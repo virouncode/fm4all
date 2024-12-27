@@ -1,4 +1,11 @@
+import { Metadata } from "next";
 import ServiceCards from "./ServiceCards";
+
+export const metadata: Metadata = {
+  title: "Nos services",
+  description:
+    "Découvrez les services de Facility Management proposés par fm4all.",
+};
 
 const ServicesPage = () => {
   return (

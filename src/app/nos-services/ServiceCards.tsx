@@ -1,34 +1,12 @@
-"use client";
-
 import ImgCardVertical from "@/components/cards/ImgCardVertical";
 import Link from "next/link";
-import { useRef, useEffect } from "react";
 
 const ServiceCards = () => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const items = Array.from(containerRef.current.children) as HTMLElement[];
-    const lastOffsetTop = items[items.length - 1].offsetTop;
-    items.forEach((item) => {
-      if (item.offsetTop === lastOffsetTop) {
-        item.classList.remove("flex-1");
-        item.classList.add("w-[calc(25%-18px)]");
-      }
-    });
-  }, []);
   return (
-    <div
-      className="flex flex-wrap gap-6 items-center mt-6 w-full"
-      ref={containerRef}
-    >
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 items-center mt-6 w-full">
       <ImgCardVertical
         src="https://picsum.photos/350/300"
-        alt="service1"
-        className="flex-1 min-w-[250px]"
-        width={350}
-        height={300}
+        alt="illustration-nettoyage"
       >
         <div className="p-4 flex flex-col gap-4 h-56">
           <p className="text-2xl">Nettoyage</p>
@@ -45,10 +23,7 @@ const ServiceCards = () => {
       </ImgCardVertical>
       <ImgCardVertical
         src="https://picsum.photos/350/300"
-        alt="service1"
-        className="flex-1 min-w-[250px]"
-        width={350}
-        height={300}
+        alt="illustration-cafe"
       >
         <div className="p-4 flex flex-col gap-4 h-56">
           <p className="text-2xl">Café</p>
@@ -65,10 +40,7 @@ const ServiceCards = () => {
       </ImgCardVertical>
       <ImgCardVertical
         src="https://picsum.photos/350/300"
-        alt="service1"
-        className="flex-1 min-w-[250px]"
-        width={350}
-        height={300}
+        alt="illustration-fontaine-a-eau"
       >
         <div className="p-4 flex flex-col gap-4 h-56">
           <p className="text-2xl">Fontaine à eau</p>
@@ -85,10 +57,7 @@ const ServiceCards = () => {
       </ImgCardVertical>
       <ImgCardVertical
         src="https://picsum.photos/350/300"
-        alt="service1"
-        className="flex-1 min-w-[250px]"
-        width={350}
-        height={300}
+        alt="illustration-maintenance"
       >
         <div className="p-4 flex flex-col gap-4 h-56">
           <p className="text-2xl">Maintenance</p>
@@ -105,10 +74,7 @@ const ServiceCards = () => {
       </ImgCardVertical>
       <ImgCardVertical
         src="https://picsum.photos/350/300"
-        alt="service1"
-        className="flex-1 min-w-[250px]"
-        width={350}
-        height={300}
+        alt="illustration-securite-incendie"
       >
         <div className="p-4 flex flex-col gap-4 h-56">
           <p className="text-2xl">Sécurité incendie</p>
@@ -125,10 +91,7 @@ const ServiceCards = () => {
       </ImgCardVertical>
       <ImgCardVertical
         src="https://picsum.photos/350/300"
-        alt="service1"
-        className="flex-1 min-w-[250px]"
-        width={350}
-        height={300}
+        alt="illustration-accueil"
       >
         <div className="p-4 flex flex-col gap-4 h-56">
           <p className="text-2xl">Office Manager</p>
@@ -145,10 +108,7 @@ const ServiceCards = () => {
       </ImgCardVertical>
       <ImgCardVertical
         src="https://picsum.photos/350/300"
-        alt="service1"
-        className="flex-1 min-w-[250px]"
-        width={350}
-        height={300}
+        alt="illustration-accueil"
       >
         <div className="p-4 flex flex-col gap-4 h-56">
           <p className="text-2xl">Accueil</p>
@@ -165,10 +125,7 @@ const ServiceCards = () => {
       </ImgCardVertical>
       <ImgCardVertical
         src="https://picsum.photos/350/300"
-        alt="service1"
-        className="flex-1 min-w-[250px]"
-        width={350}
-        height={300}
+        alt="illustration-petits-travaux"
       >
         <div className="p-4 flex flex-col gap-4 h-56">
           <p className="text-2xl">Petits travaux</p>
@@ -185,10 +142,7 @@ const ServiceCards = () => {
       </ImgCardVertical>
       <ImgCardVertical
         src="https://picsum.photos/350/300"
-        alt="service1"
-        className="flex-1 min-w-[250px]"
-        width={350}
-        height={300}
+        alt="illustration-snacks"
       >
         <div className="p-4 flex flex-col gap-4 h-56">
           <p className="text-2xl">Snacks & fruits</p>
@@ -205,10 +159,7 @@ const ServiceCards = () => {
       </ImgCardVertical>
       <ImgCardVertical
         src="https://picsum.photos/350/300"
-        alt="service1"
-        className="flex-1 min-w-[250px]"
-        width={350}
-        height={300}
+        alt="illustration-agent-de-securite"
       >
         <div className="p-4 flex flex-col gap-4 h-56">
           <p className="text-2xl">Agent de sécurité</p>

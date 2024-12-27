@@ -15,7 +15,9 @@ const ImgCardHorizontal = ({
 }: PropsWithChildren<ImgCardHorizontalProps>) => {
   return (
     <div className={`flex items-center gap-6 w-[300px] ${className}`}>
-      <Image src={src} alt={alt} width={100} height={100} />
+      <div className="h-[80px] w-[80px] relative">
+        <Image src={src} alt={alt} fill={true} />
+      </div>
       {children}
     </div>
   );

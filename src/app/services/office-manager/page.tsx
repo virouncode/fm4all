@@ -1,4 +1,11 @@
+import { Metadata } from "next";
 import Image from "next/image";
+
+export const metadata: Metadata = {
+  title: "Services: Office Manager",
+  description:
+    "Hospitality, Office ou Facility Manager, une personne dédiée chez vous dès ½ journée par semaine.",
+};
 
 const page = () => {
   return (

@@ -1,5 +1,3 @@
-"use client";
-
 import ImgCardVertical from "@/components/cards/ImgCardVertical";
 import Link from "next/link";
 
@@ -7,13 +5,10 @@ const Articles = () => {
   return (
     <section className="max-w-7xl  w-full mx-auto flex flex-col gap-10 p-6 mt-10">
       <h2 className="text-3xl border-l-2 px-4">Nos derniers articles</h2>
-      <div className="flex flex-wrap gap-6 items-center">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 items-center">
         <ImgCardVertical
           src="https://picsum.photos/400/300"
-          alt="service1"
-          className="flex-1 min-w-[250px]"
-          width={400}
-          height={300}
+          alt="illustration-article-le-fm-cest-quoi"
         >
           <div className="p-4 flex flex-col gap-4 h-52">
             <p className="text-2xl">Le FM c&apos;est quoi ?</p>
@@ -30,10 +25,7 @@ const Articles = () => {
         </ImgCardVertical>
         <ImgCardVertical
           src="https://picsum.photos/400/300"
-          alt="service1"
-          className="flex-1 min-w-[250px]"
-          width={400}
-          height={300}
+          alt="illustration-article-les-missions-du-fm"
         >
           <div className="p-4 flex flex-col gap-4 h-52">
             <p className="text-2xl">Les différentes missions du FM</p>
@@ -50,10 +42,7 @@ const Articles = () => {
         </ImgCardVertical>
         <ImgCardVertical
           src="https://picsum.photos/400/300"
-          alt="service1"
-          className="flex-1 min-w-[250px]"
-          width={400}
-          height={300}
+          alt="illustration-article-lexternalisation-du-fm"
         >
           <div className="p-4 flex flex-col gap-4 h-52">
             <p className="text-2xl">Histoire de l&apos;externalisation du FM</p>

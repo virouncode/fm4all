@@ -1,4 +1,11 @@
+import { Metadata } from "next";
 import Image from "next/image";
+
+export const metadata: Metadata = {
+  title: "Services: Securité incendie",
+  description:
+    "BAES, éxtincteurs, détecteurs de fumée, alarme incendie, laissez nos experts vérifier vos installations.",
+};
 
 const page = () => {
   return (

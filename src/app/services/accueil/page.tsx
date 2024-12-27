@@ -1,4 +1,10 @@
+import { Metadata } from "next";
 import Image from "next/image";
+
+export const metadata: Metadata = {
+  title: "Services: Accueil",
+  description: "Mettez en place un accueil physique qui vous ressemble.",
+};
 
 const page = () => {
   return (

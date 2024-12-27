@@ -15,7 +15,7 @@ const Process = () => {
           src="/img/ourprocess1.png"
           alt="notre-process-1-logo"
         >
-          <div className="flex1">
+          <div className="flex-1">
             <h3 className="text-xl">1. MES LOCAUX</h3>
             <div className="flex gap-2 items-center">
               <House />
@@ -29,7 +29,7 @@ const Process = () => {
           src="/img/ourprocess2.png"
           alt="notre-process-2-logo"
         >
-          <div className="flex1">
+          <div className="flex-1">
             <h3 className="text-xl">2. MES SERVICES</h3>
             <div className="flex gap-2 items-center">
               <HandPlatter />
@@ -41,7 +41,7 @@ const Process = () => {
           src="/img/ourprocess3.png"
           alt="notre-process-2-logo"
         >
-          <div className="flex1">
+          <div className="flex-1">
             <h3 className="text-xl">3. MES GAMMES</h3>
             <div className="flex gap-2 items-center">
               <Star />
@@ -53,7 +53,7 @@ const Process = () => {
           src="/img/ourprocess4.png"
           alt="notre-process-3-logo"
         >
-          <div className="flex1">
+          <div className="flex-1">
             <h3 className="text-xl">4. MES PRIX</h3>
             <div className="flex gap-2 items-center">
               <Euro />
@@ -65,7 +65,7 @@ const Process = () => {
           src="/img/ourprocess5.png"
           alt="notre-process-4-logo"
         >
-          <div className="flex1">
+          <div className="flex-1">
             <h3 className="text-xl">5. MON CONTRAT</h3>
             <div className="flex gap-2 items-center">
               <ReceiptText />

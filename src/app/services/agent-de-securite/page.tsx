@@ -1,4 +1,10 @@
+import { Metadata } from "next";
 import Image from "next/image";
+
+export const metadata: Metadata = {
+  title: "Services: Agent de sécurité",
+  description: "Télésurveillance ou présence sur site",
+};
 
 const page = () => {
   return (

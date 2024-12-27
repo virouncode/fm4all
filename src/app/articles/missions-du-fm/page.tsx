@@ -1,3 +1,11 @@
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Missions du FM",
+  description:
+    "Les missions du Facility Management sont nombreuses. Découvrez les différentes tâches que peut accomplir un Facility Manager.",
+};
+
 const page = () => {
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">

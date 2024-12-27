@@ -1,3 +1,11 @@
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Nos 3 gammes",
+  description:
+    "Découvrez nos 3 gammes de services pour le Facility Management.",
+};
+
 const TroisGammesPage = () => {
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">

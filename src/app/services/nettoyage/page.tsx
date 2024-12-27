@@ -1,4 +1,10 @@
+import { Metadata } from "next";
 import Image from "next/image";
+
+export const metadata: Metadata = {
+  title: "Services: Nettoyage",
+  description: "D'un passage hebdomadaire à un(e) gouvernant(e) premium",
+};
 
 const page = () => {
   return (

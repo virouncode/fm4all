@@ -1,3 +1,11 @@
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Devenez Prestataire",
+  description:
+    "Vous êtes prestataire de service ? fm4all vous propose de devenir partenaire.",
+};
+
 const PrestatairesPage = () => {
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">

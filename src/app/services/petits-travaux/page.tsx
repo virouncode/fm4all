@@ -1,4 +1,11 @@
+import { Metadata } from "next";
 import Image from "next/image";
+
+export const metadata: Metadata = {
+  title: "Services: Petits travaux",
+  description:
+    "Plomberie, électricité, peinture, second oeuvre, confiez vos petits travaux récurrents à un prestataire de confiance.",
+};
 
 const page = () => {
   return (

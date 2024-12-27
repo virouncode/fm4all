@@ -15,13 +15,11 @@ const Services = () => {
           <Link href="/nos-services">Tous les services</Link>
         </Button>
       </div>
-      <div className="flex flex-wrap gap-6 items-center">
+      {/* <div className="flex flex-wrap gap-6 items-center"> */}
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6 items-center">
         <ImgCardVertical
           src="https://picsum.photos/350/300"
-          alt="service1"
-          className="flex-1 min-w-[250px]"
-          width={350}
-          height={300}
+          alt="illustration-nettoyage"
         >
           <div className="p-4 flex flex-col gap-4 h-52">
             <p className="text-2xl">Nettoyage</p>
@@ -38,10 +36,7 @@ const Services = () => {
         </ImgCardVertical>
         <ImgCardVertical
           src="https://picsum.photos/350/300"
-          alt="service1"
-          className="flex-1 min-w-[250px]"
-          width={350}
-          height={300}
+          alt="illustration-cafe"
         >
           <div className="p-4 flex flex-col gap-4 h-52">
             <p className="text-2xl">Café</p>
@@ -58,10 +53,7 @@ const Services = () => {
         </ImgCardVertical>
         <ImgCardVertical
           src="https://picsum.photos/350/300"
-          alt="service1"
-          className="flex-1 min-w-[250px]"
-          width={350}
-          height={300}
+          alt="illustration-fontaine-a-eau"
         >
           <div className="p-4 flex flex-col gap-4 h-52">
             <p className="text-2xl">Fontaine à eau</p>
@@ -78,10 +70,7 @@ const Services = () => {
         </ImgCardVertical>
         <ImgCardVertical
           src="https://picsum.photos/350/300"
-          alt="service1"
-          className="flex-1 min-w-[250px]"
-          width={350}
-          height={300}
+          alt="illustration-maintenance"
         >
           <div className="p-4 flex flex-col gap-4 h-52">
             <p className="text-2xl">Maintenance</p>

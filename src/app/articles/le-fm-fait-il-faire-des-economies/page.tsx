@@ -1,3 +1,11 @@
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "FM=économies ?",
+  description:
+    "Le Facility Management fait-il faire des économies ? Oui. Mais il faut savoir ce que l'on mesure et avoir des attentes réalistes !",
+};
+
 const page = () => {
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">

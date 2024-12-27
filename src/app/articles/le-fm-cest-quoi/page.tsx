@@ -1,4 +1,10 @@
+import { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Le FM",
+  description: "Qu'est-ce qu'un facility manager",
+};
 
 const page = () => {
   return (
@@ -73,7 +79,10 @@ const page = () => {
             </p>
             <p>
               Je vous invite à lire notre article sur l&apos;
-              <Link className="underline text-blue-500" href="/">
+              <Link
+                className="underline text-blue-500"
+                href="/articles/histoire-du-nettoyage"
+              >
                 histoire du nettoyage: Des femmes de ménage au nettoyage
                 industriel.
               </Link>{" "}

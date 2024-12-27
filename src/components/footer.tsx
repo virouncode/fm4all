@@ -2,11 +2,11 @@ import Link from "next/link";
 
 const Footer = () => {
   return (
-    <footer className="mt-10 bg-cyan-900">
+    <footer className="mt-10 bg-cyan-900 hidden md:block">
       <div className="max-w-7xl mx-auto p-6">
-        <div className="flex gap-10 w-2/3">
-          <div className="flex flex-col gap-6 w-1/4">
-            <p className="text-slate-200">fm4all</p>
+        <div className="flex gap-6 w-2/3">
+          <div className="flex flex-col gap-4">
+            <p className="text-slate-200 text-xl">fm4all</p>
             <ul>
               <li>
                 <Link href="/contact">Nous contacter</Link>
@@ -17,45 +17,96 @@ const Footer = () => {
               <li>Touts droits résérvés &copy;fm4all</li>
             </ul>
           </div>
-          <div className="flex flex-col gap-6 w-1/4">
-            <p className="text-slate-200">Facility Managment</p>
+          <div className="flex flex-col gap-4 ">
+            <p className="text-slate-200 text-xl">Facility Managment</p>
             <ul>
               <li>
-                <Link href="/contact">Nos 3 gammes</Link>
+                <Link href="/nos-3-gammes">Nos 3 gammes</Link>
               </li>
               <li>
-                <Link href="/contact">Nos services</Link>
+                <Link href="/nos-services">Nos services</Link>
               </li>
               <li>
-                <Link href="/contact">Nos engagements</Link>
+                <Link href="/nos-engagements">Nos engagements</Link>
               </li>
               <li>
-                <Link href="/contact">Hof Managers</Link>
+                <Link href="/hof-managers">Hof Managers</Link>
               </li>
               <li>
-                <Link href="/contact">Le FM c'est quoi ?</Link>
+                <Link href="/articles/le-fm-cest-quoi">
+                  Le FM c&apos;est quoi ?
+                </Link>
               </li>
               <li>
-                <Link href="/contact">Les différentes missions du FM</Link>
+                <Link href="/articles/missions-du-fm">
+                  Les différentes missions du FM
+                </Link>
               </li>
               <li>
-                <Link href="/contact">Le FM fait-il faire des économies ?</Link>
+                <Link href="/articles/le-fm-fait-il-faire-des-economies">
+                  Le FM fait-il faire des économies ?
+                </Link>
               </li>
               <li>
-                <Link href="/contact">Histoire de l'externalisation du FM</Link>
+                <Link href="/articles/lexternalisation-du-fm">
+                  Histoire de l&apos;externalisation du FM
+                </Link>
               </li>
               <li>
-                <Link href="/contact">Histoire du nettoyage industriel</Link>
+                <Link href="/articles/histoire-du-nettoyage">
+                  Histoire du nettoyage industriel
+                </Link>
               </li>
             </ul>
           </div>
-          <div className="flex flex-col gap-6 w-1/4">
-            <p className="text-slate-200">Services</p>
-            <ul></ul>
+          <div className="flex flex-col gap-4 ">
+            <p className="text-slate-200 text-xl">Services</p>
+            <ul>
+              <li>
+                <Link href="/services/nettoyage">Nettoyage</Link>
+              </li>
+              <li>
+                <Link href="/services/cafe">Café</Link>
+              </li>
+              <li>
+                <Link href="/services/eau">Fontaine à eau</Link>
+              </li>
+              <li>
+                <Link href="/services/maintenance">
+                  Maintenance règlementaire
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/securite-incendie">
+                  Sécurité incendie
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/office-manager">Office manager</Link>
+              </li>
+              <li>
+                <Link href="/services/accueil">Accueil</Link>
+              </li>
+              <li>
+                <Link href="/services/petits-travaux">Petits travaux</Link>
+              </li>
+              <li>
+                <Link href="/services/snack">Snack & fruits</Link>
+              </li>
+              <li>
+                <Link href="/services/agent-de-securite">
+                  Agent de sécurité
+                </Link>
+              </li>
+            </ul>
           </div>
-          <div className="flex flex-col gap-6 w-1/4">
-            <p className="text-slate-200">Prestataires</p>
-            <ul></ul>
+          <div className="flex flex-col gap-4 ">
+            <p className="text-slate-200 text-xl">Prestataires</p>
+            <ul>
+              <li>
+                <Link href="/devenir-prestataire">Devenir prestataire</Link>
+              </li>
+            </ul>
           </div>
         </div>
       </div>

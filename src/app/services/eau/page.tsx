@@ -1,4 +1,10 @@
+import { Metadata } from "next";
 import Image from "next/image";
+
+export const metadata: Metadata = {
+  title: "Services: Eau",
+  description: "Découvrez notre sélection de fontaines à eau.",
+};
 
 const page = () => {
   return (

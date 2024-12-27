@@ -1,3 +1,11 @@
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Externalisation du FM",
+  description:
+    "Externaliser le Facility Management, c'est possible pour toutes les tailles d'entreprises. Découvrez comment fm4all démocratise le FM pour tous.",
+};
+
 const page = () => {
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
