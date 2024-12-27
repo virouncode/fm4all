@@ -24,7 +24,6 @@ const ImgCardVertical = ({
       <div>
         <Image src={src} alt={alt} width={width} height={height} />
       </div>
-
       {children}
     </div>
   );

@@ -7,8 +7,10 @@ const Process = () => {
       className="max-w-7xl w-full mx-auto flex flex-col gap-10 p-6 mt-10"
       id="process"
     >
-      <h2 className="text-3xl border-l-2 px-4">Comment ça marche ?</h2>
-      <div className="flex flex-wrap justify-center align-center gap-x-4 gap-y-8">
+      <h2 className="text-2xl md:text-3xl border-l-2 px-4">
+        Comment ça marche ?
+      </h2>
+      <div className="flex flex-wrap justify-center align-center gap-x-24 gap-y-8">
         <ImgCardHorizontal
           src="/img/ourprocess1.png"
           alt="notre-process-1-logo"
@@ -67,7 +69,7 @@ const Process = () => {
             <h3 className="text-xl">5. MON CONTRAT</h3>
             <div className="flex gap-2 items-center">
               <ReceiptText />
-              <p>Je valide la date de démarrage 🚀 !</p>
+              <p>Je valide la date de démarrage et go 🚀 !</p>
             </div>
           </div>
         </ImgCardHorizontal>

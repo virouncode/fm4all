@@ -3,14 +3,16 @@ import Hero from "./Hero";
 import HofManager from "./HofManager";
 import Process from "./Process";
 import Services from "./Services";
+import VideoPresentation from "./VideoPresentation";
 
 export default function Home() {
   return (
     <main className="flex flex-col">
       <Hero />
       <Process />
-      <HofManager />
+      <VideoPresentation />
       <Services />
+      <HofManager />
       <Articles />
     </main>
   );

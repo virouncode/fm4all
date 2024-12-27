@@ -10,7 +10,7 @@ import Link from "next/link";
 
 const HofManager = () => {
   return (
-    <section className="w-full max-w-7xl mx-auto h-[600px] mt-10 p-4">
+    <section className="hidden md:block w-full max-w-7xl mx-auto h-[600px] mt-10 p-4">
       <div className="h-full bg-hof-img bg-cover bg-no-repeat rounded-lg flex items-end ">
         <Card className="w-1/3 ml-10 mb-10">
           <CardHeader>

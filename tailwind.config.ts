@@ -13,6 +13,12 @@ export default {
         "hero-img": "url('https://picsum.photos/1400/800')",
         "hof-img": "url('https://picsum.photos/800/400')",
       },
+      listStyleType: {
+        rocket: '"🚀  "',
+        thumb: '"👍  "',
+        handshake: '"🤝  "',
+        smile: '"😊  "',
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",

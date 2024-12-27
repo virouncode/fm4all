@@ -1,3 +1,5 @@
+"use client";
+
 import ImgCardVertical from "@/components/cards/ImgCardVertical";
 import Link from "next/link";
 
@@ -20,7 +22,7 @@ const Articles = () => {
               Facility Management, Facility ser...
             </p>
             <div className="flex-1">
-              <Link className="underline" href="/services/nettoyage">
+              <Link className="underline" href="/articles/le-fm-cest-quoi">
                 Lire l&apos;article
               </Link>
             </div>
@@ -40,7 +42,7 @@ const Articles = () => {
               maintenance préventive, aménageme...
             </p>
             <div className="flex-1">
-              <Link className="underline" href="/services/cafe">
+              <Link className="underline" href="/articles/missions-du-fm">
                 Lire l&apos;article
               </Link>
             </div>
@@ -60,7 +62,10 @@ const Articles = () => {
               les balbutiements du métier dès le...
             </p>
             <div className="flex-1">
-              <Link className="underline" href="/services/eau">
+              <Link
+                className="underline"
+                href="/articles/lexternalisation-du-fm"
+              >
                 Lire l&apos;article
               </Link>
             </div>

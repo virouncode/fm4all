@@ -7,8 +7,12 @@ const Services = () => {
     <section className="max-w-7xl  w-full mx-auto flex flex-col gap-10 p-6 mt-10">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl border-l-2 px-4">Nos services</h2>
-        <Button variant="outline" title="Tous les services">
-          <Link href="/services">Tous les services</Link>
+        <Button
+          variant="outline"
+          className="hidden md:block"
+          title="Tous les services"
+        >
+          <Link href="/nos-services">Tous les services</Link>
         </Button>
       </div>
       <div className="flex flex-wrap gap-6 items-center">
@@ -93,8 +97,11 @@ const Services = () => {
           </div>
         </ImgCardVertical>
       </div>
-      <div className="flex-1 flex gap-20 text-lg text-justify">
-        <div className="w-1/2 flex flex-col gap-4">
+      <Link href="/nos-services" className="underline text-blue-500 text-xl">
+        Tous les services
+      </Link>
+      <div className="flex-1 flex flex-col md:flex-row gap-4 md:gap-20 text-lg text-justify">
+        <div className="w-full md:w-1/2 flex flex-col gap-4">
           <p>
             Parce que toutes les entreprises devraient pouvoir s&apos;offrir des
             services de <strong>Facility Management</strong>, nous avons créé{" "}
@@ -108,7 +115,7 @@ const Services = () => {
             personnalisés.
           </p>
         </div>
-        <div className="w-1/2 flex flex-col gap-4">
+        <div className="w-full md:w-1/2 flex flex-col gap-4">
           <p>
             En quelques clics, <strong>cherchez, comparez et déléguez</strong>{" "}
             la gestion de vos contrats de services au bureau. Hospitality

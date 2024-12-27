@@ -35,7 +35,7 @@ const ContactForm = () => {
         <InputWithLabel<ContactType>
           fieldTitle="Email"
           nameInSchema="email"
-          className="text-base py-6 w-full md:max-w-none"
+          className="text-base py-6 w-full max-w-none"
         />
         <div className="text-center">
           <Button
@@ -43,6 +43,7 @@ const ContactForm = () => {
             title="Rejoindre la liste d'attente"
             variant="outline"
             size="lg"
+            className="w-full md:w-auto"
           >
             Rejoindre la liste d&apos;attente
           </Button>
