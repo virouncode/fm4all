@@ -2,11 +2,11 @@ import Link from "next/link";
 
 const Footer = () => {
   return (
-    <footer className="mt-10 bg-cyan-900 hidden md:block">
+    <footer className="mt-10 bg-fm4allsecondary hidden md:block">
       <div className="max-w-7xl mx-auto p-6">
         <div className="flex gap-6 w-2/3">
           <div className="flex flex-col gap-4">
-            <p className="text-slate-200 text-xl">fm4all</p>
+            <p className="text-secondary text-xl">fm4all</p>
             <ul>
               <li>
                 <Link href="/contact">Nous contacter</Link>
@@ -18,7 +18,7 @@ const Footer = () => {
             </ul>
           </div>
           <div className="flex flex-col gap-4 ">
-            <p className="text-slate-200 text-xl">Facility Managment</p>
+            <p className="text-secondary text-xl">Facility Managment</p>
             <ul>
               <li>
                 <Link href="/nos-3-gammes">Nos 3 gammes</Link>
@@ -60,7 +60,7 @@ const Footer = () => {
             </ul>
           </div>
           <div className="flex flex-col gap-4 ">
-            <p className="text-slate-200 text-xl">Services</p>
+            <p className="text-secondary text-xl">Services</p>
             <ul>
               <li>
                 <Link href="/services/nettoyage">Nettoyage</Link>
@@ -101,7 +101,7 @@ const Footer = () => {
             </ul>
           </div>
           <div className="flex flex-col gap-4 ">
-            <p className="text-slate-200 text-xl">Prestataires</p>
+            <p className="text-secondary text-xl">Prestataires</p>
             <ul>
               <li>
                 <Link href="/devenir-prestataire">Devenir prestataire</Link>

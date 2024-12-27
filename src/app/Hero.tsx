@@ -6,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import Link from "next/link";
 
 const Hero = () => {
   return (
@@ -40,11 +39,12 @@ const Hero = () => {
           <div className="w-full flex justify-center">
             <Button
               title="Mon devis en ligne"
-              variant="outline"
+              variant="destructive"
               size="lg"
-              className="w-full md:w-auto"
+              className="w-full md:w-auto text-base"
             >
-              <Link href="/mon-devis">Je réalise mon devis en ligne</Link>
+              {/* <Link href="/mon-devis">Je réalise mon devis en ligne</Link> */}
+              Mon devis en ligne
             </Button>
           </div>
         </CardContent>

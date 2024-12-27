@@ -19,13 +19,13 @@ const TroisGammesPage = () => {
             </p>
           </div>
           <div className="flex flex-wrap gap-10 justify-center mx-auto text-2xl mb-10">
-            <div className="w-44  text-center p-10 bg-teal-500 rounded-lg text-slate-100 font-bold">
+            <div className="w-44  text-center p-10 bg-fm4allessential rounded-lg text-secondary font-bold">
               Essentiel
             </div>
-            <div className="w-44 text-center p-10 bg-cyan-500 rounded-lg text-slate-100 font-bold">
+            <div className="w-44 text-center p-10 bg-fm4allcomfort rounded-lg text-secondary font-bold">
               Confort
             </div>
-            <div className="w-44 text-center p-10 bg-blue-950 rounded-lg text-slate-100 font-bold">
+            <div className="w-44 text-center p-10 bg-fm4allexcellence rounded-lg text-secondary font-bold">
               Excellence
             </div>
           </div>
@@ -33,7 +33,7 @@ const TroisGammesPage = () => {
         <div className="flex flex-col gap-16">
           <div className="flex flex-col gap-4 text-xl">
             <div className="flex flex-col gap-4 mx-auto max-w-prose text-justify">
-              <h2 className="border-l-4 border-teal-500 px-4 text-3xl text-teal-500">
+              <h2 className="border-l-4 border-fm4allessential px-4 text-3xl text-fm4allessential">
                 Gamme Essentiel
               </h2>
               <p className="md:ml-10">
@@ -46,7 +46,7 @@ const TroisGammesPage = () => {
           </div>
           <div className="flex flex-col gap-4 text-xl">
             <div className="flex flex-col gap-4 mx-auto max-w-prose text-justify">
-              <h2 className="border-l-4 border-cyan-400 px-4 text-3xl text-cyan-400">
+              <h2 className="border-l-4 border-fm4allcomfort px-4 text-3xl text-fm4allcomfort">
                 Gamme Confort
               </h2>
               <p className="md:ml-10">
@@ -60,7 +60,7 @@ const TroisGammesPage = () => {
           </div>
           <div className="flex flex-col gap-4 text-xl">
             <div className="flex flex-col gap-4 mx-auto max-w-prose text-justify">
-              <h2 className="border-l-2 border-blue-950 px-4 text-3xl text-blue-950">
+              <h2 className="border-l-4 border-fm4allexcellence px-4 text-3xl text-fm4allexcellence">
                 Gamme Excellence
               </h2>
               <p className="md:ml-10">
