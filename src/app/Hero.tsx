@@ -13,10 +13,10 @@ const Hero = () => {
       className="flex items-center justify-center h-[calc(100vh-4rem)] bg-hero-img bg-cover bg-no-repeat"
       id="hero"
     >
-      <Card className="w-3/4 md:w-1/2 py-4">
+      <Card className="w-3/4 md:w-1/2 p-4">
         <CardHeader>
           <CardTitle>
-            <h1 className="text-3xl text-center md:text-4xl ">
+            <h1 className="text-3xl text-center md:text-4xl text-fm4allsecondary text-pretty">
               Facility Management For All
             </h1>
           </CardTitle>
