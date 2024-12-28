@@ -42,7 +42,7 @@ export default function RootLayout({
       <body className={`${didact.className} antialiased scroll-smooth`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >
