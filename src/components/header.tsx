@@ -149,7 +149,9 @@ const Header = () => {
                 <Link href="/hof-managers">HOF Managers</Link>
               </div>
               <div
-                className="hidden max-[600px]:flex gap-4 items-center "
+                className={`hidden max-[600px]:flex gap-4 items-center ${
+                  isActive("/devenir-prestataire") ? "text-destructive" : ""
+                }`}
                 onClick={handleHideMobileNav}
               >
                 <HandPlatter size={30} />
