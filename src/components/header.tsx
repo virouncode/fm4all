@@ -3,10 +3,18 @@ import { Button } from "@/components/ui/button";
 import { CircleUser, HandPlatter, Home, Menu, Star, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const Header = () => {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const path = usePathname();
+
+  const isActive = (href: string) => {
+    console.log(path, href);
+
+    return path === href;
+  };
   const handleShowMobileNav = () => {
     setIsMobileNavOpen(true);
   };
@@ -26,19 +34,35 @@ const Header = () => {
             />
           </Link>
           <nav className="hidden lg:flex items-center gap-4">
-            <div className="hidden lg:flex gap-1 items-center">
+            <div
+              className={`flex gap-1 items-center ${
+                isActive("/") ? "text-destructive" : ""
+              }`}
+            >
               <Home size={15} />
               <Link href="/">Home</Link>
             </div>
-            <div className="flex gap-1 items-center">
+            <div
+              className={`flex gap-1 items-center ${
+                isActive("/nos-services") ? "text-destructive" : ""
+              }`}
+            >
               <HandPlatter size={15} />
               <Link href="/nos-services">Nos services</Link>
             </div>
-            <div className="flex gap-1 items-center">
+            <div
+              className={`flex gap-1 items-center ${
+                isActive("/nos-3-gammes") ? "text-destructive" : ""
+              }`}
+            >
               <Star size={15} />
               <Link href="/nos-3-gammes">Nos 3 gammes</Link>
             </div>
-            <div className="flex gap-1 items-center">
+            <div
+              className={`flex gap-1 items-center ${
+                isActive("/hof-managers") ? "text-destructive" : ""
+              }`}
+            >
               <CircleUser size={15} />
               <Link href="/hof-managers">HOF Managers</Link>
             </div>
@@ -81,35 +105,43 @@ const Header = () => {
         >
           <div className="flex flex-col gap-4 ">
             <div
-              className="flex gap-4 items-center"
+              className={`flex gap-4 items-center ${
+                isActive("/") ? "text-destructive" : ""
+              }`}
               onClick={handleHideMobileNav}
             >
               <Home size={30} />
               <Link href="/">Home</Link>
             </div>
             <div
-              className="flex gap-4 items-center"
+              className={`flex gap-4 items-center ${
+                isActive("/nos-services") ? "text-destructive" : ""
+              }`}
               onClick={handleHideMobileNav}
             >
               <HandPlatter size={30} />
               <Link href="/nos-services">Nos services</Link>
             </div>
             <div
-              className="flex gap-4 items-center"
+              className={`flex gap-4 items-center ${
+                isActive("/nos-3-gammes") ? "text-destructive" : ""
+              }`}
               onClick={handleHideMobileNav}
             >
               <Star size={30} />
               <Link href="/nos-3-gammes">Nos 3 gammes</Link>
             </div>
             <div
-              className="flex gap-4 items-center"
+              className={`flex gap-4 items-center ${
+                isActive("/hof-managers") ? "text-destructive" : ""
+              }`}
               onClick={handleHideMobileNav}
             >
               <CircleUser size={30} />
               <Link href="/hof-managers">HOF Managers</Link>
             </div>
             <div
-              className="max-[540px]:flex gap-4 items-center hidden"
+              className="hidden max-[540px]:flex gap-4 items-center "
               onClick={handleHideMobileNav}
             >
               <HandPlatter size={30} />
