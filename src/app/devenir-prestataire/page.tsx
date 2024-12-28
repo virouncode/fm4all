@@ -12,7 +12,7 @@ const PrestatairesPage = () => {
       <article className="mt-6 flex flex-col gap-10">
         <h1 className="text-4xl">Devenir prestataire</h1>
         <div className="flex flex-col gap-6 text-xl max-w-prose mx-auto hyphens-auto text-wrap">
-          <h2 className="text-3xl text-center">
+          <h2 className="text-2xl text-center">
             Vous êtes prestataire de service ? <br />
             Vous cherchez à développer votre activité ?
           </h2>
