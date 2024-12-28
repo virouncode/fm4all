@@ -2,6 +2,7 @@ import Footer from "@/components/footer";
 import Header from "@/components/header";
 import type { Metadata } from "next";
 import { Didact_Gothic } from "next/font/google";
+
 import "./globals.css";
 
 // const geistSans = Geist({
@@ -10,7 +11,7 @@ import "./globals.css";
 // });
 
 const didact = Didact_Gothic({
-  // variable: "--font-didact-sans",
+  variable: "--font-didact-sans",
   weight: "400",
   subsets: ["latin"],
   display: "swap",

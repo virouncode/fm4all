@@ -18,7 +18,7 @@ const Process = () => {
           <div className="flex-1">
             <h3 className="text-xl">1. MES LOCAUX</h3>
             <div className="flex gap-2 items-center">
-              <House />
+              <House size={30} />
               <p>
                 Je précise m<sup>2</sup>, type et effectif
               </p>
@@ -32,7 +32,7 @@ const Process = () => {
           <div className="flex-1">
             <h3 className="text-xl">2. MES SERVICES</h3>
             <div className="flex gap-2 items-center">
-              <HandPlatter />
+              <HandPlatter size={40} />
               <p>Je sélectionne ce qui m&apos;intéresse à la carte</p>
             </div>
           </div>
@@ -44,7 +44,7 @@ const Process = () => {
           <div className="flex-1">
             <h3 className="text-xl">3. MES GAMMES</h3>
             <div className="flex gap-2 items-center">
-              <Star />
+              <Star size={40} />
               <p>Je choisis le niveau de chaque service</p>
             </div>
           </div>
@@ -56,7 +56,7 @@ const Process = () => {
           <div className="flex-1">
             <h3 className="text-xl">4. MES PRIX</h3>
             <div className="flex gap-2 items-center">
-              <Euro />
+              <Euro size={40} />
               <p>Je compare en ligne mes prestataires</p>
             </div>
           </div>
@@ -68,7 +68,7 @@ const Process = () => {
           <div className="flex-1">
             <h3 className="text-xl">5. MON CONTRAT</h3>
             <div className="flex gap-2 items-center">
-              <ReceiptText />
+              <ReceiptText size={40} />
               <p>Je valide la date de démarrage et go 🚀 !</p>
             </div>
           </div>
