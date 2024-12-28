@@ -19,13 +19,13 @@ const TroisGammesPage = () => {
             </p>
           </div>
           <div className="flex flex-wrap gap-10 justify-center mx-auto text-2xl mb-10">
-            <div className="w-44  text-center p-10 bg-fm4allessential rounded-lg text-secondary font-bold">
+            <div className="w-48  text-center px-6 py-10 bg-fm4allessential rounded-lg text-secondary font-bold">
               Essentiel
             </div>
-            <div className="w-44 text-center p-10 bg-fm4allcomfort rounded-lg text-secondary font-bold">
+            <div className="w-48 text-center px-6 py-10 bg-fm4allcomfort rounded-lg text-secondary font-bold">
               Confort
             </div>
-            <div className="w-44 text-center p-10 bg-fm4allexcellence rounded-lg text-secondary font-bold">
+            <div className="w-48 text-center px-6 py-10 bg-fm4allexcellence rounded-lg text-secondary font-bold">
               Excellence
             </div>
           </div>

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 const page = () => {
   return (
-    <main className="max-w-7xl mx-auto mb-24 py-4 px-20">
+    <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
       <section className="mt-6 flex flex-col gap-10">
         <h1 className="text-4xl">Maintenance règlementaire</h1>
         <p className="text-xl">

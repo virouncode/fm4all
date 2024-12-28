@@ -10,11 +10,8 @@ const Header = () => {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const path = usePathname();
 
-  const isActive = (href: string) => {
-    console.log(path, href);
+  const isActive = (href: string) => path === href;
 
-    return path === href;
-  };
   const handleShowMobileNav = () => {
     setIsMobileNavOpen(true);
   };
