@@ -12,7 +12,7 @@ const TroisGammesPage = () => {
       <article className="mt-6 flex flex-col gap-10">
         <h1 className="text-4xl">Nos 3 gammes</h1>
         <div className="flex flex-col gap-10 text-xl">
-          <div className="flex flex-col gap-4 mx-auto max-w-prose text-justify">
+          <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
             <p>
               Afin de simplifier vos choix, nous avons décliné l&apos;ensemble
               des services en <strong>3 gammes</strong> :
@@ -32,7 +32,7 @@ const TroisGammesPage = () => {
         </div>
         <div className="flex flex-col gap-16">
           <div className="flex flex-col gap-4 text-xl">
-            <div className="flex flex-col gap-4 mx-auto max-w-prose text-justify">
+            <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
               <h2 className="border-l-4 border-fm4allessential px-4 text-3xl text-fm4allessential">
                 Gamme Essentiel
               </h2>
@@ -45,7 +45,7 @@ const TroisGammesPage = () => {
             </div>
           </div>
           <div className="flex flex-col gap-4 text-xl">
-            <div className="flex flex-col gap-4 mx-auto max-w-prose text-justify">
+            <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
               <h2 className="border-l-4 border-fm4allcomfort px-4 text-3xl text-fm4allcomfort">
                 Gamme Confort
               </h2>
@@ -59,7 +59,7 @@ const TroisGammesPage = () => {
             </div>
           </div>
           <div className="flex flex-col gap-4 text-xl">
-            <div className="flex flex-col gap-4 mx-auto max-w-prose text-justify">
+            <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
               <h2 className="border-l-4 border-fm4allexcellence px-4 text-3xl text-fm4allexcellence">
                 Gamme Excellence
               </h2>

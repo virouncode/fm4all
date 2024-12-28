@@ -11,7 +11,7 @@ const page = () => {
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
       <article className="mt-6 flex flex-col gap-10">
         <h1 className="text-4xl">Le FM fait-il faire des économies ?</h1>
-        <div className="flex flex-col gap-4 text-xl max-w-prose mx-auto text-justify">
+        <div className="flex flex-col gap-4 text-xl max-w-prose mx-auto hyphens-auto text-wrap">
           <p>
             La réponse courte est &quot;Oui&quot;. Mais il faut savoir ce que
             l&apos;on mesure et avoir des attentes réalistes !<br />

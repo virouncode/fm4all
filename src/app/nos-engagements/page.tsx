@@ -11,7 +11,7 @@ const page = () => {
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
       <article className="mt-6 flex flex-col gap-10">
         <h1 className="text-4xl">Nos engagements</h1>
-        <div className="flex flex-col gap-6 text-xl max-w-prose mx-auto text-justify">
+        <div className="flex flex-col gap-6 text-xl max-w-prose mx-auto hyphens-auto text-wrap">
           <h2>
             Garantie, Simplicité, Gain de temps, Suivi opérationnel
             personnalisé, Garantie Qualité, Garantie meilleur prix... Découvrez
@@ -22,7 +22,7 @@ const page = () => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             Garantie Simplicité & Gain de temps
           </h2>
-          <div className="md:w-2/3 flex flex-col gap-4 mx-auto max-w-prose text-justify">
+          <div className="md:w-2/3 flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
             <p>
               Comparez les tarifs de centaines de partenaires en quelques clics.
             </p>
@@ -36,7 +36,7 @@ const page = () => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             Suivi opérationnel personnalisé
           </h2>
-          <div className="md:w-2/3 flex flex-col gap-4 mx-auto max-w-prose text-justify">
+          <div className="md:w-2/3 flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
             <p>Un seul point de contact pour tous vos contrats !</p>
             <p>
               Devis complémentaire, suivi qualité, facturation... On
@@ -52,7 +52,7 @@ const page = () => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             Garantie Qualité
           </h2>
-          <div className="md:w-2/3 flex flex-col gap-4 mx-auto max-w-prose text-justify">
+          <div className="md:w-2/3 flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
             <p>Nous réalisons le suivi des prestations.</p>
             <p>Nous intervenons sous 24h en cas de défauts.</p>
             <p>Nous changeons le prestataire si nécessaire.</p>
@@ -62,7 +62,7 @@ const page = () => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             Garantie meilleur prix
           </h2>
-          <div className="md:w-2/3 flex flex-col gap-4 mx-auto max-w-prose text-justify">
+          <div className="md:w-2/3 flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
             <p>Bénéficiez de nos tarifs d&apos;achats groupés.</p>
             <p>
               Gestion du quotidien : Nous gérons la relation avec les
@@ -74,7 +74,7 @@ const page = () => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             Votre contrepartie
           </h2>
-          <div className="md:w-2/3 flex flex-col gap-4 mx-auto max-w-prose text-justify">
+          <div className="md:w-2/3 flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
             <p>
               Paiement garanti : Comme un syndic de copropriété, nous
               travaillons sous forme d&apos;appel de charges. Sans frais de
@@ -91,7 +91,7 @@ const page = () => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             Vos bénéfices clients
           </h2>
-          <div className="md:w-2/3 flex flex-col gap-4 mx-auto max-w-prose text-justify">
+          <div className="md:w-2/3 flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
             <p>
               Sans engagement<sup>*</sup>.
             </p>

@@ -11,7 +11,7 @@ const page = () => {
     <main className="max-w-7xl h-[calc(100vh-4rem)] mx-auto mb-24 py-4 px-6 md:px-20">
       <section className="mt-6 flex flex-col gap-10">
         <h1 className="text-4xl">Nous contacter</h1>
-        <div className="flex flex-col gap-6 text-xl max-w-prose mx-auto text-justify items-center">
+        <div className="flex flex-col gap-6 text-xl max-w-prose mx-auto hyphens-auto text-wrap items-center">
           <p>Des questions sur nos services ou nos offres en général ?</p>
           <p>Nous sommes là.</p>
         </div>

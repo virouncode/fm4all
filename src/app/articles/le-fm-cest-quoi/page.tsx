@@ -11,7 +11,7 @@ const page = () => {
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
       <article className="mt-6 flex flex-col gap-10">
         <h1 className="text-4xl">Le FM c&apos;est quoi ?</h1>
-        <div className="flex flex-col gap-6 text-xl max-w-prose mx-auto text-justify">
+        <div className="flex flex-col gap-6 text-xl max-w-prose mx-auto hyphens-auto text-wrap">
           <h2>
             Le FM a plusieurs noms : Facility Management, IFM comme Integrated
             Facility Management, Facility services ou IFS, integrated facility
@@ -60,7 +60,7 @@ const page = () => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             Gestion interne des services
           </h2>
-          <div className="flex flex-col gap-4 mx-auto max-w-prose text-justify">
+          <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
             <p>
               Il n&apos;y a pas si longtemps (30 ans tout de même), les
               entreprises géraient en interne leurs prestations. Vous aviez des
@@ -111,7 +111,7 @@ const page = () => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             Externalisation Mono Services
           </h2>
-          <div className="flex flex-col gap-4 mx-auto max-w-prose text-justify">
+          <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
             <p>
               Il y a 30 ans, devant la demande des entreprises, la
               professionnalisation par métier a commencé à exploser (
@@ -182,7 +182,7 @@ const page = () => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             FM multi services
           </h2>
-          <div className="flex flex-col gap-4 mx-auto max-w-prose text-justify">
+          <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
             <p>
               Premiers pas vers l&apos;externalisation des services, les
               prestations sont regroupées par lots.
@@ -237,7 +237,7 @@ const page = () => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             IFM / Facility Management intégré
           </h2>
-          <div className="flex flex-col gap-4 mx-auto max-w-prose text-justify">
+          <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
             <p>
               Solution adoptée depuis de nombreuses années par nos amis
               nordiques et anglo-saxons, c&apos;est l&apos;externalisation
@@ -311,7 +311,7 @@ const page = () => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             HM / Hospitality Management
           </h2>
-          <div className="flex flex-col gap-4 mx-auto max-w-prose text-justify">
+          <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
             <p>
               J&apos;allais oublier LA dernière tendance. En effet, le happiness
               management existait avant COVID. Mais depuis que la présence au

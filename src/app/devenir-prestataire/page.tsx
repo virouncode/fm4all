@@ -11,7 +11,7 @@ const PrestatairesPage = () => {
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
       <article className="mt-6 flex flex-col gap-10">
         <h1 className="text-4xl">Devenir prestataire</h1>
-        <div className="flex flex-col gap-6 text-xl max-w-prose mx-auto text-justify">
+        <div className="flex flex-col gap-6 text-xl max-w-prose mx-auto hyphens-auto text-wrap">
           <h2 className="text-3xl text-center">
             Vous êtes prestataire de service ? <br />
             Vous cherchez à développer votre activité ?
@@ -44,7 +44,7 @@ const PrestatairesPage = () => {
             </li>
           </ul>
         </div>
-        <div className="flex flex-col gap-6 text-xl w-full mx-auto text-justify max-w-prose md:max-w-none">
+        <div className="flex flex-col gap-6 text-xl w-full mx-auto hyphens-auto text-wrap max-w-prose md:max-w-none">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             Nos engagements
           </h2>
@@ -66,7 +66,7 @@ const PrestatairesPage = () => {
             </li>
           </ul>
         </div>
-        <div className="flex flex-col gap-6 text-xl w-full mx-auto text-justify max-w-prose md:max-w-none">
+        <div className="flex flex-col gap-6 text-xl w-full mx-auto hyphens-auto text-wrap max-w-prose md:max-w-none">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             Votre contrepartie
           </h2>
@@ -95,7 +95,7 @@ const PrestatairesPage = () => {
             </li>
           </ul>
         </div>
-        <div className="flex flex-col gap-6 text-xl w-full mx-auto text-justify max-w-prose md:max-w-none">
+        <div className="flex flex-col gap-6 text-xl w-full mx-auto hyphens-auto text-wrap max-w-prose md:max-w-none">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             Le bénéfice client
           </h2>

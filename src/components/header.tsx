@@ -113,7 +113,7 @@ const Header = () => {
               onClick={handleHideMobileNav}
             >
               <HandPlatter size={30} />
-              <Link href="/hof-managers">Devenir prestataire</Link>
+              <Link href="/devenir-prestataire">Devenir prestataire</Link>
             </div>
           </div>
         </div>

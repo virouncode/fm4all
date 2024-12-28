@@ -13,7 +13,7 @@ const page = () => {
           Histoire du Nettoyage : de la &quot;femme de ménage&quot; à
           l&apos;Agent de Service de nettoyage industriel
         </h1>
-        <div className="flex flex-col gap-6 text-xl max-w-prose mx-auto text-justify">
+        <div className="flex flex-col gap-6 text-xl max-w-prose mx-auto hyphens-auto text-wrap">
           <h2>
             Il y a plus de 30 ans, les agents de nettoyage (encore appelés
             &quot;femme de ménage&quot;) étaient directement des salariés des

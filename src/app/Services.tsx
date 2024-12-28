@@ -89,7 +89,7 @@ const Services = () => {
       <Link href="/nos-services" className="underline text-blue-500 text-xl">
         Tous les services
       </Link>
-      <div className="flex-1 flex flex-col md:flex-row gap-4 md:gap-20 text-lg text-justify">
+      <div className="flex-1 flex flex-col md:flex-row gap-4 md:gap-20 text-lg hyphens-auto text-wrap">
         <div className="w-full md:w-1/2 flex flex-col gap-4">
           <p>
             Parce que toutes les entreprises devraient pouvoir s&apos;offrir des
