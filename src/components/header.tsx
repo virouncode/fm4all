@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { ModeToggle } from "./mode-toggle";
 
 const Header = () => {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
@@ -22,14 +23,17 @@ const Header = () => {
     <div className="w-full sticky top-0 h-16 bg-background z-20 shadow">
       <header className="max-w-7xl h-full flex justify-between items-center p-6 mx-auto">
         <div className="flex items-center gap-6">
-          <Link href="/">
-            <Image
-              src="/img/logo-full.png"
-              alt="Logo"
-              width={100}
-              height={23}
-            />
-          </Link>
+          <div className="relative h-[23px] w-[100px] ">
+            <Link href="/">
+              <Image
+                src="/img/logo-full.png"
+                alt="Logo"
+                fill={true}
+                quality={100}
+                className="w-full h-full object-cover"
+              />
+            </Link>
+          </div>
           <nav className="hidden lg:flex items-center gap-4">
             <div
               className={`flex gap-1 items-center ${
@@ -73,7 +77,7 @@ const Header = () => {
           <Button
             title="Devenir prestataire"
             variant="outline"
-            className="hidden min-[540px]:block"
+            className="hidden min-[600px]:block"
           >
             <Link href="/devenir-prestataire">Devenir prestataire</Link>
           </Button>
@@ -90,6 +94,9 @@ const Header = () => {
               onClick={handleShowMobileNav}
             />
           )}
+          <div className="lg:flex hidden">
+            <ModeToggle />
+          </div>
         </div>
         <div
           className={`flex items-center justify-center fixed top-16 left-0 right-0 bg-background shadow-lg h-[calc(100vh-4rem)] text-2xl  ${
@@ -100,49 +107,54 @@ const Header = () => {
           role="navigation"
           aria-label="Mobile navigation"
         >
-          <div className="flex flex-col gap-4 ">
-            <div
-              className={`flex gap-4 items-center ${
-                isActive("/") ? "text-destructive" : ""
-              }`}
-              onClick={handleHideMobileNav}
-            >
-              <Home size={30} />
-              <Link href="/">Home</Link>
-            </div>
-            <div
-              className={`flex gap-4 items-center ${
-                isActive("/nos-services") ? "text-destructive" : ""
-              }`}
-              onClick={handleHideMobileNav}
-            >
-              <HandPlatter size={30} />
-              <Link href="/nos-services">Nos services</Link>
-            </div>
-            <div
-              className={`flex gap-4 items-center ${
-                isActive("/nos-3-gammes") ? "text-destructive" : ""
-              }`}
-              onClick={handleHideMobileNav}
-            >
-              <Star size={30} />
-              <Link href="/nos-3-gammes">Nos 3 gammes</Link>
-            </div>
-            <div
-              className={`flex gap-4 items-center ${
-                isActive("/hof-managers") ? "text-destructive" : ""
-              }`}
-              onClick={handleHideMobileNav}
-            >
-              <CircleUser size={30} />
-              <Link href="/hof-managers">HOF Managers</Link>
-            </div>
-            <div
-              className="hidden max-[540px]:flex gap-4 items-center "
-              onClick={handleHideMobileNav}
-            >
-              <HandPlatter size={30} />
-              <Link href="/devenir-prestataire">Devenir prestataire</Link>
+          <div className="absolute top-4 left-6">
+            <ModeToggle />
+          </div>
+          <div className="flex flex-col gap-4">
+            <div className="flex-1 flex flex-col gap-4 ">
+              <div
+                className={`flex gap-4 items-center ${
+                  isActive("/") ? "text-destructive" : ""
+                }`}
+                onClick={handleHideMobileNav}
+              >
+                <Home size={30} />
+                <Link href="/">Home</Link>
+              </div>
+              <div
+                className={`flex gap-4 items-center ${
+                  isActive("/nos-services") ? "text-destructive" : ""
+                }`}
+                onClick={handleHideMobileNav}
+              >
+                <HandPlatter size={30} />
+                <Link href="/nos-services">Nos services</Link>
+              </div>
+              <div
+                className={`flex gap-4 items-center ${
+                  isActive("/nos-3-gammes") ? "text-destructive" : ""
+                }`}
+                onClick={handleHideMobileNav}
+              >
+                <Star size={30} />
+                <Link href="/nos-3-gammes">Nos 3 gammes</Link>
+              </div>
+              <div
+                className={`flex gap-4 items-center ${
+                  isActive("/hof-managers") ? "text-destructive" : ""
+                }`}
+                onClick={handleHideMobileNav}
+              >
+                <CircleUser size={30} />
+                <Link href="/hof-managers">HOF Managers</Link>
+              </div>
+              <div
+                className="hidden max-[600px]:flex gap-4 items-center "
+                onClick={handleHideMobileNav}
+              >
+                <HandPlatter size={30} />
+                <Link href="/devenir-prestataire">Devenir prestataire</Link>
+              </div>
             </div>
           </div>
         </div>

@@ -1,3 +1,5 @@
+import { ModeToggle } from "@/components/mode-toggle";
+
 const page = () => {
   return (
     <>
@@ -72,6 +74,7 @@ const page = () => {
           chart-5
         </div>
       </div>
+      <ModeToggle />
     </>
   );
 };

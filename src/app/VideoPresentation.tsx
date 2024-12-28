@@ -1,6 +1,6 @@
 const VideoPresentation = () => {
   return (
-    <section className="w-5/6 md:w-2/3 max-w-7xl mx-auto h-[200px] sm:h-[400px] md:h-[600px]  mt-10 flex items-center justify-center rounded-lg overflow-hidden">
+    <section className="w-5/6 md:w-2/3 max-w-7xl mx-auto h-[200px] sm:h-[400px] md:h-[600px] border  mt-10 flex items-center justify-center rounded-xl overflow-hidden">
       <iframe
         width="100%"
         height="100%"
