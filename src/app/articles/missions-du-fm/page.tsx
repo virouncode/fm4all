@@ -21,7 +21,7 @@ const page = () => {
           </Button>
         </div>
         <div className="flex flex-col gap-6 text-lg w-full max-w-prose mx-auto hyphens-auto text-wrap">
-          <h2 className="text-lg font-bold">
+          <h2 className="font-bold">
             On peut résumer les missions du FM selon différents critères (GTB,
             maintenance préventive, aménagement...).
           </h2>
