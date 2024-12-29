@@ -28,7 +28,7 @@ const HofManager = () => {
               qui chez fm4all ne font plus qu&apos;un : les HOF Managers.
             </p>
             <Button variant="outline" title="Decouvrir l'offre">
-              <Link href="/hof-managers">Decouvrir l&apos;offre</Link>
+              <Link href="/articles/hof-managers">Decouvrir l&apos;offre</Link>
             </Button>
           </CardContent>
         </Card>

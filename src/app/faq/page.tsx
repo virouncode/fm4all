@@ -3,31 +3,31 @@ const page = () => {
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
       <article className="mt-6 flex flex-col gap-10">
         <h1 className="text-3xl md:text-4xl">Foire aux questions</h1>
-        <div className="flex flex-col gap-6 text-lg mx-auto">
-          <div className="flex flex-col gap-1 w-full max-w-prose">
+        <div className="flex flex-col gap-6 text-lg mx-auto w-full max-w-prose">
+          <div className="flex flex-col gap-1">
             <h2 className="font-bold">Vous payez trop cher ?</h2>
             <p>
               Sur fm4all, comparez des centaines de devis aux meilleurs prix en
-              quelques clics
+              quelques clics.
             </p>
           </div>
-          <div className="flex flex-col gap-1 w-full max-w-prose">
+          <div className="flex flex-col gap-1">
             <h2 className="font-bold">Vous voulez de meilleurs tarifs ?</h2>
             <p>
               Sur fm4all, bénéficiez de tarifs groupés négociés, d&apos;une
-              garantie qualité et d&apos;un suivi professionnel
+              garantie qualité et d&apos;un suivi professionnel.
             </p>
           </div>
-          <div className="flex flex-col gap-1 w-full max-w-prose">
+          <div className="flex flex-col gap-1">
             <h2 className="font-bold">
               Marre d&apos;avoir des prix à la tête du client ?
             </h2>
             <p>
               Sur fm4all, obtenez vos tarifs en quelques clics, en toute
-              transparence
+              transparence.
             </p>
           </div>
-          <div className="flex flex-col gap-1 w-full max-w-prose">
+          <div className="flex flex-col gap-1">
             <h2 className="font-bold">Vous déménagez ?</h2>
             <p>
               Sur fm4all, mettez en place tous les services nécessaires au bon
@@ -36,7 +36,7 @@ const page = () => {
               meilleurs délais.
             </p>
           </div>
-          <div className="flex flex-col gap-1 w-full max-w-prose">
+          <div className="flex flex-col gap-1">
             <h2 className="font-bold">
               Vous vous agrandissez ? Besoin de professionnaliser la gestion de
               vos bureaux ?
@@ -46,7 +46,7 @@ const page = () => {
               à un office manager.
             </p>
           </div>
-          <div className="flex flex-col gap-1 w-full max-w-prose">
+          <div className="flex flex-col gap-1">
             <h2 className="font-bold">
               Gérez le nettoyage n&apos;est pas votre cœur de métier ?
             </h2>
@@ -56,17 +56,17 @@ const page = () => {
             </p>
           </div>
 
-          <div className="flex flex-col gap-1 w-full max-w-prose">
+          <div className="flex flex-col gap-1">
             <h2 className="font-bold">
               Envie d&apos;attirer et retenir des talents ? De créer une
               identité à vos bureaux qui vous ressemble ?
             </h2>
             <p>
               Passez à un service 5 étoiles : chez fm4all, nous mettons en place
-              un service hospitality et animons vos bureaux selon votre image
+              un service hospitality et animons vos bureaux selon votre image.
             </p>
           </div>
-          <div className="flex flex-col gap-1 w-full max-w-prose">
+          <div className="flex flex-col gap-1">
             <h2 className="font-bold">
               La sécurité de vos collaborateurs est importante pour vous ?
             </h2>
@@ -75,14 +75,14 @@ const page = () => {
               conformité réglementaire de vos locaux.
             </p>
           </div>
-          <div className="flex flex-col gap-1 w-full max-w-prose">
+          <div className="flex flex-col gap-1">
             <h2 className="font-bold">Marre de courir après des devis ?</h2>
             <p>
               Sur fm4all, obtenez des tarifs pour tous vos services au bureau en
               quelques clics.
             </p>
           </div>
-          <div className="flex flex-col gap-1 w-full max-w-prose">
+          <div className="flex flex-col gap-1">
             <h2 className="font-bold">
               Vous n&apos;êtes pas expert en achats de services ?
             </h2>
@@ -91,7 +91,7 @@ const page = () => {
               vous permettre d&apos;acheter comme des experts.
             </p>
           </div>
-          <div className="flex flex-col gap-1 w-full max-w-prose">
+          <div className="flex flex-col gap-1">
             <h2 className="font-bold">
               Pas le temps ni les ressources pour écrire un Cahier des Charges ?
               <br />
@@ -102,7 +102,7 @@ const page = () => {
               Sur fm4all, en moins de 5 min, construisez une offre de facility
               management qui vous ressemble. Rassemblez tous les services de vos
               bureaux sous un seul contrat, une seule facture et un seul
-              interlocuteur. Gagner du temps et de l&apos;argent
+              interlocuteur. Gagner du temps et de l&apos;argent.
             </p>
           </div>
         </div>

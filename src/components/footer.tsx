@@ -5,7 +5,7 @@ const Footer = () => {
     <footer className="mt-10 bg-fm4allsecondary">
       <div className="max-w-7xl mx-auto p-6">
         <div className="flex flex-wrap gap-6 lg:w-2/3">
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
             <p className="text-secondary text-xl">fm4all</p>
             <ul>
               <li>
@@ -17,35 +17,16 @@ const Footer = () => {
               <li>Touts droits résérvés &copy;fm4all</li>
             </ul>
           </div>
-          <div className="flex flex-col gap-4 ">
-            <p className="text-secondary text-xl">Facility Managment</p>
+          <div className="flex flex-col gap-2">
+            <p className="text-secondary text-xl">Articles</p>
             <ul>
-              <li>
-                <Link href="/nos-3-gammes">Nos 3 gammes</Link>
-              </li>
-              <li>
-                <Link href="/nos-services">Nos services</Link>
-              </li>
-              <li>
-                <Link href="/nos-engagements">Nos engagements</Link>
-              </li>
-              <li>
-                <Link href="/hof-managers">Hof Managers</Link>
-              </li>
               <li>
                 <Link href="/articles/le-fm-cest-quoi">
                   Le FM c&apos;est quoi ?
                 </Link>
               </li>
               <li>
-                <Link href="/articles/missions-du-fm">
-                  Les différentes missions du FM
-                </Link>
-              </li>
-              <li>
-                <Link href="/articles/le-fm-fait-il-faire-des-economies">
-                  Le FM fait-il faire des économies ?
-                </Link>
+                <Link href="/articles/missions-du-fm">Les missions du FM</Link>
               </li>
               <li>
                 <Link href="/articles/lexternalisation-du-fm">
@@ -53,13 +34,21 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link href="/articles/le-fm-fat-il-faire-des-economies">
+                  Le FM fait-il faire des économies ?
+                </Link>
+              </li>
+              <li>
                 <Link href="/articles/histoire-du-nettoyage">
                   Histoire du nettoyage industriel
                 </Link>
               </li>
+              <li>
+                <Link href="/articles/hof-managers">Hof Managers</Link>
+              </li>
             </ul>
           </div>
-          <div className="flex flex-col gap-4 ">
+          {/* <div className="flex flex-col gap-4 ">
             <p className="text-secondary text-xl">Services</p>
             <ul>
               <li>
@@ -99,8 +88,8 @@ const Footer = () => {
                 </Link>
               </li>
             </ul>
-          </div>
-          <div className="flex flex-col gap-4 ">
+          </div> */}
+          <div className="flex flex-col gap-2">
             <p className="text-secondary text-xl">Prestataires</p>
             <ul>
               <li>

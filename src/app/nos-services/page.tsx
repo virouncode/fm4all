@@ -13,7 +13,7 @@ const page = () => {
       <article className="mt-6 flex flex-col gap-10">
         <h1 className="text-3xl md:text-4xl">Nos services</h1>
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap text-lg">
+          <div className="flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap text-lg">
             <p>
               fm4all démocratise le <strong>Facility Management</strong> à
               toutes les tailles d&apos;entreprises. En quelques clics,{" "}
@@ -29,7 +29,7 @@ const page = () => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             Pourquoi le FM pour tous ?
           </h2>
-          <div className="text-lg flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
+          <div className="text-lg flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap">
             <p>
               Parce que nous pensons que les services de Facility Management ne
               devraient pas être réservés aux grandes entreprises.
@@ -68,7 +68,7 @@ const page = () => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             Gagnez du temps et de l&apos;argent
           </h2>
-          <div className="text-lg flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
+          <div className="text-lg flex flex-col gap-4 w-full mx-auto max-w-prose hyphens-auto text-wrap">
             <p>
               En passant par fm4all, vous profitez de{" "}
               <strong>l&apos;expertise d&apos;un professionnel du FM</strong>,
@@ -85,7 +85,7 @@ const page = () => {
         </div>
         <div className="flex flex-col gap-4">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">HOF managers</h2>
-          <div className="text-lg flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
+          <div className="text-lg flex flex-col gap-4 w-full mx-auto max-w-prose hyphens-auto text-wrap">
             <p>
               Hospitality Manager, Office Manager, Facility Manager, ce sont eux
               qui gèrent le bon fonctionnement de vos locaux au quotidien, tout

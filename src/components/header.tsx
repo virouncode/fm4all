@@ -2,10 +2,10 @@
 import { Button } from "@/components/ui/button";
 import {
   CircleHelp,
-  CircleUser,
   HandPlatter,
   Home,
   Menu,
+  Newspaper,
   Star,
   X,
 } from "lucide-react";
@@ -19,7 +19,10 @@ const Header = () => {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const path = usePathname();
 
-  const isActive = (href: string) => path === href;
+  const isActive = (href: string) => {
+    if (href === "/") return path === "/";
+    return path.includes(href);
+  };
 
   const handleShowMobileNav = () => {
     setIsMobileNavOpen(true);
@@ -69,11 +72,11 @@ const Header = () => {
             </div>
             <div
               className={`flex gap-1 items-center ${
-                isActive("/hof-managers") ? "text-destructive" : ""
+                isActive("/articles") ? "text-destructive" : ""
               }`}
             >
-              <CircleUser size={15} />
-              <Link href="/hof-managers">HOF Managers</Link>
+              <Newspaper size={15} />
+              <Link href="/articles">Articles</Link>
             </div>
             <div
               className={`flex gap-1 items-center ${
@@ -157,12 +160,12 @@ const Header = () => {
               </div>
               <div
                 className={`flex gap-4 items-center ${
-                  isActive("/hof-managers") ? "text-destructive" : ""
+                  isActive("/articles") ? "text-destructive" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
-                <CircleUser size={30} />
-                <Link href="/hof-managers">HOF Managers</Link>
+                <Newspaper size={30} />
+                <Link href="/articles">Articles</Link>
               </div>
               <div
                 className={`flex gap-4 items-center ${
