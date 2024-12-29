@@ -1,6 +1,14 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { CircleUser, HandPlatter, Home, Menu, Star, X } from "lucide-react";
+import {
+  CircleHelp,
+  CircleUser,
+  HandPlatter,
+  Home,
+  Menu,
+  Star,
+  X,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -66,6 +74,14 @@ const Header = () => {
             >
               <CircleUser size={15} />
               <Link href="/hof-managers">HOF Managers</Link>
+            </div>
+            <div
+              className={`flex gap-1 items-center ${
+                isActive("/faq") ? "text-destructive" : ""
+              }`}
+            >
+              <CircleHelp size={15} />
+              <Link href="/faq">FAQ</Link>
             </div>
           </nav>
         </div>
@@ -147,6 +163,15 @@ const Header = () => {
               >
                 <CircleUser size={30} />
                 <Link href="/hof-managers">HOF Managers</Link>
+              </div>
+              <div
+                className={`flex gap-4 items-center ${
+                  isActive("/faq") ? "text-destructive" : ""
+                }`}
+                onClick={handleHideMobileNav}
+              >
+                <CircleHelp size={30} />
+                <Link href="/faq">FAQ</Link>
               </div>
               <div
                 className={`hidden max-[600px]:flex gap-4 items-center ${

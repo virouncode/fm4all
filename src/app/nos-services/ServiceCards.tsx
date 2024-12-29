@@ -23,40 +23,6 @@ const ServiceCards = () => {
       </ImgCardVertical>
       <ImgCardVertical
         src="https://picsum.photos/350/300"
-        alt="illustration-cafe"
-      >
-        <div className="p-4 flex flex-col gap-4 h-56">
-          <p className="text-2xl">Café</p>
-          <p className="overflow-hidden text-ellipsis">
-            Blend robusta, Arabica de spécialité, cappuccino noisette ou thé bio
-            ? Il y en a pour tous les goûts et budgets.
-          </p>
-          <div className="flex-1">
-            <Link className="underline" href="/services/cafe">
-              En savoir plus
-            </Link>
-          </div>
-        </div>
-      </ImgCardVertical>
-      <ImgCardVertical
-        src="https://picsum.photos/350/300"
-        alt="illustration-fontaine-a-eau"
-      >
-        <div className="p-4 flex flex-col gap-4 h-56">
-          <p className="text-2xl">Fontaine à eau</p>
-          <p className="overflow-hidden text-ellipsis">
-            Eau filtrée, fraîche, gazeuse, à poser ou encastrer, il y a
-            forcément un modèle fait pour vous.
-          </p>
-          <div className="flex-1">
-            <Link className="underline" href="/services/eau">
-              En savoir plus
-            </Link>
-          </div>
-        </div>
-      </ImgCardVertical>
-      <ImgCardVertical
-        src="https://picsum.photos/350/300"
         alt="illustration-maintenance"
       >
         <div className="p-4 flex flex-col gap-4 h-56">
@@ -91,6 +57,91 @@ const ServiceCards = () => {
       </ImgCardVertical>
       <ImgCardVertical
         src="https://picsum.photos/350/300"
+        alt="illustration-fontaine-a-eau"
+      >
+        <div className="p-4 flex flex-col gap-4 h-56">
+          <p className="text-2xl">Fontaine à eau</p>
+          <p className="overflow-hidden text-ellipsis">
+            Eau filtrée, fraîche, gazeuse, à poser ou encastrer, il y a
+            forcément un modèle fait pour vous.
+          </p>
+          <div className="flex-1">
+            <Link className="underline" href="/services/eau">
+              En savoir plus
+            </Link>
+          </div>
+        </div>
+      </ImgCardVertical>
+      <ImgCardVertical
+        src="https://picsum.photos/350/300"
+        alt="illustration-cafe"
+      >
+        <div className="p-4 flex flex-col gap-4 h-56">
+          <p className="text-2xl">Café</p>
+          <p className="overflow-hidden text-ellipsis">
+            Blend robusta, Arabica de spécialité, cappuccino noisette ou thé bio
+            ? Il y en a pour tous les goûts et budgets.
+          </p>
+          <div className="flex-1">
+            <Link className="underline" href="/services/cafe">
+              En savoir plus
+            </Link>
+          </div>
+        </div>
+      </ImgCardVertical>
+      <ImgCardVertical
+        src="https://picsum.photos/350/300"
+        alt="illustration-snacks"
+      >
+        <div className="p-4 flex flex-col gap-4 h-56">
+          <p className="text-2xl">Fruits Frais</p>
+          <p className="overflow-hidden text-ellipsis">
+            Donner, c&apos;est recevoir ! Fruité ou gourmand, offrez du
+            bien-être à vos collaborateurs !
+          </p>
+          <div className="flex-1">
+            <Link className="underline" href="/services/snack">
+              En savoir plus
+            </Link>
+          </div>
+        </div>
+      </ImgCardVertical>
+      <ImgCardVertical
+        src="https://picsum.photos/350/300"
+        alt="illustration-snacks"
+      >
+        <div className="p-4 flex flex-col gap-4 h-56">
+          <p className="text-2xl">Snacks</p>
+          <p className="overflow-hidden text-ellipsis">
+            Donner, c&apos;est recevoir ! Fruité ou gourmand, offrez du
+            bien-être à vos collaborateurs !
+          </p>
+          <div className="flex-1">
+            <Link className="underline" href="/services/snack">
+              En savoir plus
+            </Link>
+          </div>
+        </div>
+      </ImgCardVertical>
+      <ImgCardVertical
+        src="https://picsum.photos/350/300"
+        alt="illustration-snacks"
+      >
+        <div className="p-4 flex flex-col gap-4 h-56">
+          <p className="text-2xl">Boissons variées</p>
+          <p className="overflow-hidden text-ellipsis">
+            Donner, c&apos;est recevoir ! Fruité ou gourmand, offrez du
+            bien-être à vos collaborateurs !
+          </p>
+          <div className="flex-1">
+            <Link className="underline" href="/services/snack">
+              En savoir plus
+            </Link>
+          </div>
+        </div>
+      </ImgCardVertical>
+      <ImgCardVertical
+        src="https://picsum.photos/350/300"
         alt="illustration-accueil"
       >
         <div className="p-4 flex flex-col gap-4 h-56">
@@ -107,6 +158,23 @@ const ServiceCards = () => {
         </div>
       </ImgCardVertical>
       <ImgCardVertical
+        src="https://picsum.photos/350/300"
+        alt="illustration-accueil"
+      >
+        <div className="p-4 flex flex-col gap-4 h-56">
+          <p className="text-2xl">Services fm4all</p>
+          <p className="overflow-hidden text-ellipsis">
+            Hospitality, Office ou Facility Manager, une personne dédiée chez
+            vous dès ½ journée par semaine.
+          </p>
+          <div className="flex-1">
+            <Link className="underline" href="/services/office-manager">
+              En savoir plus
+            </Link>
+          </div>
+        </div>
+      </ImgCardVertical>
+      {/* <ImgCardVertical
         src="https://picsum.photos/350/300"
         alt="illustration-accueil"
       >
@@ -140,23 +208,7 @@ const ServiceCards = () => {
           </div>
         </div>
       </ImgCardVertical>
-      <ImgCardVertical
-        src="https://picsum.photos/350/300"
-        alt="illustration-snacks"
-      >
-        <div className="p-4 flex flex-col gap-4 h-56">
-          <p className="text-2xl">Snacks & fruits</p>
-          <p className="overflow-hidden text-ellipsis">
-            Donner, c&apos;est recevoir ! Fruité ou gourmand, offrez du
-            bien-être à vos collaborateurs !
-          </p>
-          <div className="flex-1">
-            <Link className="underline" href="/services/snack">
-              En savoir plus
-            </Link>
-          </div>
-        </div>
-      </ImgCardVertical>
+      
       <ImgCardVertical
         src="https://picsum.photos/350/300"
         alt="illustration-agent-de-securite"
@@ -173,7 +225,7 @@ const ServiceCards = () => {
             </Link>
           </div>
         </div>
-      </ImgCardVertical>
+      </ImgCardVertical> */}
     </div>
   );
 };

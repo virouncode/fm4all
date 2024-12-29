@@ -3,8 +3,10 @@ import Link from "next/link";
 
 const Articles = () => {
   return (
-    <section className="max-w-7xl  w-full mx-auto flex flex-col gap-10 p-6 mt-10">
-      <h2 className="text-3xl border-l-2 px-4">Nos derniers articles</h2>
+    <section className="max-w-7xl  w-full mx-auto flex flex-col gap-10 p-6">
+      <h2 className="text-2xl md:text-3xl border-l-2 px-4">
+        Nos derniers articles
+      </h2>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 items-center">
         <ImgCardVertical
           src="https://picsum.photos/400/300"

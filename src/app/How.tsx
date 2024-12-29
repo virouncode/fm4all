@@ -1,16 +1,52 @@
-import ImgCardHorizontal from "@/components/cards/ImgCardHorizontal";
+import WhyCard from "@/components/cards/WhyCard";
+import { Button } from "@/components/ui/button";
 import { Euro, HandPlatter, House, ReceiptText, Star } from "lucide-react";
+import Link from "next/link";
 
-const Process = () => {
+const How = () => {
   return (
     <section
-      className="max-w-7xl w-full mx-auto flex flex-col gap-10 p-6 mt-10"
+      className="max-w-7xl w-full mx-auto flex flex-col gap-10 p-6"
       id="process"
     >
       <h2 className="text-2xl md:text-3xl border-l-2 px-4">
         Comment ça marche ?
       </h2>
-      <div className="flex flex-wrap justify-center align-center gap-x-24 gap-y-8">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-2">
+        <WhyCard
+          title="1. Mes Locaux"
+          content="Je précise mètres carrés, type et effectif"
+          icon={House}
+        />
+        <WhyCard
+          title="2. Mes Services"
+          content="Je sélectionne ce qui m'intéresse à la carte"
+          icon={HandPlatter}
+        />
+        <WhyCard
+          title="3. Mes Gammes"
+          content="Je choisis le niveau de chaque service"
+          icon={Star}
+        />
+        <WhyCard
+          title="4. Mes Prix"
+          content="Je compare en ligne mes prestataires"
+          icon={Euro}
+        />
+        <WhyCard
+          title="5. Mon Contrat"
+          content="Je valide la date de démarrage et go 🚀 !"
+          icon={ReceiptText}
+        />
+      </div>
+      <Button
+        variant="destructive"
+        size="lg"
+        className="w-full md:w-auto text-base self-start mx-auto"
+      >
+        <Link href="/mon-devis">Démarrez maintenant</Link>
+      </Button>
+      {/* <div className="flex flex-wrap justify-center align-center gap-x-24 gap-y-8">
         <ImgCardHorizontal
           src="/img/ourprocess1.png"
           alt="notre-process-1-logo"
@@ -73,9 +109,9 @@ const Process = () => {
             </div>
           </div>
         </ImgCardHorizontal>
-      </div>
+      </div> */}
     </section>
   );
 };
 
-export default Process;
+export default How;

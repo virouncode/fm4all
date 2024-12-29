@@ -10,8 +10,8 @@ const TroisGammesPage = () => {
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
       <article className="mt-6 flex flex-col gap-10">
-        <h1 className="text-4xl">Nos 3 gammes</h1>
-        <div className="flex flex-col gap-10 text-xl">
+        <h1 className="text-3xl md:text-4xl">Nos 3 gammes</h1>
+        <div className="flex flex-col gap-10 text-lg">
           <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
             <p>
               Afin de simplifier vos choix, nous avons décliné l&apos;ensemble
@@ -31,7 +31,7 @@ const TroisGammesPage = () => {
           </div>
         </div>
         <div className="flex flex-col gap-16">
-          <div className="flex flex-col gap-4 text-xl">
+          <div className="flex flex-col gap-4 text-lg">
             <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
               <h2 className="border-l-4 border-fm4allessential px-4 text-3xl text-fm4allessential">
                 Gamme Essentiel
@@ -44,7 +44,7 @@ const TroisGammesPage = () => {
               </p>
             </div>
           </div>
-          <div className="flex flex-col gap-4 text-xl">
+          <div className="flex flex-col gap-4 text-lg">
             <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
               <h2 className="border-l-4 border-fm4allcomfort px-4 text-3xl text-fm4allcomfort">
                 Gamme Confort
@@ -58,7 +58,7 @@ const TroisGammesPage = () => {
               </p>
             </div>
           </div>
-          <div className="flex flex-col gap-4 text-xl">
+          <div className="flex flex-col gap-4 text-lg">
             <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
               <h2 className="border-l-4 border-fm4allexcellence px-4 text-3xl text-fm4allexcellence">
                 Gamme Excellence
