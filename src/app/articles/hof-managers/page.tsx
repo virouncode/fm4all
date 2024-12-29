@@ -1,4 +1,6 @@
+import { Button } from "@/components/ui/button";
 import { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "HOF Managers",
@@ -10,12 +12,17 @@ const page = () => {
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
       <article className="mt-6 flex flex-col gap-10">
-        <h1 className="text-3-xl md:text-4xl">Hof Managers</h1>
-        <div className="flex flex-col gap-6 text-lg max-w-prose mx-auto hyphens-auto text-wrap">
-          <h2>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <h1 className="text-3xl md:text-4xl">Hof Managers</h1>
+          <Button variant="outline">
+            <Link href="/articles">Revenir aux articles</Link>
+          </Button>
+        </div>
+        <div className="flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap text-lg">
+          <h2 className="font-bold">
             fm4all réinvente le métier d&apos;Office Manager. Hospitality,
             Office et Facility Manager, trois métiers qui chez fm4all ne font
-            plus qu&apos;un : <strong>les HOF Managers</strong>.
+            plus qu&apos;un : les HOF Managers.
           </h2>
           <p>
             Afin de{" "}
@@ -55,11 +62,11 @@ const page = () => {
             <strong>ils s&apos;occupent de tout</strong>.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-xl">
-          <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
+        <div className="flex flex-col gap-4 text-lg">
+          <h2 className="border-l-2 px-4 text-2xl md:text-3xl mb-4 ml-6">
             L&apos;origine des HOF Managers
           </h2>
-          <div className="text-lg flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
+          <div className="text-lg flex flex-col gap-4 w-full mx-auto max-w-prose hyphens-auto text-wrap">
             <p>
               Hospitality / Happiness Manager, Office Manager ou encore Facility
               Manager, autant de noms pour présenter ces{" "}
@@ -94,11 +101,11 @@ const page = () => {
             </p>
           </div>
         </div>
-        <div className="flex flex-col gap-4 text-xl">
-          <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
+        <div className="flex flex-col gap-4 text-lg">
+          <h2 className="border-l-2 px-4 text-2xl md:text-3xl mb-4 ml-6">
             Dans le détail des fonctions
           </h2>
-          <div className="text-lg flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
+          <div className="text-lg flex flex-col gap-4 w-full mx-auto max-w-prose hyphens-auto text-wrap">
             <p>
               <strong>Hospitality Manager ou encore Happyness Manager :</strong>
               <br /> Gère l&apos;animation des bureaux et veille au bien-être

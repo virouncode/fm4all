@@ -34,7 +34,7 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/articles/le-fm-fat-il-faire-des-economies">
+                <Link href="/articles/le-fm-fait-il-faire-des-economies">
                   Le FM fait-il faire des économies ?
                 </Link>
               </li>
