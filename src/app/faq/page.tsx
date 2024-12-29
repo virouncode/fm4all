@@ -3,7 +3,7 @@ const page = () => {
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
       <article className="mt-6 flex flex-col gap-10">
         <h1 className="text-3xl md:text-4xl">Foire aux questions</h1>
-        <div className="flex flex-col gap-6 text-lg">
+        <div className="flex flex-col gap-6 text-lg mx-auto">
           <div className="flex flex-col gap-1 w-full max-w-prose">
             <h2 className="font-bold">Vous payez trop cher ?</h2>
             <p>
