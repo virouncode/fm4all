@@ -20,7 +20,7 @@ const page = () => {
             fm4all vous propose de devenir partenaire.
           </p>
         </div>
-        <div className="flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap">
+        <div className="flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap text-lg">
           <ul className="ml-10 md:ml-20">
             <li className="list-rocket">Apports d&apos;affaires gratuits</li>
             <li className="list-rocket">
