@@ -1,4 +1,6 @@
+import { Button } from "@/components/ui/button";
 import { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Externalisation du FM",
@@ -10,9 +12,16 @@ const page = () => {
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
       <article className="mt-6 flex flex-col gap-10">
-        <h1 className="text-4xl">Histoire de l&apos;externalisation du FM</h1>
-        <div className="flex flex-col gap-4 text-xl max-w-prose mx-auto hyphens-auto text-wrap">
-          <h2>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <h1 className="text-3xl md:text-4xl">
+            Histoire de l&apos;externalisation du FM
+          </h1>
+          <Button variant="outline">
+            <Link href="/articles">Revenir aux articles</Link>
+          </Button>
+        </div>
+        <div className="flex flex-col gap-6 text-lg w-full max-w-prose mx-auto hyphens-auto text-wrap">
+          <h2 className="font-bold">
             Si on parle de FM comme des services au bâtiment, on peut trouver
             les balbutiements du métier dès le début du XXe siècle.
           </h2>
@@ -21,11 +30,12 @@ const page = () => {
             article, nous pouvons remonter aux années 90.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-xl">
-          <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
+
+        <div className="flex flex-col gap-4 text-lg">
+          <h2 className="border-l-2 px-4 text-2xl md:text-3xl mb-4 ml-6">
             Années 1990 : Les prémices du FM moderne
           </h2>
-          <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
+          <div className="flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap">
             <p>
               Début des années 1990 : Le FM se structure progressivement en
               France, avec la création des premières sociétés spécialisées et
@@ -43,11 +53,11 @@ const page = () => {
             </p>
           </div>
         </div>
-        <div className="flex flex-col gap-4 text-xl">
-          <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
+        <div className="flex flex-col gap-4 text-lg">
+          <h2 className="border-l-2 px-4 text-2xl md:text-3xl mb-4 ml-6">
             Années 2000 : Le FM entre dans l&apos;ère numérique
           </h2>
-          <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
+          <div className="flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap">
             <p>
               Début des années 2000 : Le développement d&apos;internet et des
               logiciels de gestion accélère la digitalisation du FM. Des
@@ -66,11 +76,11 @@ const page = () => {
             </p>
           </div>
         </div>
-        <div className="flex flex-col gap-4 text-xl">
-          <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
+        <div className="flex flex-col gap-4 text-lg">
+          <h2 className="border-l-2 px-4 text-2xl md:text-3xl mb-4 ml-6">
             Années 2010 : Le FM à l&apos;ère du numérique et du collaboratif
           </h2>
-          <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
+          <div className="flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap">
             <p>
               Début des années 2010 : Le smartphone et les objets connectés
               révolutionnent la gestion des installations. Des start-ups comme
@@ -89,11 +99,11 @@ const page = () => {
             </p>
           </div>
         </div>
-        <div className="flex flex-col gap-4 text-xl">
-          <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
+        <div className="flex flex-col gap-4 text-lg">
+          <h2 className="border-l-2 px-4 text-2xl md:text-3xl mb-4 ml-6">
             Années 2020 et aujourd&apos;hui : Le FM face aux défis de demain
           </h2>
-          <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
+          <div className="flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap">
             <p>
               Pandémie de Covid-19 : Le FM doit s&apos;adapter aux nouveaux
               enjeux sanitaires et sécuritaires.
@@ -109,11 +119,11 @@ const page = () => {
             </p>
           </div>
         </div>
-        <div className="flex flex-col gap-4 text-xl">
-          <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
+        <div className="flex flex-col gap-4 text-lg">
+          <h2 className="border-l-2 px-4 text-2xl md:text-3xl mb-4 ml-6">
             Quelques entreprises ayant marqué le FM (liste non exhaustive)
           </h2>
-          <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
+          <div className="flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap">
             <p>
               JLL, Cushman & Wakefield, CBRE : Leaders mondiaux du conseil en
               immobilier et du facility management.

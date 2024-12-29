@@ -1,4 +1,6 @@
+import { Button } from "@/components/ui/button";
 import { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "FM=économies ?",
@@ -10,12 +12,20 @@ const page = () => {
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
       <article className="mt-6 flex flex-col gap-10">
-        <h1 className="text-4xl">Le FM fait-il faire des économies ?</h1>
-        <div className="flex flex-col gap-4 text-xl max-w-prose mx-auto hyphens-auto text-wrap">
-          <p>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <h1 className="text-3xl md:text-4xl">
+            Le FM fait-il faire des économies ?
+          </h1>
+          <Button variant="outline">
+            <Link href="/articles">Revenir aux articles</Link>
+          </Button>
+        </div>
+
+        <div className="flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap text-lg">
+          <h2 className="font-bold">
             La réponse courte est &quot;Oui&quot;. Mais il faut savoir ce que
             l&apos;on mesure et avoir des attentes réalistes !<br />
-          </p>
+          </h2>
           <p>
             La bonne gestion des prestations, leur optimisation et le volume
             d&apos;achat des FMeurs permet de{" "}

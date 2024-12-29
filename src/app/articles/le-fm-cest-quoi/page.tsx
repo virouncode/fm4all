@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Metadata } from "next";
 import Link from "next/link";
 
@@ -10,9 +11,14 @@ const page = () => {
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
       <article className="mt-6 flex flex-col gap-10">
-        <h1 className="text-4xl">Le FM c&apos;est quoi ?</h1>
-        <div className="flex flex-col gap-6 text-xl max-w-prose mx-auto hyphens-auto text-wrap">
-          <h2>
+        <div className="flex flex-col md:flex-row items-center justify-between">
+          <h1 className="text-3x md:text-4xl">Le FM c&apos;est quoi ?</h1>
+          <Button variant="outline">
+            <Link href="/articles">Revenir aux articles</Link>
+          </Button>
+        </div>
+        <div className="flex flex-col gap-6 text-lg w-full max-w-prose mx-auto hyphens-auto text-wrap">
+          <h2 className="font-bold">
             Le FM a plusieurs noms : Facility Management, IFM comme Integrated
             Facility Management, Facility services ou IFS, integrated facility
             services.
@@ -23,7 +29,7 @@ const page = () => {
             gestion de ces prestataires de services au bâtiment.
           </p>
           <p>Cela pourrait se traduire en français par :</p>
-          <ul className="ml-6 md:ml-14 mt-4">
+          <ul className="ml-6 md:ml-14">
             <li className="list-disc">Gestion des équipements du bâtiment</li>
             <li className="list-disc">
               Gestion déléguée de services au bâtiment
@@ -56,11 +62,11 @@ const page = () => {
             service, multi services et IFM.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-xl">
-          <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
+        <div className="flex flex-col gap-4 text-lg">
+          <h2 className="border-l-2 px-4 text-2xl md:text-3xl mb-4 ml-6">
             Gestion interne des services
           </h2>
-          <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
+          <div className="flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap">
             <p>
               Il n&apos;y a pas si longtemps (30 ans tout de même), les
               entreprises géraient en interne leurs prestations. Vous aviez des
@@ -107,11 +113,11 @@ const page = () => {
             </p>
           </div>
         </div>
-        <div className="flex flex-col gap-4 text-xl">
-          <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
+        <div className="flex flex-col gap-4 text-lg">
+          <h2 className="border-l-2 px-4 text-2xl md:text-3xl mb-4 ml-6">
             Externalisation Mono Services
           </h2>
-          <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
+          <div className="flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap">
             <p>
               Il y a 30 ans, devant la demande des entreprises, la
               professionnalisation par métier a commencé à exploser (
@@ -178,11 +184,11 @@ const page = () => {
             </p>
           </div>
         </div>
-        <div className="flex flex-col gap-4 text-xl">
-          <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
+        <div className="flex flex-col gap-4 text-lg">
+          <h2 className="border-l-2 px-4 text-2xl md:text-3xl mb-4 ml-6">
             FM multi services
           </h2>
-          <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
+          <div className="flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap">
             <p>
               Premiers pas vers l&apos;externalisation des services, les
               prestations sont regroupées par lots.
@@ -233,11 +239,11 @@ const page = () => {
             </p>
           </div>
         </div>
-        <div className="flex flex-col gap-4 text-xl">
-          <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
+        <div className="flex flex-col gap-4 text-lg">
+          <h2 className="border-l-2 px-4 text-2xl md:text-3xl mb-4 ml-6">
             IFM / Facility Management intégré
           </h2>
-          <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
+          <div className="flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap">
             <p>
               Solution adoptée depuis de nombreuses années par nos amis
               nordiques et anglo-saxons, c&apos;est l&apos;externalisation
@@ -307,11 +313,11 @@ const page = () => {
             </p>
           </div>
         </div>
-        <div className="flex flex-col gap-4 text-xl">
-          <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
+        <div className="flex flex-col gap-4 text-lg">
+          <h2 className="border-l-2 px-4 text-2xl md:text-3xl mb-4 ml-6">
             HM / Hospitality Management
           </h2>
-          <div className="flex flex-col gap-4 mx-auto max-w-prose hyphens-auto text-wrap">
+          <div className="flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap">
             <p>
               J&apos;allais oublier LA dernière tendance. En effet, le happiness
               management existait avant COVID. Mais depuis que la présence au
