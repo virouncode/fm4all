@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     "Découvrez les services de Facility Management proposés par fm4all.",
 };
 
-const ServicesPage = () => {
+const page = () => {
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
       <article className="mt-6 flex flex-col gap-10">
@@ -101,4 +101,4 @@ const ServicesPage = () => {
   );
 };
 
-export default ServicesPage;
+export default page;

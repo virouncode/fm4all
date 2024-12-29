@@ -6,7 +6,7 @@ export const metadata: Metadata = {
     "Vous êtes prestataire de service ? fm4all vous propose de devenir partenaire.",
 };
 
-const PrestatairesPage = () => {
+const page = () => {
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
       <article className="mt-6 flex flex-col gap-10">
@@ -120,4 +120,4 @@ const PrestatairesPage = () => {
   );
 };
 
-export default PrestatairesPage;
+export default page;

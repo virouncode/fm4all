@@ -52,7 +52,7 @@ const Why = () => {
         </p>
         <p>
           Nous gérons la facturation, les demandes et le suivi qualité. Un gain
-          de temps précieux pour tous !
+          de temps précieux pour tous.
         </p>
         <p className="font-bold">Pour vous clients:</p>
         <ul className="mx-auto ml-10">

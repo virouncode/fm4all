@@ -86,6 +86,12 @@ const Services = () => {
           </div>
         </ImgCardVertical>
       </div>
+      <Link
+        href="/nos-services"
+        className="underline text-fm4allsecondary text-lg md:hidden"
+      >
+        Voir tous les services
+      </Link>
     </section>
   );
 };

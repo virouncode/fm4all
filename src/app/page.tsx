@@ -8,7 +8,7 @@ import Services from "./Services";
 import VideoPresentation from "./VideoPresentation";
 import Why from "./Why";
 
-export default function Home() {
+export default function page() {
   return (
     <main className="flex flex-col gap-12">
       <Hero />

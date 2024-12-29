@@ -6,7 +6,7 @@ export const metadata: Metadata = {
     "Découvrez les HOF Managers de fm4all, des professionnels de l'hospitality, de l'office et du facility management.",
 };
 
-const HofManagersPage = () => {
+const page = () => {
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
       <article className="mt-6 flex flex-col gap-10">
@@ -163,4 +163,4 @@ const HofManagersPage = () => {
   );
 };
 
-export default HofManagersPage;
+export default page;

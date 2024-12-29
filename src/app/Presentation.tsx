@@ -12,7 +12,7 @@ const Presentation = () => {
         Vous emménagez dans de nouveaux bureaux? <br />
         Ou envie d’améliorer vos services actuels ?
       </p>
-      <div className="max-w-prose mx-auto">
+      <div className="flex flex-col gap-4 max-w-prose mx-auto">
         <p>
           <strong>fm4all</strong> simplifie vos démarches d’achats et de gestion
           avec sa <strong>plateforme de Facility Management</strong> : un seul

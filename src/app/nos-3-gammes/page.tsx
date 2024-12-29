@@ -6,7 +6,7 @@ export const metadata: Metadata = {
     "Découvrez nos 3 gammes de services pour le Facility Management.",
 };
 
-const TroisGammesPage = () => {
+const page = () => {
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
       <article className="mt-6 flex flex-col gap-10">
@@ -77,4 +77,4 @@ const TroisGammesPage = () => {
   );
 };
 
-export default TroisGammesPage;
+export default page;
