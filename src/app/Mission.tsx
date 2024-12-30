@@ -43,10 +43,10 @@ const Mission = () => {
           size="lg"
           className="w-full md:w-auto text-base self-start mx-auto text-wrap"
         >
-          <Link href="/mon-devis" className="hidden md:block">
+          <Link href="/mon-devis/mes-locaux" className="hidden md:block">
             Bénéficiez de notre réseau de partenaires en quelques clics
           </Link>
-          <Link href="/mon-devis" className="block md:hidden">
+          <Link href="/mon-devis/mes-locaux" className="block md:hidden">
             Bénéficiez de notre réseau
           </Link>
         </Button>

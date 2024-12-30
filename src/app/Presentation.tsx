@@ -33,7 +33,9 @@ const Presentation = () => {
         size="lg"
         className="w-full md:w-auto text-base self-start mx-auto"
       >
-        <Link href="/mon-devis">Obtenez votre devis en quelques clics</Link>
+        <Link href="/mon-devis/mes-locaux">
+          Obtenez votre devis en quelques clics
+        </Link>
       </Button>
     </section>
   );

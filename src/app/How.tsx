@@ -44,7 +44,7 @@ const How = () => {
         size="lg"
         className="w-full md:w-auto text-base self-start mx-auto"
       >
-        <Link href="/mon-devis">Démarrez maintenant</Link>
+        <Link href="/mon-devis/mes-locaux">Démarrez maintenant</Link>
       </Button>
       {/* <div className="flex flex-wrap justify-center align-center gap-x-24 gap-y-8">
         <ImgCardHorizontal

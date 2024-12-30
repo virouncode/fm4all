@@ -1,4 +1,5 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import {
   CircleHelp,
@@ -90,8 +91,7 @@ const Header = () => {
         </div>
         <div className="flex items-center gap-4">
           <Button title="Mon devis en ligne" variant="destructive">
-            {/* <Link href="/mon-devis">Je réalise mon devis en ligne</Link> */}
-            Mon devis en ligne
+            <Link href="/mon-devis/mes-locaux">Mon devis en ligne</Link>
           </Button>
           <Button
             title="Devenir prestataire"

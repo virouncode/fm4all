@@ -10,7 +10,7 @@ import Why from "./Why";
 
 export default function page() {
   return (
-    <main className="flex flex-col gap-12">
+    <main className="flex flex-col gap-12 mb-24">
       <Hero />
       <Presentation />
       <VideoPresentation />

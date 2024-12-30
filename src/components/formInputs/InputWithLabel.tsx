@@ -13,7 +13,7 @@ import { useFormContext } from "react-hook-form";
 
 type InputWithLabelProps<S> = {
   //S for Schema
-  fieldTitle: string;
+  fieldTitle?: string;
   nameInSchema: keyof S & string; //to prevent typos errors in the name of the field
   className?: string;
 } & InputHTMLAttributes<HTMLInputElement>;
@@ -24,13 +24,13 @@ export function InputWithLabel<S>({
   className,
   ...props
 }: InputWithLabelProps<S>) {
-  const form = useFormContext();
+  const { control, formState } = useFormContext();
+  const error = formState.errors[nameInSchema];
+  const hasError = Boolean(error);
 
-  //the render function is a sepcial function from Reac Hook Form
-  //This is a render prop. A function that returns a React element and provides the ability to attach events and value into the component. This simplifies integrating with external controlled components with non-standard prop names. Provides onChange, onBlur, name, ref and value to the child component (field key), and also a fieldState object which contains specific input state.
   return (
     <FormField
-      control={form.control}
+      control={control}
       name={nameInSchema}
       render={({ field }) => (
         <FormItem>
@@ -42,12 +42,12 @@ export function InputWithLabel<S>({
           <FormControl>
             <Input
               id={nameInSchema}
-              className={`w-full max-w-xs disabled:text-blue-500 dark:disabled:text-yellow-300 disbaled:opacity-75 ${className}`}
+              className={`w-full max-w-xs disabled:text-blue-500 dark:disabled:text-yellow-300 disabled:opacity-75 ${className}`}
               {...props}
-              {...field} //Provides onChange, onBlur, name, ref and value to the child component
+              {...field} // Provides onChange, onBlur, name, ref, and value to the child component
             />
           </FormControl>
-          <FormMessage />
+          {hasError ? <FormMessage /> : <div className="h-[19px] opacity-0" />}
         </FormItem>
       )}
     />
