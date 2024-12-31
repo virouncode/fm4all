@@ -28,6 +28,7 @@ type SelectWithLabelProps<S> = {
   nameInSchema: keyof S & string;
   data: DataObj[];
   className?: string;
+  handleSelect: (value: string, name: string) => void;
 };
 
 export function SelectWithLabel<S>({
@@ -35,13 +36,11 @@ export function SelectWithLabel<S>({
   nameInSchema,
   data,
   className,
+  handleSelect,
 }: SelectWithLabelProps<S>) {
   const { control, formState } = useFormContext();
   const error = formState.errors[nameInSchema];
   const hasError = Boolean(error);
-
-  //The select component is built from RADIX UI, and it is better uncontrolled.
-  //So we need a defaultValue and the onValueChange props (read the RADIX UI docs))
 
   return (
     <FormField
@@ -54,7 +53,10 @@ export function SelectWithLabel<S>({
           </FormLabel>
           <Select
             // defaultValue={field.value.toString()}
-            onValueChange={field.onChange}
+            onValueChange={(e) => {
+              field.onChange(e);
+              handleSelect(e, nameInSchema);
+            }}
             value={field.value.toString()}
           >
             <FormControl>
@@ -66,14 +68,14 @@ export function SelectWithLabel<S>({
                     data?.find((item) => item.id === field.value)?.color ?? "",
                 }}
               >
-                <SelectValue placeholder="Select" />
+                <SelectValue placeholder="Choisir" />
               </SelectTrigger>
             </FormControl>
             <SelectContent>
               {data?.map((item) => (
                 <SelectItem
                   key={`${nameInSchema}_${item.id}`}
-                  value={item.id.toString()}
+                  value={item.id.toString() ?? ""}
                   style={{ color: item.color ?? "" }}
                 >
                   {item.description}

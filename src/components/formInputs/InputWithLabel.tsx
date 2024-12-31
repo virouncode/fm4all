@@ -8,7 +8,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { InputHTMLAttributes } from "react";
+import { ChangeEvent, InputHTMLAttributes } from "react";
 import { useFormContext } from "react-hook-form";
 
 type InputWithLabelProps<S> = {
@@ -16,12 +16,14 @@ type InputWithLabelProps<S> = {
   fieldTitle?: string;
   nameInSchema: keyof S & string; //to prevent typos errors in the name of the field
   className?: string;
+  handleChange: (e: ChangeEvent<HTMLInputElement>) => void;
 } & InputHTMLAttributes<HTMLInputElement>;
 
 export function InputWithLabel<S>({
   fieldTitle,
   nameInSchema,
   className,
+  handleChange,
   ...props
 }: InputWithLabelProps<S>) {
   const { control, formState } = useFormContext();
@@ -45,6 +47,10 @@ export function InputWithLabel<S>({
               className={`w-full max-w-xs disabled:text-blue-500 dark:disabled:text-yellow-300 disabled:opacity-75 ${className}`}
               {...props}
               {...field} // Provides onChange, onBlur, name, ref, and value to the child component
+              onChange={(e) => {
+                field.onChange(e);
+                handleChange(e);
+              }}
             />
           </FormControl>
           {hasError ? <FormMessage /> : <div className="h-[19px] opacity-0" />}
