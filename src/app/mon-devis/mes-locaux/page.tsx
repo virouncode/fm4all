@@ -5,10 +5,10 @@ import MesLocaux from "./MesLocaux";
 
 const page = () => {
   return (
-    <main className="max-w-7xl mx-auto py-4 px-6 md:px-20 h-[calc(100vh-4rem)] flex flex-col">
+    <main className="max-w-7xl mx-auto py-4 px-6 md:px-20 min-h-[calc(100vh-4rem)] mb-10 flex flex-col">
       <DevisBreadcrumb currentStepId={1} />
       <h1 className="text-3xl md:text-4xl">Mes locaux</h1>
-      <section className="flex flex-col gap-10 h-full py-6 flex-1">
+      <section className="flex flex-col gap-10 h-full flex-1">
         <DevisProgressProvider>
           <DevisDataProvider>
             <MesLocaux />

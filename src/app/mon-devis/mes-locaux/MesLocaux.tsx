@@ -15,7 +15,8 @@ import {
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { useClientOnly } from "@/hooks/use-client-only";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChangeEvent, useContext, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import CityOut from "./CityOut";
 import ServicesLoader from "./ServicesLoader";
@@ -27,6 +28,7 @@ const MesLocaux = () => {
   useClientOnly();
   const [cityError, setCityError] = useState(false);
   const [cityOut, setCityOut] = useState(false);
+  const router = useRouter();
 
   const defaultValues: FirstCompanyInfoType = {
     codePostal: devisData.firstCompanyInfo.codePostal ?? "",
@@ -40,6 +42,10 @@ const MesLocaux = () => {
     resolver: zodResolver(firstInfoSchema),
     defaultValues,
   });
+
+  useEffect(() => {
+    setDevisProgress((prev) => ({ ...prev, currentStep: 1 }));
+  }, [setDevisProgress]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -61,6 +67,7 @@ const MesLocaux = () => {
       !departements.find(({ id }) => id === data.codePostal.substring(0, 2))
     ) {
       setCityOut(true);
+      setDevisProgress({ ...devisProgress, completedSteps: [] });
       return;
     }
     try {
@@ -70,6 +77,7 @@ const MesLocaux = () => {
       const cityData = await response.json();
       if (cityData.length === 0) {
         setCityError(true);
+
         return;
       }
     } catch (err) {
@@ -77,12 +85,16 @@ const MesLocaux = () => {
     }
     setDevisProgress({ currentStep: 2, completedSteps: [1] });
     setLoadingServices(true);
+    setTimeout(() => {
+      router.push("/mon-devis/mes-services");
+    }, 5000);
+
     console.log(data);
   };
 
   if (cityError) {
     return (
-      <div className="text-lg mx-auto max-w-prose mt-10 text-center">
+      <div className="text-base md:text-lg mx-auto max-w-prose mt-6 md:mt-10 text-center">
         Le code postal que vous avez entré ne correspond à aucune ville.
         <br />
         <div
@@ -110,10 +122,10 @@ const MesLocaux = () => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(submitForm)}
-        className="flex flex-col gap-14 mx-auto w-full md:w-2/3 mt-20"
+        className="flex flex-col gap-14 mx-auto w-full md:w-2/3 mt-6 md:mt-20"
       >
-        <div className="flex gap-8">
-          <div className="flex-1 flex flex-col gap-4">
+        <div className="flex flex-col gap-4 md:flex-row md:gap-8">
+          <div className="w-full md:w-1/2 flex flex-col gap-4">
             <InputWithLabel<FirstCompanyInfoType>
               fieldTitle="Code postal*"
               nameInSchema="codePostal"
@@ -136,7 +148,7 @@ const MesLocaux = () => {
               // className="text-base py-6 w-full max-w-none"
             />
           </div>
-          <div className="flex-1 flex flex-col gap-4 ">
+          <div className="w-full md:w-1/2 flex flex-col gap-4 ">
             <SelectWithLabel<FirstCompanyInfoType>
               fieldTitle="Type de bâtiment*"
               nameInSchema="typeBatiment"

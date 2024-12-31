@@ -1,10 +1,10 @@
-import Footer from "@/components/footer";
 import Header from "@/components/header";
 import type { Metadata } from "next";
 import { Didact_Gothic } from "next/font/google";
 
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
+import Footer from "@/components/footer";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",

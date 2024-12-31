@@ -51,8 +51,8 @@ const DevisBreadcrumb = ({ currentStepId }: DevisBreadcumbProps) => {
 
   return (
     <div className="flex justify-center mb-4">
-      <Breadcrumb className="h-10">
-        <BreadcrumbList className="text-base">
+      <Breadcrumb className="h-20 md:h-10">
+        <BreadcrumbList className="text-sm lg:text-base">
           {devisRoutes.map((route, index) => (
             <div key={route.id} className="flex gap-3 items-center">
               <BreadcrumbItem className="flex items-center">
