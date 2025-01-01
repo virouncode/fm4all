@@ -20,7 +20,6 @@ const MesServices = () => {
   const { devisData, setDevisData } = useContext(DevisDataContext);
   const [selectedServicesIds, setSelectedServicesIds] = useState<number[]>([]);
   const [currentServiceId, setCurrentServiceId] = useState<number | null>(null);
-  console.log("devisData", devisData);
 
   if (!devisProgress.completedSteps.includes(1)) {
     return (
@@ -34,13 +33,16 @@ const MesServices = () => {
     );
   }
   const handleClickNext = () => {
+    console.log("selectedServicesIds", selectedServicesIds);
+    console.log("currentServiceId", currentServiceId);
+
     if (currentServiceId === null) {
-      setCurrentServiceId(selectedServicesIds[0]);
+      setCurrentServiceId(1);
       const nextService = document.getElementById(
         selectedServicesIds[0].toString()
       );
       if (nextService) {
-        nextService.scrollIntoView({ behavior: "smooth" });
+        nextService.scrollIntoView({ behavior: "smooth", block: "nearest" });
         return;
       }
     }
@@ -51,7 +53,7 @@ const MesServices = () => {
       ].toString()
     );
     if (nextService) {
-      nextService.scrollIntoView({ behavior: "smooth" });
+      nextService.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
     setCurrentServiceId(
       (currentServiceId) =>
@@ -66,7 +68,10 @@ const MesServices = () => {
       setCurrentServiceId(null);
       const servicesSelection = document.getElementById("services-selection");
       if (servicesSelection) {
-        servicesSelection.scrollIntoView({ behavior: "smooth" });
+        servicesSelection.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+        });
         return;
       }
     }
@@ -76,7 +81,7 @@ const MesServices = () => {
       ].toString()
     );
     if (previousService) {
-      previousService.scrollIntoView({ behavior: "smooth" });
+      previousService.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
     setCurrentServiceId(
       (currentServiceId) =>
@@ -87,7 +92,7 @@ const MesServices = () => {
   };
 
   return (
-    <div className="h-full overflow-auto">
+    <div className="h-full overflow-hidden">
       <ServicesSelection
         selectedServicesIds={selectedServicesIds}
         setSelectedServicesIds={setSelectedServicesIds}
@@ -97,17 +102,72 @@ const MesServices = () => {
         <Nettoyage
           handleClickNext={handleClickNext}
           handleClickPrevious={handleClickPrevious}
+          selectedServicesIds={selectedServicesIds}
         />
       )}
-      {selectedServicesIds.includes(2) && <Maintenance />}
-      {selectedServicesIds.includes(3) && <SecuriteIncendie />}
-      {selectedServicesIds.includes(4) && <Fontaine />}
-      {selectedServicesIds.includes(5) && <Cafe />}
-      {selectedServicesIds.includes(6) && <Fruits />}
-      {selectedServicesIds.includes(7) && <Snacks />}
-      {selectedServicesIds.includes(8) && <Boissons />}
-      {selectedServicesIds.includes(9) && <OfficeManager />}
-      {selectedServicesIds.includes(10) && <ServicesFm4All />}
+      {selectedServicesIds.includes(2) && (
+        <Maintenance
+          handleClickNext={handleClickNext}
+          handleClickPrevious={handleClickPrevious}
+          selectedServicesIds={selectedServicesIds}
+        />
+      )}
+      {selectedServicesIds.includes(3) && (
+        <SecuriteIncendie
+          handleClickNext={handleClickNext}
+          handleClickPrevious={handleClickPrevious}
+          selectedServicesIds={selectedServicesIds}
+        />
+      )}
+      {selectedServicesIds.includes(4) && (
+        <Fontaine
+          handleClickNext={handleClickNext}
+          handleClickPrevious={handleClickPrevious}
+          selectedServicesIds={selectedServicesIds}
+        />
+      )}
+      {selectedServicesIds.includes(5) && (
+        <Cafe
+          handleClickNext={handleClickNext}
+          handleClickPrevious={handleClickPrevious}
+          selectedServicesIds={selectedServicesIds}
+        />
+      )}
+      {selectedServicesIds.includes(6) && (
+        <Fruits
+          handleClickNext={handleClickNext}
+          handleClickPrevious={handleClickPrevious}
+          selectedServicesIds={selectedServicesIds}
+        />
+      )}
+      {selectedServicesIds.includes(7) && (
+        <Snacks
+          handleClickNext={handleClickNext}
+          handleClickPrevious={handleClickPrevious}
+          selectedServicesIds={selectedServicesIds}
+        />
+      )}
+      {selectedServicesIds.includes(8) && (
+        <Boissons
+          handleClickNext={handleClickNext}
+          handleClickPrevious={handleClickPrevious}
+          selectedServicesIds={selectedServicesIds}
+        />
+      )}
+      {selectedServicesIds.includes(9) && (
+        <OfficeManager
+          handleClickNext={handleClickNext}
+          handleClickPrevious={handleClickPrevious}
+          selectedServicesIds={selectedServicesIds}
+        />
+      )}
+      {selectedServicesIds.includes(10) && (
+        <ServicesFm4All
+          handleClickNext={handleClickNext}
+          handleClickPrevious={handleClickPrevious}
+          selectedServicesIds={selectedServicesIds}
+        />
+      )}
     </div>
   );
 };

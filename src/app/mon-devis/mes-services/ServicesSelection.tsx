@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
   Citrus,
   Coffee,
@@ -14,6 +13,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { Dispatch, SetStateAction } from "react";
+import NextServiceButton from "./NextServiceButton";
 
 const servicesChoices = [
   {
@@ -97,7 +97,7 @@ const ServicesSelection = ({
   };
   return (
     <div
-      className="flex flex-col gap-10 w-full md:w-3/4 mx-auto h-full"
+      className="flex flex-col gap-10 w-full mx-auto h-full relative"
       id="services-selection"
     >
       <p className="text-base md:text-lg">
@@ -120,16 +120,7 @@ const ServicesSelection = ({
         ))}
       </div>
       {selectedServicesIds.length > 0 && (
-        <div className="text-end">
-          <Button
-            variant="destructive"
-            size="lg"
-            className="text-base"
-            onClick={handleClickNext}
-          >
-            Suivant ↓
-          </Button>
-        </div>
+        <NextServiceButton handleClickNext={handleClickNext} />
       )}
     </div>
   );

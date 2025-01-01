@@ -1,7 +1,29 @@
-const Maintenance = () => {
+import NextServiceButton from "./NextServiceButton";
+import PreviousServiceButton from "./PreviousServiceButton";
+
+type MaintenanceProps = {
+  handleClickNext: () => void;
+  handleClickPrevious: () => void;
+  selectedServicesIds: number[];
+};
+
+const Maintenance = ({
+  handleClickNext,
+  handleClickPrevious,
+  selectedServicesIds,
+}: MaintenanceProps) => {
   return (
-    <div className="flex flex-col gap-10 w-full md:w-3/4 mx-auto h-full" id="2">
-      Maintenance
+    <div
+      className="flex flex-col gap-10 w-full  mx-auto h-full relative"
+      id="2"
+    >
+      <div className="flex justify-between items-center">
+        <p className="text-lg">Maintenance</p>
+        <PreviousServiceButton handleClickPrevious={handleClickPrevious} />
+      </div>
+      {selectedServicesIds[selectedServicesIds.length - 1] === 2 ? null : (
+        <NextServiceButton handleClickNext={handleClickNext} />
+      )}
     </div>
   );
 };

@@ -32,7 +32,7 @@ const page = () => {
           </SheetContent>
         </Sheet>
       </div>
-      <section className="flex flex-col gap-10 h-full py-6 flex-1">
+      <section className="flex flex-col gap-10 flex-1 py-6">
         <DevisProgressProvider>
           <DevisDataProvider>
             <MesServices />

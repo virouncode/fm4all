@@ -1,7 +1,26 @@
-const Cafe = () => {
+import NextServiceButton from "./NextServiceButton";
+import PreviousServiceButton from "./PreviousServiceButton";
+
+type CafeProps = {
+  handleClickNext: () => void;
+  handleClickPrevious: () => void;
+  selectedServicesIds: number[];
+};
+
+const Cafe = ({
+  handleClickNext,
+  handleClickPrevious,
+  selectedServicesIds,
+}: CafeProps) => {
   return (
-    <div className="flex flex-col gap-10 w-full md:w-3/4 mx-auto h-full" id="5">
-      Café
+    <div className="flex flex-col gap-10 w-full mx-auto h-full relative" id="5">
+      <div className="flex justify-between items-center">
+        <p className="text-lg">Café</p>
+        <PreviousServiceButton handleClickPrevious={handleClickPrevious} />
+      </div>
+      {selectedServicesIds[selectedServicesIds.length - 1] === 5 ? null : (
+        <NextServiceButton handleClickNext={handleClickNext} />
+      )}
     </div>
   );
 };

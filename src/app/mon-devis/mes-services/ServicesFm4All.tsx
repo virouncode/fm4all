@@ -1,10 +1,29 @@
-const ServicesFm4All = () => {
+import NextServiceButton from "./NextServiceButton";
+import PreviousServiceButton from "./PreviousServiceButton";
+
+type ServicesFm4AllProps = {
+  handleClickNext: () => void;
+  handleClickPrevious: () => void;
+  selectedServicesIds: number[];
+};
+
+const ServicesFm4All = ({
+  handleClickNext,
+  handleClickPrevious,
+  selectedServicesIds,
+}: ServicesFm4AllProps) => {
   return (
     <div
-      className="flex flex-col gap-10 w-full md:w-3/4 mx-auto h-full"
+      className="flex flex-col gap-10 w-full mx-auto h-full relative"
       id="10"
     >
-      Services fm4all
+      <div className="flex justify-between items-center">
+        <p className="text-lg">ServicesFm4All</p>
+        <PreviousServiceButton handleClickPrevious={handleClickPrevious} />
+      </div>
+      {selectedServicesIds[selectedServicesIds.length - 1] === 10 ? null : (
+        <NextServiceButton handleClickNext={handleClickNext} />
+      )}
     </div>
   );
 };

@@ -1,7 +1,26 @@
-const Fruits = () => {
+import NextServiceButton from "./NextServiceButton";
+import PreviousServiceButton from "./PreviousServiceButton";
+
+type FruitsProps = {
+  handleClickNext: () => void;
+  handleClickPrevious: () => void;
+  selectedServicesIds: number[];
+};
+
+const Fruits = ({
+  handleClickNext,
+  handleClickPrevious,
+  selectedServicesIds,
+}: FruitsProps) => {
   return (
-    <div className="flex flex-col gap-10 w-full md:w-3/4 mx-auto h-full" id="6">
-      Fruits
+    <div className="flex flex-col gap-10 w-full mx-auto h-full relative" id="6">
+      <div className="flex justify-between items-center">
+        <p className="text-lg">Fruits</p>
+        <PreviousServiceButton handleClickPrevious={handleClickPrevious} />
+      </div>
+      {selectedServicesIds[selectedServicesIds.length - 1] === 6 ? null : (
+        <NextServiceButton handleClickNext={handleClickNext} />
+      )}
     </div>
   );
 };
