@@ -44,7 +44,9 @@ const Hero = () => {
               size="lg"
               className="w-full md:w-auto text-base"
             >
-              <Link href="/mon-devis">Je réalise mon devis en ligne</Link>
+              <Link href="/mon-devis/mes-locaux">
+                Je réalise mon devis en ligne
+              </Link>
               {/* Mon devis en ligne */}
             </Button>
           </div>
