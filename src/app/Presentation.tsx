@@ -1,6 +1,3 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-
 const Presentation = () => {
   return (
     <section
@@ -28,7 +25,7 @@ const Presentation = () => {
         </p>
         <p>Prêt à optimiser la gestion de vos bureaux ?</p>
       </div>
-      <Button
+      {/* <Button
         variant="destructive"
         size="lg"
         className="w-full md:w-auto text-base self-start mx-auto"
@@ -36,7 +33,7 @@ const Presentation = () => {
         <Link href="/mon-devis/mes-locaux">
           Obtenez votre devis en quelques clics
         </Link>
-      </Button>
+      </Button> */}
     </section>
   );
 };

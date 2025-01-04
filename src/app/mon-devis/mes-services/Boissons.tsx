@@ -13,7 +13,7 @@ const Boissons = ({
   selectedServicesIds,
 }: BoissonsProps) => {
   return (
-    <div className="flex flex-col gap-10 w-full mx-auto h-full relative" id="8">
+    <div className="flex flex-col gap-10 w-full mx-auto h-[600px] py-2" id="8">
       <div className="flex justify-between items-center">
         <p className="text-lg">Boissons</p>
         <PreviousServiceButton handleClickPrevious={handleClickPrevious} />

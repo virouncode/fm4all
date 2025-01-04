@@ -50,7 +50,7 @@ const DevisBreadcrumb = ({ currentStepId }: DevisBreadcumbProps) => {
   }, []);
 
   return (
-    <div className="flex justify-center mb-4">
+    <div className="flex justify-center">
       <Breadcrumb className="h-20 md:h-10">
         <BreadcrumbList className="text-sm lg:text-base">
           {devisRoutes.map((route, index) => (

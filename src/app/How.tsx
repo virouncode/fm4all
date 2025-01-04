@@ -1,7 +1,5 @@
 import WhyCard from "@/components/cards/WhyCard";
-import { Button } from "@/components/ui/button";
 import { Euro, HandPlatter, House, ReceiptText, Star } from "lucide-react";
-import Link from "next/link";
 
 const How = () => {
   return (
@@ -39,13 +37,13 @@ const How = () => {
           icon={ReceiptText}
         />
       </div>
-      <Button
+      {/* <Button
         variant="destructive"
         size="lg"
         className="w-full md:w-auto text-base self-start mx-auto"
       >
         <Link href="/mon-devis/mes-locaux">Démarrez maintenant</Link>
-      </Button>
+      </Button> */}
       {/* <div className="flex flex-wrap justify-center align-center gap-x-24 gap-y-8">
         <ImgCardHorizontal
           src="/img/ourprocess1.png"

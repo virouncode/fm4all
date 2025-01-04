@@ -1,6 +1,3 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-
 const Mission = () => {
   return (
     <section className="max-w-7xl w-full mx-auto flex flex-col gap-10 p-6">
@@ -38,7 +35,7 @@ const Mission = () => {
           Ne perdez plus de temps à lancer des appels d’offres ou à attendre des
           devis sans réponse.
         </p>
-        <Button
+        {/* <Button
           variant="destructive"
           size="lg"
           className="w-full md:w-auto text-base self-start mx-auto text-wrap"
@@ -49,7 +46,7 @@ const Mission = () => {
           <Link href="/mon-devis/mes-locaux" className="block md:hidden">
             Bénéficiez de notre réseau
           </Link>
-        </Button>
+        </Button> */}
       </div>
     </section>
   );

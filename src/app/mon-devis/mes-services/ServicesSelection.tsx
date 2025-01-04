@@ -97,13 +97,13 @@ const ServicesSelection = ({
   };
   return (
     <div
-      className="flex flex-col gap-10 w-full mx-auto h-full relative"
+      className="flex flex-col gap-10 w-full mx-auto h-[600px] py-2"
       id="services-selection"
     >
       <p className="text-base md:text-lg">
         Sélectionnez les services dont vous avez besoin :
       </p>
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 items-center">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6">
         {servicesChoices.map((service) => (
           <div
             className={`flex gap-4 items-center p-4 border-2 rounded-xl cursor-pointer ${

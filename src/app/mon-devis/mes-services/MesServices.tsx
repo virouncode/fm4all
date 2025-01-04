@@ -92,7 +92,7 @@ const MesServices = () => {
   };
 
   return (
-    <div className="h-full overflow-hidden">
+    <>
       <ServicesSelection
         selectedServicesIds={selectedServicesIds}
         setSelectedServicesIds={setSelectedServicesIds}
@@ -168,7 +168,7 @@ const MesServices = () => {
           selectedServicesIds={selectedServicesIds}
         />
       )}
-    </div>
+    </>
   );
 };
 
