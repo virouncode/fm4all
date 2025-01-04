@@ -90,9 +90,9 @@ const Header = () => {
           </nav>
         </div>
         <div className="flex items-center gap-4">
-          {/* <Button title="Mon devis en ligne" variant="destructive">
+          <Button title="Mon devis en ligne" variant="destructive">
             <Link href="/mon-devis/mes-locaux">Mon devis en ligne</Link>
-          </Button> */}
+          </Button>
           <Button
             title="Devenir prestataire"
             variant="outline"

@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -5,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import ContactForm from "./ContactForm";
+import Link from "next/link";
 
 const Hero = () => {
   return (
@@ -32,27 +33,21 @@ const Hero = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* <p className="mb-6 hidden text-lg md:block text-center">
+          <p className="mb-6 hidden text-lg md:block text-center">
             Le Facility Management pour tous !
-          </p> */}
-          {/* <ContactForm /> */}
-          {/* <div className="w-full flex justify-center">
+          </p>
+
+          <div className="w-full flex justify-center">
             <Button
               title="Mon devis en ligne"
               variant="destructive"
               size="lg"
               className="w-full md:w-auto text-base"
-            > */}
-          {/* <Link href="/mon-devis">Je réalise mon devis en ligne</Link> */}
-          {/* Mon devis en ligne */}
-          {/* </Button>
-          </div> */}
-          <p className="mb-4">
-            Nous peaufinons encore les derniers détails, pour être informés de
-            l&apos;ouverture en ligne ou simplement contacter nos services,
-            c&apos;est par ici :{" "}
-          </p>
-          <ContactForm />
+            >
+              <Link href="/mon-devis">Je réalise mon devis en ligne</Link>
+              {/* Mon devis en ligne */}
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </section>
