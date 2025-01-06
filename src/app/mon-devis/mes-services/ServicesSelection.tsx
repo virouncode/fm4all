@@ -1,11 +1,6 @@
 "use client";
 
 import {
-  Citrus,
-  Coffee,
-  CupSoda,
-  Donut,
-  Droplet,
   FireExtinguisher,
   HandPlatter,
   SprayCan,
@@ -18,7 +13,7 @@ import NextServiceButton from "./NextServiceButton";
 const servicesChoices = [
   {
     id: 1,
-    description: "Nettoyage",
+    description: "Nettoyage et propreté",
     icon: <SprayCan />,
   },
   {
@@ -33,36 +28,11 @@ const servicesChoices = [
   },
   {
     id: 4,
-    description: "Fontaine à eau",
-    icon: <Droplet />,
-  },
-  {
-    id: 5,
-    description: "Café",
-    icon: <Coffee />,
-  },
-  {
-    id: 6,
-    description: "Fruits",
-    icon: <Citrus />,
-  },
-  {
-    id: 7,
-    description: "Snacks",
-    icon: <Donut />,
-  },
-  {
-    id: 8,
-    description: "Boissons",
-    icon: <CupSoda />,
-  },
-  {
-    id: 9,
     description: "Office Manager",
     icon: <User />,
   },
   {
-    id: 10,
+    id: 5,
     description: "Services fm4all",
     icon: <HandPlatter />,
   },

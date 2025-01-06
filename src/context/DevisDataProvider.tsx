@@ -6,6 +6,10 @@ type DevisDataType = {
   firstCompanyInfo: FirstCompanyInfoType;
   services: ServicesType;
   allCompanyInfo: AllCompanyInfoType;
+  nettoyagePropositionId: number | null;
+  repassePropositionId: number | null;
+  samediPropositionId: number | null;
+  dimanchePropositionId: number | null;
 };
 
 export const DevisDataContext = createContext<{
@@ -25,6 +29,10 @@ export const DevisDataContext = createContext<{
       service2: false,
       service3: false,
     },
+    nettoyagePropositionId: null,
+    repassePropositionId: null,
+    samediPropositionId: null,
+    dimanchePropositionId: null,
     allCompanyInfo: {
       siret: "",
       raisonSociale: "",
@@ -57,6 +65,10 @@ const DevisDataProvider = ({ children }: PropsWithChildren) => {
               service2: false,
               service3: false,
             },
+            nettoyagePropositionId: null,
+            repassePropositionId: null,
+            samediPropositionId: null,
+            dimanchePropositionId: null,
             allCompanyInfo: {
               siret: "",
               raisonSociale: "",
@@ -82,6 +94,10 @@ const DevisDataProvider = ({ children }: PropsWithChildren) => {
           service2: false,
           service3: false,
         },
+        nettoyagePropositionId: null,
+        repassePropositionId: null,
+        samediPropositionId: null,
+        dimanchePropositionId: null,
         allCompanyInfo: {
           siret: "",
           raisonSociale: "",

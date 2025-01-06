@@ -1,5 +1,5 @@
-import NextServiceButton from "./NextServiceButton";
-import PreviousServiceButton from "./PreviousServiceButton";
+import NextServiceButton from "../mes-services/NextServiceButton";
+import PreviousServiceButton from "../mes-services/PreviousServiceButton";
 
 type SnacksProps = {
   handleClickNext: () => void;
