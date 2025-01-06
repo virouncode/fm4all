@@ -6,10 +6,6 @@ type DevisDataType = {
   firstCompanyInfo: FirstCompanyInfoType;
   services: ServicesType;
   allCompanyInfo: AllCompanyInfoType;
-  nettoyagePropositionId: number | null;
-  repassePropositionId: number | null;
-  samediPropositionId: number | null;
-  dimanchePropositionId: number | null;
 };
 
 export const DevisDataContext = createContext<{
@@ -25,14 +21,17 @@ export const DevisDataContext = createContext<{
       typeOccupation: "",
     },
     services: {
-      service1: false,
-      service2: false,
-      service3: false,
+      nettoyage: {
+        nettoyageFournisseurId: null,
+        nettoyagePropositionId: null,
+        repassePropositionId: null,
+        samediPropositionId: null,
+        dimanchePropositionId: null,
+        vitreriePropositionId: null,
+        propreteFournisseurId: null,
+        trilogieGammeSelected: null,
+      },
     },
-    nettoyagePropositionId: null,
-    repassePropositionId: null,
-    samediPropositionId: null,
-    dimanchePropositionId: null,
     allCompanyInfo: {
       siret: "",
       raisonSociale: "",
@@ -61,14 +60,18 @@ const DevisDataProvider = ({ children }: PropsWithChildren) => {
               typeOccupation: "",
             },
             services: {
-              service1: false,
-              service2: false,
-              service3: false,
+              nettoyage: {
+                nettoyageFournisseurId: null,
+                nettoyagePropositionId: null,
+                repassePropositionId: null,
+                samediPropositionId: null,
+                dimanchePropositionId: null,
+                vitreriePropositionId: null,
+                propreteFournisseurId: null,
+                trilogieGammeSelected: null,
+              },
             },
-            nettoyagePropositionId: null,
-            repassePropositionId: null,
-            samediPropositionId: null,
-            dimanchePropositionId: null,
+
             allCompanyInfo: {
               siret: "",
               raisonSociale: "",
@@ -90,14 +93,18 @@ const DevisDataProvider = ({ children }: PropsWithChildren) => {
           typeOccupation: "",
         },
         services: {
-          service1: false,
-          service2: false,
-          service3: false,
+          nettoyage: {
+            nettoyageFournisseurId: null,
+            nettoyagePropositionId: null,
+            repassePropositionId: null,
+            samediPropositionId: null,
+            dimanchePropositionId: null,
+            vitreriePropositionId: null,
+            propreteFournisseurId: null,
+            trilogieGammeSelected: null,
+          },
         },
-        nettoyagePropositionId: null,
-        repassePropositionId: null,
-        samediPropositionId: null,
-        dimanchePropositionId: null,
+
         allCompanyInfo: {
           siret: "",
           raisonSociale: "",
@@ -141,9 +148,16 @@ export const firstInfoSchema = z.object({
 export type FirstCompanyInfoType = z.infer<typeof firstInfoSchema>;
 
 export const servicesSchema = z.object({
-  service1: z.boolean(),
-  service2: z.boolean(),
-  service3: z.boolean(),
+  nettoyage: z.object({
+    nettoyageFournisseurId: z.number().nullable(),
+    nettoyagePropositionId: z.number().nullable(),
+    repassePropositionId: z.number().nullable(),
+    samediPropositionId: z.number().nullable(),
+    dimanchePropositionId: z.number().nullable(),
+    vitreriePropositionId: z.number().nullable(),
+    propreteFournisseurId: z.number().nullable(),
+    trilogieGammeSelected: z.string().nullable(),
+  }),
 });
 
 export type ServicesType = z.infer<typeof servicesSchema>;

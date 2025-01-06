@@ -1,3 +1,4 @@
+import { Checkbox } from "@/components/ui/checkbox";
 import { TabsContent } from "@/components/ui/tabs";
 import {
   Tooltip,
@@ -8,7 +9,7 @@ import {
 import { formatNumber } from "@/lib/formatNumber";
 
 type TabsContentSamediProps = {
-  formattedNettoyagePropositions: {
+  filteredNettoyagePropositions: {
     fournisseurId: number;
     nomEntreprise: string;
     slogan: string | null;
@@ -22,75 +23,74 @@ type TabsContentSamediProps = {
     freqAnnuelle: number;
     prixAnnuelSamedi: number;
     prixAnnuelDimanche: number;
-  }[][];
+  }[];
   selectedSamediPropositionId: number | null;
   handleClickProposition: (propositionId: number) => void;
 };
 
 const TabsContentSamedi = ({
-  formattedNettoyagePropositions,
+  filteredNettoyagePropositions,
   selectedSamediPropositionId,
   handleClickProposition,
 }: TabsContentSamediProps) => {
   return (
     <TabsContent value="samedi" className="flex-1">
       <div className="h-full flex flex-col border rounded-xl overflow-hidden">
-        {formattedNettoyagePropositions.length > 0
-          ? formattedNettoyagePropositions.map((propositions) => (
+        <div
+          className="flex border-b flex-1"
+          key={filteredNettoyagePropositions[0].fournisseurId}
+        >
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex w-1/4 items-center justify-center">
+                  {filteredNettoyagePropositions[0].nomEntreprise}
+                </div>
+              </TooltipTrigger>
+              {filteredNettoyagePropositions[0].slogan && (
+                <TooltipContent>
+                  <p className="text-sm italic">
+                    {filteredNettoyagePropositions[0].slogan}
+                  </p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
+          {filteredNettoyagePropositions.map((proposition) => {
+            const gamme = proposition.gamme;
+            const color =
+              gamme === "essentiel"
+                ? "fm4allessential"
+                : gamme === "confort"
+                ? "fm4allcomfort"
+                : "fm4allexcellence";
+            return (
               <div
-                className="flex border-b flex-1"
-                key={propositions[0].fournisseurId}
+                className={`flex flex-1 ${
+                  selectedSamediPropositionId === proposition.id
+                    ? "border-2 border-destructive"
+                    : ""
+                } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
+                onClick={() => handleClickProposition(proposition.id)}
+                key={proposition.id}
               >
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="flex w-1/4 items-center justify-center">
-                        {propositions[0].nomEntreprise}
-                      </div>
-                    </TooltipTrigger>
-                    {propositions[0].slogan && (
-                      <TooltipContent>
-                        <p className="text-sm italic">
-                          {propositions[0].slogan}
-                        </p>
-                      </TooltipContent>
-                    )}
-                  </Tooltip>
-                </TooltipProvider>
-                {propositions.map((proposition) => {
-                  const gamme = proposition.gamme;
-                  const color =
-                    gamme === "essentiel"
-                      ? "fm4allessential"
-                      : gamme === "confort"
-                      ? "fm4allcomfort"
-                      : "fm4allexcellence";
-                  return (
-                    <div
-                      className={`flex flex-1 ${
-                        selectedSamediPropositionId === proposition.id
-                          ? `bg-${color} border border-destructive`
-                          : `bg-${color}/80`
-                      } text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer hover:bg-${color}`}
-                      onClick={() => handleClickProposition(proposition.id)}
-                      key={proposition.id}
-                    >
-                      {/* <Checkbox className="border-primary bg-background data-[state=checked]:bg-background data-[state=checked]:text-foreground" /> */}
-                      <div>
-                        <p className="font-bold">
-                          {formatNumber(proposition.prixAnnuelSamedi)} € / an*
-                        </p>
-                        <p className="text-sm">
-                          1 passage de {proposition.hParPassage / 10000}h en
-                          plus
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
+                <Checkbox
+                  checked={selectedSamediPropositionId === proposition.id}
+                  onCheckedChange={() => handleClickProposition(proposition.id)}
+                  className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+                />
+                <div>
+                  <p className="font-bold">
+                    {formatNumber(proposition.prixAnnuelSamedi)} € / an*
+                  </p>
+                  <p className="text-sm">
+                    1 passage de {proposition.hParPassage / 10000}h en plus
+                  </p>
+                </div>
               </div>
-            ))
-          : null}
+            );
+          })}
+        </div>
       </div>
     </TabsContent>
   );

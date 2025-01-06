@@ -155,6 +155,7 @@ export const propreteInstalDistribTarifs = pgTable(
 
 export const propreteConsoTarifs = pgTable("proprete_conso_tarifs", {
   id: serial().primaryKey(),
+  effectif: integer(),
   fournisseurId: integer("fournisseur_id")
     .notNull()
     .references(() => fournisseurs.id),

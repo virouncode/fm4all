@@ -1,3 +1,4 @@
+import { Checkbox } from "@/components/ui/checkbox";
 import { TabsContent } from "@/components/ui/tabs";
 import {
   Tooltip,
@@ -67,15 +68,23 @@ const TabsContentNettoyage = ({
                       : "fm4allexcellence";
                   return (
                     <div
-                      className={`flex flex-1 ${
+                      className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
                         selectedNettoyagePropositionId === proposition.id
-                          ? `bg-${color} border border-destructive`
-                          : `bg-${color}/80`
-                      } text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer hover:bg-${color}`}
-                      onClick={() => handleClickProposition(proposition.id)}
+                          ? "border-2 border-destructive"
+                          : ""
+                      }`}
                       key={proposition.id}
+                      onClick={() => handleClickProposition(proposition.id)}
                     >
-                      {/* <Checkbox className="border-primary bg-background data-[state=checked]:bg-background data-[state=checked]:text-foreground" /> */}
+                      <Checkbox
+                        checked={
+                          selectedNettoyagePropositionId === proposition.id
+                        }
+                        onCheckedChange={() =>
+                          handleClickProposition(proposition.id)
+                        }
+                        className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+                      />
                       <div>
                         <p className="font-bold">
                           {formatNumber(proposition.prixAnnuel)} € / an

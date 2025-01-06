@@ -2,9 +2,13 @@ import { Button } from "@/components/ui/button";
 
 type NextServiceButtonProps = {
   handleClickNext: () => void;
+  disabled?: boolean;
 };
 
-const NextServiceButton = ({ handleClickNext }: NextServiceButtonProps) => {
+const NextServiceButton = ({
+  handleClickNext,
+  disabled = false,
+}: NextServiceButtonProps) => {
   return (
     <div className="text-end">
       <Button
@@ -12,6 +16,7 @@ const NextServiceButton = ({ handleClickNext }: NextServiceButtonProps) => {
         size="lg"
         className="text-base"
         onClick={handleClickNext}
+        disabled={disabled}
       >
         Suivant ↓
       </Button>

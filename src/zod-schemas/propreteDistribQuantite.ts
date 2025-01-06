@@ -1,6 +1,5 @@
 import { propreteDistribQuantites } from "@/db/schema";
 import { createSelectSchema } from "drizzle-zod";
-import { z } from "zod";
 
 export const selectPropreteDistribQuantiteSchema = createSelectSchema(
   propreteDistribQuantites,
@@ -13,12 +12,7 @@ export const selectPropreteDistribQuantiteSchema = createSelectSchema(
     nbDistribPh: (schema) =>
       schema.min(1, "Le nombre de distributeurs ph est obligatoire"),
   }
-).extend({
-  nbDistribDesinfectant: z.number(),
-  nbDistributeurParfum: z.number(),
-  nbDistribBalai: z.number(),
-  nbDistribPoubelle: z.number(),
-});
+);
 
 export type SelectPropreteDistribQuantiteType =
   typeof selectPropreteDistribQuantiteSchema._type;

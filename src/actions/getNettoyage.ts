@@ -6,10 +6,12 @@ import {
   nettoyageQuantites,
   nettoyageRepasseTarifs,
   nettoyageTarifs,
+  nettoyageVitrerieTarifs,
 } from "@/db/schema";
 import { selectNettoyageQuantitesSchema } from "@/zod-schemas/nettoyageQuantites";
 import { selectNettoyageRepasseTarifsSchema } from "@/zod-schemas/nettoyageRepasse";
 import { selectNettoyageTarifsSchema } from "@/zod-schemas/nettoyageTarifs";
+import { selectNettoyageVitrerieTarifsSchema } from "@/zod-schemas/nettoyageVitrerie";
 import { eq, getTableColumns } from "drizzle-orm";
 import { z } from "zod";
 
@@ -107,12 +109,10 @@ export const getNettoyagePropositions = async (surface: number) => {
             (tarif.tauxHoraire / 10000)
         ),
         prixAnnuelSamedi: Math.round(
-          52 * (tarif.hParPassage / 10000) * ((tarif.tauxHoraire * 1.2) / 10000)
+          52 * (tarif.hParPassage / 10000) * (tarif.tauxHoraire / 10000)
         ),
         prixAnnuelDimanche: Math.round(
-          52 *
-            (tarif.hParPassage / 10000) *
-            ((tarif.tauxHoraire * 1.25) / 10000)
+          52 * (tarif.hParPassage / 10000) * ((tarif.tauxHoraire * 1.2) / 10000)
         ),
       }))
       .sort((a, b) => a.fournisseurId - b.fournisseurId);
@@ -225,3 +225,86 @@ export const getNettoyageRepassePropositions = async (surface: number) => {
     }
   }
 };
+
+export const getNettoyageVitrerieTarifs = async () => {
+  try {
+    const results = await db
+      .select({
+        ...getTableColumns(nettoyageVitrerieTarifs),
+        nomEntreprise: fournisseurs.nomEntreprise,
+        slogan: fournisseurs.slogan,
+      })
+      .from(nettoyageVitrerieTarifs)
+      .innerJoin(
+        fournisseurs,
+        eq(fournisseurs.id, nettoyageVitrerieTarifs.fournisseurId)
+      );
+
+    if (results.length === 0) return [];
+    return results.map((result) =>
+      selectNettoyageVitrerieTarifsSchema.parse(result)
+    );
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      const messages = err.issues
+        .map((issue) => `${issue.path[0]} : ${issue.message}`)
+        .join(", ");
+      console.error(`Erreurs de validation du schéma : ${messages}`);
+      throw new Error(
+        "Échec de la récupération des tarifs de vitrerie : le schéma est invalide."
+      );
+    } else if (err instanceof Error) {
+      console.error(`Erreur : ${err.message}`);
+      throw new Error(
+        `Échec de la récupération des tarifs de vitrerie : ${err.message}`
+      );
+    } else {
+      console.error("Erreur inconnue.");
+      throw new Error(
+        "Échec de la récupération des tarifs de vitrerie : erreur inconnue."
+      );
+    }
+  }
+};
+
+export const getNettoyageVitreriePropositions = async (surface: number) => {
+  try {
+    const tarifs = await getNettoyageVitrerieTarifs();
+    const surfaceVitrerie = surface * 0.15;
+    const surfaceCloisons = surface * 0.15;
+    const propositions = tarifs.map((tarif) => ({
+      ...tarif,
+      prixVitrerieParPassage:
+        (surfaceVitrerie / tarif.cadenceVitres) * tarif.tauxHoraire,
+      prixCloisonsParPassage:
+        (surfaceCloisons / tarif.cadenceCloisons) * tarif.tauxHoraire,
+    }));
+    return propositions;
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      const messages = err.issues
+        .map((issue) => `${issue.path[0]} : ${issue.message}`)
+        .join(", ");
+      console.error(`Erreurs de validation du schéma : ${messages}`);
+      throw new Error(
+        "Échec de la récupération des devis de vitrerie : le schéma est invalide."
+      );
+    } else if (err instanceof Error) {
+      console.error(`Erreur : ${err.message}`);
+      throw new Error(
+        `Échec de la récupération des devis de vitrerie : ${err.message}`
+      );
+    } else {
+      console.error("Erreur inconnue.");
+      throw new Error(
+        "Échec de la récupération des devis de vitrerie : erreur inconnue."
+      );
+    }
+  }
+};
+
+//cadence en M2/h
+//  candenceVitres m2       1h
+//  surfaceVitrerie         ?
+// surfaceVitrerie/cadenceVitres = nbre h vitrerie
+// surfaceCloisons/cadenceCloisons = nbre h cloisons

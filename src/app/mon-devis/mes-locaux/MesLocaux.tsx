@@ -84,6 +84,20 @@ const MesLocaux = () => {
       console.log(err);
     }
     setDevisProgress({ currentStep: 2, completedSteps: [1] });
+    setDevisData((prev) => ({
+      ...prev,
+      services: {
+        nettoyage: {
+          nettoyageFournisseurId: null,
+          nettoyagePropositionId: null,
+          repassePropositionId: null,
+          samediPropositionId: null,
+          dimanchePropositionId: null,
+          vitreriePropositionId: null,
+          propreteFournisseurId: null,
+        },
+      },
+    }));
     setLoadingServices(true);
     setTimeout(() => {
       router.push("/mon-devis/mes-services");

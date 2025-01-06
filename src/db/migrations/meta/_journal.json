@@ -22,6 +22,13 @@
       "when": 1736109105017,
       "tag": "0002_deep_cargill",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1736169595598,
+      "tag": "0003_omniscient_anita_blake",
+      "breakpoints": true
     }
   ]
 }

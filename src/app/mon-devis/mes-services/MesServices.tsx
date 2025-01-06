@@ -3,6 +3,7 @@ import { DevisDataContext } from "@/context/DevisDataProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import Link from "next/link";
 import { useContext, useState } from "react";
+import ConsommablesProprete from "./(consommablesProprete)/ConsommablesProprete";
 import Nettoyage from "./(nettoyage)/Nettoyage";
 import Maintenance from "./Maintenance";
 import OfficeManager from "./OfficeManager";
@@ -28,8 +29,8 @@ const MesServices = () => {
     );
   }
   const handleClickNext = () => {
-    console.log("selectedServicesIds", selectedServicesIds);
     console.log("currentServiceId", currentServiceId);
+    console.log("selectedServicesIds", selectedServicesIds);
 
     if (currentServiceId === null) {
       setCurrentServiceId(1);
@@ -41,12 +42,13 @@ const MesServices = () => {
         return;
       }
     }
-
     const nextService = document.getElementById(
       selectedServicesIds[
         selectedServicesIds.indexOf(currentServiceId as number) + 1
       ].toString()
     );
+    console.log("nextService", nextService);
+
     if (nextService) {
       nextService.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
@@ -100,28 +102,36 @@ const MesServices = () => {
           selectedServicesIds={selectedServicesIds}
         />
       )}
-      {selectedServicesIds.includes(2) && (
+      {selectedServicesIds.includes(1) && (
+        <ConsommablesProprete
+          handleClickNext={handleClickNext}
+          handleClickPrevious={handleClickPrevious}
+          selectedServicesIds={selectedServicesIds}
+        />
+      )}
+
+      {selectedServicesIds.includes(3) && (
         <Maintenance
           handleClickNext={handleClickNext}
           handleClickPrevious={handleClickPrevious}
           selectedServicesIds={selectedServicesIds}
         />
       )}
-      {selectedServicesIds.includes(3) && (
+      {selectedServicesIds.includes(4) && (
         <SecuriteIncendie
           handleClickNext={handleClickNext}
           handleClickPrevious={handleClickPrevious}
           selectedServicesIds={selectedServicesIds}
         />
       )}
-      {selectedServicesIds.includes(4) && (
+      {selectedServicesIds.includes(5) && (
         <OfficeManager
           handleClickNext={handleClickNext}
           handleClickPrevious={handleClickPrevious}
           selectedServicesIds={selectedServicesIds}
         />
       )}
-      {selectedServicesIds.includes(5) && (
+      {selectedServicesIds.includes(6) && (
         <ServicesFm4All
           handleClickNext={handleClickNext}
           handleClickPrevious={handleClickPrevious}

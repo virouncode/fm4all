@@ -16,23 +16,24 @@ const servicesChoices = [
     description: "Nettoyage et propreté",
     icon: <SprayCan />,
   },
+  { id: 2, description: "Consommables propreté", icon: <SprayCan /> },
   {
-    id: 2,
+    id: 3,
     description: "Maintenance",
     icon: <Wrench />,
   },
   {
-    id: 3,
+    id: 4,
     description: "Sécurité incendie",
     icon: <FireExtinguisher />,
   },
   {
-    id: 4,
+    id: 5,
     description: "Office Manager",
     icon: <User />,
   },
   {
-    id: 5,
+    id: 6,
     description: "Services fm4all",
     icon: <HandPlatter />,
   },
@@ -54,12 +55,27 @@ const ServicesSelection = ({
 
   const handleClickService = (serviceId: number) => {
     if (isServiceSelected(serviceId)) {
+      if (serviceId === 1) {
+        setSelectedServicesIds((prev) =>
+          prev
+            .filter(
+              (selectedServiceId) =>
+                selectedServiceId !== 1 && selectedServiceId !== 2
+            )
+            .sort((a, b) => a - b)
+        );
+        return;
+      }
       setSelectedServicesIds((prev) =>
         prev
           .filter((selectedServiceId) => selectedServiceId !== serviceId)
           .sort((a, b) => a - b)
       );
     } else {
+      if (serviceId === 1) {
+        setSelectedServicesIds((prev) => [...prev, 1, 2].sort((a, b) => a - b));
+        return;
+      }
       setSelectedServicesIds((prev) =>
         [...prev, serviceId].sort((a, b) => a - b)
       );
@@ -74,20 +90,22 @@ const ServicesSelection = ({
         Sélectionnez les services dont vous avez besoin :
       </p>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6">
-        {servicesChoices.map((service) => (
-          <div
-            className={`flex gap-4 items-center p-4 border-2 rounded-xl cursor-pointer ${
-              isServiceSelected(service.id)
-                ? "bg-fm4allsecondary/10 border-fm4allsecondary text-fm4allsecondary "
-                : "hover:text-fm4allsecondary hover:border-fm4allsecondary"
-            }`}
-            key={service.id}
-            onClick={() => handleClickService(service.id)}
-          >
-            {service.icon}
-            <p>{service.description}</p>
-          </div>
-        ))}
+        {servicesChoices
+          .filter(({ id }) => id !== 2)
+          .map((service) => (
+            <div
+              className={`flex gap-4 items-center p-4 border-2 rounded-xl cursor-pointer ${
+                isServiceSelected(service.id)
+                  ? "bg-fm4allsecondary/10 border-fm4allsecondary text-fm4allsecondary "
+                  : "hover:text-fm4allsecondary hover:border-fm4allsecondary"
+              }`}
+              key={service.id}
+              onClick={() => handleClickService(service.id)}
+            >
+              {service.icon}
+              <p>{service.description}</p>
+            </div>
+          ))}
       </div>
       {selectedServicesIds.length > 0 && (
         <NextServiceButton handleClickNext={handleClickNext} />

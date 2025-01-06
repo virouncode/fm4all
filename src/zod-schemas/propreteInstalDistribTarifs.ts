@@ -1,7 +1,7 @@
 import { propreteInstalDistribTarifs } from "@/db/schema";
 import { createSelectSchema } from "drizzle-zod";
 
-export const selectPropreteInstalDistribTaifsSchema = createSelectSchema(
+export const selectPropreteInstalDistribTarifsSchema = createSelectSchema(
   propreteInstalDistribTarifs,
   {
     effectif: (schema) => schema.min(1, "L'effectif est obligatoire"),
@@ -11,4 +11,4 @@ export const selectPropreteInstalDistribTaifsSchema = createSelectSchema(
 );
 
 export type SelectPropreteInstalDistribTarifsType =
-  typeof selectPropreteInstalDistribTaifsSchema._type;
+  typeof selectPropreteInstalDistribTarifsSchema._type;
