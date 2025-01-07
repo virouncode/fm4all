@@ -1,17 +1,14 @@
-import {
-  getNettoyagePropositions,
-  getNettoyageRepassePropositions,
-  getNettoyageVitreriePropositions,
-} from "@/actions/getNettoyage";
-import { DevisDataContext } from "@/context/DevisDataProvider";
+import { CompanyInfoContext } from "@/context/CompanyInfoProvider";
 import { roundSurface } from "@/lib/roundSurface";
 import { SelectNettoyageRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
 import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SelectNettoyageVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
 import { useContext, useEffect, useState } from "react";
+import { useToast } from "./use-toast";
 
 const useFetchNettoyage = () => {
-  const { devisData } = useContext(DevisDataContext);
+  const { toast } = useToast();
+  const { companyInfo } = useContext(CompanyInfoContext);
   const [nettoyagePropositions, setNettoyagePropositions] = useState<
     (SelectNettoyageTarifsType & {
       prixAnnuel: number;
@@ -34,29 +31,58 @@ const useFetchNettoyage = () => {
   >([]);
   useEffect(() => {
     const fetchPropositions = async () => {
+      const roundedSurface = roundSurface(parseInt(companyInfo.surface));
       try {
-        const results = await Promise.all([
-          getNettoyagePropositions(
-            roundSurface(parseInt(devisData.firstCompanyInfo.surface))
-          ),
-          getNettoyageRepassePropositions(
-            roundSurface(parseInt(devisData.firstCompanyInfo.surface))
-          ),
-          getNettoyageVitreriePropositions(
-            roundSurface(parseInt(devisData.firstCompanyInfo.surface))
-          ),
-        ]);
-        setNettoyagePropositions(results[0]);
-        setRepassePropositions(results[1]);
-        setVitreriePropositions(results[2]);
+        const [nettoyageResponse, repasseResponse, vitrerieResponse] =
+          await Promise.all([
+            fetch(
+              `/api/nettoyage/services/propositions?surface=${roundedSurface}`
+            ),
+            fetch(
+              `/api/nettoyage/repasse/propositions?surface=${roundedSurface}`
+            ),
+            fetch(
+              `/api/nettoyage/vitrerie/propositions?surface=${roundedSurface}`
+            ),
+          ]);
+
+        if (
+          !nettoyageResponse.ok ||
+          !repasseResponse.ok ||
+          !vitrerieResponse.ok
+        ) {
+          throw new Error("Erreur réseau");
+        }
+        const nettoyageJson = await nettoyageResponse.json();
+        const repasseJson = await repasseResponse.json();
+        const vitrerieJson = await vitrerieResponse.json();
+
+        if (
+          !nettoyageJson.success ||
+          !repasseJson.success ||
+          !vitrerieJson.success
+        ) {
+          throw new Error(
+            nettoyageJson.error.message ||
+              repasseJson.error.message ||
+              vitrerieJson.error.message
+          );
+        }
+        setNettoyagePropositions(nettoyageJson.data);
+        setRepassePropositions(repasseJson.data);
+        setVitreriePropositions(vitrerieJson.data);
       } catch (err) {
         if (err instanceof Error) {
-          console.error(err.message);
+          toast({
+            title: "Error",
+            description: err.message,
+          });
         }
       }
     };
     fetchPropositions();
-  }, [devisData.firstCompanyInfo.surface]);
+  }, [companyInfo.surface, toast]);
+
   return { nettoyagePropositions, repassePropositions, vitreriePropositions };
 };
 

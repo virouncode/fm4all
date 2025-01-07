@@ -7,13 +7,12 @@ import { Form } from "@/components/ui/form";
 import { batiments } from "@/constants/batiments";
 import { departements } from "@/constants/departements";
 import { occupations } from "@/constants/occupations";
-import {
-  DevisDataContext,
-  FirstCompanyInfoType,
-  firstInfoSchema,
-} from "@/context/DevisDataProvider";
+import { CompanyInfoContext } from "@/context/CompanyInfoProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
-import { useClientOnly } from "@/hooks/use-client-only";
+import { NettoyageContext } from "@/context/NettoyageProvider";
+import { PropreteContext } from "@/context/PropreteProvider";
+import { ServicesContext } from "@/context/ServicesProvider";
+import { companyInfoSchema, CompanyInfoType } from "@/zod-schemas/companyInfo";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useContext, useEffect, useState } from "react";
@@ -23,23 +22,27 @@ import ServicesLoader from "./ServicesLoader";
 
 const MesLocaux = () => {
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
-  const { devisData, setDevisData } = useContext(DevisDataContext);
+  const { setServices } = useContext(ServicesContext);
+  const { companyInfo, setCompanyInfo } = useContext(CompanyInfoContext);
+  const { setNettoyage } = useContext(NettoyageContext);
+  const { setProprete } = useContext(PropreteContext);
   const [loadingServices, setLoadingServices] = useState(false);
-  useClientOnly();
   const [cityError, setCityError] = useState(false);
   const [cityOut, setCityOut] = useState(false);
   const router = useRouter();
 
-  const defaultValues: FirstCompanyInfoType = {
-    codePostal: devisData.firstCompanyInfo.codePostal ?? "",
-    surface: devisData.firstCompanyInfo.surface ?? "",
-    effectif: devisData.firstCompanyInfo.effectif ?? "",
-    typeBatiment: devisData.firstCompanyInfo.typeBatiment ?? "",
-    typeOccupation: devisData.firstCompanyInfo.typeOccupation ?? "",
+  const defaultValues: Partial<CompanyInfoType> = {
+    codePostal: companyInfo.codePostal,
+    surface: companyInfo.surface,
+    effectif: companyInfo.effectif,
+    typeBatiment: companyInfo.typeBatiment,
+    typeOccupation: companyInfo.typeOccupation,
   };
-  const form = useForm<FirstCompanyInfoType>({
+  const partialCompanyInfoSchema = companyInfoSchema.partial();
+
+  const form = useForm<Partial<CompanyInfoType>>({
     mode: "onBlur",
-    resolver: zodResolver(firstInfoSchema),
+    resolver: zodResolver(partialCompanyInfoSchema),
     defaultValues,
   });
 
@@ -49,25 +52,27 @@ const MesLocaux = () => {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setDevisData((prev) => ({
+    setCompanyInfo((prev) => ({
       ...prev,
-      firstCompanyInfo: { ...prev.firstCompanyInfo, [name]: value },
+      [name]: value,
     }));
   };
 
   const handleSelect = (value: string, name: string) => {
-    setDevisData((prev) => ({
+    setCompanyInfo((prev) => ({
       ...prev,
-      firstCompanyInfo: { ...prev.firstCompanyInfo, [name]: value },
+      [name]: value,
     }));
   };
 
-  const submitForm = async (data: FirstCompanyInfoType) => {
+  const submitForm = async (data: Partial<CompanyInfoType>) => {
+    console.log("afficher les tarifs");
+
     if (
-      !departements.find(({ id }) => id === data.codePostal.substring(0, 2))
+      !departements.find(({ id }) => id === data.codePostal?.substring(0, 2))
     ) {
-      setCityOut(true);
       setDevisProgress({ ...devisProgress, completedSteps: [] });
+      setCityOut(true);
       return;
     }
     try {
@@ -84,41 +89,40 @@ const MesLocaux = () => {
       console.log(err);
     }
     setDevisProgress({ currentStep: 2, completedSteps: [1] });
-    setDevisData((prev) => ({
-      ...prev,
-      services: {
-        selectedServicesIds: [],
-        nettoyage: {
-          nettoyageFournisseurId: null,
-          nettoyagePropositionId: null,
-          repassePropositionId: null,
-          samediPropositionId: null,
-          dimanchePropositionId: null,
-          vitreriePropositionId: null,
-          nbPassageVitrerie: 2,
-          propreteFournisseurId: null,
-          trilogieGammeSelected: null,
-          nbDistribEmp: 0,
-          nbDistribSavon: 0,
-          nbDistribPh: 0,
-          nbDistribDesinfectant: 0,
-          nbDistribParfum: 0,
-          nbDistribBalai: 0,
-          nbDistribPoubelle: 0,
-          dureeLocation: "pa36M",
-          desinfectantGammeSelected: null,
-          parfumGammeSelected: null,
-          balaiGammeSelected: null,
-          poubelleGammeSelected: null,
-        },
-      },
-    }));
+    setNettoyage({
+      fournisseurId: null,
+      propositionId: null,
+      gammeSelected: null,
+      repassePropositionId: null,
+      samediPropositionId: null,
+      dimanchePropositionId: null,
+      vitreriePropositionId: null,
+      nbPassageVitrerie: 2,
+    });
+    setProprete({
+      fournisseurId: null,
+      nbDistribEmp: 0,
+      nbDistribSavon: 0,
+      nbDistribPh: 0,
+      nbDistribDesinfectant: 0,
+      nbDistribParfum: 0,
+      nbDistribBalai: 0,
+      nbDistribPoubelle: 0,
+      dureeLocation: "pa36M",
+      trilogieGammeSelected: null,
+      desinfectantGammeSelected: null,
+      parfumGammeSelected: null,
+      balaiGammeSelected: null,
+      poubelleGammeSelected: null,
+    });
+    setServices({
+      currentServiceId: null,
+      selectedServicesIds: [],
+    });
     setLoadingServices(true);
     setTimeout(() => {
       router.push("/mon-devis/mes-services");
     }, 5000);
-
-    console.log(data);
   };
 
   if (cityError) {
@@ -155,19 +159,19 @@ const MesLocaux = () => {
       >
         <div className="flex flex-col gap-4 md:flex-row md:gap-8">
           <div className="w-full md:w-1/2 flex flex-col gap-4">
-            <InputWithLabel<FirstCompanyInfoType>
+            <InputWithLabel<CompanyInfoType>
               fieldTitle="Code postal*"
               nameInSchema="codePostal"
               placeholder="XXXXX"
               handleChange={handleChange}
             />
-            <InputWithLabel<FirstCompanyInfoType>
+            <InputWithLabel<CompanyInfoType>
               fieldTitle="Surface en m²*"
               nameInSchema="surface"
               handleChange={handleChange}
               placeholder=""
             />
-            <InputWithLabel<FirstCompanyInfoType>
+            <InputWithLabel<CompanyInfoType>
               fieldTitle="Nombre moyen de personnes*"
               nameInSchema="effectif"
               handleChange={handleChange}
@@ -175,13 +179,13 @@ const MesLocaux = () => {
             />
           </div>
           <div className="w-full md:w-1/2 flex flex-col gap-4 ">
-            <SelectWithLabel<FirstCompanyInfoType>
+            <SelectWithLabel<CompanyInfoType>
               fieldTitle="Type de bâtiment*"
               nameInSchema="typeBatiment"
               data={batiments}
               handleSelect={handleSelect}
             />
-            <SelectWithLabel<FirstCompanyInfoType>
+            <SelectWithLabel<CompanyInfoType>
               fieldTitle="Type d'occupation*"
               nameInSchema="typeOccupation"
               data={occupations}

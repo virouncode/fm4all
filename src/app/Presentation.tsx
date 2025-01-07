@@ -1,5 +1,4 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import DevisButton from "@/components/devis-button";
 
 const Presentation = () => {
   return (
@@ -28,15 +27,12 @@ const Presentation = () => {
         </p>
         <p>Prêt à optimiser la gestion de vos bureaux ?</p>
       </div>
-      <Button
-        variant="destructive"
+      <DevisButton
+        title="Obtenez votre devis en quelques clics"
+        text="Obtenez votre devis en quelques clics"
         size="lg"
-        className="w-full md:w-auto text-base self-start mx-auto"
-      >
-        <Link href="/mon-devis/mes-locaux">
-          Obtenez votre devis en quelques clics
-        </Link>
-      </Button>
+        className="self-start mx-auto"
+      />
     </section>
   );
 };

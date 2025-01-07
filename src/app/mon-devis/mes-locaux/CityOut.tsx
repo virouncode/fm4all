@@ -3,36 +3,23 @@
 import { InputWithLabel } from "@/components/formInputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { DevisDataContext } from "@/context/DevisDataProvider";
+import { companyInfoSchema, CompanyInfoType } from "@/zod-schemas/companyInfo";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-const contactSchema = z.object({
-  email: z.string().email("Email invalide"),
-  phone: z.string().min(10, "Numéro invalide : 10 chiffres attendus"),
-  nomEntreprise: z.string().min(1, "Le nom de l'entreprise est obligatoire"),
-  prenom: z.string().min(1, "Le prénom est obligatoire"),
-  nom: z.string().min(1, "Le nom est obligatoire"),
-  poste: z.string(),
-});
-
-type ContactType = z.infer<typeof contactSchema>;
 
 const CityOut = () => {
-  const { devisData, setDevisData } = useContext(DevisDataContext);
-  const defaultValues = {
+  const defaultValues: Partial<CompanyInfoType> = {
     email: "",
     phone: "",
     nomEntreprise: "",
-    prenom: "",
-    nom: "",
-    poste: "",
+    prenomContact: "",
+    nomContact: "",
+    posteContact: "",
   };
-  const form = useForm<ContactType>({
+  const form = useForm<Partial<CompanyInfoType>>({
     mode: "onBlur",
-    resolver: zodResolver(contactSchema),
+    resolver: zodResolver(companyInfoSchema),
     defaultValues,
   });
 
@@ -40,7 +27,7 @@ const CityOut = () => {
     console.log(e.target.name, e.target.value);
   };
 
-  const submitForm = async (data: ContactType) => {
+  const submitForm = async (data: Partial<CompanyInfoType>) => {
     //TODO:envoyer email
     console.log(data);
   };
@@ -60,45 +47,38 @@ const CityOut = () => {
         >
           <div className="flex flex-col md:flex-row gap-4 md:gap-8">
             <div className="flex-1 flex flex-col gap-4">
-              <InputWithLabel<ContactType>
+              <InputWithLabel<CompanyInfoType>
                 fieldTitle="Nom de l'entreprise*"
                 nameInSchema="nomEntreprise"
                 handleChange={handleChange}
-                placeholder=""
-                // className="text-base py-6 w-full max-w-none"
               />
-              <InputWithLabel<ContactType>
+              <InputWithLabel<CompanyInfoType>
                 fieldTitle="Email*"
                 nameInSchema="email"
                 handleChange={handleChange}
-                // className="text-base py-6 w-full max-w-none"
               />
-              <InputWithLabel<ContactType>
+              <InputWithLabel<CompanyInfoType>
                 fieldTitle="N° de téléphone*"
                 nameInSchema="phone"
                 handleChange={handleChange}
-                placeholder="10 chiffres sans espaces ni tirets"
-                // className="text-base py-6 w-full max-w-none"
+                placeholder="XX XX XX XX XX"
               />
             </div>
             <div className="flex-1 flex flex-col gap-4 ">
-              <InputWithLabel<ContactType>
+              <InputWithLabel<CompanyInfoType>
                 fieldTitle="Prénom*"
-                nameInSchema="prenom"
+                nameInSchema="prenomContact"
                 handleChange={handleChange}
-                // className="text-base py-6 w-full max-w-none"
               />
-              <InputWithLabel<ContactType>
+              <InputWithLabel<CompanyInfoType>
                 fieldTitle="Nom*"
-                nameInSchema="nom"
+                nameInSchema="nomContact"
                 handleChange={handleChange}
-                // className="text-base py-6 w-full max-w-none"
               />
-              <InputWithLabel<ContactType>
+              <InputWithLabel<CompanyInfoType>
                 fieldTitle="Poste"
-                nameInSchema="poste"
+                nameInSchema="posteContact"
                 handleChange={handleChange}
-                // className="text-base py-6 w-full max-w-none"
               />
             </div>
           </div>

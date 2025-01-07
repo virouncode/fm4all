@@ -15,8 +15,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { locationDistribProprete } from "@/constants/locationsDistribProprete";
-import { DevisDataContext } from "@/context/DevisDataProvider";
+import { CompanyInfoContext } from "@/context/CompanyInfoProvider";
+import { PropreteContext } from "@/context/PropreteProvider";
 import { formatNumber } from "@/lib/formatNumber";
+import { DureeLocationType } from "@/zod-schemas/dureeLocation";
+import { GammeType } from "@/zod-schemas/gamme";
 import { SelectPropreteConsoTarifsType } from "@/zod-schemas/propreteConsoTarifs";
 import { SelectPropreteDistribQuantiteType } from "@/zod-schemas/propreteDistribQuantite";
 import { SelectPropreteDistribTarifsType } from "@/zod-schemas/propreteDistribTarifs";
@@ -43,72 +46,50 @@ const TabsContentTrilogie = ({
   distribInstalTarifs,
   consoTarifs,
 }: TabsContentTrilogieProps) => {
-  const { devisData, setDevisData } = useContext(DevisDataContext);
-  const {
-    nbDistribEmp,
-    nbDistribSavon,
-    nbDistribPh,
-    trilogieGammeSelected,
-    dureeLocation,
-  } = devisData.services.nettoyage;
+  const { proprete, setProprete } = useContext(PropreteContext);
+  const { companyInfo } = useContext(CompanyInfoContext);
+
+  console.log("distribTarifs", distribTarifs);
 
   //Pour chaque gamme :
   // - calculer le prix annuel consommables trilogie
   // - calculer le prix annuel distributeurs trilogie
   // - calculer le prix annuel installation distributeurs trilogie
-  const gammes = ["essentiel", "confort", "excellence"];
+  const gammes = ["essentiel", "confort", "excellence"] as const;
   const propositions = gammes.map((gamme) => ({
     gamme,
     tarifsConsommables:
       (consoTarifs[0].paParPersonneEmp +
         consoTarifs[0].paParPersonneSavon +
         consoTarifs[0].paParPersonnePh) *
-      (parseInt(devisData.firstCompanyInfo.effectif) as number),
+      parseInt(companyInfo.effectif),
     tarifsDistributeurs:
-      ((nbDistribEmp || distribQuantites?.nbDistribEmp) ?? 0) *
+      ((proprete.nbDistribEmp || distribQuantites?.nbDistribEmp) ?? 0) *
         (distribTarifs.find(
           (tarif) => tarif.type === "emp" && tarif.gamme === gamme
-        )?.[
-          dureeLocation as "pa12M" | "pa24M" | "pa36M" | "oneShot"
-        ] as number) +
-      ((nbDistribSavon || distribQuantites?.nbDistribSavon) ?? 0) *
+        )?.[proprete.dureeLocation] ?? 0) +
+      ((proprete.nbDistribSavon || distribQuantites?.nbDistribSavon) ?? 0) *
         (distribTarifs.find(
           (tarif) => tarif.type === "savon" && tarif.gamme === gamme
-        )?.[
-          dureeLocation as "pa12M" | "pa24M" | "pa36M" | "oneShot"
-        ] as number) +
-      ((nbDistribPh || distribQuantites?.nbDistribPh) ?? 0) *
+        )?.[proprete.dureeLocation] ?? 0) +
+      ((proprete.nbDistribPh || distribQuantites?.nbDistribPh) ?? 0) *
         (distribTarifs.find(
           (tarif) => tarif.type === "ph" && tarif.gamme === gamme
-        )?.[
-          dureeLocation as "pa12M" | "pa24M" | "pa36M" | "oneShot"
-        ] as number),
+        )?.[proprete.dureeLocation] ?? 0),
     tarifsInstalDistributeurs: distribInstalTarifs[0].prixInstallation,
   }));
 
-  const handleClickProposition = (gamme: string) => {
-    if (trilogieGammeSelected === gamme) {
-      setDevisData((prev) => ({
+  const handleClickProposition = (gamme: GammeType) => {
+    if (proprete.trilogieGammeSelected === gamme) {
+      setProprete((prev) => ({
         ...prev,
-        services: {
-          ...prev.services,
-          nettoyage: {
-            ...prev.services.nettoyage,
-            trilogieGammeSelected: null,
-          },
-        },
+        trilogieGammeSelected: null,
       }));
       return;
     }
-    setDevisData((prev) => ({
+    setProprete((prev) => ({
       ...prev,
-      services: {
-        ...prev.services,
-        nettoyage: {
-          ...prev.services.nettoyage,
-          trilogieGammeSelected: gamme,
-        },
-      },
+      trilogieGammeSelected: gamme,
     }));
   };
 
@@ -116,54 +97,30 @@ const TabsContentTrilogie = ({
     const number = value[0];
     switch (type) {
       case "emp":
-        setDevisData((prev) => ({
+        setProprete((prev) => ({
           ...prev,
-          services: {
-            ...prev.services,
-            nettoyage: {
-              ...prev.services.nettoyage,
-              nbDistribEmp: number,
-            },
-          },
+          nbDistribEmp: number,
         }));
-        return;
+        break;
       case "savon":
-        setDevisData((prev) => ({
+        setProprete((prev) => ({
           ...prev,
-          services: {
-            ...prev.services,
-            nettoyage: {
-              ...prev.services.nettoyage,
-              nbDistribSavon: number,
-            },
-          },
+          nbDistribSavon: number,
         }));
-        return;
+        break;
       case "ph":
-        setDevisData((prev) => ({
+        setProprete((prev) => ({
           ...prev,
-          services: {
-            ...prev.services,
-            nettoyage: {
-              ...prev.services.nettoyage,
-              nbDistribPh: number,
-            },
-          },
+          nbDistribPh: number,
         }));
-        return;
+        break;
     }
   };
 
-  const handleChangeDureeLocation = (value: string) => {
-    setDevisData((prev) => ({
+  const handleChangeDureeLocation = (value: DureeLocationType) => {
+    setProprete((prev) => ({
       ...prev,
-      services: {
-        ...prev.services,
-        nettoyage: {
-          ...prev.services.nettoyage,
-          dureeLocation: value,
-        },
-      },
+      dureeLocation: value,
     }));
   };
 
@@ -193,7 +150,8 @@ const TabsContentTrilogie = ({
               <div>
                 <Slider
                   value={[
-                    (nbDistribEmp || distribQuantites?.nbDistribEmp) ?? 0,
+                    (proprete.nbDistribEmp || distribQuantites?.nbDistribEmp) ??
+                      0,
                   ]}
                   min={1}
                   max={100}
@@ -204,14 +162,17 @@ const TabsContentTrilogie = ({
                   className="flex-1"
                 />
                 <label htmlFor="nbDeDistribEmp" className="text-sm">
-                  {(nbDistribEmp || distribQuantites?.nbDistribEmp) ?? 0}{" "}
+                  {(proprete.nbDistribEmp || distribQuantites?.nbDistribEmp) ??
+                    0}{" "}
                   distributeurs essuie-main papier
                 </label>
               </div>
               <div>
                 <Slider
                   value={[
-                    (nbDistribSavon || distribQuantites?.nbDistribSavon) ?? 0,
+                    (proprete.nbDistribSavon ||
+                      distribQuantites?.nbDistribSavon) ??
+                      0,
                   ]}
                   min={1}
                   max={100}
@@ -222,13 +183,18 @@ const TabsContentTrilogie = ({
                   className="flex-1"
                 />
                 <label htmlFor="nbDistribSavon" className="text-sm">
-                  {(nbDistribSavon || distribQuantites?.nbDistribSavon) ?? 0}{" "}
+                  {(proprete.nbDistribSavon ||
+                    distribQuantites?.nbDistribSavon) ??
+                    0}{" "}
                   distributeurs savon
                 </label>
               </div>
               <div>
                 <Slider
-                  value={[(nbDistribPh || distribQuantites?.nbDistribPh) ?? 0]}
+                  value={[
+                    (proprete.nbDistribPh || distribQuantites?.nbDistribPh) ??
+                      0,
+                  ]}
                   min={1}
                   max={100}
                   step={1}
@@ -236,14 +202,14 @@ const TabsContentTrilogie = ({
                   className="flex-1"
                 />
                 <label htmlFor="nbDistribSavon" className="text-sm">
-                  {(nbDistribPh || distribQuantites?.nbDistribPh) ?? 0}{" "}
+                  {(proprete.nbDistribPh || distribQuantites?.nbDistribPh) ?? 0}{" "}
                   distributeurs papier hygiénique
                 </label>
               </div>
               <div>
                 <Select
                   onValueChange={handleChangeDureeLocation}
-                  value={dureeLocation}
+                  value={proprete.dureeLocation}
                 >
                   <SelectTrigger className={`w-full max-w-xs`}>
                     <SelectValue />
@@ -258,7 +224,6 @@ const TabsContentTrilogie = ({
                             item.id.toString() === key
                         )
                       );
-
                       return (
                         <SelectItem
                           key={`dureeLoc_${item.id}`}
@@ -286,7 +251,7 @@ const TabsContentTrilogie = ({
             return (
               <div
                 className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
-                  trilogieGammeSelected === gamme
+                  proprete.trilogieGammeSelected === gamme
                     ? "ring-2 ring-inset ring-destructive"
                     : ""
                 } px-8`}
@@ -294,12 +259,12 @@ const TabsContentTrilogie = ({
                 onClick={() => handleClickProposition(gamme)}
               >
                 <Checkbox
-                  checked={trilogieGammeSelected === gamme}
+                  checked={proprete.trilogieGammeSelected === gamme}
                   onCheckedChange={() => handleClickProposition(gamme)}
                   className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                 />
                 <div>
-                  {dureeLocation === "oneShot" ? (
+                  {proprete.dureeLocation === "oneShot" ? (
                     <>
                       <p className="font-bold">
                         {formatNumber(
@@ -336,13 +301,13 @@ const TabsContentTrilogie = ({
                   </p>
                   <p className="text-sm">Consommables</p>
                   <p className="text-sm">
-                    {dureeLocation === "oneShot"
+                    {proprete.dureeLocation === "oneShot"
                       ? ""
                       : `Location engagement
                     ${
-                      dureeLocation === "pa12M"
+                      proprete.dureeLocation === "pa12M"
                         ? "12"
-                        : dureeLocation === "pa24M"
+                        : proprete.dureeLocation === "pa24M"
                         ? "24"
                         : "36"
                     } mois`}

@@ -1,5 +1,6 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DevisDataContext } from "@/context/DevisDataProvider";
+import { PropreteContext } from "@/context/PropreteProvider";
+import { ServicesContext } from "@/context/ServicesProvider";
 import useFetchProprete from "@/hooks/use-fetch-proprete";
 import { useContext, useState } from "react";
 import NextServiceButton from "../NextServiceButton";
@@ -7,24 +8,18 @@ import PreviousServiceButton from "../PreviousServiceButton";
 import TabsContentPropreteOptions from "./TabsContentPropreteOptions";
 import TabsContentTrilogie from "./TabsContentTrilogie";
 
-type ConsommablesPropreteProps = {
+type PropreteProps = {
   handleClickNext: () => void;
   handleClickPrevious: () => void;
-  selectedServicesIds: number[];
 };
 
-const ConsommablesProprete = ({
-  handleClickNext,
-  handleClickPrevious,
-  selectedServicesIds,
-}: ConsommablesPropreteProps) => {
-  const { devisData } = useContext(DevisDataContext);
+const Proprete = ({ handleClickNext, handleClickPrevious }: PropreteProps) => {
+  const { proprete } = useContext(PropreteContext);
   const [comment, setComment] = useState("");
+  const { services } = useContext(ServicesContext);
+
   const { distribQuantites, distribTarifs, distribInstalTarifs, consoTarifs } =
     useFetchProprete();
-
-  const trilogieGammeSelected =
-    devisData.services.nettoyage.trilogieGammeSelected;
 
   return (
     <div className="flex flex-col gap-6 w-full mx-auto h-[600px] py-2" id="2">
@@ -49,7 +44,7 @@ const ConsommablesProprete = ({
           <TabsTrigger
             value="options"
             className="text-base"
-            disabled={!trilogieGammeSelected}
+            disabled={!proprete.trilogieGammeSelected}
             onClick={() => setComment("")}
           >
             Options
@@ -73,11 +68,12 @@ const ConsommablesProprete = ({
       </Tabs>
 
       {comment && <p className="text-sm italic text-end px-1">{comment}</p>}
-      {selectedServicesIds[selectedServicesIds.length - 1] === 2 ? null : (
+      {services.selectedServicesIds[services.selectedServicesIds.length - 1] ===
+      2 ? null : (
         <NextServiceButton handleClickNext={handleClickNext} />
       )}
     </div>
   );
 };
 
-export default ConsommablesProprete;
+export default Proprete;

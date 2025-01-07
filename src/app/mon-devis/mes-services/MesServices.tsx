@@ -1,10 +1,10 @@
 "use client";
-import { DevisDataContext } from "@/context/DevisDataProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
+import { ServicesContext } from "@/context/ServicesProvider";
 import Link from "next/link";
-import { useContext, useEffect, useState } from "react";
-import ConsommablesProprete from "./(consommablesProprete)/ConsommablesProprete";
+import { useContext, useEffect } from "react";
 import Nettoyage from "./(nettoyage)/Nettoyage";
+import Proprete from "./(proprete)/Proprete";
 import Maintenance from "./Maintenance";
 import OfficeManager from "./OfficeManager";
 import SecuriteIncendie from "./SecuriteIncendie";
@@ -12,70 +12,74 @@ import ServicesFm4All from "./ServicesFm4All";
 import ServicesSelection from "./ServicesSelection";
 
 const MesServices = () => {
+  const { services, setServices } = useContext(ServicesContext);
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
-  const { devisData } = useContext(DevisDataContext);
-  const [currentServiceId, setCurrentServiceId] = useState<number | null>(null);
-  const selectedServicesIds = devisData.services.selectedServicesIds;
 
   useEffect(() => {
+    console.log("useEffect");
+
     setDevisProgress((prev) => ({ ...prev, currentStep: 2 }));
   }, [setDevisProgress]);
 
-  const handleClickNext = () => {
-    if (currentServiceId === null) {
-      setCurrentServiceId(1);
-      const nextService = document.getElementById(
-        selectedServicesIds[0].toString()
+  useEffect(() => {
+    if (services.currentServiceId) {
+      const currentService = document.getElementById(
+        services.currentServiceId.toString()
       );
-      if (nextService) {
-        nextService.scrollIntoView({ behavior: "smooth", block: "nearest" });
-        return;
+      if (currentService) {
+        currentService.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }
-    }
-    const nextService = document.getElementById(
-      selectedServicesIds[
-        selectedServicesIds.indexOf(currentServiceId as number) + 1
-      ].toString()
-    );
-
-    if (nextService) {
-      nextService.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
-    setCurrentServiceId(
-      (currentServiceId) =>
-        selectedServicesIds[
-          selectedServicesIds.indexOf(currentServiceId as number) + 1
-        ]
-    );
-  };
-
-  const handleClickPrevious = () => {
-    if (currentServiceId === 1) {
-      setCurrentServiceId(null);
+    } else {
       const servicesSelection = document.getElementById("services-selection");
       if (servicesSelection) {
         servicesSelection.scrollIntoView({
           behavior: "smooth",
           block: "nearest",
         });
-        return;
       }
     }
-    const previousService = document.getElementById(
-      selectedServicesIds[
-        selectedServicesIds.indexOf(currentServiceId as number) - 1
-      ].toString()
-    );
-    if (previousService) {
-      previousService.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [services.currentServiceId]);
+
+  const handleClickNext = () => {
+    //In ServicesSelection
+    if (services.currentServiceId === null) {
+      setServices((prev) => ({
+        ...prev,
+        currentServiceId: 1,
+      }));
+      return;
     }
-    setCurrentServiceId(
-      (currentServiceId) =>
-        selectedServicesIds[
-          selectedServicesIds.indexOf(currentServiceId as number) - 1
-        ]
-    );
+    //I'm in a Service
+    setServices((prev) => ({
+      ...prev,
+      currentServiceId:
+        services.selectedServicesIds[
+          services.selectedServicesIds.indexOf(
+            services.currentServiceId as number
+          ) + 1
+        ],
+    }));
   };
+
+  const handleClickPrevious = () => {
+    //I'm in the first service
+    if (services.currentServiceId === 1) {
+      setServices((prev) => ({ ...prev, currentServiceId: null }));
+      return;
+    }
+    //I'm sure that services.currentServiceId is not null
+    setServices((prev) => ({
+      ...prev,
+      currentServiceId:
+        services.selectedServicesIds[
+          services.selectedServicesIds.indexOf(
+            services.currentServiceId as number
+          ) - 1
+        ],
+    }));
+  };
+
+  //Breadcrumb links should not authorize this case but just in case
   if (!devisProgress.completedSteps.includes(1)) {
     return (
       <div className="text-base md:text-lg mx-auto max-w-prose mt-10">
@@ -91,47 +95,41 @@ const MesServices = () => {
   return (
     <>
       <ServicesSelection handleClickNext={handleClickNext} />
-      {selectedServicesIds.includes(1) && (
+      {services.selectedServicesIds.includes(1) && (
         <Nettoyage
           handleClickNext={handleClickNext}
           handleClickPrevious={handleClickPrevious}
-          selectedServicesIds={selectedServicesIds}
         />
       )}
-      {selectedServicesIds.includes(1) && (
-        <ConsommablesProprete
+      {services.selectedServicesIds.includes(1) && (
+        <Proprete
           handleClickNext={handleClickNext}
           handleClickPrevious={handleClickPrevious}
-          selectedServicesIds={selectedServicesIds}
         />
       )}
 
-      {selectedServicesIds.includes(3) && (
+      {services.selectedServicesIds.includes(3) && (
         <Maintenance
           handleClickNext={handleClickNext}
           handleClickPrevious={handleClickPrevious}
-          selectedServicesIds={selectedServicesIds}
         />
       )}
-      {selectedServicesIds.includes(4) && (
+      {services.selectedServicesIds.includes(4) && (
         <SecuriteIncendie
           handleClickNext={handleClickNext}
           handleClickPrevious={handleClickPrevious}
-          selectedServicesIds={selectedServicesIds}
         />
       )}
-      {selectedServicesIds.includes(5) && (
+      {services.selectedServicesIds.includes(5) && (
         <OfficeManager
           handleClickNext={handleClickNext}
           handleClickPrevious={handleClickPrevious}
-          selectedServicesIds={selectedServicesIds}
         />
       )}
-      {selectedServicesIds.includes(6) && (
+      {services.selectedServicesIds.includes(6) && (
         <ServicesFm4All
           handleClickNext={handleClickNext}
           handleClickPrevious={handleClickPrevious}
-          selectedServicesIds={selectedServicesIds}
         />
       )}
     </>

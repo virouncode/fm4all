@@ -1,34 +1,48 @@
 "use client";
-import { createContext, PropsWithChildren, useEffect, useState } from "react";
 
-// Définir le type de données de progression
-type DevisProgressType = {
-  currentStep: number;
-  completedSteps: number[];
-};
+import { useClientOnly } from "@/hooks/use-client-only";
+import { DevisProgressType } from "@/zod-schemas/devisProgress";
+import {
+  createContext,
+  Dispatch,
+  PropsWithChildren,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 
+// Initialization
 export const DevisProgressContext = createContext<{
   devisProgress: DevisProgressType;
-  setDevisProgress: React.Dispatch<React.SetStateAction<DevisProgressType>>;
+  setDevisProgress: Dispatch<SetStateAction<DevisProgressType>>;
 }>({
   devisProgress: { currentStep: 1, completedSteps: [] },
   setDevisProgress: () => {},
 });
+
 const DevisProgressProvider = ({ children }: PropsWithChildren) => {
-  const [devisProgress, setDevisProgress] = useState<DevisProgressType>(() => {
-    if (typeof window !== "undefined") {
-      const storedDevisProgress = localStorage.getItem("devisProgress");
-      return storedDevisProgress
-        ? JSON.parse(storedDevisProgress)
-        : { currentStep: 1, completedSteps: [] };
-    } else {
-      return { currentStep: 1, completedSteps: [] };
-    }
+  const isMounted = useClientOnly();
+  const [devisProgress, setDevisProgress] = useState<DevisProgressType>({
+    currentStep: 1,
+    completedSteps: [],
   });
 
   useEffect(() => {
-    localStorage.setItem("devisProgress", JSON.stringify(devisProgress));
-  }, [devisProgress]);
+    if (isMounted) {
+      const storedDevisProgress = localStorage.getItem("devisProgress");
+      if (storedDevisProgress) {
+        setDevisProgress(JSON.parse(storedDevisProgress));
+      }
+    }
+  }, [isMounted]);
+
+  useEffect(() => {
+    if (isMounted) {
+      localStorage.setItem("devisProgress", JSON.stringify(devisProgress));
+    }
+  }, [devisProgress, isMounted]);
+
+  if (!isMounted) return null;
 
   return (
     <DevisProgressContext.Provider value={{ devisProgress, setDevisProgress }}>

@@ -1,5 +1,4 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import DevisButton from "@/components/devis-button";
 
 const Mission = () => {
   return (
@@ -38,18 +37,18 @@ const Mission = () => {
           Ne perdez plus de temps à lancer des appels d’offres ou à attendre des
           devis sans réponse.
         </p>
-        <Button
-          variant="destructive"
+        <DevisButton
+          title="Bénéficiez de notre réseau de partenaires en quelques clics"
+          text="Bénéficiez de notre réseau de partenaires en quelques clics"
           size="lg"
-          className="w-full md:w-auto text-base self-start mx-auto text-wrap"
-        >
-          <Link href="/mon-devis/mes-locaux" className="hidden md:block">
-            Bénéficiez de notre réseau de partenaires en quelques clics
-          </Link>
-          <Link href="/mon-devis/mes-locaux" className="block md:hidden">
-            Bénéficiez de notre réseau
-          </Link>
-        </Button>
+          className="self-start mx-auto hidden md:block"
+        />
+        <DevisButton
+          title="Bénéficiez de notre réseau"
+          text="Bénéficiez de notre réseau"
+          size="lg"
+          className="self-start mx-auto block md:hidden"
+        />
       </div>
     </section>
   );

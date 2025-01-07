@@ -1,8 +1,10 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { TabsContent } from "@/components/ui/tabs";
-import { DevisDataContext } from "@/context/DevisDataProvider";
+import { CompanyInfoContext } from "@/context/CompanyInfoProvider";
+import { PropreteContext } from "@/context/PropreteProvider";
 import { formatNumber } from "@/lib/formatNumber";
+import { GammeType } from "@/zod-schemas/gamme";
 import { SelectPropreteConsoTarifsType } from "@/zod-schemas/propreteConsoTarifs";
 import { SelectPropreteDistribQuantiteType } from "@/zod-schemas/propreteDistribQuantite";
 import { SelectPropreteDistribTarifsType } from "@/zod-schemas/propreteDistribTarifs";
@@ -26,171 +28,103 @@ const TabsContentPropreteOptions = ({
   distribTarifs,
   consoTarifs,
 }: TabsContentPropreteOptionsProps) => {
-  const { devisData, setDevisData } = useContext(DevisDataContext);
-  const {
-    nbDistribDesinfectant,
-    nbDistribParfum,
-    nbDistribBalai,
-    nbDistribPoubelle,
-    desinfectantGammeSelected,
-    parfumGammeSelected,
-    balaiGammeSelected,
-    poubelleGammeSelected,
-  } = devisData.services.nettoyage;
+  const { proprete, setProprete } = useContext(PropreteContext);
+  const { companyInfo } = useContext(CompanyInfoContext);
+  console.log(
+    "proprete nb distrib desinfectant",
+    proprete.nbDistribDesinfectant
+  );
+  console.log(
+    "distribQuantites nb distrib desinfectant",
+    distribQuantites?.nbDistribDesinfectant
+  );
+  console.log("distribQuantites", distribQuantites);
 
-  const gammes = ["essentiel", "confort", "excellence"];
+  const gammes = ["essentiel", "confort", "excellence"] as const;
   const propositions = gammes.map((gamme) => ({
     gamme,
     tarifsDesinfectant:
       consoTarifs[0].paParPersonneDesinfectant *
-      (parseInt(devisData.firstCompanyInfo.effectif) as number),
+      (parseInt(companyInfo.effectif) as number),
     tarifsDistribDesinfectant:
-      ((nbDistribDesinfectant || distribQuantites?.nbDistribDesinfectant) ??
+      ((proprete.nbDistribDesinfectant ||
+        distribQuantites?.nbDistribDesinfectant) ??
         0) *
       (distribTarifs.find(
         (tarif) => tarif.type === "desinfectant" && tarif.gamme === gamme
-      )?.[
-        devisData.services.nettoyage.dureeLocation as
-          | "pa12M"
-          | "pa24M"
-          | "pa36M"
-          | "oneShot"
-      ] as number),
+      )?.[proprete.dureeLocation] ?? 0),
     tarifsDistribParfum:
-      ((nbDistribParfum || distribQuantites?.nbDistribParfum) ?? 0) *
+      ((proprete.nbDistribParfum || distribQuantites?.nbDistribParfum) ?? 0) *
       (distribTarifs.find(
         (tarif) => tarif.type === "parfum" && tarif.gamme === gamme
-      )?.[
-        devisData.services.nettoyage.dureeLocation as
-          | "pa12M"
-          | "pa24M"
-          | "pa36M"
-          | "oneShot"
-      ] as number),
+      )?.[proprete.dureeLocation] ?? 0),
     tarifsDistribBalai:
-      ((nbDistribBalai || distribQuantites?.nbDistribBalai) ?? 0) *
+      ((proprete.nbDistribBalai || distribQuantites?.nbDistribBalai) ?? 0) *
       (distribTarifs.find(
         (tarif) => tarif.type === "balai" && tarif.gamme === gamme
-      )?.[
-        devisData.services.nettoyage.dureeLocation as
-          | "pa12M"
-          | "pa24M"
-          | "pa36M"
-          | "oneShot"
-      ] as number),
+      )?.[proprete.dureeLocation] ?? 0),
     tarifsDistribPoubelle:
-      ((nbDistribPoubelle || distribQuantites?.nbDistribPoubelle) ?? 0) *
+      ((proprete.nbDistribPoubelle || distribQuantites?.nbDistribPoubelle) ??
+        0) *
       (distribTarifs.find(
         (tarif) => tarif.type === "poubelle" && tarif.gamme === gamme
-      )?.[
-        devisData.services.nettoyage.dureeLocation as
-          | "pa12M"
-          | "pa24M"
-          | "pa36M"
-          | "oneShot"
-      ] as number),
+      )?.[proprete.dureeLocation] ?? 0),
   }));
 
-  const handleClickProposition = (type: string, gamme: string) => {
+  const handleClickProposition = (type: string, gamme: GammeType) => {
     switch (type) {
       case "desinfectant":
-        if (desinfectantGammeSelected === gamme) {
-          setDevisData((prev) => ({
+        if (proprete.desinfectantGammeSelected === gamme) {
+          setProprete((prev) => ({
             ...prev,
-            services: {
-              ...prev.services,
-              nettoyage: {
-                ...prev.services.nettoyage,
-                desinfectantGammeSelected: null,
-              },
-            },
+            desinfectantGammeSelected: null,
           }));
           return;
         }
-        setDevisData((prev) => ({
+        setProprete((prev) => ({
           ...prev,
-          services: {
-            ...prev.services,
-            nettoyage: {
-              ...prev.services.nettoyage,
-              desinfectantGammeSelected: gamme,
-            },
-          },
+          desinfectantGammeSelected: gamme,
         }));
+
         return;
       case "parfum":
-        if (parfumGammeSelected === gamme) {
-          setDevisData((prev) => ({
+        if (proprete.parfumGammeSelected === gamme) {
+          setProprete((prev) => ({
             ...prev,
-            services: {
-              ...prev.services,
-              nettoyage: {
-                ...prev.services.nettoyage,
-                parfumGammeSelected: null,
-              },
-            },
+            parfumGammeSelected: null,
           }));
           return;
         }
-        setDevisData((prev) => ({
+        setProprete((prev) => ({
           ...prev,
-          services: {
-            ...prev.services,
-            nettoyage: {
-              ...prev.services.nettoyage,
-              parfumGammeSelected: gamme,
-            },
-          },
+          parfumGammeSelected: gamme,
         }));
         return;
       case "balai":
-        if (balaiGammeSelected === gamme) {
-          setDevisData((prev) => ({
+        if (proprete.balaiGammeSelected === gamme) {
+          setProprete((prev) => ({
             ...prev,
-            services: {
-              ...prev.services,
-              nettoyage: {
-                ...prev.services.nettoyage,
-                balaiGammeSelected: null,
-              },
-            },
+            balaiGammeSelected: null,
           }));
           return;
         }
-        setDevisData((prev) => ({
+        setProprete((prev) => ({
           ...prev,
-          services: {
-            ...prev.services,
-            nettoyage: {
-              ...prev.services.nettoyage,
-              balaiGammeSelected: gamme,
-            },
-          },
+          balaiGammeSelected: gamme,
         }));
+
         return;
       case "poubelle":
-        if (poubelleGammeSelected === gamme) {
-          setDevisData((prev) => ({
+        if (proprete.poubelleGammeSelected === gamme) {
+          setProprete((prev) => ({
             ...prev,
-            services: {
-              ...prev.services,
-              nettoyage: {
-                ...prev.services.nettoyage,
-                poubelleGammeSelected: null,
-              },
-            },
+            poubelleGammeSelected: null,
           }));
           return;
         }
-        setDevisData((prev) => ({
+        setProprete((prev) => ({
           ...prev,
-          services: {
-            ...prev.services,
-            nettoyage: {
-              ...prev.services.nettoyage,
-              poubelleGammeSelected: gamme,
-            },
-          },
+          poubelleGammeSelected: gamme,
         }));
         return;
     }
@@ -200,51 +134,27 @@ const TabsContentPropreteOptions = ({
     const number = value[0];
     switch (type) {
       case "desinfectant":
-        setDevisData((prev) => ({
+        setProprete((prev) => ({
           ...prev,
-          services: {
-            ...prev.services,
-            nettoyage: {
-              ...prev.services.nettoyage,
-              nbDistribDesinfectant: number,
-            },
-          },
+          nbDistribDesinfectant: number,
         }));
         return;
       case "parfum":
-        setDevisData((prev) => ({
+        setProprete((prev) => ({
           ...prev,
-          services: {
-            ...prev.services,
-            nettoyage: {
-              ...prev.services.nettoyage,
-              nbDistribParfum: number,
-            },
-          },
+          nbDistribParfum: number,
         }));
         return;
       case "balai":
-        setDevisData((prev) => ({
+        setProprete((prev) => ({
           ...prev,
-          services: {
-            ...prev.services,
-            nettoyage: {
-              ...prev.services.nettoyage,
-              nbDistribBalai: number,
-            },
-          },
+          nbDistribBalai: number,
         }));
         return;
       case "poubelle":
-        setDevisData((prev) => ({
+        setProprete((prev) => ({
           ...prev,
-          services: {
-            ...prev.services,
-            nettoyage: {
-              ...prev.services.nettoyage,
-              nbDistribPoubelle: number,
-            },
-          },
+          nbDistribPoubelle: number,
         }));
     }
   };
@@ -259,7 +169,7 @@ const TabsContentPropreteOptions = ({
             <div className="text-sm flex flex-col gap-2">
               <Slider
                 value={[
-                  (nbDistribDesinfectant ||
+                  (proprete.nbDistribDesinfectant ||
                     distribQuantites?.nbDistribDesinfectant) ??
                     0,
                 ]}
@@ -272,7 +182,7 @@ const TabsContentPropreteOptions = ({
                 className="flex-1"
               />
               <label htmlFor="nbDeDistribDesinfectant">
-                {(nbDistribDesinfectant ||
+                {(proprete.nbDistribDesinfectant ||
                   distribQuantites?.nbDistribDesinfectant) ??
                   0}{" "}
                 distributeurs
@@ -287,11 +197,11 @@ const TabsContentPropreteOptions = ({
                 : gamme === "confort"
                 ? "fm4allcomfort"
                 : "fm4allexcellence";
-            const dureeLocation = devisData.services.nettoyage.dureeLocation;
+            const dureeLocation = proprete.dureeLocation;
             return (
               <div
                 className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-xl gap-4 cursor-pointer ${
-                  desinfectantGammeSelected === gamme
+                  proprete.desinfectantGammeSelected === gamme
                     ? "ring-2 ring-inset ring-destructive"
                     : ""
                 } px-8`}
@@ -300,7 +210,7 @@ const TabsContentPropreteOptions = ({
               >
                 {" "}
                 <Checkbox
-                  checked={desinfectantGammeSelected === gamme}
+                  checked={proprete.desinfectantGammeSelected === gamme}
                   onCheckedChange={() =>
                     handleClickProposition("desinfectant", gamme)
                   }
@@ -363,7 +273,9 @@ const TabsContentPropreteOptions = ({
             <div className="text-sm flex flex-col gap-2">
               <Slider
                 value={[
-                  (nbDistribParfum || distribQuantites?.nbDistribParfum) ?? 0,
+                  (proprete.nbDistribParfum ||
+                    distribQuantites?.nbDistribParfum) ??
+                    0,
                 ]}
                 min={1}
                 max={100}
@@ -374,7 +286,9 @@ const TabsContentPropreteOptions = ({
                 className="flex-1"
               />
               <label htmlFor="nbDeDistribParfum">
-                {(nbDistribParfum || distribQuantites?.nbDistribParfum) ?? 0}{" "}
+                {(proprete.nbDistribParfum ||
+                  distribQuantites?.nbDistribParfum) ??
+                  0}{" "}
                 distributeurs
               </label>
             </div>
@@ -387,11 +301,11 @@ const TabsContentPropreteOptions = ({
                 : gamme === "confort"
                 ? "fm4allcomfort"
                 : "fm4allexcellence";
-            const dureeLocation = devisData.services.nettoyage.dureeLocation;
+            const dureeLocation = proprete.dureeLocation;
             return (
               <div
                 className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-xl gap-4 cursor-pointer ${
-                  parfumGammeSelected === gamme
+                  proprete.parfumGammeSelected === gamme
                     ? "ring-2 ring-inset ring-destructive"
                     : ""
                 } px-8`}
@@ -400,7 +314,7 @@ const TabsContentPropreteOptions = ({
               >
                 {" "}
                 <Checkbox
-                  checked={parfumGammeSelected === gamme}
+                  checked={proprete.parfumGammeSelected === gamme}
                   onCheckedChange={() =>
                     handleClickProposition("parfum", gamme)
                   }
@@ -449,7 +363,9 @@ const TabsContentPropreteOptions = ({
             <div className="text-sm flex flex-col gap-2">
               <Slider
                 value={[
-                  (nbDistribBalai || distribQuantites?.nbDistribBalai) ?? 0,
+                  (proprete.nbDistribBalai ||
+                    distribQuantites?.nbDistribBalai) ??
+                    0,
                 ]}
                 min={1}
                 max={100}
@@ -460,7 +376,9 @@ const TabsContentPropreteOptions = ({
                 className="flex-1"
               />
               <label htmlFor="nbDeDistribBalai">
-                {(nbDistribBalai || distribQuantites?.nbDistribBalai) ?? 0}{" "}
+                {(proprete.nbDistribBalai ||
+                  distribQuantites?.nbDistribBalai) ??
+                  0}{" "}
                 blocs
               </label>
             </div>
@@ -473,11 +391,11 @@ const TabsContentPropreteOptions = ({
                 : gamme === "confort"
                 ? "fm4allcomfort"
                 : "fm4allexcellence";
-            const dureeLocation = devisData.services.nettoyage.dureeLocation;
+            const dureeLocation = proprete.dureeLocation;
             return (
               <div
                 className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-xl gap-4 cursor-pointer ${
-                  balaiGammeSelected === gamme
+                  proprete.balaiGammeSelected === gamme
                     ? "ring-2 ring-inset ring-destructive"
                     : ""
                 } px-8`}
@@ -486,7 +404,7 @@ const TabsContentPropreteOptions = ({
               >
                 {" "}
                 <Checkbox
-                  checked={balaiGammeSelected === gamme}
+                  checked={proprete.balaiGammeSelected === gamme}
                   onCheckedChange={() => handleClickProposition("balai", gamme)}
                   className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                 />
@@ -533,7 +451,8 @@ const TabsContentPropreteOptions = ({
             <div className="text-sm flex flex-col gap-2">
               <Slider
                 value={[
-                  (nbDistribPoubelle || distribQuantites?.nbDistribPoubelle) ??
+                  (proprete.nbDistribPoubelle ||
+                    distribQuantites?.nbDistribPoubelle) ??
                     0,
                 ]}
                 min={1}
@@ -545,7 +464,8 @@ const TabsContentPropreteOptions = ({
                 className="flex-1"
               />
               <label htmlFor="nbDeDistribPoubelle">
-                {(nbDistribPoubelle || distribQuantites?.nbDistribPoubelle) ??
+                {(proprete.nbDistribPoubelle ||
+                  distribQuantites?.nbDistribPoubelle) ??
                   0}{" "}
                 réceptacles
               </label>
@@ -559,11 +479,11 @@ const TabsContentPropreteOptions = ({
                 : gamme === "confort"
                 ? "fm4allcomfort"
                 : "fm4allexcellence";
-            const dureeLocation = devisData.services.nettoyage.dureeLocation;
+            const dureeLocation = proprete.dureeLocation;
             return (
               <div
                 className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-xl gap-4 cursor-pointer ${
-                  poubelleGammeSelected === gamme
+                  proprete.poubelleGammeSelected === gamme
                     ? "ring-2 ring-inset ring-destructive"
                     : ""
                 } px-8`}
@@ -572,7 +492,7 @@ const TabsContentPropreteOptions = ({
               >
                 {" "}
                 <Checkbox
-                  checked={poubelleGammeSelected === gamme}
+                  checked={proprete.poubelleGammeSelected === gamme}
                   onCheckedChange={() =>
                     handleClickProposition("poubelle", gamme)
                   }

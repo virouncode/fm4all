@@ -1,19 +1,18 @@
-import {
-  getPropreteConsoTarifs,
-  getPropreteDistribQuantites,
-  getPropreteDistribTarifs,
-  getPropreteInstalDistribTarifs,
-} from "@/actions/getProprete";
-import { DevisDataContext } from "@/context/DevisDataProvider";
+import { CompanyInfoContext } from "@/context/CompanyInfoProvider";
+import { PropreteContext } from "@/context/PropreteProvider";
 import { roundEffectif } from "@/lib/roundEffectif";
 import { SelectPropreteConsoTarifsType } from "@/zod-schemas/propreteConsoTarifs";
 import { SelectPropreteDistribQuantiteType } from "@/zod-schemas/propreteDistribQuantite";
 import { SelectPropreteDistribTarifsType } from "@/zod-schemas/propreteDistribTarifs";
 import { SelectPropreteInstalDistribTarifsType } from "@/zod-schemas/propreteInstalDistribTarifs";
 import { useContext, useEffect, useState } from "react";
+import { useToast } from "./use-toast";
 
 const useFetchProprete = () => {
-  const { devisData, setDevisData } = useContext(DevisDataContext);
+  const { toast } = useToast();
+  const { companyInfo } = useContext(CompanyInfoContext);
+  const { proprete } = useContext(PropreteContext);
+
   const [distribQuantites, setDistribQuantites] = useState<
     | (SelectPropreteDistribQuantiteType & {
         nbDistribDesinfectant: number;
@@ -32,39 +31,76 @@ const useFetchProprete = () => {
   const [consoTarifs, setConsoTarifs] = useState<
     SelectPropreteConsoTarifsType[]
   >([]);
-  const devisDataFournisseurId =
-    devisData.services.nettoyage.propreteFournisseurId;
-  const devisDataEffectif = devisData.firstCompanyInfo.effectif;
 
   useEffect(() => {
     const fetchProprete = async () => {
-      if (!devisDataFournisseurId || !devisDataEffectif) return;
-      const roundedEffectif = roundEffectif(parseInt(devisDataEffectif));
+      const roundedEffectif = roundEffectif(parseInt(companyInfo.effectif));
+      const fournisseurId = proprete.fournisseurId;
+      if (!fournisseurId || !companyInfo.effectif) return;
       try {
-        const results = await Promise.all([
-          getPropreteDistribQuantites(roundedEffectif),
-          getPropreteDistribTarifs(devisDataFournisseurId as number),
-          getPropreteInstalDistribTarifs(
-            roundedEffectif,
-            devisDataFournisseurId as number
+        const [
+          distribQuantitesResponse,
+          distribTarifsResponse,
+          distribInstalTarifsResponse,
+          consoTarifsResponse,
+        ] = await Promise.all([
+          fetch(
+            `/api/proprete/distributeurs/quantites?effectif=${roundedEffectif}`
           ),
-          getPropreteConsoTarifs(
-            roundedEffectif,
-            devisDataFournisseurId as number
+          fetch(
+            `/api/proprete/distributeurs/tarifs?fournisseurId=${fournisseurId}`
+          ),
+          fetch(
+            `/api/proprete/distributeurs/installation?effectif=${roundedEffectif}&fournisseurId=${fournisseurId}&effectif=${roundedEffectif}`
+          ),
+          fetch(
+            `/api/proprete/consommables/tarifs?effectif=${roundedEffectif}&fournisseurId=${fournisseurId}`
           ),
         ]);
-        setDistribQuantites(results[0]);
-        setDistribTarifs(results[1]);
-        setDistribInstalTarifs(results[2]);
-        setConsoTarifs(results[3]);
+
+        if (
+          !distribQuantitesResponse.ok ||
+          !distribTarifsResponse.ok ||
+          !distribInstalTarifsResponse.ok ||
+          !consoTarifsResponse.ok
+        ) {
+          throw new Error("Erreur réseau");
+        }
+        const distribQuantitesJson = await distribQuantitesResponse.json();
+        const distribTarifsJson = await distribTarifsResponse.json();
+        const distribInstalTarifsJson =
+          await distribInstalTarifsResponse.json();
+        const consoTarifsJson = await consoTarifsResponse.json();
+
+        if (
+          !distribQuantitesJson.success ||
+          !distribTarifsJson.success ||
+          !distribInstalTarifsJson.success ||
+          !consoTarifsJson.success
+        ) {
+          throw new Error(
+            distribQuantitesJson.error.message ||
+              distribTarifsJson.error.message ||
+              distribInstalTarifsJson.error.message ||
+              consoTarifsJson.error.message
+          );
+        }
+
+        setDistribQuantites(distribQuantitesJson.data);
+        setDistribTarifs(distribTarifsJson.data);
+        setDistribInstalTarifs(distribInstalTarifsJson.data);
+        setConsoTarifs(consoTarifsJson.data);
       } catch (err) {
         if (err instanceof Error) {
-          console.log(err.message);
+          toast({
+            title: "Error",
+            description: err.message,
+          });
         }
       }
     };
     fetchProprete();
-  }, [devisDataFournisseurId, devisDataEffectif]);
+  }, [companyInfo.effectif, proprete.fournisseurId, toast]);
   return {
     distribQuantites,
     distribTarifs,

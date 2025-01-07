@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -6,7 +5,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import Link from "next/link";
+
+import DevisButton from "@/components/devis-button";
 
 const Hero = () => {
   return (
@@ -36,19 +36,12 @@ const Hero = () => {
           <p className="mb-6 hidden text-lg md:block text-center">
             Le Facility Management pour tous !
           </p>
-
           <div className="w-full flex justify-center">
-            <Button
-              title="Mon devis en ligne"
-              variant="destructive"
+            <DevisButton
+              title="Je réalise mon devis en ligne"
+              text="Je réalise mon devis en ligne"
               size="lg"
-              className="w-full md:w-auto text-base"
-            >
-              <Link href="/mon-devis/mes-locaux">
-                Je réalise mon devis en ligne
-              </Link>
-              {/* Mon devis en ligne */}
-            </Button>
+            />
           </div>
         </CardContent>
       </Card>

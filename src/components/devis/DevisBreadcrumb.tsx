@@ -11,7 +11,7 @@ import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import Link from "next/link";
 import { useContext } from "react";
 
-const devisRoutes = [
+export const devisRoutes = [
   {
     id: 1,
     url: "/mes-locaux",

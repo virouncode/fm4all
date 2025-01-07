@@ -1,6 +1,6 @@
 "use client";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DevisDataContext } from "@/context/DevisDataProvider";
+import { NettoyageContext } from "@/context/NettoyageProvider";
 import useFetchNettoyage from "@/hooks/use-fetch-nettoyage";
 import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { useContext, useState } from "react";
@@ -12,23 +12,18 @@ import TabsContentNettoyageOptions from "./TabsContentNettoyageOptions";
 type NettoyageProps = {
   handleClickNext: () => void;
   handleClickPrevious: () => void;
-  selectedServicesIds: number[];
 };
 
 const Nettoyage = ({
   handleClickNext,
   handleClickPrevious,
 }: NettoyageProps) => {
-  const { devisData } = useContext(DevisDataContext);
+  const { nettoyage, setNettoyage } = useContext(NettoyageContext);
   const [comment, setComment] = useState<string>(
     "*moyenne sur l'année (12 mois de 21,67 jours ouvrés)"
   );
-
   const { nettoyagePropositions, repassePropositions, vitreriePropositions } =
     useFetchNettoyage();
-  const nettoyagePropositionId =
-    devisData.services.nettoyage.nettoyagePropositionId;
-
   const order = ["essentiel", "confort", "excellence"];
 
   const nettoyagePropositionsByFournisseurId = nettoyagePropositions.reduce<
@@ -54,40 +49,30 @@ const Nettoyage = ({
     return acc;
   }, {});
 
+  //An array of arrays of propositions by fournisseurId
   const formattedNettoyagePropositions = Object.values(
     nettoyagePropositionsByFournisseurId
   );
 
-  const selectedFournisseurId = nettoyagePropositions.find(
-    (nettoyage) => nettoyage.id === nettoyagePropositionId
-  )?.fournisseurId;
-  const selectedGamme = nettoyagePropositions.find(
-    (nettoyage) => nettoyage.id === nettoyagePropositionId
-  )?.gamme;
+  //already selected proposition
+  const nettoyageProposition = nettoyage.propositionId
+    ? nettoyagePropositions.find((item) => item.id === nettoyage.propositionId)
+    : null;
 
-  const filteredNettoyageProposition = selectedFournisseurId
-    ? nettoyagePropositionsByFournisseurId[selectedFournisseurId].find(
-        (proposition) => proposition.gamme === selectedGamme
+  const repasseProposition =
+    nettoyage.fournisseurId && nettoyage.gammeSelected
+      ? repassePropositions.find(
+          (item) =>
+            item.fournisseurId === nettoyage.fournisseurId &&
+            item.gamme === nettoyage.gammeSelected
+        )
+      : null;
+
+  const vitrerieProposition = nettoyage.fournisseurId
+    ? vitreriePropositions.find(
+        (item) => item.fournisseurId === nettoyage.fournisseurId
       )
-    : undefined;
-
-  const filteredRepasseProposition = repassePropositions
-    .filter(
-      (item) =>
-        item.fournisseurId ===
-        nettoyagePropositions.find(
-          (nettoyage) => nettoyage.id === nettoyagePropositionId
-        )?.fournisseurId
-    )
-    .find((proposition) => proposition.gamme === selectedGamme);
-
-  const filteredVitrerieProposition = vitreriePropositions.find(
-    (item) =>
-      item.fournisseurId ===
-      nettoyagePropositions.find(
-        (nettoyage) => nettoyage.id === nettoyagePropositionId
-      )?.fournisseurId
-  );
+    : null;
 
   return (
     <div className="flex flex-col gap-6 w-full mx-auto h-[600px] py-2" id="1">
@@ -115,7 +100,7 @@ const Nettoyage = ({
           <TabsTrigger
             value="options"
             className="text-base"
-            disabled={!nettoyagePropositionId}
+            disabled={!nettoyage.propositionId}
             onClick={() =>
               setComment("*moyenne sur l'année (12 mois de 21,67 jours ouvrés)")
             }
@@ -127,11 +112,11 @@ const Nettoyage = ({
           formattedNettoyagePropositions={formattedNettoyagePropositions}
           nettoyagePropositions={nettoyagePropositions}
         />
-        {filteredNettoyageProposition && (
+        {nettoyageProposition && repasseProposition && vitrerieProposition && (
           <TabsContentNettoyageOptions
-            filteredNettoyageProposition={filteredNettoyageProposition}
-            filteredRepasseProposition={filteredRepasseProposition}
-            filteredVitrerieProposition={filteredVitrerieProposition}
+            nettoyageProposition={nettoyageProposition}
+            repasseProposition={repasseProposition}
+            vitrerieProposition={vitrerieProposition}
           />
         )}
       </Tabs>
@@ -139,7 +124,7 @@ const Nettoyage = ({
 
       <NextServiceButton
         handleClickNext={handleClickNext}
-        disabled={!nettoyagePropositionId}
+        disabled={!nettoyage.propositionId}
       />
     </div>
   );

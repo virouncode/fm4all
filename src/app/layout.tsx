@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Didact_Gothic } from "next/font/google";
 
 import Footer from "@/components/footer";
-import DevisDataProvider from "@/context/DevisDataProvider";
+import { Toaster } from "@/components/ui/toaster";
 import DevisProgressProvider from "@/context/DevisProgressProvider";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
@@ -42,18 +42,19 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${didact.className} antialiased scroll-smooth`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Header />
-          <DevisProgressProvider>
-            <DevisDataProvider>{children}</DevisDataProvider>
-          </DevisProgressProvider>
-          <Footer />
-        </ThemeProvider>
+        <DevisProgressProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Header />
+            {children}
+            <Footer />
+            <Toaster />
+          </ThemeProvider>
+        </DevisProgressProvider>
       </body>
     </html>
   );

@@ -14,6 +14,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import DevisButton from "./devis-button";
 import { ModeToggle } from "./mode-toggle";
 
 const Header = () => {
@@ -90,9 +91,11 @@ const Header = () => {
           </nav>
         </div>
         <div className="flex items-center gap-4">
-          <Button title="Mon devis en ligne" variant="destructive">
-            <Link href="/mon-devis/mes-locaux">Mon devis en ligne</Link>
-          </Button>
+          <DevisButton
+            title="Mon devis en ligne"
+            text="Mon devis en ligne"
+            className="text-sm"
+          />
           <Button
             title="Devenir prestataire"
             variant="outline"
