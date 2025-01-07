@@ -112,7 +112,7 @@ const Nettoyage = ({
           formattedNettoyagePropositions={formattedNettoyagePropositions}
           nettoyagePropositions={nettoyagePropositions}
         />
-        {nettoyageProposition && repasseProposition && vitrerieProposition && (
+        {nettoyage.propositionId && (
           <TabsContentNettoyageOptions
             nettoyageProposition={nettoyageProposition}
             repasseProposition={repasseProposition}

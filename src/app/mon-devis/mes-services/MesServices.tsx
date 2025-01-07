@@ -16,8 +16,6 @@ const MesServices = () => {
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
 
   useEffect(() => {
-    console.log("useEffect");
-
     setDevisProgress((prev) => ({ ...prev, currentStep: 2 }));
   }, [setDevisProgress]);
 
