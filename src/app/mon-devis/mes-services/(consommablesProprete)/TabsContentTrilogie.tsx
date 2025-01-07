@@ -203,7 +203,7 @@ const TabsContentTrilogie = ({
                   }
                   className="flex-1"
                 />
-                <label htmlFor="nbDeDistribEmp">
+                <label htmlFor="nbDeDistribEmp" className="text-sm">
                   {(nbDistribEmp || distribQuantites?.nbDistribEmp) ?? 0}{" "}
                   distributeurs essuie-main papier
                 </label>
@@ -221,7 +221,7 @@ const TabsContentTrilogie = ({
                   }
                   className="flex-1"
                 />
-                <label htmlFor="nbDistribSavon">
+                <label htmlFor="nbDistribSavon" className="text-sm">
                   {(nbDistribSavon || distribQuantites?.nbDistribSavon) ?? 0}{" "}
                   distributeurs savon
                 </label>
@@ -235,7 +235,7 @@ const TabsContentTrilogie = ({
                   onValueChange={(value) => handleChangeDistribNbr("ph", value)}
                   className="flex-1"
                 />
-                <label htmlFor="nbDistribSavon">
+                <label htmlFor="nbDistribSavon" className="text-sm">
                   {(nbDistribPh || distribQuantites?.nbDistribPh) ?? 0}{" "}
                   distributeurs papier hygiénique
                 </label>

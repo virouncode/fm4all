@@ -2,9 +2,11 @@ import Header from "@/components/header";
 import type { Metadata } from "next";
 import { Didact_Gothic } from "next/font/google";
 
+import Footer from "@/components/footer";
+import DevisDataProvider from "@/context/DevisDataProvider";
+import DevisProgressProvider from "@/context/DevisProgressProvider";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
-import Footer from "@/components/footer";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -47,7 +49,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Header />
-          {children}
+          <DevisProgressProvider>
+            <DevisDataProvider>{children}</DevisDataProvider>
+          </DevisProgressProvider>
           <Footer />
         </ThemeProvider>
       </body>
