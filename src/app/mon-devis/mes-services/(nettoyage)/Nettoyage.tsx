@@ -19,193 +19,15 @@ const Nettoyage = ({
   handleClickNext,
   handleClickPrevious,
 }: NettoyageProps) => {
-  const { devisData, setDevisData } = useContext(DevisDataContext);
-
-  const [selectedNettoyagePropositionId, setSelectedNettoyagePropositionId] =
-    useState<number | null>(
-      devisData.services.nettoyage.nettoyagePropositionId
-    );
-  const [selectedRepassePropositionId, setSelectedRepassePropositionId] =
-    useState<number | null>(devisData.services.nettoyage.repassePropositionId);
-  const [selectedSamediPropositionId, setSelectedSamediPropositionId] =
-    useState<number | null>(devisData.services.nettoyage.samediPropositionId);
-  const [selectedDimanchePropositionId, setSelectedDimanchePropositionId] =
-    useState<number | null>(devisData.services.nettoyage.dimanchePropositionId);
-  const [selectedVitreriePropositionId, setSelectedVitreriePropositionId] =
-    useState<number | null>(devisData.services.nettoyage.vitreriePropositionId);
+  const { devisData } = useContext(DevisDataContext);
   const [comment, setComment] = useState<string>(
     "*moyenne sur l'année (12 mois de 21,67 jours ouvrés)"
   );
 
   const { nettoyagePropositions, repassePropositions, vitreriePropositions } =
     useFetchNettoyage();
-
-  const handleClickNettoyageProposition = (propositionId: number) => {
-    if (
-      selectedNettoyagePropositionId &&
-      selectedNettoyagePropositionId === propositionId
-    ) {
-      setSelectedNettoyagePropositionId(null);
-      setDevisData((prev) => ({
-        ...prev,
-        services: {
-          nettoyage: {
-            nettoyageFournisseurId: null,
-            nettoyagePropositionId: null,
-            repassePropositionId: null,
-            samediPropositionId: null,
-            dimanchePropositionId: null,
-            vitreriePropositionId: null,
-            propreteFournisseurId: null,
-            trilogieGammeSelected: null,
-          },
-        },
-      }));
-      return;
-    }
-    setSelectedNettoyagePropositionId(propositionId);
-    setDevisData((prev) => ({
-      ...prev,
-      services: {
-        nettoyage: {
-          nettoyageFournisseurId: nettoyagePropositions.find(
-            (nettoyage) => nettoyage.id === propositionId
-          )?.fournisseurId as number,
-          propreteFournisseurId:
-            (nettoyagePropositions.find(
-              (nettoyage) => nettoyage.id === propositionId
-            )?.fournisseurId as number) === 9
-              ? 12
-              : (nettoyagePropositions.find(
-                  (nettoyage) => nettoyage.id === propositionId
-                )?.fournisseurId as number),
-          nettoyagePropositionId: propositionId,
-          repassePropositionId: null,
-          samediPropositionId: null,
-          dimanchePropositionId: null,
-          vitreriePropositionId: null,
-          trilogieGammeSelected: null,
-        },
-      },
-    }));
-  };
-
-  const handleClickOption = (type: string, propositionId: number) => {
-    switch (type) {
-      case "repasse":
-        if (
-          selectedRepassePropositionId &&
-          selectedRepassePropositionId === propositionId
-        ) {
-          setSelectedRepassePropositionId(null);
-          setDevisData((prev) => ({
-            ...prev,
-            services: {
-              nettoyage: {
-                ...prev.services.nettoyage,
-                repassePropositionId: null,
-              },
-            },
-          }));
-          return;
-        }
-        setSelectedRepassePropositionId(propositionId);
-        setDevisData((prev) => ({
-          ...prev,
-          services: {
-            nettoyage: {
-              ...prev.services.nettoyage,
-              repassePropositionId: propositionId,
-            },
-          },
-        }));
-        break;
-      case "vitrerie":
-        if (
-          selectedVitreriePropositionId &&
-          selectedVitreriePropositionId === propositionId
-        ) {
-          setSelectedVitreriePropositionId(null);
-          setDevisData((prev) => ({
-            ...prev,
-            services: {
-              nettoyage: {
-                ...prev.services.nettoyage,
-                vitreriePropositionId: null,
-              },
-            },
-          }));
-          return;
-        }
-        setSelectedVitreriePropositionId(propositionId);
-        setDevisData((prev) => ({
-          ...prev,
-          services: {
-            nettoyage: {
-              ...prev.services.nettoyage,
-              vitreriePropositionId: propositionId,
-            },
-          },
-        }));
-        break;
-      case "samedi":
-        if (
-          selectedSamediPropositionId &&
-          selectedSamediPropositionId === propositionId
-        ) {
-          setSelectedSamediPropositionId(null);
-          setDevisData((prev) => ({
-            ...prev,
-            services: {
-              nettoyage: {
-                ...prev.services.nettoyage,
-                samediPropositionId: null,
-              },
-            },
-          }));
-          return;
-        }
-        setSelectedSamediPropositionId(propositionId);
-        setDevisData((prev) => ({
-          ...prev,
-          services: {
-            nettoyage: {
-              ...prev.services.nettoyage,
-              samediPropositionId: propositionId,
-            },
-          },
-        }));
-        break;
-      case "dimanche":
-        if (
-          selectedDimanchePropositionId &&
-          selectedDimanchePropositionId === propositionId
-        ) {
-          setSelectedDimanchePropositionId(null);
-          setDevisData((prev) => ({
-            ...prev,
-            services: {
-              nettoyage: {
-                ...prev.services.nettoyage,
-                dimanchePropositionId: null,
-              },
-            },
-          }));
-          return;
-        }
-        setSelectedDimanchePropositionId(propositionId);
-        setDevisData((prev) => ({
-          ...prev,
-          services: {
-            nettoyage: {
-              ...prev.services.nettoyage,
-              dimanchePropositionId: propositionId,
-            },
-          },
-        }));
-        break;
-    }
-  };
+  const nettoyagePropositionId =
+    devisData.services.nettoyage.nettoyagePropositionId;
 
   const order = ["essentiel", "confort", "excellence"];
 
@@ -237,10 +59,10 @@ const Nettoyage = ({
   );
 
   const selectedFournisseurId = nettoyagePropositions.find(
-    (nettoyage) => nettoyage.id === selectedNettoyagePropositionId
+    (nettoyage) => nettoyage.id === nettoyagePropositionId
   )?.fournisseurId;
   const selectedGamme = nettoyagePropositions.find(
-    (nettoyage) => nettoyage.id === selectedNettoyagePropositionId
+    (nettoyage) => nettoyage.id === nettoyagePropositionId
   )?.gamme;
 
   const filteredNettoyageProposition = selectedFournisseurId
@@ -254,7 +76,7 @@ const Nettoyage = ({
       (item) =>
         item.fournisseurId ===
         nettoyagePropositions.find(
-          (nettoyage) => nettoyage.id === selectedNettoyagePropositionId
+          (nettoyage) => nettoyage.id === nettoyagePropositionId
         )?.fournisseurId
     )
     .find((proposition) => proposition.gamme === selectedGamme);
@@ -263,7 +85,7 @@ const Nettoyage = ({
     (item) =>
       item.fournisseurId ===
       nettoyagePropositions.find(
-        (nettoyage) => nettoyage.id === selectedNettoyagePropositionId
+        (nettoyage) => nettoyage.id === nettoyagePropositionId
       )?.fournisseurId
   );
 
@@ -293,7 +115,7 @@ const Nettoyage = ({
           <TabsTrigger
             value="options"
             className="text-base"
-            disabled={!selectedNettoyagePropositionId}
+            disabled={!nettoyagePropositionId}
             onClick={() =>
               setComment("*moyenne sur l'année (12 mois de 21,67 jours ouvrés)")
             }
@@ -303,19 +125,13 @@ const Nettoyage = ({
         </TabsList>
         <TabsContentNettoyage
           formattedNettoyagePropositions={formattedNettoyagePropositions}
-          selectedNettoyagePropositionId={selectedNettoyagePropositionId}
-          handleClickProposition={handleClickNettoyageProposition}
+          nettoyagePropositions={nettoyagePropositions}
         />
         {filteredNettoyageProposition && (
           <TabsContentNettoyageOptions
             filteredNettoyageProposition={filteredNettoyageProposition}
             filteredRepasseProposition={filteredRepasseProposition}
             filteredVitrerieProposition={filteredVitrerieProposition}
-            selectedRepassePropositionId={selectedRepassePropositionId}
-            selectedVitreriePropositionId={selectedVitreriePropositionId}
-            selectedSamediPropositionId={selectedSamediPropositionId}
-            selectedDimanchePropositionId={selectedDimanchePropositionId}
-            handleClickOption={handleClickOption}
           />
         )}
       </Tabs>
@@ -323,7 +139,7 @@ const Nettoyage = ({
 
       <NextServiceButton
         handleClickNext={handleClickNext}
-        disabled={!selectedNettoyagePropositionId}
+        disabled={!nettoyagePropositionId}
       />
     </div>
   );

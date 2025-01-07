@@ -1,5 +1,5 @@
+import DevisBreadcrumb from "@/components/devis/DevisBreadcrumb";
 import DevisProgressProvider from "@/context/DevisProgressProvider";
-import DevisBreadcrumb from "../../../components/devis/DevisBreadcrumb";
 import Personnaliser from "./Personnaliser";
 
 const page = () => {
@@ -7,8 +7,8 @@ const page = () => {
     <div>
       <DevisProgressProvider>
         <Personnaliser />
+        <DevisBreadcrumb currentStepId={4} />
       </DevisProgressProvider>
-      <DevisBreadcrumb currentStepId={4} />
     </div>
   );
 };

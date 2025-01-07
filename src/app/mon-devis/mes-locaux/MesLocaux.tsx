@@ -76,8 +76,8 @@ const MesLocaux = () => {
       );
       const cityData = await response.json();
       if (cityData.length === 0) {
+        setDevisProgress({ ...devisProgress, completedSteps: [] });
         setCityError(true);
-
         return;
       }
     } catch (err) {
@@ -87,6 +87,7 @@ const MesLocaux = () => {
     setDevisData((prev) => ({
       ...prev,
       services: {
+        selectedServicesIds: [],
         nettoyage: {
           nettoyageFournisseurId: null,
           nettoyagePropositionId: null,
@@ -94,7 +95,21 @@ const MesLocaux = () => {
           samediPropositionId: null,
           dimanchePropositionId: null,
           vitreriePropositionId: null,
+          nbPassageVitrerie: 2,
           propreteFournisseurId: null,
+          trilogieGammeSelected: null,
+          nbDistribEmp: 0,
+          nbDistribSavon: 0,
+          nbDistribPh: 0,
+          nbDistribDesinfectant: 0,
+          nbDistribParfum: 0,
+          nbDistribBalai: 0,
+          nbDistribPoubelle: 0,
+          dureeLocation: "pa36M",
+          desinfectantGammeSelected: null,
+          parfumGammeSelected: null,
+          balaiGammeSelected: null,
+          poubelleGammeSelected: null,
         },
       },
     }));
@@ -145,21 +160,18 @@ const MesLocaux = () => {
               nameInSchema="codePostal"
               placeholder="XXXXX"
               handleChange={handleChange}
-              // className="text-base py-6 w-full max-w-none"
             />
             <InputWithLabel<FirstCompanyInfoType>
               fieldTitle="Surface en m²*"
               nameInSchema="surface"
               handleChange={handleChange}
               placeholder=""
-              // className="text-base py-6 w-full max-w-none"
             />
             <InputWithLabel<FirstCompanyInfoType>
               fieldTitle="Nombre moyen de personnes*"
               nameInSchema="effectif"
               handleChange={handleChange}
               placeholder=""
-              // className="text-base py-6 w-full max-w-none"
             />
           </div>
           <div className="w-full md:w-1/2 flex flex-col gap-4 ">
@@ -168,14 +180,12 @@ const MesLocaux = () => {
               nameInSchema="typeBatiment"
               data={batiments}
               handleSelect={handleSelect}
-              // className="text-base py-6 w-full max-w-none"/>
             />
             <SelectWithLabel<FirstCompanyInfoType>
               fieldTitle="Type d'occupation*"
               nameInSchema="typeOccupation"
               data={occupations}
               handleSelect={handleSelect}
-              // className="text-base py-6 w-full max-w-none"/>
             />
           </div>
         </div>

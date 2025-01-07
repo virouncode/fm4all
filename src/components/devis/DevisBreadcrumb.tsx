@@ -7,8 +7,9 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useContext } from "react";
 
 const devisRoutes = [
   {
@@ -21,18 +22,19 @@ const devisRoutes = [
     url: "/mes-services",
     name: "Mes services",
   },
+  { id: 3, url: "/food-beverage", name: "Food & Beverage" },
   {
-    id: 3,
+    id: 4,
     url: "/sauvegarder-ma-progression",
     name: "Sauvegarder ma progression",
   },
   {
-    id: 4,
+    id: 5,
     url: "/personnaliser-mon-devis",
     name: "Personnaliser mon devis",
   },
   {
-    id: 5,
+    id: 6,
     url: "/afficher-mon-devis",
     name: "Afficher mon devis",
   },
@@ -43,11 +45,7 @@ type DevisBreadcumbProps = {
 };
 
 const DevisBreadcrumb = ({ currentStepId }: DevisBreadcumbProps) => {
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true); // Force le passage en client
-  }, []);
+  const { devisProgress } = useContext(DevisProgressContext);
 
   return (
     <div className="flex justify-center">
@@ -61,9 +59,21 @@ const DevisBreadcrumb = ({ currentStepId }: DevisBreadcumbProps) => {
                     {route.name}
                   </BreadcrumbPage>
                 ) : (
-                  isClient && (
-                    <Link href={`/mon-devis${route.url}`}>{route.name}</Link>
-                  )
+                  // isClient && (
+                  <Link
+                    href={`/mon-devis${route.url}`}
+                    className={`${
+                      devisProgress.completedSteps[
+                        devisProgress.completedSteps.length - 1
+                      ] !==
+                        route.id - 1 && route.id !== 1
+                        ? "pointer-events-none"
+                        : ""
+                    }`}
+                  >
+                    {route.name}
+                  </Link>
+                  // )
                 )}
               </BreadcrumbItem>
               {index < devisRoutes.length - 1 && <BreadcrumbSeparator />}

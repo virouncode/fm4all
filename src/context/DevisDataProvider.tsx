@@ -21,6 +21,7 @@ export const DevisDataContext = createContext<{
       typeOccupation: "",
     },
     services: {
+      selectedServicesIds: [],
       nettoyage: {
         nettoyageFournisseurId: null,
         nettoyagePropositionId: null,
@@ -28,8 +29,21 @@ export const DevisDataContext = createContext<{
         samediPropositionId: null,
         dimanchePropositionId: null,
         vitreriePropositionId: null,
+        nbPassageVitrerie: 2,
         propreteFournisseurId: null,
         trilogieGammeSelected: null,
+        nbDistribEmp: 0,
+        nbDistribSavon: 0,
+        nbDistribPh: 0,
+        nbDistribDesinfectant: 0,
+        nbDistribParfum: 0,
+        nbDistribBalai: 0,
+        nbDistribPoubelle: 0,
+        dureeLocation: "pa36M",
+        desinfectantGammeSelected: null,
+        parfumGammeSelected: null,
+        balaiGammeSelected: null,
+        poubelleGammeSelected: null,
       },
     },
     allCompanyInfo: {
@@ -60,6 +74,7 @@ const DevisDataProvider = ({ children }: PropsWithChildren) => {
               typeOccupation: "",
             },
             services: {
+              selectedServicesIds: [],
               nettoyage: {
                 nettoyageFournisseurId: null,
                 nettoyagePropositionId: null,
@@ -67,11 +82,23 @@ const DevisDataProvider = ({ children }: PropsWithChildren) => {
                 samediPropositionId: null,
                 dimanchePropositionId: null,
                 vitreriePropositionId: null,
+                nbPassageVitrerie: 2,
                 propreteFournisseurId: null,
                 trilogieGammeSelected: null,
+                nbDistribEmp: 0,
+                nbDistribSavon: 0,
+                nbDistribPh: 0,
+                nbDistribDesinfectant: 0,
+                nbDistribParfum: 0,
+                nbDistribBalai: 0,
+                nbDistribPoubelle: 0,
+                dureeLocation: "pa36M",
+                desinfectantGammeSelected: null,
+                parfumGammeSelected: null,
+                balaiGammeSelected: null,
+                poubelleGammeSelected: null,
               },
             },
-
             allCompanyInfo: {
               siret: "",
               raisonSociale: "",
@@ -93,6 +120,7 @@ const DevisDataProvider = ({ children }: PropsWithChildren) => {
           typeOccupation: "",
         },
         services: {
+          selectedServicesIds: [],
           nettoyage: {
             nettoyageFournisseurId: null,
             nettoyagePropositionId: null,
@@ -100,11 +128,23 @@ const DevisDataProvider = ({ children }: PropsWithChildren) => {
             samediPropositionId: null,
             dimanchePropositionId: null,
             vitreriePropositionId: null,
+            nbPassageVitrerie: 2,
             propreteFournisseurId: null,
             trilogieGammeSelected: null,
+            nbDistribEmp: 0,
+            nbDistribSavon: 0,
+            nbDistribPh: 0,
+            nbDistribDesinfectant: 0,
+            nbDistribParfum: 0,
+            nbDistribBalai: 0,
+            nbDistribPoubelle: 0,
+            dureeLocation: "pa36M",
+            desinfectantGammeSelected: null,
+            parfumGammeSelected: null,
+            balaiGammeSelected: null,
+            poubelleGammeSelected: null,
           },
         },
-
         allCompanyInfo: {
           siret: "",
           raisonSociale: "",
@@ -148,6 +188,7 @@ export const firstInfoSchema = z.object({
 export type FirstCompanyInfoType = z.infer<typeof firstInfoSchema>;
 
 export const servicesSchema = z.object({
+  selectedServicesIds: z.array(z.number()),
   nettoyage: z.object({
     nettoyageFournisseurId: z.number().nullable(),
     nettoyagePropositionId: z.number().nullable(),
@@ -155,8 +196,21 @@ export const servicesSchema = z.object({
     samediPropositionId: z.number().nullable(),
     dimanchePropositionId: z.number().nullable(),
     vitreriePropositionId: z.number().nullable(),
+    nbPassageVitrerie: z.number(),
     propreteFournisseurId: z.number().nullable(),
     trilogieGammeSelected: z.string().nullable(),
+    nbDistribEmp: z.number(),
+    nbDistribSavon: z.number(),
+    nbDistribPh: z.number(),
+    nbDistribDesinfectant: z.number(),
+    nbDistribParfum: z.number(),
+    nbDistribBalai: z.number(),
+    nbDistribPoubelle: z.number(),
+    dureeLocation: z.string(),
+    desinfectantGammeSelected: z.string().nullable(),
+    parfumGammeSelected: z.string().nullable(),
+    balaiGammeSelected: z.string().nullable(),
+    poubelleGammeSelected: z.string().nullable(),
   }),
 });
 

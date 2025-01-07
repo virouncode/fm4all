@@ -30,10 +30,10 @@ export const getPropreteDistribQuantites = async (effectif: number) => {
     );
     return {
       ...distribQuantites,
-      nb_distrib_desinfectant: distribQuantites.nbDistribPh,
-      nb_distrib_parfum: distribQuantites.nbDistribEmp,
-      nb_distrib_balai: distribQuantites.nbDistribPh,
-      nb_distrib_poubelle: Math.ceil(distribQuantites?.nbDistribPh / 2),
+      nbDistribDesinfectant: distribQuantites.nbDistribPh,
+      nbDistribParfum: distribQuantites.nbDistribEmp,
+      nbDistribBalai: distribQuantites.nbDistribPh,
+      nbDistribPoubelle: Math.ceil(distribQuantites?.nbDistribPh / 2),
     };
   } catch (err) {
     if (err instanceof z.ZodError) {
@@ -72,8 +72,6 @@ export const getPropreteDistribTarifs = async (fournisseurId: number) => {
         eq(propreteDistribTarifs.fournisseurId, fournisseurs.id)
       )
       .where(eq(propreteDistribTarifs.fournisseurId, fournisseurId));
-
-    console.log("getPropreteDistribTarifs", results);
 
     if (results.length === 0) {
       return [];
@@ -118,7 +116,7 @@ export const getPropreteInstalDistribTarifs = async (
           eq(propreteInstalDistribTarifs.fournisseurId, fournisseurId)
         )
       );
-    console.log("getPropreteInstalDistribTarifs", results);
+
     if (results.length === 0) {
       return [];
     }
@@ -170,7 +168,6 @@ export const getPropreteConsoTarifs = async (
           eq(propreteConsoTarifs.fournisseurId, fournisseurId)
         )
       );
-    console.log("getPropreteConsoTarifs", results);
 
     if (results.length === 0) {
       return [];

@@ -1,5 +1,6 @@
 "use client";
 
+import { DevisDataContext } from "@/context/DevisDataProvider";
 import {
   FireExtinguisher,
   HandPlatter,
@@ -7,7 +8,7 @@ import {
   User,
   Wrench,
 } from "lucide-react";
-import { Dispatch, SetStateAction } from "react";
+import { useContext } from "react";
 import NextServiceButton from "./NextServiceButton";
 
 const servicesChoices = [
@@ -40,45 +41,66 @@ const servicesChoices = [
 ];
 
 type ServicesSelectionProps = {
-  selectedServicesIds: number[];
-  setSelectedServicesIds: Dispatch<SetStateAction<number[]>>;
   handleClickNext: () => void;
 };
 
-const ServicesSelection = ({
-  selectedServicesIds,
-  setSelectedServicesIds,
-  handleClickNext,
-}: ServicesSelectionProps) => {
+const ServicesSelection = ({ handleClickNext }: ServicesSelectionProps) => {
+  const { devisData, setDevisData } = useContext(DevisDataContext);
+  const selectedServicesIds = devisData.services.selectedServicesIds;
   const isServiceSelected = (serviceId: number) =>
     selectedServicesIds.includes(serviceId);
 
   const handleClickService = (serviceId: number) => {
     if (isServiceSelected(serviceId)) {
       if (serviceId === 1) {
-        setSelectedServicesIds((prev) =>
-          prev
-            .filter(
-              (selectedServiceId) =>
-                selectedServiceId !== 1 && selectedServiceId !== 2
-            )
-            .sort((a, b) => a - b)
-        );
+        setDevisData((prev) => ({
+          ...prev,
+          services: {
+            ...prev.services,
+            selectedServicesIds: prev.services.selectedServicesIds
+              .filter(
+                (selectedServiceId) =>
+                  selectedServiceId !== 1 && selectedServiceId !== 2
+              )
+              .sort((a, b) => a - b),
+          },
+        }));
         return;
       }
-      setSelectedServicesIds((prev) =>
-        prev
-          .filter((selectedServiceId) => selectedServiceId !== serviceId)
-          .sort((a, b) => a - b)
-      );
+      setDevisData((prev) => ({
+        ...prev,
+        services: {
+          ...prev.services,
+          selectedServicesIds: prev.services.selectedServicesIds
+            .filter((selectedServiceId) => selectedServiceId !== serviceId)
+            .sort((a, b) => a - b),
+        },
+      }));
     } else {
       if (serviceId === 1) {
-        setSelectedServicesIds((prev) => [...prev, 1, 2].sort((a, b) => a - b));
+        setDevisData((prev) => ({
+          ...prev,
+          services: {
+            ...prev.services,
+            selectedServicesIds: [
+              ...prev.services.selectedServicesIds,
+              1,
+              2,
+            ].sort((a, b) => a - b),
+          },
+        }));
         return;
       }
-      setSelectedServicesIds((prev) =>
-        [...prev, serviceId].sort((a, b) => a - b)
-      );
+      setDevisData((prev) => ({
+        ...prev,
+        services: {
+          ...prev.services,
+          selectedServicesIds: [
+            ...prev.services.selectedServicesIds,
+            serviceId,
+          ].sort((a, b) => a - b),
+        },
+      }));
     }
   };
   return (

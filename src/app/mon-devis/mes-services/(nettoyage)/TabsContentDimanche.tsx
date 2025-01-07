@@ -68,7 +68,7 @@ const TabsContentDimanche = ({
               <div
                 className={`flex flex-1 ${
                   selectedDimanchePropositionId === proposition.id
-                    ? "border-2 border-destructive"
+                    ? "ring-2 ring-inset ring-destructive"
                     : ""
                 } bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer`}
                 onClick={() => handleClickProposition(proposition.id)}

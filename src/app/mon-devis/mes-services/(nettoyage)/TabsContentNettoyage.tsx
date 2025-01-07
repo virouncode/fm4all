@@ -6,7 +6,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { DevisDataContext } from "@/context/DevisDataProvider";
 import { formatNumber } from "@/lib/formatNumber";
+import { useContext } from "react";
 
 type TabsContentNettoyageProps = {
   formattedNettoyagePropositions: {
@@ -24,15 +26,89 @@ type TabsContentNettoyageProps = {
     prixAnnuelSamedi: number;
     prixAnnuelDimanche: number;
   }[][];
-  selectedNettoyagePropositionId: number | null;
-  handleClickProposition: (propositionId: number) => void;
+  nettoyagePropositions: {
+    surface: number;
+    id: number;
+    fournisseurId: number;
+    nomEntreprise: string;
+    slogan: string | null;
+    createdAt: Date;
+    hParPassage: number;
+    tauxHoraire: number;
+    gamme: "essentiel" | "confort" | "excellence";
+    prixAnnuel: number;
+    freqAnnuelle: number;
+    prixAnnuelSamedi: number;
+    prixAnnuelDimanche: number;
+  }[];
 };
 
 const TabsContentNettoyage = ({
   formattedNettoyagePropositions,
-  selectedNettoyagePropositionId,
-  handleClickProposition,
+  nettoyagePropositions,
 }: TabsContentNettoyageProps) => {
+  const { devisData, setDevisData } = useContext(DevisDataContext);
+  const nettoyagePropositionId =
+    devisData.services.nettoyage.nettoyagePropositionId;
+
+  const handleClickProposition = (propositionId: number) => {
+    if (nettoyagePropositionId && nettoyagePropositionId === propositionId) {
+      setDevisData((prev) => ({
+        ...prev,
+        services: {
+          ...prev.services,
+          nettoyage: {
+            nettoyageFournisseurId: null,
+            nettoyagePropositionId: null,
+            repassePropositionId: null,
+            samediPropositionId: null,
+            dimanchePropositionId: null,
+            vitreriePropositionId: null,
+            nbPassageVitrerie: 2,
+            propreteFournisseurId: null,
+            trilogieGammeSelected: null,
+            dureeLocation: "pa36M",
+            desinfectantGammeSelected: null,
+            parfumGammeSelected: null,
+            balaiGammeSelected: null,
+            poubelleGammeSelected: null,
+          },
+        },
+      }));
+      return;
+    }
+    setDevisData((prev) => ({
+      ...prev,
+      services: {
+        ...prev.services,
+        nettoyage: {
+          nettoyageFournisseurId: nettoyagePropositions.find(
+            (nettoyage) => nettoyage.id === propositionId
+          )?.fournisseurId as number,
+          propreteFournisseurId:
+            (nettoyagePropositions.find(
+              (nettoyage) => nettoyage.id === propositionId
+            )?.fournisseurId as number) === 9
+              ? 12
+              : (nettoyagePropositions.find(
+                  (nettoyage) => nettoyage.id === propositionId
+                )?.fournisseurId as number),
+          nettoyagePropositionId: propositionId,
+          repassePropositionId: null,
+          samediPropositionId: null,
+          dimanchePropositionId: null,
+          vitreriePropositionId: null,
+          nbPassageVitrerie: 2,
+          trilogieGammeSelected: null,
+          dureeLocation: "pa36M",
+          desinfectantGammeSelected: null,
+          parfumGammeSelected: null,
+          balaiGammeSelected: null,
+          poubelleGammeSelected: null,
+        },
+      },
+    }));
+  };
   return (
     <TabsContent value="nettoyage" className="flex-1">
       <div className="h-full flex flex-col border rounded-xl overflow-hidden">
@@ -69,17 +145,15 @@ const TabsContentNettoyage = ({
                   return (
                     <div
                       className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
-                        selectedNettoyagePropositionId === proposition.id
-                          ? "border-2 border-destructive"
+                        nettoyagePropositionId === proposition.id
+                          ? "ring-2 ring-inset ring-destructive"
                           : ""
                       }`}
                       key={proposition.id}
                       onClick={() => handleClickProposition(proposition.id)}
                     >
                       <Checkbox
-                        checked={
-                          selectedNettoyagePropositionId === proposition.id
-                        }
+                        checked={nettoyagePropositionId === proposition.id}
                         onCheckedChange={() =>
                           handleClickProposition(proposition.id)
                         }

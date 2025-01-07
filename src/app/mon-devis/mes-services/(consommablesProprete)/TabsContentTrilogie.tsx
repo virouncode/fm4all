@@ -21,22 +21,20 @@ import { SelectPropreteConsoTarifsType } from "@/zod-schemas/propreteConsoTarifs
 import { SelectPropreteDistribQuantiteType } from "@/zod-schemas/propreteDistribQuantite";
 import { SelectPropreteDistribTarifsType } from "@/zod-schemas/propreteDistribTarifs";
 import { SelectPropreteInstalDistribTarifsType } from "@/zod-schemas/propreteInstalDistribTarifs";
-import { Dispatch, SetStateAction, useContext, useState } from "react";
+import { useContext } from "react";
 
 type TabsContentTrilogieProps = {
   distribQuantites:
     | (SelectPropreteDistribQuantiteType & {
-        nb_distrib_desinfectant: number;
-        nb_distrib_parfum: number;
-        nb_distrib_balai: number;
-        nb_distrib_poubelle: number;
+        nbDistribDesinfectant: number;
+        nbDistribParfum: number;
+        nbDistribBalai: number;
+        nbDistribPoubelle: number;
       })
     | null;
   distribTarifs: SelectPropreteDistribTarifsType[];
   distribInstalTarifs: SelectPropreteInstalDistribTarifsType[];
   consoTarifs: SelectPropreteConsoTarifsType[];
-  trilogieGammeSelected: string | null;
-  setTrilogieGammeSelected: Dispatch<SetStateAction<string | null>>;
 };
 
 const TabsContentTrilogie = ({
@@ -44,20 +42,15 @@ const TabsContentTrilogie = ({
   distribTarifs,
   distribInstalTarifs,
   consoTarifs,
-  trilogieGammeSelected,
-  setTrilogieGammeSelected,
 }: TabsContentTrilogieProps) => {
-  const { devisData } = useContext(DevisDataContext);
-  const [nbDistribEmp, setNbDistribEmp] = useState(
-    distribQuantites?.nbDistribEmp ?? 0
-  );
-  const [nbDistribSavon, setNbDistribSavon] = useState(
-    distribQuantites?.nbDistribSavon ?? 0
-  );
-  const [nbDistribPh, setNbDistribPh] = useState(
-    distribQuantites?.nbDistribPh ?? 0
-  );
-  const [dureeLocation, setDureeLocation] = useState("pa36M");
+  const { devisData, setDevisData } = useContext(DevisDataContext);
+  const {
+    nbDistribEmp,
+    nbDistribSavon,
+    nbDistribPh,
+    trilogieGammeSelected,
+    dureeLocation,
+  } = devisData.services.nettoyage;
 
   //Pour chaque gamme :
   // - calculer le prix annuel consommables trilogie
@@ -72,19 +65,19 @@ const TabsContentTrilogie = ({
         consoTarifs[0].paParPersonnePh) *
       (parseInt(devisData.firstCompanyInfo.effectif) as number),
     tarifsDistributeurs:
-      nbDistribEmp *
+      ((nbDistribEmp || distribQuantites?.nbDistribEmp) ?? 0) *
         (distribTarifs.find(
           (tarif) => tarif.type === "emp" && tarif.gamme === gamme
         )?.[
           dureeLocation as "pa12M" | "pa24M" | "pa36M" | "oneShot"
         ] as number) +
-      nbDistribSavon *
+      ((nbDistribSavon || distribQuantites?.nbDistribSavon) ?? 0) *
         (distribTarifs.find(
           (tarif) => tarif.type === "savon" && tarif.gamme === gamme
         )?.[
           dureeLocation as "pa12M" | "pa24M" | "pa36M" | "oneShot"
         ] as number) +
-      nbDistribPh *
+      ((nbDistribPh || distribQuantites?.nbDistribPh) ?? 0) *
         (distribTarifs.find(
           (tarif) => tarif.type === "ph" && tarif.gamme === gamme
         )?.[
@@ -95,10 +88,83 @@ const TabsContentTrilogie = ({
 
   const handleClickProposition = (gamme: string) => {
     if (trilogieGammeSelected === gamme) {
-      setTrilogieGammeSelected(null);
+      setDevisData((prev) => ({
+        ...prev,
+        services: {
+          ...prev.services,
+          nettoyage: {
+            ...prev.services.nettoyage,
+            trilogieGammeSelected: null,
+          },
+        },
+      }));
       return;
     }
-    setTrilogieGammeSelected(gamme);
+    setDevisData((prev) => ({
+      ...prev,
+      services: {
+        ...prev.services,
+        nettoyage: {
+          ...prev.services.nettoyage,
+          trilogieGammeSelected: gamme,
+        },
+      },
+    }));
+  };
+
+  const handleChangeDistribNbr = (type: string, value: number[]) => {
+    const number = value[0];
+    switch (type) {
+      case "emp":
+        setDevisData((prev) => ({
+          ...prev,
+          services: {
+            ...prev.services,
+            nettoyage: {
+              ...prev.services.nettoyage,
+              nbDistribEmp: number,
+            },
+          },
+        }));
+        return;
+      case "savon":
+        setDevisData((prev) => ({
+          ...prev,
+          services: {
+            ...prev.services,
+            nettoyage: {
+              ...prev.services.nettoyage,
+              nbDistribSavon: number,
+            },
+          },
+        }));
+        return;
+      case "ph":
+        setDevisData((prev) => ({
+          ...prev,
+          services: {
+            ...prev.services,
+            nettoyage: {
+              ...prev.services.nettoyage,
+              nbDistribPh: number,
+            },
+          },
+        }));
+        return;
+    }
+  };
+
+  const handleChangeDureeLocation = (value: string) => {
+    setDevisData((prev) => ({
+      ...prev,
+      services: {
+        ...prev.services,
+        nettoyage: {
+          ...prev.services.nettoyage,
+          dureeLocation: value,
+        },
+      },
+    }));
   };
 
   return (
@@ -126,48 +192,57 @@ const TabsContentTrilogie = ({
             <div className="flex flex-col gap-8">
               <div>
                 <Slider
-                  value={[nbDistribEmp]}
+                  value={[
+                    (nbDistribEmp || distribQuantites?.nbDistribEmp) ?? 0,
+                  ]}
                   min={1}
                   max={100}
                   step={1}
-                  onValueChange={(number) => setNbDistribEmp(number[0])}
+                  onValueChange={(value) =>
+                    handleChangeDistribNbr("emp", value)
+                  }
                   className="flex-1"
                 />
                 <label htmlFor="nbDeDistribEmp">
-                  {nbDistribEmp} distributeurs essuie-main papier
+                  {(nbDistribEmp || distribQuantites?.nbDistribEmp) ?? 0}{" "}
+                  distributeurs essuie-main papier
                 </label>
               </div>
               <div>
                 <Slider
-                  value={[nbDistribSavon]}
+                  value={[
+                    (nbDistribSavon || distribQuantites?.nbDistribSavon) ?? 0,
+                  ]}
                   min={1}
                   max={100}
                   step={1}
-                  onValueChange={(number) => setNbDistribSavon(number[0])}
+                  onValueChange={(value) =>
+                    handleChangeDistribNbr("savon", value)
+                  }
                   className="flex-1"
                 />
                 <label htmlFor="nbDistribSavon">
-                  {nbDistribSavon} distributeurs savon
+                  {(nbDistribSavon || distribQuantites?.nbDistribSavon) ?? 0}{" "}
+                  distributeurs savon
                 </label>
               </div>
               <div>
                 <Slider
-                  value={[nbDistribPh]}
+                  value={[(nbDistribPh || distribQuantites?.nbDistribPh) ?? 0]}
                   min={1}
                   max={100}
                   step={1}
-                  onValueChange={(number) => setNbDistribPh(number[0])}
+                  onValueChange={(value) => handleChangeDistribNbr("ph", value)}
                   className="flex-1"
                 />
                 <label htmlFor="nbDistribSavon">
-                  {nbDistribPh} distributeurs papier hygiénique
+                  {(nbDistribPh || distribQuantites?.nbDistribPh) ?? 0}{" "}
+                  distributeurs papier hygiénique
                 </label>
               </div>
               <div>
                 <Select
-                  onValueChange={(value) => {
-                    setDureeLocation(value);
-                  }}
+                  onValueChange={handleChangeDureeLocation}
                   value={dureeLocation}
                 >
                   <SelectTrigger className={`w-full max-w-xs`}>
@@ -212,7 +287,7 @@ const TabsContentTrilogie = ({
               <div
                 className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
                   trilogieGammeSelected === gamme
-                    ? "border-2 border-destructive"
+                    ? "ring-2 ring-inset ring-destructive"
                     : ""
                 } px-8`}
                 key={proposition.gamme}
@@ -232,12 +307,12 @@ const TabsContentTrilogie = ({
                             proposition.tarifsInstalDistributeurs) /
                             10000
                         )}{" "}
-                        € (distributeurs)
+                        € <span className="text-xs">(distributeurs)</span>
                       </p>
                       <p>&</p>
                       <p className="font-bold">
                         {formatNumber(proposition.tarifsConsommables / 10000)} €
-                        / an (consommables)
+                        / an <span className="text-xs">(conso)</span>
                       </p>
                     </>
                   ) : (
@@ -254,15 +329,16 @@ const TabsContentTrilogie = ({
                   <p className="text-sm">
                     Distributeurs{" "}
                     {gamme === "essentiel"
-                      ? "simples blancs"
+                      ? "blancs basic"
                       : gamme === "confort"
-                      ? "couleur (noir ou gris)"
+                      ? "couleur (noir, gris, blanc premium...)"
                       : "inox"}
                   </p>
+                  <p className="text-sm">Consommables</p>
                   <p className="text-sm">
                     {dureeLocation === "oneShot"
-                      ? "Achat des distributeurs"
-                      : `Location avec engagement de
+                      ? ""
+                      : `Location engagement
                     ${
                       dureeLocation === "pa12M"
                         ? "12"

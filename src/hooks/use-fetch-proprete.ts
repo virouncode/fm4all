@@ -13,13 +13,13 @@ import { SelectPropreteInstalDistribTarifsType } from "@/zod-schemas/propreteIns
 import { useContext, useEffect, useState } from "react";
 
 const useFetchProprete = () => {
-  const { devisData } = useContext(DevisDataContext);
+  const { devisData, setDevisData } = useContext(DevisDataContext);
   const [distribQuantites, setDistribQuantites] = useState<
     | (SelectPropreteDistribQuantiteType & {
-        nb_distrib_desinfectant: number;
-        nb_distrib_parfum: number;
-        nb_distrib_balai: number;
-        nb_distrib_poubelle: number;
+        nbDistribDesinfectant: number;
+        nbDistribParfum: number;
+        nbDistribBalai: number;
+        nbDistribPoubelle: number;
       })
     | null
   >(null);
@@ -32,34 +32,25 @@ const useFetchProprete = () => {
   const [consoTarifs, setConsoTarifs] = useState<
     SelectPropreteConsoTarifsType[]
   >([]);
+  const devisDataFournisseurId =
+    devisData.services.nettoyage.propreteFournisseurId;
+  const devisDataEffectif = devisData.firstCompanyInfo.effectif;
 
   useEffect(() => {
     const fetchProprete = async () => {
-      if (
-        !devisData.services.nettoyage.propreteFournisseurId ||
-        !devisData.firstCompanyInfo.effectif
-      )
-        return;
-      console.log(
-        "fetchProprete forunissuerId",
-        devisData.services.nettoyage.propreteFournisseurId
-      );
-
+      if (!devisDataFournisseurId || !devisDataEffectif) return;
+      const roundedEffectif = roundEffectif(parseInt(devisDataEffectif));
       try {
         const results = await Promise.all([
-          getPropreteDistribQuantites(
-            roundEffectif(parseInt(devisData.firstCompanyInfo.effectif))
-          ),
-          getPropreteDistribTarifs(
-            devisData.services.nettoyage.propreteFournisseurId as number
-          ),
+          getPropreteDistribQuantites(roundedEffectif),
+          getPropreteDistribTarifs(devisDataFournisseurId as number),
           getPropreteInstalDistribTarifs(
-            roundEffectif(parseInt(devisData.firstCompanyInfo.effectif)),
-            devisData.services.nettoyage.propreteFournisseurId as number
+            roundedEffectif,
+            devisDataFournisseurId as number
           ),
           getPropreteConsoTarifs(
-            roundEffectif(parseInt(devisData.firstCompanyInfo.effectif)),
-            devisData.services.nettoyage.propreteFournisseurId as number
+            roundedEffectif,
+            devisDataFournisseurId as number
           ),
         ]);
         setDistribQuantites(results[0]);
@@ -73,10 +64,7 @@ const useFetchProprete = () => {
       }
     };
     fetchProprete();
-  }, [
-    devisData.firstCompanyInfo.effectif,
-    devisData.services.nettoyage.propreteFournisseurId,
-  ]);
+  }, [devisDataFournisseurId, devisDataEffectif]);
   return {
     distribQuantites,
     distribTarifs,

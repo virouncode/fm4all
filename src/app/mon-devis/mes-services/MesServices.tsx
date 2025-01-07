@@ -2,7 +2,7 @@
 import { DevisDataContext } from "@/context/DevisDataProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import Link from "next/link";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ConsommablesProprete from "./(consommablesProprete)/ConsommablesProprete";
 import Nettoyage from "./(nettoyage)/Nettoyage";
 import Maintenance from "./Maintenance";
@@ -13,25 +13,15 @@ import ServicesSelection from "./ServicesSelection";
 
 const MesServices = () => {
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
-  const { devisData, setDevisData } = useContext(DevisDataContext);
-  const [selectedServicesIds, setSelectedServicesIds] = useState<number[]>([]);
+  const { devisData } = useContext(DevisDataContext);
   const [currentServiceId, setCurrentServiceId] = useState<number | null>(null);
+  const selectedServicesIds = devisData.services.selectedServicesIds;
 
-  if (!devisProgress.completedSteps.includes(1)) {
-    return (
-      <div className="text-base md:text-lg mx-auto max-w-prose mt-10">
-        Vous devez d&apos;abord remplir les informations sur vos{" "}
-        <Link href="/mon-devis/mes-locaux" className="underline">
-          locaux
-        </Link>
-        .
-      </div>
-    );
-  }
+  useEffect(() => {
+    setDevisProgress((prev) => ({ ...prev, currentStep: 2 }));
+  }, [setDevisProgress]);
+
   const handleClickNext = () => {
-    console.log("currentServiceId", currentServiceId);
-    console.log("selectedServicesIds", selectedServicesIds);
-
     if (currentServiceId === null) {
       setCurrentServiceId(1);
       const nextService = document.getElementById(
@@ -47,7 +37,6 @@ const MesServices = () => {
         selectedServicesIds.indexOf(currentServiceId as number) + 1
       ].toString()
     );
-    console.log("nextService", nextService);
 
     if (nextService) {
       nextService.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -87,14 +76,21 @@ const MesServices = () => {
         ]
     );
   };
+  if (!devisProgress.completedSteps.includes(1)) {
+    return (
+      <div className="text-base md:text-lg mx-auto max-w-prose mt-10">
+        Vous devez d&apos;abord remplir les informations sur vos{" "}
+        <Link href="/mon-devis/mes-locaux" className="underline">
+          locaux
+        </Link>
+        .
+      </div>
+    );
+  }
 
   return (
     <>
-      <ServicesSelection
-        selectedServicesIds={selectedServicesIds}
-        setSelectedServicesIds={setSelectedServicesIds}
-        handleClickNext={handleClickNext}
-      />
+      <ServicesSelection handleClickNext={handleClickNext} />
       {selectedServicesIds.includes(1) && (
         <Nettoyage
           handleClickNext={handleClickNext}

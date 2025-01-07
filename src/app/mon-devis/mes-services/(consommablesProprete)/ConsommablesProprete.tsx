@@ -4,6 +4,7 @@ import useFetchProprete from "@/hooks/use-fetch-proprete";
 import { useContext, useState } from "react";
 import NextServiceButton from "../NextServiceButton";
 import PreviousServiceButton from "../PreviousServiceButton";
+import TabsContentPropreteOptions from "./TabsContentPropreteOptions";
 import TabsContentTrilogie from "./TabsContentTrilogie";
 
 type ConsommablesPropreteProps = {
@@ -19,11 +20,11 @@ const ConsommablesProprete = ({
 }: ConsommablesPropreteProps) => {
   const { devisData } = useContext(DevisDataContext);
   const [comment, setComment] = useState("");
-  const [trilogieGammeSelected, setTrilogieGammeSelected] = useState(
-    devisData.services.nettoyage.trilogieGammeSelected
-  );
   const { distribQuantites, distribTarifs, distribInstalTarifs, consoTarifs } =
     useFetchProprete();
+
+  const trilogieGammeSelected =
+    devisData.services.nettoyage.trilogieGammeSelected;
 
   return (
     <div className="flex flex-col gap-6 w-full mx-auto h-[600px] py-2" id="2">
@@ -40,9 +41,7 @@ const ConsommablesProprete = ({
             value="trilogie"
             className="text-base"
             onClick={() =>
-              setComment(
-                "*le tarif comprend la location et l'installation des distributeurs"
-              )
+              setComment("*le tarif comprend l'installation des distributeurs")
             }
           >
             EMP / Savon / PH
@@ -57,14 +56,19 @@ const ConsommablesProprete = ({
           </TabsTrigger>
         </TabsList>
         {distribQuantites && (
-          <TabsContentTrilogie
-            distribQuantites={distribQuantites}
-            distribTarifs={distribTarifs}
-            distribInstalTarifs={distribInstalTarifs}
-            consoTarifs={consoTarifs}
-            trilogieGammeSelected={trilogieGammeSelected}
-            setTrilogieGammeSelected={setTrilogieGammeSelected}
-          />
+          <>
+            <TabsContentTrilogie
+              distribQuantites={distribQuantites}
+              distribTarifs={distribTarifs}
+              distribInstalTarifs={distribInstalTarifs}
+              consoTarifs={consoTarifs}
+            />
+            <TabsContentPropreteOptions
+              distribQuantites={distribQuantites}
+              distribTarifs={distribTarifs}
+              consoTarifs={consoTarifs}
+            />
+          </>
         )}
       </Tabs>
 

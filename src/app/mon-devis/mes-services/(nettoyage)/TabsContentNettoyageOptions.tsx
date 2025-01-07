@@ -1,11 +1,12 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { TabsContent } from "@/components/ui/tabs";
+import { DevisDataContext } from "@/context/DevisDataProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { SelectNettoyageRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
 import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SelectNettoyageVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
-import { useState } from "react";
+import { useContext } from "react";
 
 type TabsContentNettoyageOptionsProps = {
   filteredNettoyageProposition: SelectNettoyageTarifsType & {
@@ -22,45 +23,160 @@ type TabsContentNettoyageOptionsProps = {
     prixVitrerieParPassage: number;
     prixCloisonsParPassage: number;
   };
-  selectedSamediPropositionId: number | null;
-  selectedDimanchePropositionId: number | null;
-  selectedRepassePropositionId: number | null;
-  selectedVitreriePropositionId: number | null;
-  handleClickOption: (type: string, propositionId: number) => void;
 };
 
 const TabsContentNettoyageOptions = ({
   filteredNettoyageProposition,
   filteredRepasseProposition,
   filteredVitrerieProposition,
-  selectedRepassePropositionId,
-  selectedSamediPropositionId,
-  selectedDimanchePropositionId,
-  selectedVitreriePropositionId,
-  handleClickOption,
 }: TabsContentNettoyageOptionsProps) => {
-  const [nbDePassagesVitrerie, setNbDePassagesVitrerie] = useState<number>(2);
+  const { devisData, setDevisData } = useContext(DevisDataContext);
   const color =
     filteredNettoyageProposition.gamme === "essentiel"
       ? "fm4allessential"
       : filteredNettoyageProposition.gamme === "confort"
       ? "fm4allcomfort"
       : "fm4allexcellence";
+
+  const repassePropositionId =
+    devisData.services.nettoyage.repassePropositionId;
+  const samediPropositionId = devisData.services.nettoyage.samediPropositionId;
+  const dimanchePropositionId =
+    devisData.services.nettoyage.dimanchePropositionId;
+  const vitreriePropositionId =
+    devisData.services.nettoyage.vitreriePropositionId;
+  const nbPassageVitrerie = devisData.services.nettoyage.nbPassageVitrerie;
+
+  const handleClickOption = (type: string, propositionId: number) => {
+    switch (type) {
+      case "repasse":
+        if (repassePropositionId && repassePropositionId === propositionId) {
+          setDevisData((prev) => ({
+            ...prev,
+            services: {
+              ...prev.services,
+              nettoyage: {
+                ...prev.services.nettoyage,
+                repassePropositionId: null,
+              },
+            },
+          }));
+          return;
+        }
+        setDevisData((prev) => ({
+          ...prev,
+          services: {
+            ...prev.services,
+            nettoyage: {
+              ...prev.services.nettoyage,
+              repassePropositionId: propositionId,
+            },
+          },
+        }));
+        break;
+      case "vitrerie":
+        if (vitreriePropositionId && vitreriePropositionId === propositionId) {
+          setDevisData((prev) => ({
+            ...prev,
+            services: {
+              ...prev.services,
+              nettoyage: {
+                ...prev.services.nettoyage,
+                vitreriePropositionId: null,
+              },
+            },
+          }));
+          return;
+        }
+        setDevisData((prev) => ({
+          ...prev,
+          services: {
+            ...prev.services,
+            nettoyage: {
+              ...prev.services.nettoyage,
+              vitreriePropositionId: propositionId,
+            },
+          },
+        }));
+        break;
+      case "samedi":
+        if (samediPropositionId && samediPropositionId === propositionId) {
+          setDevisData((prev) => ({
+            ...prev,
+            services: {
+              ...prev.services,
+              nettoyage: {
+                ...prev.services.nettoyage,
+                samediPropositionId: null,
+              },
+            },
+          }));
+          return;
+        }
+        setDevisData((prev) => ({
+          ...prev,
+          services: {
+            ...prev.services,
+            nettoyage: {
+              ...prev.services.nettoyage,
+              samediPropositionId: propositionId,
+            },
+          },
+        }));
+        break;
+      case "dimanche":
+        if (dimanchePropositionId && dimanchePropositionId === propositionId) {
+          setDevisData((prev) => ({
+            ...prev,
+            services: {
+              ...prev.services,
+              nettoyage: {
+                ...prev.services.nettoyage,
+                dimanchePropositionId: null,
+              },
+            },
+          }));
+          return;
+        }
+        setDevisData((prev) => ({
+          ...prev,
+          services: {
+            ...prev.services,
+            nettoyage: {
+              ...prev.services.nettoyage,
+              dimanchePropositionId: propositionId,
+            },
+          },
+        }));
+        break;
+    }
+  };
+
+  const handleChangeNbPassageVitrerie = (value: number[]) => {
+    setDevisData((prev) => ({
+      ...prev,
+      services: {
+        ...prev.services,
+        nettoyage: {
+          ...prev.services.nettoyage,
+          nbPassageVitrerie: value[0],
+        },
+      },
+    }));
+  };
+
   return (
     <TabsContent value="options" className="flex-1">
       <div className="h-full flex flex-col border rounded-xl overflow-hidden">
         {filteredRepasseProposition && (
-          <div
-            className="flex border-b flex-1"
-            key={"repasse" + filteredRepasseProposition.id}
-          >
+          <div className="flex border-b flex-1">
             <div className="flex w-1/4 items-center justify-center text-lg">
               Repasse sanitaire
             </div>
             <div
               className={`flex w-3/4 items-center justify-center ${
-                selectedRepassePropositionId === filteredRepasseProposition.id
-                  ? "border-2 border-destructive"
+                repassePropositionId === filteredRepasseProposition.id
+                  ? "ring-2 ring-inset ring-destructive"
                   : ""
               } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
               onClick={() =>
@@ -68,9 +184,7 @@ const TabsContentNettoyageOptions = ({
               }
             >
               <Checkbox
-                checked={
-                  selectedRepassePropositionId === filteredRepasseProposition.id
-                }
+                checked={repassePropositionId === filteredRepasseProposition.id}
                 onCheckedChange={() =>
                   handleClickOption("repasse", filteredRepasseProposition.id)
                 }
@@ -101,17 +215,14 @@ const TabsContentNettoyageOptions = ({
           </div>
         )}
 
-        <div
-          className="flex border-b flex-1"
-          key={"samedi" + filteredNettoyageProposition.id}
-        >
+        <div className="flex border-b flex-1">
           <div className="flex w-1/4 items-center justify-center text-lg">
             Samedi
           </div>
           <div
             className={`flex w-3/4 items-center justify-center ${
-              selectedSamediPropositionId === filteredNettoyageProposition.id
-                ? "border-2 border-destructive"
+              samediPropositionId === filteredNettoyageProposition.id
+                ? "ring-2 ring-inset ring-destructive"
                 : ""
             } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
             onClick={() =>
@@ -119,9 +230,7 @@ const TabsContentNettoyageOptions = ({
             }
           >
             <Checkbox
-              checked={
-                selectedSamediPropositionId === filteredNettoyageProposition.id
-              }
+              checked={samediPropositionId === filteredNettoyageProposition.id}
               onCheckedChange={() =>
                 handleClickOption("samedi", filteredNettoyageProposition.id)
               }
@@ -139,17 +248,14 @@ const TabsContentNettoyageOptions = ({
             </div>
           </div>
         </div>
-        <div
-          className="flex border-b flex-1"
-          key={"dimanche" + filteredNettoyageProposition.id}
-        >
+        <div className="flex border-b flex-1">
           <div className="flex w-1/4 items-center justify-center text-lg">
             Dimanche
           </div>
           <div
             className={`flex w-3/4 items-center justify-center ${
-              selectedDimanchePropositionId === filteredNettoyageProposition.id
-                ? "border-2 border-destructive"
+              dimanchePropositionId === filteredNettoyageProposition.id
+                ? "ring-2 ring-inset ring-destructive"
                 : ""
             } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
             onClick={() =>
@@ -158,8 +264,7 @@ const TabsContentNettoyageOptions = ({
           >
             <Checkbox
               checked={
-                selectedDimanchePropositionId ===
-                filteredNettoyageProposition.id
+                dimanchePropositionId === filteredNettoyageProposition.id
               }
               onCheckedChange={() =>
                 handleClickOption("dimanche", filteredNettoyageProposition.id)
@@ -179,34 +284,29 @@ const TabsContentNettoyageOptions = ({
           </div>
         </div>
         {filteredVitrerieProposition && (
-          <div
-            className="flex border-b flex-1"
-            key={"vitrerie" + filteredVitrerieProposition.id}
-          >
+          <div className="flex border-b flex-1">
             <div className="flex w-1/4 items-center justify-center">
               <div className="flex flex-col gap-4 items-center justify-center w-full">
                 <p className="text-lg">Vitrerie</p>
                 <div className="flex flex-col items-center w-full">
                   <Slider
-                    value={[nbDePassagesVitrerie]}
+                    value={[nbPassageVitrerie]}
                     min={1}
                     max={24}
                     step={1}
-                    onValueChange={(number) =>
-                      setNbDePassagesVitrerie(number[0])
-                    }
+                    onValueChange={handleChangeNbPassageVitrerie}
                     className="w-3/4"
                   />
                   <label htmlFor="nbDePassagesVitrerie" className="text-sm">
-                    {nbDePassagesVitrerie} passages / an
+                    {nbPassageVitrerie} passages / an
                   </label>
                 </div>
               </div>
             </div>
             <div
               className={`flex w-3/4 items-center justify-center ${
-                selectedVitreriePropositionId === filteredVitrerieProposition.id
-                  ? "border-2 border-destructive"
+                vitreriePropositionId === filteredVitrerieProposition.id
+                  ? "ring-2 ring-inset ring-destructive"
                   : ""
               } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
               onClick={() =>
@@ -215,8 +315,7 @@ const TabsContentNettoyageOptions = ({
             >
               <Checkbox
                 checked={
-                  selectedVitreriePropositionId ===
-                  filteredVitrerieProposition.id
+                  vitreriePropositionId === filteredVitrerieProposition.id
                 }
                 onCheckedChange={() =>
                   handleClickOption("vitrerie", filteredVitrerieProposition.id)
@@ -233,15 +332,15 @@ const TabsContentNettoyageOptions = ({
                           10000 +
                           filteredVitrerieProposition.prixCloisonsParPassage /
                             10000) *
-                          nbDePassagesVitrerie
+                          nbPassageVitrerie
                       )
                     : Math.round(
                         (filteredVitrerieProposition.minFacturation / 10000) *
-                          nbDePassagesVitrerie
+                          nbPassageVitrerie
                       )}{" "}
                   € / an
                 </p>
-                <p className="text-sm">{nbDePassagesVitrerie} passages / an</p>
+                <p className="text-sm">{nbPassageVitrerie} passages / an</p>
               </div>
             </div>
           </div>

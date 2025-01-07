@@ -7,8 +7,8 @@ const page = () => {
     <div>
       <DevisProgressProvider>
         <AfficherDevis />
+        <DevisBreadcrumb currentStepId={5} />
       </DevisProgressProvider>
-      <DevisBreadcrumb currentStepId={5} />
     </div>
   );
 };
