@@ -18,7 +18,7 @@ const Nettoyage = ({
   handleClickNext,
   handleClickPrevious,
 }: NettoyageProps) => {
-  const { nettoyage, setNettoyage } = useContext(NettoyageContext);
+  const { nettoyage } = useContext(NettoyageContext);
   const [comment, setComment] = useState<string>(
     "*moyenne sur l'année (12 mois de 21,67 jours ouvrés)"
   );
