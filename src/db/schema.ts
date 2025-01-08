@@ -21,7 +21,7 @@ export const gammeEnum = pgEnum("gamme", [
   "confort",
   "excellence",
 ]);
-export const typePropreteEnum = pgEnum("typeproprete", [
+export const typeHygieneEnum = pgEnum("typehygiene", [
   "emp",
   "savon",
   "ph",
@@ -117,7 +117,7 @@ export const nettoyageVitrerieTarifs = pgTable("nettoyage_vitrerie_tarifs", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const propreteDistribQuantites = pgTable("proprete_distrib_quantites", {
+export const hygieneDistribQuantites = pgTable("hygiene_distrib_quantites", {
   id: serial().primaryKey(),
   effectif: integer().notNull(),
   nbDistribEmp: integer("nb_distrib_emp").notNull(),
@@ -126,12 +126,12 @@ export const propreteDistribQuantites = pgTable("proprete_distrib_quantites", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const propreteDistribTarifs = pgTable("proprete_distrib_tarifs", {
+export const hygieneDistribTarifs = pgTable("hygiene_distrib_tarifs", {
   id: serial().primaryKey(),
   fournisseurId: integer("fournisseur_id")
     .notNull()
     .references(() => fournisseurs.id),
-  type: typePropreteEnum().notNull(),
+  type: typeHygieneEnum().notNull(),
   gamme: gammeEnum().notNull(),
   oneShot: integer("one_shot"),
   pa12M: integer("pa_12m"),
@@ -140,8 +140,8 @@ export const propreteDistribTarifs = pgTable("proprete_distrib_tarifs", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const propreteInstalDistribTarifs = pgTable(
-  "proprete_instal_distrib_tarifs",
+export const hygieneInstalDistribTarifs = pgTable(
+  "hygiene_instal_distrib_tarifs",
   {
     id: serial().primaryKey(),
     fournisseurId: integer("fournisseur_id")
@@ -153,7 +153,7 @@ export const propreteInstalDistribTarifs = pgTable(
   }
 );
 
-export const propreteConsoTarifs = pgTable("proprete_conso_tarifs", {
+export const hygieneConsoTarifs = pgTable("hygiene_conso_tarifs", {
   id: serial().primaryKey(),
   effectif: integer(),
   fournisseurId: integer("fournisseur_id")
@@ -177,9 +177,9 @@ export const fournisseursRelations = relations(
     nettoyageTarifs: many(nettoyageTarifs),
     nettoyageRepasseTarifs: many(nettoyageRepasseTarifs),
     nettoyageVitrerieTarifs: many(nettoyageVitrerieTarifs),
-    propreteDistribTarifs: many(propreteDistribTarifs),
-    propreteInstalDistribTarifs: many(propreteInstalDistribTarifs),
-    propreteConsoTarifs: many(propreteConsoTarifs),
+    hygieneDistribTarifs: many(hygieneDistribTarifs),
+    hygieneInstalDistribTarifs: many(hygieneInstalDistribTarifs),
+    hygieneConsoTarifs: many(hygieneConsoTarifs),
   })
 );
 
@@ -223,31 +223,31 @@ export const nettoyageVitrerieTarifsRelations = relations(
   })
 );
 
-export const propreteDistribTarifsRelations = relations(
-  propreteDistribTarifs,
+export const hygieneDistribTarifsRelations = relations(
+  hygieneDistribTarifs,
   ({ one }) => ({
     fournisseur: one(fournisseurs, {
-      fields: [propreteDistribTarifs.fournisseurId],
+      fields: [hygieneDistribTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
   })
 );
 
-export const propreteInstalDistribTarifsRelations = relations(
-  propreteInstalDistribTarifs,
+export const hygieneInstalDistribTarifsRelations = relations(
+  hygieneInstalDistribTarifs,
   ({ one }) => ({
     fournisseur: one(fournisseurs, {
-      fields: [propreteInstalDistribTarifs.fournisseurId],
+      fields: [hygieneInstalDistribTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
   })
 );
 
-export const propreteConsoTarifsRelations = relations(
-  propreteConsoTarifs,
+export const hygieneConsoTarifsRelations = relations(
+  hygieneConsoTarifs,
   ({ one }) => ({
     fournisseur: one(fournisseurs, {
-      fields: [propreteConsoTarifs.fournisseurId],
+      fields: [hygieneConsoTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
   })

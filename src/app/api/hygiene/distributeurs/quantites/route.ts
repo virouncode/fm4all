@@ -1,20 +1,20 @@
 import { db } from "@/db";
-import { nettoyageQuantites } from "@/db/schema";
+import { hygieneDistribQuantites } from "@/db/schema";
 import { errorHandler } from "@/lib/errorHandler";
-import { selectNettoyageQuantitesSchema } from "@/zod-schemas/nettoyageQuantites";
+import { selectHygieneDistribQuantiteSchema } from "@/zod-schemas/hygieneDistribQuantite";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
-  const surface = searchParams.get("surface");
-  if (!surface) {
+  const effectif = searchParams.get("effectif");
+  if (!effectif) {
     return NextResponse.json(
       {
         success: false,
         error: {
           code: "BAD_REQUEST",
-          message: "Requête invalide, vous devez fournir une surface",
+          message: "Requête invalide, vous devez fournir un effectif",
         },
       },
       { status: 400 }
@@ -23,31 +23,31 @@ export async function GET(req: NextRequest) {
   try {
     const results = await db
       .select()
-      .from(nettoyageQuantites)
-      .where(eq(nettoyageQuantites.surface, parseInt(surface)));
-
+      .from(hygieneDistribQuantites)
+      .where(eq(hygieneDistribQuantites.effectif, parseInt(effectif)));
     if (results.length === 0) {
       return NextResponse.json(
         {
           success: true,
           data: [],
-          message: "Aucune donnée trouvée pour cette surface",
+          message: "Aucune donnée trouvée pour cet effectif",
         },
         { status: 200 }
       );
     }
-    const validatedResults = results.map((result) =>
-      selectNettoyageQuantitesSchema.parse(result)
+    const validatedResult = selectHygieneDistribQuantiteSchema.parse(
+      results[0]
     );
-    const data = validatedResults.map((result) => ({
-      ...result,
-      freqAnnuelle: result.freqAnnuelle / 10000,
-    }));
-
     return NextResponse.json(
       {
         success: true,
-        data,
+        data: {
+          ...validatedResult,
+          nbDistribDesinfectant: validatedResult.nbDistribPh,
+          nbDistribParfum: validatedResult.nbDistribEmp,
+          nbDistribBalai: validatedResult.nbDistribPh,
+          nbDistribPoubelle: Math.ceil(validatedResult?.nbDistribPh / 2),
+        },
         message: "Données récupérées avec succès",
       },
       { status: 200 }

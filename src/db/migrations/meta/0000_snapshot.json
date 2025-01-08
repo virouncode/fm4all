@@ -108,9 +108,7 @@
         "clients_email_contact_unique": {
           "name": "clients_email_contact_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email_contact"
-          ]
+          "columns": ["email_contact"]
         }
       },
       "policies": {},
@@ -203,12 +201,8 @@
           "name": "fournisseurs_logo_id_logos_fournisseurs_id_fk",
           "tableFrom": "fournisseurs",
           "tableTo": "logos_fournisseurs",
-          "columnsFrom": [
-            "logo_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["logo_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -218,9 +212,7 @@
         "fournisseurs_email_contact_unique": {
           "name": "fournisseurs_email_contact_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email_contact"
-          ]
+          "columns": ["email_contact"]
         }
       },
       "policies": {},
@@ -365,12 +357,8 @@
           "name": "nettoyage_repasse_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "nettoyage_repasse_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -436,12 +424,8 @@
           "name": "nettoyage_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "nettoyage_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -512,12 +496,8 @@
           "name": "nettoyage_vitrerie_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "nettoyage_vitrerie_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -528,8 +508,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.proprete_conso_tarifs": {
-      "name": "proprete_conso_tarifs",
+    "public.hygiene_conso_tarifs": {
+      "name": "hygiene_conso_tarifs",
       "schema": "",
       "columns": {
         "id": {
@@ -578,16 +558,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "proprete_conso_tarifs_fournisseur_id_fournisseurs_id_fk": {
-          "name": "proprete_conso_tarifs_fournisseur_id_fournisseurs_id_fk",
-          "tableFrom": "proprete_conso_tarifs",
+        "hygiene_conso_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "hygiene_conso_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "hygiene_conso_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -598,8 +574,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.proprete_distrib_quantites": {
-      "name": "proprete_distrib_quantites",
+    "public.hygiene_distrib_quantites": {
+      "name": "hygiene_distrib_quantites",
       "schema": "",
       "columns": {
         "id": {
@@ -648,8 +624,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.proprete_distrib_tarifs": {
-      "name": "proprete_distrib_tarifs",
+    "public.hygiene_distrib_tarifs": {
+      "name": "hygiene_distrib_tarifs",
       "schema": "",
       "columns": {
         "id": {
@@ -666,7 +642,7 @@
         },
         "type": {
           "name": "type",
-          "type": "typeproprete",
+          "type": "typehygiene",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
@@ -712,16 +688,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "proprete_distrib_tarifs_fournisseur_id_fournisseurs_id_fk": {
-          "name": "proprete_distrib_tarifs_fournisseur_id_fournisseurs_id_fk",
-          "tableFrom": "proprete_distrib_tarifs",
+        "hygiene_distrib_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "hygiene_distrib_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "hygiene_distrib_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -732,8 +704,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.proprete_instal_distrib_tarifs": {
-      "name": "proprete_instal_distrib_tarifs",
+    "public.hygiene_instal_distrib_tarifs": {
+      "name": "hygiene_instal_distrib_tarifs",
       "schema": "",
       "columns": {
         "id": {
@@ -770,16 +742,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "proprete_instal_distrib_tarifs_fournisseur_id_fournisseurs_id_fk": {
-          "name": "proprete_instal_distrib_tarifs_fournisseur_id_fournisseurs_id_fk",
-          "tableFrom": "proprete_instal_distrib_tarifs",
+        "hygiene_instal_distrib_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "hygiene_instal_distrib_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "hygiene_instal_distrib_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -795,32 +763,20 @@
     "public.gamme": {
       "name": "gamme",
       "schema": "public",
-      "values": [
-        "essentiel",
-        "confort",
-        "excellence"
-      ]
+      "values": ["essentiel", "confort", "excellence"]
     },
     "public.status": {
       "name": "status",
       "schema": "public",
-      "values": [
-        "active",
-        "inactive"
-      ]
+      "values": ["active", "inactive"]
     },
     "public.typebatiment": {
       "name": "typebatiment",
       "schema": "public",
-      "values": [
-        "bureaux",
-        "localCommercial",
-        "entrepot",
-        "cabinetMedical"
-      ]
+      "values": ["bureaux", "localCommercial", "entrepot", "cabinetMedical"]
     },
-    "public.typeproprete": {
-      "name": "typeproprete",
+    "public.typehygiene": {
+      "name": "typehygiene",
       "schema": "public",
       "values": [
         "emp",

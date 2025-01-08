@@ -46,10 +46,15 @@ export async function GET(req: NextRequest) {
     const validatedResults = results.map((result) =>
       selectNettoyageTarifsSchema.parse(result)
     );
+    const data = validatedResults.map((result) => ({
+      ...result,
+      hParPassage: result.hParPassage / 10000,
+      tauxHoraire: result.tauxHoraire / 10000,
+    }));
     return NextResponse.json(
       {
         success: true,
-        data: validatedResults,
+        data,
         message: "Données récupérées avec succès",
       },
       { status: 200 }

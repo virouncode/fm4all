@@ -1,15 +1,36 @@
 "use client";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
+import { FireExtinguisher, SprayCan, Toilet, Wrench } from "lucide-react";
 import Link from "next/link";
 import { useContext, useEffect } from "react";
+import Hygiene from "./(hygiene)/Hygiene";
 import Nettoyage from "./(nettoyage)/Nettoyage";
-import Proprete from "./(proprete)/Proprete";
+import NettoyageOptions from "./(nettoyage)/NettoyageOptions";
 import Maintenance from "./Maintenance";
-import OfficeManager from "./OfficeManager";
 import SecuriteIncendie from "./SecuriteIncendie";
-import ServicesFm4All from "./ServicesFm4All";
-import ServicesSelection from "./ServicesSelection";
+import HygieneOptions from "./(hygiene)/HygieneOptions";
+
+const servicesChoices = [
+  {
+    id: 1,
+    description: "Nettoyage et propreté",
+    icon: <SprayCan />,
+  },
+  { id: 2, description: "Nettoyage options", icon: <SprayCan /> },
+  { id: 3, description: "Hygiène sanitaire", icon: <Toilet /> },
+  { id: 4, description: "Hygiène options", icon: <Toilet /> },
+  {
+    id: 5,
+    description: "Maintenance",
+    icon: <Wrench />,
+  },
+  {
+    id: 6,
+    description: "Protection incendie",
+    icon: <FireExtinguisher />,
+  },
+];
 
 const MesServices = () => {
   const { services, setServices } = useContext(ServicesContext);
@@ -20,60 +41,25 @@ const MesServices = () => {
   }, [setDevisProgress]);
 
   useEffect(() => {
-    if (services.currentServiceId) {
-      const currentService = document.getElementById(
-        services.currentServiceId.toString()
-      );
-      if (currentService) {
-        currentService.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      }
-    } else {
-      const servicesSelection = document.getElementById("services-selection");
-      if (servicesSelection) {
-        servicesSelection.scrollIntoView({
-          behavior: "smooth",
-          block: "nearest",
-        });
-      }
+    const currentService = document.getElementById(
+      services.currentServiceId.toString()
+    );
+    if (currentService) {
+      currentService.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
   }, [services.currentServiceId]);
 
   const handleClickNext = () => {
-    //In ServicesSelection
-    if (services.currentServiceId === null) {
-      setServices((prev) => ({
-        ...prev,
-        currentServiceId: 1,
-      }));
-      return;
-    }
-    //I'm in a Service
     setServices((prev) => ({
       ...prev,
-      currentServiceId:
-        services.selectedServicesIds[
-          services.selectedServicesIds.indexOf(
-            services.currentServiceId as number
-          ) + 1
-        ],
+      currentServiceId: prev.currentServiceId + 1,
     }));
   };
 
   const handleClickPrevious = () => {
-    //I'm in the first service
-    if (services.currentServiceId === 1) {
-      setServices((prev) => ({ ...prev, currentServiceId: null }));
-      return;
-    }
-    //I'm sure that services.currentServiceId is not null
     setServices((prev) => ({
       ...prev,
-      currentServiceId:
-        services.selectedServicesIds[
-          services.selectedServicesIds.indexOf(
-            services.currentServiceId as number
-          ) - 1
-        ],
+      currentServiceId: prev.currentServiceId - 1,
     }));
   };
 
@@ -91,46 +77,27 @@ const MesServices = () => {
   }
 
   return (
-    <>
-      <ServicesSelection handleClickNext={handleClickNext} />
-      {services.selectedServicesIds.includes(1) && (
-        <Nettoyage
-          handleClickNext={handleClickNext}
-          handleClickPrevious={handleClickPrevious}
-        />
-      )}
-      {services.selectedServicesIds.includes(1) && (
-        <Proprete
-          handleClickNext={handleClickNext}
-          handleClickPrevious={handleClickPrevious}
-        />
-      )}
+    <section className="flex-1 overflow-hidden">
+      <Nettoyage handleClickNext={handleClickNext} />
+      <NettoyageOptions
+        handleClickNext={handleClickNext}
+        handleClickPrevious={handleClickPrevious}
+      />
+      <Hygiene
+        handleClickNext={handleClickNext}
+        handleClickPrevious={handleClickPrevious}
+      />
+      <HygieneOptions
+        handleClickNext={handleClickNext}
+        handleClickPrevious={handleClickPrevious}
+      />
 
-      {services.selectedServicesIds.includes(3) && (
-        <Maintenance
-          handleClickNext={handleClickNext}
-          handleClickPrevious={handleClickPrevious}
-        />
-      )}
-      {services.selectedServicesIds.includes(4) && (
-        <SecuriteIncendie
-          handleClickNext={handleClickNext}
-          handleClickPrevious={handleClickPrevious}
-        />
-      )}
-      {services.selectedServicesIds.includes(5) && (
-        <OfficeManager
-          handleClickNext={handleClickNext}
-          handleClickPrevious={handleClickPrevious}
-        />
-      )}
-      {services.selectedServicesIds.includes(6) && (
-        <ServicesFm4All
-          handleClickNext={handleClickNext}
-          handleClickPrevious={handleClickPrevious}
-        />
-      )}
-    </>
+      <Maintenance
+        handleClickNext={handleClickNext}
+        handleClickPrevious={handleClickPrevious}
+      />
+      <SecuriteIncendie handleClickPrevious={handleClickPrevious} />
+    </section>
   );
 };
 

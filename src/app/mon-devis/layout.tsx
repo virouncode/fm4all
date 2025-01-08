@@ -1,9 +1,9 @@
 import CompanyInfoProvider from "@/context/CompanyInfoProvider";
+import HygieneProvider from "@/context/HygieneProvider";
 import NettoyageProvider from "@/context/NettoyageProvider";
-import PropreteProvider from "@/context/PropreteProvider";
 import ServicesProvider from "@/context/ServicesProvider";
+import TotalHygieneProvider from "@/context/TotalHygieneProvider";
 import TotalNettoyageProvider from "@/context/TotalNettoyageProvider";
-import TotalPropreteProvider from "@/context/TotalPropreteProvider";
 import Total from "./Total";
 
 export default function MonDevisLayout({
@@ -16,14 +16,14 @@ export default function MonDevisLayout({
       <CompanyInfoProvider>
         <ServicesProvider>
           <NettoyageProvider>
-            <PropreteProvider>
+            <HygieneProvider>
               <TotalNettoyageProvider>
-                <TotalPropreteProvider>
+                <TotalHygieneProvider>
                   {children}
                   <Total />
-                </TotalPropreteProvider>
+                </TotalHygieneProvider>
               </TotalNettoyageProvider>
-            </PropreteProvider>
+            </HygieneProvider>
           </NettoyageProvider>
         </ServicesProvider>
       </CompanyInfoProvider>

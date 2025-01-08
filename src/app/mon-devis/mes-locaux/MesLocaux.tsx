@@ -9,15 +9,15 @@ import { departements } from "@/constants/departements";
 import { occupations } from "@/constants/occupations";
 import { CompanyInfoContext } from "@/context/CompanyInfoProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
+import { HygieneContext } from "@/context/HygieneProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
-import { PropreteContext } from "@/context/PropreteProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
+import { useToast } from "@/hooks/use-toast";
 import { companyInfoSchema, CompanyInfoType } from "@/zod-schemas/companyInfo";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import CityOut from "./CityOut";
 import ServicesLoader from "./ServicesLoader";
 
 const MesLocaux = () => {
@@ -25,11 +25,10 @@ const MesLocaux = () => {
   const { setServices } = useContext(ServicesContext);
   const { companyInfo, setCompanyInfo } = useContext(CompanyInfoContext);
   const { setNettoyage } = useContext(NettoyageContext);
-  const { setProprete } = useContext(PropreteContext);
+  const { setHygiene } = useContext(HygieneContext);
   const [loadingServices, setLoadingServices] = useState(false);
-  const [cityError, setCityError] = useState(false);
-  const [cityOut, setCityOut] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const defaultValues: Partial<CompanyInfoType> = {
     codePostal: companyInfo.codePostal,
@@ -70,9 +69,10 @@ const MesLocaux = () => {
       !departements.find(({ id }) => id === data.codePostal?.substring(0, 2))
     ) {
       setDevisProgress({ ...devisProgress, completedSteps: [] });
-      setCityOut(true);
+      router.push("/city-out");
       return;
     }
+
     try {
       const response = await fetch(
         `https://geo.api.gouv.fr/communes?codePostal=${data.codePostal}`
@@ -80,7 +80,12 @@ const MesLocaux = () => {
       const cityData = await response.json();
       if (cityData.length === 0) {
         setDevisProgress({ ...devisProgress, completedSteps: [] });
-        setCityError(true);
+        toast({
+          variant: "destructive",
+          title: "Code postal invalide",
+          description:
+            "Le code postal ne correspond à aucune ville, veullez réessayer",
+        });
         return;
       }
     } catch (err) {
@@ -97,7 +102,7 @@ const MesLocaux = () => {
       vitreriePropositionId: null,
       nbPassageVitrerie: 2,
     });
-    setProprete({
+    setHygiene({
       fournisseurId: null,
       nbDistribEmp: 0,
       nbDistribSavon: 0,
@@ -114,36 +119,13 @@ const MesLocaux = () => {
       poubelleGammeSelected: null,
     });
     setServices({
-      currentServiceId: null,
-      selectedServicesIds: [],
+      currentServiceId: 1,
     });
     setLoadingServices(true);
     setTimeout(() => {
       router.push("/mon-devis/mes-services");
     }, 5000);
   };
-
-  if (cityError) {
-    return (
-      <div className="text-base md:text-lg mx-auto max-w-prose mt-6 md:mt-10 text-center">
-        Le code postal que vous avez entré ne correspond à aucune ville.
-        <br />
-        <div
-          className="underline cursor-pointer"
-          onClick={() => {
-            setCityError(false);
-          }}
-        >
-          Veuillez vérifier et réessayer
-        </div>
-        .
-      </div>
-    );
-  }
-
-  if (cityOut) {
-    return <CityOut />;
-  }
 
   if (loadingServices) {
     return <ServicesLoader />;
@@ -153,7 +135,7 @@ const MesLocaux = () => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(submitForm)}
-        className="flex flex-col gap-14 mx-auto w-full md:w-2/3 mt-6 md:mt-20"
+        className="flex flex-col gap-14 mx-auto w-full md:w-2/3 mt-6 md:mt-10"
       >
         <div className="flex flex-col gap-4 md:flex-row md:gap-8">
           <div className="w-full md:w-1/2 flex flex-col gap-4">

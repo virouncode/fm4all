@@ -1,1 +1,1 @@
-ALTER TABLE "proprete_distrib_tarifs" ALTER COLUMN "one_shot" DROP NOT NULL;
+ALTER TABLE "hygiene_distrib_tarifs" ALTER COLUMN "one_shot" DROP NOT NULL;

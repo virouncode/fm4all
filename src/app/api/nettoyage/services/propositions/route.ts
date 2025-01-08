@@ -79,15 +79,13 @@ export async function GET(req: NextRequest) {
         const freqAnnuelle =
           quantites.find(({ gamme }) => gamme === tarif.gamme)?.freqAnnuelle ||
           0;
-        const hParPassage = tarif.hParPassage / 10000;
-        const tauxHoraire = tarif.tauxHoraire / 10000;
+        const hParPassage = tarif.hParPassage;
+        const tauxHoraire = tarif.tauxHoraire;
 
         return {
           ...tarif,
           freqAnnuelle,
-          prixAnnuel: Math.round(
-            (freqAnnuelle / 10000) * hParPassage * tauxHoraire
-          ),
+          prixAnnuel: Math.round(freqAnnuelle * hParPassage * tauxHoraire),
           prixAnnuelSamedi: Math.round(52 * hParPassage * tauxHoraire),
           prixAnnuelDimanche: Math.round(52 * hParPassage * tauxHoraire * 1.2),
         };

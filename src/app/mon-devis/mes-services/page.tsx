@@ -8,11 +8,7 @@ const page = () => {
       <div className="flex justify-between items-center">
         <h1 className="text-3xl md:text-4xl">Mes services</h1>
       </div>
-      <div className="h-[600px] overflow-hidden">
-        <section className="flex flex-col gap-10 py-6">
-          <MesServices />
-        </section>
-      </div>
+      <MesServices />
     </main>
   );
 };

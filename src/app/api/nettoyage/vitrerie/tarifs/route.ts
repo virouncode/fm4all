@@ -32,11 +32,17 @@ export async function GET() {
     const validatedResults = results.map((result) =>
       selectNettoyageVitrerieTarifsSchema.parse(result)
     );
+    const data = validatedResults.map((result) => ({
+      ...result,
+      tauxHoraire: result.tauxHoraire / 10000,
+      minFacturation: result.minFacturation / 10000,
+      fraisDeplacement: result.fraisDeplacement / 10000,
+    }));
 
     return NextResponse.json(
       {
         success: true,
-        data: validatedResults,
+        data,
         message: "Données récupérées avec succès",
       },
       { status: 200 }

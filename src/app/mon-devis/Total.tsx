@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/sheet";
 import { CompanyInfoContext } from "@/context/CompanyInfoProvider";
 import { useContext } from "react";
+import TotalHygiene from "./TotalHygiene";
 import TotalNettoyage from "./TotalNettoyage";
-import TotalProprete from "./TotalProprete";
 
 const Total = () => {
   const { companyInfo } = useContext(CompanyInfoContext);
@@ -40,7 +40,7 @@ const Total = () => {
         </SheetHeader>
         <div className="flex flex-col gap-6">
           <TotalNettoyage />
-          <TotalProprete />
+          <TotalHygiene />
         </div>
       </SheetContent>
     </Sheet>

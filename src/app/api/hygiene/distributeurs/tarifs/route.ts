@@ -1,20 +1,20 @@
 import { db } from "@/db";
-import { fournisseurs, nettoyageRepasseTarifs } from "@/db/schema";
+import { fournisseurs, hygieneDistribTarifs } from "@/db/schema";
 import { errorHandler } from "@/lib/errorHandler";
-import { selectNettoyageRepasseTarifsSchema } from "@/zod-schemas/nettoyageRepasse";
+import { selectHygieneDistribTarifsSchema } from "@/zod-schemas/hygieneDistribTarifs";
 import { eq, getTableColumns } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
-  const surface = searchParams.get("surface");
-  if (!surface) {
+  const fournisseurId = searchParams.get("fournisseurId");
+  if (!fournisseurId) {
     return NextResponse.json(
       {
         success: false,
         error: {
           code: "BAD_REQUEST",
-          message: "Requête invalide, vous devez fournir une surface",
+          message: "Requête invalide, vous devez fournir un fournisseurId",
         },
       },
       { status: 400 }
@@ -23,36 +23,36 @@ export async function GET(req: NextRequest) {
   try {
     const results = await db
       .select({
-        ...getTableColumns(nettoyageRepasseTarifs),
+        ...getTableColumns(hygieneDistribTarifs),
         nomEntreprise: fournisseurs.nomEntreprise,
         slogan: fournisseurs.slogan,
       })
-      .from(nettoyageRepasseTarifs)
+      .from(hygieneDistribTarifs)
       .innerJoin(
         fournisseurs,
-        eq(fournisseurs.id, nettoyageRepasseTarifs.fournisseurId)
+        eq(hygieneDistribTarifs.fournisseurId, fournisseurs.id)
       )
-      .where(eq(nettoyageRepasseTarifs.surface, parseInt(surface)));
-
+      .where(eq(hygieneDistribTarifs.fournisseurId, parseInt(fournisseurId)));
     if (results.length === 0) {
       return NextResponse.json(
         {
           success: true,
           data: [],
-          message: "Aucune donnée trouvée pour cette surface",
+          message: "Aucune donnée trouvée pour ce fournisseur",
         },
         { status: 200 }
       );
     }
     const validatedResults = results.map((result) =>
-      selectNettoyageRepasseTarifsSchema.parse(result)
+      selectHygieneDistribTarifsSchema.parse(result)
     );
     const data = validatedResults.map((result) => ({
       ...result,
-      hParPassage: result.hParPassage / 10000,
-      tauxHoraire: result.tauxHoraire / 10000,
+      oneShot: result.oneShot ? result.oneShot / 10000 : null,
+      pa12M: result.pa12M ? result.pa12M / 10000 : null,
+      pa24M: result.pa24M ? result.pa24M / 10000 : null,
+      pa36M: result.pa36M ? result.pa36M / 10000 : null,
     }));
-
     return NextResponse.json(
       {
         success: true,

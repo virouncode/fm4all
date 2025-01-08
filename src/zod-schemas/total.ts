@@ -8,7 +8,7 @@ export const totalNettoyageSchema = z.object({
   prixDimanche: z.number().nullable(),
   prixVitrerie: z.number().nullable(),
 });
-export const totalPropreteSchema = z.object({
+export const totalHygieneSchema = z.object({
   nomFournisseur: z.string().nullable(),
   prixTrilogieAbonnement: z.number().nullable(),
   prixTrilogieAchat: z
@@ -30,4 +30,4 @@ export const totalPropreteSchema = z.object({
 });
 
 export type TotalNettoyageType = z.infer<typeof totalNettoyageSchema>;
-export type TotalPropreteType = z.infer<typeof totalPropreteSchema>;
+export type TotalHygieneType = z.infer<typeof totalHygieneSchema>;

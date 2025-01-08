@@ -1,6 +1,6 @@
 {
-  "id": "428cf80c-5d73-4e2c-9abf-5d84c667f573",
-  "prevId": "c8f213ae-6cbc-4bbe-b2d8-6754e595483d",
+  "id": "eeb84f53-0bdf-475d-abac-fb2b22c982f3",
+  "prevId": "f13aba00-2376-4e9c-87e0-ce4568266553",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -108,7 +108,9 @@
         "clients_email_contact_unique": {
           "name": "clients_email_contact_unique",
           "nullsNotDistinct": false,
-          "columns": ["email_contact"]
+          "columns": [
+            "email_contact"
+          ]
         }
       },
       "policies": {},
@@ -201,8 +203,12 @@
           "name": "fournisseurs_logo_id_logos_fournisseurs_id_fk",
           "tableFrom": "fournisseurs",
           "tableTo": "logos_fournisseurs",
-          "columnsFrom": ["logo_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "logo_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -212,9 +218,279 @@
         "fournisseurs_email_contact_unique": {
           "name": "fournisseurs_email_contact_unique",
           "nullsNotDistinct": false,
-          "columns": ["email_contact"]
+          "columns": [
+            "email_contact"
+          ]
         }
       },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.hygiene_conso_tarifs": {
+      "name": "hygiene_conso_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "effectif": {
+          "name": "effectif",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fournisseur_id": {
+          "name": "fournisseur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pa_par_personne_emp": {
+          "name": "pa_par_personne_emp",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pa_par_personne_savon": {
+          "name": "pa_par_personne_savon",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pa_par_personne_ph": {
+          "name": "pa_par_personne_ph",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pa_par_personne_desinfectant": {
+          "name": "pa_par_personne_desinfectant",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "hygiene_conso_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "hygiene_conso_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "hygiene_conso_tarifs",
+          "tableTo": "fournisseurs",
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.hygiene_distrib_quantites": {
+      "name": "hygiene_distrib_quantites",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "effectif": {
+          "name": "effectif",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nb_distrib_emp": {
+          "name": "nb_distrib_emp",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nb_distrib_savon": {
+          "name": "nb_distrib_savon",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nb_distrib_ph": {
+          "name": "nb_distrib_ph",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.hygiene_distrib_tarifs": {
+      "name": "hygiene_distrib_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "fournisseur_id": {
+          "name": "fournisseur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "typehygiene",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gamme": {
+          "name": "gamme",
+          "type": "gamme",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "one_shot": {
+          "name": "one_shot",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pa_12m": {
+          "name": "pa_12m",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pa_24m": {
+          "name": "pa_24m",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pa_36m": {
+          "name": "pa_36m",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "hygiene_distrib_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "hygiene_distrib_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "hygiene_distrib_tarifs",
+          "tableTo": "fournisseurs",
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.hygiene_instal_distrib_tarifs": {
+      "name": "hygiene_instal_distrib_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "fournisseur_id": {
+          "name": "fournisseur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "effectif": {
+          "name": "effectif",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prix_installation": {
+          "name": "prix_installation",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "hygiene_instal_distrib_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "hygiene_instal_distrib_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "hygiene_instal_distrib_tarifs",
+          "tableTo": "fournisseurs",
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -316,7 +592,7 @@
           "name": "fournisseur_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "h_par_passage": {
           "name": "h_par_passage",
@@ -357,8 +633,12 @@
           "name": "nettoyage_repasse_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "nettoyage_repasse_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": ["fournisseur_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -383,7 +663,7 @@
           "name": "fournisseur_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "h_par_passage": {
           "name": "h_par_passage",
@@ -424,8 +704,12 @@
           "name": "nettoyage_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "nettoyage_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": ["fournisseur_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -450,7 +734,7 @@
           "name": "fournisseur_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "cadence_vitres": {
           "name": "cadence_vitres",
@@ -496,258 +780,12 @@
           "name": "nettoyage_vitrerie_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "nettoyage_vitrerie_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": ["fournisseur_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.hygiene_conso_tarifs": {
-      "name": "hygiene_conso_tarifs",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "fournisseur_id": {
-          "name": "fournisseur_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "pa_par_personne_emp": {
-          "name": "pa_par_personne_emp",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "pa_par_personne_savon": {
-          "name": "pa_par_personne_savon",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "pa_par_personne_ph": {
-          "name": "pa_par_personne_ph",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "pa_par_personne_desinfectant": {
-          "name": "pa_par_personne_desinfectant",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "hygiene_conso_tarifs_fournisseur_id_fournisseurs_id_fk": {
-          "name": "hygiene_conso_tarifs_fournisseur_id_fournisseurs_id_fk",
-          "tableFrom": "hygiene_conso_tarifs",
-          "tableTo": "fournisseurs",
-          "columnsFrom": ["fournisseur_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.hygiene_distrib_quantites": {
-      "name": "hygiene_distrib_quantites",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "effectif": {
-          "name": "effectif",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "nb_distrib_emp": {
-          "name": "nb_distrib_emp",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "nb_distrib_savon": {
-          "name": "nb_distrib_savon",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "nb_distrib_ph": {
-          "name": "nb_distrib_ph",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.hygiene_distrib_tarifs": {
-      "name": "hygiene_distrib_tarifs",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "fournisseur_id": {
-          "name": "fournisseur_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "type": {
-          "name": "type",
-          "type": "typehygiene",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "gamme": {
-          "name": "gamme",
-          "type": "gamme",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "one_shot": {
-          "name": "one_shot",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "pa_12m": {
-          "name": "pa_12m",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "pa_24m": {
-          "name": "pa_24m",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "pa_36m": {
-          "name": "pa_36m",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "hygiene_distrib_tarifs_fournisseur_id_fournisseurs_id_fk": {
-          "name": "hygiene_distrib_tarifs_fournisseur_id_fournisseurs_id_fk",
-          "tableFrom": "hygiene_distrib_tarifs",
-          "tableTo": "fournisseurs",
-          "columnsFrom": ["fournisseur_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.hygiene_instal_distrib_tarifs": {
-      "name": "hygiene_instal_distrib_tarifs",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "fournisseur_id": {
-          "name": "fournisseur_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "effectif": {
-          "name": "effectif",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "prix_installation": {
-          "name": "prix_installation",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "hygiene_instal_distrib_tarifs_fournisseur_id_fournisseurs_id_fk": {
-          "name": "hygiene_instal_distrib_tarifs_fournisseur_id_fournisseurs_id_fk",
-          "tableFrom": "hygiene_instal_distrib_tarifs",
-          "tableTo": "fournisseurs",
-          "columnsFrom": ["fournisseur_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -763,17 +801,29 @@
     "public.gamme": {
       "name": "gamme",
       "schema": "public",
-      "values": ["essentiel", "confort", "excellence"]
+      "values": [
+        "essentiel",
+        "confort",
+        "excellence"
+      ]
     },
     "public.status": {
       "name": "status",
       "schema": "public",
-      "values": ["active", "inactive"]
+      "values": [
+        "active",
+        "inactive"
+      ]
     },
     "public.typebatiment": {
       "name": "typebatiment",
       "schema": "public",
-      "values": ["bureaux", "localCommercial", "entrepot", "cabinetMedical"]
+      "values": [
+        "bureaux",
+        "localCommercial",
+        "entrepot",
+        "cabinetMedical"
+      ]
     },
     "public.typehygiene": {
       "name": "typehygiene",

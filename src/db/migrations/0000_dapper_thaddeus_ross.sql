@@ -1,7 +1,7 @@
 CREATE TYPE "public"."gamme" AS ENUM('essentiel', 'confort', 'excellence');--> statement-breakpoint
 CREATE TYPE "public"."status" AS ENUM('active', 'inactive');--> statement-breakpoint
 CREATE TYPE "public"."typebatiment" AS ENUM('bureaux', 'localCommercial', 'entrepot', 'cabinetMedical');--> statement-breakpoint
-CREATE TYPE "public"."typeproprete" AS ENUM('emp', 'savon', 'ph', 'desinfectant', 'parfum', 'balai', 'poubelle');--> statement-breakpoint
+CREATE TYPE "public"."typehygiene" AS ENUM('emp', 'savon', 'ph', 'desinfectant', 'parfum', 'balai', 'poubelle');--> statement-breakpoint
 CREATE TABLE "clients" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"nom_entreprise" varchar NOT NULL,
@@ -83,7 +83,7 @@ CREATE TABLE "nettoyage_vitrerie_tarifs" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "proprete_conso_tarifs" (
+CREATE TABLE "hygiene_conso_tarifs" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"fournisseur_id" integer,
 	"pa_par_personne_emp" integer NOT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE "proprete_conso_tarifs" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "proprete_distrib_quantites" (
+CREATE TABLE "hygiene_distrib_quantites" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"effectif" integer NOT NULL,
 	"nb_distrib_emp" integer NOT NULL,
@@ -102,10 +102,10 @@ CREATE TABLE "proprete_distrib_quantites" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "proprete_distrib_tarifs" (
+CREATE TABLE "hygiene_distrib_tarifs" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"fournisseur_id" integer,
-	"type" "typeproprete" NOT NULL,
+	"type" "typehygiene" NOT NULL,
 	"gamme" "gamme" NOT NULL,
 	"one_shot" integer NOT NULL,
 	"pa_12m" integer,
@@ -114,7 +114,7 @@ CREATE TABLE "proprete_distrib_tarifs" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "proprete_instal_distrib_tarifs" (
+CREATE TABLE "hygiene_instal_distrib_tarifs" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"fournisseur_id" integer,
 	"effectif" integer NOT NULL,
@@ -126,6 +126,6 @@ ALTER TABLE "fournisseurs" ADD CONSTRAINT "fournisseurs_logo_id_logos_fournisseu
 ALTER TABLE "nettoyage_repasse_tarifs" ADD CONSTRAINT "nettoyage_repasse_tarifs_fournisseur_id_fournisseurs_id_fk" FOREIGN KEY ("fournisseur_id") REFERENCES "public"."fournisseurs"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "nettoyage_tarifs" ADD CONSTRAINT "nettoyage_tarifs_fournisseur_id_fournisseurs_id_fk" FOREIGN KEY ("fournisseur_id") REFERENCES "public"."fournisseurs"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "nettoyage_vitrerie_tarifs" ADD CONSTRAINT "nettoyage_vitrerie_tarifs_fournisseur_id_fournisseurs_id_fk" FOREIGN KEY ("fournisseur_id") REFERENCES "public"."fournisseurs"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "proprete_conso_tarifs" ADD CONSTRAINT "proprete_conso_tarifs_fournisseur_id_fournisseurs_id_fk" FOREIGN KEY ("fournisseur_id") REFERENCES "public"."fournisseurs"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "proprete_distrib_tarifs" ADD CONSTRAINT "proprete_distrib_tarifs_fournisseur_id_fournisseurs_id_fk" FOREIGN KEY ("fournisseur_id") REFERENCES "public"."fournisseurs"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "proprete_instal_distrib_tarifs" ADD CONSTRAINT "proprete_instal_distrib_tarifs_fournisseur_id_fournisseurs_id_fk" FOREIGN KEY ("fournisseur_id") REFERENCES "public"."fournisseurs"("id") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "hygiene_conso_tarifs" ADD CONSTRAINT "hygiene_conso_tarifs_fournisseur_id_fournisseurs_id_fk" FOREIGN KEY ("fournisseur_id") REFERENCES "public"."fournisseurs"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "hygiene_distrib_tarifs" ADD CONSTRAINT "hygiene_distrib_tarifs_fournisseur_id_fournisseurs_id_fk" FOREIGN KEY ("fournisseur_id") REFERENCES "public"."fournisseurs"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "hygiene_instal_distrib_tarifs" ADD CONSTRAINT "hygiene_instal_distrib_tarifs_fournisseur_id_fournisseurs_id_fk" FOREIGN KEY ("fournisseur_id") REFERENCES "public"."fournisseurs"("id") ON DELETE no action ON UPDATE no action;
