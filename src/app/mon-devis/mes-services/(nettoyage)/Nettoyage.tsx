@@ -87,10 +87,10 @@ const Nettoyage = ({
       </div>
 
       <Tabs defaultValue="nettoyage" className="w-full flex-1 flex flex-col">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="flex items-center">
           <TabsTrigger
             value="nettoyage"
-            className="text-base"
+            className="text-base flex-1"
             onClick={() =>
               setComment("*moyenne sur l'année (12 mois de 21,67 jours ouvrés)")
             }
@@ -99,7 +99,7 @@ const Nettoyage = ({
           </TabsTrigger>
           <TabsTrigger
             value="options"
-            className="text-base"
+            className="text-base flex-1"
             disabled={!nettoyage.propositionId}
             onClick={() =>
               setComment("*moyenne sur l'année (12 mois de 21,67 jours ouvrés)")

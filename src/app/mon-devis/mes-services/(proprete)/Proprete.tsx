@@ -31,10 +31,10 @@ const Proprete = ({ handleClickNext, handleClickPrevious }: PropreteProps) => {
         <PreviousServiceButton handleClickPrevious={handleClickPrevious} />
       </div>
       <Tabs defaultValue="trilogie" className="w-full flex-1 flex flex-col">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="flex items-center">
           <TabsTrigger
             value="trilogie"
-            className="text-base"
+            className="text-base flex-1"
             onClick={() =>
               setComment("*le tarif comprend l'installation des distributeurs")
             }
@@ -43,7 +43,7 @@ const Proprete = ({ handleClickNext, handleClickPrevious }: PropreteProps) => {
           </TabsTrigger>
           <TabsTrigger
             value="options"
-            className="text-base"
+            className="text-base flex-1"
             disabled={!proprete.trilogieGammeSelected}
             onClick={() => setComment("")}
           >

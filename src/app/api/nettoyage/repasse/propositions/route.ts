@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
           success: false,
           error: {
             code: "EXTERNAL_API_ERROR",
-            message: `Erreur lors de la récupération des quantités : ${quantitesResponse.statusText},${process.env.MY_URL},${process.env.DATABASE_URL}`,
+            message: `Erreur lors de la récupération des quantités : ${quantitesResponse.statusText}`,
           },
         },
         { status: quantitesResponse.status }

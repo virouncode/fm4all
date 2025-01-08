@@ -3,6 +3,7 @@ import { Slider } from "@/components/ui/slider";
 import { TabsContent } from "@/components/ui/tabs";
 import { CompanyInfoContext } from "@/context/CompanyInfoProvider";
 import { PropreteContext } from "@/context/PropreteProvider";
+import { TotalPropreteContext } from "@/context/TotalPropreteProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { GammeType } from "@/zod-schemas/gamme";
 import { SelectPropreteConsoTarifsType } from "@/zod-schemas/propreteConsoTarifs";
@@ -30,15 +31,7 @@ const TabsContentPropreteOptions = ({
 }: TabsContentPropreteOptionsProps) => {
   const { proprete, setProprete } = useContext(PropreteContext);
   const { companyInfo } = useContext(CompanyInfoContext);
-  console.log(
-    "proprete nb distrib desinfectant",
-    proprete.nbDistribDesinfectant
-  );
-  console.log(
-    "distribQuantites nb distrib desinfectant",
-    distribQuantites?.nbDistribDesinfectant
-  );
-  console.log("distribQuantites", distribQuantites);
+  const { setTotalProprete } = useContext(TotalPropreteContext);
 
   const gammes = ["essentiel", "confort", "excellence"] as const;
   const propositions = gammes.map((gamme) => ({
@@ -72,6 +65,9 @@ const TabsContentPropreteOptions = ({
   }));
 
   const handleClickProposition = (type: string, gamme: GammeType) => {
+    const proposition = propositions.find(
+      (proposition) => proposition.gamme === gamme
+    );
     switch (type) {
       case "desinfectant":
         if (proprete.desinfectantGammeSelected === gamme) {
@@ -79,13 +75,34 @@ const TabsContentPropreteOptions = ({
             ...prev,
             desinfectantGammeSelected: null,
           }));
+          setTotalProprete((prev) => ({
+            ...prev,
+            tarifsDesinfectant: null,
+          }));
           return;
         }
         setProprete((prev) => ({
           ...prev,
           desinfectantGammeSelected: gamme,
         }));
-
+        if (proposition) {
+          setTotalProprete((prev) => ({
+            ...prev,
+            prixDesinfectantAbonnement:
+              proprete.dureeLocation === "oneShot"
+                ? null
+                : (proposition.tarifsDesinfectant +
+                    proposition.tarifsDistribDesinfectant) /
+                  10000,
+            prixDesinfectantAchat:
+              proprete.dureeLocation === "oneShot"
+                ? {
+                    prixAchat: proposition.tarifsDistribDesinfectant / 10000,
+                    prixConsommables: proposition.tarifsDesinfectant / 10000,
+                  }
+                : null,
+          }));
+        }
         return;
       case "parfum":
         if (proprete.parfumGammeSelected === gamme) {
@@ -93,12 +110,22 @@ const TabsContentPropreteOptions = ({
             ...prev,
             parfumGammeSelected: null,
           }));
+          setTotalProprete((prev) => ({
+            ...prev,
+            prixParfum: null,
+          }));
           return;
         }
         setProprete((prev) => ({
           ...prev,
           parfumGammeSelected: gamme,
         }));
+        if (proposition) {
+          setTotalProprete((prev) => ({
+            ...prev,
+            prixParfum: proposition.tarifsDistribParfum / 10000,
+          }));
+        }
         return;
       case "balai":
         if (proprete.balaiGammeSelected === gamme) {
@@ -106,13 +133,22 @@ const TabsContentPropreteOptions = ({
             ...prev,
             balaiGammeSelected: null,
           }));
+          setTotalProprete((prev) => ({
+            ...prev,
+            prixBalai: null,
+          }));
           return;
         }
         setProprete((prev) => ({
           ...prev,
           balaiGammeSelected: gamme,
         }));
-
+        if (proposition) {
+          setTotalProprete((prev) => ({
+            ...prev,
+            prixBalai: proposition.tarifsDistribBalai / 10000,
+          }));
+        }
         return;
       case "poubelle":
         if (proprete.poubelleGammeSelected === gamme) {
@@ -120,12 +156,22 @@ const TabsContentPropreteOptions = ({
             ...prev,
             poubelleGammeSelected: null,
           }));
+          setTotalProprete((prev) => ({
+            ...prev,
+            prixPoubelle: null,
+          }));
           return;
         }
         setProprete((prev) => ({
           ...prev,
           poubelleGammeSelected: gamme,
         }));
+        if (proposition) {
+          setTotalProprete((prev) => ({
+            ...prev,
+            prixPoubelle: proposition.tarifsDistribPoubelle / 10000,
+          }));
+        }
         return;
     }
   };
@@ -223,12 +269,12 @@ const TabsContentPropreteOptions = ({
                         {formatNumber(
                           proposition.tarifsDistribDesinfectant / 10000
                         )}{" "}
-                        € (distributeurs)
+                        € <span className="text-xs">(distributeurs)</span>
                       </p>
                       <p>&</p>
                       <p className="font-bold">
                         {formatNumber(proposition.tarifsDesinfectant / 10000)} €
-                        / an (consommables)
+                        / an <span className="text-xs">(conso)</span>
                       </p>
                     </>
                   ) : (
@@ -246,12 +292,12 @@ const TabsContentPropreteOptions = ({
                     {gamme === "essentiel"
                       ? "blancs basic"
                       : gamme === "confort"
-                      ? "couleur (noir, gris, blanc premium...)"
+                      ? "couleur"
                       : "inox"}
                   </p>
                   <p className="text-sm">
                     {dureeLocation === "oneShot"
-                      ? "Achat des distributeurs"
+                      ? ""
                       : `Location engagement
                     ${
                       dureeLocation === "pa12M"
@@ -336,12 +382,12 @@ const TabsContentPropreteOptions = ({
                     {gamme === "essentiel"
                       ? "blancs basic"
                       : gamme === "confort"
-                      ? "couleur (noir, gris, blanc premium...)"
+                      ? "couleur"
                       : "inox"}
                   </p>
                   <p className="text-sm">
                     {dureeLocation === "oneShot"
-                      ? "Achat des distributeurs"
+                      ? ""
                       : `Location engagement
                     ${
                       dureeLocation === "pa12M"
@@ -424,12 +470,12 @@ const TabsContentPropreteOptions = ({
                     {gamme === "essentiel"
                       ? "blancs basic"
                       : gamme === "confort"
-                      ? "couleur (noir, gris, blanc premium...)"
+                      ? "couleur"
                       : "inox"}
                   </p>
                   <p className="text-sm">
                     {dureeLocation === "oneShot"
-                      ? "Achat des distributeurs"
+                      ? ""
                       : `Location engagement
                     ${
                       dureeLocation === "pa12M"
@@ -515,12 +561,12 @@ const TabsContentPropreteOptions = ({
                     {gamme === "essentiel"
                       ? "blancs basic"
                       : gamme === "confort"
-                      ? "couleur (noir, gris, blanc premium...)"
+                      ? "couleur"
                       : "inox"}
                   </p>
                   <p className="text-sm">
                     {dureeLocation === "oneShot"
-                      ? "Achat des distributeurs"
+                      ? ""
                       : `Location engagement
                     ${
                       dureeLocation === "pa12M"

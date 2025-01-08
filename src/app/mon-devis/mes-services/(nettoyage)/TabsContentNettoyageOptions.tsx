@@ -2,6 +2,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { TabsContent } from "@/components/ui/tabs";
 import { NettoyageContext } from "@/context/NettoyageProvider";
+import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { useContext } from "react";
 
@@ -58,6 +59,7 @@ const TabsContentNettoyageOptions = ({
   vitrerieProposition,
 }: TabsContentNettoyageOptionsProps) => {
   const { nettoyage, setNettoyage } = useContext(NettoyageContext);
+  const { setTotalNettoyage } = useContext(TotalNettoyageContext);
   const color =
     nettoyageProposition?.gamme === "essentiel"
       ? "fm4allessential"
@@ -76,11 +78,19 @@ const TabsContentNettoyageOptions = ({
             ...prev,
             repassePropositionId: null,
           }));
+          setTotalNettoyage((prev) => ({
+            ...prev,
+            prixRepasse: null,
+          }));
           return;
         }
         setNettoyage((prev) => ({
           ...prev,
           repassePropositionId: propositionId,
+        }));
+        setTotalNettoyage((prev) => ({
+          ...prev,
+          prixRepasse: repasseProposition?.prixAnnuel as number,
         }));
         break;
       case "vitrerie":
@@ -92,11 +102,30 @@ const TabsContentNettoyageOptions = ({
             ...prev,
             vitreriePropositionId: null,
           }));
+          setTotalNettoyage((prev) => ({
+            ...prev,
+            prixVitrerie: null,
+          }));
           return;
         }
         setNettoyage((prev) => ({
           ...prev,
           vitreriePropositionId: propositionId,
+        }));
+        setTotalNettoyage((prev) => ({
+          ...prev,
+          prixVitrerie: vitrerieProposition
+            ? vitrerieProposition.prixVitrerieParPassage +
+                vitrerieProposition.prixCloisonsParPassage >
+              vitrerieProposition.minFacturation
+              ? (vitrerieProposition.prixVitrerieParPassage / 10000 +
+                  vitrerieProposition.prixCloisonsParPassage / 10000) *
+                nettoyage.nbPassageVitrerie
+              : Math.round(
+                  (vitrerieProposition.minFacturation / 10000) *
+                    nettoyage.nbPassageVitrerie
+                )
+            : null,
         }));
         break;
       case "samedi":
@@ -108,11 +137,19 @@ const TabsContentNettoyageOptions = ({
             ...prev,
             samediPropositionId: null,
           }));
+          setTotalNettoyage((prev) => ({
+            ...prev,
+            prixSamedi: null,
+          }));
           return;
         }
         setNettoyage((prev) => ({
           ...prev,
           samediPropositionId: propositionId,
+        }));
+        setTotalNettoyage((prev) => ({
+          ...prev,
+          prixSamedi: nettoyageProposition?.prixAnnuelSamedi as number,
         }));
         break;
       case "dimanche":
@@ -124,11 +161,19 @@ const TabsContentNettoyageOptions = ({
             ...prev,
             dimanchePropositionId: null,
           }));
+          setTotalNettoyage((prev) => ({
+            ...prev,
+            prixDimanche: null,
+          }));
           return;
         }
         setNettoyage((prev) => ({
           ...prev,
           dimanchePropositionId: propositionId,
+        }));
+        setTotalNettoyage((prev) => ({
+          ...prev,
+          prixDimanche: nettoyageProposition?.prixAnnuelDimanche as number,
         }));
         break;
     }

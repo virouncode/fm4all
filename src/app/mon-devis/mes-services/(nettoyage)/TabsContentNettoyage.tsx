@@ -8,6 +8,8 @@ import {
 } from "@/components/ui/tooltip";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { PropreteContext } from "@/context/PropreteProvider";
+import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
+import { TotalPropreteContext } from "@/context/TotalPropreteProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { GammeType } from "@/zod-schemas/gamme";
 import { useContext } from "react";
@@ -51,6 +53,8 @@ const TabsContentNettoyage = ({
 }: TabsContentNettoyageProps) => {
   const { nettoyage, setNettoyage } = useContext(NettoyageContext);
   const { setProprete } = useContext(PropreteContext);
+  const { setTotalNettoyage } = useContext(TotalNettoyageContext);
+  const { setTotalProprete } = useContext(TotalPropreteContext);
 
   const handleClickProposition = (propositionId: number) => {
     if (nettoyage.propositionId === propositionId) {
@@ -80,11 +84,32 @@ const TabsContentNettoyage = ({
         balaiGammeSelected: null,
         poubelleGammeSelected: null,
       });
+      setTotalNettoyage({
+        nomFournisseur: null,
+        prixService: null,
+        prixRepasse: null,
+        prixSamedi: null,
+        prixDimanche: null,
+        prixVitrerie: null,
+      });
+      setTotalProprete({
+        nomFournisseur: null,
+        prixTrilogieAbonnement: null,
+        prixTrilogieAchat: null,
+        prixDesinfectantAbonnement: null,
+        prixDesinfectantAchat: null,
+        prixParfum: null,
+        prixBalai: null,
+        prixPoubelle: null,
+      });
       return;
     }
     const nettoyageFournisseurId = nettoyagePropositions.find(
       (nettoyage) => nettoyage.id === propositionId
     )?.fournisseurId as number;
+    const nettoyageFournisseurName = nettoyagePropositions.find(
+      (nettoyage) => nettoyage.id === propositionId
+    )?.nomEntreprise as string;
     const gammeSelected = nettoyagePropositions.find(
       (nettoyage) => nettoyage.id === propositionId
     )?.gamme as GammeType;
@@ -101,6 +126,18 @@ const TabsContentNettoyage = ({
       nbPassageVitrerie: 2,
     }));
 
+    setTotalNettoyage((prev) => ({
+      ...prev,
+      nomFournisseur: nettoyageFournisseurName,
+      prixService: nettoyagePropositions.find(
+        (nettoyage) => nettoyage.id === propositionId
+      )?.prixAnnuel as number,
+      prixRepasse: null,
+      prixSamedi: null,
+      prixDimanche: null,
+      prixVitrerie: null,
+    }));
+
     const propreteFournisseurId =
       (nettoyagePropositions.find((nettoyage) => nettoyage.id === propositionId)
         ?.fournisseurId as number) === 9
@@ -108,6 +145,13 @@ const TabsContentNettoyage = ({
         : (nettoyagePropositions.find(
             (nettoyage) => nettoyage.id === propositionId
           )?.fournisseurId as number);
+    const propreteFournisseurName =
+      (nettoyagePropositions.find((nettoyage) => nettoyage.id === propositionId)
+        ?.fournisseurId as number) === 9
+        ? "EPCH"
+        : (nettoyagePropositions.find(
+            (nettoyage) => nettoyage.id === propositionId
+          )?.nomEntreprise as string);
 
     setProprete((prev) => ({
       ...prev,
@@ -119,6 +163,16 @@ const TabsContentNettoyage = ({
       balaiGammeSelected: null,
       poubelleGammeSelected: null,
     }));
+    setTotalProprete({
+      nomFournisseur: propreteFournisseurName,
+      prixTrilogieAbonnement: null,
+      prixTrilogieAchat: null,
+      prixDesinfectantAbonnement: null,
+      prixDesinfectantAchat: null,
+      prixParfum: null,
+      prixBalai: null,
+      prixPoubelle: null,
+    });
   };
   return (
     <TabsContent value="nettoyage" className="flex-1">

@@ -66,8 +66,6 @@ const MesLocaux = () => {
   };
 
   const submitForm = async (data: Partial<CompanyInfoType>) => {
-    console.log("afficher les tarifs");
-
     if (
       !departements.find(({ id }) => id === data.codePostal?.substring(0, 2))
     ) {

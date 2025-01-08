@@ -7,10 +7,7 @@ const allowedOrigins =
         "https://www.fm4all.com",
         "https://fm4all.com",
       ]
-    : [
-        "http://localhost:3000",
-        "https://fm4all-git-staging-virouncodes-projects.vercel.app",
-      ];
+    : ["http://localhost:3000"];
 
 export function middleware(req: NextRequest) {
   const origin = req.headers.get("origin");

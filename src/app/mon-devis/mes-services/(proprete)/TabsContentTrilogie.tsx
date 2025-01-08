@@ -17,6 +17,7 @@ import {
 import { locationDistribProprete } from "@/constants/locationsDistribProprete";
 import { CompanyInfoContext } from "@/context/CompanyInfoProvider";
 import { PropreteContext } from "@/context/PropreteProvider";
+import { TotalPropreteContext } from "@/context/TotalPropreteProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { DureeLocationType } from "@/zod-schemas/dureeLocation";
 import { GammeType } from "@/zod-schemas/gamme";
@@ -48,8 +49,7 @@ const TabsContentTrilogie = ({
 }: TabsContentTrilogieProps) => {
   const { proprete, setProprete } = useContext(PropreteContext);
   const { companyInfo } = useContext(CompanyInfoContext);
-
-  console.log("distribTarifs", distribTarifs);
+  const { setTotalProprete } = useContext(TotalPropreteContext);
 
   //Pour chaque gamme :
   // - calculer le prix annuel consommables trilogie
@@ -85,12 +85,47 @@ const TabsContentTrilogie = ({
         ...prev,
         trilogieGammeSelected: null,
       }));
+      setTotalProprete((prev) => ({
+        ...prev,
+        prixTrilogieAbonnement: null,
+        prixTrilogieAchat: null,
+        prixDesinfectantAbonnement: null,
+        prixDesinfectantAchat: null,
+        prixParfum: null,
+        prixBalai: null,
+        prixPoubelle: null,
+      }));
       return;
     }
+
     setProprete((prev) => ({
       ...prev,
       trilogieGammeSelected: gamme,
     }));
+    const proposition = propositions.find(
+      (proposition) => proposition.gamme === gamme
+    );
+    if (proposition)
+      setTotalProprete((prev) => ({
+        ...prev,
+        prixTrilogieAbonnement:
+          proprete.dureeLocation === "oneShot"
+            ? null
+            : (proposition.tarifsConsommables +
+                proposition.tarifsDistributeurs +
+                proposition.tarifsInstalDistributeurs) /
+              10000,
+        prixTrilogieAchat:
+          proprete.dureeLocation === "oneShot"
+            ? {
+                prixAchat:
+                  (proposition.tarifsDistributeurs +
+                    proposition.tarifsInstalDistributeurs) /
+                  10000,
+                prixConsommables: proposition.tarifsConsommables / 10000,
+              }
+            : null,
+      }));
   };
 
   const handleChangeDistribNbr = (type: string, value: number[]) => {
@@ -296,7 +331,7 @@ const TabsContentTrilogie = ({
                     {gamme === "essentiel"
                       ? "blancs basic"
                       : gamme === "confort"
-                      ? "couleur (noir, gris, blanc premium...)"
+                      ? "couleur"
                       : "inox"}
                   </p>
                   <p className="text-sm">Consommables</p>
