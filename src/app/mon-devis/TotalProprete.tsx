@@ -108,7 +108,7 @@ const TotalProprete = () => {
                 </p>
               </div>
             )}
-            {totalAchat ? (
+            {totalAchat !== "0" ? (
               <>
                 <div className="flex items-center justify-between border-t border-foreground mt-2">
                   <p>TOTAL</p>
