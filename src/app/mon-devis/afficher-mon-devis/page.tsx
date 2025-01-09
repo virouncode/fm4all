@@ -5,7 +5,7 @@ const page = () => {
   return (
     <div>
       <AfficherDevis />
-      <DevisBreadcrumb currentStepId={5} />
+      <DevisBreadcrumb />
     </div>
   );
 };

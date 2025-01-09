@@ -5,7 +5,7 @@ const page = () => {
   return (
     <div>
       <SauvegarderProgression />
-      <DevisBreadcrumb currentStepId={3} />
+      <DevisBreadcrumb />
     </div>
   );
 };

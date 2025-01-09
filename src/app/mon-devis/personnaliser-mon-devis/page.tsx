@@ -5,7 +5,7 @@ const page = () => {
   return (
     <div>
       <Personnaliser />
-      <DevisBreadcrumb currentStepId={4} />
+      <DevisBreadcrumb />
     </div>
   );
 };
