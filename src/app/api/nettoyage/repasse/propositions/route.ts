@@ -1,6 +1,6 @@
 import { errorHandler } from "@/lib/errorHandler";
 import { SelectNettoyageQuantitesType } from "@/zod-schemas/nettoyageQuantites";
-import { SelectNettoyageRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
+import { SelectRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
     }
 
     const quantites: SelectNettoyageQuantitesType[] = quantitesJson.data;
-    const tarifs: SelectNettoyageRepasseTarifsType[] = tarifsJson.data;
+    const tarifs: SelectRepasseTarifsType[] = tarifsJson.data;
 
     const propositions = tarifs
       .map((tarif) => {

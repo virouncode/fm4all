@@ -1,5 +1,5 @@
 import { errorHandler } from "@/lib/errorHandler";
-import { SelectNettoyageVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
+import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
         { status: 400 }
       );
     }
-    const tarifs: SelectNettoyageVitrerieTarifsType[] = tarifsJson.data;
+    const tarifs: SelectVitrerieTarifsType[] = tarifsJson.data;
     const surfaceVitrerie = parseInt(surface) * 0.15;
     const surfaceCloisons = parseInt(surface) * 0.15;
     const propositions = tarifs.map((tarif) => {
