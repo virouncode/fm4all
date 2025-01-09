@@ -1,7 +1,6 @@
 "use client";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
-import { FireExtinguisher, SprayCan, Toilet, Wrench } from "lucide-react";
 import Link from "next/link";
 import { useContext, useEffect } from "react";
 import Hygiene from "./(hygiene)/Hygiene";
@@ -12,27 +11,6 @@ import NettoyageOptions from "./(nettoyage)/NettoyageOptions";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import SecuriteIncendie from "./(incendie)/SecuriteIncendie";
 import Maintenance from "./(maintenance)/Maintenance";
-
-const servicesChoices = [
-  {
-    id: 1,
-    description: "Nettoyage et Propreté",
-    icon: <SprayCan />,
-  },
-  { id: 2, description: "Nettoyage options", icon: <SprayCan /> },
-  { id: 3, description: "Hygiène sanitaire", icon: <Toilet /> },
-  { id: 4, description: "Hygiène options", icon: <Toilet /> },
-  {
-    id: 5,
-    description: "Maintenance",
-    icon: <Wrench />,
-  },
-  {
-    id: 6,
-    description: "Protection incendie",
-    icon: <FireExtinguisher />,
-  },
-];
 
 const MesServices = () => {
   const { nettoyage } = useContext(NettoyageContext);
