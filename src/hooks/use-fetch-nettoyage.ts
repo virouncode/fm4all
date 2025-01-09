@@ -1,8 +1,8 @@
 import { ClientContext } from "@/context/ClientProvider";
 import { roundSurface } from "@/lib/roundSurface";
-import { SelectNettoyageRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
+import { SelectRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
 import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
-import { SelectNettoyageVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
+import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
 import { useContext, useEffect, useState } from "react";
 import { useToast } from "./use-toast";
 
@@ -18,13 +18,13 @@ const useFetchNettoyage = () => {
     })[]
   >([]);
   const [repassePropositions, setRepassePropositions] = useState<
-    (SelectNettoyageRepasseTarifsType & {
+    (SelectRepasseTarifsType & {
       prixAnnuel: number;
       freqAnnuelle: number;
     })[]
   >([]);
   const [vitreriePropositions, setVitreriePropositions] = useState<
-    (SelectNettoyageVitrerieTarifsType & {
+    (SelectVitrerieTarifsType & {
       prixVitrerieParPassage: number;
       prixCloisonsParPassage: number;
     })[]

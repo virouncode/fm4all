@@ -2,7 +2,7 @@ import { ServicesContext } from "@/context/ServicesProvider";
 import { useContext, useEffect } from "react";
 
 export default function useScrollIntoService() {
-  const { services, setServices } = useContext(ServicesContext);
+  const { services } = useContext(ServicesContext);
   useEffect(() => {
     const currentService = document.getElementById(
       services.currentServiceId.toString()

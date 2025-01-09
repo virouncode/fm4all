@@ -2,7 +2,7 @@ import { ClientContext } from "@/context/ClientProvider";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { roundEffectif } from "@/lib/roundEffectif";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
-import { SelectHygieneDistribQuantiteType } from "@/zod-schemas/hygieneDistribQuantites";
+import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs";
 import { useContext, useEffect, useState } from "react";
@@ -14,7 +14,7 @@ const useFetchHygiene = () => {
   const { hygiene } = useContext(HygieneContext);
 
   const [distribQuantites, setDistribQuantites] = useState<
-    | (SelectHygieneDistribQuantiteType & {
+    | (SelectHygieneDistribQuantitesType & {
         nbDistribDesinfectant: number;
         nbDistribParfum: number;
         nbDistribBalai: number;
