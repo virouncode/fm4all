@@ -19,10 +19,8 @@ const OfficeManager = ({
         <p className="text-lg">OfficeManager</p>
         <PreviousServiceButton handleClickPrevious={handleClickPrevious} />
       </div>
-      {services.selectedServicesIds[services.selectedServicesIds.length - 1] ===
-      9 ? null : (
-        <NextServiceButton handleClickNext={handleClickNext} />
-      )}
+
+      <NextServiceButton handleClickNext={handleClickNext} />
     </div>
   );
 };
