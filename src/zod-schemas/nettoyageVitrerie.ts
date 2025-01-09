@@ -2,7 +2,7 @@ import { nettoyageVitrerieTarifs } from "@/db/schema";
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const selectNettoyageVitrerieTarifsSchema = createSelectSchema(
+export const selectVitrerieTarifsSchema = createSelectSchema(
   nettoyageVitrerieTarifs,
   {
     cadenceVitres: (schema) =>
@@ -16,5 +16,4 @@ export const selectNettoyageVitrerieTarifsSchema = createSelectSchema(
   slogan: z.string().nullable(),
 });
 
-export type SelectNettoyageVitrerieTarifsType =
-  typeof selectNettoyageVitrerieTarifsSchema._type;
+export type SelectVitrerieTarifsType = typeof selectVitrerieTarifsSchema._type;

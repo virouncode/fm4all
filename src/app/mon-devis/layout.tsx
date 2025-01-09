@@ -1,12 +1,12 @@
-import CompanyInfoProvider from "@/context/CompanyInfoProvider";
+import DevisBreadcrumb from "@/components/devis/DevisBreadcrumb";
+import ClientProvider from "@/context/ClientProvider";
 import HygieneProvider from "@/context/HygieneProvider";
 import IncendieProvider from "@/context/IncendieProvider";
 import NettoyageProvider from "@/context/NettoyageProvider";
 import ServicesProvider from "@/context/ServicesProvider";
 import TotalHygieneProvider from "@/context/TotalHygieneProvider";
-import TotalNettoyageProvider from "@/context/TotalNettoyageProvider";
-import Total from "./Total";
 import TotalIncendieProvider from "@/context/TotalIncendieProvider";
+import TotalNettoyageProvider from "@/context/TotalNettoyageProvider";
 
 export default function MonDevisLayout({
   children,
@@ -15,7 +15,7 @@ export default function MonDevisLayout({
 }>) {
   return (
     <>
-      <CompanyInfoProvider>
+      <ClientProvider>
         <ServicesProvider>
           <NettoyageProvider>
             <HygieneProvider>
@@ -23,8 +23,10 @@ export default function MonDevisLayout({
                 <TotalNettoyageProvider>
                   <TotalHygieneProvider>
                     <TotalIncendieProvider>
-                      {children}
-                      <Total />
+                      <main className="max-w-7xl mx-auto pt-4 px-6  pb-10 md:px-20 h-[calc(100vh-4rem)] flex flex-col gap-4">
+                        <DevisBreadcrumb />
+                        {children}
+                      </main>
                     </TotalIncendieProvider>
                   </TotalHygieneProvider>
                 </TotalNettoyageProvider>
@@ -32,7 +34,7 @@ export default function MonDevisLayout({
             </HygieneProvider>
           </NettoyageProvider>
         </ServicesProvider>
-      </CompanyInfoProvider>
+      </ClientProvider>
     </>
   );
 }

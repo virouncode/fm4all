@@ -1,3 +1,4 @@
+import { RATIO } from "@/constants/ratio";
 import { db } from "@/db";
 import { fournisseurs, incendieTarifs } from "@/db/schema";
 import { errorHandler } from "@/lib/errorHandler";
@@ -48,10 +49,10 @@ export async function GET(req: NextRequest) {
     );
     const data = validatedResults.map((result) => ({
       ...result,
-      prixParExtincteur: result.prixParExtincteur / 10000,
-      prixParBaes: result.prixParBaes / 10000,
-      prixParTelBaes: result.prixParTelBaes / 10000,
-      fraisDeplacement: result.fraisDeplacement / 10000,
+      prixParExtincteur: result.prixParExtincteur / RATIO,
+      prixParBaes: result.prixParBaes / RATIO,
+      prixParTelBaes: result.prixParTelBaes / RATIO,
+      fraisDeplacement: result.fraisDeplacement / RATIO,
     }));
     return NextResponse.json(
       {

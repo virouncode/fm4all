@@ -3,7 +3,7 @@
 import { InputWithLabel } from "@/components/formInputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { companyInfoSchema, CompanyInfoType } from "@/zod-schemas/companyInfo";
+import { insertClientSchema, InsertClientType } from "@/zod-schemas/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { ChangeEvent } from "react";
@@ -11,17 +11,17 @@ import { useForm } from "react-hook-form";
 
 const CityOut = () => {
   const router = useRouter();
-  const defaultValues: Partial<CompanyInfoType> = {
-    email: "",
-    phone: "",
+  const defaultValues: Partial<InsertClientType> = {
+    emailContact: "",
+    phoneContact: "",
     nomEntreprise: "",
     prenomContact: "",
     nomContact: "",
     posteContact: "",
   };
-  const form = useForm<Partial<CompanyInfoType>>({
+  const form = useForm<Partial<InsertClientType>>({
     mode: "onBlur",
-    resolver: zodResolver(companyInfoSchema.partial()),
+    resolver: zodResolver(insertClientSchema.partial()),
     defaultValues,
   });
 
@@ -29,8 +29,9 @@ const CityOut = () => {
     console.log(e.target.name, e.target.value);
   };
 
-  const submitForm = async (data: Partial<CompanyInfoType>) => {
+  const submitForm = async (data: Partial<InsertClientType>) => {
     //TODO:envoyer email
+    //TODO:mettre les coordonnées dans la bdd ???
     console.log(data);
     router.push("/");
   };
@@ -53,35 +54,35 @@ const CityOut = () => {
         >
           <div className="flex flex-col md:flex-row gap-4 md:gap-8">
             <div className="flex-1 flex flex-col gap-4">
-              <InputWithLabel<CompanyInfoType>
+              <InputWithLabel<InsertClientType>
                 fieldTitle="Nom de l'entreprise*"
                 nameInSchema="nomEntreprise"
                 handleChange={handleChange}
               />
-              <InputWithLabel<CompanyInfoType>
+              <InputWithLabel<InsertClientType>
                 fieldTitle="Email*"
-                nameInSchema="email"
+                nameInSchema="emailContact"
                 handleChange={handleChange}
               />
-              <InputWithLabel<CompanyInfoType>
+              <InputWithLabel<InsertClientType>
                 fieldTitle="N° de téléphone*"
-                nameInSchema="phone"
+                nameInSchema="phoneContact"
                 handleChange={handleChange}
                 placeholder="XX XX XX XX XX"
               />
             </div>
             <div className="flex-1 flex flex-col gap-4 ">
-              <InputWithLabel<CompanyInfoType>
+              <InputWithLabel<InsertClientType>
                 fieldTitle="Prénom*"
                 nameInSchema="prenomContact"
                 handleChange={handleChange}
               />
-              <InputWithLabel<CompanyInfoType>
+              <InputWithLabel<InsertClientType>
                 fieldTitle="Nom*"
                 nameInSchema="nomContact"
                 handleChange={handleChange}
               />
-              <InputWithLabel<CompanyInfoType>
+              <InputWithLabel<InsertClientType>
                 fieldTitle="Poste"
                 nameInSchema="posteContact"
                 handleChange={handleChange}

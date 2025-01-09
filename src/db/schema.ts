@@ -30,6 +30,11 @@ export const typeHygieneEnum = pgEnum("typehygiene", [
   "balai",
   "poubelle",
 ]);
+export const typeOccupationEnum = pgEnum("typeoccupation", [
+  "partieEtage",
+  "plateauComplet",
+  "batimentEntier",
+]);
 
 export const fournisseurs = pgTable("fournisseurs", {
   id: serial().primaryKey(),
@@ -52,11 +57,13 @@ export const clients = pgTable("clients", {
   siret: varchar().notNull(),
   prenomContact: varchar("prenom_contact").notNull(),
   nomContact: varchar("nom_contact").notNull(),
+  posteContact: varchar("poste_contact"),
   emailContact: varchar("email_contact").unique().notNull(),
   phoneContact: varchar("phone_contact").notNull(),
   surface: integer().notNull(),
   effectif: integer().notNull(),
   typeBatiment: typeBatimentEnum().notNull(),
+  typeOccupation: typeOccupationEnum().notNull(),
   adresseLigne1: varchar("adresse_ligne_1").notNull(),
   adresseLigne2: varchar("adresse_ligne_2"),
   codePostal: varchar("code_postal").notNull(),

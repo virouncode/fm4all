@@ -4,66 +4,42 @@ import { Label } from "@/components/ui/label";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
+import { SelectRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
+import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
+import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
 import { ChangeEvent, useContext } from "react";
 
 type NettoyageOptionsPropositionsProps = {
-  nettoyageProposition?: {
-    fournisseurId: number;
-    gamme: "essentiel" | "confort" | "excellence";
-    id: number;
-    nomEntreprise: string;
-    slogan: string | null;
-    createdAt: Date;
-    hParPassage: number;
-    tauxHoraire: number;
-    surface: number;
-    prixAnnuel: number;
-    freqAnnuelle: number;
-    prixAnnuelSamedi: number;
-    prixAnnuelDimanche: number;
-  } | null;
-
-  repasseProposition?: {
-    fournisseurId: number;
-    gamme: "essentiel" | "confort" | "excellence";
-    id: number;
-    nomEntreprise: string;
-    slogan: string | null;
-    createdAt: Date;
-    hParPassage: number;
-    tauxHoraire: number;
-    surface: number;
-    prixAnnuel: number;
-    freqAnnuelle: number;
-  } | null;
-
-  vitrerieProposition?: {
-    fournisseurId: number;
-    id: number;
-    nomEntreprise: string;
-    slogan: string | null;
-    createdAt: Date;
-    tauxHoraire: number;
-    cadenceVitres: number;
-    cadenceCloisons: number;
-    minFacturation: number;
-    fraisDeplacement: number;
-    prixVitrerieParPassage: number;
-    prixCloisonsParPassage: number;
-  } | null;
+  repasseProposition:
+    | (SelectRepasseTarifsType & {
+        freqAnnuelle: number;
+        prixAnnuel: number;
+      })
+    | null;
+  samediDimancheProposition:
+    | (SelectNettoyageTarifsType & {
+        prixAnnuelSamedi: number;
+        prixAnnuelDimanche: number;
+      })
+    | null;
+  vitrerieProposition:
+    | (SelectVitrerieTarifsType & {
+        prixParPassage: number;
+      })
+    | null;
 };
 
 const NettoyageOptionsPropositions = ({
-  nettoyageProposition,
+  samediDimancheProposition,
   repasseProposition,
   vitrerieProposition,
 }: NettoyageOptionsPropositionsProps) => {
   const { nettoyage, setNettoyage } = useContext(NettoyageContext);
   const { setTotalNettoyage } = useContext(TotalNettoyageContext);
   const color =
-    nettoyageProposition?.gamme === "essentiel"
+    repasseProposition?.gamme === "essentiel"
       ? "fm4allessential"
-      : nettoyageProposition?.gamme === "confort"
+      : repasseProposition?.gamme === "confort"
       ? "fm4allcomfort"
       : "fm4allexcellence";
 
@@ -114,18 +90,9 @@ const NettoyageOptionsPropositions = ({
         }));
         setTotalNettoyage((prev) => ({
           ...prev,
-          prixVitrerie: vitrerieProposition
-            ? vitrerieProposition.prixVitrerieParPassage +
-                vitrerieProposition.prixCloisonsParPassage >
-              vitrerieProposition.minFacturation
-              ? (vitrerieProposition.prixVitrerieParPassage / 10000 +
-                  vitrerieProposition.prixCloisonsParPassage / 10000) *
-                nettoyage.nbPassageVitrerie
-              : Math.round(
-                  (vitrerieProposition.minFacturation / 10000) *
-                    nettoyage.nbPassageVitrerie
-                )
-            : null,
+          prixVitrerie:
+            (vitrerieProposition?.prixParPassage as number) *
+            nettoyage.nbPassageVitrerie,
         }));
         break;
       case "samedi":
@@ -149,7 +116,7 @@ const NettoyageOptionsPropositions = ({
         }));
         setTotalNettoyage((prev) => ({
           ...prev,
-          prixSamedi: nettoyageProposition?.prixAnnuelSamedi as number,
+          prixSamedi: samediDimancheProposition?.prixAnnuelSamedi as number,
         }));
         break;
       case "dimanche":
@@ -173,7 +140,7 @@ const NettoyageOptionsPropositions = ({
         }));
         setTotalNettoyage((prev) => ({
           ...prev,
-          prixDimanche: nettoyageProposition?.prixAnnuelDimanche as number,
+          prixDimanche: samediDimancheProposition?.prixAnnuelDimanche as number,
         }));
         break;
     }
@@ -202,54 +169,27 @@ const NettoyageOptionsPropositions = ({
           repasseProposition.freqAnnuelle / 52.008
         )}  passage(s) de ${repasseProposition.hParPassage} h / semaine`
       : "";
-  const samediPrixAnnuel = nettoyageProposition?.prixAnnuelSamedi
-    ? `${formatNumber(nettoyageProposition.prixAnnuelSamedi)} € / an`
+  const samediPrixAnnuel = samediDimancheProposition?.prixAnnuelSamedi
+    ? `${formatNumber(samediDimancheProposition.prixAnnuelSamedi)} € / an`
     : "Non proposé";
-  const samediNbPassagesParSemaine = nettoyageProposition?.hParPassage
-    ? `1 passage de ${nettoyageProposition.hParPassage} h / semaine en plus`
+  const samediNbPassagesParSemaine = samediDimancheProposition?.hParPassage
+    ? `1 passage de ${samediDimancheProposition.hParPassage} h / semaine en plus`
     : "";
-  const dimanchePrixAnnuel = nettoyageProposition?.prixAnnuelDimanche
-    ? `${formatNumber(nettoyageProposition.prixAnnuelDimanche)} € / an`
+  const dimanchePrixAnnuel = samediDimancheProposition?.prixAnnuelDimanche
+    ? `${formatNumber(samediDimancheProposition.prixAnnuelDimanche)} € / an`
     : "Non proposé";
-  const diamncheNbPassagesParSemaine = nettoyageProposition?.hParPassage
-    ? `1 passage de ${nettoyageProposition.hParPassage} h / semaine en plus`
+  const diamncheNbPassagesParSemaine = samediDimancheProposition?.hParPassage
+    ? `1 passage de ${samediDimancheProposition.hParPassage} h / semaine en plus`
     : "";
-  let vitreriePrixAnnuel = "";
-  if (
-    vitrerieProposition?.prixVitrerieParPassage &&
-    vitrerieProposition?.prixCloisonsParPassage
-  ) {
-    vitreriePrixAnnuel =
-      vitrerieProposition.prixVitrerieParPassage +
-        vitrerieProposition.prixCloisonsParPassage >
-      vitrerieProposition.minFacturation
-        ? `${formatNumber(
-            (vitrerieProposition.prixVitrerieParPassage +
-              vitrerieProposition.prixCloisonsParPassage) *
-              nettoyage.nbPassageVitrerie
-          )} € / an`
-        : `${Math.round(
-            vitrerieProposition.minFacturation * nettoyage.nbPassageVitrerie
-          )} € / an`;
-  } else {
-    vitreriePrixAnnuel = "Non proposé";
-  }
 
-  const nbPassagesVitrerie =
-    vitrerieProposition?.prixVitrerieParPassage &&
-    vitrerieProposition?.prixCloisonsParPassage
-      ? `${nettoyage.nbPassageVitrerie} passages / an`
-      : "";
-
-  if (!nettoyage.propositionId) {
-    return (
-      <div className="h-full flex flex-col border rounded-xl items-center justify-center">
-        <p className="text-lg text-center italic">
-          Veuillez d&apos;abord choisir une formule Nettoyage et Propreté
-        </p>
-      </div>
-    );
-  }
+  const vitreriePrixAnnuel = vitrerieProposition?.prixParPassage
+    ? `${formatNumber(
+        vitrerieProposition.prixParPassage * nettoyage.nbPassageVitrerie
+      )} € /an`
+    : "Non proposé";
+  const nbPassagesVitrerie = vitrerieProposition?.prixParPassage
+    ? `${nettoyage.nbPassageVitrerie} passages / an`
+    : "";
 
   return (
     <div className="h-full flex flex-col border rounded-xl overflow-hidden">
@@ -282,25 +222,27 @@ const NettoyageOptionsPropositions = ({
         </div>
       )}
 
-      {nettoyageProposition && (
+      {samediDimancheProposition && (
         <div className="flex border-b flex-1">
           <div className="flex w-1/4 items-center justify-center text-lg">
             Samedi
           </div>
           <div
             className={`flex w-3/4 items-center justify-center ${
-              nettoyage.samediPropositionId === nettoyageProposition.id
+              nettoyage.samediPropositionId === samediDimancheProposition.id
                 ? "ring-2 ring-inset ring-destructive"
                 : ""
             } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
-            onClick={() => handleClickOption("samedi", nettoyageProposition.id)}
+            onClick={() =>
+              handleClickOption("samedi", samediDimancheProposition.id)
+            }
           >
             <Checkbox
               checked={
-                nettoyage.samediPropositionId === nettoyageProposition.id
+                nettoyage.samediPropositionId === samediDimancheProposition.id
               }
               onCheckedChange={() =>
-                handleClickOption("samedi", nettoyageProposition.id)
+                handleClickOption("samedi", samediDimancheProposition.id)
               }
               className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             />
@@ -311,27 +253,27 @@ const NettoyageOptionsPropositions = ({
           </div>
         </div>
       )}
-      {nettoyageProposition && (
+      {samediDimancheProposition && (
         <div className="flex border-b flex-1">
           <div className="flex w-1/4 items-center justify-center text-lg">
             Dimanche
           </div>
           <div
             className={`flex w-3/4 items-center justify-center ${
-              nettoyage.dimanchePropositionId === nettoyageProposition.id
+              nettoyage.dimanchePropositionId === samediDimancheProposition.id
                 ? "ring-2 ring-inset ring-destructive"
                 : ""
             } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
             onClick={() =>
-              handleClickOption("dimanche", nettoyageProposition.id)
+              handleClickOption("dimanche", samediDimancheProposition.id)
             }
           >
             <Checkbox
               checked={
-                nettoyage.dimanchePropositionId === nettoyageProposition.id
+                nettoyage.dimanchePropositionId === samediDimancheProposition.id
               }
               onCheckedChange={() =>
-                handleClickOption("dimanche", nettoyageProposition.id)
+                handleClickOption("dimanche", samediDimancheProposition.id)
               }
               className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             />

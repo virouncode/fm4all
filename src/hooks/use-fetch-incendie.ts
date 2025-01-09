@@ -1,4 +1,4 @@
-import { CompanyInfoContext } from "@/context/CompanyInfoProvider";
+import { ClientContext } from "@/context/ClientProvider";
 import { roundSurface } from "@/lib/roundSurface";
 import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites";
 import { SelectIncendieTarifsType } from "@/zod-schemas/incendieTarifs";
@@ -7,7 +7,7 @@ import { useToast } from "./use-toast";
 
 const useFetchIncendie = () => {
   const { toast } = useToast();
-  const { companyInfo } = useContext(CompanyInfoContext);
+  const { client } = useContext(ClientContext);
 
   const [incendieQuantites, setIncendieQuantites] =
     useState<SelectIncendieQuantitesType | null>(null);
@@ -22,7 +22,8 @@ const useFetchIncendie = () => {
 
   useEffect(() => {
     const fetchIncendie = async () => {
-      const roundedSurface = roundSurface(parseInt(companyInfo.surface));
+      if (!client?.surface) return;
+      const roundedSurface = roundSurface(client.surface);
       try {
         const [incendieQuantitesResponse, incendieTarifsResponse] =
           await Promise.all([
@@ -54,7 +55,7 @@ const useFetchIncendie = () => {
       }
     };
     fetchIncendie();
-  }, [companyInfo.surface, toast]);
+  }, [client.surface, toast]);
   return {
     incendieQuantites,
     incendieTarifs,

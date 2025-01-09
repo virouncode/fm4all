@@ -1,4 +1,4 @@
-import { CompanyInfoContext } from "@/context/CompanyInfoProvider";
+import { ClientContext } from "@/context/ClientProvider";
 import { roundSurface } from "@/lib/roundSurface";
 import { SelectNettoyageRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
 import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
@@ -8,7 +8,7 @@ import { useToast } from "./use-toast";
 
 const useFetchNettoyage = () => {
   const { toast } = useToast();
-  const { companyInfo } = useContext(CompanyInfoContext);
+  const { client } = useContext(ClientContext);
   const [nettoyagePropositions, setNettoyagePropositions] = useState<
     (SelectNettoyageTarifsType & {
       prixAnnuel: number;
@@ -31,7 +31,8 @@ const useFetchNettoyage = () => {
   >([]);
   useEffect(() => {
     const fetchPropositions = async () => {
-      const roundedSurface = roundSurface(parseInt(companyInfo.surface));
+      if (!client.surface) return;
+      const roundedSurface = roundSurface(client.surface);
       try {
         const [nettoyageResponse, repasseResponse, vitrerieResponse] =
           await Promise.all([
@@ -81,7 +82,7 @@ const useFetchNettoyage = () => {
       }
     };
     fetchPropositions();
-  }, [companyInfo.surface, toast]);
+  }, [client.surface, toast]);
 
   return { nettoyagePropositions, repassePropositions, vitreriePropositions };
 };

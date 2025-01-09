@@ -1,8 +1,8 @@
-import { CompanyInfoContext } from "@/context/CompanyInfoProvider";
+import { ClientContext } from "@/context/ClientProvider";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { roundEffectif } from "@/lib/roundEffectif";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
-import { SelectHygieneDistribQuantiteType } from "@/zod-schemas/hygieneDistribQuantite";
+import { SelectHygieneDistribQuantiteType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs";
 import { useContext, useEffect, useState } from "react";
@@ -10,7 +10,7 @@ import { useToast } from "./use-toast";
 
 const useFetchHygiene = () => {
   const { toast } = useToast();
-  const { companyInfo } = useContext(CompanyInfoContext);
+  const { client } = useContext(ClientContext);
   const { hygiene } = useContext(HygieneContext);
 
   const [distribQuantites, setDistribQuantites] = useState<
@@ -34,9 +34,10 @@ const useFetchHygiene = () => {
 
   useEffect(() => {
     const fetchHygiene = async () => {
-      const roundedEffectif = roundEffectif(parseInt(companyInfo.effectif));
+      if (!client.effectif || !hygiene.fournisseurId) return;
+      const roundedEffectif = roundEffectif(client.effectif);
       const fournisseurId = hygiene.fournisseurId;
-      if (!fournisseurId || !companyInfo.effectif) return;
+      if (!fournisseurId || !client.effectif) return;
       try {
         const [
           distribQuantitesResponse,
@@ -100,7 +101,7 @@ const useFetchHygiene = () => {
       }
     };
     fetchHygiene();
-  }, [companyInfo.effectif, hygiene.fournisseurId, toast]);
+  }, [client.effectif, hygiene.fournisseurId, toast]);
   return {
     distribQuantites,
     distribTarifs,

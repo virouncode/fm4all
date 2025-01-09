@@ -1,20 +1,25 @@
+"use client";
+import { HygieneContext } from "@/context/HygieneProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import { Wrench } from "lucide-react";
 import { useContext } from "react";
-import NextServiceButton from "../NextServiceButton";
 import PreviousServiceButton from "../PreviousServiceButton";
 
-type MaintenanceProps = {
-  handleClickNext: () => void;
-};
-
-const Maintenance = ({ handleClickNext }: MaintenanceProps) => {
+const Maintenance = () => {
+  const { hygiene } = useContext(HygieneContext);
   const { nettoyage } = useContext(NettoyageContext);
   const { setServices } = useContext(ServicesContext);
 
   const handleClickPrevious = () => {
     if (nettoyage.propositionId) {
+      if (!hygiene.trilogieGammeSelected) {
+        setServices((prev) => ({
+          ...prev,
+          currentServiceId: prev.currentServiceId - 2,
+        }));
+        return;
+      }
       setServices((prev) => ({
         ...prev,
         currentServiceId: prev.currentServiceId - 1,
@@ -44,7 +49,7 @@ const Maintenance = ({ handleClickNext }: MaintenanceProps) => {
       </div>
       <div className="w-full flex-1">{/*MaintenancePropositions*/}</div>
       <p className="text-sm italic text-end px-1">*ma NB</p>
-      <NextServiceButton handleClickNext={handleClickNext} />
+      {/* <NextServiceButton handleClickNext={handleClickNext} /> */}
     </div>
   );
 };

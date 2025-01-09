@@ -49,8 +49,8 @@ export async function GET(req: NextRequest) {
     );
     const data = validatedResults.map((result) => ({
       ...result,
-      hParPassage: result.hParPassage / 10000,
-      tauxHoraire: result.tauxHoraire / 10000,
+      hParPassage: result.hParPassage / RATIO,
+      tauxHoraire: result.tauxHoraire / RATIO,
     }));
 
     return NextResponse.json(

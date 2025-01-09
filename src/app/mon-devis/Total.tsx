@@ -9,14 +9,20 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { CompanyInfoContext } from "@/context/CompanyInfoProvider";
+import { ClientContext } from "@/context/ClientProvider";
+import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
+import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
+import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { useContext } from "react";
 import TotalHygiene from "./TotalHygiene";
 import TotalIncendie from "./TotalIncendie";
 import TotalNettoyage from "./TotalNettoyage";
 
 const Total = () => {
-  const { companyInfo } = useContext(CompanyInfoContext);
+  const { client } = useContext(ClientContext);
+  const { totalNettoyage } = useContext(TotalNettoyageContext);
+  const { totalHygiene } = useContext(TotalHygieneContext);
+  const { totalIncendie } = useContext(TotalIncendieContext);
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -25,7 +31,20 @@ const Total = () => {
           size="lg"
           className="text-base absolute top-20 right-10"
         >
-          Total
+          {Math.round(
+            (totalNettoyage.prixService ?? 0) +
+              (totalNettoyage.prixRepasse ?? 0) +
+              (totalNettoyage.prixSamedi ?? 0) +
+              (totalNettoyage.prixDimanche ?? 0) +
+              (totalNettoyage.prixVitrerie ?? 0) +
+              (totalHygiene.prixTrilogieAbonnement ?? 0) +
+              (totalHygiene.prixDesinfectantAbonnement ?? 0) +
+              (totalHygiene.prixParfum ?? 0) +
+              (totalHygiene.prixBalai ?? 0) +
+              (totalHygiene.prixPoubelle ?? 0) +
+              (totalIncendie.prixIncendie ?? 0)
+          )}{" "}
+          € / an
         </Button>
       </SheetTrigger>
       <SheetContent>
@@ -33,8 +52,7 @@ const Total = () => {
           <SheetTitle>
             <span className="text-2xl">Total </span>{" "}
             <span className="text-sm font-normal">
-              ({companyInfo.effectif} personnes, {companyInfo.surface} m
-              <sup>2</sup>)
+              ({client.effectif} personnes, {client.surface} m<sup>2</sup>)
             </span>
           </SheetTitle>
           <SheetDescription></SheetDescription>

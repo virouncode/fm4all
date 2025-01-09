@@ -1,19 +1,47 @@
-import useFetchHygiene from "@/hooks/use-fetch-hygiene";
+"use client";
+
+import { NettoyageContext } from "@/context/NettoyageProvider";
+import { ServicesContext } from "@/context/ServicesProvider";
+import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
+import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
+import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { Toilet } from "lucide-react";
+import { useContext } from "react";
 import NextServiceButton from "../NextServiceButton";
 import PreviousServiceButton from "../PreviousServiceButton";
 import HygieneOptionsPropositions from "./HygieneOptionsPropositions";
+import { HygieneContext } from "@/context/HygieneProvider";
 
 type HygieneOptionsProps = {
-  handleClickNext: () => void;
-  handleClickPrevious: () => void;
+  distribQuantites?: SelectHygieneDistribQuantitesType | null;
+  distribTarifs?: SelectHygieneDistribTarifsType[];
+  consosTarif?: SelectHygieneConsoTarifsType | null;
 };
 
 const HygieneOptions = ({
-  handleClickNext,
-  handleClickPrevious,
+  distribQuantites,
+  distribTarifs,
+  consosTarif,
 }: HygieneOptionsProps) => {
-  const { distribQuantites, distribTarifs, consoTarifs } = useFetchHygiene();
+  const { hygiene } = useContext(HygieneContext);
+  const { nettoyage } = useContext(NettoyageContext);
+  const { setServices } = useContext(ServicesContext);
+
+  const handleClickNext = () => {
+    setServices((prev) => ({
+      ...prev,
+      currentServiceId: prev.currentServiceId + 1,
+    }));
+  };
+  const handleClickPrevious = () => {
+    setServices((prev) => ({
+      ...prev,
+      currentServiceId: prev.currentServiceId - 1,
+    }));
+  };
+  if (!nettoyage.propositionId || !hygiene.trilogieGammeSelected) {
+    return null;
+  }
   return (
     <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="4">
       <div className="flex justify-between items-center">
@@ -27,11 +55,11 @@ const HygieneOptions = ({
         <PreviousServiceButton handleClickPrevious={handleClickPrevious} />
       </div>
       <div className="w-full flex-1">
-        {distribQuantites && (
+        {distribQuantites && distribTarifs && consosTarif && (
           <HygieneOptionsPropositions
             distribQuantites={distribQuantites}
             distribTarifs={distribTarifs}
-            consoTarifs={consoTarifs}
+            consosTarif={consosTarif}
           />
         )}
       </div>

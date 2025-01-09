@@ -1,5 +1,10 @@
+"use client";
+
 import { NettoyageContext } from "@/context/NettoyageProvider";
-import useFetchNettoyage from "@/hooks/use-fetch-nettoyage";
+import { ServicesContext } from "@/context/ServicesProvider";
+import { SelectRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
+import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
+import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
 import { SprayCan } from "lucide-react";
 import { useContext } from "react";
 import NextServiceButton from "../NextServiceButton";
@@ -7,36 +12,50 @@ import PreviousServiceButton from "../PreviousServiceButton";
 import NettoyageOptionsPropositions from "./NettoyageOptionsPropositions";
 
 type NettoyageOptionsProps = {
-  handleClickNext: () => void;
-  handleClickPrevious: () => void;
+  repasseProposition:
+    | (SelectRepasseTarifsType & {
+        freqAnnuelle: number;
+        prixAnnuel: number;
+      })
+    | null;
+  samediDimancheProposition:
+    | (SelectNettoyageTarifsType & {
+        prixAnnuelSamedi: number;
+        prixAnnuelDimanche: number;
+      })
+    | null;
+  vitrerieProposition:
+    | (SelectVitrerieTarifsType & {
+        prixParPassage: number;
+      })
+    | null;
 };
 
 const NettoyageOptions = ({
-  handleClickNext,
-  handleClickPrevious,
+  samediDimancheProposition,
+  repasseProposition,
+  vitrerieProposition,
 }: NettoyageOptionsProps) => {
   const { nettoyage } = useContext(NettoyageContext);
-  const { nettoyagePropositions, repassePropositions, vitreriePropositions } =
-    useFetchNettoyage();
-  //already selected proposition
-  const nettoyageProposition = nettoyage.propositionId
-    ? nettoyagePropositions.find((item) => item.id === nettoyage.propositionId)
-    : null;
+  const { setServices } = useContext(ServicesContext);
 
-  const repasseProposition =
-    nettoyage.fournisseurId && nettoyage.gammeSelected
-      ? repassePropositions.find(
-          (item) =>
-            item.fournisseurId === nettoyage.fournisseurId &&
-            item.gamme === nettoyage.gammeSelected
-        )
-      : null;
+  const handleClickPrevious = () => {
+    setServices((prev) => ({
+      ...prev,
+      currentServiceId: prev.currentServiceId - 1,
+    }));
+  };
+  const handleClickNext = () => {
+    setServices((prev) => ({
+      ...prev,
+      currentServiceId: prev.currentServiceId + 1,
+    }));
+  };
 
-  const vitrerieProposition = nettoyage.fournisseurId
-    ? vitreriePropositions.find(
-        (item) => item.fournisseurId === nettoyage.fournisseurId
-      )
-    : null;
+  if (!nettoyage.propositionId) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="2">
       <div className="flex justify-between items-center">
@@ -51,7 +70,7 @@ const NettoyageOptions = ({
       </div>
       <div className="w-full flex-1">
         <NettoyageOptionsPropositions
-          nettoyageProposition={nettoyageProposition}
+          samediDimancheProposition={samediDimancheProposition}
           repasseProposition={repasseProposition}
           vitrerieProposition={vitrerieProposition}
         />

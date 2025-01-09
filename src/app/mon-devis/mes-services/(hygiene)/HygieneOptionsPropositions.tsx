@@ -1,43 +1,37 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CompanyInfoContext } from "@/context/CompanyInfoProvider";
+import { RATIO } from "@/constants/ratio";
+import { ClientContext } from "@/context/ClientProvider";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
+import { formatNumber } from "@/lib/formatNumber";
 import { GammeType } from "@/zod-schemas/gamme";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
-import { SelectHygieneDistribQuantiteType } from "@/zod-schemas/hygieneDistribQuantite";
+import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { ChangeEvent, useContext } from "react";
 
 type HygieneOptionsPropositionsProps = {
-  distribQuantites:
-    | (SelectHygieneDistribQuantiteType & {
-        nbDistribDesinfectant: number;
-        nbDistribParfum: number;
-        nbDistribBalai: number;
-        nbDistribPoubelle: number;
-      })
-    | null;
+  distribQuantites: SelectHygieneDistribQuantitesType;
   distribTarifs: SelectHygieneDistribTarifsType[];
-  consoTarifs: SelectHygieneConsoTarifsType[];
+  consosTarif: SelectHygieneConsoTarifsType;
 };
 
 const HygieneOptionsPropositions = ({
   distribQuantites,
   distribTarifs,
-  consoTarifs,
+  consosTarif,
 }: HygieneOptionsPropositionsProps) => {
   const { hygiene, setHygiene } = useContext(HygieneContext);
-  const { companyInfo } = useContext(CompanyInfoContext);
+  const { client } = useContext(ClientContext);
   const { setTotalHygiene } = useContext(TotalHygieneContext);
 
   const gammes = ["essentiel", "confort", "excellence"] as const;
   const propositions = gammes.map((gamme) => ({
     gamme,
     tarifsDesinfectant:
-      consoTarifs[0].paParPersonneDesinfectant *
-      (parseInt(companyInfo.effectif) as number),
+      consosTarif.paParPersonneDesinfectant * (client.effectif as number),
     tarifsDistribDesinfectant:
       ((hygiene.nbDistribDesinfectant ||
         distribQuantites?.nbDistribDesinfectant) ??
@@ -92,12 +86,12 @@ const HygieneOptionsPropositions = ({
                 ? null
                 : (proposition.tarifsDesinfectant +
                     proposition.tarifsDistribDesinfectant) /
-                  10000,
+                  RATIO,
             prixDesinfectantAchat:
               hygiene.dureeLocation === "oneShot"
                 ? {
-                    prixAchat: proposition.tarifsDistribDesinfectant / 10000,
-                    prixConsommables: proposition.tarifsDesinfectant / 10000,
+                    prixAchat: proposition.tarifsDistribDesinfectant / RATIO,
+                    prixConsommables: proposition.tarifsDesinfectant / RATIO,
                   }
                 : null,
           }));
@@ -122,7 +116,7 @@ const HygieneOptionsPropositions = ({
         if (proposition) {
           setTotalHygiene((prev) => ({
             ...prev,
-            prixParfum: proposition.tarifsDistribParfum / 10000,
+            prixParfum: proposition.tarifsDistribParfum / RATIO,
           }));
         }
         return;
@@ -145,7 +139,7 @@ const HygieneOptionsPropositions = ({
         if (proposition) {
           setTotalHygiene((prev) => ({
             ...prev,
-            prixBalai: proposition.tarifsDistribBalai / 10000,
+            prixBalai: proposition.tarifsDistribBalai / RATIO,
           }));
         }
         return;
@@ -168,7 +162,7 @@ const HygieneOptionsPropositions = ({
         if (proposition) {
           setTotalHygiene((prev) => ({
             ...prev,
-            prixPoubelle: proposition.tarifsDistribPoubelle / 10000,
+            prixPoubelle: proposition.tarifsDistribPoubelle / RATIO,
           }));
         }
         return;
@@ -258,17 +252,23 @@ const HygieneOptionsPropositions = ({
           const dureeLocation = hygiene.dureeLocation;
           const tarifsDistribAchatDesinfectant =
             proposition.tarifsDistribDesinfectant
-              ? `${proposition.tarifsDistribDesinfectant} €`
+              ? `${formatNumber(
+                  Math.round(proposition.tarifsDistribDesinfectant)
+                )} €`
               : "Non proposé";
           const tarifsConsosDesinfectant = proposition.tarifsDesinfectant
-            ? `${proposition.tarifsDesinfectant} € / an`
+            ? `${formatNumber(
+                Math.round(proposition.tarifsDesinfectant)
+              )} € / an`
             : "";
           const tarifsDistribLocDesinfectant =
             proposition.tarifsDistribDesinfectant
-              ? `${
-                  proposition.tarifsDistribDesinfectant +
-                  proposition.tarifsDesinfectant
-                } € / an`
+              ? `${formatNumber(
+                  Math.round(
+                    proposition.tarifsDistribDesinfectant +
+                      proposition.tarifsDesinfectant
+                  )
+                )} € / an`
               : "Non proposé";
 
           return (
@@ -368,15 +368,19 @@ const HygieneOptionsPropositions = ({
               ? "fm4allcomfort"
               : "fm4allexcellence";
           const tarifsDistribAchatParfum = proposition.tarifsDistribParfum
-            ? `${proposition.tarifsDistribParfum} €`
+            ? `${formatNumber(Math.round(proposition.tarifsDistribParfum))} €`
             : "Non proposé";
-          // const tarifsConsosParfum = proposition.tarifsParfum ? `${proposition.tarifsParfum} € / an` : ""; //Quand les fournisseurs l'auront renseigné
+          // const tarifsConsosParfum = proposition.tarifsParfum ? `${formatNumber(
+          // Math.round(proposition.tarifsParfum))} € / an` : ""; //Quand les fournisseurs l'auront renseigné
           const tarifsConsosParfum = "0 € / an";
           // const tarifsdDistribLocParfum = proposition.tarifsDistribParfum
-          // ? `${proposition.tarifsDistribParfum + proposition.tarifsParfum} € / an`
+          // ? `${formatNumber(
+          // Math.round(proposition.tarifsDistribParfum + proposition.tarifsParfum))} € / an`
           // : "Non proposé"; Quand les fournisseurs l'auront renseigné
           const tarifsDistribLocParfum = proposition.tarifsDistribParfum
-            ? `${proposition.tarifsDistribParfum} € / an`
+            ? `${formatNumber(
+                Math.round(proposition.tarifsDistribParfum)
+              )} € / an`
             : "Non proposé";
           const dureeLocation = hygiene.dureeLocation;
           return (
@@ -475,13 +479,17 @@ const HygieneOptionsPropositions = ({
               : "fm4allexcellence";
           const dureeLocation = hygiene.dureeLocation;
           const tarifsDistribAchatBalai = proposition.tarifsDistribBalai
-            ? `${proposition.tarifsDistribBalai} €`
+            ? `${formatNumber(Math.round(proposition.tarifsDistribBalai))} €`
             : "Non proposé";
-          // const tarifsConsosBalai = proposition.tarifsBalai ? `${proposition.tarifsBalai} € / an` : ""; //Quand les fournisseurs l'auront renseigné
+          // const tarifsConsosBalai = proposition.tarifsBalai ? `${formatNumber(
+          // Math.round(proposition.tarifsBalai))} € / an` : ""; //Quand les fournisseurs l'auront renseigné
           const tarifsConsosBalai = "0 € / an";
-          // const tarifsDistribLocBalai = proposition.tarifsDistribBalai ? `${proposition.tarifsDistribBalai + proposition.tarifsBalai} € / an` : "Non proposé"; //Quand les fournisseurs l'auront renseigné
+          // const tarifsDistribLocBalai = proposition.tarifsDistribBalai ? `${formatNumber(
+          // Math.round(proposition.tarifsDistribBalai + proposition.tarifsBalai))} € / an` : "Non proposé"; //Quand les fournisseurs l'auront renseigné
           const tarifsDistribLocBalai = proposition.tarifsDistribBalai
-            ? `${proposition.tarifsDistribBalai} € / an`
+            ? `${formatNumber(
+                Math.round(proposition.tarifsDistribBalai)
+              )} € / an`
             : "Non proposé";
           return (
             <div
@@ -583,13 +591,17 @@ const HygieneOptionsPropositions = ({
               : "fm4allexcellence";
           const dureeLocation = hygiene.dureeLocation;
           const tarifsDistribAchatPoubelle = proposition.tarifsDistribPoubelle
-            ? `${proposition.tarifsDistribPoubelle} €`
+            ? `${formatNumber(Math.round(proposition.tarifsDistribPoubelle))} €`
             : "Non proposé";
-          // const tarifsConsosPoubelle = proposition.tarifsPoubelle ? `${proposition.tarifsPoubelle} € / an` : ""; //Quand les fournisseurs l'auront renseigné
+          // const tarifsConsosPoubelle = proposition.tarifsPoubelle ? `${formatNumber(
+          // Math.round(proposition.tarifsPoubelle))} € / an` : ""; //Quand les fournisseurs l'auront renseigné
           const tarifsConsosPoubelle = "0 € / an";
-          // const tarifsDistribLocPoubelle = proposition.tarifsDistribPoubelle ? `${proposition.tarifsDistribPoubelle + proposition.tarifsPoubelle} € / an` : "Non proposé"; //Quand les fournisseurs l'auront renseigné
+          // const tarifsDistribLocPoubelle = proposition.tarifsDistribPoubelle ? `${formatNumber(
+          //        Math.round(proposition.tarifsDistribPoubelle + proposition.tarifsPoubelle})) € / an` : "Non proposé"; //Quand les fournisseurs l'auront renseigné
           const tarifsDistribLocPoubelle = proposition.tarifsDistribPoubelle
-            ? `${proposition.tarifsDistribPoubelle} € / an`
+            ? `${formatNumber(
+                Math.round(proposition.tarifsDistribPoubelle)
+              )} € / an`
             : "Non proposé";
           return (
             <div

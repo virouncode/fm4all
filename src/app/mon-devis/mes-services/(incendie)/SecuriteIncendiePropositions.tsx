@@ -9,17 +9,26 @@ import {
 } from "@/components/ui/tooltip";
 import { IncendieContext } from "@/context/IncendieProvider";
 import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
-import useFetchIncendie from "@/hooks/use-fetch-incendie";
+import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites";
+import { SelectIncendieTarifsType } from "@/zod-schemas/incendieTarifs";
 import { ChangeEvent, useContext } from "react";
 
-const SecuriteIncendiePropositions = () => {
+type SecuriteIncendiePropositionsProps = {
+  incendieQuantite: SelectIncendieQuantitesType;
+  incendieTarifs: SelectIncendieTarifsType[];
+};
+
+const SecuriteIncendiePropositions = ({
+  incendieQuantite,
+  incendieTarifs,
+}: SecuriteIncendiePropositionsProps) => {
   const { incendie, setIncendie } = useContext(IncendieContext);
   const { setTotalIncendie } = useContext(TotalIncendieContext);
-  const { incendieQuantites, incendieTarifs } = useFetchIncendie();
 
   const nbExtincteurs =
-    (incendie.nbExtincteurs || incendieQuantites?.nbExtincteurs) ?? 0;
-  const nbBaes = incendie.nbBaes || Math.round(nbExtincteurs * 2.3);
+    (incendie.nbExtincteurs || incendieQuantite?.nbExtincteurs) ?? 0;
+  const nbBaes =
+    incendie.nbBaes || Math.round(incendieQuantite.nbExtincteurs * 2.3);
   const nbTelBaes = incendie.nbTelBaes || 1;
 
   const propositions = incendieTarifs.map((tarif) => ({
@@ -74,7 +83,7 @@ const SecuriteIncendiePropositions = () => {
           ...prev,
           nbExtincteurs: value
             ? parseInt(value)
-            : incendieQuantites?.nbExtincteurs ?? 0,
+            : incendieQuantite?.nbExtincteurs ?? 0,
         }));
         return;
       case "baes":
@@ -83,7 +92,7 @@ const SecuriteIncendiePropositions = () => {
           nbBaes: value
             ? parseInt(value)
             : Math.round(
-                ((incendie.nbExtincteurs || incendieQuantites?.nbExtincteurs) ??
+                ((incendie.nbExtincteurs || incendieQuantite?.nbExtincteurs) ??
                   0) * 2.3
               ),
         }));
@@ -125,8 +134,7 @@ const SecuriteIncendiePropositions = () => {
                     step={1}
                     onChange={(e) => handleChangeNbr(e, "extincteur")}
                     className={`w-16 ${
-                      incendie.nbExtincteurs ===
-                      incendieQuantites?.nbExtincteurs
+                      incendie.nbExtincteurs === incendieQuantite?.nbExtincteurs
                         ? "text-destructive"
                         : ""
                     }`}
@@ -146,7 +154,7 @@ const SecuriteIncendiePropositions = () => {
                     onChange={(e) => handleChangeNbr(e, "baes")}
                     className={`w-16 ${
                       incendie.nbBaes ===
-                      Math.ceil((incendieQuantites?.nbExtincteurs ?? 0) * 2.3)
+                      Math.ceil((incendieQuantite?.nbExtincteurs ?? 0) * 2.3)
                         ? "text-destructive"
                         : ""
                     }`}

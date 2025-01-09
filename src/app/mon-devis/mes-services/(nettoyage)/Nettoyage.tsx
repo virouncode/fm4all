@@ -1,18 +1,32 @@
 "use client";
+
+import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
-import useFetchNettoyage from "@/hooks/use-fetch-nettoyage";
+import useScrollIntoService from "@/hooks/use-scroll-into-service";
+import { gammes } from "@/zod-schemas/gamme";
 import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SprayCan } from "lucide-react";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import NextServiceButton from "../NextServiceButton";
 import NettoyagePropositions from "./NettoyagePropositions";
 
-const Nettoyage = () => {
+type NettoyageProps = {
+  nettoyagePropositions: (SelectNettoyageTarifsType & {
+    freqAnnuelle: number;
+    prixAnnuel: number;
+  })[];
+};
+
+const Nettoyage = ({ nettoyagePropositions }: NettoyageProps) => {
   const { nettoyage } = useContext(NettoyageContext);
   const { setServices } = useContext(ServicesContext);
-  const { nettoyagePropositions } = useFetchNettoyage();
-  const order = ["essentiel", "confort", "excellence"];
+  const { setDevisProgress } = useContext(DevisProgressContext);
+  useScrollIntoService();
+
+  useEffect(() => {
+    setDevisProgress((prev) => ({ ...prev, currentStep: 2 }));
+  }, [setDevisProgress]);
 
   const nettoyagePropositionsByFournisseurId = nettoyagePropositions.reduce<
     Record<
@@ -20,8 +34,6 @@ const Nettoyage = () => {
       (SelectNettoyageTarifsType & {
         prixAnnuel: number;
         freqAnnuelle: number;
-        prixAnnuelSamedi: number;
-        prixAnnuelDimanche: number;
       })[]
     >
   >((acc, item) => {
@@ -32,7 +44,7 @@ const Nettoyage = () => {
     // Add the item to the appropriate array
     acc[fournisseurId].push(item);
     acc[fournisseurId].sort(
-      (a, b) => order.indexOf(a.gamme) - order.indexOf(b.gamme)
+      (a, b) => gammes.indexOf(a.gamme) - gammes.indexOf(b.gamme)
     );
     return acc;
   }, {});
@@ -83,5 +95,4 @@ const Nettoyage = () => {
     </div>
   );
 };
-
 export default Nettoyage;

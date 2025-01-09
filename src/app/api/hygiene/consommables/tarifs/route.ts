@@ -56,10 +56,10 @@ export async function GET(req: NextRequest) {
     );
     const data = validatedResults.map((result) => ({
       ...result,
-      paParPersonneEmp: result.paParPersonneEmp / 10000,
-      paParPersonneSavon: result.paParPersonneSavon / 10000,
-      paParPersonnePh: result.paParPersonnePh / 10000,
-      paParPersonneDesinfectant: result.paParPersonneDesinfectant / 10000,
+      paParPersonneEmp: result.paParPersonneEmp / RATIO,
+      paParPersonneSavon: result.paParPersonneSavon / RATIO,
+      paParPersonnePh: result.paParPersonnePh / RATIO,
+      paParPersonneDesinfectant: result.paParPersonneDesinfectant / RATIO,
     }));
     return NextResponse.json(
       {

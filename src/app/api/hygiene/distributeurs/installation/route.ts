@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
     );
     const data = validatedResults.map((result) => ({
       ...result,
-      prixInstallation: result.prixInstallation / 10000,
+      prixInstallation: result.prixInstallation / RATIO,
     }));
     return NextResponse.json(
       {

@@ -34,9 +34,9 @@ export async function GET() {
     );
     const data = validatedResults.map((result) => ({
       ...result,
-      tauxHoraire: result.tauxHoraire / 10000,
-      minFacturation: result.minFacturation / 10000,
-      fraisDeplacement: result.fraisDeplacement / 10000,
+      tauxHoraire: result.tauxHoraire / RATIO,
+      minFacturation: result.minFacturation / RATIO,
+      fraisDeplacement: result.fraisDeplacement / RATIO,
     }));
 
     return NextResponse.json(

@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
     );
     const data = validatedResults.map((result) => ({
       ...result,
-      freqAnnuelle: result.freqAnnuelle / 10000,
+      freqAnnuelle: result.freqAnnuelle / RATIO,
     }));
 
     return NextResponse.json(

@@ -15,40 +15,33 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { locationDistribHygiene } from "@/constants/locationsDistribHygiene";
-import { CompanyInfoContext } from "@/context/CompanyInfoProvider";
+import { ClientContext } from "@/context/ClientProvider";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { DureeLocationType } from "@/zod-schemas/dureeLocation";
 import { GammeType } from "@/zod-schemas/gamme";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
-import { SelectHygieneDistribQuantiteType } from "@/zod-schemas/hygieneDistribQuantite";
+import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs";
 import { ChangeEvent, useContext } from "react";
 
 type HygienePropositionsProps = {
-  distribQuantites:
-    | (SelectHygieneDistribQuantiteType & {
-        nbDistribDesinfectant: number;
-        nbDistribParfum: number;
-        nbDistribBalai: number;
-        nbDistribPoubelle: number;
-      })
-    | null;
+  distribQuantites: SelectHygieneDistribQuantitesType;
   distribTarifs: SelectHygieneDistribTarifsType[];
-  distribInstalTarifs: SelectHygieneInstalDistribTarifsType[];
-  consoTarifs: SelectHygieneConsoTarifsType[];
+  distribInstalTarif: SelectHygieneInstalDistribTarifsType;
+  consosTarif: SelectHygieneConsoTarifsType;
 };
 
 const HygienePropositions = ({
   distribQuantites,
   distribTarifs,
-  distribInstalTarifs,
-  consoTarifs,
+  distribInstalTarif,
+  consosTarif,
 }: HygienePropositionsProps) => {
   const { hygiene, setHygiene } = useContext(HygieneContext);
-  const { companyInfo } = useContext(CompanyInfoContext);
+  const { client } = useContext(ClientContext);
   const { setTotalHygiene } = useContext(TotalHygieneContext);
 
   //Pour chaque gamme :
@@ -60,10 +53,10 @@ const HygienePropositions = ({
   const propositions = gammes.map((gamme) => ({
     gamme,
     tarifsConsommables:
-      (consoTarifs[0].paParPersonneEmp +
-        consoTarifs[0].paParPersonneSavon +
-        consoTarifs[0].paParPersonnePh) *
-      parseInt(companyInfo.effectif),
+      (consosTarif.paParPersonneEmp +
+        consosTarif.paParPersonneSavon +
+        consosTarif.paParPersonnePh) *
+      (client.effectif as number),
     tarifsDistributeurs:
       ((hygiene.nbDistribEmp || distribQuantites?.nbDistribEmp) ?? 0) *
         (distribTarifs.find(
@@ -77,7 +70,7 @@ const HygienePropositions = ({
         (distribTarifs.find(
           (tarif) => tarif.type === "ph" && tarif.gamme === gamme
         )?.[hygiene.dureeLocation] ?? 0),
-    tarifsInstalDistributeurs: distribInstalTarifs[0].prixInstallation,
+    tarifsInstalDistributeurs: distribInstalTarif.prixInstallation,
   }));
 
   const handleClickProposition = (gamme: GammeType) => {
@@ -85,6 +78,10 @@ const HygienePropositions = ({
       setHygiene((prev) => ({
         ...prev,
         trilogieGammeSelected: null,
+        desinfectantGammeSelected: null,
+        parfumGammeSelected: null,
+        balaiGammeSelected: null,
+        poubelleGammeSelected: null,
       }));
       setTotalHygiene((prev) => ({
         ...prev,
@@ -102,6 +99,10 @@ const HygienePropositions = ({
     setHygiene((prev) => ({
       ...prev,
       trilogieGammeSelected: gamme,
+      desinfectantGammeSelected: null,
+      parfumGammeSelected: null,
+      balaiGammeSelected: null,
+      poubelleGammeSelected: null,
     }));
     const proposition = propositions.find(
       (proposition) => proposition.gamme === gamme
@@ -112,18 +113,19 @@ const HygienePropositions = ({
         prixTrilogieAbonnement:
           hygiene.dureeLocation === "oneShot"
             ? null
-            : (proposition.tarifsConsommables +
-                proposition.tarifsDistributeurs +
-                proposition.tarifsInstalDistributeurs) /
-              10000,
+            : Math.round(
+                proposition.tarifsConsommables +
+                  proposition.tarifsDistributeurs +
+                  proposition.tarifsInstalDistributeurs
+              ),
         prixTrilogieAchat:
           hygiene.dureeLocation === "oneShot"
             ? {
-                prixAchat:
-                  (proposition.tarifsDistributeurs +
-                    proposition.tarifsInstalDistributeurs) /
-                  10000,
-                prixConsommables: proposition.tarifsConsommables / 10000,
+                prixAchat: Math.round(
+                  proposition.tarifsDistributeurs +
+                    proposition.tarifsInstalDistributeurs
+                ),
+                prixConsommables: Math.round(proposition.tarifsConsommables),
               }
             : null,
       }));
@@ -301,18 +303,24 @@ const HygienePropositions = ({
 
           const tarifsDistribAchat = proposition.tarifsDistributeurs
             ? `${formatNumber(
-                proposition.tarifsDistributeurs +
-                  proposition.tarifsInstalDistributeurs
+                Math.round(
+                  proposition.tarifsDistributeurs +
+                    proposition.tarifsInstalDistributeurs
+                )
               )} €`
             : "Non proposé";
           const tarifsConsosAnnuel = proposition.tarifsConsommables
-            ? `${formatNumber(proposition.tarifsConsommables)} € / an`
+            ? `${formatNumber(
+                Math.round(proposition.tarifsConsommables)
+              )} € / an`
             : "";
           const tarifsDistribLoc = proposition.tarifsDistributeurs
             ? `${formatNumber(
-                proposition.tarifsDistributeurs +
-                  proposition.tarifsInstalDistributeurs +
-                  proposition.tarifsConsommables
+                Math.round(
+                  proposition.tarifsDistributeurs +
+                    proposition.tarifsInstalDistributeurs +
+                    proposition.tarifsConsommables
+                )
               )} € / an`
             : "Non proposé";
 

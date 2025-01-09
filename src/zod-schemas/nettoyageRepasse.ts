@@ -2,7 +2,7 @@ import { nettoyageRepasseTarifs } from "@/db/schema";
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const selectNettoyageRepasseTarifsSchema = createSelectSchema(
+export const selectRepasseTarifsSchema = createSelectSchema(
   nettoyageRepasseTarifs,
   {
     hParPassage: (schema) =>
@@ -15,5 +15,4 @@ export const selectNettoyageRepasseTarifsSchema = createSelectSchema(
   slogan: z.string().nullable(),
 });
 
-export type SelectNettoyageRepasseTarifsType =
-  typeof selectNettoyageRepasseTarifsSchema._type;
+export type SelectRepasseTarifsType = typeof selectRepasseTarifsSchema._type;

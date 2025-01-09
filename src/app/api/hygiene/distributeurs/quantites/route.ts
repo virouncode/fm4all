@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { hygieneDistribQuantites } from "@/db/schema";
 import { errorHandler } from "@/lib/errorHandler";
-import { selectHygieneDistribQuantiteSchema } from "@/zod-schemas/hygieneDistribQuantite";
+import { selectHygieneDistribQuantiteSchema } from "@/zod-schemas/hygieneDistribQuantites";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 

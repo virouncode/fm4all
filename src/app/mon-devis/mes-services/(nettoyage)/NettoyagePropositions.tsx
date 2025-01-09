@@ -11,6 +11,7 @@ import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { GammeType } from "@/zod-schemas/gamme";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useContext } from "react";
 
 type NettoyagePropositionsProps = {
@@ -26,8 +27,6 @@ type NettoyagePropositionsProps = {
     tauxHoraire: number;
     prixAnnuel: number;
     freqAnnuelle: number;
-    prixAnnuelSamedi: number;
-    prixAnnuelDimanche: number;
   }[][];
   nettoyagePropositions: {
     surface: number;
@@ -41,8 +40,6 @@ type NettoyagePropositionsProps = {
     gamme: "essentiel" | "confort" | "excellence";
     prixAnnuel: number;
     freqAnnuelle: number;
-    prixAnnuelSamedi: number;
-    prixAnnuelDimanche: number;
   }[];
 };
 
@@ -54,6 +51,9 @@ const NettoyagePropositions = ({
   const { setHygiene } = useContext(HygieneContext);
   const { setTotalNettoyage } = useContext(TotalNettoyageContext);
   const { setTotalHygiene } = useContext(TotalHygieneContext);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
 
   const handleClickProposition = (propositionId: number) => {
     if (nettoyage.propositionId === propositionId) {
@@ -101,6 +101,10 @@ const NettoyagePropositions = ({
         prixBalai: null,
         prixPoubelle: null,
       });
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("fournisseurId");
+      params.delete("nettoyageGamme");
+      router.push(`${pathname}?${params.toString()}`);
       return;
     }
     const nettoyageFournisseurId = nettoyagePropositions.find(
@@ -172,6 +176,10 @@ const NettoyagePropositions = ({
       prixBalai: null,
       prixPoubelle: null,
     });
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("fournisseurId", nettoyageFournisseurId.toString());
+    params.set("nettoyageGamme", gammeSelected);
+    router.push(`${pathname}?${params.toString()}`);
   };
   return (
     <div className="h-full flex flex-col border rounded-xl overflow-hidden">

@@ -48,10 +48,10 @@ export async function GET(req: NextRequest) {
     );
     const data = validatedResults.map((result) => ({
       ...result,
-      oneShot: result.oneShot ? result.oneShot / 10000 : null,
-      pa12M: result.pa12M ? result.pa12M / 10000 : null,
-      pa24M: result.pa24M ? result.pa24M / 10000 : null,
-      pa36M: result.pa36M ? result.pa36M / 10000 : null,
+      oneShot: result.oneShot ? result.oneShot / RATIO : null,
+      pa12M: result.pa12M ? result.pa12M / RATIO : null,
+      pa24M: result.pa24M ? result.pa24M / RATIO : null,
+      pa36M: result.pa36M ? result.pa36M / RATIO : null,
     }));
     return NextResponse.json(
       {
