@@ -245,7 +245,7 @@ const NettoyageOptionsPropositions = ({
     return (
       <div className="h-full flex flex-col border rounded-xl items-center justify-center">
         <p className="text-lg text-center italic">
-          Veuillez d&apos;abord choisir une formule Nettoyage et propreté
+          Veuillez d&apos;abord choisir une formule Nettoyage et Propreté
         </p>
       </div>
     );
@@ -363,6 +363,10 @@ const NettoyageOptionsPropositions = ({
                   passages / an
                 </Label>
               </div>
+              <p className="text-xs text-destructive italic px-2 text-center">
+                Les quantités sont estimées pour vous mais vous pouvez les
+                changer
+              </p>
             </div>
           </div>
           <div

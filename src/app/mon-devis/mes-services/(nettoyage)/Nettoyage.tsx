@@ -1,15 +1,16 @@
 "use client";
+import { NettoyageContext } from "@/context/NettoyageProvider";
+import { ServicesContext } from "@/context/ServicesProvider";
 import useFetchNettoyage from "@/hooks/use-fetch-nettoyage";
 import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SprayCan } from "lucide-react";
+import { useContext } from "react";
 import NextServiceButton from "../NextServiceButton";
 import NettoyagePropositions from "./NettoyagePropositions";
 
-type NettoyageProps = {
-  handleClickNext: () => void;
-};
-
-const Nettoyage = ({ handleClickNext }: NettoyageProps) => {
+const Nettoyage = () => {
+  const { nettoyage } = useContext(NettoyageContext);
+  const { setServices } = useContext(ServicesContext);
   const { nettoyagePropositions } = useFetchNettoyage();
   const order = ["essentiel", "confort", "excellence"];
 
@@ -40,6 +41,20 @@ const Nettoyage = ({ handleClickNext }: NettoyageProps) => {
   const formattedNettoyagePropositions = Object.values(
     nettoyagePropositionsByFournisseurId
   );
+
+  const handleClickNext = () => {
+    if (nettoyage.propositionId) {
+      setServices((prev) => ({
+        ...prev,
+        currentServiceId: prev.currentServiceId + 1,
+      }));
+    } else {
+      setServices((prev) => ({
+        ...prev,
+        currentServiceId: 5,
+      }));
+    }
+  };
 
   return (
     <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="1">

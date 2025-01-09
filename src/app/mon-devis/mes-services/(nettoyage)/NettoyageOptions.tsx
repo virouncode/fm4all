@@ -43,7 +43,7 @@ const NettoyageOptions = ({
         <div className="flex gap-4 items-center">
           <div className="flex gap-4 items-center p-4 border-2 rounded-xl">
             <SprayCan />
-            <p>Nettoyage et propreté</p>
+            <p>Nettoyage et Propreté</p>
           </div>
           <p className="text-base italic">Choisissez vos options</p>
         </div>
@@ -56,9 +56,7 @@ const NettoyageOptions = ({
           vitrerieProposition={vitrerieProposition}
         />
       </div>
-      <p className="text-sm italic text-end px-1">
-        *2 passages anuels vitrerie par défaut
-      </p>
+      <p className="text-sm italic text-end px-1"></p>
       <NextServiceButton handleClickNext={handleClickNext} />
     </div>
   );

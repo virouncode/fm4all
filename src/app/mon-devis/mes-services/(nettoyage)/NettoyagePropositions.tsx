@@ -13,7 +13,7 @@ import { formatNumber } from "@/lib/formatNumber";
 import { GammeType } from "@/zod-schemas/gamme";
 import { useContext } from "react";
 
-type TabsContentNettoyageProps = {
+type NettoyagePropositionsProps = {
   formattedNettoyagePropositions: {
     fournisseurId: number;
     nomEntreprise: string;
@@ -49,7 +49,7 @@ type TabsContentNettoyageProps = {
 const NettoyagePropositions = ({
   formattedNettoyagePropositions,
   nettoyagePropositions,
-}: TabsContentNettoyageProps) => {
+}: NettoyagePropositionsProps) => {
   const { nettoyage, setNettoyage } = useContext(NettoyageContext);
   const { setHygiene } = useContext(HygieneContext);
   const { setTotalNettoyage } = useContext(TotalNettoyageContext);

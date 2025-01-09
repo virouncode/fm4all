@@ -1,5 +1,6 @@
 import useFetchHygiene from "@/hooks/use-fetch-hygiene";
 import { Toilet } from "lucide-react";
+import NextServiceButton from "../NextServiceButton";
 import PreviousServiceButton from "../PreviousServiceButton";
 import HygieneOptionsPropositions from "./HygieneOptionsPropositions";
 
@@ -34,6 +35,7 @@ const HygieneOptions = ({
           />
         )}
       </div>
+      <NextServiceButton handleClickNext={handleClickNext} />
     </div>
   );
 };

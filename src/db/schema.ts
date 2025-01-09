@@ -166,6 +166,26 @@ export const hygieneConsoTarifs = pgTable("hygiene_conso_tarifs", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const incendieQuantites = pgTable("incendie_quantites", {
+  id: serial().primaryKey(),
+  surface: integer().notNull(),
+  nbExtincteurs: integer("nb_extincteurs").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const incendieTarifs = pgTable("incendie_tarifs", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  surface: integer().notNull(),
+  prixParExtincteur: integer("prix_par_extincteur").notNull(),
+  prixParBaes: integer("prix_par_baes").notNull(),
+  prixParTelBaes: integer("prix_par_tel_baes").notNull(),
+  fraisDeplacement: integer("frais_deplacement").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 //RELATIONS
 export const fournisseursRelations = relations(
   fournisseurs,
@@ -180,6 +200,7 @@ export const fournisseursRelations = relations(
     hygieneDistribTarifs: many(hygieneDistribTarifs),
     hygieneInstalDistribTarifs: many(hygieneInstalDistribTarifs),
     hygieneConsoTarifs: many(hygieneConsoTarifs),
+    incendieTarifs: many(incendieTarifs),
   })
 );
 
@@ -252,3 +273,10 @@ export const hygieneConsoTarifsRelations = relations(
     }),
   })
 );
+
+export const incendieTarifsRelations = relations(incendieTarifs, ({ one }) => ({
+  fournisseur: one(fournisseurs, {
+    fields: [incendieTarifs.fournisseurId],
+    references: [fournisseurs.id],
+  }),
+}));

@@ -5,16 +5,18 @@ import { FireExtinguisher, SprayCan, Toilet, Wrench } from "lucide-react";
 import Link from "next/link";
 import { useContext, useEffect } from "react";
 import Hygiene from "./(hygiene)/Hygiene";
+import HygieneOptions from "./(hygiene)/HygieneOptions";
 import Nettoyage from "./(nettoyage)/Nettoyage";
 import NettoyageOptions from "./(nettoyage)/NettoyageOptions";
-import Maintenance from "./Maintenance";
-import SecuriteIncendie from "./SecuriteIncendie";
-import HygieneOptions from "./(hygiene)/HygieneOptions";
+
+import { NettoyageContext } from "@/context/NettoyageProvider";
+import SecuriteIncendie from "./(incendie)/SecuriteIncendie";
+import Maintenance from "./(maintenance)/Maintenance";
 
 const servicesChoices = [
   {
     id: 1,
-    description: "Nettoyage et propreté",
+    description: "Nettoyage et Propreté",
     icon: <SprayCan />,
   },
   { id: 2, description: "Nettoyage options", icon: <SprayCan /> },
@@ -33,6 +35,7 @@ const servicesChoices = [
 ];
 
 const MesServices = () => {
+  const { nettoyage } = useContext(NettoyageContext);
   const { services, setServices } = useContext(ServicesContext);
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
 
@@ -78,25 +81,28 @@ const MesServices = () => {
 
   return (
     <section className="flex-1 overflow-hidden">
-      <Nettoyage handleClickNext={handleClickNext} />
-      <NettoyageOptions
+      <Nettoyage />
+      {nettoyage.propositionId && (
+        <>
+          <NettoyageOptions
+            handleClickNext={handleClickNext}
+            handleClickPrevious={handleClickPrevious}
+          />
+          <Hygiene
+            handleClickNext={handleClickNext}
+            handleClickPrevious={handleClickPrevious}
+          />
+          <HygieneOptions
+            handleClickNext={handleClickNext}
+            handleClickPrevious={handleClickPrevious}
+          />
+        </>
+      )}
+      <Maintenance handleClickNext={handleClickNext} />
+      <SecuriteIncendie
         handleClickNext={handleClickNext}
         handleClickPrevious={handleClickPrevious}
       />
-      <Hygiene
-        handleClickNext={handleClickNext}
-        handleClickPrevious={handleClickPrevious}
-      />
-      <HygieneOptions
-        handleClickNext={handleClickNext}
-        handleClickPrevious={handleClickPrevious}
-      />
-
-      <Maintenance
-        handleClickNext={handleClickNext}
-        handleClickPrevious={handleClickPrevious}
-      />
-      <SecuriteIncendie handleClickPrevious={handleClickPrevious} />
     </section>
   );
 };

@@ -219,7 +219,7 @@ const HygieneOptionsPropositions = ({
     <div className="h-full flex flex-col border rounded-xl overflow-hidden">
       {/*1ère ligne */}
       <div className="flex border-b flex-1">
-        <div className="flex w-1/4 items-center justify-center flex-col gap-6">
+        <div className="flex w-1/4 items-center justify-center flex-col gap-4">
           <p className="text-lg">Desinfectant pour cuvettes</p>
           <div className="text-sm flex flex-col gap-2">
             <div className="flex gap-4 items-center justify-center w-full">
@@ -332,7 +332,7 @@ const HygieneOptionsPropositions = ({
       </div>
       {/*2ème ligne */}
       <div className="flex border-b flex-1">
-        <div className="flex w-1/4 items-center justify-center flex-col gap-6">
+        <div className="flex w-1/4 items-center justify-center flex-col gap-4">
           <p className="text-lg">Parfum</p>
           <div className="text-sm flex flex-col gap-2">
             <div className="flex gap-4 items-center justify-center w-full">
@@ -438,7 +438,7 @@ const HygieneOptionsPropositions = ({
       </div>
       {/*3ème ligne */}
       <div className="flex border-b flex-1">
-        <div className="flex w-1/4 items-center justify-center flex-col gap-6">
+        <div className="flex w-1/4 items-center justify-center flex-col gap-4">
           <p className="text-lg">Balais WC</p>
           <div className="text-sm flex flex-col gap-2">
             <div className="flex gap-4 items-center justify-center w-full">
@@ -542,7 +542,7 @@ const HygieneOptionsPropositions = ({
       </div>
       {/*4ème ligne */}
       <div className="flex border-b flex-1">
-        <div className="flex w-1/4 items-center justify-center flex-col gap-6">
+        <div className="flex w-1/4 items-center justify-center flex-col gap-4">
           <p className="text-lg">Poubelles hygiène féminine</p>
           <div className="text-sm flex flex-col gap-2">
             <div className="flex gap-4 items-center justify-center w-full">
@@ -568,6 +568,9 @@ const HygieneOptionsPropositions = ({
                 blocs
               </Label>
             </div>
+            <p className="text-xs text-destructive italic px-2 text-center">
+              Les quantités sont estimées pour vous mais vous pouvez les changer
+            </p>
           </div>
         </div>
         {propositions.map((proposition) => {

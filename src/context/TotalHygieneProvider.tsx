@@ -46,9 +46,9 @@ const TotalHygieneProvider = ({ children }: PropsWithChildren) => {
 
   useEffect(() => {
     if (isMounted) {
-      const storedHygiene = localStorage.getItem("totalHygiene");
-      if (storedHygiene) {
-        setTotalHygiene(JSON.parse(storedHygiene));
+      const storedTotalHygiene = localStorage.getItem("totalHygiene");
+      if (storedTotalHygiene) {
+        setTotalHygiene(JSON.parse(storedTotalHygiene));
       }
     }
   }, [isMounted]);

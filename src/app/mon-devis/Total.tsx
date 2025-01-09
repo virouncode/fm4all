@@ -12,6 +12,7 @@ import {
 import { CompanyInfoContext } from "@/context/CompanyInfoProvider";
 import { useContext } from "react";
 import TotalHygiene from "./TotalHygiene";
+import TotalIncendie from "./TotalIncendie";
 import TotalNettoyage from "./TotalNettoyage";
 
 const Total = () => {
@@ -41,6 +42,8 @@ const Total = () => {
         <div className="flex flex-col gap-6">
           <TotalNettoyage />
           <TotalHygiene />
+          {/* <TotalMaintenance /> */}
+          <TotalIncendie />
         </div>
       </SheetContent>
     </Sheet>

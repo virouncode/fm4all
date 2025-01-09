@@ -172,10 +172,7 @@ const HygienePropositions = ({
 
   return (
     <div className="h-full flex flex-col border rounded-xl overflow-hidden">
-      <div
-        className="flex border-b flex-1"
-        key={distribTarifs[0].fournisseurId}
-      >
+      <div className="flex border-b flex-1">
         <div className="flex w-1/4 items-center justify-center flex-col gap-10">
           <TooltipProvider>
             <Tooltip>
@@ -189,7 +186,7 @@ const HygienePropositions = ({
               )}
             </Tooltip>
           </TooltipProvider>
-          <div className="flex flex-col gap-6 w-3/4">
+          <div className="flex flex-col gap-6 w-full p-4">
             <div className="flex gap-4 items-center w-full">
               <Input
                 type="number"
@@ -287,6 +284,9 @@ const HygienePropositions = ({
                 </SelectContent>
               </Select>
             </div>
+            <p className="text-xs text-destructive italic px-2 text-center">
+              Les quantités sont estimées pour vous mais vous pouvez les changer
+            </p>
           </div>
         </div>
 

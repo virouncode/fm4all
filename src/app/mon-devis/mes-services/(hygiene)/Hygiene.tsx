@@ -16,7 +16,7 @@ const Hygiene = ({ handleClickNext, handleClickPrevious }: HygieneProps) => {
   return (
     <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="3">
       <div className="flex justify-between items-center">
-        <div className="flex gap-2 items-center flex-1">
+        <div className="flex gap-4 items-center">
           <div className="flex gap-4 items-center p-4 border-2 rounded-xl">
             <Toilet />
             <p>Hygiène sanitaire</p>
@@ -38,12 +38,6 @@ const Hygiene = ({ handleClickNext, handleClickPrevious }: HygieneProps) => {
             distribInstalTarifs={distribInstalTarifs}
             consoTarifs={consoTarifs}
           />
-
-          // <TabsContentHygieneOptions
-          //   distribQuantites={distribQuantites}
-          //   distribTarifs={distribTarifs}
-          //   consoTarifs={consoTarifs}
-          // />
         )}
       </div>
       <p className="text-sm italic text-end px-1">*ma NB</p>
