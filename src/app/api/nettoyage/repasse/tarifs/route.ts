@@ -1,7 +1,8 @@
+import { RATIO } from "@/constants/ratio";
 import { db } from "@/db";
 import { fournisseurs, nettoyageRepasseTarifs } from "@/db/schema";
 import { errorHandler } from "@/lib/errorHandler";
-import { selectNettoyageRepasseTarifsSchema } from "@/zod-schemas/nettoyageRepasse";
+import { selectRepasseTarifsSchema } from "@/zod-schemas/nettoyageRepasse";
 import { eq, getTableColumns } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -45,7 +46,7 @@ export async function GET(req: NextRequest) {
       );
     }
     const validatedResults = results.map((result) =>
-      selectNettoyageRepasseTarifsSchema.parse(result)
+      selectRepasseTarifsSchema.parse(result)
     );
     const data = validatedResults.map((result) => ({
       ...result,

@@ -1,7 +1,9 @@
+import { RATIO } from "@/constants/ratio";
 import { db } from "@/db";
 import { fournisseurs, nettoyageVitrerieTarifs } from "@/db/schema";
 import { errorHandler } from "@/lib/errorHandler";
-import { selectNettoyageVitrerieTarifsSchema } from "@/zod-schemas/nettoyageVitrerie";
+
+import { selectVitrerieTarifsSchema } from "@/zod-schemas/nettoyageVitrerie";
 import { eq, getTableColumns } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
@@ -30,7 +32,7 @@ export async function GET() {
       );
     }
     const validatedResults = results.map((result) =>
-      selectNettoyageVitrerieTarifsSchema.parse(result)
+      selectVitrerieTarifsSchema.parse(result)
     );
     const data = validatedResults.map((result) => ({
       ...result,

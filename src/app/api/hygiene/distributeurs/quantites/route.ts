@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { hygieneDistribQuantites } from "@/db/schema";
 import { errorHandler } from "@/lib/errorHandler";
-import { selectHygieneDistribQuantiteSchema } from "@/zod-schemas/hygieneDistribQuantites";
+import { selectHygieneDistribQuantitesSchema } from "@/zod-schemas/hygieneDistribQuantites";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
         { status: 200 }
       );
     }
-    const validatedResult = selectHygieneDistribQuantiteSchema.parse(
+    const validatedResult = selectHygieneDistribQuantitesSchema.parse(
       results[0]
     );
     return NextResponse.json(
