@@ -19,7 +19,6 @@ import {
   getVitrerieTarif,
 } from "@/lib/queries/nettoyage/getNettoyage";
 import { GammeType } from "@/zod-schemas/gamme";
-import Total from "../Total";
 import Hygiene from "./(hygiene)/Hygiene";
 import HygieneOptions from "./(hygiene)/HygieneOptions";
 import SecuriteIncendie from "./(incendie)/SecuriteIncendie";
@@ -165,7 +164,6 @@ const MesServices = async ({
         incendieQuantite={incendieQuantite}
         incendieTarifs={incendieTarifs}
       />
-      <Total />
     </section>
   );
 };

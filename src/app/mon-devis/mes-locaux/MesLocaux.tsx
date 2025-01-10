@@ -18,7 +18,7 @@ import { roundSurface } from "@/lib/roundSurface";
 import { insertClientSchema, InsertClientType } from "@/zod-schemas/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, useContext, useEffect } from "react";
+import { ChangeEvent, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -54,10 +54,6 @@ const MesLocaux = () => {
     resolver: zodResolver(partialClientSchema),
     defaultValues,
   });
-
-  useEffect(() => {
-    setDevisProgress((prev) => ({ ...prev, currentStep: 1 }));
-  }, [setDevisProgress]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

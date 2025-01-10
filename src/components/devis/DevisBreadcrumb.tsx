@@ -16,7 +16,7 @@ import { useContext } from "react";
 import { roundEffectif } from "../../lib/roundEffectif";
 
 const DevisBreadcrumb = () => {
-  const { devisProgress } = useContext(DevisProgressContext);
+  const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const { client } = useContext(ClientContext);
   const { nettoyage } = useContext(NettoyageContext);
   const serviceSearchParams = new URLSearchParams();
@@ -68,6 +68,8 @@ const DevisBreadcrumb = () => {
       name: "Afficher mon devis",
     },
   ];
+  console.log("devisProgress in breadcrumb", devisProgress);
+
   return (
     <div className="flex justify-center">
       <Breadcrumb className="h-20 md:h-10">
@@ -81,14 +83,22 @@ const DevisBreadcrumb = () => {
                   </BreadcrumbPage>
                 ) : (
                   <Link
+                    onClick={() => {
+                      setDevisProgress((prev) => ({
+                        ...prev,
+                        currentStep: route.id,
+                      }));
+                    }}
                     href={`/mon-devis${route.url}`}
                     className={`${
-                      devisProgress.completedSteps[
-                        devisProgress.completedSteps.length - 1
-                      ] !==
-                        route.id - 1 && route.id !== 1
-                        ? "pointer-events-none"
-                        : ""
+                      devisProgress.completedSteps.includes(route.id) ||
+                      route.id ===
+                        devisProgress.completedSteps[
+                          devisProgress.completedSteps.length - 1
+                        ] +
+                          1
+                        ? ""
+                        : "pointer-events-none"
                     }`}
                   >
                     {route.name}
@@ -106,3 +116,5 @@ const DevisBreadcrumb = () => {
 };
 
 export default DevisBreadcrumb;
+
+//Si j'ai complété les étapes d'avant je suis cliquable

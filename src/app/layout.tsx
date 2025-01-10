@@ -4,9 +4,20 @@ import { Didact_Gothic } from "next/font/google";
 
 import Footer from "@/components/footer";
 import { Toaster } from "@/components/ui/toaster";
+import ClientProvider from "@/context/ClientProvider";
 import DevisProgressProvider from "@/context/DevisProgressProvider";
+import HygieneProvider from "@/context/HygieneProvider";
+import IncendieProvider from "@/context/IncendieProvider";
+import MaintenanceProvider from "@/context/MaintenanceProvider";
+import NettoyageProvider from "@/context/NettoyageProvider";
+import ServicesProvider from "@/context/ServicesProvider";
+import TotalHygieneProvider from "@/context/TotalHygieneProvider";
+import TotalIncendieProvider from "@/context/TotalIncendieProvider";
+import TotalMaintenanceProvider from "@/context/TotalMaintenanceProvider";
+import TotalNettoyageProvider from "@/context/TotalNettoyageProvider";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
+import Total from "./mon-devis/Total";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -43,17 +54,38 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${didact.className} antialiased scroll-smooth`}>
         <DevisProgressProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <Header />
-            {children}
-            <Footer />
-            <Toaster />
-          </ThemeProvider>
+          <ClientProvider>
+            <ServicesProvider>
+              <NettoyageProvider>
+                <HygieneProvider>
+                  <IncendieProvider>
+                    <MaintenanceProvider>
+                      <TotalNettoyageProvider>
+                        <TotalHygieneProvider>
+                          <TotalIncendieProvider>
+                            <TotalMaintenanceProvider>
+                              <ThemeProvider
+                                attribute="class"
+                                defaultTheme="light"
+                                enableSystem
+                                disableTransitionOnChange
+                              >
+                                <Header />
+                                {children}
+                                <Total />
+                                <Footer />
+                                <Toaster />
+                              </ThemeProvider>
+                            </TotalMaintenanceProvider>
+                          </TotalIncendieProvider>
+                        </TotalHygieneProvider>
+                      </TotalNettoyageProvider>
+                    </MaintenanceProvider>
+                  </IncendieProvider>
+                </HygieneProvider>
+              </NettoyageProvider>
+            </ServicesProvider>
+          </ClientProvider>
         </DevisProgressProvider>
       </body>
     </html>

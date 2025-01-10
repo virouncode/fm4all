@@ -1,13 +1,12 @@
 "use client";
 
-import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import useScrollIntoService from "@/hooks/use-scroll-into-service";
 import { gammes } from "@/zod-schemas/gamme";
 import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SprayCan } from "lucide-react";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import NextServiceButton from "../NextServiceButton";
 import PreviousServiceButton from "../PreviousServiceButton";
 import NettoyagePropositions from "./NettoyagePropositions";
@@ -22,12 +21,7 @@ type NettoyageProps = {
 const Nettoyage = ({ nettoyagePropositions }: NettoyageProps) => {
   const { nettoyage } = useContext(NettoyageContext);
   const { setServices } = useContext(ServicesContext);
-  const { setDevisProgress } = useContext(DevisProgressContext);
   useScrollIntoService();
-
-  useEffect(() => {
-    setDevisProgress((prev) => ({ ...prev, currentStep: 2 }));
-  }, [setDevisProgress]);
 
   const nettoyagePropositionsByFournisseurId = nettoyagePropositions.reduce<
     Record<

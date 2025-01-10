@@ -1,9 +1,11 @@
 "use client";
+import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import useScrollIntoService from "@/hooks/use-scroll-into-service";
 import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites";
 import { SelectIncendieTarifsType } from "@/zod-schemas/incendieTarifs";
 import { FireExtinguisher } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import NextServiceButton from "../NextServiceButton";
 import PreviousServiceButton from "../PreviousServiceButton";
@@ -19,13 +21,13 @@ const SecuriteIncendie = ({
   incendieTarifs,
 }: SecuriteIncendieProps) => {
   const { setServices } = useContext(ServicesContext);
+  const { setDevisProgress } = useContext(DevisProgressContext);
+  const router = useRouter();
   useScrollIntoService();
 
   const handleClickNext = () => {
-    setServices((prev) => ({
-      ...prev,
-      currentServiceId: 5,
-    }));
+    setDevisProgress({ currentStep: 3, completedSteps: [1, 2] });
+    router.push("/mon-devis/food-beverage");
   };
   const handleClickPrevious = () => {
     setServices((prev) => ({
