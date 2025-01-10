@@ -96,10 +96,11 @@ export const getHygieneInstalDistribTarif = async (
     const validatedResult = selectHygieneInstalDistribTarifsSchema.parse(
       results[0]
     );
-    return {
+    const data = {
       ...validatedResult,
       prixInstallation: validatedResult.prixInstallation / RATIO,
     };
+    return data;
   } catch (err) {
     errorHelper(err);
   }
@@ -133,7 +134,7 @@ export const getHygieneConsosTarif = async (
       return null;
     }
     const validatedResult = selectHygieneConsoTarifsSchema.parse(results[0]);
-    return {
+    const data = {
       ...validatedResult,
       paParPersonneEmp: validatedResult.paParPersonneEmp / RATIO,
       paParPersonnePh: validatedResult.paParPersonnePh / RATIO,
@@ -141,6 +142,7 @@ export const getHygieneConsosTarif = async (
       paParPersonneDesinfectant:
         validatedResult.paParPersonneDesinfectant / RATIO,
     };
+    return data;
   } catch (err) {
     errorHelper(err);
   }

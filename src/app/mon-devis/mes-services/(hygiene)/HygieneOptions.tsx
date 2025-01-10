@@ -1,5 +1,6 @@
 "use client";
 
+import { HygieneContext } from "@/context/HygieneProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
@@ -10,7 +11,6 @@ import { useContext } from "react";
 import NextServiceButton from "../NextServiceButton";
 import PreviousServiceButton from "../PreviousServiceButton";
 import HygieneOptionsPropositions from "./HygieneOptionsPropositions";
-import { HygieneContext } from "@/context/HygieneProvider";
 
 type HygieneOptionsProps = {
   distribQuantites?: SelectHygieneDistribQuantitesType | null;
@@ -45,13 +45,14 @@ const HygieneOptions = ({
   return (
     <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="4">
       <div className="flex justify-between items-center">
-        <div className="flex gap-4 items-center flex-1">
-          <div className="flex gap-4 items-center p-4 border-2 rounded-xl">
-            <Toilet />
-            <p>Hygiène sanitaire</p>
-          </div>
-          <p className="text-base italic w-2/3">Choisissez vos options</p>
+        <div className="flex gap-4 items-center p-4 border rounded-xl">
+          <Toilet />
+          <p>Hygiène sanitaire</p>
         </div>
+        <p className="text-base w-2/3 text-center italic px-4">
+          Choisissez vos options
+        </p>
+
         <PreviousServiceButton handleClickPrevious={handleClickPrevious} />
       </div>
       <div className="w-full flex-1">

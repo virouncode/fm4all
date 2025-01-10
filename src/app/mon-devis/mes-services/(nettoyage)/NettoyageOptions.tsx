@@ -59,13 +59,13 @@ const NettoyageOptions = ({
   return (
     <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="2">
       <div className="flex justify-between items-center">
-        <div className="flex gap-4 items-center">
-          <div className="flex gap-4 items-center p-4 border-2 rounded-xl">
-            <SprayCan />
-            <p>Nettoyage et Propreté</p>
-          </div>
-          <p className="text-base italic">Choisissez vos options</p>
+        <div className="flex gap-4 items-center p-4 border rounded-xl">
+          <SprayCan />
+          <p>Nettoyage et Propreté</p>
         </div>
+        <p className="text-base w-2/3 text-center italic px-4">
+          Choisissez vos options
+        </p>
         <PreviousServiceButton handleClickPrevious={handleClickPrevious} />
       </div>
       <div className="w-full flex-1">

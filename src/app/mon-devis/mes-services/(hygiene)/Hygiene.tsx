@@ -58,18 +58,16 @@ const Hygiene = ({
   return (
     <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="3">
       <div className="flex justify-between items-center">
-        <div className="flex gap-4 items-center">
-          <div className="flex gap-4 items-center p-4 border-2 rounded-xl">
-            <Toilet />
-            <p>Hygiène sanitaire</p>
-          </div>
-          <p className="text-base italic w-2/3">
-            Un tarif forfaitaire tout compris pour vos sanitaires avec
-            distributeurs et consommables mis en place : essuie-main papier,
-            savon & papier hygiénique. La gamme détermine la finition des
-            distributeurs.
-          </p>
+        <div className="flex gap-4 items-center p-4 border rounded-xl">
+          <Toilet />
+          <p>Hygiène sanitaire</p>
         </div>
+        <p className="text-base w-2/3 text-center italic px-4">
+          Un tarif forfaitaire tout compris pour vos sanitaires avec
+          distributeurs et consommables mis en place : essuie-main papier, savon
+          & papier hygiénique. La gamme détermine la finition des distributeurs.
+        </p>
+
         <PreviousServiceButton handleClickPrevious={handleClickPrevious} />
       </div>
       <div className="w-full flex-1">

@@ -80,7 +80,6 @@ const DevisBreadcrumb = () => {
                     {route.name}
                   </BreadcrumbPage>
                 ) : (
-                  // isClient && (
                   <Link
                     href={`/mon-devis${route.url}`}
                     className={`${

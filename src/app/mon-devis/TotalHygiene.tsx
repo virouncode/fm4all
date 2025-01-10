@@ -92,7 +92,7 @@ const TotalHygiene = () => {
             )}
             {totalHygiene.prixBalai && (
               <div className="flex items-center justify-between">
-                <p>Option balai</p>
+                <p>Option balais WC</p>
                 <p className="text-end">
                   {formatNumber(totalHygiene.prixBalai)} € HT / an
                 </p>

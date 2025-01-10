@@ -9,6 +9,7 @@ import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SprayCan } from "lucide-react";
 import { useContext, useEffect } from "react";
 import NextServiceButton from "../NextServiceButton";
+import PreviousServiceButton from "../PreviousServiceButton";
 import NettoyagePropositions from "./NettoyagePropositions";
 
 type NettoyageProps = {
@@ -54,6 +55,8 @@ const Nettoyage = ({ nettoyagePropositions }: NettoyageProps) => {
     nettoyagePropositionsByFournisseurId
   );
 
+  console.log("formattedNettoyagePropositions", formattedNettoyagePropositions);
+
   const handleClickNext = () => {
     if (nettoyage.propositionId) {
       setServices((prev) => ({
@@ -67,20 +70,23 @@ const Nettoyage = ({ nettoyagePropositions }: NettoyageProps) => {
       }));
     }
   };
+  const handleClickPrevious = () => {};
 
   return (
     <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="1">
       <div className="flex justify-between items-center">
-        <div className="flex gap-4 items-center">
-          <div className="flex gap-4 items-center p-4 border-2 rounded-xl">
-            <SprayCan />
-            <p>Nettoyage et propreté</p>
-          </div>
-          <p className="text-base italic">
-            D’un nettoyage essentiel à une expérience 5 étoiles, choisissez la
-            prestation propreté qui vous ressemble.
-          </p>
+        <div className="flex gap-4 items-center p-4 border rounded-xl">
+          <SprayCan />
+          <p>Nettoyage et propreté</p>
         </div>
+        <p className="text-base w-2/3 text-center italic px-4">
+          D’un nettoyage essentiel à une expérience 5 étoiles, choisissez la
+          prestation propreté qui vous ressemble.
+        </p>
+        <PreviousServiceButton
+          handleClickPrevious={handleClickPrevious}
+          className="invisible"
+        />
       </div>
       <div className="w-full flex-1">
         <NettoyagePropositions

@@ -12,16 +12,19 @@ import {
 import { ClientContext } from "@/context/ClientProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
+import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { useContext } from "react";
 import TotalHygiene from "./TotalHygiene";
 import TotalIncendie from "./TotalIncendie";
 import TotalNettoyage from "./TotalNettoyage";
+import TotalMaintenance from "./TotalMaintenance";
 
 const Total = () => {
   const { client } = useContext(ClientContext);
   const { totalNettoyage } = useContext(TotalNettoyageContext);
   const { totalHygiene } = useContext(TotalHygieneContext);
+  const { totalMaintenance } = useContext(TotalMaintenanceContext);
   const { totalIncendie } = useContext(TotalIncendieContext);
   return (
     <Sheet>
@@ -42,6 +45,7 @@ const Total = () => {
               (totalHygiene.prixParfum ?? 0) +
               (totalHygiene.prixBalai ?? 0) +
               (totalHygiene.prixPoubelle ?? 0) +
+              (totalMaintenance.prixMaintenance ?? 0) +
               (totalIncendie.prixIncendie ?? 0)
           )}{" "}
           € / an
@@ -60,7 +64,7 @@ const Total = () => {
         <div className="flex flex-col gap-6">
           <TotalNettoyage />
           <TotalHygiene />
-          {/* <TotalMaintenance /> */}
+          <TotalMaintenance />
           <TotalIncendie />
         </div>
       </SheetContent>

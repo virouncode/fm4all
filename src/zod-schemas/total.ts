@@ -32,7 +32,12 @@ export const totalIncendieSchema = z.object({
   nomFournisseur: z.string().nullable(),
   prixIncendie: z.number().nullable(),
 });
+export const totalMaintenanceSchema = z.object({
+  nomFournisseur: z.string().nullable(),
+  prixMaintenance: z.number().nullable(),
+});
 
 export type TotalNettoyageType = z.infer<typeof totalNettoyageSchema>;
 export type TotalHygieneType = z.infer<typeof totalHygieneSchema>;
 export type TotalIncendieType = z.infer<typeof totalIncendieSchema>;
+export type TotalMaintenanceType = z.infer<typeof totalMaintenanceSchema>;

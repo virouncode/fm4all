@@ -1,7 +1,6 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RATIO } from "@/constants/ratio";
 import { ClientContext } from "@/context/ClientProvider";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
@@ -84,14 +83,13 @@ const HygieneOptionsPropositions = ({
             prixDesinfectantAbonnement:
               hygiene.dureeLocation === "oneShot"
                 ? null
-                : (proposition.tarifsDesinfectant +
-                    proposition.tarifsDistribDesinfectant) /
-                  RATIO,
+                : proposition.tarifsDesinfectant +
+                  proposition.tarifsDistribDesinfectant,
             prixDesinfectantAchat:
               hygiene.dureeLocation === "oneShot"
                 ? {
-                    prixAchat: proposition.tarifsDistribDesinfectant / RATIO,
-                    prixConsommables: proposition.tarifsDesinfectant / RATIO,
+                    prixAchat: proposition.tarifsDistribDesinfectant,
+                    prixConsommables: proposition.tarifsDesinfectant,
                   }
                 : null,
           }));
@@ -116,7 +114,7 @@ const HygieneOptionsPropositions = ({
         if (proposition) {
           setTotalHygiene((prev) => ({
             ...prev,
-            prixParfum: proposition.tarifsDistribParfum / RATIO,
+            prixParfum: proposition.tarifsDistribParfum,
           }));
         }
         return;
@@ -139,7 +137,7 @@ const HygieneOptionsPropositions = ({
         if (proposition) {
           setTotalHygiene((prev) => ({
             ...prev,
-            prixBalai: proposition.tarifsDistribBalai / RATIO,
+            prixBalai: proposition.tarifsDistribBalai,
           }));
         }
         return;
@@ -162,7 +160,7 @@ const HygieneOptionsPropositions = ({
         if (proposition) {
           setTotalHygiene((prev) => ({
             ...prev,
-            prixPoubelle: proposition.tarifsDistribPoubelle / RATIO,
+            prixPoubelle: proposition.tarifsDistribPoubelle,
           }));
         }
         return;

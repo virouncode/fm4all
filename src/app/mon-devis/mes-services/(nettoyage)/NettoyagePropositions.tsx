@@ -10,7 +10,9 @@ import { NettoyageContext } from "@/context/NettoyageProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
+import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
 import { GammeType } from "@/zod-schemas/gamme";
+import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useContext } from "react";
 
@@ -189,11 +191,27 @@ const NettoyagePropositions = ({
               className="flex border-b flex-1"
               key={propositions[0].fournisseurId}
             >
-              <TooltipProvider>
+              <TooltipProvider delayDuration={0}>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div className="flex w-1/4 items-center justify-center">
-                      {propositions[0].nomEntreprise}
+                      {getLogoFournisseurUrl(propositions[0].fournisseurId) ? (
+                        <div className="w-full h-full relative">
+                          <Image
+                            src={
+                              getLogoFournisseurUrl(
+                                propositions[0].fournisseurId
+                              ) as string
+                            }
+                            alt={`logo-de-${propositions[0].nomEntreprise}`}
+                            fill={true}
+                            className="w-full h-full object-contain"
+                            quality={100}
+                          />
+                        </div>
+                      ) : (
+                        propositions[0].nomEntreprise
+                      )}
                     </div>
                   </TooltipTrigger>
                   {propositions[0].slogan && (
@@ -225,7 +243,7 @@ const NettoyagePropositions = ({
                   proposition.freqAnnuelle && proposition.hParPassage
                     ? `${formatNumber(
                         proposition.freqAnnuelle / 52.008
-                      )} passages de ${proposition.hParPassage}h / semaine`
+                      )} passage(s) de ${proposition.hParPassage}h / semaine`
                     : "";
 
                 return (

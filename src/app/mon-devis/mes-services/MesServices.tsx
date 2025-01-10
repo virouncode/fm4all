@@ -9,6 +9,10 @@ import {
   getIncendieTarifs,
 } from "@/lib/queries/incendie/getIncendie";
 import {
+  getMaintenanceQuantites,
+  getMaintenanceTarifs,
+} from "@/lib/queries/maintenance/getMaintenance";
+import {
   getNettoyageQuantites,
   getNettoyageTarifs,
   getRepasseTarif,
@@ -47,6 +51,8 @@ const MesServices = async ({
     hygieneConsosTarif,
     incendieQuantite,
     incendieTarifs,
+    maintenanceQuantites,
+    maintenanceTarifs,
   ] = await Promise.all([
     getNettoyageQuantites(surface),
     getNettoyageTarifs(surface),
@@ -58,6 +64,8 @@ const MesServices = async ({
     getHygieneConsosTarif(effectif, fournisseurId),
     getIncendieQuantite(surface),
     getIncendieTarifs(surface),
+    getMaintenanceQuantites(surface),
+    getMaintenanceTarifs(surface),
   ]);
 
   const nettoyagePropositions = nettoyageTarifs
@@ -149,8 +157,10 @@ const MesServices = async ({
         distribTarifs={hygieneDistribTarifs}
         consosTarif={hygieneConsosTarif}
       />
-
-      <Maintenance />
+      <Maintenance
+        maintenanceQuantites={maintenanceQuantites}
+        maintenanceTarifs={maintenanceTarifs}
+      />
       <SecuriteIncendie
         incendieQuantite={incendieQuantite}
         incendieTarifs={incendieTarifs}

@@ -188,7 +188,7 @@ const SecuriteIncendiePropositions = ({
             </div>
 
             <div
-              className={`w-3/4 flex items-center justify-center text-xl gap-4 cursor-pointer bg-slate-400 ${
+              className={`w-3/4 flex items-center justify-center text-xl gap-4 cursor-pointer bg-slate-100 ${
                 incendie.propositionId === proposition.id
                   ? "ring-2 ring-inset ring-destructive"
                   : ""
