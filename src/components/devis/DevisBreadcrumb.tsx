@@ -68,8 +68,6 @@ const DevisBreadcrumb = () => {
       name: "Afficher mon devis",
     },
   ];
-  console.log("devisProgress in breadcrumb", devisProgress);
-
   return (
     <div className="flex justify-center">
       <Breadcrumb className="h-20 md:h-10">

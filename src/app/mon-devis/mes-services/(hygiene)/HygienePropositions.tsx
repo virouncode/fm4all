@@ -19,12 +19,14 @@ import { ClientContext } from "@/context/ClientProvider";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { formatNumber } from "@/lib/formatNumber";
+import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
 import { DureeLocationType } from "@/zod-schemas/dureeLocation";
 import { GammeType } from "@/zod-schemas/gamme";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs";
+import Image from "next/image";
 import { ChangeEvent, useContext } from "react";
 
 type HygienePropositionsProps = {
@@ -175,11 +177,29 @@ const HygienePropositions = ({
   return (
     <div className="h-full flex flex-col border rounded-xl overflow-hidden">
       <div className="flex border-b flex-1">
-        <div className="flex w-1/4 items-center justify-center flex-col gap-10">
-          <TooltipProvider>
+        <div className="flex w-1/4 items-center justify-center flex-col">
+          <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="text-lg">{distribTarifs[0].nomEntreprise}</div>
+                <div className="flex items-center justify-center h-1/4 w-full py-2">
+                  {getLogoFournisseurUrl(distribTarifs[0].fournisseurId) ? (
+                    <div className="w-full h-full relative">
+                      <Image
+                        src={
+                          getLogoFournisseurUrl(
+                            distribTarifs[0].fournisseurId
+                          ) as string
+                        }
+                        alt={`logo-de-${distribTarifs[0].nomEntreprise}`}
+                        fill={true}
+                        className="w-full h-full object-contain"
+                        quality={100}
+                      />
+                    </div>
+                  ) : (
+                    distribTarifs[0].nomEntreprise
+                  )}
+                </div>
               </TooltipTrigger>
               {distribTarifs[0].slogan && (
                 <TooltipContent>

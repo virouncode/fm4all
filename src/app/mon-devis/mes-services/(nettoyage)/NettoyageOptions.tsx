@@ -64,7 +64,7 @@ const NettoyageOptions = ({
           <p>Nettoyage et Propreté</p>
         </div>
         <p className="text-base w-2/3 text-center italic px-4">
-          Choisissez vos options
+          {`Choisissez vos options en gamme ${nettoyage.gammeSelected} chez ${samediDimancheProposition?.nomEntreprise}`}
         </p>
         <PreviousServiceButton handleClickPrevious={handleClickPrevious} />
       </div>

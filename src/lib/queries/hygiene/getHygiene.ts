@@ -41,6 +41,7 @@ export const getHygieneDistribQuantites = async (effectif: string) => {
 export const getHygieneDistribTarifs = async (fournisseurId?: string) => {
   if (!fournisseurId || isNaN(parseInt(fournisseurId))) return [];
   if (fournisseurId === "9") fournisseurId = "12";
+
   try {
     const results = await db
       .select({
@@ -79,6 +80,7 @@ export const getHygieneInstalDistribTarif = async (
   fournisseurId?: string
 ) => {
   if (!fournisseurId || isNaN(parseInt(fournisseurId))) return null;
+  if (fournisseurId === "9") fournisseurId = "12";
   try {
     const results = await db
       .select()
@@ -111,6 +113,7 @@ export const getHygieneConsosTarif = async (
   fournisseurId?: string
 ) => {
   if (!fournisseurId || isNaN(parseInt(fournisseurId))) return null;
+  if (fournisseurId === "9") fournisseurId = "12";
   try {
     const results = await db
       .select({

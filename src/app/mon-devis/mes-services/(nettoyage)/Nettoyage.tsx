@@ -48,9 +48,6 @@ const Nettoyage = ({ nettoyagePropositions }: NettoyageProps) => {
   const formattedNettoyagePropositions = Object.values(
     nettoyagePropositionsByFournisseurId
   );
-
-  console.log("formattedNettoyagePropositions", formattedNettoyagePropositions);
-
   const handleClickNext = () => {
     if (nettoyage.propositionId) {
       setServices((prev) => ({

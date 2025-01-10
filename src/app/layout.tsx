@@ -17,7 +17,6 @@ import TotalMaintenanceProvider from "@/context/TotalMaintenanceProvider";
 import TotalNettoyageProvider from "@/context/TotalNettoyageProvider";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
-import Total from "./mon-devis/Total";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -72,7 +71,6 @@ export default function RootLayout({
                               >
                                 <Header />
                                 {children}
-                                <Total />
                                 <Footer />
                                 <Toaster />
                               </ThemeProvider>

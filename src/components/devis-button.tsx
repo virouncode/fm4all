@@ -25,7 +25,6 @@ const DevisButton = ({
   const { client } = useContext(ClientContext);
   const { nettoyage } = useContext(NettoyageContext);
   const serviceSearchParams = new URLSearchParams();
-  console.log("clientContext", client);
 
   if (client.effectif) {
     serviceSearchParams.set(

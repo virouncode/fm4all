@@ -9,8 +9,10 @@ import {
 } from "@/components/ui/tooltip";
 import { IncendieContext } from "@/context/IncendieProvider";
 import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
+import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
 import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites";
 import { SelectIncendieTarifsType } from "@/zod-schemas/incendieTarifs";
+import Image from "next/image";
 import { ChangeEvent, useContext } from "react";
 
 type SecuriteIncendiePropositionsProps = {
@@ -33,6 +35,7 @@ const SecuriteIncendiePropositions = ({
 
   const propositions = incendieTarifs.map((tarif) => ({
     id: tarif.id,
+    fournisseurId: tarif.fournisseurId,
     nomEntreprise: tarif.nomEntreprise,
     slogan: tarif.slogan,
     nbExtincteurs,
@@ -115,7 +118,25 @@ const SecuriteIncendiePropositions = ({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="text-lg">{proposition.nomEntreprise}</div>
+                    <div className="flex items-center justify-center h-1/4 w-full py-2">
+                      {getLogoFournisseurUrl(proposition.fournisseurId) ? (
+                        <div className="w-full h-full relative">
+                          <Image
+                            src={
+                              getLogoFournisseurUrl(
+                                proposition.fournisseurId
+                              ) as string
+                            }
+                            alt={`logo-de-${proposition.nomEntreprise}`}
+                            fill={true}
+                            className="w-full h-full object-contain"
+                            quality={100}
+                          />
+                        </div>
+                      ) : (
+                        proposition.nomEntreprise
+                      )}
+                    </div>
                   </TooltipTrigger>
                   {proposition.slogan && (
                     <TooltipContent>

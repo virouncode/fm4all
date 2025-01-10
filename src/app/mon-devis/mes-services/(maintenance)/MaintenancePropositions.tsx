@@ -8,6 +8,8 @@ import {
 import { MaintenanceContext } from "@/context/MaintenanceProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
 import { formatNumber } from "@/lib/formatNumber";
+import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
+import Image from "next/image";
 import { useContext } from "react";
 
 type MaintenancePropositionsProps = {
@@ -80,11 +82,27 @@ const MaintenancePropositions = ({
               className="flex border-b flex-1"
               key={propositions[0].fournisseurId}
             >
-              <TooltipProvider>
+              <TooltipProvider delayDuration={0}>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div className="flex w-1/4 items-center justify-center">
-                      {propositions[0].nomEntreprise}
+                      {getLogoFournisseurUrl(propositions[0].fournisseurId) ? (
+                        <div className="w-full h-full relative">
+                          <Image
+                            src={
+                              getLogoFournisseurUrl(
+                                propositions[0].fournisseurId
+                              ) as string
+                            }
+                            alt={`logo-de-${propositions[0].nomEntreprise}`}
+                            fill={true}
+                            className="w-full h-full object-contain"
+                            quality={100}
+                          />
+                        </div>
+                      ) : (
+                        propositions[0].nomEntreprise
+                      )}
                     </div>
                   </TooltipTrigger>
                   {propositions[0].slogan && (

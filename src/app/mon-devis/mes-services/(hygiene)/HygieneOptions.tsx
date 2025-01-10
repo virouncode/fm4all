@@ -50,7 +50,7 @@ const HygieneOptions = ({
           <p>Hygiène sanitaire</p>
         </div>
         <p className="text-base w-2/3 text-center italic px-4">
-          Choisissez vos options
+          {`Choisissez vos options en gamme chez ${distribTarifs?.[0]?.nomEntreprise}`}
         </p>
 
         <PreviousServiceButton handleClickPrevious={handleClickPrevious} />

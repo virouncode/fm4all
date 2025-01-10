@@ -70,8 +70,6 @@ const Maintenance = ({
         })
       : [];
 
-  console.log("propositions", propositions);
-
   const propositionsByFournisseurId = propositions.reduce<
     Record<
       number,
