@@ -20,7 +20,7 @@ import { HygieneContext } from "@/context/HygieneProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
-import { DureeLocationType } from "@/zod-schemas/dureeLocation";
+import { DureeLocationHygieneType } from "@/zod-schemas/dureeLocation";
 import { GammeType } from "@/zod-schemas/gamme";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
@@ -167,7 +167,7 @@ const HygienePropositions = ({
     }
   };
 
-  const handleChangeDureeLocation = (value: DureeLocationType) => {
+  const handleChangeDureeLocation = (value: DureeLocationHygieneType) => {
     setHygiene((prev) => ({
       ...prev,
       dureeLocation: value,

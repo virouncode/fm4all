@@ -10,16 +10,19 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ClientContext } from "@/context/ClientProvider";
+import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { Calculator } from "lucide-react";
 import { useContext } from "react";
+import TotalCafe from "./TotalCafe";
 import TotalHygiene from "./TotalHygiene";
 import TotalIncendie from "./TotalIncendie";
 import TotalMaintenance from "./TotalMaintenance";
 import TotalNettoyage from "./TotalNettoyage";
+import TotalThe from "./TotalThe";
 
 const Total = () => {
   const { client } = useContext(ClientContext);
@@ -27,20 +30,34 @@ const Total = () => {
   const { totalHygiene } = useContext(TotalHygieneContext);
   const { totalMaintenance } = useContext(TotalMaintenanceContext);
   const { totalIncendie } = useContext(TotalIncendieContext);
-  const prixNettoyage =
-    (totalNettoyage.prixService ?? 0) +
-    (totalNettoyage.prixRepasse ?? 0) +
-    (totalNettoyage.prixSamedi ?? 0) +
-    (totalNettoyage.prixDimanche ?? 0) +
-    (totalNettoyage.prixVitrerie ?? 0);
-  const prixHygiene =
-    (totalHygiene.prixTrilogieAbonnement ?? 0) +
-    (totalHygiene.prixDesinfectantAbonnement ?? 0) +
-    (totalHygiene.prixParfum ?? 0) +
-    (totalHygiene.prixBalai ?? 0) +
-    (totalHygiene.prixPoubelle ?? 0);
+  const { totalCafe } = useContext(TotalCafeContext);
+  const prixNettoyage = [
+    totalNettoyage.prixService,
+    totalNettoyage.prixRepasse,
+    totalNettoyage.prixSamedi,
+    totalNettoyage.prixDimanche,
+    totalNettoyage.prixVitrerie,
+  ]
+    .filter((value) => value !== null)
+    .reduce((acc, curr) => acc + curr, 0);
+  const prixHygiene = [
+    totalHygiene.prixTrilogieAbonnement,
+    totalHygiene.prixTrilogieAchat?.prixConsommables,
+    totalHygiene.prixDesinfectantAbonnement,
+    totalHygiene.prixDesinfectantAchat?.prixConsommables,
+    totalHygiene.prixParfum,
+    totalHygiene.prixBalai,
+    totalHygiene.prixPoubelle,
+  ]
+    .filter((value) => value !== null && value !== undefined)
+    .reduce((acc, curr) => acc + curr, 0);
   const prixMaintenance = totalMaintenance.prixMaintenance ?? 0;
   const prixIncendie = totalIncendie.prixIncendie ?? 0;
+  const prixCafe = totalCafe.prixCafeMachines.reduce(
+    (acc, item) => acc + (item.prix ?? 0),
+    0
+  );
+  const prixThe = totalCafe.prixThe ?? 0;
 
   return (
     <Sheet>
@@ -52,7 +69,12 @@ const Total = () => {
         >
           <Calculator />
           {Math.round(
-            prixNettoyage + prixHygiene + prixMaintenance + prixIncendie
+            prixNettoyage +
+              prixHygiene +
+              prixMaintenance +
+              prixIncendie +
+              prixCafe +
+              prixThe
           )}{" "}
           € / an
         </Button>
@@ -72,6 +94,8 @@ const Total = () => {
           {prixHygiene ? <TotalHygiene /> : null}
           {prixMaintenance ? <TotalMaintenance /> : null}
           {prixIncendie ? <TotalIncendie /> : null}
+          {prixCafe ? <TotalCafe /> : null}
+          {prixThe ? <TotalThe /> : null}
         </div>
       </SheetContent>
     </Sheet>

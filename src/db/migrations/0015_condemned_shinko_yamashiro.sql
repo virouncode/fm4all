@@ -1,0 +1,1 @@
+ALTER TABLE "cafe_conso_tarifs" RENAME COLUMN "prixUnitaire" TO "prix_unitaire";

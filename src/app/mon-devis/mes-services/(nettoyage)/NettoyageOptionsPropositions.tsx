@@ -1,6 +1,7 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { S_OUVREES_PAR_AN } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
@@ -37,9 +38,9 @@ const NettoyageOptionsPropositions = ({
   const { nettoyage, setNettoyage } = useContext(NettoyageContext);
   const { setTotalNettoyage } = useContext(TotalNettoyageContext);
   const color =
-    repasseProposition?.gamme === "essentiel"
+    samediDimancheProposition?.gamme === "essentiel"
       ? "fm4allessential"
-      : repasseProposition?.gamme === "confort"
+      : samediDimancheProposition?.gamme === "confort"
       ? "fm4allcomfort"
       : "fm4allexcellence";
 
@@ -160,13 +161,13 @@ const NettoyageOptionsPropositions = ({
     repasseProposition?.hParPassage && repasseProposition?.freqAnnuelle
       ? `${formatNumber(
           (repasseProposition.hParPassage * repasseProposition.freqAnnuelle) /
-            52.008
+            S_OUVREES_PAR_AN
         )} h / semaine en plus*`
       : "";
   const repasseNbPassagesParSemaine =
     repasseProposition?.freqAnnuelle && repasseProposition.hParPassage
       ? `${formatNumber(
-          repasseProposition.freqAnnuelle / 52.008
+          repasseProposition.freqAnnuelle / S_OUVREES_PAR_AN
         )}  passage(s) de ${repasseProposition.hParPassage} h / semaine`
       : "";
   const samediPrixAnnuel = samediDimancheProposition?.prixAnnuelSamedi
@@ -344,4 +345,4 @@ const NettoyageOptionsPropositions = ({
 export default NettoyageOptionsPropositions;
 
 //heures  par an = heures par passage * frequence annuelle
-//heures  par semaine = heures  par an / (nombre de semaines ouvrées dans l'année: 52.008 = 21.67*12/5)
+//heures  par semaine = heures  par an / (nombre de semaines ouvrées dans l'année: S_OUVREES_PAR_AN = 21.67*12/5)

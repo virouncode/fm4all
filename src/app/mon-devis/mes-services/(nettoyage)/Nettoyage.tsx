@@ -22,6 +22,20 @@ const Nettoyage = ({ nettoyagePropositions }: NettoyageProps) => {
   const { nettoyage } = useContext(NettoyageContext);
   const { setServices } = useContext(ServicesContext);
   useScrollIntoService();
+  const handleClickNext = () => {
+    if (nettoyage.propositionId) {
+      setServices((prev) => ({
+        ...prev,
+        currentServiceId: prev.currentServiceId + 1,
+      }));
+    } else {
+      setServices((prev) => ({
+        ...prev,
+        currentServiceId: 5,
+      }));
+    }
+  };
+  const handleClickPrevious = () => {};
 
   const nettoyagePropositionsByFournisseurId = nettoyagePropositions.reduce<
     Record<
@@ -48,20 +62,6 @@ const Nettoyage = ({ nettoyagePropositions }: NettoyageProps) => {
   const formattedNettoyagePropositions = Object.values(
     nettoyagePropositionsByFournisseurId
   );
-  const handleClickNext = () => {
-    if (nettoyage.propositionId) {
-      setServices((prev) => ({
-        ...prev,
-        currentServiceId: prev.currentServiceId + 1,
-      }));
-    } else {
-      setServices((prev) => ({
-        ...prev,
-        currentServiceId: 5,
-      }));
-    }
-  };
-  const handleClickPrevious = () => {};
 
   return (
     <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="1">

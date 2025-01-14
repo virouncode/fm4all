@@ -56,7 +56,9 @@ const MesLocaux = () => {
   });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    const name = e.target.name;
+    let value: string | number = e.target.value;
+    if (name === "surface" || name === "effectif") value = parseInt(value);
     setClient((prev) => ({
       ...prev,
       [name]: value,

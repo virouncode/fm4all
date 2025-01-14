@@ -1,4 +1,4 @@
-import { RATIO } from "@/constants/ratio";
+import { RATIO } from "@/constants/constants";
 import { db } from "@/db";
 import { fournisseurs, incendieQuantites, incendieTarifs } from "@/db/schema";
 import { errorHelper } from "@/lib/errorHelper";

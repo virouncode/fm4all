@@ -5,6 +5,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { S_OUVREES_PAR_AN } from "@/constants/constants";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
@@ -236,13 +237,13 @@ const NettoyagePropositions = ({
                   proposition.hParPassage && proposition.freqAnnuelle
                     ? `${formatNumber(
                         (proposition.hParPassage * proposition.freqAnnuelle) /
-                          52.008
+                          S_OUVREES_PAR_AN
                       )} h / semaine*`
                     : "";
                 const nbPassagesParSemaine =
                   proposition.freqAnnuelle && proposition.hParPassage
                     ? `${formatNumber(
-                        proposition.freqAnnuelle / 52.008
+                        proposition.freqAnnuelle / S_OUVREES_PAR_AN
                       )} passage(s) de ${proposition.hParPassage}h / semaine`
                     : "";
 
@@ -283,4 +284,4 @@ export default NettoyagePropositions;
 //heures par an = heures par passage * frequence annuelle
 
 // X passages par an
-// Y passages par semaine = X / 52.008
+// Y passages par semaine = X / S_OUVREES_PAR_AN

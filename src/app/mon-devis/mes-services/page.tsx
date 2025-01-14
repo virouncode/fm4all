@@ -47,7 +47,7 @@ const page = async ({
       </section>
     );
   }
-  if (nettoyageGamme && !gammes.includes(nettoyageGamme) === undefined) {
+  if (nettoyageGamme && !gammes.includes(nettoyageGamme)) {
     return (
       <section className="flex flex-col gap-6">
         La gamme de nettoyage n&apos;est pas valide.

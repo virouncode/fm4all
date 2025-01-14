@@ -36,8 +36,16 @@ export const totalMaintenanceSchema = z.object({
   nomFournisseur: z.string().nullable(),
   prixMaintenance: z.number().nullable(),
 });
+export const totalCafeSchema = z.object({
+  nomFournisseur: z.string().nullable(),
+  prixCafeMachines: z.array(
+    z.object({ machineId: z.number(), prix: z.number().nullable() })
+  ),
+  prixThe: z.number().nullable(),
+});
 
 export type TotalNettoyageType = z.infer<typeof totalNettoyageSchema>;
 export type TotalHygieneType = z.infer<typeof totalHygieneSchema>;
 export type TotalIncendieType = z.infer<typeof totalIncendieSchema>;
 export type TotalMaintenanceType = z.infer<typeof totalMaintenanceSchema>;
+export type TotalCafeType = z.infer<typeof totalCafeSchema>;

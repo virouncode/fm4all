@@ -4,13 +4,17 @@ import { Didact_Gothic } from "next/font/google";
 
 import Footer from "@/components/footer";
 import { Toaster } from "@/components/ui/toaster";
+import CafeProvider from "@/context/CafeProvider";
 import ClientProvider from "@/context/ClientProvider";
 import DevisProgressProvider from "@/context/DevisProgressProvider";
+import FoodBeverageProvider from "@/context/FoodBeverageProvider";
 import HygieneProvider from "@/context/HygieneProvider";
 import IncendieProvider from "@/context/IncendieProvider";
 import MaintenanceProvider from "@/context/MaintenanceProvider";
 import NettoyageProvider from "@/context/NettoyageProvider";
 import ServicesProvider from "@/context/ServicesProvider";
+import TheProvider from "@/context/TheProvider";
+import TotalCafeProvider from "@/context/TotalCafeProvider";
 import TotalHygieneProvider from "@/context/TotalHygieneProvider";
 import TotalIncendieProvider from "@/context/TotalIncendieProvider";
 import TotalMaintenanceProvider from "@/context/TotalMaintenanceProvider";
@@ -59,25 +63,33 @@ export default function RootLayout({
                 <HygieneProvider>
                   <IncendieProvider>
                     <MaintenanceProvider>
-                      <TotalNettoyageProvider>
-                        <TotalHygieneProvider>
-                          <TotalIncendieProvider>
-                            <TotalMaintenanceProvider>
-                              <ThemeProvider
-                                attribute="class"
-                                defaultTheme="light"
-                                enableSystem
-                                disableTransitionOnChange
-                              >
-                                <Header />
-                                {children}
-                                <Footer />
-                                <Toaster />
-                              </ThemeProvider>
-                            </TotalMaintenanceProvider>
-                          </TotalIncendieProvider>
-                        </TotalHygieneProvider>
-                      </TotalNettoyageProvider>
+                      <FoodBeverageProvider>
+                        <CafeProvider>
+                          <TheProvider>
+                            <TotalNettoyageProvider>
+                              <TotalHygieneProvider>
+                                <TotalIncendieProvider>
+                                  <TotalMaintenanceProvider>
+                                    <TotalCafeProvider>
+                                      <ThemeProvider
+                                        attribute="class"
+                                        defaultTheme="light"
+                                        enableSystem
+                                        disableTransitionOnChange
+                                      >
+                                        <Header />
+                                        {children}
+                                        <Footer />
+                                        <Toaster />
+                                      </ThemeProvider>
+                                    </TotalCafeProvider>
+                                  </TotalMaintenanceProvider>
+                                </TotalIncendieProvider>
+                              </TotalHygieneProvider>
+                            </TotalNettoyageProvider>
+                          </TheProvider>
+                        </CafeProvider>
+                      </FoodBeverageProvider>
                     </MaintenanceProvider>
                   </IncendieProvider>
                 </HygieneProvider>
