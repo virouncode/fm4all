@@ -71,12 +71,12 @@ const MachinePropositions = ({
   const nbBoissonsParJParMachine = Math.round(
     (roundEffectif(machine.nbPersonnes) * 2) / nbMachines
   );
-  const limiteBoissonsJParMachine = toLimiteBoissonsParJParMachine(
+  const limiteTassesJParMachine = toLimiteBoissonsParJParMachine(
     nbBoissonsParJParMachine
   );
   const tarifsMachines = cafeMachinesTarifs?.filter(
     (tarif) =>
-      tarif.limiteTassesJ === limiteBoissonsJParMachine &&
+      tarif.limiteTassesJ === limiteTassesJParMachine &&
       tarif.type === machine.typeBoissons &&
       tarif[machine.dureeLocation] !== null
   );

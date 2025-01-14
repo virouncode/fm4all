@@ -5,7 +5,7 @@ import { z } from "zod";
 export const selectCafeMachinesTarifsSchema = createSelectSchema(
   cafeMachinesTarifs,
   {
-    limiteBoissonsJ: (schema) =>
+    limiteTassesJ: (schema) =>
       schema.min(20, "La limite de boissons par jour est obligatoire"),
   }
 ).extend({
