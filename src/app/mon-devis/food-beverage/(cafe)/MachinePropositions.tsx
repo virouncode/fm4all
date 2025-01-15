@@ -251,8 +251,6 @@ const MachinePropositions = ({
           nbPersonnes: parseInt(effectif),
           nbMachines: 0,
           gammeSelected: null,
-          validated: true,
-          propositionId: null,
         },
       ].sort((a, b) => a.machineId - b.machineId),
     }));

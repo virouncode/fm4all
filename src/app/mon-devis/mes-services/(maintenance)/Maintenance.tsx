@@ -34,7 +34,7 @@ const Maintenance = ({
   };
 
   const handleClickPrevious = () => {
-    if (nettoyage.propositionId) {
+    if (nettoyage.gammeSelected && nettoyage.fournisseurId) {
       if (!hygiene.trilogieGammeSelected) {
         setServices((prev) => ({
           ...prev,

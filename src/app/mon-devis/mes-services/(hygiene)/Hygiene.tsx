@@ -50,7 +50,7 @@ const Hygiene = ({
     }
   };
 
-  if (!nettoyage.propositionId) {
+  if (!nettoyage.gammeSelected || !nettoyage.fournisseurId) {
     return null;
   }
 

@@ -8,9 +8,9 @@ import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQ
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { Toilet } from "lucide-react";
 import { useContext } from "react";
+import PropositionsFooter from "../PropositionsFooter";
 import PropositionsTitle from "../PropositionsTitle";
 import HygieneOptionsPropositions from "./HygieneOptionsPropositions";
-import PropositionsFooter from "../PropositionsFooter";
 
 type HygieneOptionsProps = {
   distribQuantites?: SelectHygieneDistribQuantitesType | null;
@@ -39,7 +39,11 @@ const HygieneOptions = ({
       currentServiceId: prev.currentServiceId - 1,
     }));
   };
-  if (!nettoyage.propositionId || !hygiene.trilogieGammeSelected) {
+  if (
+    !nettoyage.gammeSelected ||
+    !nettoyage.fournisseurId ||
+    !hygiene.trilogieGammeSelected
+  ) {
     return null;
   }
   return (
