@@ -68,7 +68,7 @@ const MachineUpdateForm = ({
       const cafeQuantite = cafeQuantites.find(
         ({ effectif }) => effectif === roundEffectif(machine.nbPersonnes)
       );
-      const nbMachines = machine.nbMachines;
+      const nbMachines = cafeQuantite?.nbMachines ?? 1;
       const nbCafesParAn = cafeQuantite?.nbCafesParAn as number;
       const nbTassesParJParMachine = Math.round(
         (roundEffectif(machine.nbPersonnes) * 2) / nbMachines
@@ -236,11 +236,15 @@ const MachineUpdateForm = ({
   const handleChangeEffectif = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     const newNbPersonnes = value ? parseInt(value) : client.effectif ?? 0;
+    console.log("newNbPersonnes", newNbPersonnes);
+    console.log("newNbPersonnesRounded", roundEffectif(newNbPersonnes));
+
     if (cafe.cafeFournisseurId) {
       const cafeQuantite = cafeQuantites.find(
         ({ effectif }) => effectif === roundEffectif(newNbPersonnes)
       );
-      const nbMachines = machine.nbMachines;
+      const nbMachines = cafeQuantite?.nbMachines ?? 1;
+
       const nbCafesParAn = cafeQuantite?.nbCafesParAn as number;
       const nbTassesParJParMachine = Math.round(
         (roundEffectif(newNbPersonnes) * 2) / nbMachines
@@ -248,6 +252,7 @@ const MachineUpdateForm = ({
       const limiteTassesJParMachine = toLimiteBoissonsParJParMachine(
         nbTassesParJParMachine
       );
+
       const tarifMachine = cafeMachinesTarifs.find(
         (tarif) =>
           tarif.limiteTassesJ === limiteTassesJParMachine &&
@@ -411,7 +416,7 @@ const MachineUpdateForm = ({
       const cafeQuantite = cafeQuantites.find(
         ({ effectif }) => effectif === roundEffectif(machine.nbPersonnes)
       );
-      const nbMachines = machine.nbMachines;
+      const nbMachines = cafeQuantite?.nbMachines ?? 1;
       const nbCafesParAn = cafeQuantite?.nbCafesParAn as number;
       const nbTassesParJParMachine = Math.round(
         (roundEffectif(machine.nbPersonnes) * 2) / nbMachines
