@@ -19,6 +19,7 @@ import {
   getVitrerieTarif,
 } from "@/lib/queries/nettoyage/getNettoyage";
 import { GammeType } from "@/zod-schemas/gamme";
+import Link from "next/link";
 import Hygiene from "./(hygiene)/Hygiene";
 import HygieneOptions from "./(hygiene)/HygieneOptions";
 import SecuriteIncendie from "./(incendie)/SecuriteIncendie";
@@ -67,33 +68,50 @@ const MesServices = async ({
     getMaintenanceTarifs(surface),
   ]);
 
+  if (
+    !nettoyageTarifs ||
+    nettoyageTarifs.length === 0 ||
+    !nettoyageQuantites ||
+    nettoyageQuantites.length === 0
+  ) {
+    return (
+      <section className="flex h-dvh items-center justify-center text-lg">
+        <p>
+          Nous n&apos;avons pas trouvé de tarifs de nettoyage.{" "}
+          <Link href="/mon-devis/mes-locaux" className="underline">
+            Veuillez réessayer
+          </Link>
+          .
+        </p>
+      </section>
+    );
+  }
+  //Proposition de service de nettoyage
   const nettoyagePropositions = nettoyageTarifs
-    ? nettoyageTarifs
-        .map((tarif) => {
-          const freqAnnuelle =
-            nettoyageQuantites?.find(
-              (item) =>
-                item.gamme === tarif.gamme && item.surface === parseInt(surface)
-            )?.freqAnnuelle || 0;
-          const hParPassage = tarif.hParPassage;
-          const tauxHoraire = tarif.tauxHoraire;
+    .map((tarif) => {
+      const freqAnnuelle =
+        nettoyageQuantites.find(
+          (item) =>
+            item.gamme === tarif.gamme && item.surface === parseInt(surface)
+        )?.freqAnnuelle || 0;
+      const hParPassage = tarif.hParPassage;
+      const tauxHoraire = tarif.tauxHoraire;
+      return {
+        ...tarif,
+        freqAnnuelle,
+        prixAnnuel: Math.round(freqAnnuelle * hParPassage * tauxHoraire),
+      };
+    })
+    .sort((a, b) => a.fournisseurId - b.fournisseurId);
 
-          return {
-            ...tarif,
-            freqAnnuelle,
-            prixAnnuel: Math.round(freqAnnuelle * hParPassage * tauxHoraire),
-          };
-        })
-        .sort((a, b) => a.fournisseurId - b.fournisseurId)
-    : [];
-
+  //Proposition des options
   let repasseProposition = null;
   let vitrerieProposition = null;
   let samediDimancheProposition = null;
 
-  if (nettoyageGamme && fournisseurId && nettoyageTarifs && vitrerieTarif) {
+  if (nettoyageGamme && fournisseurId && vitrerieTarif) {
     const freqAnnuelle =
-      nettoyageQuantites?.find(
+      nettoyageQuantites.find(
         (item) =>
           item.gamme === nettoyageGamme && item.surface === parseInt(surface)
       )?.freqAnnuelle || 0;

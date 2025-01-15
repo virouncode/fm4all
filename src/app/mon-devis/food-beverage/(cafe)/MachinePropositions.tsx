@@ -6,174 +6,44 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { RATIO_CHOCO, RATIO_LAIT } from "@/constants/constants";
 import { TypesBoissonsType } from "@/constants/typesBoissons";
 import { CafeContext } from "@/context/CafeProvider";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
+import { TheContext } from "@/context/TheProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import { toast } from "@/hooks/use-toast";
 import { formatNumber } from "@/lib/formatNumber";
 import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
-import { roundEffectif } from "@/lib/roundEffectif";
-import { toLimiteBoissonsParJParMachine } from "@/lib/roundLimitBoissonsParJParMachine";
 import { CafeMachineType } from "@/zod-schemas/cafe";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
-import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine";
-import { SelectCafeMachinesTarifsType } from "@/zod-schemas/cafeMachinesTarifs";
-import { SelectCafeQuantitesType } from "@/zod-schemas/cafeQuantites";
-import { SelectChocoConsoTarifsType } from "@/zod-schemas/chocoConsoTarifs";
 import { DureeLocationCafeType } from "@/zod-schemas/dureeLocation";
-import { gammes } from "@/zod-schemas/gamme";
-import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import NextServiceButton from "../../mes-services/NextServiceButton";
 
 type MachinePropositionsProps = {
-  machineId: number;
-  cafeMachines?: SelectCafeMachinesType[];
-  cafeQuantites?: SelectCafeQuantitesType[];
-  cafeMachinesTarifs?: SelectCafeMachinesTarifsType[];
-  cafeConsoTarifs?: SelectCafeConsoTarifsType[];
-  laitConsoTarifs?: SelectLaitConsoTarifsType[];
-  chocoConsoTarifs?: SelectChocoConsoTarifsType[];
   effectif: string;
-  cafeFournisseurId?: string;
+  formattedPropositions: (SelectCafeConsoTarifsType & {
+    prixAnnuel: number | null;
+    modeleMachine: string | null;
+    marqueMachine: string | null;
+    reconditionne: boolean | null;
+  })[][];
+  machine: CafeMachineType;
 };
 
 const MachinePropositions = ({
-  machineId,
-  cafeMachines,
-  cafeQuantites,
-  cafeMachinesTarifs,
-  cafeConsoTarifs,
-  laitConsoTarifs,
-  chocoConsoTarifs,
   effectif,
-  cafeFournisseurId,
+  formattedPropositions,
+  machine,
 }: MachinePropositionsProps) => {
   const { setFoodBeverage } = useContext(FoodBeverageContext);
-  const { setCafe } = useContext(CafeContext);
+  const { cafe, setCafe } = useContext(CafeContext);
+  const { setThe } = useContext(TheContext);
   const { setTotalCafe } = useContext(TotalCafeContext);
-  const { cafe } = useContext(CafeContext);
   const router = useRouter();
-  const machine = cafe.machines.find(
-    (item) => item.machineId === machineId
-  ) as CafeMachineType;
-
-  const nbMachines = cafeQuantites?.find(
-    ({ effectif }) => effectif === roundEffectif(machine.nbPersonnes)
-  )?.nbMachines as number;
-  const nbCafesParAn = cafeQuantites?.find(
-    ({ effectif }) => effectif === roundEffectif(machine.nbPersonnes)
-  )?.nbCafesParAn as number;
-  const nbBoissonsParJParMachine = Math.round(
-    (roundEffectif(machine.nbPersonnes) * 2) / nbMachines
-  );
-  const limiteTassesJParMachine = toLimiteBoissonsParJParMachine(
-    nbBoissonsParJParMachine
-  );
-  const tarifsMachines = cafeMachinesTarifs?.filter(
-    (tarif) =>
-      tarif.limiteTassesJ === limiteTassesJParMachine &&
-      tarif.type === machine.typeBoissons &&
-      tarif[machine.dureeLocation] !== null
-  );
-  const fournisseursId =
-    cafeFournisseurId &&
-    cafe.machines.map(({ machineId }) => machineId)[0] !== machineId
-      ? [parseInt(cafeFournisseurId)]
-      : tarifsMachines?.map(({ fournisseurId }) => fournisseurId);
-
-  const propositions =
-    cafeConsoTarifs
-      ?.filter(
-        (tarif) =>
-          tarif.effectif === roundEffectif(machine.nbPersonnes) &&
-          fournisseursId?.includes(tarif.fournisseurId)
-      )
-      .map((tarif) => {
-        const tarifCafeConso = tarif.prixUnitaire * nbCafesParAn;
-        const tarifLaitConso =
-          machine.typeBoissons !== "cafe"
-            ? (laitConsoTarifs?.find(
-                ({ effectif }) =>
-                  effectif === roundEffectif(machine.nbPersonnes)
-              )?.prixUnitaire ?? 0) *
-              nbCafesParAn *
-              RATIO_LAIT
-            : 0;
-        const tarifChocoConso =
-          machine.typeBoissons === "chocolat"
-            ? (chocoConsoTarifs?.find(
-                ({ effectif }) =>
-                  effectif === roundEffectif(machine.nbPersonnes)
-              )?.prixUnitaire ?? 0) *
-              nbCafesParAn *
-              RATIO_CHOCO
-            : 0;
-        const tarifMachineRecord = tarifsMachines?.find(
-          ({ fournisseurId }) => fournisseurId === tarif.fournisseurId
-        ) as SelectCafeMachinesTarifsType;
-
-        const modeleMachine = tarifMachineRecord
-          ? cafeMachines?.find(
-              ({ id }) => id === tarifMachineRecord?.cafeMachineId
-            )?.modele ?? null
-          : null;
-        const marqueMachine = tarifMachineRecord
-          ? cafeMachines?.find(
-              ({ id }) => id === tarifMachineRecord?.cafeMachineId
-            )?.marque ?? null
-          : null;
-        const reconditionne = tarifMachineRecord
-          ? tarifMachineRecord.reconditionne
-          : null;
-        const prixAnnuel = Math.round(
-          tarifCafeConso +
-            tarifLaitConso +
-            tarifChocoConso +
-            nbMachines *
-              ((tarifMachineRecord[machine.dureeLocation] as number) +
-                (tarifMachineRecord.paMaintenance ?? 0) +
-                (tarifMachineRecord.prixInstallation ?? 0))
-        );
-        return {
-          ...tarif,
-          prixAnnuel,
-          modeleMachine: modeleMachine,
-          marqueMachine: marqueMachine,
-          reconditionne,
-        };
-      }) ?? [];
-
-  const propositionsByFournisseurId = propositions
-    .filter((proposition) => proposition.prixAnnuel)
-    .reduce<
-      Record<
-        number,
-        (SelectCafeConsoTarifsType & {
-          prixAnnuel: number | null;
-          modeleMachine: string | null;
-          marqueMachine: string | null;
-          reconditionne: boolean | null;
-        })[]
-      >
-    >((acc, item) => {
-      const { fournisseurId } = item;
-      if (!acc[fournisseurId]) {
-        acc[fournisseurId] = [];
-      }
-      // Add the item to the appropriate array
-      acc[fournisseurId].push(item);
-      acc[fournisseurId].sort(
-        (a, b) => gammes.indexOf(a.gamme) - gammes.indexOf(b.gamme)
-      );
-      return acc;
-    }, {});
-
-  const formattedPropositions = Object.values(propositionsByFournisseurId);
+  const cafeMachinesIds = cafe.machines.map((item) => item.machineId);
 
   const handleClickProposition = (
     propositionId: number,
@@ -181,11 +51,102 @@ const MachinePropositions = ({
     nomEntreprise: string,
     prixAnnuel: number | null
   ) => {
+    //Si c'est la première machine
+    if (cafeMachinesIds[0] === machine.machineId) {
+      //Je decoche
+      if (machine.propositionId === propositionId) {
+        //Je retire toutes les propositions cafe et the mais je garde les machines
+        setCafe((prev) => ({
+          ...prev,
+          cafeFournisseurId: null,
+          machines: prev.machines.map((item) => ({
+            ...item,
+            propositionId: null,
+          })),
+        }));
+        setThe((prev) => ({
+          ...prev,
+          theGammeSelected: null,
+        }));
+        //Je retire tous les totaux mais je garde les machines
+        setTotalCafe((prev) => ({
+          ...prev,
+          nomFournisseur: null,
+          prixCafeMachines: prev.prixCafeMachines.map((item) => ({
+            ...item,
+            prix: null,
+          })),
+          prixThe: null,
+        }));
+        router.push(`/mon-devis/food-beverage?effectif=${effectif}`);
+      }
+      //Je coche
+      else {
+        //Je mets à jour le fournisseur et la proposition
+        setCafe((prev) => ({
+          ...prev,
+          cafeFournisseurId: fournisseurId,
+          machines:
+            fournisseurId === prev.cafeFournisseurId //même fournisseur que le choix précédent
+              ? prev.machines.map((item) =>
+                  item.machineId === machine.machineId
+                    ? {
+                        ...item,
+                        propositionId,
+                      }
+                    : item
+                )
+              : prev.machines.map((item) =>
+                  item.machineId === machine.machineId
+                    ? {
+                        ...item,
+                        propositionId,
+                      }
+                    : { ...item, propositionId: null }
+                ),
+        }));
+        //Je mets à jour les totaux
+        setTotalCafe((prev) => ({
+          ...prev,
+          nomFournisseur: nomEntreprise,
+          prixCafeMachines:
+            fournisseurId === cafe.cafeFournisseurId
+              ? prev.prixCafeMachines.map((item) =>
+                  item.machineId === machine.machineId
+                    ? { ...item, prix: prixAnnuel }
+                    : item
+                )
+              : prev.prixCafeMachines.map((item) =>
+                  item.machineId === machine.machineId
+                    ? { ...item, prix: prixAnnuel }
+                    : { ...item, prix: null }
+                ),
+        }));
+        if (
+          cafe.cafeFournisseurId !== fournisseurId &&
+          cafe.machines.length > 1
+        ) {
+          toast({
+            title: "Attention",
+            description:
+              "Vous avez selectionné un nouveau fournisseur, pensez à refaire vos choix pour les autres machines et pour le thé",
+            variant: "destructive",
+            duration: 3000,
+            className: "left-0",
+          });
+        }
+        router.push(
+          `/mon-devis/food-beverage?effectif=${effectif}&cafeFournisseurId=${fournisseurId}`
+        );
+      }
+      return;
+    }
+    //Si ce n'est pas la première machine
     if (machine.propositionId === propositionId) {
-      //Si je décoche
+      //Je decoche
+      //Je mets à jour la proposition
       setCafe((prev) => ({
         ...prev,
-        cafeFournisseurId: null,
         machines: prev.machines.map((item) =>
           item.machineId === machine.machineId
             ? {
@@ -195,68 +156,36 @@ const MachinePropositions = ({
             : item
         ),
       }));
-      if (cafe.machines.map(({ machineId }) => machineId)[0] === machineId) {
-        //si c'est la première machine
-        router.push(`/mon-devis/food-beverage?effectif=${effectif}`);
-        setTotalCafe((prev) => ({
-          ...prev,
-          nomFournisseur: null,
-          prixCafeMachines: prev.prixCafeMachines.map((item) =>
-            item.machineId === machine.machineId
-              ? { ...item, prix: null }
-              : item
-          ),
-          prixThe: null,
-        }));
-        return;
-      } //Si c'est pas la première machine
+      //Je mets à jour les totaux
       setTotalCafe((prev) => ({
         ...prev,
         prixCafeMachines: prev.prixCafeMachines.map((item) =>
           item.machineId === machine.machineId ? { ...item, prix: null } : item
         ),
       }));
-      return;
-    }
-    //Si je coche
-    setCafe((prev) => ({
-      ...prev,
-      cafeFournisseurId: fournisseurId,
-      machines: prev.machines.map((item) =>
-        item.machineId === machine.machineId
-          ? {
-              ...item,
-              propositionId,
-            }
-          : item
-      ),
-    }));
-    setTotalCafe((prev) => ({
-      ...prev,
-      nomFournisseur: nomEntreprise,
-      prixCafeMachines: prev.prixCafeMachines.map((item) =>
-        item.machineId === machine.machineId
-          ? { ...item, prix: prixAnnuel }
-          : item
-      ),
-    }));
-    if (cafe.machines.map(({ machineId }) => machineId)[0] === machineId) {
-      //si c'est la première machine
-      router.push(
-        `/mon-devis/food-beverage?cafeFournisseurId=${fournisseurId}&effectif=${effectif}`
-      );
-      if (
-        cafe.cafeFournisseurId !== fournisseurId &&
-        cafe.machines.length > 1
-      ) {
-        //si je change de fournisseur
-        toast({
-          title: "Attention",
-          description: `Vous avez changé de fournisseur, pensez à refaire vos choix pour les autres machines`,
-          variant: "destructive",
-          duration: 3000,
-        });
-      }
+    } else {
+      //Je coche
+      //Je mets à jour la proposition
+      setCafe((prev) => ({
+        ...prev,
+        machines: prev.machines.map((item) =>
+          item.machineId === machine.machineId
+            ? {
+                ...item,
+                propositionId,
+              }
+            : item
+        ),
+      }));
+      //Je mets à jour les totaux
+      setTotalCafe((prev) => ({
+        ...prev,
+        prixCafeMachines: prev.prixCafeMachines.map((item) =>
+          item.machineId === machine.machineId
+            ? { ...item, prix: prixAnnuel }
+            : item
+        ),
+      }));
     }
   };
 
@@ -298,87 +227,98 @@ const MachinePropositions = ({
     }));
   };
   const handleClickNextMachine = () => {
-    const machinesIds = cafe.machines.map(({ machineId }) => machineId);
-    const indexOfCurrentMachine = machinesIds.indexOf(machineId);
+    const machinesIds = cafeMachinesIds;
+    const indexOfCurrentMachine = machinesIds.indexOf(machine.machineId);
     setCafe((prev) => ({
       ...prev,
       currentMachineId: machinesIds[indexOfCurrentMachine + 1],
     }));
   };
+
+  const handleAlert = () => {
+    if (!machine.propositionId) {
+      toast({
+        description: "Veuillez d'abord sélectionner une offre",
+        duration: 3000,
+        variant: "destructive",
+        className: "left-0",
+      });
+      return;
+    }
+  };
+
   return (
     <div className="flex-1 flex flex-col gap-4">
-      <div className="flex-1 flex flex-col border rounded-xl overflow-hidden">
-        {formattedPropositions.length > 0
-          ? formattedPropositions.map((propositions) => (
-              <div
-                className="flex border-b flex-1"
-                key={propositions[0].fournisseurId}
-              >
-                <TooltipProvider delayDuration={0}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="flex w-1/4 items-center justify-center p-4">
-                        {getLogoFournisseurUrl(
-                          propositions[0].fournisseurId
-                        ) ? (
-                          <div className="w-full h-full relative">
-                            <Image
-                              src={
-                                getLogoFournisseurUrl(
-                                  propositions[0].fournisseurId
-                                ) as string
-                              }
-                              alt={`logo-de-${propositions[0].nomEntreprise}`}
-                              fill={true}
-                              className="w-full h-full object-contain"
-                              quality={100}
-                            />
-                          </div>
-                        ) : (
-                          propositions[0].nomEntreprise
-                        )}
-                      </div>
-                    </TooltipTrigger>
-                    {propositions[0].slogan && (
-                      <TooltipContent>
-                        <p className="text-sm italic">
-                          {propositions[0].slogan}
-                        </p>
-                      </TooltipContent>
-                    )}
-                  </Tooltip>
-                </TooltipProvider>
-                {propositions.map((proposition) => {
-                  const gamme = proposition.gamme;
-                  const color =
-                    gamme === "essentiel"
-                      ? "fm4allessential"
-                      : gamme === "confort"
-                      ? "fm4allcomfort"
-                      : "fm4allexcellence";
-                  const prixAnnuel = proposition.prixAnnuel
-                    ? `${formatNumber(proposition.prixAnnuel)} € /an`
-                    : "Non proposé";
-                  return (
-                    <div
-                      className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer px-10 ${
-                        machine.propositionId === proposition.id
-                          ? "ring-2 ring-inset ring-destructive"
-                          : ""
-                      }`}
-                      key={proposition.id}
-                      onClick={() =>
-                        handleClickProposition(
-                          proposition.id,
-                          proposition.fournisseurId,
-                          proposition.nomEntreprise,
-                          proposition.prixAnnuel
-                        )
-                      }
-                    >
-                      <Checkbox
-                        checked={machine.propositionId === proposition.id}
-                        onCheckedChange={() =>
+      {isNaN(machine.nbPersonnes) ||
+      machine.nbPersonnes < 1 ||
+      machine.nbPersonnes > 300 ? (
+        <div className="flex-1 flex justify-center items-center">
+          <p className="text-center text-xl">
+            Veuillez renseigner un nombre de personnes compris entre 1 et 300
+          </p>
+        </div>
+      ) : (
+        <div className="flex-1 flex flex-col border rounded-xl overflow-hidden">
+          {formattedPropositions.length > 0
+            ? formattedPropositions.map((propositions) => (
+                <div
+                  className="flex border-b flex-1"
+                  key={propositions[0].fournisseurId}
+                >
+                  <TooltipProvider delayDuration={0}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex w-1/4 items-center justify-center p-4">
+                          {getLogoFournisseurUrl(
+                            propositions[0].fournisseurId
+                          ) ? (
+                            <div className="w-full h-full relative">
+                              <Image
+                                src={
+                                  getLogoFournisseurUrl(
+                                    propositions[0].fournisseurId
+                                  ) as string
+                                }
+                                alt={`logo-de-${propositions[0].nomEntreprise}`}
+                                fill={true}
+                                className="w-full h-full object-contain"
+                                quality={100}
+                              />
+                            </div>
+                          ) : (
+                            propositions[0].nomEntreprise
+                          )}
+                        </div>
+                      </TooltipTrigger>
+                      {propositions[0].slogan && (
+                        <TooltipContent>
+                          <p className="text-sm italic">
+                            {propositions[0].slogan}
+                          </p>
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  </TooltipProvider>
+                  {propositions.map((proposition) => {
+                    const gamme = proposition.gamme;
+                    const color =
+                      gamme === "essentiel"
+                        ? "fm4allessential"
+                        : gamme === "confort"
+                        ? "fm4allcomfort"
+                        : "fm4allexcellence";
+                    const prixAnnuel = proposition.prixAnnuel
+                      ? `${formatNumber(proposition.prixAnnuel)} € /an`
+                      : "Non proposé";
+                    return (
+                      <div
+                        className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer px-10 ${
+                          machine.propositionId === proposition.id
+                            ? "ring-2 ring-inset ring-destructive"
+                            : ""
+                        }`}
+                        key={proposition.id}
+                        onClick={() =>
                           handleClickProposition(
                             proposition.id,
                             proposition.fournisseurId,
@@ -386,44 +326,54 @@ const MachinePropositions = ({
                             proposition.prixAnnuel
                           )
                         }
-                        className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-                      />
-                      <div>
-                        <p className="font-bold">{prixAnnuel}</p>
-                        <p className="text-sm">
-                          {nbMachines} machine(s){" "}
-                          {proposition.marqueMachine ?? ""}{" "}
-                          {proposition.modeleMachine}
-                          {proposition.reconditionne
-                            ? " reconditionnée(s)"
-                            : ""}
-                        </p>
+                      >
+                        <Checkbox
+                          checked={machine.propositionId === proposition.id}
+                          onCheckedChange={() =>
+                            handleClickProposition(
+                              proposition.id,
+                              proposition.fournisseurId,
+                              proposition.nomEntreprise,
+                              proposition.prixAnnuel
+                            )
+                          }
+                          className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+                        />
+                        <div>
+                          <p className="font-bold">{prixAnnuel}</p>
+                          <p className="text-sm">
+                            {machine.nbMachines} machine(s){" "}
+                            {proposition.marqueMachine ?? ""}{" "}
+                            {proposition.modeleMachine}
+                            {proposition.reconditionne
+                              ? " reconditionnée(s)"
+                              : ""}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ))
-          : null}
-      </div>
-
-      {cafe.machines.map(({ machineId }) => machineId).slice(-1)[0] ===
-      machineId ? (
+                    );
+                  })}
+                </div>
+              ))
+            : null}
+        </div>
+      )}
+      {cafeMachinesIds.slice(-1)[0] === machine.machineId ? (
         <div className="flex justify-end gap-4 items-center">
           {machine.propositionId ? (
             <Button variant="outline" size="lg" onClick={handleAddMachine}>
-              Ajouter une machine
+              Ajouter une/des machine(s)
             </Button>
           ) : null}
           <NextServiceButton handleClickNext={handleClickNext} />
         </div>
       ) : (
-        <div className="ml-auto">
+        <div className="ml-auto" onClick={handleAlert}>
           <Button
             variant="outline"
-            size="lg"
+            size="sm"
             onClick={handleClickNextMachine}
-            className={machine.propositionId ? "" : "invisible"}
+            disabled={!machine.propositionId}
           >
             Machine(s) suivante(s) ↓
           </Button>

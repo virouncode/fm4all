@@ -1,15 +1,15 @@
 "use client";
+import { CafeContext } from "@/context/CafeProvider";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { Leaf } from "lucide-react";
 import { useContext } from "react";
 import NextServiceButton from "../../mes-services/NextServiceButton";
-import PreviousServiceButton from "../../mes-services/PreviousServiceButton";
+import PropositionsTitle from "../../mes-services/PropositionsTitle";
 import ThePropositions from "./ThePropositions";
-import { CafeContext } from "@/context/CafeProvider";
 
 type TheProps = {
-  theConsoTarifs?: SelectTheConsoTarifsType[];
+  theConsoTarifs: SelectTheConsoTarifsType[];
   effectif: string;
 };
 
@@ -34,19 +34,14 @@ const The = ({ theConsoTarifs, effectif }: TheProps) => {
 
   return (
     <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="2">
-      <div className="flex justify-between items-center">
-        <div className="flex gap-4 items-center p-4 border rounded-xl">
-          <Leaf />
-          <p>Thé variés</p>
-        </div>
-        <p className="text-base flex-1 text-center italic px-4">
-          Parce que tout le monde ne boit pas forcément du Café, un choix de
-          thés présentés en coffrets
-        </p>
-        <PreviousServiceButton handleClickPrevious={handleClickPrevious} />
-      </div>
+      <PropositionsTitle
+        title="Thé variés"
+        icon={Leaf}
+        description="Parce que tout le monde ne boit pas forcément du café, un choix de thés présentés en coffrets"
+        handleClickPrevious={handleClickPrevious}
+      />
       <div className="w-full flex-1">
-        <ThePropositions theConsoTarifs={theConsoTarifs} effectif={effectif} />
+        <ThePropositions theConsoTarifs={theConsoTarifs} />
       </div>
       <NextServiceButton handleClickNext={handleClickNext} />
     </div>

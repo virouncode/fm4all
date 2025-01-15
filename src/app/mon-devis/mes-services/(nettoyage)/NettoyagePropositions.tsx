@@ -8,123 +8,64 @@ import {
 import { S_OUVREES_PAR_AN } from "@/constants/constants";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
+import { ServicesContext } from "@/context/ServicesProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
 import { GammeType } from "@/zod-schemas/gamme";
+import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import Image from "next/image";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useContext } from "react";
+import { reinitialisationNettoyage } from "./reinitialisationNettoyage";
 
 type NettoyagePropositionsProps = {
-  formattedNettoyagePropositions: {
-    fournisseurId: number;
-    nomEntreprise: string;
-    slogan: string | null;
-    id: number;
-    surface: number;
-    gamme: "essentiel" | "confort" | "excellence";
-    createdAt: Date;
-    hParPassage: number;
-    tauxHoraire: number;
-    prixAnnuel: number;
+  formattedNettoyagePropositions: (SelectNettoyageTarifsType & {
     freqAnnuelle: number;
-  }[][];
-  nettoyagePropositions: {
-    surface: number;
-    id: number;
-    fournisseurId: number;
-    nomEntreprise: string;
-    slogan: string | null;
-    createdAt: Date;
-    hParPassage: number;
-    tauxHoraire: number;
-    gamme: "essentiel" | "confort" | "excellence";
     prixAnnuel: number;
-    freqAnnuelle: number;
-  }[];
+  })[][];
 };
 
 const NettoyagePropositions = ({
   formattedNettoyagePropositions,
-  nettoyagePropositions,
 }: NettoyagePropositionsProps) => {
   const { nettoyage, setNettoyage } = useContext(NettoyageContext);
   const { setHygiene } = useContext(HygieneContext);
   const { setTotalNettoyage } = useContext(TotalNettoyageContext);
   const { setTotalHygiene } = useContext(TotalHygieneContext);
+  const { setServices } = useContext(ServicesContext);
   const searchParams = useSearchParams();
   const router = useRouter();
-  const pathname = usePathname();
 
-  const handleClickProposition = (propositionId: number) => {
+  const handleClickProposition = (
+    propositionId: number,
+    fournisseurId: number,
+    nomEntreprise: string,
+    gamme: GammeType,
+    prixAnnuel: number
+  ) => {
+    //Je décoche la proposition
     if (nettoyage.propositionId === propositionId) {
-      setNettoyage({
-        fournisseurId: null,
-        propositionId: null,
-        gammeSelected: null,
-        repassePropositionId: null,
-        samediPropositionId: null,
-        dimanchePropositionId: null,
-        vitreriePropositionId: null,
-        nbPassageVitrerie: 2,
-      });
-      setHygiene({
-        fournisseurId: null,
-        nbDistribEmp: 0,
-        nbDistribSavon: 0,
-        nbDistribPh: 0,
-        nbDistribDesinfectant: 0,
-        nbDistribParfum: 0,
-        nbDistribBalai: 0,
-        nbDistribPoubelle: 0,
-        dureeLocation: "pa36M",
-        trilogieGammeSelected: null,
-        desinfectantGammeSelected: null,
-        parfumGammeSelected: null,
-        balaiGammeSelected: null,
-        poubelleGammeSelected: null,
-      });
-      setTotalNettoyage({
-        nomFournisseur: null,
-        prixService: null,
-        prixRepasse: null,
-        prixSamedi: null,
-        prixDimanche: null,
-        prixVitrerie: null,
-      });
-      setTotalHygiene({
-        nomFournisseur: null,
-        prixTrilogieAbonnement: null,
-        prixTrilogieAchat: null,
-        prixDesinfectantAbonnement: null,
-        prixDesinfectantAchat: null,
-        prixParfum: null,
-        prixBalai: null,
-        prixPoubelle: null,
-      });
+      reinitialisationNettoyage(
+        setNettoyage,
+        setHygiene,
+        setServices,
+        setTotalNettoyage,
+        setTotalHygiene
+      );
       const params = new URLSearchParams(searchParams.toString());
       params.delete("fournisseurId");
       params.delete("nettoyageGamme");
-      router.push(`${pathname}?${params.toString()}`);
+      router.push(`/mon-devis/mes-services?${params.toString()}`);
       return;
     }
-    const nettoyageFournisseurId = nettoyagePropositions.find(
-      (nettoyage) => nettoyage.id === propositionId
-    )?.fournisseurId as number;
-    const nettoyageFournisseurName = nettoyagePropositions.find(
-      (nettoyage) => nettoyage.id === propositionId
-    )?.nomEntreprise as string;
-    const gammeSelected = nettoyagePropositions.find(
-      (nettoyage) => nettoyage.id === propositionId
-    )?.gamme as GammeType;
-
+    //Je coche la proposition
     setNettoyage((prev) => ({
       ...prev,
-      fournisseurId: nettoyageFournisseurId,
+      fournisseurId: fournisseurId,
       propositionId,
-      gammeSelected,
+      gammeSelected: gamme,
       repassePropositionId: null,
       samediPropositionId: null,
       dimanchePropositionId: null,
@@ -134,35 +75,22 @@ const NettoyagePropositions = ({
 
     setTotalNettoyage((prev) => ({
       ...prev,
-      nomFournisseur: nettoyageFournisseurName,
-      prixService: nettoyagePropositions.find(
-        (nettoyage) => nettoyage.id === propositionId
-      )?.prixAnnuel as number,
+      nomFournisseur: nomEntreprise,
+      prixService: prixAnnuel,
       prixRepasse: null,
       prixSamedi: null,
       prixDimanche: null,
       prixVitrerie: null,
     }));
 
-    const hygieneFournisseurId =
-      (nettoyagePropositions.find((nettoyage) => nettoyage.id === propositionId)
-        ?.fournisseurId as number) === 9
-        ? 12
-        : (nettoyagePropositions.find(
-            (nettoyage) => nettoyage.id === propositionId
-          )?.fournisseurId as number);
-    const hygieneFournisseurName =
-      (nettoyagePropositions.find((nettoyage) => nettoyage.id === propositionId)
-        ?.fournisseurId as number) === 9
-        ? "EPCH"
-        : (nettoyagePropositions.find(
-            (nettoyage) => nettoyage.id === propositionId
-          )?.nomEntreprise as string);
+    //Car on ne travaille pas forcément avec le même fournisseur pour l'hygiène
+    const hygieneFournisseurId = fournisseurId === 9 ? 12 : fournisseurId;
+    const hygieneFournisseurName = fournisseurId === 9 ? "EPCH" : nomEntreprise;
 
     setHygiene((prev) => ({
       ...prev,
       fournisseurId: hygieneFournisseurId,
-      dureeLocation: "pa36M",
+      dureeLocation: "pa12M",
       trilogieGammeSelected: null,
       desinfectantGammeSelected: null,
       parfumGammeSelected: null,
@@ -180,9 +108,9 @@ const NettoyagePropositions = ({
       prixPoubelle: null,
     });
     const params = new URLSearchParams(searchParams.toString());
-    params.set("fournisseurId", nettoyageFournisseurId.toString());
-    params.set("nettoyageGamme", gammeSelected);
-    router.push(`${pathname}?${params.toString()}`);
+    params.set("fournisseurId", fournisseurId.toString());
+    params.set("nettoyageGamme", gamme);
+    router.push(`/mon-devis/mes-services?${params.toString()}`);
   };
   return (
     <div className="h-full flex flex-col border rounded-xl overflow-hidden">
@@ -255,12 +183,26 @@ const NettoyagePropositions = ({
                         : ""
                     }`}
                     key={proposition.id}
-                    onClick={() => handleClickProposition(proposition.id)}
+                    onClick={() =>
+                      handleClickProposition(
+                        proposition.id,
+                        proposition.fournisseurId,
+                        proposition.nomEntreprise,
+                        proposition.gamme,
+                        proposition.prixAnnuel
+                      )
+                    }
                   >
                     <Checkbox
                       checked={nettoyage.propositionId === proposition.id}
                       onCheckedChange={() =>
-                        handleClickProposition(proposition.id)
+                        handleClickProposition(
+                          proposition.id,
+                          proposition.fournisseurId,
+                          proposition.nomEntreprise,
+                          proposition.gamme,
+                          proposition.prixAnnuel
+                        )
                       }
                       className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                     />
@@ -280,8 +222,3 @@ const NettoyagePropositions = ({
 };
 
 export default NettoyagePropositions;
-
-//heures par an = heures par passage * frequence annuelle
-
-// X passages par an
-// Y passages par semaine = X / S_OUVREES_PAR_AN

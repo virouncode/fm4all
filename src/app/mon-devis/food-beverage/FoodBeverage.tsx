@@ -7,9 +7,10 @@ import {
   getLaitConsoTarifs,
   getTheConsoTarifs,
 } from "@/lib/queries/boissons-chaudes/getBoissonsChaudes";
+import Link from "next/link";
 import Cafe from "./(cafe)/Cafe";
-import The from "./(the)/The";
 import Snacks from "./(snacks)/Snacks";
+import The from "./(the)/The";
 
 type FoodBeverageProps = {
   cafeFournisseurId?: string;
@@ -37,6 +38,28 @@ const FoodBeverage = async ({
     getChocoConsoTarifs(),
     getTheConsoTarifs(cafeFournisseurId),
   ]);
+
+  if (
+    !cafeMachines ||
+    !cafeQuantites ||
+    !cafeMachinesTarifs ||
+    !cafeConsoTarifs ||
+    !laitConsoTarifs ||
+    !chocoConsoTarifs ||
+    !theConsoTarifs
+  ) {
+    return (
+      <section className="flex h-dvh items-center justify-center text-lg">
+        <p>
+          Nous n&apos;avons pas trouvé de tarifs de machines à cafés.{" "}
+          <Link href="/mon-devis/mes-locaux" className="underline">
+            Veuillez réessayer
+          </Link>
+          .
+        </p>
+      </section>
+    );
+  }
 
   return (
     <section className="flex-1 overflow-hidden">

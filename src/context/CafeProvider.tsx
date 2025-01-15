@@ -7,16 +7,18 @@ import {
   Dispatch,
   PropsWithChildren,
   SetStateAction,
+  useContext,
   useEffect,
   useState,
 } from "react";
+import { ClientContext } from "./ClientProvider";
 
 export const CafeContext = createContext<{
   cafe: CafeType;
   setCafe: Dispatch<SetStateAction<CafeType>>;
 }>({
   cafe: {
-    currentMachineId: null,
+    currentMachineId: 1,
     cafeFournisseurId: null,
     machines: [],
   },
@@ -25,32 +27,41 @@ export const CafeContext = createContext<{
 
 const CafeProvider = ({ children }: PropsWithChildren) => {
   const isMounted = useClientOnly();
+  const { client } = useContext(ClientContext);
 
   // Always initialize state
   const [cafe, setCafe] = useState<CafeType>({
-    currentMachineId: null,
+    currentMachineId: 1,
     cafeFournisseurId: null,
-    machines: [],
+    machines: [
+      {
+        machineId: 1,
+        typeBoissons: "cafe",
+        dureeLocation: "pa12M",
+        nbPersonnes: client.effectif ?? 0,
+        nbMachines: 0,
+        propositionId: null,
+      },
+    ],
   });
 
-  // Update state after mounting
   useEffect(() => {
     if (isMounted) {
       const storedCafe = localStorage.getItem("cafe");
+      console.log("storedCafe", storedCafe);
+
       if (storedCafe) {
         setCafe(JSON.parse(storedCafe));
       }
     }
   }, [isMounted]);
 
-  // Save to localStorage when `hygiene` changes
   useEffect(() => {
     if (isMounted) {
       localStorage.setItem("cafe", JSON.stringify(cafe));
     }
   }, [cafe, isMounted]);
 
-  // Conditional rendering after hooks are initialized
   if (!isMounted) return null;
 
   return (

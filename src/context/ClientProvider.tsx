@@ -18,8 +18,8 @@ export const ClientContext = createContext<{
 }>({
   client: {
     codePostal: "",
-    surface: 0,
-    effectif: 0,
+    surface: 100,
+    effectif: 20,
     typeBatiment: "bureaux",
     typeOccupation: "partieEtage",
   },
@@ -32,8 +32,8 @@ const ClientProvider = ({ children }: PropsWithChildren) => {
   // Always initialize state
   const [client, setClient] = useState<Partial<SelectClientType>>({
     codePostal: "",
-    surface: 0,
-    effectif: 0,
+    surface: 100,
+    effectif: 20,
     typeBatiment: "bureaux",
     typeOccupation: "partieEtage",
   });

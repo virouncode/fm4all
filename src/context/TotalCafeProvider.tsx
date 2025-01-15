@@ -30,7 +30,7 @@ const TotalCafeProvider = ({ children }: PropsWithChildren) => {
   // Always initialize state
   const [totalCafe, setTotalCafe] = useState<TotalCafeType>({
     nomFournisseur: null,
-    prixCafeMachines: [],
+    prixCafeMachines: [{ machineId: 1, prix: null }],
     prixThe: null,
   });
 

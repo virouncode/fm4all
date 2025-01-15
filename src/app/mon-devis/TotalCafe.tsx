@@ -13,9 +13,7 @@ const TotalCafe = () => {
     <div className="flex flex-col gap-4">
       {totalCafe.nomFournisseur && (
         <div className="flex flex-col gap-4">
-          <div>
-            Machines à Café et consommables ({totalCafe.nomFournisseur})
-          </div>
+          <div>Machines à Café ({totalCafe.nomFournisseur})</div>
           <div className="flex flex-col ml-4 text-xs ">
             {prixCafe && (
               <div className="flex items-center justify-between">

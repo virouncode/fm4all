@@ -8,8 +8,8 @@ import { SelectMaintenanceQuantitesType } from "@/zod-schemas/maintenanceQuantit
 import { SelectMaintenanceTarifsType } from "@/zod-schemas/maintenanceTarifs";
 import { Wrench } from "lucide-react";
 import { useContext } from "react";
-import NextServiceButton from "../NextServiceButton";
-import PreviousServiceButton from "../PreviousServiceButton";
+import PropositionsFooter from "../PropositionsFooter";
+import PropositionsTitle from "../PropositionsTitle";
 import MaintenancePropositions from "./MaintenancePropositions";
 
 type MaintenanceProps = {
@@ -95,31 +95,23 @@ const Maintenance = ({
   const formattedPropositions = Object.values(propositionsByFournisseurId);
   return (
     <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="5">
-      <div className="flex justify-between items-center">
-        <div className="flex gap-4 items-center p-4 border rounded-xl">
-          <Wrench />
-          <p>Maintenance</p>
-        </div>
-        <p className="text-base w-2/3 text-center italic px-4">
-          Veille réglementaire, obligations légales, bien-être au travail,
-          petits travaux, lien avec le gestionnaire de l’immeuble... déléguez la
-          maintenance de vos locaux et le suivi de vos contrôles.
-        </p>
-
-        <PreviousServiceButton handleClickPrevious={handleClickPrevious} />
-      </div>
+      <PropositionsTitle
+        title="Maintenance"
+        description="Veille réglementaire, obligations légales, bien-être au travail, petits travaux, lien avec le gestionnaire de l’immeuble... déléguez la maintenance de vos locaux et le suivi de vos contrôles."
+        icon={Wrench}
+        handleClickPrevious={handleClickPrevious}
+      />
       {maintenanceQuantites && maintenanceTarifs && (
         <div className="w-full flex-1">
           <MaintenancePropositions
             formattedPropositions={formattedPropositions}
-            propositions={propositions}
           />
         </div>
       )}
-      <p className="text-sm italic text-end px-1">
-        *frais de déplacement inclus
-      </p>
-      <NextServiceButton handleClickNext={handleClickNext} />
+      <PropositionsFooter
+        comment="*frais de déplacement inclus"
+        handleClickNext={handleClickNext}
+      />
     </div>
   );
 };

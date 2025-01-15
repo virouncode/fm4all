@@ -13,12 +13,14 @@ const page = async ({
     await searchParams;
   if (!surface || !effectif) {
     return (
-      <section className="flex flex-col gap-6">
-        Vous devez d&apos;abord remplir les informations sur vos{" "}
-        <Link href="/mon-devis/mes-locaux" className="underline">
-          locaux
-        </Link>
-        .
+      <section className="flex h-dvh items-center justify-center text-lg">
+        <p>
+          Vous devez d&apos;abord remplir les informations sur vos{" "}
+          <Link href="/mon-devis/mes-locaux" className="underline">
+            locaux
+          </Link>
+          .
+        </p>
       </section>
     );
   }
@@ -27,34 +29,43 @@ const page = async ({
     isNaN(parseInt(effectif as string))
   ) {
     return (
-      <section className="flex flex-col gap-6">
-        Les valeurs de surface et effectif renseignées ne sont pas valides.
-        <Link href="/mon-devis/mes-locaux" className="underline">
-          Veuillez réessayer
-        </Link>
-        .
+      <section className="flex h-dvh items-center justify-center text-lg">
+        <p>
+          Les valeurs de surface et effectif renseignées ne sont pas valides.{" "}
+          <Link href="/mon-devis/mes-locaux" className="underline">
+            Veuillez réessayer
+          </Link>
+          .
+        </p>
       </section>
     );
   }
   if (fournisseurId && isNaN(parseInt(fournisseurId as string))) {
     return (
-      <section className="flex flex-col gap-6">
-        L&apos;identifiant du fournisseur n&apos;est pas valide.
-        <Link href="/mon-devis/mes-locaux" className="underline">
-          Veuillez réessayer
-        </Link>
-        .
+      <section className="flex h-dvh items-center justify-center text-lg">
+        <p>
+          L&apos;identifiant du fournisseur n&apos;est pas valide.{" "}
+          <Link href="/mon-devis/mes-locaux" className="underline">
+            Veuillez réessayer
+          </Link>
+          .
+        </p>
       </section>
     );
   }
-  if (nettoyageGamme && !gammes.includes(nettoyageGamme)) {
+  const isGammeType = (value: string): value is GammeType => {
+    return gammes.includes(value as GammeType);
+  };
+  if (nettoyageGamme && !isGammeType(nettoyageGamme)) {
     return (
-      <section className="flex flex-col gap-6">
-        La gamme de nettoyage n&apos;est pas valide.
-        <Link href="/mon-devis/mes-locaux" className="underline">
-          Veuillez réessayer
-        </Link>
-        .
+      <section className="flex h-dvh items-center justify-center text-lg">
+        <p>
+          La gamme de nettoyage n&apos;est pas valide.
+          <Link href="/mon-devis/mes-locaux" className="underline">
+            Veuillez réessayer
+          </Link>
+          .
+        </p>
       </section>
     );
   }

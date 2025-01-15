@@ -9,53 +9,35 @@ import { MaintenanceContext } from "@/context/MaintenanceProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
+import { SelectMaintenanceTarifsType } from "@/zod-schemas/maintenanceTarifs";
 import Image from "next/image";
 import { useContext } from "react";
 
 type MaintenancePropositionsProps = {
-  formattedPropositions: {
-    id: number;
-    surface: number;
-    gamme: "essentiel" | "confort" | "excellence";
-    createdAt: Date;
-    nomEntreprise: string;
-    slogan: string | null;
-    fournisseurId: number;
-    hParPassage: number;
-    tauxHoraire: number;
-    prixAnnuel: number;
-    freqAnnuelle: number;
-  }[][];
-  propositions: {
+  formattedPropositions: (SelectMaintenanceTarifsType & {
     freqAnnuelle: number;
     prixAnnuel: number;
-    id: number;
-    nomEntreprise: string;
-    slogan: string | null;
-    createdAt: Date;
-    fournisseurId: number;
-    surface: number;
-    hParPassage: number;
-    tauxHoraire: number;
-    gamme: "essentiel" | "confort" | "excellence";
-  }[];
+  })[][];
 };
 
 const MaintenancePropositions = ({
   formattedPropositions,
-  propositions,
 }: MaintenancePropositionsProps) => {
   const { maintenance, setMaintenance } = useContext(MaintenanceContext);
   const { setTotalMaintenance } = useContext(TotalMaintenanceContext);
 
-  const handleClickProposition = (propositionId: number) => {
+  const handleClickProposition = (
+    propositionId: number,
+    prixAnnuel: number,
+    nomEntreprise: string
+  ) => {
     if (maintenance.propositionId === propositionId) {
       setMaintenance((prev) => ({
         ...prev,
         propositionId: null,
       }));
       setTotalMaintenance({
-        nomFournisseur: "",
+        nomFournisseur: null,
         prixMaintenance: null,
       });
       return;
@@ -65,12 +47,8 @@ const MaintenancePropositions = ({
       propositionId,
     }));
     setTotalMaintenance({
-      nomFournisseur: propositions.find(
-        (proposition) => proposition.id === propositionId
-      )?.nomEntreprise as string,
-      prixMaintenance: propositions.find(
-        (proposition) => proposition.id === propositionId
-      )?.prixAnnuel as number,
+      nomFournisseur: nomEntreprise,
+      prixMaintenance: prixAnnuel,
     });
   };
 
@@ -132,12 +110,22 @@ const MaintenancePropositions = ({
                         : ""
                     }`}
                     key={proposition.id}
-                    onClick={() => handleClickProposition(proposition.id)}
+                    onClick={() =>
+                      handleClickProposition(
+                        proposition.id,
+                        proposition.prixAnnuel,
+                        proposition.nomEntreprise
+                      )
+                    }
                   >
                     <Checkbox
                       checked={maintenance.propositionId === proposition.id}
                       onCheckedChange={() =>
-                        handleClickProposition(proposition.id)
+                        handleClickProposition(
+                          proposition.id,
+                          proposition.prixAnnuel,
+                          proposition.nomEntreprise
+                        )
                       }
                       className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                     />

@@ -7,9 +7,9 @@ import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
 import { SprayCan } from "lucide-react";
 import { useContext } from "react";
-import NextServiceButton from "../NextServiceButton";
-import PreviousServiceButton from "../PreviousServiceButton";
+import PropositionsTitle from "../PropositionsTitle";
 import NettoyageOptionsPropositions from "./NettoyageOptionsPropositions";
+import PropositionsFooter from "../PropositionsFooter";
 
 type NettoyageOptionsProps = {
   repasseProposition:
@@ -53,21 +53,17 @@ const NettoyageOptions = ({
   };
 
   if (!nettoyage.propositionId) {
-    return null;
+    return null; //pour skiper le service
   }
 
   return (
     <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="2">
-      <div className="flex justify-between items-center">
-        <div className="flex gap-4 items-center p-4 border rounded-xl">
-          <SprayCan />
-          <p>Nettoyage et Propreté</p>
-        </div>
-        <p className="text-base w-2/3 text-center italic px-4">
-          {`Choisissez vos options en gamme ${nettoyage.gammeSelected} chez ${samediDimancheProposition?.nomEntreprise}`}
-        </p>
-        <PreviousServiceButton handleClickPrevious={handleClickPrevious} />
-      </div>
+      <PropositionsTitle
+        title="Nettoyage et Propreté"
+        description={`Choisissez vos options en gamme ${nettoyage.gammeSelected} chez ${samediDimancheProposition?.nomEntreprise}`}
+        icon={SprayCan}
+        handleClickPrevious={handleClickPrevious}
+      />
       <div className="w-full flex-1">
         <NettoyageOptionsPropositions
           samediDimancheProposition={samediDimancheProposition}
@@ -75,8 +71,10 @@ const NettoyageOptions = ({
           vitrerieProposition={vitrerieProposition}
         />
       </div>
-      <p className="text-sm italic text-end px-1"></p>
-      <NextServiceButton handleClickNext={handleClickNext} />
+      <PropositionsFooter
+        comment="*emplacement pour remarque"
+        handleClickNext={handleClickNext}
+      />
     </div>
   );
 };

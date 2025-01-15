@@ -7,28 +7,31 @@ import {
   Dispatch,
   PropsWithChildren,
   SetStateAction,
+  useContext,
   useEffect,
   useState,
 } from "react";
+import { ClientContext } from "./ClientProvider";
 
 export const TheContext = createContext<{
   the: TheType;
   setThe: Dispatch<SetStateAction<TheType>>;
 }>({
   the: {
-    propositionId: null,
-    nbPersonnes: null,
+    theGammeSelected: null,
+    nbPersonnes: 0,
   },
   setThe: () => {},
 });
 
 const TheProvider = ({ children }: PropsWithChildren) => {
   const isMounted = useClientOnly();
+  const { client } = useContext(ClientContext);
 
   // Always initialize state
   const [the, setThe] = useState<TheType>({
-    propositionId: null,
-    nbPersonnes: null,
+    theGammeSelected: null,
+    nbPersonnes: Math.round((client.effectif ?? 0) * 0.15),
   });
 
   // Update state after mounting

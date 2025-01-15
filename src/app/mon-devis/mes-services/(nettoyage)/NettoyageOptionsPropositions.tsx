@@ -44,7 +44,11 @@ const NettoyageOptionsPropositions = ({
       ? "fm4allcomfort"
       : "fm4allexcellence";
 
-  const handleClickOption = (type: string, propositionId: number) => {
+  const handleClickProposition = (
+    type: string,
+    propositionId: number,
+    prixAnnuel: number
+  ) => {
     switch (type) {
       case "repasse":
         if (
@@ -67,7 +71,7 @@ const NettoyageOptionsPropositions = ({
         }));
         setTotalNettoyage((prev) => ({
           ...prev,
-          prixRepasse: repasseProposition?.prixAnnuel as number,
+          prixRepasse: prixAnnuel,
         }));
         break;
       case "vitrerie":
@@ -91,9 +95,7 @@ const NettoyageOptionsPropositions = ({
         }));
         setTotalNettoyage((prev) => ({
           ...prev,
-          prixVitrerie:
-            (vitrerieProposition?.prixParPassage as number) *
-            nettoyage.nbPassageVitrerie,
+          prixVitrerie: prixAnnuel,
         }));
         break;
       case "samedi":
@@ -117,7 +119,7 @@ const NettoyageOptionsPropositions = ({
         }));
         setTotalNettoyage((prev) => ({
           ...prev,
-          prixSamedi: samediDimancheProposition?.prixAnnuelSamedi as number,
+          prixSamedi: prixAnnuel,
         }));
         break;
       case "dimanche":
@@ -141,17 +143,30 @@ const NettoyageOptionsPropositions = ({
         }));
         setTotalNettoyage((prev) => ({
           ...prev,
-          prixDimanche: samediDimancheProposition?.prixAnnuelDimanche as number,
+          prixDimanche: prixAnnuel,
         }));
         break;
     }
   };
 
   const handleChangeNbPassageVitrerie = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const newNbPassageVitrerie = value ? parseInt(value) : 2;
     setNettoyage((prev) => ({
       ...prev,
-      nbPassageVitrerie: e.target.value ? parseInt(e.target.value) : 2,
+      nbPassageVitrerie: newNbPassageVitrerie,
     }));
+    if (nettoyage.vitreriePropositionId) {
+      const prixVitrerie = Math.round(
+        vitrerieProposition?.prixParPassage
+          ? vitrerieProposition.prixParPassage * newNbPassageVitrerie
+          : 0
+      );
+      setTotalNettoyage((prev) => ({
+        ...prev,
+        prixVitrerie,
+      }));
+    }
   };
 
   const repassePrixAnnuel = repasseProposition?.prixAnnuel
@@ -205,12 +220,22 @@ const NettoyageOptionsPropositions = ({
                 ? "ring-2 ring-inset ring-destructive"
                 : ""
             } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
-            onClick={() => handleClickOption("repasse", repasseProposition.id)}
+            onClick={() =>
+              handleClickProposition(
+                "repasse",
+                repasseProposition.id,
+                repasseProposition.prixAnnuel
+              )
+            }
           >
             <Checkbox
               checked={nettoyage.repassePropositionId === repasseProposition.id}
               onCheckedChange={() =>
-                handleClickOption("repasse", repasseProposition.id)
+                handleClickProposition(
+                  "repasse",
+                  repasseProposition.id,
+                  repasseProposition.prixAnnuel
+                )
               }
               className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             />
@@ -235,7 +260,11 @@ const NettoyageOptionsPropositions = ({
                 : ""
             } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
             onClick={() =>
-              handleClickOption("samedi", samediDimancheProposition.id)
+              handleClickProposition(
+                "samedi",
+                samediDimancheProposition.id,
+                samediDimancheProposition.prixAnnuelSamedi
+              )
             }
           >
             <Checkbox
@@ -243,7 +272,11 @@ const NettoyageOptionsPropositions = ({
                 nettoyage.samediPropositionId === samediDimancheProposition.id
               }
               onCheckedChange={() =>
-                handleClickOption("samedi", samediDimancheProposition.id)
+                handleClickProposition(
+                  "samedi",
+                  samediDimancheProposition.id,
+                  samediDimancheProposition.prixAnnuelSamedi
+                )
               }
               className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             />
@@ -266,7 +299,11 @@ const NettoyageOptionsPropositions = ({
                 : ""
             } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
             onClick={() =>
-              handleClickOption("dimanche", samediDimancheProposition.id)
+              handleClickProposition(
+                "dimanche",
+                samediDimancheProposition.id,
+                samediDimancheProposition.prixAnnuelDimanche
+              )
             }
           >
             <Checkbox
@@ -274,7 +311,11 @@ const NettoyageOptionsPropositions = ({
                 nettoyage.dimanchePropositionId === samediDimancheProposition.id
               }
               onCheckedChange={() =>
-                handleClickOption("dimanche", samediDimancheProposition.id)
+                handleClickProposition(
+                  "dimanche",
+                  samediDimancheProposition.id,
+                  samediDimancheProposition.prixAnnuelDimanche
+                )
               }
               className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             />
@@ -319,7 +360,11 @@ const NettoyageOptionsPropositions = ({
                 : ""
             } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
             onClick={() =>
-              handleClickOption("vitrerie", vitrerieProposition.id)
+              handleClickProposition(
+                "vitrerie",
+                vitrerieProposition.id,
+                vitrerieProposition.prixParPassage * nettoyage.nbPassageVitrerie
+              )
             }
           >
             <Checkbox
@@ -327,7 +372,12 @@ const NettoyageOptionsPropositions = ({
                 nettoyage.vitreriePropositionId === vitrerieProposition.id
               }
               onCheckedChange={() =>
-                handleClickOption("vitrerie", vitrerieProposition.id)
+                handleClickProposition(
+                  "vitrerie",
+                  vitrerieProposition.id,
+                  vitrerieProposition.prixParPassage *
+                    nettoyage.nbPassageVitrerie
+                )
               }
               className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             />

@@ -16,11 +16,16 @@ import Link from "next/link";
 import { useContext } from "react";
 import { roundEffectif } from "../../lib/roundEffectif";
 
+//Pour naviguer dans le Funnel de devis
+//Il faut que le client ait rempli les étapes précédentes pour pouvoir cliquer sur l'étape suivante
+//Quand on clique sur une étape il faut renvoyer vers l'url avec les search params correspondants
+
 const DevisBreadcrumb = () => {
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const { client } = useContext(ClientContext);
   const { nettoyage } = useContext(NettoyageContext);
   const { cafe } = useContext(CafeContext);
+
   const serviceSearchParams = new URLSearchParams();
   const foodBeverageSearchParams = new URLSearchParams();
 
@@ -37,6 +42,7 @@ const DevisBreadcrumb = () => {
   if (client.surface) {
     serviceSearchParams.set("surface", roundSurface(client.surface).toString());
   }
+
   if (nettoyage.gammeSelected) {
     serviceSearchParams.set("nettoyageGamme", nettoyage.gammeSelected);
   }
@@ -46,12 +52,16 @@ const DevisBreadcrumb = () => {
       nettoyage.fournisseurId.toString()
     );
   }
+
   if (cafe.cafeFournisseurId) {
     foodBeverageSearchParams.set(
       "cafeFournisseurId",
       cafe.cafeFournisseurId.toString()
     );
   }
+
+  //mes-services searchParams : surface, effectif, fournisseurId, nettoyageGamme
+  //food-beverage searchParams : cafeFournisseurId, effectif
 
   const devisRoutes = [
     {

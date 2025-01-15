@@ -8,9 +8,9 @@ import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQ
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { Toilet } from "lucide-react";
 import { useContext } from "react";
-import NextServiceButton from "../NextServiceButton";
-import PreviousServiceButton from "../PreviousServiceButton";
+import PropositionsTitle from "../PropositionsTitle";
 import HygieneOptionsPropositions from "./HygieneOptionsPropositions";
+import PropositionsFooter from "../PropositionsFooter";
 
 type HygieneOptionsProps = {
   distribQuantites?: SelectHygieneDistribQuantitesType | null;
@@ -44,17 +44,15 @@ const HygieneOptions = ({
   }
   return (
     <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="4">
-      <div className="flex justify-between items-center">
-        <div className="flex gap-4 items-center p-4 border rounded-xl">
-          <Toilet />
-          <p>Hygiène sanitaire</p>
-        </div>
-        <p className="text-base w-2/3 text-center italic px-4">
-          {`Choisissez vos options en gamme chez ${distribTarifs?.[0]?.nomEntreprise}`}
-        </p>
-
-        <PreviousServiceButton handleClickPrevious={handleClickPrevious} />
-      </div>
+      <PropositionsTitle
+        icon={Toilet}
+        title="Hygiène sanitaire"
+        description={
+          "Choisissez vos options en gamme chez " +
+          distribTarifs?.[0]?.nomEntreprise
+        }
+        handleClickPrevious={handleClickPrevious}
+      />
       <div className="w-full flex-1">
         {distribQuantites && distribTarifs && consosTarif && (
           <HygieneOptionsPropositions
@@ -64,7 +62,10 @@ const HygieneOptions = ({
           />
         )}
       </div>
-      <NextServiceButton handleClickNext={handleClickNext} />
+      <PropositionsFooter
+        comment="*emplacement pour remarque"
+        handleClickNext={handleClickNext}
+      />
     </div>
   );
 };

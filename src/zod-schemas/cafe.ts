@@ -39,9 +39,12 @@ export const cafeMachineFormSchema = z.object({
   ]),
   nbPersonnes: z
     .string()
-    .regex(
-      /^(0|[1-9]\d*)$/,
-      "Nombre de personnes invalide : entrez un chiffre entier positif"
+    .refine(
+      (value) =>
+        /^\d+$/.test(value) &&
+        parseInt(value, 10) >= 1 &&
+        parseInt(value, 10) <= 300,
+      "Le nombre de personnes doit être compris entre 1 et 300"
     ),
   nbMachines: z.number(),
 });

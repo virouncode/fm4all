@@ -1,10 +1,12 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ClientContext } from "@/context/ClientProvider";
 import { TheContext } from "@/context/TheProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
 import { roundEffectif } from "@/lib/roundEffectif";
+import { GammeType } from "@/zod-schemas/gamme";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import {
   Tooltip,
@@ -16,24 +18,31 @@ import Image from "next/image";
 import { ChangeEvent, useContext } from "react";
 
 type ThePropositionsProps = {
-  theConsoTarifs?: SelectTheConsoTarifsType[];
-  effectif: string;
+  theConsoTarifs: SelectTheConsoTarifsType[];
 };
 
-const ThePropositions = ({
-  theConsoTarifs,
-  effectif,
-}: ThePropositionsProps) => {
+const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
+  const { client } = useContext(ClientContext);
   const { the, setThe } = useContext(TheContext);
   const { setTotalCafe } = useContext(TotalCafeContext);
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setThe((prev) => ({ ...prev, nbPersonnes: parseInt(value) }));
+    const newNbPersonnes = value
+      ? parseInt(value)
+      : Math.round((client.effectif ?? 0) * 0.15);
+    setThe((prev) => ({ ...prev, nbPersonnes: newNbPersonnes }));
+    if (the.theGammeSelected) {
+      const proposition = propositions.find(
+        (proposition) => proposition.gamme === the.theGammeSelected
+      );
+      setTotalCafe((prev) => ({
+        ...prev,
+        prixThe: (proposition?.prixUnitaire ?? 0) * newNbPersonnes * 400,
+      }));
+    }
   };
-
-  const nbPersonnesInitial = Math.round(parseInt(effectif) * 0.15); //15% de la boite
-  const nbPersonnes = the.nbPersonnes ?? nbPersonnesInitial;
-
+  const nbPersonnes = the.nbPersonnes;
   const nbThesParAn = nbPersonnes * 400;
 
   const propositions =
@@ -45,18 +54,18 @@ const ThePropositions = ({
       })) ?? [];
 
   const handleClickProposition = (
-    propositionId: number,
+    gamme: GammeType,
     prixAnnuel: number | null
   ) => {
-    if (the.propositionId === propositionId) {
-      setThe((prev) => ({ ...prev, propositionId: null }));
+    if (the.theGammeSelected === gamme) {
+      setThe((prev) => ({ ...prev, theGammeSelected: null }));
       setTotalCafe((prev) => ({
         ...prev,
         prixThe: null,
       }));
       return;
     }
-    setThe((prev) => ({ ...prev, propositionId }));
+    setThe((prev) => ({ ...prev, theGammeSelected: gamme }));
     setTotalCafe((prev) => ({
       ...prev,
       prixThe: prixAnnuel,
@@ -107,7 +116,7 @@ const ThePropositions = ({
                 step={1}
                 onChange={handleChange}
                 className={`w-16 ${
-                  the.nbPersonnes === nbPersonnesInitial
+                  the.nbPersonnes === Math.round((client.effectif ?? 0) * 0.15)
                     ? "text-destructive"
                     : ""
                 }`}
@@ -135,19 +144,19 @@ const ThePropositions = ({
           return (
             <div
               className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
-                the.propositionId === proposition.id
+                the.theGammeSelected === gamme
                   ? "ring-2 ring-inset ring-destructive"
                   : ""
               } px-8`}
               key={proposition.id}
               onClick={() =>
-                handleClickProposition(proposition.id, proposition.prixAnnuel)
+                handleClickProposition(gamme, proposition.prixAnnuel)
               }
             >
               <Checkbox
-                checked={the.propositionId === proposition.id}
+                checked={the.theGammeSelected === gamme}
                 onCheckedChange={() =>
-                  handleClickProposition(proposition.id, proposition.prixAnnuel)
+                  handleClickProposition(gamme, proposition.prixAnnuel)
                 }
                 className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
               />

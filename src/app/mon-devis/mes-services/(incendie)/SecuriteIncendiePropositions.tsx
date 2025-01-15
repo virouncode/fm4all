@@ -41,6 +41,10 @@ const SecuriteIncendiePropositions = ({
     nbExtincteurs,
     nbBaes,
     nbTelBaes,
+    tarifParExtincteur: tarif.prixParExtincteur,
+    tarifParBaes: tarif.prixParBaes,
+    tarifParTelBaes: tarif.prixParTelBaes,
+    tarifFraisDeplacement: tarif.fraisDeplacement,
     prixAnnuel: Math.round(
       nbExtincteurs * tarif.prixParExtincteur +
         nbBaes * tarif.prixParBaes +
@@ -49,7 +53,11 @@ const SecuriteIncendiePropositions = ({
     ),
   }));
 
-  const handleClickProposition = (propositionId: number) => {
+  const handleClickProposition = (
+    propositionId: number,
+    prixAnnuel: number,
+    nomEntreprise: string
+  ) => {
     if (incendie.propositionId === propositionId) {
       setIncendie((prev) => ({
         ...prev,
@@ -66,45 +74,88 @@ const SecuriteIncendiePropositions = ({
       propositionId,
     }));
     setTotalIncendie({
-      nomFournisseur: propositions.find(
-        (proposition) => proposition.id === propositionId
-      )?.nomEntreprise as string,
-      prixIncendie: propositions.find(
-        (proposition) => proposition.id === propositionId
-      )?.prixAnnuel as number,
+      nomFournisseur: nomEntreprise,
+      prixIncendie: prixAnnuel,
     });
   };
 
   const handleChangeNbr = (
     e: ChangeEvent<HTMLInputElement>,
-    type: "extincteur" | "baes" | "telBaes"
+    type: "extincteur" | "baes" | "telBaes",
+    proposition: {
+      id: number;
+      fournisseurId: number;
+      nomEntreprise: string;
+      slogan: string | null;
+      nbExtincteurs: number;
+      nbBaes: number;
+      nbTelBaes: number;
+      tarifParExtincteur: number;
+      tarifParBaes: number;
+      tarifParTelBaes: number;
+      tarifFraisDeplacement: number;
+      prixAnnuel: number;
+    }
   ) => {
     const value = e.target.value;
     switch (type) {
       case "extincteur":
+        const newNbExtincteurs = value
+          ? parseInt(value)
+          : incendieQuantite.nbExtincteurs;
         setIncendie((prev) => ({
           ...prev,
-          nbExtincteurs: value
-            ? parseInt(value)
-            : incendieQuantite?.nbExtincteurs ?? 0,
+          nbExtincteurs: newNbExtincteurs,
         }));
+        if (incendie.propositionId)
+          setTotalIncendie((prev) => ({
+            ...prev,
+            prixIncendie: Math.round(
+              newNbExtincteurs * proposition.tarifParExtincteur +
+                nbBaes * proposition.tarifParBaes +
+                nbTelBaes * proposition.tarifParTelBaes +
+                proposition.tarifFraisDeplacement
+            ),
+          }));
         return;
       case "baes":
+        const newNbBaes = value
+          ? parseInt(value)
+          : Math.round(
+              ((incendie.nbExtincteurs || incendieQuantite?.nbExtincteurs) ??
+                0) * 2.3
+            );
         setIncendie((prev) => ({
           ...prev,
-          nbBaes: value
-            ? parseInt(value)
-            : Math.round(
-                ((incendie.nbExtincteurs || incendieQuantite?.nbExtincteurs) ??
-                  0) * 2.3
-              ),
+          nbBaes: newNbBaes,
         }));
+        if (incendie.propositionId)
+          setTotalIncendie((prev) => ({
+            ...prev,
+            prixIncendie: Math.round(
+              nbExtincteurs * proposition.tarifParExtincteur +
+                newNbBaes * proposition.tarifParBaes +
+                nbTelBaes * proposition.tarifParTelBaes +
+                proposition.tarifFraisDeplacement
+            ),
+          }));
         return;
       case "telBaes":
+        const newNbTelBaes = value ? parseInt(value) : 1;
         setIncendie((prev) => ({
           ...prev,
           nbTelBaes: value ? parseInt(value) : 1,
         }));
+        if (incendie.propositionId)
+          setTotalIncendie((prev) => ({
+            ...prev,
+            prixIncendie: Math.round(
+              nbExtincteurs * proposition.tarifParExtincteur +
+                nbBaes * proposition.tarifParBaes +
+                newNbTelBaes * proposition.tarifParTelBaes +
+                proposition.tarifFraisDeplacement
+            ),
+          }));
         return;
     }
   };
@@ -149,11 +200,13 @@ const SecuriteIncendiePropositions = ({
                 <div className="flex gap-4 items-center  w-full">
                   <Input
                     type="number"
-                    value={incendie.nbExtincteurs || proposition.nbExtincteurs}
+                    value={nbExtincteurs}
                     min={1}
                     max={100}
                     step={1}
-                    onChange={(e) => handleChangeNbr(e, "extincteur")}
+                    onChange={(e) =>
+                      handleChangeNbr(e, "extincteur", proposition)
+                    }
                     className={`w-16 ${
                       incendie.nbExtincteurs === incendieQuantite?.nbExtincteurs
                         ? "text-destructive"
@@ -168,11 +221,11 @@ const SecuriteIncendiePropositions = ({
                 <div className="flex gap-4 items-center w-full">
                   <Input
                     type="number"
-                    value={incendie.nbBaes || proposition.nbBaes}
+                    value={nbBaes}
                     min={1}
                     max={100}
                     step={1}
-                    onChange={(e) => handleChangeNbr(e, "baes")}
+                    onChange={(e) => handleChangeNbr(e, "baes", proposition)}
                     className={`w-16 ${
                       incendie.nbBaes ===
                       Math.ceil((incendieQuantite?.nbExtincteurs ?? 0) * 2.3)
@@ -188,11 +241,11 @@ const SecuriteIncendiePropositions = ({
                 <div className="flex gap-4 items-center w-full">
                   <Input
                     type="number"
-                    value={incendie.nbTelBaes || proposition.nbTelBaes}
+                    value={nbTelBaes}
                     min={1}
                     max={10}
                     step={1}
-                    onChange={(e) => handleChangeNbr(e, "telBaes")}
+                    onChange={(e) => handleChangeNbr(e, "telBaes", proposition)}
                     className={`w-16 ${
                       incendie.nbTelBaes === 1 ? "text-destructive" : ""
                     }`}
@@ -214,11 +267,23 @@ const SecuriteIncendiePropositions = ({
                   ? "ring-2 ring-inset ring-destructive"
                   : ""
               }`}
-              onClick={() => handleClickProposition(proposition.id)}
+              onClick={() =>
+                handleClickProposition(
+                  proposition.id,
+                  proposition.prixAnnuel,
+                  proposition.nomEntreprise
+                )
+              }
             >
               <Checkbox
                 checked={incendie.propositionId === proposition.id}
-                onCheckedChange={() => handleClickProposition(proposition.id)}
+                onCheckedChange={() =>
+                  handleClickProposition(
+                    proposition.id,
+                    proposition.prixAnnuel,
+                    proposition.nomEntreprise
+                  )
+                }
                 className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
               />
               <div>

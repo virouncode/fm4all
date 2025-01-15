@@ -21,10 +21,14 @@ export const selectClientSchema = createSelectSchema(clients, {
       /^\d{2} \d{2} \d{2} \d{2} \d{2}$/,
       "Numéro de téléphone invalide, format attendu : XX XX XX XX XX"
     ),
-  surface: (schema) => schema.min(1, "Surface obligatoire"),
-  effectif: (schema) => schema.min(1, "Effectif obligatoire"),
+  surface: (schema) =>
+    schema.min(1, "Surface obligatoire").max(3000, "Surface maximum 3000 m²"),
+  effectif: (schema) =>
+    schema
+      .min(1, "Effectif obligatoire")
+      .max(300, "Effectif maximum 300 personnes"),
   typeBatiment: z.enum(
-    ["bureaux", "localCommercial", "entreport", "cabinetMedical"],
+    ["bureaux", "localCommercial", "entrepot", "cabinetMedical"],
     { message: "Type de batiment invalide" }
   ),
   typeOccupation: z.enum(["partieEtage", "plateauComplet", "batimentEntier"], {
@@ -53,10 +57,14 @@ export const insertClientSchema = createInsertSchema(clients, {
       /^\d{2} \d{2} \d{2} \d{2} \d{2}$/,
       "Numéro de téléphone invalide, format attendu : XX XX XX XX XX"
     ),
-  surface: (schema) => schema.min(1, "Surface obligatoire"),
-  effectif: (schema) => schema.min(1, "Effectif obligatoire"),
+  surface: (schema) =>
+    schema.min(1, "Surface obligatoire").max(3000, "Surface maximum 3000 m²"),
+  effectif: (schema) =>
+    schema
+      .min(1, "Effectif obligatoire")
+      .max(300, "Effectif maximum 300 personnes"),
   typeBatiment: z.enum(
-    ["bureaux", "localCommercial", "entreport", "cabinetMedical"],
+    ["bureaux", "localCommercial", "entrepot", "cabinetMedical"],
     { message: "Type de batiment invalide" }
   ),
   typeOccupation: z.enum(["partieEtage", "plateauComplet", "batimentEntier"], {
@@ -69,6 +77,13 @@ export const insertClientSchema = createInsertSchema(clients, {
 });
 
 export type InsertClientType = z.infer<typeof insertClientSchema>;
+export type InsertClientFormType = Omit<
+  InsertClientType,
+  "surface" | "effectif"
+> & {
+  surface: string;
+  effectif: string;
+};
 
 export const updateClientSchema = createUpdateSchema(clients, {
   nomEntreprise: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
@@ -85,10 +100,14 @@ export const updateClientSchema = createUpdateSchema(clients, {
       /^\d{2} \d{2} \d{2} \d{2} \d{2}$/,
       "Numéro de téléphone invalide, format attendu : XX XX XX XX XX"
     ),
-  surface: (schema) => schema.min(1, "Surface obligatoire"),
-  effectif: (schema) => schema.min(1, "Effectif obligatoire"),
+  surface: (schema) =>
+    schema.min(1, "Surface obligatoire").max(3000, "Surface maximum 3000 m²"),
+  effectif: (schema) =>
+    schema
+      .min(1, "Effectif obligatoire")
+      .max(300, "Effectif maximum 300 personnes"),
   typeBatiment: z.enum(
-    ["bureaux", "localCommercial", "entreport", "cabinetMedical"],
+    ["bureaux", "localCommercial", "entrepot", "cabinetMedical"],
     { message: "Type de batiment invalide" }
   ),
   typeOccupation: z.enum(["partieEtage", "plateauComplet", "batimentEntier"], {

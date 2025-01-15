@@ -9,8 +9,8 @@ import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTari
 import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs";
 import { Toilet } from "lucide-react";
 import { useContext } from "react";
-import NextServiceButton from "../NextServiceButton";
-import PreviousServiceButton from "../PreviousServiceButton";
+import PropositionsFooter from "../PropositionsFooter";
+import PropositionsTitle from "../PropositionsTitle";
 import HygienePropositions from "./HygienePropositions";
 
 type HygieneProps = {
@@ -30,6 +30,12 @@ const Hygiene = ({
   const { hygiene } = useContext(HygieneContext);
   const { services, setServices } = useContext(ServicesContext);
 
+  const handleClickPrevious = () => {
+    setServices((prev) => ({
+      ...prev,
+      currentServiceId: prev.currentServiceId - 1,
+    }));
+  };
   const handleClickNext = () => {
     if (hygiene.trilogieGammeSelected) {
       setServices((prev) => ({
@@ -44,32 +50,18 @@ const Hygiene = ({
     }
   };
 
-  const handleClickPrevious = () => {
-    setServices((prev) => ({
-      ...prev,
-      currentServiceId: prev.currentServiceId - 1,
-    }));
-  };
-
   if (!nettoyage.propositionId) {
     return null;
   }
 
   return (
     <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="3">
-      <div className="flex justify-between items-center">
-        <div className="flex gap-4 items-center p-4 border rounded-xl">
-          <Toilet />
-          <p>Hygiène sanitaire</p>
-        </div>
-        <p className="text-base w-2/3 text-center italic px-4">
-          Un tarif forfaitaire tout compris pour vos sanitaires avec
-          distributeurs et consommables mis en place : essuie-main papier, savon
-          & papier hygiénique. La gamme détermine la finition des distributeurs.
-        </p>
-
-        <PreviousServiceButton handleClickPrevious={handleClickPrevious} />
-      </div>
+      <PropositionsTitle
+        icon={Toilet}
+        title="Hygiène sanitaire"
+        description="Un tarif forfaitaire tout compris pour vos sanitaires avec distributeurs et consommables mis en place : essuie-main papier, savon & papier hygiénique. La gamme détermine la finition des distributeurs."
+        handleClickPrevious={handleClickPrevious}
+      />
       <div className="w-full flex-1">
         {distribQuantites &&
           distribTarifs &&
@@ -83,8 +75,10 @@ const Hygiene = ({
             />
           )}
       </div>
-      <p className="text-sm italic text-end px-1">*ma NB</p>
-      <NextServiceButton handleClickNext={handleClickNext} />
+      <PropositionsFooter
+        comment="*emplacement pour remarque"
+        handleClickNext={handleClickNext}
+      />
     </div>
   );
 };
