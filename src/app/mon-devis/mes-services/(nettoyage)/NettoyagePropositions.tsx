@@ -180,7 +180,7 @@ const NettoyagePropositions = ({
                   <div
                     className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
                       nettoyage.fournisseurId === proposition.fournisseurId &&
-                      nettoyage.gammeSelected === proposition.gamme
+                      nettoyage.gammeSelected === gamme
                         ? "ring-2 ring-inset ring-destructive"
                         : ""
                     }`}
@@ -196,7 +196,8 @@ const NettoyagePropositions = ({
                   >
                     <Checkbox
                       checked={
-                        nettoyage.fournisseurId === proposition.fournisseurId
+                        nettoyage.fournisseurId === proposition.fournisseurId &&
+                        nettoyage.gammeSelected === gamme
                       }
                       onCheckedChange={() =>
                         handleClickProposition(
