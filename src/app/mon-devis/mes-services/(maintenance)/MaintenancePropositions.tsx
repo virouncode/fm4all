@@ -40,6 +40,7 @@ const MaintenancePropositions = ({
       {
         setMaintenance((prev) => ({
           ...prev,
+          fournisseurId: null,
           gammeSelected: null,
         }));
         setTotalMaintenance({
@@ -51,6 +52,7 @@ const MaintenancePropositions = ({
     }
     setMaintenance((prev) => ({
       ...prev,
+      fournisseurId,
       gammeSelected: gamme,
     }));
     setTotalMaintenance({
