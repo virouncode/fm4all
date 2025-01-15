@@ -17,7 +17,7 @@ export const MaintenanceContext = createContext<{
 }>({
   maintenance: {
     fournisseurId: null,
-    propositionId: null,
+    gammeSelected: null,
   },
   setMaintenance: () => {},
 });
@@ -28,7 +28,7 @@ const MaintenanceProvider = ({ children }: PropsWithChildren) => {
   // Always initialize state
   const [maintenance, setMaintenance] = useState<MaintenanceType>({
     fournisseurId: null,
-    propositionId: null,
+    gammeSelected: null,
   });
 
   // Update state after mounting

@@ -28,13 +28,13 @@ export const totalHygieneSchema = z.object({
   prixBalai: z.number().nullable(),
   prixPoubelle: z.number().nullable(),
 });
-export const totalIncendieSchema = z.object({
-  nomFournisseur: z.string().nullable(),
-  prixIncendie: z.number().nullable(),
-});
 export const totalMaintenanceSchema = z.object({
   nomFournisseur: z.string().nullable(),
   prixMaintenance: z.number().nullable(),
+});
+export const totalIncendieSchema = z.object({
+  nomFournisseur: z.string().nullable(),
+  prixIncendie: z.number().nullable(),
 });
 export const totalCafeSchema = z.object({
   nomFournisseur: z.string().nullable(),

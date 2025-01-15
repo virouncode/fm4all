@@ -9,6 +9,7 @@ import { MaintenanceContext } from "@/context/MaintenanceProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
+import { GammeType } from "@/zod-schemas/gamme";
 import { SelectMaintenanceTarifsType } from "@/zod-schemas/maintenanceTarifs";
 import Image from "next/image";
 import { useContext } from "react";
@@ -27,24 +28,30 @@ const MaintenancePropositions = ({
   const { setTotalMaintenance } = useContext(TotalMaintenanceContext);
 
   const handleClickProposition = (
-    propositionId: number,
-    prixAnnuel: number,
-    nomEntreprise: string
+    fournisseurId: number,
+    gamme: GammeType,
+    nomEntreprise: string,
+    prixAnnuel: number
   ) => {
-    if (maintenance.propositionId === propositionId) {
-      setMaintenance((prev) => ({
-        ...prev,
-        propositionId: null,
-      }));
-      setTotalMaintenance({
-        nomFournisseur: null,
-        prixMaintenance: null,
-      });
-      return;
+    if (
+      maintenance.fournisseurId === fournisseurId &&
+      maintenance.gammeSelected === gamme
+    ) {
+      {
+        setMaintenance((prev) => ({
+          ...prev,
+          gammeSelected: null,
+        }));
+        setTotalMaintenance({
+          nomFournisseur: null,
+          prixMaintenance: null,
+        });
+        return;
+      }
     }
     setMaintenance((prev) => ({
       ...prev,
-      propositionId,
+      gammeSelected: gamme,
     }));
     setTotalMaintenance({
       nomFournisseur: nomEntreprise,
@@ -105,26 +112,33 @@ const MaintenancePropositions = ({
                 return (
                   <div
                     className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
-                      maintenance.propositionId === proposition.id
+                      maintenance.fournisseurId === proposition.fournisseurId &&
+                      maintenance.gammeSelected === gamme
                         ? "ring-2 ring-inset ring-destructive"
                         : ""
                     }`}
                     key={proposition.id}
                     onClick={() =>
                       handleClickProposition(
-                        proposition.id,
-                        proposition.prixAnnuel,
-                        proposition.nomEntreprise
+                        proposition.fournisseurId,
+                        proposition.gamme,
+                        proposition.nomEntreprise,
+                        proposition.prixAnnuel
                       )
                     }
                   >
                     <Checkbox
-                      checked={maintenance.propositionId === proposition.id}
+                      checked={
+                        maintenance.fournisseurId ===
+                          proposition.fournisseurId &&
+                        maintenance.gammeSelected === gamme
+                      }
                       onCheckedChange={() =>
                         handleClickProposition(
-                          proposition.id,
-                          proposition.prixAnnuel,
-                          proposition.nomEntreprise
+                          proposition.fournisseurId,
+                          proposition.gamme,
+                          proposition.nomEntreprise,
+                          proposition.prixAnnuel
                         )
                       }
                       className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"

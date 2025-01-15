@@ -3,6 +3,8 @@ import { SelectClientType } from "@/zod-schemas/client";
 import { DevisProgressType } from "@/zod-schemas/devisProgress";
 import { FoodBeverageType } from "@/zod-schemas/foodBeverage";
 import { HygieneType } from "@/zod-schemas/hygiene";
+import { IncendieType } from "@/zod-schemas/incendie";
+import { MaintenanceType } from "@/zod-schemas/maintenance";
 import { NettoyageType } from "@/zod-schemas/nettoyage";
 import { ServicesType } from "@/zod-schemas/services";
 import { TheType } from "@/zod-schemas/the";
@@ -19,14 +21,16 @@ export const reinitialisationDevis = (
   setDevisProgress: (devisProgress: DevisProgressType) => void,
   setNettoyage: (nettoyage: NettoyageType) => void,
   setHygiene: (hygiene: HygieneType) => void,
+  setMaintenance: (maintenance: MaintenanceType) => void,
+  setIncendie: (incendie: IncendieType) => void,
   setCafe: (cafe: CafeType) => void,
   setThe: (the: TheType) => void,
   setServices: (services: ServicesType) => void,
   setFoodBeverage: (foodBeverage: FoodBeverageType) => void,
   setTotalNettoyage: (totalNettoyage: TotalNettoyageType) => void,
   setTotalHygiene: (totalHygiene: TotalHygieneType) => void,
-  setTotalIncendie: (totalIncendie: TotalIncendieType) => void,
   setTotalMaintenance: (totalMaintenance: TotalMaintenanceType) => void,
+  setTotalIncendie: (totalIncendie: TotalIncendieType) => void,
   setTotalCafe: (totalCafe: TotalCafeType) => void
 ) => {
   //Devis
@@ -34,12 +38,11 @@ export const reinitialisationDevis = (
   //Services
   setNettoyage({
     fournisseurId: null,
-    propositionId: null,
     gammeSelected: null,
-    repassePropositionId: null,
-    samediPropositionId: null,
-    dimanchePropositionId: null,
-    vitreriePropositionId: null,
+    repasseSelected: false,
+    samediSelected: false,
+    dimancheSelected: false,
+    vitrerieSelected: false,
     nbPassageVitrerie: 2,
   });
   setHygiene({
@@ -58,22 +61,33 @@ export const reinitialisationDevis = (
     balaiGammeSelected: null,
     poubelleGammeSelected: null,
   });
+  setMaintenance({
+    fournisseurId: null,
+    gammeSelected: null,
+  });
+  setIncendie({
+    fournisseurId: null,
+    nbExtincteurs: 0,
+    nbBaes: 0,
+    nbTelBaes: 0,
+  });
+
   setCafe({
     currentMachineId: null,
     cafeFournisseurId: null,
     machines: [
       {
         machineId: 1,
+        gammeSelected: null,
         typeBoissons: "cafe",
         dureeLocation: "pa12M",
         nbPersonnes: client.effectif ?? 0,
         nbMachines: 0,
-        propositionId: null,
       },
     ],
   });
   setThe({
-    theGammeSelected: null,
+    gammeSelected: null,
     nbPersonnes: Math.round((client.effectif ?? 0) * 0.15),
   });
   //Navigation

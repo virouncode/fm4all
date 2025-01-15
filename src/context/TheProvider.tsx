@@ -18,7 +18,7 @@ export const TheContext = createContext<{
   setThe: Dispatch<SetStateAction<TheType>>;
 }>({
   the: {
-    theGammeSelected: null,
+    gammeSelected: null,
     nbPersonnes: 0,
   },
   setThe: () => {},
@@ -30,7 +30,7 @@ const TheProvider = ({ children }: PropsWithChildren) => {
 
   // Always initialize state
   const [the, setThe] = useState<TheType>({
-    theGammeSelected: null,
+    gammeSelected: null,
     nbPersonnes: Math.round((client.effectif ?? 0) * 0.15),
   });
 

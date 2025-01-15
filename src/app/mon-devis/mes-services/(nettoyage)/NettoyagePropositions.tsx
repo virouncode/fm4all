@@ -39,14 +39,16 @@ const NettoyagePropositions = ({
   const router = useRouter();
 
   const handleClickProposition = (
-    propositionId: number,
     fournisseurId: number,
-    nomEntreprise: string,
     gamme: GammeType,
+    nomEntreprise: string,
     prixAnnuel: number
   ) => {
     //Je décoche la proposition
-    if (nettoyage.propositionId === propositionId) {
+    if (
+      nettoyage.fournisseurId === fournisseurId &&
+      nettoyage.gammeSelected === gamme
+    ) {
       reinitialisationNettoyage(
         setNettoyage,
         setHygiene,
@@ -64,12 +66,11 @@ const NettoyagePropositions = ({
     setNettoyage((prev) => ({
       ...prev,
       fournisseurId: fournisseurId,
-      propositionId,
       gammeSelected: gamme,
-      repassePropositionId: null,
-      samediPropositionId: null,
-      dimanchePropositionId: null,
-      vitreriePropositionId: null,
+      repasseSelected: false,
+      samediSelected: false,
+      dimancheSelected: false,
+      vitrerieSelected: false,
       nbPassageVitrerie: 2,
     }));
 
@@ -178,29 +179,30 @@ const NettoyagePropositions = ({
                 return (
                   <div
                     className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
-                      nettoyage.propositionId === proposition.id
+                      nettoyage.fournisseurId === proposition.fournisseurId &&
+                      nettoyage.gammeSelected === proposition.gamme
                         ? "ring-2 ring-inset ring-destructive"
                         : ""
                     }`}
                     key={proposition.id}
                     onClick={() =>
                       handleClickProposition(
-                        proposition.id,
                         proposition.fournisseurId,
-                        proposition.nomEntreprise,
                         proposition.gamme,
+                        proposition.nomEntreprise,
                         proposition.prixAnnuel
                       )
                     }
                   >
                     <Checkbox
-                      checked={nettoyage.propositionId === proposition.id}
+                      checked={
+                        nettoyage.fournisseurId === proposition.fournisseurId
+                      }
                       onCheckedChange={() =>
                         handleClickProposition(
-                          proposition.id,
                           proposition.fournisseurId,
-                          proposition.nomEntreprise,
                           proposition.gamme,
+                          proposition.nomEntreprise,
                           proposition.prixAnnuel
                         )
                       }

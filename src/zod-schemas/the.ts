@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const theSchema = z.object({
-  theGammeSelected: z.enum(["essentiel", "confort", "excellence"]).nullable(),
+  gammeSelected: z.enum(["essentiel", "confort", "excellence"]).nullable(),
   nbPersonnes: z.number(),
 });
 

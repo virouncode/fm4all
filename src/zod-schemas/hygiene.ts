@@ -14,6 +14,7 @@ export const hygieneSchema = z.object({
   }),
   trilogieGammeSelected: z
     .enum(["essentiel", "confort", "excellence"])
+    .default("essentiel")
     .nullable(),
   desinfectantGammeSelected: z
     .enum(["essentiel", "confort", "excellence"])

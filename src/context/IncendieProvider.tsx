@@ -17,7 +17,6 @@ export const IncendieContext = createContext<{
 }>({
   incendie: {
     fournisseurId: null,
-    propositionId: null,
     nbExtincteurs: 0,
     nbBaes: 0,
     nbTelBaes: 0,
@@ -31,7 +30,6 @@ const IncendieProvider = ({ children }: PropsWithChildren) => {
   // Always initialize state
   const [incendie, setIncendie] = useState<IncendieType>({
     fournisseurId: null,
-    propositionId: null,
     nbExtincteurs: 0,
     nbBaes: 0,
     nbTelBaes: 0,

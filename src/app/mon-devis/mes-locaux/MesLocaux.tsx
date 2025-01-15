@@ -12,6 +12,8 @@ import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
 import { HygieneContext } from "@/context/HygieneProvider";
+import { IncendieContext } from "@/context/IncendieProvider";
+import { MaintenanceContext } from "@/context/MaintenanceProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import { TheContext } from "@/context/TheProvider";
@@ -42,6 +44,8 @@ const MesLocaux = () => {
   const { client, setClient } = useContext(ClientContext);
   const { setNettoyage } = useContext(NettoyageContext);
   const { setHygiene } = useContext(HygieneContext);
+  const { setMaintenance } = useContext(MaintenanceContext);
+  const { setIncendie } = useContext(IncendieContext);
   const { setCafe } = useContext(CafeContext);
   const { setThe } = useContext(TheContext);
   const { setTotalNettoyage } = useContext(TotalNettoyageContext);
@@ -139,6 +143,8 @@ const MesLocaux = () => {
       setDevisProgress,
       setNettoyage,
       setHygiene,
+      setMaintenance,
+      setIncendie,
       setCafe,
       setThe,
       //navigation
@@ -147,8 +153,8 @@ const MesLocaux = () => {
       //Total
       setTotalNettoyage,
       setTotalHygiene,
-      setTotalIncendie,
       setTotalMaintenance,
+      setTotalIncendie,
       setTotalCafe
     );
     //Passer à l'étape suivante

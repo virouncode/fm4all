@@ -7,9 +7,9 @@ import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
 import { SprayCan } from "lucide-react";
 import { useContext } from "react";
+import PropositionsFooter from "../PropositionsFooter";
 import PropositionsTitle from "../PropositionsTitle";
 import NettoyageOptionsPropositions from "./NettoyageOptionsPropositions";
-import PropositionsFooter from "../PropositionsFooter";
 
 type NettoyageOptionsProps = {
   repasseProposition:
@@ -52,7 +52,7 @@ const NettoyageOptions = ({
     }));
   };
 
-  if (!nettoyage.propositionId) {
+  if (!nettoyage.fournisseurId && !nettoyage.gammeSelected) {
     return null; //pour skiper le service
   }
 

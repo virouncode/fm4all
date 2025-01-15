@@ -2,12 +2,11 @@ import { z } from "zod";
 
 export const nettoyageSchema = z.object({
   fournisseurId: z.number().nullable(),
-  propositionId: z.number().nullable(),
   gammeSelected: z.enum(["essentiel", "confort", "excellence"]).nullable(),
-  repassePropositionId: z.number().nullable(),
-  samediPropositionId: z.number().nullable(),
-  dimanchePropositionId: z.number().nullable(),
-  vitreriePropositionId: z.number().nullable(),
+  repasseSelected: z.boolean().default(false),
+  samediSelected: z.boolean().default(false),
+  dimancheSelected: z.boolean().default(false),
+  vitrerieSelected: z.boolean().default(false),
   nbPassageVitrerie: z.number().default(2),
 });
 

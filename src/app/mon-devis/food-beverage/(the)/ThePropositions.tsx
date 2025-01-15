@@ -32,9 +32,9 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
       ? parseInt(value)
       : Math.round((client.effectif ?? 0) * 0.15);
     setThe((prev) => ({ ...prev, nbPersonnes: newNbPersonnes }));
-    if (the.theGammeSelected) {
+    if (the.gammeSelected) {
       const proposition = propositions.find(
-        (proposition) => proposition.gamme === the.theGammeSelected
+        (proposition) => proposition.gamme === the.gammeSelected
       );
       setTotalCafe((prev) => ({
         ...prev,
@@ -42,6 +42,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
       }));
     }
   };
+
   const nbPersonnes = the.nbPersonnes;
   const nbThesParAn = nbPersonnes * 400;
 
@@ -57,15 +58,15 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
     gamme: GammeType,
     prixAnnuel: number | null
   ) => {
-    if (the.theGammeSelected === gamme) {
-      setThe((prev) => ({ ...prev, theGammeSelected: null }));
+    if (the.gammeSelected === gamme) {
+      setThe((prev) => ({ ...prev, gammeSelected: null }));
       setTotalCafe((prev) => ({
         ...prev,
         prixThe: null,
       }));
       return;
     }
-    setThe((prev) => ({ ...prev, theGammeSelected: gamme }));
+    setThe((prev) => ({ ...prev, gammeSelected: gamme }));
     setTotalCafe((prev) => ({
       ...prev,
       prixThe: prixAnnuel,
@@ -144,7 +145,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
           return (
             <div
               className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
-                the.theGammeSelected === gamme
+                the.gammeSelected === gamme
                   ? "ring-2 ring-inset ring-destructive"
                   : ""
               } px-8`}
@@ -154,7 +155,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
               }
             >
               <Checkbox
-                checked={the.theGammeSelected === gamme}
+                checked={the.gammeSelected === gamme}
                 onCheckedChange={() =>
                   handleClickProposition(gamme, proposition.prixAnnuel)
                 }

@@ -35,7 +35,7 @@ const The = ({ theConsoTarifs, effectif }: TheProps) => {
   return (
     <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="2">
       <PropositionsTitle
-        title="Thé variés"
+        title="Thés variés"
         icon={Leaf}
         description="Parce que tout le monde ne boit pas forcément du café, un choix de thés présentés en coffrets"
         handleClickPrevious={handleClickPrevious}

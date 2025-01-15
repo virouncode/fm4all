@@ -13,6 +13,7 @@ import { SelectCafeQuantitesType } from "@/zod-schemas/cafeQuantites";
 import { SelectChocoConsoTarifsType } from "@/zod-schemas/chocoConsoTarifs";
 import { DureeLocationCafeType } from "@/zod-schemas/dureeLocation";
 import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
+import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { Coffee } from "lucide-react";
 import { useContext } from "react";
 import PropositionsFooter from "../../mes-services/PropositionsFooter";
@@ -26,6 +27,7 @@ type CafeProps = {
   cafeConsoTarifs: SelectCafeConsoTarifsType[];
   laitConsoTarifs: SelectLaitConsoTarifsType[];
   chocoConsoTarifs: SelectChocoConsoTarifsType[];
+  theConsoTarifs: SelectTheConsoTarifsType[];
   effectif: string;
   cafeFournisseurId?: string;
 };
@@ -37,6 +39,7 @@ const Cafe = ({
   cafeConsoTarifs,
   laitConsoTarifs,
   chocoConsoTarifs,
+  theConsoTarifs,
   effectif,
   cafeFournisseurId,
 }: CafeProps) => {
@@ -74,7 +77,7 @@ const Cafe = ({
           dureeLocation: "pa12M" as DureeLocationCafeType,
           nbPersonnes: parseInt(effectif),
           nbMachines: 0,
-          propositionId: null,
+          gammeSelected: null,
         },
       ],
     }));
@@ -115,6 +118,7 @@ const Cafe = ({
               cafeConsoTarifs={cafeConsoTarifs}
               laitConsoTarifs={laitConsoTarifs}
               chocoConsoTarifs={chocoConsoTarifs}
+              theConsoTarifs={theConsoTarifs}
               effectif={effectif}
               cafeFournisseurId={cafeFournisseurId}
             />

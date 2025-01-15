@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { RATIO_CHOCO, RATIO_LAIT } from "@/constants/constants";
 import { CafeContext } from "@/context/CafeProvider";
+import { ClientContext } from "@/context/ClientProvider";
+import { TheContext } from "@/context/TheProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import { toast } from "@/hooks/use-toast";
 import { roundEffectif } from "@/lib/roundEffectif";
@@ -13,10 +15,12 @@ import { SelectCafeQuantitesType } from "@/zod-schemas/cafeQuantites";
 import { SelectChocoConsoTarifsType } from "@/zod-schemas/chocoConsoTarifs";
 import { gammes } from "@/zod-schemas/gamme";
 import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
+import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { Trash2 } from "lucide-react";
 import { useContext, useEffect } from "react";
 import MachinePropositions from "./MachinePropositions";
 import MachineUpdateForm from "./MachineUpdateForm";
+import { reinitialisationCafeThe } from "./reinitialisationCafeThe";
 
 type CafeMachineProps = {
   machine: CafeMachineType;
@@ -26,6 +30,7 @@ type CafeMachineProps = {
   cafeConsoTarifs: SelectCafeConsoTarifsType[];
   laitConsoTarifs: SelectLaitConsoTarifsType[];
   chocoConsoTarifs: SelectChocoConsoTarifsType[];
+  theConsoTarifs: SelectTheConsoTarifsType[];
   effectif: string;
   cafeFournisseurId?: string;
 };
@@ -38,10 +43,13 @@ const CafeMachine = ({
   cafeConsoTarifs,
   laitConsoTarifs,
   chocoConsoTarifs,
+  theConsoTarifs,
   effectif,
   cafeFournisseurId,
 }: CafeMachineProps) => {
+  const { client } = useContext(ClientContext);
   const { cafe, setCafe } = useContext(CafeContext);
+  const { setThe } = useContext(TheContext);
   const { setTotalCafe } = useContext(TotalCafeContext);
   const cafeMachinesIds = cafe.machines.map(({ machineId }) => machineId);
 
@@ -76,18 +84,9 @@ const CafeMachine = ({
   };
 
   const handleClickRemove = () => {
-    if (cafeMachinesIds.length === 1) {
-      //Je retire la première machine
-      setCafe((prev) => ({
-        ...prev,
-        currentMachineId: null,
-        machines: [],
-      }));
-      setTotalCafe((prev) => ({
-        ...prev,
-        prixCafeMachines: [],
-        prixThe: null,
-      }));
+    if (cafeMachinesIds[0] === machine.machineId) {
+      //Je reinitialise tout
+      reinitialisationCafeThe(setCafe, setThe, setTotalCafe, client);
       return;
     }
     const indexOfCurrentMachine = cafeMachinesIds.indexOf(machine.machineId);
@@ -202,7 +201,7 @@ const CafeMachine = ({
             nbMachines * prixAnnuelTotalParMachine
         );
         return {
-          ...tarif, //l'id du tarif est utilisé pour identifier la proposition (si la proposition change et donc l'id selectionné change car l'effectif change, ce n'est pas grave car de toute facon on annule le choix)
+          ...tarif,
           prixAnnuel,
           modeleMachine: modeleMachine,
           marqueMachine: marqueMachine,
@@ -240,7 +239,16 @@ const CafeMachine = ({
   return (
     <div className="h-full flex flex-col" id={`machine_${machine.machineId}`}>
       <div className="w-full flex justify-between items-start">
-        <MachineUpdateForm machine={machine} />
+        <MachineUpdateForm
+          machine={machine}
+          cafeMachines={cafeMachines}
+          cafeQuantites={cafeQuantites}
+          cafeMachinesTarifs={cafeMachinesTarifs}
+          cafeConsoTarifs={cafeConsoTarifs}
+          laitConsoTarifs={laitConsoTarifs}
+          chocoConsoTarifs={chocoConsoTarifs}
+          theConsoTarifs={theConsoTarifs}
+        />
         <div className="flex gap-2 items-center">
           {cafeMachinesIds[0] !== machine.machineId && (
             <Button
@@ -260,10 +268,15 @@ const CafeMachine = ({
               title="Retirer"
               onClick={handleClickRemove}
               type="button"
-              disabled={cafeMachinesIds.slice(-1)[0] !== machine.machineId}
+              disabled={
+                cafeMachinesIds[0] !== machine.machineId &&
+                cafeMachinesIds.slice(-1)[0] !== machine.machineId
+              }
             >
               <Trash2 />
-              Retirer machine(s) n°{machine.machineId}
+              {cafeMachinesIds[0] === machine.machineId
+                ? "Retirer tout"
+                : `Retirer`}
             </Button>
           </div>
         </div>

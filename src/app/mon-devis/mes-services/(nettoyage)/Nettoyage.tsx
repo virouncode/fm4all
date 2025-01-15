@@ -25,7 +25,7 @@ const Nettoyage = ({ nettoyagePropositions }: NettoyageProps) => {
 
   const handleClickPrevious = () => {};
   const handleClickNext = () => {
-    if (nettoyage.propositionId) {
+    if (nettoyage.fournisseurId && nettoyage.gammeSelected) {
       setServices((prev) => ({
         ...prev,
         currentServiceId: prev.currentServiceId + 1,

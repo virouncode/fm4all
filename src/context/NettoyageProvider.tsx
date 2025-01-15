@@ -18,12 +18,11 @@ export const NettoyageContext = createContext<{
 }>({
   nettoyage: {
     fournisseurId: null,
-    propositionId: null,
     gammeSelected: null,
-    repassePropositionId: null,
-    samediPropositionId: null,
-    dimanchePropositionId: null,
-    vitreriePropositionId: null,
+    repasseSelected: false,
+    samediSelected: false,
+    dimancheSelected: false,
+    vitrerieSelected: false,
     nbPassageVitrerie: 2,
   },
   setNettoyage: () => {},
@@ -35,12 +34,11 @@ const NettoyageProvider = ({ children }: PropsWithChildren) => {
   // Always initialize state
   const [nettoyage, setNettoyage] = useState<NettoyageType>({
     fournisseurId: null,
-    propositionId: null,
     gammeSelected: null,
-    repassePropositionId: null,
-    samediPropositionId: null,
-    dimanchePropositionId: null,
-    vitreriePropositionId: null,
+    repasseSelected: false,
+    samediSelected: false,
+    dimancheSelected: false,
+    vitrerieSelected: false,
     nbPassageVitrerie: 2,
   });
 

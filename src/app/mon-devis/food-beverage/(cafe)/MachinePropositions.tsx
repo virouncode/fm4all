@@ -17,6 +17,7 @@ import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
 import { CafeMachineType } from "@/zod-schemas/cafe";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
 import { DureeLocationCafeType } from "@/zod-schemas/dureeLocation";
+import { GammeType } from "@/zod-schemas/gamme";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
@@ -40,14 +41,14 @@ const MachinePropositions = ({
 }: MachinePropositionsProps) => {
   const { setFoodBeverage } = useContext(FoodBeverageContext);
   const { cafe, setCafe } = useContext(CafeContext);
-  const { setThe } = useContext(TheContext);
+  const { the, setThe } = useContext(TheContext);
   const { setTotalCafe } = useContext(TotalCafeContext);
   const router = useRouter();
   const cafeMachinesIds = cafe.machines.map((item) => item.machineId);
 
   const handleClickProposition = (
-    propositionId: number,
     fournisseurId: number,
+    gamme: GammeType,
     nomEntreprise: string,
     prixAnnuel: number | null,
     marque: string,
@@ -57,19 +58,22 @@ const MachinePropositions = ({
     //Si c'est la première machine
     if (cafeMachinesIds[0] === machine.machineId) {
       //Je decoche
-      if (machine.propositionId === propositionId) {
+      if (
+        machine.gammeSelected === gamme &&
+        cafe.cafeFournisseurId === fournisseurId
+      ) {
         //Je retire toutes les propositions cafe et the mais je garde les machines
         setCafe((prev) => ({
           ...prev,
           cafeFournisseurId: null,
           machines: prev.machines.map((item) => ({
             ...item,
-            propositionId: null,
+            gammeSelected: null,
           })),
         }));
         setThe((prev) => ({
           ...prev,
-          theGammeSelected: null,
+          gammeSelected: null,
         }));
         //Je retire tous les totaux mais je garde les machines
         setTotalCafe((prev) => ({
@@ -98,7 +102,7 @@ const MachinePropositions = ({
                   item.machineId === machine.machineId
                     ? {
                         ...item,
-                        propositionId,
+                        gammeSelected: gamme,
                       }
                     : item
                 )
@@ -106,11 +110,12 @@ const MachinePropositions = ({
                   item.machineId === machine.machineId
                     ? {
                         ...item,
-                        propositionId,
+                        gammeSelected: gamme,
                       }
-                    : { ...item, propositionId: null }
+                    : { ...item, gammeSelected: null }
                 ),
         }));
+
         //Je mets à jour les totaux
         setTotalCafe((prev) => ({
           ...prev,
@@ -147,15 +152,18 @@ const MachinePropositions = ({
                         reconditionne: false,
                       }
                 ),
+          prixThe:
+            cafe.cafeFournisseurId !== fournisseurId ? null : prev.prixThe,
         }));
-        if (
-          cafe.cafeFournisseurId !== fournisseurId &&
-          cafe.machines.length > 1
-        ) {
+        if (cafe.cafeFournisseurId !== fournisseurId) {
+          setThe((prev) => ({
+            ...prev,
+            gammeSelected: null,
+          }));
           toast({
             title: "Attention",
             description:
-              "Vous avez selectionné un nouveau fournisseur, pensez à refaire vos choix pour les autres machines et pour le thé",
+              "Vous avez selectionné un nouveau fournisseur, pensez à refaire vos choix pour les autres machines et pour le thé si vous en avez",
             variant: "destructive",
             duration: 3000,
             className: "left-0",
@@ -168,7 +176,7 @@ const MachinePropositions = ({
       return;
     }
     //Si ce n'est pas la première machine
-    if (machine.propositionId === propositionId) {
+    if (machine.gammeSelected === gamme) {
       //Je decoche
       //Je mets à jour la proposition
       setCafe((prev) => ({
@@ -177,7 +185,7 @@ const MachinePropositions = ({
           item.machineId === machine.machineId
             ? {
                 ...item,
-                propositionId: null,
+                gammeSelected: null,
               }
             : item
         ),
@@ -206,7 +214,7 @@ const MachinePropositions = ({
           item.machineId === machine.machineId
             ? {
                 ...item,
-                propositionId,
+                gammeSelected: gamme,
               }
             : item
         ),
@@ -266,6 +274,14 @@ const MachinePropositions = ({
     }));
   };
   const handleClickNext = () => {
+    if (!cafe.cafeFournisseurId) {
+      //pour skiper le the si pas de cafe
+      setFoodBeverage((prev) => ({
+        ...prev,
+        currentFoodBeverageId: prev.currentFoodBeverageId + 2,
+      }));
+      return;
+    }
     setFoodBeverage((prev) => ({
       ...prev,
       currentFoodBeverageId: prev.currentFoodBeverageId + 1,
@@ -281,7 +297,7 @@ const MachinePropositions = ({
   };
 
   const handleAlert = () => {
-    if (!machine.propositionId) {
+    if (!machine.gammeSelected) {
       toast({
         description: "Veuillez d'abord sélectionner une offre",
         duration: 3000,
@@ -291,6 +307,18 @@ const MachinePropositions = ({
       return;
     }
   };
+
+  if (formattedPropositions.length === 0) {
+    return (
+      <div className="flex-1 flex items-center justify-center border rounded-xl">
+        <p className="max-w-prose text-center text-base">
+          Le fournisseur choisi précédemment ne propose pas d&apos;offre pour
+          ces critères, veuillez changer le type de machine, le nombre de
+          personnes ou la duree de location
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex flex-col gap-4">
@@ -358,15 +386,16 @@ const MachinePropositions = ({
                     return (
                       <div
                         className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer px-10 ${
-                          machine.propositionId === proposition.id
+                          machine.gammeSelected === gamme &&
+                          cafe.cafeFournisseurId === proposition.fournisseurId
                             ? "ring-2 ring-inset ring-destructive"
                             : ""
                         }`}
                         key={proposition.id}
                         onClick={() =>
                           handleClickProposition(
-                            proposition.id,
                             proposition.fournisseurId,
+                            gamme,
                             proposition.nomEntreprise,
                             proposition.prixAnnuel,
                             proposition.marqueMachine ?? "",
@@ -376,11 +405,14 @@ const MachinePropositions = ({
                         }
                       >
                         <Checkbox
-                          checked={machine.propositionId === proposition.id}
+                          checked={
+                            machine.gammeSelected === gamme &&
+                            cafe.cafeFournisseurId === proposition.fournisseurId
+                          }
                           onCheckedChange={() =>
                             handleClickProposition(
-                              proposition.id,
                               proposition.fournisseurId,
+                              gamme,
                               proposition.nomEntreprise,
                               proposition.prixAnnuel,
                               proposition.marqueMachine ?? "",
@@ -411,7 +443,7 @@ const MachinePropositions = ({
       )}
       {cafeMachinesIds.slice(-1)[0] === machine.machineId ? (
         <div className="flex justify-end gap-4 items-center">
-          {machine.propositionId ? (
+          {machine.gammeSelected ? (
             <Button variant="outline" size="lg" onClick={handleAddMachine}>
               Ajouter une/des machine(s)
             </Button>
@@ -424,7 +456,7 @@ const MachinePropositions = ({
             variant="outline"
             size="sm"
             onClick={handleClickNextMachine}
-            disabled={!machine.propositionId}
+            disabled={!machine.gammeSelected}
           >
             Machine(s) suivante(s) ↓
           </Button>

@@ -54,14 +54,14 @@ const SecuriteIncendiePropositions = ({
   }));
 
   const handleClickProposition = (
-    propositionId: number,
-    prixAnnuel: number,
-    nomEntreprise: string
+    fournisseurId: number,
+    nomEntreprise: string,
+    prixAnnuel: number
   ) => {
-    if (incendie.propositionId === propositionId) {
+    if (incendie.fournisseurId === fournisseurId) {
       setIncendie((prev) => ({
         ...prev,
-        propositionId: null,
+        fournisseurId: null,
       }));
       setTotalIncendie({
         nomFournisseur: "",
@@ -71,7 +71,7 @@ const SecuriteIncendiePropositions = ({
     }
     setIncendie((prev) => ({
       ...prev,
-      propositionId,
+      fournisseurId,
     }));
     setTotalIncendie({
       nomFournisseur: nomEntreprise,
@@ -107,7 +107,7 @@ const SecuriteIncendiePropositions = ({
           ...prev,
           nbExtincteurs: newNbExtincteurs,
         }));
-        if (incendie.propositionId)
+        if (incendie.fournisseurId)
           setTotalIncendie((prev) => ({
             ...prev,
             prixIncendie: Math.round(
@@ -129,7 +129,7 @@ const SecuriteIncendiePropositions = ({
           ...prev,
           nbBaes: newNbBaes,
         }));
-        if (incendie.propositionId)
+        if (incendie.fournisseurId)
           setTotalIncendie((prev) => ({
             ...prev,
             prixIncendie: Math.round(
@@ -146,7 +146,7 @@ const SecuriteIncendiePropositions = ({
           ...prev,
           nbTelBaes: value ? parseInt(value) : 1,
         }));
-        if (incendie.propositionId)
+        if (incendie.fournisseurId)
           setTotalIncendie((prev) => ({
             ...prev,
             prixIncendie: Math.round(
@@ -263,25 +263,25 @@ const SecuriteIncendiePropositions = ({
 
             <div
               className={`w-3/4 flex items-center justify-center text-xl gap-4 cursor-pointer bg-slate-100 ${
-                incendie.propositionId === proposition.id
+                incendie.fournisseurId === proposition.fournisseurId
                   ? "ring-2 ring-inset ring-destructive"
                   : ""
               }`}
               onClick={() =>
                 handleClickProposition(
-                  proposition.id,
-                  proposition.prixAnnuel,
-                  proposition.nomEntreprise
+                  proposition.fournisseurId,
+                  proposition.nomEntreprise,
+                  proposition.prixAnnuel
                 )
               }
             >
               <Checkbox
-                checked={incendie.propositionId === proposition.id}
+                checked={incendie.fournisseurId === proposition.fournisseurId}
                 onCheckedChange={() =>
                   handleClickProposition(
-                    proposition.id,
-                    proposition.prixAnnuel,
-                    proposition.nomEntreprise
+                    proposition.fournisseurId,
+                    proposition.nomEntreprise,
+                    proposition.prixAnnuel
                   )
                 }
                 className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"

@@ -7,19 +7,30 @@ import {
   getLaitConsoTarifs,
   getTheConsoTarifs,
 } from "@/lib/queries/boissons-chaudes/getBoissonsChaudes";
+import {
+  getBoissonsQuantites,
+  getBoissonsTarifs,
+  getFoodLivraisonTarifs,
+  getFruitsQuantites,
+  getFruitsTarifs,
+  getSnacksQuantites,
+  getSnacksTarifs,
+} from "@/lib/queries/boissons-chaudes/getSnacksFruits";
 import Link from "next/link";
 import Cafe from "./(cafe)/Cafe";
-import Snacks from "./(snacks)/Snacks";
+import SnacksFruits from "./(snacks)/SnacksFruits";
 import The from "./(the)/The";
 
 type FoodBeverageProps = {
   cafeFournisseurId?: string;
   effectif: string;
+  nbPersonnesFood?: string;
 };
 
 const FoodBeverage = async ({
   cafeFournisseurId,
   effectif,
+  nbPersonnesFood,
 }: FoodBeverageProps) => {
   const [
     cafeMachines,
@@ -29,6 +40,13 @@ const FoodBeverage = async ({
     laitConsoTarifs,
     chocoConsoTarifs,
     theConsoTarifs,
+    fruitsQuantites,
+    fruitsTarifs,
+    snacksQuantites,
+    snacksTarifs,
+    boissonsQuantites,
+    boissonsTarifs,
+    foodLivraisonTarifs,
   ] = await Promise.all([
     getCafeMachines(),
     getCafeQuantites(),
@@ -37,6 +55,13 @@ const FoodBeverage = async ({
     getLaitConsoTarifs(),
     getChocoConsoTarifs(),
     getTheConsoTarifs(cafeFournisseurId),
+    getFruitsQuantites(nbPersonnesFood),
+    getFruitsTarifs(nbPersonnesFood),
+    getSnacksQuantites(nbPersonnesFood),
+    getSnacksTarifs(nbPersonnesFood),
+    getBoissonsQuantites(nbPersonnesFood),
+    getBoissonsTarifs(nbPersonnesFood),
+    getFoodLivraisonTarifs(),
   ]);
 
   if (
@@ -70,11 +95,20 @@ const FoodBeverage = async ({
         cafeConsoTarifs={cafeConsoTarifs}
         laitConsoTarifs={laitConsoTarifs}
         chocoConsoTarifs={chocoConsoTarifs}
+        theConsoTarifs={theConsoTarifs}
         effectif={effectif}
         cafeFournisseurId={cafeFournisseurId}
       />
       <The theConsoTarifs={theConsoTarifs} effectif={effectif} />
-      <Snacks />
+      <SnacksFruits
+        fruitsQuantites={fruitsQuantites}
+        fruitsTarifs={fruitsTarifs}
+        snacksQuantites={snacksQuantites}
+        snacksTarifs={snacksTarifs}
+        boissonsQuantites={boissonsQuantites}
+        boissonsTarifs={boissonsTarifs}
+        foodLivraisonTarifs={foodLivraisonTarifs}
+      />
     </section>
   );
 };

@@ -44,20 +44,13 @@ const NettoyageOptionsPropositions = ({
       ? "fm4allcomfort"
       : "fm4allexcellence";
 
-  const handleClickProposition = (
-    type: string,
-    propositionId: number,
-    prixAnnuel: number
-  ) => {
+  const handleClickProposition = (type: string, prixAnnuel: number) => {
     switch (type) {
       case "repasse":
-        if (
-          nettoyage.repassePropositionId &&
-          nettoyage.repassePropositionId === propositionId
-        ) {
+        if (nettoyage.repasseSelected) {
           setNettoyage((prev) => ({
             ...prev,
-            repassePropositionId: null,
+            repasseSelected: false,
           }));
           setTotalNettoyage((prev) => ({
             ...prev,
@@ -67,7 +60,7 @@ const NettoyageOptionsPropositions = ({
         }
         setNettoyage((prev) => ({
           ...prev,
-          repassePropositionId: propositionId,
+          repasseSelected: true,
         }));
         setTotalNettoyage((prev) => ({
           ...prev,
@@ -75,13 +68,10 @@ const NettoyageOptionsPropositions = ({
         }));
         break;
       case "vitrerie":
-        if (
-          nettoyage.vitreriePropositionId &&
-          nettoyage.vitreriePropositionId === propositionId
-        ) {
+        if (nettoyage.vitrerieSelected) {
           setNettoyage((prev) => ({
             ...prev,
-            vitreriePropositionId: null,
+            vitrerieSelected: false,
           }));
           setTotalNettoyage((prev) => ({
             ...prev,
@@ -91,7 +81,7 @@ const NettoyageOptionsPropositions = ({
         }
         setNettoyage((prev) => ({
           ...prev,
-          vitreriePropositionId: propositionId,
+          vitrerieSelected: true,
         }));
         setTotalNettoyage((prev) => ({
           ...prev,
@@ -99,13 +89,10 @@ const NettoyageOptionsPropositions = ({
         }));
         break;
       case "samedi":
-        if (
-          nettoyage.samediPropositionId &&
-          nettoyage.samediPropositionId === propositionId
-        ) {
+        if (nettoyage.samediSelected) {
           setNettoyage((prev) => ({
             ...prev,
-            samediPropositionId: null,
+            samediSelected: false,
           }));
           setTotalNettoyage((prev) => ({
             ...prev,
@@ -115,7 +102,7 @@ const NettoyageOptionsPropositions = ({
         }
         setNettoyage((prev) => ({
           ...prev,
-          samediPropositionId: propositionId,
+          samediSelected: true,
         }));
         setTotalNettoyage((prev) => ({
           ...prev,
@@ -123,13 +110,10 @@ const NettoyageOptionsPropositions = ({
         }));
         break;
       case "dimanche":
-        if (
-          nettoyage.dimanchePropositionId &&
-          nettoyage.dimanchePropositionId === propositionId
-        ) {
+        if (nettoyage.dimancheSelected) {
           setNettoyage((prev) => ({
             ...prev,
-            dimanchePropositionId: null,
+            dimancheSelected: false,
           }));
           setTotalNettoyage((prev) => ({
             ...prev,
@@ -139,7 +123,7 @@ const NettoyageOptionsPropositions = ({
         }
         setNettoyage((prev) => ({
           ...prev,
-          dimanchePropositionId: propositionId,
+          dimancheSelected: true,
         }));
         setTotalNettoyage((prev) => ({
           ...prev,
@@ -156,7 +140,7 @@ const NettoyageOptionsPropositions = ({
       ...prev,
       nbPassageVitrerie: newNbPassageVitrerie,
     }));
-    if (nettoyage.vitreriePropositionId) {
+    if (nettoyage.vitrerieSelected) {
       const prixVitrerie = Math.round(
         vitrerieProposition?.prixParPassage
           ? vitrerieProposition.prixParPassage * newNbPassageVitrerie
@@ -216,26 +200,18 @@ const NettoyageOptionsPropositions = ({
           </div>
           <div
             className={`flex w-3/4 items-center justify-center ${
-              nettoyage.repassePropositionId === repasseProposition.id
+              nettoyage.repasseSelected
                 ? "ring-2 ring-inset ring-destructive"
                 : ""
             } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
             onClick={() =>
-              handleClickProposition(
-                "repasse",
-                repasseProposition.id,
-                repasseProposition.prixAnnuel
-              )
+              handleClickProposition("repasse", repasseProposition.prixAnnuel)
             }
           >
             <Checkbox
-              checked={nettoyage.repassePropositionId === repasseProposition.id}
+              checked={nettoyage.repasseSelected}
               onCheckedChange={() =>
-                handleClickProposition(
-                  "repasse",
-                  repasseProposition.id,
-                  repasseProposition.prixAnnuel
-                )
+                handleClickProposition("repasse", repasseProposition.prixAnnuel)
               }
               className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             />
@@ -255,26 +231,22 @@ const NettoyageOptionsPropositions = ({
           </div>
           <div
             className={`flex w-3/4 items-center justify-center ${
-              nettoyage.samediPropositionId === samediDimancheProposition.id
+              nettoyage.samediSelected
                 ? "ring-2 ring-inset ring-destructive"
                 : ""
             } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
             onClick={() =>
               handleClickProposition(
                 "samedi",
-                samediDimancheProposition.id,
                 samediDimancheProposition.prixAnnuelSamedi
               )
             }
           >
             <Checkbox
-              checked={
-                nettoyage.samediPropositionId === samediDimancheProposition.id
-              }
+              checked={nettoyage.samediSelected}
               onCheckedChange={() =>
                 handleClickProposition(
                   "samedi",
-                  samediDimancheProposition.id,
                   samediDimancheProposition.prixAnnuelSamedi
                 )
               }
@@ -294,26 +266,22 @@ const NettoyageOptionsPropositions = ({
           </div>
           <div
             className={`flex w-3/4 items-center justify-center ${
-              nettoyage.dimanchePropositionId === samediDimancheProposition.id
+              nettoyage.dimancheSelected
                 ? "ring-2 ring-inset ring-destructive"
                 : ""
             } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
             onClick={() =>
               handleClickProposition(
                 "dimanche",
-                samediDimancheProposition.id,
                 samediDimancheProposition.prixAnnuelDimanche
               )
             }
           >
             <Checkbox
-              checked={
-                nettoyage.dimanchePropositionId === samediDimancheProposition.id
-              }
+              checked={nettoyage.dimancheSelected}
               onCheckedChange={() =>
                 handleClickProposition(
                   "dimanche",
-                  samediDimancheProposition.id,
                   samediDimancheProposition.prixAnnuelDimanche
                 )
               }
@@ -355,26 +323,22 @@ const NettoyageOptionsPropositions = ({
           </div>
           <div
             className={`flex w-3/4 items-center justify-center ${
-              nettoyage.vitreriePropositionId === vitrerieProposition.id
+              nettoyage.vitrerieSelected
                 ? "ring-2 ring-inset ring-destructive"
                 : ""
             } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
             onClick={() =>
               handleClickProposition(
                 "vitrerie",
-                vitrerieProposition.id,
                 vitrerieProposition.prixParPassage * nettoyage.nbPassageVitrerie
               )
             }
           >
             <Checkbox
-              checked={
-                nettoyage.vitreriePropositionId === vitrerieProposition.id
-              }
+              checked={nettoyage.vitrerieSelected}
               onCheckedChange={() =>
                 handleClickProposition(
                   "vitrerie",
-                  vitrerieProposition.id,
                   vitrerieProposition.prixParPassage *
                     nettoyage.nbPassageVitrerie
                 )

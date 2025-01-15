@@ -17,7 +17,7 @@ export const cafeSchema = z.object({
       ]),
       nbPersonnes: z.number(),
       nbMachines: z.number(),
-      propositionId: z.number().nullable(),
+      gammeSelected: z.enum(["essentiel", "confort", "excellence"]).nullable(),
     })
   ),
 });

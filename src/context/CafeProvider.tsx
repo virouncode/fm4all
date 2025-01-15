@@ -40,7 +40,7 @@ const CafeProvider = ({ children }: PropsWithChildren) => {
         dureeLocation: "pa12M",
         nbPersonnes: client.effectif ?? 0,
         nbMachines: 0,
-        propositionId: null,
+        gammeSelected: null,
       },
     ],
   });
@@ -48,8 +48,6 @@ const CafeProvider = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     if (isMounted) {
       const storedCafe = localStorage.getItem("cafe");
-      console.log("storedCafe", storedCafe);
-
       if (storedCafe) {
         setCafe(JSON.parse(storedCafe));
       }
