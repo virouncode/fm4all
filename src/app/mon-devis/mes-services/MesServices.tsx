@@ -86,7 +86,8 @@ const MesServices = async ({
       </section>
     );
   }
-  //Proposition de service de nettoyage
+  //Propositions de service de nettoyage
+  //L'id de la proposition sera l'id du tarif : pour une surface donnéee, un tarif = une proposition
   const nettoyagePropositions = nettoyageTarifs
     .map((tarif) => {
       const freqAnnuelle =
@@ -123,6 +124,7 @@ const MesServices = async ({
     );
     if (nettoyageTarif) {
       if (repasseTarif) {
+        //L'id de la proposition sera l'id du tarif de repasse : pour une surface donnée, un tarif = une proposition
         repasseProposition = {
           ...repasseTarif,
           freqAnnuelle,
@@ -131,6 +133,7 @@ const MesServices = async ({
           ),
         };
       }
+      //L'id de la proposition sera l'id du tarif de vitrerie : pour une surface donnée, un tarif = une proposition
       vitrerieProposition = {
         ...vitrerieTarif,
         prixParPassage: Math.round(
@@ -143,6 +146,7 @@ const MesServices = async ({
           )
         ),
       };
+      //L'id de la proposition sera l'id du tarif de nettoyage : pour une surface donnée, un tarif = une proposition
       samediDimancheProposition = {
         ...nettoyageTarif,
         prixAnnuelSamedi: Math.round(

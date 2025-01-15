@@ -321,6 +321,76 @@ export const theConsoTarifs = pgTable("the_conso_tarifs", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const fruitsQuantites = pgTable("fruits_quantites", {
+  id: serial().primaryKey(),
+  effectif: integer().notNull(),
+  kilosParSemaine: integer("kilos_par_semaine").notNull(),
+  gamme: gammeEnum().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const fruitsTarifs = pgTable("fruits_tarifs", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  effectif: integer().notNull(),
+  prixKg: integer("prix_kg").notNull(),
+  gamme: gammeEnum().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const snacksQuantites = pgTable("snacks_quantites", {
+  id: serial().primaryKey(),
+  effectif: integer().notNull(),
+  portionsParSemaine: integer("portions_par_semaine").notNull(),
+  gamme: gammeEnum().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const snacksTarifs = pgTable("snacks_tarifs", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  effectif: integer().notNull(),
+  prixUnitaire: integer("prix_unitaire").notNull(),
+  gamme: gammeEnum().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const boissonsQuantites = pgTable("boissons_quantites", {
+  id: serial().primaryKey(),
+  effectif: integer().notNull(),
+  consosParSemaine: integer("consos_par_semaine").notNull(),
+  gamme: gammeEnum().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const boissonsTarifs = pgTable("boissons_tarifs", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  effectif: integer().notNull(),
+  prixUnitaire: integer("prix_unitaire").notNull(),
+  gamme: gammeEnum().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const foodLivraisonTarifs = pgTable("food_livraison_tarifs", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  freqAnnuelle: integer("freq_annuelle").notNull(),
+  panierMinimum: integer("panier_minimum").notNull(),
+  prixUnitaire: integer("prix_unitaire").notNull(),
+  seuilFranco: integer("seuil_franco"),
+  remise_si_cafe: integer("remise_si_cafe"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 //RELATIONS
 export const fournisseursRelations = relations(
   fournisseurs,
@@ -342,6 +412,10 @@ export const fournisseursRelations = relations(
     laitConsoTarifs: many(laitConsoTarifs),
     chocoConsoTarifs: many(chocoConsoTarifs),
     theConsoTarifs: many(theConsoTarifs),
+    fruitsTarifs: many(fruitsTarifs),
+    snacksTarifs: many(snacksTarifs),
+    boissonsTarifs: many(boissonsTarifs),
+    foodLivraisonTarifs: many(foodLivraisonTarifs),
   })
 );
 
@@ -478,6 +552,37 @@ export const chocoConsoTarifsRelations = relations(
   ({ one }) => ({
     fournisseur: one(fournisseurs, {
       fields: [chocoConsoTarifs.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+  })
+);
+
+export const fruitsTarifsRelations = relations(fruitsTarifs, ({ one }) => ({
+  fournisseur: one(fournisseurs, {
+    fields: [fruitsTarifs.fournisseurId],
+    references: [fournisseurs.id],
+  }),
+}));
+
+export const snacksTarifsRelations = relations(snacksTarifs, ({ one }) => ({
+  fournisseur: one(fournisseurs, {
+    fields: [snacksTarifs.fournisseurId],
+    references: [fournisseurs.id],
+  }),
+}));
+
+export const boissonsTarifsRelations = relations(boissonsTarifs, ({ one }) => ({
+  fournisseur: one(fournisseurs, {
+    fields: [boissonsTarifs.fournisseurId],
+    references: [fournisseurs.id],
+  }),
+}));
+
+export const foodLivraisonTarifsRelations = relations(
+  foodLivraisonTarifs,
+  ({ one }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [foodLivraisonTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
   })

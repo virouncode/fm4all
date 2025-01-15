@@ -59,7 +59,7 @@ const HygienePropositions = ({
   const dureeLocation = hygiene.dureeLocation;
 
   const propositions = gammes.map((gamme) => ({
-    gamme,
+    gamme, //la gamme suffit a identifier la proposition car il n'y a qu'un fournisseur
     tarifDistribEmp:
       distribTarifs.find(
         (tarif) => tarif.type === "emp" && tarif.gamme === gamme

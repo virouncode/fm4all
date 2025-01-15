@@ -16,15 +16,10 @@ import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { TheContext } from "@/context/TheProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
-import {
-  cafeMachineFormSchema,
-  CafeMachineFormType,
-  CafeMachineType,
-} from "@/zod-schemas/cafe";
+import { CafeMachineType } from "@/zod-schemas/cafe";
 import { DureeLocationCafeType } from "@/zod-schemas/dureeLocation";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { ChangeEvent, useContext } from "react";
-import { useForm } from "react-hook-form";
 
 type MachineFormProps = {
   machine: CafeMachineType;
@@ -32,14 +27,48 @@ type MachineFormProps = {
 
 const MachineUpdateForm = ({ machine }: MachineFormProps) => {
   const { client } = useContext(ClientContext);
-  const { setCafe } = useContext(CafeContext);
+  const { cafe, setCafe } = useContext(CafeContext);
   const { setThe } = useContext(TheContext);
   const { setTotalCafe } = useContext(TotalCafeContext);
+  const cafeMachinesIds = cafe.machines.map((item) => item.machineId);
+  const router = useRouter();
 
   const handleChangeTypeBoissons = (value: string) => {
+    if (cafeMachinesIds[0] === machine.machineId) {
+      setCafe((prev) => ({
+        ...prev,
+        cafeFournisseurId: null,
+        machines: prev.machines.map((item) =>
+          item.machineId === machine?.machineId
+            ? {
+                ...item,
+                typeBoissons: value as TypesBoissonsType,
+                propositionId: null,
+              }
+            : { ...item, propositionId: null }
+        ),
+      }));
+      setThe((prev) => ({
+        ...prev,
+        theGammeSelected: null,
+      }));
+      setTotalCafe((prev) => ({
+        ...prev,
+        nomFournisseur: null,
+        prixCafeMachines: prev.prixCafeMachines.map((item) => ({
+          ...item,
+          prix: null,
+          marque: "",
+          modele: "",
+          reconditionnne: false,
+        })),
+        prixThe: null,
+      }));
+      router.push(`/mon-devis/food-beverage?effectif=${client.effectif}`);
+      return;
+    }
     setCafe((prev) => ({
       ...prev,
-      cafeFournisseurId: null,
       machines: prev.machines.map((item) =>
         item.machineId === machine?.machineId
           ? {
@@ -47,30 +76,63 @@ const MachineUpdateForm = ({ machine }: MachineFormProps) => {
               typeBoissons: value as TypesBoissonsType,
               propositionId: null,
             }
-          : { ...item, propositionId: null }
+          : item
       ),
-    }));
-    setThe((prev) => ({
-      ...prev,
-      theGammeSelected: null,
     }));
     setTotalCafe((prev) => ({
       ...prev,
-      nomFournisseur: null,
-      prixCafeMachines: prev.prixCafeMachines.map((item) => ({
-        ...item,
-        prix: null,
-      })),
-      prixThe: null,
+      prixCafeMachines: prev.prixCafeMachines.map((item) =>
+        item.machineId === machine.machineId
+          ? {
+              ...item,
+              prix: null,
+              marque: "",
+              modele: "",
+              reconditionnne: false,
+            }
+          : item
+      ),
     }));
   };
 
   const handleChangeEffectif = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     const newNbPersonnes = value ? parseInt(value) : client.effectif ?? 0;
+    if (cafeMachinesIds[0] === machine.machineId) {
+      setCafe((prev) => ({
+        ...prev,
+        cafeFournisseurId: null,
+        machines: prev.machines.map((item) =>
+          item.machineId === machine?.machineId
+            ? {
+                ...item,
+                nbPersonnes: newNbPersonnes,
+                propositionId: null,
+              }
+            : { ...item, propositionId: null }
+        ),
+      }));
+      setThe((prev) => ({
+        ...prev,
+        theGammeSelected: null,
+      }));
+      setTotalCafe((prev) => ({
+        ...prev,
+        nomFournisseur: null,
+        prixCafeMachines: prev.prixCafeMachines.map((item) => ({
+          ...item,
+          prix: null,
+          marque: "",
+          modele: "",
+          reconditionnne: false,
+        })),
+        prixThe: null,
+      }));
+      router.push(`/mon-devis/food-beverage?effectif=${client.effectif}`); //ne pas mettre newNbPersonnes
+      return;
+    }
     setCafe((prev) => ({
       ...prev,
-      cafeFournisseurId: null,
       machines: prev.machines.map((item) =>
         item.machineId === machine?.machineId
           ? {
@@ -78,28 +140,61 @@ const MachineUpdateForm = ({ machine }: MachineFormProps) => {
               nbPersonnes: newNbPersonnes,
               propositionId: null,
             }
-          : { ...item, propositionId: null }
+          : item
       ),
-    }));
-    setThe((prev) => ({
-      ...prev,
-      theGammeSelected: null,
     }));
     setTotalCafe((prev) => ({
       ...prev,
-      nomFournisseur: null,
-      prixCafeMachines: prev.prixCafeMachines.map((item) => ({
-        ...item,
-        prix: null,
-      })),
-      prixThe: null,
+      prixCafeMachines: prev.prixCafeMachines.map((item) =>
+        item.machineId === machine.machineId
+          ? {
+              ...item,
+              prix: null,
+              marque: "",
+              modele: "",
+              reconditionnne: false,
+            }
+          : item
+      ),
     }));
   };
 
   const handleSelectDureeLocation = (value: string) => {
+    if (cafeMachinesIds[0] === machine.machineId) {
+      setCafe((prev) => ({
+        ...prev,
+        cafeFournisseurId: null,
+        machines: prev.machines.map((item) =>
+          item.machineId === machine?.machineId
+            ? {
+                ...item,
+                dureeLocation: value as DureeLocationCafeType,
+                propositionId: null,
+              }
+            : { ...item, propositionId: null }
+        ),
+      }));
+      setThe((prev) => ({
+        ...prev,
+        theGammeSelected: null,
+      }));
+      setTotalCafe((prev) => ({
+        ...prev,
+        nomFournisseur: null,
+        prixCafeMachines: prev.prixCafeMachines.map((item) => ({
+          ...item,
+          prix: null,
+          marque: "",
+          modele: "",
+          reconditionnne: false,
+        })),
+        prixThe: null,
+      }));
+      router.push(`/mon-devis/food-beverage?effectif=${client.effectif}`);
+      return;
+    }
     setCafe((prev) => ({
       ...prev,
-      cafeFournisseurId: null,
       machines: prev.machines.map((item) =>
         item.machineId === machine?.machineId
           ? {
@@ -107,72 +202,25 @@ const MachineUpdateForm = ({ machine }: MachineFormProps) => {
               dureeLocation: value as DureeLocationCafeType,
               propositionId: null,
             }
-          : { ...item, propositionId: null }
+          : item
       ),
-    }));
-    setThe((prev) => ({
-      ...prev,
-      theGammeSelected: null,
     }));
     setTotalCafe((prev) => ({
       ...prev,
-      nomFournisseur: null,
-      prixCafeMachines: prev.prixCafeMachines.map((item) => ({
-        ...item,
-        prix: null,
-      })),
-      prixThe: null,
+      prixCafeMachines: prev.prixCafeMachines.map((item) =>
+        item.machineId === machine.machineId
+          ? {
+              ...item,
+              prix: null,
+              marque: "",
+              modele: "",
+              reconditionnne: false,
+            }
+          : item
+      ),
     }));
   };
 
-  const defaultValues: CafeMachineFormType = {
-    machineId: machine.machineId || 0,
-    dureeLocation: machine.dureeLocation ?? "pa12M",
-    nbPersonnes: machine.nbPersonnes.toString() || "0",
-    typeBoissons: machine.typeBoissons ?? "cafe",
-    nbMachines: 0,
-  };
-
-  const form = useForm<CafeMachineFormType>({
-    mode: "onBlur",
-    resolver: zodResolver(cafeMachineFormSchema),
-    defaultValues,
-  });
-
-  // return (
-  //   <Form {...form}>
-  //     <form className="flex-1 mr-20">
-  //       <div className="flex gap-8">
-  //         <RadioGroupWithLabel<CafeMachineFormType>
-  //           fieldTitle="Type de boissons*"
-  //           nameInSchema="typeBoissons"
-  //           data={typesBoissons}
-  //           containerClassName="w-1/3"
-  //           className="flex flex-row gap-4 w-1/3"
-  //           handleChange={handleChangeTypeBoissons}
-  //         />
-  //         <InputWithLabel<CafeMachineFormType>
-  //           fieldTitle="Nombre de personnes*"
-  //           nameInSchema="nbPersonnes"
-  //           type="number"
-  //           pattern="^[1-9]\d*$"
-  //           min={1}
-  //           max={300}
-  //           step={1}
-  //           containerClassName="w-1/3"
-  //           handleChange={handleChangeEffectif}
-  //         />
-  //         <SelectWithLabel<CafeMachineFormType>
-  //           fieldTitle="Durée d'engagement*"
-  //           nameInSchema="dureeLocation"
-  //           data={locationCafeMachine}
-  //           handleSelect={handleSelectDureeLocation}
-  //           containerClassName="w-1/3"
-  //         />
-  //       </div>
-  //     </form>
-  //   </Form>
-  // );
   return (
     <form className="w-2/3">
       <div className="flex gap-8 items-center mb-6">
@@ -185,8 +233,14 @@ const MachineUpdateForm = ({ machine }: MachineFormProps) => {
           >
             {typesBoissons.map(({ id, description }) => (
               <div key={id} className="flex gap-2 items-center">
-                <RadioGroupItem value={id} title={description} id={id} />
-                <Label htmlFor={id}>{description}</Label>
+                <RadioGroupItem
+                  value={id}
+                  title={description}
+                  id={`${id}_${machine.machineId}`}
+                />
+                <Label htmlFor={`${id}_${machine.machineId}`}>
+                  {description}
+                </Label>
               </div>
             ))}
           </RadioGroup>
@@ -202,9 +256,12 @@ const MachineUpdateForm = ({ machine }: MachineFormProps) => {
             step={1}
             value={machine.nbPersonnes}
             onChange={handleChangeEffectif}
-            id="nbPersonnes"
+            id={`nbPersonnes_${machine.machineId}`}
           />
-          <Label htmlFor="nbPersonnes" className="text-base">
+          <Label
+            htmlFor={`nbPersonnes_${machine.machineId}`}
+            className="text-base"
+          >
             personnes
           </Label>
         </div>

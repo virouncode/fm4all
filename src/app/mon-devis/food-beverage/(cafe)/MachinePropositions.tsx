@@ -49,7 +49,10 @@ const MachinePropositions = ({
     propositionId: number,
     fournisseurId: number,
     nomEntreprise: string,
-    prixAnnuel: number | null
+    prixAnnuel: number | null,
+    marque: string,
+    modele: string,
+    reconditionne: boolean
   ) => {
     //Si c'est la première machine
     if (cafeMachinesIds[0] === machine.machineId) {
@@ -75,6 +78,9 @@ const MachinePropositions = ({
           prixCafeMachines: prev.prixCafeMachines.map((item) => ({
             ...item,
             prix: null,
+            marque: "",
+            modele: "",
+            reconditionne: false,
           })),
           prixThe: null,
         }));
@@ -113,13 +119,33 @@ const MachinePropositions = ({
             fournisseurId === cafe.cafeFournisseurId
               ? prev.prixCafeMachines.map((item) =>
                   item.machineId === machine.machineId
-                    ? { ...item, prix: prixAnnuel }
+                    ? {
+                        ...item,
+                        prix: prixAnnuel,
+                        marque,
+                        modele,
+                        reconditionne,
+                        nbMachines: machine.nbMachines,
+                      }
                     : item
                 )
               : prev.prixCafeMachines.map((item) =>
                   item.machineId === machine.machineId
-                    ? { ...item, prix: prixAnnuel }
-                    : { ...item, prix: null }
+                    ? {
+                        ...item,
+                        prix: prixAnnuel,
+                        marque,
+                        modele,
+                        reconditionne,
+                        nbMachines: machine.nbMachines,
+                      }
+                    : {
+                        ...item,
+                        prix: null,
+                        marque: "",
+                        modele: "",
+                        reconditionne: false,
+                      }
                 ),
         }));
         if (
@@ -160,7 +186,15 @@ const MachinePropositions = ({
       setTotalCafe((prev) => ({
         ...prev,
         prixCafeMachines: prev.prixCafeMachines.map((item) =>
-          item.machineId === machine.machineId ? { ...item, prix: null } : item
+          item.machineId === machine.machineId
+            ? {
+                ...item,
+                prix: null,
+                marque: "",
+                modele: "",
+                reconditionne: false,
+              }
+            : item
         ),
       }));
     } else {
@@ -182,7 +216,14 @@ const MachinePropositions = ({
         ...prev,
         prixCafeMachines: prev.prixCafeMachines.map((item) =>
           item.machineId === machine.machineId
-            ? { ...item, prix: prixAnnuel }
+            ? {
+                ...item,
+                prix: prixAnnuel,
+                marque,
+                modele,
+                reconditionne,
+                nbMachines: machine.nbMachines,
+              }
             : item
         ),
       }));
@@ -216,6 +257,10 @@ const MachinePropositions = ({
             prev.prixCafeMachines[prev.prixCafeMachines.length - 1].machineId +
             1,
           prix: null,
+          nbMachines: 0,
+          marque: "",
+          modele: "",
+          reconditionnne: false,
         },
       ],
     }));
@@ -323,7 +368,10 @@ const MachinePropositions = ({
                             proposition.id,
                             proposition.fournisseurId,
                             proposition.nomEntreprise,
-                            proposition.prixAnnuel
+                            proposition.prixAnnuel,
+                            proposition.marqueMachine ?? "",
+                            proposition.modeleMachine ?? "",
+                            proposition.reconditionne ?? false
                           )
                         }
                       >
@@ -334,7 +382,10 @@ const MachinePropositions = ({
                               proposition.id,
                               proposition.fournisseurId,
                               proposition.nomEntreprise,
-                              proposition.prixAnnuel
+                              proposition.prixAnnuel,
+                              proposition.marqueMachine ?? "",
+                              proposition.modeleMachine ?? "",
+                              proposition.reconditionne ?? false
                             )
                           }
                           className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"

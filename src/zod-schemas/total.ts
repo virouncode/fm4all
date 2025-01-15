@@ -39,7 +39,14 @@ export const totalMaintenanceSchema = z.object({
 export const totalCafeSchema = z.object({
   nomFournisseur: z.string().nullable(),
   prixCafeMachines: z.array(
-    z.object({ machineId: z.number(), prix: z.number().nullable() })
+    z.object({
+      machineId: z.number(),
+      prix: z.number().nullable(),
+      marque: z.string(),
+      modele: z.string(),
+      reconditionnne: z.boolean(),
+      nbMachines: z.number(),
+    })
   ),
   prixThe: z.number().nullable(),
 });

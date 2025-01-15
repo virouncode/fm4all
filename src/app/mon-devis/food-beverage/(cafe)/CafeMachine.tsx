@@ -107,12 +107,9 @@ const CafeMachine = ({
   };
 
   const handleAlert = () => {
-    if (
-      cafeMachinesIds.length > 1 &&
-      cafeMachinesIds[0] === machine.machineId
-    ) {
+    if (cafeMachinesIds.slice(-1)[0] !== machine.machineId) {
       toast({
-        description: "Veuillez d'abord retirer les autres machines",
+        description: "Veuillez d'abord retirer les machines suivantes",
         variant: "destructive",
         duration: 3000,
       });
@@ -205,7 +202,7 @@ const CafeMachine = ({
             nbMachines * prixAnnuelTotalParMachine
         );
         return {
-          ...tarif,
+          ...tarif, //l'id du tarif est utilisé pour identifier la proposition (si la proposition change et donc l'id selectionné change car l'effectif change, ce n'est pas grave car de toute facon on annule le choix)
           prixAnnuel,
           modeleMachine: modeleMachine,
           marqueMachine: marqueMachine,
@@ -263,10 +260,7 @@ const CafeMachine = ({
               title="Retirer"
               onClick={handleClickRemove}
               type="button"
-              disabled={
-                cafeMachinesIds.length > 1 &&
-                cafeMachinesIds[0] === machine.machineId
-              }
+              disabled={cafeMachinesIds.slice(-1)[0] !== machine.machineId}
             >
               <Trash2 />
               Retirer machine(s) n°{machine.machineId}

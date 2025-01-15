@@ -38,7 +38,7 @@ const HygieneOptionsPropositions = ({
   const dureeLocation = hygiene.dureeLocation;
 
   const propositions = gammes.map((gamme) => ({
-    gamme,
+    gamme, //la gamme suffit pour identifier la proposition car il n'y a qu'un fournisseur
     tarifDistribDesinfectant: distribTarifs.find(
       (tarif) => tarif.type === "desinfectant" && tarif.gamme === gamme
     ),

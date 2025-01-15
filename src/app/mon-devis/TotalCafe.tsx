@@ -15,12 +15,19 @@ const TotalCafe = () => {
         <div className="flex flex-col gap-4">
           <div>Machines à Café ({totalCafe.nomFournisseur})</div>
           <div className="flex flex-col ml-4 text-xs ">
-            {prixCafe && (
-              <div className="flex items-center justify-between">
-                <p>Service</p>
-                <p className="text-end">{total} € HT / an</p>
-              </div>
-            )}
+            {totalCafe.prixCafeMachines
+              .filter((item) => item.marque)
+              .map((item) => (
+                <div
+                  key={item.machineId}
+                  className="flex items-center justify-between"
+                >
+                  <p>
+                    {item.nbMachines} x {item.marque} {item.modele}
+                  </p>
+                  <p>{item.prix} € HT / an</p>
+                </div>
+              ))}
             <div className="flex items-center justify-between border-t border-foreground mt-2">
               <p>TOTAL</p>
               <p className="text-end">{total} € HT / an</p>

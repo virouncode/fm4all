@@ -80,7 +80,16 @@ const Cafe = ({
     }));
     setTotalCafe((prev) => ({
       ...prev,
-      prixCafeMachines: [{ machineId: 1, prix: null }],
+      prixCafeMachines: [
+        {
+          machineId: 1,
+          prix: null,
+          nbMachines: 0,
+          marque: "",
+          modele: "",
+          reconditionnne: false,
+        },
+      ],
     }));
   };
 
