@@ -18,7 +18,7 @@ import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useContext } from "react";
-import { reinitialisationNettoyage } from "./reinitialisationNettoyage";
+import { reinitialisationNettoyageHygiene } from "./reinitialisationNettoyageHygiene";
 
 type NettoyagePropositionsProps = {
   formattedNettoyagePropositions: (SelectNettoyageTarifsType & {
@@ -49,7 +49,7 @@ const NettoyagePropositions = ({
       nettoyage.fournisseurId === fournisseurId &&
       nettoyage.gammeSelected === gamme
     ) {
-      reinitialisationNettoyage(
+      reinitialisationNettoyageHygiene(
         setNettoyage,
         setHygiene,
         setServices,

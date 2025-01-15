@@ -155,7 +155,10 @@ const MachinePropositions = ({
           prixThe:
             cafe.cafeFournisseurId !== fournisseurId ? null : prev.prixThe,
         }));
-        if (cafe.cafeFournisseurId !== fournisseurId) {
+        if (
+          cafe.cafeFournisseurId !== fournisseurId &&
+          (the.gammeSelected || cafe.machines.length > 1)
+        ) {
           setThe((prev) => ({
             ...prev,
             gammeSelected: null,

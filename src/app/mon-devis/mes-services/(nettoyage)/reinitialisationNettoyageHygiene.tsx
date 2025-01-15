@@ -3,7 +3,7 @@ import { NettoyageType } from "@/zod-schemas/nettoyage";
 import { ServicesType } from "@/zod-schemas/services";
 import { TotalHygieneType, TotalNettoyageType } from "@/zod-schemas/total";
 
-export const reinitialisationNettoyage = (
+export const reinitialisationNettoyageHygiene = (
   setNettoyage: (nettoyage: NettoyageType) => void,
   setHygiene: (hygiene: HygieneType) => void,
   setServices: (services: ServicesType) => void,
