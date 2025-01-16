@@ -8,7 +8,7 @@ const page = async ({
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) => {
-  const { cafeFournisseurId, effectif, nbPersonnesFood } = await searchParams;
+  const { cafeFournisseurId, effectif } = await searchParams;
 
   if (!effectif) {
     return (
@@ -43,17 +43,6 @@ const page = async ({
       </section>
     );
   }
-  if (nbPersonnesFood && isNaN(parseInt(nbPersonnesFood))) {
-    return (
-      <section className="flex flex-col gap-6">
-        Le nombre de personnes pour les snacks et fruits n&apos;est pas valide.
-        <Link href="/mon-devis/mes-locaux" className="underline">
-          Veuillez réessayer
-        </Link>
-        .
-      </section>
-    );
-  }
 
   return (
     <>
@@ -64,7 +53,6 @@ const page = async ({
         <FoodBeverage
           cafeFournisseurId={cafeFournisseurId}
           effectif={effectif as string}
-          nbPersonnesFood={nbPersonnesFood}
         />
       </Suspense>
     </>
