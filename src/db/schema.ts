@@ -329,6 +329,14 @@ export const fruitsQuantites = pgTable("fruits_quantites", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const tempfruitsQuantites = pgTable("temp_fruits_quantites", {
+  id: serial().primaryKey(),
+  effectif: integer().notNull(),
+  kgParSemaine: integer("kg_par_semaine").notNull(),
+  gamme: gammeEnum().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const fruitsTarifs = pgTable("fruits_tarifs", {
   id: serial().primaryKey(),
   fournisseurId: integer("fournisseur_id")
@@ -385,7 +393,7 @@ export const foodLivraisonTarifs = pgTable("food_livraison_tarifs", {
     .references(() => fournisseurs.id),
   freqAnnuelle: integer("freq_annuelle").notNull(),
   panierMin: integer("panier_min"),
-  prixUnitaire: integer("prix_unitaire"),
+  prixUnitaire: integer("prix_unitaire").notNull(),
   prixUnitaireSiCafe: integer("prix_unitaire_si_cafe").notNull(),
   seuilFranco: integer("seuil_franco"),
   remise_si_cafe: integer("remise_si_cafe"),

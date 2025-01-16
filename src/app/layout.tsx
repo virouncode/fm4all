@@ -13,12 +13,14 @@ import IncendieProvider from "@/context/IncendieProvider";
 import MaintenanceProvider from "@/context/MaintenanceProvider";
 import NettoyageProvider from "@/context/NettoyageProvider";
 import ServicesProvider from "@/context/ServicesProvider";
+import SnacksFruitsProvider from "@/context/SnacksFruitsProvider";
 import TheProvider from "@/context/TheProvider";
 import TotalCafeProvider from "@/context/TotalCafeProvider";
 import TotalHygieneProvider from "@/context/TotalHygieneProvider";
 import TotalIncendieProvider from "@/context/TotalIncendieProvider";
 import TotalMaintenanceProvider from "@/context/TotalMaintenanceProvider";
 import TotalNettoyageProvider from "@/context/TotalNettoyageProvider";
+import TotalSnacksFruitsProvider from "@/context/TotalSnacksFruitsProvider";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 
@@ -66,27 +68,31 @@ export default function RootLayout({
                       <FoodBeverageProvider>
                         <CafeProvider>
                           <TheProvider>
-                            <TotalNettoyageProvider>
-                              <TotalHygieneProvider>
-                                <TotalIncendieProvider>
-                                  <TotalMaintenanceProvider>
-                                    <TotalCafeProvider>
-                                      <ThemeProvider
-                                        attribute="class"
-                                        defaultTheme="light"
-                                        enableSystem
-                                        disableTransitionOnChange
-                                      >
-                                        <Header />
-                                        {children}
-                                        <Footer />
-                                        <Toaster />
-                                      </ThemeProvider>
-                                    </TotalCafeProvider>
-                                  </TotalMaintenanceProvider>
-                                </TotalIncendieProvider>
-                              </TotalHygieneProvider>
-                            </TotalNettoyageProvider>
+                            <SnacksFruitsProvider>
+                              <TotalNettoyageProvider>
+                                <TotalHygieneProvider>
+                                  <TotalIncendieProvider>
+                                    <TotalMaintenanceProvider>
+                                      <TotalCafeProvider>
+                                        <TotalSnacksFruitsProvider>
+                                          <ThemeProvider
+                                            attribute="class"
+                                            defaultTheme="light"
+                                            enableSystem
+                                            disableTransitionOnChange
+                                          >
+                                            <Header />
+                                            {children}
+                                            <Footer />
+                                            <Toaster />
+                                          </ThemeProvider>
+                                        </TotalSnacksFruitsProvider>
+                                      </TotalCafeProvider>
+                                    </TotalMaintenanceProvider>
+                                  </TotalIncendieProvider>
+                                </TotalHygieneProvider>
+                              </TotalNettoyageProvider>
+                            </SnacksFruitsProvider>
                           </TheProvider>
                         </CafeProvider>
                       </FoodBeverageProvider>

@@ -9,6 +9,7 @@ import {
 import { TypesBoissonsType } from "@/constants/typesBoissons";
 import { CafeContext } from "@/context/CafeProvider";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
+import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { TheContext } from "@/context/TheProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import { toast } from "@/hooks/use-toast";
@@ -39,6 +40,7 @@ const MachinePropositions = ({
   formattedPropositions,
   machine,
 }: MachinePropositionsProps) => {
+  const { snacksFruits } = useContext(SnacksFruitsContext);
   const { setFoodBeverage } = useContext(FoodBeverageContext);
   const { cafe, setCafe } = useContext(CafeContext);
   const { the, setThe } = useContext(TheContext);
@@ -88,7 +90,9 @@ const MachinePropositions = ({
           })),
           prixThe: null,
         }));
-        router.push(`/mon-devis/food-beverage?effectif=${effectif}`);
+        router.push(
+          `/mon-devis/food-beverage?effectif=${effectif}&nbPersonnesFood=${snacksFruits.nbPersonnes}`
+        );
       }
       //Je coche
       else {

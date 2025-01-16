@@ -1,3 +1,4 @@
+import { RATIO } from "@/constants/constants";
 import { db } from "@/db";
 import {
   boissonsQuantites,
@@ -10,7 +11,6 @@ import {
   snacksTarifs,
 } from "@/db/schema";
 import { errorHelper } from "@/lib/errorHelper";
-import { roundEffectif } from "@/lib/roundEffectif";
 import { selectBoissonsQuantitesSchema } from "@/zod-schemas/boissonsQuantites";
 import { selectBoissonsTarifsSchema } from "@/zod-schemas/boissonsTarifs";
 import { selectFoodLivraisonTarifsSchema } from "@/zod-schemas/foodLivraisonTarifs";
@@ -20,27 +20,23 @@ import { selectSnacksQuantitesSchema } from "@/zod-schemas/snacksQuantites";
 import { selectSnacksTarifsSchema } from "@/zod-schemas/snacksTarifs";
 import { eq, getTableColumns } from "drizzle-orm";
 
-export const getFruitsQuantites = async (nbPersonnesFood?: string) => {
-  if (!nbPersonnesFood) return [];
+export const getFruitsQuantites = async () => {
   try {
-    const results = await db
-      .select()
-      .from(fruitsQuantites)
-      .where(
-        eq(fruitsQuantites.effectif, roundEffectif(parseInt(nbPersonnesFood)))
-      );
+    const results = await db.select().from(fruitsQuantites);
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectFruitsQuantitesSchema.parse(result)
     );
-    return validatedResults;
+    return validatedResults.map((result) => ({
+      ...result,
+      kgParSemaine: result.kgParSemaine / RATIO,
+    }));
   } catch (err) {
     errorHelper(err);
   }
 };
 
-export const getFruitsTarifs = async (nbPersonnesFood?: string) => {
-  if (!nbPersonnesFood) return [];
+export const getFruitsTarifs = async () => {
   try {
     const results = await db
       .select({
@@ -49,29 +45,23 @@ export const getFruitsTarifs = async (nbPersonnesFood?: string) => {
         slogan: fournisseurs.slogan,
       })
       .from(fruitsTarifs)
-      .innerJoin(fournisseurs, eq(fruitsTarifs.fournisseurId, fournisseurs.id))
-      .where(
-        eq(fruitsTarifs.effectif, roundEffectif(parseInt(nbPersonnesFood)))
-      );
+      .innerJoin(fournisseurs, eq(fruitsTarifs.fournisseurId, fournisseurs.id));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectFruitsTarifsSchema.parse(result)
     );
-    return validatedResults;
+    return validatedResults.map((result) => ({
+      ...result,
+      prixKg: result.prixKg ? result.prixKg / RATIO : null,
+    }));
   } catch (err) {
     errorHelper(err);
   }
 };
 
-export const getSnacksQuantites = async (nbPersonnesFood?: string) => {
-  if (!nbPersonnesFood) return [];
+export const getSnacksQuantites = async () => {
   try {
-    const results = await db
-      .select()
-      .from(snacksQuantites)
-      .where(
-        eq(snacksQuantites.effectif, roundEffectif(parseInt(nbPersonnesFood)))
-      );
+    const results = await db.select().from(snacksQuantites);
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectSnacksQuantitesSchema.parse(result)
@@ -82,8 +72,7 @@ export const getSnacksQuantites = async (nbPersonnesFood?: string) => {
   }
 };
 
-export const getSnacksTarifs = async (nbPersonnesFood?: string) => {
-  if (!nbPersonnesFood) return [];
+export const getSnacksTarifs = async () => {
   try {
     const results = await db
       .select({
@@ -92,29 +81,23 @@ export const getSnacksTarifs = async (nbPersonnesFood?: string) => {
         slogan: fournisseurs.slogan,
       })
       .from(snacksTarifs)
-      .innerJoin(fournisseurs, eq(snacksTarifs.fournisseurId, fournisseurs.id))
-      .where(
-        eq(snacksTarifs.effectif, roundEffectif(parseInt(nbPersonnesFood)))
-      );
+      .innerJoin(fournisseurs, eq(snacksTarifs.fournisseurId, fournisseurs.id));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectSnacksTarifsSchema.parse(result)
     );
-    return validatedResults;
+    return validatedResults.map((result) => ({
+      ...result,
+      prixUnitaire: result.prixUnitaire ? result.prixUnitaire / RATIO : null,
+    }));
   } catch (err) {
     errorHelper(err);
   }
 };
 
-export const getBoissonsQuantites = async (nbPersonnesFood?: string) => {
-  if (!nbPersonnesFood) return [];
+export const getBoissonsQuantites = async () => {
   try {
-    const results = await db
-      .select()
-      .from(boissonsQuantites)
-      .where(
-        eq(boissonsQuantites.effectif, roundEffectif(parseInt(nbPersonnesFood)))
-      );
+    const results = await db.select().from(boissonsQuantites);
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectBoissonsQuantitesSchema.parse(result)
@@ -125,8 +108,7 @@ export const getBoissonsQuantites = async (nbPersonnesFood?: string) => {
   }
 };
 
-export const getBoissonsTarifs = async (nbPersonnesFood?: string) => {
-  if (!nbPersonnesFood) return [];
+export const getBoissonsTarifs = async () => {
   try {
     const results = await db
       .select({
@@ -138,15 +120,15 @@ export const getBoissonsTarifs = async (nbPersonnesFood?: string) => {
       .innerJoin(
         fournisseurs,
         eq(boissonsTarifs.fournisseurId, fournisseurs.id)
-      )
-      .where(
-        eq(boissonsTarifs.effectif, roundEffectif(parseInt(nbPersonnesFood)))
       );
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectBoissonsTarifsSchema.parse(result)
     );
-    return validatedResults;
+    return validatedResults.map((result) => ({
+      ...result,
+      prixUnitaire: result.prixUnitaire ? result.prixUnitaire / RATIO : null,
+    }));
   } catch (err) {
     errorHelper(err);
   }
@@ -169,7 +151,13 @@ export const getFoodLivraisonTarifs = async () => {
     const validatedResults = results.map((result) =>
       selectFoodLivraisonTarifsSchema.parse(result)
     );
-    return validatedResults;
+    return validatedResults.map((result) => ({
+      ...result,
+      prixUnitaire: result.prixUnitaire / RATIO,
+      panierMin: result.panierMin ? result.panierMin / RATIO : null,
+      seuilFranco: result.seuilFranco ? result.seuilFranco / RATIO : null,
+      prixUnitaireSiCafe: result.prixUnitaireSiCafe / RATIO,
+    }));
   } catch (err) {
     errorHelper(err);
   }

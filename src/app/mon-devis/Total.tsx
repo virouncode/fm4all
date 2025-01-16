@@ -15,6 +15,7 @@ import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
+import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { Calculator } from "lucide-react";
 import { useContext } from "react";
 import TotalCafe from "./TotalCafe";
@@ -22,6 +23,7 @@ import TotalHygiene from "./TotalHygiene";
 import TotalIncendie from "./TotalIncendie";
 import TotalMaintenance from "./TotalMaintenance";
 import TotalNettoyage from "./TotalNettoyage";
+import TotalSnacksFruits from "./TotalSnacksFruits";
 import TotalThe from "./TotalThe";
 
 const Total = () => {
@@ -31,6 +33,7 @@ const Total = () => {
   const { totalMaintenance } = useContext(TotalMaintenanceContext);
   const { totalIncendie } = useContext(TotalIncendieContext);
   const { totalCafe } = useContext(TotalCafeContext);
+  const { totalSnacksFruits } = useContext(TotalSnacksFruitsContext);
   const prixNettoyage = [
     totalNettoyage.prixService,
     totalNettoyage.prixRepasse,
@@ -58,6 +61,7 @@ const Total = () => {
     0
   );
   const prixThe = totalCafe.prixThe ?? 0;
+  const prixSnacksFruits = totalSnacksFruits.prixTotal ?? 0;
 
   return (
     <Sheet>
@@ -74,7 +78,8 @@ const Total = () => {
               prixMaintenance +
               prixIncendie +
               prixCafe +
-              prixThe
+              prixThe +
+              prixSnacksFruits
           )}{" "}
           € / an
         </Button>
@@ -96,6 +101,7 @@ const Total = () => {
           {prixIncendie ? <TotalIncendie /> : null}
           {prixCafe ? <TotalCafe /> : null}
           {prixThe ? <TotalThe /> : null}
+          {prixSnacksFruits ? <TotalSnacksFruits /> : null}
         </div>
       </SheetContent>
     </Sheet>

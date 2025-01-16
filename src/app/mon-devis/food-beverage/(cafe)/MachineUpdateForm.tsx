@@ -15,6 +15,7 @@ import { locationCafeMachine } from "@/constants/locationsDistribHygiene";
 import { typesBoissons, TypesBoissonsType } from "@/constants/typesBoissons";
 import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
+import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { TheContext } from "@/context/TheProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import { roundEffectif } from "@/lib/roundEffectif";
@@ -52,9 +53,10 @@ const MachineUpdateForm = ({
   chocoConsoTarifs,
   theConsoTarifs,
 }: MachineFormProps) => {
+  const { snacksFruits } = useContext(SnacksFruitsContext);
   const { client } = useContext(ClientContext);
   const { cafe, setCafe } = useContext(CafeContext);
-  const { the, setThe } = useContext(TheContext);
+  const { setThe } = useContext(TheContext);
   const { setTotalCafe } = useContext(TotalCafeContext);
   const router = useRouter();
   const cafeMachinesIds = cafe.machines.map((item) => item.machineId);
@@ -113,7 +115,9 @@ const MachineUpdateForm = ({
             })),
             prixThe: null,
           }));
-          router.push(`/mon-devis/food-beverage?effectif=${client.effectif}`);
+          router.push(
+            `/mon-devis/food-beverage?effectif=${client.effectif}&nbPersonnesFood=${snacksFruits.nbPersonnes}`
+          );
         } else {
           setCafe((prev) => ({
             ...prev,
@@ -288,7 +292,9 @@ const MachineUpdateForm = ({
             })),
             prixThe: null,
           }));
-          router.push(`/mon-devis/food-beverage?effectif=${client.effectif}`);
+          router.push(
+            `/mon-devis/food-beverage?effectif=${client.effectif}&nbPersonnesFood=${snacksFruits.nbPersonnes}`
+          );
         } else {
           setCafe((prev) => ({
             ...prev,
@@ -460,7 +466,9 @@ const MachineUpdateForm = ({
             })),
             prixThe: null,
           }));
-          router.push(`/mon-devis/food-beverage?effectif=${client.effectif}`);
+          router.push(
+            `/mon-devis/food-beverage?effectif=${client.effectif}&nbPersonnesFood=${snacksFruits.nbPersonnes}`
+          );
         } else {
           setCafe((prev) => ({
             ...prev,

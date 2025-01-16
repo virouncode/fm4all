@@ -3,6 +3,7 @@ import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
+import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import useScrollIntoService from "@/hooks/use-scroll-into-service";
 import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites";
 import { SelectIncendieTarifsType } from "@/zod-schemas/incendieTarifs";
@@ -22,6 +23,7 @@ const SecuriteIncendie = ({
   incendieQuantite,
   incendieTarifs,
 }: SecuriteIncendieProps) => {
+  const { snacksFruits } = useContext(SnacksFruitsContext);
   const { client } = useContext(ClientContext);
   const { cafe } = useContext(CafeContext);
   const { setServices } = useContext(ServicesContext);
@@ -39,8 +41,8 @@ const SecuriteIncendie = ({
       searchParams.set("effectif", client.effectif.toString());
     if (cafe.cafeFournisseurId)
       searchParams.set("cafeFournisseurId", cafe.cafeFournisseurId.toString());
-    router.push(`/mon-devis/food-beverage?${searchParams.toString()}`);
     setDevisProgress({ currentStep: 3, completedSteps: [1, 2] });
+    router.push(`/mon-devis/food-beverage?${searchParams.toString()}`);
   };
 
   const handleClickPrevious = () => {

@@ -24,13 +24,11 @@ import The from "./(the)/The";
 type FoodBeverageProps = {
   cafeFournisseurId?: string;
   effectif: string;
-  nbPersonnesFood?: string;
 };
 
 const FoodBeverage = async ({
   cafeFournisseurId,
   effectif,
-  nbPersonnesFood,
 }: FoodBeverageProps) => {
   const [
     cafeMachines,
@@ -55,12 +53,12 @@ const FoodBeverage = async ({
     getLaitConsoTarifs(),
     getChocoConsoTarifs(),
     getTheConsoTarifs(cafeFournisseurId),
-    getFruitsQuantites(nbPersonnesFood),
-    getFruitsTarifs(nbPersonnesFood),
-    getSnacksQuantites(nbPersonnesFood),
-    getSnacksTarifs(nbPersonnesFood),
-    getBoissonsQuantites(nbPersonnesFood),
-    getBoissonsTarifs(nbPersonnesFood),
+    getFruitsQuantites(),
+    getFruitsTarifs(),
+    getSnacksQuantites(),
+    getSnacksTarifs(),
+    getBoissonsQuantites(),
+    getBoissonsTarifs(),
     getFoodLivraisonTarifs(),
   ]);
 
@@ -71,12 +69,19 @@ const FoodBeverage = async ({
     !cafeConsoTarifs ||
     !laitConsoTarifs ||
     !chocoConsoTarifs ||
-    !theConsoTarifs
+    !theConsoTarifs ||
+    !fruitsQuantites ||
+    !fruitsTarifs ||
+    !snacksQuantites ||
+    !snacksTarifs ||
+    !boissonsQuantites ||
+    !boissonsTarifs ||
+    !foodLivraisonTarifs
   ) {
     return (
       <section className="flex h-dvh items-center justify-center text-lg">
         <p>
-          Nous n&apos;avons pas trouvé de tarifs de machines à cafés.{" "}
+          Nous n&apos;avons pas trouvé de tarifs.{" "}
           <Link href="/mon-devis/mes-locaux" className="underline">
             Veuillez réessayer
           </Link>
