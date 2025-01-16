@@ -14,7 +14,10 @@ export const logosFournisseursMapping = [
   { fournisseurId: 13, url: "/img/logos-fournisseurs/logo_castalie.png" },
 ];
 
-export const getLogoFournisseurUrl = (fournisseurId: number) => {
+export const getLogoFournisseurUrl = (fournisseurId?: number | null) => {
+  if (!fournisseurId) {
+    return undefined;
+  }
   return logosFournisseursMapping.find(
     (logo) => logo.fournisseurId === fournisseurId
   )?.url;

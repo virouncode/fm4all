@@ -51,7 +51,7 @@ const SecuriteIncendie = ({
   };
 
   return (
-    <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="6">
+    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="6">
       <PropositionsTitle
         icon={FireExtinguisher}
         title="Securité Incendie"
@@ -66,10 +66,7 @@ const SecuriteIncendie = ({
           />
         )}
       </div>
-      <PropositionsFooter
-        comment=" *frais de déplacement inclus, pas de déclinaison en gammes car service réglementaire"
-        handleClickNext={handleClickNext}
-      />
+      <PropositionsFooter handleClickNext={handleClickNext} />
     </div>
   );
 };

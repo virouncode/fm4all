@@ -14,13 +14,13 @@ import { ChangeEvent, useContext } from "react";
 type HygieneOptionsPropositionsProps = {
   distribQuantites: SelectHygieneDistribQuantitesType;
   distribTarifs: SelectHygieneDistribTarifsType[];
-  consosTarif: SelectHygieneConsoTarifsType;
+  consosTarifs: SelectHygieneConsoTarifsType[];
 };
 
 const HygieneOptionsPropositions = ({
   distribQuantites,
   distribTarifs,
-  consosTarif,
+  consosTarifs,
 }: HygieneOptionsPropositionsProps) => {
   const { hygiene, setHygiene } = useContext(HygieneContext);
   const { client } = useContext(ClientContext);
@@ -36,41 +36,47 @@ const HygieneOptionsPropositions = ({
   const nbDistribPoubelle =
     hygiene.nbDistribPoubelle || distribQuantites.nbDistribPoubelle;
   const dureeLocation = hygiene.dureeLocation;
+  const distribTarifsDuFournisseur = distribTarifs.filter(
+    (tarif) => tarif.fournisseurId === hygiene.fournisseurId
+  );
+  const consosTarifsDuFournisseur = consosTarifs.find(
+    (tarif) => tarif.fournisseurId === hygiene.fournisseurId
+  );
 
   const propositions = gammes.map((gamme) => ({
     gamme, //la gamme suffit pour identifier la proposition car il n'y a qu'un fournisseur
-    tarifDistribDesinfectant: distribTarifs.find(
+    tarifDistribDesinfectant: distribTarifsDuFournisseur.find(
       (tarif) => tarif.type === "desinfectant" && tarif.gamme === gamme
     ),
-    tarifDistribParfum: distribTarifs.find(
+    tarifDistribParfum: distribTarifsDuFournisseur.find(
       (tarif) => tarif.type === "parfum" && tarif.gamme === gamme
     ),
-    tarifDistribBalai: distribTarifs.find(
+    tarifDistribBalai: distribTarifsDuFournisseur.find(
       (tarif) => tarif.type === "balai" && tarif.gamme === gamme
     ),
-    tarifDistribPoubelle: distribTarifs.find(
+    tarifDistribPoubelle: distribTarifsDuFournisseur.find(
       (tarif) => tarif.type === "poubelle" && tarif.gamme === gamme
     ),
     prixAnnuelConsoDesinfectant:
-      consosTarif.paParPersonneDesinfectant * effectif,
+      (consosTarifsDuFournisseur?.paParPersonneDesinfectant ?? 0) * effectif, //il n'y qu'un fournisseur
     prixAnnuelDistribDesinfectant:
       nbDistribDesinfectant *
-      (distribTarifs.find(
+      (distribTarifsDuFournisseur.find(
         (tarif) => tarif.type === "desinfectant" && tarif.gamme === gamme
       )?.[dureeLocation] ?? 0),
     prixAnnuelDistribParfum:
       nbDistribParfum *
-      (distribTarifs.find(
+      (distribTarifsDuFournisseur.find(
         (tarif) => tarif.type === "parfum" && tarif.gamme === gamme
       )?.[dureeLocation] ?? 0),
     prixAnnuelDistribBalai:
       nbDistribBalai *
-      (distribTarifs.find(
+      (distribTarifsDuFournisseur.find(
         (tarif) => tarif.type === "balai" && tarif.gamme === gamme
       )?.[dureeLocation] ?? 0),
     prixAnnuelDistribPoubelle:
       nbDistribPoubelle *
-      (distribTarifs.find(
+      (distribTarifsDuFournisseur.find(
         (tarif) => tarif.type === "poubelle" && tarif.gamme === gamme
       )?.[dureeLocation] ?? 0),
   }));
@@ -308,8 +314,8 @@ const HygieneOptionsPropositions = ({
     <div className="h-full flex flex-col border rounded-xl overflow-hidden">
       {/*1ère ligne */}
       <div className="flex border-b flex-1">
-        <div className="flex w-1/4 items-center justify-center flex-col gap-4">
-          <p className="text-lg">Desinfectant pour cuvettes</p>
+        <div className="flex w-1/4 items-center justify-center flex-col gap-2 p-4">
+          <p className="text-base">Desinfectant pour cuvettes</p>
           <div className="text-sm flex flex-col gap-2">
             <div className="flex gap-4 items-center justify-center w-full">
               <Input
@@ -366,7 +372,7 @@ const HygieneOptionsPropositions = ({
             <div
               className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-xl gap-4 cursor-pointer ${
                 hygiene.desinfectantGammeSelected === gamme
-                  ? "ring-2 ring-inset ring-destructive"
+                  ? "ring-4 ring-inset ring-destructive"
                   : ""
               } px-8`}
               key={"desinfectant" + gamme}
@@ -423,8 +429,8 @@ const HygieneOptionsPropositions = ({
       </div>
       {/*2ème ligne */}
       <div className="flex border-b flex-1">
-        <div className="flex w-1/4 items-center justify-center flex-col gap-4">
-          <p className="text-lg">Parfum</p>
+        <div className="flex w-1/4 items-center justify-center flex-col gap-2 p-4">
+          <p className="text-base">Parfum</p>
           <div className="text-sm flex flex-col gap-2">
             <div className="flex gap-4 items-center justify-center w-full">
               <Input
@@ -475,7 +481,7 @@ const HygieneOptionsPropositions = ({
             <div
               className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-xl gap-4 cursor-pointer ${
                 hygiene.parfumGammeSelected === gamme
-                  ? "ring-2 ring-inset ring-destructive"
+                  ? "ring-4 ring-inset ring-destructive"
                   : ""
               } px-8`}
               key={"parfum" + gamme}
@@ -530,8 +536,8 @@ const HygieneOptionsPropositions = ({
       </div>
       {/*3ème ligne */}
       <div className="flex border-b flex-1">
-        <div className="flex w-1/4 items-center justify-center flex-col gap-4">
-          <p className="text-lg">Balais WC</p>
+        <div className="flex w-1/4 items-center justify-center flex-col gap-2 p-4">
+          <p className="text-base">Balais WC</p>
           <div className="text-sm flex flex-col gap-2">
             <div className="flex gap-4 items-center justify-center w-full">
               <Input
@@ -580,7 +586,7 @@ const HygieneOptionsPropositions = ({
             <div
               className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-xl gap-4 cursor-pointer ${
                 hygiene.balaiGammeSelected === gamme
-                  ? "ring-2 ring-inset ring-destructive"
+                  ? "ring-4 ring-inset ring-destructive"
                   : ""
               } px-8`}
               key={"balai" + gamme}
@@ -635,8 +641,8 @@ const HygieneOptionsPropositions = ({
       </div>
       {/*4ème ligne */}
       <div className="flex border-b flex-1">
-        <div className="flex w-1/4 items-center justify-center flex-col gap-4">
-          <p className="text-lg">Poubelles hygiène féminine</p>
+        <div className="flex w-1/4 items-center justify-center flex-col gap-2 p-4">
+          <p className="text-base">Poubelles hygiène féminine</p>
           <div className="text-sm flex flex-col gap-2">
             <div className="flex gap-4 items-center justify-center w-full">
               <Input
@@ -690,7 +696,7 @@ const HygieneOptionsPropositions = ({
             <div
               className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-xl gap-4 cursor-pointer ${
                 hygiene.poubelleGammeSelected === gamme
-                  ? "ring-2 ring-inset ring-destructive"
+                  ? "ring-4 ring-inset ring-destructive"
                   : ""
               } px-8`}
               key={"poubelle" + gamme}

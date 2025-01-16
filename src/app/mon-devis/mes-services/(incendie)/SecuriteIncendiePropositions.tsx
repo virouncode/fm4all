@@ -165,11 +165,11 @@ const SecuriteIncendiePropositions = ({
       {propositions.length > 0 &&
         propositions.map((proposition) => (
           <div className="flex border-b flex-1" key={proposition.id}>
-            <div className="flex w-1/4 items-center justify-center flex-col gap-10">
+            <div className="flex w-1/4 items-center justify-between flex-col gap-10 p-4">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="flex items-center justify-center h-1/4 w-full py-2">
+                    <div className="flex items-center justify-center h-1/4 w-full">
                       {getLogoFournisseurUrl(proposition.fournisseurId) ? (
                         <div className="w-full h-full relative">
                           <Image
@@ -264,7 +264,7 @@ const SecuriteIncendiePropositions = ({
             <div
               className={`w-3/4 flex items-center justify-center text-xl gap-4 cursor-pointer bg-slate-100 ${
                 incendie.fournisseurId === proposition.fournisseurId
-                  ? "ring-2 ring-inset ring-destructive"
+                  ? "ring-4 ring-inset ring-destructive"
                   : ""
               }`}
               onClick={() =>

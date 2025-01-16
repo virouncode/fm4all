@@ -36,8 +36,6 @@ const SnacksFruits = ({
   const { foodBeverage, setFoodBeverage } = useContext(FoodBeverageContext);
   const { cafe } = useContext(CafeContext);
   const handleClickPrevious = () => {
-    console.log("foodBeverage", foodBeverage);
-
     setFoodBeverage((prev) => ({
       ...prev,
       currentFoodBeverageId: cafe.cafeFournisseurId
@@ -46,7 +44,7 @@ const SnacksFruits = ({
     }));
   };
   return (
-    <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="3">
+    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="3">
       <PropositionsTitle
         icon={Cookie}
         icon2={Banana}

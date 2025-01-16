@@ -16,15 +16,15 @@ import HygienePropositions from "./HygienePropositions";
 type HygieneProps = {
   distribQuantites?: SelectHygieneDistribQuantitesType | null;
   distribTarifs?: SelectHygieneDistribTarifsType[];
-  distribInstalTarif?: SelectHygieneInstalDistribTarifsType | null;
-  consosTarif?: SelectHygieneConsoTarifsType | null;
+  distribInstalTarifs?: SelectHygieneInstalDistribTarifsType[];
+  consosTarifs?: SelectHygieneConsoTarifsType[];
 };
 
 const Hygiene = ({
   distribQuantites,
   distribTarifs,
-  distribInstalTarif,
-  consosTarif,
+  distribInstalTarifs,
+  consosTarifs,
 }: HygieneProps) => {
   const { nettoyage } = useContext(NettoyageContext);
   const { hygiene } = useContext(HygieneContext);
@@ -55,7 +55,7 @@ const Hygiene = ({
   }
 
   return (
-    <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="3">
+    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="3">
       <PropositionsTitle
         icon={Toilet}
         title="Hygiène sanitaire"
@@ -65,20 +65,17 @@ const Hygiene = ({
       <div className="w-full flex-1">
         {distribQuantites &&
           distribTarifs &&
-          distribInstalTarif &&
-          consosTarif && (
+          distribInstalTarifs &&
+          consosTarifs && (
             <HygienePropositions
               distribQuantites={distribQuantites}
               distribTarifs={distribTarifs}
-              distribInstalTarif={distribInstalTarif}
-              consosTarif={consosTarif}
+              distribInstalTarifs={distribInstalTarifs}
+              consosTarifs={consosTarifs}
             />
           )}
       </div>
-      <PropositionsFooter
-        comment="*emplacement pour remarque"
-        handleClickNext={handleClickNext}
-      />
+      <PropositionsFooter handleClickNext={handleClickNext} />
     </div>
   );
 };

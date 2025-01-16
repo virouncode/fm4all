@@ -94,7 +94,7 @@ const Maintenance = ({
   //An array of arrays of propositions by fournisseurId
   const formattedPropositions = Object.values(propositionsByFournisseurId);
   return (
-    <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="5">
+    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="5">
       <PropositionsTitle
         title="Maintenance"
         description="Veille réglementaire, obligations légales, bien-être au travail, petits travaux, lien avec le gestionnaire de l’immeuble... déléguez la maintenance de vos locaux et le suivi de vos contrôles."
@@ -108,10 +108,7 @@ const Maintenance = ({
           />
         </div>
       )}
-      <PropositionsFooter
-        comment="*frais de déplacement inclus"
-        handleClickNext={handleClickNext}
-      />
+      <PropositionsFooter handleClickNext={handleClickNext} />
     </div>
   );
 };

@@ -32,15 +32,15 @@ import { ChangeEvent, useContext } from "react";
 type HygienePropositionsProps = {
   distribQuantites: SelectHygieneDistribQuantitesType;
   distribTarifs: SelectHygieneDistribTarifsType[];
-  distribInstalTarif: SelectHygieneInstalDistribTarifsType;
-  consosTarif: SelectHygieneConsoTarifsType;
+  distribInstalTarifs: SelectHygieneInstalDistribTarifsType[];
+  consosTarifs: SelectHygieneConsoTarifsType[];
 };
 
 const HygienePropositions = ({
   distribQuantites,
   distribTarifs,
-  distribInstalTarif,
-  consosTarif,
+  distribInstalTarifs,
+  consosTarifs,
 }: HygienePropositionsProps) => {
   const { hygiene, setHygiene } = useContext(HygieneContext);
   const { client } = useContext(ClientContext);
@@ -56,42 +56,52 @@ const HygienePropositions = ({
   const nbDistribSavon =
     hygiene.nbDistribSavon || distribQuantites.nbDistribSavon;
   const nbDistribPh = hygiene.nbDistribPh || distribQuantites.nbDistribPh;
-  const dureeLocation = hygiene.dureeLocation;
 
-  const propositions = gammes.map((gamme) => ({
-    gamme, //la gamme suffit a identifier la proposition car il n'y a qu'un fournisseur
-    tarifDistribEmp:
-      distribTarifs.find(
+  const dureeLocation = hygiene.dureeLocation;
+  const consosTarifDuFournisseur = consosTarifs.find(
+    (item) => item.fournisseurId === hygiene.fournisseurId
+  );
+  const ditribInstalTarifDuFournisseur = distribInstalTarifs.find(
+    (item) => item.fournisseurId === hygiene.fournisseurId
+  );
+  const distribTarifsDuFournisseur = distribTarifs.filter(
+    (item) => item.fournisseurId === hygiene.fournisseurId
+  );
+
+  const propositions = gammes.map((gamme) => {
+    const tarifDistribEmp =
+      distribTarifsDuFournisseur.find(
         (tarif) => tarif.type === "emp" && tarif.gamme === gamme
-      )?.[dureeLocation] ?? 0,
-    tarifDistribSavon:
-      distribTarifs.find(
+      )?.[dureeLocation] ?? 0;
+    const tarifDistribSavon =
+      distribTarifsDuFournisseur.find(
         (tarif) => tarif.type === "savon" && tarif.gamme === gamme
-      )?.[dureeLocation] ?? 0,
-    tarifDistribPh:
-      distribTarifs.find(
+      )?.[dureeLocation] ?? 0;
+    const tarifDistribPh =
+      distribTarifsDuFournisseur.find(
         (tarif) => tarif.type === "ph" && tarif.gamme === gamme
-      )?.[dureeLocation] ?? 0,
-    prixAnnuelConsommables:
-      (consosTarif.paParPersonneEmp +
-        consosTarif.paParPersonneSavon +
-        consosTarif.paParPersonnePh) *
-      effectif,
-    prixAnnuelDistributeurs:
-      nbDistribEmp *
-        (distribTarifs.find(
-          (tarif) => tarif.type === "emp" && tarif.gamme === gamme
-        )?.[dureeLocation] ?? 0) +
-      nbDistribSavon *
-        (distribTarifs.find(
-          (tarif) => tarif.type === "savon" && tarif.gamme === gamme
-        )?.[dureeLocation] ?? 0) +
-      nbDistribPh *
-        (distribTarifs.find(
-          (tarif) => tarif.type === "ph" && tarif.gamme === gamme
-        )?.[dureeLocation] ?? 0),
-    prixAnnuelInstalDistributeurs: distribInstalTarif.prixInstallation,
-  }));
+      )?.[dureeLocation] ?? 0;
+
+    const prixAnnuelDistributeurs =
+      nbDistribEmp * tarifDistribEmp +
+      nbDistribSavon * tarifDistribSavon +
+      nbDistribPh * tarifDistribPh;
+
+    return {
+      gamme, //la gamme suffit a identifier la proposition car il n'y a qu'un fournisseur
+      tarifDistribEmp,
+      tarifDistribSavon,
+      tarifDistribPh,
+      prixAnnuelConsommables:
+        ((consosTarifDuFournisseur?.paParPersonneEmp ?? 0) +
+          (consosTarifDuFournisseur?.paParPersonneSavon ?? 0) +
+          (consosTarifDuFournisseur?.paParPersonnePh ?? 0)) *
+        effectif,
+      prixAnnuelDistributeurs,
+      prixAnnuelInstalDistributeurs:
+        ditribInstalTarifDuFournisseur?.prixInstallation ?? 0,
+    };
+  });
 
   const handleClickProposition = (gamme: GammeType) => {
     //Je décoche la proposition
@@ -377,38 +387,42 @@ const HygienePropositions = ({
   return (
     <div className="h-full flex flex-col border rounded-xl overflow-hidden">
       <div className="flex border-b flex-1">
-        <div className="flex w-1/4 items-center justify-center flex-col">
+        <div className="flex w-1/4 items-center justify-center flex-col p-4">
           <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="flex items-center justify-center h-1/4 w-full py-2">
-                  {getLogoFournisseurUrl(distribTarifs[0].fournisseurId) ? (
+                <div className="flex items-center justify-center h-1/4 w-full">
+                  {getLogoFournisseurUrl(
+                    distribTarifsDuFournisseur[0].fournisseurId
+                  ) ? (
                     <div className="w-full h-full relative">
                       <Image
                         src={
                           getLogoFournisseurUrl(
-                            distribTarifs[0].fournisseurId
+                            hygiene?.fournisseurId
                           ) as string
                         }
-                        alt={`logo-de-${distribTarifs[0].nomEntreprise}`}
+                        alt={`logo-de-${distribTarifsDuFournisseur[0].nomEntreprise}`}
                         fill={true}
                         className="w-full h-full object-contain"
                         quality={100}
                       />
                     </div>
                   ) : (
-                    distribTarifs[0].nomEntreprise
+                    distribTarifsDuFournisseur[0].nomEntreprise
                   )}
                 </div>
               </TooltipTrigger>
-              {distribTarifs[0].slogan && (
+              {distribTarifsDuFournisseur[0].slogan && (
                 <TooltipContent>
-                  <p className="text-sm italic">{distribTarifs[0].slogan}</p>
+                  <p className="text-sm italic">
+                    {distribTarifsDuFournisseur[0].slogan}
+                  </p>
                 </TooltipContent>
               )}
             </Tooltip>
           </TooltipProvider>
-          <div className="flex flex-col gap-6 w-full p-4">
+          <div className="flex flex-col gap-6 w-full">
             <div className="flex gap-4 items-center w-full">
               <Input
                 type="number"
@@ -534,12 +548,11 @@ const HygienePropositions = ({
                 )
               )} € / an`
             : "Non proposé";
-
           return (
             <div
-              className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
+              className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer p-2 ${
                 hygiene.trilogieGammeSelected === gamme
-                  ? "ring-2 ring-inset ring-destructive"
+                  ? "ring-4 ring-inset ring-destructive"
                   : ""
               } px-8`}
               key={proposition.gamme}

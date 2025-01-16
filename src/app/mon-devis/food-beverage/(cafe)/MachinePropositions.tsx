@@ -389,7 +389,7 @@ const MachinePropositions = ({
                         className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer px-10 ${
                           machine.gammeSelected === gamme &&
                           cafe.cafeFournisseurId === proposition.fournisseurId
-                            ? "ring-2 ring-inset ring-destructive"
+                            ? "ring-4 ring-inset ring-destructive"
                             : ""
                         }`}
                         key={proposition.id}

@@ -38,10 +38,7 @@ export const getHygieneDistribQuantites = async (effectif: string) => {
   }
 };
 
-export const getHygieneDistribTarifs = async (fournisseurId?: string) => {
-  if (!fournisseurId || isNaN(parseInt(fournisseurId))) return [];
-  if (fournisseurId === "9") fournisseurId = "12";
-
+export const getHygieneDistribTarifs = async () => {
   try {
     const results = await db
       .select({
@@ -53,9 +50,7 @@ export const getHygieneDistribTarifs = async (fournisseurId?: string) => {
       .innerJoin(
         fournisseurs,
         eq(hygieneDistribTarifs.fournisseurId, fournisseurs.id)
-      )
-      .where(eq(hygieneDistribTarifs.fournisseurId, parseInt(fournisseurId)));
-
+      );
     if (results.length === 0) {
       return [];
     }
@@ -75,45 +70,30 @@ export const getHygieneDistribTarifs = async (fournisseurId?: string) => {
   }
 };
 
-export const getHygieneInstalDistribTarif = async (
-  effectif: string,
-  fournisseurId?: string
-) => {
-  if (!fournisseurId || isNaN(parseInt(fournisseurId))) return null;
-  if (fournisseurId === "9") fournisseurId = "12";
+export const getHygieneInstalDistribTarifs = async (effectif: string) => {
   try {
     const results = await db
       .select()
       .from(hygieneInstalDistribTarifs)
-      .where(
-        and(
-          eq(hygieneInstalDistribTarifs.effectif, parseInt(effectif)),
-          eq(hygieneInstalDistribTarifs.fournisseurId, parseInt(fournisseurId))
-        )
-      );
+      .where(and(eq(hygieneInstalDistribTarifs.effectif, parseInt(effectif))));
 
     if (results.length === 0) {
-      return null;
+      return [];
     }
-    const validatedResult = selectHygieneInstalDistribTarifsSchema.parse(
-      results[0]
+    const validatedResults = results.map((result) =>
+      selectHygieneInstalDistribTarifsSchema.parse(result)
     );
-    const data = {
+    const data = validatedResults.map((validatedResult) => ({
       ...validatedResult,
       prixInstallation: validatedResult.prixInstallation / RATIO,
-    };
+    }));
     return data;
   } catch (err) {
     errorHelper(err);
   }
 };
 
-export const getHygieneConsosTarif = async (
-  effectif: string,
-  fournisseurId?: string
-) => {
-  if (!fournisseurId || isNaN(parseInt(fournisseurId))) return null;
-  if (fournisseurId === "9") fournisseurId = "12";
+export const getHygieneConsosTarifs = async (effectif: string) => {
   try {
     const results = await db
       .select({
@@ -126,25 +106,22 @@ export const getHygieneConsosTarif = async (
         fournisseurs,
         eq(hygieneConsoTarifs.fournisseurId, fournisseurs.id)
       )
-      .where(
-        and(
-          eq(hygieneConsoTarifs.effectif, parseInt(effectif)),
-          eq(hygieneConsoTarifs.fournisseurId, parseInt(fournisseurId))
-        )
-      );
+      .where(and(eq(hygieneConsoTarifs.effectif, parseInt(effectif))));
 
     if (results.length === 0) {
-      return null;
+      return [];
     }
-    const validatedResult = selectHygieneConsoTarifsSchema.parse(results[0]);
-    const data = {
+    const validatedResults = results.map((result) =>
+      selectHygieneConsoTarifsSchema.parse(result)
+    );
+    const data = validatedResults.map((validatedResult) => ({
       ...validatedResult,
       paParPersonneEmp: validatedResult.paParPersonneEmp / RATIO,
       paParPersonnePh: validatedResult.paParPersonnePh / RATIO,
       paParPersonneSavon: validatedResult.paParPersonneSavon / RATIO,
       paParPersonneDesinfectant:
         validatedResult.paParPersonneDesinfectant / RATIO,
-    };
+    }));
     return data;
   } catch (err) {
     errorHelper(err);

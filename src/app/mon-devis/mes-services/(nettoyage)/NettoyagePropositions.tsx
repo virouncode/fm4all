@@ -6,6 +6,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { S_OUVREES_PAR_AN } from "@/constants/constants";
+import { ClientContext } from "@/context/ClientProvider";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
@@ -14,6 +15,10 @@ import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
 import { GammeType } from "@/zod-schemas/gamme";
+import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
+import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
+import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
+import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs";
 import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -25,11 +30,21 @@ type NettoyagePropositionsProps = {
     freqAnnuelle: number;
     prixAnnuel: number;
   })[][];
+  distribQuantites?: SelectHygieneDistribQuantitesType | null;
+  distribTarifs?: SelectHygieneDistribTarifsType[];
+  distribInstalTarifs?: SelectHygieneInstalDistribTarifsType[];
+  consosTarifs?: SelectHygieneConsoTarifsType[];
 };
 
 const NettoyagePropositions = ({
   formattedNettoyagePropositions,
+  distribQuantites,
+  distribTarifs,
+  distribInstalTarifs,
+  consosTarifs,
 }: NettoyagePropositionsProps) => {
+  const { client } = useContext(ClientContext);
+  const { hygiene } = useContext(HygieneContext);
   const { nettoyage, setNettoyage } = useContext(NettoyageContext);
   const { setHygiene } = useContext(HygieneContext);
   const { setTotalNettoyage } = useContext(TotalNettoyageContext);
@@ -63,6 +78,7 @@ const NettoyagePropositions = ({
       return;
     }
     //Je coche la proposition
+
     setNettoyage((prev) => ({
       ...prev,
       fournisseurId: fournisseurId,
@@ -73,7 +89,6 @@ const NettoyagePropositions = ({
       vitrerieSelected: false,
       nbPassageVitrerie: 2,
     }));
-
     setTotalNettoyage((prev) => ({
       ...prev,
       nomFournisseur: nomEntreprise,
@@ -84,23 +99,75 @@ const NettoyagePropositions = ({
       prixVitrerie: null,
     }));
 
-    //Car on ne travaille pas forcément avec le même fournisseur pour l'hygiène
+    //Car on ne travaille pas forcément avec le même fournisseur pour l'hygiène, la gamme essentielle et
     const hygieneFournisseurId = fournisseurId === 9 ? 12 : fournisseurId;
     const hygieneFournisseurName = fournisseurId === 9 ? "EPCH" : nomEntreprise;
+
+    const effectif = client.effectif as number;
+    const nbDistribEmp =
+      (hygiene.nbDistribEmp || distribQuantites?.nbDistribEmp) ?? 0;
+    const nbDistribSavon =
+      (hygiene.nbDistribSavon || distribQuantites?.nbDistribSavon) ?? 0;
+    const nbDistribPh =
+      (hygiene.nbDistribPh || distribQuantites?.nbDistribPh) ?? 0;
+
+    const distribTarifsDuFournisseur = distribTarifs?.filter(
+      (tarif) => tarif.fournisseurId === hygieneFournisseurId
+    );
+
+    const dureeLocation = hygiene.dureeLocation;
+
+    const tarifDistribEmp =
+      distribTarifsDuFournisseur?.find(
+        (tarif) => tarif.type === "emp" && tarif.gamme === "essentiel"
+      )?.[dureeLocation] ?? 0;
+
+    const tarifDistribSavon =
+      distribTarifsDuFournisseur?.find(
+        (tarif) => tarif.type === "savon" && tarif.gamme === "essentiel"
+      )?.[dureeLocation] ?? 0;
+    const tarifDistribPh =
+      distribTarifsDuFournisseur?.find(
+        (tarif) => tarif.type === "ph" && tarif.gamme === "essentiel"
+      )?.[dureeLocation] ?? 0;
+    const consosTarif = consosTarifs?.find(
+      (item) => item.fournisseurId === hygieneFournisseurId
+    );
+
+    const distribInstalTarif = distribInstalTarifs?.find(
+      (item) => item.fournisseurId === hygieneFournisseurId
+    );
+
+    const prixAnnuelConsommables =
+      ((consosTarif?.paParPersonneEmp ?? 0) +
+        (consosTarif?.paParPersonneSavon ?? 0) +
+        (consosTarif?.paParPersonnePh ?? 0)) *
+      effectif;
+    const prixAnnuelDistributeurs =
+      nbDistribEmp * tarifDistribEmp +
+      nbDistribSavon * tarifDistribSavon +
+      nbDistribPh * tarifDistribPh;
+    const prixAnnuelInstalDistributeurs =
+      distribInstalTarif?.prixInstallation ?? 0;
+    const prixAnnuelTrilogie =
+      prixAnnuelConsommables +
+      prixAnnuelDistributeurs +
+      prixAnnuelInstalDistributeurs;
 
     setHygiene((prev) => ({
       ...prev,
       fournisseurId: hygieneFournisseurId,
       dureeLocation: "pa12M",
-      trilogieGammeSelected: null,
+      trilogieGammeSelected: "essentiel",
       desinfectantGammeSelected: null,
       parfumGammeSelected: null,
       balaiGammeSelected: null,
       poubelleGammeSelected: null,
     }));
+    //J'ai calcule le prix de la trilogie avec le fournisseur d'hygiene et la gamme essentielle
     setTotalHygiene({
       nomFournisseur: hygieneFournisseurName,
-      prixTrilogieAbonnement: null,
+      prixTrilogieAbonnement: prixAnnuelTrilogie,
       prixTrilogieAchat: null,
       prixDesinfectantAbonnement: null,
       prixDesinfectantAchat: null,
@@ -181,7 +248,7 @@ const NettoyagePropositions = ({
                     className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
                       nettoyage.fournisseurId === proposition.fournisseurId &&
                       nettoyage.gammeSelected === gamme
-                        ? "ring-2 ring-inset ring-destructive"
+                        ? "ring-4 ring-inset ring-destructive"
                         : ""
                     }`}
                     key={proposition.id}

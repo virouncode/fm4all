@@ -3,6 +3,10 @@ import { NettoyageContext } from "@/context/NettoyageProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import useScrollIntoService from "@/hooks/use-scroll-into-service";
 import { gammes } from "@/zod-schemas/gamme";
+import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
+import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
+import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
+import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs";
 import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SprayCan } from "lucide-react";
 import { useContext } from "react";
@@ -15,9 +19,19 @@ type NettoyageProps = {
     freqAnnuelle: number;
     prixAnnuel: number;
   })[];
+  distribQuantites?: SelectHygieneDistribQuantitesType | null;
+  distribTarifs?: SelectHygieneDistribTarifsType[];
+  distribInstalTarifs?: SelectHygieneInstalDistribTarifsType[];
+  consosTarifs?: SelectHygieneConsoTarifsType[];
 };
 
-const Nettoyage = ({ nettoyagePropositions }: NettoyageProps) => {
+const Nettoyage = ({
+  nettoyagePropositions,
+  distribQuantites,
+  distribTarifs,
+  distribInstalTarifs,
+  consosTarifs,
+}: NettoyageProps) => {
   const { nettoyage } = useContext(NettoyageContext);
   const { setServices } = useContext(ServicesContext);
   //Scroller automatiquement vers le service actuel
@@ -65,7 +79,7 @@ const Nettoyage = ({ nettoyagePropositions }: NettoyageProps) => {
   );
 
   return (
-    <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="1">
+    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="1">
       <PropositionsTitle
         title="Nettoyage et propreté"
         description="D’un nettoyage essentiel à une expérience 5 étoiles, choisissez la prestation propreté qui vous ressemble."
@@ -76,12 +90,13 @@ const Nettoyage = ({ nettoyagePropositions }: NettoyageProps) => {
       <div className="w-full flex-1">
         <NettoyagePropositions
           formattedNettoyagePropositions={formattedNettoyagePropositions}
+          distribQuantites={distribQuantites}
+          distribTarifs={distribTarifs}
+          distribInstalTarifs={distribInstalTarifs}
+          consosTarifs={consosTarifs}
         />
       </div>
-      <PropositionsFooter
-        comment="*moyenne sur l'année (12 mois de 21,67 jours ouvrés)"
-        handleClickNext={handleClickNext}
-      />
+      <PropositionsFooter handleClickNext={handleClickNext} />
     </div>
   );
 };

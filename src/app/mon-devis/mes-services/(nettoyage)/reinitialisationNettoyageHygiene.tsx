@@ -28,7 +28,7 @@ export const reinitialisationNettoyageHygiene = (
     nbDistribParfum: 0,
     nbDistribBalai: 0,
     nbDistribPoubelle: 0,
-    dureeLocation: "pa36M",
+    dureeLocation: "pa12M",
     trilogieGammeSelected: null,
     desinfectantGammeSelected: null,
     parfumGammeSelected: null,

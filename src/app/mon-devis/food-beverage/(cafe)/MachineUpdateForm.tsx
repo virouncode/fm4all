@@ -236,8 +236,6 @@ const MachineUpdateForm = ({
   const handleChangeEffectif = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     const newNbPersonnes = value ? parseInt(value) : client.effectif ?? 0;
-    console.log("newNbPersonnes", newNbPersonnes);
-    console.log("newNbPersonnesRounded", roundEffectif(newNbPersonnes));
 
     if (cafe.cafeFournisseurId) {
       const cafeQuantite = cafeQuantites.find(

@@ -26,6 +26,7 @@ export default {
         fm4allessential: "hsl(var(--fm4all-essential))",
         fm4allcomfort: "hsl(var(--fm4all-comfort))",
         fm4allexcellence: "hsl(var(--fm4all-excellence))",
+        fm4allSelection: "hsl(var(--fm4all-selection))",
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",

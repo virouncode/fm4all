@@ -195,13 +195,13 @@ const NettoyageOptionsPropositions = ({
     <div className="h-full flex flex-col border rounded-xl overflow-hidden">
       {repasseProposition && (
         <div className="flex border-b flex-1">
-          <div className="flex w-1/4 items-center justify-center text-lg">
+          <div className="flex w-1/4 items-center justify-center text-base p-4">
             Repasse sanitaire
           </div>
           <div
             className={`flex w-3/4 items-center justify-center ${
               nettoyage.repasseSelected
-                ? "ring-2 ring-inset ring-destructive"
+                ? "ring-4 ring-inset ring-destructive"
                 : ""
             } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
             onClick={() =>
@@ -225,14 +225,14 @@ const NettoyageOptionsPropositions = ({
       )}
 
       {samediDimancheProposition && (
-        <div className="flex border-b flex-1">
-          <div className="flex w-1/4 items-center justify-center text-lg">
-            Samedi
+        <div className="flex border-b flex-1 ">
+          <div className="flex w-1/4 items-center justify-center text-base text-center p-4">
+            Nettoyage supplémentaire tous les Samedi
           </div>
           <div
             className={`flex w-3/4 items-center justify-center ${
               nettoyage.samediSelected
-                ? "ring-2 ring-inset ring-destructive"
+                ? "ring-4 ring-inset ring-destructive"
                 : ""
             } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
             onClick={() =>
@@ -261,13 +261,13 @@ const NettoyageOptionsPropositions = ({
       )}
       {samediDimancheProposition && (
         <div className="flex border-b flex-1">
-          <div className="flex w-1/4 items-center justify-center text-lg">
-            Dimanche
+          <div className="flex w-1/4 items-center justify-center text-base text-center p-4">
+            Nettoyage supplémentaire tous les Dimanche
           </div>
           <div
             className={`flex w-3/4 items-center justify-center ${
               nettoyage.dimancheSelected
-                ? "ring-2 ring-inset ring-destructive"
+                ? "ring-4 ring-inset ring-destructive"
                 : ""
             } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
             onClick={() =>
@@ -296,9 +296,9 @@ const NettoyageOptionsPropositions = ({
       )}
       {vitrerieProposition && (
         <div className="flex border-b flex-1">
-          <div className="flex w-1/4 items-center justify-center">
-            <div className="flex flex-col gap-4 items-center justify-center w-full">
-              <p className="text-lg">Vitrerie*</p>
+          <div className="flex w-1/4 items-center justify-center p-4">
+            <div className="flex flex-col gap-2 items-center justify-center w-full">
+              <p className="text-base">Lavage Vitrerie*</p>
               <div className="flex gap-4 items-center justify-center w-full">
                 <Input
                   type="number"
@@ -324,7 +324,7 @@ const NettoyageOptionsPropositions = ({
           <div
             className={`flex w-3/4 items-center justify-center ${
               nettoyage.vitrerieSelected
-                ? "ring-2 ring-inset ring-destructive"
+                ? "ring-4 ring-inset ring-destructive"
                 : ""
             } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
             onClick={() =>

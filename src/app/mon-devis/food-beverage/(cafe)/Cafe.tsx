@@ -98,7 +98,7 @@ const Cafe = ({
 
   //Le container exterieur pour faire defiler les machines
   return (
-    <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="1">
+    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="1">
       <PropositionsTitle
         icon={Coffee}
         title="Café et boissons chaudes"

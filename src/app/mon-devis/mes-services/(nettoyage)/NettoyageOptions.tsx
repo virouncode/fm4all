@@ -57,7 +57,7 @@ const NettoyageOptions = ({
   }
 
   return (
-    <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="2">
+    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="2">
       <PropositionsTitle
         title="Nettoyage et Propreté"
         description={`Choisissez vos options en gamme ${nettoyage.gammeSelected} chez ${samediDimancheProposition?.nomEntreprise}`}
@@ -71,10 +71,7 @@ const NettoyageOptions = ({
           vitrerieProposition={vitrerieProposition}
         />
       </div>
-      <PropositionsFooter
-        comment="*emplacement pour remarque"
-        handleClickNext={handleClickNext}
-      />
+      <PropositionsFooter handleClickNext={handleClickNext} />
     </div>
   );
 };

@@ -1,8 +1,8 @@
 import {
-  getHygieneConsosTarif,
+  getHygieneConsosTarifs,
   getHygieneDistribQuantites,
   getHygieneDistribTarifs,
-  getHygieneInstalDistribTarif,
+  getHygieneInstalDistribTarifs,
 } from "@/lib/queries/hygiene/getHygiene";
 import {
   getIncendieQuantite,
@@ -47,8 +47,8 @@ const MesServices = async ({
     vitrerieTarif,
     hygieneDistribQuantites,
     hygieneDistribTarifs,
-    hygieneDistribInstalTarif,
-    hygieneConsosTarif,
+    hygieneDistribInstalTarifs,
+    hygieneConsosTarifs,
     incendieQuantite,
     incendieTarifs,
     maintenanceQuantites,
@@ -59,9 +59,9 @@ const MesServices = async ({
     getRepasseTarif(surface, fournisseurId, nettoyageGamme),
     getVitrerieTarif(fournisseurId),
     getHygieneDistribQuantites(effectif),
-    getHygieneDistribTarifs(fournisseurId),
-    getHygieneInstalDistribTarif(effectif, fournisseurId),
-    getHygieneConsosTarif(effectif, fournisseurId),
+    getHygieneDistribTarifs(),
+    getHygieneInstalDistribTarifs(effectif),
+    getHygieneConsosTarifs(effectif),
     getIncendieQuantite(surface),
     getIncendieTarifs(surface),
     getMaintenanceQuantites(surface),
@@ -157,7 +157,13 @@ const MesServices = async ({
 
   return (
     <section className="flex-1 overflow-hidden">
-      <Nettoyage nettoyagePropositions={nettoyagePropositions} />
+      <Nettoyage
+        nettoyagePropositions={nettoyagePropositions}
+        distribQuantites={hygieneDistribQuantites}
+        distribTarifs={hygieneDistribTarifs}
+        distribInstalTarifs={hygieneDistribInstalTarifs}
+        consosTarifs={hygieneConsosTarifs}
+      />
       <NettoyageOptions
         repasseProposition={repasseProposition}
         vitrerieProposition={vitrerieProposition}
@@ -166,13 +172,13 @@ const MesServices = async ({
       <Hygiene
         distribQuantites={hygieneDistribQuantites}
         distribTarifs={hygieneDistribTarifs}
-        distribInstalTarif={hygieneDistribInstalTarif}
-        consosTarif={hygieneConsosTarif}
+        distribInstalTarifs={hygieneDistribInstalTarifs}
+        consosTarifs={hygieneConsosTarifs}
       />
       <HygieneOptions
         distribQuantites={hygieneDistribQuantites}
         distribTarifs={hygieneDistribTarifs}
-        consosTarif={hygieneConsosTarif}
+        consosTarifs={hygieneConsosTarifs}
       />
       <Maintenance
         maintenanceQuantites={maintenanceQuantites}

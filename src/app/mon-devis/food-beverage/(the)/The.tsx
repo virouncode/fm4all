@@ -33,7 +33,7 @@ const The = ({ theConsoTarifs, effectif }: TheProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="2">
+    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="2">
       <PropositionsTitle
         title="Thés variés"
         icon={Leaf}
