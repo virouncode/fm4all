@@ -324,7 +324,7 @@ export const theConsoTarifs = pgTable("the_conso_tarifs", {
 export const fruitsQuantites = pgTable("fruits_quantites", {
   id: serial().primaryKey(),
   effectif: integer().notNull(),
-  kilosParSemaine: integer("kilos_par_semaine").notNull(),
+  kgParSemaine: integer("kg_par_semaine").notNull(),
   gamme: gammeEnum().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
@@ -335,7 +335,7 @@ export const fruitsTarifs = pgTable("fruits_tarifs", {
     .notNull()
     .references(() => fournisseurs.id),
   effectif: integer().notNull(),
-  prixKg: integer("prix_kg").notNull(),
+  prixKg: integer("prix_kg"),
   gamme: gammeEnum().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
@@ -354,7 +354,7 @@ export const snacksTarifs = pgTable("snacks_tarifs", {
     .notNull()
     .references(() => fournisseurs.id),
   effectif: integer().notNull(),
-  prixUnitaire: integer("prix_unitaire").notNull(),
+  prixUnitaire: integer("prix_unitaire"),
   gamme: gammeEnum().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
@@ -373,7 +373,7 @@ export const boissonsTarifs = pgTable("boissons_tarifs", {
     .notNull()
     .references(() => fournisseurs.id),
   effectif: integer().notNull(),
-  prixUnitaire: integer("prix_unitaire").notNull(),
+  prixUnitaire: integer("prix_unitaire"),
   gamme: gammeEnum().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
@@ -384,8 +384,9 @@ export const foodLivraisonTarifs = pgTable("food_livraison_tarifs", {
     .notNull()
     .references(() => fournisseurs.id),
   freqAnnuelle: integer("freq_annuelle").notNull(),
-  panierMinimum: integer("panier_minimum").notNull(),
-  prixUnitaire: integer("prix_unitaire").notNull(),
+  panierMin: integer("panier_min"),
+  prixUnitaire: integer("prix_unitaire"),
+  prixUnitaireSiCafe: integer("prix_unitaire_si_cafe").notNull(),
   seuilFranco: integer("seuil_franco"),
   remise_si_cafe: integer("remise_si_cafe"),
   createdAt: timestamp("created_at").notNull().defaultNow(),

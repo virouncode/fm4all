@@ -1,0 +1,1 @@
+ALTER TABLE "snacks_tarifs" ALTER COLUMN "prix_unitaire" DROP NOT NULL;

@@ -7,7 +7,8 @@ export const selectFoodLivraisonTarifsSchema = createSelectSchema(
   {
     freqAnnuelle: (schema) =>
       schema.min(1, "La fréquence annuelle est obligatoire"),
-    prixUnitaire: (schema) => schema.min(0, "Le prix unitaire est obligatoire"),
+    prixUnitaireSiCafe: (schema) =>
+      schema.min(0, "Le prix unitaire si café est obligatoire"),
   }
 ).extend({
   nomEntreprise: z.string().nonempty("Le nom du fournisseur est obligatoire"),

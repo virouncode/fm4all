@@ -155,6 +155,55 @@
       "when": 1736945589009,
       "tag": "0021_huge_mother_askani",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1736986838477,
+      "tag": "0022_busy_wildside",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1737022467162,
+      "tag": "0023_useful_gwen_stacy",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1737022614020,
+      "tag": "0024_powerful_bullseye",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1737022988089,
+      "tag": "0025_broad_squirrel_girl",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1737023055786,
+      "tag": "0026_furry_forgotten_one",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1737023525765,
+      "tag": "0027_demonic_zzzax",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1737023608029,
+      "tag": "0028_loving_yellow_claw",
+      "breakpoints": true
     }
   ]
 }
