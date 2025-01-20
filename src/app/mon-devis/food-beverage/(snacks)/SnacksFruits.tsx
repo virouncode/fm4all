@@ -82,14 +82,17 @@ const SnacksFruits = ({
     } = item;
     //Quantites / semaine
     const fruitsKgParSemaine =
-      fruitsQuantitesPourNbPersonnes.find(({ gamme }) => gamme === gamme)
-        ?.kgParSemaine ?? 0;
+      fruitsQuantitesPourNbPersonnes.find(
+        (quantite) => quantite.gamme === gamme
+      )?.kgParSemaine ?? 0;
     const snacksPortionsParSemaine =
-      snacksQuantitesPourNbPersonnes.find(({ gamme }) => gamme === gamme)
-        ?.portionsParSemaine ?? 0;
+      snacksQuantitesPourNbPersonnes.find(
+        (quantite) => quantite.gamme === gamme
+      )?.portionsParSemaine ?? 0;
     const boissonsConsosParSemaine =
-      boissonsQuantitesPourNbPersonnes.find(({ gamme }) => gamme === gamme)
-        ?.consosParSemaine ?? 0;
+      boissonsQuantitesPourNbPersonnes.find(
+        (quantite) => quantite.gamme === gamme
+      )?.consosParSemaine ?? 0;
     //Tarifs / portion
     const prixKgFruits = prixKg ?? 0;
     const prixUnitaireSnacks =
