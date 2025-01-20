@@ -187,7 +187,7 @@ const SnacksFruitsPropositions = ({
               <TooltipProvider delayDuration={0}>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="flex w-1/4 items-center justify-center">
+                    <div className="flex w-1/4 items-center justify-center px-4">
                       {getLogoFournisseurUrl(propositions[0].fournisseurId) ? (
                         <div className="w-full h-full relative">
                           <Image
@@ -244,7 +244,7 @@ const SnacksFruitsPropositions = ({
                   return (
                     <div
                       key={proposition.id}
-                      className={`flex-1 bg-${color} text-xl font-bold text-slate-200 flex items-center justify-center`}
+                      className={`flex-1 bg-${color} text-xl font-bold text-slate-200 flex items-center justify-center p-2`}
                     >
                       <p>Non proposé</p>
                     </div>

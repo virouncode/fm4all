@@ -400,6 +400,13 @@ export const foodLivraisonTarifs = pgTable("food_livraison_tarifs", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const eauQuantites = pgTable("eau_quantites", {
+  id: serial().primaryKey(),
+  effectif: integer().notNull(),
+  nbFontaines: integer("nb_fontaines").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 //RELATIONS
 export const fournisseursRelations = relations(
   fournisseurs,

@@ -33,6 +33,7 @@ import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
+import { TotalTheContext } from "@/context/TotalTheProvider";
 import { useToast } from "@/hooks/use-toast";
 import { roundEffectif } from "@/lib/roundEffectif";
 import { roundSurface } from "@/lib/roundSurface";
@@ -42,12 +43,12 @@ import {
   InsertClientType,
 } from "@/zod-schemas/client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { DialogClose } from "@radix-ui/react-dialog";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { reinitialisationDevis } from "./reinitialisationDevis";
-import { TotalTheContext } from "@/context/TotalTheProvider";
 
 const MesLocaux = () => {
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
@@ -235,7 +236,7 @@ const MesLocaux = () => {
             />
           </div>
         </div>
-        {client.effectif && client.surface ? (
+        {devisProgress.completedSteps.includes(1) ? (
           <Dialog>
             <DialogTrigger asChild>
               <div className="flex justify-center">
@@ -254,22 +255,22 @@ const MesLocaux = () => {
               <DialogHeader>
                 <DialogTitle>Devis en cours</DialogTitle>
                 <DialogDescription>
-                  Un devis est déjà en cours. Souhaitez-vous le reprendre ou en
-                  créer un nouveau ?
+                  Un devis est déjà en cours. Souaitez-vous poursuivre (vos
+                  informations de devis seront perdues) ?
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
-                <div className="flex gap-4">
-                  <Button
-                    variant="destructive"
-                    onClick={() => form.handleSubmit(submitForm)()}
-                  >
-                    Nouveau
-                  </Button>
-                  <Button onClick={handleClickReprendre} variant="outline">
-                    Reprendre
-                  </Button>
-                </div>
+                <DialogClose asChild>
+                  <div className="flex gap-4">
+                    <Button
+                      variant="destructive"
+                      onClick={() => form.handleSubmit(submitForm)()}
+                    >
+                      Poursuivre
+                    </Button>
+                    <Button variant="outline">Annuler</Button>
+                  </div>
+                </DialogClose>
               </DialogFooter>
             </DialogContent>
           </Dialog>

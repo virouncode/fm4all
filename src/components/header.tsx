@@ -95,6 +95,7 @@ const Header = () => {
             title="Mon devis en ligne"
             text="Mon devis en ligne"
             className="text-sm"
+            disabled={path.includes("/mon-devis")}
           />
           <Button
             title="Devenir prestataire"
