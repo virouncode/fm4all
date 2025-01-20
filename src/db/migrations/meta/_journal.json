@@ -281,6 +281,13 @@
       "when": 1737379501425,
       "tag": "0039_friendly_psynapse",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1737387630167,
+      "tag": "0040_pink_bedlam",
+      "breakpoints": true
     }
   ]
 }
