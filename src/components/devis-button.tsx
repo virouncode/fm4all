@@ -1,9 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
-import { NettoyageContext } from "@/context/NettoyageProvider";
 import { roundEffectif } from "@/lib/roundEffectif";
 import { roundSurface } from "@/lib/roundSurface";
 import Link from "next/link";
@@ -24,18 +22,11 @@ const DevisButton = ({
 }: DevisButtonProps) => {
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const { client } = useContext(ClientContext);
-  const { nettoyage } = useContext(NettoyageContext);
-  const { cafe } = useContext(CafeContext);
 
   const serviceSearchParams = new URLSearchParams();
-  const foodBeverageSearchParams = new URLSearchParams();
 
   if (client.effectif) {
     serviceSearchParams.set(
-      "effectif",
-      roundEffectif(client.effectif).toString()
-    );
-    foodBeverageSearchParams.set(
       "effectif",
       roundEffectif(client.effectif).toString()
     );
@@ -43,26 +34,6 @@ const DevisButton = ({
   if (client.surface) {
     serviceSearchParams.set("surface", roundSurface(client.surface).toString());
   }
-
-  if (nettoyage.gammeSelected) {
-    serviceSearchParams.set("nettoyageGamme", nettoyage.gammeSelected);
-  }
-  if (nettoyage.fournisseurId) {
-    serviceSearchParams.set(
-      "fournisseurId",
-      nettoyage.fournisseurId.toString()
-    );
-  }
-
-  if (cafe.cafeFournisseurId) {
-    foodBeverageSearchParams.set(
-      "cafeFournisseurId",
-      cafe.cafeFournisseurId.toString()
-    );
-  }
-
-  //mes-services searchParams : surface, effectif, fournisseurId, nettoyageGamme
-  //food-beverage searchParams : cafeFournisseurId, effectif
 
   const devisRoutes = [
     {
@@ -77,7 +48,7 @@ const DevisButton = ({
     },
     {
       id: 3,
-      url: `/food-beverage?${foodBeverageSearchParams.toString()}`,
+      url: `/food-beverage`,
       name: "Food & Beverage",
     },
     {

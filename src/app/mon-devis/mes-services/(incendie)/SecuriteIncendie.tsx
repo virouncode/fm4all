@@ -37,8 +37,6 @@ const SecuriteIncendie = ({
     const searchParams = new URLSearchParams();
     if (client.effectif)
       searchParams.set("effectif", client.effectif.toString());
-    if (cafe.cafeFournisseurId)
-      searchParams.set("cafeFournisseurId", cafe.cafeFournisseurId.toString());
     setDevisProgress({ currentStep: 3, completedSteps: [1, 2] });
     router.push(`/mon-devis/food-beverage?${searchParams.toString()}`);
   };

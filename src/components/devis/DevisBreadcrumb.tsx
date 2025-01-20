@@ -7,7 +7,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { roundSurface } from "@/lib/roundSurface";
@@ -22,17 +21,11 @@ import { roundEffectif } from "../../lib/roundEffectif";
 const DevisBreadcrumb = () => {
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const { client } = useContext(ClientContext);
-  const { cafe } = useContext(CafeContext);
 
   const serviceSearchParams = new URLSearchParams();
-  const foodBeverageSearchParams = new URLSearchParams();
 
   if (client.effectif) {
     serviceSearchParams.set(
-      "effectif",
-      roundEffectif(client.effectif).toString()
-    );
-    foodBeverageSearchParams.set(
       "effectif",
       roundEffectif(client.effectif).toString()
     );
@@ -41,15 +34,7 @@ const DevisBreadcrumb = () => {
     serviceSearchParams.set("surface", roundSurface(client.surface).toString());
   }
 
-  if (cafe.cafeFournisseurId) {
-    foodBeverageSearchParams.set(
-      "cafeFournisseurId",
-      cafe.cafeFournisseurId.toString()
-    );
-  }
-
   //mes-services searchParams : surface, effectif, fournisseurId, nettoyageGamme
-  //food-beverage searchParams : cafeFournisseurId, effectif
 
   const devisRoutes = [
     {
@@ -64,7 +49,7 @@ const DevisBreadcrumb = () => {
     },
     {
       id: 3,
-      url: `/food-beverage?${foodBeverageSearchParams.toString()}`,
+      url: `/food-beverage`,
       name: "Food & Beverage",
     },
     {
