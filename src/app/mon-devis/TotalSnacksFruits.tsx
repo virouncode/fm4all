@@ -1,58 +1,68 @@
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { formatNumber } from "@/lib/formatNumber";
+import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { useContext } from "react";
 
 const TotalSnacksFruits = () => {
   const { snacksFruits } = useContext(SnacksFruitsContext);
   const { totalSnacksFruits } = useContext(TotalSnacksFruitsContext);
-  const prixSnacksFruits = totalSnacksFruits.prixTotal ?? 0;
-  const total = formatNumber(prixSnacksFruits);
+  const totalFruits = totalSnacksFruits.totalFruits;
+  const totalSnacks = totalSnacksFruits.totalSnacks;
+  const totalBoissons = totalSnacksFruits.totalBoissons;
+  const totalLivraison = totalSnacksFruits.totalLivraison;
+  const total = totalSnacksFruits.total;
+  const color = getFm4AllColor(snacksFruits.infos.gammeSelected);
+
+  if (total === 0) return null;
 
   return (
     <div className="flex flex-col gap-4">
-      {totalSnacksFruits.nomFournisseur && (
+      {snacksFruits.infos.nomFournisseur && (
         <div className="flex flex-col gap-4">
-          <div>Snacks & Fruits ({totalSnacksFruits.nomFournisseur})</div>
-          <div className="flex flex-col ml-4 text-xs ">
-            {totalSnacksFruits.prixFruits &&
-              snacksFruits.choix.includes("fruits") && (
-                <div className="flex items-center justify-between">
-                  <p>Fruits</p>
-                  <p className="text-end">
-                    {totalSnacksFruits.prixFruits} € HT / an
-                  </p>
-                </div>
-              )}
-            {totalSnacksFruits.prixSnacks &&
-              snacksFruits.choix.includes("snacks") && (
-                <div className="flex items-center justify-between">
-                  <p>Snacks</p>
-                  <p className="text-end">
-                    {totalSnacksFruits.prixSnacks} € HT / an
-                  </p>
-                </div>
-              )}
-            {totalSnacksFruits.prixBoissons &&
-              snacksFruits.choix.includes("boissons") && (
-                <div className="flex items-center justify-between">
-                  <p>Boissons</p>
-                  <p className="text-end">
-                    {totalSnacksFruits.prixBoissons} € HT / an
-                  </p>
-                </div>
-              )}
+          <div>Snacks & Fruits ({snacksFruits.infos.nomFournisseur})</div>
+          <div className={`flex flex-col ml-4 text-xs`}>
+            {totalFruits ? (
+              <div
+                className={`flex items-center justify-between text-${color} font-bold`}
+              >
+                <p>Fruits</p>
+                <p className="text-end">
+                  {formatNumber(totalFruits)} € HT / an
+                </p>
+              </div>
+            ) : null}
+            {totalSnacks ? (
+              <div
+                className={`flex items-center justify-between text-${color} font-bold`}
+              >
+                <p>Snacks</p>
+                <p className="text-end">
+                  {formatNumber(totalSnacks)} € HT / an
+                </p>
+              </div>
+            ) : null}
+            {totalBoissons ? (
+              <div
+                className={`flex items-center justify-between text-${color} font-bold`}
+              >
+                <p>Fruits</p>
+                <p className="text-end">
+                  {formatNumber(totalBoissons)} € HT / an
+                </p>
+              </div>
+            ) : null}
 
-            <div className="flex items-center justify-between">
+            <div className={`flex items-center justify-between  font-bold`}>
               <p>Livraison</p>
               <p className="text-end">
-                {totalSnacksFruits.prixLivraison} € HT / an
+                {formatNumber(totalLivraison)} € HT / an
               </p>
             </div>
 
             <div className="flex items-center justify-between border-t border-foreground mt-2">
               <p>TOTAL</p>
-              <p className="text-end">{total} € HT / an</p>
+              <p className="text-end">{formatNumber(total)} € HT / an</p>
             </div>
           </div>
         </div>

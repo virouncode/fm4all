@@ -1,19 +1,20 @@
 "use client";
 import { CafeContext } from "@/context/CafeProvider";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
+import { SelectCafeQuantitesType } from "@/zod-schemas/cafeQuantites";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { Leaf } from "lucide-react";
 import { useContext } from "react";
-import NextServiceButton from "../../mes-services/NextServiceButton";
+import PropositionsFooter from "../../mes-services/PropositionsFooter";
 import PropositionsTitle from "../../mes-services/PropositionsTitle";
 import ThePropositions from "./ThePropositions";
 
 type TheProps = {
   theConsoTarifs: SelectTheConsoTarifsType[];
-  effectif: string;
+  cafeQuantites: SelectCafeQuantitesType[];
 };
 
-const The = ({ theConsoTarifs, effectif }: TheProps) => {
+const The = ({ theConsoTarifs, cafeQuantites }: TheProps) => {
   const { cafe } = useContext(CafeContext);
   const { setFoodBeverage } = useContext(FoodBeverageContext);
   const handleClickPrevious = () => {
@@ -28,7 +29,7 @@ const The = ({ theConsoTarifs, effectif }: TheProps) => {
       currentFoodBeverageId: prev.currentFoodBeverageId + 1,
     }));
   };
-  if (!cafe.cafeFournisseurId) {
+  if (!cafe.infos.fournisseurId) {
     return null;
   }
 
@@ -41,9 +42,15 @@ const The = ({ theConsoTarifs, effectif }: TheProps) => {
         handleClickPrevious={handleClickPrevious}
       />
       <div className="w-full flex-1">
-        <ThePropositions theConsoTarifs={theConsoTarifs} />
+        <ThePropositions
+          theConsoTarifs={theConsoTarifs}
+          cafeQuantites={cafeQuantites}
+        />
       </div>
-      <NextServiceButton handleClickNext={handleClickNext} />
+      <PropositionsFooter
+        handleClickNext={handleClickNext}
+        comment="*Les quantités sont éstimées à 15% de la consommation de votre effetif"
+      />
     </div>
   );
 };

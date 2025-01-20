@@ -3,6 +3,15 @@
 import { InputWithLabel } from "@/components/formInputs/InputWithLabel";
 import { SelectWithLabel } from "@/components/formInputs/SelectWithLabel";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { batiments } from "@/constants/batiments";
 import { departements } from "@/constants/departements";
@@ -16,12 +25,14 @@ import { IncendieContext } from "@/context/IncendieProvider";
 import { MaintenanceContext } from "@/context/MaintenanceProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
+import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { TheContext } from "@/context/TheProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
+import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { useToast } from "@/hooks/use-toast";
 import { roundEffectif } from "@/lib/roundEffectif";
 import { roundSurface } from "@/lib/roundSurface";
@@ -36,6 +47,7 @@ import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { reinitialisationDevis } from "./reinitialisationDevis";
+import { TotalTheContext } from "@/context/TotalTheProvider";
 
 const MesLocaux = () => {
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
@@ -48,11 +60,14 @@ const MesLocaux = () => {
   const { setIncendie } = useContext(IncendieContext);
   const { setCafe } = useContext(CafeContext);
   const { setThe } = useContext(TheContext);
+  const { setTotalThe } = useContext(TotalTheContext);
+  const { setSnacksFruits } = useContext(SnacksFruitsContext);
   const { setTotalNettoyage } = useContext(TotalNettoyageContext);
   const { setTotalHygiene } = useContext(TotalHygieneContext);
   const { setTotalIncendie } = useContext(TotalIncendieContext);
   const { setTotalMaintenance } = useContext(TotalMaintenanceContext);
   const { setTotalCafe } = useContext(TotalCafeContext);
+  const { setTotalSnacksFruits } = useContext(TotalSnacksFruitsContext);
 
   const router = useRouter();
   const { toast } = useToast();
@@ -133,6 +148,7 @@ const MesLocaux = () => {
     } catch (err) {
       console.log(err);
     }
+
     //Update client
     setClient(dataToPost);
     //Réinitialisation de tous le devis
@@ -147,6 +163,7 @@ const MesLocaux = () => {
       setIncendie,
       setCafe,
       setThe,
+      setSnacksFruits,
       //navigation
       setServices,
       setFoodBeverage,
@@ -155,11 +172,23 @@ const MesLocaux = () => {
       setTotalHygiene,
       setTotalMaintenance,
       setTotalIncendie,
-      setTotalCafe
+      setTotalCafe,
+      setTotalThe,
+      setTotalSnacksFruits
     );
+    localStorage.clear();
     //Passer à l'étape suivante
     router.push(
       `/mon-devis/mes-services?effectif=${dataToPost.effectif}&surface=${dataToPost.surface}`
+    );
+  };
+  const handleClickReprendre = () => {
+    setDevisProgress((prev) => ({
+      ...prev,
+      currentStep: 2,
+    }));
+    router.push(
+      `/mon-devis/mes-services?effectif=${client.effectif}&surface=${client.surface}`
     );
   };
 
@@ -206,16 +235,56 @@ const MesLocaux = () => {
             />
           </div>
         </div>
-        <div className="flex justify-center">
-          <Button
-            variant="destructive"
-            size="lg"
-            title="Afficher les tarifs"
-            className="text-base"
-          >
-            Afficher les tarifs
-          </Button>
-        </div>
+        {client.effectif && client.surface ? (
+          <Dialog>
+            <DialogTrigger asChild>
+              <div className="flex justify-center">
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="lg"
+                  title="Afficher les tarifs"
+                  className="text-base"
+                >
+                  Afficher les tarifs
+                </Button>
+              </div>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Devis en cours</DialogTitle>
+                <DialogDescription>
+                  Un devis est déjà en cours. Souhaitez-vous le reprendre ou en
+                  créer un nouveau ?
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <div className="flex gap-4">
+                  <Button
+                    variant="destructive"
+                    onClick={() => form.handleSubmit(submitForm)()}
+                  >
+                    Nouveau
+                  </Button>
+                  <Button onClick={handleClickReprendre} variant="outline">
+                    Reprendre
+                  </Button>
+                </div>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        ) : (
+          <div className="flex justify-center">
+            <Button
+              variant="destructive"
+              size="lg"
+              title="Afficher les tarifs"
+              className="text-base"
+            >
+              Afficher les tarifs
+            </Button>
+          </div>
+        )}
       </form>
     </Form>
   );

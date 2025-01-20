@@ -1,8 +1,15 @@
 import { z } from "zod";
 
 export const theSchema = z.object({
-  gammeSelected: z.enum(["essentiel", "confort", "excellence"]).nullable(),
-  nbPersonnes: z.number(),
+  infos: z.object({
+    gammeSelected: z.enum(["essentiel", "confort", "excellence"]).nullable(),
+  }),
+  quantites: z.object({
+    nbPersonnes: z.number(),
+  }),
+  prix: z.object({
+    prixUnitaire: z.number().nullable(),
+  }),
 });
 
 export type TheType = z.infer<typeof theSchema>;

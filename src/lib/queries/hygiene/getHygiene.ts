@@ -14,7 +14,7 @@ import { selectHygieneDistribTarifsSchema } from "@/zod-schemas/hygieneDistribTa
 import { selectHygieneInstalDistribTarifsSchema } from "@/zod-schemas/hygieneInstalDistribTarifs";
 import { and, eq, getTableColumns } from "drizzle-orm";
 
-export const getHygieneDistribQuantites = async (effectif: string) => {
+export const getHygieneDistribQuantite = async (effectif: string) => {
   try {
     const results = await db
       .select()
@@ -43,7 +43,7 @@ export const getHygieneDistribTarifs = async () => {
     const results = await db
       .select({
         ...getTableColumns(hygieneDistribTarifs),
-        nomEntreprise: fournisseurs.nomEntreprise,
+        nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
       })
       .from(hygieneDistribTarifs)
@@ -98,7 +98,7 @@ export const getHygieneConsosTarifs = async (effectif: string) => {
     const results = await db
       .select({
         ...getTableColumns(hygieneConsoTarifs),
-        nomEntreprise: fournisseurs.nomEntreprise,
+        nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
       })
       .from(hygieneConsoTarifs)

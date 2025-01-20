@@ -8,8 +8,8 @@ export default function useScrollIntoFood() {
     const currentFoodBeverage = document.getElementById(
       foodBeverage.currentFoodBeverageId.toString()
     );
-
     if (currentFoodBeverage) {
+      console.log("scrolling into food");
       currentFoodBeverage.scrollIntoView({
         behavior: "smooth",
         block: "nearest",

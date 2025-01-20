@@ -9,7 +9,7 @@ export const selectCafeMachinesTarifsSchema = createSelectSchema(
       schema.min(20, "La limite de boissons par jour est obligatoire"),
   }
 ).extend({
-  nomEntreprise: z.string().nonempty("Le nom du fournisseur est obligatoire"),
+  nomFournisseur: z.string().nonempty("Le nom du fournisseur est obligatoire"),
   slogan: z.string().nullable(),
 });
 

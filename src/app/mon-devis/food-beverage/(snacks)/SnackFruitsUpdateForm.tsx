@@ -2,8 +2,11 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
+import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
+import { roundEffectif } from "@/lib/roundEffectif";
 import { SelectBoissonsQuantitesType } from "@/zod-schemas/boissonsQuantites";
 import { SelectBoissonsTarifsType } from "@/zod-schemas/boissonsTarifs";
 import { SelectFoodLivraisonTarifsType } from "@/zod-schemas/foodLivraisonTarifs";
@@ -33,30 +36,210 @@ const SnacksFruitsUpdateForm = ({
   foodLivraisonTarifs,
 }: SnacksFruitsUpdateFormProps) => {
   const { client } = useContext(ClientContext);
+  const { cafe } = useContext(CafeContext);
   const { snacksFruits, setSnacksFruits } = useContext(SnacksFruitsContext);
+  const { totalSnacksFruits, setTotalSnacksFruits } = useContext(
+    TotalSnacksFruitsContext
+  );
 
   const handleChangeNbPersonnes = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     const newNbPersonnes = value ? parseInt(value) : client.effectif ?? 0;
-    setSnacksFruits((prev) => ({
-      ...prev,
-      nbPersonnes: newNbPersonnes,
-    }));
+
+    if (snacksFruits.infos.gammeSelected && snacksFruits.infos.fournisseurId) {
+      const fruitsQuantitesPourNbPersonnes = fruitsQuantites.filter(
+        (item) => item.effectif === roundEffectif(newNbPersonnes)
+      );
+      const fruitsTarifsPourNbPersonnes = fruitsTarifs.filter(
+        (item) => item.effectif === roundEffectif(newNbPersonnes)
+      );
+      const snacksQuantitesPourNbPersonnes = snacksQuantites.filter(
+        (item) => item.effectif === roundEffectif(newNbPersonnes)
+      );
+      const snacksTarifsPourNbPersonnes = snacksTarifs.filter(
+        (item) => item.effectif === roundEffectif(newNbPersonnes)
+      );
+      const boissonsQuantitesPourNbPersonnes = boissonsQuantites.filter(
+        (item) => item.effectif === roundEffectif(newNbPersonnes)
+      );
+      const boissonsTarifsPourNbPersonnes = boissonsTarifs.filter(
+        (item) => item.effectif === roundEffectif(newNbPersonnes)
+      );
+      const fruitsKgParSemaine =
+        fruitsQuantitesPourNbPersonnes.find(
+          ({ gamme }) => gamme === snacksFruits.infos.gammeSelected
+        )?.kgParSemaine ?? 0;
+      const snacksPortionsParSemaine =
+        snacksQuantitesPourNbPersonnes.find(
+          ({ gamme }) => gamme === snacksFruits.infos.gammeSelected
+        )?.portionsParSemaine ?? 0;
+      const boissonsConsosParSemaine =
+        boissonsQuantitesPourNbPersonnes.find(
+          ({ gamme }) => gamme === snacksFruits.infos.gammeSelected
+        )?.consosParSemaine ?? 0;
+      //Tarifs / portion
+      const prixKgFruits =
+        fruitsTarifsPourNbPersonnes.find(
+          (tarif) =>
+            tarif.gamme === snacksFruits.infos.gammeSelected &&
+            tarif.fournisseurId === snacksFruits.infos.fournisseurId
+        )?.prixKg ?? 0;
+      const prixUnitaireSnacks =
+        snacksTarifsPourNbPersonnes.find(
+          (tarif) =>
+            tarif.gamme === snacksFruits.infos.gammeSelected &&
+            tarif.fournisseurId === snacksFruits.infos.fournisseurId
+        )?.prixUnitaire ?? 0;
+      const prixUnitaireBoissons =
+        boissonsTarifsPourNbPersonnes.find(
+          (tarif) =>
+            tarif.gamme === snacksFruits.infos.gammeSelected &&
+            tarif.fournisseurId === snacksFruits.infos.fournisseurId
+        )?.prixUnitaire ?? 0;
+      const panierFruits = snacksFruits.infos.choix.includes("fruits")
+        ? prixKgFruits * fruitsKgParSemaine
+        : 0;
+      const panierSnacks = snacksFruits.infos.choix.includes("snacks")
+        ? prixUnitaireSnacks * snacksPortionsParSemaine
+        : 0;
+      const panierBoissons = snacksFruits.infos.choix.includes("boissons")
+        ? prixUnitaireBoissons * boissonsConsosParSemaine
+        : 0;
+      const totalFruits = Math.round(52 * panierFruits);
+      const totalSnacks = Math.round(52 * panierSnacks);
+      const totalBoissons = Math.round(52 * panierBoissons);
+
+      const prixPanier = panierFruits + panierSnacks + panierBoissons;
+
+      //Prix livraison / panier
+      const fraisLivraisonsDuFournisseur = foodLivraisonTarifs.find(
+        ({ fournisseurId }) =>
+          fournisseurId === snacksFruits.infos.fournisseurId
+      );
+      const isSameFournisseur =
+        snacksFruits.infos.fournisseurId === cafe.infos.fournisseurId;
+      const prixUnitaireLivraisonSiCafe =
+        fraisLivraisonsDuFournisseur?.prixUnitaireSiCafe ?? 0;
+      const prixUnitaireLivraison =
+        fraisLivraisonsDuFournisseur?.prixUnitaire ?? 0;
+
+      let fraisLivraisonPanier = isSameFournisseur
+        ? prixUnitaireLivraisonSiCafe
+        : prixUnitaireLivraison;
+
+      const seuilFranco = fraisLivraisonsDuFournisseur?.seuilFranco ?? 0;
+
+      fraisLivraisonPanier =
+        prixPanier < seuilFranco ? fraisLivraisonPanier : 0;
+      const totalLivraison = Math.round(fraisLivraisonPanier * 52);
+      const total = Math.round(52 * (prixPanier + fraisLivraisonPanier));
+      const panierMin = fraisLivraisonsDuFournisseur?.panierMin ?? 0;
+
+      setSnacksFruits((prev) => ({
+        ...prev,
+        quantites: {
+          ...prev.quantites,
+          nbPersonnes: newNbPersonnes,
+        },
+        prix: {
+          prixKgFruits,
+          prixUnitaireSnacks,
+          prixUnitaireBoissons,
+          prixUnitaireLivraisonSiCafe,
+          prixUnitaireLivraison,
+          seuilFranco,
+          panierMin,
+        },
+      }));
+      setTotalSnacksFruits({
+        totalFruits,
+        totalSnacks,
+        totalBoissons,
+        totalLivraison,
+        total,
+      });
+    } else {
+      setSnacksFruits((prev) => ({
+        ...prev,
+        quantites: {
+          ...prev.quantites,
+          nbPersonnes: newNbPersonnes,
+        },
+      }));
+    }
   };
+
   const handleCheck = (type: "fruits" | "snacks" | "boissons") => {
+    const newChoix = snacksFruits.infos.choix.includes(type)
+      ? snacksFruits.infos.choix.filter((item) => item !== type)
+      : [...snacksFruits.infos.choix, type];
+
     setSnacksFruits((prev) => ({
       ...prev,
-      choix: prev.choix.includes(type)
-        ? prev.choix.filter((c) => c !== type)
-        : [...prev.choix, type],
+      infos: {
+        ...prev.infos,
+        choix: newChoix,
+      },
     }));
+    console.log("newChoix", newChoix);
+
+    if (newChoix.length === 0) {
+      setTotalSnacksFruits((prev) => ({
+        ...prev,
+        totalFruits: 0,
+        totalSnacks: 0,
+        totalBoissons: 0,
+        totalLivraison: 0,
+        total: 0,
+      }));
+      return;
+    }
+    if (snacksFruits.infos.gammeSelected && snacksFruits.infos.fournisseurId) {
+      const panierFruits = newChoix.includes("fruits")
+        ? (snacksFruits.prix.prixKgFruits ?? 0) *
+          snacksFruits.quantites.fruitsKgParSemaine
+        : 0;
+      const panierSnacks = newChoix.includes("snacks")
+        ? (snacksFruits.prix.prixUnitaireSnacks ?? 0) *
+          snacksFruits.quantites.snacksPortionsParSemaine
+        : 0;
+      const panierBoissons = newChoix.includes("boissons")
+        ? (snacksFruits.prix.prixUnitaireBoissons ?? 0) *
+          snacksFruits.quantites.boissonsConsosParSemaine
+        : 0;
+      const totalFruits = Math.round(52 * panierFruits);
+      const totalSnacks = Math.round(52 * panierSnacks);
+      const totalBoissons = Math.round(52 * panierBoissons);
+
+      const prixPanier = panierFruits + panierSnacks + panierBoissons;
+
+      let fraisLivraisonPanier = snacksFruits.infos.isSameFournisseur
+        ? snacksFruits.prix.prixUnitaireLivraisonSiCafe ?? 0
+        : snacksFruits.prix.prixUnitaireLivraison ?? 0;
+
+      const seuilFranco = snacksFruits.prix.seuilFranco ?? 0;
+
+      fraisLivraisonPanier =
+        prixPanier < seuilFranco ? fraisLivraisonPanier : 0;
+      const totalLivraison = Math.round(fraisLivraisonPanier * 52);
+      const total = Math.round(52 * (prixPanier + fraisLivraisonPanier));
+
+      setTotalSnacksFruits((prev) => ({
+        ...prev,
+        totalFruits,
+        totalSnacks,
+        totalBoissons,
+        totalLivraison,
+        total,
+      }));
+    }
   };
   return (
     <form className="w-2/3 flex items-center gap-8">
       <div className="flex gap-4 items-center">
         <div className="flex items-center gap-2">
           <Checkbox
-            checked={snacksFruits.choix.includes("fruits")}
+            checked={snacksFruits.infos.choix.includes("fruits")}
             onCheckedChange={() => handleCheck("fruits")}
             className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             id="fruits"
@@ -67,7 +250,7 @@ const SnacksFruitsUpdateForm = ({
         </div>
         <div className="flex items-center gap-2">
           <Checkbox
-            checked={snacksFruits.choix.includes("snacks")}
+            checked={snacksFruits.infos.choix.includes("snacks")}
             onCheckedChange={() => handleCheck("snacks")}
             className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             id="snacks"
@@ -78,7 +261,7 @@ const SnacksFruitsUpdateForm = ({
         </div>
         <div className="flex items-center gap-2">
           <Checkbox
-            checked={snacksFruits.choix.includes("boissons")}
+            checked={snacksFruits.infos.choix.includes("boissons")}
             onCheckedChange={() => handleCheck("boissons")}
             className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             id="boissons"
@@ -91,7 +274,7 @@ const SnacksFruitsUpdateForm = ({
       <div className="flex gap-2 items-center">
         <Input
           className={`w-full max-w-xs min-w-20 ${
-            snacksFruits.nbPersonnes === client.effectif
+            snacksFruits.quantites.nbPersonnes === client.effectif
               ? "text-destructive"
               : ""
           }`}
@@ -99,7 +282,7 @@ const SnacksFruitsUpdateForm = ({
           min={1}
           max={300}
           step={1}
-          value={snacksFruits.nbPersonnes.toString()}
+          value={snacksFruits.quantites.nbPersonnes.toString()}
           onChange={handleChangeNbPersonnes}
           id={`nbPersonnesFood`}
         />

@@ -10,7 +10,6 @@ import {
 import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
-import { NettoyageContext } from "@/context/NettoyageProvider";
 import { roundSurface } from "@/lib/roundSurface";
 import Link from "next/link";
 import { useContext } from "react";
@@ -23,7 +22,6 @@ import { roundEffectif } from "../../lib/roundEffectif";
 const DevisBreadcrumb = () => {
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const { client } = useContext(ClientContext);
-  const { nettoyage } = useContext(NettoyageContext);
   const { cafe } = useContext(CafeContext);
 
   const serviceSearchParams = new URLSearchParams();
@@ -41,16 +39,6 @@ const DevisBreadcrumb = () => {
   }
   if (client.surface) {
     serviceSearchParams.set("surface", roundSurface(client.surface).toString());
-  }
-
-  if (nettoyage.gammeSelected) {
-    serviceSearchParams.set("nettoyageGamme", nettoyage.gammeSelected);
-  }
-  if (nettoyage.fournisseurId) {
-    serviceSearchParams.set(
-      "fournisseurId",
-      nettoyage.fournisseurId.toString()
-    );
   }
 
   if (cafe.cafeFournisseurId) {

@@ -9,39 +9,42 @@ import { S_OUVREES_PAR_AN } from "@/constants/constants";
 import { ClientContext } from "@/context/ClientProvider";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
-import { ServicesContext } from "@/context/ServicesProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
-import { GammeType } from "@/zod-schemas/gamme";
+import { gammes, GammeType } from "@/zod-schemas/gamme";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs";
+import { SelectNettoyageQuantitesType } from "@/zod-schemas/nettoyageQuantites";
+import { SelectRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
 import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
+import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
 import { useContext } from "react";
-import { reinitialisationNettoyageHygiene } from "./reinitialisationNettoyageHygiene";
 
 type NettoyagePropositionsProps = {
-  formattedNettoyagePropositions: (SelectNettoyageTarifsType & {
-    freqAnnuelle: number;
-    prixAnnuel: number;
-  })[][];
-  distribQuantites?: SelectHygieneDistribQuantitesType | null;
-  distribTarifs?: SelectHygieneDistribTarifsType[];
-  distribInstalTarifs?: SelectHygieneInstalDistribTarifsType[];
-  consosTarifs?: SelectHygieneConsoTarifsType[];
+  nettoyageQuantites: SelectNettoyageQuantitesType[];
+  nettoyageTarifs: SelectNettoyageTarifsType[];
+  repasseTarifs: SelectRepasseTarifsType[];
+  vitrerieTarifs: SelectVitrerieTarifsType[];
+  hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
+  hygieneDistribTarifs: SelectHygieneDistribTarifsType[];
+  hygieneDistribInstalTarifs: SelectHygieneInstalDistribTarifsType[];
+  hygieneConsosTarifs: SelectHygieneConsoTarifsType[];
 };
 
 const NettoyagePropositions = ({
-  formattedNettoyagePropositions,
-  distribQuantites,
-  distribTarifs,
-  distribInstalTarifs,
-  consosTarifs,
+  nettoyageQuantites,
+  nettoyageTarifs,
+  repasseTarifs,
+  vitrerieTarifs,
+  hygieneDistribQuantite,
+  hygieneDistribTarifs,
+  hygieneDistribInstalTarifs,
+  hygieneConsosTarifs,
 }: NettoyagePropositionsProps) => {
   const { client } = useContext(ClientContext);
   const { hygiene } = useContext(HygieneContext);
@@ -49,137 +52,363 @@ const NettoyagePropositions = ({
   const { setHygiene } = useContext(HygieneContext);
   const { setTotalNettoyage } = useContext(TotalNettoyageContext);
   const { setTotalHygiene } = useContext(TotalHygieneContext);
-  const { setServices } = useContext(ServicesContext);
-  const searchParams = useSearchParams();
-  const router = useRouter();
 
-  const handleClickProposition = (
-    fournisseurId: number,
-    gamme: GammeType,
-    nomEntreprise: string,
-    prixAnnuel: number
-  ) => {
+  const handleClickProposition = (proposition: {
+    id: number;
+    fournisseurId: number;
+    nomFournisseur: string;
+    sloganFournisseur: string | null;
+    freqAnnuelle: number;
+    hParPassage: number;
+    tauxHoraire: number;
+    gamme: GammeType;
+    prixAnnuel: number;
+  }) => {
     //Je décoche la proposition
     if (
-      nettoyage.fournisseurId === fournisseurId &&
-      nettoyage.gammeSelected === gamme
+      nettoyage.infos.fournisseurId === proposition.fournisseurId &&
+      nettoyage.infos.gammeSelected === proposition.gamme
     ) {
-      reinitialisationNettoyageHygiene(
-        setNettoyage,
-        setHygiene,
-        setServices,
-        setTotalNettoyage,
-        setTotalHygiene
-      );
-      const params = new URLSearchParams(searchParams.toString());
-      params.delete("fournisseurId");
-      params.delete("nettoyageGamme");
-      router.push(`/mon-devis/mes-services?${params.toString()}`);
+      setNettoyage((prev) => ({
+        infos: {
+          ...prev.infos,
+          fournisseurId: null,
+          nomFournisseur: null,
+          sloganFournisseur: null,
+          gammeSelected: null,
+        },
+        quantites: {
+          ...prev.quantites,
+          freqAnnuelle: 0,
+          hParPassage: 0,
+          hParPassageRepasse: 0,
+          cadenceCloisons: 0,
+          cadenceVitres: 0,
+        },
+        prix: {
+          tauxHoraire: 0,
+          tauxHoraireRepasse: 0,
+          tauxHoraireVitrerie: 0,
+          minFacturationVitrerie: 0,
+        },
+      }));
+      setTotalNettoyage({
+        totalService: 0,
+        totalRepasse: 0,
+        totalSamedi: 0,
+        totalDimanche: 0,
+        totalVitrerie: 0,
+      });
+      setHygiene((prev) => ({
+        ...prev,
+        infos: {
+          ...prev.infos,
+          fournisseurId: null,
+          nomFournisseur: null,
+          sloganFournisseur: null,
+        },
+        prix: {
+          prixDistribEmp: null,
+          prixDistribSavon: null,
+          prixDistribPh: null,
+          prixDistribDesinfectant: null,
+          prixDistribParfum: null,
+          prixDistribBalai: null,
+          prixDistribPoubelle: null,
+          prixInstalDistrib: null,
+          paParPersonneEmp: null,
+          paParPersonneSavon: null,
+          paParPersonnePh: null,
+          paParPersonneDesinfectant: null,
+        },
+      }));
+      setTotalHygiene({
+        totalTrilogie: 0,
+        totalDesinfectant: 0,
+        totalParfum: 0,
+        totalBalai: 0,
+        totalPoubelle: 0,
+      });
       return;
     }
     //Je coche la proposition
+    const {
+      fournisseurId,
+      nomFournisseur,
+      sloganFournisseur,
+      freqAnnuelle,
+      gamme,
+      hParPassage,
+      tauxHoraire,
+      prixAnnuel,
+    } = proposition;
+    const repasseTarif = repasseTarifs.find(
+      (tarif) => tarif.fournisseurId === fournisseurId && tarif.gamme === gamme
+    );
+    const hParPassageRepasse = repasseTarif?.hParPassage ?? 0;
+    const tauxHoraireRepasse = repasseTarif?.tauxHoraire ?? 0;
+    const vitrerieTarif = vitrerieTarifs.find(
+      (tarif) => tarif.fournisseurId === fournisseurId
+    );
+    const tauxHoraireVitrerie = vitrerieTarif?.tauxHoraire ?? 0;
+    const minFacturationVitrerie = vitrerieTarif?.minFacturation ?? 0;
+    const cadenceVitres = vitrerieTarif?.cadenceVitres ?? 0;
+    const cadenceCloisons = vitrerieTarif?.cadenceCloisons ?? 0;
 
     setNettoyage((prev) => ({
-      ...prev,
-      fournisseurId: fournisseurId,
-      gammeSelected: gamme,
-      repasseSelected: false,
-      samediSelected: false,
-      dimancheSelected: false,
-      vitrerieSelected: false,
-      nbPassageVitrerie: 2,
-    }));
-    setTotalNettoyage((prev) => ({
-      ...prev,
-      nomFournisseur: nomEntreprise,
-      prixService: prixAnnuel,
-      prixRepasse: null,
-      prixSamedi: null,
-      prixDimanche: null,
-      prixVitrerie: null,
+      infos: {
+        ...prev.infos,
+        fournisseurId,
+        nomFournisseur,
+        sloganFournisseur,
+        gammeSelected: gamme,
+      },
+      quantites: {
+        ...prev.quantites,
+        freqAnnuelle,
+        hParPassage,
+        hParPassageRepasse,
+        cadenceCloisons,
+        cadenceVitres,
+      },
+      prix: {
+        tauxHoraire,
+        tauxHoraireRepasse,
+        tauxHoraireVitrerie,
+        minFacturationVitrerie,
+      },
     }));
 
-    //Car on ne travaille pas forcément avec le même fournisseur pour l'hygiène, la gamme essentielle et
+    const totalRepasse = nettoyage.infos.repasseSelected
+      ? Math.round(freqAnnuelle * hParPassageRepasse * tauxHoraireRepasse)
+      : 0;
+    const totalSamedi = nettoyage.infos.samediSelected
+      ? Math.round(52 * tauxHoraire * hParPassage)
+      : 0;
+    const totalDimanche = nettoyage.infos.dimancheSelected
+      ? Math.round(52 * tauxHoraire * hParPassage * 1.2)
+      : 0;
+    const totalVitrerie = nettoyage.infos.vitrerieSelected
+      ? Math.round(
+          nettoyage.quantites.nbPassagesVitrerie *
+            Math.max(
+              (((client.surface ?? 0) * 0.15) / cadenceVitres) *
+                tauxHoraireVitrerie +
+                (((client.surface ?? 0) * 0.15) / cadenceCloisons) *
+                  tauxHoraireVitrerie,
+              minFacturationVitrerie
+            )
+        )
+      : 0;
+    setTotalNettoyage({
+      totalService: prixAnnuel,
+      totalRepasse,
+      totalSamedi,
+      totalDimanche,
+      totalVitrerie,
+    });
+
     const hygieneFournisseurId = fournisseurId === 9 ? 12 : fournisseurId;
-    const hygieneFournisseurName = fournisseurId === 9 ? "EPCH" : nomEntreprise;
-
-    const effectif = client.effectif as number;
-    const nbDistribEmp =
-      (hygiene.nbDistribEmp || distribQuantites?.nbDistribEmp) ?? 0;
-    const nbDistribSavon =
-      (hygiene.nbDistribSavon || distribQuantites?.nbDistribSavon) ?? 0;
-    const nbDistribPh =
-      (hygiene.nbDistribPh || distribQuantites?.nbDistribPh) ?? 0;
-
-    const distribTarifsDuFournisseur = distribTarifs?.filter(
+    const hygieneFournisseurNom = fournisseurId === 9 ? "EPCH" : nomFournisseur;
+    const distribsTarifsPourFournisseur = hygieneDistribTarifs.filter(
       (tarif) => tarif.fournisseurId === hygieneFournisseurId
     );
+    const prixDistribEmp =
+      distribsTarifsPourFournisseur.find(
+        (tarif) =>
+          tarif.type === "emp" &&
+          tarif.gamme === hygiene.infos.trilogieGammeSelected
+      )?.[hygiene.infos.dureeLocation] ?? 0;
+    const prixDistribSavon =
+      distribsTarifsPourFournisseur.find(
+        (tarif) =>
+          tarif.type === "savon" &&
+          tarif.gamme === hygiene.infos.trilogieGammeSelected
+      )?.[hygiene.infos.dureeLocation] ?? 0;
+    const prixDistribPh =
+      distribsTarifsPourFournisseur.find(
+        (tarif) =>
+          tarif.type === "ph" &&
+          tarif.gamme === hygiene.infos.trilogieGammeSelected
+      )?.[hygiene.infos.dureeLocation] ?? 0;
+    const prixDistribDesinfectant =
+      distribsTarifsPourFournisseur.find(
+        (tarif) =>
+          tarif.type === "desinfectant" &&
+          tarif.gamme === hygiene.infos.desinfectantGammeSelected
+      )?.[hygiene.infos.dureeLocation] ?? 0;
+    const prixDistribParfum =
+      distribsTarifsPourFournisseur.find(
+        (tarif) =>
+          tarif.type === "parfum" &&
+          tarif.gamme === hygiene.infos.parfumGammeSelected
+      )?.[hygiene.infos.dureeLocation] ?? 0;
+    const prixDistribBalai =
+      distribsTarifsPourFournisseur.find(
+        (tarif) =>
+          tarif.type === "balai" &&
+          tarif.gamme === hygiene.infos.balaiGammeSelected
+      )?.[hygiene.infos.dureeLocation] ?? 0;
+    const prixDistribPoubelle =
+      distribsTarifsPourFournisseur.find(
+        (tarif) =>
+          tarif.type === "poubelle" &&
+          tarif.gamme === hygiene.infos.poubelleGammeSelected
+      )?.[hygiene.infos.dureeLocation] ?? 0;
 
-    const dureeLocation = hygiene.dureeLocation;
-
-    const tarifDistribEmp =
-      distribTarifsDuFournisseur?.find(
-        (tarif) => tarif.type === "emp" && tarif.gamme === "essentiel"
-      )?.[dureeLocation] ?? 0;
-
-    const tarifDistribSavon =
-      distribTarifsDuFournisseur?.find(
-        (tarif) => tarif.type === "savon" && tarif.gamme === "essentiel"
-      )?.[dureeLocation] ?? 0;
-    const tarifDistribPh =
-      distribTarifsDuFournisseur?.find(
-        (tarif) => tarif.type === "ph" && tarif.gamme === "essentiel"
-      )?.[dureeLocation] ?? 0;
-    const consosTarif = consosTarifs?.find(
-      (item) => item.fournisseurId === hygieneFournisseurId
+    const consosTarifPourFournisseur = hygieneConsosTarifs.find(
+      (tarif) => tarif.fournisseurId === hygieneFournisseurId
     );
-
-    const distribInstalTarif = distribInstalTarifs?.find(
-      (item) => item.fournisseurId === hygieneFournisseurId
-    );
-
-    const prixAnnuelConsommables =
-      ((consosTarif?.paParPersonneEmp ?? 0) +
-        (consosTarif?.paParPersonneSavon ?? 0) +
-        (consosTarif?.paParPersonnePh ?? 0)) *
-      effectif;
-    const prixAnnuelDistributeurs =
-      nbDistribEmp * tarifDistribEmp +
-      nbDistribSavon * tarifDistribSavon +
-      nbDistribPh * tarifDistribPh;
-    const prixAnnuelInstalDistributeurs =
-      distribInstalTarif?.prixInstallation ?? 0;
-    const prixAnnuelTrilogie =
-      prixAnnuelConsommables +
-      prixAnnuelDistributeurs +
-      prixAnnuelInstalDistributeurs;
+    const paParPersonneEmp = consosTarifPourFournisseur?.paParPersonneEmp ?? 0;
+    const paParPersonneSavon =
+      consosTarifPourFournisseur?.paParPersonneSavon ?? 0;
+    const paParPersonnePh = consosTarifPourFournisseur?.paParPersonnePh ?? 0;
+    const paParPersonneDesinfectant =
+      consosTarifPourFournisseur?.paParPersonneDesinfectant ?? 0;
+    const prixInstalDistrib =
+      hygieneDistribInstalTarifs.find(
+        (tarif) => tarif.fournisseurId === hygieneFournisseurId
+      )?.prixInstallation ?? 0;
 
     setHygiene((prev) => ({
       ...prev,
-      fournisseurId: hygieneFournisseurId,
-      dureeLocation: "pa12M",
-      trilogieGammeSelected: "essentiel",
-      desinfectantGammeSelected: null,
-      parfumGammeSelected: null,
-      balaiGammeSelected: null,
-      poubelleGammeSelected: null,
+      infos: {
+        ...prev.infos,
+        fournisseurId: hygieneFournisseurId,
+        nomFournisseur: hygieneFournisseurNom,
+        sloganFournisseur:
+          hygieneFournisseurNom === "EPCH"
+            ? "Le spécialiste de l'hygiène"
+            : sloganFournisseur,
+      },
+      prix: {
+        prixDistribEmp,
+        prixDistribSavon,
+        prixDistribPh,
+        prixDistribDesinfectant,
+        prixDistribParfum,
+        prixDistribBalai,
+        prixDistribPoubelle,
+        prixInstalDistrib,
+        paParPersonneEmp,
+        paParPersonneSavon,
+        paParPersonnePh,
+        paParPersonneDesinfectant,
+      },
     }));
-    //J'ai calcule le prix de la trilogie avec le fournisseur d'hygiene et la gamme essentielle
+    const nbDistribEmp =
+      hygiene.quantites.nbDistribEmp ?? hygieneDistribQuantite.nbDistribEmp;
+    const nbDistribSavon =
+      hygiene.quantites.nbDistribSavon ?? hygieneDistribQuantite.nbDistribSavon;
+    const nbDistribPh =
+      hygiene.quantites.nbDistribPh ?? hygieneDistribQuantite.nbDistribPh;
+    const nbDistribDesinfectant =
+      hygiene.quantites.nbDistribDesinfectant ??
+      hygieneDistribQuantite.nbDistribDesinfectant;
+    const nbDistribParfum =
+      hygiene.quantites.nbDistribParfum ??
+      hygieneDistribQuantite.nbDistribParfum;
+    const nbDistribBalai =
+      hygiene.quantites.nbDistribBalai ?? hygieneDistribQuantite.nbDistribBalai;
+    const nbDistribPoubelle =
+      hygiene.quantites.nbDistribPoubelle ??
+      hygieneDistribQuantite.nbDistribPoubelle;
+
+    const totalTrilogie = hygiene.infos.trilogieGammeSelected
+      ? Math.round(
+          nbDistribEmp * prixDistribEmp +
+            nbDistribSavon * prixDistribSavon +
+            nbDistribPh * prixDistribPh +
+            prixInstalDistrib +
+            (paParPersonneEmp + paParPersonneSavon + paParPersonnePh) *
+              (client.effectif ?? 0)
+        )
+      : 0;
+    const totalDesinfectant = hygiene.infos.desinfectantGammeSelected
+      ? Math.round(
+          nbDistribDesinfectant * prixDistribDesinfectant +
+            paParPersonneDesinfectant * (client.effectif ?? 0)
+        )
+      : 0;
+    const totalParfum = hygiene.infos.parfumGammeSelected
+      ? Math.round(nbDistribParfum * prixDistribParfum)
+      : 0;
+    const totalBalai = hygiene.infos.balaiGammeSelected
+      ? Math.round(nbDistribBalai * prixDistribBalai)
+      : 0;
+    const totalPoubelle = hygiene.infos.poubelleGammeSelected
+      ? Math.round(nbDistribPoubelle * prixDistribPoubelle)
+      : 0;
     setTotalHygiene({
-      nomFournisseur: hygieneFournisseurName,
-      prixTrilogieAbonnement: prixAnnuelTrilogie,
-      prixTrilogieAchat: null,
-      prixDesinfectantAbonnement: null,
-      prixDesinfectantAchat: null,
-      prixParfum: null,
-      prixBalai: null,
-      prixPoubelle: null,
+      totalTrilogie,
+      totalDesinfectant,
+      totalParfum,
+      totalBalai,
+      totalPoubelle,
     });
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("fournisseurId", fournisseurId.toString());
-    params.set("nettoyageGamme", gamme);
-    router.push(`/mon-devis/mes-services?${params.toString()}`);
   };
+
+  //Formatter les propositions de nettoyage
+  const nettoyagePropositions = nettoyageTarifs.map((item) => {
+    const {
+      id,
+      fournisseurId,
+      nomFournisseur,
+      slogan: sloganFournisseur,
+      hParPassage,
+      tauxHoraire,
+      gamme,
+    } = item;
+    const freqAnnuelle =
+      nettoyageQuantites.find((quantite) => quantite.gamme === gamme)
+        ?.freqAnnuelle ?? 0;
+    const prixAnnuel = Math.round(freqAnnuelle * hParPassage * tauxHoraire);
+    return {
+      id,
+      fournisseurId,
+      nomFournisseur,
+      sloganFournisseur,
+      freqAnnuelle,
+      hParPassage,
+      tauxHoraire,
+      gamme,
+      prixAnnuel,
+    };
+  });
+
+  const nettoyagePropositionsByFournisseurId = nettoyagePropositions.reduce<
+    Record<
+      number,
+      {
+        id: number;
+        fournisseurId: number;
+        nomFournisseur: string;
+        sloganFournisseur: string | null;
+        freqAnnuelle: number;
+        hParPassage: number;
+        tauxHoraire: number;
+        gamme: GammeType;
+        prixAnnuel: number;
+      }[]
+    >
+  >((acc, item) => {
+    const { fournisseurId } = item;
+    if (!acc[fournisseurId]) {
+      acc[fournisseurId] = [];
+    }
+    // Add the item to the appropriate array
+    acc[fournisseurId].push(item);
+    acc[fournisseurId].sort(
+      (a, b) => gammes.indexOf(a.gamme) - gammes.indexOf(b.gamme)
+    );
+    return acc;
+  }, {});
+
+  //Un tableau de tableaux de propositions de nettoyage par fournisseur pour itérer
+  const formattedNettoyagePropositions = Object.values(
+    nettoyagePropositionsByFournisseurId
+  );
+
   return (
     <div className="h-full flex flex-col border rounded-xl overflow-hidden">
       {formattedNettoyagePropositions.length > 0
@@ -200,20 +429,22 @@ const NettoyagePropositions = ({
                                 propositions[0].fournisseurId
                               ) as string
                             }
-                            alt={`logo-de-${propositions[0].nomEntreprise}`}
+                            alt={`logo-de-${propositions[0].nomFournisseur}`}
                             fill={true}
                             className="w-full h-full object-contain"
                             quality={100}
                           />
                         </div>
                       ) : (
-                        propositions[0].nomEntreprise
+                        propositions[0].nomFournisseur
                       )}
                     </div>
                   </TooltipTrigger>
-                  {propositions[0].slogan && (
+                  {propositions[0].sloganFournisseur && (
                     <TooltipContent>
-                      <p className="text-sm italic">{propositions[0].slogan}</p>
+                      <p className="text-sm italic">
+                        {propositions[0].sloganFournisseur}
+                      </p>
                     </TooltipContent>
                   )}
                 </Tooltip>
@@ -226,17 +457,17 @@ const NettoyagePropositions = ({
                     : gamme === "confort"
                     ? "fm4allcomfort"
                     : "fm4allexcellence";
-                const prixAnnuel = proposition.prixAnnuel
+                const prixAnnuelText = proposition.prixAnnuel
                   ? `${formatNumber(proposition.prixAnnuel)} € /an`
                   : "Non proposé";
-                const hParSemaine =
+                const hParSemaineText =
                   proposition.hParPassage && proposition.freqAnnuelle
                     ? `${formatNumber(
                         (proposition.hParPassage * proposition.freqAnnuelle) /
                           S_OUVREES_PAR_AN
                       )} h / semaine*`
                     : "";
-                const nbPassagesParSemaine =
+                const nbPassagesParSemaineText =
                   proposition.freqAnnuelle && proposition.hParPassage
                     ? `${formatNumber(
                         proposition.freqAnnuelle / S_OUVREES_PAR_AN
@@ -246,40 +477,30 @@ const NettoyagePropositions = ({
                 return (
                   <div
                     className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
-                      nettoyage.fournisseurId === proposition.fournisseurId &&
-                      nettoyage.gammeSelected === gamme
+                      nettoyage.infos.fournisseurId ===
+                        proposition.fournisseurId &&
+                      nettoyage.infos.gammeSelected === gamme
                         ? "ring-4 ring-inset ring-destructive"
                         : ""
                     }`}
                     key={proposition.id}
-                    onClick={() =>
-                      handleClickProposition(
-                        proposition.fournisseurId,
-                        proposition.gamme,
-                        proposition.nomEntreprise,
-                        proposition.prixAnnuel
-                      )
-                    }
+                    onClick={() => handleClickProposition(proposition)}
                   >
                     <Checkbox
                       checked={
-                        nettoyage.fournisseurId === proposition.fournisseurId &&
-                        nettoyage.gammeSelected === gamme
+                        nettoyage.infos.fournisseurId ===
+                          proposition.fournisseurId &&
+                        nettoyage.infos.gammeSelected === gamme
                       }
                       onCheckedChange={() =>
-                        handleClickProposition(
-                          proposition.fournisseurId,
-                          proposition.gamme,
-                          proposition.nomEntreprise,
-                          proposition.prixAnnuel
-                        )
+                        handleClickProposition(proposition)
                       }
                       className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                     />
                     <div>
-                      <p className="font-bold">{prixAnnuel}</p>
-                      <p className="text-base">{hParSemaine}</p>
-                      <p className="text-xs">{nbPassagesParSemaine}</p>
+                      <p className="font-bold">{prixAnnuelText}</p>
+                      <p className="text-base">{hParSemaineText}</p>
+                      <p className="text-xs">{nbPassagesParSemaineText}</p>
                     </div>
                   </div>
                 );

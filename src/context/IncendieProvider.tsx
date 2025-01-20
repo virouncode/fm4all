@@ -16,10 +16,22 @@ export const IncendieContext = createContext<{
   setIncendie: Dispatch<SetStateAction<IncendieType>>;
 }>({
   incendie: {
-    fournisseurId: null,
-    nbExtincteurs: 0,
-    nbBaes: 0,
-    nbTelBaes: 0,
+    infos: {
+      fournisseurId: null,
+      nomFournisseur: null,
+      sloganFournisseur: null,
+    },
+    quantites: {
+      nbExtincteurs: null,
+      nbBaes: null,
+      nbTelBaes: null,
+    },
+    prix: {
+      prixParExtincteur: 0,
+      prixParBaes: 0,
+      prixParTelBaes: 0,
+      fraisDeplacement: 0,
+    },
   },
   setIncendie: () => {},
 });
@@ -29,10 +41,22 @@ const IncendieProvider = ({ children }: PropsWithChildren) => {
 
   // Always initialize state
   const [incendie, setIncendie] = useState<IncendieType>({
-    fournisseurId: null,
-    nbExtincteurs: 0,
-    nbBaes: 0,
-    nbTelBaes: 0,
+    infos: {
+      fournisseurId: null,
+      nomFournisseur: null,
+      sloganFournisseur: null,
+    },
+    quantites: {
+      nbExtincteurs: null,
+      nbBaes: null,
+      nbTelBaes: null,
+    },
+    prix: {
+      prixParExtincteur: 0,
+      prixParBaes: 0,
+      prixParTelBaes: 0,
+      fraisDeplacement: 0,
+    },
   });
 
   // Update state after mounting

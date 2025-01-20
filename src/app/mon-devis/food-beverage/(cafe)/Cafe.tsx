@@ -1,24 +1,23 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { TypesBoissonsType } from "@/constants/typesBoissons";
 import { CafeContext } from "@/context/CafeProvider";
+import { ClientContext } from "@/context/ClientProvider";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import useScrollIntoFood from "@/hooks/use-scroll-into-food";
-import useScrollIntoMachine from "@/hooks/use-scroll-into-machine";
+import useScrollIntoLot from "@/hooks/use-scroll-into-lot";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine";
 import { SelectCafeMachinesTarifsType } from "@/zod-schemas/cafeMachinesTarifs";
 import { SelectCafeQuantitesType } from "@/zod-schemas/cafeQuantites";
 import { SelectChocoConsoTarifsType } from "@/zod-schemas/chocoConsoTarifs";
-import { DureeLocationCafeType } from "@/zod-schemas/dureeLocation";
 import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { Coffee } from "lucide-react";
 import { useContext } from "react";
 import PropositionsFooter from "../../mes-services/PropositionsFooter";
 import PropositionsTitle from "../../mes-services/PropositionsTitle";
-import CafeMachine from "./CafeMachine";
+import CafeLot from "./CafeLot";
 
 type CafeProps = {
   cafeMachines: SelectCafeMachinesType[];
@@ -28,8 +27,6 @@ type CafeProps = {
   laitConsoTarifs: SelectLaitConsoTarifsType[];
   chocoConsoTarifs: SelectChocoConsoTarifsType[];
   theConsoTarifs: SelectTheConsoTarifsType[];
-  effectif: string;
-  cafeFournisseurId?: string;
 };
 
 const Cafe = ({
@@ -40,19 +37,18 @@ const Cafe = ({
   laitConsoTarifs,
   chocoConsoTarifs,
   theConsoTarifs,
-  effectif,
-  cafeFournisseurId,
 }: CafeProps) => {
+  const { client } = useContext(ClientContext);
   const { setFoodBeverage } = useContext(FoodBeverageContext);
   const { cafe, setCafe } = useContext(CafeContext);
   const { setTotalCafe } = useContext(TotalCafeContext);
   useScrollIntoFood();
-  useScrollIntoMachine();
+  useScrollIntoLot();
 
   const handleClickPrevious = () => {};
 
   const handleClickNext = () => {
-    if (!cafe.cafeFournisseurId) {
+    if (!cafe.infos.fournisseurId) {
       //pour skiper le the si pas de cafe
       setFoodBeverage((prev) => ({
         ...prev,
@@ -66,34 +62,38 @@ const Cafe = ({
     }));
   };
 
-  const handleAddMachine = () => {
+  const handleAddLot = () => {
     setCafe((prev) => ({
       ...prev,
-      currentMachineId: 1,
-      machines: [
+      nbLotsMachines: 1,
+      lotsMachines: [
         {
-          machineId: 1,
-          typeBoissons: "cafe" as TypesBoissonsType,
-          dureeLocation: "pa12M" as DureeLocationCafeType,
-          nbPersonnes: parseInt(effectif),
-          nbMachines: 0,
-          gammeSelected: null,
+          infos: {
+            lotId: 1,
+            typeBoissons: "cafe",
+            gammeCafeSelected: null,
+            marque: null,
+            modele: null,
+            reconditionne: false,
+          },
+          quantites: {
+            nbPersonnes: client.effectif ?? 0,
+            nbMachines: null,
+          },
+          prix: {
+            prixUnitaireLoc: null,
+            prixUnitaireInstal: null,
+            prixUnitaireMaintenance: null,
+            prixUnitaireConsoCafe: null,
+            prixUnitaireConsoLait: null,
+            prixUnitaireConsoChocolat: null,
+          },
         },
       ],
     }));
-    setTotalCafe((prev) => ({
-      ...prev,
-      prixCafeMachines: [
-        {
-          machineId: 1,
-          prix: null,
-          nbMachines: 0,
-          marque: "",
-          modele: "",
-          reconditionnne: false,
-        },
-      ],
-    }));
+    setTotalCafe({
+      totalMachines: [{ lotId: 1, total: 0, totalInstallation: 0 }],
+    });
   };
 
   //Le container exterieur pour faire defiler les machines
@@ -101,17 +101,17 @@ const Cafe = ({
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="1">
       <PropositionsTitle
         icon={Coffee}
-        title="Café et boissons chaudes"
-        description="Café expresso, boisson lactée ou boisson gourmande, choisissez la gamme de machine qui vous convient le mieux. Forfait mensuel tout compris selon durée d'engagement"
+        title="Boissons chaudes"
+        description="Café expresso, boissons lactées ou gourmandes, choisissez la gamme de machines qui vous convient le mieux"
         handleClickPrevious={handleClickPrevious}
         previousButton={false}
       />
       <div className="flex-1 overflow-hidden">
-        {cafe.machines && cafe.machines.length > 0 ? (
-          cafe.machines.map((machine) => (
-            <CafeMachine
-              key={machine.machineId}
-              machine={machine}
+        {cafe.nbLotsMachines > 0 ? (
+          cafe.lotsMachines.map((lot) => (
+            <CafeLot
+              key={lot.infos.lotId}
+              lot={lot}
               cafeMachines={cafeMachines}
               cafeQuantites={cafeQuantites}
               cafeMachinesTarifs={cafeMachinesTarifs}
@@ -119,8 +119,6 @@ const Cafe = ({
               laitConsoTarifs={laitConsoTarifs}
               chocoConsoTarifs={chocoConsoTarifs}
               theConsoTarifs={theConsoTarifs}
-              effectif={effectif}
-              cafeFournisseurId={cafeFournisseurId}
             />
           ))
         ) : (
@@ -129,7 +127,7 @@ const Cafe = ({
               variant="outline"
               size="lg"
               className="text-base"
-              onClick={handleAddMachine}
+              onClick={handleAddLot}
             >
               Ajouter une/des machines
             </Button>
@@ -138,7 +136,7 @@ const Cafe = ({
       </div>
       <PropositionsFooter
         handleClickNext={handleClickNext}
-        nextButton={cafe.machines.length === 0}
+        nextButton={cafe.nbLotsMachines === 0}
       />
     </div>
   );

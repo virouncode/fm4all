@@ -50,7 +50,7 @@ export const typeMachineEnum = pgEnum("typemachine", [
 
 export const fournisseurs = pgTable("fournisseurs", {
   id: serial().primaryKey(),
-  nomEntreprise: varchar("nom_entreprise").notNull(),
+  nomFournisseur: varchar("nom_fournisseur").notNull(),
   siret: varchar().notNull(),
   prenomContact: varchar("prenom_contact").notNull(),
   nomContact: varchar("nom_contact").notNull(),
@@ -65,7 +65,7 @@ export const fournisseurs = pgTable("fournisseurs", {
 
 export const clients = pgTable("clients", {
   id: serial().primaryKey(),
-  nomEntreprise: varchar("nom_entreprise").notNull(),
+  nomFournisseur: varchar("nom_fournisseur").notNull(),
   siret: varchar().notNull(),
   prenomContact: varchar("prenom_contact").notNull(),
   nomContact: varchar("nom_contact").notNull(),

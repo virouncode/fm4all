@@ -9,16 +9,21 @@ import { MaintenanceContext } from "@/context/MaintenanceProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
-import { GammeType } from "@/zod-schemas/gamme";
-import { SelectMaintenanceTarifsType } from "@/zod-schemas/maintenanceTarifs";
 import Image from "next/image";
 import { useContext } from "react";
 
 type MaintenancePropositionsProps = {
-  formattedPropositions: (SelectMaintenanceTarifsType & {
+  formattedPropositions: {
+    id: number;
+    gamme: "essentiel" | "confort" | "excellence";
+    nomFournisseur: string;
+    fournisseurId: number;
+    sloganFournisseur: string | null;
+    hParPassage: number;
+    tauxHoraire: number;
     freqAnnuelle: number;
     prixAnnuel: number;
-  })[][];
+  }[][];
 };
 
 const MaintenancePropositions = ({
@@ -27,37 +32,71 @@ const MaintenancePropositions = ({
   const { maintenance, setMaintenance } = useContext(MaintenanceContext);
   const { setTotalMaintenance } = useContext(TotalMaintenanceContext);
 
-  const handleClickProposition = (
-    fournisseurId: number,
-    gamme: GammeType,
-    nomEntreprise: string,
-    prixAnnuel: number
-  ) => {
+  const handleClickProposition = (proposition: {
+    id: number;
+    gamme: "essentiel" | "confort" | "excellence";
+    nomFournisseur: string;
+    fournisseurId: number;
+    sloganFournisseur: string | null;
+    hParPassage: number;
+    tauxHoraire: number;
+    freqAnnuelle: number;
+    prixAnnuel: number;
+  }) => {
+    const {
+      gamme,
+      nomFournisseur,
+      fournisseurId,
+      sloganFournisseur,
+      hParPassage,
+      tauxHoraire,
+      freqAnnuelle,
+      prixAnnuel,
+    } = proposition;
     if (
-      maintenance.fournisseurId === fournisseurId &&
-      maintenance.gammeSelected === gamme
+      maintenance.infos.fournisseurId === fournisseurId &&
+      maintenance.infos.gammeSelected === gamme
     ) {
       {
         setMaintenance((prev) => ({
           ...prev,
-          fournisseurId: null,
-          gammeSelected: null,
+          infos: {
+            fournisseurId: null,
+            nomFournisseur: null,
+            sloganFournisseur: null,
+            gammeSelected: null,
+          },
+          quantites: {
+            freqAnnuelle: 0,
+            hParPassage: 0,
+          },
+          prix: {
+            tauxHoraire: 0,
+          },
         }));
         setTotalMaintenance({
-          nomFournisseur: null,
-          prixMaintenance: null,
+          totalService: 0,
         });
         return;
       }
     }
-    setMaintenance((prev) => ({
-      ...prev,
-      fournisseurId,
-      gammeSelected: gamme,
-    }));
+    setMaintenance({
+      infos: {
+        fournisseurId,
+        nomFournisseur,
+        sloganFournisseur,
+        gammeSelected: gamme,
+      },
+      quantites: {
+        freqAnnuelle,
+        hParPassage,
+      },
+      prix: {
+        tauxHoraire,
+      },
+    });
     setTotalMaintenance({
-      nomFournisseur: nomEntreprise,
-      prixMaintenance: prixAnnuel,
+      totalService: prixAnnuel,
     });
   };
 
@@ -81,20 +120,22 @@ const MaintenancePropositions = ({
                                 propositions[0].fournisseurId
                               ) as string
                             }
-                            alt={`logo-de-${propositions[0].nomEntreprise}`}
+                            alt={`logo-de-${propositions[0].nomFournisseur}`}
                             fill={true}
                             className="w-full h-full object-contain"
                             quality={100}
                           />
                         </div>
                       ) : (
-                        propositions[0].nomEntreprise
+                        propositions[0].nomFournisseur
                       )}
                     </div>
                   </TooltipTrigger>
-                  {propositions[0].slogan && (
+                  {propositions[0].sloganFournisseur && (
                     <TooltipContent>
-                      <p className="text-sm italic">{propositions[0].slogan}</p>
+                      <p className="text-sm italic">
+                        {propositions[0].sloganFournisseur}
+                      </p>
                     </TooltipContent>
                   )}
                 </Tooltip>
@@ -114,34 +155,23 @@ const MaintenancePropositions = ({
                 return (
                   <div
                     className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
-                      maintenance.fournisseurId === proposition.fournisseurId &&
-                      maintenance.gammeSelected === gamme
+                      maintenance.infos.fournisseurId ===
+                        proposition.fournisseurId &&
+                      maintenance.infos.gammeSelected === gamme
                         ? "ring-4 ring-inset ring-destructive"
                         : ""
                     }`}
                     key={proposition.id}
-                    onClick={() =>
-                      handleClickProposition(
-                        proposition.fournisseurId,
-                        proposition.gamme,
-                        proposition.nomEntreprise,
-                        proposition.prixAnnuel
-                      )
-                    }
+                    onClick={() => handleClickProposition(proposition)}
                   >
                     <Checkbox
                       checked={
-                        maintenance.fournisseurId ===
+                        maintenance.infos.fournisseurId ===
                           proposition.fournisseurId &&
-                        maintenance.gammeSelected === gamme
+                        maintenance.infos.gammeSelected === gamme
                       }
                       onCheckedChange={() =>
-                        handleClickProposition(
-                          proposition.fournisseurId,
-                          proposition.gamme,
-                          proposition.nomEntreprise,
-                          proposition.prixAnnuel
-                        )
+                        handleClickProposition(proposition)
                       }
                       className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                     />

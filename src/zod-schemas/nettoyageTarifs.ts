@@ -8,7 +8,7 @@ export const selectNettoyageTarifsSchema = createSelectSchema(nettoyageTarifs, {
   tauxHoraire: (schema) => schema.min(1, "Le taux horaire est obligatoire"),
   surface: (schema) => schema.min(1, "La surface est obligatoire"),
 }).extend({
-  nomEntreprise: z.string().nonempty("Nom de fournisseur invalide"),
+  nomFournisseur: z.string().nonempty("Nom de fournisseur invalide"),
   slogan: z.string().nullable(),
 });
 

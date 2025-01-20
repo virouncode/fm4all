@@ -1,62 +1,45 @@
 import { z } from "zod";
 
 export const totalNettoyageSchema = z.object({
-  nomFournisseur: z.string().nullable(),
-  prixRepasse: z.number().nullable(),
-  prixService: z.number().nullable(),
-  prixSamedi: z.number().nullable(),
-  prixDimanche: z.number().nullable(),
-  prixVitrerie: z.number().nullable(),
+  totalService: z.number().default(0),
+  totalRepasse: z.number().default(0),
+  totalSamedi: z.number().default(0),
+  totalDimanche: z.number().default(0),
+  totalVitrerie: z.number().default(0),
 });
 export const totalHygieneSchema = z.object({
-  nomFournisseur: z.string().nullable(),
-  prixTrilogieAbonnement: z.number().nullable(),
-  prixTrilogieAchat: z
-    .object({
-      prixAchat: z.number(),
-      prixConsommables: z.number(),
-    })
-    .nullable(),
-  prixDesinfectantAbonnement: z.number().nullable(),
-  prixDesinfectantAchat: z
-    .object({
-      prixAchat: z.number(),
-      prixConsommables: z.number(),
-    })
-    .nullable(),
-  prixParfum: z.number().nullable(),
-  prixBalai: z.number().nullable(),
-  prixPoubelle: z.number().nullable(),
+  totalTrilogie: z.number().default(0),
+  totalDesinfectant: z.number().default(0),
+  totalParfum: z.number().default(0),
+  totalBalai: z.number().default(0),
+  totalPoubelle: z.number().default(0),
 });
 export const totalMaintenanceSchema = z.object({
-  nomFournisseur: z.string().nullable(),
-  prixMaintenance: z.number().nullable(),
+  totalService: z.number().default(0),
 });
 export const totalIncendieSchema = z.object({
-  nomFournisseur: z.string().nullable(),
-  prixIncendie: z.number().nullable(),
+  totalService: z.number().default(0),
 });
 export const totalCafeSchema = z.object({
-  nomFournisseur: z.string().nullable(),
-  prixCafeMachines: z.array(
-    z.object({
-      machineId: z.number(),
-      prix: z.number().nullable(),
-      marque: z.string(),
-      modele: z.string(),
-      reconditionnne: z.boolean(),
-      nbMachines: z.number(),
-    })
-  ),
-  prixThe: z.number().nullable(),
+  totalMachines: z
+    .array(
+      z.object({
+        lotId: z.number(),
+        total: z.number().default(0),
+        totalInstallation: z.number().default(0),
+      })
+    )
+    .default([]),
+});
+export const totalTheSchema = z.object({
+  totalService: z.number().default(0),
 });
 export const totalSnacksFruitsSchema = z.object({
-  nomFournisseur: z.string().nullable(),
-  prixFruits: z.number().nullable(),
-  prixSnacks: z.number().nullable(),
-  prixBoissons: z.number().nullable(),
-  prixLivraison: z.number().nullable(),
-  prixTotal: z.number().nullable(),
+  totalFruits: z.number().default(0),
+  totalSnacks: z.number().default(0),
+  totalBoissons: z.number().default(0),
+  totalLivraison: z.number().default(0),
+  total: z.number().default(0),
 });
 
 export type TotalNettoyageType = z.infer<typeof totalNettoyageSchema>;
@@ -64,4 +47,5 @@ export type TotalHygieneType = z.infer<typeof totalHygieneSchema>;
 export type TotalIncendieType = z.infer<typeof totalIncendieSchema>;
 export type TotalMaintenanceType = z.infer<typeof totalMaintenanceSchema>;
 export type TotalCafeType = z.infer<typeof totalCafeSchema>;
+export type TotalTheType = z.infer<typeof totalTheSchema>;
 export type TotalSnacksFruitsType = z.infer<typeof totalSnacksFruitsSchema>;

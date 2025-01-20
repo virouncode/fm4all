@@ -17,9 +17,7 @@ export const TotalCafeContext = createContext<{
   setTotalCafe: Dispatch<SetStateAction<TotalCafeType>>;
 }>({
   totalCafe: {
-    nomFournisseur: null,
-    prixCafeMachines: [],
-    prixThe: null,
+    totalMachines: [],
   },
   setTotalCafe: () => {},
 });
@@ -29,18 +27,13 @@ const TotalCafeProvider = ({ children }: PropsWithChildren) => {
 
   // Always initialize state
   const [totalCafe, setTotalCafe] = useState<TotalCafeType>({
-    nomFournisseur: null,
-    prixCafeMachines: [
+    totalMachines: [
       {
-        machineId: 1,
-        prix: null,
-        marque: "",
-        modele: "",
-        reconditionnne: false,
-        nbMachines: 0,
+        lotId: 1,
+        total: 0,
+        totalInstallation: 0,
       },
     ],
-    prixThe: null,
   });
 
   useEffect(() => {

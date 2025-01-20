@@ -11,7 +11,7 @@ export const selectMaintenanceTarifsSchema = createSelectSchema(
     tauxHoraire: (schema) => schema.min(1, "Le taux horaire est obligatoire"),
   }
 ).extend({
-  nomEntreprise: z.string().nonempty("Le nom du fournisseur est obligatoire"),
+  nomFournisseur: z.string().nonempty("Le nom du fournisseur est obligatoire"),
   slogan: z.string().nullable(),
 });
 

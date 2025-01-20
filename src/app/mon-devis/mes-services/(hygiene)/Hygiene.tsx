@@ -14,17 +14,17 @@ import PropositionsTitle from "../PropositionsTitle";
 import HygienePropositions from "./HygienePropositions";
 
 type HygieneProps = {
-  distribQuantites?: SelectHygieneDistribQuantitesType | null;
-  distribTarifs?: SelectHygieneDistribTarifsType[];
-  distribInstalTarifs?: SelectHygieneInstalDistribTarifsType[];
-  consosTarifs?: SelectHygieneConsoTarifsType[];
+  hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
+  hygieneDistribTarifs: SelectHygieneDistribTarifsType[];
+  hygieneDistribInstalTarifs: SelectHygieneInstalDistribTarifsType[];
+  hygieneConsosTarifs: SelectHygieneConsoTarifsType[];
 };
 
 const Hygiene = ({
-  distribQuantites,
-  distribTarifs,
-  distribInstalTarifs,
-  consosTarifs,
+  hygieneDistribQuantite,
+  hygieneDistribTarifs,
+  hygieneDistribInstalTarifs,
+  hygieneConsosTarifs,
 }: HygieneProps) => {
   const { nettoyage } = useContext(NettoyageContext);
   const { hygiene } = useContext(HygieneContext);
@@ -37,7 +37,7 @@ const Hygiene = ({
     }));
   };
   const handleClickNext = () => {
-    if (hygiene.trilogieGammeSelected) {
+    if (hygiene.infos.trilogieGammeSelected) {
       setServices((prev) => ({
         ...prev,
         currentServiceId: services.currentServiceId + 1,
@@ -50,8 +50,8 @@ const Hygiene = ({
     }
   };
 
-  if (!nettoyage.gammeSelected || !nettoyage.fournisseurId) {
-    return null;
+  if (!nettoyage.infos.gammeSelected || !nettoyage.infos.fournisseurId) {
+    return null; //pour skiper l'hygiene si pas de nettoyage
   }
 
   return (
@@ -63,17 +63,12 @@ const Hygiene = ({
         handleClickPrevious={handleClickPrevious}
       />
       <div className="w-full flex-1">
-        {distribQuantites &&
-          distribTarifs &&
-          distribInstalTarifs &&
-          consosTarifs && (
-            <HygienePropositions
-              distribQuantites={distribQuantites}
-              distribTarifs={distribTarifs}
-              distribInstalTarifs={distribInstalTarifs}
-              consosTarifs={consosTarifs}
-            />
-          )}
+        <HygienePropositions
+          hygieneDistribQuantite={hygieneDistribQuantite}
+          hygieneDistribTarifs={hygieneDistribTarifs}
+          hygieneDistribInstalTarifs={hygieneDistribInstalTarifs}
+          hygieneConsosTarifs={hygieneConsosTarifs}
+        />
       </div>
       <PropositionsFooter handleClickNext={handleClickNext} />
     </div>

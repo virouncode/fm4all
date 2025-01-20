@@ -18,10 +18,29 @@ export const SnacksFruitsContext = createContext<{
   setSnacksFruits: Dispatch<SetStateAction<SnacksFruitsType>>;
 }>({
   snacksFruits: {
-    fournisseurId: null,
-    gammeSelected: null,
-    nbPersonnes: 0,
-    choix: ["fruits"],
+    infos: {
+      fournisseurId: null,
+      nomFournisseur: null,
+      sloganFournisseur: null,
+      isSameFournisseur: false,
+      gammeSelected: null,
+      choix: ["fruits"],
+    },
+    quantites: {
+      nbPersonnes: 0,
+      fruitsKgParSemaine: 0,
+      snacksPortionsParSemaine: 0,
+      boissonsConsosParSemaine: 0,
+    },
+    prix: {
+      prixKgFruits: null,
+      prixUnitaireSnacks: null,
+      prixUnitaireBoissons: null,
+      prixUnitaireLivraisonSiCafe: null,
+      prixUnitaireLivraison: null,
+      seuilFranco: null,
+      panierMin: null,
+    },
   },
   setSnacksFruits: () => {},
 });
@@ -32,10 +51,29 @@ const SnacksFruitsProvider = ({ children }: PropsWithChildren) => {
 
   // Always initialize state
   const [snacksFruits, setSnacksFruits] = useState<SnacksFruitsType>({
-    fournisseurId: null,
-    gammeSelected: null,
-    nbPersonnes: client.effectif ?? 0,
-    choix: ["fruits"],
+    infos: {
+      fournisseurId: null,
+      nomFournisseur: null,
+      sloganFournisseur: null,
+      isSameFournisseur: false,
+      gammeSelected: null,
+      choix: ["fruits"],
+    },
+    quantites: {
+      nbPersonnes: client.effectif ?? 0,
+      fruitsKgParSemaine: 0,
+      snacksPortionsParSemaine: 0,
+      boissonsConsosParSemaine: 0,
+    },
+    prix: {
+      prixKgFruits: null,
+      prixUnitaireSnacks: null,
+      prixUnitaireBoissons: null,
+      prixUnitaireLivraisonSiCafe: null,
+      prixUnitaireLivraison: null,
+      seuilFranco: null,
+      panierMin: null,
+    },
   });
 
   useEffect(() => {

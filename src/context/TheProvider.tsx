@@ -18,8 +18,15 @@ export const TheContext = createContext<{
   setThe: Dispatch<SetStateAction<TheType>>;
 }>({
   the: {
-    gammeSelected: null,
-    nbPersonnes: 0,
+    infos: {
+      gammeSelected: null,
+    },
+    quantites: {
+      nbPersonnes: 0,
+    },
+    prix: {
+      prixUnitaire: 0,
+    },
   },
   setThe: () => {},
 });
@@ -30,8 +37,15 @@ const TheProvider = ({ children }: PropsWithChildren) => {
 
   // Always initialize state
   const [the, setThe] = useState<TheType>({
-    gammeSelected: null,
-    nbPersonnes: Math.round((client.effectif ?? 0) * 0.15),
+    infos: {
+      gammeSelected: null,
+    },
+    quantites: {
+      nbPersonnes: Math.round((client.effectif ?? 0) * 0.15),
+    },
+    prix: {
+      prixUnitaire: null,
+    },
   });
 
   // Update state after mounting

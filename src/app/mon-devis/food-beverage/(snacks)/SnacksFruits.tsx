@@ -45,13 +45,13 @@ const SnacksFruits = ({
   const handleClickPrevious = () => {
     setFoodBeverage((prev) => ({
       ...prev,
-      currentFoodBeverageId: cafe.cafeFournisseurId
+      currentFoodBeverageId: cafe.infos.fournisseurId
         ? prev.currentFoodBeverageId - 1
         : prev.currentFoodBeverageId - 2,
     }));
   };
 
-  const nbPersonnes = snacksFruits.nbPersonnes;
+  const nbPersonnes = snacksFruits.quantites.nbPersonnes;
   const fruitsQuantitesPourNbPersonnes = fruitsQuantites.filter(
     (item) => item.effectif === roundEffectif(nbPersonnes)
   );
@@ -72,51 +72,57 @@ const SnacksFruits = ({
   );
 
   const propositions = fruitsTarifsPourNbPersonnes.map((item) => {
+    const {
+      id,
+      gamme,
+      nomFournisseur,
+      slogan: sloganFournisseur,
+      fournisseurId,
+      prixKg,
+    } = item;
     //Quantites / semaine
     const fruitsKgParSemaine =
-      fruitsQuantitesPourNbPersonnes.find(({ gamme }) => gamme === item.gamme)
+      fruitsQuantitesPourNbPersonnes.find(({ gamme }) => gamme === gamme)
         ?.kgParSemaine ?? 0;
     const snacksPortionsParSemaine =
-      snacksQuantitesPourNbPersonnes.find(({ gamme }) => gamme === item.gamme)
+      snacksQuantitesPourNbPersonnes.find(({ gamme }) => gamme === gamme)
         ?.portionsParSemaine ?? 0;
     const boissonsConsosParSemaine =
-      boissonsQuantitesPourNbPersonnes.find(({ gamme }) => gamme === item.gamme)
+      boissonsQuantitesPourNbPersonnes.find(({ gamme }) => gamme === gamme)
         ?.consosParSemaine ?? 0;
     //Tarifs / portion
-    const prixKgFruits =
-      fruitsTarifsPourNbPersonnes.find(
-        (tarif) =>
-          tarif.gamme === item.gamme &&
-          tarif.fournisseurId === item.fournisseurId
-      )?.prixKg ?? 0;
+    const prixKgFruits = prixKg ?? 0;
     const prixUnitaireSnacks =
       snacksTarifsPourNbPersonnes.find(
         (tarif) =>
-          tarif.gamme === item.gamme &&
-          tarif.fournisseurId === item.fournisseurId
+          tarif.gamme === gamme && tarif.fournisseurId === fournisseurId
       )?.prixUnitaire ?? 0;
     const prixUnitaireBoissons =
       boissonsTarifsPourNbPersonnes.find(
         (tarif) =>
-          tarif.gamme === item.gamme &&
-          tarif.fournisseurId === item.fournisseurId
+          tarif.gamme === gamme && tarif.fournisseurId === fournisseurId
       )?.prixUnitaire ?? 0;
     //Prix panier
-    const prixPanier =
-      (snacksFruits.choix.includes("fruits")
-        ? prixKgFruits * fruitsKgParSemaine
-        : 0) +
-      (snacksFruits.choix.includes("snacks")
-        ? prixUnitaireSnacks * snacksPortionsParSemaine
-        : 0) +
-      (snacksFruits.choix.includes("boissons")
-        ? prixUnitaireBoissons * boissonsConsosParSemaine
-        : 0);
+    const panierFruits = snacksFruits.infos.choix.includes("fruits")
+      ? prixKgFruits * fruitsKgParSemaine
+      : 0;
+    const panierSnacks = snacksFruits.infos.choix.includes("snacks")
+      ? prixUnitaireSnacks * snacksPortionsParSemaine
+      : 0;
+    const panierBoissons = snacksFruits.infos.choix.includes("boissons")
+      ? prixUnitaireBoissons * boissonsConsosParSemaine
+      : 0;
+    const totalFruits = Math.round(52 * panierFruits);
+    const totalSnacks = Math.round(52 * panierSnacks);
+    const totalBoissons = Math.round(52 * panierBoissons);
+
+    const prixPanier = panierFruits + panierSnacks + panierBoissons;
+
     //Prix livraison / panier
     const fraisLivraisonsDuFournisseur = foodLivraisonTarifs.find(
-      ({ fournisseurId }) => fournisseurId === item.fournisseurId
+      ({ fournisseurId }) => fournisseurId === fournisseurId
     );
-    const isSameFournisseur = item.fournisseurId === cafe.cafeFournisseurId;
+    const isSameFournisseur = fournisseurId === cafe.infos.fournisseurId;
     const prixUnitaireLivraisonSiCafe =
       fraisLivraisonsDuFournisseur?.prixUnitaireSiCafe ?? 0;
     const prixUnitaireLivraison =
@@ -129,14 +135,18 @@ const SnacksFruits = ({
     const seuilFranco = fraisLivraisonsDuFournisseur?.seuilFranco ?? 0;
 
     fraisLivraisonPanier = prixPanier < seuilFranco ? fraisLivraisonPanier : 0;
-
-    const prixAnnuel = 52 * (prixPanier + fraisLivraisonPanier);
+    const totalLivraison = Math.round(fraisLivraisonPanier * 52);
+    const total = Math.round(52 * (prixPanier + fraisLivraisonPanier));
     const panierMin = fraisLivraisonsDuFournisseur?.panierMin ?? 0;
 
     return {
-      ...item,
-      prixAnnuel: Math.round(prixAnnuel),
+      //infos
+      id,
+      fournisseurId,
+      nomFournisseur,
+      sloganFournisseur,
       isSameFournisseur,
+      gamme,
       //quantites
       fruitsKgParSemaine,
       snacksPortionsParSemaine,
@@ -145,28 +155,47 @@ const SnacksFruits = ({
       prixKgFruits,
       prixUnitaireSnacks,
       prixUnitaireBoissons,
-      fraisLivraisonPanier,
+      prixUnitaireLivraisonSiCafe,
+      prixUnitaireLivraison,
       seuilFranco,
+      fraisLivraisonPanier,
       panierMin,
+      //total
+      total,
+      totalFruits,
+      totalSnacks,
+      totalBoissons,
+      totalLivraison,
     };
   });
 
   const propositionsByFournisseurId = propositions.reduce<
     Record<
       number,
-      (SelectFruitsTarifsType & {
-        prixAnnuel: number;
+      {
+        id: number;
+        fournisseurId: number;
+        nomFournisseur: string;
+        sloganFournisseur: string | null;
         isSameFournisseur: boolean;
+        gamme: "essentiel" | "confort" | "excellence";
         fruitsKgParSemaine: number;
         snacksPortionsParSemaine: number;
         boissonsConsosParSemaine: number;
         prixKgFruits: number;
         prixUnitaireSnacks: number;
         prixUnitaireBoissons: number;
-        fraisLivraisonPanier: number;
+        prixUnitaireLivraisonSiCafe: number;
+        prixUnitaireLivraison: number;
         seuilFranco: number;
+        fraisLivraisonPanier: number;
         panierMin: number;
-      })[]
+        total: number;
+        totalFruits: number;
+        totalSnacks: number;
+        totalBoissons: number;
+        totalLivraison: number;
+      }[]
     >
   >((acc, item) => {
     const { fournisseurId } = item;

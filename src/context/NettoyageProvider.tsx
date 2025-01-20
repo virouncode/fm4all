@@ -7,9 +7,11 @@ import {
   Dispatch,
   PropsWithChildren,
   SetStateAction,
+  useContext,
   useEffect,
   useState,
 } from "react";
+import { ClientContext } from "./ClientProvider";
 
 // Initialization
 export const NettoyageContext = createContext<{
@@ -17,29 +19,68 @@ export const NettoyageContext = createContext<{
   setNettoyage: Dispatch<SetStateAction<NettoyageType>>;
 }>({
   nettoyage: {
-    fournisseurId: null,
-    gammeSelected: null,
-    repasseSelected: false,
-    samediSelected: false,
-    dimancheSelected: false,
-    vitrerieSelected: false,
-    nbPassageVitrerie: 2,
+    infos: {
+      fournisseurId: null,
+      nomFournisseur: null,
+      sloganFournisseur: null,
+      gammeSelected: null,
+      repasseSelected: false,
+      samediSelected: false,
+      dimancheSelected: false,
+      vitrerieSelected: false,
+    },
+    quantites: {
+      freqAnnuelle: 0,
+      hParPassage: 0,
+      hParPassageRepasse: 0,
+      surfaceCloisons: 0,
+      surfaceVitres: 0,
+      cadenceCloisons: 0,
+      cadenceVitres: 0,
+      nbPassagesVitrerie: 2,
+    },
+    prix: {
+      tauxHoraire: 0,
+      tauxHoraireRepasse: 0,
+      tauxHoraireVitrerie: 0,
+      minFacturationVitrerie: 0,
+    },
   },
   setNettoyage: () => {},
 });
 
 const NettoyageProvider = ({ children }: PropsWithChildren) => {
+  const { client } = useContext(ClientContext);
   const isMounted = useClientOnly();
 
   // Always initialize state
   const [nettoyage, setNettoyage] = useState<NettoyageType>({
-    fournisseurId: null,
-    gammeSelected: null,
-    repasseSelected: false,
-    samediSelected: false,
-    dimancheSelected: false,
-    vitrerieSelected: false,
-    nbPassageVitrerie: 2,
+    infos: {
+      fournisseurId: null,
+      nomFournisseur: null,
+      sloganFournisseur: null,
+      gammeSelected: null,
+      repasseSelected: false,
+      samediSelected: false,
+      dimancheSelected: false,
+      vitrerieSelected: false,
+    },
+    quantites: {
+      freqAnnuelle: 0,
+      hParPassage: 0,
+      hParPassageRepasse: 0,
+      surfaceCloisons: (client.surface ?? 0) * 0.15,
+      surfaceVitres: (client.surface ?? 0) * 0.15,
+      cadenceCloisons: 0,
+      cadenceVitres: 0,
+      nbPassagesVitrerie: 2,
+    },
+    prix: {
+      tauxHoraire: 0,
+      tauxHoraireRepasse: 0,
+      tauxHoraireVitrerie: 0,
+      minFacturationVitrerie: 0,
+    },
   });
 
   // Update state after mounting

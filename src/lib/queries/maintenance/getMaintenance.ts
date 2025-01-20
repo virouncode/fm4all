@@ -35,7 +35,7 @@ export const getMaintenanceTarifs = async (surface: string) => {
     const results = await db
       .select({
         ...getTableColumns(maintenanceTarifs),
-        nomEntreprise: fournisseurs.nomEntreprise,
+        nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
       })
       .from(maintenanceTarifs)

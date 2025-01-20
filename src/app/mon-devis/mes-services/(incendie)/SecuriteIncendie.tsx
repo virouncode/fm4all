@@ -4,7 +4,6 @@ import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
-import useScrollIntoService from "@/hooks/use-scroll-into-service";
 import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites";
 import { SelectIncendieTarifsType } from "@/zod-schemas/incendieTarifs";
 import { FireExtinguisher } from "lucide-react";
@@ -15,8 +14,8 @@ import PropositionsTitle from "../PropositionsTitle";
 import SecuriteIncendiePropositions from "./SecuriteIncendiePropositions";
 
 type SecuriteIncendieProps = {
-  incendieQuantite?: SelectIncendieQuantitesType | null;
-  incendieTarifs?: SelectIncendieTarifsType[];
+  incendieQuantite: SelectIncendieQuantitesType;
+  incendieTarifs: SelectIncendieTarifsType[];
 };
 
 const SecuriteIncendie = ({
@@ -29,7 +28,6 @@ const SecuriteIncendie = ({
   const { setServices } = useContext(ServicesContext);
   const { setDevisProgress } = useContext(DevisProgressContext);
   const router = useRouter();
-  useScrollIntoService();
 
   const handleClickNext = () => {
     setServices((prev) => ({
@@ -61,12 +59,10 @@ const SecuriteIncendie = ({
         handleClickPrevious={handleClickPrevious}
       />
       <div className="w-full flex-1">
-        {incendieQuantite && incendieTarifs && (
-          <SecuriteIncendiePropositions
-            incendieQuantite={incendieQuantite}
-            incendieTarifs={incendieTarifs}
-          />
-        )}
+        <SecuriteIncendiePropositions
+          incendieQuantite={incendieQuantite}
+          incendieTarifs={incendieTarifs}
+        />
       </div>
       <PropositionsFooter handleClickNext={handleClickNext} />
     </div>

@@ -41,7 +41,7 @@ export const getFruitsTarifs = async () => {
     const results = await db
       .select({
         ...getTableColumns(fruitsTarifs),
-        nomEntreprise: fournisseurs.nomEntreprise,
+        nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
       })
       .from(fruitsTarifs)
@@ -77,7 +77,7 @@ export const getSnacksTarifs = async () => {
     const results = await db
       .select({
         ...getTableColumns(snacksTarifs),
-        nomEntreprise: fournisseurs.nomEntreprise,
+        nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
       })
       .from(snacksTarifs)
@@ -113,7 +113,7 @@ export const getBoissonsTarifs = async () => {
     const results = await db
       .select({
         ...getTableColumns(boissonsTarifs),
-        nomEntreprise: fournisseurs.nomEntreprise,
+        nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
       })
       .from(boissonsTarifs)
@@ -139,7 +139,7 @@ export const getFoodLivraisonTarifs = async () => {
     const results = await db
       .select({
         ...getTableColumns(foodLivraisonTarifs),
-        nomEntreprise: fournisseurs.nomEntreprise,
+        nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
       })
       .from(foodLivraisonTarifs)

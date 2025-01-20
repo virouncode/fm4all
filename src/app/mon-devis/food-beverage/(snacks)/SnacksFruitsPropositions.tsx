@@ -3,7 +3,6 @@ import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
-import { SelectFruitsTarifsType } from "@/zod-schemas/fruitsTarifs";
 import {
   Tooltip,
   TooltipContent,
@@ -14,19 +13,30 @@ import Image from "next/image";
 import { useContext } from "react";
 
 type SnacksFruitsPropositionsType = {
-  formattedPropositions: (SelectFruitsTarifsType & {
-    prixAnnuel: number;
+  formattedPropositions: {
+    id: number;
+    fournisseurId: number;
+    nomFournisseur: string;
+    sloganFournisseur: string | null;
     isSameFournisseur: boolean;
+    gamme: "essentiel" | "confort" | "excellence";
     fruitsKgParSemaine: number;
     snacksPortionsParSemaine: number;
     boissonsConsosParSemaine: number;
     prixKgFruits: number;
     prixUnitaireSnacks: number;
     prixUnitaireBoissons: number;
-    fraisLivraisonPanier: number;
+    prixUnitaireLivraisonSiCafe: number;
+    prixUnitaireLivraison: number;
     seuilFranco: number;
+    fraisLivraisonPanier: number;
     panierMin: number;
-  })[][];
+    total: number;
+    totalFruits: number;
+    totalSnacks: number;
+    totalBoissons: number;
+    totalLivraison: number;
+  }[][];
 };
 
 const SnacksFruitsPropositions = ({
@@ -35,68 +45,126 @@ const SnacksFruitsPropositions = ({
   const { snacksFruits, setSnacksFruits } = useContext(SnacksFruitsContext);
   const { setTotalSnacksFruits } = useContext(TotalSnacksFruitsContext);
 
-  const handleClickProposition = (
-    proposition: SelectFruitsTarifsType & {
-      prixAnnuel: number;
-      isSameFournisseur: boolean;
-      fruitsKgParSemaine: number;
-      snacksPortionsParSemaine: number;
-      boissonsConsosParSemaine: number;
-      prixKgFruits: number;
-      prixUnitaireSnacks: number;
-      prixUnitaireBoissons: number;
-      fraisLivraisonPanier: number;
-      seuilFranco: number;
-      panierMin: number;
-    }
-  ) => {
+  const handleClickProposition = (proposition: {
+    id: number;
+    fournisseurId: number;
+    nomFournisseur: string;
+    sloganFournisseur: string | null;
+    isSameFournisseur: boolean;
+    gamme: "essentiel" | "confort" | "excellence";
+    fruitsKgParSemaine: number;
+    snacksPortionsParSemaine: number;
+    boissonsConsosParSemaine: number;
+    prixKgFruits: number;
+    prixUnitaireSnacks: number;
+    prixUnitaireBoissons: number;
+    prixUnitaireLivraisonSiCafe: number;
+    prixUnitaireLivraison: number;
+    seuilFranco: number;
+    fraisLivraisonPanier: number;
+    panierMin: number;
+    total: number;
+    totalFruits: number;
+    totalSnacks: number;
+    totalBoissons: number;
+    totalLivraison: number;
+  }) => {
+    const {
+      fournisseurId,
+      nomFournisseur,
+      sloganFournisseur,
+      isSameFournisseur,
+      gamme,
+      fruitsKgParSemaine,
+      snacksPortionsParSemaine,
+      boissonsConsosParSemaine,
+      prixKgFruits,
+      prixUnitaireSnacks,
+      prixUnitaireBoissons,
+      prixUnitaireLivraisonSiCafe,
+      prixUnitaireLivraison,
+      seuilFranco,
+      panierMin,
+      total,
+      totalFruits,
+      totalSnacks,
+      totalBoissons,
+      totalLivraison,
+    } = proposition;
+
     if (
-      snacksFruits.fournisseurId === proposition.fournisseurId &&
-      snacksFruits.gammeSelected === proposition.gamme
+      snacksFruits.infos.fournisseurId === proposition.fournisseurId &&
+      snacksFruits.infos.gammeSelected === proposition.gamme
     ) {
       setSnacksFruits((prev) => ({
-        ...prev,
-        fournisseurId: null,
-        gammeSelected: null,
+        infos: {
+          ...prev.infos,
+          fournisseurId: null,
+          nomFournisseur: null,
+          sloganFournisseur: null,
+          isSameFournisseur: false,
+          gammeSelected: null,
+        },
+        quantites: {
+          ...prev.quantites,
+          fruitsKgParSemaine: 0,
+          snacksPortionsParSemaine: 0,
+          boissonsConsosParSemaine: 0,
+        },
+        prix: {
+          prixKgFruits: null,
+          prixUnitaireSnacks: null,
+          prixUnitaireBoissons: null,
+          prixUnitaireLivraisonSiCafe: null,
+          prixUnitaireLivraison: null,
+          seuilFranco: null,
+          panierMin: null,
+        },
       }));
-      setTotalSnacksFruits((prev) => ({
-        ...prev,
-        nomFournisseur: null,
-        prixFruits: null,
-        prixSnacks: null,
-        prixBoissons: null,
-        prixLivraison: null,
-        prixTotal: null,
-      }));
+      setTotalSnacksFruits({
+        totalFruits: 0,
+        totalSnacks: 0,
+        totalBoissons: 0,
+        totalLivraison: 0,
+        total: 0,
+      });
       return;
     }
     setSnacksFruits((prev) => ({
-      ...prev,
-      fournisseurId: proposition.fournisseurId,
-      gammeSelected: proposition.gamme,
+      infos: {
+        ...prev.infos,
+        fournisseurId,
+        nomFournisseur,
+        sloganFournisseur,
+        isSameFournisseur,
+        gammeSelected: gamme,
+      },
+      quantites: {
+        ...prev.quantites,
+        fruitsKgParSemaine,
+        snacksPortionsParSemaine,
+        boissonsConsosParSemaine,
+      },
+      prix: {
+        prixKgFruits,
+        prixUnitaireSnacks,
+        prixUnitaireBoissons,
+        prixUnitaireLivraisonSiCafe,
+        prixUnitaireLivraison,
+        seuilFranco,
+        panierMin,
+      },
     }));
-    setTotalSnacksFruits((prev) => ({
-      ...prev,
-      nomFournisseur: proposition.nomEntreprise,
-      prixFruits: Math.round(
-        52 * proposition.fruitsKgParSemaine * proposition.prixKgFruits
-      ),
-      prixSnacks: Math.round(
-        52 *
-          proposition.snacksPortionsParSemaine *
-          proposition.prixUnitaireSnacks
-      ),
-      prixBoissons: Math.round(
-        52 *
-          proposition.boissonsConsosParSemaine *
-          proposition.prixUnitaireBoissons
-      ),
-      prixLivraison: Math.round(52 * proposition.fraisLivraisonPanier),
-      prixTotal: proposition.prixAnnuel,
-    }));
+    setTotalSnacksFruits({
+      totalFruits,
+      totalSnacks,
+      totalBoissons,
+      totalLivraison,
+      total,
+    });
   };
 
-  if (snacksFruits.choix.length === 0) {
+  if (snacksFruits.infos.choix.length === 0) {
     return (
       <div className="h-full flex flex-col items-center justify-center border rounded-xl overflow-hidden">
         <p>Nous n&apos;avons pas d&apos;offres correspondant à ces critères</p>
@@ -128,20 +196,22 @@ const SnacksFruitsPropositions = ({
                                 propositions[0].fournisseurId
                               ) as string
                             }
-                            alt={`logo-de-${propositions[0].nomEntreprise}`}
+                            alt={`logo-de-${propositions[0].nomFournisseur}`}
                             fill={true}
                             className="w-full h-full object-contain"
                             quality={100}
                           />
                         </div>
                       ) : (
-                        propositions[0].nomEntreprise
+                        propositions[0].nomFournisseur
                       )}
                     </div>
                   </TooltipTrigger>
-                  {propositions[0].slogan && (
+                  {propositions[0].sloganFournisseur && (
                     <TooltipContent>
-                      <p className="text-sm italic">{propositions[0].slogan}</p>
+                      <p className="text-sm italic">
+                        {propositions[0].sloganFournisseur}
+                      </p>
                     </TooltipContent>
                   )}
                 </Tooltip>
@@ -155,7 +225,7 @@ const SnacksFruitsPropositions = ({
                     ? "fm4allcomfort"
                     : "fm4allexcellence";
                 if (
-                  snacksFruits.choix.includes("fruits") &&
+                  snacksFruits.infos.choix.includes("fruits") &&
                   proposition.prixKgFruits === 0
                 ) {
                   return (
@@ -168,7 +238,7 @@ const SnacksFruitsPropositions = ({
                   );
                 }
                 if (
-                  snacksFruits.choix.includes("snacks") &&
+                  snacksFruits.infos.choix.includes("snacks") &&
                   proposition.prixUnitaireSnacks === 0
                 ) {
                   return (
@@ -181,7 +251,7 @@ const SnacksFruitsPropositions = ({
                   );
                 }
                 if (
-                  snacksFruits.choix.includes("boissons") &&
+                  snacksFruits.infos.choix.includes("boissons") &&
                   proposition.prixUnitaireBoissons === 0
                 ) {
                   return (
@@ -193,51 +263,50 @@ const SnacksFruitsPropositions = ({
                     </div>
                   );
                 }
-                const prixAnnuel = proposition.prixAnnuel
-                  ? `${formatNumber(proposition.prixAnnuel)} € /an`
+                const prixAnnuelText = proposition.total
+                  ? `${formatNumber(proposition.total)} € /an`
                   : "Non proposé";
-                const kgFruitsParSemaine = snacksFruits.choix.includes("fruits")
-                  ? `${
-                      proposition.fruitsKgParSemaine /
-                        snacksFruits.nbPersonnes <
-                      1
-                        ? `${
-                            Math.round(
-                              ((proposition.fruitsKgParSemaine /
-                                snacksFruits.nbPersonnes) *
-                                1000) /
-                                10
-                            ) * 10
-                          } g de fruits / personne / semaine`
-                        : `${(
-                            proposition.fruitsKgParSemaine /
-                            snacksFruits.nbPersonnes
-                          ).toFixed(2)} kg de fruits / personne / semaine`
-                    }`
-                  : "";
-                const portionsSnacksParSemaine = snacksFruits.choix.includes(
-                  "snacks"
-                )
-                  ? `${Math.round(
-                      proposition.snacksPortionsParSemaine /
-                        snacksFruits.nbPersonnes
-                    )} portions de snacks / personne / semaine`
-                  : "";
-                const boissonsConsosParSemaine = snacksFruits.choix.includes(
-                  "boissons"
-                )
-                  ? `${Math.round(
-                      proposition.boissonsConsosParSemaine /
-                        snacksFruits.nbPersonnes
-                    )} boissons / personne / semaine`
-                  : "";
+                const fruitsKgParSemaineText =
+                  snacksFruits.infos.choix.includes("fruits")
+                    ? `${
+                        proposition.fruitsKgParSemaine /
+                          snacksFruits.quantites.nbPersonnes <
+                        1
+                          ? `${
+                              Math.round(
+                                ((proposition.fruitsKgParSemaine /
+                                  snacksFruits.quantites.nbPersonnes) *
+                                  1000) /
+                                  10
+                              ) * 10
+                            } g de fruits / personne / semaine`
+                          : `${(
+                              proposition.fruitsKgParSemaine /
+                              snacksFruits.quantites.nbPersonnes
+                            ).toFixed(2)} kg de fruits / personne / semaine`
+                      }`
+                    : "";
+                const snacksPortionsParSemaineText =
+                  snacksFruits.infos.choix.includes("snacks")
+                    ? `${Math.round(
+                        proposition.snacksPortionsParSemaine /
+                          snacksFruits.quantites.nbPersonnes
+                      )} portions de snacks / personne / semaine`
+                    : "";
+                const boissonsConsosParSemaineText =
+                  snacksFruits.infos.choix.includes("boissons")
+                    ? `${Math.round(
+                        proposition.boissonsConsosParSemaine /
+                          snacksFruits.quantites.nbPersonnes
+                      )} boissons / personne / semaine`
+                    : "";
 
                 return (
                   <div
                     className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
-                      snacksFruits.fournisseurId ===
+                      snacksFruits.infos.fournisseurId ===
                         proposition.fournisseurId &&
-                      snacksFruits.gammeSelected === gamme
+                      snacksFruits.infos.gammeSelected === gamme
                         ? "ring-4 ring-inset ring-destructive"
                         : ""
                     }`}
@@ -246,9 +315,9 @@ const SnacksFruitsPropositions = ({
                   >
                     <Checkbox
                       checked={
-                        snacksFruits.fournisseurId ===
+                        snacksFruits.infos.fournisseurId ===
                           proposition.fournisseurId &&
-                        snacksFruits.gammeSelected === gamme
+                        snacksFruits.infos.gammeSelected === gamme
                       }
                       onCheckedChange={() =>
                         handleClickProposition(proposition)
@@ -256,15 +325,19 @@ const SnacksFruitsPropositions = ({
                       className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                     />
                     <div>
-                      <p className="font-bold">{prixAnnuel}</p>
-                      {kgFruitsParSemaine ? (
-                        <p className="text-xs">{kgFruitsParSemaine}</p>
+                      <p className="font-bold">{prixAnnuelText}</p>
+                      {fruitsKgParSemaineText ? (
+                        <p className="text-xs">{fruitsKgParSemaineText}</p>
                       ) : null}
-                      {portionsSnacksParSemaine ? (
-                        <p className="text-xs">{portionsSnacksParSemaine}</p>
+                      {snacksPortionsParSemaineText ? (
+                        <p className="text-xs">
+                          {snacksPortionsParSemaineText}
+                        </p>
                       ) : null}
-                      {boissonsConsosParSemaine ? (
-                        <p className="text-xs">{boissonsConsosParSemaine}</p>
+                      {boissonsConsosParSemaineText ? (
+                        <p className="text-xs">
+                          {boissonsConsosParSemaineText}
+                        </p>
                       ) : null}
                     </div>
                   </div>

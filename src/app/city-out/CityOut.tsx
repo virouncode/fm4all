@@ -14,7 +14,7 @@ const CityOut = () => {
   const defaultValues: Partial<InsertClientType> = {
     emailContact: "",
     phoneContact: "",
-    nomEntreprise: "",
+    nomFournisseur: "",
     prenomContact: "",
     nomContact: "",
     posteContact: "",
@@ -56,7 +56,7 @@ const CityOut = () => {
             <div className="flex-1 flex flex-col gap-4">
               <InputWithLabel<InsertClientType>
                 fieldTitle="Nom de l'entreprise*"
-                nameInSchema="nomEntreprise"
+                nameInSchema="nomFournisseur"
                 handleChange={handleChange}
               />
               <InputWithLabel<InsertClientType>

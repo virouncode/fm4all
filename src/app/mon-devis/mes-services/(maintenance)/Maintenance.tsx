@@ -2,7 +2,6 @@
 import { HygieneContext } from "@/context/HygieneProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
-import useScrollIntoService from "@/hooks/use-scroll-into-service";
 import { gammes } from "@/zod-schemas/gamme";
 import { SelectMaintenanceQuantitesType } from "@/zod-schemas/maintenanceQuantites";
 import { SelectMaintenanceTarifsType } from "@/zod-schemas/maintenanceTarifs";
@@ -13,8 +12,8 @@ import PropositionsTitle from "../PropositionsTitle";
 import MaintenancePropositions from "./MaintenancePropositions";
 
 type MaintenanceProps = {
-  maintenanceQuantites?: SelectMaintenanceQuantitesType[];
-  maintenanceTarifs?: SelectMaintenanceTarifsType[];
+  maintenanceQuantites: SelectMaintenanceQuantitesType[];
+  maintenanceTarifs: SelectMaintenanceTarifsType[];
 };
 
 const Maintenance = ({
@@ -24,7 +23,6 @@ const Maintenance = ({
   const { hygiene } = useContext(HygieneContext);
   const { nettoyage } = useContext(NettoyageContext);
   const { setServices } = useContext(ServicesContext);
-  useScrollIntoService();
 
   const handleClickNext = () => {
     setServices((prev) => ({
@@ -34,8 +32,8 @@ const Maintenance = ({
   };
 
   const handleClickPrevious = () => {
-    if (nettoyage.gammeSelected && nettoyage.fournisseurId) {
-      if (!hygiene.trilogieGammeSelected) {
+    if (nettoyage.infos.gammeSelected && nettoyage.infos.fournisseurId) {
+      if (!hygiene.infos.trilogieGammeSelected) {
         setServices((prev) => ({
           ...prev,
           currentServiceId: prev.currentServiceId - 2,
@@ -53,30 +51,49 @@ const Maintenance = ({
       }));
     }
   };
-  const propositions =
-    maintenanceTarifs && maintenanceQuantites
-      ? maintenanceTarifs.map((tarif) => {
-          const freqAnnuelle =
-            maintenanceQuantites.find(
-              (quantite) => quantite.gamme === tarif.gamme
-            )?.freqAnnuelle ?? 0;
-          return {
-            ...tarif,
-            freqAnnuelle,
-            prixAnnuel: Math.round(
-              tarif.hParPassage * tarif.tauxHoraire * freqAnnuelle
-            ),
-          };
-        })
-      : [];
+
+  const propositions = maintenanceTarifs.map((tarif) => {
+    const {
+      id,
+      gamme,
+      nomFournisseur,
+      slogan: sloganFournisseur,
+      fournisseurId,
+      hParPassage,
+      tauxHoraire,
+    } = tarif;
+    const freqAnnuelle =
+      maintenanceQuantites.find((quantite) => quantite.gamme === tarif.gamme)
+        ?.freqAnnuelle ?? 0;
+    return {
+      id,
+      gamme,
+      nomFournisseur,
+      fournisseurId,
+      sloganFournisseur,
+      hParPassage,
+      tauxHoraire,
+      freqAnnuelle,
+      prixAnnuel: Math.round(
+        tarif.hParPassage * tarif.tauxHoraire * freqAnnuelle
+      ),
+    };
+  });
 
   const propositionsByFournisseurId = propositions.reduce<
     Record<
       number,
-      (SelectMaintenanceTarifsType & {
-        prixAnnuel: number;
+      {
+        id: number;
+        gamme: "essentiel" | "confort" | "excellence";
+        nomFournisseur: string;
+        fournisseurId: number;
+        sloganFournisseur: string | null;
+        hParPassage: number;
+        tauxHoraire: number;
         freqAnnuelle: number;
-      })[]
+        prixAnnuel: number;
+      }[]
     >
   >((acc, item) => {
     const { fournisseurId } = item;
@@ -93,6 +110,7 @@ const Maintenance = ({
 
   //An array of arrays of propositions by fournisseurId
   const formattedPropositions = Object.values(propositionsByFournisseurId);
+
   return (
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="5">
       <PropositionsTitle

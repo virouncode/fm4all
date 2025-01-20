@@ -5,7 +5,7 @@ import { z } from "zod";
 export const selectHygieneDistribTarifsSchema = createSelectSchema(
   hygieneDistribTarifs
 ).extend({
-  nomEntreprise: z.string().nonempty("Le nom de l'entreprise est requis"),
+  nomFournisseur: z.string().nonempty("Le nom de l'entreprise est requis"),
   slogan: z.string().nullable(),
 });
 

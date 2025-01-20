@@ -7,7 +7,7 @@ import {
 import { z } from "zod";
 
 export const selectClientSchema = createSelectSchema(clients, {
-  nomEntreprise: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
+  nomFournisseur: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
   siret: (schema) =>
     schema.regex(
       /^\d{3} \d{3} \d{3} \d{4}$/,
@@ -43,7 +43,7 @@ export const selectClientSchema = createSelectSchema(clients, {
 export type SelectClientType = z.infer<typeof selectClientSchema>;
 
 export const insertClientSchema = createInsertSchema(clients, {
-  nomEntreprise: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
+  nomFournisseur: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
   siret: (schema) =>
     schema.regex(
       /^\d{3} \d{3} \d{3} \d{4}$/,
@@ -86,7 +86,7 @@ export type InsertClientFormType = Omit<
 };
 
 export const updateClientSchema = createUpdateSchema(clients, {
-  nomEntreprise: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
+  nomFournisseur: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
   siret: (schema) =>
     schema.regex(
       /^\d{3} \d{3} \d{3} \d{4}$/,

@@ -23,6 +23,7 @@ import TotalNettoyageProvider from "@/context/TotalNettoyageProvider";
 import TotalSnacksFruitsProvider from "@/context/TotalSnacksFruitsProvider";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
+import TotalTheProvider from "@/context/TotalTheProvider";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -74,19 +75,21 @@ export default function RootLayout({
                                   <TotalIncendieProvider>
                                     <TotalMaintenanceProvider>
                                       <TotalCafeProvider>
-                                        <TotalSnacksFruitsProvider>
-                                          <ThemeProvider
-                                            attribute="class"
-                                            defaultTheme="light"
-                                            enableSystem
-                                            disableTransitionOnChange
-                                          >
-                                            <Header />
-                                            {children}
-                                            <Footer />
-                                            <Toaster />
-                                          </ThemeProvider>
-                                        </TotalSnacksFruitsProvider>
+                                        <TotalTheProvider>
+                                          <TotalSnacksFruitsProvider>
+                                            <ThemeProvider
+                                              attribute="class"
+                                              defaultTheme="light"
+                                              enableSystem
+                                              disableTransitionOnChange
+                                            >
+                                              <Header />
+                                              {children}
+                                              <Footer />
+                                              <Toaster />
+                                            </ThemeProvider>
+                                          </TotalSnacksFruitsProvider>
+                                        </TotalTheProvider>
                                       </TotalCafeProvider>
                                     </TotalMaintenanceProvider>
                                   </TotalIncendieProvider>

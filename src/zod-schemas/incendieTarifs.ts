@@ -12,7 +12,7 @@ export const selectIncendieTarifsSchema = createSelectSchema(incendieTarifs, {
   fraisDeplacement: (schema) =>
     schema.min(1, "Les frais de déplacement sont obligatoire"),
 }).extend({
-  nomEntreprise: z.string().nonempty("Le nom du fournisseur est obligatoire"),
+  nomFournisseur: z.string().nonempty("Le nom du fournisseur est obligatoire"),
   slogan: z.string().nullable(),
 });
 

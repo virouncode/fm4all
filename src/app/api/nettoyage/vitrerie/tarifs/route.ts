@@ -12,7 +12,7 @@ export async function GET() {
     const results = await db
       .select({
         ...getTableColumns(nettoyageVitrerieTarifs),
-        nomEntreprise: fournisseurs.nomEntreprise,
+        nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
       })
       .from(nettoyageVitrerieTarifs)

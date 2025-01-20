@@ -21,15 +21,7 @@ import Cafe from "./(cafe)/Cafe";
 import SnacksFruits from "./(snacks)/SnacksFruits";
 import The from "./(the)/The";
 
-type FoodBeverageProps = {
-  cafeFournisseurId?: string;
-  effectif: string;
-};
-
-const FoodBeverage = async ({
-  cafeFournisseurId,
-  effectif,
-}: FoodBeverageProps) => {
+const FoodBeverage = async () => {
   const [
     cafeMachines,
     cafeQuantites,
@@ -52,7 +44,7 @@ const FoodBeverage = async ({
     getCafeConsoTarifs(),
     getLaitConsoTarifs(),
     getChocoConsoTarifs(),
-    getTheConsoTarifs(cafeFournisseurId),
+    getTheConsoTarifs(),
     getFruitsQuantites(),
     getFruitsTarifs(),
     getSnacksQuantites(),
@@ -81,7 +73,7 @@ const FoodBeverage = async ({
     return (
       <section className="flex h-dvh items-center justify-center text-lg">
         <p>
-          Nous n&apos;avons pas trouvé de tarifs.{" "}
+          Nous n&apos;avons pas trouvé de tarifs pour ces informations.{" "}
           <Link href="/mon-devis/mes-locaux" className="underline">
             Veuillez réessayer
           </Link>
@@ -101,10 +93,8 @@ const FoodBeverage = async ({
         laitConsoTarifs={laitConsoTarifs}
         chocoConsoTarifs={chocoConsoTarifs}
         theConsoTarifs={theConsoTarifs}
-        effectif={effectif}
-        cafeFournisseurId={cafeFournisseurId}
       />
-      <The theConsoTarifs={theConsoTarifs} effectif={effectif} />
+      <The cafeQuantites={cafeQuantites} theConsoTarifs={theConsoTarifs} />
       <SnacksFruits
         fruitsQuantites={fruitsQuantites}
         fruitsTarifs={fruitsTarifs}

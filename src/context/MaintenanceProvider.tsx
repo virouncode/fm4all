@@ -16,8 +16,19 @@ export const MaintenanceContext = createContext<{
   setMaintenance: Dispatch<SetStateAction<MaintenanceType>>;
 }>({
   maintenance: {
-    fournisseurId: null,
-    gammeSelected: null,
+    infos: {
+      fournisseurId: null,
+      nomFournisseur: null,
+      sloganFournisseur: null,
+      gammeSelected: null,
+    },
+    quantites: {
+      freqAnnuelle: 0,
+      hParPassage: 0,
+    },
+    prix: {
+      tauxHoraire: 0,
+    },
   },
   setMaintenance: () => {},
 });
@@ -27,8 +38,19 @@ const MaintenanceProvider = ({ children }: PropsWithChildren) => {
 
   // Always initialize state
   const [maintenance, setMaintenance] = useState<MaintenanceType>({
-    fournisseurId: null,
-    gammeSelected: null,
+    infos: {
+      fournisseurId: null,
+      nomFournisseur: null,
+      sloganFournisseur: null,
+      gammeSelected: null,
+    },
+    quantites: {
+      freqAnnuelle: 0,
+      hParPassage: 0,
+    },
+    prix: {
+      tauxHoraire: 0,
+    },
   });
 
   // Update state after mounting

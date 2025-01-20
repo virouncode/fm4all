@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
     const results = await db
       .select({
         ...getTableColumns(nettoyageTarifs),
-        nomEntreprise: fournisseurs.nomEntreprise,
+        nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
       })
       .from(nettoyageTarifs)

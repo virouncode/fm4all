@@ -16,6 +16,7 @@ import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
+import { TotalTheContext } from "@/context/TotalTheProvider";
 import { Calculator } from "lucide-react";
 import { useContext } from "react";
 import TotalCafe from "./TotalCafe";
@@ -33,35 +34,30 @@ const Total = () => {
   const { totalMaintenance } = useContext(TotalMaintenanceContext);
   const { totalIncendie } = useContext(TotalIncendieContext);
   const { totalCafe } = useContext(TotalCafeContext);
+  const { totalThe } = useContext(TotalTheContext);
   const { totalSnacksFruits } = useContext(TotalSnacksFruitsContext);
-  const prixNettoyage = [
-    totalNettoyage.prixService,
-    totalNettoyage.prixRepasse,
-    totalNettoyage.prixSamedi,
-    totalNettoyage.prixDimanche,
-    totalNettoyage.prixVitrerie,
-  ]
-    .filter((value) => value !== null)
+
+  const totalFinalNettoyage =
+    totalNettoyage.totalService +
+    totalNettoyage.totalRepasse +
+    totalNettoyage.totalSamedi +
+    totalNettoyage.totalDimanche +
+    totalNettoyage.totalVitrerie;
+  const totalFinalHygiene =
+    totalHygiene.totalTrilogie +
+    totalHygiene.totalDesinfectant +
+    totalHygiene.totalParfum +
+    totalHygiene.totalBalai +
+    totalHygiene.totalPoubelle;
+  const totalFinalMaintenance = totalMaintenance.totalService;
+  const totalFinalIncendie = totalIncendie.totalService;
+  //TODO voir pour les prix one shot d'installation
+  const totalFinalCafe = totalCafe.totalMachines
+    .map(({ total }) => total ?? 0)
     .reduce((acc, curr) => acc + curr, 0);
-  const prixHygiene = [
-    totalHygiene.prixTrilogieAbonnement,
-    totalHygiene.prixTrilogieAchat?.prixConsommables,
-    totalHygiene.prixDesinfectantAbonnement,
-    totalHygiene.prixDesinfectantAchat?.prixConsommables,
-    totalHygiene.prixParfum,
-    totalHygiene.prixBalai,
-    totalHygiene.prixPoubelle,
-  ]
-    .filter((value) => value !== null && value !== undefined)
-    .reduce((acc, curr) => acc + curr, 0);
-  const prixMaintenance = totalMaintenance.prixMaintenance ?? 0;
-  const prixIncendie = totalIncendie.prixIncendie ?? 0;
-  const prixCafe = totalCafe.prixCafeMachines.reduce(
-    (acc, item) => acc + (item.prix ?? 0),
-    0
-  );
-  const prixThe = totalCafe.prixThe ?? 0;
-  const prixSnacksFruits = totalSnacksFruits.prixTotal ?? 0;
+
+  const totalFinalThe = totalThe.totalService;
+  const totalFinalSnacksFruits = totalSnacksFruits.total;
 
   return (
     <Sheet>
@@ -73,13 +69,13 @@ const Total = () => {
         >
           <Calculator />
           {Math.round(
-            prixNettoyage +
-              prixHygiene +
-              prixMaintenance +
-              prixIncendie +
-              prixCafe +
-              prixThe +
-              prixSnacksFruits
+            totalFinalNettoyage +
+              totalFinalHygiene +
+              totalFinalMaintenance +
+              totalFinalIncendie +
+              totalFinalCafe +
+              totalFinalThe +
+              totalFinalSnacksFruits
           )}{" "}
           € / an
         </Button>
@@ -95,13 +91,13 @@ const Total = () => {
           <SheetDescription></SheetDescription>
         </SheetHeader>
         <div className="flex flex-col gap-6">
-          {prixNettoyage ? <TotalNettoyage /> : null}
-          {prixHygiene ? <TotalHygiene /> : null}
-          {prixMaintenance ? <TotalMaintenance /> : null}
-          {prixIncendie ? <TotalIncendie /> : null}
-          {prixCafe ? <TotalCafe /> : null}
-          {prixThe ? <TotalThe /> : null}
-          {prixSnacksFruits ? <TotalSnacksFruits /> : null}
+          <TotalNettoyage />
+          <TotalHygiene />
+          <TotalMaintenance />
+          <TotalIncendie />
+          <TotalCafe />
+          <TotalThe />
+          <TotalSnacksFruits />
         </div>
       </SheetContent>
     </Sheet>

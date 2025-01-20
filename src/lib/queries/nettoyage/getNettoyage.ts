@@ -8,7 +8,6 @@ import {
   nettoyageVitrerieTarifs,
 } from "@/db/schema";
 import { errorHelper } from "@/lib/errorHelper";
-import { GammeType } from "@/zod-schemas/gamme";
 import { selectNettoyageQuantitesSchema } from "@/zod-schemas/nettoyageQuantites";
 import { selectRepasseTarifsSchema } from "@/zod-schemas/nettoyageRepasse";
 import { selectNettoyageTarifsSchema } from "@/zod-schemas/nettoyageTarifs";
@@ -40,7 +39,7 @@ export const getNettoyageTarifs = async (surface: string) => {
     const results = await db
       .select({
         ...getTableColumns(nettoyageTarifs),
-        nomEntreprise: fournisseurs.nomEntreprise,
+        nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
       })
       .from(nettoyageTarifs)
@@ -64,18 +63,12 @@ export const getNettoyageTarifs = async (surface: string) => {
   }
 };
 
-export const getRepasseTarif = async (
-  surface: string,
-  fournisseurId?: string,
-  gamme?: GammeType
-) => {
-  if (!fournisseurId || !gamme || isNaN(parseInt(fournisseurId))) return null;
-
+export const getRepasseTarifs = async (surface: string) => {
   try {
-    const result = await db
+    const results = await db
       .select({
         ...getTableColumns(nettoyageRepasseTarifs),
-        nomEntreprise: fournisseurs.nomEntreprise,
+        nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
       })
       .from(nettoyageRepasseTarifs)
@@ -83,52 +76,46 @@ export const getRepasseTarif = async (
         fournisseurs,
         eq(fournisseurs.id, nettoyageRepasseTarifs.fournisseurId)
       )
-      .where(
-        and(
-          eq(nettoyageRepasseTarifs.surface, parseInt(surface)),
-          eq(nettoyageRepasseTarifs.fournisseurId, parseInt(fournisseurId)),
-          eq(nettoyageRepasseTarifs.gamme, gamme)
-        )
-      );
-    if (result.length === 0) return null;
-    const validatedResult = selectRepasseTarifsSchema.parse(result[0]);
+      .where(and(eq(nettoyageRepasseTarifs.surface, parseInt(surface))));
+    if (results.length === 0) return [];
+    const validatedResults = results.map((result) =>
+      selectRepasseTarifsSchema.parse(result)
+    );
 
-    const data = {
+    const data = validatedResults.map((validatedResult) => ({
       ...validatedResult,
       hParPassage: validatedResult.hParPassage / RATIO,
       tauxHoraire: validatedResult.tauxHoraire / RATIO,
-    };
+    }));
     return data;
   } catch (err) {
     errorHelper(err);
   }
 };
 
-export const getVitrerieTarif = async (fournisseurId?: string) => {
-  if (!fournisseurId || isNaN(parseInt(fournisseurId))) return null;
+export const getVitrerieTarifs = async () => {
   try {
     const results = await db
       .select({
         ...getTableColumns(nettoyageVitrerieTarifs),
-        nomEntreprise: fournisseurs.nomEntreprise,
+        nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
       })
       .from(nettoyageVitrerieTarifs)
       .innerJoin(
         fournisseurs,
         eq(fournisseurs.id, nettoyageVitrerieTarifs.fournisseurId)
-      )
-      .where(
-        and(eq(nettoyageVitrerieTarifs.fournisseurId, parseInt(fournisseurId)))
       );
-    if (results.length === 0) return null;
-    const validatedResult = selectVitrerieTarifsSchema.parse(results[0]);
-    const data = {
+    if (results.length === 0) return [];
+    const validatedResults = results.map((result) =>
+      selectVitrerieTarifsSchema.parse(result)
+    );
+    const data = validatedResults.map((validatedResult) => ({
       ...validatedResult,
       tauxHoraire: validatedResult.tauxHoraire / RATIO,
       minFacturation: validatedResult.minFacturation / RATIO,
       fraisDeplacement: validatedResult.fraisDeplacement / RATIO,
-    };
+    }));
     return data;
   } catch (err) {
     errorHelper(err);

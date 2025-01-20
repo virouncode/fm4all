@@ -11,7 +11,7 @@ export const selectRepasseTarifsSchema = createSelectSchema(
     surface: (schema) => schema.min(1, "La surface est obligatoire"),
   }
 ).extend({
-  nomEntreprise: z.string().nonempty("Nom de fournisseur invalide"),
+  nomFournisseur: z.string().nonempty("Nom de fournisseur invalide"),
   slogan: z.string().nullable(),
 });
 

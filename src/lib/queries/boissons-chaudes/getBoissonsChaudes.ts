@@ -35,7 +35,7 @@ export const getCafeMachinesTarifs = async () => {
     const results = await db
       .select({
         ...getTableColumns(cafeMachinesTarifs),
-        nomEntreprise: fournisseurs.nomEntreprise,
+        nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
       })
       .from(cafeMachinesTarifs)
@@ -75,7 +75,7 @@ export const getCafeConsoTarifs = async () => {
     const results = await db
       .select({
         ...getTableColumns(cafeConsoTarifs),
-        nomEntreprise: fournisseurs.nomEntreprise,
+        nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
       })
       .from(cafeConsoTarifs)
@@ -102,7 +102,7 @@ export const getLaitConsoTarifs = async () => {
     const results = await db
       .select({
         ...getTableColumns(laitConsoTarifs),
-        nomEntreprise: fournisseurs.nomEntreprise,
+        nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
       })
       .from(laitConsoTarifs)
@@ -129,7 +129,7 @@ export const getChocoConsoTarifs = async () => {
     const results = await db
       .select({
         ...getTableColumns(chocoConsoTarifs),
-        nomEntreprise: fournisseurs.nomEntreprise,
+        nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
       })
       .from(chocoConsoTarifs)
@@ -151,23 +151,18 @@ export const getChocoConsoTarifs = async () => {
   }
 };
 
-export const getTheConsoTarifs = async (cafeFournisseurId?: string) => {
+export const getTheConsoTarifs = async () => {
   try {
     const results = await db
       .select({
         ...getTableColumns(theConsoTarifs),
-        nomEntreprise: fournisseurs.nomEntreprise,
+        nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
       })
       .from(theConsoTarifs)
       .innerJoin(
         fournisseurs,
         eq(fournisseurs.id, theConsoTarifs.fournisseurId)
-      )
-      .where(
-        cafeFournisseurId
-          ? eq(theConsoTarifs.fournisseurId, parseInt(cafeFournisseurId))
-          : undefined
       );
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>

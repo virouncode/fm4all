@@ -12,7 +12,7 @@ export const selectVitrerieTarifsSchema = createSelectSchema(
     tauxHoraire: (schema) => schema.min(1, "Le taux horaire est obligatoire"),
   }
 ).extend({
-  nomEntreprise: z.string().nonempty("Nom de fournisseur invalide"),
+  nomFournisseur: z.string().nonempty("Nom de fournisseur invalide"),
   slogan: z.string().nullable(),
 });
 

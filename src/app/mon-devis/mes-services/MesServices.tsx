@@ -1,6 +1,6 @@
 import {
   getHygieneConsosTarifs,
-  getHygieneDistribQuantites,
+  getHygieneDistribQuantite,
   getHygieneDistribTarifs,
   getHygieneInstalDistribTarifs,
 } from "@/lib/queries/hygiene/getHygiene";
@@ -15,10 +15,9 @@ import {
 import {
   getNettoyageQuantites,
   getNettoyageTarifs,
-  getRepasseTarif,
-  getVitrerieTarif,
+  getRepasseTarifs,
+  getVitrerieTarifs,
 } from "@/lib/queries/nettoyage/getNettoyage";
-import { GammeType } from "@/zod-schemas/gamme";
 import Link from "next/link";
 import Hygiene from "./(hygiene)/Hygiene";
 import HygieneOptions from "./(hygiene)/HygieneOptions";
@@ -30,22 +29,16 @@ import NettoyageOptions from "./(nettoyage)/NettoyageOptions";
 type MesServicesProps = {
   surface: string;
   effectif: string;
-  fournisseurId?: string;
-  nettoyageGamme?: GammeType;
 };
 
-const MesServices = async ({
-  surface,
-  effectif,
-  fournisseurId,
-  nettoyageGamme,
-}: MesServicesProps) => {
+const MesServices = async ({ surface, effectif }: MesServicesProps) => {
+  //Infos filtrées par surface et effectif
   const [
     nettoyageQuantites,
     nettoyageTarifs,
-    repasseTarif,
-    vitrerieTarif,
-    hygieneDistribQuantites,
+    repasseTarifs,
+    vitrerieTarifs,
+    hygieneDistribQuantite,
     hygieneDistribTarifs,
     hygieneDistribInstalTarifs,
     hygieneConsosTarifs,
@@ -56,9 +49,9 @@ const MesServices = async ({
   ] = await Promise.all([
     getNettoyageQuantites(surface),
     getNettoyageTarifs(surface),
-    getRepasseTarif(surface, fournisseurId, nettoyageGamme),
-    getVitrerieTarif(fournisseurId),
-    getHygieneDistribQuantites(effectif),
+    getRepasseTarifs(surface),
+    getVitrerieTarifs(),
+    getHygieneDistribQuantite(effectif),
     getHygieneDistribTarifs(),
     getHygieneInstalDistribTarifs(effectif),
     getHygieneConsosTarifs(effectif),
@@ -71,13 +64,33 @@ const MesServices = async ({
   if (
     !nettoyageTarifs ||
     nettoyageTarifs.length === 0 ||
+    !repasseTarifs ||
+    repasseTarifs.length === 0 ||
+    !vitrerieTarifs ||
+    vitrerieTarifs.length === 0 ||
+    !hygieneDistribTarifs ||
+    hygieneDistribTarifs.length === 0 ||
+    !hygieneDistribInstalTarifs ||
+    hygieneDistribInstalTarifs.length === 0 ||
+    !hygieneConsosTarifs ||
+    hygieneConsosTarifs.length === 0 ||
+    !incendieTarifs ||
+    incendieTarifs.length === 0 ||
+    !maintenanceTarifs ||
+    maintenanceTarifs.length === 0 ||
+    !incendieTarifs ||
+    incendieTarifs.length === 0 ||
     !nettoyageQuantites ||
-    nettoyageQuantites.length === 0
+    nettoyageQuantites.length === 0 ||
+    !hygieneDistribQuantite ||
+    !maintenanceQuantites ||
+    maintenanceQuantites.length === 0 ||
+    !incendieQuantite
   ) {
     return (
       <section className="flex h-dvh items-center justify-center text-lg">
         <p>
-          Nous n&apos;avons pas trouvé de tarifs de nettoyage.{" "}
+          Nous n&apos;avons pas trouvé de tarifs pour ces informations.{" "}
           <Link href="/mon-devis/mes-locaux" className="underline">
             Veuillez réessayer
           </Link>
@@ -86,99 +99,35 @@ const MesServices = async ({
       </section>
     );
   }
-  //Propositions de service de nettoyage
-  const nettoyagePropositions = nettoyageTarifs
-    .map((tarif) => {
-      const freqAnnuelle =
-        nettoyageQuantites.find(
-          (item) =>
-            item.gamme === tarif.gamme && item.surface === parseInt(surface)
-        )?.freqAnnuelle || 0;
-      const hParPassage = tarif.hParPassage;
-      const tauxHoraire = tarif.tauxHoraire;
-      return {
-        ...tarif,
-        freqAnnuelle,
-        prixAnnuel: Math.round(freqAnnuelle * hParPassage * tauxHoraire),
-      };
-    })
-    .sort((a, b) => a.fournisseurId - b.fournisseurId);
-
-  //Proposition des options
-  let repasseProposition = null;
-  let vitrerieProposition = null;
-  let samediDimancheProposition = null;
-
-  if (nettoyageGamme && fournisseurId && vitrerieTarif) {
-    const freqAnnuelle =
-      nettoyageQuantites.find(
-        (item) =>
-          item.gamme === nettoyageGamme && item.surface === parseInt(surface)
-      )?.freqAnnuelle || 0;
-    const nettoyageTarif = nettoyageTarifs.find(
-      (tarif) =>
-        tarif.gamme === nettoyageGamme &&
-        tarif.fournisseurId === parseInt(fournisseurId) &&
-        tarif.surface === parseInt(surface)
-    );
-    if (nettoyageTarif) {
-      if (repasseTarif) {
-        repasseProposition = {
-          ...repasseTarif,
-          freqAnnuelle,
-          prixAnnuel: Math.round(
-            freqAnnuelle * repasseTarif.tauxHoraire * repasseTarif.hParPassage
-          ),
-        };
-      }
-      vitrerieProposition = {
-        ...vitrerieTarif,
-        prixParPassage: Math.round(
-          Math.max(
-            ((parseInt(surface) * 0.15) / vitrerieTarif.cadenceVitres) *
-              vitrerieTarif.tauxHoraire +
-              ((parseInt(surface) * 0.15) / vitrerieTarif.cadenceCloisons) *
-                vitrerieTarif.tauxHoraire,
-            vitrerieTarif.minFacturation
-          )
-        ),
-      };
-      samediDimancheProposition = {
-        ...nettoyageTarif,
-        prixAnnuelSamedi: Math.round(
-          52 * nettoyageTarif.tauxHoraire * nettoyageTarif.hParPassage
-        ),
-        prixAnnuelDimanche: Math.round(
-          52 * nettoyageTarif.tauxHoraire * nettoyageTarif.hParPassage * 1.2
-        ),
-      };
-    }
-  }
 
   return (
     <section className="flex-1 overflow-hidden">
       <Nettoyage
-        nettoyagePropositions={nettoyagePropositions}
-        distribQuantites={hygieneDistribQuantites}
-        distribTarifs={hygieneDistribTarifs}
-        distribInstalTarifs={hygieneDistribInstalTarifs}
-        consosTarifs={hygieneConsosTarifs}
+        nettoyageQuantites={nettoyageQuantites}
+        nettoyageTarifs={nettoyageTarifs}
+        repasseTarifs={repasseTarifs}
+        vitrerieTarifs={vitrerieTarifs}
+        hygieneDistribQuantite={hygieneDistribQuantite}
+        hygieneDistribTarifs={hygieneDistribTarifs}
+        hygieneDistribInstalTarifs={hygieneDistribInstalTarifs}
+        hygieneConsosTarifs={hygieneConsosTarifs}
       />
       <NettoyageOptions
-        repasseProposition={repasseProposition}
-        vitrerieProposition={vitrerieProposition}
-        samediDimancheProposition={samediDimancheProposition}
+        nettoyageQuantites={nettoyageQuantites}
+        nettoyageTarifs={nettoyageTarifs}
+        repasseTarifs={repasseTarifs}
+        vitrerieTarifs={vitrerieTarifs}
       />
       <Hygiene
-        distribQuantites={hygieneDistribQuantites}
-        distribTarifs={hygieneDistribTarifs}
-        distribInstalTarifs={hygieneDistribInstalTarifs}
-        consosTarifs={hygieneConsosTarifs}
+        hygieneDistribQuantite={hygieneDistribQuantite}
+        hygieneDistribTarifs={hygieneDistribTarifs}
+        hygieneDistribInstalTarifs={hygieneDistribInstalTarifs}
+        hygieneConsosTarifs={hygieneConsosTarifs}
       />
       <HygieneOptions
-        distribQuantites={hygieneDistribQuantites}
-        distribTarifs={hygieneDistribTarifs}
-        consosTarifs={hygieneConsosTarifs}
+        hygieneDistribQuantite={hygieneDistribQuantite}
+        hygieneDistribTarifs={hygieneDistribTarifs}
+        hygieneConsosTarifs={hygieneConsosTarifs}
       />
       <Maintenance
         maintenanceQuantites={maintenanceQuantites}

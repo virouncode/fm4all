@@ -218,6 +218,13 @@
       "when": 1737037445167,
       "tag": "0030_outstanding_chamber",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1737111096748,
+      "tag": "0031_material_warstar",
+      "breakpoints": true
     }
   ]
 }

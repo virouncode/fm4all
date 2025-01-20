@@ -12,188 +12,120 @@ import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTari
 import { ChangeEvent, useContext } from "react";
 
 type HygieneOptionsPropositionsProps = {
-  distribQuantites: SelectHygieneDistribQuantitesType;
-  distribTarifs: SelectHygieneDistribTarifsType[];
-  consosTarifs: SelectHygieneConsoTarifsType[];
+  hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
+  hygieneDistribTarifs: SelectHygieneDistribTarifsType[];
+  hygieneConsosTarifs: SelectHygieneConsoTarifsType[];
 };
 
 const HygieneOptionsPropositions = ({
-  distribQuantites,
-  distribTarifs,
-  consosTarifs,
+  hygieneDistribQuantite,
+  hygieneDistribTarifs,
+  hygieneConsosTarifs,
 }: HygieneOptionsPropositionsProps) => {
   const { hygiene, setHygiene } = useContext(HygieneContext);
   const { client } = useContext(ClientContext);
   const { setTotalHygiene } = useContext(TotalHygieneContext);
 
-  const effectif = client.effectif as number;
-  const nbDistribDesinfectant =
-    hygiene.nbDistribDesinfectant || distribQuantites.nbDistribDesinfectant;
-  const nbDistribParfum =
-    hygiene.nbDistribParfum || distribQuantites.nbDistribParfum;
-  const nbDistribBalai =
-    hygiene.nbDistribBalai || distribQuantites.nbDistribBalai;
-  const nbDistribPoubelle =
-    hygiene.nbDistribPoubelle || distribQuantites.nbDistribPoubelle;
-  const dureeLocation = hygiene.dureeLocation;
-  const distribTarifsDuFournisseur = distribTarifs.filter(
-    (tarif) => tarif.fournisseurId === hygiene.fournisseurId
-  );
-  const consosTarifsDuFournisseur = consosTarifs.find(
-    (tarif) => tarif.fournisseurId === hygiene.fournisseurId
-  );
-
-  const propositions = gammes.map((gamme) => ({
-    gamme, //la gamme suffit pour identifier la proposition car il n'y a qu'un fournisseur
-    tarifDistribDesinfectant: distribTarifsDuFournisseur.find(
-      (tarif) => tarif.type === "desinfectant" && tarif.gamme === gamme
-    ),
-    tarifDistribParfum: distribTarifsDuFournisseur.find(
-      (tarif) => tarif.type === "parfum" && tarif.gamme === gamme
-    ),
-    tarifDistribBalai: distribTarifsDuFournisseur.find(
-      (tarif) => tarif.type === "balai" && tarif.gamme === gamme
-    ),
-    tarifDistribPoubelle: distribTarifsDuFournisseur.find(
-      (tarif) => tarif.type === "poubelle" && tarif.gamme === gamme
-    ),
-    prixAnnuelConsoDesinfectant:
-      (consosTarifsDuFournisseur?.paParPersonneDesinfectant ?? 0) * effectif, //il n'y qu'un fournisseur
-    prixAnnuelDistribDesinfectant:
-      nbDistribDesinfectant *
-      (distribTarifsDuFournisseur.find(
-        (tarif) => tarif.type === "desinfectant" && tarif.gamme === gamme
-      )?.[dureeLocation] ?? 0),
-    prixAnnuelDistribParfum:
-      nbDistribParfum *
-      (distribTarifsDuFournisseur.find(
-        (tarif) => tarif.type === "parfum" && tarif.gamme === gamme
-      )?.[dureeLocation] ?? 0),
-    prixAnnuelDistribBalai:
-      nbDistribBalai *
-      (distribTarifsDuFournisseur.find(
-        (tarif) => tarif.type === "balai" && tarif.gamme === gamme
-      )?.[dureeLocation] ?? 0),
-    prixAnnuelDistribPoubelle:
-      nbDistribPoubelle *
-      (distribTarifsDuFournisseur.find(
-        (tarif) => tarif.type === "poubelle" && tarif.gamme === gamme
-      )?.[dureeLocation] ?? 0),
-  }));
-
-  const handleClickProposition = (type: string, gamme: GammeType) => {
-    const proposition = propositions.find(
-      (proposition) => proposition.gamme === gamme
-    );
+  const handleClickProposition = (
+    type: string,
+    proposition: {
+      gamme: GammeType;
+      prixAnnuelDesinfectant: number;
+      prixAnnuelParfum: number;
+      prixAnnuelBalai: number;
+      prixAnnuelPoubelle: number;
+    }
+  ) => {
     switch (type) {
       case "desinfectant":
-        if (hygiene.desinfectantGammeSelected === gamme) {
+        if (hygiene.infos.desinfectantGammeSelected === proposition.gamme) {
           setHygiene((prev) => ({
             ...prev,
-            desinfectantGammeSelected: null,
+            infos: { ...prev.infos, desinfectantGammeSelected: null },
           }));
           setTotalHygiene((prev) => ({
             ...prev,
-            prixAnnuelConsoDesinfectant: null,
+            totalDesinfectant: 0,
           }));
           return;
         }
         setHygiene((prev) => ({
           ...prev,
-          desinfectantGammeSelected: gamme,
+          infos: {
+            ...prev.infos,
+            desinfectantGammeSelected: proposition.gamme,
+          },
         }));
-        if (proposition) {
-          setTotalHygiene((prev) => ({
-            ...prev,
-            prixDesinfectantAbonnement:
-              dureeLocation === "oneShot"
-                ? null
-                : Math.round(
-                    proposition.prixAnnuelConsoDesinfectant +
-                      proposition.prixAnnuelDistribDesinfectant
-                  ),
-            prixDesinfectantAchat:
-              dureeLocation === "oneShot"
-                ? {
-                    prixAchat: Math.round(
-                      proposition.prixAnnuelDistribDesinfectant
-                    ),
-                    prixConsommables: Math.round(
-                      proposition.prixAnnuelConsoDesinfectant
-                    ),
-                  }
-                : null,
-          }));
-        }
+        setTotalHygiene((prev) => ({
+          ...prev,
+          totalDesinfectant: proposition.prixAnnuelDesinfectant,
+        }));
         return;
       case "parfum":
-        if (hygiene.parfumGammeSelected === gamme) {
+        if (hygiene.infos.parfumGammeSelected === proposition.gamme) {
           setHygiene((prev) => ({
             ...prev,
-            parfumGammeSelected: null,
+            infos: { ...prev.infos, parfumGammeSelected: null },
           }));
           setTotalHygiene((prev) => ({
             ...prev,
-            prixParfum: null,
+            totalParfum: 0,
           }));
           return;
         }
         setHygiene((prev) => ({
           ...prev,
-          parfumGammeSelected: gamme,
+          infos: {
+            ...prev.infos,
+            parfumGammeSelected: proposition.gamme,
+          },
         }));
-        if (proposition) {
-          setTotalHygiene((prev) => ({
-            ...prev,
-            prixParfum: Math.round(proposition.prixAnnuelDistribParfum),
-          }));
-        }
+        setTotalHygiene((prev) => ({
+          ...prev,
+          totalParfum: proposition.prixAnnuelParfum,
+        }));
         return;
       case "balai":
-        if (hygiene.balaiGammeSelected === gamme) {
+        if (hygiene.infos.balaiGammeSelected === proposition.gamme) {
           setHygiene((prev) => ({
             ...prev,
-            balaiGammeSelected: null,
+            infos: { ...prev.infos, balaiGammeSelected: null },
           }));
           setTotalHygiene((prev) => ({
             ...prev,
-            prixBalai: null,
+            totalBalai: 0,
           }));
           return;
         }
         setHygiene((prev) => ({
           ...prev,
-          balaiGammeSelected: gamme,
+          infos: { ...prev.infos, balaiGammeSelected: proposition.gamme },
         }));
-        if (proposition) {
-          setTotalHygiene((prev) => ({
-            ...prev,
-            prixBalai: Math.round(proposition.prixAnnuelDistribBalai),
-          }));
-        }
+        setTotalHygiene((prev) => ({
+          ...prev,
+          totalBalai: proposition.prixAnnuelBalai,
+        }));
         return;
       case "poubelle":
-        if (hygiene.poubelleGammeSelected === gamme) {
+        if (hygiene.infos.poubelleGammeSelected === proposition.gamme) {
           setHygiene((prev) => ({
             ...prev,
-            poubelleGammeSelected: null,
+            infos: { ...prev.infos, poubelleGammeSelected: null },
           }));
           setTotalHygiene((prev) => ({
             ...prev,
-            prixPoubelle: null,
+            totalPoubelle: 0,
           }));
           return;
         }
         setHygiene((prev) => ({
           ...prev,
-          poubelleGammeSelected: gamme,
+          infos: { ...prev.infos, poubelleGammeSelected: proposition.gamme },
         }));
-        if (proposition) {
-          setTotalHygiene((prev) => ({
-            ...prev,
-            prixPoubelle: Math.round(proposition.prixAnnuelDistribPoubelle),
-          }));
-        }
+        setTotalHygiene((prev) => ({
+          ...prev,
+          totalPoubelle: proposition.prixAnnuelPoubelle,
+        }));
         return;
     }
   };
@@ -207,114 +139,176 @@ const HygieneOptionsPropositions = ({
       case "desinfectant":
         const newNbDistribDesinfectant = value
           ? parseInt(value)
-          : distribQuantites.nbDistribDesinfectant ?? 0;
+          : hygieneDistribQuantite.nbDistribDesinfectant ?? 0;
         setHygiene((prev) => ({
           ...prev,
-          nbDistribDesinfectant: newNbDistribDesinfectant,
+          quantites: {
+            ...prev.quantites,
+            nbDistribDesinfectant: newNbDistribDesinfectant,
+          },
         }));
-        if (hygiene.desinfectantGammeSelected) {
-          const proposition = propositions.find(
-            (proposition) =>
-              proposition.gamme === hygiene.desinfectantGammeSelected
-          );
-          if (proposition) {
-            setTotalHygiene((prev) => ({
-              ...prev,
-              prixDesinfectantAbonnement:
-                dureeLocation === "oneShot"
-                  ? null
-                  : proposition.prixAnnuelConsoDesinfectant +
-                    newNbDistribDesinfectant *
-                      (proposition.tarifDistribDesinfectant?.[dureeLocation] ??
-                        0),
-              prixDesinfectantAchat:
-                dureeLocation === "oneShot"
-                  ? {
-                      prixAchat:
-                        newNbDistribDesinfectant *
-                        (proposition.tarifDistribDesinfectant?.[
-                          dureeLocation
-                        ] ?? 0),
-                      prixConsommables: proposition.prixAnnuelConsoDesinfectant,
-                    }
-                  : null,
-            }));
-          }
+        if (hygiene.infos.desinfectantGammeSelected) {
+          const prixDistribDesinfectant =
+            distribTarifsDuFournisseur.find(
+              (tarif) =>
+                tarif.type === "desinfectant" &&
+                tarif.gamme === hygiene.infos.desinfectantGammeSelected
+            )?.[dureeLocation] ?? 0;
+
+          const totalDesinfectant =
+            newNbDistribDesinfectant * prixDistribDesinfectant +
+            (consosTarifsDuFournisseur?.paParPersonneDesinfectant ?? 0) *
+              (client.effectif ?? 0);
+          setTotalHygiene((prev) => ({
+            ...prev,
+            totalDesinfectant,
+          }));
         }
         return;
       case "parfum":
         const newNbDistribParfum = value
           ? parseInt(value)
-          : distribQuantites.nbDistribParfum ?? 0;
+          : hygieneDistribQuantite.nbDistribParfum ?? 0;
         setHygiene((prev) => ({
           ...prev,
-          nbDistribParfum: newNbDistribParfum,
+          quantites: {
+            ...prev.quantites,
+            nbDistribParfum: newNbDistribParfum,
+          },
         }));
-        if (hygiene.parfumGammeSelected) {
-          const proposition = propositions.find(
-            (proposition) => proposition.gamme === hygiene.parfumGammeSelected
-          );
-          if (proposition) {
-            setTotalHygiene((prev) => ({
-              ...prev,
-              prixParfum:
-                newNbDistribParfum *
-                (proposition.tarifDistribParfum?.[dureeLocation] ?? 0),
-            }));
-          }
+        if (hygiene.infos.parfumGammeSelected) {
+          const prixDistribParfum =
+            distribTarifsDuFournisseur.find(
+              (tarif) =>
+                tarif.type === "parfum" &&
+                tarif.gamme === hygiene.infos.parfumGammeSelected
+            )?.[dureeLocation] ?? 0;
+
+          const totalParfum = newNbDistribParfum * prixDistribParfum;
+          setTotalHygiene((prev) => ({
+            ...prev,
+            totalParfum,
+          }));
         }
         return;
+
       case "balai":
         const newNbDistribBalai = value
           ? parseInt(value)
-          : distribQuantites.nbDistribBalai ?? 0;
+          : hygieneDistribQuantite.nbDistribBalai ?? 0;
         setHygiene((prev) => ({
           ...prev,
-          nbDistribBalai: newNbDistribBalai,
+          quantites: {
+            ...prev.quantites,
+            nbDistribBalai: newNbDistribBalai,
+          },
         }));
-        if (hygiene.balaiGammeSelected) {
-          const proposition = propositions.find(
-            (proposition) => proposition.gamme === hygiene.balaiGammeSelected
-          );
-          if (proposition) {
-            setTotalHygiene((prev) => ({
-              ...prev,
-              prixBalai:
-                newNbDistribBalai *
-                (proposition.tarifDistribBalai?.[dureeLocation] ?? 0),
-            }));
-          }
+        if (hygiene.infos.balaiGammeSelected) {
+          const prixDistribBalai =
+            distribTarifsDuFournisseur.find(
+              (tarif) =>
+                tarif.type === "balai" &&
+                tarif.gamme === hygiene.infos.balaiGammeSelected
+            )?.[dureeLocation] ?? 0;
+
+          const totalBalai = newNbDistribBalai * prixDistribBalai;
+          setTotalHygiene((prev) => ({
+            ...prev,
+            totalBalai,
+          }));
         }
         return;
+
       case "poubelle":
         const newNbDistribPoubelle = value
           ? parseInt(value)
-          : distribQuantites.nbDistribPoubelle ?? 0;
+          : hygieneDistribQuantite.nbDistribPoubelle ?? 0;
         setHygiene((prev) => ({
           ...prev,
-          nbDistribPoubelle: newNbDistribPoubelle,
+          quantites: {
+            ...prev.quantites,
+            nbDistribPoubelle: newNbDistribPoubelle,
+          },
         }));
-        if (hygiene.poubelleGammeSelected) {
-          const proposition = propositions.find(
-            (proposition) => proposition.gamme === hygiene.poubelleGammeSelected
-          );
-          if (proposition) {
-            setTotalHygiene((prev) => ({
-              ...prev,
-              prixPoubelle:
-                newNbDistribPoubelle *
-                (proposition.tarifDistribPoubelle?.[dureeLocation] ?? 0),
-            }));
-          }
+        if (hygiene.infos.poubelleGammeSelected) {
+          const prixDistribPoubelle =
+            distribTarifsDuFournisseur.find(
+              (tarif) =>
+                tarif.type === "poubelle" &&
+                tarif.gamme === hygiene.infos.poubelleGammeSelected
+            )?.[dureeLocation] ?? 0;
+
+          const totalPoubelle = newNbDistribPoubelle * prixDistribPoubelle;
+          setTotalHygiene((prev) => ({
+            ...prev,
+            totalPoubelle,
+          }));
         }
+        return;
     }
   };
+
+  //Formatter les propositions d'options en hygiene
+  const nbDistribDesinfectant =
+    hygiene.quantites.nbDistribDesinfectant ||
+    hygieneDistribQuantite.nbDistribDesinfectant;
+  const nbDistribParfum =
+    hygiene.quantites.nbDistribParfum || hygieneDistribQuantite.nbDistribParfum;
+  const nbDistribBalai =
+    hygiene.quantites.nbDistribBalai || hygieneDistribQuantite.nbDistribBalai;
+  const nbDistribPoubelle =
+    hygiene.quantites.nbDistribPoubelle ||
+    hygieneDistribQuantite.nbDistribPoubelle;
+  const dureeLocation = hygiene.infos.dureeLocation;
+  const distribTarifsDuFournisseur = hygieneDistribTarifs.filter(
+    (tarif) => tarif.fournisseurId === hygiene.infos.fournisseurId
+  );
+  const consosTarifsDuFournisseur = hygieneConsosTarifs.find(
+    (tarif) => tarif.fournisseurId === hygiene.infos.fournisseurId
+  );
+
+  const propositions = gammes.map((gamme) => {
+    //la gamme suffit pour identifier la proposition car il n'y a qu'un fournisseur
+    const prixDistribDesinfectant =
+      distribTarifsDuFournisseur.find(
+        (tarif) => tarif.type === "desinfectant" && tarif.gamme === gamme
+      )?.[dureeLocation] ?? 0;
+    const prixDistribParfum =
+      distribTarifsDuFournisseur.find(
+        (tarif) => tarif.type === "parfum" && tarif.gamme === gamme
+      )?.[dureeLocation] ?? 0;
+    const prixDistribBalai =
+      distribTarifsDuFournisseur.find(
+        (tarif) => tarif.type === "balai" && tarif.gamme === gamme
+      )?.[dureeLocation] ?? 0;
+    const prixDistribPoubelle =
+      distribTarifsDuFournisseur.find(
+        (tarif) => tarif.type === "poubelle" && tarif.gamme === gamme
+      )?.[dureeLocation] ?? 0;
+    const prixAnnuelConsoDesinfectant =
+      (consosTarifsDuFournisseur?.paParPersonneDesinfectant ?? 0) *
+      (client.effectif ?? 0);
+    const prixAnnuelDesinfectant =
+      nbDistribDesinfectant * prixDistribDesinfectant +
+      prixAnnuelConsoDesinfectant;
+    const prixAnnuelParfum = nbDistribParfum * prixDistribParfum;
+    const prixAnnuelBalai = nbDistribBalai * prixDistribBalai;
+    const prixAnnuelPoubelle = nbDistribPoubelle * prixDistribPoubelle;
+
+    return {
+      gamme,
+      prixAnnuelDesinfectant,
+      prixAnnuelParfum,
+      prixAnnuelBalai,
+      prixAnnuelPoubelle,
+    };
+  });
 
   return (
     <div className="h-full flex flex-col border rounded-xl overflow-hidden">
       {/*1ère ligne */}
       <div className="flex border-b flex-1">
-        <div className="flex w-1/4 items-center justify-center flex-col gap-2 p-4">
+        <div className="flex w-1/4 items-center justify-center flex-col gap-2 p-2">
           <p className="text-base">Desinfectant pour cuvettes</p>
           <div className="text-sm flex flex-col gap-2">
             <div className="flex gap-4 items-center justify-center w-full">
@@ -326,8 +320,8 @@ const HygieneOptionsPropositions = ({
                 step={1}
                 onChange={(e) => handleChangeDistribNbr(e, "desinfectant")}
                 className={`w-16 ${
-                  hygiene.nbDistribDesinfectant ===
-                  distribQuantites.nbDistribDesinfectant
+                  hygiene.quantites.nbDistribDesinfectant ===
+                  hygieneDistribQuantite.nbDistribDesinfectant
                     ? "text-destructive"
                     : ""
                 }`}
@@ -346,62 +340,34 @@ const HygieneOptionsPropositions = ({
               : gamme === "confort"
               ? "fm4allcomfort"
               : "fm4allexcellence";
-          const tarifsDistribAchatDesinfectant =
-            proposition.prixAnnuelDistribDesinfectant
-              ? `${formatNumber(
-                  Math.round(proposition.prixAnnuelDistribDesinfectant)
-                )} €`
-              : "Non proposé";
-          const tarifsConsosDesinfectant =
-            proposition.prixAnnuelConsoDesinfectant
-              ? `${formatNumber(
-                  Math.round(proposition.prixAnnuelConsoDesinfectant)
-                )} € / an`
-              : "";
-          const tarifsDistribLocDesinfectant =
-            proposition.prixAnnuelDistribDesinfectant
-              ? `${formatNumber(
-                  Math.round(
-                    proposition.prixAnnuelDistribDesinfectant +
-                      proposition.prixAnnuelConsoDesinfectant
-                  )
-                )} € / an`
-              : "Non proposé";
+          const prixAnnuelDesinfectantText = proposition.prixAnnuelDesinfectant
+            ? `${formatNumber(
+                Math.round(proposition.prixAnnuelDesinfectant)
+              )} € / an`
+            : "Non proposé";
 
           return (
             <div
               className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-xl gap-4 cursor-pointer ${
-                hygiene.desinfectantGammeSelected === gamme
+                hygiene.infos.desinfectantGammeSelected === gamme
                   ? "ring-4 ring-inset ring-destructive"
                   : ""
               } px-8`}
               key={"desinfectant" + gamme}
-              onClick={() => handleClickProposition("desinfectant", gamme)}
+              onClick={() =>
+                handleClickProposition("desinfectant", proposition)
+              }
             >
               {" "}
               <Checkbox
-                checked={hygiene.desinfectantGammeSelected === gamme}
+                checked={hygiene.infos.desinfectantGammeSelected === gamme}
                 onCheckedChange={() =>
-                  handleClickProposition("desinfectant", gamme)
+                  handleClickProposition("desinfectant", proposition)
                 }
                 className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
               />
               <div>
-                {dureeLocation === "oneShot" ? (
-                  <>
-                    <p className="font-bold">
-                      {tarifsDistribAchatDesinfectant}
-                      <span className="text-xs"> (distributeurs)</span>
-                    </p>
-                    <p>&</p>
-                    <p className="font-bold">
-                      {tarifsConsosDesinfectant}
-                      <span className="text-xs"> (conso)</span>
-                    </p>
-                  </>
-                ) : (
-                  <p>{tarifsDistribLocDesinfectant}</p>
-                )}
+                <p>{prixAnnuelDesinfectantText}</p>
                 <p className="text-sm">
                   Distributeurs{" "}
                   {gamme === "essentiel"
@@ -411,9 +377,7 @@ const HygieneOptionsPropositions = ({
                     : "inox"}
                 </p>
                 <p className="text-sm">
-                  {dureeLocation === "oneShot"
-                    ? ""
-                    : `Location engagement
+                  {`Location engagement
                     ${
                       dureeLocation === "pa12M"
                         ? "12"
@@ -429,7 +393,7 @@ const HygieneOptionsPropositions = ({
       </div>
       {/*2ème ligne */}
       <div className="flex border-b flex-1">
-        <div className="flex w-1/4 items-center justify-center flex-col gap-2 p-4">
+        <div className="flex w-1/4 items-center justify-center flex-col gap-2 p-2">
           <p className="text-base">Parfum</p>
           <div className="text-sm flex flex-col gap-2">
             <div className="flex gap-4 items-center justify-center w-full">
@@ -441,7 +405,8 @@ const HygieneOptionsPropositions = ({
                 step={1}
                 onChange={(e) => handleChangeDistribNbr(e, "parfum")}
                 className={`w-16 ${
-                  hygiene.nbDistribParfum === distribQuantites.nbDistribParfum
+                  hygiene.quantites.nbDistribParfum ===
+                  hygieneDistribQuantite.nbDistribParfum
                     ? "text-destructive"
                     : ""
                 }`}
@@ -460,55 +425,29 @@ const HygieneOptionsPropositions = ({
               : gamme === "confort"
               ? "fm4allcomfort"
               : "fm4allexcellence";
-          const tarifsDistribAchatParfum = proposition.prixAnnuelDistribParfum
-            ? `${formatNumber(
-                Math.round(proposition.prixAnnuelDistribParfum)
-              )} €`
-            : "Non proposé";
-          // const tarifsConsosParfum = proposition.tarifsParfum ? `${formatNumber(
-          // Math.round(proposition.tarifsParfum))} € / an` : ""; //Quand les fournisseurs l'auront renseigné
-          const tarifsConsosParfum = "0 € / an";
-          // const tarifsdDistribLocParfum = proposition.prixAnnuelDistribParfum
-          // ? `${formatNumber(
-          // Math.round(proposition.prixAnnuelDistribParfum + proposition.tarifsParfum))} € / an`
-          // : "Non proposé"; Quand les fournisseurs l'auront renseigné
-          const tarifsDistribLocParfum = proposition.prixAnnuelDistribParfum
-            ? `${formatNumber(
-                Math.round(proposition.prixAnnuelDistribParfum)
-              )} € / an`
+          const prixAnnuelParfumText = proposition.prixAnnuelParfum
+            ? `${formatNumber(Math.round(proposition.prixAnnuelParfum))} € / an`
             : "Non proposé";
           return (
             <div
               className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-xl gap-4 cursor-pointer ${
-                hygiene.parfumGammeSelected === gamme
+                hygiene.infos.parfumGammeSelected === gamme
                   ? "ring-4 ring-inset ring-destructive"
                   : ""
               } px-8`}
               key={"parfum" + gamme}
-              onClick={() => handleClickProposition("parfum", gamme)}
+              onClick={() => handleClickProposition("parfum", proposition)}
             >
               {" "}
               <Checkbox
-                checked={hygiene.parfumGammeSelected === gamme}
-                onCheckedChange={() => handleClickProposition("parfum", gamme)}
+                checked={hygiene.infos.parfumGammeSelected === gamme}
+                onCheckedChange={() =>
+                  handleClickProposition("parfum", proposition)
+                }
                 className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
               />
               <div>
-                {dureeLocation === "oneShot" ? (
-                  <>
-                    <p className="font-bold">
-                      {tarifsDistribAchatParfum}
-                      <span className="text-xs"> (distributeurs)</span>
-                    </p>
-                    <p>&</p>
-                    <p className="font-bold">
-                      {tarifsConsosParfum}
-                      <span className="text-xs"> (conso)</span>
-                    </p>
-                  </>
-                ) : (
-                  <p>{tarifsDistribLocParfum}</p>
-                )}
+                <p>{prixAnnuelParfumText}</p>
                 <p className="text-sm">
                   Distributeurs{" "}
                   {gamme === "essentiel"
@@ -536,7 +475,7 @@ const HygieneOptionsPropositions = ({
       </div>
       {/*3ème ligne */}
       <div className="flex border-b flex-1">
-        <div className="flex w-1/4 items-center justify-center flex-col gap-2 p-4">
+        <div className="flex w-1/4 items-center justify-center flex-col gap-2 p-2">
           <p className="text-base">Balais WC</p>
           <div className="text-sm flex flex-col gap-2">
             <div className="flex gap-4 items-center justify-center w-full">
@@ -548,7 +487,8 @@ const HygieneOptionsPropositions = ({
                 step={1}
                 onChange={(e) => handleChangeDistribNbr(e, "balai")}
                 className={`w-16 ${
-                  hygiene.nbDistribBalai === distribQuantites.nbDistribBalai
+                  hygiene.quantites.nbDistribBalai ===
+                  hygieneDistribQuantite.nbDistribBalai
                     ? "text-destructive"
                     : ""
                 }`}
@@ -567,53 +507,31 @@ const HygieneOptionsPropositions = ({
               : gamme === "confort"
               ? "fm4allcomfort"
               : "fm4allexcellence";
-          const tarifsDistribAchatBalai = proposition.prixAnnuelDistribBalai
-            ? `${formatNumber(
-                Math.round(proposition.prixAnnuelDistribBalai)
-              )} €`
+          const prixAnnuelBalaiText = proposition.prixAnnuelBalai
+            ? `${formatNumber(Math.round(proposition.prixAnnuelBalai))} € / an`
             : "Non proposé";
-          // const tarifsConsosBalai = proposition.tarifsBalai ? `${formatNumber(
-          // Math.round(proposition.tarifsBalai))} € / an` : ""; //Quand les fournisseurs l'auront renseigné
-          const tarifsConsosBalai = "0 € / an";
-          // const tarifsDistribLocBalai = proposition.prixAnnuelDistribBalai ? `${formatNumber(
-          // Math.round(proposition.prixAnnuelDistribBalai + proposition.tarifsBalai))} € / an` : "Non proposé"; //Quand les fournisseurs l'auront renseigné
-          const tarifsDistribLocBalai = proposition.prixAnnuelDistribBalai
-            ? `${formatNumber(
-                Math.round(proposition.prixAnnuelDistribBalai)
-              )} € / an`
-            : "Non proposé";
+
           return (
             <div
               className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-xl gap-4 cursor-pointer ${
-                hygiene.balaiGammeSelected === gamme
+                hygiene.infos.balaiGammeSelected === gamme
                   ? "ring-4 ring-inset ring-destructive"
                   : ""
               } px-8`}
               key={"balai" + gamme}
-              onClick={() => handleClickProposition("balai", gamme)}
+              onClick={() => handleClickProposition("balai", proposition)}
             >
               {" "}
               <Checkbox
-                checked={hygiene.balaiGammeSelected === gamme}
-                onCheckedChange={() => handleClickProposition("balai", gamme)}
+                checked={hygiene.infos.balaiGammeSelected === gamme}
+                onCheckedChange={() =>
+                  handleClickProposition("balai", proposition)
+                }
                 className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
               />
               <div>
-                {dureeLocation === "oneShot" ? (
-                  <>
-                    <p className="font-bold">
-                      {tarifsDistribAchatBalai}
-                      <span className="text-xs"> (distributeurs)</span>
-                    </p>
-                    <p>&</p>
-                    <p className="font-bold">
-                      {tarifsConsosBalai}
-                      <span className="text-xs"> (conso)</span>
-                    </p>
-                  </>
-                ) : (
-                  <p>{tarifsDistribLocBalai}</p>
-                )}
+                <p>{prixAnnuelBalaiText}</p>
+
                 <p className="text-sm">
                   Socle et manche{" "}
                   {gamme === "essentiel"
@@ -641,7 +559,7 @@ const HygieneOptionsPropositions = ({
       </div>
       {/*4ème ligne */}
       <div className="flex border-b flex-1">
-        <div className="flex w-1/4 items-center justify-center flex-col gap-2 p-4">
+        <div className="flex w-1/4 items-center justify-center flex-col gap-2 p-2">
           <p className="text-base">Poubelles hygiène féminine</p>
           <div className="text-sm flex flex-col gap-2">
             <div className="flex gap-4 items-center justify-center w-full">
@@ -653,8 +571,8 @@ const HygieneOptionsPropositions = ({
                 step={1}
                 onChange={(e) => handleChangeDistribNbr(e, "poubelle")}
                 className={`w-16 ${
-                  hygiene.nbDistribPoubelle ===
-                  distribQuantites.nbDistribPoubelle
+                  hygiene.quantites.nbDistribPoubelle ===
+                  hygieneDistribQuantite.nbDistribPoubelle
                     ? "text-destructive"
                     : ""
                 }`}
@@ -676,56 +594,32 @@ const HygieneOptionsPropositions = ({
               : gamme === "confort"
               ? "fm4allcomfort"
               : "fm4allexcellence";
-          const tarifsDistribAchatPoubelle =
-            proposition.prixAnnuelDistribPoubelle
-              ? `${formatNumber(
-                  Math.round(proposition.prixAnnuelDistribPoubelle)
-                )} €`
-              : "Non proposé";
-          // const tarifsConsosPoubelle = proposition.tarifsPoubelle ? `${formatNumber(
-          // Math.round(proposition.tarifsPoubelle))} € / an` : ""; //Quand les fournisseurs l'auront renseigné
-          const tarifsConsosPoubelle = "0 € / an";
-          // const tarifsDistribLocPoubelle = proposition.prixAnnuelDistribPoubelle ? `${formatNumber(
-          //        Math.round(proposition.prixAnnuelDistribPoubelle + proposition.tarifsPoubelle})) € / an` : "Non proposé"; //Quand les fournisseurs l'auront renseigné
-          const tarifsDistribLocPoubelle = proposition.prixAnnuelDistribPoubelle
+          const prixAnnuelPoubelleText = proposition.prixAnnuelPoubelle
             ? `${formatNumber(
-                Math.round(proposition.prixAnnuelDistribPoubelle)
+                Math.round(proposition.prixAnnuelPoubelle)
               )} € / an`
             : "Non proposé";
+
           return (
             <div
               className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-xl gap-4 cursor-pointer ${
-                hygiene.poubelleGammeSelected === gamme
+                hygiene.infos.poubelleGammeSelected === gamme
                   ? "ring-4 ring-inset ring-destructive"
                   : ""
               } px-8`}
               key={"poubelle" + gamme}
-              onClick={() => handleClickProposition("poubelle", gamme)}
+              onClick={() => handleClickProposition("poubelle", proposition)}
             >
               {" "}
               <Checkbox
-                checked={hygiene.poubelleGammeSelected === gamme}
+                checked={hygiene.infos.poubelleGammeSelected === gamme}
                 onCheckedChange={() =>
-                  handleClickProposition("poubelle", gamme)
+                  handleClickProposition("poubelle", proposition)
                 }
                 className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
               />
               <div>
-                {dureeLocation === "oneShot" ? (
-                  <>
-                    <p className="font-bold">
-                      {tarifsDistribAchatPoubelle}
-                      <span className="text-xs"> (distributeurs)</span>
-                    </p>
-                    <p>&</p>
-                    <p className="font-bold">
-                      {tarifsConsosPoubelle}
-                      <span className="text-xs"> (conso)</span>
-                    </p>
-                  </>
-                ) : (
-                  <p>{tarifsDistribLocPoubelle}</p>
-                )}
+                <p>{prixAnnuelPoubelleText}</p>
                 <p className="text-sm">
                   Réceptacles{" "}
                   {gamme === "essentiel"

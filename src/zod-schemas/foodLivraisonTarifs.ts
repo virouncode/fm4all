@@ -12,7 +12,7 @@ export const selectFoodLivraisonTarifsSchema = createSelectSchema(
       schema.min(0, "Le prix unitaire si café est obligatoire"),
   }
 ).extend({
-  nomEntreprise: z.string().nonempty("Le nom du fournisseur est obligatoire"),
+  nomFournisseur: z.string().nonempty("Le nom du fournisseur est obligatoire"),
   slogan: z.string().nullable(),
 });
 

@@ -18,9 +18,15 @@ export const CafeContext = createContext<{
   setCafe: Dispatch<SetStateAction<CafeType>>;
 }>({
   cafe: {
-    currentMachineId: 1,
-    cafeFournisseurId: null,
-    machines: [],
+    infos: {
+      fournisseurId: null,
+      nomFournisseur: null,
+      sloganFournisseur: null,
+      currentLotId: 1,
+      dureeLocation: "pa12M",
+    },
+    nbLotsMachines: 0,
+    lotsMachines: [],
   },
   setCafe: () => {},
 });
@@ -31,16 +37,36 @@ const CafeProvider = ({ children }: PropsWithChildren) => {
 
   // Always initialize state
   const [cafe, setCafe] = useState<CafeType>({
-    currentMachineId: 1,
-    cafeFournisseurId: null,
-    machines: [
+    infos: {
+      fournisseurId: null,
+      nomFournisseur: null,
+      sloganFournisseur: null,
+      currentLotId: 1,
+      dureeLocation: "pa12M",
+    },
+    nbLotsMachines: 1,
+    lotsMachines: [
       {
-        machineId: 1,
-        typeBoissons: "cafe",
-        dureeLocation: "pa12M",
-        nbPersonnes: client.effectif ?? 0,
-        nbMachines: 0,
-        gammeSelected: null,
+        infos: {
+          lotId: 1,
+          typeBoissons: "cafe",
+          gammeCafeSelected: null,
+          marque: null,
+          modele: null,
+          reconditionne: false,
+        },
+        quantites: {
+          nbPersonnes: client.effectif ?? 0,
+          nbMachines: null,
+        },
+        prix: {
+          prixUnitaireLoc: null,
+          prixUnitaireInstal: null,
+          prixUnitaireMaintenance: null,
+          prixUnitaireConsoCafe: null,
+          prixUnitaireConsoLait: null,
+          prixUnitaireConsoChocolat: null,
+        },
       },
     ],
   });

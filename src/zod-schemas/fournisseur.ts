@@ -8,7 +8,7 @@ import { z } from "zod";
 
 //SELECT
 export const selectFournisseurSchema = createSelectSchema(fournisseurs, {
-  nomEntreprise: (schema) => schema.min(1, "Nom du fournisseur obligatoire"),
+  nomFournisseur: (schema) => schema.min(1, "Nom du fournisseur obligatoire"),
   siret: (schema) =>
     schema.regex(/^\d{3} \d{3} \d{3} \d{5}$/, "Siret invalide"),
   prenomContact: (schema) =>
@@ -36,7 +36,7 @@ export type SelectFournisseurType = typeof selectFournisseurSchema._type;
 
 //INSERT
 export const insertFournisseurSchema = createInsertSchema(fournisseurs, {
-  nomEntreprise: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
+  nomFournisseur: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
   siret: (schema) =>
     schema.regex(
       /^\d{3} \d{3} \d{3} \d{5}$/,
@@ -60,7 +60,7 @@ export type InsertFournisseurType = typeof insertFournisseurSchema._type;
 
 //UPDATE
 export const updateFournisseurSchema = createUpdateSchema(fournisseurs, {
-  nomEntreprise: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
+  nomFournisseur: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
   siret: (schema) =>
     schema.regex(
       /^\d{3} \d{3} \d{3} \d{5}$/,

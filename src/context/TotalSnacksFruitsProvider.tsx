@@ -17,12 +17,11 @@ export const TotalSnacksFruitsContext = createContext<{
   setTotalSnacksFruits: Dispatch<SetStateAction<TotalSnacksFruitsType>>;
 }>({
   totalSnacksFruits: {
-    nomFournisseur: null,
-    prixFruits: null,
-    prixSnacks: null,
-    prixBoissons: null,
-    prixLivraison: null,
-    prixTotal: null,
+    totalFruits: 0,
+    totalSnacks: 0,
+    totalBoissons: 0,
+    totalLivraison: 0,
+    total: 0,
   },
   setTotalSnacksFruits: () => {},
 });
@@ -33,12 +32,11 @@ const TotalSnacksFruitsProvider = ({ children }: PropsWithChildren) => {
   // Always initialize state
   const [totalSnacksFruits, setTotalSnacksFruits] =
     useState<TotalSnacksFruitsType>({
-      nomFournisseur: null,
-      prixFruits: null,
-      prixSnacks: null,
-      prixBoissons: null,
-      prixLivraison: null,
-      prixTotal: null,
+      totalFruits: 0,
+      totalSnacks: 0,
+      totalBoissons: 0,
+      totalLivraison: 0,
+      total: 0,
     });
 
   useEffect(() => {
