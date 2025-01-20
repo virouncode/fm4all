@@ -17,8 +17,7 @@ export const TotalIncendieContext = createContext<{
   setTotalIncendie: Dispatch<SetStateAction<TotalIncendieType>>;
 }>({
   totalIncendie: {
-    nomFournisseur: null,
-    prixIncendie: null,
+    totalService: 0,
   },
   setTotalIncendie: () => {},
 });
@@ -28,8 +27,7 @@ const TotalIncendieProvider = ({ children }: PropsWithChildren) => {
 
   // Always initialize state
   const [totalIncendie, setTotalIncendie] = useState<TotalIncendieType>({
-    nomFournisseur: null,
-    prixIncendie: null,
+    totalService: 0,
   });
 
   useEffect(() => {
