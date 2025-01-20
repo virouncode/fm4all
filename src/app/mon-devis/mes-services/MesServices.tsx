@@ -9,8 +9,11 @@ import {
   getIncendieTarifs,
 } from "@/lib/queries/incendie/getIncendie";
 import {
+  getLegioTarif,
   getMaintenanceQuantites,
   getMaintenanceTarifs,
+  getQ18Tarif,
+  getQualiteAirTarif,
 } from "@/lib/queries/maintenance/getMaintenance";
 import {
   getNettoyageQuantites,
@@ -46,6 +49,9 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
     incendieTarifs,
     maintenanceQuantites,
     maintenanceTarifs,
+    q18Tarif,
+    legioTarif,
+    qualiteAirTarif,
   ] = await Promise.all([
     getNettoyageQuantites(surface),
     getNettoyageTarifs(surface),
@@ -59,6 +65,9 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
     getIncendieTarifs(surface),
     getMaintenanceQuantites(surface),
     getMaintenanceTarifs(surface),
+    getQ18Tarif(surface),
+    getLegioTarif(surface),
+    getQualiteAirTarif(surface),
   ]);
 
   if (
@@ -85,7 +94,10 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
     !hygieneDistribQuantite ||
     !maintenanceQuantites ||
     maintenanceQuantites.length === 0 ||
-    !incendieQuantite
+    !incendieQuantite ||
+    !q18Tarif ||
+    !legioTarif ||
+    !qualiteAirTarif
   ) {
     return (
       <section className="flex h-dvh items-center justify-center text-lg">
@@ -132,6 +144,9 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
       <Maintenance
         maintenanceQuantites={maintenanceQuantites}
         maintenanceTarifs={maintenanceTarifs}
+        q18Tarif={q18Tarif}
+        legioTarif={legioTarif}
+        qualiteAirTarif={qualiteAirTarif}
       />
       <SecuriteIncendie
         incendieQuantite={incendieQuantite}

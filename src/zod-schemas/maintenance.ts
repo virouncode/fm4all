@@ -13,6 +13,9 @@ export const maintenanceSchema = z.object({
   }),
   prix: z.object({
     tauxHoraire: z.number().default(0),
+    prixQ18: z.number().default(0),
+    prixLegio: z.number().default(0),
+    prixQualiteAir: z.number().default(0),
   }),
 });
 

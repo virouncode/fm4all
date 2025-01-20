@@ -2,12 +2,18 @@ import { RATIO } from "@/constants/constants";
 import { db } from "@/db";
 import {
   fournisseurs,
+  legioTarifs,
   maintenanceQuantites,
   maintenanceTarifs,
+  q18Tarifs,
+  qualiteAirTarifs,
 } from "@/db/schema";
 import { errorHelper } from "@/lib/errorHelper";
+import { selectLegioTarifsSchema } from "@/zod-schemas/legioTarifs";
 import { selectMaintenanceQuantitesSchema } from "@/zod-schemas/maintenanceQuantites";
 import { selectMaintenanceTarifsSchema } from "@/zod-schemas/maintenanceTarifs";
+import { selectQ18TarifsSchema } from "@/zod-schemas/q18Tarifs";
+import { selectQualiteAirTarifsSchema } from "@/zod-schemas/qualiteAirTarifs";
 import { eq, getTableColumns } from "drizzle-orm";
 
 export const getMaintenanceQuantites = async (surface: string) => {
@@ -53,6 +59,61 @@ export const getMaintenanceTarifs = async (surface: string) => {
       hParPassage: result.hParPassage / RATIO,
       tauxHoraire: result.tauxHoraire / RATIO,
     }));
+    return data;
+  } catch (err) {
+    errorHelper(err);
+  }
+};
+
+export const getQ18Tarif = async (surface: string) => {
+  try {
+    const results = await db
+      .select()
+      .from(q18Tarifs)
+      .where(eq(q18Tarifs.surface, parseInt(surface)));
+    if (results.length === 0) return null;
+    const validatedResult = selectQ18TarifsSchema.parse(results[0]);
+    const data = {
+      ...validatedResult,
+      prixAnnuel: validatedResult.prixAnnuel / RATIO,
+    };
+    return data;
+  } catch (err) {
+    errorHelper(err);
+  }
+};
+
+export const getLegioTarif = async (surface: string) => {
+  try {
+    const results = await db
+      .select()
+      .from(legioTarifs)
+      .where(eq(legioTarifs.surface, parseInt(surface)));
+    if (results.length === 0) return null;
+    const validatedResult = selectLegioTarifsSchema.parse(results[0]);
+
+    const data = {
+      ...validatedResult,
+      prixAnnuel: validatedResult.prixAnnuel / RATIO,
+    };
+    return data;
+  } catch (err) {
+    errorHelper(err);
+  }
+};
+
+export const getQualiteAirTarif = async (surface: string) => {
+  try {
+    const results = await db
+      .select()
+      .from(qualiteAirTarifs)
+      .where(eq(qualiteAirTarifs.surface, parseInt(surface)));
+    if (results.length === 0) return null;
+    const validatedResult = selectQualiteAirTarifsSchema.parse(results[0]);
+    const data = {
+      ...validatedResult,
+      prixAnnuel: validatedResult.prixAnnuel / RATIO,
+    };
     return data;
   } catch (err) {
     errorHelper(err);

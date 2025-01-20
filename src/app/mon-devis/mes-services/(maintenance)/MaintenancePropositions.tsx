@@ -9,20 +9,25 @@ import { MaintenanceContext } from "@/context/MaintenanceProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
+import { gammes, GammeType } from "@/zod-schemas/gamme";
 import Image from "next/image";
 import { useContext } from "react";
 
 type MaintenancePropositionsProps = {
   formattedPropositions: {
     id: number;
-    gamme: "essentiel" | "confort" | "excellence";
+    gamme: GammeType;
     nomFournisseur: string;
     fournisseurId: number;
     sloganFournisseur: string | null;
     hParPassage: number;
     tauxHoraire: number;
     freqAnnuelle: number;
-    prixAnnuel: number;
+    prixAnnuelService: number;
+    prixAnnuelQ18: number;
+    prixAnnuelLegio: number;
+    prixAnnuelQualiteAir: number;
+    total: number;
   }[][];
 };
 
@@ -34,14 +39,18 @@ const MaintenancePropositions = ({
 
   const handleClickProposition = (proposition: {
     id: number;
-    gamme: "essentiel" | "confort" | "excellence";
+    gamme: GammeType;
     nomFournisseur: string;
     fournisseurId: number;
     sloganFournisseur: string | null;
     hParPassage: number;
     tauxHoraire: number;
     freqAnnuelle: number;
-    prixAnnuel: number;
+    prixAnnuelService: number;
+    prixAnnuelQ18: number;
+    prixAnnuelLegio: number;
+    prixAnnuelQualiteAir: number;
+    total: number;
   }) => {
     const {
       gamme,
@@ -51,8 +60,17 @@ const MaintenancePropositions = ({
       hParPassage,
       tauxHoraire,
       freqAnnuelle,
-      prixAnnuel,
+      prixAnnuelService,
+      prixAnnuelQ18,
+      prixAnnuelLegio,
+      prixAnnuelQualiteAir,
     } = proposition;
+
+    const totalQ18 = prixAnnuelQ18;
+    const totalLegio = gammes.indexOf(gamme) > 0 ? prixAnnuelLegio : 0;
+    const totalQualiteAir =
+      gammes.indexOf(gamme) > 1 ? prixAnnuelQualiteAir : 0;
+
     if (
       maintenance.infos.fournisseurId === fournisseurId &&
       maintenance.infos.gammeSelected === gamme
@@ -72,10 +90,16 @@ const MaintenancePropositions = ({
           },
           prix: {
             tauxHoraire: 0,
+            prixQ18: 0,
+            prixLegio: 0,
+            prixQualiteAir: 0,
           },
         }));
         setTotalMaintenance({
           totalService: 0,
+          totalQ18: 0,
+          totalLegio: 0,
+          totalQualiteAir: 0,
         });
         return;
       }
@@ -93,10 +117,16 @@ const MaintenancePropositions = ({
       },
       prix: {
         tauxHoraire,
+        prixQ18: prixAnnuelQ18,
+        prixLegio: prixAnnuelLegio,
+        prixQualiteAir: prixAnnuelQualiteAir,
       },
     });
     setTotalMaintenance({
-      totalService: prixAnnuel,
+      totalService: prixAnnuelService,
+      totalQ18,
+      totalLegio,
+      totalQualiteAir,
     });
   };
 
@@ -148,8 +178,8 @@ const MaintenancePropositions = ({
                     : gamme === "confort"
                     ? "fm4allcomfort"
                     : "fm4allexcellence";
-                const prixAnnuel = proposition.prixAnnuel
-                  ? `${formatNumber(proposition.prixAnnuel)} € /an`
+                const totalText = proposition.total
+                  ? `${formatNumber(proposition.total)} € /an`
                   : "Non proposé";
 
                 return (
@@ -176,11 +206,27 @@ const MaintenancePropositions = ({
                       className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                     />
                     <div>
-                      <p className="font-bold">{prixAnnuel}</p>
-                      <p className="text-xs">
+                      <p className="font-bold">{totalText}</p>
+                      <p className="text-sm">
                         {proposition.freqAnnuelle} passage(s) de{" "}
                         {proposition.hParPassage} h / an
                       </p>
+                      {proposition.gamme === "essentiel" && (
+                        <p className="text-sm">+ contrôle Q18</p>
+                      )}
+                      {proposition.gamme === "confort" && (
+                        <>
+                          <p className="text-sm">+ contrôle Q18</p>
+                          <p className="text-sm">+ contrôle Legio</p>
+                        </>
+                      )}
+                      {proposition.gamme === "excellence" && (
+                        <>
+                          <p className="text-sm">+ contrôle Q18</p>
+                          <p className="text-sm">+ contrôle Legio</p>
+                          <p className="text-sm">+ contrôle Qualité Air</p>
+                        </>
+                      )}
                     </div>
                   </div>
                 );

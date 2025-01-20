@@ -231,21 +231,21 @@ export const maintenanceTarifs = pgTable("maintenance_tarifs", {
 export const legioTarifs = pgTable("legio_tarifs", {
   id: serial().primaryKey(),
   surface: integer().notNull(),
-  prix_annuel: integer("prix_annuel").notNull(),
+  prixAnnuel: integer("prix_annuel").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 export const q18Tarifs = pgTable("q18_tarifs", {
   id: serial().primaryKey(),
   surface: integer().notNull(),
-  prix_annuel: integer("prix_annuel").notNull(),
+  prixAnnuel: integer("prix_annuel").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 export const qualiteAirTarifs = pgTable("qualite_air_tarifs", {
   id: serial().primaryKey(),
   surface: integer().notNull(),
-  prix_annuel: integer("prix_annuel").notNull(),
+  prixAnnuel: integer("prix_annuel").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

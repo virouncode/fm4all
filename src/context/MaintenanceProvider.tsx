@@ -28,6 +28,9 @@ export const MaintenanceContext = createContext<{
     },
     prix: {
       tauxHoraire: 0,
+      prixQ18: 0,
+      prixLegio: 0,
+      prixQualiteAir: 0,
     },
   },
   setMaintenance: () => {},
@@ -50,6 +53,9 @@ const MaintenanceProvider = ({ children }: PropsWithChildren) => {
     },
     prix: {
       tauxHoraire: 0,
+      prixQ18: 0,
+      prixLegio: 0,
+      prixQualiteAir: 0,
     },
   });
 

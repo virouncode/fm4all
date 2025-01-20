@@ -17,6 +17,9 @@ export const totalHygieneSchema = z.object({
 });
 export const totalMaintenanceSchema = z.object({
   totalService: z.number().default(0),
+  totalQ18: z.number().default(0),
+  totalLegio: z.number().default(0),
+  totalQualiteAir: z.number().default(0),
 });
 export const totalIncendieSchema = z.object({
   totalService: z.number().default(0),

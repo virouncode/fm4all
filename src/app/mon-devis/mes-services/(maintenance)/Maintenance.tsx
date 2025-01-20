@@ -2,9 +2,12 @@
 import { HygieneContext } from "@/context/HygieneProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
-import { gammes } from "@/zod-schemas/gamme";
+import { gammes, GammeType } from "@/zod-schemas/gamme";
+import { SelectLegioTarifsType } from "@/zod-schemas/legioTarifs";
 import { SelectMaintenanceQuantitesType } from "@/zod-schemas/maintenanceQuantites";
 import { SelectMaintenanceTarifsType } from "@/zod-schemas/maintenanceTarifs";
+import { SelectQ18TarifsType } from "@/zod-schemas/q18Tarifs";
+import { SelectQualiteAirTarifsType } from "@/zod-schemas/qualiteAirTarifs";
 import { Wrench } from "lucide-react";
 import { useContext } from "react";
 import PropositionsFooter from "../PropositionsFooter";
@@ -14,11 +17,17 @@ import MaintenancePropositions from "./MaintenancePropositions";
 type MaintenanceProps = {
   maintenanceQuantites: SelectMaintenanceQuantitesType[];
   maintenanceTarifs: SelectMaintenanceTarifsType[];
+  q18Tarif: SelectQ18TarifsType;
+  legioTarif: SelectLegioTarifsType;
+  qualiteAirTarif: SelectQualiteAirTarifsType;
 };
 
 const Maintenance = ({
   maintenanceQuantites,
   maintenanceTarifs,
+  q18Tarif,
+  legioTarif,
+  qualiteAirTarif,
 }: MaintenanceProps) => {
   const { hygiene } = useContext(HygieneContext);
   const { nettoyage } = useContext(NettoyageContext);
@@ -65,6 +74,20 @@ const Maintenance = ({
     const freqAnnuelle =
       maintenanceQuantites.find((quantite) => quantite.gamme === tarif.gamme)
         ?.freqAnnuelle ?? 0;
+    const prixAnnuelService = Math.round(
+      hParPassage * tauxHoraire * freqAnnuelle
+    );
+    const prixAnnuelQ18 = q18Tarif.prixAnnuel;
+    const prixAnnuelLegio = legioTarif.prixAnnuel;
+    const prixAnnuelQualiteAir = qualiteAirTarif.prixAnnuel;
+
+    const prixAnnuelControlesSupplementaires =
+      gamme === "essentiel"
+        ? prixAnnuelQ18
+        : gamme === "confort"
+        ? prixAnnuelQ18 + prixAnnuelLegio
+        : prixAnnuelQ18 + prixAnnuelLegio + prixAnnuelQualiteAir;
+    const total = prixAnnuelService + prixAnnuelControlesSupplementaires;
     return {
       id,
       gamme,
@@ -74,9 +97,11 @@ const Maintenance = ({
       hParPassage,
       tauxHoraire,
       freqAnnuelle,
-      prixAnnuel: Math.round(
-        tarif.hParPassage * tarif.tauxHoraire * freqAnnuelle
-      ),
+      prixAnnuelService,
+      prixAnnuelQ18,
+      prixAnnuelLegio,
+      prixAnnuelQualiteAir,
+      total,
     };
   });
 
@@ -85,14 +110,18 @@ const Maintenance = ({
       number,
       {
         id: number;
-        gamme: "essentiel" | "confort" | "excellence";
+        gamme: GammeType;
         nomFournisseur: string;
         fournisseurId: number;
         sloganFournisseur: string | null;
         hParPassage: number;
         tauxHoraire: number;
         freqAnnuelle: number;
-        prixAnnuel: number;
+        prixAnnuelService: number;
+        prixAnnuelQ18: number;
+        prixAnnuelLegio: number;
+        prixAnnuelQualiteAir: number;
+        total: number;
       }[]
     >
   >((acc, item) => {

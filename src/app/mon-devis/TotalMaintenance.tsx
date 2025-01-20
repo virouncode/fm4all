@@ -8,7 +8,11 @@ const TotalMaintenance = () => {
   const { maintenance } = useContext(MaintenanceContext);
   const { totalMaintenance } = useContext(TotalMaintenanceContext);
 
-  const total = totalMaintenance.totalService;
+  const total =
+    totalMaintenance.totalService +
+    totalMaintenance.totalQ18 +
+    totalMaintenance.totalLegio +
+    totalMaintenance.totalQualiteAir;
 
   if (total === 0) return null;
 
@@ -29,6 +33,64 @@ const TotalMaintenance = () => {
               {formatNumber(totalMaintenance.totalService)} € HT / an
             </p>
           </div>
+          {maintenance.infos.gammeSelected === "essentiel" && (
+            <div
+              className={`flex items-center justify-between text-${color} font-bold`}
+            >
+              <p>Contrôle Q18</p>
+              <p className="text-end">
+                {formatNumber(totalMaintenance.totalQ18)} € HT / an
+              </p>
+            </div>
+          )}
+          {maintenance.infos.gammeSelected === "confort" && (
+            <>
+              <div
+                className={`flex items-center justify-between text-${color} font-bold`}
+              >
+                <p>Contrôle Q18</p>
+                <p className="text-end">
+                  {formatNumber(totalMaintenance.totalQ18)} € HT / an
+                </p>
+              </div>
+              <div
+                className={`flex items-center justify-between text-${color} font-bold`}
+              >
+                <p>Contrôle Legio</p>
+                <p className="text-end">
+                  {formatNumber(totalMaintenance.totalLegio)} € HT / an
+                </p>
+              </div>
+            </>
+          )}
+          {maintenance.infos.gammeSelected === "excellence" && (
+            <>
+              <div
+                className={`flex items-center justify-between text-${color} font-bold`}
+              >
+                <p>Contrôle Q18</p>
+                <p className="text-end">
+                  {formatNumber(totalMaintenance.totalQ18)} € HT / an
+                </p>
+              </div>
+              <div
+                className={`flex items-center justify-between text-${color} font-bold`}
+              >
+                <p>Contrôle Legio</p>
+                <p className="text-end">
+                  {formatNumber(totalMaintenance.totalLegio)} € HT / an
+                </p>
+              </div>
+              <div
+                className={`flex items-center justify-between text-${color} font-bold`}
+              >
+                <p>Contrôle Qualité Air</p>
+                <p className="text-end">
+                  {formatNumber(totalMaintenance.totalQualiteAir)} € HT / an
+                </p>
+              </div>
+            </>
+          )}
           <div className="flex items-center justify-between border-t border-foreground mt-2">
             <p>TOTAL</p>
             <p className="text-end">{formatNumber(total)} € HT / an</p>

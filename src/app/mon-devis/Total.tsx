@@ -49,7 +49,11 @@ const Total = () => {
     totalHygiene.totalParfum +
     totalHygiene.totalBalai +
     totalHygiene.totalPoubelle;
-  const totalFinalMaintenance = totalMaintenance.totalService;
+  const totalFinalMaintenance =
+    totalMaintenance.totalService +
+    totalMaintenance.totalQ18 +
+    totalMaintenance.totalLegio +
+    totalMaintenance.totalQualiteAir;
   const totalFinalIncendie = totalIncendie.totalService;
   //TODO voir pour les prix one shot d'installation
   const totalFinalCafe = totalCafe.totalMachines

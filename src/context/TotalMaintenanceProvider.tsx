@@ -18,6 +18,9 @@ export const TotalMaintenanceContext = createContext<{
 }>({
   totalMaintenance: {
     totalService: 0,
+    totalQ18: 0,
+    totalLegio: 0,
+    totalQualiteAir: 0,
   },
   setTotalMaintenance: () => {},
 });
@@ -29,6 +32,9 @@ const TotalMaintenanceProvider = ({ children }: PropsWithChildren) => {
   const [totalMaintenance, setTotalMaintenance] =
     useState<TotalMaintenanceType>({
       totalService: 0,
+      totalQ18: 0,
+      totalLegio: 0,
+      totalQualiteAir: 0,
     });
 
   useEffect(() => {

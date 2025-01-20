@@ -128,6 +128,9 @@ export const fullReinitialisationDevis = (
     },
     prix: {
       tauxHoraire: 0,
+      prixQ18: 0,
+      prixLegio: 0,
+      prixQualiteAir: 0,
     },
   });
   setIncendie({
@@ -243,6 +246,9 @@ export const fullReinitialisationDevis = (
   });
   setTotalMaintenance({
     totalService: 0,
+    totalQ18: 0,
+    totalLegio: 0,
+    totalQualiteAir: 0,
   });
   setTotalIncendie({
     totalService: 0,
