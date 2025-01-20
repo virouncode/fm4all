@@ -90,5 +90,6 @@ export const reinitialisationNettoyageHygiene = (
     totalParfum: 0,
     totalBalai: 0,
     totalPoubelle: 0,
+    totalInstallation: 0,
   });
 };
