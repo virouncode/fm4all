@@ -225,6 +225,62 @@
       "when": 1737111096748,
       "tag": "0031_material_warstar",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1737377386906,
+      "tag": "0032_chubby_wendell_vaughn",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1737377432266,
+      "tag": "0033_demonic_phalanx",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1737377544661,
+      "tag": "0034_aromatic_toad",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1737378750994,
+      "tag": "0035_perpetual_secret_warriors",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1737378817532,
+      "tag": "0036_massive_lady_ursula",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1737378829498,
+      "tag": "0037_loud_callisto",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1737378996282,
+      "tag": "0038_purple_famine",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1737379501425,
+      "tag": "0039_friendly_psynapse",
+      "breakpoints": true
     }
   ]
 }

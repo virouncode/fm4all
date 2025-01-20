@@ -128,6 +128,7 @@ const NettoyagePropositions = ({
         totalParfum: 0,
         totalBalai: 0,
         totalPoubelle: 0,
+        totalInstallation: 0,
       });
       return;
     }
@@ -319,7 +320,6 @@ const NettoyagePropositions = ({
           nbDistribEmp * prixDistribEmp +
             nbDistribSavon * prixDistribSavon +
             nbDistribPh * prixDistribPh +
-            prixInstalDistrib +
             (paParPersonneEmp + paParPersonneSavon + paParPersonnePh) *
               (client.effectif ?? 0)
         )
@@ -345,6 +345,7 @@ const NettoyagePropositions = ({
       totalParfum,
       totalBalai,
       totalPoubelle,
+      totalInstallation: prixInstalDistrib,
     });
   };
 

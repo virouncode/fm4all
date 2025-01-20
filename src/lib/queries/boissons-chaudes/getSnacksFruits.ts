@@ -27,10 +27,7 @@ export const getFruitsQuantites = async () => {
     const validatedResults = results.map((result) =>
       selectFruitsQuantitesSchema.parse(result)
     );
-    return validatedResults.map((result) => ({
-      ...result,
-      kgParSemaine: result.kgParSemaine / RATIO,
-    }));
+    return validatedResults;
   } catch (err) {
     errorHelper(err);
   }

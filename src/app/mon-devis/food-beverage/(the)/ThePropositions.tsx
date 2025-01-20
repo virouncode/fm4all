@@ -109,14 +109,7 @@ const ThePropositions = ({
   };
 
   const nbPersonnes = the.quantites.nbPersonnes;
-  // const cafeQuantite = cafeQuantites.find(
-  //   (quantite) => quantite.effectif === roundEffectif(nbPersonnes / 0.15)
-  // );
-  const cafeQuantite = cafeQuantites.find(
-    (quantite) => quantite.effectif === client.effectif
-  );
-  const nbCafesParAn = cafeQuantite?.nbCafesParAn ?? 0;
-  const nbThesParAn = nbCafesParAn * 0.15;
+  const nbThesParAn = nbPersonnes * 400 * 0.15;
   const nbTassesParJour = (client.effectif ?? 0) * 2 * 0.15;
 
   const propositions =

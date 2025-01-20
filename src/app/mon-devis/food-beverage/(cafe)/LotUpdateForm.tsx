@@ -64,6 +64,7 @@ const LotUpdateForm = ({
   //Pour la première machine et les autres : Je ne change pas de fournisseur ni de gamme, je mets juste le total à jour
 
   const handleChangeTypeBoissons = (value: string) => {
+    const nbPersonnes = lot.quantites.nbPersonnes;
     //JE N'AI PAS DE FOURNISSEUR
     if (!cafe.infos.fournisseurId) {
       setCafe((prev) => ({
@@ -84,14 +85,12 @@ const LotUpdateForm = ({
     }
     //J'ai un fournisseur, je dois mettre à jour les prix et les caractéristiques de la machine
     const cafeQuantite = cafeQuantites.find(
-      ({ effectif }) => effectif === roundEffectif(lot.quantites.nbPersonnes)
+      ({ effectif }) => effectif === roundEffectif(nbPersonnes)
     );
     const nbMachines =
       (lot.quantites.nbMachines || cafeQuantite?.nbMachines) ?? 0;
-    const nbTassesParAn = cafeQuantite?.nbCafesParAn ?? 0;
-    const nbTassesParJParMachine = Math.round(
-      (roundEffectif(lot.quantites.nbPersonnes) * 2) / nbMachines
-    );
+    const nbTassesParAn = nbPersonnes * 400;
+    const nbTassesParJParMachine = Math.round((nbPersonnes * 2) / nbMachines);
     const limiteTassesJParMachine = toLimiteBoissonsParJParMachine(
       nbTassesParJParMachine
     );
@@ -220,20 +219,20 @@ const LotUpdateForm = ({
     const prixUnitaireConsoCafe =
       cafeConsoTarifs.find(
         (item) =>
-          item.effectif === roundEffectif(lot.quantites.nbPersonnes) &&
+          item.effectif === roundEffectif(nbPersonnes) &&
           item.fournisseurId === cafe.infos.fournisseurId &&
           item.gamme === lot.infos.gammeCafeSelected
       )?.prixUnitaire ?? 0;
     const prixUnitaireConsoLait =
       laitConsoTarifs.find(
         (item) =>
-          item.effectif === roundEffectif(lot.quantites.nbPersonnes) &&
+          item.effectif === roundEffectif(nbPersonnes) &&
           item.fournisseurId === cafe.infos.fournisseurId
       )?.prixUnitaire ?? 0;
     const prixUnitaireConsoChocolat =
       chocoConsoTarifs.find(
         (item) =>
-          item.effectif === roundEffectif(lot.quantites.nbPersonnes) &&
+          item.effectif === roundEffectif(nbPersonnes) &&
           item.fournisseurId === cafe.infos.fournisseurId
       )?.prixUnitaire ?? 0;
     const prixAnnuelConso =
@@ -326,9 +325,9 @@ const LotUpdateForm = ({
     );
     const nbMachines =
       (lot.quantites.nbMachines || cafeQuantite?.nbMachines) ?? 0;
-    const nbTassesParAn = cafeQuantite?.nbCafesParAn as number;
+    const nbTassesParAn = newNbPersonnes * 400;
     const nbTassesParJParMachine = Math.round(
-      (roundEffectif(newNbPersonnes) * 2) / nbMachines
+      (newNbPersonnes * 2) / nbMachines
     );
     const limiteTassesJParMachine = toLimiteBoissonsParJParMachine(
       nbTassesParJParMachine
@@ -547,6 +546,7 @@ const LotUpdateForm = ({
   };
 
   const handleSelectDureeLocation = (value: string) => {
+    const nbPersonnes = lot.quantites.nbPersonnes;
     //Si j'ai pas de fournisseur encore, je change juste la duree de Location
     if (!cafe.infos.fournisseurId) {
       setCafe((prev) => ({
@@ -560,15 +560,12 @@ const LotUpdateForm = ({
     }
     //Si j'ai un fournisseur, je dois mettre à jour les prix et les caractéristiques de la machine
     const cafeQuantite = cafeQuantites.find(
-      ({ effectif }) => effectif === roundEffectif(lot.quantites.nbPersonnes)
+      ({ effectif }) => effectif === roundEffectif(nbPersonnes)
     );
-
     const nbMachines =
       (lot.quantites.nbMachines || cafeQuantite?.nbMachines) ?? 0;
-    const nbCafesParAn = cafeQuantite?.nbCafesParAn as number;
-    const nbTassesParJParMachine = Math.round(
-      (roundEffectif(lot.quantites.nbPersonnes) * 2) / nbMachines
-    );
+    const nbCafesParAn = nbPersonnes * 400;
+    const nbTassesParJParMachine = Math.round((nbPersonnes * 2) / nbMachines);
     const limiteTassesJParMachine = toLimiteBoissonsParJParMachine(
       nbTassesParJParMachine
     );
@@ -657,20 +654,20 @@ const LotUpdateForm = ({
     const prixUnitaireConsoCafe =
       cafeConsoTarifs.find(
         (item) =>
-          item.effectif === roundEffectif(lot.quantites.nbPersonnes) &&
+          item.effectif === roundEffectif(nbPersonnes) &&
           item.fournisseurId === cafe.infos.fournisseurId &&
           item.gamme === lot.infos.gammeCafeSelected
       )?.prixUnitaire ?? 0;
     const prixUnitaireConsoLait =
       laitConsoTarifs.find(
         (item) =>
-          item.effectif === roundEffectif(lot.quantites.nbPersonnes) &&
+          item.effectif === roundEffectif(nbPersonnes) &&
           item.fournisseurId === cafe.infos.fournisseurId
       )?.prixUnitaire ?? 0;
     const prixUnitaireConsoChocolat =
       chocoConsoTarifs.find(
         (item) =>
-          item.effectif === roundEffectif(lot.quantites.nbPersonnes) &&
+          item.effectif === roundEffectif(nbPersonnes) &&
           item.fournisseurId === cafe.infos.fournisseurId
       )?.prixUnitaire ?? 0;
     const prixAnnuelConso =

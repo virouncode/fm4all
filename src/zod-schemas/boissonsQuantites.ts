@@ -5,8 +5,16 @@ export const selectBoissonsQuantitesSchema = createSelectSchema(
   boissonsQuantites,
   {
     effectif: (schema) => schema.min(1, "L'effectif est obligatoire"),
-    consosParSemaine: (schema) =>
-      schema.min(1, "Le nombre de consommations par semaine est obligatoire"),
+    consosParSemaineParPersonne: (schema) =>
+      schema.min(
+        1,
+        "Le nombre de consommations par semaine par personne est obligatoire"
+      ),
+    minConsosParSemaine: (schema) =>
+      schema.min(
+        1,
+        "Le nombre minimum de consommations par semaine est obligatoire"
+      ),
   }
 );
 

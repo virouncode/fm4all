@@ -13,6 +13,7 @@ const TotalHygiene = () => {
     totalParfum,
     totalBalai,
     totalPoubelle,
+    totalInstallation,
   } = totalHygiene;
   const total = Math.round(
     totalTrilogie + totalDesinfectant + totalParfum + totalBalai + totalPoubelle
@@ -79,10 +80,22 @@ const TotalHygiene = () => {
               </p>
             </div>
           ) : null}
+          {totalInstallation ? (
+            <div className="flex items-center justify-between">
+              <p>Installation</p>
+              <p className="text-end">{formatNumber(totalInstallation)} € HT</p>
+            </div>
+          ) : null}
           <div className="flex items-center justify-between border-t border-foreground mt-2">
             <p>TOTAL</p>
             <p className="text-end">{total} € HT / an</p>
           </div>
+          {totalInstallation ? (
+            <div className="flex justify-between w-full">
+              <p>TOTAL INSTALLATION</p>
+              <p className="text-end">{formatNumber(totalInstallation)} € HT</p>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

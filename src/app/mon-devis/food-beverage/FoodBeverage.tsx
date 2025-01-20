@@ -18,6 +18,7 @@ import {
 } from "@/lib/queries/boissons-chaudes/getSnacksFruits";
 import Link from "next/link";
 import Cafe from "./(cafe)/Cafe";
+import Fontaine from "./(fontaine)/Fontaine";
 import SnacksFruits from "./(snacks)/SnacksFruits";
 import The from "./(the)/The";
 
@@ -104,6 +105,7 @@ const FoodBeverage = async () => {
         boissonsTarifs={boissonsTarifs}
         foodLivraisonTarifs={foodLivraisonTarifs}
       />
+      <Fontaine />
     </section>
   );
 };

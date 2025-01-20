@@ -22,6 +22,7 @@ export const TotalHygieneContext = createContext<{
     totalParfum: 0,
     totalBalai: 0,
     totalPoubelle: 0,
+    totalInstallation: 0,
   },
   setTotalHygiene: () => {},
 });
@@ -36,6 +37,7 @@ const TotalHygieneProvider = ({ children }: PropsWithChildren) => {
     totalParfum: 0,
     totalBalai: 0,
     totalPoubelle: 0,
+    totalInstallation: 0,
   });
 
   useEffect(() => {

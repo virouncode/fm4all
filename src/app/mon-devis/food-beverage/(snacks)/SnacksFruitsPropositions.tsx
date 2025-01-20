@@ -23,6 +23,9 @@ type SnacksFruitsPropositionsType = {
     fruitsKgParSemaine: number;
     snacksPortionsParSemaine: number;
     boissonsConsosParSemaine: number;
+    gFruitsParSemaineParPersonne: number;
+    portionsSnacksParSemaineParPersonne: number;
+    consosBoissonsParSemaineParPersonne: number;
     prixKgFruits: number;
     prixUnitaireSnacks: number;
     prixUnitaireBoissons: number;
@@ -55,6 +58,9 @@ const SnacksFruitsPropositions = ({
     fruitsKgParSemaine: number;
     snacksPortionsParSemaine: number;
     boissonsConsosParSemaine: number;
+    gFruitsParSemaineParPersonne: number;
+    portionsSnacksParSemaineParPersonne: number;
+    consosBoissonsParSemaineParPersonne: number;
     prixKgFruits: number;
     prixUnitaireSnacks: number;
     prixUnitaireBoissons: number;
@@ -266,39 +272,17 @@ const SnacksFruitsPropositions = ({
                 const prixAnnuelText = proposition.total
                   ? `${formatNumber(proposition.total)} € /an`
                   : "Non proposé";
-                const fruitsKgParSemaineText =
+                const gFruitsParSemaineParPersonneText =
                   snacksFruits.infos.choix.includes("fruits")
-                    ? `${
-                        proposition.fruitsKgParSemaine /
-                          snacksFruits.quantites.nbPersonnes <
-                        1
-                          ? `${
-                              Math.round(
-                                ((proposition.fruitsKgParSemaine /
-                                  snacksFruits.quantites.nbPersonnes) *
-                                  1000) /
-                                  10
-                              ) * 10
-                            } g de fruits / personne / semaine`
-                          : `${(
-                              proposition.fruitsKgParSemaine /
-                              snacksFruits.quantites.nbPersonnes
-                            ).toFixed(2)} kg de fruits / personne / semaine`
-                      }`
+                    ? `${proposition.gFruitsParSemaineParPersonne} g / personne / semaine`
                     : "";
-                const snacksPortionsParSemaineText =
+                const portionsSnacksParSemaineParPersonneText =
                   snacksFruits.infos.choix.includes("snacks")
-                    ? `${Math.round(
-                        proposition.snacksPortionsParSemaine /
-                          snacksFruits.quantites.nbPersonnes
-                      )} portions de snacks / personne / semaine`
+                    ? `${proposition.portionsSnacksParSemaineParPersonne} portions / personne / semaine`
                     : "";
-                const boissonsConsosParSemaineText =
+                const consosBoissonsParSemaineParPersonneText =
                   snacksFruits.infos.choix.includes("boissons")
-                    ? `${Math.round(
-                        proposition.boissonsConsosParSemaine /
-                          snacksFruits.quantites.nbPersonnes
-                      )} boissons / personne / semaine`
+                    ? `${proposition.consosBoissonsParSemaineParPersonne} consos / personne / semaine`
                     : "";
 
                 return (
@@ -326,17 +310,19 @@ const SnacksFruitsPropositions = ({
                     />
                     <div>
                       <p className="font-bold">{prixAnnuelText}</p>
-                      {fruitsKgParSemaineText ? (
-                        <p className="text-xs">{fruitsKgParSemaineText}</p>
-                      ) : null}
-                      {snacksPortionsParSemaineText ? (
+                      {gFruitsParSemaineParPersonneText ? (
                         <p className="text-xs">
-                          {snacksPortionsParSemaineText}
+                          {gFruitsParSemaineParPersonneText}
                         </p>
                       ) : null}
-                      {boissonsConsosParSemaineText ? (
+                      {portionsSnacksParSemaineParPersonneText ? (
                         <p className="text-xs">
-                          {boissonsConsosParSemaineText}
+                          {portionsSnacksParSemaineParPersonneText}
+                        </p>
+                      ) : null}
+                      {consosBoissonsParSemaineParPersonneText ? (
+                        <p className="text-xs">
+                          {consosBoissonsParSemaineParPersonneText}
                         </p>
                       ) : null}
                     </div>

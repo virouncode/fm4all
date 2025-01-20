@@ -323,16 +323,8 @@ export const theConsoTarifs = pgTable("the_conso_tarifs", {
 
 export const fruitsQuantites = pgTable("fruits_quantites", {
   id: serial().primaryKey(),
-  effectif: integer().notNull(),
-  kgParSemaine: integer("kg_par_semaine").notNull(),
-  gamme: gammeEnum().notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
-
-export const tempfruitsQuantites = pgTable("temp_fruits_quantites", {
-  id: serial().primaryKey(),
-  effectif: integer().notNull(),
-  kgParSemaine: integer("kg_par_semaine").notNull(),
+  gParSemaineParPersonne: integer("g_par_semaine_par_personne").notNull(),
+  minKgParSemaine: integer("min_kg_par_semaine").notNull(),
   gamme: gammeEnum().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
@@ -350,8 +342,10 @@ export const fruitsTarifs = pgTable("fruits_tarifs", {
 
 export const snacksQuantites = pgTable("snacks_quantites", {
   id: serial().primaryKey(),
-  effectif: integer().notNull(),
-  portionsParSemaine: integer("portions_par_semaine").notNull(),
+  portionsParSemaineParPersonne: integer(
+    "portions_par_semaine_par_personne"
+  ).notNull(),
+  minPortionsParSemaine: integer("min_portions_par_semaine").notNull(),
   gamme: gammeEnum().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
@@ -369,9 +363,11 @@ export const snacksTarifs = pgTable("snacks_tarifs", {
 
 export const boissonsQuantites = pgTable("boissons_quantites", {
   id: serial().primaryKey(),
-  effectif: integer().notNull(),
-  consosParSemaine: integer("consos_par_semaine").notNull(),
+  consosParSemaineParPersonne: integer(
+    "consos_par_semaine_par_personne"
+  ).notNull(),
   gamme: gammeEnum().notNull(),
+  minConsosParSemaine: integer("min_consos_par_semaine").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -400,12 +396,12 @@ export const foodLivraisonTarifs = pgTable("food_livraison_tarifs", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const eauQuantites = pgTable("eau_quantites", {
-  id: serial().primaryKey(),
-  effectif: integer().notNull(),
-  nbFontaines: integer("nb_fontaines").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
+// export const eauQuantites = pgTable("eau_quantites", {
+//   id: serial().primaryKey(),
+//   effectif: integer().notNull(),
+//   nbFontaines: integer("nb_fontaines").notNull(),
+//   createdAt: timestamp("created_at").notNull().defaultNow(),
+// });
 
 //RELATIONS
 export const fournisseursRelations = relations(

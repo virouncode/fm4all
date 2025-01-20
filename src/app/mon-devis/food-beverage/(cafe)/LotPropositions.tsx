@@ -342,13 +342,12 @@ const LotPropositions = ({
           return;
         }
         //selection existante je recalcule tout
-        const nbPersonnes = item.quantites.nbPersonnes;
         const cafeQuantite = cafeQuantites.find(
-          (quantite) => quantite.effectif === nbPersonnes
+          (quantite) => quantite.effectif === roundEffectif(nbPersonnes)
         );
         const nbMachines =
           (item.quantites.nbMachines || cafeQuantite?.nbMachines) ?? 1;
-        const nbTassesParAn = cafeQuantite?.nbCafesParAn ?? 0;
+        const nbTassesParAn = nbPersonnes * 400;
         const nbTassesParJParMachine = Math.round(
           (nbPersonnes * 2) / nbMachines
         );
@@ -377,20 +376,20 @@ const LotPropositions = ({
         const prixUnitaireConsoCafe =
           cafeConsoTarifs.find(
             (tarif) =>
-              tarif.effectif === nbPersonnes &&
+              tarif.effectif === roundEffectif(nbPersonnes) &&
               tarif.fournisseurId === fournisseurId &&
               tarif.gamme === item.infos.gammeCafeSelected
           )?.prixUnitaire ?? 0;
         const prixUnitaireConsoLait =
           laitConsoTarifs.find(
             (tarif) =>
-              tarif.effectif === nbPersonnes &&
+              tarif.effectif === roundEffectif(nbPersonnes) &&
               tarif.fournisseurId === fournisseurId
           )?.prixUnitaire ?? 0;
         const prixUnitaireConsoChocolat =
           chocoConsoTarifs.find(
             (tarif) =>
-              tarif.effectif === nbPersonnes &&
+              tarif.effectif === roundEffectif(nbPersonnes) &&
               tarif.fournisseurId === fournisseurId
           )?.prixUnitaire ?? 0;
         const prixAnnuelConso =
@@ -447,21 +446,15 @@ const LotPropositions = ({
         totalMachines: newTotalMachines,
       });
       if (the.infos.gammeSelected) {
-        const cafeQuantite = cafeQuantites.find(
-          (quantite) =>
-            quantite.effectif ===
-            roundEffectif(the.quantites.nbPersonnes / 0.15)
-        );
-        const nbTassesParAn = cafeQuantite?.nbCafesParAn ?? 0;
+        const nbTassesParAn = nbPersonnes * 400 * 0.15;
         const theConsoTarif = theConsoTarifs.find(
           (tarif) =>
-            tarif.effectif ===
-              roundEffectif(the.quantites.nbPersonnes / 0.15) &&
+            tarif.effectif === the.quantites.nbPersonnes &&
             tarif.fournisseurId === fournisseurId &&
             tarif.gamme === the.infos.gammeSelected
         );
         const prixUnitaireThe = theConsoTarif?.prixUnitaire ?? 0;
-        const totalThe = nbTassesParAn * prixUnitaireThe * 0.15;
+        const totalThe = nbTassesParAn * prixUnitaireThe;
         setThe((prev) => ({
           ...prev,
           prix: {
@@ -568,17 +561,16 @@ const LotPropositions = ({
   };
 
   //Formatter les propositions de machines à café
+  //Trouver les machines
   const cafeLotsMachinesIds = cafe.lotsMachines.map((lot) => lot.infos.lotId);
   const cafeQuantite = cafeQuantites.find(
     ({ effectif }) => effectif === roundEffectif(lot.quantites.nbPersonnes)
   );
+  const nbPersonnes = lot.quantites.nbPersonnes;
   const nbMachines =
     (lot.quantites.nbMachines || cafeQuantite?.nbMachines) ?? 0;
-  const nbTassesParAn = cafeQuantite?.nbCafesParAn ?? 0;
   const nbTassesParJ = roundEffectif(lot.quantites.nbPersonnes) * 2;
-  const nbTassesParJParMachine = Math.round(
-    (roundEffectif(lot.quantites.nbPersonnes) * 2) / nbMachines
-  );
+  const nbTassesParJParMachine = Math.round((nbPersonnes * 2) / nbMachines);
   const limiteTassesJParMachine = toLimiteBoissonsParJParMachine(
     nbTassesParJParMachine
   );
@@ -588,7 +580,7 @@ const LotPropositions = ({
       tarif.type === lot.infos.typeBoissons &&
       tarif[cafe.infos.dureeLocation] !== null
   );
-
+  //Fournisseurs compatibles
   const fournisseursCompatiblesIds = machinesTarifs?.map(
     ({ fournisseurId }) => fournisseurId
   );
@@ -614,10 +606,12 @@ const LotPropositions = ({
       ? [cafe.infos.fournisseurId] //1 seul fournisseur
       : machinesTarifs?.map(({ fournisseurId }) => fournisseurId); //tous les fournisseurs qui ont une offre pour ce typede boissons, cette duree de loc et cette limite de tasses par jour
 
+  const nbTassesParAn = nbPersonnes * 400;
+
   const propositions = cafeConsoTarifs
     .filter(
       (tarif) =>
-        tarif.effectif === roundEffectif(lot.quantites.nbPersonnes) &&
+        tarif.effectif === roundEffectif(nbPersonnes) &&
         fournisseursIds.includes(tarif.fournisseurId)
     )
     .map((tarif) => {
@@ -798,7 +792,7 @@ const LotPropositions = ({
                   ? `${formatNumber(proposition.prixAnnuel)} € /an*`
                   : "Non proposé";
                 const prixInstallationText = proposition.prixInstallation
-                  ? `${formatNumber(
+                  ? `+ ${formatNumber(
                       proposition.prixInstallation
                     )} € d'installation`
                   : "";

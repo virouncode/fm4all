@@ -21,7 +21,7 @@ import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
 import { DureeLocationHygieneType } from "@/zod-schemas/dureeLocation";
-import { gammes, GammeType } from "@/zod-schemas/gamme";
+import { gammes } from "@/zod-schemas/gamme";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
@@ -47,13 +47,24 @@ const HygienePropositions = ({
   const { setTotalHygiene } = useContext(TotalHygieneContext);
 
   const handleClickProposition = (proposition: {
-    gamme: GammeType;
+    gamme: "essentiel" | "confort" | "excellence";
     nbDistribEmp: number;
     nbDistribSavon: number;
     nbDistribPh: number;
-    prixAnnuel: number;
+    prixDistribEmp: number;
+    prixDistribSavon: number;
+    prixDistribPh: number;
+    prixInstalDistrib: number;
+    prixAnnuelTrilogie: number;
   }) => {
-    const { gamme, prixAnnuel } = proposition;
+    const {
+      gamme,
+      prixDistribEmp,
+      prixDistribSavon,
+      prixDistribPh,
+      prixInstalDistrib,
+      prixAnnuelTrilogie,
+    } = proposition;
 
     //Je décoche la proposition
     if (gamme === hygiene.infos.trilogieGammeSelected) {
@@ -64,18 +75,14 @@ const HygienePropositions = ({
           trilogieGammeSelected: null,
         },
         prix: {
+          ...prev.prix,
           prixDistribEmp: null,
           prixDistribSavon: null,
           prixDistribPh: null,
-          prixDistribDesinfectant: null,
-          prixDistribParfum: null,
-          prixDistribBalai: null,
-          prixDistribPoubelle: null,
           prixInstalDistrib: null,
           paParPersonneEmp: null,
           paParPersonneSavon: null,
           paParPersonnePh: null,
-          paParPersonneDesinfectant: null,
         },
       }));
       setTotalHygiene((prev) => ({
@@ -85,47 +92,10 @@ const HygienePropositions = ({
         totalParfum: 0,
         totalBalai: 0,
         totalPoubelle: 0,
+        totalInstallation: 0,
       }));
       return;
     }
-    //Je coche la proposition
-    const prixDistribEmp =
-      hygieneDistribTarifsFournisseur?.find(
-        (tarif) => tarif.type === "emp" && tarif.gamme === gamme
-      )?.[hygiene.infos.dureeLocation] ?? 0;
-    const prixDistribSavon =
-      hygieneDistribTarifsFournisseur?.find(
-        (tarif) => tarif.type === "savon" && tarif.gamme === gamme
-      )?.[hygiene.infos.dureeLocation] ?? 0;
-    const prixDistribPh =
-      hygieneDistribTarifsFournisseur?.find(
-        (tarif) => tarif.type === "ph" && tarif.gamme === gamme
-      )?.[hygiene.infos.dureeLocation] ?? 0;
-    const prixDistribDesinfectant =
-      hygieneDistribTarifsFournisseur?.find(
-        (tarif) =>
-          tarif.type === "desinfectant" &&
-          tarif.gamme === hygiene.infos.desinfectantGammeSelected
-      )?.[hygiene.infos.dureeLocation] ?? 0;
-    const prixDistribParfum =
-      hygieneDistribTarifsFournisseur?.find(
-        (tarif) =>
-          tarif.type === "parfum" &&
-          tarif.gamme === hygiene.infos.parfumGammeSelected
-      )?.[hygiene.infos.dureeLocation] ?? 0;
-    const prixDistribBalai =
-      hygieneDistribTarifsFournisseur?.find(
-        (tarif) =>
-          tarif.type === "balai" &&
-          tarif.gamme === hygiene.infos.balaiGammeSelected
-      )?.[hygiene.infos.dureeLocation] ?? 0;
-    const prixDistribPoubelle =
-      hygieneDistribTarifsFournisseur?.find(
-        (tarif) =>
-          tarif.type === "poubelle" &&
-          tarif.gamme === hygiene.infos.poubelleGammeSelected
-      )?.[hygiene.infos.dureeLocation] ?? 0;
-
     setHygiene((prev) => ({
       ...prev,
       infos: {
@@ -133,23 +103,29 @@ const HygienePropositions = ({
         trilogieGammeSelected: gamme,
       },
       prix: {
+        ...prev.prix,
         prixDistribEmp,
         prixDistribSavon,
         prixDistribPh,
-        prixDistribDesinfectant,
-        prixDistribParfum,
-        prixDistribBalai,
-        prixDistribPoubelle,
         prixInstalDistrib,
         paParPersonneEmp,
         paParPersonneSavon,
         paParPersonnePh,
-        paParPersonneDesinfectant,
       },
     }));
-
     //Calculer total hygiene
-    const totalTrilogie = prixAnnuel;
+    const totalTrilogie = prixAnnuelTrilogie;
+    const nbDistribDesinfectant = hygiene.quantites.nbDistribDesinfectant ?? 0;
+    const nbDistribParfum = hygiene.quantites.nbDistribParfum ?? 0;
+    const nbDistribBalai = hygiene.quantites.nbDistribBalai ?? 0;
+    const nbDistribPoubelle = hygiene.quantites.nbDistribPoubelle ?? 0;
+    const prixDistribDesinfectant = hygiene.prix.prixDistribDesinfectant ?? 0;
+    const prixDistribParfum = hygiene.prix.prixDistribParfum ?? 0;
+    const prixDistribBalai = hygiene.prix.prixDistribBalai ?? 0;
+    const prixDistribPoubelle = hygiene.prix.prixDistribPoubelle ?? 0;
+    const paParPersonneDesinfectant =
+      hygiene.prix.paParPersonneDesinfectant ?? 0;
+
     const totalDesinfectant = hygiene.infos.desinfectantGammeSelected
       ? nbDistribDesinfectant * prixDistribDesinfectant +
         paParPersonneDesinfectant
@@ -163,13 +139,13 @@ const HygienePropositions = ({
     const totalPoubelle = hygiene.infos.poubelleGammeSelected
       ? nbDistribPoubelle * prixDistribPoubelle
       : 0;
-
     setTotalHygiene({
       totalTrilogie,
       totalDesinfectant,
       totalParfum,
       totalBalai,
       totalPoubelle,
+      totalInstallation: prixInstalDistrib,
     });
   };
 
@@ -178,26 +154,77 @@ const HygienePropositions = ({
     type: string
   ) => {
     const value = e.target.value;
-    const gamme = hygiene.infos.trilogieGammeSelected;
+    if (!hygiene.infos.trilogieGammeSelected) {
+      switch (type) {
+        case "emp":
+          const newNbDistribEmp = value
+            ? parseInt(value)
+            : hygieneDistribQuantite?.nbDistribEmp ?? 0;
+          setHygiene((prev) => ({
+            ...prev,
+            quantites: {
+              ...prev.quantites,
+              nbDistribEmp: newNbDistribEmp,
+            },
+          }));
+          break;
+        case "savon":
+          const newNbDistribSavon = value
+            ? parseInt(value)
+            : hygieneDistribQuantite?.nbDistribSavon ?? 0;
+          setHygiene((prev) => ({
+            ...prev,
+            quantites: {
+              ...prev.quantites,
+              nbDistribSavon: newNbDistribSavon,
+            },
+          }));
+          break;
+        case "ph":
+          const newNbDistribPh = value
+            ? parseInt(value)
+            : hygieneDistribQuantite?.nbDistribPh ?? 0;
+          setHygiene((prev) => ({
+            ...prev,
+            quantites: {
+              ...prev.quantites,
+              nbDistribPh: newNbDistribPh,
+            },
+          }));
+          break;
+      }
+      return;
+    }
 
+    const gamme = hygiene.infos.trilogieGammeSelected;
+    const fournisseurId = hygiene.infos.fournisseurId;
     const prixDistribEmp =
       hygieneDistribTarifs.find(
-        (item) => item.type === "emp" && item.gamme === gamme
+        (item) =>
+          item.type === "emp" &&
+          item.gamme === gamme &&
+          item.fournisseurId === fournisseurId
       )?.[dureeLocation] ?? 0;
     const prixDistribSavon =
       hygieneDistribTarifs.find(
-        (item) => item.type === "savon" && item.gamme === gamme
+        (item) =>
+          item.type === "savon" &&
+          item.gamme === gamme &&
+          item.fournisseurId === fournisseurId
       )?.[dureeLocation] ?? 0;
     const prixDistribPh =
       hygieneDistribTarifs.find(
-        (item) => item.type === "ph" && item.gamme === gamme
+        (item) =>
+          item.type === "ph" &&
+          item.gamme === gamme &&
+          item.fournisseurId === fournisseurId
       )?.[hygiene.infos.dureeLocation] ?? 0;
-    const prixInstalDistrib =
-      hygieneDistribInstalTarifs.find(
-        (item) => item.fournisseurId === hygiene.infos.fournisseurId
-      )?.prixInstallation ?? 0;
 
+    let totalEmp = 0;
+    let totalSavon = 0;
+    let totalPh = 0;
     let totalTrilogie = 0;
+
     switch (type) {
       case "emp":
         const newNbDistribEmp = value
@@ -210,22 +237,20 @@ const HygienePropositions = ({
             nbDistribEmp: newNbDistribEmp,
           },
         }));
-        totalTrilogie = gamme
-          ? Math.round(
-              newNbDistribEmp * prixDistribEmp +
-                nbDistribSavon * prixDistribSavon +
-                nbDistribPh * prixDistribPh +
-                prixInstalDistrib +
-                (paParPersonneEmp + paParPersonneSavon + paParPersonnePh) *
-                  (client.effectif ?? 0)
-            )
-          : 0;
-        if (hygiene.infos.trilogieGammeSelected) {
-          setTotalHygiene((prev) => ({
-            ...prev,
-            totalTrilogie,
-          }));
-        }
+        totalEmp =
+          newNbDistribEmp * prixDistribEmp +
+          paParPersonneEmp * (client.effectif ?? 0);
+        totalSavon =
+          nbDistribSavon * prixDistribSavon +
+          paParPersonneSavon * (client.effectif ?? 0);
+        totalPh =
+          nbDistribPh * prixDistribPh +
+          paParPersonnePh * (client.effectif ?? 0);
+        totalTrilogie = gamme ? Math.round(totalEmp + totalSavon + totalPh) : 0;
+        setTotalHygiene((prev) => ({
+          ...prev,
+          totalTrilogie,
+        }));
         break;
       case "savon":
         const newNbDistribSavon = value
@@ -238,22 +263,20 @@ const HygienePropositions = ({
             nbDistribSavon: newNbDistribSavon,
           },
         }));
-        totalTrilogie = gamme
-          ? Math.round(
-              nbDistribEmp * prixDistribEmp +
-                newNbDistribSavon * prixDistribSavon +
-                nbDistribPh * prixDistribPh +
-                prixInstalDistrib +
-                (paParPersonneEmp + paParPersonneSavon + paParPersonnePh) *
-                  (client.effectif ?? 0)
-            )
-          : 0;
-        if (hygiene.infos.trilogieGammeSelected) {
-          setTotalHygiene((prev) => ({
-            ...prev,
-            totalTrilogie,
-          }));
-        }
+        totalEmp =
+          nbDistribEmp * prixDistribEmp +
+          paParPersonneEmp * (client.effectif ?? 0);
+        totalSavon =
+          newNbDistribSavon * prixDistribSavon +
+          paParPersonneSavon * (client.effectif ?? 0);
+        totalPh =
+          nbDistribPh * prixDistribPh +
+          paParPersonnePh * (client.effectif ?? 0);
+        totalTrilogie = gamme ? Math.round(totalEmp + totalSavon + totalPh) : 0;
+        setTotalHygiene((prev) => ({
+          ...prev,
+          totalTrilogie,
+        }));
         break;
       case "ph":
         const newNbDistribPh = value
@@ -266,22 +289,20 @@ const HygienePropositions = ({
             nbDistribPh: newNbDistribPh,
           },
         }));
-        totalTrilogie = gamme
-          ? Math.round(
-              nbDistribEmp * prixDistribEmp +
-                nbDistribSavon * prixDistribSavon +
-                newNbDistribPh * prixDistribPh +
-                prixInstalDistrib +
-                (paParPersonneEmp + paParPersonneSavon + paParPersonnePh) *
-                  (client.effectif ?? 0)
-            )
-          : 0;
-        if (hygiene.infos.trilogieGammeSelected) {
-          setTotalHygiene((prev) => ({
-            ...prev,
-            totalTrilogie,
-          }));
-        }
+        totalEmp =
+          nbDistribEmp * prixDistribEmp +
+          paParPersonneEmp * (client.effectif ?? 0);
+        totalSavon =
+          nbDistribSavon * prixDistribSavon +
+          paParPersonneSavon * (client.effectif ?? 0);
+        totalPh =
+          newNbDistribPh * prixDistribPh +
+          paParPersonnePh * (client.effectif ?? 0);
+        totalTrilogie = gamme ? Math.round(totalEmp + totalSavon + totalPh) : 0;
+        setTotalHygiene((prev) => ({
+          ...prev,
+          totalTrilogie,
+        }));
         break;
     }
   };
@@ -291,62 +312,74 @@ const HygienePropositions = ({
       hygieneDistribTarifs.find(
         (tarif) =>
           tarif.type === "emp" &&
-          tarif.gamme === hygiene.infos.trilogieGammeSelected
+          tarif.gamme === hygiene.infos.trilogieGammeSelected &&
+          tarif.fournisseurId === hygiene.infos.fournisseurId
       )?.[value] ?? 0;
     const prixDistribSavon =
       hygieneDistribTarifs.find(
         (tarif) =>
           tarif.type === "savon" &&
-          tarif.gamme === hygiene.infos.trilogieGammeSelected
+          tarif.gamme === hygiene.infos.trilogieGammeSelected &&
+          tarif.fournisseurId === hygiene.infos.fournisseurId
       )?.[value] ?? 0;
     const prixDistribPh =
       hygieneDistribTarifs.find(
         (tarif) =>
           tarif.type === "ph" &&
-          tarif.gamme === hygiene.infos.trilogieGammeSelected
+          tarif.gamme === hygiene.infos.trilogieGammeSelected &&
+          tarif.fournisseurId === hygiene.infos.fournisseurId
       )?.[value] ?? 0;
     const prixDistribDesinfectant =
       hygieneDistribTarifs.find(
         (tarif) =>
           tarif.type === "desinfectant" &&
-          tarif.gamme === hygiene.infos.desinfectantGammeSelected
+          tarif.gamme === hygiene.infos.desinfectantGammeSelected &&
+          tarif.fournisseurId === hygiene.infos.fournisseurId
       )?.[value] ?? 0;
     const prixDistribParfum =
       hygieneDistribTarifs.find(
         (tarif) =>
           tarif.type === "parfum" &&
-          tarif.gamme === hygiene.infos.parfumGammeSelected
+          tarif.gamme === hygiene.infos.parfumGammeSelected &&
+          tarif.fournisseurId === hygiene.infos.fournisseurId
       )?.[value] ?? 0;
     const prixDistribBalai =
       hygieneDistribTarifs.find(
         (tarif) =>
           tarif.type === "balai" &&
-          tarif.gamme === hygiene.infos.balaiGammeSelected
+          tarif.gamme === hygiene.infos.balaiGammeSelected &&
+          tarif.fournisseurId === hygiene.infos.fournisseurId
       )?.[value] ?? 0;
     const prixDistribPoubelle =
       hygieneDistribTarifs.find(
         (tarif) =>
           tarif.type === "poubelle" &&
-          tarif.gamme === hygiene.infos.poubelleGammeSelected
+          tarif.gamme === hygiene.infos.poubelleGammeSelected &&
+          tarif.fournisseurId === hygiene.infos.fournisseurId
       )?.[value] ?? 0;
 
+    const nbDistribDesinfectant = hygiene.quantites.nbDistribDesinfectant ?? 0;
+    const nbDistribParfum = hygiene.quantites.nbDistribParfum ?? 0;
+    const nbDistribBalai = hygiene.quantites.nbDistribBalai ?? 0;
+    const nbDistribPoubelle = hygiene.quantites.nbDistribPoubelle ?? 0;
+    const paParPersonneDesinfectant =
+      hygiene.prix.paParPersonneDesinfectant ?? 0;
+
+    const totalEmp =
+      nbDistribEmp * prixDistribEmp + paParPersonneEmp * (client.effectif ?? 0);
+    const totalSavon =
+      nbDistribSavon * prixDistribSavon +
+      paParPersonneSavon * (client.effectif ?? 0);
+    const totalPh =
+      nbDistribPh * prixDistribPh + paParPersonnePh * (client.effectif ?? 0);
+
     const totalTrilogie = hygiene.infos.trilogieGammeSelected
-      ? nbDistribEmp * prixDistribEmp +
-        nbDistribSavon * prixDistribSavon +
-        nbDistribPh * prixDistribPh +
-        prixInstalDistrib +
-        (paParPersonneEmp + paParPersonneSavon + paParPersonnePh) *
-          (client.effectif ?? 0)
+      ? Math.round(totalEmp + totalSavon + totalPh)
       : 0;
     const totalDesinfectant = hygiene.infos.desinfectantGammeSelected
       ? nbDistribDesinfectant * prixDistribDesinfectant +
         (client.effectif ?? 0) * paParPersonneDesinfectant
       : 0;
-    console.log(
-      "desinfectantGammeSelected",
-      hygiene.infos.desinfectantGammeSelected
-    );
-    console.log("totalSDesinfectant", totalDesinfectant);
 
     const totalParfum = hygiene.infos.parfumGammeSelected
       ? nbDistribParfum * prixDistribParfum
@@ -375,13 +408,14 @@ const HygienePropositions = ({
       },
     }));
     if (hygiene.infos.trilogieGammeSelected) {
-      setTotalHygiene({
+      setTotalHygiene((prev) => ({
+        ...prev,
         totalTrilogie,
         totalDesinfectant,
         totalParfum,
         totalBalai,
         totalPoubelle,
-      });
+      }));
     }
   };
 
@@ -394,16 +428,6 @@ const HygienePropositions = ({
     hygiene.quantites.nbDistribSavon || hygieneDistribQuantite.nbDistribSavon;
   const nbDistribPh =
     hygiene.quantites.nbDistribPh || hygieneDistribQuantite.nbDistribPh;
-  const nbDistribDesinfectant =
-    hygiene.quantites.nbDistribDesinfectant ||
-    hygieneDistribQuantite.nbDistribDesinfectant;
-  const nbDistribParfum =
-    hygiene.quantites.nbDistribParfum || hygieneDistribQuantite.nbDistribParfum;
-  const nbDistribBalai =
-    hygiene.quantites.nbDistribBalai || hygieneDistribQuantite.nbDistribBalai;
-  const nbDistribPoubelle =
-    hygiene.quantites.nbDistribPoubelle ||
-    hygieneDistribQuantite.nbDistribPoubelle;
 
   //Tarifs distributeurs
   const dureeLocation = hygiene.infos.dureeLocation;
@@ -420,8 +444,6 @@ const HygienePropositions = ({
   const paParPersonneEmp = consosTarifFournisseur?.paParPersonneEmp ?? 0;
   const paParPersonneSavon = consosTarifFournisseur?.paParPersonneSavon ?? 0;
   const paParPersonnePh = consosTarifFournisseur?.paParPersonnePh ?? 0;
-  const paParPersonneDesinfectant =
-    consosTarifFournisseur?.paParPersonneDesinfectant ?? 0;
 
   const propositions = gammes.map((gamme) => {
     const prixDistribEmp =
@@ -439,11 +461,10 @@ const HygienePropositions = ({
         (tarif) => tarif.type === "ph" && tarif.gamme === gamme
       )?.[dureeLocation] ?? 0;
 
-    const prixAnnuel = Math.round(
+    const prixAnnuelTrilogie = Math.round(
       nbDistribEmp * prixDistribEmp +
         nbDistribSavon * prixDistribSavon +
         nbDistribPh * prixDistribPh +
-        prixInstalDistrib +
         (paParPersonneEmp + paParPersonneSavon + paParPersonnePh) *
           (client.effectif ?? 0)
     );
@@ -453,7 +474,11 @@ const HygienePropositions = ({
       nbDistribEmp,
       nbDistribSavon,
       nbDistribPh,
-      prixAnnuel,
+      prixDistribEmp,
+      prixDistribSavon,
+      prixDistribPh,
+      prixInstalDistrib,
+      prixAnnuelTrilogie,
     };
   });
 
@@ -599,9 +624,12 @@ const HygienePropositions = ({
               : gamme === "confort"
               ? "fm4allcomfort"
               : "fm4allexcellence";
-          const prixAnnuelText = proposition.prixAnnuel
-            ? `${formatNumber(proposition.prixAnnuel)} € / an`
+          const prixAnnuelText = proposition.prixAnnuelTrilogie
+            ? `${formatNumber(proposition.prixAnnuelTrilogie)} € / an`
             : "Non proposé";
+          const prixInstallationText = `+ ${formatNumber(
+            proposition.prixInstalDistrib
+          )} € d'installation`;
           return (
             <div
               className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer p-2 ${
@@ -640,6 +668,9 @@ const HygienePropositions = ({
                         : "36"
                     } mois`}
                 </p>
+                {prixInstallationText && (
+                  <p className="text-base">{prixInstallationText}</p>
+                )}
               </div>
             </div>
           );

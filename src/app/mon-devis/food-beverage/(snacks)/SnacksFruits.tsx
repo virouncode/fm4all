@@ -13,6 +13,7 @@ import { SelectSnacksQuantitesType } from "@/zod-schemas/snacksQuantites";
 import { SelectSnacksTarifsType } from "@/zod-schemas/snacksTarifs";
 import { Banana, Cookie, CupSoda } from "lucide-react";
 import { useContext } from "react";
+import PropositionsFooter from "../../mes-services/PropositionsFooter";
 import PropositionsTitle from "../../mes-services/PropositionsTitle";
 import SnacksFruitsUpdateForm from "./SnackFruitsUpdateForm";
 import SnacksFruitsPropositions from "./SnacksFruitsPropositions";
@@ -51,20 +52,18 @@ const SnacksFruits = ({
     }));
   };
 
+  const handleClickNext = () => {
+    setFoodBeverage((prev) => ({
+      ...prev,
+      currentFoodBeverageId: prev.currentFoodBeverageId + 1,
+    }));
+  };
+
   const nbPersonnes = snacksFruits.quantites.nbPersonnes;
-  const fruitsQuantitesPourNbPersonnes = fruitsQuantites.filter(
-    (item) => item.effectif === roundEffectif(nbPersonnes)
-  );
   const fruitsTarifsPourNbPersonnes = fruitsTarifs.filter(
     (item) => item.effectif === roundEffectif(nbPersonnes)
   );
-  const snacksQuantitesPourNbPersonnes = snacksQuantites.filter(
-    (item) => item.effectif === roundEffectif(nbPersonnes)
-  );
   const snacksTarifsPourNbPersonnes = snacksTarifs.filter(
-    (item) => item.effectif === roundEffectif(nbPersonnes)
-  );
-  const boissonsQuantitesPourNbPersonnes = boissonsQuantites.filter(
     (item) => item.effectif === roundEffectif(nbPersonnes)
   );
   const boissonsTarifsPourNbPersonnes = boissonsTarifs.filter(
@@ -80,19 +79,43 @@ const SnacksFruits = ({
       fournisseurId,
       prixKg,
     } = item;
-    //Quantites / semaine
+    //Quantites /  semaine / personne
+
+    const gFruitsParSemaineParPersonne =
+      fruitsQuantites.find((quantite) => quantite.gamme === gamme)
+        ?.gParSemaineParPersonne ?? 0;
+    const minKgFruitsParSemaine =
+      fruitsQuantites.find((quantite) => quantite.gamme === gamme)
+        ?.minKgParSemaine ?? 0;
+    const portionsSnacksParSemaineParPersonne =
+      snacksQuantites.find((quantite) => quantite.gamme === gamme)
+        ?.portionsParSemaineParPersonne ?? 0;
+    const minPortionsSnacksParSemaine =
+      snacksQuantites.find((quantite) => quantite.gamme === gamme)
+        ?.minPortionsParSemaine ?? 0;
+    const consosBoissonsParSemaineParPersonne =
+      boissonsQuantites.find((quantite) => quantite.gamme === gamme)
+        ?.consosParSemaineParPersonne ?? 0;
+    const minConsosBoissonsParSemaine =
+      boissonsQuantites.find((quantite) => quantite.gamme === gamme)
+        ?.minConsosParSemaine ?? 0;
+
     const fruitsKgParSemaine =
-      fruitsQuantitesPourNbPersonnes.find(
-        (quantite) => quantite.gamme === gamme
-      )?.kgParSemaine ?? 0;
+      (gFruitsParSemaineParPersonne * nbPersonnes) / 1000 >=
+      minKgFruitsParSemaine
+        ? (gFruitsParSemaineParPersonne * nbPersonnes) / 1000
+        : minKgFruitsParSemaine;
     const snacksPortionsParSemaine =
-      snacksQuantitesPourNbPersonnes.find(
-        (quantite) => quantite.gamme === gamme
-      )?.portionsParSemaine ?? 0;
+      portionsSnacksParSemaineParPersonne * nbPersonnes >=
+      minPortionsSnacksParSemaine
+        ? portionsSnacksParSemaineParPersonne * nbPersonnes
+        : minPortionsSnacksParSemaine;
     const boissonsConsosParSemaine =
-      boissonsQuantitesPourNbPersonnes.find(
-        (quantite) => quantite.gamme === gamme
-      )?.consosParSemaine ?? 0;
+      consosBoissonsParSemaineParPersonne * nbPersonnes >=
+      minConsosBoissonsParSemaine
+        ? consosBoissonsParSemaineParPersonne * nbPersonnes
+        : minConsosBoissonsParSemaine;
+
     //Tarifs / portion
     const prixKgFruits = prixKg ?? 0;
     const prixUnitaireSnacks =
@@ -154,6 +177,9 @@ const SnacksFruits = ({
       fruitsKgParSemaine,
       snacksPortionsParSemaine,
       boissonsConsosParSemaine,
+      gFruitsParSemaineParPersonne,
+      portionsSnacksParSemaineParPersonne,
+      consosBoissonsParSemaineParPersonne,
       //prix
       prixKgFruits,
       prixUnitaireSnacks,
@@ -185,6 +211,9 @@ const SnacksFruits = ({
         fruitsKgParSemaine: number;
         snacksPortionsParSemaine: number;
         boissonsConsosParSemaine: number;
+        gFruitsParSemaineParPersonne: number;
+        portionsSnacksParSemaineParPersonne: number;
+        consosBoissonsParSemaineParPersonne: number;
         prixKgFruits: number;
         prixUnitaireSnacks: number;
         prixUnitaireBoissons: number;
@@ -239,6 +268,7 @@ const SnacksFruits = ({
           formattedPropositions={formattedPropositions}
         />
       </div>
+      <PropositionsFooter handleClickNext={handleClickNext} />
     </div>
   );
 };

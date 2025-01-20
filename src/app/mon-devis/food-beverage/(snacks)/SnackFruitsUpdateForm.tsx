@@ -47,36 +47,54 @@ const SnacksFruitsUpdateForm = ({
     const newNbPersonnes = value ? parseInt(value) : client.effectif ?? 0;
 
     if (snacksFruits.infos.gammeSelected && snacksFruits.infos.fournisseurId) {
-      const fruitsQuantitesPourNbPersonnes = fruitsQuantites.filter(
-        (item) => item.effectif === roundEffectif(newNbPersonnes)
-      );
       const fruitsTarifsPourNbPersonnes = fruitsTarifs.filter(
-        (item) => item.effectif === roundEffectif(newNbPersonnes)
-      );
-      const snacksQuantitesPourNbPersonnes = snacksQuantites.filter(
         (item) => item.effectif === roundEffectif(newNbPersonnes)
       );
       const snacksTarifsPourNbPersonnes = snacksTarifs.filter(
         (item) => item.effectif === roundEffectif(newNbPersonnes)
       );
-      const boissonsQuantitesPourNbPersonnes = boissonsQuantites.filter(
-        (item) => item.effectif === roundEffectif(newNbPersonnes)
-      );
       const boissonsTarifsPourNbPersonnes = boissonsTarifs.filter(
         (item) => item.effectif === roundEffectif(newNbPersonnes)
       );
+      const gFruitsParSemaineParPersonne =
+        fruitsQuantites.find(
+          (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected
+        )?.gParSemaineParPersonne ?? 0;
+      const minKgFruitsParSemaine =
+        fruitsQuantites.find(
+          (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected
+        )?.minKgParSemaine ?? 0;
+      const portionsSnacksParSemaineParPersonne =
+        snacksQuantites.find(
+          (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected
+        )?.portionsParSemaineParPersonne ?? 0;
+      const minPortionsSnacksParSemaine =
+        snacksQuantites.find(
+          (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected
+        )?.minPortionsParSemaine ?? 0;
+      const consosBoissonsParSemaineParPersonne =
+        boissonsQuantites.find(
+          (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected
+        )?.consosParSemaineParPersonne ?? 0;
+      const minConsosBoissonsParSemaine =
+        boissonsQuantites.find(
+          (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected
+        )?.minConsosParSemaine ?? 0;
       const fruitsKgParSemaine =
-        fruitsQuantitesPourNbPersonnes.find(
-          ({ gamme }) => gamme === snacksFruits.infos.gammeSelected
-        )?.kgParSemaine ?? 0;
+        (gFruitsParSemaineParPersonne * newNbPersonnes) / 1000 >=
+        minKgFruitsParSemaine
+          ? (gFruitsParSemaineParPersonne * newNbPersonnes) / 1000
+          : minKgFruitsParSemaine;
       const snacksPortionsParSemaine =
-        snacksQuantitesPourNbPersonnes.find(
-          ({ gamme }) => gamme === snacksFruits.infos.gammeSelected
-        )?.portionsParSemaine ?? 0;
+        portionsSnacksParSemaineParPersonne * newNbPersonnes >=
+        minPortionsSnacksParSemaine
+          ? portionsSnacksParSemaineParPersonne * newNbPersonnes
+          : minPortionsSnacksParSemaine;
       const boissonsConsosParSemaine =
-        boissonsQuantitesPourNbPersonnes.find(
-          ({ gamme }) => gamme === snacksFruits.infos.gammeSelected
-        )?.consosParSemaine ?? 0;
+        consosBoissonsParSemaineParPersonne * newNbPersonnes >=
+        minConsosBoissonsParSemaine
+          ? consosBoissonsParSemaineParPersonne * newNbPersonnes
+          : minConsosBoissonsParSemaine;
       //Tarifs / portion
       const prixKgFruits =
         fruitsTarifsPourNbPersonnes.find(

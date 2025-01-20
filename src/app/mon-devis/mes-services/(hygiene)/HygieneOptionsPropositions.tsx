@@ -5,7 +5,7 @@ import { ClientContext } from "@/context/ClientProvider";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { formatNumber } from "@/lib/formatNumber";
-import { gammes, GammeType } from "@/zod-schemas/gamme";
+import { gammes } from "@/zod-schemas/gamme";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
@@ -29,19 +29,41 @@ const HygieneOptionsPropositions = ({
   const handleClickProposition = (
     type: string,
     proposition: {
-      gamme: GammeType;
-      prixAnnuelDesinfectant: number;
-      prixAnnuelParfum: number;
-      prixAnnuelBalai: number;
-      prixAnnuelPoubelle: number;
+      gamme: "essentiel" | "confort" | "excellence";
+      prixDistribDesinfectant: number;
+      prixDistribParfum: number;
+      prixDistribBalai: number;
+      prixDistribPoubelle: number;
+      paParPersonneDesinfectant: number;
+      totalDesinfectant: number;
+      totalParfum: number;
+      totalBalai: number;
+      totalPoubelle: number;
     }
   ) => {
+    const {
+      gamme,
+      prixDistribDesinfectant,
+      prixDistribParfum,
+      prixDistribBalai,
+      prixDistribPoubelle,
+      paParPersonneDesinfectant,
+      totalDesinfectant,
+      totalParfum,
+      totalBalai,
+      totalPoubelle,
+    } = proposition;
     switch (type) {
       case "desinfectant":
-        if (hygiene.infos.desinfectantGammeSelected === proposition.gamme) {
+        if (hygiene.infos.desinfectantGammeSelected === gamme) {
           setHygiene((prev) => ({
             ...prev,
             infos: { ...prev.infos, desinfectantGammeSelected: null },
+            prix: {
+              ...prev.prix,
+              prixDistribDesinfectant: 0,
+              paParPersonneDesinfectant: 0,
+            },
           }));
           setTotalHygiene((prev) => ({
             ...prev,
@@ -53,19 +75,28 @@ const HygieneOptionsPropositions = ({
           ...prev,
           infos: {
             ...prev.infos,
-            desinfectantGammeSelected: proposition.gamme,
+            desinfectantGammeSelected: gamme,
+          },
+          prix: {
+            ...prev.prix,
+            prixDistribDesinfectant,
+            paParPersonneDesinfectant,
           },
         }));
         setTotalHygiene((prev) => ({
           ...prev,
-          totalDesinfectant: proposition.prixAnnuelDesinfectant,
+          totalDesinfectant,
         }));
         return;
       case "parfum":
-        if (hygiene.infos.parfumGammeSelected === proposition.gamme) {
+        if (hygiene.infos.parfumGammeSelected === gamme) {
           setHygiene((prev) => ({
             ...prev,
             infos: { ...prev.infos, parfumGammeSelected: null },
+            prix: {
+              ...prev.prix,
+              prixDistribParfum: 0,
+            },
           }));
           setTotalHygiene((prev) => ({
             ...prev,
@@ -77,19 +108,27 @@ const HygieneOptionsPropositions = ({
           ...prev,
           infos: {
             ...prev.infos,
-            parfumGammeSelected: proposition.gamme,
+            parfumGammeSelected: gamme,
+          },
+          prix: {
+            ...prev.prix,
+            prixDistribParfum,
           },
         }));
         setTotalHygiene((prev) => ({
           ...prev,
-          totalParfum: proposition.prixAnnuelParfum,
+          totalParfum,
         }));
         return;
       case "balai":
-        if (hygiene.infos.balaiGammeSelected === proposition.gamme) {
+        if (hygiene.infos.balaiGammeSelected === gamme) {
           setHygiene((prev) => ({
             ...prev,
             infos: { ...prev.infos, balaiGammeSelected: null },
+            prix: {
+              ...prev.prix,
+              prixDistribBalai: 0,
+            },
           }));
           setTotalHygiene((prev) => ({
             ...prev,
@@ -99,15 +138,19 @@ const HygieneOptionsPropositions = ({
         }
         setHygiene((prev) => ({
           ...prev,
-          infos: { ...prev.infos, balaiGammeSelected: proposition.gamme },
+          infos: { ...prev.infos, balaiGammeSelected: gamme },
+          prix: {
+            ...prev.prix,
+            prixDistribBalai,
+          },
         }));
         setTotalHygiene((prev) => ({
           ...prev,
-          totalBalai: proposition.prixAnnuelBalai,
+          totalBalai,
         }));
         return;
       case "poubelle":
-        if (hygiene.infos.poubelleGammeSelected === proposition.gamme) {
+        if (hygiene.infos.poubelleGammeSelected === gamme) {
           setHygiene((prev) => ({
             ...prev,
             infos: { ...prev.infos, poubelleGammeSelected: null },
@@ -120,11 +163,15 @@ const HygieneOptionsPropositions = ({
         }
         setHygiene((prev) => ({
           ...prev,
-          infos: { ...prev.infos, poubelleGammeSelected: proposition.gamme },
+          infos: { ...prev.infos, poubelleGammeSelected: gamme },
+          prix: {
+            ...prev.prix,
+            prixDistribPoubelle,
+          },
         }));
         setTotalHygiene((prev) => ({
           ...prev,
-          totalPoubelle: proposition.prixAnnuelPoubelle,
+          totalPoubelle: totalPoubelle,
         }));
         return;
     }
@@ -155,10 +202,11 @@ const HygieneOptionsPropositions = ({
                 tarif.gamme === hygiene.infos.desinfectantGammeSelected
             )?.[dureeLocation] ?? 0;
 
-          const totalDesinfectant =
+          const totalDesinfectant = Math.round(
             newNbDistribDesinfectant * prixDistribDesinfectant +
-            (consosTarifsDuFournisseur?.paParPersonneDesinfectant ?? 0) *
-              (client.effectif ?? 0);
+              (consosTarifsDuFournisseur?.paParPersonneDesinfectant ?? 0) *
+                (client.effectif ?? 0)
+          );
           setTotalHygiene((prev) => ({
             ...prev,
             totalDesinfectant,
@@ -184,7 +232,9 @@ const HygieneOptionsPropositions = ({
                 tarif.gamme === hygiene.infos.parfumGammeSelected
             )?.[dureeLocation] ?? 0;
 
-          const totalParfum = newNbDistribParfum * prixDistribParfum;
+          const totalParfum = Math.round(
+            newNbDistribParfum * prixDistribParfum
+          );
           setTotalHygiene((prev) => ({
             ...prev,
             totalParfum,
@@ -211,7 +261,7 @@ const HygieneOptionsPropositions = ({
                 tarif.gamme === hygiene.infos.balaiGammeSelected
             )?.[dureeLocation] ?? 0;
 
-          const totalBalai = newNbDistribBalai * prixDistribBalai;
+          const totalBalai = Math.round(newNbDistribBalai * prixDistribBalai);
           setTotalHygiene((prev) => ({
             ...prev,
             totalBalai,
@@ -238,7 +288,9 @@ const HygieneOptionsPropositions = ({
                 tarif.gamme === hygiene.infos.poubelleGammeSelected
             )?.[dureeLocation] ?? 0;
 
-          const totalPoubelle = newNbDistribPoubelle * prixDistribPoubelle;
+          const totalPoubelle = Math.round(
+            newNbDistribPoubelle * prixDistribPoubelle
+          );
           setTotalHygiene((prev) => ({
             ...prev,
             totalPoubelle,
@@ -285,22 +337,26 @@ const HygieneOptionsPropositions = ({
       distribTarifsDuFournisseur.find(
         (tarif) => tarif.type === "poubelle" && tarif.gamme === gamme
       )?.[dureeLocation] ?? 0;
-    const prixAnnuelConsoDesinfectant =
-      (consosTarifsDuFournisseur?.paParPersonneDesinfectant ?? 0) *
-      (client.effectif ?? 0);
-    const prixAnnuelDesinfectant =
+    const paParPersonneDesinfectant =
+      consosTarifsDuFournisseur?.paParPersonneDesinfectant ?? 0;
+    const totalDesinfectant =
       nbDistribDesinfectant * prixDistribDesinfectant +
-      prixAnnuelConsoDesinfectant;
-    const prixAnnuelParfum = nbDistribParfum * prixDistribParfum;
-    const prixAnnuelBalai = nbDistribBalai * prixDistribBalai;
-    const prixAnnuelPoubelle = nbDistribPoubelle * prixDistribPoubelle;
+      paParPersonneDesinfectant * (client.effectif ?? 0);
+    const totalParfum = nbDistribParfum * prixDistribParfum;
+    const totalBalai = nbDistribBalai * prixDistribBalai;
+    const totalPoubelle = nbDistribPoubelle * prixDistribPoubelle;
 
     return {
       gamme,
-      prixAnnuelDesinfectant,
-      prixAnnuelParfum,
-      prixAnnuelBalai,
-      prixAnnuelPoubelle,
+      prixDistribDesinfectant,
+      prixDistribParfum,
+      prixDistribBalai,
+      prixDistribPoubelle,
+      paParPersonneDesinfectant,
+      totalDesinfectant,
+      totalParfum,
+      totalBalai,
+      totalPoubelle,
     };
   });
 
@@ -340,9 +396,9 @@ const HygieneOptionsPropositions = ({
               : gamme === "confort"
               ? "fm4allcomfort"
               : "fm4allexcellence";
-          const prixAnnuelDesinfectantText = proposition.prixAnnuelDesinfectant
+          const prixAnnuelDesinfectantText = proposition.totalDesinfectant
             ? `${formatNumber(
-                Math.round(proposition.prixAnnuelDesinfectant)
+                Math.round(proposition.totalDesinfectant)
               )} € / an`
             : "Non proposé";
 
@@ -425,8 +481,8 @@ const HygieneOptionsPropositions = ({
               : gamme === "confort"
               ? "fm4allcomfort"
               : "fm4allexcellence";
-          const prixAnnuelParfumText = proposition.prixAnnuelParfum
-            ? `${formatNumber(Math.round(proposition.prixAnnuelParfum))} € / an`
+          const prixAnnuelParfumText = proposition.totalParfum
+            ? `${formatNumber(Math.round(proposition.totalParfum))} € / an`
             : "Non proposé";
           return (
             <div
@@ -507,8 +563,8 @@ const HygieneOptionsPropositions = ({
               : gamme === "confort"
               ? "fm4allcomfort"
               : "fm4allexcellence";
-          const prixAnnuelBalaiText = proposition.prixAnnuelBalai
-            ? `${formatNumber(Math.round(proposition.prixAnnuelBalai))} € / an`
+          const prixAnnuelBalaiText = proposition.totalBalai
+            ? `${formatNumber(Math.round(proposition.totalBalai))} € / an`
             : "Non proposé";
 
           return (
@@ -594,10 +650,8 @@ const HygieneOptionsPropositions = ({
               : gamme === "confort"
               ? "fm4allcomfort"
               : "fm4allexcellence";
-          const prixAnnuelPoubelleText = proposition.prixAnnuelPoubelle
-            ? `${formatNumber(
-                Math.round(proposition.prixAnnuelPoubelle)
-              )} € / an`
+          const prixAnnuelPoubelleText = proposition.totalPoubelle
+            ? `${formatNumber(Math.round(proposition.totalPoubelle))} € / an`
             : "Non proposé";
 
           return (

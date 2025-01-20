@@ -13,6 +13,7 @@ export const totalHygieneSchema = z.object({
   totalParfum: z.number().default(0),
   totalBalai: z.number().default(0),
   totalPoubelle: z.number().default(0),
+  totalInstallation: z.number().default(0),
 });
 export const totalMaintenanceSchema = z.object({
   totalService: z.number().default(0),
