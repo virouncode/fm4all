@@ -26,7 +26,7 @@ export const reinitialisationCafeThe = (
       gammeSelected: null,
     },
     quantites: {
-      nbPersonnes: Math.round((client.effectif ?? 0) * 0.15),
+      nbPersonnes: client.effectif ?? 0,
     },
     prix: {
       prixUnitaire: 0,

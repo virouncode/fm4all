@@ -32,9 +32,7 @@ const ThePropositions = ({
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    const newNbPersonnes = value
-      ? parseInt(value)
-      : Math.round((client.effectif ?? 0) * 0.15);
+    const newNbPersonnes = value ? parseInt(value) : client.effectif ?? 0;
     const cafeQuantite = cafeQuantites.find(
       (quantite) => quantite.effectif === roundEffectif(newNbPersonnes / 0.15)
     );
@@ -109,8 +107,11 @@ const ThePropositions = ({
   };
 
   const nbPersonnes = the.quantites.nbPersonnes;
+  console.log("nbPersonnes", nbPersonnes);
+
   const nbThesParAn = nbPersonnes * 400 * 0.15;
-  const nbTassesParJour = (client.effectif ?? 0) * 2 * 0.15;
+  console.log("nbThesParAn", nbThesParAn);
+  const nbTassesParJour = nbPersonnes * 2 * 0.15;
 
   const propositions =
     theConsoTarifs
