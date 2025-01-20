@@ -17,8 +17,7 @@ export const TotalMaintenanceContext = createContext<{
   setTotalMaintenance: Dispatch<SetStateAction<TotalMaintenanceType>>;
 }>({
   totalMaintenance: {
-    nomFournisseur: null,
-    prixMaintenance: null,
+    totalService: 0,
   },
   setTotalMaintenance: () => {},
 });
@@ -29,8 +28,7 @@ const TotalMaintenanceProvider = ({ children }: PropsWithChildren) => {
   // Always initialize state
   const [totalMaintenance, setTotalMaintenance] =
     useState<TotalMaintenanceType>({
-      nomFournisseur: null,
-      prixMaintenance: null,
+      totalService: 0,
     });
 
   useEffect(() => {
