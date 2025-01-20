@@ -4,7 +4,6 @@ import { createSelectSchema } from "drizzle-zod";
 export const selectBoissonsQuantitesSchema = createSelectSchema(
   boissonsQuantites,
   {
-    effectif: (schema) => schema.min(1, "L'effectif est obligatoire"),
     consosParSemaineParPersonne: (schema) =>
       schema.min(
         1,
