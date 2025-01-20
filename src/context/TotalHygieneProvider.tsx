@@ -17,14 +17,11 @@ export const TotalHygieneContext = createContext<{
   setTotalHygiene: Dispatch<SetStateAction<TotalHygieneType>>;
 }>({
   totalHygiene: {
-    nomFournisseur: null,
-    prixTrilogieAbonnement: null,
-    prixTrilogieAchat: null,
-    prixDesinfectantAbonnement: null,
-    prixDesinfectantAchat: null,
-    prixParfum: null,
-    prixBalai: null,
-    prixPoubelle: null,
+    totalTrilogie: 0,
+    totalDesinfectant: 0,
+    totalParfum: 0,
+    totalBalai: 0,
+    totalPoubelle: 0,
   },
   setTotalHygiene: () => {},
 });
@@ -34,14 +31,11 @@ const TotalHygieneProvider = ({ children }: PropsWithChildren) => {
 
   // Always initialize state
   const [totalHygiene, setTotalHygiene] = useState<TotalHygieneType>({
-    nomFournisseur: null,
-    prixTrilogieAbonnement: null,
-    prixTrilogieAchat: null,
-    prixDesinfectantAbonnement: null,
-    prixDesinfectantAchat: null,
-    prixParfum: null,
-    prixBalai: null,
-    prixPoubelle: null,
+    totalTrilogie: 0,
+    totalDesinfectant: 0,
+    totalParfum: 0,
+    totalBalai: 0,
+    totalPoubelle: 0,
   });
 
   useEffect(() => {
