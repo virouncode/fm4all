@@ -1,22 +1,21 @@
 "use client";
 import { CafeContext } from "@/context/CafeProvider";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
-import { SelectCafeQuantitesType } from "@/zod-schemas/cafeQuantites";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { Leaf } from "lucide-react";
 import { useContext } from "react";
-import PropositionsFooter from "../../mes-services/PropositionsFooter";
-import PropositionsTitle from "../../mes-services/PropositionsTitle";
+import PropositionsFooter from "../../PropositionsFooter";
+import PropositionsTitle from "../../PropositionsTitle";
 import ThePropositions from "./ThePropositions";
 
 type TheProps = {
   theConsoTarifs: SelectTheConsoTarifsType[];
-  cafeQuantites: SelectCafeQuantitesType[];
 };
 
-const The = ({ theConsoTarifs, cafeQuantites }: TheProps) => {
+const The = ({ theConsoTarifs }: TheProps) => {
   const { cafe } = useContext(CafeContext);
   const { setFoodBeverage } = useContext(FoodBeverageContext);
+
   const handleClickPrevious = () => {
     setFoodBeverage((prev) => ({
       ...prev,
@@ -30,7 +29,7 @@ const The = ({ theConsoTarifs, cafeQuantites }: TheProps) => {
     }));
   };
   if (!cafe.infos.fournisseurId) {
-    return null;
+    return null; //pour skiper le service
   }
 
   return (
@@ -42,10 +41,7 @@ const The = ({ theConsoTarifs, cafeQuantites }: TheProps) => {
         handleClickPrevious={handleClickPrevious}
       />
       <div className="w-full flex-1">
-        <ThePropositions
-          theConsoTarifs={theConsoTarifs}
-          cafeQuantites={cafeQuantites}
-        />
+        <ThePropositions theConsoTarifs={theConsoTarifs} />
       </div>
       <PropositionsFooter
         handleClickNext={handleClickNext}

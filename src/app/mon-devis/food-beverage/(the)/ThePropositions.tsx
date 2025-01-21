@@ -1,11 +1,12 @@
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { TheContext } from "@/context/TheProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
 import { roundEffectif } from "@/lib/roundEffectif";
-import { SelectCafeQuantitesType } from "@/zod-schemas/cafeQuantites";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import {
   Tooltip,
@@ -18,13 +19,9 @@ import { ChangeEvent, useContext } from "react";
 
 type ThePropositionsProps = {
   theConsoTarifs: SelectTheConsoTarifsType[];
-  cafeQuantites: SelectCafeQuantitesType[];
 };
 
-const ThePropositions = ({
-  theConsoTarifs,
-  cafeQuantites,
-}: ThePropositionsProps) => {
+const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
   const { client } = useContext(ClientContext);
   const { cafe } = useContext(CafeContext);
   const { the, setThe } = useContext(TheContext);
@@ -32,15 +29,14 @@ const ThePropositions = ({
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    const newNbPersonnes = value ? parseInt(value) : client.effectif ?? 0;
-    const cafeQuantite = cafeQuantites.find(
-      (quantite) => quantite.effectif === roundEffectif(newNbPersonnes / 0.15)
-    );
-    const nbCafesParAn = cafeQuantite?.nbCafesParAn ?? 0;
+    const newNbPersonnes = value
+      ? parseInt(value)
+      : Math.round((client.effectif ?? 0) * 0.15);
+    const nbThesParAn = newNbPersonnes * 400;
     const prixUnitaire =
       theConsoTarifs.find(
         (tarif) =>
-          tarif.effectif === roundEffectif(nbPersonnes / 0.15) &&
+          tarif.effectif === roundEffectif(newNbPersonnes / 0.15) &&
           tarif.fournisseurId === cafe.infos.fournisseurId &&
           tarif.gamme === the.infos.gammeSelected
       )?.prixUnitaire ?? 0;
@@ -59,7 +55,7 @@ const ThePropositions = ({
     }));
     if (the.infos.gammeSelected) {
       setTotalThe({
-        totalService: Math.round(nbCafesParAn * prixUnitaire * 0.15),
+        totalService: Math.round(nbThesParAn * prixUnitaire),
       });
     }
   };
@@ -107,17 +103,15 @@ const ThePropositions = ({
   };
 
   const nbPersonnes = the.quantites.nbPersonnes;
-  console.log("nbPersonnes", nbPersonnes);
 
-  const nbThesParAn = nbPersonnes * 400 * 0.15;
-  console.log("nbThesParAn", nbThesParAn);
-  const nbTassesParJour = nbPersonnes * 2 * 0.15;
+  const nbThesParAn = nbPersonnes * 400;
+  const nbTassesParJour = nbPersonnes * 2;
 
   const propositions =
     theConsoTarifs
       ?.filter(
         (tarif) =>
-          tarif.effectif === client.effectif &&
+          tarif.effectif === roundEffectif(nbPersonnes / 0.15) &&
           tarif.fournisseurId === cafe.infos.fournisseurId
       )
       .map((tarif) => ({
@@ -159,11 +153,11 @@ const ThePropositions = ({
               )}
             </Tooltip>
           </TooltipProvider>
-          {/* <div className="flex flex-col gap-6 w-full p-4">
-            <div className="flex gap-4 items-center w-full">
+          <div className="flex flex-col gap-6 w-full p-4">
+            <div className="flex gap-4 items-center justify-center w-full">
               <Input
                 type="number"
-                value={(the.quantites.nbPersonnes || nbPersonnes) ?? 0}
+                value={the.quantites.nbPersonnes}
                 min={1}
                 max={300}
                 step={1}
@@ -175,7 +169,7 @@ const ThePropositions = ({
                     : ""
                 }`}
               />
-              <Label htmlFor="nbDistribEmp" className="text-sm flex-1">
+              <Label htmlFor="nbDistribEmp" className="text-sm">
                 personnes
               </Label>
             </div>
@@ -183,7 +177,7 @@ const ThePropositions = ({
               Les quantités sont estimées pour vous (environ 15% de votre
               effectif) mais vous pouvez les changer
             </p>
-          </div> */}
+          </div>
         </div>
 
         {propositions.map((proposition) => {

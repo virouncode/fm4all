@@ -41,7 +41,7 @@ const TheProvider = ({ children }: PropsWithChildren) => {
       gammeSelected: null,
     },
     quantites: {
-      nbPersonnes: client.effectif ?? 0,
+      nbPersonnes: (client.effectif ?? 0) * 0.15,
     },
     prix: {
       prixUnitaire: null,

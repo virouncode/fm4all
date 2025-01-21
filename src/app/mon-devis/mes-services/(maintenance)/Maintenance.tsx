@@ -10,8 +10,8 @@ import { SelectQ18TarifsType } from "@/zod-schemas/q18Tarifs";
 import { SelectQualiteAirTarifsType } from "@/zod-schemas/qualiteAirTarifs";
 import { Wrench } from "lucide-react";
 import { useContext } from "react";
-import PropositionsFooter from "../PropositionsFooter";
-import PropositionsTitle from "../PropositionsTitle";
+import PropositionsFooter from "../../PropositionsFooter";
+import PropositionsTitle from "../../PropositionsTitle";
 import MaintenancePropositions from "./MaintenancePropositions";
 
 type MaintenanceProps = {

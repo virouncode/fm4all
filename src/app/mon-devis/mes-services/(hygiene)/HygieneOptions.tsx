@@ -8,8 +8,8 @@ import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQ
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { Toilet } from "lucide-react";
 import { useContext } from "react";
-import PropositionsFooter from "../PropositionsFooter";
-import PropositionsTitle from "../PropositionsTitle";
+import PropositionsFooter from "../../PropositionsFooter";
+import PropositionsTitle from "../../PropositionsTitle";
 import HygieneOptionsPropositions from "./HygieneOptionsPropositions";
 
 type HygieneOptionsProps = {

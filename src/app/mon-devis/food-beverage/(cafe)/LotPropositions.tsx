@@ -16,6 +16,7 @@ import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { TheContext } from "@/context/TheProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
+import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { toast } from "@/hooks/use-toast";
 import { formatNumber } from "@/lib/formatNumber";
@@ -33,7 +34,7 @@ import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import Image from "next/image";
 import { useContext } from "react";
-import NextServiceButton from "../../mes-services/NextServiceButton";
+import NextServiceButton from "../../NextServiceButton";
 
 type LotPropositionsProps = {
   lot: CafeLotType;
@@ -63,6 +64,7 @@ const LotPropositions = ({
   const { the, setThe } = useContext(TheContext);
   const { setTotalCafe } = useContext(TotalCafeContext);
   const { setTotalThe } = useContext(TotalTheContext);
+  const { setTotalSnacksFruits } = useContext(TotalSnacksFruitsContext);
 
   const handleClickProposition = (proposition: {
     id: number;
@@ -283,6 +285,42 @@ const LotPropositions = ({
       setTotalThe({
         totalService: 0,
       });
+      //Voir si snacks fruits a des frais de livraison
+      if (snacksFruits.infos.gammeSelected) {
+        const prixPanierSnacksFruits = snacksFruits.infos.choix.reduce(
+          (acc, cur: "fruits" | "snacks" | "boissons") => {
+            if (cur === "fruits")
+              return (
+                acc +
+                snacksFruits.quantites.fruitsKgParSemaine *
+                  (snacksFruits.prix.prixKgFruits ?? 0)
+              );
+            else if (cur === "snacks")
+              return (
+                acc +
+                snacksFruits.quantites.snacksPortionsParSemaine *
+                  (snacksFruits.prix.prixUnitaireSnacks ?? 0)
+              );
+            else if (cur === "boissons")
+              return (
+                acc +
+                snacksFruits.quantites.boissonsConsosParSemaine *
+                  (snacksFruits.prix.prixUnitaireBoissons ?? 0)
+              );
+            return acc;
+          },
+          0
+        );
+        const prixLivraisonPanier =
+          prixPanierSnacksFruits >= (snacksFruits.prix.seuilFranco ?? 0)
+            ? 0
+            : snacksFruits.prix.prixUnitaireLivraison ?? 0;
+        const totalLivraison = Math.round(52 * prixLivraisonPanier);
+        setTotalSnacksFruits((prev) => ({
+          ...prev,
+          totalLivraison,
+        }));
+      }
     } else {
       //======================== JE COCHE ======================//
       //Pour chaque lot et le the si gammeCafeSelected je mets à jour les prix et le total
@@ -446,10 +484,11 @@ const LotPropositions = ({
         totalMachines: newTotalMachines,
       });
       if (the.infos.gammeSelected) {
-        const nbTassesParAn = nbPersonnes * 400 * 0.15;
+        const nbTassesParAn = the.quantites.nbPersonnes * 400;
         const theConsoTarif = theConsoTarifs.find(
           (tarif) =>
-            tarif.effectif === the.quantites.nbPersonnes &&
+            tarif.effectif ===
+              roundEffectif(the.quantites.nbPersonnes / 0.15) &&
             tarif.fournisseurId === fournisseurId &&
             tarif.gamme === the.infos.gammeSelected
         );
@@ -468,6 +507,46 @@ const LotPropositions = ({
         setTotalThe({
           totalService: 0,
         });
+      }
+      //Voir si snacks fruits a des frais de livraison
+      if (snacksFruits.infos.gammeSelected) {
+        const prixPanierSnacksFruits = snacksFruits.infos.choix.reduce(
+          (acc, cur: "fruits" | "snacks" | "boissons") => {
+            if (cur === "fruits")
+              return (
+                acc +
+                snacksFruits.quantites.fruitsKgParSemaine *
+                  (snacksFruits.prix.prixKgFruits ?? 0)
+              );
+            else if (cur === "snacks")
+              return (
+                acc +
+                snacksFruits.quantites.snacksPortionsParSemaine *
+                  (snacksFruits.prix.prixUnitaireSnacks ?? 0)
+              );
+            else if (cur === "boissons")
+              return (
+                acc +
+                snacksFruits.quantites.boissonsConsosParSemaine *
+                  (snacksFruits.prix.prixUnitaireBoissons ?? 0)
+              );
+            return acc;
+          },
+          0
+        );
+        const isSameFournisseur =
+          snacksFruits.infos.fournisseurId === fournisseurId;
+        const prixLivraisonPanier =
+          prixPanierSnacksFruits >= (snacksFruits.prix.seuilFranco ?? 0)
+            ? 0
+            : isSameFournisseur
+            ? snacksFruits.prix.prixUnitaireLivraisonSiCafe ?? 0
+            : snacksFruits.prix.prixUnitaireLivraison ?? 0;
+        const totalLivraison = Math.round(52 * prixLivraisonPanier);
+        setTotalSnacksFruits((prev) => ({
+          ...prev,
+          totalLivraison,
+        }));
       }
     }
   };

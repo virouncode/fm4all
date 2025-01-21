@@ -49,11 +49,13 @@ import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { reinitialisationDevis } from "./reinitialisationDevis";
+import { ManagementContext } from "@/context/ManagementProvider";
 
 const MesLocaux = () => {
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const { setServices } = useContext(ServicesContext);
   const { setFoodBeverage } = useContext(FoodBeverageContext);
+  const { setManagement } = useContext(ManagementContext);
   const { client, setClient } = useContext(ClientContext);
   const { setNettoyage } = useContext(NettoyageContext);
   const { setHygiene } = useContext(HygieneContext);
@@ -168,6 +170,7 @@ const MesLocaux = () => {
       //navigation
       setServices,
       setFoodBeverage,
+      setManagement,
       //Total
       setTotalNettoyage,
       setTotalHygiene,

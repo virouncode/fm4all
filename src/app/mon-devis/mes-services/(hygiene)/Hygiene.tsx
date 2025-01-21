@@ -9,8 +9,8 @@ import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTari
 import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs";
 import { Toilet } from "lucide-react";
 import { useContext } from "react";
-import PropositionsFooter from "../PropositionsFooter";
-import PropositionsTitle from "../PropositionsTitle";
+import PropositionsFooter from "../../PropositionsFooter";
+import PropositionsTitle from "../../PropositionsTitle";
 import HygienePropositions from "./HygienePropositions";
 
 type HygieneProps = {

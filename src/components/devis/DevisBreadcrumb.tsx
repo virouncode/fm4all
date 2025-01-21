@@ -54,16 +54,21 @@ const DevisBreadcrumb = () => {
     },
     {
       id: 4,
-      url: "/sauvegarder-ma-progression",
-      name: "Sauvegarder ma progression",
+      url: `/office-management?${serviceSearchParams.toString()}`,
+      name: "Office Management",
     },
     {
       id: 5,
-      url: "/personnaliser-mon-devis",
-      name: "Personnaliser mon devis",
+      url: "/sauvegarder-ma-progression",
+      name: "Sauvegarder",
     },
     {
       id: 6,
+      url: "/personnaliser-mon-devis",
+      name: "Personnaliser",
+    },
+    {
+      id: 7,
       url: "/afficher-mon-devis",
       name: "Afficher mon devis",
     },

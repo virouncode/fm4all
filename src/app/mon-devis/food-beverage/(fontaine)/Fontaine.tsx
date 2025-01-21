@@ -1,12 +1,31 @@
 "use client";
-
+import { ClientContext } from "@/context/ClientProvider";
+import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
 import { Droplets } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useContext } from "react";
-import PropositionsTitle from "../../mes-services/PropositionsTitle";
+import PropositionsFooter from "../../PropositionsFooter";
+import PropositionsTitle from "../../PropositionsTitle";
 
 const Fontaine = () => {
+  const { client } = useContext(ClientContext);
   const { setFoodBeverage } = useContext(FoodBeverageContext);
+  const { setDevisProgress } = useContext(DevisProgressContext);
+  const router = useRouter();
+
+  const handleClickNext = () => {
+    setFoodBeverage((prev) => ({
+      ...prev,
+      currentFoodBeverageId: 1,
+    }));
+    const searchParams = new URLSearchParams();
+    if (client.effectif)
+      searchParams.set("effectif", client.effectif.toString());
+    if (client.surface) searchParams.set("surface", client.surface.toString());
+    setDevisProgress({ currentStep: 4, completedSteps: [1, 2, 3] });
+    router.push(`/mon-devis/office-management?${searchParams.toString()}`);
+  };
 
   const handleClickPrevious = () => {
     setFoodBeverage((prev) => ({
@@ -22,10 +41,7 @@ const Fontaine = () => {
         description="Eau fraîche ou pétillante, de l'eau pure filtrée pour tous. Adaptés à votre besoin, nos fontaines réseau sont à poser, sur pied ou sous comptoir"
         handleClickPrevious={handleClickPrevious}
       />
-
-      {/* {selectedServicesIds[selectedServicesIds.length - 1] === 4 ? null : (
-        <NextServiceButton handleClickNext={handleClickNext} />
-      )} */}
+      <PropositionsFooter handleClickNext={handleClickNext} comment="" />
     </div>
   );
 };

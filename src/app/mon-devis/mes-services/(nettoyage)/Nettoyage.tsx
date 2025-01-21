@@ -12,8 +12,8 @@ import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
 import { SprayCan } from "lucide-react";
 import { useContext } from "react";
-import PropositionsFooter from "../PropositionsFooter";
-import PropositionsTitle from "../PropositionsTitle";
+import PropositionsFooter from "../../PropositionsFooter";
+import PropositionsTitle from "../../PropositionsTitle";
 import NettoyagePropositions from "./NettoyagePropositions";
 
 type NettoyageProps = {

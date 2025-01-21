@@ -5,6 +5,7 @@ import { FoodBeverageType } from "@/zod-schemas/foodBeverage";
 import { HygieneType } from "@/zod-schemas/hygiene";
 import { IncendieType } from "@/zod-schemas/incendie";
 import { MaintenanceType } from "@/zod-schemas/maintenance";
+import { ManagementType } from "@/zod-schemas/management";
 import { NettoyageType } from "@/zod-schemas/nettoyage";
 import { ServicesType } from "@/zod-schemas/services";
 import { SnacksFruitsType } from "@/zod-schemas/snacksFruits";
@@ -31,6 +32,7 @@ export const reinitialisationDevis = (
   setSnacksFruits: (snacksFruits: SnacksFruitsType) => void,
   setServices: (services: ServicesType) => void,
   setFoodBeverage: (foodBeverage: FoodBeverageType) => void,
+  setManagement: (management: ManagementType) => void,
   setTotalNettoyage: (totalNettoyage: TotalNettoyageType) => void,
   setTotalHygiene: (totalHygiene: TotalHygieneType) => void,
   setTotalMaintenance: (totalMaintenance: TotalMaintenanceType) => void,
@@ -181,7 +183,7 @@ export const reinitialisationDevis = (
       gammeSelected: null,
     },
     quantites: {
-      nbPersonnes: client.effectif ?? 0,
+      nbPersonnes: Math.round((client.effectif ?? 0) * 0.15),
     },
     prix: {
       prixUnitaire: 0,
@@ -218,6 +220,9 @@ export const reinitialisationDevis = (
   });
   setFoodBeverage({
     currentFoodBeverageId: 1,
+  });
+  setManagement({
+    currentManagementId: 1,
   });
   //Total
   setTotalNettoyage({

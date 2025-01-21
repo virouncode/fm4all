@@ -18,6 +18,7 @@ import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { IncendieContext } from "@/context/IncendieProvider";
 import { MaintenanceContext } from "@/context/MaintenanceProvider";
+import { ManagementContext } from "@/context/ManagementProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
@@ -50,6 +51,7 @@ const DevisButton = ({
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const { setServices } = useContext(ServicesContext);
   const { setFoodBeverage } = useContext(FoodBeverageContext);
+  const { setManagement } = useContext(ManagementContext);
   const { client, setClient } = useContext(ClientContext);
   const { setNettoyage } = useContext(NettoyageContext);
   const { setHygiene } = useContext(HygieneContext);
@@ -95,16 +97,21 @@ const DevisButton = ({
     },
     {
       id: 4,
-      url: "/sauvegarder-ma-progression",
-      name: "Sauvegarder ma progression",
+      url: `/office-management?${serviceSearchParams.toString()}`,
+      name: "Office Management",
     },
     {
       id: 5,
-      url: "/personnaliser-mon-devis",
-      name: "Personnaliser mon devis",
+      url: "/sauvegarder-ma-progression",
+      name: "Sauvegarder",
     },
     {
       id: 6,
+      url: "/personnaliser-mon-devis",
+      name: "Personnaliser",
+    },
+    {
+      id: 7,
       url: "/afficher-mon-devis",
       name: "Afficher mon devis",
     },
@@ -132,6 +139,7 @@ const DevisButton = ({
       setSnacksFruits,
       setServices,
       setFoodBeverage,
+      setManagement,
       setTotalNettoyage,
       setTotalHygiene,
       setTotalMaintenance,

@@ -15,8 +15,8 @@ import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { Coffee } from "lucide-react";
 import { useContext } from "react";
-import PropositionsFooter from "../../mes-services/PropositionsFooter";
-import PropositionsTitle from "../../mes-services/PropositionsTitle";
+import PropositionsFooter from "../../PropositionsFooter";
+import PropositionsTitle from "../../PropositionsTitle";
 import CafeLot from "./CafeLot";
 
 type CafeProps = {

@@ -13,8 +13,8 @@ import { SelectSnacksQuantitesType } from "@/zod-schemas/snacksQuantites";
 import { SelectSnacksTarifsType } from "@/zod-schemas/snacksTarifs";
 import { Banana, Cookie, CupSoda } from "lucide-react";
 import { useContext } from "react";
-import PropositionsFooter from "../../mes-services/PropositionsFooter";
-import PropositionsTitle from "../../mes-services/PropositionsTitle";
+import PropositionsFooter from "../../PropositionsFooter";
+import PropositionsTitle from "../../PropositionsTitle";
 import SnacksFruitsUpdateForm from "./SnackFruitsUpdateForm";
 import SnacksFruitsPropositions from "./SnacksFruitsPropositions";
 

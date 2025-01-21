@@ -1,16 +1,14 @@
 "use client";
-import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
-import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites";
 import { SelectIncendieTarifsType } from "@/zod-schemas/incendieTarifs";
 import { FireExtinguisher } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
-import PropositionsFooter from "../PropositionsFooter";
-import PropositionsTitle from "../PropositionsTitle";
+import PropositionsFooter from "../../PropositionsFooter";
+import PropositionsTitle from "../../PropositionsTitle";
 import SecuriteIncendiePropositions from "./SecuriteIncendiePropositions";
 
 type SecuriteIncendieProps = {
@@ -22,9 +20,7 @@ const SecuriteIncendie = ({
   incendieQuantite,
   incendieTarifs,
 }: SecuriteIncendieProps) => {
-  const { snacksFruits } = useContext(SnacksFruitsContext);
   const { client } = useContext(ClientContext);
-  const { cafe } = useContext(CafeContext);
   const { setServices } = useContext(ServicesContext);
   const { setDevisProgress } = useContext(DevisProgressContext);
   const router = useRouter();

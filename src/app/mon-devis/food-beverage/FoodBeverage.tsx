@@ -95,7 +95,7 @@ const FoodBeverage = async () => {
         chocoConsoTarifs={chocoConsoTarifs}
         theConsoTarifs={theConsoTarifs}
       />
-      <The cafeQuantites={cafeQuantites} theConsoTarifs={theConsoTarifs} />
+      <The theConsoTarifs={theConsoTarifs} />
       <SnacksFruits
         fruitsQuantites={fruitsQuantites}
         fruitsTarifs={fruitsTarifs}
