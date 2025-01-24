@@ -2,6 +2,7 @@
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
 import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
 import { TotalOfficeManagerContext } from "@/context/TotalOfficeManagerProvider";
@@ -100,6 +101,7 @@ const OfficeManagerPropositions = ({
       sloganFournisseur,
       prixAnnuel,
       demiJParSemaine,
+      demiTjm,
     } = proposition;
 
     if (
@@ -143,7 +145,7 @@ const OfficeManagerPropositions = ({
         demiJParSemaine,
       },
       prix: {
-        demiTjm: prixAnnuel,
+        demiTjm,
       },
     });
     setTotalOfficeManager({
@@ -172,6 +174,47 @@ const OfficeManagerPropositions = ({
       const prixAnnuel = officeManager.infos.remplace
         ? Math.round(value[0] * demiTjm * 52 * (1 + newMajoration / 100))
         : Math.round(value[0] * demiTjm * 47 * (1 + newMajoration / 100));
+      setTotalOfficeManager({
+        totalService: prixAnnuel,
+      });
+    }
+  };
+
+  const handleChangeRemplace = (value: string) => {
+    setOfficeManager((prev) => ({
+      ...prev,
+      infos: {
+        ...prev.infos,
+        remplace: value === "remplace",
+      },
+    }));
+    if (officeManager.infos.gammeSelected) {
+      const demiJParSemaine =
+        officeManager.quantites.demiJParSemaine || demiJParSemaineEssentiel;
+      const newMajoration =
+        demiJParSemaine <= 1
+          ? 20
+          : demiJParSemaine <= 2
+          ? 15
+          : demiJParSemaine <= 3
+          ? 10
+          : demiJParSemaine <= 4
+          ? 5
+          : 0;
+      const prixAnnuel =
+        value === "remplace"
+          ? Math.round(
+              demiJParSemaine *
+                officeManager.prix.demiTjm *
+                52 *
+                (1 + newMajoration / 100)
+            )
+          : Math.round(
+              demiJParSemaine *
+                officeManager.prix.demiTjm *
+                47 *
+                (1 + newMajoration / 100)
+            );
       setTotalOfficeManager({
         totalService: prixAnnuel,
       });
@@ -244,6 +287,39 @@ const OfficeManagerPropositions = ({
                       {officeManager.quantites.demiJParSemaine} demi journée(s)
                       / semaine
                     </Label>
+                  </div>
+                  <div>
+                    <RadioGroup
+                      onValueChange={handleChangeRemplace}
+                      value={
+                        officeManager.infos.remplace
+                          ? "remplace"
+                          : "non remplace"
+                      }
+                      className="flex gap-4 flex-col items-center"
+                      name="typeBoissons"
+                    >
+                      <div className="flex gap-2 items-center">
+                        <RadioGroupItem
+                          value={"remplace"}
+                          title={"Remplacé pendant congés"}
+                          id={"remplace"}
+                        />
+                        <Label htmlFor={`remplace`}>
+                          Remplacé pendant congés
+                        </Label>
+                      </div>
+                      <div className="flex gap-2 items-center">
+                        <RadioGroupItem
+                          value={"non remplace"}
+                          title={"Non remplacé pendant congés"}
+                          id={"non_remplace"}
+                        />
+                        <Label htmlFor={"non_remplace"}>
+                          Non remplacé pendant congés
+                        </Label>
+                      </div>
+                    </RadioGroup>
                   </div>
                 </div>
                 <div
