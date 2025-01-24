@@ -2,12 +2,23 @@
 
 import { ManagementContext } from "@/context/ManagementProvider";
 import useScrollIntoManagement from "@/hooks/use-scroll-into-management";
+import { SelectOfficeManagerQuantitesType } from "@/zod-schemas/officeManagerQuantites";
+import { SelectOfficeManagerTarifsType } from "@/zod-schemas/officeManagerTarifs";
 import { UserRoundCog } from "lucide-react";
 import { useContext } from "react";
 import PropositionsFooter from "../../PropositionsFooter";
 import PropositionsTitle from "../../PropositionsTitle";
+import OfficeManagerPropositions from "./OfficeManagerPropositions";
 
-const OfficeManager = () => {
+type OfficeManagerProps = {
+  officeManagerQuantites: SelectOfficeManagerQuantitesType[];
+  officeManagerTarifs: SelectOfficeManagerTarifsType[];
+};
+
+const OfficeManager = ({
+  officeManagerQuantites,
+  officeManagerTarifs,
+}: OfficeManagerProps) => {
   const { setManagement } = useContext(ManagementContext);
   const handleClickPrevious = () => {};
   const handleClickNext = () => {
@@ -25,7 +36,12 @@ const OfficeManager = () => {
         handleClickPrevious={handleClickPrevious}
         previousButton={false}
       />
-      <div className="w-full flex-1"></div>
+      <div className="w-full flex-1">
+        <OfficeManagerPropositions
+          officeManagerQuantites={officeManagerQuantites}
+          officeManagerTarifs={officeManagerTarifs}
+        />
+      </div>
       <PropositionsFooter handleClickNext={handleClickNext} />
     </div>
   );

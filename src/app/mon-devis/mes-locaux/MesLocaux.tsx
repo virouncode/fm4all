@@ -23,7 +23,9 @@ import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { IncendieContext } from "@/context/IncendieProvider";
 import { MaintenanceContext } from "@/context/MaintenanceProvider";
+import { ManagementContext } from "@/context/ManagementProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
+import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { TheContext } from "@/context/TheProvider";
@@ -49,7 +51,6 @@ import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { reinitialisationDevis } from "./reinitialisationDevis";
-import { ManagementContext } from "@/context/ManagementProvider";
 
 const MesLocaux = () => {
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
@@ -65,6 +66,7 @@ const MesLocaux = () => {
   const { setThe } = useContext(TheContext);
   const { setTotalThe } = useContext(TotalTheContext);
   const { setSnacksFruits } = useContext(SnacksFruitsContext);
+  const { setOfficeManager } = useContext(OfficeManagerContext);
   const { setTotalNettoyage } = useContext(TotalNettoyageContext);
   const { setTotalHygiene } = useContext(TotalHygieneContext);
   const { setTotalIncendie } = useContext(TotalIncendieContext);
@@ -167,6 +169,7 @@ const MesLocaux = () => {
       setCafe,
       setThe,
       setSnacksFruits,
+      setOfficeManager,
       //navigation
       setServices,
       setFoodBeverage,

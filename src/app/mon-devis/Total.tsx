@@ -15,6 +15,7 @@ import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
+import { TotalOfficeManagerContext } from "@/context/TotalOfficeManagerProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { Calculator } from "lucide-react";
@@ -24,6 +25,7 @@ import TotalHygiene from "./TotalHygiene";
 import TotalIncendie from "./TotalIncendie";
 import TotalMaintenance from "./TotalMaintenance";
 import TotalNettoyage from "./TotalNettoyage";
+import TotalOfficeManager from "./TotalOfficeManager";
 import TotalSnacksFruits from "./TotalSnacksFruits";
 import TotalThe from "./TotalThe";
 
@@ -36,6 +38,7 @@ const Total = () => {
   const { totalCafe } = useContext(TotalCafeContext);
   const { totalThe } = useContext(TotalTheContext);
   const { totalSnacksFruits } = useContext(TotalSnacksFruitsContext);
+  const { totalOfficeManager } = useContext(TotalOfficeManagerContext);
 
   const totalFinalNettoyage =
     totalNettoyage.totalService +
@@ -62,6 +65,7 @@ const Total = () => {
 
   const totalFinalThe = totalThe.totalService;
   const totalFinalSnacksFruits = totalSnacksFruits.total;
+  const totalFinalOfficeManager = totalOfficeManager.totalService;
 
   return (
     <Sheet>
@@ -79,7 +83,8 @@ const Total = () => {
               totalFinalIncendie +
               totalFinalCafe +
               totalFinalThe +
-              totalFinalSnacksFruits
+              totalFinalSnacksFruits +
+              totalFinalOfficeManager
           )}{" "}
           € / an
         </Button>
@@ -102,6 +107,7 @@ const Total = () => {
           <TotalCafe />
           <TotalThe />
           <TotalSnacksFruits />
+          <TotalOfficeManager />
         </div>
       </SheetContent>
     </Sheet>

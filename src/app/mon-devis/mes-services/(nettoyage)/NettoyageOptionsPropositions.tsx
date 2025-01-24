@@ -248,12 +248,12 @@ const NettoyageOptionsPropositions = ({
     : "";
 
   const samediPrixAnnuelText = samediProposition.prixAnnuel
-    ? `${formatNumber(samediProposition?.prixAnnuel)} € / an`
+    ? `${formatNumber(samediProposition?.prixAnnuel / 12)} € / mois`
     : "Non proposé";
   const samediNbPassagesParSemaineText = `1 passage de ${nettoyage.quantites.hParPassage} h / semaine en plus`;
 
   const dimanchePrixAnnuel = dimancheProposition.prixAnnuel
-    ? `${formatNumber(dimancheProposition.prixAnnuel)} € / an`
+    ? `${formatNumber(dimancheProposition.prixAnnuel / 12)} € / mois`
     : "Non proposé";
   const diamncheNbPassagesParSemaineText = `1 passage de ${nettoyage.quantites.hParPassage} h / semaine en plus`;
 

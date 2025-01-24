@@ -417,6 +417,24 @@ export const foodLivraisonTarifs = pgTable("food_livraison_tarifs", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const officeManagerQuantites = pgTable("office_manager_quantites", {
+  id: serial().primaryKey(),
+  effectif: integer().notNull(),
+  surface: integer().notNull(),
+  gamme: gammeEnum().notNull(),
+  demiJParSemaine: integer("demi_j_par_semaine").notNull(),
+  majoration: integer().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const officeManagerTarifs = pgTable("office_manager_tarifs", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  demiTjm: integer("demi_tjm").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
 // export const eauQuantites = pgTable("eau_quantites", {
 //   id: serial().primaryKey(),
 //   effectif: integer().notNull(),
@@ -431,6 +449,10 @@ export const fournisseursRelations = relations(
     logosFournisseur: one(logosFournisseurs, {
       fields: [fournisseurs.logoId],
       references: [logosFournisseurs.id],
+    }),
+    officeManagerTarif: one(officeManagerTarifs, {
+      fields: [fournisseurs.id],
+      references: [officeManagerTarifs.fournisseurId],
     }),
     nettoyageTarifs: many(nettoyageTarifs),
     nettoyageRepasseTarifs: many(nettoyageRepasseTarifs),
@@ -616,6 +638,16 @@ export const foodLivraisonTarifsRelations = relations(
   ({ one }) => ({
     fournisseur: one(fournisseurs, {
       fields: [foodLivraisonTarifs.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+  })
+);
+
+export const officeManagerTarifsRelations = relations(
+  officeManagerTarifs,
+  ({ one }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [officeManagerTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
   })

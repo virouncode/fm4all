@@ -45,7 +45,7 @@ const page = async ({
         <h1 className="text-3xl md:text-4xl">Office Management</h1>
       </div>
       <Suspense fallback={<ServicesLoader />}>
-        <OfficeManagement />
+        <OfficeManagement surface={surface} effectif={effectif} />
       </Suspense>
     </>
   );

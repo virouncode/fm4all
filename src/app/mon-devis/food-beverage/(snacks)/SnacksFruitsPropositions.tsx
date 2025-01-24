@@ -270,7 +270,7 @@ const SnacksFruitsPropositions = ({
                   );
                 }
                 const prixAnnuelText = proposition.total
-                  ? `${formatNumber(proposition.total)} € /an`
+                  ? `${formatNumber(proposition.total / 12)} € / mois`
                   : "Non proposé";
                 const gFruitsParSemaineParPersonneText =
                   snacksFruits.infos.choix.includes("fruits")

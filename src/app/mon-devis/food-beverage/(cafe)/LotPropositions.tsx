@@ -868,7 +868,7 @@ const LotPropositions = ({
                     ? "fm4allcomfort"
                     : "fm4allexcellence";
                 const prixAnnuelText = proposition.prixAnnuel
-                  ? `${formatNumber(proposition.prixAnnuel)} € /an*`
+                  ? `${formatNumber(proposition.prixAnnuel / 12)} € / an*`
                   : "Non proposé";
                 const prixInstallationText = proposition.prixInstallation
                   ? `+ ${formatNumber(

@@ -288,6 +288,13 @@
       "when": 1737387630167,
       "tag": "0040_pink_bedlam",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1737637266031,
+      "tag": "0041_striped_pixie",
+      "breakpoints": true
     }
   ]
 }

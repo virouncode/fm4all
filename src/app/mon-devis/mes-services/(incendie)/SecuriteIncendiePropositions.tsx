@@ -305,7 +305,9 @@ const SecuriteIncendiePropositions = ({
                 className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
               />
               <div>
-                <p className="font-bold">{proposition.prixAnnuel} € / an*</p>
+                <p className="font-bold">
+                  {proposition.prixAnnuel / 12} € / mois*
+                </p>
                 <p>Pour le contrôle de :</p>
                 <p className="text-sm">
                   {" "}

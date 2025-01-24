@@ -20,6 +20,7 @@ import { IncendieContext } from "@/context/IncendieProvider";
 import { MaintenanceContext } from "@/context/MaintenanceProvider";
 import { ManagementContext } from "@/context/ManagementProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
+import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { TheContext } from "@/context/TheProvider";
@@ -61,6 +62,7 @@ const DevisButton = ({
   const { setThe } = useContext(TheContext);
   const { setTotalThe } = useContext(TotalTheContext);
   const { setSnacksFruits } = useContext(SnacksFruitsContext);
+  const { setOfficeManager } = useContext(OfficeManagerContext);
   const { setTotalNettoyage } = useContext(TotalNettoyageContext);
   const { setTotalHygiene } = useContext(TotalHygieneContext);
   const { setTotalIncendie } = useContext(TotalIncendieContext);
@@ -137,6 +139,7 @@ const DevisButton = ({
       setCafe,
       setThe,
       setSnacksFruits,
+      setOfficeManager,
       setServices,
       setFoodBeverage,
       setManagement,

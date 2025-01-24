@@ -7,6 +7,7 @@ import { IncendieType } from "@/zod-schemas/incendie";
 import { MaintenanceType } from "@/zod-schemas/maintenance";
 import { ManagementType } from "@/zod-schemas/management";
 import { NettoyageType } from "@/zod-schemas/nettoyage";
+import { OfficeManagerType } from "@/zod-schemas/officeManager";
 import { ServicesType } from "@/zod-schemas/services";
 import { SnacksFruitsType } from "@/zod-schemas/snacksFruits";
 import { TheType } from "@/zod-schemas/the";
@@ -30,6 +31,7 @@ export const reinitialisationDevis = (
   setCafe: (cafe: CafeType) => void,
   setThe: (the: TheType) => void,
   setSnacksFruits: (snacksFruits: SnacksFruitsType) => void,
+  setOfficeManager: (officeManager: OfficeManagerType) => void,
   setServices: (services: ServicesType) => void,
   setFoodBeverage: (foodBeverage: FoodBeverageType) => void,
   setManagement: (management: ManagementType) => void,
@@ -212,6 +214,21 @@ export const reinitialisationDevis = (
       prixUnitaireLivraison: null,
       seuilFranco: null,
       panierMin: null,
+    },
+  });
+  setOfficeManager({
+    infos: {
+      fournisseurId: null,
+      nomFournisseur: null,
+      sloganFournisseur: null,
+      gammeSelected: null,
+      remplace: true,
+    },
+    quantites: {
+      demiJParSemaine: null,
+    },
+    prix: {
+      demiTjm: 0,
     },
   });
   //Navigation

@@ -179,7 +179,7 @@ const MaintenancePropositions = ({
                     ? "fm4allcomfort"
                     : "fm4allexcellence";
                 const totalText = proposition.total
-                  ? `${formatNumber(proposition.total)} € /an`
+                  ? `${formatNumber(proposition.total / 12)} € / mois`
                   : "Non proposé";
 
                 return (

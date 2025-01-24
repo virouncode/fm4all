@@ -18,55 +18,47 @@ const TotalSnacksFruits = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      {snacksFruits.infos.nomFournisseur && (
-        <div className="flex flex-col gap-4">
-          <div>Snacks & Fruits ({snacksFruits.infos.nomFournisseur})</div>
-          <div className={`flex flex-col ml-4 text-xs`}>
-            {totalFruits ? (
-              <div
-                className={`flex items-center justify-between text-${color} font-bold`}
-              >
-                <p>Fruits</p>
-                <p className="text-end">
-                  {formatNumber(totalFruits)} € HT / an
-                </p>
-              </div>
-            ) : null}
-            {totalSnacks ? (
-              <div
-                className={`flex items-center justify-between text-${color} font-bold`}
-              >
-                <p>Snacks</p>
-                <p className="text-end">
-                  {formatNumber(totalSnacks)} € HT / an
-                </p>
-              </div>
-            ) : null}
-            {totalBoissons ? (
-              <div
-                className={`flex items-center justify-between text-${color} font-bold`}
-              >
-                <p>Fruits</p>
-                <p className="text-end">
-                  {formatNumber(totalBoissons)} € HT / an
-                </p>
-              </div>
-            ) : null}
-
-            <div className={`flex items-center justify-between  font-bold`}>
-              <p>Livraison</p>
+      <div className="flex flex-col gap-4">
+        <div>Snacks & Fruits ({snacksFruits.infos.nomFournisseur})</div>
+        <div className={`flex flex-col ml-4 text-xs`}>
+          {totalFruits ? (
+            <div
+              className={`flex items-center justify-between text-${color} font-bold`}
+            >
+              <p>Fruits</p>
+              <p className="text-end">{formatNumber(totalFruits)} € HT / an</p>
+            </div>
+          ) : null}
+          {totalSnacks ? (
+            <div
+              className={`flex items-center justify-between text-${color} font-bold`}
+            >
+              <p>Snacks</p>
+              <p className="text-end">{formatNumber(totalSnacks)} € HT / an</p>
+            </div>
+          ) : null}
+          {totalBoissons ? (
+            <div
+              className={`flex items-center justify-between text-${color} font-bold`}
+            >
+              <p>Fruits</p>
               <p className="text-end">
-                {formatNumber(totalLivraison)} € HT / an
+                {formatNumber(totalBoissons)} € HT / an
               </p>
             </div>
+          ) : null}
 
-            <div className="flex items-center justify-between border-t border-foreground mt-2">
-              <p>TOTAL</p>
-              <p className="text-end">{formatNumber(total)} € HT / an</p>
-            </div>
+          <div className={`flex items-center justify-between  font-bold`}>
+            <p>Livraison</p>
+            <p className="text-end">{formatNumber(totalLivraison)} € HT / an</p>
+          </div>
+
+          <div className="flex items-center justify-between border-t border-foreground mt-2">
+            <p>TOTAL</p>
+            <p className="text-end">{formatNumber(total)} € HT / an</p>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

@@ -46,6 +46,10 @@ export const totalSnacksFruitsSchema = z.object({
   total: z.number().default(0),
 });
 
+export const totalOfficeManager = z.object({
+  totalService: z.number().default(0),
+});
+
 export type TotalNettoyageType = z.infer<typeof totalNettoyageSchema>;
 export type TotalHygieneType = z.infer<typeof totalHygieneSchema>;
 export type TotalIncendieType = z.infer<typeof totalIncendieSchema>;
@@ -53,3 +57,4 @@ export type TotalMaintenanceType = z.infer<typeof totalMaintenanceSchema>;
 export type TotalCafeType = z.infer<typeof totalCafeSchema>;
 export type TotalTheType = z.infer<typeof totalTheSchema>;
 export type TotalSnacksFruitsType = z.infer<typeof totalSnacksFruitsSchema>;
+export type TotalOfficeManagerType = z.infer<typeof totalOfficeManager>;
