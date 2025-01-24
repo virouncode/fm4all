@@ -4,17 +4,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
-import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
-import { TotalOfficeManagerContext } from "@/context/TotalOfficeManagerProvider";
-import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
-import { SelectOfficeManagerQuantitesType } from "@/zod-schemas/officeManagerQuantites";
-import { SelectOfficeManagerTarifsType } from "@/zod-schemas/officeManagerTarifs";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@radix-ui/react-tooltip";
+} from "@/components/ui/tooltip";
+import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
+import { TotalOfficeManagerContext } from "@/context/TotalOfficeManagerProvider";
+import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
+import { SelectOfficeManagerQuantitesType } from "@/zod-schemas/officeManagerQuantites";
+import { SelectOfficeManagerTarifsType } from "@/zod-schemas/officeManagerTarifs";
 import Image from "next/image";
 import { useContext } from "react";
 
@@ -233,7 +233,9 @@ const OfficeManagerPropositions = ({
             const prixAnnuelText = proposition.prixAnnuel
               ? `${Math.round(proposition.prixAnnuel / 12)} € / mois*`
               : "Non proposé";
-            const demiJParSemaineText = `${proposition.demiJParSemaine} demi journée(s) / semaine`;
+            const demiJParSemaineText = `${
+              proposition.demiJParSemaine / 2
+            } j / semaine`;
             return (
               <div className="flex border-b flex-1" key={proposition.id}>
                 <div className="flex w-1/4 items-center justify-center flex-col gap-6 p-4">

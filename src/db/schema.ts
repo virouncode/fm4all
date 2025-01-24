@@ -48,6 +48,13 @@ export const typeMachineEnum = pgEnum("typemachine", [
   "chocolat",
 ]);
 
+export const inclusEnum = pgEnum("inclus", [
+  "inclus",
+  "non inclus",
+  "non propose",
+  "sur demande",
+]);
+
 export const fournisseurs = pgTable("fournisseurs", {
   id: serial().primaryKey(),
   nomFournisseur: varchar("nom_fournisseur").notNull(),
@@ -433,6 +440,36 @@ export const officeManagerTarifs = pgTable("office_manager_tarifs", {
     .notNull()
     .references(() => fournisseurs.id),
   demiTjm: integer("demi_tjm").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const servicesFm4AllTaux = pgTable("services_fm4all_taux", {
+  id: serial().primaryKey(),
+  assurance: integer().notNull(),
+  plateforme: integer().notNull(),
+  minFacturationPlateforme: integer("min_facturation_plateforme").notNull(),
+  supportAdmin: integer("support_admin").notNull(),
+  supportOp: integer("support_op").notNull(),
+  minFacturationSupportOp: integer("min_facturation_support_op").notNull(),
+  accountManager: integer("account_manager").notNull(),
+  minFacturationAccountManager: integer(
+    "min_facturation_account_manager"
+  ).notNull(),
+  remiseCaSeuil: integer("remise_ca_seuil").notNull(),
+  remiseCa: integer("remise_ca").notNull(),
+  remiseHof: integer("remise_hof").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const servicesFm4AllOffres = pgTable("services_fm4all_offres", {
+  id: serial().primaryKey(),
+  gamme: gammeEnum().notNull(),
+  assurance: inclusEnum().notNull(),
+  plateforme: inclusEnum().notNull(),
+  supportAdmin: inclusEnum("support_admin").notNull(),
+  supportOp: inclusEnum("support_op").notNull(),
+  accountManager: inclusEnum("account_manager").notNull(),
+  audit: inclusEnum().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 // export const eauQuantites = pgTable("eau_quantites", {

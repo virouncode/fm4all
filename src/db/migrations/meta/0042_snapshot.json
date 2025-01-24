@@ -1,0 +1,2470 @@
+{
+  "id": "30a3d01a-7703-485e-8a07-b02d76cf0ffb",
+  "prevId": "2393de51-dda9-4ed3-9587-ceca0f5befa5",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.boissons_quantites": {
+      "name": "boissons_quantites",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "consos_par_semaine_par_personne": {
+          "name": "consos_par_semaine_par_personne",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gamme": {
+          "name": "gamme",
+          "type": "gamme",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "min_consos_par_semaine": {
+          "name": "min_consos_par_semaine",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.boissons_tarifs": {
+      "name": "boissons_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "fournisseur_id": {
+          "name": "fournisseur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "effectif": {
+          "name": "effectif",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prix_unitaire": {
+          "name": "prix_unitaire",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gamme": {
+          "name": "gamme",
+          "type": "gamme",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "boissons_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "boissons_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "boissons_tarifs",
+          "tableTo": "fournisseurs",
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.cafe_conso_tarifs": {
+      "name": "cafe_conso_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "fournisseur_id": {
+          "name": "fournisseur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gamme": {
+          "name": "gamme",
+          "type": "gamme",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "effectif": {
+          "name": "effectif",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prix_unitaire": {
+          "name": "prix_unitaire",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "infos": {
+          "name": "infos",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "cafe_conso_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "cafe_conso_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "cafe_conso_tarifs",
+          "tableTo": "fournisseurs",
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.cafe_machines": {
+      "name": "cafe_machines",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "marque": {
+          "name": "marque",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "modele": {
+          "name": "modele",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nb_boissons": {
+          "name": "nb_boissons",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nb_tasses_par_j": {
+          "name": "nb_tasses_par_j",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "arrivee_reseau": {
+          "name": "arrivee_reseau",
+          "type": "possibilite",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "evacuation_reseau": {
+          "name": "evacuation_reseau",
+          "type": "possibilite",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "evacuation_marc": {
+          "name": "evacuation_marc",
+          "type": "possibilite",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lactee": {
+          "name": "lactee",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gourmande": {
+          "name": "gourmande",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "infos": {
+          "name": "infos",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.cafe_machines_tarifs": {
+      "name": "cafe_machines_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "fournisseur_id": {
+          "name": "fournisseur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "typemachine",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "limite_tasses_j": {
+          "name": "limite_tasses_j",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prix_installation": {
+          "name": "prix_installation",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "one_shot": {
+          "name": "one_shot",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pa_12m": {
+          "name": "pa_12m",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pa_24m": {
+          "name": "pa_24m",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pa_36m": {
+          "name": "pa_36m",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pa_48m": {
+          "name": "pa_48m",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pa_60m": {
+          "name": "pa_60m",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rac_12m": {
+          "name": "rac_12m",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rac_24m": {
+          "name": "rac_24m",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pa_maintenance": {
+          "name": "pa_maintenance",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cafe_machine_id": {
+          "name": "cafe_machine_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reconditionne": {
+          "name": "reconditionne",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "infos": {
+          "name": "infos",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "cafe_machines_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "cafe_machines_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "cafe_machines_tarifs",
+          "tableTo": "fournisseurs",
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "cafe_machines_tarifs_cafe_machine_id_cafe_machines_id_fk": {
+          "name": "cafe_machines_tarifs_cafe_machine_id_cafe_machines_id_fk",
+          "tableFrom": "cafe_machines_tarifs",
+          "tableTo": "cafe_machines",
+          "columnsFrom": [
+            "cafe_machine_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.cafe_quantites": {
+      "name": "cafe_quantites",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "effectif": {
+          "name": "effectif",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nb_cafes_par_an": {
+          "name": "nb_cafes_par_an",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nb_machines": {
+          "name": "nb_machines",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.choco_conso_tarifs": {
+      "name": "choco_conso_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "fournisseur_id": {
+          "name": "fournisseur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "effectif": {
+          "name": "effectif",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prixUnitaire": {
+          "name": "prixUnitaire",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "infos": {
+          "name": "infos",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "choco_conso_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "choco_conso_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "choco_conso_tarifs",
+          "tableTo": "fournisseurs",
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.clients": {
+      "name": "clients",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nom_fournisseur": {
+          "name": "nom_fournisseur",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "siret": {
+          "name": "siret",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prenom_contact": {
+          "name": "prenom_contact",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nom_contact": {
+          "name": "nom_contact",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "poste_contact": {
+          "name": "poste_contact",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email_contact": {
+          "name": "email_contact",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "phone_contact": {
+          "name": "phone_contact",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "surface": {
+          "name": "surface",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "effectif": {
+          "name": "effectif",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "typeBatiment": {
+          "name": "typeBatiment",
+          "type": "typebatiment",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "typeOccupation": {
+          "name": "typeOccupation",
+          "type": "typeoccupation",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "adresse_ligne_1": {
+          "name": "adresse_ligne_1",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "adresse_ligne_2": {
+          "name": "adresse_ligne_2",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "code_postal": {
+          "name": "code_postal",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ville": {
+          "name": "ville",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "clients_email_contact_unique": {
+          "name": "clients_email_contact_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email_contact"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.food_livraison_tarifs": {
+      "name": "food_livraison_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "fournisseur_id": {
+          "name": "fournisseur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "freq_annuelle": {
+          "name": "freq_annuelle",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "panier_min": {
+          "name": "panier_min",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "prix_unitaire": {
+          "name": "prix_unitaire",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prix_unitaire_si_cafe": {
+          "name": "prix_unitaire_si_cafe",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "seuil_franco": {
+          "name": "seuil_franco",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "remise_si_cafe": {
+          "name": "remise_si_cafe",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "food_livraison_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "food_livraison_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "food_livraison_tarifs",
+          "tableTo": "fournisseurs",
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.fournisseurs": {
+      "name": "fournisseurs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nom_fournisseur": {
+          "name": "nom_fournisseur",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "siret": {
+          "name": "siret",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prenom_contact": {
+          "name": "prenom_contact",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nom_contact": {
+          "name": "nom_contact",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email_contact": {
+          "name": "email_contact",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "phone_contact": {
+          "name": "phone_contact",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date_chiffrage": {
+          "name": "date_chiffrage",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "slogan": {
+          "name": "slogan",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "logo_id": {
+          "name": "logo_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fournisseurs_logo_id_logos_fournisseurs_id_fk": {
+          "name": "fournisseurs_logo_id_logos_fournisseurs_id_fk",
+          "tableFrom": "fournisseurs",
+          "tableTo": "logos_fournisseurs",
+          "columnsFrom": [
+            "logo_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "fournisseurs_email_contact_unique": {
+          "name": "fournisseurs_email_contact_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email_contact"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.fruits_quantites": {
+      "name": "fruits_quantites",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "g_par_semaine_par_personne": {
+          "name": "g_par_semaine_par_personne",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "min_kg_par_semaine": {
+          "name": "min_kg_par_semaine",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gamme": {
+          "name": "gamme",
+          "type": "gamme",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.fruits_tarifs": {
+      "name": "fruits_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "fournisseur_id": {
+          "name": "fournisseur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "effectif": {
+          "name": "effectif",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prix_kg": {
+          "name": "prix_kg",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gamme": {
+          "name": "gamme",
+          "type": "gamme",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fruits_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "fruits_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "fruits_tarifs",
+          "tableTo": "fournisseurs",
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.hygiene_conso_tarifs": {
+      "name": "hygiene_conso_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "effectif": {
+          "name": "effectif",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fournisseur_id": {
+          "name": "fournisseur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pa_par_personne_emp": {
+          "name": "pa_par_personne_emp",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pa_par_personne_savon": {
+          "name": "pa_par_personne_savon",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pa_par_personne_ph": {
+          "name": "pa_par_personne_ph",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pa_par_personne_desinfectant": {
+          "name": "pa_par_personne_desinfectant",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "hygiene_conso_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "hygiene_conso_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "hygiene_conso_tarifs",
+          "tableTo": "fournisseurs",
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.hygiene_distrib_quantites": {
+      "name": "hygiene_distrib_quantites",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "effectif": {
+          "name": "effectif",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nb_distrib_emp": {
+          "name": "nb_distrib_emp",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nb_distrib_savon": {
+          "name": "nb_distrib_savon",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nb_distrib_ph": {
+          "name": "nb_distrib_ph",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.hygiene_distrib_tarifs": {
+      "name": "hygiene_distrib_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "fournisseur_id": {
+          "name": "fournisseur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "typehygiene",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gamme": {
+          "name": "gamme",
+          "type": "gamme",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "one_shot": {
+          "name": "one_shot",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pa_12m": {
+          "name": "pa_12m",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pa_24m": {
+          "name": "pa_24m",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pa_36m": {
+          "name": "pa_36m",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "hygiene_distrib_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "hygiene_distrib_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "hygiene_distrib_tarifs",
+          "tableTo": "fournisseurs",
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.hygiene_instal_distrib_tarifs": {
+      "name": "hygiene_instal_distrib_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "fournisseur_id": {
+          "name": "fournisseur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "effectif": {
+          "name": "effectif",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prix_installation": {
+          "name": "prix_installation",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "hygiene_instal_distrib_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "hygiene_instal_distrib_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "hygiene_instal_distrib_tarifs",
+          "tableTo": "fournisseurs",
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.incendie_quantites": {
+      "name": "incendie_quantites",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "surface": {
+          "name": "surface",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nb_extincteurs": {
+          "name": "nb_extincteurs",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.incendie_tarifs": {
+      "name": "incendie_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "fournisseur_id": {
+          "name": "fournisseur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "surface": {
+          "name": "surface",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prix_par_extincteur": {
+          "name": "prix_par_extincteur",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prix_par_baes": {
+          "name": "prix_par_baes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prix_par_tel_baes": {
+          "name": "prix_par_tel_baes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "frais_deplacement": {
+          "name": "frais_deplacement",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "incendie_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "incendie_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "incendie_tarifs",
+          "tableTo": "fournisseurs",
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.lait_conso_tarifs": {
+      "name": "lait_conso_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "fournisseur_id": {
+          "name": "fournisseur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "effectif": {
+          "name": "effectif",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prixUnitaire": {
+          "name": "prixUnitaire",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "infos": {
+          "name": "infos",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "lait_conso_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "lait_conso_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "lait_conso_tarifs",
+          "tableTo": "fournisseurs",
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.legio_tarifs": {
+      "name": "legio_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "surface": {
+          "name": "surface",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prix_annuel": {
+          "name": "prix_annuel",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.logos_fournisseurs": {
+      "name": "logos_fournisseurs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "url": {
+          "name": "url",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.maintenance_quantites": {
+      "name": "maintenance_quantites",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "surface": {
+          "name": "surface",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "freq_annuelle": {
+          "name": "freq_annuelle",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gamme": {
+          "name": "gamme",
+          "type": "gamme",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.maintenance_tarifs": {
+      "name": "maintenance_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "fournisseur_id": {
+          "name": "fournisseur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "surface": {
+          "name": "surface",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "h_par_passage": {
+          "name": "h_par_passage",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "taux_horaire": {
+          "name": "taux_horaire",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gamme": {
+          "name": "gamme",
+          "type": "gamme",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "maintenance_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "maintenance_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "maintenance_tarifs",
+          "tableTo": "fournisseurs",
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.nettoyage_quantites": {
+      "name": "nettoyage_quantites",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "freq_annuelle": {
+          "name": "freq_annuelle",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "surface": {
+          "name": "surface",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gamme": {
+          "name": "gamme",
+          "type": "gamme",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.nettoyage_repasse_tarifs": {
+      "name": "nettoyage_repasse_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "fournisseur_id": {
+          "name": "fournisseur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "h_par_passage": {
+          "name": "h_par_passage",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "taux_horaire": {
+          "name": "taux_horaire",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "surface": {
+          "name": "surface",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gamme": {
+          "name": "gamme",
+          "type": "gamme",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "nettoyage_repasse_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "nettoyage_repasse_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "nettoyage_repasse_tarifs",
+          "tableTo": "fournisseurs",
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.nettoyage_tarifs": {
+      "name": "nettoyage_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "fournisseur_id": {
+          "name": "fournisseur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "h_par_passage": {
+          "name": "h_par_passage",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "taux_horaire": {
+          "name": "taux_horaire",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "surface": {
+          "name": "surface",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gamme": {
+          "name": "gamme",
+          "type": "gamme",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "nettoyage_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "nettoyage_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "nettoyage_tarifs",
+          "tableTo": "fournisseurs",
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.nettoyage_vitrerie_tarifs": {
+      "name": "nettoyage_vitrerie_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "fournisseur_id": {
+          "name": "fournisseur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cadence_vitres": {
+          "name": "cadence_vitres",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cadence_cloisons": {
+          "name": "cadence_cloisons",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "taux_horaire": {
+          "name": "taux_horaire",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "min_facturation": {
+          "name": "min_facturation",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "frais_deplacement": {
+          "name": "frais_deplacement",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "nettoyage_vitrerie_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "nettoyage_vitrerie_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "nettoyage_vitrerie_tarifs",
+          "tableTo": "fournisseurs",
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.office_manager_quantites": {
+      "name": "office_manager_quantites",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "effectif": {
+          "name": "effectif",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "surface": {
+          "name": "surface",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gamme": {
+          "name": "gamme",
+          "type": "gamme",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "demi_j_par_semaine": {
+          "name": "demi_j_par_semaine",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "majoration": {
+          "name": "majoration",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.office_manager_tarifs": {
+      "name": "office_manager_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "fournisseur_id": {
+          "name": "fournisseur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "demi_tjm": {
+          "name": "demi_tjm",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "office_manager_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "office_manager_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "office_manager_tarifs",
+          "tableTo": "fournisseurs",
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.q18_tarifs": {
+      "name": "q18_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "surface": {
+          "name": "surface",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prix_annuel": {
+          "name": "prix_annuel",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.qualite_air_tarifs": {
+      "name": "qualite_air_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "surface": {
+          "name": "surface",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prix_annuel": {
+          "name": "prix_annuel",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.services_fm4all_offres": {
+      "name": "services_fm4all_offres",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "gamme": {
+          "name": "gamme",
+          "type": "gamme",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "assurance": {
+          "name": "assurance",
+          "type": "inclus",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "plateforme": {
+          "name": "plateforme",
+          "type": "inclus",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "support_admin": {
+          "name": "support_admin",
+          "type": "inclus",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "support_op": {
+          "name": "support_op",
+          "type": "inclus",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "account_manager": {
+          "name": "account_manager",
+          "type": "inclus",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "audit": {
+          "name": "audit",
+          "type": "inclus",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.services_fm4all_taux": {
+      "name": "services_fm4all_taux",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "assurance": {
+          "name": "assurance",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "plateforme": {
+          "name": "plateforme",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "support_admin": {
+          "name": "support_admin",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "support_op": {
+          "name": "support_op",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "account_manager": {
+          "name": "account_manager",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "remise_ca_seuil": {
+          "name": "remise_ca_seuil",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "remise_ca": {
+          "name": "remise_ca",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "remise_hof": {
+          "name": "remise_hof",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.snacks_quantites": {
+      "name": "snacks_quantites",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "portions_par_semaine_par_personne": {
+          "name": "portions_par_semaine_par_personne",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "min_portions_par_semaine": {
+          "name": "min_portions_par_semaine",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gamme": {
+          "name": "gamme",
+          "type": "gamme",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.snacks_tarifs": {
+      "name": "snacks_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "fournisseur_id": {
+          "name": "fournisseur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "effectif": {
+          "name": "effectif",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prix_unitaire": {
+          "name": "prix_unitaire",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gamme": {
+          "name": "gamme",
+          "type": "gamme",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "snacks_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "snacks_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "snacks_tarifs",
+          "tableTo": "fournisseurs",
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.the_conso_tarifs": {
+      "name": "the_conso_tarifs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "fournisseur_id": {
+          "name": "fournisseur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gamme": {
+          "name": "gamme",
+          "type": "gamme",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "effectif": {
+          "name": "effectif",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prix_unitaire": {
+          "name": "prix_unitaire",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "infos": {
+          "name": "infos",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "the_conso_tarifs_fournisseur_id_fournisseurs_id_fk": {
+          "name": "the_conso_tarifs_fournisseur_id_fournisseurs_id_fk",
+          "tableFrom": "the_conso_tarifs",
+          "tableTo": "fournisseurs",
+          "columnsFrom": [
+            "fournisseur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.gamme": {
+      "name": "gamme",
+      "schema": "public",
+      "values": [
+        "essentiel",
+        "confort",
+        "excellence"
+      ]
+    },
+    "public.inclus": {
+      "name": "inclus",
+      "schema": "public",
+      "values": [
+        "inclus",
+        "non inclus",
+        "non propose",
+        "sur demande"
+      ]
+    },
+    "public.possibilite": {
+      "name": "possibilite",
+      "schema": "public",
+      "values": [
+        "possible",
+        "non",
+        "obligatoire"
+      ]
+    },
+    "public.status": {
+      "name": "status",
+      "schema": "public",
+      "values": [
+        "active",
+        "inactive"
+      ]
+    },
+    "public.typebatiment": {
+      "name": "typebatiment",
+      "schema": "public",
+      "values": [
+        "bureaux",
+        "localCommercial",
+        "entrepot",
+        "cabinetMedical"
+      ]
+    },
+    "public.typehygiene": {
+      "name": "typehygiene",
+      "schema": "public",
+      "values": [
+        "emp",
+        "savon",
+        "ph",
+        "desinfectant",
+        "parfum",
+        "balai",
+        "poubelle"
+      ]
+    },
+    "public.typemachine": {
+      "name": "typemachine",
+      "schema": "public",
+      "values": [
+        "cafe",
+        "lait",
+        "chocolat"
+      ]
+    },
+    "public.typeoccupation": {
+      "name": "typeoccupation",
+      "schema": "public",
+      "values": [
+        "partieEtage",
+        "plateauComplet",
+        "batimentEntier"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

@@ -26,6 +26,7 @@ import { MaintenanceContext } from "@/context/MaintenanceProvider";
 import { ManagementContext } from "@/context/ManagementProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
+import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { TheContext } from "@/context/TheProvider";
@@ -34,6 +35,8 @@ import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
+import { TotalOfficeManagerContext } from "@/context/TotalOfficeManagerProvider";
+import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { useToast } from "@/hooks/use-toast";
@@ -67,12 +70,15 @@ const MesLocaux = () => {
   const { setTotalThe } = useContext(TotalTheContext);
   const { setSnacksFruits } = useContext(SnacksFruitsContext);
   const { setOfficeManager } = useContext(OfficeManagerContext);
+  const { setServicesFm4All } = useContext(ServicesFm4AllContext);
   const { setTotalNettoyage } = useContext(TotalNettoyageContext);
   const { setTotalHygiene } = useContext(TotalHygieneContext);
   const { setTotalIncendie } = useContext(TotalIncendieContext);
   const { setTotalMaintenance } = useContext(TotalMaintenanceContext);
   const { setTotalCafe } = useContext(TotalCafeContext);
   const { setTotalSnacksFruits } = useContext(TotalSnacksFruitsContext);
+  const { setTotalOfficeManager } = useContext(TotalOfficeManagerContext);
+  const { setTotalServicesFm4All } = useContext(TotalServicesFm4AllContext);
 
   const router = useRouter();
   const { toast } = useToast();
@@ -170,6 +176,7 @@ const MesLocaux = () => {
       setThe,
       setSnacksFruits,
       setOfficeManager,
+      setServicesFm4All,
       //navigation
       setServices,
       setFoodBeverage,
@@ -181,21 +188,14 @@ const MesLocaux = () => {
       setTotalIncendie,
       setTotalCafe,
       setTotalThe,
-      setTotalSnacksFruits
+      setTotalSnacksFruits,
+      setTotalOfficeManager,
+      setTotalServicesFm4All
     );
     localStorage.clear();
     //Passer à l'étape suivante
     router.push(
       `/mon-devis/mes-services?effectif=${dataToPost.effectif}&surface=${dataToPost.surface}`
-    );
-  };
-  const handleClickReprendre = () => {
-    setDevisProgress((prev) => ({
-      ...prev,
-      currentStep: 2,
-    }));
-    router.push(
-      `/mon-devis/mes-services?effectif=${client.effectif}&surface=${client.surface}`
     );
   };
 

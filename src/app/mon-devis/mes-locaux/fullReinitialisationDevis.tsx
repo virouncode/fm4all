@@ -9,6 +9,7 @@ import { ManagementType } from "@/zod-schemas/management";
 import { NettoyageType } from "@/zod-schemas/nettoyage";
 import { OfficeManagerType } from "@/zod-schemas/officeManager";
 import { ServicesType } from "@/zod-schemas/services";
+import { ServicesFm4AllType } from "@/zod-schemas/servicesFm4All";
 import { SnacksFruitsType } from "@/zod-schemas/snacksFruits";
 import { TheType } from "@/zod-schemas/the";
 import {
@@ -17,6 +18,8 @@ import {
   TotalIncendieType,
   TotalMaintenanceType,
   TotalNettoyageType,
+  TotalOfficeManagerType,
+  TotalServicesFm4AllType,
   TotalSnacksFruitsType,
   TotalTheType,
 } from "@/zod-schemas/total";
@@ -33,6 +36,7 @@ export const fullReinitialisationDevis = (
   setThe: (the: TheType) => void,
   setSnacksFruits: (snacksFruits: SnacksFruitsType) => void,
   setOfficeManager: (officeManager: OfficeManagerType) => void,
+  setServicesFm4All: (servicesFm4All: ServicesFm4AllType) => void,
   setServices: (services: ServicesType) => void,
   setFoodBeverage: (foodBeverage: FoodBeverageType) => void,
   setManagement: (management: ManagementType) => void,
@@ -42,7 +46,9 @@ export const fullReinitialisationDevis = (
   setTotalIncendie: (totalIncendie: TotalIncendieType) => void,
   setTotalCafe: (totalCafe: TotalCafeType) => void,
   setTotalThe: (totalThe: TotalTheType) => void,
-  setTotalSnacksFruits: (totalSnacksFruits: TotalSnacksFruitsType) => void
+  setTotalSnacksFruits: (totalSnacksFruits: TotalSnacksFruitsType) => void,
+  setTotalOfficeManager: (totalOfficeManager: TotalOfficeManagerType) => void,
+  setTotalServicesFm4All: (totalServicesFm4All: TotalServicesFm4AllType) => void
 ) => {
   //Client
   setClient({
@@ -231,13 +237,28 @@ export const fullReinitialisationDevis = (
       nomFournisseur: null,
       sloganFournisseur: null,
       gammeSelected: null,
-      remplace: true,
+      remplace: false,
     },
     quantites: {
       demiJParSemaine: null,
     },
     prix: {
       demiTjm: 0,
+    },
+  });
+  setServicesFm4All({
+    infos: {
+      gammeSelected: "essentiel",
+    },
+    prix: {
+      tauxAssurance: null,
+      tauxPlateforme: null,
+      tauxSupportAdmin: null,
+      tauxSupportOp: null,
+      tauxAccountManager: null,
+      remiseCaSeuil: null,
+      tauxRemiseCa: null,
+      tauxRemiseHof: null,
     },
   });
   //Navigation
@@ -293,5 +314,17 @@ export const fullReinitialisationDevis = (
     totalBoissons: 0,
     totalLivraison: 0,
     total: 0,
+  });
+  setTotalOfficeManager({
+    totalService: 0,
+  });
+  setTotalServicesFm4All({
+    totalAssurance: 0,
+    totalPlateforme: 0,
+    totalSupportAdmin: 0,
+    totalSupportOp: 0,
+    totalAccountManager: 0,
+    totalRemiseCa: 0,
+    totalRemiseHof: 0,
   });
 };

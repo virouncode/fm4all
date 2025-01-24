@@ -614,8 +614,6 @@ const LotPropositions = ({
   const handleClickNextLot = () => {
     const machinesIds = cafeLotsMachinesIds;
     const indexOfCurrentMachine = machinesIds.indexOf(lot.infos.lotId);
-    console.log("machinesIds", machinesIds);
-    console.log("indexOfCurrentMachine", indexOfCurrentMachine);
 
     setCafe((prev) => ({
       ...prev,
@@ -808,7 +806,6 @@ const LotPropositions = ({
     }, {});
 
   const formattedPropositions = Object.values(propositionsByFournisseurId);
-  console.log("formattedPropositions", formattedPropositions);
 
   return (
     <div className="flex-1 flex flex-col gap-4">

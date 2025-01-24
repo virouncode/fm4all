@@ -1,12 +1,23 @@
 "use client";
 
 import { ManagementContext } from "@/context/ManagementProvider";
+import { SelectServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4AllOffresType";
+import { SelectServicesFm4AllTauxType } from "@/zod-schemas/servicesFm4AllTaux";
 import { HandPlatter } from "lucide-react";
 import { useContext } from "react";
 import PropositionsFooter from "../../PropositionsFooter";
 import PropositionsTitle from "../../PropositionsTitle";
+import ServicesFm4AllPropositions from "./ServicesFm4AllPropositions";
 
-const ServicesFm4All = () => {
+type ServicesFm4AllProps = {
+  servicesFm4AllTaux: SelectServicesFm4AllTauxType[];
+  servicesFm4AllOffres: SelectServicesFm4AllOffresType[];
+};
+
+const ServicesFm4All = ({
+  servicesFm4AllTaux,
+  servicesFm4AllOffres,
+}: ServicesFm4AllProps) => {
   const { setManagement } = useContext(ManagementContext);
   const handleClickPrevious = () => {
     setManagement((prev) => ({
@@ -24,8 +35,18 @@ const ServicesFm4All = () => {
         icon={HandPlatter}
         handleClickPrevious={handleClickPrevious}
       />
-      <div className="w-full flex-1"></div>
-      <PropositionsFooter handleClickNext={handleClickNext} />
+      <div className="w-full flex-1">
+        <ServicesFm4AllPropositions
+          servicesFm4AllOffres={servicesFm4AllOffres}
+          servicesFm4AllTaux={servicesFm4AllTaux}
+        />
+      </div>
+      <PropositionsFooter
+        handleClickNext={handleClickNext}
+        comment={
+          "\u00B9remise de 0,5% à partir d'un chiffre d'affaires de 26 000€ HT/an, \u00B2remise de 0,5% pour le choix d'un Office Manager"
+        }
+      />
     </div>
   );
 };

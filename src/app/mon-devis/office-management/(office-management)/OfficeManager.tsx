@@ -44,7 +44,7 @@ const OfficeManager = ({
       </div>
       <PropositionsFooter
         handleClickNext={handleClickNext}
-        comment="* certaines demi-journées peuvent être en télétravail"
+        comment="*selon lieu d'exécution les demi journées pourront être proposés en télétravail"
       />
     </div>
   );

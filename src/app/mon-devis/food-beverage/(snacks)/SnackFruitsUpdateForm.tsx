@@ -199,7 +199,6 @@ const SnacksFruitsUpdateForm = ({
         choix: newChoix,
       },
     }));
-    console.log("newChoix", newChoix);
 
     if (newChoix.length === 0) {
       setTotalSnacksFruits((prev) => ({

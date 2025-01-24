@@ -65,7 +65,6 @@ export const getOfficeManagerTarifs = async () => {
       ...result,
       demiTjm: result.demiTjm / RATIO,
     }));
-    console.log("data", data);
 
     return data;
   } catch (err) {
