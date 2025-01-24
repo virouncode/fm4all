@@ -23,7 +23,7 @@ export const TotalServicesFm4AllContext = createContext<{
     totalSupportOp: 0,
     totalAccountManager: 0,
     totalRemiseCa: 0,
-    totalRemiseCaHof: 0,
+    totalRemiseHof: 0,
   },
   setTotalServicesFm4All: () => {},
 });
@@ -40,7 +40,7 @@ const TotalServicesFm4AllProvider = ({ children }: PropsWithChildren) => {
       totalSupportOp: 0,
       totalAccountManager: 0,
       totalRemiseCa: 0,
-      totalRemiseCaHof: 0,
+      totalRemiseHof: 0,
     });
 
   useEffect(() => {
