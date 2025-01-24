@@ -1,12 +1,12 @@
 "use client";
 
 import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
 import { TotalOfficeManagerContext } from "@/context/TotalOfficeManagerProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
-import { GammeType } from "@/zod-schemas/gamme";
 import { SelectOfficeManagerQuantitesType } from "@/zod-schemas/officeManagerQuantites";
 import { SelectOfficeManagerTarifsType } from "@/zod-schemas/officeManagerTarifs";
 import {
@@ -33,30 +33,36 @@ const OfficeManagerPropositions = ({
   const demiJParSemaineEssentiel =
     officeManagerQuantites.find((q) => q.gamme === "essentiel")
       ?.demiJParSemaine ?? 0;
-  const majorationEssentiel =
-    officeManagerQuantites.find((q) => q.gamme === "essentiel")?.majoration ??
-    0;
   const demiJParSemaineConfort =
     officeManagerQuantites.find((q) => q.gamme === "confort")
       ?.demiJParSemaine ?? 0;
-  const majorationConfort =
-    officeManagerQuantites.find((q) => q.gamme === "confort")?.majoration ?? 0;
   const demiJParSemaineExcellence =
     officeManagerQuantites.find((q) => q.gamme === "excellence")
       ?.demiJParSemaine ?? 0;
-  const majorationExcellence =
-    officeManagerQuantites.find((q) => q.gamme === "excellence")?.majoration ??
-    0;
+
+  const demiJParSemaine =
+    officeManager.quantites.demiJParSemaine || demiJParSemaineEssentiel;
+
+  const majoration =
+    demiJParSemaine <= 1
+      ? 20
+      : demiJParSemaine <= 2
+      ? 15
+      : demiJParSemaine <= 3
+      ? 10
+      : demiJParSemaine <= 4
+      ? 5
+      : 0;
 
   const formattedPropositions: {
-    id: string;
+    id: number;
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
-    gamme: GammeType;
     prixAnnuel: number;
     demiJParSemaine: number;
-  }[][] = officeManagerTarifs.map((tarif) => {
+    demiTjm: number;
+  }[] = officeManagerTarifs.map((tarif) => {
     let { fournisseurId, nomFournisseur, slogan } = tarif;
     const { id, demiTjm } = tarif;
     if (fournisseurId === 14) {
@@ -64,91 +70,41 @@ const OfficeManagerPropositions = ({
       nomFournisseur = "FM4ALL";
       slogan = "L'office management pour tous";
     }
-    const prixAnnuelEssentiel = officeManager.infos.remplace
-      ? Math.round(
-          demiJParSemaineEssentiel *
-            demiTjm *
-            52 *
-            (1 + majorationEssentiel / 100)
-        )
-      : Math.round(
-          demiJParSemaineEssentiel *
-            demiTjm *
-            47 *
-            (1 + majorationEssentiel / 100)
-        );
-    const prixAnnuelConfort = officeManager.infos.remplace
-      ? Math.round(
-          demiJParSemaineConfort * demiTjm * 52 * (1 + majorationConfort / 100)
-        )
-      : Math.round(
-          demiJParSemaineConfort * demiTjm * 47 * (1 + majorationConfort / 100)
-        );
-    const prixAnnuelExcellence = officeManager.infos.remplace
-      ? Math.round(
-          demiJParSemaineExcellence *
-            demiTjm *
-            52 *
-            (1 + majorationExcellence / 100)
-        )
-      : Math.round(
-          demiJParSemaineExcellence *
-            demiTjm *
-            47 *
-            (1 + majorationExcellence / 100)
-        );
-    return [
-      {
-        id: id.toString() + "essentiel",
-        fournisseurId,
-        nomFournisseur,
-        sloganFournisseur: slogan,
-        gamme: "essentiel",
-        prixAnnuel: prixAnnuelEssentiel,
-        demiJParSemaine: demiJParSemaineEssentiel,
-      },
-      {
-        id: id.toString() + "confort",
-        fournisseurId,
-        nomFournisseur,
-        sloganFournisseur: slogan,
-        gamme: "confort",
-        prixAnnuel: prixAnnuelConfort,
-        demiJParSemaine: demiJParSemaineConfort,
-      },
-      {
-        id: id.toString() + "excellence",
-        fournisseurId,
-        nomFournisseur,
-        sloganFournisseur: slogan,
-        gamme: "excellence",
-        prixAnnuel: prixAnnuelExcellence,
-        demiJParSemaine: demiJParSemaineExcellence,
-      },
-    ];
+    const prixAnnuel = officeManager.infos.remplace
+      ? Math.round(demiJParSemaine * demiTjm * 52 * (1 + majoration / 100))
+      : Math.round(demiJParSemaine * demiTjm * 47 * (1 + majoration / 100));
+
+    return {
+      id,
+      fournisseurId,
+      nomFournisseur,
+      sloganFournisseur: slogan,
+      prixAnnuel,
+      demiJParSemaine,
+      demiTjm,
+    };
   });
 
   const handleClickProposition = (proposition: {
-    id: string;
+    id: number;
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
-    gamme: GammeType;
     prixAnnuel: number;
     demiJParSemaine: number;
+    demiTjm: number;
   }) => {
     const {
       fournisseurId,
       nomFournisseur,
       sloganFournisseur,
-      gamme,
       prixAnnuel,
       demiJParSemaine,
     } = proposition;
 
     if (
       officeManager.infos.fournisseurId === fournisseurId &&
-      officeManager.infos.gammeSelected === gamme
+      officeManager.infos.gammeSelected
     ) {
       setOfficeManager({
         infos: {
@@ -175,7 +131,12 @@ const OfficeManagerPropositions = ({
         fournisseurId,
         nomFournisseur,
         sloganFournisseur,
-        gammeSelected: gamme,
+        gammeSelected:
+          demiJParSemaine < demiJParSemaineConfort
+            ? "essentiel"
+            : demiJParSemaine < demiJParSemaineExcellence
+            ? "confort"
+            : "excellence",
         remplace: true,
       },
       quantites: {
@@ -190,114 +151,129 @@ const OfficeManagerPropositions = ({
     });
   };
 
-  const handleChangeDemiJParSemaine = (value: number) => {
+  const handleChangeDemiJParSemaine = (value: number[], demiTjm: number) => {
     setOfficeManager({
       ...officeManager,
       quantites: {
-        demiJParSemaine: value,
+        demiJParSemaine: value[0],
       },
     });
+    if (officeManager.infos.gammeSelected) {
+      const newMajoration =
+        value[0] <= 1
+          ? 20
+          : value[0] <= 2
+          ? 15
+          : value[0] <= 3
+          ? 10
+          : value[0] <= 4
+          ? 5
+          : 0;
+      const prixAnnuel = officeManager.infos.remplace
+        ? Math.round(value[0] * demiTjm * 52 * (1 + newMajoration / 100))
+        : Math.round(value[0] * demiTjm * 47 * (1 + newMajoration / 100));
+      setTotalOfficeManager({
+        totalService: prixAnnuel,
+      });
+    }
   };
 
   return (
     <div className="h-full flex flex-col border rounded-xl overflow-hidden">
       {formattedPropositions.length > 0
-        ? formattedPropositions.map((propositions) => (
-            <div
-              className="flex border-b flex-1"
-              key={propositions[0].fournisseurId}
-            >
-              <TooltipProvider delayDuration={0}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex w-1/4 items-center justify-center p-4">
-                      <div className="flex flex-col gap-2 items-center justify-center w-full">
-                        {getLogoFournisseurUrl(
-                          propositions[0].fournisseurId
-                        ) ? (
-                          <div className="w-full h-full relative">
-                            <Image
-                              src={
-                                getLogoFournisseurUrl(
-                                  propositions[0].fournisseurId
-                                ) as string
-                              }
-                              alt={`logo-de-${propositions[0].nomFournisseur}`}
-                              fill={true}
-                              className="w-full h-full object-contain"
-                              quality={100}
-                            />
-                          </div>
-                        ) : (
-                          propositions[0].nomFournisseur
-                        )}
-                        <Slider
-                          value={[
-                            officeManager.quantites.demiJParSemaine ||
-                              demiJParSemaineEssentiel,
-                          ]}
-                          onValueChange={handleChangeDemiJParSemaine}
-                          min={1}
-                          max={20}
-                          step={1}
-                        />
-                      </div>
-                    </div>
-                  </TooltipTrigger>
-                  {propositions[0].sloganFournisseur && (
-                    <TooltipContent>
-                      <p className="text-sm italic">
-                        {propositions[0].sloganFournisseur}
-                      </p>
-                    </TooltipContent>
-                  )}
-                </Tooltip>
-              </TooltipProvider>
-              {propositions.map((proposition) => {
-                const gamme = proposition.gamme;
-                const color =
-                  gamme === "essentiel"
-                    ? "fm4allessential"
-                    : gamme === "confort"
-                    ? "fm4allcomfort"
-                    : "fm4allexcellence";
-                const prixAnnuelText = proposition.prixAnnuel
-                  ? `${formatNumber(proposition.prixAnnuel)} € /an`
-                  : "Non proposé";
-                const demiJParSemaineText = `${proposition.demiJParSemaine} demi journée(s) / semaine`;
-
-                return (
-                  <div
-                    className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
+        ? formattedPropositions.map((proposition) => {
+            const color =
+              demiJParSemaine < demiJParSemaineConfort
+                ? "fm4allessential"
+                : demiJParSemaine < demiJParSemaineExcellence
+                ? "fm4allcomfort"
+                : "fm4allexcellence";
+            const prixAnnuelText = proposition.prixAnnuel
+              ? `${formatNumber(proposition.prixAnnuel)} € /an`
+              : "Non proposé";
+            const demiJParSemaineText = `${proposition.demiJParSemaine} demi journée(s) / semaine`;
+            return (
+              <div className="flex border-b flex-1" key={proposition.id}>
+                <div className="flex w-1/4 items-center justify-center flex-col gap-6 p-4">
+                  <TooltipProvider delayDuration={0}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex items-center justify-center p-4 h-1/2 w-full">
+                          {getLogoFournisseurUrl(proposition.fournisseurId) ? (
+                            <div className="w-full h-full relative">
+                              <Image
+                                src={
+                                  getLogoFournisseurUrl(
+                                    proposition.fournisseurId
+                                  ) as string
+                                }
+                                alt={`logo-de-${proposition.nomFournisseur}`}
+                                fill={true}
+                                className="w-full h-full object-contain"
+                                quality={100}
+                              />
+                            </div>
+                          ) : (
+                            proposition.nomFournisseur
+                          )}
+                        </div>
+                      </TooltipTrigger>
+                      {proposition.sloganFournisseur && (
+                        <TooltipContent>
+                          <p className="text-sm italic">
+                            {proposition.sloganFournisseur}
+                          </p>
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  </TooltipProvider>
+                  <div className="flex gap-4 items-center flex-col  w-full">
+                    <Slider
+                      value={[
+                        officeManager.quantites.demiJParSemaine ||
+                          demiJParSemaineEssentiel,
+                      ]}
+                      onValueChange={(value: number[]) =>
+                        handleChangeDemiJParSemaine(value, proposition.demiTjm)
+                      }
+                      min={1}
+                      max={20}
+                      step={1}
+                    />
+                    <Label htmlFor="demiJParSemaine" className="text-sm flex-1">
+                      {officeManager.quantites.demiJParSemaine} demi journée(s)
+                      / semaine
+                    </Label>
+                  </div>
+                </div>
+                <div
+                  className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
+                    officeManager.infos.fournisseurId ===
+                      proposition.fournisseurId &&
+                    officeManager.infos.gammeSelected !== null
+                      ? "ring-4 ring-inset ring-destructive"
+                      : ""
+                  }`}
+                  key={proposition.id}
+                  onClick={() => handleClickProposition(proposition)}
+                >
+                  <Checkbox
+                    checked={
                       officeManager.infos.fournisseurId ===
                         proposition.fournisseurId &&
-                      officeManager.infos.gammeSelected === gamme
-                        ? "ring-4 ring-inset ring-destructive"
-                        : ""
-                    }`}
-                    key={proposition.id}
-                    onClick={() => handleClickProposition(proposition)}
-                  >
-                    <Checkbox
-                      checked={
-                        officeManager.infos.fournisseurId ===
-                          proposition.fournisseurId &&
-                        officeManager.infos.gammeSelected === gamme
-                      }
-                      onCheckedChange={() =>
-                        handleClickProposition(proposition)
-                      }
-                      className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-                    />
-                    <div>
-                      <p className="font-bold">{prixAnnuelText}</p>
-                      <p className="text-sm">{demiJParSemaineText}</p>
-                    </div>
+                      officeManager.infos.gammeSelected !== null
+                    }
+                    onCheckedChange={() => handleClickProposition(proposition)}
+                    className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+                  />
+                  <div>
+                    <p className="font-bold">{prixAnnuelText}</p>
+                    <p className="text-sm">{demiJParSemaineText}</p>
                   </div>
-                );
-              })}
-            </div>
-          ))
+                </div>
+              </div>
+            );
+          })
         : null}
     </div>
   );

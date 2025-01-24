@@ -191,7 +191,7 @@ const SecuriteIncendiePropositions = ({
         propositions.map((proposition) => (
           <div className="flex border-b flex-1" key={proposition.id}>
             <div className="flex w-1/4 items-center justify-between flex-col gap-10 p-4">
-              <TooltipProvider>
+              <TooltipProvider delayDuration={0}>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div className="flex items-center justify-center h-1/4 w-full">
