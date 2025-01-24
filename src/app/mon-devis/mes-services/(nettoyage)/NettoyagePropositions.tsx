@@ -459,7 +459,7 @@ const NettoyagePropositions = ({
                     ? "fm4allcomfort"
                     : "fm4allexcellence";
                 const prixAnnuelText = proposition.prixAnnuel
-                  ? `${formatNumber(proposition.prixAnnuel)} € /an`
+                  ? `${Math.round(proposition.prixAnnuel / 12)} € / mois`
                   : "Non proposé";
                 const hParSemaineText =
                   proposition.hParPassage && proposition.freqAnnuelle

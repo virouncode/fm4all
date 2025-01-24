@@ -1,7 +1,6 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
-import { formatNumber } from "@/lib/formatNumber";
 import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
 import {
   Tooltip,
@@ -270,7 +269,7 @@ const SnacksFruitsPropositions = ({
                   );
                 }
                 const prixAnnuelText = proposition.total
-                  ? `${formatNumber(proposition.total / 12)} € / mois`
+                  ? `${Math.round(proposition.total / 12)} € / mois`
                   : "Non proposé";
                 const gFruitsParSemaineParPersonneText =
                   snacksFruits.infos.choix.includes("fruits")

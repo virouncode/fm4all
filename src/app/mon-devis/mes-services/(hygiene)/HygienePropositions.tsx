@@ -625,7 +625,7 @@ const HygienePropositions = ({
               ? "fm4allcomfort"
               : "fm4allexcellence";
           const prixAnnuelText = proposition.prixAnnuelTrilogie
-            ? `${formatNumber(proposition.prixAnnuelTrilogie / 12)} € / mois`
+            ? `${Math.round(proposition.prixAnnuelTrilogie / 12)} € / mois`
             : "Non proposé";
           const prixInstallationText = `+ ${formatNumber(
             proposition.prixInstalDistrib

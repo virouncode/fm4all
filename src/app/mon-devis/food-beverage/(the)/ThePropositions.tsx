@@ -5,7 +5,6 @@ import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { TheContext } from "@/context/TheProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
-import { formatNumber } from "@/lib/formatNumber";
 import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
 import { roundEffectif } from "@/lib/roundEffectif";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
@@ -207,7 +206,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
               />
               <div>
                 <p className="font-bold">
-                  {formatNumber(proposition.prixAnnuel / 12)} € / mois*
+                  {Math.round(proposition.prixAnnuel / 12)} € / mois*
                 </p>
                 <p className="text-sm">
                   Consommables ~ {nbTassesParJour} tasses / j

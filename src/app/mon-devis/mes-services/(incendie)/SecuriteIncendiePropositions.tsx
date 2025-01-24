@@ -306,7 +306,7 @@ const SecuriteIncendiePropositions = ({
               />
               <div>
                 <p className="font-bold">
-                  {proposition.prixAnnuel / 12} € / mois*
+                  {Math.round(proposition.prixAnnuel / 12)} € / mois*
                 </p>
                 <p>Pour le contrôle de :</p>
                 <p className="text-sm">

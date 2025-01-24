@@ -233,7 +233,7 @@ const NettoyageOptionsPropositions = ({
   };
 
   const repassePrixAnnuelText = repasseProposition?.prixAnnuel
-    ? `${formatNumber(repasseProposition.prixAnnuel)} € /an`
+    ? `${Math.round(repasseProposition.prixAnnuel / 12)} € / mois`
     : "Non proposé";
   const repasseHParSemaineText = repasseProposition
     ? `${formatNumber(
@@ -248,17 +248,17 @@ const NettoyageOptionsPropositions = ({
     : "";
 
   const samediPrixAnnuelText = samediProposition.prixAnnuel
-    ? `${formatNumber(samediProposition?.prixAnnuel / 12)} € / mois`
+    ? `${Math.round(samediProposition?.prixAnnuel / 12)} € / mois`
     : "Non proposé";
   const samediNbPassagesParSemaineText = `1 passage de ${nettoyage.quantites.hParPassage} h / semaine en plus`;
 
   const dimanchePrixAnnuel = dimancheProposition.prixAnnuel
-    ? `${formatNumber(dimancheProposition.prixAnnuel / 12)} € / mois`
+    ? `${Math.round(dimancheProposition.prixAnnuel / 12)} € / mois`
     : "Non proposé";
   const diamncheNbPassagesParSemaineText = `1 passage de ${nettoyage.quantites.hParPassage} h / semaine en plus`;
 
   const vitreriePrixAnnuelText = vitrerieProposition.prixAnnuel
-    ? `${formatNumber(vitrerieProposition.prixAnnuel)} € /an`
+    ? `${Math.round(vitrerieProposition.prixAnnuel / 12)} € / mois`
     : "Non proposé";
   const nbPassagesVitrerieText = `${nettoyage.quantites.nbPassagesVitrerie} passages / an`;
 

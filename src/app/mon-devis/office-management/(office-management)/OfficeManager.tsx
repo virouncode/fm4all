@@ -42,7 +42,10 @@ const OfficeManager = ({
           officeManagerTarifs={officeManagerTarifs}
         />
       </div>
-      <PropositionsFooter handleClickNext={handleClickNext} />
+      <PropositionsFooter
+        handleClickNext={handleClickNext}
+        comment="* certaines demi-journées peuvent être en télétravail"
+      />
     </div>
   );
 };

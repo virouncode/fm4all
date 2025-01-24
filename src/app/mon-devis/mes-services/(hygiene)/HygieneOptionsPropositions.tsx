@@ -4,7 +4,6 @@ import { Label } from "@/components/ui/label";
 import { ClientContext } from "@/context/ClientProvider";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
-import { formatNumber } from "@/lib/formatNumber";
 import { gammes } from "@/zod-schemas/gamme";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
@@ -397,9 +396,7 @@ const HygieneOptionsPropositions = ({
               ? "fm4allcomfort"
               : "fm4allexcellence";
           const prixAnnuelDesinfectantText = proposition.totalDesinfectant
-            ? `${formatNumber(
-                Math.round(proposition.totalDesinfectant / 12)
-              )} € / mois`
+            ? `${Math.round(proposition.totalDesinfectant / 12)} € / mois`
             : "Non proposé";
 
           return (
@@ -482,9 +479,7 @@ const HygieneOptionsPropositions = ({
               ? "fm4allcomfort"
               : "fm4allexcellence";
           const prixAnnuelParfumText = proposition.totalParfum
-            ? `${formatNumber(
-                Math.round(proposition.totalParfum / 12)
-              )} € / mois`
+            ? `${Math.round(proposition.totalParfum / 12)} € / mois`
             : "Non proposé";
           return (
             <div
@@ -566,9 +561,7 @@ const HygieneOptionsPropositions = ({
               ? "fm4allcomfort"
               : "fm4allexcellence";
           const prixAnnuelBalaiText = proposition.totalBalai
-            ? `${formatNumber(
-                Math.round(proposition.totalBalai / 12)
-              )} € / mois`
+            ? `${Math.round(proposition.totalBalai / 12)} € / mois`
             : "Non proposé";
 
           return (
@@ -655,9 +648,7 @@ const HygieneOptionsPropositions = ({
               ? "fm4allcomfort"
               : "fm4allexcellence";
           const prixAnnuelPoubelleText = proposition.totalPoubelle
-            ? `${formatNumber(
-                Math.round(proposition.totalPoubelle / 12)
-              )} € / mois`
+            ? `${Math.round(proposition.totalPoubelle / 12)} € / mois`
             : "Non proposé";
 
           return (

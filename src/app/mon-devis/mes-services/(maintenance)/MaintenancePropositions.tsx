@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/tooltip";
 import { MaintenanceContext } from "@/context/MaintenanceProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
-import { formatNumber } from "@/lib/formatNumber";
 import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
 import { gammes, GammeType } from "@/zod-schemas/gamme";
 import Image from "next/image";
@@ -179,7 +178,7 @@ const MaintenancePropositions = ({
                     ? "fm4allcomfort"
                     : "fm4allexcellence";
                 const totalText = proposition.total
-                  ? `${formatNumber(proposition.total / 12)} € / mois`
+                  ? `${Math.round(proposition.total / 12)} € / mois`
                   : "Non proposé";
 
                 return (
