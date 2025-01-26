@@ -42,6 +42,7 @@ const Cafe = ({
   const { setFoodBeverage } = useContext(FoodBeverageContext);
   const { cafe, setCafe } = useContext(CafeContext);
   const { setTotalCafe } = useContext(TotalCafeContext);
+  const effectif = client.effectif ?? 0;
   useScrollIntoFood();
   useScrollIntoLot();
 
@@ -77,7 +78,7 @@ const Cafe = ({
             reconditionne: false,
           },
           quantites: {
-            nbPersonnes: client.effectif ?? 0,
+            nbPersonnes: effectif,
             nbMachines: null,
           },
           prix: {
@@ -107,7 +108,7 @@ const Cafe = ({
         previousButton={false}
       />
       <div className="flex-1 overflow-hidden">
-        {cafe.nbLotsMachines > 0 ? (
+        {cafe.nbLotsMachines && cafe.nbLotsMachines > 0 ? (
           cafe.lotsMachines.map((lot) => (
             <CafeLot
               key={lot.infos.lotId}
@@ -136,7 +137,7 @@ const Cafe = ({
       </div>
       <PropositionsFooter
         handleClickNext={handleClickNext}
-        nextButton={cafe.nbLotsMachines === 0}
+        nextButton={!cafe.nbLotsMachines}
       />
     </div>
   );

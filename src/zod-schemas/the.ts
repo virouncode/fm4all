@@ -5,7 +5,7 @@ export const theSchema = z.object({
     gammeSelected: z.enum(["essentiel", "confort", "excellence"]).nullable(),
   }),
   quantites: z.object({
-    nbPersonnes: z.number(),
+    nbPersonnes: z.number().nullable(),
   }),
   prix: z.object({
     prixUnitaire: z.number().nullable(),

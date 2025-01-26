@@ -17,10 +17,10 @@ export const TotalMaintenanceContext = createContext<{
   setTotalMaintenance: Dispatch<SetStateAction<TotalMaintenanceType>>;
 }>({
   totalMaintenance: {
-    totalService: 0,
-    totalQ18: 0,
-    totalLegio: 0,
-    totalQualiteAir: 0,
+    totalService: null,
+    totalQ18: null,
+    totalLegio: null,
+    totalQualiteAir: null,
   },
   setTotalMaintenance: () => {},
 });
@@ -31,10 +31,10 @@ const TotalMaintenanceProvider = ({ children }: PropsWithChildren) => {
   // Always initialize state
   const [totalMaintenance, setTotalMaintenance] =
     useState<TotalMaintenanceType>({
-      totalService: 0,
-      totalQ18: 0,
-      totalLegio: 0,
-      totalQualiteAir: 0,
+      totalService: null,
+      totalQ18: null,
+      totalLegio: null,
+      totalQualiteAir: null,
     });
 
   useEffect(() => {

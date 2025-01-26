@@ -23,15 +23,30 @@ const DevisBreadcrumb = () => {
   const { client } = useContext(ClientContext);
 
   const serviceSearchParams = new URLSearchParams();
+  const sauvegarderSearchParams = new URLSearchParams();
 
   if (client.effectif) {
     serviceSearchParams.set(
       "effectif",
       roundEffectif(client.effectif).toString()
     );
+    sauvegarderSearchParams.set(
+      "effectif",
+      roundEffectif(client.effectif).toString()
+    );
   }
   if (client.surface) {
     serviceSearchParams.set("surface", roundSurface(client.surface).toString());
+    sauvegarderSearchParams.set(
+      "surface",
+      roundSurface(client.surface).toString()
+    );
+  }
+  if (client.typeBatiment) {
+    sauvegarderSearchParams.set("typeBatiment", client.typeBatiment);
+  }
+  if (client.typeOccupation) {
+    sauvegarderSearchParams.set("typeOccupation", client.typeOccupation);
   }
 
   //mes-services searchParams : surface, effectif, fournisseurId, nettoyageGamme
@@ -59,7 +74,7 @@ const DevisBreadcrumb = () => {
     },
     {
       id: 5,
-      url: "/sauvegarder-ma-progression",
+      url: `/sauvegarder-ma-progression?${sauvegarderSearchParams.toString()}`,
       name: "Sauvegarder",
     },
     {

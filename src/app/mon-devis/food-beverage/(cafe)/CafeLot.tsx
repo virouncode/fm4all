@@ -15,8 +15,8 @@ import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { Trash2 } from "lucide-react";
 import { useContext } from "react";
-import LotPropositions from "./LotPropositions";
-import LotUpdateForm from "./LotUpdateForm";
+import CafeLotForm from "./CafeLotForm";
+import CafeLotPropositions from "./CafeLotPropositions";
 import { reinitialisationCafeThe } from "./reinitialisationCafeThe";
 
 type CafeMachineProps = {
@@ -111,7 +111,7 @@ const CafeLot = ({
         )}
       </p> */}
       <div className="w-full flex justify-between items-start">
-        <LotUpdateForm
+        <CafeLotForm
           lot={lot}
           cafeMachines={cafeMachines}
           cafeQuantites={cafeQuantites}
@@ -119,7 +119,6 @@ const CafeLot = ({
           cafeConsoTarifs={cafeConsoTarifs}
           laitConsoTarifs={laitConsoTarifs}
           chocoConsoTarifs={chocoConsoTarifs}
-          theConsoTarifs={theConsoTarifs}
         />
         <div className="flex gap-2 items-center">
           {cafeLotsMachinesIds[0] !== lot.infos.lotId && (
@@ -153,7 +152,7 @@ const CafeLot = ({
           </div>
         </div>
       </div>
-      <LotPropositions
+      <CafeLotPropositions
         cafeMachines={cafeMachines}
         cafeQuantites={cafeQuantites}
         cafeMachinesTarifs={cafeMachinesTarifs}

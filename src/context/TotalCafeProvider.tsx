@@ -30,8 +30,8 @@ const TotalCafeProvider = ({ children }: PropsWithChildren) => {
     totalMachines: [
       {
         lotId: 1,
-        total: 0,
-        totalInstallation: 0,
+        total: null,
+        totalInstallation: null,
       },
     ],
   });

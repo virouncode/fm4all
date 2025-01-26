@@ -2,16 +2,18 @@ import { RATIO } from "@/constants/constants";
 import { db } from "@/db";
 import { fournisseurs, incendieQuantites, incendieTarifs } from "@/db/schema";
 import { errorHelper } from "@/lib/errorHelper";
+import { roundSurface } from "@/lib/roundSurface";
 import { selectIncendieQuantitesSchema } from "@/zod-schemas/incendieQuantites";
 import { selectIncendieTarifsSchema } from "@/zod-schemas/incendieTarifs";
 import { eq, getTableColumns } from "drizzle-orm";
 
 export const getIncendieQuantite = async (surface: string) => {
+  const roundedSurface = roundSurface(parseInt(surface));
   try {
     const results = await db
       .select()
       .from(incendieQuantites)
-      .where(eq(incendieQuantites.surface, parseInt(surface)));
+      .where(eq(incendieQuantites.surface, roundedSurface));
     if (results.length === 0) return null;
     return selectIncendieQuantitesSchema.parse(results[0]);
   } catch (err) {
@@ -20,6 +22,7 @@ export const getIncendieQuantite = async (surface: string) => {
 };
 
 export const getIncendieTarifs = async (surface: string) => {
+  const roundedSurface = roundSurface(parseInt(surface));
   try {
     const results = await db
       .select({
@@ -32,7 +35,7 @@ export const getIncendieTarifs = async (surface: string) => {
         fournisseurs,
         eq(fournisseurs.id, incendieTarifs.fournisseurId)
       )
-      .where(eq(incendieTarifs.surface, parseInt(surface)));
+      .where(eq(incendieTarifs.surface, roundedSurface));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectIncendieTarifsSchema.parse(result)

@@ -12,10 +12,10 @@ export const incendieSchema = z.object({
     nbTelBaes: z.number().nullable(),
   }),
   prix: z.object({
-    prixParExtincteur: z.number().default(0),
-    prixParBaes: z.number().default(0),
-    prixParTelBaes: z.number().default(0),
-    fraisDeplacement: z.number().default(0),
+    prixParExtincteur: z.number().nullable(),
+    prixParBaes: z.number().nullable(),
+    prixParTelBaes: z.number().nullable(),
+    fraisDeplacement: z.number().nullable(),
   }),
 });
 

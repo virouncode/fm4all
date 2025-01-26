@@ -5,6 +5,7 @@ import { SelectWithLabel } from "@/components/formInputs/SelectWithLabel";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -40,15 +41,12 @@ import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvide
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { useToast } from "@/hooks/use-toast";
-import { roundEffectif } from "@/lib/roundEffectif";
-import { roundSurface } from "@/lib/roundSurface";
 import {
   InsertClientFormType,
   insertClientSchema,
   InsertClientType,
 } from "@/zod-schemas/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DialogClose } from "@radix-ui/react-dialog";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { useForm } from "react-hook-form";
@@ -127,8 +125,8 @@ const MesLocaux = () => {
   const submitForm = async (data: Partial<InsertClientFormType>) => {
     const dataToPost = {
       ...data,
-      surface: roundSurface(parseInt(data.surface as string)),
-      effectif: roundEffectif(parseInt(data.effectif as string)),
+      surface: parseInt(data.surface as string),
+      effectif: parseInt(data.effectif as string),
     };
     //Departement in ou out
     if (
@@ -192,10 +190,10 @@ const MesLocaux = () => {
       setTotalOfficeManager,
       setTotalServicesFm4All
     );
-    localStorage.clear();
+    // localStorage.clear();
     //Passer à l'étape suivante
     router.push(
-      `/mon-devis/mes-services?effectif=${dataToPost.effectif}&surface=${dataToPost.surface}`
+      `/mon-devis/mes-services?effectif=${data.effectif}&surface=${data.surface}`
     );
   };
 
@@ -252,33 +250,36 @@ const MesLocaux = () => {
                   size="lg"
                   title="Afficher les tarifs"
                   className="text-base"
+                  disabled={!form.formState.isValid}
                 >
                   Afficher les tarifs
                 </Button>
               </div>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Devis en cours</DialogTitle>
-                <DialogDescription>
-                  Un devis est déjà en cours. Souaitez-vous poursuivre (vos
-                  informations de devis seront perdues) ?
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <div className="flex gap-4">
-                    <Button
-                      variant="destructive"
-                      onClick={() => form.handleSubmit(submitForm)()}
-                    >
-                      Poursuivre
-                    </Button>
-                    <Button variant="outline">Annuler</Button>
-                  </div>
-                </DialogClose>
-              </DialogFooter>
-            </DialogContent>
+            {form.formState.isValid && (
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Devis en cours</DialogTitle>
+                  <DialogDescription>
+                    Un devis est déjà en cours. Souaitez-vous poursuivre (vos
+                    informations de devis seront perdues) ?
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <div className="flex gap-4">
+                      <Button
+                        variant="destructive"
+                        onClick={() => form.handleSubmit(submitForm)()}
+                      >
+                        Poursuivre
+                      </Button>
+                      <Button variant="outline">Annuler</Button>
+                    </div>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            )}
           </Dialog>
         ) : (
           <div className="flex justify-center">

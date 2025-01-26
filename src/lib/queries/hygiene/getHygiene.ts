@@ -8,6 +8,7 @@ import {
   hygieneInstalDistribTarifs,
 } from "@/db/schema";
 import { errorHelper } from "@/lib/errorHelper";
+import { roundEffectif } from "@/lib/roundEffectif";
 import { selectHygieneConsoTarifsSchema } from "@/zod-schemas/hygieneConsoTarifs";
 import { selectHygieneDistribQuantitesSchema } from "@/zod-schemas/hygieneDistribQuantites";
 import { selectHygieneDistribTarifsSchema } from "@/zod-schemas/hygieneDistribTarifs";
@@ -15,11 +16,12 @@ import { selectHygieneInstalDistribTarifsSchema } from "@/zod-schemas/hygieneIns
 import { and, eq, getTableColumns } from "drizzle-orm";
 
 export const getHygieneDistribQuantite = async (effectif: string) => {
+  const roundedEffectif = roundEffectif(parseInt(effectif));
   try {
     const results = await db
       .select()
       .from(hygieneDistribQuantites)
-      .where(eq(hygieneDistribQuantites.effectif, parseInt(effectif)));
+      .where(eq(hygieneDistribQuantites.effectif, roundedEffectif));
 
     if (results.length === 0) {
       return null;
@@ -71,11 +73,12 @@ export const getHygieneDistribTarifs = async () => {
 };
 
 export const getHygieneInstalDistribTarifs = async (effectif: string) => {
+  const roundedEffectif = roundEffectif(parseInt(effectif));
   try {
     const results = await db
       .select()
       .from(hygieneInstalDistribTarifs)
-      .where(and(eq(hygieneInstalDistribTarifs.effectif, parseInt(effectif))));
+      .where(and(eq(hygieneInstalDistribTarifs.effectif, roundedEffectif)));
 
     if (results.length === 0) {
       return [];
@@ -94,6 +97,7 @@ export const getHygieneInstalDistribTarifs = async (effectif: string) => {
 };
 
 export const getHygieneConsosTarifs = async (effectif: string) => {
+  const roundedEffectif = roundEffectif(parseInt(effectif));
   try {
     const results = await db
       .select({
@@ -106,7 +110,7 @@ export const getHygieneConsosTarifs = async (effectif: string) => {
         fournisseurs,
         eq(hygieneConsoTarifs.fournisseurId, fournisseurs.id)
       )
-      .where(and(eq(hygieneConsoTarifs.effectif, parseInt(effectif))));
+      .where(and(eq(hygieneConsoTarifs.effectif, roundedEffectif)));
 
     if (results.length === 0) {
       return [];

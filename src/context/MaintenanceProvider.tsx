@@ -23,14 +23,14 @@ export const MaintenanceContext = createContext<{
       gammeSelected: null,
     },
     quantites: {
-      freqAnnuelle: 0,
-      hParPassage: 0,
+      freqAnnuelle: null,
+      hParPassage: null,
     },
     prix: {
-      tauxHoraire: 0,
-      prixQ18: 0,
-      prixLegio: 0,
-      prixQualiteAir: 0,
+      tauxHoraire: null,
+      prixQ18: null,
+      prixLegio: null,
+      prixQualiteAir: null,
     },
   },
   setMaintenance: () => {},
@@ -48,14 +48,14 @@ const MaintenanceProvider = ({ children }: PropsWithChildren) => {
       gammeSelected: null,
     },
     quantites: {
-      freqAnnuelle: 0,
-      hParPassage: 0,
+      freqAnnuelle: null,
+      hParPassage: null,
     },
     prix: {
-      tauxHoraire: 0,
-      prixQ18: 0,
-      prixLegio: 0,
-      prixQualiteAir: 0,
+      tauxHoraire: null,
+      prixQ18: null,
+      prixLegio: null,
+      prixQualiteAir: null,
     },
   });
 

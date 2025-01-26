@@ -1,9 +1,12 @@
 "use client";
 
+import { ClientContext } from "@/context/ClientProvider";
+import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { ManagementContext } from "@/context/ManagementProvider";
 import { SelectServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4AllOffresType";
 import { SelectServicesFm4AllTauxType } from "@/zod-schemas/servicesFm4AllTaux";
 import { HandPlatter } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import PropositionsFooter from "../../PropositionsFooter";
 import PropositionsTitle from "../../PropositionsTitle";
@@ -19,13 +22,30 @@ const ServicesFm4All = ({
   servicesFm4AllOffres,
 }: ServicesFm4AllProps) => {
   const { setManagement } = useContext(ManagementContext);
+  const { client } = useContext(ClientContext);
+  const { setDevisProgress } = useContext(DevisProgressContext);
+  const router = useRouter();
   const handleClickPrevious = () => {
     setManagement((prev) => ({
       currentManagementId: prev.currentManagementId - 1,
     }));
   };
   const handleClickNext = () => {
-    //TODO: envoyez vers sauvgarder devis
+    setManagement({
+      currentManagementId: 1,
+    });
+    const searchParams = new URLSearchParams();
+    if (client.effectif)
+      searchParams.set("effectif", client.effectif.toString());
+    if (client.surface) searchParams.set("surface", client.surface.toString());
+    if (client.typeBatiment)
+      searchParams.set("typeBatiment", client.typeBatiment);
+    if (client.typeOccupation)
+      searchParams.set("typeOccupation", client.typeOccupation);
+    setDevisProgress({ currentStep: 5, completedSteps: [1, 2, 3, 4] });
+    router.push(
+      `/mon-devis/sauvegarder-ma-progression?${searchParams.toString()}`
+    );
   };
   return (
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="2">

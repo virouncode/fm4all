@@ -125,7 +125,6 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
         hygieneConsosTarifs={hygieneConsosTarifs}
       />
       <NettoyageOptions
-        nettoyageQuantites={nettoyageQuantites}
         nettoyageTarifs={nettoyageTarifs}
         repasseTarifs={repasseTarifs}
         vitrerieTarifs={vitrerieTarifs}

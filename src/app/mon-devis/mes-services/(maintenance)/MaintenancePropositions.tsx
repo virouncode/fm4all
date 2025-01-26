@@ -1,40 +1,115 @@
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { MaintenanceContext } from "@/context/MaintenanceProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
-import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
 import { gammes, GammeType } from "@/zod-schemas/gamme";
-import Image from "next/image";
+import { SelectLegioTarifsType } from "@/zod-schemas/legioTarifs";
+import { SelectMaintenanceQuantitesType } from "@/zod-schemas/maintenanceQuantites";
+import { SelectMaintenanceTarifsType } from "@/zod-schemas/maintenanceTarifs";
+import { SelectQ18TarifsType } from "@/zod-schemas/q18Tarifs";
+import { SelectQualiteAirTarifsType } from "@/zod-schemas/qualiteAirTarifs";
 import { useContext } from "react";
+import MaintenanceFournisseurLogo from "./MaintenanceFournisseurLogo";
+import MaintenancePropositionCard from "./MaintenancePropositionCard";
 
 type MaintenancePropositionsProps = {
-  formattedPropositions: {
-    id: number;
-    gamme: GammeType;
-    nomFournisseur: string;
-    fournisseurId: number;
-    sloganFournisseur: string | null;
-    hParPassage: number;
-    tauxHoraire: number;
-    freqAnnuelle: number;
-    prixAnnuelService: number;
-    prixAnnuelQ18: number;
-    prixAnnuelLegio: number;
-    prixAnnuelQualiteAir: number;
-    total: number;
-  }[][];
+  maintenanceQuantites: SelectMaintenanceQuantitesType[];
+  maintenanceTarifs: SelectMaintenanceTarifsType[];
+  q18Tarif: SelectQ18TarifsType;
+  legioTarif: SelectLegioTarifsType;
+  qualiteAirTarif: SelectQualiteAirTarifsType;
 };
 
 const MaintenancePropositions = ({
-  formattedPropositions,
+  maintenanceQuantites,
+  maintenanceTarifs,
+  q18Tarif,
+  legioTarif,
+  qualiteAirTarif,
 }: MaintenancePropositionsProps) => {
   const { maintenance, setMaintenance } = useContext(MaintenanceContext);
   const { setTotalMaintenance } = useContext(TotalMaintenanceContext);
+
+  //Calcul des propositions
+  const propositions = maintenanceTarifs.map((tarif) => {
+    const {
+      id,
+      gamme,
+      nomFournisseur,
+      slogan: sloganFournisseur,
+      fournisseurId,
+      hParPassage,
+      tauxHoraire,
+    } = tarif;
+    const freqAnnuelle =
+      maintenanceQuantites.find((quantite) => quantite.gamme === tarif.gamme)
+        ?.freqAnnuelle ?? null;
+    const prixAnnuelService =
+      freqAnnuelle !== null
+        ? Math.round(hParPassage * tauxHoraire * freqAnnuelle)
+        : null;
+    const prixAnnuelQ18 = q18Tarif.prixAnnuel;
+    const prixAnnuelLegio = legioTarif.prixAnnuel;
+    const prixAnnuelQualiteAir = qualiteAirTarif.prixAnnuel;
+
+    const prixAnnuelControlesSupplementaires =
+      gamme === "essentiel"
+        ? prixAnnuelQ18
+        : gamme === "confort"
+        ? prixAnnuelQ18 + prixAnnuelLegio
+        : prixAnnuelQ18 + prixAnnuelLegio + prixAnnuelQualiteAir;
+    const total = prixAnnuelService
+      ? prixAnnuelService + prixAnnuelControlesSupplementaires
+      : null;
+    return {
+      id,
+      gamme,
+      nomFournisseur,
+      fournisseurId,
+      sloganFournisseur,
+      hParPassage,
+      tauxHoraire,
+      freqAnnuelle,
+      prixAnnuelService,
+      prixAnnuelQ18,
+      prixAnnuelLegio,
+      prixAnnuelQualiteAir,
+      total,
+    };
+  });
+
+  const propositionsByFournisseurId = propositions.reduce<
+    Record<
+      number,
+      {
+        id: number;
+        gamme: GammeType;
+        nomFournisseur: string;
+        fournisseurId: number;
+        sloganFournisseur: string | null;
+        hParPassage: number;
+        tauxHoraire: number;
+        freqAnnuelle: number | null;
+        prixAnnuelService: number | null;
+        prixAnnuelQ18: number;
+        prixAnnuelLegio: number;
+        prixAnnuelQualiteAir: number;
+        total: number | null;
+      }[]
+    >
+  >((acc, item) => {
+    const { fournisseurId } = item;
+    if (!acc[fournisseurId]) {
+      acc[fournisseurId] = [];
+    }
+    // Add the item to the appropriate array
+    acc[fournisseurId].push(item);
+    acc[fournisseurId].sort(
+      (a, b) => gammes.indexOf(a.gamme) - gammes.indexOf(b.gamme)
+    );
+    return acc;
+  }, {});
+
+  //An array of arrays of propositions by fournisseurId
+  const formattedPropositions = Object.values(propositionsByFournisseurId);
 
   const handleClickProposition = (proposition: {
     id: number;
@@ -44,12 +119,12 @@ const MaintenancePropositions = ({
     sloganFournisseur: string | null;
     hParPassage: number;
     tauxHoraire: number;
-    freqAnnuelle: number;
-    prixAnnuelService: number;
+    freqAnnuelle: number | null;
+    prixAnnuelService: number | null;
     prixAnnuelQ18: number;
     prixAnnuelLegio: number;
     prixAnnuelQualiteAir: number;
-    total: number;
+    total: number | null;
   }) => {
     const {
       gamme,
@@ -66,9 +141,9 @@ const MaintenancePropositions = ({
     } = proposition;
 
     const totalQ18 = prixAnnuelQ18;
-    const totalLegio = gammes.indexOf(gamme) > 0 ? prixAnnuelLegio : 0;
+    const totalLegio = gammes.indexOf(gamme) > 0 ? prixAnnuelLegio : null;
     const totalQualiteAir =
-      gammes.indexOf(gamme) > 1 ? prixAnnuelQualiteAir : 0;
+      gammes.indexOf(gamme) > 1 ? prixAnnuelQualiteAir : null;
 
     if (
       maintenance.infos.fournisseurId === fournisseurId &&
@@ -84,21 +159,21 @@ const MaintenancePropositions = ({
             gammeSelected: null,
           },
           quantites: {
-            freqAnnuelle: 0,
-            hParPassage: 0,
+            freqAnnuelle: null,
+            hParPassage: null,
           },
           prix: {
-            tauxHoraire: 0,
-            prixQ18: 0,
-            prixLegio: 0,
-            prixQualiteAir: 0,
+            tauxHoraire: null,
+            prixQ18: null,
+            prixLegio: null,
+            prixQualiteAir: null,
           },
         }));
         setTotalMaintenance({
-          totalService: 0,
-          totalQ18: 0,
-          totalLegio: 0,
-          totalQualiteAir: 0,
+          totalService: null,
+          totalQ18: null,
+          totalLegio: null,
+          totalQualiteAir: null,
         });
         return;
       }
@@ -137,99 +212,14 @@ const MaintenancePropositions = ({
               className="flex border-b flex-1"
               key={propositions[0].fournisseurId}
             >
-              <TooltipProvider delayDuration={0}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex w-1/4 items-center justify-center">
-                      {getLogoFournisseurUrl(propositions[0].fournisseurId) ? (
-                        <div className="w-full h-full relative">
-                          <Image
-                            src={
-                              getLogoFournisseurUrl(
-                                propositions[0].fournisseurId
-                              ) as string
-                            }
-                            alt={`logo-de-${propositions[0].nomFournisseur}`}
-                            fill={true}
-                            className="w-full h-full object-contain"
-                            quality={100}
-                          />
-                        </div>
-                      ) : (
-                        propositions[0].nomFournisseur
-                      )}
-                    </div>
-                  </TooltipTrigger>
-                  {propositions[0].sloganFournisseur && (
-                    <TooltipContent>
-                      <p className="text-sm italic">
-                        {propositions[0].sloganFournisseur}
-                      </p>
-                    </TooltipContent>
-                  )}
-                </Tooltip>
-              </TooltipProvider>
-              {propositions.map((proposition) => {
-                const gamme = proposition.gamme;
-                const color =
-                  gamme === "essentiel"
-                    ? "fm4allessential"
-                    : gamme === "confort"
-                    ? "fm4allcomfort"
-                    : "fm4allexcellence";
-                const totalText = proposition.total
-                  ? `${Math.round(proposition.total / 12)} € / mois`
-                  : "Non proposé";
-
-                return (
-                  <div
-                    className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
-                      maintenance.infos.fournisseurId ===
-                        proposition.fournisseurId &&
-                      maintenance.infos.gammeSelected === gamme
-                        ? "ring-4 ring-inset ring-destructive"
-                        : ""
-                    }`}
-                    key={proposition.id}
-                    onClick={() => handleClickProposition(proposition)}
-                  >
-                    <Checkbox
-                      checked={
-                        maintenance.infos.fournisseurId ===
-                          proposition.fournisseurId &&
-                        maintenance.infos.gammeSelected === gamme
-                      }
-                      onCheckedChange={() =>
-                        handleClickProposition(proposition)
-                      }
-                      className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-                    />
-                    <div>
-                      <p className="font-bold">{totalText}</p>
-                      <p className="text-sm">
-                        {proposition.freqAnnuelle} passage(s) de{" "}
-                        {proposition.hParPassage} h / an
-                      </p>
-                      {proposition.gamme === "essentiel" && (
-                        <p className="text-sm">+ contrôle Q18</p>
-                      )}
-                      {proposition.gamme === "confort" && (
-                        <>
-                          <p className="text-sm">+ contrôle Q18</p>
-                          <p className="text-sm">+ contrôle Legio</p>
-                        </>
-                      )}
-                      {proposition.gamme === "excellence" && (
-                        <>
-                          <p className="text-sm">+ contrôle Q18</p>
-                          <p className="text-sm">+ contrôle Legio</p>
-                          <p className="text-sm">+ contrôle Qualité Air</p>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+              <MaintenanceFournisseurLogo {...propositions[0]} />
+              {propositions.map((proposition) => (
+                <MaintenancePropositionCard
+                  key={proposition.id}
+                  proposition={proposition}
+                  handleClickProposition={handleClickProposition}
+                />
+              ))}
             </div>
           ))
         : null}

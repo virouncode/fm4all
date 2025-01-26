@@ -1,10 +1,3 @@
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
 import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
@@ -16,12 +9,12 @@ import { TotalOfficeManagerContext } from "@/context/TotalOfficeManagerProvider"
 import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
-import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
 import { GammeType } from "@/zod-schemas/gamme";
 import { SelectServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4AllOffresType";
 import { SelectServicesFm4AllTauxType } from "@/zod-schemas/servicesFm4AllTaux";
-import Image from "next/image";
 import { useContext } from "react";
+import ServicesFm4AllFournisseurLogo from "./ServicesFm4AllFournisseurLogo";
+import ServicesFm4AllPropositionCard from "./ServicesFm4AllPropositionCard";
 
 type ServicesFm4AllPropositionsProps = {
   servicesFm4AllTaux: SelectServicesFm4AllTauxType[];
@@ -59,43 +52,34 @@ const ServicesFm4AllPropositions = ({
     remiseHof: tauxRemiseHof,
   } = servicesFm4AllTaux[0];
 
-  const totalFinalNettoyage =
-    totalNettoyage.totalService +
-    totalNettoyage.totalRepasse +
-    totalNettoyage.totalSamedi +
-    totalNettoyage.totalDimanche +
-    totalNettoyage.totalVitrerie;
-  const totalFinalHygiene =
-    totalHygiene.totalTrilogie +
-    totalHygiene.totalDesinfectant +
-    totalHygiene.totalParfum +
-    totalHygiene.totalBalai +
-    totalHygiene.totalPoubelle;
-  const totalFinalMaintenance =
-    totalMaintenance.totalService +
-    totalMaintenance.totalQ18 +
-    totalMaintenance.totalLegio +
-    totalMaintenance.totalQualiteAir;
-  const totalFinalIncendie = totalIncendie.totalService;
+  //Calcul des propositions
+  const totalFinalNettoyage = Object.values(totalNettoyage)
+    .filter((item) => item !== null)
+    .reduce((sum, value) => sum + value, 0);
+  const totalFinalHygiene = Object.values(totalHygiene)
+    .filter((item) => item !== null)
+    .reduce((sum, value) => sum + value, 0);
+  const totalFinalMaintenance = Object.values(totalMaintenance)
+    .filter((item) => item !== null)
+    .reduce((sum, value) => sum + value, 0);
+  const totalFinalIncendie = totalIncendie.totalService ?? 0;
   //TODO voir pour les prix one shot d'installation
   const totalFinalCafe = totalCafe.totalMachines
     .map(({ total }) => total ?? 0)
     .reduce((acc, curr) => acc + curr, 0);
 
-  const totalFinalThe = totalThe.totalService;
-  const totalFinalSnacksFruits = totalSnacksFruits.total;
-  const totalFinalOfficeManager = totalOfficeManager.totalService;
-
-  const total = Math.round(
+  const totalFinalThe = totalThe.totalService ?? 0;
+  const totalFinalSnacksFruits = totalSnacksFruits.total ?? 0;
+  const totalFinalOfficeManager = totalOfficeManager.totalService ?? 0;
+  const total =
     totalFinalNettoyage +
-      totalFinalHygiene +
-      totalFinalMaintenance +
-      totalFinalIncendie +
-      totalFinalCafe +
-      totalFinalThe +
-      totalFinalSnacksFruits +
-      totalFinalOfficeManager
-  );
+    totalFinalHygiene +
+    totalFinalMaintenance +
+    totalFinalIncendie +
+    totalFinalCafe +
+    totalFinalThe +
+    totalFinalSnacksFruits +
+    totalFinalOfficeManager;
 
   const formattedPropositions = servicesFm4AllOffres.map((offre) => {
     const {
@@ -118,9 +102,7 @@ const ServicesFm4AllPropositions = ({
         ? null
         : plateforme === "inclus"
         ? 0
-        : tauxPlateforme * total >= minFacturationPlateforme
-        ? tauxPlateforme * total
-        : minFacturationPlateforme;
+        : Math.max(tauxPlateforme * total, minFacturationPlateforme);
     const prixSupportAdmin =
       supportAdmin === "non propose"
         ? null
@@ -132,17 +114,13 @@ const ServicesFm4AllPropositions = ({
         ? null
         : supportOp === "inclus"
         ? 0
-        : tauxSupportOp * total >= minFacturationSupportOp
-        ? tauxSupportOp * total
-        : minFacturationSupportOp;
+        : Math.max(tauxSupportOp * total, minFacturationSupportOp);
     const prixAccountManager =
       accountManager === "non propose"
         ? null
         : accountManager === "inclus"
         ? 0
-        : tauxAccountManager * total >= minFacturationAccountManager
-        ? tauxAccountManager * total
-        : minFacturationAccountManager;
+        : Math.max(tauxAccountManager * total, minFacturationAccountManager);
     const remiseCa = total >= remiseCaSeuil ? tauxRemiseCa * total : 0;
     const remiseHof = officeManager.infos.gammeSelected
       ? tauxRemiseHof * total
@@ -244,11 +222,11 @@ const ServicesFm4AllPropositions = ({
       },
     }));
     setTotalServicesFm4All({
-      totalAssurance: prixAssurance ?? 0,
-      totalPlateforme: prixPlateforme ?? 0,
-      totalSupportAdmin: prixSupportAdmin ?? 0,
-      totalSupportOp: prixSupportOp ?? 0,
-      totalAccountManager: prixAccountManager ?? 0,
+      totalAssurance: prixAssurance,
+      totalPlateforme: prixPlateforme,
+      totalSupportAdmin: prixSupportAdmin,
+      totalSupportOp: prixSupportOp,
+      totalAccountManager: prixAccountManager,
       totalRemiseCa: remiseCa,
       totalRemiseHof: remiseHof,
     });
@@ -257,83 +235,15 @@ const ServicesFm4AllPropositions = ({
   return (
     <div className="h-full flex flex-col border rounded-xl overflow-hidden">
       <div className="flex border-b flex-1">
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="flex w-1/4 items-center justify-center p-4">
-                {getLogoFournisseurUrl(15) ? (
-                  <div className="w-full h-full relative">
-                    <Image
-                      src={getLogoFournisseurUrl(15) as string}
-                      alt={`logo-de-fm4All`}
-                      fill={true}
-                      className="w-full h-full object-contain"
-                      quality={100}
-                    />
-                  </div>
-                ) : (
-                  "FM4ALL"
-                )}
-              </div>
-            </TooltipTrigger>
-
-            <TooltipContent>
-              <p className="text-sm italic">Le Facility Management pour tous</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        {formattedPropositions.map((proposition) => {
-          const gamme = proposition.gamme;
-          const color =
-            gamme === "essentiel"
-              ? "fm4allessential"
-              : gamme === "confort"
-              ? "fm4allcomfort"
-              : "fm4allexcellence";
-          const prixTotalAnnuelSansRemiseText = `${Math.round(
-            proposition.prixTotalAnnuelSansRemise / 12
-          )} € / mois`;
-          const prixTotalAnnuelText = `${Math.round(
-            proposition.prixTotalAnnuel / 12
-          )} € / mois${proposition.remiseCa ? "\u00B9" : ""}${
-            proposition.remiseHof ? "\u00B2" : ""
-          }`;
-          return (
-            <div
-              className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
-                servicesFm4All.infos.gammeSelected === gamme
-                  ? "ring-4 ring-inset ring-destructive"
-                  : ""
-              }`}
-              key={proposition.id}
-              onClick={() => handleClickProposition(proposition)}
-            >
-              <Checkbox
-                checked={servicesFm4All.infos.gammeSelected === gamme}
-                onCheckedChange={() => handleClickProposition(proposition)}
-                className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-              />
-              <div>
-                {proposition.prixTotalAnnuelSansRemise !==
-                  proposition.prixTotalAnnuel && (
-                  <p className="font-bold line-through">
-                    {prixTotalAnnuelSansRemiseText}
-                  </p>
-                )}
-                <p className="font-bold">{prixTotalAnnuelText}</p>
-                <p className="text-sm">Assurance</p>
-                <p className="text-sm">Plateforme fm4All</p>
-                <p className="text-sm">Support administratif</p>
-                {gamme !== "essentiel" && (
-                  <p className="text-sm">Support opérationnel</p>
-                )}
-                {gamme === "excellence" && (
-                  <p className="text-sm">Account Manager dédié</p>
-                )}
-              </div>
-            </div>
-          );
-        })}
+        <ServicesFm4AllFournisseurLogo />
+        {formattedPropositions.map((proposition) => (
+          <ServicesFm4AllPropositionCard
+            key={proposition.id}
+            proposition={proposition}
+            handleClickProposition={handleClickProposition}
+            total={total}
+          />
+        ))}
       </div>
     </div>
   );

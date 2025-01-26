@@ -27,10 +27,10 @@ export const IncendieContext = createContext<{
       nbTelBaes: null,
     },
     prix: {
-      prixParExtincteur: 0,
-      prixParBaes: 0,
-      prixParTelBaes: 0,
-      fraisDeplacement: 0,
+      prixParExtincteur: null,
+      prixParBaes: null,
+      prixParTelBaes: null,
+      fraisDeplacement: null,
     },
   },
   setIncendie: () => {},
@@ -52,10 +52,10 @@ const IncendieProvider = ({ children }: PropsWithChildren) => {
       nbTelBaes: null,
     },
     prix: {
-      prixParExtincteur: 0,
-      prixParBaes: 0,
-      prixParTelBaes: 0,
-      fraisDeplacement: 0,
+      prixParExtincteur: null,
+      prixParBaes: null,
+      prixParTelBaes: null,
+      fraisDeplacement: null,
     },
   });
 

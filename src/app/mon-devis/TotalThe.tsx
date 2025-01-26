@@ -11,7 +11,7 @@ const TotalThe = () => {
   const { totalThe } = useContext(TotalTheContext);
 
   const total = totalThe.totalService;
-  if (total === 0) return null;
+  if (!total) return null;
 
   const color = getFm4AllColor(the.infos.gammeSelected);
 
@@ -24,11 +24,11 @@ const TotalThe = () => {
             className={`flex items-center justify-between text-${color} font-bold`}
           >
             <p>Sachets</p>
-            <p className="text-end">{formatNumber(total)} € HT / an</p>
+            <p className="text-end">{formatNumber(total)} € HT/an</p>
           </div>
           <div className="flex items-center justify-between border-t border-foreground mt-2">
             <p>TOTAL</p>
-            <p className="text-end">{formatNumber(total)} € HT / an</p>
+            <p className="text-end">{formatNumber(total)} € HT/an</p>
           </div>
         </div>
       </div>

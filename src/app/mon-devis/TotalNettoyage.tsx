@@ -16,10 +16,12 @@ const TotalNettoyage = () => {
     totalVitrerie,
   } = totalNettoyage;
   const total = Math.round(
-    totalService + totalRepasse + totalSamedi + totalDimanche + totalVitrerie
+    Object.values(totalNettoyage)
+      .filter((item) => item !== null)
+      .reduce((sum, value) => sum + value, 0)
   );
 
-  if (total === 0) return null;
+  if (!total) return null;
 
   const color = getFm4AllColor(nettoyage.infos.gammeSelected);
 
@@ -33,7 +35,7 @@ const TotalNettoyage = () => {
               className={`flex items-center justify-between text-${color} font-bold`}
             >
               <p>Service</p>
-              <p className="text-end">{formatNumber(totalService)} € HT / an</p>
+              <p className="text-end">{formatNumber(totalService)} € HT/an</p>
             </div>
           ) : null}
           {totalRepasse ? (
@@ -41,7 +43,7 @@ const TotalNettoyage = () => {
               className={`flex items-center justify-between text-${color} font-bold`}
             >
               <p>Option repasse</p>
-              <p className="text-end">{formatNumber(totalRepasse)} € HT / an</p>
+              <p className="text-end">{formatNumber(totalRepasse)} € HT/an</p>
             </div>
           ) : null}
           {totalSamedi ? (
@@ -49,7 +51,7 @@ const TotalNettoyage = () => {
               className={`flex items-center justify-between text-${color} font-bold`}
             >
               <p>Option samedi</p>
-              <p className="text-end">{formatNumber(totalSamedi)} € HT / an</p>
+              <p className="text-end">{formatNumber(totalSamedi)} € HT/an</p>
             </div>
           ) : null}
           {totalDimanche ? (
@@ -57,9 +59,7 @@ const TotalNettoyage = () => {
               className={`flex items-center justify-between text-${color} font-bold`}
             >
               <p>Option dimanche</p>
-              <p className="text-end">
-                {formatNumber(totalDimanche)} € HT / an
-              </p>
+              <p className="text-end">{formatNumber(totalDimanche)} € HT/an</p>
             </div>
           ) : null}
           {totalVitrerie ? (
@@ -67,14 +67,12 @@ const TotalNettoyage = () => {
               className={`flex items-center justify-between text-${color} font-bold`}
             >
               <p>Option vitrerie</p>
-              <p className="text-end">
-                {formatNumber(totalVitrerie)} € HT / an
-              </p>
+              <p className="text-end">{formatNumber(totalVitrerie)} € HT/an</p>
             </div>
           ) : null}
           <div className="flex items-center justify-between border-t border-foreground mt-2">
             <p>TOTAL</p>
-            <p className="text-end">{total} € HT / an</p>
+            <p className="text-end">{total} € HT/an</p>
           </div>
         </div>
       </div>

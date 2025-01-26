@@ -14,7 +14,7 @@ const TotalCafe = () => {
     .map(({ totalInstallation }) => totalInstallation ?? 0)
     .reduce((acc, curr) => acc + curr, 0);
 
-  if (total === 0) return null;
+  if (!total) return null;
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-4">
@@ -44,7 +44,7 @@ const TotalCafe = () => {
                         (total) => total.lotId === item.infos.lotId
                       )?.total ?? 0
                     )}{" "}
-                    € HT / an
+                    € HT/an
                   </p>
                 </div>
                 {totalCafe.totalMachines.find(
@@ -67,7 +67,7 @@ const TotalCafe = () => {
           <div className="flex flex-col border-t border-foreground mt-2">
             <div className="flex justify-between w-full">
               <p>TOTAL</p>
-              <p className="text-end">{formatNumber(total)} € HT / an</p>
+              <p className="text-end">{formatNumber(total)} € HT/an</p>
             </div>
             {totalInstallation ? (
               <div className="flex justify-between w-full">

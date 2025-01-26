@@ -28,10 +28,9 @@ import { SelectCafeQuantitesType } from "@/zod-schemas/cafeQuantites";
 import { SelectChocoConsoTarifsType } from "@/zod-schemas/chocoConsoTarifs";
 import { DureeLocationCafeType } from "@/zod-schemas/dureeLocation";
 import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
-import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { ChangeEvent, useContext } from "react";
 
-type LotUpdateFormProps = {
+type CafeLotFormProps = {
   lot: CafeLotType;
   cafeMachines: SelectCafeMachinesType[];
   cafeQuantites: SelectCafeQuantitesType[];
@@ -39,10 +38,9 @@ type LotUpdateFormProps = {
   cafeConsoTarifs: SelectCafeConsoTarifsType[];
   laitConsoTarifs: SelectLaitConsoTarifsType[];
   chocoConsoTarifs: SelectChocoConsoTarifsType[];
-  theConsoTarifs: SelectTheConsoTarifsType[];
 };
 
-const LotUpdateForm = ({
+const CafeLotForm = ({
   lot,
   cafeMachines,
   cafeQuantites,
@@ -50,21 +48,21 @@ const LotUpdateForm = ({
   cafeConsoTarifs,
   laitConsoTarifs,
   chocoConsoTarifs,
-  theConsoTarifs,
-}: LotUpdateFormProps) => {
+}: CafeLotFormProps) => {
   const { client } = useContext(ClientContext);
   const { cafe, setCafe } = useContext(CafeContext);
   const { setThe } = useContext(TheContext);
   const { setTotalCafe } = useContext(TotalCafeContext);
   const { setTotalThe } = useContext(TotalTheContext);
   const cafeLotsMachinesIds = cafe.lotsMachines.map((lot) => lot.infos.lotId);
+  const effectif = client.effectif ?? 0;
+  const nbPersonnes = lot.quantites.nbPersonnes || effectif;
 
   //Je change le type de boissons
   //Si c'est la première machine :
   //Pour la première machine et les autres : Je ne change pas de fournisseur ni de gamme, je mets juste le total à jour
 
   const handleChangeTypeBoissons = (value: string) => {
-    const nbPersonnes = lot.quantites.nbPersonnes;
     //JE N'AI PAS DE FOURNISSEUR
     if (!cafe.infos.fournisseurId) {
       setCafe((prev) => ({
@@ -88,21 +86,21 @@ const LotUpdateForm = ({
       ({ effectif }) => effectif === roundEffectif(nbPersonnes)
     );
     const nbMachines =
-      (lot.quantites.nbMachines || cafeQuantite?.nbMachines) ?? 0;
+      (lot.quantites.nbMachines || cafeQuantite?.nbMachines) ?? 1;
     const nbTassesParAn = nbPersonnes * 400;
     const nbTassesParJParMachine = Math.round((nbPersonnes * 2) / nbMachines);
     const limiteTassesJParMachine = toLimiteBoissonsParJParMachine(
       nbTassesParJParMachine
     );
-    const machinesTarif = cafeMachinesTarifs.find(
+    const machinesTarifFournisseur = cafeMachinesTarifs.find(
       (tarif) =>
         tarif.limiteTassesJ === limiteTassesJParMachine &&
         tarif.type === value &&
         tarif[cafe.infos.dureeLocation] !== null &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
-    //Il se peut que mon fournisseur n'ait pas de tarif ces critères
-    if (!machinesTarif) {
+    //Il se peut que mon fournisseur n'ait pas de tarif pour ces critères
+    if (!machinesTarifFournisseur) {
       //si c'est la première machine
       if (cafeLotsMachinesIds[0] === lot.infos.lotId) {
         //On retire TOUT
@@ -163,12 +161,12 @@ const LotUpdateForm = ({
         setTotalCafe((prev) => ({
           totalMachines: prev.totalMachines.map((item) => ({
             ...item,
-            total: 0,
-            totalInstallation: 0,
+            total: null,
+            totalInstallation: null,
           })),
         }));
         setTotalThe({
-          totalService: 0,
+          totalService: null,
         });
       } else {
         //Si c'est pas la première machine on retire juste les choix pour la machine en cours
@@ -203,8 +201,8 @@ const LotUpdateForm = ({
             item.lotId === lot.infos.lotId
               ? {
                   ...item,
-                  total: 0,
-                  totalInstallation: 0,
+                  total: null,
+                  totalInstallation: null,
                 }
               : item
           ),
@@ -213,49 +211,67 @@ const LotUpdateForm = ({
       return;
     }
     //Le fournisseur a des tarifs pour ces critères ! On reprend le calcul
-    const prixUnitaireLoc = machinesTarif[cafe.infos.dureeLocation] ?? 0;
-    const prixUnitaireInstal = machinesTarif.prixInstallation ?? 0;
-    const prixUnitaireMaintenance = machinesTarif.paMaintenance ?? 0;
+    const prixUnitaireLoc = machinesTarifFournisseur[cafe.infos.dureeLocation];
+    const prixUnitaireInstal = machinesTarifFournisseur.prixInstallation;
+    const prixUnitaireMaintenance = machinesTarifFournisseur.paMaintenance;
     const prixUnitaireConsoCafe =
       cafeConsoTarifs.find(
         (item) =>
           item.effectif === roundEffectif(nbPersonnes) &&
           item.fournisseurId === cafe.infos.fournisseurId &&
           item.gamme === lot.infos.gammeCafeSelected
-      )?.prixUnitaire ?? 0;
+      )?.prixUnitaire ?? null;
     const prixUnitaireConsoLait =
       laitConsoTarifs.find(
         (item) =>
           item.effectif === roundEffectif(nbPersonnes) &&
           item.fournisseurId === cafe.infos.fournisseurId
-      )?.prixUnitaire ?? 0;
+      )?.prixUnitaire ?? null;
     const prixUnitaireConsoChocolat =
       chocoConsoTarifs.find(
         (item) =>
           item.effectif === roundEffectif(nbPersonnes) &&
           item.fournisseurId === cafe.infos.fournisseurId
-      )?.prixUnitaire ?? 0;
-    const prixAnnuelConso =
-      prixUnitaireConsoCafe * nbTassesParAn +
-      (value !== "cafe"
+      )?.prixUnitaire ?? null;
+    const prixAnnuelConsoCafe =
+      prixUnitaireConsoCafe !== null
+        ? prixUnitaireConsoCafe * nbTassesParAn
+        : null;
+    const prixAnnuelConsoLait =
+      prixUnitaireConsoLait !== null
         ? prixUnitaireConsoLait * nbTassesParAn * RATIO_LAIT
-        : 0) +
-      (value === "chocolat"
+        : null;
+    const prixAnnuelConsoChocolat =
+      prixUnitaireConsoChocolat !== null
         ? prixUnitaireConsoChocolat * nbTassesParAn * RATIO_CHOCO
+        : null;
+    const prixAnnuelConso =
+      (prixAnnuelConsoCafe ?? 0) +
+      (lot.infos.typeBoissons !== "cafe" ? prixAnnuelConsoLait ?? 0 : 0) +
+      (lot.infos.typeBoissons === "chocolat"
+        ? prixAnnuelConsoChocolat ?? 0
         : 0);
-    const prixAnnuel = Math.round(
-      prixAnnuelConso + nbMachines * (prixUnitaireLoc + prixUnitaireMaintenance)
-    );
-    const prixInstallation = prixUnitaireInstal * nbMachines;
+
+    const prixAnnuel =
+      prixUnitaireLoc !== null && prixUnitaireMaintenance !== null
+        ? Math.round(
+            prixAnnuelConso +
+              nbMachines * (prixUnitaireLoc + prixUnitaireMaintenance)
+          )
+        : null;
+    const prixInstallation =
+      prixUnitaireInstal !== null ? prixUnitaireInstal * nbMachines : null;
 
     //Caractéristiques de la machine
     const modele =
-      cafeMachines.find(({ id }) => id === machinesTarif.cafeMachineId)
-        ?.modele ?? "";
+      cafeMachines.find(
+        ({ id }) => id === machinesTarifFournisseur.cafeMachineId
+      )?.modele ?? null;
     const marque =
-      cafeMachines.find(({ id }) => id === machinesTarif.cafeMachineId)
-        ?.marque ?? "";
-    const reconditionne = machinesTarif.reconditionne ?? false;
+      cafeMachines.find(
+        ({ id }) => id === machinesTarifFournisseur.cafeMachineId
+      )?.marque ?? null;
+    const reconditionne = machinesTarifFournisseur.reconditionne;
     //Je mets à jour ma machine
     setCafe((prev) => ({
       ...prev,
@@ -298,9 +314,9 @@ const LotUpdateForm = ({
     }
   };
 
-  const handleChangeEffectif = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChangeNbPersonnes = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    const newNbPersonnes = value ? parseInt(value) : client.effectif ?? 0;
+    const newNbPersonnes = value ? parseInt(value) : effectif;
     //Si je n'avais pas de fournisseur, je change juste le nombre de personnes
     if (!cafe.infos.fournisseurId) {
       setCafe((prev) => ({
@@ -324,7 +340,7 @@ const LotUpdateForm = ({
       ({ effectif }) => effectif === roundEffectif(newNbPersonnes)
     );
     const nbMachines =
-      (lot.quantites.nbMachines || cafeQuantite?.nbMachines) ?? 0;
+      (lot.quantites.nbMachines || cafeQuantite?.nbMachines) ?? 1;
     const nbTassesParAn = newNbPersonnes * 400;
     const nbTassesParJParMachine = Math.round(
       (newNbPersonnes * 2) / nbMachines
@@ -332,7 +348,7 @@ const LotUpdateForm = ({
     const limiteTassesJParMachine = toLimiteBoissonsParJParMachine(
       nbTassesParJParMachine
     );
-    const machinesTarif = cafeMachinesTarifs.find(
+    const machinesTarifFournisseur = cafeMachinesTarifs.find(
       (tarif) =>
         tarif.limiteTassesJ === limiteTassesJParMachine &&
         tarif.type === lot.infos.typeBoissons &&
@@ -340,7 +356,7 @@ const LotUpdateForm = ({
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     //Il se peut que mon fournisseur n'ait pas de tarif pour ces critères
-    if (!machinesTarif) {
+    if (!machinesTarifFournisseur) {
       //si c'est la première machine
       if (cafeLotsMachinesIds[0] === lot.infos.lotId) {
         //On retire TOUT
@@ -404,12 +420,12 @@ const LotUpdateForm = ({
         setTotalCafe((prev) => ({
           totalMachines: prev.totalMachines.map((item) => ({
             ...item,
-            total: 0,
-            totalInstallation: 0,
+            total: null,
+            totalInstallation: null,
           })),
         }));
         setTotalThe({
-          totalService: 0,
+          totalService: null,
         });
       } else {
         //Si c'est pas la première machine on retire juste les choix pour la machine en cours
@@ -447,8 +463,8 @@ const LotUpdateForm = ({
             item.lotId === lot.infos.lotId
               ? {
                   ...item,
-                  total: 0,
-                  totalInstallation: 0,
+                  total: null,
+                  totalInstallation: null,
                 }
               : item
           ),
@@ -457,48 +473,63 @@ const LotUpdateForm = ({
       return;
     }
     //Le fournisseur a des tarifs pour ces critères ! On reprend le calcul
-    const prixUnitaireLoc = machinesTarif[cafe.infos.dureeLocation] ?? 0;
-    const prixUnitaireInstal = machinesTarif.prixInstallation ?? 0;
-    const prixUnitaireMaintenance = machinesTarif.paMaintenance ?? 0;
+    const prixUnitaireLoc = machinesTarifFournisseur[cafe.infos.dureeLocation];
+    const prixUnitaireInstal = machinesTarifFournisseur.prixInstallation;
+    const prixUnitaireMaintenance = machinesTarifFournisseur.paMaintenance;
     const prixUnitaireConsoCafe =
       cafeConsoTarifs.find(
         (item) =>
           item.effectif === roundEffectif(newNbPersonnes) &&
           item.fournisseurId === cafe.infos.fournisseurId &&
           item.gamme === lot.infos.gammeCafeSelected
-      )?.prixUnitaire ?? 0;
+      )?.prixUnitaire ?? null;
     const prixUnitaireConsoLait =
       laitConsoTarifs.find(
         (item) =>
           item.effectif === roundEffectif(newNbPersonnes) &&
           item.fournisseurId === cafe.infos.fournisseurId
-      )?.prixUnitaire ?? 0;
+      )?.prixUnitaire ?? null;
     const prixUnitaireConsoChocolat =
       chocoConsoTarifs.find(
         (item) =>
           item.effectif === roundEffectif(newNbPersonnes) &&
           item.fournisseurId === cafe.infos.fournisseurId
-      )?.prixUnitaire ?? 0;
-    const prixAnnuelConso =
-      prixUnitaireConsoCafe * nbTassesParAn +
-      (value !== "cafe"
+      )?.prixUnitaire ?? null;
+    const prixAnnuelConsoCafe =
+      prixUnitaireConsoCafe !== null
+        ? prixUnitaireConsoCafe * nbTassesParAn
+        : null;
+    const prixAnnuelConsoLait =
+      prixUnitaireConsoLait !== null
         ? prixUnitaireConsoLait * nbTassesParAn * RATIO_LAIT
-        : 0) +
-      (value === "chocolat"
+        : null;
+    const prixAnnuelConsoChocolat =
+      prixUnitaireConsoChocolat !== null
         ? prixUnitaireConsoChocolat * nbTassesParAn * RATIO_CHOCO
-        : 0);
-    const prixAnnuel = Math.round(
-      prixAnnuelConso + nbMachines * (prixUnitaireLoc + prixUnitaireMaintenance)
-    );
-    const prixInstallation = prixUnitaireInstal * nbMachines;
+        : null;
+    const prixAnnuelConso =
+      (prixAnnuelConsoCafe ?? 0) +
+      (value !== "cafe" ? prixAnnuelConsoLait ?? 0 : 0) +
+      (value === "chocolat" ? prixAnnuelConsoChocolat ?? 0 : 0);
+    const prixAnnuel =
+      prixUnitaireLoc !== null && prixUnitaireMaintenance !== null
+        ? Math.round(
+            prixAnnuelConso +
+              nbMachines * (prixUnitaireLoc + prixUnitaireMaintenance)
+          )
+        : null;
+    const prixInstallation =
+      prixUnitaireInstal !== null ? prixUnitaireInstal * nbMachines : null;
     //Caractéristiques de la machine
     const modele =
-      cafeMachines.find(({ id }) => id === machinesTarif.cafeMachineId)
-        ?.modele ?? "";
+      cafeMachines.find(
+        ({ id }) => id === machinesTarifFournisseur.cafeMachineId
+      )?.modele ?? null;
     const marque =
-      cafeMachines.find(({ id }) => id === machinesTarif.cafeMachineId)
-        ?.marque ?? "";
-    const reconditionne = machinesTarif.reconditionne ?? false;
+      cafeMachines.find(
+        ({ id }) => id === machinesTarifFournisseur.cafeMachineId
+      )?.marque ?? null;
+    const reconditionne = machinesTarifFournisseur.reconditionne;
 
     //Je mets à jour  ma machine
     setCafe((prev) => ({
@@ -546,7 +577,6 @@ const LotUpdateForm = ({
   };
 
   const handleSelectDureeLocation = (value: string) => {
-    const nbPersonnes = lot.quantites.nbPersonnes;
     //Si j'ai pas de fournisseur encore, je change juste la duree de Location
     if (!cafe.infos.fournisseurId) {
       setCafe((prev) => ({
@@ -563,14 +593,14 @@ const LotUpdateForm = ({
       ({ effectif }) => effectif === roundEffectif(nbPersonnes)
     );
     const nbMachines =
-      (lot.quantites.nbMachines || cafeQuantite?.nbMachines) ?? 0;
+      (lot.quantites.nbMachines || cafeQuantite?.nbMachines) ?? 1;
     const nbCafesParAn = nbPersonnes * 400;
     const nbTassesParJParMachine = Math.round((nbPersonnes * 2) / nbMachines);
     const limiteTassesJParMachine = toLimiteBoissonsParJParMachine(
       nbTassesParJParMachine
     );
 
-    const machinesTarif = cafeMachinesTarifs.find(
+    const machinesTarifFournisseur = cafeMachinesTarifs.find(
       (tarif) =>
         tarif.limiteTassesJ === limiteTassesJParMachine &&
         tarif.type === lot.infos.typeBoissons &&
@@ -578,7 +608,7 @@ const LotUpdateForm = ({
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     //Il se peut que mon fournisseur n'ait pas de tarif ces critères
-    if (!machinesTarif) {
+    if (!machinesTarifFournisseur) {
       //si c'est la première machine => c'est forcément la première machine
       //On retire TOUT
       setCafe((prev) => ({
@@ -638,58 +668,75 @@ const LotUpdateForm = ({
       setTotalCafe((prev) => ({
         totalMachines: prev.totalMachines.map((item) => ({
           ...item,
-          total: 0,
-          totalInstallation: 0,
+          total: null,
+          totalInstallation: null,
         })),
       }));
       setTotalThe({
-        totalService: 0,
+        totalService: null,
       });
       return;
     }
     //Le fournisseur a des tarifs pour ces critères ! On reprend le calcul
-    const prixUnitaireLoc = machinesTarif[value as DureeLocationCafeType] ?? 0;
-    const prixUnitaireInstal = machinesTarif.prixInstallation ?? 0;
-    const prixUnitaireMaintenance = machinesTarif.paMaintenance ?? 0;
+    const prixUnitaireLoc =
+      machinesTarifFournisseur[value as DureeLocationCafeType];
+    const prixUnitaireInstal = machinesTarifFournisseur.prixInstallation;
+    const prixUnitaireMaintenance = machinesTarifFournisseur.paMaintenance;
     const prixUnitaireConsoCafe =
       cafeConsoTarifs.find(
         (item) =>
           item.effectif === roundEffectif(nbPersonnes) &&
           item.fournisseurId === cafe.infos.fournisseurId &&
           item.gamme === lot.infos.gammeCafeSelected
-      )?.prixUnitaire ?? 0;
+      )?.prixUnitaire ?? null;
     const prixUnitaireConsoLait =
       laitConsoTarifs.find(
         (item) =>
           item.effectif === roundEffectif(nbPersonnes) &&
           item.fournisseurId === cafe.infos.fournisseurId
-      )?.prixUnitaire ?? 0;
+      )?.prixUnitaire ?? null;
     const prixUnitaireConsoChocolat =
       chocoConsoTarifs.find(
         (item) =>
           item.effectif === roundEffectif(nbPersonnes) &&
           item.fournisseurId === cafe.infos.fournisseurId
-      )?.prixUnitaire ?? 0;
-    const prixAnnuelConso =
-      prixUnitaireConsoCafe * nbCafesParAn +
-      (value !== "cafe"
+      )?.prixUnitaire ?? null;
+    const prixAnnuelConsoCafe =
+      prixUnitaireConsoCafe !== null
+        ? prixUnitaireConsoCafe * nbCafesParAn
+        : null;
+    const prixAnnuelConsoLait =
+      prixUnitaireConsoLait !== null
         ? prixUnitaireConsoLait * nbCafesParAn * RATIO_LAIT
-        : 0) +
-      (value === "chocolat"
+        : null;
+    const prixAnnuelConsoChocolat =
+      prixUnitaireConsoChocolat !== null
         ? prixUnitaireConsoChocolat * nbCafesParAn * RATIO_CHOCO
-        : 0);
-    const prixAnnuel = Math.round(
-      prixAnnuelConso + nbMachines * (prixUnitaireLoc + prixUnitaireMaintenance)
-    );
-    const prixInstallation = prixUnitaireInstal * nbMachines;
+        : null;
+
+    const prixAnnuelConso =
+      (prixAnnuelConsoCafe ?? 0) +
+      (value !== "cafe" ? prixAnnuelConsoLait ?? 0 : 0) +
+      (value === "chocolat" ? prixAnnuelConsoChocolat ?? 0 : 0);
+    const prixAnnuel =
+      prixUnitaireLoc !== null && prixUnitaireMaintenance !== null
+        ? Math.round(
+            prixAnnuelConso +
+              nbMachines * (prixUnitaireLoc + prixUnitaireMaintenance)
+          )
+        : null;
+    const prixInstallation =
+      prixUnitaireInstal !== null ? prixUnitaireInstal * nbMachines : null;
     //Caractéristiques de la machine
     const modele =
-      cafeMachines.find(({ id }) => id === machinesTarif.cafeMachineId)
-        ?.modele ?? "";
+      cafeMachines.find(
+        ({ id }) => id === machinesTarifFournisseur.cafeMachineId
+      )?.modele ?? null;
     const marque =
-      cafeMachines.find(({ id }) => id === machinesTarif.cafeMachineId)
-        ?.marque ?? "";
-    const reconditionne = machinesTarif.reconditionne ?? false;
+      cafeMachines.find(
+        ({ id }) => id === machinesTarifFournisseur.cafeMachineId
+      )?.marque ?? null;
+    const reconditionne = machinesTarifFournisseur.reconditionne;
     //Je mets à jour le type de boissons de ma machine
     //Je mets à jour  ma machine
     setCafe((prev) => ({
@@ -763,16 +810,14 @@ const LotUpdateForm = ({
         <div className="flex gap-2 items-center">
           <Input
             className={`w-full max-w-xs min-w-20 ${
-              lot.quantites.nbPersonnes === client.effectif
-                ? "text-destructive"
-                : ""
+              nbPersonnes === client.effectif ? "text-destructive" : ""
             }`}
             type="number"
             min={1}
             max={300}
             step={1}
-            value={lot.quantites.nbPersonnes}
-            onChange={handleChangeEffectif}
+            value={nbPersonnes}
+            onChange={handleChangeNbPersonnes}
             id={`nbPersonnes_${lot.infos.lotId}`}
           />
           <Label
@@ -804,4 +849,4 @@ const LotUpdateForm = ({
   );
 };
 
-export default LotUpdateForm;
+export default CafeLotForm;

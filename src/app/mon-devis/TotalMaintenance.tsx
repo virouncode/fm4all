@@ -8,13 +8,14 @@ const TotalMaintenance = () => {
   const { maintenance } = useContext(MaintenanceContext);
   const { totalMaintenance } = useContext(TotalMaintenanceContext);
 
-  const total =
-    totalMaintenance.totalService +
-    totalMaintenance.totalQ18 +
-    totalMaintenance.totalLegio +
-    totalMaintenance.totalQualiteAir;
+  const { totalService, totalQ18, totalLegio, totalQualiteAir } =
+    totalMaintenance;
 
-  if (total === 0) return null;
+  const total = Object.values(totalMaintenance)
+    .filter((item) => item !== null)
+    .reduce((sum, value) => sum + value, 0);
+
+  if (!total) return null;
 
   const color = getFm4AllColor(maintenance.infos.gammeSelected);
 
@@ -25,75 +26,70 @@ const TotalMaintenance = () => {
           Maintenance multi-technique ({maintenance.infos.nomFournisseur})
         </div>
         <div className="flex flex-col ml-4 text-xs ">
-          <div
-            className={`flex items-center justify-between text-${color} font-bold`}
-          >
-            <p>Service</p>
-            <p className="text-end">
-              {formatNumber(totalMaintenance.totalService)} € HT / an
-            </p>
-          </div>
-          {maintenance.infos.gammeSelected === "essentiel" && (
+          {totalService ? (
+            <div
+              className={`flex items-center justify-between text-${color} font-bold`}
+            >
+              <p>Service</p>
+              <p className="text-end">{formatNumber(totalService)} € HT/an</p>
+            </div>
+          ) : null}
+          {maintenance.infos.gammeSelected === "essentiel" && totalQ18 ? (
             <div
               className={`flex items-center justify-between text-${color} font-bold`}
             >
               <p>Contrôle Q18</p>
-              <p className="text-end">
-                {formatNumber(totalMaintenance.totalQ18)} € HT / an
-              </p>
+              <p className="text-end">{formatNumber(totalQ18)} € HT/an</p>
             </div>
-          )}
-          {maintenance.infos.gammeSelected === "confort" && (
+          ) : null}
+          {maintenance.infos.gammeSelected === "confort" &&
+          totalQ18 &&
+          totalLegio ? (
             <>
               <div
                 className={`flex items-center justify-between text-${color} font-bold`}
               >
                 <p>Contrôle Q18</p>
-                <p className="text-end">
-                  {formatNumber(totalMaintenance.totalQ18)} € HT / an
-                </p>
+                <p className="text-end">{formatNumber(totalQ18)} € HT/an</p>
               </div>
               <div
                 className={`flex items-center justify-between text-${color} font-bold`}
               >
                 <p>Contrôle Legio</p>
-                <p className="text-end">
-                  {formatNumber(totalMaintenance.totalLegio)} € HT / an
-                </p>
+                <p className="text-end">{formatNumber(totalLegio)} € HT/an</p>
               </div>
             </>
-          )}
-          {maintenance.infos.gammeSelected === "excellence" && (
+          ) : null}
+          {maintenance.infos.gammeSelected === "excellence" &&
+          totalQ18 &&
+          totalLegio &&
+          totalQualiteAir ? (
             <>
               <div
                 className={`flex items-center justify-between text-${color} font-bold`}
               >
                 <p>Contrôle Q18</p>
-                <p className="text-end">
-                  {formatNumber(totalMaintenance.totalQ18)} € HT / an
-                </p>
+                <p className="text-end">{formatNumber(totalQ18)} € HT/an</p>
               </div>
               <div
                 className={`flex items-center justify-between text-${color} font-bold`}
               >
                 <p>Contrôle Legio</p>
-                <p className="text-end">
-                  {formatNumber(totalMaintenance.totalLegio)} € HT / an
-                </p>
+                <p className="text-end">{formatNumber(totalLegio)} € HT/an</p>
               </div>
               <div
                 className={`flex items-center justify-between text-${color} font-bold`}
               >
                 <p>Contrôle Qualité Air</p>
                 <p className="text-end">
-                  {formatNumber(totalMaintenance.totalQualiteAir)} € HT / an
+                  {formatNumber(totalQualiteAir)} € HT/an
                 </p>
               </div>
             </>
-          )}
+          ) : null}
           <div className="flex items-center justify-between border-t border-foreground mt-2">
             <p>TOTAL</p>
-            <p className="text-end">{formatNumber(total)} € HT / an</p>
+            <p className="text-end">{formatNumber(total)} € HT/an</p>
           </div>
         </div>
       </div>

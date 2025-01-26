@@ -17,7 +17,7 @@ export const TotalTheContext = createContext<{
   setTotalThe: Dispatch<SetStateAction<TotalTheType>>;
 }>({
   totalThe: {
-    totalService: 0,
+    totalService: null,
   },
   setTotalThe: () => {},
 });
@@ -27,7 +27,7 @@ const TotalTheProvider = ({ children }: PropsWithChildren) => {
 
   // Always initialize state
   const [totalThe, setTotalThe] = useState<TotalTheType>({
-    totalService: 0,
+    totalService: null,
   });
 
   useEffect(() => {

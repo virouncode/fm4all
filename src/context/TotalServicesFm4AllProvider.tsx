@@ -17,13 +17,13 @@ export const TotalServicesFm4AllContext = createContext<{
   setTotalServicesFm4All: Dispatch<SetStateAction<TotalServicesFm4AllType>>;
 }>({
   totalServicesFm4All: {
-    totalAssurance: 0,
-    totalPlateforme: 0,
-    totalSupportAdmin: 0,
-    totalSupportOp: 0,
-    totalAccountManager: 0,
-    totalRemiseCa: 0,
-    totalRemiseHof: 0,
+    totalAssurance: null,
+    totalPlateforme: null,
+    totalSupportAdmin: null,
+    totalSupportOp: null,
+    totalAccountManager: null,
+    totalRemiseCa: null,
+    totalRemiseHof: null,
   },
   setTotalServicesFm4All: () => {},
 });
@@ -34,13 +34,13 @@ const TotalServicesFm4AllProvider = ({ children }: PropsWithChildren) => {
   // Always initialize state
   const [totalServicesFm4All, setTotalServicesFm4All] =
     useState<TotalServicesFm4AllType>({
-      totalAssurance: 0,
-      totalPlateforme: 0,
-      totalSupportAdmin: 0,
-      totalSupportOp: 0,
-      totalAccountManager: 0,
-      totalRemiseCa: 0,
-      totalRemiseHof: 0,
+      totalAssurance: null,
+      totalPlateforme: null,
+      totalSupportAdmin: null,
+      totalSupportOp: null,
+      totalAccountManager: null,
+      totalRemiseCa: null,
+      totalRemiseHof: null,
     });
 
   useEffect(() => {

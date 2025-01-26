@@ -2,7 +2,6 @@
 
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
-import { SelectNettoyageQuantitesType } from "@/zod-schemas/nettoyageQuantites";
 import { SelectRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
 import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
@@ -13,14 +12,12 @@ import PropositionsTitle from "../../PropositionsTitle";
 import NettoyageOptionsPropositions from "./NettoyageOptionsPropositions";
 
 type NettoyageOptionsProps = {
-  nettoyageQuantites: SelectNettoyageQuantitesType[];
   nettoyageTarifs: SelectNettoyageTarifsType[];
   repasseTarifs: SelectRepasseTarifsType[];
   vitrerieTarifs: SelectVitrerieTarifsType[];
 };
 
 const NettoyageOptions = ({
-  nettoyageQuantites,
   nettoyageTarifs,
   repasseTarifs,
   vitrerieTarifs,
@@ -45,13 +42,12 @@ const NettoyageOptions = ({
     return null; //pour skiper le service
   }
 
-  const freqAnnuelle =
-    nettoyageQuantites.find(
-      (quantite) => quantite.gamme === nettoyage.infos.gammeSelected
-    )?.freqAnnuelle ?? 0;
-
+  // Calcul des propositions
+  const freqAnnuelle = nettoyage.quantites.freqAnnuelle;
   const repasseProposition =
-    freqAnnuelle < 260.04
+    freqAnnuelle === null
+      ? null
+      : freqAnnuelle < 260.04
       ? null
       : repasseTarifs
           .filter(
@@ -111,16 +107,20 @@ const NettoyageOptions = ({
         minFacturation,
         fraisDeplacement,
       } = tarif;
-      const prixAnnuel = Math.round(
-        nettoyage.quantites.nbPassagesVitrerie *
-          Math.max(
-            (nettoyage.quantites.surfaceCloisons * cadenceCloisons +
-              nettoyage.quantites.surfaceVitres * cadenceVitres) *
-              tauxHoraire +
-              fraisDeplacement,
-            minFacturation
-          )
-      );
+
+      const prixAnnuel =
+        nettoyage.quantites.surfaceCloisons && nettoyage.quantites.surfaceVitres
+          ? Math.round(
+              nettoyage.quantites.nbPassagesVitrerie *
+                Math.max(
+                  (nettoyage.quantites.surfaceCloisons / cadenceCloisons +
+                    nettoyage.quantites.surfaceVitres / cadenceVitres) *
+                    tauxHoraire +
+                    fraisDeplacement,
+                  minFacturation
+                )
+            )
+          : null;
       return {
         id,
         tauxHoraire,

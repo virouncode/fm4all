@@ -2,6 +2,7 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { TypesSnacksFruitsType } from "@/constants/typesSnacksFruits";
 import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
@@ -16,7 +17,7 @@ import { SelectSnacksQuantitesType } from "@/zod-schemas/snacksQuantites";
 import { SelectSnacksTarifsType } from "@/zod-schemas/snacksTarifs";
 import { useContext } from "react";
 
-type SnacksFruitsUpdateFormProps = {
+type SnacksFruitsFormProps = {
   fruitsQuantites: SelectFruitsQuantitesType[];
   fruitsTarifs: SelectFruitsTarifsType[];
   snacksQuantites: SelectSnacksQuantitesType[];
@@ -26,7 +27,7 @@ type SnacksFruitsUpdateFormProps = {
   foodLivraisonTarifs: SelectFoodLivraisonTarifsType[];
 };
 
-const SnacksFruitsUpdateForm = ({
+const SnacksFruitsForm = ({
   fruitsQuantites,
   fruitsTarifs,
   snacksQuantites,
@@ -34,17 +35,17 @@ const SnacksFruitsUpdateForm = ({
   boissonsQuantites,
   boissonsTarifs,
   foodLivraisonTarifs,
-}: SnacksFruitsUpdateFormProps) => {
+}: SnacksFruitsFormProps) => {
   const { client } = useContext(ClientContext);
   const { cafe } = useContext(CafeContext);
   const { snacksFruits, setSnacksFruits } = useContext(SnacksFruitsContext);
-  const { totalSnacksFruits, setTotalSnacksFruits } = useContext(
-    TotalSnacksFruitsContext
-  );
+  const { setTotalSnacksFruits } = useContext(TotalSnacksFruitsContext);
+  const effectif = client.effectif ?? 0;
+  const nbPersonnes = snacksFruits.quantites.nbPersonnes || effectif;
 
   const handleChangeNbPersonnes = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    const newNbPersonnes = value ? parseInt(value) : client.effectif ?? 0;
+    const newNbPersonnes = value ? parseInt(value) : effectif;
 
     if (snacksFruits.infos.gammeSelected && snacksFruits.infos.fournisseurId) {
       const fruitsTarifsPourNbPersonnes = fruitsTarifs.filter(
@@ -59,70 +60,88 @@ const SnacksFruitsUpdateForm = ({
       const gFruitsParSemaineParPersonne =
         fruitsQuantites.find(
           (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected
-        )?.gParSemaineParPersonne ?? 0;
+        )?.gParSemaineParPersonne ?? null;
       const minKgFruitsParSemaine =
         fruitsQuantites.find(
           (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected
-        )?.minKgParSemaine ?? 0;
+        )?.minKgParSemaine ?? null;
       const portionsSnacksParSemaineParPersonne =
         snacksQuantites.find(
           (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected
-        )?.portionsParSemaineParPersonne ?? 0;
+        )?.portionsParSemaineParPersonne ?? null;
       const minPortionsSnacksParSemaine =
         snacksQuantites.find(
           (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected
-        )?.minPortionsParSemaine ?? 0;
+        )?.minPortionsParSemaine ?? null;
       const consosBoissonsParSemaineParPersonne =
         boissonsQuantites.find(
           (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected
-        )?.consosParSemaineParPersonne ?? 0;
+        )?.consosParSemaineParPersonne ?? null;
       const minConsosBoissonsParSemaine =
         boissonsQuantites.find(
           (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected
-        )?.minConsosParSemaine ?? 0;
+        )?.minConsosParSemaine ?? null;
+
       const fruitsKgParSemaine =
-        (gFruitsParSemaineParPersonne * newNbPersonnes) / 1000 >=
-        minKgFruitsParSemaine
-          ? (gFruitsParSemaineParPersonne * newNbPersonnes) / 1000
-          : minKgFruitsParSemaine;
+        gFruitsParSemaineParPersonne !== null && minKgFruitsParSemaine !== null
+          ? (gFruitsParSemaineParPersonne * newNbPersonnes) / 1000 >=
+            minKgFruitsParSemaine
+            ? (gFruitsParSemaineParPersonne * newNbPersonnes) / 1000
+            : minKgFruitsParSemaine
+          : null;
       const snacksPortionsParSemaine =
-        portionsSnacksParSemaineParPersonne * newNbPersonnes >=
-        minPortionsSnacksParSemaine
-          ? portionsSnacksParSemaineParPersonne * newNbPersonnes
-          : minPortionsSnacksParSemaine;
+        portionsSnacksParSemaineParPersonne !== null &&
+        minPortionsSnacksParSemaine !== null
+          ? portionsSnacksParSemaineParPersonne * newNbPersonnes >=
+            minPortionsSnacksParSemaine
+            ? portionsSnacksParSemaineParPersonne * newNbPersonnes
+            : minPortionsSnacksParSemaine
+          : null;
       const boissonsConsosParSemaine =
-        consosBoissonsParSemaineParPersonne * newNbPersonnes >=
-        minConsosBoissonsParSemaine
-          ? consosBoissonsParSemaineParPersonne * newNbPersonnes
-          : minConsosBoissonsParSemaine;
+        consosBoissonsParSemaineParPersonne !== null &&
+        minConsosBoissonsParSemaine !== null
+          ? consosBoissonsParSemaineParPersonne * newNbPersonnes >=
+            minConsosBoissonsParSemaine
+            ? consosBoissonsParSemaineParPersonne * newNbPersonnes
+            : minConsosBoissonsParSemaine
+          : null;
       //Tarifs / portion
       const prixKgFruits =
         fruitsTarifsPourNbPersonnes.find(
           (tarif) =>
             tarif.gamme === snacksFruits.infos.gammeSelected &&
             tarif.fournisseurId === snacksFruits.infos.fournisseurId
-        )?.prixKg ?? 0;
+        )?.prixKg ?? null;
       const prixUnitaireSnacks =
         snacksTarifsPourNbPersonnes.find(
           (tarif) =>
             tarif.gamme === snacksFruits.infos.gammeSelected &&
             tarif.fournisseurId === snacksFruits.infos.fournisseurId
-        )?.prixUnitaire ?? 0;
+        )?.prixUnitaire ?? null;
       const prixUnitaireBoissons =
         boissonsTarifsPourNbPersonnes.find(
           (tarif) =>
             tarif.gamme === snacksFruits.infos.gammeSelected &&
             tarif.fournisseurId === snacksFruits.infos.fournisseurId
-        )?.prixUnitaire ?? 0;
-      const panierFruits = snacksFruits.infos.choix.includes("fruits")
-        ? prixKgFruits * fruitsKgParSemaine
-        : 0;
-      const panierSnacks = snacksFruits.infos.choix.includes("snacks")
-        ? prixUnitaireSnacks * snacksPortionsParSemaine
-        : 0;
-      const panierBoissons = snacksFruits.infos.choix.includes("boissons")
-        ? prixUnitaireBoissons * boissonsConsosParSemaine
-        : 0;
+        )?.prixUnitaire ?? null;
+      const panierFruits =
+        snacksFruits.infos.choix.includes("fruits") &&
+        prixKgFruits !== null &&
+        fruitsKgParSemaine !== null
+          ? prixKgFruits * fruitsKgParSemaine
+          : 0;
+      const panierSnacks =
+        snacksFruits.infos.choix.includes("snacks") &&
+        prixUnitaireSnacks !== null &&
+        snacksPortionsParSemaine !== null
+          ? prixUnitaireSnacks * snacksPortionsParSemaine
+          : 0;
+      const panierBoissons =
+        snacksFruits.infos.choix.includes("boissons") &&
+        prixUnitaireBoissons !== null &&
+        boissonsConsosParSemaine !== null
+          ? prixUnitaireBoissons * boissonsConsosParSemaine
+          : 0;
       const totalFruits = Math.round(52 * panierFruits);
       const totalSnacks = Math.round(52 * panierSnacks);
       const totalBoissons = Math.round(52 * panierBoissons);
@@ -130,34 +149,50 @@ const SnacksFruitsUpdateForm = ({
       const prixPanier = panierFruits + panierSnacks + panierBoissons;
 
       //Prix livraison / panier
-      const fraisLivraisonsDuFournisseur = foodLivraisonTarifs.find(
+      const fraisLivraisonsFournisseur = foodLivraisonTarifs.find(
         ({ fournisseurId }) =>
           fournisseurId === snacksFruits.infos.fournisseurId
       );
+      const panierMin = fraisLivraisonsFournisseur?.panierMin ?? null;
+      const isPanierMin = panierMin === null || prixPanier >= panierMin;
+
       const isSameFournisseur =
         snacksFruits.infos.fournisseurId === cafe.infos.fournisseurId;
-      const prixUnitaireLivraisonSiCafe =
-        fraisLivraisonsDuFournisseur?.prixUnitaireSiCafe ?? 0;
-      const prixUnitaireLivraison =
-        fraisLivraisonsDuFournisseur?.prixUnitaire ?? 0;
+      const prixUnitaireLivraisonSiCafe = isPanierMin
+        ? fraisLivraisonsFournisseur?.prixUnitaireSiCafe ?? null
+        : null;
+      const prixUnitaireLivraison = isPanierMin
+        ? fraisLivraisonsFournisseur?.prixUnitaire ?? null
+        : null;
 
       let fraisLivraisonPanier = isSameFournisseur
         ? prixUnitaireLivraisonSiCafe
         : prixUnitaireLivraison;
 
-      const seuilFranco = fraisLivraisonsDuFournisseur?.seuilFranco ?? 0;
+      const seuilFranco = fraisLivraisonsFournisseur?.seuilFranco ?? 0;
 
-      fraisLivraisonPanier =
-        prixPanier < seuilFranco ? fraisLivraisonPanier : 0;
-      const totalLivraison = Math.round(fraisLivraisonPanier * 52);
-      const total = Math.round(52 * (prixPanier + fraisLivraisonPanier));
-      const panierMin = fraisLivraisonsDuFournisseur?.panierMin ?? 0;
+      fraisLivraisonPanier = isPanierMin
+        ? prixPanier < seuilFranco
+          ? fraisLivraisonPanier
+          : 0
+        : null;
+      const totalLivraison =
+        fraisLivraisonPanier !== null
+          ? Math.round(fraisLivraisonPanier * 52)
+          : null;
+      const total =
+        fraisLivraisonPanier !== null
+          ? Math.round(52 * (prixPanier + fraisLivraisonPanier))
+          : null;
 
       setSnacksFruits((prev) => ({
         ...prev,
         quantites: {
           ...prev.quantites,
           nbPersonnes: newNbPersonnes,
+          fruitsKgParSemaine,
+          snacksPortionsParSemaine,
+          boissonsConsosParSemaine,
         },
         prix: {
           prixKgFruits,
@@ -187,7 +222,7 @@ const SnacksFruitsUpdateForm = ({
     }
   };
 
-  const handleCheck = (type: "fruits" | "snacks" | "boissons") => {
+  const handleCheck = (type: TypesSnacksFruitsType) => {
     const newChoix = snacksFruits.infos.choix.includes(type)
       ? snacksFruits.infos.choix.filter((item) => item !== type)
       : [...snacksFruits.infos.choix, type];
@@ -203,43 +238,63 @@ const SnacksFruitsUpdateForm = ({
     if (newChoix.length === 0) {
       setTotalSnacksFruits((prev) => ({
         ...prev,
-        totalFruits: 0,
-        totalSnacks: 0,
-        totalBoissons: 0,
-        totalLivraison: 0,
-        total: 0,
+        totalFruits: null,
+        totalSnacks: null,
+        totalBoissons: null,
+        totalLivraison: null,
+        total: null,
       }));
       return;
     }
     if (snacksFruits.infos.gammeSelected && snacksFruits.infos.fournisseurId) {
-      const panierFruits = newChoix.includes("fruits")
-        ? (snacksFruits.prix.prixKgFruits ?? 0) *
-          snacksFruits.quantites.fruitsKgParSemaine
-        : 0;
-      const panierSnacks = newChoix.includes("snacks")
-        ? (snacksFruits.prix.prixUnitaireSnacks ?? 0) *
-          snacksFruits.quantites.snacksPortionsParSemaine
-        : 0;
-      const panierBoissons = newChoix.includes("boissons")
-        ? (snacksFruits.prix.prixUnitaireBoissons ?? 0) *
-          snacksFruits.quantites.boissonsConsosParSemaine
-        : 0;
+      const panierFruits =
+        newChoix.includes("fruits") &&
+        snacksFruits.quantites.fruitsKgParSemaine !== null
+          ? (snacksFruits.prix.prixKgFruits ?? 0) *
+            snacksFruits.quantites.fruitsKgParSemaine
+          : 0;
+      const panierSnacks =
+        newChoix.includes("snacks") &&
+        snacksFruits.quantites.snacksPortionsParSemaine !== null
+          ? (snacksFruits.prix.prixUnitaireSnacks ?? 0) *
+            snacksFruits.quantites.snacksPortionsParSemaine
+          : 0;
+      const panierBoissons =
+        newChoix.includes("boissons") &&
+        snacksFruits.quantites.boissonsConsosParSemaine !== null
+          ? (snacksFruits.prix.prixUnitaireBoissons ?? 0) *
+            snacksFruits.quantites.boissonsConsosParSemaine
+          : 0;
       const totalFruits = Math.round(52 * panierFruits);
       const totalSnacks = Math.round(52 * panierSnacks);
       const totalBoissons = Math.round(52 * panierBoissons);
 
       const prixPanier = panierFruits + panierSnacks + panierBoissons;
+      const fraisLivraisonsFournisseur = foodLivraisonTarifs.find(
+        (tarif) => tarif.fournisseurId === snacksFruits.infos.fournisseurId
+      );
+      const panierMin = fraisLivraisonsFournisseur?.panierMin ?? null;
+      const isPanierMin = panierMin === null || prixPanier >= panierMin;
 
       let fraisLivraisonPanier = snacksFruits.infos.isSameFournisseur
-        ? snacksFruits.prix.prixUnitaireLivraisonSiCafe ?? 0
-        : snacksFruits.prix.prixUnitaireLivraison ?? 0;
+        ? snacksFruits.prix.prixUnitaireLivraisonSiCafe
+        : snacksFruits.prix.prixUnitaireLivraison;
 
       const seuilFranco = snacksFruits.prix.seuilFranco ?? 0;
 
-      fraisLivraisonPanier =
-        prixPanier < seuilFranco ? fraisLivraisonPanier : 0;
-      const totalLivraison = Math.round(fraisLivraisonPanier * 52);
-      const total = Math.round(52 * (prixPanier + fraisLivraisonPanier));
+      fraisLivraisonPanier = isPanierMin
+        ? prixPanier < seuilFranco
+          ? fraisLivraisonPanier
+          : 0
+        : null;
+      const totalLivraison =
+        fraisLivraisonPanier !== null
+          ? Math.round(fraisLivraisonPanier * 52)
+          : null;
+      const total =
+        fraisLivraisonPanier !== null
+          ? Math.round(52 * (prixPanier + fraisLivraisonPanier))
+          : null;
 
       setTotalSnacksFruits((prev) => ({
         ...prev,
@@ -299,7 +354,7 @@ const SnacksFruitsUpdateForm = ({
           min={1}
           max={300}
           step={1}
-          value={snacksFruits.quantites.nbPersonnes.toString()}
+          value={nbPersonnes}
           onChange={handleChangeNbPersonnes}
           id={`nbPersonnesFood`}
         />
@@ -311,4 +366,4 @@ const SnacksFruitsUpdateForm = ({
   );
 };
 
-export default SnacksFruitsUpdateForm;
+export default SnacksFruitsForm;

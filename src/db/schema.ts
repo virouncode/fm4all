@@ -72,8 +72,8 @@ export const fournisseurs = pgTable("fournisseurs", {
 
 export const clients = pgTable("clients", {
   id: serial().primaryKey(),
-  nomFournisseur: varchar("nom_fournisseur").notNull(),
-  siret: varchar().notNull(),
+  nomEntreprise: varchar("nom_entreprise").notNull(),
+  siret: varchar(),
   prenomContact: varchar("prenom_contact").notNull(),
   nomContact: varchar("nom_contact").notNull(),
   posteContact: varchar("poste_contact"),
@@ -83,10 +83,10 @@ export const clients = pgTable("clients", {
   effectif: integer().notNull(),
   typeBatiment: typeBatimentEnum().notNull(),
   typeOccupation: typeOccupationEnum().notNull(),
-  adresseLigne1: varchar("adresse_ligne_1").notNull(),
+  adresseLigne1: varchar("adresse_ligne_1"),
   adresseLigne2: varchar("adresse_ligne_2"),
-  codePostal: varchar("code_postal").notNull(),
-  ville: varchar().notNull(),
+  codePostal: varchar("code_postal"),
+  ville: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

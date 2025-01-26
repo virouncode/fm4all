@@ -10,10 +10,10 @@ export const snacksFruitsSchema = z.object({
     choix: z.array(z.enum(["fruits", "snacks", "boissons"])),
   }),
   quantites: z.object({
-    nbPersonnes: z.number(),
-    fruitsKgParSemaine: z.number(),
-    snacksPortionsParSemaine: z.number(),
-    boissonsConsosParSemaine: z.number(),
+    nbPersonnes: z.number().nullable(),
+    fruitsKgParSemaine: z.number().nullable(),
+    snacksPortionsParSemaine: z.number().nullable(),
+    boissonsConsosParSemaine: z.number().nullable(),
   }),
   prix: z.object({
     prixKgFruits: z.number().nullable(),

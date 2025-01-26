@@ -18,7 +18,7 @@ export const reinitialisationCafeThe = (
       currentLotId: 1,
       dureeLocation: "pa12M",
     },
-    nbLotsMachines: 0,
+    nbLotsMachines: null,
     lotsMachines: [],
   });
   setThe({
@@ -29,7 +29,7 @@ export const reinitialisationCafeThe = (
       nbPersonnes: Math.round((client.effectif ?? 0) * 0.15),
     },
     prix: {
-      prixUnitaire: 0,
+      prixUnitaire: null,
     },
   });
   setTotalCafe({

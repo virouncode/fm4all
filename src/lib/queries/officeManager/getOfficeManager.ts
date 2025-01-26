@@ -6,6 +6,8 @@ import {
   officeManagerTarifs,
 } from "@/db/schema";
 import { errorHelper } from "@/lib/errorHelper";
+import { roundEffectif } from "@/lib/roundEffectif";
+import { roundSurface } from "@/lib/roundSurface";
 import { selectOfficeManagerQuantitesSchema } from "@/zod-schemas/officeManagerQuantites";
 import { selectOfficeManagerTarifsSchema } from "@/zod-schemas/officeManagerTarifs";
 import { eq, getTableColumns } from "drizzle-orm";
@@ -14,15 +16,17 @@ export const getOfficeManagerQuantites = async (
   surface: string,
   effectif: string
 ) => {
+  const roundedSurface = roundSurface(parseInt(surface));
+  const roundedEffectif = roundEffectif(parseInt(effectif));
   try {
     const resultsSurface = await db
       .select()
       .from(officeManagerQuantites)
-      .where(eq(officeManagerQuantites.surface, parseInt(surface)));
+      .where(eq(officeManagerQuantites.surface, roundedSurface));
     const resultsEffectif = await db
       .select()
       .from(officeManagerQuantites)
-      .where(eq(officeManagerQuantites.effectif, parseInt(effectif)));
+      .where(eq(officeManagerQuantites.effectif, roundedEffectif));
     if (resultsSurface.length === 0 || resultsEffectif.length === 0) {
       return [];
     }

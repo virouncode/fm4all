@@ -9,6 +9,7 @@ import {
   qualiteAirTarifs,
 } from "@/db/schema";
 import { errorHelper } from "@/lib/errorHelper";
+import { roundSurface } from "@/lib/roundSurface";
 import { selectLegioTarifsSchema } from "@/zod-schemas/legioTarifs";
 import { selectMaintenanceQuantitesSchema } from "@/zod-schemas/maintenanceQuantites";
 import { selectMaintenanceTarifsSchema } from "@/zod-schemas/maintenanceTarifs";
@@ -17,11 +18,12 @@ import { selectQualiteAirTarifsSchema } from "@/zod-schemas/qualiteAirTarifs";
 import { eq, getTableColumns } from "drizzle-orm";
 
 export const getMaintenanceQuantites = async (surface: string) => {
+  const roundedSurface = roundSurface(parseInt(surface));
   try {
     const results = await db
       .select()
       .from(maintenanceQuantites)
-      .where(eq(maintenanceQuantites.surface, parseInt(surface)));
+      .where(eq(maintenanceQuantites.surface, roundedSurface));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectMaintenanceQuantitesSchema.parse(result)
@@ -37,6 +39,7 @@ export const getMaintenanceQuantites = async (surface: string) => {
 };
 
 export const getMaintenanceTarifs = async (surface: string) => {
+  const roundedSurface = roundSurface(parseInt(surface));
   try {
     const results = await db
       .select({
@@ -49,7 +52,7 @@ export const getMaintenanceTarifs = async (surface: string) => {
         fournisseurs,
         eq(fournisseurs.id, maintenanceTarifs.fournisseurId)
       )
-      .where(eq(maintenanceTarifs.surface, parseInt(surface)));
+      .where(eq(maintenanceTarifs.surface, roundedSurface));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectMaintenanceTarifsSchema.parse(result)
@@ -66,11 +69,12 @@ export const getMaintenanceTarifs = async (surface: string) => {
 };
 
 export const getQ18Tarif = async (surface: string) => {
+  const roundedSurface = roundSurface(parseInt(surface));
   try {
     const results = await db
       .select()
       .from(q18Tarifs)
-      .where(eq(q18Tarifs.surface, parseInt(surface)));
+      .where(eq(q18Tarifs.surface, roundedSurface));
     if (results.length === 0) return null;
     const validatedResult = selectQ18TarifsSchema.parse(results[0]);
     const data = {
@@ -84,11 +88,12 @@ export const getQ18Tarif = async (surface: string) => {
 };
 
 export const getLegioTarif = async (surface: string) => {
+  const roundedSurface = roundSurface(parseInt(surface));
   try {
     const results = await db
       .select()
       .from(legioTarifs)
-      .where(eq(legioTarifs.surface, parseInt(surface)));
+      .where(eq(legioTarifs.surface, roundedSurface));
     if (results.length === 0) return null;
     const validatedResult = selectLegioTarifsSchema.parse(results[0]);
 
@@ -103,11 +108,12 @@ export const getLegioTarif = async (surface: string) => {
 };
 
 export const getQualiteAirTarif = async (surface: string) => {
+  const roundedSurface = roundSurface(parseInt(surface));
   try {
     const results = await db
       .select()
       .from(qualiteAirTarifs)
-      .where(eq(qualiteAirTarifs.surface, parseInt(surface)));
+      .where(eq(qualiteAirTarifs.surface, roundedSurface));
     if (results.length === 0) return null;
     const validatedResult = selectQualiteAirTarifsSchema.parse(results[0]);
     const data = {

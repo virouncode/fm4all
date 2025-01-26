@@ -1,21 +1,14 @@
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { TheContext } from "@/context/TheProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
-import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
 import { roundEffectif } from "@/lib/roundEffectif";
+import { GammeType } from "@/zod-schemas/gamme";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@radix-ui/react-tooltip";
-import Image from "next/image";
 import { ChangeEvent, useContext } from "react";
+import ThePropositionCard from "./ThePropositionCard";
+import ThePropositionFournisseurLogo from "./ThePropositionFournisseurLogo";
+import ThePropositionsInput from "./ThePropositionsInput";
 
 type ThePropositionsProps = {
   theConsoTarifs: SelectTheConsoTarifsType[];
@@ -26,12 +19,30 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
   const { cafe } = useContext(CafeContext);
   const { the, setThe } = useContext(TheContext);
   const { setTotalThe } = useContext(TotalTheContext);
+  const effectif = client.effectif ?? 0;
+
+  //Calcul des propositions
+  const nbPersonnes = the.quantites.nbPersonnes || Math.round(effectif * 0.15);
+  const nbThesParAn = nbPersonnes * 400;
+  const nbTassesParJour = nbPersonnes * 2;
+
+  const propositions =
+    theConsoTarifs
+      ?.filter(
+        (tarif) =>
+          tarif.effectif === roundEffectif(nbPersonnes / 0.15) &&
+          tarif.fournisseurId === cafe.infos.fournisseurId
+      )
+      .map((tarif) => ({
+        ...tarif,
+        prixAnnuel: Math.round(nbThesParAn * tarif.prixUnitaire),
+      })) ?? [];
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     const newNbPersonnes = value
       ? parseInt(value)
-      : Math.round((client.effectif ?? 0) * 0.15);
+      : Math.round(effectif * 0.15);
     const nbThesParAn = newNbPersonnes * 400;
     const prixUnitaire =
       theConsoTarifs.find(
@@ -39,7 +50,9 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
           tarif.effectif === roundEffectif(newNbPersonnes / 0.15) &&
           tarif.fournisseurId === cafe.infos.fournisseurId &&
           tarif.gamme === the.infos.gammeSelected
-      )?.prixUnitaire ?? 0;
+      )?.prixUnitaire ?? null;
+    const prixAnnuel =
+      prixUnitaire !== null ? Math.round(nbThesParAn * prixUnitaire) : null;
 
     setThe((prev) => ({
       ...prev,
@@ -55,22 +68,22 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
     }));
     if (the.infos.gammeSelected) {
       setTotalThe({
-        totalService: Math.round(nbThesParAn * prixUnitaire),
+        totalService: prixAnnuel,
       });
     }
   };
 
   const handleClickProposition = (proposition: {
     prixAnnuel: number;
-    infos: string | null;
-    prixUnitaire: number;
     id: number;
     nomFournisseur: string;
     slogan: string | null;
     createdAt: Date;
     fournisseurId: number;
-    gamme: "essentiel" | "confort" | "excellence";
+    gamme: GammeType;
     effectif: number;
+    prixUnitaire: number;
+    infos: string | null;
   }) => {
     const { gamme, prixAnnuel, prixUnitaire } = proposition;
     if (the.infos.gammeSelected === gamme) {
@@ -80,11 +93,11 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
           gammeSelected: null,
         },
         prix: {
-          prixUnitaire: 0,
+          prixUnitaire: null,
         },
       }));
       setTotalThe({
-        totalService: 0,
+        totalService: null,
       });
       return;
     }
@@ -102,119 +115,25 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
     });
   };
 
-  const nbPersonnes = the.quantites.nbPersonnes;
-
-  const nbThesParAn = nbPersonnes * 400;
-  const nbTassesParJour = nbPersonnes * 2;
-
-  const propositions =
-    theConsoTarifs
-      ?.filter(
-        (tarif) =>
-          tarif.effectif === roundEffectif(nbPersonnes / 0.15) &&
-          tarif.fournisseurId === cafe.infos.fournisseurId
-      )
-      .map((tarif) => ({
-        ...tarif,
-        prixAnnuel: Math.round(nbThesParAn * tarif.prixUnitaire),
-      })) ?? [];
-
   return (
     <div className="h-full flex flex-col border rounded-xl overflow-hidden">
       <div className="flex border-b flex-1">
         <div className="flex w-1/4 items-center justify-center flex-col">
-          <TooltipProvider delayDuration={0}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center justify-center h-1/4 w-full py-2 px-4">
-                  {getLogoFournisseurUrl(propositions[0].fournisseurId) ? (
-                    <div className="w-full h-full relative">
-                      <Image
-                        src={
-                          getLogoFournisseurUrl(
-                            propositions[0].fournisseurId
-                          ) as string
-                        }
-                        alt={`logo-de-${propositions[0].nomFournisseur}`}
-                        fill={true}
-                        className="w-full h-full object-contain"
-                        quality={100}
-                      />
-                    </div>
-                  ) : (
-                    propositions[0].nomFournisseur
-                  )}
-                </div>
-              </TooltipTrigger>
-              {propositions[0].slogan && (
-                <TooltipContent>
-                  <p className="text-sm italic">{propositions[0].slogan}</p>
-                </TooltipContent>
-              )}
-            </Tooltip>
-          </TooltipProvider>
-          <div className="flex flex-col gap-6 w-full p-4">
-            <div className="flex gap-4 items-center justify-center w-full">
-              <Input
-                type="number"
-                value={the.quantites.nbPersonnes}
-                min={1}
-                max={300}
-                step={1}
-                onChange={handleChange}
-                className={`w-16 ${
-                  the.quantites.nbPersonnes ===
-                  Math.round((client.effectif ?? 0) * 0.15)
-                    ? "text-destructive"
-                    : ""
-                }`}
-              />
-              <Label htmlFor="nbDistribEmp" className="text-sm">
-                personnes
-              </Label>
-            </div>
-            <p className="text-xs text-destructive italic px-2 text-center">
-              Les quantités sont estimées pour vous (environ 15% de votre
-              effectif) mais vous pouvez les changer
-            </p>
-          </div>
+          <ThePropositionFournisseurLogo {...propositions[0]} />
+          <ThePropositionsInput
+            nbPersonnes={nbPersonnes}
+            handleChange={handleChange}
+            effectif={effectif}
+          />
         </div>
-
-        {propositions.map((proposition) => {
-          const gamme = proposition.gamme;
-          const color =
-            gamme === "essentiel"
-              ? "fm4allessential"
-              : gamme === "confort"
-              ? "fm4allcomfort"
-              : "fm4allexcellence";
-
-          return (
-            <div
-              className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
-                the.infos.gammeSelected === gamme
-                  ? "ring-4 ring-inset ring-destructive"
-                  : ""
-              } px-8`}
-              key={proposition.id}
-              onClick={() => handleClickProposition(proposition)}
-            >
-              <Checkbox
-                checked={the.infos.gammeSelected === gamme}
-                onCheckedChange={() => handleClickProposition(proposition)}
-                className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-              />
-              <div>
-                <p className="font-bold">
-                  {Math.round(proposition.prixAnnuel / 12)} € / mois*
-                </p>
-                <p className="text-sm">
-                  Consommables ~ {nbTassesParJour} tasses / j
-                </p>
-              </div>
-            </div>
-          );
-        })}
+        {propositions.map((proposition) => (
+          <ThePropositionCard
+            key={proposition.id}
+            proposition={proposition}
+            handleClickProposition={handleClickProposition}
+            nbTassesParJour={nbTassesParJour}
+          />
+        ))}
       </div>
     </div>
   );

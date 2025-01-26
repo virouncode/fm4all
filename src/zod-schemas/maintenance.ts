@@ -8,14 +8,14 @@ export const maintenanceSchema = z.object({
     gammeSelected: z.enum(["essentiel", "confort", "excellence"]).nullable(),
   }),
   quantites: z.object({
-    freqAnnuelle: z.number().default(0),
-    hParPassage: z.number().default(0),
+    freqAnnuelle: z.number().nullable(),
+    hParPassage: z.number().nullable(),
   }),
   prix: z.object({
-    tauxHoraire: z.number().default(0),
-    prixQ18: z.number().default(0),
-    prixLegio: z.number().default(0),
-    prixQualiteAir: z.number().default(0),
+    tauxHoraire: z.number().nullable(),
+    prixQ18: z.number().nullable(),
+    prixLegio: z.number().nullable(),
+    prixQualiteAir: z.number().nullable(),
   }),
 });
 

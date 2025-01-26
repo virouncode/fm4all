@@ -12,7 +12,7 @@ export const officeManagerSchema = z.object({
     demiJParSemaine: z.number().nullable(),
   }),
   prix: z.object({
-    demiTjm: z.number(),
+    demiTjm: z.number().nullable(),
   }),
 });
 

@@ -17,7 +17,7 @@ export const TotalOfficeManagerContext = createContext<{
   setTotalOfficeManager: Dispatch<SetStateAction<TotalOfficeManagerType>>;
 }>({
   totalOfficeManager: {
-    totalService: 0,
+    totalService: null,
   },
   setTotalOfficeManager: () => {},
 });
@@ -28,7 +28,7 @@ const TotalOfficeManagerProvider = ({ children }: PropsWithChildren) => {
   // Always initialize state
   const [totalOfficeManager, setTotalOfficeManager] =
     useState<TotalOfficeManagerType>({
-      totalService: 0,
+      totalService: null,
     });
 
   useEffect(() => {

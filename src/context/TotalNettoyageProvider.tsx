@@ -17,11 +17,11 @@ export const TotalNettoyageContext = createContext<{
   setTotalNettoyage: Dispatch<SetStateAction<TotalNettoyageType>>;
 }>({
   totalNettoyage: {
-    totalService: 0,
-    totalRepasse: 0,
-    totalSamedi: 0,
-    totalDimanche: 0,
-    totalVitrerie: 0,
+    totalService: null,
+    totalRepasse: null,
+    totalSamedi: null,
+    totalDimanche: null,
+    totalVitrerie: null,
   },
   setTotalNettoyage: () => {},
 });
@@ -31,11 +31,11 @@ const TotalNettoyageProvider = ({ children }: PropsWithChildren) => {
 
   // Always initialize state
   const [totalNettoyage, setTotalNettoyage] = useState<TotalNettoyageType>({
-    totalService: 0,
-    totalRepasse: 0,
-    totalSamedi: 0,
-    totalDimanche: 0,
-    totalVitrerie: 0,
+    totalService: null,
+    totalRepasse: null,
+    totalSamedi: null,
+    totalDimanche: null,
+    totalVitrerie: null,
   });
 
   useEffect(() => {

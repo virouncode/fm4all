@@ -15,7 +15,6 @@ export default function useScrollIntoLot() {
       `lot_${cafe.infos.currentLotId.toString()}`
     );
     if (currentLot) {
-      console.log("scrolling into lot");
       currentLot.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

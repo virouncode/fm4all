@@ -22,10 +22,10 @@ export const TheContext = createContext<{
       gammeSelected: null,
     },
     quantites: {
-      nbPersonnes: 0,
+      nbPersonnes: null,
     },
     prix: {
-      prixUnitaire: 0,
+      prixUnitaire: null,
     },
   },
   setThe: () => {},
@@ -41,7 +41,7 @@ const TheProvider = ({ children }: PropsWithChildren) => {
       gammeSelected: null,
     },
     quantites: {
-      nbPersonnes: (client.effectif ?? 0) * 0.15,
+      nbPersonnes: Math.round((client.effectif ?? 0) * 0.15),
     },
     prix: {
       prixUnitaire: null,

@@ -7,11 +7,13 @@ import {
 import { z } from "zod";
 
 export const selectClientSchema = createSelectSchema(clients, {
-  nomFournisseur: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
+  nomEntreprise: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
   siret: (schema) =>
-    schema.regex(
-      /^\d{3} \d{3} \d{3} \d{4}$/,
-      "Siret invalide, format attendu : XXX XXX XXX XXXX"
+    schema.refine(
+      (value) => !value || /^\d{3} \d{3} \d{3} \d{4}$/.test(value),
+      {
+        message: "Siret invalide, format attendu : XXX XXX XXX XXXX",
+      }
     ),
   prenomContact: (schema) => schema.min(1, "Prénom du contact obligatoire"),
   nomContact: (schema) => schema.min(1, "Nom du contact obligatoire"),
@@ -21,6 +23,7 @@ export const selectClientSchema = createSelectSchema(clients, {
       /^\d{2} \d{2} \d{2} \d{2} \d{2}$/,
       "Numéro de téléphone invalide, format attendu : XX XX XX XX XX"
     ),
+  posteContact: (schema) => schema.min(1, "Poste du contact obligatoire"),
   surface: (schema) =>
     schema.min(1, "Surface obligatoire").max(3000, "Surface maximum 3000 m²"),
   effectif: (schema) =>
@@ -34,20 +37,22 @@ export const selectClientSchema = createSelectSchema(clients, {
   typeOccupation: z.enum(["partieEtage", "plateauComplet", "batimentEntier"], {
     message: "Type d'occupation invalide",
   }),
-  adresseLigne1: (schema) => schema.min(1, "Adresse ligne 1 obligatoire"),
   codePostal: (schema) =>
-    schema.regex(/^\d{5}$/, "Code postal invalide, entrez 5 chiffres"),
-  ville: (schema) => schema.min(1, "Ville obligatoire"),
+    schema.refine((value) => !value || /^\d{5}$/.test(value), {
+      message: "Code postal invalide, entrez 5 chiffres",
+    }),
 });
 
 export type SelectClientType = z.infer<typeof selectClientSchema>;
 
 export const insertClientSchema = createInsertSchema(clients, {
-  nomFournisseur: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
+  nomEntreprise: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
   siret: (schema) =>
-    schema.regex(
-      /^\d{3} \d{3} \d{3} \d{4}$/,
-      "Siret invalide, format attendu : XXX XXX XXX XXXX"
+    schema.refine(
+      (value) => !value || /^\d{3} \d{3} \d{3} \d{4}$/.test(value),
+      {
+        message: "Siret invalide, format attendu : XXX XXX XXX XXXX",
+      }
     ),
   prenomContact: (schema) => schema.min(1, "Prénom du contact obligatoire"),
   nomContact: (schema) => schema.min(1, "Nom du contact obligatoire"),
@@ -57,6 +62,7 @@ export const insertClientSchema = createInsertSchema(clients, {
       /^\d{2} \d{2} \d{2} \d{2} \d{2}$/,
       "Numéro de téléphone invalide, format attendu : XX XX XX XX XX"
     ),
+  posteContact: (schema) => schema.min(1, "Poste du contact obligatoire"),
   surface: (schema) =>
     schema.min(1, "Surface obligatoire").max(3000, "Surface maximum 3000 m²"),
   effectif: (schema) =>
@@ -70,10 +76,10 @@ export const insertClientSchema = createInsertSchema(clients, {
   typeOccupation: z.enum(["partieEtage", "plateauComplet", "batimentEntier"], {
     message: "Type d'occupation invalide",
   }),
-  adresseLigne1: (schema) => schema.min(1, "Adresse ligne 1 obligatoire"),
   codePostal: (schema) =>
-    schema.regex(/^\d{5}$/, "Code postal invalide, entrez 5 chiffres"),
-  ville: (schema) => schema.min(1, "Ville obligatoire"),
+    schema.refine((value) => !value || /^\d{5}$/.test(value), {
+      message: "Code postal invalide, entrez 5 chiffres",
+    }),
 });
 
 export type InsertClientType = z.infer<typeof insertClientSchema>;
@@ -86,7 +92,7 @@ export type InsertClientFormType = Omit<
 };
 
 export const updateClientSchema = createUpdateSchema(clients, {
-  nomFournisseur: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
+  nomEntreprise: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
   siret: (schema) =>
     schema.regex(
       /^\d{3} \d{3} \d{3} \d{4}$/,

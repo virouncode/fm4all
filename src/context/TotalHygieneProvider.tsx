@@ -17,12 +17,12 @@ export const TotalHygieneContext = createContext<{
   setTotalHygiene: Dispatch<SetStateAction<TotalHygieneType>>;
 }>({
   totalHygiene: {
-    totalTrilogie: 0,
-    totalDesinfectant: 0,
-    totalParfum: 0,
-    totalBalai: 0,
-    totalPoubelle: 0,
-    totalInstallation: 0,
+    totalTrilogie: null,
+    totalDesinfectant: null,
+    totalParfum: null,
+    totalBalai: null,
+    totalPoubelle: null,
+    totalInstallation: null,
   },
   setTotalHygiene: () => {},
 });
@@ -32,12 +32,12 @@ const TotalHygieneProvider = ({ children }: PropsWithChildren) => {
 
   // Always initialize state
   const [totalHygiene, setTotalHygiene] = useState<TotalHygieneType>({
-    totalTrilogie: 0,
-    totalDesinfectant: 0,
-    totalParfum: 0,
-    totalBalai: 0,
-    totalPoubelle: 0,
-    totalInstallation: 0,
+    totalTrilogie: null,
+    totalDesinfectant: null,
+    totalParfum: null,
+    totalBalai: null,
+    totalPoubelle: null,
+    totalInstallation: null,
   });
 
   useEffect(() => {

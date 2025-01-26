@@ -1,51 +1,260 @@
-import { Checkbox } from "@/components/ui/checkbox";
+import { CafeContext } from "@/context/CafeProvider";
+import { ClientContext } from "@/context/ClientProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
-import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@radix-ui/react-tooltip";
-import Image from "next/image";
+import { roundEffectif } from "@/lib/roundEffectif";
+import { SelectBoissonsQuantitesType } from "@/zod-schemas/boissonsQuantites";
+import { SelectBoissonsTarifsType } from "@/zod-schemas/boissonsTarifs";
+import { SelectFoodLivraisonTarifsType } from "@/zod-schemas/foodLivraisonTarifs";
+import { SelectFruitsQuantitesType } from "@/zod-schemas/fruitsQuantites";
+import { SelectFruitsTarifsType } from "@/zod-schemas/fruitsTarifs";
+import { gammes } from "@/zod-schemas/gamme";
+import { SelectSnacksQuantitesType } from "@/zod-schemas/snacksQuantites";
+import { SelectSnacksTarifsType } from "@/zod-schemas/snacksTarifs";
 import { useContext } from "react";
+import SnackFruitsPropositionLogo from "./SnackFruitsPropositionLogo";
+import SnacksFruitsPropositionCard from "./SnacksFruitsPropositionCard";
 
 type SnacksFruitsPropositionsType = {
-  formattedPropositions: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    isSameFournisseur: boolean;
-    gamme: "essentiel" | "confort" | "excellence";
-    fruitsKgParSemaine: number;
-    snacksPortionsParSemaine: number;
-    boissonsConsosParSemaine: number;
-    gFruitsParSemaineParPersonne: number;
-    portionsSnacksParSemaineParPersonne: number;
-    consosBoissonsParSemaineParPersonne: number;
-    prixKgFruits: number;
-    prixUnitaireSnacks: number;
-    prixUnitaireBoissons: number;
-    prixUnitaireLivraisonSiCafe: number;
-    prixUnitaireLivraison: number;
-    seuilFranco: number;
-    fraisLivraisonPanier: number;
-    panierMin: number;
-    total: number;
-    totalFruits: number;
-    totalSnacks: number;
-    totalBoissons: number;
-    totalLivraison: number;
-  }[][];
+  fruitsQuantites: SelectFruitsQuantitesType[];
+  fruitsTarifs: SelectFruitsTarifsType[];
+  snacksQuantites: SelectSnacksQuantitesType[];
+  snacksTarifs: SelectSnacksTarifsType[];
+  boissonsQuantites: SelectBoissonsQuantitesType[];
+  boissonsTarifs: SelectBoissonsTarifsType[];
+  foodLivraisonTarifs: SelectFoodLivraisonTarifsType[];
 };
 
 const SnacksFruitsPropositions = ({
-  formattedPropositions,
+  fruitsQuantites,
+  fruitsTarifs,
+  snacksQuantites,
+  snacksTarifs,
+  boissonsQuantites,
+  boissonsTarifs,
+  foodLivraisonTarifs,
 }: SnacksFruitsPropositionsType) => {
   const { snacksFruits, setSnacksFruits } = useContext(SnacksFruitsContext);
   const { setTotalSnacksFruits } = useContext(TotalSnacksFruitsContext);
+  const { client } = useContext(ClientContext);
+  const { cafe } = useContext(CafeContext);
+  const effectif = client.effectif ?? 0;
+  const nbPersonnes = snacksFruits.quantites.nbPersonnes || effectif;
+
+  //Calcul des propositions
+  const fruitsTarifsPourNbPersonnes = fruitsTarifs.filter(
+    (item) => item.effectif === roundEffectif(nbPersonnes)
+  );
+  const snacksTarifsPourNbPersonnes = snacksTarifs.filter(
+    (item) => item.effectif === roundEffectif(nbPersonnes)
+  );
+  const boissonsTarifsPourNbPersonnes = boissonsTarifs.filter(
+    (item) => item.effectif === roundEffectif(nbPersonnes)
+  );
+
+  const propositions = fruitsTarifsPourNbPersonnes.map((item) => {
+    const {
+      id,
+      gamme,
+      nomFournisseur,
+      slogan: sloganFournisseur,
+      fournisseurId,
+      prixKg,
+    } = item;
+    //Quantites /  semaine / personne
+    const gFruitsParSemaineParPersonne =
+      fruitsQuantites.find((quantite) => quantite.gamme === gamme)
+        ?.gParSemaineParPersonne ?? null;
+    const minKgFruitsParSemaine =
+      fruitsQuantites.find((quantite) => quantite.gamme === gamme)
+        ?.minKgParSemaine ?? null;
+    const portionsSnacksParSemaineParPersonne =
+      snacksQuantites.find((quantite) => quantite.gamme === gamme)
+        ?.portionsParSemaineParPersonne ?? null;
+    const minPortionsSnacksParSemaine =
+      snacksQuantites.find((quantite) => quantite.gamme === gamme)
+        ?.minPortionsParSemaine ?? null;
+    const consosBoissonsParSemaineParPersonne =
+      boissonsQuantites.find((quantite) => quantite.gamme === gamme)
+        ?.consosParSemaineParPersonne ?? null;
+    const minConsosBoissonsParSemaine =
+      boissonsQuantites.find((quantite) => quantite.gamme === gamme)
+        ?.minConsosParSemaine ?? null;
+
+    const fruitsKgParSemaine =
+      gFruitsParSemaineParPersonne !== null && minKgFruitsParSemaine !== null
+        ? (gFruitsParSemaineParPersonne * nbPersonnes) / 1000 >=
+          (minKgFruitsParSemaine ?? 0)
+          ? (gFruitsParSemaineParPersonne * nbPersonnes) / 1000
+          : minKgFruitsParSemaine
+        : null;
+    const snacksPortionsParSemaine =
+      portionsSnacksParSemaineParPersonne !== null &&
+      minPortionsSnacksParSemaine !== null
+        ? portionsSnacksParSemaineParPersonne * nbPersonnes >=
+          minPortionsSnacksParSemaine
+          ? portionsSnacksParSemaineParPersonne * nbPersonnes
+          : minPortionsSnacksParSemaine
+        : null;
+    const boissonsConsosParSemaine =
+      consosBoissonsParSemaineParPersonne !== null &&
+      minConsosBoissonsParSemaine !== null
+        ? consosBoissonsParSemaineParPersonne * nbPersonnes >=
+          minConsosBoissonsParSemaine
+          ? consosBoissonsParSemaineParPersonne * nbPersonnes
+          : minConsosBoissonsParSemaine
+        : null;
+
+    //Tarifs / portion
+    const prixKgFruits = prixKg;
+    const prixUnitaireSnacks =
+      snacksTarifsPourNbPersonnes.find(
+        (tarif) =>
+          tarif.gamme === gamme && tarif.fournisseurId === fournisseurId
+      )?.prixUnitaire ?? null;
+    const prixUnitaireBoissons =
+      boissonsTarifsPourNbPersonnes.find(
+        (tarif) =>
+          tarif.gamme === gamme && tarif.fournisseurId === fournisseurId
+      )?.prixUnitaire ?? null;
+    //Prix panier
+    const panierFruits =
+      snacksFruits.infos.choix.includes("fruits") &&
+      prixKgFruits !== null &&
+      fruitsKgParSemaine !== null
+        ? prixKgFruits * fruitsKgParSemaine
+        : 0;
+    const panierSnacks =
+      snacksFruits.infos.choix.includes("snacks") &&
+      prixUnitaireSnacks !== null &&
+      snacksPortionsParSemaine !== null
+        ? prixUnitaireSnacks * snacksPortionsParSemaine
+        : 0;
+    const panierBoissons =
+      snacksFruits.infos.choix.includes("boissons") &&
+      prixUnitaireBoissons !== null &&
+      boissonsConsosParSemaine !== null
+        ? prixUnitaireBoissons * boissonsConsosParSemaine
+        : 0;
+    const totalFruits = Math.round(52 * panierFruits);
+    const totalSnacks = Math.round(52 * panierSnacks);
+    const totalBoissons = Math.round(52 * panierBoissons);
+
+    const prixPanier = panierFruits + panierSnacks + panierBoissons;
+
+    //Prix livraison / panier
+    const fraisLivraisonsFournisseur = foodLivraisonTarifs.find(
+      (tarif) => tarif.fournisseurId === fournisseurId
+    );
+    const panierMin = fraisLivraisonsFournisseur?.panierMin ?? null;
+    const isPanierMin = panierMin === null || prixPanier >= panierMin;
+
+    const isSameFournisseur = fournisseurId === cafe.infos.fournisseurId;
+    const prixUnitaireLivraisonSiCafe = isPanierMin
+      ? fraisLivraisonsFournisseur?.prixUnitaireSiCafe ?? null
+      : null;
+    const prixUnitaireLivraison = isPanierMin
+      ? fraisLivraisonsFournisseur?.prixUnitaire ?? null
+      : null;
+
+    let fraisLivraisonPanier = isSameFournisseur
+      ? prixUnitaireLivraisonSiCafe
+      : prixUnitaireLivraison;
+
+    const seuilFranco = fraisLivraisonsFournisseur?.seuilFranco ?? 0;
+
+    fraisLivraisonPanier = isPanierMin
+      ? prixPanier < seuilFranco
+        ? fraisLivraisonPanier
+        : 0
+      : null;
+    const totalLivraison =
+      fraisLivraisonPanier !== null
+        ? Math.round(fraisLivraisonPanier * 52)
+        : null;
+    const total =
+      fraisLivraisonPanier !== null
+        ? Math.round(52 * (prixPanier + fraisLivraisonPanier))
+        : null;
+
+    return {
+      //infos
+      id,
+      fournisseurId,
+      nomFournisseur,
+      sloganFournisseur,
+      isSameFournisseur,
+      gamme,
+      //quantites
+      fruitsKgParSemaine,
+      snacksPortionsParSemaine,
+      boissonsConsosParSemaine,
+      gFruitsParSemaineParPersonne,
+      portionsSnacksParSemaineParPersonne,
+      consosBoissonsParSemaineParPersonne,
+      //prix
+      prixKgFruits,
+      prixUnitaireSnacks,
+      prixUnitaireBoissons,
+      prixUnitaireLivraisonSiCafe,
+      prixUnitaireLivraison,
+      seuilFranco,
+      fraisLivraisonPanier,
+      panierMin,
+      //total
+      total,
+      totalFruits,
+      totalSnacks,
+      totalBoissons,
+      totalLivraison,
+    };
+  });
+
+  const propositionsByFournisseurId = propositions.reduce<
+    Record<
+      number,
+      {
+        id: number;
+        fournisseurId: number;
+        nomFournisseur: string;
+        sloganFournisseur: string | null;
+        isSameFournisseur: boolean;
+        gamme: "essentiel" | "confort" | "excellence";
+        fruitsKgParSemaine: number | null;
+        snacksPortionsParSemaine: number | null;
+        boissonsConsosParSemaine: number | null;
+        gFruitsParSemaineParPersonne: number | null;
+        portionsSnacksParSemaineParPersonne: number | null;
+        consosBoissonsParSemaineParPersonne: number | null;
+        prixKgFruits: number | null;
+        prixUnitaireSnacks: number | null;
+        prixUnitaireBoissons: number | null;
+        prixUnitaireLivraisonSiCafe: number | null;
+        prixUnitaireLivraison: number | null;
+        seuilFranco: number;
+        fraisLivraisonPanier: number | null;
+        panierMin: number | null;
+        total: number | null;
+        totalFruits: number;
+        totalSnacks: number;
+        totalBoissons: number;
+        totalLivraison: number | null;
+      }[]
+    >
+  >((acc, item) => {
+    const { fournisseurId } = item;
+    if (!acc[fournisseurId]) {
+      acc[fournisseurId] = [];
+    }
+    // Add the item to the appropriate array
+    acc[fournisseurId].push(item);
+    acc[fournisseurId].sort(
+      (a, b) => gammes.indexOf(a.gamme) - gammes.indexOf(b.gamme)
+    );
+    return acc;
+  }, {});
+
+  const formattedPropositions = Object.values(propositionsByFournisseurId);
 
   const handleClickProposition = (proposition: {
     id: number;
@@ -54,25 +263,25 @@ const SnacksFruitsPropositions = ({
     sloganFournisseur: string | null;
     isSameFournisseur: boolean;
     gamme: "essentiel" | "confort" | "excellence";
-    fruitsKgParSemaine: number;
-    snacksPortionsParSemaine: number;
-    boissonsConsosParSemaine: number;
-    gFruitsParSemaineParPersonne: number;
-    portionsSnacksParSemaineParPersonne: number;
-    consosBoissonsParSemaineParPersonne: number;
-    prixKgFruits: number;
-    prixUnitaireSnacks: number;
-    prixUnitaireBoissons: number;
-    prixUnitaireLivraisonSiCafe: number;
-    prixUnitaireLivraison: number;
+    fruitsKgParSemaine: number | null;
+    snacksPortionsParSemaine: number | null;
+    boissonsConsosParSemaine: number | null;
+    gFruitsParSemaineParPersonne: number | null;
+    portionsSnacksParSemaineParPersonne: number | null;
+    consosBoissonsParSemaineParPersonne: number | null;
+    prixKgFruits: number | null;
+    prixUnitaireSnacks: number | null;
+    prixUnitaireBoissons: number | null;
+    prixUnitaireLivraisonSiCafe: number | null;
+    prixUnitaireLivraison: number | null;
     seuilFranco: number;
-    fraisLivraisonPanier: number;
-    panierMin: number;
-    total: number;
+    fraisLivraisonPanier: number | null;
+    panierMin: number | null;
+    total: number | null;
     totalFruits: number;
     totalSnacks: number;
     totalBoissons: number;
-    totalLivraison: number;
+    totalLivraison: number | null;
   }) => {
     const {
       fournisseurId,
@@ -112,9 +321,9 @@ const SnacksFruitsPropositions = ({
         },
         quantites: {
           ...prev.quantites,
-          fruitsKgParSemaine: 0,
-          snacksPortionsParSemaine: 0,
-          boissonsConsosParSemaine: 0,
+          fruitsKgParSemaine: null,
+          snacksPortionsParSemaine: null,
+          boissonsConsosParSemaine: null,
         },
         prix: {
           prixKgFruits: null,
@@ -127,11 +336,11 @@ const SnacksFruitsPropositions = ({
         },
       }));
       setTotalSnacksFruits({
-        totalFruits: 0,
-        totalSnacks: 0,
-        totalBoissons: 0,
-        totalLivraison: 0,
-        total: 0,
+        totalFruits: null,
+        totalSnacks: null,
+        totalBoissons: null,
+        totalLivraison: null,
+        total: null,
       });
       return;
     }
@@ -183,154 +392,30 @@ const SnacksFruitsPropositions = ({
 
   return (
     <div className="h-full flex flex-col border rounded-xl overflow-hidden">
-      {formattedPropositions.length > 0
-        ? formattedPropositions.map((propositions) => (
-            <div
-              className="flex border-b flex-1"
-              key={propositions[0].fournisseurId}
-            >
-              <TooltipProvider delayDuration={0}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex w-1/4 items-center justify-center px-4">
-                      {getLogoFournisseurUrl(propositions[0].fournisseurId) ? (
-                        <div className="w-full h-full relative">
-                          <Image
-                            src={
-                              getLogoFournisseurUrl(
-                                propositions[0].fournisseurId
-                              ) as string
-                            }
-                            alt={`logo-de-${propositions[0].nomFournisseur}`}
-                            fill={true}
-                            className="w-full h-full object-contain"
-                            quality={100}
-                          />
-                        </div>
-                      ) : (
-                        propositions[0].nomFournisseur
-                      )}
-                    </div>
-                  </TooltipTrigger>
-                  {propositions[0].sloganFournisseur && (
-                    <TooltipContent>
-                      <p className="text-sm italic">
-                        {propositions[0].sloganFournisseur}
-                      </p>
-                    </TooltipContent>
-                  )}
-                </Tooltip>
-              </TooltipProvider>
-              {propositions.map((proposition) => {
-                const gamme = proposition.gamme;
-                const color =
-                  gamme === "essentiel"
-                    ? "fm4allessential"
-                    : gamme === "confort"
-                    ? "fm4allcomfort"
-                    : "fm4allexcellence";
-                if (
-                  snacksFruits.infos.choix.includes("fruits") &&
-                  proposition.prixKgFruits === 0
-                ) {
-                  return (
-                    <div
-                      key={proposition.id}
-                      className={`flex-1 bg-${color} text-xl font-bold text-slate-200 flex items-center justify-center`}
-                    >
-                      <p>Non proposé</p>
-                    </div>
-                  );
-                }
-                if (
-                  snacksFruits.infos.choix.includes("snacks") &&
-                  proposition.prixUnitaireSnacks === 0
-                ) {
-                  return (
-                    <div
-                      key={proposition.id}
-                      className={`flex-1 bg-${color} text-xl font-bold text-slate-200 flex items-center justify-center p-2`}
-                    >
-                      <p>Non proposé</p>
-                    </div>
-                  );
-                }
-                if (
-                  snacksFruits.infos.choix.includes("boissons") &&
-                  proposition.prixUnitaireBoissons === 0
-                ) {
-                  return (
-                    <div
-                      key={proposition.id}
-                      className={`flex-1 bg-${color} text-lg font-bold text-slate-200 flex items-center justify-center`}
-                    >
-                      <p>Non proposé</p>
-                    </div>
-                  );
-                }
-                const prixAnnuelText = proposition.total
-                  ? `${Math.round(proposition.total / 12)} € / mois`
-                  : "Non proposé";
-                const gFruitsParSemaineParPersonneText =
-                  snacksFruits.infos.choix.includes("fruits")
-                    ? `${proposition.gFruitsParSemaineParPersonne} g / personne / semaine`
-                    : "";
-                const portionsSnacksParSemaineParPersonneText =
-                  snacksFruits.infos.choix.includes("snacks")
-                    ? `${proposition.portionsSnacksParSemaineParPersonne} portions / personne / semaine`
-                    : "";
-                const consosBoissonsParSemaineParPersonneText =
-                  snacksFruits.infos.choix.includes("boissons")
-                    ? `${proposition.consosBoissonsParSemaineParPersonne} consos / personne / semaine`
-                    : "";
-
-                return (
-                  <div
-                    className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
-                      snacksFruits.infos.fournisseurId ===
-                        proposition.fournisseurId &&
-                      snacksFruits.infos.gammeSelected === gamme
-                        ? "ring-4 ring-inset ring-destructive"
-                        : ""
-                    }`}
-                    key={proposition.id}
-                    onClick={() => handleClickProposition(proposition)}
-                  >
-                    <Checkbox
-                      checked={
-                        snacksFruits.infos.fournisseurId ===
-                          proposition.fournisseurId &&
-                        snacksFruits.infos.gammeSelected === gamme
-                      }
-                      onCheckedChange={() =>
-                        handleClickProposition(proposition)
-                      }
-                      className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-                    />
-                    <div>
-                      <p className="font-bold">{prixAnnuelText}</p>
-                      {gFruitsParSemaineParPersonneText ? (
-                        <p className="text-xs">
-                          {gFruitsParSemaineParPersonneText}
-                        </p>
-                      ) : null}
-                      {portionsSnacksParSemaineParPersonneText ? (
-                        <p className="text-xs">
-                          {portionsSnacksParSemaineParPersonneText}
-                        </p>
-                      ) : null}
-                      {consosBoissonsParSemaineParPersonneText ? (
-                        <p className="text-xs">
-                          {consosBoissonsParSemaineParPersonneText}
-                        </p>
-                      ) : null}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ))
-        : null}
+      {isNaN(nbPersonnes) || nbPersonnes < 1 || nbPersonnes > 300 ? (
+        <div className="flex-1 flex justify-center items-center border rounded-xl">
+          <p className="text-center text-base">
+            Veuillez renseigner un nombre de personnes entier compris entre 1 et
+            300
+          </p>
+        </div>
+      ) : formattedPropositions.length > 0 ? (
+        formattedPropositions.map((propositions) => (
+          <div
+            className="flex border-b flex-1"
+            key={propositions[0].fournisseurId}
+          >
+            <SnackFruitsPropositionLogo {...propositions[0]} />
+            {propositions.map((proposition) => (
+              <SnacksFruitsPropositionCard
+                key={proposition.id}
+                proposition={proposition}
+                handleClickProposition={handleClickProposition}
+              />
+            ))}
+          </div>
+        ))
+      ) : null}
     </div>
   );
 };

@@ -64,20 +64,20 @@ export const reinitialisationDevis = (
       vitrerieSelected: false,
     },
     quantites: {
-      freqAnnuelle: 0,
-      hParPassage: 0,
-      hParPassageRepasse: 0,
-      surfaceCloisons: 0,
-      surfaceVitres: 0,
-      cadenceCloisons: 0,
-      cadenceVitres: 0,
+      freqAnnuelle: null,
+      hParPassage: null,
+      hParPassageRepasse: null,
+      surfaceCloisons: (client.surface ?? 0) * 0.15,
+      surfaceVitres: (client.surface ?? 0) * 0.15,
+      cadenceCloisons: null,
+      cadenceVitres: null,
       nbPassagesVitrerie: 2,
     },
     prix: {
-      tauxHoraire: 0,
-      tauxHoraireRepasse: 0,
-      tauxHoraireVitrerie: 0,
-      minFacturationVitrerie: 0,
+      tauxHoraire: null,
+      tauxHoraireRepasse: null,
+      tauxHoraireVitrerie: null,
+      minFacturationVitrerie: null,
     },
   });
   setHygiene({
@@ -124,14 +124,14 @@ export const reinitialisationDevis = (
       gammeSelected: null,
     },
     quantites: {
-      freqAnnuelle: 0,
-      hParPassage: 0,
+      freqAnnuelle: null,
+      hParPassage: null,
     },
     prix: {
-      tauxHoraire: 0,
-      prixQ18: 0,
-      prixLegio: 0,
-      prixQualiteAir: 0,
+      tauxHoraire: null,
+      prixQ18: null,
+      prixLegio: null,
+      prixQualiteAir: null,
     },
   });
   setIncendie({
@@ -146,10 +146,10 @@ export const reinitialisationDevis = (
       nbTelBaes: null,
     },
     prix: {
-      prixParExtincteur: 0,
-      prixParBaes: 0,
-      prixParTelBaes: 0,
-      fraisDeplacement: 0,
+      prixParExtincteur: null,
+      prixParBaes: null,
+      prixParTelBaes: null,
+      fraisDeplacement: null,
     },
   });
   setCafe({
@@ -169,7 +169,7 @@ export const reinitialisationDevis = (
           gammeCafeSelected: null,
           marque: null,
           modele: null,
-          reconditionne: false,
+          reconditionne: null,
         },
         quantites: {
           nbPersonnes: client.effectif ?? 0,
@@ -194,7 +194,7 @@ export const reinitialisationDevis = (
       nbPersonnes: Math.round((client.effectif ?? 0) * 0.15),
     },
     prix: {
-      prixUnitaire: 0,
+      prixUnitaire: null,
     },
   });
   setSnacksFruits({
@@ -208,9 +208,9 @@ export const reinitialisationDevis = (
     },
     quantites: {
       nbPersonnes: client.effectif ?? 0,
-      fruitsKgParSemaine: 0,
-      snacksPortionsParSemaine: 0,
-      boissonsConsosParSemaine: 0,
+      fruitsKgParSemaine: null,
+      snacksPortionsParSemaine: null,
+      boissonsConsosParSemaine: null,
     },
     prix: {
       prixKgFruits: null,
@@ -234,7 +234,7 @@ export const reinitialisationDevis = (
       demiJParSemaine: null,
     },
     prix: {
-      demiTjm: 0,
+      demiTjm: null,
     },
   });
   setServicesFm4All({
@@ -264,58 +264,58 @@ export const reinitialisationDevis = (
   });
   //Total
   setTotalNettoyage({
-    totalService: 0,
-    totalRepasse: 0,
-    totalSamedi: 0,
-    totalDimanche: 0,
-    totalVitrerie: 0,
+    totalService: null,
+    totalRepasse: null,
+    totalSamedi: null,
+    totalDimanche: null,
+    totalVitrerie: null,
   });
   setTotalHygiene({
-    totalTrilogie: 0,
-    totalDesinfectant: 0,
-    totalParfum: 0,
-    totalBalai: 0,
-    totalPoubelle: 0,
-    totalInstallation: 0,
+    totalTrilogie: null,
+    totalDesinfectant: null,
+    totalParfum: null,
+    totalBalai: null,
+    totalPoubelle: null,
+    totalInstallation: null,
   });
   setTotalMaintenance({
-    totalService: 0,
-    totalQ18: 0,
-    totalLegio: 0,
-    totalQualiteAir: 0,
+    totalService: null,
+    totalQ18: null,
+    totalLegio: null,
+    totalQualiteAir: null,
   });
   setTotalIncendie({
-    totalService: 0,
+    totalService: null,
   });
   setTotalCafe({
     totalMachines: [
       {
         lotId: 1,
-        total: 0,
-        totalInstallation: 0,
+        total: null,
+        totalInstallation: null,
       },
     ],
   });
   setTotalThe({
-    totalService: 0,
+    totalService: null,
   });
   setTotalSnacksFruits({
-    totalFruits: 0,
-    totalSnacks: 0,
-    totalBoissons: 0,
-    totalLivraison: 0,
-    total: 0,
+    totalFruits: null,
+    totalSnacks: null,
+    totalBoissons: null,
+    totalLivraison: null,
+    total: null,
   });
   setTotalOfficeManager({
-    totalService: 0,
+    totalService: null,
   });
   setTotalServicesFm4All({
-    totalAssurance: 0,
-    totalPlateforme: 0,
-    totalSupportAdmin: 0,
-    totalSupportOp: 0,
-    totalAccountManager: 0,
-    totalRemiseCa: 0,
-    totalRemiseHof: 0,
+    totalAssurance: null,
+    totalPlateforme: null,
+    totalSupportAdmin: null,
+    totalSupportOp: null,
+    totalAccountManager: null,
+    totalRemiseCa: null,
+    totalRemiseHof: null,
   });
 };

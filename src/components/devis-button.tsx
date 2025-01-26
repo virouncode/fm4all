@@ -79,12 +79,21 @@ const DevisButton = ({
   const router = useRouter();
 
   const serviceSearchParams = new URLSearchParams();
+  const sauvegarderSearchParams = new URLSearchParams();
 
   if (client.effectif) {
     serviceSearchParams.set("effectif", client.effectif.toString());
+    sauvegarderSearchParams.set("effectif", client.effectif.toString());
   }
   if (client.surface) {
     serviceSearchParams.set("surface", client.surface.toString());
+    sauvegarderSearchParams.set("surface", client.surface.toString());
+  }
+  if (client.typeBatiment) {
+    sauvegarderSearchParams.set("typeBatiment", client.typeBatiment);
+  }
+  if (client.typeOccupation) {
+    sauvegarderSearchParams.set("typeOccupation", client.typeOccupation);
   }
 
   const devisRoutes = [
@@ -110,7 +119,7 @@ const DevisButton = ({
     },
     {
       id: 5,
-      url: "/sauvegarder-ma-progression",
+      url: `/sauvegarder-ma-progression?${sauvegarderSearchParams.toString()}`,
       name: "Sauvegarder",
     },
     {

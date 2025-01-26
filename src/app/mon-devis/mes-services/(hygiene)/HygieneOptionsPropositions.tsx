@@ -1,6 +1,3 @@
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { ClientContext } from "@/context/ClientProvider";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
@@ -9,6 +6,11 @@ import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { ChangeEvent, useContext } from "react";
+import { getHygieneFournisseurTarifs } from "./getFormattedHygienePropositions";
+import HygieneOptionsBalaiCard from "./HygieneOptionsBalaiCard";
+import HygieneOptionsDesinfectantCard from "./HygieneOptionsDesinfectantCard";
+import HygieneOptionsParfumCard from "./HygieneOptionsParfumCard";
+import HygieneOptionsPoubelleCard from "./HygieneOptionsPoubelleCard";
 
 type HygieneOptionsPropositionsProps = {
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
@@ -24,20 +26,84 @@ const HygieneOptionsPropositions = ({
   const { hygiene, setHygiene } = useContext(HygieneContext);
   const { client } = useContext(ClientContext);
   const { setTotalHygiene } = useContext(TotalHygieneContext);
+  //Formatter les propositions d'options en hygiene
+  const nbDistribDesinfectant =
+    hygiene.quantites.nbDistribDesinfectant ||
+    hygieneDistribQuantite.nbDistribDesinfectant;
+  const nbDistribParfum =
+    hygiene.quantites.nbDistribParfum || hygieneDistribQuantite.nbDistribParfum;
+  const nbDistribBalai =
+    hygiene.quantites.nbDistribBalai || hygieneDistribQuantite.nbDistribBalai;
+  const nbDistribPoubelle =
+    hygiene.quantites.nbDistribPoubelle ||
+    hygieneDistribQuantite.nbDistribPoubelle;
+  const dureeLocation = hygiene.infos.dureeLocation;
+  const { hygieneDistribTarifsFournisseur, paParPersonneDesinfectant } =
+    getHygieneFournisseurTarifs(
+      hygiene,
+      hygieneDistribTarifs,
+      hygieneConsosTarifs
+    );
+
+  const propositions = gammes.map((gamme) => {
+    //la gamme suffit pour identifier la proposition car il n'y a qu'un fournisseur
+    const prixDistribDesinfectant =
+      hygieneDistribTarifsFournisseur.find(
+        (tarif) => tarif.type === "desinfectant" && tarif.gamme === gamme
+      )?.[dureeLocation] ?? null;
+    const prixDistribParfum =
+      hygieneDistribTarifsFournisseur.find(
+        (tarif) => tarif.type === "parfum" && tarif.gamme === gamme
+      )?.[dureeLocation] ?? null;
+    const prixDistribBalai =
+      hygieneDistribTarifsFournisseur.find(
+        (tarif) => tarif.type === "balai" && tarif.gamme === gamme
+      )?.[dureeLocation] ?? null;
+    const prixDistribPoubelle =
+      hygieneDistribTarifsFournisseur.find(
+        (tarif) => tarif.type === "poubelle" && tarif.gamme === gamme
+      )?.[dureeLocation] ?? null;
+    const totalDesinfectant =
+      paParPersonneDesinfectant !== null && prixDistribDesinfectant !== null
+        ? nbDistribDesinfectant * prixDistribDesinfectant +
+          paParPersonneDesinfectant * (client.effectif ?? 0)
+        : null;
+    const totalParfum =
+      prixDistribParfum !== null ? nbDistribParfum * prixDistribParfum : null;
+    const totalBalai =
+      prixDistribBalai !== null ? nbDistribBalai * prixDistribBalai : null;
+    const totalPoubelle =
+      prixDistribPoubelle !== null
+        ? nbDistribPoubelle * prixDistribPoubelle
+        : null;
+
+    return {
+      gamme,
+      prixDistribDesinfectant,
+      prixDistribParfum,
+      prixDistribBalai,
+      prixDistribPoubelle,
+      paParPersonneDesinfectant,
+      totalDesinfectant,
+      totalParfum,
+      totalBalai,
+      totalPoubelle,
+    };
+  });
 
   const handleClickProposition = (
     type: string,
     proposition: {
       gamme: "essentiel" | "confort" | "excellence";
-      prixDistribDesinfectant: number;
-      prixDistribParfum: number;
-      prixDistribBalai: number;
-      prixDistribPoubelle: number;
-      paParPersonneDesinfectant: number;
-      totalDesinfectant: number;
-      totalParfum: number;
-      totalBalai: number;
-      totalPoubelle: number;
+      prixDistribDesinfectant: number | null;
+      prixDistribParfum: number | null;
+      prixDistribBalai: number | null;
+      prixDistribPoubelle: number | null;
+      paParPersonneDesinfectant: number | null;
+      totalDesinfectant: number | null;
+      totalParfum: number | null;
+      totalBalai: number | null;
+      totalPoubelle: number | null;
     }
   ) => {
     const {
@@ -60,13 +126,13 @@ const HygieneOptionsPropositions = ({
             infos: { ...prev.infos, desinfectantGammeSelected: null },
             prix: {
               ...prev.prix,
-              prixDistribDesinfectant: 0,
-              paParPersonneDesinfectant: 0,
+              prixDistribDesinfectant: null,
+              paParPersonneDesinfectant: null,
             },
           }));
           setTotalHygiene((prev) => ({
             ...prev,
-            totalDesinfectant: 0,
+            totalDesinfectant: null,
           }));
           return;
         }
@@ -94,12 +160,12 @@ const HygieneOptionsPropositions = ({
             infos: { ...prev.infos, parfumGammeSelected: null },
             prix: {
               ...prev.prix,
-              prixDistribParfum: 0,
+              prixDistribParfum: null,
             },
           }));
           setTotalHygiene((prev) => ({
             ...prev,
-            totalParfum: 0,
+            totalParfum: null,
           }));
           return;
         }
@@ -126,12 +192,12 @@ const HygieneOptionsPropositions = ({
             infos: { ...prev.infos, balaiGammeSelected: null },
             prix: {
               ...prev.prix,
-              prixDistribBalai: 0,
+              prixDistribBalai: null,
             },
           }));
           setTotalHygiene((prev) => ({
             ...prev,
-            totalBalai: 0,
+            totalBalai: null,
           }));
           return;
         }
@@ -156,7 +222,7 @@ const HygieneOptionsPropositions = ({
           }));
           setTotalHygiene((prev) => ({
             ...prev,
-            totalPoubelle: 0,
+            totalPoubelle: null,
           }));
           return;
         }
@@ -185,7 +251,7 @@ const HygieneOptionsPropositions = ({
       case "desinfectant":
         const newNbDistribDesinfectant = value
           ? parseInt(value)
-          : hygieneDistribQuantite.nbDistribDesinfectant ?? 0;
+          : hygieneDistribQuantite.nbDistribDesinfectant;
         setHygiene((prev) => ({
           ...prev,
           quantites: {
@@ -195,17 +261,20 @@ const HygieneOptionsPropositions = ({
         }));
         if (hygiene.infos.desinfectantGammeSelected) {
           const prixDistribDesinfectant =
-            distribTarifsDuFournisseur.find(
+            hygieneDistribTarifsFournisseur.find(
               (tarif) =>
                 tarif.type === "desinfectant" &&
                 tarif.gamme === hygiene.infos.desinfectantGammeSelected
-            )?.[dureeLocation] ?? 0;
+            )?.[dureeLocation] ?? null;
 
-          const totalDesinfectant = Math.round(
-            newNbDistribDesinfectant * prixDistribDesinfectant +
-              (consosTarifsDuFournisseur?.paParPersonneDesinfectant ?? 0) *
-                (client.effectif ?? 0)
-          );
+          const totalDesinfectant =
+            prixDistribDesinfectant !== null &&
+            paParPersonneDesinfectant !== null
+              ? Math.round(
+                  newNbDistribDesinfectant * prixDistribDesinfectant +
+                    paParPersonneDesinfectant * (client.effectif ?? 0)
+                )
+              : null;
           setTotalHygiene((prev) => ({
             ...prev,
             totalDesinfectant,
@@ -215,7 +284,7 @@ const HygieneOptionsPropositions = ({
       case "parfum":
         const newNbDistribParfum = value
           ? parseInt(value)
-          : hygieneDistribQuantite.nbDistribParfum ?? 0;
+          : hygieneDistribQuantite.nbDistribParfum;
         setHygiene((prev) => ({
           ...prev,
           quantites: {
@@ -225,15 +294,16 @@ const HygieneOptionsPropositions = ({
         }));
         if (hygiene.infos.parfumGammeSelected) {
           const prixDistribParfum =
-            distribTarifsDuFournisseur.find(
+            hygieneDistribTarifsFournisseur.find(
               (tarif) =>
                 tarif.type === "parfum" &&
                 tarif.gamme === hygiene.infos.parfumGammeSelected
-            )?.[dureeLocation] ?? 0;
+            )?.[dureeLocation] ?? null;
 
-          const totalParfum = Math.round(
-            newNbDistribParfum * prixDistribParfum
-          );
+          const totalParfum =
+            prixDistribParfum !== null
+              ? Math.round(newNbDistribParfum * prixDistribParfum)
+              : null;
           setTotalHygiene((prev) => ({
             ...prev,
             totalParfum,
@@ -244,7 +314,7 @@ const HygieneOptionsPropositions = ({
       case "balai":
         const newNbDistribBalai = value
           ? parseInt(value)
-          : hygieneDistribQuantite.nbDistribBalai ?? 0;
+          : hygieneDistribQuantite.nbDistribBalai;
         setHygiene((prev) => ({
           ...prev,
           quantites: {
@@ -254,13 +324,16 @@ const HygieneOptionsPropositions = ({
         }));
         if (hygiene.infos.balaiGammeSelected) {
           const prixDistribBalai =
-            distribTarifsDuFournisseur.find(
+            hygieneDistribTarifsFournisseur.find(
               (tarif) =>
                 tarif.type === "balai" &&
                 tarif.gamme === hygiene.infos.balaiGammeSelected
-            )?.[dureeLocation] ?? 0;
+            )?.[dureeLocation] ?? null;
 
-          const totalBalai = Math.round(newNbDistribBalai * prixDistribBalai);
+          const totalBalai =
+            prixDistribBalai !== null
+              ? Math.round(newNbDistribBalai * prixDistribBalai)
+              : null;
           setTotalHygiene((prev) => ({
             ...prev,
             totalBalai,
@@ -271,7 +344,7 @@ const HygieneOptionsPropositions = ({
       case "poubelle":
         const newNbDistribPoubelle = value
           ? parseInt(value)
-          : hygieneDistribQuantite.nbDistribPoubelle ?? 0;
+          : hygieneDistribQuantite.nbDistribPoubelle;
         setHygiene((prev) => ({
           ...prev,
           quantites: {
@@ -281,15 +354,16 @@ const HygieneOptionsPropositions = ({
         }));
         if (hygiene.infos.poubelleGammeSelected) {
           const prixDistribPoubelle =
-            distribTarifsDuFournisseur.find(
+            hygieneDistribTarifsFournisseur.find(
               (tarif) =>
                 tarif.type === "poubelle" &&
                 tarif.gamme === hygiene.infos.poubelleGammeSelected
-            )?.[dureeLocation] ?? 0;
+            )?.[dureeLocation] ?? null;
 
-          const totalPoubelle = Math.round(
-            newNbDistribPoubelle * prixDistribPoubelle
-          );
+          const totalPoubelle =
+            prixDistribPoubelle !== null
+              ? Math.round(newNbDistribPoubelle * prixDistribPoubelle)
+              : null;
           setTotalHygiene((prev) => ({
             ...prev,
             totalPoubelle,
@@ -299,403 +373,44 @@ const HygieneOptionsPropositions = ({
     }
   };
 
-  //Formatter les propositions d'options en hygiene
-  const nbDistribDesinfectant =
-    hygiene.quantites.nbDistribDesinfectant ||
-    hygieneDistribQuantite.nbDistribDesinfectant;
-  const nbDistribParfum =
-    hygiene.quantites.nbDistribParfum || hygieneDistribQuantite.nbDistribParfum;
-  const nbDistribBalai =
-    hygiene.quantites.nbDistribBalai || hygieneDistribQuantite.nbDistribBalai;
-  const nbDistribPoubelle =
-    hygiene.quantites.nbDistribPoubelle ||
-    hygieneDistribQuantite.nbDistribPoubelle;
-  const dureeLocation = hygiene.infos.dureeLocation;
-  const distribTarifsDuFournisseur = hygieneDistribTarifs.filter(
-    (tarif) => tarif.fournisseurId === hygiene.infos.fournisseurId
-  );
-  const consosTarifsDuFournisseur = hygieneConsosTarifs.find(
-    (tarif) => tarif.fournisseurId === hygiene.infos.fournisseurId
-  );
-
-  const propositions = gammes.map((gamme) => {
-    //la gamme suffit pour identifier la proposition car il n'y a qu'un fournisseur
-    const prixDistribDesinfectant =
-      distribTarifsDuFournisseur.find(
-        (tarif) => tarif.type === "desinfectant" && tarif.gamme === gamme
-      )?.[dureeLocation] ?? 0;
-    const prixDistribParfum =
-      distribTarifsDuFournisseur.find(
-        (tarif) => tarif.type === "parfum" && tarif.gamme === gamme
-      )?.[dureeLocation] ?? 0;
-    const prixDistribBalai =
-      distribTarifsDuFournisseur.find(
-        (tarif) => tarif.type === "balai" && tarif.gamme === gamme
-      )?.[dureeLocation] ?? 0;
-    const prixDistribPoubelle =
-      distribTarifsDuFournisseur.find(
-        (tarif) => tarif.type === "poubelle" && tarif.gamme === gamme
-      )?.[dureeLocation] ?? 0;
-    const paParPersonneDesinfectant =
-      consosTarifsDuFournisseur?.paParPersonneDesinfectant ?? 0;
-    const totalDesinfectant =
-      nbDistribDesinfectant * prixDistribDesinfectant +
-      paParPersonneDesinfectant * (client.effectif ?? 0);
-    const totalParfum = nbDistribParfum * prixDistribParfum;
-    const totalBalai = nbDistribBalai * prixDistribBalai;
-    const totalPoubelle = nbDistribPoubelle * prixDistribPoubelle;
-
-    return {
-      gamme,
-      prixDistribDesinfectant,
-      prixDistribParfum,
-      prixDistribBalai,
-      prixDistribPoubelle,
-      paParPersonneDesinfectant,
-      totalDesinfectant,
-      totalParfum,
-      totalBalai,
-      totalPoubelle,
-    };
-  });
-
   return (
     <div className="h-full flex flex-col border rounded-xl overflow-hidden">
       {/*1ère ligne */}
-      <div className="flex border-b flex-1">
-        <div className="flex w-1/4 items-center justify-center flex-col gap-2 p-2">
-          <p className="text-base">Desinfectant pour cuvettes</p>
-          <div className="text-sm flex flex-col gap-2">
-            <div className="flex gap-4 items-center justify-center w-full">
-              <Input
-                type="number"
-                value={nbDistribDesinfectant}
-                min={1}
-                max={100}
-                step={1}
-                onChange={(e) => handleChangeDistribNbr(e, "desinfectant")}
-                className={`w-16 ${
-                  hygiene.quantites.nbDistribDesinfectant ===
-                  hygieneDistribQuantite.nbDistribDesinfectant
-                    ? "text-destructive"
-                    : ""
-                }`}
-              />
-              <Label htmlFor="nbDistribDesinfectant" className="text-sm">
-                distributeurs
-              </Label>
-            </div>
-          </div>
-        </div>
-        {propositions.map((proposition) => {
-          const gamme = proposition.gamme;
-          const color =
-            gamme === "essentiel"
-              ? "fm4allessential"
-              : gamme === "confort"
-              ? "fm4allcomfort"
-              : "fm4allexcellence";
-          const prixAnnuelDesinfectantText = proposition.totalDesinfectant
-            ? `${Math.round(proposition.totalDesinfectant / 12)} € / mois`
-            : "Non proposé";
-
-          return (
-            <div
-              className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-xl gap-4 cursor-pointer ${
-                hygiene.infos.desinfectantGammeSelected === gamme
-                  ? "ring-4 ring-inset ring-destructive"
-                  : ""
-              } px-8`}
-              key={"desinfectant" + gamme}
-              onClick={() =>
-                handleClickProposition("desinfectant", proposition)
-              }
-            >
-              {" "}
-              <Checkbox
-                checked={hygiene.infos.desinfectantGammeSelected === gamme}
-                onCheckedChange={() =>
-                  handleClickProposition("desinfectant", proposition)
-                }
-                className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-              />
-              <div>
-                <p>{prixAnnuelDesinfectantText}</p>
-                <p className="text-sm">
-                  Distributeurs{" "}
-                  {gamme === "essentiel"
-                    ? "blancs basic"
-                    : gamme === "confort"
-                    ? "couleur"
-                    : "inox"}
-                </p>
-                <p className="text-sm">
-                  {`Location engagement
-                    ${
-                      dureeLocation === "pa12M"
-                        ? "12"
-                        : dureeLocation === "pa24M"
-                        ? "24"
-                        : "36"
-                    } mois`}
-                </p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <HygieneOptionsDesinfectantCard
+        nbDistribDesinfectant={nbDistribDesinfectant}
+        dureeLocation={dureeLocation}
+        handleChangeDistribNbr={handleChangeDistribNbr}
+        handleClickProposition={handleClickProposition}
+        hygieneDistribQuantite={hygieneDistribQuantite}
+        propositions={propositions}
+      />
       {/*2ème ligne */}
-      <div className="flex border-b flex-1">
-        <div className="flex w-1/4 items-center justify-center flex-col gap-2 p-2">
-          <p className="text-base">Parfum</p>
-          <div className="text-sm flex flex-col gap-2">
-            <div className="flex gap-4 items-center justify-center w-full">
-              <Input
-                type="number"
-                value={nbDistribParfum}
-                min={1}
-                max={100}
-                step={1}
-                onChange={(e) => handleChangeDistribNbr(e, "parfum")}
-                className={`w-16 ${
-                  hygiene.quantites.nbDistribParfum ===
-                  hygieneDistribQuantite.nbDistribParfum
-                    ? "text-destructive"
-                    : ""
-                }`}
-              />
-              <Label htmlFor="nbDistribParfum" className="text-sm">
-                distributeurs
-              </Label>
-            </div>
-          </div>
-        </div>
-        {propositions.map((proposition) => {
-          const gamme = proposition.gamme;
-          const color =
-            gamme === "essentiel"
-              ? "fm4allessential"
-              : gamme === "confort"
-              ? "fm4allcomfort"
-              : "fm4allexcellence";
-          const prixAnnuelParfumText = proposition.totalParfum
-            ? `${Math.round(proposition.totalParfum / 12)} € / mois`
-            : "Non proposé";
-          return (
-            <div
-              className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-xl gap-4 cursor-pointer ${
-                hygiene.infos.parfumGammeSelected === gamme
-                  ? "ring-4 ring-inset ring-destructive"
-                  : ""
-              } px-8`}
-              key={"parfum" + gamme}
-              onClick={() => handleClickProposition("parfum", proposition)}
-            >
-              {" "}
-              <Checkbox
-                checked={hygiene.infos.parfumGammeSelected === gamme}
-                onCheckedChange={() =>
-                  handleClickProposition("parfum", proposition)
-                }
-                className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-              />
-              <div>
-                <p>{prixAnnuelParfumText}</p>
-                <p className="text-sm">
-                  Distributeurs{" "}
-                  {gamme === "essentiel"
-                    ? "blancs basic"
-                    : gamme === "confort"
-                    ? "couleur"
-                    : "inox"}
-                </p>
-                <p className="text-sm">
-                  {dureeLocation === "oneShot"
-                    ? ""
-                    : `Location engagement
-                    ${
-                      dureeLocation === "pa12M"
-                        ? "12"
-                        : dureeLocation === "pa24M"
-                        ? "24"
-                        : "36"
-                    } mois`}
-                </p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <HygieneOptionsParfumCard
+        nbDistribParfum={nbDistribParfum}
+        dureeLocation={dureeLocation}
+        handleChangeDistribNbr={handleChangeDistribNbr}
+        handleClickProposition={handleClickProposition}
+        hygieneDistribQuantite={hygieneDistribQuantite}
+        propositions={propositions}
+      />
       {/*3ème ligne */}
-      <div className="flex border-b flex-1">
-        <div className="flex w-1/4 items-center justify-center flex-col gap-2 p-2">
-          <p className="text-base">Balais WC</p>
-          <div className="text-sm flex flex-col gap-2">
-            <div className="flex gap-4 items-center justify-center w-full">
-              <Input
-                type="number"
-                value={nbDistribBalai}
-                min={1}
-                max={100}
-                step={1}
-                onChange={(e) => handleChangeDistribNbr(e, "balai")}
-                className={`w-16 ${
-                  hygiene.quantites.nbDistribBalai ===
-                  hygieneDistribQuantite.nbDistribBalai
-                    ? "text-destructive"
-                    : ""
-                }`}
-              />
-              <Label htmlFor="nbDistribBalai" className="text-sm">
-                blocs
-              </Label>
-            </div>
-          </div>
-        </div>
-        {propositions.map((proposition) => {
-          const gamme = proposition.gamme;
-          const color =
-            gamme === "essentiel"
-              ? "fm4allessential"
-              : gamme === "confort"
-              ? "fm4allcomfort"
-              : "fm4allexcellence";
-          const prixAnnuelBalaiText = proposition.totalBalai
-            ? `${Math.round(proposition.totalBalai / 12)} € / mois`
-            : "Non proposé";
-
-          return (
-            <div
-              className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-xl gap-4 cursor-pointer ${
-                hygiene.infos.balaiGammeSelected === gamme
-                  ? "ring-4 ring-inset ring-destructive"
-                  : ""
-              } px-8`}
-              key={"balai" + gamme}
-              onClick={() => handleClickProposition("balai", proposition)}
-            >
-              {" "}
-              <Checkbox
-                checked={hygiene.infos.balaiGammeSelected === gamme}
-                onCheckedChange={() =>
-                  handleClickProposition("balai", proposition)
-                }
-                className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-              />
-              <div>
-                <p>{prixAnnuelBalaiText}</p>
-
-                <p className="text-sm">
-                  Socle et manche{" "}
-                  {gamme === "essentiel"
-                    ? "blancs basic"
-                    : gamme === "confort"
-                    ? "couleur"
-                    : "inox"}
-                </p>
-                <p className="text-sm">
-                  {dureeLocation === "oneShot"
-                    ? ""
-                    : `Location engagement
-                    ${
-                      dureeLocation === "pa12M"
-                        ? "12"
-                        : dureeLocation === "pa24M"
-                        ? "24"
-                        : "36"
-                    } mois`}
-                </p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <HygieneOptionsBalaiCard
+        nbDistribBalai={nbDistribBalai}
+        dureeLocation={dureeLocation}
+        handleChangeDistribNbr={handleChangeDistribNbr}
+        handleClickProposition={handleClickProposition}
+        hygieneDistribQuantite={hygieneDistribQuantite}
+        propositions={propositions}
+      />
       {/*4ème ligne */}
-      <div className="flex border-b flex-1">
-        <div className="flex w-1/4 items-center justify-center flex-col gap-2 p-2">
-          <p className="text-base">Poubelles hygiène féminine</p>
-          <div className="text-sm flex flex-col gap-2">
-            <div className="flex gap-4 items-center justify-center w-full">
-              <Input
-                type="number"
-                value={nbDistribPoubelle}
-                min={1}
-                max={100}
-                step={1}
-                onChange={(e) => handleChangeDistribNbr(e, "poubelle")}
-                className={`w-16 ${
-                  hygiene.quantites.nbDistribPoubelle ===
-                  hygieneDistribQuantite.nbDistribPoubelle
-                    ? "text-destructive"
-                    : ""
-                }`}
-              />
-              <Label htmlFor="nbDistribPoubelle" className="text-sm">
-                blocs
-              </Label>
-            </div>
-            <p className="text-xs text-destructive italic px-2 text-center">
-              Les quantités sont estimées pour vous mais vous pouvez les changer
-            </p>
-          </div>
-        </div>
-        {propositions.map((proposition) => {
-          const gamme = proposition.gamme;
-          const color =
-            gamme === "essentiel"
-              ? "fm4allessential"
-              : gamme === "confort"
-              ? "fm4allcomfort"
-              : "fm4allexcellence";
-          const prixAnnuelPoubelleText = proposition.totalPoubelle
-            ? `${Math.round(proposition.totalPoubelle / 12)} € / mois`
-            : "Non proposé";
-
-          return (
-            <div
-              className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-xl gap-4 cursor-pointer ${
-                hygiene.infos.poubelleGammeSelected === gamme
-                  ? "ring-4 ring-inset ring-destructive"
-                  : ""
-              } px-8`}
-              key={"poubelle" + gamme}
-              onClick={() => handleClickProposition("poubelle", proposition)}
-            >
-              {" "}
-              <Checkbox
-                checked={hygiene.infos.poubelleGammeSelected === gamme}
-                onCheckedChange={() =>
-                  handleClickProposition("poubelle", proposition)
-                }
-                className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-              />
-              <div>
-                <p>{prixAnnuelPoubelleText}</p>
-                <p className="text-sm">
-                  Réceptacles{" "}
-                  {gamme === "essentiel"
-                    ? "blancs basic"
-                    : gamme === "confort"
-                    ? "couleur"
-                    : "inox"}
-                </p>
-                <p className="text-sm">
-                  {dureeLocation === "oneShot"
-                    ? ""
-                    : `Location engagement
-                    ${
-                      dureeLocation === "pa12M"
-                        ? "12"
-                        : dureeLocation === "pa24M"
-                        ? "24"
-                        : "36"
-                    } mois`}
-                </p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <HygieneOptionsPoubelleCard
+        nbDistribPoubelle={nbDistribPoubelle}
+        dureeLocation={dureeLocation}
+        handleChangeDistribNbr={handleChangeDistribNbr}
+        handleClickProposition={handleClickProposition}
+        hygieneDistribQuantite={hygieneDistribQuantite}
+        propositions={propositions}
+      />
     </div>
   );
 };

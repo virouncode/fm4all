@@ -10,7 +10,7 @@ export const cafeSchema = z.object({
       .enum(["pa12M", "pa24M", "pa36M", "pa48M", "pa60M", "oneShot"])
       .default("pa12M"),
   }),
-  nbLotsMachines: z.number().default(0),
+  nbLotsMachines: z.number().nullable(),
   lotsMachines: z.array(
     z.object({
       infos: z.object({
@@ -21,10 +21,10 @@ export const cafeSchema = z.object({
           .nullable(),
         marque: z.string().nullable(),
         modele: z.string().nullable(),
-        reconditionne: z.boolean().default(false),
+        reconditionne: z.boolean().nullable(),
       }),
       quantites: z.object({
-        nbPersonnes: z.number(),
+        nbPersonnes: z.number().nullable(),
         nbMachines: z.number().nullable(),
       }),
       prix: z.object({

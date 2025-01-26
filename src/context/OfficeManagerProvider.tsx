@@ -27,7 +27,7 @@ export const OfficeManagerContext = createContext<{
       demiJParSemaine: null,
     },
     prix: {
-      demiTjm: 0,
+      demiTjm: null,
     },
   },
   setOfficeManager: () => {},
@@ -49,7 +49,7 @@ const OfficeManagerProvider = ({ children }: PropsWithChildren) => {
       demiJParSemaine: null,
     },
     prix: {
-      demiTjm: 0,
+      demiTjm: null,
     },
   });
 
