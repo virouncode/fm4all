@@ -23,7 +23,7 @@ const SauvegarderProgression = ({
   typeBatiment,
   typeOccupation,
 }: SauvegarderProgressionProps) => {
-  const { client } = useContext(ClientContext);
+  const { setClient } = useContext(ClientContext);
   const { setDevisProgress } = useContext(DevisProgressContext);
   const router = useRouter();
 
@@ -54,6 +54,7 @@ const SauvegarderProgression = ({
     console.log("ok data", data);
     //TODO Server action pour insérer le client dans la db
     setDevisProgress({ currentStep: 6, completedSteps: [1, 2, 3, 4, 5] });
+    setClient(data);
     router.push("/mon-devis/personnaliser-mon-devis");
   };
 
