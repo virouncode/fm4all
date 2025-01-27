@@ -107,8 +107,11 @@ const MonDevisForm = () => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-6 h-full" id="1">
-      <p className="text-2xl font-bold ">
+    <div
+      className="flex flex-col items-center gap-4 h-full overflow-auto"
+      id="1"
+    >
+      <p className="text-2xl font-bold">
         Félicitations {client.prenomContact} {client.nomContact} !
       </p>
       <p className="text-lg">Votre devis final est prêt</p>
@@ -125,7 +128,7 @@ const MonDevisForm = () => {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(submitForm)}
-          className="flex-1 flex flex-col gap-4 mx-auto w-full mt-6"
+          className="flex-1 flex flex-col gap-4 mx-auto w-full mt-6 p-4"
         >
           <div className="flex flex-col gap-10 md:flex-row md:gap-20">
             <div className="w-full md:w-1/4 flex flex-col">
