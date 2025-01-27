@@ -116,7 +116,7 @@ const DevisBreadcrumb = () => {
                         ] +
                           1
                         ? ""
-                        : "pointer-events-none"
+                        : "pointer-events-none opacity-40"
                     }`}
                   >
                     {route.name}
