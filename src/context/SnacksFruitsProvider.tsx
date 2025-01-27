@@ -25,6 +25,7 @@ export const SnacksFruitsContext = createContext<{
       isSameFournisseur: false,
       gammeSelected: null,
       choix: ["fruits"],
+      commentaires: null,
     },
     quantites: {
       nbPersonnes: 0,
@@ -58,6 +59,7 @@ const SnacksFruitsProvider = ({ children }: PropsWithChildren) => {
       isSameFournisseur: false,
       gammeSelected: null,
       choix: ["fruits"],
+      commentaires: null,
     },
     quantites: {
       nbPersonnes: client.effectif ?? 0,

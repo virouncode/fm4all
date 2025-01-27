@@ -26,6 +26,7 @@ export const HygieneContext = createContext<{
       parfumGammeSelected: null,
       balaiGammeSelected: null,
       poubelleGammeSelected: null,
+      commentaires: null,
     },
     quantites: {
       nbDistribEmp: null,
@@ -69,6 +70,7 @@ const HygieneProvider = ({ children }: PropsWithChildren) => {
       parfumGammeSelected: null,
       balaiGammeSelected: null,
       poubelleGammeSelected: null,
+      commentaires: null,
     },
     quantites: {
       nbDistribEmp: null,

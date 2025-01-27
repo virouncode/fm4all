@@ -1,7 +1,14 @@
+import { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import ServicesLoader from "../mes-locaux/ServicesLoader";
 import OfficeManagement from "./OfficeManagement";
+
+export const metadata: Metadata = {
+  title: "Mes Services",
+  description:
+    "Etape 4 du devis: pourquoi pas un office manager dans vos locaux ?",
+};
 
 const page = async ({
   searchParams,

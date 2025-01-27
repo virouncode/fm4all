@@ -76,7 +76,7 @@ export const clients = pgTable("clients", {
   siret: varchar(),
   prenomContact: varchar("prenom_contact").notNull(),
   nomContact: varchar("nom_contact").notNull(),
-  posteContact: varchar("poste_contact"),
+  posteContact: varchar("poste_contact").notNull(),
   emailContact: varchar("email_contact").unique().notNull(),
   phoneContact: varchar("phone_contact").notNull(),
   surface: integer().notNull(),
@@ -85,8 +85,10 @@ export const clients = pgTable("clients", {
   typeOccupation: typeOccupationEnum().notNull(),
   adresseLigne1: varchar("adresse_ligne_1"),
   adresseLigne2: varchar("adresse_ligne_2"),
-  codePostal: varchar("code_postal"),
-  ville: varchar(),
+  codePostal: varchar("code_postal").notNull(),
+  ville: varchar().notNull(),
+  dateDeDemarrage: date("date_de_demarrage", { mode: "string" }),
+  commentaires: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

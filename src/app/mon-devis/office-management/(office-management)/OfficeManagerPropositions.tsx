@@ -96,13 +96,13 @@ const OfficeManagerPropositions = ({
       officeManager.infos.fournisseurId === fournisseurId &&
       officeManager.infos.gammeSelected
     ) {
-      setOfficeManager({
+      setOfficeManager((prev) => ({
         infos: {
+          ...prev.infos,
           fournisseurId: null,
           nomFournisseur: null,
           sloganFournisseur: null,
           gammeSelected: null,
-          remplace: true,
         },
         quantites: {
           demiJParSemaine: null,
@@ -110,14 +110,15 @@ const OfficeManagerPropositions = ({
         prix: {
           demiTjm: null,
         },
-      });
+      }));
       setTotalOfficeManager({
         totalService: 0,
       });
       return;
     }
-    setOfficeManager({
+    setOfficeManager((prev) => ({
       infos: {
+        ...prev.infos,
         fournisseurId,
         nomFournisseur,
         sloganFournisseur,
@@ -131,7 +132,6 @@ const OfficeManagerPropositions = ({
               ? "confort"
               : "excellence"
             : null,
-        remplace: true,
       },
       quantites: {
         demiJParSemaine,
@@ -139,7 +139,7 @@ const OfficeManagerPropositions = ({
       prix: {
         demiTjm,
       },
-    });
+    }));
     setTotalOfficeManager({
       totalService: prixAnnuel,
     });

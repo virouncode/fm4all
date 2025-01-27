@@ -9,6 +9,7 @@ export const cafeSchema = z.object({
     dureeLocation: z
       .enum(["pa12M", "pa24M", "pa36M", "pa48M", "pa60M", "oneShot"])
       .default("pa12M"),
+    commentaires: z.string().nullable(),
   }),
   nbLotsMachines: z.number().nullable(),
   lotsMachines: z.array(

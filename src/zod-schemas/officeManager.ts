@@ -7,6 +7,7 @@ export const officeManagerSchema = z.object({
     sloganFournisseur: z.string().nullable(),
     gammeSelected: z.enum(["essentiel", "confort", "excellence"]).nullable(),
     remplace: z.boolean(),
+    commentaires: z.string().nullable(),
   }),
   quantites: z.object({
     demiJParSemaine: z.number().nullable(),

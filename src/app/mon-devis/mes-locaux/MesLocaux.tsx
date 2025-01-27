@@ -27,6 +27,7 @@ import { MaintenanceContext } from "@/context/MaintenanceProvider";
 import { ManagementContext } from "@/context/ManagementProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
+import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
@@ -42,15 +43,14 @@ import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { useToast } from "@/hooks/use-toast";
 import {
-  InsertClientFormType,
-  insertClientSchema,
   InsertClientType,
+  mesLocauxSchema,
+  MesLocauxType,
 } from "@/zod-schemas/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { reinitialisationDevis } from "./reinitialisationDevis";
 
 const MesLocaux = () => {
@@ -58,6 +58,7 @@ const MesLocaux = () => {
   const { setServices } = useContext(ServicesContext);
   const { setFoodBeverage } = useContext(FoodBeverageContext);
   const { setManagement } = useContext(ManagementContext);
+  const { setPersonnalisation } = useContext(PersonnalisationContext);
   const { client, setClient } = useContext(ClientContext);
   const { setNettoyage } = useContext(NettoyageContext);
   const { setHygiene } = useContext(HygieneContext);
@@ -81,52 +82,33 @@ const MesLocaux = () => {
   const router = useRouter();
   const { toast } = useToast();
 
-  const defaultValues: Partial<InsertClientFormType> = {
-    codePostal: client.codePostal,
-    surface: client.surface?.toString(),
-    effectif: client.effectif?.toString(),
+  const defaultValues: MesLocauxType = {
+    surface: client.surface.toString(),
+    effectif: client.effectif.toString(),
     typeBatiment: client.typeBatiment,
     typeOccupation: client.typeOccupation,
+    codePostal: client.codePostal || "",
   };
-  const partialClientSchema = insertClientSchema.partial().extend({
-    surface: z
-      .string()
-      .refine(
-        (value) =>
-          /^\d+$/.test(value) &&
-          parseInt(value, 10) >= 50 &&
-          parseInt(value, 10) <= 3000,
-        "La surface doit être un nombre compris entre 50 et 3000 m²"
-      ),
-    effectif: z
-      .string()
-      .refine(
-        (value) =>
-          /^\d+$/.test(value) &&
-          parseInt(value, 10) >= 1 &&
-          parseInt(value, 10) <= 300,
-        "Le nombre de personnes doit être compris entre 1 et 300"
-      ),
-  });
 
-  const form = useForm<Partial<InsertClientFormType>>({
+  const form = useForm<MesLocauxType>({
     mode: "onBlur",
-    resolver: zodResolver(partialClientSchema),
+    resolver: zodResolver(mesLocauxSchema),
     defaultValues,
   });
 
-  const handleSelect = (value: string, name: string) => {
-    setClient((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  // const handleSelect = (value: string, name: string) => {
+  //   setClient((prev) => ({
+  //     ...prev,
+  //     [name]: value,
+  //   }));
+  // };
 
-  const submitForm = async (data: Partial<InsertClientFormType>) => {
+  const submitForm = async (data: MesLocauxType) => {
     const dataToPost = {
       ...data,
       surface: parseInt(data.surface as string),
       effectif: parseInt(data.effectif as string),
+      ville: "",
     };
     //Departement in ou out
     if (
@@ -135,7 +117,7 @@ const MesLocaux = () => {
       )
     ) {
       setDevisProgress({ ...devisProgress, completedSteps: [] });
-      router.push("/city-out");
+      router.push("/city-out?destination=/");
       return;
     }
     //La ville existe ?
@@ -144,6 +126,8 @@ const MesLocaux = () => {
         `https://geo.api.gouv.fr/communes?codePostal=${dataToPost.codePostal}`
       );
       const cityData = await response.json();
+      console.log(cityData);
+
       if (cityData.length === 0) {
         setDevisProgress({ ...devisProgress, completedSteps: [] });
         toast({
@@ -154,16 +138,21 @@ const MesLocaux = () => {
         });
         return;
       }
+      dataToPost.ville = cityData[0].nom;
     } catch (err) {
       console.log(err);
     }
 
     //Update client
-    setClient(dataToPost);
+    setClient((prev) => ({
+      ...prev,
+      ...dataToPost,
+    }));
     //Réinitialisation de tous le devis
     reinitialisationDevis(
       //client
-      client,
+      parseInt(data.surface as string),
+      parseInt(data.effectif as string),
       //services
       setDevisProgress,
       setNettoyage,
@@ -179,6 +168,7 @@ const MesLocaux = () => {
       setServices,
       setFoodBeverage,
       setManagement,
+      setPersonnalisation,
       //Total
       setTotalNettoyage,
       setTotalHygiene,
@@ -230,13 +220,11 @@ const MesLocaux = () => {
               fieldTitle="Type de bâtiment*"
               nameInSchema="typeBatiment"
               data={batiments}
-              handleSelect={handleSelect}
             />
             <SelectWithLabel<InsertClientType>
               fieldTitle="Type d'occupation*"
               nameInSchema="typeOccupation"
               data={occupations}
-              handleSelect={handleSelect}
             />
           </div>
         </div>

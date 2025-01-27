@@ -17,6 +17,7 @@ export const reinitialisationCafeThe = (
       sloganFournisseur: null,
       currentLotId: 1,
       dureeLocation: "pa12M",
+      commentaires: null,
     },
     nbLotsMachines: null,
     lotsMachines: [],
@@ -24,6 +25,7 @@ export const reinitialisationCafeThe = (
   setThe({
     infos: {
       gammeSelected: null,
+      commentaires: null,
     },
     quantites: {
       nbPersonnes: Math.round((client.effectif ?? 0) * 0.15),

@@ -1,7 +1,13 @@
+import { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import SauvegarderProgression from "./SauvegarderProgression";
 import ServicesLoader from "../mes-locaux/ServicesLoader";
+import SauvegarderProgression from "./SauvegarderProgression";
+
+export const metadata: Metadata = {
+  title: "Mes Services",
+  description: "Etape 5 du devis: sauvegarder votre progression",
+};
 
 const page = async ({
   searchParams,

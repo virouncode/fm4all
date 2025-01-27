@@ -1,12 +1,10 @@
-import DevisBreadcrumb from "@/components/devis/DevisBreadcrumb";
-import AfficherDevis from "./AfficherDevis";
+import MonDevis from "./MonDevis";
 
 const page = () => {
   return (
-    <div>
-      <AfficherDevis />
-      <DevisBreadcrumb />
-    </div>
+    <section className="h-full flex-1">
+      <MonDevis />
+    </section>
   );
 };
 

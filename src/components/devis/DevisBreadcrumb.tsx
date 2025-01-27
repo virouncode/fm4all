@@ -85,7 +85,7 @@ const DevisBreadcrumb = () => {
     {
       id: 7,
       url: "/afficher-mon-devis",
-      name: "Afficher mon devis",
+      name: "Mon devis",
     },
   ];
   return (

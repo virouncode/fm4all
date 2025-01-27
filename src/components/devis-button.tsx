@@ -21,6 +21,7 @@ import { MaintenanceContext } from "@/context/MaintenanceProvider";
 import { ManagementContext } from "@/context/ManagementProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
+import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
@@ -56,6 +57,7 @@ const DevisButton = ({
   const { setServices } = useContext(ServicesContext);
   const { setFoodBeverage } = useContext(FoodBeverageContext);
   const { setManagement } = useContext(ManagementContext);
+  const { setPersonnalisation } = useContext(PersonnalisationContext);
   const { client, setClient } = useContext(ClientContext);
   const { setNettoyage } = useContext(NettoyageContext);
   const { setHygiene } = useContext(HygieneContext);
@@ -144,7 +146,6 @@ const DevisButton = ({
   };
   const handleClickNouveau = () => {
     fullReinitialisationDevis(
-      client,
       setClient,
       setDevisProgress,
       setNettoyage,
@@ -159,6 +160,7 @@ const DevisButton = ({
       setServices,
       setFoodBeverage,
       setManagement,
+      setPersonnalisation,
       setTotalNettoyage,
       setTotalHygiene,
       setTotalMaintenance,

@@ -24,6 +24,7 @@ export const CafeContext = createContext<{
       sloganFournisseur: null,
       currentLotId: 1,
       dureeLocation: "pa12M",
+      commentaires: null,
     },
     nbLotsMachines: 0,
     lotsMachines: [],
@@ -43,6 +44,7 @@ const CafeProvider = ({ children }: PropsWithChildren) => {
       sloganFournisseur: null,
       currentLotId: 1,
       dureeLocation: "pa12M",
+      commentaires: null,
     },
     nbLotsMachines: 1,
     lotsMachines: [

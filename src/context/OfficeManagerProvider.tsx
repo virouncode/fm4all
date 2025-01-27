@@ -22,6 +22,7 @@ export const OfficeManagerContext = createContext<{
       sloganFournisseur: null,
       gammeSelected: null,
       remplace: false,
+      commentaires: null,
     },
     quantites: {
       demiJParSemaine: null,
@@ -44,6 +45,7 @@ const OfficeManagerProvider = ({ children }: PropsWithChildren) => {
       sloganFournisseur: null,
       gammeSelected: null,
       remplace: false,
+      commentaires: null,
     },
     quantites: {
       demiJParSemaine: null,

@@ -18,6 +18,7 @@ export const ServicesFm4AllContext = createContext<{
   servicesFm4All: {
     infos: {
       gammeSelected: "essentiel",
+      commentaires: null,
     },
     prix: {
       tauxAssurance: null,
@@ -40,6 +41,7 @@ const ServicesFm4AllProvider = ({ children }: PropsWithChildren) => {
   const [servicesFm4All, setServicesFm4All] = useState<ServicesFm4AllType>({
     infos: {
       gammeSelected: "essentiel",
+      commentaires: null,
     },
     prix: {
       tauxAssurance: null,

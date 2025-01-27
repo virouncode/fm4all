@@ -20,6 +20,7 @@ export const TheContext = createContext<{
   the: {
     infos: {
       gammeSelected: null,
+      commentaires: null,
     },
     quantites: {
       nbPersonnes: null,
@@ -39,6 +40,7 @@ const TheProvider = ({ children }: PropsWithChildren) => {
   const [the, setThe] = useState<TheType>({
     infos: {
       gammeSelected: null,
+      commentaires: null,
     },
     quantites: {
       nbPersonnes: Math.round((client.effectif ?? 0) * 0.15),

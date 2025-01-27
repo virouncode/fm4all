@@ -1,5 +1,5 @@
 import { CafeType } from "@/zod-schemas/cafe";
-import { SelectClientType } from "@/zod-schemas/client";
+import { InsertClientType } from "@/zod-schemas/client";
 import { DevisProgressType } from "@/zod-schemas/devisProgress";
 import { FoodBeverageType } from "@/zod-schemas/foodBeverage";
 import { HygieneType } from "@/zod-schemas/hygiene";
@@ -8,6 +8,7 @@ import { MaintenanceType } from "@/zod-schemas/maintenance";
 import { ManagementType } from "@/zod-schemas/management";
 import { NettoyageType } from "@/zod-schemas/nettoyage";
 import { OfficeManagerType } from "@/zod-schemas/officeManager";
+import { PersonnalisationType } from "@/zod-schemas/personnalisation";
 import { ServicesType } from "@/zod-schemas/services";
 import { ServicesFm4AllType } from "@/zod-schemas/servicesFm4All";
 import { SnacksFruitsType } from "@/zod-schemas/snacksFruits";
@@ -25,8 +26,7 @@ import {
 } from "@/zod-schemas/total";
 
 export const fullReinitialisationDevis = (
-  client: Partial<SelectClientType>,
-  setClient: (client: Partial<SelectClientType>) => void,
+  setClient: (client: InsertClientType) => void,
   setDevisProgress: (devisProgress: DevisProgressType) => void,
   setNettoyage: (nettoyage: NettoyageType) => void,
   setHygiene: (hygiene: HygieneType) => void,
@@ -40,6 +40,7 @@ export const fullReinitialisationDevis = (
   setServices: (services: ServicesType) => void,
   setFoodBeverage: (foodBeverage: FoodBeverageType) => void,
   setManagement: (management: ManagementType) => void,
+  setPersonnalisation: (personnalisation: PersonnalisationType) => void,
   setTotalNettoyage: (totalNettoyage: TotalNettoyageType) => void,
   setTotalHygiene: (totalHygiene: TotalHygieneType) => void,
   setTotalMaintenance: (totalMaintenance: TotalMaintenanceType) => void,
@@ -52,11 +53,23 @@ export const fullReinitialisationDevis = (
 ) => {
   //Client
   setClient({
-    codePostal: "",
+    nomEntreprise: "",
+    siret: null,
+    prenomContact: "",
+    nomContact: "",
+    posteContact: "",
+    emailContact: "",
+    phoneContact: "",
     surface: 100,
     effectif: 20,
     typeBatiment: "bureaux",
     typeOccupation: "partieEtage",
+    adresseLigne1: null,
+    adresseLigne2: null,
+    codePostal: "",
+    ville: "",
+    dateDeDemarrage: null,
+    commentaires: null,
   });
   //Devis
   setDevisProgress({ currentStep: 1, completedSteps: [] });
@@ -71,13 +84,15 @@ export const fullReinitialisationDevis = (
       samediSelected: false,
       dimancheSelected: false,
       vitrerieSelected: false,
+      pleinPied: true,
+      commentaires: null,
     },
     quantites: {
       freqAnnuelle: null,
       hParPassage: null,
       hParPassageRepasse: null,
-      surfaceCloisons: (client.surface ?? 0) * 0.15,
-      surfaceVitres: (client.surface ?? 0) * 0.15,
+      surfaceCloisons: null,
+      surfaceVitres: null,
       cadenceCloisons: null,
       cadenceVitres: null,
       nbPassagesVitrerie: 2,
@@ -100,6 +115,7 @@ export const fullReinitialisationDevis = (
       parfumGammeSelected: null,
       balaiGammeSelected: null,
       poubelleGammeSelected: null,
+      commentaires: null,
     },
     quantites: {
       nbDistribEmp: null,
@@ -131,6 +147,7 @@ export const fullReinitialisationDevis = (
       nomFournisseur: null,
       sloganFournisseur: null,
       gammeSelected: null,
+      commentaires: null,
     },
     quantites: {
       freqAnnuelle: null,
@@ -148,11 +165,17 @@ export const fullReinitialisationDevis = (
       fournisseurId: null,
       nomFournisseur: null,
       sloganFournisseur: null,
+      commentaires: null,
     },
     quantites: {
       nbExtincteurs: null,
       nbBaes: null,
       nbTelBaes: null,
+      nbExutoires: null,
+      nbAlarmesT4SSI: null,
+      nbPortesCoupFeu: null,
+      nbRIA: null,
+      nbColonnesSeches: null,
     },
     prix: {
       prixParExtincteur: null,
@@ -168,6 +191,7 @@ export const fullReinitialisationDevis = (
       sloganFournisseur: null,
       currentLotId: 1,
       dureeLocation: "pa12M",
+      commentaires: null,
     },
     nbLotsMachines: 1,
     lotsMachines: [
@@ -181,7 +205,7 @@ export const fullReinitialisationDevis = (
           reconditionne: false,
         },
         quantites: {
-          nbPersonnes: client.effectif ?? 0,
+          nbPersonnes: null,
           nbMachines: null,
         },
         prix: {
@@ -198,9 +222,10 @@ export const fullReinitialisationDevis = (
   setThe({
     infos: {
       gammeSelected: null,
+      commentaires: null,
     },
     quantites: {
-      nbPersonnes: Math.round((client.effectif ?? 0) * 0.15),
+      nbPersonnes: null,
     },
     prix: {
       prixUnitaire: null,
@@ -214,9 +239,10 @@ export const fullReinitialisationDevis = (
       isSameFournisseur: false,
       gammeSelected: null,
       choix: ["fruits"],
+      commentaires: null,
     },
     quantites: {
-      nbPersonnes: client.effectif ?? null,
+      nbPersonnes: null,
       fruitsKgParSemaine: null,
       snacksPortionsParSemaine: null,
       boissonsConsosParSemaine: null,
@@ -238,6 +264,7 @@ export const fullReinitialisationDevis = (
       sloganFournisseur: null,
       gammeSelected: null,
       remplace: false,
+      commentaires: null,
     },
     quantites: {
       demiJParSemaine: null,
@@ -249,6 +276,7 @@ export const fullReinitialisationDevis = (
   setServicesFm4All({
     infos: {
       gammeSelected: "essentiel",
+      commentaires: null,
     },
     prix: {
       tauxAssurance: null,
@@ -270,6 +298,10 @@ export const fullReinitialisationDevis = (
   });
   setManagement({
     currentManagementId: 1,
+  });
+  setPersonnalisation({
+    currentPersonnalisationId: 1,
+    personnalisationIds: [1],
   });
   //Total
   setTotalNettoyage({

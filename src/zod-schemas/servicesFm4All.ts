@@ -3,6 +3,7 @@ import { z } from "zod";
 export const servicesFm4AllSchema = z.object({
   infos: z.object({
     gammeSelected: z.enum(["essentiel", "confort", "excellence"]).nullable(),
+    commentaires: z.string().nullable(),
   }),
   prix: z.object({
     tauxAssurance: z.number().nullable(),

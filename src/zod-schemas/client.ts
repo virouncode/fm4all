@@ -17,13 +17,13 @@ export const selectClientSchema = createSelectSchema(clients, {
     ),
   prenomContact: (schema) => schema.min(1, "Prénom du contact obligatoire"),
   nomContact: (schema) => schema.min(1, "Nom du contact obligatoire"),
+  posteContact: (schema) => schema.min(1, "Poste du contact obligatoire"),
   emailContact: (schema) => schema.email("Adresse email invalide"),
   phoneContact: (schema) =>
     schema.regex(
       /^\d{2} \d{2} \d{2} \d{2} \d{2}$/,
       "Numéro de téléphone invalide, format attendu : XX XX XX XX XX"
     ),
-  posteContact: (schema) => schema.min(1, "Poste du contact obligatoire"),
   surface: (schema) =>
     schema.min(1, "Surface obligatoire").max(3000, "Surface maximum 3000 m²"),
   effectif: (schema) =>
@@ -38,9 +38,10 @@ export const selectClientSchema = createSelectSchema(clients, {
     message: "Type d'occupation invalide",
   }),
   codePostal: (schema) =>
-    schema.refine((value) => !value || /^\d{5}$/.test(value), {
+    schema.refine((value) => /^\d{5}$/.test(value), {
       message: "Code postal invalide, entrez 5 chiffres",
     }),
+  ville: (schema) => schema.min(1, "Ville obligatoire"),
 });
 
 export type SelectClientType = z.infer<typeof selectClientSchema>;
@@ -56,13 +57,13 @@ export const insertClientSchema = createInsertSchema(clients, {
     ),
   prenomContact: (schema) => schema.min(1, "Prénom du contact obligatoire"),
   nomContact: (schema) => schema.min(1, "Nom du contact obligatoire"),
+  posteContact: (schema) => schema.min(1, "Poste du contact obligatoire"),
   emailContact: (schema) => schema.email("Adresse email invalide"),
   phoneContact: (schema) =>
     schema.regex(
       /^\d{2} \d{2} \d{2} \d{2} \d{2}$/,
       "Numéro de téléphone invalide, format attendu : XX XX XX XX XX"
     ),
-  posteContact: (schema) => schema.min(1, "Poste du contact obligatoire"),
   surface: (schema) =>
     schema.min(1, "Surface obligatoire").max(3000, "Surface maximum 3000 m²"),
   effectif: (schema) =>
@@ -77,29 +78,26 @@ export const insertClientSchema = createInsertSchema(clients, {
     message: "Type d'occupation invalide",
   }),
   codePostal: (schema) =>
-    schema.refine((value) => !value || /^\d{5}$/.test(value), {
+    schema.refine((value) => /^\d{5}$/.test(value), {
       message: "Code postal invalide, entrez 5 chiffres",
     }),
+  ville: (schema) => schema.min(1, "Ville obligatoire"),
 });
 
 export type InsertClientType = z.infer<typeof insertClientSchema>;
-export type InsertClientFormType = Omit<
-  InsertClientType,
-  "surface" | "effectif"
-> & {
-  surface: string;
-  effectif: string;
-};
 
 export const updateClientSchema = createUpdateSchema(clients, {
   nomEntreprise: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
   siret: (schema) =>
-    schema.regex(
-      /^\d{3} \d{3} \d{3} \d{4}$/,
-      "Siret invalide, format attendu : XXX XXX XXX XXXX"
+    schema.refine(
+      (value) => !value || /^\d{3} \d{3} \d{3} \d{4}$/.test(value),
+      {
+        message: "Siret invalide, format attendu : XXX XXX XXX XXXX",
+      }
     ),
   prenomContact: (schema) => schema.min(1, "Prénom du contact obligatoire"),
   nomContact: (schema) => schema.min(1, "Nom du contact obligatoire"),
+  posteContact: (schema) => schema.min(1, "Poste du contact obligatoire"),
   emailContact: (schema) => schema.email("Adresse email invalide"),
   phoneContact: (schema) =>
     schema.regex(
@@ -119,10 +117,44 @@ export const updateClientSchema = createUpdateSchema(clients, {
   typeOccupation: z.enum(["partieEtage", "plateauComplet", "batimentEntier"], {
     message: "Type d'occupation invalide",
   }),
-  adresseLigne1: (schema) => schema.min(1, "Adresse ligne 1 obligatoire"),
   codePostal: (schema) =>
-    schema.regex(/^\d{5}$/, "Code postal invalide, entrez 5 chiffres"),
+    schema.refine((value) => /^\d{5}$/.test(value), {
+      message: "Code postal invalide, entrez 5 chiffres",
+    }),
   ville: (schema) => schema.min(1, "Ville obligatoire"),
 });
 
 export type UpdateClientType = z.infer<typeof updateClientSchema>;
+
+export const mesLocauxSchema = z.object({
+  surface: z
+    .string()
+    .refine(
+      (value) =>
+        /^\d+$/.test(value) &&
+        parseInt(value, 10) >= 50 &&
+        parseInt(value, 10) <= 3000,
+      "La surface doit être un nombre compris entre 50 et 3000 m²"
+    ),
+  effectif: z
+    .string()
+    .refine(
+      (value) =>
+        /^\d+$/.test(value) &&
+        parseInt(value, 10) >= 1 &&
+        parseInt(value, 10) <= 300,
+      "Le nombre de personnes doit être compris entre 1 et 300"
+    ),
+  typeBatiment: z.enum(
+    ["bureaux", "localCommercial", "entrepot", "cabinetMedical"],
+    { message: "Type de batiment invalide" }
+  ),
+  typeOccupation: z.enum(["partieEtage", "plateauComplet", "batimentEntier"], {
+    message: "Type d'occupation invalide",
+  }),
+  codePostal: z.string().refine((value) => /^\d{5}$/.test(value), {
+    message: "Code postal invalide, entrez 5 chiffres",
+  }),
+});
+
+export type MesLocauxType = z.infer<typeof mesLocauxSchema>;

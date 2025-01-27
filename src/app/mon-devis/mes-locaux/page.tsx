@@ -1,4 +1,11 @@
+import { Metadata } from "next";
 import MesLocaux from "./MesLocaux";
+
+export const metadata: Metadata = {
+  title: "Mes locaux",
+  description:
+    "Etape 1 du devis: Mes locaux. 5 informations seulement pour obtenir tous vos devis",
+};
 
 const page = () => {
   return (

@@ -21,6 +21,7 @@ export const MaintenanceContext = createContext<{
       nomFournisseur: null,
       sloganFournisseur: null,
       gammeSelected: null,
+      commentaires: null,
     },
     quantites: {
       freqAnnuelle: null,
@@ -46,6 +47,7 @@ const MaintenanceProvider = ({ children }: PropsWithChildren) => {
       nomFournisseur: null,
       sloganFournisseur: null,
       gammeSelected: null,
+      commentaires: null,
     },
     quantites: {
       freqAnnuelle: null,

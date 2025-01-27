@@ -3,21 +3,27 @@
 import { InputWithLabel } from "@/components/formInputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { ClientContext } from "@/context/ClientProvider";
 import { insertClientSchema, InsertClientType } from "@/zod-schemas/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useContext } from "react";
 import { useForm } from "react-hook-form";
 
-const CityOut = () => {
+type CityOutProps = {
+  destination?: string;
+};
+
+const CityOut = ({ destination }: CityOutProps) => {
+  const { client } = useContext(ClientContext);
   const router = useRouter();
   const defaultValues: Partial<InsertClientType> = {
-    emailContact: "",
-    phoneContact: "",
-    nomEntreprise: "",
-    prenomContact: "",
-    nomContact: "",
-    posteContact: "",
+    emailContact: client.emailContact ?? "",
+    phoneContact: client.phoneContact ?? "",
+    nomEntreprise: client.nomEntreprise ?? "",
+    prenomContact: client.prenomContact ?? "",
+    nomContact: client.nomContact ?? "",
+    posteContact: client.posteContact ?? "",
   };
   const form = useForm<Partial<InsertClientType>>({
     mode: "onBlur",
@@ -33,7 +39,8 @@ const CityOut = () => {
     //TODO:envoyer email
     //TODO:mettre les coordonnées dans la bdd ???
     console.log(data);
-    router.push("/");
+    if (destination) router.push(destination);
+    else router.back();
   };
 
   return (
@@ -60,7 +67,7 @@ const CityOut = () => {
                 handleChange={handleChange}
               />
               <InputWithLabel<InsertClientType>
-                fieldTitle="Email*"
+                fieldTitle="Email du contact*"
                 nameInSchema="emailContact"
                 handleChange={handleChange}
               />
@@ -73,17 +80,17 @@ const CityOut = () => {
             </div>
             <div className="flex-1 flex flex-col gap-4 ">
               <InputWithLabel<InsertClientType>
-                fieldTitle="Prénom*"
+                fieldTitle="Prénom du contact*"
                 nameInSchema="prenomContact"
                 handleChange={handleChange}
               />
               <InputWithLabel<InsertClientType>
-                fieldTitle="Nom*"
+                fieldTitle="Nom du contact*"
                 nameInSchema="nomContact"
                 handleChange={handleChange}
               />
               <InputWithLabel<InsertClientType>
-                fieldTitle="Poste"
+                fieldTitle="Poste du contact*"
                 nameInSchema="posteContact"
                 handleChange={handleChange}
               />

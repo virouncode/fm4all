@@ -2,6 +2,12 @@ import Link from "next/link";
 import { Suspense } from "react";
 import ServicesLoader from "../mes-locaux/ServicesLoader";
 import MesServices from "./MesServices";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Mes Services",
+  description: "Etape 2 du devis: choisissez vos services",
+};
 
 const page = async ({
   searchParams,

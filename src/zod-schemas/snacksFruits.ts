@@ -8,6 +8,7 @@ export const snacksFruitsSchema = z.object({
     isSameFournisseur: z.boolean().nullable(),
     gammeSelected: z.enum(["essentiel", "confort", "excellence"]).nullable(),
     choix: z.array(z.enum(["fruits", "snacks", "boissons"])),
+    commentaires: z.string().nullable(),
   }),
   quantites: z.object({
     nbPersonnes: z.number().nullable(),

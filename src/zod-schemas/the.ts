@@ -3,6 +3,7 @@ import { z } from "zod";
 export const theSchema = z.object({
   infos: z.object({
     gammeSelected: z.enum(["essentiel", "confort", "excellence"]).nullable(),
+    commentaires: z.string().nullable(),
   }),
   quantites: z.object({
     nbPersonnes: z.number().nullable(),

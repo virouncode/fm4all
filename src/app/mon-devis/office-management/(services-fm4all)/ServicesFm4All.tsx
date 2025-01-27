@@ -3,6 +3,9 @@
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { ManagementContext } from "@/context/ManagementProvider";
+import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
+import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
+import { toast } from "@/hooks/use-toast";
 import { SelectServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4AllOffresType";
 import { SelectServicesFm4AllTauxType } from "@/zod-schemas/servicesFm4AllTaux";
 import { HandPlatter } from "lucide-react";
@@ -23,6 +26,8 @@ const ServicesFm4All = ({
 }: ServicesFm4AllProps) => {
   const { setManagement } = useContext(ManagementContext);
   const { client } = useContext(ClientContext);
+  const { totalServicesFm4All } = useContext(TotalServicesFm4AllContext);
+  const { servicesFm4All } = useContext(ServicesFm4AllContext);
   const { setDevisProgress } = useContext(DevisProgressContext);
   const router = useRouter();
   const handleClickPrevious = () => {
@@ -31,6 +36,36 @@ const ServicesFm4All = ({
     }));
   };
   const handleClickNext = () => {
+    const totalFinalServicesFm4All =
+      servicesFm4All.infos.gammeSelected === "essentiel"
+        ? (totalServicesFm4All.totalAssurance ?? 0) +
+          (totalServicesFm4All.totalPlateforme ?? 0) +
+          (totalServicesFm4All.totalSupportAdmin ?? 0) -
+          (totalServicesFm4All.totalRemiseCa ?? 0) -
+          (totalServicesFm4All.totalRemiseHof ?? 0)
+        : servicesFm4All.infos.gammeSelected === "confort"
+        ? (totalServicesFm4All.totalAssurance ?? 0) +
+          (totalServicesFm4All.totalPlateforme ?? 0) +
+          (totalServicesFm4All.totalSupportAdmin ?? 0) +
+          (totalServicesFm4All.totalSupportOp ?? 0) -
+          (totalServicesFm4All.totalRemiseCa ?? 0) -
+          (totalServicesFm4All.totalRemiseHof ?? 0)
+        : (totalServicesFm4All.totalAssurance ?? 0) +
+          (totalServicesFm4All.totalPlateforme ?? 0) +
+          (totalServicesFm4All.totalSupportAdmin ?? 0) +
+          (totalServicesFm4All.totalSupportOp ?? 0) +
+          (totalServicesFm4All.totalAccountManager ?? 0) -
+          (totalServicesFm4All.totalRemiseCa ?? 0) -
+          (totalServicesFm4All.totalRemiseHof ?? 0);
+    if (!totalFinalServicesFm4All) {
+      toast({
+        variant: "destructive",
+        title: "Panier vide",
+        description:
+          "Vous n'avez choisi aucun service, veuillez sélectionner au moins un service",
+      });
+      return;
+    }
     setManagement({
       currentManagementId: 1,
     });

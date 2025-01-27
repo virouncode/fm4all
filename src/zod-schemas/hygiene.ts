@@ -22,6 +22,7 @@ export const hygieneSchema = z.object({
     poubelleGammeSelected: z
       .enum(["essentiel", "confort", "excellence"])
       .nullable(),
+    commentaires: z.string().nullable(),
   }),
   quantites: z.object({
     nbDistribEmp: z.number().nullable(),

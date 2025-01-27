@@ -6,6 +6,7 @@ export const maintenanceSchema = z.object({
     nomFournisseur: z.string().nullable(),
     sloganFournisseur: z.string().nullable(),
     gammeSelected: z.enum(["essentiel", "confort", "excellence"]).nullable(),
+    commentaires: z.string().nullable(),
   }),
   quantites: z.object({
     freqAnnuelle: z.number().nullable(),

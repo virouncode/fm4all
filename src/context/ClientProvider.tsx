@@ -1,7 +1,7 @@
 "use client";
 
 import { useClientOnly } from "@/hooks/use-client-only";
-import { SelectClientType } from "@/zod-schemas/client";
+import { InsertClientType } from "@/zod-schemas/client";
 import {
   createContext,
   Dispatch,
@@ -13,15 +13,27 @@ import {
 
 // Initialization
 export const ClientContext = createContext<{
-  client: Partial<SelectClientType>;
-  setClient: Dispatch<SetStateAction<Partial<SelectClientType>>>;
+  client: InsertClientType;
+  setClient: Dispatch<SetStateAction<InsertClientType>>;
 }>({
   client: {
-    codePostal: "",
+    nomEntreprise: "",
+    siret: null,
+    prenomContact: "",
+    nomContact: "",
+    posteContact: "",
+    emailContact: "",
+    phoneContact: "",
     surface: 100,
     effectif: 20,
     typeBatiment: "bureaux",
     typeOccupation: "partieEtage",
+    adresseLigne1: null,
+    adresseLigne2: null,
+    codePostal: "",
+    ville: "",
+    dateDeDemarrage: null,
+    commentaires: null,
   },
   setClient: () => {},
 });
@@ -30,12 +42,24 @@ const ClientProvider = ({ children }: PropsWithChildren) => {
   const isMounted = useClientOnly();
 
   // Always initialize state
-  const [client, setClient] = useState<Partial<SelectClientType>>({
-    codePostal: "",
+  const [client, setClient] = useState<InsertClientType>({
+    nomEntreprise: "",
+    siret: null,
+    prenomContact: "",
+    nomContact: "",
+    posteContact: "",
+    emailContact: "",
+    phoneContact: "",
     surface: 100,
     effectif: 20,
     typeBatiment: "bureaux",
     typeOccupation: "partieEtage",
+    adresseLigne1: null,
+    adresseLigne2: null,
+    codePostal: "",
+    ville: "",
+    dateDeDemarrage: null,
+    commentaires: null,
   });
 
   // Update state after mounting
