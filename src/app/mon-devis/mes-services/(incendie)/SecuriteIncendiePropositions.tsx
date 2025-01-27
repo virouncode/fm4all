@@ -53,6 +53,7 @@ const SecuriteIncendiePropositions = ({
       setIncendie((prev) => ({
         ...prev,
         infos: {
+          ...prev.infos,
           fournisseurId: null,
           nomFournisseur: null,
           sloganFournisseur: null,
@@ -75,6 +76,7 @@ const SecuriteIncendiePropositions = ({
     setIncendie((prev) => ({
       ...prev,
       infos: {
+        ...prev.infos,
         fournisseurId,
         nomFournisseur,
         sloganFournisseur,
