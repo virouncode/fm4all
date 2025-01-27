@@ -1,6 +1,12 @@
+import { Metadata } from "next";
 import { Suspense } from "react";
 import ServicesLoader from "../mes-locaux/ServicesLoader";
 import PersonnaliserDevis from "./PersonnaliserDevis";
+
+export const metadata: Metadata = {
+  title: "Personnaliser",
+  description: "Etape 6 du devis: personnaliser votre devis",
+};
 
 const page = () => {
   return (

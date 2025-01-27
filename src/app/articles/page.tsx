@@ -1,5 +1,12 @@
 import ImgCardVertical from "@/components/cards/ImgCardVertical";
+import { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Articles",
+  description:
+    "Articles intéressants autour du facility management, de l'hospitality managment et de l'office management",
+};
 
 const page = () => {
   return (

@@ -5,7 +5,7 @@ import ServicesLoader from "../mes-locaux/ServicesLoader";
 import SauvegarderProgression from "./SauvegarderProgression";
 
 export const metadata: Metadata = {
-  title: "Mes Services",
+  title: "Sauvegarder",
   description: "Etape 5 du devis: sauvegarder votre progression",
 };
 

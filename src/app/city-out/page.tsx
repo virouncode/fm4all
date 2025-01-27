@@ -1,4 +1,11 @@
+import { Metadata } from "next";
 import CityOut from "./CityOut";
+
+export const metadata: Metadata = {
+  title: "Ville non supportée",
+  description:
+    " Notre matrice de chiffrage automatique est en cours de développement pour votre région",
+};
 
 const page = async ({
   searchParams,
