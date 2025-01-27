@@ -153,6 +153,7 @@ const MaintenancePropositions = ({
         setMaintenance((prev) => ({
           ...prev,
           infos: {
+            ...prev.infos,
             fournisseurId: null,
             nomFournisseur: null,
             sloganFournisseur: null,
@@ -178,8 +179,9 @@ const MaintenancePropositions = ({
         return;
       }
     }
-    setMaintenance({
+    setMaintenance((prev) => ({
       infos: {
+        ...prev.infos,
         fournisseurId,
         nomFournisseur,
         sloganFournisseur,
@@ -195,7 +197,7 @@ const MaintenancePropositions = ({
         prixLegio: prixAnnuelLegio,
         prixQualiteAir: prixAnnuelQualiteAir,
       },
-    });
+    }));
     setTotalMaintenance({
       totalService: prixAnnuelService,
       totalQ18,
