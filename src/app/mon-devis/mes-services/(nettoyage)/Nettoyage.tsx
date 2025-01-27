@@ -66,7 +66,7 @@ const Nettoyage = ({
         handleClickPrevious={handleClickPrevious}
         previousButton={false}
       />
-      <div className="w-full flex-1">
+      <div className="w-full flex-1 overflow-auto">
         <NettoyagePropositions
           nettoyageQuantites={nettoyageQuantites}
           nettoyageTarifs={nettoyageTarifs}

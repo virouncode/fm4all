@@ -23,7 +23,7 @@ const SnackFruitsPropositionLogo = ({
     <TooltipProvider delayDuration={0}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className="flex w-1/4 items-center justify-center px-4">
+          <div className="flex w-1/4 items-center justify-center p-2">
             {logoFournisseurUrl ? (
               <div className="w-full h-full relative">
                 <Image

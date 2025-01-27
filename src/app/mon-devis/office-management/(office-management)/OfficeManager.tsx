@@ -36,7 +36,7 @@ const OfficeManager = ({
         handleClickPrevious={handleClickPrevious}
         previousButton={false}
       />
-      <div className="w-full flex-1">
+      <div className="w-full flex-1 overflow-auto">
         <OfficeManagerPropositions
           officeManagerQuantites={officeManagerQuantites}
           officeManagerTarifs={officeManagerTarifs}

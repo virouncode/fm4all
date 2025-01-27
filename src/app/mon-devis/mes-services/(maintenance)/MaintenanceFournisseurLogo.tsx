@@ -25,7 +25,7 @@ const MaintenanceFournisseurLogo = ({
     <TooltipProvider delayDuration={0}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className="flex w-1/4 items-center justify-center">
+          <div className="flex w-1/4 items-center justify-center p-4">
             {logoFournisseurUrl ? (
               <div className="w-full h-full relative">
                 <Image

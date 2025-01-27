@@ -81,6 +81,12 @@ const SecuriteIncendiePropositions = ({
         nomFournisseur,
         sloganFournisseur,
       },
+      quantites: {
+        ...prev.quantites,
+        nbExtincteurs,
+        nbBaes,
+        nbTelBaes,
+      },
       prix: {
         prixParExtincteur: incendieTarifsFournisseur?.prixParExtincteur ?? null,
         prixParBaes: incendieTarifsFournisseur?.prixParBaes ?? null,
@@ -203,7 +209,7 @@ const SecuriteIncendiePropositions = ({
   };
 
   return (
-    <div className="h-full flex flex-col border rounded-xl overflow-hidden">
+    <div className="h-full flex flex-col border rounded-xl overflow-auto">
       {propositions.length > 0 &&
         propositions.map((proposition) => (
           <div className="flex border-b flex-1" key={proposition.id}>

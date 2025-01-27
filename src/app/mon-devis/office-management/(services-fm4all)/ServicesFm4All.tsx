@@ -90,7 +90,7 @@ const ServicesFm4All = ({
         icon={HandPlatter}
         handleClickPrevious={handleClickPrevious}
       />
-      <div className="w-full flex-1">
+      <div className="w-full flex-1 overflow-auto">
         <ServicesFm4AllPropositions
           servicesFm4AllOffres={servicesFm4AllOffres}
           servicesFm4AllTaux={servicesFm4AllTaux}

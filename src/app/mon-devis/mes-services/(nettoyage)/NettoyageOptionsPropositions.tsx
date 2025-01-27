@@ -236,7 +236,7 @@ const NettoyageOptionsPropositions = ({
   };
 
   return (
-    <div className="h-full flex flex-col border rounded-xl overflow-hidden">
+    <div className="h-full flex flex-col border rounded-xl overflow-auto">
       <NettoyageOptionsRepasseCard
         repasseProposition={repasseProposition}
         handleClickRepasseProposition={handleClickRepasseProposition}

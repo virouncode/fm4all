@@ -1,6 +1,7 @@
 import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
 import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
+import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
@@ -36,6 +37,7 @@ const ServicesFm4AllPropositions = ({
   const { totalCafe } = useContext(TotalCafeContext);
   const { totalThe } = useContext(TotalTheContext);
   const { totalSnacksFruits } = useContext(TotalSnacksFruitsContext);
+  const { totalFontaines } = useContext(TotalFontainesContext);
   const { totalOfficeManager } = useContext(TotalOfficeManagerContext);
   const { officeManager } = useContext(OfficeManagerContext);
   const {
@@ -67,9 +69,11 @@ const ServicesFm4AllPropositions = ({
   const totalFinalCafe = totalCafe.totalMachines
     .map(({ total }) => total ?? 0)
     .reduce((acc, curr) => acc + curr, 0);
-
   const totalFinalThe = totalThe.totalService ?? 0;
   const totalFinalSnacksFruits = totalSnacksFruits.total ?? 0;
+  const totalFinalFontaines = totalFontaines.totalLotsFontaines
+    .map(({ total }) => total ?? 0)
+    .reduce((acc, curr) => acc + curr, 0);
   const totalFinalOfficeManager = totalOfficeManager.totalService ?? 0;
   const total =
     totalFinalNettoyage +
@@ -79,6 +83,7 @@ const ServicesFm4AllPropositions = ({
     totalFinalCafe +
     totalFinalThe +
     totalFinalSnacksFruits +
+    totalFinalFontaines +
     totalFinalOfficeManager;
 
   const formattedPropositions = servicesFm4AllOffres.map((offre) => {
@@ -233,7 +238,7 @@ const ServicesFm4AllPropositions = ({
   };
 
   return (
-    <div className="h-full flex flex-col border rounded-xl overflow-hidden">
+    <div className="h-full flex flex-col border rounded-xl overflow-auto">
       <div className="flex border-b flex-1">
         <ServicesFm4AllFournisseurLogo />
         {formattedPropositions.map((proposition) => (

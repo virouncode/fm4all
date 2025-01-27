@@ -68,7 +68,7 @@ const ServicesFm4AllPropositionCard = ({
   }`;
   return (
     <div
-      className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
+      className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4 cursor-pointer ${
         servicesFm4All.infos.gammeSelected === gamme
           ? "ring-4 ring-inset ring-destructive"
           : ""

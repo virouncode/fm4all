@@ -119,7 +119,7 @@ const MonDevisForm = () => {
         </p>
         <p>
           Afin de donner une <strong>entête à votre devis</strong> et faciliter
-          vos futures démarches, vous pouvez nous communiquer (facultatif) :
+          vos futures démarches, vous pouvez nous communiquer :
         </p>
       </div>
       <Form {...form}>

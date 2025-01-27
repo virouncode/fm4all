@@ -14,6 +14,7 @@ import {
 import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
+import { FontainesContext } from "@/context/FontainesProvider";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { IncendieContext } from "@/context/IncendieProvider";
@@ -28,6 +29,7 @@ import { ServicesContext } from "@/context/ServicesProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { TheContext } from "@/context/TheProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
+import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
@@ -69,6 +71,7 @@ const DevisButton = ({
   const { setThe } = useContext(TheContext);
   const { setTotalThe } = useContext(TotalTheContext);
   const { setSnacksFruits } = useContext(SnacksFruitsContext);
+  const { setFontaines } = useContext(FontainesContext);
   const { setOfficeManager } = useContext(OfficeManagerContext);
   const { setServicesFm4All } = useContext(ServicesFm4AllContext);
   const { setTotalNettoyage } = useContext(TotalNettoyageContext);
@@ -77,6 +80,7 @@ const DevisButton = ({
   const { setTotalMaintenance } = useContext(TotalMaintenanceContext);
   const { setTotalCafe } = useContext(TotalCafeContext);
   const { setTotalSnacksFruits } = useContext(TotalSnacksFruitsContext);
+  const { setTotalFontaines } = useContext(TotalFontainesContext);
   const { setTotalOfficeManager } = useContext(TotalOfficeManagerContext);
   const { setTotalServicesFm4All } = useContext(TotalServicesFm4AllContext);
 
@@ -157,6 +161,7 @@ const DevisButton = ({
       setCafe,
       setThe,
       setSnacksFruits,
+      setFontaines,
       setOfficeManager,
       setServicesFm4All,
       setServices,
@@ -171,6 +176,7 @@ const DevisButton = ({
       setTotalCafe,
       setTotalThe,
       setTotalSnacksFruits,
+      setTotalFontaines,
       setTotalOfficeManager,
       setTotalServicesFm4All
     );

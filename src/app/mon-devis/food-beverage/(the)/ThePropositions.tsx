@@ -118,9 +118,9 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
   };
 
   return (
-    <div className="h-full flex flex-col border rounded-xl overflow-hidden">
+    <div className="h-full flex flex-col border rounded-xl overflow-auto">
       <div className="flex border-b flex-1">
-        <div className="flex w-1/4 items-center justify-center flex-col">
+        <div className="flex w-1/4 items-center justify-center flex-col p-4">
           <ThePropositionFournisseurLogo {...propositions[0]} />
           <ThePropositionsInput
             nbPersonnes={nbPersonnes}

@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { toast } from "@/hooks/use-toast";
+import { formatLocalStorageData } from "@/lib/formatLocalStorageData";
 import { insertClientSchema, InsertClientType } from "@/zod-schemas/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -68,7 +69,11 @@ const SauvegarderProgression = ({
     console.log("ok data", data);
     //TODO Server action pour insérer le client dans la db
     //TODO envoyez un email à Romu avec toutes les infos du devis grâce aux contextes
+    //TODO: ecrire dans la bdd une log table du devis avec formatted data, client_id, createdAt
     //TODO envoyer un email au client, bienvenue blablabla
+    const formattedData = formatLocalStorageData();
+    console.log("formattedData", formattedData);
+
     setDevisProgress({ currentStep: 6, completedSteps: [1, 2, 3, 4, 5] });
     setClient(data);
     router.push("/mon-devis/personnaliser-mon-devis");

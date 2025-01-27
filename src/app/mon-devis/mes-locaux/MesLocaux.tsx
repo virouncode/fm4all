@@ -20,6 +20,7 @@ import { occupations } from "@/constants/occupations";
 import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
+import { FontainesContext } from "@/context/FontainesProvider";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { IncendieContext } from "@/context/IncendieProvider";
@@ -53,6 +54,7 @@ import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { reinitialisationDevis } from "./reinitialisationDevis";
+import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
 
 const MesLocaux = () => {
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
@@ -70,6 +72,7 @@ const MesLocaux = () => {
   const { setThe } = useContext(TheContext);
   const { setTotalThe } = useContext(TotalTheContext);
   const { setSnacksFruits } = useContext(SnacksFruitsContext);
+  const { setFontaines } = useContext(FontainesContext);
   const { setOfficeManager } = useContext(OfficeManagerContext);
   const { setServicesFm4All } = useContext(ServicesFm4AllContext);
   const { setTotalNettoyage } = useContext(TotalNettoyageContext);
@@ -78,6 +81,7 @@ const MesLocaux = () => {
   const { setTotalMaintenance } = useContext(TotalMaintenanceContext);
   const { setTotalCafe } = useContext(TotalCafeContext);
   const { setTotalSnacksFruits } = useContext(TotalSnacksFruitsContext);
+  const { setTotalFontaines } = useContext(TotalFontainesContext);
   const { setTotalOfficeManager } = useContext(TotalOfficeManagerContext);
   const { setTotalServicesFm4All } = useContext(TotalServicesFm4AllContext);
 
@@ -97,13 +101,6 @@ const MesLocaux = () => {
     resolver: zodResolver(mesLocauxSchema),
     defaultValues,
   });
-
-  // const handleSelect = (value: string, name: string) => {
-  //   setClient((prev) => ({
-  //     ...prev,
-  //     [name]: value,
-  //   }));
-  // };
 
   const submitForm = async (data: MesLocauxType) => {
     const dataToPost = {
@@ -164,6 +161,7 @@ const MesLocaux = () => {
       setCafe,
       setThe,
       setSnacksFruits,
+      setFontaines,
       setOfficeManager,
       setServicesFm4All,
       //navigation
@@ -180,6 +178,7 @@ const MesLocaux = () => {
       setTotalCafe,
       setTotalThe,
       setTotalSnacksFruits,
+      setTotalFontaines,
       setTotalOfficeManager,
       setTotalServicesFm4All
     );

@@ -374,7 +374,7 @@ const HygieneOptionsPropositions = ({
   };
 
   return (
-    <div className="h-full flex flex-col border rounded-xl overflow-hidden">
+    <div className="h-full flex flex-col border rounded-xl overflow-auto">
       {/*1ère ligne */}
       <HygieneOptionsDesinfectantCard
         nbDistribDesinfectant={nbDistribDesinfectant}

@@ -53,7 +53,7 @@ const OfficeManagerPropositionCard = ({
       : "";
   return (
     <div
-      className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
+      className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4 cursor-pointer ${
         officeManager.infos.fournisseurId === proposition.fournisseurId &&
         officeManager.infos.gammeSelected !== null
           ? "ring-4 ring-inset ring-destructive"

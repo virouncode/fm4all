@@ -27,7 +27,7 @@ const SecuriteIncendiePropostionCard = ({
   const { incendie } = useContext(IncendieContext);
   return (
     <div
-      className={`w-3/4 flex items-center justify-center text-xl gap-4 cursor-pointer bg-slate-100 ${
+      className={`w-3/4 flex items-center justify-center text-xl gap-4 p-4 cursor-pointer bg-slate-100 ${
         incendie.infos.fournisseurId === proposition.fournisseurId
           ? "ring-4 ring-inset ring-destructive"
           : ""

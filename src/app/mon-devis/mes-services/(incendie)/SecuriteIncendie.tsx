@@ -52,7 +52,7 @@ const SecuriteIncendie = ({
         description="Extincteurs, blocs autonomes d'éclairage de sécurité (BAES), télécommande BAES, laissez nos experts vérifier vos installations."
         handleClickPrevious={handleClickPrevious}
       />
-      <div className="w-full flex-1">
+      <div className="w-full flex-1 overflow-auto">
         <SecuriteIncendiePropositions
           incendieQuantite={incendieQuantite}
           incendieTarifs={incendieTarifs}

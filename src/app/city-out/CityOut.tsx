@@ -36,8 +36,8 @@ const CityOut = ({ destination }: CityOutProps) => {
   };
 
   const submitForm = async (data: Partial<InsertClientType>) => {
-    //TODO:envoyer email
-    //TODO:mettre les coordonnées dans la bdd ???
+    //TODO:envoyer email à Romu
+    //TODO:mettre les coordonnées dans la bdd
     console.log(data);
     if (destination) router.push(destination);
     else router.back();

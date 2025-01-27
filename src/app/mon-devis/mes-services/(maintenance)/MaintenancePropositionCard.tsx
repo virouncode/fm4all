@@ -51,7 +51,7 @@ const MaintenancePropositionCard = ({
     : "Non proposé";
   return (
     <div
-      className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
+      className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4 cursor-pointer ${
         maintenance.infos.fournisseurId === proposition.fournisseurId &&
         maintenance.infos.gammeSelected === proposition.gamme
           ? "ring-4 ring-inset ring-destructive"

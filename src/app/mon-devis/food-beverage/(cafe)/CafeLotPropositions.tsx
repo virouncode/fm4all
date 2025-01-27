@@ -845,7 +845,7 @@ const CafeLotPropositions = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col gap-4">
+    <div className="flex-1 flex flex-col gap-4 overflow-auto">
       {isNaN(nbPersonnes) || nbPersonnes < 1 || nbPersonnes > 300 ? (
         <div className="flex-1 flex justify-center items-center border rounded-xl">
           <p className="text-center text-base">
@@ -854,7 +854,7 @@ const CafeLotPropositions = ({
           </p>
         </div>
       ) : (
-        <div className="flex-1 flex flex-col border rounded-xl overflow-hidden">
+        <div className="flex-1 flex flex-col border rounded-xl overflow-auto">
           {formattedPropositions.map((propositions) => (
             <div
               className="flex border-b flex-1"

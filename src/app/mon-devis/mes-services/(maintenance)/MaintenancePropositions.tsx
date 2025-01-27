@@ -207,7 +207,7 @@ const MaintenancePropositions = ({
   };
 
   return (
-    <div className="h-full flex flex-col border rounded-xl overflow-hidden">
+    <div className="h-full flex flex-col border rounded-xl overflow-auto">
       {formattedPropositions.length > 0
         ? formattedPropositions.map((propositions) => (
             <div

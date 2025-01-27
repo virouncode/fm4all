@@ -140,7 +140,7 @@ const NettoyageOptions = ({
         icon={SprayCan}
         handleClickPrevious={handleClickPrevious}
       />
-      <div className="w-full flex-1">
+      <div className="w-full flex-1 overflow-auto">
         <NettoyageOptionsPropositions
           samediProposition={samediProposition}
           dimancheProposition={dimancheProposition}

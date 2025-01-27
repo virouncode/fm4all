@@ -12,6 +12,7 @@ import {
 import { ClientContext } from "@/context/ClientProvider";
 import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
+import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
@@ -25,6 +26,7 @@ import { formatNumber } from "@/lib/formatNumber";
 import { Calculator } from "lucide-react";
 import { useContext } from "react";
 import TotalCafe from "./TotalCafe";
+import TotalFontaines from "./TotalFontaines";
 import TotalHygiene from "./TotalHygiene";
 import TotalIncendie from "./TotalIncendie";
 import TotalMaintenance from "./TotalMaintenance";
@@ -44,6 +46,7 @@ const Total = () => {
   const { totalCafe } = useContext(TotalCafeContext);
   const { totalThe } = useContext(TotalTheContext);
   const { totalSnacksFruits } = useContext(TotalSnacksFruitsContext);
+  const { totalFontaines } = useContext(TotalFontainesContext);
   const { totalOfficeManager } = useContext(TotalOfficeManagerContext);
   const { totalServicesFm4All } = useContext(TotalServicesFm4AllContext);
   useUpddateServicesFm4AllTotal();
@@ -62,9 +65,11 @@ const Total = () => {
   const totalFinalCafe = totalCafe.totalMachines
     .map(({ total }) => total ?? 0)
     .reduce((acc, curr) => acc + curr, 0);
-
   const totalFinalThe = totalThe.totalService ?? 0;
   const totalFinalSnacksFruits = totalSnacksFruits.total ?? 0;
+  const totalFinalFontaines = totalFontaines.totalLotsFontaines
+    .map(({ total }) => total ?? 0)
+    .reduce((acc, curr) => acc + curr, 0);
   const totalFinalOfficeManager = totalOfficeManager.totalService ?? 0;
   const totalFinalServicesFm4All =
     servicesFm4All.infos.gammeSelected === "essentiel"
@@ -95,6 +100,7 @@ const Total = () => {
       totalFinalCafe +
       totalFinalThe +
       totalFinalSnacksFruits +
+      totalFinalFontaines +
       totalFinalOfficeManager +
       totalFinalServicesFm4All
   );
@@ -129,6 +135,7 @@ const Total = () => {
           <TotalCafe />
           <TotalThe />
           <TotalSnacksFruits />
+          <TotalFontaines />
           <TotalOfficeManager />
           <TotalServicesFm4All />
         </div>

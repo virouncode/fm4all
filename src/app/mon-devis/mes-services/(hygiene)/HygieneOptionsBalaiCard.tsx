@@ -91,11 +91,11 @@ const HygieneOptionsBalaiCard = ({
 
         return (
           <div
-            className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-xl gap-4 cursor-pointer ${
+            className={`flex flex-1 bg-${color} text-slate-200 items-center p-2 justify-center text-xl gap-4 cursor-pointer ${
               hygiene.infos.balaiGammeSelected === gamme
                 ? "ring-4 ring-inset ring-destructive"
                 : ""
-            } px-8`}
+            }`}
             key={"balai" + gamme}
             onClick={() => handleClickProposition("balai", proposition)}
           >

@@ -46,6 +46,18 @@ export const totalSnacksFruitsSchema = z.object({
   total: z.number().nullable(),
 });
 
+export const totalFontainesSchema = z.object({
+  totalLotsFontaines: z
+    .array(
+      z.object({
+        lotId: z.number(),
+        total: z.number().nullable(),
+        totalInstallation: z.number().nullable(),
+      })
+    )
+    .default([]),
+});
+
 export const totalOfficeManager = z.object({
   totalService: z.number().nullable(),
 });
@@ -67,5 +79,6 @@ export type TotalMaintenanceType = z.infer<typeof totalMaintenanceSchema>;
 export type TotalCafeType = z.infer<typeof totalCafeSchema>;
 export type TotalTheType = z.infer<typeof totalTheSchema>;
 export type TotalSnacksFruitsType = z.infer<typeof totalSnacksFruitsSchema>;
+export type TotalFontainesType = z.infer<typeof totalFontainesSchema>;
 export type TotalOfficeManagerType = z.infer<typeof totalOfficeManager>;
 export type TotalServicesFm4AllType = z.infer<typeof totalServicesFm4AllSchema>;

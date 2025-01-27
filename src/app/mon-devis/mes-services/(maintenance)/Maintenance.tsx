@@ -69,7 +69,7 @@ const Maintenance = ({
         handleClickPrevious={handleClickPrevious}
       />
       {maintenanceQuantites && maintenanceTarifs && (
-        <div className="w-full flex-1">
+        <div className="w-full flex-1 overflow-auto">
           <MaintenancePropositions
             maintenanceQuantites={maintenanceQuantites}
             maintenanceTarifs={maintenanceTarifs}

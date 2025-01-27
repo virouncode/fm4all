@@ -65,16 +65,16 @@ const SnacksFruits = ({
         description="Fruits locaux, bio, eco-responsables, snacks sains et gourmands, boissons fraiches, chaque semaine faites varier les plaisirs dans un panier qui ravira vos équipes"
         handleClickPrevious={handleClickPrevious}
       />
-      <div className="w-full flex-1 flex flex-col gap-4">
-        <SnacksFruitsForm
-          fruitsQuantites={fruitsQuantites}
-          fruitsTarifs={fruitsTarifs}
-          snacksQuantites={snacksQuantites}
-          snacksTarifs={snacksTarifs}
-          boissonsQuantites={boissonsQuantites}
-          boissonsTarifs={boissonsTarifs}
-          foodLivraisonTarifs={foodLivraisonTarifs}
-        />
+      <SnacksFruitsForm
+        fruitsQuantites={fruitsQuantites}
+        fruitsTarifs={fruitsTarifs}
+        snacksQuantites={snacksQuantites}
+        snacksTarifs={snacksTarifs}
+        boissonsQuantites={boissonsQuantites}
+        boissonsTarifs={boissonsTarifs}
+        foodLivraisonTarifs={foodLivraisonTarifs}
+      />
+      <div className="w-full flex-1 flex flex-col gap-4 overflow-auto">
         <SnacksFruitsPropositions
           fruitsQuantites={fruitsQuantites}
           fruitsTarifs={fruitsTarifs}

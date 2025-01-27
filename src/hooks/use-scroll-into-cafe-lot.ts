@@ -2,7 +2,7 @@ import { CafeContext } from "@/context/CafeProvider";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
 import { useContext, useEffect } from "react";
 
-export default function useScrollIntoLot() {
+export default function useScrollIntoCafeLot() {
   const { cafe } = useContext(CafeContext);
   const { foodBeverage } = useContext(FoodBeverageContext);
   useEffect(() => {

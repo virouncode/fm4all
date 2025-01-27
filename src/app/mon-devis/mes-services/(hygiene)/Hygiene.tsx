@@ -62,7 +62,7 @@ const Hygiene = ({
         description="Un tarif forfaitaire tout compris pour vos sanitaires avec distributeurs et consommables mis en place : essuie-main papier, savon & papier hygiénique. La gamme détermine la finition des distributeurs."
         handleClickPrevious={handleClickPrevious}
       />
-      <div className="w-full flex-1">
+      <div className="w-full flex-1 overflow-auto">
         <HygienePropositions
           hygieneDistribQuantite={hygieneDistribQuantite}
           hygieneDistribTarifs={hygieneDistribTarifs}

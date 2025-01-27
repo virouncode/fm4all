@@ -75,7 +75,7 @@ const SnacksFruitsPropositionCard = ({
   ) {
     return (
       <div
-        className={`flex-1 bg-${color} text-xl font-bold text-slate-200 flex items-center justify-center px-4`}
+        className={`flex-1 bg-${color} text-xl font-bold text-slate-200 flex items-center justify-center p-2`}
       >
         <p>Non proposé</p>
       </div>
@@ -87,7 +87,7 @@ const SnacksFruitsPropositionCard = ({
   ) {
     return (
       <div
-        className={`flex-1 bg-${color} text-xl font-bold text-slate-200 flex items-center justify-center px-4`}
+        className={`flex-1 bg-${color} text-xl font-bold text-slate-200 flex items-center justify-center p-2`}
       >
         <p>Non proposé</p>
       </div>
@@ -99,7 +99,7 @@ const SnacksFruitsPropositionCard = ({
   ) {
     return (
       <div
-        className={`flex-1 bg-${color} text-lg font-bold text-slate-200 flex items-center justify-center px-4`}
+        className={`flex-1 bg-${color} text-lg font-bold text-slate-200 flex items-center justify-center p-2`}
       >
         <p>Non proposé</p>
       </div>
@@ -108,7 +108,7 @@ const SnacksFruitsPropositionCard = ({
   if (!proposition.total) {
     return (
       <div
-        className={`flex-1 bg-${color} text-sm font-bold text-slate-200 flex items-center justify-center px-4`}
+        className={`flex-1 bg-${color} text-sm font-bold text-slate-200 flex items-center justify-center p-2`}
       >
         <p className="text-center">
           Le panier minimum hebdomadaire du fournisseur n&apos;est pas atteint
@@ -135,7 +135,7 @@ const SnacksFruitsPropositionCard = ({
 
   return (
     <div
-      className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 px-4 cursor-pointer ${
+      className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 p-2 cursor-pointer ${
         snacksFruits.infos.fournisseurId === proposition.fournisseurId &&
         snacksFruits.infos.gammeSelected === gamme
           ? "ring-4 ring-inset ring-destructive"

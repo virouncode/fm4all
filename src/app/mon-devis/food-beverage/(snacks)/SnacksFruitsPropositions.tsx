@@ -391,9 +391,9 @@ const SnacksFruitsPropositions = ({
   }
 
   return (
-    <div className="h-full flex flex-col border rounded-xl overflow-hidden">
+    <div className="flex-1 flex flex-col border rounded-xl overflow-auto">
       {isNaN(nbPersonnes) || nbPersonnes < 1 || nbPersonnes > 300 ? (
-        <div className="flex-1 flex justify-center items-center border rounded-xl">
+        <div className="flex-1 flex justify-center items-center border rounded-xl p-4">
           <p className="text-center text-base">
             Veuillez renseigner un nombre de personnes entier compris entre 1 et
             300

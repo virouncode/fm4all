@@ -40,7 +40,7 @@ const The = ({ theConsoTarifs }: TheProps) => {
         description="Parce que tout le monde ne boit pas forcément du café, un choix de thés présentés en coffrets"
         handleClickPrevious={handleClickPrevious}
       />
-      <div className="w-full flex-1">
+      <div className="w-full flex-1 overflow-auto">
         <ThePropositions theConsoTarifs={theConsoTarifs} />
       </div>
       <PropositionsFooter

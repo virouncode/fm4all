@@ -47,7 +47,7 @@ const HygienePropositionCard = ({
     : "";
   return (
     <div
-      className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer p-2 ${
+      className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer p-4 ${
         hygiene.infos.trilogieGammeSelected === gamme
           ? "ring-4 ring-inset ring-destructive"
           : ""

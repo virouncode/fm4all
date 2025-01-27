@@ -23,7 +23,7 @@ const ThePropositionFournisseurLogo = ({
     <TooltipProvider delayDuration={0}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className="flex items-center justify-center h-1/4 w-full py-2 px-4">
+          <div className="flex items-center justify-center h-1/4 w-full">
             {logoFournisseurUrl ? (
               <div className="w-full h-full relative">
                 <Image

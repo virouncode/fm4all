@@ -87,7 +87,7 @@ const CafeLotPropositionCard = ({
     : "";
   return (
     <div
-      className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer px-10 ${
+      className={`flex flex-1 bg-${color} text-slate-200 items-center p-2 justify-center text-2xl gap-4 cursor-pointer ${
         lot.infos.gammeCafeSelected === gamme &&
         cafe.infos.fournisseurId === proposition.fournisseurId
           ? "ring-4 ring-inset ring-destructive"

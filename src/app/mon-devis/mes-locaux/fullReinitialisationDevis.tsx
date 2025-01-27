@@ -1,6 +1,7 @@
 import { CafeType } from "@/zod-schemas/cafe";
 import { InsertClientType } from "@/zod-schemas/client";
 import { DevisProgressType } from "@/zod-schemas/devisProgress";
+import { FontainesType } from "@/zod-schemas/fontaines";
 import { FoodBeverageType } from "@/zod-schemas/foodBeverage";
 import { HygieneType } from "@/zod-schemas/hygiene";
 import { IncendieType } from "@/zod-schemas/incendie";
@@ -16,6 +17,7 @@ import { SnacksFruitsType } from "@/zod-schemas/snacksFruits";
 import { TheType } from "@/zod-schemas/the";
 import {
   TotalCafeType,
+  TotalFontainesType,
   TotalHygieneType,
   TotalIncendieType,
   TotalMaintenanceType,
@@ -36,6 +38,7 @@ export const fullReinitialisationDevis = (
   setCafe: (cafe: CafeType) => void,
   setThe: (the: TheType) => void,
   setSnacksFruits: (snacksFruits: SnacksFruitsType) => void,
+  setFontaines: (fontaines: FontainesType) => void,
   setOfficeManager: (officeManager: OfficeManagerType) => void,
   setServicesFm4All: (servicesFm4All: ServicesFm4AllType) => void,
   setServices: (services: ServicesType) => void,
@@ -50,6 +53,7 @@ export const fullReinitialisationDevis = (
   setTotalCafe: (totalCafe: TotalCafeType) => void,
   setTotalThe: (totalThe: TotalTheType) => void,
   setTotalSnacksFruits: (totalSnacksFruits: TotalSnacksFruitsType) => void,
+  setTotalFontaines: (totalFontaines: TotalFontainesType) => void,
   setTotalOfficeManager: (totalOfficeManager: TotalOfficeManagerType) => void,
   setTotalServicesFm4All: (totalServicesFm4All: TotalServicesFm4AllType) => void
 ) => {
@@ -259,6 +263,41 @@ export const fullReinitialisationDevis = (
       panierMin: null,
     },
   });
+  setFontaines({
+    infos: {
+      fournisseurId: null,
+      nomFournisseur: null,
+      sloganFournisseur: null,
+      currentLotId: 1,
+      dureeLocation: "pa12M",
+      commentaires: null,
+    },
+    nbLotsFontaines: 1,
+    lotsFontaines: [
+      {
+        infos: {
+          lotId: 1,
+          typeEau: "EF",
+          typePose: "aposer",
+          marque: null,
+          modele: null,
+          reconditionne: false,
+        },
+        quantites: {
+          nbPersonnes: null,
+          nbFontaines: null,
+        },
+        prix: {
+          prixUnitaireLoc: null,
+          prixUnitaireInstal: null,
+          prixUnitaireMaintenance: null,
+          prixUnitaireConsoFiltres: null,
+          prixUnitaireConsoCO2: null,
+          prixUnitaireConsoEauChaude: null,
+        },
+      },
+    ],
+  });
   setOfficeManager({
     infos: {
       fournisseurId: null,
@@ -351,6 +390,15 @@ export const fullReinitialisationDevis = (
     totalBoissons: null,
     totalLivraison: null,
     total: null,
+  });
+  setTotalFontaines({
+    totalLotsFontaines: [
+      {
+        lotId: 1,
+        total: null,
+        totalInstallation: null,
+      },
+    ],
   });
   setTotalOfficeManager({
     totalService: null,

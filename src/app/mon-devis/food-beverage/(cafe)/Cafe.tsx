@@ -4,8 +4,8 @@ import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
+import useScrollIntoCafeLot from "@/hooks/use-scroll-into-cafe-lot";
 import useScrollIntoFood from "@/hooks/use-scroll-into-food";
-import useScrollIntoLot from "@/hooks/use-scroll-into-lot";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine";
 import { SelectCafeMachinesTarifsType } from "@/zod-schemas/cafeMachinesTarifs";
@@ -44,7 +44,7 @@ const Cafe = ({
   const { setTotalCafe } = useContext(TotalCafeContext);
   const effectif = client.effectif ?? 0;
   useScrollIntoFood();
-  useScrollIntoLot();
+  useScrollIntoCafeLot();
 
   const handleClickPrevious = () => {};
 
@@ -107,7 +107,7 @@ const Cafe = ({
         handleClickPrevious={handleClickPrevious}
         previousButton={false}
       />
-      <div className="flex-1 overflow-hidden">
+      <div className="w-full flex-1 overflow-auto">
         {cafe.nbLotsMachines && cafe.nbLotsMachines > 0 ? (
           cafe.lotsMachines.map((lot) => (
             <CafeLot

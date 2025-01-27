@@ -31,7 +31,7 @@ const NettoyageOptionsDimancheCard = ({
         Nettoyage supplémentaire tous les Dimanche
       </div>
       <div
-        className={`flex w-3/4 items-center justify-center ${
+        className={`flex w-3/4 items-center p-4 justify-center ${
           nettoyage.infos.dimancheSelected
             ? "ring-4 ring-inset ring-destructive"
             : ""
