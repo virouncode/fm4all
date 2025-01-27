@@ -5,6 +5,7 @@ import { HygieneType } from "@/zod-schemas/hygiene";
 import { IncendieType } from "@/zod-schemas/incendie";
 import { MaintenanceType } from "@/zod-schemas/maintenance";
 import { ManagementType } from "@/zod-schemas/management";
+import { MonDevisType } from "@/zod-schemas/monDevis";
 import { NettoyageType } from "@/zod-schemas/nettoyage";
 import { OfficeManagerType } from "@/zod-schemas/officeManager";
 import { PersonnalisationType } from "@/zod-schemas/personnalisation";
@@ -41,6 +42,7 @@ export const reinitialisationDevis = (
   setFoodBeverage: (foodBeverage: FoodBeverageType) => void,
   setManagement: (management: ManagementType) => void,
   setPersonnalisation: (personnalisation: PersonnalisationType) => void,
+  setMonDevis: (monDevis: MonDevisType) => void,
   setTotalNettoyage: (totalNettoyage: TotalNettoyageType) => void,
   setTotalHygiene: (totalHygiene: TotalHygieneType) => void,
   setTotalMaintenance: (totalMaintenance: TotalMaintenanceType) => void,
@@ -282,6 +284,9 @@ export const reinitialisationDevis = (
   setPersonnalisation({
     currentPersonnalisationId: 1,
     personnalisationIds: [1],
+  });
+  setMonDevis({
+    currentMonDevisId: 1,
   });
   //Total
   setTotalNettoyage({

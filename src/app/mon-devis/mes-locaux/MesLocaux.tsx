@@ -25,6 +25,7 @@ import { HygieneContext } from "@/context/HygieneProvider";
 import { IncendieContext } from "@/context/IncendieProvider";
 import { MaintenanceContext } from "@/context/MaintenanceProvider";
 import { ManagementContext } from "@/context/ManagementProvider";
+import { MonDevisContext } from "@/context/MonDevisProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
 import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
@@ -59,6 +60,7 @@ const MesLocaux = () => {
   const { setFoodBeverage } = useContext(FoodBeverageContext);
   const { setManagement } = useContext(ManagementContext);
   const { setPersonnalisation } = useContext(PersonnalisationContext);
+  const { setMonDevis } = useContext(MonDevisContext);
   const { client, setClient } = useContext(ClientContext);
   const { setNettoyage } = useContext(NettoyageContext);
   const { setHygiene } = useContext(HygieneContext);
@@ -169,6 +171,7 @@ const MesLocaux = () => {
       setFoodBeverage,
       setManagement,
       setPersonnalisation,
+      setMonDevis,
       //Total
       setTotalNettoyage,
       setTotalHygiene,
