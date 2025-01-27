@@ -90,6 +90,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
       setThe((prev) => ({
         ...prev,
         infos: {
+          ...prev.infos,
           gammeSelected: null,
         },
         prix: {
@@ -104,6 +105,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
     setThe((prev) => ({
       ...prev,
       infos: {
+        ...prev.infos,
         gammeSelected: gamme,
       },
       prix: {
