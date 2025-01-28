@@ -19,7 +19,7 @@ export const selectFournisseurSchema = createSelectSchema(fournisseurs, {
     schema.email("Email du contact fournisseur invalide"),
   phoneContact: (schema) =>
     schema.regex(
-      /^\d{2} \d{2} \d{2} \d{2} \d{2}$/,
+      /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{3,5}[-.\s]?\d{3,5}$/,
       "Numéro de téléphone du contact fournisseur invalide"
     ),
 }).extend({
@@ -47,8 +47,8 @@ export const insertFournisseurSchema = createInsertSchema(fournisseurs, {
   emailContact: (schema) => schema.email("Email du contact invalide"),
   phoneContact: (schema) =>
     schema.regex(
-      /^\d{2} \d{2} \d{2} \d{2} \d{2}$/,
-      "Numéro de téléphone du contact invalide, format attendu: 01 23 45 67 89"
+      /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{3,5}[-.\s]?\d{3,5}$/,
+      "Numéro de téléphone du contact invalide"
     ),
   dateChiffrage: (schema) => schema.date("Date de chiffrage obligatoire"),
   status: z.string().nonempty("Statut obligatoire"),
@@ -71,7 +71,7 @@ export const updateFournisseurSchema = createUpdateSchema(fournisseurs, {
   emailContact: (schema) => schema.email("Email du contact invalide"),
   phoneContact: (schema) =>
     schema.regex(
-      /^\d{2} \d{2} \d{2} \d{2} \d{2}$/,
+      /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{3,5}[-.\s]?\d{3,5}$/,
       "Numéro de téléphone du contact invalide, format attendu: 01 23 45 67 89"
     ),
   dateChiffrage: (schema) => schema.date("Date de chiffrage obligatoire"),
