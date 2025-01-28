@@ -36,7 +36,7 @@ const TotalIncendie = () => {
         <div className="flex flex-col ml-4 text-xs ">
           {totalTrilogie ? (
             <div className="flex items-center justify-between font-bold">
-              <p>Trilogie Extincteurs / BAES / Télécommandes BAES</p>
+              <p>Trilogie Extincteurs / BAES / Télécommandes</p>
               <p className="text-end">{formatNumber(totalTrilogie)} € HT/an</p>
             </div>
           ) : null}

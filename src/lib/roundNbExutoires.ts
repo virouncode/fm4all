@@ -1,4 +1,4 @@
-const exutoires = [0, 10, 29, 60];
+const exutoires = [1, 10, 29, 60];
 
 export const roundNbExutoires = (nbExutoires: number) => {
   const roundedNbExutoires = exutoires

@@ -31,6 +31,13 @@ const PersonnaliserNettoyageVitrerie = () => {
     const minFacturationVitrerie = nettoyage.prix.minFacturationVitrerie;
     const newSurface = value ? parseInt(value) : (client.surface ?? 0) * 0.15;
     if (name === "vitres") {
+      console.log("newSufrace", newSurface);
+      console.log("surfaceCloisons", nettoyage.quantites.surfaceCloisons);
+      console.log("cadenceVitres", cadenceVitres);
+      console.log("cadenceCloisons", cadenceCloisons);
+      console.log("tauxHoraireVitrerie", tauxHoraireVitrerie);
+      console.log("minFacturationVitrerie", minFacturationVitrerie);
+
       const surfaceCloisons = nettoyage.quantites.surfaceCloisons;
       const totalVitrerieParPassage =
         cadenceVitres !== null &&
@@ -44,10 +51,14 @@ const PersonnaliserNettoyageVitrerie = () => {
               minFacturationVitrerie ?? 0
             )
           : null;
+
+      console.log("totalVitrerieParPassage", totalVitrerieParPassage);
+
       const totalVitrerie =
         totalVitrerieParPassage !== null
           ? Math.round(nbPassagesVitrerie * totalVitrerieParPassage)
           : null;
+
       setNettoyage((prev) => ({
         ...prev,
         quantites: {
@@ -119,9 +130,10 @@ const PersonnaliserNettoyageVitrerie = () => {
                 <Input
                   value={nettoyage.quantites.surfaceVitres ?? 0}
                   onChange={handleChange}
-                  name="surfaceVitres"
+                  name="vitres"
                   id="vitres"
                   type="number"
+                  min={1}
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -131,16 +143,17 @@ const PersonnaliserNettoyageVitrerie = () => {
                 <Input
                   value={nettoyage.quantites.surfaceCloisons ?? 0}
                   onChange={handleChange}
-                  name="surfaceCloisons"
+                  name="cloisons"
                   id="cloisons"
                   type="number"
+                  min={1}
                 />
               </div>
             </div>
           </div>
           <div className="flex flex-col gap-4">
             <p className="max-w-prose mx-auto hyphens-auto font-bold">
-              La vitrerie est-elle accessible de plein pied ?
+              La vitrerie est-elle totalement accessible de plein pied ?
             </p>
             <div className="flex items-center justify-center gap-14">
               <RadioGroup

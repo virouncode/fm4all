@@ -83,7 +83,7 @@ const PersonnaliserIncendieComplements = ({
     incendie.quantites.nbColonnesSechesStatiques || 1;
   const nbColonnesSechesDynamiques =
     incendie.quantites.nbColonnesSechesDynamiques || 1;
-  const nbRia = incendie.quantites.nbRIA || 1;
+  const nbRIA = incendie.quantites.nbRIA || 1;
 
   const handleClickPrevious = () => {
     const currentIndex = personnalisation.personnalisationIds.indexOf(
@@ -210,7 +210,7 @@ const PersonnaliserIncendieComplements = ({
         }));
         setTotalIncendie((prev) => ({
           ...prev,
-          totalPortesCoupFeuBattantes: totalPortesCoupeFeuBattantes,
+          totalPortesCoupeFeuBattantes: totalPortesCoupeFeuBattantes,
         }));
 
         break;
@@ -235,7 +235,7 @@ const PersonnaliserIncendieComplements = ({
         }));
         setTotalIncendie((prev) => ({
           ...prev,
-          totalPortesCoupFeuCoulissantes: totalPortesCoupeFeuCoulissantes,
+          totalPortesCoupeFeuCoulissantes: totalPortesCoupeFeuCoulissantes,
         }));
         break;
       case "colonnesSechesStatiques":
@@ -436,7 +436,7 @@ const PersonnaliserIncendieComplements = ({
           }));
           setTotalIncendie((prev) => ({
             ...prev,
-            totalPortesCoupFeuBattantes: null,
+            totalPortesCoupeFeuBattantes: null,
           }));
         } else {
           const prixParPorteCoupeFeuBattante =
@@ -578,10 +578,10 @@ const PersonnaliserIncendieComplements = ({
           setTotalIncendie((prev) => ({ ...prev, totalRIA: null }));
         } else {
           const prixParRIA = riaTarifFournisseur?.prixParRIA ?? null;
-          const totalRIA = prixParRIA !== null ? prixParRIA * nbRia : null;
+          const totalRIA = prixParRIA !== null ? prixParRIA * nbRIA : null;
           setIncendie((prev) => ({
             ...prev,
-            quantites: { ...prev.quantites, nbRIA: nbRia },
+            quantites: { ...prev.quantites, nbRIA: nbRIA },
             prix: { ...prev.prix, prixParRIA },
           }));
           setTotalIncendie((prev) => ({ ...prev, totalRIA }));
@@ -622,7 +622,7 @@ const PersonnaliserIncendieComplements = ({
                   Exutoires de fumée
                 </Label>
                 <Input
-                  value={incendie.quantites.nbExutoires ?? 0}
+                  value={nbExutoires}
                   onChange={handleChange}
                   name="exutoires"
                   type="number"
@@ -644,7 +644,7 @@ const PersonnaliserIncendieComplements = ({
                   Exutoires de fumée (parking)
                 </Label>
                 <Input
-                  value={incendie.quantites.nbExutoires ?? 0}
+                  value={nbExutoiresParking}
                   onChange={handleChange}
                   name="exutoiresParking"
                   type="number"
@@ -666,7 +666,7 @@ const PersonnaliserIncendieComplements = ({
                   Alarmes T4
                 </Label>
                 <Input
-                  value={incendie.quantites.nbAlarmes ?? 0}
+                  value={nbAlarmes}
                   onChange={handleChange}
                   name="alarmes"
                   type="number"
@@ -692,7 +692,7 @@ const PersonnaliserIncendieComplements = ({
                   Portes coupe-feu battantes
                 </Label>
                 <Input
-                  value={incendie.quantites.nbPortesCoupeFeuBattantes ?? 0}
+                  value={nbPortesCoupeFeuBattantes}
                   onChange={handleChange}
                   name="portesCoupeFeuBattantes"
                   type="number"
@@ -718,7 +718,7 @@ const PersonnaliserIncendieComplements = ({
                   Portes coupe-feu coulissantes
                 </Label>
                 <Input
-                  value={incendie.quantites.nbPortesCoupeFeuCoulissantes ?? 0}
+                  value={nbPortesCoupeFeuCoulissantes}
                   onChange={handleChange}
                   name="portesCoupeFeuCoulissantes"
                   type="number"
@@ -744,7 +744,7 @@ const PersonnaliserIncendieComplements = ({
                   Colonnes sèches statiques
                 </Label>
                 <Input
-                  value={incendie.quantites.nbColonnesSechesStatiques ?? 0}
+                  value={nbColonnesSechesStatiques}
                   onChange={handleChange}
                   name="colonnesSechesStatiques"
                   type="number"
@@ -770,7 +770,7 @@ const PersonnaliserIncendieComplements = ({
                   Colonnes sèches dynamiques
                 </Label>
                 <Input
-                  value={incendie.quantites.nbColonnesSechesDynamiques ?? 0}
+                  value={nbColonnesSechesDynamiques}
                   onChange={handleChange}
                   name="colonnesSechesDynamiques"
                   type="number"
@@ -793,7 +793,7 @@ const PersonnaliserIncendieComplements = ({
                   Robinets d&apos;incendie armés
                 </Label>
                 <Input
-                  value={incendie.quantites.nbRIA ?? 0}
+                  value={nbRIA}
                   onChange={handleChange}
                   name="ria"
                   type="number"

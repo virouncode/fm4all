@@ -72,7 +72,14 @@ export const getExutoiresTarifs = async () => {
   try {
     const results = await db.select().from(exutoiresTarifs);
     if (results.length === 0) return [];
-    return results.map((result) => selectExutoiresTarifsSchema.parse(result));
+    const validatedResults = results.map((result) =>
+      selectExutoiresTarifsSchema.parse(result)
+    );
+    return validatedResults.map((result) => ({
+      ...result,
+      prixParExutoire: result.prixParExutoire / RATIO,
+      fraisDeplacement: result.fraisDeplacement / RATIO,
+    }));
   } catch (err) {
     errorHelper(err);
   }
@@ -81,7 +88,14 @@ export const getExutoiresParkingsTarifs = async () => {
   try {
     const results = await db.select().from(exutoiresParkingTarifs);
     if (results.length === 0) return [];
-    return results.map((result) => selectExutoiresTarifsSchema.parse(result));
+    const validatedResults = results.map((result) =>
+      selectExutoiresTarifsSchema.parse(result)
+    );
+    return validatedResults.map((result) => ({
+      ...result,
+      prixParExutoire: result.prixParExutoire / RATIO,
+      fraisDeplacement: result.fraisDeplacement / RATIO,
+    }));
   } catch (err) {
     errorHelper(err);
   }
@@ -91,7 +105,13 @@ export const getAlarmesTarifs = async () => {
   try {
     const results = await db.select().from(alarmesTarifs);
     if (results.length === 0) return [];
-    return results.map((result) => selectAlarmesTarifsSchema.parse(result));
+    const validatedResults = results.map((result) =>
+      selectAlarmesTarifsSchema.parse(result)
+    );
+    return validatedResults.map((result) => ({
+      ...result,
+      prixParControle: result.prixParControle / RATIO,
+    }));
   } catch (err) {
     errorHelper(err);
   }
@@ -101,7 +121,13 @@ export const getRiaTarifs = async () => {
   try {
     const results = await db.select().from(riaTarifs);
     if (results.length === 0) return [];
-    return results.map((result) => selectRiaTarifsSchema.parse(result));
+    const validatedResults = results.map((result) =>
+      selectRiaTarifsSchema.parse(result)
+    );
+    return validatedResults.map((result) => ({
+      ...result,
+      prixParRIA: result.prixParRIA / RATIO,
+    }));
   } catch (err) {
     errorHelper(err);
   }
@@ -111,9 +137,13 @@ export const getColonnesSechesTarifs = async () => {
   try {
     const results = await db.select().from(colonnesSechesTarifs);
     if (results.length === 0) return [];
-    return results.map((result) =>
+    const validatedResults = results.map((result) =>
       selectColonnesSechesTarifsSchema.parse(result)
     );
+    return validatedResults.map((result) => ({
+      ...result,
+      prixParColonne: result.prixParColonne / RATIO,
+    }));
   } catch (err) {
     errorHelper(err);
   }
@@ -123,9 +153,13 @@ export const getPortesCoupeFeuTarifs = async () => {
   try {
     const results = await db.select().from(portesCoupeFeuTarifs);
     if (results.length === 0) return [];
-    return results.map((result) =>
+    const validatedResults = results.map((result) =>
       selectPortesCoupeFeuTarifsSchema.parse(result)
     );
+    return validatedResults.map((result) => ({
+      ...result,
+      prixParPorte: result.prixParPorte / RATIO,
+    }));
   } catch (err) {
     errorHelper(err);
   }
