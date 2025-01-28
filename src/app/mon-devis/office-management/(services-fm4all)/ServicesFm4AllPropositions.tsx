@@ -64,7 +64,9 @@ const ServicesFm4AllPropositions = ({
   const totalFinalMaintenance = Object.values(totalMaintenance)
     .filter((item) => item !== null)
     .reduce((sum, value) => sum + value, 0);
-  const totalFinalIncendie = totalIncendie.totalService ?? 0;
+  const totalFinalIncendie = Object.values(totalIncendie)
+    .filter((item) => item !== null)
+    .reduce((sum, value) => sum + value, 0);
   //TODO voir pour les prix one shot d'installation
   const totalFinalCafe = totalCafe.totalMachines
     .map(({ total }) => total ?? 0)
