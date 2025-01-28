@@ -4,8 +4,8 @@ const effectifs = [
 ];
 
 export const roundEffectif = (effectif: number) => {
-  const roundedEffectif = effectifs.reduce((prev, curr) =>
-    Math.abs(curr - effectif) < Math.abs(prev - effectif) ? curr : prev
-  );
+  const roundedEffectif = effectifs
+    .filter((curr) => curr <= effectif) // Garde les valeurs inférieures ou égales
+    .reduce((prev, curr) => Math.max(prev, curr), -Infinity); // Trouve le maximum
   return roundedEffectif;
 };

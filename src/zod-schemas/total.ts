@@ -22,7 +22,18 @@ export const totalMaintenanceSchema = z.object({
   totalQualiteAir: z.number().nullable(),
 });
 export const totalIncendieSchema = z.object({
-  totalService: z.number().nullable(),
+  totalTrilogie: z.number().nullable(),
+  totalExutoires: z.number().nullable(),
+  totalExutoiresParking: z.number().nullable(),
+  totalAlarmes: z.number().nullable(),
+  totalPortesCoupeFeuBattantes: z.number().nullable(),
+  totalPortesCoupeFeuCoulissantes: z.number().nullable(),
+  totalRIA: z.number().nullable(),
+  totalColonnesSechesStatiques: z.number().nullable(),
+  totalColonnesSechesDynamiques: z.number().nullable(),
+  totalDeplacementTrilogie: z.number().nullable(),
+  totalDeplacementExutoires: z.number().nullable(),
+  totalDeplacementExutoiresParking: z.number().nullable(),
 });
 export const totalCafeSchema = z.object({
   totalMachines: z

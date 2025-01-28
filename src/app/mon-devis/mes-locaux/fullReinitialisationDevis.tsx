@@ -178,16 +178,26 @@ export const fullReinitialisationDevis = (
       nbBaes: null,
       nbTelBaes: null,
       nbExutoires: null,
-      nbAlarmesT4SSI: null,
-      nbPortesCoupFeu: null,
+      nbAlarmes: null,
+      nbPortesCoupeFeuBattantes: null,
+      nbPortesCoupeFeuCoulissantes: null,
       nbRIA: null,
-      nbColonnesSeches: null,
+      nbColonnesSechesStatiques: null,
+      nbColonnesSechesDynamiques: null,
     },
     prix: {
       prixParExtincteur: null,
       prixParBaes: null,
       prixParTelBaes: null,
-      fraisDeplacement: null,
+      prixParExutoire: null,
+      prixParAlarme: null,
+      prixParPorteCoupeFeuBattante: null,
+      prixParProteCoupeFeuCoulissante: null,
+      prixParRIA: null,
+      prixParColonneSecheStatique: null,
+      prixParColonneSecheDynamique: null,
+      fraisDeplacementTrilogie: null,
+      fraisDeplacementExutoires: null,
     },
   });
   setCafe({
@@ -370,7 +380,16 @@ export const fullReinitialisationDevis = (
     totalQualiteAir: null,
   });
   setTotalIncendie({
-    totalService: null,
+    totalTrilogie: null,
+    totalExutoires: null,
+    totalAlarmes: null,
+    totalPortesCoupeFeuBattantes: null,
+    totalPortesCoupeFeuCoulissantes: null,
+    totalRIA: null,
+    totalColonnesSechesStatiques: null,
+    totalColonnesSechesDynamiques: null,
+    totalDeplacementTrilogie: null,
+    totalDeplacementExutoires: null,
   });
   setTotalCafe({
     totalMachines: [

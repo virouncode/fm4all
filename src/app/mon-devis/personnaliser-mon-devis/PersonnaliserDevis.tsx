@@ -1,8 +1,12 @@
 "use client";
-
 import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { usePersonnalisation } from "@/hooks/use-personnalisation";
 import useScrollIntoPersonnalisation from "@/hooks/use-scroll-into-personnalisation";
+import { SelectAlarmesTarifsType } from "@/zod-schemas/alarmesTarifs";
+import { SelectColonnesSechesTarifsType } from "@/zod-schemas/colonnesSechesTarifs";
+import { SelectExutoiresTarifsType } from "@/zod-schemas/exutoiresTarifs";
+import { SelectPortesCoupeFeuTarifsType } from "@/zod-schemas/portesCoupeFeuTarifs";
+import { SelectRiaTarifsType } from "@/zod-schemas/riaTarifs";
 import { useContext } from "react";
 import PersonnaliserCafeCommentaires from "./(cafe)/PersonnaliserCafeCommentaires";
 import PersonnaliserHygiene from "./(hygiene)/PersonnaliserHygiene";
@@ -18,7 +22,23 @@ import PersonnaliserTheCommentaires from "./(the)/PersonnaliserTheCommentaires";
 import PersonnaliserFinal from "./PersonnaliserFinal";
 import PersonnaliserPresentation from "./PersonnaliserPresentation";
 
-const PersonnaliserDevis = () => {
+type PersonnaliserDevisProps = {
+  exutoiresTarifs?: SelectExutoiresTarifsType[];
+  exutoiresParkingTarifs?: SelectExutoiresTarifsType[];
+  alarmesTarifs?: SelectAlarmesTarifsType[];
+  riaTarifs?: SelectRiaTarifsType[];
+  colonnesSechesTarifs?: SelectColonnesSechesTarifsType[];
+  portesCoupeFeuTarifs?: SelectPortesCoupeFeuTarifsType[];
+};
+
+const PersonnaliserDevis = ({
+  exutoiresTarifs,
+  exutoiresParkingTarifs,
+  alarmesTarifs,
+  riaTarifs,
+  colonnesSechesTarifs,
+  portesCoupeFeuTarifs,
+}: PersonnaliserDevisProps) => {
   const { personnalisation } = useContext(PersonnalisationContext);
   const personnalisationIds = personnalisation.personnalisationIds;
   usePersonnalisation();
@@ -34,7 +54,16 @@ const PersonnaliserDevis = () => {
       {personnalisationIds.includes(5) && (
         <PersonnaliserMaintenanceCommentaires />
       )}
-      {personnalisationIds.includes(6) && <PersonnaliserIncendieComplements />}
+      {personnalisationIds.includes(6) && (
+        <PersonnaliserIncendieComplements
+          exutoiresTarifs={exutoiresTarifs}
+          exutoiresParkingTarifs={exutoiresParkingTarifs}
+          alarmesTarifs={alarmesTarifs}
+          riaTarifs={riaTarifs}
+          colonnesSechesTarifs={colonnesSechesTarifs}
+          portesCoupeFeuTarifs={portesCoupeFeuTarifs}
+        />
+      )}
       {personnalisationIds.includes(7) && <PersonnaliserIncendieCommentaires />}
       {personnalisationIds.includes(8) && <PersonnaliserCafeCommentaires />}
       {personnalisationIds.includes(9) && <PersonnaliserTheCommentaires />}

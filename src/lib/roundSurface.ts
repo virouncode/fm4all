@@ -4,8 +4,8 @@ const surfaces = [
 ];
 
 export const roundSurface = (surface: number) => {
-  const roundedSurface = surfaces.reduce((prev, curr) =>
-    Math.abs(curr - surface) < Math.abs(prev - surface) ? curr : prev
-  );
+  const roundedSurface = surfaces
+    .filter((curr) => curr <= surface) // Garde les valeurs inférieures ou égales
+    .reduce((prev, curr) => Math.max(prev, curr), -Infinity); // Trouve le maximum
   return roundedSurface;
 };

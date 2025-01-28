@@ -17,7 +17,16 @@ export const TotalIncendieContext = createContext<{
   setTotalIncendie: Dispatch<SetStateAction<TotalIncendieType>>;
 }>({
   totalIncendie: {
-    totalService: null,
+    totalTrilogie: null,
+    totalExutoires: null,
+    totalAlarmes: null,
+    totalPortesCoupeFeuBattantes: null,
+    totalPortesCoupeFeuCoulissantes: null,
+    totalRIA: null,
+    totalColonnesSechesStatiques: null,
+    totalColonnesSechesDynamiques: null,
+    totalDeplacementTrilogie: null,
+    totalDeplacementExutoires: null,
   },
   setTotalIncendie: () => {},
 });
@@ -27,7 +36,16 @@ const TotalIncendieProvider = ({ children }: PropsWithChildren) => {
 
   // Always initialize state
   const [totalIncendie, setTotalIncendie] = useState<TotalIncendieType>({
-    totalService: null,
+    totalTrilogie: null,
+    totalExutoires: null,
+    totalAlarmes: null,
+    totalPortesCoupeFeuBattantes: null,
+    totalPortesCoupeFeuCoulissantes: null,
+    totalRIA: null,
+    totalColonnesSechesStatiques: null,
+    totalColonnesSechesDynamiques: null,
+    totalDeplacementTrilogie: null,
+    totalDeplacementExutoires: null,
   });
 
   useEffect(() => {

@@ -55,6 +55,9 @@ export const inclusEnum = pgEnum("inclus", [
   "sur demande",
 ]);
 
+export const typePorteEnum = pgEnum("typeporte", ["vantaux", "coulissante"]);
+export const typeColonneEnum = pgEnum("typecolonne", ["statique", "dynamique"]);
+
 export const fournisseurs = pgTable("fournisseurs", {
   id: serial().primaryKey(),
   nomFournisseur: varchar("nom_fournisseur").notNull(),
@@ -216,6 +219,66 @@ export const incendieTarifs = pgTable("incendie_tarifs", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const exutoiresTarifs = pgTable("exutoires_tarifs", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  nbExutoires: integer("nb_exutoires").notNull(),
+  prixParExutoire: integer("prix_par_exutoire").notNull(),
+  fraisDeplacement: integer("frais_deplacement").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const exutoiresParkingTarifs = pgTable("exutoires_parking_tarifs", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  nbExutoires: integer("nb_exutoires").notNull(),
+  prixParExutoire: integer("prix_par_exutoire").notNull(),
+  fraisDeplacement: integer("frais_deplacement").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const alarmesTarifs = pgTable("alarmes_tarifs", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  nbPoints: integer("nb_points").notNull(),
+  prixParControle: integer("prix_par_controle").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const portesCoupeFeuTarifs = pgTable("portes_coupe_feu_tarifs", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  type: typePorteEnum().notNull(),
+  prixParPorte: integer("prix_par_porte").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const riaTarifs = pgTable("ria_tarifs", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  prixParRIA: integer("prix_par_ria").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const colonnesSechesTarifs = pgTable("colonnes_seches_tarifs", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  type: typeColonneEnum().notNull(),
+  prixParColonne: integer("prix_par_colonne").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
 //MAINTENANCE
 export const maintenanceQuantites = pgTable("maintenance_quantites", {
   id: serial().primaryKey(),
@@ -500,6 +563,12 @@ export const fournisseursRelations = relations(
     hygieneInstalDistribTarifs: many(hygieneInstalDistribTarifs),
     hygieneConsoTarifs: many(hygieneConsoTarifs),
     incendieTarifs: many(incendieTarifs),
+    exutoiresTarifs: many(exutoiresTarifs),
+    exutoiresParkingTarifs: many(exutoiresParkingTarifs),
+    alarmesTarifs: many(alarmesTarifs),
+    portesCoupeFeuTarifs: many(portesCoupeFeuTarifs),
+    riaTarifs: many(riaTarifs),
+    colonnesSechesTarifs: many(colonnesSechesTarifs),
     maintenanceTarifs: many(maintenanceTarifs),
     cafeMachinesTarifs: many(cafeMachinesTarifs),
     cafeConsoTarifs: many(cafeConsoTarifs),
@@ -589,6 +658,60 @@ export const incendieTarifsRelations = relations(incendieTarifs, ({ one }) => ({
     references: [fournisseurs.id],
   }),
 }));
+
+export const exutoiresTarifsRelations = relations(
+  exutoiresTarifs,
+  ({ one }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [exutoiresTarifs.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+  })
+);
+
+export const exutoiresParkingTarifsRelations = relations(
+  exutoiresParkingTarifs,
+  ({ one }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [exutoiresParkingTarifs.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+  })
+);
+
+export const alarmesTarifsRelations = relations(alarmesTarifs, ({ one }) => ({
+  fournisseur: one(fournisseurs, {
+    fields: [alarmesTarifs.fournisseurId],
+    references: [fournisseurs.id],
+  }),
+}));
+
+export const portesCoupeFeuTarifsRelations = relations(
+  portesCoupeFeuTarifs,
+  ({ one }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [portesCoupeFeuTarifs.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+  })
+);
+
+export const riaTarifsRelations = relations(riaTarifs, ({ one }) => ({
+  fournisseur: one(fournisseurs, {
+    fields: [riaTarifs.fournisseurId],
+    references: [fournisseurs.id],
+  }),
+}));
+
+export const colonnesSechesTarifsRelations = relations(
+  colonnesSechesTarifs,
+  ({ one }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [colonnesSechesTarifs.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+  })
+);
 
 export const maintenanceTarifsRelations = relations(
   maintenanceTarifs,

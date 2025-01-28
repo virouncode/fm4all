@@ -9,14 +9,22 @@ type SecuriteIncendiePropostionCardProps = {
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
-    prixAnnuel: number;
+    prixParExtincteur: number;
+    prixParBaes: number;
+    prixParTelBaes: number;
+    prixAnnuelTrilogie: number;
+    fraisDeplacementTrilogie: number;
   };
   handleClickProposition: (proposition: {
     id: number;
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
-    prixAnnuel: number;
+    prixParExtincteur: number;
+    prixParBaes: number;
+    prixParTelBaes: number;
+    prixAnnuelTrilogie: number;
+    fraisDeplacementTrilogie: number;
   }) => void;
 };
 
@@ -25,6 +33,11 @@ const SecuriteIncendiePropostionCard = ({
   handleClickProposition,
 }: SecuriteIncendiePropostionCardProps) => {
   const { incendie } = useContext(IncendieContext);
+  const prixAnnuelText =
+    formatNumber(
+      (proposition.prixAnnuelTrilogie + proposition.fraisDeplacementTrilogie) /
+        12
+    ) + " € / mois*";
 
   return (
     <div
@@ -41,17 +54,14 @@ const SecuriteIncendiePropostionCard = ({
         className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
       />
       <div>
-        <p className="font-bold">
-          {formatNumber(proposition.prixAnnuel / 12)} € / mois*
-        </p>
+        <p className="font-bold">{prixAnnuelText}</p>
+        <p className="text-sm">1 passage par an</p>
         <p>Pour le contrôle de :</p>
         <p className="text-sm">
-          {" "}
           {incendie.quantites.nbExtincteurs} extincteurs
         </p>
         <p className="text-sm"> {incendie.quantites.nbBaes} BAES</p>
         <p className="text-sm">
-          {" "}
           {incendie.quantites.nbTelBaes} télécommandes BAES
         </p>
       </div>
