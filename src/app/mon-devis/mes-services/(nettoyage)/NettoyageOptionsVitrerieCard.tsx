@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { useContext } from "react";
+import { MAX_PASSAGES_VITRERIE } from "./NettoyageOptionsPropositions";
 
 type NettoyageOptionsVitrerieCardProps = {
   vitrerieProposition: {
@@ -51,7 +52,7 @@ const NettoyageOptionsVitrerieCard = ({
               type="number"
               value={nettoyage.quantites.nbPassagesVitrerie}
               min={1}
-              max={24}
+              max={MAX_PASSAGES_VITRERIE}
               step={1}
               onChange={handleChangeNbPassageVitrerie}
               className={`w-16 ${

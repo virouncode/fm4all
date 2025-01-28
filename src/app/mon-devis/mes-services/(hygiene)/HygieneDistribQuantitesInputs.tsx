@@ -14,6 +14,7 @@ import { DureeLocationHygieneType } from "@/zod-schemas/dureeLocation";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { useContext } from "react";
+import { MAX_NB_EMP, MAX_NB_PH, MAX_NB_SAVON } from "./HygienePropositions";
 
 type HygieneDistribQuantitesInputsProps = {
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
@@ -47,7 +48,7 @@ const HygieneDistribQuantitesInputs = ({
           type="number"
           value={nbDistribEmp}
           min={1}
-          max={100}
+          max={MAX_NB_EMP}
           step={1}
           onChange={(e) => handleChangeDistribNbr(e, "emp")}
           className={`w-16 ${
@@ -67,7 +68,7 @@ const HygieneDistribQuantitesInputs = ({
           type="number"
           value={nbDistribSavon}
           min={1}
-          max={100}
+          max={MAX_NB_SAVON}
           step={1}
           onChange={(e) => handleChangeDistribNbr(e, "savon")}
           className={`w-16 ${
@@ -86,7 +87,7 @@ const HygieneDistribQuantitesInputs = ({
           type="number"
           value={nbDistribPh}
           min={1}
-          max={100}
+          max={MAX_NB_PH}
           step={1}
           onChange={(e) => handleChangeDistribNbr(e, "ph")}
           className={`w-16 ${

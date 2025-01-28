@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { RATIO_CHOCO, RATIO_LAIT } from "@/constants/constants";
 import { TypesBoissonsType } from "@/constants/typesBoissons";
 import { TypesSnacksFruitsType } from "@/constants/typesSnacksFruits";
@@ -26,8 +25,10 @@ import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { useContext } from "react";
 import NextServiceButton from "../../NextServiceButton";
+import AddLotButton from "./AddLotButton";
 import CafeLotPropositionCard from "./CafeLotPropositionCard";
 import CafeLotPropositionFournisseurLogo from "./CafeLotPropositionFournisseurLogo";
+import NextLotButton from "./NextLotButton";
 
 type CafeLotPropositionsProps = {
   lot: CafeLotType;
@@ -846,61 +847,46 @@ const CafeLotPropositions = ({
 
   return (
     <div className="flex-1 flex flex-col gap-4 overflow-auto">
-      {isNaN(nbPersonnes) || nbPersonnes < 1 || nbPersonnes > 300 ? (
-        <div className="flex-1 flex justify-center items-center border rounded-xl">
-          <p className="text-center text-base">
-            Veuillez renseigner un nombre de personnes entier compris entre 1 et
-            300
-          </p>
-        </div>
-      ) : (
-        <div className="flex-1 flex flex-col border rounded-xl overflow-auto">
-          {formattedPropositions.map((propositions) => (
-            <div
-              className="flex border-b flex-1"
-              key={propositions[0].fournisseurId}
-            >
-              <CafeLotPropositionFournisseurLogo {...propositions[0]} />
-              {propositions.map((proposition) => (
-                <CafeLotPropositionCard
-                  key={proposition.id}
-                  proposition={proposition}
-                  handleClickProposition={handleClickProposition}
-                  handleClickFirstLotProposition={
-                    handleClickFirstLotProposition
-                  }
-                  lot={lot}
-                  cafeLotsMachinesIds={cafeLotsMachinesIds}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
-      )}
-      <p className="italic text-xs text-end px-2">
-        *Le nombre de machines est imposé par le nombre de personnes
-      </p>
-      {cafeLotsMachinesIds.slice(-1)[0] === lot.infos.lotId ? (
-        <div className="flex justify-end gap-4 items-center">
-          {lot.infos.gammeCafeSelected ? (
-            <Button variant="outline" size="lg" onClick={handleAddLot}>
-              Ajouter une/des machine(s)
-            </Button>
-          ) : null}
-          <NextServiceButton handleClickNext={handleClickNext} />
-        </div>
-      ) : (
-        <div className="ml-auto" onClick={handleAlert}>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleClickNextLot}
-            disabled={!lot.infos.gammeCafeSelected}
+      <div className="flex-1 flex flex-col border rounded-xl overflow-auto">
+        {formattedPropositions.map((propositions) => (
+          <div
+            className="flex border-b flex-1"
+            key={propositions[0].fournisseurId}
           >
-            Machine(s) suivante(s) ↓
-          </Button>
-        </div>
-      )}
+            <CafeLotPropositionFournisseurLogo {...propositions[0]} />
+            {propositions.map((proposition) => (
+              <CafeLotPropositionCard
+                key={proposition.id}
+                proposition={proposition}
+                handleClickProposition={handleClickProposition}
+                handleClickFirstLotProposition={handleClickFirstLotProposition}
+                lot={lot}
+                cafeLotsMachinesIds={cafeLotsMachinesIds}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+      <div className="flex flex-col gap-1">
+        <p className="italic text-xs text-end px-2">
+          *Le nombre de machines est imposé par le nombre de personnes
+        </p>
+        {cafeLotsMachinesIds.slice(-1)[0] === lot.infos.lotId ? (
+          <div className="flex justify-end gap-4 items-center">
+            {lot.infos.gammeCafeSelected ? (
+              <AddLotButton handleAddLot={handleAddLot} />
+            ) : null}
+            <NextServiceButton handleClickNext={handleClickNext} />
+          </div>
+        ) : (
+          <div className="ml-auto" onClick={handleAlert}>
+            <NextLotButton
+              disabled={lot.infos.gammeCafeSelected ? true : false}
+              handleClickNextLot={handleClickNextLot}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

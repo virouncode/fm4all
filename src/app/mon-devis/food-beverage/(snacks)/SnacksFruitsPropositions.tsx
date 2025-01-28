@@ -392,30 +392,23 @@ const SnacksFruitsPropositions = ({
 
   return (
     <div className="flex-1 flex flex-col border rounded-xl overflow-auto">
-      {isNaN(nbPersonnes) || nbPersonnes < 1 || nbPersonnes > 300 ? (
-        <div className="flex-1 flex justify-center items-center border rounded-xl p-4">
-          <p className="text-center text-base">
-            Veuillez renseigner un nombre de personnes entier compris entre 1 et
-            300
-          </p>
-        </div>
-      ) : formattedPropositions.length > 0 ? (
-        formattedPropositions.map((propositions) => (
-          <div
-            className="flex border-b flex-1"
-            key={propositions[0].fournisseurId}
-          >
-            <SnackFruitsPropositionLogo {...propositions[0]} />
-            {propositions.map((proposition) => (
-              <SnacksFruitsPropositionCard
-                key={proposition.id}
-                proposition={proposition}
-                handleClickProposition={handleClickProposition}
-              />
-            ))}
-          </div>
-        ))
-      ) : null}
+      {formattedPropositions.length > 0
+        ? formattedPropositions.map((propositions) => (
+            <div
+              className="flex border-b flex-1"
+              key={propositions[0].fournisseurId}
+            >
+              <SnackFruitsPropositionLogo {...propositions[0]} />
+              {propositions.map((proposition) => (
+                <SnacksFruitsPropositionCard
+                  key={proposition.id}
+                  proposition={proposition}
+                  handleClickProposition={handleClickProposition}
+                />
+              ))}
+            </div>
+          ))
+        : null}
     </div>
   );
 };

@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { TheContext } from "@/context/TheProvider";
@@ -13,11 +12,12 @@ import { SelectCafeQuantitesType } from "@/zod-schemas/cafeQuantites";
 import { SelectChocoConsoTarifsType } from "@/zod-schemas/chocoConsoTarifs";
 import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
-import { Trash2 } from "lucide-react";
 import { useContext } from "react";
 import CafeLotForm from "./CafeLotForm";
 import CafeLotPropositions from "./CafeLotPropositions";
+import PreviousLotButton from "./PreviousLotButton";
 import { reinitialisationCafeThe } from "./reinitialisationCafeThe";
+import RetirerLotButton from "./RetirerLotButton";
 
 type CafeMachineProps = {
   lot: CafeLotType;
@@ -47,7 +47,7 @@ const CafeLot = ({
   const { setTotalThe } = useContext(TotalTheContext);
   const cafeLotsMachinesIds = cafe.lotsMachines.map((lot) => lot.infos.lotId);
 
-  const handleClikPreviousLot = () => {
+  const handleClickPreviousLot = () => {
     const currentLotIdIndex = cafeLotsMachinesIds.indexOf(lot.infos.lotId);
     setCafe((prev) => ({
       ...prev,
@@ -100,17 +100,8 @@ const CafeLot = ({
 
   return (
     <div className="h-full flex flex-col" id={`lot_${lot.infos.lotId}`}>
-      {/* <p className="font-bold text-center mb-4">
-        Lot n°{lot.infos.lotId}
-        {lot.infos.gammeCafeSelected && (
-          <span className="font-normal">
-            {" "}
-            : {lot.quantites.nbMachines} machine(s) {lot.infos.marque}{" "}
-            {lot.infos.modele}, café {lot.infos.gammeCafeSelected}
-          </span>
-        )}
-      </p> */}
-      <div className="w-full flex justify-between items-start">
+      {/* <CafeLotSummary lot={lot} /> */}
+      <div className="w-full flex justify-between items-start py-1">
         <CafeLotForm
           lot={lot}
           cafeMachines={cafeMachines}
@@ -122,33 +113,20 @@ const CafeLot = ({
         />
         <div className="flex gap-2 items-center">
           {cafeLotsMachinesIds[0] !== lot.infos.lotId && (
-            <Button
-              variant="outline"
-              size="sm"
-              title="Machine précédente"
-              type="button"
-              onClick={handleClikPreviousLot}
-            >
-              Machine(s) précédente(s) ↑
-            </Button>
+            <PreviousLotButton
+              handleClickPreviousLot={handleClickPreviousLot}
+            />
           )}
           <div onClick={handleAlert}>
-            <Button
-              variant="destructive"
-              size="sm"
-              title="Retirer"
-              onClick={handleClickRemove}
-              type="button"
+            <RetirerLotButton
+              handleClickRemove={handleClickRemove}
               disabled={
                 cafeLotsMachinesIds[0] !== lot.infos.lotId &&
                 cafeLotsMachinesIds.slice(-1)[0] !== lot.infos.lotId
               }
-            >
-              <Trash2 />
-              {cafeLotsMachinesIds[0] === lot.infos.lotId
-                ? "Retirer tous les lots"
-                : `Retirer lot n°${lot.infos.lotId}`}
-            </Button>
+              all={cafeLotsMachinesIds[0] === lot.infos.lotId}
+              lotId={lot.infos.lotId}
+            />
           </div>
         </div>
       </div>

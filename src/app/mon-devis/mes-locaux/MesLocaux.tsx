@@ -35,6 +35,7 @@ import { ServicesContext } from "@/context/ServicesProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { TheContext } from "@/context/TheProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
+import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
@@ -51,10 +52,12 @@ import {
 } from "@/zod-schemas/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useContext } from "react";
+import { useContext, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { reinitialisationDevis } from "./reinitialisationDevis";
-import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
+
+export const MAX_SURFACE = 3000;
+export const MAX_NB_PERSONNES = 300;
 
 const MesLocaux = () => {
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
@@ -84,6 +87,7 @@ const MesLocaux = () => {
   const { setTotalFontaines } = useContext(TotalFontainesContext);
   const { setTotalOfficeManager } = useContext(TotalOfficeManagerContext);
   const { setTotalServicesFm4All } = useContext(TotalServicesFm4AllContext);
+  const dialogRef = useRef<HTMLButtonElement>(null);
 
   const router = useRouter();
   const { toast } = useToast();
@@ -189,6 +193,13 @@ const MesLocaux = () => {
     );
   };
 
+  const handleClick = () => {
+    const dialogTrigger = dialogRef.current;
+    if (dialogTrigger && !form.formState.isValid) {
+      dialogTrigger.click();
+    }
+  };
+
   return (
     <Form {...form}>
       <form
@@ -207,14 +218,14 @@ const MesLocaux = () => {
               nameInSchema="surface"
               type="number"
               min={50}
-              max={3000}
+              max={MAX_SURFACE}
             />
             <InputWithLabel<InsertClientType>
               fieldTitle="Nombre moyen de personnes*"
               nameInSchema="effectif"
               type="number"
               min={1}
-              max={300}
+              max={MAX_NB_PERSONNES}
             />
           </div>
           <div className="w-full md:w-1/2 flex flex-col gap-4 ">
@@ -232,7 +243,7 @@ const MesLocaux = () => {
         </div>
         {devisProgress.completedSteps.includes(1) ? (
           <Dialog>
-            <DialogTrigger asChild>
+            <DialogTrigger asChild ref={dialogRef} onClick={handleClick}>
               <div className="flex justify-center">
                 <Button
                   type="button"
@@ -246,30 +257,29 @@ const MesLocaux = () => {
                 </Button>
               </div>
             </DialogTrigger>
-            {form.formState.isValid && (
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Devis en cours</DialogTitle>
-                  <DialogDescription>
-                    Un devis est déjà en cours. Souaitez-vous poursuivre (vos
-                    informations de devis seront perdues) ?
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <div className="flex gap-4">
-                      <Button
-                        variant="destructive"
-                        onClick={() => form.handleSubmit(submitForm)()}
-                      >
-                        Poursuivre
-                      </Button>
-                      <Button variant="outline">Annuler</Button>
-                    </div>
-                  </DialogClose>
-                </DialogFooter>
-              </DialogContent>
-            )}
+
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Devis en cours</DialogTitle>
+                <DialogDescription>
+                  Un devis est déjà en cours. Souaitez-vous poursuivre (vos
+                  informations de devis seront perdues) ?
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <div className="flex gap-4">
+                    <Button
+                      variant="destructive"
+                      onClick={() => form.handleSubmit(submitForm)()}
+                    >
+                      Poursuivre
+                    </Button>
+                    <Button variant="outline">Annuler</Button>
+                  </div>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
           </Dialog>
         ) : (
           <div className="flex justify-center">
@@ -278,6 +288,7 @@ const MesLocaux = () => {
               size="lg"
               title="Afficher les tarifs"
               className="text-base"
+              disabled={!form.formState.isValid}
             >
               Afficher les tarifs
             </Button>

@@ -135,10 +135,9 @@ const Cafe = ({
           </div>
         )}
       </div>
-      <PropositionsFooter
-        handleClickNext={handleClickNext}
-        nextButton={!cafe.nbLotsMachines}
-      />
+      {!cafe.nbLotsMachines ? (
+        <PropositionsFooter handleClickNext={handleClickNext} />
+      ) : null}
     </div>
   );
 };

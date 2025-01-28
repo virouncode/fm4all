@@ -1,8 +1,10 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { IncendieContext } from "@/context/IncendieProvider";
 import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites";
-import { useContext } from "react";
+import {
+  MAX_NB_BAES,
+  MAX_NB_EXTINCTEURS,
+} from "./SecuriteIncendiePropositions";
 
 type SecuriteIncendieInputsProps = {
   nbExtincteurs: number;
@@ -22,7 +24,6 @@ const SecuriteIncendieInputs = ({
   handleChangeNbr,
   incendieQuantite,
 }: SecuriteIncendieInputsProps) => {
-  const { incendie } = useContext(IncendieContext);
   return (
     <div className="flex flex-col gap-6 w-3/4">
       <div className="flex gap-4 items-center  w-full">
@@ -30,11 +31,11 @@ const SecuriteIncendieInputs = ({
           type="number"
           value={nbExtincteurs}
           min={1}
-          max={100}
+          max={MAX_NB_EXTINCTEURS}
           step={1}
           onChange={(e) => handleChangeNbr(e, "extincteur")}
           className={`w-16 ${
-            incendie.quantites.nbExtincteurs === incendieQuantite.nbExtincteurs
+            nbExtincteurs === incendieQuantite.nbExtincteurs
               ? "text-destructive"
               : ""
           }`}
@@ -49,12 +50,11 @@ const SecuriteIncendieInputs = ({
           type="number"
           value={nbBaes}
           min={1}
-          max={100}
+          max={MAX_NB_BAES}
           step={1}
           onChange={(e) => handleChangeNbr(e, "baes")}
           className={`w-16 ${
-            incendie.quantites.nbBaes ===
-            Math.ceil(incendieQuantite.nbExtincteurs * 2.3)
+            nbBaes === Math.ceil(incendieQuantite.nbExtincteurs * 2.3)
               ? "text-destructive"
               : ""
           }`}
@@ -69,12 +69,10 @@ const SecuriteIncendieInputs = ({
           type="number"
           value={nbTelBaes}
           min={1}
-          max={10}
+          max={MAX_NB_BAES}
           step={1}
           onChange={(e) => handleChangeNbr(e, "telBaes")}
-          className={`w-16 ${
-            incendie.quantites.nbTelBaes === 1 ? "text-destructive" : ""
-          }`}
+          className={`w-16 ${nbTelBaes === 1 ? "text-destructive" : ""}`}
         />
         <Label htmlFor="nbTelBaes" className="text-sm flex-1">
           télécommande(s) BAES

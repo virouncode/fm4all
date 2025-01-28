@@ -7,6 +7,10 @@ import SecuriteIncendieFournisseurLogo from "./SecuriteIncendieFournisseurLogo";
 import SecuriteIncendieInputs from "./SecuriteIncendieInputs";
 import SecuriteIncendiePropostionCard from "./SecuriteIncendiePropostionCard";
 
+export const MAX_NB_EXTINCTEURS = 100;
+export const MAX_NB_BAES = 100;
+export const MAX_NB_TEL_BAES = 10;
+
 type SecuriteIncendiePropositionsProps = {
   incendieQuantite: SelectIncendieQuantitesType;
   incendieTarifs: SelectIncendieTarifsType[];
@@ -106,9 +110,11 @@ const SecuriteIncendiePropositions = ({
     const value = e.target.value;
     switch (type) {
       case "extincteur":
-        const newNbExtincteurs = value
+        let newNbExtincteurs = value
           ? parseInt(value)
           : incendieQuantite.nbExtincteurs;
+        if (newNbExtincteurs > MAX_NB_EXTINCTEURS)
+          newNbExtincteurs = MAX_NB_EXTINCTEURS;
         setIncendie((prev) => ({
           ...prev,
           quantites: { ...prev.quantites, nbExtincteurs: newNbExtincteurs },
@@ -140,9 +146,10 @@ const SecuriteIncendiePropositions = ({
         }
         return;
       case "baes":
-        const newNbBaes = value
+        let newNbBaes = value
           ? parseInt(value)
-          : incendieQuantite.nbExtincteurs * 2.3;
+          : Math.ceil(incendieQuantite.nbExtincteurs * 2.3);
+        if (newNbBaes > MAX_NB_BAES) newNbBaes = MAX_NB_BAES;
         setIncendie((prev) => ({
           ...prev,
           quantites: { ...prev.quantites, nbBaes: newNbBaes },
@@ -174,7 +181,8 @@ const SecuriteIncendiePropositions = ({
         }
         return;
       case "telBaes":
-        const newNbTelBaes = value ? parseInt(value) : 1;
+        let newNbTelBaes = value ? parseInt(value) : 1;
+        if (newNbTelBaes > MAX_NB_TEL_BAES) newNbTelBaes = MAX_NB_TEL_BAES;
         setIncendie((prev) => ({
           ...prev,
           quantites: { ...prev.quantites, nbTelBaes: newNbTelBaes },

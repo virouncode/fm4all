@@ -25,6 +25,7 @@ const SecuriteIncendiePropostionCard = ({
   handleClickProposition,
 }: SecuriteIncendiePropostionCardProps) => {
   const { incendie } = useContext(IncendieContext);
+
   return (
     <div
       className={`w-3/4 flex items-center justify-center text-xl gap-4 p-4 cursor-pointer bg-slate-100 ${

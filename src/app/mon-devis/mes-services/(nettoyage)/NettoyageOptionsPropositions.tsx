@@ -7,6 +7,8 @@ import NettoyageOptionsRepasseCard from "./NettoyageOptionsRepasseCard";
 import NettoyageOptionsSamediCard from "./NettoyageOptionsSamediCard";
 import NettoyageOptionsVitrerieCard from "./NettoyageOptionsVitrerieCard";
 
+export const MAX_PASSAGES_VITRERIE = 24;
+
 type NettoyageOptionsPropositionsProps = {
   repasseProposition: {
     id: number;
@@ -200,7 +202,9 @@ const NettoyageOptionsPropositions = ({
 
   const handleChangeNbPassageVitrerie = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    const newNbPassageVitrerie = value ? parseInt(value) : 2;
+    let newNbPassageVitrerie = value ? parseInt(value) : 2;
+    if (newNbPassageVitrerie > MAX_PASSAGES_VITRERIE)
+      newNbPassageVitrerie = MAX_PASSAGES_VITRERIE;
     setNettoyage((prev) => ({
       ...prev,
       quantites: {

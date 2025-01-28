@@ -249,9 +249,10 @@ const HygieneOptionsPropositions = ({
     const value = e.target.value;
     switch (type) {
       case "desinfectant":
-        const newNbDistribDesinfectant = value
+        let newNbDistribDesinfectant = value
           ? parseInt(value)
           : hygieneDistribQuantite.nbDistribDesinfectant;
+        if (newNbDistribDesinfectant > 100) newNbDistribDesinfectant = 100;
         setHygiene((prev) => ({
           ...prev,
           quantites: {
@@ -282,9 +283,10 @@ const HygieneOptionsPropositions = ({
         }
         return;
       case "parfum":
-        const newNbDistribParfum = value
+        let newNbDistribParfum = value
           ? parseInt(value)
           : hygieneDistribQuantite.nbDistribParfum;
+        if (newNbDistribParfum > 100) newNbDistribParfum = 100;
         setHygiene((prev) => ({
           ...prev,
           quantites: {
@@ -312,9 +314,10 @@ const HygieneOptionsPropositions = ({
         return;
 
       case "balai":
-        const newNbDistribBalai = value
+        let newNbDistribBalai = value
           ? parseInt(value)
           : hygieneDistribQuantite.nbDistribBalai;
+        if (newNbDistribBalai > 100) newNbDistribBalai = 100;
         setHygiene((prev) => ({
           ...prev,
           quantites: {
@@ -342,9 +345,10 @@ const HygieneOptionsPropositions = ({
         return;
 
       case "poubelle":
-        const newNbDistribPoubelle = value
+        let newNbDistribPoubelle = value
           ? parseInt(value)
           : hygieneDistribQuantite.nbDistribPoubelle;
+        if (newNbDistribPoubelle > 100) newNbDistribPoubelle = 100;
         setHygiene((prev) => ({
           ...prev,
           quantites: {

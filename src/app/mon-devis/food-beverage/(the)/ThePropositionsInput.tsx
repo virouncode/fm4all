@@ -1,6 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import React from "react";
+import { MAX_NB_PERSONNES } from "../../mes-locaux/MesLocaux";
 
 type ThePropositionsInputProps = {
   nbPersonnes: number;
@@ -20,7 +21,7 @@ const ThePropositionsInput = ({
           type="number"
           value={nbPersonnes}
           min={1}
-          max={300}
+          max={MAX_NB_PERSONNES}
           step={1}
           onChange={handleChange}
           className={`w-16 ${

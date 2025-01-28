@@ -16,6 +16,7 @@ import { SelectFruitsTarifsType } from "@/zod-schemas/fruitsTarifs";
 import { SelectSnacksQuantitesType } from "@/zod-schemas/snacksQuantites";
 import { SelectSnacksTarifsType } from "@/zod-schemas/snacksTarifs";
 import { useContext } from "react";
+import { MAX_NB_PERSONNES } from "../../mes-locaux/MesLocaux";
 
 type SnacksFruitsFormProps = {
   fruitsQuantites: SelectFruitsQuantitesType[];
@@ -45,7 +46,8 @@ const SnacksFruitsForm = ({
 
   const handleChangeNbPersonnes = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    const newNbPersonnes = value ? parseInt(value) : effectif;
+    let newNbPersonnes = value ? parseInt(value) : effectif;
+    if (newNbPersonnes > MAX_NB_PERSONNES) newNbPersonnes = MAX_NB_PERSONNES;
 
     if (snacksFruits.infos.gammeSelected && snacksFruits.infos.fournisseurId) {
       const fruitsTarifsPourNbPersonnes = fruitsTarifs.filter(
@@ -352,7 +354,7 @@ const SnacksFruitsForm = ({
           }`}
           type="number"
           min={1}
-          max={300}
+          max={MAX_NB_PERSONNES}
           step={1}
           value={nbPersonnes}
           onChange={handleChangeNbPersonnes}

@@ -9,6 +9,7 @@ import { ChangeEvent, useContext } from "react";
 import ThePropositionCard from "./ThePropositionCard";
 import ThePropositionFournisseurLogo from "./ThePropositionFournisseurLogo";
 import ThePropositionsInput from "./ThePropositionsInput";
+import { MAX_NB_PERSONNES } from "../../mes-locaux/MesLocaux";
 
 type ThePropositionsProps = {
   theConsoTarifs: SelectTheConsoTarifsType[];
@@ -38,11 +39,10 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
         prixAnnuel: Math.round(nbThesParAn * tarif.prixUnitaire),
       })) ?? [];
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChangeNbPersonnes = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    const newNbPersonnes = value
-      ? parseInt(value)
-      : Math.round(effectif * 0.15);
+    let newNbPersonnes = value ? parseInt(value) : Math.round(effectif * 0.15);
+    if (newNbPersonnes > MAX_NB_PERSONNES) newNbPersonnes = MAX_NB_PERSONNES;
     const nbThesParAn = newNbPersonnes * 400;
     const prixUnitaire =
       theConsoTarifs.find(
@@ -124,7 +124,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
           <ThePropositionFournisseurLogo {...propositions[0]} />
           <ThePropositionsInput
             nbPersonnes={nbPersonnes}
-            handleChange={handleChange}
+            handleChange={handleChangeNbPersonnes}
             effectif={effectif}
           />
         </div>

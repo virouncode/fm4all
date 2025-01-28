@@ -29,6 +29,7 @@ import { SelectChocoConsoTarifsType } from "@/zod-schemas/chocoConsoTarifs";
 import { DureeLocationCafeType } from "@/zod-schemas/dureeLocation";
 import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { ChangeEvent, useContext } from "react";
+import { MAX_NB_PERSONNES } from "../../mes-locaux/MesLocaux";
 
 type CafeLotFormProps = {
   lot: CafeLotType;
@@ -316,7 +317,8 @@ const CafeLotForm = ({
 
   const handleChangeNbPersonnes = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    const newNbPersonnes = value ? parseInt(value) : effectif;
+    let newNbPersonnes = value ? parseInt(value) : effectif;
+    if (newNbPersonnes > MAX_NB_PERSONNES) newNbPersonnes = MAX_NB_PERSONNES;
     //Si je n'avais pas de fournisseur, je change juste le nombre de personnes
     if (!cafe.infos.fournisseurId) {
       setCafe((prev) => ({
@@ -785,7 +787,7 @@ const CafeLotForm = ({
 
   return (
     <form className="w-2/3">
-      <div className="flex gap-8 items-center mb-6">
+      <div className="flex gap-8 items-center mb-4">
         <div>
           <RadioGroup
             onValueChange={handleChangeTypeBoissons}
@@ -814,7 +816,7 @@ const CafeLotForm = ({
             }`}
             type="number"
             min={1}
-            max={300}
+            max={MAX_NB_PERSONNES}
             step={1}
             value={nbPersonnes}
             onChange={handleChangeNbPersonnes}
