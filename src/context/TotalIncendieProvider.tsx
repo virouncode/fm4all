@@ -19,6 +19,7 @@ export const TotalIncendieContext = createContext<{
   totalIncendie: {
     totalTrilogie: null,
     totalExutoires: null,
+    totalExutoiresParking: null,
     totalAlarmes: null,
     totalPortesCoupeFeuBattantes: null,
     totalPortesCoupeFeuCoulissantes: null,
@@ -27,6 +28,7 @@ export const TotalIncendieContext = createContext<{
     totalColonnesSechesDynamiques: null,
     totalDeplacementTrilogie: null,
     totalDeplacementExutoires: null,
+    totalDeplacementExutoiresParking: null,
   },
   setTotalIncendie: () => {},
 });
@@ -38,6 +40,7 @@ const TotalIncendieProvider = ({ children }: PropsWithChildren) => {
   const [totalIncendie, setTotalIncendie] = useState<TotalIncendieType>({
     totalTrilogie: null,
     totalExutoires: null,
+    totalExutoiresParking: null,
     totalAlarmes: null,
     totalPortesCoupeFeuBattantes: null,
     totalPortesCoupeFeuCoulissantes: null,
@@ -46,6 +49,7 @@ const TotalIncendieProvider = ({ children }: PropsWithChildren) => {
     totalColonnesSechesDynamiques: null,
     totalDeplacementTrilogie: null,
     totalDeplacementExutoires: null,
+    totalDeplacementExutoiresParking: null,
   });
 
   useEffect(() => {
