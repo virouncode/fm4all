@@ -299,12 +299,14 @@ export const reinitialisationDevis = (
       gammeSelected: null,
       remplace: false,
       commentaires: null,
+      premium: false,
     },
     quantites: {
       demiJParSemaine: null,
     },
     prix: {
       demiTjm: null,
+      demiTjmPremium: null,
     },
   });
   setServicesFm4All({

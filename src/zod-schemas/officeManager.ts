@@ -8,12 +8,14 @@ export const officeManagerSchema = z.object({
     gammeSelected: z.enum(["essentiel", "confort", "excellence"]).nullable(),
     remplace: z.boolean(),
     commentaires: z.string().nullable(),
+    premium: z.boolean().default(false),
   }),
   quantites: z.object({
     demiJParSemaine: z.number().nullable(),
   }),
   prix: z.object({
     demiTjm: z.number().nullable(),
+    demiTjmPremium: z.number().nullable(),
   }),
 });
 

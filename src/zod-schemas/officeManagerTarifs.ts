@@ -7,6 +7,8 @@ export const selectOfficeManagerTarifsSchema = createSelectSchema(
   {
     demiTjm: (schema) =>
       schema.min(1, "Le tarif demi-journalier doit être supérieur à 1"),
+    demiTjmPremium: (schema) =>
+      schema.min(1, "Le tarif demi-journalier premium doit être supérieur à 1"),
   }
 ).extend({
   nomFournisseur: z.string().nonempty("Nom de fournisseur invalide"),

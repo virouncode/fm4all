@@ -68,6 +68,7 @@ export const getOfficeManagerTarifs = async () => {
     const data = validatedResults.map((result) => ({
       ...result,
       demiTjm: result.demiTjm / RATIO,
+      demiTjmPremium: result.demiTjmPremium / RATIO,
     }));
 
     return data;

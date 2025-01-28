@@ -505,6 +505,7 @@ export const officeManagerTarifs = pgTable("office_manager_tarifs", {
     .notNull()
     .references(() => fournisseurs.id),
   demiTjm: integer("demi_tjm").notNull(),
+  demiTjmPremium: integer("demi_tjm_premium").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

@@ -23,12 +23,14 @@ export const OfficeManagerContext = createContext<{
       gammeSelected: null,
       remplace: false,
       commentaires: null,
+      premium: false,
     },
     quantites: {
       demiJParSemaine: null,
     },
     prix: {
       demiTjm: null,
+      demiTjmPremium: null,
     },
   },
   setOfficeManager: () => {},
@@ -46,12 +48,14 @@ const OfficeManagerProvider = ({ children }: PropsWithChildren) => {
       gammeSelected: null,
       remplace: false,
       commentaires: null,
+      premium: false,
     },
     quantites: {
       demiJParSemaine: null,
     },
     prix: {
       demiTjm: null,
+      demiTjmPremium: null,
     },
   });
 

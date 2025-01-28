@@ -1,3 +1,4 @@
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
@@ -8,22 +9,27 @@ type OfficeManagerInputsProps = {
   demiJParSemaineEssentiel: number | null;
   handleChangeDemiJParSemaine: (
     value: number[],
-    demiTjm: number | null
+    demiTauxJournalier: number | null
   ) => void;
   demiTjm: number | null;
+  demiTjmPremium: number | null;
   handleChangeRemplace: (value: string) => void;
+  handleCheckPremium: (checked: boolean) => void;
 };
 
 const OfficeManagerInputs = ({
   demiJParSemaineEssentiel,
   handleChangeDemiJParSemaine,
   handleChangeRemplace,
+  handleCheckPremium,
   demiTjm,
+  demiTjmPremium,
 }: OfficeManagerInputsProps) => {
   const { officeManager } = useContext(OfficeManagerContext);
+
   return (
     <>
-      <div className="flex gap-4 items-center flex-col  w-full">
+      <div className="flex gap-2 items-center flex-col  w-full">
         <Slider
           value={[
             (officeManager.quantites.demiJParSemaine ||
@@ -31,7 +37,10 @@ const OfficeManagerInputs = ({
               1,
           ]}
           onValueChange={(value: number[]) =>
-            handleChangeDemiJParSemaine(value, demiTjm)
+            handleChangeDemiJParSemaine(
+              value,
+              officeManager.infos.premium ? demiTjmPremium : demiTjm
+            )
           }
           min={1}
           max={20}
@@ -40,6 +49,17 @@ const OfficeManagerInputs = ({
         <Label htmlFor="demiJParSemaine" className="text-sm flex-1">
           {officeManager.quantites.demiJParSemaine || demiJParSemaineEssentiel}{" "}
           demi journée(s) / semaine
+        </Label>
+      </div>
+      <div className="flex gap-2 justify-center items-center">
+        <Checkbox
+          id="premium"
+          className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+          checked={officeManager.infos.premium}
+          onCheckedChange={handleCheckPremium}
+        />
+        <Label htmlFor="premium" className="text-sm flex-1">
+          Anglais courant + bureautique
         </Label>
       </div>
       <div>

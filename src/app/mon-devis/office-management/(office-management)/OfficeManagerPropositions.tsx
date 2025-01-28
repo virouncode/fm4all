@@ -50,17 +50,24 @@ const OfficeManagerPropositions = ({
 
   const formattedPropositions = officeManagerTarifs.map((tarif) => {
     let { fournisseurId, nomFournisseur, slogan } = tarif;
-    const { id, demiTjm } = tarif;
+    const { id, demiTjm, demiTjmPremium } = tarif;
     if (fournisseurId === 14) {
       fournisseurId = 15;
       nomFournisseur = "FM4ALL";
       slogan = "L'office management pour tous";
     }
+    const demiTauxJournalier = officeManager.infos.premium
+      ? demiTjmPremium
+      : demiTjm;
     const prixAnnuel =
       demiJParSemaine !== null && majoration !== null
         ? officeManager.infos.remplace
-          ? Math.round(demiJParSemaine * demiTjm * 52 * (1 + majoration / 100))
-          : Math.round(demiJParSemaine * demiTjm * 47 * (1 + majoration / 100))
+          ? Math.round(
+              demiJParSemaine * demiTauxJournalier * 52 * (1 + majoration / 100)
+            )
+          : Math.round(
+              demiJParSemaine * demiTauxJournalier * 47 * (1 + majoration / 100)
+            )
         : null;
 
     return {
@@ -71,6 +78,7 @@ const OfficeManagerPropositions = ({
       prixAnnuel,
       demiJParSemaine,
       demiTjm,
+      demiTjmPremium,
     };
   });
 
@@ -82,6 +90,7 @@ const OfficeManagerPropositions = ({
     prixAnnuel: number | null;
     demiJParSemaine: number | null;
     demiTjm: number;
+    demiTjmPremium: number;
   }) => {
     const {
       fournisseurId,
@@ -90,6 +99,7 @@ const OfficeManagerPropositions = ({
       prixAnnuel,
       demiJParSemaine,
       demiTjm,
+      demiTjmPremium,
     } = proposition;
 
     if (
@@ -109,6 +119,7 @@ const OfficeManagerPropositions = ({
         },
         prix: {
           demiTjm: null,
+          demiTjmPremium: null,
         },
       }));
       setTotalOfficeManager({
@@ -138,6 +149,7 @@ const OfficeManagerPropositions = ({
       },
       prix: {
         demiTjm,
+        demiTjmPremium,
       },
     }));
     setTotalOfficeManager({
@@ -147,7 +159,7 @@ const OfficeManagerPropositions = ({
 
   const handleChangeDemiJParSemaine = (
     value: number[],
-    demiTjm: number | null
+    demiTauxJournalier: number | null
   ) => {
     setOfficeManager({
       ...officeManager,
@@ -167,10 +179,14 @@ const OfficeManagerPropositions = ({
           ? 5
           : 0;
       const prixAnnuel =
-        demiTjm !== null
+        demiTauxJournalier !== null
           ? officeManager.infos.remplace
-            ? Math.round(value[0] * demiTjm * 52 * (1 + newMajoration / 100))
-            : Math.round(value[0] * demiTjm * 47 * (1 + newMajoration / 100))
+            ? Math.round(
+                value[0] * demiTauxJournalier * 52 * (1 + newMajoration / 100)
+              )
+            : Math.round(
+                value[0] * demiTauxJournalier * 47 * (1 + newMajoration / 100)
+              )
           : null;
       setTotalOfficeManager({
         totalService: prixAnnuel,
@@ -201,20 +217,75 @@ const OfficeManagerPropositions = ({
             ? 5
             : 0
           : null;
+      const demiTauxJournalier = officeManager.infos.premium
+        ? officeManager.prix.demiTjmPremium
+        : officeManager.prix.demiTjm;
       const prixAnnuel =
         demiJParSemaine !== null &&
-        officeManager.prix.demiTjm !== null &&
+        demiTauxJournalier !== null &&
         newMajoration !== null
           ? value === "remplace"
             ? Math.round(
                 demiJParSemaine *
-                  officeManager.prix.demiTjm *
+                  demiTauxJournalier *
                   52 *
                   (1 + newMajoration / 100)
               )
             : Math.round(
                 demiJParSemaine *
-                  officeManager.prix.demiTjm *
+                  demiTauxJournalier *
+                  47 *
+                  (1 + newMajoration / 100)
+              )
+          : null;
+      setTotalOfficeManager({
+        totalService: prixAnnuel,
+      });
+    }
+  };
+
+  const handleCheckPremium = (checked: boolean) => {
+    setOfficeManager((prev) => ({
+      ...prev,
+      infos: {
+        ...prev.infos,
+        premium: checked,
+      },
+    }));
+    if (officeManager.infos.gammeSelected) {
+      const demiJParSemaine =
+        officeManager.quantites.demiJParSemaine || demiJParSemaineEssentiel;
+      const newMajoration =
+        demiJParSemaine !== null
+          ? demiJParSemaine <= 1
+            ? 20
+            : demiJParSemaine <= 2
+            ? 15
+            : demiJParSemaine <= 3
+            ? 10
+            : demiJParSemaine <= 4
+            ? 5
+            : 0
+          : null;
+      const demiTauxJournalier = checked
+        ? officeManager.prix.demiTjmPremium
+        : officeManager.prix.demiTjm;
+      console.log("demiTauxJournalier", demiTauxJournalier);
+
+      const prixAnnuel =
+        demiJParSemaine !== null &&
+        demiTauxJournalier !== null &&
+        newMajoration !== null
+          ? officeManager.infos.remplace === true
+            ? Math.round(
+                demiJParSemaine *
+                  demiTauxJournalier *
+                  52 *
+                  (1 + newMajoration / 100)
+              )
+            : Math.round(
+                demiJParSemaine *
+                  demiTauxJournalier *
                   47 *
                   (1 + newMajoration / 100)
               )
@@ -242,6 +313,8 @@ const OfficeManagerPropositions = ({
                     handleChangeDemiJParSemaine={handleChangeDemiJParSemaine}
                     handleChangeRemplace={handleChangeRemplace}
                     demiTjm={proposition.demiTjm}
+                    demiTjmPremium={proposition.demiTjmPremium}
+                    handleCheckPremium={handleCheckPremium}
                   />
                 </div>
                 <OfficeManagerPropositionCard

@@ -12,6 +12,7 @@ type OfficeManagerPropositionCardProps = {
     prixAnnuel: number | null;
     demiJParSemaine: number | null;
     demiTjm: number;
+    demiTjmPremium: number;
   };
   handleClickProposition: (proposition: {
     id: number;
@@ -21,6 +22,7 @@ type OfficeManagerPropositionCardProps = {
     prixAnnuel: number | null;
     demiJParSemaine: number | null;
     demiTjm: number;
+    demiTjmPremium: number;
   }) => void;
   demiJParSemaineConfort: number | null;
   demiJParSemaineExcellence: number | null;
