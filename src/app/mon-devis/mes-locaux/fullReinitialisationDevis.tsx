@@ -178,6 +178,7 @@ export const fullReinitialisationDevis = (
       nbBaes: null,
       nbTelBaes: null,
       nbExutoires: null,
+      nbExutoiresParking: null,
       nbAlarmes: null,
       nbPortesCoupeFeuBattantes: null,
       nbPortesCoupeFeuCoulissantes: null,
@@ -190,6 +191,7 @@ export const fullReinitialisationDevis = (
       prixParBaes: null,
       prixParTelBaes: null,
       prixParExutoire: null,
+      prixParExutoireParking: null,
       prixParAlarme: null,
       prixParPorteCoupeFeuBattante: null,
       prixParProteCoupeFeuCoulissante: null,
@@ -198,6 +200,7 @@ export const fullReinitialisationDevis = (
       prixParColonneSecheDynamique: null,
       fraisDeplacementTrilogie: null,
       fraisDeplacementExutoires: null,
+      fraisDeplacementExutoiresParking: null,
     },
   });
   setCafe({
@@ -382,6 +385,7 @@ export const fullReinitialisationDevis = (
   setTotalIncendie({
     totalTrilogie: null,
     totalExutoires: null,
+    totalExutoiresParking: null,
     totalAlarmes: null,
     totalPortesCoupeFeuBattantes: null,
     totalPortesCoupeFeuCoulissantes: null,
@@ -390,6 +394,7 @@ export const fullReinitialisationDevis = (
     totalColonnesSechesDynamiques: null,
     totalDeplacementTrilogie: null,
     totalDeplacementExutoires: null,
+    totalDeplacementExutoiresParking: null,
   });
   setTotalCafe({
     totalMachines: [
