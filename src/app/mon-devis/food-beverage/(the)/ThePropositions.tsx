@@ -3,6 +3,7 @@ import { ClientContext } from "@/context/ClientProvider";
 import { TheContext } from "@/context/TheProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { roundEffectif } from "@/lib/roundEffectif";
+import { roundNbPersonnesCafeConso } from "@/lib/roundNbPersonnesCafeConso";
 import { GammeType } from "@/zod-schemas/gamme";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { ChangeEvent, useContext } from "react";
@@ -31,12 +32,15 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
     theConsoTarifs
       ?.filter(
         (tarif) =>
-          tarif.effectif === roundEffectif(nbPersonnes / 0.15) &&
+          tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes / 0.15) &&
           tarif.fournisseurId === cafe.infos.fournisseurId
       )
       .map((tarif) => ({
         ...tarif,
-        prixAnnuel: Math.round(nbThesParAn * tarif.prixUnitaire),
+        prixAnnuel:
+          tarif.prixUnitaire !== null
+            ? Math.round(nbThesParAn * tarif.prixUnitaire)
+            : null,
       })) ?? [];
 
   const handleChangeNbPersonnes = (e: ChangeEvent<HTMLInputElement>) => {
@@ -74,7 +78,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
   };
 
   const handleClickProposition = (proposition: {
-    prixAnnuel: number;
+    prixAnnuel: number | null;
     id: number;
     nomFournisseur: string;
     slogan: string | null;
@@ -82,7 +86,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
     fournisseurId: number;
     gamme: GammeType;
     effectif: number;
-    prixUnitaire: number;
+    prixUnitaire: number | null;
     infos: string | null;
   }) => {
     const { gamme, prixAnnuel, prixUnitaire } = proposition;

@@ -91,7 +91,7 @@ const CafeEspace = ({
   const handleAlert = () => {
     if (cafeEspacesIds.slice(-1)[0] !== espace.infos.espaceId) {
       toast({
-        description: "Veuillez d'abord retirer les machines suivantes",
+        description: "Veuillez d'abord retirer les espaces suivants",
         variant: "destructive",
         duration: 3000,
       });

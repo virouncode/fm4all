@@ -7,28 +7,28 @@ import { useContext } from "react";
 
 type ThePropositionCardProps = {
   proposition: {
-    prixAnnuel: number;
+    prixAnnuel: number | null;
     id: number;
-    effectif: number;
-    createdAt: Date;
-    infos: string | null;
-    fournisseurId: number;
     nomFournisseur: string;
-    prixUnitaire: number;
     slogan: string | null;
+    createdAt: Date;
+    fournisseurId: number;
     gamme: GammeType;
+    effectif: number;
+    prixUnitaire: number | null;
+    infos: string | null;
   };
   handleClickProposition: (proposition: {
-    prixAnnuel: number;
+    prixAnnuel: number | null;
     id: number;
-    effectif: number;
-    createdAt: Date;
-    infos: string | null;
-    fournisseurId: number;
     nomFournisseur: string;
-    prixUnitaire: number;
     slogan: string | null;
+    createdAt: Date;
+    fournisseurId: number;
     gamme: GammeType;
+    effectif: number;
+    prixUnitaire: number | null;
+    infos: string | null;
   }) => void;
   nbTassesParJour: number;
 };
@@ -39,9 +39,9 @@ const ThePropositionCard = ({
   nbTassesParJour,
 }: ThePropositionCardProps) => {
   const { the } = useContext(TheContext);
-  const prixMensuelText = `${formatNumber(
-    proposition.prixAnnuel / 12
-  )} € / mois*`;
+  const prixMensuelText = proposition.prixAnnuel
+    ? `${formatNumber(proposition.prixAnnuel / 12)} € / mois*`
+    : "Non proposé";
   const color = getFm4AllColor(proposition.gamme);
   return (
     <div
@@ -52,14 +52,18 @@ const ThePropositionCard = ({
       } px-8`}
       onClick={() => handleClickProposition(proposition)}
     >
-      <Checkbox
-        checked={the.infos.gammeSelected === proposition.gamme}
-        onCheckedChange={() => handleClickProposition(proposition)}
-        className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-      />
+      {proposition.prixAnnuel ? (
+        <Checkbox
+          checked={the.infos.gammeSelected === proposition.gamme}
+          onCheckedChange={() => handleClickProposition(proposition)}
+          className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+        />
+      ) : null}
       <div>
         <p className="font-bold">{prixMensuelText}</p>
-        <p className="text-sm">Consommables ~ {nbTassesParJour} tasses / j</p>
+        {proposition.prixAnnuel ? (
+          <p className="text-sm">Consommables ~ {nbTassesParJour} tasses / j</p>
+        ) : null}
       </div>
     </div>
   );

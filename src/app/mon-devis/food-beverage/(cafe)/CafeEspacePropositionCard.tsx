@@ -114,17 +114,19 @@ const CafeEspacePropositionCard = ({
           : handleClickProposition(proposition)
       }
     >
-      <Checkbox
-        checked={
-          espace.infos.gammeCafeSelected === gamme &&
-          cafe.infos.fournisseurId === proposition.fournisseurId
-        }
-        onCheckedChange={() => () =>
-          cafeEspacesIds[0] === espace.infos.espaceId
-            ? handleClickFirstEspaceProposition(proposition)
-            : handleClickProposition(proposition)}
-        className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-      />
+      {proposition.totalAnnuel ? (
+        <Checkbox
+          checked={
+            espace.infos.gammeCafeSelected === gamme &&
+            cafe.infos.fournisseurId === proposition.fournisseurId
+          }
+          onCheckedChange={() => () =>
+            cafeEspacesIds[0] === espace.infos.espaceId
+              ? handleClickFirstEspaceProposition(proposition)
+              : handleClickProposition(proposition)}
+          className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+        />
+      ) : null}
       <div>
         <p className="font-bold">{prixMensuelText}</p>
         {prixInstallationText && (

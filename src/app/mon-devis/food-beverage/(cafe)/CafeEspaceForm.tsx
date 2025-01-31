@@ -19,8 +19,8 @@ import { TheContext } from "@/context/TheProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { toast } from "@/hooks/use-toast";
-import { roundNbPersonnesCafe } from "@/lib/roundNbPersonnesCafe";
-import { roundNbPersonnesTotalCafe } from "@/lib/roundNbPersonnesTotalCafe";
+import { roundNbPersonnesCafeConso } from "@/lib/roundNbPersonnesCafeConso";
+import { roundNbPersonnesCafeMachines } from "@/lib/roundNbPersonnesCafeMachines";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine";
@@ -102,7 +102,7 @@ const CafeEspaceForm = ({
     //J'ai un fournisseur, je dois mettre à jour les prix et les caractéristiques de la machine
     const machinesTarifFournisseur = cafeMachinesTarifs.find(
       (tarif) =>
-        tarif.nbPersonnes === roundNbPersonnesCafe(nbPersonnes) &&
+        tarif.nbPersonnes === roundNbPersonnesCafeMachines(nbPersonnes) &&
         tarif.type === value &&
         tarif.fournisseurId === cafe.infos.fournisseurId &&
         tarif[cafe.infos.dureeLocation] !== null
@@ -246,13 +246,13 @@ const CafeEspaceForm = ({
     const prixUnitaireConsoCafe =
       cafeConsoTarifs.find(
         (item) =>
-          item.effectif === roundNbPersonnesTotalCafe(nbPersonnesTotal) &&
+          item.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
           item.fournisseurId === cafe.infos.fournisseurId &&
           item.gamme === espace.infos.gammeCafeSelected
       )?.prixUnitaire ?? null;
     const consoLaitTarifFournisseur = laitConsoTarifs.find(
       (item) =>
-        item.effectif === roundNbPersonnesTotalCafe(nbPersonnesTotal) &&
+        item.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
         item.fournisseurId === cafe.infos.fournisseurId
     );
     const typeLait =
@@ -268,7 +268,7 @@ const CafeEspaceForm = ({
 
     const consoChocolatTarifFournisseur = chocolatConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesTotalCafe(nbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const typeChocolat =
@@ -282,7 +282,7 @@ const CafeEspaceForm = ({
 
     const consoSucreTarifFournisseur = sucreConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesTotalCafe(nbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const prixUnitaireConsoSucre =
@@ -393,7 +393,7 @@ const CafeEspaceForm = ({
     //Si j'avais deja un fournisseur
     const machinesTarifFournisseur = cafeMachinesTarifs.find(
       (tarif) =>
-        tarif.nbPersonnes === roundNbPersonnesCafe(newNbPersonnes) &&
+        tarif.nbPersonnes === roundNbPersonnesCafeMachines(newNbPersonnes) &&
         tarif.type === espace.infos.typeBoissons &&
         tarif.fournisseurId === cafe.infos.fournisseurId &&
         tarif[cafe.infos.dureeLocation] !== null
@@ -536,13 +536,13 @@ const CafeEspaceForm = ({
     const prixUnitaireConsoCafe =
       cafeConsoTarifs.find(
         (item) =>
-          item.effectif === roundNbPersonnesTotalCafe(nbPersonnesTotal) &&
+          item.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
           item.fournisseurId === cafe.infos.fournisseurId &&
           item.gamme === espace.infos.gammeCafeSelected
       )?.prixUnitaire ?? null;
     const consoLaitTarifFournisseur = laitConsoTarifs.find(
       (item) =>
-        item.effectif === roundNbPersonnesTotalCafe(nbPersonnesTotal) &&
+        item.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
         item.fournisseurId === cafe.infos.fournisseurId
     );
     const typeLait =
@@ -558,7 +558,7 @@ const CafeEspaceForm = ({
 
     const consoChocolatTarifFournisseur = chocolatConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesTotalCafe(nbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const typeChocolat =
@@ -574,7 +574,7 @@ const CafeEspaceForm = ({
 
     const consoSucreTarifFournisseur = sucreConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesTotalCafe(nbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const prixUnitaireConsoSucre =
@@ -668,7 +668,7 @@ const CafeEspaceForm = ({
     //Si j'ai un fournisseur, je dois mettre à jour les prix et les caractéristiques de la machine
     const machinesTarifFournisseur = cafeMachinesTarifs.find(
       (tarif) =>
-        tarif.nbPersonnes === roundNbPersonnesCafe(nbPersonnes) &&
+        tarif.nbPersonnes === roundNbPersonnesCafeMachines(nbPersonnes) &&
         tarif.type === espace.infos.typeBoissons &&
         tarif[value as DureeLocationCafeType] !== null &&
         tarif.fournisseurId === cafe.infos.fournisseurId
@@ -765,13 +765,13 @@ const CafeEspaceForm = ({
     const prixUnitaireConsoCafe =
       cafeConsoTarifs.find(
         (item) =>
-          item.effectif === roundNbPersonnesTotalCafe(nbPersonnesTotal) &&
+          item.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
           item.fournisseurId === cafe.infos.fournisseurId &&
           item.gamme === espace.infos.gammeCafeSelected
       )?.prixUnitaire ?? null;
     const consoLaitTarifFournisseur = laitConsoTarifs.find(
       (item) =>
-        item.effectif === roundNbPersonnesTotalCafe(nbPersonnesTotal) &&
+        item.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
         item.fournisseurId === cafe.infos.fournisseurId
     );
     const typeLait =
@@ -787,7 +787,7 @@ const CafeEspaceForm = ({
 
     const consoChocolatTarifFournisseur = chocolatConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesTotalCafe(nbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const typeChocolat =
@@ -801,7 +801,7 @@ const CafeEspaceForm = ({
 
     const consoSucreTarifFournisseur = sucreConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesTotalCafe(nbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const prixUnitaireConsoSucre =
