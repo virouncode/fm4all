@@ -89,10 +89,19 @@ const HygieneOptionsPoubelleCard = ({
       {propositions.map((proposition) => {
         const gamme = proposition.gamme;
         const color = getFm4AllColor(gamme);
-        const prixMensuelPoubelleText = proposition.totalPoubelle
-          ? `${formatNumber(proposition.totalPoubelle / 12)} € / mois`
-          : "Non proposé";
-
+        if (!proposition.totalPoubelle) {
+          return (
+            <div
+              className={`flex-1 bg-${color} text-xl font-bold text-slate-200 flex items-center justify-center p-2`}
+              key={"poubelle" + gamme}
+            >
+              <p>Non proposé</p>
+            </div>
+          );
+        }
+        const prixMensuelPoubelleText = `${formatNumber(
+          proposition.totalPoubelle / 12
+        )} € / mois`;
         return (
           <div
             className={`flex flex-1 bg-${color} text-slate-200 items-center p-2 justify-center text-xl gap-4 cursor-pointer ${

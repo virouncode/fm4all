@@ -85,10 +85,19 @@ const HygieneOptionsDesinfectantCard = ({
       {propositions.map((proposition) => {
         const gamme = proposition.gamme;
         const color = getFm4AllColor(gamme);
-        const prixMensuelDesinfectantText = proposition.totalDesinfectant
-          ? `${formatNumber(proposition.totalDesinfectant / 12)} € / mois`
-          : "Non proposé";
-
+        if (!proposition.totalDesinfectant) {
+          return (
+            <div
+              className={`flex flex-1 bg-${color} text-slate-200 items-center p-2 justify-center text-xl gap-4 `}
+              key={"desinfectant" + gamme}
+            >
+              Non proposé
+            </div>
+          );
+        }
+        const prixMensuelDesinfectantText = `${formatNumber(
+          proposition.totalDesinfectant / 12
+        )} € / mois`;
         return (
           <div
             className={`flex flex-1 bg-${color} text-slate-200 items-center p-2 justify-center text-xl gap-4 cursor-pointer ${

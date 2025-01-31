@@ -38,6 +38,7 @@ const NettoyageOptionsVitrerieCard = ({
   color,
 }: NettoyageOptionsVitrerieCardProps) => {
   const { nettoyage } = useContext(NettoyageContext);
+
   const vitreriePrixMensuelText = vitrerieProposition.prixAnnuel
     ? `${formatNumber(vitrerieProposition.prixAnnuel / 12)} € / mois`
     : "Non proposé";
@@ -70,26 +71,34 @@ const NettoyageOptionsVitrerieCard = ({
           </p>
         </div>
       </div>
-      <div
-        className={`flex w-3/4 items-center p-4 justify-center ${
-          nettoyage.infos.vitrerieSelected
-            ? "ring-4 ring-inset ring-destructive"
-            : ""
-        } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
-        onClick={() => handleClickVitrerieProposition(vitrerieProposition)}
-      >
-        <Checkbox
-          checked={nettoyage.infos.vitrerieSelected}
-          onCheckedChange={() =>
-            handleClickVitrerieProposition(vitrerieProposition)
-          }
-          className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-        />
-        <div>
-          <p className="font-bold">{vitreriePrixMensuelText}</p>
-          <p className="text-sm">{nbPassagesVitrerieText}</p>
+      {vitrerieProposition.prixAnnuel ? (
+        <div
+          className={`flex w-3/4 items-center p-4 justify-center ${
+            nettoyage.infos.vitrerieSelected
+              ? "ring-4 ring-inset ring-destructive"
+              : ""
+          } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
+          onClick={() => handleClickVitrerieProposition(vitrerieProposition)}
+        >
+          <Checkbox
+            checked={nettoyage.infos.vitrerieSelected}
+            onCheckedChange={() =>
+              handleClickVitrerieProposition(vitrerieProposition)
+            }
+            className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+          />
+          <div>
+            <p className="font-bold">{vitreriePrixMensuelText}</p>
+            <p className="text-sm">{nbPassagesVitrerieText}</p>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div
+          className={`flex w-3/4 items-center p-4 justify-center bg-${color} text-slate-200 items-center justify-center text-2xl gap-4`}
+        >
+          Non proposé
+        </div>
+      )}
     </div>
   );
 };

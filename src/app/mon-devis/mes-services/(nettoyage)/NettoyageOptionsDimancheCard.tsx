@@ -21,9 +21,24 @@ const NettoyageOptionsDimancheCard = ({
   color,
 }: NettoyageOptionsDimancheCardProps) => {
   const { nettoyage } = useContext(NettoyageContext);
-  const dimanchePrixMensuelText = dimancheProposition.prixAnnuel
-    ? `${formatNumber(dimancheProposition.prixAnnuel / 12)} € / mois`
-    : "Non proposé";
+  if (!dimancheProposition.prixAnnuel) {
+    return (
+      <div className="flex border-b flex-1">
+        <div className="flex w-1/4 items-center justify-center text-base text-center p-4">
+          Nettoyage supplémentaire tous les Dimanche
+        </div>
+        <div
+          className={`flex w-3/4 items-center p-4 justify-center bg-${color} text-slate-200 items-center justify-center text-2xl gap-4`}
+        >
+          Non proposé
+        </div>
+      </div>
+    );
+  }
+  const dimanchePrixMensuelText = `${formatNumber(
+    dimancheProposition.prixAnnuel / 12
+  )} € / mois`;
+
   const diamncheNbPassagesParSemaineText = `1 passage de ${nettoyage.quantites.hParPassage} h / semaine en plus`;
   return (
     <div className="flex border-b flex-1">
@@ -35,7 +50,7 @@ const NettoyageOptionsDimancheCard = ({
           nettoyage.infos.dimancheSelected
             ? "ring-4 ring-inset ring-destructive"
             : ""
-        } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
+        } bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer`}
         onClick={() => handleClickDimancheProposition(dimancheProposition)}
       >
         <Checkbox

@@ -39,9 +39,18 @@ const HygienePropositionCard = ({
   const { hygiene } = useContext(HygieneContext);
   const gamme = proposition.gamme;
   const color = getFm4AllColor(gamme);
-  const prixMensuelText = proposition.prixAnnuelTrilogie
-    ? `${formatNumber(proposition.prixAnnuelTrilogie / 12)} € / mois`
-    : "Non proposé";
+  if (!proposition.prixAnnuelTrilogie) {
+    return (
+      <div
+        className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 p-4`}
+      >
+        Non proposé
+      </div>
+    );
+  }
+  const prixMensuelText = `${formatNumber(
+    proposition.prixAnnuelTrilogie / 12
+  )} € / mois`;
   const prixInstallationText = prixInstalDistrib
     ? `+ ${formatNumber(prixInstalDistrib)} € d'installation`
     : "";
@@ -51,7 +60,7 @@ const HygienePropositionCard = ({
         hygiene.infos.trilogieGammeSelected === gamme
           ? "ring-4 ring-inset ring-destructive"
           : ""
-      } px-8`}
+      }`}
       onClick={() => handleClickProposition(proposition)}
     >
       <Checkbox

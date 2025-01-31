@@ -39,9 +39,16 @@ const NettoyagePropositionCard = ({
   const { nettoyage } = useContext(NettoyageContext);
   const gamme = proposition.gamme;
   const color = getFm4AllColor(gamme);
-  const prixMensuelText = proposition.prixAnnuel
-    ? `${Math.round(proposition.prixAnnuel / 12)} € / mois`
-    : "Non proposé";
+  if (!proposition.prixAnnuel) {
+    return (
+      <div
+        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4`}
+      >
+        Non proposé
+      </div>
+    );
+  }
+  const prixMensuelText = `${Math.round(proposition.prixAnnuel / 12)} € / mois`;
   const hParSemaineText =
     proposition.hParPassage && proposition.freqAnnuelle
       ? `${formatNumber(

@@ -46,9 +46,18 @@ const OfficeManagerPropositionCard = ({
         : "fm4allexcellence"
       : "";
 
-  const prixMensuelText = proposition.prixAnnuel
-    ? `${formatNumber(proposition.prixAnnuel / 12)} € / mois*`
-    : "Non proposé";
+  if (!proposition.prixAnnuel) {
+    return (
+      <div
+        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4`}
+      >
+        Non proposé
+      </div>
+    );
+  }
+  const prixMensuelText = `${formatNumber(
+    proposition.prixAnnuel / 12
+  )} € / mois*`;
   const demiJParSemaineText =
     proposition.demiJParSemaine !== null
       ? `${proposition.demiJParSemaine / 2} j / semaine`

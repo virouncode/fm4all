@@ -71,7 +71,7 @@ const NettoyageOptionsRepasseCard = ({
         </div>
       ) : (
         <div
-          className={`flex w-3/4 items-center p-4 justify-center bg-${color} text-slate-200 items-center justify-center text-lg gap-4 cursor-pointer`}
+          className={`flex w-3/4 items-center p-4 justify-center bg-${color} text-slate-200 items-center justify-center text-lg gap-4`}
         >
           Non proposé pour une frequence annuelle de passage de moins de 260 j /
           an

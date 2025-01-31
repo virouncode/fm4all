@@ -116,9 +116,7 @@ const SnacksFruitsPropositionCard = ({
       </div>
     );
   }
-  const prixMensuelText = proposition.total
-    ? `${Math.round(proposition.total / 12)} € / mois`
-    : "Non proposé";
+  const prixMensuelText = `${Math.round(proposition.total / 12)} € / mois`;
   const gFruitsParSemaineParPersonneText = snacksFruits.infos.choix.includes(
     "fruits"
   )

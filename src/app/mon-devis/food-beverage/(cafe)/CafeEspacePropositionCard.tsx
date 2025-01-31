@@ -94,9 +94,20 @@ const CafeEspacePropositionCard = ({
   const { cafe } = useContext(CafeContext);
   const gamme = proposition.gamme;
   const color = getFm4AllColor(gamme);
-  const prixMensuelText = proposition.totalAnnuel
-    ? `${Math.round(proposition.totalAnnuel / 12)} € / mois`
-    : "Non proposé";
+
+  if (!proposition.totalAnnuel) {
+    return (
+      <div
+        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4`}
+      >
+        Non proposé
+      </div>
+    );
+  }
+
+  const prixMensuelText = `${Math.round(
+    proposition.totalAnnuel / 12
+  )} € / mois`;
   const prixInstallationText = proposition.totalInstallation
     ? `+ ${formatNumber(proposition.totalInstallation)} € d'installation`
     : "";
@@ -132,39 +143,36 @@ const CafeEspacePropositionCard = ({
         {prixInstallationText && (
           <p className="text-base">{prixInstallationText}</p>
         )}
-        {proposition.totalAnnuel ? (
-          <>
-            <p className="text-xs">
-              {proposition.nbMachines} machine(s) {proposition.marque}{" "}
-              {proposition.modele}{" "}
-              {proposition.reconditionne ? " reconditionnée(s)" : ""}
-            </p>
-            <p className="text-xs">
-              Consommables ~ {proposition.nbTassesParJ} tasses / j
-            </p>
-            <p className="text-xs">
-              Maintenance: {proposition.nbPassagesParAn} passages / an
-            </p>
-            {proposition.infos && (
-              <p className="text-xs">Café : {proposition.infos}</p>
-            )}
-            {proposition.typeLait === "dosettes" && (
-              <p className="text-xs">Lait en dosettes</p>
-            )}
-            {proposition.typeLait === "frais" && (
-              <p className="text-xs">Lait frais</p>
-            )}
-            {proposition.typeLait === "poudre" && (
-              <p className="text-xs">Lait en poudre machine</p>
-            )}
-            {proposition.typeChocolat === "sachets" && (
-              <p className="text-xs">Chocolat en sachets</p>
-            )}
-            {proposition.typeChocolat === "poudre" && (
-              <p className="text-xs">Chocolat en poudre machine</p>
-            )}
-          </>
-        ) : null}
+
+        <p className="text-xs">
+          {proposition.nbMachines} machine(s) {proposition.marque}{" "}
+          {proposition.modele}{" "}
+          {proposition.reconditionne ? " reconditionnée(s)" : ""}
+        </p>
+        <p className="text-xs">
+          Consommables ~ {proposition.nbTassesParJ} tasses / j
+        </p>
+        <p className="text-xs">
+          Maintenance: {proposition.nbPassagesParAn} passages / an
+        </p>
+        {proposition.infos && (
+          <p className="text-xs">Café : {proposition.infos}</p>
+        )}
+        {proposition.typeLait === "dosettes" && (
+          <p className="text-xs">Lait en dosettes</p>
+        )}
+        {proposition.typeLait === "frais" && (
+          <p className="text-xs">Lait frais</p>
+        )}
+        {proposition.typeLait === "poudre" && (
+          <p className="text-xs">Lait en poudre machine</p>
+        )}
+        {proposition.typeChocolat === "sachets" && (
+          <p className="text-xs">Chocolat en sachets</p>
+        )}
+        {proposition.typeChocolat === "poudre" && (
+          <p className="text-xs">Chocolat en poudre machine</p>
+        )}
       </div>
     </div>
   );

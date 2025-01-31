@@ -46,9 +46,16 @@ const MaintenancePropositionCard = ({
   const { maintenance } = useContext(MaintenanceContext);
   const gamme = proposition.gamme;
   const color = getFm4AllColor(gamme);
-  const prixMensuelText = proposition.total
-    ? `${Math.round(proposition.total / 12)} € / mois`
-    : "Non proposé";
+  if (!proposition.total) {
+    return (
+      <div
+        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4`}
+      >
+        Non proposé
+      </div>
+    );
+  }
+  const prixMensuelText = `${Math.round(proposition.total / 12)} € / mois`;
   return (
     <div
       className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4 cursor-pointer ${

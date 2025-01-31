@@ -39,10 +39,20 @@ const ThePropositionCard = ({
   nbTassesParJour,
 }: ThePropositionCardProps) => {
   const { the } = useContext(TheContext);
-  const prixMensuelText = proposition.prixAnnuel
-    ? `${formatNumber(proposition.prixAnnuel / 12)} € / mois*`
-    : "Non proposé";
   const color = getFm4AllColor(proposition.gamme);
+  if (!proposition.prixAnnuel) {
+    return (
+      <div
+        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4`}
+      >
+        Non proposé
+      </div>
+    );
+  }
+  const prixMensuelText = `${formatNumber(
+    proposition.prixAnnuel / 12
+  )} € / mois*`;
+
   return (
     <div
       className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${

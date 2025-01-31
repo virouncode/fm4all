@@ -85,10 +85,19 @@ const HygieneOptionsBalaiCard = ({
       {propositions.map((proposition) => {
         const gamme = proposition.gamme;
         const color = getFm4AllColor(gamme);
-        const prixMensuelBalaiText = proposition.totalBalai
-          ? `${formatNumber(proposition.totalBalai / 12)} € / mois`
-          : "Non proposé";
-
+        if (!proposition.totalBalai) {
+          return (
+            <div
+              className={`flex flex-1 bg-${color} text-slate-200 items-center p-2 justify-center text-xl gap-4 `}
+              key={"balai" + gamme}
+            >
+              Non proposé
+            </div>
+          );
+        }
+        const prixMensuelBalaiText = `${formatNumber(
+          proposition.totalBalai / 12
+        )} € / mois`;
         return (
           <div
             className={`flex flex-1 bg-${color} text-slate-200 items-center p-2 justify-center text-xl gap-4 cursor-pointer ${

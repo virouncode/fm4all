@@ -85,9 +85,19 @@ const HygieneOptionsParfumCard = ({
       {propositions.map((proposition) => {
         const gamme = proposition.gamme;
         const color = getFm4AllColor(gamme);
-        const prixMensuelParfumText = proposition.totalParfum
-          ? `${formatNumber(proposition.totalParfum / 12)} € / mois`
-          : "Non proposé";
+        if (!proposition.totalParfum) {
+          return (
+            <div
+              className={`flex flex-1 bg-${color} text-slate-200 items-center p-2 justify-center text-xl gap-4 `}
+              key={"parfum" + gamme}
+            >
+              Non proposé
+            </div>
+          );
+        }
+        const prixMensuelParfumText = `${formatNumber(
+          proposition.totalParfum / 12
+        )} € / mois`;
         return (
           <div
             className={`flex flex-1 bg-${color} text-slate-200 items-center p-2 justify-center text-xl gap-4 cursor-pointer ${
