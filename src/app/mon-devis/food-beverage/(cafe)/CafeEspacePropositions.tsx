@@ -101,10 +101,10 @@ const CafeEspacePropositions = ({
     );
   }
 
-  // const fournisseursIds =
-  //   cafe.infos.fournisseurId && cafeEspacesIds[0] !== espace.infos.espaceId
-  //     ? [cafe.infos.fournisseurId] //1 seul fournisseur
-  //     : machinesTarifs?.map(({ fournisseurId }) => fournisseurId); //tous les fournisseurs
+  const fournisseursIds =
+    cafe.infos.fournisseurId && cafeEspacesIds[0] !== espace.infos.espaceId
+      ? [cafe.infos.fournisseurId] //1 seul fournisseur
+      : machinesTarifs?.map(({ fournisseurId }) => fournisseurId); //tous les fournisseurs
 
   const nbTassesParAn = nbPersonnes * 400;
 
@@ -119,9 +119,9 @@ const CafeEspacePropositions = ({
   );
   const propositions = cafeConsoTarifs
     .filter(
-      (tarif) => tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal)
-      // &&
-      // fournisseursIds.includes(tarif.fournisseurId)
+      (tarif) =>
+        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+        fournisseursIds.includes(tarif.fournisseurId)
     )
     .map((tarif) => {
       const {
