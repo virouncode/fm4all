@@ -72,6 +72,8 @@ const Cafe = ({
           infos: {
             espaceId: 1,
             typeBoissons: "cafe",
+            typeLait: null,
+            typeChocolat: null,
             gammeCafeSelected: null,
             marque: null,
             modele: null,
