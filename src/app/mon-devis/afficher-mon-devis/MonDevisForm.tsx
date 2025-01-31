@@ -76,7 +76,6 @@ const MonDevisForm = () => {
   };
 
   const submitForm = async (data: UpdateClientType) => {
-    console.log(data);
     if (
       !departements.find(({ id }) => id === data.codePostal?.substring(0, 2))
     ) {

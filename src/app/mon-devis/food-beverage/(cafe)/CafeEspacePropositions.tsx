@@ -78,12 +78,10 @@ const CafeEspacePropositions = ({
       tarif.nbPersonnes === roundNbPersonnesCafeMachines(nbPersonnes) &&
       tarif.type === espace.infos.typeBoissons
   ); //1 ligne par fournisseur
-  console.log("machinesTarifs", machinesTarifs);
 
   const fournisseursCompatiblesIds = machinesTarifs
     ?.filter((tarif) => tarif[cafe.infos.dureeLocation] !== null)
     .map(({ fournisseurId }) => fournisseurId);
-  console.log("fournisseursCompatiblesIds", fournisseursCompatiblesIds);
 
   if (
     cafe.infos.fournisseurId &&
@@ -111,10 +109,12 @@ const CafeEspacePropositions = ({
   const nbPersonnesTotal = cafe.espaces.reduce(
     (acc, curr) =>
       acc +
-      (curr.quantites.nbPersonnes ||
-        (effectif > MAX_NB_PERSONNES_PAR_ESPACE
-          ? MAX_NB_PERSONNES_PAR_ESPACE
-          : effectif)),
+      (curr.infos.gammeCafeSelected !== null
+        ? curr.quantites.nbPersonnes ||
+          (effectif > MAX_NB_PERSONNES_PAR_ESPACE
+            ? MAX_NB_PERSONNES_PAR_ESPACE
+            : effectif)
+        : 0),
     0
   );
   const propositions = cafeConsoTarifs
@@ -150,6 +150,7 @@ const CafeEspacePropositions = ({
       const totalInstallation = prixInstal !== null ? prixInstal : null;
       //CAFE
       const prixUnitaireConsoCafe = prixUnitaire;
+
       //LAIT
       const consoLaitTarifFournisseur = laitConsoTarifs.find(
         (tarif) =>
@@ -202,9 +203,12 @@ const CafeEspacePropositions = ({
         (espace.infos.typeBoissons === "chocolat"
           ? (prixUnitaireConsoChocolat ?? 0) * nbTassesParAn * RATIO_CHOCO
           : 0);
-      console.log("totalConso", totalConso);
-      console.log("totalLoc", totalLoc);
-      console.log("prixUnitaireCafe", prixUnitaireConsoCafe);
+
+      if (fournisseurId === 3 && gamme === "essentiel") {
+        console.log("totalConso", totalConso);
+        console.log("prixUnitaitreConsoCafe", prixUnitaireConsoCafe);
+        console.log("nbTassesParAn", nbTassesParAn);
+      }
 
       const totalAnnuel = totalLoc !== null ? totalLoc + totalConso : null;
       //Modele

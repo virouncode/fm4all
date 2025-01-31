@@ -398,7 +398,6 @@ const CafeEspaceForm = ({
         tarif.fournisseurId === cafe.infos.fournisseurId &&
         tarif[cafe.infos.dureeLocation] !== null
     );
-    console.log("machinesTarifFournisseur", machinesTarifFournisseur);
 
     //Il se peut que mon fournisseur n'ait pas de tarif pour ces critères
     if (!machinesTarifFournisseur) {

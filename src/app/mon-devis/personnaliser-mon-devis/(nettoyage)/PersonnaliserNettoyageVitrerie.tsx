@@ -31,13 +31,6 @@ const PersonnaliserNettoyageVitrerie = () => {
     const minFacturationVitrerie = nettoyage.prix.minFacturationVitrerie;
     const newSurface = value ? parseInt(value) : (client.surface ?? 0) * 0.15;
     if (name === "vitres") {
-      console.log("newSufrace", newSurface);
-      console.log("surfaceCloisons", nettoyage.quantites.surfaceCloisons);
-      console.log("cadenceVitres", cadenceVitres);
-      console.log("cadenceCloisons", cadenceCloisons);
-      console.log("tauxHoraireVitrerie", tauxHoraireVitrerie);
-      console.log("minFacturationVitrerie", minFacturationVitrerie);
-
       const surfaceCloisons = nettoyage.quantites.surfaceCloisons;
       const totalVitrerieParPassage =
         cadenceVitres !== null &&
@@ -51,8 +44,6 @@ const PersonnaliserNettoyageVitrerie = () => {
               minFacturationVitrerie ?? 0
             )
           : null;
-
-      console.log("totalVitrerieParPassage", totalVitrerieParPassage);
 
       const totalVitrerie =
         totalVitrerieParPassage !== null

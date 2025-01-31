@@ -79,7 +79,6 @@ const SauvegarderProgression = () =>
       insertDevisAction,
       {
         onSuccess: ({ data }) => {
-          console.log("data", data);
           toast({
             variant: "default",
             title: "Succès ! 🎉",

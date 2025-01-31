@@ -18,7 +18,6 @@ const PersonnaliserNettoyageCommentaires = () => {
     const currentIndex = personnalisation.personnalisationIds.indexOf(
       personnalisation.currentPersonnalisationId as number
     );
-    console.log("currentIndex", currentIndex);
 
     setPersonnalisation((prev) => ({
       ...prev,

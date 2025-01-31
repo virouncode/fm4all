@@ -33,7 +33,6 @@ const CityOut = ({ destination }: CityOutProps) => {
     insertClientCityOutAction,
     {
       onSuccess: ({ data }) => {
-        console.log("data", data);
         toast({
           variant: "default",
           title: "Succès ! 🎉",

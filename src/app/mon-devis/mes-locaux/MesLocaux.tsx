@@ -119,7 +119,6 @@ const MesLocaux = () => {
         `https://geo.api.gouv.fr/communes?codePostal=${dataToPost.codePostal}`
       );
       const cityData = await response.json();
-      console.log(cityData);
 
       if (cityData.length === 0) {
         setDevisProgress({ ...devisProgress, completedSteps: [] });

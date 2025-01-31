@@ -270,7 +270,6 @@ const OfficeManagerPropositions = ({
       const demiTauxJournalier = checked
         ? officeManager.prix.demiTjmPremium
         : officeManager.prix.demiTjm;
-      console.log("demiTauxJournalier", demiTauxJournalier);
 
       const prixAnnuel =
         demiJParSemaine !== null &&
