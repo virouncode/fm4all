@@ -22,6 +22,7 @@ import ServicesProvider from "@/context/ServicesProvider";
 import SnacksFruitsProvider from "@/context/SnacksFruitsProvider";
 import TheProvider from "@/context/TheProvider";
 import TotalCafeProvider from "@/context/TotalCafeProvider";
+import TotalFontainesProvider from "@/context/TotalFontainesProvider";
 import TotalHygieneProvider from "@/context/TotalHygieneProvider";
 import TotalIncendieProvider from "@/context/TotalIncendieProvider";
 import TotalMaintenanceProvider from "@/context/TotalMaintenanceProvider";
@@ -32,7 +33,6 @@ import TotalSnacksFruitsProvider from "@/context/TotalSnacksFruitsProvider";
 import TotalTheProvider from "@/context/TotalTheProvider";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
-import TotalFontainesProvider from "@/context/TotalFontainesProvider";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",

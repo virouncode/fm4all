@@ -23,11 +23,11 @@ const TotalFontaines = () => {
             .filter(
               (item) =>
                 totalFontaines.totalLotsFontaines.find(
-                  ({ lotId }) => lotId === item.infos.lotId
+                  ({ espaceId }) => espaceId === item.infos.espaceId
                 )?.total ?? 0 > 0
             )
             .map((item) => (
-              <div key={item.infos.lotId} className="flex flex-col">
+              <div key={item.infos.espaceId} className="flex flex-col">
                 <div
                   className="flex items-center justify-between 
                   )} font-bold"
@@ -39,21 +39,21 @@ const TotalFontaines = () => {
                   <p>
                     {formatNumber(
                       totalFontaines.totalLotsFontaines.find(
-                        (total) => total.lotId === item.infos.lotId
+                        (total) => total.espaceId === item.infos.espaceId
                       )?.total ?? 0
                     )}{" "}
                     € HT/an
                   </p>
                 </div>
                 {totalFontaines.totalLotsFontaines.find(
-                  (total) => total.lotId === item.infos.lotId
+                  (total) => total.espaceId === item.infos.espaceId
                 )?.totalInstallation ? (
                   <div className="flex items-center justify-between">
                     <p>Installation</p>
                     <p>
                       {formatNumber(
                         totalFontaines.totalLotsFontaines.find(
-                          (total) => total.lotId === item.infos.lotId
+                          (total) => total.espaceId === item.infos.espaceId
                         )?.totalInstallation ?? 0
                       )}{" "}
                       € HT

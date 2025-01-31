@@ -4,62 +4,62 @@ import { TheContext } from "@/context/TheProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { toast } from "@/hooks/use-toast";
-import { CafeLotType } from "@/zod-schemas/cafe";
+import { CafeEspaceType } from "@/zod-schemas/cafe";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine";
 import { SelectCafeMachinesTarifsType } from "@/zod-schemas/cafeMachinesTarifs";
-import { SelectCafeQuantitesType } from "@/zod-schemas/cafeQuantites";
-import { SelectChocoConsoTarifsType } from "@/zod-schemas/chocoConsoTarifs";
+import { SelectChocolatConsoTarifsType } from "@/zod-schemas/chocolatConsoTarifs";
 import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
+import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { useContext } from "react";
-import CafeLotForm from "./CafeLotForm";
-import CafeLotPropositions from "./CafeLotPropositions";
-import PreviousLotButton from "./PreviousLotButton";
+import CafeEspaceForm from "./CafeEspaceForm";
+import CafeEspacePropositions from "./CafeEspacePropositions";
+import PreviousEspaceButton from "./PreviousEspaceButton";
 import { reinitialisationCafeThe } from "./reinitialisationCafeThe";
-import RetirerLotButton from "./RetirerLotButton";
+import RetirerEspaceButton from "./RetirerEspaceButton";
 
 type CafeMachineProps = {
-  lot: CafeLotType;
+  espace: CafeEspaceType;
   cafeMachines: SelectCafeMachinesType[];
-  cafeQuantites: SelectCafeQuantitesType[];
   cafeMachinesTarifs: SelectCafeMachinesTarifsType[];
   cafeConsoTarifs: SelectCafeConsoTarifsType[];
   laitConsoTarifs: SelectLaitConsoTarifsType[];
-  chocoConsoTarifs: SelectChocoConsoTarifsType[];
+  chocolatConsoTarifs: SelectChocolatConsoTarifsType[];
   theConsoTarifs: SelectTheConsoTarifsType[];
+  sucreConsoTarifs: SelectSucreConsoTarifsType[];
 };
 
-const CafeLot = ({
-  lot,
+const CafeEspace = ({
+  espace,
   cafeMachines,
-  cafeQuantites,
   cafeMachinesTarifs,
   cafeConsoTarifs,
   laitConsoTarifs,
-  chocoConsoTarifs,
+  chocolatConsoTarifs,
   theConsoTarifs,
+  sucreConsoTarifs,
 }: CafeMachineProps) => {
   const { client } = useContext(ClientContext);
   const { cafe, setCafe } = useContext(CafeContext);
   const { setThe } = useContext(TheContext);
   const { setTotalCafe } = useContext(TotalCafeContext);
   const { setTotalThe } = useContext(TotalTheContext);
-  const cafeLotsMachinesIds = cafe.lotsMachines.map((lot) => lot.infos.lotId);
+  const cafeEspacesIds = cafe.espaces.map((espace) => espace.infos.espaceId);
 
-  const handleClickPreviousLot = () => {
-    const currentLotIdIndex = cafeLotsMachinesIds.indexOf(lot.infos.lotId);
+  const handleClickPreviousEspace = () => {
+    const currentEspaceIdIndex = cafeEspacesIds.indexOf(espace.infos.espaceId);
     setCafe((prev) => ({
       ...prev,
       infos: {
         ...prev.infos,
-        currentLotId: prev.lotsMachines[currentLotIdIndex - 1].infos.lotId,
+        currentEspaceId: prev.espaces[currentEspaceIdIndex - 1].infos.espaceId,
       },
     }));
   };
 
   const handleClickRemove = () => {
-    if (cafeLotsMachinesIds[0] === lot.infos.lotId) {
+    if (cafeEspacesIds[0] === espace.infos.espaceId) {
       //Je reinitialise tout
       reinitialisationCafeThe(
         setCafe,
@@ -70,26 +70,26 @@ const CafeLot = ({
       );
       return;
     }
-    const indexOfCurrentLot = cafeLotsMachinesIds.indexOf(lot.infos.lotId);
+    const indexOfCurrentEspace = cafeEspacesIds.indexOf(espace.infos.espaceId);
     setCafe((prev) => ({
       ...prev,
       infos: {
         ...prev.infos,
-        currentLotId: cafeLotsMachinesIds[indexOfCurrentLot - 1],
+        currentEspaceId: cafeEspacesIds[indexOfCurrentEspace - 1],
       },
-      lotsMachines: prev.lotsMachines.filter(
-        (item) => item.infos.lotId !== lot.infos.lotId
+      espaces: prev.espaces.filter(
+        (item) => item.infos.espaceId !== espace.infos.espaceId
       ),
     }));
     setTotalCafe((prev) => ({
-      totalMachines: prev.totalMachines.filter(
-        (item) => item.lotId !== lot.infos.lotId
+      totalEspaces: prev.totalEspaces.filter(
+        (item) => item.espaceId !== espace.infos.espaceId
       ),
     }));
   };
 
   const handleAlert = () => {
-    if (cafeLotsMachinesIds.slice(-1)[0] !== lot.infos.lotId) {
+    if (cafeEspacesIds.slice(-1)[0] !== espace.infos.espaceId) {
       toast({
         description: "Veuillez d'abord retirer les machines suivantes",
         variant: "destructive",
@@ -99,49 +99,52 @@ const CafeLot = ({
   };
 
   return (
-    <div className="h-full flex flex-col" id={`lot_${lot.infos.lotId}`}>
-      {/* <CafeLotSummary lot={lot} /> */}
+    <div
+      className="h-full flex flex-col"
+      id={`espace_${espace.infos.espaceId}`}
+    >
+      {/* <CafeEspaceSummary espace={espace} /> */}
       <div className="w-full flex justify-between items-start py-1">
-        <CafeLotForm
-          lot={lot}
+        <CafeEspaceForm
+          espace={espace}
           cafeMachines={cafeMachines}
-          cafeQuantites={cafeQuantites}
           cafeMachinesTarifs={cafeMachinesTarifs}
           cafeConsoTarifs={cafeConsoTarifs}
           laitConsoTarifs={laitConsoTarifs}
-          chocoConsoTarifs={chocoConsoTarifs}
+          chocolatConsoTarifs={chocolatConsoTarifs}
+          sucreConsoTarifs={sucreConsoTarifs}
         />
         <div className="flex gap-2 items-center">
-          {cafeLotsMachinesIds[0] !== lot.infos.lotId && (
-            <PreviousLotButton
-              handleClickPreviousLot={handleClickPreviousLot}
+          {cafeEspacesIds[0] !== espace.infos.espaceId && (
+            <PreviousEspaceButton
+              handleClickPreviousEspace={handleClickPreviousEspace}
             />
           )}
           <div onClick={handleAlert}>
-            <RetirerLotButton
+            <RetirerEspaceButton
               handleClickRemove={handleClickRemove}
               disabled={
-                cafeLotsMachinesIds[0] !== lot.infos.lotId &&
-                cafeLotsMachinesIds.slice(-1)[0] !== lot.infos.lotId
+                cafeEspacesIds[0] !== espace.infos.espaceId &&
+                cafeEspacesIds.slice(-1)[0] !== espace.infos.espaceId
               }
-              all={cafeLotsMachinesIds[0] === lot.infos.lotId}
-              lotId={lot.infos.lotId}
+              all={cafeEspacesIds[0] === espace.infos.espaceId}
+              espaceId={espace.infos.espaceId}
             />
           </div>
         </div>
       </div>
-      <CafeLotPropositions
+      <CafeEspacePropositions
         cafeMachines={cafeMachines}
-        cafeQuantites={cafeQuantites}
         cafeMachinesTarifs={cafeMachinesTarifs}
         cafeConsoTarifs={cafeConsoTarifs}
         laitConsoTarifs={laitConsoTarifs}
-        chocoConsoTarifs={chocoConsoTarifs}
+        chocolatConsoTarifs={chocolatConsoTarifs}
         theConsoTarifs={theConsoTarifs}
-        lot={lot}
+        sucreConsoTarifs={sucreConsoTarifs}
+        espace={espace}
       />
     </div>
   );
 };
 
-export default CafeLot;
+export default CafeEspace;

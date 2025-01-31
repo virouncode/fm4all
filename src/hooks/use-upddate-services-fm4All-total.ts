@@ -40,7 +40,7 @@ export const useUpddateServicesFm4AllTotal = () => {
       .filter((item) => item !== null)
       .reduce((sum, value) => sum + value, 0);
     //TODO voir pour les prix one shot d'installation
-    const totalFinalCafe = totalCafe.totalMachines
+    const totalFinalCafe = totalCafe.totalEspaces
       .map(({ total }) => total ?? 0)
       .reduce((acc, curr) => acc + curr, 0);
 
@@ -97,7 +97,7 @@ export const useUpddateServicesFm4AllTotal = () => {
     servicesFm4All.prix.tauxSupportAdmin,
     servicesFm4All.prix.tauxSupportOp,
     setTotalServicesFm4All,
-    totalCafe.totalMachines,
+    totalCafe.totalEspaces,
     totalHygiene,
     totalIncendie,
     totalMaintenance,

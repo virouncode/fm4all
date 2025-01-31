@@ -21,7 +21,7 @@ export const selectClientSchema = createSelectSchema(clients, {
   emailContact: (schema) => schema.email("Adresse email invalide"),
   phoneContact: (schema) =>
     schema.regex(
-      /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{3,5}[-.\s]?\d{3,5}$/,
+      /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{2,4}([-.\s]?\d{2,4}){2,3}$/,
       "Numéro de téléphone invalide"
     ),
   surface: (schema) =>
@@ -61,7 +61,7 @@ export const insertClientSchema = createInsertSchema(clients, {
   emailContact: (schema) => schema.email("Adresse email invalide"),
   phoneContact: (schema) =>
     schema.regex(
-      /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{3,5}[-.\s]?\d{3,5}$/,
+      /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{2,4}([-.\s]?\d{2,4}){2,3}$/,
       "Numéro de téléphone invalide"
     ),
   surface: (schema) =>
@@ -101,7 +101,7 @@ export const updateClientSchema = createUpdateSchema(clients, {
   emailContact: (schema) => schema.email("Adresse email invalide"),
   phoneContact: (schema) =>
     schema.regex(
-      /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{3,5}[-.\s]?\d{3,5}$/,
+      /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{2,4}([-.\s]?\d{2,4}){2,3}$/,
       "Numéro de téléphone invalide, format attendu : XX XX XX XX XX"
     ),
   surface: (schema) =>

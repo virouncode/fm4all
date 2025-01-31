@@ -1,5 +1,6 @@
 "use client";
 
+import { MAX_NB_PERSONNES_PAR_ESPACE } from "@/app/mon-devis/food-beverage/(cafe)/CafeEspacePropositions";
 import { useClientOnly } from "@/hooks/use-client-only";
 import { CafeType } from "@/zod-schemas/cafe";
 import {
@@ -22,12 +23,12 @@ export const CafeContext = createContext<{
       fournisseurId: null,
       nomFournisseur: null,
       sloganFournisseur: null,
-      currentLotId: 1,
+      currentEspaceId: 1,
       dureeLocation: "pa12M",
       commentaires: null,
     },
-    nbLotsMachines: 0,
-    lotsMachines: [],
+    nbEspaces: 0,
+    espaces: [],
   },
   setCafe: () => {},
 });
@@ -42,32 +43,39 @@ const CafeProvider = ({ children }: PropsWithChildren) => {
       fournisseurId: null,
       nomFournisseur: null,
       sloganFournisseur: null,
-      currentLotId: 1,
+      currentEspaceId: 1,
       dureeLocation: "pa12M",
       commentaires: null,
     },
-    nbLotsMachines: 1,
-    lotsMachines: [
+    nbEspaces: 1,
+    espaces: [
       {
         infos: {
-          lotId: 1,
+          espaceId: 1,
           typeBoissons: "cafe",
+          typeLait: null,
+          typeChocolat: null,
           gammeCafeSelected: null,
           marque: null,
           modele: null,
           reconditionne: false,
         },
         quantites: {
-          nbPersonnes: client.effectif ?? 0,
+          nbPersonnes:
+            client.effectif > MAX_NB_PERSONNES_PAR_ESPACE
+              ? MAX_NB_PERSONNES_PAR_ESPACE
+              : client.effectif ?? 0,
           nbMachines: null,
+          nbPassagesParAn: null,
         },
         prix: {
-          prixUnitaireLoc: null,
-          prixUnitaireInstal: null,
-          prixUnitaireMaintenance: null,
+          prixLoc: null,
+          prixInstal: null,
+          prixMaintenance: null,
           prixUnitaireConsoCafe: null,
           prixUnitaireConsoLait: null,
           prixUnitaireConsoChocolat: null,
+          prixUnitaireConsoSucre: null,
         },
       },
     ],

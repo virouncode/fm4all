@@ -5,7 +5,7 @@ export const fontainesSchema = z.object({
     fournisseurId: z.number().nullable(),
     nomFournisseur: z.string().nullable(),
     sloganFournisseur: z.string().nullable(),
-    currentLotId: z.number().nullable(),
+    currentEspaceId: z.number().nullable(),
     dureeLocation: z
       .enum(["pa12M", "pa24M", "pa36M", "pa48M", "pa60M", "oneShot"])
       .default("pa12M"),
@@ -15,7 +15,7 @@ export const fontainesSchema = z.object({
   lotsFontaines: z.array(
     z.object({
       infos: z.object({
-        lotId: z.number(),
+        espaceId: z.number(),
         typeEau: z.enum(["EF", "EFC", "EFG", "EFCG"]),
         typePose: z.enum(["aposer", "colonne", "comptoir"]),
         marque: z.string().nullable(),

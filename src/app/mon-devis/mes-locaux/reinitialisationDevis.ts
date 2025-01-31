@@ -26,6 +26,7 @@ import {
   TotalSnacksFruitsType,
   TotalTheType,
 } from "@/zod-schemas/total";
+import { MAX_NB_PERSONNES_PAR_ESPACE } from "../food-beverage/(cafe)/CafeEspacePropositions";
 
 export const reinitialisationDevis = (
   surface: number,
@@ -188,32 +189,39 @@ export const reinitialisationDevis = (
       fournisseurId: null,
       nomFournisseur: null,
       sloganFournisseur: null,
-      currentLotId: 1,
+      currentEspaceId: 1,
       dureeLocation: "pa12M",
       commentaires: null,
     },
-    nbLotsMachines: 1,
-    lotsMachines: [
+    nbEspaces: 1,
+    espaces: [
       {
         infos: {
-          lotId: 1,
+          espaceId: 1,
           typeBoissons: "cafe",
+          typeLait: null,
+          typeChocolat: null,
           gammeCafeSelected: null,
           marque: null,
           modele: null,
           reconditionne: null,
         },
         quantites: {
-          nbPersonnes: effectif,
+          nbPersonnes:
+            effectif > MAX_NB_PERSONNES_PAR_ESPACE
+              ? MAX_NB_PERSONNES_PAR_ESPACE
+              : effectif ?? 0,
           nbMachines: null,
+          nbPassagesParAn: null,
         },
         prix: {
-          prixUnitaireLoc: null,
-          prixUnitaireInstal: null,
-          prixUnitaireMaintenance: null,
+          prixLoc: null,
+          prixInstal: null,
+          prixMaintenance: null,
           prixUnitaireConsoCafe: null,
           prixUnitaireConsoLait: null,
           prixUnitaireConsoChocolat: null,
+          prixUnitaireConsoSucre: null,
         },
       },
     ],
@@ -261,7 +269,7 @@ export const reinitialisationDevis = (
       fournisseurId: null,
       nomFournisseur: null,
       sloganFournisseur: null,
-      currentLotId: 1,
+      currentEspaceId: 1,
       dureeLocation: "pa12M",
       commentaires: null,
     },
@@ -269,7 +277,7 @@ export const reinitialisationDevis = (
     lotsFontaines: [
       {
         infos: {
-          lotId: 1,
+          espaceId: 1,
           typeEau: "EF",
           typePose: "aposer",
           marque: null,
@@ -379,9 +387,9 @@ export const reinitialisationDevis = (
     totalDeplacementExutoiresParking: null,
   });
   setTotalCafe({
-    totalMachines: [
+    totalEspaces: [
       {
-        lotId: 1,
+        espaceId: 1,
         total: null,
         totalInstallation: null,
       },
@@ -400,7 +408,7 @@ export const reinitialisationDevis = (
   setTotalFontaines({
     totalLotsFontaines: [
       {
-        lotId: 1,
+        espaceId: 1,
         total: null,
         totalInstallation: null,
       },

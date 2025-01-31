@@ -4,39 +4,39 @@ import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
-import useScrollIntoCafeLot from "@/hooks/use-scroll-into-cafe-lot";
+import useScrollIntoCafeEspace from "@/hooks/use-scroll-into-cafe-espace";
 import useScrollIntoFood from "@/hooks/use-scroll-into-food";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine";
 import { SelectCafeMachinesTarifsType } from "@/zod-schemas/cafeMachinesTarifs";
-import { SelectCafeQuantitesType } from "@/zod-schemas/cafeQuantites";
-import { SelectChocoConsoTarifsType } from "@/zod-schemas/chocoConsoTarifs";
+import { SelectChocolatConsoTarifsType } from "@/zod-schemas/chocolatConsoTarifs";
 import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
+import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { Coffee } from "lucide-react";
 import { useContext } from "react";
 import PropositionsFooter from "../../PropositionsFooter";
 import PropositionsTitle from "../../PropositionsTitle";
-import CafeLot from "./CafeLot";
+import CafeEspace from "./CafeEspace";
 
 type CafeProps = {
   cafeMachines: SelectCafeMachinesType[];
-  cafeQuantites: SelectCafeQuantitesType[];
   cafeMachinesTarifs: SelectCafeMachinesTarifsType[];
   cafeConsoTarifs: SelectCafeConsoTarifsType[];
   laitConsoTarifs: SelectLaitConsoTarifsType[];
-  chocoConsoTarifs: SelectChocoConsoTarifsType[];
+  chocolatConsoTarifs: SelectChocolatConsoTarifsType[];
   theConsoTarifs: SelectTheConsoTarifsType[];
+  sucreConsoTarifs: SelectSucreConsoTarifsType[];
 };
 
 const Cafe = ({
   cafeMachines,
-  cafeQuantites,
   cafeMachinesTarifs,
   cafeConsoTarifs,
   laitConsoTarifs,
-  chocoConsoTarifs,
+  chocolatConsoTarifs,
   theConsoTarifs,
+  sucreConsoTarifs,
 }: CafeProps) => {
   const { client } = useContext(ClientContext);
   const { setFoodBeverage } = useContext(FoodBeverageContext);
@@ -44,7 +44,7 @@ const Cafe = ({
   const { setTotalCafe } = useContext(TotalCafeContext);
   const effectif = client.effectif ?? 0;
   useScrollIntoFood();
-  useScrollIntoCafeLot();
+  useScrollIntoCafeEspace();
 
   const handleClickPrevious = () => {};
 
@@ -63,14 +63,14 @@ const Cafe = ({
     }));
   };
 
-  const handleAddLot = () => {
+  const handleAddEspace = () => {
     setCafe((prev) => ({
       ...prev,
-      nbLotsMachines: 1,
-      lotsMachines: [
+      nbEspaces: 1,
+      espaces: [
         {
           infos: {
-            lotId: 1,
+            espaceId: 1,
             typeBoissons: "cafe",
             gammeCafeSelected: null,
             marque: null,
@@ -80,20 +80,22 @@ const Cafe = ({
           quantites: {
             nbPersonnes: effectif,
             nbMachines: null,
+            nbPassagesParAn: null,
           },
           prix: {
-            prixUnitaireLoc: null,
-            prixUnitaireInstal: null,
-            prixUnitaireMaintenance: null,
+            prixLoc: null,
+            prixInstal: null,
+            prixMaintenance: null,
             prixUnitaireConsoCafe: null,
             prixUnitaireConsoLait: null,
             prixUnitaireConsoChocolat: null,
+            prixUnitaireConsoSucre: null,
           },
         },
       ],
     }));
     setTotalCafe({
-      totalMachines: [{ lotId: 1, total: 0, totalInstallation: 0 }],
+      totalEspaces: [{ espaceId: 1, total: 0, totalInstallation: 0 }],
     });
   };
 
@@ -108,18 +110,18 @@ const Cafe = ({
         previousButton={false}
       />
       <div className="w-full flex-1 overflow-auto">
-        {cafe.nbLotsMachines && cafe.nbLotsMachines > 0 ? (
-          cafe.lotsMachines.map((lot) => (
-            <CafeLot
-              key={lot.infos.lotId}
-              lot={lot}
+        {cafe.nbEspaces && cafe.nbEspaces > 0 ? (
+          cafe.espaces.map((espace) => (
+            <CafeEspace
+              key={espace.infos.espaceId}
+              espace={espace}
               cafeMachines={cafeMachines}
-              cafeQuantites={cafeQuantites}
               cafeMachinesTarifs={cafeMachinesTarifs}
               cafeConsoTarifs={cafeConsoTarifs}
               laitConsoTarifs={laitConsoTarifs}
-              chocoConsoTarifs={chocoConsoTarifs}
+              chocolatConsoTarifs={chocolatConsoTarifs}
               theConsoTarifs={theConsoTarifs}
+              sucreConsoTarifs={sucreConsoTarifs}
             />
           ))
         ) : (
@@ -128,14 +130,14 @@ const Cafe = ({
               variant="outline"
               size="lg"
               className="text-base"
-              onClick={handleAddLot}
+              onClick={handleAddEspace}
             >
-              Ajouter une/des machines
+              Ajouter un espace tisanerie
             </Button>
           </div>
         )}
       </div>
-      {!cafe.nbLotsMachines ? (
+      {!cafe.nbEspaces ? (
         <PropositionsFooter handleClickNext={handleClickNext} />
       ) : null}
     </div>

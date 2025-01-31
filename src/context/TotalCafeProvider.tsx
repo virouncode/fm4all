@@ -17,7 +17,7 @@ export const TotalCafeContext = createContext<{
   setTotalCafe: Dispatch<SetStateAction<TotalCafeType>>;
 }>({
   totalCafe: {
-    totalMachines: [],
+    totalEspaces: [],
   },
   setTotalCafe: () => {},
 });
@@ -27,9 +27,9 @@ const TotalCafeProvider = ({ children }: PropsWithChildren) => {
 
   // Always initialize state
   const [totalCafe, setTotalCafe] = useState<TotalCafeType>({
-    totalMachines: [
+    totalEspaces: [
       {
-        lotId: 1,
+        espaceId: 1,
         total: null,
         totalInstallation: null,
       },

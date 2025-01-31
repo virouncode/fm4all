@@ -1,11 +1,15 @@
 "use client";
 
+import { insertClientCityOutAction } from "@/actions/insertClientCityOutAction";
 import { InputWithLabel } from "@/components/formInputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { ClientContext } from "@/context/ClientProvider";
+import { toast } from "@/hooks/use-toast";
 import { insertClientSchema, InsertClientType } from "@/zod-schemas/client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { LoaderCircle } from "lucide-react";
+import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useContext } from "react";
 import { useForm } from "react-hook-form";
@@ -17,30 +21,49 @@ type CityOutProps = {
 const CityOut = ({ destination }: CityOutProps) => {
   const { client } = useContext(ClientContext);
   const router = useRouter();
-  const defaultValues: Partial<InsertClientType> = {
-    emailContact: client.emailContact ?? "",
-    phoneContact: client.phoneContact ?? "",
-    nomEntreprise: client.nomEntreprise ?? "",
-    prenomContact: client.prenomContact ?? "",
-    nomContact: client.nomContact ?? "",
-    posteContact: client.posteContact ?? "",
+  const defaultValues: InsertClientType = {
+    ...client,
   };
-  const form = useForm<Partial<InsertClientType>>({
+  const form = useForm<InsertClientType>({
     mode: "onBlur",
-    resolver: zodResolver(insertClientSchema.partial()),
+    resolver: zodResolver(insertClientSchema),
     defaultValues,
   });
+  const { execute: executeSaveClient, isPending: isSavingClient } = useAction(
+    insertClientCityOutAction,
+    {
+      onSuccess: ({ data }) => {
+        console.log("data", data);
+        toast({
+          variant: "default",
+          title: "Succès ! 🎉",
+          description: data?.message,
+        });
+      },
+      onError: () => {
+        toast({
+          variant: "destructive",
+          title: "Erreur ! 😿",
+          description: `Impossible de sauvegarder vos coordonnées: veuillez réessayer`,
+        });
+      },
+    }
+  );
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     console.log(e.target.name, e.target.value);
   };
 
-  const submitForm = async (data: Partial<InsertClientType>) => {
+  const submitForm = async (data: InsertClientType) => {
     //TODO:envoyer email à Romu
+
     //TODO:mettre les coordonnées dans la bdd
-    console.log(data);
-    if (destination) router.push(destination);
-    else router.back();
+    executeSaveClient(data);
+    setTimeout(() => {
+      //pour laisser le temps à la toast de s'afficher
+      if (destination) router.push(destination);
+      else router.back();
+    }, 1000);
   };
 
   return (
@@ -101,9 +124,13 @@ const CityOut = ({ destination }: CityOutProps) => {
               variant="destructive"
               size="lg"
               title="Afficher les tarifs"
-              className="text-base"
+              className="text-base min-w-28"
             >
-              Envoyer mes coordonnées
+              {isSavingClient ? (
+                <LoaderCircle className="animate-spin" />
+              ) : (
+                "Envoyer mes coordonnées"
+              )}
             </Button>
           </div>
         </form>

@@ -52,12 +52,12 @@ import {
 } from "@/zod-schemas/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useContext, useRef } from "react";
+import { ChangeEvent, useContext, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { reinitialisationDevis } from "./reinitialisationDevis";
 
 export const MAX_SURFACE = 3000;
-export const MAX_NB_PERSONNES = 300;
+export const MAX_EFFECTIF = 300;
 
 const MesLocaux = () => {
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
@@ -113,16 +113,6 @@ const MesLocaux = () => {
       effectif: parseInt(data.effectif as string),
       ville: "",
     };
-    //Departement in ou out
-    if (
-      !departements.find(
-        ({ id }) => id === dataToPost.codePostal?.substring(0, 2)
-      )
-    ) {
-      setDevisProgress({ ...devisProgress, completedSteps: [] });
-      router.push("/city-out?destination=/");
-      return;
-    }
     //La ville existe ?
     try {
       const response = await fetch(
@@ -142,8 +132,22 @@ const MesLocaux = () => {
         return;
       }
       dataToPost.ville = cityData[0].nom;
+      setClient({
+        ...client,
+        ville: dataToPost.ville,
+      });
     } catch (err) {
       console.log(err);
+    }
+    //Departement in ou out
+    if (
+      !departements.find(
+        ({ id }) => id === dataToPost.codePostal?.substring(0, 2)
+      )
+    ) {
+      setDevisProgress({ ...devisProgress, completedSteps: [] });
+      router.push("/city-out?destination=/");
+      return;
     }
 
     //Update client
@@ -193,6 +197,37 @@ const MesLocaux = () => {
     );
   };
 
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (name === "surface") {
+      const newValue = value ? parseInt(value) : 50;
+      setClient((prev) => ({
+        ...prev,
+        [name]: newValue > MAX_SURFACE ? MAX_SURFACE : newValue,
+      }));
+      return;
+    }
+    if (name === "effectif") {
+      const newValue = value ? parseInt(value) : 1;
+      setClient((prev) => ({
+        ...prev,
+        [name]: newValue > MAX_EFFECTIF ? MAX_EFFECTIF : newValue,
+      }));
+      return;
+    }
+    setClient((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSelect = (value: string, name: string) => {
+    setClient((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   const handleClick = () => {
     const dialogTrigger = dialogRef.current;
     if (dialogTrigger && !form.formState.isValid) {
@@ -212,6 +247,7 @@ const MesLocaux = () => {
               fieldTitle="Code postal*"
               nameInSchema="codePostal"
               placeholder="XXXXX"
+              handleChange={handleChange}
             />
             <InputWithLabel<InsertClientType>
               fieldTitle="Surface en m²*"
@@ -225,7 +261,7 @@ const MesLocaux = () => {
               nameInSchema="effectif"
               type="number"
               min={1}
-              max={MAX_NB_PERSONNES}
+              max={MAX_EFFECTIF}
             />
           </div>
           <div className="w-full md:w-1/2 flex flex-col gap-4 ">
@@ -233,11 +269,13 @@ const MesLocaux = () => {
               fieldTitle="Type de bâtiment*"
               nameInSchema="typeBatiment"
               data={batiments}
+              handleSelect={handleSelect}
             />
             <SelectWithLabel<InsertClientType>
               fieldTitle="Type d'occupation*"
               nameInSchema="typeOccupation"
               data={occupations}
+              handleSelect={handleSelect}
             />
           </div>
         </div>

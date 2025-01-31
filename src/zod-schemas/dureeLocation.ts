@@ -16,7 +16,6 @@ export const dureeLocationCafeSchema = z.enum([
   "pa24M",
   "pa36M",
   "pa48M",
-  "pa60M",
   "oneShot",
 ]);
 

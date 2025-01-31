@@ -29,7 +29,7 @@ const TotalFontainesProvider = ({ children }: PropsWithChildren) => {
   const [totalFontaines, setTotalFontaines] = useState<TotalFontainesType>({
     totalLotsFontaines: [
       {
-        lotId: 1,
+        espaceId: 1,
         total: null,
         totalInstallation: null,
       },

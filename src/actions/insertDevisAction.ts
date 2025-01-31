@@ -1,0 +1,40 @@
+"use server";
+
+import { db } from "@/db";
+import { devis } from "@/db/schema";
+import { actionClient } from "@/lib/safe-actions";
+import { insertDevisSchema, InsertDevisType } from "@/zod-schemas/devis";
+import { flattenValidationErrors } from "next-safe-action";
+
+export const insertDevisAction = actionClient
+  .metadata({ actionName: "insertPatientAction" })
+  .schema(insertDevisSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(
+    async ({ parsedInput: devisInput }: { parsedInput: InsertDevisType }) => {
+      let insertedDevisId: number | null = null;
+      try {
+        const resultDevis = await db
+          .insert(devis)
+          .values(devisInput)
+          .returning({ id: devis.id });
+
+        if (!resultDevis[0]?.id) {
+          throw new Error("Impossible d'enregistrer le devis.");
+        }
+        insertedDevisId = resultDevis[0].id;
+      } catch (err) {
+        if (err instanceof Error) {
+          console.log(err.message);
+        }
+        throw err;
+      }
+      return {
+        success: true,
+        data: { id: insertedDevisId },
+        message: `Votre devis a bien été enregistré, merci !`,
+      };
+    }
+  );

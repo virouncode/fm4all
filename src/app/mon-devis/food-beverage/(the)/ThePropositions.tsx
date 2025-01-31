@@ -6,10 +6,10 @@ import { roundEffectif } from "@/lib/roundEffectif";
 import { GammeType } from "@/zod-schemas/gamme";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { ChangeEvent, useContext } from "react";
+import { MAX_EFFECTIF } from "../../mes-locaux/MesLocaux";
 import ThePropositionCard from "./ThePropositionCard";
 import ThePropositionFournisseurLogo from "./ThePropositionFournisseurLogo";
 import ThePropositionsInput from "./ThePropositionsInput";
-import { MAX_NB_PERSONNES } from "../../mes-locaux/MesLocaux";
 
 type ThePropositionsProps = {
   theConsoTarifs: SelectTheConsoTarifsType[];
@@ -42,7 +42,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
   const handleChangeNbPersonnes = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     let newNbPersonnes = value ? parseInt(value) : Math.round(effectif * 0.15);
-    if (newNbPersonnes > MAX_NB_PERSONNES) newNbPersonnes = MAX_NB_PERSONNES;
+    if (newNbPersonnes > MAX_EFFECTIF) newNbPersonnes = MAX_EFFECTIF;
     const nbThesParAn = newNbPersonnes * 400;
     const prixUnitaire =
       theConsoTarifs.find(

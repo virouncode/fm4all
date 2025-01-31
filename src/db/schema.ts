@@ -48,6 +48,9 @@ export const typeMachineEnum = pgEnum("typemachine", [
   "chocolat",
 ]);
 
+export const typeLaitEnum = pgEnum("typelait", ["dosettes", "frais", "poudre"]);
+export const typeChocolatEnum = pgEnum("typechocolat", ["sachets", "poudre"]);
+
 export const inclusEnum = pgEnum("inclus", [
   "inclus",
   "non inclus",
@@ -80,7 +83,7 @@ export const clients = pgTable("clients", {
   prenomContact: varchar("prenom_contact").notNull(),
   nomContact: varchar("nom_contact").notNull(),
   posteContact: varchar("poste_contact").notNull(),
-  emailContact: varchar("email_contact").unique().notNull(),
+  emailContact: varchar("email_contact").notNull(),
   phoneContact: varchar("phone_contact").notNull(),
   surface: integer().notNull(),
   effectif: integer().notNull(),
@@ -322,14 +325,6 @@ export const qualiteAirTarifs = pgTable("qualite_air_tarifs", {
 });
 
 //CAFE
-export const cafeQuantites = pgTable("cafe_quantites", {
-  id: serial().primaryKey(),
-  effectif: integer().notNull(),
-  nbCafesParAn: integer("nb_cafes_par_an").notNull(),
-  nbMachines: integer("nb_machines").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
-
 export const cafeMachines = pgTable("cafe_machines", {
   id: serial().primaryKey(),
   marque: varchar().notNull(),
@@ -351,20 +346,23 @@ export const cafeMachinesTarifs = pgTable("cafe_machines_tarifs", {
     .notNull()
     .references(() => fournisseurs.id),
   type: typeMachineEnum().notNull(),
-  limiteTassesJ: integer("limite_tasses_j").notNull(),
-  prixInstallation: integer("prix_installation"),
+  nbPersonnes: integer("nb_personnes").notNull(),
+  nbMachines: integer("nb_machines"),
+  typeLait: typeLaitEnum("type_lait"),
+  typeChocolat: typeChocolatEnum("type_chocolat"),
   oneShot: integer("one_shot"),
   pa12M: integer("pa_12m"),
+  rac12M: integer("rac_12m"),
   pa24M: integer("pa_24m"),
+  rac24M: integer("rac_24m"),
   pa36M: integer("pa_36m"),
   pa48M: integer("pa_48m"),
-  pa60M: integer("pa_60m"),
-  rac12M: integer("rac_12m"),
-  rac24M: integer("rac_24m"),
   paMaintenance: integer("pa_maintenance"),
+  nbPassages: integer("nb_passages"),
+  fraisInstallation: integer("frais_installation"),
   cafeMachineId: integer("cafe_machine_id").references(() => cafeMachines.id),
-  reconditionne: boolean().default(false),
   infos: varchar(),
+  reconditionne: boolean().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -375,29 +373,7 @@ export const cafeConsoTarifs = pgTable("cafe_conso_tarifs", {
     .references(() => fournisseurs.id),
   gamme: gammeEnum().notNull(),
   effectif: integer().notNull(),
-  prixUnitaire: integer("prix_unitaire").notNull(),
-  infos: varchar(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
-
-export const laitConsoTarifs = pgTable("lait_conso_tarifs", {
-  id: serial().primaryKey(),
-  fournisseurId: integer("fournisseur_id")
-    .notNull()
-    .references(() => fournisseurs.id),
-  effectif: integer().notNull(),
-  prixUnitaire: integer().notNull(),
-  infos: varchar(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
-
-export const chocoConsoTarifs = pgTable("choco_conso_tarifs", {
-  id: serial().primaryKey(),
-  fournisseurId: integer("fournisseur_id")
-    .notNull()
-    .references(() => fournisseurs.id),
-  effectif: integer().notNull(),
-  prixUnitaire: integer().notNull(),
+  prixUnitaire: integer("prix_unitaire"),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
@@ -409,7 +385,43 @@ export const theConsoTarifs = pgTable("the_conso_tarifs", {
     .references(() => fournisseurs.id),
   gamme: gammeEnum().notNull(),
   effectif: integer().notNull(),
-  prixUnitaire: integer("prix_unitaire").notNull(),
+  prixUnitaire: integer("prix_unitaire"),
+  infos: varchar(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const laitConsoTarifs = pgTable("lait_conso_tarifs", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  effectif: integer().notNull(),
+  prixUnitaireDosette: integer("prix_unitaire_dosette"),
+  prixUnitaireFrais: integer("prix_unitaire_frais"),
+  prixUnitairePoudre: integer("prix_unitaire_poudre"),
+  infos: varchar(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const chocolatConsoTarifs = pgTable("chocolat_conso_tarifs", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  effectif: integer().notNull(),
+  prixUnitaireSachet: integer("prix_unitaire_sachet"),
+  prixUnitairePoudre: integer("prix_unitaire_poudre"),
+  infos: varchar(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const sucreConsoTarifs = pgTable("sucre_conso_tarifs", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  effectif: integer().notNull(),
+  prixUnitaire: integer("prix_unitaire"),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
@@ -544,8 +556,19 @@ export const servicesFm4AllOffres = pgTable("services_fm4all_offres", {
 //   nbFontaines: integer("nb_fontaines").notNull(),
 //   createdAt: timestamp("created_at").notNull().defaultNow(),
 // });
+export const devis = pgTable("devis", {
+  id: serial().primaryKey(),
+  clientId: integer("client_id")
+    .notNull()
+    .references(() => clients.id),
+  texte: varchar().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
 
 //RELATIONS
+export const clientsRelations = relations(clients, ({ many }) => ({
+  devis: many(devis),
+}));
 export const fournisseursRelations = relations(
   fournisseurs,
   ({ one, many }) => ({
@@ -574,8 +597,9 @@ export const fournisseursRelations = relations(
     cafeMachinesTarifs: many(cafeMachinesTarifs),
     cafeConsoTarifs: many(cafeConsoTarifs),
     laitConsoTarifs: many(laitConsoTarifs),
-    chocoConsoTarifs: many(chocoConsoTarifs),
+    chocoConsoTarifs: many(chocolatConsoTarifs),
     theConsoTarifs: many(theConsoTarifs),
+    sucreConsoTarifs: many(sucreConsoTarifs),
     fruitsTarifs: many(fruitsTarifs),
     snacksTarifs: many(snacksTarifs),
     boissonsTarifs: many(boissonsTarifs),
@@ -765,11 +789,21 @@ export const laitConsoTarifsRelations = relations(
   })
 );
 
-export const chocoConsoTarifsRelations = relations(
-  chocoConsoTarifs,
+export const chocolatConsoTarifsRelations = relations(
+  chocolatConsoTarifs,
   ({ one }) => ({
     fournisseur: one(fournisseurs, {
-      fields: [chocoConsoTarifs.fournisseurId],
+      fields: [chocolatConsoTarifs.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+  })
+);
+
+export const sucreConsoTarifsRelations = relations(
+  sucreConsoTarifs,
+  ({ one }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [sucreConsoTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
   })
@@ -815,3 +849,10 @@ export const officeManagerTarifsRelations = relations(
     }),
   })
 );
+
+export const devisRelations = relations(devis, ({ one }) => ({
+  client: one(clients, {
+    fields: [devis.clientId],
+    references: [clients.id],
+  }),
+}));

@@ -22,7 +22,7 @@ export const FontainesContext = createContext<{
       fournisseurId: null,
       nomFournisseur: null,
       sloganFournisseur: null,
-      currentLotId: 1,
+      currentEspaceId: 1,
       dureeLocation: "pa12M",
       commentaires: null,
     },
@@ -42,7 +42,7 @@ const FontainesProvider = ({ children }: PropsWithChildren) => {
       fournisseurId: null,
       nomFournisseur: null,
       sloganFournisseur: null,
-      currentLotId: 1,
+      currentEspaceId: 1,
       dureeLocation: "pa12M",
       commentaires: null,
     },
@@ -50,7 +50,7 @@ const FontainesProvider = ({ children }: PropsWithChildren) => {
     lotsFontaines: [
       {
         infos: {
-          lotId: 1,
+          espaceId: 1,
           typeEau: "EF",
           typePose: "aposer",
           marque: null,

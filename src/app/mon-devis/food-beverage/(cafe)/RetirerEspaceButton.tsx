@@ -1,19 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 
-type RetirerLotButtonProps = {
+type RetirerEspaceButtonProps = {
   handleClickRemove: () => void;
-  lotId: number;
+  espaceId: number;
   disabled: boolean;
   all: boolean;
 };
 
-const RetirerLotButton = ({
+const RetirerEspaceButton = ({
   handleClickRemove,
-  lotId,
+  espaceId,
   disabled,
   all,
-}: RetirerLotButtonProps) => {
+}: RetirerEspaceButtonProps) => {
   return (
     <Button
       variant="destructive"
@@ -24,9 +24,9 @@ const RetirerLotButton = ({
       disabled={disabled}
     >
       <Trash2 />
-      {all ? "Retirer tous les lots" : `Retirer lot n°${lotId}`}
+      {all ? "Retirer tous les espaces" : `Retirer espace n°${espaceId}`}
     </Button>
   );
 };
 
-export default RetirerLotButton;
+export default RetirerEspaceButton;

@@ -7,17 +7,17 @@ import {
 import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
 import Image from "next/image";
 
-type CafeLotPropositionFournisseurLogoProps = {
+type CafeEspacePropositionFournisseurLogoProps = {
   fournisseurId: number | null;
   nomFournisseur: string | null;
   sloganFournisseur: string | null;
 };
 
-const CafeLotPropositionFournisseurLogo = ({
+const CafeEspacePropositionFournisseurLogo = ({
   fournisseurId,
   nomFournisseur,
   sloganFournisseur,
-}: CafeLotPropositionFournisseurLogoProps) => {
+}: CafeEspacePropositionFournisseurLogoProps) => {
   const logoFournisseurUrl = getLogoFournisseurUrl(fournisseurId);
   return (
     <TooltipProvider delayDuration={0}>
@@ -49,4 +49,4 @@ const CafeLotPropositionFournisseurLogo = ({
   );
 };
 
-export default CafeLotPropositionFournisseurLogo;
+export default CafeEspacePropositionFournisseurLogo;

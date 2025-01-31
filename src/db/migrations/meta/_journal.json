@@ -414,6 +414,48 @@
       "when": 1738105887963,
       "tag": "0058_graceful_blacklash",
       "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1738168850563,
+      "tag": "0059_chunky_harpoon",
+      "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1738172199565,
+      "tag": "0060_brief_quasar",
+      "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1738230690471,
+      "tag": "0061_lame_luckman",
+      "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1738231828852,
+      "tag": "0062_lucky_overlord",
+      "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1738237329969,
+      "tag": "0063_boring_mephistopheles",
+      "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "7",
+      "when": 1738245364158,
+      "tag": "0064_tense_misty_knight",
+      "breakpoints": true
     }
   ]
 }

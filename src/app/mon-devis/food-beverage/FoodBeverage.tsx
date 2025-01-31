@@ -2,9 +2,9 @@ import {
   getCafeConsoTarifs,
   getCafeMachines,
   getCafeMachinesTarifs,
-  getCafeQuantites,
-  getChocoConsoTarifs,
+  getChocolatConsoTarifs,
   getLaitConsoTarifs,
+  getSucreConsoTarifs,
   getTheConsoTarifs,
 } from "@/lib/queries/boissons-chaudes/getBoissonsChaudes";
 import {
@@ -25,12 +25,12 @@ import The from "./(the)/The";
 const FoodBeverage = async () => {
   const [
     cafeMachines,
-    cafeQuantites,
     cafeMachinesTarifs,
     cafeConsoTarifs,
     laitConsoTarifs,
-    chocoConsoTarifs,
+    chocolatConsoTarifs,
     theConsoTarifs,
+    sucreConsoTarifs,
     fruitsQuantites,
     fruitsTarifs,
     snacksQuantites,
@@ -40,12 +40,12 @@ const FoodBeverage = async () => {
     foodLivraisonTarifs,
   ] = await Promise.all([
     getCafeMachines(),
-    getCafeQuantites(),
     getCafeMachinesTarifs(),
     getCafeConsoTarifs(),
     getLaitConsoTarifs(),
-    getChocoConsoTarifs(),
+    getChocolatConsoTarifs(),
     getTheConsoTarifs(),
+    getSucreConsoTarifs(),
     getFruitsQuantites(),
     getFruitsTarifs(),
     getSnacksQuantites(),
@@ -57,12 +57,12 @@ const FoodBeverage = async () => {
 
   if (
     !cafeMachines ||
-    !cafeQuantites ||
     !cafeMachinesTarifs ||
     !cafeConsoTarifs ||
     !laitConsoTarifs ||
-    !chocoConsoTarifs ||
+    !chocolatConsoTarifs ||
     !theConsoTarifs ||
+    !sucreConsoTarifs ||
     !fruitsQuantites ||
     !fruitsTarifs ||
     !snacksQuantites ||
@@ -88,12 +88,12 @@ const FoodBeverage = async () => {
     <section className="flex-1 overflow-hidden">
       <Cafe
         cafeMachines={cafeMachines}
-        cafeQuantites={cafeQuantites}
         cafeMachinesTarifs={cafeMachinesTarifs}
         cafeConsoTarifs={cafeConsoTarifs}
         laitConsoTarifs={laitConsoTarifs}
-        chocoConsoTarifs={chocoConsoTarifs}
+        chocolatConsoTarifs={chocolatConsoTarifs}
         theConsoTarifs={theConsoTarifs}
+        sucreConsoTarifs={sucreConsoTarifs}
       />
       <The theConsoTarifs={theConsoTarifs} />
       <SnacksFruits

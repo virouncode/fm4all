@@ -15,12 +15,12 @@ export const reinitialisationCafeThe = (
       fournisseurId: null,
       nomFournisseur: null,
       sloganFournisseur: null,
-      currentLotId: 1,
+      currentEspaceId: 1,
       dureeLocation: "pa12M",
       commentaires: null,
     },
-    nbLotsMachines: null,
-    lotsMachines: [],
+    nbEspaces: null,
+    espaces: [],
   });
   setThe({
     infos: {
@@ -35,7 +35,7 @@ export const reinitialisationCafeThe = (
     },
   });
   setTotalCafe({
-    totalMachines: [],
+    totalEspaces: [],
   });
   setTotalThe({
     totalService: 0,

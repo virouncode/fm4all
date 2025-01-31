@@ -7,10 +7,10 @@ import { useContext } from "react";
 const TotalCafe = () => {
   const { cafe } = useContext(CafeContext);
   const { totalCafe } = useContext(TotalCafeContext);
-  const total = totalCafe.totalMachines
+  const total = totalCafe.totalEspaces
     .map(({ total }) => total ?? 0)
     .reduce((acc, curr) => acc + curr, 0);
-  const totalInstallation = totalCafe.totalMachines
+  const totalInstallation = totalCafe.totalEspaces
     .map(({ totalInstallation }) => totalInstallation ?? 0)
     .reduce((acc, curr) => acc + curr, 0);
 
@@ -20,15 +20,15 @@ const TotalCafe = () => {
       <div className="flex flex-col gap-4">
         <div>Machines à Café ({cafe.infos.nomFournisseur})</div>
         <div className="flex flex-col ml-4 text-xs ">
-          {cafe.lotsMachines
+          {cafe.espaces
             .filter(
               (item) =>
-                totalCafe.totalMachines.find(
-                  ({ lotId }) => lotId === item.infos.lotId
+                totalCafe.totalEspaces.find(
+                  ({ espaceId }) => espaceId === item.infos.espaceId
                 )?.total ?? 0 > 0
             )
             .map((item) => (
-              <div key={item.infos.lotId} className="flex flex-col">
+              <div key={item.infos.espaceId} className="flex flex-col">
                 <div
                   className={`flex items-center justify-between text-${getFm4AllColor(
                     item.infos.gammeCafeSelected
@@ -40,22 +40,22 @@ const TotalCafe = () => {
                   </p>
                   <p>
                     {formatNumber(
-                      totalCafe.totalMachines.find(
-                        (total) => total.lotId === item.infos.lotId
+                      totalCafe.totalEspaces.find(
+                        (total) => total.espaceId === item.infos.espaceId
                       )?.total ?? 0
                     )}{" "}
                     € HT/an
                   </p>
                 </div>
-                {totalCafe.totalMachines.find(
-                  (total) => total.lotId === item.infos.lotId
+                {totalCafe.totalEspaces.find(
+                  (total) => total.espaceId === item.infos.espaceId
                 )?.totalInstallation ? (
                   <div className="flex items-center justify-between">
                     <p>Installation</p>
                     <p>
                       {formatNumber(
-                        totalCafe.totalMachines.find(
-                          (total) => total.lotId === item.infos.lotId
+                        totalCafe.totalEspaces.find(
+                          (total) => total.espaceId === item.infos.espaceId
                         )?.totalInstallation ?? 0
                       )}{" "}
                       € HT

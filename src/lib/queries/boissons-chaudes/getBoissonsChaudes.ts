@@ -4,31 +4,21 @@ import {
   cafeConsoTarifs,
   cafeMachines,
   cafeMachinesTarifs,
-  cafeQuantites,
-  chocoConsoTarifs,
+  chocolatConsoTarifs,
   fournisseurs,
   laitConsoTarifs,
+  sucreConsoTarifs,
   theConsoTarifs,
 } from "@/db/schema";
 import { errorHelper } from "@/lib/errorHelper";
 import { selectCafeConsoTarifsSchema } from "@/zod-schemas/cafeConsoTarifs";
 import { selectCafeMachinesSchema } from "@/zod-schemas/cafeMachine";
 import { selectCafeMachinesTarifsSchema } from "@/zod-schemas/cafeMachinesTarifs";
-import { selectCafeQuantitesSchema } from "@/zod-schemas/cafeQuantites";
-import { selectChocoConsoTarifsSchema } from "@/zod-schemas/chocoConsoTarifs";
+import { selectChocolatConsoTarifsSchema } from "@/zod-schemas/chocolatConsoTarifs";
 import { selectLaitConsoTarifsSchema } from "@/zod-schemas/laitConsoTarifs";
+import { selectSucreConsoTarifsSchema } from "@/zod-schemas/sucreConsoTarifs";
 import { selectTheConsoTarifsSchema } from "@/zod-schemas/theConsoTarifs";
 import { eq, getTableColumns } from "drizzle-orm";
-
-export const getCafeQuantites = async () => {
-  try {
-    const results = await db.select().from(cafeQuantites);
-    if (results.length === 0) return [];
-    return results.map((result) => selectCafeQuantitesSchema.parse(result));
-  } catch (err) {
-    errorHelper(err);
-  }
-};
 
 export const getCafeMachinesTarifs = async () => {
   try {
@@ -50,10 +40,6 @@ export const getCafeMachinesTarifs = async () => {
     );
     return validatedResults.map((result) => ({
       ...result,
-      prixInstallation:
-        result.prixInstallation !== null
-          ? result.prixInstallation / RATIO
-          : null,
       oneShot: result.oneShot !== null ? result.oneShot / RATIO : null,
       pa12M: result.pa12M !== null ? result.pa12M / RATIO : null,
       rac12M: result.rac12M !== null ? result.rac12M / RATIO : null,
@@ -61,9 +47,12 @@ export const getCafeMachinesTarifs = async () => {
       rac24M: result.rac24M !== null ? result.rac24M / RATIO : null,
       pa36M: result.pa36M !== null ? result.pa36M / RATIO : null,
       pa48M: result.pa48M !== null ? result.pa48M / RATIO : null,
-      pa60M: result.pa60M !== null ? result.pa60M / RATIO : null,
       paMaintenance:
         result.paMaintenance !== null ? result.paMaintenance / RATIO : null,
+      fraisInstallation:
+        result.fraisInstallation !== null
+          ? result.fraisInstallation / RATIO
+          : null,
     }));
   } catch (err) {
     errorHelper(err);
@@ -90,7 +79,7 @@ export const getCafeConsoTarifs = async () => {
     );
     return validatedResults.map((result) => ({
       ...result,
-      prixUnitaire: result.prixUnitaire / RATIO,
+      prixUnitaire: result.prixUnitaire ? result.prixUnitaire / RATIO : null,
     }));
   } catch (err) {
     errorHelper(err);
@@ -117,34 +106,52 @@ export const getLaitConsoTarifs = async () => {
     );
     return validatedResults.map((result) => ({
       ...result,
-      prixUnitaire: result.prixUnitaire / RATIO,
+      prixUnitaireDosette:
+        result.prixUnitaireDosette !== null
+          ? result.prixUnitaireDosette / RATIO
+          : null,
+      prixUnitaireFrais:
+        result.prixUnitaireFrais !== null
+          ? result.prixUnitaireFrais / RATIO
+          : null,
+      prixUnitairePoudre:
+        result.prixUnitairePoudre !== null
+          ? result.prixUnitairePoudre / RATIO
+          : null,
     }));
   } catch (err) {
     errorHelper(err);
   }
 };
 
-export const getChocoConsoTarifs = async () => {
+export const getChocolatConsoTarifs = async () => {
   try {
     const results = await db
       .select({
-        ...getTableColumns(chocoConsoTarifs),
+        ...getTableColumns(chocolatConsoTarifs),
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
       })
-      .from(chocoConsoTarifs)
+      .from(chocolatConsoTarifs)
       .innerJoin(
         fournisseurs,
-        eq(fournisseurs.id, chocoConsoTarifs.fournisseurId)
+        eq(fournisseurs.id, chocolatConsoTarifs.fournisseurId)
       );
 
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectChocoConsoTarifsSchema.parse(result)
+      selectChocolatConsoTarifsSchema.parse(result)
     );
     return validatedResults.map((result) => ({
       ...result,
-      prixUnitaire: result.prixUnitaire / RATIO,
+      prixUnitaireSachet:
+        result.prixUnitaireSachet !== null
+          ? result.prixUnitaireSachet / RATIO
+          : null,
+      prixUnitairePoudre:
+        result.prixUnitairePoudre !== null
+          ? result.prixUnitairePoudre / RATIO
+          : null,
     }));
   } catch (err) {
     errorHelper(err);
@@ -170,7 +177,35 @@ export const getTheConsoTarifs = async () => {
     );
     return validatedResults.map((result) => ({
       ...result,
-      prixUnitaire: result.prixUnitaire / RATIO,
+      prixUnitaire:
+        result.prixUnitaire !== null ? result.prixUnitaire / RATIO : null,
+    }));
+  } catch (err) {
+    errorHelper(err);
+  }
+};
+
+export const getSucreConsoTarifs = async () => {
+  try {
+    const results = await db
+      .select({
+        ...getTableColumns(sucreConsoTarifs),
+        nomFournisseur: fournisseurs.nomFournisseur,
+        slogan: fournisseurs.slogan,
+      })
+      .from(sucreConsoTarifs)
+      .innerJoin(
+        fournisseurs,
+        eq(fournisseurs.id, sucreConsoTarifs.fournisseurId)
+      );
+    if (results.length === 0) return [];
+    const validatedResults = results.map((result) =>
+      selectSucreConsoTarifsSchema.parse(result)
+    );
+    return validatedResults.map((result) => ({
+      ...result,
+      prixUnitaire:
+        result.prixUnitaire !== null ? result.prixUnitaire / RATIO : null,
     }));
   } catch (err) {
     errorHelper(err);

@@ -75,7 +75,7 @@ const OfficeManagerInputs = ({
               title={"Remplacé pendant congés"}
               id={"remplace"}
             />
-            <Label htmlFor={`remplace`}>Remplacé pendant congés</Label>
+            <Label htmlFor="remplace">Remplacé pendant congés</Label>
           </div>
           <div className="flex gap-2 items-center">
             <RadioGroupItem
@@ -83,7 +83,7 @@ const OfficeManagerInputs = ({
               title={"Non remplacé pendant congés"}
               id={"non_remplace"}
             />
-            <Label htmlFor={"non_remplace"}>Non remplacé pendant congés</Label>
+            <Label htmlFor="non_remplace">Non remplacé pendant congés</Label>
           </div>
         </RadioGroup>
       </div>

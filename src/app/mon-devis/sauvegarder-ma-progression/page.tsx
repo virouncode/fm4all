@@ -58,23 +58,7 @@ const page = async ({
         <h1 className="text-3xl md:text-4xl">Sauvegarder ma progression</h1>
       </div>
       <Suspense fallback={<ServicesLoader />}>
-        <SauvegarderProgression
-          surface={surface}
-          effectif={effectif}
-          typeBatiment={
-            typeBatiment as
-              | "bureaux"
-              | "localCommercial"
-              | "entrepot"
-              | "cabinetMedical"
-          }
-          typeOccupation={
-            typeOccupation as
-              | "partieEtage"
-              | "plateauComplet"
-              | "batimentEntier"
-          }
-        />
+        <SauvegarderProgression />
       </Suspense>
     </>
   );

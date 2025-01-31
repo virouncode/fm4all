@@ -36,10 +36,10 @@ export const totalIncendieSchema = z.object({
   totalDeplacementExutoiresParking: z.number().nullable(),
 });
 export const totalCafeSchema = z.object({
-  totalMachines: z
+  totalEspaces: z
     .array(
       z.object({
-        lotId: z.number(),
+        espaceId: z.number(),
         total: z.number().nullable(),
         totalInstallation: z.number().nullable(),
       })
@@ -61,7 +61,7 @@ export const totalFontainesSchema = z.object({
   totalLotsFontaines: z
     .array(
       z.object({
-        lotId: z.number(),
+        espaceId: z.number(),
         total: z.number().nullable(),
         totalInstallation: z.number().nullable(),
       })

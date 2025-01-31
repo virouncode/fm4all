@@ -208,16 +208,18 @@ export const fullReinitialisationDevis = (
       fournisseurId: null,
       nomFournisseur: null,
       sloganFournisseur: null,
-      currentLotId: 1,
+      currentEspaceId: 1,
       dureeLocation: "pa12M",
       commentaires: null,
     },
-    nbLotsMachines: 1,
-    lotsMachines: [
+    nbEspaces: 1,
+    espaces: [
       {
         infos: {
-          lotId: 1,
+          espaceId: 1,
           typeBoissons: "cafe",
+          typeLait: null,
+          typeChocolat: null,
           gammeCafeSelected: null,
           marque: null,
           modele: null,
@@ -226,14 +228,16 @@ export const fullReinitialisationDevis = (
         quantites: {
           nbPersonnes: null,
           nbMachines: null,
+          nbPassagesParAn: null,
         },
         prix: {
-          prixUnitaireLoc: null,
-          prixUnitaireInstal: null,
-          prixUnitaireMaintenance: null,
+          prixLoc: null,
+          prixInstal: null,
+          prixMaintenance: null,
           prixUnitaireConsoCafe: null,
           prixUnitaireConsoLait: null,
           prixUnitaireConsoChocolat: null,
+          prixUnitaireConsoSucre: null,
         },
       },
     ],
@@ -281,7 +285,7 @@ export const fullReinitialisationDevis = (
       fournisseurId: null,
       nomFournisseur: null,
       sloganFournisseur: null,
-      currentLotId: 1,
+      currentEspaceId: 1,
       dureeLocation: "pa12M",
       commentaires: null,
     },
@@ -289,7 +293,7 @@ export const fullReinitialisationDevis = (
     lotsFontaines: [
       {
         infos: {
-          lotId: 1,
+          espaceId: 1,
           typeEau: "EF",
           typePose: "aposer",
           marque: null,
@@ -399,9 +403,9 @@ export const fullReinitialisationDevis = (
     totalDeplacementExutoiresParking: null,
   });
   setTotalCafe({
-    totalMachines: [
+    totalEspaces: [
       {
-        lotId: 1,
+        espaceId: 1,
         total: null,
         totalInstallation: null,
       },
@@ -420,7 +424,7 @@ export const fullReinitialisationDevis = (
   setTotalFontaines({
     totalLotsFontaines: [
       {
-        lotId: 1,
+        espaceId: 1,
         total: null,
         totalInstallation: null,
       },
