@@ -1,4 +1,10 @@
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { S_OUVREES_PAR_AN } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
@@ -44,9 +50,19 @@ const NettoyageOptionsRepasseCard = ({
       : "";
   return (
     <div className="flex border-b flex-1">
-      <div className="flex w-1/4 items-center justify-center text-base p-4">
-        Repasse sanitaire
-      </div>
+      <TooltipProvider delayDuration={0}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="flex w-1/4 items-center justify-center text-base p-4">
+              Repasse sanitaire
+            </div>
+          </TooltipTrigger>
+          <TooltipContent className="max-w-60">
+            Second passage dans la même journée pour entretenir sanitaires et
+            zones sensibles
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       {repasseProposition ? (
         <div
           className={`flex w-3/4 items-center justify-center p-4 ${
@@ -73,8 +89,7 @@ const NettoyageOptionsRepasseCard = ({
         <div
           className={`flex w-3/4 items-center p-4 justify-center bg-${color} text-slate-200 items-center justify-center text-lg gap-4`}
         >
-          Non proposé pour une frequence annuelle de passage de moins de 260 j /
-          an
+          Non proposé pour une frequence inférieure à 5 passages/semaine
         </div>
       )}
     </div>

@@ -2,10 +2,10 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import ServicesLoader from "../mes-locaux/ServicesLoader";
-import OfficeManagement from "./OfficeManagement";
+import PilotagePrestations from "./PilotagePrestations";
 
 export const metadata: Metadata = {
-  title: "Office Management",
+  title: "Pilotage Prestations",
   description:
     "Etape 4 du devis: pourquoi pas un office manager dans vos locaux ?",
 };
@@ -49,10 +49,10 @@ const page = async ({
   return (
     <>
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl md:text-4xl">Office Management</h1>
+        <h1 className="text-3xl md:text-4xl">Pilotage Prestations</h1>
       </div>
       <Suspense fallback={<ServicesLoader />}>
-        <OfficeManagement surface={surface} effectif={effectif} />
+        <PilotagePrestations surface={surface} effectif={effectif} />
       </Suspense>
     </>
   );

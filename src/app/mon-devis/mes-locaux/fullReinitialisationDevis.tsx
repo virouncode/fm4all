@@ -351,7 +351,7 @@ export const fullReinitialisationDevis = (
   });
   //Navigation
   setServices({
-    currentServiceId: 1,
+    currentServiceId: 0,
   });
   setFoodBeverage({
     currentFoodBeverageId: 1,

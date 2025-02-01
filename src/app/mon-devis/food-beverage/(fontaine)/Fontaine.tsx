@@ -24,7 +24,7 @@ const Fontaine = () => {
       searchParams.set("effectif", client.effectif.toString());
     if (client.surface) searchParams.set("surface", client.surface.toString());
     setDevisProgress({ currentStep: 4, completedSteps: [1, 2, 3] });
-    router.push(`/mon-devis/office-management?${searchParams.toString()}`);
+    router.push(`/mon-devis/pilotage-prestations?${searchParams.toString()}`);
   };
 
   const handleClickPrevious = () => {

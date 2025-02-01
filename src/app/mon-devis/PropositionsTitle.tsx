@@ -28,7 +28,6 @@ const PropositionsTitle = ({
           {Icon2 && <Icon2 />}
           {Icon3 && <Icon3 />}
         </div>
-
         <p>{title}</p>
       </div>
       <p className="text-base flex-1 text-center italic px-4">{description}</p>

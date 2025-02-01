@@ -1,34 +1,39 @@
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { TheContext } from "@/context/TheProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
-import { GammeType } from "@/zod-schemas/gamme";
 import { useContext } from "react";
 
 type ThePropositionCardProps = {
   proposition: {
     prixAnnuel: number | null;
+    infos: string | null;
     id: number;
     nomFournisseur: string;
     slogan: string | null;
     createdAt: Date;
     fournisseurId: number;
-    gamme: GammeType;
+    gamme: "essentiel" | "confort" | "excellence";
     effectif: number;
     prixUnitaire: number | null;
-    infos: string | null;
   };
   handleClickProposition: (proposition: {
     prixAnnuel: number | null;
+    infos: string | null;
     id: number;
     nomFournisseur: string;
     slogan: string | null;
     createdAt: Date;
     fournisseurId: number;
-    gamme: GammeType;
+    gamme: "essentiel" | "confort" | "excellence";
     effectif: number;
     prixUnitaire: number | null;
-    infos: string | null;
   }) => void;
   nbTassesParJour: number;
 };
@@ -39,7 +44,8 @@ const ThePropositionCard = ({
   nbTassesParJour,
 }: ThePropositionCardProps) => {
   const { the } = useContext(TheContext);
-  const color = getFm4AllColor(proposition.gamme);
+  const gamme = proposition.gamme;
+  const color = getFm4AllColor(gamme);
   if (!proposition.prixAnnuel) {
     return (
       <div
@@ -53,29 +59,73 @@ const ThePropositionCard = ({
     proposition.prixAnnuel / 12
   )} € / mois*`;
 
-  return (
-    <div
-      className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer ${
-        the.infos.gammeSelected === proposition.gamme
-          ? "ring-4 ring-inset ring-destructive"
-          : ""
-      } px-8`}
-      onClick={() => handleClickProposition(proposition)}
-    >
-      {proposition.prixAnnuel ? (
-        <Checkbox
-          checked={the.infos.gammeSelected === proposition.gamme}
-          onCheckedChange={() => handleClickProposition(proposition)}
-          className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-        />
-      ) : null}
+  const tooltipEssentiel = (
+    <div className="flex flex-col gap-4">
+      <p className="text-center text-lg">Essentiel</p>
       <div>
-        <p className="font-bold">{prixMensuelText}</p>
-        {proposition.prixAnnuel ? (
-          <p className="text-sm">Consommables ~ {nbTassesParJour} tasses / j</p>
-        ) : null}
+        <p>The en sachet, un ou deux au choix</p>
+        {proposition.infos && <p>{proposition.infos}</p>}
       </div>
     </div>
+  );
+  const tooltipConfort = (
+    <div className="flex flex-col gap-4">
+      <p className="text-center text-lg">Confort</p>
+      <div>
+        <p>Choix de plusieurs thés en sachets</p>
+        {proposition.infos && <p>{proposition.infos}</p>}
+      </div>
+    </div>
+  );
+  const tooltipExcellence = (
+    <div className="flex flex-col gap-4">
+      <p className="text-center text-lg">Excellence</p>
+      <div>
+        <p>Thés Premium en boite bois ou présentoir</p>
+        {proposition.infos && <p>{proposition.infos}</p>}
+      </div>
+    </div>
+  );
+
+  const tooltip =
+    gamme === "essentiel"
+      ? tooltipEssentiel
+      : gamme === "confort"
+      ? tooltipConfort
+      : tooltipExcellence;
+
+  return (
+    <TooltipProvider delayDuration={0}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div
+            className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4 cursor-pointer ${
+              the.infos.gammeSelected === proposition.gamme
+                ? "ring-4 ring-inset ring-destructive"
+                : ""
+            }`}
+            onClick={() => handleClickProposition(proposition)}
+          >
+            {proposition.prixAnnuel ? (
+              <Checkbox
+                checked={the.infos.gammeSelected === proposition.gamme}
+                onCheckedChange={() => handleClickProposition(proposition)}
+                className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+              />
+            ) : null}
+            <div>
+              <p className="font-bold">{prixMensuelText}</p>
+              <p className="text-sm">
+                Consommables ~ {nbTassesParJour} tasses / j
+              </p>
+            </div>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-60">
+          <p>{tooltip}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 

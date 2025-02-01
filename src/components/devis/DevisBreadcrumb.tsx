@@ -69,8 +69,8 @@ const DevisBreadcrumb = () => {
     },
     {
       id: 4,
-      url: `/office-management?${serviceSearchParams.toString()}`,
-      name: "Office Management",
+      url: `/pilotage-prestations?${serviceSearchParams.toString()}`,
+      name: "Pilotage Prestations",
     },
     {
       id: 5,

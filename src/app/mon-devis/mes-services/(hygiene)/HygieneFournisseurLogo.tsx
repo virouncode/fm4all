@@ -34,7 +34,7 @@ const HygieneFournisseurLogo = () => {
           </div>
         </TooltipTrigger>
         {hygiene.infos.sloganFournisseur && (
-          <TooltipContent>
+          <TooltipContent className="max-w-60">
             <p className="text-sm italic">{hygiene.infos.sloganFournisseur}</p>
           </TooltipContent>
         )}

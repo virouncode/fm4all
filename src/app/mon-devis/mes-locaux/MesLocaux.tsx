@@ -52,9 +52,10 @@ import {
 } from "@/zod-schemas/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, useContext, useRef } from "react";
+import { ChangeEvent, useContext, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { reinitialisationDevis } from "./reinitialisationDevis";
+import ServicesLoader from "./ServicesLoader";
 
 export const MAX_SURFACE = 3000;
 export const MAX_EFFECTIF = 300;
@@ -88,6 +89,7 @@ const MesLocaux = () => {
   const { setTotalOfficeManager } = useContext(TotalOfficeManagerContext);
   const { setTotalServicesFm4All } = useContext(TotalServicesFm4AllContext);
   const dialogRef = useRef<HTMLButtonElement>(null);
+  const [loaderVisible, setLoaderVisible] = useState(false);
 
   const router = useRouter();
   const { toast } = useToast();
@@ -190,10 +192,13 @@ const MesLocaux = () => {
       setTotalServicesFm4All
     );
     // localStorage.clear();
+    setLoaderVisible(true);
     //Passer à l'étape suivante
-    router.push(
-      `/mon-devis/mes-services?effectif=${data.effectif}&surface=${data.surface}`
-    );
+    setTimeout(() => {
+      router.push(
+        `/mon-devis/mes-services?effectif=${data.effectif}&surface=${data.surface}`
+      );
+    }, 3000);
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -234,7 +239,7 @@ const MesLocaux = () => {
     }
   };
 
-  return (
+  return !loaderVisible ? (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(submitForm)}
@@ -299,8 +304,8 @@ const MesLocaux = () => {
               <DialogHeader>
                 <DialogTitle>Devis en cours</DialogTitle>
                 <DialogDescription>
-                  Un devis est déjà en cours. Souaitez-vous poursuivre (vos
-                  informations de devis seront perdues) ?
+                  Un devis est déjà en cours. Souaitez-vous recommencer un
+                  nouveau devis ? (vos informations actuelles seront perdues)
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
@@ -310,7 +315,7 @@ const MesLocaux = () => {
                       variant="destructive"
                       onClick={() => form.handleSubmit(submitForm)()}
                     >
-                      Poursuivre
+                      Nouveau
                     </Button>
                     <Button variant="outline">Annuler</Button>
                   </div>
@@ -333,6 +338,8 @@ const MesLocaux = () => {
         )}
       </form>
     </Form>
+  ) : (
+    <ServicesLoader />
   );
 };
 export default MesLocaux;

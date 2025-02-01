@@ -10,6 +10,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { RATIO_CHOCO, RATIO_LAIT, RATIO_SUCRE } from "@/constants/constants";
 import { locationCafeMachine } from "@/constants/locationsDistribHygiene";
 import { typesBoissons, TypesBoissonsType } from "@/constants/typesBoissons";
@@ -882,68 +888,81 @@ const CafeEspaceForm = ({
   };
 
   return (
-    <form className="w-2/3">
-      <div className="flex gap-8 items-center mb-4">
-        <div>
-          <RadioGroup
-            onValueChange={handleChangeTypeBoissons}
-            value={espace.infos.typeBoissons}
-            className="flex gap-4 items-center"
-            name="typeBoissons"
-          >
-            {typesBoissons.map(({ id, description }) => (
-              <div key={id} className="flex gap-2 items-center">
-                <RadioGroupItem
-                  value={id}
-                  title={description}
-                  id={`${id}_${espace.infos.espaceId}`}
+    <TooltipProvider delayDuration={0}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <form className="w-2/3">
+            <div className="flex gap-8 items-center mb-4">
+              <div>
+                <RadioGroup
+                  onValueChange={handleChangeTypeBoissons}
+                  value={espace.infos.typeBoissons}
+                  className="flex gap-4 items-center"
+                  name="typeBoissons"
+                >
+                  {typesBoissons.map(({ id, description }) => (
+                    <div key={id} className="flex gap-2 items-center">
+                      <RadioGroupItem
+                        value={id}
+                        title={description}
+                        id={`${id}_${espace.infos.espaceId}`}
+                      />
+                      <Label htmlFor={`${id}_${espace.infos.espaceId}`}>
+                        {description}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+              <div className="flex gap-2 items-center">
+                <Input
+                  className={`w-full max-w-xs min-w-20 ${
+                    nbPersonnes === client.effectif ? "text-destructive" : ""
+                  }`}
+                  type="number"
+                  min={1}
+                  max={MAX_EFFECTIF}
+                  step={1}
+                  value={nbPersonnes}
+                  onChange={handleChangeNbPersonnes}
+                  id={`nbPersonnes_${espace.infos.espaceId}`}
                 />
-                <Label htmlFor={`${id}_${espace.infos.espaceId}`}>
-                  {description}
+                <Label
+                  htmlFor={`nbPersonnes_${espace.infos.espaceId}`}
+                  className="text-base"
+                >
+                  personnes
                 </Label>
               </div>
-            ))}
-          </RadioGroup>
-        </div>
-        <div className="flex gap-2 items-center">
-          <Input
-            className={`w-full max-w-xs min-w-20 ${
-              nbPersonnes === client.effectif ? "text-destructive" : ""
-            }`}
-            type="number"
-            min={1}
-            max={MAX_EFFECTIF}
-            step={1}
-            value={nbPersonnes}
-            onChange={handleChangeNbPersonnes}
-            id={`nbPersonnes_${espace.infos.espaceId}`}
-          />
-          <Label
-            htmlFor={`nbPersonnes_${espace.infos.espaceId}`}
-            className="text-base"
-          >
-            personnes
-          </Label>
-        </div>
-        {espace.infos.espaceId === cafeEspacesIds[0] && (
-          <Select
-            value={cafe.infos.dureeLocation}
-            onValueChange={handleSelectDureeLocation}
-          >
-            <SelectTrigger className={`w-full max-w-xs`}>
-              <SelectValue placeholder="Choisir" />
-            </SelectTrigger>
-            <SelectContent>
-              {locationCafeMachine.map((item) => (
-                <SelectItem key={`${location}_${item.id}`} value={item.id}>
-                  {item.description}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-      </div>
-    </form>
+              {espace.infos.espaceId === cafeEspacesIds[0] && (
+                <Select
+                  value={cafe.infos.dureeLocation}
+                  onValueChange={handleSelectDureeLocation}
+                >
+                  <SelectTrigger className={`w-full max-w-xs`}>
+                    <SelectValue placeholder="Choisir" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {locationCafeMachine.map((item) => (
+                      <SelectItem
+                        key={`${location}_${item.id}`}
+                        value={item.id}
+                      >
+                        {item.description}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+          </form>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-60">
+          Sélectionnez le nombre de personnes pour votre espace café et le type
+          de boissons, avec ou sans Lait/Cacao
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 

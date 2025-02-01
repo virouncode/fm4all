@@ -335,7 +335,7 @@ export const reinitialisationDevis = (
   });
   //Navigation
   setServices({
-    currentServiceId: 1,
+    currentServiceId: 0,
   });
   setFoodBeverage({
     currentFoodBeverageId: 1,

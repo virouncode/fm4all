@@ -132,26 +132,26 @@ const MonDevisForm = () => {
           <div className="flex flex-col gap-10 md:flex-row md:gap-20">
             <div className="w-full md:w-1/4 flex flex-col">
               <InputWithLabel<InsertClientType>
-                fieldTitle="Prénom du contact*"
+                fieldTitle="Prénom du signataire*"
                 nameInSchema="prenomContact"
                 name="prenomContact"
                 handleChange={handleChange}
               />
               <InputWithLabel<InsertClientType>
-                fieldTitle="Nom du contact*"
+                fieldTitle="Nom du signataire*"
                 nameInSchema="nomContact"
                 name="nomContact"
                 handleChange={handleChange}
               />
               <InputWithLabel<InsertClientType>
-                fieldTitle="Email du contact*"
+                fieldTitle="Email du signataire*"
                 nameInSchema="emailContact"
                 type="email"
                 name="emailContact"
                 handleChange={handleChange}
               />
               <InputWithLabel<InsertClientType>
-                fieldTitle="Poste du contact*"
+                fieldTitle="Poste du signataire*"
                 nameInSchema="posteContact"
                 name="phoneContact"
                 handleChange={handleChange}

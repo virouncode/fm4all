@@ -135,7 +135,7 @@ const SauvegarderProgression = () =>
             Dans la prochaine étape, vous allez personnaliser vos services et
             choisir des options avant de valider votre budget final. Afin
             d’améliorer votre expérience et enregistrer votre progression, merci
-            de compléter les informations suivantes :
+            de renseigner vos informations suivantes :
           </p>
           <Form {...form}>
             <form
@@ -221,6 +221,7 @@ const SauvegarderProgression = () =>
                   <Link
                     href="/politique-de-confidentialite"
                     className="underline"
+                    target="_blank"
                   >
                     politique de confidentialité.
                   </Link>

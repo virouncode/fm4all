@@ -107,7 +107,7 @@ const Cafe = ({
       <PropositionsTitle
         icon={Coffee}
         title="Boissons chaudes"
-        description="Café expresso, boissons lactées ou gourmandes, choisissez la gamme de machines qui vous convient le mieux"
+        description="Café expresso, boissons lactées ou gourmandes, choisissez la gamme de machine qui vous convient le mieux. Forfait mensuel tout compris (machine, café, consommables)"
         handleClickPrevious={handleClickPrevious}
         previousButton={false}
       />
@@ -134,7 +134,7 @@ const Cafe = ({
               className="text-base"
               onClick={handleAddEspace}
             >
-              Ajouter un espace tisanerie
+              Ajouter un espace café
             </Button>
           </div>
         )}

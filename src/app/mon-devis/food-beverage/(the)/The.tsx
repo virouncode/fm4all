@@ -37,7 +37,7 @@ const The = ({ theConsoTarifs }: TheProps) => {
       <PropositionsTitle
         title="Thés variés"
         icon={Leaf}
-        description="Parce que tout le monde ne boit pas forcément du café, un choix de thés présentés en coffrets"
+        description="Parce que tout le monde ne boit pas forcément du café, un choix de thés présentés en boîtes et coffrets"
         handleClickPrevious={handleClickPrevious}
       />
       <div className="w-full flex-1 overflow-auto">

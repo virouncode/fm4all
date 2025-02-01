@@ -66,6 +66,7 @@ const ServicesFm4AllPropositionCard = ({
   )} € / mois${proposition.remiseCa ? "\u00B9" : ""}${
     proposition.remiseHof ? "\u00B2" : ""
   }`;
+
   return (
     <div
       className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4 cursor-pointer ${
@@ -90,14 +91,41 @@ const ServicesFm4AllPropositionCard = ({
           </p>
         )}
         <p className="font-bold">{prixTotalMensuelText}</p>
-        <p className="text-sm">Assurance</p>
-        <p className="text-sm">Plateforme fm4All</p>
-        <p className="text-sm">Support administratif</p>
-        {gamme !== "essentiel" && (
-          <p className="text-sm">Support opérationnel</p>
+        {gamme === "essentiel" && (
+          <>
+            <p className="text-sm">Accès Services</p>
+            <p className="text-sm">Plateforme fm4All</p>
+            <p className="text-sm">Frais bancaires & Assurance</p>
+            <p className="text-sm">Garanties contractuelles</p>
+            <p className="text-sm">Service support administratif</p>
+            <p className="text-sm">Suivi administratif des contrats</p>
+            <p className="text-sm">Facturation centralisée</p>
+            <p className="text-sm">Gestion des tickets en ligne (24/48h)</p>
+          </>
+        )}
+        {gamme === "confort" && (
+          <>
+            <p className="text-sm">Tout Essentiel +</p>
+            <p className="text-sm">Gestion des partenaires fm4all</p>
+            <p className="text-sm">Planification des interventions</p>
+            <p className="text-sm">Suivi de la réalisation des interventions</p>
+            <p className="text-sm">Reporting personnalisé</p>
+            <p className="text-sm">
+              Service support opérationnel téléphonique (1 pour 50 clients env.)
+            </p>
+          </>
         )}
         {gamme === "excellence" && (
-          <p className="text-sm">Account Manager dédié</p>
+          <>
+            <p className="text-sm">Tout Confort +</p>
+            <p className="text-sm">+10 utilisateurs</p>
+            <p className="text-sm">Account Manager dédié</p>
+            <p className="text-sm">Conseils achats / audit</p>
+            <p className="text-sm">
+              Lien avec le propriétaire / Property Manager / Asset Manager
+            </p>
+            <p className="text-sm">Audit opérationnel</p>
+          </>
         )}
       </div>
     </div>

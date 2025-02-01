@@ -1,9 +1,11 @@
 import WhyCard from "@/components/cards/WhyCard";
+import Loader from "@/components/loader";
 import { Euro, Feather, Handshake, Rabbit, Waves } from "lucide-react";
 
 const ServicesLoader = () => {
   return (
     <div className="flex flex-col gap-10">
+      <Loader src="/img/logo_simple.png" alt="logo-fm4all-simple" />
       <div className="text-lg mx-auto max-w-prose mt-10 animate-pulse text-center">
         Vous allez obtenir des devis qui bénéficient du service de gestion
         centralisé fm4all : <br />

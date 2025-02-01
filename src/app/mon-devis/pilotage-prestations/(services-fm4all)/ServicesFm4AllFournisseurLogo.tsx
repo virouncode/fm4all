@@ -7,46 +7,34 @@ import {
 import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
 import Image from "next/image";
 
-type OfficeManagerFournisseurLogoProps = {
-  fournisseurId: number | null;
-  nomFournisseur: string | null;
-  sloganFournisseur: string | null;
-};
-
-const OfficeManagerFournisseurLogo = ({
-  fournisseurId,
-  nomFournisseur,
-  sloganFournisseur,
-}: OfficeManagerFournisseurLogoProps) => {
-  const logoFournisseurUrl = getLogoFournisseurUrl(fournisseurId);
+const ServicesFm4AllFournisseurLogo = () => {
+  const logoFournisseurUrl = getLogoFournisseurUrl(16);
   return (
     <TooltipProvider delayDuration={0}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className="flex items-center justify-center p-4 h-1/2 w-full">
+          <div className="flex w-1/4 items-center justify-center p-4">
             {logoFournisseurUrl ? (
               <div className="w-full h-full relative">
                 <Image
                   src={logoFournisseurUrl}
-                  alt={`logo-de-${nomFournisseur}`}
+                  alt={`logo-de-fm4All`}
                   fill={true}
                   className="w-full h-full object-contain"
                   quality={100}
                 />
               </div>
             ) : (
-              nomFournisseur
+              "FM4ALL"
             )}
           </div>
         </TooltipTrigger>
-        {sloganFournisseur && (
-          <TooltipContent>
-            <p className="text-sm italic">{sloganFournisseur}</p>
-          </TooltipContent>
-        )}
+        <TooltipContent className="max-w-60">
+          <p className="text-sm italic">Le Facility Management pour tous</p>
+        </TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );
 };
 
-export default OfficeManagerFournisseurLogo;
+export default ServicesFm4AllFournisseurLogo;

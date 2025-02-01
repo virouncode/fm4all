@@ -109,7 +109,8 @@ const CafeEspacePropositions = ({
   const nbPersonnesTotal = cafe.espaces.reduce(
     (acc, curr) =>
       acc +
-      (curr.infos.gammeCafeSelected !== null
+      (cafeEspacesIds[0] === curr.infos.espaceId ||
+      curr.infos.gammeCafeSelected !== null
         ? curr.quantites.nbPersonnes ||
           (effectif > MAX_NB_PERSONNES_PAR_ESPACE
             ? MAX_NB_PERSONNES_PAR_ESPACE
@@ -117,6 +118,7 @@ const CafeEspacePropositions = ({
         : 0),
     0
   );
+
   const propositions = cafeConsoTarifs
     .filter(
       (tarif) =>
@@ -137,6 +139,7 @@ const CafeEspacePropositions = ({
       const machinesTarifFournisseur = machinesTarifs.find(
         (item) => item.fournisseurId === fournisseurId
       );
+
       const nbMachines = machinesTarifFournisseur?.nbMachines ?? null;
       const prixLoc =
         machinesTarifFournisseur?.[cafe.infos.dureeLocation] ?? null;
@@ -295,6 +298,7 @@ const CafeEspacePropositions = ({
   }, {});
 
   const formattedPropositions = Object.values(propositionsByFournisseurId);
+  console.log("formattedPropositions", formattedPropositions);
 
   const handleClickProposition = (proposition: {
     id: number;

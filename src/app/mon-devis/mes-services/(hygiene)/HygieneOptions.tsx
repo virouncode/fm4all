@@ -53,8 +53,7 @@ const HygieneOptions = ({
         icon={Toilet}
         title="Hygiène sanitaire"
         description={
-          "Choisissez vos options en gamme chez " +
-          (hygiene.infos.nomFournisseur ?? "")
+          "Choisissez vos options chez " + (hygiene.infos.nomFournisseur ?? "")
         }
         handleClickPrevious={handleClickPrevious}
       />

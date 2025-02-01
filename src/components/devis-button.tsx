@@ -122,7 +122,7 @@ const DevisButton = ({
     },
     {
       id: 4,
-      url: `/office-management?${serviceSearchParams.toString()}`,
+      url: `/pilotage-prestations?${serviceSearchParams.toString()}`,
       name: "Office Management",
     },
     {

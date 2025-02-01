@@ -23,16 +23,16 @@ const PersonnaliserPresentation = () => {
   return (
     <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="1">
       <div className="flex-1 flex flex-col gap-4">
-        <p className="max-w-prose">
+        <p className="max-w-prose mx-auto">
           {client.prenomContact} {client.nomContact},{" "}
         </p>
-        <p className="max-w-prose">
+        <p className="max-w-prose mx-auto">
           Dans cette étape, vous allez pouvoir personnaliser votre devis et
           confirmer certaines informations. Ces compléments vont nous permettre
           de vous donner un tarif définitif pour votre futur contrat de
           prestations de services.
         </p>
-        <p className="max-w-prose">
+        <p className="max-w-prose mx-auto">
           Avec fm4all vous avez{" "}
           <strong>5 bonnes raisons d’améliorer votre quotidien</strong> :
         </p>

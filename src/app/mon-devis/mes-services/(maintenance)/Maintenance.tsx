@@ -64,7 +64,7 @@ const Maintenance = ({
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="5">
       <PropositionsTitle
         title="Maintenance"
-        description="Veille réglementaire, obligations légales, bien-être au travail, petits travaux, lien avec le gestionnaire de l’immeuble... déléguez la maintenance de vos locaux et le suivi de vos contrôles."
+        description="Obligations légales & veille réglementaire, bien-être, petits travaux, lien avec le gestionnaire de l’immeuble... déléguez la maintenance et le suivi de vos contrôles."
         icon={Wrench}
         handleClickPrevious={handleClickPrevious}
       />

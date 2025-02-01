@@ -40,7 +40,7 @@ const ThePropositionFournisseurLogo = ({
           </div>
         </TooltipTrigger>
         {slogan && (
-          <TooltipContent>
+          <TooltipContent className="max-w-60">
             <p className="text-sm italic">{slogan}</p>
           </TooltipContent>
         )}

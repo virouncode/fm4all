@@ -52,7 +52,7 @@ const OfficeManagerPropositions = ({
     let { fournisseurId, nomFournisseur, slogan } = tarif;
     const { id, demiTjm, demiTjmPremium } = tarif;
     if (fournisseurId === 14) {
-      fournisseurId = 15;
+      fournisseurId = 16;
       nomFournisseur = "FM4ALL";
       slogan = "L'office management pour tous";
     }

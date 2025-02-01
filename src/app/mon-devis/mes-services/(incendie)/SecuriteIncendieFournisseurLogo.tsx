@@ -39,7 +39,7 @@ const SecuriteIncendieFournisseurLogo = ({
             )}
           </div>
         </TooltipTrigger>
-        <TooltipContent>
+        <TooltipContent className="max-w-60">
           <p className="text-sm italic">{sloganFournisseur}</p>
         </TooltipContent>
       </Tooltip>

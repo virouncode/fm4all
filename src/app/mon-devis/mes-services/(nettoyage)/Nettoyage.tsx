@@ -42,7 +42,12 @@ const Nettoyage = ({
   //Scroller automatiquement vers le service actuel
   useScrollIntoService();
 
-  const handleClickPrevious = () => {};
+  const handleClickPrevious = () => {
+    setServices((prev) => ({
+      ...prev,
+      currentServiceId: prev.currentServiceId - 1,
+    }));
+  };
   const handleClickNext = () => {
     if (nettoyage.infos.fournisseurId && nettoyage.infos.gammeSelected) {
       setServices((prev) => ({
@@ -64,7 +69,6 @@ const Nettoyage = ({
         description="D’un nettoyage essentiel à une expérience 5 étoiles, choisissez la prestation propreté qui vous ressemble."
         icon={SprayCan}
         handleClickPrevious={handleClickPrevious}
-        previousButton={false}
       />
       <div className="w-full flex-1 overflow-auto">
         <NettoyagePropositions

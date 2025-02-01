@@ -4,7 +4,6 @@ import { TheContext } from "@/context/TheProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { roundEffectif } from "@/lib/roundEffectif";
 import { roundNbPersonnesCafeConso } from "@/lib/roundNbPersonnesCafeConso";
-import { GammeType } from "@/zod-schemas/gamme";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { ChangeEvent, useContext } from "react";
 import { MAX_EFFECTIF } from "../../mes-locaux/MesLocaux";
@@ -41,6 +40,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
           tarif.prixUnitaire !== null
             ? Math.round(nbThesParAn * tarif.prixUnitaire)
             : null,
+        infos: tarif.infos ?? null,
       })) ?? [];
 
   const handleChangeNbPersonnes = (e: ChangeEvent<HTMLInputElement>) => {
@@ -79,15 +79,15 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
 
   const handleClickProposition = (proposition: {
     prixAnnuel: number | null;
+    infos: string | null;
     id: number;
     nomFournisseur: string;
     slogan: string | null;
     createdAt: Date;
     fournisseurId: number;
-    gamme: GammeType;
+    gamme: "essentiel" | "confort" | "excellence";
     effectif: number;
     prixUnitaire: number | null;
-    infos: string | null;
   }) => {
     const { gamme, prixAnnuel, prixUnitaire } = proposition;
     if (the.infos.gammeSelected === gamme) {

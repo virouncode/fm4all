@@ -7,7 +7,7 @@ type AddEspaceButtonProps = {
 const AddEspaceButton = ({ handleAddEspace }: AddEspaceButtonProps) => {
   return (
     <Button variant="outline" size="lg" onClick={handleAddEspace}>
-      Ajouter un espace
+      Ajouter un espace café
     </Button>
   );
 };

@@ -139,9 +139,7 @@ const SecuriteIncendiePropositions = ({
       totalDeplacementTrilogie: fraisDeplacementTrilogie,
     }));
     toast({
-      title: `Attention`,
       description: `Veillez à (re)-sélectionner vos options de sécurité incendie dans l'étape 6 (Personnaliser)`,
-      variant: "destructive",
     });
   };
 

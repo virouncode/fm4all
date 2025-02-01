@@ -7,18 +7,18 @@ import {
   getServicesFm4AllTaux,
 } from "@/lib/queries/services-fm4all/getServicesFm4All";
 import Link from "next/link";
-import OfficeManager from "./(office-management)/OfficeManager";
+import OfficeManager from "./(office-manager)/OfficeManager";
 import ServicesFm4All from "./(services-fm4all)/ServicesFm4All";
 
-type OfficeManagementProps = {
+type PilotagePrestationsProps = {
   surface: string;
   effectif: string;
 };
 
-const OfficeManagement = async ({
+const PilotagePrestations = async ({
   surface,
   effectif,
-}: OfficeManagementProps) => {
+}: PilotagePrestationsProps) => {
   const [
     officeManagerQuantites,
     officeManagerTarifs,
@@ -67,4 +67,4 @@ const OfficeManagement = async ({
   );
 };
 
-export default OfficeManagement;
+export default PilotagePrestations;

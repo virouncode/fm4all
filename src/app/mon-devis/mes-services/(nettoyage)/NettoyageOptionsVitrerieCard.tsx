@@ -1,6 +1,12 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { useContext } from "react";
@@ -47,7 +53,16 @@ const NettoyageOptionsVitrerieCard = ({
     <div className="flex border-b flex-1">
       <div className="flex w-1/4 items-center justify-center p-4">
         <div className="flex flex-col gap-2 items-center justify-center w-full">
-          <p className="text-base">Lavage Vitrerie*</p>
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <p className="text-base">Lavage Vitrerie*</p>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-60">
+                Vitres accessibles et cloisons
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <div className="flex gap-4 items-center justify-center w-full">
             <Input
               type="number"

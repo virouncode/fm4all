@@ -16,7 +16,7 @@ export const ServicesContext = createContext<{
   services: ServicesType;
   setServices: Dispatch<SetStateAction<ServicesType>>;
 }>({
-  services: { currentServiceId: 1 },
+  services: { currentServiceId: 0 },
   setServices: () => {},
 });
 
@@ -25,7 +25,7 @@ const ServicesProvider = ({ children }: PropsWithChildren) => {
 
   // Default state initialization
   const [services, setServices] = useState<ServicesType>({
-    currentServiceId: 1,
+    currentServiceId: 0,
   });
 
   // Load data from localStorage after mounting

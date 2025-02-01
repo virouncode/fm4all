@@ -1,4 +1,10 @@
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { CafeContext } from "@/context/CafeProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
@@ -111,70 +117,111 @@ const CafeEspacePropositionCard = ({
   const prixInstallationText = proposition.totalInstallation
     ? `+ ${formatNumber(proposition.totalInstallation)} € d'installation`
     : "";
-  return (
-    <div
-      className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4 cursor-pointer ${
-        espace.infos.gammeCafeSelected === gamme &&
-        cafe.infos.fournisseurId === proposition.fournisseurId
-          ? "ring-4 ring-inset ring-destructive"
-          : ""
-      }`}
-      onClick={() =>
-        cafeEspacesIds[0] === espace.infos.espaceId
-          ? handleClickFirstEspaceProposition(proposition)
-          : handleClickProposition(proposition)
-      }
-    >
-      {proposition.totalAnnuel ? (
-        <Checkbox
-          checked={
-            espace.infos.gammeCafeSelected === gamme &&
-            cafe.infos.fournisseurId === proposition.fournisseurId
-          }
-          onCheckedChange={() => () =>
-            cafeEspacesIds[0] === espace.infos.espaceId
-              ? handleClickFirstEspaceProposition(proposition)
-              : handleClickProposition(proposition)}
-          className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-        />
-      ) : null}
-      <div>
-        <p className="font-bold">{prixMensuelText}</p>
-        {prixInstallationText && (
-          <p className="text-base">{prixInstallationText}</p>
-        )}
+  const typeLaitText = !proposition.typeLait
+    ? ""
+    : proposition.typeLait === "dosettes"
+    ? "Lait en dosettes"
+    : proposition.typeLait === "frais"
+    ? "Lait frais"
+    : "Lait en poudre machine";
+  const typeChocolatText = !proposition.typeChocolat
+    ? ""
+    : proposition.typeChocolat === "sachets"
+    ? "Chocolat en sachets"
+    : "Chocolat en poudre machine";
 
-        <p className="text-xs">
-          {proposition.nbMachines} machine(s) {proposition.marque}{" "}
-          {proposition.modele}{" "}
-          {proposition.reconditionne ? " reconditionnée(s)" : ""}
-        </p>
-        <p className="text-xs">
-          Consommables ~ {proposition.nbTassesParJ} tasses / j
-        </p>
-        <p className="text-xs">
-          Maintenance: {proposition.nbPassagesParAn} passages / an
-        </p>
-        {proposition.infos && (
-          <p className="text-xs">Café : {proposition.infos}</p>
-        )}
-        {proposition.typeLait === "dosettes" && (
-          <p className="text-xs">Lait en dosettes</p>
-        )}
-        {proposition.typeLait === "frais" && (
-          <p className="text-xs">Lait frais</p>
-        )}
-        {proposition.typeLait === "poudre" && (
-          <p className="text-xs">Lait en poudre machine</p>
-        )}
-        {proposition.typeChocolat === "sachets" && (
-          <p className="text-xs">Chocolat en sachets</p>
-        )}
-        {proposition.typeChocolat === "poudre" && (
-          <p className="text-xs">Chocolat en poudre machine</p>
-        )}
-      </div>
+  const tooltipEssentiel = (
+    <div className="flex flex-col gap-4">
+      <p className="text-center text-lg">Essentiel</p>
+      <p>
+        {proposition.infos
+          ? proposition.infos
+          : "Café conventionnel dit Classique, Blend"}
+      </p>
     </div>
+  );
+  const tooltipConfort = (
+    <div className="flex flex-col gap-4">
+      <p className="text-center text-lg">Confort</p>
+      <p>
+        {proposition.infos ? proposition.infos : "Café Supérieur, 100% Arabica"}
+      </p>
+    </div>
+  );
+  const tooltipExcellence = (
+    <div className="flex flex-col gap-4">
+      <p className="text-center text-lg">Excellence</p>
+      <p>
+        {proposition.infos
+          ? proposition.infos
+          : "Café de spécialité, premium, café d’exception, Bio"}
+      </p>
+    </div>
+  );
+  const tooltip =
+    gamme === "essentiel"
+      ? tooltipEssentiel
+      : gamme === "confort"
+      ? tooltipConfort
+      : tooltipExcellence;
+
+  return (
+    <TooltipProvider delayDuration={0}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div
+            className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4 cursor-pointer ${
+              espace.infos.gammeCafeSelected === gamme &&
+              cafe.infos.fournisseurId === proposition.fournisseurId
+                ? "ring-4 ring-inset ring-destructive"
+                : ""
+            }`}
+            onClick={() =>
+              cafeEspacesIds[0] === espace.infos.espaceId
+                ? handleClickFirstEspaceProposition(proposition)
+                : handleClickProposition(proposition)
+            }
+          >
+            {proposition.totalAnnuel ? (
+              <Checkbox
+                checked={
+                  espace.infos.gammeCafeSelected === gamme &&
+                  cafe.infos.fournisseurId === proposition.fournisseurId
+                }
+                onCheckedChange={() => () =>
+                  cafeEspacesIds[0] === espace.infos.espaceId
+                    ? handleClickFirstEspaceProposition(proposition)
+                    : handleClickProposition(proposition)}
+                className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+              />
+            ) : null}
+            <div>
+              <p className="font-bold">{prixMensuelText}</p>
+              {prixInstallationText && (
+                <p className="text-base">{prixInstallationText}</p>
+              )}
+
+              <p className="text-xs">
+                {proposition.nbMachines} machine(s) {proposition.marque}{" "}
+                {proposition.modele}{" "}
+                {proposition.reconditionne ? " reconditionnée(s)" : ""}
+              </p>
+              <p className="text-xs">
+                Consommables ~ {proposition.nbTassesParJ} tasses / j
+              </p>
+              <p className="text-xs">
+                Maintenance: {proposition.nbPassagesParAn} passages / an
+              </p>
+            </div>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-60">
+          <p>{tooltip}</p>
+          <p>{typeLaitText}</p>
+          <p>{typeChocolatText}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 

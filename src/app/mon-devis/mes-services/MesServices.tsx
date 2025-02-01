@@ -28,6 +28,7 @@ import SecuriteIncendie from "./(incendie)/SecuriteIncendie";
 import Maintenance from "./(maintenance)/Maintenance";
 import Nettoyage from "./(nettoyage)/Nettoyage";
 import NettoyageOptions from "./(nettoyage)/NettoyageOptions";
+import MesServicesPresentation from "./MesServicesPresentation";
 
 type MesServicesProps = {
   surface: string;
@@ -114,6 +115,7 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
 
   return (
     <section className="flex-1 overflow-hidden">
+      <MesServicesPresentation />
       <Nettoyage
         nettoyageQuantites={nettoyageQuantites}
         nettoyageTarifs={nettoyageTarifs}

@@ -2,6 +2,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
 import { useContext } from "react";
 
@@ -26,31 +32,41 @@ const OfficeManagerInputs = ({
   demiTjmPremium,
 }: OfficeManagerInputsProps) => {
   const { officeManager } = useContext(OfficeManagerContext);
-
+  const tooltipText =
+    "Sélectionnez le nombre de jour qui vous convient en fonction des tâches à réaliser";
   return (
     <>
-      <div className="flex gap-2 items-center flex-col  w-full">
-        <Slider
-          value={[
-            (officeManager.quantites.demiJParSemaine ||
-              demiJParSemaineEssentiel) ??
-              1,
-          ]}
-          onValueChange={(value: number[]) =>
-            handleChangeDemiJParSemaine(
-              value,
-              officeManager.infos.premium ? demiTjmPremium : demiTjm
-            )
-          }
-          min={1}
-          max={20}
-          step={1}
-        />
-        <Label htmlFor="demiJParSemaine" className="text-sm flex-1">
-          {officeManager.quantites.demiJParSemaine || demiJParSemaineEssentiel}{" "}
-          demi journée(s) / semaine
-        </Label>
-      </div>
+      <TooltipProvider delayDuration={0}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="flex gap-2 items-center flex-col  w-full">
+              <Slider
+                value={[
+                  (officeManager.quantites.demiJParSemaine ||
+                    demiJParSemaineEssentiel) ??
+                    1,
+                ]}
+                onValueChange={(value: number[]) =>
+                  handleChangeDemiJParSemaine(
+                    value,
+                    officeManager.infos.premium ? demiTjmPremium : demiTjm
+                  )
+                }
+                min={1}
+                max={20}
+                step={1}
+              />
+              <Label htmlFor="demiJParSemaine" className="text-sm flex-1">
+                {officeManager.quantites.demiJParSemaine ||
+                  demiJParSemaineEssentiel}{" "}
+                demi journée(s) / semaine
+              </Label>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent className="max-w-60">{tooltipText}</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
       <div className="flex gap-2 justify-center items-center">
         <Checkbox
           id="premium"
@@ -59,7 +75,7 @@ const OfficeManagerInputs = ({
           onCheckedChange={handleCheckPremium}
         />
         <Label htmlFor="premium" className="text-sm flex-1">
-          Anglais courant + bureautique
+          Anglais courant ou Expertise Sup.
         </Label>
       </div>
       <div>

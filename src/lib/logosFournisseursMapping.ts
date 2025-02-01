@@ -13,7 +13,8 @@ export const logosFournisseursMapping = [
   { fournisseurId: 12, url: "/img/logos-fournisseurs/logo_epch.png" },
   { fournisseurId: 13, url: "/img/logos-fournisseurs/logo_castalie.png" },
   { fournisseurId: 14, url: "" },
-  { fournisseurId: 15, url: "/img/logos-fournisseurs/logo_full.png" },
+  { fournisseurId: 16, url: "/img/logos-fournisseurs/logo_full.png" },
+  { fournisseurId: 17, url: "/img/logos-fournisseurs/logo_gally.png" },
 ];
 
 export const getLogoFournisseurUrl = (fournisseurId?: number | null) => {

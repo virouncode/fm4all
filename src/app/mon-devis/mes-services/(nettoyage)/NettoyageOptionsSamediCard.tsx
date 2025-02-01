@@ -1,4 +1,10 @@
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { useContext } from "react";
@@ -42,9 +48,18 @@ const NettoyageOptionsSamediCard = ({
   const samediNbPassagesParSemaineText = `1 passage de ${nettoyage.quantites.hParPassage} h / semaine en plus`;
   return (
     <div className="flex border-b flex-1 ">
-      <div className="flex w-1/4 items-center justify-center text-base text-center p-4">
-        Nettoyage supplémentaire tous les Samedi
-      </div>
+      <TooltipProvider delayDuration={0}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="flex w-1/4 items-center justify-center text-base text-center p-4">
+              Nettoyage supplémentaire tous les Samedi
+            </div>
+          </TooltipTrigger>
+          <TooltipContent className="max-w-60">
+            Ajoute une journée à la fréquence choisie précédemment
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <div
         className={`flex w-3/4 items-center p-4 justify-center ${
           nettoyage.infos.samediSelected
