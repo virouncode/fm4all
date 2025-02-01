@@ -1,10 +1,4 @@
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { useContext } from "react";
@@ -128,47 +122,44 @@ const OfficeManagerPropositionCard = ({
       : "";
 
   return (
-    <TooltipProvider delayDuration={0}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div
-            className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4 cursor-pointer ${
-              officeManager.infos.fournisseurId === proposition.fournisseurId &&
-              officeManager.infos.gammeSelected !== null
-                ? "ring-4 ring-inset ring-destructive"
-                : ""
-            }`}
-            onClick={() => handleClickProposition(proposition)}
-          >
-            <Checkbox
-              checked={
-                officeManager.infos.fournisseurId ===
-                  proposition.fournisseurId &&
-                officeManager.infos.gammeSelected !== null
-              }
-              onCheckedChange={() => handleClickProposition(proposition)}
-              className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-            />
-            <div>
-              <p className="font-bold">{prixMensuelText}</p>
-              <p className="text-sm">{demiJParSemaineText}</p>
-              {officeManager.infos.premium && (
-                <p className="text-sm">
-                  Profil premium : Anglais ou exp.longue, logiciel, compta, ADV
-                  ou ADC
-                </p>
-              )}
-              <p className="text-sm">
-                Présent {officeManager.infos.remplace ? "52" : "47"} semaines /
-                an
-              </p>
-              {tooltip}
-            </div>
-          </div>
-        </TooltipTrigger>
-        <TooltipContent className="max-w-60">{tooltip}</TooltipContent>{" "}
-      </Tooltip>
-    </TooltipProvider>
+    // <TooltipProvider delayDuration={0}>
+    //   <Tooltip>
+    //     <TooltipTrigger asChild>
+    <div
+      className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4 cursor-pointer ${
+        officeManager.infos.fournisseurId === proposition.fournisseurId &&
+        officeManager.infos.gammeSelected !== null
+          ? "ring-4 ring-inset ring-destructive"
+          : ""
+      }`}
+      onClick={() => handleClickProposition(proposition)}
+    >
+      <Checkbox
+        checked={
+          officeManager.infos.fournisseurId === proposition.fournisseurId &&
+          officeManager.infos.gammeSelected !== null
+        }
+        onCheckedChange={() => handleClickProposition(proposition)}
+        className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+      />
+      <div>
+        <p className="font-bold">{prixMensuelText}</p>
+        <p className="text-sm">{demiJParSemaineText}</p>
+        {officeManager.infos.premium && (
+          <p className="text-sm">
+            Profil premium : Anglais ou exp.longue, logiciel, compta, ADV ou ADC
+          </p>
+        )}
+        <p className="text-sm">
+          Présent {officeManager.infos.remplace ? "52" : "47"} semaines / an
+        </p>
+        {tooltip}
+      </div>
+    </div>
+    //     </TooltipTrigger>
+    //     <TooltipContent className="max-w-60">{tooltip}</TooltipContent>{" "}
+    //   </Tooltip>
+    // </TooltipProvider>
   );
 };
 
