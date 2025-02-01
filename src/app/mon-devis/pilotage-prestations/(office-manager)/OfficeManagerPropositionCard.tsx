@@ -69,10 +69,9 @@ const OfficeManagerPropositionCard = ({
       ? `${proposition.demiJParSemaine / 2} j / semaine`
       : "";
   const tooltipEssentiel = (
-    <div className="flex flex-col gap-4">
-      <p className="text-center text-lg">Essentiel</p>
-      <p>Facility Manager : </p>
-      <ul className="ml-10">
+    <div className="flex flex-col">
+      <p className="text-sm">Essentiel, Facility Manager : </p>
+      <ul className="text-sm ml-10">
         <li className="list-disc">Coordination technique des locaux</li>
         <li className="list-disc">Suivi sous-traitants</li>
         <li className="list-disc">Contrôle et gestion prestataires</li>
@@ -85,10 +84,9 @@ const OfficeManagerPropositionCard = ({
   );
 
   const tooltipConfort = (
-    <div className="flex flex-col gap-4">
-      <p className="text-center text-lg">Confort</p>
-      <p>Essentiel + Office Management :</p>
-      <ul className="ml-10">
+    <div className="flex flex-col">
+      <p className="text-sm">Confort: Essentiel + Office Management :</p>
+      <ul className="text-sm ml-10">
         <li className="list-disc">Gestion des contrats de services tiers</li>
         <li className="list-disc">Accueil des locaux</li>
         <li className="list-disc">Support administratif aux équipes</li>
@@ -100,10 +98,12 @@ const OfficeManagerPropositionCard = ({
   );
 
   const tooltipExcellence = (
-    <div className="flex flex-col gap-4">
-      <p className="text-center text-lg">Excellence</p>
-      <p>Confort + Hospitality & Happiness Management : </p>
-      <ul className="ml-10">
+    <div className="flex flex-col">
+      {/* <p className="text-center text-sm">Excellence</p> */}
+      <p className="text-sm">
+        Excellence : Confort + Hospitality & Happiness Management :{" "}
+      </p>
+      <ul className="text-sm ml-10">
         <li className="list-disc">
           Animation du site (orga events, déj, soirées)
         </li>
@@ -162,6 +162,7 @@ const OfficeManagerPropositionCard = ({
                 Présent {officeManager.infos.remplace ? "52" : "47"} semaines /
                 an
               </p>
+              {tooltip}
             </div>
           </div>
         </TooltipTrigger>
