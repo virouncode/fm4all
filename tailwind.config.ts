@@ -10,7 +10,7 @@ export default {
   theme: {
     extend: {
       backgroundImage: {
-        "hero-img": "url('https://picsum.photos/1400/800')",
+        "hero-img": "url('/img/hero_wallpaper.png')",
         "hof-img": "url('https://picsum.photos/800/400')",
       },
       listStyleType: {

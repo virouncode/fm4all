@@ -207,12 +207,6 @@ const CafeEspacePropositions = ({
           ? (prixUnitaireConsoChocolat ?? 0) * nbTassesParAn * RATIO_CHOCO
           : 0);
 
-      if (fournisseurId === 3 && gamme === "essentiel") {
-        console.log("totalConso", totalConso);
-        console.log("prixUnitaitreConsoCafe", prixUnitaireConsoCafe);
-        console.log("nbTassesParAn", nbTassesParAn);
-      }
-
       const totalAnnuel = totalLoc !== null ? totalLoc + totalConso : null;
       //Modele
       const modele = machinesTarifFournisseur
@@ -298,7 +292,6 @@ const CafeEspacePropositions = ({
   }, {});
 
   const formattedPropositions = Object.values(propositionsByFournisseurId);
-  console.log("formattedPropositions", formattedPropositions);
 
   const handleClickProposition = (proposition: {
     id: number;
