@@ -6,7 +6,7 @@ import {
   officeManagerTarifs,
 } from "@/db/schema";
 import { errorHelper } from "@/lib/errorHelper";
-import { roundEffectif } from "@/lib/roundEffectif";
+import { roundEffectifOfficeManager } from "@/lib/roundEffectifOfficeManager";
 import { roundSurface } from "@/lib/roundSurface";
 import { selectOfficeManagerQuantitesSchema } from "@/zod-schemas/officeManagerQuantites";
 import { selectOfficeManagerTarifsSchema } from "@/zod-schemas/officeManagerTarifs";
@@ -17,7 +17,7 @@ export const getOfficeManagerQuantites = async (
   effectif: string
 ) => {
   const roundedSurface = roundSurface(parseInt(surface));
-  const roundedEffectif = roundEffectif(parseInt(effectif));
+  const roundedEffectif = roundEffectifOfficeManager(parseInt(effectif));
   try {
     const resultsSurface = await db
       .select()
