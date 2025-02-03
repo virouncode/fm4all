@@ -27,11 +27,13 @@ const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
   const { client } = useContext(ClientContext);
   const { fontaines, setFontaines } = useContext(FontainesContext);
   const { setTotalFontaines } = useContext(TotalFontainesContext);
-  const { setFoodBeverage } = useContext(FoodBeverageContext);
+  const { foodBeverage, setFoodBeverage } = useContext(FoodBeverageContext);
   const { setDevisProgress } = useContext(DevisProgressContext);
   const effectif = client.effectif ?? 0;
   const router = useRouter();
   useScrollIntoFontainesEspace();
+
+  console.log("foodBeverage", foodBeverage);
 
   const handleClickNext = () => {
     setFoodBeverage((prev) => ({

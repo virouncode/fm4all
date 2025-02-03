@@ -89,7 +89,10 @@ const CafeEspace = ({
   };
 
   const handleAlert = () => {
-    if (cafeEspacesIds.slice(-1)[0] !== espace.infos.espaceId) {
+    if (
+      cafeEspacesIds.slice(-1)[0] !== espace.infos.espaceId &&
+      cafeEspacesIds[0] !== espace.infos.espaceId
+    ) {
       toast({
         description: "Veuillez d'abord retirer les espaces suivants",
         variant: "destructive",

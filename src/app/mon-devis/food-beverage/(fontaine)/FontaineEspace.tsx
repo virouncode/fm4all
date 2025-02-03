@@ -81,7 +81,13 @@ const FontaineEspace = ({
   };
 
   const handleAlert = () => {
-    if (fontainesEspacesIds.slice(-1)[0] !== espace.infos.espaceId) {
+    console.log("fontainesEspacesIds", fontainesEspacesIds);
+    console.log("espace.infos.espaceId", espace.infos.espaceId);
+
+    if (
+      fontainesEspacesIds.slice(-1)[0] !== espace.infos.espaceId &&
+      fontainesEspacesIds[0] !== espace.infos.espaceId
+    ) {
       toast({
         description: "Veuillez d'abord retirer les espaces suivants",
         variant: "destructive",

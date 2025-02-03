@@ -8,7 +8,7 @@ export default function useScrollIntoFontainesEspace() {
   useEffect(() => {
     if (
       fontaines.infos.currentEspaceId === null ||
-      foodBeverage.currentFoodBeverageId !== 1
+      foodBeverage.currentFoodBeverageId !== 4
     )
       return;
     const currentEspace = document.getElementById(
