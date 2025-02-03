@@ -81,9 +81,6 @@ const FontaineEspace = ({
   };
 
   const handleAlert = () => {
-    console.log("fontainesEspacesIds", fontainesEspacesIds);
-    console.log("espace.infos.espaceId", espace.infos.espaceId);
-
     if (
       fontainesEspacesIds.slice(-1)[0] !== espace.infos.espaceId &&
       fontainesEspacesIds[0] !== espace.infos.espaceId

@@ -543,8 +543,6 @@ const FontaineEspacePropositions = ({
     const indexOfCurrentEspace = fontainesEspacesIds.indexOf(
       espace.infos.espaceId
     );
-    console.log("indexOfCurrentEspace", indexOfCurrentEspace);
-
     setFontaines((prev) => ({
       ...prev,
       infos: {
