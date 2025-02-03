@@ -9,7 +9,7 @@ type OfficeManagerPropositionCardProps = {
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
-    prixAnnuel: number | null;
+    totalAnnuel: number | null;
     demiJParSemaine: number | null;
     demiTjm: number;
     demiTjmPremium: number;
@@ -19,7 +19,7 @@ type OfficeManagerPropositionCardProps = {
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
-    prixAnnuel: number | null;
+    totalAnnuel: number | null;
     demiJParSemaine: number | null;
     demiTjm: number;
     demiTjmPremium: number;
@@ -46,7 +46,7 @@ const OfficeManagerPropositionCard = ({
         : "fm4allexcellence"
       : "";
 
-  if (!proposition.prixAnnuel) {
+  if (!proposition.totalAnnuel) {
     return (
       <div
         className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4`}
@@ -55,8 +55,8 @@ const OfficeManagerPropositionCard = ({
       </div>
     );
   }
-  const prixMensuelText = `${formatNumber(
-    proposition.prixAnnuel / 12
+  const totalMensuelText = `${formatNumber(
+    proposition.totalAnnuel / 12
   )} € / mois*`;
   const demiJParSemaineText =
     proposition.demiJParSemaine !== null
@@ -143,7 +143,7 @@ const OfficeManagerPropositionCard = ({
         className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
       />
       <div>
-        <p className="font-bold">{prixMensuelText}</p>
+        <p className="font-bold">{totalMensuelText}</p>
         <p className="text-sm">{demiJParSemaineText}</p>
         {officeManager.infos.premium && (
           <p className="text-sm">

@@ -23,7 +23,7 @@ type NettoyagePropositionCardProps = {
     hParPassage: number;
     tauxHoraire: number;
     gamme: GammeType;
-    prixAnnuel: number | null;
+    totalAnnuel: number | null;
   }) => void;
   proposition: {
     id: number;
@@ -34,7 +34,7 @@ type NettoyagePropositionCardProps = {
     hParPassage: number;
     tauxHoraire: number;
     gamme: GammeType;
-    prixAnnuel: number | null;
+    totalAnnuel: number | null;
   };
 };
 
@@ -45,7 +45,7 @@ const NettoyagePropositionCard = ({
   const { nettoyage } = useContext(NettoyageContext);
   const gamme = proposition.gamme;
   const color = getFm4AllColor(gamme);
-  if (!proposition.prixAnnuel) {
+  if (!proposition.totalAnnuel) {
     return (
       <div
         className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4`}
@@ -54,7 +54,9 @@ const NettoyagePropositionCard = ({
       </div>
     );
   }
-  const prixMensuelText = `${Math.round(proposition.prixAnnuel / 12)} € / mois`;
+  const totalMensuelText = `${Math.round(
+    proposition.totalAnnuel / 12
+  )} € / mois`;
   const hParSemaineText =
     proposition.hParPassage && proposition.freqAnnuelle
       ? `${formatNumber(
@@ -115,7 +117,7 @@ const NettoyagePropositionCard = ({
               className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             />
             <div>
-              <p className="font-bold">{prixMensuelText}</p>
+              <p className="font-bold">{totalMensuelText}</p>
               <p className="text-base">{hParSemaineText}</p>
               <p className="text-xs">{nbPassagesParSemaineText}</p>
             </div>

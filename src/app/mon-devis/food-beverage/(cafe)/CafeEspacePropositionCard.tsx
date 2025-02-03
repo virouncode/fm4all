@@ -9,6 +9,7 @@ import { CafeContext } from "@/context/CafeProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
+import { GammeType } from "@/zod-schemas/gamme";
 import { useContext } from "react";
 
 type CafeEspacePropositionCardProps = {
@@ -17,7 +18,7 @@ type CafeEspacePropositionCardProps = {
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
-    gamme: "essentiel" | "confort" | "excellence";
+    gamme: GammeType;
     modele: string | null;
     marque: string | null;
     infos: string | null;
@@ -42,7 +43,7 @@ type CafeEspacePropositionCardProps = {
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
-    gamme: "essentiel" | "confort" | "excellence";
+    gamme: GammeType;
     modele: string | null;
     marque: string | null;
     infos: string | null;
@@ -67,7 +68,7 @@ type CafeEspacePropositionCardProps = {
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
-    gamme: "essentiel" | "confort" | "excellence";
+    gamme: GammeType;
     modele: string | null;
     marque: string | null;
     infos: string | null;
@@ -111,7 +112,7 @@ const CafeEspacePropositionCard = ({
     );
   }
 
-  const prixMensuelText = `${Math.round(
+  const totalMensuelText = `${Math.round(
     proposition.totalAnnuel / 12
   )} € / mois`;
   const prixInstallationText = proposition.totalInstallation
@@ -196,7 +197,7 @@ const CafeEspacePropositionCard = ({
               />
             ) : null}
             <div>
-              <p className="font-bold">{prixMensuelText}</p>
+              <p className="font-bold">{totalMensuelText}</p>
               {prixInstallationText && (
                 <p className="text-base">{prixInstallationText}</p>
               )}
@@ -216,7 +217,7 @@ const CafeEspacePropositionCard = ({
           </div>
         </TooltipTrigger>
         <TooltipContent className="max-w-60">
-          <p>{tooltip}</p>
+          {tooltip}
           <p>{typeLaitText}</p>
           <p>{typeChocolatText}</p>
         </TooltipContent>

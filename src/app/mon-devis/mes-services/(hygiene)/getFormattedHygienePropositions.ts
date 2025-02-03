@@ -51,7 +51,7 @@ export const getFormattedHygienePropositions = (
         (tarif) => tarif.type === "ph" && tarif.gamme === gamme
       )?.[dureeLocation] ?? null;
 
-    const prixAnnuelTrilogie =
+    const totalAnnuelTrilogie =
       prixDistribEmp !== null &&
       prixDistribSavon !== null &&
       prixDistribPh !== null &&
@@ -76,7 +76,7 @@ export const getFormattedHygienePropositions = (
       prixDistribSavon,
       prixDistribPh,
       prixInstalDistrib,
-      prixAnnuelTrilogie,
+      totalAnnuelTrilogie,
     };
   });
   return propositions;

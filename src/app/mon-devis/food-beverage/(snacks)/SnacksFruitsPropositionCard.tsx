@@ -116,7 +116,7 @@ const SnacksFruitsPropositionCard = ({
       </div>
     );
   }
-  const prixMensuelText = `${Math.round(proposition.total / 12)} € / mois`;
+  const totalMensuelText = `${Math.round(proposition.total / 12)} € / mois`;
   const gFruitsParSemaineParPersonneText = snacksFruits.infos.choix.includes(
     "fruits"
   )
@@ -150,7 +150,7 @@ const SnacksFruitsPropositionCard = ({
         className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
       />
       <div>
-        <p className="font-bold">{prixMensuelText}</p>
+        <p className="font-bold">{totalMensuelText}</p>
         {gFruitsParSemaineParPersonneText ? (
           <p className="text-xs">{gFruitsParSemaineParPersonneText}</p>
         ) : null}

@@ -12,7 +12,7 @@ import { useContext } from "react";
 
 type ThePropositionCardProps = {
   proposition: {
-    prixAnnuel: number | null;
+    totalAnnuel: number | null;
     infos: string | null;
     id: number;
     nomFournisseur: string;
@@ -24,7 +24,7 @@ type ThePropositionCardProps = {
     prixUnitaire: number | null;
   };
   handleClickProposition: (proposition: {
-    prixAnnuel: number | null;
+    totalAnnuel: number | null;
     infos: string | null;
     id: number;
     nomFournisseur: string;
@@ -46,7 +46,7 @@ const ThePropositionCard = ({
   const { the } = useContext(TheContext);
   const gamme = proposition.gamme;
   const color = getFm4AllColor(gamme);
-  if (!proposition.prixAnnuel) {
+  if (!proposition.totalAnnuel) {
     return (
       <div
         className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4`}
@@ -55,8 +55,8 @@ const ThePropositionCard = ({
       </div>
     );
   }
-  const prixMensuelText = `${formatNumber(
-    proposition.prixAnnuel / 12
+  const totalMensuelText = `${formatNumber(
+    proposition.totalAnnuel / 12
   )} € / mois*`;
 
   const tooltipEssentiel = (
@@ -106,7 +106,7 @@ const ThePropositionCard = ({
             }`}
             onClick={() => handleClickProposition(proposition)}
           >
-            {proposition.prixAnnuel ? (
+            {proposition.totalAnnuel ? (
               <Checkbox
                 checked={the.infos.gammeSelected === proposition.gamme}
                 onCheckedChange={() => handleClickProposition(proposition)}
@@ -114,16 +114,14 @@ const ThePropositionCard = ({
               />
             ) : null}
             <div>
-              <p className="font-bold">{prixMensuelText}</p>
+              <p className="font-bold">{totalMensuelText}</p>
               <p className="text-sm">
                 Consommables ~ {nbTassesParJour} tasses / j
               </p>
             </div>
           </div>
         </TooltipTrigger>
-        <TooltipContent className="max-w-60">
-          <p>{tooltip}</p>
-        </TooltipContent>
+        <TooltipContent className="max-w-60">{tooltip}</TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );

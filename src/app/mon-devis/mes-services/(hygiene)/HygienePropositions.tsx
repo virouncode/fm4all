@@ -77,7 +77,7 @@ const HygienePropositions = ({
     prixDistribSavon: number | null;
     prixDistribPh: number | null;
     prixInstalDistrib: number | null;
-    prixAnnuelTrilogie: number | null;
+    totalAnnuelTrilogie: number | null;
   }) => {
     const {
       gamme,
@@ -85,7 +85,7 @@ const HygienePropositions = ({
       prixDistribSavon,
       prixDistribPh,
       prixInstalDistrib,
-      prixAnnuelTrilogie,
+      totalAnnuelTrilogie,
     } = proposition;
 
     //Je décoche la proposition
@@ -137,7 +137,7 @@ const HygienePropositions = ({
       },
     }));
     //Calculer total hygiene
-    const totalTrilogie = prixAnnuelTrilogie;
+    const totalTrilogie = totalAnnuelTrilogie;
     //Recupération des options
     const nbDistribDesinfectant = hygiene.quantites.nbDistribDesinfectant;
     const nbDistribParfum = hygiene.quantites.nbDistribParfum;

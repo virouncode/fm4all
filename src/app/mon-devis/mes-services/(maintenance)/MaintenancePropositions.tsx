@@ -42,22 +42,22 @@ const MaintenancePropositions = ({
     const freqAnnuelle =
       maintenanceQuantites.find((quantite) => quantite.gamme === tarif.gamme)
         ?.freqAnnuelle ?? null;
-    const prixAnnuelService =
+    const totalAnnuelService =
       freqAnnuelle !== null
         ? Math.round(hParPassage * tauxHoraire * freqAnnuelle)
         : null;
-    const prixAnnuelQ18 = q18Tarif.prixAnnuel;
-    const prixAnnuelLegio = legioTarif.prixAnnuel;
-    const prixAnnuelQualiteAir = qualiteAirTarif.prixAnnuel;
+    const totalAnnuelQ18 = q18Tarif.prixAnnuel;
+    const totalAnnuelLegio = legioTarif.prixAnnuel;
+    const totalAnnuelQualiteAir = qualiteAirTarif.prixAnnuel;
 
-    const prixAnnuelControlesSupplementaires =
+    const totalAnnuelControlesSupplementaires =
       gamme === "essentiel"
-        ? prixAnnuelQ18
+        ? totalAnnuelQ18
         : gamme === "confort"
-        ? prixAnnuelQ18 + prixAnnuelLegio
-        : prixAnnuelQ18 + prixAnnuelLegio + prixAnnuelQualiteAir;
-    const total = prixAnnuelService
-      ? prixAnnuelService + prixAnnuelControlesSupplementaires
+        ? totalAnnuelQ18 + totalAnnuelLegio
+        : totalAnnuelQ18 + totalAnnuelLegio + totalAnnuelQualiteAir;
+    const totalAnnuel = totalAnnuelService
+      ? totalAnnuelService + totalAnnuelControlesSupplementaires
       : null;
     return {
       id,
@@ -68,11 +68,11 @@ const MaintenancePropositions = ({
       hParPassage,
       tauxHoraire,
       freqAnnuelle,
-      prixAnnuelService,
-      prixAnnuelQ18,
-      prixAnnuelLegio,
-      prixAnnuelQualiteAir,
-      total,
+      totalAnnuelService,
+      totalAnnuelQ18,
+      totalAnnuelLegio,
+      totalAnnuelQualiteAir,
+      totalAnnuel,
     };
   });
 
@@ -88,11 +88,11 @@ const MaintenancePropositions = ({
         hParPassage: number;
         tauxHoraire: number;
         freqAnnuelle: number | null;
-        prixAnnuelService: number | null;
-        prixAnnuelQ18: number;
-        prixAnnuelLegio: number;
-        prixAnnuelQualiteAir: number;
-        total: number | null;
+        totalAnnuelService: number | null;
+        totalAnnuelQ18: number;
+        totalAnnuelLegio: number;
+        totalAnnuelQualiteAir: number;
+        totalAnnuel: number | null;
       }[]
     >
   >((acc, item) => {
@@ -120,11 +120,11 @@ const MaintenancePropositions = ({
     hParPassage: number;
     tauxHoraire: number;
     freqAnnuelle: number | null;
-    prixAnnuelService: number | null;
-    prixAnnuelQ18: number;
-    prixAnnuelLegio: number;
-    prixAnnuelQualiteAir: number;
-    total: number | null;
+    totalAnnuelService: number | null;
+    totalAnnuelQ18: number;
+    totalAnnuelLegio: number;
+    totalAnnuelQualiteAir: number;
+    totalAnnuel: number | null;
   }) => {
     const {
       gamme,
@@ -134,16 +134,16 @@ const MaintenancePropositions = ({
       hParPassage,
       tauxHoraire,
       freqAnnuelle,
-      prixAnnuelService,
-      prixAnnuelQ18,
-      prixAnnuelLegio,
-      prixAnnuelQualiteAir,
+      totalAnnuelService,
+      totalAnnuelQ18,
+      totalAnnuelLegio,
+      totalAnnuelQualiteAir,
     } = proposition;
 
-    const totalQ18 = prixAnnuelQ18;
-    const totalLegio = gammes.indexOf(gamme) > 0 ? prixAnnuelLegio : null;
+    const totalQ18 = totalAnnuelQ18;
+    const totalLegio = gammes.indexOf(gamme) > 0 ? totalAnnuelLegio : null;
     const totalQualiteAir =
-      gammes.indexOf(gamme) > 1 ? prixAnnuelQualiteAir : null;
+      gammes.indexOf(gamme) > 1 ? totalAnnuelQualiteAir : null;
 
     if (
       maintenance.infos.fournisseurId === fournisseurId &&
@@ -193,13 +193,13 @@ const MaintenancePropositions = ({
       },
       prix: {
         tauxHoraire,
-        prixQ18: prixAnnuelQ18,
-        prixLegio: prixAnnuelLegio,
-        prixQualiteAir: prixAnnuelQualiteAir,
+        prixQ18: totalAnnuelQ18,
+        prixLegio: totalAnnuelLegio,
+        prixQualiteAir: totalAnnuelQualiteAir,
       },
     }));
     setTotalMaintenance({
-      totalService: prixAnnuelService,
+      totalService: totalAnnuelService,
       totalQ18,
       totalLegio,
       totalQualiteAir,

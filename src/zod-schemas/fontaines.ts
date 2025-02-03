@@ -11,25 +11,25 @@ export const fontainesSchema = z.object({
       .default("pa12M"),
     commentaires: z.string().nullable(),
   }),
-  nbLotsFontaines: z.number().nullable(),
-  lotsFontaines: z.array(
+  nbEspaces: z.number().nullable(),
+  espaces: z.array(
     z.object({
       infos: z.object({
         espaceId: z.number(),
-        typeEau: z.enum(["EF", "EFC", "EFG", "EFCG"]),
+        typeBoissons: z.enum(["EF", "EC", "EG", "ECG"]).default("EF"),
         typePose: z.enum(["aposer", "colonne", "comptoir"]),
         marque: z.string().nullable(),
         modele: z.string().nullable(),
         reconditionne: z.boolean().nullable(),
+        selected: z.boolean().nullable(),
       }),
       quantites: z.object({
         nbPersonnes: z.number().nullable(),
-        nbFontaines: z.number().nullable(),
       }),
       prix: z.object({
-        prixUnitaireLoc: z.number().nullable(),
-        prixUnitaireInstal: z.number().nullable(),
-        prixUnitaireMaintenance: z.number().nullable(),
+        prixLoc: z.number().nullable(),
+        prixInstal: z.number().nullable(),
+        prixMaintenance: z.number().nullable(),
         prixUnitaireConsoFiltres: z.number().nullable(),
         prixUnitaireConsoCO2: z.number().nullable(),
         prixUnitaireConsoEauChaude: z.number().nullable(),
@@ -38,26 +38,25 @@ export const fontainesSchema = z.object({
   ),
 });
 
-export const fontainesLotSchema = z.object({
-  ...fontainesSchema.shape.lotsFontaines.element.shape, // Use `.shape` to spread properties
+export const fontainesEspaceSchema = z.object({
+  ...fontainesSchema.shape.espaces.element.shape, // Use `.shape` to spread properties
 });
 
-export const fontainesLotFormSchema = z.object({
+export const fontainesEspaceFormSchema = z.object({
   machineId: z.number(),
-  typeEau: z.enum(["EF", "EFC", "EFG", "EFCG"]),
-  typePose: z.enum(["aposer", "colonne", "comptoir"]),
+  typeBoissons: z.enum(["EF", "EC", "EG", "ECG"]).default("EF"),
   nbPersonnes: z
     .string()
     .refine(
       (value) =>
         /^\d+$/.test(value) &&
         parseInt(value, 10) >= 1 &&
-        parseInt(value, 10) <= 300,
-      "Le nombre de personnes doit être compris entre 1 et 300"
+        parseInt(value, 10) <= 110,
+      "Le nombre de personnes doit être compris entre 1 et 110"
     ),
-  nbFontaines: z.number(),
+  nbMachines: z.number(),
 });
 
 export type FontainesType = z.infer<typeof fontainesSchema>;
-export type FontainesLotType = z.infer<typeof fontainesLotSchema>;
-export type FontainesLotFormType = z.infer<typeof fontainesLotFormSchema>;
+export type FontaineEspaceType = z.infer<typeof fontainesEspaceSchema>;
+export type FontainesEspaceFormType = z.infer<typeof fontainesEspaceFormSchema>;

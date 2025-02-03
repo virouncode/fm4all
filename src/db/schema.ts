@@ -60,6 +60,8 @@ export const inclusEnum = pgEnum("inclus", [
 
 export const typePorteEnum = pgEnum("typeporte", ["vantaux", "coulissante"]);
 export const typeColonneEnum = pgEnum("typecolonne", ["statique", "dynamique"]);
+export const typeEau = pgEnum("typeeau", ["EF", "EC", "EG", "ECG"]);
+export const typePose = pgEnum("typepose", ["aposer", "colonne", "comptoir"]);
 
 export const fournisseurs = pgTable("fournisseurs", {
   id: serial().primaryKey(),
@@ -426,6 +428,7 @@ export const sucreConsoTarifs = pgTable("sucre_conso_tarifs", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+//SNACKS FRUITS BOISSONS
 export const fruitsQuantites = pgTable("fruits_quantites", {
   id: serial().primaryKey(),
   gParSemaineParPersonne: integer("g_par_semaine_par_personne").notNull(),
@@ -498,6 +501,41 @@ export const foodLivraisonTarifs = pgTable("food_livraison_tarifs", {
   prixUnitaireSiCafe: integer("prix_unitaire_si_cafe").notNull(),
   seuilFranco: integer("seuil_franco"),
   remise_si_cafe: integer("remise_si_cafe"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+//FONTAINES
+export const fontaines = pgTable("fontaines", {
+  id: serial().primaryKey(),
+  marque: varchar().notNull(),
+  modele: varchar().notNull(),
+  infos: varchar(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+export const fontainesTarifs = pgTable("fontaines_tarifs", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  type: typeEau().notNull(),
+  typePose: typePose("type_pose").notNull(),
+  nbPersonnes: integer("nb_personnes").notNull(),
+  oneShot: integer("one_shot"),
+  pa12M: integer("pa_12m"),
+  rac12M: integer("rac_12m"),
+  pa24M: integer("pa_24m"),
+  rac24M: integer("rac_24m"),
+  pa36M: integer("pa_36m"),
+  pa48M: integer("pa_48m"),
+  pa60M: integer("pa_60m"),
+  paMaintenance: integer("pa_maintenance"),
+  fraisInstallation: integer("frais_installation"),
+  paConsoFiltres: integer("pa_conso_filtres"),
+  paConsoCO2: integer("pa_conso_co2"),
+  paConsoEauChaude: integer("pa_conso_eau_chaude"),
+  fontaineId: integer("fontaine_id").references(() => fontaines.id),
+  reconditionne: boolean().default(false),
+  infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -604,6 +642,7 @@ export const fournisseursRelations = relations(
     snacksTarifs: many(snacksTarifs),
     boissonsTarifs: many(boissonsTarifs),
     foodLivraisonTarifs: many(foodLivraisonTarifs),
+    fontainesTarifs: many(fontainesTarifs),
   })
 );
 
@@ -837,6 +876,21 @@ export const foodLivraisonTarifsRelations = relations(
       fields: [foodLivraisonTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
+  })
+);
+
+export const fontainesRelations = relations(fontaines, ({ many }) => ({
+  fontainesTarif: many(fontainesTarifs),
+}));
+
+export const fontainesTarifsRelations = relations(
+  fontainesTarifs,
+  ({ one }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [fontainesTarifs.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    fontaine: one(fontaines),
   })
 );
 

@@ -12,6 +12,8 @@ import HygieneOptionsDesinfectantCard from "./HygieneOptionsDesinfectantCard";
 import HygieneOptionsParfumCard from "./HygieneOptionsParfumCard";
 import HygieneOptionsPoubelleCard from "./HygieneOptionsPoubelleCard";
 
+export const MAX_NB_DISTRIB = 100;
+
 type HygieneOptionsPropositionsProps = {
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
   hygieneDistribTarifs: SelectHygieneDistribTarifsType[];
@@ -252,7 +254,8 @@ const HygieneOptionsPropositions = ({
         let newNbDistribDesinfectant = value
           ? parseInt(value)
           : hygieneDistribQuantite.nbDistribDesinfectant;
-        if (newNbDistribDesinfectant > 100) newNbDistribDesinfectant = 100;
+        if (newNbDistribDesinfectant > MAX_NB_DISTRIB)
+          newNbDistribDesinfectant = MAX_NB_DISTRIB;
         setHygiene((prev) => ({
           ...prev,
           quantites: {
@@ -286,7 +289,8 @@ const HygieneOptionsPropositions = ({
         let newNbDistribParfum = value
           ? parseInt(value)
           : hygieneDistribQuantite.nbDistribParfum;
-        if (newNbDistribParfum > 100) newNbDistribParfum = 100;
+        if (newNbDistribParfum > MAX_NB_DISTRIB)
+          newNbDistribParfum = MAX_NB_DISTRIB;
         setHygiene((prev) => ({
           ...prev,
           quantites: {
@@ -317,7 +321,8 @@ const HygieneOptionsPropositions = ({
         let newNbDistribBalai = value
           ? parseInt(value)
           : hygieneDistribQuantite.nbDistribBalai;
-        if (newNbDistribBalai > 100) newNbDistribBalai = 100;
+        if (newNbDistribBalai > MAX_NB_DISTRIB)
+          newNbDistribBalai = MAX_NB_DISTRIB;
         setHygiene((prev) => ({
           ...prev,
           quantites: {
@@ -348,7 +353,8 @@ const HygieneOptionsPropositions = ({
         let newNbDistribPoubelle = value
           ? parseInt(value)
           : hygieneDistribQuantite.nbDistribPoubelle;
-        if (newNbDistribPoubelle > 100) newNbDistribPoubelle = 100;
+        if (newNbDistribPoubelle > MAX_NB_DISTRIB)
+          newNbDistribPoubelle = MAX_NB_DISTRIB;
         setHygiene((prev) => ({
           ...prev,
           quantites: {

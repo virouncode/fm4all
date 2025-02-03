@@ -13,6 +13,8 @@ import {
 } from "react";
 import { ClientContext } from "./ClientProvider";
 
+export const MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE = 110;
+
 export const FontainesContext = createContext<{
   fontaines: FontainesType;
   setFontaines: Dispatch<SetStateAction<FontainesType>>;
@@ -26,8 +28,8 @@ export const FontainesContext = createContext<{
       dureeLocation: "pa12M",
       commentaires: null,
     },
-    nbLotsFontaines: 0,
-    lotsFontaines: [],
+    nbEspaces: 0,
+    espaces: [],
   },
   setFontaines: () => {},
 });
@@ -46,25 +48,28 @@ const FontainesProvider = ({ children }: PropsWithChildren) => {
       dureeLocation: "pa12M",
       commentaires: null,
     },
-    nbLotsFontaines: 1,
-    lotsFontaines: [
+    nbEspaces: 1,
+    espaces: [
       {
         infos: {
           espaceId: 1,
-          typeEau: "EF",
+          typeBoissons: "EF",
           typePose: "aposer",
           marque: null,
           modele: null,
           reconditionne: false,
+          selected: false,
         },
         quantites: {
-          nbPersonnes: client.effectif ?? 0,
-          nbFontaines: null,
+          nbPersonnes:
+            client.effectif > MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE
+              ? MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE
+              : client.effectif ?? 0,
         },
         prix: {
-          prixUnitaireLoc: null,
-          prixUnitaireInstal: null,
-          prixUnitaireMaintenance: null,
+          prixLoc: null,
+          prixInstal: null,
+          prixMaintenance: null,
           prixUnitaireConsoFiltres: null,
           prixUnitaireConsoCO2: null,
           prixUnitaireConsoEauChaude: null,

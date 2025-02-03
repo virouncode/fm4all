@@ -17,7 +17,7 @@ export const TotalFontainesContext = createContext<{
   setTotalFontaines: Dispatch<SetStateAction<TotalFontainesType>>;
 }>({
   totalFontaines: {
-    totalLotsFontaines: [],
+    totalEspaces: [],
   },
   setTotalFontaines: () => {},
 });
@@ -27,7 +27,7 @@ const TotalFontainesProvider = ({ children }: PropsWithChildren) => {
 
   // Always initialize state
   const [totalFontaines, setTotalFontaines] = useState<TotalFontainesType>({
-    totalLotsFontaines: [
+    totalEspaces: [
       {
         espaceId: 1,
         total: null,

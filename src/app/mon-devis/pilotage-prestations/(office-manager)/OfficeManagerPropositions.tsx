@@ -59,7 +59,7 @@ const OfficeManagerPropositions = ({
     const demiTauxJournalier = officeManager.infos.premium
       ? demiTjmPremium
       : demiTjm;
-    const prixAnnuel =
+    const totalAnnuel =
       demiJParSemaine !== null && majoration !== null
         ? officeManager.infos.remplace
           ? Math.round(
@@ -75,7 +75,7 @@ const OfficeManagerPropositions = ({
       fournisseurId,
       nomFournisseur,
       sloganFournisseur: slogan,
-      prixAnnuel,
+      totalAnnuel,
       demiJParSemaine,
       demiTjm,
       demiTjmPremium,
@@ -87,7 +87,7 @@ const OfficeManagerPropositions = ({
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
-    prixAnnuel: number | null;
+    totalAnnuel: number | null;
     demiJParSemaine: number | null;
     demiTjm: number;
     demiTjmPremium: number;
@@ -96,7 +96,7 @@ const OfficeManagerPropositions = ({
       fournisseurId,
       nomFournisseur,
       sloganFournisseur,
-      prixAnnuel,
+      totalAnnuel,
       demiJParSemaine,
       demiTjm,
       demiTjmPremium,
@@ -153,7 +153,7 @@ const OfficeManagerPropositions = ({
       },
     }));
     setTotalOfficeManager({
-      totalService: prixAnnuel,
+      totalService: totalAnnuel,
     });
   };
 
@@ -178,7 +178,7 @@ const OfficeManagerPropositions = ({
           : value[0] <= 4
           ? 5
           : 0;
-      const prixAnnuel =
+      const totalAnnuel =
         demiTauxJournalier !== null
           ? officeManager.infos.remplace
             ? Math.round(
@@ -189,7 +189,7 @@ const OfficeManagerPropositions = ({
               )
           : null;
       setTotalOfficeManager({
-        totalService: prixAnnuel,
+        totalService: totalAnnuel,
       });
     }
   };
@@ -220,7 +220,7 @@ const OfficeManagerPropositions = ({
       const demiTauxJournalier = officeManager.infos.premium
         ? officeManager.prix.demiTjmPremium
         : officeManager.prix.demiTjm;
-      const prixAnnuel =
+      const totalAnnuel =
         demiJParSemaine !== null &&
         demiTauxJournalier !== null &&
         newMajoration !== null
@@ -239,7 +239,7 @@ const OfficeManagerPropositions = ({
               )
           : null;
       setTotalOfficeManager({
-        totalService: prixAnnuel,
+        totalService: totalAnnuel,
       });
     }
   };
@@ -271,7 +271,7 @@ const OfficeManagerPropositions = ({
         ? officeManager.prix.demiTjmPremium
         : officeManager.prix.demiTjm;
 
-      const prixAnnuel =
+      const totalAnnuel =
         demiJParSemaine !== null &&
         demiTauxJournalier !== null &&
         newMajoration !== null
@@ -290,7 +290,7 @@ const OfficeManagerPropositions = ({
               )
           : null;
       setTotalOfficeManager({
-        totalService: prixAnnuel,
+        totalService: totalAnnuel,
       });
     }
   };

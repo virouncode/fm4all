@@ -8,7 +8,7 @@ import { SelectBoissonsTarifsType } from "@/zod-schemas/boissonsTarifs";
 import { SelectFoodLivraisonTarifsType } from "@/zod-schemas/foodLivraisonTarifs";
 import { SelectFruitsQuantitesType } from "@/zod-schemas/fruitsQuantites";
 import { SelectFruitsTarifsType } from "@/zod-schemas/fruitsTarifs";
-import { gammes } from "@/zod-schemas/gamme";
+import { gammes, GammeType } from "@/zod-schemas/gamme";
 import { SelectSnacksQuantitesType } from "@/zod-schemas/snacksQuantites";
 import { SelectSnacksTarifsType } from "@/zod-schemas/snacksTarifs";
 import { useContext } from "react";
@@ -219,7 +219,7 @@ const SnacksFruitsPropositions = ({
         nomFournisseur: string;
         sloganFournisseur: string | null;
         isSameFournisseur: boolean;
-        gamme: "essentiel" | "confort" | "excellence";
+        gamme: GammeType;
         fruitsKgParSemaine: number | null;
         snacksPortionsParSemaine: number | null;
         boissonsConsosParSemaine: number | null;
@@ -262,7 +262,7 @@ const SnacksFruitsPropositions = ({
     nomFournisseur: string;
     sloganFournisseur: string | null;
     isSameFournisseur: boolean;
-    gamme: "essentiel" | "confort" | "excellence";
+    gamme: GammeType;
     fruitsKgParSemaine: number | null;
     snacksPortionsParSemaine: number | null;
     boissonsConsosParSemaine: number | null;

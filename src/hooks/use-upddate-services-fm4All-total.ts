@@ -2,6 +2,7 @@
 import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
 import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
+import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
@@ -20,6 +21,7 @@ export const useUpddateServicesFm4AllTotal = () => {
   const { totalCafe } = useContext(TotalCafeContext);
   const { totalThe } = useContext(TotalTheContext);
   const { totalSnacksFruits } = useContext(TotalSnacksFruitsContext);
+  const { totalFontaines } = useContext(TotalFontainesContext);
   const { totalOfficeManager } = useContext(TotalOfficeManagerContext);
   const { setTotalServicesFm4All } = useContext(TotalServicesFm4AllContext);
   const { servicesFm4All } = useContext(ServicesFm4AllContext);
@@ -43,9 +45,11 @@ export const useUpddateServicesFm4AllTotal = () => {
     const totalFinalCafe = totalCafe.totalEspaces
       .map(({ total }) => total ?? 0)
       .reduce((acc, curr) => acc + curr, 0);
-
     const totalFinalThe = totalThe.totalService ?? 0;
     const totalFinalSnacksFruits = totalSnacksFruits.total ?? 0;
+    const totalFinalFontaines = totalFontaines.totalEspaces
+      .map(({ total }) => total ?? 0)
+      .reduce((acc, curr) => acc + curr, 0);
     const totalFinalOfficeManager = totalOfficeManager.totalService ?? 0;
     const total =
       totalFinalNettoyage +
@@ -55,6 +59,7 @@ export const useUpddateServicesFm4AllTotal = () => {
       totalFinalCafe +
       totalFinalThe +
       totalFinalSnacksFruits +
+      totalFinalFontaines +
       totalFinalOfficeManager;
 
     const tauxAssurance = servicesFm4All.prix.tauxAssurance;
@@ -104,6 +109,7 @@ export const useUpddateServicesFm4AllTotal = () => {
     totalNettoyage,
     totalOfficeManager.totalService,
     totalSnacksFruits.total,
+    totalFontaines.totalEspaces,
     totalThe.totalService,
   ]);
 };

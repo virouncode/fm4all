@@ -20,7 +20,7 @@ import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine";
 import { SelectCafeMachinesTarifsType } from "@/zod-schemas/cafeMachinesTarifs";
 import { SelectChocolatConsoTarifsType } from "@/zod-schemas/chocolatConsoTarifs";
-import { gammes } from "@/zod-schemas/gamme";
+import { gammes, GammeType } from "@/zod-schemas/gamme";
 import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
@@ -257,7 +257,7 @@ const CafeEspacePropositions = ({
         fournisseurId: number;
         nomFournisseur: string;
         sloganFournisseur: string | null;
-        gamme: "essentiel" | "confort" | "excellence";
+        gamme: GammeType;
         modele: string | null;
         marque: string | null;
         infos: string | null;
@@ -298,7 +298,7 @@ const CafeEspacePropositions = ({
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
-    gamme: "essentiel" | "confort" | "excellence";
+    gamme: GammeType;
     modele: string | null;
     marque: string | null;
     infos: string | null;
@@ -468,12 +468,10 @@ const CafeEspacePropositions = ({
       gamme,
       modele,
       marque,
-      infos,
       reconditionne,
       typeLait,
       typeChocolat,
       nbMachines,
-      nbTassesParJ,
       nbPassagesParAn,
       prixLoc,
       prixInstal,
@@ -938,14 +936,13 @@ const CafeEspacePropositions = ({
     }));
   };
   const handleClickNextEspace = () => {
-    const machinesIds = cafeEspacesIds;
-    const indexOfCurrentMachine = machinesIds.indexOf(espace.infos.espaceId);
+    const indexOfCurrentEspace = cafeEspacesIds.indexOf(espace.infos.espaceId);
 
     setCafe((prev) => ({
       ...prev,
       infos: {
         ...prev.infos,
-        currentEspaceId: machinesIds[indexOfCurrentMachine + 1],
+        currentEspaceId: cafeEspacesIds[indexOfCurrentEspace + 1],
       },
     }));
   };

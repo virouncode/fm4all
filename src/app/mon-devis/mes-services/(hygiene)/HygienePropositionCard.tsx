@@ -15,7 +15,7 @@ type HygienePropositionCardProps = {
     prixDistribSavon: number | null;
     prixDistribPh: number | null;
     prixInstalDistrib: number | null;
-    prixAnnuelTrilogie: number | null;
+    totalAnnuelTrilogie: number | null;
   };
   handleClickProposition: (proposition: {
     gamme: GammeType;
@@ -26,7 +26,7 @@ type HygienePropositionCardProps = {
     prixDistribSavon: number | null;
     prixDistribPh: number | null;
     prixInstalDistrib: number | null;
-    prixAnnuelTrilogie: number | null;
+    totalAnnuelTrilogie: number | null;
   }) => void;
   prixInstalDistrib: number | null;
 };
@@ -39,7 +39,7 @@ const HygienePropositionCard = ({
   const { hygiene } = useContext(HygieneContext);
   const gamme = proposition.gamme;
   const color = getFm4AllColor(gamme);
-  if (!proposition.prixAnnuelTrilogie) {
+  if (!proposition.totalAnnuelTrilogie) {
     return (
       <div
         className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 p-4`}
@@ -48,8 +48,8 @@ const HygienePropositionCard = ({
       </div>
     );
   }
-  const prixMensuelText = `${formatNumber(
-    proposition.prixAnnuelTrilogie / 12
+  const totalMensuelText = `${formatNumber(
+    proposition.totalAnnuelTrilogie / 12
   )} € / mois`;
   const prixInstallationText = prixInstalDistrib
     ? `+ ${formatNumber(prixInstalDistrib)} € d'installation`
@@ -70,7 +70,7 @@ const HygienePropositionCard = ({
         className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
       />
       <div>
-        <p className="font-bold">{prixMensuelText}</p>
+        <p className="font-bold">{totalMensuelText}</p>
         <p className="text-sm">
           Distributeurs{" "}
           {gamme === "essentiel"

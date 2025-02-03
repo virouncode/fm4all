@@ -18,6 +18,7 @@ import { useContext } from "react";
 import PropositionsFooter from "../../PropositionsFooter";
 import PropositionsTitle from "../../PropositionsTitle";
 import CafeEspace from "./CafeEspace";
+import { MAX_NB_PERSONNES_PAR_ESPACE } from "./CafeEspacePropositions";
 
 type CafeProps = {
   cafeMachines: SelectCafeMachinesType[];
@@ -80,7 +81,10 @@ const Cafe = ({
             reconditionne: false,
           },
           quantites: {
-            nbPersonnes: effectif,
+            nbPersonnes:
+              effectif > MAX_NB_PERSONNES_PAR_ESPACE
+                ? MAX_NB_PERSONNES_PAR_ESPACE
+                : effectif,
             nbMachines: null,
             nbPassagesParAn: null,
           },

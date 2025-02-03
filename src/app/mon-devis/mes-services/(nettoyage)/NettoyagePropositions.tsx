@@ -60,7 +60,7 @@ const NettoyagePropositions = ({
     const freqAnnuelle =
       nettoyageQuantites.find((quantite) => quantite.gamme === gamme)
         ?.freqAnnuelle ?? null;
-    const prixAnnuel =
+    const totalAnnuel =
       freqAnnuelle !== null
         ? Math.round(freqAnnuelle * hParPassage * tauxHoraire)
         : null;
@@ -73,7 +73,7 @@ const NettoyagePropositions = ({
       hParPassage,
       tauxHoraire,
       gamme,
-      prixAnnuel,
+      totalAnnuel,
     };
   });
 
@@ -89,7 +89,7 @@ const NettoyagePropositions = ({
         hParPassage: number;
         tauxHoraire: number;
         gamme: GammeType;
-        prixAnnuel: number | null;
+        totalAnnuel: number | null;
       }[]
     >
   >((acc, item) => {
@@ -117,7 +117,7 @@ const NettoyagePropositions = ({
     hParPassage: number;
     tauxHoraire: number;
     gamme: GammeType;
-    prixAnnuel: number | null;
+    totalAnnuel: number | null;
   }) => {
     //Je décoche la proposition
     if (
@@ -196,7 +196,7 @@ const NettoyagePropositions = ({
       gamme,
       hParPassage,
       tauxHoraire,
-      prixAnnuel,
+      totalAnnuel,
     } = proposition;
 
     //NETTOYAGE
@@ -264,7 +264,7 @@ const NettoyagePropositions = ({
               )
           )
         : null;
-    const totalService = prixAnnuel;
+    const totalService = totalAnnuel;
     setTotalNettoyage({
       totalService,
       totalRepasse,

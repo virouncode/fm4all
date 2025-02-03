@@ -57,8 +57,8 @@ export const cafeEspaceFormSchema = z.object({
       (value) =>
         /^\d+$/.test(value) &&
         parseInt(value, 10) >= 1 &&
-        parseInt(value, 10) <= 300,
-      "Le nombre de personnes doit être compris entre 1 et 300"
+        parseInt(value, 10) <= 150,
+      "Le nombre de personnes doit être compris entre 1 et 150"
     ),
   nbMachines: z.number(),
 });

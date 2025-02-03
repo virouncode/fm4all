@@ -22,11 +22,11 @@ type MaintenancePropositionCardProps = {
     hParPassage: number;
     tauxHoraire: number;
     freqAnnuelle: number | null;
-    prixAnnuelService: number | null;
-    prixAnnuelQ18: number;
-    prixAnnuelLegio: number;
-    prixAnnuelQualiteAir: number;
-    total: number | null;
+    totalAnnuelService: number | null;
+    totalAnnuelQ18: number;
+    totalAnnuelLegio: number;
+    totalAnnuelQualiteAir: number;
+    totalAnnuel: number | null;
   };
   handleClickProposition: (proposition: {
     id: number;
@@ -37,11 +37,11 @@ type MaintenancePropositionCardProps = {
     hParPassage: number;
     tauxHoraire: number;
     freqAnnuelle: number | null;
-    prixAnnuelService: number | null;
-    prixAnnuelQ18: number;
-    prixAnnuelLegio: number;
-    prixAnnuelQualiteAir: number;
-    total: number | null;
+    totalAnnuelService: number | null;
+    totalAnnuelQ18: number;
+    totalAnnuelLegio: number;
+    totalAnnuelQualiteAir: number;
+    totalAnnuel: number | null;
   }) => void;
 };
 
@@ -52,7 +52,7 @@ const MaintenancePropositionCard = ({
   const { maintenance } = useContext(MaintenanceContext);
   const gamme = proposition.gamme;
   const color = getFm4AllColor(gamme);
-  if (!proposition.total) {
+  if (!proposition.totalAnnuel) {
     return (
       <div
         className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4`}
@@ -61,7 +61,9 @@ const MaintenancePropositionCard = ({
       </div>
     );
   }
-  const prixMensuelText = `${Math.round(proposition.total / 12)} € / mois`;
+  const totalMensuelText = `${Math.round(
+    proposition.totalAnnuel / 12
+  )} € / mois`;
   const tooltipEssentiel = (
     <div className="flex flex-col gap-4">
       <p className="text-center text-lg">Essentiel</p>
@@ -116,7 +118,7 @@ const MaintenancePropositionCard = ({
               className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             />
             <div>
-              <p className="font-bold">{prixMensuelText}</p>
+              <p className="font-bold">{totalMensuelText}</p>
               <p className="text-sm">
                 {proposition.freqAnnuelle} passage(s) de{" "}
                 {proposition.hParPassage} h / an

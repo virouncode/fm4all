@@ -37,10 +37,13 @@ const SecuriteIncendiePropositions = ({
     fournisseurId: tarif.fournisseurId,
     nomFournisseur: tarif.nomFournisseur,
     sloganFournisseur: tarif.slogan,
+    nbExtincteurs,
+    nbBaes,
+    nbTelBaes,
     prixParExtincteur: tarif.prixParExtincteur,
     prixParBaes: tarif.prixParBaes,
     prixParTelBaes: tarif.prixParTelBaes,
-    prixAnnuelTrilogie: Math.round(
+    totalAnnuelTrilogie: Math.round(
       nbExtincteurs * tarif.prixParExtincteur +
         nbBaes * tarif.prixParBaes +
         nbTelBaes * tarif.prixParTelBaes
@@ -53,20 +56,26 @@ const SecuriteIncendiePropositions = ({
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
+    nbExtincteurs: number;
+    nbBaes: number;
+    nbTelBaes: number;
     prixParExtincteur: number;
     prixParBaes: number;
     prixParTelBaes: number;
-    prixAnnuelTrilogie: number;
+    totalAnnuelTrilogie: number;
     fraisDeplacementTrilogie: number;
   }) => {
     const {
       fournisseurId,
       nomFournisseur,
       sloganFournisseur,
+      nbExtincteurs,
+      nbBaes,
+      nbTelBaes,
       prixParExtincteur,
       prixParBaes,
       prixParTelBaes,
-      prixAnnuelTrilogie,
+      totalAnnuelTrilogie,
       fraisDeplacementTrilogie,
     } = proposition;
     if (incendie.infos.fournisseurId === fournisseurId) {
@@ -121,9 +130,9 @@ const SecuriteIncendiePropositions = ({
       },
       quantites: {
         ...prev.quantites,
-        // nbExtincteurs,
-        // nbBaes,
-        // nbTelBaes,
+        nbExtincteurs,
+        nbBaes,
+        nbTelBaes,
       },
       prix: {
         ...prev.prix,
@@ -135,7 +144,7 @@ const SecuriteIncendiePropositions = ({
     }));
     setTotalIncendie((prev) => ({
       ...prev,
-      totalTrilogie: prixAnnuelTrilogie,
+      totalTrilogie: totalAnnuelTrilogie,
       totalDeplacementTrilogie: fraisDeplacementTrilogie,
     }));
     toast({

@@ -289,25 +289,25 @@ export const fullReinitialisationDevis = (
       dureeLocation: "pa12M",
       commentaires: null,
     },
-    nbLotsFontaines: 1,
-    lotsFontaines: [
+    nbEspaces: 1,
+    espaces: [
       {
         infos: {
           espaceId: 1,
-          typeEau: "EF",
+          typeBoissons: "EF",
           typePose: "aposer",
           marque: null,
           modele: null,
           reconditionne: false,
+          selected: false,
         },
         quantites: {
           nbPersonnes: null,
-          nbFontaines: null,
         },
         prix: {
-          prixUnitaireLoc: null,
-          prixUnitaireInstal: null,
-          prixUnitaireMaintenance: null,
+          prixLoc: null,
+          prixInstal: null,
+          prixMaintenance: null,
           prixUnitaireConsoFiltres: null,
           prixUnitaireConsoCO2: null,
           prixUnitaireConsoEauChaude: null,
@@ -422,7 +422,7 @@ export const fullReinitialisationDevis = (
     total: null,
   });
   setTotalFontaines({
-    totalLotsFontaines: [
+    totalEspaces: [
       {
         espaceId: 1,
         total: null,

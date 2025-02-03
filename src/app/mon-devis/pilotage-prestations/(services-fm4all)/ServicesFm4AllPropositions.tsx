@@ -73,7 +73,7 @@ const ServicesFm4AllPropositions = ({
     .reduce((acc, curr) => acc + curr, 0);
   const totalFinalThe = totalThe.totalService ?? 0;
   const totalFinalSnacksFruits = totalSnacksFruits.total ?? 0;
-  const totalFinalFontaines = totalFontaines.totalLotsFontaines
+  const totalFinalFontaines = totalFontaines.totalEspaces
     .map(({ total }) => total ?? 0)
     .reduce((acc, curr) => acc + curr, 0);
   const totalFinalOfficeManager = totalOfficeManager.totalService ?? 0;
@@ -132,7 +132,7 @@ const ServicesFm4AllPropositions = ({
     const remiseHof = officeManager.infos.gammeSelected
       ? tauxRemiseHof * total
       : 0;
-    const prixTotalAnnuel = Math.round(
+    const totalAnnuel = Math.round(
       (prixAssurance ?? 0) +
         (prixPlateforme ?? 0) +
         (prixSupportAdmin ?? 0) +
@@ -141,7 +141,7 @@ const ServicesFm4AllPropositions = ({
         remiseCa -
         remiseHof
     );
-    const prixTotalAnnuelSansRemise = Math.round(
+    const totalAnnuelSansRemise = Math.round(
       (prixAssurance ?? 0) +
         (prixPlateforme ?? 0) +
         (prixSupportAdmin ?? 0) +
@@ -166,8 +166,8 @@ const ServicesFm4AllPropositions = ({
       remiseCaSeuil,
       remiseCa,
       remiseHof,
-      prixTotalAnnuel,
-      prixTotalAnnuelSansRemise,
+      totalAnnuel,
+      totalAnnuelSansRemise,
     };
   });
 
@@ -189,7 +189,7 @@ const ServicesFm4AllPropositions = ({
     remiseCaSeuil: number;
     remiseCa: number;
     remiseHof: number;
-    prixTotalAnnuel: number;
+    totalAnnuel: number;
   }) => {
     const {
       gamme,

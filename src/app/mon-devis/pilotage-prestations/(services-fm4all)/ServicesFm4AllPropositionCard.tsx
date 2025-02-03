@@ -23,8 +23,8 @@ type ServicesFm4AllPropositionCardProps = {
     remiseCaSeuil: number;
     remiseCa: number;
     remiseHof: number;
-    prixTotalAnnuel: number;
-    prixTotalAnnuelSansRemise: number;
+    totalAnnuel: number;
+    totalAnnuelSansRemise: number;
   };
   handleClickProposition: (proposition: {
     id: number;
@@ -44,8 +44,8 @@ type ServicesFm4AllPropositionCardProps = {
     remiseCaSeuil: number;
     remiseCa: number;
     remiseHof: number;
-    prixTotalAnnuel: number;
-    prixTotalAnnuelSansRemise: number;
+    totalAnnuel: number;
+    totalAnnuelSansRemise: number;
   }) => void;
   total: number;
 };
@@ -58,11 +58,11 @@ const ServicesFm4AllPropositionCard = ({
   const { servicesFm4All } = useContext(ServicesFm4AllContext);
   const gamme = proposition.gamme;
   const color = getFm4AllColor(gamme);
-  const prixTotalMensuelSansRemiseText = `${Math.round(
-    proposition.prixTotalAnnuelSansRemise / 12
+  const totalMensuelSansRemiseText = `${Math.round(
+    proposition.totalAnnuelSansRemise / 12
   )} € / mois`;
-  const prixTotalMensuelText = `${Math.round(
-    proposition.prixTotalAnnuel / 12
+  const totalMensuelText = `${Math.round(
+    proposition.totalAnnuel / 12
   )} € / mois${proposition.remiseCa ? "\u00B9" : ""}${
     proposition.remiseHof ? "\u00B2" : ""
   }`;
@@ -84,13 +84,10 @@ const ServicesFm4AllPropositionCard = ({
         disabled={!total}
       />
       <div>
-        {proposition.prixTotalAnnuelSansRemise !==
-          proposition.prixTotalAnnuel && (
-          <p className="font-bold line-through">
-            {prixTotalMensuelSansRemiseText}
-          </p>
+        {proposition.totalAnnuelSansRemise !== proposition.totalAnnuel && (
+          <p className="font-bold line-through">{totalMensuelSansRemiseText}</p>
         )}
-        <p className="font-bold">{prixTotalMensuelText}</p>
+        <p className="font-bold">{totalMensuelText}</p>
         {gamme === "essentiel" && (
           <>
             <p className="text-sm">Accès Services</p>

@@ -17,7 +17,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { RATIO_CHOCO, RATIO_LAIT, RATIO_SUCRE } from "@/constants/constants";
-import { locationCafeMachine } from "@/constants/locationsDistribHygiene";
+import { locationCafeMachine } from "@/constants/locationCafeMachine";
 import { typesBoissons, TypesBoissonsType } from "@/constants/typesBoissons";
 import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";

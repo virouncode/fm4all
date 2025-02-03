@@ -6,10 +6,10 @@ import { useContext } from "react";
 const TotalFontaines = () => {
   const { fontaines } = useContext(FontainesContext);
   const { totalFontaines } = useContext(TotalFontainesContext);
-  const total = totalFontaines.totalLotsFontaines
+  const total = totalFontaines.totalEspaces
     .map(({ total }) => total ?? 0)
     .reduce((acc, curr) => acc + curr, 0);
-  const totalInstallation = totalFontaines.totalLotsFontaines
+  const totalInstallation = totalFontaines.totalEspaces
     .map(({ totalInstallation }) => totalInstallation ?? 0)
     .reduce((acc, curr) => acc + curr, 0);
 
@@ -17,12 +17,12 @@ const TotalFontaines = () => {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-4">
-        <div>Machines à Café ({fontaines.infos.nomFournisseur})</div>
+        <div>Fontaines à eau ({fontaines.infos.nomFournisseur})</div>
         <div className="flex flex-col ml-4 text-xs ">
-          {fontaines.lotsFontaines
+          {fontaines.espaces
             .filter(
               (item) =>
-                totalFontaines.totalLotsFontaines.find(
+                totalFontaines.totalEspaces.find(
                   ({ espaceId }) => espaceId === item.infos.espaceId
                 )?.total ?? 0 > 0
             )
@@ -33,26 +33,25 @@ const TotalFontaines = () => {
                   )} font-bold"
                 >
                   <p>
-                    {item.quantites.nbFontaines} x {item.infos.marque}{" "}
-                    {item.infos.modele}
+                    1 x {item.infos.marque} {item.infos.modele}
                   </p>
                   <p>
                     {formatNumber(
-                      totalFontaines.totalLotsFontaines.find(
+                      totalFontaines.totalEspaces.find(
                         (total) => total.espaceId === item.infos.espaceId
                       )?.total ?? 0
                     )}{" "}
                     € HT/an
                   </p>
                 </div>
-                {totalFontaines.totalLotsFontaines.find(
+                {totalFontaines.totalEspaces.find(
                   (total) => total.espaceId === item.infos.espaceId
                 )?.totalInstallation ? (
                   <div className="flex items-center justify-between">
                     <p>Installation</p>
                     <p>
                       {formatNumber(
-                        totalFontaines.totalLotsFontaines.find(
+                        totalFontaines.totalEspaces.find(
                           (total) => total.espaceId === item.infos.espaceId
                         )?.totalInstallation ?? 0
                       )}{" "}

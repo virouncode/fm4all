@@ -15,10 +15,13 @@ type SecuriteIncendiePropostionCardProps = {
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
+    nbExtincteurs: number;
+    nbBaes: number;
+    nbTelBaes: number;
     prixParExtincteur: number;
     prixParBaes: number;
     prixParTelBaes: number;
-    prixAnnuelTrilogie: number;
+    totalAnnuelTrilogie: number;
     fraisDeplacementTrilogie: number;
   };
   handleClickProposition: (proposition: {
@@ -26,10 +29,13 @@ type SecuriteIncendiePropostionCardProps = {
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
+    nbExtincteurs: number;
+    nbBaes: number;
+    nbTelBaes: number;
     prixParExtincteur: number;
     prixParBaes: number;
     prixParTelBaes: number;
-    prixAnnuelTrilogie: number;
+    totalAnnuelTrilogie: number;
     fraisDeplacementTrilogie: number;
   }) => void;
 };
@@ -41,7 +47,7 @@ const SecuriteIncendiePropostionCard = ({
   const { incendie } = useContext(IncendieContext);
   const prixAnnuelText =
     formatNumber(
-      (proposition.prixAnnuelTrilogie + proposition.fraisDeplacementTrilogie) /
+      (proposition.totalAnnuelTrilogie + proposition.fraisDeplacementTrilogie) /
         12
     ) + " € / mois";
   const tooltipText =
@@ -70,12 +76,10 @@ const SecuriteIncendiePropostionCard = ({
               <p className="font-bold">{prixAnnuelText}</p>
               <p className="text-sm">1 passage par an</p>
               <p>Pour le contrôle de :</p>
+              <p className="text-sm">{proposition.nbExtincteurs} extincteurs</p>
+              <p className="text-sm"> {proposition.nbBaes} BAES</p>
               <p className="text-sm">
-                {incendie.quantites.nbExtincteurs} extincteurs
-              </p>
-              <p className="text-sm"> {incendie.quantites.nbBaes} BAES</p>
-              <p className="text-sm">
-                {incendie.quantites.nbTelBaes} télécommandes BAES
+                {proposition.nbTelBaes} télécommandes BAES
               </p>
             </div>
           </div>

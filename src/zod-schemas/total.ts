@@ -58,7 +58,7 @@ export const totalSnacksFruitsSchema = z.object({
 });
 
 export const totalFontainesSchema = z.object({
-  totalLotsFontaines: z
+  totalEspaces: z
     .array(
       z.object({
         espaceId: z.number(),

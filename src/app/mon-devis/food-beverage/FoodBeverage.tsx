@@ -8,6 +8,10 @@ import {
   getTheConsoTarifs,
 } from "@/lib/queries/boissons-chaudes/getBoissonsChaudes";
 import {
+  getFontaines,
+  getFontainesTarifs,
+} from "@/lib/queries/fontaines/getFontaines";
+import {
   getBoissonsQuantites,
   getBoissonsTarifs,
   getFoodLivraisonTarifs,
@@ -15,10 +19,10 @@ import {
   getFruitsTarifs,
   getSnacksQuantites,
   getSnacksTarifs,
-} from "@/lib/queries/boissons-chaudes/getSnacksFruits";
+} from "@/lib/queries/snacks-fruits/getSnacksFruits";
 import Link from "next/link";
 import Cafe from "./(cafe)/Cafe";
-import Fontaine from "./(fontaine)/Fontaine";
+import Fontaines from "./(fontaine)/Fontaines";
 import SnacksFruits from "./(snacks)/SnacksFruits";
 import The from "./(the)/The";
 
@@ -38,6 +42,8 @@ const FoodBeverage = async () => {
     boissonsQuantites,
     boissonsTarifs,
     foodLivraisonTarifs,
+    fontainesModeles,
+    fontainesTarifs,
   ] = await Promise.all([
     getCafeMachines(),
     getCafeMachinesTarifs(),
@@ -53,6 +59,8 @@ const FoodBeverage = async () => {
     getBoissonsQuantites(),
     getBoissonsTarifs(),
     getFoodLivraisonTarifs(),
+    getFontaines(),
+    getFontainesTarifs(),
   ]);
 
   if (
@@ -69,7 +77,9 @@ const FoodBeverage = async () => {
     !snacksTarifs ||
     !boissonsQuantites ||
     !boissonsTarifs ||
-    !foodLivraisonTarifs
+    !foodLivraisonTarifs ||
+    !fontainesModeles ||
+    !fontainesTarifs
   ) {
     return (
       <section className="flex h-dvh items-center justify-center text-lg">
@@ -105,7 +115,10 @@ const FoodBeverage = async () => {
         boissonsTarifs={boissonsTarifs}
         foodLivraisonTarifs={foodLivraisonTarifs}
       />
-      <Fontaine />
+      <Fontaines
+        fontainesModeles={fontainesModeles}
+        fontainesTarifs={fontainesTarifs}
+      />
     </section>
   );
 };

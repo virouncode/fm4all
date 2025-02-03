@@ -69,7 +69,7 @@ const Total = () => {
     .reduce((acc, curr) => acc + curr, 0);
   const totalFinalThe = totalThe.totalService ?? 0;
   const totalFinalSnacksFruits = totalSnacksFruits.total ?? 0;
-  const totalFinalFontaines = totalFontaines.totalLotsFontaines
+  const totalFinalFontaines = totalFontaines.totalEspaces
     .map(({ total }) => total ?? 0)
     .reduce((acc, curr) => acc + curr, 0);
   const totalFinalOfficeManager = totalOfficeManager.totalService ?? 0;

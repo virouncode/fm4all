@@ -2,12 +2,16 @@ import { Button } from "@/components/ui/button";
 
 type AddEspaceButtonProps = {
   handleAddEspace: () => void;
+  title?: string;
 };
 
-const AddEspaceButton = ({ handleAddEspace }: AddEspaceButtonProps) => {
+const AddEspaceButton = ({
+  handleAddEspace,
+  title = "café",
+}: AddEspaceButtonProps) => {
   return (
     <Button variant="outline" size="lg" onClick={handleAddEspace}>
-      Ajouter un espace café
+      Ajouter un espace {title}
     </Button>
   );
 };

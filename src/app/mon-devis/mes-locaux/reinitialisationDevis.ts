@@ -1,3 +1,4 @@
+import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/context/FontainesProvider";
 import { CafeType } from "@/zod-schemas/cafe";
 import { DevisProgressType } from "@/zod-schemas/devisProgress";
 import { FontainesType } from "@/zod-schemas/fontaines";
@@ -273,25 +274,28 @@ export const reinitialisationDevis = (
       dureeLocation: "pa12M",
       commentaires: null,
     },
-    nbLotsFontaines: 1,
-    lotsFontaines: [
+    nbEspaces: 1,
+    espaces: [
       {
         infos: {
           espaceId: 1,
-          typeEau: "EF",
+          typeBoissons: "EF",
           typePose: "aposer",
           marque: null,
           modele: null,
           reconditionne: false,
+          selected: false,
         },
         quantites: {
-          nbPersonnes: effectif,
-          nbFontaines: null,
+          nbPersonnes:
+            effectif > MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE
+              ? MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE
+              : effectif ?? 0,
         },
         prix: {
-          prixUnitaireLoc: null,
-          prixUnitaireInstal: null,
-          prixUnitaireMaintenance: null,
+          prixLoc: null,
+          prixInstal: null,
+          prixMaintenance: null,
           prixUnitaireConsoFiltres: null,
           prixUnitaireConsoCO2: null,
           prixUnitaireConsoEauChaude: null,
@@ -406,7 +410,7 @@ export const reinitialisationDevis = (
     total: null,
   });
   setTotalFontaines({
-    totalLotsFontaines: [
+    totalEspaces: [
       {
         espaceId: 1,
         total: null,

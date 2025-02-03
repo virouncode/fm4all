@@ -2,8 +2,8 @@ import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { TheContext } from "@/context/TheProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
-import { roundEffectif } from "@/lib/roundEffectif";
 import { roundNbPersonnesCafeConso } from "@/lib/roundNbPersonnesCafeConso";
+import { GammeType } from "@/zod-schemas/gamme";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { ChangeEvent, useContext } from "react";
 import { MAX_EFFECTIF } from "../../mes-locaux/MesLocaux";
@@ -36,7 +36,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
       )
       .map((tarif) => ({
         ...tarif,
-        prixAnnuel:
+        totalAnnuel:
           tarif.prixUnitaire !== null
             ? Math.round(nbThesParAn * tarif.prixUnitaire)
             : null,
@@ -51,11 +51,11 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
     const prixUnitaire =
       theConsoTarifs.find(
         (tarif) =>
-          tarif.effectif === roundEffectif(newNbPersonnes / 0.15) &&
+          tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnes / 0.15) &&
           tarif.fournisseurId === cafe.infos.fournisseurId &&
           tarif.gamme === the.infos.gammeSelected
       )?.prixUnitaire ?? null;
-    const prixAnnuel =
+    const totalAnnuel =
       prixUnitaire !== null ? Math.round(nbThesParAn * prixUnitaire) : null;
 
     setThe((prev) => ({
@@ -72,24 +72,24 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
     }));
     if (the.infos.gammeSelected) {
       setTotalThe({
-        totalService: prixAnnuel,
+        totalService: totalAnnuel,
       });
     }
   };
 
   const handleClickProposition = (proposition: {
-    prixAnnuel: number | null;
-    infos: string | null;
     id: number;
     nomFournisseur: string;
     slogan: string | null;
     createdAt: Date;
     fournisseurId: number;
-    gamme: "essentiel" | "confort" | "excellence";
+    gamme: GammeType;
     effectif: number;
     prixUnitaire: number | null;
+    totalAnnuel: number | null;
+    infos: string | null;
   }) => {
-    const { gamme, prixAnnuel, prixUnitaire } = proposition;
+    const { gamme, totalAnnuel, prixUnitaire } = proposition;
     if (the.infos.gammeSelected === gamme) {
       setThe((prev) => ({
         ...prev,
@@ -117,7 +117,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
       },
     }));
     setTotalThe({
-      totalService: prixAnnuel,
+      totalService: totalAnnuel,
     });
   };
 
