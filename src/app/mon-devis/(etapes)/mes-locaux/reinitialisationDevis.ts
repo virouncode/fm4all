@@ -26,6 +26,7 @@ import {
   TotalServicesFm4AllType,
   TotalSnacksFruitsType,
   TotalTheType,
+  TotalType,
 } from "@/zod-schemas/total";
 import { MAX_NB_PERSONNES_PAR_ESPACE } from "../food-beverage/(cafe)/CafeEspacePropositions";
 
@@ -57,7 +58,10 @@ export const reinitialisationDevis = (
   setTotalSnacksFruits: (totalSnacksFruits: TotalSnacksFruitsType) => void,
   setTotalFontaines: (totalFontaines: TotalFontainesType) => void,
   setTotalOfficeManager: (totalOfficeManager: TotalOfficeManagerType) => void,
-  setTotalServicesFm4All: (totalServicesFm4All: TotalServicesFm4AllType) => void
+  setTotalServicesFm4All: (
+    totalServicesFm4All: TotalServicesFm4AllType
+  ) => void,
+  setTotal: (total: TotalType) => void
 ) => {
   //Devis
   setDevisProgress({ currentStep: 2, completedSteps: [1] });
@@ -429,5 +433,9 @@ export const reinitialisationDevis = (
     totalAccountManager: null,
     totalRemiseCa: null,
     totalRemiseHof: null,
+  });
+  setTotal({
+    totalAnnuelHt: null,
+    totalInstallationHt: null,
   });
 };

@@ -83,6 +83,11 @@ export const totalServicesFm4AllSchema = z.object({
   totalRemiseHof: z.number().nullable(),
 });
 
+export const totalSchema = z.object({
+  totalAnnuelHt: z.number().nullable(),
+  totalInstallationHt: z.number().nullable(),
+});
+
 export type TotalNettoyageType = z.infer<typeof totalNettoyageSchema>;
 export type TotalHygieneType = z.infer<typeof totalHygieneSchema>;
 export type TotalIncendieType = z.infer<typeof totalIncendieSchema>;
@@ -93,3 +98,4 @@ export type TotalSnacksFruitsType = z.infer<typeof totalSnacksFruitsSchema>;
 export type TotalFontainesType = z.infer<typeof totalFontainesSchema>;
 export type TotalOfficeManagerType = z.infer<typeof totalOfficeManager>;
 export type TotalServicesFm4AllType = z.infer<typeof totalServicesFm4AllSchema>;
+export type TotalType = z.infer<typeof totalSchema>;

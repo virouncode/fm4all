@@ -35,6 +35,7 @@ import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { TotalOfficeManagerContext } from "@/context/TotalOfficeManagerProvider";
+import { TotalContext } from "@/context/TotalProvider";
 import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
@@ -83,6 +84,7 @@ const DevisButton = ({
   const { setTotalFontaines } = useContext(TotalFontainesContext);
   const { setTotalOfficeManager } = useContext(TotalOfficeManagerContext);
   const { setTotalServicesFm4All } = useContext(TotalServicesFm4AllContext);
+  const { setTotal } = useContext(TotalContext);
 
   const router = useRouter();
 
@@ -178,7 +180,8 @@ const DevisButton = ({
       setTotalSnacksFruits,
       setTotalFontaines,
       setTotalOfficeManager,
-      setTotalServicesFm4All
+      setTotalServicesFm4All,
+      setTotal
     );
     router.push("/mon-devis/mes-locaux");
   };

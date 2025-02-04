@@ -7,6 +7,7 @@ import { Form } from "@/components/ui/form";
 import { departements } from "@/constants/departements";
 import { ClientContext } from "@/context/ClientProvider";
 import { MonDevisContext } from "@/context/MonDevisProvider";
+import { TotalContext } from "@/context/TotalProvider";
 import useScrollIntoMonDevis from "@/hooks/use-scroll-into-mon-devis";
 import { toast } from "@/hooks/use-toast";
 import fillDevis from "@/lib/fillDevis";
@@ -28,6 +29,7 @@ type MonDevisFormProps = {
 
 const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
   const { client, setClient } = useContext(ClientContext);
+  const { total } = useContext(TotalContext);
   const { setMonDevis } = useContext(MonDevisContext);
   const router = useRouter();
   useScrollIntoMonDevis();
@@ -118,8 +120,8 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
         format(new Date(), "dd/MM/yyyy", { locale: fr }),
         "FM4ALL comparateur en ligne",
         client,
-        1000,
-        100
+        total.totalAnnuelHt,
+        total.totalInstallationHt
       );
       if (url) setDevisUrl(url);
       setMonDevis({ currentMonDevisId: 2 });

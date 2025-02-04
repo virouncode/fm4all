@@ -28,6 +28,7 @@ import TotalIncendieProvider from "@/context/TotalIncendieProvider";
 import TotalMaintenanceProvider from "@/context/TotalMaintenanceProvider";
 import TotalNettoyageProvider from "@/context/TotalNettoyageProvider";
 import TotalOfficeManagerProvider from "@/context/TotalOfficeManagerProvider";
+import TotalProvider from "@/context/TotalProvider";
 import TotalServicesFm4AllProvider from "@/context/TotalServicesFm4AllProvider";
 import TotalSnacksFruitsProvider from "@/context/TotalSnacksFruitsProvider";
 import TotalTheProvider from "@/context/TotalTheProvider";
@@ -85,37 +86,39 @@ export default function RootLayout({
                                     <ManagementProvider>
                                       <OfficeManagerProvider>
                                         <ServicesFm4AllProvider>
-                                          <TotalNettoyageProvider>
-                                            <TotalHygieneProvider>
-                                              <TotalIncendieProvider>
-                                                <TotalMaintenanceProvider>
-                                                  <TotalCafeProvider>
-                                                    <TotalTheProvider>
-                                                      <TotalSnacksFruitsProvider>
-                                                        <TotalFontainesProvider>
-                                                          <TotalOfficeManagerProvider>
-                                                            <TotalServicesFm4AllProvider>
-                                                              <ThemeProvider
-                                                                attribute="class"
-                                                                defaultTheme="light"
-                                                                enableSystem
-                                                                disableTransitionOnChange
-                                                              >
-                                                                <Header />
-                                                                {children}
-                                                                <Footer />
-                                                                <Toaster />
-                                                              </ThemeProvider>
-                                                            </TotalServicesFm4AllProvider>
-                                                          </TotalOfficeManagerProvider>
-                                                        </TotalFontainesProvider>
-                                                      </TotalSnacksFruitsProvider>
-                                                    </TotalTheProvider>
-                                                  </TotalCafeProvider>
-                                                </TotalMaintenanceProvider>
-                                              </TotalIncendieProvider>
-                                            </TotalHygieneProvider>
-                                          </TotalNettoyageProvider>
+                                          <TotalProvider>
+                                            <TotalNettoyageProvider>
+                                              <TotalHygieneProvider>
+                                                <TotalIncendieProvider>
+                                                  <TotalMaintenanceProvider>
+                                                    <TotalCafeProvider>
+                                                      <TotalTheProvider>
+                                                        <TotalSnacksFruitsProvider>
+                                                          <TotalFontainesProvider>
+                                                            <TotalOfficeManagerProvider>
+                                                              <TotalServicesFm4AllProvider>
+                                                                <ThemeProvider
+                                                                  attribute="class"
+                                                                  defaultTheme="light"
+                                                                  enableSystem
+                                                                  disableTransitionOnChange
+                                                                >
+                                                                  <Header />
+                                                                  {children}
+                                                                  <Footer />
+                                                                  <Toaster />
+                                                                </ThemeProvider>
+                                                              </TotalServicesFm4AllProvider>
+                                                            </TotalOfficeManagerProvider>
+                                                          </TotalFontainesProvider>
+                                                        </TotalSnacksFruitsProvider>
+                                                      </TotalTheProvider>
+                                                    </TotalCafeProvider>
+                                                  </TotalMaintenanceProvider>
+                                                </TotalIncendieProvider>
+                                              </TotalHygieneProvider>
+                                            </TotalNettoyageProvider>
+                                          </TotalProvider>
                                         </ServicesFm4AllProvider>
                                       </OfficeManagerProvider>
                                     </ManagementProvider>

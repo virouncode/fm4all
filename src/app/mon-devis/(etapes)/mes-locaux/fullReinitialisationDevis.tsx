@@ -26,6 +26,7 @@ import {
   TotalServicesFm4AllType,
   TotalSnacksFruitsType,
   TotalTheType,
+  TotalType,
 } from "@/zod-schemas/total";
 
 export const fullReinitialisationDevis = (
@@ -55,7 +56,10 @@ export const fullReinitialisationDevis = (
   setTotalSnacksFruits: (totalSnacksFruits: TotalSnacksFruitsType) => void,
   setTotalFontaines: (totalFontaines: TotalFontainesType) => void,
   setTotalOfficeManager: (totalOfficeManager: TotalOfficeManagerType) => void,
-  setTotalServicesFm4All: (totalServicesFm4All: TotalServicesFm4AllType) => void
+  setTotalServicesFm4All: (
+    totalServicesFm4All: TotalServicesFm4AllType
+  ) => void,
+  setTotal: (total: TotalType) => void
 ) => {
   //Client
   setClient({
@@ -65,6 +69,10 @@ export const fullReinitialisationDevis = (
     nomContact: "",
     posteContact: "",
     emailContact: "",
+    prenomSignataire: null,
+    nomSignataire: null,
+    posteSignataire: null,
+    emailSignataire: null,
     phoneContact: "",
     surface: 100,
     effectif: 20,
@@ -441,5 +449,9 @@ export const fullReinitialisationDevis = (
     totalAccountManager: null,
     totalRemiseCa: null,
     totalRemiseHof: null,
+  });
+  setTotal({
+    totalAnnuelHt: null,
+    totalInstallationHt: null,
   });
 };

@@ -54,7 +54,7 @@ const NettoyagePropositionCard = ({
       </div>
     );
   }
-  const totalMensuelText = `${Math.round(
+  const totalMensuelText = `${formatNumber(
     proposition.totalAnnuel / 12
   )} € / mois`;
   const hParSemaineText =

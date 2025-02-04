@@ -41,6 +41,7 @@ import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { TotalOfficeManagerContext } from "@/context/TotalOfficeManagerProvider";
+import { TotalContext } from "@/context/TotalProvider";
 import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
@@ -88,6 +89,7 @@ const MesLocaux = () => {
   const { setTotalFontaines } = useContext(TotalFontainesContext);
   const { setTotalOfficeManager } = useContext(TotalOfficeManagerContext);
   const { setTotalServicesFm4All } = useContext(TotalServicesFm4AllContext);
+  const { setTotal } = useContext(TotalContext);
   const dialogRef = useRef<HTMLButtonElement>(null);
   const [loaderVisible, setLoaderVisible] = useState(false);
 
@@ -189,7 +191,8 @@ const MesLocaux = () => {
       setTotalSnacksFruits,
       setTotalFontaines,
       setTotalOfficeManager,
-      setTotalServicesFm4All
+      setTotalServicesFm4All,
+      setTotal
     );
     // localStorage.clear();
     setLoaderVisible(true);
