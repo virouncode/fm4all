@@ -283,12 +283,11 @@ export const reinitialisationDevis = (
       {
         infos: {
           espaceId: 1,
-          typeBoissons: "EF",
-          typePose: "aposer",
+          typeEau: ["Eau froide"],
           marque: null,
           modele: null,
           reconditionne: false,
-          selected: false,
+          poseSelected: null,
         },
         quantites: {
           nbPersonnes:

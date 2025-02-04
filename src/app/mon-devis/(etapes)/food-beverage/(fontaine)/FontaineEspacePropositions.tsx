@@ -1,5 +1,5 @@
 import { TypesEauType } from "@/constants/typesEau";
-import { TypesPoseType } from "@/constants/typesPose";
+import { typesPoseArray, TypesPoseType } from "@/constants/typesPose";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import {
@@ -20,6 +20,7 @@ import NextEspaceButton from "../(cafe)/NextEspaceButton";
 import NextServiceButton from "../../../NextServiceButton";
 import FontaineEspacePropositionCard from "./FontaineEspacePropositionCard";
 import FontaineEspacePropositionFournisseurLogo from "./FontaineEspacePropositionFournisseurLogo";
+import { getTypeFontaine } from "./getTypeFontaine";
 
 type FontaineEspacePropositionsProps = {
   fontainesModeles: SelectFontainesModelesType[];
@@ -51,13 +52,15 @@ const FontaineEspacePropositions = ({
   const tarifs = fontainesTarifs.filter(
     (tarif) =>
       tarif.nbPersonnes === roundNbPersonnesFontaine(nbPersonnes) &&
-      tarif.type === espace.infos.typeBoissons &&
-      tarif.typePose === espace.infos.typePose
+      tarif.type === getTypeFontaine(espace.infos.typeEau)
   );
-
-  const fournisseursCompatiblesIds = tarifs
-    ?.filter((tarif) => tarif[fontaines.infos.dureeLocation] !== null)
-    .map(({ fournisseurId }) => fournisseurId);
+  const fournisseursCompatiblesIds = [
+    ...new Set(
+      tarifs
+        ?.filter((tarif) => tarif[fontaines.infos.dureeLocation] !== null)
+        .map(({ fournisseurId }) => fournisseurId)
+    ),
+  ];
 
   if (
     fontaines.infos.fournisseurId &&
@@ -68,8 +71,8 @@ const FontaineEspacePropositions = ({
       <div className="flex-1 flex items-center justify-center border rounded-xl">
         <p className="max-w-prose text-center text-base">
           Le fournisseur choisi précédemment ne propose pas d&apos;offre pour
-          ces critères, veuillez changer le type de boissons, le type de pose ou
-          le nombre de personnes.
+          ces critères, veuillez changer le type d&apos;eau ou le nombre de
+          personnes.
         </p>
       </div>
     );
@@ -81,66 +84,103 @@ const FontaineEspacePropositions = ({
       ? [fontaines.infos.fournisseurId] //1 seul fournisseur
       : tarifs?.map(({ fournisseurId }) => fournisseurId); //tous les fournisseurs
 
-  const propositions = fournisseursIds.map((fournisseurId) => {
-    const tarifsFournisseur = tarifs.find(
-      (tarif) => tarif.fournisseurId === fournisseurId
+  const propositions = tarifs
+    .filter(({ fournisseurId }) => fournisseursIds.includes(fournisseurId))
+    .map((tarif) => {
+      const prixLoc = tarif[fontaines.infos.dureeLocation] ?? null;
+      const prixInstal = tarif.fraisInstallation ?? null;
+      const prixMaintenance = tarif.paMaintenance ?? null;
+      const prixUnitaireConsoFiltres = tarif.paConsoFiltres ?? null;
+      const prixUnitaireConsoCO2 = tarif.paConsoCO2 ?? null;
+      const prixUnitaireConsoEauChaude = tarif.paConsoEauChaude ?? null;
+      const totalLoc =
+        prixLoc !== null && prixMaintenance !== null
+          ? prixLoc + prixMaintenance
+          : null;
+      const totalConso =
+        nbPersonnes *
+        ((prixUnitaireConsoFiltres ?? 0) +
+          (prixUnitaireConsoCO2 ?? 0) +
+          (prixUnitaireConsoEauChaude ?? 0));
+      const totalAnnuel = totalLoc !== null ? totalLoc + totalConso : null;
+      const totalInstallation = prixInstal !== null ? prixInstal : null;
+      const modele =
+        fontainesModeles.find((modele) => modele.id === tarif.fontaineId)
+          ?.modele ?? null;
+      const marque =
+        fontainesModeles.find((modele) => modele.id === tarif.fontaineId)
+          ?.marque ?? null;
+
+      return {
+        id: tarif.id,
+        fournisseurId: tarif.fournisseurId,
+        nomFournisseur: tarif.nomFournisseur,
+        sloganFournisseur: tarif.sloganFournisseur,
+        modele,
+        marque,
+        infos: tarif.infos,
+        typePose: tarif.typePose,
+        reconditionne: tarif.reconditionne,
+        prixLoc,
+        prixInstal,
+        prixMaintenance,
+        prixUnitaireConsoFiltres,
+        prixUnitaireConsoCO2,
+        prixUnitaireConsoEauChaude,
+        totalAnnuel,
+        totalInstallation,
+      };
+    });
+
+  const propositionsByFournisseurId = propositions.reduce<
+    Record<
+      number,
+      {
+        id: number;
+        fournisseurId: number;
+        nomFournisseur: string;
+        sloganFournisseur: string | null;
+        modele: string | null;
+        marque: string | null;
+        infos: string | null;
+        typePose: TypesPoseType;
+        reconditionne: boolean | null;
+        prixLoc: number | null;
+        prixInstal: number | null;
+        prixMaintenance: number | null;
+        prixUnitaireConsoFiltres: number | null;
+        prixUnitaireConsoCO2: number | null;
+        prixUnitaireConsoEauChaude: number | null;
+        totalAnnuel: number | null;
+        totalInstallation: number | null;
+      }[]
+    >
+  >((acc, item) => {
+    const { fournisseurId } = item;
+    if (!acc[fournisseurId]) {
+      acc[fournisseurId] = [];
+    }
+    // Add the item to the appropriate array
+    acc[fournisseurId].push(item);
+    acc[fournisseurId].sort(
+      (a, b) =>
+        typesPoseArray.indexOf(a.typePose) - typesPoseArray.indexOf(b.typePose)
     );
-    const prixLoc = tarifsFournisseur?.[fontaines.infos.dureeLocation] ?? null;
-    const prixInstal = tarifsFournisseur?.fraisInstallation ?? null;
-    const prixMaintenance = tarifsFournisseur?.paMaintenance ?? null;
-    const prixUnitaireConsoFiltres = tarifsFournisseur?.paConsoFiltres ?? null;
-    const prixUnitaireConsoCO2 = tarifsFournisseur?.paConsoCO2 ?? null;
-    const prixUnitaireConsoEauChaude =
-      tarifsFournisseur?.paConsoEauChaude ?? null;
-    const totalLoc =
-      prixLoc !== null && prixMaintenance !== null
-        ? prixLoc + prixMaintenance
-        : null;
-    const totalConso =
-      nbPersonnes *
-      ((prixUnitaireConsoFiltres ?? 0) +
-        (prixUnitaireConsoCO2 ?? 0) +
-        (prixUnitaireConsoEauChaude ?? 0));
-    const totalAnnuel = totalLoc !== null ? totalLoc + totalConso : null;
-    const totalInstallation = prixInstal !== null ? prixInstal : null;
-    const modele = tarifsFournisseur?.fontaineId
-      ? fontainesModeles.find(
-          (modele) => modele.id === tarifsFournisseur?.fontaineId
-        )?.modele ?? null
-      : null;
-    const marque = tarifsFournisseur?.fontaineId
-      ? fontainesModeles.find(
-          (modele) => modele.id === tarifsFournisseur?.fontaineId
-        )?.marque ?? null
-      : null;
-    return {
-      id: tarifsFournisseur?.id as number,
-      fournisseurId,
-      nomFournisseur: tarifsFournisseur?.nomFournisseur ?? null,
-      sloganFournisseur: tarifsFournisseur?.sloganFournisseur ?? null,
-      modele,
-      marque,
-      infos: tarifsFournisseur?.infos ?? null,
-      reconditionne: tarifsFournisseur?.reconditionne ?? null,
-      prixLoc,
-      prixInstal,
-      prixMaintenance,
-      prixUnitaireConsoFiltres,
-      prixUnitaireConsoCO2,
-      prixUnitaireConsoEauChaude,
-      totalAnnuel,
-      totalInstallation,
-    };
-  });
+    return acc;
+  }, {});
+
+  //Un tableau de tableaux de propositions de nettoyage par fournisseur pour itérer
+  const formattedPropositions = Object.values(propositionsByFournisseurId);
 
   const handleClickProposition = (proposition: {
     id: number;
     fournisseurId: number;
-    nomFournisseur: string | null;
+    nomFournisseur: string;
     sloganFournisseur: string | null;
     modele: string | null;
     marque: string | null;
     infos: string | null;
+    typePose: TypesPoseType;
     reconditionne: boolean | null;
     prixLoc: number | null;
     prixInstal: number | null;
@@ -155,6 +195,7 @@ const FontaineEspacePropositions = ({
       fournisseurId,
       modele,
       marque,
+      typePose,
       reconditionne,
       prixLoc,
       prixInstal,
@@ -167,7 +208,7 @@ const FontaineEspacePropositions = ({
     } = proposition;
     //Je décoche
     if (
-      espace.infos.selected &&
+      espace.infos.poseSelected === typePose &&
       fontaines.infos.fournisseurId === fournisseurId
     ) {
       setFontaines((prev) => ({
@@ -178,7 +219,7 @@ const FontaineEspacePropositions = ({
                 ...item,
                 infos: {
                   ...item.infos,
-                  selected: false,
+                  poseSelected: null,
                   marque: null,
                   modele: null,
                   reconditionne: false,
@@ -216,7 +257,7 @@ const FontaineEspacePropositions = ({
                 ...item,
                 infos: {
                   ...item.infos,
-                  selected: true,
+                  poseSelected: typePose,
                   marque,
                   modele,
                   reconditionne,
@@ -250,11 +291,12 @@ const FontaineEspacePropositions = ({
   const handleClickFirstEspaceProposition = (proposition: {
     id: number;
     fournisseurId: number;
-    nomFournisseur: string | null;
+    nomFournisseur: string;
     sloganFournisseur: string | null;
     modele: string | null;
     marque: string | null;
     infos: string | null;
+    typePose: TypesPoseType;
     reconditionne: boolean | null;
     prixLoc: number | null;
     prixInstal: number | null;
@@ -271,6 +313,7 @@ const FontaineEspacePropositions = ({
       sloganFournisseur,
       modele,
       marque,
+      typePose,
       reconditionne,
       prixLoc,
       prixInstal,
@@ -283,7 +326,7 @@ const FontaineEspacePropositions = ({
     } = proposition;
     //======================= JE DECOCHE ======================//
     if (
-      espace.infos.selected &&
+      espace.infos.poseSelected === typePose &&
       fontaines.infos.fournisseurId === fournisseurId
     ) {
       setFontaines((prev) => ({
@@ -298,10 +341,10 @@ const FontaineEspacePropositions = ({
           ...item,
           infos: {
             ...item.infos,
-            selected:
+            poseSelected:
               item.infos.espaceId === espace.infos.espaceId
-                ? false
-                : item.infos.selected,
+                ? null
+                : item.infos.poseSelected,
             marque: null,
             modele: null,
             reconditionne: false,
@@ -345,7 +388,7 @@ const FontaineEspacePropositions = ({
             ...item,
             infos: {
               ...item.infos,
-              selected: true,
+              poseSelected: typePose,
               marque,
               modele,
               reconditionne,
@@ -367,7 +410,7 @@ const FontaineEspacePropositions = ({
           return;
         }
         //AUTRES LOTS
-        if (!item.infos.selected) {
+        if (!item.infos.poseSelected) {
           //pas de selection
           newEspace.push(item);
           newTotalEspace.push({
@@ -386,8 +429,8 @@ const FontaineEspacePropositions = ({
         const itemMachinesTarifFournisseur = fontainesTarifs.find(
           (tarif) =>
             tarif.nbPersonnes === roundNbPersonnesFontaine(itemNbPersonnes) &&
-            tarif.type === item.infos.typeBoissons &&
-            tarif.typePose === item.infos.typePose &&
+            tarif.type === getTypeFontaine(item.infos.typeEau) &&
+            tarif.typePose === item.infos.poseSelected &&
             tarif[fontaines.infos.dureeLocation] !== null &&
             tarif.fournisseurId === fournisseurId
         );
@@ -489,9 +532,8 @@ const FontaineEspacePropositions = ({
         {
           infos: {
             espaceId: prev.espaces[prev.espaces.length - 1].infos.espaceId + 1,
-            typeBoissons: "EF" as TypesEauType,
-            typePose: "aposer" as TypesPoseType,
-            selected: false,
+            typeEau: ["Eau froide"] as TypesEauType[],
+            poseSelected: null,
             marque: null,
             modele: null,
             reconditionne: false,
@@ -527,7 +569,7 @@ const FontaineEspacePropositions = ({
   };
 
   const handleAlert = () => {
-    if (!espace.infos.selected) {
+    if (!espace.infos.poseSelected) {
       toast({
         description:
           "Veuillez d'abord sélectionner une offre ou retirer tous les espaces",
@@ -568,25 +610,31 @@ const FontaineEspacePropositions = ({
   return (
     <div className="flex-1 flex flex-col gap-4 overflow-auto">
       <div className="flex-1 flex flex-col border rounded-xl overflow-auto">
-        {propositions.map((proposition) => (
-          <div className="flex border-b flex-1" key={proposition.fournisseurId}>
-            <FontaineEspacePropositionFournisseurLogo {...proposition} />
-            <FontaineEspacePropositionCard
-              proposition={proposition}
-              handleClickProposition={handleClickProposition}
-              handleClickFirstEspaceProposition={
-                handleClickFirstEspaceProposition
-              }
-              espace={espace}
-              fontainesEspacesIds={fontainesEspacesIds}
-            />
+        {formattedPropositions.map((propositions) => (
+          <div
+            className="flex border-b flex-1"
+            key={propositions[0].fournisseurId}
+          >
+            <FontaineEspacePropositionFournisseurLogo {...propositions[0]} />
+            {propositions.map((proposition) => (
+              <FontaineEspacePropositionCard
+                key={proposition.id}
+                proposition={proposition}
+                handleClickProposition={handleClickProposition}
+                handleClickFirstEspaceProposition={
+                  handleClickFirstEspaceProposition
+                }
+                espace={espace}
+                fontainesEspacesIds={fontainesEspacesIds}
+              />
+            ))}
           </div>
         ))}
       </div>
       <div className="flex flex-col gap-1">
         {fontainesEspacesIds.slice(-1)[0] === espace.infos.espaceId ? (
           <div className="flex justify-end gap-4 items-center">
-            {espace.infos.selected ? (
+            {espace.infos.poseSelected ? (
               <AddEspaceButton
                 handleAddEspace={handleAddEspace}
                 title="fontaine"
@@ -597,7 +645,7 @@ const FontaineEspacePropositions = ({
         ) : (
           <div className="ml-auto" onClick={handleAlert}>
             <NextEspaceButton
-              disabled={espace.infos.selected ? false : true}
+              disabled={espace.infos.poseSelected ? false : true}
               handleClickNextEspace={handleClickNextEspace}
             />
           </div>

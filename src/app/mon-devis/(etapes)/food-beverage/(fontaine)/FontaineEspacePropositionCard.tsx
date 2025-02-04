@@ -5,20 +5,23 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { TypesPoseType } from "@/constants/typesPose";
 import { FontainesContext } from "@/context/FontainesProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
 import { useContext } from "react";
+import { getTypeFontaine } from "./getTypeFontaine";
 
 type FontaineEspacePropositionCardProps = {
   proposition: {
     id: number;
     fournisseurId: number;
-    nomFournisseur: string | null;
+    nomFournisseur: string;
     sloganFournisseur: string | null;
     modele: string | null;
     marque: string | null;
     infos: string | null;
+    typePose: TypesPoseType;
     reconditionne: boolean | null;
     prixLoc: number | null;
     prixInstal: number | null;
@@ -32,11 +35,12 @@ type FontaineEspacePropositionCardProps = {
   handleClickProposition: (proposition: {
     id: number;
     fournisseurId: number;
-    nomFournisseur: string | null;
+    nomFournisseur: string;
     sloganFournisseur: string | null;
     modele: string | null;
     marque: string | null;
     infos: string | null;
+    typePose: TypesPoseType;
     reconditionne: boolean | null;
     prixLoc: number | null;
     prixInstal: number | null;
@@ -50,11 +54,12 @@ type FontaineEspacePropositionCardProps = {
   handleClickFirstEspaceProposition: (proposition: {
     id: number;
     fournisseurId: number;
-    nomFournisseur: string | null;
+    nomFournisseur: string;
     sloganFournisseur: string | null;
     modele: string | null;
     marque: string | null;
     infos: string | null;
+    typePose: TypesPoseType;
     reconditionne: boolean | null;
     prixLoc: number | null;
     prixInstal: number | null;
@@ -80,7 +85,7 @@ const FontaineEspacePropositionCard = ({
   if (!proposition.totalAnnuel) {
     return (
       <div
-        className={`flex flex-1 items-center p-4 justify-center text-2xl gap-4 bg-slate-100`}
+        className={`flex flex-1 items-center p-4 justify-center text-2xl gap-4 bg-slate-100 border-r`}
       >
         Non proposé
       </div>
@@ -94,49 +99,39 @@ const FontaineEspacePropositionCard = ({
     ? `+ ${formatNumber(proposition.totalInstallation)} € d'installation`
     : "";
 
-  // const tooltipEssentiel = (
-  //   <div className="flex flex-col gap-4">
-  //     <p className="text-center text-lg">Essentiel</p>
-  //     <p>
-  //       {proposition.infos
-  //         ? proposition.infos
-  //         : "Café conventionnel dit Classique, Blend"}
-  //     </p>
-  //   </div>
-  // );
-  // const tooltipConfort = (
-  //   <div className="flex flex-col gap-4">
-  //     <p className="text-center text-lg">Confort</p>
-  //     <p>
-  //       {proposition.infos ? proposition.infos : "Café Supérieur, 100% Arabica"}
-  //     </p>
-  //   </div>
-  // );
-  // const tooltipExcellence = (
-  //   <div className="flex flex-col gap-4">
-  //     <p className="text-center text-lg">Excellence</p>
-  //     <p>
-  //       {proposition.infos
-  //         ? proposition.infos
-  //         : "Café de spécialité, premium, café d’exception, Bio"}
-  //     </p>
-  //   </div>
-  // );
-  // const tooltip =
-  //   gamme === "essentiel"
-  //     ? tooltipEssentiel
-  //     : gamme === "confort"
-  //     ? tooltipConfort
-  //     : tooltipExcellence;
+  const tooltipEssentiel = (
+    <div className="flex flex-col gap-4">
+      <p className="text-center text-lg">A poser</p>
+      <p></p>
+    </div>
+  );
+  const tooltipConfort = (
+    <div className="flex flex-col gap-4">
+      <p className="text-center text-lg">Colonne sur pied</p>
+      <p></p>
+    </div>
+  );
+  const tooltipExcellence = (
+    <div className="flex flex-col gap-4">
+      <p className="text-center text-lg">Sur comptoir</p>
+      <p></p>
+    </div>
+  );
+  const tooltip =
+    proposition.typePose === "aposer"
+      ? tooltipEssentiel
+      : proposition.typePose === "colonne"
+      ? tooltipConfort
+      : tooltipExcellence;
 
   return (
     <TooltipProvider delayDuration={0}>
       <Tooltip>
         <TooltipTrigger asChild>
           <div
-            className={`flex flex-1  items-center p-4 justify-center text-2xl gap-4 cursor-pointer bg-slate-100 ${
+            className={`flex flex-1  items-center p-4 justify-center text-2xl gap-4 cursor-pointer bg-slate-100 border-r ${
               fontaines.infos.fournisseurId === proposition.fournisseurId &&
-              espace.infos.selected
+              espace.infos.poseSelected === proposition.typePose
                 ? "ring-4 ring-inset ring-destructive"
                 : ""
             }`}
@@ -150,7 +145,9 @@ const FontaineEspacePropositionCard = ({
               <Checkbox
                 checked={
                   fontaines.infos.fournisseurId === proposition.fournisseurId &&
-                  (espace.infos.selected ? true : false)
+                  (espace.infos.poseSelected === proposition.typePose
+                    ? true
+                    : false)
                 }
                 onCheckedChange={() => () =>
                   fontainesEspacesIds[0] === espace.infos.espaceId
@@ -172,14 +169,14 @@ const FontaineEspacePropositionCard = ({
               <p className="text-xs">
                 Consommables ~ 200 L / an / personne d&apos;eau fraiche
               </p>
-              {espace.infos.typeBoissons === "EC" ||
-              espace.infos.typeBoissons === "ECG" ? (
+              {getTypeFontaine(espace.infos.typeEau) === "EC" ||
+              getTypeFontaine(espace.infos.typeEau) === "ECG" ? (
                 <p className="text-xs">
                   Consommables ~ 15 L / an / personne d&apos;eau chaude
                 </p>
               ) : null}
-              {espace.infos.typeBoissons === "EG" ||
-              espace.infos.typeBoissons === "ECG" ? (
+              {getTypeFontaine(espace.infos.typeEau) === "EG" ||
+              getTypeFontaine(espace.infos.typeEau) === "ECG" ? (
                 <p className="text-xs">
                   Consommables ~ 100 L / an / personne d&apos;eau gazeuse
                 </p>
@@ -187,7 +184,7 @@ const FontaineEspacePropositionCard = ({
             </div>
           </div>
         </TooltipTrigger>
-        <TooltipContent className="max-w-60">{/* {tooltip} */}</TooltipContent>
+        <TooltipContent className="max-w-60"> {tooltip}</TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );

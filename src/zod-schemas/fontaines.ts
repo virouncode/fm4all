@@ -16,12 +16,11 @@ export const fontainesSchema = z.object({
     z.object({
       infos: z.object({
         espaceId: z.number(),
-        typeBoissons: z.enum(["EF", "EC", "EG", "ECG"]).default("EF"),
-        typePose: z.enum(["aposer", "colonne", "comptoir"]),
+        typeEau: z.array(z.enum(["Eau froide", "Eau gazeuse", "Eau chaude"])),
         marque: z.string().nullable(),
         modele: z.string().nullable(),
         reconditionne: z.boolean().nullable(),
-        selected: z.boolean().nullable(),
+        poseSelected: z.enum(["aposer", "colonne", "comptoir"]).nullable(),
       }),
       quantites: z.object({
         nbPersonnes: z.number().nullable(),

@@ -7,4 +7,5 @@ export const typesPose = [
   { id: "comptoir", description: "Sous comptoir" },
 ];
 
+export const typesPoseArray = typesPose.map((type) => type.id);
 export type TypesPoseType = "aposer" | "colonne" | "comptoir";

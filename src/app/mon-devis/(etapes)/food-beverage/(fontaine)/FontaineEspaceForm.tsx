@@ -1,8 +1,8 @@
 "use client";
 
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
@@ -17,8 +17,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { locationFontaine } from "@/constants/locationFontaine";
-import { typesEau, TypesEauType } from "@/constants/typesEau";
-import { typesPose, TypesPoseType } from "@/constants/typesPose";
+import { TypesEauType } from "@/constants/typesEau";
 import { ClientContext } from "@/context/ClientProvider";
 import {
   FontainesContext,
@@ -32,6 +31,7 @@ import { FontaineEspaceType } from "@/zod-schemas/fontaines";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
 import { ChangeEvent, useContext } from "react";
+import { getTypeFontaine } from "./getTypeFontaine";
 type FontaineEspaceFormProps = {
   espace: FontaineEspaceType;
   fontainesModeles: SelectFontainesModelesType[];
@@ -59,9 +59,12 @@ const FontaineEspaceForm = ({
   //Je change le type de boissons
   //Si c'est la première machine :
   //Pour la première machine et les autres : Je ne change pas de fournisseur ni de gamme, je mets juste le total à jour
-  const handleChangeTypeBoissons = (value: string) => {
-    //JE N'AI PAS DE FOURNISSEUR
-    if (!fontaines.infos.fournisseurId) {
+  const handleCheck = (checked: boolean, type: TypesEauType) => {
+    const newTypeEau = checked
+      ? [...espace.infos.typeEau, type]
+      : espace.infos.typeEau.filter((item) => item !== type);
+    //JE N'AI PAS CHOISI DE POSE : je mets juste le formulaire à jour
+    if (!espace.infos.poseSelected) {
       setFontaines((prev) => ({
         ...prev,
         espaces: prev.espaces.map((item) =>
@@ -70,7 +73,7 @@ const FontaineEspaceForm = ({
                 ...item,
                 infos: {
                   ...item.infos,
-                  typeBoissons: value as TypesEauType,
+                  typeEau: newTypeEau,
                 },
               }
             : item
@@ -78,12 +81,13 @@ const FontaineEspaceForm = ({
       }));
       return;
     }
-    //J'ai un fournisseur, je dois mettre à jour les prix et les caractéristiques de la machine
+    //J'ai déjà choisi une pose, je dois mettre à jour les prix et les caractéristiques de la fontaine
+    const typeFontaine = getTypeFontaine(newTypeEau);
     const fontainesTarifFournisseur = fontainesTarifs.find(
       (tarif) =>
         tarif.nbPersonnes === roundNbPersonnesFontaine(nbPersonnes) &&
-        tarif.type === value &&
-        tarif.typePose === espace.infos.typePose &&
+        tarif.type === typeFontaine &&
+        tarif.typePose === espace.infos.poseSelected &&
         tarif.fournisseurId === fontaines.infos.fournisseurId &&
         tarif[fontaines.infos.dureeLocation] !== null
     ); //1 ligne par fournisseur
@@ -106,8 +110,8 @@ const FontaineEspaceForm = ({
                   ...item,
                   infos: {
                     ...item.infos,
-                    selected: false,
-                    typeBoissons: value as TypesEauType,
+                    poseSelected: null,
+                    typeEau: newTypeEau,
                     marque: null,
                     modele: null,
                     reconditionne: false,
@@ -157,7 +161,7 @@ const FontaineEspaceForm = ({
                   ...item,
                   infos: {
                     ...item.infos,
-                    typeBoissons: value as TypesEauType,
+                    typeEau: newTypeEau,
                     selected: false,
                     marque: null,
                     modele: null,
@@ -234,7 +238,7 @@ const FontaineEspaceForm = ({
               ...item,
               infos: {
                 ...item.infos,
-                typeBoissons: value as TypesEauType,
+                typeEau: newTypeEau,
                 marque,
                 modele,
                 reconditionne,
@@ -252,215 +256,7 @@ const FontaineEspaceForm = ({
       ),
     }));
     //Je mets à jour les totaux si la gamme a été choisie
-    if (espace.infos.selected) {
-      setTotalFontaines((prev) => ({
-        totalEspaces: prev.totalEspaces.map((item) =>
-          item.espaceId === espace.infos.espaceId
-            ? {
-                ...item,
-                total: totalAnnuel,
-                totalInstallation: totalInstallation,
-              }
-            : item
-        ),
-      }));
-    }
-  };
-
-  const handleChangeTypePose = (value: string) => {
-    //JE N'AI PAS DE FOURNISSEUR
-    if (!fontaines.infos.fournisseurId) {
-      setFontaines((prev) => ({
-        ...prev,
-        espaces: prev.espaces.map((item) =>
-          item.infos.espaceId === espace.infos.espaceId
-            ? {
-                ...item,
-                infos: {
-                  ...item.infos,
-                  typePose: value as TypesPoseType,
-                },
-              }
-            : item
-        ),
-      }));
-      return;
-    }
-    //J'ai un fournisseur, je dois mettre à jour les prix et les caractéristiques de la machine
-    const fontainesTarifFournisseur = fontainesTarifs.find(
-      (tarif) =>
-        tarif.nbPersonnes === roundNbPersonnesFontaine(nbPersonnes) &&
-        tarif.type === espace.infos.typeBoissons &&
-        tarif.typePose === value &&
-        tarif.fournisseurId === fontaines.infos.fournisseurId &&
-        tarif[fontaines.infos.dureeLocation] !== null
-    ); //1 ligne par fournisseur
-    //Il se peut que mon fournisseur n'ait pas de tarif pour ces critères
-    if (!fontainesTarifFournisseur) {
-      //si c'est la première machine
-      if (fontainesEspacesIds[0] === espace.infos.espaceId) {
-        //On retire TOUT
-        setFontaines((prev) => ({
-          ...prev,
-          infos: {
-            ...prev.infos,
-            fournisseurId: null,
-            nomFournisseur: null,
-            sloganFournisseur: null,
-          },
-          espaces: prev.espaces.map((item) =>
-            item.infos.espaceId === espace.infos.espaceId
-              ? {
-                  ...item,
-                  infos: {
-                    ...item.infos,
-                    selected: false,
-                    typePose: value as TypesPoseType,
-                    marque: null,
-                    modele: null,
-                    reconditionne: false,
-                  },
-                  prix: {
-                    prixLoc: null,
-                    prixInstal: null,
-                    prixMaintenance: null,
-                    prixUnitaireConsoFiltres: null,
-                    prixUnitaireConsoCO2: null,
-                    prixUnitaireConsoEauChaude: null,
-                  },
-                }
-              : {
-                  ...item,
-                  infos: {
-                    ...item.infos,
-                    marque: null,
-                    modele: null,
-                    reconditionne: false,
-                  },
-                  prix: {
-                    prixLoc: null,
-                    prixInstal: null,
-                    prixMaintenance: null,
-                    prixUnitaireConsoFiltres: null,
-                    prixUnitaireConsoCO2: null,
-                    prixUnitaireConsoEauChaude: null,
-                  },
-                }
-          ),
-        }));
-        setTotalFontaines((prev) => ({
-          totalEspaces: prev.totalEspaces.map((item) => ({
-            ...item,
-            total: null,
-            totalInstallation: null,
-          })),
-        }));
-      } else {
-        //Si c'est pas la première machine on retire juste les choix pour la machine en cours
-        setFontaines((prev) => ({
-          ...prev,
-          espaces: prev.espaces.map((item) =>
-            item.infos.espaceId === espace.infos.espaceId
-              ? {
-                  ...item,
-                  infos: {
-                    ...item.infos,
-                    typePose: value as TypesPoseType,
-                    selected: false,
-                    marque: null,
-                    modele: null,
-                    reconditionne: false,
-                  },
-                  prix: {
-                    prixLoc: null,
-                    prixInstal: null,
-                    prixMaintenance: null,
-                    prixUnitaireConsoFiltres: null,
-                    prixUnitaireConsoCO2: null,
-                    prixUnitaireConsoEauChaude: null,
-                  },
-                }
-              : item
-          ),
-        }));
-        setTotalFontaines((prev) => ({
-          totalEspaces: prev.totalEspaces.map((item) =>
-            item.espaceId === espace.infos.espaceId
-              ? {
-                  ...item,
-                  total: null,
-                  totalInstallation: null,
-                }
-              : item
-          ),
-        }));
-      }
-      return;
-    }
-    //Le fournisseur a des tarifs pour ces critères ! On reprend le calcul
-    const prixLoc = fontainesTarifFournisseur[fontaines.infos.dureeLocation];
-    const prixInstal = fontainesTarifFournisseur.fraisInstallation;
-    const prixMaintenance = fontainesTarifFournisseur.paMaintenance;
-    const totalLoc =
-      prixLoc !== null && prixMaintenance !== null
-        ? prixLoc + prixMaintenance
-        : null;
-    const totalInstallation = prixInstal !== null ? prixInstal : null;
-
-    const prixUnitaireConsoFiltres =
-      fontainesTarifFournisseur.paConsoFiltres ?? null;
-    const prixUnitaireConsoCO2 = fontainesTarifFournisseur.paConsoCO2 ?? null;
-    const prixUnitaireConsoEauChaude =
-      fontainesTarifFournisseur.paConsoEauChaude ?? null;
-
-    const totalConso =
-      ((prixUnitaireConsoFiltres ?? 0) +
-        (prixUnitaireConsoCO2 ?? 0) +
-        (prixUnitaireConsoEauChaude ?? 0)) *
-      nbPersonnes;
-    const totalAnnuel = totalLoc !== null ? totalLoc + totalConso : null;
-    //Modele
-    const modele = fontainesTarifFournisseur
-      ? fontainesModeles?.find(
-          ({ id }) => id === fontainesTarifFournisseur?.fontaineId
-        )?.modele ?? null
-      : null;
-    const marque = fontainesTarifFournisseur
-      ? fontainesModeles?.find(
-          ({ id }) => id === fontainesTarifFournisseur?.fontaineId
-        )?.marque ?? null
-      : null;
-    const reconditionne = fontainesTarifFournisseur
-      ? fontainesTarifFournisseur.reconditionne ?? null
-      : null;
-    //Je mets à jour mon espace
-    setFontaines((prev) => ({
-      ...prev,
-      espaces: prev.espaces.map((item) =>
-        item.infos.espaceId === espace.infos.espaceId
-          ? {
-              ...item,
-              infos: {
-                ...item.infos,
-                typePose: value as TypesPoseType,
-                marque,
-                modele,
-                reconditionne,
-              },
-              prix: {
-                prixLoc,
-                prixInstal,
-                prixMaintenance,
-                prixUnitaireConsoFiltres,
-                prixUnitaireConsoCO2,
-                prixUnitaireConsoEauChaude,
-              },
-            }
-          : item
-      ),
-    }));
-    //Je mets à jour les totaux si la gamme a été choisie
-    if (espace.infos.selected) {
+    if (espace.infos.poseSelected) {
       setTotalFontaines((prev) => ({
         totalEspaces: prev.totalEspaces.map((item) =>
           item.espaceId === espace.infos.espaceId
@@ -478,7 +274,7 @@ const FontaineEspaceForm = ({
   const handleChangeNbPersonnes = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     let newNbPersonnes = value ? parseInt(value) : effectif;
-    if (newNbPersonnes > MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE) {
+    if (newNbPersonnes >= MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE) {
       newNbPersonnes = MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE;
       toast({
         title: "Limite atteinte",
@@ -506,11 +302,12 @@ const FontaineEspaceForm = ({
       return;
     }
     //Si j'avais deja un fournisseur
+    const typeFontaine = getTypeFontaine(espace.infos.typeEau);
     const fontainesTarifFournisseur = fontainesTarifs.find(
       (tarif) =>
         tarif.nbPersonnes === roundNbPersonnesFontaine(newNbPersonnes) &&
-        tarif.type === espace.infos.typeBoissons &&
-        tarif.typePose === espace.infos.typePose &&
+        tarif.type === typeFontaine &&
+        tarif.typePose === espace.infos.poseSelected &&
         tarif.fournisseurId === fontaines.infos.fournisseurId &&
         tarif[fontaines.infos.dureeLocation] !== null
     );
@@ -688,7 +485,7 @@ const FontaineEspaceForm = ({
       ),
     }));
     //Je mets à jour les totaux si la gamme a été choisie
-    if (espace.infos.selected) {
+    if (espace.infos.poseSelected) {
       setTotalFontaines((prev) => ({
         totalEspaces: prev.totalEspaces.map((item) =>
           item.espaceId === espace.infos.espaceId
@@ -716,11 +513,12 @@ const FontaineEspaceForm = ({
       return;
     }
     //Si j'ai un fournisseur, je dois mettre à jour les prix et les caractéristiques de la machine
+    const typeFontaine = getTypeFontaine(espace.infos.typeEau);
     const fontainesTarifFournisseur = fontainesTarifs.find(
       (tarif) =>
         tarif.nbPersonnes === roundNbPersonnesFontaine(nbPersonnes) &&
-        tarif.type === espace.infos.typeBoissons &&
-        tarif.typePose === espace.infos.typePose &&
+        tarif.type === typeFontaine &&
+        tarif.typePose === espace.infos.poseSelected &&
         tarif[value as DureeLocationFontaineType] !== null &&
         tarif.fournisseurId === fontaines.infos.fournisseurId
     );
@@ -852,7 +650,7 @@ const FontaineEspaceForm = ({
       ),
     }));
     //Je mets à jour les totaux si la gamme a été choisie
-    if (espace.infos.selected) {
+    if (espace.infos.poseSelected) {
       setTotalFontaines((prev) => ({
         totalEspaces: prev.totalEspaces.map((item) =>
           item.espaceId === espace.infos.espaceId
@@ -873,47 +671,47 @@ const FontaineEspaceForm = ({
         <TooltipTrigger asChild>
           <form className="w-2/3">
             <div className="flex gap-8 items-center mb-4">
-              <div>
-                <RadioGroup
-                  onValueChange={handleChangeTypeBoissons}
-                  value={espace.infos.typeBoissons}
-                  className="flex gap-4 items-center"
-                  name="typeBoissons"
-                >
-                  {typesEau.map(({ id, description }) => (
-                    <div key={id} className="flex gap-2 items-center">
-                      <RadioGroupItem
-                        value={id}
-                        title={description}
-                        id={`${id}_${espace.infos.espaceId}`}
-                      />
-                      <Label htmlFor={`${id}_${espace.infos.espaceId}`}>
-                        {description}
-                      </Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-              </div>
-              <div>
-                <RadioGroup
-                  onValueChange={handleChangeTypePose}
-                  value={espace.infos.typePose}
-                  className="flex gap-4 items-center"
-                  name="typePose"
-                >
-                  {typesPose.map(({ id, description }) => (
-                    <div key={id} className="flex gap-2 items-center">
-                      <RadioGroupItem
-                        value={id}
-                        title={description}
-                        id={`${id}_${espace.infos.espaceId}`}
-                      />
-                      <Label htmlFor={`${id}_${espace.infos.espaceId}`}>
-                        {description}
-                      </Label>
-                    </div>
-                  ))}
-                </RadioGroup>
+              <div className="flex gap-4 items-center">
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    checked={espace.infos.typeEau.includes("Eau froide")}
+                    onCheckedChange={(checked: boolean) =>
+                      handleCheck(checked, "Eau froide")
+                    }
+                    disabled={true}
+                    className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+                    id="eau froide"
+                  />
+                  <Label htmlFor="eau froide" className="text-sm">
+                    Eau froide
+                  </Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    checked={espace.infos.typeEau.includes("Eau gazeuse")}
+                    onCheckedChange={(checked: boolean) =>
+                      handleCheck(checked, "Eau gazeuse")
+                    }
+                    className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+                    id="eau gazeuse"
+                  />
+                  <Label htmlFor="eau gazeuse" className="text-sm">
+                    Eau gazeuse
+                  </Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    checked={espace.infos.typeEau.includes("Eau chaude")}
+                    onCheckedChange={(checked: boolean) =>
+                      handleCheck(checked, "Eau chaude")
+                    }
+                    className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+                    id="boissons"
+                  />
+                  <Label htmlFor="Eau chaude" className="text-sm">
+                    Eau chaude
+                  </Label>
+                </div>
               </div>
               <div className="flex gap-2 items-center">
                 <Input
@@ -940,7 +738,7 @@ const FontaineEspaceForm = ({
                   value={fontaines.infos.dureeLocation}
                   onValueChange={handleSelectDureeLocation}
                 >
-                  <SelectTrigger className={`w-full max-w-xs`}>
+                  <SelectTrigger className={" max-w-xs w-1/4"}>
                     <SelectValue placeholder="Choisir" />
                   </SelectTrigger>
                   <SelectContent>
@@ -962,14 +760,11 @@ const FontaineEspaceForm = ({
           <div>
             <p>Pour votre espace fontaine à eau veuillez sélectionner :</p>
             <ul className="ml-10">
-              <li className="list-disc">
-                Le type d&apos;eau (EF : eau froide + tempérée, EC : eau froide
-                + tempérée + chaude, EG : eau froide + tempérée + gazeuse, ECG :
-                eau froide + tempérée + chaude + gazeuse)
-              </li>
-              <li className="list-disc">Le type de pose</li>
-              <li className="list-disc">Le nombre de personnes</li>
-              <li className="list-disc">La durée de location</li>
+              <li className="list-disc">Le type d&apos;eau</li>
+              <li className="list-disc">Le nombre de personnes (max 110)</li>
+              {fontainesEspacesIds[0] === espace.infos.espaceId && (
+                <li className="list-disc">La durée de location</li>
+              )}
             </ul>
           </div>
         </TooltipContent>

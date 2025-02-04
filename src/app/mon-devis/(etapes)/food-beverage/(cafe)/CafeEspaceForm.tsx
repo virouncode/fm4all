@@ -369,7 +369,7 @@ const CafeEspaceForm = ({
   const handleChangeNbPersonnes = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     let newNbPersonnes = value ? parseInt(value) : effectif;
-    if (newNbPersonnes > MAX_NB_PERSONNES_PAR_ESPACE) {
+    if (newNbPersonnes >= MAX_NB_PERSONNES_PAR_ESPACE) {
       newNbPersonnes = MAX_NB_PERSONNES_PAR_ESPACE;
       toast({
         title: "Limite atteinte",
