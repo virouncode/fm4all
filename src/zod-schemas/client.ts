@@ -10,9 +10,9 @@ export const selectClientSchema = createSelectSchema(clients, {
   nomEntreprise: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
   siret: (schema) =>
     schema.refine(
-      (value) => !value || /^\d{3} \d{3} \d{3} \d{4}$/.test(value),
+      (value) => !value || /^\d{3} \d{3} \d{3} \d{5}$/.test(value),
       {
-        message: "Siret invalide, format attendu : XXX XXX XXX XXXX",
+        message: "Siret invalide, format attendu : XXX XXX XXX XXXXX",
       }
     ),
   prenomContact: (schema) => schema.min(1, "Prénom du contact obligatoire"),
@@ -24,6 +24,8 @@ export const selectClientSchema = createSelectSchema(clients, {
       /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{2,4}([-.\s]?\d{2,4}){2,3}$/,
       "Numéro de téléphone invalide"
     ),
+  emailSignataire: (schema) =>
+    schema.email("Adresse email invalide").or(z.literal("")).nullable(),
   surface: (schema) =>
     schema.min(1, "Surface obligatoire").max(3000, "Surface maximum 3000 m²"),
   effectif: (schema) =>
@@ -50,9 +52,9 @@ export const insertClientSchema = createInsertSchema(clients, {
   nomEntreprise: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
   siret: (schema) =>
     schema.refine(
-      (value) => !value || /^\d{3} \d{3} \d{3} \d{4}$/.test(value),
+      (value) => !value || /^\d{3} \d{3} \d{3} \d{5}$/.test(value),
       {
-        message: "Siret invalide, format attendu : XXX XXX XXX XXXX",
+        message: "Siret invalide, format attendu : XXX XXX XXX XXXXX",
       }
     ),
   prenomContact: (schema) => schema.min(1, "Prénom du contact obligatoire"),
@@ -64,6 +66,8 @@ export const insertClientSchema = createInsertSchema(clients, {
       /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{2,4}([-.\s]?\d{2,4}){2,3}$/,
       "Numéro de téléphone invalide"
     ),
+  emailSignataire: (schema) =>
+    schema.email("Adresse email invalide").or(z.literal("")).nullable(),
   surface: (schema) =>
     schema.min(1, "Surface obligatoire").max(3000, "Surface maximum 3000 m²"),
   effectif: (schema) =>
@@ -90,9 +94,9 @@ export const updateClientSchema = createUpdateSchema(clients, {
   nomEntreprise: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
   siret: (schema) =>
     schema.refine(
-      (value) => !value || /^\d{3} \d{3} \d{3} \d{4}$/.test(value),
+      (value) => !value || /^\d{3} \d{3} \d{3} \d{5}$/.test(value),
       {
-        message: "Siret invalide, format attendu : XXX XXX XXX XXXX",
+        message: "Siret invalide, format attendu : XXX XXX XXX XXXXX",
       }
     ),
   prenomContact: (schema) => schema.min(1, "Prénom du contact obligatoire"),
@@ -104,6 +108,8 @@ export const updateClientSchema = createUpdateSchema(clients, {
       /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{2,4}([-.\s]?\d{2,4}){2,3}$/,
       "Numéro de téléphone invalide, format attendu : XX XX XX XX XX"
     ),
+  emailSignataire: (schema) =>
+    schema.email("Adresse email invalide").or(z.literal("")).nullable(),
   surface: (schema) =>
     schema.min(1, "Surface obligatoire").max(3000, "Surface maximum 3000 m²"),
   effectif: (schema) =>

@@ -463,6 +463,13 @@
       "when": 1738591483870,
       "tag": "0065_clammy_tyger_tiger",
       "breakpoints": true
+    },
+    {
+      "idx": 66,
+      "version": "7",
+      "when": 1738662710065,
+      "tag": "0066_naive_doctor_strange",
+      "breakpoints": true
     }
   ]
 }

@@ -1,5 +1,5 @@
 "use client";
-import { fullReinitialisationDevis } from "@/app/mon-devis/mes-locaux/fullReinitialisationDevis";
+import { fullReinitialisationDevis } from "@/app/mon-devis/(etapes)/mes-locaux/fullReinitialisationDevis";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

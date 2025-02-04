@@ -5,7 +5,7 @@ const ServiceCards = () => {
   return (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 items-center mt-6 w-full">
       <ImgCardVertical
-        src="https://picsum.photos/350/300"
+        src="/img/services/nettoyage.png"
         alt="illustration-nettoyage"
       >
         <div className="p-4 flex flex-col gap-4 h-52">

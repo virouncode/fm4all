@@ -28,7 +28,7 @@ export const NettoyageContext = createContext<{
       samediSelected: false,
       dimancheSelected: false,
       vitrerieSelected: false,
-      pleinPied: true,
+      plainPied: true,
       commentaires: null,
     },
     quantites: {
@@ -66,7 +66,7 @@ const NettoyageProvider = ({ children }: PropsWithChildren) => {
       samediSelected: false,
       dimancheSelected: false,
       vitrerieSelected: false,
-      pleinPied: true,
+      plainPied: true,
       commentaires: null,
     },
     quantites: {

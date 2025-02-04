@@ -10,7 +10,7 @@ export const nettoyageSchema = z.object({
     samediSelected: z.boolean().default(false),
     dimancheSelected: z.boolean().default(false),
     vitrerieSelected: z.boolean().default(false),
-    pleinPied: z.boolean().default(true),
+    plainPied: z.boolean().default(true),
     commentaires: z.string().nullable(),
   }),
   quantites: z.object({

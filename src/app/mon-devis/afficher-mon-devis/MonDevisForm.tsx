@@ -2,7 +2,6 @@
 
 import { DateInputWithLabel } from "@/components/formInputs/DateInputWithLabel";
 import { InputWithLabel } from "@/components/formInputs/InputWithLabel";
-import { TextAreaWithLabel } from "@/components/formInputs/TextAreaWithLabel";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { departements } from "@/constants/departements";
@@ -10,17 +9,24 @@ import { ClientContext } from "@/context/ClientProvider";
 import { MonDevisContext } from "@/context/MonDevisProvider";
 import useScrollIntoMonDevis from "@/hooks/use-scroll-into-mon-devis";
 import { toast } from "@/hooks/use-toast";
+import fillDevis from "@/lib/fillDevis";
 import {
   InsertClientType,
   updateClientSchema,
   UpdateClientType,
 } from "@/zod-schemas/client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent, Dispatch, SetStateAction, useContext } from "react";
 import { useForm } from "react-hook-form";
 
-const MonDevisForm = () => {
+type MonDevisFormProps = {
+  setDevisUrl: Dispatch<SetStateAction<string | null>>;
+};
+
+const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
   const { client, setClient } = useContext(ClientContext);
   const { setMonDevis } = useContext(MonDevisContext);
   const router = useRouter();
@@ -34,6 +40,10 @@ const MonDevisForm = () => {
     posteContact: client.posteContact ?? "",
     emailContact: client.emailContact ?? "",
     phoneContact: client.phoneContact ?? "",
+    prenomSignataire: client.prenomSignataire ?? "",
+    nomSignataire: client.nomSignataire ?? "",
+    posteSignataire: client.posteSignataire ?? "",
+    emailSignataire: client.emailSignataire ?? "",
     surface: client.surface ?? 100,
     effectif: client.effectif ?? 20,
     typeBatiment: client.typeBatiment as
@@ -101,8 +111,27 @@ const MonDevisForm = () => {
     } catch (err) {
       console.log(err);
     }
-    //TODO enregistrer client dans la bdd
-    setMonDevis({ currentMonDevisId: 2 });
+    //TODO update client dans la bdd
+    try {
+      const url = await fillDevis(
+        "Test2025",
+        format(new Date(), "dd/MM/yyyy", { locale: fr }),
+        "FM4ALL comparateur en ligne",
+        client,
+        1000,
+        100
+      );
+      if (url) setDevisUrl(url);
+      setMonDevis({ currentMonDevisId: 2 });
+    } catch (err) {
+      if (err instanceof Error) {
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: err.message,
+        });
+      } else console.log(err);
+    }
   };
 
   return (
@@ -114,120 +143,129 @@ const MonDevisForm = () => {
         Félicitations {client.prenomContact} {client.nomContact} !
       </p>
       <p className="text-lg">Votre devis final est prêt</p>
-      <div className="flex flex-col gap-2 items-center">
-        <p>
-          Il ne vous reste plus qu&apos;à le valider pour le transformer en
-          contrat.
-        </p>
-        <p>
-          Afin de donner une <strong>entête à votre devis</strong> et faciliter
-          vos futures démarches, vous pouvez nous communiquer :
-        </p>
-      </div>
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(submitForm)}
-          className="flex-1 flex flex-col gap-4 mx-auto w-full mt-6 p-4"
-        >
-          <div className="flex flex-col gap-10 md:flex-row md:gap-20">
-            <div className="w-full md:w-1/4 flex flex-col">
-              <InputWithLabel<InsertClientType>
-                fieldTitle="Prénom du signataire*"
-                nameInSchema="prenomContact"
-                name="prenomContact"
-                handleChange={handleChange}
-              />
-              <InputWithLabel<InsertClientType>
-                fieldTitle="Nom du signataire*"
-                nameInSchema="nomContact"
-                name="nomContact"
-                handleChange={handleChange}
-              />
-              <InputWithLabel<InsertClientType>
-                fieldTitle="Email du signataire*"
-                nameInSchema="emailContact"
-                type="email"
-                name="emailContact"
-                handleChange={handleChange}
-              />
-              <InputWithLabel<InsertClientType>
-                fieldTitle="Poste du signataire*"
-                nameInSchema="posteContact"
-                name="phoneContact"
-                handleChange={handleChange}
-              />
-            </div>
-            <div className="w-full md:w-1/4 flex flex-col">
-              <InputWithLabel<InsertClientType>
-                fieldTitle="Nom de l'entreprise*"
-                nameInSchema="nomEntreprise"
-                name="nomEntreprise"
-                handleChange={handleChange}
-              />
-              <InputWithLabel<InsertClientType>
-                fieldTitle="Siret"
-                nameInSchema="siret"
-                name="siret"
-                handleChange={handleChange}
-                placeholder="XXX XXX XXX XXXX"
-              />
-              <InputWithLabel<InsertClientType>
-                fieldTitle="N°de téléphone*"
-                nameInSchema="phoneContact"
-                placeholder="XX XX XX XX XX"
-                name="phoneContact"
-                handleChange={handleChange}
-              />
-              <DateInputWithLabel<InsertClientType>
-                fieldTitle="Date de démarrage souhaitée"
-                nameInSchema="dateDeDemarrage"
-                handleChangeDate={handleChangeDate}
-              />
-            </div>
+      <p className="text-base max-w-prose mx-auto hyphens-auto text-wrap">
+        Afin de donner une <strong>entête à votre devis</strong> et faciliter
+        vos futures démarches, vous pouvez nous communiquer vos coordonnées,
+        ainsi que celles du signataire du contrat (si différentes) :
+      </p>
 
-            <div className="w-full md:w-1/4 flex flex-col">
-              <InputWithLabel<InsertClientType>
-                fieldTitle="Addresse du site ligne 1"
-                nameInSchema="adresseLigne1"
-                name="addressLigne1"
-                handleChange={handleChange}
-              />
-              <InputWithLabel<InsertClientType>
-                fieldTitle="Addresse du site ligne 2"
-                nameInSchema="adresseLigne2"
-                name="adresseLigne2"
-                handleChange={handleChange}
-              />
-              <InputWithLabel<InsertClientType>
-                fieldTitle="Code postal*"
-                nameInSchema="codePostal"
-                name="codePostal"
-                handleChange={handleChange}
-              />
-              <InputWithLabel<InsertClientType>
-                fieldTitle="Ville"
-                nameInSchema="ville"
-                name="ville"
-                handleChange={handleChange}
-              />
-            </div>
-            <div className="w-full md:w-1/4 flex flex-col gap-4">
-              <TextAreaWithLabel<InsertClientType>
-                fieldTitle="Commentaires"
-                nameInSchema="commentaires"
-                className="resize-none h-40"
-                name="commentaires"
-                onChange={handleChange}
-              />
-              <div className="w-full">
-                <Button
-                  variant="destructive"
-                  size="lg"
-                  className="text-base w-full"
-                >
-                  Afficher mon devis
-                </Button>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(submitForm)} className="mt-6 p-4">
+          <div className="flex-1 flex flex-col gap-4">
+            <div className="flex flex-col gap-10 md:flex-row md:gap-20">
+              <div className="w-full md:w-1/4 flex flex-col">
+                <InputWithLabel<InsertClientType>
+                  fieldTitle="Prénom du contact*"
+                  nameInSchema="prenomContact"
+                  name="prenomContact"
+                  handleChange={handleChange}
+                />
+                <InputWithLabel<InsertClientType>
+                  fieldTitle="Nom du contact*"
+                  nameInSchema="nomContact"
+                  name="nomContact"
+                  handleChange={handleChange}
+                />
+                <InputWithLabel<InsertClientType>
+                  fieldTitle="Email du contact*"
+                  nameInSchema="emailContact"
+                  type="email"
+                  name="emailContact"
+                  handleChange={handleChange}
+                />
+                <InputWithLabel<InsertClientType>
+                  fieldTitle="Poste du contact*"
+                  nameInSchema="posteContact"
+                  name="posteContact"
+                  handleChange={handleChange}
+                />
               </div>
+              <div className="w-full md:w-1/4 flex flex-col">
+                <InputWithLabel<InsertClientType>
+                  fieldTitle="Prénom du signataire"
+                  nameInSchema="prenomSignataire"
+                  name="prenomSignataire"
+                  handleChange={handleChange}
+                />
+                <InputWithLabel<InsertClientType>
+                  fieldTitle="Nom du signataire"
+                  nameInSchema="nomSignataire"
+                  name="nomSignataire"
+                  handleChange={handleChange}
+                />
+                <InputWithLabel<InsertClientType>
+                  fieldTitle="Email du signataire"
+                  nameInSchema="emailSignataire"
+                  type="email"
+                  name="emailSignataire"
+                  handleChange={handleChange}
+                />
+                <InputWithLabel<InsertClientType>
+                  fieldTitle="Poste du signataire"
+                  nameInSchema="posteSignataire"
+                  name="posteSignataire"
+                  handleChange={handleChange}
+                />
+              </div>
+              <div className="w-full md:w-1/4 flex flex-col">
+                <InputWithLabel<InsertClientType>
+                  fieldTitle="Nom de l'entreprise*"
+                  nameInSchema="nomEntreprise"
+                  name="nomEntreprise"
+                  handleChange={handleChange}
+                />
+                <InputWithLabel<InsertClientType>
+                  fieldTitle="Siret"
+                  nameInSchema="siret"
+                  name="siret"
+                  handleChange={handleChange}
+                  placeholder="XXX XXX XXX XXXXX"
+                />
+                <InputWithLabel<InsertClientType>
+                  fieldTitle="N°de téléphone*"
+                  nameInSchema="phoneContact"
+                  placeholder="XX XX XX XX XX"
+                  name="phoneContact"
+                  handleChange={handleChange}
+                />
+                <DateInputWithLabel<InsertClientType>
+                  fieldTitle="Date de démarrage souhaitée"
+                  nameInSchema="dateDeDemarrage"
+                  handleChangeDate={handleChangeDate}
+                />
+              </div>
+
+              <div className="w-full md:w-1/4 flex flex-col">
+                <InputWithLabel<InsertClientType>
+                  fieldTitle="Addresse du site ligne 1"
+                  nameInSchema="adresseLigne1"
+                  name="addressLigne1"
+                  handleChange={handleChange}
+                />
+                <InputWithLabel<InsertClientType>
+                  fieldTitle="Addresse du site ligne 2"
+                  nameInSchema="adresseLigne2"
+                  name="adresseLigne2"
+                  handleChange={handleChange}
+                />
+                <InputWithLabel<InsertClientType>
+                  fieldTitle="Code postal*"
+                  nameInSchema="codePostal"
+                  name="codePostal"
+                  handleChange={handleChange}
+                />
+                <InputWithLabel<InsertClientType>
+                  fieldTitle="Ville"
+                  nameInSchema="ville"
+                  name="ville"
+                  handleChange={handleChange}
+                />
+              </div>
+            </div>
+            <div className="flex justify-center">
+              <Button variant="destructive" size="lg" className="text-base">
+                Afficher mon devis
+              </Button>
             </div>
           </div>
         </form>

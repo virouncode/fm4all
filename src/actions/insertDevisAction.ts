@@ -34,7 +34,7 @@ export const insertDevisAction = actionClient
       return {
         success: true,
         data: { id: insertedDevisId },
-        message: `Votre devis a bien été enregistré, merci !`,
+        message: `Votre progression a bien été enregistrée, merci !`,
       };
     }
   );

@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import ServicesLoader from "../mes-locaux/ServicesLoader";
+import ServicesLoader from "../(etapes)/mes-locaux/ServicesLoader";
 import SauvegarderProgression from "./SauvegarderProgression";
 
 export const metadata: Metadata = {

@@ -33,14 +33,14 @@ const Services = () => {
         <CarouselContent>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="https://picsum.photos/350/300"
+              src="/img/services/nettoyage.png"
               alt="illustration-nettoyage"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
                 <p className="text-2xl">Nettoyage</p>
                 <p className="w-full overflow-hidden text-ellipsis">
-                  D&apos;un passage hebdomadaire à un(e) gouvernant(e) premium,
-                  trouvez un prestataire Propreté à votre image.
+                  Du nettoyage essentiel à une expérience 5 étoiles, du
+                  prestataire PME au grand groupe, choisissez la...
                 </p>
                 <div className="flex-1">
                   <Link className="underline" href="/services/nettoyage">
