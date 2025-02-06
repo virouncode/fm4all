@@ -96,7 +96,7 @@ const HygieneOptionsBalaiCard = ({
           );
         }
         const prixMensuelBalaiText = `${formatNumber(
-          proposition.totalBalai / 12
+          Math.round(proposition.totalBalai / 12)
         )} € / mois`;
         return (
           <div

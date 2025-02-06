@@ -47,7 +47,7 @@ const TotalServicesFm4All = () => {
   if (total === 0) return null;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 total-section" id="total-fm4all">
       <div className="flex flex-col gap-4">
         <div>Services fm4All</div>
         <div className={`flex flex-col ml-4 text-xs`}>
@@ -121,7 +121,6 @@ const TotalServicesFm4All = () => {
               </p>
             </div>
           ) : null}
-
           <div className="flex items-center justify-between border-t border-foreground mt-2">
             <p>TOTAL</p>
             <p className="text-end">

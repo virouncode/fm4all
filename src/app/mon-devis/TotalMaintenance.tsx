@@ -20,7 +20,7 @@ const TotalMaintenance = () => {
   const color = getFm4AllColor(maintenance.infos.gammeSelected);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 total-section" id="total-maintenance">
       <div className="flex flex-col gap-4">
         <div>
           Maintenance multi-technique ({maintenance.infos.nomFournisseur})
@@ -31,7 +31,9 @@ const TotalMaintenance = () => {
               className={`flex items-center justify-between text-${color} font-bold`}
             >
               <p>Service</p>
-              <p className="text-end">{formatNumber(totalService)} € HT/an</p>
+              <p className="text-end">
+                {formatNumber(Math.round(totalService))} € HT/an
+              </p>
             </div>
           ) : null}
           {maintenance.infos.gammeSelected === "essentiel" && totalQ18 ? (
@@ -39,7 +41,9 @@ const TotalMaintenance = () => {
               className={`flex items-center justify-between text-${color} font-bold`}
             >
               <p>Contrôle Q18</p>
-              <p className="text-end">{formatNumber(totalQ18)} € HT/an</p>
+              <p className="text-end">
+                {formatNumber(Math.round(totalQ18))} € HT/an
+              </p>
             </div>
           ) : null}
           {maintenance.infos.gammeSelected === "confort" &&
@@ -50,13 +54,17 @@ const TotalMaintenance = () => {
                 className={`flex items-center justify-between text-${color} font-bold`}
               >
                 <p>Contrôle Q18</p>
-                <p className="text-end">{formatNumber(totalQ18)} € HT/an</p>
+                <p className="text-end">
+                  {formatNumber(Math.round(totalQ18))} € HT/an
+                </p>
               </div>
               <div
                 className={`flex items-center justify-between text-${color} font-bold`}
               >
                 <p>Contrôle Legio</p>
-                <p className="text-end">{formatNumber(totalLegio)} € HT/an</p>
+                <p className="text-end">
+                  {formatNumber(Math.round(totalLegio))} € HT/an
+                </p>
               </div>
             </>
           ) : null}
@@ -69,27 +77,33 @@ const TotalMaintenance = () => {
                 className={`flex items-center justify-between text-${color} font-bold`}
               >
                 <p>Contrôle Q18</p>
-                <p className="text-end">{formatNumber(totalQ18)} € HT/an</p>
+                <p className="text-end">
+                  {formatNumber(Math.round(totalQ18))} € HT/an
+                </p>
               </div>
               <div
                 className={`flex items-center justify-between text-${color} font-bold`}
               >
                 <p>Contrôle Legio</p>
-                <p className="text-end">{formatNumber(totalLegio)} € HT/an</p>
+                <p className="text-end">
+                  {formatNumber(Math.round(totalLegio))} € HT/an
+                </p>
               </div>
               <div
                 className={`flex items-center justify-between text-${color} font-bold`}
               >
                 <p>Contrôle Qualité Air</p>
                 <p className="text-end">
-                  {formatNumber(totalQualiteAir)} € HT/an
+                  {formatNumber(Math.round(totalQualiteAir))} € HT/an
                 </p>
               </div>
             </>
           ) : null}
           <div className="flex items-center justify-between border-t border-foreground mt-2">
             <p>TOTAL</p>
-            <p className="text-end">{formatNumber(total)} € HT/an</p>
+            <p className="text-end">
+              {formatNumber(Math.round(total))} € HT/an
+            </p>
           </div>
         </div>
       </div>

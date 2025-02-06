@@ -22,7 +22,7 @@ const SecuriteIncendie = ({
 }: SecuriteIncendieProps) => {
   const { client } = useContext(ClientContext);
   const { setServices } = useContext(ServicesContext);
-  const { setDevisProgress } = useContext(DevisProgressContext);
+  const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const router = useRouter();
 
   const handleClickNext = () => {
@@ -33,7 +33,10 @@ const SecuriteIncendie = ({
     const searchParams = new URLSearchParams();
     if (client.effectif)
       searchParams.set("effectif", client.effectif.toString());
-    setDevisProgress({ currentStep: 3, completedSteps: [1, 2] });
+    const newCompletedSteps = [
+      ...new Set([...devisProgress.completedSteps, 1, 2]),
+    ].sort((a, b) => a - b);
+    setDevisProgress({ currentStep: 3, completedSteps: newCompletedSteps });
     router.push(`/mon-devis/food-beverage?${searchParams.toString()}`);
   };
 

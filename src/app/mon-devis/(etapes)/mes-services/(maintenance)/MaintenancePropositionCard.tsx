@@ -8,6 +8,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { MaintenanceContext } from "@/context/MaintenanceProvider";
+import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { GammeType } from "@/zod-schemas/gamme";
 import { useContext } from "react";
@@ -61,8 +62,8 @@ const MaintenancePropositionCard = ({
       </div>
     );
   }
-  const totalMensuelText = `${Math.round(
-    proposition.totalAnnuel / 12
+  const totalMensuelText = `${formatNumber(
+    Math.round(proposition.totalAnnuel / 12)
   )} € / mois`;
   const tooltipEssentiel = (
     <div className="flex flex-col gap-4">

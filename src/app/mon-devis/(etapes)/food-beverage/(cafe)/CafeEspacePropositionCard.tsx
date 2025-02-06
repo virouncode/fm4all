@@ -112,11 +112,13 @@ const CafeEspacePropositionCard = ({
     );
   }
 
-  const totalMensuelText = `${Math.round(
-    proposition.totalAnnuel / 12
+  const totalMensuelText = `${formatNumber(
+    Math.round(proposition.totalAnnuel / 12)
   )} € / mois`;
   const prixInstallationText = proposition.totalInstallation
-    ? `+ ${formatNumber(proposition.totalInstallation)} € d'installation`
+    ? `+ ${formatNumber(
+        Math.round(proposition.totalInstallation)
+      )} € d'installation`
     : "";
   const typeLaitText = !proposition.typeLait
     ? ""

@@ -49,10 +49,10 @@ const HygienePropositionCard = ({
     );
   }
   const totalMensuelText = `${formatNumber(
-    proposition.totalAnnuelTrilogie / 12
+    Math.round(proposition.totalAnnuelTrilogie / 12)
   )} € / mois`;
   const prixInstallationText = prixInstalDistrib
-    ? `+ ${formatNumber(prixInstalDistrib)} € d'installation`
+    ? `+ ${formatNumber(Math.round(prixInstalDistrib))} € d'installation`
     : "";
 
   return (

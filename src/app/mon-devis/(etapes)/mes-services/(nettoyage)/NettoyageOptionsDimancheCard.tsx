@@ -42,7 +42,7 @@ const NettoyageOptionsDimancheCard = ({
     );
   }
   const dimanchePrixMensuelText = `${formatNumber(
-    dimancheProposition.prixAnnuel / 12
+    Math.round(dimancheProposition.prixAnnuel / 12)
   )} € / mois`;
 
   const diamncheNbPassagesParSemaineText = `1 passage de ${nettoyage.quantites.hParPassage} h / semaine en plus`;

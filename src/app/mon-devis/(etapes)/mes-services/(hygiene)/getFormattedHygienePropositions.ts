@@ -58,13 +58,10 @@ export const getFormattedHygienePropositions = (
       paParPersonneEmp !== null &&
       paParPersonneSavon !== null &&
       paParPersonnePh !== null
-        ? Math.round(
-            nbDistribEmp * prixDistribEmp +
-              nbDistribSavon * prixDistribSavon +
-              nbDistribPh * prixDistribPh +
-              (paParPersonneEmp + paParPersonneSavon + paParPersonnePh) *
-                effectif
-          )
+        ? nbDistribEmp * prixDistribEmp +
+          nbDistribSavon * prixDistribSavon +
+          nbDistribPh * prixDistribPh +
+          (paParPersonneEmp + paParPersonneSavon + paParPersonnePh) * effectif
         : null;
 
     return {

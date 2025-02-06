@@ -96,7 +96,7 @@ const HygieneOptionsDesinfectantCard = ({
           );
         }
         const prixMensuelDesinfectantText = `${formatNumber(
-          proposition.totalDesinfectant / 12
+          Math.round(proposition.totalDesinfectant / 12)
         )} € / mois`;
         return (
           <div

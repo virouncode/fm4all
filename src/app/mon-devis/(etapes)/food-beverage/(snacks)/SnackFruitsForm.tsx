@@ -144,9 +144,9 @@ const SnacksFruitsForm = ({
         boissonsConsosParSemaine !== null
           ? prixUnitaireBoissons * boissonsConsosParSemaine
           : 0;
-      const totalFruits = Math.round(52 * panierFruits);
-      const totalSnacks = Math.round(52 * panierSnacks);
-      const totalBoissons = Math.round(52 * panierBoissons);
+      const totalFruits = 52 * panierFruits;
+      const totalSnacks = 52 * panierSnacks;
+      const totalBoissons = 52 * panierBoissons;
 
       const prixPanier = panierFruits + panierSnacks + panierBoissons;
 
@@ -179,12 +179,10 @@ const SnacksFruitsForm = ({
           : 0
         : null;
       const totalLivraison =
-        fraisLivraisonPanier !== null
-          ? Math.round(fraisLivraisonPanier * 52)
-          : null;
+        fraisLivraisonPanier !== null ? fraisLivraisonPanier * 52 : null;
       const total =
         fraisLivraisonPanier !== null
-          ? Math.round(52 * (prixPanier + fraisLivraisonPanier))
+          ? 52 * (prixPanier + fraisLivraisonPanier)
           : null;
 
       setSnacksFruits((prev) => ({
@@ -267,9 +265,9 @@ const SnacksFruitsForm = ({
           ? (snacksFruits.prix.prixUnitaireBoissons ?? 0) *
             snacksFruits.quantites.boissonsConsosParSemaine
           : 0;
-      const totalFruits = Math.round(52 * panierFruits);
-      const totalSnacks = Math.round(52 * panierSnacks);
-      const totalBoissons = Math.round(52 * panierBoissons);
+      const totalFruits = 52 * panierFruits;
+      const totalSnacks = 52 * panierSnacks;
+      const totalBoissons = 52 * panierBoissons;
 
       const prixPanier = panierFruits + panierSnacks + panierBoissons;
       const fraisLivraisonsFournisseur = foodLivraisonTarifs.find(
@@ -290,12 +288,10 @@ const SnacksFruitsForm = ({
           : 0
         : null;
       const totalLivraison =
-        fraisLivraisonPanier !== null
-          ? Math.round(fraisLivraisonPanier * 52)
-          : null;
+        fraisLivraisonPanier !== null ? fraisLivraisonPanier * 52 : null;
       const total =
         fraisLivraisonPanier !== null
-          ? Math.round(52 * (prixPanier + fraisLivraisonPanier))
+          ? 52 * (prixPanier + fraisLivraisonPanier)
           : null;
 
       setTotalSnacksFruits((prev) => ({

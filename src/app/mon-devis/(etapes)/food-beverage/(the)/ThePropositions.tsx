@@ -37,9 +37,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
       .map((tarif) => ({
         ...tarif,
         totalAnnuel:
-          tarif.prixUnitaire !== null
-            ? Math.round(nbThesParAn * tarif.prixUnitaire)
-            : null,
+          tarif.prixUnitaire !== null ? nbThesParAn * tarif.prixUnitaire : null,
         infos: tarif.infos ?? null,
       })) ?? [];
 
@@ -56,7 +54,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
           tarif.gamme === the.infos.gammeSelected
       )?.prixUnitaire ?? null;
     const totalAnnuel =
-      prixUnitaire !== null ? Math.round(nbThesParAn * prixUnitaire) : null;
+      prixUnitaire !== null ? nbThesParAn * prixUnitaire : null;
 
     setThe((prev) => ({
       ...prev,

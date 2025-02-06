@@ -274,10 +274,8 @@ const HygieneOptionsPropositions = ({
           const totalDesinfectant =
             prixDistribDesinfectant !== null &&
             paParPersonneDesinfectant !== null
-              ? Math.round(
-                  newNbDistribDesinfectant * prixDistribDesinfectant +
-                    paParPersonneDesinfectant * (client.effectif ?? 0)
-                )
+              ? newNbDistribDesinfectant * prixDistribDesinfectant +
+                paParPersonneDesinfectant * (client.effectif ?? 0)
               : null;
           setTotalHygiene((prev) => ({
             ...prev,
@@ -308,7 +306,7 @@ const HygieneOptionsPropositions = ({
 
           const totalParfum =
             prixDistribParfum !== null
-              ? Math.round(newNbDistribParfum * prixDistribParfum)
+              ? newNbDistribParfum * prixDistribParfum
               : null;
           setTotalHygiene((prev) => ({
             ...prev,
@@ -340,7 +338,7 @@ const HygieneOptionsPropositions = ({
 
           const totalBalai =
             prixDistribBalai !== null
-              ? Math.round(newNbDistribBalai * prixDistribBalai)
+              ? newNbDistribBalai * prixDistribBalai
               : null;
           setTotalHygiene((prev) => ({
             ...prev,
@@ -372,7 +370,7 @@ const HygieneOptionsPropositions = ({
 
           const totalPoubelle =
             prixDistribPoubelle !== null
-              ? Math.round(newNbDistribPoubelle * prixDistribPoubelle)
+              ? newNbDistribPoubelle * prixDistribPoubelle
               : null;
           setTotalHygiene((prev) => ({
             ...prev,

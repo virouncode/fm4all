@@ -26,16 +26,18 @@ const TotalNettoyage = () => {
   const color = getFm4AllColor(nettoyage.infos.gammeSelected);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 total-section" id="total-nettoyage">
       <div className="flex flex-col gap-4">
         <div>Nettoyage ({nettoyage.infos.nomFournisseur})</div>
-        <div className="flex flex-col ml-4 text-xs ">
+        <div className="flex flex-col ml-4 text-xs">
           {totalService ? (
             <div
               className={`flex items-center justify-between text-${color} font-bold`}
             >
-              <p>Service</p>
-              <p className="text-end">{formatNumber(totalService)} € HT/an</p>
+              <p>Nettoyage</p>
+              <p className="text-end">
+                {formatNumber(Math.round(totalService))} € HT/an
+              </p>
             </div>
           ) : null}
           {totalRepasse ? (
@@ -43,7 +45,9 @@ const TotalNettoyage = () => {
               className={`flex items-center justify-between text-${color} font-bold`}
             >
               <p>Option repasse</p>
-              <p className="text-end">{formatNumber(totalRepasse)} € HT/an</p>
+              <p className="text-end">
+                {formatNumber(Math.round(totalRepasse))} € HT/an
+              </p>
             </div>
           ) : null}
           {totalSamedi ? (
@@ -51,7 +55,9 @@ const TotalNettoyage = () => {
               className={`flex items-center justify-between text-${color} font-bold`}
             >
               <p>Option samedi</p>
-              <p className="text-end">{formatNumber(totalSamedi)} € HT/an</p>
+              <p className="text-end">
+                {formatNumber(Math.round(totalSamedi))} € HT/an
+              </p>
             </div>
           ) : null}
           {totalDimanche ? (
@@ -59,7 +65,9 @@ const TotalNettoyage = () => {
               className={`flex items-center justify-between text-${color} font-bold`}
             >
               <p>Option dimanche</p>
-              <p className="text-end">{formatNumber(totalDimanche)} € HT/an</p>
+              <p className="text-end">
+                {formatNumber(Math.round(totalDimanche))} € HT/an
+              </p>
             </div>
           ) : null}
           {totalVitrerie ? (
@@ -67,7 +75,9 @@ const TotalNettoyage = () => {
               className={`flex items-center justify-between text-${color} font-bold`}
             >
               <p>Option vitrerie</p>
-              <p className="text-end">{formatNumber(totalVitrerie)} € HT/an</p>
+              <p className="text-end">
+                {formatNumber(Math.round(totalVitrerie))} € HT/an
+              </p>
             </div>
           ) : null}
           <div className="flex items-center justify-between border-t border-foreground mt-2">

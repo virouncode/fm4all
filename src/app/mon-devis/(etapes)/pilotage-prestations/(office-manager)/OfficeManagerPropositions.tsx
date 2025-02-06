@@ -62,12 +62,8 @@ const OfficeManagerPropositions = ({
     const totalAnnuel =
       demiJParSemaine !== null && majoration !== null
         ? officeManager.infos.remplace
-          ? Math.round(
-              demiJParSemaine * demiTauxJournalier * 52 * (1 + majoration / 100)
-            )
-          : Math.round(
-              demiJParSemaine * demiTauxJournalier * 47 * (1 + majoration / 100)
-            )
+          ? demiJParSemaine * demiTauxJournalier * 52 * (1 + majoration / 100)
+          : demiJParSemaine * demiTauxJournalier * 47 * (1 + majoration / 100)
         : null;
 
     return {
@@ -181,12 +177,8 @@ const OfficeManagerPropositions = ({
       const totalAnnuel =
         demiTauxJournalier !== null
           ? officeManager.infos.remplace
-            ? Math.round(
-                value[0] * demiTauxJournalier * 52 * (1 + newMajoration / 100)
-              )
-            : Math.round(
-                value[0] * demiTauxJournalier * 47 * (1 + newMajoration / 100)
-              )
+            ? value[0] * demiTauxJournalier * 52 * (1 + newMajoration / 100)
+            : value[0] * demiTauxJournalier * 47 * (1 + newMajoration / 100)
           : null;
       setTotalOfficeManager({
         totalService: totalAnnuel,
@@ -225,18 +217,14 @@ const OfficeManagerPropositions = ({
         demiTauxJournalier !== null &&
         newMajoration !== null
           ? value === "remplace"
-            ? Math.round(
-                demiJParSemaine *
-                  demiTauxJournalier *
-                  52 *
-                  (1 + newMajoration / 100)
-              )
-            : Math.round(
-                demiJParSemaine *
-                  demiTauxJournalier *
-                  47 *
-                  (1 + newMajoration / 100)
-              )
+            ? demiJParSemaine *
+              demiTauxJournalier *
+              52 *
+              (1 + newMajoration / 100)
+            : demiJParSemaine *
+              demiTauxJournalier *
+              47 *
+              (1 + newMajoration / 100)
           : null;
       setTotalOfficeManager({
         totalService: totalAnnuel,
@@ -276,18 +264,14 @@ const OfficeManagerPropositions = ({
         demiTauxJournalier !== null &&
         newMajoration !== null
           ? officeManager.infos.remplace === true
-            ? Math.round(
-                demiJParSemaine *
-                  demiTauxJournalier *
-                  52 *
-                  (1 + newMajoration / 100)
-              )
-            : Math.round(
-                demiJParSemaine *
-                  demiTauxJournalier *
-                  47 *
-                  (1 + newMajoration / 100)
-              )
+            ? demiJParSemaine *
+              demiTauxJournalier *
+              52 *
+              (1 + newMajoration / 100)
+            : demiJParSemaine *
+              demiTauxJournalier *
+              47 *
+              (1 + newMajoration / 100)
           : null;
       setTotalOfficeManager({
         totalService: totalAnnuel,

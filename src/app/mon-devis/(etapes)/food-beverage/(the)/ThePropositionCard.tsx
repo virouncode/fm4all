@@ -56,7 +56,7 @@ const ThePropositionCard = ({
     );
   }
   const totalMensuelText = `${formatNumber(
-    proposition.totalAnnuel / 12
+    Math.round(proposition.totalAnnuel / 12)
   )} € / mois*`;
 
   const tooltipEssentiel = (

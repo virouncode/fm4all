@@ -96,7 +96,7 @@ const HygieneOptionsParfumCard = ({
           );
         }
         const prixMensuelParfumText = `${formatNumber(
-          proposition.totalParfum / 12
+          Math.round(proposition.totalParfum / 12)
         )} € / mois`;
         return (
           <div

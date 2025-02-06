@@ -61,9 +61,7 @@ const NettoyagePropositions = ({
       nettoyageQuantites.find((quantite) => quantite.gamme === gamme)
         ?.freqAnnuelle ?? null;
     const totalAnnuel =
-      freqAnnuelle !== null
-        ? Math.round(freqAnnuelle * hParPassage * tauxHoraire)
-        : null;
+      freqAnnuelle !== null ? freqAnnuelle * hParPassage * tauxHoraire : null;
     return {
       id,
       fournisseurId,
@@ -242,26 +240,24 @@ const NettoyagePropositions = ({
       freqAnnuelle !== null &&
       hParPassageRepasse !== null &&
       tauxHoraireRepasse !== null
-        ? Math.round(freqAnnuelle * hParPassageRepasse * tauxHoraireRepasse)
+        ? freqAnnuelle * hParPassageRepasse * tauxHoraireRepasse
         : null;
     const totalSamedi = nettoyage.infos.samediSelected
-      ? Math.round(52 * tauxHoraire * hParPassage)
+      ? 52 * tauxHoraire * hParPassage
       : null;
     const totalDimanche = nettoyage.infos.dimancheSelected
-      ? Math.round(52 * tauxHoraire * hParPassage * 1.2)
+      ? 52 * tauxHoraire * hParPassage * 1.2
       : null;
     const totalVitrerie =
       nettoyage.infos.vitrerieSelected &&
       cadenceVitres !== null &&
       cadenceCloisons !== null &&
       tauxHoraireVitrerie !== null
-        ? Math.round(
-            nettoyage.quantites.nbPassagesVitrerie *
-              Math.max(
-                ((surface * 0.15) / cadenceVitres) * tauxHoraireVitrerie +
-                  ((surface * 0.15) / cadenceCloisons) * tauxHoraireVitrerie,
-                minFacturationVitrerie ?? 0
-              )
+        ? nettoyage.quantites.nbPassagesVitrerie *
+          Math.max(
+            ((surface * 0.15) / cadenceVitres) * tauxHoraireVitrerie +
+              ((surface * 0.15) / cadenceCloisons) * tauxHoraireVitrerie,
+            minFacturationVitrerie ?? 0
           )
         : null;
     const totalService = totalAnnuel;
@@ -397,34 +393,29 @@ const NettoyagePropositions = ({
       paParPersonneEmp !== null &&
       paParPersonneSavon !== null &&
       paParPersonnePh !== null
-        ? Math.round(
-            nbDistribEmp * prixDistribEmp +
-              nbDistribSavon * prixDistribSavon +
-              nbDistribPh * prixDistribPh +
-              (paParPersonneEmp + paParPersonneSavon + paParPersonnePh) *
-                effectif
-          )
+        ? nbDistribEmp * prixDistribEmp +
+          nbDistribSavon * prixDistribSavon +
+          nbDistribPh * prixDistribPh +
+          (paParPersonneEmp + paParPersonneSavon + paParPersonnePh) * effectif
         : null;
     const totalDesinfectant =
       hygiene.infos.desinfectantGammeSelected &&
       prixDistribDesinfectant !== null &&
       paParPersonneDesinfectant !== null
-        ? Math.round(
-            nbDistribDesinfectant * prixDistribDesinfectant +
-              paParPersonneDesinfectant * effectif
-          )
+        ? nbDistribDesinfectant * prixDistribDesinfectant +
+          paParPersonneDesinfectant * effectif
         : null;
     const totalParfum =
       hygiene.infos.parfumGammeSelected && prixDistribParfum !== null
-        ? Math.round(nbDistribParfum * prixDistribParfum)
+        ? nbDistribParfum * prixDistribParfum
         : null;
     const totalBalai =
       hygiene.infos.balaiGammeSelected && prixDistribBalai !== null
-        ? Math.round(nbDistribBalai * prixDistribBalai)
+        ? nbDistribBalai * prixDistribBalai
         : null;
     const totalPoubelle =
       hygiene.infos.poubelleGammeSelected && prixDistribPoubelle !== null
-        ? Math.round(nbDistribPoubelle * prixDistribPoubelle)
+        ? nbDistribPoubelle * prixDistribPoubelle
         : null;
     setTotalHygiene({
       totalTrilogie,

@@ -33,7 +33,7 @@ const NettoyageOptionsRepasseCard = ({
 }: NettoyageOptionsRepasseCardProps) => {
   const { nettoyage } = useContext(NettoyageContext);
   const repassePrixMensuelText = repasseProposition?.prixAnnuel
-    ? `${formatNumber(repasseProposition.prixAnnuel / 12)} € / mois`
+    ? `${formatNumber(Math.round(repasseProposition.prixAnnuel / 12))} € / mois`
     : "Non proposé";
   const repasseHParSemaineText =
     repasseProposition && nettoyage.quantites.freqAnnuelle

@@ -43,9 +43,7 @@ const MaintenancePropositions = ({
       maintenanceQuantites.find((quantite) => quantite.gamme === tarif.gamme)
         ?.freqAnnuelle ?? null;
     const totalAnnuelService =
-      freqAnnuelle !== null
-        ? Math.round(hParPassage * tauxHoraire * freqAnnuelle)
-        : null;
+      freqAnnuelle !== null ? hParPassage * tauxHoraire * freqAnnuelle : null;
     const totalAnnuelQ18 = q18Tarif.prixAnnuel;
     const totalAnnuelLegio = legioTarif.prixAnnuel;
     const totalAnnuelQualiteAir = qualiteAirTarif.prixAnnuel;

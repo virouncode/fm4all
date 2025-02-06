@@ -47,7 +47,7 @@ const PersonnaliserNettoyageVitrerie = () => {
 
       const totalVitrerie =
         totalVitrerieParPassage !== null
-          ? Math.round(nbPassagesVitrerie * totalVitrerieParPassage)
+          ? nbPassagesVitrerie * totalVitrerieParPassage
           : null;
 
       setNettoyage((prev) => ({
@@ -74,7 +74,7 @@ const PersonnaliserNettoyageVitrerie = () => {
           : null;
       const totalVitrerie =
         totalVitrerieParPassage !== null
-          ? Math.round(nbPassagesVitrerie * totalVitrerieParPassage)
+          ? nbPassagesVitrerie * totalVitrerieParPassage
           : null;
       setNettoyage((prev) => ({
         ...prev,

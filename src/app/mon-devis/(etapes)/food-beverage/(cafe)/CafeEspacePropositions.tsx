@@ -573,9 +573,7 @@ const CafeEspacePropositions = ({
             ? 0
             : snacksFruits.prix.prixUnitaireLivraison;
         const totalLivraison =
-          prixLivraisonPanier !== null
-            ? Math.round(52 * prixLivraisonPanier)
-            : null;
+          prixLivraisonPanier !== null ? 52 * prixLivraisonPanier : null;
         setTotalSnacksFruits((prev) => ({
           ...prev,
           totalLivraison,
@@ -857,9 +855,7 @@ const CafeEspacePropositions = ({
             ? snacksFruits.prix.prixUnitaireLivraisonSiCafe
             : snacksFruits.prix.prixUnitaireLivraison;
         const totalLivraison =
-          prixLivraisonPanier !== null
-            ? Math.round(52 * prixLivraisonPanier)
-            : null;
+          prixLivraisonPanier !== null ? 52 * prixLivraisonPanier : null;
         setTotalSnacksFruits((prev) => ({
           ...prev,
           totalLivraison,

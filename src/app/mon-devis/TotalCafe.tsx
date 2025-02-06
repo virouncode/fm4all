@@ -16,7 +16,7 @@ const TotalCafe = () => {
 
   if (!total) return null;
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 total-section" id="total-cafe">
       <div className="flex flex-col gap-4">
         <div>Machines à Café ({cafe.infos.nomFournisseur})</div>
         <div className="flex flex-col ml-4 text-xs ">
@@ -40,9 +40,11 @@ const TotalCafe = () => {
                   </p>
                   <p>
                     {formatNumber(
-                      totalCafe.totalEspaces.find(
-                        (total) => total.espaceId === item.infos.espaceId
-                      )?.total ?? 0
+                      Math.round(
+                        totalCafe.totalEspaces.find(
+                          (total) => total.espaceId === item.infos.espaceId
+                        )?.total ?? 0
+                      )
                     )}{" "}
                     € HT/an
                   </p>
@@ -54,9 +56,11 @@ const TotalCafe = () => {
                     <p>Installation</p>
                     <p>
                       {formatNumber(
-                        totalCafe.totalEspaces.find(
-                          (total) => total.espaceId === item.infos.espaceId
-                        )?.totalInstallation ?? 0
+                        Math.round(
+                          totalCafe.totalEspaces.find(
+                            (total) => total.espaceId === item.infos.espaceId
+                          )?.totalInstallation ?? 0
+                        )
                       )}{" "}
                       € HT
                     </p>
@@ -67,13 +71,15 @@ const TotalCafe = () => {
           <div className="flex flex-col border-t border-foreground mt-2">
             <div className="flex justify-between w-full">
               <p>TOTAL</p>
-              <p className="text-end">{formatNumber(total)} € HT/an</p>
+              <p className="text-end">
+                {formatNumber(Math.round(total))} € HT/an
+              </p>
             </div>
             {totalInstallation ? (
               <div className="flex justify-between w-full">
                 <p>TOTAL INSTALLATION</p>
                 <p className="text-end">
-                  {formatNumber(totalInstallation)} € HT
+                  {formatNumber(Math.round(totalInstallation))} € HT
                 </p>
               </div>
             ) : null}

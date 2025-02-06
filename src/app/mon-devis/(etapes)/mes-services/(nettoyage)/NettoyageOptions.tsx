@@ -57,9 +57,7 @@ const NettoyageOptions = ({
           )
           .map((tarif) => {
             const { id, hParPassage, tauxHoraire } = tarif;
-            const prixAnnuel = Math.round(
-              freqAnnuelle * hParPassage * tauxHoraire
-            );
+            const prixAnnuel = freqAnnuelle * hParPassage * tauxHoraire;
             return {
               id,
               hParPassage,
@@ -75,7 +73,7 @@ const NettoyageOptions = ({
     )
     .map((tarif) => {
       const { id, gamme, hParPassage, tauxHoraire } = tarif;
-      const prixAnnuel = Math.round(52 * hParPassage * tauxHoraire);
+      const prixAnnuel = 52 * hParPassage * tauxHoraire;
       return {
         id,
         gamme,
@@ -90,7 +88,7 @@ const NettoyageOptions = ({
     )
     .map((tarif) => {
       const { id, hParPassage, tauxHoraire } = tarif;
-      const prixAnnuel = Math.round(52 * hParPassage * tauxHoraire * 1.2);
+      const prixAnnuel = 52 * hParPassage * tauxHoraire * 1.2;
       return {
         id,
         prixAnnuel,
@@ -110,15 +108,13 @@ const NettoyageOptions = ({
 
       const prixAnnuel =
         nettoyage.quantites.surfaceCloisons && nettoyage.quantites.surfaceVitres
-          ? Math.round(
-              nettoyage.quantites.nbPassagesVitrerie *
-                Math.max(
-                  (nettoyage.quantites.surfaceCloisons / cadenceCloisons +
-                    nettoyage.quantites.surfaceVitres / cadenceVitres) *
-                    tauxHoraire +
-                    fraisDeplacement,
-                  minFacturation
-                )
+          ? nettoyage.quantites.nbPassagesVitrerie *
+            Math.max(
+              (nettoyage.quantites.surfaceCloisons / cadenceCloisons +
+                nettoyage.quantites.surfaceVitres / cadenceVitres) *
+                tauxHoraire +
+                fraisDeplacement,
+              minFacturation
             )
           : null;
       return {

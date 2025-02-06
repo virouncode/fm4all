@@ -117,9 +117,9 @@ const Header = () => {
               onClick={handleShowMobileNav}
             />
           )}
-          <div className="lg:flex hidden">
+          {/* <div className="lg:flex hidden">
             <ModeToggle />
-          </div>
+          </div> */}
         </div>
         <div
           className={`flex items-center justify-center fixed top-16 left-0 right-0 bg-background shadow-lg h-[calc(100vh-4rem)] text-2xl  ${

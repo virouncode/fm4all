@@ -28,7 +28,7 @@ const ServicesFm4All = ({
   const { client } = useContext(ClientContext);
   const { totalServicesFm4All } = useContext(TotalServicesFm4AllContext);
   const { servicesFm4All } = useContext(ServicesFm4AllContext);
-  const { setDevisProgress } = useContext(DevisProgressContext);
+  const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const router = useRouter();
   const handleClickPrevious = () => {
     setManagement((prev) => ({
@@ -77,7 +77,10 @@ const ServicesFm4All = ({
       searchParams.set("typeBatiment", client.typeBatiment);
     if (client.typeOccupation)
       searchParams.set("typeOccupation", client.typeOccupation);
-    setDevisProgress({ currentStep: 5, completedSteps: [1, 2, 3, 4] });
+    const newCompletedSteps = [
+      ...new Set([...devisProgress.completedSteps, 1, 2, 3, 4]),
+    ].sort((a, b) => a - b);
+    setDevisProgress({ currentStep: 5, completedSteps: newCompletedSteps });
     router.push(
       `/mon-devis/sauvegarder-ma-progression?${searchParams.toString()}`
     );

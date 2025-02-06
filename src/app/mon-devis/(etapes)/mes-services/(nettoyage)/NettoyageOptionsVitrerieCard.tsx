@@ -46,7 +46,9 @@ const NettoyageOptionsVitrerieCard = ({
   const { nettoyage } = useContext(NettoyageContext);
 
   const vitreriePrixMensuelText = vitrerieProposition.prixAnnuel
-    ? `${formatNumber(vitrerieProposition.prixAnnuel / 12)} € / mois`
+    ? `${formatNumber(
+        Math.round(vitrerieProposition.prixAnnuel / 12)
+      )} € / mois`
     : "Non proposé";
   const nbPassagesVitrerieText = `${nettoyage.quantites.nbPassagesVitrerie} passages / an`;
   return (

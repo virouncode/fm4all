@@ -28,7 +28,7 @@ const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
   const { fontaines, setFontaines } = useContext(FontainesContext);
   const { setTotalFontaines } = useContext(TotalFontainesContext);
   const { setFoodBeverage } = useContext(FoodBeverageContext);
-  const { setDevisProgress } = useContext(DevisProgressContext);
+  const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const effectif = client.effectif ?? 0;
   const router = useRouter();
   useScrollIntoFontainesEspace();
@@ -42,7 +42,10 @@ const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
     if (client.effectif)
       searchParams.set("effectif", client.effectif.toString());
     if (client.surface) searchParams.set("surface", client.surface.toString());
-    setDevisProgress({ currentStep: 4, completedSteps: [1, 2, 3] });
+    const newCompletedSteps = [
+      ...new Set([...devisProgress.completedSteps, 1, 2, 3]),
+    ].sort((a, b) => a - b);
+    setDevisProgress({ currentStep: 4, completedSteps: newCompletedSteps });
     router.push(`/mon-devis/pilotage-prestations?${searchParams.toString()}`);
   };
 

@@ -100,7 +100,7 @@ const HygieneOptionsPoubelleCard = ({
           );
         }
         const prixMensuelPoubelleText = `${formatNumber(
-          proposition.totalPoubelle / 12
+          Math.round(proposition.totalPoubelle / 12)
         )} € / mois`;
         return (
           <div

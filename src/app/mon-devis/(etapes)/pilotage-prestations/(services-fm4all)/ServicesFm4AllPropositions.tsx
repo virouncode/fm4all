@@ -132,22 +132,22 @@ const ServicesFm4AllPropositions = ({
     const remiseHof = officeManager.infos.gammeSelected
       ? tauxRemiseHof * total
       : 0;
-    const totalAnnuel = Math.round(
+    const totalAnnuel =
       (prixAssurance ?? 0) +
-        (prixPlateforme ?? 0) +
-        (prixSupportAdmin ?? 0) +
-        (prixSupportOp ?? 0) +
-        (prixAccountManager ?? 0) -
-        remiseCa -
-        remiseHof
-    );
-    const totalAnnuelSansRemise = Math.round(
+      (prixPlateforme ?? 0) +
+      (prixSupportAdmin ?? 0) +
+      (prixSupportOp ?? 0) +
+      (prixAccountManager ?? 0) -
+      remiseCa -
+      remiseHof;
+
+    const totalAnnuelSansRemise =
       (prixAssurance ?? 0) +
-        (prixPlateforme ?? 0) +
-        (prixSupportAdmin ?? 0) +
-        (prixSupportOp ?? 0) +
-        (prixAccountManager ?? 0)
-    );
+      (prixPlateforme ?? 0) +
+      (prixSupportAdmin ?? 0) +
+      (prixSupportOp ?? 0) +
+      (prixAccountManager ?? 0);
+
     return {
       id,
       gamme,

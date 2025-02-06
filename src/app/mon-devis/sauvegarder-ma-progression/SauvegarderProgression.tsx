@@ -36,7 +36,8 @@ const SauvegarderProgression = () =>
   // }: SauvegarderProgressionProps
   {
     const { client, setClient } = useContext(ClientContext);
-    const { setDevisProgress } = useContext(DevisProgressContext);
+    const { devisProgress, setDevisProgress } =
+      useContext(DevisProgressContext);
     const [accepte, setAccepte] = useState(false);
     const router = useRouter();
 
@@ -112,8 +113,10 @@ const SauvegarderProgression = () =>
 
       //TODO envoyer un email au client, bienvenue blablabla
       // console.log("formattedData", formattedData);
-
-      setDevisProgress({ currentStep: 6, completedSteps: [1, 2, 3, 4, 5] });
+      const newCompletedSteps = [
+        ...new Set([...devisProgress.completedSteps, 1, 2, 3, 4, 5]),
+      ].sort((a, b) => a - b);
+      setDevisProgress({ currentStep: 6, completedSteps: newCompletedSteps });
       setClient(data);
       setTimeout(() => {
         router.push("/mon-devis/personnaliser-mon-devis");

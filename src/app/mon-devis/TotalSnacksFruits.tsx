@@ -17,7 +17,7 @@ const TotalSnacksFruits = () => {
   if (!total) return null;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 total-section" id="total-snacks">
       <div className="flex flex-col gap-4">
         <div>Snacks & Fruits ({snacksFruits.infos.nomFournisseur})</div>
         <div className={`flex flex-col ml-4 text-xs`}>
@@ -26,7 +26,9 @@ const TotalSnacksFruits = () => {
               className={`flex items-center justify-between text-${color} font-bold`}
             >
               <p>Fruits</p>
-              <p className="text-end">{formatNumber(totalFruits)} € HT/an</p>
+              <p className="text-end">
+                {formatNumber(Math.round(totalFruits))} € HT/an
+              </p>
             </div>
           ) : null}
           {totalSnacks ? (
@@ -34,7 +36,9 @@ const TotalSnacksFruits = () => {
               className={`flex items-center justify-between text-${color} font-bold`}
             >
               <p>Snacks</p>
-              <p className="text-end">{formatNumber(totalSnacks)} € HT/an</p>
+              <p className="text-end">
+                {formatNumber(Math.round(totalSnacks))} € HT/an
+              </p>
             </div>
           ) : null}
           {totalBoissons ? (
@@ -42,18 +46,24 @@ const TotalSnacksFruits = () => {
               className={`flex items-center justify-between text-${color} font-bold`}
             >
               <p>Fruits</p>
-              <p className="text-end">{formatNumber(totalBoissons)} € HT/an</p>
+              <p className="text-end">
+                {formatNumber(Math.round(totalBoissons))} € HT/an
+              </p>
             </div>
           ) : null}
 
           <div className={`flex items-center justify-between  font-bold`}>
             <p>Livraison</p>
-            <p className="text-end">{formatNumber(totalLivraison)} € HT/an</p>
+            <p className="text-end">
+              {formatNumber(Math.round(totalLivraison))} € HT/an
+            </p>
           </div>
 
           <div className="flex items-center justify-between border-t border-foreground mt-2">
             <p>TOTAL</p>
-            <p className="text-end">{formatNumber(total)} € HT/an</p>
+            <p className="text-end">
+              {formatNumber(Math.round(total))} € HT/an
+            </p>
           </div>
         </div>
       </div>

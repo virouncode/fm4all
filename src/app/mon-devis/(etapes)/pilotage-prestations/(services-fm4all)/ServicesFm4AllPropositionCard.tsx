@@ -1,5 +1,6 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
+import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { GammeType } from "@/zod-schemas/gamme";
 import { useContext } from "react";
@@ -58,11 +59,11 @@ const ServicesFm4AllPropositionCard = ({
   const { servicesFm4All } = useContext(ServicesFm4AllContext);
   const gamme = proposition.gamme;
   const color = getFm4AllColor(gamme);
-  const totalMensuelSansRemiseText = `${Math.round(
+  const totalMensuelSansRemiseText = `${formatNumber(
     proposition.totalAnnuelSansRemise / 12
   )} € / mois`;
-  const totalMensuelText = `${Math.round(
-    proposition.totalAnnuel / 12
+  const totalMensuelText = `${formatNumber(
+    Math.round(proposition.totalAnnuel / 12)
   )} € / mois${proposition.remiseCa ? "\u00B9" : ""}${
     proposition.remiseHof ? "\u00B2" : ""
   }`;

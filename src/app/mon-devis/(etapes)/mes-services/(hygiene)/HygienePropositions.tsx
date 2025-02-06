@@ -283,7 +283,7 @@ const HygienePropositions = ({
             : null;
         totalTrilogie =
           totalEmp !== null && totalSavon !== null && totalPh !== null
-            ? Math.round(totalEmp + totalSavon + totalPh)
+            ? totalEmp + totalSavon + totalPh
             : null;
         if (hygiene.infos.trilogieGammeSelected) {
           setTotalHygiene((prev) => ({
@@ -318,7 +318,7 @@ const HygienePropositions = ({
             : null;
         totalTrilogie =
           totalEmp !== null && totalSavon !== null && totalPh !== null
-            ? Math.round(totalEmp + totalSavon + totalPh)
+            ? totalEmp + totalSavon + totalPh
             : null;
         if (hygiene.infos.trilogieGammeSelected) {
           setTotalHygiene((prev) => ({
@@ -353,7 +353,7 @@ const HygienePropositions = ({
             : null;
         totalTrilogie =
           totalEmp !== null && totalSavon !== null && totalPh !== null
-            ? Math.round(totalEmp + totalSavon + totalPh)
+            ? totalEmp + totalSavon + totalPh
             : null;
         if (hygiene.infos.trilogieGammeSelected) {
           setTotalHygiene((prev) => ({
@@ -433,7 +433,7 @@ const HygienePropositions = ({
       totalEmp !== null &&
       totalSavon !== null &&
       totalPh !== null
-        ? Math.round(totalEmp + totalSavon + totalPh)
+        ? totalEmp + totalSavon + totalPh
         : null;
     const totalDesinfectant =
       hygiene.infos.desinfectantGammeSelected &&

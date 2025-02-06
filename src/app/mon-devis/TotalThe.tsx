@@ -16,7 +16,7 @@ const TotalThe = () => {
   const color = getFm4AllColor(the.infos.gammeSelected);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 total-section" id="total-the">
       <div className="flex flex-col gap-4">
         <div>Thés ({cafe.infos.nomFournisseur})</div>
         <div className="flex flex-col ml-4 text-xs ">
@@ -24,11 +24,15 @@ const TotalThe = () => {
             className={`flex items-center justify-between text-${color} font-bold`}
           >
             <p>Sachets</p>
-            <p className="text-end">{formatNumber(total)} € HT/an</p>
+            <p className="text-end">
+              {formatNumber(Math.round(total))} € HT/an
+            </p>
           </div>
           <div className="flex items-center justify-between border-t border-foreground mt-2">
             <p>TOTAL</p>
-            <p className="text-end">{formatNumber(total)} € HT/an</p>
+            <p className="text-end">
+              {formatNumber(Math.round(total))} € HT/an
+            </p>
           </div>
         </div>
       </div>

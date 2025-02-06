@@ -1,5 +1,6 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
+import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { GammeType } from "@/zod-schemas/gamme";
 import { useContext } from "react";
@@ -116,7 +117,9 @@ const SnacksFruitsPropositionCard = ({
       </div>
     );
   }
-  const totalMensuelText = `${Math.round(proposition.total / 12)} € / mois`;
+  const totalMensuelText = `${formatNumber(
+    Math.round(proposition.total / 12)
+  )} € / mois`;
   const gFruitsParSemaineParPersonneText = snacksFruits.infos.choix.includes(
     "fruits"
   )

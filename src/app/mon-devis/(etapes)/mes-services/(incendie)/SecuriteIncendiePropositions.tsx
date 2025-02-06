@@ -43,11 +43,10 @@ const SecuriteIncendiePropositions = ({
     prixParExtincteur: tarif.prixParExtincteur,
     prixParBaes: tarif.prixParBaes,
     prixParTelBaes: tarif.prixParTelBaes,
-    totalAnnuelTrilogie: Math.round(
+    totalAnnuelTrilogie:
       nbExtincteurs * tarif.prixParExtincteur +
-        nbBaes * tarif.prixParBaes +
-        nbTelBaes * tarif.prixParTelBaes
-    ),
+      nbBaes * tarif.prixParBaes +
+      nbTelBaes * tarif.prixParTelBaes,
     fraisDeplacementTrilogie: tarif.fraisDeplacement,
   }));
 
@@ -180,11 +179,9 @@ const SecuriteIncendiePropositions = ({
             prixParExtincteur !== null &&
             prixParBaes !== null &&
             prixParTelBaes !== null
-              ? Math.round(
-                  newNbExtincteurs * prixParExtincteur +
-                    nbBaes * prixParBaes +
-                    nbTelBaes * prixParTelBaes
-                )
+              ? newNbExtincteurs * prixParExtincteur +
+                nbBaes * prixParBaes +
+                nbTelBaes * prixParTelBaes
               : null;
 
           setTotalIncendie((prev) => ({
@@ -214,11 +211,9 @@ const SecuriteIncendiePropositions = ({
             prixParExtincteur !== null &&
             prixParBaes !== null &&
             prixParTelBaes !== null
-              ? Math.round(
-                  nbExtincteurs * prixParExtincteur +
-                    newNbBaes * prixParBaes +
-                    nbTelBaes * prixParTelBaes
-                )
+              ? nbExtincteurs * prixParExtincteur +
+                newNbBaes * prixParBaes +
+                nbTelBaes * prixParTelBaes
               : null;
           setTotalIncendie((prev) => ({
             ...prev,
@@ -245,11 +240,9 @@ const SecuriteIncendiePropositions = ({
             prixParExtincteur !== null &&
             prixParBaes !== null &&
             prixParTelBaes !== null
-              ? Math.round(
-                  nbExtincteurs * prixParExtincteur +
-                    nbBaes * prixParBaes +
-                    newNbTelBaes * prixParTelBaes
-                )
+              ? nbExtincteurs * prixParExtincteur +
+                nbBaes * prixParBaes +
+                newNbTelBaes * prixParTelBaes
               : null;
           setTotalIncendie((prev) => ({
             ...prev,

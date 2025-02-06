@@ -221,16 +221,14 @@ const NettoyageOptionsPropositions = ({
       nettoyage.quantites.cadenceVitres !== null &&
       nettoyage.prix.tauxHoraireVitrerie !== null &&
       nettoyage.prix.minFacturationVitrerie !== null
-        ? Math.round(
-            newNbPassageVitrerie *
-              Math.max(
-                (nettoyage.quantites.surfaceCloisons /
-                  nettoyage.quantites.cadenceCloisons +
-                  nettoyage.quantites.surfaceVitres /
-                    nettoyage.quantites.cadenceVitres) *
-                  nettoyage.prix.tauxHoraireVitrerie,
-                nettoyage.prix.minFacturationVitrerie
-              )
+        ? newNbPassageVitrerie *
+          Math.max(
+            (nettoyage.quantites.surfaceCloisons /
+              nettoyage.quantites.cadenceCloisons +
+              nettoyage.quantites.surfaceVitres /
+                nettoyage.quantites.cadenceVitres) *
+              nettoyage.prix.tauxHoraireVitrerie,
+            nettoyage.prix.minFacturationVitrerie
           )
         : null;
     setTotalNettoyage((prev) => ({

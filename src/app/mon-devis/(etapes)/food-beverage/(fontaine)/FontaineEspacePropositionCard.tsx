@@ -92,11 +92,13 @@ const FontaineEspacePropositionCard = ({
     );
   }
 
-  const totalMensuelText = `${Math.round(
-    proposition.totalAnnuel / 12
+  const totalMensuelText = `${formatNumber(
+    Math.round(proposition.totalAnnuel / 12)
   )} € / mois`;
   const prixInstallationText = proposition.totalInstallation
-    ? `+ ${formatNumber(proposition.totalInstallation)} € d'installation`
+    ? `+ ${formatNumber(
+        Math.round(proposition.totalInstallation)
+      )} € d'installation`
     : "";
 
   const tooltipEssentiel = (
@@ -166,20 +168,16 @@ const FontaineEspacePropositionCard = ({
                 1 fontaine {proposition.marque} {proposition.modele}{" "}
                 {proposition.reconditionne ? " reconditionnée(s)" : ""}
               </p>
-              <p className="text-xs">
-                Consommables ~ 200 L / an / personne d&apos;eau fraiche
-              </p>
-              {getTypeFontaine(espace.infos.typeEau) === "EC" ||
+              <p className="text-xs">Filtres et maintenance inclus</p>
+              {/* {getTypeFontaine(espace.infos.typeEau) === "EC" ||
               getTypeFontaine(espace.infos.typeEau) === "ECG" ? (
                 <p className="text-xs">
                   Consommables ~ 15 L / an / personne d&apos;eau chaude
                 </p>
-              ) : null}
+              ) : null} */}
               {getTypeFontaine(espace.infos.typeEau) === "EG" ||
               getTypeFontaine(espace.infos.typeEau) === "ECG" ? (
-                <p className="text-xs">
-                  Consommables ~ 100 L / an / personne d&apos;eau gazeuse
-                </p>
+                <p className="text-xs">CO2 inclus</p>
               ) : null}
             </div>
           </div>

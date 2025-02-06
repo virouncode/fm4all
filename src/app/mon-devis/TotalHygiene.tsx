@@ -32,7 +32,7 @@ const TotalHygiene = () => {
   const colorPoubelle = getFm4AllColor(hygiene.infos.poubelleGammeSelected);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 total-section" id="total-hygiene">
       <div className="flex flex-col gap-4">
         <div>Hygiene ({hygiene.infos.nomFournisseur})</div>
         <div className="flex flex-col ml-4 text-xs ">
@@ -41,7 +41,9 @@ const TotalHygiene = () => {
               className={`flex items-center justify-between text-${colorTrilogie} font-bold`}
             >
               <p>Trilogie EMP / Savon / PH</p>
-              <p className="text-end">{formatNumber(totalTrilogie)} € HT/an</p>
+              <p className="text-end">
+                {formatNumber(Math.round(totalTrilogie))} € HT/an
+              </p>
             </div>
           ) : null}
           {totalDesinfectant ? (
@@ -50,7 +52,7 @@ const TotalHygiene = () => {
             >
               <p>Option désinfectant</p>
               <p className="text-end">
-                {formatNumber(totalDesinfectant)} € HT/an
+                {formatNumber(Math.round(totalDesinfectant))} € HT/an
               </p>
             </div>
           ) : null}
@@ -59,7 +61,9 @@ const TotalHygiene = () => {
               className={`flex items-center justify-between text-${colorParfum} font-bold`}
             >
               <p>Option parfum</p>
-              <p className="text-end">{formatNumber(totalParfum)} € HT/an</p>
+              <p className="text-end">
+                {formatNumber(Math.round(totalParfum))} € HT/an
+              </p>
             </div>
           ) : null}
           {totalBalai ? (
@@ -67,7 +71,9 @@ const TotalHygiene = () => {
               className={`flex items-center justify-between text-${colorBalai} font-bold`}
             >
               <p>Option balais WC</p>
-              <p className="text-end">{formatNumber(totalBalai)} € HT/an</p>
+              <p className="text-end">
+                {formatNumber(Math.round(totalBalai))} € HT/an
+              </p>
             </div>
           ) : null}
           {totalPoubelle ? (
@@ -75,13 +81,17 @@ const TotalHygiene = () => {
               className={`flex items-center justify-between text-${colorPoubelle} font-bold`}
             >
               <p>Option poubelle hygiène féminine</p>
-              <p className="text-end">{formatNumber(totalPoubelle)} € HT/an</p>
+              <p className="text-end">
+                {formatNumber(Math.round(totalPoubelle))} € HT/an
+              </p>
             </div>
           ) : null}
           {totalInstallation ? (
             <div className="flex items-center justify-between">
               <p>Installation</p>
-              <p className="text-end">{formatNumber(totalInstallation)} € HT</p>
+              <p className="text-end">
+                {formatNumber(Math.round(totalInstallation))} € HT
+              </p>
             </div>
           ) : null}
           <div className="flex items-center justify-between border-t border-foreground mt-2">
@@ -91,7 +101,9 @@ const TotalHygiene = () => {
           {totalInstallation ? (
             <div className="flex justify-between w-full">
               <p>TOTAL INSTALLATION</p>
-              <p className="text-end">{formatNumber(totalInstallation)} € HT</p>
+              <p className="text-end">
+                {formatNumber(Math.round(totalInstallation))} € HT
+              </p>
             </div>
           ) : null}
         </div>

@@ -39,8 +39,10 @@ import { TotalContext } from "@/context/TotalProvider";
 import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
+import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
+import { useMediaQuery } from "react-responsive";
 
 type DevisButtonProps = {
   title: string;
@@ -85,6 +87,7 @@ const DevisButton = ({
   const { setTotalOfficeManager } = useContext(TotalOfficeManagerContext);
   const { setTotalServicesFm4All } = useContext(TotalServicesFm4AllContext);
   const { setTotal } = useContext(TotalContext);
+  const isTabletOrMobile = useMediaQuery({ maxWidth: 1024 });
 
   const router = useRouter();
 
@@ -186,7 +189,27 @@ const DevisButton = ({
     router.push("/mon-devis/mes-locaux");
   };
 
-  return devisProgress.completedSteps.includes(1) ? (
+  const handleAlert = () => {
+    toast({
+      description:
+        "Cette fonctionnalité n'est pas optimisée pour votre taille d'écran. Veuillez réessayer sur un écran plus grand.",
+    });
+  };
+
+  return isTabletOrMobile ? (
+    <div className="flex justify-center">
+      <Button
+        variant="destructive"
+        size={size}
+        title={title}
+        className={`text-base ${className}`}
+        onClick={handleAlert}
+        disabled={disabled}
+      >
+        {text}
+      </Button>
+    </div>
+  ) : devisProgress.completedSteps.includes(1) ? (
     <Dialog>
       <DialogTrigger asChild>
         <div className="flex justify-center">

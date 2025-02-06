@@ -47,8 +47,11 @@ const SecuriteIncendiePropostionCard = ({
   const { incendie } = useContext(IncendieContext);
   const prixAnnuelText =
     formatNumber(
-      (proposition.totalAnnuelTrilogie + proposition.fraisDeplacementTrilogie) /
-        12
+      Math.round(
+        (proposition.totalAnnuelTrilogie +
+          proposition.fraisDeplacementTrilogie) /
+          12
+      )
     ) + " € / mois";
   const tooltipText =
     "Pour la sécurité de tous : Vérification annuelle obligatoire (NF S61-919), conseils sur l’implantation, remplacement ou rechargement si nécessaire au BPU.";

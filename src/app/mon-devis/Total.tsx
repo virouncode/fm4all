@@ -158,21 +158,24 @@ const Total = () => {
         <SheetHeader>
           <SheetTitle>
             <span className="text-2xl">
-              Total: {formatNumber(total.totalAnnuelHt ?? 0)} € HT/an
+              Total: {formatNumber(Math.round(total.totalAnnuelHt ?? 0))} €
+              HT/an
             </span>{" "}
           </SheetTitle>
           <SheetDescription>
-            <p>
-              Soit {formatNumber((total.totalAnnuelHt ?? 0) / 12)} € HT/mois
-              pour {client.effectif} personnes, {client.surface} m<sup>2</sup>
-            </p>
-            <p>
-              + {formatNumber(total.totalInstallationHt ?? 0)} € HT
+            <span>
+              Soit {formatNumber(Math.round((total.totalAnnuelHt ?? 0) / 12))} €
+              HT/mois pour {client.effectif} personnes, {client.surface} m
+              <sup>2</sup>
+            </span>
+            <br />
+            <span>
+              + {formatNumber(Math.round(total.totalInstallationHt ?? 0))} € HT
               d&apos;installation
-            </p>
+            </span>
           </SheetDescription>
         </SheetHeader>
-        <div className="flex flex-col gap-6 overflow-scroll flex-1">
+        <div className="flex flex-col gap-6 overflow-scroll flex-1 bg-inherit">
           <TotalNettoyage />
           <TotalHygiene />
           <TotalMaintenance />
