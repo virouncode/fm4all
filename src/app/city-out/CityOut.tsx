@@ -55,6 +55,24 @@ const CityOut = ({ destination }: CityOutProps) => {
 
   const submitForm = async (data: InsertClientType) => {
     //TODO:envoyer email à Romu
+    try {
+      const result = await fetch("/api/mailgun", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          to: "virounk@gmail.com",
+          subject: "Nouveau client",
+          text: `Un nouveau client a laissé ses coordonnées sur la page de chiffrage automatique. Voici ses coordonnées : ${JSON.stringify(
+            data
+          )}`,
+        }),
+      });
+      console.log(result);
+    } catch (err) {
+      console.log(err);
+    }
 
     //TODO:mettre les coordonnées dans la bdd
     executeSaveClient(data);

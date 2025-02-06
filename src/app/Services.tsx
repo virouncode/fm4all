@@ -52,7 +52,7 @@ const Services = () => {
           </CarouselItem>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="https://picsum.photos/350/300"
+              src="/img/services/maintenance.png"
               alt="illustration-maintenance"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
@@ -71,7 +71,7 @@ const Services = () => {
           </CarouselItem>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="https://picsum.photos/350/300"
+              src="/img/services/incendie.png"
               alt="illustration-securite-incendie"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
@@ -94,26 +94,7 @@ const Services = () => {
           </CarouselItem>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="https://picsum.photos/350/300"
-              alt="illustration-fontaine-a-eau"
-            >
-              <div className="p-4 flex flex-col gap-4 h-52">
-                <p className="text-2xl">Fontaine à eau</p>
-                <p className="overflow-hidden text-ellipsis">
-                  Eau filtrée, fraîche, gazeuse, à poser ou encastrer, il y a
-                  forcément un modèle fait pour vous.
-                </p>
-                <div className="flex-1">
-                  <Link className="underline" href="/services/eau">
-                    En savoir plus
-                  </Link>
-                </div>
-              </div>
-            </ImgCardVertical>
-          </CarouselItem>
-          <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
-            <ImgCardVertical
-              src="https://picsum.photos/350/300"
+              src="/img/services/cafe.png"
               alt="illustration-cafe"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
@@ -132,8 +113,8 @@ const Services = () => {
           </CarouselItem>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="https://picsum.photos/350/300"
-              alt="illustration-snacks"
+              src="/img/services/fruits.png"
+              alt="illustration-fruits"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
                 <p className="text-2xl">Fruits Frais</p>
@@ -151,7 +132,7 @@ const Services = () => {
           </CarouselItem>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="https://picsum.photos/350/300"
+              src="/img/services/snacks.png"
               alt="illustration-snacks"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
@@ -170,8 +151,8 @@ const Services = () => {
           </CarouselItem>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="https://picsum.photos/350/300"
-              alt="illustration-snacks"
+              src="/img/services/boissons.png"
+              alt="illustration-boissons"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
                 <p className="text-2xl">Boissons variées</p>
@@ -189,8 +170,27 @@ const Services = () => {
           </CarouselItem>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="https://picsum.photos/350/300"
-              alt="illustration-accueil"
+              src="/img/services/fontaines.png"
+              alt="illustration-fontaine-a-eau"
+            >
+              <div className="p-4 flex flex-col gap-4 h-52">
+                <p className="text-2xl">Fontaine à eau</p>
+                <p className="overflow-hidden text-ellipsis">
+                  Eau filtrée, fraîche, gazeuse, à poser ou encastrer, il y a
+                  forcément un modèle fait pour vous.
+                </p>
+                <div className="flex-1">
+                  <Link className="underline" href="/services/eau">
+                    En savoir plus
+                  </Link>
+                </div>
+              </div>
+            </ImgCardVertical>
+          </CarouselItem>
+          <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
+            <ImgCardVertical
+              src="/img/services/office-manager.png"
+              alt="illustration-office-manager"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
                 <p className="text-2xl">Office Manager</p>
@@ -206,10 +206,10 @@ const Services = () => {
               </div>
             </ImgCardVertical>
           </CarouselItem>
-          <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
+          {/* <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="https://picsum.photos/350/300"
-              alt="illustration-accueil"
+              src="/img/services/fm4all.png"
+              alt="illustration-fm4all"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
                 <p className="text-2xl">Services fm4all</p>
@@ -224,7 +224,7 @@ const Services = () => {
                 </div>
               </div>
             </ImgCardVertical>
-          </CarouselItem>
+          </CarouselItem> */}
         </CarouselContent>
         <CarouselPrevious className="right-12 -top-9 translate-y-0 left-auto" />
         <CarouselNext className="right-0 -top-9 translate-y-0" />

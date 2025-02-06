@@ -24,7 +24,7 @@ const Articles = () => {
         <CarouselContent>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="https://picsum.photos/350/300"
+              src="/img/articles/le-fm-c-quoi.png"
               alt="illustration-article-le-fm-cest-quoi"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
@@ -43,7 +43,7 @@ const Articles = () => {
           </CarouselItem>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="https://picsum.photos/350/300"
+              src="/img/articles/missions-fm.png"
               alt="illustration-article-les-missions-du-fm"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
@@ -62,7 +62,7 @@ const Articles = () => {
           </CarouselItem>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="https://picsum.photos/350/300"
+              src="/img/articles/histoire-fm.png"
               alt="illustration-article-lexternalisation-du-fm"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
@@ -86,7 +86,7 @@ const Articles = () => {
           </CarouselItem>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="https://picsum.photos/350/300"
+              src="/img/articles/economies.png"
               alt="illustration-le-fm-fait-il-faire-des-economies"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
@@ -108,7 +108,7 @@ const Articles = () => {
           </CarouselItem>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="https://picsum.photos/350/300"
+              src="/img/articles/histoire-nettoyage.png"
               alt="illustration-histoire-du-nettoyage-industriel"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
@@ -131,7 +131,7 @@ const Articles = () => {
           </CarouselItem>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="https://picsum.photos/350/300"
+              src="/img/articles/hof.png"
               alt="illustration-hof-managers"
             >
               <div className="p-4 flex flex-col gap-4 h-52">

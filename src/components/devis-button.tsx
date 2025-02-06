@@ -155,7 +155,24 @@ const DevisButton = ({
     const url = route.url;
     router.push(`/mon-devis${url}`);
   };
-  const handleClickNouveau = () => {
+  const handleClickNouveau = async () => {
+    try {
+      const response = await fetch("/api/mailgun", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          to: "virounk@gmail.com",
+          subject: "Nouveau test",
+          text: "Un nouveau test a été effectué",
+        }),
+      });
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+
     fullReinitialisationDevis(
       setClient,
       setDevisProgress,

@@ -18,7 +18,7 @@ const page = () => {
         </p>
         <div className="w-full h-[500px] rounded-lg relative overflow-hidden">
           <Image
-            src={"https://picsum.photos/1200/500"}
+            src={"/img/services/office-managers.png"}
             alt="illustration-office-manager"
             quality={100}
             className="w-full h-full object-cover"

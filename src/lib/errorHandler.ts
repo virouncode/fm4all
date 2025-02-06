@@ -19,7 +19,7 @@ export const errorHandler = (err: unknown) => {
     );
   }
   if (err instanceof Error)
-    console.error(`Erreur : ${err.message}`, { stack: err.stack }); //Don't send the error back
+    console.error(`Erreur : ${err.message} ${err}`, { stack: err.stack }); //Don't send the error back
 
   return NextResponse.json(
     {
