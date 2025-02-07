@@ -11,7 +11,7 @@ export default {
     extend: {
       backgroundImage: {
         "hero-img": "url('/img/hero_wallpaper.png')",
-        "hof-img": "url('https://picsum.photos/800/400')",
+        "hof-img": "url('/img/hof-managers.png')",
       },
       listStyleType: {
         rocket: '"🚀  "',

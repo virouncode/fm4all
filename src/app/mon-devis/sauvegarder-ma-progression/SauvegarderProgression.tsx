@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Form } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
+import { batiments } from "@/constants/batiments";
+import { occupations } from "@/constants/occupations";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { toast } from "@/hooks/use-toast";
@@ -96,7 +98,7 @@ const SauvegarderProgression = () =>
       }
     );
 
-    const submitForm = (data: InsertClientType) => {
+    const submitForm = async (data: InsertClientType) => {
       if (!accepte) {
         toast({
           variant: "destructive",
@@ -104,15 +106,50 @@ const SauvegarderProgression = () =>
         });
         return;
       }
-      //TODO Server action pour insérer le client dans la db
+      //Server action pour insérer ou update le client dans la db
       executeSaveClient(data);
-      console.log("resultSaveClient", resultSaveClient);
       //TODO: ecrire dans la bdd une log table du devis avec formatted data, client_id, createdAt
       //cf onSuccess
       //TODO envoyez un email à Romu avec toutes les infos du devis grâce aux contextes
-
+      try {
+        await fetch("/api/mailgun", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            to: "contact@fm4all.com",
+            from: "contact@fm4all.com",
+            subject: "Un client a sauvegardé sa progression",
+            text: `<p>Un client a sauvegardé sa progression dans le funnel.</p><br/>
+                <p>Voici ses coordonnées :</p><br/>
+                <p>Entreprise : ${data.nomEntreprise}</p>
+                <p>Nom du contact : ${data.nomContact}</p>
+                <p>Prénom du contact : ${data.prenomContact}</p>
+                <p>Poste du contact : ${data.posteContact}</p>
+                <p>Email du contact : ${data.emailContact}</p>
+                <p>N°Tél du contact : ${data.phoneContact}</p>
+                <p>Code postal : ${data.codePostal}</p>
+                <p>Ville : ${data.ville}</p>
+                <p>Surface des locaux : ${data.surface}</p>
+                <p>Nombre de personnes : ${data.effectif}</p>
+                <p>Type de bâtiment : ${
+                  batiments.find(({ id }) => id === data.typeBatiment)
+                    ?.description
+                }</p>
+                <p>Type d'occupation : ${
+                  occupations.find(({ id }) => id === data.typeOccupation)
+                    ?.description
+                }</p><br/>
+                <p>Voici les informations de chiffrage :</p><br/>
+                ${formatLocalStorageData()}
+                `,
+          }),
+        });
+      } catch (err) {
+        console.log(err);
+      }
       //TODO envoyer un email au client, bienvenue blablabla
-      // console.log("formattedData", formattedData);
       const newCompletedSteps = [
         ...new Set([...devisProgress.completedSteps, 1, 2, 3, 4, 5]),
       ].sort((a, b) => a - b);

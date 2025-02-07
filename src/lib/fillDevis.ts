@@ -16,8 +16,6 @@ export const fillDevis = async (
   totalInstallationHT: number | null
 ) => {
   try {
-    // const formUrl = url;
-    // Fetch the PDF form
     const formPdfBytes = await fetch("/pdf/fm4all_devis_template_NEW.pdf").then(
       (res) => res.arrayBuffer()
     );

@@ -4,7 +4,9 @@ import { DateInputWithLabel } from "@/components/formInputs/DateInputWithLabel";
 import { InputWithLabel } from "@/components/formInputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { batiments } from "@/constants/batiments";
 import { departements } from "@/constants/departements";
+import { occupations } from "@/constants/occupations";
 import { ClientContext } from "@/context/ClientProvider";
 import { MonDevisContext } from "@/context/MonDevisProvider";
 import { TotalContext } from "@/context/TotalProvider";
@@ -125,7 +127,67 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
         total.totalAnnuelHt,
         total.totalInstallationHt
       );
-      if (url) setDevisUrl(url);
+      if (url) {
+        setDevisUrl(url);
+
+        try {
+          //Le Fichier du devis
+          const responseBlob = await fetch(url);
+          const blob = await responseBlob.blob();
+          const file = new File([blob], `devis_${client.nomEntreprise}.pdf`);
+          //Dans vercel blob
+          const response = await fetch(
+            `/api/devis/upload?filename=devis_${client.nomEntreprise}.pdf`,
+            {
+              method: "POST",
+              body: file,
+            }
+          );
+          const urlToPost = (await response.json()).url;
+
+          await fetch("/api/mailgun", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              to: "contact@fm4all.com",
+              from: "devis@fm4all.com",
+              subject: "Un client a finalisé son devis",
+              text: `<p>Un client a finalisé son devis.</p><br/>
+                        <p>Voici ses coordonnées :</p><br/>
+                        <p>Entreprise : ${data.nomEntreprise}</p>
+                        <p>Nom du contact : ${data.nomContact}</p>
+                        <p>Prénom du contact : ${data.prenomContact}</p>
+                        <p>Poste du contact : ${data.posteContact}</p>
+                        <p>Email du contact : ${data.emailContact}</p>
+                        <p>N°Tél du contact : ${data.phoneContact}</p>
+                        <p>Nom du signataire : ${data.nomSignataire}</p>
+                        <p>Prénom du signataire : ${data.prenomSignataire}</p>
+                        <p>Poste du signataire : ${data.posteSignataire}</p>
+                        <p>Email du signataire : ${data.emailSignataire}</p>
+                        <p>Code postal : ${data.codePostal}</p>
+                        <p>Ville : ${data.ville}</p>
+                        <p>Surface des locaux : ${data.surface}</p>
+                        <p>Nombre de personnes : ${data.effectif}</p>
+                        <p>Type de bâtiment : ${
+                          batiments.find(({ id }) => id === data.typeBatiment)
+                            ?.description
+                        }</p>
+                        <p>Type d'occupation : ${
+                          occupations.find(
+                            ({ id }) => id === data.typeOccupation
+                          )?.description
+                        }</p><br/>
+                        <p>Veuillez trouver en pièce jointe le devis</p>
+                        `,
+              attachment: urlToPost,
+            }),
+          });
+        } catch (err) {
+          console.log(err);
+        }
+      }
       setMonDevis({ currentMonDevisId: 2 });
     } catch (err) {
       if (err instanceof Error) {
