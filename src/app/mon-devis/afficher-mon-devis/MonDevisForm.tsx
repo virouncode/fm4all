@@ -137,7 +137,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
           const file = new File([blob], `devis_${client.nomEntreprise}.pdf`);
           //Dans vercel blob
           const response = await fetch(
-            `/api/devis/upload?filename=devis_${client.nomEntreprise}.pdf`,
+            `/api/vercelblob/upload?filename=devis_${client.nomEntreprise}.pdf`,
             {
               method: "POST",
               body: file,

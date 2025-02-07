@@ -15,8 +15,6 @@ export async function POST(req: NextRequest) {
     const responseBlob = await fetch(body?.attachment);
     const arrayBuffer = await responseBlob.arrayBuffer();
     const fileBuffer = Buffer.from(arrayBuffer);
-    console.log("body from", body.from, "bodyto", body.to);
-
     const response = await mg.messages.create("mg.fm4all.com", {
       from: `fm4all: Le Facility Management pour tous <${body.from}>`,
       to: [body.to],
