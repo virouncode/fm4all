@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { MARGE } from "@/constants/constants";
 import { locationFontaine } from "@/constants/locationFontaine";
 import { typesPose } from "@/constants/typesPose";
 import { FontainesContext } from "@/context/FontainesProvider";
@@ -66,7 +67,7 @@ const DetailFontaines = () => {
                 }
               </TableCell>
               <TableCell className="text-end">
-                {formatNumber((totalEspace.total ?? 0) / 12)}
+                {formatNumber(((totalEspace.total ?? 0) * MARGE) / 12)}
               </TableCell>
             </TableRow>
           );
@@ -78,7 +79,7 @@ const DetailFontaines = () => {
             Total Fontaines à eau
           </TableCell>
           <TableCell className="text-end font-bold">
-            {formatNumber(total / 12)}
+            {formatNumber((total * MARGE) / 12)}
           </TableCell>
         </TableRow>
       </TableFooter>

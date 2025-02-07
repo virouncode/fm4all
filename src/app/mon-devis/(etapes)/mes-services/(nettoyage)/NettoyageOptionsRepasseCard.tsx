@@ -5,7 +5,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { S_OUVREES_PAR_AN } from "@/constants/constants";
+import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { useContext } from "react";
@@ -33,7 +33,9 @@ const NettoyageOptionsRepasseCard = ({
 }: NettoyageOptionsRepasseCardProps) => {
   const { nettoyage } = useContext(NettoyageContext);
   const repassePrixMensuelText = repasseProposition?.prixAnnuel
-    ? `${formatNumber(Math.round(repasseProposition.prixAnnuel / 12))} € / mois`
+    ? `${formatNumber(
+        Math.round((repasseProposition.prixAnnuel * MARGE) / 12)
+      )} € / mois`
     : "Non proposé";
   const repasseHParSemaineText =
     repasseProposition && nettoyage.quantites.freqAnnuelle

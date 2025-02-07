@@ -9,6 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { MARGE } from "@/constants/constants";
 import { ClientContext } from "@/context/ClientProvider";
 import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
@@ -151,27 +152,34 @@ const Total = () => {
           className="text-base absolute top-20 right-10"
         >
           <Calculator />
-          {formatNumber(Math.round(total.totalAnnuelHt ?? 0))} € HT/an
+          {formatNumber(Math.round((total.totalAnnuelHt ?? 0) * MARGE))} € HT/an
         </Button>
       </SheetTrigger>
       <SheetContent className="flex flex-col">
         <SheetHeader>
           <SheetTitle>
             <span className="text-2xl">
-              Total: {formatNumber(Math.round(total.totalAnnuelHt ?? 0))} €
+              Total:{" "}
+              {formatNumber(Math.round((total.totalAnnuelHt ?? 0) * MARGE))} €
               HT/an
             </span>{" "}
           </SheetTitle>
           <SheetDescription>
             <span>
-              Soit {formatNumber(Math.round((total.totalAnnuelHt ?? 0) / 12))} €
-              HT/mois pour {client.effectif} personnes, {client.surface} m
+              Soit{" "}
+              {formatNumber(
+                Math.round(((total.totalAnnuelHt ?? 0) * MARGE) / 12)
+              )}{" "}
+              € HT/mois pour {client.effectif} personnes, {client.surface} m
               <sup>2</sup>
             </span>
             <br />
             <span>
-              + {formatNumber(Math.round(total.totalInstallationHt ?? 0))} € HT
-              d&apos;installation
+              +{" "}
+              {formatNumber(
+                Math.round((total.totalInstallationHt ?? 0) * MARGE)
+              )}{" "}
+              € HT d&apos;installation
             </span>
           </SheetDescription>
         </SheetHeader>

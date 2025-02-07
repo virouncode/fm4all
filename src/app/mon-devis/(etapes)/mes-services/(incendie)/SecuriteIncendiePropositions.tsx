@@ -25,12 +25,23 @@ const SecuriteIncendiePropositions = ({
   const { setTotalIncendie } = useContext(TotalIncendieContext);
 
   //Calcul des propositions
+  console.log(
+    "incendie.quantites.nbExtincteurs",
+    incendie.quantites.nbExtincteurs
+  );
+
   const nbExtincteurs =
-    incendie.quantites.nbExtincteurs || incendieQuantite.nbExtincteurs;
+    incendie.quantites.nbExtincteurs !== null
+      ? incendie.quantites.nbExtincteurs
+      : incendieQuantite.nbExtincteurs;
+
   const nbBaes =
-    incendie.quantites.nbBaes ||
-    Math.ceil(incendieQuantite.nbExtincteurs * 2.3);
-  const nbTelBaes = incendie.quantites.nbTelBaes || 1;
+    incendie.quantites.nbBaes !== null
+      ? incendie.quantites.nbBaes
+      : Math.ceil(incendieQuantite.nbExtincteurs * 2.3);
+
+  const nbTelBaes =
+    incendie.quantites.nbTelBaes !== null ? incendie.quantites.nbTelBaes : 1;
 
   const propositions = incendieTarifs.map((tarif) => ({
     id: tarif.id,
@@ -158,9 +169,12 @@ const SecuriteIncendiePropositions = ({
     const value = e.target.value;
     switch (type) {
       case "extincteur":
-        let newNbExtincteurs = value
-          ? parseInt(value)
-          : incendieQuantite.nbExtincteurs;
+        // let newNbExtincteurs = value
+        //   ? parseInt(value)
+        //   : incendieQuantite.nbExtincteurs;
+        let newNbExtincteurs = value ? parseInt(value) : 0;
+        console.log("newNbExtincteurs", newNbExtincteurs);
+
         if (newNbExtincteurs > MAX_NB_EXTINCTEURS)
           newNbExtincteurs = MAX_NB_EXTINCTEURS;
         setIncendie((prev) => ({
@@ -191,9 +205,11 @@ const SecuriteIncendiePropositions = ({
         }
         return;
       case "baes":
-        let newNbBaes = value
-          ? parseInt(value)
-          : Math.ceil(incendieQuantite.nbExtincteurs * 2.3);
+        // let newNbBaes = value
+        //   ? parseInt(value)
+        //   : Math.ceil(incendieQuantite.nbExtincteurs * 2.3);
+        let newNbBaes = value ? parseInt(value) : 0;
+
         if (newNbBaes > MAX_NB_BAES) newNbBaes = MAX_NB_BAES;
         setIncendie((prev) => ({
           ...prev,
@@ -222,7 +238,9 @@ const SecuriteIncendiePropositions = ({
         }
         return;
       case "telBaes":
-        let newNbTelBaes = value ? parseInt(value) : 1;
+        // let newNbTelBaes = value ? parseInt(value) : 1;
+        let newNbTelBaes = value ? parseInt(value) : 0;
+
         if (newNbTelBaes > MAX_NB_TEL_BAES) newNbTelBaes = MAX_NB_TEL_BAES;
         setIncendie((prev) => ({
           ...prev,

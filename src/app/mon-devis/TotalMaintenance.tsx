@@ -1,3 +1,4 @@
+import { MARGE } from "@/constants/constants";
 import { MaintenanceContext } from "@/context/MaintenanceProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
 import { formatNumber } from "@/lib/formatNumber";
@@ -32,7 +33,7 @@ const TotalMaintenance = () => {
             >
               <p>Service</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalService))} € HT/an
+                {formatNumber(Math.round(totalService * MARGE))} € HT/an
               </p>
             </div>
           ) : null}
@@ -42,7 +43,7 @@ const TotalMaintenance = () => {
             >
               <p>Contrôle Q18</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalQ18))} € HT/an
+                {formatNumber(Math.round(totalQ18 * MARGE))} € HT/an
               </p>
             </div>
           ) : null}
@@ -55,7 +56,7 @@ const TotalMaintenance = () => {
               >
                 <p>Contrôle Q18</p>
                 <p className="text-end">
-                  {formatNumber(Math.round(totalQ18))} € HT/an
+                  {formatNumber(Math.round(totalQ18 * MARGE))} € HT/an
                 </p>
               </div>
               <div
@@ -63,7 +64,7 @@ const TotalMaintenance = () => {
               >
                 <p>Contrôle Legio</p>
                 <p className="text-end">
-                  {formatNumber(Math.round(totalLegio))} € HT/an
+                  {formatNumber(Math.round(totalLegio * MARGE))} € HT/an
                 </p>
               </div>
             </>
@@ -78,7 +79,7 @@ const TotalMaintenance = () => {
               >
                 <p>Contrôle Q18</p>
                 <p className="text-end">
-                  {formatNumber(Math.round(totalQ18))} € HT/an
+                  {formatNumber(Math.round(totalQ18 * MARGE))} € HT/an
                 </p>
               </div>
               <div
@@ -86,7 +87,7 @@ const TotalMaintenance = () => {
               >
                 <p>Contrôle Legio</p>
                 <p className="text-end">
-                  {formatNumber(Math.round(totalLegio))} € HT/an
+                  {formatNumber(Math.round(totalLegio * MARGE))} € HT/an
                 </p>
               </div>
               <div
@@ -94,7 +95,7 @@ const TotalMaintenance = () => {
               >
                 <p>Contrôle Qualité Air</p>
                 <p className="text-end">
-                  {formatNumber(Math.round(totalQualiteAir))} € HT/an
+                  {formatNumber(Math.round(totalQualiteAir * MARGE))} € HT/an
                 </p>
               </div>
             </>
@@ -102,7 +103,7 @@ const TotalMaintenance = () => {
           <div className="flex items-center justify-between border-t border-foreground mt-2">
             <p>TOTAL</p>
             <p className="text-end">
-              {formatNumber(Math.round(total))} € HT/an
+              {formatNumber(Math.round(total * MARGE))} € HT/an
             </p>
           </div>
         </div>

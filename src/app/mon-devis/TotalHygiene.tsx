@@ -1,3 +1,4 @@
+import { MARGE } from "@/constants/constants";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { formatNumber } from "@/lib/formatNumber";
@@ -15,11 +16,9 @@ const TotalHygiene = () => {
     totalPoubelle,
     totalInstallation,
   } = totalHygiene;
-  const total = Math.round(
-    Object.values(totalHygiene)
-      .filter((item) => item !== null)
-      .reduce((sum, value) => sum + value, 0)
-  );
+  const total = Object.values(totalHygiene)
+    .filter((item) => item !== null)
+    .reduce((sum, value) => sum + value, 0);
 
   if (!total) return null;
 
@@ -42,7 +41,7 @@ const TotalHygiene = () => {
             >
               <p>Trilogie EMP / Savon / PH</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalTrilogie))} € HT/an
+                {formatNumber(Math.round(totalTrilogie * MARGE))} € HT/an
               </p>
             </div>
           ) : null}
@@ -52,7 +51,7 @@ const TotalHygiene = () => {
             >
               <p>Option désinfectant</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalDesinfectant))} € HT/an
+                {formatNumber(Math.round(totalDesinfectant * MARGE))} € HT/an
               </p>
             </div>
           ) : null}
@@ -62,7 +61,7 @@ const TotalHygiene = () => {
             >
               <p>Option parfum</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalParfum))} € HT/an
+                {formatNumber(Math.round(totalParfum * MARGE))} € HT/an
               </p>
             </div>
           ) : null}
@@ -72,7 +71,7 @@ const TotalHygiene = () => {
             >
               <p>Option balais WC</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalBalai))} € HT/an
+                {formatNumber(Math.round(totalBalai * MARGE))} € HT/an
               </p>
             </div>
           ) : null}
@@ -82,7 +81,7 @@ const TotalHygiene = () => {
             >
               <p>Option poubelle hygiène féminine</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalPoubelle))} € HT/an
+                {formatNumber(Math.round(totalPoubelle * MARGE))} € HT/an
               </p>
             </div>
           ) : null}
@@ -90,19 +89,21 @@ const TotalHygiene = () => {
             <div className="flex items-center justify-between">
               <p>Installation</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalInstallation))} € HT
+                {formatNumber(Math.round(totalInstallation * MARGE))} € HT
               </p>
             </div>
           ) : null}
           <div className="flex items-center justify-between border-t border-foreground mt-2">
             <p>TOTAL</p>
-            <p className="text-end">{total} € HT/an</p>
+            <p className="text-end">
+              {formatNumber(Math.round(total * MARGE))} € HT/an
+            </p>
           </div>
           {totalInstallation ? (
             <div className="flex justify-between w-full">
               <p>TOTAL INSTALLATION</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalInstallation))} € HT
+                {formatNumber(Math.round(totalInstallation * MARGE))} € HT
               </p>
             </div>
           ) : null}

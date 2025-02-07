@@ -1,4 +1,5 @@
 "use client";
+import { MARGE } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
@@ -36,7 +37,7 @@ const TotalNettoyage = () => {
             >
               <p>Nettoyage</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalService))} € HT/an
+                {formatNumber(Math.round(totalService * MARGE))} € HT/an
               </p>
             </div>
           ) : null}
@@ -46,7 +47,7 @@ const TotalNettoyage = () => {
             >
               <p>Option repasse</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalRepasse))} € HT/an
+                {formatNumber(Math.round(totalRepasse * MARGE))} € HT/an
               </p>
             </div>
           ) : null}
@@ -56,7 +57,7 @@ const TotalNettoyage = () => {
             >
               <p>Option samedi</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalSamedi))} € HT/an
+                {formatNumber(Math.round(totalSamedi * MARGE))} € HT/an
               </p>
             </div>
           ) : null}
@@ -66,7 +67,7 @@ const TotalNettoyage = () => {
             >
               <p>Option dimanche</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalDimanche))} € HT/an
+                {formatNumber(Math.round(totalDimanche * MARGE))} € HT/an
               </p>
             </div>
           ) : null}
@@ -76,13 +77,15 @@ const TotalNettoyage = () => {
             >
               <p>Option vitrerie</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalVitrerie))} € HT/an
+                {formatNumber(Math.round(totalVitrerie * MARGE))} € HT/an
               </p>
             </div>
           ) : null}
           <div className="flex items-center justify-between border-t border-foreground mt-2">
             <p>TOTAL</p>
-            <p className="text-end">{total} € HT/an</p>
+            <p className="text-end">
+              {formatNumber(Math.round(total * MARGE))} € HT/an
+            </p>
           </div>
         </div>
       </div>

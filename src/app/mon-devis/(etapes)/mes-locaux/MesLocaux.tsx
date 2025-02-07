@@ -19,6 +19,7 @@ import { departements } from "@/constants/departements";
 import { occupations } from "@/constants/occupations";
 import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
+import { CommentairesContext } from "@/context/CommentairesProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { FontainesContext } from "@/context/FontainesProvider";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
@@ -80,6 +81,7 @@ const MesLocaux = () => {
   const { setFontaines } = useContext(FontainesContext);
   const { setOfficeManager } = useContext(OfficeManagerContext);
   const { setServicesFm4All } = useContext(ServicesFm4AllContext);
+  const { setCommentaires } = useContext(CommentairesContext);
   const { setTotalNettoyage } = useContext(TotalNettoyageContext);
   const { setTotalHygiene } = useContext(TotalHygieneContext);
   const { setTotalIncendie } = useContext(TotalIncendieContext);
@@ -175,6 +177,7 @@ const MesLocaux = () => {
       setFontaines,
       setOfficeManager,
       setServicesFm4All,
+      setCommentaires,
       //navigation
       setServices,
       setFoodBeverage,

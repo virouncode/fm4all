@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { MARGE } from "@/constants/constants";
 import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
 import { TotalOfficeManagerContext } from "@/context/TotalOfficeManagerProvider";
 import { formatNumber } from "@/lib/formatNumber";
@@ -46,7 +47,7 @@ const DetailOfficeManager = () => {
             </TableCell>
             <TableCell>N/A</TableCell>
             <TableCell className="text-end">
-              {formatNumber(totalOfficeManager.totalService / 12)}
+              {formatNumber((totalOfficeManager.totalService * MARGE) / 12)}
             </TableCell>
           </TableRow>
         ) : null}
@@ -57,7 +58,7 @@ const DetailOfficeManager = () => {
             Total OfficeManager
           </TableCell>
           <TableCell className="text-end font-bold">
-            {formatNumber(totalOfficeManager.totalService / 12)}
+            {formatNumber((totalOfficeManager.totalService * MARGE) / 12)}
           </TableCell>
         </TableRow>
       </TableFooter>

@@ -11,6 +11,7 @@ import { NettoyageContext } from "@/context/NettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { useContext } from "react";
 import { MAX_PASSAGES_VITRERIE } from "./NettoyageOptionsPropositions";
+import { MARGE } from "@/constants/constants";
 
 type NettoyageOptionsVitrerieCardProps = {
   vitrerieProposition: {
@@ -47,7 +48,7 @@ const NettoyageOptionsVitrerieCard = ({
 
   const vitreriePrixMensuelText = vitrerieProposition.prixAnnuel
     ? `${formatNumber(
-        Math.round(vitrerieProposition.prixAnnuel / 12)
+        Math.round((vitrerieProposition.prixAnnuel * MARGE) / 12)
       )} € / mois`
     : "Non proposé";
   const nbPassagesVitrerieText = `${nettoyage.quantites.nbPassagesVitrerie} passages / an`;

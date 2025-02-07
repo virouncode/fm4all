@@ -39,7 +39,7 @@ const SecuriteIncendieInputs = ({
               <Input
                 type="number"
                 value={nbExtincteurs}
-                min={1}
+                min={0}
                 max={MAX_NB_EXTINCTEURS}
                 step={1}
                 onChange={(e) => handleChangeNbr(e, "extincteur")}
@@ -58,7 +58,7 @@ const SecuriteIncendieInputs = ({
               <Input
                 type="number"
                 value={nbBaes}
-                min={1}
+                min={0}
                 max={MAX_NB_BAES}
                 step={1}
                 onChange={(e) => handleChangeNbr(e, "baes")}
@@ -77,7 +77,7 @@ const SecuriteIncendieInputs = ({
               <Input
                 type="number"
                 value={nbTelBaes}
-                min={1}
+                min={0}
                 max={MAX_NB_BAES}
                 step={1}
                 onChange={(e) => handleChangeNbr(e, "telBaes")}

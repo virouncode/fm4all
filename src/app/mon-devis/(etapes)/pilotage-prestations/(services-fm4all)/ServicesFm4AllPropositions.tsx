@@ -16,6 +16,7 @@ import { SelectServicesFm4AllTauxType } from "@/zod-schemas/servicesFm4AllTaux";
 import { useContext } from "react";
 import ServicesFm4AllFournisseurLogo from "./ServicesFm4AllFournisseurLogo";
 import ServicesFm4AllPropositionCard from "./ServicesFm4AllPropositionCard";
+import { MARGE } from "@/constants/constants";
 
 type ServicesFm4AllPropositionsProps = {
   servicesFm4AllTaux: SelectServicesFm4AllTauxType[];
@@ -103,34 +104,38 @@ const ServicesFm4AllPropositions = ({
         ? null
         : assurance === "inclus"
         ? 0
-        : tauxAssurance * total;
+        : tauxAssurance * total * MARGE;
     const prixPlateforme =
       plateforme === "non propose"
         ? null
         : plateforme === "inclus"
         ? 0
-        : Math.max(tauxPlateforme * total, minFacturationPlateforme);
+        : Math.max(tauxPlateforme * total * MARGE, minFacturationPlateforme);
     const prixSupportAdmin =
       supportAdmin === "non propose"
         ? null
         : supportAdmin === "inclus"
         ? 0
-        : tauxSupportAdmin * total;
+        : tauxSupportAdmin * total * MARGE;
     const prixSupportOp =
       supportOp === "non propose"
         ? null
         : supportOp === "inclus"
         ? 0
-        : Math.max(tauxSupportOp * total, minFacturationSupportOp);
+        : Math.max(tauxSupportOp * total * MARGE, minFacturationSupportOp);
     const prixAccountManager =
       accountManager === "non propose"
         ? null
         : accountManager === "inclus"
         ? 0
-        : Math.max(tauxAccountManager * total, minFacturationAccountManager);
-    const remiseCa = total >= remiseCaSeuil ? tauxRemiseCa * total : 0;
+        : Math.max(
+            tauxAccountManager * total * MARGE,
+            minFacturationAccountManager
+          );
+    const remiseCa =
+      total * MARGE >= remiseCaSeuil ? tauxRemiseCa * total * MARGE : 0;
     const remiseHof = officeManager.infos.gammeSelected
-      ? tauxRemiseHof * total
+      ? tauxRemiseHof * total * MARGE
       : 0;
     const totalAnnuel =
       (prixAssurance ?? 0) +

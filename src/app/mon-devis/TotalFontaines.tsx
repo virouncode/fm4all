@@ -1,3 +1,4 @@
+import { MARGE } from "@/constants/constants";
 import { FontainesContext } from "@/context/FontainesProvider";
 import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
 import { formatNumber } from "@/lib/formatNumber";
@@ -38,9 +39,9 @@ const TotalFontaines = () => {
                   <p>
                     {formatNumber(
                       Math.round(
-                        totalFontaines.totalEspaces.find(
+                        (totalFontaines.totalEspaces.find(
                           (total) => total.espaceId === item.infos.espaceId
-                        )?.total ?? 0
+                        )?.total ?? 0) * MARGE
                       )
                     )}{" "}
                     € HT/an
@@ -54,9 +55,9 @@ const TotalFontaines = () => {
                     <p>
                       {formatNumber(
                         Math.round(
-                          totalFontaines.totalEspaces.find(
+                          (totalFontaines.totalEspaces.find(
                             (total) => total.espaceId === item.infos.espaceId
-                          )?.totalInstallation ?? 0
+                          )?.totalInstallation ?? 0) * MARGE
                         )
                       )}{" "}
                       € HT
@@ -69,14 +70,14 @@ const TotalFontaines = () => {
             <div className="flex justify-between w-full">
               <p>TOTAL</p>
               <p className="text-end">
-                {formatNumber(Math.round(total))} € HT/an
+                {formatNumber(Math.round(total * MARGE))} € HT/an
               </p>
             </div>
             {totalInstallation ? (
               <div className="flex justify-between w-full">
                 <p>TOTAL INSTALLATION</p>
                 <p className="text-end">
-                  {formatNumber(Math.round(totalInstallation))} € HT
+                  {formatNumber(Math.round(totalInstallation * MARGE))} € HT
                 </p>
               </div>
             ) : null}

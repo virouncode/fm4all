@@ -5,6 +5,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { MARGE } from "@/constants/constants";
 import { TypesPoseType } from "@/constants/typesPose";
 import { FontainesContext } from "@/context/FontainesProvider";
 import { formatNumber } from "@/lib/formatNumber";
@@ -93,11 +94,11 @@ const FontaineEspacePropositionCard = ({
   }
 
   const totalMensuelText = `${formatNumber(
-    Math.round(proposition.totalAnnuel / 12)
+    Math.round((proposition.totalAnnuel * MARGE) / 12)
   )} € / mois`;
   const prixInstallationText = proposition.totalInstallation
     ? `+ ${formatNumber(
-        Math.round(proposition.totalInstallation)
+        Math.round(proposition.totalInstallation * MARGE)
       )} € d'installation`
     : "";
 

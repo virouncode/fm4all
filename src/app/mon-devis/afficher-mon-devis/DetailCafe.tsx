@@ -13,6 +13,7 @@ import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { useContext } from "react";
 import { locationCafeMachine } from "../../../constants/locationCafeMachine";
+import { MARGE } from "@/constants/constants";
 
 const DetailCafe = () => {
   const { cafe } = useContext(CafeContext);
@@ -68,7 +69,7 @@ const DetailCafe = () => {
                 }
               </TableCell>
               <TableCell className="text-end">
-                {formatNumber((totalEspace.total ?? 0) / 12)}
+                {formatNumber(((totalEspace.total ?? 0) * MARGE) / 12)}
               </TableCell>
             </TableRow>
           );
@@ -80,7 +81,7 @@ const DetailCafe = () => {
             Total Café
           </TableCell>
           <TableCell className="text-end font-bold">
-            {formatNumber(total / 12)}
+            {formatNumber((total * MARGE) / 12)}
           </TableCell>
         </TableRow>
       </TableFooter>

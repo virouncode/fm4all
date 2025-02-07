@@ -5,6 +5,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { MARGE } from "@/constants/constants";
 import { IncendieContext } from "@/context/IncendieProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { useContext } from "react";
@@ -45,11 +46,12 @@ const SecuriteIncendiePropostionCard = ({
   handleClickProposition,
 }: SecuriteIncendiePropostionCardProps) => {
   const { incendie } = useContext(IncendieContext);
-  const prixAnnuelText =
+  const totalMensuelText =
     formatNumber(
       Math.round(
-        (proposition.totalAnnuelTrilogie +
-          proposition.fraisDeplacementTrilogie) /
+        ((proposition.totalAnnuelTrilogie +
+          proposition.fraisDeplacementTrilogie) *
+          MARGE) /
           12
       )
     ) + " € / mois";
@@ -76,7 +78,7 @@ const SecuriteIncendiePropostionCard = ({
               className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             />
             <div>
-              <p className="font-bold">{prixAnnuelText}</p>
+              <p className="font-bold">{totalMensuelText}</p>
               <p className="text-sm">1 passage par an</p>
               <p>Contrôle obligatoire de :</p>
               <p className="text-sm">{proposition.nbExtincteurs} extincteurs</p>

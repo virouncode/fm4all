@@ -8,6 +8,7 @@ import { batiments } from "@/constants/batiments";
 import { departements } from "@/constants/departements";
 import { occupations } from "@/constants/occupations";
 import { ClientContext } from "@/context/ClientProvider";
+import { CommentairesContext } from "@/context/CommentairesProvider";
 import { MonDevisContext } from "@/context/MonDevisProvider";
 import { TotalContext } from "@/context/TotalProvider";
 import useScrollIntoMonDevis from "@/hooks/use-scroll-into-mon-devis";
@@ -21,8 +22,15 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, Dispatch, SetStateAction, useContext } from "react";
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useState,
+} from "react";
 import { useForm } from "react-hook-form";
 
 type MonDevisFormProps = {
@@ -32,7 +40,9 @@ type MonDevisFormProps = {
 const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
   const { client, setClient } = useContext(ClientContext);
   const { total } = useContext(TotalContext);
+  const { commentaires } = useContext(CommentairesContext);
   const { setMonDevis } = useContext(MonDevisContext);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   useScrollIntoMonDevis();
 
@@ -119,8 +129,15 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
     console.log("total", total);
 
     try {
+      setLoading(true);
+      const numerosDevis = `${client.nomEntreprise}_${format(
+        new Date(),
+        "yyyyMMddHHmmss"
+      )}`;
+      const nomDevis = `Devis_${numerosDevis}.pdf`;
+
       const url = await fillDevis(
-        "Test2025",
+        numerosDevis,
         format(new Date(), "dd/MM/yyyy", { locale: fr }),
         "FM4ALL comparateur en ligne",
         client,
@@ -134,10 +151,10 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
           //Le Fichier du devis
           const responseBlob = await fetch(url);
           const blob = await responseBlob.blob();
-          const file = new File([blob], `devis_${client.nomEntreprise}.pdf`);
+          const file = new File([blob], nomDevis);
           //Dans vercel blob
           const response = await fetch(
-            `/api/vercelblob/upload?filename=devis_${client.nomEntreprise}.pdf`,
+            `/api/vercelblob/upload?filename=${nomDevis}`,
             {
               method: "POST",
               body: file,
@@ -179,9 +196,11 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                             ({ id }) => id === data.typeOccupation
                           )?.description
                         }</p><br/>
+                        <p>Commentaires du client : ${commentaires}</p><br/>
                         <p>Veuillez trouver en pièce jointe le devis</p>
                         `,
               attachment: urlToPost,
+              filename: nomDevis,
             }),
           });
         } catch (err) {
@@ -197,6 +216,8 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
           description: err.message,
         });
       } else console.log(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -329,8 +350,17 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
               </div>
             </div>
             <div className="flex justify-center">
-              <Button variant="destructive" size="lg" className="text-base">
-                Afficher mon devis
+              <Button
+                variant="destructive"
+                size="lg"
+                className="text-base min-w-[200px]"
+                disabled={loading}
+              >
+                {loading ? (
+                  <Loader className="animate-spin" />
+                ) : (
+                  "Afficher mon devis"
+                )}
               </Button>
             </div>
           </div>

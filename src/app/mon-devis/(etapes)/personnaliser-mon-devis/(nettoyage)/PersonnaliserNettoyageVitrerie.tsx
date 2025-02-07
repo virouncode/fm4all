@@ -19,7 +19,7 @@ const PersonnaliserNettoyageVitrerie = () => {
   const handleClickNext = () => {
     setPersonnalisation((prev) => ({
       ...prev,
-      currentPersonnalisationId: 3,
+      currentPersonnalisationId: 6,
     }));
   };
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {

@@ -1,3 +1,4 @@
+import { MARGE } from "@/constants/constants";
 import { IncendieContext } from "@/context/IncendieProvider";
 import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { formatNumber } from "@/lib/formatNumber";
@@ -38,7 +39,7 @@ const TotalIncendie = () => {
             <div className="flex items-center justify-between font-bold">
               <p>Trilogie Extincteurs / BAES / Télécommandes</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalTrilogie))} € HT/an
+                {formatNumber(Math.round(totalTrilogie * MARGE))} € HT/an
               </p>
             </div>
           ) : null}
@@ -46,7 +47,8 @@ const TotalIncendie = () => {
             <div className="flex items-center justify-between font-bold">
               <p>Frais de déplacement</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalDeplacementTrilogie))} € HT/an
+                {formatNumber(Math.round(totalDeplacementTrilogie * MARGE))} €
+                HT/an
               </p>
             </div>
           ) : null}
@@ -54,7 +56,7 @@ const TotalIncendie = () => {
             <div className="flex items-center justify-between font-bold">
               <p>Exutoires de fumée</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalExutoires))} € HT/an
+                {formatNumber(Math.round(totalExutoires * MARGE))} € HT/an
               </p>
             </div>
           ) : null}
@@ -62,7 +64,8 @@ const TotalIncendie = () => {
             <div className="flex items-center justify-between font-bold">
               <p>Frais de déplacement</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalDeplacementExutoires))} € HT/an
+                {formatNumber(Math.round(totalDeplacementExutoires * MARGE))} €
+                HT/an
               </p>
             </div>
           ) : null}
@@ -70,7 +73,8 @@ const TotalIncendie = () => {
             <div className="flex items-center justify-between font-bold">
               <p>Exutoires de fumée (parking)</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalExutoiresParking))} € HT/an
+                {formatNumber(Math.round(totalExutoiresParking * MARGE))} €
+                HT/an
               </p>
             </div>
           ) : null}
@@ -78,8 +82,10 @@ const TotalIncendie = () => {
             <div className="flex items-center justify-between font-bold">
               <p>Frais de déplacement</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalDeplacementExutoiresParking))} €
-                HT/an
+                {formatNumber(
+                  Math.round(totalDeplacementExutoiresParking * MARGE)
+                )}{" "}
+                € HT/an
               </p>
             </div>
           ) : null}
@@ -87,7 +93,7 @@ const TotalIncendie = () => {
             <div className="flex items-center justify-between font-bold">
               <p>Alarmes T4 / SSI</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalAlarmes))} € HT/an
+                {formatNumber(Math.round(totalAlarmes * MARGE))} € HT/an
               </p>
             </div>
           ) : null}
@@ -95,7 +101,7 @@ const TotalIncendie = () => {
             <div className="flex items-center justify-between font-bold">
               <p>RIA</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalRIA))} € HT/an
+                {formatNumber(Math.round(totalRIA * MARGE))} € HT/an
               </p>
             </div>
           ) : null}
@@ -103,7 +109,8 @@ const TotalIncendie = () => {
             <div className="flex items-center justify-between font-bold">
               <p>Portes coupe-feu battantes</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalPortesCoupeFeuBattantes))} € HT/an
+                {formatNumber(Math.round(totalPortesCoupeFeuBattantes * MARGE))}{" "}
+                € HT/an
               </p>
             </div>
           ) : null}
@@ -111,8 +118,10 @@ const TotalIncendie = () => {
             <div className="flex items-center justify-between font-bold">
               <p>Portes coupe-feu coulissantes</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalPortesCoupeFeuCoulissantes))} €
-                HT/an
+                {formatNumber(
+                  Math.round(totalPortesCoupeFeuCoulissantes * MARGE)
+                )}{" "}
+                € HT/an
               </p>
             </div>
           ) : null}
@@ -120,7 +129,8 @@ const TotalIncendie = () => {
             <div className="flex items-center justify-between font-bold">
               <p>Colonnes sèches statiques</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalColonnesSechesStatiques))} € HT/an
+                {formatNumber(Math.round(totalColonnesSechesStatiques * MARGE))}{" "}
+                € HT/an
               </p>
             </div>
           ) : null}
@@ -128,15 +138,17 @@ const TotalIncendie = () => {
             <div className="flex items-center justify-between font-bold">
               <p>Colonnes sèches dynamiques</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalColonnesSechesDynamiques))} €
-                HT/an
+                {formatNumber(
+                  Math.round(totalColonnesSechesDynamiques * MARGE)
+                )}{" "}
+                € HT/an
               </p>
             </div>
           ) : null}
           <div className="flex items-center justify-between border-t border-foreground mt-2">
             <p>TOTAL</p>
             <p className="text-end">
-              {formatNumber(Math.round(total))} € HT/an
+              {formatNumber(Math.round(total * MARGE))} € HT/an
             </p>
           </div>
         </div>

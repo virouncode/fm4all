@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { S_OUVREES_PAR_AN } from "@/constants/constants";
+import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
@@ -50,7 +50,7 @@ const DetailNettoyage = () => {
             </TableCell>
             <TableCell>N/A</TableCell>
             <TableCell className="text-end">
-              {formatNumber(totalNettoyage.totalService / 12)}
+              {formatNumber((totalNettoyage.totalService * MARGE) / 12)}
             </TableCell>
           </TableRow>
         ) : null}
@@ -69,7 +69,7 @@ const DetailNettoyage = () => {
             </TableCell>
             <TableCell>N/A</TableCell>
             <TableCell className="text-end">
-              {formatNumber(totalNettoyage.totalRepasse / 12)}
+              {formatNumber((totalNettoyage.totalRepasse * MARGE) / 12)}
             </TableCell>
           </TableRow>
         ) : null}
@@ -85,7 +85,7 @@ const DetailNettoyage = () => {
             </TableCell>
             <TableCell>N/A</TableCell>
             <TableCell className="text-end">
-              {formatNumber(totalNettoyage.totalSamedi / 12)}
+              {formatNumber((totalNettoyage.totalSamedi * MARGE) / 12)}
             </TableCell>
           </TableRow>
         ) : null}
@@ -101,7 +101,7 @@ const DetailNettoyage = () => {
             </TableCell>
             <TableCell>N/A</TableCell>
             <TableCell className="text-end">
-              {formatNumber(totalNettoyage.totalDimanche / 12)}
+              {formatNumber((totalNettoyage.totalDimanche * MARGE) / 12)}
             </TableCell>
           </TableRow>
         ) : null}
@@ -120,7 +120,7 @@ const DetailNettoyage = () => {
             </TableCell>
             <TableCell>N/A</TableCell>
             <TableCell className="text-end">
-              {formatNumber(totalNettoyage.totalVitrerie / 12)}
+              {formatNumber((totalNettoyage.totalVitrerie * MARGE) / 12)}
             </TableCell>
           </TableRow>
         ) : null}
@@ -131,7 +131,7 @@ const DetailNettoyage = () => {
             Total Nettoyage
           </TableCell>
           <TableCell className="text-end font-bold">
-            {formatNumber(total / 12)}
+            {formatNumber((total * MARGE) / 12)}
           </TableCell>
         </TableRow>
       </TableFooter>

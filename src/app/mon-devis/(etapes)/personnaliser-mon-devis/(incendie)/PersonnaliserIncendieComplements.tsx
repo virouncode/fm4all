@@ -40,19 +40,32 @@ const PersonnaliserIncendieComplements = ({
   portesCoupeFeuTarifs,
 }: PersonnaliserIncendieComplementsProps) => {
   const { incendie, setIncendie } = useContext(IncendieContext);
-  const { setTotalIncendie } = useContext(TotalIncendieContext);
+  const { totalIncendie, setTotalIncendie } = useContext(TotalIncendieContext);
   const { personnalisation, setPersonnalisation } = useContext(
     PersonnalisationContext
   );
-  const [exutoires, setExutoires] = useState(false);
-  const [exutoiresParking, setExutoiresParking] = useState(false);
-  const [portesCoupeFeuBattantes, setPortesCoupeFeuBattantes] = useState(false);
-  const [portesCoupeFeuCoulissantes, setPortesCoupeFeuCoulissantes] =
-    useState(false);
-  const [colonnesSechesStatiques, setColonnesStatiques] = useState(false);
-  const [colonnesSechesDynamiques, setColonnesDynamiques] = useState(false);
-  const [ria, setRia] = useState(false);
-  const [alarmes, setAlarmes] = useState(false);
+  const [exutoires, setExutoires] = useState(
+    totalIncendie.totalExutoires ? true : false
+  );
+  const [exutoiresParking, setExutoiresParking] = useState(
+    totalIncendie.totalExutoiresParking ? true : false
+  );
+  const [portesCoupeFeuBattantes, setPortesCoupeFeuBattantes] = useState(
+    totalIncendie.totalPortesCoupeFeuBattantes ? true : false
+  );
+  const [portesCoupeFeuCoulissantes, setPortesCoupeFeuCoulissantes] = useState(
+    totalIncendie.totalPortesCoupeFeuCoulissantes ? true : false
+  );
+  const [colonnesSechesStatiques, setColonnesStatiques] = useState(
+    totalIncendie.totalColonnesSechesStatiques ? true : false
+  );
+  const [colonnesSechesDynamiques, setColonnesDynamiques] = useState(
+    totalIncendie.totalColonnesSechesDynamiques ? true : false
+  );
+  const [ria, setRia] = useState(totalIncendie.totalRIA ? true : false);
+  const [alarmes, setAlarmes] = useState(
+    totalIncendie.totalAlarmes ? true : false
+  );
 
   const exutoiresTarifsFournisseur = exutoiresTarifs?.filter(
     (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
@@ -98,7 +111,7 @@ const PersonnaliserIncendieComplements = ({
   const handleClickNext = () => {
     setPersonnalisation((prev) => ({
       ...prev,
-      currentPersonnalisationId: 7,
+      currentPersonnalisationId: 13,
     }));
   };
 
@@ -608,7 +621,7 @@ const PersonnaliserIncendieComplements = ({
               En complément des BAES et Extincteurs, souhaitez vous nous confier
               le contrôle de :
             </p>
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-12 w-full md:mx-auto flex-1 overflow-auto">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-12 w-full md:mx-auto flex-1 overflow-auto p-2">
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="exutoires"

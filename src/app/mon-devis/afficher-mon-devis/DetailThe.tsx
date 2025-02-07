@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { MARGE } from "@/constants/constants";
 import { CafeContext } from "@/context/CafeProvider";
 import { TheContext } from "@/context/TheProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
@@ -44,7 +45,7 @@ const DetailThe = () => {
             <TableCell>N/A</TableCell>
             <TableCell>N/A</TableCell>
             <TableCell className="text-end">
-              {formatNumber(totalThe.totalService / 12)}
+              {formatNumber((totalThe.totalService * MARGE) / 12)}
             </TableCell>
           </TableRow>
         ) : null}

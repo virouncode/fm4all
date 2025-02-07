@@ -6,7 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { S_OUVREES_PAR_AN } from "@/constants/constants";
+import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
@@ -55,7 +55,7 @@ const NettoyagePropositionCard = ({
     );
   }
   const totalMensuelText = `${formatNumber(
-    Math.round(proposition.totalAnnuel / 12)
+    Math.round((proposition.totalAnnuel * MARGE) / 12)
   )} € / mois`;
   const hParSemaineText =
     proposition.hParPassage && proposition.freqAnnuelle

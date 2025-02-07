@@ -1,4 +1,5 @@
 import { Checkbox } from "@/components/ui/checkbox";
+import { MARGE } from "@/constants/constants";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
@@ -118,7 +119,7 @@ const SnacksFruitsPropositionCard = ({
     );
   }
   const totalMensuelText = `${formatNumber(
-    Math.round(proposition.total / 12)
+    Math.round((proposition.total * MARGE) / 12)
   )} € / mois`;
   const gFruitsParSemaineParPersonneText = snacksFruits.infos.choix.includes(
     "fruits"

@@ -5,6 +5,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { MARGE } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { useContext } from "react";
@@ -42,7 +43,7 @@ const NettoyageOptionsSamediCard = ({
     );
   }
   const samediPrixMensuelText = `${formatNumber(
-    Math.round(samediProposition?.prixAnnuel / 12)
+    Math.round((samediProposition?.prixAnnuel * MARGE) / 12)
   )} € / mois`;
 
   const samediNbPassagesParSemaineText = `1 passage de ${nettoyage.quantites.hParPassage} h / semaine en plus`;

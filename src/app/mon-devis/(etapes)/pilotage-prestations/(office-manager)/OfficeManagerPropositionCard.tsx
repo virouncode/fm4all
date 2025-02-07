@@ -1,4 +1,5 @@
 import { Checkbox } from "@/components/ui/checkbox";
+import { MARGE } from "@/constants/constants";
 import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { useContext } from "react";
@@ -56,7 +57,7 @@ const OfficeManagerPropositionCard = ({
     );
   }
   const totalMensuelText = `${formatNumber(
-    Math.round(proposition.totalAnnuel / 12)
+    Math.round((proposition.totalAnnuel * MARGE) / 12)
   )} € / mois*`;
   const demiJParSemaineText =
     proposition.demiJParSemaine !== null

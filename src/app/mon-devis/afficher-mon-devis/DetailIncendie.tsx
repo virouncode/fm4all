@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { MARGE } from "@/constants/constants";
 import { IncendieContext } from "@/context/IncendieProvider";
 import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { formatNumber } from "@/lib/formatNumber";
@@ -56,7 +57,8 @@ const DetailIncendie = () => {
                 <TableCell className="text-end">
                   {formatNumber(
                     ((incendie.quantites.nbExtincteurs ?? 0) *
-                      (incendie.prix.prixParExtincteur ?? 0)) /
+                      (incendie.prix.prixParExtincteur ?? 0) *
+                      MARGE) /
                       12
                   )}
                 </TableCell>
@@ -72,7 +74,8 @@ const DetailIncendie = () => {
                 <TableCell className="text-end">
                   {formatNumber(
                     ((incendie.quantites.nbBaes ?? 0) *
-                      (incendie.prix.prixParBaes ?? 0)) /
+                      (incendie.prix.prixParBaes ?? 0) *
+                      MARGE) /
                       12
                   )}
                 </TableCell>
@@ -88,7 +91,8 @@ const DetailIncendie = () => {
                 <TableCell className="text-end">
                   {formatNumber(
                     ((incendie.quantites.nbTelBaes ?? 0) *
-                      (incendie.prix.prixParTelBaes ?? 0)) /
+                      (incendie.prix.prixParTelBaes ?? 0) *
+                      MARGE) /
                       12
                   )}
                 </TableCell>
@@ -103,7 +107,7 @@ const DetailIncendie = () => {
                 <TableCell>N/A</TableCell>
                 <TableCell className="text-end">
                   {formatNumber(
-                    (totalIncendie.totalDeplacementTrilogie ?? 0) / 12
+                    ((totalIncendie.totalDeplacementTrilogie ?? 0) * MARGE) / 12
                   )}
                 </TableCell>
               </TableRow>
@@ -117,8 +121,9 @@ const DetailIncendie = () => {
             </TableCell>
             <TableCell className="text-end font-bold">
               {formatNumber(
-                ((totalIncendie.totalTrilogie ?? 0) +
-                  (totalIncendie.totalDeplacementTrilogie ?? 0)) /
+                (((totalIncendie.totalTrilogie ?? 0) +
+                  (totalIncendie.totalDeplacementTrilogie ?? 0)) *
+                  MARGE) /
                   12
               )}
             </TableCell>
@@ -150,7 +155,7 @@ const DetailIncendie = () => {
                 <TableCell>N/A</TableCell>
                 <TableCell>N/A</TableCell>
                 <TableCell className="text-end">
-                  {formatNumber(totalIncendie.totalExutoires / 12)}
+                  {formatNumber((totalIncendie.totalExutoires * MARGE) / 12)}
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -163,7 +168,8 @@ const DetailIncendie = () => {
                 <TableCell>N/A</TableCell>
                 <TableCell className="text-end">
                   {formatNumber(
-                    (totalIncendie.totalDeplacementExutoires ?? 0) / 12
+                    ((totalIncendie.totalDeplacementExutoires ?? 0) * MARGE) /
+                      12
                   )}
                 </TableCell>
               </TableRow>
@@ -180,7 +186,9 @@ const DetailIncendie = () => {
                 <TableCell>N/A</TableCell>
                 <TableCell>N/A</TableCell>
                 <TableCell className="text-end">
-                  {formatNumber(totalIncendie.totalExutoiresParking / 12)}
+                  {formatNumber(
+                    (totalIncendie.totalExutoiresParking * MARGE) / 12
+                  )}
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -193,7 +201,9 @@ const DetailIncendie = () => {
                 <TableCell>N/A</TableCell>
                 <TableCell className="text-end">
                   {formatNumber(
-                    (totalIncendie.totalDeplacementExutoiresParking ?? 0) / 12
+                    ((totalIncendie.totalDeplacementExutoiresParking ?? 0) *
+                      MARGE) /
+                      12
                   )}
                 </TableCell>
               </TableRow>
@@ -210,7 +220,7 @@ const DetailIncendie = () => {
               <TableCell>N/A</TableCell>
               <TableCell>N/A</TableCell>
               <TableCell className="text-end">
-                {formatNumber((totalIncendie.totalAlarmes ?? 0) / 12)}
+                {formatNumber(((totalIncendie.totalAlarmes ?? 0) * MARGE) / 12)}
               </TableCell>
             </TableRow>
           ) : null}
@@ -227,7 +237,8 @@ const DetailIncendie = () => {
               <TableCell>N/A</TableCell>
               <TableCell className="text-end">
                 {formatNumber(
-                  (totalIncendie.totalPortesCoupeFeuBattantes ?? 0) / 12
+                  ((totalIncendie.totalPortesCoupeFeuBattantes ?? 0) * MARGE) /
+                    12
                 )}
               </TableCell>
             </TableRow>
@@ -245,7 +256,9 @@ const DetailIncendie = () => {
               <TableCell>N/A</TableCell>
               <TableCell className="text-end">
                 {formatNumber(
-                  (totalIncendie.totalPortesCoupeFeuCoulissantes ?? 0) / 12
+                  ((totalIncendie.totalPortesCoupeFeuCoulissantes ?? 0) *
+                    MARGE) /
+                    12
                 )}
               </TableCell>
             </TableRow>
@@ -263,7 +276,8 @@ const DetailIncendie = () => {
               <TableCell>N/A</TableCell>
               <TableCell className="text-end">
                 {formatNumber(
-                  (totalIncendie.totalColonnesSechesStatiques ?? 0) / 12
+                  ((totalIncendie.totalColonnesSechesStatiques ?? 0) * MARGE) /
+                    12
                 )}
               </TableCell>
             </TableRow>
@@ -281,7 +295,8 @@ const DetailIncendie = () => {
               <TableCell>N/A</TableCell>
               <TableCell className="text-end">
                 {formatNumber(
-                  (totalIncendie.totalColonnesSechesDynamiques ?? 0) / 12
+                  ((totalIncendie.totalColonnesSechesDynamiques ?? 0) * MARGE) /
+                    12
                 )}
               </TableCell>
             </TableRow>
@@ -296,7 +311,7 @@ const DetailIncendie = () => {
               <TableCell>N/A</TableCell>
               <TableCell>N/A</TableCell>
               <TableCell className="text-end">
-                {formatNumber((totalIncendie.totalRIA ?? 0) / 12)}
+                {formatNumber(((totalIncendie.totalRIA ?? 0) * MARGE) / 12)}
               </TableCell>
             </TableRow>
           ) : null}
@@ -307,7 +322,7 @@ const DetailIncendie = () => {
               Total Incendie Options
             </TableCell>
             <TableCell className="text-end font-bold">
-              {formatNumber((totalOptions ?? 0) / 12)}
+              {formatNumber(((totalOptions ?? 0) * MARGE) / 12)}
             </TableCell>
           </TableRow>
         </TableFooter>

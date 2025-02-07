@@ -1,3 +1,4 @@
+export const MARGE = 1.11111111;
 export const RATIO = 10000;
 export const RATIO_LAIT = 0.2;
 export const RATIO_CHOCO = 0.2;

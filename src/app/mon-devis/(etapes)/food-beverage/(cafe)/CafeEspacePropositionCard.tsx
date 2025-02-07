@@ -5,6 +5,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { MARGE } from "@/constants/constants";
 import { CafeContext } from "@/context/CafeProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
@@ -113,11 +114,11 @@ const CafeEspacePropositionCard = ({
   }
 
   const totalMensuelText = `${formatNumber(
-    Math.round(proposition.totalAnnuel / 12)
+    Math.round((proposition.totalAnnuel * MARGE) / 12)
   )} € / mois`;
   const prixInstallationText = proposition.totalInstallation
     ? `+ ${formatNumber(
-        Math.round(proposition.totalInstallation)
+        Math.round(proposition.totalInstallation * MARGE)
       )} € d'installation`
     : "";
   const typeLaitText = !proposition.typeLait

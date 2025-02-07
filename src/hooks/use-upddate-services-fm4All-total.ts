@@ -1,4 +1,5 @@
 "use client";
+import { MARGE } from "@/constants/constants";
 import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
 import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
@@ -71,15 +72,17 @@ export const useUpddateServicesFm4AllTotal = () => {
     const tauxRemiseHof = servicesFm4All.prix.tauxRemiseHof;
     const remiseCaSeuil = servicesFm4All.prix.remiseCaSeuil;
 
-    const prixAssurance = (tauxAssurance ?? 0.0108) * total;
-    const prixPlateforme = (tauxPlateforme ?? 0.01) * total;
-    const prixSupportAdmin = (tauxSupportAdmin ?? 0) * total;
-    const prixSupportOp = (tauxSupportOp ?? 0.0219) * total;
-    const prixAccountManager = (tauxAccountManager ?? 0.0399) * total;
+    const prixAssurance = (tauxAssurance ?? 0.0108) * total * MARGE;
+    const prixPlateforme = (tauxPlateforme ?? 0.01) * total * MARGE;
+    const prixSupportAdmin = (tauxSupportAdmin ?? 0) * total * MARGE;
+    const prixSupportOp = (tauxSupportOp ?? 0.0219) * total * MARGE;
+    const prixAccountManager = (tauxAccountManager ?? 0.0399) * total * MARGE;
     const remiseCa =
-      total > (remiseCaSeuil ?? 26000) ? total * (tauxRemiseCa ?? 0.005) : 0;
+      total * MARGE > (remiseCaSeuil ?? 26000)
+        ? total * MARGE * (tauxRemiseCa ?? 0.005)
+        : 0;
     const remiseHof = officeManager.infos.gammeSelected
-      ? total * (tauxRemiseHof ?? 0.005)
+      ? total * MARGE * (tauxRemiseHof ?? 0.005)
       : 0;
 
     setTotalServicesFm4All({

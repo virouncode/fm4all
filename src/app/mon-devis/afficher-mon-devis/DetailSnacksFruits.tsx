@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { MARGE } from "@/constants/constants";
 import { CafeContext } from "@/context/CafeProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
@@ -59,7 +60,7 @@ const DetailSnacksFruits = () => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {totalSnacksFruits.totalFruits ? (
+        {totalFruits ? (
           <TableRow>
             <TableCell>Fruits</TableCell>
             <TableCell>{snacksFruits.infos.nomFournisseur}</TableCell>
@@ -69,11 +70,11 @@ const DetailSnacksFruits = () => {
             <TableCell>{previsionnelFruits} </TableCell>
             <TableCell>N/A</TableCell>
             <TableCell className="text-end">
-              {formatNumber(totalSnacksFruits.totalFruits / 12)}
+              {formatNumber((totalFruits * MARGE) / 12)}
             </TableCell>
           </TableRow>
         ) : null}
-        {totalSnacksFruits.totalSnacks ? (
+        {totalSnacks ? (
           <TableRow>
             <TableCell>Snacks</TableCell>
             <TableCell>{snacksFruits.infos.nomFournisseur}</TableCell>
@@ -83,11 +84,11 @@ const DetailSnacksFruits = () => {
             <TableCell>{previsionnelSnacks}</TableCell>
             <TableCell>N/A</TableCell>
             <TableCell className="text-end">
-              {formatNumber(totalSnacksFruits.totalSnacks / 12)}
+              {formatNumber((totalSnacks * MARGE) / 12)}
             </TableCell>
           </TableRow>
         ) : null}
-        {totalSnacksFruits.totalBoissons ? (
+        {totalBoissons ? (
           <TableRow>
             <TableCell>Boissons</TableCell>
             <TableCell>{snacksFruits.infos.nomFournisseur}</TableCell>
@@ -97,7 +98,7 @@ const DetailSnacksFruits = () => {
             <TableCell>{previsionnelBoissons}</TableCell>
             <TableCell>N/A</TableCell>
             <TableCell className="text-end">
-              {formatNumber(totalSnacksFruits.totalBoissons / 12)}
+              {formatNumber((totalBoissons * MARGE) / 12)}
             </TableCell>
           </TableRow>
         ) : null}
@@ -111,7 +112,7 @@ const DetailSnacksFruits = () => {
           <TableCell>N/A</TableCell>
           <TableCell>N/A</TableCell>
           <TableCell className="text-end">
-            {formatNumber((totalSnacksFruits.totalLivraison ?? 0) / 12)}
+            {formatNumber(((totalLivraison ?? 0) * MARGE) / 12)}
           </TableCell>
         </TableRow>
       </TableBody>
@@ -121,7 +122,7 @@ const DetailSnacksFruits = () => {
             Total Snacks & Fruits
           </TableCell>
           <TableCell className="text-end font-bold">
-            {formatNumber((totalSnacksFruits.total ?? 0) / 12)}
+            {formatNumber(((totalSnacksFruits.total ?? 0) * MARGE) / 12)}
           </TableCell>
         </TableRow>
       </TableFooter>

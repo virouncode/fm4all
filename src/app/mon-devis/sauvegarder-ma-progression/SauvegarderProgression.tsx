@@ -126,8 +126,8 @@ const SauvegarderProgression = () => {
                   occupations.find(({ id }) => id === data.typeOccupation)
                     ?.description
                 }</p><br/>
-                <p>Voici les informations de chiffrage :</p><br/>
-                ${formatLocalStorageData()}
+                <p>Voici les informations de chiffrage (avant personnalisation) :</p><br/>
+                <pre>${formatLocalStorageData()}</pre>
                 `,
         }),
       });

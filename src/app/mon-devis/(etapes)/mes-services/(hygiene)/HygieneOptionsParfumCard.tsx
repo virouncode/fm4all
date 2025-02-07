@@ -2,6 +2,7 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { MARGE } from "@/constants/constants";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
@@ -96,7 +97,7 @@ const HygieneOptionsParfumCard = ({
           );
         }
         const prixMensuelParfumText = `${formatNumber(
-          Math.round(proposition.totalParfum / 12)
+          Math.round((proposition.totalParfum * MARGE) / 12)
         )} € / mois`;
         return (
           <div

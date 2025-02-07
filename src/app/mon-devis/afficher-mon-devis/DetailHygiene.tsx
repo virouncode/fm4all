@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { MARGE } from "@/constants/constants";
 import { locationDistribHygiene } from "@/constants/locationsDistribHygiene";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
@@ -98,7 +99,7 @@ const DetailHygiene = () => {
               Total Hygiène Sanitaire Trilogie EMP / Savon / PH
             </TableCell>
             <TableCell className="text-end font-bold">
-              {formatNumber((totalHygiene.totalTrilogie ?? 0) / 12)}
+              {formatNumber(((totalHygiene.totalTrilogie ?? 0) * MARGE) / 12)}
             </TableCell>
           </TableRow>
         </TableFooter>
@@ -133,7 +134,7 @@ const DetailHygiene = () => {
                 }
               </TableCell>
               <TableCell className="text-end">
-                {formatNumber(totalHygiene.totalDesinfectant / 12)}
+                {formatNumber((totalHygiene.totalDesinfectant * MARGE) / 12)}
               </TableCell>
             </TableRow>
           ) : null}
@@ -154,7 +155,7 @@ const DetailHygiene = () => {
                 }
               </TableCell>
               <TableCell className="text-end">
-                {formatNumber((totalHygiene.totalParfum ?? 0) / 12)}
+                {formatNumber(((totalHygiene.totalParfum ?? 0) * MARGE) / 12)}
               </TableCell>
             </TableRow>
           ) : null}
@@ -174,7 +175,7 @@ const DetailHygiene = () => {
                 }
               </TableCell>
               <TableCell className="text-end">
-                {formatNumber((totalHygiene.totalBalai ?? 0) / 12)}
+                {formatNumber(((totalHygiene.totalBalai ?? 0) * MARGE) / 12)}
               </TableCell>
             </TableRow>
           ) : null}
@@ -194,7 +195,7 @@ const DetailHygiene = () => {
                 }
               </TableCell>
               <TableCell className="text-end">
-                {formatNumber((totalHygiene.totalPoubelle ?? 0) / 12)}
+                {formatNumber(((totalHygiene.totalPoubelle ?? 0) * MARGE) / 12)}
               </TableCell>
             </TableRow>
           ) : null}
@@ -205,7 +206,7 @@ const DetailHygiene = () => {
               Total Hygiène Sanitaire Options
             </TableCell>
             <TableCell className="text-end font-bold">
-              {formatNumber((totalOptions ?? 0) / 12)}
+              {formatNumber(((totalOptions ?? 0) * MARGE) / 12)}
             </TableCell>
           </TableRow>
         </TableFooter>

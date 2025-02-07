@@ -1,3 +1,4 @@
+import { MARGE } from "@/constants/constants";
 import { CafeContext } from "@/context/CafeProvider";
 import { TheContext } from "@/context/TheProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
@@ -25,13 +26,13 @@ const TotalThe = () => {
           >
             <p>Sachets</p>
             <p className="text-end">
-              {formatNumber(Math.round(total))} € HT/an
+              {formatNumber(Math.round(total * MARGE))} € HT/an
             </p>
           </div>
           <div className="flex items-center justify-between border-t border-foreground mt-2">
             <p>TOTAL</p>
             <p className="text-end">
-              {formatNumber(Math.round(total))} € HT/an
+              {formatNumber(Math.round(total * MARGE))} € HT/an
             </p>
           </div>
         </div>

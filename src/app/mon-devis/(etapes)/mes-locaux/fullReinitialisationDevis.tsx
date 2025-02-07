@@ -1,5 +1,6 @@
 import { CafeType } from "@/zod-schemas/cafe";
 import { InsertClientType } from "@/zod-schemas/client";
+import { CommentairesType } from "@/zod-schemas/commentaires";
 import { DevisProgressType } from "@/zod-schemas/devisProgress";
 import { FontainesType } from "@/zod-schemas/fontaines";
 import { FoodBeverageType } from "@/zod-schemas/foodBeverage";
@@ -42,6 +43,7 @@ export const fullReinitialisationDevis = (
   setFontaines: (fontaines: FontainesType) => void,
   setOfficeManager: (officeManager: OfficeManagerType) => void,
   setServicesFm4All: (servicesFm4All: ServicesFm4AllType) => void,
+  setCommentaires: (commentaires: CommentairesType) => void,
   setServices: (services: ServicesType) => void,
   setFoodBeverage: (foodBeverage: FoodBeverageType) => void,
   setManagement: (management: ManagementType) => void,
@@ -356,6 +358,7 @@ export const fullReinitialisationDevis = (
       tauxRemiseHof: null,
     },
   });
+  setCommentaires(null);
   //Navigation
   setServices({
     currentServiceId: 0,

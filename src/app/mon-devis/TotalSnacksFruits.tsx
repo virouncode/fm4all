@@ -1,3 +1,4 @@
+import { MARGE } from "@/constants/constants";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { formatNumber } from "@/lib/formatNumber";
@@ -27,7 +28,7 @@ const TotalSnacksFruits = () => {
             >
               <p>Fruits</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalFruits))} € HT/an
+                {formatNumber(Math.round(totalFruits * MARGE))} € HT/an
               </p>
             </div>
           ) : null}
@@ -37,7 +38,7 @@ const TotalSnacksFruits = () => {
             >
               <p>Snacks</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalSnacks))} € HT/an
+                {formatNumber(Math.round(totalSnacks * MARGE))} € HT/an
               </p>
             </div>
           ) : null}
@@ -47,7 +48,7 @@ const TotalSnacksFruits = () => {
             >
               <p>Fruits</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalBoissons))} € HT/an
+                {formatNumber(Math.round(totalBoissons * MARGE))} € HT/an
               </p>
             </div>
           ) : null}
@@ -55,14 +56,14 @@ const TotalSnacksFruits = () => {
           <div className={`flex items-center justify-between  font-bold`}>
             <p>Livraison</p>
             <p className="text-end">
-              {formatNumber(Math.round(totalLivraison))} € HT/an
+              {formatNumber(Math.round(totalLivraison * MARGE))} € HT/an
             </p>
           </div>
 
           <div className="flex items-center justify-between border-t border-foreground mt-2">
             <p>TOTAL</p>
             <p className="text-end">
-              {formatNumber(Math.round(total))} € HT/an
+              {formatNumber(Math.round(total * MARGE))} € HT/an
             </p>
           </div>
         </div>

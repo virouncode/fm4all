@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { MARGE } from "@/constants/constants";
 import { MaintenanceContext } from "@/context/MaintenanceProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
 import { formatNumber } from "@/lib/formatNumber";
@@ -47,7 +48,7 @@ const DetailMaintenance = () => {
             </TableCell>
             <TableCell>N/A</TableCell>
             <TableCell className="text-end">
-              {formatNumber(totalMaintenance.totalService / 12)}
+              {formatNumber((totalMaintenance.totalService * MARGE) / 12)}
             </TableCell>
           </TableRow>
         ) : null}
@@ -64,7 +65,7 @@ const DetailMaintenance = () => {
             </TableCell>
             <TableCell>N/A</TableCell>
             <TableCell className="text-end">
-              {formatNumber(totalMaintenance.totalQ18 / 12)}
+              {formatNumber((totalMaintenance.totalQ18 * MARGE) / 12)}
             </TableCell>
           </TableRow>
         ) : null}
@@ -81,7 +82,7 @@ const DetailMaintenance = () => {
             </TableCell>
             <TableCell>N/A</TableCell>
             <TableCell className="text-end">
-              {formatNumber(totalMaintenance.totalLegio / 12)}
+              {formatNumber((totalMaintenance.totalLegio * MARGE) / 12)}
             </TableCell>
           </TableRow>
         ) : null}
@@ -98,7 +99,7 @@ const DetailMaintenance = () => {
             </TableCell>
             <TableCell>N/A</TableCell>
             <TableCell className="text-end">
-              {formatNumber(totalMaintenance.totalQualiteAir / 12)}
+              {formatNumber((totalMaintenance.totalQualiteAir * MARGE) / 12)}
             </TableCell>
           </TableRow>
         ) : null}
@@ -109,7 +110,7 @@ const DetailMaintenance = () => {
             Total Maintenance
           </TableCell>
           <TableCell className="text-end font-bold">
-            {formatNumber(total / 12)}
+            {formatNumber((total * MARGE) / 12)}
           </TableCell>
         </TableRow>
       </TableFooter>

@@ -7,6 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { MARGE } from "@/constants/constants";
 import { MaintenanceContext } from "@/context/MaintenanceProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
@@ -63,7 +64,7 @@ const MaintenancePropositionCard = ({
     );
   }
   const totalMensuelText = `${formatNumber(
-    Math.round(proposition.totalAnnuel / 12)
+    Math.round((proposition.totalAnnuel * MARGE) / 12)
   )} € / mois`;
   const tooltipEssentiel = (
     <div className="flex flex-col gap-4">

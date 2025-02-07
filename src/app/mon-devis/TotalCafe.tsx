@@ -1,3 +1,4 @@
+import { MARGE } from "@/constants/constants";
 import { CafeContext } from "@/context/CafeProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import { formatNumber } from "@/lib/formatNumber";
@@ -41,9 +42,9 @@ const TotalCafe = () => {
                   <p>
                     {formatNumber(
                       Math.round(
-                        totalCafe.totalEspaces.find(
+                        (totalCafe.totalEspaces.find(
                           (total) => total.espaceId === item.infos.espaceId
-                        )?.total ?? 0
+                        )?.total ?? 0) * MARGE
                       )
                     )}{" "}
                     € HT/an
@@ -57,9 +58,9 @@ const TotalCafe = () => {
                     <p>
                       {formatNumber(
                         Math.round(
-                          totalCafe.totalEspaces.find(
+                          (totalCafe.totalEspaces.find(
                             (total) => total.espaceId === item.infos.espaceId
-                          )?.totalInstallation ?? 0
+                          )?.totalInstallation ?? 0) * MARGE
                         )
                       )}{" "}
                       € HT
@@ -72,14 +73,14 @@ const TotalCafe = () => {
             <div className="flex justify-between w-full">
               <p>TOTAL</p>
               <p className="text-end">
-                {formatNumber(Math.round(total))} € HT/an
+                {formatNumber(Math.round(total * MARGE))} € HT/an
               </p>
             </div>
             {totalInstallation ? (
               <div className="flex justify-between w-full">
                 <p>TOTAL INSTALLATION</p>
                 <p className="text-end">
-                  {formatNumber(Math.round(totalInstallation))} € HT
+                  {formatNumber(Math.round(totalInstallation * MARGE))} € HT
                 </p>
               </div>
             ) : null}
