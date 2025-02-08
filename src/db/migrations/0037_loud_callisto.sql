@@ -1,0 +1,1 @@
+-- ALTER TABLE "boissons_quantites" DROP COLUMN "effectif";

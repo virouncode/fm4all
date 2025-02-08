@@ -7,6 +7,7 @@ import { ButtonHTMLAttributes } from "react";
 type BackButtonProps = {
   title: string;
   className?: string;
+  size?: "default" | "sm" | "lg" | "icon" | null | undefined;
   variant?:
     | "default"
     | "destructive"
@@ -22,6 +23,7 @@ const BackButton = ({
   title,
   className,
   variant,
+  size,
   ...props
 }: BackButtonProps) => {
   const router = useRouter();
@@ -30,6 +32,7 @@ const BackButton = ({
       title={title}
       className={className}
       variant={variant}
+      size={size}
       {...props}
       onClick={() => router.back()}
     >

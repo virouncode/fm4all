@@ -13,10 +13,10 @@ export default function page() {
     <main className="flex flex-col gap-12 mb-24">
       <Hero />
       <Presentation />
+      <Services />
       <VideoPresentation />
       <How />
       <Why />
-      <Services />
       <Mission />
       <HofManager />
       <Articles />

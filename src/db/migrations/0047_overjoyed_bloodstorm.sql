@@ -1,0 +1,1 @@
+DROP TABLE "services_fm4all_taux" CASCADE;

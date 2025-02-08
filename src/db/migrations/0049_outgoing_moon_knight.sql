@@ -1,0 +1,1 @@
+ALTER TABLE "clients" RENAME COLUMN "nom_fournisseur" TO "nom_entreprise";

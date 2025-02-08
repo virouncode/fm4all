@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "Nos 3 gammes",
@@ -35,10 +36,12 @@ const page = () => {
                 Gamme Essentiel
               </h2>
               <p className="text-lg md:ml-10 max-w-prose mx-auto">
-                Vous êtes en recherche de{" "}
-                <strong>services efficaces et optimisés</strong>. Ce qui est
-                important pour vous c&apos;est d&apos;être en règle et
-                d&apos;apporter ce qui est essentiel pour votre site.
+                Vous recherchez des services efficaces et optimisés, qui
+                couvrent l’essentiel sans superflu ? Cette gamme est faite pour
+                vous. Elle vous garantit le respect des réglementations et vous
+                apporte les prestations indispensables pour assurer le bon
+                fonctionnement de votre site. Simplicité et efficacité sont au
+                rendez-vous.
               </p>
             </div>
             <div className="flex flex-col gap-4 mx-auto">
@@ -46,11 +49,11 @@ const page = () => {
                 Gamme Confort
               </h2>
               <p className="text-lg md:ml-10 max-w-prose mx-auto">
-                Vous êtes en recherche du{" "}
-                <strong>bon rapport qualité prix</strong>. Le strict minimum
-                vous semble un peu juste pour cette prestation et vous cherchez
-                le bon équilibre. Dans cette formule, tout est géré clé en main,
-                sans contraintes.
+                Pour vous, le bon équilibre entre qualité et prix est essentiel.
+                Si le strict minimum ne suffit pas, la Gamme Confort offre une
+                solution clé en main, sans contraintes. Vous bénéficiez d’une
+                gestion complète des prestations pour un confort optimal, tout
+                en restant dans une logique de maîtrise des coûts.
               </p>
             </div>
             <div className="flex flex-col gap-4 mx-auto">
@@ -58,13 +61,60 @@ const page = () => {
                 Gamme Excellence
               </h2>
               <p className="text-lg md:ml-10 max-w-prose mx-auto">
-                <strong>Le bien être au travail</strong>, c&apos;est important.
-                Vous investissez sur les services envers vos collaborateurs, car
-                ils vous le rendent bien. L&apos;excellence de service vous
-                donne tranquillité d&apos;esprit.
+                Vous placez le bien-être de vos collaborateurs au cœur de vos
+                priorités. Avec la Gamme Excellence, vous investissez dans des
+                services premium qui valorisent votre entreprise et garantissent
+                une expérience optimale. L’excellence du service vous offre une
+                tranquillité d’esprit totale tout en renforçant votre marque
+                employeur.
               </p>
             </div>
           </div>
+        </div>
+        <div className="flex flex-col gap-6 w-full mx-auto hyphens-auto text-wrap text-lg mt-10">
+          <p className="text-2xl">Quelle gamme de services choisir ?</p>
+          <div className="flex flex-col gap-6 justify-between md:w-5/6 mx-auto md:flex-row">
+            <div className="h-[180px] w-[300px] relative rounded-xl overflow-hidden hidden lg:block">
+              <Image
+                src={"/img/baer_otis.png"}
+                alt={"photo d'otis mon scribe"}
+                fill={true}
+              />
+            </div>
+            <div className="flex flex-col gap-4 flex-1">
+              <p>
+                Comme dirait Edouard Baer, “Il n’y a pas de bonne ou de mauvaise
+                gamme” : chaque solution répond à des besoins et des niveaux
+                d’exigences différents.
+              </p>
+              <p>
+                Nous n’offrons pas de services low-cost, mais des options
+                adaptées à votre stratégie, à votre image de marque et à vos
+                objectifs budgétaires. Vous avez ainsi la liberté de choisir la
+                gamme la plus en phase avec vos attentes et vos priorités.
+              </p>
+            </div>
+          </div>
+          <p className="md:w-5/6 mx-auto">
+            Pour chaque prestation, vous pouvez sélectionner un niveau de gamme
+            qui reflète vos ambitions en matière de qualité de service, de
+            gestion des ressources et de positionnement stratégique.
+          </p>
+        </div>
+        <div className="flex flex-col gap-6 w-full mx-auto hyphens-auto text-wrap text-lg">
+          <p className="text-2xl">Quels prestataires choisir ?</p>
+          <p className="md:w-5/6 mx-auto">
+            La bonne nouvelle, c’est que tous les prestataires référencés sur
+            notre plateforme ont été rigoureusement sélectionnés. Nous
+            collaborons uniquement avec des entreprises qui partagent nos
+            valeurs : sens du service, réactivité, engagement envers la qualité
+            et tarifs compétitifs.
+          </p>
+          <p className="md:w-5/6 mx-auto">
+            Tous nos partenaires respectent une charte d’achat exigeante et
+            s’engagent à respecter nos Conditions Générales de Vente (CGV). Vous
+            avez donc la garantie d’un service aligné sur vos attentes.
+          </p>
         </div>
       </article>
     </main>

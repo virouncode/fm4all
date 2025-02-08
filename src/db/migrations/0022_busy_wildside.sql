@@ -1,0 +1,1 @@
+ALTER TABLE "fruits_quantites" RENAME COLUMN "kilos_par_semaine" TO "kg_par_semaine";

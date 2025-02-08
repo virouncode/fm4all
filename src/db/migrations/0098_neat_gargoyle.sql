@@ -1,0 +1,1 @@
+DROP TABLE "q18_tarifs" CASCADE;

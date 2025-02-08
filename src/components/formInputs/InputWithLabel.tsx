@@ -16,13 +16,15 @@ type InputWithLabelProps<S> = {
   fieldTitle?: string;
   nameInSchema: keyof S & string; //to prevent typos errors in the name of the field
   className?: string;
-  handleChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  containerClassName?: string;
+  handleChange?: (e: ChangeEvent<HTMLInputElement>) => void;
 } & InputHTMLAttributes<HTMLInputElement>;
 
 export function InputWithLabel<S>({
   fieldTitle,
   nameInSchema,
   className,
+  containerClassName,
   handleChange,
   ...props
 }: InputWithLabelProps<S>) {
@@ -35,7 +37,7 @@ export function InputWithLabel<S>({
       control={control}
       name={nameInSchema}
       render={({ field }) => (
-        <FormItem>
+        <FormItem className={containerClassName}>
           {fieldTitle && (
             <FormLabel htmlFor={nameInSchema} className="text-base">
               {fieldTitle}
@@ -49,7 +51,7 @@ export function InputWithLabel<S>({
               {...field} // Provides onChange, onBlur, name, ref, and value to the child component
               onChange={(e) => {
                 field.onChange(e);
-                handleChange(e);
+                if (handleChange) handleChange(e);
               }}
             />
           </FormControl>

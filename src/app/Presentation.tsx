@@ -1,39 +1,53 @@
+import DevisButton from "@/components/devis-button";
+import Image from "next/image";
+
 const Presentation = () => {
   return (
     <section
       className="max-w-7xl w-full mx-auto flex flex-col gap-8 p-6 text-lg hyphens-auto text-wrap"
       id="presentation"
     >
-      <p className="text-center font-bold text-xl">
-        TPE/PME en Île-de-France? <br />
-        Vous emménagez dans de nouveaux bureaux? <br />
-        Ou envie d’améliorer vos services actuels ?
-      </p>
-      <div className="flex flex-col gap-4 max-w-prose mx-auto">
-        <p>
-          <strong>fm4all</strong> simplifie vos démarches d’achats et de gestion
-          avec sa <strong>plateforme de Facility Management</strong> : un seul
-          contact, un seul contrat et une seule facture pour toutes vos
-          prestations.
-        </p>
-        <p>
-          Choisissez en ligne des prestataires de confiance{" "}
-          <strong>au meilleur prix</strong> : nettoyage, café, fontaine à eau,
-          sécurité incendie, office management, et plus encore. Gamme Essentiel,
-          Confort ou Excellence : Simplifiez, Comparez et Déléguez en quelques
-          clics.
-        </p>
-        <p>Prêt à optimiser la gestion de vos bureaux ?</p>
+      <div className="flex gap-8 justify-center">
+        <div className="flex flex-col gap-6">
+          <p className="text-center font-bold text-xl">
+            TPE/PME en Île-de-France? <br />
+            Vous emménagez dans de nouveaux bureaux? <br />
+            Ou envie d’améliorer vos services actuels ?
+          </p>
+          <div className="flex flex-col gap-4 max-w-prose mx-auto">
+            <p>
+              <strong>fm4all</strong> simplifie vos démarches d’achats et de
+              gestion avec sa <strong>plateforme de Facility Management</strong>{" "}
+              : un seul contact, un seul contrat et une seule facture pour
+              toutes vos prestations.
+            </p>
+            <p>
+              Choisissez en ligne des prestataires de confiance{" "}
+              <strong>au meilleur prix</strong> : nettoyage, café, fontaine à
+              eau, sécurité incendie, office management, et plus encore.{" "}
+              <strong>
+                Gamme Essentiel, Confort ou Excellence : Simplifiez, Comparez et
+                Déléguez
+              </strong>{" "}
+              en quelques clics.
+            </p>
+            <p className="mb-6">Prêt à optimiser la gestion de vos bureaux ?</p>
+            <DevisButton
+              title="Obtenez votre devis en quelques clics"
+              text="Obtenez votre devis en quelques clics"
+              size="lg"
+              className="self-start mx-auto"
+            />
+          </div>
+        </div>
+        <div className="h-[420px] w-[420px] relative md:block hidden rounded-xl overflow-hidden">
+          <Image
+            src={"/img/zen_2.png"}
+            alt={"image-collaboratrice-zen"}
+            fill={true}
+          />
+        </div>
       </div>
-      {/* <Button
-        variant="destructive"
-        size="lg"
-        className="w-full md:w-auto text-base self-start mx-auto"
-      >
-        <Link href="/mon-devis/mes-locaux">
-          Obtenez votre devis en quelques clics
-        </Link>
-      </Button> */}
     </section>
   );
 };

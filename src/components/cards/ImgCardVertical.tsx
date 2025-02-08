@@ -17,7 +17,7 @@ const ImgCardVertical = ({
     <div
       className={`flex flex-col gap-4 rounded-xl border bg-card text-card-foreground shadow overflow-hidden ${className}`}
     >
-      <div className="w-full h-64 relative">
+      <div className="w-full h-64 relative max-w-96 mx-auto">
         <Image src={src} alt={alt} fill={true} />
       </div>
       {children}

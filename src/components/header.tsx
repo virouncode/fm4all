@@ -14,6 +14,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import DevisButton from "./devis-button";
 import { ModeToggle } from "./mode-toggle";
 
 const Header = () => {
@@ -38,7 +39,7 @@ const Header = () => {
           <div className="relative h-[23px] w-[100px] ">
             <Link href="/">
               <Image
-                src="/img/logo-full.png"
+                src="/img/logo_full.png"
                 alt="Logo"
                 fill={true}
                 quality={100}
@@ -90,9 +91,12 @@ const Header = () => {
           </nav>
         </div>
         <div className="flex items-center gap-4">
-          {/* <Button title="Mon devis en ligne" variant="destructive">
-            <Link href="/mon-devis/mes-locaux">Mon devis en ligne</Link>
-          </Button> */}
+          <DevisButton
+            title="Mon devis en ligne"
+            text="Mon devis en ligne"
+            className="text-sm"
+            disabled={path.includes("/mon-devis")}
+          />
           <Button
             title="Devenir prestataire"
             variant="outline"
@@ -113,9 +117,9 @@ const Header = () => {
               onClick={handleShowMobileNav}
             />
           )}
-          <div className="lg:flex hidden">
+          {/* <div className="lg:flex hidden">
             <ModeToggle />
-          </div>
+          </div> */}
         </div>
         <div
           className={`flex items-center justify-center fixed top-16 left-0 right-0 bg-background shadow-lg h-[calc(100vh-4rem)] text-2xl  ${

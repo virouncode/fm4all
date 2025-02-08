@@ -28,7 +28,9 @@ type SelectWithLabelProps<S> = {
   nameInSchema: keyof S & string;
   data: DataObj[];
   className?: string;
-  handleSelect: (value: string, name: string) => void;
+  containerClassName?: string;
+  handleSelect?: (value: string, name: string) => void;
+  disabled?: boolean;
 };
 
 export function SelectWithLabel<S>({
@@ -36,7 +38,9 @@ export function SelectWithLabel<S>({
   nameInSchema,
   data,
   className,
+  containerClassName,
   handleSelect,
+  disabled = false,
 }: SelectWithLabelProps<S>) {
   const { control, formState } = useFormContext();
   const error = formState.errors[nameInSchema];
@@ -47,7 +51,7 @@ export function SelectWithLabel<S>({
       control={control} //object that contains methods to register component into React Hook Form.
       name={nameInSchema}
       render={({ field }) => (
-        <FormItem>
+        <FormItem className={containerClassName}>
           <FormLabel className="text-base" htmlFor={nameInSchema}>
             {fieldTitle}
           </FormLabel>
@@ -55,7 +59,7 @@ export function SelectWithLabel<S>({
             // defaultValue={field.value.toString()}
             onValueChange={(e) => {
               field.onChange(e);
-              handleSelect(e, nameInSchema);
+              if (handleSelect) handleSelect(e, nameInSchema);
             }}
             value={field.value.toString()}
           >
@@ -67,6 +71,7 @@ export function SelectWithLabel<S>({
                   color:
                     data?.find((item) => item.id === field.value)?.color ?? "",
                 }}
+                disabled={disabled}
               >
                 <SelectValue placeholder="Choisir" />
               </SelectTrigger>

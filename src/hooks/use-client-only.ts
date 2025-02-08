@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export const useClientOnly = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -7,7 +7,5 @@ export const useClientOnly = () => {
     setIsMounted(true);
   }, []);
 
-  if (!isMounted) {
-    return null;
-  }
+  return isMounted;
 };

@@ -5,6 +5,10 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
+body > div:last-child > span + img {
+  /*pour html2canvas */
+  display: inline !important;
+}
 
 @layer base {
   :root {

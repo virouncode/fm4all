@@ -1,0 +1,1 @@
+ALTER TYPE "public"."typehygiene" ADD VALUE 'poubelleEmp' BEFORE 'savon';
