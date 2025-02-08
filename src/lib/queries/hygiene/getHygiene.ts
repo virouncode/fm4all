@@ -28,6 +28,7 @@ export const getHygieneDistribQuantite = async (effectif: string) => {
     }
     const formattedResults = {
       ...results[0],
+      nbDistribEmpPoubelle: results[0].nbDistribEmp,
       nbDistribDesinfectant: results[0].nbDistribPh,
       nbDistribParfum: results[0].nbDistribEmp,
       nbDistribBalai: results[0].nbDistribPh,

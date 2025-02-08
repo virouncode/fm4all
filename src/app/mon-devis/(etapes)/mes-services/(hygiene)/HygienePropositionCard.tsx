@@ -12,6 +12,7 @@ type HygienePropositionCardProps = {
     nbDistribSavon: number;
     nbDistribPh: number;
     prixDistribEmp: number | null;
+    prixDistribEmpPoubelle: number | null;
     prixDistribSavon: number | null;
     prixDistribPh: number | null;
     prixInstalDistrib: number | null;
@@ -23,6 +24,7 @@ type HygienePropositionCardProps = {
     nbDistribSavon: number;
     nbDistribPh: number;
     prixDistribEmp: number | null;
+    prixDistribEmpPoubelle: number | null;
     prixDistribSavon: number | null;
     prixDistribPh: number | null;
     prixInstalDistrib: number | null;

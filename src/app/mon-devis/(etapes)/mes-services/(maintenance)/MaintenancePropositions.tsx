@@ -1,6 +1,6 @@
 import { MaintenanceContext } from "@/context/MaintenanceProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
-import { gammes, GammeType } from "@/zod-schemas/gamme";
+import { gammes } from "@/zod-schemas/gamme";
 import { SelectLegioTarifsType } from "@/zod-schemas/legioTarifs";
 import { SelectMaintenanceQuantitesType } from "@/zod-schemas/maintenanceQuantites";
 import { SelectMaintenanceTarifsType } from "@/zod-schemas/maintenanceTarifs";
@@ -13,17 +13,17 @@ import MaintenancePropositionCard from "./MaintenancePropositionCard";
 type MaintenancePropositionsProps = {
   maintenanceQuantites: SelectMaintenanceQuantitesType[];
   maintenanceTarifs: SelectMaintenanceTarifsType[];
-  q18Tarif: SelectQ18TarifsType;
-  legioTarif: SelectLegioTarifsType;
-  qualiteAirTarif: SelectQualiteAirTarifsType;
+  q18Tarifs: SelectQ18TarifsType[];
+  legioTarifs: SelectLegioTarifsType[];
+  qualiteAirTarifs: SelectQualiteAirTarifsType[];
 };
 
 const MaintenancePropositions = ({
   maintenanceQuantites,
   maintenanceTarifs,
-  q18Tarif,
-  legioTarif,
-  qualiteAirTarif,
+  q18Tarifs,
+  legioTarifs,
+  qualiteAirTarifs,
 }: MaintenancePropositionsProps) => {
   const { maintenance, setMaintenance } = useContext(MaintenanceContext);
   const { setTotalMaintenance } = useContext(TotalMaintenanceContext);
@@ -44,18 +44,26 @@ const MaintenancePropositions = ({
         ?.freqAnnuelle ?? null;
     const totalAnnuelService =
       freqAnnuelle !== null ? hParPassage * tauxHoraire * freqAnnuelle : null;
-    const totalAnnuelQ18 = q18Tarif.prixAnnuel;
-    const totalAnnuelLegio = legioTarif.prixAnnuel;
-    const totalAnnuelQualiteAir = qualiteAirTarif.prixAnnuel;
+    const totalAnnuelQ18 =
+      q18Tarifs.find((item) => item.fournisseurId === fournisseurId)
+        ?.prixAnnuel ?? null;
+    const totalAnnuelLegio =
+      legioTarifs.find((item) => item.fournisseurId === fournisseurId)
+        ?.prixAnnuel ?? null;
+    const totalAnnuelQualiteAir =
+      qualiteAirTarifs.find((item) => item.fournisseurId === fournisseurId)
+        ?.prixAnnuel ?? null;
 
     const totalAnnuelControlesSupplementaires =
       gamme === "essentiel"
         ? totalAnnuelQ18
         : gamme === "confort"
-        ? totalAnnuelQ18 + totalAnnuelLegio
-        : totalAnnuelQ18 + totalAnnuelLegio + totalAnnuelQualiteAir;
+        ? (totalAnnuelQ18 ?? 0) + (totalAnnuelLegio ?? 0)
+        : (totalAnnuelQ18 ?? 0) +
+          (totalAnnuelLegio ?? 0) +
+          (totalAnnuelQualiteAir ?? 0);
     const totalAnnuel = totalAnnuelService
-      ? totalAnnuelService + totalAnnuelControlesSupplementaires
+      ? totalAnnuelService + (totalAnnuelControlesSupplementaires ?? 0)
       : null;
     return {
       id,
@@ -79,7 +87,7 @@ const MaintenancePropositions = ({
       number,
       {
         id: number;
-        gamme: GammeType;
+        gamme: "essentiel" | "confort" | "excellence";
         nomFournisseur: string;
         fournisseurId: number;
         sloganFournisseur: string | null;
@@ -87,9 +95,9 @@ const MaintenancePropositions = ({
         tauxHoraire: number;
         freqAnnuelle: number | null;
         totalAnnuelService: number | null;
-        totalAnnuelQ18: number;
-        totalAnnuelLegio: number;
-        totalAnnuelQualiteAir: number;
+        totalAnnuelQ18: number | null;
+        totalAnnuelLegio: number | null;
+        totalAnnuelQualiteAir: number | null;
         totalAnnuel: number | null;
       }[]
     >
@@ -111,7 +119,7 @@ const MaintenancePropositions = ({
 
   const handleClickProposition = (proposition: {
     id: number;
-    gamme: GammeType;
+    gamme: "essentiel" | "confort" | "excellence";
     nomFournisseur: string;
     fournisseurId: number;
     sloganFournisseur: string | null;
@@ -119,9 +127,9 @@ const MaintenancePropositions = ({
     tauxHoraire: number;
     freqAnnuelle: number | null;
     totalAnnuelService: number | null;
-    totalAnnuelQ18: number;
-    totalAnnuelLegio: number;
-    totalAnnuelQualiteAir: number;
+    totalAnnuelQ18: number | null;
+    totalAnnuelLegio: number | null;
+    totalAnnuelQualiteAir: number | null;
     totalAnnuel: number | null;
   }) => {
     const {

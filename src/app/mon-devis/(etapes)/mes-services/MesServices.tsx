@@ -9,11 +9,11 @@ import {
   getIncendieTarifs,
 } from "@/lib/queries/incendie/getIncendie";
 import {
-  getLegioTarif,
+  getLegioTarifs,
   getMaintenanceQuantites,
   getMaintenanceTarifs,
-  getQ18Tarif,
-  getQualiteAirTarif,
+  getQ18Tarifs,
+  getQualiteAirTarifs,
 } from "@/lib/queries/maintenance/getMaintenance";
 import {
   getNettoyageQuantites,
@@ -50,9 +50,9 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
     incendieTarifs,
     maintenanceQuantites,
     maintenanceTarifs,
-    q18Tarif,
-    legioTarif,
-    qualiteAirTarif,
+    q18Tarifs,
+    legioTarifs,
+    qualiteAirTarifs,
   ] = await Promise.all([
     getNettoyageQuantites(surface),
     getNettoyageTarifs(surface),
@@ -66,9 +66,9 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
     getIncendieTarifs(surface),
     getMaintenanceQuantites(surface),
     getMaintenanceTarifs(surface),
-    getQ18Tarif(surface),
-    getLegioTarif(surface),
-    getQualiteAirTarif(surface),
+    getQ18Tarifs(surface),
+    getLegioTarifs(surface),
+    getQualiteAirTarifs(surface),
   ]);
 
   if (
@@ -96,9 +96,12 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
     !maintenanceQuantites ||
     maintenanceQuantites.length === 0 ||
     !incendieQuantite ||
-    !q18Tarif ||
-    !legioTarif ||
-    !qualiteAirTarif
+    !q18Tarifs ||
+    q18Tarifs.length === 0 ||
+    !legioTarifs ||
+    legioTarifs.length === 0 ||
+    !qualiteAirTarifs ||
+    qualiteAirTarifs.length === 0
   ) {
     return (
       <section className="flex h-dvh items-center justify-center text-lg">
@@ -145,9 +148,9 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
       <Maintenance
         maintenanceQuantites={maintenanceQuantites}
         maintenanceTarifs={maintenanceTarifs}
-        q18Tarif={q18Tarif}
-        legioTarif={legioTarif}
-        qualiteAirTarif={qualiteAirTarif}
+        q18Tarifs={q18Tarifs}
+        legioTarifs={legioTarifs}
+        qualiteAirTarifs={qualiteAirTarifs}
       />
       <SecuriteIncendie
         incendieQuantite={incendieQuantite}

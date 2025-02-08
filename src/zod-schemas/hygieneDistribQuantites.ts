@@ -14,6 +14,9 @@ export const selectHygieneDistribQuantitesSchema = createSelectSchema(
       schema.min(1, "Le nombre de distributeurs ph est obligatoire"),
   }
 ).extend({
+  nbDistribEmpPoubelle: z
+    .number()
+    .min(1, "Le nombre de distributeurs poubelle emp est obligatoire"),
   nbDistribDesinfectant: z
     .number()
     .min(1, "Le nombre de distributeurs désinfectant est obligatoire"),

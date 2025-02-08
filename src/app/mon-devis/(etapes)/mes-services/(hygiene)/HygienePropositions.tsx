@@ -40,6 +40,9 @@ const HygienePropositions = ({
   const effectif = client.effectif ?? 0;
   const nbDistribEmp =
     hygiene.quantites.nbDistribEmp || hygieneDistribQuantite.nbDistribEmp;
+  const nbDistribEmpPoubelle =
+    hygiene.quantites.nbDistribEmpPoubelle ||
+    hygieneDistribQuantite.nbDistribEmpPoubelle;
   const nbDistribSavon =
     hygiene.quantites.nbDistribSavon || hygieneDistribQuantite.nbDistribSavon;
   const nbDistribPh =
@@ -74,6 +77,7 @@ const HygienePropositions = ({
     nbDistribSavon: number;
     nbDistribPh: number;
     prixDistribEmp: number | null;
+    prixDistribEmpPoubelle: number | null;
     prixDistribSavon: number | null;
     prixDistribPh: number | null;
     prixInstalDistrib: number | null;
@@ -82,6 +86,7 @@ const HygienePropositions = ({
     const {
       gamme,
       prixDistribEmp,
+      prixDistribEmpPoubelle,
       prixDistribSavon,
       prixDistribPh,
       prixInstalDistrib,
@@ -99,6 +104,7 @@ const HygienePropositions = ({
         prix: {
           ...prev.prix,
           prixDistribEmp: null,
+          prixDistribEmpPoubelle: null,
           prixDistribSavon: null,
           prixDistribPh: null,
           prixInstalDistrib: null,
@@ -128,6 +134,7 @@ const HygienePropositions = ({
       prix: {
         ...prev.prix,
         prixDistribEmp,
+        prixDistribEmpPoubelle,
         prixDistribSavon,
         prixDistribPh,
         prixInstalDistrib,
@@ -204,6 +211,7 @@ const HygienePropositions = ({
             quantites: {
               ...prev.quantites,
               nbDistribEmp: newNbrEmp,
+              nbDistribEmpPoubelle: newNbrEmp,
             },
           }));
           break;
@@ -242,6 +250,10 @@ const HygienePropositions = ({
       hygieneDistribTarifsFournisseur.find(
         (item) => item.type === "emp" && item.gamme === gamme
       )?.[dureeLocation] ?? null;
+    const prixDistribEmpPoubelle =
+      hygieneDistribTarifsFournisseur.find(
+        (item) => item.type === "poubelleEmp" && item.gamme === gamme
+      )?.[dureeLocation] ?? null;
     const prixDistribSavon =
       hygieneDistribTarifsFournisseur.find(
         (item) => item.type === "savon" && item.gamme === gamme
@@ -267,11 +279,15 @@ const HygienePropositions = ({
           quantites: {
             ...prev.quantites,
             nbDistribEmp: newNbrEmp,
+            nbDistribEmpPoubelle: newNbrEmp,
           },
         }));
         totalEmp =
-          prixDistribEmp !== null && paParPersonneEmp !== null
-            ? newNbrEmp * prixDistribEmp + paParPersonneEmp * effectif
+          prixDistribEmp !== null &&
+          paParPersonneEmp !== null &&
+          prixDistribEmpPoubelle !== null
+            ? newNbrEmp * (prixDistribEmp + prixDistribEmpPoubelle) +
+              paParPersonneEmp * effectif
             : null;
         totalSavon =
           prixDistribSavon !== null && paParPersonneSavon !== null
@@ -305,8 +321,11 @@ const HygienePropositions = ({
           },
         }));
         totalEmp =
-          prixDistribEmp !== null && paParPersonneEmp !== null
-            ? nbDistribEmp * prixDistribEmp + paParPersonneEmp * effectif
+          prixDistribEmp !== null &&
+          paParPersonneEmp !== null &&
+          prixDistribEmpPoubelle !== null
+            ? nbDistribEmp * (prixDistribEmp + prixDistribEmpPoubelle) +
+              paParPersonneEmp * effectif
             : null;
         totalSavon =
           prixDistribSavon !== null && paParPersonneSavon !== null
@@ -340,8 +359,11 @@ const HygienePropositions = ({
           },
         }));
         totalEmp =
-          prixDistribEmp !== null && paParPersonneEmp !== null
-            ? nbDistribEmp * prixDistribEmp + paParPersonneEmp * effectif
+          prixDistribEmp !== null &&
+          paParPersonneEmp !== null &&
+          prixDistribEmpPoubelle !== null
+            ? nbDistribEmp * (prixDistribEmp + prixDistribEmpPoubelle) +
+              paParPersonneEmp * effectif
             : null;
         totalSavon =
           prixDistribSavon !== null && paParPersonneSavon !== null
@@ -370,6 +392,12 @@ const HygienePropositions = ({
       hygieneDistribTarifsFournisseur.find(
         (tarif) =>
           tarif.type === "emp" &&
+          tarif.gamme === hygiene.infos.trilogieGammeSelected
+      )?.[value] ?? null;
+    const prixDistribEmpPoubelle =
+      hygieneDistribTarifsFournisseur.find(
+        (tarif) =>
+          tarif.type === "poubelleEmp" &&
           tarif.gamme === hygiene.infos.trilogieGammeSelected
       )?.[value] ?? null;
     const prixDistribSavon =
@@ -416,8 +444,11 @@ const HygienePropositions = ({
     const paParPersonneDesinfectant = hygiene.prix.paParPersonneDesinfectant;
 
     const totalEmp =
-      prixDistribEmp !== null && paParPersonneEmp !== null
-        ? nbDistribEmp * prixDistribEmp + paParPersonneEmp * effectif
+      prixDistribEmp !== null &&
+      paParPersonneEmp !== null &&
+      prixDistribEmpPoubelle !== null
+        ? nbDistribEmp * (prixDistribEmp + prixDistribEmpPoubelle) +
+          paParPersonneEmp * effectif
         : null;
     const totalSavon =
       prixDistribSavon !== null && paParPersonneSavon !== null
@@ -471,6 +502,7 @@ const HygienePropositions = ({
       prix: {
         ...prev.prix,
         prixDistribEmp,
+        prixDistribEmpPoubelle,
         prixDistribSavon,
         prixDistribPh,
         prixDistribDesinfectant,

@@ -25,9 +25,9 @@ type MaintenancePropositionCardProps = {
     tauxHoraire: number;
     freqAnnuelle: number | null;
     totalAnnuelService: number | null;
-    totalAnnuelQ18: number;
-    totalAnnuelLegio: number;
-    totalAnnuelQualiteAir: number;
+    totalAnnuelQ18: number | null;
+    totalAnnuelLegio: number | null;
+    totalAnnuelQualiteAir: number | null;
     totalAnnuel: number | null;
   };
   handleClickProposition: (proposition: {
@@ -40,9 +40,9 @@ type MaintenancePropositionCardProps = {
     tauxHoraire: number;
     freqAnnuelle: number | null;
     totalAnnuelService: number | null;
-    totalAnnuelQ18: number;
-    totalAnnuelLegio: number;
-    totalAnnuelQualiteAir: number;
+    totalAnnuelQ18: number | null;
+    totalAnnuelLegio: number | null;
+    totalAnnuelQualiteAir: number | null;
     totalAnnuel: number | null;
   }) => void;
 };

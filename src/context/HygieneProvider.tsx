@@ -30,6 +30,7 @@ export const HygieneContext = createContext<{
     },
     quantites: {
       nbDistribEmp: null,
+      nbDistribEmpPoubelle: null,
       nbDistribSavon: null,
       nbDistribPh: null,
       nbDistribDesinfectant: null,
@@ -39,6 +40,7 @@ export const HygieneContext = createContext<{
     },
     prix: {
       prixDistribEmp: null,
+      prixDistribEmpPoubelle: null,
       prixDistribSavon: null,
       prixDistribPh: null,
       prixDistribDesinfectant: null,
@@ -74,6 +76,7 @@ const HygieneProvider = ({ children }: PropsWithChildren) => {
     },
     quantites: {
       nbDistribEmp: null,
+      nbDistribEmpPoubelle: null,
       nbDistribSavon: null,
       nbDistribPh: null,
       nbDistribDesinfectant: null,
@@ -83,6 +86,7 @@ const HygieneProvider = ({ children }: PropsWithChildren) => {
     },
     prix: {
       prixDistribEmp: null,
+      prixDistribEmpPoubelle: null,
       prixDistribSavon: null,
       prixDistribPh: null,
       prixDistribDesinfectant: null,

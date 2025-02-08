@@ -16,17 +16,17 @@ import MaintenancePropositions from "./MaintenancePropositions";
 type MaintenanceProps = {
   maintenanceQuantites: SelectMaintenanceQuantitesType[];
   maintenanceTarifs: SelectMaintenanceTarifsType[];
-  q18Tarif: SelectQ18TarifsType;
-  legioTarif: SelectLegioTarifsType;
-  qualiteAirTarif: SelectQualiteAirTarifsType;
+  q18Tarifs: SelectQ18TarifsType[];
+  legioTarifs: SelectLegioTarifsType[];
+  qualiteAirTarifs: SelectQualiteAirTarifsType[];
 };
 
 const Maintenance = ({
   maintenanceQuantites,
   maintenanceTarifs,
-  q18Tarif,
-  legioTarif,
-  qualiteAirTarif,
+  q18Tarifs,
+  legioTarifs,
+  qualiteAirTarifs,
 }: MaintenanceProps) => {
   const { hygiene } = useContext(HygieneContext);
   const { nettoyage } = useContext(NettoyageContext);
@@ -73,9 +73,9 @@ const Maintenance = ({
           <MaintenancePropositions
             maintenanceQuantites={maintenanceQuantites}
             maintenanceTarifs={maintenanceTarifs}
-            q18Tarif={q18Tarif}
-            legioTarif={legioTarif}
-            qualiteAirTarif={qualiteAirTarif}
+            q18Tarifs={q18Tarifs}
+            legioTarifs={legioTarifs}
+            qualiteAirTarifs={qualiteAirTarifs}
           />
         </div>
       )}

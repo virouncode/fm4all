@@ -16,6 +16,9 @@ export const getFormattedHygienePropositions = (
   //Nombre de distributeurs
   const nbDistribEmp =
     hygiene.quantites.nbDistribEmp || hygieneDistribQuantite.nbDistribEmp;
+  const nbDistribEmpPoubelle =
+    hygiene.quantites.nbDistribEmpPoubelle ||
+    hygieneDistribQuantite.nbDistribEmpPoubelle;
   const nbDistribSavon =
     hygiene.quantites.nbDistribSavon || hygieneDistribQuantite.nbDistribSavon;
   const nbDistribPh =
@@ -41,6 +44,11 @@ export const getFormattedHygienePropositions = (
         (tarif) => tarif.type === "emp" && tarif.gamme === gamme
       )?.[dureeLocation] ?? null;
 
+    const prixDistribEmpPoubelle =
+      hygieneDistribTarifsFournisseur.find(
+        (tarif) => tarif.type === "poubelleEmp" && tarif.gamme === gamme
+      )?.[dureeLocation] ?? null;
+
     const prixDistribSavon =
       hygieneDistribTarifsFournisseur.find(
         (tarif) => tarif.type === "savon" && tarif.gamme === gamme
@@ -53,12 +61,14 @@ export const getFormattedHygienePropositions = (
 
     const totalAnnuelTrilogie =
       prixDistribEmp !== null &&
+      prixDistribEmpPoubelle !== null &&
       prixDistribSavon !== null &&
       prixDistribPh !== null &&
       paParPersonneEmp !== null &&
       paParPersonneSavon !== null &&
       paParPersonnePh !== null
         ? nbDistribEmp * prixDistribEmp +
+          nbDistribEmpPoubelle * prixDistribEmpPoubelle +
           nbDistribSavon * prixDistribSavon +
           nbDistribPh * prixDistribPh +
           (paParPersonneEmp + paParPersonneSavon + paParPersonnePh) * effectif
@@ -70,6 +80,7 @@ export const getFormattedHygienePropositions = (
       nbDistribSavon,
       nbDistribPh,
       prixDistribEmp,
+      prixDistribEmpPoubelle,
       prixDistribSavon,
       prixDistribPh,
       prixInstalDistrib,

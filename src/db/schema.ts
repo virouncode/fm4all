@@ -24,6 +24,7 @@ export const gammeEnum = pgEnum("gamme", [
 ]);
 export const typeHygieneEnum = pgEnum("typehygiene", [
   "emp",
+  "poubelleEmp",
   "savon",
   "ph",
   "desinfectant",
@@ -206,6 +207,56 @@ export const hygieneConsoTarifs = pgTable("hygiene_conso_tarifs", {
   paParPersonneDesinfectant: integer("pa_par_personne_desinfectant").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
+//MAINTENANCE
+export const maintenanceQuantites = pgTable("maintenance_quantites", {
+  id: serial().primaryKey(),
+  surface: integer().notNull(),
+  freqAnnuelle: integer("freq_annuelle").notNull(),
+  gamme: gammeEnum().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const maintenanceTarifs = pgTable("maintenance_tarifs", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  surface: integer().notNull(),
+  hParPassage: integer("h_par_passage").notNull(),
+  tauxHoraire: integer("taux_horaire").notNull(),
+  gamme: gammeEnum().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const legioTarifs = pgTable("legio_tarifs", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  surface: integer().notNull(),
+  prixAnnuel: integer("prix_annuel").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const q18Tarifs = pgTable("q18_tarifs", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  surface: integer().notNull(),
+  prixAnnuel: integer("prix_annuel").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const qualiteAirTarifs = pgTable("qualite_air_tarifs", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  surface: integer().notNull(),
+  prixAnnuel: integer("prix_annuel").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
 
 //INCENDIE
 export const incendieQuantites = pgTable("incendie_quantites", {
@@ -286,47 +337,6 @@ export const colonnesSechesTarifs = pgTable("colonnes_seches_tarifs", {
     .references(() => fournisseurs.id),
   type: typeColonneEnum().notNull(),
   prixParColonne: integer("prix_par_colonne").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
-//MAINTENANCE
-export const maintenanceQuantites = pgTable("maintenance_quantites", {
-  id: serial().primaryKey(),
-  surface: integer().notNull(),
-  freqAnnuelle: integer("freq_annuelle").notNull(),
-  gamme: gammeEnum().notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
-
-export const maintenanceTarifs = pgTable("maintenance_tarifs", {
-  id: serial().primaryKey(),
-  fournisseurId: integer("fournisseur_id")
-    .notNull()
-    .references(() => fournisseurs.id),
-  surface: integer().notNull(),
-  hParPassage: integer("h_par_passage").notNull(),
-  tauxHoraire: integer("taux_horaire").notNull(),
-  gamme: gammeEnum().notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
-
-export const legioTarifs = pgTable("legio_tarifs", {
-  id: serial().primaryKey(),
-  surface: integer().notNull(),
-  prixAnnuel: integer("prix_annuel").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
-
-export const q18Tarifs = pgTable("q18_tarifs", {
-  id: serial().primaryKey(),
-  surface: integer().notNull(),
-  prixAnnuel: integer("prix_annuel").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
-
-export const qualiteAirTarifs = pgTable("qualite_air_tarifs", {
-  id: serial().primaryKey(),
-  surface: integer().notNull(),
-  prixAnnuel: integer("prix_annuel").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -592,12 +602,6 @@ export const servicesFm4AllOffres = pgTable("services_fm4all_offres", {
   audit: inclusEnum().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
-// export const eauQuantites = pgTable("eau_quantites", {
-//   id: serial().primaryKey(),
-//   effectif: integer().notNull(),
-//   nbFontaines: integer("nb_fontaines").notNull(),
-//   createdAt: timestamp("created_at").notNull().defaultNow(),
-// });
 export const devis = pgTable("devis", {
   id: serial().primaryKey(),
   clientId: integer("client_id")
@@ -636,6 +640,9 @@ export const fournisseursRelations = relations(
     riaTarifs: many(riaTarifs),
     colonnesSechesTarifs: many(colonnesSechesTarifs),
     maintenanceTarifs: many(maintenanceTarifs),
+    legioTarifs: many(legioTarifs),
+    q18Tarifs: many(q18Tarifs),
+    qualiteAirTarifs: many(qualiteAirTarifs),
     cafeMachinesTarifs: many(cafeMachinesTarifs),
     cafeConsoTarifs: many(cafeConsoTarifs),
     laitConsoTarifs: many(laitConsoTarifs),
@@ -786,6 +793,30 @@ export const maintenanceTarifsRelations = relations(
   ({ one }) => ({
     fournisseur: one(fournisseurs, {
       fields: [maintenanceTarifs.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+  })
+);
+
+export const legioTarifsRelations = relations(legioTarifs, ({ one }) => ({
+  fournisseur: one(fournisseurs, {
+    fields: [legioTarifs.fournisseurId],
+    references: [fournisseurs.id],
+  }),
+}));
+
+export const q18TarifsRelations = relations(q18Tarifs, ({ one }) => ({
+  fournisseur: one(fournisseurs, {
+    fields: [q18Tarifs.fournisseurId],
+    references: [fournisseurs.id],
+  }),
+}));
+
+export const qualiteAirTarifsRelations = relations(
+  qualiteAirTarifs,
+  ({ one }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [qualiteAirTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
   })

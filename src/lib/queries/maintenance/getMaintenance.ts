@@ -68,58 +68,64 @@ export const getMaintenanceTarifs = async (surface: string) => {
   }
 };
 
-export const getQ18Tarif = async (surface: string) => {
+export const getQ18Tarifs = async (surface: string) => {
   const roundedSurface = roundSurface(parseInt(surface));
   try {
     const results = await db
       .select()
       .from(q18Tarifs)
       .where(eq(q18Tarifs.surface, roundedSurface));
-    if (results.length === 0) return null;
-    const validatedResult = selectQ18TarifsSchema.parse(results[0]);
-    const data = {
-      ...validatedResult,
-      prixAnnuel: validatedResult.prixAnnuel / RATIO,
-    };
+    if (results.length === 0) return [];
+    const validatedResults = results.map((result) =>
+      selectQ18TarifsSchema.parse(result)
+    );
+    const data = validatedResults.map((result) => ({
+      ...result,
+      prixAnnuel: result.prixAnnuel / RATIO,
+    }));
     return data;
   } catch (err) {
     errorHelper(err);
   }
 };
 
-export const getLegioTarif = async (surface: string) => {
+export const getLegioTarifs = async (surface: string) => {
   const roundedSurface = roundSurface(parseInt(surface));
   try {
     const results = await db
       .select()
       .from(legioTarifs)
       .where(eq(legioTarifs.surface, roundedSurface));
-    if (results.length === 0) return null;
-    const validatedResult = selectLegioTarifsSchema.parse(results[0]);
+    if (results.length === 0) return [];
 
-    const data = {
-      ...validatedResult,
-      prixAnnuel: validatedResult.prixAnnuel / RATIO,
-    };
+    const validatedResults = results.map((result) =>
+      selectLegioTarifsSchema.parse(result)
+    );
+    const data = validatedResults.map((result) => ({
+      ...result,
+      prixAnnuel: result.prixAnnuel / RATIO,
+    }));
     return data;
   } catch (err) {
     errorHelper(err);
   }
 };
 
-export const getQualiteAirTarif = async (surface: string) => {
+export const getQualiteAirTarifs = async (surface: string) => {
   const roundedSurface = roundSurface(parseInt(surface));
   try {
     const results = await db
       .select()
       .from(qualiteAirTarifs)
       .where(eq(qualiteAirTarifs.surface, roundedSurface));
-    if (results.length === 0) return null;
-    const validatedResult = selectQualiteAirTarifsSchema.parse(results[0]);
-    const data = {
-      ...validatedResult,
-      prixAnnuel: validatedResult.prixAnnuel / RATIO,
-    };
+    if (results.length === 0) return [];
+    const validatedResults = results.map((result) =>
+      selectQualiteAirTarifsSchema.parse(result)
+    );
+    const data = validatedResults.map((result) => ({
+      ...result,
+      prixAnnuel: result.prixAnnuel / RATIO,
+    }));
     return data;
   } catch (err) {
     errorHelper(err);

@@ -113,6 +113,7 @@ export const reinitialisationDevis = (
     },
     quantites: {
       nbDistribEmp: null,
+      nbDistribEmpPoubelle: null,
       nbDistribSavon: null,
       nbDistribPh: null,
       nbDistribDesinfectant: null,
@@ -122,6 +123,7 @@ export const reinitialisationDevis = (
     },
     prix: {
       prixDistribEmp: null,
+      prixDistribEmpPoubelle: null,
       prixDistribSavon: null,
       prixDistribPh: null,
       prixDistribDesinfectant: null,

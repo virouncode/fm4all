@@ -162,6 +162,7 @@ const NettoyagePropositions = ({
         },
         prix: {
           prixDistribEmp: null,
+          prixDistribEmpPoubelle: null,
           prixDistribSavon: null,
           prixDistribPh: null,
           prixDistribDesinfectant: null,
@@ -283,6 +284,12 @@ const NettoyagePropositions = ({
           tarif.type === "emp" &&
           tarif.gamme === hygiene.infos.trilogieGammeSelected
       )?.[hygiene.infos.dureeLocation] ?? null;
+    const prixDistribEmpPoubelle =
+      distribsTarifsFournisseur.find(
+        (tarif) =>
+          tarif.type === "poubelleEmp" &&
+          tarif.gamme === hygiene.infos.trilogieGammeSelected
+      )?.[hygiene.infos.dureeLocation] ?? null;
     const prixDistribSavon =
       distribsTarifsFournisseur.find(
         (tarif) =>
@@ -334,6 +341,9 @@ const NettoyagePropositions = ({
 
     const nbDistribEmp =
       hygiene.quantites.nbDistribEmp || hygieneDistribQuantite.nbDistribEmp;
+    const nbDistribEmpPoubelle =
+      hygiene.quantites.nbDistribEmpPoubelle ||
+      hygieneDistribQuantite.nbDistribEmpPoubelle;
     const nbDistribSavon =
       hygiene.quantites.nbDistribSavon || hygieneDistribQuantite.nbDistribSavon;
     const nbDistribPh =
@@ -362,6 +372,7 @@ const NettoyagePropositions = ({
       },
       quantites: {
         nbDistribEmp,
+        nbDistribEmpPoubelle,
         nbDistribSavon,
         nbDistribPh,
         nbDistribDesinfectant,
@@ -371,6 +382,7 @@ const NettoyagePropositions = ({
       },
       prix: {
         prixDistribEmp,
+        prixDistribEmpPoubelle,
         prixDistribSavon,
         prixDistribPh,
         prixDistribDesinfectant,
@@ -388,6 +400,7 @@ const NettoyagePropositions = ({
     const totalTrilogie =
       hygiene.infos.trilogieGammeSelected &&
       prixDistribEmp !== null &&
+      prixDistribEmpPoubelle !== null &&
       prixDistribSavon !== null &&
       prixDistribPh !== null &&
       paParPersonneEmp !== null &&
@@ -396,6 +409,7 @@ const NettoyagePropositions = ({
         ? nbDistribEmp * prixDistribEmp +
           nbDistribSavon * prixDistribSavon +
           nbDistribPh * prixDistribPh +
+          nbDistribEmpPoubelle * prixDistribEmpPoubelle +
           (paParPersonneEmp + paParPersonneSavon + paParPersonnePh) * effectif
         : null;
     const totalDesinfectant =

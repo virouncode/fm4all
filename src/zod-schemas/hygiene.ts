@@ -26,6 +26,7 @@ export const hygieneSchema = z.object({
   }),
   quantites: z.object({
     nbDistribEmp: z.number().nullable(),
+    nbDistribEmpPoubelle: z.number().nullable(),
     nbDistribSavon: z.number().nullable(),
     nbDistribPh: z.number().nullable(),
     nbDistribDesinfectant: z.number().nullable(),
@@ -35,6 +36,7 @@ export const hygieneSchema = z.object({
   }),
   prix: z.object({
     prixDistribEmp: z.number().nullable(),
+    prixDistribEmpPoubelle: z.number().nullable(),
     prixDistribSavon: z.number().nullable(),
     prixDistribPh: z.number().nullable(),
     prixDistribDesinfectant: z.number().nullable(),
