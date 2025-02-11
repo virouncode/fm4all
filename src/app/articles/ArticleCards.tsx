@@ -94,7 +94,7 @@ const ArticleCards = () => {
         </div>
       </ImgCardVertical>
       <ImgCardVertical
-        src="/img/articles/hof-managers.png"
+        src="/img/articles/hof.png"
         alt="illustration-hof-managers"
       >
         <div className="p-4 flex flex-col gap-4 h-52">
