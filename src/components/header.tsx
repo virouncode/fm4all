@@ -15,7 +15,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import DevisButton from "./devis-button";
-import { ModeToggle } from "./mode-toggle";
 
 const Header = () => {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
@@ -130,9 +129,9 @@ const Header = () => {
           role="navigation"
           aria-label="Mobile navigation"
         >
-          <div className="absolute top-4 left-6">
+          {/* <div className="absolute top-4 left-6">
             <ModeToggle />
-          </div>
+          </div> */}
           <div className="flex flex-col gap-4">
             <div className="flex-1 flex flex-col gap-4 ">
               <div
