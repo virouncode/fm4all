@@ -14,16 +14,16 @@ const Hero = () => {
       className="flex items-center justify-center min-h-[calc(100vh-4rem)] md:h-[calc(100vh-4rem)] bg-hero-img bg-cover bg-no-repeat p-6"
       id="hero"
     >
-      <Card className="w-5/6 sm:w-3/4 md:max-w-2xl p-4">
+      <Card className="w-11/12 sm:w-3/4 md:max-w-2xl p-4">
         <CardHeader>
           <CardTitle>
             <h1 className="text-3xl md:text-4xl text-center  text-fm4allsecondary text-pretty">
-              Facility Management For All
+              Trouvez des prestataires de services au meilleur prix.
             </h1>
           </CardTitle>
           <CardDescription>
             <h2 className="text-lg md:text-xl text-center">
-              <em>Trouvez des prestataires de services au meilleur prix.</em>
+              <em>Le Facility Management pour tous</em>
             </h2>
             {/* <p className="flex md:flex-row flex-col items-center text-xl md:text-2xl mt-6 md:justify-center">
               <span>Simplifiez.</span>

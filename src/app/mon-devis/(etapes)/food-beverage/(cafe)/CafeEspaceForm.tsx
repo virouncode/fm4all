@@ -958,8 +958,8 @@ const CafeEspaceForm = ({
           </form>
         </TooltipTrigger>
         <TooltipContent className="max-w-60">
-          Sélectionnez le nombre de personnes pour votre espace café et le type
-          de boissons, avec ou sans Lait/Cacao
+          Choisissez le type de machine avec ou sans lait/cacao, le nombre de
+          personnes pour votre espace café et la durée d’engagement
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

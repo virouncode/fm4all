@@ -105,19 +105,26 @@ const FontaineEspacePropositionCard = ({
   const tooltipEssentiel = (
     <div className="flex flex-col gap-4">
       <p className="text-center text-lg">A poser</p>
-      <p></p>
+      <p className="text-center text-sm">
+        Machine table top à poser sur un plan de travail ou une table
+      </p>
     </div>
   );
   const tooltipConfort = (
     <div className="flex flex-col gap-4">
       <p className="text-center text-lg">Colonne sur pied</p>
-      <p></p>
+      <p className="text-center text-sm">
+        Machine autonome fournie avec un meuble ou un pied
+      </p>
     </div>
   );
   const tooltipExcellence = (
     <div className="flex flex-col gap-4">
       <p className="text-center text-lg">Sur comptoir</p>
-      <p></p>
+      <p className="text-center text-sm">
+        Machine intégrée sous un meuble (non fourni). Seule la colonne de
+        distribution dépasse
+      </p>
     </div>
   );
   const tooltip =

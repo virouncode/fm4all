@@ -79,7 +79,7 @@ const Why = () => {
         <div className="flex flex-col md:flex-row w-full lg:w-3/4 mx-auto border rounded-xl overflow-hidden">
           <div className="w-full md:w-2/3 p-6 md:py-10 md:px-16 flex flex-col gap-4 italic order-last md:order-first">
             <p>
-              “Quand on est client utilisateur de bureaux de moins de 2000m²,
+              “Quand on est client utilisateur de bureaux de moins de 3000m²,
               beaucoup de demandes de devis restent sans réponse. Les ressources
               achats sont limitées, on n&apos;achète pas ça tous les jours, et
               d’ailleurs que mettre dans son cahier des charges ? On perd du
