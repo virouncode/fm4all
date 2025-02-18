@@ -1,4 +1,6 @@
+import { Button } from "@/components/ui/button";
 import { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Nous contacter",
@@ -15,9 +17,27 @@ const page = () => {
           <p>Des questions sur nos services ou nos offres en général ?</p>
           <p>Nous sommes là.</p>
         </div>
+        <div className="flex flex-col items-center justify-center gap-4">
+          <Button variant="destructive" size="lg" className="text-base">
+            <Link
+              href="https://calendly.com/romuald-fm4all/rdv-fm4all"
+              target="_blank"
+            >
+              Je prends un rendez-vous en visio
+            </Link>
+          </Button>
+          <Button variant="destructive" size="lg" className="text-base">
+            Je contacte par téléphone
+            <Link href="tel:+33669311046"></Link>
+          </Button>
+          <Button variant="destructive" size="lg" className="text-base">
+            Je contacte par e-mail
+            <Link href="mailto:contact@fm4all.com"></Link>
+          </Button>
+        </div>
         <div className="flex items-center justify-center w-full">
-          <div className="text-xl">
-            <p>
+          <div>
+            {/* <p>
               Par téléphone :{" "}
               <a
                 className="font-bold underline"
@@ -38,7 +58,7 @@ const page = () => {
               >
                 contact@fm4all.com
               </a>
-            </p>
+            </p> */}
             <p className="text-base text-center mt-4">Romuald Buffe</p>
             <p className="text-base text-center">Dirigeant fm4all</p>
           </div>

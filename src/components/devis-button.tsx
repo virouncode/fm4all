@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ToastAction } from "@/components/ui/toast";
 import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { CommentairesContext } from "@/context/CommentairesProvider";
@@ -41,6 +42,7 @@ import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvide
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { toast } from "@/hooks/use-toast";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
@@ -195,7 +197,12 @@ const DevisButton = ({
   const handleAlert = () => {
     toast({
       description:
-        "Cette fonctionnalité n'est pas optimisée pour votre taille d'écran. Veuillez réessayer sur un écran plus grand.",
+        "Les devis en ligne ne sont pas encore possibles depuis un mobile. Essayez de votre ordinateur ou contactez-nous",
+      action: (
+        <ToastAction altText="Appelez-nous">
+          <Link href="/contact">Contact</Link>
+        </ToastAction>
+      ),
     });
   };
 
