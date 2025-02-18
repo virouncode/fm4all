@@ -27,12 +27,10 @@ const page = () => {
             </Link>
           </Button>
           <Button variant="destructive" size="lg" className="text-base">
-            Je contacte par téléphone
-            <Link href="tel:+33669311046"></Link>
+            <Link href="tel:+33669311046">Je contacte par téléphone</Link>
           </Button>
           <Button variant="destructive" size="lg" className="text-base">
-            Je contacte par e-mail
-            <Link href="mailto:contact@fm4all.com"></Link>
+            <Link href="mailto:contact@fm4all.com">Je contacte par e-mail</Link>
           </Button>
         </div>
         <div className="flex items-center justify-center w-full">
