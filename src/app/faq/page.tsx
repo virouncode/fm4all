@@ -1,4 +1,6 @@
+import { Button } from "@/components/ui/button";
 import { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "FAQ",
@@ -112,6 +114,34 @@ const page = () => {
               interlocuteur. Gagner du temps et de l&apos;argent.
             </p>
           </div>
+        </div>
+        <div className="flex flex-col items-center justify-center gap-4">
+          <Button
+            variant="destructive"
+            size="lg"
+            className="text-base w-full sm:w-2/3 lg:w-1/3"
+          >
+            <Link
+              href="https://calendly.com/romuald-fm4all/rdv-fm4all"
+              target="_blank"
+            >
+              Je prends un rendez-vous en visio
+            </Link>
+          </Button>
+          <Button
+            variant="destructive"
+            size="lg"
+            className="text-base w-full sm:w-2/3 lg:w-1/3"
+          >
+            <Link href="tel:+33669311046">Je contacte par téléphone</Link>
+          </Button>
+          <Button
+            variant="destructive"
+            size="lg"
+            className="text-base w-full sm:w-2/3 lg:w-1/3"
+          >
+            <Link href="mailto:contact@fm4all.com">Je contacte par e-mail</Link>
+          </Button>
         </div>
       </article>
     </main>

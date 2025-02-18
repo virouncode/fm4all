@@ -111,7 +111,7 @@ const Cafe = ({
       <PropositionsTitle
         icon={Coffee}
         title="Boissons chaudes"
-        description="Café expresso, boissons lactées ou gourmandes, choisissez la gamme de machine qui vous convient le mieux. Forfait mensuel tout compris (machine, café, consommables)"
+        description="Café expresso, boissons lactées ou chocolatées, choisissez le type de machine puis la Gamme de grains de café qui vous convient le mieux. Forfait mensuel tout compris (machine, café, consommables)"
         handleClickPrevious={handleClickPrevious}
         previousButton={false}
       />
