@@ -16,7 +16,7 @@ const page = () => {
           5 informations seulement pour obtenir tous vos devis
         </p>
       </div>
-      <section className="flex flex-col gap-10 h-full flex-1">
+      <section className="flex flex-col gap-10 h-full flex-1 overflow-auto">
         <MesLocaux />
       </section>
     </>

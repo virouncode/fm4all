@@ -11,7 +11,7 @@ export default {
     extend: {
       backgroundImage: {
         "hero-img": "url('/img/hero_wallpaper.png')",
-        "hof-img": "url('/img/hof-managers.png')",
+        "hof-img": "url('/img/hof_managers.png')",
       },
       listStyleType: {
         rocket: '"🚀  "',
