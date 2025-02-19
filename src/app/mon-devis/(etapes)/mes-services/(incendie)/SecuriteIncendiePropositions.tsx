@@ -25,11 +25,6 @@ const SecuriteIncendiePropositions = ({
   const { setTotalIncendie } = useContext(TotalIncendieContext);
 
   //Calcul des propositions
-  console.log(
-    "incendie.quantites.nbExtincteurs",
-    incendie.quantites.nbExtincteurs
-  );
-
   const nbExtincteurs =
     incendie.quantites.nbExtincteurs !== null
       ? incendie.quantites.nbExtincteurs
@@ -173,7 +168,6 @@ const SecuriteIncendiePropositions = ({
         //   ? parseInt(value)
         //   : incendieQuantite.nbExtincteurs;
         let newNbExtincteurs = value ? parseInt(value) : 0;
-        console.log("newNbExtincteurs", newNbExtincteurs);
 
         if (newNbExtincteurs > MAX_NB_EXTINCTEURS)
           newNbExtincteurs = MAX_NB_EXTINCTEURS;

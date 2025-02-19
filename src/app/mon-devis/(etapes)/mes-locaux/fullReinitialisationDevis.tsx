@@ -91,7 +91,6 @@ export const fullReinitialisationDevis = (
   setDevisProgress({
     currentStep: 1,
     completedSteps: [],
-    currentStepHasChanged: false,
   });
   //Services
   setNettoyage({

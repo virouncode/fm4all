@@ -9,10 +9,12 @@ export default function useScrollIntoFood() {
       foodBeverage.currentFoodBeverageId.toString()
     );
     if (currentFoodBeverage) {
-      currentFoodBeverage.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-      });
+      setTimeout(() => {
+        currentFoodBeverage.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+        });
+      }, 100);
     }
   }, [foodBeverage.currentFoodBeverageId]);
 }

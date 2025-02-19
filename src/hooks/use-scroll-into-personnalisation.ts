@@ -9,7 +9,9 @@ export default function useScrollIntoPersonnalisation() {
       personnalisation.currentPersonnalisationId.toString()
     );
     if (currentService) {
-      currentService.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      setTimeout(() => {
+        currentService.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }, 100);
     }
   }, [personnalisation.currentPersonnalisationId]);
 }

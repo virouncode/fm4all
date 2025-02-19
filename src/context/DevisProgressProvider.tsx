@@ -19,7 +19,6 @@ export const DevisProgressContext = createContext<{
   devisProgress: {
     currentStep: 1,
     completedSteps: [],
-    currentStepHasChanged: false,
   },
   setDevisProgress: () => {},
 });
@@ -29,7 +28,6 @@ const DevisProgressProvider = ({ children }: PropsWithChildren) => {
   const [devisProgress, setDevisProgress] = useState<DevisProgressType>({
     currentStep: 1,
     completedSteps: [],
-    currentStepHasChanged: false,
   });
 
   useEffect(() => {

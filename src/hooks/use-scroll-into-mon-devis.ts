@@ -8,7 +8,9 @@ export default function useScrollIntoMonDevis() {
       monDevis.currentMonDevisId.toString()
     );
     if (currentMonDevis) {
-      currentMonDevis.scrollIntoView({ behavior: "smooth", block: "end" });
+      setTimeout(() => {
+        currentMonDevis.scrollIntoView({ behavior: "smooth", block: "end" });
+      }, 100);
     }
   }, [monDevis.currentMonDevisId]);
 }

@@ -8,7 +8,9 @@ export default function useScrollIntoService() {
       services.currentServiceId.toString()
     );
     if (currentService) {
-      currentService.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      setTimeout(() => {
+        currentService.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }, 100);
     }
   }, [services.currentServiceId]);
 }

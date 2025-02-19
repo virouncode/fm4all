@@ -36,7 +36,10 @@ const SecuriteIncendie = ({
     const newCompletedSteps = [
       ...new Set([...devisProgress.completedSteps, 1, 2]),
     ].sort((a, b) => a - b);
-    setDevisProgress({ currentStep: 3, completedSteps: newCompletedSteps });
+    setDevisProgress({
+      currentStep: 3,
+      completedSteps: newCompletedSteps,
+    });
     router.push(`/mon-devis/food-beverage?${searchParams.toString()}`);
   };
 
