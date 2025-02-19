@@ -66,9 +66,6 @@ const ServicesFm4All = ({
       });
       return;
     }
-    setManagement({
-      currentManagementId: 1,
-    });
     const searchParams = new URLSearchParams();
     if (client.effectif)
       searchParams.set("effectif", client.effectif.toString());

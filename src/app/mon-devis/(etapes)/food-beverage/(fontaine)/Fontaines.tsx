@@ -34,10 +34,6 @@ const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
   useScrollIntoFontainesEspace();
 
   const handleClickNext = () => {
-    setFoodBeverage((prev) => ({
-      ...prev,
-      currentFoodBeverageId: 1,
-    }));
     const searchParams = new URLSearchParams();
     if (client.effectif)
       searchParams.set("effectif", client.effectif.toString());

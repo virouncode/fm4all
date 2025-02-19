@@ -8,12 +8,10 @@ export default function useScrollIntoManagement() {
       management.currentManagementId.toString()
     );
     if (currentManagement) {
-      setTimeout(() => {
-        currentManagement.scrollIntoView({
-          behavior: "smooth",
-          block: "nearest",
-        });
-      }, 100);
+      currentManagement.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
     }
   }, [management.currentManagementId]);
 }

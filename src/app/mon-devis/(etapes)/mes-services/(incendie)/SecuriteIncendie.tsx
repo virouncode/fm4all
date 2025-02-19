@@ -26,10 +26,6 @@ const SecuriteIncendie = ({
   const router = useRouter();
 
   const handleClickNext = () => {
-    setServices((prev) => ({
-      ...prev,
-      currentServiceId: 1,
-    }));
     const searchParams = new URLSearchParams();
     if (client.effectif)
       searchParams.set("effectif", client.effectif.toString());

@@ -9,6 +9,10 @@ import {
 } from "@/components/ui/breadcrumb";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
+import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
+import { ManagementContext } from "@/context/ManagementProvider";
+import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
+import { ServicesContext } from "@/context/ServicesProvider";
 import { roundSurface } from "@/lib/roundSurface";
 import Link from "next/link";
 import { useContext } from "react";
@@ -21,6 +25,10 @@ import { roundEffectif } from "../../lib/roundEffectif";
 const DevisBreadcrumb = () => {
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const { client } = useContext(ClientContext);
+  const { setServices } = useContext(ServicesContext);
+  const { setFoodBeverage } = useContext(FoodBeverageContext);
+  const { setManagement } = useContext(ManagementContext);
+  const { setPersonnalisation } = useContext(PersonnalisationContext);
 
   const serviceSearchParams = new URLSearchParams();
   const sauvegarderSearchParams = new URLSearchParams();
@@ -88,6 +96,29 @@ const DevisBreadcrumb = () => {
       name: "Mon devis",
     },
   ];
+
+  const handleClickBreadcrumbLink = (route: {
+    id: number;
+    url: string;
+    name: string;
+  }) => {
+    setDevisProgress((prev) => ({
+      ...prev,
+      currentStep: route.id,
+    }));
+    if (route.id === 2)
+      setServices((prev) => ({ ...prev, currentServiceId: 1 }));
+    if (route.id === 3)
+      setFoodBeverage((prev) => ({ ...prev, currentFoodBeverageId: 1 }));
+    if (route.id === 4)
+      setManagement((prev) => ({ ...prev, currentManagementId: 1 }));
+    if (route.id === 6)
+      setPersonnalisation((prev) => ({
+        ...prev,
+        currentPersonnalisationId: 1,
+      }));
+  };
+
   return (
     <div className="flex justify-center">
       <Breadcrumb className="h-20 md:h-10">
@@ -101,12 +132,7 @@ const DevisBreadcrumb = () => {
                   </BreadcrumbPage>
                 ) : (
                   <Link
-                    onClick={() => {
-                      setDevisProgress((prev) => ({
-                        ...prev,
-                        currentStep: route.id,
-                      }));
-                    }}
+                    onClick={() => handleClickBreadcrumbLink(route)}
                     href={`/mon-devis${route.url}`}
                     className={`${
                       devisProgress.completedSteps.includes(route.id) ||
