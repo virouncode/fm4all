@@ -9,7 +9,11 @@ body > div:last-child > span + img {
   /*pour html2canvas */
   display: inline !important;
 }
-
+html,
+body {
+  height: 100vh;
+  width: 100vw;
+}
 @layer base {
   :root {
     --background: 0 0% 100%; /* global background, button:outline */

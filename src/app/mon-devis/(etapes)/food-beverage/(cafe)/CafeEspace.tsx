@@ -103,11 +103,11 @@ const CafeEspace = ({
 
   return (
     <div
-      className="h-full flex flex-col"
+      className="h-full flex flex-col overflow-hidden"
       id={`espace_${espace.infos.espaceId}`}
     >
       {/* <CafeEspaceSummary espace={espace} /> */}
-      <div className="w-full flex justify-between items-start py-1">
+      <div className="w-full flex justify-between items-start py-1 overflow-hidden">
         <CafeEspaceForm
           espace={espace}
           cafeMachines={cafeMachines}

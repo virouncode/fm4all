@@ -199,7 +199,7 @@ const DevisButton = ({
       description:
         "Les devis en ligne ne sont pas encore possibles depuis un mobile. Essayez de votre ordinateur ou contactez-nous",
       action: (
-        <ToastAction altText="Appelez-nous">
+        <ToastAction altText="Contactez-nous" asChild>
           <Link href="/contact">Contact</Link>
         </ToastAction>
       ),
