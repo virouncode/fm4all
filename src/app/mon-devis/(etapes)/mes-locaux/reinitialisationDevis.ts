@@ -66,7 +66,11 @@ export const reinitialisationDevis = (
   setTotal: (total: TotalType) => void
 ) => {
   //Devis
-  setDevisProgress({ currentStep: 2, completedSteps: [1] });
+  setDevisProgress({
+    currentStep: 2,
+    completedSteps: [1],
+    currentStepHasChanged: false,
+  });
   //Services
   setNettoyage({
     infos: {

@@ -88,7 +88,11 @@ export const fullReinitialisationDevis = (
     commentaires: null,
   });
   //Devis
-  setDevisProgress({ currentStep: 1, completedSteps: [] });
+  setDevisProgress({
+    currentStep: 1,
+    completedSteps: [],
+    currentStepHasChanged: false,
+  });
   //Services
   setNettoyage({
     infos: {
