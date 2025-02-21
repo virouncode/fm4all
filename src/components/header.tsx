@@ -49,7 +49,7 @@ const Header = () => {
           <nav className="hidden lg:flex items-center gap-4">
             <div
               className={`flex gap-1 items-center ${
-                isActive("/") ? "text-destructive" : ""
+                isActive("/") ? "text-destructive font-bold" : ""
               }`}
             >
               <Home size={15} />
@@ -57,7 +57,7 @@ const Header = () => {
             </div>
             <div
               className={`flex gap-1 items-center ${
-                isActive("/nos-services") ? "text-destructive" : ""
+                isActive("/nos-services") ? "text-destructive font-bold" : ""
               }`}
             >
               <HandPlatter size={15} />
@@ -65,7 +65,7 @@ const Header = () => {
             </div>
             <div
               className={`flex gap-1 items-center ${
-                isActive("/nos-3-gammes") ? "text-destructive" : ""
+                isActive("/nos-3-gammes") ? "text-destructive font-bold" : ""
               }`}
             >
               <Star size={15} />
@@ -73,7 +73,7 @@ const Header = () => {
             </div>
             <div
               className={`flex gap-1 items-center ${
-                isActive("/articles") ? "text-destructive" : ""
+                isActive("/articles") ? "text-destructive font-bold" : ""
               }`}
             >
               <Newspaper size={15} />
@@ -81,7 +81,7 @@ const Header = () => {
             </div>
             <div
               className={`flex gap-1 items-center ${
-                isActive("/faq") ? "text-destructive" : ""
+                isActive("/faq") ? "text-destructive font-bold" : ""
               }`}
             >
               <CircleHelp size={15} />
@@ -136,7 +136,7 @@ const Header = () => {
             <div className="flex-1 flex flex-col gap-4 ">
               <div
                 className={`flex gap-4 items-center ${
-                  isActive("/") ? "text-destructive" : ""
+                  isActive("/") ? "text-destructive font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
@@ -145,7 +145,7 @@ const Header = () => {
               </div>
               <div
                 className={`flex gap-4 items-center ${
-                  isActive("/nos-services") ? "text-destructive" : ""
+                  isActive("/nos-services") ? "text-destructive font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
@@ -154,7 +154,7 @@ const Header = () => {
               </div>
               <div
                 className={`flex gap-4 items-center ${
-                  isActive("/nos-3-gammes") ? "text-destructive" : ""
+                  isActive("/nos-3-gammes") ? "text-destructive font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
@@ -163,7 +163,7 @@ const Header = () => {
               </div>
               <div
                 className={`flex gap-4 items-center ${
-                  isActive("/articles") ? "text-destructive" : ""
+                  isActive("/articles") ? "text-destructive font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
@@ -172,7 +172,7 @@ const Header = () => {
               </div>
               <div
                 className={`flex gap-4 items-center ${
-                  isActive("/faq") ? "text-destructive" : ""
+                  isActive("/faq") ? "text-destructive font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
@@ -181,7 +181,9 @@ const Header = () => {
               </div>
               <div
                 className={`hidden max-[600px]:flex gap-4 items-center ${
-                  isActive("/devenir-prestataire") ? "text-destructive" : ""
+                  isActive("/devenir-prestataire")
+                    ? "text-destructive font-bold"
+                    : ""
                 }`}
                 onClick={handleHideMobileNav}
               >

@@ -1,6 +1,5 @@
 import Header from "@/components/header";
 import type { Metadata } from "next";
-import { Didact_Gothic } from "next/font/google";
 
 import Footer from "@/components/footer";
 import { Toaster } from "@/components/ui/toaster";
@@ -34,12 +33,8 @@ import TotalServicesFm4AllProvider from "@/context/TotalServicesFm4AllProvider";
 import TotalSnacksFruitsProvider from "@/context/TotalSnacksFruitsProvider";
 import TotalTheProvider from "@/context/TotalTheProvider";
 import { ThemeProvider } from "next-themes";
+import { Didact_Gothic } from "next/font/google";
 import "./globals.css";
-
-// const geistSans = Geist({
-//   variable: "--font-geist-sans",
-//   subsets: ["latin"],
-// });
 
 const didact = Didact_Gothic({
   variable: "--font-didact-sans",
@@ -47,11 +42,6 @@ const didact = Didact_Gothic({
   subsets: ["latin"],
   display: "swap",
 });
-
-// const geistMono = Geist_Mono({
-//   variable: "--font-geist-mono",
-//   subsets: ["latin"],
-// });
 
 export const metadata: Metadata = {
   title: {
