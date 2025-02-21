@@ -197,7 +197,7 @@ const DevisButton = ({
   const handleAlert = () => {
     toast({
       description:
-        "Les devis en ligne ne sont pas encore possibles depuis un mobile. Essayez de votre ordinateur ou contactez-nous",
+        "Les devis en ligne ne sont pas encore possibles depuis un mobile. Essayez depuis un ordinateur ou contactez-nous",
       action: (
         <ToastAction altText="Contactez-nous" asChild>
           <Link href="/contact">Contact</Link>
