@@ -21,7 +21,10 @@ const PersonnaliserPresentation = () => {
     }));
   };
   return (
-    <div className="flex flex-col gap-6 w-full mx-auto h-full py-2" id="1">
+    <div
+      className="flex flex-col gap-6 w-full mx-auto h-full py-2 overflow-auto"
+      id="1"
+    >
       <div className="flex-1 flex flex-col gap-4">
         <p className="max-w-prose mx-auto">
           {client.prenomContact} {client.nomContact},{" "}

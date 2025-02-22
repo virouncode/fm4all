@@ -29,7 +29,10 @@ const PersonnaliserFinal = () => {
     }));
   };
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="14">
+    <div
+      className="flex flex-col gap-4 w-full mx-auto h-full py-2 overflow-auto"
+      id="14"
+    >
       <div className="flex justify-end">
         <PreviousServiceButton handleClickPrevious={handleClickPrevious} />
       </div>

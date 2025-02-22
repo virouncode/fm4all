@@ -49,7 +49,10 @@ const PersonnaliserCommentaires = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="13">
+    <div
+      className="flex flex-col gap-4 w-full mx-auto h-full py-2 overflow-auto"
+      id="13"
+    >
       <PropositionsTitle
         title="Commentaires / remarques"
         description=""
