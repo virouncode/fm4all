@@ -345,7 +345,7 @@ const SnacksFruitsForm = ({
         <Input
           className={`w-full max-w-xs min-w-20 ${
             snacksFruits.quantites.nbPersonnes === client.effectif
-              ? "text-destructive"
+              ? "text-fm4alldestructive"
               : ""
           }`}
           type="number"

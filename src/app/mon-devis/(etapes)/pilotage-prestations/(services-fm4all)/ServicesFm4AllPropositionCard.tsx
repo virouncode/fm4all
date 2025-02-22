@@ -72,7 +72,7 @@ const ServicesFm4AllPropositionCard = ({
     <div
       className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4 cursor-pointer ${
         servicesFm4All.infos.gammeSelected === gamme
-          ? "ring-4 ring-inset ring-destructive"
+          ? "ring-4 ring-inset ring-fm4alldestructive"
           : ""
       } ${!total ? "opacity-50 pointer-events-none" : ""}`}
       key={proposition.id}

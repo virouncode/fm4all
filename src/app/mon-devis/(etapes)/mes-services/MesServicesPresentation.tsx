@@ -101,7 +101,7 @@ const MesServicesPresentation = () => {
             <div
               className={`w-48 text-center px-6 py-10 bg-fm4allessential rounded-lg text-slate-200 font-bold cursor-pointer ${
                 isGammeSelected("essentiel")
-                  ? "ring-4 ring-inset ring-destructive"
+                  ? "ring-4 ring-inset ring-fm4alldestructive"
                   : ""
               }`}
               onClick={() => setGammeSelected("essentiel")}
@@ -111,7 +111,7 @@ const MesServicesPresentation = () => {
             <div
               className={`w-48 text-center px-6 py-10 bg-fm4allcomfort rounded-lg text-slate-200 font-bold cursor-pointer ${
                 isGammeSelected("confort")
-                  ? "ring-4 ring-inset ring-destructive"
+                  ? "ring-4 ring-inset ring-fm4alldestructive"
                   : ""
               }`}
               onClick={() => setGammeSelected("confort")}
@@ -121,7 +121,7 @@ const MesServicesPresentation = () => {
             <div
               className={`w-48 text-center px-6 py-10 bg-fm4allexcellence rounded-lg text-slate-200 font-bold cursor-pointer ${
                 isGammeSelected("excellence")
-                  ? "ring-4 ring-inset ring-destructive"
+                  ? "ring-4 ring-inset ring-fm4alldestructive"
                   : ""
               }`}
               onClick={() => setGammeSelected("excellence")}

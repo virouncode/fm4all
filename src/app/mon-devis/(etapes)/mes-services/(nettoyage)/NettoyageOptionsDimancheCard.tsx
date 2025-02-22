@@ -64,7 +64,7 @@ const NettoyageOptionsDimancheCard = ({
       <div
         className={`flex w-3/4 items-center p-4 justify-center ${
           nettoyage.infos.dimancheSelected
-            ? "ring-4 ring-inset ring-destructive"
+            ? "ring-4 ring-inset ring-fm4alldestructive"
             : ""
         } bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer`}
         onClick={() => handleClickDimancheProposition(dimancheProposition)}

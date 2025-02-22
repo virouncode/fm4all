@@ -106,7 +106,7 @@ const MaintenancePropositionCard = ({
             className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4 cursor-pointer ${
               maintenance.infos.fournisseurId === proposition.fournisseurId &&
               maintenance.infos.gammeSelected === proposition.gamme
-                ? "ring-4 ring-inset ring-destructive"
+                ? "ring-4 ring-inset ring-fm4alldestructive"
                 : ""
             }`}
             onClick={() => handleClickProposition(proposition)}

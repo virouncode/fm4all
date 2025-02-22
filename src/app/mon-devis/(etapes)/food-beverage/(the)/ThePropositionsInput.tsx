@@ -26,7 +26,7 @@ const ThePropositionsInput = ({
           onChange={handleChange}
           className={`w-16 ${
             nbPersonnes === Math.round(effectif * 0.15)
-              ? "text-destructive"
+              ? "text-fm4alldestructive"
               : ""
           }`}
         />
@@ -34,7 +34,7 @@ const ThePropositionsInput = ({
           personnes
         </Label>
       </div>
-      <p className="text-xs text-destructive italic px-2 text-center">
+      <p className="text-xs text-fm4alldestructive italic px-2 text-center">
         Les quantités sont estimées pour vous (environ 15% de votre effectif)
         mais vous pouvez les changer
       </p>

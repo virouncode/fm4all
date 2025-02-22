@@ -73,7 +73,7 @@ const HygieneOptionsDesinfectantCard = ({
               className={`w-16 ${
                 hygiene.quantites.nbDistribDesinfectant ===
                 hygieneDistribQuantite.nbDistribDesinfectant
-                  ? "text-destructive"
+                  ? "text-fm4alldestructive"
                   : ""
               }`}
             />
@@ -103,7 +103,7 @@ const HygieneOptionsDesinfectantCard = ({
           <div
             className={`flex flex-1 bg-${color} text-slate-200 items-center p-2 justify-center text-xl gap-4 cursor-pointer ${
               hygiene.infos.desinfectantGammeSelected === gamme
-                ? "ring-4 ring-inset ring-destructive"
+                ? "ring-4 ring-inset ring-fm4alldestructive"
                 : ""
             }`}
             key={"desinfectant" + gamme}

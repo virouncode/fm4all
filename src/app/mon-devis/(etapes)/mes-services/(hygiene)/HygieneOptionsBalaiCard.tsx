@@ -73,7 +73,7 @@ const HygieneOptionsBalaiCard = ({
               className={`w-16 ${
                 hygiene.quantites.nbDistribBalai ===
                 hygieneDistribQuantite.nbDistribBalai
-                  ? "text-destructive"
+                  ? "text-fm4alldestructive"
                   : ""
               }`}
             />
@@ -103,7 +103,7 @@ const HygieneOptionsBalaiCard = ({
           <div
             className={`flex flex-1 bg-${color} text-slate-200 items-center p-2 justify-center text-xl gap-4 cursor-pointer ${
               hygiene.infos.balaiGammeSelected === gamme
-                ? "ring-4 ring-inset ring-destructive"
+                ? "ring-4 ring-inset ring-fm4alldestructive"
                 : ""
             }`}
             key={"balai" + gamme}

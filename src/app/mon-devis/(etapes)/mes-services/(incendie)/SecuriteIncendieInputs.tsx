@@ -45,7 +45,7 @@ const SecuriteIncendieInputs = ({
                 onChange={(e) => handleChangeNbr(e, "extincteur")}
                 className={`w-16 ${
                   nbExtincteurs === incendieQuantite.nbExtincteurs
-                    ? "text-destructive"
+                    ? "text-fm4alldestructive"
                     : ""
                 }`}
               />
@@ -64,7 +64,7 @@ const SecuriteIncendieInputs = ({
                 onChange={(e) => handleChangeNbr(e, "baes")}
                 className={`w-16 ${
                   nbBaes === Math.ceil(incendieQuantite.nbExtincteurs * 2.3)
-                    ? "text-destructive"
+                    ? "text-fm4alldestructive"
                     : ""
                 }`}
               />
@@ -81,7 +81,9 @@ const SecuriteIncendieInputs = ({
                 max={MAX_NB_BAES}
                 step={1}
                 onChange={(e) => handleChangeNbr(e, "telBaes")}
-                className={`w-16 ${nbTelBaes === 1 ? "text-destructive" : ""}`}
+                className={`w-16 ${
+                  nbTelBaes === 1 ? "text-fm4alldestructive" : ""
+                }`}
               />
               <Label htmlFor="nbTelBaes" className="text-sm flex-1">
                 télécommande(s) BAES

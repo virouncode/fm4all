@@ -74,7 +74,7 @@ const HygieneOptionsPoubelleCard = ({
               className={`w-16 ${
                 hygiene.quantites.nbDistribPoubelle ===
                 hygieneDistribQuantite.nbDistribPoubelle
-                  ? "text-destructive"
+                  ? "text-fm4alldestructive"
                   : ""
               }`}
             />
@@ -82,7 +82,7 @@ const HygieneOptionsPoubelleCard = ({
               blocs
             </Label>
           </div>
-          <p className="text-xs text-destructive italic px-2 text-center">
+          <p className="text-xs text-fm4alldestructive italic px-2 text-center">
             Les quantités sont estimées pour vous mais vous pouvez les changer
           </p>
         </div>
@@ -107,7 +107,7 @@ const HygieneOptionsPoubelleCard = ({
           <div
             className={`flex flex-1 bg-${color} text-slate-200 items-center p-2 justify-center text-xl gap-4 cursor-pointer ${
               hygiene.infos.poubelleGammeSelected === gamme
-                ? "ring-4 ring-inset ring-destructive"
+                ? "ring-4 ring-inset ring-fm4alldestructive"
                 : ""
             }`}
             key={"poubelle" + gamme}

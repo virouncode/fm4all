@@ -69,7 +69,7 @@ const NettoyageOptionsRepasseCard = ({
         <div
           className={`flex w-3/4 items-center justify-center p-4 ${
             nettoyage.infos.repasseSelected
-              ? "ring-4 ring-inset ring-destructive"
+              ? "ring-4 ring-inset ring-fm4alldestructive"
               : ""
           } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
           onClick={() => handleClickRepasseProposition(repasseProposition)}

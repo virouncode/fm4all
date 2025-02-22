@@ -23,6 +23,7 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         fm4allsecondary: "hsl(var(--fm4all-secondary))",
+        fm4alldestructive: "hsl(var(--fm4all-destructive))",
         fm4allessential: "hsl(var(--fm4all-essential))",
         fm4allcomfort: "hsl(var(--fm4all-comfort))",
         fm4allexcellence: "hsl(var(--fm4all-excellence))",

@@ -7,11 +7,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { MARGE } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { useContext } from "react";
 import { MAX_PASSAGES_VITRERIE } from "./NettoyageOptionsPropositions";
-import { MARGE } from "@/constants/constants";
 
 type NettoyageOptionsVitrerieCardProps = {
   vitrerieProposition: {
@@ -76,7 +76,7 @@ const NettoyageOptionsVitrerieCard = ({
               onChange={handleChangeNbPassageVitrerie}
               className={`w-16 ${
                 nettoyage.quantites.nbPassagesVitrerie === 2
-                  ? "text-destructive"
+                  ? "text-fm4alldestructive"
                   : ""
               }`}
             />
@@ -84,7 +84,7 @@ const NettoyageOptionsVitrerieCard = ({
               passages / an
             </Label>
           </div>
-          <p className="text-xs text-destructive italic px-2 text-center">
+          <p className="text-xs text-fm4alldestructive italic px-2 text-center">
             Les quantités sont estimées pour vous mais vous pouvez les changer
           </p>
         </div>
@@ -93,7 +93,7 @@ const NettoyageOptionsVitrerieCard = ({
         <div
           className={`flex w-3/4 items-center p-4 justify-center ${
             nettoyage.infos.vitrerieSelected
-              ? "ring-4 ring-inset ring-destructive"
+              ? "ring-4 ring-inset ring-fm4alldestructive"
               : ""
           } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
           onClick={() => handleClickVitrerieProposition(vitrerieProposition)}

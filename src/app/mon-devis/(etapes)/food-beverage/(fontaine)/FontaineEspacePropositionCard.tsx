@@ -142,7 +142,7 @@ const FontaineEspacePropositionCard = ({
             className={`flex flex-1  items-center p-4 justify-center text-2xl gap-4 cursor-pointer bg-slate-100 border-r ${
               fontaines.infos.fournisseurId === proposition.fournisseurId &&
               espace.infos.poseSelected === proposition.typePose
-                ? "ring-4 ring-inset ring-destructive"
+                ? "ring-4 ring-inset ring-fm4alldestructive"
                 : ""
             }`}
             onClick={() =>

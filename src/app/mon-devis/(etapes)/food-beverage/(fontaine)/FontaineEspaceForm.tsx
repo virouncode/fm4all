@@ -716,7 +716,9 @@ const FontaineEspaceForm = ({
               <div className="flex gap-2 items-center">
                 <Input
                   className={`w-full max-w-xs min-w-20 ${
-                    nbPersonnes === client.effectif ? "text-destructive" : ""
+                    nbPersonnes === client.effectif
+                      ? "text-fm4alldestructive"
+                      : ""
                   }`}
                   type="number"
                   min={1}
