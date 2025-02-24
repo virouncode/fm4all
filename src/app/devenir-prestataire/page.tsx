@@ -12,7 +12,7 @@ const page = () => {
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
       <article className="mt-6 flex flex-col gap-10">
-        <h1 className="text-3xl md:text-4xl">Devenir prestataire</h1>
+        <h1 className="text-4xl">Devenir prestataire</h1>
         <div className="flex flex-col gap-6 text-lg w-full max-w-prose mx-auto hyphens-auto text-wrap">
           <h2 className="text-center font-bold">
             Vous êtes prestataire de service ? <br />
