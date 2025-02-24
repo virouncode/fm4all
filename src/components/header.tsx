@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import {
   CircleHelp,
   HandPlatter,
+  Handshake,
   Home,
   Menu,
-  Newspaper,
+  ScrollText,
   Star,
   X,
 } from "lucide-react";
@@ -73,11 +74,19 @@ const Header = () => {
             </div>
             <div
               className={`flex gap-1 items-center ${
-                isActive("/articles") ? "text-destructive font-bold" : ""
+                isActive("/nos-engagements") ? "text-destructive font-bold" : ""
               }`}
             >
-              <Newspaper size={15} />
-              <Link href="/articles">Articles</Link>
+              <ScrollText size={15} />
+              <Link href="/nos-engagements">Nos engagements</Link>
+            </div>
+            <div
+              className={`flex gap-1 items-center ${
+                isActive("/nos-partenaires") ? "text-destructive font-bold" : ""
+              }`}
+            >
+              <Handshake size={15} />
+              <Link href="/nos-partenaires">Nos partenaires</Link>
             </div>
             <div
               className={`flex gap-1 items-center ${
@@ -163,12 +172,25 @@ const Header = () => {
               </div>
               <div
                 className={`flex gap-4 items-center ${
-                  isActive("/articles") ? "text-destructive font-bold" : ""
+                  isActive("/nos-engagements")
+                    ? "text-destructive font-bold"
+                    : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
-                <Newspaper size={30} />
-                <Link href="/articles">Articles</Link>
+                <ScrollText size={30} />
+                <Link href="/nos-engagements">Nos engagements</Link>
+              </div>
+              <div
+                className={`flex gap-4 items-center ${
+                  isActive("/nos-partenaires")
+                    ? "text-destructive font-bold"
+                    : ""
+                }`}
+                onClick={handleHideMobileNav}
+              >
+                <Handshake size={30} />
+                <Link href="/nos-partenaires">Nos partenaires</Link>
               </div>
               <div
                 className={`flex gap-4 items-center ${

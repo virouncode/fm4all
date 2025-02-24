@@ -22,6 +22,7 @@ const ImgCardVertical = ({
           src={src}
           alt={alt}
           fill
+          quality={100}
           className="object-cover object-center"
         />
       </div>

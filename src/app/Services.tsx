@@ -52,14 +52,34 @@ const Services = () => {
           </CarouselItem>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
+              src="/img/services/hygiene.png"
+              alt="illustration-hygiene-sanitaire"
+            >
+              <div className="p-4 flex flex-col gap-4 h-52">
+                <p className="text-2xl">Hygiène sanitaire</p>
+                <p className="w-full overflow-hidden text-ellipsis">
+                  En plus des prestations de nettoyage, fm4all propose la
+                  gestion complète des consommables sanitaires...
+                </p>
+                <div className="flex-1">
+                  <Link className="underline" href="/services/hygiene">
+                    En savoir plus
+                  </Link>
+                </div>
+              </div>
+            </ImgCardVertical>
+          </CarouselItem>
+          <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
+            <ImgCardVertical
               src="/img/services/maintenance.png"
               alt="illustration-maintenance"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
                 <p className="text-2xl">Maintenance</p>
                 <p className="overflow-hidden text-ellipsis">
-                  Veille règlementaire, obligations légales, bien-être au
-                  travail, déléguez la maintenance et le suivi de vos...
+                  Gérer un espace de travail fonctionnel et conforme aux
+                  réglementations en vigueur peut être complexe et
+                  chronophage...
                 </p>
                 <div className="flex-1">
                   <Link className="underline" href="/services/maintenance">
@@ -206,16 +226,16 @@ const Services = () => {
               </div>
             </ImgCardVertical>
           </CarouselItem>
-          {/* <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
+          <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
               src="/img/services/fm4all.png"
               alt="illustration-fm4all"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
-                <p className="text-2xl">Services fm4all</p>
+                <p className="text-2xl">Pilotage fm4all</p>
                 <p className="overflow-hidden text-ellipsis">
-                  Hospitality, Office ou Facility Manager, une personne dédiée
-                  chez vous dès ½ journée par semaine.
+                  Chez fm4all, nous réinventons la gestion des services généraux
+                  pour les entreprises. Notre plateforme...
                 </p>
                 <div className="flex-1">
                   <Link className="underline" href="/services/office-manager">
@@ -224,7 +244,7 @@ const Services = () => {
                 </div>
               </div>
             </ImgCardVertical>
-          </CarouselItem> */}
+          </CarouselItem>
         </CarouselContent>
         <CarouselPrevious className="right-12 -top-9 translate-y-0 left-auto" />
         <CarouselNext className="right-0 -top-9 translate-y-0" />

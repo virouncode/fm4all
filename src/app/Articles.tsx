@@ -1,4 +1,5 @@
 import ImgCardVertical from "@/components/cards/ImgCardVertical";
+import { Button } from "@/components/ui/button";
 import {
   Carousel,
   CarouselContent,
@@ -11,9 +12,20 @@ import Link from "next/link";
 const Articles = () => {
   return (
     <section className="max-w-7xl  w-full mx-auto flex flex-col gap-10 p-6">
-      <h2 className="text-2xl md:text-3xl border-l-2 px-4">
-        Nos derniers articles
-      </h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl md:text-3xl border-l-2 px-4">
+          Nos derniers articles
+        </h2>
+        <Button
+          variant="outline"
+          className="hidden md:block text-base"
+          title="Tous les articles"
+          size="lg"
+        >
+          <Link href="/articles">Tous les articles</Link>
+        </Button>
+      </div>
+
       <Carousel
         opts={{
           align: "start",
@@ -153,6 +165,12 @@ const Articles = () => {
         <CarouselPrevious className="right-12 -top-9 translate-y-0 left-auto" />
         <CarouselNext className="right-0 -top-9 translate-y-0" />
       </Carousel>
+      <Link
+        href="/articles"
+        className="underline text-fm4allsecondary text-lg md:hidden"
+      >
+        Voir tous les articles
+      </Link>
     </section>
   );
 };
