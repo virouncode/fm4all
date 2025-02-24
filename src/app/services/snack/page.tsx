@@ -74,7 +74,7 @@ const page = () => {
           <ul className="text-lg max-w-prose ml-10 md:mx-auto hyphens-auto text-wrap">
             <li className="list-disc">
               <span className="text-fm4allessential font-bold">
-                Gamme essentiel
+                Gamme Essentiel
               </span>{" "}
               : Environ 1 à 2 par personne par semaine choix standard (+/- 200g)
             </li>
@@ -96,10 +96,10 @@ const page = () => {
           <p className="border-l-2 px-4 text-3xl mb-4 ml-6">
             Les Gammes pour les Snacks & Boissons
           </p>
-          <ul className="text-lg max-w-prose ml-10 md:mx-auto hyphens-auto text-wrap">
+          <ul className="text-lg ml-10 md:w-[660px] md:mx-auto hyphens-auto text-wrap">
             <li className="list-disc">
               <span className="text-fm4allessential font-bold">
-                Gamme essentiel
+                Gamme Essentiel
               </span>{" "}
               : 1 portion par personne par semaine, choix standard
             </li>
@@ -163,7 +163,7 @@ const page = () => {
           <p className="border-l-2 px-4 text-3xl mb-4 ml-6">
             Des résultats prouvés : un investissement rentable
           </p>
-          <p className="text-lg max-w-prose mx-auto hyphens-auto text-wrap">
+          <p className="text-lg max-w-prose mx-auto hyphens-auto text-pretty">
             Une étude* a démontré que l’introduction de fruits frais sur le lieu
             de travail permet de :
           </p>
