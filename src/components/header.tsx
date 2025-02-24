@@ -47,7 +47,7 @@ const Header = () => {
               />
             </Link>
           </div>
-          <nav className="hidden lg:flex items-center gap-4">
+          <nav className="hidden xl:flex items-center gap-4">
             <div
               className={`flex gap-1 items-center ${
                 isActive("/") ? "text-destructive font-bold" : ""
@@ -115,13 +115,13 @@ const Header = () => {
           {isMobileNavOpen ? (
             <X
               size={30}
-              className="block lg:hidden"
+              className="block xl:hidden"
               onClick={handleHideMobileNav}
             />
           ) : (
             <Menu
               size={30}
-              className="block lg:hidden"
+              className="block xl:hidden"
               onClick={handleShowMobileNav}
             />
           )}

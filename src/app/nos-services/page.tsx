@@ -11,7 +11,7 @@ const page = () => {
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
       <article className="mt-6 flex flex-col gap-10">
-        <h1 className="text-3xl md:text-4xl">Nos services</h1>
+        <h1 className="text-4xl">Nos services</h1>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap text-lg">
             <p>
