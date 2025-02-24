@@ -120,8 +120,8 @@ const Services = () => {
               <div className="p-4 flex flex-col gap-4 h-52">
                 <p className="text-2xl">Café</p>
                 <p className="overflow-hidden text-ellipsis">
-                  Blend robusta, Arabica de spécialité, cappuccino noisette ou
-                  thé bio ? Il y en a pour tous les goûts et budgets.
+                  Chez fm4all, nous savons qu’un bon café fait toute la
+                  différence pour vos collaborateurs et vos...
                 </p>
                 <div className="flex-1">
                   <Link className="underline" href="/services/cafe">
