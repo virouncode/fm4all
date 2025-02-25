@@ -9,9 +9,12 @@ body > div:last-child > span + img {
   /*pour html2canvas */
   display: inline !important;
 }
-html,
+html {
+  min-height: 100%;
+  overflow-y: auto;
+}
 body {
-  height: 100vh;
+  min-height: 100%;
   width: 100vw;
 }
 @layer base {

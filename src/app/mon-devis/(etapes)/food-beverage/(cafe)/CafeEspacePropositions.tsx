@@ -980,23 +980,23 @@ const CafeEspacePropositions = ({
           </div>
         ))}
       </div>
-      <div className="flex flex-col gap-1">
-        {cafeEspacesIds.slice(-1)[0] === espace.infos.espaceId ? (
-          <div className="flex justify-end gap-4 items-center">
-            {espace.infos.gammeCafeSelected ? (
-              <AddEspaceButton handleAddEspace={handleAddEspace} />
-            ) : null}
-            <NextServiceButton handleClickNext={handleClickNext} />
-          </div>
-        ) : (
-          <div className="ml-auto" onClick={handleAlert}>
-            <NextEspaceButton
-              disabled={espace.infos.gammeCafeSelected ? false : true}
-              handleClickNextEspace={handleClickNextEspace}
-            />
-          </div>
-        )}
-      </div>
+      {/* <div className="flex flex-col gap-1"> */}
+      {cafeEspacesIds.slice(-1)[0] === espace.infos.espaceId ? (
+        <div className="flex justify-end gap-4 items-center">
+          {espace.infos.gammeCafeSelected ? (
+            <AddEspaceButton handleAddEspace={handleAddEspace} />
+          ) : null}
+          <NextServiceButton handleClickNext={handleClickNext} />
+        </div>
+      ) : (
+        <div className="ml-auto" onClick={handleAlert}>
+          <NextEspaceButton
+            disabled={espace.infos.gammeCafeSelected ? false : true}
+            handleClickNextEspace={handleClickNextEspace}
+          />
+        </div>
+      )}
+      {/* </div> */}
     </div>
   );
 };
