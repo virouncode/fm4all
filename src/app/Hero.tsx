@@ -96,6 +96,7 @@ const Hero = () => {
             quality={100}
             className="object-cover object-center"
             fill={true}
+            priority={true}
           />
         </div>
       </div>
