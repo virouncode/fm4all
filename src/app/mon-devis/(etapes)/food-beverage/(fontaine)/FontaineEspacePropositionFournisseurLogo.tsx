@@ -45,7 +45,11 @@ const FontaineEspacePropositionFournisseurLogo = ({
         </TooltipTrigger>
         {sloganFournisseur && (
           <TooltipContent className="max-w-60">
-            <p className="text-sm italic">{sloganFournisseur}</p>
+            <p className="text-sm italic">
+              {fournisseurId === 13
+                ? "Entreprise française leader sur son marché souhaitant travailler en marque blache"
+                : sloganFournisseur}
+            </p>
           </TooltipContent>
         )}
       </Tooltip>
