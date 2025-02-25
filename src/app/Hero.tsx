@@ -12,12 +12,10 @@ const Hero = () => {
   return (
     <section
       className="flex items-center justify-center min-h-[calc(100vh-4rem)] md:min-h-[calc(100vh-4rem)] bg-hero-img
-      bg-cover bg-center bg-no-repeat
-      p-6
-      "
+      bg-cover bg-center bg-no-repeat p-6"
       id="hero"
     >
-      <div className="flex w-11/12 sm:w-3/4 md:max-w-5xl rounded-xl overflow-hidden border-destructive border-1">
+      <div className="flex w-11/12 sm:w-3/4 md:max-w-5xl rounded-xl overflow-hidden shadow-lg shadow-slate-100/50">
         <Card className="flex-1 rounded-none py-4">
           <CardHeader>
             <CardTitle>
