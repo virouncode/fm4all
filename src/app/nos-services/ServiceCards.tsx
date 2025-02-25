@@ -150,7 +150,7 @@ const ServiceCards = () => {
         </div>
       </ImgCardVertical>
       <ImgCardVertical
-        src="/img/services/office-manager.png"
+        src="/img/services/office-managers-vertical.png"
         alt="illustration-office-manager"
       >
         <div className="p-4 flex flex-col gap-4 h-52">

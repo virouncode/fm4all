@@ -10,7 +10,7 @@ export default {
   theme: {
     extend: {
       backgroundImage: {
-        "hero-img": "url('/img/hero_wallpaper.png')",
+        "hero-img": "url('/img/hero_wallpaper2.png')",
         "hof-img": "url('/img/hof_managers.png')",
       },
       listStyleType: {

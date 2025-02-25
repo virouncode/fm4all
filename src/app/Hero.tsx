@@ -92,9 +92,9 @@ const Hero = () => {
         <div className="w-[365px] relative overflow-hidden hidden lg:block">
           <Image
             src={"/img/two_collaborators.png"}
-            alt="deux-collaborateurs-se)serrent-la-main"
+            alt="deux-collaborateurs-se-serrent-la-main"
             quality={100}
-            className="object-cover"
+            className="object-cover object-center"
             fill={true}
           />
         </div>
