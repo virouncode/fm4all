@@ -43,7 +43,7 @@ const Header = () => {
                 alt="Logo"
                 fill={true}
                 quality={100}
-                className="w-full h-full object-cover"
+                className="object-contain"
               />
             </Link>
           </div>
