@@ -18,6 +18,7 @@ export default {
         thumb: '"👍  "',
         handshake: '"🤝  "',
         smile: '"😊  "',
+        check: '"✓  "',
       },
       colors: {
         background: "hsl(var(--background))",

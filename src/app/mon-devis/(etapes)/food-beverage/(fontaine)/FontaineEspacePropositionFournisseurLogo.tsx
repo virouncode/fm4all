@@ -25,7 +25,11 @@ const FontaineEspacePropositionFournisseurLogo = ({
         <TooltipTrigger asChild>
           <div className="flex w-1/4 items-center justify-center p-2">
             {logoFournisseurUrl ? (
-              <div className="w-full h-full relative">
+              <div
+                className={`w-full h-full relative ${
+                  fournisseurId === 13 ? "blur-lg" : ""
+                }`}
+              >
                 <Image
                   src={logoFournisseurUrl}
                   alt={`logo-de-${nomFournisseur}`}

@@ -173,7 +173,17 @@ const FontaineEspacePropositionCard = ({
               )}
 
               <p className="text-xs">
-                1 fontaine {proposition.marque} {proposition.modele}{" "}
+                1 fontaine{" "}
+                <span
+                  className={`${
+                    proposition.fournisseurId === 13
+                      ? "inline-block blur-sm"
+                      : ""
+                  }`}
+                >
+                  {proposition.marque}
+                </span>{" "}
+                {proposition.modele}{" "}
                 {proposition.reconditionne ? " reconditionnée(s)" : ""}
               </p>
               <p className="text-xs">Filtres et maintenance inclus</p>

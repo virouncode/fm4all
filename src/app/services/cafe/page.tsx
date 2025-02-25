@@ -80,7 +80,8 @@ const page = () => {
           </p>
           <ul className="text-lg max-w-prose ml-10 md:mx-auto hyphens-auto text-wrap">
             <li className="list-disc">
-              Café : Machine à grain proposant des café simple espresso ou lungo
+              Café : Machine à grain proposant des cafés simples espresso ou
+              lungo
             </li>
             <li className="list-disc">
               Café + Lait : Machine à grain avec option Lait (automatique ou
@@ -99,10 +100,10 @@ const page = () => {
           <p className="text-lg max-w-prose mx-auto hyphens-auto text-wrap">
             3 gammes de cafés :
           </p>
-          <ul className="text-lg max-w-prose ml-10 md:mx-auto hyphens-auto text-wrap">
+          <ul className="text-lg md:w-[660px] ml-10 md:mx-auto hyphens-auto text-wrap">
             <li className="list-disc">
               <span className="text-fm4allessential font-bold">
-                Gamme essentiel
+                Gamme Essentiel
               </span>{" "}
               : Café conventionnel dit Classique, Blend
             </li>
@@ -122,10 +123,10 @@ const page = () => {
           <p className="text-lg max-w-prose mx-auto hyphens-auto text-wrap">
             3 gammes de thés :
           </p>
-          <ul className="text-lg max-w-prose ml-10 md:mx-auto hyphens-auto text-wrap">
+          <ul className="text-lg md:w-[660px] ml-10 md:mx-auto hyphens-auto text-wrap">
             <li className="list-disc">
               <span className="text-fm4allessential font-bold">
-                Gamme essentiel
+                Gamme Essentiel
               </span>{" "}
               : Thé en sachet, un ou deux au choix
             </li>

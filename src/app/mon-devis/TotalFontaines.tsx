@@ -18,7 +18,16 @@ const TotalFontaines = () => {
   return (
     <div className="flex flex-col gap-4 total-section" id="total-fontaines">
       <div className="flex flex-col gap-4">
-        <div>Fontaines à eau ({fontaines.infos.nomFournisseur})</div>
+        <div>
+          Fontaines à eau{" "}
+          <span
+            className={`${
+              fontaines.infos.fournisseurId === 13 ? "inline-block blur-sm" : ""
+            }`}
+          >
+            ({fontaines.infos.nomFournisseur})
+          </span>
+        </div>
         <div className="flex flex-col ml-4 text-xs ">
           {fontaines.espaces
             .filter(
@@ -34,7 +43,17 @@ const TotalFontaines = () => {
                   )} font-bold"
                 >
                   <p>
-                    1 x {item.infos.marque} {item.infos.modele}
+                    1 x{" "}
+                    <span
+                      className={`${
+                        fontaines.infos.fournisseurId === 13
+                          ? "inline-block blur-sm"
+                          : ""
+                      }`}
+                    >
+                      {item.infos.marque}
+                    </span>{" "}
+                    {item.infos.modele}
                   </p>
                   <p>
                     {formatNumber(
