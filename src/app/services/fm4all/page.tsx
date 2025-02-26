@@ -6,7 +6,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Services: Pilotage fm4all",
   description:
-    "Du nettoyage essentiel à une expérience 5 étoiles, du prestataire PM au grand groupe, choisissez la prestation Propreté qui vous ressemble",
+    "Chez fm4all, nous réinventons la gestion des services généraux pour les entreprises.",
 };
 
 const page = () => {

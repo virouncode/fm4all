@@ -30,7 +30,7 @@ const PropositionsTitle = ({
         </div>
         <p>{title}</p>
       </div>
-      <p className="text-base flex-1 text-center italic px-4">{description}</p>
+      <p className="text-base flex-1 px-4">{description}</p>
       <PreviousServiceButton
         handleClickPrevious={handleClickPrevious}
         className={previousButton ? "" : "invisible"}

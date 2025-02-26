@@ -6,7 +6,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Services: Fontaine à eau",
   description:
-    "Eau filtrée, fraîche, gazeuse, à poser ou encastrer, il y a forcément un modèle fait pour vous.",
+    "Eau filtrée, fraîche, gazeuse, à poser ou encastrer, il y a forcément un modèle de fontaine à eau fait pour vous.",
 };
 
 const page = () => {

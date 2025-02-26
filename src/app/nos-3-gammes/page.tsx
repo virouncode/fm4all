@@ -4,7 +4,7 @@ import Image from "next/image";
 export const metadata: Metadata = {
   title: "Nos 3 gammes",
   description:
-    "Découvrez nos 3 gammes de services pour le Facility Management.",
+    "Découvrez nos 3 gammes de services (essentiel, confort, excellence) pour le Facility Management.",
 };
 
 const page = () => {
@@ -72,7 +72,9 @@ const page = () => {
           </div>
         </div>
         <div className="flex flex-col gap-6 w-full mx-auto hyphens-auto text-wrap text-lg mt-10">
-          <p className="text-2xl">Quelle gamme de services choisir ?</p>
+          <p className="border-l-2 px-4 text-3xl mb-4 ml-6">
+            Quelle gamme de services choisir ?
+          </p>
           <div className="flex flex-col gap-6 justify-between md:w-5/6 mx-auto md:flex-row">
             <div className="h-[180px] w-[300px] relative rounded-xl overflow-hidden hidden lg:block">
               <Image
@@ -102,7 +104,9 @@ const page = () => {
           </p>
         </div>
         <div className="flex flex-col gap-6 w-full mx-auto hyphens-auto text-wrap text-lg">
-          <p className="text-2xl">Quels prestataires choisir ?</p>
+          <p className="border-l-2 px-4 text-3xl mb-4 ml-6">
+            Quels prestataires choisir ?
+          </p>
           <p className="md:w-5/6 mx-auto">
             La bonne nouvelle, c’est que tous les prestataires référencés sur
             notre plateforme ont été rigoureusement sélectionnés. Nous

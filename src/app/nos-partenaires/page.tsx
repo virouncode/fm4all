@@ -5,7 +5,8 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Nos partenaires",
-  description: "Une collaboration fondée sur la qualité et la confiance",
+  description:
+    "Avec nos partenaires, nous établissons une collaboration fondée sur la qualité et la confiance",
 };
 
 const page = () => {

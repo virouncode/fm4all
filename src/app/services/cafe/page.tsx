@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Services: Café et boissons chaudes",
-  description: "Découvrez notre sélection de cafés et thés.",
+  description: "Découvrez notre sélection de machines à cafés et sachets thés.",
 };
 
 const page = () => {

@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Le FM",
-  description: "Qu'est-ce qu'un facility manager",
+  description: "Qu'est-ce qu'un facility manager ?",
 };
 
 const page = () => {

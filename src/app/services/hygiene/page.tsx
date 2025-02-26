@@ -4,7 +4,7 @@ import Image from "next/image";
 export const metadata: Metadata = {
   title: "Services: Hygiène Sanitaire",
   description:
-    "En plus des prestations de nettoyage, fm4all propose la gestion complète des consommables sanitaires",
+    "En plus des prestations de nettoyage, fm4all propose la gestion complète des consommables d'hygiène sanitaire",
 };
 
 const page = () => {

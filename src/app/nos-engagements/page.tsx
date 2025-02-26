@@ -7,7 +7,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Nos engagements",
   description:
-    "Garantie, Simplicité, Gain de temps, Suivi opérationnel personnalisé, Garantie Qualité",
+    "Nos engagements : Garantie, Simplicité, Gain de temps, Suivi opérationnel personnalisé, Garantie Qualité",
 };
 
 const page = () => {

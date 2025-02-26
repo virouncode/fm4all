@@ -2,7 +2,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Politique de confidentialité",
-  description: "Vous pouvez lire ici notre politique de confidenti&lité",
+  description: "Vous pouvez lire ici notre politique de confidentialité",
 };
 
 const page = () => {
