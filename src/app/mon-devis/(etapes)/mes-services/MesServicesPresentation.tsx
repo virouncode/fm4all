@@ -8,6 +8,7 @@ import {
   Cookie,
   CupSoda,
   FireExtinguisher,
+  Info,
   Leaf,
   SprayCan,
   Toilet,
@@ -94,8 +95,9 @@ const MesServicesPresentation = () => {
             </div> */}
           </div>
           <p>
-            Pour chaque service, déplacez votre curseur pour en savoir plus et
-            cliquez sur la gamme qui vous convient :{" "}
+            Pour chaque offre, cliquez sur{" "}
+            <Info className="inline-block" size={14} /> pour en savoir plus et
+            sélectionnez la gamme qui vous convient :{" "}
           </p>
           <div className="flex flex-wrap gap-10 justify-center text-2xl mb-4">
             <div

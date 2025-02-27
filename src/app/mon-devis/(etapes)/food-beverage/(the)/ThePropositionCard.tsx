@@ -1,14 +1,16 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { MARGE } from "@/constants/constants";
 import { TheContext } from "@/context/TheProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
+import { Info } from "lucide-react";
 import { useContext } from "react";
 
 type ThePropositionCardProps = {
@@ -62,71 +64,80 @@ const ThePropositionCard = ({
     Math.round((proposition.totalAnnuel * MARGE) / 12)
   )} € / mois*`;
 
-  const tooltipEssentiel = (
-    <div className="flex flex-col gap-4">
-      <p className="text-center text-lg">Essentiel</p>
-      <div>
-        <p>The en sachet, un ou deux au choix</p>
-        {proposition.infos && <p>{proposition.infos}</p>}
-      </div>
+  //Détails de l'offre
+
+  const infosEssentiel = (
+    <div className="flex flex-col gap-2">
+      <p>The en sachet, un ou deux au choix</p>
+      {proposition.infos && <p>{proposition.infos}</p>}
     </div>
   );
-  const tooltipConfort = (
-    <div className="flex flex-col gap-4">
-      <p className="text-center text-lg">Confort</p>
-      <div>
-        <p>Choix de plusieurs thés en sachets</p>
-        {proposition.infos && <p>{proposition.infos}</p>}
-      </div>
+  const infosConfort = (
+    <div className="flex flex-col gap-2">
+      <p>Choix de plusieurs thés en sachets</p>
+      {proposition.infos && <p>{proposition.infos}</p>}
     </div>
   );
-  const tooltipExcellence = (
-    <div className="flex flex-col gap-4">
-      <p className="text-center text-lg">Excellence</p>
-      <div>
-        <p>Thés Premium en boite bois ou présentoir</p>
-        {proposition.infos && <p>{proposition.infos}</p>}
-      </div>
+  const infosExcellence = (
+    <div className="flex flex-col gap-2">
+      <p>Thés Premium en boite bois ou présentoir</p>
+      {proposition.infos && <p>{proposition.infos}</p>}
     </div>
+  );
+  const infosTitle = (
+    <p className={`text-${getFm4AllColor(proposition.gamme)} text-center`}>
+      {proposition.gamme === "essentiel"
+        ? "Essentiel"
+        : proposition.gamme === "confort"
+        ? "Confort"
+        : "Excellence"}
+    </p>
   );
 
-  const tooltip =
-    gamme === "essentiel"
-      ? tooltipEssentiel
-      : gamme === "confort"
-      ? tooltipConfort
-      : tooltipExcellence;
+  const infosProduit = (
+    <div className="flex flex-col text-sm my-4">
+      {gamme === "essentiel"
+        ? infosEssentiel
+        : gamme === "confort"
+        ? infosConfort
+        : infosExcellence}
+    </div>
+  );
 
   return (
-    <TooltipProvider delayDuration={0}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div
-            className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4 cursor-pointer ${
-              the.infos.gammeSelected === proposition.gamme
-                ? "ring-4 ring-inset ring-fm4alldestructive"
-                : ""
-            }`}
-            onClick={() => handleClickProposition(proposition)}
-          >
-            {proposition.totalAnnuel ? (
-              <Checkbox
-                checked={the.infos.gammeSelected === proposition.gamme}
-                onCheckedChange={() => handleClickProposition(proposition)}
-                className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-              />
-            ) : null}
-            <div>
-              <p className="font-bold">{totalMensuelText}</p>
-              <p className="text-sm">
-                Consommables ~ {nbTassesParJour} tasses / j
-              </p>
-            </div>
-          </div>
-        </TooltipTrigger>
-        <TooltipContent className="max-w-60">{tooltip}</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <div
+      className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4 cursor-pointer ${
+        the.infos.gammeSelected === proposition.gamme
+          ? "ring-4 ring-inset ring-fm4alldestructive"
+          : ""
+      }`}
+      onClick={() => handleClickProposition(proposition)}
+    >
+      {proposition.totalAnnuel ? (
+        <Checkbox
+          checked={the.infos.gammeSelected === proposition.gamme}
+          onCheckedChange={() => handleClickProposition(proposition)}
+          className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+        />
+      ) : null}
+      <div>
+        <div className="flex gap-2">
+          <p className="font-bold">{totalMensuelText}</p>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Info size={16} onClick={(e) => e.stopPropagation()} />
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>{infosTitle}</DialogTitle>
+              </DialogHeader>
+              {infosProduit}
+            </DialogContent>
+          </Dialog>
+        </div>
+        <p className="text-sm">Consommables ~ {nbTassesParJour} tasses / j</p>
+      </div>
+    </div>
   );
 };
 

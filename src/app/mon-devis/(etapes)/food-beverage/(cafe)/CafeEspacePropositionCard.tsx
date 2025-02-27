@@ -1,16 +1,18 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { MARGE } from "@/constants/constants";
 import { CafeContext } from "@/context/CafeProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
 import { GammeType } from "@/zod-schemas/gamme";
+import { Info } from "lucide-react";
 import Image from "next/image";
 import { useContext } from "react";
 
@@ -128,6 +130,8 @@ const CafeEspacePropositionCard = ({
         Math.round(proposition.totalInstallation * MARGE)
       )} € d'installation`
     : "";
+
+  //Détails de l'offre
   const typeLaitText = !proposition.typeLait
     ? ""
     : proposition.typeLait === "dosettes"
@@ -140,110 +144,137 @@ const CafeEspacePropositionCard = ({
     : proposition.typeChocolat === "sachets"
     ? "Chocolat en sachets"
     : "Chocolat en poudre machine";
+  const imgProduit = proposition.imageUrl ? (
+    <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-200">
+      <Image
+        src={proposition.imageUrl}
+        alt={`${proposition.marque} ${proposition.modele}`}
+        fill
+        quality={100}
+        className="object-contain"
+      />
+    </div>
+  ) : null;
 
-  const tooltipEssentiel = (
-    <div className="flex flex-col gap-4">
-      <p className="text-center text-lg">Essentiel</p>
-      <p>
-        {proposition.infos
-          ? proposition.infos
-          : "Café conventionnel dit Classique, Blend"}
-      </p>
+  const infosEssentiel = (
+    <p>
+      {proposition.infos
+        ? proposition.infos
+        : "Café conventionnel dit Classique, Blend"}
+    </p>
+  );
+  const infosConfort = (
+    <p>
+      {proposition.infos ? proposition.infos : "Café Supérieur, 100% Arabica"}
+    </p>
+  );
+  const infosExcellence = (
+    <p>
+      {proposition.infos
+        ? proposition.infos
+        : "Café de spécialité, premium, café d’exception, Bio"}
+    </p>
+  );
+
+  const infosTitle = (
+    <p className={`text-${getFm4AllColor(proposition.gamme)} text-center`}>
+      {proposition.gamme === "essentiel"
+        ? "Essentiel"
+        : proposition.gamme === "confort"
+        ? "Confort"
+        : "Excellence"}
+    </p>
+  );
+
+  const infosProduit = (
+    <div className="flex flex-col text-sm my-4">
+      {gamme === "essentiel"
+        ? infosEssentiel
+        : gamme === "confort"
+        ? infosConfort
+        : infosExcellence}
+      <p>{typeLaitText}</p>
+      <p className="mb-4">{typeChocolatText}</p>
+      {imgProduit}
     </div>
   );
-  const tooltipConfort = (
-    <div className="flex flex-col gap-4">
-      <p className="text-center text-lg">Confort</p>
-      <p>
-        {proposition.infos ? proposition.infos : "Café Supérieur, 100% Arabica"}
-      </p>
-    </div>
-  );
-  const tooltipExcellence = (
-    <div className="flex flex-col gap-4">
-      <p className="text-center text-lg">Excellence</p>
-      <p>
-        {proposition.infos
-          ? proposition.infos
-          : "Café de spécialité, premium, café d’exception, Bio"}
-      </p>
-    </div>
-  );
-  const tooltip =
-    gamme === "essentiel"
-      ? tooltipEssentiel
-      : gamme === "confort"
-      ? tooltipConfort
-      : tooltipExcellence;
 
   return (
-    <TooltipProvider delayDuration={0}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div
-            className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4 cursor-pointer ${
-              espace.infos.gammeCafeSelected === gamme &&
-              cafe.infos.fournisseurId === proposition.fournisseurId
-                ? "ring-4 ring-inset ring-fm4alldestructive"
-                : ""
-            }`}
-            onClick={() =>
-              cafeEspacesIds[0] === espace.infos.espaceId
-                ? handleClickFirstEspaceProposition(proposition)
-                : handleClickProposition(proposition)
-            }
-          >
-            {proposition.totalAnnuel ? (
-              <Checkbox
-                checked={
-                  espace.infos.gammeCafeSelected === gamme &&
-                  cafe.infos.fournisseurId === proposition.fournisseurId
-                }
-                onCheckedChange={() => () =>
-                  cafeEspacesIds[0] === espace.infos.espaceId
-                    ? handleClickFirstEspaceProposition(proposition)
-                    : handleClickProposition(proposition)}
-                className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-              />
-            ) : null}
-            <div>
-              <p className="font-bold">{totalMensuelText}</p>
-              {prixInstallationText && (
-                <p className="text-base">{prixInstallationText}</p>
-              )}
+    <div
+      className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4 cursor-pointer ${
+        espace.infos.gammeCafeSelected === gamme &&
+        cafe.infos.fournisseurId === proposition.fournisseurId
+          ? "ring-4 ring-inset ring-fm4alldestructive"
+          : ""
+      }`}
+      onClick={() =>
+        cafeEspacesIds[0] === espace.infos.espaceId
+          ? handleClickFirstEspaceProposition(proposition)
+          : handleClickProposition(proposition)
+      }
+    >
+      {proposition.totalAnnuel ? (
+        <Checkbox
+          checked={
+            espace.infos.gammeCafeSelected === gamme &&
+            cafe.infos.fournisseurId === proposition.fournisseurId
+          }
+          onCheckedChange={() => () =>
+            cafeEspacesIds[0] === espace.infos.espaceId
+              ? handleClickFirstEspaceProposition(proposition)
+              : handleClickProposition(proposition)}
+          className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+        />
+      ) : null}
+      <div>
+        <div className="flex gap-2">
+          <p className="font-bold">{totalMensuelText}</p>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Info size={16} onClick={(e) => e.stopPropagation()} />
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>{infosTitle}</DialogTitle>
+              </DialogHeader>
+              {infosProduit}
+            </DialogContent>
+          </Dialog>
+        </div>
+        {prixInstallationText && (
+          <p className="text-base">{prixInstallationText}</p>
+        )}
 
-              <p className="text-xs">
-                {proposition.nbMachines} machine(s) {proposition.marque}{" "}
-                {proposition.modele}{" "}
-                {proposition.reconditionne ? " reconditionnée(s)" : ""}
-              </p>
-              <p className="text-xs">
-                Consommables ~ {proposition.nbTassesParJ} tasses / j
-              </p>
-              <p className="text-xs">
-                Maintenance: {proposition.nbPassagesParAn} passages / an
-              </p>
-            </div>
-          </div>
-        </TooltipTrigger>
-        <TooltipContent className="w-96 flex flex-col gap-2">
-          {tooltip}
-          <p>{typeLaitText}</p>
-          <p>{typeChocolatText}</p>
-          {proposition.imageUrl ? (
-            <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-200">
-              <Image
-                src={proposition.imageUrl}
-                alt={`${proposition.marque} ${proposition.modele}`}
-                fill
-                quality={100}
-                className="object-contain"
-              />
-            </div>
-          ) : null}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+        <p className="text-xs">
+          {proposition.nbMachines} machine(s) {proposition.marque}{" "}
+          {proposition.modele}{" "}
+          {proposition.reconditionne ? " reconditionnée(s)" : ""}
+        </p>
+        <p className="text-xs">
+          Consommables ~ {proposition.nbTassesParJ} tasses / j
+        </p>
+        <p className="text-xs">
+          Maintenance: {proposition.nbPassagesParAn} passages / an
+        </p>
+      </div>
+    </div>
+
+    // <TooltipContent className="w-96 flex flex-col gap-2">
+    //   {tooltip}
+    //   <p>{typeLaitText}</p>
+    //   <p>{typeChocolatText}</p>
+    //   {proposition.imageUrl ? (
+    //     <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-200">
+    //       <Image
+    //         src={proposition.imageUrl}
+    //         alt={`${proposition.marque} ${proposition.modele}`}
+    //         fill
+    //         quality={100}
+    //         className="object-contain"
+    //       />
+    //     </div>
+    //   ) : null}
+    // </TooltipContent>
   );
 };
 

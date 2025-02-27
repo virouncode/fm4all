@@ -1,15 +1,17 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { MARGE } from "@/constants/constants";
 import { TypesPoseType } from "@/constants/typesPose";
 import { FontainesContext } from "@/context/FontainesProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
+import { Info } from "lucide-react";
 import Image from "next/image";
 import { useContext } from "react";
 import { getTypeFontaine } from "./getTypeFontaine";
@@ -109,120 +111,121 @@ const FontaineEspacePropositionCard = ({
       )} € d'installation`
     : "";
 
-  const tooltipEssentiel = (
+  const infosEssentiel = (
     <div className="flex flex-col gap-4">
       <p className="text-center text-lg">A poser</p>
-      <p className="text-center text-sm">
+      <p className="text-center text-sm font-normal">
         Machine table top à poser sur un plan de travail ou une table
       </p>
     </div>
   );
-  const tooltipConfort = (
+  const infosConfort = (
     <div className="flex flex-col gap-4">
       <p className="text-center text-lg">Colonne sur pied</p>
-      <p className="text-center text-sm">
+      <p className="text-center text-sm font-normal">
         Machine autonome fournie avec un meuble ou un pied
       </p>
     </div>
   );
-  const tooltipExcellence = (
+  const infosExcellence = (
     <div className="flex flex-col gap-4">
       <p className="text-center text-lg">Sur comptoir</p>
-      <p className="text-center text-sm">
+      <p className="text-center text-sm font-normal">
         Machine intégrée sous un meuble (non fourni). Seule la colonne de
         distribution dépasse
       </p>
     </div>
   );
-  const tooltip =
+  const infosTitle =
     proposition.typePose === "aposer"
-      ? tooltipEssentiel
+      ? infosEssentiel
       : proposition.typePose === "colonne"
-      ? tooltipConfort
-      : tooltipExcellence;
+      ? infosConfort
+      : infosExcellence;
+
+  const imgProduit = proposition.imageUrl ? (
+    <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-200">
+      <Image
+        src={proposition.imageUrl}
+        alt={`${proposition.marque} ${proposition.modele}`}
+        fill
+        quality={100}
+        className="object-contain"
+      />
+    </div>
+  ) : null;
 
   return (
-    <TooltipProvider delayDuration={0}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div
-            className={`flex flex-1  items-center p-4 justify-center text-2xl gap-4 cursor-pointer bg-slate-100 border-r ${
-              fontaines.infos.fournisseurId === proposition.fournisseurId &&
-              espace.infos.poseSelected === proposition.typePose
-                ? "ring-4 ring-inset ring-fm4alldestructive"
-                : ""
-            }`}
-            onClick={() =>
-              fontainesEspacesIds[0] === espace.infos.espaceId
-                ? handleClickFirstEspaceProposition(proposition)
-                : handleClickProposition(proposition)
-            }
-          >
-            {proposition.totalAnnuel ? (
-              <Checkbox
-                checked={
-                  fontaines.infos.fournisseurId === proposition.fournisseurId &&
-                  (espace.infos.poseSelected === proposition.typePose
-                    ? true
-                    : false)
-                }
-                onCheckedChange={() => () =>
-                  fontainesEspacesIds[0] === espace.infos.espaceId
-                    ? handleClickFirstEspaceProposition(proposition)
-                    : handleClickProposition(proposition)}
-                className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-              />
-            ) : null}
-            <div>
-              <p className="font-bold">{totalMensuelText}</p>
-              {prixInstallationText && (
-                <p className="text-base">{prixInstallationText}</p>
-              )}
+    <div
+      className={`flex flex-1  items-center p-4 justify-center text-2xl gap-4 cursor-pointer bg-slate-100 border-r ${
+        fontaines.infos.fournisseurId === proposition.fournisseurId &&
+        espace.infos.poseSelected === proposition.typePose
+          ? "ring-4 ring-inset ring-fm4alldestructive"
+          : ""
+      }`}
+      onClick={() =>
+        fontainesEspacesIds[0] === espace.infos.espaceId
+          ? handleClickFirstEspaceProposition(proposition)
+          : handleClickProposition(proposition)
+      }
+    >
+      {proposition.totalAnnuel ? (
+        <Checkbox
+          checked={
+            fontaines.infos.fournisseurId === proposition.fournisseurId &&
+            (espace.infos.poseSelected === proposition.typePose ? true : false)
+          }
+          onCheckedChange={() => () =>
+            fontainesEspacesIds[0] === espace.infos.espaceId
+              ? handleClickFirstEspaceProposition(proposition)
+              : handleClickProposition(proposition)}
+          className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+        />
+      ) : null}
+      <div>
+        <div className="flex gap-2">
+          <p className="font-bold">{totalMensuelText}</p>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Info size={16} onClick={(e) => e.stopPropagation()} />
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>{infosTitle}</DialogTitle>
+              </DialogHeader>
+              {imgProduit}
+            </DialogContent>
+          </Dialog>
+        </div>
+        {prixInstallationText && (
+          <p className="text-base">{prixInstallationText}</p>
+        )}
 
-              <p className="text-xs">
-                1 fontaine{" "}
-                <span
-                  className={`${
-                    proposition.fournisseurId === 13
-                      ? "inline-block blur-sm"
-                      : ""
-                  }`}
-                >
-                  {proposition.marque}
-                </span>{" "}
-                {proposition.modele}{" "}
-                {proposition.reconditionne ? " reconditionnée(s)" : ""}
-              </p>
-              <p className="text-xs">Filtres et maintenance inclus</p>
-              {/* {getTypeFontaine(espace.infos.typeEau) === "EC" ||
+        <p className="text-xs">
+          1 fontaine{" "}
+          <span
+            className={`${
+              proposition.fournisseurId === 13 ? "inline-block blur-sm" : ""
+            }`}
+          >
+            {proposition.marque}
+          </span>{" "}
+          {proposition.modele}{" "}
+          {proposition.reconditionne ? " reconditionnée(s)" : ""}
+        </p>
+        <p className="text-xs">Filtres et maintenance inclus</p>
+        {/* {getTypeFontaine(espace.infos.typeEau) === "EC" ||
               getTypeFontaine(espace.infos.typeEau) === "ECG" ? (
                 <p className="text-xs">
                   Consommables ~ 15 L / an / personne d&apos;eau chaude
                 </p>
               ) : null} */}
-              {getTypeFontaine(espace.infos.typeEau) === "EG" ||
-              getTypeFontaine(espace.infos.typeEau) === "ECG" ? (
-                <p className="text-xs">CO2 inclus</p>
-              ) : null}
-            </div>
-          </div>
-        </TooltipTrigger>
-        <TooltipContent className="w-96 flex flex-col gap-2">
-          {tooltip}
-          {proposition.imageUrl ? (
-            <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-200">
-              <Image
-                src={proposition.imageUrl}
-                alt={`${proposition.marque} ${proposition.modele}`}
-                fill
-                quality={100}
-                className="object-contain"
-              />
-            </div>
-          ) : null}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+        {getTypeFontaine(espace.infos.typeEau) === "EG" ||
+        getTypeFontaine(espace.infos.typeEau) === "ECG" ? (
+          <p className="text-xs">CO2 inclus</p>
+        ) : null}
+      </div>
+    </div>
   );
 };
 
