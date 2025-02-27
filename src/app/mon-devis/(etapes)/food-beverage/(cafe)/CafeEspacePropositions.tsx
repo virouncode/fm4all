@@ -219,6 +219,11 @@ const CafeEspacePropositions = ({
             ({ id }) => id === machinesTarifFournisseur?.cafeMachineId
           )?.marque ?? null
         : null;
+      const imageUrl = machinesTarifFournisseur
+        ? cafeMachines?.find(
+            ({ id }) => id === machinesTarifFournisseur?.cafeMachineId
+          )?.imageUrl ?? null
+        : null;
       const reconditionne = machinesTarifFournisseur
         ? machinesTarifFournisseur.reconditionne ?? null
         : null;
@@ -230,6 +235,7 @@ const CafeEspacePropositions = ({
         gamme,
         modele,
         marque,
+        imageUrl,
         infos,
         reconditionne,
         typeLait,
@@ -260,6 +266,7 @@ const CafeEspacePropositions = ({
         gamme: GammeType;
         modele: string | null;
         marque: string | null;
+        imageUrl: string | null;
         infos: string | null;
         reconditionne: boolean | null;
         typeLait: "dosettes" | "frais" | "poudre" | null;
@@ -301,6 +308,7 @@ const CafeEspacePropositions = ({
     gamme: GammeType;
     modele: string | null;
     marque: string | null;
+    imageUrl: string | null;
     infos: string | null;
     reconditionne: boolean | null;
     typeLait: "dosettes" | "frais" | "poudre" | null;
@@ -444,6 +452,7 @@ const CafeEspacePropositions = ({
     gamme: "essentiel" | "confort" | "excellence";
     modele: string | null;
     marque: string | null;
+    imageUrl: string | null;
     infos: string | null;
     reconditionne: boolean | null;
     typeLait: "dosettes" | "frais" | "poudre" | null;

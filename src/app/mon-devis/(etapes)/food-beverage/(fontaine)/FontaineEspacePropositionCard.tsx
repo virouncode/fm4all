@@ -10,6 +10,7 @@ import { TypesPoseType } from "@/constants/typesPose";
 import { FontainesContext } from "@/context/FontainesProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
+import Image from "next/image";
 import { useContext } from "react";
 import { getTypeFontaine } from "./getTypeFontaine";
 
@@ -21,6 +22,7 @@ type FontaineEspacePropositionCardProps = {
     sloganFournisseur: string | null;
     modele: string | null;
     marque: string | null;
+    imageUrl: string | null;
     infos: string | null;
     typePose: TypesPoseType;
     reconditionne: boolean | null;
@@ -40,6 +42,7 @@ type FontaineEspacePropositionCardProps = {
     sloganFournisseur: string | null;
     modele: string | null;
     marque: string | null;
+    imageUrl: string | null;
     infos: string | null;
     typePose: TypesPoseType;
     reconditionne: boolean | null;
@@ -59,6 +62,7 @@ type FontaineEspacePropositionCardProps = {
     sloganFournisseur: string | null;
     modele: string | null;
     marque: string | null;
+    imageUrl: string | null;
     infos: string | null;
     typePose: TypesPoseType;
     reconditionne: boolean | null;
@@ -200,7 +204,20 @@ const FontaineEspacePropositionCard = ({
             </div>
           </div>
         </TooltipTrigger>
-        <TooltipContent className="max-w-60"> {tooltip}</TooltipContent>
+        <TooltipContent className="w-96 flex flex-col gap-2">
+          {tooltip}
+          {proposition.imageUrl ? (
+            <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-200">
+              <Image
+                src={proposition.imageUrl}
+                alt={`${proposition.marque} ${proposition.modele}`}
+                fill
+                quality={100}
+                className="object-contain"
+              />
+            </div>
+          ) : null}
+        </TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );

@@ -6,7 +6,6 @@ import {
   FontainesContext,
   MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE,
 } from "@/context/FontainesProvider";
-import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
 import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
 import { toast } from "@/hooks/use-toast";
 import { roundNbPersonnesFontaine } from "@/lib/roundNbPersonnesFontaine";
@@ -34,7 +33,6 @@ const FontaineEspacePropositions = ({
   espace,
 }: FontaineEspacePropositionsProps) => {
   const { client } = useContext(ClientContext);
-  const { setFoodBeverage } = useContext(FoodBeverageContext);
   const { setDevisProgress } = useContext(DevisProgressContext);
   const { fontaines, setFontaines } = useContext(FontainesContext);
   const { setTotalFontaines } = useContext(TotalFontainesContext);
@@ -110,6 +108,10 @@ const FontaineEspacePropositions = ({
       const marque =
         fontainesModeles.find((modele) => modele.id === tarif.fontaineId)
           ?.marque ?? null;
+      const imageUrl =
+        fontainesModeles.find((modele) => modele.id === tarif.fontaineId)
+          ?.imageUrl ?? null;
+      console.log("imageUrl", imageUrl);
 
       return {
         id: tarif.id,
@@ -118,6 +120,7 @@ const FontaineEspacePropositions = ({
         sloganFournisseur: tarif.sloganFournisseur,
         modele,
         marque,
+        imageUrl,
         infos: tarif.infos,
         typePose: tarif.typePose,
         reconditionne: tarif.reconditionne,
@@ -142,6 +145,7 @@ const FontaineEspacePropositions = ({
         sloganFournisseur: string | null;
         modele: string | null;
         marque: string | null;
+        imageUrl: string | null;
         infos: string | null;
         typePose: TypesPoseType;
         reconditionne: boolean | null;
@@ -179,6 +183,7 @@ const FontaineEspacePropositions = ({
     sloganFournisseur: string | null;
     modele: string | null;
     marque: string | null;
+    imageUrl: string | null;
     infos: string | null;
     typePose: TypesPoseType;
     reconditionne: boolean | null;
@@ -295,6 +300,7 @@ const FontaineEspacePropositions = ({
     sloganFournisseur: string | null;
     modele: string | null;
     marque: string | null;
+    imageUrl: string | null;
     infos: string | null;
     typePose: TypesPoseType;
     reconditionne: boolean | null;

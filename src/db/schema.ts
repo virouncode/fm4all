@@ -75,7 +75,6 @@ export const fournisseurs = pgTable("fournisseurs", {
   dateChiffrage: date("date_chiffrage", { mode: "string" }).notNull(),
   status: statusEnum().notNull().default("active"),
   slogan: varchar(),
-  logoId: integer("logo_id").references(() => logosFournisseurs.id),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -353,6 +352,7 @@ export const cafeMachines = pgTable("cafe_machines", {
   lactee: boolean().notNull(),
   gourmande: boolean().notNull(),
   infos: varchar(),
+  imageUrl: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -524,6 +524,7 @@ export const fontaines = pgTable("fontaines", {
   marque: varchar().notNull(),
   modele: varchar().notNull(),
   infos: varchar(),
+  imageUrl: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 export const fontainesTarifs = pgTable("fontaines_tarifs", {
@@ -618,10 +619,6 @@ export const clientsRelations = relations(clients, ({ many }) => ({
 export const fournisseursRelations = relations(
   fournisseurs,
   ({ one, many }) => ({
-    logosFournisseur: one(logosFournisseurs, {
-      fields: [fournisseurs.logoId],
-      references: [logosFournisseurs.id],
-    }),
     officeManagerTarif: one(officeManagerTarifs, {
       fields: [fournisseurs.id],
       references: [officeManagerTarifs.fournisseurId],
@@ -654,16 +651,6 @@ export const fournisseursRelations = relations(
     boissonsTarifs: many(boissonsTarifs),
     foodLivraisonTarifs: many(foodLivraisonTarifs),
     fontainesTarifs: many(fontainesTarifs),
-  })
-);
-
-export const logosFournisseursRelations = relations(
-  logosFournisseurs,
-  ({ one }) => ({
-    fournisseur: one(fournisseurs, {
-      fields: [logosFournisseurs.id],
-      references: [fournisseurs.logoId],
-    }),
   })
 );
 

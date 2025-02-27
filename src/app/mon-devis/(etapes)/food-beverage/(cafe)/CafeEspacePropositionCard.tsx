@@ -11,6 +11,7 @@ import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
 import { GammeType } from "@/zod-schemas/gamme";
+import Image from "next/image";
 import { useContext } from "react";
 
 type CafeEspacePropositionCardProps = {
@@ -22,6 +23,7 @@ type CafeEspacePropositionCardProps = {
     gamme: GammeType;
     modele: string | null;
     marque: string | null;
+    imageUrl: string | null;
     infos: string | null;
     reconditionne: boolean | null;
     typeLait: "dosettes" | "frais" | "poudre" | null;
@@ -47,6 +49,7 @@ type CafeEspacePropositionCardProps = {
     gamme: GammeType;
     modele: string | null;
     marque: string | null;
+    imageUrl: string | null;
     infos: string | null;
     reconditionne: boolean | null;
     typeLait: "dosettes" | "frais" | "poudre" | null;
@@ -72,6 +75,7 @@ type CafeEspacePropositionCardProps = {
     gamme: GammeType;
     modele: string | null;
     marque: string | null;
+    imageUrl: string | null;
     infos: string | null;
     reconditionne: boolean | null;
     typeLait: "dosettes" | "frais" | "poudre" | null;
@@ -219,10 +223,21 @@ const CafeEspacePropositionCard = ({
             </div>
           </div>
         </TooltipTrigger>
-        <TooltipContent className="max-w-60">
+        <TooltipContent className="w-96 flex flex-col gap-2">
           {tooltip}
           <p>{typeLaitText}</p>
           <p>{typeChocolatText}</p>
+          {proposition.imageUrl ? (
+            <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-200">
+              <Image
+                src={proposition.imageUrl}
+                alt={`${proposition.marque} ${proposition.modele}`}
+                fill
+                quality={100}
+                className="object-contain"
+              />
+            </div>
+          ) : null}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
