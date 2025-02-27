@@ -5,6 +5,7 @@ export const nettoyageSchema = z.object({
     fournisseurId: z.number().nullable(),
     nomFournisseur: z.string().nullable(),
     sloganFournisseur: z.string().nullable(),
+    logoUrl: z.string().nullable(),
     gammeSelected: z.enum(["essentiel", "confort", "excellence"]).nullable(),
     repasseSelected: z.boolean().default(false),
     samediSelected: z.boolean().default(false),

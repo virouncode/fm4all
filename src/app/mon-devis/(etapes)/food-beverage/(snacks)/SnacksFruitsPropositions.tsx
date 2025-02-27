@@ -58,6 +58,7 @@ const SnacksFruitsPropositions = ({
       gamme,
       nomFournisseur,
       slogan: sloganFournisseur,
+      logoUrl,
       fournisseurId,
       prixKg,
     } = item;
@@ -181,6 +182,7 @@ const SnacksFruitsPropositions = ({
       fournisseurId,
       nomFournisseur,
       sloganFournisseur,
+      logoUrl,
       isSameFournisseur,
       gamme,
       //quantites
@@ -216,6 +218,7 @@ const SnacksFruitsPropositions = ({
         fournisseurId: number;
         nomFournisseur: string;
         sloganFournisseur: string | null;
+        logoUrl: string | null;
         isSameFournisseur: boolean;
         gamme: GammeType;
         fruitsKgParSemaine: number | null;
@@ -259,6 +262,7 @@ const SnacksFruitsPropositions = ({
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
+    logoUrl: string | null;
     isSameFournisseur: boolean;
     gamme: GammeType;
     fruitsKgParSemaine: number | null;

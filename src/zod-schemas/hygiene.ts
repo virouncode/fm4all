@@ -5,6 +5,7 @@ export const hygieneSchema = z.object({
     fournisseurId: z.number().nullable(),
     nomFournisseur: z.string().nullable(),
     sloganFournisseur: z.string().nullable(),
+    logoUrl: z.string().nullable(),
     dureeLocation: z.enum(["pa12M", "pa24M", "pa36M", "oneShot"]),
     trilogieGammeSelected: z
       .enum(["essentiel", "confort", "excellence"])

@@ -48,6 +48,7 @@ export const getHygieneDistribTarifs = async () => {
         ...getTableColumns(hygieneDistribTarifs),
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
+        logoUrl: fournisseurs.logoUrl,
       })
       .from(hygieneDistribTarifs)
       .innerJoin(
@@ -105,6 +106,7 @@ export const getHygieneConsosTarifs = async (effectif: string) => {
         ...getTableColumns(hygieneConsoTarifs),
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
+        logoUrl: fournisseurs.logoUrl,
       })
       .from(hygieneConsoTarifs)
       .innerJoin(

@@ -533,6 +533,7 @@ const FontaineEspaceForm = ({
           fournisseurId: null,
           nomFournisseur: null,
           sloganFournisseur: null,
+          logoUrl: null,
           dureeLocation: value as DureeLocationFontaineType,
         },
         espaces: prev.espaces.map((item) =>

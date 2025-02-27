@@ -132,6 +132,7 @@ const CafeEspacePropositions = ({
         fournisseurId,
         nomFournisseur,
         slogan: sloganFournisseur,
+        logoUrl,
         gamme,
         prixUnitaire,
       } = tarif;
@@ -232,6 +233,7 @@ const CafeEspacePropositions = ({
         fournisseurId,
         nomFournisseur,
         sloganFournisseur,
+        logoUrl,
         gamme,
         modele,
         marque,
@@ -263,6 +265,7 @@ const CafeEspacePropositions = ({
         fournisseurId: number;
         nomFournisseur: string;
         sloganFournisseur: string | null;
+        logoUrl: string | null;
         gamme: GammeType;
         modele: string | null;
         marque: string | null;
@@ -305,6 +308,7 @@ const CafeEspacePropositions = ({
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
+    logoUrl: string | null;
     gamme: GammeType;
     modele: string | null;
     marque: string | null;
@@ -449,6 +453,7 @@ const CafeEspacePropositions = ({
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
+    logoUrl: string | null;
     gamme: "essentiel" | "confort" | "excellence";
     modele: string | null;
     marque: string | null;
@@ -504,6 +509,7 @@ const CafeEspacePropositions = ({
           fournisseurId: null,
           nomFournisseur: null,
           sloganFournisseur: null,
+          logoUrl: null,
         },
         espaces: prev.espaces.map((item) => ({
           ...item,

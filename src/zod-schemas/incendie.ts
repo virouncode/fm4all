@@ -5,6 +5,7 @@ export const incendieSchema = z.object({
     fournisseurId: z.number().nullable(),
     nomFournisseur: z.string().nullable(),
     sloganFournisseur: z.string().nullable(),
+    logoUrl: z.string().nullable(),
     commentaires: z.string().nullable(),
   }),
   quantites: z.object({

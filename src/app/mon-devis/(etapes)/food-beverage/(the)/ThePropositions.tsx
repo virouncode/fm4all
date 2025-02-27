@@ -79,6 +79,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
     id: number;
     nomFournisseur: string;
     slogan: string | null;
+    logoUrl: string | null;
     createdAt: Date;
     fournisseurId: number;
     gamme: GammeType;

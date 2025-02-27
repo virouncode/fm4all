@@ -10,6 +10,7 @@ export const selectChocolatConsoTarifsSchema = createSelectSchema(
 ).extend({
   nomFournisseur: z.string().nonempty("Le nom du fournisseur est obligatoire"),
   slogan: z.string().nullable(),
+  logoUrl: z.string().nullable(),
 });
 
 export type SelectChocolatConsoTarifsType =

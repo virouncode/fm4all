@@ -46,6 +46,7 @@ export const getMaintenanceTarifs = async (surface: string) => {
         ...getTableColumns(maintenanceTarifs),
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
+        logoUrl: fournisseurs.logoUrl,
       })
       .from(maintenanceTarifs)
       .innerJoin(

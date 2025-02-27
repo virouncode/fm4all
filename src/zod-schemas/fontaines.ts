@@ -5,6 +5,7 @@ export const fontainesSchema = z.object({
     fournisseurId: z.number().nullable(),
     nomFournisseur: z.string().nullable(),
     sloganFournisseur: z.string().nullable(),
+    logoUrl: z.string().nullable(),
     currentEspaceId: z.number().nullable(),
     dureeLocation: z
       .enum(["pa12M", "pa24M", "pa36M", "pa48M", "pa60M", "oneShot"])

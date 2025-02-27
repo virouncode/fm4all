@@ -7,6 +7,7 @@ export const selectHygieneDistribTarifsSchema = createSelectSchema(
 ).extend({
   nomFournisseur: z.string().nonempty("Le nom de l'entreprise est requis"),
   slogan: z.string().nullable(),
+  logoUrl: z.string().nullable(),
 });
 
 export type SelectHygieneDistribTarifsType =

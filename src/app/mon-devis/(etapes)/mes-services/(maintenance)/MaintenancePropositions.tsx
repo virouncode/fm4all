@@ -35,6 +35,7 @@ const MaintenancePropositions = ({
       gamme,
       nomFournisseur,
       slogan: sloganFournisseur,
+      logoUrl,
       fournisseurId,
       hParPassage,
       tauxHoraire,
@@ -71,6 +72,7 @@ const MaintenancePropositions = ({
       nomFournisseur,
       fournisseurId,
       sloganFournisseur,
+      logoUrl,
       hParPassage,
       tauxHoraire,
       freqAnnuelle,
@@ -91,6 +93,7 @@ const MaintenancePropositions = ({
         nomFournisseur: string;
         fournisseurId: number;
         sloganFournisseur: string | null;
+        logoUrl: string | null;
         hParPassage: number;
         tauxHoraire: number;
         freqAnnuelle: number | null;
@@ -123,6 +126,7 @@ const MaintenancePropositions = ({
     nomFournisseur: string;
     fournisseurId: number;
     sloganFournisseur: string | null;
+    logoUrl: string | null;
     hParPassage: number;
     tauxHoraire: number;
     freqAnnuelle: number | null;
@@ -137,6 +141,7 @@ const MaintenancePropositions = ({
       nomFournisseur,
       fournisseurId,
       sloganFournisseur,
+      logoUrl,
       hParPassage,
       tauxHoraire,
       freqAnnuelle,
@@ -163,6 +168,7 @@ const MaintenancePropositions = ({
             fournisseurId: null,
             nomFournisseur: null,
             sloganFournisseur: null,
+            logoUrl: null,
             gammeSelected: null,
           },
           quantites: {
@@ -191,6 +197,7 @@ const MaintenancePropositions = ({
         fournisseurId,
         nomFournisseur,
         sloganFournisseur,
+        logoUrl,
         gammeSelected: gamme,
       },
       quantites: {

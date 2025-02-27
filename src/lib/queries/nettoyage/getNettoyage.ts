@@ -44,6 +44,7 @@ export const getNettoyageTarifs = async (surface: string) => {
         ...getTableColumns(nettoyageTarifs),
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
+        logoUrl: fournisseurs.logoUrl,
       })
       .from(nettoyageTarifs)
       .innerJoin(
@@ -74,6 +75,7 @@ export const getRepasseTarifs = async (surface: string) => {
         ...getTableColumns(nettoyageRepasseTarifs),
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
+        logoUrl: fournisseurs.logoUrl,
       })
       .from(nettoyageRepasseTarifs)
       .innerJoin(
@@ -104,6 +106,7 @@ export const getVitrerieTarifs = async () => {
         ...getTableColumns(nettoyageVitrerieTarifs),
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
+        logoUrl: fournisseurs.logoUrl,
       })
       .from(nettoyageVitrerieTarifs)
       .innerJoin(

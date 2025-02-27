@@ -50,7 +50,7 @@ const OfficeManagerPropositions = ({
 
   const formattedPropositions = officeManagerTarifs.map((tarif) => {
     let { fournisseurId, nomFournisseur, slogan } = tarif;
-    const { id, demiTjm, demiTjmPremium } = tarif;
+    const { id, demiTjm, demiTjmPremium, logoUrl } = tarif;
     if (fournisseurId === 14) {
       fournisseurId = 16;
       nomFournisseur = "FM4ALL";
@@ -71,6 +71,7 @@ const OfficeManagerPropositions = ({
       fournisseurId,
       nomFournisseur,
       sloganFournisseur: slogan,
+      logoUrl,
       totalAnnuel,
       demiJParSemaine,
       demiTjm,
@@ -83,6 +84,7 @@ const OfficeManagerPropositions = ({
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
+    logoUrl: string | null;
     totalAnnuel: number | null;
     demiJParSemaine: number | null;
     demiTjm: number;
@@ -92,6 +94,7 @@ const OfficeManagerPropositions = ({
       fournisseurId,
       nomFournisseur,
       sloganFournisseur,
+      logoUrl,
       totalAnnuel,
       demiJParSemaine,
       demiTjm,
@@ -108,6 +111,7 @@ const OfficeManagerPropositions = ({
           fournisseurId: null,
           nomFournisseur: null,
           sloganFournisseur: null,
+          logoUrl: null,
           gammeSelected: null,
         },
         quantites: {
@@ -129,6 +133,7 @@ const OfficeManagerPropositions = ({
         fournisseurId,
         nomFournisseur,
         sloganFournisseur,
+        logoUrl,
         gammeSelected:
           demiJParSemaine !== null &&
           demiJParSemaineConfort !== null &&
@@ -157,12 +162,12 @@ const OfficeManagerPropositions = ({
     value: number[],
     demiTauxJournalier: number | null
   ) => {
-    setOfficeManager({
-      ...officeManager,
+    setOfficeManager((prev) => ({
+      ...prev,
       quantites: {
         demiJParSemaine: value[0],
       },
-    });
+    }));
     if (officeManager.infos.gammeSelected) {
       const newMajoration =
         value[0] <= 1
@@ -287,9 +292,9 @@ const OfficeManagerPropositions = ({
               <div className="flex border-b flex-1" key={proposition.id}>
                 <div className="flex w-1/4 items-center justify-center flex-col gap-6 p-4">
                   <OfficeManagerFournisseurLogo
-                    fournisseurId={proposition.fournisseurId}
                     nomFournisseur={proposition.nomFournisseur}
                     sloganFournisseur={proposition.sloganFournisseur}
+                    logoUrl={proposition.logoUrl}
                   />
                   <OfficeManagerInputs
                     demiJParSemaineEssentiel={demiJParSemaineEssentiel}

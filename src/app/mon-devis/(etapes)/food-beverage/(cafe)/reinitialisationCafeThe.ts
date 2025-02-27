@@ -15,6 +15,7 @@ export const reinitialisationCafeThe = (
       fournisseurId: null,
       nomFournisseur: null,
       sloganFournisseur: null,
+      logoUrl: null,
       currentEspaceId: 1,
       dureeLocation: "pa12M",
       commentaires: null,

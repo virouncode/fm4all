@@ -44,6 +44,7 @@ export const getIncendieTarifs = async (surface: string) => {
         ...getTableColumns(incendieTarifs),
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
+        logoUrl: fournisseurs.logoUrl,
       })
       .from(incendieTarifs)
       .innerJoin(

@@ -6,22 +6,21 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { HygieneContext } from "@/context/HygieneProvider";
-import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
 import Image from "next/image";
 import { useContext } from "react";
 
 const HygieneFournisseurLogo = () => {
   const { hygiene } = useContext(HygieneContext);
-  const logoFournisseurUrl = getLogoFournisseurUrl(hygiene.infos.fournisseurId);
+  const logoUrl = hygiene.infos.logoUrl;
   return (
     <TooltipProvider delayDuration={0}>
       <Tooltip>
         <TooltipTrigger asChild>
           <div className="flex items-center justify-center h-1/4 w-full">
-            {logoFournisseurUrl ? (
+            {logoUrl ? (
               <div className="w-full h-full relative">
                 <Image
-                  src={logoFournisseurUrl}
+                  src={logoUrl}
                   alt={`logo-de-${hygiene.infos.nomFournisseur}`}
                   fill={true}
                   className="w-full h-full object-contain"

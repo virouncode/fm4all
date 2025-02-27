@@ -40,6 +40,7 @@ export const getFruitsTarifs = async () => {
         ...getTableColumns(fruitsTarifs),
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
+        logoUrl: fournisseurs.logoUrl,
       })
       .from(fruitsTarifs)
       .innerJoin(fournisseurs, eq(fruitsTarifs.fournisseurId, fournisseurs.id));
@@ -76,6 +77,7 @@ export const getSnacksTarifs = async () => {
         ...getTableColumns(snacksTarifs),
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
+        logoUrl: fournisseurs.logoUrl,
       })
       .from(snacksTarifs)
       .innerJoin(fournisseurs, eq(snacksTarifs.fournisseurId, fournisseurs.id));
@@ -112,6 +114,7 @@ export const getBoissonsTarifs = async () => {
         ...getTableColumns(boissonsTarifs),
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
+        logoUrl: fournisseurs.logoUrl,
       })
       .from(boissonsTarifs)
       .innerJoin(
@@ -138,6 +141,7 @@ export const getFoodLivraisonTarifs = async () => {
         ...getTableColumns(foodLivraisonTarifs),
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
+        logoUrl: fournisseurs.logoUrl,
       })
       .from(foodLivraisonTarifs)
       .innerJoin(

@@ -13,6 +13,7 @@ export const getFontainesTarifs = async () => {
         ...getTableColumns(fontainesTarifs),
         nomFournisseur: fournisseurs.nomFournisseur,
         sloganFournisseur: fournisseurs.slogan,
+        logoUrl: fournisseurs.logoUrl,
       })
       .from(fontainesTarifs)
       .innerJoin(

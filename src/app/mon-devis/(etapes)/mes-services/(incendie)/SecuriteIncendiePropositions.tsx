@@ -43,6 +43,7 @@ const SecuriteIncendiePropositions = ({
     fournisseurId: tarif.fournisseurId,
     nomFournisseur: tarif.nomFournisseur,
     sloganFournisseur: tarif.slogan,
+    logoUrl: tarif.logoUrl,
     nbExtincteurs,
     nbBaes,
     nbTelBaes,
@@ -61,6 +62,7 @@ const SecuriteIncendiePropositions = ({
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
+    logoUrl: string | null;
     nbExtincteurs: number;
     nbBaes: number;
     nbTelBaes: number;
@@ -74,6 +76,7 @@ const SecuriteIncendiePropositions = ({
       fournisseurId,
       nomFournisseur,
       sloganFournisseur,
+      logoUrl,
       nbExtincteurs,
       nbBaes,
       nbTelBaes,
@@ -91,6 +94,7 @@ const SecuriteIncendiePropositions = ({
           fournisseurId: null,
           nomFournisseur: null,
           sloganFournisseur: null,
+          logoUrl: null,
         },
         prix: {
           prixParExtincteur: null,
@@ -132,6 +136,7 @@ const SecuriteIncendiePropositions = ({
         fournisseurId,
         nomFournisseur,
         sloganFournisseur,
+        logoUrl,
       },
       quantites: {
         ...prev.quantites,
@@ -272,9 +277,9 @@ const SecuriteIncendiePropositions = ({
           <div className="flex border-b flex-1" key={proposition.id}>
             <div className="flex w-1/4 items-center justify-between flex-col gap-10 p-4">
               <SecuriteIncendieFournisseurLogo
-                fournisseurId={proposition.fournisseurId}
                 nomFournisseur={proposition.nomFournisseur}
                 sloganFournisseur={proposition.sloganFournisseur}
+                logoUrl={proposition.logoUrl}
               />
               <SecuriteIncendieInputs
                 nbExtincteurs={nbExtincteurs}

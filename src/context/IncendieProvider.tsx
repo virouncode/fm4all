@@ -20,6 +20,7 @@ export const IncendieContext = createContext<{
       fournisseurId: null,
       nomFournisseur: null,
       sloganFournisseur: null,
+      logoUrl: null,
       commentaires: null,
     },
     quantites: {
@@ -64,6 +65,7 @@ const IncendieProvider = ({ children }: PropsWithChildren) => {
       fournisseurId: null,
       nomFournisseur: null,
       sloganFournisseur: null,
+      logoUrl: null,
       commentaires: null,
     },
     quantites: {

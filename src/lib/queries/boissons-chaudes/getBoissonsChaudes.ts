@@ -27,6 +27,7 @@ export const getCafeMachinesTarifs = async () => {
         ...getTableColumns(cafeMachinesTarifs),
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
+        logoUrl: fournisseurs.logoUrl,
       })
       .from(cafeMachinesTarifs)
       .innerJoin(
@@ -66,6 +67,7 @@ export const getCafeConsoTarifs = async () => {
         ...getTableColumns(cafeConsoTarifs),
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
+        logoUrl: fournisseurs.logoUrl,
       })
       .from(cafeConsoTarifs)
       .innerJoin(
@@ -93,6 +95,7 @@ export const getLaitConsoTarifs = async () => {
         ...getTableColumns(laitConsoTarifs),
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
+        logoUrl: fournisseurs.logoUrl,
       })
       .from(laitConsoTarifs)
       .innerJoin(
@@ -131,6 +134,7 @@ export const getChocolatConsoTarifs = async () => {
         ...getTableColumns(chocolatConsoTarifs),
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
+        logoUrl: fournisseurs.logoUrl,
       })
       .from(chocolatConsoTarifs)
       .innerJoin(
@@ -165,6 +169,7 @@ export const getTheConsoTarifs = async () => {
         ...getTableColumns(theConsoTarifs),
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
+        logoUrl: fournisseurs.logoUrl,
       })
       .from(theConsoTarifs)
       .innerJoin(
@@ -192,6 +197,7 @@ export const getSucreConsoTarifs = async () => {
         ...getTableColumns(sucreConsoTarifs),
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
+        logoUrl: fournisseurs.logoUrl,
       })
       .from(sucreConsoTarifs)
       .innerJoin(

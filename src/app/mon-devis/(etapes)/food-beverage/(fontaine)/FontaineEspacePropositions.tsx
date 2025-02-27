@@ -118,6 +118,7 @@ const FontaineEspacePropositions = ({
         fournisseurId: tarif.fournisseurId,
         nomFournisseur: tarif.nomFournisseur,
         sloganFournisseur: tarif.sloganFournisseur,
+        logoUrl: tarif.logoUrl,
         modele,
         marque,
         imageUrl,
@@ -143,6 +144,7 @@ const FontaineEspacePropositions = ({
         fournisseurId: number;
         nomFournisseur: string;
         sloganFournisseur: string | null;
+        logoUrl: string | null;
         modele: string | null;
         marque: string | null;
         imageUrl: string | null;
@@ -181,6 +183,7 @@ const FontaineEspacePropositions = ({
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
+    logoUrl: string | null;
     modele: string | null;
     marque: string | null;
     imageUrl: string | null;
@@ -298,6 +301,7 @@ const FontaineEspacePropositions = ({
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
+    logoUrl: string | null;
     modele: string | null;
     marque: string | null;
     imageUrl: string | null;
@@ -317,6 +321,7 @@ const FontaineEspacePropositions = ({
       fournisseurId,
       nomFournisseur,
       sloganFournisseur,
+      logoUrl,
       modele,
       marque,
       typePose,
@@ -342,6 +347,7 @@ const FontaineEspacePropositions = ({
           fournisseurId: null,
           nomFournisseur: null,
           sloganFournisseur: null,
+          logoUrl: null,
         },
         espaces: prev.espaces.map((item) => ({
           ...item,
@@ -380,6 +386,7 @@ const FontaineEspacePropositions = ({
         fournisseurId,
         nomFournisseur,
         sloganFournisseur,
+        logoUrl,
       };
       const newEspace: FontaineEspaceType[] = [];
       const newTotalEspace: {

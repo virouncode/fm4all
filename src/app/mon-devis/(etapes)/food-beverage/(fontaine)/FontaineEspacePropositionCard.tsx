@@ -20,6 +20,7 @@ type FontaineEspacePropositionCardProps = {
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
+    logoUrl: string | null;
     modele: string | null;
     marque: string | null;
     imageUrl: string | null;
@@ -40,6 +41,7 @@ type FontaineEspacePropositionCardProps = {
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
+    logoUrl: string | null;
     modele: string | null;
     marque: string | null;
     imageUrl: string | null;
@@ -60,6 +62,7 @@ type FontaineEspacePropositionCardProps = {
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
+    logoUrl: string | null;
     modele: string | null;
     marque: string | null;
     imageUrl: string | null;

@@ -4,11 +4,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
 import Image from "next/image";
 
 const ServicesFm4AllFournisseurLogo = () => {
-  const logoFournisseurUrl = getLogoFournisseurUrl(16);
+  const logoFournisseurUrl =
+    "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/logos_fournisseurs/logo_full-9pR7O9U3ZmYUyrsH9plouCrF6ZIQmH.webp";
   return (
     <TooltipProvider delayDuration={0}>
       <Tooltip>

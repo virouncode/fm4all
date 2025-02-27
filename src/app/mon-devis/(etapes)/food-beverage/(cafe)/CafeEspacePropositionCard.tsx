@@ -20,6 +20,7 @@ type CafeEspacePropositionCardProps = {
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
+    logoUrl: string | null;
     gamme: GammeType;
     modele: string | null;
     marque: string | null;
@@ -46,6 +47,7 @@ type CafeEspacePropositionCardProps = {
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
+    logoUrl: string | null;
     gamme: GammeType;
     modele: string | null;
     marque: string | null;
@@ -72,6 +74,7 @@ type CafeEspacePropositionCardProps = {
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
+    logoUrl: string | null;
     gamme: GammeType;
     modele: string | null;
     marque: string | null;

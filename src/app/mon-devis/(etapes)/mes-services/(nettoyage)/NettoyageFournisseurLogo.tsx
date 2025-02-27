@@ -6,30 +6,28 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { getLogoFournisseurUrl } from "@/lib/logosFournisseursMapping";
 import Image from "next/image";
 
 type NettoyageFournisseurLogoProps = {
-  fournisseurId: number | null;
   nomFournisseur: string | null;
+  logoUrl: string | null;
   sloganFournisseur: string | null;
 };
 
 const NettoyageFournisseurLogo = ({
-  fournisseurId,
   nomFournisseur,
+  logoUrl,
   sloganFournisseur,
 }: NettoyageFournisseurLogoProps) => {
-  const logoFournisseurUrl = getLogoFournisseurUrl(fournisseurId);
   return (
     <TooltipProvider delayDuration={0}>
       <Tooltip>
         <TooltipTrigger asChild>
           <div className="flex w-1/4 items-center justify-center p-2">
-            {logoFournisseurUrl ? (
+            {logoUrl ? (
               <div className="w-full h-full relative">
                 <Image
-                  src={logoFournisseurUrl}
+                  src={logoUrl}
                   alt={`logo-de-${nomFournisseur}`}
                   fill={true}
                   className="w-full h-full object-contain"

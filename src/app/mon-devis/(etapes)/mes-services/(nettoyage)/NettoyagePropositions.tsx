@@ -53,6 +53,7 @@ const NettoyagePropositions = ({
       fournisseurId,
       nomFournisseur,
       slogan: sloganFournisseur,
+      logoUrl,
       hParPassage,
       tauxHoraire,
       gamme,
@@ -67,6 +68,7 @@ const NettoyagePropositions = ({
       fournisseurId,
       nomFournisseur,
       sloganFournisseur,
+      logoUrl,
       freqAnnuelle,
       hParPassage,
       tauxHoraire,
@@ -83,6 +85,7 @@ const NettoyagePropositions = ({
         fournisseurId: number;
         nomFournisseur: string;
         sloganFournisseur: string | null;
+        logoUrl: string | null;
         freqAnnuelle: number | null;
         hParPassage: number;
         tauxHoraire: number;
@@ -111,6 +114,7 @@ const NettoyagePropositions = ({
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
+    logoUrl: string | null;
     freqAnnuelle: number | null;
     hParPassage: number;
     tauxHoraire: number;
@@ -128,6 +132,7 @@ const NettoyagePropositions = ({
           fournisseurId: null,
           nomFournisseur: null,
           sloganFournisseur: null,
+          logoUrl: null,
           gammeSelected: null,
         },
         quantites: {
@@ -159,6 +164,7 @@ const NettoyagePropositions = ({
           fournisseurId: null,
           nomFournisseur: null,
           sloganFournisseur: null,
+          logoUrl: null,
         },
         prix: {
           prixDistribEmp: null,
@@ -191,6 +197,7 @@ const NettoyagePropositions = ({
       fournisseurId,
       nomFournisseur,
       sloganFournisseur,
+      logoUrl,
       freqAnnuelle,
       gamme,
       hParPassage,
@@ -218,6 +225,7 @@ const NettoyagePropositions = ({
         fournisseurId,
         nomFournisseur,
         sloganFournisseur,
+        logoUrl,
         gammeSelected: gamme,
       },
       quantites: {
@@ -369,6 +377,10 @@ const NettoyagePropositions = ({
           hygieneFournisseurNom === "EPCH"
             ? "Le spécialiste de l'hygiène"
             : sloganFournisseur,
+        logoUrl:
+          hygieneFournisseurNom === "EPCH"
+            ? "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/logos_fournisseurs/logo_epch-Iy9QGTogt8KMcKbWGFrKzjQ6jqlEHS.webp"
+            : logoUrl,
       },
       quantites: {
         nbDistribEmp,

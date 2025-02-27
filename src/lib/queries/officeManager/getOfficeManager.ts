@@ -53,6 +53,7 @@ export const getOfficeManagerTarifs = async () => {
         ...getTableColumns(officeManagerTarifs),
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
+        logoUrl: fournisseurs.logoUrl,
       })
       .from(officeManagerTarifs)
       .innerJoin(

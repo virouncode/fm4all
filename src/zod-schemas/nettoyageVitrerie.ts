@@ -14,6 +14,7 @@ export const selectVitrerieTarifsSchema = createSelectSchema(
 ).extend({
   nomFournisseur: z.string().nonempty("Nom de fournisseur invalide"),
   slogan: z.string().nullable(),
+  logoUrl: z.string().nullable(),
 });
 
 export type SelectVitrerieTarifsType = typeof selectVitrerieTarifsSchema._type;

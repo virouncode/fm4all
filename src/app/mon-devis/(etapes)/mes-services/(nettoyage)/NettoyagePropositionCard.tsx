@@ -19,6 +19,7 @@ type NettoyagePropositionCardProps = {
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
+    logoUrl: string | null;
     freqAnnuelle: number | null;
     hParPassage: number;
     tauxHoraire: number;
@@ -30,6 +31,7 @@ type NettoyagePropositionCardProps = {
     fournisseurId: number;
     nomFournisseur: string;
     sloganFournisseur: string | null;
+    logoUrl: string | null;
     freqAnnuelle: number | null;
     hParPassage: number;
     tauxHoraire: number;

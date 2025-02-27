@@ -18,6 +18,7 @@ type ThePropositionCardProps = {
     id: number;
     nomFournisseur: string;
     slogan: string | null;
+    logoUrl: string | null;
     createdAt: Date;
     fournisseurId: number;
     gamme: "essentiel" | "confort" | "excellence";
@@ -30,6 +31,7 @@ type ThePropositionCardProps = {
     id: number;
     nomFournisseur: string;
     slogan: string | null;
+    logoUrl: string | null;
     createdAt: Date;
     fournisseurId: number;
     gamme: "essentiel" | "confort" | "excellence";

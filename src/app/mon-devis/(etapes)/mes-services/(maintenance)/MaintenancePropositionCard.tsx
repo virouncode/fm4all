@@ -21,6 +21,7 @@ type MaintenancePropositionCardProps = {
     nomFournisseur: string;
     fournisseurId: number;
     sloganFournisseur: string | null;
+    logoUrl: string | null;
     hParPassage: number;
     tauxHoraire: number;
     freqAnnuelle: number | null;
@@ -36,6 +37,7 @@ type MaintenancePropositionCardProps = {
     nomFournisseur: string;
     fournisseurId: number;
     sloganFournisseur: string | null;
+    logoUrl: string | null;
     hParPassage: number;
     tauxHoraire: number;
     freqAnnuelle: number | null;
