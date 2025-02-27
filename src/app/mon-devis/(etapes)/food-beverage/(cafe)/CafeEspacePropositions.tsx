@@ -479,6 +479,7 @@ const CafeEspacePropositions = ({
       fournisseurId,
       nomFournisseur,
       sloganFournisseur,
+      logoUrl,
       gamme,
       modele,
       marque,
@@ -602,6 +603,7 @@ const CafeEspacePropositions = ({
         fournisseurId,
         nomFournisseur,
         sloganFournisseur,
+        logoUrl,
       };
       const newEspace: CafeEspaceType[] = [];
       const newTotalEspace: {

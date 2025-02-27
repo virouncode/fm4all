@@ -125,6 +125,7 @@ const CafeEspaceForm = ({
             fournisseurId: null,
             nomFournisseur: null,
             sloganFournisseur: null,
+            logoUrl: null,
           },
           espaces: prev.espaces.map((item) =>
             item.infos.espaceId === espace.infos.espaceId
@@ -417,6 +418,7 @@ const CafeEspaceForm = ({
             fournisseurId: null,
             nomFournisseur: null,
             sloganFournisseur: null,
+            logoUrl: null,
           },
           espaces: prev.espaces.map((item) =>
             item.infos.espaceId === espace.infos.espaceId
@@ -689,6 +691,7 @@ const CafeEspaceForm = ({
           fournisseurId: null,
           nomFournisseur: null,
           sloganFournisseur: null,
+          logoUrl: null,
           dureeLocation: value as DureeLocationCafeType,
         },
         espaces: prev.espaces.map((item) =>

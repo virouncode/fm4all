@@ -103,6 +103,7 @@ const FontaineEspaceForm = ({
             fournisseurId: null,
             nomFournisseur: null,
             sloganFournisseur: null,
+            logoUrl: null,
           },
           espaces: prev.espaces.map((item) =>
             item.infos.espaceId === espace.infos.espaceId
@@ -324,6 +325,7 @@ const FontaineEspaceForm = ({
             fournisseurId: null,
             nomFournisseur: null,
             sloganFournisseur: null,
+            logoUrl: null,
           },
           espaces: prev.espaces.map((item) =>
             item.infos.espaceId === espace.infos.espaceId
