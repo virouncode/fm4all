@@ -119,6 +119,13 @@ const FontaineEspacePropositions = ({
         nomFournisseur: tarif.nomFournisseur,
         sloganFournisseur: tarif.sloganFournisseur,
         logoUrl: tarif.logoUrl,
+        locationUrl: tarif.locationUrl,
+        anneeCreation: tarif.anneeCreation,
+        ca: tarif.ca,
+        effectifFournisseur: tarif.effectifFournisseur,
+        nbClients: tarif.nbClients,
+        noteGoogle: tarif.noteGoogle,
+        nbAvis: tarif.nbAvis,
         modele,
         marque,
         imageUrl,
@@ -145,6 +152,13 @@ const FontaineEspacePropositions = ({
         nomFournisseur: string;
         sloganFournisseur: string | null;
         logoUrl: string | null;
+        locationUrl: string | null;
+        anneeCreation: number | null;
+        ca: string | null;
+        effectifFournisseur: string | null;
+        nbClients: number | null;
+        noteGoogle: string | null;
+        nbAvis: number | null;
         modele: string | null;
         marque: string | null;
         imageUrl: string | null;
@@ -184,6 +198,13 @@ const FontaineEspacePropositions = ({
     nomFournisseur: string;
     sloganFournisseur: string | null;
     logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
     modele: string | null;
     marque: string | null;
     imageUrl: string | null;

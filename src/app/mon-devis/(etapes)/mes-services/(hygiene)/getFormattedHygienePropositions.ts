@@ -59,6 +59,17 @@ export const getFormattedHygienePropositions = (
         (tarif) => tarif.type === "ph" && tarif.gamme === gamme
       )?.[dureeLocation] ?? null;
 
+    const nomFournisseur = hygieneDistribTarifsFournisseur[0].nomFournisseur;
+    const sloganFournisseur = hygieneDistribTarifsFournisseur[0].slogan;
+    const logoUrl = hygieneDistribTarifsFournisseur[0].logoUrl;
+    const locationUrl = hygieneDistribTarifsFournisseur[0].locationUrl;
+    const anneeCreation = hygieneDistribTarifsFournisseur[0].anneeCreation;
+    const ca = hygieneDistribTarifsFournisseur[0].ca;
+    const effectifFournisseur = hygieneDistribTarifsFournisseur[0].effectif;
+    const nbClients = hygieneDistribTarifsFournisseur[0].nbClients;
+    const noteGoogle = hygieneDistribTarifsFournisseur[0].noteGoogle;
+    const nbAvis = hygieneDistribTarifsFournisseur[0].nbAvis;
+
     const totalAnnuelTrilogie =
       prixDistribEmp !== null &&
       prixDistribEmpPoubelle !== null &&
@@ -76,6 +87,16 @@ export const getFormattedHygienePropositions = (
 
     return {
       gamme,
+      nomFournisseur,
+      sloganFournisseur,
+      logoUrl,
+      locationUrl,
+      anneeCreation,
+      ca,
+      effectifFournisseur,
+      nbClients,
+      noteGoogle,
+      nbAvis,
       nbDistribEmp,
       nbDistribSavon,
       nbDistribPh,

@@ -820,6 +820,34 @@
       "when": 1740666353961,
       "tag": "0116_young_unus",
       "breakpoints": true
+    },
+    {
+      "idx": 117,
+      "version": "7",
+      "when": 1740697496903,
+      "tag": "0117_open_fabian_cortez",
+      "breakpoints": true
+    },
+    {
+      "idx": 118,
+      "version": "7",
+      "when": 1740741262567,
+      "tag": "0118_certain_mad_thinker",
+      "breakpoints": true
+    },
+    {
+      "idx": 119,
+      "version": "7",
+      "when": 1740741347798,
+      "tag": "0119_ambiguous_leader",
+      "breakpoints": true
+    },
+    {
+      "idx": 120,
+      "version": "7",
+      "when": 1740741574381,
+      "tag": "0120_thin_mongu",
+      "breakpoints": true
     }
   ]
 }

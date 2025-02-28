@@ -8,6 +8,16 @@ import { useContext } from "react";
 type HygienePropositionCardProps = {
   proposition: {
     gamme: GammeType;
+    nomFournisseur: string;
+    sloganFournisseur: string | null;
+    logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
     nbDistribEmp: number;
     nbDistribSavon: number;
     nbDistribPh: number;
@@ -20,6 +30,16 @@ type HygienePropositionCardProps = {
   };
   handleClickProposition: (proposition: {
     gamme: GammeType;
+    nomFournisseur: string;
+    sloganFournisseur: string | null;
+    logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
     nbDistribEmp: number;
     nbDistribSavon: number;
     nbDistribPh: number;

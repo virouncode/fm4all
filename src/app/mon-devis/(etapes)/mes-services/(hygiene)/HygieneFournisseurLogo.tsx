@@ -1,44 +1,80 @@
 "use client";
+import FournisseurDialog from "@/app/mon-devis/FournisseurDialog";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { HygieneContext } from "@/context/HygieneProvider";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { SquareArrowOutUpRight } from "lucide-react";
 import Image from "next/image";
-import { useContext } from "react";
+type HygieneFournisseurLogoProps = {
+  nomFournisseur: string | null;
+  logoUrl: string | null;
+  locationUrl: string | null;
+  sloganFournisseur: string | null;
+  anneeCreation: number | null;
+  ca: string | null;
+  effectifFournisseur: string | null;
+  nbClients: number | null;
+  noteGoogle: string | null;
+  nbAvis: number | null;
+};
 
-const HygieneFournisseurLogo = () => {
-  const { hygiene } = useContext(HygieneContext);
-  const logoUrl = hygiene.infos.logoUrl;
+const HygieneFournisseurLogo = ({
+  nomFournisseur,
+  logoUrl,
+  locationUrl,
+  sloganFournisseur,
+  anneeCreation,
+  ca,
+  effectifFournisseur,
+  nbClients,
+  noteGoogle,
+  nbAvis,
+}: HygieneFournisseurLogoProps) => {
   return (
-    <TooltipProvider delayDuration={0}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="flex items-center justify-center h-1/4 w-full">
-            {logoUrl ? (
-              <div className="w-full h-full relative">
-                <Image
-                  src={logoUrl}
-                  alt={`logo-de-${hygiene.infos.nomFournisseur}`}
-                  fill={true}
-                  className="w-full h-full object-contain"
-                  quality={100}
-                />
-              </div>
-            ) : (
-              hygiene.infos.nomFournisseur
-            )}
-          </div>
-        </TooltipTrigger>
-        {hygiene.infos.sloganFournisseur && (
-          <TooltipContent className="max-w-60">
-            <p className="text-sm italic">{hygiene.infos.sloganFournisseur}</p>
-          </TooltipContent>
-        )}
-      </Tooltip>
-    </TooltipProvider>
+    <Dialog>
+      <DialogTrigger asChild>
+        <div className="flex items-center justify-center p-2 h-1/4 w-full relative">
+          {logoUrl ? (
+            <div className="w-full h-full relative">
+              <Image
+                src={logoUrl}
+                alt={`logo-de-${nomFournisseur}`}
+                fill={true}
+                className="w-full h-full object-contain cursor-pointer"
+                quality={100}
+              />
+            </div>
+          ) : (
+            nomFournisseur
+          )}
+          <SquareArrowOutUpRight
+            className="absolute right-0 top-0 cursor-pointer hover:opacity-70"
+            size={16}
+          />
+        </div>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{nomFournisseur}</DialogTitle>
+        </DialogHeader>
+        <FournisseurDialog
+          sloganFournisseur={sloganFournisseur}
+          logoUrl={logoUrl}
+          nomFournisseur={nomFournisseur}
+          locationUrl={locationUrl}
+          anneeCreation={anneeCreation}
+          ca={ca}
+          effectif={effectifFournisseur}
+          nbClients={nbClients}
+          noteGoogle={noteGoogle}
+          nbAvis={nbAvis}
+        />
+      </DialogContent>
+    </Dialog>
   );
 };
 

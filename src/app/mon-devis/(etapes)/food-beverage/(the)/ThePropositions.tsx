@@ -80,6 +80,13 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
     nomFournisseur: string;
     slogan: string | null;
     logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
     createdAt: Date;
     fournisseurId: number;
     gamme: GammeType;

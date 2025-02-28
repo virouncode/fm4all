@@ -23,6 +23,13 @@ type CafeEspacePropositionCardProps = {
     nomFournisseur: string;
     sloganFournisseur: string | null;
     logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
     gamme: GammeType;
     modele: string | null;
     marque: string | null;
@@ -50,6 +57,13 @@ type CafeEspacePropositionCardProps = {
     nomFournisseur: string;
     sloganFournisseur: string | null;
     logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
     gamme: GammeType;
     modele: string | null;
     marque: string | null;
@@ -77,6 +91,13 @@ type CafeEspacePropositionCardProps = {
     nomFournisseur: string;
     sloganFournisseur: string | null;
     logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
     gamme: GammeType;
     modele: string | null;
     marque: string | null;
@@ -194,7 +215,12 @@ const CafeEspacePropositionCard = ({
         ? infosConfort
         : infosExcellence}
       <p>{typeLaitText}</p>
-      <p className="mb-4">{typeChocolatText}</p>
+      <p>{typeChocolatText}</p>
+      <p className="mb-4">
+        {proposition.nbMachines} machine(s) {proposition.marque}{" "}
+        {proposition.modele}{" "}
+        {proposition.reconditionne ? " reconditionnée(s)" : ""}
+      </p>
       {imgProduit}
     </div>
   );

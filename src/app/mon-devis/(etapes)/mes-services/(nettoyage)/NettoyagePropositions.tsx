@@ -54,6 +54,13 @@ const NettoyagePropositions = ({
       nomFournisseur,
       slogan: sloganFournisseur,
       logoUrl,
+      locationUrl,
+      anneeCreation,
+      ca,
+      effectif: effectifFournisseur,
+      nbClients,
+      noteGoogle,
+      nbAvis,
       hParPassage,
       tauxHoraire,
       gamme,
@@ -69,6 +76,13 @@ const NettoyagePropositions = ({
       nomFournisseur,
       sloganFournisseur,
       logoUrl,
+      locationUrl,
+      anneeCreation,
+      ca,
+      effectifFournisseur,
+      nbClients,
+      noteGoogle,
+      nbAvis,
       freqAnnuelle,
       hParPassage,
       tauxHoraire,
@@ -86,6 +100,13 @@ const NettoyagePropositions = ({
         nomFournisseur: string;
         sloganFournisseur: string | null;
         logoUrl: string | null;
+        locationUrl: string | null;
+        anneeCreation: number | null;
+        ca: string | null;
+        effectifFournisseur: string | null;
+        nbClients: number | null;
+        noteGoogle: string | null;
+        nbAvis: number | null;
         freqAnnuelle: number | null;
         hParPassage: number;
         tauxHoraire: number;
@@ -115,6 +136,13 @@ const NettoyagePropositions = ({
     nomFournisseur: string;
     sloganFournisseur: string | null;
     logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
     freqAnnuelle: number | null;
     hParPassage: number;
     tauxHoraire: number;

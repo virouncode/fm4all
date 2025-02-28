@@ -22,6 +22,13 @@ type NettoyagePropositionCardProps = {
     nomFournisseur: string;
     sloganFournisseur: string | null;
     logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
     freqAnnuelle: number | null;
     hParPassage: number;
     tauxHoraire: number;
@@ -34,6 +41,13 @@ type NettoyagePropositionCardProps = {
     nomFournisseur: string;
     sloganFournisseur: string | null;
     logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
     freqAnnuelle: number | null;
     hParPassage: number;
     tauxHoraire: number;
@@ -47,6 +61,7 @@ const NettoyagePropositionCard = ({
   proposition,
 }: NettoyagePropositionCardProps) => {
   const { nettoyage } = useContext(NettoyageContext);
+
   const gamme = proposition.gamme;
   const color = getFm4AllColor(gamme);
   if (!proposition.totalAnnuel) {
@@ -121,7 +136,11 @@ const NettoyagePropositionCard = ({
           <p className="font-bold">{totalMensuelText}</p>
           <Dialog>
             <DialogTrigger asChild>
-              <Info size={16} onClick={(e) => e.stopPropagation()} />
+              <Info
+                size={16}
+                onClick={(e) => e.stopPropagation()}
+                className="hover:opacity-80"
+              />
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>

@@ -44,6 +44,13 @@ const SecuriteIncendiePropositions = ({
     nomFournisseur: tarif.nomFournisseur,
     sloganFournisseur: tarif.slogan,
     logoUrl: tarif.logoUrl,
+    locationUrl: tarif.locationUrl,
+    anneeCreation: tarif.anneeCreation,
+    ca: tarif.ca,
+    effectifFournisseur: tarif.effectif,
+    nbClients: tarif.nbClients,
+    noteGoogle: tarif.noteGoogle,
+    nbAvis: tarif.nbAvis,
     nbExtincteurs,
     nbBaes,
     nbTelBaes,
@@ -63,6 +70,13 @@ const SecuriteIncendiePropositions = ({
     nomFournisseur: string;
     sloganFournisseur: string | null;
     logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
     nbExtincteurs: number;
     nbBaes: number;
     nbTelBaes: number;
@@ -276,11 +290,7 @@ const SecuriteIncendiePropositions = ({
         propositions.map((proposition) => (
           <div className="flex border-b flex-1" key={proposition.id}>
             <div className="flex w-1/4 items-center justify-between flex-col gap-10 p-4">
-              <SecuriteIncendieFournisseurLogo
-                nomFournisseur={proposition.nomFournisseur}
-                sloganFournisseur={proposition.sloganFournisseur}
-                logoUrl={proposition.logoUrl}
-              />
+              <SecuriteIncendieFournisseurLogo {...proposition} />
               <SecuriteIncendieInputs
                 nbExtincteurs={nbExtincteurs}
                 nbBaes={nbBaes}

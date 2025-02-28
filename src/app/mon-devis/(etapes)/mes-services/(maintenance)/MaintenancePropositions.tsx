@@ -36,6 +36,13 @@ const MaintenancePropositions = ({
       nomFournisseur,
       slogan: sloganFournisseur,
       logoUrl,
+      locationUrl,
+      anneeCreation,
+      ca,
+      effectif: effectifFournisseur,
+      nbClients,
+      noteGoogle,
+      nbAvis,
       fournisseurId,
       hParPassage,
       tauxHoraire,
@@ -73,6 +80,13 @@ const MaintenancePropositions = ({
       fournisseurId,
       sloganFournisseur,
       logoUrl,
+      locationUrl,
+      anneeCreation,
+      ca,
+      effectifFournisseur,
+      nbClients,
+      noteGoogle,
+      nbAvis,
       hParPassage,
       tauxHoraire,
       freqAnnuelle,
@@ -94,6 +108,13 @@ const MaintenancePropositions = ({
         fournisseurId: number;
         sloganFournisseur: string | null;
         logoUrl: string | null;
+        locationUrl: string | null;
+        anneeCreation: number | null;
+        ca: string | null;
+        effectifFournisseur: string | null;
+        nbClients: number | null;
+        noteGoogle: string | null;
+        nbAvis: number | null;
         hParPassage: number;
         tauxHoraire: number;
         freqAnnuelle: number | null;
@@ -127,6 +148,13 @@ const MaintenancePropositions = ({
     fournisseurId: number;
     sloganFournisseur: string | null;
     logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
     hParPassage: number;
     tauxHoraire: number;
     freqAnnuelle: number | null;

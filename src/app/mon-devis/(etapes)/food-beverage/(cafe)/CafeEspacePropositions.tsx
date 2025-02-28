@@ -133,6 +133,13 @@ const CafeEspacePropositions = ({
         nomFournisseur,
         slogan: sloganFournisseur,
         logoUrl,
+        locationUrl,
+        anneeCreation,
+        ca,
+        effectifFournisseur,
+        nbClients,
+        noteGoogle,
+        nbAvis,
         gamme,
         prixUnitaire,
       } = tarif;
@@ -234,6 +241,13 @@ const CafeEspacePropositions = ({
         nomFournisseur,
         sloganFournisseur,
         logoUrl,
+        locationUrl,
+        anneeCreation,
+        ca,
+        effectifFournisseur,
+        nbClients,
+        noteGoogle,
+        nbAvis,
         gamme,
         modele,
         marque,
@@ -266,6 +280,13 @@ const CafeEspacePropositions = ({
         nomFournisseur: string;
         sloganFournisseur: string | null;
         logoUrl: string | null;
+        locationUrl: string | null;
+        anneeCreation: number | null;
+        ca: string | null;
+        effectifFournisseur: string | null;
+        nbClients: number | null;
+        noteGoogle: string | null;
+        nbAvis: number | null;
         gamme: GammeType;
         modele: string | null;
         marque: string | null;
@@ -309,6 +330,13 @@ const CafeEspacePropositions = ({
     nomFournisseur: string;
     sloganFournisseur: string | null;
     logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
     gamme: GammeType;
     modele: string | null;
     marque: string | null;
@@ -454,6 +482,13 @@ const CafeEspacePropositions = ({
     nomFournisseur: string;
     sloganFournisseur: string | null;
     logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
     gamme: "essentiel" | "confort" | "excellence";
     modele: string | null;
     marque: string | null;

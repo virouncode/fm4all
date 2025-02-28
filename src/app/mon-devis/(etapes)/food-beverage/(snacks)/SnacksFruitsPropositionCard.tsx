@@ -13,6 +13,13 @@ type SnacksFruitsPropositionCardProps = {
     nomFournisseur: string;
     sloganFournisseur: string | null;
     logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
     isSameFournisseur: boolean;
     gamme: GammeType;
     fruitsKgParSemaine: number | null;
@@ -41,6 +48,13 @@ type SnacksFruitsPropositionCardProps = {
     nomFournisseur: string;
     sloganFournisseur: string | null;
     logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
     isSameFournisseur: boolean;
     gamme: GammeType;
     fruitsKgParSemaine: number | null;

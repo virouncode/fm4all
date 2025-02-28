@@ -76,6 +76,13 @@ export const fournisseurs = pgTable("fournisseurs", {
   status: statusEnum().notNull().default("active"),
   slogan: varchar(),
   logoUrl: varchar("logo_url"),
+  locationUrl: varchar("location_url"),
+  anneeCreation: integer("annee_creation"),
+  ca: varchar(),
+  effectif: varchar(),
+  nbClients: integer("nb_clients"),
+  noteGoogle: varchar("note_google"),
+  nbAvis: integer("nb_avis"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

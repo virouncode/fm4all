@@ -73,6 +73,16 @@ const HygienePropositions = ({
 
   const handleClickProposition = (proposition: {
     gamme: "essentiel" | "confort" | "excellence";
+    nomFournisseur: string;
+    sloganFournisseur: string | null;
+    logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
     nbDistribEmp: number;
     nbDistribSavon: number;
     nbDistribPh: number;
@@ -527,7 +537,7 @@ const HygienePropositions = ({
     <div className="h-full flex flex-col border rounded-xl overflow-auto">
       <div className="flex border-b flex-1">
         <div className="flex w-1/4 items-center justify-center flex-col p-4">
-          <HygieneFournisseurLogo />
+          <HygieneFournisseurLogo {...propositions[0]} />
           <HygieneDistribQuantitesInputs
             hygieneDistribQuantite={hygieneDistribQuantite}
             hygieneDistribTarifs={hygieneDistribTarifs}

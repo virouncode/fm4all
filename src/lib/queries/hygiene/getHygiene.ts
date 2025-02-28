@@ -49,6 +49,13 @@ export const getHygieneDistribTarifs = async () => {
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
         logoUrl: fournisseurs.logoUrl,
+        locationUrl: fournisseurs.locationUrl,
+        anneeCreation: fournisseurs.anneeCreation,
+        ca: fournisseurs.ca,
+        effectif: fournisseurs.effectif,
+        nbClients: fournisseurs.nbClients,
+        noteGoogle: fournisseurs.noteGoogle,
+        nbAvis: fournisseurs.nbAvis,
       })
       .from(hygieneDistribTarifs)
       .innerJoin(
@@ -107,6 +114,13 @@ export const getHygieneConsosTarifs = async (effectif: string) => {
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
         logoUrl: fournisseurs.logoUrl,
+        locationUrl: fournisseurs.locationUrl,
+        anneeCreation: fournisseurs.anneeCreation,
+        ca: fournisseurs.ca,
+        effectif: fournisseurs.effectif,
+        nbClients: fournisseurs.nbClients,
+        noteGoogle: fournisseurs.noteGoogle,
+        nbAvis: fournisseurs.nbAvis,
       })
       .from(hygieneConsoTarifs)
       .innerJoin(

@@ -41,6 +41,13 @@ export const getFruitsTarifs = async () => {
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
         logoUrl: fournisseurs.logoUrl,
+        locationUrl: fournisseurs.locationUrl,
+        anneeCreation: fournisseurs.anneeCreation,
+        ca: fournisseurs.ca,
+        effectifFournisseur: fournisseurs.effectif,
+        nbClients: fournisseurs.nbClients,
+        noteGoogle: fournisseurs.noteGoogle,
+        nbAvis: fournisseurs.nbAvis,
       })
       .from(fruitsTarifs)
       .innerJoin(fournisseurs, eq(fruitsTarifs.fournisseurId, fournisseurs.id));
@@ -78,6 +85,13 @@ export const getSnacksTarifs = async () => {
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
         logoUrl: fournisseurs.logoUrl,
+        locationUrl: fournisseurs.locationUrl,
+        anneeCreation: fournisseurs.anneeCreation,
+        ca: fournisseurs.ca,
+        effectifFournisseur: fournisseurs.effectif,
+        nbClients: fournisseurs.nbClients,
+        noteGoogle: fournisseurs.noteGoogle,
+        nbAvis: fournisseurs.nbAvis,
       })
       .from(snacksTarifs)
       .innerJoin(fournisseurs, eq(snacksTarifs.fournisseurId, fournisseurs.id));
@@ -115,6 +129,13 @@ export const getBoissonsTarifs = async () => {
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
         logoUrl: fournisseurs.logoUrl,
+        locationUrl: fournisseurs.locationUrl,
+        anneeCreation: fournisseurs.anneeCreation,
+        ca: fournisseurs.ca,
+        effectifFournisseur: fournisseurs.effectif,
+        nbClients: fournisseurs.nbClients,
+        noteGoogle: fournisseurs.noteGoogle,
+        nbAvis: fournisseurs.nbAvis,
       })
       .from(boissonsTarifs)
       .innerJoin(

@@ -8,6 +8,13 @@ export const selectFruitsTarifsSchema = createSelectSchema(fruitsTarifs, {
   nomFournisseur: z.string().nonempty("Le nom du fournisseur est obligatoire"),
   slogan: z.string().nullable(),
   logoUrl: z.string().nullable(),
+  locationUrl: z.string().nullable(),
+  anneeCreation: z.number().nullable(),
+  ca: z.string().nullable(),
+  effectifFournisseur: z.string().nullable(),
+  nbClients: z.number().nullable(),
+  noteGoogle: z.string().nullable(),
+  nbAvis: z.number().nullable(),
 });
 
 export type SelectFruitsTarifsType = typeof selectFruitsTarifsSchema._type;

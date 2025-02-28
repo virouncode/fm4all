@@ -28,6 +28,13 @@ export const getCafeMachinesTarifs = async () => {
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
         logoUrl: fournisseurs.logoUrl,
+        locationUrl: fournisseurs.locationUrl,
+        anneeCreation: fournisseurs.anneeCreation,
+        ca: fournisseurs.ca,
+        effectif: fournisseurs.effectif,
+        nbClients: fournisseurs.nbClients,
+        noteGoogle: fournisseurs.noteGoogle,
+        nbAvis: fournisseurs.nbAvis,
       })
       .from(cafeMachinesTarifs)
       .innerJoin(
@@ -68,6 +75,13 @@ export const getCafeConsoTarifs = async () => {
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
         logoUrl: fournisseurs.logoUrl,
+        locationUrl: fournisseurs.locationUrl,
+        anneeCreation: fournisseurs.anneeCreation,
+        ca: fournisseurs.ca,
+        effectifFournisseur: fournisseurs.effectif,
+        nbClients: fournisseurs.nbClients,
+        noteGoogle: fournisseurs.noteGoogle,
+        nbAvis: fournisseurs.nbAvis,
       })
       .from(cafeConsoTarifs)
       .innerJoin(
@@ -170,6 +184,13 @@ export const getTheConsoTarifs = async () => {
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
         logoUrl: fournisseurs.logoUrl,
+        locationUrl: fournisseurs.locationUrl,
+        anneeCreation: fournisseurs.anneeCreation,
+        ca: fournisseurs.ca,
+        effectifFournisseur: fournisseurs.effectif,
+        nbClients: fournisseurs.nbClients,
+        noteGoogle: fournisseurs.noteGoogle,
+        nbAvis: fournisseurs.nbAvis,
       })
       .from(theConsoTarifs)
       .innerJoin(

@@ -19,6 +19,13 @@ type SecuriteIncendiePropostionCardProps = {
     nomFournisseur: string;
     sloganFournisseur: string | null;
     logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
     nbExtincteurs: number;
     nbBaes: number;
     nbTelBaes: number;
@@ -34,6 +41,13 @@ type SecuriteIncendiePropostionCardProps = {
     nomFournisseur: string;
     sloganFournisseur: string | null;
     logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
     nbExtincteurs: number;
     nbBaes: number;
     nbTelBaes: number;

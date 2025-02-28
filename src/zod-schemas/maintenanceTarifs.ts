@@ -14,6 +14,13 @@ export const selectMaintenanceTarifsSchema = createSelectSchema(
   nomFournisseur: z.string().nonempty("Le nom du fournisseur est obligatoire"),
   slogan: z.string().nullable(),
   logoUrl: z.string().nullable(),
+  locationUrl: z.string().nullable(),
+  anneeCreation: z.number().nullable(),
+  ca: z.string().nullable(),
+  effectif: z.string().nullable(),
+  nbClients: z.number().nullable(),
+  noteGoogle: z.string().nullable(),
+  nbAvis: z.number().nullable(),
 });
 
 export type SelectMaintenanceTarifsType = z.infer<

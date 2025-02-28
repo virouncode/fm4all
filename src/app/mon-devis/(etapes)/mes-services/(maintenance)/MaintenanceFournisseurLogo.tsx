@@ -1,51 +1,82 @@
 "use client";
 
+import FournisseurDialog from "@/app/mon-devis/FournisseurDialog";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { SquareArrowOutUpRight } from "lucide-react";
 import Image from "next/image";
 
 type MaintenanceFournisseurLogoProps = {
   nomFournisseur: string | null;
   sloganFournisseur: string | null;
   logoUrl: string | null;
+  locationUrl: string | null;
+  anneeCreation: number | null;
+  ca: string | null;
+  effectifFournisseur: string | null;
+  nbClients: number | null;
+  noteGoogle: string | null;
+  nbAvis: number | null;
 };
 
 const MaintenanceFournisseurLogo = ({
   nomFournisseur,
   sloganFournisseur,
   logoUrl,
+  locationUrl,
+  anneeCreation,
+  ca,
+  effectifFournisseur,
+  nbClients,
+  noteGoogle,
+  nbAvis,
 }: MaintenanceFournisseurLogoProps) => {
   return (
-    <TooltipProvider delayDuration={0}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="flex w-1/4 items-center justify-center p-4">
-            {logoUrl ? (
-              <div className="w-full h-full relative">
-                <Image
-                  src={logoUrl}
-                  alt={`logo-de-${nomFournisseur}`}
-                  fill={true}
-                  className="w-full h-full object-contain"
-                  quality={100}
-                />
-              </div>
-            ) : (
-              nomFournisseur
-            )}
-          </div>
-        </TooltipTrigger>
-        {sloganFournisseur && (
-          <TooltipContent className="max-w-60">
-            <p className="text-sm italic">{sloganFournisseur}</p>
-          </TooltipContent>
-        )}
-      </Tooltip>
-    </TooltipProvider>
+    <Dialog>
+      <DialogTrigger asChild>
+        <div className="flex w-1/4 items-center justify-center p-4 relative">
+          {logoUrl ? (
+            <div className="w-full h-full relative">
+              <Image
+                src={logoUrl}
+                alt={`logo-de-${nomFournisseur}`}
+                fill={true}
+                className="w-full h-full object-contain cursor-pointer"
+                quality={100}
+              />
+            </div>
+          ) : (
+            nomFournisseur
+          )}
+          <SquareArrowOutUpRight
+            className="absolute right-2 top-2 cursor-pointer hover:opacity-70"
+            size={16}
+          />
+        </div>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{nomFournisseur}</DialogTitle>
+        </DialogHeader>
+        <FournisseurDialog
+          sloganFournisseur={sloganFournisseur}
+          logoUrl={logoUrl}
+          nomFournisseur={nomFournisseur}
+          locationUrl={locationUrl}
+          anneeCreation={anneeCreation}
+          ca={ca}
+          effectif={effectifFournisseur}
+          nbClients={nbClients}
+          noteGoogle={noteGoogle}
+          nbAvis={nbAvis}
+        />
+      </DialogContent>
+    </Dialog>
   );
 };
 

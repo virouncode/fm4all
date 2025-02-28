@@ -59,6 +59,13 @@ const SnacksFruitsPropositions = ({
       nomFournisseur,
       slogan: sloganFournisseur,
       logoUrl,
+      locationUrl,
+      anneeCreation,
+      ca,
+      effectifFournisseur,
+      nbClients,
+      noteGoogle,
+      nbAvis,
       fournisseurId,
       prixKg,
     } = item;
@@ -183,6 +190,13 @@ const SnacksFruitsPropositions = ({
       nomFournisseur,
       sloganFournisseur,
       logoUrl,
+      locationUrl,
+      anneeCreation,
+      ca,
+      effectifFournisseur,
+      nbClients,
+      noteGoogle,
+      nbAvis,
       isSameFournisseur,
       gamme,
       //quantites
@@ -219,6 +233,13 @@ const SnacksFruitsPropositions = ({
         nomFournisseur: string;
         sloganFournisseur: string | null;
         logoUrl: string | null;
+        locationUrl: string | null;
+        anneeCreation: number | null;
+        ca: string | null;
+        effectifFournisseur: string | null;
+        nbClients: number | null;
+        noteGoogle: string | null;
+        nbAvis: number | null;
         isSameFournisseur: boolean;
         gamme: GammeType;
         fruitsKgParSemaine: number | null;
@@ -263,6 +284,13 @@ const SnacksFruitsPropositions = ({
     nomFournisseur: string;
     sloganFournisseur: string | null;
     logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
     isSameFournisseur: boolean;
     gamme: GammeType;
     fruitsKgParSemaine: number | null;

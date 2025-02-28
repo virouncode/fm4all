@@ -45,6 +45,13 @@ export const getNettoyageTarifs = async (surface: string) => {
         nomFournisseur: fournisseurs.nomFournisseur,
         slogan: fournisseurs.slogan,
         logoUrl: fournisseurs.logoUrl,
+        locationUrl: fournisseurs.locationUrl,
+        anneeCreation: fournisseurs.anneeCreation,
+        ca: fournisseurs.ca,
+        effectif: fournisseurs.effectif,
+        nbClients: fournisseurs.nbClients,
+        noteGoogle: fournisseurs.noteGoogle,
+        nbAvis: fournisseurs.nbAvis,
       })
       .from(nettoyageTarifs)
       .innerJoin(
@@ -71,17 +78,8 @@ export const getRepasseTarifs = async (surface: string) => {
   const roundedSurface = roundSurface(parseInt(surface));
   try {
     const results = await db
-      .select({
-        ...getTableColumns(nettoyageRepasseTarifs),
-        nomFournisseur: fournisseurs.nomFournisseur,
-        slogan: fournisseurs.slogan,
-        logoUrl: fournisseurs.logoUrl,
-      })
+      .select()
       .from(nettoyageRepasseTarifs)
-      .innerJoin(
-        fournisseurs,
-        eq(fournisseurs.id, nettoyageRepasseTarifs.fournisseurId)
-      )
       .where(and(eq(nettoyageRepasseTarifs.surface, roundedSurface)));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
@@ -101,18 +99,7 @@ export const getRepasseTarifs = async (surface: string) => {
 
 export const getVitrerieTarifs = async () => {
   try {
-    const results = await db
-      .select({
-        ...getTableColumns(nettoyageVitrerieTarifs),
-        nomFournisseur: fournisseurs.nomFournisseur,
-        slogan: fournisseurs.slogan,
-        logoUrl: fournisseurs.logoUrl,
-      })
-      .from(nettoyageVitrerieTarifs)
-      .innerJoin(
-        fournisseurs,
-        eq(fournisseurs.id, nettoyageVitrerieTarifs.fournisseurId)
-      );
+    const results = await db.select().from(nettoyageVitrerieTarifs);
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectVitrerieTarifsSchema.parse(result)

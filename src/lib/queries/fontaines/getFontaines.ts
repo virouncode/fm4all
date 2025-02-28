@@ -14,6 +14,13 @@ export const getFontainesTarifs = async () => {
         nomFournisseur: fournisseurs.nomFournisseur,
         sloganFournisseur: fournisseurs.slogan,
         logoUrl: fournisseurs.logoUrl,
+        locationUrl: fournisseurs.locationUrl,
+        anneeCreation: fournisseurs.anneeCreation,
+        ca: fournisseurs.ca,
+        effectifFournisseur: fournisseurs.effectif,
+        nbClients: fournisseurs.nbClients,
+        noteGoogle: fournisseurs.noteGoogle,
+        nbAvis: fournisseurs.nbAvis,
       })
       .from(fontainesTarifs)
       .innerJoin(
