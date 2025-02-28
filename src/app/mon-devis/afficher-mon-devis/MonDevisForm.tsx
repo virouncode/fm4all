@@ -126,7 +126,6 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
       console.log(err);
     }
     //TODO update client dans la bdd
-    console.log("total", total);
 
     try {
       setLoading(true);

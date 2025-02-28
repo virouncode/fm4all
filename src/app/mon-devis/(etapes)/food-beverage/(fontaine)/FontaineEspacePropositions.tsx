@@ -111,7 +111,6 @@ const FontaineEspacePropositions = ({
       const imageUrl =
         fontainesModeles.find((modele) => modele.id === tarif.fontaineId)
           ?.imageUrl ?? null;
-      console.log("imageUrl", imageUrl);
 
       return {
         id: tarif.id,
