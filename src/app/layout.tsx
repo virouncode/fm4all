@@ -1,7 +1,5 @@
-import Header from "@/components/header";
-import type { Metadata } from "next";
-
 import Footer from "@/components/footer";
+import Header from "@/components/header";
 import { Toaster } from "@/components/ui/toaster";
 import CafeProvider from "@/context/CafeProvider";
 import ClientProvider from "@/context/ClientProvider";
@@ -32,6 +30,8 @@ import TotalProvider from "@/context/TotalProvider";
 import TotalServicesFm4AllProvider from "@/context/TotalServicesFm4AllProvider";
 import TotalSnacksFruitsProvider from "@/context/TotalSnacksFruitsProvider";
 import TotalTheProvider from "@/context/TotalTheProvider";
+import { Analytics } from "@vercel/analytics/next";
+import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Didact_Gothic } from "next/font/google";
 import "./globals.css";
@@ -97,6 +97,7 @@ export default function RootLayout({
                                                                   >
                                                                     <Header />
                                                                     {children}
+                                                                    <Analytics />
                                                                     <Footer />
                                                                     <Toaster />
                                                                   </ThemeProvider>
