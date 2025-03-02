@@ -59,6 +59,21 @@ export const getFormattedHygienePropositions = (
         (tarif) => tarif.type === "ph" && tarif.gamme === gamme
       )?.[dureeLocation] ?? null;
 
+    const imageUrlEmp =
+      hygieneDistribTarifsFournisseur.find(
+        (tarif) => tarif.type === "emp" && tarif.gamme === gamme
+      )?.imageUrl ?? null;
+
+    const imageUrlSavon =
+      hygieneDistribTarifsFournisseur.find(
+        (tarif) => tarif.type === "savon" && tarif.gamme === gamme
+      )?.imageUrl ?? null;
+
+    const imageUrlPh =
+      hygieneDistribTarifsFournisseur.find(
+        (tarif) => tarif.type === "ph" && tarif.gamme === gamme
+      )?.imageUrl ?? null;
+
     const nomFournisseur = hygieneDistribTarifsFournisseur[0].nomFournisseur;
     const sloganFournisseur = hygieneDistribTarifsFournisseur[0].slogan;
     const logoUrl = hygieneDistribTarifsFournisseur[0].logoUrl;
@@ -106,6 +121,9 @@ export const getFormattedHygienePropositions = (
       prixDistribPh,
       prixInstalDistrib,
       totalAnnuelTrilogie,
+      imageUrlEmp,
+      imageUrlSavon,
+      imageUrlPh,
     };
   });
   return propositions;

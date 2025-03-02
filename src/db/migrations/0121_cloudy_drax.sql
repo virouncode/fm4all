@@ -1,0 +1,1 @@
+ALTER TABLE "hygiene_distrib_tarifs" ADD COLUMN "imageUrl" varchar;

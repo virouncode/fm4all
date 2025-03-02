@@ -1,5 +1,12 @@
 "use client";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MARGE } from "@/constants/constants";
@@ -9,6 +16,8 @@ import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { DureeLocationHygieneType } from "@/zod-schemas/dureeLocation";
 import { GammeType } from "@/zod-schemas/gamme";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
+import { Info } from "lucide-react";
+import Image from "next/image";
 import { ChangeEvent, useContext } from "react";
 
 type HygieneOptionsDesinfectantCardProps = {
@@ -27,6 +36,10 @@ type HygieneOptionsDesinfectantCardProps = {
       totalParfum: number | null;
       totalBalai: number | null;
       totalPoubelle: number | null;
+      imageUrlDesinfectant: string | null;
+      imageUrlParfum: string | null;
+      imageUrlBalai: string | null;
+      imageUrlPoubelle: string | null;
     }
   ) => void;
   handleChangeDistribNbr: (
@@ -45,6 +58,10 @@ type HygieneOptionsDesinfectantCardProps = {
     totalParfum: number | null;
     totalBalai: number | null;
     totalPoubelle: number | null;
+    imageUrlDesinfectant: string | null;
+    imageUrlParfum: string | null;
+    imageUrlBalai: string | null;
+    imageUrlPoubelle: string | null;
   }[];
 };
 
@@ -99,6 +116,44 @@ const HygieneOptionsDesinfectantCard = ({
         const prixMensuelDesinfectantText = `${formatNumber(
           Math.round((proposition.totalDesinfectant * MARGE) / 12)
         )} € / mois`;
+        const infosTitle = (
+          <p
+            className={`text-${getFm4AllColor(proposition.gamme)} text-center`}
+          >
+            {proposition.gamme === "essentiel"
+              ? "Essentiel"
+              : proposition.gamme === "confort"
+              ? "Confort"
+              : "Excellence"}
+          </p>
+        );
+        const imgProduit = proposition.imageUrlDesinfectant ? (
+          <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-100">
+            <Image
+              src={proposition.imageUrlDesinfectant}
+              alt="illustration-distributeur-desinfectant"
+              fill
+              quality={100}
+              className="object-contain"
+            />
+          </div>
+        ) : null;
+
+        const infosProduit = (
+          <div>
+            <p className="text-sm mb-2">
+              Distributeurs{" "}
+              {gamme === "essentiel"
+                ? "blancs basic"
+                : gamme === "confort"
+                ? "couleur"
+                : "inox"}
+            </p>
+            {imgProduit}
+            <p className="text-xs text-end italic">*photo non contractuelle</p>
+          </div>
+        );
+
         return (
           <div
             className={`flex flex-1 bg-${color} text-slate-200 items-center p-2 justify-center text-xl gap-4 cursor-pointer ${
@@ -118,7 +173,20 @@ const HygieneOptionsDesinfectantCard = ({
               className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             />
             <div>
-              <p>{prixMensuelDesinfectantText}</p>
+              <div className="flex gap-2">
+                <p>{prixMensuelDesinfectantText}</p>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Info size={16} onClick={(e) => e.stopPropagation()} />
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>{infosTitle}</DialogTitle>
+                    </DialogHeader>
+                    {infosProduit}
+                  </DialogContent>
+                </Dialog>
+              </div>
               <p className="text-sm">
                 Distributeurs{" "}
                 {gamme === "essentiel"

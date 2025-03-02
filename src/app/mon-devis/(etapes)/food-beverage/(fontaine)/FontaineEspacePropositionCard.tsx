@@ -165,14 +165,17 @@ const FontaineEspacePropositionCard = ({
       : infosExcellence;
 
   const imgProduit = proposition.imageUrl ? (
-    <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-200">
-      <Image
-        src={proposition.imageUrl}
-        alt={`${proposition.marque} ${proposition.modele}`}
-        fill
-        quality={100}
-        className="object-contain"
-      />
+    <div>
+      <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-200">
+        <Image
+          src={proposition.imageUrl}
+          alt={`${proposition.marque} ${proposition.modele}`}
+          fill
+          quality={100}
+          className="object-contain"
+        />
+      </div>
+      <p className="text-xs text-end italic">*photo non contractuelle</p>
     </div>
   ) : null;
 

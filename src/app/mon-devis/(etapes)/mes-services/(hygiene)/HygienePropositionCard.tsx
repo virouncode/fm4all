@@ -1,8 +1,17 @@
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { GammeType } from "@/zod-schemas/gamme";
+import { Info } from "lucide-react";
+import Image from "next/image";
 import { useContext } from "react";
 
 type HygienePropositionCardProps = {
@@ -27,6 +36,9 @@ type HygienePropositionCardProps = {
     prixDistribPh: number | null;
     prixInstalDistrib: number | null;
     totalAnnuelTrilogie: number | null;
+    imageUrlEmp: string | null;
+    imageUrlSavon: string | null;
+    imageUrlPh: string | null;
   };
   handleClickProposition: (proposition: {
     gamme: GammeType;
@@ -49,6 +61,9 @@ type HygienePropositionCardProps = {
     prixDistribPh: number | null;
     prixInstalDistrib: number | null;
     totalAnnuelTrilogie: number | null;
+    imageUrlEmp: string | null;
+    imageUrlSavon: string | null;
+    imageUrlPh: string | null;
   }) => void;
   prixInstalDistrib: number | null;
 };
@@ -77,6 +92,69 @@ const HygienePropositionCard = ({
     ? `+ ${formatNumber(Math.round(prixInstalDistrib))} € d'installation`
     : "";
 
+  const infosTitle = (
+    <p className={`text-${getFm4AllColor(proposition.gamme)} text-center`}>
+      {proposition.gamme === "essentiel"
+        ? "Essentiel"
+        : proposition.gamme === "confort"
+        ? "Confort"
+        : "Excellence"}
+    </p>
+  );
+
+  const imgProduit = (
+    <div className="flex items-center justify-between gap-2">
+      {proposition.imageUrlEmp ? (
+        <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-100">
+          <Image
+            src={proposition.imageUrlEmp}
+            alt="illustration-essuie-mains-papier"
+            fill
+            quality={100}
+            className="object-contain"
+          />
+        </div>
+      ) : null}
+      {proposition.imageUrlPh ? (
+        <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-100">
+          <Image
+            src={proposition.imageUrlPh}
+            alt="illustration-ditributeur-papier-hygiénique"
+            fill
+            quality={100}
+            className="object-contain"
+          />
+        </div>
+      ) : null}
+      {proposition.imageUrlSavon ? (
+        <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-100">
+          <Image
+            src={proposition.imageUrlSavon}
+            alt="illustration-ditributeur-savon"
+            fill
+            quality={100}
+            className="object-contain"
+          />
+        </div>
+      ) : null}
+    </div>
+  );
+
+  const infosProduit = (
+    <div>
+      <p className="text-sm mb-2">
+        Distributeurs{" "}
+        {gamme === "essentiel"
+          ? "blancs basic"
+          : gamme === "confort"
+          ? "couleur"
+          : "inox"}
+      </p>
+      {imgProduit}
+      <p className="text-xs text-end italic">*photos non contractuelles</p>
+    </div>
+  );
+
   return (
     <div
       className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer p-4 ${
@@ -92,7 +170,20 @@ const HygienePropositionCard = ({
         className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
       />
       <div>
-        <p className="font-bold">{totalMensuelText}</p>
+        <div className="flex gap-2">
+          <p className="font-bold">{totalMensuelText}</p>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Info size={16} onClick={(e) => e.stopPropagation()} />
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>{infosTitle}</DialogTitle>
+              </DialogHeader>
+              {infosProduit}
+            </DialogContent>
+          </Dialog>
+        </div>
         <p className="text-sm">
           Distributeurs{" "}
           {gamme === "essentiel"

@@ -65,6 +65,24 @@ const HygieneOptionsPropositions = ({
       hygieneDistribTarifsFournisseur.find(
         (tarif) => tarif.type === "poubelle" && tarif.gamme === gamme
       )?.[dureeLocation] ?? null;
+
+    const imageUrlDesinfectant =
+      hygieneDistribTarifsFournisseur.find(
+        (tarif) => tarif.type === "desinfectant" && tarif.gamme === gamme
+      )?.imageUrl ?? null;
+    const imageUrlParfum =
+      hygieneDistribTarifsFournisseur.find(
+        (tarif) => tarif.type === "parfum" && tarif.gamme === gamme
+      )?.imageUrl ?? null;
+    const imageUrlBalai =
+      hygieneDistribTarifsFournisseur.find(
+        (tarif) => tarif.type === "balai" && tarif.gamme === gamme
+      )?.imageUrl ?? null;
+    const imageUrlPoubelle =
+      hygieneDistribTarifsFournisseur.find(
+        (tarif) => tarif.type === "poubelle" && tarif.gamme === gamme
+      )?.imageUrl ?? null;
+
     const totalDesinfectant =
       paParPersonneDesinfectant !== null && prixDistribDesinfectant !== null
         ? nbDistribDesinfectant * prixDistribDesinfectant +
@@ -90,6 +108,10 @@ const HygieneOptionsPropositions = ({
       totalParfum,
       totalBalai,
       totalPoubelle,
+      imageUrlDesinfectant,
+      imageUrlParfum,
+      imageUrlBalai,
+      imageUrlPoubelle,
     };
   });
 
@@ -106,6 +128,10 @@ const HygieneOptionsPropositions = ({
       totalParfum: number | null;
       totalBalai: number | null;
       totalPoubelle: number | null;
+      imageUrlDesinfectant: string | null;
+      imageUrlParfum: string | null;
+      imageUrlBalai: string | null;
+      imageUrlPoubelle: string | null;
     }
   ) => {
     const {

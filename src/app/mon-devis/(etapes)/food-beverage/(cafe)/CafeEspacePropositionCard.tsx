@@ -165,6 +165,7 @@ const CafeEspacePropositionCard = ({
     : proposition.typeChocolat === "sachets"
     ? "Chocolat en sachets"
     : "Chocolat en poudre machine";
+
   const imgProduit = proposition.imageUrl ? (
     <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-200">
       <Image
@@ -222,6 +223,7 @@ const CafeEspacePropositionCard = ({
         {proposition.reconditionne ? " reconditionnée(s)" : ""}
       </p>
       {imgProduit}
+      <p className="text-xs text-end italic">*photo non contractuelle</p>
     </div>
   );
 

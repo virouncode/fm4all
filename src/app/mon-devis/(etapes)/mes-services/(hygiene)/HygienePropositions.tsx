@@ -92,6 +92,9 @@ const HygienePropositions = ({
     prixDistribPh: number | null;
     prixInstalDistrib: number | null;
     totalAnnuelTrilogie: number | null;
+    imageUrlEmp: string | null;
+    imageUrlSavon: string | null;
+    imageUrlPh: string | null;
   }) => {
     const {
       gamme,
