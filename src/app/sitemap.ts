@@ -9,6 +9,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
+      url: "http://www.fm4all.com",
+      lastModified: "2025-03-02T09:35:25.103Z",
+      changeFrequency: "yearly",
+      priority: 1,
+    },
+    {
+      url: "http://fm4all.com",
+      lastModified: "2025-03-02T09:35:25.103Z",
+      changeFrequency: "yearly",
+      priority: 1,
+    },
+    {
+      url: "https://fm4all.com",
+      lastModified: "2025-03-02T09:35:25.103Z",
+      changeFrequency: "yearly",
+      priority: 1,
+    },
+    {
       url: "https://www.fm4all.com/nos-services",
       lastModified: "2025-03-02T09:35:25.103Z",
       changeFrequency: "yearly",
