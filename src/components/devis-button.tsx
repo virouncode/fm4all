@@ -222,18 +222,16 @@ const DevisButton = ({
   ) : devisProgress.completedSteps.includes(1) ? (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="flex justify-center">
-          <Button
-            type="button"
-            variant="destructive"
-            size={size}
-            title={text}
-            className={`text-base ${className}`}
-            disabled={disabled}
-          >
-            {text}
-          </Button>
-        </div>
+        <Button
+          type="button"
+          variant="destructive"
+          size={size}
+          title={text}
+          className={`text-base ${className}`}
+          disabled={disabled}
+        >
+          {text}
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
