@@ -1,4 +1,5 @@
 import FournisseurDialog from "@/app/mon-devis/FournisseurDialog";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -37,7 +38,10 @@ const SecuriteIncendieFournisseurLogo = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="flex items-center justify-center p-2 h-1/4 w-full relative">
+        <Button
+          className="flex items-center justify-center p-2 h-1/4 w-full relative bg-transparent hover:bg-transparent shadow-none
+        "
+        >
           {logoUrl ? (
             <div className="w-full h-full relative">
               <Image
@@ -54,8 +58,9 @@ const SecuriteIncendieFournisseurLogo = ({
           <SquareArrowOutUpRight
             className="absolute right-0 top-0 cursor-pointer hover:opacity-70"
             size={16}
+            color="#000000"
           />
-        </div>
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
@@ -208,11 +209,17 @@ const FontaineEspacePropositionCard = ({
         />
       ) : null}
       <div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
           <p className="font-bold">{totalMensuelText}</p>
           <Dialog>
             <DialogTrigger asChild>
-              <Info size={16} onClick={(e) => e.stopPropagation()} />
+              <Button
+                size="icon"
+                variant="ghost"
+                className="hover:bg-transparent hover:opacity-80"
+              >
+                <Info size={16} onClick={(e) => e.stopPropagation()} />
+              </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>

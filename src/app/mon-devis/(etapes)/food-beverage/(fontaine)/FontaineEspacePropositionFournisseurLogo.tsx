@@ -1,4 +1,5 @@
 import FournisseurDialog from "@/app/mon-devis/FournisseurDialog";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -39,7 +40,7 @@ const FontaineEspacePropositionFournisseurLogo = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="flex w-1/4 items-center justify-center p-2 relative">
+        <Button className="flex w-1/4 h-full items-center justify-center p-2 relative bg-transparent hover:bg-transparent shadow-none">
           {logoUrl ? (
             <div
               className={`w-full h-full relative ${
@@ -60,8 +61,9 @@ const FontaineEspacePropositionFournisseurLogo = ({
           <SquareArrowOutUpRight
             className="absolute right-2 top-2 cursor-pointer hover:opacity-70"
             size={16}
+            color="#000000"
           />
-        </div>
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

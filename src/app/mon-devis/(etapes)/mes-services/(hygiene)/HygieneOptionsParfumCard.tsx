@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
@@ -172,11 +173,18 @@ const HygieneOptionsParfumCard = ({
               aria-label="Sélectionner cette proposition"
             />
             <div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-center">
                 <p>{prixMensuelParfumText}</p>
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Info size={16} onClick={(e) => e.stopPropagation()} />
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="hover:bg-transparent hover:text-slate-200 hover:opacity-80"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Info size={16} />
+                    </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
