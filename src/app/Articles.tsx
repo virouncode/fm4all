@@ -18,9 +18,10 @@ const Articles = () => {
         </h2>
         <Button
           variant="outline"
-          className="hidden md:block text-base"
+          className="hidden md:flex text-base justify-center items-center"
           title="Tous les articles"
           size="lg"
+          asChild
         >
           <Link href="/articles">Tous les articles</Link>
         </Button>

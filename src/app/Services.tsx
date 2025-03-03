@@ -16,9 +16,10 @@ const Services = () => {
         <h2 className="text-2xl md:text-3xl border-l-2 px-4">Nos services</h2>
         <Button
           variant="outline"
-          className="hidden md:block text-base"
+          className="hidden md:flex text-base justify-center items-center"
           title="Tous les services"
           size="lg"
+          asChild
         >
           <Link href="/nos-services">Tous les services</Link>
         </Button>

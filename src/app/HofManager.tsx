@@ -27,7 +27,13 @@ const HofManager = () => {
               Manager. Hospitality, Office et Facility Manager, trois métiers
               qui chez fm4all ne font plus qu&apos;un : les HOF Managers.
             </p>
-            <Button variant="outline" title="Decouvrir l'offre">
+            <Button
+              variant="outline"
+              title="Decouvrir l'offre"
+              className="flex justify-center items-center text-base"
+              size="default"
+              asChild
+            >
               <Link href="/articles/hof-managers">Decouvrir l&apos;offre</Link>
             </Button>
           </CardContent>

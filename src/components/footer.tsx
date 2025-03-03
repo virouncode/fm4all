@@ -7,7 +7,7 @@ const Footer = () => {
         <div className="flex flex-wrap gap-6 lg:w-2/3">
           <div className="flex flex-col gap-2">
             <p className="text-secondary text-xl">fm4all</p>
-            <ul>
+            <ul className="text-secondary">
               <li>
                 <Link href="/contact">Nous contacter</Link>
               </li>
@@ -19,7 +19,7 @@ const Footer = () => {
           </div>
           <div className="flex flex-col gap-2">
             <p className="text-secondary text-xl">Articles</p>
-            <ul>
+            <ul className="text-secondary">
               <li>
                 <Link href="/articles/le-fm-cest-quoi">
                   Le FM c&apos;est quoi ?
@@ -91,7 +91,7 @@ const Footer = () => {
           </div> */}
           <div className="flex flex-col gap-2">
             <p className="text-secondary text-xl">Prestataires</p>
-            <ul>
+            <ul className="text-secondary">
               <li>
                 <Link href="/devenir-prestataire">Devenir prestataire</Link>
               </li>

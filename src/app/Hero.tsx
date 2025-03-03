@@ -47,14 +47,15 @@ const Hero = () => {
               <ul className="ml-10 mb-4">
                 <li className="list-check">
                   <strong>Comparez</strong> par gamme :{" "}
-                  <span className="text-fm4allessential font-bold">
-                    Essentiel
-                  </span>
-                  ,{" "}
-                  <span className="text-fm4allcomfort font-bold">Confort</span>,{" "}
-                  <span className="text-fm4allexcellence font-bold">
-                    Excellence
-                  </span>
+                  {/* <span className="text-fm4allessential font-bold"> */}
+                  Essentiel
+                  {/* </span> */},{" "}
+                  {/* <span className="text-fm4allcomfort font-bold"> */}
+                  Confort
+                  {/* </span> */},{" "}
+                  {/* <span className="text-fm4allexcellence font-bold"> */}
+                  Excellence
+                  {/* </span> */}
                 </li>
                 <li className="list-check">
                   <strong>Simplifiez</strong> la mise en place des services

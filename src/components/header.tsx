@@ -108,7 +108,9 @@ const Header = () => {
           <Button
             title="Devenir prestataire"
             variant="outline"
-            className="hidden min-[600px]:block"
+            className="hidden min-[600px]:flex justify-center items-center"
+            size="default"
+            asChild
           >
             <Link href="/devenir-prestataire">Devenir prestataire</Link>
           </Button>
