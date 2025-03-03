@@ -143,6 +143,7 @@ const NettoyagePropositionCard = ({
                 variant="ghost"
                 className="hover:bg-transparent hover:text-slate-200 hover:opacity-80"
                 onClick={(e) => e.stopPropagation()}
+                title="Détails de l'offre"
               >
                 <Info size={16} />
               </Button>

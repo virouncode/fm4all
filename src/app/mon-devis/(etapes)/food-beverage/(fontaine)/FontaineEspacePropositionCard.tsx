@@ -218,6 +218,7 @@ const FontaineEspacePropositionCard = ({
                 variant="ghost"
                 className="hover:bg-transparent hover:opacity-80"
                 onClick={(e) => e.stopPropagation()}
+                title="Détails de l'offre"
               >
                 <Info size={16} />
               </Button>

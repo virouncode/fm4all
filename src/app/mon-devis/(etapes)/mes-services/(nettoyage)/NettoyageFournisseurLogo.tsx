@@ -43,6 +43,7 @@ const NettoyageFournisseurLogo = ({
         <Button
           className="flex w-1/4 h-full items-center justify-center p-2 relative bg-transparent hover:bg-transparent shadow-none"
           asChild
+          title="Infos sur le fournisseur"
         >
           <div>
             {logoUrl ? (

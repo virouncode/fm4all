@@ -42,6 +42,7 @@ const SecuriteIncendieFournisseurLogo = ({
           className="flex items-center justify-center p-2 h-1/4 w-full relative bg-transparent hover:bg-transparent shadow-none
         "
           asChild
+          title="Infos sur le fournisseur"
         >
           <div>
             {logoUrl ? (
