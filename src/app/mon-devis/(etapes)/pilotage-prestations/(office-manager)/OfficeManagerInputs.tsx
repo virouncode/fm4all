@@ -55,6 +55,7 @@ const OfficeManagerInputs = ({
                 min={1}
                 max={20}
                 step={1}
+                title="Nombre de demi-journées par semaine"
               />
               <Label htmlFor="demiJParSemaine" className="text-sm flex-1">
                 {officeManager.quantites.demiJParSemaine ||
