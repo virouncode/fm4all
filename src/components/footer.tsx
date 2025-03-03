@@ -4,7 +4,7 @@ const Footer = () => {
   return (
     <footer className="bg-fm4allsecondary">
       <div className="max-w-7xl mx-auto p-6">
-        <div className="flex flex-wrap gap-6 lg:w-2/3">
+        <div className="flex flex-wrap gap-6 lg:w-3/4">
           <div className="flex flex-col gap-2">
             <p className="text-secondary text-xl">fm4all</p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
@@ -24,6 +24,16 @@ const Footer = () => {
                 </Link>
               </li>
               <li>Touts droits résérvés &copy;fm4all</li>
+            </ul>
+          </div>
+          <div className="flex flex-col gap-2">
+            <p className="text-secondary text-xl">Prestataires</p>
+            <ul className="text-secondary text-sm flex flex-col gap-2">
+              <li>
+                <Link href="/devenir-prestataire" className="hover:opacity-80">
+                  Devenir prestataire
+                </Link>
+              </li>
             </ul>
           </div>
           <div className="flex flex-col gap-2">
@@ -131,57 +141,6 @@ const Footer = () => {
                   className="hover:opacity-80"
                 >
                   Hof Managers
-                </Link>
-              </li>
-            </ul>
-          </div>
-          {/* <div className="flex flex-col gap-4 ">
-            <p className="text-secondary text-xl">Services</p>
-            <ul>
-              <li>
-                <Link href="/services/nettoyage">Nettoyage</Link>
-              </li>
-              <li>
-                <Link href="/services/cafe">Café</Link>
-              </li>
-              <li>
-                <Link href="/services/eau">Fontaine à eau</Link>
-              </li>
-              <li>
-                <Link href="/services/maintenance">
-                  Maintenance règlementaire
-                </Link>
-              </li>
-              <li>
-                <Link href="/services/securite-incendie">
-                  Sécurité incendie
-                </Link>
-              </li>
-              <li>
-                <Link href="/services/office-manager">Office manager</Link>
-              </li>
-              <li>
-                <Link href="/services/accueil">Accueil</Link>
-              </li>
-              <li>
-                <Link href="/services/petits-travaux">Petits travaux</Link>
-              </li>
-              <li>
-                <Link href="/services/snack">Snack & fruits</Link>
-              </li>
-              <li>
-                <Link href="/services/agent-de-securite">
-                  Agent de sécurité
-                </Link>
-              </li>
-            </ul>
-          </div> */}
-          <div className="flex flex-col gap-2">
-            <p className="text-secondary text-xl">Prestataires</p>
-            <ul className="text-secondary text-sm flex flex-col gap-2">
-              <li>
-                <Link href="/devenir-prestataire" className="hover:opacity-80">
-                  Devenir prestataire
                 </Link>
               </li>
             </ul>
