@@ -745,6 +745,7 @@ const FontaineEspaceForm = ({
                 <Select
                   value={fontaines.infos.dureeLocation}
                   onValueChange={handleSelectDureeLocation}
+                  aria-label="Sélectionnez la durée de location"
                 >
                   <SelectTrigger className={" max-w-xs w-1/4"}>
                     <SelectValue placeholder="Choisir" />

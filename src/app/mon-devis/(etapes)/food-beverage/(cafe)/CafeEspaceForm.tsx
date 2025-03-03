@@ -943,6 +943,7 @@ const CafeEspaceForm = ({
                 <Select
                   value={cafe.infos.dureeLocation}
                   onValueChange={handleSelectDureeLocation}
+                  aria-label="Sélectionnez la durée de location"
                 >
                   <SelectTrigger className={`w-full max-w-xs`}>
                     <SelectValue placeholder="Choisir" />
