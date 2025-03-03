@@ -45,6 +45,7 @@ const Presentation = () => {
             src={"/img/zen.webp"}
             alt={"image-collaboratrice-zen"}
             fill={true}
+            className="object-cover object-center"
           />
         </div>
       </div>
