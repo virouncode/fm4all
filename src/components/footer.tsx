@@ -7,7 +7,7 @@ const Footer = () => {
         <div className="flex flex-wrap gap-6 lg:w-2/3">
           <div className="flex flex-col gap-2">
             <p className="text-secondary text-xl">fm4all</p>
-            <ul className="text-secondary text-sm">
+            <ul className="text-secondary text-sm flex flex-col gap-2">
               <li>
                 <Link href="/" className="hover:opacity-80">
                   Page d&apos;accueil
@@ -27,8 +27,64 @@ const Footer = () => {
             </ul>
           </div>
           <div className="flex flex-col gap-2">
+            <p className="text-secondary text-xl">Services</p>
+            <ul className="text-secondary text-sm flex flex-col gap-2">
+              <li>
+                <Link href="/services/nettoyage" className="hover:opacity-80">
+                  Nettoyage
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/hygiene" className="hover:opacity-80">
+                  Hygiene sanitaire
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/maintenance" className="hover:opacity-80">
+                  Maintenance
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/services/securite-incendie"
+                  className="hover:opacity-80"
+                >
+                  Securité incendie
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/cafe" className="hover:opacity-80">
+                  Café et boissons chaudes
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/snack" className="hover:opacity-80">
+                  Snacks et fruits
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/eau" className="hover:opacity-80">
+                  Fontaines à eau
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/services/office-manager"
+                  className="hover:opacity-80"
+                >
+                  Office manager
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/fm4all" className="hover:opacity-80">
+                  Pilotage fm4all
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div className="flex flex-col gap-2">
             <p className="text-secondary text-xl">Articles</p>
-            <ul className="text-secondary text-sm">
+            <ul className="text-secondary text-sm flex flex-col gap-2">
               <li>
                 <Link
                   href="/articles/le-fm-cest-quoi"
@@ -122,7 +178,7 @@ const Footer = () => {
           </div> */}
           <div className="flex flex-col gap-2">
             <p className="text-secondary text-xl">Prestataires</p>
-            <ul className="text-secondary text-sm">
+            <ul className="text-secondary text-sm flex flex-col gap-2">
               <li>
                 <Link href="/devenir-prestataire" className="hover:opacity-80">
                   Devenir prestataire

@@ -54,7 +54,6 @@ const NettoyageFournisseurLogo = ({
                   fill={true}
                   className="w-full h-full object-contain cursor-pointer"
                   quality={100}
-                  aria-label="Infos sur le fournisseur"
                 />
               </div>
             ) : (
