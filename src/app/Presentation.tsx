@@ -42,7 +42,7 @@ const Presentation = () => {
         </div>
         <div className="h-[420px] w-[420px] relative md:block hidden rounded-xl overflow-hidden">
           <Image
-            src={"/img/zen_2.png"}
+            src={"/img/zen.webp"}
             alt={"image-collaboratrice-zen"}
             fill={true}
           />

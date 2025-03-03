@@ -78,7 +78,7 @@ const page = () => {
           <div className="flex flex-col gap-6 justify-between md:w-5/6 mx-auto md:flex-row">
             <div className="h-[180px] w-[300px] relative rounded-xl overflow-hidden hidden lg:block">
               <Image
-                src={"/img/baer_otis.png"}
+                src={"/img/baer_otis.webp"}
                 alt={"photo d'otis mon scribe"}
                 fill={true}
               />

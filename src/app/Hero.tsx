@@ -63,13 +63,6 @@ const Hero = () => {
                   <strong>Déléguez</strong> la gestion du quotidien
                 </li>
               </ul>
-              {/* <div className="h-[120px] w-[120px] relative md:block hidden rounded-xl overflow-hidden">
-              <Image
-                src={"/img/zen_1.png"}
-                alt={"image-collaborateur-zen"}
-                fill={true}
-              />
-            </div> */}
             </div>
             <div className="hidden w-full md:flex justify-center">
               <DevisButton
@@ -89,12 +82,12 @@ const Hero = () => {
         </Card>
         <div className="w-[365px] relative overflow-hidden hidden lg:block">
           <Image
-            src={"/img/two_collaborators.png"}
+            src={"/img/two_collaborators.webp"}
             alt="deux-collaborateurs-se-serrent-la-main"
             quality={100}
             className="object-cover object-center"
             fill={true}
-            priority={true}
+            priority
           />
         </div>
       </div>

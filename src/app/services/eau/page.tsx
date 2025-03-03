@@ -21,7 +21,7 @@ const page = () => {
           </p>
           <div className="w-full md:w-3/4 h-[400px] rounded-lg relative overflow-hidden mx-auto">
             <Image
-              src={"/img/services/fontaines.png"}
+              src={"/img/services/fontaines.webp"}
               alt="illustration-fontaines-a-eau"
               quality={100}
               className="object-cover object-center"
@@ -153,7 +153,7 @@ const page = () => {
           </p>
           <div className="w-full md:w-3/4 h-[400px] rounded-lg relative overflow-hidden mx-auto">
             <Image
-              src={"/img/services/fontaines-multi.png"}
+              src={"/img/services/fontaines-multi.webp"}
               alt="illustration-fontaines-a-eau-multiples"
               quality={100}
               className="object-cover object-center"

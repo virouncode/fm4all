@@ -39,7 +39,7 @@ const Header = () => {
           <div className="relative h-[23px] w-[100px] ">
             <Link href="/">
               <Image
-                src="/img/logo_full.png"
+                src="/img/logo_full.webp"
                 alt="Logo"
                 fill={true}
                 quality={100}

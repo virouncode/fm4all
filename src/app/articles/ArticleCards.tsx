@@ -5,7 +5,7 @@ const ArticleCards = () => {
   return (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 items-center mt-6 w-full">
       <ImgCardVertical
-        src="/img/articles/le-fm-c-quoi.png"
+        src="/img/articles/le-fm-c-quoi.webp"
         alt="illustration-article-le-fm-cest-quoi"
       >
         <div className="p-4 flex flex-col gap-4 h-52">
@@ -22,7 +22,7 @@ const ArticleCards = () => {
         </div>
       </ImgCardVertical>
       <ImgCardVertical
-        src="/img/articles/missions-fm.png"
+        src="/img/articles/missions-fm.webp"
         alt="illustration-article-les-missions-du-fm"
       >
         <div className="p-4 flex flex-col gap-4 h-52">
@@ -39,7 +39,7 @@ const ArticleCards = () => {
         </div>
       </ImgCardVertical>
       <ImgCardVertical
-        src="/img/articles/histoire-fm.png"
+        src="/img/articles/histoire-fm.webp"
         alt="illustration-article-lexternalisation-du-fm"
       >
         <div className="p-4 flex flex-col gap-4 h-52">
@@ -56,7 +56,7 @@ const ArticleCards = () => {
         </div>
       </ImgCardVertical>
       <ImgCardVertical
-        src="/img/articles/economies.png"
+        src="/img/articles/economies.webp"
         alt="illustration-le-fm-fait-il-faire-des-economies"
       >
         <div className="p-4 flex flex-col gap-4 h-52">
@@ -76,7 +76,7 @@ const ArticleCards = () => {
         </div>
       </ImgCardVertical>
       <ImgCardVertical
-        src="/img/articles/histoire-nettoyage.png"
+        src="/img/articles/histoire-nettoyage.webp"
         alt="illustration-histoire-du-nettoyage-industriel"
       >
         <div className="p-4 flex flex-col gap-4 h-52">
@@ -94,7 +94,7 @@ const ArticleCards = () => {
         </div>
       </ImgCardVertical>
       <ImgCardVertical
-        src="/img/articles/hof.png"
+        src="/img/articles/hof.webp"
         alt="illustration-hof-managers"
       >
         <div className="p-4 flex flex-col gap-4 h-52">

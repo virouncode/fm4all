@@ -19,7 +19,7 @@ const page = () => {
           </p>
           <div className="w-full md:w-3/4 h-[400px] rounded-lg relative overflow-hidden mx-auto">
             <Image
-              src={"/img/services/hygiene.png"}
+              src={"/img/services/hygiene.webp"}
               alt="illustration-hygiene-sanitaire"
               quality={100}
               className="object-cover object-center"
@@ -50,7 +50,7 @@ const page = () => {
           </p>
           <div className="w-full md:w-3/4 h-[400px] rounded-lg relative overflow-hidden mx-auto">
             <Image
-              src={"/img/services/hygiene-distrib-blanc.png"}
+              src={"/img/services/hygiene-distrib-blanc.webp"}
               alt="illustration-hygiene-distributeur-blanc"
               quality={100}
               className="object-contain"
@@ -66,7 +66,7 @@ const page = () => {
           </p>
           <div className="w-full md:w-3/4 h-[400px] rounded-lg relative overflow-hidden mx-auto">
             <Image
-              src={"/img/services/hygiene-distrib-noir.png"}
+              src={"/img/services/hygiene-distrib-noir.webp"}
               alt="illustration-hygiene-distributeur-noir"
               quality={100}
               className="object-contain"
@@ -84,7 +84,7 @@ const page = () => {
           </p>
           <div className="w-full md:w-3/4 h-[400px] rounded-lg relative overflow-hidden mx-auto">
             <Image
-              src={"/img/services/hygiene-distrib-inox.png"}
+              src={"/img/services/hygiene-distrib-inox.webp"}
               alt="illustration-hygiene-distributeur-inox"
               quality={100}
               className="object-contain"

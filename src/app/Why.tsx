@@ -102,7 +102,7 @@ const Why = () => {
           </div>
           <div className="w-full md:w-1/3 h-[300px] sm:h-[500px] md:h-auto relative">
             <Image
-              src="/img/portrait-dg.jpg"
+              src="/img/portrait-dg.webp"
               alt="portrait-du-directeur-general"
               fill={true}
               className="w-full h-full object-cover"

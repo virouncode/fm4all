@@ -33,7 +33,7 @@ const Services = () => {
         <CarouselContent>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="/img/services/nettoyage.png"
+              src="/img/services/nettoyage.webp"
               alt="illustration-nettoyage"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
@@ -52,7 +52,7 @@ const Services = () => {
           </CarouselItem>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="/img/services/hygiene.png"
+              src="/img/services/hygiene.webp"
               alt="illustration-hygiene-sanitaire"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
@@ -71,7 +71,7 @@ const Services = () => {
           </CarouselItem>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="/img/services/maintenance.png"
+              src="/img/services/maintenance.webp"
               alt="illustration-maintenance"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
@@ -91,7 +91,7 @@ const Services = () => {
           </CarouselItem>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="/img/services/incendie.png"
+              src="/img/services/incendie.webp"
               alt="illustration-securite-incendie"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
@@ -114,7 +114,7 @@ const Services = () => {
           </CarouselItem>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="/img/services/cafe.png"
+              src="/img/services/cafe.webp"
               alt="illustration-cafe"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
@@ -133,7 +133,7 @@ const Services = () => {
           </CarouselItem>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="/img/services/fruits.png"
+              src="/img/services/fruits.webp"
               alt="illustration-fruits"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
@@ -152,7 +152,7 @@ const Services = () => {
           </CarouselItem>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="/img/services/snacks.png"
+              src="/img/services/snacks.webp"
               alt="illustration-snacks"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
@@ -171,7 +171,7 @@ const Services = () => {
           </CarouselItem>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="/img/services/boissons.png"
+              src="/img/services/boissons.webp"
               alt="illustration-boissons"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
@@ -190,7 +190,7 @@ const Services = () => {
           </CarouselItem>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="/img/services/fontaines.png"
+              src="/img/services/fontaines.webp"
               alt="illustration-fontaine-a-eau"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
@@ -209,7 +209,7 @@ const Services = () => {
           </CarouselItem>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="/img/services/office-managers-vertical.png"
+              src="/img/services/office-managers-vertical.webp"
               alt="illustration-office-manager"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
@@ -228,7 +228,7 @@ const Services = () => {
           </CarouselItem>
           <CarouselItem className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ImgCardVertical
-              src="/img/services/fm4all.png"
+              src="/img/services/fm4all.webp"
               alt="illustration-fm4all"
             >
               <div className="p-4 flex flex-col gap-4 h-52">

@@ -28,7 +28,7 @@ const page = () => {
           </p>
           <div className="w-full md:w-3/4 h-[400px] rounded-lg relative overflow-hidden mx-auto">
             <Image
-              src={"/img/services/incendie.png"}
+              src={"/img/services/incendie.webp"}
               alt="illustration-incendie"
               quality={100}
               className="object-cover object-center"

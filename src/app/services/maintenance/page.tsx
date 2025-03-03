@@ -20,7 +20,7 @@ const page = () => {
           </p>
           <div className="w-full md:w-3/4 h-[400px] rounded-lg relative overflow-hidden mx-auto">
             <Image
-              src={"/img/services/maintenance.png"}
+              src={"/img/services/maintenance.webp"}
               alt="illustration-maintenance"
               quality={100}
               className="object-cover object-center"
@@ -103,7 +103,7 @@ const page = () => {
         </div>
         <div className="w-full md:w-3/4 h-[200px] rounded-lg relative overflow-hidden mx-auto">
           <Image
-            src={"/img/services/maintenance_cdc.png"}
+            src={"/img/services/maintenance_cdc.webp"}
             alt="maintenance-cdc"
             quality={100}
             className="object-contain"

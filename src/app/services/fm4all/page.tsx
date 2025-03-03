@@ -21,7 +21,7 @@ const page = () => {
           </p>
           <div className="w-full md:w-3/4 h-[400px] rounded-lg relative overflow-hidden mx-auto">
             <Image
-              src={"/img/services/fm4all.png"}
+              src={"/img/services/fm4all.webp"}
               alt="illustration-pilotage-fm4all"
               quality={100}
               className="object-cover object-center"
@@ -235,7 +235,7 @@ const page = () => {
         </div>
         <div className="w-full md:w-3/4 h-[400px] rounded-lg relative overflow-hidden mx-auto">
           <Image
-            src={"/img/services/fm4all_cdc.png"}
+            src={"/img/services/fm4all_cdc.webp"}
             alt="pilotage-fm4all-cdc"
             quality={100}
             className="object-contain"
