@@ -4,8 +4,8 @@ const Footer = () => {
   return (
     <footer className="bg-fm4allsecondary">
       <div className="max-w-7xl mx-auto p-6">
-        <div className="flex flex-wrap gap-6 lg:w-3/4">
-          <div className="flex flex-col gap-2">
+        <div className="flex flex-wrap gap-6">
+          <div className="flex flex-col gap-2 w-52">
             <p className="text-secondary text-xl">fm4all</p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
               <li>
@@ -26,17 +26,7 @@ const Footer = () => {
               <li>Touts droits résérvés &copy;fm4all</li>
             </ul>
           </div>
-          <div className="flex flex-col gap-2">
-            <p className="text-secondary text-xl">Prestataires</p>
-            <ul className="text-secondary text-sm flex flex-col gap-2">
-              <li>
-                <Link href="/devenir-prestataire" className="hover:opacity-80">
-                  Devenir prestataire
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 w-52">
             <p className="text-secondary text-xl">Services</p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
               <li>
@@ -92,7 +82,7 @@ const Footer = () => {
               </li>
             </ul>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 w-52">
             <p className="text-secondary text-xl">Articles</p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
               <li>
@@ -141,6 +131,16 @@ const Footer = () => {
                   className="hover:opacity-80"
                 >
                   Hof Managers
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div className="flex flex-col gap-2 w-52">
+            <p className="text-secondary text-xl">Prestataires</p>
+            <ul className="text-secondary text-sm flex flex-col gap-2">
+              <li>
+                <Link href="/devenir-prestataire" className="hover:opacity-80">
+                  Devenir prestataire
                 </Link>
               </li>
             </ul>
