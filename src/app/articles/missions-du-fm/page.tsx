@@ -16,7 +16,12 @@ const page = () => {
           <h1 className="text-3xl md:text-4xl">
             Les différentes missions du FM
           </h1>
-          <Button variant="outline">
+          <Button
+            variant="outline"
+            className="flex items-center justify-center text-base"
+            asChild
+            size="lg"
+          >
             <Link href="/articles">Revenir aux articles</Link>
           </Button>
         </div>

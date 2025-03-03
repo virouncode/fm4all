@@ -175,6 +175,7 @@ const HygieneOptionsPoubelleCard = ({
                 handleClickProposition("poubelle", proposition)
               }
               className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+              aria-label="Sélectionner cette proposition"
             />
             <div>
               <div className="flex gap-2">

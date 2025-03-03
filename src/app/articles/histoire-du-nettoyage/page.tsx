@@ -16,7 +16,12 @@ const page = () => {
             Histoire du Nettoyage : de la &quot;femme de ménage&quot; à
             l&apos;Agent de Service de nettoyage industriel
           </h1>
-          <Button variant="outline">
+          <Button
+            variant="outline"
+            className="flex items-center justify-center text-base"
+            asChild
+            size="lg"
+          >
             <Link href="/articles">Revenir aux articles</Link>
           </Button>
         </div>

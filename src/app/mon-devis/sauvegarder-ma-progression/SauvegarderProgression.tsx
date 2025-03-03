@@ -239,6 +239,7 @@ const SauvegarderProgression = () => {
                 onCheckedChange={(value: boolean) => setAccepte(value)}
                 className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                 id="acceptation"
+                aria-label="Acceptez les conditions"
               />
               <Label htmlFor="acceptation">
                 J&apos;accepte que les informations saisies soient utilisées par

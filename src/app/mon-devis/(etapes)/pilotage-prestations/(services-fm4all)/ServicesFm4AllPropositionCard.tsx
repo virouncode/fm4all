@@ -83,6 +83,7 @@ const ServicesFm4AllPropositionCard = ({
         onCheckedChange={() => handleClickProposition(proposition)}
         className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
         disabled={!total}
+        aria-label="Sélectionner cette proposition"
       />
       <div>
         {proposition.totalAnnuelSansRemise !== proposition.totalAnnuel && (

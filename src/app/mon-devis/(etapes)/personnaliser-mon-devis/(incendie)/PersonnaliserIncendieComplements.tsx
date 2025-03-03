@@ -630,6 +630,7 @@ const PersonnaliserIncendieComplements = ({
                   onCheckedChange={(checked: boolean) =>
                     handleCheck(checked, "exutoires")
                   }
+                  aria-label="Sélectionner exutoires de fumée"
                 />
                 <Label htmlFor="exutoires" className="text-base flex-1">
                   Exutoires de fumée
@@ -652,6 +653,7 @@ const PersonnaliserIncendieComplements = ({
                   onCheckedChange={(checked: boolean) =>
                     handleCheck(checked, "exutoiresParking")
                   }
+                  aria-label="Sélectionner exutoires de fumée (parking)"
                 />
                 <Label htmlFor="exutoiresParking" className="text-base flex-1">
                   Exutoires de fumée (parking)
@@ -674,6 +676,7 @@ const PersonnaliserIncendieComplements = ({
                   onCheckedChange={(checked: boolean) =>
                     handleCheck(checked, "alarmes")
                   }
+                  aria-label="Sélectionner alarmes T4"
                 />
                 <Label htmlFor="alarmes" className="text-base flex-1">
                   Alarmes T4
@@ -697,6 +700,7 @@ const PersonnaliserIncendieComplements = ({
                   onCheckedChange={(checked: boolean) =>
                     handleCheck(checked, "portesCoupeFeuBattantes")
                   }
+                  aria-label="Sélectionner portes coupe-feu battantes"
                 />
                 <Label
                   htmlFor="portesCoupeFeuBattantes"
@@ -723,6 +727,7 @@ const PersonnaliserIncendieComplements = ({
                   onCheckedChange={(checked: boolean) =>
                     handleCheck(checked, "portesCoupeFeuCoulissantes")
                   }
+                  aria-label="Sélectionner portes coupe-feu coulissantes"
                 />
                 <Label
                   htmlFor="portesCoupeFeuCoulissantes"
@@ -749,6 +754,7 @@ const PersonnaliserIncendieComplements = ({
                   onCheckedChange={(checked: boolean) =>
                     handleCheck(checked, "colonnesSechesStatiques")
                   }
+                  aria-label="Sélectionner colonnes sèches statiques"
                 />
                 <Label
                   htmlFor="colonnesSechesStatiques"
@@ -775,6 +781,7 @@ const PersonnaliserIncendieComplements = ({
                   onCheckedChange={(checked: boolean) =>
                     handleCheck(checked, "colonnesSechesDynamiques")
                   }
+                  aria-label="Sélectionner colonnes sèches dynamiques"
                 />
                 <Label
                   htmlFor="colonnesSechesDynamiques"
@@ -801,6 +808,7 @@ const PersonnaliserIncendieComplements = ({
                   onCheckedChange={(checked: boolean) =>
                     handleCheck(checked, "ria")
                   }
+                  aria-label="Sélectionner robinets d'incendie armés"
                 />
                 <Label htmlFor="ria" className="text-base flex-1">
                   Robinets d&apos;incendie armés

@@ -195,7 +195,7 @@ const Services = () => {
               alt="illustration-fontaine-a-eau"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
-                <p className="text-2xl">Fontaine à eau</p>
+                <p className="text-2xl">Fontaines à eau</p>
                 <p className="overflow-hidden text-ellipsis">
                   Eau filtrée, fraîche, gazeuse, à poser ou encastrer, il y a
                   forcément un modèle fait pour vous.

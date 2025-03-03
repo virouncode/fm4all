@@ -313,6 +313,7 @@ const SnacksFruitsForm = ({
             onCheckedChange={() => handleCheck("fruits")}
             className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             id="fruits"
+            aria-label="Sélectionner fruits"
           />
           <Label htmlFor={`fruits`} className="text-sm">
             Fruits
@@ -324,6 +325,7 @@ const SnacksFruitsForm = ({
             onCheckedChange={() => handleCheck("snacks")}
             className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             id="snacks"
+            aria-label="Sélectionner snacks"
           />
           <Label htmlFor={`snacks`} className="text-sm">
             Snacks
@@ -335,6 +337,7 @@ const SnacksFruitsForm = ({
             onCheckedChange={() => handleCheck("boissons")}
             className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             id="boissons"
+            aria-label="Sélectionner boissons"
           />
           <Label htmlFor={`boissons`} className="text-sm">
             Boissons

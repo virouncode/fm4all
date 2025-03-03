@@ -13,7 +13,12 @@ const page = () => {
       <article className="mt-6 flex flex-col gap-10">
         <div className="flex flex-col md:flex-row items-center justify-between">
           <h1 className="text-3xl md:text-4xl">Le FM c&apos;est quoi ?</h1>
-          <Button variant="outline">
+          <Button
+            variant="outline"
+            className="flex items-center justify-center text-base"
+            asChild
+            size="lg"
+          >
             <Link href="/articles">Revenir aux articles</Link>
           </Button>
         </div>

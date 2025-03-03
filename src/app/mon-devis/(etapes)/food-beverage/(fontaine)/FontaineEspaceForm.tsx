@@ -684,6 +684,7 @@ const FontaineEspaceForm = ({
                     disabled={true}
                     className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                     id="eau froide"
+                    aria-label="Sélectionner eau froide"
                   />
                   <Label htmlFor="eau froide" className="text-sm">
                     Eau froide
@@ -697,6 +698,7 @@ const FontaineEspaceForm = ({
                     }
                     className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                     id="eau gazeuse"
+                    aria-label="Sélectionner eau gazeuse"
                   />
                   <Label htmlFor="eau gazeuse" className="text-sm">
                     Eau gazeuse
@@ -710,6 +712,7 @@ const FontaineEspaceForm = ({
                     }
                     className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                     id="boissons"
+                    aria-label="Sélectionner eau chaude"
                   />
                   <Label htmlFor="Eau chaude" className="text-sm">
                     Eau chaude

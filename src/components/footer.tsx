@@ -7,44 +7,75 @@ const Footer = () => {
         <div className="flex flex-wrap gap-6 lg:w-2/3">
           <div className="flex flex-col gap-2">
             <p className="text-secondary text-xl">fm4all</p>
-            <ul className="text-secondary">
+            <ul className="text-secondary text-sm">
               <li>
-                <Link href="/contact">Nous contacter</Link>
+                <Link href="/" className="hover:opacity-80">
+                  Page d&apos;accueil
+                </Link>
               </li>
               <li>
-                <Link href="/mentions-legales">Mentions legales</Link>
+                <Link href="/contact" className="hover:opacity-80">
+                  Nous contacter
+                </Link>
+              </li>
+              <li>
+                <Link href="/mentions-legales" className="hover:opacity-80">
+                  Mentions legales
+                </Link>
               </li>
               <li>Touts droits résérvés &copy;fm4all</li>
             </ul>
           </div>
           <div className="flex flex-col gap-2">
             <p className="text-secondary text-xl">Articles</p>
-            <ul className="text-secondary">
+            <ul className="text-secondary text-sm">
               <li>
-                <Link href="/articles/le-fm-cest-quoi">
+                <Link
+                  href="/articles/le-fm-cest-quoi"
+                  className="hover:opacity-80"
+                >
                   Le FM c&apos;est quoi ?
                 </Link>
               </li>
               <li>
-                <Link href="/articles/missions-du-fm">Les missions du FM</Link>
+                <Link
+                  href="/articles/missions-du-fm"
+                  className="hover:opacity-80"
+                >
+                  Les missions du FM
+                </Link>
               </li>
               <li>
-                <Link href="/articles/lexternalisation-du-fm">
+                <Link
+                  href="/articles/lexternalisation-du-fm"
+                  className="hover:opacity-80"
+                >
                   Histoire de l&apos;externalisation du FM
                 </Link>
               </li>
               <li>
-                <Link href="/articles/le-fm-fait-il-faire-des-economies">
+                <Link
+                  href="/articles/le-fm-fait-il-faire-des-economies"
+                  className="hover:opacity-80"
+                >
                   Le FM fait-il faire des économies ?
                 </Link>
               </li>
               <li>
-                <Link href="/articles/histoire-du-nettoyage">
+                <Link
+                  href="/articles/histoire-du-nettoyage"
+                  className="hover:opacity-80"
+                >
                   Histoire du nettoyage industriel
                 </Link>
               </li>
               <li>
-                <Link href="/articles/hof-managers">Hof Managers</Link>
+                <Link
+                  href="/articles/hof-managers"
+                  className="hover:opacity-80"
+                >
+                  Hof Managers
+                </Link>
               </li>
             </ul>
           </div>
@@ -91,9 +122,11 @@ const Footer = () => {
           </div> */}
           <div className="flex flex-col gap-2">
             <p className="text-secondary text-xl">Prestataires</p>
-            <ul className="text-secondary">
+            <ul className="text-secondary text-sm">
               <li>
-                <Link href="/devenir-prestataire">Devenir prestataire</Link>
+                <Link href="/devenir-prestataire" className="hover:opacity-80">
+                  Devenir prestataire
+                </Link>
               </li>
             </ul>
           </div>

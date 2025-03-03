@@ -73,6 +73,7 @@ const OfficeManagerInputs = ({
           className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
           checked={officeManager.infos.premium}
           onCheckedChange={handleCheckPremium}
+          aria-label="Sélectionner l'option premium"
         />
         <Label htmlFor="premium" className="text-sm flex-1">
           Anglais courant ou Expertise Sup.

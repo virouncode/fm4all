@@ -80,6 +80,7 @@ const NettoyageOptionsRepasseCard = ({
               handleClickRepasseProposition(repasseProposition)
             }
             className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+            aria-label="Sélectionner cette proposition"
           />
           <div>
             <p className="font-bold">{repassePrixMensuelText}</p>

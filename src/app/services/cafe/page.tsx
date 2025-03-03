@@ -11,10 +11,20 @@ export const metadata: Metadata = {
 const page = () => {
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
-      <h1 className="text-4xl mt-6 mb-10">
-        Machines à café et consommables : un service sur-mesure pour vos pauses
-        café
-      </h1>
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 mt-6 mb-10">
+        <h1 className="text-4xl">
+          Machines à café et consommables : un service sur-mesure pour vos
+          pauses café
+        </h1>
+        <Button
+          variant="outline"
+          className="flex items-center justify-center text-base"
+          asChild
+          size="lg"
+        >
+          <Link href="/nos-services">Revenir aux services</Link>
+        </Button>
+      </div>
       <section className="flex flex-col gap-10">
         <div className="flex flex-col gap-8">
           <p className="text-lg max-w-prose mx-auto hyphens-auto text-wrap">

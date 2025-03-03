@@ -48,6 +48,7 @@ const SecuriteIncendieInputs = ({
                     ? "text-fm4alldestructive"
                     : ""
                 }`}
+                id="nbExtincteurs"
               />
               <Label htmlFor="nbExtincteurs" className="text-sm flex-1">
                 extincteur(s)
@@ -56,6 +57,7 @@ const SecuriteIncendieInputs = ({
 
             <div className="flex gap-4 items-center w-full">
               <Input
+                id="nbBaes"
                 type="number"
                 value={nbBaes}
                 min={0}
@@ -84,6 +86,7 @@ const SecuriteIncendieInputs = ({
                 className={`w-16 ${
                   nbTelBaes === 1 ? "text-fm4alldestructive" : ""
                 }`}
+                id="nbTelBaes"
               />
               <Label htmlFor="nbTelBaes" className="text-sm flex-1">
                 télécommande(s) BAES
