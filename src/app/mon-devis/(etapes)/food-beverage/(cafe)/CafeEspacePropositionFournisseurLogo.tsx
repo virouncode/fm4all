@@ -38,25 +38,30 @@ const CafeEspacePropositionFournisseurLogo = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="flex w-1/4 h-full items-center justify-center p-4 relative bg-transparent hover:bg-transparent shadow-none">
-          {logoUrl ? (
-            <div className="w-full h-full relative">
-              <Image
-                src={logoUrl}
-                alt={`logo-de-${nomFournisseur}`}
-                fill={true}
-                className="w-full h-full object-contain cursor-pointer"
-                quality={100}
-              />
-            </div>
-          ) : (
-            nomFournisseur
-          )}
-          <SquareArrowOutUpRight
-            className="absolute right-2 top-2 cursor-pointer hover:opacity-70"
-            size={16}
-            color="#000000"
-          />
+        <Button
+          className="flex w-1/4 h-full items-center justify-center p-4 relative bg-transparent hover:bg-transparent shadow-none"
+          asChild
+        >
+          <div>
+            {logoUrl ? (
+              <div className="w-full h-full relative">
+                <Image
+                  src={logoUrl}
+                  alt={`logo-de-${nomFournisseur}`}
+                  fill={true}
+                  className="w-full h-full object-contain cursor-pointer"
+                  quality={100}
+                />
+              </div>
+            ) : (
+              nomFournisseur
+            )}
+            <SquareArrowOutUpRight
+              className="absolute right-2 top-2 cursor-pointer hover:opacity-70"
+              size={16}
+              color="#000000"
+            />
+          </div>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
