@@ -66,6 +66,7 @@ const HygieneDistribQuantitesInputs = ({
                     ? "text-fm4alldestructive"
                     : ""
                 }`}
+                id="nbDistribEmp"
               />
               <Label htmlFor="nbDistribEmp" className="text-sm flex-1">
                 distributeurs essuie-main papier
@@ -85,6 +86,7 @@ const HygieneDistribQuantitesInputs = ({
                     ? "text-fm4alldestructive"
                     : ""
                 }`}
+                id="nbDistribSavon"
               />
               <Label htmlFor="nbDistribSavon" className="text-sm flex-1">
                 distributeurs savon
@@ -104,6 +106,7 @@ const HygieneDistribQuantitesInputs = ({
                     ? "text-fm4alldestructive"
                     : ""
                 }`}
+                id="nbDistribPh"
               />
               <Label htmlFor="nbDistribPh" className="text-sm flex-1">
                 distributeurs papier hygiénique
@@ -114,6 +117,7 @@ const HygieneDistribQuantitesInputs = ({
               <Select
                 onValueChange={handleChangeDureeLocation}
                 value={dureeLocation}
+                aria-label="Sélectionnez la durée de location"
               >
                 <SelectTrigger className={`w-full max-w-xs`}>
                   <SelectValue />

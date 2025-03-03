@@ -94,6 +94,7 @@ const HygieneOptionsBalaiCard = ({
                   ? "text-fm4alldestructive"
                   : ""
               }`}
+              id="nbDistribBalai"
             />
             <Label htmlFor="nbDistribBalai" className="text-sm">
               blocs

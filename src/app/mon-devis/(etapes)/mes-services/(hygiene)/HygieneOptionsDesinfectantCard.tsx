@@ -94,6 +94,7 @@ const HygieneOptionsDesinfectantCard = ({
                   ? "text-fm4alldestructive"
                   : ""
               }`}
+              id="nbDistribDesinfectant"
             />
             <Label htmlFor="nbDistribDesinfectant" className="text-sm">
               distributeurs

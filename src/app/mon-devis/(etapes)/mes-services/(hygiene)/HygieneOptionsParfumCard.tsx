@@ -94,6 +94,7 @@ const HygieneOptionsParfumCard = ({
                   ? "text-fm4alldestructive"
                   : ""
               }`}
+              id="nbDistribParfum"
             />
             <Label htmlFor="nbDistribParfum" className="text-sm">
               distributeurs

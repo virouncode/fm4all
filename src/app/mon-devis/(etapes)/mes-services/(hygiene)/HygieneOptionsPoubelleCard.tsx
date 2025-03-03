@@ -95,6 +95,7 @@ const HygieneOptionsPoubelleCard = ({
                   ? "text-fm4alldestructive"
                   : ""
               }`}
+              id="nbDistribPoubelle"
             />
             <Label htmlFor="nbDistribPoubelle" className="text-sm">
               blocs
