@@ -27,11 +27,6 @@ const Hero = () => {
               <h2 className="text-lg md:text-xl text-center mt-6 font-bold">
                 Vos locaux font moins de 3000m² ?
               </h2>
-              {/* <p className="flex md:flex-row flex-col items-center text-xl md:text-2xl mt-6 md:justify-center">
-              <span>Simplifiez.</span>
-              <span>Comparez.</span>
-              <span>Déléguez.</span>
-            </p> */}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-6 text-base md:text-lg">
@@ -47,15 +42,14 @@ const Hero = () => {
               <ul className="ml-10 mb-4">
                 <li className="list-check">
                   <strong>Comparez</strong> par gamme :{" "}
-                  {/* <span className="text-fm4allessential font-bold"> */}
-                  Essentiel
-                  {/* </span> */},{" "}
-                  {/* <span className="text-fm4allcomfort font-bold"> */}
-                  Confort
-                  {/* </span> */},{" "}
-                  {/* <span className="text-fm4allexcellence font-bold"> */}
-                  Excellence
-                  {/* </span> */}
+                  <span className="text-fm4allessential font-bold">
+                    Essentiel
+                  </span>
+                  ,{" "}
+                  <span className="text-fm4allcomfort font-bold">Confort</span>,{" "}
+                  <span className="text-fm4allexcellence font-bold">
+                    Excellence
+                  </span>
                 </li>
                 <li className="list-check">
                   <strong>Simplifiez</strong> la mise en place des services
