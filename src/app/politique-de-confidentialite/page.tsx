@@ -241,7 +241,7 @@ const page = () => {
         Notre site web utilise des cookies. Pour en savoir plus sur les types de
         cookies que nous utilisons, leur finalité et comment les gérer, veuillez
         consulter notre [Politique de cookies](lien vers la page de politique de
-        cookies). Une bannière de consentement aux cookies s&apis;affiche lors
+        cookies). Une bannière de consentement aux cookies s&apos;affiche lors
         de votre première visite sur notre site.
       </p>
       <h2 className="font-bold">8. Sécurité des données</h2>
