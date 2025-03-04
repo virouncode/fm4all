@@ -3,7 +3,9 @@
 import { DateInputWithLabel } from "@/components/formInputs/DateInputWithLabel";
 import { InputWithLabel } from "@/components/formInputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Form } from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
 import { batiments } from "@/constants/batiments";
 import { departements } from "@/constants/departements";
 import { occupations } from "@/constants/occupations";
@@ -23,6 +25,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Loader } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ChangeEvent,
@@ -43,6 +46,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
   const { commentaires } = useContext(CommentairesContext);
   const { setMonDevis } = useContext(MonDevisContext);
   const [loading, setLoading] = useState(false);
+  const [accepte, setAccepte] = useState(false);
   const router = useRouter();
   useScrollIntoMonDevis();
 
@@ -348,12 +352,27 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                 />
               </div>
             </div>
+            <div className="flex gap-4 items-center justify-center mb-6">
+              <Checkbox
+                checked={accepte}
+                onCheckedChange={(value: boolean) => setAccepte(value)}
+                className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+                id="acceptation"
+                aria-label="Acceptez les conditions"
+              />
+              <Label htmlFor="acceptation">
+                J&apos;accepte les{" "}
+                <Link href="/cgv" className="underline" target="_blank">
+                  conditions générales de vente
+                </Link>
+              </Label>
+            </div>
             <div className="flex justify-center">
               <Button
                 variant="destructive"
                 size="lg"
                 className="text-base min-w-[200px]"
-                disabled={loading}
+                disabled={loading || !accepte}
               >
                 {loading ? (
                   <Loader className="animate-spin" />
