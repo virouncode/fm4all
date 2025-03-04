@@ -20,7 +20,7 @@ const Hero = () => {
           <CardHeader>
             <CardTitle>
               <h1 className="text-3xl md:text-4xl text-center text-fm4allsecondary text-pretty font-bold">
-                Trouvez des prestataires de services au meilleur prix.
+                Vos prestataires de services au meilleur prix.
               </h1>
             </CardTitle>
             <CardDescription>
