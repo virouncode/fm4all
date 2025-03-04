@@ -4,6 +4,7 @@ import Hero from "./Hero";
 import HofManager from "./HofManager";
 import How from "./How";
 import Mission from "./Mission";
+import Partenaires from "./Partenaires";
 import Presentation from "./Presentation";
 import Services from "./Services";
 import VideoPresentation from "./VideoPresentation";
@@ -21,6 +22,7 @@ export default function page() {
       <Hero />
       <Presentation />
       <Services />
+      <Partenaires />
       <VideoPresentation />
       <How />
       <Why />

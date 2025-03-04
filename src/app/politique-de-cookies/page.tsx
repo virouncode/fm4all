@@ -1,3 +1,12 @@
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -74,16 +83,16 @@ const page = () => {
                 et ils ne peuvent pas suivre votre activité de navigation sur
                 d&apos;autres sites web. Base légale : Consentement
               </li>
-              {/* <li className="list-disc">
+              <li className="list-disc">
                 <strong>Cookies de ciblage/publicité</strong> : Ces cookies sont
                 utilisés pour diffuser des publicités plus pertinentes pour vous
                 et vos intérêts. Ils sont également utilisés pour limiter le
                 nombre de fois que vous voyez une publicité, ainsi que pour
-                aider à mesurer l&apos;efficacité des campagnes publicitaires. Ils
-                sont généralement placés par des réseaux publicitaires avec la
-                permission de l&apos;opérateur du site web. Base légale :
+                aider à mesurer l&apos;efficacité des campagnes publicitaires.
+                Ils sont généralement placés par des réseaux publicitaires avec
+                la permission de l&apos;opérateur du site web. Base légale :
                 Consentement
-              </li> */}
+              </li>
             </ul>
           </div>
         </div>
@@ -91,7 +100,250 @@ const page = () => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             3. Liste des cookies utilisés
           </h2>
-          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2"></div>
+          <div className="flex flex-col w-full md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2 overflow-x-auto">
+            <Table>
+              <TableCaption>List des cookies utilisés</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nom du cookie</TableHead>
+                  <TableHead>Nom du fournisseur</TableHead>
+                  <TableHead>Finalité</TableHead>
+                  <TableHead>Durée de conservation</TableHead>
+                  <TableHead>Type de cookie</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell>_ga</TableCell>
+                  <TableCell>Google Analytics</TableCell>
+                  <TableCell>
+                    Utilisé pour distinguer les utilisateurs
+                  </TableCell>
+                  <TableCell>2 ans</TableCell>
+                  <TableCell>Suivi Analytique</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>_ga_GPWGXZXVW0</TableCell>
+                  <TableCell>Google Analytics</TableCell>
+                  <TableCell>
+                    Identifie de manière unique un visiteur sur plusieurs
+                    sessions
+                  </TableCell>
+                  <TableCell>2 ans</TableCell>
+                  <TableCell>Suivi Analytique</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>ADS_VISITOR_ID</TableCell>
+                  <TableCell>YouTube (Google)</TableCell>
+                  <TableCell>
+                    Identifie un utilisateur unique pour le suivi des publicités
+                    et du remarketing
+                  </TableCell>
+                  <TableCell>13 mois</TableCell>
+                  <TableCell>Suivi publicitaire et analytique</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>AEC</TableCell>
+                  <TableCell>YouTube (Google)</TableCell>
+                  <TableCell>
+                    Assure que les requêtes des utilisateurs ne sont pas
+                    falsifiées
+                  </TableCell>
+                  <TableCell>6 mois</TableCell>
+                  <TableCell>Sécurité</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>APISID</TableCell>
+                  <TableCell>YouTube (Google)</TableCell>
+                  <TableCell>
+                    Stockage des préférences et informations de session de
+                    l&apos;utilisateur
+                  </TableCell>
+                  <TableCell>2 ans</TableCell>
+                  <TableCell>Suivi et personnalisation</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>HSID</TableCell>
+                  <TableCell>YouTube (Google)</TableCell>
+                  <TableCell>
+                    Stockage des informations de session, liées à
+                    l&apos;authentification et la sécurisation des comptes
+                    Google
+                  </TableCell>
+                  <TableCell>2 ans</TableCell>
+                  <TableCell>Sécurité et authentification</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>NID</TableCell>
+                  <TableCell>YouTube (Google)</TableCell>
+                  <TableCell>
+                    Personnaliser les annonces qui sont affichées sur Google et
+                    ses partenaires
+                  </TableCell>
+                  <TableCell>6 mois</TableCell>
+                  <TableCell>Suivi publicitaire et personnalisation</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>OTZ</TableCell>
+                  <TableCell>YouTube (Google)</TableCell>
+                  <TableCell>Optimiser la diffusion des publicités</TableCell>
+                  <TableCell>28 jours</TableCell>
+                  <TableCell>Suivi publicitaire et personnalisation</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>SAPISID</TableCell>
+                  <TableCell>YouTube (Google)</TableCell>
+                  <TableCell>
+                    Authentifier un utilisateur lorsque ce dernier est connecté
+                    à son compte Google
+                  </TableCell>
+                  <TableCell>2 ans</TableCell>
+                  <TableCell>Sécurité et authentification</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>SEARCH_SAMESITE</TableCell>
+                  <TableCell>YouTube (Google)</TableCell>
+                  <TableCell>
+                    Protéger les utilisateurs contre certains types
+                    d&apos;attaques, en particulier les attaques de
+                    falsification de requêtes inter-sites
+                  </TableCell>
+                  <TableCell>Quelques h</TableCell>
+                  <TableCell>Sécurité et gestion de session</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>SID</TableCell>
+                  <TableCell>YouTube (Google)</TableCell>
+                  <TableCell>
+                    Maintenir l&apos;authentification active lorsque
+                    l&apos;utilisateur navigue sur des services comme Gmail,
+                    Google Drive, YouTube
+                  </TableCell>
+                  <TableCell>2 ans</TableCell>
+                  <TableCell>Sécurité et gestion de session</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>SIDCC</TableCell>
+                  <TableCell>YouTube (Google)</TableCell>
+                  <TableCell>
+                    Renforcer la sécurité de la session de l&apos;utilisateur
+                    connecté à son compte Google
+                  </TableCell>
+                  <TableCell>3 mois</TableCell>
+                  <TableCell>Sécurité et personnalisation</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>SSID</TableCell>
+                  <TableCell>YouTube (Google)</TableCell>
+                  <TableCell>
+                    Maintenir la session d&apos;un utilisateur qui est connecté
+                    à son compte Google, en garantissant qu&apos;il ne soit pas
+                    obligé de se reconnecter à chaque page
+                  </TableCell>
+                  <TableCell>2 ans</TableCell>
+                  <TableCell>Sécurité et gestion de session</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>__Secure-1PAPISID</TableCell>
+                  <TableCell>YouTube (Google)</TableCell>
+                  <TableCell>
+                    Assurer la sécurité des sessions utilisateurs,
+                    particulièrement dans le cadre des services de publicité
+                    Google
+                  </TableCell>
+                  <TableCell>2 ans</TableCell>
+                  <TableCell>Sécurité et personnalisation</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>__Secure-1PSID</TableCell>
+                  <TableCell>YouTube (Google)</TableCell>
+                  <TableCell>
+                    Maintenir et sécuriser la session des utilisateurs
+                    lorsqu&apos;ils sont connectés à leurs comptes Google
+                  </TableCell>
+                  <TableCell>2 ans</TableCell>
+                  <TableCell>Sécurité et personnalisation</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>__Secure-1PSIDCC</TableCell>
+                  <TableCell>YouTube (Google)</TableCell>
+                  <TableCell>
+                    Empêcher les utilisateurs d&apos;être déconnectés
+                    lorsqu&apos;ils naviguent entre les pages des services
+                    Google
+                  </TableCell>
+                  <TableCell>2 ans</TableCell>
+                  <TableCell>Sécurité et personnalisation</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>__Secure-1PSIDTS</TableCell>
+                  <TableCell>YouTube (Google)</TableCell>
+                  <TableCell>
+                    Empêcher les utilisateurs d&apos;être déconnectés
+                    lorsqu&apos;ils naviguent entre les pages des services
+                    Google
+                  </TableCell>
+                  <TableCell>2 ans</TableCell>
+                  <TableCell>Sécurité et personnalisation</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>__Secure-3PAPISID</TableCell>
+                  <TableCell>YouTube (Google)</TableCell>
+                  <TableCell>
+                    Assurer la sécurité des sessions utilisateurs,
+                    particulièrement lorsqu&apos;ils interagissent avec les
+                    services Google
+                  </TableCell>
+                  <TableCell>2 ans</TableCell>
+                  <TableCell>Sécurité et personnalisation</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>__Secure-3PSID</TableCell>
+                  <TableCell>YouTube (Google)</TableCell>
+                  <TableCell>
+                    Assurer la sécurité des sessions utilisateurs,
+                    particulièrement lorsqu&apos;ils interagissent avec les
+                    services Google
+                  </TableCell>
+                  <TableCell>2 ans</TableCell>
+                  <TableCell>Sécurité et personnalisation</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>__Secure-3PSIDCC</TableCell>
+                  <TableCell>YouTube (Google)</TableCell>
+                  <TableCell>
+                    Assurer la sécurité des sessions utilisateurs,
+                    particulièrement lorsqu&apos;ils interagissent avec les
+                    services Google
+                  </TableCell>
+                  <TableCell>2 ans</TableCell>
+                  <TableCell>Sécurité et personnalisation</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>__Secure-3PSIDTS</TableCell>
+                  <TableCell>YouTube (Google)</TableCell>
+                  <TableCell>
+                    Assurer la sécurité des sessions utilisateurs,
+                    particulièrement lorsqu&apos;ils interagissent avec les
+                    services Google
+                  </TableCell>
+                  <TableCell>2 ans</TableCell>
+                  <TableCell>Sécurité et personnalisation</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>__Secure-ENID</TableCell>
+                  <TableCell>YouTube (Google)</TableCell>
+                  <TableCell>
+                    Assurer la sécurité des sessions utilisateurs,
+                    particulièrement lorsqu&apos;ils interagissent avec les
+                    services Google
+                  </TableCell>
+                  <TableCell>2 ans</TableCell>
+                  <TableCell>Sécurité et personnalisation</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
         </div>
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
@@ -100,11 +352,14 @@ const page = () => {
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
             <p className="text-base">
               Vous pouvez gérer vos préférences en matière de cookies à tout
-              moment en [indiquer la méthode, par exemple : cliquant sur le lien
-              &quot;Gestion des cookies&quot; présent en bas de chaque page, ou
-              en modifiant les paramètres de votre navigateur].
+              moment :
             </p>
             <ul className="ml-10 flex flex-col gap-2">
+              <li className="list-disc">
+                <strong>Bannière cookies</strong> : Lors de chaque session vous
+                verrez apparaître une banière de consentement aux cookies. Vous
+                pouvez accepter ou refuser les cookies non essentiels.
+              </li>
               <li className="list-disc">
                 <strong>Paramètres du navigateur</strong> : La plupart des
                 navigateurs web vous permettent de contrôler les cookies via

@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import Partenaires from "../Partenaires";
 
 export const metadata: Metadata = {
   title: "Nos partenaires",
@@ -185,6 +186,7 @@ const page = () => {
             en une expérience simple, efficace et éthique.
           </p>
         </div>
+        <Partenaires />
         <div className="flex flex-col items-center justify-center gap-4">
           <Button
             variant="destructive"

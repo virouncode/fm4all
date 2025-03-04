@@ -45,7 +45,7 @@ const page = () => {
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto">
             <p className="text-base">Nom de l&apos;hébergeur : Vercel Inc.</p>
             <p className="text-base">
-              340 S Lemon Ave #4133 Walnut, CA 91789, US
+              Addresse : 340 S Lemon Ave #4133 Walnut, CA 91789, US
             </p>
             <p className="text-base">Tél : (559) 288-7060</p>
           </div>
