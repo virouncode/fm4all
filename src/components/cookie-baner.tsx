@@ -22,15 +22,9 @@ const CookieBanner = () => {
   useEffect(() => {
     const storedCookieConsent = getLocalStorage("cookie_consent", null);
     const storedConsentDate = getLocalStorage("cookie_consent_date", null);
-
-    if (
-      storedCookieConsent !== null &&
-      storedConsentDate !== null &&
-      window !== undefined
-    ) {
+    if (storedCookieConsent !== null && storedConsentDate !== null) {
       const now = Date.now();
       const isExpired = now - storedConsentDate > COOKIE_EXPIRATION_MS;
-
       if (isExpired) {
         localStorage.removeItem("cookie_consent");
         localStorage.removeItem("cookie_consent_date");
@@ -42,8 +36,13 @@ const CookieBanner = () => {
   }, []);
 
   useEffect(() => {
+    console.log("use effect changed cookie consent", cookieConsent);
+
     if (cookieConsent === null) return;
     const newValue = cookieConsent ? "granted" : "denied";
+    console.log("window", window);
+    console.log("window.gtag", window.gtag);
+
     if (window !== undefined && window.gtag) {
       window.gtag("consent", "update", {
         analytics_storage: newValue,
