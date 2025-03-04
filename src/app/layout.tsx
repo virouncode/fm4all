@@ -1,4 +1,6 @@
+import CookieBanner from "@/components/cookie-baner";
 import Footer from "@/components/footer";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 import Header from "@/components/header";
 import { Toaster } from "@/components/ui/toaster";
 import CafeProvider from "@/context/CafeProvider";
@@ -60,6 +62,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${didact.className} antialiased scroll-smooth`}>
+        <GoogleAnalytics
+          GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!}
+        />
         <DevisProgressProvider>
           <ClientProvider>
             <ServicesProvider>
@@ -97,6 +102,7 @@ export default function RootLayout({
                                                                   >
                                                                     <Header />
                                                                     {children}
+                                                                    <CookieBanner />
                                                                     <Analytics />
                                                                     <Footer />
                                                                     <Toaster />

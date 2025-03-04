@@ -4,7 +4,7 @@ const VideoPresentation = () => {
       <iframe
         width="100%"
         height="100%"
-        src="https://www.youtube.com/embed/1t8QE1Zp6I8?si=Ps06ViHpWz2QBdA0?modestbranding=1&rel=0"
+        src="https://www.youtube-nocookie.com/embed/1t8QE1Zp6I8?si=Ps06ViHpWz2QBdA0?modestbranding=1&rel=0"
         title="fm4all-presentation-video"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         referrerPolicy="strict-origin-when-cross-origin"
