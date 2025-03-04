@@ -36,8 +36,8 @@ import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Didact_Gothic } from "next/font/google";
-import "./globals.css";
 import { Suspense } from "react";
+import "./globals.css";
 
 const didact = Didact_Gothic({
   variable: "--font-didact-sans",
@@ -63,7 +63,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${didact.className} antialiased scroll-smooth`}>
-        <Suspense fallback={null}>
+        <Suspense>
           <GoogleAnalytics
             GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!}
           />

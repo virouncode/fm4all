@@ -197,7 +197,6 @@ const MesLocaux = () => {
       setTotalServicesFm4All,
       setTotal
     );
-    // localStorage.clear();
     setLoaderVisible(true);
     //Passer à l'étape suivante
     setTimeout(() => {

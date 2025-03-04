@@ -12,26 +12,44 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 
+const COOKIE_EXPIRATION_MS = 1000 * 60;
+
 const CookieBanner = () => {
-  const [cookieConsent, setCookieConsent] = useState(false);
+  const [cookieConsent, setCookieConsent] = useState<boolean | null>(null);
   useEffect(() => {
-    const storedCookieConsent = getLocalStorage("cookie_consent", false);
+    const storedCookieConsent = getLocalStorage("cookie_consent", null);
+    const storedConsentDate = getLocalStorage("cookie_consent_date", null);
 
-    setCookieConsent(storedCookieConsent);
-  }, [setCookieConsent]);
+    if (
+      storedCookieConsent !== null &&
+      storedConsentDate !== null &&
+      window !== undefined
+    ) {
+      const now = Date.now();
+      const isExpired = now - storedConsentDate > COOKIE_EXPIRATION_MS;
+
+      if (isExpired) {
+        localStorage.removeItem("cookie_consent");
+        localStorage.removeItem("cookie_consent_date");
+        setCookieConsent(null);
+      } else {
+        setCookieConsent(storedCookieConsent);
+      }
+    }
+  }, []);
 
   useEffect(() => {
+    if (cookieConsent === null) return;
     const newValue = cookieConsent ? "granted" : "denied";
-
-    window.gtag("consent", "update", {
-      analytics_storage: newValue,
-    });
-
+    if (window !== undefined && window.gtag) {
+      window.gtag("consent", "update", {
+        analytics_storage: newValue,
+      });
+    }
     setLocalStorage("cookie_consent", cookieConsent);
-
-    //For Testing
-    console.log("Cookie Consent: ", cookieConsent);
+    setLocalStorage("cookie_consent_date", Date.now());
   }, [cookieConsent]);
+
   const handleAccept = () => {
     setCookieConsent(true);
   };
@@ -39,7 +57,7 @@ const CookieBanner = () => {
     setCookieConsent(false);
   };
   return (
-    <Sheet open={!cookieConsent}>
+    <Sheet open={cookieConsent === null}>
       <SheetTrigger asChild></SheetTrigger>
       <SheetContent side="bottom" className="[&>button:first-child]:hidden">
         <SheetHeader>
