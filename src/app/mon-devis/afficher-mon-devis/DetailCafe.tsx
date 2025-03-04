@@ -7,13 +7,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { MARGE } from "@/constants/constants";
 import { typesBoissons } from "@/constants/typesBoissons";
 import { CafeContext } from "@/context/CafeProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { useContext } from "react";
 import { locationCafeMachine } from "../../../constants/locationCafeMachine";
-import { MARGE } from "@/constants/constants";
 
 const DetailCafe = () => {
   const { cafe } = useContext(CafeContext);

@@ -15,9 +15,7 @@ const PersonnaliserCommentaires = () => {
   );
   const router = useRouter();
   const handleClickPrevious = () => {
-    const currentIndex = personnalisation.personnalisationIds.indexOf(
-      personnalisation.currentPersonnalisationId as number
-    );
+    const currentIndex = personnalisation.personnalisationIds.indexOf(13);
 
     setPersonnalisation((prev) => ({
       ...prev,
@@ -26,9 +24,7 @@ const PersonnaliserCommentaires = () => {
     }));
   };
   const handleClickNext = () => {
-    const currentIndex = personnalisation.personnalisationIds.indexOf(
-      personnalisation.currentPersonnalisationId as number
-    );
+    const currentIndex = personnalisation.personnalisationIds.indexOf(13);
     if (currentIndex + 1 === personnalisation.personnalisationIds.length) {
       setPersonnalisation((prev) => ({
         ...prev,

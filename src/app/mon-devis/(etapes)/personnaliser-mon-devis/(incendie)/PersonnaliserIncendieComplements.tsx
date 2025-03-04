@@ -99,9 +99,7 @@ const PersonnaliserIncendieComplements = ({
   const nbRIA = incendie.quantites.nbRIA || 1;
 
   const handleClickPrevious = () => {
-    const currentIndex = personnalisation.personnalisationIds.indexOf(
-      personnalisation.currentPersonnalisationId as number
-    );
+    const currentIndex = personnalisation.personnalisationIds.indexOf(6);
     setPersonnalisation((prev) => ({
       ...prev,
       currentPersonnalisationId:
@@ -109,9 +107,10 @@ const PersonnaliserIncendieComplements = ({
     }));
   };
   const handleClickNext = () => {
+    const currentIndex = personnalisation.personnalisationIds.indexOf(6);
     setPersonnalisation((prev) => ({
       ...prev,
-      currentPersonnalisationId: 13,
+      currentPersonnalisationId: prev.personnalisationIds[currentIndex + 1],
     }));
   };
 

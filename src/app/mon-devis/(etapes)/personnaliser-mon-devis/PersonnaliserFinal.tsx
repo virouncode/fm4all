@@ -19,9 +19,7 @@ const PersonnaliserFinal = () => {
     router.push("/mon-devis/afficher-mon-devis");
   };
   const handleClickPrevious = () => {
-    const currentIndex = personnalisation.personnalisationIds.indexOf(
-      personnalisation.currentPersonnalisationId as number
-    );
+    const currentIndex = personnalisation.personnalisationIds.indexOf(14);
     setPersonnalisation((prev) => ({
       ...prev,
       currentPersonnalisationId:

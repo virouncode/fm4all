@@ -14,12 +14,15 @@ const PersonnaliserNettoyageVitrerie = () => {
   const { client } = useContext(ClientContext);
   const { nettoyage, setNettoyage } = useContext(NettoyageContext);
   const { setTotalNettoyage } = useContext(TotalNettoyageContext);
-  const { setPersonnalisation } = useContext(PersonnalisationContext);
+  const { personnalisation, setPersonnalisation } = useContext(
+    PersonnalisationContext
+  );
   const handleClickPrevious = () => {};
   const handleClickNext = () => {
+    const currentIndex = personnalisation.personnalisationIds.indexOf(2);
     setPersonnalisation((prev) => ({
       ...prev,
-      currentPersonnalisationId: 6,
+      currentPersonnalisationId: prev.personnalisationIds[currentIndex + 1],
     }));
   };
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {

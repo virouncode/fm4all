@@ -9,13 +9,16 @@ import {
 import { getLocalStorage, setLocalStorage } from "@/lib/storageHelper";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 
-const COOKIE_EXPIRATION_MS = 1000 * 60;
+const COOKIE_EXPIRATION_MS = 1000 * 60 * 60 * 24;
+// const COOKIE_EXPIRATION_MS = 1000 * 60;
 
 const CookieBanner = () => {
   const [cookieConsent, setCookieConsent] = useState<boolean | null>(null);
+  const pathname = usePathname();
   useEffect(() => {
     const storedCookieConsent = getLocalStorage("cookie_consent", null);
     const storedConsentDate = getLocalStorage("cookie_consent_date", null);
@@ -57,7 +60,9 @@ const CookieBanner = () => {
     setCookieConsent(false);
   };
   return (
-    <Sheet open={cookieConsent === null}>
+    <Sheet
+      open={cookieConsent === null && pathname !== "/politique-de-cookies"}
+    >
       <SheetTrigger asChild></SheetTrigger>
       <SheetContent side="bottom" className="[&>button:first-child]:hidden">
         <SheetHeader>
@@ -90,6 +95,7 @@ const CookieBanner = () => {
               <Link
                 href="/politique-de-cookies"
                 className="text-fm4allsecondary cursor-pointer hover:opacity-80"
+                target="_blank"
               >
                 Politique relative aux cookies
               </Link>

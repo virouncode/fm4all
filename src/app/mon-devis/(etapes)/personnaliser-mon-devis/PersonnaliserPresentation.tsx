@@ -12,12 +12,10 @@ const PersonnaliserPresentation = () => {
   );
 
   const handleClickNext = () => {
-    const indexOfcurrentPersonnalisationId =
-      personnalisation.personnalisationIds.indexOf(1);
+    const currentIndex = personnalisation.personnalisationIds.indexOf(1);
     setPersonnalisation((prev) => ({
       ...prev,
-      currentPersonnalisationId:
-        prev.personnalisationIds[indexOfcurrentPersonnalisationId + 1],
+      currentPersonnalisationId: prev.personnalisationIds[currentIndex + 1],
     }));
   };
   return (
