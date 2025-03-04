@@ -6,7 +6,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { getSessionStorage, setSessionStorage } from "@/lib/storageHelper";
+import { getLocalStorage, setLocalStorage } from "@/lib/storageHelper";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -20,14 +20,15 @@ const CookieBanner = () => {
   const [cookieConsent, setCookieConsent] = useState<boolean | null>(null);
   const pathname = usePathname();
   useEffect(() => {
-    const storedCookieConsent = getSessionStorage("cookie_consent", null);
-    const storedConsentDate = getSessionStorage("cookie_consent_date", null);
+    const storedCookieConsent = getLocalStorage("cookie_consent", null);
+    const storedConsentDate = getLocalStorage("cookie_consent_date", null);
     if (storedCookieConsent !== null && storedConsentDate !== null) {
       const now = Date.now();
       const isExpired = now - storedConsentDate > COOKIE_EXPIRATION_MS;
+
       if (isExpired) {
-        sessionStorage.removeItem("cookie_consent");
-        sessionStorage.removeItem("cookie_consent_date");
+        localStorage.removeItem("cookie_consent");
+        localStorage.removeItem("cookie_consent_date");
         setCookieConsent(null);
       } else {
         setCookieConsent(storedCookieConsent);
@@ -48,8 +49,8 @@ const CookieBanner = () => {
         analytics_storage: newValue,
       });
     }
-    setSessionStorage("cookie_consent", cookieConsent);
-    setSessionStorage("cookie_consent_date", Date.now());
+    setLocalStorage("cookie_consent", cookieConsent);
+    setLocalStorage("cookie_consent_date", Date.now());
   }, [cookieConsent]);
 
   const handleAccept = () => {
