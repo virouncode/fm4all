@@ -1,16 +1,19 @@
 import "client-only";
 
-export function getLocalStorage(
+export function getSessionStorage(
   key: string,
   defaultValue: string | boolean | null
 ) {
-  const stickyValue = localStorage.getItem(key);
+  const stickyValue = sessionStorage.getItem(key);
 
   return stickyValue !== null && stickyValue !== "undefined"
     ? JSON.parse(stickyValue)
     : defaultValue;
 }
 
-export function setLocalStorage(key: string, value: string | number | boolean) {
-  localStorage.setItem(key, JSON.stringify(value));
+export function setSessionStorage(
+  key: string,
+  value: string | number | boolean
+) {
+  sessionStorage.setItem(key, JSON.stringify(value));
 }

@@ -15,7 +15,7 @@ const Hero = () => {
       bg-cover bg-center bg-no-repeat p-6"
       id="hero"
     >
-      <div className="flex w-11/12 sm:w-3/4 md:max-w-5xl rounded-xl overflow-hidden shadow-lg shadow-slate-100/50">
+      <div className="flex w-11/12 sm:w-3/4 md:max-w-5xl rounded-xl overflow-hidden ">
         <Card className="flex-1 rounded-none py-4">
           <CardHeader>
             <CardTitle>
