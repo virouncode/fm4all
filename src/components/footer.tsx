@@ -31,6 +31,21 @@ const Footer = () => {
                   Politique de confidentialité
                 </Link>
               </li>
+              <li>
+                <Link href="/politique-de-cookies" className="hover:opacity-80">
+                  Politique de cookies
+                </Link>
+              </li>
+              <li>
+                <Link href="/cgv" className="hover:opacity-80">
+                  CGV
+                </Link>
+              </li>
+              <li>
+                <Link href="/cgu" className="hover:opacity-80">
+                  CGU
+                </Link>
+              </li>
               <li>Touts droits résérvés &copy;fm4all</li>
             </ul>
           </div>
