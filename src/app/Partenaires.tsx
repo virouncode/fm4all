@@ -6,8 +6,6 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
 import Image from "next/image";
 
@@ -184,8 +182,8 @@ const Partenaires = () => {
             </div>
           </CarouselItem>
         </CarouselContent>
-        <CarouselPrevious className="right-12 -top-9 translate-y-0 left-auto" />
-        <CarouselNext className="right-0 -top-9 translate-y-0" />
+        {/* <CarouselPrevious className="right-12 -top-9 translate-y-0 left-auto" />
+        <CarouselNext className="right-0 -top-9 translate-y-0" /> */}
       </Carousel>
     </section>
   );
