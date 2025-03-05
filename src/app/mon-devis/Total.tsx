@@ -149,7 +149,7 @@ const Total = () => {
         <Button
           variant="outline"
           size="lg"
-          className="text-base absolute top-[20px] right-0"
+          className="text-base fixed bottom-6 right-4 lg:absolute lg:top-[20px] lg:right-0 z-30"
         >
           <Calculator />
           {formatNumber(Math.round((total.totalAnnuelHt ?? 0) * MARGE))} € HT/an

@@ -9,7 +9,7 @@ export default function MonDevisLayout({
   return (
     <main className="max-w-7xl mx-auto pt-4 px-6 pb-10 md:px-20 lg:h-[calc(100vh-4rem)] flex flex-col gap-4">
       <DevisBreadcrumb />
-      <div className="relative">
+      <div className="lg:relative">
         <Total />
       </div>
       {children}
