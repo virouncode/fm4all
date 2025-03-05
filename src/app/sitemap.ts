@@ -9,18 +9,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
-      url: "http://www.fm4all.com",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "yearly",
-      priority: 1,
-    },
-    {
-      url: "http://fm4all.com",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "yearly",
-      priority: 1,
-    },
-    {
       url: "https://fm4all.com",
       lastModified: "2025-03-02T09:35:25.103Z",
       changeFrequency: "yearly",
@@ -39,7 +27,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
-      url: "https://www.fm4all.com/nos-3-engagements",
+      url: "https://www.fm4all.com/nos-engagements",
       lastModified: "2025-03-02T09:35:25.103Z",
       changeFrequency: "yearly",
       priority: 0.8,
@@ -202,6 +190,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: "https://www.fm4all.com/politique-de-confidentialite",
+      lastModified: "2025-03-02T09:35:25.103Z",
+      changeFrequency: "yearly",
+      priority: 0.5,
+    },
+    {
+      url: "https://www.fm4all.com/politique-de-cookies",
       lastModified: "2025-03-02T09:35:25.103Z",
       changeFrequency: "yearly",
       priority: 0.5,
