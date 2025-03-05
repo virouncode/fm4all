@@ -63,38 +63,36 @@ const NettoyageMobilePropositionsCarousel = ({
     });
   }, [api]);
   return (
-    <>
-      <Carousel
-        opts={{
-          align: "start",
-          loop: true,
-        }}
-        className="w-full relative"
-        setApi={setApi}
-      >
-        <CarouselContent>
-          {propositions.map((proposition) => (
-            <NettoyageMobilePropositionCard
-              proposition={proposition}
-              key={proposition.id}
-              handleClickProposition={handleClickProposition}
+    <Carousel
+      opts={{
+        align: "start",
+        loop: true,
+      }}
+      className="w-full relative"
+      setApi={setApi}
+    >
+      <CarouselContent>
+        {propositions.map((proposition) => (
+          <NettoyageMobilePropositionCard
+            proposition={proposition}
+            key={proposition.id}
+            handleClickProposition={handleClickProposition}
+          />
+        ))}
+      </CarouselContent>
+      <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2 z-10">
+        {[...Array(3)].map((_, index) => {
+          return (
+            <div
+              key={index}
+              className={`w-3 h-3 rounded-full border-white border ${
+                currentIndex === index ? "bg-fm4allsecondary" : "bg-gray-300"
+              }`}
             />
-          ))}
-        </CarouselContent>
-        <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2 z-10">
-          {[...Array(3)].map((_, index) => {
-            return (
-              <div
-                key={index}
-                className={`w-3 h-3 rounded-full border-white border ${
-                  currentIndex === index ? "bg-fm4allsecondary" : "bg-gray-300"
-                }`}
-              />
-            );
-          })}
-        </div>
-      </Carousel>
-    </>
+          );
+        })}
+      </div>
+    </Carousel>
   );
 };
 

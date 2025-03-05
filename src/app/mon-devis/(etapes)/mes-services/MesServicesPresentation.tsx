@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  Carousel,
+  CarouselApi,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
 import { ServicesContext } from "@/context/ServicesProvider";
 import { GammeType } from "@/zod-schemas/gamme";
 import {
@@ -15,12 +21,23 @@ import {
   UserRoundCog,
   Wrench,
 } from "lucide-react";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import NextServiceButton from "../../NextServiceButton";
 
 const MesServicesPresentation = () => {
   const { setServices } = useContext(ServicesContext);
   const [gammeSelected, setGammeSelected] = useState<GammeType>("essentiel");
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [api, setApi] = useState<CarouselApi>();
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
+    api.on("select", () => {
+      setCurrentIndex(api.selectedScrollSnap());
+    });
+  }, [api]);
+
   const isGammeSelected = (gamme: GammeType) => gamme === gammeSelected;
   const handleClickNext = () => {
     setServices((prev) => ({
@@ -99,7 +116,7 @@ const MesServicesPresentation = () => {
             <Info className="inline-block" size={14} /> pour en savoir plus et
             sélectionnez la gamme qui vous convient :{" "}
           </p>
-          <div className="flex flex-wrap gap-10 justify-center text-2xl mb-4">
+          <div className="flex-wrap gap-10 justify-center text-2xl mb-4 hidden lg:flex">
             <div
               className={`w-48 text-center px-6 py-10 bg-fm4allessential rounded-lg text-slate-200 font-bold cursor-pointer ${
                 isGammeSelected("essentiel")
@@ -131,6 +148,87 @@ const MesServicesPresentation = () => {
               Excellence
             </div>
           </div>
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            className="w-full relative lg:hidden"
+            setApi={setApi}
+          >
+            <CarouselContent>
+              <CarouselItem>
+                <div
+                  className={
+                    "bg-fm4allessential flex flex-col items-center justify-center h-[calc(100vh-15rem)] border border-slate-200 rounded-xl p-6 text-white"
+                  }
+                >
+                  <p className="text-xl text-center font-bold">
+                    Gamme Essentiel
+                  </p>
+                  <div className="flex-1 flex items-center justify-center">
+                    <p className="text-center">
+                      Vous êtes en recherche de services efficaces et optimisés.
+                      Ce qui est important pour vous c&apos;est d&apos;être en
+                      règle et d&apos;apporter ce qui est essentiel pour votre
+                      site.
+                    </p>
+                  </div>
+                </div>
+              </CarouselItem>
+              <CarouselItem>
+                <div
+                  className={
+                    "bg-fm4allcomfort flex flex-col items-center justify-center h-[calc(100vh-15rem)] border border-slate-200 rounded-xl p-6 text-white"
+                  }
+                >
+                  <p className="text-xl text-center font-bold">Gamme Confort</p>
+                  <div className="flex-1 flex items-center justify-center">
+                    <p className="text-center">
+                      Vous êtes en recherche du bon rapport qualité prix. Le
+                      strict minimum vous semble un peu juste pour cette
+                      prestation et vous cherchez le bon équilibre. Dans cette
+                      formule, tout est géré clé en main, sans contraintes.
+                    </p>
+                  </div>
+                </div>
+              </CarouselItem>
+              <CarouselItem>
+                <div
+                  className={
+                    "bg-fm4allexcellence flex flex-col items-center justify-center h-[calc(100vh-15rem)] border border-slate-200 rounded-xl p-6 text-white"
+                  }
+                >
+                  <p className="text-xl text-center font-bold">
+                    Gamme Excellence
+                  </p>
+                  <div className="flex-1 flex items-center justify-center">
+                    <p className="text-center">
+                      Le bien être au travail, c&apos;est important. Vous
+                      investissez sur les services envers vos collaborateurs,
+                      car ils vous le rendent bien. L&apos;excellence de service
+                      vous donne tranquillité d&apos;esprit.
+                    </p>
+                  </div>
+                </div>
+              </CarouselItem>
+            </CarouselContent>
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2 z-10">
+              {[...Array(3)].map((_, index) => {
+                return (
+                  <div
+                    key={index}
+                    className={`w-3 h-3 rounded-full border-white border ${
+                      currentIndex === index
+                        ? "bg-fm4allsecondary"
+                        : "bg-gray-300"
+                    }`}
+                  />
+                );
+              })}
+            </div>
+          </Carousel>
+
           <div className="lg:w-2/3 mx-auto hyphens-auto text-wrap mb-6 lg:mb-0">
             {gammeSelected === "essentiel" && (
               <p>
