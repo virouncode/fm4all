@@ -13,7 +13,9 @@ import { SelectRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
 import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
 import { useContext } from "react";
+import { useMediaQuery } from "react-responsive";
 import NettoyageFournisseurLogo from "./NettoyageFournisseurLogo";
+import NettoyageMobilePropositions from "./NettoyageMobilePropositions";
 import NettoyagePropositionCard from "./NettoyagePropositionCard";
 
 type NettoyagePropositionsProps = {
@@ -480,8 +482,14 @@ const NettoyagePropositions = ({
       totalInstallation: prixInstalDistrib,
     });
   };
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 
-  return (
+  return isTabletOrMobile ? (
+    <NettoyageMobilePropositions
+      formattedPropositions={formattedPropositions}
+      handleClickProposition={handleClickProposition}
+    />
+  ) : (
     <div className="h-full flex flex-col border rounded-xl overflow-auto">
       {formattedPropositions.length > 0
         ? formattedPropositions.map((propositions) => (

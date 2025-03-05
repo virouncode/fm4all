@@ -248,7 +248,7 @@ const MesLocaux = () => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(submitForm)}
-        className="flex flex-col gap-14 mx-auto w-full md:w-2/3 mt-6 md:mt-10"
+        className="flex flex-col gap-14 mx-auto w-full md:w-2/3 mt-6 md:mt-10 p-1"
       >
         <div className="flex flex-col gap-4 md:flex-row md:gap-8">
           <div className="w-full md:w-1/2 flex flex-col gap-4">
@@ -305,7 +305,7 @@ const MesLocaux = () => {
               </div>
             </DialogTrigger>
 
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
               <DialogHeader>
                 <DialogTitle>Devis en cours</DialogTitle>
                 <DialogDescription>
@@ -315,7 +315,7 @@ const MesLocaux = () => {
               </DialogHeader>
               <DialogFooter>
                 <DialogClose asChild>
-                  <div className="flex gap-4">
+                  <div className="flex gap-4 justify-center">
                     <Button
                       variant="destructive"
                       onClick={() => form.handleSubmit(submitForm)()}

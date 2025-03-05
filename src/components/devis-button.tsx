@@ -215,7 +215,7 @@ const DevisButton = ({
           {text}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
         <DialogHeader>
           <DialogTitle>Devis en cours</DialogTitle>
           <DialogDescription>
@@ -225,7 +225,7 @@ const DevisButton = ({
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
-            <div className="flex gap-4">
+            <div className="flex gap-4 justify-center">
               <Button onClick={handleClickReprendre} variant="outline">
                 Reprendre
               </Button>

@@ -131,7 +131,7 @@ const MesServicesPresentation = () => {
               Excellence
             </div>
           </div>
-          <div className="w-2/3 mx-auto hyphens-auto text-wrap">
+          <div className="lg:w-2/3 mx-auto hyphens-auto text-wrap mb-6 lg:mb-0">
             {gammeSelected === "essentiel" && (
               <p>
                 Gamme Essentiel : Vous êtes en recherche de services efficaces

@@ -1,4 +1,7 @@
+"use client";
+
 import { LucideIcon } from "lucide-react";
+import { useMediaQuery } from "react-responsive";
 import PreviousServiceButton from "./PreviousServiceButton";
 
 type PropositionsTitleProps = {
@@ -20,9 +23,10 @@ const PropositionsTitle = ({
   handleClickPrevious,
   previousButton = true,
 }: PropositionsTitleProps) => {
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
   return (
-    <div className="flex justify-between items-center">
-      <div className="flex gap-4 items-center p-4 border rounded-xl">
+    <div className="flex flex-col gap-4 lg:gap-0 lg:flex-row justify-between items-center">
+      <div className="flex justify-center lg:justify-start gap-4 items-center p-4 border rounded-xl w-full lg:w-auto">
         <div className="flex items-center gap-1">
           <Icon />
           {Icon2 && <Icon2 />}
@@ -31,10 +35,12 @@ const PropositionsTitle = ({
         <p>{title}</p>
       </div>
       <p className="text-base flex-1 px-4">{description}</p>
-      <PreviousServiceButton
-        handleClickPrevious={handleClickPrevious}
-        className={previousButton ? "" : "invisible"}
-      />
+      {isTabletOrMobile ? null : (
+        <PreviousServiceButton
+          handleClickPrevious={handleClickPrevious}
+          className={previousButton ? "" : "invisible"}
+        />
+      )}
     </div>
   );
 };

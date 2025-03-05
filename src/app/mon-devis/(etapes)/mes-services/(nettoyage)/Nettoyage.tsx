@@ -12,6 +12,7 @@ import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
 import { SprayCan } from "lucide-react";
 import { useContext } from "react";
+import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import NettoyagePropositions from "./NettoyagePropositions";
@@ -62,6 +63,8 @@ const Nettoyage = ({
     }
   };
 
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+
   return (
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="1">
       <PropositionsTitle
@@ -82,7 +85,9 @@ const Nettoyage = ({
           hygieneConsosTarifs={hygieneConsosTarifs}
         />
       </div>
-      <PropositionsFooter handleClickNext={handleClickNext} />
+      {isTabletOrMobile ? null : (
+        <PropositionsFooter handleClickNext={handleClickNext} />
+      )}
     </div>
   );
 };
