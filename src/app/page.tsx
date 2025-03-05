@@ -11,7 +11,7 @@ import VideoPresentation from "./VideoPresentation";
 import Why from "./Why";
 
 export const metadata: Metadata = {
-  title: "Vos services en entreprise",
+  title: "fm4all : Vos services en entreprise",
   description:
     "Office Management, nettoyage, maintenance règlementaire, machine à café, ... fm4all démocratise le Facility Management pour toutes les tailles d'entreprises. En quelques clics, validez les prestations qui vous conviennent. Cahier des charges, contrats, planification, démarrage, fm4all vous offre un service FM clé en main.",
 };
