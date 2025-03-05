@@ -44,20 +44,23 @@ const NettoyageMobileFournisseurLogo = ({
           asChild
           title="Infos sur le fournisseur"
         >
-          <div className="flex propositions-center justify-between w-full">
-            {logoUrl ? (
-              <div className="w-3/4 h-10 relative">
-                <Image
-                  src={logoUrl}
-                  alt={`logo-de-${nomFournisseur}`}
-                  fill={true}
-                  className="object-contain object-left cursor-pointer"
-                  quality={100}
-                />
-              </div>
-            ) : (
-              nomFournisseur
-            )}
+          <div className="flex items-center justify-between w-full">
+            <div className="flex flex-1 items-center gap-2">
+              <p className="text-lg font-bold text-foreground">
+                {nomFournisseur}
+              </p>
+              {logoUrl ? (
+                <div className="flex-1 h-10 relative">
+                  <Image
+                    src={logoUrl}
+                    alt={`logo-de-${nomFournisseur}`}
+                    fill={true}
+                    className="object-contain object-left cursor-pointer"
+                    quality={100}
+                  />
+                </div>
+              ) : null}
+            </div>
 
             <SquareArrowOutUpRight
               className="cursor-pointer hover:opacity-70"
