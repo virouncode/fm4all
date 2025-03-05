@@ -119,43 +119,94 @@ const DevisBreadcrumb = () => {
       }));
   };
 
+  const previousRoute = devisRoutes.find(
+    ({ id }) => id === devisProgress.currentStep - 1
+  );
+  const nextRoute = devisRoutes.find(
+    ({ id }) => id === devisProgress.currentStep + 1
+  );
+
   return (
-    <div className="flex justify-center">
-      <Breadcrumb className="h-20 md:h-10">
-        <BreadcrumbList className="text-sm lg:text-base">
-          {devisRoutes.map((route, index) => (
-            <div key={route.id} className="flex gap-3 items-center">
-              <BreadcrumbItem className="flex items-center">
-                {route.id === devisProgress.currentStep ? (
-                  <BreadcrumbPage className="font-bold">
-                    {route.name}
-                  </BreadcrumbPage>
-                ) : (
-                  <Link
-                    onClick={() => handleClickBreadcrumbLink(route)}
-                    href={`/mon-devis${route.url}`}
-                    className={`${
-                      devisProgress.completedSteps.includes(route.id) ||
-                      route.id ===
-                        devisProgress.completedSteps[
-                          devisProgress.completedSteps.length - 1
-                        ] +
-                          1
-                        ? ""
-                        : "pointer-events-none opacity-40"
-                    }`}
-                  >
-                    {route.name}
-                  </Link>
-                  // )
-                )}
-              </BreadcrumbItem>
-              {index < devisRoutes.length - 1 && <BreadcrumbSeparator />}
-            </div>
-          ))}
-        </BreadcrumbList>
-      </Breadcrumb>
-    </div>
+    <>
+      <div className="justify-center hidden lg:flex">
+        <Breadcrumb className="h-20 md:h-10 overflow-auto">
+          <BreadcrumbList className="text-sm lg:text-base">
+            {devisRoutes.map((route, index) => (
+              <div key={route.id} className="flex gap-2 items-center">
+                <BreadcrumbItem className="flex items-center">
+                  {route.id === devisProgress.currentStep ? (
+                    <BreadcrumbPage className="font-bold hover:opacity-80">
+                      {route.name}
+                    </BreadcrumbPage>
+                  ) : (
+                    <Link
+                      onClick={() => handleClickBreadcrumbLink(route)}
+                      href={`/mon-devis${route.url}`}
+                      className={`hover:opacity-80 ${
+                        devisProgress.completedSteps.includes(route.id) ||
+                        route.id ===
+                          devisProgress.completedSteps[
+                            devisProgress.completedSteps.length - 1
+                          ] +
+                            1
+                          ? ""
+                          : "pointer-events-none opacity-40"
+                      }`}
+                    >
+                      {route.name}
+                    </Link>
+                    // )
+                  )}
+                </BreadcrumbItem>
+                {index < devisRoutes.length - 1 && <BreadcrumbSeparator />}
+              </div>
+            ))}
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
+      <div className="justify-between flex lg:hidden sticky -mt-4 top-[4rem] bg-white z-10 py-4 border-slate-200 border-b">
+        <div>
+          {previousRoute ? (
+            <Link
+              onClick={() => handleClickBreadcrumbLink(previousRoute)}
+              href={`/mon-devis${previousRoute.url}`}
+              className={`hover:opacity-80 ${
+                devisProgress.completedSteps.includes(previousRoute.id) ||
+                previousRoute.id ===
+                  devisProgress.completedSteps[
+                    devisProgress.completedSteps.length - 1
+                  ] +
+                    1
+                  ? ""
+                  : "pointer-events-none opacity-40"
+              }`}
+            >
+              &lt; {previousRoute.name}
+            </Link>
+          ) : null}
+        </div>
+        <div>
+          {nextRoute ? (
+            <Link
+              onClick={() => handleClickBreadcrumbLink(nextRoute)}
+              href={`/mon-devis${nextRoute.url}`}
+              className={`hover:opacity-80 ${
+                devisProgress.completedSteps.includes(nextRoute.id) ||
+                nextRoute.id ===
+                  devisProgress.completedSteps[
+                    devisProgress.completedSteps.length - 1
+                  ] +
+                    1
+                  ? ""
+                  : "pointer-events-none opacity-40"
+              }`}
+            >
+              {nextRoute.name} &gt;
+            </Link>
+          ) : null}
+        </div>
+      </div>
+    </>
   );
 };
 
