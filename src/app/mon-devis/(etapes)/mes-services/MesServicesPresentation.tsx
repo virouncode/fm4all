@@ -50,8 +50,8 @@ const MesServicesPresentation = () => {
       <div className="w-full flex-1 overflow-auto">
         <div className="h-full flex flex-col gap-6">
           <p>
-            Nous allons vous proposer plus de 3 devis pour chacun des services
-            suivants :
+            Nous allons vous proposer plus de 3 devis de plusieurs fournisseurs
+            pour chacun des services suivants :
           </p>
           <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 items-center">
             <div className="flex gap-4 items-center p-4 border rounded-xl">

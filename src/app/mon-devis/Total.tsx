@@ -155,7 +155,7 @@ const Total = () => {
           {formatNumber(Math.round((total.totalAnnuelHt ?? 0) * MARGE))} € HT/an
         </Button>
       </SheetTrigger>
-      <SheetContent className="flex flex-col">
+      <SheetContent className="flex flex-col w-full lg:w-[calc(100%-20rem)]">
         <SheetHeader>
           <SheetTitle>
             <span className="text-2xl">

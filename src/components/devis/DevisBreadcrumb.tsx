@@ -164,7 +164,7 @@ const DevisBreadcrumb = () => {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      <div className="justify-between flex lg:hidden sticky -mt-4 top-[4rem] bg-white z-20 py-4 border-slate-200 border-b">
+      <div className="justify-between flex lg:hidden sticky -mt-4 top-[65px] bg-white z-20 py-4 border-slate-200 border-b">
         <div>
           {previousRoute ? (
             <Link
