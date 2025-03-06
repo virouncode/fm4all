@@ -7,10 +7,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
-import { Switch } from "@radix-ui/react-switch";
 import Image from "next/image";
 import { useContext } from "react";
 
@@ -95,8 +95,8 @@ const NettoyageMobileOptionsRepasseCard = ({
       </li>
     ) : null;
   return (
-    <div className="flex flex-col gap-4">
-      <p className="text-center">Repasse Sanitaire</p>
+    <div className="flex flex-col gap-1">
+      <p>Repasse Sanitaire</p>
       <div
         className={`bg-${color} flex flex-col h-72 border border-slate-200 rounded-xl p-4 text-white  ${
           nettoyage.infos.repasseSelected
