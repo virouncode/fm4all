@@ -1,4 +1,5 @@
 import FournisseurDialog from "@/app/mon-devis/FournisseurDialog";
+import StarRating from "@/components/star-rating";
 import { CarouselItem } from "@/components/ui/carousel";
 import {
   Dialog,
@@ -207,7 +208,7 @@ const NettoyageMobilePropositionCard = ({
                   <div className="h-10 relative">
                     <Image
                       src={proposition.logoUrl}
-                      alt={`illustration de nettoyage`}
+                      alt={`logo-de-${proposition.nomFournisseur}`}
                       fill={true}
                       className="object-contain object-left"
                       quality={100}
@@ -234,6 +235,12 @@ const NettoyageMobilePropositionCard = ({
                 />
               </DialogContent>
             </Dialog>
+            {noteGoogle && nbAvis && (
+              <div className="flex items-center gap-1 text-xs">
+                <StarRating score={noteGoogle ? parseFloat(noteGoogle) : 0} />
+                <p>({nbAvis})</p>
+              </div>
+            )}
           </div>
         </div>
         <div className="flex h-1/2 pt-2 justify-between">
