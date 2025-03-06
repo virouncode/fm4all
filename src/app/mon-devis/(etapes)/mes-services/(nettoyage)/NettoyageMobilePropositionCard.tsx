@@ -105,7 +105,7 @@ const NettoyageMobilePropositionCard = ({
   return (
     <CarouselItem>
       <div
-        className={`bg-${color} flex flex-col h-[calc(100vh-15rem)] border border-slate-200 rounded-xl p-4 text-white  ${
+        className={`bg-${color} flex flex-col h-56 border border-slate-200 rounded-xl p-4 text-white  ${
           nettoyage.infos.fournisseurId === fournisseurId &&
           nettoyage.infos.gammeSelected === gamme
             ? "ring-4 ring-inset ring-fm4alldestructive"
@@ -115,7 +115,7 @@ const NettoyageMobilePropositionCard = ({
         <NettoyageMobileFournisseurLogo {...proposition} />
         <div className="flex-1 flex flex-col gap-2 justify-center">
           <div
-            className={`flex flex-1 text-slate-200 items-center justify-center items-center text-2xl gap-4 cursor-pointer p-4`}
+            className={`flex flex-1 text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer p-4`}
             key={id}
             onClick={() => handleClickProposition(proposition)}
           >

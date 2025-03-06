@@ -160,7 +160,7 @@ const MesServicesPresentation = () => {
               <CarouselItem>
                 <div
                   className={
-                    "bg-fm4allessential flex flex-col items-center justify-center h-[calc(100vh-15rem)] border border-slate-200 rounded-xl p-6 text-white"
+                    "bg-fm4allessential flex flex-col items-center justify-center border border-slate-200 rounded-xl p-6 text-white h-48"
                   }
                 >
                   <p className="text-2xl text-center font-bold">
@@ -179,7 +179,7 @@ const MesServicesPresentation = () => {
               <CarouselItem>
                 <div
                   className={
-                    "bg-fm4allcomfort flex flex-col items-center justify-center h-[calc(100vh-15rem)] border border-slate-200 rounded-xl p-6 text-white"
+                    "bg-fm4allcomfort flex flex-col items-center justify-center border border-slate-200 rounded-xl p-6 text-white h-48"
                   }
                 >
                   <p className="text-2xl text-center font-bold">
@@ -198,7 +198,7 @@ const MesServicesPresentation = () => {
               <CarouselItem>
                 <div
                   className={
-                    "bg-fm4allexcellence flex flex-col items-center justify-center h-[calc(100vh-15rem)] border border-slate-200 rounded-xl p-6 text-white"
+                    "bg-fm4allexcellence flex flex-col items-center justify-center border border-slate-200 rounded-xl p-6 text-white h-48"
                   }
                 >
                   <p className="text-2xl text-center font-bold">
