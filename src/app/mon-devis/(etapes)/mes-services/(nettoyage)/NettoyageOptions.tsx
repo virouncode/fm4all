@@ -7,6 +7,7 @@ import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
 import { SprayCan } from "lucide-react";
 import { useContext } from "react";
+import { useMediaQuery } from "react-responsive";
 import { capitalize } from "../../../../../lib/capitalize";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
@@ -25,6 +26,7 @@ const NettoyageOptions = ({
 }: NettoyageOptionsProps) => {
   const { nettoyage } = useContext(NettoyageContext);
   const { setServices } = useContext(ServicesContext);
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 
   const handleClickPrevious = () => {
     setServices((prev) => ({
@@ -243,7 +245,9 @@ const NettoyageOptions = ({
           vitrerieProposition={vitrerieProposition}
         />
       </div>
-      <PropositionsFooter handleClickNext={handleClickNext} />
+      {isTabletOrMobile ? null : (
+        <PropositionsFooter handleClickNext={handleClickNext} />
+      )}
     </div>
   );
 };

@@ -7,7 +7,6 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import { ServicesContext } from "@/context/ServicesProvider";
-import { GammeType } from "@/zod-schemas/gamme";
 import {
   Banana,
   Coffee,
@@ -27,7 +26,6 @@ import NextServiceButton from "../../NextServiceButton";
 
 const MesServicesPresentation = () => {
   const { setServices } = useContext(ServicesContext);
-  const [gammeSelected, setGammeSelected] = useState<GammeType>("essentiel");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
   useEffect(() => {
@@ -40,7 +38,7 @@ const MesServicesPresentation = () => {
   }, [api]);
 
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
-  const isGammeSelected = (gamme: GammeType) => gamme === gammeSelected;
+  // const isGammeSelected = (gamme: GammeType) => gamme === gammeSelected;
   const handleClickNext = () => {
     setServices((prev) => ({
       ...prev,
@@ -206,63 +204,57 @@ const MesServicesPresentation = () => {
             <>
               <div className="flex-wrap gap-10 justify-center text-2xl mb-4 hidden lg:flex">
                 <div
-                  className={`w-48 text-center px-6 py-10 bg-fm4allessential rounded-lg text-slate-200 font-bold cursor-pointer ${
-                    isGammeSelected("essentiel")
-                      ? "ring-4 ring-inset ring-fm4alldestructive"
-                      : ""
-                  }`}
-                  onClick={() => setGammeSelected("essentiel")}
+                  className={`w-48 text-center px-6 py-10 bg-fm4allessential rounded-lg text-slate-200 font-bold`}
+                  // onClick={() => setGammeSelected("essentiel")}
                 >
                   Essentiel
                 </div>
                 <div
-                  className={`w-48 text-center px-6 py-10 bg-fm4allcomfort rounded-lg text-slate-200 font-bold cursor-pointer ${
-                    isGammeSelected("confort")
-                      ? "ring-4 ring-inset ring-fm4alldestructive"
-                      : ""
-                  }`}
-                  onClick={() => setGammeSelected("confort")}
+                  className={`w-48 text-center px-6 py-10 bg-fm4allcomfort rounded-lg text-slate-200 font-bold`}
+                  // onClick={() => setGammeSelected("confort")}
                 >
                   Confort
                 </div>
                 <div
-                  className={`w-48 text-center px-6 py-10 bg-fm4allexcellence rounded-lg text-slate-200 font-bold cursor-pointer ${
-                    isGammeSelected("excellence")
-                      ? "ring-4 ring-inset ring-fm4alldestructive"
-                      : ""
-                  }`}
-                  onClick={() => setGammeSelected("excellence")}
+                  className={`w-48 text-center px-6 py-10 bg-fm4allexcellence rounded-lg text-slate-200 font-bold`}
+                  // onClick={() => setGammeSelected("excellence")}
                 >
                   Excellence
                 </div>
               </div>
-              <div className="lg:w-2/3 mx-auto hyphens-auto text-wrap mb-6 lg:mb-0">
-                {gammeSelected === "essentiel" && (
-                  <p>
-                    Gamme Essentiel : Vous êtes en recherche de services
-                    efficaces et optimisés. Ce qui est important pour vous
-                    c&apos;est d&apos;être en règle et d&apos;apporter ce qui
-                    est essentiel pour votre site.
-                  </p>
-                )}
-                {gammeSelected === "confort" && (
-                  <p>
-                    Gamme Confort : Vous êtes en recherche du bon rapport
-                    qualité prix. Le strict minimum vous semble un peu juste
-                    pour cette prestation et vous cherchez le bon équilibre.
-                    Dans cette formule, tout est géré clé en main, sans
-                    contraintes.
-                  </p>
-                )}
-                {gammeSelected === "excellence" && (
-                  <p>
-                    Gamme Excellence : Le bien être au travail, c&apos;est
-                    important. Vous investissez sur les services envers vos
-                    collaborateurs, car ils vous le rendent bien.
-                    L&apos;excellence de service vous donne tranquillité
-                    d&apos;esprit.
-                  </p>
-                )}
+              <div className="flex flex-col gap-2 lg:w-2/3 mx-auto hyphens-auto text-wrap mb-6 lg:mb-0">
+                {/* {gammeSelected === "essentiel" && ( */}
+                <p>
+                  <span className="text-fm4allessential font-bold">
+                    Gamme Essentiel
+                  </span>{" "}
+                  : Vous êtes en recherche de services efficaces et optimisés.
+                  Ce qui est important pour vous c&apos;est d&apos;être en règle
+                  et d&apos;apporter ce qui est essentiel pour votre site.
+                </p>
+                {/* )} */}
+                {/* {gammeSelected === "confort" && ( */}
+                <p>
+                  <span className="text-fm4allcomfort font-bold">
+                    Gamme Confort
+                  </span>{" "}
+                  : Vous êtes en recherche du bon rapport qualité prix. Le
+                  strict minimum vous semble un peu juste pour cette prestation
+                  et vous cherchez le bon équilibre. Dans cette formule, tout
+                  est géré clé en main, sans contraintes.
+                </p>
+                {/* )} */}
+                {/* {gammeSelected === "excellence" && ( */}
+                <p>
+                  <span className="text-fm4allexcellence font-bold">
+                    Gamme Excellence
+                  </span>{" "}
+                  : Le bien être au travail, c&apos;est important. Vous
+                  investissez sur les services envers vos collaborateurs, car
+                  ils vous le rendent bien. L&apos;excellence de service vous
+                  donne tranquillité d&apos;esprit.
+                </p>
+                {/* )} */}
               </div>
             </>
           )}

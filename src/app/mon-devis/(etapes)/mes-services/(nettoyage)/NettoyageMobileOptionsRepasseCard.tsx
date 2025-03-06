@@ -77,14 +77,14 @@ const NettoyageMobileOptionsRepasseCard = ({
     </p>
   );
   const infosProduit = (
-    <li className="list-check list-inside">
+    <li className="list-check">
       Second passage dans la même journée pour entretenir sanitaires et zones
       sensibles
     </li>
   );
   const repasseHParSemaineText =
     repasseProposition && nettoyage.quantites.freqAnnuelle ? (
-      <li className="list-check list-inside">
+      <li className="list-check">
         {formatNumber(
           (repasseProposition.hParPassage * nettoyage.quantites.freqAnnuelle) /
             S_OUVREES_PAR_AN
@@ -94,7 +94,7 @@ const NettoyageMobileOptionsRepasseCard = ({
     ) : null;
   const repasseNbPassagesParSemaineText =
     repasseProposition && nettoyage.quantites.freqAnnuelle ? (
-      <li className="list-check list-inside">
+      <li className="list-check">
         {formatNumber(nettoyage.quantites.freqAnnuelle / S_OUVREES_PAR_AN)}{" "}
         passage(s) de {repasseProposition.hParPassage} h / semaine
       </li>
@@ -126,7 +126,7 @@ const NettoyageMobileOptionsRepasseCard = ({
               <DialogHeader>
                 <DialogTitle>{infosTitle}</DialogTitle>
               </DialogHeader>
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4 items-center">
                 {repasseProposition?.logoUrl ? (
                   <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
                     <Image
@@ -138,7 +138,7 @@ const NettoyageMobileOptionsRepasseCard = ({
                     />
                   </div>
                 ) : null}
-                <ul className="flex flex-col text-xs mx-auto w-2/3">
+                <ul className="flex flex-col text-xs px-4">
                   {infosProduit}
                   {repasseHParSemaineText}
                   {repasseNbPassagesParSemaineText}
@@ -216,7 +216,7 @@ const NettoyageMobileOptionsRepasseCard = ({
           </div>
         </div>
         <div className="flex h-1/2 pt-2 justify-between gap-6">
-          <ul className="flex flex-col text-xs w-2/3">
+          <ul className="flex flex-col ml-4 text-xs w-2/3">
             {infosProduit}
             {repasseHParSemaineText}
             {repasseNbPassagesParSemaineText}

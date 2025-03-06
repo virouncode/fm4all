@@ -376,7 +376,8 @@ const CafeEspaceForm = ({
         title: "Limite atteinte",
         variant: "destructive",
         description:
-          "Le nombre de personnes par espace tisanerie est limité à 150. Vous pouvez créer un second espace si besoin",
+          "Le nombre de personnes par espace café est limité à 150. Choisissez une offre puis ajoutez un espace café si besoin",
+        duration: 7000,
       });
     }
     //Si je n'avais pas de fournisseur, je change juste le nombre de personnes

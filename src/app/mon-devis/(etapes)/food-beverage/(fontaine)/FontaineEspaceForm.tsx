@@ -281,7 +281,8 @@ const FontaineEspaceForm = ({
         title: "Limite atteinte",
         variant: "destructive",
         description:
-          "Le nombre de personnes par espace fontaine à eau est limité à 110. Vous pouvez créer un second espace si besoin",
+          "Le nombre de personnes par espace fontaine à eau est limité à 110. Choisissez une offre puis ajoutez un espace fontaine à eau si besoin",
+        duration: 7000,
       });
     }
     //Si je n'avais pas de fournisseur, je change juste le nombre de personnes

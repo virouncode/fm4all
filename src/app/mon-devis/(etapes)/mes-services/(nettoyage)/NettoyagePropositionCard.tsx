@@ -95,7 +95,7 @@ const NettoyagePropositionCard = ({
     proposition.freqAnnuelle && proposition.hParPassage ? (
       <p className="text-xs">
         {formatNumber(proposition.freqAnnuelle / S_OUVREES_PAR_AN)} passage(s)
-        de ${proposition.hParPassage}h / semaine
+        de {proposition.hParPassage}h / semaine
       </p>
     ) : null;
 
