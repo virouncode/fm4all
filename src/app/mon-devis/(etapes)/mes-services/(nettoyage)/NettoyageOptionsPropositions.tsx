@@ -2,10 +2,9 @@ import { NettoyageContext } from "@/context/NettoyageProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { ChangeEvent, useContext } from "react";
-import NettoyageOptionsDimancheCard from "./NettoyageOptionsDimancheCard";
-import NettoyageOptionsRepasseCard from "./NettoyageOptionsRepasseCard";
-import NettoyageOptionsSamediCard from "./NettoyageOptionsSamediCard";
-import NettoyageOptionsVitrerieCard from "./NettoyageOptionsVitrerieCard";
+import { useMediaQuery } from "react-responsive";
+import NettoyageDesktopOptionsPropositions from "./NettoyageDesktopOptionsPropositions";
+import NettoyageMobileOptionsPropositions from "./NettoyageMobileOptionsPropositions";
 
 export const MAX_PASSAGES_VITRERIE = 24;
 
@@ -15,14 +14,44 @@ type NettoyageOptionsPropositionsProps = {
     hParPassage: number;
     tauxHoraire: number;
     prixAnnuel: number;
+    nomFournisseur: string;
+    slogan: string | null;
+    logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectif: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
   } | null;
   samediProposition: {
     id: number;
     prixAnnuel: number;
+    nomFournisseur: string;
+    slogan: string | null;
+    logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectif: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
   };
   dimancheProposition: {
     id: number;
     prixAnnuel: number;
+    nomFournisseur: string;
+    slogan: string | null;
+    logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectif: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
   };
   vitrerieProposition: {
     id: number;
@@ -32,6 +61,16 @@ type NettoyageOptionsPropositionsProps = {
     minFacturation: number;
     fraisDeplacement: number;
     prixAnnuel: number | null;
+    nomFournisseur: string;
+    slogan: string | null;
+    logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectif: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
   };
 };
 
@@ -237,30 +276,34 @@ const NettoyageOptionsPropositions = ({
     }));
   };
 
-  return (
-    <div className="h-full flex flex-col border rounded-xl overflow-auto">
-      <NettoyageOptionsRepasseCard
-        repasseProposition={repasseProposition}
-        handleClickRepasseProposition={handleClickRepasseProposition}
-        color={color}
-      />
-      <NettoyageOptionsSamediCard
-        samediProposition={samediProposition}
-        handleClickSamediProposition={handleClickSamediProposition}
-        color={color}
-      />
-      <NettoyageOptionsDimancheCard
-        dimancheProposition={dimancheProposition}
-        handleClickDimancheProposition={handleClickDimancheProposition}
-        color={color}
-      />
-      <NettoyageOptionsVitrerieCard
-        vitrerieProposition={vitrerieProposition}
-        handleClickVitrerieProposition={handleClickVitrerieProposition}
-        handleChangeNbPassageVitrerie={handleChangeNbPassageVitrerie}
-        color={color}
-      />
-    </div>
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+
+  return isTabletOrMobile ? (
+    <NettoyageMobileOptionsPropositions
+      repasseProposition={repasseProposition}
+      handleClickRepasseProposition={handleClickRepasseProposition}
+      samediProposition={samediProposition}
+      handleClickSamediProposition={handleClickSamediProposition}
+      dimancheProposition={dimancheProposition}
+      handleClickDimancheProposition={handleClickDimancheProposition}
+      vitrerieProposition={vitrerieProposition}
+      handleClickVitrerieProposition={handleClickVitrerieProposition}
+      handleChangeNbPassageVitrerie={handleChangeNbPassageVitrerie}
+      color={color}
+    />
+  ) : (
+    <NettoyageDesktopOptionsPropositions
+      repasseProposition={repasseProposition}
+      handleClickRepasseProposition={handleClickRepasseProposition}
+      samediProposition={samediProposition}
+      handleClickSamediProposition={handleClickSamediProposition}
+      dimancheProposition={dimancheProposition}
+      handleClickDimancheProposition={handleClickDimancheProposition}
+      vitrerieProposition={vitrerieProposition}
+      handleClickVitrerieProposition={handleClickVitrerieProposition}
+      handleChangeNbPassageVitrerie={handleChangeNbPassageVitrerie}
+      color={color}
+    />
   );
 };
 export default NettoyageOptionsPropositions;

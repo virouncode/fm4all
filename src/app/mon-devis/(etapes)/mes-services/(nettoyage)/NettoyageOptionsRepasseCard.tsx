@@ -16,12 +16,32 @@ type NettoyageOptionsRepasseCardProps = {
     hParPassage: number;
     tauxHoraire: number;
     prixAnnuel: number;
+    nomFournisseur: string;
+    slogan: string | null;
+    logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectif: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
   } | null;
   handleClickRepasseProposition: (repasseProposition: {
     id: number;
     hParPassage: number;
     tauxHoraire: number;
     prixAnnuel: number;
+    nomFournisseur: string;
+    slogan: string | null;
+    logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectif: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
   }) => void;
   color: string;
 };
@@ -32,7 +52,7 @@ const NettoyageOptionsRepasseCard = ({
   color,
 }: NettoyageOptionsRepasseCardProps) => {
   const { nettoyage } = useContext(NettoyageContext);
-  const repassePrixMensuelText = repasseProposition?.prixAnnuel
+  const totalMensuelText = repasseProposition?.prixAnnuel
     ? `${formatNumber(
         Math.round((repasseProposition.prixAnnuel * MARGE) / 12)
       )} € / mois`
@@ -83,7 +103,7 @@ const NettoyageOptionsRepasseCard = ({
             aria-label="Sélectionner cette proposition"
           />
           <div>
-            <p className="font-bold">{repassePrixMensuelText}</p>
+            <p className="font-bold">{totalMensuelText}</p>
             <p className="text-base">{repasseHParSemaineText}</p>
             <p className="text-xs">{repasseNbPassagesParSemaineText}</p>
           </div>

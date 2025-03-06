@@ -82,7 +82,7 @@ const NettoyagePropositionCard = ({
       ? `${formatNumber(
           (proposition.hParPassage * proposition.freqAnnuelle) /
             S_OUVREES_PAR_AN
-        )} h / semaine*`
+        )} h / semaine`
       : "";
   const nbPassagesParSemaineText =
     proposition.freqAnnuelle && proposition.hParPassage

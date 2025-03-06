@@ -88,7 +88,7 @@ const NettoyageMobilePropositionCard = ({
     hParPassage && freqAnnuelle
       ? `${formatNumber(
           (hParPassage * freqAnnuelle) / S_OUVREES_PAR_AN
-        )} h / semaine*`
+        )} h / semaine`
       : "";
   const infosEssentiel = <p>Entretien fonctionnel et optimisé</p>;
   const infosConfort = <p>Equilibre parfait entre qualité et efficacité</p>;

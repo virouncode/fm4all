@@ -14,9 +14,8 @@ import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
 import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
-import NettoyageFournisseurLogo from "./NettoyageFournisseurLogo";
+import NettoyageDesktopPropositions from "./NettoyageDesktopPropositions";
 import NettoyageMobilePropositions from "./NettoyageMobilePropositions";
-import NettoyagePropositionCard from "./NettoyagePropositionCard";
 
 type NettoyagePropositionsProps = {
   nettoyageQuantites: SelectNettoyageQuantitesType[];
@@ -490,25 +489,10 @@ const NettoyagePropositions = ({
       handleClickProposition={handleClickProposition}
     />
   ) : (
-    <div className="h-full flex flex-col border rounded-xl overflow-auto">
-      {formattedPropositions.length > 0
-        ? formattedPropositions.map((propositions) => (
-            <div
-              className="flex border-b flex-1"
-              key={propositions[0].fournisseurId}
-            >
-              <NettoyageFournisseurLogo {...propositions[0]} />
-              {propositions.map((proposition) => (
-                <NettoyagePropositionCard
-                  key={proposition.id}
-                  handleClickProposition={handleClickProposition}
-                  proposition={proposition}
-                />
-              ))}
-            </div>
-          ))
-        : null}
-    </div>
+    <NettoyageDesktopPropositions
+      formattedPropositions={formattedPropositions}
+      handleClickProposition={handleClickProposition}
+    />
   );
 };
 
