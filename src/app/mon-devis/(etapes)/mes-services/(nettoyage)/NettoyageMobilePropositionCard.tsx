@@ -1,4 +1,5 @@
 import { CarouselItem } from "@/components/ui/carousel";
+import { Switch } from "@/components/ui/switch";
 import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
@@ -188,7 +189,22 @@ const NettoyageMobilePropositionCard = ({
             <li className="list-check">{hParSemaineText}</li>
             <li className="list-check">{nbPassagesParSemaineText}</li>
           </ul>
-          <p className="text-sm font-bold text-end">{totalMensuelText}</p>
+          <div className="flex flex-col gap-2 items-end">
+            <p className="text-sm font-bold">{totalMensuelText}</p>
+            <Switch
+              className={`${
+                nettoyage.infos.fournisseurId === fournisseurId &&
+                nettoyage.infos.gammeSelected === gamme
+                  ? "data-[state=checked]:bg-fm4alldestructive"
+                  : ""
+              }`}
+              checked={
+                nettoyage.infos.fournisseurId === fournisseurId &&
+                nettoyage.infos.gammeSelected === gamme
+              }
+              onCheckedChange={() => handleClickProposition(proposition)}
+            />
+          </div>
         </div>
       </div>
     </CarouselItem>
