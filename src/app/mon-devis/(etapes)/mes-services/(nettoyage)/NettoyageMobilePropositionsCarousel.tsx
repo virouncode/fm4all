@@ -3,8 +3,9 @@ import {
   CarouselApi,
   CarouselContent,
 } from "@/components/ui/carousel";
+import { NettoyageContext } from "@/context/NettoyageProvider";
 import { GammeType } from "@/zod-schemas/gamme";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import NettoyageMobilePropositionCard from "./NettoyageMobilePropositionCard";
 
 type NettoyageMobilePropositionsCarouselProps = {
@@ -54,6 +55,7 @@ const NettoyageMobilePropositionsCarousel = ({
 }: NettoyageMobilePropositionsCarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
+  const { nettoyage } = useContext(NettoyageContext);
   useEffect(() => {
     if (!api) {
       return;
@@ -62,6 +64,26 @@ const NettoyageMobilePropositionsCarousel = ({
       setCurrentIndex(api.selectedScrollSnap());
     });
   }, [api]);
+
+  useEffect(() => {
+    if (!nettoyage.infos.fournisseurId && !api) {
+      return;
+    }
+    if (propositions[0].fournisseurId === nettoyage.infos.fournisseurId) {
+      api?.scrollTo(
+        nettoyage.infos.gammeSelected === "essentiel"
+          ? 0
+          : nettoyage.infos.gammeSelected === "confort"
+          ? 1
+          : 2
+      );
+    }
+  }, [
+    api,
+    nettoyage.infos.fournisseurId,
+    nettoyage.infos.gammeSelected,
+    propositions,
+  ]);
   return (
     <Carousel
       opts={{
