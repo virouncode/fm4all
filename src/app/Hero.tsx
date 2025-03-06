@@ -75,11 +75,10 @@ const Hero = () => {
             </div>
           </CardContent>
         </Card>
-        <div className="w-[365px] relative overflow-hidden hidden lg:block">
+        <div className="w-[365px] h-[500px] relative overflow-hidden hidden lg:block">
           <Image
             src={"/img/two_collaborators.webp"}
             alt="deux-collaborateurs-se-serrent-la-main"
-            quality={100}
             className="object-cover object-center"
             fill={true}
             priority
