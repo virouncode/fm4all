@@ -1,20 +1,10 @@
-import { Button } from "@/components/ui/button";
 import { CarouselItem } from "@/components/ui/carousel";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
-import { Info } from "lucide-react";
+import Image from "next/image";
 import { useContext } from "react";
-import NettoyageMobileFournisseurLogo from "./NettoyageMobileFournisseurLogo";
 
 type NettoyageMobilePropositionCardProps = {
   handleClickProposition: (proposition: {
@@ -67,7 +57,7 @@ const NettoyageMobilePropositionCard = ({
   const color = getFm4AllColor(gamme);
   const totalMensuelText = `${formatNumber(
     Math.round(((totalAnnuel ?? 0) * MARGE) / 12)
-  )} € / mois`;
+  )} €/mois`;
   const hParSemaineText =
     hParPassage && freqAnnuelle
       ? `${formatNumber(
@@ -88,13 +78,13 @@ const NettoyageMobilePropositionCard = ({
   );
 
   const infosProduit = (
-    <div className="flex flex-col text-sm my-4">
+    <li className="list-check">
       {gamme === "essentiel"
         ? infosEssentiel
         : gamme === "confort"
         ? infosConfort
         : infosExcellence}
-    </div>
+    </li>
   );
   const nbPassagesParSemaineText =
     freqAnnuelle && hParPassage
@@ -103,6 +93,61 @@ const NettoyageMobilePropositionCard = ({
         )} passage(s) de ${hParPassage}h / semaine`
       : "";
   return (
+    // <CarouselItem>
+    //   <div
+    //     className={`bg-${color} flex flex-col h-56 border border-slate-200 rounded-xl p-4 text-white  ${
+    //       nettoyage.infos.fournisseurId === fournisseurId &&
+    //       nettoyage.infos.gammeSelected === gamme
+    //         ? "ring-4 ring-inset ring-fm4alldestructive"
+    //         : ""
+    //     }`}
+    //   >
+    //     <NettoyageMobileFournisseurLogo {...proposition} />
+    //     <div className="flex-1 flex flex-col gap-2 justify-center">
+    //       <div
+    //         className={`flex flex-1 text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer p-4`}
+    //         key={id}
+    //         onClick={() => handleClickProposition(proposition)}
+    //       >
+    //         <Checkbox
+    //           checked={
+    //             nettoyage.infos.fournisseurId === fournisseurId &&
+    //             nettoyage.infos.gammeSelected === gamme
+    //           }
+    //           onCheckedChange={() => handleClickProposition(proposition)}
+    //           className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+    //           aria-label="Sélectionner cette proposition"
+    //         />
+    //         <div className="text-white">
+    //           <div className="flex gap-2 items-center">
+    //             <p className="font-bold">{totalMensuelText}</p>
+    //             <Dialog>
+    //               <DialogTrigger asChild>
+    //                 <Button
+    //                   size="icon"
+    //                   variant="ghost"
+    //                   className="hover:bg-transparent hover:text-white hover:opacity-80"
+    //                   onClick={(e) => e.stopPropagation()}
+    //                   title="Détails de l'offre"
+    //                 >
+    //                   <Info size={16} />
+    //                 </Button>
+    //               </DialogTrigger>
+    //               <DialogContent className="w-5/6 sm:max-w-[425px] rounded-xl">
+    //                 <DialogHeader>
+    //                   <DialogTitle>{infosTitle}</DialogTitle>
+    //                 </DialogHeader>
+    //                 {infosProduit}
+    //               </DialogContent>
+    //             </Dialog>
+    //           </div>
+    //           <p className="text-base">{hParSemaineText}</p>
+    //           <p className="text-xs">{nbPassagesParSemaineText}</p>
+    //         </div>
+    //       </div>
+    //     </div>
+    //   </div>
+    // </CarouselItem>
     <CarouselItem>
       <div
         className={`bg-${color} flex flex-col h-56 border border-slate-200 rounded-xl p-4 text-white  ${
@@ -112,54 +157,42 @@ const NettoyageMobilePropositionCard = ({
             : ""
         }`}
       >
-        <NettoyageMobileFournisseurLogo {...proposition} />
-        <div className="flex-1 flex flex-col gap-2 justify-center">
-          <div
-            className={`flex flex-1 text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer p-4`}
-            key={id}
-            onClick={() => handleClickProposition(proposition)}
-          >
-            <Checkbox
-              checked={
-                nettoyage.infos.fournisseurId === fournisseurId &&
-                nettoyage.infos.gammeSelected === gamme
-              }
-              onCheckedChange={() => handleClickProposition(proposition)}
-              className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-              aria-label="Sélectionner cette proposition"
+        <div className="flex items-center h-1/2 gap-2 border-b pb-2 border-slate-200">
+          <div className="w-1/3 h-full relative rounded-xl overflow-hidden">
+            <Image
+              src={"/img/services/nettoyage.webp"}
+              alt={`illustration de nettoyage`}
+              fill={true}
+              className="object-cover cursor-pointer"
+              quality={100}
             />
-            <div className="text-white">
-              <div className="flex gap-2 items-center">
-                <p className="font-bold">{totalMensuelText}</p>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="hover:bg-transparent hover:text-white hover:opacity-80"
-                      onClick={(e) => e.stopPropagation()}
-                      title="Détails de l'offre"
-                    >
-                      <Info size={16} />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="w-5/6 sm:max-w-[425px] rounded-xl">
-                    <DialogHeader>
-                      <DialogTitle>{infosTitle}</DialogTitle>
-                    </DialogHeader>
-                    {infosProduit}
-                  </DialogContent>
-                </Dialog>
-              </div>
-              <p className="text-base">{hParSemaineText}</p>
-              <p className="text-xs">{nbPassagesParSemaineText}</p>
-            </div>
           </div>
+          <div className="w-2/3 flex flex-col gap-1 h-full">
+            <p className="font-bold text-sm">{proposition.nomFournisseur}</p>
+            {proposition.logoUrl ? (
+              <div className="h-10 relative">
+                <Image
+                  src={proposition.logoUrl}
+                  alt={`illustration de nettoyage`}
+                  fill={true}
+                  className="object-contain object-left"
+                  quality={100}
+                />
+              </div>
+            ) : null}
+          </div>
+        </div>
+        <div className="flex h-1/2 pt-2 justify-between">
+          <ul className="flex flex-col text-xs ml-4 w-2/3">
+            {infosProduit}
+            <li className="list-check">{hParSemaineText}</li>
+            <li className="list-check">{nbPassagesParSemaineText}</li>
+          </ul>
+          <p className="text-sm font-bold text-end">{totalMensuelText}</p>
         </div>
       </div>
     </CarouselItem>
   );
-  return <div></div>;
 };
 
 export default NettoyageMobilePropositionCard;
