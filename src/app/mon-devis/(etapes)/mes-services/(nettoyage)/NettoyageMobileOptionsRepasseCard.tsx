@@ -57,11 +57,16 @@ const NettoyageMobileOptionsRepasseCard = ({
 }: NettoyageMobileOptionsRepasseCardProps) => {
   const { nettoyage } = useContext(NettoyageContext);
   const { gammeSelected: gamme } = nettoyage.infos;
-  const totalMensuelText = repasseProposition?.prixAnnuel
-    ? `${formatNumber(
-        Math.round((repasseProposition.prixAnnuel * MARGE) / 12)
-      )} € / mois`
-    : "Non proposé pour une fréquence inférieure à 5 passages/semaine";
+  const totalMensuelText = repasseProposition?.prixAnnuel ? (
+    <p className="text-sm font-bold text-end">
+      {formatNumber(Math.round((repasseProposition.prixAnnuel * MARGE) / 12))} €
+      / mois
+    </p>
+  ) : (
+    <p className="text-xs font-bold text-end">
+      Non proposé pour une fréquence inférieure à 5 passages/semaine
+    </p>
+  );
   const infosTitle = (
     <p className={`text-${color} text-center`}>
       {gamme === "essentiel"
@@ -217,7 +222,7 @@ const NettoyageMobileOptionsRepasseCard = ({
             {repasseNbPassagesParSemaineText}
           </ul>
           <div className="flex flex-col gap-2 items-end w-1/3">
-            <p className="text-sm font-bold text-end">{totalMensuelText}</p>
+            {totalMensuelText}
             {repasseProposition && (
               <Switch
                 className={`${
