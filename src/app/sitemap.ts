@@ -165,30 +165,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.5,
     },
     {
-      url: "https://www.fm4all.com/mon-devis/mes-services",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.5,
-    },
-    {
-      url: "https://www.fm4all.com/mon-devis/food-beverage",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.5,
-    },
-    {
-      url: "https://www.fm4all.com/mon-devis/pilotage-prestations",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.5,
-    },
-    {
-      url: "https://www.fm4all.com/mon-devis/sauvegarder-ma-progression",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.5,
-    },
-    {
       url: "https://www.fm4all.com/politique-de-confidentialite",
       lastModified: "2025-03-02T09:35:25.103Z",
       changeFrequency: "weekly",
@@ -196,18 +172,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: "https://www.fm4all.com/politique-de-cookies",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.5,
-    },
-    {
-      url: "https://www.fm4all.com/mon-devis/personnaliser-mon-devis",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.5,
-    },
-    {
-      url: "https://www.fm4all.com/mon-devis/afficher-mon-devis",
       lastModified: "2025-03-02T09:35:25.103Z",
       changeFrequency: "weekly",
       priority: 0.5,
