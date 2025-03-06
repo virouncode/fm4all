@@ -163,7 +163,7 @@ const MesServicesPresentation = () => {
                     "bg-fm4allessential flex flex-col items-center justify-center h-[calc(100vh-15rem)] border border-slate-200 rounded-xl p-6 text-white"
                   }
                 >
-                  <p className="text-xl text-center font-bold">
+                  <p className="text-2xl text-center font-bold">
                     Gamme Essentiel
                   </p>
                   <div className="flex-1 flex items-center justify-center">
@@ -182,7 +182,9 @@ const MesServicesPresentation = () => {
                     "bg-fm4allcomfort flex flex-col items-center justify-center h-[calc(100vh-15rem)] border border-slate-200 rounded-xl p-6 text-white"
                   }
                 >
-                  <p className="text-xl text-center font-bold">Gamme Confort</p>
+                  <p className="text-2xl text-center font-bold">
+                    Gamme Confort
+                  </p>
                   <div className="flex-1 flex items-center justify-center">
                     <p className="text-center">
                       Vous êtes en recherche du bon rapport qualité prix. Le
@@ -199,7 +201,7 @@ const MesServicesPresentation = () => {
                     "bg-fm4allexcellence flex flex-col items-center justify-center h-[calc(100vh-15rem)] border border-slate-200 rounded-xl p-6 text-white"
                   }
                 >
-                  <p className="text-xl text-center font-bold">
+                  <p className="text-2xl text-center font-bold">
                     Gamme Excellence
                   </p>
                   <div className="flex-1 flex items-center justify-center">

@@ -46,7 +46,7 @@ const NettoyageMobileFournisseurLogo = ({
         >
           <div className="flex items-center justify-between w-full">
             <div className="flex flex-1 items-center gap-2">
-              <p className="text-lg font-bold text-foreground">
+              <p className="text-sm font-bold text-foreground">
                 {nomFournisseur}
               </p>
               {logoUrl ? (
