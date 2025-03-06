@@ -1,4 +1,12 @@
+import FournisseurDialog from "@/app/mon-devis/FournisseurDialog";
 import { CarouselItem } from "@/components/ui/carousel";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
@@ -53,8 +61,24 @@ const NettoyageMobilePropositionCard = ({
   handleClickProposition,
 }: NettoyageMobilePropositionCardProps) => {
   const { nettoyage } = useContext(NettoyageContext);
-  const { fournisseurId, gamme, id, freqAnnuelle, hParPassage, totalAnnuel } =
-    proposition;
+  const {
+    fournisseurId,
+    gamme,
+    id,
+    freqAnnuelle,
+    hParPassage,
+    totalAnnuel,
+    ca,
+    sloganFournisseur,
+    logoUrl,
+    nomFournisseur,
+    locationUrl,
+    anneeCreation,
+    effectifFournisseur,
+    nbClients,
+    noteGoogle,
+    nbAvis,
+  } = proposition;
   const color = getFm4AllColor(gamme);
   const totalMensuelText = `${formatNumber(
     Math.round(((totalAnnuel ?? 0) * MARGE) / 12)
@@ -168,19 +192,48 @@ const NettoyageMobilePropositionCard = ({
               quality={100}
             />
           </div>
+
           <div className="w-2/3 flex flex-col gap-1 h-full">
             <p className="font-bold text-sm">{proposition.nomFournisseur}</p>
-            {proposition.logoUrl ? (
-              <div className="h-10 relative">
-                <Image
-                  src={proposition.logoUrl}
-                  alt={`illustration de nettoyage`}
-                  fill={true}
-                  className="object-contain object-left"
-                  quality={100}
+            <Dialog>
+              <DialogTrigger asChild>
+                {/* <Button
+                  variant="outline"
+                  className="flex w-full h-auto p-2 shadow rounded-xl"
+                  asChild
+                  title="Infos sur le fournisseur"
+                > */}
+                {proposition.logoUrl ? (
+                  <div className="h-10 relative">
+                    <Image
+                      src={proposition.logoUrl}
+                      alt={`illustration de nettoyage`}
+                      fill={true}
+                      className="object-contain object-left"
+                      quality={100}
+                    />
+                  </div>
+                ) : null}
+                {/* </Button> */}
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
+                <DialogHeader>
+                  <DialogTitle>{nomFournisseur}</DialogTitle>
+                </DialogHeader>
+                <FournisseurDialog
+                  sloganFournisseur={sloganFournisseur}
+                  logoUrl={logoUrl}
+                  nomFournisseur={nomFournisseur}
+                  locationUrl={locationUrl}
+                  anneeCreation={anneeCreation}
+                  ca={ca}
+                  effectif={effectifFournisseur}
+                  nbClients={nbClients}
+                  noteGoogle={noteGoogle}
+                  nbAvis={nbAvis}
                 />
-              </div>
-            ) : null}
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
         <div className="flex h-1/2 pt-2 justify-between">
@@ -203,6 +256,7 @@ const NettoyageMobilePropositionCard = ({
                 nettoyage.infos.gammeSelected === gamme
               }
               onCheckedChange={() => handleClickProposition(proposition)}
+              title="Sélectionner cette proposition"
             />
           </div>
         </div>
