@@ -184,38 +184,58 @@ const NettoyageMobilePropositionCard = ({
         }`}
       >
         <div className="flex items-center h-1/2 gap-2 border-b pb-2 border-slate-200">
-          <div className="w-1/3 h-full relative rounded-xl overflow-hidden">
-            <Image
-              src={"/img/services/nettoyage.webp"}
-              alt={`illustration de nettoyage`}
-              fill={true}
-              className="object-cover cursor-pointer"
-              quality={100}
-            />
-          </div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <div className="w-1/3 h-full relative rounded-xl overflow-hidden">
+                <Image
+                  src={"/img/services/nettoyage.webp"}
+                  alt={`illustration de nettoyage`}
+                  fill={true}
+                  className="object-cover cursor-pointer"
+                  quality={100}
+                />
+              </div>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
+              <DialogHeader>
+                <DialogTitle>{infosTitle}</DialogTitle>
+              </DialogHeader>
+              <div className="flex flex-col gap-4">
+                {proposition.logoUrl ? (
+                  <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+                    <Image
+                      src={"/img/services/nettoyage.webp"}
+                      alt={`illustration de nettoyage`}
+                      fill={true}
+                      className="object-contain object-center cursor-pointer"
+                      quality={100}
+                    />
+                  </div>
+                ) : null}
+                <ul className="flex flex-col text-xs mx-auto">
+                  {infosProduit}
+                  <li className="list-check">{hParSemaineText}</li>
+                  <li className="list-check">{nbPassagesParSemaineText}</li>
+                </ul>
+              </div>
+            </DialogContent>
+          </Dialog>
 
           <div className="w-2/3 flex flex-col gap-1 h-full">
             <p className="font-bold text-sm">{proposition.nomFournisseur}</p>
             <Dialog>
               <DialogTrigger asChild>
-                {/* <Button
-                  variant="outline"
-                  className="flex w-full h-auto p-2 shadow rounded-xl"
-                  asChild
-                  title="Infos sur le fournisseur"
-                > */}
                 {proposition.logoUrl ? (
                   <div className="h-10 relative">
                     <Image
                       src={proposition.logoUrl}
                       alt={`logo-de-${proposition.nomFournisseur}`}
                       fill={true}
-                      className="object-contain object-left"
+                      className="object-contain object-left cursor-pointer"
                       quality={100}
                     />
                   </div>
                 ) : null}
-                {/* </Button> */}
               </DialogTrigger>
               <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
                 <DialogHeader>
@@ -237,6 +257,7 @@ const NettoyageMobilePropositionCard = ({
             </Dialog>
             {noteGoogle && nbAvis && (
               <div className="flex items-center gap-1 text-xs">
+                <p>{noteGoogle}</p>
                 <StarRating score={noteGoogle ? parseFloat(noteGoogle) : 0} />
                 <p>({nbAvis})</p>
               </div>
