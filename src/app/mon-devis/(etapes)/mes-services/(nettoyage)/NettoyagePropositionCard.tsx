@@ -62,9 +62,9 @@ const NettoyagePropositionCard = ({
   proposition,
 }: NettoyagePropositionCardProps) => {
   const { nettoyage } = useContext(NettoyageContext);
-
   const gamme = proposition.gamme;
   const color = getFm4AllColor(gamme);
+
   if (!proposition.totalAnnuel) {
     return (
       <div
@@ -74,35 +74,34 @@ const NettoyagePropositionCard = ({
       </div>
     );
   }
-  const totalMensuelText = `${formatNumber(
-    Math.round((proposition.totalAnnuel * MARGE) / 12)
-  )} € / mois`;
+
+  const totalMensuelText = (
+    <p className="font-bold">
+      {formatNumber(Math.round((proposition.totalAnnuel * MARGE) / 12))} € /
+      mois
+    </p>
+  );
   const hParSemaineText =
-    proposition.hParPassage && proposition.freqAnnuelle
-      ? `${formatNumber(
+    proposition.hParPassage && proposition.freqAnnuelle ? (
+      <p className="text-base">
+        {formatNumber(
           (proposition.hParPassage * proposition.freqAnnuelle) /
             S_OUVREES_PAR_AN
-        )} h / semaine`
-      : "";
+        )}{" "}
+        h / semaine
+      </p>
+    ) : null;
   const nbPassagesParSemaineText =
-    proposition.freqAnnuelle && proposition.hParPassage
-      ? `${formatNumber(
-          proposition.freqAnnuelle / S_OUVREES_PAR_AN
-        )} passage(s) de ${proposition.hParPassage}h / semaine`
-      : "";
+    proposition.freqAnnuelle && proposition.hParPassage ? (
+      <p className="text-xs">
+        {formatNumber(proposition.freqAnnuelle / S_OUVREES_PAR_AN)} passage(s)
+        de ${proposition.hParPassage}h / semaine
+      </p>
+    ) : null;
+
   const infosEssentiel = <p>Entretien fonctionnel et optimisé</p>;
   const infosConfort = <p>Equilibre parfait entre qualité et efficacité</p>;
   const infosExcellence = <p>Un standard de propreté exemplaire</p>;
-  const infosTitle = (
-    <p className={`text-${getFm4AllColor(proposition.gamme)} text-center`}>
-      {proposition.gamme === "essentiel"
-        ? "Essentiel"
-        : proposition.gamme === "confort"
-        ? "Confort"
-        : "Excellence"}
-    </p>
-  );
-
   const infosProduit = (
     <div className="flex flex-col text-sm my-4">
       {gamme === "essentiel"
@@ -111,6 +110,15 @@ const NettoyagePropositionCard = ({
         ? infosConfort
         : infosExcellence}
     </div>
+  );
+  const infosTitle = (
+    <p className={`text-${getFm4AllColor(proposition.gamme)} text-center`}>
+      {proposition.gamme === "essentiel"
+        ? "Essentiel"
+        : proposition.gamme === "confort"
+        ? "Confort"
+        : "Excellence"}
+    </p>
   );
 
   return (
@@ -135,7 +143,7 @@ const NettoyagePropositionCard = ({
       />
       <div>
         <div className="flex gap-2 items-center">
-          <p className="font-bold">{totalMensuelText}</p>
+          {totalMensuelText}
           <Dialog>
             <DialogTrigger asChild>
               <Button
@@ -156,8 +164,8 @@ const NettoyagePropositionCard = ({
             </DialogContent>
           </Dialog>
         </div>
-        <p className="text-base">{hParSemaineText}</p>
-        <p className="text-xs">{nbPassagesParSemaineText}</p>
+        {hParSemaineText}
+        {nbPassagesParSemaineText}
       </div>
     </div>
   );

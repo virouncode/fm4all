@@ -103,7 +103,7 @@ const NettoyageMobileOptionsRepasseCard = ({
     <div className="flex flex-col gap-1">
       <p className="font-bold">Repasse Sanitaire</p>
       <div
-        className={`bg-${color} flex flex-col h-72 border border-slate-200 rounded-xl p-4 text-white  ${
+        className={`bg-${color} flex flex-col h-64 border border-slate-200 rounded-xl p-4 text-white  ${
           nettoyage.infos.repasseSelected && repasseProposition
             ? "ring-4 ring-inset ring-fm4alldestructive"
             : ""
