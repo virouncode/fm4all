@@ -72,14 +72,14 @@ const NettoyageMobileOptionsRepasseCard = ({
     </p>
   );
   const infosProduit = (
-    <li className="list-check">
+    <li className="list-check list-inside">
       Second passage dans la même journée pour entretenir sanitaires et zones
       sensibles
     </li>
   );
   const repasseHParSemaineText =
     repasseProposition && nettoyage.quantites.freqAnnuelle ? (
-      <li className="list-check">
+      <li className="list-check list-inside">
         {formatNumber(
           (repasseProposition.hParPassage * nettoyage.quantites.freqAnnuelle) /
             S_OUVREES_PAR_AN
@@ -89,14 +89,14 @@ const NettoyageMobileOptionsRepasseCard = ({
     ) : null;
   const repasseNbPassagesParSemaineText =
     repasseProposition && nettoyage.quantites.freqAnnuelle ? (
-      <li className="list-check">
+      <li className="list-check list-inside">
         {formatNumber(nettoyage.quantites.freqAnnuelle / S_OUVREES_PAR_AN)}{" "}
         passage(s) de {repasseProposition.hParPassage} h / semaine
       </li>
     ) : null;
   return (
     <div className="flex flex-col gap-1">
-      <p>Repasse Sanitaire</p>
+      <p className="font-bold">Repasse Sanitaire</p>
       <div
         className={`bg-${color} flex flex-col h-72 border border-slate-200 rounded-xl p-4 text-white  ${
           nettoyage.infos.repasseSelected
@@ -133,12 +133,10 @@ const NettoyageMobileOptionsRepasseCard = ({
                     />
                   </div>
                 ) : null}
-                <ul className="flex flex-col text-xs mx-auto">
+                <ul className="flex flex-col text-xs mx-auto w-2/3">
                   {infosProduit}
-                  <li className="list-check">{repasseHParSemaineText}</li>
-                  <li className="list-check">
-                    {repasseNbPassagesParSemaineText}
-                  </li>
+                  {repasseHParSemaineText}
+                  {repasseNbPassagesParSemaineText}
                 </ul>
               </div>
             </DialogContent>
@@ -213,7 +211,7 @@ const NettoyageMobileOptionsRepasseCard = ({
           </div>
         </div>
         <div className="flex h-1/2 pt-2 justify-between gap-6">
-          <ul className="flex flex-col text-xs ml-4 w-2/3">
+          <ul className="flex flex-col text-xs w-2/3">
             {infosProduit}
             {repasseHParSemaineText}
             {repasseNbPassagesParSemaineText}

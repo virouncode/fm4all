@@ -90,9 +90,9 @@ const NettoyageMobilePropositionCard = ({
           (hParPassage * freqAnnuelle) / S_OUVREES_PAR_AN
         )} h / semaine`
       : "";
-  const infosEssentiel = <p>Entretien fonctionnel et optimisé</p>;
-  const infosConfort = <p>Equilibre parfait entre qualité et efficacité</p>;
-  const infosExcellence = <p>Un standard de propreté exemplaire</p>;
+  const infosEssentiel = "Entretien fonctionnel et optimisé";
+  const infosConfort = "Equilibre parfait entre qualité et efficacité";
+  const infosExcellence = "Un standard de propreté exemplaire";
   const infosTitle = (
     <p className={`text-${color} text-center`}>
       {gamme === "essentiel"
@@ -104,7 +104,7 @@ const NettoyageMobilePropositionCard = ({
   );
 
   const infosProduit = (
-    <li className="list-check">
+    <li className="list-check list-inside">
       {gamme === "essentiel"
         ? infosEssentiel
         : gamme === "confort"
@@ -214,8 +214,10 @@ const NettoyageMobilePropositionCard = ({
                 ) : null}
                 <ul className="flex flex-col text-xs mx-auto">
                   {infosProduit}
-                  <li className="list-check">{hParSemaineText}</li>
-                  <li className="list-check">{nbPassagesParSemaineText}</li>
+                  <li className="list-check list-inside">{hParSemaineText}</li>
+                  <li className="list-check list-inside">
+                    {nbPassagesParSemaineText}
+                  </li>
                 </ul>
               </div>
             </DialogContent>
@@ -265,10 +267,12 @@ const NettoyageMobilePropositionCard = ({
           </div>
         </div>
         <div className="flex h-1/2 pt-2 justify-between">
-          <ul className="flex flex-col text-xs ml-4 w-2/3">
+          <ul className="flex flex-col text-xs w-2/3">
             {infosProduit}
-            <li className="list-check">{hParSemaineText}</li>
-            <li className="list-check">{nbPassagesParSemaineText}</li>
+            <li className="list-check list-inside">{hParSemaineText}</li>
+            <li className="list-check list-inside">
+              {nbPassagesParSemaineText}
+            </li>
           </ul>
           <div className="flex flex-col gap-2 items-end">
             <p className="text-sm font-bold">{totalMensuelText}</p>
