@@ -109,7 +109,7 @@ const NettoyageOptionsRepasseCard = ({
             : undefined
         }
       >
-        {repasseProposition && (
+        {repasseProposition ? (
           <Switch
             checked={nettoyage.infos.repasseSelected}
             onCheckedChange={() =>
@@ -118,7 +118,7 @@ const NettoyageOptionsRepasseCard = ({
             className="data-[state=checked]:bg-fm4alldestructive"
             title="Sélectionner cette proposition"
           />
-        )}
+        ) : null}
         <div>
           <div className="flex gap-2 items-center">
             {totalMensuelText}

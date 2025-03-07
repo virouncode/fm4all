@@ -241,7 +241,7 @@ const NettoyageOptionsPropositions = ({
 
   const handleChangeNbPassageVitrerie = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    let newNbPassageVitrerie = value ? parseInt(value) : 2;
+    let newNbPassageVitrerie = value ? parseInt(value) : 0;
     if (newNbPassageVitrerie > MAX_PASSAGES_VITRERIE)
       newNbPassageVitrerie = MAX_PASSAGES_VITRERIE;
     setNettoyage((prev) => ({

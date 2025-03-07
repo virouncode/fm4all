@@ -199,7 +199,7 @@ const NettoyageMobileOptionsSamediCard = ({
           </ul>
           <div className="flex flex-col gap-2 items-end w-1/3">
             {samediPrixMensuelText}
-            {samediProposition.prixAnnuel && (
+            {samediProposition.prixAnnuel ? (
               <Switch
                 className={`${
                   nettoyage.infos.samediSelected
@@ -212,7 +212,7 @@ const NettoyageMobileOptionsSamediCard = ({
                 }
                 title="Sélectionner cette proposition"
               />
-            )}
+            ) : null}
           </div>
         </div>
       </div>

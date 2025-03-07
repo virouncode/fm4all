@@ -264,6 +264,8 @@ const MesLocaux = () => {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    console.log("value", value);
+
     if (name === "surface") {
       const newValue = value ? parseInt(value) : 50;
       setClient((prev) => ({
@@ -321,7 +323,6 @@ const MesLocaux = () => {
               fieldTitle="Code postal*"
               nameInSchema="codePostal"
               placeholder="XXXXX"
-              handleChange={handleChange}
             />
             <InputWithLabel<InsertClientType>
               fieldTitle="Surface en m²*"

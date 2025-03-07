@@ -95,7 +95,7 @@ const NettoyageOptionsVitrerieCard = ({
           <div className="flex gap-4 items-center justify-center w-full">
             <Input
               type="number"
-              value={nettoyage.quantites.nbPassagesVitrerie}
+              value={nettoyage.quantites.nbPassagesVitrerie || ""}
               min={1}
               max={MAX_PASSAGES_VITRERIE}
               step={1}
@@ -117,7 +117,7 @@ const NettoyageOptionsVitrerieCard = ({
       </div>
       <div
         className={`flex w-3/4 items-center p-4 justify-center ${
-          nettoyage.infos.vitrerieSelected
+          nettoyage.infos.vitrerieSelected && vitrerieProposition.prixAnnuel
             ? "ring-4 ring-inset ring-fm4alldestructive"
             : ""
         } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
@@ -127,7 +127,7 @@ const NettoyageOptionsVitrerieCard = ({
             : undefined
         }
       >
-        {vitrerieProposition.prixAnnuel && (
+        {vitrerieProposition.prixAnnuel ? (
           <Switch
             checked={nettoyage.infos.vitrerieSelected}
             onCheckedChange={() =>
@@ -136,7 +136,7 @@ const NettoyageOptionsVitrerieCard = ({
             className="data-[state=checked]:bg-fm4alldestructive"
             title="Sélectionner cette proposition"
           />
-        )}
+        ) : null}
         <div>
           <div className="flex gap-2 items-center">
             {vitreriePrixMensuelText}

@@ -92,7 +92,7 @@ const NettoyageOptionsSamediCard = ({
             : undefined
         }
       >
-        {samediProposition.prixAnnuel && (
+        {samediProposition.prixAnnuel ? (
           <Switch
             checked={nettoyage.infos.samediSelected}
             onCheckedChange={() =>
@@ -101,7 +101,7 @@ const NettoyageOptionsSamediCard = ({
             className="data-[state=checked]:bg-fm4alldestructive"
             title="Sélectionner cette proposition"
           />
-        )}
+        ) : null}
         <div>
           <div className="flex gap-2 items-center">
             {samediPrixMensuelText}

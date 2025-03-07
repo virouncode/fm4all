@@ -92,7 +92,7 @@ const NettoyageOptionsDimancheCard = ({
             : undefined
         }
       >
-        {dimancheProposition.prixAnnuel && (
+        {dimancheProposition.prixAnnuel ? (
           <Switch
             checked={nettoyage.infos.dimancheSelected}
             onCheckedChange={() =>
@@ -101,7 +101,7 @@ const NettoyageOptionsDimancheCard = ({
             className="data-[state=checked]:bg-fm4alldestructive"
             title="Sélectionner cette proposition"
           />
-        )}
+        ) : null}
         <div>
           <div className="flex gap-2 items-center">
             {dimanchePrixMensuelText}

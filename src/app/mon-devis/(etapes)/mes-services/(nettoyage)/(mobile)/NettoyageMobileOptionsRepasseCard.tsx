@@ -221,7 +221,7 @@ const NettoyageMobileOptionsRepasseCard = ({
           </ul>
           <div className="flex flex-col gap-2 items-end w-1/3">
             {totalMensuelText}
-            {repasseProposition && (
+            {repasseProposition ? (
               <Switch
                 className={`${
                   nettoyage.infos.repasseSelected
@@ -234,7 +234,7 @@ const NettoyageMobileOptionsRepasseCard = ({
                 }
                 title="Sélectionner cette proposition"
               />
-            )}
+            ) : null}
           </div>
         </div>
       </div>

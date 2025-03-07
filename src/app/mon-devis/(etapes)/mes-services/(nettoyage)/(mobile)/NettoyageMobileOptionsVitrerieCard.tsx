@@ -105,7 +105,7 @@ const NettoyageMobileOptionsVitrerieCard = ({
         </Label>
         <Input
           type="number"
-          value={nettoyage.quantites.nbPassagesVitrerie}
+          value={nettoyage.quantites.nbPassagesVitrerie || ""}
           min={1}
           max={MAX_PASSAGES_VITRERIE}
           step={1}
@@ -122,7 +122,7 @@ const NettoyageMobileOptionsVitrerieCard = ({
       </div>
       <div
         className={`bg-${color} flex flex-col h-64 border border-slate-200 rounded-xl p-4 text-white  ${
-          nettoyage.infos.vitrerieSelected
+          nettoyage.infos.vitrerieSelected && vitrerieProposition.prixAnnuel
             ? "ring-4 ring-inset ring-fm4alldestructive"
             : ""
         }`}
@@ -236,7 +236,7 @@ const NettoyageMobileOptionsVitrerieCard = ({
           </ul>
           <div className="flex flex-col gap-2 items-end w-1/3">
             {vitreriePrixMensuelText}
-            {vitrerieProposition.prixAnnuel && (
+            {vitrerieProposition.prixAnnuel ? (
               <Switch
                 className={`${
                   nettoyage.infos.vitrerieSelected
@@ -249,7 +249,7 @@ const NettoyageMobileOptionsVitrerieCard = ({
                 }
                 title="Sélectionner cette proposition"
               />
-            )}
+            ) : null}
           </div>
         </div>
       </div>
