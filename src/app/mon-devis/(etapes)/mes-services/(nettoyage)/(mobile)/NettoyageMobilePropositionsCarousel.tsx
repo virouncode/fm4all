@@ -7,6 +7,7 @@ import { NettoyageContext } from "@/context/NettoyageProvider";
 import { GammeType } from "@/zod-schemas/gamme";
 import { useContext, useEffect, useState } from "react";
 import NettoyageMobilePropositionCard from "./NettoyageMobilePropositionCard";
+import CarouselGammesDots from "@/components/CarouselGammesDots";
 
 type NettoyageMobilePropositionsCarouselProps = {
   handleClickProposition: (proposition: {
@@ -53,9 +54,10 @@ const NettoyageMobilePropositionsCarousel = ({
   propositions,
   handleClickProposition,
 }: NettoyageMobilePropositionsCarouselProps) => {
+  const { nettoyage } = useContext(NettoyageContext);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
-  const { nettoyage } = useContext(NettoyageContext);
+
   useEffect(() => {
     if (!api) {
       return;
@@ -102,18 +104,7 @@ const NettoyageMobilePropositionsCarousel = ({
           />
         ))}
       </CarouselContent>
-      <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2 z-10">
-        {[...Array(3)].map((_, index) => {
-          return (
-            <div
-              key={index}
-              className={`w-3 h-3 rounded-full border-white border ${
-                currentIndex === index ? "bg-fm4allsecondary" : "bg-gray-300"
-              }`}
-            />
-          );
-        })}
-      </div>
+      <CarouselGammesDots currentIndex={currentIndex} />
     </Carousel>
   );
 };

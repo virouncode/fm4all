@@ -377,24 +377,22 @@ const NettoyagePropositions = ({
       )?.prixInstallation ?? null;
 
     const nbDistribEmp =
-      hygiene.quantites.nbDistribEmp || hygieneDistribQuantite.nbDistribEmp;
-    const nbDistribEmpPoubelle =
-      hygiene.quantites.nbDistribEmpPoubelle ||
-      hygieneDistribQuantite.nbDistribEmpPoubelle;
+      hygiene.quantites.nbDistribEmp ?? hygieneDistribQuantite.nbDistribEmp;
+    const nbDistribEmpPoubelle = nbDistribEmp;
     const nbDistribSavon =
-      hygiene.quantites.nbDistribSavon || hygieneDistribQuantite.nbDistribSavon;
+      hygiene.quantites.nbDistribSavon ?? hygieneDistribQuantite.nbDistribSavon;
     const nbDistribPh =
-      hygiene.quantites.nbDistribPh || hygieneDistribQuantite.nbDistribPh;
+      hygiene.quantites.nbDistribPh ?? hygieneDistribQuantite.nbDistribPh;
     const nbDistribDesinfectant =
-      hygiene.quantites.nbDistribDesinfectant ||
+      hygiene.quantites.nbDistribDesinfectant ??
       hygieneDistribQuantite.nbDistribDesinfectant;
     const nbDistribParfum =
-      hygiene.quantites.nbDistribParfum ||
+      hygiene.quantites.nbDistribParfum ??
       hygieneDistribQuantite.nbDistribParfum;
     const nbDistribBalai =
-      hygiene.quantites.nbDistribBalai || hygieneDistribQuantite.nbDistribBalai;
+      hygiene.quantites.nbDistribBalai ?? hygieneDistribQuantite.nbDistribBalai;
     const nbDistribPoubelle =
-      hygiene.quantites.nbDistribPoubelle ||
+      hygiene.quantites.nbDistribPoubelle ??
       hygieneDistribQuantite.nbDistribPoubelle;
 
     setHygiene((prev) => ({
@@ -438,38 +436,54 @@ const NettoyagePropositions = ({
       },
     }));
 
-    const totalTrilogie =
-      hygiene.infos.trilogieGammeSelected &&
-      prixDistribEmp !== null &&
-      prixDistribEmpPoubelle !== null &&
-      prixDistribSavon !== null &&
-      prixDistribPh !== null &&
-      paParPersonneEmp !== null &&
-      paParPersonneSavon !== null &&
-      paParPersonnePh !== null
-        ? nbDistribEmp * prixDistribEmp +
-          nbDistribSavon * prixDistribSavon +
-          nbDistribPh * prixDistribPh +
-          nbDistribEmpPoubelle * prixDistribEmpPoubelle +
-          (paParPersonneEmp + paParPersonneSavon + paParPersonnePh) * effectif
-        : null;
+    const totalEmp =
+      nbDistribEmp && prixDistribEmp !== null && paParPersonneEmp !== null
+        ? nbDistribEmp * prixDistribEmp + paParPersonneEmp * effectif
+        : 0;
+
+    const totalPoubellEmp =
+      nbDistribEmpPoubelle && prixDistribEmpPoubelle !== null
+        ? nbDistribEmpPoubelle * prixDistribEmpPoubelle
+        : 0;
+
+    const totalSavon =
+      nbDistribSavon && prixDistribSavon !== null && paParPersonneSavon !== null
+        ? nbDistribSavon * prixDistribSavon + paParPersonneSavon * effectif
+        : 0;
+
+    const totalPh =
+      nbDistribPh && prixDistribPh !== null && paParPersonnePh !== null
+        ? nbDistribPh * prixDistribPh + paParPersonnePh * effectif
+        : 0;
+
+    const totalTrilogie = hygiene.infos.trilogieGammeSelected
+      ? totalEmp + totalPoubellEmp + totalSavon + totalPh || null
+      : null;
+
     const totalDesinfectant =
       hygiene.infos.desinfectantGammeSelected &&
       prixDistribDesinfectant !== null &&
-      paParPersonneDesinfectant !== null
+      paParPersonneDesinfectant !== null &&
+      nbDistribDesinfectant
         ? nbDistribDesinfectant * prixDistribDesinfectant +
           paParPersonneDesinfectant * effectif
         : null;
     const totalParfum =
-      hygiene.infos.parfumGammeSelected && prixDistribParfum !== null
+      hygiene.infos.parfumGammeSelected &&
+      prixDistribParfum !== null &&
+      nbDistribParfum
         ? nbDistribParfum * prixDistribParfum
         : null;
     const totalBalai =
-      hygiene.infos.balaiGammeSelected && prixDistribBalai !== null
+      hygiene.infos.balaiGammeSelected &&
+      prixDistribBalai !== null &&
+      nbDistribBalai
         ? nbDistribBalai * prixDistribBalai
         : null;
     const totalPoubelle =
-      hygiene.infos.poubelleGammeSelected && prixDistribPoubelle !== null
+      hygiene.infos.poubelleGammeSelected &&
+      prixDistribPoubelle !== null &&
+      nbDistribPoubelle
         ? nbDistribPoubelle * prixDistribPoubelle
         : null;
     setTotalHygiene({

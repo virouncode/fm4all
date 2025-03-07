@@ -39,14 +39,12 @@ const HygienePropositions = ({
   //Calcul des propositions : 1 fournisseur 3 gammes.
   const effectif = client.effectif ?? 0;
   const nbDistribEmp =
-    hygiene.quantites.nbDistribEmp || hygieneDistribQuantite.nbDistribEmp;
-  const nbDistribEmpPoubelle =
-    hygiene.quantites.nbDistribEmpPoubelle ||
-    hygieneDistribQuantite.nbDistribEmpPoubelle;
+    hygiene.quantites.nbDistribEmp ?? hygieneDistribQuantite.nbDistribEmp;
+  const nbDistribEmpPoubelle = nbDistribEmp;
   const nbDistribSavon =
-    hygiene.quantites.nbDistribSavon || hygieneDistribQuantite.nbDistribSavon;
+    hygiene.quantites.nbDistribSavon ?? hygieneDistribQuantite.nbDistribSavon;
   const nbDistribPh =
-    hygiene.quantites.nbDistribPh || hygieneDistribQuantite.nbDistribPh;
+    hygiene.quantites.nbDistribPh ?? hygieneDistribQuantite.nbDistribPh;
   //Tarifs distributeurs
   const dureeLocation = hygiene.infos.dureeLocation;
   const {
@@ -215,9 +213,7 @@ const HygienePropositions = ({
       //On change juste le nb de distributeurs
       switch (type) {
         case "emp":
-          let newNbrEmp = value
-            ? parseInt(value)
-            : hygieneDistribQuantite?.nbDistribEmp;
+          let newNbrEmp = value ? parseInt(value) : 0;
           if (newNbrEmp > MAX_NB_EMP) newNbrEmp = MAX_NB_EMP;
           setHygiene((prev) => ({
             ...prev,
@@ -229,9 +225,7 @@ const HygienePropositions = ({
           }));
           break;
         case "savon":
-          let newNbSavon = value
-            ? parseInt(value)
-            : hygieneDistribQuantite?.nbDistribSavon;
+          let newNbSavon = value ? parseInt(value) : 0;
           if (newNbSavon > MAX_NB_SAVON) newNbSavon = MAX_NB_SAVON;
           setHygiene((prev) => ({
             ...prev,
@@ -242,9 +236,7 @@ const HygienePropositions = ({
           }));
           break;
         case "ph":
-          let newNbPh = value
-            ? parseInt(value)
-            : hygieneDistribQuantite?.nbDistribPh;
+          let newNbPh = value ? parseInt(value) : 0;
           if (newNbPh > MAX_NB_PH) newNbPh = MAX_NB_PH;
           setHygiene((prev) => ({
             ...prev,
@@ -283,10 +275,9 @@ const HygienePropositions = ({
 
     switch (type) {
       case "emp":
-        let newNbrEmp = value
-          ? parseInt(value)
-          : hygieneDistribQuantite?.nbDistribEmp;
+        let newNbrEmp = value ? parseInt(value) : 0;
         if (newNbrEmp > MAX_NB_EMP) newNbrEmp = MAX_NB_EMP;
+
         setHygiene((prev) => ({
           ...prev,
           quantites: {
@@ -322,9 +313,7 @@ const HygienePropositions = ({
         }
         break;
       case "savon":
-        let newNbSavon = value
-          ? parseInt(value)
-          : hygieneDistribQuantite?.nbDistribSavon;
+        let newNbSavon = value ? parseInt(value) : 0;
         if (newNbSavon > MAX_NB_SAVON) newNbSavon = MAX_NB_SAVON;
         setHygiene((prev) => ({
           ...prev,
@@ -360,9 +349,7 @@ const HygienePropositions = ({
         }
         break;
       case "ph":
-        let newNbPh = value
-          ? parseInt(value)
-          : hygieneDistribQuantite?.nbDistribPh;
+        let newNbPh = value ? parseInt(value) : 0;
         if (newNbPh > MAX_NB_PH) newNbPh = MAX_NB_PH;
         setHygiene((prev) => ({
           ...prev,
