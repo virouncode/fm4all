@@ -82,7 +82,9 @@ const NettoyageMobileOptionsDimancheCard = ({
   );
   return (
     <div className="flex flex-col gap-1">
-      <p className="font-bold">Nettoyage supplémentaire tous les dimanches</p>
+      <p className="font-bold text-xl">
+        Nettoyage supplémentaire tous les dimanches
+      </p>
       <div
         className={`bg-${color} flex flex-col h-64 border border-slate-200 rounded-xl p-4 text-white  ${
           nettoyage.infos.dimancheSelected

@@ -101,7 +101,7 @@ const NettoyageMobileOptionsRepasseCard = ({
     ) : null;
   return (
     <div className="flex flex-col gap-1">
-      <p className="font-bold">Repasse Sanitaire</p>
+      <p className="font-bold text-xl">Repasse Sanitaire</p>
       <div
         className={`bg-${color} flex flex-col h-64 border border-slate-200 rounded-xl p-4 text-white  ${
           nettoyage.infos.repasseSelected && repasseProposition
