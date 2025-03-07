@@ -87,7 +87,7 @@ const HygieneMobilePropositions = ({
   return (
     <div className="flex flex-col gap-6 w-full">
       <p className="font-bold text-xl lg:hidden">
-        Hygiène sanitaire : essuie-mains papiers, savon, papier hygiénique
+        Essuie-mains papier, savon, papier hygiénique
       </p>
       <HygieneMobileDistribQuantitesInputs
         hygieneDistribQuantite={hygieneDistribQuantite}

@@ -1,3 +1,4 @@
+import CarouselGammesDots from "@/components/CarouselGammesDots";
 import {
   Carousel,
   CarouselApi,
@@ -6,7 +7,6 @@ import {
 import { HygieneContext } from "@/context/HygieneProvider";
 import { useContext, useEffect, useState } from "react";
 import HygieneMobilePropositionCard from "./HygieneMobilePropositionCard";
-import CarouselGammesDots from "@/components/CarouselGammesDots";
 
 type HygieneMobilePropositionsProps = {
   prixInstalDistrib: number | null;
@@ -83,14 +83,15 @@ const HygieneMobileTrilogieCarousel = ({
     if (!hygiene.infos.fournisseurId && !api) {
       return;
     }
-
-    api?.scrollTo(
-      hygiene.infos.trilogieGammeSelected === "essentiel"
-        ? 0
-        : hygiene.infos.trilogieGammeSelected === "confort"
-        ? 1
-        : 2
-    );
+    if (hygiene.infos.trilogieGammeSelected) {
+      api?.scrollTo(
+        hygiene.infos.trilogieGammeSelected === "essentiel"
+          ? 0
+          : hygiene.infos.trilogieGammeSelected === "confort"
+          ? 1
+          : 2
+      );
+    }
   }, [api, hygiene.infos.fournisseurId, hygiene.infos.trilogieGammeSelected]);
   return (
     <Carousel
