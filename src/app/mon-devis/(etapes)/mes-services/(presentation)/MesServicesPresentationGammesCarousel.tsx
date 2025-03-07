@@ -4,6 +4,7 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 import { useEffect, useState } from "react";
 
 const MesServicesPresentationGammesCarousel = () => {
@@ -25,6 +26,11 @@ const MesServicesPresentationGammesCarousel = () => {
       }}
       className="w-full relative"
       setApi={setApi}
+      plugins={[
+        Autoplay({
+          delay: 5000,
+        }),
+      ]}
     >
       <CarouselContent>
         <CarouselItem>

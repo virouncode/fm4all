@@ -228,7 +228,10 @@ const NettoyageOptions = ({
     })[0];
 
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="2">
+    <div
+      className="flex flex-col gap-4 w-full mx-auto h-full py-2 mb-14 lg:mb-0"
+      id="2"
+    >
       <PropositionsTitle
         title="Options de nettoyage"
         description={`Choisissez vos options en gamme ${capitalize(

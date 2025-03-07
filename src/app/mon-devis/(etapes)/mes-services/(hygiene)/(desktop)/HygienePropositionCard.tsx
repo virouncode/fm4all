@@ -92,8 +92,8 @@ const HygienePropositionCard = ({
   );
 
   const prixInstallationText = prixInstalDistrib ? (
-    <p className="font-bold text-xl ml-4">
-      {formatNumber(Math.round(prixInstalDistrib))} € d&apos;installation
+    <p className="font-bold text-base ml-4">
+      +{formatNumber(Math.round(prixInstalDistrib))} € d&apos;installation
     </p>
   ) : null;
 
@@ -233,9 +233,7 @@ const HygienePropositionCard = ({
           </Dialog>
         </div>
         {infosProduit}
-        {prixInstallationText && (
-          <p className="text-base">{prixInstallationText}</p>
-        )}
+        {prixInstallationText}
       </div>
     </div>
   );

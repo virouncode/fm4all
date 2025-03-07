@@ -39,6 +39,7 @@
     "drizzle-zod": "^0.6.1",
     "embla-carousel": "^8.5.2",
     "embla-carousel-auto-scroll": "^8.5.2",
+    "embla-carousel-autoplay": "^8.5.2",
     "embla-carousel-react": "^8.5.2",
     "form-data": "^4.0.1",
     "formidable": "^3.5.2",
