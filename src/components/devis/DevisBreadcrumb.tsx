@@ -93,7 +93,7 @@ const DevisBreadcrumb = () => {
     {
       id: 7,
       url: "/afficher-mon-devis",
-      name: "7. Devis",
+      name: "7. Mon Devis",
     },
   ];
 

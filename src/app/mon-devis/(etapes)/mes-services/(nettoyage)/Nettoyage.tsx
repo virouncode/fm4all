@@ -65,7 +65,10 @@ const Nettoyage = ({
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="1">
+    <div
+      className="flex flex-col gap-4 w-full mx-auto h-full py-2 mb-14 lg:mb-0"
+      id="1"
+    >
       <PropositionsTitle
         title="Nettoyage et propreté"
         description="D’un nettoyage essentiel à une expérience 5 étoiles, choisissez la prestation propreté qui vous ressemble."

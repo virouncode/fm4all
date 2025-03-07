@@ -21,7 +21,10 @@ const MesServicesPresentation = () => {
     }));
   };
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="0">
+    <div
+      className="flex flex-col gap-4 w-full mx-auto h-full py-2 mb-14 lg:mb-0"
+      id="0"
+    >
       <div className="w-full flex-1 overflow-auto">
         <div className="h-full flex flex-col gap-6">
           <p>
@@ -33,13 +36,17 @@ const MesServicesPresentation = () => {
           <div>
             <p>
               Cliquez sur le <strong>logo du prestataire</strong>{" "}
-              <SquareArrowOutUpRight size={16} className="inline-block" /> pour
-              plus d&apos;informations sur l&apos;entreprise.
+              <SquareArrowOutUpRight
+                size={16}
+                className="hidden lg:inline-block"
+              />{" "}
+              pour plus d&apos;informations sur l&apos;entreprise.
             </p>
             <p>
               Pour chaque offre, <strong>cliquez sur </strong>{" "}
-              <Info className="inline-block" size={14} /> pour en savoir plus et
-              sélectionnez l&apos;offre qui vous convient.
+              <Info className="hidden lg:inline-block" size={14} />
+              <span className="lg:hidden font-bold">la photo</span> pour en
+              savoir plus et sélectionnez l&apos;offre qui vous convient.
             </p>
           </div>
           {isTabletOrMobile ? (

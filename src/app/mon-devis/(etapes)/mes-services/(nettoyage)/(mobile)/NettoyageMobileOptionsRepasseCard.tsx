@@ -127,17 +127,16 @@ const NettoyageMobileOptionsRepasseCard = ({
                 <DialogTitle>{infosTitle}</DialogTitle>
               </DialogHeader>
               <div className="flex flex-col gap-4 items-center">
-                {repasseProposition?.logoUrl ? (
-                  <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
-                    <Image
-                      src={"/img/services/nettoyage.webp"}
-                      alt={`illustration de nettoyage`}
-                      fill={true}
-                      className="object-contain object-center cursor-pointer"
-                      quality={100}
-                    />
-                  </div>
-                ) : null}
+                <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+                  <Image
+                    src={"/img/services/nettoyage.webp"}
+                    alt={`illustration de nettoyage`}
+                    fill={true}
+                    className="object-contain object-center cursor-pointer"
+                    quality={100}
+                  />
+                </div>
+
                 <ul className="flex flex-col text-xs px-4">
                   {infosProduit}
                   {repasseHParSemaineText}
@@ -151,7 +150,6 @@ const NettoyageMobileOptionsRepasseCard = ({
             <p className="font-bold text-sm">
               {nettoyage.infos.nomFournisseur}
             </p>
-
             {repasseProposition ? (
               <>
                 <Dialog>

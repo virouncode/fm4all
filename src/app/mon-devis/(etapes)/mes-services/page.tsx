@@ -48,7 +48,7 @@ const page = async ({
   return (
     <>
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl md:text-4xl">Mes services</h1>
+        <h1 className="text-3xl md:text-4xl">2. Mes services</h1>
       </div>
       <Suspense fallback={<ServicesLoader />}>
         <MesServices surface={surface} effectif={effectif} />

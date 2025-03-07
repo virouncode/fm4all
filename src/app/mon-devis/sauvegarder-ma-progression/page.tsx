@@ -55,7 +55,7 @@ const page = async ({
   return (
     <>
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl md:text-4xl">Sauvegarder ma progression</h1>
+        <h1 className="text-3xl md:text-4xl">5. Sauvegarder ma progression</h1>
       </div>
       <Suspense fallback={<ServicesLoader />}>
         <SauvegarderProgression />

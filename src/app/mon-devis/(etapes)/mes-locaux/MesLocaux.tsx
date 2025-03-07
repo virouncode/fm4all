@@ -300,14 +300,14 @@ const MesLocaux = () => {
     }
   };
 
-  const handleClickReprendre = () => {
-    const route = devisProgress.currentStep
-      ? devisRoutes.find(({ id }) => id === devisProgress.currentStep) ??
-        devisRoutes[0]
-      : devisRoutes[0];
-    const url = route.url;
-    router.push(`/mon-devis${url}`);
-  };
+  // const handleClickReprendre = () => {
+  //   const route = devisProgress.currentStep
+  //     ? devisRoutes.find(({ id }) => id === devisProgress.currentStep) ??
+  //       devisRoutes[0]
+  //     : devisRoutes[0];
+  //   const url = route.url;
+  //   router.push(`/mon-devis${url}`);
+  // };
 
   return !loaderVisible ? (
     <Form {...form}>

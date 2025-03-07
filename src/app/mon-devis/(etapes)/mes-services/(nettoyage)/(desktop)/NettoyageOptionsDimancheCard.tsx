@@ -67,18 +67,18 @@ const NettoyageOptionsDimancheCard = ({
   );
   const infosProduit = (
     <li className="list-check">
-      Ajoute une journée à la fréquence choisie précédemment
+      Ajoute une journée à la fréquence de nettoyage
     </li>
   );
   const dialogTitle = (
     <p className={`text-${color} text-center`}>
-      Nettoyage supplémentaire tous les dimanche
+      Nettoyage supplémentaire tous les dimanches
     </p>
   );
   return (
     <div className="flex border-b flex-1">
       <div className="flex w-1/4 items-center justify-center text-base text-center p-4">
-        Nettoyage supplémentaire tous les Dimanche
+        Nettoyage supplémentaire tous les dimanches
       </div>
       <div
         className={`flex w-3/4 items-center p-4 justify-center ${
