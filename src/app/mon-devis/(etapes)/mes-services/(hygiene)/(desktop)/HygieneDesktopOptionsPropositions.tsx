@@ -11,7 +11,6 @@ type HygieneDesktopOptionsPropositionsProps = {
   nbDistribParfum: number;
   nbDistribBalai: number;
   nbDistribPoubelle: number;
-  dureeLocation: "pa12M" | "pa24M" | "pa36M" | "oneShot";
   handleChangeDistribNbr: (
     e: ChangeEvent<HTMLInputElement>,
     type: string
@@ -59,7 +58,6 @@ const HygieneDesktopOptionsPropositions = ({
   nbDistribParfum,
   nbDistribBalai,
   nbDistribPoubelle,
-  dureeLocation,
   handleChangeDistribNbr,
   handleClickProposition,
   propositions,

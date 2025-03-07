@@ -276,9 +276,7 @@ const HygieneOptionsPropositions = ({
     const value = e.target.value;
     switch (type) {
       case "desinfectant":
-        let newNbDistribDesinfectant = value
-          ? parseInt(value)
-          : hygieneDistribQuantite.nbDistribDesinfectant;
+        let newNbDistribDesinfectant = value ? parseInt(value) : 0;
         if (newNbDistribDesinfectant > MAX_NB_DISTRIB)
           newNbDistribDesinfectant = MAX_NB_DISTRIB;
         setHygiene((prev) => ({
@@ -298,7 +296,8 @@ const HygieneOptionsPropositions = ({
 
           const totalDesinfectant =
             prixDistribDesinfectant !== null &&
-            paParPersonneDesinfectant !== null
+            paParPersonneDesinfectant !== null &&
+            newNbDistribDesinfectant
               ? newNbDistribDesinfectant * prixDistribDesinfectant +
                 paParPersonneDesinfectant * (client.effectif ?? 0)
               : null;
@@ -309,9 +308,7 @@ const HygieneOptionsPropositions = ({
         }
         return;
       case "parfum":
-        let newNbDistribParfum = value
-          ? parseInt(value)
-          : hygieneDistribQuantite.nbDistribParfum;
+        let newNbDistribParfum = value ? parseInt(value) : 0;
         if (newNbDistribParfum > MAX_NB_DISTRIB)
           newNbDistribParfum = MAX_NB_DISTRIB;
         setHygiene((prev) => ({
@@ -341,9 +338,7 @@ const HygieneOptionsPropositions = ({
         return;
 
       case "balai":
-        let newNbDistribBalai = value
-          ? parseInt(value)
-          : hygieneDistribQuantite.nbDistribBalai;
+        let newNbDistribBalai = value ? parseInt(value) : 0;
         if (newNbDistribBalai > MAX_NB_DISTRIB)
           newNbDistribBalai = MAX_NB_DISTRIB;
         setHygiene((prev) => ({
@@ -373,9 +368,7 @@ const HygieneOptionsPropositions = ({
         return;
 
       case "poubelle":
-        let newNbDistribPoubelle = value
-          ? parseInt(value)
-          : hygieneDistribQuantite.nbDistribPoubelle;
+        let newNbDistribPoubelle = value ? parseInt(value) : 0;
         if (newNbDistribPoubelle > MAX_NB_DISTRIB)
           newNbDistribPoubelle = MAX_NB_DISTRIB;
         setHygiene((prev) => ({
@@ -415,7 +408,6 @@ const HygieneOptionsPropositions = ({
       nbDistribParfum={nbDistribParfum}
       nbDistribBalai={nbDistribBalai}
       nbDistribPoubelle={nbDistribPoubelle}
-      dureeLocation={dureeLocation}
       handleChangeDistribNbr={handleChangeDistribNbr}
       propositions={propositions}
       handleClickProposition={handleClickProposition}
@@ -427,7 +419,6 @@ const HygieneOptionsPropositions = ({
       nbDistribParfum={nbDistribParfum}
       nbDistribBalai={nbDistribBalai}
       nbDistribPoubelle={nbDistribPoubelle}
-      dureeLocation={dureeLocation}
       handleChangeDistribNbr={handleChangeDistribNbr}
       propositions={propositions}
       handleClickProposition={handleClickProposition}

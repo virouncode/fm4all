@@ -18,6 +18,7 @@ import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQ
 import { Info } from "lucide-react";
 import Image from "next/image";
 import { ChangeEvent, useContext } from "react";
+import { MAX_NB_DISTRIB } from "./HygieneOptionsPropositions";
 
 type HygieneOptionsDesinfectantCardProps = {
   nbDistribDesinfectant: number;
@@ -79,9 +80,9 @@ const HygieneOptionsDesinfectantCard = ({
           <div className="flex gap-4 items-center justify-center w-full">
             <Input
               type="number"
-              value={nbDistribDesinfectant}
+              value={nbDistribDesinfectant || ""}
               min={1}
-              max={100}
+              max={MAX_NB_DISTRIB}
               step={1}
               onChange={(e) => handleChangeDistribNbr(e, "desinfectant")}
               className={`w-16 ${

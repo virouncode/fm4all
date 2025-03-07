@@ -9,10 +9,10 @@ import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTari
 import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs";
 import { Toilet } from "lucide-react";
 import { useContext } from "react";
+import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import HygienePropositions from "./HygienePropositions";
-import { useMediaQuery } from "react-responsive";
 
 type HygieneProps = {
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
@@ -58,7 +58,10 @@ const Hygiene = ({
   }
 
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="3">
+    <div
+      className="flex flex-col gap-4 w-full mx-auto h-full py-2 mb-14 lg:mb-0"
+      id="3"
+    >
       <PropositionsTitle
         icon={Toilet}
         title="Hygiène sanitaire"

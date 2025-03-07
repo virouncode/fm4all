@@ -1,17 +1,11 @@
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { ChangeEvent } from "react";
+import HygieneMobileOptionsBalaiInput from "./HygieneMobileOptionsBalaiInput";
+import HygieneMobileOptionsBalaiCarousel from "./HygieneMobileOptionsBalaiCarousel";
 
-import HygieneMobileOptionsBalai from "./HygieneMobileOptionsBalai";
-import HygieneMobileOptionsDesinfectant from "./HygieneMobileOptionsDesinfectant";
-import HygieneMobileOptionsParfum from "./HygieneMobileOptionsParfum";
-import HygieneMobileOptionsPoubelle from "./HygieneMobileOptionsPoubelle";
-
-type HygieneMobielOptionsPropositionsProps = {
+type HygieneMobileOptionsBalaiProps = {
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
-  nbDistribDesinfectant: number;
-  nbDistribParfum: number;
   nbDistribBalai: number;
-  nbDistribPoubelle: number;
   handleChangeDistribNbr: (
     e: ChangeEvent<HTMLInputElement>,
     type: string
@@ -53,48 +47,26 @@ type HygieneMobielOptionsPropositionsProps = {
   ) => void;
 };
 
-const HygieneMobileOptionsPropositions = ({
+const HygieneMobileOptionsBalai = ({
   hygieneDistribQuantite,
-  nbDistribDesinfectant,
-  nbDistribParfum,
   nbDistribBalai,
-  nbDistribPoubelle,
   handleChangeDistribNbr,
-  handleClickProposition,
   propositions,
-}: HygieneMobielOptionsPropositionsProps) => {
+  handleClickProposition,
+}: HygieneMobileOptionsBalaiProps) => {
   return (
-    <div className="flex flex-col gap-6 w-full">
-      <HygieneMobileOptionsDesinfectant
-        nbDistribDesinfectant={nbDistribDesinfectant}
-        handleChangeDistribNbr={handleChangeDistribNbr}
-        propositions={propositions}
-        hygieneDistribQuantite={hygieneDistribQuantite}
-        handleClickProposition={handleClickProposition}
-      />
-      <HygieneMobileOptionsParfum
-        nbDistribParfum={nbDistribParfum}
-        handleChangeDistribNbr={handleChangeDistribNbr}
-        propositions={propositions}
-        hygieneDistribQuantite={hygieneDistribQuantite}
-        handleClickProposition={handleClickProposition}
-      />
-      <HygieneMobileOptionsBalai
+    <>
+      <HygieneMobileOptionsBalaiInput
         nbDistribBalai={nbDistribBalai}
         handleChangeDistribNbr={handleChangeDistribNbr}
-        propositions={propositions}
         hygieneDistribQuantite={hygieneDistribQuantite}
+      />
+      <HygieneMobileOptionsBalaiCarousel
+        propositions={propositions}
         handleClickProposition={handleClickProposition}
       />
-      <HygieneMobileOptionsPoubelle
-        nbDistribPoubelle={nbDistribPoubelle}
-        handleChangeDistribNbr={handleChangeDistribNbr}
-        propositions={propositions}
-        hygieneDistribQuantite={hygieneDistribQuantite}
-        handleClickProposition={handleClickProposition}
-      />
-    </div>
+    </>
   );
 };
 
-export default HygieneMobileOptionsPropositions;
+export default HygieneMobileOptionsBalai;
