@@ -95,7 +95,7 @@ const NettoyageMobilePropositionCard = ({
   const nbPassagesParSemaineText =
     freqAnnuelle && hParPassage ? (
       <li className="list-check">
-        {formatNumber(freqAnnuelle / S_OUVREES_PAR_AN)} passage(s) de $
+        {formatNumber(freqAnnuelle / S_OUVREES_PAR_AN)} passage(s) de
         {hParPassage}h / semaine
       </li>
     ) : null;
