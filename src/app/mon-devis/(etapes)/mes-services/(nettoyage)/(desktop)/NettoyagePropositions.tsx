@@ -3,6 +3,7 @@ import { HygieneContext } from "@/context/HygieneProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
+import { toast } from "@/hooks/use-toast";
 import { gammes, GammeType } from "@/zod-schemas/gamme";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
@@ -233,6 +234,13 @@ const NettoyagePropositions = ({
       tauxHoraire,
       totalAnnuel,
     } = proposition;
+
+    if (fournisseurId !== nettoyage.infos.fournisseurId) {
+      toast({
+        title: "Fournisseur sélectionné",
+        description: `Vous avez choisi ${nomFournisseur} pour le nettoyage, ce prestataire ou son partenaire assurera la prestation hygiène sanitaire`,
+      });
+    }
 
     //NETTOYAGE
     const repasseTarif = repasseTarifs.find(
