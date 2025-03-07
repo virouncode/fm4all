@@ -1,5 +1,5 @@
-import MaintenanceFournisseurLogo from "../MaintenanceFournisseurLogo";
-import MaintenancePropositionCard from "../MaintenancePropositionCard";
+import MaintenanceFournisseurLogo from "./MaintenanceFournisseurLogo";
+import MaintenancePropositionCard from "./MaintenancePropositionCard";
 
 type MaintenanceDesktopPropositionsProps = {
   formattedPropositions: {

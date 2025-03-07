@@ -14,6 +14,7 @@ import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { GammeType } from "@/zod-schemas/gamme";
 import { Info } from "lucide-react";
+import Image from "next/image";
 import { useContext } from "react";
 
 type MaintenancePropositionCardProps = {
@@ -87,25 +88,40 @@ const MaintenancePropositionCard = ({
     </p>
   );
 
-  const nbPassagesText = <li className="list-check ">{}</li>;
+  const nbPassagesText = (
+    <li className="list-check ">
+      {proposition.freqAnnuelle} passage(s) de {proposition.hParPassage} h / an
+    </li>
+  );
 
   const infosEssentiel = (
-    <li className="list-check ">
-      Obligation légale et contrôles règlementaires
-    </li>
+    <>
+      <li className="list-check ">
+        Obligation légale et contrôles règlementaires
+      </li>
+      <li className="list-check">Contrôle Q18</li>
+    </>
   );
   const infosConfort = (
-    <li className="list-check ">
-      Essentiel + recommandations ARS, petits travaux d’entretien tous les trois
-      mois
-    </li>
+    <>
+      <li className="list-check ">
+        Essentiel + recommandations ARS, petits travaux d’entretien tous les
+        trois mois
+      </li>
+      <li className="list-check ">Contrôle Q18</li>
+      <li className="list-check ">Contrôle Legionellose</li>
+    </>
   );
   const infosExcellence = (
-    <li className="list-check ">
-      Une à deux fois par mois passage technicien / homme à tout faire pour
-      maintenance & petits travaux. Lien technique avec le gestionnaire de
-      l’immeuble
-    </li>
+    <>
+      <li className="list-check ">
+        Une à deux fois par mois passage technicien pour maintenance & petits
+        travaux. Lien technique avec le gestionnaire de l’immeuble
+      </li>
+      <li className="list-check ">Contrôle Q18</li>
+      <li className="list-check ">Contrôle Legionellose</li>
+      <li className="list-check ">Contrôle Qualité Air</li>
+    </>
   );
 
   const infosProduit =
@@ -159,7 +175,17 @@ const MaintenancePropositionCard = ({
               <DialogHeader>
                 <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
+
               <div className="flex flex-col gap-4 items-center">
+                <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+                  <Image
+                    src={"/img/services/maintenance.webp"}
+                    alt={`illustration de maintenance`}
+                    fill={true}
+                    className="object-contain object-center cursor-pointer"
+                    quality={100}
+                  />
+                </div>
                 <ul className="flex flex-col text-sm px-4">{infosProduit}</ul>
               </div>
             </DialogContent>

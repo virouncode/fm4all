@@ -63,37 +63,37 @@ const DevisBreadcrumb = () => {
     {
       id: 1,
       url: "/mes-locaux",
-      name: "Mes locaux",
+      name: "1. Mes locaux",
     },
     {
       id: 2,
       url: `/mes-services?${serviceSearchParams.toString()}`,
-      name: "Mes services",
+      name: "2. Services",
     },
     {
       id: 3,
       url: `/food-beverage`,
-      name: "Food & Beverage",
+      name: "3. Food/Beverage",
     },
     {
       id: 4,
       url: `/pilotage-prestations?${serviceSearchParams.toString()}`,
-      name: "Pilotage Prestations",
+      name: "4. Pilotage",
     },
     {
       id: 5,
       url: `/sauvegarder-ma-progression?${sauvegarderSearchParams.toString()}`,
-      name: "Sauvegarder",
+      name: "5. Sauvegarder",
     },
     {
       id: 6,
       url: "/personnaliser-mon-devis",
-      name: "Personnaliser",
+      name: "6. Personnaliser",
     },
     {
       id: 7,
       url: "/afficher-mon-devis",
-      name: "Mon devis",
+      name: "7. Devis",
     },
   ];
 

@@ -1,5 +1,3 @@
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -7,10 +5,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { IncendieContext } from "@/context/IncendieProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { Info } from "lucide-react";
+import Image from "next/image";
 import { useContext } from "react";
 
 type SecuriteIncendiePropostionCardProps = {
@@ -65,22 +65,62 @@ const SecuriteIncendiePropostionCard = ({
   handleClickProposition,
 }: SecuriteIncendiePropostionCardProps) => {
   const { incendie } = useContext(IncendieContext);
-  const totalMensuelText =
-    formatNumber(
-      Math.round(
-        ((proposition.totalAnnuelTrilogie +
-          proposition.fraisDeplacementTrilogie) *
-          MARGE) /
-          12
-      )
-    ) + " € / mois";
-  const infosText = (
-    <p className="text-sm">
-      Pour la sécurité de tous : vérification annuelle obligatoire (NF S61-919),
-      conseils sur l’implantation, remplacement ou rechargement si nécessaire au
-      BPU.
+  const totalMensuelText = (
+    <p className="font-bold text-xl ml-4">
+      {formatNumber(
+        Math.round(
+          ((proposition.totalAnnuelTrilogie +
+            proposition.fraisDeplacementTrilogie) *
+            MARGE) /
+            12
+        )
+      )}{" "}
+      €/mois
     </p>
   );
+  const infosProduit = (
+    <ul className="flex flex-col text-sm px-4">
+      <li className="list-check">
+        1 passage/an pour le contrôle obligatoire de :
+        <ul className="ml-4">
+          <li className="list-disc">
+            {proposition.nbExtincteurs} extincteur(s)
+          </li>
+          <li className="list-disc">{proposition.nbBaes} BAES</li>
+          <li className="list-disc">
+            {proposition.nbTelBaes} télécommande(s) BAES
+          </li>
+        </ul>
+      </li>
+    </ul>
+  );
+
+  const infosProduitDialog = (
+    <ul className="flex flex-col text-sm px-4">
+      <li className="list-check">
+        1 passage par an pour le contrôle obligatoire de :
+        <ul className="ml-4">
+          <li className="list-disc">
+            {proposition.nbExtincteurs} extincteur(s)
+          </li>
+          <li className="list-disc">{proposition.nbBaes} BAES</li>
+          <li className="list-disc">
+            {proposition.nbTelBaes} télécommande(s) BAES
+          </li>
+        </ul>
+      </li>
+    </ul>
+  );
+
+  const infosText = (
+    <p className="text-sm">
+      Pour la sécurité de tous : vérification annuelle obligatoire (norme
+      <strong> NF S61-919</strong>), conseils sur l’implantation, remplacement
+      ou rechargement si nécessaire au BPU.
+    </p>
+  );
+
+  const dialogTitle = <p className="text-center">Sécurité incendie</p>;
 
   return (
     <div
@@ -91,40 +131,44 @@ const SecuriteIncendiePropostionCard = ({
       }`}
       onClick={() => handleClickProposition(proposition)}
     >
-      <Checkbox
+      <Switch
         checked={incendie.infos.fournisseurId === proposition.fournisseurId}
         onCheckedChange={() => handleClickProposition(proposition)}
-        className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-        aria-label="Sélectionner cette proposition"
+        className="data-[state=checked]:bg-fm4alldestructive"
+        title="Sélectionner cette proposition"
       />
       <div>
         <div className="flex gap-2 items-center">
-          <p className="font-bold">{totalMensuelText}</p>
+          {totalMensuelText}
           <Dialog>
             <DialogTrigger asChild>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="hover:bg-transparent hover:opacity-80"
+              <Info
+                size={16}
+                className="cursor-pointer"
                 onClick={(e) => e.stopPropagation()}
-                title="Détails de l'offre"
-              >
-                <Info size={16} />
-              </Button>
+              />
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle></DialogTitle>
+                <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
-              {infosText}
+              <div className="flex flex-col gap-4 items-center">
+                {infosText}
+                <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+                  <Image
+                    src={"/img/services/incendie.webp"}
+                    alt={`illustration de securité incendie`}
+                    fill={true}
+                    className="object-contain object-center cursor-pointer"
+                    quality={100}
+                  />
+                </div>
+                {infosProduitDialog}
+              </div>
             </DialogContent>
           </Dialog>
         </div>
-        <p className="text-sm">1 passage par an</p>
-        <p>Contrôle obligatoire de :</p>
-        <p className="text-sm">{proposition.nbExtincteurs} extincteurs</p>
-        <p className="text-sm"> {proposition.nbBaes} BAES</p>
-        <p className="text-sm">{proposition.nbTelBaes} télécommandes BAES</p>
+        {infosProduit}
       </div>
     </div>
   );
