@@ -225,12 +225,12 @@ const DevisButton = ({
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
-            <div className="flex gap-4 justify-center">
-              <Button onClick={handleClickReprendre} variant="outline">
-                Reprendre
-              </Button>
+            <div className="flex gap-4 justify-center mx-auto">
               <Button variant="destructive" onClick={handleClickNouveau}>
                 Nouveau
+              </Button>
+              <Button onClick={handleClickReprendre} variant="outline">
+                Reprendre
               </Button>
             </div>
           </DialogClose>

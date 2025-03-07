@@ -8,9 +8,10 @@ import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQ
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { Toilet } from "lucide-react";
 import { useContext } from "react";
+import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
-import HygieneOptionsPropositions from "./HygieneOptionsPropositions";
+import HygieneOptionsPropositions from "./(desktop)/HygieneOptionsPropositions";
 
 type HygieneOptionsProps = {
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
@@ -26,6 +27,7 @@ const HygieneOptions = ({
   const { hygiene } = useContext(HygieneContext);
   const { nettoyage } = useContext(NettoyageContext);
   const { setServices } = useContext(ServicesContext);
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 
   const handleClickNext = () => {
     setServices((prev) => ({
@@ -39,6 +41,7 @@ const HygieneOptions = ({
       currentServiceId: prev.currentServiceId - 1,
     }));
   };
+
   if (
     !nettoyage.infos.gammeSelected ||
     !nettoyage.infos.fournisseurId ||
@@ -51,7 +54,7 @@ const HygieneOptions = ({
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="4">
       <PropositionsTitle
         icon={Toilet}
-        title="Hygiène sanitaire"
+        title="Options hygiène sanitaire"
         description={
           "Choisissez vos options chez " + (hygiene.infos.nomFournisseur ?? "")
         }
@@ -64,7 +67,9 @@ const HygieneOptions = ({
           hygieneConsosTarifs={hygieneConsosTarifs}
         />
       </div>
-      <PropositionsFooter handleClickNext={handleClickNext} />
+      {isTabletOrMobile ? null : (
+        <PropositionsFooter handleClickNext={handleClickNext} />
+      )}
     </div>
   );
 };

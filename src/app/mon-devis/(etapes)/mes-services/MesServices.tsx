@@ -28,7 +28,7 @@ import SecuriteIncendie from "./(incendie)/SecuriteIncendie";
 import Maintenance from "./(maintenance)/Maintenance";
 import Nettoyage from "./(nettoyage)/Nettoyage";
 import NettoyageOptions from "./(nettoyage)/NettoyageOptions";
-import MesServicesPresentation from "./MesServicesPresentation";
+import MesServicesPresentation from "./(presentation)/MesServicesPresentation";
 
 type MesServicesProps = {
   surface: string;

@@ -11,7 +11,7 @@ import { useMediaQuery } from "react-responsive";
 import { capitalize } from "../../../../../lib/capitalize";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
-import NettoyageOptionsPropositions from "./NettoyageOptionsPropositions";
+import NettoyageOptionsPropositions from "./(desktop)/NettoyageOptionsPropositions";
 
 type NettoyageOptionsProps = {
   nettoyageTarifs: SelectNettoyageTarifsType[];

@@ -6,11 +6,10 @@ import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { ChangeEvent, useContext } from "react";
-import { getHygieneFournisseurTarifs } from "./getFormattedHygienePropositions";
-import HygieneOptionsBalaiCard from "./HygieneOptionsBalaiCard";
-import HygieneOptionsDesinfectantCard from "./HygieneOptionsDesinfectantCard";
-import HygieneOptionsParfumCard from "./HygieneOptionsParfumCard";
-import HygieneOptionsPoubelleCard from "./HygieneOptionsPoubelleCard";
+import { useMediaQuery } from "react-responsive";
+import HygieneMobileOptionsPropositions from "../(mobile)/HygieneMobileOptionsPropositions";
+import { getHygieneFournisseurTarifs } from "../getFormattedHygienePropositions";
+import HygieneDesktopOptionsPropositions from "./HygieneDesktopOptionsPropositions";
 
 export const MAX_NB_DISTRIB = 100;
 
@@ -407,45 +406,32 @@ const HygieneOptionsPropositions = ({
     }
   };
 
-  return (
-    <div className="h-full flex flex-col border rounded-xl overflow-auto">
-      {/*1ère ligne */}
-      <HygieneOptionsDesinfectantCard
-        nbDistribDesinfectant={nbDistribDesinfectant}
-        dureeLocation={dureeLocation}
-        handleChangeDistribNbr={handleChangeDistribNbr}
-        handleClickProposition={handleClickProposition}
-        hygieneDistribQuantite={hygieneDistribQuantite}
-        propositions={propositions}
-      />
-      {/*2ème ligne */}
-      <HygieneOptionsParfumCard
-        nbDistribParfum={nbDistribParfum}
-        dureeLocation={dureeLocation}
-        handleChangeDistribNbr={handleChangeDistribNbr}
-        handleClickProposition={handleClickProposition}
-        hygieneDistribQuantite={hygieneDistribQuantite}
-        propositions={propositions}
-      />
-      {/*3ème ligne */}
-      <HygieneOptionsBalaiCard
-        nbDistribBalai={nbDistribBalai}
-        dureeLocation={dureeLocation}
-        handleChangeDistribNbr={handleChangeDistribNbr}
-        handleClickProposition={handleClickProposition}
-        hygieneDistribQuantite={hygieneDistribQuantite}
-        propositions={propositions}
-      />
-      {/*4ème ligne */}
-      <HygieneOptionsPoubelleCard
-        nbDistribPoubelle={nbDistribPoubelle}
-        dureeLocation={dureeLocation}
-        handleChangeDistribNbr={handleChangeDistribNbr}
-        handleClickProposition={handleClickProposition}
-        hygieneDistribQuantite={hygieneDistribQuantite}
-        propositions={propositions}
-      />
-    </div>
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+
+  return isTabletOrMobile ? (
+    <HygieneMobileOptionsPropositions
+      hygieneDistribQuantite={hygieneDistribQuantite}
+      nbDistribDesinfectant={nbDistribDesinfectant}
+      nbDistribParfum={nbDistribParfum}
+      nbDistribBalai={nbDistribBalai}
+      nbDistribPoubelle={nbDistribPoubelle}
+      dureeLocation={dureeLocation}
+      handleChangeDistribNbr={handleChangeDistribNbr}
+      propositions={propositions}
+      handleClickProposition={handleClickProposition}
+    />
+  ) : (
+    <HygieneDesktopOptionsPropositions
+      hygieneDistribQuantite={hygieneDistribQuantite}
+      nbDistribDesinfectant={nbDistribDesinfectant}
+      nbDistribParfum={nbDistribParfum}
+      nbDistribBalai={nbDistribBalai}
+      nbDistribPoubelle={nbDistribPoubelle}
+      dureeLocation={dureeLocation}
+      handleChangeDistribNbr={handleChangeDistribNbr}
+      propositions={propositions}
+      handleClickProposition={handleClickProposition}
+    />
   );
 };
 

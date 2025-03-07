@@ -166,7 +166,7 @@ const CityOut = ({ destination }: CityOutProps) => {
             <Button
               variant="destructive"
               size="lg"
-              title="Afficher les tarifs"
+              title="Envoyer mes coordonnées"
               className="text-base min-w-28"
             >
               {isSavingClient ? (

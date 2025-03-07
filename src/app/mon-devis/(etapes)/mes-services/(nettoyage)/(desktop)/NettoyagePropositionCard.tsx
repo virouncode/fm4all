@@ -1,6 +1,4 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -8,12 +6,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { GammeType } from "@/zod-schemas/gamme";
 import { Info } from "lucide-react";
+import Image from "next/image";
 import { useContext } from "react";
 
 type NettoyagePropositionCardProps = {
@@ -74,45 +74,49 @@ const NettoyagePropositionCard = ({
       </div>
     );
   }
-
   const totalMensuelText = (
-    <p className="font-bold">
-      {formatNumber(Math.round((proposition.totalAnnuel * MARGE) / 12))} € /
-      mois
+    <p className="font-bold text-xl ml-4">
+      {formatNumber(Math.round((proposition.totalAnnuel * MARGE) / 12))} €/mois
     </p>
   );
   const hParSemaineText =
     proposition.hParPassage && proposition.freqAnnuelle ? (
-      <p className="text-base">
+      <li className="list-check ">
         {formatNumber(
           (proposition.hParPassage * proposition.freqAnnuelle) /
             S_OUVREES_PAR_AN
         )}{" "}
         h / semaine
-      </p>
+      </li>
     ) : null;
   const nbPassagesParSemaineText =
     proposition.freqAnnuelle && proposition.hParPassage ? (
-      <p className="text-xs">
+      <li className="list-check ">
         {formatNumber(proposition.freqAnnuelle / S_OUVREES_PAR_AN)} passage(s)
         de {proposition.hParPassage}h / semaine
-      </p>
+      </li>
     ) : null;
 
-  const infosEssentiel = <p>Entretien fonctionnel et optimisé</p>;
-  const infosConfort = <p>Equilibre parfait entre qualité et efficacité</p>;
-  const infosExcellence = <p>Un standard de propreté exemplaire</p>;
-  const infosProduit = (
-    <div className="flex flex-col text-sm my-4">
-      {gamme === "essentiel"
-        ? infosEssentiel
-        : gamme === "confort"
-        ? infosConfort
-        : infosExcellence}
-    </div>
+  const infosEssentiel = (
+    <li className="list-check ">Entretien fonctionnel et optimisé</li>
   );
-  const infosTitle = (
-    <p className={`text-${getFm4AllColor(proposition.gamme)} text-center`}>
+  const infosConfort = (
+    <li className="list-check ">
+      Equilibre parfait entre qualité et efficacité
+    </li>
+  );
+  const infosExcellence = (
+    <li className="list-check ">Un standard de propreté exemplaire</li>
+  );
+  const infosProduit =
+    gamme === "essentiel"
+      ? infosEssentiel
+      : gamme === "confort"
+      ? infosConfort
+      : infosExcellence;
+
+  const dialogTitle = (
+    <p className={`text-${color} text-center`}>
       {proposition.gamme === "essentiel"
         ? "Essentiel"
         : proposition.gamme === "confort"
@@ -129,43 +133,56 @@ const NettoyagePropositionCard = ({
           ? "ring-4 ring-inset ring-fm4alldestructive"
           : ""
       }`}
-      key={proposition.id}
       onClick={() => handleClickProposition(proposition)}
     >
-      <Checkbox
+      <Switch
         checked={
           nettoyage.infos.fournisseurId === proposition.fournisseurId &&
           nettoyage.infos.gammeSelected === proposition.gamme
         }
         onCheckedChange={() => handleClickProposition(proposition)}
-        className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-        aria-label="Sélectionner cette proposition"
+        className="data-[state=checked]:bg-fm4alldestructive"
+        title="Sélectionner cette proposition"
       />
       <div>
         <div className="flex gap-2 items-center">
           {totalMensuelText}
           <Dialog>
             <DialogTrigger asChild>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="hover:bg-transparent hover:text-slate-200 hover:opacity-80"
+              <Info
+                size={16}
+                className="cursor-pointer"
                 onClick={(e) => e.stopPropagation()}
-                title="Détails de l'offre"
-              >
-                <Info size={16} />
-              </Button>
+              />
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>{infosTitle}</DialogTitle>
+                <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
-              {infosProduit}
+              <div className="flex flex-col gap-4 items-center">
+                <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+                  <Image
+                    src={"/img/services/nettoyage.webp"}
+                    alt={`illustration de nettoyage`}
+                    fill={true}
+                    className="object-contain object-center cursor-pointer"
+                    quality={100}
+                  />
+                </div>
+                <ul className="flex flex-col text-sm px-4">
+                  {infosProduit}
+                  {hParSemaineText}
+                  {nbPassagesParSemaineText}
+                </ul>
+              </div>
             </DialogContent>
           </Dialog>
         </div>
-        {hParSemaineText}
-        {nbPassagesParSemaineText}
+        <ul className="flex flex-col text-xs ml-4">
+          {infosProduit}
+          {hParSemaineText}
+          {nbPassagesParSemaineText}
+        </ul>
       </div>
     </div>
   );

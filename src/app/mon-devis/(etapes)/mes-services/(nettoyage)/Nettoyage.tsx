@@ -15,7 +15,7 @@ import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
-import NettoyagePropositions from "./NettoyagePropositions";
+import NettoyagePropositions from "./(desktop)/NettoyagePropositions";
 
 type NettoyageProps = {
   nettoyageQuantites: SelectNettoyageQuantitesType[];
@@ -40,7 +40,6 @@ const Nettoyage = ({
 }: NettoyageProps) => {
   const { nettoyage } = useContext(NettoyageContext);
   const { setServices } = useContext(ServicesContext);
-  //Scroller automatiquement vers le service actuel
   useScrollIntoService();
 
   const handleClickPrevious = () => {

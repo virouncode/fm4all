@@ -7,8 +7,9 @@ import { SelectMaintenanceTarifsType } from "@/zod-schemas/maintenanceTarifs";
 import { SelectQ18TarifsType } from "@/zod-schemas/q18Tarifs";
 import { SelectQualiteAirTarifsType } from "@/zod-schemas/qualiteAirTarifs";
 import { useContext } from "react";
-import MaintenanceFournisseurLogo from "./MaintenanceFournisseurLogo";
-import MaintenancePropositionCard from "./MaintenancePropositionCard";
+import { useMediaQuery } from "react-responsive";
+import MaintenanceDesktopPropositions from "./(desktop)/MaintenanceDesktopPropositions";
+import MaintenanceMobilePropositions from "./(mobile)/MaintenanceMobilePropositions";
 
 type MaintenancePropositionsProps = {
   maintenanceQuantites: SelectMaintenanceQuantitesType[];
@@ -247,26 +248,18 @@ const MaintenancePropositions = ({
     });
   };
 
-  return (
-    <div className="h-full flex flex-col border rounded-xl overflow-auto">
-      {formattedPropositions.length > 0
-        ? formattedPropositions.map((propositions) => (
-            <div
-              className="flex border-b flex-1"
-              key={propositions[0].fournisseurId}
-            >
-              <MaintenanceFournisseurLogo {...propositions[0]} />
-              {propositions.map((proposition) => (
-                <MaintenancePropositionCard
-                  key={proposition.id}
-                  proposition={proposition}
-                  handleClickProposition={handleClickProposition}
-                />
-              ))}
-            </div>
-          ))
-        : null}
-    </div>
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+
+  return isTabletOrMobile ? (
+    <MaintenanceMobilePropositions
+      formattedPropositions={formattedPropositions}
+      handleClickProposition={handleClickProposition}
+    />
+  ) : (
+    <MaintenanceDesktopPropositions
+      formattedPropositions={formattedPropositions}
+      handleClickProposition={handleClickProposition}
+    />
   );
 };
 

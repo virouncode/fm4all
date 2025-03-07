@@ -1,6 +1,4 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -10,11 +8,11 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
-import { DureeLocationHygieneType } from "@/zod-schemas/dureeLocation";
 import { GammeType } from "@/zod-schemas/gamme";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { Info } from "lucide-react";
@@ -23,7 +21,6 @@ import { ChangeEvent, useContext } from "react";
 
 type HygieneOptionsParfumCardProps = {
   nbDistribParfum: number;
-  dureeLocation: DureeLocationHygieneType;
   handleClickProposition: (
     type: string,
     proposition: {
@@ -68,7 +65,6 @@ type HygieneOptionsParfumCardProps = {
 
 const HygieneOptionsParfumCard = ({
   nbDistribParfum,
-  dureeLocation,
   handleChangeDistribNbr,
   handleClickProposition,
   hygieneDistribQuantite,
@@ -115,13 +111,14 @@ const HygieneOptionsParfumCard = ({
             </div>
           );
         }
-        const prixMensuelParfumText = `${formatNumber(
-          Math.round((proposition.totalParfum * MARGE) / 12)
-        )} € / mois`;
-        const infosTitle = (
-          <p
-            className={`text-${getFm4AllColor(proposition.gamme)} text-center`}
-          >
+        const prixMensuelParfumText = (
+          <p className="font-bold text-xl ml-4">
+            {formatNumber(Math.round((proposition.totalParfum * MARGE) / 12))}{" "}
+            €/mois
+          </p>
+        );
+        const dialogTitle = (
+          <p className={`text-${color} text-center`}>
             {proposition.gamme === "essentiel"
               ? "Essentiel"
               : proposition.gamme === "confort"
@@ -141,18 +138,54 @@ const HygieneOptionsParfumCard = ({
           </div>
         ) : null;
         const infosProduit = (
-          <div>
-            <p className="text-sm mb-2">
+          <ul className="flex flex-col text-xs px-4 mx-auto">
+            <li className="list-check">
               Distributeurs{" "}
               {gamme === "essentiel"
                 ? "blancs basic"
                 : gamme === "confort"
                 ? "couleur"
                 : "inox"}
-            </p>
-            {imgProduit}
-            <p className="text-xs text-end italic">*photo non contractuelle</p>
-          </div>
+            </li>
+            <li className="list-check">Consommables inclus</li>
+            <li className="list-check">
+              {hygiene.infos.dureeLocation === "oneShot"
+                ? ""
+                : `Location engagement
+              ${
+                hygiene.infos.dureeLocation === "pa12M"
+                  ? "12"
+                  : hygiene.infos.dureeLocation === "pa24M"
+                  ? "24"
+                  : "36"
+              } mois`}
+            </li>
+          </ul>
+        );
+        const infosProduitDialog = (
+          <ul className="flex flex-col text-sm px-4 mx-auto">
+            <li className="list-check">
+              Distributeurs{" "}
+              {gamme === "essentiel"
+                ? "blancs basic"
+                : gamme === "confort"
+                ? "couleur"
+                : "inox"}
+            </li>
+            <li className="list-check">Consommables inclus</li>
+            <li className="list-check">
+              {hygiene.infos.dureeLocation === "oneShot"
+                ? ""
+                : `Location engagement
+                  ${
+                    hygiene.infos.dureeLocation === "pa12M"
+                      ? "12"
+                      : hygiene.infos.dureeLocation === "pa24M"
+                      ? "24"
+                      : "36"
+                  } mois`}
+            </li>
+          </ul>
         );
         return (
           <div
@@ -164,58 +197,38 @@ const HygieneOptionsParfumCard = ({
             key={"parfum" + gamme}
             onClick={() => handleClickProposition("parfum", proposition)}
           >
-            {" "}
-            <Checkbox
+            <Switch
               checked={hygiene.infos.parfumGammeSelected === gamme}
               onCheckedChange={() =>
                 handleClickProposition("parfum", proposition)
               }
-              className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-              aria-label="Sélectionner cette proposition"
+              className="data-[state=checked]:bg-fm4alldestructive"
+              title="Sélectionner cette proposition"
             />
             <div>
               <div className="flex gap-2 items-center">
-                <p>{prixMensuelParfumText}</p>
+                {prixMensuelParfumText}
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="hover:bg-transparent hover:text-slate-200 hover:opacity-80"
+                    <Info
+                      size={16}
+                      className="cursor-pointer"
                       onClick={(e) => e.stopPropagation()}
-                      title="Détails de l'offre"
-                    >
-                      <Info size={16} />
-                    </Button>
+                    />
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                      <DialogTitle>{infosTitle}</DialogTitle>
+                      <DialogTitle>{dialogTitle}</DialogTitle>
                     </DialogHeader>
-                    {infosProduit}
+                    {imgProduit}
+                    <p className="text-xs italic text-end">
+                      *photo non contractuelle
+                    </p>
+                    {infosProduitDialog}
                   </DialogContent>
                 </Dialog>
               </div>
-              <p className="text-sm">
-                Distributeurs{" "}
-                {gamme === "essentiel"
-                  ? "blancs basic"
-                  : gamme === "confort"
-                  ? "couleur"
-                  : "inox"}
-              </p>
-              <p className="text-sm">
-                {dureeLocation === "oneShot"
-                  ? ""
-                  : `Location engagement
-                    ${
-                      dureeLocation === "pa12M"
-                        ? "12"
-                        : dureeLocation === "pa24M"
-                        ? "24"
-                        : "36"
-                    } mois`}
-              </p>
+              {infosProduit}
             </div>
           </div>
         );

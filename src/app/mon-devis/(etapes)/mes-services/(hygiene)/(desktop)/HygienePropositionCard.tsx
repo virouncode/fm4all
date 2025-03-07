@@ -1,5 +1,3 @@
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -7,6 +5,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
@@ -86,15 +85,20 @@ const HygienePropositionCard = ({
       </div>
     );
   }
-  const totalMensuelText = `${formatNumber(
-    Math.round(proposition.totalAnnuelTrilogie / 12)
-  )} € / mois`;
-  const prixInstallationText = prixInstalDistrib
-    ? `+ ${formatNumber(Math.round(prixInstalDistrib))} € d'installation`
-    : "";
+  const totalMensuelText = (
+    <p className="font-bold text-xl ml-4">
+      {formatNumber(Math.round(proposition.totalAnnuelTrilogie / 12))} €/mois
+    </p>
+  );
 
-  const infosTitle = (
-    <p className={`text-${getFm4AllColor(proposition.gamme)} text-center`}>
+  const prixInstallationText = prixInstalDistrib ? (
+    <p className="font-bold text-xl ml-4">
+      {formatNumber(Math.round(prixInstalDistrib))} € d&apos;installation
+    </p>
+  ) : null;
+
+  const dialogTitle = (
+    <p className={`text-${color} text-center`}>
       {proposition.gamme === "essentiel"
         ? "Essentiel"
         : proposition.gamme === "confort"
@@ -142,18 +146,55 @@ const HygienePropositionCard = ({
   );
 
   const infosProduit = (
-    <div>
-      <p className="text-sm mb-2">
+    <ul className="flex flex-col text-xs px-4 mx-auto">
+      <li className="list-check">
         Distributeurs{" "}
         {gamme === "essentiel"
           ? "blancs basic"
           : gamme === "confort"
           ? "couleur"
           : "inox"}
-      </p>
-      {imgProduit}
-      <p className="text-xs text-end italic">*photos non contractuelles</p>
-    </div>
+      </li>
+      <li className="list-check">Consommables inclus</li>
+      <li className="list-check">
+        {hygiene.infos.dureeLocation === "oneShot"
+          ? ""
+          : `Location engagement
+            ${
+              hygiene.infos.dureeLocation === "pa12M"
+                ? "12"
+                : hygiene.infos.dureeLocation === "pa24M"
+                ? "24"
+                : "36"
+            } mois`}
+      </li>
+    </ul>
+  );
+
+  const infosProduitDialog = (
+    <ul className="flex flex-col text-sm px-4 mx-auto">
+      <li className="list-check">
+        Distributeurs{" "}
+        {gamme === "essentiel"
+          ? "blancs basic"
+          : gamme === "confort"
+          ? "couleur"
+          : "inox"}
+      </li>
+      <li className="list-check">Consommables inclus</li>
+      <li className="list-check">
+        {hygiene.infos.dureeLocation === "oneShot"
+          ? ""
+          : `Location engagement
+            ${
+              hygiene.infos.dureeLocation === "pa12M"
+                ? "12"
+                : hygiene.infos.dureeLocation === "pa24M"
+                ? "24"
+                : "36"
+            } mois`}
+      </li>
+    </ul>
   );
 
   return (
@@ -165,56 +206,33 @@ const HygienePropositionCard = ({
       }`}
       onClick={() => handleClickProposition(proposition)}
     >
-      <Checkbox
+      <Switch
         checked={hygiene.infos.trilogieGammeSelected === gamme}
         onCheckedChange={() => handleClickProposition(proposition)}
-        className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-        aria-label="Sélectionner cette proposition"
+        className="data-[state=checked]:bg-fm4alldestructive"
+        title="Sélectionner cette proposition"
       />
       <div>
         <div className="flex gap-2 items-center">
-          <p className="font-bold">{totalMensuelText}</p>
+          {totalMensuelText}
           <Dialog>
             <DialogTrigger asChild>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="hover:bg-transparent hover:text-slate-200 hover:opacity-80"
+              <Info
+                size={16}
+                className="cursor-pointer"
                 onClick={(e) => e.stopPropagation()}
-                title="Détails de l'offre"
-              >
-                <Info size={16} />
-              </Button>
+              />
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>{infosTitle}</DialogTitle>
+                <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
-              {infosProduit}
+              {imgProduit}
+              {infosProduitDialog}
             </DialogContent>
           </Dialog>
         </div>
-        <p className="text-sm">
-          Distributeurs{" "}
-          {gamme === "essentiel"
-            ? "blancs basic"
-            : gamme === "confort"
-            ? "couleur"
-            : "inox"}
-        </p>
-        <p className="text-sm">Consommables</p>
-        <p className="text-sm">
-          {hygiene.infos.dureeLocation === "oneShot"
-            ? ""
-            : `Location engagement
-                    ${
-                      hygiene.infos.dureeLocation === "pa12M"
-                        ? "12"
-                        : hygiene.infos.dureeLocation === "pa24M"
-                        ? "24"
-                        : "36"
-                    } mois`}
-        </p>
+        {infosProduit}
         {prixInstallationText && (
           <p className="text-base">{prixInstallationText}</p>
         )}

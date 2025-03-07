@@ -12,6 +12,7 @@ import { useContext } from "react";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import HygienePropositions from "./HygienePropositions";
+import { useMediaQuery } from "react-responsive";
 
 type HygieneProps = {
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
@@ -50,6 +51,8 @@ const Hygiene = ({
     }
   };
 
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+
   if (!nettoyage.infos.gammeSelected || !nettoyage.infos.fournisseurId) {
     return null; //pour skiper l'hygiene si pas de nettoyage
   }
@@ -70,7 +73,9 @@ const Hygiene = ({
           hygieneConsosTarifs={hygieneConsosTarifs}
         />
       </div>
-      <PropositionsFooter handleClickNext={handleClickNext} />
+      {isTabletOrMobile ? null : (
+        <PropositionsFooter handleClickNext={handleClickNext} />
+      )}
     </div>
   );
 };

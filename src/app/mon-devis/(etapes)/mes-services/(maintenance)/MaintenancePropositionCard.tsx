@@ -1,7 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -9,6 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { MaintenanceContext } from "@/context/MaintenanceProvider";
 import { formatNumber } from "@/lib/formatNumber";
@@ -82,27 +81,42 @@ const MaintenancePropositionCard = ({
       </div>
     );
   }
-  const totalMensuelText = `${formatNumber(
-    Math.round((proposition.totalAnnuel * MARGE) / 12)
-  )} € / mois`;
-
-  const infosEssentiel = <p>Obligation légale et contrôles règlementaires</p>;
-  const infosConfort = (
-    <p>
-      Essentiel + recommandations ARS, petits travaux d’entretien tous les trois
-      mois
+  const totalMensuelText = (
+    <p className="font-bold text-xl ml-4">
+      {formatNumber(Math.round((proposition.totalAnnuel * MARGE) / 12))} €/mois
     </p>
   );
+
+  const nbPassagesText = <li className="list-check ">{}</li>;
+
+  const infosEssentiel = (
+    <li className="list-check ">
+      Obligation légale et contrôles règlementaires
+    </li>
+  );
+  const infosConfort = (
+    <li className="list-check ">
+      Essentiel + recommandations ARS, petits travaux d’entretien tous les trois
+      mois
+    </li>
+  );
   const infosExcellence = (
-    <p>
+    <li className="list-check ">
       Une à deux fois par mois passage technicien / homme à tout faire pour
       maintenance & petits travaux. Lien technique avec le gestionnaire de
       l’immeuble
-    </p>
+    </li>
   );
 
-  const infosTitle = (
-    <p className={`text-${getFm4AllColor(proposition.gamme)} text-center`}>
+  const infosProduit =
+    gamme === "essentiel"
+      ? infosEssentiel
+      : gamme === "confort"
+      ? infosConfort
+      : infosExcellence;
+
+  const dialogTitle = (
+    <p className={`text-${color} text-center`}>
       {proposition.gamme === "essentiel"
         ? "Essentiel"
         : proposition.gamme === "confort"
@@ -111,15 +125,6 @@ const MaintenancePropositionCard = ({
     </p>
   );
 
-  const infosProduit = (
-    <div className="flex flex-col text-sm my-4">
-      {gamme === "essentiel"
-        ? infosEssentiel
-        : gamme === "confort"
-        ? infosConfort
-        : infosExcellence}
-    </div>
-  );
   return (
     <div
       className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4 cursor-pointer ${
@@ -130,58 +135,37 @@ const MaintenancePropositionCard = ({
       }`}
       onClick={() => handleClickProposition(proposition)}
     >
-      <Checkbox
+      <Switch
         checked={
           maintenance.infos.fournisseurId === proposition.fournisseurId &&
           maintenance.infos.gammeSelected === proposition.gamme
         }
         onCheckedChange={() => handleClickProposition(proposition)}
-        className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-        aria-label="Sélectionner cette proposition"
+        className="data-[state=checked]:bg-fm4alldestructive"
+        title="Sélectionner cette proposition"
       />
       <div>
         <div className="flex gap-2 items-center">
-          <p className="font-bold">{totalMensuelText}</p>
+          {totalMensuelText}
           <Dialog>
             <DialogTrigger asChild>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="hover:bg-transparent hover:text-slate-200 hover:opacity-80"
+              <Info
+                size={16}
+                className="cursor-pointer"
                 onClick={(e) => e.stopPropagation()}
-                title="Détails de l'offre"
-              >
-                <Info size={16} />
-              </Button>
+              />
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>{infosTitle}</DialogTitle>
+                <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
-              {infosProduit}
+              <div className="flex flex-col gap-4 items-center">
+                <ul className="flex flex-col text-sm px-4">{infosProduit}</ul>
+              </div>
             </DialogContent>
           </Dialog>
         </div>
-        <p className="text-sm">
-          {proposition.freqAnnuelle} passage(s) de {proposition.hParPassage} h /
-          an
-        </p>
-        {proposition.gamme === "essentiel" && (
-          <p className="text-sm">+ contrôle Q18</p>
-        )}
-        {proposition.gamme === "confort" && (
-          <>
-            <p className="text-sm">+ contrôle Q18</p>
-            <p className="text-sm">+ contrôle Legio</p>
-          </>
-        )}
-        {proposition.gamme === "excellence" && (
-          <>
-            <p className="text-sm">+ contrôle Q18</p>
-            <p className="text-sm">+ contrôle Legio</p>
-            <p className="text-sm">+ contrôle Qualité Air</p>
-          </>
-        )}
+        <ul className="flex flex-col text-xs ml-4">{infosProduit}</ul>
       </div>
     </div>
   );

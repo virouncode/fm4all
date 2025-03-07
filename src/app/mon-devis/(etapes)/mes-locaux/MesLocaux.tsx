@@ -98,6 +98,62 @@ const MesLocaux = () => {
   const router = useRouter();
   const { toast } = useToast();
 
+  const serviceSearchParams = new URLSearchParams();
+  const sauvegarderSearchParams = new URLSearchParams();
+
+  if (client.effectif) {
+    serviceSearchParams.set("effectif", client.effectif.toString());
+    sauvegarderSearchParams.set("effectif", client.effectif.toString());
+  }
+  if (client.surface) {
+    serviceSearchParams.set("surface", client.surface.toString());
+    sauvegarderSearchParams.set("surface", client.surface.toString());
+  }
+  if (client.typeBatiment) {
+    sauvegarderSearchParams.set("typeBatiment", client.typeBatiment);
+  }
+  if (client.typeOccupation) {
+    sauvegarderSearchParams.set("typeOccupation", client.typeOccupation);
+  }
+
+  const devisRoutes = [
+    {
+      id: 1,
+      url: "/mes-locaux",
+      name: "Mes locaux",
+    },
+    {
+      id: 2,
+      url: `/mes-services?${serviceSearchParams.toString()}`,
+      name: "Mes services",
+    },
+    {
+      id: 3,
+      url: `/food-beverage`,
+      name: "Food & Beverage",
+    },
+    {
+      id: 4,
+      url: `/pilotage-prestations?${serviceSearchParams.toString()}`,
+      name: "Office Management",
+    },
+    {
+      id: 5,
+      url: `/sauvegarder-ma-progression?${sauvegarderSearchParams.toString()}`,
+      name: "Sauvegarder",
+    },
+    {
+      id: 6,
+      url: "/personnaliser-mon-devis",
+      name: "Personnaliser",
+    },
+    {
+      id: 7,
+      url: "/afficher-mon-devis",
+      name: "Afficher mon devis",
+    },
+  ];
+
   const defaultValues: MesLocauxType = {
     surface: client.surface.toString(),
     effectif: client.effectif.toString(),
@@ -244,6 +300,15 @@ const MesLocaux = () => {
     }
   };
 
+  const handleClickReprendre = () => {
+    const route = devisProgress.currentStep
+      ? devisRoutes.find(({ id }) => id === devisProgress.currentStep) ??
+        devisRoutes[0]
+      : devisRoutes[0];
+    const url = route.url;
+    router.push(`/mon-devis${url}`);
+  };
+
   return !loaderVisible ? (
     <Form {...form}>
       <form
@@ -310,18 +375,22 @@ const MesLocaux = () => {
                 <DialogTitle>Devis en cours</DialogTitle>
                 <DialogDescription>
                   Un devis est déjà en cours. Souaitez-vous recommencer un
-                  nouveau devis ? (vos informations actuelles seront perdues)
+                  nouveau devis (vos informations actuelles seront perdues) ou
+                  reprendre ?
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
                 <DialogClose asChild>
-                  <div className="flex gap-4 justify-center">
+                  <div className="flex gap-4 justify-center mx-auto">
                     <Button
                       variant="destructive"
                       onClick={() => form.handleSubmit(submitForm)()}
                     >
                       Nouveau
                     </Button>
+                    {/* <Button variant="outline" onClick={handleClickReprendre}>
+                      Reprendre
+                    </Button> */}
                     <Button variant="outline">Annuler</Button>
                   </div>
                 </DialogClose>

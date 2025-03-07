@@ -7,9 +7,9 @@ import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQ
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs";
 import { ChangeEvent, useContext } from "react";
-import HygieneDistribQuantitesInputs from "./HygieneDistribQuantitesInputs";
-import HygieneFournisseurLogo from "./HygieneFournisseurLogo";
-import HygienePropositionCard from "./HygienePropositionCard";
+import { useMediaQuery } from "react-responsive";
+import HygieneDesktopPropositions from "./(desktop)/HygieneDesktopPropositions";
+import HygieneMobilePropositions from "./(mobile)/HygieneMobilePropositions";
 import {
   getFormattedHygienePropositions,
   getHygieneFournisseurTarifs,
@@ -536,32 +536,36 @@ const HygienePropositions = ({
     }
   };
 
-  return (
-    <div className="h-full flex flex-col border rounded-xl overflow-auto">
-      <div className="flex border-b flex-1">
-        <div className="flex w-1/4 items-center justify-center flex-col p-4">
-          <HygieneFournisseurLogo {...propositions[0]} />
-          <HygieneDistribQuantitesInputs
-            hygieneDistribQuantite={hygieneDistribQuantite}
-            hygieneDistribTarifs={hygieneDistribTarifs}
-            handleChangeDistribNbr={handleChangeDistribNbr}
-            handleChangeDureeLocation={handleChangeDureeLocation}
-            nbDistribEmp={nbDistribEmp}
-            nbDistribSavon={nbDistribSavon}
-            nbDistribPh={nbDistribPh}
-            dureeLocation={dureeLocation}
-          />
-        </div>
-        {propositions.map((proposition) => (
-          <HygienePropositionCard
-            key={proposition.gamme}
-            proposition={proposition}
-            handleClickProposition={handleClickProposition}
-            prixInstalDistrib={prixInstalDistrib}
-          />
-        ))}
-      </div>
-    </div>
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+
+  return isTabletOrMobile ? (
+    <HygieneMobilePropositions
+      hygieneDistribQuantite={hygieneDistribQuantite}
+      hygieneDistribTarifs={hygieneDistribTarifs}
+      handleChangeDistribNbr={handleChangeDistribNbr}
+      handleChangeDureeLocation={handleChangeDureeLocation}
+      nbDistribEmp={nbDistribEmp}
+      nbDistribSavon={nbDistribSavon}
+      nbDistribPh={nbDistribPh}
+      dureeLocation={dureeLocation}
+      prixInstalDistrib={prixInstalDistrib}
+      propositions={propositions}
+      handleClickProposition={handleClickProposition}
+    />
+  ) : (
+    <HygieneDesktopPropositions
+      hygieneDistribQuantite={hygieneDistribQuantite}
+      hygieneDistribTarifs={hygieneDistribTarifs}
+      handleChangeDistribNbr={handleChangeDistribNbr}
+      handleChangeDureeLocation={handleChangeDureeLocation}
+      nbDistribEmp={nbDistribEmp}
+      nbDistribSavon={nbDistribSavon}
+      nbDistribPh={nbDistribPh}
+      dureeLocation={dureeLocation}
+      prixInstalDistrib={prixInstalDistrib}
+      propositions={propositions}
+      handleClickProposition={handleClickProposition}
+    />
   );
 };
 

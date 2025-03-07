@@ -14,8 +14,8 @@ import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
 import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
+import NettoyageMobilePropositions from "../(mobile)/NettoyageMobilePropositions";
 import NettoyageDesktopPropositions from "./NettoyageDesktopPropositions";
-import NettoyageMobilePropositions from "./NettoyageMobilePropositions";
 
 type NettoyagePropositionsProps = {
   nettoyageQuantites: SelectNettoyageQuantitesType[];

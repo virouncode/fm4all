@@ -1,15 +1,18 @@
-import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
+import { Info } from "lucide-react";
+import Image from "next/image";
 import { useContext } from "react";
 import { MAX_PASSAGES_VITRERIE } from "./NettoyageOptionsPropositions";
 
@@ -65,27 +68,30 @@ const NettoyageOptionsVitrerieCard = ({
   color,
 }: NettoyageOptionsVitrerieCardProps) => {
   const { nettoyage } = useContext(NettoyageContext);
-
-  const vitreriePrixMensuelText = vitrerieProposition.prixAnnuel
-    ? `${formatNumber(
-        Math.round((vitrerieProposition.prixAnnuel * MARGE) / 12)
-      )} € / mois`
-    : "Non proposé";
-  const nbPassagesVitrerieText = `${nettoyage.quantites.nbPassagesVitrerie} passages / an`;
+  const vitreriePrixMensuelText = vitrerieProposition.prixAnnuel ? (
+    <p className="font-bold text-xl ml-4">
+      {formatNumber(Math.round((vitrerieProposition.prixAnnuel * MARGE) / 12))}{" "}
+      €/mois
+    </p>
+  ) : (
+    <p className="font-bold text-base">Non proposé</p>
+  );
+  const nbPassagesVitrerieText = (
+    <li className="list-check">
+      {nettoyage.quantites.nbPassagesVitrerie} passages / an
+    </li>
+  );
+  const infosProduit = (
+    <li className="list-check">Vitres et cloisons accessibles de plain-pied</li>
+  );
+  const dialogTitle = (
+    <p className={`text-${color} text-center`}>Lavage Vitrerie</p>
+  );
   return (
     <div className="flex border-b flex-1">
       <div className="flex w-1/4 items-center justify-center p-4">
         <div className="flex flex-col gap-2 items-center justify-center w-full">
-          <TooltipProvider delayDuration={0}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <p className="text-base">Lavage Vitrerie*</p>
-              </TooltipTrigger>
-              <TooltipContent className="max-w-60">
-                Vitres accessibles et cloisons
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          Lavage Vitrerie
           <div className="flex gap-4 items-center justify-center w-full">
             <Input
               type="number"
@@ -109,35 +115,67 @@ const NettoyageOptionsVitrerieCard = ({
           </p>
         </div>
       </div>
-      {vitrerieProposition.prixAnnuel ? (
-        <div
-          className={`flex w-3/4 items-center p-4 justify-center ${
-            nettoyage.infos.vitrerieSelected
-              ? "ring-4 ring-inset ring-fm4alldestructive"
-              : ""
-          } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
-          onClick={() => handleClickVitrerieProposition(vitrerieProposition)}
-        >
-          <Checkbox
+      <div
+        className={`flex w-3/4 items-center p-4 justify-center ${
+          nettoyage.infos.vitrerieSelected
+            ? "ring-4 ring-inset ring-fm4alldestructive"
+            : ""
+        } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
+        onClick={
+          vitrerieProposition.prixAnnuel
+            ? () => handleClickVitrerieProposition(vitrerieProposition)
+            : undefined
+        }
+      >
+        {vitrerieProposition.prixAnnuel && (
+          <Switch
             checked={nettoyage.infos.vitrerieSelected}
             onCheckedChange={() =>
               handleClickVitrerieProposition(vitrerieProposition)
             }
-            className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-            aria-label="Sélectionner cette proposition"
+            className="data-[state=checked]:bg-fm4alldestructive"
+            title="Sélectionner cette proposition"
           />
-          <div>
-            <p className="font-bold">{vitreriePrixMensuelText}</p>
-            <p className="text-sm">{nbPassagesVitrerieText}</p>
+        )}
+        <div>
+          <div className="flex gap-2 items-center">
+            {vitreriePrixMensuelText}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Info
+                  size={16}
+                  className="cursor-pointer"
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>{dialogTitle}</DialogTitle>
+                </DialogHeader>
+                <div className="flex flex-col gap-4 items-center">
+                  <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+                    <Image
+                      src={"/img/services/nettoyage.webp"}
+                      alt={`illustration de nettoyage`}
+                      fill={true}
+                      className="object-contain object-center cursor-pointer"
+                      quality={100}
+                    />
+                  </div>
+                  <ul className="flex flex-col text-sm px-4">
+                    {infosProduit}
+                    {nbPassagesVitrerieText}
+                  </ul>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
+          <ul className="flex flex-col text-xs ml-4">
+            {infosProduit}
+            {nbPassagesVitrerieText}
+          </ul>
         </div>
-      ) : (
-        <div
-          className={`flex w-3/4 items-center p-4 justify-center bg-${color} text-slate-200 items-center justify-center text-2xl gap-4`}
-        >
-          Non proposé
-        </div>
-      )}
+      </div>
     </div>
   );
 };
