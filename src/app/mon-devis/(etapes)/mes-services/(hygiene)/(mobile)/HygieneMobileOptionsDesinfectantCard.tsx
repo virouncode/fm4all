@@ -9,74 +9,80 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
+import { MARGE } from "@/constants/constants";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import Image from "next/image";
 import { useContext } from "react";
 
-type HygieneMobilePropositionCardProps = {
+type HygieneMobileOptionsDesinfectantCardProps = {
   proposition: {
-    gamme: "essentiel" | "confort" | "excellence";
     nomFournisseur: string;
     sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
     anneeCreation: number | null;
+    logoUrl: string | null;
     ca: string | null;
     effectifFournisseur: string | null;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
-    nbDistribEmp: number;
-    nbDistribSavon: number;
-    nbDistribPh: number;
-    prixDistribEmp: number | null;
-    prixDistribEmpPoubelle: number | null;
-    prixDistribSavon: number | null;
-    prixDistribPh: number | null;
-    prixInstalDistrib: number | null;
-    totalAnnuelTrilogie: number | null;
-    imageUrlEmp: string | null;
-    imageUrlSavon: string | null;
-    imageUrlPh: string | null;
+    locationUrl: string | null;
+    gamme: "essentiel" | "confort" | "excellence";
+    prixDistribDesinfectant: number | null;
+    prixDistribParfum: number | null;
+    prixDistribBalai: number | null;
+    prixDistribPoubelle: number | null;
+    paParPersonneDesinfectant: number | null;
+    totalDesinfectant: number | null;
+    totalParfum: number | null;
+    totalBalai: number | null;
+    totalPoubelle: number | null;
+    imageUrlDesinfectant: string | null;
+    imageUrlParfum: string | null;
+    imageUrlBalai: string | null;
+    imageUrlPoubelle: string | null;
   };
-  handleClickProposition: (proposition: {
-    gamme: "essentiel" | "confort" | "excellence";
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    nbDistribEmp: number;
-    nbDistribSavon: number;
-    nbDistribPh: number;
-    prixDistribEmp: number | null;
-    prixDistribEmpPoubelle: number | null;
-    prixDistribSavon: number | null;
-    prixDistribPh: number | null;
-    prixInstalDistrib: number | null;
-    totalAnnuelTrilogie: number | null;
-    imageUrlEmp: string | null;
-    imageUrlSavon: string | null;
-    imageUrlPh: string | null;
-  }) => void;
-  prixInstalDistrib: number | null;
+  handleClickProposition: (
+    type: string,
+    proposition: {
+      nomFournisseur: string;
+      sloganFournisseur: string | null;
+      anneeCreation: number | null;
+      logoUrl: string | null;
+      ca: string | null;
+      effectifFournisseur: string | null;
+      nbClients: number | null;
+      noteGoogle: string | null;
+      nbAvis: number | null;
+      locationUrl: string | null;
+      gamme: "essentiel" | "confort" | "excellence";
+      prixDistribDesinfectant: number | null;
+      prixDistribParfum: number | null;
+      prixDistribBalai: number | null;
+      prixDistribPoubelle: number | null;
+      paParPersonneDesinfectant: number | null;
+      totalDesinfectant: number | null;
+      totalParfum: number | null;
+      totalBalai: number | null;
+      totalPoubelle: number | null;
+      imageUrlDesinfectant: string | null;
+      imageUrlParfum: string | null;
+      imageUrlBalai: string | null;
+      imageUrlPoubelle: string | null;
+    }
+  ) => void;
 };
 
-const HygieneMobilePropositionCard = ({
+const HygieneMobileOptionsDesinfectantCard = ({
   proposition,
   handleClickProposition,
-  prixInstalDistrib,
-}: HygieneMobilePropositionCardProps) => {
+}: HygieneMobileOptionsDesinfectantCardProps) => {
   const { hygiene } = useContext(HygieneContext);
   const {
     gamme,
+    imageUrlDesinfectant,
+    totalDesinfectant,
     nomFournisseur,
     sloganFournisseur,
     logoUrl,
@@ -89,29 +95,14 @@ const HygieneMobilePropositionCard = ({
     nbAvis,
   } = proposition;
   const color = getFm4AllColor(gamme);
-
-  // if (!proposition.totalAnnuelTrilogie) {
-  //   return (
-  //     <div
-  //       className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 p-4`}
-  //     >
-  //       Non proposé
-  //     </div>
-  //   );
-  // }
-
-  const totalMensuelText = proposition.totalAnnuelTrilogie ? (
+  const prixMensuelDesinfectantText = totalDesinfectant ? (
     <p className="text-sm font-bold">
-      {formatNumber(Math.round(proposition.totalAnnuelTrilogie / 12))} €/mois
+      {formatNumber(Math.round((totalDesinfectant * MARGE) / 12))} €/mois
     </p>
   ) : (
     <p className="text-sm font-bold">Non proposé</p>
   );
-  const prixInstallationText = prixInstalDistrib ? (
-    <p className="text-xs">
-      +{formatNumber(Math.round(prixInstalDistrib))} € d&apos;installation
-    </p>
-  ) : null;
+
   const infosTitle = (
     <p className={`text-${color} text-center`}>
       {gamme === "essentiel"
@@ -121,59 +112,31 @@ const HygieneMobilePropositionCard = ({
         : "Excellence"}
     </p>
   );
+
   const imgProduit = (
-    <div className="w-1/3 h-full relative rounded-xl overflow-hidden bg-slate-200">
+    <div className="w-1/3 h-full relative rounded-xl overflow-hidden">
       <Image
-        src={
-          proposition.imageUrlEmp ||
-          proposition.imageUrlSavon ||
-          proposition.imageUrlPh ||
-          "/img/services/hygiene.webp"
-        }
-        alt={`illustration de nettoyage`}
+        src={`${imageUrlDesinfectant || "/img/services/hygiene.webp"}`}
+        alt={`illustration de distributeur de desinfectant`}
         fill={true}
-        className="object-contain cursor-pointer"
+        className="object-cover cursor-pointer"
         quality={100}
       />
     </div>
   );
+
   const imgProduitDialog = (
-    <div className="flex items-center justify-between gap-2 w-full">
-      {proposition.imageUrlEmp ? (
-        <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-100">
-          <Image
-            src={proposition.imageUrlEmp}
-            alt="illustration-essuie-mains-papier"
-            fill
-            quality={100}
-            className="object-contain"
-          />
-        </div>
-      ) : null}
-      {proposition.imageUrlPh ? (
-        <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-100">
-          <Image
-            src={proposition.imageUrlPh}
-            alt="illustration-ditributeur-papier-hygiénique"
-            fill
-            quality={100}
-            className="object-contain"
-          />
-        </div>
-      ) : null}
-      {proposition.imageUrlSavon ? (
-        <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-100">
-          <Image
-            src={proposition.imageUrlSavon}
-            alt="illustration-ditributeur-savon"
-            fill
-            quality={100}
-            className="object-contain"
-          />
-        </div>
-      ) : null}
+    <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+      <Image
+        src={`${imageUrlDesinfectant || "/img/services/hygiene.webp"}`}
+        alt={`illustration de distributeur de desinfectant`}
+        fill={true}
+        className="object-cover cursor-pointer"
+        quality={100}
+      />
     </div>
   );
+
   const infosProduit = (
     <ul className="flex flex-col text-xs px-4">
       <li className="list-check">
@@ -224,11 +187,12 @@ const HygieneMobilePropositionCard = ({
       </li>
     </ul>
   );
+
   return (
     <CarouselItem>
       <div
         className={`bg-${color} flex flex-col h-56 border border-slate-200 rounded-xl p-4 text-white  ${
-          hygiene.infos.trilogieGammeSelected === gamme
+          hygiene.infos.desinfectantGammeSelected === gamme
             ? "ring-4 ring-inset ring-fm4alldestructive"
             : ""
         }`}
@@ -292,17 +256,18 @@ const HygieneMobilePropositionCard = ({
         <div className="flex h-1/2 pt-2 justify-between">
           {infosProduit}
           <div className="flex flex-col gap-2 items-end">
-            {totalMensuelText}
-            {prixInstallationText}
-            {proposition.totalAnnuelTrilogie ? (
+            {prixMensuelDesinfectantText}
+            {totalDesinfectant ? (
               <Switch
                 className={`${
-                  hygiene.infos.trilogieGammeSelected === gamme
+                  hygiene.infos.desinfectantGammeSelected === gamme
                     ? "data-[state=checked]:bg-fm4alldestructive"
                     : ""
                 }`}
-                checked={hygiene.infos.trilogieGammeSelected === gamme}
-                onCheckedChange={() => handleClickProposition(proposition)}
+                checked={hygiene.infos.desinfectantGammeSelected === gamme}
+                onCheckedChange={() =>
+                  handleClickProposition("desinfectant", proposition)
+                }
                 title="Sélectionnez cette proposition"
               />
             ) : null}
@@ -313,4 +278,4 @@ const HygieneMobilePropositionCard = ({
   );
 };
 
-export default HygieneMobilePropositionCard;
+export default HygieneMobileOptionsDesinfectantCard;

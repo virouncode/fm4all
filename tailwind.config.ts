@@ -19,6 +19,7 @@ export default {
         handshake: '"🤝  "',
         smile: '"😊  "',
         check: '"✓  "',
+        finger: '"👉  "',
       },
       colors: {
         background: "hsl(var(--background))",

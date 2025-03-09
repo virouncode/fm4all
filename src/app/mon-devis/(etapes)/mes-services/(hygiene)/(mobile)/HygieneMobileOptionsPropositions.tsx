@@ -17,6 +17,16 @@ type HygieneMobielOptionsPropositionsProps = {
     type: string
   ) => void;
   propositions: {
+    nomFournisseur: string;
+    sloganFournisseur: string | null;
+    anneeCreation: number | null;
+    logoUrl: string | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
+    locationUrl: string | null;
     gamme: "essentiel" | "confort" | "excellence";
     prixDistribDesinfectant: number | null;
     prixDistribParfum: number | null;
@@ -35,6 +45,16 @@ type HygieneMobielOptionsPropositionsProps = {
   handleClickProposition: (
     type: string,
     proposition: {
+      nomFournisseur: string;
+      sloganFournisseur: string | null;
+      anneeCreation: number | null;
+      logoUrl: string | null;
+      ca: string | null;
+      effectifFournisseur: string | null;
+      nbClients: number | null;
+      noteGoogle: string | null;
+      nbAvis: number | null;
+      locationUrl: string | null;
       gamme: "essentiel" | "confort" | "excellence";
       prixDistribDesinfectant: number | null;
       prixDistribParfum: number | null;
@@ -79,6 +99,7 @@ const HygieneMobileOptionsPropositions = ({
         hygieneDistribQuantite={hygieneDistribQuantite}
         handleClickProposition={handleClickProposition}
       />
+
       <HygieneMobileOptionsBalai
         nbDistribBalai={nbDistribBalai}
         handleChangeDistribNbr={handleChangeDistribNbr}
@@ -86,6 +107,7 @@ const HygieneMobileOptionsPropositions = ({
         hygieneDistribQuantite={hygieneDistribQuantite}
         handleClickProposition={handleClickProposition}
       />
+
       <HygieneMobileOptionsPoubelle
         nbDistribPoubelle={nbDistribPoubelle}
         handleChangeDistribNbr={handleChangeDistribNbr}

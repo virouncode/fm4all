@@ -11,6 +11,16 @@ type HygieneMobileOptionsParfumProps = {
     type: string
   ) => void;
   propositions: {
+    nomFournisseur: string;
+    sloganFournisseur: string | null;
+    anneeCreation: number | null;
+    logoUrl: string | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
+    locationUrl: string | null;
     gamme: "essentiel" | "confort" | "excellence";
     prixDistribDesinfectant: number | null;
     prixDistribParfum: number | null;
@@ -29,6 +39,16 @@ type HygieneMobileOptionsParfumProps = {
   handleClickProposition: (
     type: string,
     proposition: {
+      nomFournisseur: string;
+      sloganFournisseur: string | null;
+      anneeCreation: number | null;
+      logoUrl: string | null;
+      ca: string | null;
+      effectifFournisseur: string | null;
+      nbClients: number | null;
+      noteGoogle: string | null;
+      nbAvis: number | null;
+      locationUrl: string | null;
       gamme: "essentiel" | "confort" | "excellence";
       prixDistribDesinfectant: number | null;
       prixDistribParfum: number | null;

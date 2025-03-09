@@ -14,7 +14,6 @@ import { MARGE } from "@/constants/constants";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
-import { GammeType } from "@/zod-schemas/gamme";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { Info } from "lucide-react";
 import Image from "next/image";
@@ -25,7 +24,17 @@ type HygieneOptionsPoubelleCardProps = {
   handleClickProposition: (
     type: string,
     proposition: {
-      gamme: GammeType;
+      nomFournisseur: string;
+      sloganFournisseur: string | null;
+      anneeCreation: number | null;
+      logoUrl: string | null;
+      ca: string | null;
+      effectifFournisseur: string | null;
+      nbClients: number | null;
+      noteGoogle: string | null;
+      nbAvis: number | null;
+      locationUrl: string | null;
+      gamme: "essentiel" | "confort" | "excellence";
       prixDistribDesinfectant: number | null;
       prixDistribParfum: number | null;
       prixDistribBalai: number | null;
@@ -47,7 +56,17 @@ type HygieneOptionsPoubelleCardProps = {
   ) => void;
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
   propositions: {
-    gamme: GammeType;
+    nomFournisseur: string;
+    sloganFournisseur: string | null;
+    anneeCreation: number | null;
+    logoUrl: string | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
+    locationUrl: string | null;
+    gamme: "essentiel" | "confort" | "excellence";
     prixDistribDesinfectant: number | null;
     prixDistribParfum: number | null;
     prixDistribBalai: number | null;

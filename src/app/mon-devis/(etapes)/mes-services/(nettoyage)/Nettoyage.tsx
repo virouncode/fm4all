@@ -71,7 +71,7 @@ const Nettoyage = ({
     >
       <PropositionsTitle
         title="Nettoyage et propreté"
-        description="D’un nettoyage essentiel à une expérience 5 étoiles, choisissez la prestation propreté qui vous ressemble."
+        description="D’un nettoyage essentiel à une expérience 5 étoiles, choisissez la prestation propreté qui vous ressemble. La gamme détermine la fréquence de passage et la cadence de nettoyage."
         icon={SprayCan}
         handleClickPrevious={handleClickPrevious}
       />

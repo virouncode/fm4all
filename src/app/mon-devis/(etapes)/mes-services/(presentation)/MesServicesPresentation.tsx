@@ -34,20 +34,23 @@ const MesServicesPresentation = () => {
           </p>
           <MesServicesPresentationCards />
           <div>
-            <p>
-              Cliquez sur le <strong>logo du prestataire</strong>{" "}
-              <SquareArrowOutUpRight
-                size={16}
-                className="hidden lg:inline-block"
-              />{" "}
-              pour plus d&apos;informations sur l&apos;entreprise.
-            </p>
-            <p>
-              Pour chaque offre, <strong>cliquez sur </strong>{" "}
-              <Info className="hidden lg:inline-block" size={14} />
-              <span className="lg:hidden font-bold">la photo</span> pour en
-              savoir plus et sélectionnez l&apos;offre qui vous convient.
-            </p>
+            <p className="mb-2">Pour chaque offre : </p>
+            <ul className="ml-10">
+              <li className="list-finger">
+                Cliquez sur le <strong>logo du prestataire</strong>{" "}
+                <SquareArrowOutUpRight
+                  size={16}
+                  className="hidden lg:inline-block"
+                />{" "}
+                pour plus d&apos;informations sur l&apos;entreprise.
+              </li>
+              <li className="list-finger">
+                Cliquez sur{" "}
+                <Info className="hidden lg:inline-block" size={14} />
+                <span className="lg:hidden font-bold">la photo</span> pour en
+                savoir plus et sélectionnez l&apos;offre qui vous convient.
+              </li>
+            </ul>
           </div>
           {isTabletOrMobile ? (
             <MesServicesPresentationGammesCarousel />

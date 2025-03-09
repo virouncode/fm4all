@@ -29,14 +29,14 @@ const HygieneOptionsPropositions = ({
   const { setTotalHygiene } = useContext(TotalHygieneContext);
   //Formatter les propositions d'options en hygiene
   const nbDistribDesinfectant =
-    hygiene.quantites.nbDistribDesinfectant ||
+    hygiene.quantites.nbDistribDesinfectant ??
     hygieneDistribQuantite.nbDistribDesinfectant;
   const nbDistribParfum =
-    hygiene.quantites.nbDistribParfum || hygieneDistribQuantite.nbDistribParfum;
+    hygiene.quantites.nbDistribParfum ?? hygieneDistribQuantite.nbDistribParfum;
   const nbDistribBalai =
-    hygiene.quantites.nbDistribBalai || hygieneDistribQuantite.nbDistribBalai;
+    hygiene.quantites.nbDistribBalai ?? hygieneDistribQuantite.nbDistribBalai;
   const nbDistribPoubelle =
-    hygiene.quantites.nbDistribPoubelle ||
+    hygiene.quantites.nbDistribPoubelle ??
     hygieneDistribQuantite.nbDistribPoubelle;
   const dureeLocation = hygiene.infos.dureeLocation;
   const { hygieneDistribTarifsFournisseur, paParPersonneDesinfectant } =
@@ -83,20 +83,47 @@ const HygieneOptionsPropositions = ({
       )?.imageUrl ?? null;
 
     const totalDesinfectant =
-      paParPersonneDesinfectant !== null && prixDistribDesinfectant !== null
+      paParPersonneDesinfectant !== null &&
+      prixDistribDesinfectant !== null &&
+      nbDistribDesinfectant
         ? nbDistribDesinfectant * prixDistribDesinfectant +
           paParPersonneDesinfectant * (client.effectif ?? 0)
         : null;
     const totalParfum =
-      prixDistribParfum !== null ? nbDistribParfum * prixDistribParfum : null;
+      prixDistribParfum !== null && nbDistribParfum
+        ? nbDistribParfum * prixDistribParfum
+        : null;
     const totalBalai =
-      prixDistribBalai !== null ? nbDistribBalai * prixDistribBalai : null;
+      prixDistribBalai !== null && nbDistribBalai
+        ? nbDistribBalai * prixDistribBalai
+        : null;
     const totalPoubelle =
-      prixDistribPoubelle !== null
+      prixDistribPoubelle !== null && nbDistribPoubelle
         ? nbDistribPoubelle * prixDistribPoubelle
         : null;
 
+    const nomFournisseur = hygieneDistribTarifsFournisseur[0].nomFournisseur;
+    const sloganFournisseur = hygieneDistribTarifsFournisseur[0].slogan;
+    const anneeCreation = hygieneDistribTarifsFournisseur[0].anneeCreation;
+    const logoUrl = hygieneDistribTarifsFournisseur[0].logoUrl;
+    const ca = hygieneDistribTarifsFournisseur[0].ca;
+    const effectifFournisseur = hygieneDistribTarifsFournisseur[0].effectif;
+    const nbClients = hygieneDistribTarifsFournisseur[0].nbClients;
+    const noteGoogle = hygieneDistribTarifsFournisseur[0].noteGoogle;
+    const nbAvis = hygieneDistribTarifsFournisseur[0].nbAvis;
+    const locationUrl = hygieneDistribTarifsFournisseur[0].locationUrl;
+
     return {
+      nomFournisseur,
+      sloganFournisseur,
+      anneeCreation,
+      logoUrl,
+      ca,
+      effectifFournisseur,
+      nbClients,
+      noteGoogle,
+      nbAvis,
+      locationUrl,
       gamme,
       prixDistribDesinfectant,
       prixDistribParfum,
@@ -117,6 +144,16 @@ const HygieneOptionsPropositions = ({
   const handleClickProposition = (
     type: string,
     proposition: {
+      nomFournisseur: string;
+      sloganFournisseur: string | null;
+      anneeCreation: number | null;
+      logoUrl: string | null;
+      ca: string | null;
+      effectifFournisseur: string | null;
+      nbClients: number | null;
+      noteGoogle: string | null;
+      nbAvis: number | null;
+      locationUrl: string | null;
       gamme: "essentiel" | "confort" | "excellence";
       prixDistribDesinfectant: number | null;
       prixDistribParfum: number | null;

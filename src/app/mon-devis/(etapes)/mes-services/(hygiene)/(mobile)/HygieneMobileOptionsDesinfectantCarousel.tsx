@@ -1,8 +1,25 @@
+import CarouselGammesDots from "@/components/CarouselGammesDots";
+import {
+  Carousel,
+  CarouselApi,
+  CarouselContent,
+} from "@/components/ui/carousel";
 import { HygieneContext } from "@/context/HygieneProvider";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
+import HygieneMobileOptionsDesinfectantCard from "./HygieneMobileOptionsDesinfectantCard";
 
 type HygieneMobileOptionsDesinfectantCarouselProps = {
   propositions: {
+    nomFournisseur: string;
+    sloganFournisseur: string | null;
+    anneeCreation: number | null;
+    logoUrl: string | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
+    locationUrl: string | null;
     gamme: "essentiel" | "confort" | "excellence";
     prixDistribDesinfectant: number | null;
     prixDistribParfum: number | null;
@@ -21,6 +38,16 @@ type HygieneMobileOptionsDesinfectantCarouselProps = {
   handleClickProposition: (
     type: string,
     proposition: {
+      nomFournisseur: string;
+      sloganFournisseur: string | null;
+      anneeCreation: number | null;
+      logoUrl: string | null;
+      ca: string | null;
+      effectifFournisseur: string | null;
+      nbClients: number | null;
+      noteGoogle: string | null;
+      nbAvis: number | null;
+      locationUrl: string | null;
       gamme: "essentiel" | "confort" | "excellence";
       prixDistribDesinfectant: number | null;
       prixDistribParfum: number | null;
@@ -44,8 +71,58 @@ const HygieneMobileOptionsDesinfectantCarousel = ({
   handleClickProposition,
 }: HygieneMobileOptionsDesinfectantCarouselProps) => {
   const { hygiene } = useContext(HygieneContext);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [api, setApi] = useState<CarouselApi>();
 
-  return <div></div>;
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
+    api.on("select", () => {
+      setCurrentIndex(api.selectedScrollSnap());
+    });
+  }, [api]);
+
+  useEffect(() => {
+    if (!hygiene.infos.fournisseurId && !api) {
+      return;
+    }
+    if (hygiene.infos.desinfectantGammeSelected) {
+      api?.scrollTo(
+        hygiene.infos.desinfectantGammeSelected === "essentiel"
+          ? 0
+          : hygiene.infos.desinfectantGammeSelected === "confort"
+          ? 1
+          : 2
+      );
+    }
+  }, [
+    api,
+    hygiene.infos.desinfectantGammeSelected,
+    hygiene.infos.fournisseurId,
+  ]);
+
+  return (
+    <Carousel
+      opts={{
+        align: "start",
+        loop: true,
+      }}
+      className="w-full relative"
+      setApi={setApi}
+    >
+      <CarouselContent>
+        {propositions.map((proposition) => (
+          <HygieneMobileOptionsDesinfectantCard
+            proposition={proposition}
+            handleClickProposition={handleClickProposition}
+            key={"desinfectant" + proposition.gamme}
+          />
+        ))}
+      </CarouselContent>
+      <CarouselGammesDots currentIndex={currentIndex} />
+    </Carousel>
+  );
 };
 
 export default HygieneMobileOptionsDesinfectantCarousel;

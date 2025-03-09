@@ -1,7 +1,7 @@
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { ChangeEvent } from "react";
-import HygieneMobileOptionsBalaiInput from "./HygieneMobileOptionsBalaiInput";
 import HygieneMobileOptionsBalaiCarousel from "./HygieneMobileOptionsBalaiCarousel";
+import HygieneMobileOptionsBalaiInput from "./HygieneMobileOptionsBalaiInput";
 
 type HygieneMobileOptionsBalaiProps = {
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
@@ -11,6 +11,16 @@ type HygieneMobileOptionsBalaiProps = {
     type: string
   ) => void;
   propositions: {
+    nomFournisseur: string;
+    sloganFournisseur: string | null;
+    anneeCreation: number | null;
+    logoUrl: string | null;
+    ca: string | null;
+    effectifFournisseur: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
+    locationUrl: string | null;
     gamme: "essentiel" | "confort" | "excellence";
     prixDistribDesinfectant: number | null;
     prixDistribParfum: number | null;
@@ -29,6 +39,16 @@ type HygieneMobileOptionsBalaiProps = {
   handleClickProposition: (
     type: string,
     proposition: {
+      nomFournisseur: string;
+      sloganFournisseur: string | null;
+      anneeCreation: number | null;
+      logoUrl: string | null;
+      ca: string | null;
+      effectifFournisseur: string | null;
+      nbClients: number | null;
+      noteGoogle: string | null;
+      nbAvis: number | null;
+      locationUrl: string | null;
       gamme: "essentiel" | "confort" | "excellence";
       prixDistribDesinfectant: number | null;
       prixDistribParfum: number | null;
