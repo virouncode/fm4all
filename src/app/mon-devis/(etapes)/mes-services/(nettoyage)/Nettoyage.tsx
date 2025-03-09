@@ -1,4 +1,5 @@
 "use client";
+import PropositionsTitleMobile from "@/app/mon-devis/PropositionsTitleMobile";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import useScrollIntoService from "@/hooks/use-scroll-into-service";
@@ -67,14 +68,25 @@ const Nettoyage = ({
 
   return (
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="1">
-      <PropositionsTitle
-        title="Nettoyage et propreté"
-        description="D’un nettoyage essentiel à une expérience 5 étoiles, choisissez la prestation propreté qui vous ressemble. La gamme détermine la fréquence de passage et la cadence de nettoyage."
-        icon={SprayCan}
-        handleClickPrevious={handleClickPrevious}
-        propositionsRef={propositionsRef}
-      />
-      <div className="w-full lg:flex-1 overflow-auto" ref={propositionsRef}>
+      {isTabletOrMobile ? (
+        <PropositionsTitleMobile
+          title="Nettoyage et propreté"
+          description="D’un nettoyage essentiel à une expérience 5 étoiles, choisissez la prestation propreté qui vous ressemble. La gamme détermine la fréquence de passage et la cadence de nettoyage."
+          icon={SprayCan}
+          propositionsRef={propositionsRef}
+        />
+      ) : (
+        <PropositionsTitle
+          title="Nettoyage et propreté"
+          description="D’un nettoyage essentiel à une expérience 5 étoiles, choisissez la prestation propreté qui vous ressemble. La gamme détermine la fréquence de passage et la cadence de nettoyage."
+          icon={SprayCan}
+          handleClickPrevious={handleClickPrevious}
+        />
+      )}
+      <div
+        className="w-full flex-1 overflow-auto transition"
+        ref={propositionsRef}
+      >
         <NettoyagePropositions
           nettoyageQuantites={nettoyageQuantites}
           nettoyageTarifs={nettoyageTarifs}

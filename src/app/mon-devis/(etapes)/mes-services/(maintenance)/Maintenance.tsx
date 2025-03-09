@@ -1,4 +1,5 @@
 "use client";
+import PropositionsTitleMobile from "@/app/mon-devis/PropositionsTitleMobile";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
@@ -8,7 +9,7 @@ import { SelectMaintenanceTarifsType } from "@/zod-schemas/maintenanceTarifs";
 import { SelectQ18TarifsType } from "@/zod-schemas/q18Tarifs";
 import { SelectQualiteAirTarifsType } from "@/zod-schemas/qualiteAirTarifs";
 import { Wrench } from "lucide-react";
-import { useContext } from "react";
+import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
@@ -32,6 +33,7 @@ const Maintenance = ({
   const { hygiene } = useContext(HygieneContext);
   const { nettoyage } = useContext(NettoyageContext);
   const { setServices } = useContext(ServicesContext);
+  const propositionsRef = useRef<HTMLDivElement>(null);
 
   const handleClickNext = () => {
     setServices((prev) => ({
@@ -65,14 +67,23 @@ const Maintenance = ({
 
   return (
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="5">
-      <PropositionsTitle
-        title="Maintenance"
-        description="Obligations légales & veille réglementaire, bien-être, petits travaux, lien avec le gestionnaire de l’immeuble... déléguez la maintenance et le suivi de vos contrôles."
-        icon={Wrench}
-        handleClickPrevious={handleClickPrevious}
-      />
+      {isTabletOrMobile ? (
+        <PropositionsTitleMobile
+          title="Maintenance"
+          description="Obligations légales & veille réglementaire, bien-être, petits travaux, lien avec le gestionnaire de l’immeuble... déléguez la maintenance et le suivi de vos contrôles."
+          icon={Wrench}
+          propositionsRef={propositionsRef}
+        />
+      ) : (
+        <PropositionsTitle
+          title="Maintenance"
+          description="Obligations légales & veille réglementaire, bien-être, petits travaux, lien avec le gestionnaire de l’immeuble... déléguez la maintenance et le suivi de vos contrôles."
+          icon={Wrench}
+          handleClickPrevious={handleClickPrevious}
+        />
+      )}
       {maintenanceQuantites && maintenanceTarifs && (
-        <div className="w-full flex-1 overflow-auto">
+        <div className="w-full flex-1 overflow-auto" ref={propositionsRef}>
           <MaintenancePropositions
             maintenanceQuantites={maintenanceQuantites}
             maintenanceTarifs={maintenanceTarifs}

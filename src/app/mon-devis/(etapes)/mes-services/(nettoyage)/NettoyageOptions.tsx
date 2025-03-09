@@ -1,12 +1,13 @@
 "use client";
 
+import PropositionsTitleMobile from "@/app/mon-devis/PropositionsTitleMobile";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import { SelectRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
 import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
 import { SprayCan } from "lucide-react";
-import { useContext } from "react";
+import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import { capitalize } from "../../../../../lib/capitalize";
 import PropositionsFooter from "../../../PropositionsFooter";
@@ -27,6 +28,7 @@ const NettoyageOptions = ({
   const { nettoyage } = useContext(NettoyageContext);
   const { setServices } = useContext(ServicesContext);
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+  const propositionsRef = useRef<HTMLDivElement>(null);
 
   const handleClickPrevious = () => {
     setServices((prev) => ({
@@ -229,15 +231,26 @@ const NettoyageOptions = ({
 
   return (
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="2">
-      <PropositionsTitle
-        title="Options de nettoyage"
-        description={`Choisissez vos options en gamme ${capitalize(
-          nettoyage.infos.gammeSelected
-        )} chez ${nettoyage.infos.nomFournisseur}`}
-        icon={SprayCan}
-        handleClickPrevious={handleClickPrevious}
-      />
-      <div className="w-full flex-1 overflow-auto">
+      {isTabletOrMobile ? (
+        <PropositionsTitleMobile
+          title="Nettoyage et propreté (options)"
+          description={`Choisissez vos options en gamme ${capitalize(
+            nettoyage.infos.gammeSelected
+          )} chez ${nettoyage.infos.nomFournisseur}`}
+          icon={SprayCan}
+          propositionsRef={propositionsRef}
+        />
+      ) : (
+        <PropositionsTitle
+          title="Nettoyage et propreté (options)"
+          description={`Choisissez vos options en gamme ${capitalize(
+            nettoyage.infos.gammeSelected
+          )} chez ${nettoyage.infos.nomFournisseur}`}
+          icon={SprayCan}
+          handleClickPrevious={handleClickPrevious}
+        />
+      )}
+      <div className="w-full flex-1 overflow-auto" ref={propositionsRef}>
         <NettoyageOptionsPropositions
           samediProposition={samediProposition}
           dimancheProposition={dimancheProposition}
