@@ -25,7 +25,7 @@ const PropositionsTitle = ({
 }: PropositionsTitleProps) => {
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
   return (
-    <div className="flex flex-col gap-4 lg:gap-0 lg:flex-row justify-between items-center py-4 lg:py-0 sticky top-[7.6rem] lg:static bg-white z-[15] border-b-2 border-slate-100 lg:border-none">
+    <div className="flex flex-col gap-4 lg:gap-0 lg:flex-row justify-between items-center py-4 lg:py-0 sticky top-[7.6rem] lg:static bg-white z-[15] border-b-4 border-slate-100 lg:border-none">
       <div className="flex justify-center lg:justify-start gap-4 items-center p-4 border-2 rounded-xl w-full lg:w-auto text-fm4allsecondary border-fm4allsecondary">
         <div className="flex items-center gap-1">
           <Icon />
