@@ -114,12 +114,12 @@ const HygieneMobileOptionsDesinfectantCard = ({
   );
 
   const imgProduit = (
-    <div className="w-1/3 h-full relative rounded-xl overflow-hidden">
+    <div className="w-1/3 h-full relative rounded-xl overflow-hidden bg-slate-100">
       <Image
         src={`${imageUrlDesinfectant || "/img/services/hygiene.webp"}`}
         alt={`illustration de distributeur de desinfectant`}
         fill={true}
-        className="object-cover cursor-pointer"
+        className="object-contain cursor-pointer"
         quality={100}
       />
     </div>
@@ -131,7 +131,7 @@ const HygieneMobileOptionsDesinfectantCard = ({
         src={`${imageUrlDesinfectant || "/img/services/hygiene.webp"}`}
         alt={`illustration de distributeur de desinfectant`}
         fill={true}
-        className="object-cover cursor-pointer"
+        className="object-contain cursor-pointer"
         quality={100}
       />
     </div>

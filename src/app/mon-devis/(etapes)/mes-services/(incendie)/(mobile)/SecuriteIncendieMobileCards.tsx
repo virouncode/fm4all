@@ -1,5 +1,3 @@
-import { IncendieContext } from "@/context/IncendieProvider";
-import { useContext } from "react";
 import SecuriteIncendieMobileCard from "./SecuriteIncendieMobileCard";
 
 type SecuriteIncendieMobileCardsProps = {
@@ -53,8 +51,6 @@ const SecuriteIncendieMobileCards = ({
   propositions,
   handleClickProposition,
 }: SecuriteIncendieMobileCardsProps) => {
-  const { incendie } = useContext(IncendieContext);
-
   return (
     <div className="flex flex-col gap-6 w-full">
       {propositions.map((proposition) => (

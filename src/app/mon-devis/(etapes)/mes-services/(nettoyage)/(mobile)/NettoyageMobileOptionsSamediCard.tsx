@@ -96,12 +96,12 @@ const NettoyageMobileOptionsSamediCard = ({
         <div className="flex items-center h-1/2 gap-2 border-b pb-2 border-slate-200">
           <Dialog>
             <DialogTrigger asChild>
-              <div className="w-1/3 h-full relative rounded-xl overflow-hidden">
+              <div className="w-1/3 h-full relative rounded-xl overflow-hidden bg-slate-100">
                 <Image
                   src={"/img/services/nettoyage.webp"}
                   alt={`illustration de nettoyage`}
                   fill={true}
-                  className="object-cover cursor-pointer"
+                  className="object-contain cursor-pointer"
                   quality={100}
                 />
               </div>

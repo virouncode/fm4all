@@ -114,12 +114,12 @@ const HygieneMobileOptionsPoubelleCard = ({
   );
 
   const imgProduit = (
-    <div className="w-1/3 h-full relative rounded-xl overflow-hidden">
+    <div className="w-1/3 h-full relative rounded-xl overflow-hidden bg-slate-100">
       <Image
         src={`${imageUrlPoubelle || "/img/services/hygiene.webp"}`}
-        alt={`illustration de distributeur de poubelle`}
+        alt={`illustration de poubelle hygiene féminine`}
         fill={true}
-        className="object-cover cursor-pointer"
+        className="object-contain cursor-pointer"
         quality={100}
       />
     </div>
@@ -129,9 +129,9 @@ const HygieneMobileOptionsPoubelleCard = ({
     <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
       <Image
         src={`${imageUrlPoubelle || "/img/services/hygiene.webp"}`}
-        alt={`illustration de distributeur de poubelle`}
+        alt={`illustration de poubelle hygiene féminine`}
         fill={true}
-        className="object-cover cursor-pointer"
+        className="object-contain cursor-pointer"
         quality={100}
       />
     </div>

@@ -155,12 +155,12 @@ const MaintenanceMobilePropositionCard = ({
   );
 
   const imgProduit = (
-    <div className="w-1/3 h-full relative rounded-xl overflow-hidden">
+    <div className="w-1/3 h-full relative rounded-xl overflow-hidden bg-slate-100">
       <Image
         src={`${"/img/services/maintenance.webp"}`}
-        alt={`illustration de distributeur de desinfectant`}
+        alt={`illustration de maintenance`}
         fill={true}
-        className="object-cover cursor-pointer"
+        className="object-contain cursor-pointer"
         quality={100}
       />
     </div>
@@ -170,9 +170,9 @@ const MaintenanceMobilePropositionCard = ({
     <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
       <Image
         src={`${"/img/services/maintenance.webp"}`}
-        alt={`illustration de distributeur de desinfectant`}
+        alt={`illustration de maintenance`}
         fill={true}
-        className="object-cover cursor-pointer"
+        className="object-contain cursor-pointer"
         quality={100}
       />
     </div>

@@ -97,13 +97,14 @@ const SecuriteIncendieMobileCard = ({
   );
 
   const infosTitle = <p className="text-center">Sécurité incendie</p>;
+
   const imgProduit = (
     <div className="w-1/3 h-full relative rounded-xl overflow-hidden bg-slate-200">
       <Image
         src={"/img/services/incendie.webp"}
         alt={`illustration de sécurité incendie`}
         fill={true}
-        className="object-cover object-center cursor-pointer"
+        className="object-contain cursor-pointer"
         quality={100}
       />
     </div>

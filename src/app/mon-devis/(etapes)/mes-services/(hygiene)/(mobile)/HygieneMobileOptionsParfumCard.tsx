@@ -114,12 +114,12 @@ const HygieneMobileOptionsParfumCard = ({
   );
 
   const imgProduit = (
-    <div className="w-1/3 h-full relative rounded-xl overflow-hidden">
+    <div className="w-1/3 h-full relative rounded-xl overflow-hidden bg-slate-100">
       <Image
         src={`${imageUrlParfum || "/img/services/hygiene.webp"}`}
         alt={`illustration de distributeur de parfum`}
         fill={true}
-        className="object-cover cursor-pointer"
+        className="object-contain cursor-pointer"
         quality={100}
       />
     </div>
@@ -131,7 +131,7 @@ const HygieneMobileOptionsParfumCard = ({
         src={`${imageUrlParfum || "/img/services/hygiene.webp"}`}
         alt={`illustration de distributeur de parfum`}
         fill={true}
-        className="object-cover cursor-pointer"
+        className="object-contain cursor-pointer"
         quality={100}
       />
     </div>
