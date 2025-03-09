@@ -50,10 +50,7 @@ const SecuriteIncendie = ({
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 
   return (
-    <div
-      className="flex flex-col gap-4 w-full mx-auto h-full py-2  mb-14 lg:mb-0"
-      id="6"
-    >
+    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="6">
       <PropositionsTitle
         icon={FireExtinguisher}
         title="Securité Incendie"

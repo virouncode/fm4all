@@ -58,10 +58,7 @@ const Hygiene = ({
   }
 
   return (
-    <div
-      className="flex flex-col gap-4 w-full mx-auto h-full py-2 mb-14 lg:mb-0"
-      id="3"
-    >
+    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="3">
       <PropositionsTitle
         icon={Toilet}
         title="Hygiène sanitaire"
