@@ -20,13 +20,28 @@ const TotalIncendie = () => {
     totalIncendie.totalColonnesSechesStatiques;
   const totalColonnesSechesDynamiques =
     totalIncendie.totalColonnesSechesDynamiques;
-  const totalDeplacementTrilogie = totalIncendie.totalDeplacementTrilogie;
-  const totalDeplacementExutoires = totalIncendie.totalDeplacementExutoires;
-  const totalDeplacementExutoiresParking =
-    totalIncendie.totalDeplacementExutoiresParking;
-  const total = Object.values(totalIncendie)
-    .filter((item) => item !== null)
-    .reduce((sum, value) => sum + value, 0);
+  const totalDeplacementTrilogie = !totalTrilogie
+    ? 0
+    : totalIncendie.totalDeplacementTrilogie;
+  const totalDeplacementExutoires = !totalExutoires
+    ? 0
+    : totalIncendie.totalDeplacementExutoires;
+  const totalDeplacementExutoiresParking = !totalExutoiresParking
+    ? 0
+    : totalIncendie.totalDeplacementExutoiresParking;
+  const total =
+    (totalTrilogie || 0) +
+    (totalDeplacementTrilogie || 0) +
+    (totalExutoires || 0) +
+    (totalDeplacementExutoires || 0) +
+    (totalExutoiresParking || 0) +
+    (totalDeplacementExutoiresParking || 0) +
+    (totalAlarmes || 0) +
+    (totalRIA || 0) +
+    (totalPortesCoupeFeuBattantes || 0) +
+    (totalPortesCoupeFeuCoulissantes || 0) +
+    (totalColonnesSechesStatiques || 0) +
+    (totalColonnesSechesDynamiques || 0);
 
   if (!total) return null;
 

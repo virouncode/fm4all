@@ -130,7 +130,7 @@ const HygieneMobilePropositionCard = ({
           proposition.imageUrlPh ||
           "/img/services/hygiene.webp"
         }
-        alt={`illustration de nettoyage`}
+        alt={`illustration d'hygiène sanitaire`}
         fill={true}
         className="object-contain cursor-pointer"
         quality={100}

@@ -39,7 +39,7 @@ const SecuriteIncendieInputs = ({
             <div className="flex gap-4 items-center  w-full">
               <Input
                 type="number"
-                value={nbExtincteurs}
+                value={nbExtincteurs || ""}
                 min={0}
                 max={MAX_NB_EXTINCTEURS}
                 step={1}
@@ -76,7 +76,7 @@ const SecuriteIncendieInputs = ({
               <Input
                 id="nbBaes"
                 type="number"
-                value={nbBaes}
+                value={nbBaes || ""}
                 min={0}
                 max={MAX_NB_BAES}
                 step={1}
@@ -111,7 +111,7 @@ const SecuriteIncendieInputs = ({
             <div className="flex gap-4 items-center w-full">
               <Input
                 type="number"
-                value={nbTelBaes}
+                value={nbTelBaes || ""}
                 min={0}
                 max={MAX_NB_BAES}
                 step={1}

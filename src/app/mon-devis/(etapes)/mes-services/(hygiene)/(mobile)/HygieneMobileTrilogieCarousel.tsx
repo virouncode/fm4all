@@ -80,7 +80,7 @@ const HygieneMobileTrilogieCarousel = ({
   }, [api]);
 
   useEffect(() => {
-    if (!hygiene.infos.fournisseurId && !api) {
+    if (!hygiene.infos.fournisseurId || !api) {
       return;
     }
     if (hygiene.infos.trilogieGammeSelected) {

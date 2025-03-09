@@ -191,14 +191,14 @@ const MaintenanceMobilePropositionCard = ({
   return (
     <CarouselItem>
       <div
-        className={`bg-${color} flex flex-col h-96 border border-slate-200 rounded-xl p-4 text-white  ${
+        className={`bg-${color} flex flex-col h-72 border border-slate-200 rounded-xl p-4 text-white  ${
           maintenance.infos.fournisseurId === fournisseurId &&
           maintenance.infos.gammeSelected === gamme
             ? "ring-4 ring-inset ring-fm4alldestructive"
             : ""
         }`}
       >
-        <div className="flex items-center h-1/2 gap-2 border-b pb-2 border-slate-200">
+        <div className="flex items-center h-1/3 gap-2 border-b pb-2 border-slate-200">
           <Dialog>
             <DialogTrigger asChild>{imgProduit}</DialogTrigger>
             <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
@@ -254,7 +254,7 @@ const MaintenanceMobilePropositionCard = ({
             )}
           </div>
         </div>
-        <div className="flex h-1/2 pt-2 justify-between">
+        <div className="flex h-2/3 pt-2 justify-between">
           {infosProduit}
           <div className="flex flex-col gap-2 items-end">
             {totalMensuelText}

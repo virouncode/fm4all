@@ -65,14 +65,19 @@ const SecuriteIncendiePropostionCard = ({
   handleClickProposition,
 }: SecuriteIncendiePropostionCardProps) => {
   const { incendie } = useContext(IncendieContext);
+  const { totalAnnuelTrilogie, fraisDeplacementTrilogie } = proposition;
+
+  if (!totalAnnuelTrilogie)
+    return (
+      <div className="w-3/4 flex items-center justify-center text-xl gap-4 p-4 cursor-pointer bg-slate-100">
+        Non proposé
+      </div>
+    );
   const totalMensuelText = (
     <p className="font-bold text-xl ml-4">
       {formatNumber(
         Math.round(
-          ((proposition.totalAnnuelTrilogie +
-            proposition.fraisDeplacementTrilogie) *
-            MARGE) /
-            12
+          ((totalAnnuelTrilogie + fraisDeplacementTrilogie) * MARGE) / 12
         )
       )}{" "}
       €/mois
