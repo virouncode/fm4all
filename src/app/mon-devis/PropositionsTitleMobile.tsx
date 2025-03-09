@@ -23,6 +23,7 @@ const PropositionsTitleMobile = ({
   const descriptionRef = useRef<HTMLParagraphElement>(null);
   const triangleRef = useRef<SVGSVGElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const handleClickTitle = () => {
     if (titleRef?.current) {
       titleRef.current.classList.toggle("text-fm4allsecondary");
@@ -41,12 +42,16 @@ const PropositionsTitleMobile = ({
       triangleRef.current.classList.toggle("-rotate-180");
       triangleRef.current.classList.toggle("-rotate-90");
     }
+    // if (containerRef.current) {
+    //   containerRef.current.scrollIntoView();
+    // }
   };
   return (
     <>
       <div
         className="py-2 sticky top-[7.6rem] bg-white z-[15]"
         onClick={handleClickTitle}
+        ref={containerRef}
       >
         <div
           className="flex items-center p-4 justify-between border-2 rounded-xl w-full text-fm4allsecondary border-fm4allsecondary font-bold"

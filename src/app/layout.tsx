@@ -1,6 +1,5 @@
 import CookieBanner from "@/components/cookie-baner";
 import Footer from "@/components/footer";
-
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import Header from "@/components/header";
 import { Toaster } from "@/components/ui/toaster";

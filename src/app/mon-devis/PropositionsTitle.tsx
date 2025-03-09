@@ -22,19 +22,6 @@ const PropositionsTitle = ({
   handleClickPrevious,
   previousButton = true,
 }: PropositionsTitleProps) => {
-  // const handleToggleContainerSize = () => {
-  //   console.log("propositionsRef?.current", propositionsRef?.current);
-
-  //   if (propositionsRef?.current) {
-  //     propositionsRef.current.classList.toggle("hidden");
-  //   }
-  //   if (descriptionRef.current) {
-  //     descriptionRef.current.classList.toggle("hidden");
-  //   }
-  //   if (separatorRef.current) {
-  //     separatorRef.current.classList.toggle("hidden");
-  //   }
-  // };
   return (
     <div className="flex flex-col gap-4 lg:gap-0 lg:flex-row justify-between items-center">
       <div className="flex justify-center lg:justify-start gap-4 items-center p-4 border-2 rounded-xl w-full lg:w-auto text-fm4allsecondary border-fm4allsecondary">
