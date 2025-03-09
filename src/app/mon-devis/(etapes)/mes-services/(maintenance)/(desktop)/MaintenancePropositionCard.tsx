@@ -100,6 +100,7 @@ const MaintenancePropositionCard = ({
         Obligation légale et contrôles règlementaires
       </li>
       <li className="list-check">Contrôle Q18</li>
+      {nbPassagesText}
     </>
   );
   const infosConfort = (
@@ -110,6 +111,7 @@ const MaintenancePropositionCard = ({
       </li>
       <li className="list-check ">Contrôle Q18</li>
       <li className="list-check ">Contrôle Legionellose</li>
+      {nbPassagesText}
     </>
   );
   const infosExcellence = (
@@ -121,6 +123,7 @@ const MaintenancePropositionCard = ({
       <li className="list-check ">Contrôle Q18</li>
       <li className="list-check ">Contrôle Legionellose</li>
       <li className="list-check ">Contrôle Qualité Air</li>
+      {nbPassagesText}
     </>
   );
 

@@ -5,7 +5,7 @@ import {
   CarouselContent,
 } from "@/components/ui/carousel";
 import { MaintenanceContext } from "@/context/MaintenanceProvider";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import MaintenanceMobilePropositionCard from "./MaintenanceMobilePropositionCard";
 
 type MaintenanceMobilePropositionsCarouselProps = {
@@ -64,6 +64,37 @@ const MaintenanceMobilePropositionsCarousel = ({
   const { maintenance } = useContext(MaintenanceContext);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
+    api.on("select", () => {
+      setCurrentIndex(api.selectedScrollSnap());
+    });
+  }, [api]);
+
+  useEffect(() => {
+    if (!maintenance.infos.fournisseurId && !api) {
+      return;
+    }
+    if (
+      propositions[0].fournisseurId === maintenance.infos.fournisseurId &&
+      maintenance.infos.gammeSelected
+    ) {
+      api?.scrollTo(
+        maintenance.infos.gammeSelected === "essentiel"
+          ? 0
+          : maintenance.infos.gammeSelected === "confort"
+          ? 1
+          : 2
+      );
+    }
+  }, [
+    api,
+    maintenance.infos.fournisseurId,
+    maintenance.infos.gammeSelected,
+    propositions,
+  ]);
   return (
     <Carousel
       opts={{

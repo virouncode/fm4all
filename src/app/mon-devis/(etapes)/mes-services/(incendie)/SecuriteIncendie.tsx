@@ -7,6 +7,7 @@ import { SelectIncendieTarifsType } from "@/zod-schemas/incendieTarifs";
 import { FireExtinguisher } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
+import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import SecuriteIncendiePropositions from "./SecuriteIncendiePropositions";
@@ -46,8 +47,13 @@ const SecuriteIncendie = ({
     }));
   };
 
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="6">
+    <div
+      className="flex flex-col gap-4 w-full mx-auto h-full py-2  mb-14 lg:mb-0"
+      id="6"
+    >
       <PropositionsTitle
         icon={FireExtinguisher}
         title="Securité Incendie"
@@ -60,7 +66,9 @@ const SecuriteIncendie = ({
           incendieTarifs={incendieTarifs}
         />
       </div>
-      <PropositionsFooter handleClickNext={handleClickNext} />
+      {isTabletOrMobile ? null : (
+        <PropositionsFooter handleClickNext={handleClickNext} />
+      )}
     </div>
   );
 };

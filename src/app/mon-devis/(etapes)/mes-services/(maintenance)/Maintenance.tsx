@@ -9,6 +9,7 @@ import { SelectQ18TarifsType } from "@/zod-schemas/q18Tarifs";
 import { SelectQualiteAirTarifsType } from "@/zod-schemas/qualiteAirTarifs";
 import { Wrench } from "lucide-react";
 import { useContext } from "react";
+import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import MaintenancePropositions from "./MaintenancePropositions";
@@ -60,8 +61,13 @@ const Maintenance = ({
     }
   };
 
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="5">
+    <div
+      className="flex flex-col gap-4 w-full mx-auto h-full py-2  mb-14 lg:mb-0"
+      id="5"
+    >
       <PropositionsTitle
         title="Maintenance"
         description="Obligations légales & veille réglementaire, bien-être, petits travaux, lien avec le gestionnaire de l’immeuble... déléguez la maintenance et le suivi de vos contrôles."
@@ -79,7 +85,9 @@ const Maintenance = ({
           />
         </div>
       )}
-      <PropositionsFooter handleClickNext={handleClickNext} />
+      {isTabletOrMobile ? null : (
+        <PropositionsFooter handleClickNext={handleClickNext} />
+      )}
     </div>
   );
 };

@@ -1,3 +1,4 @@
+import CarouselGammesDots from "@/components/CarouselGammesDots";
 import {
   Carousel,
   CarouselApi,
@@ -7,7 +8,6 @@ import { NettoyageContext } from "@/context/NettoyageProvider";
 import { GammeType } from "@/zod-schemas/gamme";
 import { useContext, useEffect, useState } from "react";
 import NettoyageMobilePropositionCard from "./NettoyageMobilePropositionCard";
-import CarouselGammesDots from "@/components/CarouselGammesDots";
 
 type NettoyageMobilePropositionsCarouselProps = {
   handleClickProposition: (proposition: {
@@ -71,7 +71,10 @@ const NettoyageMobilePropositionsCarousel = ({
     if (!nettoyage.infos.fournisseurId && !api) {
       return;
     }
-    if (propositions[0].fournisseurId === nettoyage.infos.fournisseurId) {
+    if (
+      propositions[0].fournisseurId === nettoyage.infos.fournisseurId &&
+      nettoyage.infos.gammeSelected
+    ) {
       api?.scrollTo(
         nettoyage.infos.gammeSelected === "essentiel"
           ? 0
