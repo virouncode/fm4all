@@ -11,7 +11,7 @@ import { SelectRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
 import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
 import { SprayCan } from "lucide-react";
-import { useContext } from "react";
+import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
@@ -63,6 +63,7 @@ const Nettoyage = ({
   };
 
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+  const propositionsRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="1">
@@ -71,8 +72,9 @@ const Nettoyage = ({
         description="D’un nettoyage essentiel à une expérience 5 étoiles, choisissez la prestation propreté qui vous ressemble. La gamme détermine la fréquence de passage et la cadence de nettoyage."
         icon={SprayCan}
         handleClickPrevious={handleClickPrevious}
+        propositionsRef={propositionsRef}
       />
-      <div className="w-full flex-1 overflow-auto">
+      <div className="w-full lg:flex-1 overflow-auto" ref={propositionsRef}>
         <NettoyagePropositions
           nettoyageQuantites={nettoyageQuantites}
           nettoyageTarifs={nettoyageTarifs}
