@@ -254,6 +254,7 @@ const MesLocaux = () => {
       setTotal
     );
     setLoaderVisible(true);
+    window.scrollTo(0, 0);
     //Passer à l'étape suivante
     setTimeout(() => {
       router.push(

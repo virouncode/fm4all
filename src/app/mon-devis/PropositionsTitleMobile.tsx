@@ -42,9 +42,6 @@ const PropositionsTitleMobile = ({
       triangleRef.current.classList.toggle("-rotate-180");
       triangleRef.current.classList.toggle("-rotate-90");
     }
-    // if (containerRef.current) {
-    //   containerRef.current.scrollIntoView();
-    // }
   };
   return (
     <>
