@@ -546,7 +546,7 @@ const HygieneMobileDistribQuantitesInputs = ({
             />
             <Button
               variant="outline"
-              title="Diminuer le nombre de passages"
+              title="Diminuer le nombre de distributeurs"
               onClick={() => handleDecrement("emp")}
               disabled={nbDistribEmp === 0}
             >
@@ -554,7 +554,7 @@ const HygieneMobileDistribQuantitesInputs = ({
             </Button>
             <Button
               variant="outline"
-              title="Augmenter le nombre de passages"
+              title="Augmenter le nombre de distributeurs"
               onClick={() => handleIncrement("emp")}
               disabled={nbDistribEmp === MAX_NB_EMP}
             >
@@ -591,7 +591,7 @@ const HygieneMobileDistribQuantitesInputs = ({
             />
             <Button
               variant="outline"
-              title="Diminuer le nombre de passages"
+              title="Diminuer le nombre de distributeurs"
               onClick={() => handleDecrement("savon")}
               disabled={nbDistribSavon === 0}
             >
@@ -599,7 +599,7 @@ const HygieneMobileDistribQuantitesInputs = ({
             </Button>
             <Button
               variant="outline"
-              title="Augmenter le nombre de passages"
+              title="Augmenter le nombre de distributeurs"
               onClick={() => handleIncrement("savon")}
               disabled={nbDistribSavon === MAX_NB_SAVON}
             >
@@ -636,7 +636,7 @@ const HygieneMobileDistribQuantitesInputs = ({
             />
             <Button
               variant="outline"
-              title="Diminuer le nombre de passages"
+              title="Diminuer le nombre de distributeurs"
               onClick={() => handleDecrement("ph")}
               disabled={nbDistribPh === 0}
             >
@@ -644,7 +644,7 @@ const HygieneMobileDistribQuantitesInputs = ({
             </Button>
             <Button
               variant="outline"
-              title="Augmenter le nombre de passages"
+              title="Augmenter le nombre de distributeurs"
               onClick={() => handleIncrement("ph")}
               disabled={nbDistribPh === MAX_NB_PH}
             >

@@ -449,6 +449,7 @@ const HygieneOptionsPropositions = ({
       handleChangeDistribNbr={handleChangeDistribNbr}
       propositions={propositions}
       handleClickProposition={handleClickProposition}
+      hygieneDistribTarifsFournisseur={hygieneDistribTarifsFournisseur}
     />
   ) : (
     <HygieneDesktopOptionsPropositions

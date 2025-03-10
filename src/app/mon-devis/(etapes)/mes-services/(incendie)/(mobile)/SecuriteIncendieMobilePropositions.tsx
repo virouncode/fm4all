@@ -1,3 +1,4 @@
+import { SelectIncendieTarifsType } from "@/zod-schemas/incendieTarifs";
 import React from "react";
 import SecuriteIncendieMobileCards from "./SecuriteIncendieMobileCards";
 import SecuriteIncendieMobileInputs from "./SecuriteIncendieMobileInputs";
@@ -60,6 +61,7 @@ type SecuriteIncendieMobilePropositionsProps = {
     totalAnnuelTrilogie: number;
     fraisDeplacementTrilogie: number;
   }) => void;
+  incendieTarifs: SelectIncendieTarifsType[];
 };
 
 const SecuriteIncendieMobilePropositions = ({
@@ -70,6 +72,7 @@ const SecuriteIncendieMobilePropositions = ({
   handleChangeNbr,
   incendieQuantite,
   handleClickProposition,
+  incendieTarifs,
 }: SecuriteIncendieMobilePropositionsProps) => {
   return (
     <div className="flex flex-col gap-6 w-full">
@@ -82,6 +85,7 @@ const SecuriteIncendieMobilePropositions = ({
         nbTelBaes={nbTelBaes}
         handleChangeNbr={handleChangeNbr}
         incendieQuantite={incendieQuantite}
+        incendieTarifs={incendieTarifs}
       />
       <SecuriteIncendieMobileCards
         propositions={propositions}
