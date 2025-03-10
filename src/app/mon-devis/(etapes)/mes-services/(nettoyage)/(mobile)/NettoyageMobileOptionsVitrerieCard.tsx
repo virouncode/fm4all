@@ -1,5 +1,6 @@
 import FournisseurDialog from "@/app/mon-devis/FournisseurDialog";
 import StarRating from "@/components/star-rating";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -13,9 +14,11 @@ import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
+import { Minus, Plus } from "lucide-react";
 import Image from "next/image";
 import React, { useContext } from "react";
 import { MAX_PASSAGES_VITRERIE } from "../(desktop)/NettoyageOptionsPropositions";
+import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 
 type NettoyageMobileOptionsVitrerieCardProps = {
   vitrerieProposition: {
@@ -68,7 +71,8 @@ const NettoyageMobileOptionsVitrerieCard = ({
   handleChangeNbPassageVitrerie,
   color,
 }: NettoyageMobileOptionsVitrerieCardProps) => {
-  const { nettoyage } = useContext(NettoyageContext);
+  const { nettoyage, setNettoyage } = useContext(NettoyageContext);
+  const { setTotalNettoyage } = useContext(TotalNettoyageContext);
   const { gammeSelected: gamme } = nettoyage.infos;
   const vitreriePrixMensuelText = vitrerieProposition.prixAnnuel ? (
     <p className="text-sm font-bold text-end">
@@ -95,6 +99,73 @@ const NettoyageMobileOptionsVitrerieCard = ({
   const infosProduit = (
     <li className="list-check">Vitres et cloisons accessibles de plain-pied</li>
   );
+  const handleDecrement = () => {
+    let newNbPassageVitrerie = nettoyage.quantites.nbPassagesVitrerie - 1;
+    if (newNbPassageVitrerie < 0) newNbPassageVitrerie = 0;
+    setNettoyage((prev) => ({
+      ...prev,
+      quantites: {
+        ...prev.quantites,
+        nbPassagesVitrerie: newNbPassageVitrerie,
+      },
+    }));
+    const totalVitrerie =
+      nettoyage.infos.vitrerieSelected &&
+      nettoyage.quantites.surfaceCloisons !== null &&
+      nettoyage.quantites.cadenceCloisons !== null &&
+      nettoyage.quantites.surfaceVitres !== null &&
+      nettoyage.quantites.cadenceVitres !== null &&
+      nettoyage.prix.tauxHoraireVitrerie !== null &&
+      nettoyage.prix.minFacturationVitrerie !== null
+        ? newNbPassageVitrerie *
+          Math.max(
+            (nettoyage.quantites.surfaceCloisons /
+              nettoyage.quantites.cadenceCloisons +
+              nettoyage.quantites.surfaceVitres /
+                nettoyage.quantites.cadenceVitres) *
+              nettoyage.prix.tauxHoraireVitrerie,
+            nettoyage.prix.minFacturationVitrerie
+          )
+        : null;
+    setTotalNettoyage((prev) => ({
+      ...prev,
+      totalVitrerie,
+    }));
+  };
+  const handleIncrement = () => {
+    let newNbPassageVitrerie = nettoyage.quantites.nbPassagesVitrerie + 1;
+    if (newNbPassageVitrerie > MAX_PASSAGES_VITRERIE)
+      newNbPassageVitrerie = MAX_PASSAGES_VITRERIE;
+    setNettoyage((prev) => ({
+      ...prev,
+      quantites: {
+        ...prev.quantites,
+        nbPassagesVitrerie: newNbPassageVitrerie,
+      },
+    }));
+    const totalVitrerie =
+      nettoyage.infos.vitrerieSelected &&
+      nettoyage.quantites.surfaceCloisons !== null &&
+      nettoyage.quantites.cadenceCloisons !== null &&
+      nettoyage.quantites.surfaceVitres !== null &&
+      nettoyage.quantites.cadenceVitres !== null &&
+      nettoyage.prix.tauxHoraireVitrerie !== null &&
+      nettoyage.prix.minFacturationVitrerie !== null
+        ? newNbPassageVitrerie *
+          Math.max(
+            (nettoyage.quantites.surfaceCloisons /
+              nettoyage.quantites.cadenceCloisons +
+              nettoyage.quantites.surfaceVitres /
+                nettoyage.quantites.cadenceVitres) *
+              nettoyage.prix.tauxHoraireVitrerie,
+            nettoyage.prix.minFacturationVitrerie
+          )
+        : null;
+    setTotalNettoyage((prev) => ({
+      ...prev,
+      totalVitrerie,
+    }));
+  };
   return (
     <div className="flex flex-col gap-4">
       <p className="font-bold text-xl">Lavage Vitrerie</p>
@@ -103,19 +174,36 @@ const NettoyageMobileOptionsVitrerieCard = ({
         <Label htmlFor="nbDePassagesVitrerie" className="text-sm">
           Nombre de passages / an
         </Label>
-        <Input
-          type="number"
-          value={nettoyage.quantites.nbPassagesVitrerie || ""}
-          min={1}
-          max={MAX_PASSAGES_VITRERIE}
-          step={1}
-          onChange={handleChangeNbPassageVitrerie}
-          className={`w-full ${
-            nettoyage.quantites.nbPassagesVitrerie === 2
-              ? "text-fm4alldestructive"
-              : ""
-          }`}
-        />
+        <div className="flex items-center gap-2">
+          <Input
+            type="number"
+            value={nettoyage.quantites.nbPassagesVitrerie || ""}
+            min={1}
+            max={MAX_PASSAGES_VITRERIE}
+            step={1}
+            onChange={handleChangeNbPassageVitrerie}
+            className={`w-full ${
+              nettoyage.quantites.nbPassagesVitrerie === 2
+                ? "text-fm4alldestructive"
+                : ""
+            }`}
+          />
+          <Button
+            variant="outline"
+            title="Diminuer le nombre de passages"
+            onClick={handleDecrement}
+          >
+            <Minus />
+          </Button>
+          <Button
+            variant="outline"
+            title="Augmenter le nombre de passages"
+            onClick={handleIncrement}
+          >
+            <Plus />
+          </Button>
+        </div>
+
         <p className="text-xs italic text-fm4alldestructive">
           Les quantités sont estimées pour vous mais vous pouvez les changer
         </p>
