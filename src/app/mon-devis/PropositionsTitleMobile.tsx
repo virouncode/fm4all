@@ -25,16 +25,10 @@ const PropositionsTitleMobile = ({
   const titleRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const handleClickTitle = () => {
-    // let initialContainerTop = 0;
-    // let initialWindowScroll = 0;
-    // let initialOffset = 0;
-    // if (containerRef.current) {
-    //   console.log(containerRef.current.getBoundingClientRect().top);
-    //   initialContainerTop = containerRef.current.getBoundingClientRect().top;
-    //   console.log(window.scrollY);
-    //   initialWindowScroll = window.scrollY;
-    //   initialOffset = initialWindowScroll - initialContainerTop;
-    // }
+    let initialContainerTop = 0;
+    if (containerRef.current) {
+      initialContainerTop = containerRef.current.getBoundingClientRect().top;
+    }
     if (titleRef?.current) {
       titleRef.current.classList.toggle("text-fm4allsecondary");
       titleRef.current.classList.toggle("border-fm4allsecondary");
@@ -52,14 +46,14 @@ const PropositionsTitleMobile = ({
       triangleRef.current.classList.toggle("-rotate-180");
       triangleRef.current.classList.toggle("-rotate-90");
     }
-    if (containerRef.current) {
+    if (containerRef.current && initialContainerTop < 122) {
       window.scroll(0, containerRef.current.offsetTop - 120);
     }
   };
   return (
     <>
       <div
-        className="py-2 sticky top-[7.6rem] bg-white z-[15]"
+        className="py-2 sticky top-[7.6rem] bg-white z-[15] cursor-pointer"
         onClick={handleClickTitle}
         ref={containerRef}
       >
