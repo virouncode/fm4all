@@ -1,4 +1,5 @@
 "use client";
+import PropositionsTitleMobile from "@/app/mon-devis/PropositionsTitleMobile";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import useScrollIntoService from "@/hooks/use-scroll-into-service";
@@ -11,10 +12,11 @@ import { SelectRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
 import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
 import { SprayCan } from "lucide-react";
-import { useContext } from "react";
+import { useContext, useRef } from "react";
+import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
-import NettoyagePropositions from "./NettoyagePropositions";
+import NettoyagePropositions from "./(desktop)/NettoyagePropositions";
 
 type NettoyageProps = {
   nettoyageQuantites: SelectNettoyageQuantitesType[];
@@ -39,7 +41,6 @@ const Nettoyage = ({
 }: NettoyageProps) => {
   const { nettoyage } = useContext(NettoyageContext);
   const { setServices } = useContext(ServicesContext);
-  //Scroller automatiquement vers le service actuel
   useScrollIntoService();
 
   const handleClickPrevious = () => {
@@ -62,15 +63,30 @@ const Nettoyage = ({
     }
   };
 
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+  const propositionsRef = useRef<HTMLDivElement>(null);
+
   return (
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="1">
-      <PropositionsTitle
-        title="Nettoyage et propreté"
-        description="D’un nettoyage essentiel à une expérience 5 étoiles, choisissez la prestation propreté qui vous ressemble."
-        icon={SprayCan}
-        handleClickPrevious={handleClickPrevious}
-      />
-      <div className="w-full flex-1 overflow-auto">
+      {isTabletOrMobile ? (
+        <PropositionsTitleMobile
+          title="Nettoyage et propreté"
+          description="D’un nettoyage essentiel à une expérience 5 étoiles, choisissez la prestation propreté qui vous ressemble. La gamme détermine la fréquence de passage et la cadence de nettoyage."
+          icon={SprayCan}
+          propositionsRef={propositionsRef}
+        />
+      ) : (
+        <PropositionsTitle
+          title="Nettoyage et propreté"
+          description="D’un nettoyage essentiel à une expérience 5 étoiles, choisissez la prestation propreté qui vous ressemble. La gamme détermine la fréquence de passage et la cadence de nettoyage."
+          icon={SprayCan}
+          handleClickPrevious={handleClickPrevious}
+        />
+      )}
+      <div
+        className="w-full flex-1 overflow-auto transition"
+        ref={propositionsRef}
+      >
         <NettoyagePropositions
           nettoyageQuantites={nettoyageQuantites}
           nettoyageTarifs={nettoyageTarifs}
@@ -82,7 +98,9 @@ const Nettoyage = ({
           hygieneConsosTarifs={hygieneConsosTarifs}
         />
       </div>
-      <PropositionsFooter handleClickNext={handleClickNext} />
+      {isTabletOrMobile ? null : (
+        <PropositionsFooter handleClickNext={handleClickNext} />
+      )}
     </div>
   );
 };

@@ -1,3 +1,5 @@
+"use client";
+
 import { LucideIcon } from "lucide-react";
 import PreviousServiceButton from "./PreviousServiceButton";
 
@@ -21,16 +23,18 @@ const PropositionsTitle = ({
   previousButton = true,
 }: PropositionsTitleProps) => {
   return (
-    <div className="flex justify-between items-center">
-      <div className="flex gap-4 items-center p-4 border rounded-xl">
+    <div className="flex flex-col gap-4 lg:gap-0 lg:flex-row justify-between items-center">
+      <div className="flex justify-center lg:justify-start gap-4 items-center p-4 border-2 rounded-xl w-full lg:w-auto text-fm4allsecondary border-fm4allsecondary">
         <div className="flex items-center gap-1">
           <Icon />
           {Icon2 && <Icon2 />}
           {Icon3 && <Icon3 />}
         </div>
-        <p>{title}</p>
+        <p className="font-bold">{title}</p>
       </div>
-      <p className="text-base flex-1 px-4">{description}</p>
+      <p className="text-base flex-1 px-4 hyphens-auto text-wrap">
+        {description}
+      </p>
       <PreviousServiceButton
         handleClickPrevious={handleClickPrevious}
         className={previousButton ? "" : "invisible"}

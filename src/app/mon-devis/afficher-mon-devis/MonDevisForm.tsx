@@ -360,11 +360,17 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                 id="acceptation"
                 aria-label="Acceptez les conditions"
               />
-              <Label htmlFor="acceptation">
-                J&apos;accepte les{" "}
+              <Label htmlFor="acceptation" className="max-w-prose">
+                En cochant cette case, je reconnais avoir lu, compris et accepté
+                sans réserve les{" "}
+                <Link href="/cgu" className="underline" target="_blank">
+                  Conditions Générales d&apos;Utilisation (CGU)
+                </Link>{" "}
+                et les{" "}
                 <Link href="/cgv" className="underline" target="_blank">
-                  conditions générales de vente
-                </Link>
+                  Conditions Générales de Vente
+                </Link>{" "}
+                de FM4ALL, applicables à tout contrat ultérieur.
               </Label>
             </div>
             <div className="flex justify-center">

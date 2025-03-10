@@ -13,7 +13,7 @@ const page = () => {
   return (
     <>
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl md:text-4xl">Food & Beverage</h1>
+        <h1 className="text-3xl md:text-4xl">3. Food & Beverage</h1>
       </div>
       <Suspense fallback={<ServicesLoader />}>
         <FoodBeverage />

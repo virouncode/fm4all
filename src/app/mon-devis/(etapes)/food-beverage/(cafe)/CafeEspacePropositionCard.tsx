@@ -137,7 +137,7 @@ const CafeEspacePropositionCard = ({
   if (!proposition.totalAnnuel) {
     return (
       <div
-        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4`}
+        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center min-h-28 text-2xl gap-4`}
       >
         Non proposé
       </div>
@@ -230,7 +230,7 @@ const CafeEspacePropositionCard = ({
 
   return (
     <div
-      className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4 cursor-pointer ${
+      className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4 cursor-pointer  ${
         espace.infos.gammeCafeSelected === gamme &&
         cafe.infos.fournisseurId === proposition.fournisseurId
           ? "ring-4 ring-inset ring-fm4alldestructive"

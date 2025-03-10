@@ -1,8 +1,8 @@
+import { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import ServicesLoader from "../mes-locaux/ServicesLoader";
 import MesServices from "./MesServices";
-import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Mes Services",
@@ -48,7 +48,7 @@ const page = async ({
   return (
     <>
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl md:text-4xl">Mes services</h1>
+        <h1 className="text-3xl md:text-4xl">2. Mes services</h1>
       </div>
       <Suspense fallback={<ServicesLoader />}>
         <MesServices surface={surface} effectif={effectif} />

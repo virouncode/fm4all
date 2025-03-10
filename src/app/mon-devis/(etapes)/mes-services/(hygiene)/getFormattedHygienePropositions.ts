@@ -15,14 +15,12 @@ export const getFormattedHygienePropositions = (
 ) => {
   //Nombre de distributeurs
   const nbDistribEmp =
-    hygiene.quantites.nbDistribEmp || hygieneDistribQuantite.nbDistribEmp;
-  const nbDistribEmpPoubelle =
-    hygiene.quantites.nbDistribEmpPoubelle ||
-    hygieneDistribQuantite.nbDistribEmpPoubelle;
+    hygiene.quantites.nbDistribEmp ?? hygieneDistribQuantite.nbDistribEmp;
+  const nbDistribEmpPoubelle = nbDistribEmp;
   const nbDistribSavon =
-    hygiene.quantites.nbDistribSavon || hygieneDistribQuantite.nbDistribSavon;
+    hygiene.quantites.nbDistribSavon ?? hygieneDistribQuantite.nbDistribSavon;
   const nbDistribPh =
-    hygiene.quantites.nbDistribPh || hygieneDistribQuantite.nbDistribPh;
+    hygiene.quantites.nbDistribPh ?? hygieneDistribQuantite.nbDistribPh;
   //Tarifs distributeurs
   const dureeLocation = hygiene.infos.dureeLocation;
   const {
@@ -85,20 +83,28 @@ export const getFormattedHygienePropositions = (
     const noteGoogle = hygieneDistribTarifsFournisseur[0].noteGoogle;
     const nbAvis = hygieneDistribTarifsFournisseur[0].nbAvis;
 
+    const totalEmp =
+      nbDistribEmp && prixDistribEmp !== null && paParPersonneEmp !== null
+        ? nbDistribEmp * prixDistribEmp + paParPersonneEmp * effectif
+        : 0;
+
+    const totalPoubellEmp =
+      nbDistribEmp && nbDistribEmpPoubelle && prixDistribEmpPoubelle !== null
+        ? nbDistribEmpPoubelle * prixDistribEmpPoubelle
+        : 0;
+
+    const totalSavon =
+      nbDistribSavon && prixDistribSavon !== null && paParPersonneSavon !== null
+        ? nbDistribSavon * prixDistribSavon + paParPersonneSavon * effectif
+        : 0;
+
+    const totalPh =
+      nbDistribPh && prixDistribPh !== null && paParPersonnePh !== null
+        ? nbDistribPh * prixDistribPh + paParPersonnePh * effectif
+        : 0;
+
     const totalAnnuelTrilogie =
-      prixDistribEmp !== null &&
-      prixDistribEmpPoubelle !== null &&
-      prixDistribSavon !== null &&
-      prixDistribPh !== null &&
-      paParPersonneEmp !== null &&
-      paParPersonneSavon !== null &&
-      paParPersonnePh !== null
-        ? nbDistribEmp * prixDistribEmp +
-          nbDistribEmpPoubelle * prixDistribEmpPoubelle +
-          nbDistribSavon * prixDistribSavon +
-          nbDistribPh * prixDistribPh +
-          (paParPersonneEmp + paParPersonneSavon + paParPersonnePh) * effectif
-        : null;
+      totalEmp + totalPoubellEmp + totalSavon + totalPh || null;
 
     return {
       gamme,

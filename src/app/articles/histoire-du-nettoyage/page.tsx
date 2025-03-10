@@ -38,7 +38,6 @@ const page = () => {
             ces métiers.
           </p>
           <p>L&apos;âge d&apos;Or des entreprises de nettoyage était né.</p>
-
           <p>
             Avec très peu de frein à l&apos;entrée, l&apos;investissement de
             départ se résumant à un chariot de ménage, un chasuble et quelques

@@ -4,9 +4,9 @@ import { toast } from "@/hooks/use-toast";
 import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites";
 import { SelectIncendieTarifsType } from "@/zod-schemas/incendieTarifs";
 import { ChangeEvent, useContext } from "react";
-import SecuriteIncendieFournisseurLogo from "./SecuriteIncendieFournisseurLogo";
-import SecuriteIncendieInputs from "./SecuriteIncendieInputs";
-import SecuriteIncendiePropostionCard from "./SecuriteIncendiePropostionCard";
+import { useMediaQuery } from "react-responsive";
+import SecuriteIncendieDesktopPropositions from "./(desktop)/SecuriteIncendieDesktopPropositions";
+import SecuriteIncendieMobilePropositions from "./(mobile)/SecuriteIncendieMobilePropositions";
 
 export const MAX_NB_EXTINCTEURS = 100;
 export const MAX_NB_BAES = 100;
@@ -284,32 +284,28 @@ const SecuriteIncendiePropositions = ({
     }
   };
 
-  return (
-    <div className="h-full flex flex-col border rounded-xl overflow-auto">
-      {propositions.length > 0 &&
-        propositions.map((proposition) => (
-          <div className="flex border-b flex-1" key={proposition.id}>
-            <div className="flex w-1/4 items-center justify-between flex-col gap-10 p-4">
-              <SecuriteIncendieFournisseurLogo {...proposition} />
-              <SecuriteIncendieInputs
-                nbExtincteurs={nbExtincteurs}
-                nbBaes={nbBaes}
-                nbTelBaes={nbTelBaes}
-                handleChangeNbr={handleChangeNbr}
-                incendieQuantite={incendieQuantite}
-              />
-              <p className="text-xs text-fm4alldestructive italic px-2 text-center">
-                Les quantités sont estimées pour vous mais vous pouvez les
-                changer
-              </p>
-            </div>
-            <SecuriteIncendiePropostionCard
-              proposition={proposition}
-              handleClickProposition={handleClickProposition}
-            />
-          </div>
-        ))}
-    </div>
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+
+  return isTabletOrMobile ? (
+    <SecuriteIncendieMobilePropositions
+      propositions={propositions}
+      nbExtincteurs={nbExtincteurs}
+      nbBaes={nbBaes}
+      nbTelBaes={nbTelBaes}
+      handleChangeNbr={handleChangeNbr}
+      incendieQuantite={incendieQuantite}
+      handleClickProposition={handleClickProposition}
+    />
+  ) : (
+    <SecuriteIncendieDesktopPropositions
+      propositions={propositions}
+      nbExtincteurs={nbExtincteurs}
+      nbBaes={nbBaes}
+      nbTelBaes={nbTelBaes}
+      handleChangeNbr={handleChangeNbr}
+      incendieQuantite={incendieQuantite}
+      handleClickProposition={handleClickProposition}
+    />
   );
 };
 

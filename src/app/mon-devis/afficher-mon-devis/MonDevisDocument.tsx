@@ -33,47 +33,73 @@ const MonDevisDocument = ({ devisUrl }: MonDevisDocumentProps) => {
           <p>
             <strong>Pour donner suite</strong> :
           </p>
-          <div className="flex flex-col items-center justify-center gap-4">
-            <Button variant="destructive" size="lg" className="text-base">
-              <Link
-                href="https://calendly.com/romuald-fm4all/rdv-fm4all"
-                target="_blank"
-              >
-                Je prends un rendez-vous visio
-              </Link>
-            </Button>
-            <Button variant="destructive" size="lg" className="text-base">
-              Je contacte par téléphone le{" "}
-              <Link href="tel:+33669311046">+33 6 69 31 10 46</Link>
-            </Button>
-            <Button variant="destructive" size="lg" className="text-base">
-              <Link href="mailto:devis@fm4all.com">
-                Je renvoie mon devis signé
-              </Link>
-            </Button>
-          </div>
+        </div>
+        <div className="flex flex-col items-center justify-center gap-4">
+          <Button
+            variant="destructive"
+            size="lg"
+            className="text-base flex items-center justify-center w-full"
+            asChild
+          >
+            <Link
+              href="https://calendly.com/romuald-fm4all/rdv-fm4all"
+              target="_blank"
+            >
+              Je prends un rendez-vous en visio
+            </Link>
+          </Button>
+          <Button
+            variant="destructive"
+            size="lg"
+            className="text-base flex items-center justify-center w-full"
+            asChild
+          >
+            <Link href="tel:+33669311046">Je contacte par téléphone</Link>
+          </Button>
+          <Button
+            variant="destructive"
+            size="lg"
+            className="text-base flex items-center justify-center w-full"
+            asChild
+          >
+            <Link href="mailto:contact@fm4all.com">Je contacte par e-mail</Link>
+          </Button>
         </div>
         <div className="w-full mt-6 mb-6">
           <embed src={devisUrl} className="w-full h-screen" />
         </div>
-        <div className="flex flex-col gap-4 mx-auto max-w-prose items-center hyphens-auto text-wrap">
-          <p>Vous avez des questions ?</p>
+        <div className="flex flex-col gap-4 mx-auto  items-center hyphens-auto text-wrap">
+          <p className="max-w-prose">Vous avez des questions ?</p>
           <div className="flex flex-col items-center justify-center gap-4">
-            <Button variant="destructive" size="lg" className="text-base">
+            <Button
+              variant="destructive"
+              size="lg"
+              className="text-base w-full flex items-center justify-center"
+              asChild
+            >
               <Link
                 href="https://calendly.com/romuald-fm4all/rdv-fm4all"
                 target="_blank"
               >
-                Je prends un rendez-vous visio
+                Je prends un rendez-vous en visio
               </Link>
             </Button>
-            <Button variant="destructive" size="lg" className="text-base">
-              Je contacte par téléphone le{" "}
-              <Link href="tel:+33669311046">+33 6 69 31 10 46</Link>
+            <Button
+              variant="destructive"
+              size="lg"
+              className="text-base w-full flex items-center justify-center"
+              asChild
+            >
+              <Link href="tel:+33669311046">Je contacte par téléphone</Link>
             </Button>
-            <Button variant="destructive" size="lg" className="text-base">
-              <Link href="mailto:devis@fm4all.com">
-                Je renvoie mon devis signé
+            <Button
+              variant="destructive"
+              size="lg"
+              className="text-base w-full flex items-center justify-center"
+              asChild
+            >
+              <Link href="mailto:contact@fm4all.com">
+                Je contacte par e-mail
               </Link>
             </Button>
           </div>

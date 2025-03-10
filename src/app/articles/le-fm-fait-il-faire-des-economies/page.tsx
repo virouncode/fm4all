@@ -25,7 +25,6 @@ const page = () => {
             <Link href="/articles">Revenir aux articles</Link>
           </Button>
         </div>
-
         <div className="flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap text-lg">
           <h2 className="font-bold">
             La réponse courte est &quot;Oui&quot;. Mais il faut savoir ce que

@@ -35,7 +35,7 @@ const page = async () => {
   return (
     <>
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl md:text-4xl">Personnaliser mon devis</h1>
+        <h1 className="text-3xl md:text-4xl">6. Personnaliser mon devis</h1>
       </div>
       <Suspense fallback={<ServicesLoader />}>
         <PersonnaliserDevis

@@ -37,12 +37,8 @@ const CookieBanner = () => {
   }, []);
 
   useEffect(() => {
-    console.log("use effect changed cookie consent", cookieConsent);
-
     if (cookieConsent === null) return;
     const newValue = cookieConsent ? "granted" : "denied";
-    console.log("window", window);
-    console.log("window.gtag", window.gtag);
 
     if (window !== undefined && window.gtag) {
       window.gtag("consent", "update", {

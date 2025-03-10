@@ -149,13 +149,13 @@ const Total = () => {
         <Button
           variant="outline"
           size="lg"
-          className="text-base absolute top-20 right-10"
+          className="text-base fixed bottom-6 right-4 lg:absolute lg:top-[20px] lg:right-0 z-30"
         >
           <Calculator />
           {formatNumber(Math.round((total.totalAnnuelHt ?? 0) * MARGE))} € HT/an
         </Button>
       </SheetTrigger>
-      <SheetContent className="flex flex-col">
+      <SheetContent className="flex flex-col w-full lg:w-[calc(100%-20rem)]">
         <SheetHeader>
           <SheetTitle>
             <span className="text-2xl">
