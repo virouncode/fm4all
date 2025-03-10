@@ -182,7 +182,7 @@ const NettoyageMobileOptionsVitrerieCard = ({
             max={MAX_PASSAGES_VITRERIE}
             step={1}
             onChange={handleChangeNbPassageVitrerie}
-            className={`w-full ${
+            className={`w-16 ${
               nettoyage.quantites.nbPassagesVitrerie === 2
                 ? "text-fm4alldestructive"
                 : ""

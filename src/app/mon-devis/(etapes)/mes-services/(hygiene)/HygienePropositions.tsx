@@ -548,6 +548,7 @@ const HygienePropositions = ({
       prixInstalDistrib={prixInstalDistrib}
       propositions={propositions}
       handleClickProposition={handleClickProposition}
+      hygieneDistribTarifsFournisseur={hygieneDistribTarifsFournisseur}
     />
   ) : (
     <HygieneDesktopPropositions
