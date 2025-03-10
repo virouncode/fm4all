@@ -5,6 +5,7 @@ import { IncendieContext } from "@/context/IncendieProvider";
 import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { SelectIncendieTarifsType } from "@/zod-schemas/incendieTarifs";
 import { Minus, Plus } from "lucide-react";
+import Image from "next/image";
 import React, { useContext } from "react";
 import {
   MAX_NB_BAES,
@@ -283,6 +284,15 @@ const SecuriteIncendieMobileInputs = ({
           Indiquez votre nombre de BAES (blocs autonomes d&apos;éclairage de
           sécurité) :
         </p>
+        <div className="w-24 h-16 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+          <Image
+            src={"/img/services/baes.webp"}
+            alt={`illustration de bloc autonome d'eclairage de securite`}
+            fill={true}
+            className="object-cover cursor-pointer"
+            quality={100}
+          />
+        </div>
         <div className="flex flex-col w-full p-1 gap-2">
           <Label htmlFor="nbBaes" className="text-sm">
             Nombre de BAES
@@ -327,6 +337,15 @@ const SecuriteIncendieMobileInputs = ({
       </div>
       <div className="flex flex-col gap-4">
         <p>Indiquez votre nombre de télécommandes BAES :</p>
+        <div className="w-24 h-16 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+          <Image
+            src={"/img/services/tel_baes.webp"}
+            alt={`illustration de télécommande de bloc autonome d'eclairage de securite`}
+            fill={true}
+            className="object-cover cursor-pointer"
+            quality={100}
+          />
+        </div>
         <div className="flex flex-col w-full p-1 gap-2">
           <Label htmlFor="nbTelBaes" className="text-sm">
             Nombre de télécommandes

@@ -374,7 +374,6 @@ const CafeEspaceForm = ({
       newNbPersonnes = MAX_NB_PERSONNES_PAR_ESPACE;
       toast({
         title: "Limite atteinte",
-        variant: "destructive",
         description:
           "Le nombre de personnes par espace café est limité à 150. Choisissez une offre puis ajoutez un espace café si besoin",
         duration: 7000,
