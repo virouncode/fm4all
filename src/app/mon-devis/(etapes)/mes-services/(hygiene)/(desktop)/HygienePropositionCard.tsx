@@ -6,6 +6,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
+import { MARGE } from "@/constants/constants";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
@@ -93,7 +94,8 @@ const HygienePropositionCard = ({
 
   const prixInstallationText = prixInstalDistrib ? (
     <p className="font-bold text-base ml-4">
-      +{formatNumber(Math.round(prixInstalDistrib))} € d&apos;installation
+      +{formatNumber(Math.round(prixInstalDistrib * MARGE))} €
+      d&apos;installation
     </p>
   ) : null;
 

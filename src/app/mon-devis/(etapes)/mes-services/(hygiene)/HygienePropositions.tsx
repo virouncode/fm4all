@@ -287,6 +287,7 @@ const HygienePropositions = ({
           },
         }));
         totalEmp =
+          newNbrEmp &&
           prixDistribEmp !== null &&
           paParPersonneEmp !== null &&
           prixDistribEmpPoubelle !== null
@@ -294,17 +295,20 @@ const HygienePropositions = ({
               paParPersonneEmp * effectif
             : null;
         totalSavon =
-          prixDistribSavon !== null && paParPersonneSavon !== null
+          nbDistribSavon &&
+          prixDistribSavon !== null &&
+          paParPersonneSavon !== null
             ? nbDistribSavon * prixDistribSavon + paParPersonneSavon * effectif
             : null;
         totalPh =
-          prixDistribPh !== null && paParPersonnePh !== null
+          nbDistribPh && prixDistribPh !== null && paParPersonnePh !== null
             ? nbDistribPh * prixDistribPh + paParPersonnePh * effectif
             : null;
         totalTrilogie =
-          totalEmp !== null && totalSavon !== null && totalPh !== null
-            ? totalEmp + totalSavon + totalPh
-            : null;
+          totalEmp === null && totalSavon === null && totalPh === null
+            ? null
+            : (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0);
+
         if (hygiene.infos.trilogieGammeSelected) {
           setTotalHygiene((prev) => ({
             ...prev,
@@ -323,6 +327,7 @@ const HygienePropositions = ({
           },
         }));
         totalEmp =
+          nbDistribEmp &&
           prixDistribEmp !== null &&
           paParPersonneEmp !== null &&
           prixDistribEmpPoubelle !== null
@@ -330,17 +335,19 @@ const HygienePropositions = ({
               paParPersonneEmp * effectif
             : null;
         totalSavon =
-          prixDistribSavon !== null && paParPersonneSavon !== null
+          newNbSavon !== null &&
+          prixDistribSavon !== null &&
+          paParPersonneSavon !== null
             ? newNbSavon * prixDistribSavon + paParPersonneSavon * effectif
             : null;
         totalPh =
-          prixDistribPh !== null && paParPersonnePh !== null
+          nbDistribPh && prixDistribPh !== null && paParPersonnePh !== null
             ? nbDistribPh * prixDistribPh + paParPersonnePh * effectif
             : null;
         totalTrilogie =
-          totalEmp !== null && totalSavon !== null && totalPh !== null
-            ? totalEmp + totalSavon + totalPh
-            : null;
+          totalEmp === null && totalSavon === null && totalPh === null
+            ? null
+            : (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0);
         if (hygiene.infos.trilogieGammeSelected) {
           setTotalHygiene((prev) => ({
             ...prev,
@@ -359,6 +366,7 @@ const HygienePropositions = ({
           },
         }));
         totalEmp =
+          nbDistribEmp &&
           prixDistribEmp !== null &&
           paParPersonneEmp !== null &&
           prixDistribEmpPoubelle !== null
@@ -366,17 +374,19 @@ const HygienePropositions = ({
               paParPersonneEmp * effectif
             : null;
         totalSavon =
-          prixDistribSavon !== null && paParPersonneSavon !== null
+          nbDistribSavon &&
+          prixDistribSavon !== null &&
+          paParPersonneSavon !== null
             ? nbDistribSavon * prixDistribSavon + paParPersonneSavon * effectif
             : null;
         totalPh =
-          prixDistribPh !== null && paParPersonnePh !== null
+          newNbPh && prixDistribPh !== null && paParPersonnePh !== null
             ? newNbPh * prixDistribPh + paParPersonnePh * effectif
             : null;
         totalTrilogie =
-          totalEmp !== null && totalSavon !== null && totalPh !== null
-            ? totalEmp + totalSavon + totalPh
-            : null;
+          totalEmp === null && totalSavon === null && totalPh === null
+            ? null
+            : (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0);
         if (hygiene.infos.trilogieGammeSelected) {
           setTotalHygiene((prev) => ({
             ...prev,
@@ -444,6 +454,7 @@ const HygienePropositions = ({
     const paParPersonneDesinfectant = hygiene.prix.paParPersonneDesinfectant;
 
     const totalEmp =
+      nbDistribEmp &&
       prixDistribEmp !== null &&
       paParPersonneEmp !== null &&
       prixDistribEmpPoubelle !== null
@@ -451,24 +462,23 @@ const HygienePropositions = ({
           paParPersonneEmp * effectif
         : null;
     const totalSavon =
-      prixDistribSavon !== null && paParPersonneSavon !== null
+      nbDistribSavon && prixDistribSavon !== null && paParPersonneSavon !== null
         ? nbDistribSavon * prixDistribSavon + paParPersonneSavon * effectif
         : null;
     const totalPh =
-      prixDistribPh !== null && paParPersonnePh !== null
+      nbDistribPh && prixDistribPh !== null && paParPersonnePh !== null
         ? nbDistribPh * prixDistribPh + paParPersonnePh * effectif
         : null;
 
-    const totalTrilogie =
-      hygiene.infos.trilogieGammeSelected &&
-      totalEmp !== null &&
-      totalSavon !== null &&
-      totalPh !== null
-        ? totalEmp + totalSavon + totalPh
-        : null;
+    const totalTrilogie = !hygiene.infos.trilogieGammeSelected
+      ? null
+      : totalEmp === null && totalSavon === null && totalPh === null
+      ? null
+      : (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0);
+
     const totalDesinfectant =
       hygiene.infos.desinfectantGammeSelected &&
-      nbDistribDesinfectant !== null &&
+      nbDistribDesinfectant &&
       prixDistribDesinfectant !== null &&
       paParPersonneDesinfectant !== null
         ? nbDistribDesinfectant * prixDistribDesinfectant +
@@ -477,19 +487,19 @@ const HygienePropositions = ({
 
     const totalParfum =
       hygiene.infos.parfumGammeSelected &&
-      nbDistribParfum !== null &&
+      nbDistribParfum &&
       prixDistribParfum !== null
         ? nbDistribParfum * prixDistribParfum
         : null;
     const totalBalai =
       hygiene.infos.balaiGammeSelected &&
-      nbDistribBalai !== null &&
+      nbDistribBalai &&
       prixDistribBalai !== null
         ? nbDistribBalai * prixDistribBalai
         : null;
     const totalPoubelle =
       hygiene.infos.poubelleGammeSelected &&
-      nbDistribPoubelle !== null &&
+      nbDistribPoubelle &&
       prixDistribPoubelle !== null
         ? nbDistribPoubelle * prixDistribPoubelle
         : null;

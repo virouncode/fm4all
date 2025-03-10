@@ -46,7 +46,7 @@ const HygieneDistribQuantitesInputs = ({
       <div className="flex gap-4 items-center w-full">
         <Input
           type="number"
-          value={nbDistribEmp}
+          value={nbDistribEmp || ""}
           min={1}
           max={MAX_NB_EMP}
           step={1}
@@ -66,7 +66,7 @@ const HygieneDistribQuantitesInputs = ({
       <div className="flex gap-4 items-center w-full">
         <Input
           type="number"
-          value={nbDistribSavon}
+          value={nbDistribSavon || ""}
           min={1}
           max={MAX_NB_SAVON}
           step={1}
@@ -86,7 +86,7 @@ const HygieneDistribQuantitesInputs = ({
       <div className="flex gap-4 items-center w-full">
         <Input
           type="number"
-          value={nbDistribPh}
+          value={nbDistribPh || ""}
           min={1}
           max={MAX_NB_PH}
           step={1}

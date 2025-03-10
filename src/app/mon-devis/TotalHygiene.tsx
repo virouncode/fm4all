@@ -16,9 +16,14 @@ const TotalHygiene = () => {
     totalPoubelle,
     totalInstallation,
   } = totalHygiene;
-  const total = Object.values(totalHygiene)
-    .filter((item) => item !== null)
-    .reduce((sum, value) => sum + value, 0);
+
+  const total = totalTrilogie
+    ? (totalTrilogie ?? 0) +
+      (totalDesinfectant ?? 0) +
+      (totalParfum ?? 0) +
+      (totalBalai ?? 0) +
+      (totalPoubelle ?? 0)
+    : null;
 
   if (!total) return null;
 

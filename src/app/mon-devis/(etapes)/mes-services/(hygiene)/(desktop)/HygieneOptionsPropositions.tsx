@@ -332,6 +332,7 @@ const HygieneOptionsPropositions = ({
             )?.[dureeLocation] ?? null;
 
           const totalDesinfectant =
+            newNbDistribDesinfectant &&
             prixDistribDesinfectant !== null &&
             paParPersonneDesinfectant !== null &&
             newNbDistribDesinfectant
@@ -364,7 +365,7 @@ const HygieneOptionsPropositions = ({
             )?.[dureeLocation] ?? null;
 
           const totalParfum =
-            prixDistribParfum !== null
+            newNbDistribParfum && prixDistribParfum !== null
               ? newNbDistribParfum * prixDistribParfum
               : null;
           setTotalHygiene((prev) => ({
@@ -394,7 +395,7 @@ const HygieneOptionsPropositions = ({
             )?.[dureeLocation] ?? null;
 
           const totalBalai =
-            prixDistribBalai !== null
+            newNbDistribBalai && prixDistribBalai !== null
               ? newNbDistribBalai * prixDistribBalai
               : null;
           setTotalHygiene((prev) => ({
@@ -424,7 +425,7 @@ const HygieneOptionsPropositions = ({
             )?.[dureeLocation] ?? null;
 
           const totalPoubelle =
-            prixDistribPoubelle !== null
+            newNbDistribPoubelle && prixDistribPoubelle !== null
               ? newNbDistribPoubelle * prixDistribPoubelle
               : null;
           setTotalHygiene((prev) => ({

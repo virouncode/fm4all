@@ -98,7 +98,7 @@ const HygieneOptionsParfumCard = ({
           <div className="flex gap-4 items-center justify-center w-full">
             <Input
               type="number"
-              value={nbDistribParfum}
+              value={nbDistribParfum || ""}
               min={1}
               max={100}
               step={1}

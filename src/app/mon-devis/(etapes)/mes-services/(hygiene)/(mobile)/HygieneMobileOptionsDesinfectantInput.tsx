@@ -1,9 +1,9 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { HygieneContext } from "@/context/HygieneProvider";
+import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { useContext } from "react";
 import { MAX_NB_DISTRIB } from "../(desktop)/HygieneOptionsPropositions";
-import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 
 type HygieneMobileOptionsDesinfectantInputProps = {
   nbDistribDesinfectant: number;

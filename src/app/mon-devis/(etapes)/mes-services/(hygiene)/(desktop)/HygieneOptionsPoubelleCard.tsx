@@ -99,7 +99,7 @@ const HygieneOptionsPoubelleCard = ({
           <div className="flex gap-4 items-center justify-center w-full">
             <Input
               type="number"
-              value={nbDistribPoubelle}
+              value={nbDistribPoubelle || ""}
               min={1}
               max={100}
               step={1}

@@ -98,7 +98,7 @@ const HygieneOptionsBalaiCard = ({
           <div className="flex gap-4 items-center justify-center w-full">
             <Input
               type="number"
-              value={nbDistribBalai}
+              value={nbDistribBalai || ""}
               min={1}
               max={100}
               step={1}

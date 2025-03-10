@@ -89,7 +89,7 @@ export const getFormattedHygienePropositions = (
         : 0;
 
     const totalPoubellEmp =
-      nbDistribEmpPoubelle && prixDistribEmpPoubelle !== null
+      nbDistribEmp && nbDistribEmpPoubelle && prixDistribEmpPoubelle !== null
         ? nbDistribEmpPoubelle * prixDistribEmpPoubelle
         : 0;
 
