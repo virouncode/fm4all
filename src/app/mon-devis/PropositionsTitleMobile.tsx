@@ -25,6 +25,16 @@ const PropositionsTitleMobile = ({
   const titleRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const handleClickTitle = () => {
+    // let initialContainerTop = 0;
+    // let initialWindowScroll = 0;
+    // let initialOffset = 0;
+    // if (containerRef.current) {
+    //   console.log(containerRef.current.getBoundingClientRect().top);
+    //   initialContainerTop = containerRef.current.getBoundingClientRect().top;
+    //   console.log(window.scrollY);
+    //   initialWindowScroll = window.scrollY;
+    //   initialOffset = initialWindowScroll - initialContainerTop;
+    // }
     if (titleRef?.current) {
       titleRef.current.classList.toggle("text-fm4allsecondary");
       titleRef.current.classList.toggle("border-fm4allsecondary");
@@ -41,6 +51,9 @@ const PropositionsTitleMobile = ({
     if (triangleRef.current) {
       triangleRef.current.classList.toggle("-rotate-180");
       triangleRef.current.classList.toggle("-rotate-90");
+    }
+    if (containerRef.current) {
+      window.scroll(0, containerRef.current.offsetTop - 120);
     }
   };
   return (
