@@ -96,11 +96,11 @@ const FontaineEspace = ({
 
   return (
     <div
-      className="h-full flex flex-col"
+      className="h-full flex flex-col overflow-hidden"
       id={`espace_fontaine_${espace.infos.espaceId}`}
     >
       {/* <FontaineEspaceSummary espace={espace} /> */}
-      <div className="w-full flex justify-between items-start py-1">
+      <div className="w-full flex justify-between items-start py-1 overflow-hidden">
         <FontaineEspaceForm
           espace={espace}
           fontainesModeles={fontainesModeles}

@@ -65,14 +65,14 @@ const Hygiene = ({
         <PropositionsTitleMobile
           icon={Toilet}
           title="Hygiène sanitaire"
-          description="Un tarif forfaitaire tout compris pour vos sanitaires avec distributeurs et consommables mis en place : essuie-main papier, savon & papier hygiénique. La gamme détermine la finition des distributeurs."
+          description="Un tarif forfaitaire tout compris pour vos sanitaires avec distributeurs et consommables mis en place : essuie-main papier, savon & papier hygiénique. La gamme détermine la finition des distributeurs"
           propositionsRef={propositionsRef}
         />
       ) : (
         <PropositionsTitle
           icon={Toilet}
           title="Hygiène sanitaire"
-          description="Un tarif forfaitaire tout compris pour vos sanitaires avec distributeurs et consommables mis en place : essuie-main papier, savon & papier hygiénique. La gamme détermine la finition des distributeurs."
+          description="Un tarif forfaitaire tout compris pour vos sanitaires avec distributeurs et consommables mis en place : essuie-main papier, savon & papier hygiénique. La gamme détermine la finition des distributeurs"
           handleClickPrevious={handleClickPrevious}
         />
       )}

@@ -238,7 +238,7 @@ const NettoyagePropositions = ({
     if (fournisseurId !== nettoyage.infos.fournisseurId) {
       toast({
         title: "Fournisseur sélectionné",
-        description: `Vous avez choisi ${nomFournisseur} pour le nettoyage, ce prestataire ou son partenaire assurera la prestation hygiène sanitaire`,
+        description: `Vous avez choisi ${nomFournisseur} pour le nettoyage, ce prestataire ou son partenaire assurera la prestation Hygiène sanitaire`,
       });
     }
 

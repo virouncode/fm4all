@@ -1,5 +1,3 @@
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -7,6 +5,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { TypesPoseType } from "@/constants/typesPose";
 import { FontainesContext } from "@/context/FontainesProvider";
@@ -117,72 +116,128 @@ const FontaineEspacePropositionCard = ({
   if (!proposition.totalAnnuel) {
     return (
       <div
-        className={`flex flex-1 items-center p-4 justify-center text-2xl gap-4 bg-slate-100 border-r`}
+        className={`flex flex-1 bg-slate-100  items-center p-4 justify-center text-xl gap-4 border-r min-h-36`}
       >
         Non proposé
       </div>
     );
   }
 
-  const totalMensuelText = `${formatNumber(
-    Math.round((proposition.totalAnnuel * MARGE) / 12)
-  )} € / mois`;
-  const prixInstallationText = proposition.totalInstallation
-    ? `+ ${formatNumber(
-        Math.round(proposition.totalInstallation * MARGE)
-      )} € d'installation`
-    : "";
+  const totalMensuelText = (
+    <p className="font-bold text-xl ml-4">
+      {formatNumber(Math.round((proposition.totalAnnuel * MARGE) / 12))} €/mois
+    </p>
+  );
+
+  const prixInstallationText = proposition.totalInstallation ? (
+    <p className="text-base ml-4">
+      + {formatNumber(Math.round(proposition.totalInstallation * MARGE))} €
+      d&apos;installation
+    </p>
+  ) : null;
 
   const infosEssentiel = (
-    <div className="flex flex-col gap-4">
-      <p className="text-center text-lg">A poser</p>
-      <p className="text-center text-sm font-normal">
-        Machine table top à poser sur un plan de travail ou une table
-      </p>
-    </div>
+    <>
+      <li className="list-check">
+        Machine à poser sur un plan de travail ou une table
+      </li>
+    </>
   );
   const infosConfort = (
-    <div className="flex flex-col gap-4">
-      <p className="text-center text-lg">Colonne sur pied</p>
-      <p className="text-center text-sm font-normal">
+    <>
+      <li className="list-check">
         Machine autonome fournie avec un meuble ou un pied
-      </p>
-    </div>
+      </li>
+    </>
   );
   const infosExcellence = (
-    <div className="flex flex-col gap-4">
-      <p className="text-center text-lg">Sur comptoir</p>
-      <p className="text-center text-sm font-normal">
-        Machine intégrée sous un meuble (non fourni). Seule la colonne de
-        distribution dépasse
-      </p>
-    </div>
+    <>
+      <li className="list-check">
+        Machine intégrée sous un meuble (non fourni) avec colonne de
+        distribution
+      </li>
+    </>
   );
-  const infosTitle =
-    proposition.typePose === "aposer"
-      ? infosEssentiel
-      : proposition.typePose === "colonne"
-      ? infosConfort
-      : infosExcellence;
+  const dialogTitle = (
+    <p className="text-center">
+      {proposition.typePose === "aposer"
+        ? "A poser"
+        : proposition.typePose === "colonne"
+        ? "Colonne sur pied"
+        : "Sous comptoir"}
+    </p>
+  );
+  const infosProduit = (
+    <ul className="flex flex-col text-xs px-4 mx-auto">
+      <li className="list-check text-sm font-bold">
+        1 fontaine{" "}
+        <span
+          className={`${
+            proposition.fournisseurId === 13 ? "inline-block blur-sm" : ""
+          }`}
+        >
+          {proposition.marque}
+        </span>{" "}
+        {proposition.modele}{" "}
+        {proposition.reconditionne ? " reconditionnée(s)" : ""}
+      </li>
+      {proposition.typePose === "aposer"
+        ? infosEssentiel
+        : proposition.typePose === "colonne"
+        ? infosConfort
+        : infosExcellence}
+
+      <li className="list-check">Filtres et maintenance inclus</li>
+      {getTypeFontaine(espace.infos.typeEau) === "EG" ||
+      getTypeFontaine(espace.infos.typeEau) === "ECG" ? (
+        <li className="list-check">CO2 inclus</li>
+      ) : null}
+    </ul>
+  );
+
+  const infosProduitDialog = (
+    <ul className="flex flex-col text-sm px-4 mx-auto">
+      <li className="list-check font-bold">
+        1 fontaine{" "}
+        <span
+          className={`${
+            proposition.fournisseurId === 13 ? "inline-block blur-sm" : ""
+          }`}
+        >
+          {proposition.marque}
+        </span>{" "}
+        {proposition.modele}{" "}
+        {proposition.reconditionne ? " reconditionnée(s)" : ""}
+      </li>
+      {proposition.typePose === "aposer"
+        ? infosEssentiel
+        : proposition.typePose === "colonne"
+        ? infosConfort
+        : infosExcellence}
+
+      <li className="list-check">Filtres et maintenance inclus</li>
+      {getTypeFontaine(espace.infos.typeEau) === "EG" ||
+      getTypeFontaine(espace.infos.typeEau) === "ECG" ? (
+        <li className="list-check">CO2 inclus</li>
+      ) : null}
+    </ul>
+  );
 
   const imgProduit = proposition.imageUrl ? (
-    <div>
-      <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-200">
-        <Image
-          src={proposition.imageUrl}
-          alt={`${proposition.marque} ${proposition.modele}`}
-          fill
-          quality={100}
-          className="object-contain"
-        />
-      </div>
-      <p className="text-xs text-end italic">*photo non contractuelle</p>
+    <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-100">
+      <Image
+        src={proposition.imageUrl}
+        alt={`illustration ${proposition.marque} ${proposition.modele}`}
+        fill
+        quality={100}
+        className="object-contain"
+      />
     </div>
   ) : null;
 
   return (
     <div
-      className={`flex flex-1  items-center p-4 justify-center text-2xl gap-4 cursor-pointer bg-slate-100 border-r ${
+      className={`flex flex-1 items-center p-4 justify-center text-2xl gap-4 cursor-pointer bg-slate-100 border-r ${
         fontaines.infos.fournisseurId === proposition.fournisseurId &&
         espace.infos.poseSelected === proposition.typePose
           ? "ring-4 ring-inset ring-fm4alldestructive"
@@ -194,70 +249,44 @@ const FontaineEspacePropositionCard = ({
           : handleClickProposition(proposition)
       }
     >
-      {proposition.totalAnnuel ? (
-        <Checkbox
-          checked={
-            fontaines.infos.fournisseurId === proposition.fournisseurId &&
-            (espace.infos.poseSelected === proposition.typePose ? true : false)
-          }
-          onCheckedChange={() => () =>
-            fontainesEspacesIds[0] === espace.infos.espaceId
-              ? handleClickFirstEspaceProposition(proposition)
-              : handleClickProposition(proposition)}
-          className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-          aria-label="Sélectionner cette proposition"
-        />
-      ) : null}
+      <Switch
+        checked={
+          fontaines.infos.fournisseurId === proposition.fournisseurId &&
+          (espace.infos.poseSelected === proposition.typePose ? true : false)
+        }
+        onCheckedChange={() => () =>
+          fontainesEspacesIds[0] === espace.infos.espaceId
+            ? handleClickFirstEspaceProposition(proposition)
+            : handleClickProposition(proposition)}
+        className="data-[state=checked]:bg-fm4alldestructive"
+        title="Sélectionner cette proposition"
+      />
+
       <div>
         <div className="flex gap-2 items-center">
-          <p className="font-bold">{totalMensuelText}</p>
+          {totalMensuelText}
           <Dialog>
             <DialogTrigger asChild>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="hover:bg-transparent hover:opacity-80"
+              <Info
+                size={16}
+                className="cursor-pointer"
                 onClick={(e) => e.stopPropagation()}
-                title="Détails de l'offre"
-              >
-                <Info size={16} />
-              </Button>
+              />
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>{infosTitle}</DialogTitle>
+                <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
               {imgProduit}
+              <p className="text-xs italic text-end">
+                *photo non contractuelle
+              </p>
+              {infosProduitDialog}
             </DialogContent>
           </Dialog>
         </div>
-        {prixInstallationText && (
-          <p className="text-base">{prixInstallationText}</p>
-        )}
-
-        <p className="text-xs">
-          1 fontaine{" "}
-          <span
-            className={`${
-              proposition.fournisseurId === 13 ? "inline-block blur-sm" : ""
-            }`}
-          >
-            {proposition.marque}
-          </span>{" "}
-          {proposition.modele}{" "}
-          {proposition.reconditionne ? " reconditionnée(s)" : ""}
-        </p>
-        <p className="text-xs">Filtres et maintenance inclus</p>
-        {/* {getTypeFontaine(espace.infos.typeEau) === "EC" ||
-              getTypeFontaine(espace.infos.typeEau) === "ECG" ? (
-                <p className="text-xs">
-                  Consommables ~ 15 L / an / personne d&apos;eau chaude
-                </p>
-              ) : null} */}
-        {getTypeFontaine(espace.infos.typeEau) === "EG" ||
-        getTypeFontaine(espace.infos.typeEau) === "ECG" ? (
-          <p className="text-xs">CO2 inclus</p>
-        ) : null}
+        {prixInstallationText}
+        {infosProduit}
       </div>
     </div>
   );

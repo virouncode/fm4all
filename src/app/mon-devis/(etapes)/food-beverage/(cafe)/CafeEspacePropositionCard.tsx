@@ -1,5 +1,3 @@
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -7,6 +5,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { CafeContext } from "@/context/CafeProvider";
 import { formatNumber } from "@/lib/formatNumber";
@@ -144,63 +143,21 @@ const CafeEspacePropositionCard = ({
     );
   }
 
-  const totalMensuelText = `${formatNumber(
-    Math.round((proposition.totalAnnuel * MARGE) / 12)
-  )} € / mois`;
-  const prixInstallationText = proposition.totalInstallation
-    ? `+ ${formatNumber(
-        Math.round(proposition.totalInstallation * MARGE)
-      )} € d'installation`
-    : "";
+  const totalMensuelText = (
+    <p className="font-bold text-xl ml-4">
+      {formatNumber(Math.round((proposition.totalAnnuel * MARGE) / 12))} €/mois
+    </p>
+  );
 
-  //Détails de l'offre
-  const typeLaitText = !proposition.typeLait
-    ? ""
-    : proposition.typeLait === "dosettes"
-    ? "Lait en dosettes"
-    : proposition.typeLait === "frais"
-    ? "Lait frais"
-    : "Lait en poudre machine";
-  const typeChocolatText = !proposition.typeChocolat
-    ? ""
-    : proposition.typeChocolat === "sachets"
-    ? "Chocolat en sachets"
-    : "Chocolat en poudre machine";
-
-  const imgProduit = proposition.imageUrl ? (
-    <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-200">
-      <Image
-        src={proposition.imageUrl}
-        alt={`${proposition.marque} ${proposition.modele}`}
-        fill
-        quality={100}
-        className="object-contain"
-      />
-    </div>
+  const prixInstallationText = proposition.totalInstallation ? (
+    <p className="text-base ml-4">
+      + {formatNumber(Math.round(proposition.totalInstallation * MARGE))} €
+      d&apos;installation
+    </p>
   ) : null;
 
-  const infosEssentiel = (
-    <p>
-      {proposition.infos
-        ? proposition.infos
-        : "Café conventionnel dit Classique, Blend"}
-    </p>
-  );
-  const infosConfort = (
-    <p>
-      {proposition.infos ? proposition.infos : "Café Supérieur, 100% Arabica"}
-    </p>
-  );
-  const infosExcellence = (
-    <p>
-      {proposition.infos
-        ? proposition.infos
-        : "Café de spécialité, premium, café d’exception, Bio"}
-    </p>
-  );
-
-  const infosTitle = (
-    <p className={`text-${getFm4AllColor(proposition.gamme)} text-center`}>
+  const dialogTitle = (
+    <p className={`text-${color} text-center`}>
       {proposition.gamme === "essentiel"
         ? "Essentiel"
         : proposition.gamme === "confort"
@@ -209,23 +166,100 @@ const CafeEspacePropositionCard = ({
     </p>
   );
 
+  //Détails de l'offre
+  const typeLaitText = !proposition.typeLait ? null : proposition.typeLait ===
+    "dosettes" ? (
+    <li className="list-check">Lait en dosettes</li>
+  ) : proposition.typeLait === "frais" ? (
+    <li className="list-check">Lait frais</li>
+  ) : (
+    <li className="list-check">Lait en poudre machine</li>
+  );
+
+  const typeChocolatText =
+    !proposition.typeChocolat ? null : proposition.typeChocolat ===
+      "sachets" ? (
+      <li className="list-check">Chocolat en sachets</li>
+    ) : (
+      <li className="list-check">Chocolat en poudre machine</li>
+    );
+
+  const imgProduit = proposition.imageUrl ? (
+    <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-100">
+      <Image
+        src={proposition.imageUrl}
+        alt={`illustration ${proposition.marque} ${proposition.modele}`}
+        fill
+        quality={100}
+        className="object-contain"
+      />
+    </div>
+  ) : null;
+
+  const infosEssentiel = (
+    <li className="list-check">
+      {proposition.infos
+        ? proposition.infos
+        : "Café conventionnel dit Classique, Blend"}
+    </li>
+  );
+  const infosConfort = (
+    <li className="list-check">
+      {proposition.infos ? proposition.infos : "Café Supérieur, 100% Arabica"}
+    </li>
+  );
+  const infosExcellence = (
+    <li className="list-check">
+      {proposition.infos
+        ? proposition.infos
+        : "Café de spécialité, premium, café d’exception, Bio"}
+    </li>
+  );
+
   const infosProduit = (
-    <div className="flex flex-col text-sm my-4">
+    <ul className="flex flex-col text-xs px-4 mx-auto">
+      <li className="list-check text-sm font-bold">
+        {proposition.nbMachines} machine(s) {proposition.marque}{" "}
+        {proposition.modele}{" "}
+        {proposition.reconditionne ? " reconditionnée(s)" : ""}
+      </li>
       {gamme === "essentiel"
         ? infosEssentiel
         : gamme === "confort"
         ? infosConfort
         : infosExcellence}
-      <p>{typeLaitText}</p>
-      <p>{typeChocolatText}</p>
-      <p className="mb-4">
+      {typeLaitText}
+      {typeChocolatText}
+      <li className="list-check">
+        Consommables ~ {proposition.nbTassesParJ} tasses / j
+      </li>
+      <li className="list-check">
+        Maintenance: {proposition.nbPassagesParAn} passages / an
+      </li>
+    </ul>
+  );
+
+  const infosProduitDialog = (
+    <ul className="flex flex-col text-sm px-4 mx-auto">
+      <li className="list-check font-bold">
         {proposition.nbMachines} machine(s) {proposition.marque}{" "}
         {proposition.modele}{" "}
         {proposition.reconditionne ? " reconditionnée(s)" : ""}
-      </p>
-      {imgProduit}
-      <p className="text-xs text-end italic">*photo non contractuelle</p>
-    </div>
+      </li>
+      {gamme === "essentiel"
+        ? infosEssentiel
+        : gamme === "confort"
+        ? infosConfort
+        : infosExcellence}
+      {typeLaitText}
+      {typeChocolatText}
+      <li className="list-check">
+        Consommables ~ {proposition.nbTassesParJ} tasses / j
+      </li>
+      <li className="list-check">
+        Maintenance: {proposition.nbPassagesParAn} passages / an
+      </li>
+    </ul>
   );
 
   return (
@@ -242,58 +276,43 @@ const CafeEspacePropositionCard = ({
           : handleClickProposition(proposition)
       }
     >
-      {proposition.totalAnnuel ? (
-        <Checkbox
-          checked={
-            espace.infos.gammeCafeSelected === gamme &&
-            cafe.infos.fournisseurId === proposition.fournisseurId
-          }
-          onCheckedChange={() => () =>
-            cafeEspacesIds[0] === espace.infos.espaceId
-              ? handleClickFirstEspaceProposition(proposition)
-              : handleClickProposition(proposition)}
-          className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-          aria-label="Sélectionner cette proposition"
-        />
-      ) : null}
+      <Switch
+        checked={
+          espace.infos.gammeCafeSelected === gamme &&
+          cafe.infos.fournisseurId === proposition.fournisseurId
+        }
+        onCheckedChange={() => () =>
+          cafeEspacesIds[0] === espace.infos.espaceId
+            ? handleClickFirstEspaceProposition(proposition)
+            : handleClickProposition(proposition)}
+        className="data-[state=checked]:bg-fm4alldestructive"
+        title="Sélectionner cette proposition"
+      />
       <div>
         <div className="flex gap-2 items-center">
-          <p className="font-bold">{totalMensuelText}</p>
+          {totalMensuelText}
           <Dialog>
             <DialogTrigger asChild>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="hover:bg-transparent hover:text-slate-200 hover:opacity-80"
+              <Info
+                size={16}
+                className="cursor-pointer"
                 onClick={(e) => e.stopPropagation()}
-                title="Détails de l'offre"
-              >
-                <Info size={16} />
-              </Button>
+              />
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>{infosTitle}</DialogTitle>
+                <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
-              {infosProduit}
+              {imgProduit}
+              <p className="text-xs italic text-end">
+                *photo non contractuelle
+              </p>
+              {infosProduitDialog}
             </DialogContent>
           </Dialog>
         </div>
-        {prixInstallationText && (
-          <p className="text-base">{prixInstallationText}</p>
-        )}
-
-        <p className="text-xs">
-          {proposition.nbMachines} machine(s) {proposition.marque}{" "}
-          {proposition.modele}{" "}
-          {proposition.reconditionne ? " reconditionnée(s)" : ""}
-        </p>
-        <p className="text-xs">
-          Consommables ~ {proposition.nbTassesParJ} tasses / j
-        </p>
-        <p className="text-xs">
-          Maintenance: {proposition.nbPassagesParAn} passages / an
-        </p>
+        {prixInstallationText}
+        {infosProduit}
       </div>
     </div>
 

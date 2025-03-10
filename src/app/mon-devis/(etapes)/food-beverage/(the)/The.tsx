@@ -43,10 +43,7 @@ const The = ({ theConsoTarifs }: TheProps) => {
       <div className="w-full flex-1 overflow-auto">
         <ThePropositions theConsoTarifs={theConsoTarifs} />
       </div>
-      <PropositionsFooter
-        handleClickNext={handleClickNext}
-        comment="*Les quantités sont éstimées à 15% de la consommation de votre effetif"
-      />
+      <PropositionsFooter handleClickNext={handleClickNext} />
     </div>
   );
 };

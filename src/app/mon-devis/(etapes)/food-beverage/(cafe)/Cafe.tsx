@@ -111,11 +111,11 @@ const Cafe = ({
       <PropositionsTitle
         icon={Coffee}
         title="Boissons chaudes"
-        description="Café expresso, boissons lactées ou chocolatées, choisissez le type de machine puis la Gamme de qualité de café qui vous convient le mieux. Forfait mensuel tout compris (machine, café, consommables)"
+        description="Café expresso, boissons lactées ou chocolatées, choisissez le type de machine et le nombre de personnes pour votre espace café. Forfait mensuel tout compris (machine, café, consommables). La gamme détermine la qualité du café"
         handleClickPrevious={handleClickPrevious}
         previousButton={false}
       />
-      <div className="w-full flex-1 overflow-auto">
+      <div className="w-full flex-1 overflow-hidden">
         {cafe.nbEspaces && cafe.nbEspaces > 0 ? (
           cafe.espaces.map((espace) => (
             <CafeEspace

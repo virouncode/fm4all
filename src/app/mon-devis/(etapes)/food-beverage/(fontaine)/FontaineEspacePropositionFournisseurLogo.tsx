@@ -1,5 +1,4 @@
 import FournisseurDialog from "@/app/mon-devis/FournisseurDialog";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -40,36 +39,30 @@ const FontaineEspacePropositionFournisseurLogo = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button
-          className="flex w-1/4 h-full items-center justify-center p-2 relative bg-transparent hover:bg-transparent shadow-none"
-          asChild
-          title="Infos sur le fournisseur"
-        >
-          <div>
-            {logoUrl ? (
-              <div
-                className={`w-full h-full relative ${
-                  fournisseurId === 13 ? "blur-lg" : ""
-                }`}
-              >
-                <Image
-                  src={logoUrl}
-                  alt={`logo-de-${nomFournisseur}`}
-                  fill={true}
-                  className="w-full h-full object-contain cursor-pointer"
-                  quality={100}
-                />
-              </div>
-            ) : (
-              nomFournisseur
-            )}
-            <SquareArrowOutUpRight
-              className="absolute right-2 top-2 cursor-pointer hover:opacity-70"
-              size={16}
-              color="#000000"
-            />
-          </div>
-        </Button>
+        <div className="flex w-1/4 h-full items-center justify-center p-2 relative">
+          {logoUrl ? (
+            <div
+              className={`w-full h-full relative ${
+                fournisseurId === 13 ? "blur-lg" : ""
+              }`}
+            >
+              <Image
+                src={logoUrl}
+                alt={`logo-de-${nomFournisseur}`}
+                fill={true}
+                className="w-full h-full object-contain cursor-pointer"
+                quality={100}
+              />
+            </div>
+          ) : (
+            nomFournisseur
+          )}
+          <SquareArrowOutUpRight
+            className="absolute right-2 top-2 cursor-pointer hover:opacity-70"
+            size={16}
+            color="#000000"
+          />
+        </div>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

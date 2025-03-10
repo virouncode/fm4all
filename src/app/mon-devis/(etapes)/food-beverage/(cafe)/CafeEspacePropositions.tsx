@@ -25,11 +25,9 @@ import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { useContext } from "react";
-import NextServiceButton from "../../../NextServiceButton";
-import AddEspaceButton from "./AddEspaceButton";
-import CafeEspacePropositionCard from "./CafeEspacePropositionCard";
-import CafeEspacePropositionFournisseurLogo from "./CafeEspacePropositionFournisseurLogo";
-import NextEspaceButton from "./NextEspaceButton";
+import { useMediaQuery } from "react-responsive";
+import CafeEspaceDesktopPropositions from "./(desktop)/CafeEspaceDesktopPropositions";
+import CafeEspaceMobilePropositions from "./(mobile)/CafeEspaceMobilePropositions";
 
 export const MAX_NB_PERSONNES_PAR_ESPACE = 150;
 
@@ -62,6 +60,7 @@ const CafeEspacePropositions = ({
   const { setTotalCafe } = useContext(TotalCafeContext);
   const { setTotalThe } = useContext(TotalTheContext);
   const { setTotalSnacksFruits } = useContext(TotalSnacksFruitsContext);
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 
   //Calcul des propositions
   const cafeEspacesIds = cafe.espaces.map((espace) => espace.infos.espaceId);
@@ -92,7 +91,7 @@ const CafeEspacePropositions = ({
       <div className="flex-1 flex items-center justify-center border rounded-xl">
         <p className="max-w-prose text-center text-base">
           Le fournisseur choisi précédemment ne propose pas d&apos;offre pour
-          ces critères, veuillez changer le type de boissons ou le nombre de
+          ces critères, veuillez changer le type de machine ou le nombre de
           personnes.
         </p>
       </div>
@@ -633,6 +632,12 @@ const CafeEspacePropositions = ({
     } else {
       //======================== JE COCHE ======================//
       //Pour chaque espace et le the si gammeCafeSelected je mets à jour les prix et le total
+      if (fournisseurId !== cafe.infos.fournisseurId) {
+        toast({
+          title: "Fournisseur sélectionné",
+          description: `Vous avez choisi ${nomFournisseur} pour le café, ce prestataire assurera la prestation Thés variés`,
+        });
+      }
       const newCafeInfos = {
         ...cafe.infos,
         fournisseurId,
@@ -1008,48 +1013,30 @@ const CafeEspacePropositions = ({
     }
   };
 
-  return (
-    <div className="flex-1 flex flex-col gap-4 overflow-auto">
-      <div className="flex-1 flex flex-col border rounded-xl overflow-auto">
-        {formattedPropositions.map((propositions) => (
-          <div
-            className="flex border-b flex-1"
-            key={propositions[0].fournisseurId}
-          >
-            <CafeEspacePropositionFournisseurLogo {...propositions[0]} />
-            {propositions.map((proposition) => (
-              <CafeEspacePropositionCard
-                key={proposition.id}
-                proposition={proposition}
-                handleClickProposition={handleClickProposition}
-                handleClickFirstEspaceProposition={
-                  handleClickFirstEspaceProposition
-                }
-                espace={espace}
-                cafeEspacesIds={cafeEspacesIds}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
-      {/* <div className="flex flex-col gap-1"> */}
-      {cafeEspacesIds.slice(-1)[0] === espace.infos.espaceId ? (
-        <div className="flex justify-end gap-4 items-center">
-          {espace.infos.gammeCafeSelected ? (
-            <AddEspaceButton handleAddEspace={handleAddEspace} />
-          ) : null}
-          <NextServiceButton handleClickNext={handleClickNext} />
-        </div>
-      ) : (
-        <div className="ml-auto" onClick={handleAlert}>
-          <NextEspaceButton
-            disabled={espace.infos.gammeCafeSelected ? false : true}
-            handleClickNextEspace={handleClickNextEspace}
-          />
-        </div>
-      )}
-      {/* </div> */}
-    </div>
+  return isTabletOrMobile ? (
+    <CafeEspaceMobilePropositions
+      formattedPropositions={formattedPropositions}
+      handleClickFirstEspaceProposition={handleClickFirstEspaceProposition}
+      handleClickProposition={handleClickProposition}
+      handleAddEspace={handleAddEspace}
+      handleClickNext={handleClickNext}
+      handleClickNextEspace={handleClickNextEspace}
+      handleAlert={handleAlert}
+      cafeEspacesIds={cafeEspacesIds}
+      espace={espace}
+    />
+  ) : (
+    <CafeEspaceDesktopPropositions
+      formattedPropositions={formattedPropositions}
+      handleClickFirstEspaceProposition={handleClickFirstEspaceProposition}
+      handleClickProposition={handleClickProposition}
+      handleAddEspace={handleAddEspace}
+      handleClickNext={handleClickNext}
+      handleClickNextEspace={handleClickNextEspace}
+      handleAlert={handleAlert}
+      cafeEspacesIds={cafeEspacesIds}
+      espace={espace}
+    />
   );
 };
 

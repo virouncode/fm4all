@@ -96,7 +96,7 @@ const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
         description="Eau fraîche ou pétillante, de l'eau pure filtrée pour tous. Adaptés à votre besoin, nos fontaines réseau sont à poser, sur pied ou sous comptoir"
         handleClickPrevious={handleClickPrevious}
       />
-      <div className="w-full flex-1 overflow-auto">
+      <div className="w-full flex-1 overflow-hidden">
         {fontaines.nbEspaces && fontaines.nbEspaces > 0 ? (
           fontaines.espaces.map((espace) => (
             <FontaineEspace

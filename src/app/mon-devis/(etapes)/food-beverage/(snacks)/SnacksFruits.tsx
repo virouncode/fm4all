@@ -62,7 +62,7 @@ const SnacksFruits = ({
         icon2={Banana}
         icon3={CupSoda}
         title="Snacks & Fruits"
-        description="Fruits locaux, bio, eco-responsables, snacks sains et gourmands, boissons fraiches, chaque semaine faites varier les plaisirs dans un panier qui ravira vos équipes"
+        description="Fruits locaux, bio, eco-responsables, snacks sains et gourmands, boissons fraiches, chaque semaine faites varier les plaisirs dans un panier qui ravira vos équipes. La gamme détermine les quantités par personne par semaine"
         handleClickPrevious={handleClickPrevious}
       />
       <SnacksFruitsForm

@@ -1,5 +1,3 @@
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -7,11 +5,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { TheContext } from "@/context/TheProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { Info } from "lucide-react";
+import Image from "next/image";
 import { useContext } from "react";
 
 type ThePropositionCardProps = {
@@ -75,32 +75,35 @@ const ThePropositionCard = ({
       </div>
     );
   }
-  const totalMensuelText = `${formatNumber(
-    Math.round((proposition.totalAnnuel * MARGE) / 12)
-  )} € / mois*`;
-
-  //Détails de l'offre
+  const totalMensuelText = (
+    <p className="font-bold text-xl ml-4">
+      {formatNumber(Math.round((proposition.totalAnnuel * MARGE) / 12))} €/mois
+    </p>
+  );
 
   const infosEssentiel = (
-    <div className="flex flex-col gap-2">
-      <p>The en sachet, un ou deux au choix</p>
-      {proposition.infos && <p>{proposition.infos}</p>}
-    </div>
+    <>
+      <li className="list-check">The en sachet, un ou deux au choix</li>
+      {proposition.infos && <li className="list-check">{proposition.infos}</li>}
+    </>
   );
+
   const infosConfort = (
-    <div className="flex flex-col gap-2">
-      <p>Choix de plusieurs thés en sachets</p>
-      {proposition.infos && <p>{proposition.infos}</p>}
-    </div>
+    <>
+      <li className="list-check">Choix de plusieurs thés en sachets</li>
+      {proposition.infos && <li className="list-check">{proposition.infos}</li>}
+    </>
   );
+
   const infosExcellence = (
-    <div className="flex flex-col gap-2">
-      <p>Thés Premium en boite bois ou présentoir</p>
-      {proposition.infos && <p>{proposition.infos}</p>}
-    </div>
+    <>
+      <li className="list-check">Thés Premium en boite bois ou présentoir</li>
+      {proposition.infos && <li className="list-check">{proposition.infos}</li>}
+    </>
   );
-  const infosTitle = (
-    <p className={`text-${getFm4AllColor(proposition.gamme)} text-center`}>
+
+  const dialogTitle = (
+    <p className={`text-${color} text-center`}>
       {proposition.gamme === "essentiel"
         ? "Essentiel"
         : proposition.gamme === "confort"
@@ -110,12 +113,42 @@ const ThePropositionCard = ({
   );
 
   const infosProduit = (
-    <div className="flex flex-col text-sm my-4">
+    <ul className="flex flex-col text-xs px-4 mx-auto">
       {gamme === "essentiel"
         ? infosEssentiel
         : gamme === "confort"
         ? infosConfort
         : infosExcellence}
+      <li className="list-check">
+        Consommables ~ {nbTassesParJour} tasses / j
+      </li>
+    </ul>
+  );
+  const infosProduitDialog = (
+    <ul className="flex flex-col text-sm px-4 mx-auto">
+      {gamme === "essentiel"
+        ? infosEssentiel
+        : gamme === "confort"
+        ? infosConfort
+        : infosExcellence}
+      <li className="list-check">
+        Consommables ~ {nbTassesParJour} tasses / j
+      </li>
+    </ul>
+  );
+  const imgProduit = (
+    <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-100">
+      <Image
+        src={
+          gamme === "excellence"
+            ? "/img/services/the_coffrets.webp"
+            : "/img/services/the_sachets.webp"
+        }
+        alt={`illustration de thés variés`}
+        fill
+        quality={100}
+        className="object-contain"
+      />
     </div>
   );
 
@@ -128,38 +161,36 @@ const ThePropositionCard = ({
       }`}
       onClick={() => handleClickProposition(proposition)}
     >
-      {proposition.totalAnnuel ? (
-        <Checkbox
-          checked={the.infos.gammeSelected === proposition.gamme}
-          onCheckedChange={() => handleClickProposition(proposition)}
-          className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-          aria-label="Sélectionner cette proposition"
-        />
-      ) : null}
+      <Switch
+        checked={the.infos.gammeSelected === proposition.gamme}
+        onCheckedChange={() => handleClickProposition(proposition)}
+        className="data-[state=checked]:bg-fm4alldestructive"
+        title="Sélectionner cette proposition"
+      />
       <div>
         <div className="flex gap-2 items-center">
-          <p className="font-bold">{totalMensuelText}</p>
+          {totalMensuelText}
           <Dialog>
             <DialogTrigger asChild>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="hover:bg-transparent hover:text-slate-200 hover:opacity-80"
+              <Info
+                size={16}
+                className="cursor-pointer"
                 onClick={(e) => e.stopPropagation()}
-                title="Détails de l'offre"
-              >
-                <Info size={16} />
-              </Button>
+              />
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>{infosTitle}</DialogTitle>
+                <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
-              {infosProduit}
+              {imgProduit}
+              <p className="text-xs italic text-end">
+                *photo non contractuelle
+              </p>
+              {infosProduitDialog}
             </DialogContent>
           </Dialog>
         </div>
-        <p className="text-sm">Consommables ~ {nbTassesParJour} tasses / j</p>
+        {infosProduit}
       </div>
     </div>
   );
