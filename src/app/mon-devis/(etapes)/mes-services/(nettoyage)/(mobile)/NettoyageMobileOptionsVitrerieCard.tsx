@@ -13,12 +13,12 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
+import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { Minus, Plus } from "lucide-react";
 import Image from "next/image";
 import React, { useContext } from "react";
 import { MAX_PASSAGES_VITRERIE } from "../(desktop)/NettoyageOptionsPropositions";
-import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 
 type NettoyageMobileOptionsVitrerieCardProps = {
   vitrerieProposition: {
@@ -317,7 +317,10 @@ const NettoyageMobileOptionsVitrerieCard = ({
             ) : null}
           </div>
         </div>
-        <div className="flex h-1/2 pt-2 justify-between gap-6">
+        <div
+          className="flex h-1/2 pt-2 justify-between gap-6"
+          onClick={() => handleClickVitrerieProposition(vitrerieProposition)}
+        >
           <ul className="flex flex-col ml-4 text-xs w-2/3">
             {infosProduit}
             {nbPassagesVitrerieText}
@@ -336,6 +339,7 @@ const NettoyageMobileOptionsVitrerieCard = ({
                   handleClickVitrerieProposition(vitrerieProposition)
                 }
                 title="Sélectionner cette proposition"
+                onClick={(e) => e.stopPropagation()}
               />
             ) : null}
           </div>

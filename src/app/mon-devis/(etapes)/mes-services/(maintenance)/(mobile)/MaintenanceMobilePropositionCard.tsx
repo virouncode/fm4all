@@ -254,7 +254,10 @@ const MaintenanceMobilePropositionCard = ({
             )}
           </div>
         </div>
-        <div className="flex h-2/3 pt-2 justify-between">
+        <div
+          className="flex h-2/3 pt-2 justify-between"
+          onClick={() => handleClickProposition(proposition)}
+        >
           {infosProduit}
           <div className="flex flex-col gap-2 items-end">
             {totalMensuelText}
@@ -272,6 +275,7 @@ const MaintenanceMobilePropositionCard = ({
                 }
                 onCheckedChange={() => handleClickProposition(proposition)}
                 title="Sélectionnez cette proposition"
+                onClick={(e) => e.stopPropagation()}
               />
             ) : null}
           </div>

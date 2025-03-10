@@ -250,7 +250,10 @@ const HygieneMobileOptionsBalaiCard = ({
             )}
           </div>
         </div>
-        <div className="flex h-1/2 pt-2 justify-between">
+        <div
+          className="flex h-1/2 pt-2 justify-between"
+          onClick={() => handleClickProposition("balai", proposition)}
+        >
           {infosProduit}
           <div className="flex flex-col gap-2 items-end">
             {prixMensuelBalaiText}
@@ -266,6 +269,7 @@ const HygieneMobileOptionsBalaiCard = ({
                   handleClickProposition("balai", proposition)
                 }
                 title="Sélectionnez cette proposition"
+                onClick={(e) => e.stopPropagation()}
               />
             ) : null}
           </div>

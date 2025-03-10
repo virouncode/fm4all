@@ -194,7 +194,10 @@ const NettoyageMobileOptionsSamediCard = ({
             ) : null}
           </div>
         </div>
-        <div className="flex h-1/2 pt-2 justify-between gap-6">
+        <div
+          className="flex h-1/2 pt-2 justify-between gap-6"
+          onClick={() => handleClickSamediProposition(samediProposition)}
+        >
           <ul className="flex flex-col ml-4 text-xs w-2/3">
             {infosProduit}
             {samediNbPassagesParSemaineText}
@@ -213,6 +216,7 @@ const NettoyageMobileOptionsSamediCard = ({
                   handleClickSamediProposition(samediProposition)
                 }
                 title="Sélectionner cette proposition"
+                onClick={(e) => e.stopPropagation()}
               />
             ) : null}
           </div>

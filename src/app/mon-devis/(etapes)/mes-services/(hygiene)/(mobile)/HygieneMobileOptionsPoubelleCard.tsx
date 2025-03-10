@@ -251,7 +251,10 @@ const HygieneMobileOptionsPoubelleCard = ({
             )}
           </div>
         </div>
-        <div className="flex h-1/2 pt-2 justify-between">
+        <div
+          className="flex h-1/2 pt-2 justify-between"
+          onClick={() => handleClickProposition("poubelle", proposition)}
+        >
           {infosProduit}
           <div className="flex flex-col gap-2 items-end">
             {prixMensuelPoubelleText}
@@ -267,6 +270,7 @@ const HygieneMobileOptionsPoubelleCard = ({
                   handleClickProposition("poubelle", proposition)
                 }
                 title="Sélectionnez cette proposition"
+                onClick={(e) => e.stopPropagation()}
               />
             ) : null}
           </div>

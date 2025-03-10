@@ -209,7 +209,10 @@ const NettoyageMobilePropositionCard = ({
             )}
           </div>
         </div>
-        <div className="flex h-1/2 pt-2 justify-between">
+        <div
+          className="flex h-1/2 pt-2 justify-between"
+          onClick={() => handleClickProposition(proposition)}
+        >
           <ul className="flex flex-col ml-4 text-xs w-2/3">
             {infosProduit}
             {hParSemaineText}
@@ -229,6 +232,7 @@ const NettoyageMobilePropositionCard = ({
                 nettoyage.infos.gammeSelected === gamme
               }
               onCheckedChange={() => handleClickProposition(proposition)}
+              onClick={(e) => e.stopPropagation()}
               title="Sélectionnez cette proposition"
             />
           </div>

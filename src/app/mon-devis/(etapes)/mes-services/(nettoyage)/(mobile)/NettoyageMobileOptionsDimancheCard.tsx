@@ -194,7 +194,10 @@ const NettoyageMobileOptionsDimancheCard = ({
             ) : null}
           </div>
         </div>
-        <div className="flex h-1/2 pt-2 justify-between gap-6">
+        <div
+          className="flex h-1/2 pt-2 justify-between gap-6"
+          onClick={() => handleClickDimancheProposition(dimancheProposition)}
+        >
           <ul className="flex flex-col ml-4 text-xs w-2/3">
             {infosProduit}
             {dimancheNbPassagesParSemaineText}
@@ -213,6 +216,7 @@ const NettoyageMobileOptionsDimancheCard = ({
                   handleClickDimancheProposition(dimancheProposition)
                 }
                 title="Sélectionner cette proposition"
+                onClick={(e) => e.stopPropagation()}
               />
             ) : null}
           </div>

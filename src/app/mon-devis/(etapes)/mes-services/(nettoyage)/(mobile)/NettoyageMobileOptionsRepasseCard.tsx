@@ -213,7 +213,14 @@ const NettoyageMobileOptionsRepasseCard = ({
             ) : null}
           </div>
         </div>
-        <div className="flex h-1/2 pt-2 justify-between gap-6">
+        <div
+          className="flex h-1/2 pt-2 justify-between gap-6"
+          onClick={
+            repasseProposition
+              ? () => handleClickRepasseProposition(repasseProposition)
+              : undefined
+          }
+        >
           <ul className="flex flex-col ml-4 text-xs w-2/3">
             {infosProduit}
             {repasseHParSemaineText}
@@ -233,6 +240,7 @@ const NettoyageMobileOptionsRepasseCard = ({
                   handleClickRepasseProposition(repasseProposition)
                 }
                 title="Sélectionner cette proposition"
+                onClick={(e) => e.stopPropagation()}
               />
             ) : null}
           </div>
