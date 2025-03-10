@@ -294,6 +294,7 @@ const SecuriteIncendiePropositions = ({
       nbTelBaes={nbTelBaes}
       handleChangeNbr={handleChangeNbr}
       incendieQuantite={incendieQuantite}
+      incendieTarifs={incendieTarifs}
       handleClickProposition={handleClickProposition}
     />
   ) : (
