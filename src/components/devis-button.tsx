@@ -42,7 +42,8 @@ import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { toast } from "@/hooks/use-toast";
 import { ToastAction } from "@radix-ui/react-toast";
-import { Link } from "lucide-react";
+import Link from "next/link";
+
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
