@@ -19,8 +19,8 @@ import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import CafeDesktopEspaces from "./(desktop)/CafeDesktopEspaces";
-import { MAX_NB_PERSONNES_PAR_ESPACE } from "./CafeEspacePropositions";
 import CafeMobileEspaces from "./(mobile)/CafeMobileEspaces";
+import { MAX_NB_PERSONNES_PAR_ESPACE } from "./CafeEspacePropositions";
 
 type CafeProps = {
   cafeMachines: SelectCafeMachinesType[];
@@ -116,7 +116,7 @@ const Cafe = ({
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
           title="Boissons chaudes"
-          description="Café expresso, boissons lactées ou chocolatées, choisissez le type de machine et le nombre de personnes pour votre espace café. Forfait mensuel tout compris (machine, café, consommables). La gamme détermine la qualité du café"
+          description="Café expresso, boissons lactées ou chocolatées, choisissez le type de boissons et le nombre de personnes pour votre espace café. Forfait mensuel tout compris (machine, café, consommables). La gamme détermine la qualité du café"
           icon={SprayCan}
           propositionsRef={propositionsRef}
         />
@@ -124,7 +124,7 @@ const Cafe = ({
         <PropositionsTitle
           icon={Coffee}
           title="Boissons chaudes"
-          description="Café expresso, boissons lactées ou chocolatées, choisissez le type de machine et le nombre de personnes pour votre espace café. Forfait mensuel tout compris (machine, café, consommables). La gamme détermine la qualité du café"
+          description="Café expresso, boissons lactées ou chocolatées, choisissez le type de boissons et le nombre de personnes pour votre espace café. Forfait mensuel tout compris (machine, café, consommables). La gamme détermine la qualité du café"
           handleClickPrevious={handleClickPrevious}
           previousButton={false}
         />

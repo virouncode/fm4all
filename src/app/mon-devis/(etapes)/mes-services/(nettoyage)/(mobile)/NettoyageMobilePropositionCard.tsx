@@ -80,11 +80,12 @@ const NettoyageMobilePropositionCard = ({
     nbAvis,
   } = proposition;
   const color = getFm4AllColor(gamme);
-  const totalMensuelText = (
+  const totalMensuelText = totalAnnuel ? (
     <p className="text-sm font-bold">
-      {formatNumber(Math.round(((totalAnnuel ?? 0) * MARGE) / 12))} €/mois
+      {formatNumber(Math.round((totalAnnuel * MARGE) / 12))} €/mois
     </p>
-  );
+  ) : null;
+
   const hParSemaineText =
     hParPassage && freqAnnuelle ? (
       <li className="list-check">
@@ -102,16 +103,36 @@ const NettoyageMobilePropositionCard = ({
   const infosEssentiel = "Entretien fonctionnel et optimisé";
   const infosConfort = "Equilibre parfait entre qualité et efficacité";
   const infosExcellence = "Un standard de propreté exemplaire";
+
   const infosProduit = (
-    <li className="list-check">
-      {gamme === "essentiel"
-        ? infosEssentiel
-        : gamme === "confort"
-        ? infosConfort
-        : infosExcellence}
-    </li>
+    <ul className="flex flex-col text-xs px-4 w-2/3">
+      <li className="list-check">
+        {gamme === "essentiel"
+          ? infosEssentiel
+          : gamme === "confort"
+          ? infosConfort
+          : infosExcellence}
+      </li>
+      {hParSemaineText}
+      {nbPassagesParSemaineText}
+    </ul>
   );
-  const infosTitle = (
+
+  const infosProduitDialog = (
+    <ul className="flex flex-col text-sm px-4 mx-auto">
+      <li className="list-check">
+        {gamme === "essentiel"
+          ? infosEssentiel
+          : gamme === "confort"
+          ? infosConfort
+          : infosExcellence}
+      </li>
+      {hParSemaineText}
+      {nbPassagesParSemaineText}
+    </ul>
+  );
+
+  const dialogTitle = (
     <p className={`text-${color} text-center`}>
       {gamme === "essentiel"
         ? "Essentiel"
@@ -119,6 +140,30 @@ const NettoyageMobilePropositionCard = ({
         ? "Confort"
         : "Excellence"}
     </p>
+  );
+
+  const imgProduit = (
+    <div className="w-1/3 h-full relative rounded-xl overflow-hidden bg-slate-100">
+      <Image
+        src={"/img/services/nettoyage.webp"}
+        alt={`illustration de nettoyage`}
+        fill={true}
+        className="object-contain cursor-pointer"
+        quality={100}
+      />
+    </div>
+  );
+
+  const imgProduitDialog = (
+    <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+      <Image
+        src={"/img/services/nettoyage.webp"}
+        alt={`illustration de nettoyage`}
+        fill={true}
+        className="object-contain object-center cursor-pointer"
+        quality={100}
+      />
+    </div>
   );
 
   return (
@@ -133,36 +178,17 @@ const NettoyageMobilePropositionCard = ({
       >
         <div className="flex items-center h-1/2 gap-2 border-b pb-2 border-slate-200">
           <Dialog>
-            <DialogTrigger asChild>
-              <div className="w-1/3 h-full relative rounded-xl overflow-hidden bg-slate-100">
-                <Image
-                  src={"/img/services/nettoyage.webp"}
-                  alt={`illustration de nettoyage`}
-                  fill={true}
-                  className="object-contain cursor-pointer"
-                  quality={100}
-                />
-              </div>
-            </DialogTrigger>
+            <DialogTrigger asChild>{imgProduit}</DialogTrigger>
             <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
               <DialogHeader>
-                <DialogTitle>{infosTitle}</DialogTitle>
+                <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
-              <div className="flex flex-col gap-4 items-center">
-                <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
-                  <Image
-                    src={"/img/services/nettoyage.webp"}
-                    alt={`illustration de nettoyage`}
-                    fill={true}
-                    className="object-contain object-center cursor-pointer"
-                    quality={100}
-                  />
-                </div>
-                <ul className="flex flex-col text-xs px-4">
-                  {infosProduit}
-                  {hParSemaineText}
-                  {nbPassagesParSemaineText}
-                </ul>
+              <div className="flex flex-col gap-4">
+                {imgProduitDialog}
+                <p className="text-xs italic text-end">
+                  *photo non contractuelle
+                </p>
+                {infosProduitDialog}
               </div>
             </DialogContent>
           </Dialog>
@@ -213,28 +239,26 @@ const NettoyageMobilePropositionCard = ({
           className="flex h-1/2 pt-2 justify-between"
           onClick={() => handleClickProposition(proposition)}
         >
-          <ul className="flex flex-col ml-4 text-xs w-2/3">
-            {infosProduit}
-            {hParSemaineText}
-            {nbPassagesParSemaineText}
-          </ul>
+          {infosProduit}
           <div className="flex flex-col gap-2 items-end">
             {totalMensuelText}
-            <Switch
-              className={`${
-                nettoyage.infos.fournisseurId === fournisseurId &&
-                nettoyage.infos.gammeSelected === gamme
-                  ? "data-[state=checked]:bg-fm4alldestructive"
-                  : ""
-              }`}
-              checked={
-                nettoyage.infos.fournisseurId === fournisseurId &&
-                nettoyage.infos.gammeSelected === gamme
-              }
-              onCheckedChange={() => handleClickProposition(proposition)}
-              onClick={(e) => e.stopPropagation()}
-              title="Sélectionnez cette proposition"
-            />
+            {totalAnnuel ? (
+              <Switch
+                className={`${
+                  nettoyage.infos.fournisseurId === fournisseurId &&
+                  nettoyage.infos.gammeSelected === gamme
+                    ? "data-[state=checked]:bg-fm4alldestructive"
+                    : ""
+                }`}
+                checked={
+                  nettoyage.infos.fournisseurId === fournisseurId &&
+                  nettoyage.infos.gammeSelected === gamme
+                }
+                onCheckedChange={() => handleClickProposition(proposition)}
+                onClick={(e) => e.stopPropagation()}
+                title="Sélectionnez cette proposition"
+              />
+            ) : null}
           </div>
         </div>
       </div>

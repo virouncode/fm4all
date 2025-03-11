@@ -119,7 +119,9 @@ const HygieneMobileOptionsPoubelleInput = ({
   return (
     <div className="flex flex-col gap-4">
       <p className="font-bold text-xl">Poubelle hygiène féminine</p>
-      <p>Indiquez le nombre de réceptacles : </p>
+      <p>
+        Indiquez le nombre de <strong>réceptacles</strong> :
+      </p>
       <div className="flex flex-col w-full p-1 gap-2">
         <Label htmlFor="nbDistribPoubelle" className="text-sm">
           Nombre de réceptacles

@@ -8,7 +8,7 @@ import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { useContext } from "react";
-import CafeEspace from "../CafeEspace";
+import CafeEspace from "./CafeEspace";
 
 type CafeDesktopEspacesProps = {
   cafeMachines: SelectCafeMachinesType[];

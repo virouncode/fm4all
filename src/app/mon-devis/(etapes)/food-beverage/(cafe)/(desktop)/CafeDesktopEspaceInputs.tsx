@@ -16,11 +16,11 @@ import {
 } from "@/components/ui/tooltip";
 import { locationCafeMachine } from "@/constants/locationCafeMachine";
 import { typesBoissons } from "@/constants/typesBoissons";
+import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
 import { useContext } from "react";
 import { MAX_EFFECTIF } from "../../../mes-locaux/MesLocaux";
-import { CafeContext } from "@/context/CafeProvider";
 
 type CafeDesktopEspaceInputsProps = {
   espace: CafeEspaceType;
@@ -79,7 +79,7 @@ const CafeDesktopEspaceInputs = ({
                   min={1}
                   max={MAX_EFFECTIF}
                   step={1}
-                  value={nbPersonnes}
+                  value={nbPersonnes || ""}
                   onChange={handleChangeNbPersonnes}
                   id={`nbPersonnes_${espace.infos.espaceId}`}
                 />
@@ -115,7 +115,7 @@ const CafeDesktopEspaceInputs = ({
           </form>
         </TooltipTrigger>
         <TooltipContent className="max-w-60">
-          Choisissez le type de machine avec ou sans lait/cacao, le nombre de
+          Choisissez le type de boissons avec ou sans lait/cacao, le nombre de
           personnes pour votre espace café et la durée d’engagement
         </TooltipContent>
       </Tooltip>

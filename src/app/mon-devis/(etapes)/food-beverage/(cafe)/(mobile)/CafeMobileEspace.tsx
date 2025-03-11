@@ -14,6 +14,7 @@ import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { useContext } from "react";
 import CafeEspaceForm from "../CafeEspaceForm";
+import CafeEspacePropositions from "../CafeEspacePropositions";
 import { reinitialisationCafeThe } from "../reinitialisationCafeThe";
 import RetirerEspaceButton from "../RetirerEspaceButton";
 
@@ -89,11 +90,13 @@ const CafeMobileEspace = ({
   };
   return (
     <div
-      className="h-full flex flex-col overflow-hidden gap-4 mt-4"
+      className="h-full flex flex-col overflow-hidden gap-4 mt-10"
       id={`espace_${espace.infos.espaceId}`}
     >
       <div className="flex items-center justify-between">
-        <p className="text-xl font-bold">Espace n°{espace.infos.espaceId}</p>
+        <p className="text-xl font-bold">
+          Espace café n°{espace.infos.espaceId}
+        </p>
         <div onClick={handleAlert}>
           <RetirerEspaceButton
             handleClickRemove={handleClickRemove}
@@ -114,6 +117,16 @@ const CafeMobileEspace = ({
         laitConsoTarifs={laitConsoTarifs}
         chocolatConsoTarifs={chocolatConsoTarifs}
         sucreConsoTarifs={sucreConsoTarifs}
+      />
+      <CafeEspacePropositions
+        cafeMachines={cafeMachines}
+        cafeMachinesTarifs={cafeMachinesTarifs}
+        cafeConsoTarifs={cafeConsoTarifs}
+        laitConsoTarifs={laitConsoTarifs}
+        chocolatConsoTarifs={chocolatConsoTarifs}
+        theConsoTarifs={theConsoTarifs}
+        sucreConsoTarifs={sucreConsoTarifs}
+        espace={espace}
       />
     </div>
   );

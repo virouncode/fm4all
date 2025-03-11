@@ -127,7 +127,9 @@ const HygieneMobileOptionsDesinfectantInput = ({
   return (
     <div className="flex flex-col gap-4">
       <p className="font-bold text-xl">Désinfectant cuvettes</p>
-      <p>Indiquez le nombre de distributeurs de désinfectant : </p>
+      <p>
+        Indiquez le nombre de <strong>distributeurs de désinfectant</strong> :{" "}
+      </p>
       <div className="flex flex-col w-full p-1 gap-2">
         <Label htmlFor="nbDistribDesinfectant" className="text-sm">
           Nombre de distributeurs

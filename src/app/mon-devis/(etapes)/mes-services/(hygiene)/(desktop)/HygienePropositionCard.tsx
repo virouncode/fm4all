@@ -88,7 +88,8 @@ const HygienePropositionCard = ({
   }
   const totalMensuelText = (
     <p className="font-bold text-xl ml-4">
-      {formatNumber(Math.round(proposition.totalAnnuelTrilogie / 12))} €/mois
+      {formatNumber(Math.round((proposition.totalAnnuelTrilogie * MARGE) / 12))}{" "}
+      €/mois
     </p>
   );
 

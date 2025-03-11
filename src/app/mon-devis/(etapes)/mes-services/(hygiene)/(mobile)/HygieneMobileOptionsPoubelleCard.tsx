@@ -103,7 +103,7 @@ const HygieneMobileOptionsPoubelleCard = ({
     <p className="text-sm font-bold">Non proposé</p>
   );
 
-  const infosTitle = (
+  const dialogTitle = (
     <p className={`text-${color} text-center`}>
       {gamme === "essentiel"
         ? "Essentiel"
@@ -200,10 +200,13 @@ const HygieneMobileOptionsPoubelleCard = ({
             <DialogTrigger asChild>{imgProduit}</DialogTrigger>
             <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
               <DialogHeader>
-                <DialogTitle>{infosTitle}</DialogTitle>
+                <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
-              <div className="flex flex-col gap-4 items-center">
+              <div className="flex flex-col gap-4">
                 {imgProduitDialog}
+                <p className="text-xs italic text-end">
+                  *photo non contractuelle
+                </p>
                 {infosProduitDialog}
               </div>
             </DialogContent>
@@ -256,7 +259,7 @@ const HygieneMobileOptionsPoubelleCard = ({
           onClick={() => handleClickProposition("poubelle", proposition)}
         >
           {infosProduit}
-          <div className="flex flex-col gap-2 items-end">
+          <div className="flex flex-col gap-2 items-end w-1/3">
             {prixMensuelPoubelleText}
             {totalPoubelle ? (
               <Switch

@@ -483,7 +483,9 @@ const HygieneMobileDistribQuantitesInputs = ({
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-4">
-        <p>Indiquez la durée d&apos;engagement souhaitée : </p>
+        <p>
+          Indiquez la <strong>durée d&apos;engagement</strong> souhaitée :{" "}
+        </p>
         <div className="flex flex-col w-full p-1 gap-2">
           <Label htmlFor="nbDistribPh" className="text-sm flex-1">
             Durée de location
@@ -523,7 +525,10 @@ const HygieneMobileDistribQuantitesInputs = ({
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        <p>Indiquez le nombre de distributeurs essuie-mains papier : </p>
+        <p>
+          Indiquez le nombre de{" "}
+          <strong>distributeurs essuie-mains papier</strong> :
+        </p>
         <div className="flex flex-col w-full p-1 gap-2">
           <Label htmlFor="nbDistribEmp" className="text-sm flex-1">
             Nombre de distributeurs
@@ -568,7 +573,9 @@ const HygieneMobileDistribQuantitesInputs = ({
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        <p>Indiquez le nombre de distributeurs de savon : </p>
+        <p>
+          Indiquez le nombre de <strong>distributeurs de savon</strong> :
+        </p>
         <div className="flex flex-col w-full p-1 gap-2">
           <Label htmlFor="nbDistribSavon" className="text-sm flex-1">
             Nombre de distributeurs
@@ -613,7 +620,10 @@ const HygieneMobileDistribQuantitesInputs = ({
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        <p>Indiquez le nombre de distributeurs de papier hygiénique : </p>
+        <p>
+          Indiquez le nombre de{" "}
+          <strong>distributeurs de papier hygiénique</strong> :{" "}
+        </p>
         <div className="flex flex-col w-full p-1 gap-2">
           <Label htmlFor="nbDistribPh" className="text-sm flex-1">
             Nombre de distributeurs

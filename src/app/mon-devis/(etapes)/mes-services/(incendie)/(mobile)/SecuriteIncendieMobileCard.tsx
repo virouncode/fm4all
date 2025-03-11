@@ -96,7 +96,7 @@ const SecuriteIncendieMobileCard = ({
     <p className="text-sm font-bold">Non proposé</p>
   );
 
-  const infosTitle = <p className="text-center">Sécurité incendie</p>;
+  const dialogTitle = <p className="text-center">Sécurité incendie</p>;
 
   const imgProduit = (
     <div className="w-1/3 h-full relative rounded-xl overflow-hidden bg-slate-200">
@@ -111,7 +111,7 @@ const SecuriteIncendieMobileCard = ({
   );
 
   const imgProduitDialog = (
-    <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-100">
+    <div className="w-full h-60 relative mx-auto rounded-lg border-slate-200 border bg-slate-100">
       <Image
         src={"/img/services/incendie.webp"}
         alt={`illustration de sécurité incendie`}
@@ -123,7 +123,7 @@ const SecuriteIncendieMobileCard = ({
   );
 
   const infosProduit = (
-    <ul className="flex flex-col text-xs px-4 w-3/4">
+    <ul className="flex flex-col text-xs px-4 w-2/3">
       <li className="list-check">
         1 passage/an pour le contrôle obligatoire de :
         <ul className="ml-4">
@@ -145,7 +145,7 @@ const SecuriteIncendieMobileCard = ({
   );
 
   const infosProduitDialog = (
-    <ul className="flex flex-col text-sm px-4">
+    <ul className="flex flex-col text-sm px-4 mx-auto">
       <li className="list-check">
         1 passage par an pour le contrôle obligatoire de :
         <ul className="ml-4">
@@ -179,10 +179,13 @@ const SecuriteIncendieMobileCard = ({
           <DialogTrigger asChild>{imgProduit}</DialogTrigger>
           <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
             <DialogHeader>
-              <DialogTitle>{infosTitle}</DialogTitle>
+              <DialogTitle>{dialogTitle}</DialogTitle>
             </DialogHeader>
             <div className="flex flex-col gap-4 items-center">
               {imgProduitDialog}
+              <p className="text-xs italic text-end">
+                *photo non contractuelle
+              </p>
               {infosProduitDialog}
             </div>
           </DialogContent>
@@ -235,7 +238,7 @@ const SecuriteIncendieMobileCard = ({
         onClick={() => handleClickProposition(proposition)}
       >
         {infosProduit}
-        <div className="flex flex-col gap-2 items-end">
+        <div className="flex flex-col gap-2 items-end w-1/3">
           {totalMensuelText}
           {totalAnnuelTrilogie ? (
             <Switch

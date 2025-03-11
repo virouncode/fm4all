@@ -1,12 +1,17 @@
-import NextServiceButton from "@/app/mon-devis/NextServiceButton";
+import CarouselGammesDots from "@/components/CarouselGammesDots";
+import {
+  Carousel,
+  CarouselApi,
+  CarouselContent,
+} from "@/components/ui/carousel";
+import { CafeContext } from "@/context/CafeProvider";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
-import AddEspaceButton from "../AddEspaceButton";
-import CafeEspacePropositionCard from "../CafeEspacePropositionCard";
-import CafeEspacePropositionFournisseurLogo from "../CafeEspacePropositionFournisseurLogo";
-import NextEspaceButton from "../NextEspaceButton";
+import { useContext, useEffect, useState } from "react";
+import CafeMobilePropositionCard from "./CafeMobilePropositionCard";
 
-type CafeEspaceDesktopPropositionsProps = {
-  formattedPropositions: {
+type CafeMobileEspacePropositionsCarouselProps = {
+  espace: CafeEspaceType;
+  propositions: {
     id: number;
     fournisseurId: number;
     nomFournisseur: string;
@@ -39,7 +44,7 @@ type CafeEspaceDesktopPropositionsProps = {
     prixUnitaireConsoSucre: number | null;
     totalAnnuel: number | null;
     totalInstallation: number | null;
-  }[][];
+  }[];
   handleClickProposition: (proposition: {
     id: number;
     fournisseurId: number;
@@ -108,66 +113,78 @@ type CafeEspaceDesktopPropositionsProps = {
     totalAnnuel: number | null;
     totalInstallation: number | null;
   }) => void;
-  espace: CafeEspaceType;
   cafeEspacesIds: number[];
-  handleAddEspace: () => void;
-  handleClickNext: () => void;
-  handleClickNextEspace: () => void;
-  handleAlert: () => void;
 };
 
-const CafeEspaceDesktopPropositions = ({
-  formattedPropositions,
+const CafeMobileEspacePropositionsCarousel = ({
+  espace,
+  propositions,
   handleClickProposition,
   handleClickFirstEspaceProposition,
-  espace,
   cafeEspacesIds,
-  handleAddEspace,
-  handleClickNext,
-  handleClickNextEspace,
-  handleAlert,
-}: CafeEspaceDesktopPropositionsProps) => {
+}: CafeMobileEspacePropositionsCarouselProps) => {
+  const { cafe } = useContext(CafeContext);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [api, setApi] = useState<CarouselApi>();
+
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
+    api.on("select", () => {
+      setCurrentIndex(api.selectedScrollSnap());
+    });
+  }, [api]);
+
+  useEffect(() => {
+    if (!cafe.infos.fournisseurId && !api) {
+      return;
+    }
+    if (
+      propositions[0].fournisseurId === cafe.infos.fournisseurId &&
+      espace.infos.gammeCafeSelected
+    ) {
+      api?.scrollTo(
+        espace.infos.gammeCafeSelected === "essentiel"
+          ? 0
+          : espace.infos.gammeCafeSelected === "confort"
+          ? 1
+          : 2
+      );
+    }
+  }, [
+    api,
+    cafe.infos.fournisseurId,
+    espace.infos.gammeCafeSelected,
+    propositions,
+  ]);
+
   return (
-    <div className="flex-1 flex flex-col gap-4 overflow-auto">
-      <div className="flex-1 flex flex-col border rounded-xl overflow-auto">
-        {formattedPropositions.map((propositions) => (
-          <div
-            className="flex border-b flex-1"
-            key={propositions[0].fournisseurId}
-          >
-            <CafeEspacePropositionFournisseurLogo {...propositions[0]} />
-            {propositions.map((proposition) => (
-              <CafeEspacePropositionCard
-                key={proposition.id}
-                proposition={proposition}
-                handleClickProposition={handleClickProposition}
-                handleClickFirstEspaceProposition={
-                  handleClickFirstEspaceProposition
-                }
-                espace={espace}
-                cafeEspacesIds={cafeEspacesIds}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
-      {cafeEspacesIds.slice(-1)[0] === espace.infos.espaceId ? (
-        <div className="flex justify-end gap-4 items-center">
-          {espace.infos.gammeCafeSelected ? (
-            <AddEspaceButton handleAddEspace={handleAddEspace} />
-          ) : null}
-          <NextServiceButton handleClickNext={handleClickNext} />
-        </div>
-      ) : (
-        <div className="ml-auto" onClick={handleAlert}>
-          <NextEspaceButton
-            disabled={espace.infos.gammeCafeSelected ? false : true}
-            handleClickNextEspace={handleClickNextEspace}
+    <Carousel
+      opts={{
+        align: "start",
+        loop: true,
+      }}
+      className="w-full relative"
+      setApi={setApi}
+    >
+      <CarouselContent>
+        {propositions.map((proposition) => (
+          <CafeMobilePropositionCard
+            key={proposition.id}
+            proposition={proposition}
+            handleClickProposition={handleClickProposition}
+            handleClickFirstEspaceProposition={
+              handleClickFirstEspaceProposition
+            }
+            espace={espace}
+            cafeEspacesIds={cafeEspacesIds}
           />
-        </div>
-      )}
-    </div>
+        ))}
+      </CarouselContent>
+      <CarouselGammesDots currentIndex={currentIndex} />
+    </Carousel>
   );
 };
 
-export default CafeEspaceDesktopPropositions;
+export default CafeMobileEspacePropositionsCarousel;

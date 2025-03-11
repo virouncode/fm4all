@@ -115,7 +115,9 @@ const HygieneMobileOptionsBalaiInput = ({
   return (
     <div className="flex flex-col gap-4">
       <p className="font-bold text-xl">Balais WC</p>
-      <p>Indiquez le nombre de blocs : </p>
+      <p>
+        Indiquez le nombre de <strong>blocs</strong> :{" "}
+      </p>
       <div className="flex flex-col w-full p-1 gap-2">
         <Label htmlFor="nbDistribBalai" className="text-sm">
           Nombre de blocs balais WC

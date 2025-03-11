@@ -26,8 +26,8 @@ import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
-import CafeEspaceDesktopPropositions from "./(desktop)/CafeEspaceDesktopPropositions";
-import CafeEspaceMobilePropositions from "./(mobile)/CafeEspaceMobilePropositions";
+import CafeDesktopEspacePropositions from "./(desktop)/CafeDesktopEspacePropositions";
+import CafeMobileEspacePropositions from "./(mobile)/CafeMobileEspacePropositions";
 
 export const MAX_NB_PERSONNES_PAR_ESPACE = 150;
 
@@ -66,7 +66,7 @@ const CafeEspacePropositions = ({
   const cafeEspacesIds = cafe.espaces.map((espace) => espace.infos.espaceId);
   const effectif = client.effectif ?? 0;
   const nbPersonnes =
-    espace.quantites.nbPersonnes ||
+    espace.quantites.nbPersonnes ??
     (effectif > MAX_NB_PERSONNES_PAR_ESPACE
       ? MAX_NB_PERSONNES_PAR_ESPACE
       : effectif);
@@ -91,7 +91,7 @@ const CafeEspacePropositions = ({
       <div className="flex-1 flex items-center justify-center border rounded-xl">
         <p className="max-w-prose text-center text-base">
           Le fournisseur choisi précédemment ne propose pas d&apos;offre pour
-          ces critères, veuillez changer le type de machine ou le nombre de
+          ces critères, veuillez changer le type de boissons ou le nombre de
           personnes.
         </p>
       </div>
@@ -214,7 +214,8 @@ const CafeEspacePropositions = ({
           ? (prixUnitaireConsoChocolat ?? 0) * nbTassesParAn * RATIO_CHOCO
           : 0);
 
-      const totalAnnuel = totalLoc !== null ? totalLoc + totalConso : null;
+      const totalAnnuel =
+        nbPersonnes && totalLoc !== null ? totalLoc + totalConso : null;
       //Modele
       const modele = machinesTarifFournisseur
         ? cafeMachines?.find(
@@ -632,6 +633,9 @@ const CafeEspacePropositions = ({
     } else {
       //======================== JE COCHE ======================//
       //Pour chaque espace et le the si gammeCafeSelected je mets à jour les prix et le total
+
+      console.log("Je coche");
+
       if (fournisseurId !== cafe.infos.fournisseurId) {
         toast({
           title: "Fournisseur sélectionné",
@@ -1014,7 +1018,7 @@ const CafeEspacePropositions = ({
   };
 
   return isTabletOrMobile ? (
-    <CafeEspaceMobilePropositions
+    <CafeMobileEspacePropositions
       formattedPropositions={formattedPropositions}
       handleClickFirstEspaceProposition={handleClickFirstEspaceProposition}
       handleClickProposition={handleClickProposition}
@@ -1026,7 +1030,7 @@ const CafeEspacePropositions = ({
       espace={espace}
     />
   ) : (
-    <CafeEspaceDesktopPropositions
+    <CafeDesktopEspacePropositions
       formattedPropositions={formattedPropositions}
       handleClickFirstEspaceProposition={handleClickFirstEspaceProposition}
       handleClickProposition={handleClickProposition}

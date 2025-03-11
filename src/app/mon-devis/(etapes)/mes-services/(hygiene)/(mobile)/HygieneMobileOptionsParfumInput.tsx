@@ -119,7 +119,9 @@ const HygieneMobileOptionsParfumInput = ({
   return (
     <div className="flex flex-col gap-4">
       <p className="font-bold text-xl">Parfum</p>
-      <p>Indiquez le nombre de diffuseurs de parfum : </p>
+      <p>
+        Indiquez le nombre de <strong>diffuseurs de parfum</strong> :
+      </p>
       <div className="flex flex-col w-full p-1 gap-2">
         <Label htmlFor="nbDistribParfum" className="text-sm">
           Nombre de distributeurs

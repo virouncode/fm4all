@@ -13,11 +13,11 @@ import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { useContext } from "react";
-import CafeEspaceForm from "./CafeEspaceForm";
-import CafeEspacePropositions from "./CafeEspacePropositions";
-import PreviousEspaceButton from "./PreviousEspaceButton";
-import { reinitialisationCafeThe } from "./reinitialisationCafeThe";
-import RetirerEspaceButton from "./RetirerEspaceButton";
+import CafeEspaceForm from "../CafeEspaceForm";
+import CafeEspacePropositions from "../CafeEspacePropositions";
+import PreviousEspaceButton from "../PreviousEspaceButton";
+import { reinitialisationCafeThe } from "../reinitialisationCafeThe";
+import RetirerEspaceButton from "../RetirerEspaceButton";
 
 type CafeEspaceProps = {
   espace: CafeEspaceType;

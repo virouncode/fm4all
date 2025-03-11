@@ -73,7 +73,7 @@ const NettoyageMobileOptionsVitrerieCard = ({
 }: NettoyageMobileOptionsVitrerieCardProps) => {
   const { nettoyage, setNettoyage } = useContext(NettoyageContext);
   const { setTotalNettoyage } = useContext(TotalNettoyageContext);
-  const { gammeSelected: gamme } = nettoyage.infos;
+  const { gammeSelected: gamme, nomFournisseur } = nettoyage.infos;
   const vitreriePrixMensuelText = vitrerieProposition.prixAnnuel ? (
     <p className="text-sm font-bold text-end">
       {formatNumber(Math.round((vitrerieProposition.prixAnnuel * MARGE) / 12))}{" "}
@@ -82,12 +82,7 @@ const NettoyageMobileOptionsVitrerieCard = ({
   ) : (
     <p className="text-xs font-bold text-end">Non proposé</p>
   );
-  const nbPassagesVitrerieText = (
-    <li className="list-check">
-      {nettoyage.quantites.nbPassagesVitrerie} passages / an
-    </li>
-  );
-  const infosTitle = (
+  const dialogTitle = (
     <p className={`text-${color} text-center`}>
       {gamme === "essentiel"
         ? "Essentiel"
@@ -96,9 +91,53 @@ const NettoyageMobileOptionsVitrerieCard = ({
         : "Excellence"}
     </p>
   );
-  const infosProduit = (
-    <li className="list-check">Vitres et cloisons accessibles de plain-pied</li>
+  const nbPassagesVitrerieText = (
+    <li className="list-check">
+      {nettoyage.quantites.nbPassagesVitrerie} passages / an
+    </li>
   );
+
+  const infosProduit = (
+    <ul className="flex flex-col text-xs px-4 w-2/3">
+      <li className="list-check">
+        Vitres et cloisons accessibles de plain-pied
+      </li>
+      {nbPassagesVitrerieText}
+    </ul>
+  );
+
+  const infosProduitDialog = (
+    <ul className="flex flex-col text-sm px-4 mx-auto">
+      <li className="list-check">
+        Vitres et cloisons accessibles de plain-pied
+      </li>
+      {nbPassagesVitrerieText}
+    </ul>
+  );
+
+  const imgProduit = (
+    <div className="w-1/3 h-full relative rounded-xl overflow-hidden bg-slate-100">
+      <Image
+        src={"/img/services/nettoyage.webp"}
+        alt={`illustration de nettoyage`}
+        fill={true}
+        className="object-contain cursor-pointer"
+        quality={100}
+      />
+    </div>
+  );
+  const imgProduitDialog = (
+    <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+      <Image
+        src={"/img/services/nettoyage.webp"}
+        alt={`illustration de nettoyage`}
+        fill={true}
+        className="object-contain object-center cursor-pointer"
+        quality={100}
+      />
+    </div>
+  );
+
   const handleDecrement = () => {
     let newNbPassageVitrerie = nettoyage.quantites.nbPassagesVitrerie - 1;
     if (newNbPassageVitrerie < 0) newNbPassageVitrerie = 0;
@@ -169,7 +208,9 @@ const NettoyageMobileOptionsVitrerieCard = ({
   return (
     <div className="flex flex-col gap-4">
       <p className="font-bold text-xl">Lavage Vitrerie</p>
-      <p>Indiquez le nombre de passages par an : </p>
+      <p>
+        Indiquez le nombre de <strong>passages par an</strong> :{" "}
+      </p>
       <div className="flex flex-col w-full p-1 gap-2">
         <Label htmlFor="nbDePassagesVitrerie" className="text-sm">
           Nombre de passages / an
@@ -217,42 +258,22 @@ const NettoyageMobileOptionsVitrerieCard = ({
       >
         <div className="flex items-center h-1/2 gap-2 border-b pb-2 border-slate-200">
           <Dialog>
-            <DialogTrigger asChild>
-              <div className="w-1/3 h-full relative rounded-xl overflow-hidden bg-slate-100">
-                <Image
-                  src={"/img/services/nettoyage.webp"}
-                  alt={`illustration de nettoyage`}
-                  fill={true}
-                  className="object-contain cursor-pointer"
-                  quality={100}
-                />
-              </div>
-            </DialogTrigger>
+            <DialogTrigger asChild>{imgProduit}</DialogTrigger>
             <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
               <DialogHeader>
-                <DialogTitle>{infosTitle}</DialogTitle>
+                <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
-              <div className="flex flex-col gap-4 items-center">
-                <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
-                  <Image
-                    src={"/img/services/nettoyage.webp"}
-                    alt={`illustration de nettoyage`}
-                    fill={true}
-                    className="object-contain object-center cursor-pointer"
-                    quality={100}
-                  />
-                </div>
-                <ul className="flex flex-col text-xs px-4">
-                  {infosProduit}
-                  {nbPassagesVitrerieText}
-                </ul>
+              <div className="flex flex-col gap-4">
+                {imgProduitDialog}
+                <p className="text-xs italic text-end">
+                  *photo non contractuelle
+                </p>
+                {infosProduitDialog}
               </div>
             </DialogContent>
           </Dialog>
           <div className="w-2/3 flex flex-col gap-1 h-full">
-            <p className="font-bold text-sm">
-              {nettoyage.infos.nomFournisseur}
-            </p>
+            <p className="font-bold text-sm">{nomFournisseur}</p>
             {vitrerieProposition.prixAnnuel ? (
               <>
                 <Dialog>
@@ -321,10 +342,7 @@ const NettoyageMobileOptionsVitrerieCard = ({
           className="flex h-1/2 pt-2 justify-between gap-6"
           onClick={() => handleClickVitrerieProposition(vitrerieProposition)}
         >
-          <ul className="flex flex-col ml-4 text-xs w-2/3">
-            {infosProduit}
-            {nbPassagesVitrerieText}
-          </ul>
+          {infosProduit}
           <div className="flex flex-col gap-2 items-end w-1/3">
             {vitreriePrixMensuelText}
             {vitrerieProposition.prixAnnuel ? (

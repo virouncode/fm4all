@@ -1,6 +1,8 @@
 import { CafeEspaceType } from "@/zod-schemas/cafe";
+import AddEspaceButton from "../AddEspaceButton";
+import CafeMobileEspacePropositionsCarousel from "./CafeMobileEspacePropositionsCarousel";
 
-type CafeEspaceMobilePropositionsProps = {
+type CafeMobileEspacePropositionsProps = {
   formattedPropositions: {
     id: number;
     fournisseurId: number;
@@ -111,7 +113,7 @@ type CafeEspaceMobilePropositionsProps = {
   handleAlert: () => void;
 };
 
-const CafeEspaceMobilePropositions = ({
+const CafeMobileEspacePropositions = ({
   formattedPropositions,
   handleClickProposition,
   handleClickFirstEspaceProposition,
@@ -121,8 +123,27 @@ const CafeEspaceMobilePropositions = ({
   handleClickNext,
   handleClickNextEspace,
   handleAlert,
-}: CafeEspaceMobilePropositionsProps) => {
-  return <div></div>;
+}: CafeMobileEspacePropositionsProps) => {
+  return (
+    <div className="flex flex-col gap-6 w-full">
+      {formattedPropositions.map((propositions) => (
+        <CafeMobileEspacePropositionsCarousel
+          propositions={propositions}
+          key={propositions[0].fournisseurId}
+          handleClickProposition={handleClickProposition}
+          espace={espace}
+          cafeEspacesIds={cafeEspacesIds}
+          handleClickFirstEspaceProposition={handleClickFirstEspaceProposition}
+        />
+      ))}
+      {cafeEspacesIds.slice(-1)[0] === espace.infos.espaceId &&
+      espace.infos.gammeCafeSelected ? (
+        <div className="flex justify-center gap-4 items-center mt-2">
+          <AddEspaceButton handleAddEspace={handleAddEspace} />
+        </div>
+      ) : null}
+    </div>
+  );
 };
 
-export default CafeEspaceMobilePropositions;
+export default CafeMobileEspacePropositions;

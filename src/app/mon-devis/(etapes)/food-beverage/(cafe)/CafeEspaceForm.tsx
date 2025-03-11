@@ -21,8 +21,8 @@ import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { ChangeEvent, useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import CafeDesktopEspaceInputs from "./(desktop)/CafeDesktopEspaceInputs";
-import { MAX_NB_PERSONNES_PAR_ESPACE } from "./CafeEspacePropositions";
 import CafeMobileEspaceInputs from "./(mobile)/CafeMobileEspaceInputs";
+import { MAX_NB_PERSONNES_PAR_ESPACE } from "./CafeEspacePropositions";
 
 type CafeEspaceFormProps = {
   espace: CafeEspaceType;
@@ -52,7 +52,7 @@ const CafeEspaceForm = ({
   const cafeEspacesIds = cafe.espaces.map((espace) => espace.infos.espaceId);
   const effectif = client.effectif ?? 0;
   const nbPersonnes =
-    espace.quantites.nbPersonnes ||
+    espace.quantites.nbPersonnes ??
     (effectif > MAX_NB_PERSONNES_PAR_ESPACE
       ? MAX_NB_PERSONNES_PAR_ESPACE
       : effectif);
@@ -355,7 +355,7 @@ const CafeEspaceForm = ({
 
   const handleChangeNbPersonnes = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    let newNbPersonnes = value ? parseInt(value) : effectif;
+    let newNbPersonnes = value ? parseInt(value) : 0;
     if (newNbPersonnes >= MAX_NB_PERSONNES_PAR_ESPACE) {
       newNbPersonnes = MAX_NB_PERSONNES_PAR_ESPACE;
       toast({
@@ -365,6 +365,17 @@ const CafeEspaceForm = ({
         duration: 7000,
       });
     }
+    const newNbTassesParAn = newNbPersonnes * 400;
+    const newNbPersonnesTotal = cafe.espaces.reduce(
+      (acc, curr) =>
+        acc + curr.infos.espaceId === espace.infos.espaceId
+          ? newNbPersonnes
+          : curr.quantites.nbPersonnes ||
+            (effectif > MAX_NB_PERSONNES_PAR_ESPACE
+              ? MAX_NB_PERSONNES_PAR_ESPACE
+              : effectif),
+      0
+    );
     //Si je n'avais pas de fournisseur, je change juste le nombre de personnes
     if (!cafe.infos.fournisseurId) {
       setCafe((prev) => ({
@@ -529,17 +540,19 @@ const CafeEspaceForm = ({
     const prixUnitaireConsoCafe =
       cafeConsoTarifs.find(
         (item) =>
-          item.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+          item.effectif === roundNbPersonnesCafeConso(newNbPersonnesTotal) &&
           item.fournisseurId === cafe.infos.fournisseurId &&
           item.gamme === espace.infos.gammeCafeSelected
       )?.prixUnitaire ?? null;
     const consoLaitTarifFournisseur = laitConsoTarifs.find(
       (item) =>
-        item.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+        item.effectif === roundNbPersonnesCafeConso(newNbPersonnesTotal) &&
         item.fournisseurId === cafe.infos.fournisseurId
     );
     const typeLait =
-      value !== "cafe" ? machinesTarifFournisseur?.typeLait : null;
+      espace.infos.typeBoissons === "lait"
+        ? machinesTarifFournisseur?.typeLait
+        : null;
     const prixUnitaireConsoLait =
       typeLait === "dosettes"
         ? consoLaitTarifFournisseur?.prixUnitaireDosette ?? null
@@ -551,7 +564,7 @@ const CafeEspaceForm = ({
 
     const consoChocolatTarifFournisseur = chocolatConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnesTotal) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const typeChocolat =
@@ -567,22 +580,23 @@ const CafeEspaceForm = ({
 
     const consoSucreTarifFournisseur = sucreConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnesTotal) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const prixUnitaireConsoSucre =
       consoSucreTarifFournisseur?.prixUnitaire ?? null;
 
     const totalConso =
-      (prixUnitaireConsoCafe ?? 0) * nbTassesParAn +
-      (prixUnitaireConsoSucre ?? 0) * nbTassesParAn * RATIO_SUCRE +
+      (prixUnitaireConsoCafe ?? 0) * newNbTassesParAn +
+      (prixUnitaireConsoSucre ?? 0) * newNbTassesParAn * RATIO_SUCRE +
       (espace.infos.typeBoissons !== "cafe"
-        ? (prixUnitaireConsoLait ?? 0) * nbTassesParAn * RATIO_LAIT
+        ? (prixUnitaireConsoLait ?? 0) * newNbTassesParAn * RATIO_LAIT
         : 0) +
       (espace.infos.typeBoissons === "chocolat"
-        ? (prixUnitaireConsoChocolat ?? 0) * nbTassesParAn * RATIO_CHOCO
+        ? (prixUnitaireConsoChocolat ?? 0) * newNbTassesParAn * RATIO_CHOCO
         : 0);
-    const totalAnnuel = totalLoc !== null ? totalLoc + totalConso : null;
+    const totalAnnuel =
+      newNbPersonnes && totalLoc !== null ? totalLoc + totalConso : null;
     //Modele
     const modele = machinesTarifFournisseur
       ? cafeMachines?.find(
@@ -884,6 +898,12 @@ const CafeEspaceForm = ({
       handleChangeNbPersonnes={handleChangeNbPersonnes}
       handleSelectDureeLocation={handleSelectDureeLocation}
       cafeEspacesIds={cafeEspacesIds}
+      cafeMachinesTarifs={cafeMachinesTarifs}
+      cafeConsoTarifs={cafeConsoTarifs}
+      laitConsoTarifs={laitConsoTarifs}
+      chocolatConsoTarifs={chocolatConsoTarifs}
+      sucreConsoTarifs={sucreConsoTarifs}
+      cafeMachines={cafeMachines}
     />
   ) : (
     <CafeDesktopEspaceInputs

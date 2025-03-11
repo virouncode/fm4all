@@ -236,7 +236,9 @@ const SecuriteIncendieMobileInputs = ({
         Contrôle des extincteurs, BAES, télécommandes BAES
       </p>
       <div className="flex flex-col gap-4">
-        <p>Indiquez votre nombre d&apos;extincteurs :</p>
+        <p>
+          Indiquez votre nombre d&apos;<strong>extincteurs</strong> :
+        </p>
         <div className="flex flex-col w-full p-1 gap-2">
           <Label htmlFor="nbDistribBalai" className="text-sm">
             Nombre d&apos;extincteurs
@@ -281,8 +283,8 @@ const SecuriteIncendieMobileInputs = ({
       </div>
       <div className="flex flex-col gap-4">
         <p>
-          Indiquez votre nombre de BAES (blocs autonomes d&apos;éclairage de
-          sécurité) :
+          Indiquez votre nombre de{" "}
+          <strong>BAES (blocs autonomes d&apos;éclairage de sécurité)</strong> :
         </p>
         <div className="w-24 h-16 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
           <Image
@@ -336,7 +338,9 @@ const SecuriteIncendieMobileInputs = ({
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        <p>Indiquez votre nombre de télécommandes BAES :</p>
+        <p>
+          Indiquez votre nombre de <strong>télécommandes BAES</strong> :
+        </p>
         <div className="w-24 h-16 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
           <Image
             src={"/img/services/tel_baes.webp"}
