@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@/components/ui/button";
+import PropositionsTitleMobile from "@/app/mon-devis/PropositionsTitleMobile";
 import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
@@ -13,12 +13,14 @@ import { SelectChocolatConsoTarifsType } from "@/zod-schemas/chocolatConsoTarifs
 import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
-import { Coffee } from "lucide-react";
-import { useContext } from "react";
+import { Coffee, SprayCan } from "lucide-react";
+import { useContext, useRef } from "react";
+import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
-import CafeEspace from "./CafeEspace";
+import CafeDesktopEspaces from "./(desktop)/CafeDesktopEspaces";
 import { MAX_NB_PERSONNES_PAR_ESPACE } from "./CafeEspacePropositions";
+import CafeMobileEspaces from "./(mobile)/CafeMobileEspaces";
 
 type CafeProps = {
   cafeMachines: SelectCafeMachinesType[];
@@ -105,42 +107,54 @@ const Cafe = ({
     });
   };
 
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+  const propositionsRef = useRef<HTMLDivElement>(null);
+
   //Le container exterieur pour faire defiler les machines
   return (
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="1">
-      <PropositionsTitle
-        icon={Coffee}
-        title="Boissons chaudes"
-        description="Café expresso, boissons lactées ou chocolatées, choisissez le type de machine et le nombre de personnes pour votre espace café. Forfait mensuel tout compris (machine, café, consommables). La gamme détermine la qualité du café"
-        handleClickPrevious={handleClickPrevious}
-        previousButton={false}
-      />
-      <div className="w-full flex-1 overflow-hidden">
-        {cafe.nbEspaces && cafe.nbEspaces > 0 ? (
-          cafe.espaces.map((espace) => (
-            <CafeEspace
-              key={espace.infos.espaceId}
-              espace={espace}
-              cafeMachines={cafeMachines}
-              cafeMachinesTarifs={cafeMachinesTarifs}
-              cafeConsoTarifs={cafeConsoTarifs}
-              laitConsoTarifs={laitConsoTarifs}
-              chocolatConsoTarifs={chocolatConsoTarifs}
-              theConsoTarifs={theConsoTarifs}
-              sucreConsoTarifs={sucreConsoTarifs}
-            />
-          ))
+      {isTabletOrMobile ? (
+        <PropositionsTitleMobile
+          title="Boissons chaudes"
+          description="Café expresso, boissons lactées ou chocolatées, choisissez le type de machine et le nombre de personnes pour votre espace café. Forfait mensuel tout compris (machine, café, consommables). La gamme détermine la qualité du café"
+          icon={SprayCan}
+          propositionsRef={propositionsRef}
+        />
+      ) : (
+        <PropositionsTitle
+          icon={Coffee}
+          title="Boissons chaudes"
+          description="Café expresso, boissons lactées ou chocolatées, choisissez le type de machine et le nombre de personnes pour votre espace café. Forfait mensuel tout compris (machine, café, consommables). La gamme détermine la qualité du café"
+          handleClickPrevious={handleClickPrevious}
+          previousButton={false}
+        />
+      )}
+      <div
+        className="w-full flex-1 overflow-auto transition"
+        ref={propositionsRef}
+      >
+        {isTabletOrMobile ? (
+          <CafeMobileEspaces
+            cafeMachines={cafeMachines}
+            cafeMachinesTarifs={cafeMachinesTarifs}
+            cafeConsoTarifs={cafeConsoTarifs}
+            laitConsoTarifs={laitConsoTarifs}
+            chocolatConsoTarifs={chocolatConsoTarifs}
+            theConsoTarifs={theConsoTarifs}
+            sucreConsoTarifs={sucreConsoTarifs}
+            handleAddEspace={handleAddEspace}
+          />
         ) : (
-          <div className="flex justify-center">
-            <Button
-              variant="outline"
-              size="lg"
-              className="text-base"
-              onClick={handleAddEspace}
-            >
-              Ajouter un espace café
-            </Button>
-          </div>
+          <CafeDesktopEspaces
+            cafeMachines={cafeMachines}
+            cafeMachinesTarifs={cafeMachinesTarifs}
+            cafeConsoTarifs={cafeConsoTarifs}
+            laitConsoTarifs={laitConsoTarifs}
+            chocolatConsoTarifs={chocolatConsoTarifs}
+            theConsoTarifs={theConsoTarifs}
+            sucreConsoTarifs={sucreConsoTarifs}
+            handleAddEspace={handleAddEspace}
+          />
         )}
       </div>
       {!cafe.nbEspaces ? (

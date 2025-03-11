@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ClientContext } from "@/context/ClientProvider";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
@@ -56,7 +55,6 @@ const HygieneMobileOptionsBalaiInput = ({
 }: HygieneMobileOptionsBalaiInputProps) => {
   const { hygiene, setHygiene } = useContext(HygieneContext);
   const { setTotalHygiene } = useContext(TotalHygieneContext);
-  const { client } = useContext(ClientContext);
 
   const handleIncrement = () => {
     let newNbDistribBalai = nbDistribBalai + 1;

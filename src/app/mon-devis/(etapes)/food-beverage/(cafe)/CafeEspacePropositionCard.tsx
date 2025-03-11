@@ -136,7 +136,7 @@ const CafeEspacePropositionCard = ({
   if (!proposition.totalAnnuel) {
     return (
       <div
-        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center min-h-28 text-2xl gap-4`}
+        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center min-h-28 text-xl gap-4`}
       >
         Non proposé
       </div>

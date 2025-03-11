@@ -1,24 +1,7 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { RATIO_CHOCO, RATIO_LAIT, RATIO_SUCRE } from "@/constants/constants";
-import { locationCafeMachine } from "@/constants/locationCafeMachine";
-import { typesBoissons, TypesBoissonsType } from "@/constants/typesBoissons";
+import { TypesBoissonsType } from "@/constants/typesBoissons";
 import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { TheContext } from "@/context/TheProvider";
@@ -36,8 +19,10 @@ import { DureeLocationCafeType } from "@/zod-schemas/dureeLocation";
 import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { ChangeEvent, useContext } from "react";
-import { MAX_EFFECTIF } from "../../mes-locaux/MesLocaux";
+import { useMediaQuery } from "react-responsive";
+import CafeDesktopEspaceInputs from "./(desktop)/CafeDesktopEspaceInputs";
 import { MAX_NB_PERSONNES_PAR_ESPACE } from "./CafeEspacePropositions";
+import CafeMobileEspaceInputs from "./(mobile)/CafeMobileEspaceInputs";
 
 type CafeEspaceFormProps = {
   espace: CafeEspaceType;
@@ -63,6 +48,7 @@ const CafeEspaceForm = ({
   const { setThe } = useContext(TheContext);
   const { setTotalCafe } = useContext(TotalCafeContext);
   const { setTotalThe } = useContext(TotalTheContext);
+  const isTabletOrMobile = useMediaQuery({ maxWidth: 1024 });
   const cafeEspacesIds = cafe.espaces.map((espace) => espace.infos.espaceId);
   const effectif = client.effectif ?? 0;
   const nbPersonnes =
@@ -890,85 +876,24 @@ const CafeEspaceForm = ({
     }
   };
 
-  return (
-    <TooltipProvider delayDuration={0}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <form className="w-2/3">
-            <div className="flex gap-8 items-center mb-4">
-              <div>
-                <RadioGroup
-                  onValueChange={handleChangeTypeBoissons}
-                  value={espace.infos.typeBoissons}
-                  className="flex gap-4 items-center"
-                  name="typeBoissons"
-                >
-                  {typesBoissons.map(({ id, description }) => (
-                    <div key={id} className="flex gap-2 items-center">
-                      <RadioGroupItem
-                        value={id}
-                        title={description}
-                        id={`${id}_${espace.infos.espaceId}`}
-                      />
-                      <Label htmlFor={`${id}_${espace.infos.espaceId}`}>
-                        {description}
-                      </Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-              </div>
-              <div className="flex gap-2 items-center">
-                <Input
-                  className={`w-full max-w-xs min-w-20 ${
-                    nbPersonnes === client.effectif
-                      ? "text-fm4alldestructive"
-                      : ""
-                  }`}
-                  type="number"
-                  min={1}
-                  max={MAX_EFFECTIF}
-                  step={1}
-                  value={nbPersonnes}
-                  onChange={handleChangeNbPersonnes}
-                  id={`nbPersonnes_${espace.infos.espaceId}`}
-                />
-                <Label
-                  htmlFor={`nbPersonnes_${espace.infos.espaceId}`}
-                  className="text-base"
-                >
-                  personnes
-                </Label>
-              </div>
-              {espace.infos.espaceId === cafeEspacesIds[0] && (
-                <Select
-                  value={cafe.infos.dureeLocation}
-                  onValueChange={handleSelectDureeLocation}
-                  aria-label="Sélectionnez la durée de location"
-                >
-                  <SelectTrigger className={`w-full max-w-xs`}>
-                    <SelectValue placeholder="Choisir" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {locationCafeMachine.map((item) => (
-                      <SelectItem
-                        key={`${location}_${item.id}`}
-                        value={item.id}
-                      >
-                        {item.description}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </div>
-          </form>
-        </TooltipTrigger>
-        <TooltipContent className="max-w-60">
-          Choisissez le type de machine avec ou sans lait/cacao, le nombre de
-          personnes pour votre espace café et la durée d’engagement
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+  return isTabletOrMobile ? (
+    <CafeMobileEspaceInputs
+      espace={espace}
+      handleChangeTypeBoissons={handleChangeTypeBoissons}
+      nbPersonnes={nbPersonnes}
+      handleChangeNbPersonnes={handleChangeNbPersonnes}
+      handleSelectDureeLocation={handleSelectDureeLocation}
+      cafeEspacesIds={cafeEspacesIds}
+    />
+  ) : (
+    <CafeDesktopEspaceInputs
+      espace={espace}
+      handleChangeTypeBoissons={handleChangeTypeBoissons}
+      nbPersonnes={nbPersonnes}
+      handleChangeNbPersonnes={handleChangeNbPersonnes}
+      handleSelectDureeLocation={handleSelectDureeLocation}
+      cafeEspacesIds={cafeEspacesIds}
+    />
   );
 };
 
