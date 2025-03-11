@@ -79,16 +79,16 @@ const CafeMobileEspaceInputs = ({
         duration: 7000,
       });
     }
-    const newNbPersonnesTotal = cafe.espaces.reduce(
-      (acc, curr) =>
-        acc + curr.infos.espaceId === espace.infos.espaceId
-          ? newNbPersonnes
-          : curr.quantites.nbPersonnes ||
-            (effectif > MAX_NB_PERSONNES_PAR_ESPACE
-              ? MAX_NB_PERSONNES_PAR_ESPACE
-              : effectif),
-      0
-    );
+    // const newNbPersonnesTotal = cafe.espaces.reduce(
+    //   (acc, curr) =>
+    //     acc + curr.infos.espaceId === espace.infos.espaceId
+    //       ? newNbPersonnes
+    //       : curr.quantites.nbPersonnes ||
+    //         (effectif > MAX_NB_PERSONNES_PAR_ESPACE
+    //           ? MAX_NB_PERSONNES_PAR_ESPACE
+    //           : effectif),
+    //   0
+    // );
     const newNbTassesParAn = newNbPersonnes * 400;
     //Si je n'avais pas de fournisseur, je change juste le nombre de personnes
     if (!cafe.infos.fournisseurId) {
@@ -254,13 +254,13 @@ const CafeMobileEspaceInputs = ({
     const prixUnitaireConsoCafe =
       cafeConsoTarifs.find(
         (item) =>
-          item.effectif === roundNbPersonnesCafeConso(newNbPersonnesTotal) &&
+          item.effectif === roundNbPersonnesCafeConso(newNbPersonnes) &&
           item.fournisseurId === cafe.infos.fournisseurId &&
           item.gamme === espace.infos.gammeCafeSelected
       )?.prixUnitaire ?? null;
     const consoLaitTarifFournisseur = laitConsoTarifs.find(
       (item) =>
-        item.effectif === roundNbPersonnesCafeConso(newNbPersonnesTotal) &&
+        item.effectif === roundNbPersonnesCafeConso(newNbPersonnes) &&
         item.fournisseurId === cafe.infos.fournisseurId
     );
     const typeLait =
@@ -278,7 +278,7 @@ const CafeMobileEspaceInputs = ({
 
     const consoChocolatTarifFournisseur = chocolatConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnes) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const typeChocolat =
@@ -294,7 +294,7 @@ const CafeMobileEspaceInputs = ({
 
     const consoSucreTarifFournisseur = sucreConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnes) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const prixUnitaireConsoSucre =
@@ -378,16 +378,16 @@ const CafeMobileEspaceInputs = ({
     if (newNbPersonnes < 0) {
       newNbPersonnes = 0;
     }
-    const newNbPersonnesTotal = cafe.espaces.reduce(
-      (acc, curr) =>
-        acc + curr.infos.espaceId === espace.infos.espaceId
-          ? newNbPersonnes
-          : curr.quantites.nbPersonnes ||
-            (effectif > MAX_NB_PERSONNES_PAR_ESPACE
-              ? MAX_NB_PERSONNES_PAR_ESPACE
-              : effectif),
-      0
-    );
+    // const newNbPersonnesTotal = cafe.espaces.reduce(
+    //   (acc, curr) =>
+    //     acc + curr.infos.espaceId === espace.infos.espaceId
+    //       ? newNbPersonnes
+    //       : curr.quantites.nbPersonnes ||
+    //         (effectif > MAX_NB_PERSONNES_PAR_ESPACE
+    //           ? MAX_NB_PERSONNES_PAR_ESPACE
+    //           : effectif),
+    //   0
+    // );
     const newNbTassesParAn = newNbPersonnes * 400;
     //Si je n'avais pas de fournisseur, je change juste le nombre de personnes
     if (!cafe.infos.fournisseurId) {
@@ -553,13 +553,13 @@ const CafeMobileEspaceInputs = ({
     const prixUnitaireConsoCafe =
       cafeConsoTarifs.find(
         (item) =>
-          item.effectif === roundNbPersonnesCafeConso(newNbPersonnesTotal) &&
+          item.effectif === roundNbPersonnesCafeConso(newNbPersonnes) &&
           item.fournisseurId === cafe.infos.fournisseurId &&
           item.gamme === espace.infos.gammeCafeSelected
       )?.prixUnitaire ?? null;
     const consoLaitTarifFournisseur = laitConsoTarifs.find(
       (item) =>
-        item.effectif === roundNbPersonnesCafeConso(newNbPersonnesTotal) &&
+        item.effectif === roundNbPersonnesCafeConso(newNbPersonnes) &&
         item.fournisseurId === cafe.infos.fournisseurId
     );
     const typeLait =
@@ -577,7 +577,7 @@ const CafeMobileEspaceInputs = ({
 
     const consoChocolatTarifFournisseur = chocolatConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnes) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const typeChocolat =
@@ -593,7 +593,7 @@ const CafeMobileEspaceInputs = ({
 
     const consoSucreTarifFournisseur = sucreConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnes) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const prixUnitaireConsoSucre =
@@ -675,15 +675,17 @@ const CafeMobileEspaceInputs = ({
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-4">
-        <p>
-          Indiquez la <strong>durée d&apos;engagement</strong> souhaitée :{" "}
-        </p>
-        <div className="flex flex-col w-full p-1 gap-2">
-          <Label htmlFor="nbDistribPh" className="text-sm flex-1">
-            Durée de location
-          </Label>
-          {espace.infos.espaceId === cafeEspacesIds[0] && (
+      {espace.infos.espaceId === cafeEspacesIds[0] && (
+        <div className="flex flex-col gap-4">
+          <p>
+            Indiquez la <strong>durée d&apos;engagement</strong> souhaitée :{" "}
+          </p>
+
+          <div className="flex flex-col w-full p-1 gap-2">
+            <Label htmlFor="nbDistribPh" className="text-sm flex-1">
+              Durée de location
+            </Label>
+
             <Select
               value={cafe.infos.dureeLocation}
               onValueChange={handleSelectDureeLocation}
@@ -700,9 +702,9 @@ const CafeMobileEspaceInputs = ({
                 ))}
               </SelectContent>
             </Select>
-          )}
+          </div>
         </div>
-      </div>
+      )}
       <div className="flex flex-col gap-4">
         <p>
           Indiquez le <strong>type de boissons</strong> :{" "}

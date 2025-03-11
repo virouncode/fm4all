@@ -17,7 +17,7 @@ import { CafeEspaceType } from "@/zod-schemas/cafe";
 import Image from "next/image";
 import { useContext } from "react";
 
-type CafeMobilePropositionCardProps = {
+type CafeMobileEspacePropositionCardProps = {
   proposition: {
     id: number;
     fournisseurId: number;
@@ -124,13 +124,13 @@ type CafeMobilePropositionCardProps = {
   cafeEspacesIds: number[];
 };
 
-const CafeMobilePropositionCard = ({
+const CafeMobileEspacePropositionCard = ({
   espace,
   handleClickProposition,
   handleClickFirstEspaceProposition,
   proposition,
   cafeEspacesIds,
-}: CafeMobilePropositionCardProps) => {
+}: CafeMobileEspacePropositionCardProps) => {
   const { cafe } = useContext(CafeContext);
   const {
     gamme,
@@ -291,9 +291,10 @@ const CafeMobilePropositionCard = ({
   return (
     <CarouselItem>
       <div
-        className={`bg-${color} flex flex-col h-72 border border-slate-200 rounded-xl p-4 text-white  ${
+        className={`bg-${color} flex flex-col h-80 border border-slate-200 rounded-xl p-4 text-white  ${
           cafe.infos.fournisseurId === fournisseurId &&
-          espace.infos.gammeCafeSelected === gamme
+          espace.infos.gammeCafeSelected === gamme &&
+          totalAnnuel
             ? "ring-4 ring-inset ring-fm4alldestructive"
             : ""
         }`}
@@ -367,7 +368,7 @@ const CafeMobilePropositionCard = ({
           <div className="flex flex-col gap-2 items-end w-1/4">
             {totalMensuelText}
             {prixInstallationText}
-            {proposition.totalAnnuel ? (
+            {totalAnnuel ? (
               <Switch
                 className={`${
                   espace.infos.gammeCafeSelected === gamme &&
@@ -395,4 +396,4 @@ const CafeMobilePropositionCard = ({
   );
 };
 
-export default CafeMobilePropositionCard;
+export default CafeMobileEspacePropositionCard;

@@ -4,6 +4,7 @@ const nbPersonnesPaliers = [
 ];
 
 export const roundNbPersonnesCafeConso = (nbPersonnesTotal: number) => {
+  if (nbPersonnesTotal <= 1) return 1;
   const roundedNbPersonnesTotal = nbPersonnesPaliers
     .filter((curr) => curr <= nbPersonnesTotal) // Garde les valeurs inférieures ou égales
     .reduce((prev, curr) => Math.max(prev, curr), -Infinity); // Trouve le maximum

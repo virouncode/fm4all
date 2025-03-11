@@ -130,7 +130,7 @@ const Cafe = ({
         />
       )}
       <div
-        className="w-full flex-1 overflow-auto transition"
+        className="w-full flex-1 overflow-hidden transition"
         ref={propositionsRef}
       >
         {isTabletOrMobile ? (
@@ -157,7 +157,7 @@ const Cafe = ({
           />
         )}
       </div>
-      {!cafe.nbEspaces ? (
+      {!cafe.nbEspaces && !isTabletOrMobile ? (
         <PropositionsFooter handleClickNext={handleClickNext} />
       ) : null}
     </div>

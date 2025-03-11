@@ -1,9 +1,11 @@
 "use client";
+import PropositionsTitleMobile from "@/app/mon-devis/PropositionsTitleMobile";
 import { CafeContext } from "@/context/CafeProvider";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { Leaf } from "lucide-react";
-import { useContext } from "react";
+import { useContext, useRef } from "react";
+import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import ThePropositions from "./ThePropositions";
@@ -15,6 +17,8 @@ type TheProps = {
 const The = ({ theConsoTarifs }: TheProps) => {
   const { cafe } = useContext(CafeContext);
   const { setFoodBeverage } = useContext(FoodBeverageContext);
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+  const propositionsRef = useRef<HTMLDivElement>(null);
 
   const handleClickPrevious = () => {
     setFoodBeverage((prev) => ({
@@ -34,16 +38,30 @@ const The = ({ theConsoTarifs }: TheProps) => {
 
   return (
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="2">
-      <PropositionsTitle
-        title="Thés variés"
-        icon={Leaf}
-        description="Parce que tout le monde ne boit pas forcément du café, un choix de thés présentés en boîtes et coffrets"
-        handleClickPrevious={handleClickPrevious}
-      />
-      <div className="w-full flex-1 overflow-auto">
+      {isTabletOrMobile ? (
+        <PropositionsTitleMobile
+          title="Thés variés"
+          icon={Leaf}
+          description="Parce que tout le monde ne boit pas forcément du café, un choix de thés présentés en boîtes et coffrets. La gamme détermine la qualité du thé"
+          propositionsRef={propositionsRef}
+        />
+      ) : (
+        <PropositionsTitle
+          title="Thés variés"
+          icon={Leaf}
+          description="Parce que tout le monde ne boit pas forcément du café, un choix de thés présentés en boîtes et coffrets. La gamme détermine la qualité du thé"
+          handleClickPrevious={handleClickPrevious}
+        />
+      )}
+      <div
+        className="w-full flex-1 overflow-auto transition"
+        ref={propositionsRef}
+      >
         <ThePropositions theConsoTarifs={theConsoTarifs} />
       </div>
-      <PropositionsFooter handleClickNext={handleClickNext} />
+      {!isTabletOrMobile ? (
+        <PropositionsFooter handleClickNext={handleClickNext} />
+      ) : null}
     </div>
   );
 };

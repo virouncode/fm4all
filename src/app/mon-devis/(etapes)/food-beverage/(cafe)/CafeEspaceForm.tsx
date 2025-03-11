@@ -58,15 +58,15 @@ const CafeEspaceForm = ({
       : effectif);
 
   const nbTassesParAn = nbPersonnes * 400;
-  const nbPersonnesTotal = cafe.espaces.reduce(
-    (acc, curr) =>
-      acc +
-      (curr.quantites.nbPersonnes ||
-        (effectif > MAX_NB_PERSONNES_PAR_ESPACE
-          ? MAX_NB_PERSONNES_PAR_ESPACE
-          : effectif)),
-    0
-  );
+  // const nbPersonnesTotal = cafe.espaces.reduce(
+  //   (acc, curr) =>
+  //     acc +
+  //     (curr.quantites.nbPersonnes ||
+  //       (effectif > MAX_NB_PERSONNES_PAR_ESPACE
+  //         ? MAX_NB_PERSONNES_PAR_ESPACE
+  //         : effectif)),
+  //   0
+  // );
 
   //Je change le type de boissons
   //Si c'est la première machine :
@@ -239,13 +239,13 @@ const CafeEspaceForm = ({
     const prixUnitaireConsoCafe =
       cafeConsoTarifs.find(
         (item) =>
-          item.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+          item.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
           item.fournisseurId === cafe.infos.fournisseurId &&
           item.gamme === espace.infos.gammeCafeSelected
       )?.prixUnitaire ?? null;
     const consoLaitTarifFournisseur = laitConsoTarifs.find(
       (item) =>
-        item.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+        item.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
         item.fournisseurId === cafe.infos.fournisseurId
     );
     const typeLait =
@@ -261,7 +261,7 @@ const CafeEspaceForm = ({
 
     const consoChocolatTarifFournisseur = chocolatConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const typeChocolat =
@@ -275,7 +275,7 @@ const CafeEspaceForm = ({
 
     const consoSucreTarifFournisseur = sucreConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const prixUnitaireConsoSucre =
@@ -366,16 +366,16 @@ const CafeEspaceForm = ({
       });
     }
     const newNbTassesParAn = newNbPersonnes * 400;
-    const newNbPersonnesTotal = cafe.espaces.reduce(
-      (acc, curr) =>
-        acc + curr.infos.espaceId === espace.infos.espaceId
-          ? newNbPersonnes
-          : curr.quantites.nbPersonnes ||
-            (effectif > MAX_NB_PERSONNES_PAR_ESPACE
-              ? MAX_NB_PERSONNES_PAR_ESPACE
-              : effectif),
-      0
-    );
+    // const newNbPersonnesTotal = cafe.espaces.reduce(
+    //   (acc, curr) =>
+    //     acc + curr.infos.espaceId === espace.infos.espaceId
+    //       ? newNbPersonnes
+    //       : curr.quantites.nbPersonnes ||
+    //         (effectif > MAX_NB_PERSONNES_PAR_ESPACE
+    //           ? MAX_NB_PERSONNES_PAR_ESPACE
+    //           : effectif),
+    //   0
+    // );
     //Si je n'avais pas de fournisseur, je change juste le nombre de personnes
     if (!cafe.infos.fournisseurId) {
       setCafe((prev) => ({
@@ -540,13 +540,13 @@ const CafeEspaceForm = ({
     const prixUnitaireConsoCafe =
       cafeConsoTarifs.find(
         (item) =>
-          item.effectif === roundNbPersonnesCafeConso(newNbPersonnesTotal) &&
+          item.effectif === roundNbPersonnesCafeConso(newNbPersonnes) &&
           item.fournisseurId === cafe.infos.fournisseurId &&
           item.gamme === espace.infos.gammeCafeSelected
       )?.prixUnitaire ?? null;
     const consoLaitTarifFournisseur = laitConsoTarifs.find(
       (item) =>
-        item.effectif === roundNbPersonnesCafeConso(newNbPersonnesTotal) &&
+        item.effectif === roundNbPersonnesCafeConso(newNbPersonnes) &&
         item.fournisseurId === cafe.infos.fournisseurId
     );
     const typeLait =
@@ -564,7 +564,7 @@ const CafeEspaceForm = ({
 
     const consoChocolatTarifFournisseur = chocolatConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnes) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const typeChocolat =
@@ -580,7 +580,7 @@ const CafeEspaceForm = ({
 
     const consoSucreTarifFournisseur = sucreConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnes) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const prixUnitaireConsoSucre =
@@ -773,13 +773,13 @@ const CafeEspaceForm = ({
     const prixUnitaireConsoCafe =
       cafeConsoTarifs.find(
         (item) =>
-          item.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+          item.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
           item.fournisseurId === cafe.infos.fournisseurId &&
           item.gamme === espace.infos.gammeCafeSelected
       )?.prixUnitaire ?? null;
     const consoLaitTarifFournisseur = laitConsoTarifs.find(
       (item) =>
-        item.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+        item.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
         item.fournisseurId === cafe.infos.fournisseurId
     );
     const typeLait =
@@ -795,7 +795,7 @@ const CafeEspaceForm = ({
 
     const consoChocolatTarifFournisseur = chocolatConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const typeChocolat =
@@ -809,7 +809,7 @@ const CafeEspaceForm = ({
 
     const consoSucreTarifFournisseur = sucreConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const prixUnitaireConsoSucre =

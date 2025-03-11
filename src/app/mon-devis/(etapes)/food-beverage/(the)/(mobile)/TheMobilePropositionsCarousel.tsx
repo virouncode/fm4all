@@ -4,57 +4,60 @@ import {
   CarouselApi,
   CarouselContent,
 } from "@/components/ui/carousel";
-import { NettoyageContext } from "@/context/NettoyageProvider";
-import { GammeType } from "@/zod-schemas/gamme";
+import { TheContext } from "@/context/TheProvider";
 import { useContext, useEffect, useState } from "react";
-import NettoyageMobilePropositionCard from "./NettoyageMobilePropositionCard";
+import TheMobilePropositionCard from "./TheMobilePropositionCard";
 
-type NettoyageMobilePropositionsCarouselProps = {
-  handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    freqAnnuelle: number | null;
-    hParPassage: number;
-    tauxHoraire: number;
-    gamme: GammeType;
-    totalAnnuel: number | null;
-  }) => void;
+type TheMobilePropositionsCarouselProps = {
   propositions: {
+    totalAnnuel: number | null;
+    infos: string | null;
     id: number;
-    fournisseurId: number;
     nomFournisseur: string;
-    sloganFournisseur: string | null;
+    slogan: string | null;
     logoUrl: string | null;
     locationUrl: string | null;
     anneeCreation: number | null;
     ca: string | null;
-    effectifFournisseur: string | null;
+    effectif: number;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
-    freqAnnuelle: number | null;
-    hParPassage: number;
-    tauxHoraire: number;
+    createdAt: Date;
+    fournisseurId: number;
     gamme: "essentiel" | "confort" | "excellence";
-    totalAnnuel: number | null;
+    prixUnitaire: number | null;
+    effectifFournisseur: string | null;
   }[];
+  handleClickProposition: (proposition: {
+    totalAnnuel: number | null;
+    infos: string | null;
+    id: number;
+    nomFournisseur: string;
+    slogan: string | null;
+    logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectif: number;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
+    createdAt: Date;
+    fournisseurId: number;
+    gamme: "essentiel" | "confort" | "excellence";
+    prixUnitaire: number | null;
+    effectifFournisseur: string | null;
+  }) => void;
+  nbTassesParJour: number;
 };
 
-const NettoyageMobilePropositionsCarousel = ({
+const TheMobilePropositionsCarousel = ({
   propositions,
   handleClickProposition,
-}: NettoyageMobilePropositionsCarouselProps) => {
-  const { nettoyage } = useContext(NettoyageContext);
+  nbTassesParJour,
+}: TheMobilePropositionsCarouselProps) => {
+  const { the } = useContext(TheContext);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
 
@@ -68,27 +71,20 @@ const NettoyageMobilePropositionsCarousel = ({
   }, [api]);
 
   useEffect(() => {
-    if (!nettoyage.infos.fournisseurId || !api) {
+    if (!the.infos.gammeSelected || !api) {
       return;
     }
-    if (
-      propositions[0].fournisseurId === nettoyage.infos.fournisseurId &&
-      nettoyage.infos.gammeSelected
-    ) {
+    if (the.infos.gammeSelected) {
       api?.scrollTo(
-        nettoyage.infos.gammeSelected === "essentiel"
+        the.infos.gammeSelected === "essentiel"
           ? 0
-          : nettoyage.infos.gammeSelected === "confort"
+          : the.infos.gammeSelected === "confort"
           ? 1
           : 2
       );
     }
-  }, [
-    api,
-    nettoyage.infos.fournisseurId,
-    nettoyage.infos.gammeSelected,
-    propositions,
-  ]);
+  }, [api, the.infos.gammeSelected]);
+
   return (
     <Carousel
       opts={{
@@ -100,10 +96,11 @@ const NettoyageMobilePropositionsCarousel = ({
     >
       <CarouselContent>
         {propositions.map((proposition) => (
-          <NettoyageMobilePropositionCard
+          <TheMobilePropositionCard
             proposition={proposition}
             key={proposition.id}
             handleClickProposition={handleClickProposition}
+            nbTassesParJour={nbTassesParJour}
           />
         ))}
       </CarouselContent>
@@ -112,4 +109,4 @@ const NettoyageMobilePropositionsCarousel = ({
   );
 };
 
-export default NettoyageMobilePropositionsCarousel;
+export default TheMobilePropositionsCarousel;

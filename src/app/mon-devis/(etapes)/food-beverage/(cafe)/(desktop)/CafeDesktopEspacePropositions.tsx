@@ -1,9 +1,9 @@
 import NextServiceButton from "@/app/mon-devis/NextServiceButton";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
 import AddEspaceButton from "../AddEspaceButton";
-import CafeEspacePropositionCard from "../CafeEspacePropositionCard";
 import CafeEspacePropositionFournisseurLogo from "../CafeEspacePropositionFournisseurLogo";
 import NextEspaceButton from "../NextEspaceButton";
+import CafeEspacePropositionCard from "./CafeEspacePropositionCard";
 
 type CafeDesktopEspacePropositionsProps = {
   formattedPropositions: {

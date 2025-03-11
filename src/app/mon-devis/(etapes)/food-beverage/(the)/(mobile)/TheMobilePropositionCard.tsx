@@ -9,77 +9,80 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
-import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
-import { NettoyageContext } from "@/context/NettoyageProvider";
+import { MARGE } from "@/constants/constants";
+import { TheContext } from "@/context/TheProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import Image from "next/image";
 import { useContext } from "react";
 
-type NettoyageMobilePropositionCardProps = {
-  handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    freqAnnuelle: number | null;
-    hParPassage: number;
-    tauxHoraire: number;
-    gamme: "essentiel" | "confort" | "excellence";
-    totalAnnuel: number | null;
-  }) => void;
+type TheMobilePropositionCardProps = {
   proposition: {
+    totalAnnuel: number | null;
+    infos: string | null;
     id: number;
-    fournisseurId: number;
     nomFournisseur: string;
-    sloganFournisseur: string | null;
+    slogan: string | null;
     logoUrl: string | null;
     locationUrl: string | null;
     anneeCreation: number | null;
     ca: string | null;
-    effectifFournisseur: string | null;
+    effectif: number;
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
-    freqAnnuelle: number | null;
-    hParPassage: number;
-    tauxHoraire: number;
+    createdAt: Date;
+    fournisseurId: number;
     gamme: "essentiel" | "confort" | "excellence";
-    totalAnnuel: number | null;
+    prixUnitaire: number | null;
+    effectifFournisseur: string | null;
   };
+  handleClickProposition: (proposition: {
+    totalAnnuel: number | null;
+    infos: string | null;
+    id: number;
+    nomFournisseur: string;
+    slogan: string | null;
+    logoUrl: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectif: number;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
+    createdAt: Date;
+    fournisseurId: number;
+    gamme: "essentiel" | "confort" | "excellence";
+    prixUnitaire: number | null;
+    effectifFournisseur: string | null;
+  }) => void;
+  nbTassesParJour: number;
 };
 
-const NettoyageMobilePropositionCard = ({
+const TheMobilePropositionCard = ({
   proposition,
   handleClickProposition,
-}: NettoyageMobilePropositionCardProps) => {
-  const { nettoyage } = useContext(NettoyageContext);
+  nbTassesParJour,
+}: TheMobilePropositionCardProps) => {
+  const { the } = useContext(TheContext);
   const {
-    fournisseurId,
     gamme,
-    freqAnnuelle,
-    hParPassage,
-    totalAnnuel,
-    ca,
-    sloganFournisseur,
-    logoUrl,
     nomFournisseur,
+    slogan,
+    logoUrl,
     locationUrl,
     anneeCreation,
-    effectifFournisseur,
+    ca,
     nbClients,
     noteGoogle,
     nbAvis,
+    effectifFournisseur,
+    totalAnnuel,
   } = proposition;
+
   const color = getFm4AllColor(gamme);
+
   const totalMensuelText = totalAnnuel ? (
     <p className="text-sm font-bold">
       {formatNumber(Math.round((totalAnnuel * MARGE) / 12))} €/mois
@@ -88,70 +91,74 @@ const NettoyageMobilePropositionCard = ({
     <p className="text-sm font-bold">Non proposé</p>
   );
 
-  const hParSemaineText =
-    hParPassage && freqAnnuelle ? (
-      <li className="list-check">
-        {formatNumber((hParPassage * freqAnnuelle) / S_OUVREES_PAR_AN)} h /
-        semaine
-      </li>
-    ) : null;
-  const nbPassagesParSemaineText =
-    freqAnnuelle && hParPassage ? (
-      <li className="list-check">
-        {formatNumber(freqAnnuelle / S_OUVREES_PAR_AN)} passage(s) de
-        {hParPassage}h / semaine
-      </li>
-    ) : null;
-  const infosEssentiel = "Entretien fonctionnel et optimisé";
-  const infosConfort = "Equilibre parfait entre qualité et efficacité";
-  const infosExcellence = "Un standard de propreté exemplaire";
-
-  const infosProduit = (
-    <ul className="flex flex-col text-xs px-4 w-2/3">
-      <li className="list-check">
-        {gamme === "essentiel"
-          ? infosEssentiel
-          : gamme === "confort"
-          ? infosConfort
-          : infosExcellence}
-      </li>
-      {hParSemaineText}
-      {nbPassagesParSemaineText}
-    </ul>
+  const infosEssentiel = (
+    <>
+      <li className="list-check">The en sachet, un ou deux au choix</li>
+      {proposition.infos && <li className="list-check">{proposition.infos}</li>}
+    </>
   );
 
-  const infosProduitDialog = (
-    <ul className="flex flex-col text-sm px-4 mx-auto">
-      <li className="list-check">
-        {gamme === "essentiel"
-          ? infosEssentiel
-          : gamme === "confort"
-          ? infosConfort
-          : infosExcellence}
-      </li>
-      {hParSemaineText}
-      {nbPassagesParSemaineText}
-    </ul>
+  const infosConfort = (
+    <>
+      <li className="list-check">Choix de plusieurs thés en sachets</li>
+      {proposition.infos && <li className="list-check">{proposition.infos}</li>}
+    </>
+  );
+
+  const infosExcellence = (
+    <>
+      <li className="list-check">Thés Premium en boite bois ou présentoir</li>
+      {proposition.infos && <li className="list-check">{proposition.infos}</li>}
+    </>
   );
 
   const dialogTitle = (
     <p className={`text-${color} text-center`}>
-      {gamme === "essentiel"
+      {proposition.gamme === "essentiel"
         ? "Essentiel"
-        : gamme === "confort"
+        : proposition.gamme === "confort"
         ? "Confort"
         : "Excellence"}
     </p>
   );
 
+  const infosProduit = (
+    <ul className="flex flex-col text-xs px-4 w-2/3">
+      {gamme === "essentiel"
+        ? infosEssentiel
+        : gamme === "confort"
+        ? infosConfort
+        : infosExcellence}
+      <li className="list-check">
+        Consommables ~ {nbTassesParJour} tasses / j
+      </li>
+    </ul>
+  );
+  const infosProduitDialog = (
+    <ul className="flex flex-col text-sm px-4 mx-auto">
+      {gamme === "essentiel"
+        ? infosEssentiel
+        : gamme === "confort"
+        ? infosConfort
+        : infosExcellence}
+      <li className="list-check">
+        Consommables ~ {nbTassesParJour} tasses / j
+      </li>
+    </ul>
+  );
+
   const imgProduit = (
     <div className="w-1/3 h-full relative rounded-xl overflow-hidden bg-slate-100">
       <Image
-        src={"/img/services/nettoyage.webp"}
-        alt={`illustration de nettoyage`}
-        fill={true}
-        className="object-contain cursor-pointer"
+        src={
+          gamme === "excellence"
+            ? "/img/services/the_coffrets.webp"
+            : "/img/services/the_sachets.webp"
+        }
+        alt={`illustration de thés variés`}
+        fill
         quality={100}
+        className="object-contain cursor-pointer"
       />
     </div>
   );
@@ -159,11 +166,15 @@ const NettoyageMobilePropositionCard = ({
   const imgProduitDialog = (
     <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
       <Image
-        src={"/img/services/nettoyage.webp"}
-        alt={`illustration de nettoyage`}
-        fill={true}
-        className="object-contain object-center"
+        src={
+          gamme === "excellence"
+            ? "/img/services/the_coffrets.webp"
+            : "/img/services/the_sachets.webp"
+        }
+        alt={`illustration de thés variés`}
+        fill
         quality={100}
+        className="object-contain"
       />
     </div>
   );
@@ -171,9 +182,8 @@ const NettoyageMobilePropositionCard = ({
   return (
     <CarouselItem>
       <div
-        className={`bg-${color} flex flex-col h-56 border border-slate-200 rounded-xl p-4 text-white  ${
-          nettoyage.infos.fournisseurId === fournisseurId &&
-          nettoyage.infos.gammeSelected === gamme
+        className={`bg-${color} flex flex-col h-64 border border-slate-200 rounded-xl p-4 text-white  ${
+          the.infos.gammeSelected === gamme
             ? "ring-4 ring-inset ring-fm4alldestructive"
             : ""
         }`}
@@ -215,7 +225,7 @@ const NettoyageMobilePropositionCard = ({
                   <DialogTitle>{nomFournisseur}</DialogTitle>
                 </DialogHeader>
                 <FournisseurDialog
-                  sloganFournisseur={sloganFournisseur}
+                  sloganFournisseur={slogan}
                   logoUrl={logoUrl}
                   nomFournisseur={nomFournisseur}
                   locationUrl={locationUrl}
@@ -247,15 +257,11 @@ const NettoyageMobilePropositionCard = ({
             {totalAnnuel ? (
               <Switch
                 className={`${
-                  nettoyage.infos.fournisseurId === fournisseurId &&
-                  nettoyage.infos.gammeSelected === gamme
+                  the.infos.gammeSelected === gamme
                     ? "data-[state=checked]:bg-fm4alldestructive"
                     : ""
                 }`}
-                checked={
-                  nettoyage.infos.fournisseurId === fournisseurId &&
-                  nettoyage.infos.gammeSelected === gamme
-                }
+                checked={the.infos.gammeSelected === gamme}
                 onCheckedChange={() => handleClickProposition(proposition)}
                 onClick={(e) => e.stopPropagation()}
                 title="Sélectionnez cette proposition"
@@ -268,4 +274,4 @@ const NettoyageMobilePropositionCard = ({
   );
 };
 
-export default NettoyageMobilePropositionCard;
+export default TheMobilePropositionCard;

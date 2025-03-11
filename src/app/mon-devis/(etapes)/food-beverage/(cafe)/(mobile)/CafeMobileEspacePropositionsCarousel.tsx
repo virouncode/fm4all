@@ -7,7 +7,7 @@ import {
 import { CafeContext } from "@/context/CafeProvider";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
 import { useContext, useEffect, useState } from "react";
-import CafeMobilePropositionCard from "./CafeMobilePropositionCard";
+import CafeMobileEspacePropositionCard from "./CafeMobileEspacePropositionCard";
 
 type CafeMobileEspacePropositionsCarouselProps = {
   espace: CafeEspaceType;
@@ -170,7 +170,7 @@ const CafeMobileEspacePropositionsCarousel = ({
     >
       <CarouselContent>
         {propositions.map((proposition) => (
-          <CafeMobilePropositionCard
+          <CafeMobileEspacePropositionCard
             key={proposition.id}
             proposition={proposition}
             handleClickProposition={handleClickProposition}
