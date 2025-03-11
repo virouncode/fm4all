@@ -68,7 +68,7 @@ const NettoyageMobilePropositionsCarousel = ({
   }, [api]);
 
   useEffect(() => {
-    if (!nettoyage.infos.fournisseurId && !api) {
+    if (!nettoyage.infos.fournisseurId || !api) {
       return;
     }
     if (

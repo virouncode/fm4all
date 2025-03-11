@@ -25,11 +25,9 @@ import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { useContext } from "react";
-import NextServiceButton from "../../../NextServiceButton";
-import AddEspaceButton from "./AddEspaceButton";
-import CafeEspacePropositionCard from "./CafeEspacePropositionCard";
-import CafeEspacePropositionFournisseurLogo from "./CafeEspacePropositionFournisseurLogo";
-import NextEspaceButton from "./NextEspaceButton";
+import { useMediaQuery } from "react-responsive";
+import CafeDesktopEspacePropositions from "./(desktop)/CafeDesktopEspacePropositions";
+import CafeMobileEspacePropositions from "./(mobile)/CafeMobileEspacePropositions";
 
 export const MAX_NB_PERSONNES_PAR_ESPACE = 150;
 
@@ -62,12 +60,13 @@ const CafeEspacePropositions = ({
   const { setTotalCafe } = useContext(TotalCafeContext);
   const { setTotalThe } = useContext(TotalTheContext);
   const { setTotalSnacksFruits } = useContext(TotalSnacksFruitsContext);
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 
   //Calcul des propositions
   const cafeEspacesIds = cafe.espaces.map((espace) => espace.infos.espaceId);
   const effectif = client.effectif ?? 0;
   const nbPersonnes =
-    espace.quantites.nbPersonnes ||
+    espace.quantites.nbPersonnes ??
     (effectif > MAX_NB_PERSONNES_PAR_ESPACE
       ? MAX_NB_PERSONNES_PAR_ESPACE
       : effectif);
@@ -106,23 +105,22 @@ const CafeEspacePropositions = ({
 
   const nbTassesParAn = nbPersonnes * 400;
 
-  const nbPersonnesTotal = cafe.espaces.reduce(
-    (acc, curr) =>
-      acc +
-      (cafeEspacesIds[0] === curr.infos.espaceId ||
-      curr.infos.gammeCafeSelected !== null
-        ? curr.quantites.nbPersonnes ||
-          (effectif > MAX_NB_PERSONNES_PAR_ESPACE
-            ? MAX_NB_PERSONNES_PAR_ESPACE
-            : effectif)
-        : 0),
-    0
-  );
+  // const nbPersonnesTotal = cafe.espaces.reduce(
+  //   (acc, curr) =>
+  //     acc +
+  //     (curr.infos.gammeCafeSelected !== null
+  //       ? curr.quantites.nbPersonnes ??
+  //         (effectif > MAX_NB_PERSONNES_PAR_ESPACE
+  //           ? MAX_NB_PERSONNES_PAR_ESPACE
+  //           : effectif)
+  //       : 0),
+  //   0
+  // );
 
   const propositions = cafeConsoTarifs
     .filter(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
         fournisseursIds.includes(tarif.fournisseurId)
     )
     .map((tarif) => {
@@ -165,7 +163,7 @@ const CafeEspacePropositions = ({
       //LAIT
       const consoLaitTarifFournisseur = laitConsoTarifs.find(
         (tarif) =>
-          tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+          tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
           tarif.fournisseurId === fournisseurId
       );
       const typeLait =
@@ -183,7 +181,7 @@ const CafeEspacePropositions = ({
       //CHOCOLAT
       const consoChocolatTarifFournisseur = chocolatConsoTarifs.find(
         (tarif) =>
-          tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+          tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
           tarif.fournisseurId === fournisseurId
       );
       const typeChocolat =
@@ -199,7 +197,7 @@ const CafeEspacePropositions = ({
       //SUCRE
       const consoSucreTarifFournisseur = sucreConsoTarifs.find(
         (tarif) =>
-          tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+          tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
           tarif.fournisseurId === fournisseurId
       );
       const prixUnitaireConsoSucre =
@@ -215,7 +213,8 @@ const CafeEspacePropositions = ({
           ? (prixUnitaireConsoChocolat ?? 0) * nbTassesParAn * RATIO_CHOCO
           : 0);
 
-      const totalAnnuel = totalLoc !== null ? totalLoc + totalConso : null;
+      const totalAnnuel =
+        nbPersonnes && totalLoc !== null ? totalLoc + totalConso : null;
       //Modele
       const modele = machinesTarifFournisseur
         ? cafeMachines?.find(
@@ -633,6 +632,13 @@ const CafeEspacePropositions = ({
     } else {
       //======================== JE COCHE ======================//
       //Pour chaque espace et le the si gammeCafeSelected je mets à jour les prix et le total
+
+      if (fournisseurId !== cafe.infos.fournisseurId) {
+        toast({
+          title: "Fournisseur sélectionné",
+          description: `Vous avez choisi ${nomFournisseur} pour le café, ce prestataire assurera la prestation Thés variés`,
+        });
+      }
       const newCafeInfos = {
         ...cafe.infos,
         fournisseurId,
@@ -695,7 +701,7 @@ const CafeEspacePropositions = ({
         }
         //selection existante je recalcule tout
         const itemNbPersonnes =
-          item.quantites.nbPersonnes ||
+          item.quantites.nbPersonnes ??
           (effectif > MAX_NB_PERSONNES_PAR_ESPACE
             ? MAX_NB_PERSONNES_PAR_ESPACE
             : effectif);
@@ -732,13 +738,13 @@ const CafeEspacePropositions = ({
         const itemPrixUnitaireConsoCafe =
           cafeConsoTarifs.find(
             (tarif) =>
-              tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+              tarif.effectif === roundNbPersonnesCafeConso(itemNbPersonnes) &&
               tarif.fournisseurId === fournisseurId &&
               tarif.gamme === item.infos.gammeCafeSelected
           )?.prixUnitaire ?? null;
         const itemConsoLaitTarifFournisseur = laitConsoTarifs.find(
           (tarif) =>
-            tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+            tarif.effectif === roundNbPersonnesCafeConso(itemNbPersonnes) &&
             tarif.fournisseurId === fournisseurId
         );
         const itemTypeLait =
@@ -756,7 +762,7 @@ const CafeEspacePropositions = ({
 
         const itemConsoChocolatTarifFournisseur = chocolatConsoTarifs.find(
           (tarif) =>
-            tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+            tarif.effectif === roundNbPersonnesCafeConso(itemNbPersonnes) &&
             tarif.fournisseurId === fournisseurId
         );
         const itemTypeChocolat =
@@ -771,7 +777,7 @@ const CafeEspacePropositions = ({
             : null;
         const itemConsoSucreTarifFournisseur = sucreConsoTarifs.find(
           (tarif) =>
-            tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+            tarif.effectif === roundNbPersonnesCafeConso(itemNbPersonnes) &&
             tarif.fournisseurId === fournisseurId
         );
         const itemPrixUnitaireConsoSucre =
@@ -1008,48 +1014,30 @@ const CafeEspacePropositions = ({
     }
   };
 
-  return (
-    <div className="flex-1 flex flex-col gap-4 overflow-auto">
-      <div className="flex-1 flex flex-col border rounded-xl overflow-auto">
-        {formattedPropositions.map((propositions) => (
-          <div
-            className="flex border-b flex-1"
-            key={propositions[0].fournisseurId}
-          >
-            <CafeEspacePropositionFournisseurLogo {...propositions[0]} />
-            {propositions.map((proposition) => (
-              <CafeEspacePropositionCard
-                key={proposition.id}
-                proposition={proposition}
-                handleClickProposition={handleClickProposition}
-                handleClickFirstEspaceProposition={
-                  handleClickFirstEspaceProposition
-                }
-                espace={espace}
-                cafeEspacesIds={cafeEspacesIds}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
-      {/* <div className="flex flex-col gap-1"> */}
-      {cafeEspacesIds.slice(-1)[0] === espace.infos.espaceId ? (
-        <div className="flex justify-end gap-4 items-center">
-          {espace.infos.gammeCafeSelected ? (
-            <AddEspaceButton handleAddEspace={handleAddEspace} />
-          ) : null}
-          <NextServiceButton handleClickNext={handleClickNext} />
-        </div>
-      ) : (
-        <div className="ml-auto" onClick={handleAlert}>
-          <NextEspaceButton
-            disabled={espace.infos.gammeCafeSelected ? false : true}
-            handleClickNextEspace={handleClickNextEspace}
-          />
-        </div>
-      )}
-      {/* </div> */}
-    </div>
+  return isTabletOrMobile ? (
+    <CafeMobileEspacePropositions
+      formattedPropositions={formattedPropositions}
+      handleClickFirstEspaceProposition={handleClickFirstEspaceProposition}
+      handleClickProposition={handleClickProposition}
+      handleAddEspace={handleAddEspace}
+      handleClickNext={handleClickNext}
+      handleClickNextEspace={handleClickNextEspace}
+      handleAlert={handleAlert}
+      cafeEspacesIds={cafeEspacesIds}
+      espace={espace}
+    />
+  ) : (
+    <CafeDesktopEspacePropositions
+      formattedPropositions={formattedPropositions}
+      handleClickFirstEspaceProposition={handleClickFirstEspaceProposition}
+      handleClickProposition={handleClickProposition}
+      handleAddEspace={handleAddEspace}
+      handleClickNext={handleClickNext}
+      handleClickNextEspace={handleClickNextEspace}
+      handleAlert={handleAlert}
+      cafeEspacesIds={cafeEspacesIds}
+      espace={espace}
+    />
   );
 };
 

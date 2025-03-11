@@ -48,7 +48,7 @@ const NettoyageMobilePropositions = ({
 }: NettoyageMobilePropositionsProps) => {
   return (
     <div className="flex flex-col gap-6 w-full">
-      <p className="font-bold text-xl -mb-4 lg:hidden">Nettoyage</p>
+      <p className="font-bold text-xl -mb-4">Nettoyage</p>
       {formattedPropositions.map((propositions) => (
         <NettoyageMobilePropositionsCarousel
           propositions={propositions}

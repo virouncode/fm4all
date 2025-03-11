@@ -69,6 +69,36 @@ type HygieneMobilePropositionsProps = {
     imageUrlSavon: string | null;
     imageUrlPh: string | null;
   }[];
+  hygieneDistribTarifsFournisseur: {
+    type:
+      | "emp"
+      | "poubelleEmp"
+      | "savon"
+      | "ph"
+      | "desinfectant"
+      | "parfum"
+      | "balai"
+      | "poubelle";
+    fournisseurId: number;
+    nomFournisseur: string;
+    logoUrl: string | null;
+    pa12M: number | null;
+    pa24M: number | null;
+    pa36M: number | null;
+    oneShot: number | null;
+    id: number;
+    slogan: string | null;
+    locationUrl: string | null;
+    anneeCreation: number | null;
+    ca: string | null;
+    effectif: string | null;
+    nbClients: number | null;
+    noteGoogle: string | null;
+    nbAvis: number | null;
+    createdAt: Date;
+    gamme: "essentiel" | "confort" | "excellence";
+    imageUrl: string | null;
+  }[];
 };
 
 const HygieneMobilePropositions = ({
@@ -83,6 +113,7 @@ const HygieneMobilePropositions = ({
   handleClickProposition,
   prixInstalDistrib,
   propositions,
+  hygieneDistribTarifsFournisseur,
 }: HygieneMobilePropositionsProps) => {
   return (
     <div className="flex flex-col gap-6 w-full">
@@ -98,6 +129,7 @@ const HygieneMobilePropositions = ({
         nbDistribSavon={nbDistribSavon}
         nbDistribPh={nbDistribPh}
         dureeLocation={dureeLocation}
+        hygieneDistribTarifsFournisseur={hygieneDistribTarifsFournisseur}
       />
       <HygieneMobileTrilogieCarousel
         propositions={propositions}

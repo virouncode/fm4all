@@ -10,7 +10,7 @@ const NextServiceButton = ({
   disabled = false,
 }: NextServiceButtonProps) => {
   return (
-    <div className="text-end">
+    <div className="text-center lg:text-end">
       <Button
         variant="destructive"
         size="lg"

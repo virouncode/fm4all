@@ -1,24 +1,7 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { RATIO_CHOCO, RATIO_LAIT, RATIO_SUCRE } from "@/constants/constants";
-import { locationCafeMachine } from "@/constants/locationCafeMachine";
-import { typesBoissons, TypesBoissonsType } from "@/constants/typesBoissons";
+import { TypesBoissonsType } from "@/constants/typesBoissons";
 import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { TheContext } from "@/context/TheProvider";
@@ -36,7 +19,9 @@ import { DureeLocationCafeType } from "@/zod-schemas/dureeLocation";
 import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { ChangeEvent, useContext } from "react";
-import { MAX_EFFECTIF } from "../../mes-locaux/MesLocaux";
+import { useMediaQuery } from "react-responsive";
+import CafeDesktopEspaceInputs from "./(desktop)/CafeDesktopEspaceInputs";
+import CafeMobileEspaceInputs from "./(mobile)/CafeMobileEspaceInputs";
 import { MAX_NB_PERSONNES_PAR_ESPACE } from "./CafeEspacePropositions";
 
 type CafeEspaceFormProps = {
@@ -63,24 +48,25 @@ const CafeEspaceForm = ({
   const { setThe } = useContext(TheContext);
   const { setTotalCafe } = useContext(TotalCafeContext);
   const { setTotalThe } = useContext(TotalTheContext);
+  const isTabletOrMobile = useMediaQuery({ maxWidth: 1024 });
   const cafeEspacesIds = cafe.espaces.map((espace) => espace.infos.espaceId);
   const effectif = client.effectif ?? 0;
   const nbPersonnes =
-    espace.quantites.nbPersonnes ||
+    espace.quantites.nbPersonnes ??
     (effectif > MAX_NB_PERSONNES_PAR_ESPACE
       ? MAX_NB_PERSONNES_PAR_ESPACE
       : effectif);
 
   const nbTassesParAn = nbPersonnes * 400;
-  const nbPersonnesTotal = cafe.espaces.reduce(
-    (acc, curr) =>
-      acc +
-      (curr.quantites.nbPersonnes ||
-        (effectif > MAX_NB_PERSONNES_PAR_ESPACE
-          ? MAX_NB_PERSONNES_PAR_ESPACE
-          : effectif)),
-    0
-  );
+  // const nbPersonnesTotal = cafe.espaces.reduce(
+  //   (acc, curr) =>
+  //     acc +
+  //     (curr.quantites.nbPersonnes ||
+  //       (effectif > MAX_NB_PERSONNES_PAR_ESPACE
+  //         ? MAX_NB_PERSONNES_PAR_ESPACE
+  //         : effectif)),
+  //   0
+  // );
 
   //Je change le type de boissons
   //Si c'est la première machine :
@@ -253,13 +239,13 @@ const CafeEspaceForm = ({
     const prixUnitaireConsoCafe =
       cafeConsoTarifs.find(
         (item) =>
-          item.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+          item.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
           item.fournisseurId === cafe.infos.fournisseurId &&
           item.gamme === espace.infos.gammeCafeSelected
       )?.prixUnitaire ?? null;
     const consoLaitTarifFournisseur = laitConsoTarifs.find(
       (item) =>
-        item.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+        item.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
         item.fournisseurId === cafe.infos.fournisseurId
     );
     const typeLait =
@@ -275,7 +261,7 @@ const CafeEspaceForm = ({
 
     const consoChocolatTarifFournisseur = chocolatConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const typeChocolat =
@@ -289,7 +275,7 @@ const CafeEspaceForm = ({
 
     const consoSucreTarifFournisseur = sucreConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const prixUnitaireConsoSucre =
@@ -369,17 +355,27 @@ const CafeEspaceForm = ({
 
   const handleChangeNbPersonnes = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    let newNbPersonnes = value ? parseInt(value) : effectif;
+    let newNbPersonnes = value ? parseInt(value) : 0;
     if (newNbPersonnes >= MAX_NB_PERSONNES_PAR_ESPACE) {
       newNbPersonnes = MAX_NB_PERSONNES_PAR_ESPACE;
       toast({
         title: "Limite atteinte",
-        variant: "destructive",
         description:
           "Le nombre de personnes par espace café est limité à 150. Choisissez une offre puis ajoutez un espace café si besoin",
         duration: 7000,
       });
     }
+    const newNbTassesParAn = newNbPersonnes * 400;
+    // const newNbPersonnesTotal = cafe.espaces.reduce(
+    //   (acc, curr) =>
+    //     acc + curr.infos.espaceId === espace.infos.espaceId
+    //       ? newNbPersonnes
+    //       : curr.quantites.nbPersonnes ||
+    //         (effectif > MAX_NB_PERSONNES_PAR_ESPACE
+    //           ? MAX_NB_PERSONNES_PAR_ESPACE
+    //           : effectif),
+    //   0
+    // );
     //Si je n'avais pas de fournisseur, je change juste le nombre de personnes
     if (!cafe.infos.fournisseurId) {
       setCafe((prev) => ({
@@ -544,17 +540,19 @@ const CafeEspaceForm = ({
     const prixUnitaireConsoCafe =
       cafeConsoTarifs.find(
         (item) =>
-          item.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+          item.effectif === roundNbPersonnesCafeConso(newNbPersonnes) &&
           item.fournisseurId === cafe.infos.fournisseurId &&
           item.gamme === espace.infos.gammeCafeSelected
       )?.prixUnitaire ?? null;
     const consoLaitTarifFournisseur = laitConsoTarifs.find(
       (item) =>
-        item.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+        item.effectif === roundNbPersonnesCafeConso(newNbPersonnes) &&
         item.fournisseurId === cafe.infos.fournisseurId
     );
     const typeLait =
-      value !== "cafe" ? machinesTarifFournisseur?.typeLait : null;
+      espace.infos.typeBoissons === "lait"
+        ? machinesTarifFournisseur?.typeLait
+        : null;
     const prixUnitaireConsoLait =
       typeLait === "dosettes"
         ? consoLaitTarifFournisseur?.prixUnitaireDosette ?? null
@@ -566,7 +564,7 @@ const CafeEspaceForm = ({
 
     const consoChocolatTarifFournisseur = chocolatConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnes) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const typeChocolat =
@@ -582,22 +580,23 @@ const CafeEspaceForm = ({
 
     const consoSucreTarifFournisseur = sucreConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnes) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const prixUnitaireConsoSucre =
       consoSucreTarifFournisseur?.prixUnitaire ?? null;
 
     const totalConso =
-      (prixUnitaireConsoCafe ?? 0) * nbTassesParAn +
-      (prixUnitaireConsoSucre ?? 0) * nbTassesParAn * RATIO_SUCRE +
+      (prixUnitaireConsoCafe ?? 0) * newNbTassesParAn +
+      (prixUnitaireConsoSucre ?? 0) * newNbTassesParAn * RATIO_SUCRE +
       (espace.infos.typeBoissons !== "cafe"
-        ? (prixUnitaireConsoLait ?? 0) * nbTassesParAn * RATIO_LAIT
+        ? (prixUnitaireConsoLait ?? 0) * newNbTassesParAn * RATIO_LAIT
         : 0) +
       (espace.infos.typeBoissons === "chocolat"
-        ? (prixUnitaireConsoChocolat ?? 0) * nbTassesParAn * RATIO_CHOCO
+        ? (prixUnitaireConsoChocolat ?? 0) * newNbTassesParAn * RATIO_CHOCO
         : 0);
-    const totalAnnuel = totalLoc !== null ? totalLoc + totalConso : null;
+    const totalAnnuel =
+      newNbPersonnes && totalLoc !== null ? totalLoc + totalConso : null;
     //Modele
     const modele = machinesTarifFournisseur
       ? cafeMachines?.find(
@@ -774,13 +773,13 @@ const CafeEspaceForm = ({
     const prixUnitaireConsoCafe =
       cafeConsoTarifs.find(
         (item) =>
-          item.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+          item.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
           item.fournisseurId === cafe.infos.fournisseurId &&
           item.gamme === espace.infos.gammeCafeSelected
       )?.prixUnitaire ?? null;
     const consoLaitTarifFournisseur = laitConsoTarifs.find(
       (item) =>
-        item.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+        item.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
         item.fournisseurId === cafe.infos.fournisseurId
     );
     const typeLait =
@@ -796,7 +795,7 @@ const CafeEspaceForm = ({
 
     const consoChocolatTarifFournisseur = chocolatConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const typeChocolat =
@@ -810,7 +809,7 @@ const CafeEspaceForm = ({
 
     const consoSucreTarifFournisseur = sucreConsoTarifs.find(
       (tarif) =>
-        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnesTotal) &&
+        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
         tarif.fournisseurId === cafe.infos.fournisseurId
     );
     const prixUnitaireConsoSucre =
@@ -891,85 +890,30 @@ const CafeEspaceForm = ({
     }
   };
 
-  return (
-    <TooltipProvider delayDuration={0}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <form className="w-2/3">
-            <div className="flex gap-8 items-center mb-4">
-              <div>
-                <RadioGroup
-                  onValueChange={handleChangeTypeBoissons}
-                  value={espace.infos.typeBoissons}
-                  className="flex gap-4 items-center"
-                  name="typeBoissons"
-                >
-                  {typesBoissons.map(({ id, description }) => (
-                    <div key={id} className="flex gap-2 items-center">
-                      <RadioGroupItem
-                        value={id}
-                        title={description}
-                        id={`${id}_${espace.infos.espaceId}`}
-                      />
-                      <Label htmlFor={`${id}_${espace.infos.espaceId}`}>
-                        {description}
-                      </Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-              </div>
-              <div className="flex gap-2 items-center">
-                <Input
-                  className={`w-full max-w-xs min-w-20 ${
-                    nbPersonnes === client.effectif
-                      ? "text-fm4alldestructive"
-                      : ""
-                  }`}
-                  type="number"
-                  min={1}
-                  max={MAX_EFFECTIF}
-                  step={1}
-                  value={nbPersonnes}
-                  onChange={handleChangeNbPersonnes}
-                  id={`nbPersonnes_${espace.infos.espaceId}`}
-                />
-                <Label
-                  htmlFor={`nbPersonnes_${espace.infos.espaceId}`}
-                  className="text-base"
-                >
-                  personnes
-                </Label>
-              </div>
-              {espace.infos.espaceId === cafeEspacesIds[0] && (
-                <Select
-                  value={cafe.infos.dureeLocation}
-                  onValueChange={handleSelectDureeLocation}
-                  aria-label="Sélectionnez la durée de location"
-                >
-                  <SelectTrigger className={`w-full max-w-xs`}>
-                    <SelectValue placeholder="Choisir" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {locationCafeMachine.map((item) => (
-                      <SelectItem
-                        key={`${location}_${item.id}`}
-                        value={item.id}
-                      >
-                        {item.description}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </div>
-          </form>
-        </TooltipTrigger>
-        <TooltipContent className="max-w-60">
-          Choisissez le type de machine avec ou sans lait/cacao, le nombre de
-          personnes pour votre espace café et la durée d’engagement
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+  return isTabletOrMobile ? (
+    <CafeMobileEspaceInputs
+      espace={espace}
+      handleChangeTypeBoissons={handleChangeTypeBoissons}
+      nbPersonnes={nbPersonnes}
+      handleChangeNbPersonnes={handleChangeNbPersonnes}
+      handleSelectDureeLocation={handleSelectDureeLocation}
+      cafeEspacesIds={cafeEspacesIds}
+      cafeMachinesTarifs={cafeMachinesTarifs}
+      cafeConsoTarifs={cafeConsoTarifs}
+      laitConsoTarifs={laitConsoTarifs}
+      chocolatConsoTarifs={chocolatConsoTarifs}
+      sucreConsoTarifs={sucreConsoTarifs}
+      cafeMachines={cafeMachines}
+    />
+  ) : (
+    <CafeDesktopEspaceInputs
+      espace={espace}
+      handleChangeTypeBoissons={handleChangeTypeBoissons}
+      nbPersonnes={nbPersonnes}
+      handleChangeNbPersonnes={handleChangeNbPersonnes}
+      handleSelectDureeLocation={handleSelectDureeLocation}
+      cafeEspacesIds={cafeEspacesIds}
+    />
   );
 };
 

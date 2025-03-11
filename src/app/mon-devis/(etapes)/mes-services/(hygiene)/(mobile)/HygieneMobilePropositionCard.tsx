@@ -9,6 +9,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
+import { MARGE } from "@/constants/constants";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
@@ -90,29 +91,22 @@ const HygieneMobilePropositionCard = ({
   } = proposition;
   const color = getFm4AllColor(gamme);
 
-  // if (!proposition.totalAnnuelTrilogie) {
-  //   return (
-  //     <div
-  //       className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 p-4`}
-  //     >
-  //       Non proposé
-  //     </div>
-  //   );
-  // }
-
   const totalMensuelText = proposition.totalAnnuelTrilogie ? (
     <p className="text-sm font-bold">
-      {formatNumber(Math.round(proposition.totalAnnuelTrilogie / 12))} €/mois
+      {formatNumber(Math.round((proposition.totalAnnuelTrilogie * MARGE) / 12))}{" "}
+      €/mois
     </p>
   ) : (
     <p className="text-sm font-bold">Non proposé</p>
   );
   const prixInstallationText = prixInstalDistrib ? (
     <p className="text-xs">
-      +{formatNumber(Math.round(prixInstalDistrib))} € d&apos;installation
+      +{formatNumber(Math.round(prixInstalDistrib * MARGE))} €
+      d&apos;installation
     </p>
   ) : null;
-  const infosTitle = (
+
+  const dialogTitle = (
     <p className={`text-${color} text-center`}>
       {gamme === "essentiel"
         ? "Essentiel"
@@ -238,10 +232,13 @@ const HygieneMobilePropositionCard = ({
             <DialogTrigger asChild>{imgProduit}</DialogTrigger>
             <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
               <DialogHeader>
-                <DialogTitle>{infosTitle}</DialogTitle>
+                <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
-              <div className="flex flex-col gap-4 items-center">
+              <div className="flex flex-col gap-4">
                 {imgProduitDialog}
+                <p className="text-xs italic text-end">
+                  *photo non contractuelle
+                </p>
                 {infosProduitDialog}
               </div>
             </DialogContent>
@@ -289,9 +286,12 @@ const HygieneMobilePropositionCard = ({
             )}
           </div>
         </div>
-        <div className="flex h-1/2 pt-2 justify-between">
+        <div
+          className="flex h-1/2 pt-2 justify-between"
+          onClick={() => handleClickProposition(proposition)}
+        >
           {infosProduit}
-          <div className="flex flex-col gap-2 items-end">
+          <div className="flex flex-col gap-2 items-end w-1/3">
             {totalMensuelText}
             {prixInstallationText}
             {proposition.totalAnnuelTrilogie ? (
@@ -304,6 +304,7 @@ const HygieneMobilePropositionCard = ({
                 checked={hygiene.infos.trilogieGammeSelected === gamme}
                 onCheckedChange={() => handleClickProposition(proposition)}
                 title="Sélectionnez cette proposition"
+                onClick={(e) => e.stopPropagation()}
               />
             ) : null}
           </div>

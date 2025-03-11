@@ -3,6 +3,5 @@ export const locationCafeMachine = [
   { id: "pa24M", description: "Location 24 mois" },
   { id: "pa36M", description: "Location 36 mois" },
   { id: "pa48M", description: "Location 48 mois" },
-  { id: "pa60M", description: "Location 60 mois" },
   // { id: "oneShot", description: "Achat" },
 ];

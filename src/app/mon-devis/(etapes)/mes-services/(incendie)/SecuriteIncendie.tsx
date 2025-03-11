@@ -74,9 +74,7 @@ const SecuriteIncendie = ({
           incendieTarifs={incendieTarifs}
         />
       </div>
-      {isTabletOrMobile ? null : (
-        <PropositionsFooter handleClickNext={handleClickNext} />
-      )}
+      <PropositionsFooter handleClickNext={handleClickNext} />
     </div>
   );
 };

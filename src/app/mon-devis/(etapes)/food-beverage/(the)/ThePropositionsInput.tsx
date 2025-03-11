@@ -19,7 +19,7 @@ const ThePropositionsInput = ({
       <div className="flex gap-4 items-center justify-center w-full">
         <Input
           type="number"
-          value={nbPersonnes}
+          value={nbPersonnes || ""}
           min={1}
           max={MAX_EFFECTIF}
           step={1}

@@ -96,6 +96,38 @@ const MaintenanceMobilePropositionCard = ({
   ) : (
     <p className="text-sm font-bold">Non proposé</p>
   );
+  const dialogTitle = (
+    <p className={`text-${color} text-center`}>
+      {gamme === "essentiel"
+        ? "Essentiel"
+        : gamme === "confort"
+        ? "Confort"
+        : "Excellence"}
+    </p>
+  );
+  const imgProduit = (
+    <div className="w-1/3 h-full relative rounded-xl overflow-hidden bg-slate-100">
+      <Image
+        src={`${"/img/services/maintenance.webp"}`}
+        alt={`illustration de maintenance`}
+        fill={true}
+        className="object-contain cursor-pointer"
+        quality={100}
+      />
+    </div>
+  );
+
+  const imgProduitDialog = (
+    <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+      <Image
+        src={`${"/img/services/maintenance.webp"}`}
+        alt={`illustration de maintenance`}
+        fill={true}
+        className="object-contain cursor-pointer"
+        quality={100}
+      />
+    </div>
+  );
   const nbPassagesText = (
     <li className="list-check ">
       {freqAnnuelle} passage(s) de {hParPassage} h / an
@@ -135,7 +167,7 @@ const MaintenanceMobilePropositionCard = ({
   );
 
   const infosProduit = (
-    <ul className="flex flex-col text-xs px-4 w-2/3">
+    <ul className="flex flex-col text-xs px-4">
       {gamme === "essentiel"
         ? infosEssentiel
         : gamme === "confort"
@@ -152,40 +184,6 @@ const MaintenanceMobilePropositionCard = ({
         ? infosConfort
         : infosExcellence}
     </ul>
-  );
-
-  const imgProduit = (
-    <div className="w-1/3 h-full relative rounded-xl overflow-hidden bg-slate-100">
-      <Image
-        src={`${"/img/services/maintenance.webp"}`}
-        alt={`illustration de maintenance`}
-        fill={true}
-        className="object-contain cursor-pointer"
-        quality={100}
-      />
-    </div>
-  );
-
-  const imgProduitDialog = (
-    <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
-      <Image
-        src={`${"/img/services/maintenance.webp"}`}
-        alt={`illustration de maintenance`}
-        fill={true}
-        className="object-contain cursor-pointer"
-        quality={100}
-      />
-    </div>
-  );
-
-  const dialogTitle = (
-    <p className={`text-${color} text-center`}>
-      {gamme === "essentiel"
-        ? "Essentiel"
-        : gamme === "confort"
-        ? "Confort"
-        : "Excellence"}
-    </p>
   );
 
   return (
@@ -205,8 +203,11 @@ const MaintenanceMobilePropositionCard = ({
               <DialogHeader>
                 <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
-              <div className="flex flex-col gap-4 items-center">
+              <div className="flex flex-col gap-4">
                 {imgProduitDialog}
+                <p className="text-xs italic text-end">
+                  *photo non contractuelle
+                </p>
                 {infosProduitDialog}
               </div>
             </DialogContent>
@@ -254,9 +255,12 @@ const MaintenanceMobilePropositionCard = ({
             )}
           </div>
         </div>
-        <div className="flex h-2/3 pt-2 justify-between">
+        <div
+          className="flex h-2/3 pt-2 justify-between"
+          onClick={() => handleClickProposition(proposition)}
+        >
           {infosProduit}
-          <div className="flex flex-col gap-2 items-end">
+          <div className="flex flex-col gap-2 items-end w-1/3">
             {totalMensuelText}
             {totalMensuelText ? (
               <Switch
@@ -272,6 +276,7 @@ const MaintenanceMobilePropositionCard = ({
                 }
                 onCheckedChange={() => handleClickProposition(proposition)}
                 title="Sélectionnez cette proposition"
+                onClick={(e) => e.stopPropagation()}
               />
             ) : null}
           </div>

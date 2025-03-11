@@ -103,7 +103,7 @@ const HygieneMobileOptionsBalaiCard = ({
     <p className="text-sm font-bold">Non proposé</p>
   );
 
-  const infosTitle = (
+  const dialogTitle = (
     <p className={`text-${color} text-center`}>
       {gamme === "essentiel"
         ? "Essentiel"
@@ -199,10 +199,13 @@ const HygieneMobileOptionsBalaiCard = ({
             <DialogTrigger asChild>{imgProduit}</DialogTrigger>
             <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
               <DialogHeader>
-                <DialogTitle>{infosTitle}</DialogTitle>
+                <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
-              <div className="flex flex-col gap-4 items-center">
+              <div className="flex flex-col gap-4">
                 {imgProduitDialog}
+                <p className="text-xs italic text-end">
+                  *photo non contractuelle
+                </p>
                 {infosProduitDialog}
               </div>
             </DialogContent>
@@ -250,9 +253,12 @@ const HygieneMobileOptionsBalaiCard = ({
             )}
           </div>
         </div>
-        <div className="flex h-1/2 pt-2 justify-between">
+        <div
+          className="flex h-1/2 pt-2 justify-between"
+          onClick={() => handleClickProposition("balai", proposition)}
+        >
           {infosProduit}
-          <div className="flex flex-col gap-2 items-end">
+          <div className="flex flex-col gap-2 items-end w-1/3">
             {prixMensuelBalaiText}
             {totalBalai ? (
               <Switch
@@ -266,6 +272,7 @@ const HygieneMobileOptionsBalaiCard = ({
                   handleClickProposition("balai", proposition)
                 }
                 title="Sélectionnez cette proposition"
+                onClick={(e) => e.stopPropagation()}
               />
             ) : null}
           </div>

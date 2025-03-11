@@ -14,6 +14,7 @@ import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
+import { useMediaQuery } from "react-responsive";
 import AddEspaceButton from "../(cafe)/AddEspaceButton";
 import NextEspaceButton from "../(cafe)/NextEspaceButton";
 import NextServiceButton from "../../../NextServiceButton";
@@ -36,6 +37,8 @@ const FontaineEspacePropositions = ({
   const { setDevisProgress } = useContext(DevisProgressContext);
   const { fontaines, setFontaines } = useContext(FontainesContext);
   const { setTotalFontaines } = useContext(TotalFontainesContext);
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+
   const router = useRouter();
   //Calcul des propositions
   const fontainesEspacesIds = fontaines.espaces.map(

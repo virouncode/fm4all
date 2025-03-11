@@ -6,10 +6,10 @@ import { roundNbPersonnesCafeConso } from "@/lib/roundNbPersonnesCafeConso";
 import { GammeType } from "@/zod-schemas/gamme";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { ChangeEvent, useContext } from "react";
+import { useMediaQuery } from "react-responsive";
 import { MAX_EFFECTIF } from "../../mes-locaux/MesLocaux";
-import ThePropositionCard from "./ThePropositionCard";
-import ThePropositionFournisseurLogo from "./ThePropositionFournisseurLogo";
-import ThePropositionsInput from "./ThePropositionsInput";
+import TheDesktopPropositions from "./(desktop)/TheDesktopPropositions";
+import TheMobilePropositions from "./(mobile)/TheMobilePropositions";
 
 type ThePropositionsProps = {
   theConsoTarifs: SelectTheConsoTarifsType[];
@@ -23,27 +23,26 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
   const effectif = client.effectif ?? 0;
 
   //Calcul des propositions
-  const nbPersonnes = the.quantites.nbPersonnes || Math.round(effectif * 0.15);
+  const nbPersonnes = the.quantites.nbPersonnes ?? Math.round(effectif * 0.15);
   const nbThesParAn = nbPersonnes * 400;
   const nbTassesParJour = nbPersonnes * 2;
 
-  const propositions =
-    theConsoTarifs
-      ?.filter(
-        (tarif) =>
-          tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes / 0.15) &&
-          tarif.fournisseurId === cafe.infos.fournisseurId
-      )
-      .map((tarif) => ({
-        ...tarif,
-        totalAnnuel:
-          tarif.prixUnitaire !== null ? nbThesParAn * tarif.prixUnitaire : null,
-        infos: tarif.infos ?? null,
-      })) ?? [];
+  const propositions = theConsoTarifs
+    ?.filter(
+      (tarif) =>
+        tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes / 0.15) &&
+        tarif.fournisseurId === cafe.infos.fournisseurId
+    )
+    .map((tarif) => ({
+      ...tarif,
+      totalAnnuel:
+        tarif.prixUnitaire !== null ? nbThesParAn * tarif.prixUnitaire : null,
+      infos: tarif.infos ?? null,
+    }));
 
   const handleChangeNbPersonnes = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    let newNbPersonnes = value ? parseInt(value) : Math.round(effectif * 0.15);
+    let newNbPersonnes = value ? parseInt(value) : 0;
     if (newNbPersonnes > MAX_EFFECTIF) newNbPersonnes = MAX_EFFECTIF;
     const nbThesParAn = newNbPersonnes * 400;
     const prixUnitaire =
@@ -54,7 +53,9 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
           tarif.gamme === the.infos.gammeSelected
       )?.prixUnitaire ?? null;
     const totalAnnuel =
-      prixUnitaire !== null ? nbThesParAn * prixUnitaire : null;
+      newNbPersonnes && prixUnitaire !== null
+        ? nbThesParAn * prixUnitaire
+        : null;
 
     setThe((prev) => ({
       ...prev,
@@ -126,28 +127,27 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
       totalService: totalAnnuel,
     });
   };
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 
-  return (
-    <div className="h-full flex flex-col border rounded-xl overflow-auto">
-      <div className="flex border-b flex-1">
-        <div className="flex w-1/4 items-center justify-center flex-col p-4">
-          <ThePropositionFournisseurLogo {...propositions[0]} />
-          <ThePropositionsInput
-            nbPersonnes={nbPersonnes}
-            handleChange={handleChangeNbPersonnes}
-            effectif={effectif}
-          />
-        </div>
-        {propositions.map((proposition) => (
-          <ThePropositionCard
-            key={proposition.id}
-            proposition={proposition}
-            handleClickProposition={handleClickProposition}
-            nbTassesParJour={nbTassesParJour}
-          />
-        ))}
-      </div>
-    </div>
+  return isTabletOrMobile ? (
+    <TheMobilePropositions
+      nbPersonnes={nbPersonnes}
+      nbTassesParJour={nbTassesParJour}
+      effectif={effectif}
+      handleChangeNbPersonnes={handleChangeNbPersonnes}
+      propositions={propositions}
+      handleClickProposition={handleClickProposition}
+      theConsoTarifs={theConsoTarifs}
+    />
+  ) : (
+    <TheDesktopPropositions
+      nbPersonnes={nbPersonnes}
+      nbTassesParJour={nbTassesParJour}
+      effectif={effectif}
+      handleChangeNbPersonnes={handleChangeNbPersonnes}
+      propositions={propositions}
+      handleClickProposition={handleClickProposition}
+    />
   );
 };
 

@@ -96,7 +96,7 @@ const SecuriteIncendieInputs = ({
             <div className="w-40 h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
               <Image
                 src={"/img/services/baes.webp"}
-                alt={`illustration de nettoyage`}
+                alt={`illustration de bloc autonome d'eclairage de securite`}
                 fill={true}
                 className="object-contain object-center cursor-pointer"
                 quality={100}
@@ -130,7 +130,7 @@ const SecuriteIncendieInputs = ({
             <div className="w-40 h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
               <Image
                 src={"/img/services/tel_baes.webp"}
-                alt={`illustration de nettoyage`}
+                alt={`illustration de telecommande de bloc autonome d'eclairage de securite`}
                 fill={true}
                 className="object-contain object-center cursor-pointer"
                 quality={100}

@@ -37,7 +37,7 @@ const PropositionsTitle = ({
       </p>
       <PreviousServiceButton
         handleClickPrevious={handleClickPrevious}
-        className={previousButton ? "" : "invisible"}
+        className={previousButton ? "" : "hidden"}
       />
     </div>
   );

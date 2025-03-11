@@ -1,9 +1,18 @@
-import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { GammeType } from "@/zod-schemas/gamme";
+import { Info } from "lucide-react";
+import Image from "next/image";
 import { useContext } from "react";
 
 type SnacksFruitsPropositionCardProps = {
@@ -93,7 +102,7 @@ const SnacksFruitsPropositionCard = ({
   ) {
     return (
       <div
-        className={`flex-1 bg-${color} text-xl font-bold text-slate-200 flex items-center justify-center p-2`}
+        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-xl gap-4 min-h-36`}
       >
         <p>Non proposé</p>
       </div>
@@ -105,7 +114,7 @@ const SnacksFruitsPropositionCard = ({
   ) {
     return (
       <div
-        className={`flex-1 bg-${color} text-xl font-bold text-slate-200 flex items-center justify-center p-2`}
+        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-xl gap-4 min-h-36`}
       >
         <p>Non proposé</p>
       </div>
@@ -117,7 +126,7 @@ const SnacksFruitsPropositionCard = ({
   ) {
     return (
       <div
-        className={`flex-1 bg-${color} text-lg font-bold text-slate-200 flex items-center justify-center p-2`}
+        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-xl gap-4 min-h-36`}
       >
         <p>Non proposé</p>
       </div>
@@ -126,7 +135,7 @@ const SnacksFruitsPropositionCard = ({
   if (!proposition.total) {
     return (
       <div
-        className={`flex-1 bg-${color} text-sm font-bold text-slate-200 flex items-center justify-center p-2`}
+        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-base gap-4 min-h-36`}
       >
         <p className="text-center">
           Le panier minimum hebdomadaire du fournisseur n&apos;est pas atteint
@@ -134,26 +143,96 @@ const SnacksFruitsPropositionCard = ({
       </div>
     );
   }
-  const totalMensuelText = `${formatNumber(
-    Math.round((proposition.total * MARGE) / 12)
-  )} € / mois`;
+  const totalMensuelText = (
+    <p className="font-bold text-xl ml-4">
+      {formatNumber(Math.round((proposition.total * MARGE) / 12))} €/mois
+    </p>
+  );
   const gFruitsParSemaineParPersonneText = snacksFruits.infos.choix.includes(
     "fruits"
-  )
-    ? `${proposition.gFruitsParSemaineParPersonne} g / personne / semaine`
-    : "";
+  ) ? (
+    <li className="list-check">
+      {proposition.gFruitsParSemaineParPersonne} g / personne / semaine
+    </li>
+  ) : null;
+
   const portionsSnacksParSemaineParPersonneText =
-    snacksFruits.infos.choix.includes("snacks")
-      ? `${proposition.portionsSnacksParSemaineParPersonne} portion(s) / personne / semaine`
-      : "";
+    snacksFruits.infos.choix.includes("snacks") ? (
+      <li className="list-check">
+        {proposition.portionsSnacksParSemaineParPersonne} portion(s) / personne
+        / semaine
+      </li>
+    ) : null;
+
   const consosBoissonsParSemaineParPersonneText =
-    snacksFruits.infos.choix.includes("boissons")
-      ? `${proposition.consosBoissonsParSemaineParPersonne} boisson(s) / personne / semaine`
-      : "";
+    snacksFruits.infos.choix.includes("boissons") ? (
+      <li className="list-check">
+        {proposition.consosBoissonsParSemaineParPersonne} boisson(s) / personne
+        / semaine
+      </li>
+    ) : null;
+
+  const dialogTitle = (
+    <p className={`text-${color} text-center`}>
+      {proposition.gamme === "essentiel"
+        ? "Essentiel"
+        : proposition.gamme === "confort"
+        ? "Confort"
+        : "Excellence"}
+    </p>
+  );
+
+  const infosProduit = (
+    <ul className="flex flex-col text-xs px-4 mx-auto">
+      {gFruitsParSemaineParPersonneText}
+      {portionsSnacksParSemaineParPersonneText}
+      {consosBoissonsParSemaineParPersonneText}
+    </ul>
+  );
+
+  const infosProduitDialog = (
+    <ul className="flex flex-col text-sm px-4 mx-auto">
+      {gFruitsParSemaineParPersonneText}
+      {portionsSnacksParSemaineParPersonneText}
+      {consosBoissonsParSemaineParPersonneText}
+    </ul>
+  );
+
+  const imgProduit = (
+    <div className="flex items-center justify-between gap-2">
+      <div className="w-full h-40 relative mx-auto rounded-lg border-slate-300 border bg-slate-100 overflow-hidden">
+        <Image
+          src="/img/services/fruits.webp"
+          alt="illustration-corbeille-fruits"
+          fill
+          quality={100}
+          className="object-cover"
+        />
+      </div>
+      <div className="w-full h-40 relative mx-auto rounded-lg border-slate-300 border bg-slate-100 overflow-hidden">
+        <Image
+          src="/img/services/snacks.webp"
+          alt="illustration-snacks"
+          fill
+          quality={100}
+          className="object-cover"
+        />
+      </div>
+      <div className="w-full h-40 relative mx-auto rounded-lg border-slate-300 border bg-slate-100 overflow-hidden">
+        <Image
+          src="/img/services/boissons.webp"
+          alt="illustration-boissons"
+          fill
+          quality={100}
+          className="object-cover"
+        />
+      </div>
+    </div>
+  );
 
   return (
     <div
-      className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 p-2 cursor-pointer ${
+      className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 p-4 cursor-pointer min-h-36 ${
         snacksFruits.infos.fournisseurId === proposition.fournisseurId &&
         snacksFruits.infos.gammeSelected === gamme
           ? "ring-4 ring-inset ring-fm4alldestructive"
@@ -161,26 +240,39 @@ const SnacksFruitsPropositionCard = ({
       }`}
       onClick={() => handleClickProposition(proposition)}
     >
-      <Checkbox
+      <Switch
         checked={
           snacksFruits.infos.fournisseurId === proposition.fournisseurId &&
           snacksFruits.infos.gammeSelected === gamme
         }
         onCheckedChange={() => handleClickProposition(proposition)}
-        className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-        aria-label="Sélectionner cette proposition"
+        className="data-[state=checked]:bg-fm4alldestructive"
+        title="Sélectionner cette proposition"
       />
       <div>
-        <p className="font-bold">{totalMensuelText}</p>
-        {gFruitsParSemaineParPersonneText ? (
-          <p className="text-xs">{gFruitsParSemaineParPersonneText}</p>
-        ) : null}
-        {portionsSnacksParSemaineParPersonneText ? (
-          <p className="text-xs">{portionsSnacksParSemaineParPersonneText}</p>
-        ) : null}
-        {consosBoissonsParSemaineParPersonneText ? (
-          <p className="text-xs">{consosBoissonsParSemaineParPersonneText}</p>
-        ) : null}
+        <div className="flex gap-2 items-center">
+          {totalMensuelText}
+          <Dialog>
+            <DialogTrigger asChild>
+              <Info
+                size={16}
+                className="cursor-pointer"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>{dialogTitle}</DialogTitle>
+              </DialogHeader>
+              {imgProduit}
+              <p className="text-xs italic text-end">
+                *photos non contractuelles
+              </p>
+              {infosProduitDialog}
+            </DialogContent>
+          </Dialog>
+        </div>
+        {infosProduit}
       </div>
     </div>
   );
