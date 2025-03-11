@@ -4,6 +4,7 @@ const effectifsPaliers = [
 ];
 
 export const roundEffectif = (effectif: number) => {
+  if (effectif <= 1) return 1;
   const roundedEffectif = effectifsPaliers
     .filter((curr) => curr <= effectif) // Garde les valeurs inférieures ou égales
     .reduce((prev, curr) => Math.max(prev, curr), -Infinity); // Trouve le maximum

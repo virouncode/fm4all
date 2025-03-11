@@ -240,7 +240,7 @@ const SecuriteIncendieMobileInputs = ({
           Indiquez votre nombre d&apos;<strong>extincteurs</strong> :
         </p>
         <div className="flex flex-col w-full p-1 gap-2">
-          <Label htmlFor="nbDistribBalai" className="text-sm">
+          <Label htmlFor="nbExtincteurs" className="text-sm">
             Nombre d&apos;extincteurs
           </Label>
           <div className="flex items-center gap-2">

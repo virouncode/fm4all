@@ -735,7 +735,10 @@ const CafeMobileEspaceInputs = ({
           café :
         </p>
         <div className="flex flex-col w-full p-1 gap-2">
-          <Label htmlFor="nbDistribPh" className="text-sm flex-1">
+          <Label
+            htmlFor={`nbPersonnes_${espace.infos.espaceId}`}
+            className="text-sm flex-1"
+          >
             Nombre de personnes
           </Label>
           <div className="flex items-center gap-2">

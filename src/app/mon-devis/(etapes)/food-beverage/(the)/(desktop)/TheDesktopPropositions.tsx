@@ -1,7 +1,7 @@
 import { ChangeEvent } from "react";
-import ThePropositionCard from "../ThePropositionCard";
-import ThePropositionFournisseurLogo from "../ThePropositionFournisseurLogo";
-import ThePropositionsInput from "../ThePropositionsInput";
+import ThePropositionCard from "./ThePropositionCard";
+import ThePropositionFournisseurLogo from "./ThePropositionFournisseurLogo";
+import ThePropositionsInput from "./ThePropositionsInput";
 
 type TheDesktopPropositionsProps = {
   nbPersonnes: number;

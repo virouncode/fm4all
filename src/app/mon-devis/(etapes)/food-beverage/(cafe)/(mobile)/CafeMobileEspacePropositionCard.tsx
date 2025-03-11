@@ -291,7 +291,7 @@ const CafeMobileEspacePropositionCard = ({
   return (
     <CarouselItem>
       <div
-        className={`bg-${color} flex flex-col h-80 border border-slate-200 rounded-xl p-4 text-white  ${
+        className={`bg-${color} flex flex-col h-96 border border-slate-200 rounded-xl p-4 text-white  ${
           cafe.infos.fournisseurId === fournisseurId &&
           espace.infos.gammeCafeSelected === gamme &&
           totalAnnuel

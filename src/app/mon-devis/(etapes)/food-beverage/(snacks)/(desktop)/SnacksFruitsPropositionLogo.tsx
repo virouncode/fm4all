@@ -9,7 +9,7 @@ import {
 import { SquareArrowOutUpRight } from "lucide-react";
 import Image from "next/image";
 
-type SnacksFruitsFournisseurLogoProps = {
+type SnacksFruitsPropositionLogoProps = {
   nomFournisseur: string | null;
   logoUrl: string | null;
   locationUrl: string | null;
@@ -22,7 +22,7 @@ type SnacksFruitsFournisseurLogoProps = {
   nbAvis: number | null;
 };
 
-const SnackFruitsPropositionLogo = ({
+const SnacksFruitsPropositionLogo = ({
   nomFournisseur,
   logoUrl,
   locationUrl,
@@ -33,7 +33,7 @@ const SnackFruitsPropositionLogo = ({
   nbClients,
   noteGoogle,
   nbAvis,
-}: SnacksFruitsFournisseurLogoProps) => {
+}: SnacksFruitsPropositionLogoProps) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -79,4 +79,4 @@ const SnackFruitsPropositionLogo = ({
   );
 };
 
-export default SnackFruitsPropositionLogo;
+export default SnacksFruitsPropositionLogo;

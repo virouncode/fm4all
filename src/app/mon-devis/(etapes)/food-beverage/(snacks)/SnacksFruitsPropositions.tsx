@@ -12,8 +12,9 @@ import { gammes, GammeType } from "@/zod-schemas/gamme";
 import { SelectSnacksQuantitesType } from "@/zod-schemas/snacksQuantites";
 import { SelectSnacksTarifsType } from "@/zod-schemas/snacksTarifs";
 import { useContext } from "react";
-import SnackFruitsPropositionLogo from "./SnackFruitsPropositionLogo";
-import SnacksFruitsPropositionCard from "./SnacksFruitsPropositionCard";
+import { useMediaQuery } from "react-responsive";
+import SnacksFruitsDesktopPropositions from "./(desktop)/SnacksFruitsDesktopPropositions";
+import SnacksFruitsMobilePropositions from "./(mobile)/SnacksFruitsMobilePropositions";
 
 type SnacksFruitsPropositionsType = {
   fruitsQuantites: SelectFruitsQuantitesType[];
@@ -39,7 +40,7 @@ const SnacksFruitsPropositions = ({
   const { client } = useContext(ClientContext);
   const { cafe } = useContext(CafeContext);
   const effectif = client.effectif ?? 0;
-  const nbPersonnes = snacksFruits.quantites.nbPersonnes || effectif;
+  const nbPersonnes = snacksFruits.quantites.nbPersonnes ?? effectif;
 
   //Calcul des propositions
   const fruitsTarifsPourNbPersonnes = fruitsTarifs.filter(
@@ -91,26 +92,27 @@ const SnacksFruitsPropositions = ({
 
     const fruitsKgParSemaine =
       gFruitsParSemaineParPersonne !== null && minKgFruitsParSemaine !== null
-        ? (gFruitsParSemaineParPersonne * nbPersonnes) / 1000 >=
-          (minKgFruitsParSemaine ?? 0)
-          ? (gFruitsParSemaineParPersonne * nbPersonnes) / 1000
-          : minKgFruitsParSemaine
+        ? Math.max(
+            (gFruitsParSemaineParPersonne * nbPersonnes) / 1000,
+            minKgFruitsParSemaine
+          )
         : null;
+
     const snacksPortionsParSemaine =
       portionsSnacksParSemaineParPersonne !== null &&
       minPortionsSnacksParSemaine !== null
-        ? portionsSnacksParSemaineParPersonne * nbPersonnes >=
-          minPortionsSnacksParSemaine
-          ? portionsSnacksParSemaineParPersonne * nbPersonnes
-          : minPortionsSnacksParSemaine
+        ? Math.max(
+            portionsSnacksParSemaineParPersonne * nbPersonnes,
+            minPortionsSnacksParSemaine
+          )
         : null;
     const boissonsConsosParSemaine =
       consosBoissonsParSemaineParPersonne !== null &&
       minConsosBoissonsParSemaine !== null
-        ? consosBoissonsParSemaineParPersonne * nbPersonnes >=
-          minConsosBoissonsParSemaine
-          ? consosBoissonsParSemaineParPersonne * nbPersonnes
-          : minConsosBoissonsParSemaine
+        ? Math.max(
+            consosBoissonsParSemaineParPersonne * nbPersonnes,
+            minConsosBoissonsParSemaine
+          )
         : null;
 
     //Tarifs / portion
@@ -125,6 +127,7 @@ const SnacksFruitsPropositions = ({
         (tarif) =>
           tarif.gamme === gamme && tarif.fournisseurId === fournisseurId
       )?.prixUnitaire ?? null;
+
     //Prix panier
     const panierFruits =
       snacksFruits.infos.choix.includes("fruits") &&
@@ -179,7 +182,7 @@ const SnacksFruitsPropositions = ({
     const totalLivraison =
       fraisLivraisonPanier !== null ? fraisLivraisonPanier * 52 : null;
     const total =
-      fraisLivraisonPanier !== null
+      fraisLivraisonPanier !== null && nbPersonnes
         ? 52 * (prixPanier + fraisLivraisonPanier)
         : null;
 
@@ -408,38 +411,18 @@ const SnacksFruitsPropositions = ({
     });
   };
 
-  if (snacksFruits.infos.choix.length === 0) {
-    return (
-      <div className="h-full flex flex-col items-center justify-center border rounded-xl overflow-hidden">
-        <p>Nous n&apos;avons pas d&apos;offres correspondant à ces critères</p>
-        <p>
-          Veuillez choisir au moins une valeur parmi &quot;fruits, snacks et
-          boissons&quot;
-        </p>
-      </div>
-    );
-  }
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 
-  return (
-    <div className="flex-1 flex flex-col border rounded-xl overflow-auto">
-      {formattedPropositions.length > 0
-        ? formattedPropositions.map((propositions) => (
-            <div
-              className="flex border-b flex-1"
-              key={propositions[0].fournisseurId}
-            >
-              <SnackFruitsPropositionLogo {...propositions[0]} />
-              {propositions.map((proposition) => (
-                <SnacksFruitsPropositionCard
-                  key={proposition.id}
-                  proposition={proposition}
-                  handleClickProposition={handleClickProposition}
-                />
-              ))}
-            </div>
-          ))
-        : null}
-    </div>
+  return isTabletOrMobile ? (
+    <SnacksFruitsMobilePropositions
+      formattedPropositions={formattedPropositions}
+      handleClickProposition={handleClickProposition}
+    />
+  ) : (
+    <SnacksFruitsDesktopPropositions
+      formattedPropositions={formattedPropositions}
+      handleClickProposition={handleClickProposition}
+    />
   );
 };
 
