@@ -40,8 +40,12 @@ import { TotalContext } from "@/context/TotalProvider";
 import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
+import { toast } from "@/hooks/use-toast";
+import { ToastAction } from "@radix-ui/react-toast";
+import { Link } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
+import { useMediaQuery } from "react-responsive";
 
 type DevisButtonProps = {
   title: string;
@@ -87,7 +91,7 @@ const DevisButton = ({
   const { setTotalOfficeManager } = useContext(TotalOfficeManagerContext);
   const { setTotalServicesFm4All } = useContext(TotalServicesFm4AllContext);
   const { setTotal } = useContext(TotalContext);
-
+  const isTabletOrMobile = useMediaQuery({ maxWidth: 1024 });
   const router = useRouter();
 
   const serviceSearchParams = new URLSearchParams();
@@ -189,19 +193,32 @@ const DevisButton = ({
     router.push("/mon-devis/mes-locaux");
   };
 
-  // const handleAlert = () => {
-  //   toast({
-  //     description:
-  //       "Les devis en ligne ne sont pas encore possibles depuis un mobile. Essayez depuis un ordinateur ou contactez-nous",
-  //     action: (
-  //       <ToastAction altText="Contactez-nous" asChild>
-  //         <Link href="/contact">Contact</Link>
-  //       </ToastAction>
-  //     ),
-  //   });
-  // };
+  const handleAlert = () => {
+    toast({
+      description:
+        "Les devis en ligne ne sont pas encore possibles depuis un mobile. Essayez depuis un ordinateur ou contactez-nous",
+      action: (
+        <ToastAction altText="Contactez-nous" asChild>
+          <Link href="/contact">Contact</Link>
+        </ToastAction>
+      ),
+    });
+  };
 
-  return devisProgress.completedSteps.includes(1) ? (
+  return isTabletOrMobile ? (
+    <div className="flex justify-center">
+      <Button
+        variant="destructive"
+        size={size}
+        title={title}
+        className={`text-base ${className}`}
+        onClick={handleAlert}
+        disabled={disabled}
+      >
+        {text}
+      </Button>
+    </div>
+  ) : devisProgress.completedSteps.includes(1) ? (
     <Dialog>
       <DialogTrigger asChild>
         <Button
