@@ -10,9 +10,9 @@ import { SelectRiaTarifsType } from "@/zod-schemas/riaTarifs";
 import { useContext } from "react";
 import PersonnaliserIncendieComplements from "./(incendie)/PersonnaliserIncendieComplements";
 import PersonnaliserNettoyageVitrerie from "./(nettoyage)/PersonnaliserNettoyageVitrerie";
+import PersonnaliserCommentaires from "./PersonnaliserCommentaires";
 import PersonnaliserFinal from "./PersonnaliserFinal";
 import PersonnaliserPresentation from "./PersonnaliserPresentation";
-import PersonnaliserCommentaires from "./PersonnaliserCommentaires";
 
 type PersonnaliserDevisProps = {
   exutoiresTarifs?: SelectExutoiresTarifsType[];
@@ -36,7 +36,7 @@ const PersonnaliserDevis = ({
   usePersonnalisation();
   useScrollIntoPersonnalisation();
   return (
-    <section className="flex-1 overflow-hidden">
+    <section className="flex-1 lg:overflow-hidden">
       <PersonnaliserPresentation />
       {personnalisationIds.includes(2) && <PersonnaliserNettoyageVitrerie />}
       {/* {personnalisationIds.includes(3) && (

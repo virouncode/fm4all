@@ -1,3 +1,4 @@
+import PropositionsTitleMobile from "@/app/mon-devis/PropositionsTitleMobile";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,7 +13,8 @@ import { SelectExutoiresTarifsType } from "@/zod-schemas/exutoiresTarifs";
 import { SelectPortesCoupeFeuTarifsType } from "@/zod-schemas/portesCoupeFeuTarifs";
 import { SelectRiaTarifsType } from "@/zod-schemas/riaTarifs";
 import { FireExtinguisher } from "lucide-react";
-import { ChangeEvent, useContext, useState } from "react";
+import { ChangeEvent, useContext, useRef, useState } from "react";
+import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 
@@ -603,15 +605,30 @@ const PersonnaliserIncendieComplements = ({
     }
   };
 
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+  const propositionsRef = useRef<HTMLDivElement>(null);
+
   return (
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="6">
-      <PropositionsTitle
-        title="Securite incendie"
-        description=""
-        icon={FireExtinguisher}
-        handleClickPrevious={handleClickPrevious}
-      />
-      <div className="w-full flex-1 flex flex-col gap-6 overflow-auto">
+      {isTabletOrMobile ? (
+        <PropositionsTitleMobile
+          title="Securite incendie"
+          description=""
+          icon={FireExtinguisher}
+          propositionsRef={propositionsRef}
+        />
+      ) : (
+        <PropositionsTitle
+          title="Securite incendie"
+          description=""
+          icon={FireExtinguisher}
+          handleClickPrevious={handleClickPrevious}
+        />
+      )}
+      <div
+        className="w-full flex-1 flex flex-col gap-6 overflow-auto"
+        ref={propositionsRef}
+      >
         <div className="flex flex-col gap-6">
           <p className="text-2xl">Compléments</p>
           <p className="max-w-prose mx-auto hyphens-auto"></p>
@@ -827,7 +844,9 @@ const PersonnaliserIncendieComplements = ({
           </div>
         </div>
       </div>
-      <PropositionsFooter handleClickNext={handleClickNext} />
+      {!isTabletOrMobile ? (
+        <PropositionsFooter handleClickNext={handleClickNext} />
+      ) : null}
     </div>
   );
 };

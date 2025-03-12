@@ -167,7 +167,7 @@ const SauvegarderProgression = () => {
             onSubmit={form.handleSubmit(submitForm)}
             className="flex flex-col gap-8 mx-auto w-full md:w-2/3 mt-6"
           >
-            <div className="flex flex-col gap-4 md:flex-row md:gap-8">
+            <div className="flex flex-col gap-4 md:flex-row md:gap-8 px-1">
               <div className="w-full md:w-1/2 flex flex-col gap-4">
                 <InputWithLabel<InsertClientType>
                   fieldTitle="Email*"
@@ -217,7 +217,7 @@ const SauvegarderProgression = () => {
                 autres, avant de valider cette étape, voici{" "}
                 <strong>3 engagements que nous prenons envers vous :</strong>
               </p>
-              <ul className="flex flex-col gap-2 ml-16">
+              <ul className="flex flex-col gap-2 ml-10 lg:ml-16">
                 <li className="list-handshake">
                   Engagement N°1 : Vous allez bien obtenir un devis complet et
                   définitif 100% en ligne

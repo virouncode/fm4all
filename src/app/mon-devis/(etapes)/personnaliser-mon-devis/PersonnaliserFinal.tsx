@@ -3,6 +3,7 @@ import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
+import { useMediaQuery } from "react-responsive";
 import PreviousServiceButton from "../../PreviousServiceButton";
 
 const PersonnaliserFinal = () => {
@@ -26,18 +27,23 @@ const PersonnaliserFinal = () => {
         personnalisation.personnalisationIds[currentIndex - 1],
     }));
   };
+
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+
   return (
     <div
       className="flex flex-col gap-4 w-full mx-auto h-full py-2 overflow-auto"
       id="14"
     >
-      <div className="flex justify-end">
-        <PreviousServiceButton handleClickPrevious={handleClickPrevious} />
-      </div>
+      {!isTabletOrMobile ? (
+        <div className="flex justify-end">
+          <PreviousServiceButton handleClickPrevious={handleClickPrevious} />
+        </div>
+      ) : null}
       <div className="flex flex-col gap-4 py-6 items-center max-w-prose hyphens-auto mx-auto">
         <p>
-          Encore un doute sur une prestation? Besoin de précisions
-          supplémentaires?
+          Encore un doute sur une prestation ? Besoin de précisions
+          supplémentaires ?
         </p>
         <p className="text-center">Pas d’inquiètude !</p>
         <p>

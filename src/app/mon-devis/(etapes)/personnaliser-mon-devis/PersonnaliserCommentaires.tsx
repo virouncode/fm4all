@@ -4,9 +4,11 @@ import { CommentairesContext } from "@/context/CommentairesProvider";
 import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { MessageSquareText } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent, useContext, useRef } from "react";
+import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../PropositionsFooter";
 import PropositionsTitle from "../../PropositionsTitle";
+import PropositionsTitleMobile from "../../PropositionsTitleMobile";
 
 const PersonnaliserCommentaires = () => {
   const { commentaires, setCommentaires } = useContext(CommentairesContext);
@@ -44,18 +46,30 @@ const PersonnaliserCommentaires = () => {
     setCommentaires(value);
   };
 
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+  const propositionsRef = useRef<HTMLDivElement>(null);
+
   return (
-    <div
-      className="flex flex-col gap-4 w-full mx-auto h-full py-2 overflow-auto"
-      id="13"
-    >
-      <PropositionsTitle
-        title="Commentaires / remarques"
-        description=""
-        icon={MessageSquareText}
-        handleClickPrevious={handleClickPrevious}
-      />
-      <div className="w-full flex-1 flex flex-col gap-6 px-2">
+    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="13">
+      {isTabletOrMobile ? (
+        <PropositionsTitleMobile
+          title="Commentaires / remarques"
+          description=""
+          icon={MessageSquareText}
+          propositionsRef={propositionsRef}
+        />
+      ) : (
+        <PropositionsTitle
+          title="Commentaires / remarques"
+          description=""
+          icon={MessageSquareText}
+          handleClickPrevious={handleClickPrevious}
+        />
+      )}
+      <div
+        className="w-full flex-1 flex flex-col gap-6 px-2"
+        ref={propositionsRef}
+      >
         <p className="text-2xl">Commentaires et remarques</p>
         <Label htmlFor="commentaires-nettoyage" className="text-base">
           Ajoutez des précisions pour notre équipe :
@@ -63,11 +77,13 @@ const PersonnaliserCommentaires = () => {
         <Textarea
           id="commentaires-nettoyage"
           onChange={handleChange}
-          className="resize-none flex-1"
+          className="resize-none h-60 lg:flex-1"
           value={commentaires ?? ""}
         />
       </div>
-      <PropositionsFooter handleClickNext={handleClickNext} />
+      {!isTabletOrMobile ? (
+        <PropositionsFooter handleClickNext={handleClickNext} />
+      ) : null}
     </div>
   );
 };
