@@ -1,3 +1,4 @@
+import { MARGE } from "@/constants/constants";
 import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
 import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
@@ -14,9 +15,9 @@ import { GammeType } from "@/zod-schemas/gamme";
 import { SelectServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4AllOffresType";
 import { SelectServicesFm4AllTauxType } from "@/zod-schemas/servicesFm4AllTaux";
 import { useContext } from "react";
-import ServicesFm4AllFournisseurLogo from "./ServicesFm4AllFournisseurLogo";
-import ServicesFm4AllPropositionCard from "./ServicesFm4AllPropositionCard";
-import { MARGE } from "@/constants/constants";
+import { useMediaQuery } from "react-responsive";
+import ServicesFm4allDesktopPropositions from "./(desktop)/ServicesFm4allDesktopPropositions";
+import ServicesFm4allMobilePropositions from "./(mobile)/ServicesFm4allMobilePropositions";
 
 type ServicesFm4AllPropositionsProps = {
   servicesFm4AllTaux: SelectServicesFm4AllTauxType[];
@@ -244,20 +245,20 @@ const ServicesFm4AllPropositions = ({
     });
   };
 
-  return (
-    <div className="h-full flex flex-col border rounded-xl overflow-auto">
-      <div className="flex border-b flex-1">
-        <ServicesFm4AllFournisseurLogo />
-        {formattedPropositions.map((proposition) => (
-          <ServicesFm4AllPropositionCard
-            key={proposition.id}
-            proposition={proposition}
-            handleClickProposition={handleClickProposition}
-            total={total}
-          />
-        ))}
-      </div>
-    </div>
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+
+  return isTabletOrMobile ? (
+    <ServicesFm4allMobilePropositions
+      formattedPropositions={formattedPropositions}
+      handleClickProposition={handleClickProposition}
+      total={total}
+    />
+  ) : (
+    <ServicesFm4allDesktopPropositions
+      formattedPropositions={formattedPropositions}
+      handleClickProposition={handleClickProposition}
+      total={total}
+    />
   );
 };
 
