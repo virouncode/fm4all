@@ -284,6 +284,195 @@ const SecuriteIncendiePropositions = ({
     }
   };
 
+  const handleIncrement = (type: "extincteur" | "baes" | "telBaes") => {
+    switch (type) {
+      case "extincteur":
+        let newNbExtincteurs = nbExtincteurs + 1;
+        if (newNbExtincteurs > MAX_NB_EXTINCTEURS)
+          newNbExtincteurs = MAX_NB_EXTINCTEURS;
+
+        setIncendie((prev) => ({
+          ...prev,
+          quantites: { ...prev.quantites, nbExtincteurs: newNbExtincteurs },
+        }));
+        if (incendie.infos.fournisseurId) {
+          const tarifsFournisseur = incendieTarifs.find(
+            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
+          );
+          const prixParExtincteur =
+            tarifsFournisseur?.prixParExtincteur ?? null;
+          const prixParBaes = tarifsFournisseur?.prixParBaes ?? null;
+          const prixParTelBaes = tarifsFournisseur?.prixParTelBaes ?? null;
+          const totalTrilogie =
+            prixParExtincteur !== null &&
+            prixParBaes !== null &&
+            prixParTelBaes !== null
+              ? newNbExtincteurs * prixParExtincteur +
+                nbBaes * prixParBaes +
+                nbTelBaes * prixParTelBaes
+              : null;
+
+          setTotalIncendie((prev) => ({
+            ...prev,
+            totalTrilogie,
+          }));
+        }
+        return;
+      case "baes":
+        let newNbBaes = nbBaes + 1;
+        if (newNbBaes > MAX_NB_BAES) newNbBaes = MAX_NB_BAES;
+        setIncendie((prev) => ({
+          ...prev,
+          quantites: { ...prev.quantites, nbBaes: newNbBaes },
+        }));
+        if (incendie.infos.fournisseurId) {
+          const tarifsFournisseur = incendieTarifs.find(
+            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
+          );
+          const prixParExtincteur =
+            tarifsFournisseur?.prixParExtincteur ?? null;
+          const prixParBaes = tarifsFournisseur?.prixParBaes ?? null;
+          const prixParTelBaes = tarifsFournisseur?.prixParTelBaes ?? null;
+          const totalTrilogie =
+            prixParExtincteur !== null &&
+            prixParBaes !== null &&
+            prixParTelBaes !== null
+              ? nbExtincteurs * prixParExtincteur +
+                newNbBaes * prixParBaes +
+                nbTelBaes * prixParTelBaes
+              : null;
+          setTotalIncendie((prev) => ({
+            ...prev,
+            totalTrilogie,
+          }));
+        }
+        return;
+      case "telBaes":
+        let newNbTelBaes = nbTelBaes + 1;
+        if (newNbTelBaes > MAX_NB_TEL_BAES) newNbTelBaes = MAX_NB_TEL_BAES;
+        setIncendie((prev) => ({
+          ...prev,
+          quantites: { ...prev.quantites, nbTelBaes: newNbTelBaes },
+        }));
+        if (incendie.infos.fournisseurId) {
+          const tarifsFournisseur = incendieTarifs.find(
+            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
+          );
+          const prixParExtincteur =
+            tarifsFournisseur?.prixParExtincteur ?? null;
+          const prixParBaes = tarifsFournisseur?.prixParBaes ?? null;
+          const prixParTelBaes = tarifsFournisseur?.prixParTelBaes ?? null;
+          const totalTrilogie =
+            prixParExtincteur !== null &&
+            prixParBaes !== null &&
+            prixParTelBaes !== null
+              ? nbExtincteurs * prixParExtincteur +
+                nbBaes * prixParBaes +
+                newNbTelBaes * prixParTelBaes
+              : null;
+          setTotalIncendie((prev) => ({
+            ...prev,
+            totalTrilogie,
+          }));
+        }
+        return;
+    }
+  };
+
+  const handleDecrement = (type: "extincteur" | "baes" | "telBaes") => {
+    switch (type) {
+      case "extincteur":
+        let newNbExtincteurs = nbExtincteurs - 1;
+        if (newNbExtincteurs < 0) newNbExtincteurs = 0;
+
+        setIncendie((prev) => ({
+          ...prev,
+          quantites: { ...prev.quantites, nbExtincteurs: newNbExtincteurs },
+        }));
+        if (incendie.infos.fournisseurId) {
+          const tarifsFournisseur = incendieTarifs.find(
+            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
+          );
+          const prixParExtincteur =
+            tarifsFournisseur?.prixParExtincteur ?? null;
+          const prixParBaes = tarifsFournisseur?.prixParBaes ?? null;
+          const prixParTelBaes = tarifsFournisseur?.prixParTelBaes ?? null;
+          const totalTrilogie =
+            prixParExtincteur !== null &&
+            prixParBaes !== null &&
+            prixParTelBaes !== null
+              ? newNbExtincteurs * prixParExtincteur +
+                nbBaes * prixParBaes +
+                nbTelBaes * prixParTelBaes
+              : null;
+
+          setTotalIncendie((prev) => ({
+            ...prev,
+            totalTrilogie,
+          }));
+        }
+        return;
+      case "baes":
+        let newNbBaes = nbBaes - 1;
+        if (newNbBaes < 0) newNbBaes = 0;
+        setIncendie((prev) => ({
+          ...prev,
+          quantites: { ...prev.quantites, nbBaes: newNbBaes },
+        }));
+        if (incendie.infos.fournisseurId) {
+          const tarifsFournisseur = incendieTarifs.find(
+            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
+          );
+          const prixParExtincteur =
+            tarifsFournisseur?.prixParExtincteur ?? null;
+          const prixParBaes = tarifsFournisseur?.prixParBaes ?? null;
+          const prixParTelBaes = tarifsFournisseur?.prixParTelBaes ?? null;
+          const totalTrilogie =
+            prixParExtincteur !== null &&
+            prixParBaes !== null &&
+            prixParTelBaes !== null
+              ? nbExtincteurs * prixParExtincteur +
+                newNbBaes * prixParBaes +
+                nbTelBaes * prixParTelBaes
+              : null;
+          setTotalIncendie((prev) => ({
+            ...prev,
+            totalTrilogie,
+          }));
+        }
+        return;
+      case "telBaes":
+        let newNbTelBaes = nbTelBaes - 1;
+        if (newNbTelBaes < 0) newNbTelBaes = 0;
+        setIncendie((prev) => ({
+          ...prev,
+          quantites: { ...prev.quantites, nbTelBaes: newNbTelBaes },
+        }));
+        if (incendie.infos.fournisseurId) {
+          const tarifsFournisseur = incendieTarifs.find(
+            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
+          );
+          const prixParExtincteur =
+            tarifsFournisseur?.prixParExtincteur ?? null;
+          const prixParBaes = tarifsFournisseur?.prixParBaes ?? null;
+          const prixParTelBaes = tarifsFournisseur?.prixParTelBaes ?? null;
+          const totalTrilogie =
+            prixParExtincteur !== null &&
+            prixParBaes !== null &&
+            prixParTelBaes !== null
+              ? nbExtincteurs * prixParExtincteur +
+                nbBaes * prixParBaes +
+                newNbTelBaes * prixParTelBaes
+              : null;
+          setTotalIncendie((prev) => ({
+            ...prev,
+            totalTrilogie,
+          }));
+        }
+        return;
+    }
+  };
+
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 
   return isTabletOrMobile ? (
@@ -294,8 +483,9 @@ const SecuriteIncendiePropositions = ({
       nbTelBaes={nbTelBaes}
       handleChangeNbr={handleChangeNbr}
       incendieQuantite={incendieQuantite}
-      incendieTarifs={incendieTarifs}
       handleClickProposition={handleClickProposition}
+      handleIncrement={handleIncrement}
+      handleDecrement={handleDecrement}
     />
   ) : (
     <SecuriteIncendieDesktopPropositions

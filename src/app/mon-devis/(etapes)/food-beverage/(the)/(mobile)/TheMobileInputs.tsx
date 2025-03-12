@@ -1,12 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
-import { TheContext } from "@/context/TheProvider";
-import { TotalTheContext } from "@/context/TotalTheProvider";
-import { roundNbPersonnesCafeConso } from "@/lib/roundNbPersonnesCafeConso";
-import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { Minus, Plus } from "lucide-react";
 import { ChangeEvent, useContext } from "react";
 import { MAX_EFFECTIF } from "../../../mes-locaux/MesLocaux";
@@ -14,88 +9,19 @@ import { MAX_EFFECTIF } from "../../../mes-locaux/MesLocaux";
 type TheMobileInputsProps = {
   nbPersonnes: number;
   handleChangeNbPersonnes: (e: ChangeEvent<HTMLInputElement>) => void;
-  theConsoTarifs: SelectTheConsoTarifsType[];
+  handleIncrement: () => void;
+  handleDecrement: () => void;
 };
 
 const TheMobileInputs = ({
   nbPersonnes,
   handleChangeNbPersonnes,
-  theConsoTarifs,
+  handleIncrement,
+  handleDecrement,
 }: TheMobileInputsProps) => {
-  const { cafe } = useContext(CafeContext);
-  const { the, setThe } = useContext(TheContext);
-  const { setTotalThe } = useContext(TotalTheContext);
   const { client } = useContext(ClientContext);
   const effectif = client.effectif ?? 0;
 
-  const handleIncrement = () => {
-    let newNbPersonnes = nbPersonnes + 1;
-    if (newNbPersonnes > MAX_EFFECTIF) newNbPersonnes = MAX_EFFECTIF;
-    const nbThesParAn = newNbPersonnes * 400;
-    const prixUnitaire =
-      theConsoTarifs.find(
-        (tarif) =>
-          tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnes / 0.15) &&
-          tarif.fournisseurId === cafe.infos.fournisseurId &&
-          tarif.gamme === the.infos.gammeSelected
-      )?.prixUnitaire ?? null;
-    const totalAnnuel =
-      newNbPersonnes && prixUnitaire !== null
-        ? nbThesParAn * prixUnitaire
-        : null;
-
-    setThe((prev) => ({
-      ...prev,
-      quantites: {
-        ...prev.quantites,
-        nbPersonnes: newNbPersonnes,
-      },
-      prix: {
-        prixUnitaire: the.infos.gammeSelected
-          ? prixUnitaire
-          : prev.prix.prixUnitaire,
-      },
-    }));
-    if (the.infos.gammeSelected) {
-      setTotalThe({
-        totalService: totalAnnuel,
-      });
-    }
-  };
-  const handleDecrement = () => {
-    let newNbPersonnes = nbPersonnes - 1;
-    if (newNbPersonnes < 0) newNbPersonnes = 0;
-    const nbThesParAn = newNbPersonnes * 400;
-    const prixUnitaire =
-      theConsoTarifs.find(
-        (tarif) =>
-          tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnes / 0.15) &&
-          tarif.fournisseurId === cafe.infos.fournisseurId &&
-          tarif.gamme === the.infos.gammeSelected
-      )?.prixUnitaire ?? null;
-    const totalAnnuel =
-      newNbPersonnes && prixUnitaire !== null
-        ? nbThesParAn * prixUnitaire
-        : null;
-
-    setThe((prev) => ({
-      ...prev,
-      quantites: {
-        ...prev.quantites,
-        nbPersonnes: newNbPersonnes,
-      },
-      prix: {
-        prixUnitaire: the.infos.gammeSelected
-          ? prixUnitaire
-          : prev.prix.prixUnitaire,
-      },
-    }));
-    if (the.infos.gammeSelected) {
-      setTotalThe({
-        totalService: totalAnnuel,
-      });
-    }
-  };
   return (
     <div className="flex flex-col gap-4">
       <p>

@@ -13,18 +13,19 @@ type SnacksFruitsMobileInputsProps = {
   handleCheck: (type: TypesSnacksFruitsType) => void;
   handleChangeNbPersonnes: (e: React.ChangeEvent<HTMLInputElement>) => void;
   nbPersonnes: number;
+  handleIncrement: () => void;
+  handleDecrement: () => void;
 };
 
 const SnacksFruitsMobileInputs = ({
   handleCheck,
   handleChangeNbPersonnes,
   nbPersonnes,
+  handleIncrement,
+  handleDecrement,
 }: SnacksFruitsMobileInputsProps) => {
   const { client } = useContext(ClientContext);
   const { snacksFruits } = useContext(SnacksFruitsContext);
-
-  const handleIncrement = () => {};
-  const handleDecrement = () => {};
 
   return (
     <div className="flex flex-col gap-8">
@@ -46,7 +47,7 @@ const SnacksFruitsMobileInputs = ({
                 id="fruits"
                 aria-label="Sélectionner fruits"
               />
-              <Label htmlFor={`fruits`} className="text-sm">
+              <Label htmlFor={`fruits`} className="text-base">
                 Fruits
               </Label>
             </div>
@@ -58,7 +59,7 @@ const SnacksFruitsMobileInputs = ({
                 id="snacks"
                 aria-label="Sélectionner snacks"
               />
-              <Label htmlFor={`snacks`} className="text-sm">
+              <Label htmlFor={`snacks`} className="text-base">
                 Snacks
               </Label>
             </div>
@@ -70,7 +71,7 @@ const SnacksFruitsMobileInputs = ({
                 id="boissons"
                 aria-label="Sélectionner boissons"
               />
-              <Label htmlFor={`boissons`} className="text-sm">
+              <Label htmlFor={`boissons`} className="text-base">
                 Boissons
               </Label>
             </div>

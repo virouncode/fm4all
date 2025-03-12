@@ -4,6 +4,7 @@ import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
+import { toast } from "@/hooks/use-toast";
 import { roundEffectif } from "@/lib/roundEffectif";
 import { SelectBoissonsQuantitesType } from "@/zod-schemas/boissonsQuantites";
 import { SelectBoissonsTarifsType } from "@/zod-schemas/boissonsTarifs";
@@ -45,11 +46,7 @@ const SnacksFruitsForm = ({
   const nbPersonnes = snacksFruits.quantites.nbPersonnes ?? effectif;
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 
-  const handleChangeNbPersonnes = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    let newNbPersonnes = value ? parseInt(value) : 0;
-    if (newNbPersonnes > MAX_EFFECTIF) newNbPersonnes = MAX_EFFECTIF;
-
+  const updateSnacksFruits = (newNbPersonnes: number) => {
     if (snacksFruits.infos.gammeSelected && snacksFruits.infos.fournisseurId) {
       const fruitsTarifsPourNbPersonnes = fruitsTarifs.filter(
         (item) => item.effectif === roundEffectif(newNbPersonnes)
@@ -226,6 +223,33 @@ const SnacksFruitsForm = ({
     }
   };
 
+  const handleChangeNbPersonnes = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    let newNbPersonnes = value ? parseInt(value) : 0;
+    if (newNbPersonnes > MAX_EFFECTIF) newNbPersonnes = MAX_EFFECTIF;
+    updateSnacksFruits(newNbPersonnes);
+  };
+
+  const handleIncrement = () => {
+    let newNbPersonnes = nbPersonnes + 1;
+    if (newNbPersonnes > MAX_EFFECTIF) {
+      newNbPersonnes = MAX_EFFECTIF;
+      toast({
+        title: "Limite atteinte",
+        description:
+          "Nous ne proposons pas de livraisons pour plus de 300 personnes",
+        duration: 7000,
+      });
+    }
+    updateSnacksFruits(newNbPersonnes);
+  };
+
+  const handleDecrement = () => {
+    let newNbPersonnes = nbPersonnes - 1;
+    if (newNbPersonnes < 0) newNbPersonnes = 0;
+    updateSnacksFruits(newNbPersonnes);
+  };
+
   const handleCheck = (type: TypesSnacksFruitsType) => {
     const newChoix = snacksFruits.infos.choix.includes(type)
       ? snacksFruits.infos.choix.filter((item) => item !== type)
@@ -313,6 +337,8 @@ const SnacksFruitsForm = ({
       handleCheck={handleCheck}
       handleChangeNbPersonnes={handleChangeNbPersonnes}
       nbPersonnes={nbPersonnes}
+      handleIncrement={handleIncrement}
+      handleDecrement={handleDecrement}
     />
   ) : (
     <SnacksFruitsDesktopInputs

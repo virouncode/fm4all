@@ -2,6 +2,7 @@ import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { TheContext } from "@/context/TheProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
+import { toast } from "@/hooks/use-toast";
 import { roundNbPersonnesCafeConso } from "@/lib/roundNbPersonnesCafeConso";
 import { GammeType } from "@/zod-schemas/gamme";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
@@ -76,6 +77,58 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
     }
   };
 
+  const updateThe = (newNbPersonnes: number) => {
+    const nbThesParAn = newNbPersonnes * 400;
+    const prixUnitaire =
+      theConsoTarifs.find(
+        (tarif) =>
+          tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnes / 0.15) &&
+          tarif.fournisseurId === cafe.infos.fournisseurId &&
+          tarif.gamme === the.infos.gammeSelected
+      )?.prixUnitaire ?? null;
+    const totalAnnuel =
+      newNbPersonnes && prixUnitaire !== null
+        ? nbThesParAn * prixUnitaire
+        : null;
+
+    setThe((prev) => ({
+      ...prev,
+      quantites: {
+        ...prev.quantites,
+        nbPersonnes: newNbPersonnes,
+      },
+      prix: {
+        prixUnitaire: the.infos.gammeSelected
+          ? prixUnitaire
+          : prev.prix.prixUnitaire,
+      },
+    }));
+    if (the.infos.gammeSelected) {
+      setTotalThe({
+        totalService: totalAnnuel,
+      });
+    }
+  };
+
+  const handleIncrement = () => {
+    let newNbPersonnes = nbPersonnes + 1;
+    if (newNbPersonnes > MAX_EFFECTIF) {
+      newNbPersonnes = MAX_EFFECTIF;
+      toast({
+        title: "Limite atteinte",
+        description:
+          "Nous ne proposons pas de livraisons pour plus de 300 personnes",
+        duration: 7000,
+      });
+    }
+    updateThe(newNbPersonnes);
+  };
+  const handleDecrement = () => {
+    let newNbPersonnes = nbPersonnes - 1;
+    if (newNbPersonnes < 0) newNbPersonnes = 0;
+    updateThe(newNbPersonnes);
+  };
+
   const handleClickProposition = (proposition: {
     id: number;
     nomFournisseur: string;
@@ -133,11 +186,11 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
     <TheMobilePropositions
       nbPersonnes={nbPersonnes}
       nbTassesParJour={nbTassesParJour}
-      effectif={effectif}
       handleChangeNbPersonnes={handleChangeNbPersonnes}
       propositions={propositions}
       handleClickProposition={handleClickProposition}
-      theConsoTarifs={theConsoTarifs}
+      handleIncrement={handleIncrement}
+      handleDecrement={handleDecrement}
     />
   ) : (
     <TheDesktopPropositions

@@ -1,4 +1,5 @@
 "use client";
+import PropositionsTitleMobile from "@/app/mon-devis/PropositionsTitleMobile";
 import { Button } from "@/components/ui/button";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
@@ -13,7 +14,8 @@ import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
 import { Droplets } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useContext } from "react";
+import { useContext, useRef, useRef } from "react";
+import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import FontaineEspace from "./FontaineEspace";
@@ -30,6 +32,7 @@ const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
   const { setFoodBeverage } = useContext(FoodBeverageContext);
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const effectif = client.effectif ?? 0;
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
   const router = useRouter();
   useScrollIntoFontainesEspace();
 
@@ -88,15 +91,29 @@ const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
     });
   };
 
+  const propositionsRef = useRef<HTMLDivElement>(null);
+
   return (
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="4">
-      <PropositionsTitle
-        icon={Droplets}
-        title="Fontaines à eau"
-        description="Eau fraîche ou pétillante, de l'eau pure filtrée pour tous. Adaptés à votre besoin, nos fontaines réseau sont à poser, sur pied ou sous comptoir"
-        handleClickPrevious={handleClickPrevious}
-      />
-      <div className="w-full flex-1 overflow-hidden">
+      {isTabletOrMobile ? (
+        <PropositionsTitleMobile
+          icon={Droplets}
+          title="Fontaines à eau"
+          description="Eau fraîche ou pétillante, de l'eau pure filtrée pour tous. Adaptés à votre besoin, nos fontaines réseau sont à poser, sur pied ou sous comptoir"
+          propositionsRef={propositionsRef}
+        />
+      ) : (
+        <PropositionsTitle
+          icon={Droplets}
+          title="Fontaines à eau"
+          description="Eau fraîche ou pétillante, de l'eau pure filtrée pour tous. Adaptés à votre besoin, nos fontaines réseau sont à poser, sur pied ou sous comptoir"
+          handleClickPrevious={handleClickPrevious}
+        />
+      )}
+      <div
+        className="w-full flex-1 overflow-hidden transition"
+        ref={propositionsRef}
+      >
         {fontaines.nbEspaces && fontaines.nbEspaces > 0 ? (
           fontaines.espaces.map((espace) => (
             <FontaineEspace
@@ -119,7 +136,7 @@ const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
           </div>
         )}
       </div>
-      {!fontaines.nbEspaces ? (
+      {!fontaines.nbEspaces && !isTabletOrMobile ? (
         <PropositionsFooter handleClickNext={handleClickNext} />
       ) : null}
     </div>
