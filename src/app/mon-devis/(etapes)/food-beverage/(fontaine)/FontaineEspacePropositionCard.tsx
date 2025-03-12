@@ -223,18 +223,17 @@ const FontaineEspacePropositionCard = ({
     </ul>
   );
 
-  const imgProduit = proposition.imageUrl ? (
+  const imgProduit = (
     <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-100">
       <Image
-        src={proposition.imageUrl}
+        src={proposition.imageUrl ?? "/img/services/fontaines.webp"}
         alt={`illustration ${proposition.marque} ${proposition.modele}`}
         fill
         quality={100}
         className="object-contain"
       />
     </div>
-  ) : null;
-
+  );
   return (
     <div
       className={`flex flex-1 items-center p-4 justify-center text-2xl gap-4 cursor-pointer bg-slate-100 border-r ${

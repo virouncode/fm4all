@@ -99,14 +99,14 @@ const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
         <PropositionsTitleMobile
           icon={Droplets}
           title="Fontaines à eau"
-          description="Eau fraîche ou pétillante, de l'eau pure filtrée pour tous. Adaptés à votre besoin, nos fontaines réseau sont à poser, sur pied ou sous comptoir"
+          description="Eau fraîche ou pétillante, de l'eau pure filtrée pour tous. Adaptés à votre besoin, nos fontaines réseau sont à poser, sur pied ou sous comptoir. La gamme détermine le type de pose"
           propositionsRef={propositionsRef}
         />
       ) : (
         <PropositionsTitle
           icon={Droplets}
           title="Fontaines à eau"
-          description="Eau fraîche ou pétillante, de l'eau pure filtrée pour tous. Adaptés à votre besoin, nos fontaines réseau sont à poser, sur pied ou sous comptoir"
+          description="Eau fraîche ou pétillante, de l'eau pure filtrée pour tous. Adaptés à votre besoin, nos fontaines réseau sont à poser, sur pied ou sous comptoir. La gamme détermine le type de pose"
           handleClickPrevious={handleClickPrevious}
         />
       )}
@@ -128,9 +128,7 @@ const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
           />
         )}
       </div>
-      {!fontaines.nbEspaces && !isTabletOrMobile ? (
-        <PropositionsFooter handleClickNext={handleClickNext} />
-      ) : null}
+      <PropositionsFooter handleClickNext={handleClickNext} />
     </div>
   );
 };

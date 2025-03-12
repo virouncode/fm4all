@@ -34,7 +34,7 @@ const FontainesMobileEspaces = ({
         className="text-base"
         onClick={handleAddEspace}
       >
-        Ajouter un espace café
+        Ajouter un espace fontaine
       </Button>
     </div>
   );

@@ -1012,9 +1012,6 @@ const CafeEspacePropositions = ({
       handleClickFirstEspaceProposition={handleClickFirstEspaceProposition}
       handleClickProposition={handleClickProposition}
       handleAddEspace={handleAddEspace}
-      handleClickNext={handleClickNext}
-      handleClickNextEspace={handleClickNextEspace}
-      handleAlert={handleAlert}
       cafeEspacesIds={cafeEspacesIds}
       espace={espace}
     />

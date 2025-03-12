@@ -116,7 +116,7 @@ const FontaineMobileEspaceInputs = ({
                 handleCheck(checked, "Eau chaude")
               }
               className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-              id="boissons"
+              id="eau chaude"
               aria-label="Sélectionner eau chaude"
             />
             <Label htmlFor="Eau chaude" className="text-sm">

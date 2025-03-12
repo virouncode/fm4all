@@ -1,8 +1,8 @@
-import { CafeEspaceType } from "@/zod-schemas/cafe";
-import AddEspaceButton from "../AddEspaceButton";
-import CafeMobileEspacePropositionsCarousel from "./CafeMobileEspacePropositionsCarousel";
+import { FontaineEspaceType } from "@/zod-schemas/fontaines";
+import AddEspaceButton from "../../(cafe)/AddEspaceButton";
+import FontaineMobileEspacePropositionsCarousel from "./FontaineMobileEspacePropositionsCarousel";
 
-type CafeMobileEspacePropositionsProps = {
+type FontaineMobileEspacePropositionsProps = {
   formattedPropositions: {
     id: number;
     fournisseurId: number;
@@ -16,24 +16,18 @@ type CafeMobileEspacePropositionsProps = {
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
-    gamme: "essentiel" | "confort" | "excellence";
     modele: string | null;
     marque: string | null;
     imageUrl: string | null;
     infos: string | null;
+    typePose: "aposer" | "colonne" | "comptoir";
     reconditionne: boolean | null;
-    typeLait: "dosettes" | "frais" | "poudre" | null;
-    typeChocolat: "poudre" | "sachets" | null;
-    nbMachines: number | null;
-    nbTassesParJ: number;
-    nbPassagesParAn: number | null;
     prixLoc: number | null;
     prixInstal: number | null;
     prixMaintenance: number | null;
-    prixUnitaireConsoCafe: number | null;
-    prixUnitaireConsoLait: number | null;
-    prixUnitaireConsoChocolat: number | null;
-    prixUnitaireConsoSucre: number | null;
+    prixUnitaireConsoFiltres: number | null;
+    prixUnitaireConsoCO2: number | null;
+    prixUnitaireConsoEauChaude: number | null;
     totalAnnuel: number | null;
     totalInstallation: number | null;
   }[][];
@@ -50,24 +44,18 @@ type CafeMobileEspacePropositionsProps = {
     nbClients: number | null;
     noteGoogle: string | null;
     nbAvis: number | null;
-    gamme: "essentiel" | "confort" | "excellence";
     modele: string | null;
     marque: string | null;
     imageUrl: string | null;
     infos: string | null;
+    typePose: "aposer" | "colonne" | "comptoir";
     reconditionne: boolean | null;
-    typeLait: "dosettes" | "frais" | "poudre" | null;
-    typeChocolat: "poudre" | "sachets" | null;
-    nbMachines: number | null;
-    nbTassesParJ: number;
-    nbPassagesParAn: number | null;
     prixLoc: number | null;
     prixInstal: number | null;
     prixMaintenance: number | null;
-    prixUnitaireConsoCafe: number | null;
-    prixUnitaireConsoLait: number | null;
-    prixUnitaireConsoChocolat: number | null;
-    prixUnitaireConsoSucre: number | null;
+    prixUnitaireConsoFiltres: number | null;
+    prixUnitaireConsoCO2: number | null;
+    prixUnitaireConsoEauChaude: number | null;
     totalAnnuel: number | null;
     totalInstallation: number | null;
   }) => void;
@@ -77,67 +65,54 @@ type CafeMobileEspacePropositionsProps = {
     nomFournisseur: string;
     sloganFournisseur: string | null;
     logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    gamme: "essentiel" | "confort" | "excellence";
     modele: string | null;
     marque: string | null;
     imageUrl: string | null;
     infos: string | null;
+    typePose: "aposer" | "colonne" | "comptoir";
     reconditionne: boolean | null;
-    typeLait: "dosettes" | "frais" | "poudre" | null;
-    typeChocolat: "poudre" | "sachets" | null;
-    nbMachines: number | null;
-    nbTassesParJ: number;
-    nbPassagesParAn: number | null;
     prixLoc: number | null;
     prixInstal: number | null;
     prixMaintenance: number | null;
-    prixUnitaireConsoCafe: number | null;
-    prixUnitaireConsoLait: number | null;
-    prixUnitaireConsoChocolat: number | null;
-    prixUnitaireConsoSucre: number | null;
+    prixUnitaireConsoFiltres: number | null;
+    prixUnitaireConsoCO2: number | null;
+    prixUnitaireConsoEauChaude: number | null;
     totalAnnuel: number | null;
     totalInstallation: number | null;
   }) => void;
-  espace: CafeEspaceType;
-  cafeEspacesIds: number[];
+  espace: FontaineEspaceType;
+  fontainesEspacesIds: number[];
   handleAddEspace: () => void;
 };
 
-const CafeMobileEspacePropositions = ({
+const FontaineMobileEspacePropositions = ({
   formattedPropositions,
   handleClickProposition,
   handleClickFirstEspaceProposition,
   espace,
-  cafeEspacesIds,
+  fontainesEspacesIds,
   handleAddEspace,
-}: CafeMobileEspacePropositionsProps) => {
+}: FontaineMobileEspacePropositionsProps) => {
   return (
     <div className="flex flex-col gap-6 w-full">
       {formattedPropositions.map((propositions) => (
-        <CafeMobileEspacePropositionsCarousel
+        <FontaineMobileEspacePropositionsCarousel
           propositions={propositions}
           key={propositions[0].fournisseurId}
           handleClickProposition={handleClickProposition}
           espace={espace}
-          cafeEspacesIds={cafeEspacesIds}
+          fontainesEspacesIds={fontainesEspacesIds}
           handleClickFirstEspaceProposition={handleClickFirstEspaceProposition}
         />
       ))}
-      {cafeEspacesIds.slice(-1)[0] === espace.infos.espaceId &&
-      espace.infos.gammeCafeSelected ? (
+      {fontainesEspacesIds.slice(-1)[0] === espace.infos.espaceId &&
+      espace.infos.poseSelected ? (
         <div className="flex justify-center gap-4 items-center mt-2">
-          <AddEspaceButton handleAddEspace={handleAddEspace} />
+          <AddEspaceButton handleAddEspace={handleAddEspace} title="fontaine" />
         </div>
       ) : null}
     </div>
   );
 };
 
-export default CafeMobileEspacePropositions;
+export default FontaineMobileEspacePropositions;
