@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ClientContext } from "@/context/ClientProvider";
+import { DateTime } from "luxon";
 import Link from "next/link";
 import { useContext } from "react";
 
@@ -65,8 +66,26 @@ const MonDevisDocument = ({ devisUrl }: MonDevisDocumentProps) => {
             <Link href="mailto:contact@fm4all.com">Je contacte par e-mail</Link>
           </Button>
         </div>
-        <div className="w-full mt-6 mb-6">
-          <iframe src={devisUrl} className="w-full h-screen" />
+        <div className="flex flex-col gap-4 w-full mx-auto max-w-prose items-center">
+          <Link
+            href={devisUrl}
+            download={`Devis_fm4all_${DateTime.local().toFormat(
+              "dd-MM-yyyy'T'HH:mm"
+            )}.pdf`}
+            className="underline"
+          >
+            Télécharger le devis
+          </Link>
+          <p>
+            Si le document ne s&apos;affiche pas correctement :{" "}
+            <Link href={devisUrl} target="_blank" className="underline">
+              Cliquez ici
+            </Link>
+          </p>
+        </div>
+
+        <div className="w-full mt-6 mb-6 flex justify-center">
+          <embed src={devisUrl} className="w-full h-screen" />
         </div>
         <div className="flex flex-col gap-4 mx-auto  items-center hyphens-auto text-wrap">
           <p className="max-w-prose">Vous avez des questions ?</p>

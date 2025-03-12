@@ -6,6 +6,7 @@ import html2canvas from "html2canvas";
 import { PDFDocument, PDFTextField, RotationTypes } from "pdf-lib";
 import { formatNumber } from "./formatNumber";
 import { sanitizeText } from "./sanitizeText";
+
 export const fillDevis = async (
   // url: string,
   numeroDevis: string,
