@@ -50,7 +50,7 @@ const OfficeManagerMobileInputs = ({
             title="Nombre de demi-journées par semaine"
             className="w-1/2"
           />
-          <Label htmlFor="demiJParSemaine" className="text-sm w-1/2">
+          <Label htmlFor="demiJParSemaine" className="text-base w-1/2">
             {officeManager.quantites.demiJParSemaine ??
               demiJParSemaineEssentiel}{" "}
             demi journée(s)
@@ -73,7 +73,7 @@ const OfficeManagerMobileInputs = ({
             onCheckedChange={handleCheckPremium}
             aria-label="Sélectionner l'option premium"
           />
-          <Label htmlFor="premium" className="text-sm flex-1">
+          <Label htmlFor="premium" className="text-base flex-1">
             Anglais courant ou Expertise Sup.
           </Label>
         </div>
@@ -95,7 +95,9 @@ const OfficeManagerMobileInputs = ({
               title={"Remplacé pendant congés"}
               id={"remplace"}
             />
-            <Label htmlFor="remplace">Remplacé pendant congés</Label>
+            <Label htmlFor="remplace" className="text-base">
+              Remplacé pendant congés
+            </Label>
           </div>
           <div className="flex gap-2 items-center">
             <RadioGroupItem
@@ -103,7 +105,9 @@ const OfficeManagerMobileInputs = ({
               title={"Non remplacé pendant congés"}
               id={"non_remplace"}
             />
-            <Label htmlFor="non_remplace">Non remplacé pendant congés</Label>
+            <Label htmlFor="non_remplace" className="text-base">
+              Non remplacé pendant congés
+            </Label>
           </div>
         </RadioGroup>
       </div>
