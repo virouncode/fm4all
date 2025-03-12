@@ -105,6 +105,8 @@ const SnacksFruitsForm = ({
               minConsosBoissonsParSemaine
             )
           : null;
+      const isSameFournisseur =
+        snacksFruits.infos.fournisseurId === cafe.infos.fournisseurId;
 
       //Tarifs / portion
       const prixKgFruits =
@@ -148,17 +150,20 @@ const SnacksFruitsForm = ({
       const totalSnacks = 52 * panierSnacks;
       const totalBoissons = 52 * panierBoissons;
 
-      const prixPanier = panierFruits + panierSnacks + panierBoissons;
-
       //Prix livraison / panier
       const fraisLivraisonsFournisseur = foodLivraisonTarifs.find(
         ({ fournisseurId }) =>
           fournisseurId === snacksFruits.infos.fournisseurId
       );
+      const remiseSiCafe = isSameFournisseur
+        ? fraisLivraisonsFournisseur?.remiseSiCafe ?? 0
+        : 0;
+      const prixPanier =
+        (1 - remiseSiCafe / 100) *
+        (panierFruits + panierSnacks + panierBoissons);
+
       const panierMin = fraisLivraisonsFournisseur?.panierMin ?? null;
       const isPanierMin = panierMin === null || prixPanier >= panierMin;
-      const isSameFournisseur =
-        snacksFruits.infos.fournisseurId === cafe.infos.fournisseurId;
 
       const prixUnitaireLivraisonSiCafe = isPanierMin
         ? fraisLivraisonsFournisseur?.prixUnitaireSiCafe ?? null
@@ -297,10 +302,17 @@ const SnacksFruitsForm = ({
       const totalSnacks = 52 * panierSnacks;
       const totalBoissons = 52 * panierBoissons;
 
-      const prixPanier = panierFruits + panierSnacks + panierBoissons;
       const fraisLivraisonsFournisseur = foodLivraisonTarifs.find(
         (tarif) => tarif.fournisseurId === snacksFruits.infos.fournisseurId
       );
+      const isSameFournisseur =
+        snacksFruits.infos.fournisseurId === cafe.infos.fournisseurId;
+      const remiseSiCafe = isSameFournisseur
+        ? fraisLivraisonsFournisseur?.remiseSiCafe ?? 0
+        : 0;
+      const prixPanier =
+        (1 - remiseSiCafe / 100) *
+        (panierFruits + panierSnacks + panierBoissons);
       const panierMin = fraisLivraisonsFournisseur?.panierMin ?? null;
       const isPanierMin = panierMin === null || prixPanier >= panierMin;
 

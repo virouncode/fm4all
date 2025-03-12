@@ -80,6 +80,7 @@ const NettoyageMobilePropositionCard = ({
     nbAvis,
   } = proposition;
   const color = getFm4AllColor(gamme);
+
   const totalMensuelText = totalAnnuel ? (
     <p className="text-sm font-bold">
       {formatNumber(Math.round((totalAnnuel * MARGE) / 12))} €/mois

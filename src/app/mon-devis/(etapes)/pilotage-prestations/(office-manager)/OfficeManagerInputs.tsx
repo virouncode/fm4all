@@ -39,7 +39,7 @@ const OfficeManagerInputs = ({
       <TooltipProvider delayDuration={0}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="flex gap-2 items-center flex-col  w-full">
+            <div className="flex gap-2 items-center flex-col w-full">
               <Slider
                 value={[
                   (officeManager.quantites.demiJParSemaine ||
@@ -58,7 +58,7 @@ const OfficeManagerInputs = ({
                 title="Nombre de demi-journées par semaine"
               />
               <Label htmlFor="demiJParSemaine" className="text-sm flex-1">
-                {officeManager.quantites.demiJParSemaine ||
+                {officeManager.quantites.demiJParSemaine ??
                   demiJParSemaineEssentiel}{" "}
                 demi journée(s) / semaine
               </Label>
@@ -85,7 +85,7 @@ const OfficeManagerInputs = ({
           onValueChange={handleChangeRemplace}
           value={officeManager.infos.remplace ? "remplace" : "non remplace"}
           className="flex gap-4 flex-col items-center"
-          name="typeBoissons"
+          name="office_manager_remplacement"
         >
           <div className="flex gap-2 items-center">
             <RadioGroupItem

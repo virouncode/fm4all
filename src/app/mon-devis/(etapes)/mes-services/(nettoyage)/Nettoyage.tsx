@@ -38,7 +38,7 @@ const Nettoyage = ({
   hygieneDistribInstalTarifs,
   hygieneConsosTarifs,
 }: NettoyageProps) => {
-  const { services, setServices } = useContext(ServicesContext);
+  const { setServices } = useContext(ServicesContext);
   useScrollIntoService();
 
   const handleClickPrevious = () => {
@@ -52,7 +52,6 @@ const Nettoyage = ({
       ...prev,
       currentServiceId: prev.currentServiceId + 1,
     }));
-    console.log("currentServiceId+1", services.currentServiceId + 1);
   };
 
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });

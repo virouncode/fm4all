@@ -1,4 +1,5 @@
 "use client";
+import PropositionsFooter from "@/app/mon-devis/PropositionsFooter";
 import PropositionsTitleMobile from "@/app/mon-devis/PropositionsTitleMobile";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
@@ -15,7 +16,6 @@ import { Droplets } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
-import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import FontainesDesktopEspaces from "./(desktop)/FontainesDesktopEspaces";
 import FontainesMobileEspaces from "./(mobile)/FontainesMobileEspaces";
@@ -27,13 +27,14 @@ type FontainesProps = {
 
 const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
   const { client } = useContext(ClientContext);
-  const { fontaines, setFontaines } = useContext(FontainesContext);
+  const { setFontaines } = useContext(FontainesContext);
   const { setTotalFontaines } = useContext(TotalFontainesContext);
   const { setFoodBeverage } = useContext(FoodBeverageContext);
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const effectif = client.effectif ?? 0;
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
   const router = useRouter();
+
   useScrollIntoFontainesEspace();
 
   const handleClickNext = () => {
@@ -99,14 +100,14 @@ const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
         <PropositionsTitleMobile
           icon={Droplets}
           title="Fontaines à eau"
-          description="Eau fraîche ou pétillante, de l'eau pure filtrée pour tous. Adaptés à votre besoin, nos fontaines réseau sont à poser, sur pied ou sous comptoir. La gamme détermine le type de pose"
+          description="Eau fraîche ou pétillante, de l'eau pure filtrée pour tous. Adaptées à votre besoin, nos fontaines réseau sont à poser, sur pied ou sous comptoir. La gamme détermine le type de pose"
           propositionsRef={propositionsRef}
         />
       ) : (
         <PropositionsTitle
           icon={Droplets}
           title="Fontaines à eau"
-          description="Eau fraîche ou pétillante, de l'eau pure filtrée pour tous. Adaptés à votre besoin, nos fontaines réseau sont à poser, sur pied ou sous comptoir. La gamme détermine le type de pose"
+          description="Eau fraîche ou pétillante, de l'eau pure filtrée pour tous. Adaptées à votre besoin, nos fontaines réseau sont à poser, sur pied ou sous comptoir. La gamme détermine le type de pose"
           handleClickPrevious={handleClickPrevious}
         />
       )}
@@ -128,7 +129,9 @@ const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
           />
         )}
       </div>
-      <PropositionsFooter handleClickNext={handleClickNext} />
+      {isTabletOrMobile ? (
+        <PropositionsFooter handleClickNext={handleClickNext} />
+      ) : null}
     </div>
   );
 };

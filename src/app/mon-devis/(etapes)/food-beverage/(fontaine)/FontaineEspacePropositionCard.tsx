@@ -226,7 +226,14 @@ const FontaineEspacePropositionCard = ({
   const imgProduit = (
     <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-100">
       <Image
-        src={proposition.imageUrl ?? "/img/services/fontaines.webp"}
+        src={
+          proposition.imageUrl ??
+          (proposition.typePose === "aposer"
+            ? "/img/services/fontaine_aposer.webp"
+            : proposition.typePose === "colonne"
+            ? "/img/services/fontaine_colonne.webp"
+            : "/img/services/fontaine_comptoir.webp")
+        }
         alt={`illustration ${proposition.marque} ${proposition.modele}`}
         fill
         quality={100}

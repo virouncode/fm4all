@@ -114,6 +114,7 @@ const SnacksFruitsPropositions = ({
             minConsosBoissonsParSemaine
           )
         : null;
+    const isSameFournisseur = fournisseurId === cafe.infos.fournisseurId;
 
     //Tarifs / portion
     const prixKgFruits = prixKg;
@@ -151,16 +152,19 @@ const SnacksFruitsPropositions = ({
     const totalSnacks = 52 * panierSnacks;
     const totalBoissons = 52 * panierBoissons;
 
-    const prixPanier = panierFruits + panierSnacks + panierBoissons;
-
     //Prix livraison / panier
     const fraisLivraisonsFournisseur = foodLivraisonTarifs.find(
       (tarif) => tarif.fournisseurId === fournisseurId
     );
+    const remiseSiCafe = isSameFournisseur
+      ? fraisLivraisonsFournisseur?.remiseSiCafe ?? 0
+      : 0;
+    const prixPanier =
+      (1 - remiseSiCafe / 100) * (panierFruits + panierSnacks + panierBoissons);
+
     const panierMin = fraisLivraisonsFournisseur?.panierMin ?? null;
     const isPanierMin = panierMin === null || prixPanier >= panierMin;
 
-    const isSameFournisseur = fournisseurId === cafe.infos.fournisseurId;
     const prixUnitaireLivraisonSiCafe = isPanierMin
       ? fraisLivraisonsFournisseur?.prixUnitaireSiCafe ?? null
       : null;

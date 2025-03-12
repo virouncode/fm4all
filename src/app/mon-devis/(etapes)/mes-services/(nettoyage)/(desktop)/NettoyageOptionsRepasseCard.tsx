@@ -92,6 +92,19 @@ const NettoyageOptionsRepasseCard = ({
   const dialogTitle = (
     <p className={`text-${color} text-center`}>Repasse sanitaire</p>
   );
+
+  const imgProduit = (
+    <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+      <Image
+        src={"/img/services/nettoyage.webp"}
+        alt={`illustration de nettoyage`}
+        fill={true}
+        className="object-contain object-center cursor-pointer"
+        quality={100}
+      />
+    </div>
+  );
+
   return (
     <div className="flex border-b flex-1">
       <div className="flex w-1/4 items-center justify-center text-base p-4">
@@ -134,17 +147,12 @@ const NettoyageOptionsRepasseCard = ({
                 <DialogHeader>
                   <DialogTitle>{dialogTitle}</DialogTitle>
                 </DialogHeader>
-                <div className="flex flex-col gap-4 items-center">
-                  <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
-                    <Image
-                      src={"/img/services/nettoyage.webp"}
-                      alt={`illustration de nettoyage`}
-                      fill={true}
-                      className="object-contain object-center cursor-pointer"
-                      quality={100}
-                    />
-                  </div>
-                  <ul className="flex flex-col text-sm px-4">
+                <div className="flex flex-col gap-4">
+                  {imgProduit}
+                  <p className="text-xs italic text-end">
+                    *photo non contractuelle
+                  </p>
+                  <ul className="flex flex-col text-sm px-4 mx-auto">
                     {infosProduit}
                     {repasseHParSemaineText}
                     {repasseNbPassagesParSemaineText}

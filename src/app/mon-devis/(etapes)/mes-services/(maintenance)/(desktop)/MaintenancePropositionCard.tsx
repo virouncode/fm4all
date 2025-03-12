@@ -144,6 +144,18 @@ const MaintenancePropositionCard = ({
     </p>
   );
 
+  const imgProduit = (
+    <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+      <Image
+        src={"/img/services/maintenance.webp"}
+        alt={`illustration de maintenance`}
+        fill={true}
+        className="object-contain object-center cursor-pointer"
+        quality={100}
+      />
+    </div>
+  );
+
   return (
     <div
       className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4 cursor-pointer ${
@@ -178,18 +190,14 @@ const MaintenancePropositionCard = ({
               <DialogHeader>
                 <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
-
-              <div className="flex flex-col gap-4 items-center">
-                <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
-                  <Image
-                    src={"/img/services/maintenance.webp"}
-                    alt={`illustration de maintenance`}
-                    fill={true}
-                    className="object-contain object-center cursor-pointer"
-                    quality={100}
-                  />
-                </div>
-                <ul className="flex flex-col text-sm px-4">{infosProduit}</ul>
+              <div className="flex flex-col gap-4">
+                {imgProduit}
+                <p className="text-xs italic text-end">
+                  *photo non contractuelle
+                </p>
+                <ul className="flex flex-col text-sm px-4 mx-auto">
+                  {infosProduit}
+                </ul>
               </div>
             </DialogContent>
           </Dialog>

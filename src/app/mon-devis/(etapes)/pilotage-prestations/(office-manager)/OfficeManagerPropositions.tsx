@@ -5,9 +5,9 @@ import { TotalOfficeManagerContext } from "@/context/TotalOfficeManagerProvider"
 import { SelectOfficeManagerQuantitesType } from "@/zod-schemas/officeManagerQuantites";
 import { SelectOfficeManagerTarifsType } from "@/zod-schemas/officeManagerTarifs";
 import { useContext } from "react";
-import OfficeManagerFournisseurLogo from "./OfficeManagerFournisseurLogo";
-import OfficeManagerInputs from "./OfficeManagerInputs";
-import OfficeManagerPropositionCard from "./OfficeManagerPropositionCard";
+import { useMediaQuery } from "react-responsive";
+import OfficeManagerDesktopPropositions from "./(desktop)/OfficeManagerDesktopPropositions";
+import OfficeManagerMobilePropositions from "./(mobile)/OfficeManagerMobilePropositions";
 
 type OfficeManagerPropositionsProps = {
   officeManagerQuantites: SelectOfficeManagerQuantitesType[];
@@ -33,7 +33,7 @@ const OfficeManagerPropositions = ({
       ?.demiJParSemaine ?? null;
 
   const demiJParSemaine =
-    officeManager.quantites.demiJParSemaine || demiJParSemaineEssentiel;
+    officeManager.quantites.demiJParSemaine ?? demiJParSemaineEssentiel;
 
   const majoration =
     demiJParSemaine !== null
@@ -48,7 +48,7 @@ const OfficeManagerPropositions = ({
         : 0
       : null;
 
-  const formattedPropositions = officeManagerTarifs.map((tarif) => {
+  const propositions = officeManagerTarifs.map((tarif) => {
     let { fournisseurId, nomFournisseur, slogan } = tarif;
     const { id, demiTjm, demiTjmPremium, logoUrl } = tarif;
     if (fournisseurId === 14) {
@@ -106,6 +106,7 @@ const OfficeManagerPropositions = ({
       officeManager.infos.gammeSelected
     ) {
       setOfficeManager((prev) => ({
+        ...prev,
         infos: {
           ...prev.infos,
           fournisseurId: null,
@@ -114,9 +115,9 @@ const OfficeManagerPropositions = ({
           logoUrl: null,
           gammeSelected: null,
         },
-        quantites: {
-          demiJParSemaine: null,
-        },
+        // quantites: {
+        //   demiJParSemaine: null,
+        // },
         prix: {
           demiTjm: null,
           demiTjmPremium: null,
@@ -284,38 +285,30 @@ const OfficeManagerPropositions = ({
     }
   };
 
-  return (
-    <div className="h-full flex flex-col border rounded-xl overflow-auto">
-      {formattedPropositions.length > 0
-        ? formattedPropositions.map((proposition) => {
-            return (
-              <div className="flex border-b flex-1" key={proposition.id}>
-                <div className="flex w-1/4 items-center justify-center flex-col gap-6 p-4">
-                  <OfficeManagerFournisseurLogo
-                    nomFournisseur={proposition.nomFournisseur}
-                    sloganFournisseur={proposition.sloganFournisseur}
-                    logoUrl={proposition.logoUrl}
-                  />
-                  <OfficeManagerInputs
-                    demiJParSemaineEssentiel={demiJParSemaineEssentiel}
-                    handleChangeDemiJParSemaine={handleChangeDemiJParSemaine}
-                    handleChangeRemplace={handleChangeRemplace}
-                    demiTjm={proposition.demiTjm}
-                    demiTjmPremium={proposition.demiTjmPremium}
-                    handleCheckPremium={handleCheckPremium}
-                  />
-                </div>
-                <OfficeManagerPropositionCard
-                  proposition={proposition}
-                  handleClickProposition={handleClickProposition}
-                  demiJParSemaineConfort={demiJParSemaineConfort}
-                  demiJParSemaineExcellence={demiJParSemaineExcellence}
-                />
-              </div>
-            );
-          })
-        : null}
-    </div>
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+
+  return isTabletOrMobile ? (
+    <OfficeManagerMobilePropositions
+      propositions={propositions}
+      demiJParSemaineEssentiel={demiJParSemaineEssentiel}
+      demiJParSemaineConfort={demiJParSemaineConfort}
+      demiJParSemaineExcellence={demiJParSemaineExcellence}
+      handleChangeDemiJParSemaine={handleChangeDemiJParSemaine}
+      handleChangeRemplace={handleChangeRemplace}
+      handleCheckPremium={handleCheckPremium}
+      handleClickProposition={handleClickProposition}
+    />
+  ) : (
+    <OfficeManagerDesktopPropositions
+      propositions={propositions}
+      demiJParSemaineEssentiel={demiJParSemaineEssentiel}
+      demiJParSemaineConfort={demiJParSemaineConfort}
+      demiJParSemaineExcellence={demiJParSemaineExcellence}
+      handleChangeDemiJParSemaine={handleChangeDemiJParSemaine}
+      handleChangeRemplace={handleChangeRemplace}
+      handleCheckPremium={handleCheckPremium}
+      handleClickProposition={handleClickProposition}
+    />
   );
 };
 

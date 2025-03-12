@@ -1,9 +1,13 @@
 import { ManagementContext } from "@/context/ManagementProvider";
 import { useContext, useEffect } from "react";
+import { useMediaQuery } from "react-responsive";
 
 export default function useScrollIntoManagement() {
   const { management } = useContext(ManagementContext);
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+
   useEffect(() => {
+    if (isTabletOrMobile) return;
     const currentManagement = document.getElementById(
       management.currentManagementId.toString()
     );
@@ -13,5 +17,5 @@ export default function useScrollIntoManagement() {
         block: "nearest",
       });
     }
-  }, [management.currentManagementId]);
+  }, [management.currentManagementId, isTabletOrMobile]);
 }

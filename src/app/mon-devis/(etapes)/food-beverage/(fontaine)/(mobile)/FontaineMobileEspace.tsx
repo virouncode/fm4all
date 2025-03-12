@@ -25,18 +25,6 @@ const FontaineMobileEspace = ({
   const fontainesEspacesIds = fontaines.espaces.map(
     (espace) => espace.infos.espaceId
   );
-  const handleClickPreviousEspace = () => {
-    const currentEspaceIdIndex = fontainesEspacesIds.indexOf(
-      espace.infos.espaceId
-    );
-    setFontaines((prev) => ({
-      ...prev,
-      infos: {
-        ...prev.infos,
-        currentEspaceId: prev.espaces[currentEspaceIdIndex - 1].infos.espaceId,
-      },
-    }));
-  };
 
   const handleClickRemove = () => {
     if (fontainesEspacesIds[0] === espace.infos.espaceId) {

@@ -231,6 +231,9 @@ const HygienePropositionCard = ({
                 <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
               {imgProduit}
+              <p className="text-xs italic text-end">
+                *photos non contractuelles
+              </p>
               {infosProduitDialog}
             </DialogContent>
           </Dialog>
