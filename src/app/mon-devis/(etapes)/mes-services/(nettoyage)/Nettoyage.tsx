@@ -1,6 +1,5 @@
 "use client";
 import PropositionsTitleMobile from "@/app/mon-devis/PropositionsTitleMobile";
-import { NettoyageContext } from "@/context/NettoyageProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import useScrollIntoService from "@/hooks/use-scroll-into-service";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
@@ -39,8 +38,7 @@ const Nettoyage = ({
   hygieneDistribInstalTarifs,
   hygieneConsosTarifs,
 }: NettoyageProps) => {
-  const { nettoyage } = useContext(NettoyageContext);
-  const { setServices } = useContext(ServicesContext);
+  const { services, setServices } = useContext(ServicesContext);
   useScrollIntoService();
 
   const handleClickPrevious = () => {
@@ -50,17 +48,11 @@ const Nettoyage = ({
     }));
   };
   const handleClickNext = () => {
-    if (nettoyage.infos.fournisseurId && nettoyage.infos.gammeSelected) {
-      setServices((prev) => ({
-        ...prev,
-        currentServiceId: prev.currentServiceId + 1,
-      }));
-    } else {
-      setServices((prev) => ({
-        ...prev,
-        currentServiceId: 5,
-      }));
-    }
+    setServices((prev) => ({
+      ...prev,
+      currentServiceId: prev.currentServiceId + 1,
+    }));
+    console.log("currentServiceId+1", services.currentServiceId + 1);
   };
 
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });

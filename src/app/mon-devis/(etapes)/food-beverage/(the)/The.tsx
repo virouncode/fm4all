@@ -32,9 +32,6 @@ const The = ({ theConsoTarifs }: TheProps) => {
       currentFoodBeverageId: prev.currentFoodBeverageId + 1,
     }));
   };
-  if (!cafe.infos.fournisseurId) {
-    return null; //pour skiper le service
-  }
 
   return (
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="2">
@@ -57,7 +54,15 @@ const The = ({ theConsoTarifs }: TheProps) => {
         className="w-full flex-1 overflow-auto transition"
         ref={propositionsRef}
       >
-        <ThePropositions theConsoTarifs={theConsoTarifs} />
+        {!cafe.infos.fournisseurId ? (
+          <div className="flex h-full items-center justify-center text-base lg:text-lg">
+            <p className="text-center text-fm4alldestructive">
+              Veuillez d&apos;abord sélectionner une offre de Boissons chaudes.
+            </p>
+          </div>
+        ) : (
+          <ThePropositions theConsoTarifs={theConsoTarifs} />
+        )}
       </div>
       {!isTabletOrMobile ? (
         <PropositionsFooter handleClickNext={handleClickNext} />

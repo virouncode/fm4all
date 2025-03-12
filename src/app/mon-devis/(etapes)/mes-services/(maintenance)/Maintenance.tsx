@@ -1,7 +1,5 @@
 "use client";
 import PropositionsTitleMobile from "@/app/mon-devis/PropositionsTitleMobile";
-import { HygieneContext } from "@/context/HygieneProvider";
-import { NettoyageContext } from "@/context/NettoyageProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import { SelectLegioTarifsType } from "@/zod-schemas/legioTarifs";
 import { SelectMaintenanceQuantitesType } from "@/zod-schemas/maintenanceQuantites";
@@ -30,8 +28,6 @@ const Maintenance = ({
   legioTarifs,
   qualiteAirTarifs,
 }: MaintenanceProps) => {
-  const { hygiene } = useContext(HygieneContext);
-  const { nettoyage } = useContext(NettoyageContext);
   const { setServices } = useContext(ServicesContext);
   const propositionsRef = useRef<HTMLDivElement>(null);
 
@@ -43,24 +39,10 @@ const Maintenance = ({
   };
 
   const handleClickPrevious = () => {
-    if (nettoyage.infos.gammeSelected && nettoyage.infos.fournisseurId) {
-      if (!hygiene.infos.trilogieGammeSelected) {
-        setServices((prev) => ({
-          ...prev,
-          currentServiceId: prev.currentServiceId - 2,
-        }));
-        return;
-      }
-      setServices((prev) => ({
-        ...prev,
-        currentServiceId: prev.currentServiceId - 1,
-      }));
-    } else {
-      setServices((prev) => ({
-        ...prev,
-        currentServiceId: 1,
-      }));
-    }
+    setServices((prev) => ({
+      ...prev,
+      currentServiceId: prev.currentServiceId - 1,
+    }));
   };
 
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });

@@ -1,7 +1,6 @@
 "use client";
 
 import PropositionsTitleMobile from "@/app/mon-devis/PropositionsTitleMobile";
-import { HygieneContext } from "@/context/HygieneProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
@@ -29,7 +28,6 @@ const Hygiene = ({
   hygieneConsosTarifs,
 }: HygieneProps) => {
   const { nettoyage } = useContext(NettoyageContext);
-  const { hygiene } = useContext(HygieneContext);
   const { services, setServices } = useContext(ServicesContext);
   const propositionsRef = useRef<HTMLDivElement>(null);
 
@@ -40,24 +38,13 @@ const Hygiene = ({
     }));
   };
   const handleClickNext = () => {
-    if (hygiene.infos.trilogieGammeSelected) {
-      setServices((prev) => ({
-        ...prev,
-        currentServiceId: services.currentServiceId + 1,
-      }));
-    } else {
-      setServices((prev) => ({
-        ...prev,
-        currentServiceId: 5,
-      }));
-    }
+    setServices((prev) => ({
+      ...prev,
+      currentServiceId: services.currentServiceId + 1,
+    }));
   };
 
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
-
-  if (!nettoyage.infos.gammeSelected || !nettoyage.infos.fournisseurId) {
-    return null; //pour skiper l'hygiene si pas de nettoyage
-  }
 
   return (
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="3">
@@ -77,12 +64,20 @@ const Hygiene = ({
         />
       )}
       <div className="w-full flex-1 overflow-auto" ref={propositionsRef}>
-        <HygienePropositions
-          hygieneDistribQuantite={hygieneDistribQuantite}
-          hygieneDistribTarifs={hygieneDistribTarifs}
-          hygieneDistribInstalTarifs={hygieneDistribInstalTarifs}
-          hygieneConsosTarifs={hygieneConsosTarifs}
-        />
+        {!nettoyage.infos.fournisseurId || !nettoyage.infos.gammeSelected ? (
+          <div className="flex h-full items-center justify-center text-base lg:text-lg">
+            <p className="text-center text-fm4alldestructive">
+              Veuillez d&apos;abord sélectionner une offre de Nettoyage.
+            </p>
+          </div>
+        ) : (
+          <HygienePropositions
+            hygieneDistribQuantite={hygieneDistribQuantite}
+            hygieneDistribTarifs={hygieneDistribTarifs}
+            hygieneDistribInstalTarifs={hygieneDistribInstalTarifs}
+            hygieneConsosTarifs={hygieneConsosTarifs}
+          />
+        )}
       </div>
       {isTabletOrMobile ? null : (
         <PropositionsFooter handleClickNext={handleClickNext} />

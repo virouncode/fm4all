@@ -44,9 +44,7 @@ const SnacksFruits = ({
   const handleClickPrevious = () => {
     setFoodBeverage((prev) => ({
       ...prev,
-      currentFoodBeverageId: cafe.infos.fournisseurId
-        ? prev.currentFoodBeverageId - 1
-        : prev.currentFoodBeverageId - 2,
+      currentFoodBeverageId: prev.currentFoodBeverageId - 1,
     }));
   };
 

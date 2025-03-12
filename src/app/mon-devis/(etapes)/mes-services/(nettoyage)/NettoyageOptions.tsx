@@ -43,10 +43,6 @@ const NettoyageOptions = ({
     }));
   };
 
-  if (!nettoyage.infos.fournisseurId && !nettoyage.infos.gammeSelected) {
-    return null; //pour skiper le service
-  }
-
   // Calcul des propositions
   const freqAnnuelle = nettoyage.quantites.freqAnnuelle;
   const repasseProposition =
@@ -234,29 +230,45 @@ const NettoyageOptions = ({
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
           title="Nettoyage et propreté (options)"
-          description={`Choisissez vos options en gamme ${capitalize(
-            nettoyage.infos.gammeSelected
-          )} chez ${nettoyage.infos.nomFournisseur}`}
+          description={
+            nettoyage.infos.fournisseurId && nettoyage.infos.gammeSelected
+              ? `Choisissez vos options en gamme ${capitalize(
+                  nettoyage.infos.gammeSelected
+                )} chez ${nettoyage.infos.nomFournisseur}`
+              : ""
+          }
           icon={SprayCan}
           propositionsRef={propositionsRef}
         />
       ) : (
         <PropositionsTitle
           title="Nettoyage et propreté (options)"
-          description={`Choisissez vos options en gamme ${capitalize(
-            nettoyage.infos.gammeSelected
-          )} chez ${nettoyage.infos.nomFournisseur}`}
+          description={
+            nettoyage.infos.fournisseurId && nettoyage.infos.gammeSelected
+              ? `Choisissez vos options en gamme ${capitalize(
+                  nettoyage.infos.gammeSelected
+                )} chez ${nettoyage.infos.nomFournisseur}`
+              : ""
+          }
           icon={SprayCan}
           handleClickPrevious={handleClickPrevious}
         />
       )}
       <div className="w-full flex-1 overflow-auto" ref={propositionsRef}>
-        <NettoyageOptionsPropositions
-          samediProposition={samediProposition}
-          dimancheProposition={dimancheProposition}
-          repasseProposition={repasseProposition}
-          vitrerieProposition={vitrerieProposition}
-        />
+        {!nettoyage.infos.fournisseurId || !nettoyage.infos.gammeSelected ? (
+          <div className="flex h-full items-center justify-center text-base lg:text-lg">
+            <p className="text-center text-fm4alldestructive">
+              Veuillez d&apos;abord sélectionner une offre de Nettoyage.
+            </p>
+          </div>
+        ) : (
+          <NettoyageOptionsPropositions
+            samediProposition={samediProposition}
+            dimancheProposition={dimancheProposition}
+            repasseProposition={repasseProposition}
+            vitrerieProposition={vitrerieProposition}
+          />
+        )}
       </div>
       {isTabletOrMobile ? null : (
         <PropositionsFooter handleClickNext={handleClickNext} />

@@ -1,6 +1,5 @@
 "use client";
 import PropositionsTitleMobile from "@/app/mon-devis/PropositionsTitleMobile";
-import { Button } from "@/components/ui/button";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import {
@@ -18,7 +17,8 @@ import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
-import FontaineEspace from "./FontaineEspace";
+import FontainesDesktopEspaces from "./(desktop)/FontainesDesktopEspaces";
+import FontainesMobileEspaces from "./(mobile)/FontainesMobileEspaces";
 
 type FontainesProps = {
   fontainesModeles: SelectFontainesModelesType[];
@@ -114,26 +114,18 @@ const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
         className="w-full flex-1 overflow-hidden transition"
         ref={propositionsRef}
       >
-        {fontaines.nbEspaces && fontaines.nbEspaces > 0 ? (
-          fontaines.espaces.map((espace) => (
-            <FontaineEspace
-              key={espace.infos.espaceId}
-              espace={espace}
-              fontainesModeles={fontainesModeles}
-              fontainesTarifs={fontainesTarifs}
-            />
-          ))
+        {isTabletOrMobile ? (
+          <FontainesMobileEspaces
+            fontainesModeles={fontainesModeles}
+            fontainesTarifs={fontainesTarifs}
+            handleAddEspace={handleAddEspace}
+          />
         ) : (
-          <div className="flex justify-center">
-            <Button
-              variant="outline"
-              size="lg"
-              className="text-base"
-              onClick={handleAddEspace}
-            >
-              Ajouter un espace fontaine
-            </Button>
-          </div>
+          <FontainesDesktopEspaces
+            fontainesModeles={fontainesModeles}
+            fontainesTarifs={fontainesTarifs}
+            handleAddEspace={handleAddEspace}
+          />
         )}
       </div>
       {!fontaines.nbEspaces && !isTabletOrMobile ? (

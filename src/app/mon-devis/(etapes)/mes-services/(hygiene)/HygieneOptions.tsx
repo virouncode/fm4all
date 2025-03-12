@@ -44,14 +44,6 @@ const HygieneOptions = ({
     }));
   };
 
-  if (
-    !nettoyage.infos.gammeSelected ||
-    !nettoyage.infos.fournisseurId ||
-    !hygiene.infos.trilogieGammeSelected
-  ) {
-    return null;
-  }
-
   return (
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="4">
       {isTabletOrMobile ? (
@@ -59,8 +51,12 @@ const HygieneOptions = ({
           icon={Toilet}
           title="Hygiène sanitaire (options)"
           description={
-            "Choisissez vos options chez " +
-            (hygiene.infos.nomFournisseur ?? "")
+            nettoyage.infos.fournisseurId &&
+            nettoyage.infos.gammeSelected &&
+            hygiene.infos.trilogieGammeSelected
+              ? "Choisissez vos options chez " +
+                (hygiene.infos.nomFournisseur ?? "")
+              : ""
           }
           propositionsRef={propositionsRef}
         />
@@ -69,18 +65,36 @@ const HygieneOptions = ({
           icon={Toilet}
           title="Hygiène sanitaire (options)"
           description={
-            "Choisissez vos options chez " +
-            (hygiene.infos.nomFournisseur ?? "")
+            nettoyage.infos.fournisseurId &&
+            nettoyage.infos.gammeSelected &&
+            hygiene.infos.trilogieGammeSelected
+              ? "Choisissez vos options chez " +
+                (hygiene.infos.nomFournisseur ?? "")
+              : ""
           }
           handleClickPrevious={handleClickPrevious}
         />
       )}
-      <div className="w-full flex-1 overflow-auto" ref={propositionsRef}>
-        <HygieneOptionsPropositions
-          hygieneDistribQuantite={hygieneDistribQuantite}
-          hygieneDistribTarifs={hygieneDistribTarifs}
-          hygieneConsosTarifs={hygieneConsosTarifs}
-        />
+      <div
+        className="w-full flex-1 overflow-auto transition"
+        ref={propositionsRef}
+      >
+        {!nettoyage.infos.gammeSelected ||
+        !nettoyage.infos.fournisseurId ||
+        !hygiene.infos.trilogieGammeSelected ? (
+          <div className="flex h-full items-center justify-center text-base lg:text-lg">
+            <p className="text-center text-fm4alldestructive">
+              Veuillez d&apos;abord sélectionner une offre de Nettoyage et une
+              offre d&apos;Hygiène sanitaire
+            </p>
+          </div>
+        ) : (
+          <HygieneOptionsPropositions
+            hygieneDistribQuantite={hygieneDistribQuantite}
+            hygieneDistribTarifs={hygieneDistribTarifs}
+            hygieneConsosTarifs={hygieneConsosTarifs}
+          />
+        )}
       </div>
       {isTabletOrMobile ? null : (
         <PropositionsFooter handleClickNext={handleClickNext} />
