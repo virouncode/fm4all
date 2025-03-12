@@ -67,7 +67,7 @@ const MonDevisDocument = ({ devisUrl }: MonDevisDocumentProps) => {
           </Button>
         </div>
         <div className="flex flex-col gap-4 w-full mx-auto max-w-prose items-center">
-          <Link
+          <a
             href={devisUrl}
             download={`Devis_fm4all_${DateTime.local().toFormat(
               "dd-MM-yyyy'T'HH:mm"
@@ -75,7 +75,7 @@ const MonDevisDocument = ({ devisUrl }: MonDevisDocumentProps) => {
             className="underline"
           >
             Télécharger le devis
-          </Link>
+          </a>
           <p>
             Si le document ne s&apos;affiche pas correctement :{" "}
             <Link href={devisUrl} target="_blank" className="underline">
@@ -83,7 +83,6 @@ const MonDevisDocument = ({ devisUrl }: MonDevisDocumentProps) => {
             </Link>
           </p>
         </div>
-
         <div className="w-full mt-6 mb-6 flex justify-center">
           <embed src={devisUrl} className="w-full h-screen" />
         </div>
