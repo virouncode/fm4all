@@ -197,7 +197,7 @@ const OfficeManagerMobilePropositionCard = ({
 
   return (
     <div
-      className={`bg-${color} flex flex-col h-[400px] border border-slate-200 rounded-xl p-4 text-white  ${
+      className={`bg-${color} flex flex-col h-[430px] border border-slate-200 rounded-xl p-4 text-white  ${
         officeManager.infos.fournisseurId === fournisseurId &&
         officeManager.infos.gammeSelected !== null
           ? "ring-4 ring-inset ring-fm4alldestructive"
@@ -242,13 +242,13 @@ const OfficeManagerMobilePropositionCard = ({
                 sloganFournisseur={"Le Facility management pour tous"}
                 logoUrl={"/img/logo_full.webp"}
                 nomFournisseur={"fm4all"}
-                locationUrl={""}
+                locationUrl={null}
                 anneeCreation={2025}
-                ca={""}
-                effectif={""}
+                ca={null}
+                effectif={null}
                 nbClients={null}
-                noteGoogle={""}
-                nbAvis={0}
+                noteGoogle={null}
+                nbAvis={null}
               />
             </DialogContent>
           </Dialog>

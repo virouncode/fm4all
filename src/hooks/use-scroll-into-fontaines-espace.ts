@@ -9,10 +9,6 @@ export default function useScrollIntoFontainesEspace() {
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
   useEffect(() => {
     if (isTabletOrMobile) return;
-    console.log(
-      "fontaines.infos.currentEspaceId",
-      fontaines.infos.currentEspaceId
-    );
     if (
       fontaines.infos.currentEspaceId === null ||
       foodBeverage.currentFoodBeverageId !== 4
@@ -27,7 +23,6 @@ export default function useScrollIntoFontainesEspace() {
     const currentEspace = document.getElementById(
       `espace_fontaine_${fontaines.infos.currentEspaceId.toString()}`
     );
-    console.log("currentEspace", currentEspace);
 
     if (currentEspace) {
       currentEspace.scrollIntoView({ behavior: "smooth", block: "nearest" });

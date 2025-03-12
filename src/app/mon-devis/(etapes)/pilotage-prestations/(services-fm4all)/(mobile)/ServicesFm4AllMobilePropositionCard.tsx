@@ -1,3 +1,5 @@
+import FournisseurDialog from "@/app/mon-devis/FournisseurDialog";
+import { CarouselItem } from "@/components/ui/carousel";
 import {
   Dialog,
   DialogContent,
@@ -10,11 +12,10 @@ import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { GammeType } from "@/zod-schemas/gamme";
-import { Info } from "lucide-react";
 import Image from "next/image";
 import { useContext } from "react";
 
-type ServicesFm4AllPropositionCardProps = {
+type ServicesFm4AllMobilePropositionCardProps = {
   proposition: {
     id: number;
     gamme: GammeType;
@@ -60,23 +61,24 @@ type ServicesFm4AllPropositionCardProps = {
   total: number;
 };
 
-const ServicesFm4AllPropositionCard = ({
+const ServicesFm4AllMobilePropositionCard = ({
   proposition,
   handleClickProposition,
   total,
-}: ServicesFm4AllPropositionCardProps) => {
+}: ServicesFm4AllMobilePropositionCardProps) => {
   const { servicesFm4All } = useContext(ServicesFm4AllContext);
-  const gamme = proposition.gamme;
+  const { gamme, totalAnnuelSansRemise } = proposition;
   const color = getFm4AllColor(gamme);
+
   const totalMensuelSansRemiseText =
-    proposition.totalAnnuelSansRemise !== proposition.totalAnnuel ? (
-      <p className="font-bold text-xl ml-4 line-through">
+    totalAnnuelSansRemise !== proposition.totalAnnuel ? (
+      <p className="text-sm font-bold line-through">
         {formatNumber(Math.round(proposition.totalAnnuelSansRemise / 12))}{" "}
         €/mois
       </p>
     ) : null;
   const totalMensuelText = (
-    <p className="font-bold text-xl ml-4">
+    <p className="text-sm font-bold">
       {formatNumber(Math.round(proposition.totalAnnuel / 12))} €/mois
       {proposition.remiseCa ? "\u00B9" : ""}
       {proposition.remiseHof ? "\u00B2" : ""}
@@ -94,7 +96,19 @@ const ServicesFm4AllPropositionCard = ({
   );
 
   const imgProduit = (
-    <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-100">
+    <div className="w-1/3 h-full relative rounded-xl overflow-hidden bg-slate-200">
+      <Image
+        src={"/img/services/fm4all.webp"}
+        alt={`illustration de pilotes fm4all`}
+        fill
+        quality={100}
+        className="object-contain cursor-pointer"
+      />
+    </div>
+  );
+
+  const imgProduitDialog = (
+    <div className="w-full h-60 relative mx-auto rounded-lg border-slate-200 border bg-slate-100">
       <Image
         src={"/img/services/fm4all.webp"}
         alt={`illustration de pilotes fm4all`}
@@ -107,7 +121,7 @@ const ServicesFm4AllPropositionCard = ({
 
   const infosProduit =
     gamme === "essentiel" ? (
-      <ul className="flex flex-col text-xs px-4 mx-auto">
+      <ul className="flex flex-col text-xs px-4 w-2/3">
         <li className="list-check">Accès Services</li>
         <li className="list-check">Frais bancaires & Assurance</li>
         <li className="list-check">Garanties contractuelles</li>
@@ -117,7 +131,7 @@ const ServicesFm4AllPropositionCard = ({
         </li>
       </ul>
     ) : gamme === "confort" ? (
-      <ul className="flex flex-col text-xs px-4 mx-auto">
+      <ul className="flex flex-col text-xs px-4 w-2/3">
         <li className="list-check">Accès Services</li>
         <li className="list-check">Frais bancaires & Assurance</li>
         <li className="list-check">Garanties contractuelles</li>
@@ -134,7 +148,7 @@ const ServicesFm4AllPropositionCard = ({
         <li className="list-check">Reporting personnalisé</li>
       </ul>
     ) : (
-      <ul className="flex flex-col text-xs px-4 mx-auto">
+      <ul className="flex flex-col text-xs px-4 w-2/3">
         <li className="list-check">Accès Services</li>
         <li className="list-check">Frais bancaires & Assurance</li>
         <li className="list-check">Garanties contractuelles</li>
@@ -212,50 +226,99 @@ const ServicesFm4AllPropositionCard = ({
     );
 
   return (
-    <div
-      className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4 cursor-pointer ${
-        servicesFm4All.infos.gammeSelected === gamme
-          ? "ring-4 ring-inset ring-fm4alldestructive"
-          : ""
-      } ${!total ? "opacity-50 pointer-events-none" : ""}`}
-      onClick={() => handleClickProposition(proposition)}
-    >
-      <Switch
-        checked={servicesFm4All.infos.gammeSelected === gamme}
-        onCheckedChange={() => handleClickProposition(proposition)}
-        className="data-[state=checked]:bg-fm4alldestructive"
-        title="Sélectionner cette proposition"
-      />
-      <div>
-        <div className="flex gap-2 items-center">
-          <div className="flex flex-col gap-2">
-            {totalMensuelSansRemiseText}
-            {totalMensuelText}
-          </div>
+    <CarouselItem>
+      <div
+        className={`bg-${color} flex flex-col h-[450px] border border-slate-200 rounded-xl p-4 text-white ${
+          servicesFm4All.infos.gammeSelected === gamme
+            ? "ring-4 ring-inset ring-fm4alldestructive"
+            : ""
+        }${!total ? "opacity-50 pointer-events-none" : ""}`}
+      >
+        <div className="flex items-center h-1/3 gap-2 border-b pb-2 border-slate-200">
           <Dialog>
-            <DialogTrigger asChild>
-              <Info
-                size={16}
-                className="cursor-pointer"
-                onClick={(e) => e.stopPropagation()}
-              />
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogTrigger asChild>{imgProduit}</DialogTrigger>
+            <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
               <DialogHeader>
                 <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
-              {imgProduit}
-              <p className="text-xs italic text-end">
-                *photo non contractuelle
-              </p>
-              {infosProduitDialog}
+              <div className="flex flex-col gap-4 items-center">
+                {imgProduitDialog}
+                <p className="text-xs italic text-end">
+                  *photo non contractuelle
+                </p>
+                {infosProduitDialog}
+              </div>
             </DialogContent>
           </Dialog>
+          <div className="w-2/3 flex flex-col gap-1 h-full">
+            <p className="font-bold text-sm">{"fm4all"}</p>
+            <Dialog>
+              <DialogTrigger asChild>
+                <div className="h-10 relative">
+                  <Image
+                    src={"/img/logo_full_white.webp"}
+                    alt={`logo-de-fm4all`}
+                    fill={true}
+                    className="object-contain object-left cursor-pointer"
+                    quality={100}
+                  />
+                </div>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
+                <DialogHeader>
+                  <DialogTitle>{"fm4all"}</DialogTitle>
+                </DialogHeader>
+                <FournisseurDialog
+                  sloganFournisseur={"Le Facility Management pour tous"}
+                  logoUrl={"/img/logo_full_white.webp"}
+                  nomFournisseur={"fm4all"}
+                  locationUrl={null}
+                  anneeCreation={2025}
+                  ca={null}
+                  effectif={null}
+                  nbClients={null}
+                  noteGoogle={null}
+                  nbAvis={null}
+                />
+              </DialogContent>
+            </Dialog>
+            {/* {noteGoogle && nbAvis && (
+            <div className="flex items-center gap-1 text-xs">
+              <p>{noteGoogle}</p>
+              <StarRating score={noteGoogle ? parseFloat(noteGoogle) : 0} />
+              <p>({nbAvis})</p>
+            </div>
+          )} */}
+          </div>
         </div>
-        {infosProduit}
+        <div
+          className="flex h-2/3 pt-2 justify-between"
+          onClick={() => handleClickProposition(proposition)}
+        >
+          {infosProduit}
+          <div className="flex flex-col gap-2 items-end w-1/3">
+            <div className="flex flex-col gap-2">
+              {totalMensuelSansRemiseText}
+              {totalMensuelText}
+            </div>
+            {totalMensuelText ? (
+              <Switch
+                className={`${
+                  servicesFm4All.infos.gammeSelected === gamme
+                    ? "data-[state=checked]:bg-fm4alldestructive"
+                    : ""
+                }`}
+                checked={servicesFm4All.infos.gammeSelected === gamme}
+                onCheckedChange={() => handleClickProposition(proposition)}
+                title="Sélectionnez cette proposition"
+                onClick={(e) => e.stopPropagation()}
+              />
+            ) : null}
+          </div>
+        </div>
       </div>
-    </div>
+    </CarouselItem>
   );
 };
 
-export default ServicesFm4AllPropositionCard;
+export default ServicesFm4AllMobilePropositionCard;

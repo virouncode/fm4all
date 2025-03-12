@@ -114,12 +114,16 @@ const ServicesFm4All = ({
           servicesFm4AllTaux={servicesFm4AllTaux}
         />
       </div>
-      <PropositionsFooter
-        handleClickNext={handleClickNext}
-        comment={
-          "\u00B9remise de 0,5% à partir d'un chiffre d'affaires de 26 000€ HT/an, \u00B2remise de 0,5% pour le choix d'un Office Manager"
-        }
-      />
+      {isTabletOrMobile ? (
+        <PropositionsFooter handleClickNext={handleClickNext} />
+      ) : (
+        <PropositionsFooter
+          handleClickNext={handleClickNext}
+          comment={
+            "\u00B9remise de 0,5% à partir d'un chiffre d'affaires de 26 000€ HT/an, \u00B2remise de 0,5% pour le choix d'un Office Manager"
+          }
+        />
+      )}
     </div>
   );
 };
