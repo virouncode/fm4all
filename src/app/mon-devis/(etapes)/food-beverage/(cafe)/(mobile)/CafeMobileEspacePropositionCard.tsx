@@ -239,7 +239,7 @@ const CafeMobileEspacePropositionCard = ({
   );
 
   const infosProduit = (
-    <ul className="flex flex-col text-xs px-4 mx-auto w-3/4">
+    <ul className="flex flex-col text-xs px-4 mx-auto w-2/3">
       {totalAnnuel ? (
         <li className="list-check text-sm font-bold">
           {proposition.nbMachines} machine(s) {proposition.marque}{" "}
@@ -365,7 +365,7 @@ const CafeMobileEspacePropositionCard = ({
           }
         >
           {infosProduit}
-          <div className="flex flex-col gap-2 items-end w-1/4">
+          <div className="flex flex-col gap-2 items-end w-1/3">
             {totalMensuelText}
             {prixInstallationText}
             {totalAnnuel ? (
