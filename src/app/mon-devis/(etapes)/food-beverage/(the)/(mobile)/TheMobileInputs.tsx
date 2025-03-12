@@ -62,6 +62,10 @@ const TheMobileInputs = ({
             <Plus />
           </Button>
         </div>
+        <p className="text-xs italic text-fm4alldestructive">
+          Les quantités sont estimées pour vous (environ 15% de votre effectif)
+          mais vous pouvez les changer
+        </p>
       </div>
     </div>
   );
