@@ -106,7 +106,13 @@ const OfficeManagerPropositionCard = ({
 
   const infosConfort = (
     <>
-      <li className="list-check">Tous les services de la gamme Essentiel</li>
+      <li className="list-check">Coordination technique des locaux</li>
+      <li className="list-check">Suivi sous-traitants</li>
+      <li className="list-check">Contrôle et gestion prestataires</li>
+      <li className="list-check">Lien avec fm4all</li>
+      <li className="list-check">
+        Lien avec propriétaire, Property ou Asset Manager
+      </li>
       <li className="list-check">Gestion des contrats de services tiers</li>
       <li className="list-check">Accueil des locaux</li>
       <li className="list-check">Support administratif aux équipes</li>
@@ -118,7 +124,19 @@ const OfficeManagerPropositionCard = ({
 
   const infosExcellence = (
     <>
-      <li className="list-check">Tous les services de la gamme Confort</li>
+      <li className="list-check">Coordination technique des locaux</li>
+      <li className="list-check">Suivi sous-traitants</li>
+      <li className="list-check">Contrôle et gestion prestataires</li>
+      <li className="list-check">Lien avec fm4all</li>
+      <li className="list-check">
+        Lien avec propriétaire, Property ou Asset Manager
+      </li>
+      <li className="list-check">Gestion des contrats de services tiers</li>
+      <li className="list-check">Accueil des locaux</li>
+      <li className="list-check">Support administratif aux équipes</li>
+      <li className="list-check">
+        Gestion des logiciels internes (badges, flotte automobile, etc.)
+      </li>
       <li className="list-check">
         Animation du site (orga events, déj, soirées)
       </li>
