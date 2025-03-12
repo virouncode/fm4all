@@ -183,7 +183,7 @@ const SecuriteIncendieMobileInputs = ({
               variant="outline"
               title="Diminuer le nombre de télécommandes BAES"
               onClick={() => handleDecrement("telBaes")}
-              disabled={nbBaes === 0}
+              disabled={nbTelBaes === 0}
             >
               <Minus />
             </Button>
@@ -191,7 +191,7 @@ const SecuriteIncendieMobileInputs = ({
               variant="outline"
               title="Augmenter le nombre de télécommandes BAES"
               onClick={() => handleIncrement("telBaes")}
-              disabled={nbBaes === MAX_NB_TEL_BAES}
+              disabled={nbTelBaes === MAX_NB_TEL_BAES}
             >
               <Plus />
             </Button>
