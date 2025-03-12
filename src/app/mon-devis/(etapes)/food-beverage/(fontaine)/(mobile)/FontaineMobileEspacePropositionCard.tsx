@@ -136,7 +136,7 @@ const FontaineMobileEspacePropositionCard = ({
   );
 
   const prixInstallationText = totalInstallation ? (
-    <p className="text-xs">
+    <p className="text-xs text-end">
       + {formatNumber(Math.round(totalInstallation * MARGE))} €
       d&apos;installation
     </p>
