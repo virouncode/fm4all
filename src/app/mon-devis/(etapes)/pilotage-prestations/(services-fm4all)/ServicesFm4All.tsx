@@ -1,5 +1,6 @@
 "use client";
 
+import PropositionsTitleMobile from "@/app/mon-devis/PropositionsTitleMobile";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { ManagementContext } from "@/context/ManagementProvider";
@@ -10,7 +11,8 @@ import { SelectServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4AllOffr
 import { SelectServicesFm4AllTauxType } from "@/zod-schemas/servicesFm4AllTaux";
 import { HandPlatter } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useContext } from "react";
+import { useContext, useRef } from "react";
+import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import ServicesFm4AllPropositions from "./ServicesFm4AllPropositions";
@@ -82,15 +84,31 @@ const ServicesFm4All = ({
       `/mon-devis/sauvegarder-ma-progression?${searchParams.toString()}`
     );
   };
+
+  const isTabletOrMobile = useMediaQuery({ maxWidth: 1024 });
+  const propositionsRef = useRef<HTMLDivElement>(null);
+
   return (
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="2">
-      <PropositionsTitle
-        title="Services fm4all"
-        description="fm4all est votre interlocuteur unique pour toutes vos prestations. Regroupés sous un contrat et une facture, nous réalisons un pilotage à distance des prestations de services, gestion administrative et suivi qualité."
-        icon={HandPlatter}
-        handleClickPrevious={handleClickPrevious}
-      />
-      <div className="w-full flex-1 overflow-auto">
+      {isTabletOrMobile ? (
+        <PropositionsTitleMobile
+          title="Services fm4all"
+          description="fm4all est votre interlocuteur unique pour toutes vos prestations. Regroupés sous un contrat et une facture, nous réalisons un pilotage à distance des prestations de services, gestion administrative et suivi qualité."
+          icon={HandPlatter}
+          propositionsRef={propositionsRef}
+        />
+      ) : (
+        <PropositionsTitle
+          title="Services fm4all"
+          description="fm4all est votre interlocuteur unique pour toutes vos prestations. Regroupés sous un contrat et une facture, nous réalisons un pilotage à distance des prestations de services, gestion administrative et suivi qualité."
+          icon={HandPlatter}
+          handleClickPrevious={handleClickPrevious}
+        />
+      )}
+      <div
+        className="w-full flex-1 overflow-auto transition"
+        ref={propositionsRef}
+      >
         <ServicesFm4AllPropositions
           servicesFm4AllOffres={servicesFm4AllOffres}
           servicesFm4AllTaux={servicesFm4AllTaux}

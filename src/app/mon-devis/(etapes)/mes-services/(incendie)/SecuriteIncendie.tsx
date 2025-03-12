@@ -68,7 +68,10 @@ const SecuriteIncendie = ({
           handleClickPrevious={handleClickPrevious}
         />
       )}
-      <div className="w-full flex-1 overflow-auto" ref={propositionsRef}>
+      <div
+        className="w-full flex-1 overflow-auto transition"
+        ref={propositionsRef}
+      >
         <SecuriteIncendiePropositions
           incendieQuantite={incendieQuantite}
           incendieTarifs={incendieTarifs}
