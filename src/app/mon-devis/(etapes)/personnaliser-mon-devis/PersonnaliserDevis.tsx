@@ -13,6 +13,7 @@ import PersonnaliserNettoyageVitrerie from "./(nettoyage)/PersonnaliserNettoyage
 import PersonnaliserCommentaires from "./PersonnaliserCommentaires";
 import PersonnaliserFinal from "./PersonnaliserFinal";
 import PersonnaliserPresentation from "./PersonnaliserPresentation";
+import { useMediaQuery } from "react-responsive";
 
 type PersonnaliserDevisProps = {
   exutoiresTarifs?: SelectExutoiresTarifsType[];
@@ -35,6 +36,7 @@ const PersonnaliserDevis = ({
   const personnalisationIds = personnalisation.personnalisationIds;
   usePersonnalisation();
   useScrollIntoPersonnalisation();
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
   return (
     <section className="flex-1 lg:overflow-hidden">
       <PersonnaliserPresentation />
