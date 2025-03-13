@@ -145,7 +145,9 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
         "FM4ALL comparateur en ligne",
         client,
         total.totalAnnuelHt,
-        total.totalInstallationHt
+        total.totalInstallationHt,
+        commentaires ?? "",
+        format(client.dateDeDemarrage ?? "", "dd/MM/yyyy", { locale: fr })
       );
       if (url) {
         try {

@@ -14,7 +14,9 @@ export const fillDevis = async (
   nomEmetteur: string,
   client: InsertClientType,
   totalAnnuelHT: number | null,
-  totalInstallationHT: number | null
+  totalInstallationHT: number | null,
+  commentaires: string | null,
+  dateDemarrage: string | null
 ) => {
   try {
     const formPdfBytes = await fetch("/pdf/fm4all_devis_template_NEW.pdf").then(
@@ -78,6 +80,8 @@ export const fillDevis = async (
       { fieldName: "tva", value: tvaText },
       { fieldName: "total_installation_ht", value: totalInstallationHtText },
       { fieldName: "total_annuel_ttc", value: totalAnnuelTtcText },
+      { fieldName: "commentaires", value: commentaires ?? "" },
+      { fieldName: "date_demarrage", value: dateDemarrage ?? "" },
     ];
 
     // Loop through the text fields and populate
