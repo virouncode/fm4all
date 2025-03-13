@@ -1,12 +1,10 @@
 "use client";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { TypesSnacksFruitsType } from "@/constants/typesSnacksFruits";
 import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
+import { toast } from "@/hooks/use-toast";
 import { roundEffectif } from "@/lib/roundEffectif";
 import { SelectBoissonsQuantitesType } from "@/zod-schemas/boissonsQuantites";
 import { SelectBoissonsTarifsType } from "@/zod-schemas/boissonsTarifs";
@@ -16,7 +14,10 @@ import { SelectFruitsTarifsType } from "@/zod-schemas/fruitsTarifs";
 import { SelectSnacksQuantitesType } from "@/zod-schemas/snacksQuantites";
 import { SelectSnacksTarifsType } from "@/zod-schemas/snacksTarifs";
 import { useContext } from "react";
+import { useMediaQuery } from "react-responsive";
 import { MAX_EFFECTIF } from "../../mes-locaux/MesLocaux";
+import SnacksFruitsDesktopInputs from "./(desktop)/SnacksFruitsDesktopInputs";
+import SnacksFruitsMobileInputs from "./(mobile)/SnacksFruitsMobileInputs";
 
 type SnacksFruitsFormProps = {
   fruitsQuantites: SelectFruitsQuantitesType[];
@@ -42,13 +43,10 @@ const SnacksFruitsForm = ({
   const { snacksFruits, setSnacksFruits } = useContext(SnacksFruitsContext);
   const { setTotalSnacksFruits } = useContext(TotalSnacksFruitsContext);
   const effectif = client.effectif ?? 0;
-  const nbPersonnes = snacksFruits.quantites.nbPersonnes || effectif;
+  const nbPersonnes = snacksFruits.quantites.nbPersonnes ?? effectif;
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 
-  const handleChangeNbPersonnes = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    let newNbPersonnes = value ? parseInt(value) : effectif;
-    if (newNbPersonnes > MAX_EFFECTIF) newNbPersonnes = MAX_EFFECTIF;
-
+  const updateSnacksFruits = (newNbPersonnes: number) => {
     if (snacksFruits.infos.gammeSelected && snacksFruits.infos.fournisseurId) {
       const fruitsTarifsPourNbPersonnes = fruitsTarifs.filter(
         (item) => item.effectif === roundEffectif(newNbPersonnes)
@@ -86,27 +84,30 @@ const SnacksFruitsForm = ({
 
       const fruitsKgParSemaine =
         gFruitsParSemaineParPersonne !== null && minKgFruitsParSemaine !== null
-          ? (gFruitsParSemaineParPersonne * newNbPersonnes) / 1000 >=
-            minKgFruitsParSemaine
-            ? (gFruitsParSemaineParPersonne * newNbPersonnes) / 1000
-            : minKgFruitsParSemaine
+          ? Math.max(
+              (gFruitsParSemaineParPersonne * newNbPersonnes) / 1000,
+              minKgFruitsParSemaine
+            )
           : null;
       const snacksPortionsParSemaine =
         portionsSnacksParSemaineParPersonne !== null &&
         minPortionsSnacksParSemaine !== null
-          ? portionsSnacksParSemaineParPersonne * newNbPersonnes >=
-            minPortionsSnacksParSemaine
-            ? portionsSnacksParSemaineParPersonne * newNbPersonnes
-            : minPortionsSnacksParSemaine
+          ? Math.max(
+              portionsSnacksParSemaineParPersonne * newNbPersonnes,
+              minPortionsSnacksParSemaine
+            )
           : null;
       const boissonsConsosParSemaine =
         consosBoissonsParSemaineParPersonne !== null &&
         minConsosBoissonsParSemaine !== null
-          ? consosBoissonsParSemaineParPersonne * newNbPersonnes >=
-            minConsosBoissonsParSemaine
-            ? consosBoissonsParSemaineParPersonne * newNbPersonnes
-            : minConsosBoissonsParSemaine
+          ? Math.max(
+              consosBoissonsParSemaineParPersonne * newNbPersonnes,
+              minConsosBoissonsParSemaine
+            )
           : null;
+      const isSameFournisseur =
+        snacksFruits.infos.fournisseurId === cafe.infos.fournisseurId;
+
       //Tarifs / portion
       const prixKgFruits =
         fruitsTarifsPourNbPersonnes.find(
@@ -114,6 +115,7 @@ const SnacksFruitsForm = ({
             tarif.gamme === snacksFruits.infos.gammeSelected &&
             tarif.fournisseurId === snacksFruits.infos.fournisseurId
         )?.prixKg ?? null;
+
       const prixUnitaireSnacks =
         snacksTarifsPourNbPersonnes.find(
           (tarif) =>
@@ -148,21 +150,25 @@ const SnacksFruitsForm = ({
       const totalSnacks = 52 * panierSnacks;
       const totalBoissons = 52 * panierBoissons;
 
-      const prixPanier = panierFruits + panierSnacks + panierBoissons;
-
       //Prix livraison / panier
       const fraisLivraisonsFournisseur = foodLivraisonTarifs.find(
         ({ fournisseurId }) =>
           fournisseurId === snacksFruits.infos.fournisseurId
       );
+      const remiseSiCafe = isSameFournisseur
+        ? fraisLivraisonsFournisseur?.remiseSiCafe ?? 0
+        : 0;
+      const prixPanier =
+        (1 - remiseSiCafe / 100) *
+        (panierFruits + panierSnacks + panierBoissons);
+
       const panierMin = fraisLivraisonsFournisseur?.panierMin ?? null;
       const isPanierMin = panierMin === null || prixPanier >= panierMin;
 
-      const isSameFournisseur =
-        snacksFruits.infos.fournisseurId === cafe.infos.fournisseurId;
       const prixUnitaireLivraisonSiCafe = isPanierMin
         ? fraisLivraisonsFournisseur?.prixUnitaireSiCafe ?? null
         : null;
+
       const prixUnitaireLivraison = isPanierMin
         ? fraisLivraisonsFournisseur?.prixUnitaire ?? null
         : null;
@@ -181,7 +187,7 @@ const SnacksFruitsForm = ({
       const totalLivraison =
         fraisLivraisonPanier !== null ? fraisLivraisonPanier * 52 : null;
       const total =
-        fraisLivraisonPanier !== null
+        fraisLivraisonPanier !== null && newNbPersonnes
           ? 52 * (prixPanier + fraisLivraisonPanier)
           : null;
 
@@ -220,6 +226,33 @@ const SnacksFruitsForm = ({
         },
       }));
     }
+  };
+
+  const handleChangeNbPersonnes = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    let newNbPersonnes = value ? parseInt(value) : 0;
+    if (newNbPersonnes > MAX_EFFECTIF) newNbPersonnes = MAX_EFFECTIF;
+    updateSnacksFruits(newNbPersonnes);
+  };
+
+  const handleIncrement = () => {
+    let newNbPersonnes = nbPersonnes + 1;
+    if (newNbPersonnes > MAX_EFFECTIF) {
+      newNbPersonnes = MAX_EFFECTIF;
+      toast({
+        title: "Limite atteinte",
+        description:
+          "Nous ne proposons pas de livraisons pour plus de 300 personnes",
+        duration: 7000,
+      });
+    }
+    updateSnacksFruits(newNbPersonnes);
+  };
+
+  const handleDecrement = () => {
+    let newNbPersonnes = nbPersonnes - 1;
+    if (newNbPersonnes < 0) newNbPersonnes = 0;
+    updateSnacksFruits(newNbPersonnes);
   };
 
   const handleCheck = (type: TypesSnacksFruitsType) => {
@@ -269,10 +302,17 @@ const SnacksFruitsForm = ({
       const totalSnacks = 52 * panierSnacks;
       const totalBoissons = 52 * panierBoissons;
 
-      const prixPanier = panierFruits + panierSnacks + panierBoissons;
       const fraisLivraisonsFournisseur = foodLivraisonTarifs.find(
         (tarif) => tarif.fournisseurId === snacksFruits.infos.fournisseurId
       );
+      const isSameFournisseur =
+        snacksFruits.infos.fournisseurId === cafe.infos.fournisseurId;
+      const remiseSiCafe = isSameFournisseur
+        ? fraisLivraisonsFournisseur?.remiseSiCafe ?? 0
+        : 0;
+      const prixPanier =
+        (1 - remiseSiCafe / 100) *
+        (panierFruits + panierSnacks + panierBoissons);
       const panierMin = fraisLivraisonsFournisseur?.panierMin ?? null;
       const isPanierMin = panierMin === null || prixPanier >= panierMin;
 
@@ -290,7 +330,7 @@ const SnacksFruitsForm = ({
       const totalLivraison =
         fraisLivraisonPanier !== null ? fraisLivraisonPanier * 52 : null;
       const total =
-        fraisLivraisonPanier !== null
+        fraisLivraisonPanier !== null && nbPersonnes
           ? 52 * (prixPanier + fraisLivraisonPanier)
           : null;
 
@@ -304,66 +344,20 @@ const SnacksFruitsForm = ({
       }));
     }
   };
-  return (
-    <form className="w-2/3 flex items-center gap-8">
-      <div className="flex gap-4 items-center">
-        <div className="flex items-center gap-2">
-          <Checkbox
-            checked={snacksFruits.infos.choix.includes("fruits")}
-            onCheckedChange={() => handleCheck("fruits")}
-            className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-            id="fruits"
-            aria-label="Sélectionner fruits"
-          />
-          <Label htmlFor={`fruits`} className="text-sm">
-            Fruits
-          </Label>
-        </div>
-        <div className="flex items-center gap-2">
-          <Checkbox
-            checked={snacksFruits.infos.choix.includes("snacks")}
-            onCheckedChange={() => handleCheck("snacks")}
-            className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-            id="snacks"
-            aria-label="Sélectionner snacks"
-          />
-          <Label htmlFor={`snacks`} className="text-sm">
-            Snacks
-          </Label>
-        </div>
-        <div className="flex items-center gap-2">
-          <Checkbox
-            checked={snacksFruits.infos.choix.includes("boissons")}
-            onCheckedChange={() => handleCheck("boissons")}
-            className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-            id="boissons"
-            aria-label="Sélectionner boissons"
-          />
-          <Label htmlFor={`boissons`} className="text-sm">
-            Boissons
-          </Label>
-        </div>
-      </div>
-      <div className="flex gap-2 items-center">
-        <Input
-          className={`w-full max-w-xs min-w-20 ${
-            snacksFruits.quantites.nbPersonnes === client.effectif
-              ? "text-fm4alldestructive"
-              : ""
-          }`}
-          type="number"
-          min={1}
-          max={MAX_EFFECTIF}
-          step={1}
-          value={nbPersonnes}
-          onChange={handleChangeNbPersonnes}
-          id={`nbPersonnesFood`}
-        />
-        <Label htmlFor={`nbPersonnesFood`} className="text-sm">
-          personnes
-        </Label>
-      </div>
-    </form>
+  return isTabletOrMobile ? (
+    <SnacksFruitsMobileInputs
+      handleCheck={handleCheck}
+      handleChangeNbPersonnes={handleChangeNbPersonnes}
+      nbPersonnes={nbPersonnes}
+      handleIncrement={handleIncrement}
+      handleDecrement={handleDecrement}
+    />
+  ) : (
+    <SnacksFruitsDesktopInputs
+      handleCheck={handleCheck}
+      handleChangeNbPersonnes={handleChangeNbPersonnes}
+      nbPersonnes={nbPersonnes}
+    />
   );
 };
 

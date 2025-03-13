@@ -101,7 +101,7 @@ const SecuriteIncendiePropostionCard = ({
   );
 
   const infosProduitDialog = (
-    <ul className="flex flex-col text-sm px-4">
+    <ul className="flex flex-col text-sm px-4 mx-auto">
       <li className="list-check">
         1 passage par an pour le contrôle obligatoire de :
         <ul className="ml-4">
@@ -126,6 +126,18 @@ const SecuriteIncendiePropostionCard = ({
   );
 
   const dialogTitle = <p className="text-center">Sécurité incendie</p>;
+
+  const imgProduit = (
+    <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+      <Image
+        src={"/img/services/incendie.webp"}
+        alt={`illustration de securité incendie`}
+        fill={true}
+        className="object-contain object-center cursor-pointer"
+        quality={100}
+      />
+    </div>
+  );
 
   return (
     <div
@@ -157,17 +169,12 @@ const SecuriteIncendiePropostionCard = ({
               <DialogHeader>
                 <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
-              <div className="flex flex-col gap-4 items-center">
+              <div className="flex flex-col gap-4">
                 {infosText}
-                <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
-                  <Image
-                    src={"/img/services/incendie.webp"}
-                    alt={`illustration de securité incendie`}
-                    fill={true}
-                    className="object-contain object-center cursor-pointer"
-                    quality={100}
-                  />
-                </div>
+                {imgProduit}
+                <p className="text-xs italic text-end">
+                  *photo non contractuelle
+                </p>
                 {infosProduitDialog}
               </div>
             </DialogContent>

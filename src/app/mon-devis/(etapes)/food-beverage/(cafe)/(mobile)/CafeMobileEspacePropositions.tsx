@@ -108,9 +108,6 @@ type CafeMobileEspacePropositionsProps = {
   espace: CafeEspaceType;
   cafeEspacesIds: number[];
   handleAddEspace: () => void;
-  handleClickNext: () => void;
-  handleClickNextEspace: () => void;
-  handleAlert: () => void;
 };
 
 const CafeMobileEspacePropositions = ({
@@ -120,9 +117,6 @@ const CafeMobileEspacePropositions = ({
   espace,
   cafeEspacesIds,
   handleAddEspace,
-  handleClickNext,
-  handleClickNextEspace,
-  handleAlert,
 }: CafeMobileEspacePropositionsProps) => {
   return (
     <div className="flex flex-col gap-6 w-full">

@@ -1,7 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import React from "react";
-import { MAX_EFFECTIF } from "../../mes-locaux/MesLocaux";
+import { MAX_EFFECTIF } from "../../../mes-locaux/MesLocaux";
 
 type ThePropositionsInputProps = {
   nbPersonnes: number;

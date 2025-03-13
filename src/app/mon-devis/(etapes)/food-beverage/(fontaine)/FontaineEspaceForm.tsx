@@ -1,22 +1,5 @@
 "use client";
 
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { locationFontaine } from "@/constants/locationFontaine";
 import { TypesEauType } from "@/constants/typesEau";
 import { ClientContext } from "@/context/ClientProvider";
 import {
@@ -31,6 +14,9 @@ import { FontaineEspaceType } from "@/zod-schemas/fontaines";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
 import { ChangeEvent, useContext } from "react";
+import { useMediaQuery } from "react-responsive";
+import FontaineDesktopEspaceInputs from "./(desktop)/FontaineDesktopEspaceInputs";
+import FontaineMobileEspaceInputs from "./(mobile)/FontaineMobileEspaceInputs";
 import { getTypeFontaine } from "./getTypeFontaine";
 type FontaineEspaceFormProps = {
   espace: FontaineEspaceType;
@@ -51,7 +37,7 @@ const FontaineEspaceForm = ({
   );
   const effectif = client.effectif ?? 0;
   const nbPersonnes =
-    espace.quantites.nbPersonnes ||
+    espace.quantites.nbPersonnes ??
     (effectif > MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE
       ? MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE
       : effectif);
@@ -272,19 +258,7 @@ const FontaineEspaceForm = ({
     }
   };
 
-  const handleChangeNbPersonnes = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    let newNbPersonnes = value ? parseInt(value) : effectif;
-    if (newNbPersonnes >= MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE) {
-      newNbPersonnes = MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE;
-      toast({
-        title: "Limite atteinte",
-        variant: "destructive",
-        description:
-          "Le nombre de personnes par espace fontaine à eau est limité à 110. Choisissez une offre puis ajoutez un espace fontaine à eau si besoin",
-        duration: 7000,
-      });
-    }
+  const updateFontaineEspace = (newNbPersonnes: number) => {
     //Si je n'avais pas de fournisseur, je change juste le nombre de personnes
     if (!fontaines.infos.fournisseurId) {
       setFontaines((prev) => ({
@@ -503,6 +477,45 @@ const FontaineEspaceForm = ({
     }
   };
 
+  const handleChangeNbPersonnes = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    let newNbPersonnes = value ? parseInt(value) : 0;
+    if (newNbPersonnes >= MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE) {
+      newNbPersonnes = MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE;
+      toast({
+        title: "Limite atteinte",
+        variant: "destructive",
+        description:
+          "Le nombre de personnes par espace fontaine à eau est limité à 110. Choisissez une offre puis ajoutez un espace fontaine à eau si besoin",
+        duration: 7000,
+      });
+    }
+    updateFontaineEspace(newNbPersonnes);
+  };
+
+  const handleIncrement = () => {
+    let newNbPersonnes = nbPersonnes + 1;
+    if (newNbPersonnes >= MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE) {
+      newNbPersonnes = MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE;
+      toast({
+        title: "Limite atteinte",
+        variant: "destructive",
+        description:
+          "Le nombre de personnes par espace fontaine à eau est limité à 110. Choisissez une offre puis ajoutez un espace fontaine à eau si besoin",
+        duration: 7000,
+      });
+    }
+    updateFontaineEspace(newNbPersonnes);
+  };
+
+  const handleDecrement = () => {
+    let newNbPersonnes = nbPersonnes - 1;
+    if (newNbPersonnes <= 0) {
+      newNbPersonnes = 0;
+    }
+    updateFontaineEspace(newNbPersonnes);
+  };
+
   const handleSelectDureeLocation = (value: string) => {
     //Si j'ai pas de fournisseur encore, je change juste la duree de Location
     if (!fontaines.infos.fournisseurId) {
@@ -669,117 +682,28 @@ const FontaineEspaceForm = ({
     }
   };
 
-  return (
-    <TooltipProvider delayDuration={0}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <form className="w-2/3">
-            <div className="flex gap-8 items-center mb-4">
-              <div className="flex gap-4 items-center">
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    checked={espace.infos.typeEau.includes("Eau froide")}
-                    onCheckedChange={(checked: boolean) =>
-                      handleCheck(checked, "Eau froide")
-                    }
-                    disabled={true}
-                    className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-                    id="eau froide"
-                    aria-label="Sélectionner eau froide"
-                  />
-                  <Label htmlFor="eau froide" className="text-sm">
-                    Eau froide
-                  </Label>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    checked={espace.infos.typeEau.includes("Eau gazeuse")}
-                    onCheckedChange={(checked: boolean) =>
-                      handleCheck(checked, "Eau gazeuse")
-                    }
-                    className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-                    id="eau gazeuse"
-                    aria-label="Sélectionner eau gazeuse"
-                  />
-                  <Label htmlFor="eau gazeuse" className="text-sm">
-                    Eau gazeuse
-                  </Label>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    checked={espace.infos.typeEau.includes("Eau chaude")}
-                    onCheckedChange={(checked: boolean) =>
-                      handleCheck(checked, "Eau chaude")
-                    }
-                    className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-                    id="boissons"
-                    aria-label="Sélectionner eau chaude"
-                  />
-                  <Label htmlFor="Eau chaude" className="text-sm">
-                    Eau chaude
-                  </Label>
-                </div>
-              </div>
-              <div className="flex gap-2 items-center">
-                <Input
-                  className={`w-full max-w-xs min-w-20 ${
-                    nbPersonnes === client.effectif
-                      ? "text-fm4alldestructive"
-                      : ""
-                  }`}
-                  type="number"
-                  min={1}
-                  max={MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE}
-                  step={1}
-                  value={nbPersonnes}
-                  onChange={handleChangeNbPersonnes}
-                  id={`nbPersonnes_${espace.infos.espaceId}`}
-                />
-                <Label
-                  htmlFor={`nbPersonnes_${espace.infos.espaceId}`}
-                  className="text-base"
-                >
-                  personnes
-                </Label>
-              </div>
-              {espace.infos.espaceId === fontainesEspacesIds[0] && (
-                <Select
-                  value={fontaines.infos.dureeLocation}
-                  onValueChange={handleSelectDureeLocation}
-                  aria-label="Sélectionnez la durée de location"
-                >
-                  <SelectTrigger className={" max-w-xs w-1/4"}>
-                    <SelectValue placeholder="Choisir" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {locationFontaine.map((item) => (
-                      <SelectItem
-                        key={`${location}_${item.id}`}
-                        value={item.id}
-                      >
-                        {item.description}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </div>
-          </form>
-        </TooltipTrigger>
-        <TooltipContent className="max-w-60">
-          <div>
-            <p>Pour votre espace fontaine à eau veuillez sélectionner :</p>
-            <ul className="ml-10">
-              <li className="list-disc">Le type d&apos;eau</li>
-              <li className="list-disc">Le nombre de personnes (max 110)</li>
-              {fontainesEspacesIds[0] === espace.infos.espaceId && (
-                <li className="list-disc">La durée de location</li>
-              )}
-            </ul>
-          </div>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+
+  return isTabletOrMobile ? (
+    <FontaineMobileEspaceInputs
+      espace={espace}
+      nbPersonnes={nbPersonnes}
+      handleChangeNbPersonnes={handleChangeNbPersonnes}
+      handleSelectDureeLocation={handleSelectDureeLocation}
+      fontainesEspacesIds={fontainesEspacesIds}
+      handleCheck={handleCheck}
+      handleIncrement={handleIncrement}
+      handleDecrement={handleDecrement}
+    />
+  ) : (
+    <FontaineDesktopEspaceInputs
+      espace={espace}
+      nbPersonnes={nbPersonnes}
+      handleChangeNbPersonnes={handleChangeNbPersonnes}
+      handleSelectDureeLocation={handleSelectDureeLocation}
+      fontainesEspacesIds={fontainesEspacesIds}
+      handleCheck={handleCheck}
+    />
   );
 };
 

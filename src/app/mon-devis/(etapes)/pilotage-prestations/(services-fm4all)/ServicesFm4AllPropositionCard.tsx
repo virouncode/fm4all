@@ -1,8 +1,17 @@
-import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { GammeType } from "@/zod-schemas/gamme";
+import { Info } from "lucide-react";
+import Image from "next/image";
 import { useContext } from "react";
 
 type ServicesFm4AllPropositionCardProps = {
@@ -59,14 +68,148 @@ const ServicesFm4AllPropositionCard = ({
   const { servicesFm4All } = useContext(ServicesFm4AllContext);
   const gamme = proposition.gamme;
   const color = getFm4AllColor(gamme);
-  const totalMensuelSansRemiseText = `${formatNumber(
-    proposition.totalAnnuelSansRemise / 12
-  )} € / mois`;
-  const totalMensuelText = `${formatNumber(
-    Math.round(proposition.totalAnnuel / 12)
-  )} € / mois${proposition.remiseCa ? "\u00B9" : ""}${
-    proposition.remiseHof ? "\u00B2" : ""
-  }`;
+  const totalMensuelSansRemiseText =
+    proposition.totalAnnuelSansRemise !== proposition.totalAnnuel ? (
+      <p className="font-bold text-xl ml-4 line-through">
+        {formatNumber(Math.round(proposition.totalAnnuelSansRemise / 12))}{" "}
+        €/mois
+      </p>
+    ) : null;
+  const totalMensuelText = (
+    <p className="font-bold text-xl ml-4">
+      {formatNumber(Math.round(proposition.totalAnnuel / 12))} €/mois
+      {proposition.remiseCa ? "\u00B9" : ""}
+      {proposition.remiseHof ? "\u00B2" : ""}
+    </p>
+  );
+
+  const dialogTitle = (
+    <p className={`text-${color} text-center`}>
+      {proposition.gamme === "essentiel"
+        ? "Essentiel"
+        : proposition.gamme === "confort"
+        ? "Confort"
+        : "Excellence"}
+    </p>
+  );
+
+  const imgProduit = (
+    <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-100">
+      <Image
+        src={"/img/services/fm4all.webp"}
+        alt={`illustration de pilotes fm4all`}
+        fill
+        quality={100}
+        className="object-contain"
+      />
+    </div>
+  );
+
+  const infosProduit =
+    gamme === "essentiel" ? (
+      <ul className="flex flex-col text-xs px-4 mx-auto">
+        <li className="list-check">Accès Services</li>
+        <li className="list-check">Frais bancaires & Assurance</li>
+        <li className="list-check">Garanties contractuelles</li>
+        <li className="list-check">Facturation centralisée</li>
+        <li className="list-check">
+          Service Support en ligne en ligne (24/48h)
+        </li>
+      </ul>
+    ) : gamme === "confort" ? (
+      <ul className="flex flex-col text-xs px-4 mx-auto">
+        <li className="list-check">Accès Services</li>
+        <li className="list-check">Frais bancaires & Assurance</li>
+        <li className="list-check">Garanties contractuelles</li>
+        <li className="list-check">Facturation centralisée</li>
+        <li className="list-check">
+          Service Support en ligne en ligne (24/48h)
+        </li>
+        <li className="list-check">
+          Service support opérationnel téléphonique
+        </li>
+        <li className="list-check">
+          Suivi de la réalisation des interventions
+        </li>
+        <li className="list-check">Reporting personnalisé</li>
+      </ul>
+    ) : (
+      <ul className="flex flex-col text-xs px-4 mx-auto">
+        <li className="list-check">Accès Services</li>
+        <li className="list-check">Frais bancaires & Assurance</li>
+        <li className="list-check">Garanties contractuelles</li>
+        <li className="list-check">Facturation centralisée</li>
+        <li className="list-check">
+          Service Support en ligne en ligne (24/48h)
+        </li>
+        <li className="list-check">
+          Service support opérationnel téléphonique
+        </li>
+        <li className="list-check">
+          Suivi de la réalisation des interventions
+        </li>
+        <li className="list-check">Reporting personnalisé</li>
+        <li className="list-check">Account Manager dédié</li>
+        <li className="list-check">Conseils achats / audit</li>
+        <li className="list-check">
+          Lien avec le propriétaire / Property Manager
+        </li>
+        <li className="list-check">Audit opérationnel</li>
+      </ul>
+    );
+
+  const infosProduitDialog =
+    gamme === "essentiel" ? (
+      <ul className="flex flex-col text-sm px-4 mx-auto">
+        <li className="list-check">Accès Services</li>
+        <li className="list-check">Frais bancaires & Assurance</li>
+        <li className="list-check">Garanties contractuelles</li>
+        <li className="list-check">Facturation centralisée</li>
+        <li className="list-check">
+          Service Support en ligne en ligne (24/48h)
+        </li>
+      </ul>
+    ) : gamme === "confort" ? (
+      <ul className="flex flex-col text-sm px-4 mx-auto">
+        <li className="list-check">Accès Services</li>
+        <li className="list-check">Frais bancaires & Assurance</li>
+        <li className="list-check">Garanties contractuelles</li>
+        <li className="list-check">Facturation centralisée</li>
+        <li className="list-check">
+          Service Support en ligne en ligne (24/48h)
+        </li>
+        <li className="list-check">
+          Service support opérationnel téléphonique
+        </li>
+        <li className="list-check">
+          Suivi de la réalisation des interventions
+        </li>
+        <li className="list-check">Reporting personnalisé</li>
+      </ul>
+    ) : (
+      <ul className="flex flex-col text-sm px-4 mx-auto">
+        <li className="list-check">Accès Services</li>
+        <li className="list-check">Frais bancaires & Assurance</li>
+        <li className="list-check">Garanties contractuelles</li>
+        <li className="list-check">Facturation centralisée</li>
+        <li className="list-check">
+          Service Support en ligne en ligne (24/48h)
+        </li>
+        <li className="list-check">
+          Service support opérationnel téléphonique
+        </li>
+        <li className="list-check">
+          Suivi de la réalisation des interventions
+        </li>
+        <li className="list-check">Reporting personnalisé</li>
+        <li className="list-check">Account Manager dédié</li>
+        <li className="list-check">Conseils achats / audit</li>
+        <li className="list-check">
+          Lien avec le propriétaire / Property Manager
+        </li>
+        <li className="list-check">Audit opérationnel</li>
+      </ul>
+    );
 
   return (
     <div
@@ -75,74 +218,41 @@ const ServicesFm4AllPropositionCard = ({
           ? "ring-4 ring-inset ring-fm4alldestructive"
           : ""
       } ${!total ? "opacity-50 pointer-events-none" : ""}`}
-      key={proposition.id}
       onClick={() => handleClickProposition(proposition)}
     >
-      <Checkbox
+      <Switch
         checked={servicesFm4All.infos.gammeSelected === gamme}
         onCheckedChange={() => handleClickProposition(proposition)}
-        className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-        disabled={!total}
-        aria-label="Sélectionner cette proposition"
+        className="data-[state=checked]:bg-fm4alldestructive"
+        title="Sélectionner cette proposition"
       />
       <div>
-        {proposition.totalAnnuelSansRemise !== proposition.totalAnnuel && (
-          <p className="font-bold line-through">{totalMensuelSansRemiseText}</p>
-        )}
-        <p className="font-bold">{totalMensuelText}</p>
-        {gamme === "essentiel" && (
-          <ul className="ml-6">
-            <li className="text-xs list-disc">Accès Services</li>
-            <li className="text-xs list-disc">Frais bancaires & Assurance</li>
-            <li className="text-xs list-disc">Garanties contractuelles</li>
-            <li className="text-xs list-disc">Facturation centralisée</li>
-            <li className="text-xs list-disc">
-              Service Support en ligne en ligne (24/48h)
-            </li>
-          </ul>
-        )}
-        {gamme === "confort" && (
-          <ul className="ml-6">
-            <li className="text-xs list-disc">Accès Services</li>
-            <li className="text-xs list-disc">Frais bancaires & Assurance</li>
-            <li className="text-xs list-disc">Garanties contractuelles</li>
-            <li className="text-xs list-disc">Facturation centralisée</li>
-            <li className="text-xs list-disc">
-              Service Support en ligne en ligne (24/48h)
-            </li>
-            <li className="text-xs list-disc">
-              Service support opérationnel téléphonique
-            </li>
-            <li className="text-xs list-disc">
-              Suivi de la réalisation des interventions
-            </li>
-            <li className="text-xs list-disc">Reporting personnalisé</li>
-          </ul>
-        )}
-        {gamme === "excellence" && (
-          <ul className="ml-6">
-            <li className="text-xs list-disc">Accès Services</li>
-            <li className="text-xs list-disc">Frais bancaires & Assurance</li>
-            <li className="text-xs list-disc">Garanties contractuelles</li>
-            <li className="text-xs list-disc">Facturation centralisée</li>
-            <li className="text-xs list-disc">
-              Service Support en ligne en ligne (24/48h)
-            </li>
-            <li className="text-xs list-disc">
-              Service support opérationnel téléphonique
-            </li>
-            <li className="text-xs list-disc">
-              Suivi de la réalisation des interventions
-            </li>
-            <li className="text-xs list-disc">Reporting personnalisé</li>
-            <li className="text-xs list-disc">Account Manager dédié</li>
-            <li className="text-xs list-disc">Conseils achats / audit</li>
-            <li className="text-xs list-disc">
-              Lien avec le propriétaire / Property Manager
-            </li>
-            <li className="text-xs list-disc">Audit opérationnel</li>
-          </ul>
-        )}
+        <div className="flex gap-2 items-center">
+          <div className="flex flex-col gap-2">
+            {totalMensuelSansRemiseText}
+            {totalMensuelText}
+          </div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Info
+                size={16}
+                className="cursor-pointer"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>{dialogTitle}</DialogTitle>
+              </DialogHeader>
+              {imgProduit}
+              <p className="text-xs italic text-end">
+                *photo non contractuelle
+              </p>
+              {infosProduitDialog}
+            </DialogContent>
+          </Dialog>
+        </div>
+        {infosProduit}
       </div>
     </div>
   );

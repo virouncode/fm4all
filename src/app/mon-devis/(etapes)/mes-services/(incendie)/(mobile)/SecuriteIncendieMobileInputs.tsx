@@ -2,8 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { IncendieContext } from "@/context/IncendieProvider";
-import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
-import { SelectIncendieTarifsType } from "@/zod-schemas/incendieTarifs";
 import { Minus, Plus } from "lucide-react";
 import Image from "next/image";
 import React, { useContext } from "react";
@@ -27,7 +25,8 @@ type SecuriteIncendieMobileInputsProps = {
     surface: number;
     createdAt: Date;
   };
-  incendieTarifs: SelectIncendieTarifsType[];
+  handleIncrement: (type: "extincteur" | "baes" | "telBaes") => void;
+  handleDecrement: (type: "extincteur" | "baes" | "telBaes") => void;
 };
 
 const SecuriteIncendieMobileInputs = ({
@@ -36,199 +35,10 @@ const SecuriteIncendieMobileInputs = ({
   nbTelBaes,
   handleChangeNbr,
   incendieQuantite,
-  incendieTarifs,
+  handleIncrement,
+  handleDecrement,
 }: SecuriteIncendieMobileInputsProps) => {
-  const { incendie, setIncendie } = useContext(IncendieContext);
-  const { setTotalIncendie } = useContext(TotalIncendieContext);
-
-  const handleIncrement = (type: "extincteur" | "baes" | "telBaes") => {
-    switch (type) {
-      case "extincteur":
-        let newNbExtincteurs = nbExtincteurs + 1;
-        if (newNbExtincteurs > MAX_NB_EXTINCTEURS)
-          newNbExtincteurs = MAX_NB_EXTINCTEURS;
-
-        setIncendie((prev) => ({
-          ...prev,
-          quantites: { ...prev.quantites, nbExtincteurs: newNbExtincteurs },
-        }));
-        if (incendie.infos.fournisseurId) {
-          const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
-          );
-          const prixParExtincteur =
-            tarifsFournisseur?.prixParExtincteur ?? null;
-          const prixParBaes = tarifsFournisseur?.prixParBaes ?? null;
-          const prixParTelBaes = tarifsFournisseur?.prixParTelBaes ?? null;
-          const totalTrilogie =
-            prixParExtincteur !== null &&
-            prixParBaes !== null &&
-            prixParTelBaes !== null
-              ? newNbExtincteurs * prixParExtincteur +
-                nbBaes * prixParBaes +
-                nbTelBaes * prixParTelBaes
-              : null;
-
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalTrilogie,
-          }));
-        }
-        return;
-      case "baes":
-        let newNbBaes = nbBaes + 1;
-        if (newNbBaes > MAX_NB_BAES) newNbBaes = MAX_NB_BAES;
-        setIncendie((prev) => ({
-          ...prev,
-          quantites: { ...prev.quantites, nbBaes: newNbBaes },
-        }));
-        if (incendie.infos.fournisseurId) {
-          const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
-          );
-          const prixParExtincteur =
-            tarifsFournisseur?.prixParExtincteur ?? null;
-          const prixParBaes = tarifsFournisseur?.prixParBaes ?? null;
-          const prixParTelBaes = tarifsFournisseur?.prixParTelBaes ?? null;
-          const totalTrilogie =
-            prixParExtincteur !== null &&
-            prixParBaes !== null &&
-            prixParTelBaes !== null
-              ? nbExtincteurs * prixParExtincteur +
-                newNbBaes * prixParBaes +
-                nbTelBaes * prixParTelBaes
-              : null;
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalTrilogie,
-          }));
-        }
-        return;
-      case "telBaes":
-        let newNbTelBaes = nbTelBaes + 1;
-        if (newNbTelBaes > MAX_NB_TEL_BAES) newNbTelBaes = MAX_NB_TEL_BAES;
-        setIncendie((prev) => ({
-          ...prev,
-          quantites: { ...prev.quantites, nbTelBaes: newNbTelBaes },
-        }));
-        if (incendie.infos.fournisseurId) {
-          const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
-          );
-          const prixParExtincteur =
-            tarifsFournisseur?.prixParExtincteur ?? null;
-          const prixParBaes = tarifsFournisseur?.prixParBaes ?? null;
-          const prixParTelBaes = tarifsFournisseur?.prixParTelBaes ?? null;
-          const totalTrilogie =
-            prixParExtincteur !== null &&
-            prixParBaes !== null &&
-            prixParTelBaes !== null
-              ? nbExtincteurs * prixParExtincteur +
-                nbBaes * prixParBaes +
-                newNbTelBaes * prixParTelBaes
-              : null;
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalTrilogie,
-          }));
-        }
-        return;
-    }
-  };
-
-  const handleDecrement = (type: "extincteur" | "baes" | "telBaes") => {
-    switch (type) {
-      case "extincteur":
-        let newNbExtincteurs = nbExtincteurs - 1;
-        if (newNbExtincteurs < 0) newNbExtincteurs = 0;
-
-        setIncendie((prev) => ({
-          ...prev,
-          quantites: { ...prev.quantites, nbExtincteurs: newNbExtincteurs },
-        }));
-        if (incendie.infos.fournisseurId) {
-          const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
-          );
-          const prixParExtincteur =
-            tarifsFournisseur?.prixParExtincteur ?? null;
-          const prixParBaes = tarifsFournisseur?.prixParBaes ?? null;
-          const prixParTelBaes = tarifsFournisseur?.prixParTelBaes ?? null;
-          const totalTrilogie =
-            prixParExtincteur !== null &&
-            prixParBaes !== null &&
-            prixParTelBaes !== null
-              ? newNbExtincteurs * prixParExtincteur +
-                nbBaes * prixParBaes +
-                nbTelBaes * prixParTelBaes
-              : null;
-
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalTrilogie,
-          }));
-        }
-        return;
-      case "baes":
-        let newNbBaes = nbBaes - 1;
-        if (newNbBaes < 0) newNbBaes = 0;
-        setIncendie((prev) => ({
-          ...prev,
-          quantites: { ...prev.quantites, nbBaes: newNbBaes },
-        }));
-        if (incendie.infos.fournisseurId) {
-          const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
-          );
-          const prixParExtincteur =
-            tarifsFournisseur?.prixParExtincteur ?? null;
-          const prixParBaes = tarifsFournisseur?.prixParBaes ?? null;
-          const prixParTelBaes = tarifsFournisseur?.prixParTelBaes ?? null;
-          const totalTrilogie =
-            prixParExtincteur !== null &&
-            prixParBaes !== null &&
-            prixParTelBaes !== null
-              ? nbExtincteurs * prixParExtincteur +
-                newNbBaes * prixParBaes +
-                nbTelBaes * prixParTelBaes
-              : null;
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalTrilogie,
-          }));
-        }
-        return;
-      case "telBaes":
-        let newNbTelBaes = nbTelBaes - 1;
-        if (newNbTelBaes < 0) newNbTelBaes = 0;
-        setIncendie((prev) => ({
-          ...prev,
-          quantites: { ...prev.quantites, nbTelBaes: newNbTelBaes },
-        }));
-        if (incendie.infos.fournisseurId) {
-          const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
-          );
-          const prixParExtincteur =
-            tarifsFournisseur?.prixParExtincteur ?? null;
-          const prixParBaes = tarifsFournisseur?.prixParBaes ?? null;
-          const prixParTelBaes = tarifsFournisseur?.prixParTelBaes ?? null;
-          const totalTrilogie =
-            prixParExtincteur !== null &&
-            prixParBaes !== null &&
-            prixParTelBaes !== null
-              ? nbExtincteurs * prixParExtincteur +
-                nbBaes * prixParBaes +
-                newNbTelBaes * prixParTelBaes
-              : null;
-          setTotalIncendie((prev) => ({
-            ...prev,
-            totalTrilogie,
-          }));
-        }
-        return;
-    }
-  };
+  const { incendie } = useContext(IncendieContext);
 
   return (
     <div className="flex flex-col gap-8">
@@ -240,7 +50,7 @@ const SecuriteIncendieMobileInputs = ({
           Indiquez votre nombre d&apos;<strong>extincteurs</strong> :
         </p>
         <div className="flex flex-col w-full p-1 gap-2">
-          <Label htmlFor="nbDistribBalai" className="text-sm">
+          <Label htmlFor="nbExtincteurs" className="text-sm">
             Nombre d&apos;extincteurs
           </Label>
           <div className="flex items-center gap-2">
@@ -373,7 +183,7 @@ const SecuriteIncendieMobileInputs = ({
               variant="outline"
               title="Diminuer le nombre de télécommandes BAES"
               onClick={() => handleDecrement("telBaes")}
-              disabled={nbBaes === 0}
+              disabled={nbTelBaes === 0}
             >
               <Minus />
             </Button>
@@ -381,7 +191,7 @@ const SecuriteIncendieMobileInputs = ({
               variant="outline"
               title="Augmenter le nombre de télécommandes BAES"
               onClick={() => handleIncrement("telBaes")}
-              disabled={nbBaes === MAX_NB_TEL_BAES}
+              disabled={nbTelBaes === MAX_NB_TEL_BAES}
             >
               <Plus />
             </Button>

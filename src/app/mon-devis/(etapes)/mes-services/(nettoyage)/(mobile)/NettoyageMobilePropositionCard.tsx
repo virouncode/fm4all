@@ -80,6 +80,7 @@ const NettoyageMobilePropositionCard = ({
     nbAvis,
   } = proposition;
   const color = getFm4AllColor(gamme);
+
   const totalMensuelText = totalAnnuel ? (
     <p className="text-sm font-bold">
       {formatNumber(Math.round((totalAnnuel * MARGE) / 12))} €/mois
@@ -99,7 +100,7 @@ const NettoyageMobilePropositionCard = ({
     freqAnnuelle && hParPassage ? (
       <li className="list-check">
         {formatNumber(freqAnnuelle / S_OUVREES_PAR_AN)} passage(s) de
-        {hParPassage}h / semaine
+        {hParPassage} h / semaine
       </li>
     ) : null;
   const infosEssentiel = "Entretien fonctionnel et optimisé";

@@ -116,7 +116,7 @@ const SecuriteIncendieMobileCard = ({
         src={"/img/services/incendie.webp"}
         alt={`illustration de sécurité incendie`}
         fill={true}
-        className="object-contain cursor-pointer"
+        className="object-contain"
         quality={100}
       />
     </div>

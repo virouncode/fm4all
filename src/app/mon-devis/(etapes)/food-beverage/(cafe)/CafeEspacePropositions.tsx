@@ -976,14 +976,6 @@ const CafeEspacePropositions = ({
     }));
   };
   const handleClickNext = () => {
-    if (!cafe.infos.fournisseurId) {
-      //pour skiper le the si pas de cafe
-      setFoodBeverage((prev) => ({
-        ...prev,
-        currentFoodBeverageId: prev.currentFoodBeverageId + 2,
-      }));
-      return;
-    }
     setFoodBeverage((prev) => ({
       ...prev,
       currentFoodBeverageId: prev.currentFoodBeverageId + 1,
@@ -1020,9 +1012,6 @@ const CafeEspacePropositions = ({
       handleClickFirstEspaceProposition={handleClickFirstEspaceProposition}
       handleClickProposition={handleClickProposition}
       handleAddEspace={handleAddEspace}
-      handleClickNext={handleClickNext}
-      handleClickNextEspace={handleClickNextEspace}
-      handleAlert={handleAlert}
       cafeEspacesIds={cafeEspacesIds}
       espace={espace}
     />

@@ -3,6 +3,7 @@ import { ClientContext } from "@/context/ClientProvider";
 import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { Euro, Feather, Handshake, Rabbit, Waves } from "lucide-react";
 import { useContext } from "react";
+import { useMediaQuery } from "react-responsive";
 import NextServiceButton from "../../NextServiceButton";
 
 const PersonnaliserPresentation = () => {
@@ -18,6 +19,9 @@ const PersonnaliserPresentation = () => {
       currentPersonnalisationId: prev.personnalisationIds[currentIndex + 1],
     }));
   };
+
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+
   return (
     <div
       className="flex flex-col gap-6 w-full mx-auto h-full py-2 overflow-auto"
@@ -65,10 +69,11 @@ const PersonnaliserPresentation = () => {
           />
         </div>
       </div>
-
-      <div>
-        <NextServiceButton handleClickNext={handleClickNext} />
-      </div>
+      {!isTabletOrMobile ? (
+        <div>
+          <NextServiceButton handleClickNext={handleClickNext} />
+        </div>
+      ) : null}
     </div>
   );
 };

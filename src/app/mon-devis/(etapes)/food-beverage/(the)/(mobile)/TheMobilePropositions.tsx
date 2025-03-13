@@ -1,4 +1,3 @@
-import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { ChangeEvent } from "react";
 import TheMobileInputs from "./TheMobileInputs";
 import TheMobilePropositionsCarousel from "./TheMobilePropositionsCarousel";
@@ -6,7 +5,6 @@ import TheMobilePropositionsCarousel from "./TheMobilePropositionsCarousel";
 type TheMobilePropositionsProps = {
   nbPersonnes: number;
   nbTassesParJour: number;
-  effectif: number;
   handleChangeNbPersonnes: (e: ChangeEvent<HTMLInputElement>) => void;
   propositions: {
     totalAnnuel: number | null;
@@ -48,17 +46,18 @@ type TheMobilePropositionsProps = {
     prixUnitaire: number | null;
     effectifFournisseur: string | null;
   }) => void;
-  theConsoTarifs: SelectTheConsoTarifsType[];
+  handleIncrement: () => void;
+  handleDecrement: () => void;
 };
 
 const TheMobilePropositions = ({
   nbPersonnes,
   nbTassesParJour,
-  effectif,
   handleChangeNbPersonnes,
-  theConsoTarifs,
   propositions,
   handleClickProposition,
+  handleIncrement,
+  handleDecrement,
 }: TheMobilePropositionsProps) => {
   return (
     <div className="flex flex-col gap-6 w-full">
@@ -66,7 +65,8 @@ const TheMobilePropositions = ({
       <TheMobileInputs
         nbPersonnes={nbPersonnes}
         handleChangeNbPersonnes={handleChangeNbPersonnes}
-        theConsoTarifs={theConsoTarifs}
+        handleIncrement={handleIncrement}
+        handleDecrement={handleDecrement}
       />
       <TheMobilePropositionsCarousel
         propositions={propositions}

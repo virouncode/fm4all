@@ -523,7 +523,7 @@ export const foodLivraisonTarifs = pgTable("food_livraison_tarifs", {
   prixUnitaire: integer("prix_unitaire").notNull(),
   prixUnitaireSiCafe: integer("prix_unitaire_si_cafe").notNull(),
   seuilFranco: integer("seuil_franco"),
-  remise_si_cafe: integer("remise_si_cafe"),
+  remiseSiCafe: integer("remise_si_cafe"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

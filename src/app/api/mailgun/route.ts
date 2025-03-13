@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
 
     const emailOptions: EmailType = {
       from: `fm4all: Le Facility Management pour tous <${data.from}>`,
-      to: [data.to],
+      to: [data.to, "viroun@fm4all.com"],
       subject: data.subject,
       template: "general",
       "h:X-Mailgun-Variables": JSON.stringify({

@@ -21,6 +21,7 @@ import {
   getSnacksTarifs,
 } from "@/lib/queries/snacks-fruits/getSnacksFruits";
 import Link from "next/link";
+import NextEtapePilotageButton from "../../NextEtapePilotageButton";
 import Cafe from "./(cafe)/Cafe";
 import Fontaines from "./(fontaine)/Fontaines";
 import SnacksFruits from "./(snacks)/SnacksFruits";
@@ -119,6 +120,7 @@ const FoodBeverage = async () => {
         fontainesModeles={fontainesModeles}
         fontainesTarifs={fontainesTarifs}
       />
+      <NextEtapePilotageButton />
     </section>
   );
 };

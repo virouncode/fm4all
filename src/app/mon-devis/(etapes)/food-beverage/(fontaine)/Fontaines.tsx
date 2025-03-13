@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@/components/ui/button";
+import PropositionsTitleMobile from "@/app/mon-devis/PropositionsTitleMobile";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import {
@@ -13,10 +13,11 @@ import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
 import { Droplets } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useContext } from "react";
-import PropositionsFooter from "../../../PropositionsFooter";
+import { useContext, useRef } from "react";
+import { useMediaQuery } from "react-responsive";
 import PropositionsTitle from "../../../PropositionsTitle";
-import FontaineEspace from "./FontaineEspace";
+import FontainesDesktopEspaces from "./(desktop)/FontainesDesktopEspaces";
+import FontainesMobileEspaces from "./(mobile)/FontainesMobileEspaces";
 
 type FontainesProps = {
   fontainesModeles: SelectFontainesModelesType[];
@@ -25,12 +26,14 @@ type FontainesProps = {
 
 const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
   const { client } = useContext(ClientContext);
-  const { fontaines, setFontaines } = useContext(FontainesContext);
+  const { setFontaines } = useContext(FontainesContext);
   const { setTotalFontaines } = useContext(TotalFontainesContext);
   const { setFoodBeverage } = useContext(FoodBeverageContext);
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const effectif = client.effectif ?? 0;
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
   const router = useRouter();
+
   useScrollIntoFontainesEspace();
 
   const handleClickNext = () => {
@@ -88,40 +91,46 @@ const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
     });
   };
 
+  const propositionsRef = useRef<HTMLDivElement>(null);
+
   return (
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="4">
-      <PropositionsTitle
-        icon={Droplets}
-        title="Fontaines à eau"
-        description="Eau fraîche ou pétillante, de l'eau pure filtrée pour tous. Adaptés à votre besoin, nos fontaines réseau sont à poser, sur pied ou sous comptoir"
-        handleClickPrevious={handleClickPrevious}
-      />
-      <div className="w-full flex-1 overflow-hidden">
-        {fontaines.nbEspaces && fontaines.nbEspaces > 0 ? (
-          fontaines.espaces.map((espace) => (
-            <FontaineEspace
-              key={espace.infos.espaceId}
-              espace={espace}
-              fontainesModeles={fontainesModeles}
-              fontainesTarifs={fontainesTarifs}
-            />
-          ))
+      {isTabletOrMobile ? (
+        <PropositionsTitleMobile
+          icon={Droplets}
+          title="Fontaines à eau"
+          description="Eau fraîche ou pétillante, de l'eau pure filtrée pour tous. Adaptées à votre besoin, nos fontaines réseau sont à poser, sur pied ou sous comptoir. La gamme détermine le type de pose"
+          propositionsRef={propositionsRef}
+        />
+      ) : (
+        <PropositionsTitle
+          icon={Droplets}
+          title="Fontaines à eau"
+          description="Eau fraîche ou pétillante, de l'eau pure filtrée pour tous. Adaptées à votre besoin, nos fontaines réseau sont à poser, sur pied ou sous comptoir. La gamme détermine le type de pose"
+          handleClickPrevious={handleClickPrevious}
+        />
+      )}
+      <div
+        className="w-full flex-1 overflow-hidden transition"
+        ref={propositionsRef}
+      >
+        {isTabletOrMobile ? (
+          <FontainesMobileEspaces
+            fontainesModeles={fontainesModeles}
+            fontainesTarifs={fontainesTarifs}
+            handleAddEspace={handleAddEspace}
+          />
         ) : (
-          <div className="flex justify-center">
-            <Button
-              variant="outline"
-              size="lg"
-              className="text-base"
-              onClick={handleAddEspace}
-            >
-              Ajouter un espace fontaine
-            </Button>
-          </div>
+          <FontainesDesktopEspaces
+            fontainesModeles={fontainesModeles}
+            fontainesTarifs={fontainesTarifs}
+            handleAddEspace={handleAddEspace}
+          />
         )}
       </div>
-      {!fontaines.nbEspaces ? (
+      {/* {isTabletOrMobile ? (
         <PropositionsFooter handleClickNext={handleClickNext} />
-      ) : null}
+      ) : null} */}
     </div>
   );
 };

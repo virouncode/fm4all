@@ -22,6 +22,7 @@ import {
   getVitrerieTarifs,
 } from "@/lib/queries/nettoyage/getNettoyage";
 import Link from "next/link";
+import NextEtapeFoodButton from "../../NextEtapeFoodButton";
 import Hygiene from "./(hygiene)/Hygiene";
 import HygieneOptions from "./(hygiene)/HygieneOptions";
 import SecuriteIncendie from "./(incendie)/SecuriteIncendie";
@@ -156,6 +157,7 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
         incendieQuantite={incendieQuantite}
         incendieTarifs={incendieTarifs}
       />
+      <NextEtapeFoodButton />
     </section>
   );
 };

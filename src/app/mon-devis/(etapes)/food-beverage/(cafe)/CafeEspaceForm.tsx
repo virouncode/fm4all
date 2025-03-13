@@ -353,19 +353,7 @@ const CafeEspaceForm = ({
     }
   };
 
-  const handleChangeNbPersonnes = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    let newNbPersonnes = value ? parseInt(value) : 0;
-    if (newNbPersonnes >= MAX_NB_PERSONNES_PAR_ESPACE) {
-      newNbPersonnes = MAX_NB_PERSONNES_PAR_ESPACE;
-      toast({
-        title: "Limite atteinte",
-        description:
-          "Le nombre de personnes par espace café est limité à 150. Choisissez une offre puis ajoutez un espace café si besoin",
-        duration: 7000,
-      });
-    }
-    const newNbTassesParAn = newNbPersonnes * 400;
+  const updateCafeEspace = (newNbPersonnes: number) => {
     // const newNbPersonnesTotal = cafe.espaces.reduce(
     //   (acc, curr) =>
     //     acc + curr.infos.espaceId === espace.infos.espaceId
@@ -376,6 +364,7 @@ const CafeEspaceForm = ({
     //           : effectif),
     //   0
     // );
+    const newNbTassesParAn = newNbPersonnes * 400;
     //Si je n'avais pas de fournisseur, je change juste le nombre de personnes
     if (!cafe.infos.fournisseurId) {
       setCafe((prev) => ({
@@ -660,6 +649,42 @@ const CafeEspaceForm = ({
     }
   };
 
+  const handleChangeNbPersonnes = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    let newNbPersonnes = value ? parseInt(value) : 0;
+    if (newNbPersonnes >= MAX_NB_PERSONNES_PAR_ESPACE) {
+      newNbPersonnes = MAX_NB_PERSONNES_PAR_ESPACE;
+      toast({
+        title: "Limite atteinte",
+        description:
+          "Le nombre de personnes par espace café est limité à 150. Choisissez une offre puis ajoutez un espace café si besoin",
+        duration: 7000,
+      });
+    }
+    updateCafeEspace(newNbPersonnes);
+  };
+
+  const handleIncrement = () => {
+    let newNbPersonnes = nbPersonnes + 1;
+    if (newNbPersonnes >= MAX_NB_PERSONNES_PAR_ESPACE) {
+      newNbPersonnes = MAX_NB_PERSONNES_PAR_ESPACE;
+      toast({
+        title: "Limite atteinte",
+        description:
+          "Le nombre de personnes par espace café est limité à 150. Choisissez une offre puis ajoutez un espace café si besoin",
+        duration: 7000,
+      });
+    }
+    updateCafeEspace(newNbPersonnes);
+  };
+  const handleDecrement = () => {
+    let newNbPersonnes = nbPersonnes - 1;
+    if (newNbPersonnes < 0) {
+      newNbPersonnes = 0;
+    }
+    updateCafeEspace(newNbPersonnes);
+  };
+
   const handleSelectDureeLocation = (value: string) => {
     //Si j'ai pas de fournisseur encore, je change juste la duree de Location
     if (!cafe.infos.fournisseurId) {
@@ -897,13 +922,9 @@ const CafeEspaceForm = ({
       nbPersonnes={nbPersonnes}
       handleChangeNbPersonnes={handleChangeNbPersonnes}
       handleSelectDureeLocation={handleSelectDureeLocation}
+      handleIncrement={handleIncrement}
+      handleDecrement={handleDecrement}
       cafeEspacesIds={cafeEspacesIds}
-      cafeMachinesTarifs={cafeMachinesTarifs}
-      cafeConsoTarifs={cafeConsoTarifs}
-      laitConsoTarifs={laitConsoTarifs}
-      chocolatConsoTarifs={chocolatConsoTarifs}
-      sucreConsoTarifs={sucreConsoTarifs}
-      cafeMachines={cafeMachines}
     />
   ) : (
     <CafeDesktopEspaceInputs

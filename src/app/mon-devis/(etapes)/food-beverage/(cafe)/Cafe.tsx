@@ -52,14 +52,6 @@ const Cafe = ({
   const handleClickPrevious = () => {};
 
   const handleClickNext = () => {
-    if (!cafe.infos.fournisseurId) {
-      //pour skiper le the si pas de cafe
-      setFoodBeverage((prev) => ({
-        ...prev,
-        currentFoodBeverageId: prev.currentFoodBeverageId + 2,
-      }));
-      return;
-    }
     setFoodBeverage((prev) => ({
       ...prev,
       currentFoodBeverageId: prev.currentFoodBeverageId + 1,

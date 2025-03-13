@@ -15,11 +15,8 @@ import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
-import AddEspaceButton from "../(cafe)/AddEspaceButton";
-import NextEspaceButton from "../(cafe)/NextEspaceButton";
-import NextServiceButton from "../../../NextServiceButton";
-import FontaineEspacePropositionCard from "./FontaineEspacePropositionCard";
-import FontaineEspacePropositionFournisseurLogo from "./FontaineEspacePropositionFournisseurLogo";
+import FontaineDesktopEspacePropositions from "./(desktop)/FontaineDesktopEspacePropositions";
+import FontaineMobileEspacePropositions from "./(mobile)/FontaineMobileEspacePropositions";
 import { getTypeFontaine } from "./getTypeFontaine";
 
 type FontaineEspacePropositionsProps = {
@@ -639,51 +636,27 @@ const FontaineEspacePropositions = ({
     router.push(`/mon-devis/pilotage-prestations?${searchParams.toString()}`);
   };
 
-  return (
-    <div className="flex-1 flex flex-col gap-4 overflow-auto">
-      <div className="flex-1 flex flex-col border rounded-xl overflow-auto">
-        {formattedPropositions.map((propositions) => (
-          <div
-            className="flex border-b flex-1"
-            key={propositions[0].fournisseurId}
-          >
-            <FontaineEspacePropositionFournisseurLogo {...propositions[0]} />
-            {propositions.map((proposition) => (
-              <FontaineEspacePropositionCard
-                key={proposition.id}
-                proposition={proposition}
-                handleClickProposition={handleClickProposition}
-                handleClickFirstEspaceProposition={
-                  handleClickFirstEspaceProposition
-                }
-                espace={espace}
-                fontainesEspacesIds={fontainesEspacesIds}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
-      <div className="flex flex-col gap-1">
-        {fontainesEspacesIds.slice(-1)[0] === espace.infos.espaceId ? (
-          <div className="flex justify-end gap-4 items-center">
-            {espace.infos.poseSelected ? (
-              <AddEspaceButton
-                handleAddEspace={handleAddEspace}
-                title="fontaine"
-              />
-            ) : null}
-            <NextServiceButton handleClickNext={handleClickNext} />
-          </div>
-        ) : (
-          <div className="ml-auto" onClick={handleAlert}>
-            <NextEspaceButton
-              disabled={espace.infos.poseSelected ? false : true}
-              handleClickNextEspace={handleClickNextEspace}
-            />
-          </div>
-        )}
-      </div>
-    </div>
+  return isTabletOrMobile ? (
+    <FontaineMobileEspacePropositions
+      formattedPropositions={formattedPropositions}
+      handleClickProposition={handleClickProposition}
+      handleClickFirstEspaceProposition={handleClickFirstEspaceProposition}
+      espace={espace}
+      fontainesEspacesIds={fontainesEspacesIds}
+      handleAddEspace={handleAddEspace}
+    />
+  ) : (
+    <FontaineDesktopEspacePropositions
+      formattedPropositions={formattedPropositions}
+      handleClickProposition={handleClickProposition}
+      handleClickFirstEspaceProposition={handleClickFirstEspaceProposition}
+      espace={espace}
+      fontainesEspacesIds={fontainesEspacesIds}
+      handleAddEspace={handleAddEspace}
+      handleClickNext={handleClickNext}
+      handleClickNextEspace={handleClickNextEspace}
+      handleAlert={handleAlert}
+    />
   );
 };
 

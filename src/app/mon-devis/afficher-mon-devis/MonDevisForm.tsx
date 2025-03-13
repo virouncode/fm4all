@@ -25,6 +25,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Loader } from "lucide-react";
+import { DateTime } from "luxon";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -133,11 +134,10 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
 
     try {
       setLoading(true);
-      const numerosDevis = `${client.nomEntreprise}_${format(
-        new Date(),
-        "yyyyMMddHHmmss"
+      const numerosDevis = `${client.nomEntreprise}_${DateTime.local().toFormat(
+        "dd-MM-yyyy'T'HH:mm"
       )}`;
-      const nomDevis = `Devis_${numerosDevis}.pdf`;
+      const nomDevis = `Devis_fm4all_${numerosDevis}.pdf`;
 
       const url = await fillDevis(
         numerosDevis,

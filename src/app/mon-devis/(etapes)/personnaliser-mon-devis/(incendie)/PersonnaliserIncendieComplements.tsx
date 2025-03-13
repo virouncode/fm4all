@@ -1,6 +1,4 @@
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import PropositionsTitleMobile from "@/app/mon-devis/PropositionsTitleMobile";
 import { IncendieContext } from "@/context/IncendieProvider";
 import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
@@ -12,9 +10,12 @@ import { SelectExutoiresTarifsType } from "@/zod-schemas/exutoiresTarifs";
 import { SelectPortesCoupeFeuTarifsType } from "@/zod-schemas/portesCoupeFeuTarifs";
 import { SelectRiaTarifsType } from "@/zod-schemas/riaTarifs";
 import { FireExtinguisher } from "lucide-react";
-import { ChangeEvent, useContext, useState } from "react";
+import { ChangeEvent, useContext, useRef, useState } from "react";
+import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
+import SecuriteIncendieComplementsInputs from "./SecuriteIncendieComplementsInputs";
+import SecuriteIncendieMobileComplementsInputs from "./SecuriteIncendieMobileComplementsInputs";
 
 export const MAX_NB_EXUTOIRES = 100;
 export const MAX_NB_ALARMES = 100;
@@ -98,6 +99,16 @@ const PersonnaliserIncendieComplements = ({
     incendie.quantites.nbColonnesSechesDynamiques || 1;
   const nbRIA = incendie.quantites.nbRIA || 1;
 
+  type IncendieComplementType =
+    | "exutoires"
+    | "exutoiresParking"
+    | "alarmes"
+    | "portesCoupeFeuBattantes"
+    | "portesCoupeFeuCoulissantes"
+    | "colonnesSechesStatiques"
+    | "colonnesSechesDynamiques"
+    | "ria";
+
   const handleClickPrevious = () => {
     const currentIndex = personnalisation.personnalisationIds.indexOf(6);
     setPersonnalisation((prev) => ({
@@ -114,9 +125,7 @@ const PersonnaliserIncendieComplements = ({
     }));
   };
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    const newNb = value ? parseInt(value) : 1;
+  const updateComplements = (name: IncendieComplementType, newNb: number) => {
     switch (name) {
       case "exutoires":
         const newNbrExutoires =
@@ -313,6 +322,73 @@ const PersonnaliserIncendieComplements = ({
         setTotalIncendie((prev) => ({ ...prev, totalRIA }));
         break;
     }
+  };
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const newNb = value ? parseInt(value) : 1;
+    updateComplements(name as IncendieComplementType, newNb);
+  };
+
+  const handleIncrement = (name: IncendieComplementType) => {
+    let newNb = 0;
+    switch (name) {
+      case "exutoires":
+        newNb = nbExutoires + 1;
+        break;
+      case "exutoiresParking":
+        newNb = nbExutoiresParking + 1;
+        break;
+      case "alarmes":
+        newNb = nbAlarmes + 1;
+        break;
+      case "portesCoupeFeuBattantes":
+        newNb = nbPortesCoupeFeuBattantes + 1;
+        break;
+      case "portesCoupeFeuCoulissantes":
+        newNb = nbPortesCoupeFeuCoulissantes + 1;
+        break;
+      case "colonnesSechesStatiques":
+        newNb = nbColonnesSechesStatiques + 1;
+        break;
+      case "colonnesSechesDynamiques":
+        newNb = nbColonnesSechesDynamiques + 1;
+        break;
+      case "ria":
+        newNb = nbRIA + 1;
+        break;
+    }
+    updateComplements(name, newNb);
+  };
+  const handleDecrement = (name: IncendieComplementType) => {
+    let newNb = 0;
+    switch (name) {
+      case "exutoires":
+        newNb = nbExutoires - 1;
+        break;
+      case "exutoiresParking":
+        newNb = nbExutoiresParking - 1;
+        break;
+      case "alarmes":
+        newNb = nbAlarmes - 1;
+        break;
+      case "portesCoupeFeuBattantes":
+        newNb = nbPortesCoupeFeuBattantes - 1;
+        break;
+      case "portesCoupeFeuCoulissantes":
+        newNb = nbPortesCoupeFeuCoulissantes - 1;
+        break;
+      case "colonnesSechesStatiques":
+        newNb = nbColonnesSechesStatiques - 1;
+        break;
+      case "colonnesSechesDynamiques":
+        newNb = nbColonnesSechesDynamiques - 1;
+        break;
+      case "ria":
+        newNb = nbRIA - 1;
+        break;
+    }
+    updateComplements(name, newNb);
   };
   const handleCheck = (checked: boolean, name: string) => {
     switch (name) {
@@ -603,15 +679,30 @@ const PersonnaliserIncendieComplements = ({
     }
   };
 
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+  const propositionsRef = useRef<HTMLDivElement>(null);
+
   return (
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="6">
-      <PropositionsTitle
-        title="Securite incendie"
-        description=""
-        icon={FireExtinguisher}
-        handleClickPrevious={handleClickPrevious}
-      />
-      <div className="w-full flex-1 flex flex-col gap-6 overflow-auto">
+      {isTabletOrMobile ? (
+        <PropositionsTitleMobile
+          title="Securite incendie"
+          description=""
+          icon={FireExtinguisher}
+          propositionsRef={propositionsRef}
+        />
+      ) : (
+        <PropositionsTitle
+          title="Securite incendie"
+          description=""
+          icon={FireExtinguisher}
+          handleClickPrevious={handleClickPrevious}
+        />
+      )}
+      <div
+        className="w-full flex-1 flex flex-col gap-6 overflow-auto"
+        ref={propositionsRef}
+      >
         <div className="flex flex-col gap-6">
           <p className="text-2xl">Compléments</p>
           <p className="max-w-prose mx-auto hyphens-auto"></p>
@@ -620,214 +711,56 @@ const PersonnaliserIncendieComplements = ({
               En complément des BAES et Extincteurs, souhaitez vous nous confier
               le contrôle de :
             </p>
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-12 w-full md:mx-auto flex-1 overflow-auto p-2">
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="exutoires"
-                  className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-                  checked={exutoires}
-                  onCheckedChange={(checked: boolean) =>
-                    handleCheck(checked, "exutoires")
-                  }
-                  aria-label="Sélectionner exutoires de fumée"
-                />
-                <Label htmlFor="exutoires" className="text-base flex-1">
-                  Exutoires de fumée
-                </Label>
-                <Input
-                  value={nbExutoires}
-                  onChange={handleChange}
-                  name="exutoires"
-                  type="number"
-                  className="w-20"
-                  disabled={!exutoires}
-                  min={0}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="exutoiresParking"
-                  className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-                  checked={exutoiresParking}
-                  onCheckedChange={(checked: boolean) =>
-                    handleCheck(checked, "exutoiresParking")
-                  }
-                  aria-label="Sélectionner exutoires de fumée (parking)"
-                />
-                <Label htmlFor="exutoiresParking" className="text-base flex-1">
-                  Exutoires de fumée (parking)
-                </Label>
-                <Input
-                  value={nbExutoiresParking}
-                  onChange={handleChange}
-                  name="exutoiresParking"
-                  type="number"
-                  className="w-20"
-                  disabled={!exutoiresParking}
-                  min={0}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="alarmes"
-                  className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-                  checked={alarmes}
-                  onCheckedChange={(checked: boolean) =>
-                    handleCheck(checked, "alarmes")
-                  }
-                  aria-label="Sélectionner alarmes T4"
-                />
-                <Label htmlFor="alarmes" className="text-base flex-1">
-                  Alarmes T4
-                </Label>
-                <Input
-                  value={nbAlarmes}
-                  onChange={handleChange}
-                  name="alarmes"
-                  type="number"
-                  className="w-20"
-                  disabled={!alarmes}
-                  min={0}
-                  max={MAX_NB_EXUTOIRES}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="portesCoupeFeuBattantes"
-                  className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-                  checked={portesCoupeFeuBattantes}
-                  onCheckedChange={(checked: boolean) =>
-                    handleCheck(checked, "portesCoupeFeuBattantes")
-                  }
-                  aria-label="Sélectionner portes coupe-feu battantes"
-                />
-                <Label
-                  htmlFor="portesCoupeFeuBattantes"
-                  className="text-base flex-1"
-                >
-                  Portes coupe-feu battantes
-                </Label>
-                <Input
-                  value={nbPortesCoupeFeuBattantes}
-                  onChange={handleChange}
-                  name="portesCoupeFeuBattantes"
-                  type="number"
-                  className="w-20"
-                  disabled={!portesCoupeFeuBattantes}
-                  min={0}
-                  max={MAX_NB_PORTES_COUPES_FEU}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="portesCoupeFeuCoulissantes"
-                  className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-                  checked={portesCoupeFeuCoulissantes}
-                  onCheckedChange={(checked: boolean) =>
-                    handleCheck(checked, "portesCoupeFeuCoulissantes")
-                  }
-                  aria-label="Sélectionner portes coupe-feu coulissantes"
-                />
-                <Label
-                  htmlFor="portesCoupeFeuCoulissantes"
-                  className="text-base flex-1"
-                >
-                  Portes coupe-feu coulissantes
-                </Label>
-                <Input
-                  value={nbPortesCoupeFeuCoulissantes}
-                  onChange={handleChange}
-                  name="portesCoupeFeuCoulissantes"
-                  type="number"
-                  className="w-20"
-                  disabled={!portesCoupeFeuCoulissantes}
-                  min={0}
-                  max={MAX_NB_PORTES_COUPES_FEU}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="colonnesSechesStatiques"
-                  className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-                  checked={colonnesSechesStatiques}
-                  onCheckedChange={(checked: boolean) =>
-                    handleCheck(checked, "colonnesSechesStatiques")
-                  }
-                  aria-label="Sélectionner colonnes sèches statiques"
-                />
-                <Label
-                  htmlFor="colonnesSechesStatiques"
-                  className="text-base flex-1"
-                >
-                  Colonnes sèches statiques
-                </Label>
-                <Input
-                  value={nbColonnesSechesStatiques}
-                  onChange={handleChange}
-                  name="colonnesSechesStatiques"
-                  type="number"
-                  className="w-20"
-                  disabled={!colonnesSechesStatiques}
-                  min={0}
-                  max={MAX_NB_COLONNES_SECHES}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="colonnesSechesDynamiques"
-                  className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-                  checked={colonnesSechesDynamiques}
-                  onCheckedChange={(checked: boolean) =>
-                    handleCheck(checked, "colonnesSechesDynamiques")
-                  }
-                  aria-label="Sélectionner colonnes sèches dynamiques"
-                />
-                <Label
-                  htmlFor="colonnesSechesDynamiques"
-                  className="text-base flex-1"
-                >
-                  Colonnes sèches dynamiques
-                </Label>
-                <Input
-                  value={nbColonnesSechesDynamiques}
-                  onChange={handleChange}
-                  name="colonnesSechesDynamiques"
-                  type="number"
-                  className="w-20"
-                  disabled={!colonnesSechesDynamiques}
-                  min={0}
-                  max={MAX_NB_COLONNES_SECHES}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="ria"
-                  className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
-                  checked={ria}
-                  onCheckedChange={(checked: boolean) =>
-                    handleCheck(checked, "ria")
-                  }
-                  aria-label="Sélectionner robinets d'incendie armés"
-                />
-                <Label htmlFor="ria" className="text-base flex-1">
-                  Robinets d&apos;incendie armés
-                </Label>
-                <Input
-                  value={nbRIA}
-                  onChange={handleChange}
-                  name="ria"
-                  type="number"
-                  className="w-20"
-                  disabled={!ria}
-                  min={0}
-                  max={MAX_NB_RIA}
-                />
-              </div>
-            </div>
+            {isTabletOrMobile ? (
+              <SecuriteIncendieMobileComplementsInputs
+                exutoires={exutoires}
+                exutoiresParking={exutoiresParking}
+                portesCoupeFeuBattantes={portesCoupeFeuBattantes}
+                portesCoupeFeuCoulissantes={portesCoupeFeuCoulissantes}
+                colonnesSechesStatiques={colonnesSechesStatiques}
+                colonnesSechesDynamiques={colonnesSechesDynamiques}
+                ria={ria}
+                alarmes={alarmes}
+                handleIncrement={handleIncrement}
+                handleDecrement={handleDecrement}
+                handleCheck={handleCheck}
+                nbExutoires={nbExutoires}
+                nbExutoiresParking={nbExutoiresParking}
+                nbAlarmes={nbAlarmes}
+                nbPortesCoupeFeuBattantes={nbPortesCoupeFeuBattantes}
+                nbPortesCoupeFeuCoulissantes={nbPortesCoupeFeuCoulissantes}
+                nbColonnesSechesStatiques={nbColonnesSechesStatiques}
+                nbColonnesSechesDynamiques={nbColonnesSechesDynamiques}
+                nbRIA={nbRIA}
+              />
+            ) : (
+              <SecuriteIncendieComplementsInputs
+                exutoires={exutoires}
+                exutoiresParking={exutoiresParking}
+                portesCoupeFeuBattantes={portesCoupeFeuBattantes}
+                portesCoupeFeuCoulissantes={portesCoupeFeuCoulissantes}
+                colonnesSechesStatiques={colonnesSechesStatiques}
+                colonnesSechesDynamiques={colonnesSechesDynamiques}
+                ria={ria}
+                alarmes={alarmes}
+                handleChange={handleChange}
+                handleCheck={handleCheck}
+                nbExutoires={nbExutoires}
+                nbExutoiresParking={nbExutoiresParking}
+                nbAlarmes={nbAlarmes}
+                nbPortesCoupeFeuBattantes={nbPortesCoupeFeuBattantes}
+                nbPortesCoupeFeuCoulissantes={nbPortesCoupeFeuCoulissantes}
+                nbColonnesSechesStatiques={nbColonnesSechesStatiques}
+                nbColonnesSechesDynamiques={nbColonnesSechesDynamiques}
+                nbRIA={nbRIA}
+              />
+            )}
           </div>
         </div>
       </div>
-      <PropositionsFooter handleClickNext={handleClickNext} />
+      {!isTabletOrMobile ? (
+        <PropositionsFooter handleClickNext={handleClickNext} />
+      ) : null}
     </div>
   );
 };

@@ -1,3 +1,4 @@
+import PropositionsTitleMobile from "@/app/mon-devis/PropositionsTitleMobile";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -6,7 +7,8 @@ import { NettoyageContext } from "@/context/NettoyageProvider";
 import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { SprayCan } from "lucide-react";
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent, useContext, useRef } from "react";
+import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 
@@ -95,16 +97,32 @@ const PersonnaliserNettoyageVitrerie = () => {
       infos: { ...prev.infos, plainPied: value === "oui" ? true : false },
     }));
   };
+
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+  const propositionsRef = useRef<HTMLDivElement>(null);
+
   return (
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="2">
-      <PropositionsTitle
-        title="Nettoyage et propreté"
-        description=""
-        icon={SprayCan}
-        handleClickPrevious={handleClickPrevious}
-        previousButton={false}
-      />
-      <div className="w-full flex-1 flex flex-col gap-6">
+      {isTabletOrMobile ? (
+        <PropositionsTitleMobile
+          title="Nettoyage et propreté"
+          description=""
+          icon={SprayCan}
+          propositionsRef={propositionsRef}
+        />
+      ) : (
+        <PropositionsTitle
+          title="Nettoyage et propreté"
+          description=""
+          icon={SprayCan}
+          handleClickPrevious={handleClickPrevious}
+          previousButton={false}
+        />
+      )}
+      <div
+        className="w-full flex-1 flex flex-col gap-6 mb-6"
+        ref={propositionsRef}
+      >
         <div className="flex flex-col gap-6">
           <p className="text-2xl">Nettoyage de la vitrerie</p>
           <p className="max-w-prose mx-auto hyphens-auto">
@@ -169,7 +187,9 @@ const PersonnaliserNettoyageVitrerie = () => {
           </div>
         </div>
       </div>
-      <PropositionsFooter handleClickNext={handleClickNext} />
+      {!isTabletOrMobile ? (
+        <PropositionsFooter handleClickNext={handleClickNext} />
+      ) : null}
     </div>
   );
 };
