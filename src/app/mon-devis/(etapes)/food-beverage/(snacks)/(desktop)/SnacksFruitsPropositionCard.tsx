@@ -102,9 +102,9 @@ const SnacksFruitsPropositionCard = ({
   ) {
     return (
       <div
-        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-xl gap-4 min-h-36`}
+        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-base gap-4 min-h-36 text-center font-bold`}
       >
-        <p>Non proposé</p>
+        <p>Non proposé pour ces critères</p>
       </div>
     );
   }
@@ -135,7 +135,7 @@ const SnacksFruitsPropositionCard = ({
   if (!proposition.total) {
     return (
       <div
-        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-base gap-4 min-h-36`}
+        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-base gap-4 min-h-36 font-bold`}
       >
         <p className="text-center">
           Le panier minimum hebdomadaire du fournisseur n&apos;est pas atteint

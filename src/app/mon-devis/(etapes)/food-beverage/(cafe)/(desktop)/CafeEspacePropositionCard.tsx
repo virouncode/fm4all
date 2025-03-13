@@ -136,9 +136,9 @@ const CafeEspacePropositionCard = ({
   if (!proposition.totalAnnuel) {
     return (
       <div
-        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center min-h-28 text-xl gap-4`}
+        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center min-h-28 text-base gap-4 text-center font-bold`}
       >
-        Non proposé
+        Non proposé pour ces critères
       </div>
     );
   }
@@ -197,19 +197,19 @@ const CafeEspacePropositionCard = ({
   ) : null;
 
   const infosEssentiel = (
-    <li className="list-check">
+    <li className="list-check font-bold">
       {proposition.infos
         ? proposition.infos
         : "Café conventionnel dit Classique, Blend"}
     </li>
   );
   const infosConfort = (
-    <li className="list-check">
+    <li className="list-check font-bold">
       {proposition.infos ? proposition.infos : "Café Supérieur, 100% Arabica"}
     </li>
   );
   const infosExcellence = (
-    <li className="list-check">
+    <li className="list-check font-bold">
       {proposition.infos
         ? proposition.infos
         : "Café de spécialité, premium, café d’exception, Bio"}

@@ -156,11 +156,11 @@ const CafeMobileEspacePropositionCard = ({
   const color = getFm4AllColor(gamme);
 
   const totalMensuelText = totalAnnuel ? (
-    <p className="text-sm font-bold">
+    <p className="text-sm font-bold text-end">
       {formatNumber(Math.round((totalAnnuel * MARGE) / 12))} €/mois
     </p>
   ) : (
-    <p className="text-sm font-bold">Non proposé</p>
+    <p className="text-sm font-bold text-end">Non proposé pour ces critères</p>
   );
 
   const prixInstallationText = totalInstallation ? (
@@ -219,19 +219,19 @@ const CafeMobileEspacePropositionCard = ({
   );
 
   const infosEssentiel = (
-    <li className="list-check">
+    <li className="list-check font-bold">
       {proposition.infos
         ? proposition.infos
         : "Café conventionnel dit Classique, Blend"}
     </li>
   );
   const infosConfort = (
-    <li className="list-check">
+    <li className="list-check font-bold">
       {proposition.infos ? proposition.infos : "Café Supérieur, 100% Arabica"}
     </li>
   );
   const infosExcellence = (
-    <li className="list-check">
+    <li className="list-check font-bold">
       {proposition.infos
         ? proposition.infos
         : "Café de spécialité, premium, café d’exception, Bio"}

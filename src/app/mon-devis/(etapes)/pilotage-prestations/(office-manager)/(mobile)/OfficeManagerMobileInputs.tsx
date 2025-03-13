@@ -26,39 +26,6 @@ const OfficeManagerMobileInputs = ({
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-4">
         <p>
-          Indiquez le <strong>nombre de demi-journées par semaine</strong>{" "}
-          souhaité :
-        </p>
-        <div className="flex w-full p-2 gap-2">
-          <Slider
-            value={[
-              (officeManager.quantites.demiJParSemaine ||
-                demiJParSemaineEssentiel) ??
-                1,
-            ]}
-            onValueChange={(value: number[]) =>
-              handleChangeDemiJParSemaine(
-                value,
-                officeManager.infos.premium
-                  ? officeManager.prix.demiTjmPremium
-                  : officeManager.prix.demiTjm
-              )
-            }
-            min={1}
-            max={20}
-            step={1}
-            title="Nombre de demi-journées par semaine"
-            className="w-1/2"
-          />
-          <Label htmlFor="demiJParSemaine" className="text-base w-1/2">
-            {officeManager.quantites.demiJParSemaine ??
-              demiJParSemaineEssentiel}{" "}
-            demi journée(s)
-          </Label>
-        </div>
-      </div>
-      <div className="flex flex-col gap-4">
-        <p>
           L&apos;office manager doit-il{" "}
           <strong>
             parler l&apos;anglais et avoir une expertise supérieure
@@ -110,6 +77,39 @@ const OfficeManagerMobileInputs = ({
             </Label>
           </div>
         </RadioGroup>
+      </div>
+      <div className="flex flex-col gap-4">
+        <p>
+          Indiquez le <strong>nombre de demi-journées par semaine</strong>{" "}
+          souhaité :
+        </p>
+        <div className="flex w-full p-2 gap-2">
+          <Slider
+            value={[
+              (officeManager.quantites.demiJParSemaine ||
+                demiJParSemaineEssentiel) ??
+                1,
+            ]}
+            onValueChange={(value: number[]) =>
+              handleChangeDemiJParSemaine(
+                value,
+                officeManager.infos.premium
+                  ? officeManager.prix.demiTjmPremium
+                  : officeManager.prix.demiTjm
+              )
+            }
+            min={1}
+            max={20}
+            step={1}
+            title="Nombre de demi-journées par semaine"
+            className="w-1/2"
+          />
+          <Label htmlFor="demiJParSemaine" className="text-base w-1/2">
+            {officeManager.quantites.demiJParSemaine ??
+              demiJParSemaineEssentiel}{" "}
+            demi journée(s)
+          </Label>
+        </div>
       </div>
     </div>
   );

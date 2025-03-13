@@ -116,9 +116,9 @@ const FontaineEspacePropositionCard = ({
   if (!proposition.totalAnnuel) {
     return (
       <div
-        className={`flex flex-1 bg-slate-100  items-center p-4 justify-center text-xl gap-4 border-r min-h-36`}
+        className={`flex flex-1 bg-slate-100  items-center p-4 justify-center text-base gap-4 border-r min-h-36 text-center`}
       >
-        Non proposé
+        Non proposé pour ces critères
       </div>
     );
   }
@@ -139,22 +139,22 @@ const FontaineEspacePropositionCard = ({
   const infosEssentiel = (
     <>
       <li className="list-check">
-        Machine à poser sur un plan de travail ou une table
+        Machine <strong>à poser</strong> sur un plan de travail ou une table
       </li>
     </>
   );
   const infosConfort = (
     <>
       <li className="list-check">
-        Machine autonome fournie avec un meuble ou un pied
+        Machine autonome fournie <strong>avec un meuble ou un pied</strong>
       </li>
     </>
   );
   const infosExcellence = (
     <>
       <li className="list-check">
-        Machine intégrée sous un meuble (non fourni) avec colonne de
-        distribution
+        Machine <strong>intégrée sous un meuble</strong> (non fourni) avec
+        colonne de distribution
       </li>
     </>
   );

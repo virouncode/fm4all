@@ -111,21 +111,39 @@ const SnacksFruitsMobilePropositionCard = ({
   } = proposition;
 
   const color = getFm4AllColor(gamme);
+  const isClickable =
+    (snacksFruits.infos.choix.includes("fruits") &&
+      !proposition.prixKgFruits) ||
+    (snacksFruits.infos.choix.includes("snacks") &&
+      !proposition.prixUnitaireSnacks) ||
+    (snacksFruits.infos.choix.includes("boissons") &&
+      !proposition.prixUnitaireBoissons)
+      ? false
+      : total
+      ? true
+      : false;
+
   const totalMensuelText =
     snacksFruits.infos.choix.includes("fruits") && !proposition.prixKgFruits ? (
-      <p className="text-sm font-bold">Non proposé</p>
+      <p className="text-sm font-bold text-end">
+        Non proposé pour ces critères
+      </p>
     ) : snacksFruits.infos.choix.includes("snacks") &&
       !proposition.prixUnitaireSnacks ? (
-      <p className="text-sm font-bold">Non proposé</p>
+      <p className="text-sm font-bold text-end">
+        Non proposé pour ces critères
+      </p>
     ) : snacksFruits.infos.choix.includes("boissons") &&
       !proposition.prixUnitaireBoissons ? (
-      <p className="text-sm font-bold">Non proposé</p>
+      <p className="text-sm font-bold text-end">
+        Non proposé pour ces critères
+      </p>
     ) : total ? (
-      <p className="text-sm font-bold">
+      <p className="text-sm font-bold text-end">
         {formatNumber(Math.round((total * MARGE) / 12))} €/mois
       </p>
     ) : (
-      <p className="text-sm font-bold">
+      <p className="text-sm font-bold text-end">
         Panier minimum hebdomadaire non atteint
       </p>
     );
@@ -295,13 +313,13 @@ const SnacksFruitsMobilePropositionCard = ({
         <div
           className="flex h-1/2 pt-2 justify-between"
           onClick={
-            total ? () => handleClickProposition(proposition) : undefined
+            isClickable ? () => handleClickProposition(proposition) : undefined
           }
         >
           {infosProduit}
           <div className="flex flex-col gap-2 items-end w-1/3">
             {totalMensuelText}
-            {total ? (
+            {isClickable ? (
               <Switch
                 className={`${
                   snacksFruits.infos.fournisseurId === fournisseurId &&

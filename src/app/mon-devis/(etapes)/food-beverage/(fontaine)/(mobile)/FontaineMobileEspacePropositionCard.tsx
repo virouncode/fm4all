@@ -132,7 +132,7 @@ const FontaineMobileEspacePropositionCard = ({
       {formatNumber(Math.round((totalAnnuel * MARGE) / 12))} €/mois
     </p>
   ) : (
-    <p className="text-sm font-bold">Non proposé</p>
+    <p className="text-sm font-bold text-end">Non proposé pour ces critères</p>
   );
 
   const prixInstallationText = totalInstallation ? (
@@ -154,22 +154,22 @@ const FontaineMobileEspacePropositionCard = ({
   const infosEssentiel = (
     <>
       <li className="list-check">
-        Machine à poser sur un plan de travail ou une table
+        Machine <strong>à poser</strong> sur un plan de travail ou une table
       </li>
     </>
   );
   const infosConfort = (
     <>
       <li className="list-check">
-        Machine autonome fournie avec un meuble ou un pied
+        Machine autonome fournie <strong>avec un meuble ou un pied</strong>
       </li>
     </>
   );
   const infosExcellence = (
     <>
       <li className="list-check">
-        Machine intégrée sous un meuble (non fourni) avec colonne de
-        distribution
+        Machine <strong>intégrée sous un meuble</strong> (non fourni) avec
+        colonne de distribution
       </li>
     </>
   );

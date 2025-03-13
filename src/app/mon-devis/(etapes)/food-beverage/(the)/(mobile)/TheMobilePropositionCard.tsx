@@ -93,22 +93,34 @@ const TheMobilePropositionCard = ({
 
   const infosEssentiel = (
     <>
-      <li className="list-check">The en sachet, un ou deux au choix</li>
-      {proposition.infos && <li className="list-check">{proposition.infos}</li>}
+      <li className="list-check font-bold">
+        The en sachet, un ou deux au choix
+      </li>
+      {proposition.infos && (
+        <li className="list-check font-bold">{proposition.infos}</li>
+      )}
     </>
   );
 
   const infosConfort = (
     <>
-      <li className="list-check">Choix de plusieurs thés en sachets</li>
-      {proposition.infos && <li className="list-check">{proposition.infos}</li>}
+      <li className="list-check font-bold">
+        Choix de plusieurs thés en sachets
+      </li>
+      {proposition.infos && (
+        <li className="list-check font-bold">{proposition.infos}</li>
+      )}
     </>
   );
 
   const infosExcellence = (
     <>
-      <li className="list-check">Thés Premium en boite bois ou présentoir</li>
-      {proposition.infos && <li className="list-check">{proposition.infos}</li>}
+      <li className="list-check font-bold">
+        Thés Premium en boite bois ou présentoir
+      </li>
+      {proposition.infos && (
+        <li className="list-check font-bold">{proposition.infos}</li>
+      )}
     </>
   );
 
