@@ -100,7 +100,7 @@ const NettoyageMobilePropositionCard = ({
     freqAnnuelle && hParPassage ? (
       <li className="list-check">
         {formatNumber(freqAnnuelle / S_OUVREES_PAR_AN)} passage(s) de
-        {hParPassage}h / semaine
+        {hParPassage} h / semaine
       </li>
     ) : null;
   const infosEssentiel = "Entretien fonctionnel et optimisé";
