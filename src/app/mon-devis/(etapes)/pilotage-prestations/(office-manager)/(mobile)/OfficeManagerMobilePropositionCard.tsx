@@ -281,7 +281,9 @@ const OfficeManagerMobilePropositionCard = ({
       </div>
       <div
         className="flex h-3/4 pt-2 justify-between"
-        onClick={() => handleClickProposition(proposition)}
+        onClick={
+          totalAnnuel ? () => handleClickProposition(proposition) : undefined
+        }
       >
         {infosProduit}
         <div className="flex flex-col gap-2 items-end">

@@ -358,10 +358,13 @@ const CafeMobileEspacePropositionCard = ({
         </div>
         <div
           className="flex h-1/2 pt-2 justify-between"
-          onClick={() =>
-            cafeEspacesIds[0] === espace.infos.espaceId
-              ? handleClickFirstEspaceProposition(proposition)
-              : handleClickProposition(proposition)
+          onClick={
+            totalAnnuel
+              ? () =>
+                  cafeEspacesIds[0] === espace.infos.espaceId
+                    ? handleClickFirstEspaceProposition(proposition)
+                    : handleClickProposition(proposition)
+              : undefined
           }
         >
           {infosProduit}

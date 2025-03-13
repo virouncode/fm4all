@@ -258,7 +258,11 @@ const HygieneMobileOptionsParfumCard = ({
         </div>
         <div
           className="flex h-1/2 pt-2 justify-between"
-          onClick={() => handleClickProposition("parfum", proposition)}
+          onClick={
+            totalParfum
+              ? () => handleClickProposition("parfum", proposition)
+              : undefined
+          }
         >
           {infosProduit}
           <div className="flex flex-col gap-2 items-end">

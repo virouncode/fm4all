@@ -288,7 +288,11 @@ const HygieneMobilePropositionCard = ({
         </div>
         <div
           className="flex h-1/2 pt-2 justify-between"
-          onClick={() => handleClickProposition(proposition)}
+          onClick={
+            proposition.totalAnnuelTrilogie
+              ? () => handleClickProposition(proposition)
+              : undefined
+          }
         >
           {infosProduit}
           <div className="flex flex-col gap-2 items-end w-1/3">
