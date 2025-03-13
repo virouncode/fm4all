@@ -33,6 +33,7 @@ import TotalServicesFm4AllProvider from "@/context/TotalServicesFm4AllProvider";
 import TotalSnacksFruitsProvider from "@/context/TotalSnacksFruitsProvider";
 import TotalTheProvider from "@/context/TotalTheProvider";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Didact_Gothic } from "next/font/google";
@@ -104,6 +105,7 @@ export default function RootLayout({
                                                                     {children}
                                                                     <CookieBanner />
                                                                     <Analytics />
+                                                                    <SpeedInsights />
                                                                     <Footer />
                                                                     <Toaster />
                                                                   </ThemeProvider>

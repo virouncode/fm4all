@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: "/fournisseurs/",
+      disallow: "/fournisseurs",
     },
     sitemap: "https://www.fm4all.com/sitemap.xml",
   };
