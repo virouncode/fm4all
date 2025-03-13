@@ -47,7 +47,9 @@ const OfficeManagerMobilePropositions = ({
 }: OfficeManagerMobilePropositionsProps) => {
   return (
     <div className="flex flex-col gap-6 w-full">
-      <p className="font-bold text-xl lg:hidden">Hof Manager</p>
+      <p className="font-bold text-xl lg:hidden">
+        Office & Hospitality Manager
+      </p>
       <OfficeManagerMobileInputs
         demiJParSemaineEssentiel={demiJParSemaineEssentiel}
         handleChangeDemiJParSemaine={handleChangeDemiJParSemaine}

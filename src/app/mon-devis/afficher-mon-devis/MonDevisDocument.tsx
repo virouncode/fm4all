@@ -22,7 +22,7 @@ const MonDevisDocument = ({ devisUrl }: MonDevisDocumentProps) => {
         <div className="flex flex-col gap-4 mx-auto max-w-prose items-center hyphens-auto text-wrap">
           <p>Votre devis complet et personnalisé vous attend ci-dessous.</p>
           <p>
-            Il est <strong>valable 7 jours</strong> et nous engage. Imaginez le{" "}
+            Il est <strong>valable 15 jours</strong> et nous engage. Imaginez le{" "}
             <strong>temps que vous avez gagné</strong> par rapport à un appel
             d’offres traditionnel !
           </p>
