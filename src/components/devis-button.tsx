@@ -40,6 +40,7 @@ import { TotalContext } from "@/context/TotalProvider";
 import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 
@@ -87,7 +88,6 @@ const DevisButton = ({
   const { setTotalOfficeManager } = useContext(TotalOfficeManagerContext);
   const { setTotalServicesFm4All } = useContext(TotalServicesFm4AllContext);
   const { setTotal } = useContext(TotalContext);
-  // const isTabletOrMobile = useMediaQuery({ maxWidth: 1024 });
   const router = useRouter();
 
   const serviceSearchParams = new URLSearchParams();
@@ -201,22 +201,7 @@ const DevisButton = ({
   //   });
   // };
 
-  return (
-    // isTabletOrMobile ? (
-    //   <div className="flex justify-center">
-    //     <Button
-    //       variant="destructive"
-    //       size={size}
-    //       title={title}
-    //       className={`text-base ${className}`}
-    //       onClick={handleAlert}
-    //       disabled={disabled}
-    //     >
-    //       {text}
-    //     </Button>
-    //   </div>
-    // ) :
-    devisProgress.completedSteps.includes(1) ? (
+  return (devisProgress.completedSteps.includes(1) ? (
       <Dialog>
         <DialogTrigger asChild>
           <Button
