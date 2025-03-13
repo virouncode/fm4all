@@ -118,9 +118,11 @@ const Why = () => {
           facility management pour tous.
         </p>
         <div className="text-center max-w-prose mx-auto">
-          <p className="text-5xl my-10 font-bold text-fm4allsecondary">
-            1 contact. 1 contrat. 1 facture
-          </p>
+          <div className="flex flex-col gap-1 text-5xl my-10 font-bold text-fm4allsecondary">
+            <p>1 contact.</p>
+            <p>1 contrat.</p>
+            <p>1 facture.</p>
+          </div>
           <p>
             Avec fm4all, gérer vos bureaux n&apos;aura jamais été aussi simple !
           </p>
