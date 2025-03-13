@@ -1,5 +1,6 @@
 "use client";
 
+import NextEtapeSauverButton from "@/app/mon-devis/NextEtapeSauverButton";
 import PropositionsTitleMobile from "@/app/mon-devis/PropositionsTitleMobile";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
@@ -115,7 +116,7 @@ const ServicesFm4All = ({
         />
       </div>
       {isTabletOrMobile ? (
-        <PropositionsFooter handleClickNext={handleClickNext} />
+        <NextEtapeSauverButton />
       ) : (
         <PropositionsFooter
           handleClickNext={handleClickNext}

@@ -1,5 +1,4 @@
 "use client";
-import PropositionsFooter from "@/app/mon-devis/PropositionsFooter";
 import PropositionsTitleMobile from "@/app/mon-devis/PropositionsTitleMobile";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
@@ -129,9 +128,9 @@ const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
           />
         )}
       </div>
-      {isTabletOrMobile ? (
+      {/* {isTabletOrMobile ? (
         <PropositionsFooter handleClickNext={handleClickNext} />
-      ) : null}
+      ) : null} */}
     </div>
   );
 };
