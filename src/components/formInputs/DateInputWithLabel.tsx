@@ -60,6 +60,9 @@ export function DateInputWithLabel<S>({
                     onClick={(e) => {
                       e.stopPropagation();
                       field.onChange("");
+                      if (handleChangeDate) {
+                        handleChangeDate("");
+                      }
                     }}
                   >
                     <X size="icon" className="h-4 w-4 opacity-50" />

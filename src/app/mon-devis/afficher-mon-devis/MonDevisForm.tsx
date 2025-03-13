@@ -147,7 +147,9 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
         total.totalAnnuelHt,
         total.totalInstallationHt,
         commentaires ?? "",
-        format(client.dateDeDemarrage ?? "", "dd/MM/yyyy", { locale: fr })
+        client.dateDeDemarrage
+          ? format(client.dateDeDemarrage, "dd/MM/yyyy", { locale: fr })
+          : ""
       );
       if (url) {
         try {
