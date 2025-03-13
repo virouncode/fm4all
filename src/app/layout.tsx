@@ -37,7 +37,6 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Didact_Gothic } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 
 const didact = Didact_Gothic({
@@ -139,10 +138,6 @@ export default function RootLayout({
             </ServicesProvider>
           </ClientProvider>
         </DevisProgressProvider>
-        <Script
-          strategy="afterInteractive"
-          src="//cdn.conveythis.com/javascript/conveythis.js?api_key=pub_2a09a3ddf156e7e9c172e6e2eb33a8eb"
-        />
       </body>
     </html>
   );
