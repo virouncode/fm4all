@@ -148,8 +148,6 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
         total.totalInstallationHt
       );
       if (url) {
-        setDevisUrl(url);
-
         try {
           //Le Fichier du devis
           const responseBlob = await fetch(url);
@@ -164,7 +162,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
             }
           );
           const urlToPost = (await response.json()).url;
-
+          setDevisUrl(urlToPost);
           await fetch("/api/mailgun", {
             method: "POST",
             headers: {

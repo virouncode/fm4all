@@ -84,7 +84,7 @@ const MonDevisDocument = ({ devisUrl }: MonDevisDocumentProps) => {
           </p>
         </div>
         <div className="w-full mt-6 mb-6 flex justify-center">
-          <embed src={devisUrl} className="w-full h-screen" />
+          <iframe src={devisUrl} className="w-full h-screen" />
         </div>
         <div className="flex flex-col gap-4 mx-auto  items-center hyphens-auto text-wrap">
           <p className="max-w-prose">Vous avez des questions ?</p>

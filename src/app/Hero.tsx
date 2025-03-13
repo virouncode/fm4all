@@ -82,6 +82,7 @@ const Hero = () => {
             className="object-cover object-center"
             fill={true}
             priority
+            fetchPriority="high"
           />
         </div>
       </div>
