@@ -99,7 +99,7 @@ const NettoyageMobilePropositionCard = ({
   const nbPassagesParSemaineText =
     freqAnnuelle && hParPassage ? (
       <li className="list-check">
-        {formatNumber(freqAnnuelle / S_OUVREES_PAR_AN)} passage(s) de
+        {formatNumber(freqAnnuelle / S_OUVREES_PAR_AN)} passage(s) de{" "}
         {hParPassage} h / semaine
       </li>
     ) : null;
@@ -182,7 +182,7 @@ const NettoyageMobilePropositionCard = ({
         <div className="flex items-center h-1/2 gap-2 border-b pb-2 border-slate-200">
           <Dialog>
             <DialogTrigger asChild>{imgProduit}</DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
+            <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl pointer-events-auto">
               <DialogHeader>
                 <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>

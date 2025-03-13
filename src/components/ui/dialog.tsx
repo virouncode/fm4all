@@ -25,6 +25,7 @@ const DialogOverlay = React.forwardRef<
       className
     )}
     {...props}
+    onClick={() => console.log("click")} //pour les mobiles, fermer le dialog en cliquant sur l'overlay (sinon ça ne marche pas)
   />
 ));
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
