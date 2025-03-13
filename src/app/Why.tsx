@@ -117,11 +117,14 @@ const Why = () => {
           <strong>La solution</strong> : fm4all simplifie et optimise la gestion
           facility management pour tous.
         </p>
-        <p className="text-center max-w-prose mx-auto">
-          Un seul contact, un seul contrat, une seule facture
-          <br />
-          Avec fm4all, gérer vos bureaux n&apos;aura jamais été aussi simple !
-        </p>
+        <div className="text-center max-w-prose mx-auto">
+          <p className="text-5xl my-10 font-bold text-fm4allsecondary">
+            1 contact. 1 contrat. 1 facture
+          </p>
+          <p>
+            Avec fm4all, gérer vos bureaux n&apos;aura jamais été aussi simple !
+          </p>
+        </div>
       </div>
     </section>
   );

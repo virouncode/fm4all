@@ -7,6 +7,7 @@ import Mission from "./Mission";
 import Partenaires from "./Partenaires";
 import Presentation from "./Presentation";
 import Services from "./Services";
+import Slogan from "./Slogan";
 import VideoPresentation from "./VideoPresentation";
 import Why from "./Why";
 
@@ -20,6 +21,7 @@ export default function page() {
   return (
     <main className="flex flex-col gap-12 mb-24">
       <Hero />
+      <Slogan />
       <Presentation />
       <Services />
       <Partenaires />
