@@ -8,14 +8,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { MARGE } from "@/constants/constants";
-import { CafeContext } from "@/context/CafeProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { useContext } from "react";
 
 const DetailSnacksFruits = () => {
-  const { cafe } = useContext(CafeContext);
   const { snacksFruits } = useContext(SnacksFruitsContext);
   const { totalSnacksFruits } = useContext(TotalSnacksFruitsContext);
   const totalFruits = totalSnacksFruits.totalFruits;

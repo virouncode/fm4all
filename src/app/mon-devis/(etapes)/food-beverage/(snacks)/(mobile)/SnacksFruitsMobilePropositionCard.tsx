@@ -108,10 +108,6 @@ const SnacksFruitsMobilePropositionCard = ({
     noteGoogle,
     nbAvis,
     total,
-    totalFruits,
-    totalSnacks,
-    totalBoissons,
-    totalLivraison,
   } = proposition;
 
   const color = getFm4AllColor(gamme);

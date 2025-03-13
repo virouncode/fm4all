@@ -39,7 +39,7 @@ const SauvegarderProgression = () => {
   const {
     execute: executeSaveClient,
     isPending: isSavingClient,
-    result: resultSaveClient,
+    // result: resultSaveClient,
   } = useAction(insertClientAction, {
     onSuccess: ({ data }) => {
       toast({

@@ -1,8 +1,6 @@
 "use client";
 import PropositionsTitleMobile from "@/app/mon-devis/PropositionsTitleMobile";
-import { CafeContext } from "@/context/CafeProvider";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
-import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { SelectBoissonsQuantitesType } from "@/zod-schemas/boissonsQuantites";
 import { SelectBoissonsTarifsType } from "@/zod-schemas/boissonsTarifs";
 import { SelectFoodLivraisonTarifsType } from "@/zod-schemas/foodLivraisonTarifs";
@@ -38,8 +36,6 @@ const SnacksFruits = ({
   foodLivraisonTarifs,
 }: SnacksFruitsType) => {
   const { setFoodBeverage } = useContext(FoodBeverageContext);
-  const { cafe } = useContext(CafeContext);
-  const { snacksFruits } = useContext(SnacksFruitsContext);
 
   const handleClickPrevious = () => {
     setFoodBeverage((prev) => ({

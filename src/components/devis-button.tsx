@@ -40,7 +40,6 @@ import { TotalContext } from "@/context/TotalProvider";
 import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 
@@ -201,56 +200,55 @@ const DevisButton = ({
   //   });
   // };
 
-  return (devisProgress.completedSteps.includes(1) ? (
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button
-            type="button"
-            variant="destructive"
-            size={size}
-            title={text}
-            className={`text-base ${className}`}
-            disabled={disabled}
-          >
-            {text}
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
-          <DialogHeader>
-            <DialogTitle>Devis en cours</DialogTitle>
-            <DialogDescription>
-              Un devis est déjà en cours. Souhaitez-vous le reprendre ou en
-              créer un nouveau (vos informations seront perdues) ?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <DialogClose asChild>
-              <div className="flex gap-4 justify-center mx-auto">
-                <Button variant="destructive" onClick={handleClickNouveau}>
-                  Nouveau
-                </Button>
-                <Button onClick={handleClickReprendre} variant="outline">
-                  Reprendre
-                </Button>
-              </div>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    ) : (
-      <div className="flex justify-center">
+  return devisProgress.completedSteps.includes(1) ? (
+    <Dialog>
+      <DialogTrigger asChild>
         <Button
+          type="button"
           variant="destructive"
           size={size}
-          title={title}
+          title={text}
           className={`text-base ${className}`}
-          onClick={handleClickNouveau}
           disabled={disabled}
         >
           {text}
         </Button>
-      </div>
-    )
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
+        <DialogHeader>
+          <DialogTitle>Devis en cours</DialogTitle>
+          <DialogDescription>
+            Un devis est déjà en cours. Souhaitez-vous le reprendre ou en créer
+            un nouveau (vos informations seront perdues) ?
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <DialogClose asChild>
+            <div className="flex gap-4 justify-center mx-auto">
+              <Button variant="destructive" onClick={handleClickNouveau}>
+                Nouveau
+              </Button>
+              <Button onClick={handleClickReprendre} variant="outline">
+                Reprendre
+              </Button>
+            </div>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  ) : (
+    <div className="flex justify-center">
+      <Button
+        variant="destructive"
+        size={size}
+        title={title}
+        className={`text-base ${className}`}
+        onClick={handleClickNouveau}
+        disabled={disabled}
+      >
+        {text}
+      </Button>
+    </div>
   );
 };
 

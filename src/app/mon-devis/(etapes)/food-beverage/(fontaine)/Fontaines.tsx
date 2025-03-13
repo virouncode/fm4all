@@ -1,7 +1,6 @@
 "use client";
 import PropositionsTitleMobile from "@/app/mon-devis/PropositionsTitleMobile";
 import { ClientContext } from "@/context/ClientProvider";
-import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import {
   FontainesContext,
   MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE,
@@ -12,7 +11,6 @@ import useScrollIntoFontainesEspace from "@/hooks/use-scroll-into-fontaines-espa
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
 import { Droplets } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsTitle from "../../../PropositionsTitle";
@@ -29,24 +27,9 @@ const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
   const { setFontaines } = useContext(FontainesContext);
   const { setTotalFontaines } = useContext(TotalFontainesContext);
   const { setFoodBeverage } = useContext(FoodBeverageContext);
-  const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const effectif = client.effectif ?? 0;
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
-  const router = useRouter();
-
   useScrollIntoFontainesEspace();
-
-  const handleClickNext = () => {
-    const searchParams = new URLSearchParams();
-    if (client.effectif)
-      searchParams.set("effectif", client.effectif.toString());
-    if (client.surface) searchParams.set("surface", client.surface.toString());
-    const newCompletedSteps = [
-      ...new Set([...devisProgress.completedSteps, 1, 2, 3]),
-    ].sort((a, b) => a - b);
-    setDevisProgress({ currentStep: 4, completedSteps: newCompletedSteps });
-    router.push(`/mon-devis/pilotage-prestations?${searchParams.toString()}`);
-  };
 
   const handleClickPrevious = () => {
     setFoodBeverage((prev) => ({

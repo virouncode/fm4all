@@ -40,7 +40,7 @@ const HygienePropositions = ({
   const effectif = client.effectif ?? 0;
   const nbDistribEmp =
     hygiene.quantites.nbDistribEmp ?? hygieneDistribQuantite.nbDistribEmp;
-  const nbDistribEmpPoubelle = nbDistribEmp;
+  // const nbDistribEmpPoubelle = nbDistribEmp;
   const nbDistribSavon =
     hygiene.quantites.nbDistribSavon ?? hygieneDistribQuantite.nbDistribSavon;
   const nbDistribPh =

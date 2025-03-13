@@ -54,7 +54,7 @@ import {
 } from "@/zod-schemas/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, useContext, useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { reinitialisationDevis } from "./reinitialisationDevis";
 import ServicesLoader from "./ServicesLoader";
@@ -115,44 +115,6 @@ const MesLocaux = () => {
   if (client.typeOccupation) {
     sauvegarderSearchParams.set("typeOccupation", client.typeOccupation);
   }
-
-  const devisRoutes = [
-    {
-      id: 1,
-      url: "/mes-locaux",
-      name: "Mes locaux",
-    },
-    {
-      id: 2,
-      url: `/mes-services?${serviceSearchParams.toString()}`,
-      name: "Mes services",
-    },
-    {
-      id: 3,
-      url: `/food-beverage`,
-      name: "Food & Beverage",
-    },
-    {
-      id: 4,
-      url: `/pilotage-prestations?${serviceSearchParams.toString()}`,
-      name: "Office Management",
-    },
-    {
-      id: 5,
-      url: `/sauvegarder-ma-progression?${sauvegarderSearchParams.toString()}`,
-      name: "Sauvegarder",
-    },
-    {
-      id: 6,
-      url: "/personnaliser-mon-devis",
-      name: "Personnaliser",
-    },
-    {
-      id: 7,
-      url: "/afficher-mon-devis",
-      name: "Afficher mon devis",
-    },
-  ];
 
   const defaultValues: MesLocauxType = {
     surface: client.surface.toString(),
@@ -263,29 +225,29 @@ const MesLocaux = () => {
     }, 3000);
   };
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    if (name === "surface") {
-      const newValue = value ? parseInt(value) : 50;
-      setClient((prev) => ({
-        ...prev,
-        [name]: newValue > MAX_SURFACE ? MAX_SURFACE : newValue,
-      }));
-      return;
-    }
-    if (name === "effectif") {
-      const newValue = value ? parseInt(value) : 1;
-      setClient((prev) => ({
-        ...prev,
-        [name]: newValue > MAX_EFFECTIF ? MAX_EFFECTIF : newValue,
-      }));
-      return;
-    }
-    setClient((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  // const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value } = e.target;
+  //   if (name === "surface") {
+  //     const newValue = value ? parseInt(value) : 50;
+  //     setClient((prev) => ({
+  //       ...prev,
+  //       [name]: newValue > MAX_SURFACE ? MAX_SURFACE : newValue,
+  //     }));
+  //     return;
+  //   }
+  //   if (name === "effectif") {
+  //     const newValue = value ? parseInt(value) : 1;
+  //     setClient((prev) => ({
+  //       ...prev,
+  //       [name]: newValue > MAX_EFFECTIF ? MAX_EFFECTIF : newValue,
+  //     }));
+  //     return;
+  //   }
+  //   setClient((prev) => ({
+  //     ...prev,
+  //     [name]: value,
+  //   }));
+  // };
 
   const handleSelect = (value: string, name: string) => {
     setClient((prev) => ({
