@@ -41,7 +41,7 @@ import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvide
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { useRouter } from "next/navigation";
-import { useContext } from "react";
+import { Dispatch, SetStateAction, useContext } from "react";
 
 type DevisButtonProps = {
   title: string;
@@ -49,6 +49,7 @@ type DevisButtonProps = {
   size?: "default" | "sm" | "lg" | "icon" | null;
   className?: string;
   disabled?: boolean;
+  setIsMobileNavOpen?: Dispatch<SetStateAction<boolean>>;
 };
 
 const DevisButton = ({
@@ -57,6 +58,7 @@ const DevisButton = ({
   className,
   size = "default",
   disabled = false,
+  setIsMobileNavOpen,
 }: DevisButtonProps) => {
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const { setServices } = useContext(ServicesContext);
@@ -185,6 +187,7 @@ const DevisButton = ({
       setTotalServicesFm4All,
       setTotal
     );
+    if (setIsMobileNavOpen) setIsMobileNavOpen(false);
     router.push("/mon-devis/mes-locaux");
   };
 
@@ -210,6 +213,9 @@ const DevisButton = ({
           title={text}
           className={`text-base ${className}`}
           disabled={disabled}
+          onClick={
+            setIsMobileNavOpen ? () => setIsMobileNavOpen(false) : undefined
+          }
         >
           {text}
         </Button>

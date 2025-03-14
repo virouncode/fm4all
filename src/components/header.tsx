@@ -7,6 +7,7 @@ import {
   Handshake,
   Home,
   Menu,
+  Phone,
   ScrollText,
   Star,
   X,
@@ -104,6 +105,7 @@ const Header = () => {
             text="Mon devis en ligne"
             className="text-sm"
             disabled={path.includes("/mon-devis")}
+            setIsMobileNavOpen={setIsMobileNavOpen}
           />
           <Button
             title="Devenir prestataire"
@@ -111,8 +113,21 @@ const Header = () => {
             className="hidden min-[600px]:flex justify-center items-center"
             size="default"
             asChild
+            onClick={() => setIsMobileNavOpen(false)}
           >
             <Link href="/devenir-prestataire">Devenir prestataire</Link>
+          </Button>
+          <Button
+            title="Nous contacter"
+            variant="outline"
+            className="hidden min-[500px]:flex justify-center items-center rounded-full"
+            size="icon"
+            asChild
+            onClick={() => setIsMobileNavOpen(false)}
+          >
+            <Link href="/contact">
+              <Phone />
+            </Link>
           </Button>
           {isMobileNavOpen ? (
             <X
@@ -213,6 +228,15 @@ const Header = () => {
               >
                 <HandPlatter size={30} />
                 <Link href="/devenir-prestataire">Devenir prestataire</Link>
+              </div>
+              <div
+                className={`hidden max-[600px]:flex gap-4 items-center ${
+                  isActive("/contact") ? "text-destructive font-bold" : ""
+                }`}
+                onClick={handleHideMobileNav}
+              >
+                <Phone size={30} />
+                <Link href="/contact">Nous contacter</Link>
               </div>
             </div>
           </div>

@@ -71,9 +71,9 @@ const Why = () => {
           </li>
         </ul>
       </div>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-10">
         <p className="text-lg">
-          <strong>Le problème</strong> : un marché complexe pour les petites
+          <strong>Le problème</strong> 🤔 : un marché complexe pour les petites
           structures
         </p>
         <div className="flex flex-col md:flex-row w-full lg:w-3/4 mx-auto border rounded-xl overflow-hidden">
@@ -112,13 +112,13 @@ const Why = () => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 text-lg">
+      <div className="flex flex-col  text-lg gap-10">
         <p>
-          <strong>La solution</strong> : fm4all simplifie et optimise la gestion
-          facility management pour tous.
+          <strong>La solution</strong> 💡 : fm4all simplifie et optimise la
+          gestion facility management pour tous.
         </p>
         <div className="text-center max-w-prose mx-auto">
-          <div className="flex flex-col gap-1 text-5xl my-10 font-bold text-fm4allsecondary">
+          <div className="flex flex-col gap-1 text-5xl mb-10 font-bold text-fm4allsecondary">
             <p>1 contact.</p>
             <p>1 contrat.</p>
             <p>1 facture.</p>

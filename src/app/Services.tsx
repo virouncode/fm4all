@@ -11,7 +11,7 @@ import Link from "next/link";
 
 const Services = () => {
   return (
-    <section className="max-w-7xl w-full mx-auto flex flex-col gap-10 p-6">
+    <section className="max-w-7xl w-full mx-auto flex flex-col gap-10 p-6 relative">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl md:text-3xl border-l-2 px-4">Nos services</h2>
         <Button

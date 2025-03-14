@@ -4,7 +4,7 @@ import Image from "next/image";
 const Presentation = () => {
   return (
     <section
-      className="max-w-7xl w-full mx-auto flex flex-col gap-8 p-6 text-lg hyphens-auto text-wrap"
+      className="max-w-7xl w-full mx-auto flex flex-col gap-8 p-6 text-lg hyphens-auto text-wrap relative"
       id="presentation"
     >
       <div className="flex gap-8 justify-center">
@@ -25,11 +25,15 @@ const Presentation = () => {
               Choisissez en ligne des prestataires de confiance{" "}
               <strong>au meilleur prix</strong> : nettoyage, café, fontaine à
               eau, sécurité incendie, office management, et plus encore.{" "}
-              <strong>
-                Gamme Essentiel, Confort ou Excellence : Simplifiez, Comparez et
-                Déléguez
-              </strong>{" "}
-              en quelques clics.
+            </p>
+            <p>
+              Gamme{" "}
+              <span className="text-fm4allessential font-bold">Essentiel</span>,{" "}
+              <span className="text-fm4allcomfort font-bold">Confort</span> ou{" "}
+              <span className="text-fm4allexcellence font-bold">
+                Excellence
+              </span>{" "}
+              : simplifiez, comparez et déléguez en quelques clics.
             </p>
             <p className="mb-6">Prêt à optimiser la gestion de vos bureaux ?</p>
             <DevisButton
@@ -40,7 +44,7 @@ const Presentation = () => {
             />
           </div>
         </div>
-        <div className="h-[420px] w-[420px] relative md:block hidden rounded-xl overflow-hidden">
+        <div className="h-[470px] w-[450px] relative md:block hidden rounded-xl overflow-hidden">
           <Image
             src={"/img/zen.webp"}
             alt={"image-collaboratrice-zen"}
