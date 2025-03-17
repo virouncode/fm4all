@@ -17,6 +17,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import DevisButton from "./devis-button";
+import LangButton from "./lang-button";
 
 const Header = () => {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
@@ -117,6 +118,7 @@ const Header = () => {
           >
             <Link href="/devenir-prestataire">Devenir prestataire</Link>
           </Button>
+          <LangButton />
           <Button
             title="Nous contacter"
             variant="outline"

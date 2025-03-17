@@ -38,6 +38,7 @@ import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Didact_Gothic } from "next/font/google";
 import "./globals.css";
+import LangProvider from "@/context/LangProvider";
 
 const didact = Didact_Gothic({
   variable: "--font-didact-sans",
@@ -66,78 +67,80 @@ export default function RootLayout({
         <GoogleAnalytics
           GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!}
         />
-        <DevisProgressProvider>
-          <ClientProvider>
-            <ServicesProvider>
-              <PersonnalisationProvider>
-                <MonDevisProvider>
-                  <NettoyageProvider>
-                    <HygieneProvider>
-                      <IncendieProvider>
-                        <MaintenanceProvider>
-                          <FoodBeverageProvider>
-                            <CafeProvider>
-                              <TheProvider>
-                                <SnacksFruitsProvider>
-                                  <FontainesProvider>
-                                    <ManagementProvider>
-                                      <OfficeManagerProvider>
-                                        <ServicesFm4AllProvider>
-                                          <CommentairesProvider>
-                                            <TotalProvider>
-                                              <TotalNettoyageProvider>
-                                                <TotalHygieneProvider>
-                                                  <TotalIncendieProvider>
-                                                    <TotalMaintenanceProvider>
-                                                      <TotalCafeProvider>
-                                                        <TotalTheProvider>
-                                                          <TotalSnacksFruitsProvider>
-                                                            <TotalFontainesProvider>
-                                                              <TotalOfficeManagerProvider>
-                                                                <TotalServicesFm4AllProvider>
-                                                                  <ThemeProvider
-                                                                    attribute="class"
-                                                                    defaultTheme="light"
-                                                                    enableSystem
-                                                                    disableTransitionOnChange
-                                                                  >
-                                                                    <Header />
-                                                                    {children}
-                                                                    <CookieBanner />
-                                                                    <Analytics />
-                                                                    <SpeedInsights />
-                                                                    <Footer />
-                                                                    <Toaster />
-                                                                  </ThemeProvider>
-                                                                </TotalServicesFm4AllProvider>
-                                                              </TotalOfficeManagerProvider>
-                                                            </TotalFontainesProvider>
-                                                          </TotalSnacksFruitsProvider>
-                                                        </TotalTheProvider>
-                                                      </TotalCafeProvider>
-                                                    </TotalMaintenanceProvider>
-                                                  </TotalIncendieProvider>
-                                                </TotalHygieneProvider>
-                                              </TotalNettoyageProvider>
-                                            </TotalProvider>
-                                          </CommentairesProvider>
-                                        </ServicesFm4AllProvider>
-                                      </OfficeManagerProvider>
-                                    </ManagementProvider>
-                                  </FontainesProvider>
-                                </SnacksFruitsProvider>
-                              </TheProvider>
-                            </CafeProvider>
-                          </FoodBeverageProvider>
-                        </MaintenanceProvider>
-                      </IncendieProvider>
-                    </HygieneProvider>
-                  </NettoyageProvider>
-                </MonDevisProvider>
-              </PersonnalisationProvider>
-            </ServicesProvider>
-          </ClientProvider>
-        </DevisProgressProvider>
+        <LangProvider>
+          <DevisProgressProvider>
+            <ClientProvider>
+              <ServicesProvider>
+                <PersonnalisationProvider>
+                  <MonDevisProvider>
+                    <NettoyageProvider>
+                      <HygieneProvider>
+                        <IncendieProvider>
+                          <MaintenanceProvider>
+                            <FoodBeverageProvider>
+                              <CafeProvider>
+                                <TheProvider>
+                                  <SnacksFruitsProvider>
+                                    <FontainesProvider>
+                                      <ManagementProvider>
+                                        <OfficeManagerProvider>
+                                          <ServicesFm4AllProvider>
+                                            <CommentairesProvider>
+                                              <TotalProvider>
+                                                <TotalNettoyageProvider>
+                                                  <TotalHygieneProvider>
+                                                    <TotalIncendieProvider>
+                                                      <TotalMaintenanceProvider>
+                                                        <TotalCafeProvider>
+                                                          <TotalTheProvider>
+                                                            <TotalSnacksFruitsProvider>
+                                                              <TotalFontainesProvider>
+                                                                <TotalOfficeManagerProvider>
+                                                                  <TotalServicesFm4AllProvider>
+                                                                    <ThemeProvider
+                                                                      attribute="class"
+                                                                      defaultTheme="light"
+                                                                      enableSystem
+                                                                      disableTransitionOnChange
+                                                                    >
+                                                                      <Header />
+                                                                      {children}
+                                                                      <CookieBanner />
+                                                                      <Analytics />
+                                                                      <SpeedInsights />
+                                                                      <Footer />
+                                                                      <Toaster />
+                                                                    </ThemeProvider>
+                                                                  </TotalServicesFm4AllProvider>
+                                                                </TotalOfficeManagerProvider>
+                                                              </TotalFontainesProvider>
+                                                            </TotalSnacksFruitsProvider>
+                                                          </TotalTheProvider>
+                                                        </TotalCafeProvider>
+                                                      </TotalMaintenanceProvider>
+                                                    </TotalIncendieProvider>
+                                                  </TotalHygieneProvider>
+                                                </TotalNettoyageProvider>
+                                              </TotalProvider>
+                                            </CommentairesProvider>
+                                          </ServicesFm4AllProvider>
+                                        </OfficeManagerProvider>
+                                      </ManagementProvider>
+                                    </FontainesProvider>
+                                  </SnacksFruitsProvider>
+                                </TheProvider>
+                              </CafeProvider>
+                            </FoodBeverageProvider>
+                          </MaintenanceProvider>
+                        </IncendieProvider>
+                      </HygieneProvider>
+                    </NettoyageProvider>
+                  </MonDevisProvider>
+                </PersonnalisationProvider>
+              </ServicesProvider>
+            </ClientProvider>
+          </DevisProgressProvider>
+        </LangProvider>
       </body>
     </html>
   );
