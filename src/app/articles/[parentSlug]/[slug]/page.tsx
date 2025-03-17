@@ -33,11 +33,12 @@ export async function generateMetadata({
     await params,
     options
   );
+
   return {
     title: article.title,
     description: article.subtitle,
     openGraph: {
-      images: [urlFor(article.image)],
+      images: [urlFor(article.image)?.url()],
     },
   };
 }
