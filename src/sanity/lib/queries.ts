@@ -15,7 +15,9 @@ export const ARTICLE_TRANSLATIONS_QUERY = defineQuery(
   `*[_type == "article" && slug.current == $slug]{
 "_translations": *[_type == "translation.metadata" && references(^._id)].translations[].value->{
 title,
+subtitle,
 publishedAt,
+parentSlug,
 slug,
 image,
 body,

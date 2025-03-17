@@ -4,6 +4,7 @@ import { ARTICLE_TRANSLATIONS_QUERY } from "@/sanity/lib/queries";
 import { ArticleType } from "@/sanity/sanity.types";
 
 import { type SanityDocument } from "next-sanity";
+import { Suspense } from "react";
 
 const options = { next: { revalidate: 30 } };
 
@@ -17,8 +18,15 @@ export default async function page({
     await params,
     options
   );
+  console.log("params", await params);
+
+  console.log("results", results);
 
   const articleTranslations: ArticleType[] = results[0]._translations;
 
-  return <Article translations={articleTranslations} />;
+  return (
+    <Suspense>
+      <Article translations={articleTranslations} />
+    </Suspense>
+  );
 }

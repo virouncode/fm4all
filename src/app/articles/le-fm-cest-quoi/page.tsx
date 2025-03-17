@@ -11,7 +11,7 @@ const page = () => {
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
       <article className="mt-6 flex flex-col gap-10">
-        <div className="flex flex-col md:flex-row items-center justify-between">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <h1 className="text-3xl md:text-4xl">Le FM c&apos;est quoi ?</h1>
           <Button
             variant="outline"

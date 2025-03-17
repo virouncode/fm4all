@@ -234,6 +234,8 @@ export type ArticleType = {
   _updatedAt: string;
   _rev: string;
   title?: string;
+  subtitle?: string;
+  parentSlug?: string;
   slug?: Slug;
   publishedAt?: string;
   image?: {
