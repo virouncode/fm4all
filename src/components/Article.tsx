@@ -7,6 +7,7 @@ import { ArticleType } from "@/sanity/sanity.types";
 import { PortableText } from "next-sanity";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 
 type ArticleProps = {
@@ -16,6 +17,7 @@ type ArticleProps = {
 const Article = ({ translations }: ArticleProps) => {
   const { lang } = useContext(LangContext);
   const [article, setArticle] = useState<ArticleType>();
+  const router = useRouter();
 
   useEffect(() => {
     if (!translations) return;
@@ -31,7 +33,7 @@ const Article = ({ translations }: ArticleProps) => {
       const newUrl = `${selectedArticle?.parentSlug ? `/${selectedArticle.parentSlug}` : ""}/${selectedArticle.slug?.current}`;
       window.history.replaceState(null, "", newUrl);
     }
-  }, [lang, translations]);
+  }, [lang, translations, router]);
 
   const articleImageUrl = article?.image ? urlFor(article?.image)?.url() : null;
 

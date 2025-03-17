@@ -6,9 +6,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getScopedI18n } from "@/locales/server";
 import Image from "next/image";
 
-const Hero = () => {
+const Hero = async () => {
+  const t = await getScopedI18n("hero");
+
   return (
     <section
       className="flex items-center justify-center min-h-[calc(100vh-4rem)] md:min-h-[calc(100vh-4rem)] bg-hero-img
@@ -20,56 +23,52 @@ const Hero = () => {
           <CardHeader>
             <CardTitle>
               <h1 className="text-3xl md:text-4xl text-center text-fm4allsecondary text-pretty font-bold">
-                Vos prestataires de services au meilleur prix.
+                {t("title")}
               </h1>
             </CardTitle>
             <CardDescription>
               <h2 className="text-lg md:text-xl text-center mt-6 font-bold">
-                Vos locaux font moins de 3000m² ?
+                {t("subtitle")}
               </h2>
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-6 text-base md:text-lg">
-            {/* <p className="text-center text-xl">
-            <strong>Vos locaux font moins de 3000m² ?</strong>
-          </p> */}
-            <p className="text-center">
-              Gagnez du temps et de l’argent sur la{" "}
-              <strong>gestion de vos prestations</strong> nettoyage, café,
-              maintenance, etc.
-            </p>
+            <p className="text-center">{t("description")}</p>
             <div className="flex justify-center">
               <ul className="ml-10 mb-4">
                 <li className="list-check">
-                  <strong>Comparez</strong> par gamme :{" "}
+                  <strong>{t("compare")}</strong> {t("byRange")}{" "}
                   <span className="text-fm4allessential font-bold">
-                    Essentiel
+                    {t("essential")}
                   </span>
                   ,{" "}
-                  <span className="text-fm4allcomfort font-bold">Confort</span>,{" "}
+                  <span className="text-fm4allcomfort font-bold">
+                    {t("comfort")}
+                  </span>
+                  ,{" "}
                   <span className="text-fm4allexcellence font-bold">
-                    Excellence
+                    {t("excellence")}
                   </span>
                 </li>
                 <li className="list-check">
-                  <strong>Simplifiez</strong> la mise en place des services
+                  <strong>{t("simplify")}</strong> {t("simplifyServices")}
                 </li>
                 <li className="list-check">
-                  <strong>Déléguez</strong> la gestion du quotidien
+                  <strong>{t("delegate")}</strong> {t("delegateManagement")}
                 </li>
               </ul>
             </div>
             <div className="hidden w-full md:flex justify-center">
               <DevisButton
-                title="Je réalise mon devis en ligne"
-                text="Je réalise mon devis en ligne"
+                title={t("online_quote")}
+                text={t("online_quote")}
                 size="lg"
               />
             </div>
             <div className="flex w-full md:hidden justify-center">
               <DevisButton
-                title="Mon devis en ligne"
-                text="Mon devis en ligne"
+                title={t("mobile_quote")}
+                text={t("mobile_quote")}
                 size="lg"
               />
             </div>

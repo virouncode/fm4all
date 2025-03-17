@@ -1,7 +1,6 @@
 import CookieBanner from "@/components/cookie-baner";
 import Footer from "@/components/footer";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
-import Header from "@/components/header";
 import { Toaster } from "@/components/ui/toaster";
 import CafeProvider from "@/context/CafeProvider";
 import ClientProvider from "@/context/ClientProvider";
@@ -11,6 +10,7 @@ import FontainesProvider from "@/context/FontainesProvider";
 import FoodBeverageProvider from "@/context/FoodBeverageProvider";
 import HygieneProvider from "@/context/HygieneProvider";
 import IncendieProvider from "@/context/IncendieProvider";
+import LangProvider from "@/context/LangProvider";
 import MaintenanceProvider from "@/context/MaintenanceProvider";
 import ManagementProvider from "@/context/ManagementProvider";
 import MonDevisProvider from "@/context/MonDevisProvider";
@@ -37,8 +37,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Didact_Gothic } from "next/font/google";
+import { ReactElement } from "react";
 import "./globals.css";
-import LangProvider from "@/context/LangProvider";
 
 const didact = Didact_Gothic({
   variable: "--font-didact-sans",
@@ -56,17 +56,18 @@ export const metadata: Metadata = {
     "Office Management, nettoyage, maintenance règlementaire, machine à café, ... fm4all démocratise le Facility Management pour toutes les tailles d'entreprises. En quelques clics, validez les prestations qui vous conviennent. Cahier des charges, contrats, planification, démarrage, fm4all vous offre un service FM clé en main.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: ReactElement;
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${didact.className} antialiased scroll-smooth`}>
         <GoogleAnalytics
           GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!}
         />
+
         <LangProvider>
           <DevisProgressProvider>
             <ClientProvider>
@@ -103,7 +104,6 @@ export default function RootLayout({
                                                                       enableSystem
                                                                       disableTransitionOnChange
                                                                     >
-                                                                      <Header />
                                                                       {children}
                                                                       <CookieBanner />
                                                                       <Analytics />

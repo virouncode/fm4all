@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useScopedI18n } from "@/locales/client";
 import {
   CircleHelp,
   HandPlatter,
@@ -17,11 +18,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import DevisButton from "./devis-button";
-import LangButton from "./lang-button";
+import LocaleButton from "./locale-button";
 
 const Header = () => {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const path = usePathname();
+  const t = useScopedI18n("nav");
 
   const isActive = (href: string) => {
     if (href === "/") return path === "/";
@@ -56,7 +58,7 @@ const Header = () => {
               }`}
             >
               <Home size={15} />
-              <Link href="/">Home</Link>
+              <Link href="/">{t("maison")}</Link>
             </div> */}
             <div
               className={`flex gap-1 items-center ${
@@ -64,7 +66,7 @@ const Header = () => {
               }`}
             >
               <HandPlatter size={15} />
-              <Link href="/nos-services">Nos services</Link>
+              <Link href="/nos-services">{t("services")}</Link>
             </div>
             <div
               className={`flex gap-1 items-center ${
@@ -72,7 +74,7 @@ const Header = () => {
               }`}
             >
               <Star size={15} />
-              <Link href="/nos-3-gammes">Nos 3 gammes</Link>
+              <Link href="/nos-3-gammes">{t("range")}</Link>
             </div>
             <div
               className={`flex gap-1 items-center ${
@@ -80,7 +82,7 @@ const Header = () => {
               }`}
             >
               <ScrollText size={15} />
-              <Link href="/nos-engagements">Nos engagements</Link>
+              <Link href="/nos-engagements">{t("commitment")}</Link>
             </div>
             <div
               className={`flex gap-1 items-center ${
@@ -88,7 +90,7 @@ const Header = () => {
               }`}
             >
               <Handshake size={15} />
-              <Link href="/nos-partenaires">Nos partenaires</Link>
+              <Link href="/nos-partenaires">{t("partners")}</Link>
             </div>
             <div
               className={`flex gap-1 items-center ${
@@ -96,31 +98,31 @@ const Header = () => {
               }`}
             >
               <CircleHelp size={15} />
-              <Link href="/faq">FAQ</Link>
+              <Link href="/faq">{t("faq")}</Link>
             </div>
           </nav>
         </div>
         <div className="flex items-center gap-4">
           <DevisButton
             title="Mon devis en ligne"
-            text="Mon devis en ligne"
+            text={t("quote")}
             className="text-sm"
             disabled={path.includes("/mon-devis")}
             setIsMobileNavOpen={setIsMobileNavOpen}
           />
           <Button
-            title="Devenir prestataire"
+            title={t("provider")}
             variant="outline"
             className="hidden min-[600px]:flex justify-center items-center"
             size="default"
             asChild
             onClick={() => setIsMobileNavOpen(false)}
           >
-            <Link href="/devenir-prestataire">Devenir prestataire</Link>
+            <Link href="/devenir-prestataire">{t("provider")}</Link>
           </Button>
-          <LangButton className="hidden md:flex" />
+          <LocaleButton className="hidden md:flex" />
           <Button
-            title="Nous contacter"
+            title={t("contact")}
             variant="outline"
             className="hidden min-[500px]:flex justify-center items-center rounded-full"
             size="icon"
@@ -144,9 +146,6 @@ const Header = () => {
               onClick={handleShowMobileNav}
             />
           )}
-          {/* <div className="lg:flex hidden">
-            <ModeToggle />
-          </div> */}
         </div>
         <div
           className={`flex items-center justify-center fixed top-16 left-0 right-0 bg-background shadow-lg h-[calc(100vh-4rem)] text-2xl  ${
@@ -157,11 +156,7 @@ const Header = () => {
           role="navigation"
           aria-label="Mobile navigation"
         >
-          {/* <div className="absolute top-4 left-6">
-            <ModeToggle />
-          </div> */}
-
-          <LangButton className="absolute top-10 left-6 flex gap-1" />
+          <LocaleButton className="absolute top-10 left-6 flex gap-1" />
 
           <div className="flex flex-col gap-4">
             <div className="flex-1 flex flex-col gap-4 ">
@@ -172,7 +167,7 @@ const Header = () => {
                 onClick={handleHideMobileNav}
               >
                 <Home size={30} />
-                <Link href="/">Home</Link>
+                <Link href="/">{t("home")}</Link>
               </div>
               <div
                 className={`flex gap-4 items-center ${
@@ -181,7 +176,7 @@ const Header = () => {
                 onClick={handleHideMobileNav}
               >
                 <HandPlatter size={30} />
-                <Link href="/nos-services">Nos services</Link>
+                <Link href="/nos-services">{t("services")}</Link>
               </div>
               <div
                 className={`flex gap-4 items-center ${
@@ -190,7 +185,7 @@ const Header = () => {
                 onClick={handleHideMobileNav}
               >
                 <Star size={30} />
-                <Link href="/nos-3-gammes">Nos 3 gammes</Link>
+                <Link href="/nos-3-gammes">{t("range")}</Link>
               </div>
               <div
                 className={`flex gap-4 items-center ${
@@ -201,7 +196,7 @@ const Header = () => {
                 onClick={handleHideMobileNav}
               >
                 <ScrollText size={30} />
-                <Link href="/nos-engagements">Nos engagements</Link>
+                <Link href="/nos-engagements">{t("commitment")}</Link>
               </div>
               <div
                 className={`flex gap-4 items-center ${
@@ -212,7 +207,7 @@ const Header = () => {
                 onClick={handleHideMobileNav}
               >
                 <Handshake size={30} />
-                <Link href="/nos-partenaires">Nos partenaires</Link>
+                <Link href="/nos-partenaires">{t("partners")}</Link>
               </div>
               <div
                 className={`flex gap-4 items-center ${
@@ -221,7 +216,7 @@ const Header = () => {
                 onClick={handleHideMobileNav}
               >
                 <CircleHelp size={30} />
-                <Link href="/faq">FAQ</Link>
+                <Link href="/faq">{t("faq")}</Link>
               </div>
               <div
                 className={`hidden max-[600px]:flex gap-4 items-center ${
@@ -232,7 +227,7 @@ const Header = () => {
                 onClick={handleHideMobileNav}
               >
                 <HandPlatter size={30} />
-                <Link href="/devenir-prestataire">Devenir prestataire</Link>
+                <Link href="/devenir-prestataire">{t("provider")}</Link>
               </div>
               <div
                 className={`hidden max-[600px]:flex gap-4 items-center ${
@@ -241,7 +236,7 @@ const Header = () => {
                 onClick={handleHideMobileNav}
               >
                 <Phone size={30} />
-                <Link href="/contact">Nous contacter</Link>
+                <Link href="/contact">{t("contact")}</Link>
               </div>
             </div>
           </div>

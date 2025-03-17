@@ -7,21 +7,24 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { getScopedI18n } from "@/locales/server";
 import Link from "next/link";
 
-const Services = () => {
+const Services = async () => {
+  const t = await getScopedI18n("services");
+
   return (
     <section className="max-w-7xl w-full mx-auto flex flex-col gap-10 p-6 relative">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl md:text-3xl border-l-2 px-4">Nos services</h2>
+        <h2 className="text-2xl md:text-3xl border-l-2 px-4">{t("title")}</h2>
         <Button
           variant="outline"
           className="hidden md:flex text-base justify-center items-center"
-          title="Tous les services"
+          title={t("all_services")}
           size="lg"
           asChild
         >
-          <Link href="/nos-services">Tous les services</Link>
+          <Link href="/nos-services">{t("all_services")}</Link>
         </Button>
       </div>
       <Carousel
@@ -38,14 +41,13 @@ const Services = () => {
               alt="illustration-nettoyage"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
-                <p className="text-2xl">Nettoyage</p>
+                <p className="text-2xl">{t("cleaning.title")}</p>
                 <p className="w-full overflow-hidden text-ellipsis">
-                  Du nettoyage essentiel à une expérience 5 étoiles, du
-                  prestataire PME au grand groupe, choisissez la...
+                  {t("cleaning.description")}
                 </p>
                 <div className="flex-1">
                   <Link className="underline" href="/services/nettoyage">
-                    En savoir plus
+                    {t("learn_more")}
                   </Link>
                 </div>
               </div>
@@ -57,14 +59,13 @@ const Services = () => {
               alt="illustration-hygiene-sanitaire"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
-                <p className="text-2xl">Hygiène sanitaire</p>
+                <p className="text-2xl">{t("hygiene.title")}</p>
                 <p className="w-full overflow-hidden text-ellipsis">
-                  En plus des prestations de nettoyage, fm4all propose la
-                  gestion complète des consommables sanitaires...
+                  {t("hygiene.description")}
                 </p>
                 <div className="flex-1">
                   <Link className="underline" href="/services/hygiene">
-                    En savoir plus
+                    {t("learn_more")}
                   </Link>
                 </div>
               </div>
@@ -76,15 +77,13 @@ const Services = () => {
               alt="illustration-maintenance"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
-                <p className="text-2xl">Maintenance</p>
+                <p className="text-2xl">{t("maintenance.title")}</p>
                 <p className="overflow-hidden text-ellipsis">
-                  Gérer un espace de travail fonctionnel et conforme aux
-                  réglementations en vigueur peut être complexe et
-                  chronophage...
+                  {t("maintenance.description")}
                 </p>
                 <div className="flex-1">
                   <Link className="underline" href="/services/maintenance">
-                    En savoir plus
+                    {t("learn_more")}
                   </Link>
                 </div>
               </div>
@@ -96,18 +95,16 @@ const Services = () => {
               alt="illustration-securite-incendie"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
-                <p className="text-2xl">Sécurité incendie</p>
+                <p className="text-2xl">{t("fire_safety.title")}</p>
                 <p className="overflow-hidden text-ellipsis">
-                  Sécurité incendie BAES, éxtincteurs, détecteurs de fumée,
-                  alarme incendie, laissez nos experts vérifier vos
-                  installati...
+                  {t("fire_safety.description")}
                 </p>
                 <div className="flex-1">
                   <Link
                     className="underline"
                     href="/services/securite-incendie"
                   >
-                    En savoir plus
+                    {t("learn_more")}
                   </Link>
                 </div>
               </div>
@@ -119,14 +116,13 @@ const Services = () => {
               alt="illustration-cafe"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
-                <p className="text-2xl">Café</p>
+                <p className="text-2xl">{t("coffee.title")}</p>
                 <p className="overflow-hidden text-ellipsis">
-                  Chez fm4all, nous savons qu’un bon café fait toute la
-                  différence pour vos collaborateurs et vos...
+                  {t("coffee.description")}
                 </p>
                 <div className="flex-1">
                   <Link className="underline" href="/services/cafe">
-                    En savoir plus
+                    {t("learn_more")}
                   </Link>
                 </div>
               </div>
@@ -138,14 +134,13 @@ const Services = () => {
               alt="illustration-fruits"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
-                <p className="text-2xl">Fruits Frais</p>
+                <p className="text-2xl">{t("fruits.title")}</p>
                 <p className="overflow-hidden text-ellipsis">
-                  Donner, c&apos;est recevoir ! Fruité ou gourmand, offrez du
-                  bien-être à vos collaborateurs !
+                  {t("fruits.description")}
                 </p>
                 <div className="flex-1">
                   <Link className="underline" href="/services/snack">
-                    En savoir plus
+                    {t("learn_more")}
                   </Link>
                 </div>
               </div>
@@ -157,14 +152,13 @@ const Services = () => {
               alt="illustration-snacks"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
-                <p className="text-2xl">Snacks</p>
+                <p className="text-2xl">{t("snacks.title")}</p>
                 <p className="overflow-hidden text-ellipsis">
-                  Donner, c&apos;est recevoir ! Fruité ou gourmand, offrez du
-                  bien-être à vos collaborateurs !
+                  {t("snacks.description")}
                 </p>
                 <div className="flex-1">
                   <Link className="underline" href="/services/snack">
-                    En savoir plus
+                    {t("learn_more")}
                   </Link>
                 </div>
               </div>
@@ -176,14 +170,13 @@ const Services = () => {
               alt="illustration-boissons"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
-                <p className="text-2xl">Boissons variées</p>
+                <p className="text-2xl">{t("drinks.title")}</p>
                 <p className="overflow-hidden text-ellipsis">
-                  Donner, c&apos;est recevoir ! Fruité ou gourmand, offrez du
-                  bien-être à vos collaborateurs !
+                  {t("drinks.description")}
                 </p>
                 <div className="flex-1">
                   <Link className="underline" href="/services/snack">
-                    En savoir plus
+                    {t("learn_more")}
                   </Link>
                 </div>
               </div>
@@ -195,14 +188,13 @@ const Services = () => {
               alt="illustration-fontaine-a-eau"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
-                <p className="text-2xl">Fontaines à eau</p>
+                <p className="text-2xl">{t("water_fountains.title")}</p>
                 <p className="overflow-hidden text-ellipsis">
-                  Eau filtrée, fraîche, gazeuse, à poser ou encastrer, il y a
-                  forcément un modèle fait pour vous.
+                  {t("water_fountains.description")}
                 </p>
                 <div className="flex-1">
                   <Link className="underline" href="/services/eau">
-                    En savoir plus
+                    {t("learn_more")}
                   </Link>
                 </div>
               </div>
@@ -214,14 +206,13 @@ const Services = () => {
               alt="illustration-office-manager"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
-                <p className="text-2xl">Office Manager</p>
+                <p className="text-2xl">{t("office_manager.title")}</p>
                 <p className="overflow-hidden text-ellipsis">
-                  Hospitality, Office ou Facility Manager, une personne dédiée
-                  chez vous dès ½ journée par semaine.
+                  {t("office_manager.description")}
                 </p>
                 <div className="flex-1">
                   <Link className="underline" href="/services/office-manager">
-                    En savoir plus
+                    {t("learn_more")}
                   </Link>
                 </div>
               </div>
@@ -233,14 +224,13 @@ const Services = () => {
               alt="illustration-fm4all"
             >
               <div className="p-4 flex flex-col gap-4 h-52">
-                <p className="text-2xl">Pilotage fm4all</p>
+                <p className="text-2xl">{t("fm4all_management.title")}</p>
                 <p className="overflow-hidden text-ellipsis">
-                  Chez fm4all, nous réinventons la gestion des services généraux
-                  pour les entreprises. Notre plateforme...
+                  {t("fm4all_management.description")}
                 </p>
                 <div className="flex-1">
                   <Link className="underline" href="/services/office-manager">
-                    En savoir plus
+                    {t("learn_more")}
                   </Link>
                 </div>
               </div>
@@ -254,7 +244,7 @@ const Services = () => {
         href="/nos-services"
         className="underline text-fm4allsecondary text-lg md:hidden"
       >
-        Voir tous les services
+        {t("view_all_services")}
       </Link>
     </section>
   );
