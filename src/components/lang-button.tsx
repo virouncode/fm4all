@@ -9,10 +9,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LangContext } from "@/context/LangProvider";
+import { Flag } from "lucide-react";
 import { useContext } from "react";
-import { Button } from "./ui/button";
 
-const LangButton = () => {
+type LangButtonProps = {
+  className?: string;
+};
+
+const LangButton = ({ className }: LangButtonProps) => {
   const { lang, setLang } = useContext(LangContext);
   const handleChangeLang = (lang: string) => {
     setLang(lang as "fr" | "en");
@@ -20,9 +24,12 @@ const LangButton = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
-          {lang.toUpperCase()}
-        </Button>
+        <div
+          className={`flex items-center gap-1 text-sm hover:opacity-75 cursor-pointer rounded-md border w-16 h-9 justify-center ${className}`}
+        >
+          <Flag size={14} />
+          <span>{lang.toUpperCase()}</span>
+        </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuLabel>Language</DropdownMenuLabel>

@@ -50,14 +50,14 @@ const Header = () => {
             </Link>
           </div>
           <nav className="hidden xl:flex items-center gap-4">
-            <div
+            {/* <div
               className={`flex gap-1 items-center ${
                 isActive("/") ? "text-destructive font-bold" : ""
               }`}
             >
               <Home size={15} />
               <Link href="/">Home</Link>
-            </div>
+            </div> */}
             <div
               className={`flex gap-1 items-center ${
                 isActive("/nos-services") ? "text-destructive font-bold" : ""
@@ -118,7 +118,7 @@ const Header = () => {
           >
             <Link href="/devenir-prestataire">Devenir prestataire</Link>
           </Button>
-          <LangButton />
+          <LangButton className="hidden md:flex" />
           <Button
             title="Nous contacter"
             variant="outline"
@@ -160,6 +160,9 @@ const Header = () => {
           {/* <div className="absolute top-4 left-6">
             <ModeToggle />
           </div> */}
+
+          <LangButton className="absolute top-10 left-6 flex gap-1" />
+
           <div className="flex flex-col gap-4">
             <div className="flex-1 flex flex-col gap-4 ">
               <div
