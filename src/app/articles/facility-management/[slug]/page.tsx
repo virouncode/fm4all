@@ -23,7 +23,6 @@ export default async function page({
   console.log("results", results);
 
   const articleTranslations: ArticleType[] = results[0]._translations;
-
   return (
     <Suspense>
       <Article translations={articleTranslations} />
