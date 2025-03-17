@@ -2,20 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { LangContext } from "@/context/LangProvider";
-import { client } from "@/sanity/client";
+import { urlFor } from "@/sanity/lib/urlFor";
 import { ArticleType } from "@/sanity/sanity.types";
-import imageUrlBuilder from "@sanity/image-url";
-import { SanityImageSource } from "@sanity/image-url/lib/types/types";
 import { PortableText } from "next-sanity";
 import Image from "next/image";
 import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
-const { projectId, dataset } = client.config();
-
-const urlFor = (source: SanityImageSource) =>
-  projectId && dataset
-    ? imageUrlBuilder({ projectId, dataset }).image(source)
-    : null;
 
 type ArticleProps = {
   translations: ArticleType[];

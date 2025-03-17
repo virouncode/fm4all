@@ -1,6 +1,10 @@
 import Article from "@/components/Article";
 import { client } from "@/sanity/client";
-import { ARTICLE_TRANSLATIONS_QUERY } from "@/sanity/lib/queries";
+import {
+  ARTICLE_QUERY,
+  ARTICLE_TRANSLATIONS_QUERY,
+} from "@/sanity/lib/queries";
+import { urlFor } from "@/sanity/lib/urlFor";
 import { ArticleType } from "@/sanity/sanity.types";
 
 import { type SanityDocument } from "next-sanity";
@@ -13,6 +17,26 @@ export async function generateStaticParams() {
     { parentSlug: "facility-management", slug: "what-is-fm" },
     { parentSlug: "facility-management", slug: "history-of-fm-outsourcing" },
   ];
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  // read route params
+  const article = await client.fetch<SanityDocument>(
+    ARTICLE_QUERY,
+    await params,
+    options
+  );
+  return {
+    title: article.title,
+    description: article.subtitle,
+    openGraph: {
+      images: [urlFor(article.image)],
+    },
+  };
 }
 
 export default async function page({

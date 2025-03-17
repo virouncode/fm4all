@@ -11,6 +11,13 @@ export const ARTICLES_QUERY =
 //   defineQuery(`*[_type == "post" && slug.current == $slug][0]{
 //   title, body, mainImage
 // }`);
+export const ARTICLE_QUERY = defineQuery(
+  `*[_type == "article" && slug.current == $slug][0]{
+  title,
+  subtitle,
+  image}`
+);
+
 export const ARTICLE_TRANSLATIONS_QUERY = defineQuery(
   `*[_type == "article" && slug.current == $slug]{
 "_translations": *[_type == "translation.metadata" && references(^._id)].translations[].value->{
