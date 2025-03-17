@@ -8,6 +8,13 @@ import { Suspense } from "react";
 
 const options = { next: { revalidate: 30 } };
 
+export async function generateStaticParams() {
+  return [
+    { parentSlug: "facility-management", slug: "what-is-fm" },
+    { parentSlug: "facility-management", slug: "history-of-fm-outsourcing" },
+  ];
+}
+
 export default async function page({
   params,
 }: {
@@ -18,10 +25,6 @@ export default async function page({
     await params,
     options
   );
-  console.log("params", await params);
-
-  console.log("results", results);
-
   const articleTranslations: ArticleType[] = results[0]._translations;
   return (
     <Suspense>
