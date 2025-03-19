@@ -1,5 +1,4 @@
 "use client";
-import PropositionsTitleMobile from "@/app/[locale]/mon-devis/PropositionsTitleMobile";
 import { ServicesContext } from "@/context/ServicesProvider";
 import useScrollIntoService from "@/hooks/use-scroll-into-service";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
@@ -15,6 +14,7 @@ import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
+import PropositionsTitleMobile from "../../../PropositionsTitleMobile";
 import NettoyagePropositions from "./(desktop)/NettoyagePropositions";
 
 type NettoyageProps = {

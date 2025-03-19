@@ -1,4 +1,3 @@
-import FournisseurDialog from "@/app/[locale]/mon-devis/FournisseurDialog";
 import {
   Dialog,
   DialogContent,
@@ -8,6 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { SquareArrowOutUpRight } from "lucide-react";
 import Image from "next/image";
+import FournisseurDialog from "../../../FournisseurDialog";
 
 type CafeEspacePropositionFournisseurLogoProps = {
   nomFournisseur: string | null;

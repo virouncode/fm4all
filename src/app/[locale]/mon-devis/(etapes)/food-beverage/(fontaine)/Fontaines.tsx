@@ -1,5 +1,4 @@
 "use client";
-import PropositionsTitleMobile from "@/app/[locale]/mon-devis/PropositionsTitleMobile";
 import { ClientContext } from "@/context/ClientProvider";
 import {
   FontainesContext,
@@ -14,6 +13,7 @@ import { Droplets } from "lucide-react";
 import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsTitle from "../../../PropositionsTitle";
+import PropositionsTitleMobile from "../../../PropositionsTitleMobile";
 import FontainesDesktopEspaces from "./(desktop)/FontainesDesktopEspaces";
 import FontainesMobileEspaces from "./(mobile)/FontainesMobileEspaces";
 

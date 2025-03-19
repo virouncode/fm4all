@@ -1,4 +1,3 @@
-import FournisseurDialog from "@/app/[locale]/mon-devis/FournisseurDialog";
 import StarRating from "@/components/star-rating";
 import { CarouselItem } from "@/components/ui/carousel";
 import {
@@ -15,6 +14,7 @@ import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import Image from "next/image";
 import { useContext } from "react";
+import FournisseurDialog from "../../../../FournisseurDialog";
 
 type HygieneMobileOptionsBalaiCardProps = {
   proposition: {

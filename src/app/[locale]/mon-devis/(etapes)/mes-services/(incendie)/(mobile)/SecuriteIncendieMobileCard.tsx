@@ -1,4 +1,3 @@
-import FournisseurDialog from "@/app/[locale]/mon-devis/FournisseurDialog";
 import StarRating from "@/components/star-rating";
 import {
   Dialog,
@@ -11,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { IncendieContext } from "@/context/IncendieProvider";
 import { formatNumber } from "@/lib/formatNumber";
+import FournisseurDialog from "../../../../FournisseurDialog";
 
 import Image from "next/image";
 import { useContext } from "react";

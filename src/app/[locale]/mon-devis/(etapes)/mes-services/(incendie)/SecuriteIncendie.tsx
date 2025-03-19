@@ -1,5 +1,4 @@
 "use client";
-import PropositionsTitleMobile from "@/app/[locale]/mon-devis/PropositionsTitleMobile";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
@@ -11,6 +10,7 @@ import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
+import PropositionsTitleMobile from "../../../PropositionsTitleMobile";
 import SecuriteIncendiePropositions from "./SecuriteIncendiePropositions";
 
 type SecuriteIncendieProps = {

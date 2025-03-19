@@ -1,4 +1,3 @@
-import FournisseurDialog from "@/app/[locale]/mon-devis/FournisseurDialog";
 import StarRating from "@/components/star-rating";
 import { CarouselItem } from "@/components/ui/carousel";
 import {
@@ -16,6 +15,7 @@ import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
 import Image from "next/image";
 import { useContext } from "react";
+import FournisseurDialog from "../../../../FournisseurDialog";
 
 type CafeMobileEspacePropositionCardProps = {
   proposition: {

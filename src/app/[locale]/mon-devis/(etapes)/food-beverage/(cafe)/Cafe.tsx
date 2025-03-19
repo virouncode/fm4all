@@ -1,5 +1,4 @@
 "use client";
-import PropositionsTitleMobile from "@/app/[locale]/mon-devis/PropositionsTitleMobile";
 import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
@@ -18,6 +17,7 @@ import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
+import PropositionsTitleMobile from "../../../PropositionsTitleMobile";
 import CafeDesktopEspaces from "./(desktop)/CafeDesktopEspaces";
 import CafeMobileEspaces from "./(mobile)/CafeMobileEspaces";
 import { MAX_NB_PERSONNES_PAR_ESPACE } from "./CafeEspacePropositions";

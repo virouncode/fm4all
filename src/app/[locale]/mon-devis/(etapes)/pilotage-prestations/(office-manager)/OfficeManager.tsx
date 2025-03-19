@@ -1,6 +1,5 @@
 "use client";
 
-import PropositionsTitleMobile from "@/app/[locale]/mon-devis/PropositionsTitleMobile";
 import { ManagementContext } from "@/context/ManagementProvider";
 import useScrollIntoManagement from "@/hooks/use-scroll-into-management";
 import { SelectOfficeManagerQuantitesType } from "@/zod-schemas/officeManagerQuantites";
@@ -10,6 +9,7 @@ import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
+import PropositionsTitleMobile from "../../../PropositionsTitleMobile";
 import OfficeManagerPropositions from "./OfficeManagerPropositions";
 
 type OfficeManagerProps = {

@@ -1,4 +1,3 @@
-import PropositionsTitleMobile from "@/app/[locale]/mon-devis/PropositionsTitleMobile";
 import { IncendieContext } from "@/context/IncendieProvider";
 import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
@@ -14,6 +13,7 @@ import { ChangeEvent, useContext, useRef, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
+import PropositionsTitleMobile from "../../../PropositionsTitleMobile";
 import SecuriteIncendieComplementsInputs from "./SecuriteIncendieComplementsInputs";
 import SecuriteIncendieMobileComplementsInputs from "./SecuriteIncendieMobileComplementsInputs";
 

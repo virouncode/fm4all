@@ -29,15 +29,13 @@ const Article = ({ translations }: ArticleProps) => {
 
     setArticle(selectedArticle);
 
-    if (selectedArticle) {
-      const newUrl = `${selectedArticle?.parentSlug ? `/${selectedArticle.parentSlug}` : ""}/${selectedArticle.slug?.current}`;
-      window.history.replaceState(null, "", newUrl);
-    }
+    // if (selectedArticle) {
+    //   const newUrl = `${selectedArticle?.parentSlug ? `/${selectedArticle.parentSlug}` : ""}/${selectedArticle.slug?.current}`;
+    //   window.history.replaceState(null, "", newUrl);
+    // }
   }, [lang, translations, router]);
 
   const articleImageUrl = article?.image ? urlFor(article?.image)?.url() : null;
-
-  console.log(article);
 
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">

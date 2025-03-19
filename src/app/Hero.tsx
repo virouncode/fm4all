@@ -33,7 +33,9 @@ const Hero = async () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-6 text-base md:text-lg">
-            <p className="text-center">{t("description")}</p>
+            <p className="text-center">
+              <strong>{t("descriptionStrong")}</strong> {t("description")}
+            </p>
             <div className="flex justify-center">
               <ul className="ml-10 mb-4">
                 <li className="list-check">

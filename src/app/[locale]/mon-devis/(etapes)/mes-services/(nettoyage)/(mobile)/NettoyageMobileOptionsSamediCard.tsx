@@ -1,4 +1,3 @@
-import FournisseurDialog from "@/app/[locale]/mon-devis/FournisseurDialog";
 import StarRating from "@/components/star-rating";
 import {
   Dialog,
@@ -13,6 +12,7 @@ import { NettoyageContext } from "@/context/NettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import Image from "next/image";
 import { useContext } from "react";
+import FournisseurDialog from "../../../../FournisseurDialog";
 
 type NettoyageMobileOptionsSamediPropositionsProps = {
   samediProposition: {

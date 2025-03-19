@@ -1,7 +1,5 @@
 "use client";
 
-import NextEtapeSauverButton from "@/app/[locale]/mon-devis/NextEtapeSauverButton";
-import PropositionsTitleMobile from "@/app/[locale]/mon-devis/PropositionsTitleMobile";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { ManagementContext } from "@/context/ManagementProvider";
@@ -17,6 +15,8 @@ import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import ServicesFm4AllPropositions from "./ServicesFm4AllPropositions";
+import NextEtapeSauverButton from "../../../NextEtapeSauverButton";
+import PropositionsTitleMobile from "../../../PropositionsTitleMobile";
 
 type ServicesFm4AllProps = {
   servicesFm4AllTaux: SelectServicesFm4AllTauxType[];

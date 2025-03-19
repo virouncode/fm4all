@@ -1,5 +1,4 @@
 "use client";
-import PropositionsTitleMobile from "@/app/[locale]/mon-devis/PropositionsTitleMobile";
 import { ServicesContext } from "@/context/ServicesProvider";
 import { SelectLegioTarifsType } from "@/zod-schemas/legioTarifs";
 import { SelectMaintenanceQuantitesType } from "@/zod-schemas/maintenanceQuantites";
@@ -11,6 +10,7 @@ import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
+import PropositionsTitleMobile from "../../../PropositionsTitleMobile";
 import MaintenancePropositions from "./MaintenancePropositions";
 
 type MaintenanceProps = {

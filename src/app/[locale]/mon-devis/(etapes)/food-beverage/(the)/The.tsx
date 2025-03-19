@@ -1,5 +1,4 @@
 "use client";
-import PropositionsTitleMobile from "@/app/[locale]/mon-devis/PropositionsTitleMobile";
 import { CafeContext } from "@/context/CafeProvider";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
@@ -8,6 +7,7 @@ import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
+import PropositionsTitleMobile from "../../../PropositionsTitleMobile";
 import ThePropositions from "./ThePropositions";
 
 type TheProps = {

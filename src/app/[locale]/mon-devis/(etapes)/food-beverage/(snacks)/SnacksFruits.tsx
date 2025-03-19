@@ -1,5 +1,4 @@
 "use client";
-import PropositionsTitleMobile from "@/app/[locale]/mon-devis/PropositionsTitleMobile";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
 import { SelectBoissonsQuantitesType } from "@/zod-schemas/boissonsQuantites";
 import { SelectBoissonsTarifsType } from "@/zod-schemas/boissonsTarifs";
@@ -13,6 +12,7 @@ import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
+import PropositionsTitleMobile from "../../../PropositionsTitleMobile";
 import SnacksFruitsForm from "./SnacksFruitsForm";
 import SnacksFruitsPropositions from "./SnacksFruitsPropositions";
 

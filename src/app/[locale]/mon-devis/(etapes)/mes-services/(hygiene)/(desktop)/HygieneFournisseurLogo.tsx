@@ -1,5 +1,4 @@
 "use client";
-import FournisseurDialog from "@/app/[locale]/mon-devis/FournisseurDialog";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { SquareArrowOutUpRight } from "lucide-react";
 import Image from "next/image";
+import FournisseurDialog from "../../../../FournisseurDialog";
 type HygieneFournisseurLogoProps = {
   nomFournisseur: string | null;
   logoUrl: string | null;

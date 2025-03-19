@@ -14,10 +14,9 @@ const page = () => {
         <h1 className="text-4xl">Politique de confidentialité</h1>
         <div className="flex flex-col gap-2 md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto">
           <p className="text-base">
-            Chez fm4all, Société par actions simplifiée (en cours
-            d&apos;immatriculation, numéro SIRET communiqué dès obtention),
-            domiciliée au 3 rue de Nantes, 75019 Paris, nous accordons une
-            grande importance à la protection de vos données personnelles.
+            Chez fm4all, Société par actions simplifiée (SIRET : 941 928 640
+            00015), domiciliée au 3 rue de Nantes, 75019 Paris, nous accordons
+            une grande importance à la protection de vos données personnelles.
           </p>
           <p className="text-base">
             La présente politique de confidentialité explique comment nous
@@ -33,11 +32,10 @@ const page = () => {
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto">
             <p className="text-base">
               Le responsable du traitement des données est la société fm4all,
-              Société par actions simplifiée (en cours d&apos;immatriculation,
-              numéro SIRET communiqué dès obtention), domiciliée au 3 rue de
-              Nantes, 75019 Paris. Vous pouvez nous contacter pour toute
-              question relative à la protection des données à l&apos;adresse
-              suivante : admin@fm4all.com
+              Société par actions simplifiée (SIRET : 941 928 640 00015),
+              domiciliée au 3 rue de Nantes, 75019 Paris. Vous pouvez nous
+              contacter pour toute question relative à la protection des données
+              à l&apos;adresse suivante : admin@fm4all.com
             </p>
           </div>
         </div>

@@ -9,6 +9,15 @@ import {
 import { useChangeLocale, useCurrentLocale } from "@/locales/client";
 import { Flag } from "lucide-react";
 
+// const urlMapping: { fr: Record<string, string>; en: Record<string, string> } = {
+//   fr: {
+//     "/our-services": "/nos-services",
+//   },
+//   en: {
+//     "/nos-services": "/our-services",
+//   },
+// };
+
 type LocaleButtonProps = {
   className?: string;
 };
@@ -16,10 +25,8 @@ type LocaleButtonProps = {
 const LocaleButton = ({ className }: LocaleButtonProps) => {
   const locale = useCurrentLocale();
   const changeLocale = useChangeLocale();
-  // const { lang, setLang } = useContext(LangContext);
   const handleChangeLang = (lang: "fr" | "en") => {
     changeLocale(lang);
-    // setLang
   };
   return (
     <DropdownMenu modal={false}>

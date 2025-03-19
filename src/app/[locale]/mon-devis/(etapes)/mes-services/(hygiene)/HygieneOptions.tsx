@@ -1,6 +1,5 @@
 "use client";
 
-import PropositionsTitleMobile from "@/app/[locale]/mon-devis/PropositionsTitleMobile";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
@@ -12,6 +11,7 @@ import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
+import PropositionsTitleMobile from "../../../PropositionsTitleMobile";
 import HygieneOptionsPropositions from "./(desktop)/HygieneOptionsPropositions";
 
 type HygieneOptionsProps = {

@@ -123,8 +123,8 @@ const FontaineMobileEspacePropositionsCarousel = ({
         espace.infos.poseSelected === "aposer"
           ? 0
           : espace.infos.poseSelected === "colonne"
-          ? 1
-          : 2
+            ? 1
+            : 2
       );
     }
   }, [

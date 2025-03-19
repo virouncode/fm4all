@@ -1,4 +1,3 @@
-import FournisseurDialog from "@/app/[locale]/mon-devis/FournisseurDialog";
 import StarRating from "@/components/star-rating";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +18,7 @@ import { Minus, Plus } from "lucide-react";
 import Image from "next/image";
 import React, { useContext } from "react";
 import { MAX_PASSAGES_VITRERIE } from "../(desktop)/NettoyageOptionsPropositions";
+import FournisseurDialog from "../../../../FournisseurDialog";
 
 type NettoyageMobileOptionsVitrerieCardProps = {
   vitrerieProposition: {

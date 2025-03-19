@@ -1,4 +1,3 @@
-import FournisseurDialog from "@/app/[locale]/mon-devis/FournisseurDialog";
 import {
   Dialog,
   DialogContent,
@@ -12,6 +11,7 @@ import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import Image from "next/image";
 import { useContext } from "react";
+import FournisseurDialog from "../../../../FournisseurDialog";
 
 type OfficeManagerMobilePropositionCardProps = {
   proposition: {

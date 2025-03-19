@@ -1,4 +1,3 @@
-import FournisseurDialog from "@/app/[locale]/mon-devis/FournisseurDialog";
 import { CarouselItem } from "@/components/ui/carousel";
 import {
   Dialog,
@@ -14,6 +13,7 @@ import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { GammeType } from "@/zod-schemas/gamme";
 import Image from "next/image";
 import { useContext } from "react";
+import FournisseurDialog from "../../../../FournisseurDialog";
 
 type ServicesFm4AllMobilePropositionCardProps = {
   proposition: {
