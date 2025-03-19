@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { setStaticParamsLocale } from "next-international/server";
-import ContactPage from "../ContactPage";
+import ConfidentialitePage from "../ConfidentialitePage";
 
 export const generateMetadata = async ({
   params,
@@ -9,27 +9,27 @@ export const generateMetadata = async ({
 }): Promise<Metadata> => {
   const { locale } = await params;
   return {
-    title: "Contactez-nous",
+    title: "Privacy policy",
     description:
-      "Contactez-nous pour plus de questions sur nos services de Facility Management",
+      "Read our privacy policy to learn more about the collection and processing of your personal data.",
     alternates: {
-      canonical: `https://www.fm4all.com/${locale}/contactez-nous`,
+      canonical: `https://www.fm4all.com/${locale}/privacy-policy`,
       languages: {
-        en: "https://www.fm4all.com/en/contact-us",
-        fr: "https://www.fm4all.com/fr/contactez-nous",
+        en: "https://www.fm4all.com/en/privacy-policy",
+        fr: "https://www.fm4all.com/fr/policy-de-confidentialite",
       },
     },
   };
 };
 
 export const generateStaticParams = () => {
-  return [{ locale: "fr" }];
+  return [{ locale: "en" }];
 };
 
 const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
   const { locale } = await params;
   setStaticParamsLocale(locale);
-  return <ContactPage />;
+  return <ConfidentialitePage />;
 };
 
 export default page;

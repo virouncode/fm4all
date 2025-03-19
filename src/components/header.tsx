@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useScopedI18n } from "@/locales/client";
+import { useCurrentLocale, useScopedI18n } from "@/locales/client";
 import {
   CircleHelp,
   HandPlatter,
@@ -17,17 +17,21 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { RouteKey, routes } from "../lib/routes";
 import DevisButton from "./devis-button";
 import LocaleButton from "./locale-button";
+import LocalizedLink from "./localized-link";
 
 const Header = () => {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const path = usePathname();
   const t = useScopedI18n("nav");
+  const locale = useCurrentLocale();
 
-  const isActive = (href: string) => {
-    if (href === "/") return path === "/";
-    return path.includes(href);
+  const isActive = (routeKey: RouteKey) => {
+    const localizedPath = routes[routeKey][locale as "fr" | "en"];
+    if (localizedPath === "/") return path === "/";
+    return path.includes(localizedPath);
   };
 
   const handleShowMobileNav = () => {
@@ -41,7 +45,7 @@ const Header = () => {
       <header className="max-w-7xl h-full flex justify-between items-center p-6 mx-auto">
         <div className="flex items-center gap-6">
           <div className="relative h-[23px] w-[100px]">
-            <Link href="/">
+            <LocalizedLink href="home">
               <Image
                 src="/img/logo_full.webp"
                 alt="Logo"
@@ -49,56 +53,59 @@ const Header = () => {
                 quality={100}
                 className="object-contain"
               />
-            </Link>
+            </LocalizedLink>
           </div>
           <nav className="hidden xl:flex items-center gap-4">
             {/* <div
               className={`flex gap-1 items-center ${
-                isActive("/") ? "text-destructive font-bold" : ""
+                isActive("home") ? "text-destructive font-bold" : ""
               }`}
             >
               <Home size={15} />
-              <Link href="/">{t("maison")}</Link>
+              <LocalizedLink href="home">{t("maison")}</LocalizedLink>
             </div> */}
             <div
-              className={`flex gap-1 items-center ${
-                isActive("/nos-services") ? "text-destructive font-bold" : ""
-              }`}
+              // className={`flex gap-1 items-center ${
+              //   isActive("/nos-services") ? "text-destructive font-bold" : ""
+              // }`}
+              className={`flex gap-1 items-center`}
             >
               <HandPlatter size={15} />
               <Link href="/nos-services">{t("services")}</Link>
             </div>
             <div
               className={`flex gap-1 items-center ${
-                isActive("/nos-3-gammes") ? "text-destructive font-bold" : ""
+                isActive("gammes") ? "text-destructive font-bold" : ""
               }`}
             >
               <Star size={15} />
-              <Link href="/nos-3-gammes">{t("range")}</Link>
+              <LocalizedLink href="gammes">{t("range")}</LocalizedLink>
             </div>
             <div
               className={`flex gap-1 items-center ${
-                isActive("/nos-engagements") ? "text-destructive font-bold" : ""
+                isActive("engagements") ? "text-destructive font-bold" : ""
               }`}
             >
               <ScrollText size={15} />
-              <Link href="/nos-engagements">{t("commitment")}</Link>
+              <LocalizedLink href="engagements">
+                {t("commitment")}
+              </LocalizedLink>
             </div>
             <div
               className={`flex gap-1 items-center ${
-                isActive("/nos-partenaires") ? "text-destructive font-bold" : ""
+                isActive("partenaires") ? "text-destructive font-bold" : ""
               }`}
             >
               <Handshake size={15} />
-              <Link href="/nos-partenaires">{t("partners")}</Link>
+              <LocalizedLink href="partenaires">{t("partners")}</LocalizedLink>
             </div>
             <div
               className={`flex gap-1 items-center ${
-                isActive("/faq") ? "text-destructive font-bold" : ""
+                isActive("faq") ? "text-destructive font-bold" : ""
               }`}
             >
               <CircleHelp size={15} />
-              <Link href="/faq">{t("faq")}</Link>
+              <LocalizedLink href="faq">{t("faq")}</LocalizedLink>
             </div>
           </nav>
         </div>
@@ -118,7 +125,7 @@ const Header = () => {
             asChild
             onClick={() => setIsMobileNavOpen(false)}
           >
-            <Link href="/devenir-prestataire">{t("provider")}</Link>
+            <LocalizedLink href="prestataires">{t("provider")}</LocalizedLink>
           </Button>
           <LocaleButton className="hidden md:flex" />
           <Button
@@ -129,9 +136,9 @@ const Header = () => {
             asChild
             onClick={() => setIsMobileNavOpen(false)}
           >
-            <Link href="/contact">
+            <LocalizedLink href="contact">
               <Phone />
-            </Link>
+            </LocalizedLink>
           </Button>
           {isMobileNavOpen ? (
             <X
@@ -162,17 +169,18 @@ const Header = () => {
             <div className="flex-1 flex flex-col gap-4 ">
               <div
                 className={`flex gap-4 items-center ${
-                  isActive("/") ? "text-destructive font-bold" : ""
+                  isActive("home") ? "text-destructive font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
                 <Home size={30} />
-                <Link href="/">{t("home")}</Link>
+                <LocalizedLink href="home">{t("home")}</LocalizedLink>
               </div>
               <div
-                className={`flex gap-4 items-center ${
-                  isActive("/nos-services") ? "text-destructive font-bold" : ""
-                }`}
+                // className={`flex gap-4 items-center ${
+                //   isActive("/nos-services") ? "text-destructive font-bold" : ""
+                // }`}
+                className={`flex gap-4 items-center`}
                 onClick={handleHideMobileNav}
               >
                 <HandPlatter size={30} />
@@ -180,63 +188,63 @@ const Header = () => {
               </div>
               <div
                 className={`flex gap-4 items-center ${
-                  isActive("/nos-3-gammes") ? "text-destructive font-bold" : ""
+                  isActive("gammes") ? "text-destructive font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
                 <Star size={30} />
-                <Link href="/nos-3-gammes">{t("range")}</Link>
+                <LocalizedLink href="gammes">{t("range")}</LocalizedLink>
               </div>
               <div
                 className={`flex gap-4 items-center ${
-                  isActive("/nos-engagements")
-                    ? "text-destructive font-bold"
-                    : ""
+                  isActive("engagements") ? "text-destructive font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
                 <ScrollText size={30} />
-                <Link href="/nos-engagements">{t("commitment")}</Link>
+                <LocalizedLink href="engagements">
+                  {t("commitment")}
+                </LocalizedLink>
               </div>
               <div
                 className={`flex gap-4 items-center ${
-                  isActive("/nos-partenaires")
-                    ? "text-destructive font-bold"
-                    : ""
+                  isActive("partenaires") ? "text-destructive font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
                 <Handshake size={30} />
-                <Link href="/nos-partenaires">{t("partners")}</Link>
+                <LocalizedLink href="partenaires">
+                  {t("partners")}
+                </LocalizedLink>
               </div>
               <div
                 className={`flex gap-4 items-center ${
-                  isActive("/faq") ? "text-destructive font-bold" : ""
+                  isActive("faq") ? "text-destructive font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
                 <CircleHelp size={30} />
-                <Link href="/faq">{t("faq")}</Link>
+                <LocalizedLink href="faq">{t("faq")}</LocalizedLink>
               </div>
               <div
                 className={`hidden max-[600px]:flex gap-4 items-center ${
-                  isActive("/devenir-prestataire")
-                    ? "text-destructive font-bold"
-                    : ""
+                  isActive("prestataires") ? "text-destructive font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
                 <HandPlatter size={30} />
-                <Link href="/devenir-prestataire">{t("provider")}</Link>
+                <LocalizedLink href="prestataires">
+                  {t("provider")}
+                </LocalizedLink>
               </div>
               <div
                 className={`hidden max-[600px]:flex gap-4 items-center ${
-                  isActive("/contact") ? "text-destructive font-bold" : ""
+                  isActive("contact") ? "text-destructive font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
                 <Phone size={30} />
-                <Link href="/contact">{t("contact")}</Link>
+                <LocalizedLink href="contact">{t("contact")}</LocalizedLink>
               </div>
             </div>
           </div>

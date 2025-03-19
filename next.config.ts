@@ -18,14 +18,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  rewrites: async () => {
-    return [
-      {
-        source: "/en/our-services",
-        destination: "/en/nos-services",
-      },
-    ];
-  },
 };
 
 const withBundleAnalyzer = BundleAnalyzer({

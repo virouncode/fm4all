@@ -69,8 +69,6 @@ export default async function RootLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  console.log("locale", locale);
-
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className={`${didact.className} antialiased scroll-smooth`}>

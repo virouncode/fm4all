@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { setStaticParamsLocale } from "next-international/server";
-import ContactPage from "../ContactPage";
+import CookiesPage from "../CookiesPage";
 
 export const generateMetadata = async ({
   params,
@@ -9,27 +9,28 @@ export const generateMetadata = async ({
 }): Promise<Metadata> => {
   const { locale } = await params;
   return {
-    title: "Contactez-nous",
+    title: "Cookies policy",
     description:
-      "Contactez-nous pour plus de questions sur nos services de Facility Management",
+      "Read our cookie policy to learn more about the use of cookies on our website.",
+
     alternates: {
-      canonical: `https://www.fm4all.com/${locale}/contactez-nous`,
+      canonical: `https://www.fm4all.com/${locale}/cookies-policy`,
       languages: {
-        en: "https://www.fm4all.com/en/contact-us",
-        fr: "https://www.fm4all.com/fr/contactez-nous",
+        en: "https://www.fm4all.com/en/cookies-policy",
+        fr: "https://www.fm4all.com/fr/politique-de-cookies",
       },
     },
   };
 };
 
 export const generateStaticParams = () => {
-  return [{ locale: "fr" }];
+  return [{ locale: "en" }];
 };
 
 const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
   const { locale } = await params;
   setStaticParamsLocale(locale);
-  return <ContactPage />;
+  return <CookiesPage />;
 };
 
 export default page;

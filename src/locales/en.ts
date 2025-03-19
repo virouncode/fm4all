@@ -499,4 +499,760 @@ export default {
         "All our partners adhere to a strict purchasing charter and are committed to following our Sales Terms and Conditions. You are therefore guaranteed a service that aligns with your expectations.",
     },
   },
+  commitmentsPage: {
+    title: "Our commitments",
+    description:
+      "Our commitments: Guarantee, Simplicity, Time-saving, Personalized operational follow-up, Quality Assurance",
+    intro: {
+      part1: "At fm4all, we are committed to building trust",
+      part2: "and providing excellent services.",
+      part3:
+        "Our commitments reflect our desire to place your needs, expectations, and values at the center of our priorities.",
+    },
+    pillars: {
+      simplicity: {
+        title: "Simplicity",
+        description:
+          "We simplify your life by taking care of all aspects related to your general services.",
+      },
+      speed: {
+        title: "Speed",
+        description:
+          "Your time is valuable, and we are committed to acting efficiently.",
+      },
+      reliability: {
+        title: "Reliability",
+        description: "Trust experts to ensure impeccable services.",
+      },
+      serenity: {
+        title: "Serenity",
+        description:
+          "Work with peace of mind thanks to our comprehensive support.",
+      },
+      cost_optimization: {
+        title: "Cost Optimization",
+        description:
+          "We help you control your expenses while maintaining a high level of service.",
+      },
+    },
+    outro: {
+      part1:
+        "By entrusting us with your general services, you are choosing a modern, responsible approach focused on your priorities.",
+      part2:
+        "With fm4all, you save time, reduce your efforts, and optimize your resources while ensuring reliable and fast services.",
+    },
+    contact: {
+      schedule_meeting: "I schedule a video meeting",
+      contact_phone: "I contact by phone",
+      contact_email: "I contact by email",
+    },
+    whyCards: {
+      simplicity: {
+        title: "Simplicity",
+        content:
+          "3 standardized service ranges for easy comparison and selection.",
+      },
+      speed: {
+        title: "Speed",
+        content:
+          "Personalized quotes online in just a few minutes, ready to start.",
+      },
+      reliability: {
+        title: "Reliability",
+        content: "Clear contracts and trusted partners rigorously selected.",
+      },
+      serenity: {
+        title: "Serenity",
+        content:
+          "Centralized requests, quality monitoring, and escalations for guaranteed peace of mind.",
+      },
+      costOptimization: {
+        title: "Optimized",
+        content: "-10% on average thanks to bundled offers from our partners.",
+      },
+    },
+  },
+  partnersPage: {
+    title: "Our partners",
+    description:
+      "With our partners, we establish a collaboration based on quality and trust.",
+    intro: {
+      part1: "At fm4all, our partners are much more than simple providers:",
+      part2:
+        "they are essential players in our mission to deliver quality services to our clients.",
+      part3:
+        "This is why we have implemented a rigorous and demanding selection process,",
+      part4:
+        "as well as a collaborative framework based on clear and shared commitments.",
+    },
+    sections: {
+      selection: {
+        title: "A demanding selection process",
+        description:
+          "We only work with partners who share our values of excellence, reliability, and respect. Our selection is based on several key criteria:",
+        criteria: {
+          experience:
+            "Experience and expertise: Providers must demonstrate recognized experience and proven expertise in their field of activity.",
+          references:
+            "Verifiable references: Each candidate is evaluated based on their past achievements and recommendations from existing clients.",
+          adaptability:
+            "Adaptability: We prioritize partners who can respond quickly and effectively to the specific needs of our clients.",
+          compliance:
+            "Compliance with standards: All providers must adhere to regulatory standards and best practices in their sector.",
+        },
+      },
+      charter: {
+        title: "An engaging partnership charter",
+        description:
+          "To ensure impeccable service, we require our partners to sign a quality and responsibility charter. This charter includes strong commitments:",
+        commitments: {
+          quality:
+            "Service quality: Maintain a high level of service in line with client expectations and fm4all standards.",
+          transparency:
+            "Responsiveness and transparency: Ensure smooth communication, quickly address complaints, and share necessary information for effective follow-up.",
+          environment:
+            "Environmental commitment: Favor eco-friendly practices, such as using sustainable products and adhering to sustainable development principles.",
+          ethics:
+            "Professional ethics: Respect employee rights, ensure fair working conditions, and adopt exemplary conduct.",
+        },
+      },
+      followUp: {
+        title: "Continuous follow-up for lasting quality",
+        description:
+          "Collaborating with fm4all means joining a network where quality is a constant priority. We carry out:",
+        actions: {
+          audits:
+            "Regular audits: To assess service performance and identify areas for improvement.",
+          feedback:
+            "Client feedback monitoring: End-user feedback is systematically taken into account to adjust services if necessary.",
+          contact:
+            "Dedicated contact points: Our partners benefit from a single point of contact to facilitate exchanges and ensure smooth collaboration.",
+        },
+      },
+      benefits: {
+        title: "Benefits for our partners",
+        description:
+          "Joining the fm4all network also means enjoying numerous benefits:",
+        items: {
+          visibility:
+            "Increased visibility: Access a diverse and constantly expanding client portfolio.",
+          adminSupport:
+            "Administrative support: We handle contract management, invoicing, and administrative aspects so you can focus on your core business.",
+          growth:
+            "Growth opportunities: Join a dynamic ecosystem that promotes skill development and professional growth.",
+        },
+      },
+      community: {
+        title: "Join an engaged community",
+        description1:
+          "At fm4all, we believe in the power of partnerships to build a productive and harmonious work environment. Our partners are not chosen at random: they embody the reliability, quality, and excellence we aim to deliver to our clients.",
+        description2:
+          "Are you a provider who shares our values? Join our network and help transform service management into a simple, efficient, and ethical experience.",
+      },
+    },
+  },
+  cookiePolicyPage: {
+    title: "Cookie Policy",
+    description:
+      "Read our cookie policy to learn more about the use of cookies on our site.",
+    heading: "fm4all Cookie Policy",
+    lastUpdate: "Last updated: 03/04/2025",
+    intro:
+      'This cookie policy explains how fm4all ("we", "our", "us") uses cookies and similar technologies on its website https://www.fm4all.com (the "Site").',
+    sections: {
+      whatIsCookie: {
+        title: "1. What is a cookie?",
+        content:
+          "Cookies are small text files that are placed on your computer or mobile device when you visit a website. They are widely used to make websites work more efficiently, as well as to provide information to the site owners.",
+      },
+      typesOfCookies: {
+        title: "2. Types of cookies we use",
+        intro: "We use the following types of cookies:",
+        items: {
+          necessary: {
+            title: "Strictly necessary cookies",
+            content:
+              "These cookies are essential for the operation of the Site and enable you to use its basic features, such as navigating pages and accessing secure areas. These cookies do not collect any information about you that could be used for marketing purposes or to remember the sites you have visited on the Internet. Legal basis: Legitimate interest",
+          },
+          performance: {
+            title: "Performance/analytics cookies",
+            content:
+              "These cookies allow us to count visits and traffic sources so we can measure and improve the performance of our Site. They help us know which pages are the most and least popular and see how visitors move around the Site. All information collected by these cookies is aggregated and therefore anonymous. We use Google Analytics for this purpose. Legal basis: Consent",
+          },
+          functionality: {
+            title: "Functionality cookies",
+            content:
+              "These cookies allow the Site to remember choices you have made (such as your language or region) and provide enhanced, more personal features. They may also be used to provide services you have requested, such as watching a video or commenting on a blog. The information collected by these cookies may be anonymized and they cannot track your browsing activity on other websites. Legal basis: Consent",
+          },
+          targeting: {
+            title: "Targeting/advertising cookies",
+            content:
+              "These cookies are used to deliver advertisements more relevant to you and your interests. They are also used to limit the number of times you see an advertisement, as well as help measure the effectiveness of advertising campaigns. They are usually placed by advertising networks with the permission of the website operator. Legal basis: Consent",
+          },
+        },
+      },
+      cookiesList: {
+        title: "3. List of cookies used",
+        caption: "List of cookies used",
+        headers: {
+          name: "Cookie name",
+          provider: "Provider name",
+          purpose: "Purpose",
+          duration: "Retention period",
+          type: "Cookie type",
+        },
+        cookies: [
+          {
+            name: "_ga",
+            provider: "Google Analytics",
+            purpose: "Used to distinguish users",
+            duration: "2 years",
+            type: "Analytics Tracking",
+          },
+          {
+            name: "_ga_GPWGXZXVW0",
+            provider: "Google Analytics",
+            purpose: "Uniquely identifies a visitor across multiple sessions",
+            duration: "2 years",
+            type: "Analytics Tracking",
+          },
+          {
+            name: "ADS_VISITOR_ID",
+            provider: "YouTube (Google)",
+            purpose:
+              "Identifies a unique user for advertising and remarketing tracking",
+            duration: "13 months",
+            type: "Advertising and analytics tracking",
+          },
+          {
+            name: "AEC",
+            provider: "YouTube (Google)",
+            purpose: "Ensures that user requests are not falsified",
+            duration: "6 months",
+            type: "Security",
+          },
+          {
+            name: "APISID",
+            provider: "YouTube (Google)",
+            purpose: "Stores user preferences and session information",
+            duration: "2 years",
+            type: "Tracking and personalization",
+          },
+          {
+            name: "HSID",
+            provider: "YouTube (Google)",
+            purpose:
+              "Stores session information related to authentication and securing Google accounts",
+            duration: "2 years",
+            type: "Security and authentication",
+          },
+          {
+            name: "NID",
+            provider: "YouTube (Google)",
+            purpose: "Customizes ads displayed on Google and its partners",
+            duration: "6 months",
+            type: "Advertising tracking and personalization",
+          },
+          {
+            name: "OTZ",
+            provider: "YouTube (Google)",
+            purpose: "Optimizes ad delivery",
+            duration: "28 days",
+            type: "Advertising tracking and personalization",
+          },
+          {
+            name: "SAPISID",
+            provider: "YouTube (Google)",
+            purpose:
+              "Authenticates a user when they are logged into their Google account",
+            duration: "2 years",
+            type: "Security and authentication",
+          },
+          {
+            name: "SEARCH_SAMESITE",
+            provider: "YouTube (Google)",
+            purpose:
+              "Protects users against certain types of attacks, particularly cross-site request forgery attacks",
+            duration: "A few hours",
+            type: "Security and session management",
+          },
+          {
+            name: "SID",
+            provider: "YouTube (Google)",
+            purpose:
+              "Maintains active authentication when the user navigates services like Gmail, Google Drive, YouTube",
+            duration: "2 years",
+            type: "Security and session management",
+          },
+          {
+            name: "SIDCC",
+            provider: "YouTube (Google)",
+            purpose:
+              "Strengthens the security of the session for users logged into their Google account",
+            duration: "3 months",
+            type: "Security and personalization",
+          },
+          {
+            name: "SSID",
+            provider: "YouTube (Google)",
+            purpose:
+              "Maintains the session of a user logged into their Google account, ensuring they don't have to log in again on each page",
+            duration: "2 years",
+            type: "Security and session management",
+          },
+          {
+            name: "__Secure-1PAPISID",
+            provider: "YouTube (Google)",
+            purpose:
+              "Ensures the security of user sessions, particularly in the context of Google advertising services",
+            duration: "2 years",
+            type: "Security and personalization",
+          },
+          {
+            name: "__Secure-1PSID",
+            provider: "YouTube (Google)",
+            purpose:
+              "Maintains and secures user sessions when they are logged into their Google accounts",
+            duration: "2 years",
+            type: "Security and personalization",
+          },
+          {
+            name: "__Secure-1PSIDCC",
+            provider: "YouTube (Google)",
+            purpose:
+              "Prevents users from being logged out when navigating between Google service pages",
+            duration: "2 years",
+            type: "Security and personalization",
+          },
+          {
+            name: "__Secure-1PSIDTS",
+            provider: "YouTube (Google)",
+            purpose:
+              "Prevents users from being logged out when navigating between Google service pages",
+            duration: "2 years",
+            type: "Security and personalization",
+          },
+          {
+            name: "__Secure-3PAPISID",
+            provider: "YouTube (Google)",
+            purpose:
+              "Ensures the security of user sessions, particularly when they interact with Google services",
+            duration: "2 years",
+            type: "Security and personalization",
+          },
+          {
+            name: "__Secure-3PSID",
+            provider: "YouTube (Google)",
+            purpose:
+              "Ensures the security of user sessions, particularly when they interact with Google services",
+            duration: "2 years",
+            type: "Security and personalization",
+          },
+          {
+            name: "__Secure-3PSIDCC",
+            provider: "YouTube (Google)",
+            purpose:
+              "Ensures the security of user sessions, particularly when they interact with Google services",
+            duration: "2 years",
+            type: "Security and personalization",
+          },
+          {
+            name: "__Secure-3PSIDTS",
+            provider: "YouTube (Google)",
+            purpose:
+              "Ensures the security of user sessions, particularly when they interact with Google services",
+            duration: "2 years",
+            type: "Security and personalization",
+          },
+          {
+            name: "__Secure-ENID",
+            provider: "YouTube (Google)",
+            purpose:
+              "Ensures the security of user sessions, particularly when they interact with Google services",
+            duration: "2 years",
+            type: "Security and personalization",
+          },
+        ],
+      },
+      manageCookies: {
+        title: "4. How to manage cookies?",
+        intro: "You can manage your cookie preferences at any time:",
+        items: {
+          banner: {
+            title: "Cookie banner",
+            content:
+              "During each session, you will see a cookie consent banner. You can accept or reject non-essential cookies.",
+          },
+          browser: {
+            title: "Browser settings",
+            content:
+              "Most web browsers allow you to control cookies through their settings. You can usually configure your browser to reject all cookies or to alert you when a cookie is sent. However, if you disable cookies, some parts of our Site may not function properly. For more information on how to manage cookies in your browser, please consult your browser's documentation",
+          },
+        },
+      },
+      consent: {
+        title: "5. Cookie consent",
+        content:
+          "When you first visit our Site, a cookie consent banner appears. This banner allows you to accept or reject non-essential cookies. Your consent is stored for a period of 6 months.",
+      },
+      changes: {
+        title: "6. Changes to this policy",
+        content:
+          "We may update this cookie policy from time to time. Any changes will be published on this page with a revised update date.",
+      },
+      contact: {
+        title: "7. Contact us",
+        intro:
+          "If you have any questions about this cookie policy, please contact us at:",
+        company: "fm4all",
+        address: "3 rue de Nantes, 75019 PARIS",
+        email: "admin@fm4all.com",
+      },
+    },
+  },
+  cityOut: {
+    title: "Region in development",
+    description:
+      "Our automatic pricing matrix is currently in development for your region. However, you can be contacted for a custom quote or be notified as soon as automation is available in your region.",
+    leaveDetails: "Leave your contact details here:",
+    companyName: "Company name*",
+    contactEmail: "Contact email*",
+    phoneNumber: "Phone number*",
+    contactFirstName: "Contact first name*",
+    contactLastName: "Contact last name*",
+    contactJob: "Contact job*",
+    sendDetails: "Send my details",
+  },
+  partialClientFormErrors: {
+    companyNameRequired: "Company name is required",
+    invalidSiret: "Invalid SIRET, expected format: XXX XXX XXX XXXXX",
+    firstNameRequired: "Contact first name is required",
+    lastNameRequired: "Contact last name is required",
+    positionRequired: "Contact position is required",
+    invalidEmail: "Invalid email address",
+    invalidPhone: "Invalid phone number",
+    surfaceRequired: "Surface area is required",
+    surfaceMax: "Maximum surface area is 3000 m²",
+    staffRequired: "Staff count is required",
+    staffMax: "Maximum staff count is 300 people",
+    invalidBuildingType: "Invalid building type",
+    invalidOccupationType: "Invalid occupation type",
+    invalidPostalCode: "Invalid postal code, enter 5 digits",
+    cityRequired: "City is required",
+    surfaceRange: "Surface area must be between 50 and 3000 m²",
+    staffRange: "Staff count must be between 1 and 300 people",
+  },
+  mesLocaux: {
+    title: "My Premises",
+    postalCode: "Postal code*",
+    surface: "Surface area in m²*",
+    staffCount: "Average number of people*",
+    buildingType: "Building type*",
+    occupationType: "Occupation type*",
+    showPrices: "Show prices",
+    quoteInProgress: "Quote in progress",
+    quoteInProgressDescription:
+      "A quote is already in progress. Would you like to start a new quote (your current information will be lost) or resume?",
+    newQuote: "New",
+    resumeQuote: "Resume",
+    cancel: "Cancel",
+    invalidPostalCode: "Invalid postal code",
+    invalidPostalCodeDescription:
+      "The postal code does not correspond to any city, please try again",
+  },
+  mesLocauxFormErrors: {
+    invalidPostalCode: "Invalid postal code, enter 5 digits",
+    surfaceRange: "Surface area must be between 50 and 3000 m²",
+    staffRange: "Staff count must be between 1 and 300 people",
+    invalidBuildingType: "Invalid building type",
+    invalidOccupationType: "Invalid occupation type",
+  },
+  buildingTypes: {
+    bureaux: "Offices",
+    localCommercial: "Commercial premises",
+    entrepot: "Warehouse",
+    cabinetMedical: "Medical office",
+  },
+  occupationTypes: {
+    partieEtage: "Part of a floor",
+    plateauComplet: "Complete floor or multiple floors",
+    batimentEntier: "Entire building",
+  },
+  faqPage: {
+    title: "Frequently Asked Questions",
+    description: "Frequently asked questions about fm4All services",
+    questions: {
+      question1: {
+        title: "Are you paying too much?",
+        content:
+          "On fm4all, compare hundreds of quotes at the best prices in just a few clicks.",
+      },
+      question2: {
+        title: "Want better rates?",
+        content:
+          "On fm4all, benefit from negotiated group rates, quality guarantee, and professional monitoring.",
+      },
+      question3: {
+        title: "Tired of prices that vary from client to client?",
+        content:
+          "On fm4all, get your rates in a few clicks, with complete transparency.",
+      },
+      question4: {
+        title: "Are you moving?",
+        content:
+          "On fm4all, set up all the services necessary for the proper functioning of your offices. We create your contracts and specifications. We support your installation in the shortest possible time.",
+      },
+      question5: {
+        title:
+          "Are you expanding? Need to professionalize the management of your offices?",
+        content:
+          "With fm4all, delegate the management of all your service contracts to an office manager.",
+      },
+      question6: {
+        title: "Managing cleaning is not your core business?",
+        content:
+          "At fm4all, we manage daily services so your teams can focus on their real jobs.",
+      },
+      question7: {
+        title:
+          "Want to attract and retain talent? Create an office identity that reflects you?",
+        content:
+          "Move to a 5-star service: at fm4all, we set up a hospitality service and animate your offices according to your image.",
+      },
+      question8: {
+        title: "Is the safety of your employees important to you?",
+        content:
+          "With fm4all, transfer your risks and ensure the regulatory compliance of your premises.",
+      },
+      question9: {
+        title: "Tired of chasing quotes?",
+        content:
+          "On fm4all, get rates for all your office services in just a few clicks.",
+      },
+      question10: {
+        title: "You're not an expert in purchasing services?",
+        content:
+          "Essential, Comfort, or Excellence, we simplify your choices to allow you to buy like experts.",
+      },
+      question11: {
+        title:
+          "No time or resources to write specifications? Managing a tender or getting quotes is time-consuming?",
+        content:
+          "On fm4all, in less than 5 minutes, build a facility management offer that suits you. Gather all your office services under one contract, one invoice, and one point of contact. Save time and money.",
+      },
+    },
+    contact: {
+      schedule_meeting: "I schedule a video meeting",
+      contact_phone: "I contact by phone",
+      contact_email: "I contact by email",
+    },
+  },
+  privacyPolicyPage: {
+    title: "Privacy Policy",
+    description:
+      "Read our privacy policy to learn more about the collection and processing of your personal data.",
+    intro: {
+      part1:
+        "At fm4all, a simplified joint-stock company (SIRET: 941 928 640 00015), located at 3 rue de Nantes, 75019 Paris, we place great importance on protecting your personal data.",
+      part2:
+        "This privacy policy explains how we collect, use, share, and protect your data in accordance with the General Data Protection Regulation (GDPR) and the French Data Protection Act.",
+    },
+    sections: {
+      whoWeAre: {
+        title: "1. Who are we?",
+        content:
+          "The data controller is fm4all, a simplified joint-stock company (SIRET: 941 928 640 00015), located at 3 rue de Nantes, 75019 Paris. You can contact us for any questions related to data protection at the following address: admin@fm4all.com",
+      },
+      dataCollected: {
+        title: "2. What personal data do we collect?",
+        intro: "We collect the following categories of personal data:",
+        items: {
+          identification: {
+            title: "Identification data",
+            content:
+              "Name, first name, email address, phone number, postal address, company name.",
+            legal: "Legal basis: Performance of contract (connecting service).",
+          },
+          professional: {
+            title: "Professional data",
+            content: "Position, industry, company size.",
+            legal:
+              "Legal basis: Legitimate interest (profiling to offer relevant services).",
+          },
+          connection: {
+            title: "Connection data",
+            content:
+              "IP address, browsing data on our website (session cookies for site operation, Google Analytics audience analysis cookies (with anonymized IP) to improve our services).",
+            legal:
+              "Legal basis: Consent for non-essential cookies, legitimate interest for cookies strictly necessary for site operation.",
+          },
+          requests: {
+            title: "Data related to quote requests and services",
+            content:
+              "Type of service requested, request date, estimated budget, description of needs, information about service providers contacted, contracts concluded, service evaluations.",
+            legal:
+              "Legal basis: Performance of contract (connecting service, service follow-up).",
+          },
+        },
+      },
+      dataPurpose: {
+        title: "3. Why do we collect your personal data?",
+        intro: "We collect your personal data for the following purposes:",
+        items: {
+          identification: {
+            title: "Identification data",
+            content:
+              "Name, first name, email address, phone number, postal address, company name.",
+            legal: "Legal basis: Performance of contract (connecting service).",
+          },
+          services: {
+            title: "Provision of our services",
+            content:
+              "Connecting with general service providers, managing quote requests, service tracking, billing.",
+            legal: "Legal basis: Performance of contract.",
+          },
+          customerRelation: {
+            title: "Customer relationship management",
+            content:
+              "Communication with users, customer support, complaint processing.",
+            legal:
+              "Legal basis: Performance of contract, legitimate interest (improving customer relationships).",
+          },
+          serviceImprovement: {
+            title: "Improving our services",
+            content:
+              "Analysis of platform usage data (with anonymized data when possible), development of new features.",
+            legal:
+              "Legal basis: Legitimate interest (continuous improvement of our services).",
+          },
+          marketing: {
+            title: "Marketing and communication",
+            content:
+              "Subject to your explicit consent (dedicated checkbox), we may use your data to send you information about our services and promotional offers. You can withdraw your consent at any time by clicking on the unsubscribe link in each email or by contacting us at the address mentioned in point 1.",
+            legal: "Legal basis: Consent.",
+          },
+          legalObligations: {
+            title: "Compliance with legal obligations",
+            content:
+              "Management of accounting and tax obligations, response to requests from competent authorities.",
+            legal: "Legal basis: Legal obligation.",
+          },
+        },
+      },
+      recipients: {
+        title: "4. Who are the recipients of your data?",
+        intro:
+          "Your personal data may be communicated to the following recipients:",
+        items: {
+          providers: {
+            title: "Service providers listed on our platform",
+            content:
+              "Only the information necessary for connecting and executing the service (for example, the name and contact details of the client company, the type of service requested).",
+          },
+          technicalProviders: {
+            title: "Our technical providers",
+            content: "[to be filled]",
+          },
+          authorities: {
+            title: "Competent authorities",
+            content: "In case of legal obligation or judicial request.",
+          },
+        },
+        assurance:
+          "We ensure that our partners and service providers comply with the same data protection requirements as ours, particularly through contracts including the European Commission's standard contractual clauses if transfers outside the EU take place.",
+      },
+      retention: {
+        title: "5. How long do we keep your data?",
+        intro: "We keep your personal data for the following periods:",
+        items: {
+          accountData: {
+            title: "Account management data",
+            content:
+              "As long as the account is active and for 3 years after account deletion to manage any claims.",
+          },
+          requestData: {
+            title: "Data related to quote requests and services",
+            content:
+              "3 years after the end of the service or the last active contact, unless there is a longer legal retention obligation (for example, 10 years for invoices).",
+          },
+          marketingData: {
+            title: "Commercial prospecting data",
+            content: "3 years after the last active contact.",
+          },
+          billingData: {
+            title: "Billing data",
+            content: "10 years in accordance with legal obligations.",
+          },
+          cookiesData: {
+            title: "Cookies",
+            content:
+              "See our cookie policy for the specific retention period for each cookie.",
+          },
+        },
+      },
+      yourRights: {
+        title: "6. What are your rights?",
+        intro:
+          "In accordance with applicable regulations, you have the following rights:",
+        items: {
+          access: {
+            title: "Right of access",
+            content:
+              "You can obtain confirmation that your data is being processed and request access to it.",
+          },
+          rectification: {
+            title: "Right to rectification",
+            content:
+              "You can request the correction of inaccurate or incomplete data.",
+          },
+          deletion: {
+            title: "Right to erasure",
+            content:
+              "You can request the deletion of your data in certain cases (for example, if the data is no longer necessary for the purposes for which it was collected).",
+          },
+          limitation: {
+            title: "Right to restriction of processing",
+            content:
+              "You can request the temporary suspension of the processing of your data in certain cases.",
+          },
+          objection: {
+            title: "Right to object",
+            content:
+              "You can object to the processing of your data for legitimate reasons, particularly for processing for commercial prospecting purposes.",
+          },
+          portability: {
+            title: "Right to data portability",
+            content:
+              "You can retrieve your data in a structured, machine-readable format.",
+          },
+          complaint: {
+            title: "Right to lodge a complaint with the CNIL",
+            content:
+              "If you believe your rights are not being respected, you can lodge a complaint with the CNIL (French Data Protection Authority).",
+          },
+        },
+        exerciseRights:
+          "To exercise your rights, you can contact us by email at admin@fm4all.com or by mail at the address mentioned in point 1. Please attach a copy of your ID to your request.",
+      },
+      cookies: {
+        title: "7. Use of cookies",
+        content:
+          "Our website uses cookies. To learn more about the types of cookies we use, their purpose, and how to manage them, please consult our",
+        policyLink: "cookie policy",
+        consent:
+          "A cookie consent banner appears during your first visit to our site.",
+      },
+      security: {
+        title: "8. Data security",
+        content:
+          "We implement appropriate technical and organizational security measures to protect your personal data against unauthorized access, disclosure, alteration, or destruction, including encryption of data in transit (HTTPS), data access control, and measures to protect against intrusion.",
+      },
+      changes: {
+        title: "9. Changes to the privacy policy",
+        content:
+          "We reserve the right to modify this privacy policy at any time. Changes will be published on our website, and we will inform you of important changes via a message on the platform or by email.",
+        lastUpdate: "Last updated: 02/01/2025",
+      },
+    },
+  },
 } as const;

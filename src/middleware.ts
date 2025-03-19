@@ -1,5 +1,6 @@
 import { createI18nMiddleware } from "next-international/middleware";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { getEquivalentPath, isValidPathForLocale } from "./lib/routes";
 
 // const allowedOrigins =
 //   process.env.NODE_ENV === "production"
@@ -26,7 +27,23 @@ export function middleware(req: NextRequest) {
   //   return response;
   // }
   // return NextResponse.next();
-  return I18nMiddleware(req);
+  const url = req.nextUrl.clone();
+  const pathname = url.pathname;
+  const pathnameSegments = pathname.split("/").filter(Boolean);
+  const locale = pathnameSegments[0];
+  if (locale !== "fr" && locale !== "en") {
+    return I18nMiddleware(req);
+  }
+  const pathWithoutLocale = "/" + pathnameSegments.slice(1).join("/");
+  if (isValidPathForLocale(pathWithoutLocale, locale)) {
+    return I18nMiddleware(req);
+  }
+  const equivalentPath = getEquivalentPath(
+    pathWithoutLocale,
+    locale as "en" | "fr"
+  );
+  url.pathname = `/${locale}${equivalentPath}`;
+  return NextResponse.redirect(url);
 }
 
 export const config = {

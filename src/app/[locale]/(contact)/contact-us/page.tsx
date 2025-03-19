@@ -1,6 +1,6 @@
-import ContactPage from "@/app/[locale]/(contact)/ContactPage";
 import { Metadata } from "next";
 import { setStaticParamsLocale } from "next-international/server";
+import ContactPage from "../ContactPage";
 
 export const generateMetadata = async ({
   params,
