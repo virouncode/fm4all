@@ -14,6 +14,7 @@ import TotalOfficeManager from "../TotalOfficeManager";
 import TotalServicesFm4All from "../TotalServicesFm4All";
 import TotalSnacksFruits from "../TotalSnacksFruits";
 import TotalThe from "../TotalThe";
+import { MARGE } from "@/constants/constants";
 
 // Font files can be colocated inside of `pages`
 
@@ -35,8 +36,8 @@ const DevisSynthese = () => {
           <sup>2</sup>
         </p>
         <p>
-          + {formatNumber(Math.round(total.totalInstallationHt ?? 0))} € HT
-          d&apos;installation
+          + {formatNumber(Math.round((total.totalInstallationHt ?? 0) * MARGE))}{" "}
+          € HT d&apos;installation
         </p>
       </div>
       <div className="flex flex-col gap-4">
