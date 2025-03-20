@@ -1,54 +1,36 @@
 import DevisButton from "@/components/devis-button";
+import { getScopedI18n } from "@/locales/server";
 
-const Mission = () => {
+const Mission = async () => {
+  const t = await getScopedI18n("mission");
+
   return (
     <section className="max-w-7xl w-full mx-auto flex flex-col gap-10 p-6">
-      <h2 className="text-2xl md:text-3xl border-l-2 px-4">Notre mission</h2>
+      <h2 className="text-2xl md:text-3xl border-l-2 px-4">{t("title")}</h2>
       <div className="flex flex-col gap-4 text-lg w-full max-w-prose hyphens-auto text-wrap mx-auto">
-        <p>
-          fm4all a analysé des centaines d’appels d’offres, de matrices de
-          chiffrage et contrats pour chaque service. Forts de cette analyse,
-          nous avons modélisé des{" "}
-          <strong>solutions standardisées et personnalisables</strong>,
-          permettant d&apos;automatiser les chiffrages tout en s&apos;adaptant
-          aux besoins spécifiques de chaque client :
-        </p>
+        <p dangerouslySetInnerHTML={{ __html: t("description1") }} />
         <ul className="mx-auto ml-10">
-          <li className="list-thumb">
-            Un vrai choix avec 3 gammes de services claires
-          </li>
-          <li className="list-thumb">
-            Des devis que l’on peut comparer et personnaliser sans être
-            ingénieur métier
-          </li>
-          <li className="list-thumb">
-            Des cahiers des charges et des contrats faciles à mettre en place
-          </li>
+          <li className="list-thumb">{t("item1")}</li>
+          <li className="list-thumb">{t("item2")}</li>
+          <li className="list-thumb">{t("item3")}</li>
         </ul>
-        <p>
-          Sélectionnez vos services, le niveau de gamme, vos options et voilà 🚀
-          !
-        </p>
-        <p>
-          Cahier des charges, contrats, planification, démarrage, fm4all vous
-          offre un service de Facility Management clé en main.
-        </p>
-        <p>
-          Ne perdez plus de temps à lancer des appels d’offres ou à attendre des
-          devis sans réponse.
-        </p>
-        <DevisButton
-          title="Bénéficiez de notre réseau de partenaires en quelques clics"
-          text="Bénéficiez de notre réseau de partenaires en quelques clics"
-          size="lg"
-          className="self-start mx-auto hidden md:block"
-        />
-        <DevisButton
-          title="Bénéficiez de notre réseau"
-          text="Bénéficiez de notre réseau"
-          size="lg"
-          className="self-start mx-auto block md:hidden"
-        />
+        <p>{t("description2")}</p>
+        <p>{t("description3")}</p>
+        <p>{t("description4")}</p>
+        <div className="mt-10">
+          <DevisButton
+            title={t("button1")}
+            text={t("button1")}
+            size="lg"
+            className="self-start mx-auto hidden md:block"
+          />
+          <DevisButton
+            title={t("button2")}
+            text={t("button2")}
+            size="lg"
+            className="self-start mx-auto block md:hidden"
+          />
+        </div>
       </div>
     </section>
   );

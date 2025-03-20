@@ -20,7 +20,7 @@ export default function Error({
     <div className="flex items-center justify-center max-w-prose mx-auto h-[calc(100vh-4rem)]">
       <div className="flex flex-col gap-2">
         <h2 className="font-bold text-lg text-center">Erreur !</h2>
-        <p>{error.message}</p>
+        <p className="font-normal text-base text-center">{error.message}</p>
         <div className="flex gap-4">
           <Button
             variant="default"

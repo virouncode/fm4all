@@ -110,7 +110,7 @@ const Footer = () => {
             <ul className="text-secondary text-sm flex flex-col gap-2">
               <li>
                 <Link
-                  href="/articles/le-fm-cest-quoi"
+                  href="/articles/facility-management/le-fm-c-est-quoi"
                   className="hover:opacity-80"
                 >
                   Le FM c&apos;est quoi ?
