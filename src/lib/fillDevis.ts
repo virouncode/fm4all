@@ -34,7 +34,7 @@ export const fillDevis = async (
       (totalInstallationHT ?? 0) * MARGE
     );
     const totalInstallationTtcText = formatNumber(
-      0.2 * (totalInstallationHT ?? 0) * MARGE
+      (totalInstallationHT ?? 0) * MARGE * 1.2
     );
     const totalAnnuelTtcText = formatNumber((totalAnnuelHT ?? 0) * 1.2);
     const adresseClient =
