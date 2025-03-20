@@ -1,4 +1,5 @@
 import { batiments } from "@/constants/batiments";
+import { MARGE } from "@/constants/constants";
 import { occupations } from "@/constants/occupations";
 import { toast } from "@/hooks/use-toast";
 import { InsertClientType } from "@/zod-schemas/client";
@@ -29,7 +30,12 @@ export const fillDevis = async (
     const totalAnnuelHtText = formatNumber(totalAnnuelHT ?? 0);
     const totalMensuelHtText = formatNumber((totalAnnuelHT ?? 0) / 12);
     const tvaText = formatNumber(0.2 * (totalAnnuelHT ?? 0));
-    const totalInstallationHtText = formatNumber(totalInstallationHT ?? 0);
+    const totalInstallationHtText = formatNumber(
+      (totalInstallationHT ?? 0) * MARGE
+    );
+    const totalInstallationTtcText = formatNumber(
+      0.2 * (totalInstallationHT ?? 0) * MARGE
+    );
     const totalAnnuelTtcText = formatNumber((totalAnnuelHT ?? 0) * 1.2);
     const adresseClient =
       [client.adresseLigne1, client.adresseLigne2].filter(Boolean).join(" ") +
@@ -79,6 +85,7 @@ export const fillDevis = async (
       { fieldName: "total_mensuel_ht", value: totalMensuelHtText },
       { fieldName: "tva", value: tvaText },
       { fieldName: "total_installation_ht", value: totalInstallationHtText },
+      { fieldName: "total_installation_ttc", value: totalInstallationTtcText },
       { fieldName: "total_annuel_ttc", value: totalAnnuelTtcText },
       { fieldName: "commentaires", value: commentaires ?? "" },
       { fieldName: "date_demarrage", value: dateDemarrage ?? "" },
