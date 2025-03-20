@@ -87,29 +87,30 @@ const Total = () => {
           (totalServicesFm4All.totalRemiseCa ?? 0) -
           (totalServicesFm4All.totalRemiseHof ?? 0)
         : servicesFm4All.infos.gammeSelected === "confort"
-        ? (totalServicesFm4All.totalAssurance ?? 0) +
-          (totalServicesFm4All.totalPlateforme ?? 0) +
-          (totalServicesFm4All.totalSupportAdmin ?? 0) +
-          (totalServicesFm4All.totalSupportOp ?? 0) -
-          (totalServicesFm4All.totalRemiseCa ?? 0) -
-          (totalServicesFm4All.totalRemiseHof ?? 0)
-        : (totalServicesFm4All.totalAssurance ?? 0) +
-          (totalServicesFm4All.totalPlateforme ?? 0) +
-          (totalServicesFm4All.totalSupportAdmin ?? 0) +
-          (totalServicesFm4All.totalSupportOp ?? 0) +
-          (totalServicesFm4All.totalAccountManager ?? 0) -
-          (totalServicesFm4All.totalRemiseCa ?? 0) -
-          (totalServicesFm4All.totalRemiseHof ?? 0);
+          ? (totalServicesFm4All.totalAssurance ?? 0) +
+            (totalServicesFm4All.totalPlateforme ?? 0) +
+            (totalServicesFm4All.totalSupportAdmin ?? 0) +
+            (totalServicesFm4All.totalSupportOp ?? 0) -
+            (totalServicesFm4All.totalRemiseCa ?? 0) -
+            (totalServicesFm4All.totalRemiseHof ?? 0)
+          : (totalServicesFm4All.totalAssurance ?? 0) +
+            (totalServicesFm4All.totalPlateforme ?? 0) +
+            (totalServicesFm4All.totalSupportAdmin ?? 0) +
+            (totalServicesFm4All.totalSupportOp ?? 0) +
+            (totalServicesFm4All.totalAccountManager ?? 0) -
+            (totalServicesFm4All.totalRemiseCa ?? 0) -
+            (totalServicesFm4All.totalRemiseHof ?? 0);
     const totalAnnuelHt =
-      totalFinalNettoyage +
-      totalFinalHygiene +
-      totalFinalMaintenance +
-      totalFinalIncendie +
-      totalFinalCafe +
-      totalFinalThe +
-      totalFinalSnacksFruits +
-      totalFinalFontaines +
-      totalFinalOfficeManager +
+      (totalFinalNettoyage +
+        totalFinalHygiene +
+        totalFinalMaintenance +
+        totalFinalIncendie +
+        totalFinalCafe +
+        totalFinalThe +
+        totalFinalSnacksFruits +
+        totalFinalFontaines +
+        totalFinalOfficeManager) *
+        MARGE +
       totalFinalServicesFm4All;
 
     const totalInstallationHt =
@@ -152,25 +153,21 @@ const Total = () => {
           className="text-base fixed bottom-6 right-4 lg:absolute lg:top-[20px] lg:right-0 z-30"
         >
           <Calculator />
-          {formatNumber(Math.round((total.totalAnnuelHt ?? 0) * MARGE))} € HT/an
+          {formatNumber(Math.round(total.totalAnnuelHt ?? 0))} € HT/an
         </Button>
       </SheetTrigger>
       <SheetContent className="flex flex-col w-full lg:w-[calc(100%-20rem)]">
         <SheetHeader>
           <SheetTitle>
             <span className="text-2xl">
-              Total:{" "}
-              {formatNumber(Math.round((total.totalAnnuelHt ?? 0) * MARGE))} €
+              Total: {formatNumber(Math.round(total.totalAnnuelHt ?? 0))} €
               HT/an
             </span>{" "}
           </SheetTitle>
           <SheetDescription>
             <span>
-              Soit{" "}
-              {formatNumber(
-                Math.round(((total.totalAnnuelHt ?? 0) * MARGE) / 12)
-              )}{" "}
-              € HT/mois pour {client.effectif} personnes, {client.surface} m
+              Soit {formatNumber(Math.round((total.totalAnnuelHt ?? 0) / 12))} €
+              HT/mois pour {client.effectif} personnes, {client.surface} m
               <sup>2</sup>
             </span>
             <br />

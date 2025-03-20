@@ -467,6 +467,9 @@ const NettoyagePropositions = ({
     const totalTrilogie = hygiene.infos.trilogieGammeSelected
       ? totalEmp + totalPoubellEmp + totalSavon + totalPh || null
       : null;
+    const totalInstallation = hygiene.infos.trilogieGammeSelected
+      ? prixInstalDistrib
+      : null;
 
     const totalDesinfectant =
       hygiene.infos.desinfectantGammeSelected &&
@@ -500,7 +503,7 @@ const NettoyagePropositions = ({
       totalParfum,
       totalBalai,
       totalPoubelle,
-      totalInstallation: prixInstalDistrib,
+      totalInstallation,
     });
   };
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
