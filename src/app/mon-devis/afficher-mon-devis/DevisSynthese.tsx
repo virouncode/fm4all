@@ -1,5 +1,6 @@
 "use client";
 
+import { MARGE } from "@/constants/constants";
 import { ClientContext } from "@/context/ClientProvider";
 import { TotalContext } from "@/context/TotalProvider";
 import { formatNumber } from "@/lib/formatNumber";
@@ -14,7 +15,6 @@ import TotalOfficeManager from "../TotalOfficeManager";
 import TotalServicesFm4All from "../TotalServicesFm4All";
 import TotalSnacksFruits from "../TotalSnacksFruits";
 import TotalThe from "../TotalThe";
-import { MARGE } from "@/constants/constants";
 
 // Font files can be colocated inside of `pages`
 
