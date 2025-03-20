@@ -1,3 +1,4 @@
+import { generateAlternates } from "@/lib/metadata-helpers";
 import { Metadata } from "next";
 import { setStaticParamsLocale } from "next-international/server";
 import ConfidentialitePage from "../ConfidentialitePage";
@@ -8,18 +9,12 @@ export const generateMetadata = async ({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> => {
   const { locale } = await params;
-  return {
-    title: "Privacy policy",
-    description:
-      "Read our privacy policy to learn more about the collection and processing of your personal data.",
-    alternates: {
-      canonical: `https://www.fm4all.com/${locale}/privacy-policy`,
-      languages: {
-        en: "https://www.fm4all.com/en/privacy-policy",
-        fr: "https://www.fm4all.com/fr/policy-de-confidentialite",
-      },
-    },
-  };
+  return generateAlternates(
+    "confidentialite",
+    locale,
+    "Privacy policy",
+    "Read our privacy policy to learn more about the collection and processing of your personal data."
+  );
 };
 
 export const generateStaticParams = () => {

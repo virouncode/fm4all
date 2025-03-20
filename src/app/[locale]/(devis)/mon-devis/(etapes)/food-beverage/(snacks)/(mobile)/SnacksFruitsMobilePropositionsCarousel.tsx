@@ -1,4 +1,4 @@
-import CarouselGammesDots from "@/components/CarouselGammesDots";
+import CarouselGammesDots from "@/components/carousel-gammes-dots";
 import {
   Carousel,
   CarouselApi,
@@ -109,8 +109,8 @@ const SnacksFruitsMobilePropositionsCarousel = ({
         snacksFruits.infos.gammeSelected === "essentiel"
           ? 0
           : snacksFruits.infos.gammeSelected === "confort"
-          ? 1
-          : 2
+            ? 1
+            : 2
       );
     }
   }, [

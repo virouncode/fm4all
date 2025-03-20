@@ -1,3 +1,4 @@
+import { generateAlternates } from "@/lib/metadata-helpers";
 import { Metadata } from "next";
 import { setStaticParamsLocale } from "next-international/server";
 import CgvPage from "../CgvPage";
@@ -8,18 +9,12 @@ export const generateMetadata = async ({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> => {
   const { locale } = await params;
-  return {
-    title: "Conditions Générales de Vente (CGV)",
-    description:
-      "Lisez nos conditions générales de vente (CGV) pour en savoir plus sur les règles d'achat et de paiement",
-    alternates: {
-      canonical: `https://www.fm4all.com/${locale}/conditions-generales-de-vente`,
-      languages: {
-        en: "https://www.fm4all.com/en/sales-terms-and-conditions",
-        fr: "https://www.fm4all.com/fr/conditions-generales-de-vente",
-      },
-    },
-  };
+  return generateAlternates(
+    "cgv",
+    locale,
+    "Conditions Générales de Vente (CGV)",
+    "Lisez nos conditions générales de vente (CGV) pour en savoir plus sur les règles d'achat et de paiement"
+  );
 };
 
 export const generateStaticParams = () => {

@@ -14,7 +14,6 @@ import {
   X,
 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { RouteKey, routes } from "../lib/routes";
@@ -65,13 +64,12 @@ const Header = () => {
               <LocalizedLink href="home">{t("maison")}</LocalizedLink>
             </div> */}
             <div
-              // className={`flex gap-1 items-center ${
-              //   isActive("/nos-services") ? "text-destructive font-bold" : ""
-              // }`}
-              className={`flex gap-1 items-center`}
+              className={`flex gap-1 items-center ${
+                isActive("services") ? "text-destructive font-bold" : ""
+              }`}
             >
               <HandPlatter size={15} />
-              <Link href="/nos-services">{t("services")}</Link>
+              <LocalizedLink href="services">{t("services")}</LocalizedLink>
             </div>
             <div
               className={`flex gap-1 items-center ${
@@ -177,14 +175,13 @@ const Header = () => {
                 <LocalizedLink href="home">{t("home")}</LocalizedLink>
               </div>
               <div
-                // className={`flex gap-4 items-center ${
-                //   isActive("/nos-services") ? "text-destructive font-bold" : ""
-                // }`}
-                className={`flex gap-4 items-center`}
+                className={`flex gap-4 items-center ${
+                  isActive("services") ? "text-destructive font-bold" : ""
+                }`}
                 onClick={handleHideMobileNav}
               >
                 <HandPlatter size={30} />
-                <Link href="/nos-services">{t("services")}</Link>
+                <LocalizedLink href="services">{t("services")}</LocalizedLink>
               </div>
               <div
                 className={`flex gap-4 items-center ${

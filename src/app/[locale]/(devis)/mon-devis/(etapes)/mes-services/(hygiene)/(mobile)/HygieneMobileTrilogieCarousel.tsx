@@ -1,4 +1,4 @@
-import CarouselGammesDots from "@/components/CarouselGammesDots";
+import CarouselGammesDots from "@/components/carousel-gammes-dots";
 import {
   Carousel,
   CarouselApi,
@@ -88,8 +88,8 @@ const HygieneMobileTrilogieCarousel = ({
         hygiene.infos.trilogieGammeSelected === "essentiel"
           ? 0
           : hygiene.infos.trilogieGammeSelected === "confort"
-          ? 1
-          : 2
+            ? 1
+            : 2
       );
     }
   }, [api, hygiene.infos.fournisseurId, hygiene.infos.trilogieGammeSelected]);

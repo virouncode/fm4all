@@ -1,4 +1,4 @@
-import CarouselGammesDots from "@/components/CarouselGammesDots";
+import CarouselGammesDots from "@/components/carousel-gammes-dots";
 import {
   Carousel,
   CarouselApi,
@@ -92,8 +92,8 @@ const HygieneMobileOptionsBalaiCarousel = ({
         hygiene.infos.balaiGammeSelected === "essentiel"
           ? 0
           : hygiene.infos.balaiGammeSelected === "confort"
-          ? 1
-          : 2
+            ? 1
+            : 2
       );
     }
   }, [api, hygiene.infos.balaiGammeSelected, hygiene.infos.fournisseurId]);

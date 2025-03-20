@@ -12,7 +12,9 @@ export type RouteKey =
   | "gammes"
   | "mentions"
   | "partenaires"
-  | "prestataires";
+  | "prestataires"
+  | "services"
+  | "locaux";
 
 export const routes: Record<RouteKey, Record<"fr" | "en", string>> = {
   notFound: {
@@ -71,6 +73,14 @@ export const routes: Record<RouteKey, Record<"fr" | "en", string>> = {
     fr: "/devenir-prestataire",
     en: "/become-a-provider",
   },
+  services: {
+    fr: "/nos-services",
+    en: "/our-services",
+  },
+  locaux: {
+    fr: "/mon-devis/mes-locaux",
+    en: "/mon-devis/mes-locaux",
+  },
 };
 
 export const routeMapping: Record<"fr" | "en", Record<string, string>> = {
@@ -88,6 +98,8 @@ export const routeMapping: Record<"fr" | "en", Record<string, string>> = {
     "/mentions-legales": "/legal-notices",
     "/nos-partenaires": "/our-partners",
     "/devenir-prestataire": "/become-a-provider",
+    "/nos-services": "/our-services",
+    "/mon-devis/mes-locaux": "/mon-devis/mes-locaux",
   },
   fr: {
     "/": "/",
@@ -103,6 +115,8 @@ export const routeMapping: Record<"fr" | "en", Record<string, string>> = {
     "/legal-notices": "/mentions-legales",
     "/our-partners": "/nos-partenaires",
     "/become-a-provider": "/devenir-prestataire",
+    "/our-services": "/nos-services",
+    "/mon-devis/mes-locaux": "/mon-devis/mes-locaux",
   },
 };
 

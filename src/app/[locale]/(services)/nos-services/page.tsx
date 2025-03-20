@@ -1,7 +1,6 @@
-import { generateAlternates } from "@/lib/metadata-helpers";
 import { Metadata } from "next";
 import { setStaticParamsLocale } from "next-international/server";
-import CguPage from "../CguPage";
+import ServicesPage from "../ServicesPage";
 
 export const generateMetadata = async ({
   params,
@@ -9,12 +8,18 @@ export const generateMetadata = async ({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> => {
   const { locale } = await params;
-  return generateAlternates(
-    "cgu",
-    locale,
-    "Conditions Générales d'Utilisation (CGU)",
-    "Lisez nos conditions générales d'utilisation (CGU) pour en savoir plus sur les règles d'accès et d'utilisation de notre site."
-  );
+  return {
+    title: "Nos services",
+    description:
+      "Découvrez les services de Facility Management proposés par fm4all.",
+    alternates: {
+      canonical: `https://www.fm4all.com/${locale}/nos-services`,
+      languages: {
+        en: "https://www.fm4all.com/en/our-services",
+        fr: "https://www.fm4all.com/fr/nos-services",
+      },
+    },
+  };
 };
 
 export const generateStaticParams = () => {
@@ -24,7 +29,7 @@ export const generateStaticParams = () => {
 const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
   const { locale } = await params;
   setStaticParamsLocale(locale);
-  return <CguPage />;
+  return <ServicesPage />;
 };
 
 export default page;

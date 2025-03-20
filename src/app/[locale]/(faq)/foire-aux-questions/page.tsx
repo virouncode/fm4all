@@ -1,3 +1,4 @@
+import { generateAlternates } from "@/lib/metadata-helpers";
 import { Metadata } from "next";
 import { setStaticParamsLocale } from "next-international/server";
 import FaqPage from "../FaqPage";
@@ -8,17 +9,12 @@ export const generateMetadata = async ({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> => {
   const { locale } = await params;
-  return {
-    title: "Foire aux questions",
-    description: "Foire aux questions sur les services de fm4All",
-    alternates: {
-      canonical: `https://www.fm4all.com/${locale}/foire-aux-questions`,
-      languages: {
-        en: "https://www.fm4all.com/en/frequently-asked-questions",
-        fr: "https://www.fm4all.com/fr/foire-aux-questions",
-      },
-    },
-  };
+  return generateAlternates(
+    "faq",
+    locale,
+    "Foire aux questions",
+    "Foire aux questions sur les services de fm4All"
+  );
 };
 
 export const generateStaticParams = () => {

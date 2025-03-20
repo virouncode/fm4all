@@ -1,3 +1,4 @@
+import { generateAlternates } from "@/lib/metadata-helpers";
 import { Metadata } from "next";
 import { setStaticParamsLocale } from "next-international/server";
 import ConfidentialitePage from "../ConfidentialitePage";
@@ -8,18 +9,12 @@ export const generateMetadata = async ({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> => {
   const { locale } = await params;
-  return {
-    title: "Politique de confidentialité",
-    description:
-      "Lisez notre politique de confidentialité pour en savoir plus sur la collecte et le traitement de vos données personnelles.",
-    alternates: {
-      canonical: `https://www.fm4all.com/${locale}/politique-de-confidentialite`,
-      languages: {
-        en: "https://www.fm4all.com/en/privacy-policy",
-        fr: "https://www.fm4all.com/fr/policy-de-confidentialite",
-      },
-    },
-  };
+  return generateAlternates(
+    "confidentialite",
+    locale,
+    "Politique de confidentialité",
+    "Lisez notre politique de confidentialité pour en savoir plus sur la collecte et le traitement de vos données personnelles."
+  );
 };
 
 export const generateStaticParams = () => {

@@ -1,14 +1,7 @@
 import { getScopedI18n } from "@/locales/server";
-import { Metadata } from "next";
 import ServiceCards from "./ServiceCards";
 
-export const metadata: Metadata = {
-  title: "Nos services",
-  description:
-    "Découvrez les services de Facility Management proposés par fm4all.",
-};
-
-const page = async () => {
+const ServicesPage = async () => {
   const t = await getScopedI18n("servicesPage");
 
   return (
@@ -82,4 +75,4 @@ const page = async () => {
   );
 };
 
-export default page;
+export default ServicesPage;

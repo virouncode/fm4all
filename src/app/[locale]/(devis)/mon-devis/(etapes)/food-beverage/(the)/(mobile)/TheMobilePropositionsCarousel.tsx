@@ -1,4 +1,4 @@
-import CarouselGammesDots from "@/components/CarouselGammesDots";
+import CarouselGammesDots from "@/components/carousel-gammes-dots";
 import {
   Carousel,
   CarouselApi,
@@ -79,8 +79,8 @@ const TheMobilePropositionsCarousel = ({
         the.infos.gammeSelected === "essentiel"
           ? 0
           : the.infos.gammeSelected === "confort"
-          ? 1
-          : 2
+            ? 1
+            : 2
       );
     }
   }, [api, the.infos.gammeSelected]);

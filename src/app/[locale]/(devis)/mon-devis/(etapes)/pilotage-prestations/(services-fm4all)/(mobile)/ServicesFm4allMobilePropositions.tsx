@@ -1,4 +1,4 @@
-import CarouselGammesDots from "@/components/CarouselGammesDots";
+import CarouselGammesDots from "@/components/carousel-gammes-dots";
 import {
   Carousel,
   CarouselApi,
@@ -80,10 +80,10 @@ const ServicesFm4allMobilePropositions = ({
         servicesFm4All.infos.gammeSelected === "essentiel"
           ? 0
           : servicesFm4All.infos.gammeSelected === "confort"
-          ? 1
-          : servicesFm4All.infos.gammeSelected === "excellence"
-          ? 2
-          : 0
+            ? 1
+            : servicesFm4All.infos.gammeSelected === "excellence"
+              ? 2
+              : 0
       );
     }
   }, [api, servicesFm4All.infos.gammeSelected]);
