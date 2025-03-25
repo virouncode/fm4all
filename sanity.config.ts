@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * This configuration is used to for the Sanity Studio that’s mounted on the `/app/studio/[[...tool]]/page.tsx` route
+ * This configuration is used to for the Sanity Studio that's mounted on the `/app/studio/[[...tool]]/page.tsx` route
  */
 
 import { assist } from "@sanity/assist";
@@ -9,22 +9,37 @@ import { documentInternationalization } from "@sanity/document-internationalizat
 import { visionTool } from "@sanity/vision";
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
-// Go to https://www.sanity.io/docs/api-versioning to learn how API versioning works
 import { apiVersion, dataset, projectId } from "./src/sanity/env";
-import { schema } from "./src/sanity/schemaTypes";
 import { structure } from "./src/sanity/structure";
+
+// Import schema types directly
+import { articleType } from "./src/sanity/schemaTypes/articleType";
+import { authorType } from "./src/sanity/schemaTypes/authorType";
+import { blockContentType } from "./src/sanity/schemaTypes/blockContentType";
+import { categoryType } from "./src/sanity/schemaTypes/categoryType";
+import { postType } from "./src/sanity/schemaTypes/postType";
+import { secteurType } from "./src/sanity/schemaTypes/secteurType";
+import { serviceType } from "./src/sanity/schemaTypes/serviceType";
+
 const TRANSLATABLE_TYPES = ["article", "service", "secteur"];
 
 export default defineConfig({
   basePath: "/studio",
   projectId,
   dataset,
-  // Add and edit the content schema in the './sanity/schemaTypes' folder
-  schema,
+  schema: {
+    types: [
+      blockContentType,
+      categoryType,
+      postType,
+      authorType,
+      articleType,
+      serviceType,
+      secteurType,
+    ],
+  },
   plugins: [
     structureTool({ structure }),
-    // Vision is for querying with GROQ from inside the Studio
-    // https://www.sanity.io/docs/the-vision-plugin
     visionTool({ defaultApiVersion: apiVersion }),
     documentInternationalization({
       supportedLanguages: [
@@ -36,13 +51,7 @@ export default defineConfig({
     assist({
       translate: {
         document: {
-          // The name of the field that holds the current language
-          // in the form of a language code e.g. 'en', 'fr', 'nb_NO'.
-          // Required
           languageField: "language",
-          // Optional extra filter for document types.
-          // If not set, translation is enabled for all documents
-          // that has a field with the name defined above.
           documentTypes: TRANSLATABLE_TYPES,
         },
       },
