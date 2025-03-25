@@ -148,7 +148,9 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
         total.totalInstallationHt,
         commentaires ?? "",
         client.dateDeDemarrage
-          ? format(client.dateDeDemarrage, "dd/MM/yyyy", { locale: fr })
+          ? format(new Date(client.dateDeDemarrage), "dd/MM/yyyy", {
+              locale: fr,
+            })
           : ""
       );
       if (url) {
@@ -242,21 +244,26 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
       </p>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(submitForm)} className="mt-6 p-4">
-          <div className="flex-1 flex flex-col gap-4">
-            <div className="flex flex-col gap-10 md:flex-row md:gap-20">
+        <form
+          onSubmit={form.handleSubmit(submitForm)}
+          className="mt-6 p-1 md:p-4 w-full"
+        >
+          <div className="flex-1 flex flex-col gap-4 w-full">
+            <div className="flex flex-col gap-4 md:flex-row md:gap-20">
               <div className="w-full md:w-1/4 flex flex-col">
                 <InputWithLabel<InsertClientType>
                   fieldTitle="Prénom du contact*"
                   nameInSchema="prenomContact"
                   name="prenomContact"
                   handleChange={handleChange}
+                  className="w-full"
                 />
                 <InputWithLabel<InsertClientType>
                   fieldTitle="Nom du contact*"
                   nameInSchema="nomContact"
                   name="nomContact"
                   handleChange={handleChange}
+                  className="w-full"
                 />
                 <InputWithLabel<InsertClientType>
                   fieldTitle="Email du contact*"
@@ -264,12 +271,14 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                   type="email"
                   name="emailContact"
                   handleChange={handleChange}
+                  className="w-full"
                 />
                 <InputWithLabel<InsertClientType>
                   fieldTitle="Poste du contact*"
                   nameInSchema="posteContact"
                   name="posteContact"
                   handleChange={handleChange}
+                  className="w-full"
                 />
               </div>
               <div className="w-full md:w-1/4 flex flex-col">
@@ -278,12 +287,14 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                   nameInSchema="prenomSignataire"
                   name="prenomSignataire"
                   handleChange={handleChange}
+                  className="w-full"
                 />
                 <InputWithLabel<InsertClientType>
                   fieldTitle="Nom du signataire"
                   nameInSchema="nomSignataire"
                   name="nomSignataire"
                   handleChange={handleChange}
+                  className="w-full"
                 />
                 <InputWithLabel<InsertClientType>
                   fieldTitle="Email du signataire"
@@ -291,12 +302,14 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                   type="email"
                   name="emailSignataire"
                   handleChange={handleChange}
+                  className="w-full"
                 />
                 <InputWithLabel<InsertClientType>
                   fieldTitle="Poste du signataire"
                   nameInSchema="posteSignataire"
                   name="posteSignataire"
                   handleChange={handleChange}
+                  className="w-full"
                 />
               </div>
               <div className="w-full md:w-1/4 flex flex-col">
@@ -305,6 +318,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                   nameInSchema="nomEntreprise"
                   name="nomEntreprise"
                   handleChange={handleChange}
+                  className="w-full"
                 />
                 <InputWithLabel<InsertClientType>
                   fieldTitle="Siret"
@@ -312,6 +326,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                   name="siret"
                   handleChange={handleChange}
                   placeholder="XXX XXX XXX XXXXX"
+                  className="w-full"
                 />
                 <InputWithLabel<InsertClientType>
                   fieldTitle="N°de téléphone*"
@@ -319,9 +334,10 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                   placeholder="XX XX XX XX XX"
                   name="phoneContact"
                   handleChange={handleChange}
+                  className="w-full"
                 />
                 <DateInputWithLabel<InsertClientType>
-                  fieldTitle="Date de démarrage souhaitée"
+                  fieldTitle="Date de démarrage"
                   nameInSchema="dateDeDemarrage"
                   handleChangeDate={handleChangeDate}
                 />
@@ -333,24 +349,28 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                   nameInSchema="adresseLigne1"
                   name="addressLigne1"
                   handleChange={handleChange}
+                  className="w-full"
                 />
                 <InputWithLabel<InsertClientType>
                   fieldTitle="Addresse du site ligne 2"
                   nameInSchema="adresseLigne2"
                   name="adresseLigne2"
                   handleChange={handleChange}
+                  className="w-full"
                 />
                 <InputWithLabel<InsertClientType>
                   fieldTitle="Code postal*"
                   nameInSchema="codePostal"
                   name="codePostal"
                   handleChange={handleChange}
+                  className="w-full"
                 />
                 <InputWithLabel<InsertClientType>
                   fieldTitle="Ville"
                   nameInSchema="ville"
                   name="ville"
                   handleChange={handleChange}
+                  className="w-full"
                 />
               </div>
             </div>

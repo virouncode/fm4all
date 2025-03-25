@@ -9,11 +9,11 @@ import { documentInternationalization } from "@sanity/document-internationalizat
 import { visionTool } from "@sanity/vision";
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
-
 // Go to https://www.sanity.io/docs/api-versioning to learn how API versioning works
 import { apiVersion, dataset, projectId } from "./src/sanity/env";
 import { schema } from "./src/sanity/schemaTypes";
 import { structure } from "./src/sanity/structure";
+const TRANSLATABLE_TYPES = ["article", "service", "secteur"];
 
 export default defineConfig({
   basePath: "/studio",
@@ -23,9 +23,7 @@ export default defineConfig({
   schema: {
     ...schema,
     templates: (prev) =>
-      prev.filter(
-        (template) => !["article", "service", "secteur"].includes(template.id)
-      ),
+      prev.filter((template) => !TRANSLATABLE_TYPES.includes(template.id)),
   },
   plugins: [
     structureTool({ structure }),
@@ -37,7 +35,7 @@ export default defineConfig({
         { id: "fr", title: "Français" },
         { id: "en", title: "English" },
       ],
-      schemaTypes: ["article", "service", "secteur"],
+      schemaTypes: TRANSLATABLE_TYPES,
     }),
     assist({
       translate: {
@@ -49,7 +47,7 @@ export default defineConfig({
           // Optional extra filter for document types.
           // If not set, translation is enabled for all documents
           // that has a field with the name defined above.
-          documentTypes: ["article", "service", "secteur"],
+          documentTypes: TRANSLATABLE_TYPES,
         },
       },
     }),

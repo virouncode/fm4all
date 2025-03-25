@@ -36,7 +36,7 @@ export function DateInputWithLabel<S>({
       control={form.control}
       name={nameInSchema}
       render={({ field }) => (
-        <FormItem>
+        <FormItem className="">
           <FormLabel className="text-base" htmlFor={nameInSchema}>
             {fieldTitle}
           </FormLabel>
@@ -47,7 +47,8 @@ export function DateInputWithLabel<S>({
                   variant={"outline"}
                   className={cn(
                     "w-full max-w-xs pl-3 text-left font-normal",
-                    !field.value && "text-muted-foreground"
+                    !field.value && "text-muted-foreground",
+                    "flex items-center w-full"
                   )}
                 >
                   {field.value ? (
