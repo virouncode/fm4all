@@ -1,5 +1,5 @@
 "use client";
-import { fullReinitialisationDevis } from "@/app/[locale]/(devis)/mon-devis/(etapes)/mes-locaux/fullReinitialisationDevis";
+import { fullReinitialisationDevis } from "@/app/mon-devis/(etapes)/mes-locaux/fullReinitialisationDevis";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -149,8 +149,8 @@ const DevisButton = ({
 
   const handleClickReprendre = () => {
     const route = devisProgress.currentStep
-      ? (devisRoutes.find(({ id }) => id === devisProgress.currentStep) ??
-        devisRoutes[0])
+      ? devisRoutes.find(({ id }) => id === devisProgress.currentStep) ??
+        devisRoutes[0]
       : devisRoutes[0];
     const url = route.url;
     router.push(`/mon-devis${url}`);

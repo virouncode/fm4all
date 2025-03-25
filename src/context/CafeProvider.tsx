@@ -1,6 +1,6 @@
 "use client";
 
-import { MAX_NB_PERSONNES_PAR_ESPACE } from "@/app/[locale]/(devis)/mon-devis/(etapes)/food-beverage/(cafe)/CafeEspacePropositions";
+import { MAX_NB_PERSONNES_PAR_ESPACE } from "@/app/mon-devis/(etapes)/food-beverage/(cafe)/CafeEspacePropositions";
 import { useClientOnly } from "@/hooks/use-client-only";
 import { CafeType } from "@/zod-schemas/cafe";
 import {
@@ -66,7 +66,7 @@ const CafeProvider = ({ children }: PropsWithChildren) => {
           nbPersonnes:
             client.effectif > MAX_NB_PERSONNES_PAR_ESPACE
               ? MAX_NB_PERSONNES_PAR_ESPACE
-              : (client.effectif ?? 0),
+              : client.effectif ?? 0,
           nbMachines: null,
           nbPassagesParAn: null,
         },

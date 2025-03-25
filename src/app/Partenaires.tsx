@@ -1,19 +1,18 @@
 "use client";
 
+import Autoscroll from "embla-carousel-auto-scroll";
+
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-import { useScopedI18n } from "@/locales/client";
-import Autoscroll from "embla-carousel-auto-scroll";
 import Image from "next/image";
 
 const Partenaires = () => {
-  const t = useScopedI18n("nav");
   return (
     <section className="max-w-7xl w-full mx-auto flex flex-col gap-10 p-6">
-      <h2 className="text-2xl md:text-3xl border-l-2 px-4">{t("partners")}</h2>
+      <h2 className="text-2xl md:text-3xl border-l-2 px-4">Nos partenaires</h2>
       <Carousel
         opts={{
           align: "start",
