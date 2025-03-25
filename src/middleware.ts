@@ -2,11 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const allowedOrigins =
   process.env.NODE_ENV === "production"
-    ? [
-        "https://fm4all-git-staging-virouncodes-projects.vercel.app",
-        "https://www.fm4all.com",
-        "https://fm4all.com",
-      ]
+    ? ["https://www.fm4all.com", "https://fm4all.com"]
     : ["http://localhost:3000"];
 
 export function middleware(req: NextRequest) {
