@@ -6,7 +6,7 @@ const Hero = () => {
       className="flex items-center justify-center min-h-[calc(100vh-4rem)] md:min-h-[calc(100vh-4rem)] overflow-hidden relative"
       id="hero"
     >
-      <div className="absolute inset-0 z-0 bg-hero-img bg-cover bg-center">
+      <div className="absolute inset-0 z-0 bg-hero-img bg-cover bg-left">
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40"></div>
       </div>
       <div className="relative z-10 w-11/12 max-w-7xl mx-auto flex flex-col items-center gap-8 px-4 py-12">
