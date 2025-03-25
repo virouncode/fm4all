@@ -1,89 +1,86 @@
 import DevisButton from "@/components/devis-button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import Image from "next/image";
 
 const Hero = () => {
   return (
     <section
-      className="flex items-center justify-center min-h-[calc(100vh-4rem)] md:min-h-[calc(100vh-4rem)] bg-hero-img
-      bg-cover bg-center bg-no-repeat p-6"
+      className="flex items-center justify-center min-h-[calc(100vh-4rem)] md:min-h-[calc(100vh-4rem)] overflow-hidden"
       id="hero"
     >
-      <div className="flex w-11/12 sm:w-3/4 md:max-w-5xl rounded-xl overflow-hidden">
-        <Card className="flex-1 rounded-none py-4">
-          <CardHeader>
-            <CardTitle>
-              <h1 className="text-3xl md:text-4xl text-center text-fm4allsecondary text-pretty font-bold">
-                Vos prestataires de services au meilleur prix.
-              </h1>
-            </CardTitle>
-            <CardDescription>
-              <h2 className="text-lg md:text-xl text-center mt-6 font-bold">
-                Vos locaux font moins de 3000m² ?
-              </h2>
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-6 text-base md:text-lg">
-            {/* <p className="text-center text-xl">
-            <strong>Vos locaux font moins de 3000m² ?</strong>
-          </p> */}
-            <p className="text-center">
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/img/hero_wallpaper.webp"
+          alt="hero background"
+          fill
+          className="object-cover object-center"
+          priority
+          fetchPriority="high"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40"></div>
+      </div>
+      <div className="relative z-10 w-11/12 max-w-7xl mx-auto flex flex-col items-center gap-8 px-4 py-12">
+        <div className="w-full max-w-3xl text-white">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-pretty">
+            Vos prestataires de services au meilleur prix.
+          </h1>
+          <p className="text-xl md:text-2xl font-medium mb-8">
+            Vos locaux font moins de 3000m² ?
+          </p>
+          <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 mb-8 border border-white/20">
+            <h2 className="text-base md:text-lg mb-6">
               Gagnez du temps et de l’argent sur la{" "}
-              <strong>gestion de vos prestations</strong> nettoyage, café,
-              maintenance, etc.
-            </p>
-            <div className="flex justify-center">
-              <ul className="ml-10 mb-4">
-                <li className="list-check">
-                  <strong>Comparez</strong> par gamme :{" "}
-                  <span className="text-fm4allessential font-bold">
-                    Essentiel
-                  </span>
-                  ,{" "}
-                  <span className="text-fm4allcomfort font-bold">Confort</span>,{" "}
-                  <span className="text-fm4allexcellence font-bold">
-                    Excellence
-                  </span>
-                </li>
-                <li className="list-check">
-                  <strong>Simplifiez</strong> la mise en place des services
-                </li>
-                <li className="list-check">
-                  <strong>Déléguez</strong> la gestion du quotidien
-                </li>
-              </ul>
-            </div>
-            <div className="hidden w-full md:flex justify-center">
+              <strong>gestion de vos prestations</strong> de nettoyage, hygiène
+              sanitaire, café, maintenance multitechnique, sécurité incendie,
+              etc.
+            </h2>
+            <ul className="space-y-4 mb-10 text-base md:text-lg">
+              <li className="flex items-start">
+                <span className="inline-flex items-center justify-center bg-fm4allsecondary text-white rounded-full w-6 h-6 mr-3 flex-shrink-0 mt-0.5">
+                  ✓
+                </span>
+                <span>
+                  <strong className="text-white">Comparez</strong> par gamme :
+                  <span className="font-bold ml-1">Essentiel</span>,{" "}
+                  <span className="font-bold">Confort</span>,{" "}
+                  <span className="font-bold">Excellence</span>
+                </span>
+              </li>
+              <li className="flex items-start">
+                <span className="inline-flex items-center justify-center bg-fm4allsecondary text-white rounded-full w-6 h-6 mr-3 flex-shrink-0 mt-0.5">
+                  ✓
+                </span>
+                <span>
+                  <strong className="text-white">Simplifiez</strong> la mise en
+                  place des services
+                </span>
+              </li>
+              <li className="flex items-start">
+                <span className="inline-flex items-center justify-center bg-fm4allsecondary text-white rounded-full w-6 h-6 mr-3 flex-shrink-0 mt-0.5">
+                  ✓
+                </span>
+                <span>
+                  <strong className="text-white">Déléguez</strong> la gestion du
+                  quotidien
+                </span>
+              </li>
+            </ul>
+            <div className="hidden md:flex md:justify-center">
               <DevisButton
                 title="Je réalise mon devis en ligne"
                 text="Je réalise mon devis en ligne"
                 size="lg"
+                className="bg-fm4alldestructive hover:bg-fm4alldestructive/90 text-white border-none shadow-lg hover:shadow-xl"
               />
             </div>
-            <div className="flex w-full md:hidden justify-center">
+            <div className="md:hidden">
               <DevisButton
                 title="Mon devis en ligne"
                 text="Mon devis en ligne"
                 size="lg"
+                className="bg-fm4alldestructive hover:bg-fm4alldestructive/90 text-white border-none shadow-lg w-full"
               />
             </div>
-          </CardContent>
-        </Card>
-        <div className="w-[365px] h-[500px] relative overflow-hidden hidden lg:block">
-          <Image
-            src={"/img/two_collaborators.webp"}
-            alt="deux-collaborateurs-se-serrent-la-main"
-            className="object-cover object-center"
-            fill={true}
-            priority
-            fetchPriority="high"
-          />
+          </div>
         </div>
       </div>
     </section>

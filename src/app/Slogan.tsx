@@ -12,7 +12,7 @@ const Slogan = () => {
           className="object-contain object-center"
         />
       </div>
-      <h2 className="text-4xl italic text-center">
+      <h2 className="text-5xl text-center text-destructive font-bold">
         Le Facility Management pour tous
       </h2>
     </div>
