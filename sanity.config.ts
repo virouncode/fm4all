@@ -21,8 +21,8 @@ export default defineConfig({
   dataset,
   // Add and edit the content schema in the './sanity/schemaTypes' folder
   schema: {
-    ...schema,
-    templates: (prev) =>
+    types: schema.types,
+    templates: (prev = []) =>
       prev.filter((template) => !TRANSLATABLE_TYPES.includes(template.id)),
   },
   plugins: [
