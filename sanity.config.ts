@@ -52,4 +52,4 @@ export default defineConfig({
       },
     }),
   ],
-});
+}) as import("sanity").Config;
