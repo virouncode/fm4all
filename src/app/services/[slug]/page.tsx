@@ -18,7 +18,8 @@ import {
   PortableTextComponentProps,
 } from "next-sanity";
 import Image from "next/image";
-import { Service } from "../../../../sanity.types";
+import { Secteur, Service, SousService } from "../../../../sanity.types";
+import ExpertiseCarousel from "./ExpertiseCarousel";
 
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
@@ -99,18 +100,20 @@ export const generateMetadata = async ({
 }): Promise<Metadata> => {
   const service = await client.fetch<Service>(SERVICE_QUERY, await params);
   return {
-    title: service.titre,
-    description: service.description,
+    title: service.baliseTitle,
+    description: service.baliseDescription,
   };
 };
 
 const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const options = { next: { revalidate: 5 } };
-  const service = await client.fetch<Service>(
-    SERVICE_QUERY,
-    await params,
-    options
-  );
+  const service = await client.fetch<
+    Service & {
+      servicesAssocies: Service[];
+      sousServicesAssocies: SousService[];
+      secteursAssocies: Secteur[];
+    }
+  >(SERVICE_QUERY, await params, options);
 
   const serviceImageUrl = service.imagePrincipale
     ? urlFor(service.imagePrincipale)
@@ -154,6 +157,8 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const serviceImageBloc6Alt = service.imageBloc6?.alt
     ? service.imageBloc6.alt
     : "illustration du service";
+
+  console.log("service", service);
 
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20 hyphens-auto">
@@ -199,13 +204,21 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
           </div>
         ) : null}
       </section>
-      {(service.secteursAssocies || service.servicesAssocies) && (
+      {(service.secteursAssocies ||
+        service.servicesAssocies ||
+        service.sousServicesAssocies) && (
         <section className="flex flex-row gap-10 mb-16">
-          <div>
+          <div className="w-full">
             <h2 className="border-l-2 px-4 text-4xl mb-10">Notre expertise</h2>
+            <ExpertiseCarousel
+              services={service.servicesAssocies}
+              sousServices={service.sousServicesAssocies}
+              secteurs={service.secteursAssocies}
+            />
           </div>
         </section>
       )}
+
       <section className="flex flex-row gap-10 mb-16">
         {serviceImageBloc1Url ? (
           <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">

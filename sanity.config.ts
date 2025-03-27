@@ -20,8 +20,9 @@ import { categoryType } from "./src/sanity/schemaTypes/categoryType";
 import { postType } from "./src/sanity/schemaTypes/postType";
 import { secteurType } from "./src/sanity/schemaTypes/secteurType";
 import { serviceType } from "./src/sanity/schemaTypes/serviceType";
+import { sousServiceType } from "./src/sanity/schemaTypes/sousServiceType";
 
-const TRANSLATABLE_TYPES = ["article", "service", "secteur"];
+const TRANSLATABLE_TYPES = ["article", "service", "sousService", "secteur"];
 
 // Create configuration object
 const config = {
@@ -36,6 +37,7 @@ const config = {
       authorType,
       articleType,
       serviceType,
+      sousServiceType,
       secteurType,
     ],
   },

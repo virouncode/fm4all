@@ -19,18 +19,33 @@ export const serviceType = defineType({
       options: { source: "titre" },
       validation: (rule) => rule.required(),
     }),
-    //<title> + H1
+    //H1
     defineField({
       title: "Titre",
       name: "titre",
       type: "string",
       validation: (rule) => rule.required(),
     }),
-    //<description>
+    //<title>
+    defineField({
+      title: "Balise titre",
+      name: "baliseTitle",
+      type: "string",
+      validation: (rule) => rule.required(),
+    }),
+    //Description
     defineField({
       title: "Description",
       name: "description",
       type: "string",
+      validation: (rule) => rule.required(),
+    }),
+    //<description>
+    defineField({
+      title: "Balise description",
+      name: "baliseDescription",
+      type: "string",
+      validation: (rule) => rule.required(),
     }),
     //too long to read
     defineField({
@@ -78,6 +93,18 @@ export const serviceType = defineType({
           type: "reference",
           name: "service",
           to: [{ type: "service" }],
+        }),
+      ],
+    }),
+    defineField({
+      title: "Sous Services associés",
+      name: "sousServicesAssocies",
+      type: "array",
+      of: [
+        defineArrayMember({
+          type: "reference",
+          name: "sousService",
+          to: [{ type: "sousService" }],
         }),
       ],
     }),
