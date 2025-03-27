@@ -88,8 +88,7 @@ const ptComponents = {
 };
 
 // export const generateStaticParams = async () => {
-//   const options = { next: { revalidate: 30 } };
-//   const services = await client.fetch<Service[]>(SERVICES_QUERY, {}, options);
+//   const services = await client.fetch<Service[]>(SERVICES_QUERY, {});
 //   return services.map((service) => ({ slug: service.slug?.current }));
 // };
 
@@ -98,12 +97,7 @@ export const generateMetadata = async ({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> => {
-  // const options = { next: { revalidate: 30 } };
-  const service = await client.fetch<Service>(
-    SERVICE_QUERY,
-    await params
-    // options
-  );
+  const service = await client.fetch<Service>(SERVICE_QUERY, await params);
   return {
     title: service.titre,
     description: service.description,
