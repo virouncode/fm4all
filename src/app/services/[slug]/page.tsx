@@ -111,11 +111,11 @@ export const generateMetadata = async ({
 };
 
 const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
-  // const options = { next: { revalidate: 30 } };
+  const options = { next: { revalidate: 5 } };
   const service = await client.fetch<Service>(
     SERVICE_QUERY,
-    await params
-    // options
+    await params,
+    options
   );
 
   const serviceImageUrl = service.imagePrincipale
