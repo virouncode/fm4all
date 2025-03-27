@@ -188,7 +188,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
           </div>
         </div>
         {serviceImageUrl ? (
-          <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px]">
+          <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
             <Image
               src={serviceImageUrl.url()}
               alt={serviceImageAlt}
@@ -208,7 +208,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
       )}
       <section className="flex flex-row gap-10 mb-16">
         {serviceImageBloc1Url ? (
-          <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px]">
+          <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
             <Image
               src={serviceImageBloc1Url.url()}
               alt={serviceImageBloc1Alt}
@@ -248,7 +248,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
           )}
         </div>
         {serviceImageBloc2Url ? (
-          <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px]">
+          <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
             <Image
               src={serviceImageBloc2Url.url()}
               alt={serviceImageBloc2Alt}
@@ -264,7 +264,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
       {Array.isArray(service.bloc3) && service.bloc3.length > 0 && (
         <section className="flex flex-row gap-10 mb-16">
           {serviceImageBloc3Url ? (
-            <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px]">
+            <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
               <Image
                 src={serviceImageBloc3Url.url()}
                 alt={serviceImageBloc3Alt}
@@ -304,7 +304,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
             <PortableText value={service.bloc4} components={ptComponents} />
           </div>
           {serviceImageBloc4Url ? (
-            <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px]">
+            <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
               <Image
                 src={serviceImageBloc4Url.url()}
                 alt={serviceImageBloc4Alt}
@@ -321,7 +321,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
       {Array.isArray(service.bloc5) && service.bloc5.length > 0 && (
         <section className="flex flex-row gap-10 mb-16">
           {serviceImageBloc5Url ? (
-            <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px]">
+            <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
               <Image
                 src={serviceImageBloc5Url.url()}
                 alt={serviceImageBloc5Alt}
@@ -360,7 +360,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
             <PortableText value={service.bloc6} components={ptComponents} />
           </div>
           {serviceImageBloc6Url ? (
-            <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px]">
+            <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
               <Image
                 src={serviceImageBloc6Url.url()}
                 alt={serviceImageBloc6Alt}
