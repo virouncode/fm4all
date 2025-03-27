@@ -15,7 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
-      url: "https://www.fm4all.com/nos-services",
+      url: "https://www.fm4all.com/services",
       lastModified: "2025-03-02T09:35:25.103Z",
       changeFrequency: "weekly",
       priority: 0.8,

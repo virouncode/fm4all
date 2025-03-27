@@ -59,11 +59,11 @@ const Header = () => {
             </div>
             <div
               className={`flex gap-1 items-center ${
-                isActive("/nos-services") ? "text-destructive font-bold" : ""
+                isActive("/services") ? "text-destructive font-bold" : ""
               }`}
             >
               <HandPlatter size={15} />
-              <Link href="/nos-services">Nos services</Link>
+              <Link href="/services">Nos services</Link>
             </div>
             <div
               className={`flex gap-1 items-center ${
@@ -171,12 +171,12 @@ const Header = () => {
               </div>
               <div
                 className={`flex gap-4 items-center ${
-                  isActive("/nos-services") ? "text-destructive font-bold" : ""
+                  isActive("/services") ? "text-destructive font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
                 <HandPlatter size={30} />
-                <Link href="/nos-services">Nos services</Link>
+                <Link href="/services">Nos services</Link>
               </div>
               <div
                 className={`flex gap-4 items-center ${
