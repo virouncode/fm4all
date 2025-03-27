@@ -13,8 +13,12 @@ import Link from "next/link";
 import { Service } from "../../sanity.types";
 
 const ServicesCarousel = async () => {
-  const options = { next: { revalidate: 5 } };
-  const services = await client.fetch<Service[]>(SERVICES_QUERY, {}, options);
+  // const options = { next: { revalidate: 30 } };
+  const services = await client.fetch<Service[]>(
+    SERVICES_QUERY,
+    {}
+    // options
+  );
   return (
     <Carousel
       opts={{

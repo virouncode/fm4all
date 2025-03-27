@@ -6,8 +6,12 @@ import Link from "next/link";
 import { Service } from "../../../sanity.types";
 
 const ServiceCards = async () => {
-  const options = { next: { revalidate: 5 } };
-  const services = await client.fetch<Service[]>(SERVICES_QUERY, {}, options);
+  // const options = { next: { revalidate: 30 } };
+  const services = await client.fetch<Service[]>(
+    SERVICES_QUERY,
+    {}
+    // options
+  );
 
   return (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 items-center mt-6 w-full">
