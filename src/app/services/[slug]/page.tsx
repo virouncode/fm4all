@@ -55,7 +55,7 @@ const ptComponents = {
         <div className="relative w-full  h-[200px] md:h-[400px] my-6 mx-auto">
           <Image
             quality={100}
-            src={urlFor(value).url()}
+            src={urlFor(value).width(1920).url()}
             alt={value.alt || "illustration du service"}
             fill
             className="object-contain m-0"
@@ -211,7 +211,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
         {serviceImageUrl ? (
           <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
             <Image
-              src={serviceImageUrl.url()}
+              src={serviceImageUrl.width(1920).url()}
               alt={serviceImageAlt}
               quality={100}
               className="object-cover object-center"
@@ -239,7 +239,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
         {serviceImageBloc1Url ? (
           <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
             <Image
-              src={serviceImageBloc1Url.url()}
+              src={serviceImageBloc1Url.width(1920).url()}
               alt={serviceImageBloc1Alt}
               quality={100}
               className="object-cover object-center"
@@ -279,7 +279,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
         {serviceImageBloc2Url ? (
           <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
             <Image
-              src={serviceImageBloc2Url.url()}
+              src={serviceImageBloc2Url.width(1920).url()}
               alt={serviceImageBloc2Alt}
               quality={100}
               className="object-cover object-center"
@@ -295,7 +295,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
           {serviceImageBloc3Url ? (
             <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
               <Image
-                src={serviceImageBloc3Url.url()}
+                src={serviceImageBloc3Url.width(1920).url()}
                 alt={serviceImageBloc3Alt}
                 quality={100}
                 className="object-cover object-center"
@@ -335,7 +335,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
           {serviceImageBloc4Url ? (
             <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
               <Image
-                src={serviceImageBloc4Url.url()}
+                src={serviceImageBloc4Url.width(1920).url()}
                 alt={serviceImageBloc4Alt}
                 quality={100}
                 className="object-cover object-center"
@@ -352,7 +352,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
           {serviceImageBloc5Url ? (
             <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
               <Image
-                src={serviceImageBloc5Url.url()}
+                src={serviceImageBloc5Url.width(1920).url()}
                 alt={serviceImageBloc5Alt}
                 quality={100}
                 className="object-cover object-center"
@@ -391,7 +391,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
           {serviceImageBloc6Url ? (
             <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
               <Image
-                src={serviceImageBloc6Url.url()}
+                src={serviceImageBloc6Url.width(1920).url()}
                 alt={serviceImageBloc6Alt}
                 quality={100}
                 className="object-cover object-center"

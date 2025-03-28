@@ -26,7 +26,7 @@ const ServiceCards = async () => {
         return serviceImageUrl ? (
           <ImgCardVertical
             key={service._id}
-            src={serviceImageUrl.url()}
+            src={serviceImageUrl.width(800).url()}
             alt={serviceImageAlt}
           >
             <div className="p-4 flex flex-col gap-4 h-52">
