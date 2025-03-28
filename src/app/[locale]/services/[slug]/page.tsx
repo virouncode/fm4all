@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
+
 import { SERVICE_QUERY } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
 import { Metadata } from "next";
@@ -20,6 +21,7 @@ import {
 import Image from "next/image";
 import { Secteur, Service, SousService } from "../../../../../sanity.types";
 import ExpertiseCarousel from "./ExpertiseCarousel";
+import { notFound } from "next/navigation";
 
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
@@ -58,6 +60,7 @@ const ptComponents = {
             alt={value.alt || "illustration du service"}
             fill
             className="object-contain m-0"
+            unoptimized={true}
           />
         </div>
       );
@@ -122,6 +125,10 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
     // options
   );
 
+  if (!service) {
+    notFound();
+  }
+
   const serviceImageUrl = service.imagePrincipale
     ? urlFor(service.imagePrincipale)
     : null; //TODO placeholder image
@@ -165,8 +172,6 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
     ? service.imageBloc6.alt
     : "illustration du service";
 
-  console.log("service", service);
-
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20 hyphens-auto">
       <Breadcrumb className="mb-10">
@@ -185,7 +190,14 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
       <section className="flex flex-row gap-10 mb-16">
         <div className="flex flex-col flex-1 justify-start text-lg gap-10">
           <h1 className="text-5xl">{service.titre}</h1>
-          <div className="flex flex-col gap-4">
+          <div
+            className="flex flex-col gap-4 prose-lg 
+          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
+          prose-h3:font-bold prose-h3:text-xl
+          prose-p:text-pretty prose-p:hyphens-auto prose-p:m-0
+          prose-li:list-check prose-li:m-0
+          prose-a:underline"
+          >
             <p className="font-bold">{service.description}</p>
             {Array.isArray(service.tltr) && (
               <PortableText value={service.tltr} />
@@ -207,6 +219,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
               quality={100}
               className="object-cover object-center"
               fill={true}
+              unoptimized={true}
             />
           </div>
         ) : null}
@@ -235,6 +248,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
               quality={100}
               className="object-cover object-center"
               fill={true}
+              unoptimized={true}
             />
           </div>
         ) : null}
@@ -275,6 +289,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
               quality={100}
               className="object-cover object-center"
               fill={true}
+              unoptimized={true}
             />
           </div>
         ) : null}
@@ -291,6 +306,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
                 quality={100}
                 className="object-cover object-center"
                 fill={true}
+                unoptimized={true}
               />
             </div>
           ) : null}
@@ -331,6 +347,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
                 quality={100}
                 className="object-cover object-center"
                 fill={true}
+                unoptimized={true}
               />
             </div>
           ) : null}
@@ -348,6 +365,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
                 quality={100}
                 className="object-cover object-center"
                 fill={true}
+                unoptimized={true}
               />
             </div>
           ) : null}
@@ -387,6 +405,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
                 quality={100}
                 className="object-cover object-center"
                 fill={true}
+                unoptimized={true}
               />
             </div>
           ) : null}

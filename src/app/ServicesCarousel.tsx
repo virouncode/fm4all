@@ -21,6 +21,8 @@ const ServicesCarousel = async () => {
     { language: locale }
     // options
   );
+  console.log("services", services);
+
   return (
     <Carousel
       opts={{
@@ -43,7 +45,7 @@ const ServicesCarousel = async () => {
               key={service._id}
             >
               <ImgCardVertical
-                src={serviceImageUrl.url()}
+                src={serviceImageUrl.width(800).url()}
                 alt={serviceImageAlt}
               >
                 <div className="p-4 flex flex-col gap-4 h-56">
