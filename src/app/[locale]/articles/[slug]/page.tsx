@@ -2,7 +2,7 @@
 // import imageUrlBuilder from "@sanity/image-url";
 // import type { SanityImageSource } from "@sanity/image-url/lib/types/types";
 // import { PortableText, type SanityDocument } from "next-sanity";
-// import Link from "next/link";
+// import {Link} from "@/i18n/navigation";
 
 // const POST_QUERY = `*[_type == "post" && slug.current == $slug][0]`;
 

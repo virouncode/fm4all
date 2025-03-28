@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import { Metadata } from "next";
-import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Missions du FM",

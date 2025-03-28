@@ -1,5 +1,5 @@
 import ImgCardVertical from "@/components/cards/ImgCardVertical";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 const ArticleCards = () => {
   return (

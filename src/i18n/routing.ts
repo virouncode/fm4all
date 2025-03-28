@@ -6,6 +6,40 @@ export const routing = defineRouting({
 
   // Used when no locale matches
   defaultLocale: "fr",
+  pathnames: {
+    "/": {
+      fr: "/",
+      en: "/",
+    },
+    "/services": {
+      fr: "/services",
+      en: "/services",
+    },
+    "/nos-3-gammes": {
+      fr: "/nos-3-gammes",
+      en: "/our-3-tiers",
+    },
+    "/nos-engagements": {
+      fr: "/nos-engagements",
+      en: "/our-commitments",
+    },
+    "/nos-partenaires": {
+      fr: "/nos-partenaires",
+      en: "/our-partners",
+    },
+    "/faq": {
+      fr: "/foire-aux-questions",
+      en: "/frequently-asked-questions",
+    },
+    "/devenir-prestataire": {
+      fr: "/devenir-prestataire",
+      en: "/become-a-provider",
+    },
+    "/contact": {
+      fr: "/contactez-nous",
+      en: "/contact-us",
+    },
+  },
 });
 
 export type Locale = "fr" | "en";

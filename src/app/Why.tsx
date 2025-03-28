@@ -1,103 +1,79 @@
-import WhyCard from "@/components/cards/WhyCard";
-import { Euro, Feather, Handshake, Rabbit, Waves } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
+import WhyCards from "./WhyCards";
 
 const Why = () => {
+  const t = useTranslations("HomePage.pourquoi");
   return (
     <section
       className="max-w-7xl w-full mx-auto flex flex-col gap-10 p-6"
       id="process"
     >
       <h2 className="text-2xl md:text-3xl border-l-2 px-4">
-        Pourquoi ça marche ?
+        {t("pourquoi-ca-marche")}
       </h2>
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-2">
-        <WhyCard
-          title="Simplicité"
-          content="3 gammes de services standardisées pour une comparaison et un choix faciles."
-          icon={Feather}
-        />
-        <WhyCard
-          title="Rapidité"
-          content="Devis personnalisés en ligne en quelques minutes, prêt à démarrer."
-          icon={Rabbit}
-        />
-        <WhyCard
-          title="Fiabilité"
-          content="Contrats clairs et partenaires de confiance rigoureusement sélectionnés."
-          icon={Handshake}
-        />
-        <WhyCard
-          title="Sérénité"
-          content="Centralisation des demandes, du suivi qualité et des escalades pour une tranquillité d'esprit garantie."
-          icon={Waves}
-        />
-        <WhyCard
-          title="Optimisé"
-          content="-10% en moyenne grâce aux offres groupées de nos partenaires"
-          icon={Euro}
-        />
-      </div>
+      <WhyCards />
       <div className="text-lg flex flex-col gap-4 w-full max-w-prose mx-auto hyphens-auto text-wrap">
         <p className="text-center font-bold">
-          Parce que tout le monde est gagnant ! Prestataires comme clients !
+          {t("parce-que-tout-le-monde-est-gagnant-prestataires-comme-clients")}
         </p>
         <p>
-          Vous ne courez pas après vos devis et vous avez de meilleurs prix !
-          Nos prestataires ne perdent pas de temps ni de ressources à chiffrer
-          pour rien ! Du coup, ils peuvent vous offrir leurs meilleurs tarifs.
+          {t(
+            "vous-ne-courez-pas-apres-vos-devis-et-vous-avez-de-meilleurs-prix-nos-prestataires-ne-perdent-pas-de-temps-ni-de-ressources-a-chiffrer-pour-rien-du-coup-ils-peuvent-vous-offrir-leurs-meilleurs-tarifs"
+          )}
         </p>
         <p className="text-center font-bold">
-          Parce que fm4all centralise tout
+          {t("parce-que-fm4all-centralise-tout")}
         </p>
         <p>
-          Nous gérons la facturation, les demandes et le suivi qualité. Un gain
-          de temps précieux pour tous.
+          {t(
+            "nous-gerons-la-facturation-les-demandes-et-le-suivi-qualite-un-gain-de-temps-precieux-pour-tous"
+          )}
         </p>
-        <p className="font-bold">Pour vous clients:</p>
+        <p className="font-bold">{t("pour-vous-clients")}</p>
         <ul className="mx-auto ml-10">
-          <li className="list-thumb">Fini la course aux devis !</li>
-          <li className="list-thumb">Accédez aux prix les plus avantageux</li>
+          <li className="list-thumb">{t("fini-la-course-aux-devis")}</li>
+          <li className="list-thumb">
+            {t("accedez-aux-prix-les-plus-avantageux")}
+          </li>
         </ul>
-        <p className="font-bold">Pour nos prestataires:</p>
+        <p className="font-bold">{t("pour-nos-prestataires")}</p>
         <ul className="mx-auto ml-10">
           <li className="list-thumb">
-            Gain de temps et de ressources : ils se concentrent sur leur cœur de
-            métier.
+            {t(
+              "gain-de-temps-et-de-ressources-ils-se-concentrent-sur-leur-coeur-de-metier"
+            )}
           </li>
           <li className="list-thumb">
-            Des tarifs plus compétitifs grâce à l&apos;optimisation des
-            processus.
+            {t(
+              "des-tarifs-plus-competitifs-grace-a-l-and-apos-optimisation-des-processus"
+            )}
           </li>
         </ul>
       </div>
       <div className="flex flex-col gap-10">
         <p className="text-lg">
-          <strong>Le problème</strong> 🤔 : un marché complexe pour les petites
-          structures
+          <strong>{t("le-probleme")}</strong>{" "}
+          {t("un-marche-complexe-pour-les-petites-structures")}
         </p>
         <div className="flex flex-col md:flex-row w-full lg:w-3/4 mx-auto border rounded-xl overflow-hidden">
           <div className="w-full md:w-2/3 p-6 md:py-10 md:px-16 flex flex-col gap-4 italic order-last md:order-first">
             <p>
-              “Quand on est client utilisateur de bureaux de moins de 3000m²,
-              beaucoup de demandes de devis restent sans réponse. Les ressources
-              achats sont limitées, on n&apos;achète pas ça tous les jours, et
-              d’ailleurs que mettre dans son cahier des charges ? On perd du
-              temps à obtenir des devis et pire, ceux qu’on obtient paraissent
-              toujours trop chers.
+              {t(
+                "quand-on-est-client-utilisateur-de-bureaux-de-moins-de-3000m-beaucoup-de-demandes-de-devis-restent-sans-reponse-les-ressources-achats-sont-limitees-on-n-and-apos-achete-pas-ca-tous-les-jours-et-dailleurs-que-mettre-dans-son-cahier-des-charges-on-perd-du-temps-a-obtenir-des-devis-et-pire-ceux-quon-obtient-paraissent-toujours-trop-chers"
+              )}
             </p>
-            <p>Pour cause?</p>
+            <p>{t("pour-cause")}</p>
             <p>
-              Pour les prestataires, faire un devis pour un site de “petite
-              taille” est un risque. Le temps de visiter, chiffrer, négocier et
-              démarrer… Si ça ne signe pas ou s’il y a la moindre erreur
-              opérationnelle, c’est la marge qui s’effondre. Résultat? Soit ils
-              ne répondent pas et se concentrent sur les gros, soit ils
-              répondent avec des marges gonflées pour compenser ces risques.”
+              {t(
+                "pour-les-prestataires-faire-un-devis-pour-un-site-de-petite-taille-est-un-risque-le-temps-de-visiter-chiffrer-negocier-et-demarrer-si-ca-ne-signe-pas-ou-sil-y-a-la-moindre-erreur-operationnelle-cest-la-marge-qui-seffondre-resultat-soit-ils-ne-repondent-pas-et-se-concentrent-sur-les-gros-soit-ils-repondent-avec-des-marges-gonflees-pour-compenser-ces-risques"
+              )}
             </p>
             <p className="text-end not-italic font-bold text-sm">
-              Romuald Buffe, fondateur fm4all, <br />
-              Ancien directeur commercial de ISS France et CBRE GWS France
+              {t("romuald-buffe-fondateur-fm4all")} <br />
+              {t(
+                "ancien-directeur-commercial-de-iss-france-et-cbre-gws-france"
+              )}
             </p>
           </div>
           <div className="w-full md:w-1/3 h-[300px] sm:h-[500px] md:h-auto relative">
@@ -114,17 +90,21 @@ const Why = () => {
 
       <div className="flex flex-col  text-lg gap-10">
         <p>
-          <strong>La solution</strong> 💡 : fm4all simplifie et optimise la
-          gestion facility management pour tous.
+          <strong>{t("la-solution")}</strong>{" "}
+          {t(
+            "fm4all-simplifie-et-optimise-la-gestion-facility-management-pour-tous"
+          )}
         </p>
         <div className="text-center max-w-prose mx-auto">
           <div className="flex flex-col gap-1 text-5xl mb-10 font-bold text-fm4allsecondary">
-            <p>1 contact.</p>
-            <p>1 contrat.</p>
-            <p>1 facture.</p>
+            <p>{t("1-contact")}</p>
+            <p>{t("1-contrat")}</p>
+            <p>{t("1-facture")}</p>
           </div>
           <p>
-            Avec fm4all, gérer vos bureaux n&apos;aura jamais été aussi simple !
+            {t(
+              "avec-fm4all-gerer-vos-bureaux-n-and-apos-aura-jamais-ete-aussi-simple"
+            )}
           </p>
         </div>
       </div>

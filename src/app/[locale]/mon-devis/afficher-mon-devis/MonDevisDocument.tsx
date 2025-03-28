@@ -2,8 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { ClientContext } from "@/context/ClientProvider";
+import { Link } from "@/i18n/navigation";
 import { DateTime } from "luxon";
-import Link from "next/link";
 import { useContext } from "react";
 
 type MonDevisDocumentProps = {

@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
-import { SERVICE_QUERY, SERVICES_QUERY } from "@/sanity/queries";
+import { SERVICE_QUERY } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
 import { Metadata } from "next";
 import {
@@ -88,12 +88,13 @@ const ptComponents = {
   },
 };
 
-export const generateStaticParams = async () => {
-  const services = await client
-    .withConfig({ useCdn: false })
-    .fetch<Service[]>(SERVICES_QUERY, {});
-  return services.map((service) => ({ slug: service.slug?.current }));
-};
+// export const generateStaticParams = async () => {
+
+//   const services = await client
+//     .withConfig({ useCdn: false })
+//     .fetch<Service[]>(SERVICES_QUERY, {});
+//   return services.map((service) => ({ slug: service.slug?.current }));
+// };
 
 export const generateMetadata = async ({
   params,

@@ -1,5 +1,5 @@
+import { Link } from "@/i18n/navigation";
 import { Metadata } from "next";
-import Link from "next/link";
 import { Suspense } from "react";
 import ServicesLoader from "../mes-locaux/ServicesLoader";
 import MesServices from "./MesServices";

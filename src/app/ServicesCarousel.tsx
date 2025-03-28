@@ -6,17 +6,19 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { Link } from "@/i18n/navigation";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 import { SERVICES_QUERY } from "@/sanity/queries";
-import Link from "next/link";
+import { getLocale } from "next-intl/server";
 import { Service } from "../../sanity.types";
 
 const ServicesCarousel = async () => {
   // const options = { next: { revalidate: 30 } };
+  const locale = await getLocale();
   const services = await client.fetch<Service[]>(
     SERVICES_QUERY,
-    {}
+    { language: locale }
     // options
   );
   return (

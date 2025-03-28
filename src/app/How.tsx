@@ -1,46 +1,48 @@
 import WhyCard from "@/components/cards/WhyCard";
 import DevisButton from "@/components/devis-button";
 import { Euro, HandPlatter, House, ReceiptText, Star } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 const How = () => {
+  const t = useTranslations("HomePage.comment");
   return (
     <section
       className="max-w-7xl w-full mx-auto flex flex-col gap-10 p-6"
       id="process"
     >
       <h2 className="text-2xl md:text-3xl border-l-2 px-4">
-        Comment ça marche ?
+        {t("comment-ca-marche")}
       </h2>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-2">
         <WhyCard
-          title="1. Mes Locaux"
-          content="Je précise mètres carrés, type et effectif"
+          title={t("1-mes-locaux")}
+          content={t("je-precise-metres-carres-type-et-effectif")}
           icon={House}
         />
         <WhyCard
-          title="2. Mes Services"
-          content="Je sélectionne ce qui m'intéresse à la carte"
+          title={t("2-mes-services")}
+          content={t("je-selectionne-ce-qui-minteresse-a-la-carte")}
           icon={HandPlatter}
         />
         <WhyCard
-          title="3. Mes Gammes"
-          content="Je choisis le niveau de chaque service"
+          title={t("3-mes-gammes")}
+          content={t("je-choisis-le-niveau-de-chaque-service")}
           icon={Star}
         />
         <WhyCard
-          title="4. Mes Prix"
-          content="Je compare en ligne mes prestataires"
+          title={t("4-mes-prix")}
+          content={t("je-compare-en-ligne-mes-prestataires")}
           icon={Euro}
         />
         <WhyCard
-          title="5. Mon Contrat"
-          content="Je valide la date de démarrage et go 🚀 !"
+          title={t("5-mon-contrat")}
+          content={t("je-valide-la-date-de-demarrage-et-go")}
           icon={ReceiptText}
         />
       </div>
       <DevisButton
-        title="Démarrez maintenant"
-        text="Démarrez maintenant"
+        title={t("demarrez-maintenant")}
+        text={t("demarrez-maintenant")}
         size="lg"
         className="self-start mx-auto"
       />

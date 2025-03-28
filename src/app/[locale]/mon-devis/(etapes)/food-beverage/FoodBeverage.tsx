@@ -1,3 +1,4 @@
+import { Link } from "@/i18n/navigation";
 import {
   getCafeConsoTarifs,
   getCafeMachines,
@@ -20,7 +21,6 @@ import {
   getSnacksQuantites,
   getSnacksTarifs,
 } from "@/lib/queries/snacks-fruits/getSnacksFruits";
-import Link from "next/link";
 import NextEtapePilotageButton from "../../NextEtapePilotageButton";
 import Cafe from "./(cafe)/Cafe";
 import Fontaines from "./(fontaine)/Fontaines";

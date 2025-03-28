@@ -33,19 +33,19 @@ const DetailServicesFm4All = () => {
         (totalRemiseCa ?? 0) -
         (totalRemiseHof ?? 0)
       : servicesFm4All.infos.gammeSelected === "confort"
-      ? (totalAssurance ?? 0) +
-        (totalPlateforme ?? 0) +
-        (totalSupportAdmin ?? 0) +
-        (totalSupportOp ?? 0) -
-        (totalRemiseCa ?? 0) -
-        (totalRemiseHof ?? 0)
-      : (totalAssurance ?? 0) +
-        (totalPlateforme ?? 0) +
-        (totalSupportAdmin ?? 0) +
-        (totalSupportOp ?? 0) +
-        (totalAccountManager ?? 0) -
-        (totalRemiseCa ?? 0) -
-        (totalRemiseHof ?? 0);
+        ? (totalAssurance ?? 0) +
+          (totalPlateforme ?? 0) +
+          (totalSupportAdmin ?? 0) +
+          (totalSupportOp ?? 0) -
+          (totalRemiseCa ?? 0) -
+          (totalRemiseHof ?? 0)
+        : (totalAssurance ?? 0) +
+          (totalPlateforme ?? 0) +
+          (totalSupportAdmin ?? 0) +
+          (totalSupportOp ?? 0) +
+          (totalAccountManager ?? 0) -
+          (totalRemiseCa ?? 0) -
+          (totalRemiseHof ?? 0);
   if (total === 0) return null;
 
   return (
@@ -66,7 +66,7 @@ const DetailServicesFm4All = () => {
         {totalAssurance ? (
           <TableRow>
             <TableCell>Assurance</TableCell>
-            <TableCell>fm4All</TableCell>
+            <TableCell>fm4all</TableCell>
             <TableCell>{servicesFm4All.infos.gammeSelected}</TableCell>
             <TableCell>N/A</TableCell>
             <TableCell>N/A</TableCell>
@@ -80,7 +80,7 @@ const DetailServicesFm4All = () => {
         {totalPlateforme ? (
           <TableRow>
             <TableCell>Plateforme</TableCell>
-            <TableCell>fm4All</TableCell>
+            <TableCell>fm4all</TableCell>
             <TableCell>{servicesFm4All.infos.gammeSelected}</TableCell>
             <TableCell>N/A</TableCell>
             <TableCell>N/A</TableCell>
@@ -94,7 +94,7 @@ const DetailServicesFm4All = () => {
 
         <TableRow>
           <TableCell>Support Administratif</TableCell>
-          <TableCell>fm4All</TableCell>
+          <TableCell>fm4all</TableCell>
           <TableCell>{servicesFm4All.infos.gammeSelected}</TableCell>
           <TableCell>N/A</TableCell>
           <TableCell>N/A</TableCell>
@@ -106,7 +106,7 @@ const DetailServicesFm4All = () => {
         totalSupportOp ? (
           <TableRow>
             <TableCell>Support Opérationnel</TableCell>
-            <TableCell>fm4All</TableCell>
+            <TableCell>fm4all</TableCell>
             <TableCell>{servicesFm4All.infos.gammeSelected}</TableCell>
             <TableCell>N/A</TableCell>
             <TableCell>N/A</TableCell>
@@ -123,7 +123,7 @@ const DetailServicesFm4All = () => {
         totalAccountManager ? (
           <TableRow>
             <TableCell>Account Manager</TableCell>
-            <TableCell>fm4All</TableCell>
+            <TableCell>fm4all</TableCell>
             <TableCell>{servicesFm4All.infos.gammeSelected}</TableCell>
             <TableCell>N/A</TableCell>
             <TableCell>N/A</TableCell>
@@ -137,7 +137,7 @@ const DetailServicesFm4All = () => {
         {totalRemiseCa ? (
           <TableRow>
             <TableCell>Remise sur chiffres d&apos;affaires</TableCell>
-            <TableCell>fm4All</TableCell>
+            <TableCell>fm4all</TableCell>
             <TableCell>{servicesFm4All.infos.gammeSelected}</TableCell>
             <TableCell>N/A</TableCell>
             <TableCell>N/A</TableCell>
@@ -151,7 +151,7 @@ const DetailServicesFm4All = () => {
         {totalRemiseHof ? (
           <TableRow>
             <TableCell>Remise Office Manager</TableCell>
-            <TableCell>fm4All</TableCell>
+            <TableCell>fm4all</TableCell>
             <TableCell>{servicesFm4All.infos.gammeSelected}</TableCell>
             <TableCell>N/A</TableCell>
             <TableCell>N/A</TableCell>

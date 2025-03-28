@@ -1,53 +1,68 @@
 import DevisButton from "@/components/devis-button";
+import { useTranslations } from "next-intl";
 
 const Mission = () => {
+  const t = useTranslations("HomePage.mission");
   return (
     <section className="max-w-7xl w-full mx-auto flex flex-col gap-10 p-6">
-      <h2 className="text-2xl md:text-3xl border-l-2 px-4">Notre mission</h2>
+      <h2 className="text-2xl md:text-3xl border-l-2 px-4">
+        {t("notre-mission")}
+      </h2>
       <div className="flex flex-col gap-4 text-lg w-full max-w-prose hyphens-auto text-wrap mx-auto">
         <p>
-          fm4all a analysé des centaines d’appels d’offres, de matrices de
-          chiffrage et contrats pour chaque service. Forts de cette analyse,
-          nous avons modélisé des{" "}
-          <strong>solutions standardisées et personnalisables</strong>,
-          permettant d&apos;automatiser les chiffrages tout en s&apos;adaptant
-          aux besoins spécifiques de chaque client :
+          {t(
+            "fm4all-a-analyse-des-centaines-dappels-doffres-de-matrices-de-chiffrage-et-contrats-pour-chaque-service-forts-de-cette-analyse-nous-avons-modelise-des"
+          )}{" "}
+          <strong>{t("solutions-standardisees-et-personnalisables")}</strong>
+          {t(
+            "permettant-d-and-apos-automatiser-les-chiffrages-tout-en-s-and-apos-adaptant-aux-besoins-specifiques-de-chaque-client"
+          )}
         </p>
         <ul className="mx-auto ml-10">
           <li className="list-thumb">
-            Un vrai choix avec 3 gammes de services claires
+            {t("un-vrai-choix-avec-3-gammes-de-services-claires")}
           </li>
           <li className="list-thumb">
-            Des devis que l’on peut comparer et personnaliser sans être
-            ingénieur métier
+            {t(
+              "des-devis-que-lon-peut-comparer-et-personnaliser-sans-etre-ingenieur-metier"
+            )}
           </li>
           <li className="list-thumb">
-            Des cahiers des charges et des contrats faciles à mettre en place
+            {t(
+              "des-cahiers-des-charges-et-des-contrats-faciles-a-mettre-en-place"
+            )}
           </li>
         </ul>
         <p>
-          Sélectionnez vos services, le niveau de gamme, vos options et voilà 🚀
-          !
+          {t(
+            "selectionnez-vos-services-le-niveau-de-gamme-vos-options-et-voila"
+          )}
         </p>
         <p>
-          Cahier des charges, contrats, planification, démarrage, fm4all vous
-          offre un service de Facility Management clé en main.
+          {t(
+            "cahier-des-charges-contrats-planification-demarrage-fm4all-vous-offre-un-service-de-facility-management-cle-en-main"
+          )}
         </p>
         <p>
-          Ne perdez plus de temps à lancer des appels d’offres ou à attendre des
-          devis sans réponse.
+          {t(
+            "ne-perdez-plus-de-temps-a-lancer-des-appels-doffres-ou-a-attendre-des-devis-sans-reponse"
+          )}
         </p>
         <DevisButton
-          title="Bénéficiez de notre réseau de partenaires en quelques clics"
-          text="Bénéficiez de notre réseau de partenaires en quelques clics"
+          title={t(
+            "beneficiez-de-notre-reseau-de-partenaires-en-quelques-clics"
+          )}
+          text={t(
+            "beneficiez-de-notre-reseau-de-partenaires-en-quelques-clics"
+          )}
           size="lg"
-          className="self-start mx-auto hidden md:block"
+          className="self-start mx-auto hidden md:block mt-6"
         />
         <DevisButton
-          title="Bénéficiez de notre réseau"
-          text="Bénéficiez de notre réseau"
+          title={t("beneficiez-de-notre-reseau")}
+          text={t("beneficiez-de-notre-reseau")}
           size="lg"
-          className="self-start mx-auto block md:hidden"
+          className="self-start mx-auto block md:hidden mt-6"
         />
       </div>
     </section>

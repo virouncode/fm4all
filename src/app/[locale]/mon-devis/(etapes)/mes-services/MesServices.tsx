@@ -1,3 +1,4 @@
+import { Link } from "@/i18n/navigation";
 import {
   getHygieneConsosTarifs,
   getHygieneDistribQuantite,
@@ -21,7 +22,6 @@ import {
   getRepasseTarifs,
   getVitrerieTarifs,
 } from "@/lib/queries/nettoyage/getNettoyage";
-import Link from "next/link";
 import NextEtapeFoodButton from "../../NextEtapeFoodButton";
 import Hygiene from "./(hygiene)/Hygiene";
 import HygieneOptions from "./(hygiene)/HygieneOptions";

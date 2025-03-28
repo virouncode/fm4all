@@ -7,23 +7,25 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 
 const Articles = () => {
+  const t = useTranslations("HomePage.articles");
   return (
     <section className="max-w-7xl  w-full mx-auto flex flex-col gap-10 p-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl md:text-3xl border-l-2 px-4">
-          Nos derniers articles
+          {t("nos-derniers-articles")}
         </h2>
         <Button
           variant="outline"
           className="hidden md:flex text-base justify-center items-center"
-          title="Tous les articles"
+          title={t("tous-les-articles")}
           size="lg"
           asChild
         >
-          <Link href="/articles">Tous les articles</Link>
+          <Link href="/articles">{t("tous-les-articles")}</Link>
         </Button>
       </div>
 
@@ -170,7 +172,7 @@ const Articles = () => {
         href="/articles"
         className="underline text-fm4allsecondary text-lg md:hidden"
       >
-        Voir tous les articles
+        {t("voir-tous-les-articles")}
       </Link>
     </section>
   );

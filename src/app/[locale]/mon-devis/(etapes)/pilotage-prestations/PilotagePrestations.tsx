@@ -1,3 +1,4 @@
+import { Link } from "@/i18n/navigation";
 import {
   getOfficeManagerQuantites,
   getOfficeManagerTarifs,
@@ -6,7 +7,6 @@ import {
   getServicesFm4AllOffres,
   getServicesFm4AllTaux,
 } from "@/lib/queries/services-fm4all/getServicesFm4All";
-import Link from "next/link";
 import OfficeManager from "./(office-manager)/OfficeManager";
 import ServicesFm4All from "./(services-fm4all)/ServicesFm4All";
 

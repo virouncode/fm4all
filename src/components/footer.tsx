@@ -1,6 +1,8 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 
 const Footer = () => {
+  const t = useTranslations("footer");
   return (
     <footer className="bg-fm4allsecondary">
       <div className="max-w-7xl mx-auto p-6">
@@ -10,17 +12,17 @@ const Footer = () => {
             <ul className="text-secondary text-sm flex flex-col gap-2">
               <li>
                 <Link href="/" className="hover:opacity-80">
-                  Page d&apos;accueil
+                  {t("page-d-accueil")}
                 </Link>
               </li>
               <li>
                 <Link href="/contact" className="hover:opacity-80">
-                  Nous contacter
+                  {t("nous-contacter")}
                 </Link>
               </li>
               <li>
                 <Link href="/mentions-legales" className="hover:opacity-80">
-                  Mentions legales
+                  {t("mentions-legales")}
                 </Link>
               </li>
               <li>
@@ -28,12 +30,12 @@ const Footer = () => {
                   href="/politique-de-confidentialite"
                   className="hover:opacity-80"
                 >
-                  Politique de confidentialité
+                  {t("politique-de-confidentialite")}
                 </Link>
               </li>
               <li>
                 <Link href="/politique-de-cookies" className="hover:opacity-80">
-                  Politique de cookies
+                  {t("politique-de-cookies")}
                 </Link>
               </li>
               <li>
@@ -46,25 +48,25 @@ const Footer = () => {
                   CGU
                 </Link>
               </li>
-              <li>Touts droits résérvés &copy;fm4all</li>
+              <li>{t("touts-droits-reserves-and-copy-fm4all")}</li>
             </ul>
           </div>
           <div className="flex flex-col gap-2 w-52">
-            <p className="text-secondary text-xl">Services</p>
+            <p className="text-secondary text-xl">{t("services")}</p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
               <li>
                 <Link href="/services/nettoyage" className="hover:opacity-80">
-                  Nettoyage
+                  {t("nettoyage")}
                 </Link>
               </li>
               <li>
                 <Link href="/services/hygiene" className="hover:opacity-80">
-                  Hygiene sanitaire
+                  {t("hygiene-sanitaire")}
                 </Link>
               </li>
               <li>
                 <Link href="/services/maintenance" className="hover:opacity-80">
-                  Maintenance
+                  {t("maintenance")}
                 </Link>
               </li>
               <li>
@@ -72,22 +74,22 @@ const Footer = () => {
                   href="/services/securite-incendie"
                   className="hover:opacity-80"
                 >
-                  Securité incendie
+                  {t("securite-incendie")}
                 </Link>
               </li>
               <li>
                 <Link href="/services/cafe" className="hover:opacity-80">
-                  Café et boissons chaudes
+                  {t("cafe-et-boissons-chaudes")}
                 </Link>
               </li>
               <li>
                 <Link href="/services/snack" className="hover:opacity-80">
-                  Snacks et fruits
+                  {t("snacks-et-fruits")}
                 </Link>
               </li>
               <li>
                 <Link href="/services/eau" className="hover:opacity-80">
-                  Fontaines à eau
+                  {t("fontaines-a-eau")}
                 </Link>
               </li>
               <li>
@@ -95,12 +97,12 @@ const Footer = () => {
                   href="/services/office-manager"
                   className="hover:opacity-80"
                 >
-                  Office manager
+                  {t("office-manager")}
                 </Link>
               </li>
               <li>
                 <Link href="/services/fm4all" className="hover:opacity-80">
-                  Pilotage fm4all
+                  {t("pilotage-fm4all")}
                 </Link>
               </li>
             </ul>
@@ -159,11 +161,11 @@ const Footer = () => {
             </ul>
           </div>
           <div className="flex flex-col gap-2 w-52">
-            <p className="text-secondary text-xl">Prestataires</p>
+            <p className="text-secondary text-xl">{t("prestataires")}</p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
               <li>
                 <Link href="/devenir-prestataire" className="hover:opacity-80">
-                  Devenir prestataire
+                  {t("devenir-prestataire")}
                 </Link>
               </li>
             </ul>

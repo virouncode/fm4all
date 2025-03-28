@@ -1,5 +1,5 @@
+import { Link } from "@/i18n/navigation";
 import { Metadata } from "next";
-import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Conditions Générales de Vente (CGV)",

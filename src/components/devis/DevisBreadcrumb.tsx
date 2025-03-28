@@ -13,8 +13,8 @@ import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
 import { ManagementContext } from "@/context/ManagementProvider";
 import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
+import { Link } from "@/i18n/navigation";
 import { roundSurface } from "@/lib/roundSurface";
-import Link from "next/link";
 import { useContext } from "react";
 import { roundEffectif } from "../../lib/roundEffectif";
 

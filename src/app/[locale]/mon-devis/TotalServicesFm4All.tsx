@@ -28,19 +28,19 @@ const TotalServicesFm4All = () => {
         (totalRemiseCa ?? 0) -
         (totalRemiseHof ?? 0)
       : servicesFm4All.infos.gammeSelected === "confort"
-      ? (totalAssurance ?? 0) +
-        (totalPlateforme ?? 0) +
-        (totalSupportAdmin ?? 0) +
-        (totalSupportOp ?? 0) -
-        (totalRemiseCa ?? 0) -
-        (totalRemiseHof ?? 0)
-      : (totalAssurance ?? 0) +
-        (totalPlateforme ?? 0) +
-        (totalSupportAdmin ?? 0) +
-        (totalSupportOp ?? 0) +
-        (totalAccountManager ?? 0) -
-        (totalRemiseCa ?? 0) -
-        (totalRemiseHof ?? 0);
+        ? (totalAssurance ?? 0) +
+          (totalPlateforme ?? 0) +
+          (totalSupportAdmin ?? 0) +
+          (totalSupportOp ?? 0) -
+          (totalRemiseCa ?? 0) -
+          (totalRemiseHof ?? 0)
+        : (totalAssurance ?? 0) +
+          (totalPlateforme ?? 0) +
+          (totalSupportAdmin ?? 0) +
+          (totalSupportOp ?? 0) +
+          (totalAccountManager ?? 0) -
+          (totalRemiseCa ?? 0) -
+          (totalRemiseHof ?? 0);
 
   const color = getFm4AllColor(servicesFm4All.infos.gammeSelected);
 
@@ -49,7 +49,7 @@ const TotalServicesFm4All = () => {
   return (
     <div className="flex flex-col gap-4 total-section" id="total-fm4all">
       <div className="flex flex-col gap-4">
-        <div>Services fm4All</div>
+        <div>Services fm4all</div>
         <div className={`flex flex-col ml-4 text-xs`}>
           {totalAssurance ? (
             <div

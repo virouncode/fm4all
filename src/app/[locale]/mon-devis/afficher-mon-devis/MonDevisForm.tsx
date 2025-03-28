@@ -15,6 +15,7 @@ import { MonDevisContext } from "@/context/MonDevisProvider";
 import { TotalContext } from "@/context/TotalProvider";
 import useScrollIntoMonDevis from "@/hooks/use-scroll-into-mon-devis";
 import { toast } from "@/hooks/use-toast";
+import { Link } from "@/i18n/navigation";
 import fillDevis from "@/lib/fillDevis";
 import {
   InsertClientType,
@@ -26,7 +27,6 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Loader } from "lucide-react";
 import { DateTime } from "luxon";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ChangeEvent,

@@ -9,8 +9,8 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Link } from "@/i18n/navigation";
 import { urlFor } from "@/sanity/lib/image";
-import Link from "next/link";
 import { Secteur, Service, SousService } from "../../../../../sanity.types";
 
 type ExpertiseCarouselProps = {

@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import ServiceCards from "./ServiceCards";
 
 export const metadata: Metadata = {
@@ -7,92 +8,112 @@ export const metadata: Metadata = {
     "Découvrez les services de Facility Management proposés par fm4all.",
 };
 
-const page = () => {
+const page = async () => {
+  const t = await getTranslations("ServicesPage");
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
       <article className="mt-6 flex flex-col gap-10">
-        <h1 className="text-4xl">Nos services</h1>
+        <h1 className="text-4xl">{t("nos-services")}</h1>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap text-lg">
             <p>
-              fm4all démocratise le <strong>Facility Management</strong> à
-              toutes les tailles d&apos;entreprises. En quelques clics,{" "}
-              <strong>configurez les services utiles à vos bureaux</strong> et
-              confiez nous leur <strong>pilotage</strong> et leur{" "}
-              <strong>gestion</strong>.
+              {t("fm4all-democratise-le")}{" "}
+              <strong>{t("facility-management")}</strong>{" "}
+              {t(
+                "a-toutes-les-tailles-d-and-apos-entreprises-en-quelques-clics"
+              )}{" "}
+              <strong>
+                {t("configurez-les-services-utiles-a-vos-bureaux")}
+              </strong>{" "}
+              {t("et-confiez-nous-leur")} <strong>pilotage</strong>{" "}
+              {t("et-leur")} <strong>gestion</strong>.
             </p>
-            <p className="text-center">Nous gérons pour vous :</p>
+            <p className="text-center">{t("nous-gerons-pour-vous")}</p>
           </div>
           <ServiceCards />
         </div>
         <div className="flex flex-col gap-4">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            Pourquoi le FM pour tous ?
+            {t("pourquoi-le-fm-pour-tous")}
           </h2>
           <div className="text-lg flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap">
             <p>
-              Parce que nous pensons que les services de Facility Management ne
-              devraient pas être réservés aux grandes entreprises.
+              {t(
+                "parce-que-nous-pensons-que-les-services-de-facility-management-ne-devraient-pas-etre-reserves-aux-grandes-entreprises"
+              )}
             </p>
             <p>
-              Le Facility Management consiste à confier la gestion du quotidien
-              dans vos locaux à un prestataire FM. C&apos;est la{" "}
-              <strong>gestion déléguée de tous vos contrats de services</strong>{" "}
-              qui n&apos;ont pas de lien avec votre coeur d&apos;activité.
+              {t(
+                "le-facility-management-consiste-a-confier-la-gestion-du-quotidien-dans-vos-locaux-a-un-prestataire-fm-c-and-apos-est-la"
+              )}{" "}
+              <strong>
+                {t("gestion-deleguee-de-tous-vos-contrats-de-services")}
+              </strong>{" "}
+              {t(
+                "qui-n-and-apos-ont-pas-de-lien-avec-votre-coeur-d-and-apos-activite"
+              )}
             </p>
             <p>
               <strong>
-                Nettoyage, accueil, courrier, café, maintenance, réparations,
-                suivi réglementaire de vos locaux
+                {t(
+                  "nettoyage-accueil-courrier-cafe-maintenance-reparations-suivi-reglementaire-de-vos-locaux"
+                )}
               </strong>
-              ... Autant de tâches récurrentes à suivre pour le bon
-              fonctionnement de vos bureaux, qui pourtant n&apos;apportent pas
-              de valeur ajoutée directe à votre activité professionnelle.
+              {t(
+                "autant-de-taches-recurrentes-a-suivre-pour-le-bon-fonctionnement-de-vos-bureaux-qui-pourtant-n-and-apos-apportent-pas-de-valeur-ajoutee-directe-a-votre-activite-professionnelle"
+              )}
             </p>
             <p>
-              Le Facility Management consiste à externaliser la gestion des
-              prestataires de services intervenant au quotidien dans vos
-              bureaux. Cahier des charges, appels d&apos;offres, négociation
-              achats, contractualisation, suivi opérationnel, facturation...
-              Autant de <strong>tâches chronophages</strong>, qui ne font pas
-              croître votre business et pourtant totalement indispensables.
+              {t(
+                "le-facility-management-consiste-a-externaliser-la-gestion-des-prestataires-de-services-intervenant-au-quotidien-dans-vos-bureaux-cahier-des-charges-appels-d-and-apos-offres-negociation-achats-contractualisation-suivi-operationnel-facturation-autant-de"
+              )}{" "}
+              <strong>{t("taches-chronophages")}</strong>
+              {t(
+                "qui-ne-font-pas-croitre-votre-business-et-pourtant-totalement-indispensables"
+              )}
             </p>
             <p>
-              Auparavant réservé aux grands groupes, vous pouvez désormais
-              déléguer cette gestion quelle que soit la taille de vos locaux à
-              fm4all.
+              {t(
+                "auparavant-reserve-aux-grands-groupes-vous-pouvez-desormais-deleguer-cette-gestion-quelle-que-soit-la-taille-de-vos-locaux-a-fm4all"
+              )}
             </p>
           </div>
         </div>
         <div className="flex flex-col gap-4">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            Gagnez du temps et de l&apos;argent
+            {t("gagnez-du-temps-et-de-l-and-apos-argent")}
           </h2>
           <div className="text-lg flex flex-col gap-4 w-full mx-auto max-w-prose hyphens-auto text-wrap">
             <p>
-              En passant par fm4all, vous profitez de{" "}
-              <strong>l&apos;expertise d&apos;un professionnel du FM</strong>,
-              des ses partenaires sélectionnés et d&apos;un groupement achats
-              spécialisé dans les services d&apos;entretien et maintenance.
+              {t("en-passant-par-fm4all-vous-profitez-de")}{" "}
+              <strong>
+                {t("l-and-apos-expertise-d-and-apos-un-professionnel-du-fm")}
+              </strong>
+              {t(
+                "des-ses-partenaires-selectionnes-et-d-and-apos-un-groupement-achats-specialise-dans-les-services-d-and-apos-entretien-et-maintenance"
+              )}
             </p>
             <p>
               <strong>
-                Une seule facture. Un seul interlocuteur. Un tarif garanti.
+                {t("une-seule-facture-un-seul-interlocuteur-un-tarif-garanti")}
               </strong>{" "}
-              Vous gagnez en tranquillité d&apos;esprit et en temps de gestion.
+              {t(
+                "vous-gagnez-en-tranquillite-d-and-apos-esprit-et-en-temps-de-gestion"
+              )}
             </p>
           </div>
         </div>
         <div className="flex flex-col gap-4">
-          <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">HOF managers</h2>
+          <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
+            {t("hof-managers")}
+          </h2>
           <div className="text-lg flex flex-col gap-4 w-full mx-auto max-w-prose hyphens-auto text-wrap">
             <p>
-              Hospitality Manager, Office Manager, Facility Manager, ce sont eux
-              qui gèrent le bon fonctionnement de vos locaux au quotidien, tout
-              en veillant sur vos collaborateurs. Chez fm4all, offrez vous les
-              services d&apos;un HOF manager,{" "}
-              <strong>une personne dédiée</strong> chez vous à partir d&apos;une
-              demi journée par semaine.
+              {t(
+                "hospitality-manager-office-manager-facility-manager-ce-sont-eux-qui-gerent-le-bon-fonctionnement-de-vos-locaux-au-quotidien-tout-en-veillant-sur-vos-collaborateurs-chez-fm4all-offrez-vous-les-services-d-and-apos-un-hof-manager"
+              )}{" "}
+              <strong>{t("une-personne-dediee")}</strong>{" "}
+              {t("chez-vous-a-partir-d-and-apos-une-demi-journee-par-semaine")}
             </p>
           </div>
         </div>

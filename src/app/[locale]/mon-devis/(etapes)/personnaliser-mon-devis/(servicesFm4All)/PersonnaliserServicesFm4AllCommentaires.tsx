@@ -66,7 +66,7 @@ const PersonnaliserServicesFm4AllCommentaires = () => {
       <div className="w-full flex-1 flex flex-col gap-6">
         <p className="text-2xl">Commentaires et remarques</p>
         <Label htmlFor="commentaires-servicesFm4All" className="text-base">
-          Ajoutez des précisions pour le service fm4All :
+          Ajoutez des précisions pour le service fm4all :
         </Label>
         <Textarea
           id="commentaires-servicesFm4All"

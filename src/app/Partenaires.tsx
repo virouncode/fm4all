@@ -7,12 +7,16 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 
 const Partenaires = () => {
+  const t = useTranslations("header");
   return (
     <section className="max-w-7xl w-full mx-auto flex flex-col gap-10 p-6">
-      <h2 className="text-2xl md:text-3xl border-l-2 px-4">Nos partenaires</h2>
+      <h2 className="text-2xl md:text-3xl border-l-2 px-4">
+        {t("nos-partenaires")}
+      </h2>
       <Carousel
         opts={{
           align: "start",
