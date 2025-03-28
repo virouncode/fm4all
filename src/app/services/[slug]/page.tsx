@@ -91,7 +91,7 @@ const ptComponents = {
 export const generateStaticParams = async () => {
   const services = await client
     .withConfig({ useCdn: false })
-    .fetch<Service[]>(SERVICES_QUERY, {});
+    .fetch<Service[]>(SERVICES_QUERY, { language: "fr" });
   return services.map((service) => ({ slug: service.slug?.current }));
 };
 
@@ -184,7 +184,14 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
       <section className="flex flex-row gap-10 mb-16">
         <div className="flex flex-col flex-1 justify-start text-lg gap-10">
           <h1 className="text-5xl">{service.titre}</h1>
-          <div className="flex flex-col gap-4">
+          <div
+            className="flex flex-col gap-4 prose-lg 
+          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
+          prose-h3:font-bold prose-h3:text-xl
+          prose-p:text-pretty prose-p:hyphens-auto prose-p:m-0
+          prose-li:list-check prose-li:m-0
+          prose-a:underline"
+          >
             <p className="font-bold">{service.description}</p>
             {Array.isArray(service.tltr) && (
               <PortableText value={service.tltr} />

@@ -9,7 +9,7 @@ const ServiceCards = async () => {
   // const options = { next: { revalidate: 30 } };
   const services = await client.fetch<Service[]>(
     SERVICES_QUERY,
-    {}
+    { language: "fr" } //TODO get the language from the context
     // options
   );
 
