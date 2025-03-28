@@ -19,6 +19,8 @@ const ServicesCarousel = async () => {
     { language: "fr" } //TODO get the language from the context
     // options
   );
+  console.log("services", services);
+
   return (
     <Carousel
       opts={{
