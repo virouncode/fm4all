@@ -1,0 +1,49 @@
+{
+  "Global": {
+    "essentiel": "Essential",
+    "confort": "Comfort",
+    "excellence": "Excellence",
+    "je-realise-mon-devis-en-ligne": "Get my online quote",
+    "mon-devis-en-ligne": "My online quote",
+    "ou": "or"
+  },
+  "HomePage": {
+    "hero": {
+      "vos-prestataires-de-services-au-meilleur-prix": "Your service providers at the best price.",
+      "vos-locaux-font-moins-de-3000m": "Are your premises less than 3000m²?",
+      "gagnez-du-temps-et-de-largent-sur-la": "Save time and money on the",
+      "gestion-de-vos-prestations": "management of your",
+      "de-nettoyage-hygiene-sanitaire-cafe-maintenance-multitechnique-securite-incendie-etc": "cleaning, health hygiene, coffee, multi -technical maintenance, fire safety services, etc.",
+      "comparez": "Compare",
+      "par-gamme": "by tier:",
+      "deleguez": "Delegate",
+      "la-gestion-du-quotidien": "daily management",
+      "la-mise-en-place-des-services": "Implementation of services",
+      "simplifiez": "Simplify"
+    },
+    "presentation": {
+      "au-meilleur-prix": "at the best price",
+      "choisissez-en-ligne-des-prestataires-de-confiance": "Choose trust providers online",
+      "gamme": "",
+      "nettoyage-cafe-fontaine-a-eau-securite-incendie-office-management-et-plus-encore": ": cleaning, coffee, water fountain, multi -technical maintenance, fire safety, office management, and more.",
+      "obtenez-votre-devis-en-quelques-clics": "Get your quote in a few clicks",
+      "ou-envie-dameliorer-vos-services-actuels": "Want to improve your current services?",
+      "plateforme-de-facility-management": "Facility Management platform",
+      "pret-a-optimiser-la-gestion-de-vos-bureaux": "Ready to optimize the management of your offices?",
+      "simplifie-vos-demarches-dachats-et-de-gestion-avec-sa": "simplifies your purchasing and management procedures with its",
+      "simplifiez-comparez-et-deleguez-en-quelques-clics": ": simplify, compare and delegate in a few clicks.",
+      "tpe-pme-en-ile-de-france": "SME in Île-de-France?",
+      "un-seul-contact-un-seul-contrat-et-une-seule-facture-pour-toutes-vos-prestations": ": a single contact, a single contract and a single invoice for all your services.",
+      "vous-emmenagez-dans-de-nouveaux-bureaux": "Are you moving into new offices?"
+    }
+  },
+  "header": {
+    "home": "Home",
+    "nos-3-gammes": "Our 3 ranges",
+    "nos-engagements": "Our commitments",
+    "nos-partenaires": "Our partners",
+    "nos-services": "Our services",
+    "devenir-prestataire": "Become a service provider",
+    "nous-contacter": "Contact us"
+  }
+}

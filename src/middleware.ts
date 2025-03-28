@@ -1,4 +1,8 @@
+import createMiddleware from "next-intl/middleware";
 import { NextRequest, NextResponse } from "next/server";
+import { routing } from "./i18n/routing";
+
+const intlMiddleware = createMiddleware(routing);
 
 const allowedOrigins =
   process.env.NODE_ENV === "production"
@@ -15,9 +19,10 @@ export function middleware(req: NextRequest) {
     response.headers.set("Access-Control-Allow-Methods", "GET");
     return response;
   }
-  return NextResponse.next();
+  // Si pas d'origine ou origine non autorisée, appliquer simplement le middleware d'internationalisation
+  return intlMiddleware(req);
 }
 
 export const config = {
-  matcher: "/api/:path*",
+  matcher: "/((?!api|trpc|_next|_vercel|studio|.*\\..*).*)",
 };

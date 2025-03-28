@@ -1,0 +1,49 @@
+{
+  "Global": {
+    "essentiel": "Essentiel",
+    "confort": "Confort",
+    "excellence": "Excellence",
+    "je-realise-mon-devis-en-ligne": "Je réalise mon devis en ligne",
+    "mon-devis-en-ligne": "Mon devis en ligne",
+    "ou": "ou"
+  },
+  "HomePage": {
+    "hero": {
+      "vos-prestataires-de-services-au-meilleur-prix": "Vos prestataires de services au meilleur prix.",
+      "vos-locaux-font-moins-de-3000m": "Vos locaux font moins de 3000m² ?",
+      "gagnez-du-temps-et-de-largent-sur-la": "Gagnez du temps et de l’argent sur la",
+      "gestion-de-vos-prestations": "gestion de vos prestations",
+      "de-nettoyage-hygiene-sanitaire-cafe-maintenance-multitechnique-securite-incendie-etc": "de nettoyage, hygiène sanitaire, café, maintenance multitechnique, sécurité incendie, etc.",
+      "comparez": "Comparez",
+      "par-gamme": "par gamme :",
+      "simplifiez": "Simplifiez",
+      "la-mise-en-place-des-services": "la mise en place des services",
+      "deleguez": "Déléguez",
+      "la-gestion-du-quotidien": "la gestion du quotidien"
+    },
+    "presentation": {
+      "tpe-pme-en-ile-de-france": "TPE/PME en Île-de-France?",
+      "vous-emmenagez-dans-de-nouveaux-bureaux": "Vous emménagez dans de nouveaux bureaux?",
+      "ou-envie-dameliorer-vos-services-actuels": "Ou envie d’améliorer vos services actuels ?",
+      "simplifie-vos-demarches-dachats-et-de-gestion-avec-sa": "simplifie vos démarches d’achats et de gestion avec sa",
+      "plateforme-de-facility-management": "plateforme de Facility Management",
+      "un-seul-contact-un-seul-contrat-et-une-seule-facture-pour-toutes-vos-prestations": ": un seul contact, un seul contrat et une seule facture pour toutes vos prestations.",
+      "choisissez-en-ligne-des-prestataires-de-confiance": "Choisissez en ligne des prestataires de confiance",
+      "au-meilleur-prix": "au meilleur prix",
+      "nettoyage-cafe-fontaine-a-eau-securite-incendie-office-management-et-plus-encore": ": nettoyage, café, fontaine à eau, maintenace multitechnique, sécurité incendie, office management, et plus encore.",
+      "gamme": "Gamme",
+      "simplifiez-comparez-et-deleguez-en-quelques-clics": ": simplifiez, comparez et déléguez en quelques clics.",
+      "pret-a-optimiser-la-gestion-de-vos-bureaux": "Prêt à optimiser la gestion de vos bureaux ?",
+      "obtenez-votre-devis-en-quelques-clics": "Obtenez votre devis en quelques clics"
+    }
+  },
+  "header": {
+    "home": "Home",
+    "nos-services": "Nos services",
+    "nos-3-gammes": "Nos 3 gammes",
+    "nos-engagements": "Nos engagements",
+    "nos-partenaires": "Nos partenaires",
+    "devenir-prestataire": "Devenir prestataire",
+    "nous-contacter": "Nous contacter"
+  }
+}
