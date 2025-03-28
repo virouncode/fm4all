@@ -287,6 +287,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
               quality={100}
               className="object-cover object-center"
               fill={true}
+              unoptimized={true}
             />
           </div>
         ) : null}
@@ -303,6 +304,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
                 quality={100}
                 className="object-cover object-center"
                 fill={true}
+                unoptimized={true}
               />
             </div>
           ) : null}
