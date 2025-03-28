@@ -24,6 +24,7 @@ const ImgCardVertical = ({
           fill
           quality={100}
           className="object-cover object-center"
+          unoptimized={true}
         />
       </div>
       {children}
