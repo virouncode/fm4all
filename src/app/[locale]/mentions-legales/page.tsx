@@ -1,198 +1,171 @@
 import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 export const metadata: Metadata = {
   title: "Mentions légales",
   description: "Mentions légales du site fm4all.com",
 };
 
-const page = () => {
+const page = async () => {
+  const t = await getTranslations("MentionsPage");
   return (
     <main className="max-w-7xl min-h-[calc(100vh-4rem)] mx-auto mb-24 py-4 px-6 md:px-20">
       <section className="mt-6 flex flex-col gap-10">
-        <h1 className="text-4xl">Mentions légales</h1>
+        <h1 className="text-4xl">{t("mentions-legales")}</h1>
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            1. Identification de l&apos;Éditeur du Site
+            {t("1-identification-de-l-editeur-du-site")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto">
-            <p className="text-base">Nom de la société : FM4ALL</p>
-            <p className="text-base">Forme juridique : SAS</p>
-            <p className="text-base">Capital social : 30 000 €</p>
+            <p className="text-base">{t("nom-de-la-societe-fm4all")}</p>
+            <p className="text-base">{t("forme-juridique-sas")}</p>
+            <p className="text-base">{t("capital-social-30-000-eur")}</p>
             <p className="text-base">
-              Siège social : 3 rue de Nantes, 75019 Paris
+              {t("siege-social-3-rue-de-nantes-75019-paris")}
             </p>
-            <p className="text-base">Numéro SIRET : en cours de création</p>
+            <p className="text-base">{t("numero-siret-941-928-640-00015")}</p>
+            <p className="text-base">{t("numero-rcs-941-928-640")}</p>
             <p className="text-base">
-              Numéro RCS : RCS Paris en cours de création
+              {t(
+                "code-ape-81-10z-activites-combinees-de-soutien-lie-aux-batiments"
+              )}
             </p>
             <p className="text-base">
-              Code APE : 81.10Z Activités combinées de soutien lié aux bâtiments
+              {t("representant-legal-romuald-buffe-president-de-fm4all")}
             </p>
-            <p className="text-base">
-              Représentant légal : Romuald Buffe, Président de FM4ALL
-            </p>
-            <p className="text-base">Coordonnées de contact : </p>
+            <p className="text-base">{t("coordonnees-de-contact")} </p>
             <ul className="ml-10 md:ml-14">
-              <li className="list-disc">Tél : +33 6 69 31 10 46</li>
-              <li className="list-disc">Email : contact@fm4all.com</li>
+              <li className="list-disc">{t("tel-33-6-69-31-10-46")}</li>
+              <li className="list-disc">{t("email-contact-fm4all-com")}</li>
             </ul>
           </div>
         </div>
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            2. Identification de l&apos;Hébergeur du Site
+            {t("2-identification-de-l-hebergeur-du-site")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto">
-            <p className="text-base">Nom de l&apos;hébergeur : Vercel Inc.</p>
+            <p className="text-base">{t("nom-de-l-hebergeur-vercel-inc")}</p>
             <p className="text-base">
-              Addresse : 340 S Lemon Ave #4133 Walnut, CA 91789, US
+              {t("addresse-340-s-lemon-ave-4133-walnut-ca-91789-us")}
             </p>
-            <p className="text-base">Tél : (559) 288-7060</p>
+            <p className="text-base">{t("tel-559-288-7060")}</p>
           </div>
         </div>
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            3. Propriété Intellectuelle
+            {t("3-propriete-intellectuelle")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap gap-2 mx-auto">
             <p className="text-base">
-              Tous les contenus présents sur le site www.fm4all.com, incluant,
-              de manière non limitative, les graphismes, images, textes, vidéos,
-              animations, sons, logos, gifs et icônes ainsi que leur mise en
-              forme sont la propriété exclusive de FM4ALL à l&apos;exception des
-              marques, logos ou contenus appartenant à d&apos;autres sociétés
-              partenaires ou auteurs.
+              {t(
+                "tous-les-contenus-presents-sur-le-site-www-fm4all-com-incluant-de-maniere-non-limitative-les-graphismes-images-textes-videos-animations-sons-logos-gifs-et-icones-ainsi-que-leur-mise-en-forme-sont-la-propriete-exclusive-de-fm4all-a-l-exception-des-marques-logos-ou-contenus-appartenant-a-d-autres-societes-partenaires-ou-auteurs"
+              )}
             </p>
             <p className="text-base">
-              Toute reproduction, distribution, modification, adaptation,
-              retransmission ou publication, même partielle, de ces différents
-              éléments est strictement interdite sans l&apos;accord exprès par
-              écrit de FM4ALL. Cette représentation ou reproduction, par quelque
-              procédé que ce soit, constitue une contrefaçon sanctionnée par les
-              articles L.335-2 et suivants du Code de la propriété
-              intellectuelle.
+              {t(
+                "toute-reproduction-distribution-modification-adaptation-retransmission-ou-publication-meme-partielle-de-ces-differents-elements-est-strictement-interdite-sans-l-accord-expres-par-ecrit-de-fm4all-cette-representation-ou-reproduction-par-quelque-procede-que-ce-soit-constitue-une-contrefacon-sanctionnee-par-les-articles-l-335-2-et-suivants-du-code-de-la-propriete-intellectuelle"
+              )}
             </p>
           </div>
         </div>
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            4. Données personnelles (RGPD)
+            {t("4-donnees-personnelles-rgpd")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap gap-2 mx-auto">
             <p className="text-base">
-              FM4ALL s&apos;engage à ce que la collecte et le traitement de vos
-              données, effectués à partir du site www.fm4all.com, soient
-              conformes au Règlement Général sur la Protection des Données
-              (RGPD) et à la loi Informatique et Libertés.
+              {t(
+                "fm4all-s-engage-a-ce-que-la-collecte-et-le-traitement-de-vos-donnees-effectues-a-partir-du-site-www-fm4all-com-soient-conformes-au-reglement-general-sur-la-protection-des-donnees-rgpd-et-a-la-loi-informatique-et-libertes"
+              )}
             </p>
             <p className="text-base">
-              Les données personnelles collectées sur le site incluent notamment
-              : nom, prénom, adresse email, numéro de téléphone. Ces données
-              sont collectées dans le cadre de demandes d&apos;information, de
-              devis ou lors de la souscription à nos services.
+              {t(
+                "les-donnees-personnelles-collectees-sur-le-site-incluent-notamment-nom-prenom-adresse-email-numero-de-telephone-ces-donnees-sont-collectees-dans-le-cadre-de-demandes-d-information-de-devis-ou-lors-de-la-souscription-a-nos-services"
+              )}
             </p>
             <p className="text-base">
-              Les utilisateurs disposent d&apos;un droit d&apos;accès, de
-              rectification, de suppression et d&apos;opposition au traitement
-              de leurs données personnelles. Pour exercer ces droits, veuillez
-              nous contacter à l&apos;adresse suivante : dpo@fm4all.com.
+              {t(
+                "les-utilisateurs-disposent-d-un-droit-d-acces-de-rectification-de-suppression-et-d-opposition-au-traitement-de-leurs-donnees-personnelles-pour-exercer-ces-droits-veuillez-nous-contacter-a-l-adresse-suivante-dpo-fm4all-com"
+              )}
             </p>
           </div>
         </div>
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            5. Limite de responsabilité
+            {t("5-limite-de-responsabilite")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap gap-2 mx-auto">
             <p className="text-base">
-              FM4ALL s&apos;efforce de fournir sur le site www.fm4all.com des
-              informations aussi précises que possible. Toutefois, la société ne
-              pourra être tenue responsable des omissions, des inexactitudes et
-              des carences dans la mise à jour, qu&apos;elles soient de son fait
-              ou du fait des tiers partenaires qui lui fournissent ces
-              informations.
+              {t(
+                "fm4all-s-efforce-de-fournir-sur-le-site-www-fm4all-com-des-informations-aussi-precises-que-possible-toutefois-la-societe-ne-pourra-etre-tenue-responsable-des-omissions-des-inexactitudes-et-des-carences-dans-la-mise-a-jour-qu-elles-soient-de-son-fait-ou-du-fait-des-tiers-partenaires-qui-lui-fournissent-ces-informations"
+              )}
             </p>
             <p className="text-base">
-              L&apos;utilisateur du site www.fm4all.com reconnaît disposer de la
-              compétence et des moyens nécessaires pour accéder et utiliser ce
-              site. L&apos;utilisateur reconnaît également avoir vérifié que la
-              configuration informatique utilisée ne contient aucun virus et
-              qu&apos;elle est en parfait état de fonctionnement.
+              {t(
+                "l-utilisateur-du-site-www-fm4all-com-reconnait-disposer-de-la-competence-et-des-moyens-necessaires-pour-acceder-et-utiliser-ce-site-l-utilisateur-reconnait-egalement-avoir-verifie-que-la-configuration-informatique-utilisee-ne-contient-aucun-virus-et-qu-elle-est-en-parfait-etat-de-fonctionnement"
+              )}
             </p>
           </div>
         </div>
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            6. Conditions d’Utilisation du Site
+            {t("6-conditions-dutilisation-du-site")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap gap-2 mx-auto">
             <p className="text-base">
-              L&apos;utilisation du site www.fm4all.com implique
-              l&apos;acceptation pleine et entière des conditions générales
-              d&apos;utilisation ci-après décrites. Ces conditions
-              d&apos;utilisation sont susceptibles d&apos;être modifiées ou
-              complétées à tout moment, les utilisateurs du site sont donc
-              invités à les consulter de manière régulière.
+              {t(
+                "l-utilisation-du-site-www-fm4all-com-implique-l-acceptation-pleine-et-entiere-des-conditions-generales-d-utilisation-ci-apres-decrites-ces-conditions-d-utilisation-sont-susceptibles-d-etre-modifiees-ou-completees-a-tout-moment-les-utilisateurs-du-site-sont-donc-invites-a-les-consulter-de-maniere-reguliere"
+              )}
             </p>
             <p className="text-base">
-              Le site www.fm4all.com est normalement accessible à tout moment
-              aux utilisateurs. Une interruption pour raison de maintenance
-              technique peut être toutefois décidée par FM4ALL, qui
-              s&apos;efforcera alors de communiquer préalablement aux
-              utilisateurs les dates et heures de l&apos;intervention.
+              {t(
+                "le-site-www-fm4all-com-est-normalement-accessible-a-tout-moment-aux-utilisateurs-une-interruption-pour-raison-de-maintenance-technique-peut-etre-toutefois-decidee-par-fm4all-qui-s-efforcera-alors-de-communiquer-prealablement-aux-utilisateurs-les-dates-et-heures-de-l-intervention"
+              )}
             </p>
             <p className="text-base">
-              Les utilisateurs disposent d&apos;un droit d&apos;accès, de
-              rectification, de suppression et d&apos;opposition au traitement
-              de leurs données personnelles. Pour exercer ces droits, veuillez
-              nous contacter à l&apos;adresse suivante : dpo@fm4all.com.
+              {t(
+                "les-utilisateurs-disposent-d-un-droit-d-acces-de-rectification-de-suppression-et-d-opposition-au-traitement-de-leurs-donnees-personnelles-pour-exercer-ces-droits-veuillez-nous-contacter-a-l-adresse-suivante-dpo-fm4all-com-0"
+              )}
             </p>
           </div>
         </div>
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            7. Règlement des Litiges
+            {t("7-reglement-des-litiges")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto">
             <p className="text-base">
-              Les présentes mentions légales sont régies par le droit français.
-              En cas de litige relatif à l&apos;utilisation du site
-              www.fm4all.com, la compétence exclusive est attribuée aux
-              tribunaux compétents de Paris, sous réserve d&apos;une attribution
-              de compétence spécifique découlant d&apos;un texte de loi ou
-              réglementaire particulier.
+              {t(
+                "les-presentes-mentions-legales-sont-regies-par-le-droit-francais-en-cas-de-litige-relatif-a-l-utilisation-du-site-www-fm4all-com-la-competence-exclusive-est-attribuee-aux-tribunaux-competents-de-paris-sous-reserve-d-une-attribution-de-competence-specifique-decoulant-d-un-texte-de-loi-ou-reglementaire-particulier"
+              )}
             </p>
           </div>
         </div>
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            8. Services fournis
+            {t("8-services-fournis")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto">
             <p className="text-base">
-              Le site www.fm4all.com a pour objet de fournir une information
-              concernant l’ensemble des activités de la société. FM4ALL
-              s’efforce de fournir sur le site des informations aussi précises
-              que possible. Toutefois, elle ne pourra être tenue responsable des
-              omissions, des inexactitudes et des carences dans la mise à jour,
-              qu’elles soient de son fait ou du fait des tiers partenaires qui
-              lui fournissent ces informations.
+              {t(
+                "le-site-www-fm4all-com-a-pour-objet-de-fournir-une-information-concernant-lensemble-des-activites-de-la-societe-fm4all-sefforce-de-fournir-sur-le-site-des-informations-aussi-precises-que-possible-toutefois-elle-ne-pourra-etre-tenue-responsable-des-omissions-des-inexactitudes-et-des-carences-dans-la-mise-a-jour-quelles-soient-de-son-fait-ou-du-fait-des-tiers-partenaires-qui-lui-fournissent-ces-informations"
+              )}
             </p>
           </div>
         </div>
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            9. Crédits et Conception du Site
+            {t("9-credits-et-conception-du-site")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto">
             <p className="text-base">
-              Conception du site : Tiao Viroun Kattygnarath
+              {t("conception-du-site-tiao-viroun-kattygnarath")}
             </p>
             <p className="text-base">
-              Crédits photos et ressources : Les crédits des photos, vidéos et
-              autres ressources multimédias utilisées sont à Romuald Buffe ou à
-              défaut sont indiqués directement sur les éléments concernés ou
-              dans une section dédiée.
+              {t(
+                "credits-photos-et-ressources-les-credits-des-photos-videos-et-autres-ressources-multimedias-utilisees-sont-a-romuald-buffe-ou-a-defaut-sont-indiques-directement-sur-les-elements-concernes-ou-dans-une-section-dediee"
+              )}
             </p>
           </div>
         </div>

@@ -39,6 +39,18 @@ export const routing = defineRouting({
       fr: "/contactez-nous",
       en: "/contact-us",
     },
+    "/mentions-legales": {
+      fr: "/mentions-legales",
+      en: "/legal-notice",
+    },
+    "/politique-de-confidentialite": {
+      fr: "/politique-de-confidentialite",
+      en: "/privacy-policy",
+    },
+    "/politique-de-cookies": {
+      fr: "/politique-de-cookies",
+      en: "/cookie-policy",
+    },
   },
 });
 

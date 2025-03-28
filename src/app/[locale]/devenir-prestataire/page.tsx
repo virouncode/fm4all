@@ -25,9 +25,7 @@ const page = async () => {
         </div>
         <div className="flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap text-lg">
           <ul className="ml-10 md:ml-20">
-            <li className="list-rocket">
-              {t("apports-d-and-apos-affaires-gratuits")}
-            </li>
+            <li className="list-rocket">{t("apports-d-affaires-gratuits")}</li>
             <li className="list-rocket">
               {t("paiement-garanti-zero-risque-recouvrement")}
             </li>{" "}
@@ -41,7 +39,7 @@ const page = async () => {
             </li>
             <li className="list-rocket">
               {t(
-                "devenez-partenaires-de-la-1ere-plateforme-d-and-apos-achat-de-services-fm-pour-les-utilisateurs-de-bureaux-sans-limites-de-taille"
+                "devenez-partenaires-de-la-1ere-plateforme-d-achat-de-services-fm-pour-les-utilisateurs-de-bureaux-sans-limites-de-taille"
               )}
             </li>
             <li className="list-rocket">
@@ -50,9 +48,7 @@ const page = async () => {
               )}
             </li>
             <li className="list-rocket">
-              {t(
-                "c-and-apos-est-vous-qui-fixez-vos-regles-vos-prix-et-vos-contraintes"
-              )}
+              {t("c-est-vous-qui-fixez-vos-regles-vos-prix-et-vos-contraintes")}
             </li>
           </ul>
         </div>
@@ -63,7 +59,7 @@ const page = async () => {
           <div className="flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap">
             <ul className="ml-10 md:ml-20">
               <li className="list-thumb">
-                {t("apports-d-and-apos-affaires-sans-aucun-frais")}
+                {t("apports-d-affaires-sans-aucun-frais")}
               </li>
               <li className="list-thumb">
                 {t(
@@ -99,7 +95,7 @@ const page = async () => {
               </li>
               <li className="list-handshake">
                 {t(
-                  "vous-intervenez-sur-paris-et-en-idf-possible-d-and-apos-exclure-certaines-zones"
+                  "vous-intervenez-sur-paris-et-en-idf-possible-d-exclure-certaines-zones"
                 )}
               </li>
               <li className="list-handshake">

@@ -20,7 +20,7 @@ const page = async () => {
           <div className="flex flex-col gap-10 text-lg">
             <p className="text-center max-w-prose mx-auto text-pretty">
               {t(
-                "afin-de-simplifier-vos-choix-nous-avons-decline-l-and-apos-ensemble-des-services-en"
+                "afin-de-simplifier-vos-choix-nous-avons-decline-l-ensemble-des-services-en"
               )}{" "}
               <strong>{t("3-gammes")}</strong> :
             </p>

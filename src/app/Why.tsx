@@ -46,7 +46,7 @@ const Why = () => {
           </li>
           <li className="list-thumb">
             {t(
-              "des-tarifs-plus-competitifs-grace-a-l-and-apos-optimisation-des-processus"
+              "des-tarifs-plus-competitifs-grace-a-l-optimisation-des-processus"
             )}
           </li>
         </ul>
@@ -60,7 +60,7 @@ const Why = () => {
           <div className="w-full md:w-2/3 p-6 md:py-10 md:px-16 flex flex-col gap-4 italic order-last md:order-first">
             <p>
               {t(
-                "quand-on-est-client-utilisateur-de-bureaux-de-moins-de-3000m-beaucoup-de-demandes-de-devis-restent-sans-reponse-les-ressources-achats-sont-limitees-on-n-and-apos-achete-pas-ca-tous-les-jours-et-dailleurs-que-mettre-dans-son-cahier-des-charges-on-perd-du-temps-a-obtenir-des-devis-et-pire-ceux-quon-obtient-paraissent-toujours-trop-chers"
+                "quand-on-est-client-utilisateur-de-bureaux-de-moins-de-3000m-beaucoup-de-demandes-de-devis-restent-sans-reponse-les-ressources-achats-sont-limitees-on-n-achete-pas-ca-tous-les-jours-et-dailleurs-que-mettre-dans-son-cahier-des-charges-on-perd-du-temps-a-obtenir-des-devis-et-pire-ceux-quon-obtient-paraissent-toujours-trop-chers"
               )}
             </p>
             <p>{t("pour-cause")}</p>
@@ -102,9 +102,7 @@ const Why = () => {
             <p>{t("1-facture")}</p>
           </div>
           <p>
-            {t(
-              "avec-fm4all-gerer-vos-bureaux-n-and-apos-aura-jamais-ete-aussi-simple"
-            )}
+            {t("avec-fm4all-gerer-vos-bureaux-n-aura-jamais-ete-aussi-simple")}
           </p>
         </div>
       </div>

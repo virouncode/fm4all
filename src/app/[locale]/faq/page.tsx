@@ -29,13 +29,13 @@ const page = async () => {
             </h2>
             <p>
               {t(
-                "sur-fm4all-beneficiez-de-tarifs-groupes-negocies-d-and-apos-une-garantie-qualite-et-d-and-apos-un-suivi-professionnel"
+                "sur-fm4all-beneficiez-de-tarifs-groupes-negocies-d-une-garantie-qualite-et-d-un-suivi-professionnel"
               )}
             </p>
           </div>
           <div className="flex flex-col gap-1">
             <h2 className="font-bold">
-              {t("marre-d-and-apos-avoir-des-prix-a-la-tete-du-client")}
+              {t("marre-d-avoir-des-prix-a-la-tete-du-client")}
             </h2>
             <p>
               {t(
@@ -65,7 +65,7 @@ const page = async () => {
           </div>
           <div className="flex flex-col gap-1">
             <h2 className="font-bold">
-              {t("gerez-le-nettoyage-n-and-apos-est-pas-votre-coeur-de-metier")}
+              {t("gerez-le-nettoyage-n-est-pas-votre-coeur-de-metier")}
             </h2>
             <p>
               {t(
@@ -77,7 +77,7 @@ const page = async () => {
           <div className="flex flex-col gap-1">
             <h2 className="font-bold">
               {t(
-                "envie-d-and-apos-attirer-et-retenir-des-talents-de-creer-une-identite-a-vos-bureaux-qui-vous-ressemble"
+                "envie-d-attirer-et-retenir-des-talents-de-creer-une-identite-a-vos-bureaux-qui-vous-ressemble"
               )}
             </h2>
             <p>
@@ -108,11 +108,11 @@ const page = async () => {
           </div>
           <div className="flex flex-col gap-1">
             <h2 className="font-bold">
-              {t("vous-n-and-apos-etes-pas-expert-en-achats-de-services")}
+              {t("vous-n-etes-pas-expert-en-achats-de-services")}
             </h2>
             <p>
               {t(
-                "essentiel-confort-ou-excellence-nous-simplifions-vos-choix-pour-vous-permettre-d-and-apos-acheter-comme-des-experts"
+                "essentiel-confort-ou-excellence-nous-simplifions-vos-choix-pour-vous-permettre-d-acheter-comme-des-experts"
               )}
             </p>
           </div>
@@ -123,12 +123,12 @@ const page = async () => {
               )}
               <br />
               {t(
-                "gerer-un-appel-d-and-apos-offres-ou-obtenir-des-devis-est-chronophage"
+                "gerer-un-appel-d-offres-ou-obtenir-des-devis-est-chronophage"
               )}
             </h2>
             <p>
               {t(
-                "sur-fm4all-en-moins-de-5-min-construisez-une-offre-de-facility-management-qui-vous-ressemble-rassemblez-tous-les-services-de-vos-bureaux-sous-un-seul-contrat-une-seule-facture-et-un-seul-interlocuteur-gagner-du-temps-et-de-l-and-apos-argent"
+                "sur-fm4all-en-moins-de-5-min-construisez-une-offre-de-facility-management-qui-vous-ressemble-rassemblez-tous-les-services-de-vos-bureaux-sous-un-seul-contrat-une-seule-facture-et-un-seul-interlocuteur-gagner-du-temps-et-de-l-argent"
               )}
             </p>
           </div>

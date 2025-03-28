@@ -19,9 +19,7 @@ const page = async () => {
             <p>
               {t("fm4all-democratise-le")}{" "}
               <strong>{t("facility-management")}</strong>{" "}
-              {t(
-                "a-toutes-les-tailles-d-and-apos-entreprises-en-quelques-clics"
-              )}{" "}
+              {t("a-toutes-les-tailles-d-entreprises-en-quelques-clics")}{" "}
               <strong>
                 {t("configurez-les-services-utiles-a-vos-bureaux")}
               </strong>{" "}
@@ -44,14 +42,12 @@ const page = async () => {
             </p>
             <p>
               {t(
-                "le-facility-management-consiste-a-confier-la-gestion-du-quotidien-dans-vos-locaux-a-un-prestataire-fm-c-and-apos-est-la"
+                "le-facility-management-consiste-a-confier-la-gestion-du-quotidien-dans-vos-locaux-a-un-prestataire-fm-c-est-la"
               )}{" "}
               <strong>
                 {t("gestion-deleguee-de-tous-vos-contrats-de-services")}
               </strong>{" "}
-              {t(
-                "qui-n-and-apos-ont-pas-de-lien-avec-votre-coeur-d-and-apos-activite"
-              )}
+              {t("qui-n-ont-pas-de-lien-avec-votre-coeur-d-activite")}
             </p>
             <p>
               <strong>
@@ -60,12 +56,12 @@ const page = async () => {
                 )}
               </strong>
               {t(
-                "autant-de-taches-recurrentes-a-suivre-pour-le-bon-fonctionnement-de-vos-bureaux-qui-pourtant-n-and-apos-apportent-pas-de-valeur-ajoutee-directe-a-votre-activite-professionnelle"
+                "autant-de-taches-recurrentes-a-suivre-pour-le-bon-fonctionnement-de-vos-bureaux-qui-pourtant-n-apportent-pas-de-valeur-ajoutee-directe-a-votre-activite-professionnelle"
               )}
             </p>
             <p>
               {t(
-                "le-facility-management-consiste-a-externaliser-la-gestion-des-prestataires-de-services-intervenant-au-quotidien-dans-vos-bureaux-cahier-des-charges-appels-d-and-apos-offres-negociation-achats-contractualisation-suivi-operationnel-facturation-autant-de"
+                "le-facility-management-consiste-a-externaliser-la-gestion-des-prestataires-de-services-intervenant-au-quotidien-dans-vos-bureaux-cahier-des-charges-appels-d-offres-negociation-achats-contractualisation-suivi-operationnel-facturation-autant-de"
               )}{" "}
               <strong>{t("taches-chronophages")}</strong>
               {t(
@@ -81,25 +77,21 @@ const page = async () => {
         </div>
         <div className="flex flex-col gap-4">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            {t("gagnez-du-temps-et-de-l-and-apos-argent")}
+            {t("gagnez-du-temps-et-de-l-argent")}
           </h2>
           <div className="text-lg flex flex-col gap-4 w-full mx-auto max-w-prose hyphens-auto text-wrap">
             <p>
               {t("en-passant-par-fm4all-vous-profitez-de")}{" "}
-              <strong>
-                {t("l-and-apos-expertise-d-and-apos-un-professionnel-du-fm")}
-              </strong>
+              <strong>{t("l-expertise-d-un-professionnel-du-fm")}</strong>
               {t(
-                "des-ses-partenaires-selectionnes-et-d-and-apos-un-groupement-achats-specialise-dans-les-services-d-and-apos-entretien-et-maintenance"
+                "des-ses-partenaires-selectionnes-et-d-un-groupement-achats-specialise-dans-les-services-d-entretien-et-maintenance"
               )}
             </p>
             <p>
               <strong>
                 {t("une-seule-facture-un-seul-interlocuteur-un-tarif-garanti")}
               </strong>{" "}
-              {t(
-                "vous-gagnez-en-tranquillite-d-and-apos-esprit-et-en-temps-de-gestion"
-              )}
+              {t("vous-gagnez-en-tranquillite-d-esprit-et-en-temps-de-gestion")}
             </p>
           </div>
         </div>
@@ -110,10 +102,10 @@ const page = async () => {
           <div className="text-lg flex flex-col gap-4 w-full mx-auto max-w-prose hyphens-auto text-wrap">
             <p>
               {t(
-                "hospitality-manager-office-manager-facility-manager-ce-sont-eux-qui-gerent-le-bon-fonctionnement-de-vos-locaux-au-quotidien-tout-en-veillant-sur-vos-collaborateurs-chez-fm4all-offrez-vous-les-services-d-and-apos-un-hof-manager"
+                "hospitality-manager-office-manager-facility-manager-ce-sont-eux-qui-gerent-le-bon-fonctionnement-de-vos-locaux-au-quotidien-tout-en-veillant-sur-vos-collaborateurs-chez-fm4all-offrez-vous-les-services-d-un-hof-manager"
               )}{" "}
               <strong>{t("une-personne-dediee")}</strong>{" "}
-              {t("chez-vous-a-partir-d-and-apos-une-demi-journee-par-semaine")}
+              {t("chez-vous-a-partir-d-une-demi-journee-par-semaine")}
             </p>
           </div>
         </div>

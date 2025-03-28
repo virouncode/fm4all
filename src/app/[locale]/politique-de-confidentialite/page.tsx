@@ -1,5 +1,6 @@
 import { Link } from "@/i18n/navigation";
 import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 export const metadata: Metadata = {
   title: "Politique de confidentialité",
@@ -7,89 +8,91 @@ export const metadata: Metadata = {
     "Lisez notre politique de confidentialité pour en savoir plus sur la collecte et le traitement de vos données personnelles.",
 };
 
-const page = () => {
+const page = async () => {
+  const t = await getTranslations("ConfidentialitePage");
   return (
     <main className="max-w-7xl min-h-[calc(100vh-4rem)] mx-auto mb-24 py-4 px-6 md:px-20">
       <section className="mt-6 flex flex-col gap-10">
-        <h1 className="text-4xl">Politique de confidentialité</h1>
+        <h1 className="text-4xl">{t("politique-de-confidentialite")}</h1>
         <div className="flex flex-col gap-2 md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto">
           <p className="text-base">
-            Chez fm4all, Société par actions simplifiée (en cours
-            d&apos;immatriculation, numéro SIRET communiqué dès obtention),
-            domiciliée au 3 rue de Nantes, 75019 Paris, nous accordons une
-            grande importance à la protection de vos données personnelles.
+            {t(
+              "chez-fm4all-societe-par-actions-simplifiee-en-cours-d-immatriculation-numero-siret-communique-des-obtention-domiciliee-au-3-rue-de-nantes-75019-paris-nous-accordons-une-grande-importance-a-la-protection-de-vos-donnees-personnelles"
+            )}
           </p>
           <p className="text-base">
-            La présente politique de confidentialité explique comment nous
-            collectons, utilisons, partageons et protégeons vos données
-            conformément au Règlement Général sur la Protection des Données
-            (RGPD) et à la loi Informatique et Libertés.
+            {t(
+              "la-presente-politique-de-confidentialite-explique-comment-nous-collectons-utilisons-partageons-et-protegeons-vos-donnees-conformement-au-reglement-general-sur-la-protection-des-donnees-rgpd-et-a-la-loi-informatique-et-libertes"
+            )}
           </p>
         </div>
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            1. Qui sommes-nous ?
+            {t("1-qui-sommes-nous")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto">
             <p className="text-base">
-              Le responsable du traitement des données est la société fm4all,
-              Société par actions simplifiée (en cours d&apos;immatriculation,
-              numéro SIRET communiqué dès obtention), domiciliée au 3 rue de
-              Nantes, 75019 Paris. Vous pouvez nous contacter pour toute
-              question relative à la protection des données à l&apos;adresse
-              suivante : admin@fm4all.com
+              {t(
+                "le-responsable-du-traitement-des-donnees-est-la-societe-fm4all-societe-par-actions-simplifiee-en-cours-d-immatriculation-numero-siret-communique-des-obtention-domiciliee-au-3-rue-de-nantes-75019-paris-vous-pouvez-nous-contacter-pour-toute-question-relative-a-la-protection-des-donnees-a-l-adresse-suivante-admin-fm4all-com"
+              )}
             </p>
           </div>
         </div>
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            2. Quelles données personnelles collectons-nous ?
+            {t("2-quelles-donnees-personnelles-collectons-nous")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
             <p className="text-base">
-              Nous collectons les catégories de données personnelles suivantes :
+              {t(
+                "nous-collectons-les-categories-de-donnees-personnelles-suivantes"
+              )}
             </p>
             <ul className="ml-10 flex flex-col gap-2">
               <li className="list-disc">
-                <strong>Données d&apos;identification</strong> : Nom, prénom,
-                adresse e-mail, numéro de téléphone, adresse postale, nom de
-                l&apos;entreprise.{" "}
-                <em>Base légale : Exécution du contrat (mise en relation).</em>
-              </li>
-              <li className="list-disc">
-                <strong>
-                  Données relatives à l&apos;activité professionnelle
-                </strong>{" "}
-                : Fonction, secteur d&apos;activité, taille de
-                l&apos;entreprise.{" "}
+                <strong>{t("donnees-d-identification")}</strong>{" "}
+                {t(
+                  "nom-prenom-adresse-e-mail-numero-de-telephone-adresse-postale-nom-de-l-entreprise"
+                )}{" "}
                 <em>
-                  Base légale : Intérêt légitime (profilage pour proposer des
-                  services pertinents).
-                </em>
-              </li>
-              <li className="list-disc">
-                <strong>Données de connexion</strong> : Adresse IP, données de
-                navigation sur notre site web (cookies de session pour le
-                fonctionnement du site, cookies d&apos;analyse d&apos;audience
-                Google Analytics (avec IP anonymisée) pour améliorer nos
-                services).{" "}
-                <em>
-                  Base légale : Consentement pour les cookies non essentiels,
-                  intérêt légitime pour les cookies strictement nécessaires au
-                  fonctionnement du site.
+                  {t("base-legale-execution-du-contrat-mise-en-relation")}
                 </em>
               </li>
               <li className="list-disc">
                 <strong>
-                  Données relatives aux demandes de devis et aux prestations
+                  {t("donnees-relatives-a-l-activite-professionnelle")}
                 </strong>{" "}
-                : Type de service demandé, date de la demande, budget estimé,
-                description des besoins, informations sur les prestataires
-                contactés, les contrats conclus, les évaluations des
-                prestations.{" "}
+                {t("fonction-secteur-d-activite-taille-de-l-entreprise")}{" "}
                 <em>
-                  Base légale : Exécution du contrat (mise en relation, suivi
-                  des prestations).
+                  {t(
+                    "base-legale-interet-legitime-profilage-pour-proposer-des-services-pertinents"
+                  )}
+                </em>
+              </li>
+              <li className="list-disc">
+                <strong>{t("donnees-de-connexion")}</strong>{" "}
+                {t(
+                  "adresse-ip-donnees-de-navigation-sur-notre-site-web-cookies-de-session-pour-le-fonctionnement-du-site-cookies-d-analyse-d-audience-google-analytics-avec-ip-anonymisee-pour-ameliorer-nos-services"
+                )}{" "}
+                <em>
+                  {t(
+                    "base-legale-consentement-pour-les-cookies-non-essentiels-interet-legitime-pour-les-cookies-strictement-necessaires-au-fonctionnement-du-site"
+                  )}
+                </em>
+              </li>
+              <li className="list-disc">
+                <strong>
+                  {t(
+                    "donnees-relatives-aux-demandes-de-devis-et-aux-prestations"
+                  )}
+                </strong>{" "}
+                {t(
+                  "type-de-service-demande-date-de-la-demande-budget-estime-description-des-besoins-informations-sur-les-prestataires-contactes-les-contrats-conclus-les-evaluations-des-prestations"
+                )}{" "}
+                <em>
+                  {t(
+                    "base-legale-execution-du-contrat-mise-en-relation-suivi-des-prestations"
+                  )}
                 </em>
               </li>
             </ul>
@@ -97,135 +100,66 @@ const page = () => {
         </div>
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            3. Pourquoi collectons-nous vos données personnelles ?
+            {t("3-pourquoi-collectons-nous-vos-donnees-personnelles")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
             <p className="text-base">
-              Nous collectons vos données personnelles pour les finalités
-              suivantes :
+              {t(
+                "nous-collectons-vos-donnees-personnelles-pour-les-finalites-suivantes"
+              )}
             </p>
             <ul className="ml-10 flex flex-col gap-2">
               <li className="list-disc">
-                <strong>Données d&apos;identification</strong> : Nom, prénom,
-                adresse e-mail, numéro de téléphone, adresse postale, nom de
-                l&apos;entreprise.{" "}
-                <em>Base légale : Exécution du contrat (mise en relation).</em>
-              </li>
-              <li className="list-disc">
-                <strong>Fourniture de nos services</strong> : Mise en relation
-                avec des prestataires de services généraux, gestion des demandes
-                de devis, suivi des prestations, facturation.{" "}
-                <em>Base légale : Exécution du contrat.</em>
-              </li>
-              <li className="list-disc">
-                <strong>Gestion de la relation client</strong> : Communication
-                avec les utilisateurs, support client, traitement des
-                réclamations.{" "}
+                <strong>{t("donnees-d-identification")}</strong>{" "}
+                {t(
+                  "nom-prenom-adresse-e-mail-numero-de-telephone-adresse-postale-nom-de-l-entreprise"
+                )}{" "}
                 <em>
-                  Base légale : Exécution du contrat, intérêt légitime
-                  (amélioration de la relation client).
+                  {t("base-legale-execution-du-contrat-mise-en-relation")}
                 </em>
               </li>
               <li className="list-disc">
-                <strong>Amélioration de nos services</strong> : Analyse des
-                données d&apos;utilisation de notre plateforme (avec données
-                anonymisées lorsque cela est possible), développement de
-                nouvelles fonctionnalités.{" "}
+                <strong>{t("fourniture-de-nos-services")}</strong>{" "}
+                {t(
+                  "mise-en-relation-avec-des-prestataires-de-services-generaux-gestion-des-demandes-de-devis-suivi-des-prestations-facturation"
+                )}{" "}
+                <em>{t("base-legale-execution-du-contrat")}</em>
+              </li>
+              <li className="list-disc">
+                <strong>{t("gestion-de-la-relation-client")}</strong>{" "}
+                {t(
+                  "communication-avec-les-utilisateurs-support-client-traitement-des-reclamations"
+                )}{" "}
                 <em>
-                  Base légale : Intérêt légitime (amélioration continue de nos
-                  services).
+                  {t(
+                    "base-legale-execution-du-contrat-interet-legitime-amelioration-de-la-relation-client"
+                  )}
                 </em>
               </li>
               <li className="list-disc">
-                <strong>Marketing et communication</strong> : Sous réserve de
-                votre consentement explicite (case à cocher dédiée), nous
-                pouvons utiliser vos données pour vous envoyer des informations
-                sur nos services et offres promotionnelles. Vous pouvez retirer
-                votre consentement à tout moment en cliquant sur le lien de
-                désabonnement présent dans chaque email ou en nous contactant à
-                l&apos;adresse mentionnée au point 1.{" "}
-                <em>Base légale : Consentement.</em>
+                <strong>{t("amelioration-de-nos-services")}</strong>{" "}
+                {t(
+                  "analyse-des-donnees-d-utilisation-de-notre-plateforme-avec-donnees-anonymisees-lorsque-cela-est-possible-developpement-de-nouvelles-fonctionnalites"
+                )}{" "}
+                <em>
+                  {t(
+                    "base-legale-interet-legitime-amelioration-continue-de-nos-services"
+                  )}
+                </em>
               </li>
               <li className="list-disc">
-                <strong>Respect des obligations légales</strong> : Gestion des
-                obligations comptables et fiscales, réponse aux demandes des
-                autorités compétentes. <em>Base légale : Obligation légale.</em>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-6">
-          <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            4. Qui sont les destinataires de vos données ?
-          </h2>
-          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
-            <p className="text-base">
-              Vos données personnelles peuvent être communiquées aux
-              destinataires suivants :
-            </p>
-            <ul className="ml-10 flex flex-col gap-2">
-              <li className="list-disc">
-                <strong>
-                  Les prestataires de services référencés sur notre plateforme
-                </strong>{" "}
-                : Uniquement les informations nécessaires à la mise en relation
-                et à l&apos;exécution de la prestation (par exemple, le nom et
-                les coordonnées de l&apos;entreprise cliente, le type de service
-                demandé).
+                <strong>{t("marketing-et-communication")}</strong>{" "}
+                {t(
+                  "sous-reserve-de-votre-consentement-explicite-case-a-cocher-dediee-nous-pouvons-utiliser-vos-donnees-pour-vous-envoyer-des-informations-sur-nos-services-et-offres-promotionnelles-vous-pouvez-retirer-votre-consentement-a-tout-moment-en-cliquant-sur-le-lien-de-desabonnement-present-dans-chaque-email-ou-en-nous-contactant-a-l-adresse-mentionnee-au-point-1"
+                )}{" "}
+                <em>{t("base-legale-consentement")}</em>
               </li>
               <li className="list-disc">
-                <strong>Nos prestataires techniques :</strong> [a remplir]
-              </li>
-              <li className="list-disc">
-                <strong>Les autorités compétentes</strong> : En cas
-                d&apos;obligation légale ou de demande judiciaire.
-              </li>
-            </ul>
-            <p className="text-base">
-              Nous nous assurons que nos partenaires et prestataires respectent
-              les mêmes exigences en matière de protection des données que les
-              nôtres, notamment par le biais de contrats incluant les clauses
-              contractuelles types de la Commission Européenne si des transferts
-              hors UE ont lieu.
-            </p>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-6">
-          <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            5. Combien de temps conservons-nous vos données ?
-          </h2>
-          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
-            <p className="text-base">
-              Nous conservons vos données personnelles pendant les durées
-              suivantes :
-            </p>
-            <ul className="ml-10 flex flex-col gap-2">
-              <li className="list-disc">
-                <strong>Données relatives à la gestion de compte</strong> : Tant
-                que le compte est actif et pendant 3 ans après la suppression du
-                compte pour gérer les éventuelles réclamations.
-              </li>
-              <li className="list-disc">
-                <strong>
-                  Données relatives aux demandes de devis et aux prestations :
-                </strong>{" "}
-                3 ans après la fin de la prestation ou le dernier contact actif,
-                sauf obligation légale de conservation plus longue (par exemple,
-                10 ans pour les factures).
-              </li>
-              <li className="list-disc">
-                <strong>Données de prospection commerciale</strong> : 3 ans
-                après le dernier contact actif.
-              </li>
-              <li className="list-disc">
-                <strong>Données de facturation</strong> : 10 ans conformément
-                aux obligations légales.
-              </li>
-              <li className="list-disc">
-                <strong>Cookies : </strong> : Voir notre politique de cookies
-                pour la durée de conservation spécifique à chaque cookie.
+                <strong>{t("respect-des-obligations-legales")}</strong>{" "}
+                {t(
+                  "gestion-des-obligations-comptables-et-fiscales-reponse-aux-demandes-des-autorites-competentes"
+                )}{" "}
+                <em>{t("base-legale-obligation-legale")}</em>
               </li>
             </ul>
           </div>
@@ -233,110 +167,197 @@ const page = () => {
 
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            6. Quels sont vos droits ?
+            {t("4-qui-sont-les-destinataires-de-vos-donnees")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
             <p className="text-base">
-              Conformément à la réglementation applicable, vous disposez des
-              droits suivants :
+              {t(
+                "vos-donnees-personnelles-peuvent-etre-communiquees-aux-destinataires-suivants"
+              )}
             </p>
             <ul className="ml-10 flex flex-col gap-2">
               <li className="list-disc">
-                <strong>Droit d&apos;accès</strong> : Vous pouvez obtenir la
-                confirmation que vos données sont traitées et demander à y
-                accéder.
-              </li>
-              <li className="list-disc">
-                <strong>Droit de rectification</strong> : Vous pouvez demander
-                la correction de données inexactes ou incomplètes.
-              </li>
-              <li className="list-disc">
-                <strong>Droit à l&apos;effacement</strong> : Vous pouvez
-                demander la suppression de vos données dans certains cas (par
-                exemple, si les données ne sont plus nécessaires aux finalités
-                pour lesquelles elles ont été collectées).
-              </li>
-              <li className="list-disc">
-                <strong>Droit à la limitation du traitement</strong> : Vous
-                pouvez demander la suspension temporaire du traitement de vos
-                données dans certains cas.
-              </li>
-              <li className="list-disc">
-                <strong>Droit d&apos;opposition</strong> : Vous pouvez vous
-                opposer au traitement de vos données pour des motifs légitimes,
-                notamment au traitement à des fins de prospection commerciale.
-              </li>
-              <li className="list-disc">
-                <strong>Droit à la portabilité</strong> : Vous pouvez récupérer
-                vos données dans un format structuré et lisible par machine.
-              </li>
-              <li className="list-disc">
                 <strong>
-                  Droit d&apos;introduire une réclamation auprès de la CNIL
+                  {t(
+                    "les-prestataires-de-services-references-sur-notre-plateforme"
+                  )}
                 </strong>{" "}
-                : Si vous estimez que vos droits ne sont pas respectés, vous
-                pouvez saisir la CNIL (Commission Nationale de
-                l&apos;Informatique et des Libertés).
+                {t(
+                  "uniquement-les-informations-necessaires-a-la-mise-en-relation-et-a-l-execution-de-la-prestation-par-exemple-le-nom-et-les-coordonnees-de-l-entreprise-cliente-le-type-de-service-demande"
+                )}
+              </li>
+              <li className="list-disc">
+                <strong>{t("nos-prestataires-techniques")}</strong>{" "}
+                {t("a-remplir")}
+              </li>
+              <li className="list-disc">
+                <strong>{t("les-autorites-competentes")}</strong>{" "}
+                {t("en-cas-d-obligation-legale-ou-de-demande-judiciaire")}
               </li>
             </ul>
             <p className="text-base">
-              Pour exercer vos droits, vous pouvez nous contacter par email à
-              admin@fm4all.com ou par courrier à l&apos;adresse mentionnée au
-              point 1. Veuillez joindre une copie de votre pièce d&apos;identité
-              à votre demande.
+              {t(
+                "nous-nous-assurons-que-nos-partenaires-et-prestataires-respectent-les-memes-exigences-en-matiere-de-protection-des-donnees-que-les-notres-notamment-par-le-biais-de-contrats-incluant-les-clauses-contractuelles-types-de-la-commission-europeenne-si-des-transferts-hors-ue-ont-lieu"
+              )}
             </p>
           </div>
         </div>
 
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            7. Utilisation des cookies
+            {t("5-combien-de-temps-conservons-nous-vos-donnees")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
             <p className="text-base">
-              Notre site web utilise des cookies. Pour en savoir plus sur les
-              types de cookies que nous utilisons, leur finalité et comment les
-              gérer, veuillez consulter notre{" "}
+              {t(
+                "nous-conservons-vos-donnees-personnelles-pendant-les-durees-suivantes"
+              )}
+            </p>
+            <ul className="ml-10 flex flex-col gap-2">
+              <li className="list-disc">
+                <strong>{t("donnees-relatives-a-la-gestion-de-compte")}</strong>{" "}
+                {t(
+                  "tant-que-le-compte-est-actif-et-pendant-3-ans-apres-la-suppression-du-compte-pour-gerer-les-eventuelles-reclamations"
+                )}
+              </li>
+              <li className="list-disc">
+                <strong>
+                  {t(
+                    "donnees-relatives-aux-demandes-de-devis-et-aux-prestations-0"
+                  )}
+                </strong>{" "}
+                {t(
+                  "3-ans-apres-la-fin-de-la-prestation-ou-le-dernier-contact-actif-sauf-obligation-legale-de-conservation-plus-longue-par-exemple-10-ans-pour-les-factures"
+                )}
+              </li>
+              <li className="list-disc">
+                <strong>{t("donnees-de-prospection-commerciale")}</strong>{" "}
+                {t("3-ans-apres-le-dernier-contact-actif")}
+              </li>
+              <li className="list-disc">
+                <strong>{t("donnees-de-facturation")}</strong>{" "}
+                {t("10-ans-conformement-aux-obligations-legales")}
+              </li>
+              <li className="list-disc">
+                <strong>{t("cookies")} </strong>{" "}
+                {t(
+                  "voir-notre-politique-de-cookies-pour-la-duree-de-conservation-specifique-a-chaque-cookie"
+                )}
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-6">
+          <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
+            {t("6-quels-sont-vos-droits")}
+          </h2>
+          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
+            <p className="text-base">
+              {t(
+                "conformement-a-la-reglementation-applicable-vous-disposez-des-droits-suivants"
+              )}
+            </p>
+            <ul className="ml-10 flex flex-col gap-2">
+              <li className="list-disc">
+                <strong>{t("droit-d-acces")}</strong>{" "}
+                {t(
+                  "vous-pouvez-obtenir-la-confirmation-que-vos-donnees-sont-traitees-et-demander-a-y-acceder"
+                )}
+              </li>
+              <li className="list-disc">
+                <strong>{t("droit-de-rectification")}</strong>{" "}
+                {t(
+                  "vous-pouvez-demander-la-correction-de-donnees-inexactes-ou-incompletes"
+                )}
+              </li>
+              <li className="list-disc">
+                <strong>{t("droit-a-l-effacement")}</strong>{" "}
+                {t(
+                  "vous-pouvez-demander-la-suppression-de-vos-donnees-dans-certains-cas-par-exemple-si-les-donnees-ne-sont-plus-necessaires-aux-finalites-pour-lesquelles-elles-ont-ete-collectees"
+                )}
+              </li>
+              <li className="list-disc">
+                <strong>{t("droit-a-la-limitation-du-traitement")}</strong>{" "}
+                {t(
+                  "vous-pouvez-demander-la-suspension-temporaire-du-traitement-de-vos-donnees-dans-certains-cas"
+                )}
+              </li>
+              <li className="list-disc">
+                <strong>{t("droit-d-opposition")}</strong>{" "}
+                {t(
+                  "vous-pouvez-vous-opposer-au-traitement-de-vos-donnees-pour-des-motifs-legitimes-notamment-au-traitement-a-des-fins-de-prospection-commerciale"
+                )}
+              </li>
+              <li className="list-disc">
+                <strong>{t("droit-a-la-portabilite")}</strong>{" "}
+                {t(
+                  "vous-pouvez-recuperer-vos-donnees-dans-un-format-structure-et-lisible-par-machine"
+                )}
+              </li>
+              <li className="list-disc">
+                <strong>
+                  {t("droit-d-introduire-une-reclamation-aupres-de-la-cnil")}
+                </strong>{" "}
+                {t(
+                  "si-vous-estimez-que-vos-droits-ne-sont-pas-respectes-vous-pouvez-saisir-la-cnil-commission-nationale-de-l-informatique-et-des-libertes"
+                )}
+              </li>
+            </ul>
+            <p className="text-base">
+              {t(
+                "pour-exercer-vos-droits-vous-pouvez-nous-contacter-par-email-a-admin-fm4all-com-ou-par-courrier-a-l-adresse-mentionnee-au-point-1-veuillez-joindre-une-copie-de-votre-piece-d-identite-a-votre-demande"
+              )}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-6">
+          <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
+            {t("7-utilisation-des-cookies")}
+          </h2>
+          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
+            <p className="text-base">
+              {t(
+                "notre-site-web-utilise-des-cookies-pour-en-savoir-plus-sur-les-types-de-cookies-que-nous-utilisons-leur-finalite-et-comment-les-gerer-veuillez-consulter-notre"
+              )}{" "}
               <Link
                 href="/politique-de-cookies"
                 className="underline text-blue-500"
               >
-                politique de cookies
+                {t("politique-de-cookies")}
               </Link>
-              . Une bannière de consentement aux cookies s&apos;affiche lors de
-              votre première visite sur notre site.
+              {t(
+                "une-banniere-de-consentement-aux-cookies-s-affiche-lors-de-votre-premiere-visite-sur-notre-site"
+              )}
             </p>
           </div>
         </div>
 
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            8. Sécurité des données
+            {t("8-securite-des-donnees")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
             <p className="text-base">
-              Nous mettons en œuvre des mesures de sécurité techniques et
-              organisationnelles appropriées pour protéger vos données
-              personnelles contre tout accès non autorisé, toute divulgation,
-              toute altération ou toute destruction, notamment le chiffrement
-              des données en transit (HTTPS), le contrôle d&apos;accès aux
-              données et des mesures de protection contre les intrusions.
+              {t(
+                "nous-mettons-en-oeuvre-des-mesures-de-securite-techniques-et-organisationnelles-appropriees-pour-proteger-vos-donnees-personnelles-contre-tout-acces-non-autorise-toute-divulgation-toute-alteration-ou-toute-destruction-notamment-le-chiffrement-des-donnees-en-transit-https-le-controle-d-acces-aux-donnees-et-des-mesures-de-protection-contre-les-intrusions"
+              )}
             </p>
           </div>
         </div>
 
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            9. Modifications de la politique de confidentialité
+            {t("9-modifications-de-la-politique-de-confidentialite")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
             <p className="text-base">
-              Nous nous réservons le droit de modifier la présente politique de
-              confidentialité à tout moment. Les modifications seront publiées
-              sur notre site web et nous vous informerons des changements
-              importants par un message sur la plateforme ou par email.
+              {t(
+                "nous-nous-reservons-le-droit-de-modifier-la-presente-politique-de-confidentialite-a-tout-moment-les-modifications-seront-publiees-sur-notre-site-web-et-nous-vous-informerons-des-changements-importants-par-un-message-sur-la-plateforme-ou-par-email"
+              )}
             </p>
-            <p>Date de dernière mise à jour : 01/02/2025</p>
+            <p>{t("date-de-derniere-mise-a-jour-01-02-2025")}</p>
           </div>
         </div>
       </section>

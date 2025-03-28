@@ -15,7 +15,7 @@ const Mission = () => {
           )}{" "}
           <strong>{t("solutions-standardisees-et-personnalisables")}</strong>
           {t(
-            "permettant-d-and-apos-automatiser-les-chiffrages-tout-en-s-and-apos-adaptant-aux-besoins-specifiques-de-chaque-client"
+            "permettant-d-automatiser-les-chiffrages-tout-en-s-adaptant-aux-besoins-specifiques-de-chaque-client"
           )}
         </p>
         <ul className="mx-auto ml-10">
