@@ -18,6 +18,7 @@ import {
   PortableTextComponentProps,
 } from "next-sanity";
 import Image from "next/image";
+import { notFound } from "next/navigation";
 import { Secteur, Service, SousService } from "../../../../sanity.types";
 import ExpertiseCarousel from "./ExpertiseCarousel";
 
@@ -121,6 +122,10 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
     // options
   );
 
+  if (!service) {
+    notFound();
+  }
+
   const serviceImageUrl = service.imagePrincipale
     ? urlFor(service.imagePrincipale)
     : null; //TODO placeholder image
@@ -163,8 +168,6 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const serviceImageBloc6Alt = service.imageBloc6?.alt
     ? service.imageBloc6.alt
     : "illustration du service";
-
-  console.log("service", service);
 
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20 hyphens-auto">
