@@ -2,9 +2,12 @@
 
 // Mappings des slugs de services du français vers l'anglais
 export const slugMappingsFrToEn: Record<string, string> = {
-  "machines-a-cafe-en-entreprise": "coffee-machines",
-  "securite-incendie": "fire-safety",
   nettoyage: "cleaning-services",
+  "hygiene-sanitaire": "sanitary-supplies",
+  "securite-incendie": "fire-safety",
+  "machines-a-cafe-en-entreprise": "coffee-machines",
+  "fontaines-a-eau": "water-fountains",
+  "pilotage-fm4all": "fm4all-service-management",
   // Ajoutez tous vos autres services ici
 };
 

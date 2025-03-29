@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
+import { getSlugEn, getSlugFr } from "@/i18n/slugMappings";
 import { Flag } from "lucide-react";
 import { useLocale } from "next-intl";
 import { useParams } from "next/navigation";
@@ -23,10 +24,25 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
   const params = useParams();
 
   const handleChangeLang = (newLocale: "fr" | "en") => {
-    // @ts-expect-error -- TypeScript will validate that only known `params`
-    // // are used in combination with a given `pathname`. Since the two will
-    // // always match for the current route, we can skip runtime checks.
-    router.replace({ pathname, params }, { locale: newLocale });
+    if (newLocale === locale) return;
+    console.log("params", params);
+    console.log("pathname", pathname);
+
+    if (pathname === "/services/[slug]") {
+      if (typeof params.slug === "string") {
+        const newSlug =
+          newLocale === "fr" ? getSlugFr(params.slug) : getSlugEn(params.slug);
+        router.replace(
+          { pathname, params: { slug: newSlug } },
+          { locale: newLocale }
+        );
+      }
+    } else {
+      // @ts-expect-error -- TypeScript will validate that only known `params`
+      // // are used in combination with a given `pathname`. Since the two will
+      // // always match for the current route, we can skip runtime checks.
+      router.replace({ pathname, params }, { locale: newLocale });
+    }
   };
   return (
     <DropdownMenu modal={false}>
