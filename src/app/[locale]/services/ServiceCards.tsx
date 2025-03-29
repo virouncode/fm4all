@@ -3,7 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 import { SERVICES_QUERY } from "@/sanity/queries";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Service } from "../../../../sanity.types";
 
 const ServiceCards = async () => {
@@ -14,6 +14,7 @@ const ServiceCards = async () => {
     { language: locale }
     // options
   );
+  const t = await getTranslations("Global");
 
   return (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 items-center mt-6 w-full">
@@ -37,8 +38,14 @@ const ServiceCards = async () => {
                 {service.description}
               </p>
               <div className="flex-1">
-                <Link className="underline" href={`/services/${serviceUrl}`}>
-                  En savoir plus
+                <Link
+                  className="underline"
+                  href={{
+                    pathname: `/services/[slug]`,
+                    params: { slug: serviceUrl },
+                  }}
+                >
+                  {t("en-savoir-plus")}
                 </Link>
               </div>
             </div>

@@ -1,10 +1,7 @@
 import { defineRouting } from "next-intl/routing";
 
 export const routing = defineRouting({
-  // A list of all locales that are supported
   locales: ["en", "fr"],
-
-  // Used when no locale matches
   defaultLocale: "fr",
   pathnames: {
     "/": {
@@ -15,6 +12,19 @@ export const routing = defineRouting({
       fr: "/services",
       en: "/services",
     },
+    "/services/[slug]": {
+      fr: "/services/[slug]",
+      en: "/services/[slug]",
+    },
+
+    // "/services/securite-incendie": {
+    //   fr: "/services/securite-incendie",
+    //   en: "/services/fire-safety",
+    // },
+    // "/services/nettoyage": {
+    //   fr: "/services/nettoyage",
+    //   en: "/services/cleaning-services",
+    // },
     "/nos-3-gammes": {
       fr: "/nos-3-gammes",
       en: "/our-3-tiers",

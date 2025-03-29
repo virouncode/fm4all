@@ -7,7 +7,7 @@ servicesAssocies[]->{
     titre,
     description,
     slug,
-    
+    imagePrincipale
   },
 sousServicesAssocies[]->{
     _id,

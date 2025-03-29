@@ -9,7 +9,8 @@
     "le-facility-management-pour-tous": "Facility Management for all",
     "contactCtaVisio": "Schedule a video call",
     "contactCtaMail": "Contact by e-mail",
-    "contactCtaTel": "Contact by phone"
+    "contactCtaTel": "Contact by phone",
+    "en-savoir-plus": "Learn more"
   },
   "header": {
     "home": "Home",
@@ -25,7 +26,7 @@
     "mentions-legales": "Legal notice",
     "politique-de-confidentialite": "Privacy policy",
     "politique-de-cookies": "Cookie policy",
-    "touts-droits-reserves-and-copy-fm4all": "All rights reserved &copy;fm4all",
+    "touts-droits-reserves-and-copy-fm4all": "All rights reserved ©fm4all",
     "services": "Services",
     "nettoyage": "Cleaning",
     "hygiene-sanitaire": "Sanitary hygiene",
@@ -146,6 +147,7 @@
   },
   "ServicesPage": {
     "nos-services": "Our services",
+    "notre-expertise": "Our expertise",
     "fm4all-democratise-le": "fm4all democratizes",
     "facility-management": "Facility Management",
     "a-toutes-les-tailles-d-entreprises-en-quelques-clics": "to businesses of all sizes. In just a few clicks,",

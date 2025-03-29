@@ -13,15 +13,16 @@ import { urlFor } from "@/sanity/lib/image";
 import { SERVICE_QUERY } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
 import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import {
   PortableText,
   PortableTextBlock,
   PortableTextComponentProps,
 } from "next-sanity";
 import Image from "next/image";
+import { notFound } from "next/navigation";
 import { Secteur, Service, SousService } from "../../../../../sanity.types";
 import ExpertiseCarousel from "./ExpertiseCarousel";
-import { notFound } from "next/navigation";
 
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
@@ -113,6 +114,7 @@ export const generateMetadata = async ({
 
 const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
   // const options = { next: { revalidate: 30 } };
+
   const service = await client.fetch<
     Service & {
       servicesAssocies: Service[];
@@ -172,6 +174,9 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
     ? service.imageBloc6.alt
     : "illustration du service";
 
+  const tGlobal = await getTranslations("Global");
+  const t = await getTranslations("ServicesPage");
+
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20 hyphens-auto">
       <Breadcrumb className="mb-10">
@@ -181,7 +186,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
           </BreadcrumbLink>
           <BreadcrumbSeparator />
           <BreadcrumbLink href={`/services`} className="flex items-center">
-            Nos services
+            {t("nos-services")}
           </BreadcrumbLink>
           <BreadcrumbSeparator />
           <BreadcrumbPage>{service.titre}</BreadcrumbPage>
@@ -205,8 +210,8 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
           </div>
           <div className="flex justify-center">
             <DevisButton
-              title="Mon devis en ligne"
-              text="Mon devis en ligne"
+              title={tGlobal("mon-devis-en-ligne")}
+              text={tGlobal("mon-devis-en-ligne")}
               size="lg"
             />
           </div>
@@ -229,7 +234,9 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
         service.sousServicesAssocies) && (
         <section className="flex flex-row gap-10 mb-16">
           <div className="w-full">
-            <h2 className="border-l-2 px-4 text-4xl mb-10">Notre expertise</h2>
+            <h2 className="border-l-2 px-4 text-4xl mb-10">
+              {t("notre-expertise")}
+            </h2>
             <ExpertiseCarousel
               services={service.servicesAssocies}
               sousServices={service.sousServicesAssocies}

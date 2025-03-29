@@ -56,6 +56,7 @@ const ServicesCarousel = async () => {
                   <div className="flex-1">
                     <Link
                       className="underline"
+                      // @ts-expect-error - Dynamic route with slug
                       href={`/services/${serviceUrl}`}
                     >
                       En savoir plus
