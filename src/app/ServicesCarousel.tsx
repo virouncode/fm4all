@@ -6,11 +6,10 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Link } from "@/i18n/navigation";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 import { SERVICES_QUERY } from "@/sanity/queries";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Service } from "../../sanity.types";
 
 const ServicesCarousel = async () => {
@@ -22,7 +21,7 @@ const ServicesCarousel = async () => {
     // options
   );
   console.log("services", services);
-
+  const t = await getTranslations("Global");
   return (
     <Carousel
       opts={{
@@ -47,21 +46,17 @@ const ServicesCarousel = async () => {
               <ImgCardVertical
                 src={serviceImageUrl.width(800).url()}
                 alt={serviceImageAlt}
+                href={{
+                  pathname: `/services/[slug]`,
+                  params: { slug: serviceUrl },
+                }}
               >
                 <div className="p-4 flex flex-col gap-4 h-56">
                   <p className="text-2xl">{service.titre}</p>
                   <p className="w-full overflow-hidden line-clamp-3">
                     {service.description}
                   </p>
-                  <div className="flex-1">
-                    <Link
-                      className="underline"
-                      // @ts-expect-error - Dynamic route with slug
-                      href={`/services/${serviceUrl}`}
-                    >
-                      En savoir plus
-                    </Link>
-                  </div>
+                  <div className="flex-1 underline">{t("en-savoir-plus")}</div>
                 </div>
               </ImgCardVertical>
             </CarouselItem>

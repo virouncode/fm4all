@@ -1,5 +1,4 @@
 import ImgCardVertical from "@/components/cards/ImgCardVertical";
-import { Link } from "@/i18n/navigation";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 import { SERVICES_QUERY } from "@/sanity/queries";
@@ -31,23 +30,17 @@ const ServiceCards = async () => {
             key={service._id}
             src={serviceImageUrl.width(800).url()}
             alt={serviceImageAlt}
+            href={{
+              pathname: `/services/[slug]`,
+              params: { slug: serviceUrl },
+            }}
           >
             <div className="p-4 flex flex-col gap-4 h-52">
               <p className="text-2xl">{service.titre}</p>
               <p className="w-full overflow-hidden line-clamp-3">
                 {service.description}
               </p>
-              <div className="flex-1">
-                <Link
-                  className="underline"
-                  href={{
-                    pathname: `/services/[slug]`,
-                    params: { slug: serviceUrl },
-                  }}
-                >
-                  {t("en-savoir-plus")}
-                </Link>
-              </div>
+              <div className="flex-1 underline">{t("en-savoir-plus")}</div>
             </div>
           </ImgCardVertical>
         ) : null;

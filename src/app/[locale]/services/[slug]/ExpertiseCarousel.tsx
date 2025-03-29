@@ -9,8 +9,8 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link } from "@/i18n/navigation";
 import { urlFor } from "@/sanity/lib/image";
+import { useTranslations } from "next-intl";
 import { Secteur, Service, SousService } from "../../../../../sanity.types";
 
 type ExpertiseCarouselProps = {
@@ -24,6 +24,7 @@ const ExpertiseCarousel = ({
   sousServices,
   secteurs,
 }: ExpertiseCarouselProps) => {
+  const t = useTranslations("Global");
   return (
     <Tabs defaultValue="services">
       <TabsList className="mb-10">
@@ -62,19 +63,18 @@ const ExpertiseCarousel = ({
                   <ImgCardVertical
                     src={serviceImageUrl.url()}
                     alt={serviceImageAlt}
+                    href={{
+                      pathname: `/services/[slug]`,
+                      params: { slug: serviceUrl },
+                    }}
                   >
                     <div className="p-4 flex flex-col gap-4 h-56">
                       <p className="text-2xl">{service.titre}</p>
                       <p className="w-full overflow-hidden line-clamp-3">
                         {service.description}
                       </p>
-                      <div className="flex-1">
-                        <Link
-                          className="underline"
-                          href={`/services/${serviceUrl}`}
-                        >
-                          En savoir plus
-                        </Link>
+                      <div className="flex-1 underline">
+                        {t("en-savoir-plus")}
                       </div>
                     </div>
                   </ImgCardVertical>
@@ -110,19 +110,18 @@ const ExpertiseCarousel = ({
                   <ImgCardVertical
                     src={secteurImageUrl.url()}
                     alt={secteurImageAlt}
+                    href={{
+                      pathname: `/secteurs/[slug]`,
+                      params: { slug: secteurUrl },
+                    }}
                   >
                     <div className="p-4 flex flex-col gap-4 h-56">
                       <p className="text-2xl">{secteur.titre}</p>
                       <p className="w-full overflow-hidden line-clamp-3">
                         {secteur.description}
                       </p>
-                      <div className="flex-1">
-                        <Link
-                          className="underline"
-                          href={`/secteurs/${secteurUrl}`}
-                        >
-                          En savoir plus
-                        </Link>
+                      <div className="flex-1 underline">
+                        {t("en-savoir-plus")}
                       </div>
                     </div>
                   </ImgCardVertical>

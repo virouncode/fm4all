@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import Articles from "../Articles";
 import Hero from "../Hero";
 import HofManager from "../HofManager";
 import How from "../How";
@@ -30,7 +29,7 @@ export default function page() {
       <Why />
       <Mission />
       <HofManager />
-      <Articles />
+      {/* <Articles /> */}
     </main>
   );
 }
