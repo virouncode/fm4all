@@ -1,6 +1,6 @@
 "use client";
 
-import { MAX_NB_PERSONNES_PAR_ESPACE } from "@/app/[locale]/mon-devis/(etapes)/food-beverage/(cafe)/CafeEspacePropositions";
+import { MAX_NB_PERSONNES_PAR_ESPACE } from "@/app/[locale]/devis/(etapes)/food-beverage/(cafe)/CafeEspacePropositions";
 import { useClientOnly } from "@/hooks/use-client-only";
 import { CafeType } from "@/zod-schemas/cafe";
 import {

@@ -1,11 +1,18 @@
 import { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import ServiceCards from "./ServiceCards";
+import { generateAlternates } from "@/lib/metadata-helpers";
 
-export const metadata: Metadata = {
-  title: "Nos services",
-  description:
-    "Découvrez les services de Facility Management proposés par fm4all.",
+export const generateMetadata = async (): Promise<Metadata> => {
+  const locale = await getLocale();
+  return generateAlternates(
+    "services",
+    locale,
+    locale === "fr" ? "Nos services" : "Our services",
+    locale === "fr"
+      ? "Découvrez nos services de facility management"
+      : "Discover our facility management services"
+  );
 };
 
 const page = async () => {

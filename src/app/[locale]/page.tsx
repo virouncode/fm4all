@@ -1,4 +1,6 @@
+import { generateAlternates } from "@/lib/metadata-helpers";
 import { Metadata } from "next";
+import { getLocale } from "next-intl/server";
 import Hero from "../Hero";
 import HofManager from "../HofManager";
 import How from "../How";
@@ -10,10 +12,18 @@ import Slogan from "../Slogan";
 import VideoPresentation from "../VideoPresentation";
 import Why from "../Why";
 
-export const metadata: Metadata = {
-  title: "fm4all : Vos services en entreprise",
-  description:
-    "Office Management, nettoyage, maintenance règlementaire, machine à café, ... fm4all démocratise le Facility Management pour toutes les tailles d'entreprises. En quelques clics, validez les prestations qui vous conviennent. Cahier des charges, contrats, planification, démarrage, fm4all vous offre un service FM clé en main.",
+export const generateMetadata = async (): Promise<Metadata> => {
+  const locale = await getLocale();
+  return generateAlternates(
+    "home",
+    locale,
+    locale === "fr"
+      ? "Les services aux entreprises au meilleur prix"
+      : "Facility management services in Paris at the best price",
+    locale === "fr"
+      ? "fm4all démocratise les services généraux pour toutes les tailles d'entreprises. Utilisez notre comparateur et émetteur de devis en ligne pour les services aux entreprises."
+      : "fm4all democratizes facility management services for businesses in Paris. Use our online comparison tool and quote generator for business services."
+  );
 };
 
 export default function page() {

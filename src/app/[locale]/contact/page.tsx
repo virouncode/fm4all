@@ -1,11 +1,18 @@
 import CTAContactButtons from "@/components/cta-contact-buttons";
+import { generateAlternates } from "@/lib/metadata-helpers";
 import { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Nous contacter",
-  description:
-    "Contactez-nous pour des questions sur nos services de facility managment",
+export const generateMetadata = async (): Promise<Metadata> => {
+  const locale = await getLocale();
+  return generateAlternates(
+    "contact",
+    locale,
+    locale === "fr" ? "Nous contacter" : "Contact us",
+    locale === "fr"
+      ? "Contactez-nous pour des questions sur nos services de facility managment"
+      : "Contact us for questions about our facility management services"
+  );
 };
 
 const page = async () => {

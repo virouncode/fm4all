@@ -1,5 +1,5 @@
 "use client";
-import { fullReinitialisationDevis } from "@/app/[locale]/mon-devis/(etapes)/mes-locaux/fullReinitialisationDevis";
+import { fullReinitialisationDevis } from "@/app/[locale]/devis/(etapes)/locaux/fullReinitialisationDevis";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -40,7 +40,9 @@ import { TotalContext } from "@/context/TotalProvider";
 import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
+import router from "next/router";
 import { Dispatch, SetStateAction, useContext } from "react";
 
 type DevisButtonProps = {
@@ -60,6 +62,7 @@ const DevisButton = ({
   disabled = false,
   setIsMobileNavOpen,
 }: DevisButtonProps) => {
+  const t = useTranslations("devisButton");
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const { setServices } = useContext(ServicesContext);
   const { setFoodBeverage } = useContext(FoodBeverageContext);
@@ -109,40 +112,55 @@ const DevisButton = ({
     sauvegarderSearchParams.set("typeOccupation", client.typeOccupation);
   }
 
-  const devisRoutes = [
+  const devisRoutes: {
+    id: number;
+    pathname:
+      | "/locaux"
+      | "/services"
+      | "/food-beverage"
+      | "/pilotage"
+      | "/sauvegarder"
+      | "/personnaliser"
+      | "/afficher";
+    searchParams?: URLSearchParams;
+    name: string;
+  }[] = [
     {
       id: 1,
-      url: "/mes-locaux",
+      pathname: "/locaux",
       name: "Mes locaux",
     },
     {
       id: 2,
-      url: `/mes-services?${serviceSearchParams.toString()}`,
+      pathname: "/services",
+      searchParams: serviceSearchParams,
       name: "Mes services",
     },
     {
       id: 3,
-      url: `/food-beverage`,
+      pathname: "/food-beverage",
       name: "Food & Beverage",
     },
     {
       id: 4,
-      url: `/pilotage-prestations?${serviceSearchParams.toString()}`,
+      pathname: "/pilotage",
+      searchParams: serviceSearchParams,
       name: "Office Management",
     },
     {
       id: 5,
-      url: `/sauvegarder-ma-progression?${sauvegarderSearchParams.toString()}`,
+      pathname: "/sauvegarder",
+      searchParams: sauvegarderSearchParams,
       name: "Sauvegarder",
     },
     {
       id: 6,
-      url: "/personnaliser-mon-devis",
+      pathname: "/personnaliser",
       name: "Personnaliser",
     },
     {
       id: 7,
-      url: "/afficher-mon-devis",
+      pathname: "/afficher",
       name: "Afficher mon devis",
     },
   ];
@@ -152,8 +170,13 @@ const DevisButton = ({
       ? (devisRoutes.find(({ id }) => id === devisProgress.currentStep) ??
         devisRoutes[0])
       : devisRoutes[0];
-    const url = route.url;
-    router.push(`/mon-devis${url}`);
+
+    router.push({
+      pathname: `/devis${route.pathname}`,
+      query: route.searchParams
+        ? Object.fromEntries(route.searchParams.entries())
+        : {},
+    });
   };
   const handleClickNouveau = async () => {
     fullReinitialisationDevis(
@@ -188,7 +211,7 @@ const DevisButton = ({
       setTotal
     );
     if (setIsMobileNavOpen) setIsMobileNavOpen(false);
-    router.push("/mon-devis/mes-locaux");
+    router.push("/devis/locaux");
   };
 
   // const handleAlert = () => {
@@ -222,20 +245,21 @@ const DevisButton = ({
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
         <DialogHeader>
-          <DialogTitle>Devis en cours</DialogTitle>
+          <DialogTitle>{t("devis-en-cours")}</DialogTitle>
           <DialogDescription>
-            Un devis est déjà en cours. Souhaitez-vous le reprendre ou en créer
-            un nouveau (vos informations seront perdues) ?
+            {t(
+              "un-devis-est-deja-en-cours-souhaitez-vous-le-reprendre-ou-en-creer-un-nouveau-vos-informations-seront-perdues"
+            )}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
             <div className="flex gap-4 justify-center mx-auto">
               <Button variant="destructive" onClick={handleClickNouveau}>
-                Nouveau
+                {t("nouveau")}
               </Button>
               <Button onClick={handleClickReprendre} variant="outline">
-                Reprendre
+                {t("reprendre")}
               </Button>
             </div>
           </DialogClose>

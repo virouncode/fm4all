@@ -15,6 +15,7 @@ import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import { Link } from "@/i18n/navigation";
 import { roundSurface } from "@/lib/roundSurface";
+import { useLocale } from "next-intl";
 import { useContext } from "react";
 import { roundEffectif } from "../../lib/roundEffectif";
 
@@ -23,6 +24,7 @@ import { roundEffectif } from "../../lib/roundEffectif";
 //Quand on clique sur une étape il faut renvoyer vers l'url avec les search params correspondants
 
 const DevisBreadcrumb = () => {
+  const locale = useLocale() as "fr" | "en";
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const { client } = useContext(ClientContext);
   const { setServices } = useContext(ServicesContext);
@@ -59,48 +61,83 @@ const DevisBreadcrumb = () => {
 
   //mes-services searchParams : surface, effectif, fournisseurId, nettoyageGamme
 
-  const devisRoutes = [
+  const devisRoutes: {
+    id: number;
+    pathname:
+      | "/locaux"
+      | "/services"
+      | "/food-beverage"
+      | "/pilotage"
+      | "/sauvegarder"
+      | "/personnaliser"
+      | "/afficher";
+    searchParams?: URLSearchParams;
+    name: {
+      fr: string;
+      en: string;
+    };
+  }[] = [
     {
       id: 1,
-      url: "/mes-locaux",
-      name: "1. Mes locaux",
+      pathname: "/locaux",
+      name: {
+        fr: "1. Mes locaux",
+        en: "1. My premises",
+      },
     },
     {
       id: 2,
-      url: `/mes-services?${serviceSearchParams.toString()}`,
-      name: "2. Services",
+      pathname: "/services",
+      name: {
+        fr: "2. Services",
+        en: "2. Services",
+      },
+      searchParams: serviceSearchParams,
     },
     {
       id: 3,
-      url: `/food-beverage`,
-      name: "3. Food/Beverage",
+      pathname: `/food-beverage`,
+      name: { fr: "3. Food/Beverage", en: "3. Food/Beverage" },
     },
     {
       id: 4,
-      url: `/pilotage-prestations?${serviceSearchParams.toString()}`,
-      name: "4. Pilotage",
+      pathname: `/pilotage`,
+      name: { fr: "4. Pilotage", en: "4. Management" },
+      searchParams: serviceSearchParams,
     },
     {
       id: 5,
-      url: `/sauvegarder-ma-progression?${sauvegarderSearchParams.toString()}`,
-      name: "5. Sauvegarder",
+      pathname: `/sauvegarder`,
+      name: { fr: "5. Sauvegarder", en: "5. Save" },
+      searchParams: sauvegarderSearchParams,
     },
     {
       id: 6,
-      url: "/personnaliser-mon-devis",
-      name: "6. Personnaliser",
+      pathname: "/personnaliser",
+      name: { fr: "6. Personnaliser", en: "6. Customize" },
     },
     {
       id: 7,
-      url: "/afficher-mon-devis",
-      name: "7. Mon Devis",
+      pathname: "/afficher",
+      name: { fr: "7. Mon Devis", en: "7. My Quote" },
     },
   ];
 
   const handleClickBreadcrumbLink = (route: {
     id: number;
-    url: string;
-    name: string;
+    pathname:
+      | "/locaux"
+      | "/services"
+      | "/food-beverage"
+      | "/pilotage"
+      | "/sauvegarder"
+      | "/personnaliser"
+      | "/afficher";
+    searchParams?: URLSearchParams;
+    name: {
+      fr: string;
+      en: string;
+    };
   }) => {
     setDevisProgress((prev) => ({
       ...prev,
@@ -136,12 +173,17 @@ const DevisBreadcrumb = () => {
                 <BreadcrumbItem className="flex items-center">
                   {route.id === devisProgress.currentStep ? (
                     <BreadcrumbPage className="font-bold hover:opacity-80">
-                      {route.name}
+                      {route.name[locale]}
                     </BreadcrumbPage>
                   ) : (
                     <Link
                       onClick={() => handleClickBreadcrumbLink(route)}
-                      href={`/mon-devis${route.url}`}
+                      href={{
+                        pathname: `/devis${route.pathname}`,
+                        query: route.searchParams
+                          ? Object.fromEntries(route.searchParams.entries())
+                          : {},
+                      }}
                       className={`hover:opacity-80 ${
                         devisProgress.completedSteps.includes(route.id) ||
                         route.id ===
@@ -153,7 +195,7 @@ const DevisBreadcrumb = () => {
                           : "pointer-events-none opacity-40"
                       }`}
                     >
-                      {route.name}
+                      {route.name[locale]}
                     </Link>
                     // )
                   )}
@@ -169,7 +211,12 @@ const DevisBreadcrumb = () => {
           {previousRoute ? (
             <Link
               onClick={() => handleClickBreadcrumbLink(previousRoute)}
-              href={`/mon-devis${previousRoute.url}`}
+              href={{
+                pathname: `/devis${previousRoute.pathname}`,
+                query: previousRoute.searchParams
+                  ? Object.fromEntries(previousRoute.searchParams.entries())
+                  : {},
+              }}
               className={`hover:opacity-80 ${
                 devisProgress.completedSteps.includes(previousRoute.id) ||
                 previousRoute.id ===
@@ -181,7 +228,7 @@ const DevisBreadcrumb = () => {
                   : "pointer-events-none opacity-40"
               }`}
             >
-              &lt; {previousRoute.name}
+              &lt; {previousRoute.name[locale]}
             </Link>
           ) : null}
         </div>
@@ -189,7 +236,12 @@ const DevisBreadcrumb = () => {
           {nextRoute ? (
             <Link
               onClick={() => handleClickBreadcrumbLink(nextRoute)}
-              href={`/mon-devis${nextRoute.url}`}
+              href={{
+                pathname: `/devis${nextRoute.pathname}`,
+                query: nextRoute.searchParams
+                  ? Object.fromEntries(nextRoute.searchParams.entries())
+                  : {},
+              }}
               className={`hover:opacity-80 ${
                 devisProgress.completedSteps.includes(nextRoute.id) ||
                 nextRoute.id ===
@@ -201,7 +253,7 @@ const DevisBreadcrumb = () => {
                   : "pointer-events-none opacity-40"
               }`}
             >
-              {nextRoute.name} &gt;
+              {nextRoute.name[locale]} &gt;
             </Link>
           ) : null}
         </div>

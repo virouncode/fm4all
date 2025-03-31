@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/sheet";
 import { Link } from "@/i18n/navigation";
 import { getLocalStorage, setLocalStorage } from "@/lib/storageHelper";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -17,6 +18,7 @@ const COOKIE_EXPIRATION_MS = 1000 * 60 * 60 * 24;
 // const COOKIE_EXPIRATION_MS = 1000 * 60;
 
 const CookieBanner = () => {
+  const t = useTranslations("cookieBanniere");
   const [cookieConsent, setCookieConsent] = useState<boolean | null>(null);
   const pathname = usePathname();
   useEffect(() => {
@@ -77,42 +79,44 @@ const CookieBanner = () => {
             </div>
             <div>
               <p>
-                Nous utilisons des cookies et des technologies similaires
-                nécessaires au fonctionnement de notre site Web.
+                {t(
+                  "nous-utilisons-des-cookies-et-des-technologies-similaires-necessaires-au-fonctionnement-de-notre-site-web"
+                )}
               </p>
               <p>
-                Nous utilisons également des cookies d&apos;analyse, de
-                fonctionnalité pour analyser le traffic de notre site.
+                {t(
+                  "nous-utilisons-egalement-des-cookies-d-analyse-de-fonctionnalite-pour-analyser-le-traffic-de-notre-site"
+                )}
               </p>
             </div>
 
             <div>
-              <span>Pour en savoir plus, veuillez consulter notre </span>
+              <span>{t("pour-en-savoir-plus-veuillez-consulter-notre")} </span>
               <Link
-                href="/politique-de-cookies"
+                href="/cookies"
                 className="text-fm4allsecondary cursor-pointer hover:opacity-80"
                 target="_blank"
               >
-                Politique relative aux cookies
+                {t("politique-relative-aux-cookies")}
               </Link>
             </div>
           </div>
           <div className="flex flex-col gap-2 w-full md:w-72">
             <Button
               variant="destructive"
-              title="J'accepte"
+              title={t("jaccepte")}
               size="lg"
               onClick={handleAccept}
             >
-              J&apos;accepte
+              {t("jaccepte")}
             </Button>
             <Button
               variant="outline"
-              title="Je refuse"
+              title={t("je-refuse")}
               size="lg"
               onClick={handleRefuse}
             >
-              Je refuse
+              {t("je-refuse")}
             </Button>
           </div>
         </div>

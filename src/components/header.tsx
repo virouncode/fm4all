@@ -25,6 +25,7 @@ const Header = () => {
 
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const path = usePathname();
+  console.log("path", path);
 
   const isActive = (href: string) => {
     if (href === "/") return path === "/";
@@ -71,27 +72,27 @@ const Header = () => {
             </div>
             <div
               className={`flex gap-1 items-center ${
-                isActive("/nos-3-gammes") ? "text-destructive font-bold" : ""
+                isActive("/gammes") ? "text-destructive font-bold" : ""
               }`}
             >
               <Star size={15} />
-              <Link href="/nos-3-gammes">{t("nos-3-gammes")}</Link>
+              <Link href="/gammes">{t("nos-3-gammes")}</Link>
             </div>
             <div
               className={`flex gap-1 items-center ${
-                isActive("/nos-engagements") ? "text-destructive font-bold" : ""
+                isActive("/engagements") ? "text-destructive font-bold" : ""
               }`}
             >
               <ScrollText size={15} />
-              <Link href="/nos-engagements">{t("nos-engagements")}</Link>
+              <Link href="/engagements">{t("nos-engagements")}</Link>
             </div>
             <div
               className={`flex gap-1 items-center ${
-                isActive("/nos-partenaires") ? "text-destructive font-bold" : ""
+                isActive("/partenaires") ? "text-destructive font-bold" : ""
               }`}
             >
               <Handshake size={15} />
-              <Link href="/nos-partenaires">{t("nos-partenaires")}</Link>
+              <Link href="/partenaires">{t("nos-partenaires")}</Link>
             </div>
             <div
               className={`flex gap-1 items-center ${
@@ -119,7 +120,7 @@ const Header = () => {
             asChild
             onClick={() => setIsMobileNavOpen(false)}
           >
-            <Link href="/devenir-prestataire">{t("devenir-prestataire")}</Link>
+            <Link href="/prestataire">{t("devenir-prestataire")}</Link>
           </Button>
           <LocaleButton className="hidden md:flex" />
           <Button
@@ -186,34 +187,30 @@ const Header = () => {
               </div>
               <div
                 className={`flex gap-4 items-center ${
-                  isActive("/nos-3-gammes") ? "text-destructive font-bold" : ""
+                  isActive("/gammes") ? "text-destructive font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
                 <Star size={30} />
-                <Link href="/nos-3-gammes">{t("nos-3-gammes")}</Link>
+                <Link href="/gammes">{t("nos-3-gammes")}</Link>
               </div>
               <div
                 className={`flex gap-4 items-center ${
-                  isActive("/nos-engagements")
-                    ? "text-destructive font-bold"
-                    : ""
+                  isActive("/engagements") ? "text-destructive font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
                 <ScrollText size={30} />
-                <Link href="/nos-engagements">{t("nos-engagements")}</Link>
+                <Link href="/engagements">{t("nos-engagements")}</Link>
               </div>
               <div
                 className={`flex gap-4 items-center ${
-                  isActive("/nos-partenaires")
-                    ? "text-destructive font-bold"
-                    : ""
+                  isActive("/partenaires") ? "text-destructive font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
                 <Handshake size={30} />
-                <Link href="/nos-partenaires">{t("nos-partenaires")}</Link>
+                <Link href="/partenaires">{t("nos-partenaires")}</Link>
               </div>
               <div
                 className={`flex gap-4 items-center ${
@@ -226,16 +223,12 @@ const Header = () => {
               </div>
               <div
                 className={`hidden max-[600px]:flex gap-4 items-center ${
-                  isActive("/devenir-prestataire")
-                    ? "text-destructive font-bold"
-                    : ""
+                  isActive("/prestataire") ? "text-destructive font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
                 <HandPlatter size={30} />
-                <Link href="/devenir-prestataire">
-                  {t("devenir-prestataire")}
-                </Link>
+                <Link href="/prestataire">{t("devenir-prestataire")}</Link>
               </div>
               <div
                 className={`hidden max-[600px]:flex gap-4 items-center ${

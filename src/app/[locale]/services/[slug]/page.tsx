@@ -10,10 +10,11 @@ import {
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 
+import { generateAlternates } from "@/lib/metadata-helpers";
 import { SERVICE_QUERY } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
 import { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import {
   PortableText,
   PortableTextBlock,
@@ -106,10 +107,13 @@ export const generateMetadata = async ({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> => {
   const service = await client.fetch<Service>(SERVICE_QUERY, await params);
-  return {
-    title: service.baliseTitle,
-    description: service.baliseDescription,
-  };
+  const locale = await getLocale();
+  return generateAlternates(
+    "services",
+    locale,
+    service.titre ?? "",
+    service.description ?? ""
+  );
 };
 
 const page = async ({ params }: { params: Promise<{ slug: string }> }) => {

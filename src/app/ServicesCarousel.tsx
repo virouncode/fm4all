@@ -13,6 +13,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Service } from "../../sanity.types";
 
 const ServicesCarousel = async () => {
+  const t = await getTranslations("Global");
   // const options = { next: { revalidate: 30 } };
   const locale = await getLocale();
   const services = await client.fetch<Service[]>(
@@ -20,8 +21,6 @@ const ServicesCarousel = async () => {
     { language: locale }
     // options
   );
-  console.log("services", services);
-  const t = await getTranslations("Global");
   return (
     <Carousel
       opts={{

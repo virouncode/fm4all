@@ -35,12 +35,43 @@ import TotalTheProvider from "@/context/TotalTheProvider";
 import { routing } from "@/i18n/routing";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import type { Metadata } from "next";
+import { Metadata } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
+import { getLocale } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
 import { Didact_Gothic } from "next/font/google";
 import { notFound } from "next/navigation";
 import "./globals.css";
+
+export const generateMetadata = async (): Promise<Metadata> => {
+  const locale = await getLocale();
+  return {
+    title: {
+      template:
+        locale === "fr"
+          ? "%s | fm4all Le Facility Management pour tous"
+          : "%s | fm4all Facility Management for all",
+      default:
+        locale === "fr"
+          ? "Les services aux entreprises au meilleur prix | fm4all"
+          : "Facility management services in Paris at the best price | fm4all",
+    },
+    description:
+      locale === "fr"
+        ? "fm4all démocratise les services généraux pour toutes les tailles d'entreprises. Utilisez notre comparateur et émetteur de devis en ligne pour les services aux entreprises."
+        : "fm4all democratizes facility management services for businesses in Paris. Use our online comparison tool and quote generator for business services.",
+    alternates: {
+      canonical:
+        locale === "fr"
+          ? "https://www.fm4all.com/fr"
+          : "https://www.fm4all.com/en",
+      languages: {
+        fr: "https://www.fm4all.com/fr",
+        en: "https://www.fm4all.com/en",
+      },
+    },
+  };
+};
 
 const didact = Didact_Gothic({
   variable: "--font-didact-sans",
@@ -48,15 +79,6 @@ const didact = Didact_Gothic({
   subsets: ["latin"],
   display: "swap",
 });
-
-export const metadata: Metadata = {
-  title: {
-    template: "%s | fm4all",
-    default: "Home | fm4all",
-  },
-  description:
-    "Office Management, nettoyage, maintenance règlementaire, machine à café, ... fm4all démocratise le Facility Management pour toutes les tailles d'entreprises. En quelques clics, validez les prestations qui vous conviennent. Cahier des charges, contrats, planification, démarrage, fm4all vous offre un service FM clé en main.",
-};
 
 export default async function RootLayout({
   children,

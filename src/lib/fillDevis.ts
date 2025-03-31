@@ -1,6 +1,6 @@
 import { batiments } from "@/constants/batiments";
 import { MARGE } from "@/constants/constants";
-import { occupations } from "@/constants/occupations";
+import { occupations } from "@/constants/occupation";
 import { toast } from "@/hooks/use-toast";
 import { InsertClientType } from "@/zod-schemas/client";
 import html2canvas from "html2canvas";

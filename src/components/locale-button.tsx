@@ -8,10 +8,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
-import { getSlugEn, getSlugFr } from "@/i18n/slugMappings";
+import {
+  getServicesSlugEn,
+  getServicesSlugFr,
+} from "@/i18n/servicesSlugMappings";
 import { Flag } from "lucide-react";
 import { useLocale } from "next-intl";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 
 type LocaleButtonProps = {
   className?: string;
@@ -22,18 +25,22 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const params = useParams();
+  const searchParams = useSearchParams();
 
   const handleChangeLang = (newLocale: "fr" | "en") => {
     if (newLocale === locale) return;
-    console.log("params", params);
-    console.log("pathname", pathname);
-
+    const query: Record<string, string> = {};
+    searchParams.forEach((value, key) => {
+      query[key] = value;
+    });
     if (pathname === "/services/[slug]") {
       if (typeof params.slug === "string") {
         const newSlug =
-          newLocale === "fr" ? getSlugFr(params.slug) : getSlugEn(params.slug);
+          newLocale === "fr"
+            ? getServicesSlugFr(params.slug)
+            : getServicesSlugEn(params.slug);
         router.replace(
-          { pathname, params: { slug: newSlug } },
+          { pathname, params: { slug: newSlug }, query },
           { locale: newLocale }
         );
       }
@@ -41,7 +48,7 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
       // @ts-expect-error -- TypeScript will validate that only known `params`
       // // are used in combination with a given `pathname`. Since the two will
       // // always match for the current route, we can skip runtime checks.
-      router.replace({ pathname, params }, { locale: newLocale });
+      router.replace({ pathname, params, query }, { locale: newLocale });
     }
   };
   return (

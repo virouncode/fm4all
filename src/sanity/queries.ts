@@ -1,4 +1,4 @@
-export const SERVICES_QUERY = `*[_type == "service" && language == $language]|order(date asc)[0...20]{ _id, titre, description, slug, imagePrincipale }`;
+export const SERVICES_QUERY = `*[_type == "service" && language == $language]|order(date asc){ _id, titre, description, slug, imagePrincipale }`;
 
 export const SERVICE_QUERY = `*[_type == "service" && slug.current == $slug][0]{
 ...,
@@ -24,3 +24,34 @@ sousServicesAssocies[]->{
     imagePrincipale
     },
   }`;
+
+export const ARTICLES_QUERY = `*[_type == "article" && language == $language]|order(date desc){ _id, titre, description, slug, imagePrincipale }`;
+
+export const LAST_ARTICLES_QUERY = `*[_type == "article" && language == $language]|order(date desc)[0...10]{ _id, titre, description, slug, imagePrincipale }`;
+
+export const ARTICLES_OF_CATEGORY_QUERY = `*[_type == "article" && language == $language && parentSlug===$parentSlug]|order(date desc){ _id, titre, description, slug, imagePrincipale }`;
+
+export const ARTICLE_QUERY = `*[_type == "article" && slug.current == $slug][0]{
+    ...,
+    servicesAssocies[]->{
+        _id,
+        titre,
+        description,
+        slug,
+        imagePrincipale
+      },
+    sousServicesAssocies[]->{
+        _id,
+        titre,
+        description,
+        slug,
+        imagePrincipale
+      },
+     secteursAssocies[]->{
+        _id,
+        titre,
+        description,
+        slug,
+        imagePrincipale
+        },
+      }`;

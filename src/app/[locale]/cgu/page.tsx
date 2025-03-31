@@ -1,175 +1,177 @@
+import { generateAlternates } from "@/lib/metadata-helpers";
 import { Metadata } from "next";
+import { getLocale, getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Conditions Générales d'Utilisation (CGU)",
-  description:
-    "Lisez nos conditions générales d'utilisation (CGU) pour en savoir plus sur les règles d'accès et d'utilisation de notre site.",
+export const generateMetadata = async (): Promise<Metadata> => {
+  const locale = await getLocale();
+  return generateAlternates(
+    "cgu",
+    locale,
+    locale === "fr"
+      ? "Conditions Générales d'Utilisation (CGU)"
+      : "Terms and Conditions of Use",
+    locale === "fr"
+      ? "Lisez nos conditions générales d'utilisation (CGU) pour en savoir plus sur les règles d'accès et d'utilisation de notre site."
+      : "Read our terms and conditions of use (CGU) to learn more about the rules for accessing and using our site."
+  );
 };
 
-const page = () => {
+const page = async () => {
+  const t = await getTranslations("CGUPage");
   return (
     <main className="max-w-7xl min-h-[calc(100vh-4rem)] mx-auto mb-24 py-4 px-6 md:px-20">
       <section className="mt-6 flex flex-col gap-10">
         <h1 className="text-4xl">
-          Conditions Générales d&apos;Utilisation (CGU) du site fm4all.com
+          {t("conditions-generales-d-utilisation-cgu-du-site-fm4all-com")}
         </h1>
         <div className="flex flex-col gap-6">
-          <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">1. Objet</h2>
+          <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">{t("1-objet")}</h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
             <p className="text-base">
-              Les présentes Conditions Générales d&apos;Utilisation (CGU) ont
-              pour objet de définir les conditions d&apos;accès et
-              d&apos;utilisation du site internet www.fm4all.com (ci-après « le
-              Site »), édité par FM4ALL, société spécialisée dans le facility
-              management.
+              {t(
+                "les-presentes-conditions-generales-d-utilisation-cgu-ont-pour-objet-de-definir-les-conditions-d-acces-et-d-utilisation-du-site-internet-www-fm4all-com-ci-apres-le-site-edite-par-fm4all-societe-specialisee-dans-le-facility-management"
+              )}
             </p>
             <p className="text-base">
-              En accédant au Site, l&apos;utilisateur (ci-après «
-              l&apos;Utilisateur ») accepte sans réserve les présentes CGU. En
-              cas de désaccord avec ces conditions, l&apos;Utilisateur est
-              invité à ne pas utiliser le Site.
+              {t(
+                "en-accedant-au-site-l-utilisateur-ci-apres-l-utilisateur-accepte-sans-reserve-les-presentes-cgu-en-cas-de-desaccord-avec-ces-conditions-l-utilisateur-est-invite-a-ne-pas-utiliser-le-site"
+              )}
             </p>
           </div>
         </div>
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            2. Accès au Site
+            {t("2-acces-au-site")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
             <p className="text-base">
-              Le Site est accessible gratuitement à tout Utilisateur disposant
-              d&apos;un accès à Internet. Tous les coûts liés à l&apos;accès au
-              Site (matériel informatique, logiciels, connexion Internet, etc.)
-              sont à la charge de l&apos;Utilisateur.
+              {t(
+                "le-site-est-accessible-gratuitement-a-tout-utilisateur-disposant-d-un-acces-a-internet-tous-les-couts-lies-a-l-acces-au-site-materiel-informatique-logiciels-connexion-internet-etc-sont-a-la-charge-de-l-utilisateur"
+              )}
             </p>
             <p className="text-base">
-              FM4ALL met en œuvre tous les moyens raisonnables pour assurer un
-              accès de qualité au Site, mais n&apos;est tenue à aucune
-              obligation de résultat. L&apos;accès au Site peut être interrompu
-              pour des raisons de maintenance ou pour toute autre raison, sans
-              préavis.
+              {t(
+                "fm4all-met-en-oeuvre-tous-les-moyens-raisonnables-pour-assurer-un-acces-de-qualite-au-site-mais-n-est-tenue-a-aucune-obligation-de-resultat-l-acces-au-site-peut-etre-interrompu-pour-des-raisons-de-maintenance-ou-pour-toute-autre-raison-sans-preavis"
+              )}
             </p>
           </div>
         </div>
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            3. Utilisation du Site
+            {t("3-utilisation-du-site")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
             <p className="text-base">
-              L&apos;Utilisateur s&apos;engage à utiliser le Site conformément
-              aux présentes CGU et aux lois en vigueur. Il s&apos;interdit
-              notamment :
+              {t(
+                "l-utilisateur-s-engage-a-utiliser-le-site-conformement-aux-presentes-cgu-et-aux-lois-en-vigueur-il-s-interdit-notamment"
+              )}
             </p>
             <ul className="ml-10 flex flex-col gap-2">
               <li className="list-disc">
-                D&apos;utiliser le Site à des fins illégales ou interdites par
-                la loi.
+                {t(
+                  "d-utiliser-le-site-a-des-fins-illegales-ou-interdites-par-la-loi"
+                )}
               </li>
               <li className="list-disc">
-                D&apos;interférer avec le bon fonctionnement du Site
+                {t("d-interferer-avec-le-bon-fonctionnement-du-site")}
               </li>
               <li className="list-disc">
-                De tenter d&apos;accéder de manière non autorisée aux systèmes
-                informatiques de FM4ALL
+                {t(
+                  "de-tenter-d-acceder-de-maniere-non-autorisee-aux-systemes-informatiques-de-fm4all"
+                )}
               </li>
             </ul>
           </div>
         </div>
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            4. Responsabilité
+            {t("4-responsabilite")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
             <p className="text-base">
-              FM4ALL s&apos;efforce de fournir des informations précises et à
-              jour sur le Site. Toutefois, FM4ALL ne garantit pas
-              l&apos;exactitude, l&apos;exhaustivité ou l&apos;actualité des
-              informations diffusées sur le Site.
+              {t(
+                "fm4all-s-efforce-de-fournir-des-informations-precises-et-a-jour-sur-le-site-toutefois-fm4all-ne-garantit-pas-l-exactitude-l-exhaustivite-ou-l-actualite-des-informations-diffusees-sur-le-site"
+              )}
             </p>
             <p className="text-base">
-              FM4ALL ne pourra être tenue responsable de tout dommage direct ou
-              indirect résultant de l&apos;utilisation du Site ou de
-              l&apos;impossibilité d&apos;y accéder.
+              {t(
+                "fm4all-ne-pourra-etre-tenue-responsable-de-tout-dommage-direct-ou-indirect-resultant-de-l-utilisation-du-site-ou-de-l-impossibilite-d-y-acceder"
+              )}
             </p>
           </div>
         </div>
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            5. Propriété Intellectuelle
+            {t("5-propriete-intellectuelle")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
             <p className="text-base">
-              Tous les contenus présents sur le Site (textes, images,
-              graphismes, logos, icônes, logiciels, etc.) sont la propriété
-              exclusive de FM4ALL ou de ses partenaires.
+              {t(
+                "tous-les-contenus-presents-sur-le-site-textes-images-graphismes-logos-icones-logiciels-etc-sont-la-propriete-exclusive-de-fm4all-ou-de-ses-partenaires"
+              )}
             </p>
             <p className="text-base">
-              Toute reproduction, distribution, modification, adaptation,
-              retransmission ou publication, même partielle, de ces différents
-              éléments est strictement interdite sans l&apos;accord préalable
-              écrit de FM4ALL.
+              {t(
+                "toute-reproduction-distribution-modification-adaptation-retransmission-ou-publication-meme-partielle-de-ces-differents-elements-est-strictement-interdite-sans-l-accord-prealable-ecrit-de-fm4all"
+              )}
             </p>
           </div>
         </div>
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            6. Données Personnelles
+            {t("6-donnees-personnelles")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
             <p className="text-base">
-              L&apos;Utilisateur est informé que lors de sa navigation sur le
-              Site, des données personnelles peuvent être collectées par FM4ALL,
-              notamment via les formulaires de contact ou les cookies.
+              {t(
+                "l-utilisateur-est-informe-que-lors-de-sa-navigation-sur-le-site-des-donnees-personnelles-peuvent-etre-collectees-par-fm4all-notamment-via-les-formulaires-de-contact-ou-les-cookies"
+              )}
             </p>
             <p className="text-base">
-              FM4ALL s&apos;engage à traiter ces données conformément à sa
-              Politique de Confidentialité et en respectant la réglementation en
-              vigueur sur la protection des données personnelles (RGPD).
+              {t(
+                "fm4all-s-engage-a-traiter-ces-donnees-conformement-a-sa-politique-de-confidentialite-et-en-respectant-la-reglementation-en-vigueur-sur-la-protection-des-donnees-personnelles-rgpd"
+              )}
             </p>
           </div>
         </div>
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            7. Liens Hypertextes
+            {t("7-liens-hypertextes")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
             <p className="text-base">
-              Le Site peut contenir des liens vers des sites internet tiers.
-              FM4ALL n&apos;exerce aucun contrôle sur ces sites et décline toute
-              responsabilité quant à leur contenu.
+              {t(
+                "le-site-peut-contenir-des-liens-vers-des-sites-internet-tiers-fm4all-n-exerce-aucun-controle-sur-ces-sites-et-decline-toute-responsabilite-quant-a-leur-contenu"
+              )}
             </p>
             <p className="text-base">
-              L&apos;insertion de liens hypertextes vers le Site est autorisée
-              sous réserve de ne pas porter atteinte à l&apos;image de FM4ALL et
-              de ne pas induire en erreur sur la nature des liens avec FM4ALL.
-            </p>
-          </div>
-        </div>
-        <div className="flex flex-col gap-6">
-          <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            8. Modification des CGU
-          </h2>
-          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
-            <p className="text-base">
-              FM4ALL se réserve le droit de modifier à tout moment les présentes
-              CGU. Les nouvelles conditions seront applicables dès leur mise en
-              ligne sur le Site. L&apos;Utilisateur est donc invité à consulter
-              régulièrement cette page pour prendre connaissance de toute mise à
-              jour.
+              {t(
+                "l-insertion-de-liens-hypertextes-vers-le-site-est-autorisee-sous-reserve-de-ne-pas-porter-atteinte-a-l-image-de-fm4all-et-de-ne-pas-induire-en-erreur-sur-la-nature-des-liens-avec-fm4all"
+              )}
             </p>
           </div>
         </div>
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
-            9. Droit applicable et juridiction compétente
+            {t("8-modification-des-cgu")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
             <p className="text-base">
-              Les présentes CGU sont régies par le droit français. En cas de
-              litige relatif à l&apos;interprétation ou à l&apos;exécution des
-              présentes, les tribunaux compétents de Paris seront seuls
-              compétents.
+              {t(
+                "fm4all-se-reserve-le-droit-de-modifier-a-tout-moment-les-presentes-cgu-les-nouvelles-conditions-seront-applicables-des-leur-mise-en-ligne-sur-le-site-l-utilisateur-est-donc-invite-a-consulter-regulierement-cette-page-pour-prendre-connaissance-de-toute-mise-a-jour"
+              )}
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-col gap-6">
+          <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
+            {t("9-droit-applicable-et-juridiction-competente")}
+          </h2>
+          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
+            <p className="text-base">
+              {t(
+                "les-presentes-cgu-sont-regies-par-le-droit-francais-en-cas-de-litige-relatif-a-l-interpretation-ou-a-l-execution-des-presentes-les-tribunaux-competents-de-paris-seront-seuls-competents"
+              )}
             </p>
           </div>
         </div>

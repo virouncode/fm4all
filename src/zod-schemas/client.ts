@@ -132,35 +132,52 @@ export const updateClientSchema = createUpdateSchema(clients, {
 
 export type UpdateClientType = z.infer<typeof updateClientSchema>;
 
-export const mesLocauxSchema = z.object({
-  surface: z
-    .string()
-    .refine(
-      (value) =>
-        /^\d+$/.test(value) &&
-        parseInt(value, 10) >= 50 &&
-        parseInt(value, 10) <= 3000,
-      "La surface doit être un nombre compris entre 50 et 3000 m²"
+export const createMesLocauxSchema = (messages: {
+  surface: string;
+  effectif: string;
+  batiment: string;
+  occupation: string;
+  codePostal: string;
+}) => {
+  return z.object({
+    surface: z
+      .string()
+      .refine(
+        (value) =>
+          /^\d+$/.test(value) &&
+          parseInt(value, 10) >= 50 &&
+          parseInt(value, 10) <= 3000,
+        messages.surface
+      ),
+    effectif: z
+      .string()
+      .refine(
+        (value) =>
+          /^\d+$/.test(value) &&
+          parseInt(value, 10) >= 1 &&
+          parseInt(value, 10) <= 300,
+        messages.effectif
+      ),
+    typeBatiment: z.enum(
+      ["bureaux", "localCommercial", "entrepot", "cabinetMedical"],
+      { message: messages.batiment }
     ),
-  effectif: z
-    .string()
-    .refine(
-      (value) =>
-        /^\d+$/.test(value) &&
-        parseInt(value, 10) >= 1 &&
-        parseInt(value, 10) <= 300,
-      "Le nombre de personnes doit être compris entre 1 et 300"
+    typeOccupation: z.enum(
+      ["partieEtage", "plateauComplet", "batimentEntier"],
+      { message: messages.occupation }
     ),
-  typeBatiment: z.enum(
-    ["bureaux", "localCommercial", "entrepot", "cabinetMedical"],
-    { message: "Type de batiment invalide" }
-  ),
-  typeOccupation: z.enum(["partieEtage", "plateauComplet", "batimentEntier"], {
-    message: "Type d'occupation invalide",
-  }),
-  codePostal: z.string().refine((value) => /^\d{5}$/.test(value), {
-    message: "Code postal invalide, entrez 5 chiffres",
-  }),
+    codePostal: z.string().refine((value) => /^\d{5}$/.test(value), {
+      message: messages.codePostal,
+    }),
+  });
+};
+
+export const mesLocauxSchema = createMesLocauxSchema({
+  surface: "La surface doit être un nombre compris entre 50 et 3000 m²",
+  effectif: "Le nombre de personnes doit être compris entre 1 et 300",
+  batiment: "Type de batiment invalide",
+  occupation: "Type d'occupation invalide",
+  codePostal: "Code postal invalide, entrez 5 chiffres",
 });
 
 export type MesLocauxType = z.infer<typeof mesLocauxSchema>;

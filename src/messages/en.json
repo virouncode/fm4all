@@ -42,6 +42,20 @@
     "devenir-prestataire": "Become a provider",
     "nous-contacter": "Contact us"
   },
+  "cookieBanniere": {
+    "nous-utilisons-des-cookies-et-des-technologies-similaires-necessaires-au-fonctionnement-de-notre-site-web": "We use cookies and similar technologies necessary for the operation of our website.",
+    "nous-utilisons-egalement-des-cookies-d-analyse-de-fonctionnalite-pour-analyser-le-traffic-de-notre-site": "We also use analytics and functionality cookies to analyze the traffic on our website.",
+    "pour-en-savoir-plus-veuillez-consulter-notre": "To learn more, please see our",
+    "politique-relative-aux-cookies": "Cookies Policy",
+    "je-refuse": "I refuse",
+    "jaccepte": "I accept"
+  },
+  "devisButton": {
+    "devis-en-cours": "Quote in progress",
+    "un-devis-est-deja-en-cours-souhaitez-vous-le-reprendre-ou-en-creer-un-nouveau-vos-informations-seront-perdues": "A quote is already in progress. Would you like to resume it or create a new one (your information will be lost)?",
+    "nouveau": "New",
+    "reprendre": "Resume"
+  },
   "HomePage": {
     "hero": {
       "vos-prestataires-de-services-au-meilleur-prix": "Your service providers at the best price.",
@@ -548,5 +562,161 @@
     "7-nous-contacter": "7. Contact us",
     "si-vous-avez-des-questions-concernant-cette-politique-relative-aux-cookies-veuillez-nous-contacter-a": "If you have any questions regarding this cookies policy, please contact us at:",
     "3-rue-de-nantes-75019-paris": "3 rue de Nantes, 75019 PARIS"
+  },
+  "CGUPage": {
+    "terms-and-conditions-of-use": "Terms and Conditions of Use",
+    "conditions-generales-d-utilisation-cgu-du-site-fm4all-com": "General Terms and Conditions of Use of the fm4all.com website",
+    "1-objet": "1. Purpose",
+    "les-presentes-conditions-generales-d-utilisation-cgu-ont-pour-objet-de-definir-les-conditions-d-acces-et-d-utilisation-du-site-internet-www-fm4all-com-ci-apres-le-site-edite-par-fm4all-societe-specialisee-dans-le-facility-management": "These General Terms and Conditions of Use aim to define the terms of access and use of the website www.fm4all.com (hereinafter referred to as 'the Site'), published by FM4ALL, a company specializing in facility management.",
+    "en-accedant-au-site-l-utilisateur-ci-apres-l-utilisateur-accepte-sans-reserve-les-presentes-cgu-en-cas-de-desaccord-avec-ces-conditions-l-utilisateur-est-invite-a-ne-pas-utiliser-le-site": "By accessing the Site, the user (hereinafter referred to as 'the User') fully accepts these Terms and Conditions of Use without reservation. In case of disagreement with these terms, the User is invited not to use the Site.",
+    "2-acces-au-site": "2. Access to the Site",
+    "le-site-est-accessible-gratuitement-a-tout-utilisateur-disposant-d-un-acces-a-internet-tous-les-couts-lies-a-l-acces-au-site-materiel-informatique-logiciels-connexion-internet-etc-sont-a-la-charge-de-l-utilisateur": "The Site is freely accessible to any User with Internet access. All costs related to accessing the Site (computer equipment, software, Internet connection, etc.) are the responsibility of the User.",
+    "fm4all-met-en-oeuvre-tous-les-moyens-raisonnables-pour-assurer-un-acces-de-qualite-au-site-mais-n-est-tenue-a-aucune-obligation-de-resultat-l-acces-au-site-peut-etre-interrompu-pour-des-raisons-de-maintenance-ou-pour-toute-autre-raison-sans-preavis": "FM4ALL makes every reasonable effort to ensure quality access to the Site but is not bound by any obligation of result. Access to the Site may be interrupted for maintenance or other reasons without prior notice.",
+    "3-utilisation-du-site": "3. Use of the Site",
+    "l-utilisateur-s-engage-a-utiliser-le-site-conformement-aux-presentes-cgu-et-aux-lois-en-vigueur-il-s-interdit-notamment": "The User agrees to use the Site in accordance with these Terms and Conditions of Use and applicable laws. In particular, the User is prohibited from:",
+    "d-utiliser-le-site-a-des-fins-illegales-ou-interdites-par-la-loi": "Using the Site for illegal purposes or purposes prohibited by law.",
+    "d-interferer-avec-le-bon-fonctionnement-du-site": "Interfering with the proper functioning of the Site.",
+    "de-tenter-d-acceder-de-maniere-non-autorisee-aux-systemes-informatiques-de-fm4all": "Attempting to gain unauthorized access to FM4ALL's computer systems.",
+    "4-responsabilite": "4. Liability",
+    "fm4all-s-efforce-de-fournir-des-informations-precises-et-a-jour-sur-le-site-toutefois-fm4all-ne-garantit-pas-l-exactitude-l-exhaustivite-ou-l-actualite-des-informations-diffusees-sur-le-site": "FM4ALL strives to provide accurate and up-to-date information on the Site. However, FM4ALL does not guarantee the accuracy, completeness, or timeliness of the information provided on the Site.",
+    "fm4all-ne-pourra-etre-tenue-responsable-de-tout-dommage-direct-ou-indirect-resultant-de-l-utilisation-du-site-ou-de-l-impossibilite-d-y-acceder": "FM4ALL cannot be held liable for any direct or indirect damage resulting from the use of the Site or the inability to access it.",
+    "5-propriete-intellectuelle": "5. Intellectual Property",
+    "tous-les-contenus-presents-sur-le-site-textes-images-graphismes-logos-icones-logiciels-etc-sont-la-propriete-exclusive-de-fm4all-ou-de-ses-partenaires": "All content on the Site (texts, images, graphics, logos, icons, software, etc.) is the exclusive property of FM4ALL or its partners.",
+    "toute-reproduction-distribution-modification-adaptation-retransmission-ou-publication-meme-partielle-de-ces-differents-elements-est-strictement-interdite-sans-l-accord-prealable-ecrit-de-fm4all": "Any reproduction, distribution, modification, adaptation, retransmission, or publication, even partial, of these elements is strictly prohibited without the prior written consent of FM4ALL.",
+    "6-donnees-personnelles": "6. Personal Data",
+    "l-utilisateur-est-informe-que-lors-de-sa-navigation-sur-le-site-des-donnees-personnelles-peuvent-etre-collectees-par-fm4all-notamment-via-les-formulaires-de-contact-ou-les-cookies": "The User is informed that during their navigation on the Site, personal data may be collected by FM4ALL, notably through contact forms or cookies.",
+    "fm4all-s-engage-a-traiter-ces-donnees-conformement-a-sa-politique-de-confidentialite-et-en-respectant-la-reglementation-en-vigueur-sur-la-protection-des-donnees-personnelles-rgpd": "FM4ALL undertakes to process this data in accordance with its Privacy Policy and in compliance with the applicable regulations on personal data protection (GDPR).",
+    "7-liens-hypertextes": "7. Hypertext Links",
+    "le-site-peut-contenir-des-liens-vers-des-sites-internet-tiers-fm4all-n-exerce-aucun-controle-sur-ces-sites-et-decline-toute-responsabilite-quant-a-leur-contenu": "The Site may contain links to third-party websites. FM4ALL exercises no control over these sites and disclaims any responsibility for their content.",
+    "l-insertion-de-liens-hypertextes-vers-le-site-est-autorisee-sous-reserve-de-ne-pas-porter-atteinte-a-l-image-de-fm4all-et-de-ne-pas-induire-en-erreur-sur-la-nature-des-liens-avec-fm4all": "The insertion of hypertext links to the Site is authorized provided it does not harm FM4ALL's image or mislead about the nature of the links with FM4ALL.",
+    "8-modification-des-cgu": "8. Modification of the Terms and Conditions of Use",
+    "fm4all-se-reserve-le-droit-de-modifier-a-tout-moment-les-presentes-cgu-les-nouvelles-conditions-seront-applicables-des-leur-mise-en-ligne-sur-le-site-l-utilisateur-est-donc-invite-a-consulter-regulierement-cette-page-pour-prendre-connaissance-de-toute-mise-a-jour": "FM4ALL reserves the right to modify these Terms and Conditions of Use at any time. The new terms will apply as soon as they are published on the Site. The User is therefore invited to regularly consult this page to be aware of any updates.",
+    "9-droit-applicable-et-juridiction-competente": "9. Applicable Law and Jurisdiction",
+    "les-presentes-cgu-sont-regies-par-le-droit-francais-en-cas-de-litige-relatif-a-l-interpretation-ou-a-l-execution-des-presentes-les-tribunaux-competents-de-paris-seront-seuls-competents": "These Terms and Conditions of Use are governed by French law. In the event of a dispute regarding the interpretation or execution of these terms, the competent courts of Paris will have exclusive jurisdiction."
+  },
+  "CGVPage": {
+    "conditions-generales-de-vente-cgv": "Sales Terms and Conditions",
+    "si-le-document-ne-s-affiche-pas-correctement": "If the document does not display correctly:",
+    "cliquez-ici": "Click here"
+  },
+  "DevisPage": {
+    "vous-devez-d-abord-remplir-les-informations-sur-vos": "You must first fill in the information about your",
+    "les-valeurs-de-surface-et-effectif-renseignees-ne-sont-pas-valides": "The entered area and workforce values are not valid.",
+    "veuillez-reessayer": "Please try again.",
+    "vos-locaux": "premises",
+    "precedent": "Previous ↑",
+    "suivant": "Next ↓",
+    "nous-n-avons-pas-trouve-de-tarifs-pour-ces-informations": "We could not find any pricing for this information.",
+    "fournisseur-selectionne": "Provider selected",
+    "non-propose": "Not offered",
+    "h-semaine": "h / week",
+    "euros-mois": "€/month",
+    "passage-s-de": "visit(s) of",
+    "photo-non-contractuelle": "*non-contractual photo",
+    "selectionnez-cette-proposition": "Select this proposal",
+    "entreprise-francaise-leader-sur-son-marche-souhaitant-travailler-en-marque-blanche": "French company, leader in its market, seeking to work under a white-label arrangement",
+    "annee-de-creation": "Year of establishment:",
+    "chiffre-d-affaires": "Revenue:",
+    "effectif": "Headcount:",
+    "nombre-de-clients": "Number of clients:",
+    "avis-google": "Google reviews:",
+    "choisissez-vos-options-en-gamme-capitalize-nettoyage-infos-gammeselected-chez-nettoyage-infos-nomfournisseur": "Choose your options in the {gamme} range at {nomFournisseur}",
+    "1-passage-de": "1 visit of",
+    "passages-an": "visits / year",
+    "passages-par-an": "visits per year",
+    "nombre-de-passages-an": "Number of visits / year",
+    "diminuer-le-nombre-de-passages": "Decrease the number of visits",
+    "augmenter-le-nombre-de-passages": "Increase the number of visits",
+    "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer": "The quantities are estimated for you, but you can change them",
+    "indiquez-le-nombre-de": "Enter the number of",
+    "loader": {
+      "vous-allez-obtenir-des-devis-qui-beneficient-du-service-de-gestion-centralise-fm4all": "You will receive quotes that benefit from fm4all's centralized management service:",
+      "un-seul-interlocuteur-un-seul-contrat-une-seule-facture": "One single point of contact, one contract, one invoice..."
+    },
+    "locaux": {
+      "1-mes-locaux": "1. My premises",
+      "5-informations-seulement-pour-obtenir-tous-vos-devis": "Only 5 pieces of information to receive all your quotes.",
+      "locauxForm": {
+        "code-postal": "Postal code*",
+        "surface-en-m": "Surface area in m²*",
+        "nombre-moyen-de-personnes": "Average number of people*",
+        "type-de-batiment": "Building type*",
+        "type-doccupation": "Type of occupancy*",
+        "afficher-les-tarifs": "Show prices",
+        "un-devis-est-deja-en-cours-souaitez-vous-recommencer-un-nouveau-devis-vos-informations-actuelles-seront-perdues": "A quote is already in progress. Would you like to start a new quote (your current information will be lost)?",
+        "annuler": "Cancel",
+        "code-postal-invalide": "Invalid postal code",
+        "batiments": {
+          "bureaux": "Offices",
+          "localCommercial": "Commercial premises",
+          "entrepot": "Warehouse",
+          "cabinetMedical": "Medical office"
+        },
+        "occupation": {
+          "partieEtage": "Part of a floor",
+          "plateauComplet": "Full floor or multiple floors",
+          "batimentEntier": "Entire building"
+        },
+        "erreurs": {
+          "surface": "The area must be a number between 50 and 3000 m²",
+          "effectif": "The number of people must be between 1 and 300",
+          "batiment": "Invalid building type",
+          "occupation": "Invalid type of occupancy",
+          "codePostal": "Invalid postal code, enter 5 digits"
+        }
+      }
+    },
+    "services": {
+      "2-mes-services": "2. My services",
+      "presentation": {
+        "nous-allons-vous-proposer-des-offres": "We will present you with proposals",
+        "de-plusieurs-prestataires-dans-les": "from multiple service providers across our",
+        "3-gammes": "3 tiers",
+        "pour-chacun-des-services-suivants": "for each of the following services:",
+        "pour-chaque-offre": "For each proposal:",
+        "cliquez-sur-le": "Click on the",
+        "logo-du-prestataire": "service provider's logo",
+        "pour-plus-d-informations-sur-l-entreprise": "for more information about the company.",
+        "cliquez-sur": "Click on",
+        "la-photo": "the photo",
+        "pour-en-savoir-plus-et-selectionnez-l-offre-qui-vous-convient": "to learn more and select the offer that suits you.",
+        "cards": {
+          "nettoyage-et-proprete": "Cleaning Services",
+          "hygiene-sanitaire": "Sanitary Supplies",
+          "maintenance": "Maintenance",
+          "securite-incendie": "Fire Safety",
+          "boissons-chaudes": "Hot Beverages",
+          "thes-varies": "Variety of Teas",
+          "snacks-and-fruits": "Snacks & Fruits",
+          "fontaines-a-eau": "Water fountains",
+          "office-hospitality-manager": "Office/Hospitality Manager",
+          "services-fm4all": "Fm4all services"
+        },
+        "gammes": {
+          "vous-etes-en-recherche-de-services-efficaces-et-optimises-ce-qui-est-important-pour-vous-c-est-d-etre-en-regle-et-d-apporter-ce-qui-est-essentiel-pour-votre-site": "You are looking for efficient and optimized services. What matters to you is staying compliant and providing the essentials for your site.",
+          "vous-etes-en-recherche-du-bon-rapport-qualite-prix-le-strict-minimum-vous-semble-un-peu-juste-pour-cette-prestation-et-vous-cherchez-le-bon-equilibre-dans-cette-formule-tout-est-gere-cle-en-main-sans-contraintes": "You are looking for the best value for money. The bare minimum seems a bit insufficient for this service, and you seek the right balance. In this package, everything is managed turnkey, hassle-free.",
+          "le-bien-etre-au-travail-c-est-important-vous-investissez-sur-les-services-envers-vos-collaborateurs-car-ils-vous-le-rendent-bien-l-excellence-de-service-vous-donne-tranquillite-d-esprit": "Workplace well-being is important to you. You invest in services for your employees because they give back in return. Service excellence provides you with peace of mind."
+        }
+      },
+      "nettoyage": {
+        "dun-nettoyage-essentiel-a-une-experience-5-etoiles-choisissez-la-prestation-proprete-qui-vous-ressemble-la-gamme-determine-la-frequence-de-passage-et-la-cadence-de-nettoyage": "From essential cleaning to a 5-star experience, choose the cleaning service that suits you. The tier determines the frequency of visits and the cleaning schedule.",
+        "vous-avez-choisi-nomfournisseur-pour-le-nettoyage-ce-prestataire-ou-son-partenaire-assurera-la-prestation-hygiene-sanitaire": "You have chosen {nomFournisseur} for cleaning. This provider or its partner will ensure the Sanitary Supplies service.",
+        "nettoyage": "Cleaning",
+        "entretien-fonctionnel-et-optimise": "Efficient and optimized office cleaning",
+        "equilibre-parfait-entre-qualite-et-efficacite": "The perfect balance between quality and efficiency",
+        "un-standard-de-proprete-exemplaire": "An exemplary standard of office cleanliness",
+        "nettoyage-et-proprete-options": "Cleaning Services (options)",
+        "veuillez-d-abord-selectionner-une-offre-de-nettoyage": "Please select a cleaning offer first.",
+        "non-propose-pour-une-frequence-inferieure-a-5-passages-semaine": "Not offered for a frequency of less than 5 visits/week",
+        "h-semaine-en-plus": "h / week additional",
+        "second-passage-dans-la-meme-journee-pour-entretenir-sanitaires-et-zones-sensibles": "Second visit on the same day to maintain restrooms and sensitive areas",
+        "repasse-sanitaire": "Sanitary visit",
+        "ajoute-une-journee-a-la-frequence-de-nettoyage": "Adds an extra day to the cleaning frequency",
+        "nettoyage-supplementaire-tous-les-samedis": "Additional cleaning every Saturday",
+        "nettoyage-supplementaire-tous-les-dimanches": "Additional cleaning every Sunday",
+        "vitres-et-cloisons-accessibles-de-plain-pied": "Windows and partitions accessible at ground level",
+        "lavage-vitrerie": "Window cleaning"
+      }
+    }
   }
 }
