@@ -8,6 +8,7 @@ import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { Toilet } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
@@ -25,6 +26,7 @@ const HygieneOptions = ({
   hygieneDistribTarifs,
   hygieneConsosTarifs,
 }: HygieneOptionsProps) => {
+  const t = useTranslations("DevisPage.services.hygiene");
   const { hygiene } = useContext(HygieneContext);
   const { nettoyage } = useContext(NettoyageContext);
   const { setServices } = useContext(ServicesContext);
@@ -49,12 +51,13 @@ const HygieneOptions = ({
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
           icon={Toilet}
-          title="Hygiène sanitaire (options)"
+          title={t("hygiene-sanitaire-options")}
           description={
             nettoyage.infos.fournisseurId &&
             nettoyage.infos.gammeSelected &&
             hygiene.infos.trilogieGammeSelected
-              ? "Choisissez vos options chez " +
+              ? t("choisissez-vos-options-chez") +
+                " " +
                 (hygiene.infos.nomFournisseur ?? "")
               : ""
           }
@@ -63,12 +66,13 @@ const HygieneOptions = ({
       ) : (
         <PropositionsTitle
           icon={Toilet}
-          title="Hygiène sanitaire (options)"
+          title={t("hygiene-sanitaire-options")}
           description={
             nettoyage.infos.fournisseurId &&
             nettoyage.infos.gammeSelected &&
             hygiene.infos.trilogieGammeSelected
-              ? "Choisissez vos options chez " +
+              ? t("choisissez-vos-options-chez") +
+                " " +
                 (hygiene.infos.nomFournisseur ?? "")
               : ""
           }
@@ -84,8 +88,9 @@ const HygieneOptions = ({
         !hygiene.infos.trilogieGammeSelected ? (
           <div className="flex h-full items-center justify-center text-base lg:text-lg">
             <p className="text-center text-fm4alldestructive">
-              Veuillez d&apos;abord sélectionner une offre de Nettoyage et une
-              offre d&apos;Hygiène sanitaire
+              {t(
+                "veuillez-d-abord-selectionner-une-offre-de-nettoyage-et-une-offre-d-hygiene-sanitaire"
+              )}
             </p>
           </div>
         ) : (

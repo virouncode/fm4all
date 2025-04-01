@@ -6,6 +6,7 @@ import { HygieneContext } from "@/context/HygieneProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { Minus, Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import { MAX_NB_DISTRIB } from "../(desktop)/HygieneOptionsPropositions";
 
@@ -54,6 +55,8 @@ const HygieneMobileOptionsDesinfectantInput = ({
   hygieneDistribQuantite,
   hygieneDistribTarifsFournisseur,
 }: HygieneMobileOptionsDesinfectantInputProps) => {
+  const t = useTranslations("DevisPage");
+  const tHygiene = useTranslations("DevisPage.services.hygiene");
   const { hygiene, setHygiene } = useContext(HygieneContext);
   const { setTotalHygiene } = useContext(TotalHygieneContext);
   const { client } = useContext(ClientContext);
@@ -126,13 +129,16 @@ const HygieneMobileOptionsDesinfectantInput = ({
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="font-bold text-xl">Désinfectant cuvettes</p>
+      <p className="font-bold text-xl">
+        {tHygiene("desinfectant-pour-cuvettes")}
+      </p>
       <p>
-        Indiquez le nombre de <strong>distributeurs de désinfectant</strong> :{" "}
+        {t("indiquez-le-nombre-de")}{" "}
+        <strong>{tHygiene("distributeurs-de-desinfectant")}</strong> :{" "}
       </p>
       <div className="flex flex-col w-full p-1 gap-2">
         <Label htmlFor="nbDistribDesinfectant" className="text-sm">
-          Nombre de distributeurs
+          {tHygiene("nombre-de-distributeurs")}
         </Label>
         <div className="flex items-center gap-2">
           <Input
@@ -152,7 +158,7 @@ const HygieneMobileOptionsDesinfectantInput = ({
           />
           <Button
             variant="outline"
-            title="Diminuer le nombre de distributeurs"
+            title={tHygiene("diminuer-le-nombre-de-distributeurs")}
             onClick={handleDecrement}
             disabled={nbDistribDesinfectant === 0}
           >
@@ -160,7 +166,7 @@ const HygieneMobileOptionsDesinfectantInput = ({
           </Button>
           <Button
             variant="outline"
-            title="Augmenter le nombre de distributeurs"
+            title={tHygiene("augmenter-le-nombre-de-distributeurs")}
             onClick={handleIncrement}
             disabled={nbDistribDesinfectant === MAX_NB_DISTRIB}
           >
@@ -169,7 +175,9 @@ const HygieneMobileOptionsDesinfectantInput = ({
         </div>
 
         <p className="text-xs italic text-fm4alldestructive">
-          Les quantités sont estimées pour vous mais vous pouvez les changer
+          {t(
+            "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer"
+          )}
         </p>
       </div>
     </div>

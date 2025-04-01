@@ -13,6 +13,7 @@ import { HygieneContext } from "@/context/HygieneProvider";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { Minus, Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import React, { useContext } from "react";
 import { MAX_NB_EMP, MAX_NB_PH, MAX_NB_SAVON } from "../HygienePropositions";
 
@@ -46,22 +47,26 @@ const HygieneMobileDistribQuantitesInputs = ({
   handleIncrement,
   handleDecrement,
 }: HygieneMobileDistribQuantitesInputsProps) => {
+  const t = useTranslations("DevisPage");
+  const tHygiene = useTranslations("DevisPage.services.hygiene");
+  const tLocation = useTranslations("DevisPage.location");
   const { hygiene } = useContext(HygieneContext);
 
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-4">
         <p>
-          Indiquez la <strong>durée d&apos;engagement</strong> souhaitée :{" "}
+          {t("indiquez-la")} <strong>{t("duree-d-engagement")}</strong>{" "}
+          {t("souhaitee")}{" "}
         </p>
         <div className="flex flex-col w-full p-1 gap-2">
           <Label htmlFor="nbDistribPh" className="text-sm flex-1">
-            Durée de location
+            {t("duree-de-location")}
           </Label>
           <Select
             onValueChange={handleChangeDureeLocation}
             value={dureeLocation}
-            aria-label="Sélectionnez la durée de location"
+            aria-label={t("selectionnez-la-duree-de-location")}
           >
             <SelectTrigger className="w-full">
               <SelectValue />
@@ -72,7 +77,7 @@ const HygieneMobileDistribQuantitesInputs = ({
                 .map((item) => {
                   // Check if there is any tarif for the current item's id
                   const isDisabled = !hygieneDistribTarifs.some((tarif) =>
-                    ["pa12M", "pa24M", "pa36M", "oneShot"].some(
+                    ["pa12M", "pa24M", "pa36M"].some(
                       (key) =>
                         tarif[key as keyof typeof tarif] &&
                         item.id.toString() === key
@@ -84,7 +89,7 @@ const HygieneMobileDistribQuantitesInputs = ({
                       value={item.id.toString() ?? ""}
                       disabled={isDisabled}
                     >
-                      {item.description}
+                      {tLocation(item.id)}
                     </SelectItem>
                   );
                 })}
@@ -94,12 +99,12 @@ const HygieneMobileDistribQuantitesInputs = ({
       </div>
       <div className="flex flex-col gap-4">
         <p>
-          Indiquez le nombre de{" "}
-          <strong>distributeurs essuie-mains papier</strong> :
+          {t("indiquez-le-nombre-de")}{" "}
+          <strong>{tHygiene("distributeurs-essuie-mains-papier")}</strong> :
         </p>
         <div className="flex flex-col w-full p-1 gap-2">
           <Label htmlFor="nbDistribEmp" className="text-sm flex-1">
-            Nombre de distributeurs
+            {tHygiene("nombre-de-distributeurs")}
           </Label>
           <div className="flex items-center gap-2">
             <Input
@@ -119,7 +124,7 @@ const HygieneMobileDistribQuantitesInputs = ({
             />
             <Button
               variant="outline"
-              title="Diminuer le nombre de distributeurs"
+              title={tHygiene("diminuer-le-nombre-de-distributeurs")}
               onClick={() => handleDecrement("emp")}
               disabled={nbDistribEmp === 0}
             >
@@ -127,7 +132,7 @@ const HygieneMobileDistribQuantitesInputs = ({
             </Button>
             <Button
               variant="outline"
-              title="Augmenter le nombre de distributeurs"
+              title={tHygiene("augmenter-le-nombre-de-distributeurs")}
               onClick={() => handleIncrement("emp")}
               disabled={nbDistribEmp === MAX_NB_EMP}
             >
@@ -136,17 +141,20 @@ const HygieneMobileDistribQuantitesInputs = ({
           </div>
 
           <p className="text-xs italic text-fm4alldestructive">
-            Les quantités sont estimées pour vous mais vous pouvez les changer
+            {t(
+              "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer"
+            )}
           </p>
         </div>
       </div>
       <div className="flex flex-col gap-4">
         <p>
-          Indiquez le nombre de <strong>distributeurs de savon</strong> :
+          {t("indiquez-le-nombre-de")}{" "}
+          <strong>{tHygiene("distributeurs-de-savon")}</strong> :
         </p>
         <div className="flex flex-col w-full p-1 gap-2">
           <Label htmlFor="nbDistribSavon" className="text-sm flex-1">
-            Nombre de distributeurs
+            {tHygiene("nombre-de-distributeurs")}
           </Label>
           <div className="flex items-center gap-2">
             <Input
@@ -166,7 +174,7 @@ const HygieneMobileDistribQuantitesInputs = ({
             />
             <Button
               variant="outline"
-              title="Diminuer le nombre de distributeurs"
+              title={tHygiene("diminuer-le-nombre-de-distributeurs")}
               onClick={() => handleDecrement("savon")}
               disabled={nbDistribSavon === 0}
             >
@@ -174,7 +182,7 @@ const HygieneMobileDistribQuantitesInputs = ({
             </Button>
             <Button
               variant="outline"
-              title="Augmenter le nombre de distributeurs"
+              title={tHygiene("augmenter-le-nombre-de-distributeurs")}
               onClick={() => handleIncrement("savon")}
               disabled={nbDistribSavon === MAX_NB_SAVON}
             >
@@ -183,18 +191,20 @@ const HygieneMobileDistribQuantitesInputs = ({
           </div>
 
           <p className="text-xs italic text-fm4alldestructive">
-            Les quantités sont estimées pour vous mais vous pouvez les changer
+            {t(
+              "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer"
+            )}
           </p>
         </div>
       </div>
       <div className="flex flex-col gap-4">
         <p>
-          Indiquez le nombre de{" "}
-          <strong>distributeurs de papier hygiénique</strong> :
+          {t("indiquez-le-nombre-de")}{" "}
+          <strong>{tHygiene("distributeurs-de-papier-hygienique")}</strong> :
         </p>
         <div className="flex flex-col w-full p-1 gap-2">
           <Label htmlFor="nbDistribPh" className="text-sm flex-1">
-            Nombre de distributeurs
+            {tHygiene("nombre-de-distributeurs")}
           </Label>
           <div className="flex items-center gap-2">
             <Input
@@ -214,7 +224,7 @@ const HygieneMobileDistribQuantitesInputs = ({
             />
             <Button
               variant="outline"
-              title="Diminuer le nombre de distributeurs"
+              title={tHygiene("diminuer-le-nombre-de-distributeurs")}
               onClick={() => handleDecrement("ph")}
               disabled={nbDistribPh === 0}
             >
@@ -222,7 +232,7 @@ const HygieneMobileDistribQuantitesInputs = ({
             </Button>
             <Button
               variant="outline"
-              title="Augmenter le nombre de distributeurs"
+              title={tHygiene("augmenter-le-nombre-de-distributeurs")}
               onClick={() => handleIncrement("ph")}
               disabled={nbDistribPh === MAX_NB_PH}
             >
@@ -231,7 +241,9 @@ const HygieneMobileDistribQuantitesInputs = ({
           </div>
 
           <p className="text-xs italic text-fm4alldestructive">
-            Les quantités sont estimées pour vous mais vous pouvez les changer
+            {t(
+              "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer"
+            )}
           </p>
         </div>
       </div>

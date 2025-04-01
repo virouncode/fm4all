@@ -613,6 +613,7 @@
     "euros-mois": "€/month",
     "passage-s-de": "visit(s) of",
     "photo-non-contractuelle": "*non-contractual photo",
+    "photos-non-contractuelles": "*non-contractual photos",
     "selectionnez-cette-proposition": "Select this proposal",
     "entreprise-francaise-leader-sur-son-marche-souhaitant-travailler-en-marque-blanche": "French company, leader in its market, seeking to work under a white-label arrangement",
     "annee-de-creation": "Year of establishment:",
@@ -629,6 +630,21 @@
     "augmenter-le-nombre-de-passages": "Increase the number of visits",
     "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer": "The quantities are estimated for you, but you can change them",
     "indiquez-le-nombre-de": "Enter the number of",
+    "indiquez-la": "Select the",
+    "duree-d-engagement": "commitment duration",
+    "souhaitee": "",
+    "duree-de-location": "Rental duration",
+    "selectionnez-la-duree-de-location": "Select the rental duration",
+    "eur-d-installation": "€ installation fee",
+    "location-engagement": "Rental commitment {duree} months",
+    "consommables-inclus": "Consumables included",
+    "location": {
+      "pa12M": "12-month rental",
+      "pa24M": "24-month rental",
+      "pa36M": "36-month rental",
+      "pa48M": "48-month rental",
+      "pa60M": "60-month rental"
+    },
     "loader": {
       "vous-allez-obtenir-des-devis-qui-beneficient-du-service-de-gestion-centralise-fm4all": "You will receive quotes that benefit from fm4all's centralized management service:",
       "un-seul-interlocuteur-un-seul-contrat-une-seule-facture": "One single point of contact, one contract, one invoice..."
@@ -716,6 +732,29 @@
         "nettoyage-supplementaire-tous-les-dimanches": "Additional cleaning every Sunday",
         "vitres-et-cloisons-accessibles-de-plain-pied": "Windows and partitions accessible at ground level",
         "lavage-vitrerie": "Window cleaning"
+      },
+      "hygiene": {
+        "un-tarif-forfaitaire-tout-compris-pour-vos-sanitaires-avec-distributeurs-et-consommables-mis-en-place-essuie-main-papier-savon-and-papier-hygienique-la-gamme-determine-la-finition-des-distributeurs": "An all-inclusive flat rate for your restrooms with installed dispensers and supplies: paper hand towels, soap & toilet paper. The tier determines the dispenser finish.",
+        "essuie-mains-papier-savon-papier-hygienique": "Paper hand towels, soap, toilet paper",
+        "distributeurs-essuie-mains-papier": "paper hand towel dispensers",
+        "nombre-de-distributeurs": "Number of dispensers",
+        "diminuer-le-nombre-de-distributeurs": "Decrease the number of dispensers",
+        "augmenter-le-nombre-de-distributeurs": "Increase the number of dispensers",
+        "distributeurs-de-savon": "soap dispensers",
+        "distributeurs-de-papier-hygienique": "toilet paper dispensers",
+        "distributeurs": "Dispensers",
+        "blancs-basic": "Basic white",
+        "couleur": "Colored",
+        "inox": "Stainless steel",
+        "illustration-hygiene-sanitaire": "Sanitary hygiene illustration",
+        "illustration-essuie-mains-papier": "Paper hand towel dispenser illustration",
+        "illustration-distributeur-papier-hygienique": "Toilet paper dispenser illustration",
+        "illustration-distributeur-savon": "Soap dispenser illustration",
+        "hygiene-sanitaire-options": "Sanitary Supplies (options)",
+        "choisissez-vos-options-chez": "Choose your options at",
+        "veuillez-d-abord-selectionner-une-offre-de-nettoyage-et-une-offre-d-hygiene-sanitaire": "Please first select a Cleaning offer and a Sanitary Hygiene offer.",
+        "desinfectant-pour-cuvettes": "Toilet bowl disinfectant",
+        "distributeurs-de-desinfectant": "disinfectant dispensers"
       }
     }
   }

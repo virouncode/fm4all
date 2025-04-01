@@ -8,6 +8,7 @@ import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQ
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs";
 import { Toilet } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
@@ -27,6 +28,11 @@ const Hygiene = ({
   hygieneDistribInstalTarifs,
   hygieneConsosTarifs,
 }: HygieneProps) => {
+  const tHygiene = useTranslations("DevisPage.services.hygiene");
+  const tPresentation = useTranslations(
+    "DevisPage.services.presentation.cards"
+  );
+  const tNettoyage = useTranslations("DevisPage.services.nettoyage");
   const { nettoyage } = useContext(NettoyageContext);
   const { services, setServices } = useContext(ServicesContext);
   const propositionsRef = useRef<HTMLDivElement>(null);
@@ -51,15 +57,19 @@ const Hygiene = ({
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
           icon={Toilet}
-          title="Hygiène sanitaire"
-          description="Un tarif forfaitaire tout compris pour vos sanitaires avec distributeurs et consommables mis en place : essuie-main papier, savon & papier hygiénique. La gamme détermine la finition des distributeurs"
+          title={tPresentation("hygiene-sanitaire")}
+          description={tHygiene(
+            "un-tarif-forfaitaire-tout-compris-pour-vos-sanitaires-avec-distributeurs-et-consommables-mis-en-place-essuie-main-papier-savon-and-papier-hygienique-la-gamme-determine-la-finition-des-distributeurs"
+          )}
           propositionsRef={propositionsRef}
         />
       ) : (
         <PropositionsTitle
           icon={Toilet}
-          title="Hygiène sanitaire"
-          description="Un tarif forfaitaire tout compris pour vos sanitaires avec distributeurs et consommables mis en place : essuie-main papier, savon & papier hygiénique. La gamme détermine la finition des distributeurs"
+          title={tPresentation("hygiene-sanitaire")}
+          description={tHygiene(
+            "un-tarif-forfaitaire-tout-compris-pour-vos-sanitaires-avec-distributeurs-et-consommables-mis-en-place-essuie-main-papier-savon-and-papier-hygienique-la-gamme-determine-la-finition-des-distributeurs"
+          )}
           handleClickPrevious={handleClickPrevious}
         />
       )}
@@ -67,7 +77,9 @@ const Hygiene = ({
         {!nettoyage.infos.fournisseurId || !nettoyage.infos.gammeSelected ? (
           <div className="flex h-full items-center justify-center text-base lg:text-lg">
             <p className="text-center text-fm4alldestructive">
-              Veuillez d&apos;abord sélectionner une offre de Nettoyage.
+              {tNettoyage(
+                "veuillez-d-abord-selectionner-une-offre-de-nettoyage"
+              )}
             </p>
           </div>
         ) : (

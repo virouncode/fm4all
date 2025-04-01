@@ -1,5 +1,6 @@
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
+import { useTranslations } from "next-intl";
 import React from "react";
 import HygieneMobileDistribQuantitesInputs from "./HygieneMobileDistribQuantitesInputs";
 import HygieneMobileTrilogieCarousel from "./HygieneMobileTrilogieCarousel";
@@ -89,10 +90,11 @@ const HygieneMobilePropositions = ({
   handleIncrement,
   handleDecrement,
 }: HygieneMobilePropositionsProps) => {
+  const t = useTranslations("DevisPage.services.hygiene");
   return (
     <div className="flex flex-col gap-6 w-full">
       <p className="font-bold text-xl lg:hidden">
-        Essuie-mains papier, savon, papier hygiénique
+        {t("essuie-mains-papier-savon-papier-hygienique")}
       </p>
       <HygieneMobileDistribQuantitesInputs
         hygieneDistribQuantite={hygieneDistribQuantite}

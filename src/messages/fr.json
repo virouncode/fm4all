@@ -611,6 +611,7 @@
     "euros-mois": "€/mois",
     "passage-s-de": "passage(s) de",
     "photo-non-contractuelle": "*photo non contractuelle",
+    "photos-non-contractuelles": "*photos non contractuelles",
     "selectionnez-cette-proposition": "Sélectionnez cette proposition",
     "entreprise-francaise-leader-sur-son-marche-souhaitant-travailler-en-marque-blanche": "Entreprise française leader sur son marché souhaitant travailler en marque blanche",
     "annee-de-creation": "Année de création :",
@@ -627,6 +628,21 @@
     "augmenter-le-nombre-de-passages": "Augmenter le nombre de passages",
     "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer": "Les quantités sont estimées pour vous mais vous pouvez les changer",
     "indiquez-le-nombre-de": "Indiquez le nombre de",
+    "indiquez-la": "Indiquez la",
+    "duree-d-engagement": "durée d'engagement",
+    "souhaitee": "souhaitée",
+    "duree-de-location": "Durée de location",
+    "selectionnez-la-duree-de-location": "Sélectionnez la durée de location",
+    "eur-d-installation": "€ d'installation",
+    "location-engagement": "Location engagement {duree} mois",
+    "consommables-inclus": "Consommables inclus",
+    "location": {
+      "pa12M": "Location 12 mois",
+      "pa24M": "Location 24 mois",
+      "pa36M": "Location 36 mois",
+      "pa48M": "Location 48 mois",
+      "pa60M": "Location 60 mois"
+    },
     "loader": {
       "vous-allez-obtenir-des-devis-qui-beneficient-du-service-de-gestion-centralise-fm4all": "Vous allez obtenir des devis qui bénéficient du service de gestion centralisé fm4all :",
       "un-seul-interlocuteur-un-seul-contrat-une-seule-facture": "Un seul interlocuteur, un seul contrat, une seule facture..."
@@ -714,6 +730,29 @@
         "nettoyage-supplementaire-tous-les-dimanches": "Nettoyage supplémentaire tous les dimanches",
         "vitres-et-cloisons-accessibles-de-plain-pied": "Vitres et cloisons accessibles de plain-pied",
         "lavage-vitrerie": "Lavage Vitrerie"
+      },
+      "hygiene": {
+        "un-tarif-forfaitaire-tout-compris-pour-vos-sanitaires-avec-distributeurs-et-consommables-mis-en-place-essuie-main-papier-savon-and-papier-hygienique-la-gamme-determine-la-finition-des-distributeurs": "Un tarif forfaitaire tout compris pour vos sanitaires avec distributeurs et consommables mis en place : essuie-main papier, savon & papier hygiénique. La gamme détermine la finition des distributeurs",
+        "essuie-mains-papier-savon-papier-hygienique": "Essuie-mains papier, savon, papier hygiénique",
+        "distributeurs-essuie-mains-papier": "distributeurs essuie-mains papier",
+        "nombre-de-distributeurs": "Nombre de distributeurs",
+        "diminuer-le-nombre-de-distributeurs": "Diminuer le nombre de distributeurs",
+        "augmenter-le-nombre-de-distributeurs": "Augmenter le nombre de distributeurs",
+        "distributeurs-de-savon": "distributeurs de savon",
+        "distributeurs-de-papier-hygienique": "distributeurs de papier hygiénique",
+        "distributeurs": "Distributeurs",
+        "blancs-basic": "blancs basic",
+        "couleur": "couleur",
+        "inox": "inox",
+        "illustration-hygiene-sanitaire": "illustration hygiène sanitaire",
+        "illustration-essuie-mains-papier": "illustration essuie-mains papier",
+        "illustration-distributeur-papier-hygienique": "illustration distributeur de papier hygiénique",
+        "illustration-distributeur-savon": "illustration distributeur de savon",
+        "hygiene-sanitaire-options": "Hygiène sanitaire (options)",
+        "choisissez-vos-options-chez": "Choisissez vos options chez",
+        "veuillez-d-abord-selectionner-une-offre-de-nettoyage-et-une-offre-d-hygiene-sanitaire": "Veuillez d'abord sélectionner une offre de Nettoyage et une offre d'Hygiène sanitaire",
+        "desinfectant-pour-cuvettes": "Désinfectant pour cuvettes",
+        "distributeurs-de-desinfectant": "distributeurs de désinfectant"
       }
     }
   }

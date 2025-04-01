@@ -15,6 +15,7 @@ import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { Info } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { ChangeEvent, useContext } from "react";
 import { MAX_NB_DISTRIB } from "./HygieneOptionsPropositions";
@@ -90,11 +91,15 @@ const HygieneOptionsDesinfectantCard = ({
   hygieneDistribQuantite,
   propositions,
 }: HygieneOptionsDesinfectantCardProps) => {
+  const t = useTranslations("DevisPage");
+  const tHygiene = useTranslations("DevisPage.services.hygiene");
+  const tGlobal = useTranslations("Global");
+  const locale = useLocale();
   const { hygiene } = useContext(HygieneContext);
   return (
     <div className="flex border-b flex-1">
       <div className="flex w-1/4 items-center justify-center flex-col gap-2 p-2">
-        <p className="text-base">Desinfectant pour cuvettes</p>
+        <p className="text-base">{tHygiene("desinfectant-pour-cuvettes")}</p>
         <div className="text-sm flex flex-col gap-2">
           <div className="flex gap-4 items-center justify-center w-full">
             <Input
@@ -127,7 +132,7 @@ const HygieneOptionsDesinfectantCard = ({
               className={`flex flex-1 bg-${color} text-slate-200 items-center p-2 justify-center text-xl gap-4 `}
               key={"desinfectant" + gamme}
             >
-              Non proposé
+              {t("non-propose")}
             </div>
           );
         }
@@ -136,16 +141,16 @@ const HygieneOptionsDesinfectantCard = ({
             {formatNumber(
               Math.round((proposition.totalDesinfectant * MARGE) / 12)
             )}{" "}
-            €/mois
+            {t("euros-mois")}
           </p>
         );
         const dialogTitle = (
           <p className={`text-${color} text-center`}>
             {proposition.gamme === "essentiel"
-              ? "Essentiel"
+              ? tGlobal("essentiel")
               : proposition.gamme === "confort"
-              ? "Confort"
-              : "Excellence"}
+                ? tGlobal("confort")
+                : tGlobal("excellence")}
           </p>
         );
         const imgProduit = proposition.imageUrlDesinfectant ? (
@@ -161,52 +166,74 @@ const HygieneOptionsDesinfectantCard = ({
         ) : null;
         const infosProduit = (
           <ul className="flex flex-col text-xs px-4 mx-auto">
-            <li className="list-check">
-              Distributeurs{" "}
-              {gamme === "essentiel"
-                ? "blancs basic"
-                : gamme === "confort"
-                ? "couleur"
-                : "inox"}
-            </li>
-            <li className="list-check">Consommables inclus</li>
+            {locale === "fr" ? (
+              <li className="list-check">
+                {tHygiene("distributeurs")}{" "}
+                {gamme === "essentiel"
+                  ? tHygiene("blancs-basic")
+                  : gamme === "confort"
+                    ? tHygiene("couleur")
+                    : tHygiene("inox")}
+              </li>
+            ) : (
+              <li className="list-check">
+                {gamme === "essentiel"
+                  ? tHygiene("blancs-basic")
+                  : gamme === "confort"
+                    ? tHygiene("couleur")
+                    : tHygiene("inox")}{" "}
+                {tHygiene("distributeurs")}
+              </li>
+            )}
+            <li className="list-check">{t("consommables-inclus")}</li>
             <li className="list-check">
               {hygiene.infos.dureeLocation === "oneShot"
                 ? ""
-                : `Location engagement
-              ${
-                hygiene.infos.dureeLocation === "pa12M"
-                  ? "12"
-                  : hygiene.infos.dureeLocation === "pa24M"
-                  ? "24"
-                  : "36"
-              } mois`}
+                : t("location-engagement", {
+                    duree:
+                      hygiene.infos.dureeLocation === "pa12M"
+                        ? "12"
+                        : hygiene.infos.dureeLocation === "pa24M"
+                          ? "24"
+                          : "36",
+                  })}
             </li>
           </ul>
         );
 
         const infosProduitDialog = (
           <ul className="flex flex-col text-sm px-4 mx-auto">
-            <li className="list-check">
-              Distributeurs{" "}
-              {gamme === "essentiel"
-                ? "blancs basic"
-                : gamme === "confort"
-                ? "couleur"
-                : "inox"}
-            </li>
-            <li className="list-check">Consommables inclus</li>
+            {locale === "fr" ? (
+              <li className="list-check">
+                {tHygiene("distributeurs")}{" "}
+                {gamme === "essentiel"
+                  ? tHygiene("blancs-basic")
+                  : gamme === "confort"
+                    ? tHygiene("couleur")
+                    : tHygiene("inox")}
+              </li>
+            ) : (
+              <li className="list-check">
+                {gamme === "essentiel"
+                  ? tHygiene("blancs-basic")
+                  : gamme === "confort"
+                    ? tHygiene("couleur")
+                    : tHygiene("inox")}{" "}
+                {tHygiene("distributeurs")}
+              </li>
+            )}
+            <li className="list-check">{t("consommables-inclus")}</li>
             <li className="list-check">
               {hygiene.infos.dureeLocation === "oneShot"
                 ? ""
-                : `Location engagement
-                  ${
-                    hygiene.infos.dureeLocation === "pa12M"
-                      ? "12"
-                      : hygiene.infos.dureeLocation === "pa24M"
-                      ? "24"
-                      : "36"
-                  } mois`}
+                : t("location-engagement", {
+                    duree:
+                      hygiene.infos.dureeLocation === "pa12M"
+                        ? "12"
+                        : hygiene.infos.dureeLocation === "pa24M"
+                          ? "24"
+                          : "36",
+                  })}
             </li>
           </ul>
         );
@@ -227,7 +254,7 @@ const HygieneOptionsDesinfectantCard = ({
                 handleClickProposition("desinfectant", proposition)
               }
               className="data-[state=checked]:bg-fm4alldestructive"
-              title="Sélectionner cette proposition"
+              title={t("selectionnez-cette-proposition")}
             />
             <div>
               <div className="flex gap-2 items-center">
@@ -246,7 +273,7 @@ const HygieneOptionsDesinfectantCard = ({
                     </DialogHeader>
                     {imgProduit}
                     <p className="text-xs italic text-end">
-                      *photo non contractuelle
+                      {t("photo-non-contractuelle")}
                     </p>
                     {infosProduitDialog}
                   </DialogContent>

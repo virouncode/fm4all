@@ -13,6 +13,7 @@ import { HygieneContext } from "@/context/HygieneProvider";
 import { DureeLocationHygieneType } from "@/zod-schemas/dureeLocation";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import { MAX_NB_EMP, MAX_NB_PH, MAX_NB_SAVON } from "../HygienePropositions";
 
@@ -40,6 +41,9 @@ const HygieneDistribQuantitesInputs = ({
   nbDistribPh,
   dureeLocation,
 }: HygieneDistribQuantitesInputsProps) => {
+  const t = useTranslations("DevisPage");
+  const tHygiene = useTranslations("DevisPage.services.hygiene");
+  const tLocation = useTranslations("DevisPage.location");
   const { hygiene } = useContext(HygieneContext);
   return (
     <div className="flex flex-col gap-6 w-full">
@@ -60,7 +64,7 @@ const HygieneDistribQuantitesInputs = ({
           id="nbDistribEmp"
         />
         <Label htmlFor="nbDistribEmp" className="text-sm flex-1">
-          distributeurs essuie-main papier
+          {tHygiene("distributeurs-essuie-mains-papier")}
         </Label>
       </div>
       <div className="flex gap-4 items-center w-full">
@@ -80,7 +84,7 @@ const HygieneDistribQuantitesInputs = ({
           id="nbDistribSavon"
         />
         <Label htmlFor="nbDistribSavon" className="text-sm flex-1">
-          distributeurs savon
+          {tHygiene("distributeurs-de-savon")}
         </Label>
       </div>
       <div className="flex gap-4 items-center w-full">
@@ -100,14 +104,14 @@ const HygieneDistribQuantitesInputs = ({
           id="nbDistribPh"
         />
         <Label htmlFor="nbDistribPh" className="text-sm flex-1">
-          distributeurs papier hygiénique
+          {tHygiene("distributeurs-de-papier-hygienique")}
         </Label>
       </div>
       <div>
         <Select
           onValueChange={handleChangeDureeLocation}
           value={dureeLocation}
-          aria-label="Sélectionnez la durée de location"
+          aria-label={t("selectionnez-la-duree-de-location")}
         >
           <SelectTrigger className={`w-full max-w-xs`}>
             <SelectValue />
@@ -118,7 +122,7 @@ const HygieneDistribQuantitesInputs = ({
               .map((item) => {
                 // Check if there is any tarif for the current item's id
                 const isDisabled = !hygieneDistribTarifs.some((tarif) =>
-                  ["pa12M", "pa24M", "pa36M", "oneShot"].some(
+                  ["pa12M", "pa24M", "pa36M"].some(
                     (key) =>
                       tarif[key as keyof typeof tarif] &&
                       item.id.toString() === key
@@ -130,7 +134,7 @@ const HygieneDistribQuantitesInputs = ({
                     value={item.id.toString() ?? ""}
                     disabled={isDisabled}
                   >
-                    {item.description}
+                    {tLocation(item.id)}
                   </SelectItem>
                 );
               })}
@@ -138,7 +142,9 @@ const HygieneDistribQuantitesInputs = ({
         </Select>
       </div>
       <p className="text-xs text-fm4alldestructive italic px-2 text-center">
-        Les quantités sont estimées pour vous mais vous pouvez les changer
+        {t(
+          "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer"
+        )}
       </p>
     </div>
   );
