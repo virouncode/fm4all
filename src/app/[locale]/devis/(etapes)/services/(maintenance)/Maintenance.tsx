@@ -7,6 +7,7 @@ import { SelectMaintenanceTarifsType } from "@/zod-schemas/maintenanceTarifs";
 import { SelectQ18TarifsType } from "@/zod-schemas/q18Tarifs";
 import { SelectQualiteAirTarifsType } from "@/zod-schemas/qualiteAirTarifs";
 import { Wrench } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
@@ -28,6 +29,7 @@ const Maintenance = ({
   legioTarifs,
   qualiteAirTarifs,
 }: MaintenanceProps) => {
+  const t = useTranslations("DevisPage.services.maintenance");
   const { setServices } = useContext(ServicesContext);
   const propositionsRef = useRef<HTMLDivElement>(null);
 
@@ -51,15 +53,19 @@ const Maintenance = ({
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="5">
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
-          title="Maintenance"
-          description="Obligations légales & veille réglementaire, bien-être, petits travaux, lien avec le gestionnaire de l’immeuble... déléguez la maintenance et le suivi de vos contrôles."
+          title={t("maintenance")}
+          description={t(
+            "obligations-legales-and-veille-reglementaire-bien-etre-petits-travaux-lien-avec-le-gestionnaire-de-limmeuble-deleguez-la-maintenance-et-le-suivi-de-vos-controles"
+          )}
           icon={Wrench}
           propositionsRef={propositionsRef}
         />
       ) : (
         <PropositionsTitle
-          title="Maintenance"
-          description="Obligations légales & veille réglementaire, bien-être, petits travaux, lien avec le gestionnaire de l’immeuble... déléguez la maintenance et le suivi de vos contrôles."
+          title={t("maintenance")}
+          description={t(
+            "obligations-legales-and-veille-reglementaire-bien-etre-petits-travaux-lien-avec-le-gestionnaire-de-limmeuble-deleguez-la-maintenance-et-le-suivi-de-vos-controles"
+          )}
           icon={Wrench}
           handleClickPrevious={handleClickPrevious}
         />

@@ -7,6 +7,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import {
   MAX_NB_BAES,
@@ -31,6 +32,8 @@ const SecuriteIncendieInputs = ({
   handleChangeNbr,
   incendieQuantite,
 }: SecuriteIncendieInputsProps) => {
+  const t = useTranslations("DevisPage");
+  const tIncendie = useTranslations("DevisPage.services.incendie");
   return (
     <div className="flex flex-col gap-6 w-3/4">
       <TooltipProvider delayDuration={0}>
@@ -52,7 +55,7 @@ const SecuriteIncendieInputs = ({
                 id="nbExtincteurs"
               />
               <Label htmlFor="nbExtincteurs" className="text-sm flex-1">
-                extincteur(s)
+                {tIncendie("extincteurs").toLowerCase()}
               </Label>
             </div>
           </TooltipTrigger>
@@ -88,7 +91,9 @@ const SecuriteIncendieInputs = ({
                 }`}
               />
               <Label htmlFor="nbBaes" className="text-sm flex-1">
-                BAES (blocs autonomes d’éclairage de sécurité)
+                {tIncendie(
+                  "baes-blocs-autonomes-d-eclairage-de-securite"
+                ).toLowerCase()}
               </Label>
             </div>
           </TooltipTrigger>
@@ -96,7 +101,9 @@ const SecuriteIncendieInputs = ({
             <div className="w-40 h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
               <Image
                 src={"/img/services/baes.webp"}
-                alt={`illustration de bloc autonome d'eclairage de securite`}
+                alt={tIncendie(
+                  "illustration-de-bloc-autonome-declairage-de-securite"
+                )}
                 fill={true}
                 className="object-contain object-center cursor-pointer"
                 quality={100}
@@ -122,7 +129,7 @@ const SecuriteIncendieInputs = ({
                 id="nbTelBaes"
               />
               <Label htmlFor="nbTelBaes" className="text-sm flex-1">
-                télécommande(s) BAES
+                {tIncendie("telecommandes-baes").toLowerCase()}
               </Label>
             </div>
           </TooltipTrigger>
@@ -130,7 +137,9 @@ const SecuriteIncendieInputs = ({
             <div className="w-40 h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
               <Image
                 src={"/img/services/tel_baes.webp"}
-                alt={`illustration de telecommande de bloc autonome d'eclairage de securite`}
+                alt={tIncendie(
+                  "illustration-de-telecommande-de-bloc-autonome-declairage-de-securite"
+                )}
                 fill={true}
                 className="object-contain object-center cursor-pointer"
                 quality={100}

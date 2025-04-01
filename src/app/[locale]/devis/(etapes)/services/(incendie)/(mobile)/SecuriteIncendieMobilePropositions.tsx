@@ -1,6 +1,7 @@
 import React from "react";
 import SecuriteIncendieMobileCards from "./SecuriteIncendieMobileCards";
 import SecuriteIncendieMobileInputs from "./SecuriteIncendieMobileInputs";
+import { useTranslations } from "next-intl";
 
 type SecuriteIncendieMobilePropositionsProps = {
   propositions: {
@@ -75,10 +76,11 @@ const SecuriteIncendieMobilePropositions = ({
   handleIncrement,
   handleDecrement,
 }: SecuriteIncendieMobilePropositionsProps) => {
+  const t = useTranslations("DevisPage.services.incendie");
   return (
     <div className="flex flex-col gap-6 w-full">
       <p className="font-bold text-xl lg:hidden">
-        Sécurité incendie : contrôles obligatoires
+        {t("securite-incendie-controles-obligatoires")}
       </p>
       <SecuriteIncendieMobileInputs
         nbExtincteurs={nbExtincteurs}

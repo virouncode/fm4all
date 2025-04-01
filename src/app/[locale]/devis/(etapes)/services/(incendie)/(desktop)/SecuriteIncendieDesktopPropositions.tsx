@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import SecuriteIncendieFournisseurLogo from "../SecuriteIncendieFournisseurLogo";
 import SecuriteIncendieInputs from "../SecuriteIncendieInputs";
 import SecuriteIncendiePropostionCard from "../SecuriteIncendiePropostionCard";
@@ -71,6 +72,7 @@ const SecuriteIncendieDesktopPropositions = ({
   incendieQuantite,
   handleClickProposition,
 }: SecuriteIncendieDesktopPropositionsProps) => {
+  const t = useTranslations("DevisPage");
   return (
     <div className="h-full flex flex-col border rounded-xl overflow-auto">
       {propositions.length > 0 &&
@@ -86,8 +88,9 @@ const SecuriteIncendieDesktopPropositions = ({
                 incendieQuantite={incendieQuantite}
               />
               <p className="text-xs text-fm4alldestructive italic px-2 text-center">
-                Les quantités sont estimées pour vous mais vous pouvez les
-                changer
+                {t(
+                  "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer"
+                )}
               </p>
             </div>
             <SecuriteIncendiePropostionCard

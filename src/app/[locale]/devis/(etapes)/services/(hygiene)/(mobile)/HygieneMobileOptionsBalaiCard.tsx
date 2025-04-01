@@ -13,6 +13,7 @@ import { MARGE } from "@/constants/constants";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { useContext } from "react";
 
@@ -78,6 +79,10 @@ const HygieneMobileOptionsBalaiCard = ({
   proposition,
   handleClickProposition,
 }: HygieneMobileOptionsBalaiCardProps) => {
+  const t = useTranslations("DevisPage");
+  const tHygiene = useTranslations("DevisPage.services.hygiene");
+  const tGlobal = useTranslations("Global");
+  const locale = useLocale();
   const { hygiene } = useContext(HygieneContext);
   const {
     gamme,
@@ -97,19 +102,19 @@ const HygieneMobileOptionsBalaiCard = ({
   const color = getFm4AllColor(gamme);
   const prixMensuelBalaiText = totalBalai ? (
     <p className="text-sm font-bold">
-      {formatNumber(Math.round((totalBalai * MARGE) / 12))} €/mois
+      {formatNumber(Math.round((totalBalai * MARGE) / 12))} {t("euros-mois")}
     </p>
   ) : (
-    <p className="text-sm font-bold">Non proposé</p>
+    <p className="text-sm font-bold">{t("non-propose")}</p>
   );
 
   const dialogTitle = (
     <p className={`text-${color} text-center`}>
       {gamme === "essentiel"
-        ? "Essentiel"
+        ? tGlobal("essentiel")
         : gamme === "confort"
-          ? "Confort"
-          : "Excellence"}
+          ? tGlobal("confort")
+          : tGlobal("excellence")}
     </p>
   );
 
@@ -138,49 +143,71 @@ const HygieneMobileOptionsBalaiCard = ({
 
   const infosProduit = (
     <ul className="flex flex-col text-xs px-4">
-      <li className="list-check">
-        Socle et manche{" "}
-        {gamme === "essentiel"
-          ? "blancs basic"
-          : gamme === "confort"
-            ? "couleur"
-            : "inox"}
-      </li>
+      {locale === "fr" ? (
+        <li className="list-check">
+          {tHygiene("socle-et-manche")}{" "}
+          {gamme === "essentiel"
+            ? tHygiene("blancs-basic")
+            : gamme === "confort"
+              ? tHygiene("couleur")
+              : tHygiene("inox")}
+        </li>
+      ) : (
+        <li className="list-check">
+          {gamme === "essentiel"
+            ? tHygiene("blancs-basic")
+            : gamme === "confort"
+              ? tHygiene("couleur")
+              : tHygiene("inox")}{" "}
+          {tHygiene("socle-et-manche").toLowerCase()}
+        </li>
+      )}
       <li className="list-check">
         {hygiene.infos.dureeLocation === "oneShot"
           ? ""
-          : `Location engagement
-            ${
-              hygiene.infos.dureeLocation === "pa12M"
-                ? "12"
-                : hygiene.infos.dureeLocation === "pa24M"
-                  ? "24"
-                  : "36"
-            } mois`}
+          : t("location-engagement", {
+              duree:
+                hygiene.infos.dureeLocation === "pa12M"
+                  ? "12"
+                  : hygiene.infos.dureeLocation === "pa24M"
+                    ? "24"
+                    : "36",
+            })}
       </li>
     </ul>
   );
   const infosProduitDialog = (
     <ul className="flex flex-col text-sm px-4 mx-auto">
-      <li className="list-check">
-        Socle et manche{" "}
-        {gamme === "essentiel"
-          ? "blancs basic"
-          : gamme === "confort"
-            ? "couleur"
-            : "inox"}
-      </li>
+      {locale === "fr" ? (
+        <li className="list-check">
+          {tHygiene("socle-et-manche")}{" "}
+          {gamme === "essentiel"
+            ? tHygiene("blancs-basic")
+            : gamme === "confort"
+              ? tHygiene("couleur")
+              : tHygiene("inox")}
+        </li>
+      ) : (
+        <li className="list-check">
+          {gamme === "essentiel"
+            ? tHygiene("blancs-basic")
+            : gamme === "confort"
+              ? tHygiene("couleur")
+              : tHygiene("inox")}{" "}
+          {tHygiene("socle-et-manche").toLowerCase()}
+        </li>
+      )}
       <li className="list-check">
         {hygiene.infos.dureeLocation === "oneShot"
           ? ""
-          : `Location engagement
-            ${
-              hygiene.infos.dureeLocation === "pa12M"
-                ? "12"
-                : hygiene.infos.dureeLocation === "pa24M"
-                  ? "24"
-                  : "36"
-            } mois`}
+          : t("location-engagement", {
+              duree:
+                hygiene.infos.dureeLocation === "pa12M"
+                  ? "12"
+                  : hygiene.infos.dureeLocation === "pa24M"
+                    ? "24"
+                    : "36",
+            })}
       </li>
     </ul>
   );
@@ -204,7 +231,7 @@ const HygieneMobileOptionsBalaiCard = ({
               <div className="flex flex-col gap-4">
                 {imgProduitDialog}
                 <p className="text-xs italic text-end">
-                  *photo non contractuelle
+                  {t("photo-non-contractuelle")}
                 </p>
                 {infosProduitDialog}
               </div>
@@ -271,7 +298,7 @@ const HygieneMobileOptionsBalaiCard = ({
                 onCheckedChange={() =>
                   handleClickProposition("balai", proposition)
                 }
-                title="Sélectionnez cette proposition"
+                title={t("selectionnez-cette-proposition")}
                 onClick={(e) => e.stopPropagation()}
               />
             ) : null}

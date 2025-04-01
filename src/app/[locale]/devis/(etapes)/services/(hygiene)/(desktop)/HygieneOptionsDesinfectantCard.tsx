@@ -118,7 +118,7 @@ const HygieneOptionsDesinfectantCard = ({
               id="nbDistribDesinfectant"
             />
             <Label htmlFor="nbDistribDesinfectant" className="text-sm">
-              distributeurs
+              {tHygiene("distributeurs").toLowerCase()}
             </Label>
           </div>
         </div>
@@ -182,7 +182,7 @@ const HygieneOptionsDesinfectantCard = ({
                   : gamme === "confort"
                     ? tHygiene("couleur")
                     : tHygiene("inox")}{" "}
-                {tHygiene("distributeurs")}
+                {tHygiene("distributeurs").toLowerCase()}
               </li>
             )}
             <li className="list-check">{t("consommables-inclus")}</li>
@@ -219,7 +219,7 @@ const HygieneOptionsDesinfectantCard = ({
                   : gamme === "confort"
                     ? tHygiene("couleur")
                     : tHygiene("inox")}{" "}
-                {tHygiene("distributeurs")}
+                {tHygiene("distributeurs").toLowerCase()}
               </li>
             )}
             <li className="list-check">{t("consommables-inclus")}</li>

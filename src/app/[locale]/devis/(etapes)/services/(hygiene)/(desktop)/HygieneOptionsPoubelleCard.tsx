@@ -16,6 +16,7 @@ import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { Info } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { ChangeEvent, useContext } from "react";
 
@@ -90,11 +91,15 @@ const HygieneOptionsPoubelleCard = ({
   hygieneDistribQuantite,
   propositions,
 }: HygieneOptionsPoubelleCardProps) => {
+  const t = useTranslations("DevisPage");
+  const tHygiene = useTranslations("DevisPage.services.hygiene");
+  const tGlobal = useTranslations("Global");
+  const locale = useLocale();
   const { hygiene } = useContext(HygieneContext);
   return (
     <div className="flex border-b flex-1">
       <div className="flex w-1/4 items-center justify-center flex-col gap-2 p-2">
-        <p className="text-base">Poubelles hygiène féminine</p>
+        <p className="text-base">{tHygiene("poubelle-hygiene-feminine")}</p>
         <div className="text-sm flex flex-col gap-2">
           <div className="flex gap-4 items-center justify-center w-full">
             <Input
@@ -113,11 +118,13 @@ const HygieneOptionsPoubelleCard = ({
               id="nbDistribPoubelle"
             />
             <Label htmlFor="nbDistribPoubelle" className="text-sm">
-              blocs
+              {tHygiene("receptacles").toLocaleLowerCase()}
             </Label>
           </div>
           <p className="text-xs text-fm4alldestructive italic px-2 text-center">
-            Les quantités sont estimées pour vous mais vous pouvez les changer
+            {t(
+              "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer"
+            )}
           </p>
         </div>
       </div>
@@ -130,23 +137,23 @@ const HygieneOptionsPoubelleCard = ({
               className={`flex-1 bg-${color} text-xl font-bold text-slate-200 flex items-center justify-center p-2`}
               key={"poubelle" + gamme}
             >
-              <p>Non proposé</p>
+              <p>{t("non-propose")}</p>
             </div>
           );
         }
         const prixMensuelPoubelleText = (
           <p className="font-bold text-xl ml-4">
             {formatNumber(Math.round((proposition.totalPoubelle * MARGE) / 12))}{" "}
-            €/mois
+            {t("euros-mois")}
           </p>
         );
         const dialogTitle = (
           <p className={`text-${color} text-center`}>
             {proposition.gamme === "essentiel"
-              ? "Essentiel"
+              ? tGlobal("essentiel")
               : proposition.gamme === "confort"
-              ? "Confort"
-              : "Excellence"}
+                ? tGlobal("confort")
+                : tGlobal("excellence")}
           </p>
         );
         const imgProduit = proposition.imageUrlPoubelle ? (
@@ -162,49 +169,71 @@ const HygieneOptionsPoubelleCard = ({
         ) : null;
         const infosProduit = (
           <ul className="flex flex-col text-xs px-4 mx-auto">
-            <li className="list-check">
-              Réceptacles{" "}
-              {gamme === "essentiel"
-                ? "blancs basic"
-                : gamme === "confort"
-                ? "couleur"
-                : "inox"}
-            </li>
+            {locale === "fr" ? (
+              <li className="list-check">
+                {tHygiene("receptacles")}{" "}
+                {gamme === "essentiel"
+                  ? tHygiene("blancs-basic")
+                  : gamme === "confort"
+                    ? tHygiene("couleur")
+                    : tHygiene("inox")}
+              </li>
+            ) : (
+              <li className="list-check">
+                {gamme === "essentiel"
+                  ? tHygiene("blancs-basic")
+                  : gamme === "confort"
+                    ? tHygiene("couleur")
+                    : tHygiene("inox")}{" "}
+                {tHygiene("receptacles").toLowerCase()}
+              </li>
+            )}
             <li className="list-check">
               {hygiene.infos.dureeLocation === "oneShot"
                 ? ""
-                : `Location engagement
-              ${
-                hygiene.infos.dureeLocation === "pa12M"
-                  ? "12"
-                  : hygiene.infos.dureeLocation === "pa24M"
-                  ? "24"
-                  : "36"
-              } mois`}
+                : t("location-engagement", {
+                    duree:
+                      hygiene.infos.dureeLocation === "pa12M"
+                        ? "12"
+                        : hygiene.infos.dureeLocation === "pa24M"
+                          ? "24"
+                          : "36",
+                  })}
             </li>
           </ul>
         );
         const infosProduitDialog = (
           <ul className="flex flex-col text-sm px-4 mx-auto">
-            <li className="list-check">
-              Réceptacles{" "}
-              {gamme === "essentiel"
-                ? "blancs basic"
-                : gamme === "confort"
-                ? "couleur"
-                : "inox"}
-            </li>
+            {locale === "fr" ? (
+              <li className="list-check">
+                {tHygiene("receptacles")}{" "}
+                {gamme === "essentiel"
+                  ? tHygiene("blancs-basic")
+                  : gamme === "confort"
+                    ? tHygiene("couleur")
+                    : tHygiene("inox")}
+              </li>
+            ) : (
+              <li className="list-check">
+                {gamme === "essentiel"
+                  ? tHygiene("blancs-basic")
+                  : gamme === "confort"
+                    ? tHygiene("couleur")
+                    : tHygiene("inox")}{" "}
+                {tHygiene("receptacles").toLowerCase()}
+              </li>
+            )}
             <li className="list-check">
               {hygiene.infos.dureeLocation === "oneShot"
                 ? ""
-                : `Location engagement
-              ${
-                hygiene.infos.dureeLocation === "pa12M"
-                  ? "12"
-                  : hygiene.infos.dureeLocation === "pa24M"
-                  ? "24"
-                  : "36"
-              } mois`}
+                : t("location-engagement", {
+                    duree:
+                      hygiene.infos.dureeLocation === "pa12M"
+                        ? "12"
+                        : hygiene.infos.dureeLocation === "pa24M"
+                          ? "24"
+                          : "36",
+                  })}
             </li>
           </ul>
         );
@@ -225,7 +254,7 @@ const HygieneOptionsPoubelleCard = ({
                 handleClickProposition("poubelle", proposition)
               }
               className="data-[state=checked]:bg-fm4alldestructive"
-              title="Sélectionner cette proposition"
+              title={t("selectionnez-cette-proposition")}
             />
             <div>
               <div className="flex gap-2 items-center">
@@ -244,7 +273,7 @@ const HygieneOptionsPoubelleCard = ({
                     </DialogHeader>
                     {imgProduit}
                     <p className="text-xs italic text-end">
-                      *photo non contractuelle
+                      {t("photo-non-contractuelle")}
                     </p>
                     {infosProduitDialog}
                   </DialogContent>

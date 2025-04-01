@@ -5,6 +5,7 @@ import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { Label } from "@radix-ui/react-label";
 import { Minus, Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { ChangeEvent, useContext } from "react";
 import { MAX_NB_DISTRIB } from "../(desktop)/HygieneOptionsPropositions";
 
@@ -53,6 +54,9 @@ const HygieneMobileOptionsBalaiInput = ({
   hygieneDistribQuantite,
   hygieneDistribTarifsFournisseur,
 }: HygieneMobileOptionsBalaiInputProps) => {
+  const t = useTranslations("DevisPage");
+  const tHygiene = useTranslations("DevisPage.services.hygiene");
+
   const { hygiene, setHygiene } = useContext(HygieneContext);
   const { setTotalHygiene } = useContext(TotalHygieneContext);
 
@@ -114,13 +118,13 @@ const HygieneMobileOptionsBalaiInput = ({
   };
   return (
     <div className="flex flex-col gap-4">
-      <p className="font-bold text-xl">Balais WC</p>
+      <p className="font-bold text-xl">{tHygiene("balais-wc")}</p>
       <p>
-        Indiquez le nombre de <strong>blocs</strong> :{" "}
+        {t("indiquez-le-nombre-de")} <strong>{tHygiene("blocs")}</strong> :{" "}
       </p>
       <div className="flex flex-col w-full p-1 gap-2">
         <Label htmlFor="nbDistribBalai" className="text-sm">
-          Nombre de blocs balais WC
+          {tHygiene("nombre-de-blocs-balais-wc")}
         </Label>
         <div className="flex items-center gap-2">
           <Input
@@ -140,7 +144,7 @@ const HygieneMobileOptionsBalaiInput = ({
           />
           <Button
             variant="outline"
-            title="Diminuer le nombre de distributeurs"
+            title={tHygiene("diminuer-le-nombre-de-distributeurs")}
             onClick={handleDecrement}
             disabled={nbDistribBalai === 0}
           >
@@ -148,7 +152,7 @@ const HygieneMobileOptionsBalaiInput = ({
           </Button>
           <Button
             variant="outline"
-            title="Augmenter le nombre de distributeurs"
+            title={tHygiene("augmenter-le-nombre-de-distributeurs")}
             onClick={handleIncrement}
             disabled={nbDistribBalai === MAX_NB_DISTRIB}
           >
@@ -156,7 +160,9 @@ const HygieneMobileOptionsBalaiInput = ({
           </Button>
         </div>
         <p className="text-xs italic text-fm4alldestructive">
-          Les quantités sont estimées pour vous mais vous pouvez les changer
+          {t(
+            "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer"
+          )}
         </p>
       </div>
     </div>

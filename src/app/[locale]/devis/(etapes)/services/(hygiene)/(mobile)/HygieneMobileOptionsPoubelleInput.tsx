@@ -5,6 +5,7 @@ import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { Label } from "@radix-ui/react-label";
 import { Minus, Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { ChangeEvent, useContext } from "react";
 import { MAX_NB_DISTRIB } from "../(desktop)/HygieneOptionsPropositions";
 
@@ -53,6 +54,8 @@ const HygieneMobileOptionsPoubelleInput = ({
   hygieneDistribQuantite,
   hygieneDistribTarifsFournisseur,
 }: HygieneMobileOptionsPoubelleInputProps) => {
+  const t = useTranslations("DevisPage");
+  const tHygiene = useTranslations("DevisPage.services.hygiene");
   const { hygiene, setHygiene } = useContext(HygieneContext);
   const { setTotalHygiene } = useContext(TotalHygieneContext);
 
@@ -116,13 +119,16 @@ const HygieneMobileOptionsPoubelleInput = ({
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="font-bold text-xl">Poubelle hygiène féminine</p>
+      <p className="font-bold text-xl">
+        {tHygiene("poubelle-hygiene-feminine")}
+      </p>
       <p>
-        Indiquez le nombre de <strong>réceptacles</strong> :
+        {t("indiquez-le-nombre-de")}{" "}
+        <strong>{tHygiene("receptacles").toLowerCase()}</strong> :
       </p>
       <div className="flex flex-col w-full p-1 gap-2">
         <Label htmlFor="nbDistribPoubelle" className="text-sm">
-          Nombre de réceptacles
+          {tHygiene("nombre-de-receptacles")}
         </Label>
         <div className="flex items-center gap-2">
           <Input
@@ -142,7 +148,7 @@ const HygieneMobileOptionsPoubelleInput = ({
           />
           <Button
             variant="outline"
-            title="Diminuer le nombre de distributeurs"
+            title={tHygiene("diminuer-le-nombre-de-distributeurs")}
             onClick={handleDecrement}
             disabled={nbDistribPoubelle === 0}
           >
@@ -150,7 +156,7 @@ const HygieneMobileOptionsPoubelleInput = ({
           </Button>
           <Button
             variant="outline"
-            title="Augmenter le nombre de distributeurs"
+            title={tHygiene("augmenter-le-nombre-de-distributeurs")}
             onClick={handleIncrement}
             disabled={nbDistribPoubelle === MAX_NB_DISTRIB}
           >
@@ -159,7 +165,9 @@ const HygieneMobileOptionsPoubelleInput = ({
         </div>
 
         <p className="text-xs italic text-fm4alldestructive">
-          Les quantités sont estimées pour vous mais vous pouvez les changer
+          {t(
+            "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer"
+          )}
         </p>
       </div>
     </div>

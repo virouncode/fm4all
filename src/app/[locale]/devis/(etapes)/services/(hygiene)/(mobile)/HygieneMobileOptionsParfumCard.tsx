@@ -13,6 +13,7 @@ import { MARGE } from "@/constants/constants";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { useContext } from "react";
 
@@ -78,6 +79,11 @@ const HygieneMobileOptionsParfumCard = ({
   proposition,
   handleClickProposition,
 }: HygieneMobileOptionsParfumCardProps) => {
+  const t = useTranslations("DevisPage");
+  const tHygiene = useTranslations("DevisPage.services.hygiene");
+  const tGlobal = useTranslations("Global");
+  const locale = useLocale();
+
   const { hygiene } = useContext(HygieneContext);
   const {
     gamme,
@@ -100,16 +106,16 @@ const HygieneMobileOptionsParfumCard = ({
       {formatNumber(Math.round((totalParfum * MARGE) / 12))} €/mois
     </p>
   ) : (
-    <p className="text-sm font-bold">Non proposé</p>
+    <p className="text-sm font-bold">{t("non-propose")}</p>
   );
 
   const dialogTitle = (
     <p className={`text-${color} text-center`}>
       {gamme === "essentiel"
-        ? "Essentiel"
+        ? tGlobal("essentiel")
         : gamme === "confort"
-          ? "Confort"
-          : "Excellence"}
+          ? tGlobal("confort")
+          : tGlobal("excellence")}
     </p>
   );
 
@@ -139,51 +145,73 @@ const HygieneMobileOptionsParfumCard = ({
 
   const infosProduit = (
     <ul className="flex flex-col text-xs px-4">
-      <li className="list-check">
-        Distributeurs{" "}
-        {gamme === "essentiel"
-          ? "blancs basic"
-          : gamme === "confort"
-            ? "couleur"
-            : "inox"}
-      </li>
-      <li className="list-check">Consommables inclus</li>
+      {locale === "fr" ? (
+        <li className="list-check">
+          {tHygiene("diffuseurs")}{" "}
+          {gamme === "essentiel"
+            ? tHygiene("blancs-basic")
+            : gamme === "confort"
+              ? tHygiene("couleur")
+              : tHygiene("inox")}
+        </li>
+      ) : (
+        <li className="list-check">
+          {gamme === "essentiel"
+            ? tHygiene("blancs-basic")
+            : gamme === "confort"
+              ? tHygiene("couleur")
+              : tHygiene("inox")}{" "}
+          {tHygiene("diffuseurs").toLowerCase()}
+        </li>
+      )}
+      <li className="list-check">{t("consommables-inclus")}</li>
       <li className="list-check">
         {hygiene.infos.dureeLocation === "oneShot"
           ? ""
-          : `Location engagement
-            ${
-              hygiene.infos.dureeLocation === "pa12M"
-                ? "12"
-                : hygiene.infos.dureeLocation === "pa24M"
-                  ? "24"
-                  : "36"
-            } mois`}
+          : t("location-engagement", {
+              duree:
+                hygiene.infos.dureeLocation === "pa12M"
+                  ? "12"
+                  : hygiene.infos.dureeLocation === "pa24M"
+                    ? "24"
+                    : "36",
+            })}
       </li>
     </ul>
   );
   const infosProduitDialog = (
     <ul className="flex flex-col text-sm px-4 mx-auto">
-      <li className="list-check">
-        Distributeurs{" "}
-        {gamme === "essentiel"
-          ? "blancs basic"
-          : gamme === "confort"
-            ? "couleur"
-            : "inox"}
-      </li>
-      <li className="list-check">Consommables inclus</li>
+      {locale === "fr" ? (
+        <li className="list-check">
+          {tHygiene("diffuseurs")}{" "}
+          {gamme === "essentiel"
+            ? tHygiene("blancs-basic")
+            : gamme === "confort"
+              ? tHygiene("couleur")
+              : tHygiene("inox")}
+        </li>
+      ) : (
+        <li className="list-check">
+          {gamme === "essentiel"
+            ? tHygiene("blancs-basic")
+            : gamme === "confort"
+              ? tHygiene("couleur")
+              : tHygiene("inox")}{" "}
+          {tHygiene("diffuseurs").toLowerCase()}
+        </li>
+      )}
+      <li className="list-check">{t("consommables-inclus")}</li>
       <li className="list-check">
         {hygiene.infos.dureeLocation === "oneShot"
           ? ""
-          : `Location engagement
-            ${
-              hygiene.infos.dureeLocation === "pa12M"
-                ? "12"
-                : hygiene.infos.dureeLocation === "pa24M"
-                  ? "24"
-                  : "36"
-            } mois`}
+          : t("location-engagement", {
+              duree:
+                hygiene.infos.dureeLocation === "pa12M"
+                  ? "12"
+                  : hygiene.infos.dureeLocation === "pa24M"
+                    ? "24"
+                    : "36",
+            })}
       </li>
     </ul>
   );
@@ -204,10 +232,10 @@ const HygieneMobileOptionsParfumCard = ({
               <DialogHeader>
                 <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
-              <div className="flex flex-col gap-4 items-center">
+              <div className="flex flex-col gap-4">
                 {imgProduitDialog}
                 <p className="text-xs italic text-end">
-                  *photo non contractuelle
+                  {t("photo-non-contractuelle")}
                 </p>
                 {infosProduitDialog}
               </div>
@@ -278,7 +306,7 @@ const HygieneMobileOptionsParfumCard = ({
                 onCheckedChange={() =>
                   handleClickProposition("parfum", proposition)
                 }
-                title="Sélectionnez cette proposition"
+                title={t("selectionnez-cette-proposition")}
                 onClick={(e) => e.stopPropagation()}
               />
             ) : null}

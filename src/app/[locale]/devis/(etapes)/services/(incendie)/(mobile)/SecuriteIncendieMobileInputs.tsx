@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { IncendieContext } from "@/context/IncendieProvider";
 import { Minus, Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import React, { useContext } from "react";
 import {
@@ -38,20 +39,23 @@ const SecuriteIncendieMobileInputs = ({
   handleIncrement,
   handleDecrement,
 }: SecuriteIncendieMobileInputsProps) => {
+  const t = useTranslations("DevisPage");
+  const tIncendie = useTranslations("DevisPage.services.incendie");
   const { incendie } = useContext(IncendieContext);
 
   return (
     <div className="flex flex-col gap-8">
       <p className="font-bold text-xl hyphens-auto">
-        Contrôle des extincteurs, BAES, télécommandes BAES
+        {tIncendie("controle-des-extincteurs-baes-telecommandes-baes")}
       </p>
       <div className="flex flex-col gap-4">
         <p>
-          Indiquez votre nombre d&apos;<strong>extincteurs</strong> :
+          {tIncendie("indiquez-votre-nombre-d")}
+          <strong>{tIncendie("extincteurs").toLowerCase()}</strong> :
         </p>
         <div className="flex flex-col w-full p-1 gap-2">
           <Label htmlFor="nbExtincteurs" className="text-sm">
-            Nombre d&apos;extincteurs
+            {tIncendie("nombre-d-extincteurs")}
           </Label>
           <div className="flex items-center gap-2">
             <Input
@@ -71,7 +75,7 @@ const SecuriteIncendieMobileInputs = ({
             />
             <Button
               variant="outline"
-              title="Diminuer le nombre d' extincteurs"
+              title={tIncendie("diminuer-le-nombre-d-extincteurs")}
               onClick={() => handleDecrement("extincteur")}
               disabled={nbExtincteurs === 0}
             >
@@ -79,7 +83,7 @@ const SecuriteIncendieMobileInputs = ({
             </Button>
             <Button
               variant="outline"
-              title="Augmenter le nombre d' extincteurs"
+              title={tIncendie("augmenter-le-nombre-d-extincteurs")}
               onClick={() => handleIncrement("extincteur")}
               disabled={nbExtincteurs === MAX_NB_EXTINCTEURS}
             >
@@ -87,19 +91,28 @@ const SecuriteIncendieMobileInputs = ({
             </Button>
           </div>
           <p className="text-xs italic text-fm4alldestructive">
-            Les quantités sont estimées pour vous mais vous pouvez les changer
+            {t(
+              "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer"
+            )}
           </p>
         </div>
       </div>
       <div className="flex flex-col gap-4">
         <p>
-          Indiquez votre nombre de{" "}
-          <strong>BAES (blocs autonomes d&apos;éclairage de sécurité)</strong> :
+          {tIncendie("indiquez-votre-nombre-de")}{" "}
+          <strong>
+            {tIncendie(
+              "baes-blocs-autonomes-d-eclairage-de-securite"
+            ).toLowerCase()}
+          </strong>{" "}
+          :
         </p>
         <div className="w-24 h-16 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
           <Image
             src={"/img/services/baes.webp"}
-            alt={`illustration de bloc autonome d'eclairage de securite`}
+            alt={tIncendie(
+              "illustration-de-bloc-autonome-declairage-de-securite"
+            )}
             fill={true}
             className="object-cover cursor-pointer"
             quality={100}
@@ -107,7 +120,7 @@ const SecuriteIncendieMobileInputs = ({
         </div>
         <div className="flex flex-col w-full p-1 gap-2">
           <Label htmlFor="nbBaes" className="text-sm">
-            Nombre de BAES
+            {tIncendie("nombre-de-baes")}
           </Label>
           <div className="flex items-center gap-2">
             <Input
@@ -127,7 +140,7 @@ const SecuriteIncendieMobileInputs = ({
             />
             <Button
               variant="outline"
-              title="Diminuer le nombre de BAES"
+              title={tIncendie("diminuer-le-nombre-de-baes")}
               onClick={() => handleDecrement("baes")}
               disabled={nbBaes === 0}
             >
@@ -135,7 +148,7 @@ const SecuriteIncendieMobileInputs = ({
             </Button>
             <Button
               variant="outline"
-              title="Augmenter le nombre de BAES"
+              title={tIncendie("augmenter-le-nombre-de-baes")}
               onClick={() => handleIncrement("baes")}
               disabled={nbBaes === MAX_NB_BAES}
             >
@@ -143,18 +156,23 @@ const SecuriteIncendieMobileInputs = ({
             </Button>
           </div>
           <p className="text-xs italic text-fm4alldestructive">
-            Les quantités sont estimées pour vous mais vous pouvez les changer
+            {t(
+              "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer"
+            )}
           </p>
         </div>
       </div>
       <div className="flex flex-col gap-4">
         <p>
-          Indiquez votre nombre de <strong>télécommandes BAES</strong> :
+          {tIncendie("indiquez-votre-nombre-de")}{" "}
+          <strong>{tIncendie("telecommandes-baes").toLowerCase()}</strong> :
         </p>
         <div className="w-24 h-16 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
           <Image
             src={"/img/services/tel_baes.webp"}
-            alt={`illustration de télécommande de bloc autonome d'eclairage de securite`}
+            alt={tIncendie(
+              "illustration-de-telecommande-de-bloc-autonome-declairage-de-securite"
+            )}
             fill={true}
             className="object-cover cursor-pointer"
             quality={100}
@@ -162,7 +180,7 @@ const SecuriteIncendieMobileInputs = ({
         </div>
         <div className="flex flex-col w-full p-1 gap-2">
           <Label htmlFor="nbTelBaes" className="text-sm">
-            Nombre de télécommandes
+            {tIncendie("nombre-de-telecommandes")}
           </Label>
           <div className="flex items-center gap-2">
             <Input
@@ -181,7 +199,7 @@ const SecuriteIncendieMobileInputs = ({
             />
             <Button
               variant="outline"
-              title="Diminuer le nombre de télécommandes BAES"
+              title={tIncendie("diminuer-le-nombre-de-telecommandes-baes")}
               onClick={() => handleDecrement("telBaes")}
               disabled={nbTelBaes === 0}
             >
@@ -189,7 +207,7 @@ const SecuriteIncendieMobileInputs = ({
             </Button>
             <Button
               variant="outline"
-              title="Augmenter le nombre de télécommandes BAES"
+              title={tIncendie("augmenter-le-nombre-de-telecommandes-baes")}
               onClick={() => handleIncrement("telBaes")}
               disabled={nbTelBaes === MAX_NB_TEL_BAES}
             >
@@ -198,7 +216,9 @@ const SecuriteIncendieMobileInputs = ({
           </div>
 
           <p className="text-xs italic text-fm4alldestructive">
-            Les quantités sont estimées pour vous mais vous pouvez les changer
+            {t(
+              "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer"
+            )}
           </p>
         </div>
       </div>

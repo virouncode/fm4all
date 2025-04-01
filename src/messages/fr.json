@@ -643,6 +643,7 @@
       "pa48M": "Location 48 mois",
       "pa60M": "Location 60 mois"
     },
+    "h-an": "h / an",
     "loader": {
       "vous-allez-obtenir-des-devis-qui-beneficient-du-service-de-gestion-centralise-fm4all": "Vous allez obtenir des devis qui bénéficient du service de gestion centralisé fm4all :",
       "un-seul-interlocuteur-un-seul-contrat-une-seule-facture": "Un seul interlocuteur, un seul contrat, une seule facture..."
@@ -752,7 +753,58 @@
         "choisissez-vos-options-chez": "Choisissez vos options chez",
         "veuillez-d-abord-selectionner-une-offre-de-nettoyage-et-une-offre-d-hygiene-sanitaire": "Veuillez d'abord sélectionner une offre de Nettoyage et une offre d'Hygiène sanitaire",
         "desinfectant-pour-cuvettes": "Désinfectant pour cuvettes",
-        "distributeurs-de-desinfectant": "distributeurs de désinfectant"
+        "distributeurs-de-desinfectant": "distributeurs de désinfectant",
+        "parfum": "Parfum",
+        "diffuseurs": "Diffuseurs",
+        "nombre-de-diffuseurs": "Nombre de diffuseurs",
+        "balais-wc": "Balais WC",
+        "nombre-de-blocs-balais-wc": "Nombre de blocs balais WC",
+        "blocs": "blocs",
+        "socle-et-manche": "Socle et manche",
+        "poubelle-hygiene-feminine": "Poubelles hygiène féminine",
+        "receptacles": "Réceptacles",
+        "nombre-de-receptacles": "Nombre de réceptacles"
+      },
+      "maintenance": {
+        "maintenance": "Maintenance",
+        "obligations-legales-and-veille-reglementaire-bien-etre-petits-travaux-lien-avec-le-gestionnaire-de-limmeuble-deleguez-la-maintenance-et-le-suivi-de-vos-controles": "Obligations légales & veille réglementaire, bien-être, petits travaux, lien avec le gestionnaire de l’immeuble... déléguez la maintenance et le suivi de vos contrôles.",
+        "maintenance-multi-technique": "Maintenance multi-technique",
+        "obligation-legale-et-controles-reglementaires": "Obligation légale et contrôles règlementaires",
+        "controle-q18": "Contrôle Q18",
+        "essentiel-recommandations-ars-petits-travaux-dentretien-tous-les-trois-mois": "Essentiel + recommandations ARS, petits travaux d’entretien tous les trois mois",
+        "controle-legionellose": "Contrôle Legionellose",
+        "une-a-deux-fois-par-mois-passage-technicien-pour-maintenance-and-petits-travaux-lien-technique-avec-le-gestionnaire-de-limmeuble": "Une à deux fois par mois passage technicien pour maintenance & petits travaux. Lien technique avec le gestionnaire de l’immeuble",
+        "controle-qualite-air": "Contrôle Qualité Air"
+      },
+      "incendie": {
+        "securite-incendie": "Sécurité Incendie",
+        "extincteurs": "Extincteurs",
+        "baes": "BAES",
+        "extincteurs-blocs-autonomes-declairage-de-securite-baes-telecommande-baes-laissez-nos-experts-verifier-vos-installations": "Extincteurs, blocs autonomes d'éclairage de sécurité (BAES), télécommande BAES, laissez nos experts vérifier vos installations.",
+        "veillez-a-re-selectionner-vos-options-de-securite-incendie-dans-letape-6-personnaliser": "Veillez à (re)-sélectionner vos options de sécurité incendie dans l'étape 6 (Personnaliser)",
+        "securite-incendie-controles-obligatoires": "Sécurité incendie : contrôles obligatoires",
+        "controle-des-extincteurs-baes-telecommandes-baes": "Contrôle des extincteurs, BAES, télécommandes BAES",
+        "indiquez-votre-nombre-d": "Indiquez votre nombre d'",
+        "nombre-d-extincteurs": "Nombre d'extincteurs",
+        "diminuer-le-nombre-d-extincteurs": "Diminuer le nombre d' extincteurs",
+        "augmenter-le-nombre-d-extincteurs": "Augmenter le nombre d' extincteurs",
+        "indiquez-votre-nombre-de": "Indiquez votre nombre de",
+        "baes-blocs-autonomes-d-eclairage-de-securite": "BAES (blocs autonomes d'éclairage de sécurité)",
+        "illustration-de-bloc-autonome-declairage-de-securite": "illustration de bloc autonome d'eclairage de securite",
+        "diminuer-le-nombre-de-baes": "Diminuer le nombre de BAES",
+        "augmenter-le-nombre-de-baes": "Augmenter le nombre de BAES",
+        "telecommandes-baes": "télécommandes BAES",
+        "illustration-de-telecommande-de-bloc-autonome-declairage-de-securite": "illustration de télécommande de bloc autonome d'eclairage de securite",
+        "nombre-de-telecommandes": "Nombre de télécommandes",
+        "diminuer-le-nombre-de-telecommandes-baes": "Diminuer le nombre de télécommandes BAES",
+        "augmenter-le-nombre-de-telecommandes-baes": "Augmenter le nombre de télécommandes BAES",
+        "nombre-de-baes": "Nombre de BAES",
+        "1-passage-an-pour-le-controle-obligatoire-de": "1 passage/an pour le contrôle obligatoire de :",
+        "telecommande-s-baes": "télécommande(s) BAES",
+        "pour-la-securite-de-tous-verification-annuelle-obligatoire-norme": "Pour la sécurité de tous : vérification annuelle obligatoire (norme",
+        "nf-s61-919": "NF S61-919",
+        "conseils-sur-limplantation-remplacement-ou-rechargement-si-necessaire-au-bpu": "), conseils sur l’implantation, remplacement ou rechargement si nécessaire au BPU.",
+        "1-passage-par-an-pour-le-controle-obligatoire-de": "1 passage par an pour le contrôle obligatoire de :"
       }
     }
   }

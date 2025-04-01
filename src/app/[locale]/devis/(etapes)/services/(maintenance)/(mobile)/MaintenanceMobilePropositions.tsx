@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import MaintenanceMobilePropositionsCarousel from "./MaintenanceMobilePropositionsCarousel";
 
 type MaintenanceMobilePropositionsProps = {
@@ -53,9 +54,12 @@ const MaintenanceMobilePropositions = ({
   formattedPropositions,
   handleClickProposition,
 }: MaintenanceMobilePropositionsProps) => {
+  const t = useTranslations("DevisPage.services.maintenance");
   return (
     <div className="flex flex-col gap-6 w-full">
-      <p className="font-bold text-xl lg:hidden">Maintenance multi-technique</p>
+      <p className="font-bold text-xl lg:hidden">
+        {t("maintenance-multi-technique")}
+      </p>
       {formattedPropositions.map((propositions) => (
         <MaintenanceMobilePropositionsCarousel
           propositions={propositions}

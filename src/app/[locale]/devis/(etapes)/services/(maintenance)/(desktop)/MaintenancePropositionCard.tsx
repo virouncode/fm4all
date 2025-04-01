@@ -14,6 +14,7 @@ import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { GammeType } from "@/zod-schemas/gamme";
 import { Info } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useContext } from "react";
 
@@ -70,6 +71,9 @@ const MaintenancePropositionCard = ({
   proposition,
   handleClickProposition,
 }: MaintenancePropositionCardProps) => {
+  const t = useTranslations("DevisPage");
+  const tMaintenance = useTranslations("DevisPage.services.maintenance");
+  const tGlobal = useTranslations("Global");
   const { maintenance } = useContext(MaintenanceContext);
   const gamme = proposition.gamme;
   const color = getFm4AllColor(gamme);
@@ -78,51 +82,55 @@ const MaintenancePropositionCard = ({
       <div
         className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4`}
       >
-        Non proposé
+        {t("non-propose")}
       </div>
     );
   }
   const totalMensuelText = (
     <p className="font-bold text-xl ml-4">
-      {formatNumber(Math.round((proposition.totalAnnuel * MARGE) / 12))} €/mois
+      {formatNumber(Math.round((proposition.totalAnnuel * MARGE) / 12))}{" "}
+      {t("euros-mois")}
     </p>
   );
 
   const nbPassagesText = (
     <li className="list-check ">
-      {proposition.freqAnnuelle} passage(s) de {proposition.hParPassage} h / an
+      {proposition.freqAnnuelle} {t("passage-s-de")} {proposition.hParPassage}{" "}
+      {t("h-an")}
     </li>
   );
 
   const infosEssentiel = (
     <>
       <li className="list-check ">
-        Obligation légale et contrôles règlementaires
+        {tMaintenance("obligation-legale-et-controles-reglementaires")}
       </li>
-      <li className="list-check">Contrôle Q18</li>
+      <li className="list-check">{tMaintenance("controle-q18")}</li>
       {nbPassagesText}
     </>
   );
   const infosConfort = (
     <>
       <li className="list-check ">
-        Essentiel + recommandations ARS, petits travaux d’entretien tous les
-        trois mois
+        {tMaintenance(
+          "essentiel-recommandations-ars-petits-travaux-dentretien-tous-les-trois-mois"
+        )}
       </li>
-      <li className="list-check ">Contrôle Q18</li>
-      <li className="list-check ">Contrôle Legionellose</li>
+      <li className="list-check ">{tMaintenance("controle-q18")}</li>
+      <li className="list-check ">{tMaintenance("controle-legionellose")}</li>
       {nbPassagesText}
     </>
   );
   const infosExcellence = (
     <>
       <li className="list-check ">
-        Une à deux fois par mois passage technicien pour maintenance & petits
-        travaux. Lien technique avec le gestionnaire de l’immeuble
+        {tMaintenance(
+          "une-a-deux-fois-par-mois-passage-technicien-pour-maintenance-and-petits-travaux-lien-technique-avec-le-gestionnaire-de-limmeuble"
+        )}
       </li>
-      <li className="list-check ">Contrôle Q18</li>
-      <li className="list-check ">Contrôle Legionellose</li>
-      <li className="list-check ">Contrôle Qualité Air</li>
+      <li className="list-check ">{tMaintenance("controle-q18")}</li>
+      <li className="list-check ">{tMaintenance("controle-legionellose")}</li>
+      <li className="list-check ">{tMaintenance("controle-qualite-air")}</li>
       {nbPassagesText}
     </>
   );
@@ -131,16 +139,16 @@ const MaintenancePropositionCard = ({
     gamme === "essentiel"
       ? infosEssentiel
       : gamme === "confort"
-      ? infosConfort
-      : infosExcellence;
+        ? infosConfort
+        : infosExcellence;
 
   const dialogTitle = (
     <p className={`text-${color} text-center`}>
       {proposition.gamme === "essentiel"
-        ? "Essentiel"
+        ? tGlobal("essentiel")
         : proposition.gamme === "confort"
-        ? "Confort"
-        : "Excellence"}
+          ? tGlobal("confort")
+          : tGlobal("excellence")}
     </p>
   );
 
@@ -173,7 +181,7 @@ const MaintenancePropositionCard = ({
         }
         onCheckedChange={() => handleClickProposition(proposition)}
         className="data-[state=checked]:bg-fm4alldestructive"
-        title="Sélectionner cette proposition"
+        title={t("selectionnez-cette-proposition")}
       />
       <div>
         <div className="flex gap-2 items-center">
@@ -193,7 +201,7 @@ const MaintenancePropositionCard = ({
               <div className="flex flex-col gap-4">
                 {imgProduit}
                 <p className="text-xs italic text-end">
-                  *photo non contractuelle
+                  {t("photo-non-contractuelle")}
                 </p>
                 <ul className="flex flex-col text-sm px-4 mx-auto">
                   {infosProduit}

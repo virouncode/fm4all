@@ -15,6 +15,7 @@ import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { Info } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { ChangeEvent, useContext } from "react";
 
@@ -89,11 +90,15 @@ const HygieneOptionsBalaiCard = ({
   hygieneDistribQuantite,
   propositions,
 }: HygieneOptionsBalaiCardProps) => {
+  const t = useTranslations("DevisPage");
+  const tHygiene = useTranslations("DevisPage.services.hygiene");
+  const tGlobal = useTranslations("Global");
+  const locale = useLocale();
   const { hygiene } = useContext(HygieneContext);
   return (
     <div className="flex border-b flex-1">
       <div className="flex w-1/4 items-center justify-center flex-col gap-2 p-2">
-        <p className="text-base">Balais WC</p>
+        <p className="text-base">{tHygiene("balais-wc")}</p>
         <div className="text-sm flex flex-col gap-2">
           <div className="flex gap-4 items-center justify-center w-full">
             <Input
@@ -112,7 +117,7 @@ const HygieneOptionsBalaiCard = ({
               id="nbDistribBalai"
             />
             <Label htmlFor="nbDistribBalai" className="text-sm">
-              blocs
+              {tHygiene("blocs")}
             </Label>
           </div>
         </div>
@@ -126,23 +131,23 @@ const HygieneOptionsBalaiCard = ({
               className={`flex flex-1 bg-${color} text-slate-200 items-center p-2 justify-center text-xl gap-4 `}
               key={"balai" + gamme}
             >
-              Non proposé
+              {t("non-propose")}
             </div>
           );
         }
         const prixMensuelBalaiText = (
           <p className="font-bold text-xl ml-4">
             {formatNumber(Math.round((proposition.totalBalai * MARGE) / 12))}{" "}
-            €/mois
+            {t("euros-mois")}
           </p>
         );
         const dialogTitle = (
           <p className={`text-${color} text-center`}>
             {proposition.gamme === "essentiel"
-              ? "Essentiel"
+              ? tGlobal("essentiel")
               : proposition.gamme === "confort"
-              ? "Confort"
-              : "Excellence"}
+                ? tGlobal("confort")
+                : tGlobal("excellence")}
           </p>
         );
         const imgProduit = proposition.imageUrlBalai ? (
@@ -158,49 +163,71 @@ const HygieneOptionsBalaiCard = ({
         ) : null;
         const infosProduit = (
           <ul className="flex flex-col text-xs px-4 mx-auto">
-            <li className="list-check">
-              Socle et manche{" "}
-              {gamme === "essentiel"
-                ? "blancs basic"
-                : gamme === "confort"
-                ? "couleur"
-                : "inox"}
-            </li>
+            {locale === "fr" ? (
+              <li className="list-check">
+                {tHygiene("socle-et-manche")}{" "}
+                {gamme === "essentiel"
+                  ? tHygiene("blancs-basic")
+                  : gamme === "confort"
+                    ? tHygiene("couleur")
+                    : tHygiene("inox")}
+              </li>
+            ) : (
+              <li className="list-check">
+                {gamme === "essentiel"
+                  ? tHygiene("blancs-basic")
+                  : gamme === "confort"
+                    ? tHygiene("couleur")
+                    : tHygiene("inox")}{" "}
+                {tHygiene("socle-et-manche").toLowerCase()}
+              </li>
+            )}
             <li className="list-check">
               {hygiene.infos.dureeLocation === "oneShot"
                 ? ""
-                : `Location engagement
-              ${
-                hygiene.infos.dureeLocation === "pa12M"
-                  ? "12"
-                  : hygiene.infos.dureeLocation === "pa24M"
-                  ? "24"
-                  : "36"
-              } mois`}
+                : t("location-engagement", {
+                    duree:
+                      hygiene.infos.dureeLocation === "pa12M"
+                        ? "12"
+                        : hygiene.infos.dureeLocation === "pa24M"
+                          ? "24"
+                          : "36",
+                  })}
             </li>
           </ul>
         );
         const infosProduitDialog = (
           <ul className="flex flex-col text-sm px-4 mx-auto">
-            <li className="list-check">
-              Socle et manche{" "}
-              {gamme === "essentiel"
-                ? "blancs basic"
-                : gamme === "confort"
-                ? "couleur"
-                : "inox"}
-            </li>
+            {locale === "fr" ? (
+              <li className="list-check">
+                {tHygiene("socle-et-manche")}{" "}
+                {gamme === "essentiel"
+                  ? tHygiene("blancs-basic")
+                  : gamme === "confort"
+                    ? tHygiene("couleur")
+                    : tHygiene("inox")}
+              </li>
+            ) : (
+              <li className="list-check">
+                {gamme === "essentiel"
+                  ? tHygiene("blancs-basic")
+                  : gamme === "confort"
+                    ? tHygiene("couleur")
+                    : tHygiene("inox")}{" "}
+                {tHygiene("socle-et-manche").toLowerCase()}
+              </li>
+            )}
             <li className="list-check">
               {hygiene.infos.dureeLocation === "oneShot"
                 ? ""
-                : `Location engagement
-              ${
-                hygiene.infos.dureeLocation === "pa12M"
-                  ? "12"
-                  : hygiene.infos.dureeLocation === "pa24M"
-                  ? "24"
-                  : "36"
-              } mois`}
+                : t("location-engagement", {
+                    duree:
+                      hygiene.infos.dureeLocation === "pa12M"
+                        ? "12"
+                        : hygiene.infos.dureeLocation === "pa24M"
+                          ? "24"
+                          : "36",
+                  })}
             </li>
           </ul>
         );
@@ -221,7 +248,7 @@ const HygieneOptionsBalaiCard = ({
                 handleClickProposition("balai", proposition)
               }
               className="data-[state=checked]:bg-fm4alldestructive"
-              title="Sélectionner cette proposition"
+              title={t("selectionnez-cette-proposition")}
             />
             <div>
               <div className="flex gap-2 items-center">
@@ -240,7 +267,7 @@ const HygieneOptionsBalaiCard = ({
                     </DialogHeader>
                     {imgProduit}
                     <p className="text-xs italic text-end">
-                      *photo non contractuelle
+                      {t("photo-non-contractuelle")}
                     </p>
                     {infosProduitDialog}
                   </DialogContent>

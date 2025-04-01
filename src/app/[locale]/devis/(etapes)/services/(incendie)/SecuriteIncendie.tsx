@@ -7,6 +7,7 @@ import { useRouter } from "@/i18n/navigation";
 import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites";
 import { SelectIncendieTarifsType } from "@/zod-schemas/incendieTarifs";
 import { FireExtinguisher } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
@@ -22,6 +23,7 @@ const SecuriteIncendie = ({
   incendieQuantite,
   incendieTarifs,
 }: SecuriteIncendieProps) => {
+  const t = useTranslations("DevisPage.services.incendie");
   const { client } = useContext(ClientContext);
   const { setServices } = useContext(ServicesContext);
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
@@ -59,15 +61,19 @@ const SecuriteIncendie = ({
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
           icon={FireExtinguisher}
-          title="Securité Incendie"
-          description="Extincteurs, blocs autonomes d'éclairage de sécurité (BAES), télécommande BAES, laissez nos experts vérifier vos installations."
+          title={t("securite-incendie")}
+          description={t(
+            "extincteurs-blocs-autonomes-declairage-de-securite-baes-telecommande-baes-laissez-nos-experts-verifier-vos-installations"
+          )}
           propositionsRef={propositionsRef}
         />
       ) : (
         <PropositionsTitle
           icon={FireExtinguisher}
-          title="Securité Incendie"
-          description="Extincteurs, blocs autonomes d'éclairage de sécurité (BAES), télécommande BAES, laissez nos experts vérifier vos installations."
+          title={t("securite-incendie")}
+          description={t(
+            "extincteurs-blocs-autonomes-declairage-de-securite-baes-telecommande-baes-laissez-nos-experts-verifier-vos-installations"
+          )}
           handleClickPrevious={handleClickPrevious}
         />
       )}

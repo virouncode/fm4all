@@ -10,6 +10,7 @@ import { MARGE } from "@/constants/constants";
 import { IncendieContext } from "@/context/IncendieProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { Info } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useContext } from "react";
 
@@ -64,13 +65,15 @@ const SecuriteIncendiePropostionCard = ({
   proposition,
   handleClickProposition,
 }: SecuriteIncendiePropostionCardProps) => {
+  const t = useTranslations("DevisPage");
+  const tIncendie = useTranslations("DevisPage.services.incendie");
   const { incendie } = useContext(IncendieContext);
   const { totalAnnuelTrilogie, fraisDeplacementTrilogie } = proposition;
 
   if (!totalAnnuelTrilogie)
     return (
       <div className="w-3/4 flex items-center justify-center text-xl gap-4 p-4 cursor-pointer bg-slate-100">
-        Non proposé
+        {t("non-propose")}
       </div>
     );
   const totalMensuelText = (
@@ -80,20 +83,23 @@ const SecuriteIncendiePropostionCard = ({
           ((totalAnnuelTrilogie + fraisDeplacementTrilogie) * MARGE) / 12
         )
       )}{" "}
-      €/mois
+      {t("euros-mois")}
     </p>
   );
   const infosProduit = (
     <ul className="flex flex-col text-sm px-4">
       <li className="list-check">
-        1 passage/an pour le contrôle obligatoire de :
+        {tIncendie("1-passage-an-pour-le-controle-obligatoire-de")}
         <ul className="ml-4">
           <li className="list-disc">
-            {proposition.nbExtincteurs} extincteur(s)
+            {proposition.nbExtincteurs} {tIncendie("extincteurs").toLowerCase()}
           </li>
-          <li className="list-disc">{proposition.nbBaes} BAES</li>
           <li className="list-disc">
-            {proposition.nbTelBaes} télécommande(s) BAES
+            {proposition.nbBaes} {tIncendie("baes").toLowerCase()}
+          </li>
+          <li className="list-disc">
+            {proposition.nbTelBaes}{" "}
+            {tIncendie("telecommande-s-baes").toLowerCase()}
           </li>
         </ul>
       </li>
@@ -103,14 +109,17 @@ const SecuriteIncendiePropostionCard = ({
   const infosProduitDialog = (
     <ul className="flex flex-col text-sm px-4 mx-auto">
       <li className="list-check">
-        1 passage par an pour le contrôle obligatoire de :
+        {tIncendie("1-passage-par-an-pour-le-controle-obligatoire-de")}
         <ul className="ml-4">
           <li className="list-disc">
-            {proposition.nbExtincteurs} extincteur(s)
+            {proposition.nbExtincteurs} {tIncendie("extincteurs").toLowerCase()}
           </li>
-          <li className="list-disc">{proposition.nbBaes} BAES</li>
           <li className="list-disc">
-            {proposition.nbTelBaes} télécommande(s) BAES
+            {proposition.nbBaes} {tIncendie("baes").toLowerCase()}
+          </li>
+          <li className="list-disc">
+            {proposition.nbTelBaes}{" "}
+            {tIncendie("telecommande-s-baes").toLowerCase()}
           </li>
         </ul>
       </li>
@@ -119,13 +128,19 @@ const SecuriteIncendiePropostionCard = ({
 
   const infosText = (
     <p className="text-sm">
-      Pour la sécurité de tous : vérification annuelle obligatoire (norme
-      <strong> NF S61-919</strong>), conseils sur l’implantation, remplacement
-      ou rechargement si nécessaire au BPU.
+      {tIncendie(
+        "pour-la-securite-de-tous-verification-annuelle-obligatoire-norme"
+      )}
+      <strong> {tIncendie("nf-s61-919")}</strong>
+      {tIncendie(
+        "conseils-sur-limplantation-remplacement-ou-rechargement-si-necessaire-au-bpu"
+      )}
     </p>
   );
 
-  const dialogTitle = <p className="text-center">Sécurité incendie</p>;
+  const dialogTitle = (
+    <p className="text-center">{tIncendie("securite-incendie")}</p>
+  );
 
   const imgProduit = (
     <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
@@ -152,7 +167,7 @@ const SecuriteIncendiePropostionCard = ({
         checked={incendie.infos.fournisseurId === proposition.fournisseurId}
         onCheckedChange={() => handleClickProposition(proposition)}
         className="data-[state=checked]:bg-fm4alldestructive"
-        title="Sélectionner cette proposition"
+        title={t("selectionnez-cette-proposition")}
       />
       <div>
         <div className="flex gap-2 items-center">
@@ -173,7 +188,7 @@ const SecuriteIncendiePropostionCard = ({
                 {infosText}
                 {imgProduit}
                 <p className="text-xs italic text-end">
-                  *photo non contractuelle
+                  {t("photo-non-contractuelle")}
                 </p>
                 {infosProduitDialog}
               </div>

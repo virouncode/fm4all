@@ -3,6 +3,7 @@ import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { toast } from "@/hooks/use-toast";
 import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites";
 import { SelectIncendieTarifsType } from "@/zod-schemas/incendieTarifs";
+import { useTranslations } from "next-intl";
 import { ChangeEvent, useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import SecuriteIncendieDesktopPropositions from "./(desktop)/SecuriteIncendieDesktopPropositions";
@@ -21,6 +22,7 @@ const SecuriteIncendiePropositions = ({
   incendieQuantite,
   incendieTarifs,
 }: SecuriteIncendiePropositionsProps) => {
+  const t = useTranslations("DevisPage.services.incendie");
   const { incendie, setIncendie } = useContext(IncendieContext);
   const { setTotalIncendie } = useContext(TotalIncendieContext);
 
@@ -172,7 +174,9 @@ const SecuriteIncendiePropositions = ({
       totalDeplacementTrilogie: fraisDeplacementTrilogie,
     }));
     toast({
-      description: `Veillez à (re)-sélectionner vos options de sécurité incendie dans l'étape 6 (Personnaliser)`,
+      description: t(
+        "veillez-a-re-selectionner-vos-options-de-securite-incendie-dans-letape-6-personnaliser"
+      ),
     });
   };
 

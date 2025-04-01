@@ -13,6 +13,7 @@ import { MARGE } from "@/constants/constants";
 import { MaintenanceContext } from "@/context/MaintenanceProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useContext } from "react";
 
@@ -69,6 +70,9 @@ const MaintenanceMobilePropositionCard = ({
   proposition,
   handleClickProposition,
 }: MaintenanceMobilePropositionCardProps) => {
+  const t = useTranslations("DevisPage");
+  const tMaintenance = useTranslations("DevisPage.services.maintenance");
+  const tGlobal = useTranslations("Global");
   const { maintenance } = useContext(MaintenanceContext);
   const {
     gamme,
@@ -91,18 +95,18 @@ const MaintenanceMobilePropositionCard = ({
   const color = getFm4AllColor(gamme);
   const totalMensuelText = totalAnnuel ? (
     <p className="font-bold text-sm">
-      {formatNumber(Math.round((totalAnnuel * MARGE) / 12))} €/mois
+      {formatNumber(Math.round((totalAnnuel * MARGE) / 12))} {t("euros-mois")}
     </p>
   ) : (
-    <p className="text-sm font-bold">Non proposé</p>
+    <p className="text-sm font-bold">{t("non-propose")}</p>
   );
   const dialogTitle = (
     <p className={`text-${color} text-center`}>
       {gamme === "essentiel"
-        ? "Essentiel"
+        ? tGlobal("essentiel")
         : gamme === "confort"
-          ? "Confort"
-          : "Excellence"}
+          ? tGlobal("confort")
+          : tGlobal("excellence")}
     </p>
   );
   const imgProduit = (
@@ -130,38 +134,40 @@ const MaintenanceMobilePropositionCard = ({
   );
   const nbPassagesText = (
     <li className="list-check ">
-      {freqAnnuelle} passage(s) de {hParPassage} h / an
+      {freqAnnuelle} {t("passage-s-de")} {hParPassage} {t("h-an")}
     </li>
   );
   const infosEssentiel = (
     <>
       <li className="list-check ">
-        Obligation légale et contrôles règlementaires
+        {tMaintenance("obligation-legale-et-controles-reglementaires")}
       </li>
-      <li className="list-check">Contrôle Q18</li>
+      <li className="list-check">{tMaintenance("controle-q18")}</li>
       {nbPassagesText}
     </>
   );
   const infosConfort = (
     <>
       <li className="list-check ">
-        Essentiel + recommandations ARS, petits travaux d’entretien tous les
-        trois mois
+        {tMaintenance(
+          "essentiel-recommandations-ars-petits-travaux-dentretien-tous-les-trois-mois"
+        )}
       </li>
-      <li className="list-check ">Contrôle Q18</li>
-      <li className="list-check ">Contrôle Legionellose</li>
+      <li className="list-check ">{tMaintenance("controle-q18")}</li>
+      <li className="list-check ">{tMaintenance("controle-legionellose")}</li>
       {nbPassagesText}
     </>
   );
   const infosExcellence = (
     <>
       <li className="list-check ">
-        Une à deux fois par mois passage technicien pour maintenance & petits
-        travaux. Lien technique avec le gestionnaire de l’immeuble
+        {tMaintenance(
+          "une-a-deux-fois-par-mois-passage-technicien-pour-maintenance-and-petits-travaux-lien-technique-avec-le-gestionnaire-de-limmeuble"
+        )}
       </li>
-      <li className="list-check ">Contrôle Q18</li>
-      <li className="list-check ">Contrôle Legionellose</li>
-      <li className="list-check ">Contrôle Qualité Air</li>
+      <li className="list-check ">{tMaintenance("controle-q18")}</li>
+      <li className="list-check ">{tMaintenance("controle-legionellose")}</li>
+      <li className="list-check ">{tMaintenance("controle-qualite-air")}</li>
       {nbPassagesText}
     </>
   );
@@ -206,7 +212,7 @@ const MaintenanceMobilePropositionCard = ({
               <div className="flex flex-col gap-4">
                 {imgProduitDialog}
                 <p className="text-xs italic text-end">
-                  *photo non contractuelle
+                  {t("photo-non-contractuelle")}
                 </p>
                 {infosProduitDialog}
               </div>
@@ -279,7 +285,7 @@ const MaintenanceMobilePropositionCard = ({
                   maintenance.infos.gammeSelected === gamme
                 }
                 onCheckedChange={() => handleClickProposition(proposition)}
-                title="Sélectionnez cette proposition"
+                title={t("selectionnez-cette-proposition")}
                 onClick={(e) => e.stopPropagation()}
               />
             ) : null}
