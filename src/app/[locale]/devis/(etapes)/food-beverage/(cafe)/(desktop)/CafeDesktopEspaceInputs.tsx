@@ -19,6 +19,7 @@ import { typesBoissons } from "@/constants/typesBoissons";
 import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import { MAX_EFFECTIF } from "../../../locaux/MesLocaux";
 
@@ -39,6 +40,10 @@ const CafeDesktopEspaceInputs = ({
   handleSelectDureeLocation,
   cafeEspacesIds,
 }: CafeDesktopEspaceInputsProps) => {
+  const tTypeBoisson = useTranslations("DevisPage.foodBeverage.cafe.types");
+  const tLocation = useTranslations("DevisPage.location");
+  const t = useTranslations("DevisPage");
+  const tCafe = useTranslations("DevisPage.foodBeverage.cafe");
   const { client } = useContext(ClientContext);
   const { cafe } = useContext(CafeContext);
   return (
@@ -54,15 +59,15 @@ const CafeDesktopEspaceInputs = ({
                   className="flex gap-4 items-center"
                   name="typeBoissons"
                 >
-                  {typesBoissons.map(({ id, description }) => (
+                  {typesBoissons.map(({ id }) => (
                     <div key={id} className="flex gap-2 items-center">
                       <RadioGroupItem
                         value={id}
-                        title={description}
+                        title={tTypeBoisson(id)}
                         id={`${id}_${espace.infos.espaceId}`}
                       />
                       <Label htmlFor={`${id}_${espace.infos.espaceId}`}>
-                        {description}
+                        {tTypeBoisson(id)}
                       </Label>
                     </div>
                   ))}
@@ -87,17 +92,17 @@ const CafeDesktopEspaceInputs = ({
                   htmlFor={`nbPersonnes_${espace.infos.espaceId}`}
                   className="text-base"
                 >
-                  personnes
+                  {t("personnes")}
                 </Label>
               </div>
               {espace.infos.espaceId === cafeEspacesIds[0] && (
                 <Select
                   value={cafe.infos.dureeLocation}
                   onValueChange={handleSelectDureeLocation}
-                  aria-label="Sélectionnez la durée de location"
+                  aria-label={t("selectionnez-la-duree-de-location")}
                 >
                   <SelectTrigger className={`w-full max-w-xs`}>
-                    <SelectValue placeholder="Choisir" />
+                    <SelectValue placeholder={t("choisir")} />
                   </SelectTrigger>
                   <SelectContent>
                     {locationCafeMachine.map((item) => (
@@ -105,7 +110,7 @@ const CafeDesktopEspaceInputs = ({
                         key={`${location}_${item.id}`}
                         value={item.id}
                       >
-                        {item.description}
+                        {tLocation(item.id)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -115,8 +120,9 @@ const CafeDesktopEspaceInputs = ({
           </form>
         </TooltipTrigger>
         <TooltipContent className="max-w-60">
-          Choisissez le type de boissons avec ou sans lait/cacao, le nombre de
-          personnes pour votre espace café et la durée d’engagement
+          {tCafe(
+            "choisissez-le-type-de-boissons-avec-ou-sans-lait-cacao-le-nombre-de-personnes-pour-votre-espace-cafe-et-la-duree-dengagement"
+          )}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

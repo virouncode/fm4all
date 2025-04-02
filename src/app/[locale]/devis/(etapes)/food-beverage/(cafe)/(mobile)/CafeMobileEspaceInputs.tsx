@@ -15,6 +15,7 @@ import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
 import { Minus, Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import React, { useContext } from "react";
 import { MAX_EFFECTIF } from "../../../locaux/MesLocaux";
 
@@ -39,6 +40,10 @@ const CafeMobileEspaceInputs = ({
   handleIncrement,
   handleDecrement,
 }: CafeMobileEspaceInputsProps) => {
+  const t = useTranslations("DevisPage");
+  const tCafe = useTranslations("DevisPage.foodBeverage.cafe");
+  const tTypeBoisson = useTranslations("DevisPage.foodBeverage.cafe.types");
+  const tLocation = useTranslations("DevisPage.location");
   const { client } = useContext(ClientContext);
   const { cafe } = useContext(CafeContext);
 
@@ -47,25 +52,25 @@ const CafeMobileEspaceInputs = ({
       {espace.infos.espaceId === cafeEspacesIds[0] && (
         <div className="flex flex-col gap-4">
           <p>
-            Indiquez la <strong>durée d&apos;engagement</strong> souhaitée
-            :{" "}
+            {t("indiquez-la")} <strong>{t("duree-d-engagement")}</strong>{" "}
+            {t("souhaitee")}:{" "}
           </p>
           <div className="flex flex-col w-full p-1 gap-2">
             <Label htmlFor="nbDistribPh" className="text-sm flex-1">
-              Durée de location
+              {t("duree-de-location")}
             </Label>
             <Select
               value={cafe.infos.dureeLocation}
               onValueChange={handleSelectDureeLocation}
-              aria-label="Sélectionnez la durée de location"
+              aria-label={t("selectionnez-la-duree-de-location")}
             >
               <SelectTrigger className={`w-full max-w-xs`}>
-                <SelectValue placeholder="Choisir" />
+                <SelectValue placeholder={t("choisir")} />
               </SelectTrigger>
               <SelectContent>
                 {locationCafeMachine.map((item) => (
                   <SelectItem key={`${location}_${item.id}`} value={item.id}>
-                    {item.description}
+                    {tLocation(item.id)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -75,7 +80,8 @@ const CafeMobileEspaceInputs = ({
       )}
       <div className="flex flex-col gap-4">
         <p>
-          Indiquez le <strong>type de boissons</strong> :
+          {t("indiquez-le")}{" "}
+          <strong>{tCafe("type-de-boissons").toLowerCase()}</strong> :
         </p>
         <RadioGroup
           onValueChange={handleChangeTypeBoissons}
@@ -83,18 +89,18 @@ const CafeMobileEspaceInputs = ({
           className="flex flex-col gap-4"
           name="typeBoissons"
         >
-          {typesBoissons.map(({ id, description }) => (
+          {typesBoissons.map(({ id }) => (
             <div key={id} className="flex gap-2 items-center">
               <RadioGroupItem
                 value={id}
-                title={description}
+                title={tTypeBoisson(id)}
                 id={`${id}_${espace.infos.espaceId}`}
               />
               <Label
                 htmlFor={`${id}_${espace.infos.espaceId}`}
                 className="text-base"
               >
-                {description}
+                {tTypeBoisson(id)}
               </Label>
             </div>
           ))}
@@ -102,15 +108,16 @@ const CafeMobileEspaceInputs = ({
       </div>
       <div className="flex flex-col gap-4">
         <p>
-          Indiquez le <strong>nombre de personnes</strong> pour l&apos;espace
-          café :
+          {t("indiquez-le")}{" "}
+          <strong>{t("nombre-de-personnes").toLowerCase()}</strong>{" "}
+          {tCafe("pour-lespace-cafe")}
         </p>
         <div className="flex flex-col w-full p-1 gap-2">
           <Label
             htmlFor={`nbPersonnes_${espace.infos.espaceId}`}
             className="text-sm flex-1"
           >
-            Nombre de personnes
+            {t("nombre-de-personnes")}
           </Label>
           <div className="flex items-center gap-2">
             <Input
@@ -127,7 +134,7 @@ const CafeMobileEspaceInputs = ({
             />
             <Button
               variant="outline"
-              title="Diminuer le nombre de personnes"
+              title={t("diminuer-le-nombre-de-personnes")}
               onClick={handleDecrement}
               disabled={nbPersonnes === 0}
             >
@@ -135,7 +142,7 @@ const CafeMobileEspaceInputs = ({
             </Button>
             <Button
               variant="outline"
-              title="Augmenter le nombre de distributeurs"
+              title={t("augmenter-le-nombre-de-personnes")}
               onClick={handleIncrement}
               disabled={nbPersonnes === MAX_EFFECTIF}
             >

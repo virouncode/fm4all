@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 type PreviousEspaceButtonProps = {
   handleClickPreviousEspace: () => void;
@@ -7,15 +8,16 @@ type PreviousEspaceButtonProps = {
 const PreviousEspaceButton = ({
   handleClickPreviousEspace,
 }: PreviousEspaceButtonProps) => {
+  const t = useTranslations("DevisPage");
   return (
     <Button
       variant="outline"
       size="sm"
-      title="Espace précédent"
+      title={t("espace-precedent")}
       type="button"
       onClick={handleClickPreviousEspace}
     >
-      Espace précédent ↑
+      {t("espace-precedent-0")}
     </Button>
   );
 };

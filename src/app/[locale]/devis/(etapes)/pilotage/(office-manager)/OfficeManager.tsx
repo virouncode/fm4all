@@ -6,6 +6,7 @@ import useScrollIntoManagement from "@/hooks/use-scroll-into-management";
 import { SelectOfficeManagerQuantitesType } from "@/zod-schemas/officeManagerQuantites";
 import { SelectOfficeManagerTarifsType } from "@/zod-schemas/officeManagerTarifs";
 import { UserRoundCog } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
@@ -21,6 +22,7 @@ const OfficeManager = ({
   officeManagerQuantites,
   officeManagerTarifs,
 }: OfficeManagerProps) => {
+  const tPilotage = useTranslations("DevisPage.pilotage");
   const { setManagement } = useContext(ManagementContext);
   const handleClickPrevious = () => {};
   const handleClickNext = () => {
@@ -38,14 +40,18 @@ const OfficeManager = ({
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
           title="Office/Hospitality Manager"
-          description="Gestion opérationnelle sur site, animation des bureaux, contact direct avec les occupants, gestion des imprévus en temps réel… Un expert métier dédié directement chez vous pour tout gérer ! Le nombre de demi-journées d'intervention détermine la gamme"
+          description={tPilotage(
+            "gestion-operationnelle-sur-site-animation-des-bureaux-contact-direct-avec-les-occupants-gestion-des-imprevus-en-temps-reel-un-expert-metier-dedie-directement-chez-vous-pour-tout-gerer-le-nombre-de-demi-journees-dintervention-determine-la-gamme"
+          )}
           icon={UserRoundCog}
           propositionsRef={propositionsRef}
         />
       ) : (
         <PropositionsTitle
           title="Office/Hospitality Manager"
-          description="Gestion opérationnelle sur site, animation des bureaux, contact direct avec les occupants, gestion des imprévus en temps réel… Un expert métier dédié directement chez vous pour tout gérer ! Le nombre de demi-journées d'intervention détermine la gamme"
+          description={tPilotage(
+            "gestion-operationnelle-sur-site-animation-des-bureaux-contact-direct-avec-les-occupants-gestion-des-imprevus-en-temps-reel-un-expert-metier-dedie-directement-chez-vous-pour-tout-gerer-le-nombre-de-demi-journees-dintervention-determine-la-gamme"
+          )}
           icon={UserRoundCog}
           handleClickPrevious={handleClickPrevious}
           previousButton={false}
@@ -63,7 +69,9 @@ const OfficeManager = ({
       {!isTabletOrMobile ? (
         <PropositionsFooter
           handleClickNext={handleClickNext}
-          comment="*selon lieu d'exécution les demi journées pourront être proposées en télétravail"
+          comment={tPilotage(
+            "selon-lieu-dexecution-les-demi-journees-pourront-etre-proposees-en-teletravail"
+          )}
         />
       ) : null}
     </div>

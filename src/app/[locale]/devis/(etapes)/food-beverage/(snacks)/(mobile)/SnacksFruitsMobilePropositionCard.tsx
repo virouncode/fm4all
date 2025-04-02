@@ -13,6 +13,7 @@ import { MARGE } from "@/constants/constants";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useContext } from "react";
 
@@ -93,6 +94,9 @@ const SnacksFruitsMobilePropositionCard = ({
   proposition,
   handleClickProposition,
 }: SnacksFruitsMobilePropositionCardProps) => {
+  const t = useTranslations("DevisPage");
+  const tSnacks = useTranslations("DevisPage.foodBeverage.snacks");
+  const tGlobal = useTranslations("Global");
   const { snacksFruits } = useContext(SnacksFruitsContext);
   const {
     gamme,
@@ -126,58 +130,58 @@ const SnacksFruitsMobilePropositionCard = ({
   const totalMensuelText =
     snacksFruits.infos.choix.includes("fruits") && !proposition.prixKgFruits ? (
       <p className="text-sm font-bold text-end">
-        Non proposé pour ces critères
+        {t("non-propose-pour-ces-criteres")}
       </p>
     ) : snacksFruits.infos.choix.includes("snacks") &&
       !proposition.prixUnitaireSnacks ? (
       <p className="text-sm font-bold text-end">
-        Non proposé pour ces critères
+        {t("non-propose-pour-ces-criteres")}
       </p>
     ) : snacksFruits.infos.choix.includes("boissons") &&
       !proposition.prixUnitaireBoissons ? (
       <p className="text-sm font-bold text-end">
-        Non proposé pour ces critères
+        {t("non-propose-pour-ces-criteres")}
       </p>
     ) : total ? (
       <p className="text-sm font-bold text-end">
-        {formatNumber(Math.round((total * MARGE) / 12))} €/mois
+        {formatNumber(Math.round((total * MARGE) / 12))} {t("euros-mois")}
       </p>
     ) : (
       <p className="text-sm font-bold text-end">
-        Panier minimum hebdomadaire non atteint
+        {tSnacks("panier-minimum-hebdomadaire-non-atteint")}
       </p>
     );
   const gFruitsParSemaineParPersonneText = snacksFruits.infos.choix.includes(
     "fruits"
   ) ? (
     <li className="list-check">
-      {proposition.gFruitsParSemaineParPersonne} g / personne / semaine
+      {proposition.gFruitsParSemaineParPersonne} {tSnacks("g-personne-semaine")}
     </li>
   ) : null;
 
   const portionsSnacksParSemaineParPersonneText =
     snacksFruits.infos.choix.includes("snacks") ? (
       <li className="list-check">
-        {proposition.portionsSnacksParSemaineParPersonne} portion(s) / personne
-        / semaine
+        {proposition.portionsSnacksParSemaineParPersonne}{" "}
+        {tSnacks("portion-s-personne-semaine")}
       </li>
     ) : null;
 
   const consosBoissonsParSemaineParPersonneText =
     snacksFruits.infos.choix.includes("boissons") ? (
       <li className="list-check">
-        {proposition.consosBoissonsParSemaineParPersonne} boisson(s) / personne
-        / semaine
+        {proposition.consosBoissonsParSemaineParPersonne}{" "}
+        {tSnacks("boisson-s-personne-semaine")}
       </li>
     ) : null;
 
   const dialogTitle = (
     <p className={`text-${color} text-center`}>
       {proposition.gamme === "essentiel"
-        ? "Essentiel"
+        ? tGlobal("essentiel")
         : proposition.gamme === "confort"
-          ? "Confort"
-          : "Excellence"}
+          ? tGlobal("confort")
+          : tGlobal("excellence")}
     </p>
   );
 
@@ -261,7 +265,7 @@ const SnacksFruitsMobilePropositionCard = ({
               <div className="flex flex-col gap-4">
                 {imgProduitDialog}
                 <p className="text-xs italic text-end">
-                  *photo non contractuelle
+                  {t("photo-non-contractuelle")}
                 </p>
                 {infosProduitDialog}
               </div>
@@ -333,7 +337,7 @@ const SnacksFruitsMobilePropositionCard = ({
                 }
                 onCheckedChange={() => handleClickProposition(proposition)}
                 onClick={(e) => e.stopPropagation()}
-                title="Sélectionnez cette proposition"
+                title={t("selectionnez-cette-proposition")}
               />
             ) : null}
           </div>

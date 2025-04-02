@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ClientContext } from "@/context/ClientProvider";
 import { Minus, Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { ChangeEvent, useContext } from "react";
 import { MAX_EFFECTIF } from "../../../locaux/MesLocaux";
 
@@ -19,18 +20,21 @@ const TheMobileInputs = ({
   handleIncrement,
   handleDecrement,
 }: TheMobileInputsProps) => {
+  const t = useTranslations("DevisPage");
+  const tThe = useTranslations("DevisPage.foodBeverage.the");
   const { client } = useContext(ClientContext);
   const effectif = client.effectif ?? 0;
 
   return (
     <div className="flex flex-col gap-4">
       <p>
-        Indiquez le <strong>nombre de personnes</strong> consommant du thé
-        :{" "}
+        {t("indiquez-le")}{" "}
+        <strong>{t("nombre-de-personnes").toLowerCase()}</strong>{" "}
+        {tThe("consommant-du-the").toLowerCase()}{" "}
       </p>
       <div className="flex flex-col w-full p-1 gap-2">
         <Label htmlFor="nbDistribEmp" className="text-sm flex-1">
-          Nombre de personnes
+          {t("nombre-de-personnes")}
         </Label>
         <div className="flex items-center gap-2">
           <Input
@@ -48,7 +52,7 @@ const TheMobileInputs = ({
           />
           <Button
             variant="outline"
-            title="Diminuer le nombre de personnes"
+            title={t("diminuer-le-nombre-de-personnes")}
             onClick={handleDecrement}
             disabled={nbPersonnes === 0}
           >
@@ -56,7 +60,7 @@ const TheMobileInputs = ({
           </Button>
           <Button
             variant="outline"
-            title="Augmenter le nombre de personnes"
+            title={t("augmenter-le-nombre-de-personnes")}
             onClick={handleIncrement}
             disabled={nbPersonnes === MAX_EFFECTIF}
           >
@@ -64,8 +68,9 @@ const TheMobileInputs = ({
           </Button>
         </div>
         <p className="text-xs italic text-fm4alldestructive">
-          Les quantités sont estimées pour vous (environ 15% de votre effectif)
-          mais vous pouvez les changer
+          {tThe(
+            "les-quantites-sont-estimees-pour-vous-environ-15-de-votre-effectif-mais-vous-pouvez-les-changer"
+          )}
         </p>
       </div>
     </div>

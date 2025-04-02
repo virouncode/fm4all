@@ -2,11 +2,13 @@ import { Button } from "@/components/ui/button";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import PreviousServiceButton from "../../PreviousServiceButton";
 
 const PersonnaliserFinal = () => {
+  const tPersonnaliser = useTranslations("DevisPage.personnaliser");
   const { setDevisProgress } = useContext(DevisProgressContext);
   const { personnalisation, setPersonnalisation } = useContext(
     PersonnalisationContext
@@ -44,16 +46,18 @@ const PersonnaliserFinal = () => {
       ) : null}
       <div className="flex flex-col gap-4 py-6 items-center max-w-prose hyphens-auto mx-auto">
         <p>
-          Encore un doute sur une prestation ? Besoin de précisions
-          supplémentaires ?
+          {tPersonnaliser(
+            "encore-un-doute-sur-une-prestation-besoin-de-precisions-supplementaires"
+          )}
         </p>
-        <p className="text-center">Pas d’inquiètude !</p>
+        <p className="text-center">{tPersonnaliser("pas-dinquietude")}</p>
         <p>
-          Après cette étape, vous pourrez nous contacter pour des demandes ou
-          questions spécifiques avant de valider votre contrat.
+          {tPersonnaliser(
+            "apres-cette-etape-vous-pourrez-nous-contacter-pour-des-demandes-ou-questions-specifiques-avant-de-valider-votre-contrat"
+          )}
         </p>
         <p className="text-center">
-          Prêt à obtenir votre devis complet et engageant ?
+          {tPersonnaliser("pret-a-obtenir-votre-devis-complet-et-engageant")}
         </p>
       </div>
 
@@ -64,7 +68,7 @@ const PersonnaliserFinal = () => {
           size="lg"
           className="text-base"
         >
-          Valider
+          {tPersonnaliser("valider")}
         </Button>
       </div>
     </div>

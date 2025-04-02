@@ -9,6 +9,7 @@ import { SelectFruitsTarifsType } from "@/zod-schemas/fruitsTarifs";
 import { SelectSnacksQuantitesType } from "@/zod-schemas/snacksQuantites";
 import { SelectSnacksTarifsType } from "@/zod-schemas/snacksTarifs";
 import { Banana, Cookie, CupSoda } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
@@ -35,6 +36,7 @@ const SnacksFruits = ({
   boissonsTarifs,
   foodLivraisonTarifs,
 }: SnacksFruitsType) => {
+  const tSnacks = useTranslations("DevisPage.foodBeverage.snacks");
   const { setFoodBeverage } = useContext(FoodBeverageContext);
 
   const handleClickPrevious = () => {
@@ -61,7 +63,9 @@ const SnacksFruits = ({
           icon2={Banana}
           icon3={CupSoda}
           title="Snacks & Fruits"
-          description="Fruits locaux, bio, eco-responsables, snacks sains et gourmands, boissons fraiches, chaque semaine faites varier les plaisirs dans un panier qui ravira vos équipes. La gamme détermine les quantités par personne par semaine"
+          description={tSnacks(
+            "fruits-locaux-bio-eco-responsables-snacks-sains-et-gourmands-boissons-fraiches-chaque-semaine-faites-varier-les-plaisirs-dans-un-panier-qui-ravira-vos-equipes-la-gamme-determine-les-quantites-par-personne-par-semaine"
+          )}
           propositionsRef={propositionsRef}
         />
       ) : (
@@ -70,7 +74,9 @@ const SnacksFruits = ({
           icon2={Banana}
           icon3={CupSoda}
           title="Snacks & Fruits"
-          description="Fruits locaux, bio, eco-responsables, snacks sains et gourmands, boissons fraiches, chaque semaine faites varier les plaisirs dans un panier qui ravira vos équipes. La gamme détermine les quantités par personne par semaine"
+          description={tSnacks(
+            "fruits-locaux-bio-eco-responsables-snacks-sains-et-gourmands-boissons-fraiches-chaque-semaine-faites-varier-les-plaisirs-dans-un-panier-qui-ravira-vos-equipes-la-gamme-determine-les-quantites-par-personne-par-semaine"
+          )}
           handleClickPrevious={handleClickPrevious}
         />
       )}

@@ -9,6 +9,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 
 type OfficeManagerInputsProps = {
@@ -31,9 +32,11 @@ const OfficeManagerInputs = ({
   demiTjm,
   demiTjmPremium,
 }: OfficeManagerInputsProps) => {
+  const tOfficeManager = useTranslations("DevisPage.pilotage.officeManager");
   const { officeManager } = useContext(OfficeManagerContext);
-  const tooltipText =
-    "Sélectionnez le nombre de jour qui vous convient en fonction des tâches à réaliser";
+  const tooltipText = tOfficeManager(
+    "selectionnez-le-nombre-de-jour-qui-vous-convient-en-fonction-des-taches-a-realiser"
+  );
   return (
     <>
       <TooltipProvider delayDuration={0}>
@@ -55,12 +58,12 @@ const OfficeManagerInputs = ({
                 min={1}
                 max={20}
                 step={1}
-                title="Nombre de demi-journées par semaine"
+                title={tOfficeManager("nombre-de-demi-journees-par-semaine")}
               />
               <Label htmlFor="demiJParSemaine" className="text-sm flex-1">
                 {officeManager.quantites.demiJParSemaine ??
                   demiJParSemaineEssentiel}{" "}
-                demi journée(s) / semaine
+                {tOfficeManager("demi-journee-s-semaine")}
               </Label>
             </div>
           </TooltipTrigger>
@@ -74,10 +77,10 @@ const OfficeManagerInputs = ({
           className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
           checked={officeManager.infos.premium}
           onCheckedChange={handleCheckPremium}
-          aria-label="Sélectionner l'option premium"
+          aria-label={tOfficeManager("selectionner-loption-premium")}
         />
         <Label htmlFor="premium" className="text-sm flex-1">
-          Anglais courant ou Expertise Sup.
+          {tOfficeManager("anglais-courant-ou-expertise-sup")}
         </Label>
       </div>
       <div>
@@ -90,18 +93,22 @@ const OfficeManagerInputs = ({
           <div className="flex gap-2 items-center">
             <RadioGroupItem
               value={"remplace"}
-              title={"Remplacé pendant congés"}
+              title={tOfficeManager("remplace-pendant-conges")}
               id={"remplace"}
             />
-            <Label htmlFor="remplace">Remplacé pendant congés</Label>
+            <Label htmlFor="remplace">
+              {tOfficeManager("remplace-pendant-conges")}
+            </Label>
           </div>
           <div className="flex gap-2 items-center">
             <RadioGroupItem
               value={"non remplace"}
-              title={"Non remplacé pendant congés"}
+              title={tOfficeManager("non-remplace-pendant-conges")}
               id={"non_remplace"}
             />
-            <Label htmlFor="non_remplace">Non remplacé pendant congés</Label>
+            <Label htmlFor="non_remplace">
+              {tOfficeManager("non-remplace-pendant-conges")}
+            </Label>
           </div>
         </RadioGroup>
       </div>

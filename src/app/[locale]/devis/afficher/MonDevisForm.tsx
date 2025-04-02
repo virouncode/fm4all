@@ -6,9 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Form } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
-import { batiments } from "@/constants/batiments";
 import { departements } from "@/constants/departements";
-import { occupations } from "@/constants/occupation";
 import { ClientContext } from "@/context/ClientProvider";
 import { CommentairesContext } from "@/context/CommentairesProvider";
 import { MonDevisContext } from "@/context/MonDevisProvider";
@@ -18,8 +16,8 @@ import { toast } from "@/hooks/use-toast";
 import { Link, useRouter } from "@/i18n/navigation";
 import fillDevis from "@/lib/fillDevis";
 import {
+  createUpdateClientSchema,
   InsertClientType,
-  updateClientSchema,
   UpdateClientType,
 } from "@/zod-schemas/client";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,6 +25,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Loader } from "lucide-react";
 import { DateTime } from "luxon";
+import { useTranslations } from "next-intl";
 import {
   ChangeEvent,
   Dispatch,
@@ -41,6 +40,8 @@ type MonDevisFormProps = {
 };
 
 const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
+  const tDevisErreurs = useTranslations("DevisPage.sauver.erreurs");
+  const t = useTranslations("DevisPage.afficher");
   const { client, setClient } = useContext(ClientContext);
   const { total } = useContext(TotalContext);
   const { commentaires } = useContext(CommentairesContext);
@@ -80,9 +81,29 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
     dateDeDemarrage: client.dateDeDemarrage ?? "",
     commentaires: client.commentaires ?? "",
   };
+
   const form = useForm<UpdateClientType>({
     mode: "onBlur",
-    resolver: zodResolver(updateClientSchema),
+    resolver: zodResolver(
+      createUpdateClientSchema({
+        nomEntreprise: tDevisErreurs("nom-de-lentreprise-obligatoire"),
+        siret: tDevisErreurs("siret-invalide-format-attendu-xxx-xxx-xxx-xxxxx"),
+        prenomContact: tDevisErreurs("prenom-du-contact-obligatoire"),
+        nomContact: tDevisErreurs("nom-du-contact-obligatoire"),
+        posteContact: tDevisErreurs("poste-du-contact-obligatoire"),
+        emailContact: tDevisErreurs("adresse-email-invalide"),
+        phoneContact: tDevisErreurs("numero-de-telephone-invalide"),
+        emailSignataire: tDevisErreurs("adresse-email-invalide"),
+        surface: tDevisErreurs("surface-obligatoire"),
+        surfaceMax: tDevisErreurs("surface-maximum-3000-m"),
+        effectif: tDevisErreurs("effectif-obligatoire"),
+        effectifMax: tDevisErreurs("effectif-maximum-300-personnes"),
+        typeBatiment: tDevisErreurs("batiment"),
+        typeOccupation: tDevisErreurs("type-doccupation-invalide"),
+        codePostal: tDevisErreurs("code-postal-invalide-entrez-5-chiffres"),
+        ville: tDevisErreurs("ville-obligatoire"),
+      })
+    ),
     defaultValues,
   });
 
@@ -107,7 +128,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
     if (
       !departements.find(({ id }) => id === data.codePostal?.substring(0, 2))
     ) {
-      router.push("/city-out");
+      router.push("/chalandise");
       return;
     }
     //La ville existe ?
@@ -120,9 +141,10 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
       if (cityData.length === 0) {
         toast({
           variant: "destructive",
-          title: "Code postal invalide",
-          description:
-            "Le code postal ne correspond à aucune ville, veullez réessayer",
+          title: t("code-postal-invalide"),
+          description: t(
+            "le-code-postal-ne-correspond-a-aucune-ville-veuillez-reessayer"
+          ),
         });
         return;
       }
@@ -193,15 +215,8 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                         <p>Ville : ${data.ville}</p>
                         <p>Surface des locaux : ${data.surface}</p>
                         <p>Nombre de personnes : ${data.effectif}</p>
-                        <p>Type de bâtiment : ${
-                          batiments.find(({ id }) => id === data.typeBatiment)
-                            ?.description
-                        }</p>
-                        <p>Type d'occupation : ${
-                          occupations.find(
-                            ({ id }) => id === data.typeOccupation
-                          )?.description
-                        }</p><br/>
+                        <p>Type de bâtiment : ${data.typeBatiment}</p>
+                        <p>Type d'occupation : ${data.typeOccupation}</p><br/>
                         <p>Commentaires du client : ${commentaires}</p><br/>
                         <p>Veuillez trouver en pièce jointe le devis</p>
                         `,
@@ -218,7 +233,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
       if (err instanceof Error) {
         toast({
           variant: "destructive",
-          title: "Erreur",
+          title: t("erreur"),
           description: err.message,
         });
       } else console.log(err);
@@ -233,13 +248,14 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
       id="1"
     >
       <p className="text-2xl font-bold">
-        Félicitations {client.prenomContact} {client.nomContact} !
+        {t("felicitations")} {client.prenomContact} {client.nomContact} !
       </p>
-      <p className="text-lg">Votre devis final est prêt</p>
+      <p className="text-lg">{t("votre-devis-final-est-pret")}</p>
       <p className="text-base max-w-prose mx-auto hyphens-auto text-wrap">
-        Afin de donner une <strong>entête à votre devis</strong> et faciliter
-        vos futures démarches, vous pouvez nous communiquer vos coordonnées,
-        ainsi que celles du signataire du contrat (si différentes) :
+        {t("afin-de-donner-une")} <strong>{t("entete-a-votre-devis")}</strong>{" "}
+        {t(
+          "et-faciliter-vos-futures-demarches-vous-pouvez-nous-communiquer-vos-coordonnees-ainsi-que-celles-du-signataire-du-contrat-si-differentes"
+        )}
       </p>
 
       <Form {...form}>
@@ -251,21 +267,21 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
             <div className="flex flex-col gap-4 md:flex-row md:gap-20">
               <div className="w-full md:w-1/4 flex flex-col">
                 <InputWithLabel<InsertClientType>
-                  fieldTitle="Prénom du contact*"
+                  fieldTitle={t("prenom-du-contact")}
                   nameInSchema="prenomContact"
                   name="prenomContact"
                   handleChange={handleChange}
                   className="w-full"
                 />
                 <InputWithLabel<InsertClientType>
-                  fieldTitle="Nom du contact*"
+                  fieldTitle={t("nom-du-contact")}
                   nameInSchema="nomContact"
                   name="nomContact"
                   handleChange={handleChange}
                   className="w-full"
                 />
                 <InputWithLabel<InsertClientType>
-                  fieldTitle="Email du contact*"
+                  fieldTitle={t("email-du-contact")}
                   nameInSchema="emailContact"
                   type="email"
                   name="emailContact"
@@ -273,7 +289,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                   className="w-full"
                 />
                 <InputWithLabel<InsertClientType>
-                  fieldTitle="Poste du contact*"
+                  fieldTitle={t("poste-du-contact")}
                   nameInSchema="posteContact"
                   name="posteContact"
                   handleChange={handleChange}
@@ -282,21 +298,21 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
               </div>
               <div className="w-full md:w-1/4 flex flex-col">
                 <InputWithLabel<InsertClientType>
-                  fieldTitle="Prénom du signataire"
+                  fieldTitle={t("prenom-du-signataire")}
                   nameInSchema="prenomSignataire"
                   name="prenomSignataire"
                   handleChange={handleChange}
                   className="w-full"
                 />
                 <InputWithLabel<InsertClientType>
-                  fieldTitle="Nom du signataire"
+                  fieldTitle={t("nom-du-signataire")}
                   nameInSchema="nomSignataire"
                   name="nomSignataire"
                   handleChange={handleChange}
                   className="w-full"
                 />
                 <InputWithLabel<InsertClientType>
-                  fieldTitle="Email du signataire"
+                  fieldTitle={t("email-du-signataire")}
                   nameInSchema="emailSignataire"
                   type="email"
                   name="emailSignataire"
@@ -304,7 +320,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                   className="w-full"
                 />
                 <InputWithLabel<InsertClientType>
-                  fieldTitle="Poste du signataire"
+                  fieldTitle={t("poste-du-signataire")}
                   nameInSchema="posteSignataire"
                   name="posteSignataire"
                   handleChange={handleChange}
@@ -313,14 +329,14 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
               </div>
               <div className="w-full md:w-1/4 flex flex-col">
                 <InputWithLabel<InsertClientType>
-                  fieldTitle="Nom de l'entreprise*"
+                  fieldTitle={t("nom-de-lentreprise")}
                   nameInSchema="nomEntreprise"
                   name="nomEntreprise"
                   handleChange={handleChange}
                   className="w-full"
                 />
                 <InputWithLabel<InsertClientType>
-                  fieldTitle="Siret"
+                  fieldTitle={t("siret")}
                   nameInSchema="siret"
                   name="siret"
                   handleChange={handleChange}
@@ -328,7 +344,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                   className="w-full"
                 />
                 <InputWithLabel<InsertClientType>
-                  fieldTitle="N°de téléphone*"
+                  fieldTitle={t("n-de-telephone")}
                   nameInSchema="phoneContact"
                   placeholder="XX XX XX XX XX"
                   name="phoneContact"
@@ -336,7 +352,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                   className="w-full"
                 />
                 <DateInputWithLabel<InsertClientType>
-                  fieldTitle="Date de démarrage"
+                  fieldTitle={t("date-de-demarrage")}
                   nameInSchema="dateDeDemarrage"
                   handleChangeDate={handleChangeDate}
                 />
@@ -344,28 +360,28 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
 
               <div className="w-full md:w-1/4 flex flex-col">
                 <InputWithLabel<InsertClientType>
-                  fieldTitle="Addresse du site ligne 1"
+                  fieldTitle={t("addresse-du-site-ligne-1")}
                   nameInSchema="adresseLigne1"
                   name="addressLigne1"
                   handleChange={handleChange}
                   className="w-full"
                 />
                 <InputWithLabel<InsertClientType>
-                  fieldTitle="Addresse du site ligne 2"
+                  fieldTitle={t("addresse-du-site-ligne-2")}
                   nameInSchema="adresseLigne2"
                   name="adresseLigne2"
                   handleChange={handleChange}
                   className="w-full"
                 />
                 <InputWithLabel<InsertClientType>
-                  fieldTitle="Code postal*"
+                  fieldTitle={t("code-postal")}
                   nameInSchema="codePostal"
                   name="codePostal"
                   handleChange={handleChange}
                   className="w-full"
                 />
                 <InputWithLabel<InsertClientType>
-                  fieldTitle="Ville"
+                  fieldTitle={t("ville")}
                   nameInSchema="ville"
                   name="ville"
                   handleChange={handleChange}
@@ -379,19 +395,20 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                 onCheckedChange={(value: boolean) => setAccepte(value)}
                 className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                 id="acceptation"
-                aria-label="Acceptez les conditions"
+                aria-label={t("acceptez-les-conditions")}
               />
               <Label htmlFor="acceptation" className="max-w-prose">
-                En cochant cette case, je reconnais avoir lu, compris et accepté
-                sans réserve les{" "}
+                {t(
+                  "en-cochant-cette-case-je-reconnais-avoir-lu-compris-et-accepte-sans-reserve-les"
+                )}{" "}
                 <Link href="/cgu" className="underline" target="_blank">
-                  Conditions Générales d&apos;Utilisation (CGU)
+                  {t("conditions-generales-dutilisation-cgu")}
                 </Link>{" "}
-                et les{" "}
+                {t("et-les")}{" "}
                 <Link href="/cgv" className="underline" target="_blank">
-                  Conditions Générales de Vente
+                  {t("conditions-generales-de-vente")}
                 </Link>{" "}
-                de FM4ALL, applicables à tout contrat ultérieur.
+                {t("de-fm4all-applicables-a-tout-contrat-ulterieur")}
               </Label>
             </div>
             <div className="flex justify-center">
@@ -404,7 +421,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                 {loading ? (
                   <Loader className="animate-spin" />
                 ) : (
-                  "Afficher mon devis"
+                  t("afficher-mon-devis")
                 )}
               </Button>
             </div>

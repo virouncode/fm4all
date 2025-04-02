@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 
 const NextEtapePilotageButton = () => {
+  const t = useTranslations("DevisPage");
   const { client } = useContext(ClientContext);
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const router = useRouter();
@@ -32,10 +34,10 @@ const NextEtapePilotageButton = () => {
         variant="destructive"
         size="lg"
         className="text-base"
-        title="Passer à l'étape suivante"
+        title={t("passer-a-letape-suivante")}
         onClick={handleClickNext}
       >
-        Suivant →
+        {t("suivant-0")}
       </Button>
     </div>
   );

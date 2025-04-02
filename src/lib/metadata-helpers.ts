@@ -19,7 +19,7 @@ export type RouteKey =
   | "locauxDevis"
   | "servicesDevis"
   | "foodDevis"
-  | "managementDevis"
+  | "pilotageDevis"
   | "sauverDevis"
   | "personnaliserDevis"
   | "monDevis";
@@ -97,7 +97,7 @@ export const routes: Record<RouteKey, Record<"fr" | "en", string>> = {
     fr: "/mon-devis/food-beverage",
     en: "/my-quote/food-beverage",
   },
-  managementDevis: {
+  pilotageDevis: {
     fr: "/mon-devis/pilotage-prestations",
     en: "/my-quote/service-management",
   },

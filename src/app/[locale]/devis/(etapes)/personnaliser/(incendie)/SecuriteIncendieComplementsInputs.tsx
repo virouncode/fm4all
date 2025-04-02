@@ -1,6 +1,7 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTranslations } from "next-intl";
 import React from "react";
 import {
   MAX_NB_ALARMES,
@@ -51,6 +52,7 @@ const SecuriteIncendieComplementsInputs = ({
   handleCheck,
   handleChange,
 }: SecuriteIncendieComplementsInputsProps) => {
+  const tPersonnaliser = useTranslations("DevisPage.personnaliser");
   return (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-12 w-full md:mx-auto flex-1 overflow-auto p-2">
       <div className="flex items-center gap-2">
@@ -61,10 +63,10 @@ const SecuriteIncendieComplementsInputs = ({
           onCheckedChange={(checked: boolean) =>
             handleCheck(checked, "exutoires")
           }
-          aria-label="Sélectionner exutoires de fumée"
+          aria-label={tPersonnaliser("selectionner-exutoires-de-fumee")}
         />
         <Label htmlFor="exutoires" className="text-base flex-1">
-          Exutoires de fumée
+          {tPersonnaliser("exutoires-de-fumee")}
         </Label>
         {exutoires && (
           <Input
@@ -86,10 +88,10 @@ const SecuriteIncendieComplementsInputs = ({
           onCheckedChange={(checked: boolean) =>
             handleCheck(checked, "exutoiresParking")
           }
-          aria-label="Sélectionner exutoires de fumée (parking)"
+          aria-label={tPersonnaliser("selectionner-exutoires-de-fumee-parking")}
         />
         <Label htmlFor="exutoiresParking" className="text-base flex-1">
-          Exutoires de fumée (parking)
+          {tPersonnaliser("exutoires-de-fumee-parking")}
         </Label>
         {exutoiresParking && (
           <Input
@@ -111,10 +113,10 @@ const SecuriteIncendieComplementsInputs = ({
           onCheckedChange={(checked: boolean) =>
             handleCheck(checked, "alarmes")
           }
-          aria-label="Sélectionner alarmes T4"
+          aria-label={tPersonnaliser("selectionner-alarmes-t4")}
         />
         <Label htmlFor="alarmes" className="text-base flex-1">
-          Alarmes T4
+          {tPersonnaliser("alarmes-t4")}
         </Label>
         {alarmes && (
           <Input
@@ -136,10 +138,10 @@ const SecuriteIncendieComplementsInputs = ({
           onCheckedChange={(checked: boolean) =>
             handleCheck(checked, "portesCoupeFeuBattantes")
           }
-          aria-label="Sélectionner portes coupe-feu battantes"
+          aria-label={tPersonnaliser("selectionner-portes-coupe-feu-battantes")}
         />
         <Label htmlFor="portesCoupeFeuBattantes" className="text-base flex-1">
-          Portes coupe-feu battantes
+          {tPersonnaliser("portes-coupe-feu-battantes")}
         </Label>
         {portesCoupeFeuBattantes && (
           <Input
@@ -161,13 +163,15 @@ const SecuriteIncendieComplementsInputs = ({
           onCheckedChange={(checked: boolean) =>
             handleCheck(checked, "portesCoupeFeuCoulissantes")
           }
-          aria-label="Sélectionner portes coupe-feu coulissantes"
+          aria-label={tPersonnaliser(
+            "selectionner-portes-coupe-feu-coulissantes"
+          )}
         />
         <Label
           htmlFor="portesCoupeFeuCoulissantes"
           className="text-base flex-1"
         >
-          Portes coupe-feu coulissantes
+          {tPersonnaliser("portes-coupe-feu-coulissantes")}
         </Label>
         {portesCoupeFeuCoulissantes && (
           <Input
@@ -189,10 +193,10 @@ const SecuriteIncendieComplementsInputs = ({
           onCheckedChange={(checked: boolean) =>
             handleCheck(checked, "colonnesSechesStatiques")
           }
-          aria-label="Sélectionner colonnes sèches statiques"
+          aria-label={tPersonnaliser("selectionner-colonnes-seches-statiques")}
         />
         <Label htmlFor="colonnesSechesStatiques" className="text-base flex-1">
-          Colonnes sèches statiques
+          {tPersonnaliser("colonnes-seches-statiques")}
         </Label>
         {colonnesSechesStatiques && (
           <Input
@@ -214,10 +218,10 @@ const SecuriteIncendieComplementsInputs = ({
           onCheckedChange={(checked: boolean) =>
             handleCheck(checked, "colonnesSechesDynamiques")
           }
-          aria-label="Sélectionner colonnes sèches dynamiques"
+          aria-label={tPersonnaliser("selectionner-colonnes-seches-dynamiques")}
         />
         <Label htmlFor="colonnesSechesDynamiques" className="text-base flex-1">
-          Colonnes sèches dynamiques
+          {tPersonnaliser("colonnes-seches-dynamiques")}
         </Label>
         {colonnesSechesDynamiques && (
           <Input
@@ -237,10 +241,10 @@ const SecuriteIncendieComplementsInputs = ({
           className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
           checked={ria}
           onCheckedChange={(checked: boolean) => handleCheck(checked, "ria")}
-          aria-label="Sélectionner robinets d'incendie armés"
+          aria-label={tPersonnaliser("selectionner-robinets-dincendie-armes")}
         />
         <Label htmlFor="ria" className="text-base flex-1">
-          Robinets d&apos;incendie armés
+          {tPersonnaliser("robinets-dincendie-armes")}
         </Label>
         {ria && (
           <Input

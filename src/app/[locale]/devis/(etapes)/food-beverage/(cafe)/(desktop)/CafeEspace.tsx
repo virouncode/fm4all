@@ -18,6 +18,7 @@ import CafeEspacePropositions from "../CafeEspacePropositions";
 import PreviousEspaceButton from "../PreviousEspaceButton";
 import { reinitialisationCafeThe } from "../reinitialisationCafeThe";
 import RetirerEspaceButton from "../RetirerEspaceButton";
+import { useTranslations } from "next-intl";
 
 type CafeEspaceProps = {
   espace: CafeEspaceType;
@@ -40,6 +41,7 @@ const CafeEspace = ({
   theConsoTarifs,
   sucreConsoTarifs,
 }: CafeEspaceProps) => {
+  const t = useTranslations("DevisPage.foodBeverage.cafe");
   const { client } = useContext(ClientContext);
   const { cafe, setCafe } = useContext(CafeContext);
   const { setThe } = useContext(TheContext);
@@ -94,7 +96,7 @@ const CafeEspace = ({
       cafeEspacesIds[0] !== espace.infos.espaceId
     ) {
       toast({
-        description: "Veuillez d'abord retirer les espaces suivants",
+        description: t("veuillez-dabord-retirer-les-espaces-suivants"),
         variant: "destructive",
         duration: 3000,
       });

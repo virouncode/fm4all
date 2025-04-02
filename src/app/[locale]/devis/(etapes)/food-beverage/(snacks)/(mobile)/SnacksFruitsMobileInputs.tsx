@@ -6,6 +6,7 @@ import { TypesSnacksFruitsType } from "@/constants/typesSnacksFruits";
 import { ClientContext } from "@/context/ClientProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { Minus, Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import React, { useContext } from "react";
 import { MAX_EFFECTIF } from "../../../locaux/MesLocaux";
 
@@ -24,18 +25,21 @@ const SnacksFruitsMobileInputs = ({
   handleIncrement,
   handleDecrement,
 }: SnacksFruitsMobileInputsProps) => {
+  const t = useTranslations("DevisPage");
+  const tSnacks = useTranslations("DevisPage.foodBeverage.snacks");
   const { client } = useContext(ClientContext);
   const { snacksFruits } = useContext(SnacksFruitsContext);
 
   return (
     <div className="flex flex-col gap-8">
       <p className="font-bold text-xl hyphens-auto">
-        Fruits, snacks et boissons
+        {tSnacks("fruits-snacks-et-boissons")}
       </p>
       <div className="flex flex-col gap-4">
         <p>
-          Indiquez les <strong>produits que vous souhaitez recevoir</strong>{" "}
-          dans votre panier hebdomadaire :
+          {t("indiquez-les")}{" "}
+          <strong>{tSnacks("produits-que-vous-souhaitez-recevoir")}</strong>{" "}
+          {tSnacks("dans-votre-panier-hebdomadaire")}
         </p>
         <div className="flex flex-col w-full p-1 gap-2">
           <div className="flex gap-4 ">
@@ -45,10 +49,10 @@ const SnacksFruitsMobileInputs = ({
                 onCheckedChange={() => handleCheck("fruits")}
                 className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                 id="fruits"
-                aria-label="Sélectionner fruits"
+                aria-label={tSnacks("selectionner-fruits")}
               />
               <Label htmlFor={`fruits`} className="text-base">
-                Fruits
+                {tSnacks("fruits")}
               </Label>
             </div>
             <div className="flex items-center gap-2">
@@ -57,10 +61,10 @@ const SnacksFruitsMobileInputs = ({
                 onCheckedChange={() => handleCheck("snacks")}
                 className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                 id="snacks"
-                aria-label="Sélectionner snacks"
+                aria-label={tSnacks("selectionner-snacks")}
               />
               <Label htmlFor={`snacks`} className="text-base">
-                Snacks
+                {tSnacks("snacks")}
               </Label>
             </div>
             <div className="flex items-center gap-2">
@@ -69,10 +73,10 @@ const SnacksFruitsMobileInputs = ({
                 onCheckedChange={() => handleCheck("boissons")}
                 className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                 id="boissons"
-                aria-label="Sélectionner boissons"
+                aria-label={tSnacks("selectionner-boissons")}
               />
               <Label htmlFor={`boissons`} className="text-base">
-                Boissons
+                {tSnacks("boissons")}
               </Label>
             </div>
           </div>
@@ -80,11 +84,12 @@ const SnacksFruitsMobileInputs = ({
       </div>
       <div className="flex flex-col gap-4">
         <p>
-          Indiquez le <strong>nombre de personnes</strong> :
+          {t("indiquez-le")}{" "}
+          <strong>{t("nombre-de-personnes").toLowerCase()}</strong> :
         </p>
         <div className="flex flex-col w-full p-1 gap-2">
           <Label htmlFor="nbPersonnesFood" className="text-sm flex-1">
-            Nombre de personnes
+            {t("nombre-de-personnes")}
           </Label>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-2">
@@ -104,7 +109,7 @@ const SnacksFruitsMobileInputs = ({
               />
               <Button
                 variant="outline"
-                title="Diminuer le nombre de personnes"
+                title={t("diminuer-le-nombre-de-personnes")}
                 onClick={handleDecrement}
                 disabled={nbPersonnes === 0}
               >
@@ -112,7 +117,7 @@ const SnacksFruitsMobileInputs = ({
               </Button>
               <Button
                 variant="outline"
-                title="Augmenter le nombre de distributeurs"
+                title={t("augmenter-le-nombre-de-personnes")}
                 onClick={handleIncrement}
                 disabled={nbPersonnes === MAX_EFFECTIF}
               >

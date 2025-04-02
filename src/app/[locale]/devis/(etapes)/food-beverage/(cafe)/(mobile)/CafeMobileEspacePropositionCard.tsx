@@ -14,6 +14,7 @@ import { CafeContext } from "@/context/CafeProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { useContext } from "react";
 
@@ -131,6 +132,10 @@ const CafeMobileEspacePropositionCard = ({
   proposition,
   cafeEspacesIds,
 }: CafeMobileEspacePropositionCardProps) => {
+  const t = useTranslations("DevisPage");
+  const tCafe = useTranslations("DevisPage.foodBeverage.cafe");
+  const tGlobal = useTranslations("Global");
+  const locale = useLocale();
   const { cafe } = useContext(CafeContext);
   const {
     gamme,
@@ -157,41 +162,43 @@ const CafeMobileEspacePropositionCard = ({
 
   const totalMensuelText = totalAnnuel ? (
     <p className="text-sm font-bold text-end">
-      {formatNumber(Math.round((totalAnnuel * MARGE) / 12))} €/mois
+      {formatNumber(Math.round((totalAnnuel * MARGE) / 12))} {t("euros-mois")}
     </p>
   ) : (
-    <p className="text-sm font-bold text-end">Non proposé pour ces critères</p>
+    <p className="text-sm font-bold text-end">
+      {t("non-propose-pour-ces-criteres")}
+    </p>
   );
 
   const prixInstallationText = totalInstallation ? (
     <p className="text-xs">
-      + {formatNumber(Math.round(totalInstallation * MARGE))} €
-      d&apos;installation
+      + {formatNumber(Math.round(totalInstallation * MARGE))}{" "}
+      {t("eur-d-installation")}
     </p>
   ) : null;
 
   const dialogTitle = (
     <p className={`text-${color} text-center`}>
       {gamme === "essentiel"
-        ? "Essentiel"
+        ? tGlobal("essentiel")
         : gamme === "confort"
-          ? "Confort"
-          : "Excellence"}
+          ? tGlobal("confort")
+          : tGlobal("excellence")}
     </p>
   );
 
   const typeLaitText = !typeLait ? null : typeLait === "dosettes" ? (
-    <li className="list-check">Lait en dosettes</li>
+    <li className="list-check">{tCafe("lait-en-dosettes")}</li>
   ) : typeLait === "frais" ? (
-    <li className="list-check">Lait frais</li>
+    <li className="list-check">{tCafe("lait-frais")}</li>
   ) : (
-    <li className="list-check">Lait en poudre machine</li>
+    <li className="list-check">{tCafe("lait-en-poudre-machine")}</li>
   );
 
   const typeChocolatText = !typeChocolat ? null : typeChocolat === "sachets" ? (
-    <li className="list-check">Chocolat en sachets</li>
+    <li className="list-check">{tCafe("chocolat-en-sachets")}</li>
   ) : (
-    <li className="list-check">Chocolat en poudre machine</li>
+    <li className="list-check">{tCafe("chocolat-en-poudre-machine")}</li>
   );
 
   const imgProduit = (
@@ -222,30 +229,40 @@ const CafeMobileEspacePropositionCard = ({
     <li className="list-check font-bold">
       {proposition.infos
         ? proposition.infos
-        : "Café conventionnel dit Classique, Blend"}
+        : tCafe("cafe-conventionnel-dit-classique-blend")}
     </li>
   );
   const infosConfort = (
     <li className="list-check font-bold">
-      {proposition.infos ? proposition.infos : "Café Supérieur, 100% Arabica"}
+      {proposition.infos
+        ? proposition.infos
+        : tCafe("cafe-superieur-100-arabica")}
     </li>
   );
   const infosExcellence = (
     <li className="list-check font-bold">
       {proposition.infos
         ? proposition.infos
-        : "Café de spécialité, premium, café d’exception, Bio"}
+        : tCafe("cafe-de-specialite-premium-cafe-dexception-bio")}
     </li>
   );
 
   const infosProduit = (
     <ul className="flex flex-col text-xs px-4 mx-auto w-2/3">
       {totalAnnuel ? (
-        <li className="list-check text-sm font-bold">
-          {proposition.nbMachines} machine(s) {proposition.marque}{" "}
-          {proposition.modele}{" "}
-          {proposition.reconditionne ? " reconditionnée(s)" : ""}
-        </li>
+        locale === "fr" ? (
+          <li className="list-check text-sm font-bold">
+            {proposition.nbMachines} machine(s) {proposition.marque}{" "}
+            {proposition.modele}{" "}
+            {proposition.reconditionne ? tCafe("reconditionnee-s") : ""}
+          </li>
+        ) : (
+          <li className="list-check text-sm font-bold">
+            {proposition.nbMachines} {proposition.marque} {proposition.modele}{" "}
+            {proposition.reconditionne ? tCafe("reconditionnee-s") : ""}{" "}
+            machine(s)
+          </li>
+        )
       ) : null}
       {gamme === "essentiel"
         ? infosEssentiel
@@ -255,10 +272,10 @@ const CafeMobileEspacePropositionCard = ({
       {typeLaitText}
       {typeChocolatText}
       <li className="list-check">
-        Consommables ~ {proposition.nbTassesParJ} tasses / j
+        {t("consommables")} {proposition.nbTassesParJ} {tCafe("tasses-j")}
       </li>
       <li className="list-check">
-        Maintenance: {proposition.nbPassagesParAn} passages / an
+        Maintenance: {proposition.nbPassagesParAn} {t("passages-an")}
       </li>
     </ul>
   );
@@ -266,11 +283,19 @@ const CafeMobileEspacePropositionCard = ({
   const infosProduitDialog = (
     <ul className="flex flex-col text-sm px-4 mx-auto">
       {totalAnnuel ? (
-        <li className="list-check font-bold">
-          {proposition.nbMachines} machine(s) {proposition.marque}{" "}
-          {proposition.modele}{" "}
-          {proposition.reconditionne ? " reconditionnée(s)" : ""}
-        </li>
+        locale === "fr" ? (
+          <li className="list-check text-sm font-bold">
+            {proposition.nbMachines} machine(s) {proposition.marque}{" "}
+            {proposition.modele}{" "}
+            {proposition.reconditionne ? tCafe("reconditionnee-s") : ""}
+          </li>
+        ) : (
+          <li className="list-check text-sm font-bold">
+            {proposition.nbMachines} {proposition.marque} {proposition.modele}{" "}
+            {proposition.reconditionne ? tCafe("reconditionnee-s") : ""}{" "}
+            machine(s)
+          </li>
+        )
       ) : null}
       {gamme === "essentiel"
         ? infosEssentiel
@@ -280,10 +305,10 @@ const CafeMobileEspacePropositionCard = ({
       {typeLaitText}
       {typeChocolatText}
       <li className="list-check">
-        Consommables ~ {proposition.nbTassesParJ} tasses / j
+        {t("consommables")} {proposition.nbTassesParJ} {tCafe("tasses-j")}
       </li>
       <li className="list-check">
-        Maintenance: {proposition.nbPassagesParAn} passages / an
+        Maintenance: {proposition.nbPassagesParAn} {t("passages-an")}
       </li>
     </ul>
   );
@@ -308,7 +333,7 @@ const CafeMobileEspacePropositionCard = ({
               </DialogHeader>
               {imgProduitDialog}
               <p className="text-xs italic text-end">
-                *photo non contractuelle
+                {t("photo-non-contractuelle")}
               </p>
               {infosProduitDialog}
             </DialogContent>
@@ -388,7 +413,7 @@ const CafeMobileEspacePropositionCard = ({
                     ? handleClickFirstEspaceProposition(proposition)
                     : handleClickProposition(proposition)
                 }
-                title="Sélectionnez cette proposition"
+                title={t("selectionnez-cette-proposition")}
                 onClick={(e) => e.stopPropagation()}
               />
             ) : null}

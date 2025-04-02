@@ -4,6 +4,7 @@ import { toast } from "@/hooks/use-toast";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import RetirerEspaceButton from "../../(cafe)/RetirerEspaceButton";
 import FontaineEspaceForm from "../FontaineEspaceForm";
@@ -20,6 +21,8 @@ const FontaineMobileEspace = ({
   fontainesModeles,
   fontainesTarifs,
 }: FontainesMobileEspacesProps) => {
+  const tFontaines = useTranslations("DevisPage.foodBeverage.fontaines");
+  const tCafe = useTranslations("DevisPage.foodBeverage.cafe");
   const { fontaines, setFontaines } = useContext(FontainesContext);
   const { setTotalFontaines } = useContext(TotalFontainesContext);
   const fontainesEspacesIds = fontaines.espaces.map(
@@ -73,7 +76,7 @@ const FontaineMobileEspace = ({
       fontainesEspacesIds[0] !== espace.infos.espaceId
     ) {
       toast({
-        description: "Veuillez d'abord retirer les espaces suivants",
+        description: tCafe("veuillez-dabord-retirer-les-espaces-suivants"),
         variant: "destructive",
         duration: 3000,
       });
@@ -87,7 +90,8 @@ const FontaineMobileEspace = ({
     >
       <div className="flex items-center justify-between">
         <p className="text-xl font-bold">
-          Espace fontaine n°{espace.infos.espaceId}
+          {tFontaines("espace-fontaine-n")}
+          {espace.infos.espaceId}
         </p>
         <div onClick={handleAlert}>
           <RetirerEspaceButton

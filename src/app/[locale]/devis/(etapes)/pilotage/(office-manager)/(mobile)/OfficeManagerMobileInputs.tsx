@@ -3,6 +3,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
 import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 
 type OfficeManagerMobileInputsProps = {
@@ -21,14 +22,18 @@ const OfficeManagerMobileInputs = ({
   handleChangeRemplace,
   handleCheckPremium,
 }: OfficeManagerMobileInputsProps) => {
+  const t = useTranslations("DevisPage");
+  const tOfficeManager = useTranslations("DevisPage.pilotage.officeManager");
   const { officeManager } = useContext(OfficeManagerContext);
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-4">
         <p>
-          L&apos;office manager doit-il{" "}
+          {tOfficeManager("loffice-manager-doit-il")}{" "}
           <strong>
-            parler l&apos;anglais et avoir une expertise supérieure
+            {tOfficeManager(
+              "parler-langlais-et-avoir-une-expertise-superieure"
+            )}
           </strong>{" "}
           ?
         </p>
@@ -38,17 +43,17 @@ const OfficeManagerMobileInputs = ({
             className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             checked={officeManager.infos.premium}
             onCheckedChange={handleCheckPremium}
-            aria-label="Sélectionner l'option premium"
+            aria-label={tOfficeManager("selectionner-loption-premium")}
           />
           <Label htmlFor="premium" className="text-base flex-1">
-            Anglais courant ou Expertise Sup.
+            {tOfficeManager("anglais-courant-ou-expertise-sup")}
           </Label>
         </div>
       </div>
       <div className="flex flex-col gap-4">
         <p>
-          L&apos;office manager doit-il être{" "}
-          <strong>remplacé pendant ses congés</strong> ?
+          {tOfficeManager("loffice-manager-doit-il-etre")}{" "}
+          <strong>{tOfficeManager("remplace-pendant-ses-conges")}</strong> ?
         </p>
         <RadioGroup
           onValueChange={handleChangeRemplace}
@@ -59,29 +64,34 @@ const OfficeManagerMobileInputs = ({
           <div className="flex gap-2 items-center">
             <RadioGroupItem
               value={"remplace"}
-              title={"Remplacé pendant congés"}
+              title={tOfficeManager("remplace-pendant-conges")}
               id={"remplace"}
             />
             <Label htmlFor="remplace" className="text-base">
-              Remplacé pendant congés
+              {tOfficeManager("remplace-pendant-conges")}
             </Label>
           </div>
           <div className="flex gap-2 items-center">
             <RadioGroupItem
               value={"non remplace"}
-              title={"Non remplacé pendant congés"}
+              title={tOfficeManager("non-remplace-pendant-conges")}
               id={"non_remplace"}
             />
             <Label htmlFor="non_remplace" className="text-base">
-              Non remplacé pendant congés
+              {tOfficeManager("non-remplace-pendant-conges")}
             </Label>
           </div>
         </RadioGroup>
       </div>
       <div className="flex flex-col gap-4">
         <p>
-          Indiquez le <strong>nombre de demi-journées par semaine</strong>{" "}
-          souhaité :
+          {t("indiquez-le")}{" "}
+          <strong>
+            {tOfficeManager(
+              "nombre-de-demi-journees-par-semaine"
+            ).toLowerCase()}
+          </strong>{" "}
+          :
         </p>
         <div className="flex w-full p-2 gap-2">
           <Slider
@@ -101,13 +111,13 @@ const OfficeManagerMobileInputs = ({
             min={1}
             max={20}
             step={1}
-            title="Nombre de demi-journées par semaine"
+            title={tOfficeManager("nombre-de-demi-journees-par-semaine")}
             className="w-1/2"
           />
           <Label htmlFor="demiJParSemaine" className="text-base w-1/2">
             {officeManager.quantites.demiJParSemaine ??
               demiJParSemaineEssentiel}{" "}
-            demi journée(s)
+            {tOfficeManager("demi-journee-s")}
           </Label>
         </div>
       </div>

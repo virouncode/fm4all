@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import OfficeManagerMobileInputs from "./OfficeManagerMobileInputs";
 import OfficeManagerMobilePropositionCard from "./OfficeManagerMobilePropositionCard";
 
@@ -45,6 +46,7 @@ const OfficeManagerMobilePropositions = ({
   handleCheckPremium,
   handleClickProposition,
 }: OfficeManagerMobilePropositionsProps) => {
+  const tPilotage = useTranslations("DevisPage.pilotage");
   return (
     <div className="flex flex-col gap-6 w-full">
       <p className="font-bold text-xl lg:hidden">
@@ -66,8 +68,9 @@ const OfficeManagerMobilePropositions = ({
         />
       ))}
       <p className="text-xs">
-        *selon lieu d&apos;exécution les demi journées pourront être proposées
-        en télétravail
+        {tPilotage(
+          "selon-lieu-dexecution-les-demi-journees-pourront-etre-proposees-en-teletravail"
+        )}
       </p>
     </div>
   );

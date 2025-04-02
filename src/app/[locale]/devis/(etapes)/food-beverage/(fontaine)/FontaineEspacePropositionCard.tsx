@@ -9,9 +9,11 @@ import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { TypesPoseType } from "@/constants/typesPose";
 import { FontainesContext } from "@/context/FontainesProvider";
+import { capitalize } from "@/lib/capitalize";
 import { formatNumber } from "@/lib/formatNumber";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
 import { Info } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { useContext } from "react";
 import { getTypeFontaine } from "./getTypeFontaine";
@@ -111,6 +113,9 @@ const FontaineEspacePropositionCard = ({
   espace,
   fontainesEspacesIds,
 }: FontaineEspacePropositionCardProps) => {
+  const t = useTranslations("DevisPage");
+  const tFontaines = useTranslations("DevisPage.foodBeverage.fontaines");
+  const locale = useLocale();
   const { fontaines } = useContext(FontainesContext);
 
   if (!proposition.totalAnnuel) {
@@ -118,107 +123,156 @@ const FontaineEspacePropositionCard = ({
       <div
         className={`flex flex-1 bg-slate-100  items-center p-4 justify-center text-base gap-4 border-r min-h-36 text-center`}
       >
-        Non proposé pour ces critères
+        {t("non-propose-pour-ces-criteres")}
       </div>
     );
   }
 
   const totalMensuelText = (
     <p className="font-bold text-xl ml-4">
-      {formatNumber(Math.round((proposition.totalAnnuel * MARGE) / 12))} €/mois
+      {formatNumber(Math.round((proposition.totalAnnuel * MARGE) / 12))}{" "}
+      {t("euros-mois")}
     </p>
   );
 
   const prixInstallationText = proposition.totalInstallation ? (
     <p className="text-base ml-4">
-      + {formatNumber(Math.round(proposition.totalInstallation * MARGE))} €
-      d&apos;installation
+      + {formatNumber(Math.round(proposition.totalInstallation * MARGE))}{" "}
+      {t("eur-d-installation")}
     </p>
   ) : null;
 
-  const infosEssentiel = (
-    <>
+  const infosEssentiel =
+    locale === "fr" ? (
       <li className="list-check">
-        Machine <strong>à poser</strong> sur un plan de travail ou une table
+        {tFontaines("fontaine")}{" "}
+        <strong>{tFontaines("a-poser").toLowerCase()}</strong>{" "}
+        {tFontaines("sur-un-plan-de-travail-ou-une-table")}
       </li>
-    </>
-  );
+    ) : (
+      <li className="list-check">
+        <strong>{capitalize(tFontaines("a-poser"))}</strong>{" "}
+        {tFontaines("fontaine").toLowerCase()}{" "}
+        {tFontaines("sur-un-plan-de-travail-ou-une-table")}
+      </li>
+    );
+
   const infosConfort = (
     <>
       <li className="list-check">
-        Machine autonome fournie <strong>avec un meuble ou un pied</strong>
+        {tFontaines("machine-autonome-fournie")}{" "}
+        <strong>{tFontaines("avec-un-meuble-ou-un-pied")}</strong>
       </li>
     </>
   );
   const infosExcellence = (
     <>
       <li className="list-check">
-        Machine <strong>intégrée sous un meuble</strong> (non fourni) avec
-        colonne de distribution
+        {tFontaines("machine")}{" "}
+        <strong>{tFontaines("integree-sous-un-meuble")}</strong>{" "}
+        {tFontaines("non-fourni-avec-colonne-de-distribution")}
       </li>
     </>
   );
   const dialogTitle = (
-    <p className="text-center">
+    <p className={`text-center`}>
       {proposition.typePose === "aposer"
-        ? "A poser"
+        ? capitalize(tFontaines("a-poser"))
         : proposition.typePose === "colonne"
-        ? "Colonne sur pied"
-        : "Sous comptoir"}
+          ? tFontaines("colonne-sur-pied")
+          : tFontaines("sous-comptoir")}
     </p>
   );
   const infosProduit = (
     <ul className="flex flex-col text-xs px-4 mx-auto">
-      <li className="list-check text-sm font-bold">
-        1 fontaine{" "}
-        <span
-          className={`${
-            proposition.fournisseurId === 13 ? "inline-block blur-sm" : ""
-          }`}
-        >
-          {proposition.marque}
-        </span>{" "}
-        {proposition.modele}{" "}
-        {proposition.reconditionne ? " reconditionnée(s)" : ""}
-      </li>
+      {proposition.totalAnnuel ? (
+        locale === "fr" ? (
+          <li className="list-check text-sm font-bold">
+            1 {tFontaines("fontaine")}{" "}
+            <span
+              className={`${
+                proposition.fournisseurId === 13 ? "inline-block blur-sm" : ""
+              }`}
+            >
+              {proposition.marque}
+            </span>{" "}
+            {proposition.modele}{" "}
+            {proposition.reconditionne ? t("reconditionnee-s") : ""}
+          </li>
+        ) : (
+          <li className="list-check text-sm font-bold">
+            1{" "}
+            <span
+              className={`${
+                proposition.fournisseurId === 13 ? "inline-block blur-sm" : ""
+              }`}
+            >
+              {proposition.marque}
+            </span>{" "}
+            {proposition.modele}{" "}
+            {proposition.reconditionne ? t("reconditionnee-s") : ""}{" "}
+            {tFontaines("fontaine")}
+          </li>
+        )
+      ) : null}
       {proposition.typePose === "aposer"
         ? infosEssentiel
         : proposition.typePose === "colonne"
-        ? infosConfort
-        : infosExcellence}
-
-      <li className="list-check">Filtres et maintenance inclus</li>
+          ? infosConfort
+          : infosExcellence}
+      <li className="list-check">
+        {tFontaines("filtres-et-maintenance-inclus")}
+      </li>
       {getTypeFontaine(espace.infos.typeEau) === "EG" ||
       getTypeFontaine(espace.infos.typeEau) === "ECG" ? (
-        <li className="list-check">CO2 inclus</li>
+        <li className="list-check">{tFontaines("co2-inclus")}</li>
       ) : null}
     </ul>
   );
 
   const infosProduitDialog = (
     <ul className="flex flex-col text-sm px-4 mx-auto">
-      <li className="list-check font-bold">
-        1 fontaine{" "}
-        <span
-          className={`${
-            proposition.fournisseurId === 13 ? "inline-block blur-sm" : ""
-          }`}
-        >
-          {proposition.marque}
-        </span>{" "}
-        {proposition.modele}{" "}
-        {proposition.reconditionne ? " reconditionnée(s)" : ""}
-      </li>
+      {proposition.totalAnnuel ? (
+        locale === "fr" ? (
+          <li className="list-check text-sm font-bold">
+            1 {tFontaines("fontaine")}{" "}
+            <span
+              className={`${
+                proposition.fournisseurId === 13 ? "inline-block blur-sm" : ""
+              }`}
+            >
+              {proposition.marque}
+            </span>{" "}
+            {proposition.modele}{" "}
+            {proposition.reconditionne ? t("reconditionnee-s") : ""}
+          </li>
+        ) : (
+          <li className="list-check text-sm font-bold">
+            1{" "}
+            <span
+              className={`${
+                proposition.fournisseurId === 13 ? "inline-block blur-sm" : ""
+              }`}
+            >
+              {proposition.marque}
+            </span>{" "}
+            {proposition.modele}{" "}
+            {proposition.reconditionne ? t("reconditionnee-s") : ""}{" "}
+            {tFontaines("fontaine")}
+          </li>
+        )
+      ) : null}
       {proposition.typePose === "aposer"
         ? infosEssentiel
         : proposition.typePose === "colonne"
-        ? infosConfort
-        : infosExcellence}
-
-      <li className="list-check">Filtres et maintenance inclus</li>
+          ? infosConfort
+          : infosExcellence}
+      <li className="list-check">
+        {tFontaines("filtres-et-maintenance-inclus")}
+      </li>
       {getTypeFontaine(espace.infos.typeEau) === "EG" ||
       getTypeFontaine(espace.infos.typeEau) === "ECG" ? (
-        <li className="list-check">CO2 inclus</li>
+        <li className="list-check">{tFontaines("co2-inclus")}</li>
       ) : null}
     </ul>
   );
@@ -231,8 +285,8 @@ const FontaineEspacePropositionCard = ({
           (proposition.typePose === "aposer"
             ? "/img/services/fontaine_aposer.webp"
             : proposition.typePose === "colonne"
-            ? "/img/services/fontaine_colonne.webp"
-            : "/img/services/fontaine_comptoir.webp")
+              ? "/img/services/fontaine_colonne.webp"
+              : "/img/services/fontaine_comptoir.webp")
         }
         alt={`illustration ${proposition.marque} ${proposition.modele}`}
         fill
@@ -263,9 +317,10 @@ const FontaineEspacePropositionCard = ({
         onCheckedChange={() => () =>
           fontainesEspacesIds[0] === espace.infos.espaceId
             ? handleClickFirstEspaceProposition(proposition)
-            : handleClickProposition(proposition)}
+            : handleClickProposition(proposition)
+        }
         className="data-[state=checked]:bg-fm4alldestructive"
-        title="Sélectionner cette proposition"
+        title={t("selectionnez-cette-proposition")}
       />
 
       <div>
@@ -285,7 +340,7 @@ const FontaineEspacePropositionCard = ({
               </DialogHeader>
               {imgProduit}
               <p className="text-xs italic text-end">
-                *photo non contractuelle
+                {t("photo-non-contractuelle")}
               </p>
               {infosProduitDialog}
             </DialogContent>

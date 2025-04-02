@@ -7,6 +7,7 @@ import {
   getServicesFm4AllOffres,
   getServicesFm4AllTaux,
 } from "@/lib/queries/services-fm4all/getServicesFm4All";
+import { getTranslations } from "next-intl/server";
 import OfficeManager from "./(office-manager)/OfficeManager";
 import ServicesFm4All from "./(services-fm4all)/ServicesFm4All";
 
@@ -19,6 +20,7 @@ const PilotagePrestations = async ({
   surface,
   effectif,
 }: PilotagePrestationsProps) => {
+  const t = await getTranslations("DevisPage");
   const [
     officeManagerQuantites,
     officeManagerTarifs,
@@ -44,9 +46,9 @@ const PilotagePrestations = async ({
     return (
       <section className="flex h-dvh items-center justify-center text-lg">
         <p>
-          Nous n&apos;avons pas trouvé de tarifs pour ces informations.{" "}
+          {t("nous-n-avons-pas-trouve-de-tarifs-pour-ces-informations")}{" "}
           <Link href="/devis/locaux" className="underline">
-            Veuillez réessayer
+            {t("veuillez-reessayer")}
           </Link>
           .
         </p>

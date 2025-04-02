@@ -12,6 +12,7 @@ import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { GammeType } from "@/zod-schemas/gamme";
 import { Info } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useContext } from "react";
 
@@ -92,6 +93,9 @@ const SnacksFruitsPropositionCard = ({
   proposition,
   handleClickProposition,
 }: SnacksFruitsPropositionCardProps) => {
+  const t = useTranslations("DevisPage");
+  const tSnacks = useTranslations("DevisPage.foodBeverage.snacks");
+  const tGlobal = useTranslations("Global");
   const { snacksFruits } = useContext(SnacksFruitsContext);
   const gamme = proposition.gamme;
   const color = getFm4AllColor(gamme);
@@ -104,7 +108,7 @@ const SnacksFruitsPropositionCard = ({
       <div
         className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-base gap-4 min-h-36 text-center font-bold`}
       >
-        <p>Non proposé pour ces critères</p>
+        <p>{t("non-propose-pour-ces-criteres")}</p>
       </div>
     );
   }
@@ -116,7 +120,7 @@ const SnacksFruitsPropositionCard = ({
       <div
         className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-xl gap-4 min-h-36`}
       >
-        <p>Non proposé</p>
+        <p>{t("non-propose")}</p>
       </div>
     );
   }
@@ -128,7 +132,7 @@ const SnacksFruitsPropositionCard = ({
       <div
         className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-xl gap-4 min-h-36`}
       >
-        <p>Non proposé</p>
+        <p>{t("non-propose")}</p>
       </div>
     );
   }
@@ -138,47 +142,48 @@ const SnacksFruitsPropositionCard = ({
         className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-base gap-4 min-h-36 font-bold`}
       >
         <p className="text-center">
-          Le panier minimum hebdomadaire du fournisseur n&apos;est pas atteint
+          {tSnacks("panier-minimum-hebdomadaire-non-atteint")}
         </p>
       </div>
     );
   }
   const totalMensuelText = (
     <p className="font-bold text-xl ml-4">
-      {formatNumber(Math.round((proposition.total * MARGE) / 12))} €/mois
+      {formatNumber(Math.round((proposition.total * MARGE) / 12))}{" "}
+      {t("euros-mois")}
     </p>
   );
   const gFruitsParSemaineParPersonneText = snacksFruits.infos.choix.includes(
     "fruits"
   ) ? (
     <li className="list-check">
-      {proposition.gFruitsParSemaineParPersonne} g / personne / semaine
+      {proposition.gFruitsParSemaineParPersonne} {tSnacks("g-personne-semaine")}
     </li>
   ) : null;
 
   const portionsSnacksParSemaineParPersonneText =
     snacksFruits.infos.choix.includes("snacks") ? (
       <li className="list-check">
-        {proposition.portionsSnacksParSemaineParPersonne} portion(s) / personne
-        / semaine
+        {proposition.portionsSnacksParSemaineParPersonne}{" "}
+        {tSnacks("portion-s-personne-semaine")}
       </li>
     ) : null;
 
   const consosBoissonsParSemaineParPersonneText =
     snacksFruits.infos.choix.includes("boissons") ? (
       <li className="list-check">
-        {proposition.consosBoissonsParSemaineParPersonne} boisson(s) / personne
-        / semaine
+        {proposition.consosBoissonsParSemaineParPersonne}{" "}
+        {tSnacks("boisson-s-personne-semaine")}
       </li>
     ) : null;
 
   const dialogTitle = (
     <p className={`text-${color} text-center`}>
       {proposition.gamme === "essentiel"
-        ? "Essentiel"
+        ? tGlobal("essentiel")
         : proposition.gamme === "confort"
-        ? "Confort"
-        : "Excellence"}
+          ? tGlobal("confort")
+          : tGlobal("excellence")}
     </p>
   );
 
@@ -247,7 +252,7 @@ const SnacksFruitsPropositionCard = ({
         }
         onCheckedChange={() => handleClickProposition(proposition)}
         className="data-[state=checked]:bg-fm4alldestructive"
-        title="Sélectionner cette proposition"
+        title={t("selectionnez-cette-proposition")}
       />
       <div>
         <div className="flex gap-2 items-center">
@@ -266,7 +271,7 @@ const SnacksFruitsPropositionCard = ({
               </DialogHeader>
               {imgProduit}
               <p className="text-xs italic text-end">
-                *photos non contractuelles
+                {t("photos-non-contractuelles")}
               </p>
               {infosProduitDialog}
             </DialogContent>

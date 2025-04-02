@@ -13,6 +13,7 @@ import { roundNbPersonnesFontaine } from "@/lib/roundNbPersonnesFontaine";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import FontaineDesktopEspacePropositions from "./(desktop)/FontaineDesktopEspacePropositions";
@@ -30,6 +31,8 @@ const FontaineEspacePropositions = ({
   fontainesTarifs,
   espace,
 }: FontaineEspacePropositionsProps) => {
+  const t = useTranslations("DevisPage");
+  const tFontaines = useTranslations("DevisPage.foodBeverage.fontaines");
   const { client } = useContext(ClientContext);
   const { setDevisProgress } = useContext(DevisProgressContext);
   const { fontaines, setFontaines } = useContext(FontainesContext);
@@ -68,9 +71,9 @@ const FontaineEspacePropositions = ({
     return (
       <div className="flex-1 flex items-center justify-center border rounded-xl">
         <p className="max-w-prose text-center text-base">
-          Le fournisseur choisi précédemment ne propose pas d&apos;offre pour
-          ces critères, veuillez changer le type d&apos;eau ou le nombre de
-          personnes.
+          {tFontaines(
+            "le-fournisseur-choisi-precedemment-ne-propose-pas-doffre-pour-ces-criteres-veuillez-changer-le-type-deau-ou-le-nombre-de-personnes"
+          )}
         </p>
       </div>
     );
@@ -604,8 +607,9 @@ const FontaineEspacePropositions = ({
   const handleAlert = () => {
     if (!espace.infos.poseSelected) {
       toast({
-        description:
-          "Veuillez d'abord sélectionner une offre ou retirer tous les espaces",
+        description: t(
+          "veuillez-dabord-selectionner-une-offre-ou-retirer-tous-les-espaces"
+        ),
         duration: 3000,
         variant: "destructive",
         className: "left-0",

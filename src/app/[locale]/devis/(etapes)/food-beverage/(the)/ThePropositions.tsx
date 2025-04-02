@@ -6,6 +6,7 @@ import { toast } from "@/hooks/use-toast";
 import { roundNbPersonnesCafeConso } from "@/lib/roundNbPersonnesCafeConso";
 import { GammeType } from "@/zod-schemas/gamme";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
+import { useTranslations } from "next-intl";
 import { ChangeEvent, useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import { MAX_EFFECTIF } from "../../locaux/MesLocaux";
@@ -17,6 +18,9 @@ type ThePropositionsProps = {
 };
 
 const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
+  const t = useTranslations("DevisPage");
+  const tCafe = useTranslations("DevisPage.foodBeverage.cafe");
+  const tThe = useTranslations("DevisPage.foodBeverage.the");
   const { client } = useContext(ClientContext);
   const { cafe } = useContext(CafeContext);
   const { the, setThe } = useContext(TheContext);
@@ -115,9 +119,10 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
     if (newNbPersonnes > MAX_EFFECTIF) {
       newNbPersonnes = MAX_EFFECTIF;
       toast({
-        title: "Limite atteinte",
-        description:
-          "Nous ne proposons pas de livraisons pour plus de 300 personnes",
+        title: t("limite-atteinte"),
+        description: tThe(
+          "nous-ne-proposons-pas-de-livraisons-de-the-pour-plus-de-300-personnes"
+        ),
         duration: 7000,
       });
     }

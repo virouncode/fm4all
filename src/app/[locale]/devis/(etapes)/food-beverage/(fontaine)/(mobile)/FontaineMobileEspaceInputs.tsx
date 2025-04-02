@@ -17,6 +17,7 @@ import {
 } from "@/context/FontainesProvider";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
 import { Minus, Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 
 type FontaineMobileEspaceInputsProps = {
@@ -43,6 +44,10 @@ const FontaineMobileEspaceInputs = ({
   handleIncrement,
   handleDecrement,
 }: FontaineMobileEspaceInputsProps) => {
+  const t = useTranslations("DevisPage");
+  const tFontaines = useTranslations("DevisPage.foodBeverage.fontaines");
+  const tLocation = useTranslations("DevisPage.location");
+
   const { fontaines } = useContext(FontainesContext);
   const { client } = useContext(ClientContext);
   return (
@@ -50,24 +55,25 @@ const FontaineMobileEspaceInputs = ({
       {espace.infos.espaceId === fontainesEspacesIds[0] && (
         <div className="flex flex-col gap-4">
           <p>
-            Indiquez la <strong>durée d&apos;engagement</strong> souhaitée :{" "}
+            {t("indiquez-la")} <strong>{t("duree-d-engagement")}</strong>{" "}
+            {t("souhaitee")} :{" "}
           </p>
           <div className="flex flex-col w-full p-1 gap-2">
             <Label htmlFor="nbDistribPh" className="text-sm flex-1">
-              Durée de location
+              {t("duree-de-location")}
             </Label>
             <Select
               value={fontaines.infos.dureeLocation}
               onValueChange={handleSelectDureeLocation}
-              aria-label="Sélectionnez la durée de location"
+              aria-label={t("selectionnez-la-duree-de-location")}
             >
               <SelectTrigger className={`w-full max-w-xs`}>
-                <SelectValue placeholder="Choisir" />
+                <SelectValue placeholder={t("choisir")} />
               </SelectTrigger>
               <SelectContent>
                 {locationFontaine.map((item) => (
                   <SelectItem key={`${location}_${item.id}`} value={item.id}>
-                    {item.description}
+                    {tLocation(item.id)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -77,7 +83,7 @@ const FontaineMobileEspaceInputs = ({
       )}
       <div className="flex flex-col gap-4">
         <p>
-          Indiquez le <strong>type d&apos;eau souhaité</strong> :
+          {t("indiquez-le")} <strong>{tFontaines("type-deau")}</strong> :
         </p>
         <div className="flex gap-4 items-center">
           <div className="flex items-center gap-2">
@@ -89,10 +95,10 @@ const FontaineMobileEspaceInputs = ({
               disabled={true}
               className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
               id="eau froide"
-              aria-label="Sélectionner eau froide"
+              aria-label={tFontaines("selectionner-eau-froide")}
             />
             <Label htmlFor="eau froide" className="text-sm">
-              Eau froide
+              {tFontaines("eau-froide")}
             </Label>
           </div>
           <div className="flex items-center gap-2">
@@ -103,10 +109,10 @@ const FontaineMobileEspaceInputs = ({
               }
               className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
               id="eau gazeuse"
-              aria-label="Sélectionner eau gazeuse"
+              aria-label={tFontaines("selectionner-eau-gazeuse")}
             />
             <Label htmlFor="eau gazeuse" className="text-sm">
-              Eau gazeuse
+              {tFontaines("eau-gazeuse")}
             </Label>
           </div>
           <div className="flex items-center gap-2">
@@ -117,25 +123,26 @@ const FontaineMobileEspaceInputs = ({
               }
               className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
               id="eau chaude"
-              aria-label="Sélectionner eau chaude"
+              aria-label={tFontaines("selectionner-eau-chaude")}
             />
             <Label htmlFor="Eau chaude" className="text-sm">
-              Eau chaude
+              {tFontaines("eau-chaude")}
             </Label>
           </div>
         </div>
       </div>
       <div className="flex flex-col gap-4">
         <p>
-          Indiquez le <strong>nombre de personnes</strong> pour l&apos;espace
-          fontaine :
+          {t("indiquez-le")}{" "}
+          <strong>{t("nombre-de-personnes").toLowerCase()}</strong>{" "}
+          {tFontaines("pour-lespace-fontaine")}
         </p>
         <div className="flex flex-col w-full p-1 gap-2">
           <Label
             htmlFor={`nbPersonnes_${espace.infos.espaceId}`}
             className="text-sm flex-1"
           >
-            Nombre de personnes
+            {t("nombre-de-personnes")}
           </Label>
           <div className="flex items-center gap-2">
             <Input
@@ -152,7 +159,7 @@ const FontaineMobileEspaceInputs = ({
             />
             <Button
               variant="outline"
-              title="Diminuer le nombre de personnes"
+              title={t("diminuer-le-nombre-de-personnes")}
               onClick={handleDecrement}
               disabled={nbPersonnes === 0}
             >
@@ -160,7 +167,7 @@ const FontaineMobileEspaceInputs = ({
             </Button>
             <Button
               variant="outline"
-              title="Augmenter le nombre de distributeurs"
+              title={t("augmenter-le-nombre-de-personnes")}
               onClick={handleIncrement}
               disabled={nbPersonnes === MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE}
             >

@@ -1,11 +1,11 @@
-import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { Button } from "./ui/button";
 
 const CTAContactButtons = () => {
   const t = useTranslations("Global");
   return (
-    <div className="flex flex-col items-center justify-center gap-4">
+    <div className="w-full flex flex-col items-center justify-center gap-4">
       <Button
         variant="destructive"
         size="lg"

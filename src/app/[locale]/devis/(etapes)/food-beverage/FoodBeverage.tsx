@@ -26,6 +26,7 @@ import Cafe from "./(cafe)/Cafe";
 import Fontaines from "./(fontaine)/Fontaines";
 import SnacksFruits from "./(snacks)/SnacksFruits";
 import The from "./(the)/The";
+import { getTranslations } from "next-intl/server";
 
 const FoodBeverage = async () => {
   const [
@@ -82,12 +83,13 @@ const FoodBeverage = async () => {
     !fontainesModeles ||
     !fontainesTarifs
   ) {
+    const t = await getTranslations("DevisPage");
     return (
       <section className="flex h-dvh items-center justify-center text-lg">
         <p>
-          Nous n&apos;avons pas trouvé de tarifs pour ces informations.{" "}
+          {t("nous-n-avons-pas-trouve-de-tarifs-pour-ces-informations")}{" "}
           <Link href="/devis/locaux" className="underline">
-            Veuillez réessayer
+            {t("veuillez-reessayer")}
           </Link>
           .
         </p>

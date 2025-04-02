@@ -13,6 +13,7 @@ import { SelectFruitsQuantitesType } from "@/zod-schemas/fruitsQuantites";
 import { SelectFruitsTarifsType } from "@/zod-schemas/fruitsTarifs";
 import { SelectSnacksQuantitesType } from "@/zod-schemas/snacksQuantites";
 import { SelectSnacksTarifsType } from "@/zod-schemas/snacksTarifs";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import { MAX_EFFECTIF } from "../../locaux/MesLocaux";
@@ -38,6 +39,7 @@ const SnacksFruitsForm = ({
   boissonsTarifs,
   foodLivraisonTarifs,
 }: SnacksFruitsFormProps) => {
+  const t = useTranslations("DevisPage");
   const { client } = useContext(ClientContext);
   const { cafe } = useContext(CafeContext);
   const { snacksFruits, setSnacksFruits } = useContext(SnacksFruitsContext);
@@ -240,9 +242,10 @@ const SnacksFruitsForm = ({
     if (newNbPersonnes > MAX_EFFECTIF) {
       newNbPersonnes = MAX_EFFECTIF;
       toast({
-        title: "Limite atteinte",
-        description:
-          "Nous ne proposons pas de livraisons pour plus de 300 personnes",
+        title: t("limite-atteinte"),
+        description: t(
+          "nous-ne-proposons-pas-de-livraisons-pour-plus-de-300-personnes"
+        ),
         duration: 7000,
       });
     }

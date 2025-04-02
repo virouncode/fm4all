@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { TypesSnacksFruitsType } from "@/constants/typesSnacksFruits";
 import { ClientContext } from "@/context/ClientProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import { MAX_EFFECTIF } from "../../../locaux/MesLocaux";
 
@@ -18,6 +19,8 @@ const SnacksFruitsDesktopInputs = ({
   handleChangeNbPersonnes,
   nbPersonnes,
 }: SnacksFruitsDesktopInputsProps) => {
+  const t = useTranslations("DevisPage");
+  const tSnacks = useTranslations("DevisPage.foodBeverage.snacks");
   const { client } = useContext(ClientContext);
   const { snacksFruits } = useContext(SnacksFruitsContext);
   return (
@@ -29,10 +32,10 @@ const SnacksFruitsDesktopInputs = ({
             onCheckedChange={() => handleCheck("fruits")}
             className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             id="fruits"
-            aria-label="Sélectionner fruits"
+            aria-label={tSnacks("selectionner-fruits")}
           />
           <Label htmlFor={`fruits`} className="text-sm">
-            Fruits
+            {tSnacks("fruits")}
           </Label>
         </div>
         <div className="flex items-center gap-2">
@@ -41,10 +44,10 @@ const SnacksFruitsDesktopInputs = ({
             onCheckedChange={() => handleCheck("snacks")}
             className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             id="snacks"
-            aria-label="Sélectionner snacks"
+            aria-label={tSnacks("selectionner-snacks")}
           />
           <Label htmlFor={`snacks`} className="text-sm">
-            Snacks
+            {tSnacks("snacks")}
           </Label>
         </div>
         <div className="flex items-center gap-2">
@@ -53,10 +56,10 @@ const SnacksFruitsDesktopInputs = ({
             onCheckedChange={() => handleCheck("boissons")}
             className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             id="boissons"
-            aria-label="Sélectionner boissons"
+            aria-label={tSnacks("selectionner-boissons")}
           />
           <Label htmlFor={`boissons`} className="text-sm">
-            Boissons
+            {tSnacks("boissons")}
           </Label>
         </div>
       </div>
@@ -76,7 +79,7 @@ const SnacksFruitsDesktopInputs = ({
           id={`nbPersonnesFood`}
         />
         <Label htmlFor={`nbPersonnesFood`} className="text-sm">
-          personnes
+          {t("personnes")}
         </Label>
       </div>
     </form>

@@ -7,9 +7,12 @@ import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
 import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 
 const NextEtapeSauverButton = () => {
+  const t = useTranslations("DevisPage");
+  const tFm4all = useTranslations("DevisPage.pilotage.servicesFm4all");
   const { client } = useContext(ClientContext);
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const { servicesFm4All } = useContext(ServicesFm4AllContext);
@@ -41,9 +44,10 @@ const NextEtapeSauverButton = () => {
     if (!totalFinalServicesFm4All) {
       toast({
         variant: "destructive",
-        title: "Panier vide",
-        description:
-          "Vous n'avez choisi aucun service, veuillez sélectionner au moins un service",
+        title: tFm4all("panier-vide"),
+        description: tFm4all(
+          "vous-navez-choisi-aucun-service-veuillez-selectionner-au-moins-un-service"
+        ),
       });
       return;
     }
@@ -71,10 +75,10 @@ const NextEtapeSauverButton = () => {
         variant="destructive"
         size="lg"
         className="text-base"
-        title="Passer à l'étape suivante"
+        title={t("passer-a-letape-suivante")}
         onClick={handleClickNext}
       >
-        Suivant →
+        {t("suivant-0")}
       </Button>
     </div>
   );

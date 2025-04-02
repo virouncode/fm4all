@@ -10,6 +10,7 @@ import { SelectExutoiresTarifsType } from "@/zod-schemas/exutoiresTarifs";
 import { SelectPortesCoupeFeuTarifsType } from "@/zod-schemas/portesCoupeFeuTarifs";
 import { SelectRiaTarifsType } from "@/zod-schemas/riaTarifs";
 import { FireExtinguisher } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { ChangeEvent, useContext, useRef, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
@@ -40,6 +41,8 @@ const PersonnaliserIncendieComplements = ({
   colonnesSechesTarifs,
   portesCoupeFeuTarifs,
 }: PersonnaliserIncendieComplementsProps) => {
+  const tIncendie = useTranslations("DevisPage.services.incendie");
+  const tPersonnaliser = useTranslations("DevisPage.personnaliser");
   const { incendie, setIncendie } = useContext(IncendieContext);
   const { totalIncendie, setTotalIncendie } = useContext(TotalIncendieContext);
   const { personnalisation, setPersonnalisation } = useContext(
@@ -686,14 +689,14 @@ const PersonnaliserIncendieComplements = ({
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="6">
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
-          title="Securite incendie"
+          title={tIncendie("securite-incendie")}
           description=""
           icon={FireExtinguisher}
           propositionsRef={propositionsRef}
         />
       ) : (
         <PropositionsTitle
-          title="Securite incendie"
+          title={tIncendie("securite-incendie")}
           description=""
           icon={FireExtinguisher}
           handleClickPrevious={handleClickPrevious}
@@ -704,12 +707,13 @@ const PersonnaliserIncendieComplements = ({
         ref={propositionsRef}
       >
         <div className="flex flex-col gap-6">
-          <p className="text-2xl">Compléments</p>
+          <p className="text-2xl">{tPersonnaliser("complements")}</p>
           <p className="max-w-prose mx-auto hyphens-auto"></p>
           <div className="flex flex-col gap-8">
             <p className="max-w-prose mx-auto hyphens-auto font-bold">
-              En complément des BAES et Extincteurs, souhaitez vous nous confier
-              le contrôle de :
+              {tPersonnaliser(
+                "en-complement-des-baes-et-extincteurs-souhaitez-vous-nous-confier-le-controle-de"
+              )}
             </p>
             {isTabletOrMobile ? (
               <SecuriteIncendieMobileComplementsInputs

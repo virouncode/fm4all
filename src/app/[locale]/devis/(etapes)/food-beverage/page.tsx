@@ -1,12 +1,20 @@
+import { generateAlternates } from "@/lib/metadata-helpers";
 import { Metadata } from "next";
+import { getLocale } from "next-intl/server";
 import { Suspense } from "react";
 import ServicesLoader from "../locaux/ServicesLoader";
 import FoodBeverage from "./FoodBeverage";
 
-export const metadata: Metadata = {
-  title: "Food & Beverage",
-  description:
-    "Etape 3 du devis: optez pour des boissons chaudes, des fruits et des snacks sains et gourmands",
+export const generateMetadata = async (): Promise<Metadata> => {
+  const locale = await getLocale();
+  return generateAlternates(
+    "foodDevis",
+    locale,
+    "Food & Beverage",
+    locale === "fr"
+      ? "Etape 3 du devis: optez pour des boissons chaudes, des fruits et des snacks sains et gourmands"
+      : "Quote Step 3: choose from hot drinks, fruits, and healthy, delicious snacks."
+  );
 };
 
 const page = () => {

@@ -17,6 +17,7 @@ import CafeEspaceForm from "../CafeEspaceForm";
 import CafeEspacePropositions from "../CafeEspacePropositions";
 import { reinitialisationCafeThe } from "../reinitialisationCafeThe";
 import RetirerEspaceButton from "../RetirerEspaceButton";
+import { useTranslations } from "next-intl";
 
 type CafeMobileEspaceProps = {
   espace: CafeEspaceType;
@@ -39,6 +40,7 @@ const CafeMobileEspace = ({
   theConsoTarifs,
   sucreConsoTarifs,
 }: CafeMobileEspaceProps) => {
+  const t = useTranslations("DevisPage.foodBeverage.cafe");
   const { client } = useContext(ClientContext);
   const { cafe, setCafe } = useContext(CafeContext);
   const { setThe } = useContext(TheContext);
@@ -82,7 +84,7 @@ const CafeMobileEspace = ({
       cafeEspacesIds[0] !== espace.infos.espaceId
     ) {
       toast({
-        description: "Veuillez d'abord retirer les espaces suivants",
+        description: t("veuillez-dabord-retirer-les-espaces-suivants"),
         variant: "destructive",
         duration: 3000,
       });
@@ -95,7 +97,8 @@ const CafeMobileEspace = ({
     >
       <div className="flex items-center justify-between">
         <p className="text-xl font-bold">
-          Espace café n°{espace.infos.espaceId}
+          {t("espace-cafe-n")}
+          {espace.infos.espaceId}
         </p>
         <div onClick={handleAlert}>
           <RetirerEspaceButton

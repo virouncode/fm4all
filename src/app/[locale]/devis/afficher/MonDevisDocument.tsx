@@ -1,9 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import CTAContactButtons from "@/components/cta-contact-buttons";
 import { ClientContext } from "@/context/ClientProvider";
-import { Link } from "@/i18n/navigation";
 import { DateTime } from "luxon";
+import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { useContext } from "react";
 
 type MonDevisDocumentProps = {
@@ -11,6 +12,7 @@ type MonDevisDocumentProps = {
 };
 
 const MonDevisDocument = ({ devisUrl }: MonDevisDocumentProps) => {
+  const t = useTranslations("DevisPage.afficher");
   const { client } = useContext(ClientContext);
 
   return (
@@ -20,52 +22,25 @@ const MonDevisDocument = ({ devisUrl }: MonDevisDocumentProps) => {
       </p>
       <div className="flex-1 flex flex-col items-center gap-6 overflow-auto">
         <div className="flex flex-col gap-4 mx-auto max-w-prose items-center hyphens-auto text-wrap">
-          <p>Votre devis complet et personnalisé vous attend ci-dessous.</p>
           <p>
-            Il est <strong>valable 15 jours</strong> et nous engage. Imaginez le{" "}
-            <strong>temps que vous avez gagné</strong> par rapport à un appel
-            d’offres traditionnel !
+            {t("votre-devis-complet-et-personnalise-vous-attend-ci-dessous")}
           </p>
           <p>
-            Ce devis vous convient ? Gagnez encore du temps en nous laissant
-            rédiger pour vous les cahiers des charges et le contrat final afin
-            de démarrer au plus vite.
+            {t("il-est")} <strong>{t("valable-15-jours")}</strong>{" "}
+            {t("et-nous-engage-imaginez-le")}{" "}
+            <strong>{t("temps-que-vous-avez-gagne")}</strong>{" "}
+            {t("par-rapport-a-un-appel-doffres-traditionnel")}
           </p>
           <p>
-            <strong>Pour donner suite</strong> :
+            {t(
+              "ce-devis-vous-convient-gagnez-encore-du-temps-en-nous-laissant-rediger-pour-vous-les-cahiers-des-charges-et-le-contrat-final-afin-de-demarrer-au-plus-vite"
+            )}
+          </p>
+          <p>
+            <strong>{t("pour-donner-suite")}</strong> :
           </p>
         </div>
-        <div className="flex flex-col items-center justify-center gap-4">
-          <Button
-            variant="destructive"
-            size="lg"
-            className="text-base flex items-center justify-center w-full"
-            asChild
-          >
-            <Link
-              href="https://calendly.com/romuald-fm4all/rdv-fm4all"
-              target="_blank"
-            >
-              Je prends un rendez-vous en visio
-            </Link>
-          </Button>
-          <Button
-            variant="destructive"
-            size="lg"
-            className="text-base flex items-center justify-center w-full"
-            asChild
-          >
-            <Link href="tel:+33669311046">Je contacte par téléphone</Link>
-          </Button>
-          <Button
-            variant="destructive"
-            size="lg"
-            className="text-base flex items-center justify-center w-full"
-            asChild
-          >
-            <Link href="mailto:contact@fm4all.com">Je contacte par e-mail</Link>
-          </Button>
-        </div>
+        <CTAContactButtons />
         <div className="flex flex-col gap-4 w-full mx-auto max-w-prose items-center">
           <a
             href={devisUrl}
@@ -74,53 +49,17 @@ const MonDevisDocument = ({ devisUrl }: MonDevisDocumentProps) => {
             )}.pdf`}
             className="underline"
           >
-            Télécharger le devis
+            {t("telecharger-le-devis")}
           </a>
           <p>
-            Si le document ne s&apos;affiche pas correctement :{" "}
+            {t("si-le-document-ne-saffiche-pas-correctement")}{" "}
             <Link href={devisUrl} target="_blank" className="underline">
-              Cliquez ici
+              {t("cliquez-ici")}
             </Link>
           </p>
         </div>
         <div className="w-full mt-6 mb-6 flex justify-center">
           <iframe src={devisUrl} className="w-full h-screen" />
-        </div>
-        <div className="flex flex-col gap-4 mx-auto  items-center hyphens-auto text-wrap">
-          <p className="max-w-prose">Vous avez des questions ?</p>
-          <div className="flex flex-col items-center justify-center gap-4">
-            <Button
-              variant="destructive"
-              size="lg"
-              className="text-base w-full flex items-center justify-center"
-              asChild
-            >
-              <Link
-                href="https://calendly.com/romuald-fm4all/rdv-fm4all"
-                target="_blank"
-              >
-                Je prends un rendez-vous en visio
-              </Link>
-            </Button>
-            <Button
-              variant="destructive"
-              size="lg"
-              className="text-base w-full flex items-center justify-center"
-              asChild
-            >
-              <Link href="tel:+33669311046">Je contacte par téléphone</Link>
-            </Button>
-            <Button
-              variant="destructive"
-              size="lg"
-              className="text-base w-full flex items-center justify-center"
-              asChild
-            >
-              <Link href="mailto:contact@fm4all.com">
-                Je contacte par e-mail
-              </Link>
-            </Button>
-          </div>
         </div>
       </div>
     </div>

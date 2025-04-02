@@ -13,6 +13,7 @@ import { MARGE } from "@/constants/constants";
 import { TheContext } from "@/context/TheProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useContext } from "react";
 
@@ -65,6 +66,10 @@ const TheMobilePropositionCard = ({
   handleClickProposition,
   nbTassesParJour,
 }: TheMobilePropositionCardProps) => {
+  const tGlobal = useTranslations("Global");
+  const t = useTranslations("DevisPage");
+  const tThe = useTranslations("DevisPage.foodBeverage.the");
+  const tCafe = useTranslations("DevisPage.foodBeverage.cafe");
   const { the } = useContext(TheContext);
   const {
     gamme,
@@ -85,16 +90,16 @@ const TheMobilePropositionCard = ({
 
   const totalMensuelText = totalAnnuel ? (
     <p className="text-sm font-bold">
-      {formatNumber(Math.round((totalAnnuel * MARGE) / 12))} €/mois
+      {formatNumber(Math.round((totalAnnuel * MARGE) / 12))} {t("euros-mois")}
     </p>
   ) : (
-    <p className="text-sm font-bold">Non proposé</p>
+    <p className="text-sm font-bold">{t("non-propose")}</p>
   );
 
   const infosEssentiel = (
     <>
       <li className="list-check font-bold">
-        The en sachet, un ou deux au choix
+        {tThe("the-en-sachet-un-ou-deux-au-choix")}
       </li>
       {proposition.infos && (
         <li className="list-check font-bold">{proposition.infos}</li>
@@ -105,7 +110,7 @@ const TheMobilePropositionCard = ({
   const infosConfort = (
     <>
       <li className="list-check font-bold">
-        Choix de plusieurs thés en sachets
+        {tThe("choix-de-plusieurs-thes-en-sachets")}
       </li>
       {proposition.infos && (
         <li className="list-check font-bold">{proposition.infos}</li>
@@ -116,7 +121,7 @@ const TheMobilePropositionCard = ({
   const infosExcellence = (
     <>
       <li className="list-check font-bold">
-        Thés Premium en boite bois ou présentoir
+        {tThe("thes-premium-en-boite-bois-ou-presentoir")}
       </li>
       {proposition.infos && (
         <li className="list-check font-bold">{proposition.infos}</li>
@@ -127,10 +132,10 @@ const TheMobilePropositionCard = ({
   const dialogTitle = (
     <p className={`text-${color} text-center`}>
       {proposition.gamme === "essentiel"
-        ? "Essentiel"
+        ? tGlobal("essentiel")
         : proposition.gamme === "confort"
-          ? "Confort"
-          : "Excellence"}
+          ? tGlobal("confort")
+          : tGlobal("excellence")}
     </p>
   );
 
@@ -142,7 +147,7 @@ const TheMobilePropositionCard = ({
           ? infosConfort
           : infosExcellence}
       <li className="list-check">
-        Consommables ~ {nbTassesParJour} tasses / j
+        {t("consommables")} {nbTassesParJour} {tCafe("tasses-j")}
       </li>
     </ul>
   );
@@ -154,7 +159,7 @@ const TheMobilePropositionCard = ({
           ? infosConfort
           : infosExcellence}
       <li className="list-check">
-        Consommables ~ {nbTassesParJour} tasses / j
+        {t("consommables")} {nbTassesParJour} {tCafe("tasses-j")}
       </li>
     </ul>
   );
@@ -210,7 +215,7 @@ const TheMobilePropositionCard = ({
               <div className="flex flex-col gap-4">
                 {imgProduitDialog}
                 <p className="text-xs italic text-end">
-                  *photo non contractuelle
+                  {t("photo-non-contractuelle")}
                 </p>
                 {infosProduitDialog}
               </div>
@@ -278,7 +283,7 @@ const TheMobilePropositionCard = ({
                 checked={the.infos.gammeSelected === gamme}
                 onCheckedChange={() => handleClickProposition(proposition)}
                 onClick={(e) => e.stopPropagation()}
-                title="Sélectionnez cette proposition"
+                title={t("selectionnez-cette-proposition")}
               />
             ) : null}
           </div>

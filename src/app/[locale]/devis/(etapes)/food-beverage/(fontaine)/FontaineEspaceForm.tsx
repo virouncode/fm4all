@@ -13,6 +13,7 @@ import { DureeLocationFontaineType } from "@/zod-schemas/dureeLocation";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
+import { useTranslations } from "next-intl";
 import { ChangeEvent, useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import FontaineDesktopEspaceInputs from "./(desktop)/FontaineDesktopEspaceInputs";
@@ -29,6 +30,8 @@ const FontaineEspaceForm = ({
   fontainesModeles,
   fontainesTarifs,
 }: FontaineEspaceFormProps) => {
+  const t = useTranslations("DevisPage");
+  const tFontaines = useTranslations("DevisPage.foodBeverage.fontaines");
   const { client } = useContext(ClientContext);
   const { fontaines, setFontaines } = useContext(FontainesContext);
   const { setTotalFontaines } = useContext(TotalFontainesContext);
@@ -204,17 +207,17 @@ const FontaineEspaceForm = ({
     const totalAnnuel = totalLoc !== null ? totalLoc + totalConso : null;
     //Modele
     const modele = fontainesTarifFournisseur
-      ? fontainesModeles?.find(
+      ? (fontainesModeles?.find(
           ({ id }) => id === fontainesTarifFournisseur?.fontaineId
-        )?.modele ?? null
+        )?.modele ?? null)
       : null;
     const marque = fontainesTarifFournisseur
-      ? fontainesModeles?.find(
+      ? (fontainesModeles?.find(
           ({ id }) => id === fontainesTarifFournisseur?.fontaineId
-        )?.marque ?? null
+        )?.marque ?? null)
       : null;
     const reconditionne = fontainesTarifFournisseur
-      ? fontainesTarifFournisseur.reconditionne ?? null
+      ? (fontainesTarifFournisseur.reconditionne ?? null)
       : null;
     //Je mets à jour mon espace
     setFontaines((prev) => ({
@@ -419,17 +422,17 @@ const FontaineEspaceForm = ({
     const totalAnnuel = totalLoc !== null ? totalLoc + totalConso : null;
     //Modele
     const modele = fontainesTarifFournisseur
-      ? fontainesModeles?.find(
+      ? (fontainesModeles?.find(
           ({ id }) => id === fontainesTarifFournisseur?.fontaineId
-        )?.modele ?? null
+        )?.modele ?? null)
       : null;
     const marque = fontainesTarifFournisseur
-      ? fontainesModeles?.find(
+      ? (fontainesModeles?.find(
           ({ id }) => id === fontainesTarifFournisseur?.fontaineId
-        )?.marque ?? null
+        )?.marque ?? null)
       : null;
     const reconditionne = fontainesTarifFournisseur
-      ? fontainesTarifFournisseur.reconditionne ?? null
+      ? (fontainesTarifFournisseur.reconditionne ?? null)
       : null;
 
     //Je mets à jour  ma machine
@@ -483,10 +486,11 @@ const FontaineEspaceForm = ({
     if (newNbPersonnes >= MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE) {
       newNbPersonnes = MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE;
       toast({
-        title: "Limite atteinte",
+        title: t("limite-atteinte"),
         variant: "destructive",
-        description:
-          "Le nombre de personnes par espace fontaine à eau est limité à 110. Choisissez une offre puis ajoutez un espace fontaine à eau si besoin",
+        description: tFontaines(
+          "le-nombre-de-personnes-par-espace-fontaine-a-eau-est-limite-a-110-choisissez-une-offre-puis-ajoutez-un-espace-fontaine-a-eau-si-besoin"
+        ),
         duration: 7000,
       });
     }
@@ -498,10 +502,11 @@ const FontaineEspaceForm = ({
     if (newNbPersonnes >= MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE) {
       newNbPersonnes = MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE;
       toast({
-        title: "Limite atteinte",
+        title: t("limite-atteinte"),
         variant: "destructive",
-        description:
-          "Le nombre de personnes par espace fontaine à eau est limité à 110. Choisissez une offre puis ajoutez un espace fontaine à eau si besoin",
+        description: tFontaines(
+          "le-nombre-de-personnes-par-espace-fontaine-a-eau-est-limite-a-110-choisissez-une-offre-puis-ajoutez-un-espace-fontaine-a-eau-si-besoin"
+        ),
         duration: 7000,
       });
     }
@@ -625,17 +630,17 @@ const FontaineEspaceForm = ({
     const totalAnnuel = totalLoc !== null ? totalLoc + totalConso : null;
     //Modele
     const modele = fontainesTarifFournisseur
-      ? fontainesModeles?.find(
+      ? (fontainesModeles?.find(
           ({ id }) => id === fontainesTarifFournisseur?.fontaineId
-        )?.modele ?? null
+        )?.modele ?? null)
       : null;
     const marque = fontainesTarifFournisseur
-      ? fontainesModeles?.find(
+      ? (fontainesModeles?.find(
           ({ id }) => id === fontainesTarifFournisseur?.fontaineId
-        )?.marque ?? null
+        )?.marque ?? null)
       : null;
     const reconditionne = fontainesTarifFournisseur
-      ? fontainesTarifFournisseur.reconditionne ?? null
+      ? (fontainesTarifFournisseur.reconditionne ?? null)
       : null;
     //Je mets à jour mon espace
     setFontaines((prev) => ({

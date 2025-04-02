@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import React from "react";
 import { MAX_EFFECTIF } from "../../../locaux/MesLocaux";
+import { useTranslations } from "next-intl";
 
 type ThePropositionsInputProps = {
   nbPersonnes: number;
@@ -14,6 +15,8 @@ const ThePropositionsInput = ({
   effectif,
   handleChange,
 }: ThePropositionsInputProps) => {
+  const t = useTranslations("DevisPage");
+  const tThe = useTranslations("DevisPage.foodBeverage.the");
   return (
     <div className="flex flex-col gap-6 w-full p-4">
       <div className="flex gap-4 items-center justify-center w-full">
@@ -31,12 +34,13 @@ const ThePropositionsInput = ({
           }`}
         />
         <Label htmlFor="nbDistribEmp" className="text-sm">
-          personnes
+          {t("personnes")}
         </Label>
       </div>
       <p className="text-xs text-fm4alldestructive italic px-2 text-center">
-        Les quantités sont estimées pour vous (environ 15% de votre effectif)
-        mais vous pouvez les changer
+        {tThe(
+          "les-quantites-sont-estimees-pour-vous-environ-15-de-votre-effectif-mais-vous-pouvez-les-changer"
+        )}
       </p>
     </div>
   );

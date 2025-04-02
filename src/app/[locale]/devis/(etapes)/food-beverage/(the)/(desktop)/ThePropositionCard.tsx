@@ -11,6 +11,7 @@ import { TheContext } from "@/context/TheProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { Info } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useContext } from "react";
 
@@ -63,6 +64,10 @@ const ThePropositionCard = ({
   handleClickProposition,
   nbTassesParJour,
 }: ThePropositionCardProps) => {
+  const t = useTranslations("DevisPage");
+  const tThe = useTranslations("DevisPage.foodBeverage.the");
+  const tGlobal = useTranslations("Global");
+  const tCafe = useTranslations("DevisPage.foodBeverage.cafe");
   const { the } = useContext(TheContext);
   const gamme = proposition.gamme;
   const color = getFm4AllColor(gamme);
@@ -71,20 +76,21 @@ const ThePropositionCard = ({
       <div
         className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-lg gap-4 text-center font-bold`}
       >
-        Non proposé
+        {t("non-propose")}
       </div>
     );
   }
   const totalMensuelText = (
     <p className="font-bold text-xl ml-4">
-      {formatNumber(Math.round((proposition.totalAnnuel * MARGE) / 12))} €/mois
+      {formatNumber(Math.round((proposition.totalAnnuel * MARGE) / 12))}{" "}
+      {t("euros-mois")}
     </p>
   );
 
   const infosEssentiel = (
     <>
       <li className="list-check font-bold">
-        The en sachet, un ou deux au choix
+        {tThe("the-en-sachet-un-ou-deux-au-choix")}
       </li>
       {proposition.infos && (
         <li className="list-check font-bold">{proposition.infos}</li>
@@ -95,7 +101,7 @@ const ThePropositionCard = ({
   const infosConfort = (
     <>
       <li className="list-check font-bold">
-        Choix de plusieurs thés en sachets
+        {tThe("choix-de-plusieurs-thes-en-sachets")}
       </li>
       {proposition.infos && (
         <li className="list-check font-bold">{proposition.infos}</li>
@@ -106,7 +112,7 @@ const ThePropositionCard = ({
   const infosExcellence = (
     <>
       <li className="list-check font-bold">
-        Thés Premium en boite bois ou présentoir
+        {tThe("thes-premium-en-boite-bois-ou-presentoir")}
       </li>
       {proposition.infos && (
         <li className="list-check font-bold">{proposition.infos}</li>
@@ -117,10 +123,10 @@ const ThePropositionCard = ({
   const dialogTitle = (
     <p className={`text-${color} text-center`}>
       {proposition.gamme === "essentiel"
-        ? "Essentiel"
+        ? tGlobal("essentiel")
         : proposition.gamme === "confort"
-        ? "Confort"
-        : "Excellence"}
+          ? tGlobal("confort")
+          : tGlobal("excellence")}
     </p>
   );
 
@@ -129,10 +135,10 @@ const ThePropositionCard = ({
       {gamme === "essentiel"
         ? infosEssentiel
         : gamme === "confort"
-        ? infosConfort
-        : infosExcellence}
+          ? infosConfort
+          : infosExcellence}
       <li className="list-check">
-        Consommables ~ {nbTassesParJour} tasses / j
+        {t("consommables")} {nbTassesParJour} {tCafe("tasses-j")}
       </li>
     </ul>
   );
@@ -141,10 +147,10 @@ const ThePropositionCard = ({
       {gamme === "essentiel"
         ? infosEssentiel
         : gamme === "confort"
-        ? infosConfort
-        : infosExcellence}
+          ? infosConfort
+          : infosExcellence}
       <li className="list-check">
-        Consommables ~ {nbTassesParJour} tasses / j
+        {t("consommables")} {nbTassesParJour} {tCafe("tasses-j")}
       </li>
     </ul>
   );
@@ -177,7 +183,7 @@ const ThePropositionCard = ({
         checked={the.infos.gammeSelected === proposition.gamme}
         onCheckedChange={() => handleClickProposition(proposition)}
         className="data-[state=checked]:bg-fm4alldestructive"
-        title="Sélectionner cette proposition"
+        title={t("selectionnez-cette-proposition")}
       />
       <div>
         <div className="flex gap-2 items-center">
@@ -196,7 +202,7 @@ const ThePropositionCard = ({
               </DialogHeader>
               {imgProduit}
               <p className="text-xs italic text-end">
-                *photo non contractuelle
+                {t("photo-non-contractuelle")}
               </p>
               {infosProduitDialog}
             </DialogContent>

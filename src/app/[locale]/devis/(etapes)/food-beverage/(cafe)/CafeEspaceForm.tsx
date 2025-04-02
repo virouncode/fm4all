@@ -18,6 +18,7 @@ import { SelectChocolatConsoTarifsType } from "@/zod-schemas/chocolatConsoTarifs
 import { DureeLocationCafeType } from "@/zod-schemas/dureeLocation";
 import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
+import { useTranslations } from "next-intl";
 import { ChangeEvent, useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import CafeDesktopEspaceInputs from "./(desktop)/CafeDesktopEspaceInputs";
@@ -43,6 +44,8 @@ const CafeEspaceForm = ({
   chocolatConsoTarifs,
   sucreConsoTarifs,
 }: CafeEspaceFormProps) => {
+  const t = useTranslations("DevisPage");
+  const tCafe = useTranslations("DevisPage.foodBeverage.cafe");
   const { client } = useContext(ClientContext);
   const { cafe, setCafe } = useContext(CafeContext);
   const { setThe } = useContext(TheContext);
@@ -252,12 +255,12 @@ const CafeEspaceForm = ({
       value !== "cafe" ? machinesTarifFournisseur?.typeLait : null;
     const prixUnitaireConsoLait =
       typeLait === "dosettes"
-        ? consoLaitTarifFournisseur?.prixUnitaireDosette ?? null
+        ? (consoLaitTarifFournisseur?.prixUnitaireDosette ?? null)
         : typeLait === "frais"
-        ? consoLaitTarifFournisseur?.prixUnitaireFrais ?? null
-        : typeLait === "poudre"
-        ? consoLaitTarifFournisseur?.prixUnitairePoudre ?? null
-        : null;
+          ? (consoLaitTarifFournisseur?.prixUnitaireFrais ?? null)
+          : typeLait === "poudre"
+            ? (consoLaitTarifFournisseur?.prixUnitairePoudre ?? null)
+            : null;
 
     const consoChocolatTarifFournisseur = chocolatConsoTarifs.find(
       (tarif) =>
@@ -268,10 +271,10 @@ const CafeEspaceForm = ({
       value === "chocolat" ? machinesTarifFournisseur?.typeChocolat : null;
     const prixUnitaireConsoChocolat =
       typeChocolat === "sachets"
-        ? consoChocolatTarifFournisseur?.prixUnitaireSachet ?? null
+        ? (consoChocolatTarifFournisseur?.prixUnitaireSachet ?? null)
         : typeChocolat === "poudre"
-        ? consoChocolatTarifFournisseur?.prixUnitairePoudre ?? null
-        : null;
+          ? (consoChocolatTarifFournisseur?.prixUnitairePoudre ?? null)
+          : null;
 
     const consoSucreTarifFournisseur = sucreConsoTarifs.find(
       (tarif) =>
@@ -293,17 +296,17 @@ const CafeEspaceForm = ({
     const totalAnnuel = totalLoc !== null ? totalLoc + totalConso : null;
     //Modele
     const modele = machinesTarifFournisseur
-      ? cafeMachines?.find(
+      ? (cafeMachines?.find(
           ({ id }) => id === machinesTarifFournisseur?.cafeMachineId
-        )?.modele ?? null
+        )?.modele ?? null)
       : null;
     const marque = machinesTarifFournisseur
-      ? cafeMachines?.find(
+      ? (cafeMachines?.find(
           ({ id }) => id === machinesTarifFournisseur?.cafeMachineId
-        )?.marque ?? null
+        )?.marque ?? null)
       : null;
     const reconditionne = machinesTarifFournisseur
-      ? machinesTarifFournisseur.reconditionne ?? null
+      ? (machinesTarifFournisseur.reconditionne ?? null)
       : null;
     //Je mets à jour mon espace
     setCafe((prev) => ({
@@ -544,12 +547,12 @@ const CafeEspaceForm = ({
         : null;
     const prixUnitaireConsoLait =
       typeLait === "dosettes"
-        ? consoLaitTarifFournisseur?.prixUnitaireDosette ?? null
+        ? (consoLaitTarifFournisseur?.prixUnitaireDosette ?? null)
         : typeLait === "frais"
-        ? consoLaitTarifFournisseur?.prixUnitaireFrais ?? null
-        : typeLait === "poudre"
-        ? consoLaitTarifFournisseur?.prixUnitairePoudre ?? null
-        : null;
+          ? (consoLaitTarifFournisseur?.prixUnitaireFrais ?? null)
+          : typeLait === "poudre"
+            ? (consoLaitTarifFournisseur?.prixUnitairePoudre ?? null)
+            : null;
 
     const consoChocolatTarifFournisseur = chocolatConsoTarifs.find(
       (tarif) =>
@@ -562,10 +565,10 @@ const CafeEspaceForm = ({
         : null;
     const prixUnitaireConsoChocolat =
       typeChocolat === "sachets"
-        ? consoChocolatTarifFournisseur?.prixUnitaireSachet ?? null
+        ? (consoChocolatTarifFournisseur?.prixUnitaireSachet ?? null)
         : typeChocolat === "poudre"
-        ? consoChocolatTarifFournisseur?.prixUnitairePoudre ?? null
-        : null;
+          ? (consoChocolatTarifFournisseur?.prixUnitairePoudre ?? null)
+          : null;
 
     const consoSucreTarifFournisseur = sucreConsoTarifs.find(
       (tarif) =>
@@ -588,17 +591,17 @@ const CafeEspaceForm = ({
       newNbPersonnes && totalLoc !== null ? totalLoc + totalConso : null;
     //Modele
     const modele = machinesTarifFournisseur
-      ? cafeMachines?.find(
+      ? (cafeMachines?.find(
           ({ id }) => id === machinesTarifFournisseur?.cafeMachineId
-        )?.modele ?? null
+        )?.modele ?? null)
       : null;
     const marque = machinesTarifFournisseur
-      ? cafeMachines?.find(
+      ? (cafeMachines?.find(
           ({ id }) => id === machinesTarifFournisseur?.cafeMachineId
-        )?.marque ?? null
+        )?.marque ?? null)
       : null;
     const reconditionne = machinesTarifFournisseur
-      ? machinesTarifFournisseur.reconditionne ?? null
+      ? (machinesTarifFournisseur.reconditionne ?? null)
       : null;
 
     //Je mets à jour  ma machine
@@ -655,9 +658,10 @@ const CafeEspaceForm = ({
     if (newNbPersonnes >= MAX_NB_PERSONNES_PAR_ESPACE) {
       newNbPersonnes = MAX_NB_PERSONNES_PAR_ESPACE;
       toast({
-        title: "Limite atteinte",
-        description:
-          "Le nombre de personnes par espace café est limité à 150. Choisissez une offre puis ajoutez un espace café si besoin",
+        title: t("limite-atteinte"),
+        description: tCafe(
+          "le-nombre-de-personnes-par-espace-cafe-est-limite-a-150-choisissez-une-offre-puis-ajoutez-un-espace-cafe-si-besoin"
+        ),
         duration: 7000,
       });
     }
@@ -669,9 +673,10 @@ const CafeEspaceForm = ({
     if (newNbPersonnes >= MAX_NB_PERSONNES_PAR_ESPACE) {
       newNbPersonnes = MAX_NB_PERSONNES_PAR_ESPACE;
       toast({
-        title: "Limite atteinte",
-        description:
-          "Le nombre de personnes par espace café est limité à 150. Choisissez une offre puis ajoutez un espace café si besoin",
+        title: t("limite-atteinte"),
+        description: tCafe(
+          "le-nombre-de-personnes-par-espace-cafe-est-limite-a-150-choisissez-une-offre-puis-ajoutez-un-espace-cafe-si-besoin"
+        ),
         duration: 7000,
       });
     }
@@ -811,12 +816,12 @@ const CafeEspaceForm = ({
       value !== "cafe" ? machinesTarifFournisseur?.typeLait : null;
     const prixUnitaireConsoLait =
       typeLait === "dosettes"
-        ? consoLaitTarifFournisseur?.prixUnitaireDosette ?? null
+        ? (consoLaitTarifFournisseur?.prixUnitaireDosette ?? null)
         : typeLait === "frais"
-        ? consoLaitTarifFournisseur?.prixUnitaireFrais ?? null
-        : typeLait === "poudre"
-        ? consoLaitTarifFournisseur?.prixUnitairePoudre ?? null
-        : null;
+          ? (consoLaitTarifFournisseur?.prixUnitaireFrais ?? null)
+          : typeLait === "poudre"
+            ? (consoLaitTarifFournisseur?.prixUnitairePoudre ?? null)
+            : null;
 
     const consoChocolatTarifFournisseur = chocolatConsoTarifs.find(
       (tarif) =>
@@ -827,10 +832,10 @@ const CafeEspaceForm = ({
       value === "chocolat" ? machinesTarifFournisseur?.typeChocolat : null;
     const prixUnitaireConsoChocolat =
       typeChocolat === "sachets"
-        ? consoChocolatTarifFournisseur?.prixUnitaireSachet ?? null
+        ? (consoChocolatTarifFournisseur?.prixUnitaireSachet ?? null)
         : typeChocolat === "poudre"
-        ? consoChocolatTarifFournisseur?.prixUnitairePoudre ?? null
-        : null;
+          ? (consoChocolatTarifFournisseur?.prixUnitairePoudre ?? null)
+          : null;
 
     const consoSucreTarifFournisseur = sucreConsoTarifs.find(
       (tarif) =>
@@ -852,17 +857,17 @@ const CafeEspaceForm = ({
     const totalAnnuel = totalLoc !== null ? totalLoc + totalConso : null;
     //Modele
     const modele = machinesTarifFournisseur
-      ? cafeMachines?.find(
+      ? (cafeMachines?.find(
           ({ id }) => id === machinesTarifFournisseur?.cafeMachineId
-        )?.modele ?? null
+        )?.modele ?? null)
       : null;
     const marque = machinesTarifFournisseur
-      ? cafeMachines?.find(
+      ? (cafeMachines?.find(
           ({ id }) => id === machinesTarifFournisseur?.cafeMachineId
-        )?.marque ?? null
+        )?.marque ?? null)
       : null;
     const reconditionne = machinesTarifFournisseur
-      ? machinesTarifFournisseur.reconditionne ?? null
+      ? (machinesTarifFournisseur.reconditionne ?? null)
       : null;
     //Je mets à jour mon espace
     setCafe((prev) => ({

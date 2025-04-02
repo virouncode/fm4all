@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
 import { formatNumber } from "@/lib/formatNumber";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useContext } from "react";
 
@@ -46,6 +47,9 @@ const OfficeManagerMobilePropositionCard = ({
   demiJParSemaineConfort,
   demiJParSemaineExcellence,
 }: OfficeManagerMobilePropositionCardProps) => {
+  const t = useTranslations("DevisPage");
+  const tOfficeManager = useTranslations("DevisPage.pilotage.officeManager");
+  const tGlobal = useTranslations("Global");
   const { officeManager } = useContext(OfficeManagerContext);
   const { fournisseurId, totalAnnuel } = proposition;
   const color =
@@ -61,84 +65,115 @@ const OfficeManagerMobilePropositionCard = ({
 
   const totalMensuelText = totalAnnuel ? (
     <p className="text-sm font-bold">
-      {formatNumber(Math.round((totalAnnuel * MARGE) / 12))} €/mois*
+      {formatNumber(Math.round((totalAnnuel * MARGE) / 12))} {t("euros-mois")}*
     </p>
   ) : (
-    <p className="text-sm font-bold">Non proposé</p>
+    <p className="text-sm font-bold">{t("non-propose")}</p>
   );
 
   const demiJParSemaineText =
     proposition.demiJParSemaine !== null ? (
       <li className="list-check">
-        {proposition.demiJParSemaine / 2} j / semaine
+        {proposition.demiJParSemaine / 2} {tOfficeManager("j-semaine")}
       </li>
     ) : null;
 
   const presenceText = (
     <li className="list-check">
-      Présent {officeManager.infos.remplace ? "52" : "47"} semaines / an
+      {tOfficeManager("present")} {officeManager.infos.remplace ? "52" : "47"}{" "}
+      {tOfficeManager("semaines-an")}
     </li>
   );
 
   const premiumText = officeManager.infos.premium ? (
     <li className="list-check">
-      Profil premium : Anglais ou exp.longue, logiciel, compta, ADV ou ADC
+      {tOfficeManager(
+        "profil-premium-anglais-ou-exp-longue-logiciel-compta-adv-ou-adc"
+      )}
     </li>
   ) : null;
 
   const infosEssentiel = (
     <>
-      <li className="list-check">Coordination technique des locaux</li>
-      <li className="list-check">Suivi sous-traitants</li>
-      <li className="list-check">Contrôle et gestion prestataires</li>
-      <li className="list-check">Lien avec fm4all</li>
       <li className="list-check">
-        Lien avec propriétaire, Property ou Asset Manager
+        {tOfficeManager("coordination-technique-des-locaux")}
+      </li>
+      <li className="list-check">{tOfficeManager("suivi-sous-traitants")}</li>
+      <li className="list-check">
+        {tOfficeManager("controle-et-gestion-prestataires")}
+      </li>
+      <li className="list-check">{tOfficeManager("lien-avec-fm4all")}</li>
+      <li className="list-check">
+        {tOfficeManager("lien-avec-proprietaire-property-ou-asset-manager")}
       </li>
     </>
   );
 
   const infosConfort = (
     <>
-      <li className="list-check">Coordination technique des locaux</li>
-      <li className="list-check">Suivi sous-traitants</li>
-      <li className="list-check">Contrôle et gestion prestataires</li>
-      <li className="list-check">Lien avec fm4all</li>
       <li className="list-check">
-        Lien avec propriétaire, Property ou Asset Manager
+        {tOfficeManager("coordination-technique-des-locaux")}
       </li>
-      <li className="list-check">Gestion des contrats de services tiers</li>
-      <li className="list-check">Accueil des locaux</li>
-      <li className="list-check">Support administratif aux équipes</li>
+      <li className="list-check">{tOfficeManager("suivi-sous-traitants")}</li>
       <li className="list-check">
-        Gestion des logiciels internes (badges, flotte automobile, etc.)
+        {tOfficeManager("controle-et-gestion-prestataires")}
+      </li>
+      <li className="list-check">{tOfficeManager("lien-avec-fm4all")}</li>
+      <li className="list-check">
+        {tOfficeManager("lien-avec-proprietaire-property-ou-asset-manager")}
+      </li>
+      <li className="list-check">
+        {tOfficeManager("gestion-des-contrats-de-services-tiers")}
+      </li>
+      <li className="list-check">{tOfficeManager("accueil-des-locaux")}</li>
+      <li className="list-check">
+        {tOfficeManager("support-administratif-aux-equipes")}
+      </li>
+      <li className="list-check">
+        {tOfficeManager(
+          "gestion-des-logiciels-internes-badges-flotte-automobile-etc"
+        )}
       </li>
     </>
   );
 
   const infosExcellence = (
     <>
-      <li className="list-check">Coordination technique des locaux</li>
-      <li className="list-check">Suivi sous-traitants</li>
-      <li className="list-check">Contrôle et gestion prestataires</li>
-      <li className="list-check">Lien avec fm4all</li>
       <li className="list-check">
-        Lien avec propriétaire, Property ou Asset Manager
+        {tOfficeManager("coordination-technique-des-locaux")}
       </li>
-      <li className="list-check">Gestion des contrats de services tiers</li>
-      <li className="list-check">Accueil des locaux</li>
-      <li className="list-check">Support administratif aux équipes</li>
+      <li className="list-check">{tOfficeManager("suivi-sous-traitants")}</li>
       <li className="list-check">
-        Gestion des logiciels internes (badges, flotte automobile, etc.)
+        {tOfficeManager("controle-et-gestion-prestataires")}
+      </li>
+      <li className="list-check">{tOfficeManager("lien-avec-fm4all")}</li>
+      <li className="list-check">
+        {tOfficeManager("lien-avec-proprietaire-property-ou-asset-manager")}
       </li>
       <li className="list-check">
-        Animation du site (orga events, déj, soirées)
+        {tOfficeManager("gestion-des-contrats-de-services-tiers")}
       </li>
-      <li className="list-check">Onboarding nouveaux collaborateurs</li>
+      <li className="list-check">{tOfficeManager("accueil-des-locaux")}</li>
       <li className="list-check">
-        Création d&apos;un environnement travail positif
+        {tOfficeManager("support-administratif-aux-equipes")}
       </li>
-      <li className="list-check">Gestion de l’expérience utilisateur</li>
+      <li className="list-check">
+        {tOfficeManager(
+          "gestion-des-logiciels-internes-badges-flotte-automobile-etc"
+        )}
+      </li>
+      <li className="list-check">
+        {tOfficeManager("animation-du-site-orga-events-dej-soirees")}
+      </li>
+      <li className="list-check">
+        {tOfficeManager("onboarding-nouveaux-collaborateurs")}
+      </li>
+      <li className="list-check">
+        {tOfficeManager("creation-d-un-environnement-travail-positif")}
+      </li>
+      <li className="list-check">
+        {tOfficeManager("gestion-de-lexperience-utilisateur")}
+      </li>
     </>
   );
 
@@ -182,10 +217,10 @@ const OfficeManagerMobilePropositionCard = ({
     demiJParSemaineExcellence !== null ? (
       <p className={`text-${color} text-center`}>
         {proposition.demiJParSemaine < demiJParSemaineConfort
-          ? "Essentiel"
+          ? tGlobal("essentiel")
           : proposition.demiJParSemaine < demiJParSemaineExcellence
-            ? "Confort"
-            : "Excellence"}
+            ? tGlobal("confort")
+            : tGlobal("excellence")}
       </p>
     ) : null;
 
@@ -193,7 +228,7 @@ const OfficeManagerMobilePropositionCard = ({
     <div className="w-1/3 h-full relative rounded-xl overflow-hidden bg-slate-100">
       <Image
         src={"/img/services/office-managers.webp"}
-        alt={`illustration d'office managers`}
+        alt={tOfficeManager("illustration-doffice-managers")}
         fill={true}
         className="object-contain cursor-pointer"
         quality={100}
@@ -205,7 +240,7 @@ const OfficeManagerMobilePropositionCard = ({
     <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
       <Image
         src={"/img/services/office-managers.webp"}
-        alt={`illustration d'office managers`}
+        alt={tOfficeManager("illustration-doffice-managers")}
         fill={true}
         className="object-contain object-center"
         quality={100}
@@ -232,7 +267,7 @@ const OfficeManagerMobilePropositionCard = ({
             <div className="flex flex-col gap-4">
               {imgProduitDialog}
               <p className="text-xs italic text-end">
-                *photo non contractuelle
+                {t("photo-non-contractuelle")}
               </p>
               {infosProduitDialog}
             </div>
@@ -257,7 +292,9 @@ const OfficeManagerMobilePropositionCard = ({
                 <DialogTitle>fm4all</DialogTitle>
               </DialogHeader>
               <FournisseurDialog
-                sloganFournisseur={"Le Facility management pour tous"}
+                sloganFournisseur={tOfficeManager(
+                  "le-facility-management-pour-tous"
+                )}
                 logoUrl={"/img/logo_full.webp"}
                 nomFournisseur={"fm4all"}
                 locationUrl={null}
@@ -302,7 +339,7 @@ const OfficeManagerMobilePropositionCard = ({
               }
               onCheckedChange={() => handleClickProposition(proposition)}
               onClick={(e) => e.stopPropagation()}
-              title="Sélectionnez cette proposition"
+              title={t("selectionnez-cette-proposition")}
             />
           ) : null}
         </div>

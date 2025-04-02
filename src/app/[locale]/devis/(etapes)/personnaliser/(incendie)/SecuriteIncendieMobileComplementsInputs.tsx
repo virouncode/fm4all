@@ -3,6 +3,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Minus, Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import {
   MAX_NB_ALARMES,
   MAX_NB_COLONNES_SECHES,
@@ -64,6 +65,7 @@ const SecuriteIncendieMobileComplementsInputs = ({
   handleIncrement,
   handleDecrement,
 }: SecuriteIncendieMobileComplementsInputsProps) => {
+  const tPersonnaliser = useTranslations("DevisPage.personnaliser");
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4">
@@ -75,10 +77,10 @@ const SecuriteIncendieMobileComplementsInputs = ({
             onCheckedChange={(checked: boolean) =>
               handleCheck(checked, "exutoires")
             }
-            aria-label="Sélectionner exutoires de fumée"
+            aria-label={tPersonnaliser("selectionner-exutoires-de-fumee")}
           />
           <Label htmlFor="exutoires" className="text-base flex-1">
-            Exutoires de fumée
+            {tPersonnaliser("exutoires-de-fumee")}
           </Label>
         </div>
         {exutoires && (
@@ -94,7 +96,7 @@ const SecuriteIncendieMobileComplementsInputs = ({
             />
             <Button
               variant="outline"
-              title="Diminuer le nombre d'exutoires de fumée"
+              title={tPersonnaliser("diminuer-le-nombre-dexutoires-de-fumee")}
               onClick={() => handleDecrement("exutoires")}
               disabled={nbExutoires === 1}
             >
@@ -102,7 +104,7 @@ const SecuriteIncendieMobileComplementsInputs = ({
             </Button>
             <Button
               variant="outline"
-              title="Augmenter le nombre d'exutoires de fumée"
+              title={tPersonnaliser("augmenter-le-nombre-dexutoires-de-fumee")}
               onClick={() => handleIncrement("exutoires")}
               disabled={nbExutoires === MAX_NB_EXUTOIRES}
             >
@@ -120,10 +122,12 @@ const SecuriteIncendieMobileComplementsInputs = ({
             onCheckedChange={(checked: boolean) =>
               handleCheck(checked, "exutoiresParking")
             }
-            aria-label="Sélectionner exutoires de fumée (parking)"
+            aria-label={tPersonnaliser(
+              "selectionner-exutoires-de-fumee-parking"
+            )}
           />
           <Label htmlFor="exutoiresParking" className="text-base flex-1">
-            Exutoires de fumée (parking)
+            {tPersonnaliser("exutoires-de-fumee-parking")}
           </Label>
         </div>
         {exutoiresParking && (
@@ -139,7 +143,9 @@ const SecuriteIncendieMobileComplementsInputs = ({
             />
             <Button
               variant="outline"
-              title="Diminuer le nombre d'exutoires de fumée (parking)"
+              title={tPersonnaliser(
+                "diminuer-le-nombre-dexutoires-de-fumee-parking"
+              )}
               onClick={() => handleDecrement("exutoiresParking")}
               disabled={nbExutoiresParking === 1}
             >
@@ -147,7 +153,9 @@ const SecuriteIncendieMobileComplementsInputs = ({
             </Button>
             <Button
               variant="outline"
-              title="Augmenter le nombre d'exutoires de fumée (parking)"
+              title={tPersonnaliser(
+                "augmenter-le-nombre-dexutoires-de-fumee-parking"
+              )}
               onClick={() => handleIncrement("exutoiresParking")}
               disabled={nbExutoiresParking === MAX_NB_EXUTOIRES}
             >
@@ -165,10 +173,10 @@ const SecuriteIncendieMobileComplementsInputs = ({
             onCheckedChange={(checked: boolean) =>
               handleCheck(checked, "alarmes")
             }
-            aria-label="Sélectionner alarmes T4"
+            aria-label={tPersonnaliser("selectionner-alarmes-t4")}
           />
           <Label htmlFor="alarmes" className="text-base flex-1">
-            Alarmes T4
+            {tPersonnaliser("alarmes-t4")}
           </Label>
         </div>
         {alarmes && (
@@ -184,7 +192,7 @@ const SecuriteIncendieMobileComplementsInputs = ({
             />
             <Button
               variant="outline"
-              title="Diminuer le nombre d'alarmes T4"
+              title={tPersonnaliser("diminuer-le-nombre-dalarmes-t4")}
               onClick={() => handleDecrement("alarmes")}
               disabled={nbAlarmes === 1}
             >
@@ -192,7 +200,7 @@ const SecuriteIncendieMobileComplementsInputs = ({
             </Button>
             <Button
               variant="outline"
-              title="Augmenter le nombre d'alarmes T4"
+              title={tPersonnaliser("augmenter-le-nombre-dalarmes-t4")}
               onClick={() => handleIncrement("alarmes")}
               disabled={nbExutoiresParking === MAX_NB_ALARMES}
             >
@@ -210,10 +218,12 @@ const SecuriteIncendieMobileComplementsInputs = ({
             onCheckedChange={(checked: boolean) =>
               handleCheck(checked, "portesCoupeFeuBattantes")
             }
-            aria-label="Sélectionner portes coupe-feu battantes"
+            aria-label={tPersonnaliser(
+              "selectionner-portes-coupe-feu-battantes"
+            )}
           />
           <Label htmlFor="portesCoupeFeuBattantes" className="text-base flex-1">
-            Portes coupe-feu battantes
+            {tPersonnaliser("portes-coupe-feu-battantes")}
           </Label>
         </div>
         {portesCoupeFeuBattantes && (
@@ -229,7 +239,9 @@ const SecuriteIncendieMobileComplementsInputs = ({
             />
             <Button
               variant="outline"
-              title="Diminuer le nombre de portes coupe-feu battantes"
+              title={tPersonnaliser(
+                "diminuer-le-nombre-de-portes-coupe-feu-battantes"
+              )}
               onClick={() => handleDecrement("portesCoupeFeuBattantes")}
               disabled={nbPortesCoupeFeuBattantes === 1}
             >
@@ -237,7 +249,9 @@ const SecuriteIncendieMobileComplementsInputs = ({
             </Button>
             <Button
               variant="outline"
-              title="Augmenter le nombre de portes coupe-feu battantes"
+              title={tPersonnaliser(
+                "augmenter-le-nombre-de-portes-coupe-feu-battantes"
+              )}
               onClick={() => handleIncrement("portesCoupeFeuBattantes")}
               disabled={nbPortesCoupeFeuBattantes === MAX_NB_PORTES_COUPES_FEU}
             >
@@ -255,13 +269,15 @@ const SecuriteIncendieMobileComplementsInputs = ({
             onCheckedChange={(checked: boolean) =>
               handleCheck(checked, "portesCoupeFeuCoulissantes")
             }
-            aria-label="Sélectionner portes coupe-feu coulissantes"
+            aria-label={tPersonnaliser(
+              "selectionner-portes-coupe-feu-coulissantes"
+            )}
           />
           <Label
             htmlFor="portesCoupeFeuCoulissantes"
             className="text-base flex-1"
           >
-            Portes coupe-feu coulissantes
+            {tPersonnaliser("portes-coupe-feu-coulissantes")}
           </Label>
         </div>
         {portesCoupeFeuCoulissantes && (
@@ -277,7 +293,9 @@ const SecuriteIncendieMobileComplementsInputs = ({
             />
             <Button
               variant="outline"
-              title="Diminuer le nombre de portes coupe-feu coulissantes"
+              title={tPersonnaliser(
+                "diminuer-le-nombre-de-portes-coupe-feu-coulissantes"
+              )}
               onClick={() => handleDecrement("portesCoupeFeuCoulissantes")}
               disabled={nbPortesCoupeFeuCoulissantes === 1}
             >
@@ -285,7 +303,9 @@ const SecuriteIncendieMobileComplementsInputs = ({
             </Button>
             <Button
               variant="outline"
-              title="Augmenter le nombre de portes coupe-feu coulissantes"
+              title={tPersonnaliser(
+                "augmenter-le-nombre-de-portes-coupe-feu-coulissantes"
+              )}
               onClick={() => handleIncrement("portesCoupeFeuCoulissantes")}
               disabled={
                 nbPortesCoupeFeuCoulissantes === MAX_NB_PORTES_COUPES_FEU
@@ -305,10 +325,12 @@ const SecuriteIncendieMobileComplementsInputs = ({
             onCheckedChange={(checked: boolean) =>
               handleCheck(checked, "colonnesSechesStatiques")
             }
-            aria-label="Sélectionner Colonnes Seches Statiques"
+            aria-label={tPersonnaliser(
+              "selectionner-colonnes-seches-statiques"
+            )}
           />
           <Label htmlFor="colonnesSechesStatiques" className="text-base flex-1">
-            Colonnes sèches statiques
+            {tPersonnaliser("colonnes-seches-statiques")}
           </Label>
         </div>
         {colonnesSechesStatiques && (
@@ -324,7 +346,9 @@ const SecuriteIncendieMobileComplementsInputs = ({
             />
             <Button
               variant="outline"
-              title="Diminuer le nombre de colonnes sèches statiques"
+              title={tPersonnaliser(
+                "diminuer-le-nombre-de-colonnes-seches-statiques"
+              )}
               onClick={() => handleDecrement("colonnesSechesStatiques")}
               disabled={nbColonnesSechesStatiques === 1}
             >
@@ -332,7 +356,9 @@ const SecuriteIncendieMobileComplementsInputs = ({
             </Button>
             <Button
               variant="outline"
-              title="Augmenter le nombre de colonnes sèches statiques"
+              title={tPersonnaliser(
+                "augmenter-le-nombre-de-colonnes-seches-statiques"
+              )}
               onClick={() => handleIncrement("colonnesSechesStatiques")}
               disabled={nbColonnesSechesStatiques === MAX_NB_COLONNES_SECHES}
             >
@@ -350,13 +376,15 @@ const SecuriteIncendieMobileComplementsInputs = ({
             onCheckedChange={(checked: boolean) =>
               handleCheck(checked, "colonnesSechesDynamiques")
             }
-            aria-label="Sélectionner colonnes seches dynamiques"
+            aria-label={tPersonnaliser(
+              "selectionner-colonnes-seches-dynamiques"
+            )}
           />
           <Label
             htmlFor="colonnesSechesDynamiques"
             className="text-base flex-1"
           >
-            Colonnes sèches dynamiques
+            {tPersonnaliser("colonnes-seches-dynamiques")}
           </Label>
         </div>
         {colonnesSechesDynamiques && (
@@ -372,7 +400,9 @@ const SecuriteIncendieMobileComplementsInputs = ({
             />
             <Button
               variant="outline"
-              title="Diminuer le nombre de colonnes sèches dynamiques"
+              title={tPersonnaliser(
+                "diminuer-le-nombre-de-colonnes-seches-dynamiques"
+              )}
               onClick={() => handleDecrement("colonnesSechesDynamiques")}
               disabled={nbColonnesSechesDynamiques === 1}
             >
@@ -380,7 +410,9 @@ const SecuriteIncendieMobileComplementsInputs = ({
             </Button>
             <Button
               variant="outline"
-              title="Augmenter le nombre de colonnes sèches dynamiques"
+              title={tPersonnaliser(
+                "augmenter-le-nombre-de-colonnes-seches-dynamiques"
+              )}
               onClick={() => handleIncrement("colonnesSechesDynamiques")}
               disabled={nbColonnesSechesDynamiques === MAX_NB_COLONNES_SECHES}
             >
@@ -396,10 +428,10 @@ const SecuriteIncendieMobileComplementsInputs = ({
             className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             checked={ria}
             onCheckedChange={(checked: boolean) => handleCheck(checked, "ria")}
-            aria-label="Sélectionner robinets incendie armé"
+            aria-label={tPersonnaliser("selectionner-robinets-incendie-arme")}
           />
           <Label htmlFor="ria" className="text-base flex-1">
-            Robinets d&apos;incendie armés
+            {tPersonnaliser("robinets-dincendie-armes")}
           </Label>
         </div>
         {ria && (
@@ -415,8 +447,9 @@ const SecuriteIncendieMobileComplementsInputs = ({
             />
             <Button
               variant="outline"
-              title="Diminuer le nombre de robinets d'
-              incendie armés"
+              title={tPersonnaliser(
+                "diminuer-le-nombre-de-robinets-d-incendie-armes"
+              )}
               onClick={() => handleDecrement("ria")}
               disabled={nbRIA === 1}
             >
@@ -424,8 +457,9 @@ const SecuriteIncendieMobileComplementsInputs = ({
             </Button>
             <Button
               variant="outline"
-              title="Augmenter le nombre de robinets d'
-              incendie armés"
+              title={tPersonnaliser(
+                "augmenter-le-nombre-de-robinets-d-incendie-armes"
+              )}
               onClick={() => handleIncrement("ria")}
               disabled={nbRIA === MAX_NB_RIA}
             >

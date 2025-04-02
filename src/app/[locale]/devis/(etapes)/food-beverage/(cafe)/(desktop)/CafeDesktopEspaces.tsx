@@ -7,6 +7,7 @@ import { SelectChocolatConsoTarifsType } from "@/zod-schemas/chocolatConsoTarifs
 import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import CafeEspace from "./CafeEspace";
 
@@ -31,6 +32,7 @@ const CafeDesktopEspaces = ({
   sucreConsoTarifs,
   handleAddEspace,
 }: CafeDesktopEspacesProps) => {
+  const t = useTranslations("DevisPage.foodBeverage.cafe");
   const { cafe } = useContext(CafeContext);
   return cafe.nbEspaces && cafe.nbEspaces > 0 ? (
     cafe.espaces.map((espace) => (
@@ -54,7 +56,7 @@ const CafeDesktopEspaces = ({
         className="text-base"
         onClick={handleAddEspace}
       >
-        Ajouter un espace café
+        {t("ajouter-un-espace-cafe")}
       </Button>
     </div>
   );

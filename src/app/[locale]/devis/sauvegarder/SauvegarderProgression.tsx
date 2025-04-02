@@ -6,22 +6,27 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Form } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
-import { batiments } from "@/constants/batiments";
-import { occupations } from "@/constants/occupation";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { toast } from "@/hooks/use-toast";
 import { Link, useRouter } from "@/i18n/navigation";
 import { formatLocalStorageData } from "@/lib/formatLocalStorageData";
-import { insertClientSchema, InsertClientType } from "@/zod-schemas/client";
+import {
+  createInsertClientSchema,
+  InsertClientType,
+} from "@/zod-schemas/client";
 import { InsertDevisType } from "@/zod-schemas/devis";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useAction } from "next-safe-action/hooks";
 import { ChangeEvent, useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 
 const SauvegarderProgression = () => {
+  const t = useTranslations("DevisPage");
+  const tSauverErreurs = useTranslations("DevisPage.sauver.erreurs");
+  const tSauver = useTranslations("DevisPage.sauver");
   const { client, setClient } = useContext(ClientContext);
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const [accepte, setAccepte] = useState(false);
@@ -32,7 +37,28 @@ const SauvegarderProgression = () => {
   };
   const form = useForm<InsertClientType>({
     mode: "onBlur",
-    resolver: zodResolver(insertClientSchema),
+    resolver: zodResolver(
+      createInsertClientSchema({
+        nomEntreprise: tSauverErreurs("nom-de-lentreprise-obligatoire"),
+        siret: tSauverErreurs(
+          "siret-invalide-format-attendu-xxx-xxx-xxx-xxxxx"
+        ),
+        prenomContact: tSauverErreurs("prenom-du-contact-obligatoire"),
+        nomContact: tSauverErreurs("nom-du-contact-obligatoire"),
+        posteContact: tSauverErreurs("poste-du-contact-obligatoire"),
+        emailContact: tSauverErreurs("adresse-email-invalide"),
+        phoneContact: tSauverErreurs("numero-de-telephone-invalide"),
+        emailSignataire: tSauverErreurs("adresse-email-invalide"),
+        surface: tSauverErreurs("surface-obligatoire"),
+        surfaceMax: tSauverErreurs("surface-maximum-3000-m"),
+        effectif: tSauverErreurs("effectif-obligatoire"),
+        effectifMax: tSauverErreurs("effectif-maximum-300-personnes"),
+        typeBatiment: tSauverErreurs("batiment"),
+        typeOccupation: tSauverErreurs("type-doccupation-invalide"),
+        codePostal: tSauverErreurs("code-postal-invalide-entrez-5-chiffres"),
+        ville: tSauverErreurs("ville-obligatoire"),
+      })
+    ),
     defaultValues,
   });
   const {
@@ -43,7 +69,7 @@ const SauvegarderProgression = () => {
     onSuccess: ({ data }) => {
       toast({
         variant: "default",
-        title: "Succès ! 🎉",
+        title: tSauver("succes"),
         description: data?.message,
       });
       if (data?.data?.clientId) {
@@ -57,8 +83,10 @@ const SauvegarderProgression = () => {
     onError: () => {
       toast({
         variant: "destructive",
-        title: "Erreur ! 😿",
-        description: `Impossible de sauvegarder vos coordonnées: veuillez réessayer`,
+        title: tSauver("erreur"),
+        description: tSauver(
+          "impossible-de-sauvegarder-vos-coordonnees-veuillez-reessayer"
+        ),
       });
     },
   });
@@ -68,15 +96,17 @@ const SauvegarderProgression = () => {
       onSuccess: ({ data }) => {
         toast({
           variant: "default",
-          title: "Succès ! 🎉",
+          title: tSauver("succes"),
           description: data?.message,
         });
       },
       onError: () => {
         toast({
           variant: "destructive",
-          title: "Erreur ! 😿",
-          description: `Impossible de sauvegarder le devis: veuillez réessayer`,
+          title: tSauver("erreur"),
+          description: tSauver(
+            "impossible-de-sauvegarder-le-devis-veuillez-reessayer"
+          ),
         });
       },
     }
@@ -86,7 +116,9 @@ const SauvegarderProgression = () => {
     if (!accepte) {
       toast({
         variant: "destructive",
-        description: "Veuillez accepter les conditions avant de  continuer",
+        description: tSauver(
+          "veuillez-accepter-notre-politique-de-confidentialite-avant-de-continuer"
+        ),
       });
       return;
     }
@@ -117,14 +149,8 @@ const SauvegarderProgression = () => {
                 <p>Ville : ${data.ville}</p>
                 <p>Surface des locaux : ${data.surface}</p>
                 <p>Nombre de personnes : ${data.effectif}</p>
-                <p>Type de bâtiment : ${
-                  batiments.find(({ id }) => id === data.typeBatiment)
-                    ?.description
-                }</p>
-                <p>Type d'occupation : ${
-                  occupations.find(({ id }) => id === data.typeOccupation)
-                    ?.description
-                }</p><br/>
+                <p>Type de bâtiment : ${data.typeBatiment}</p>
+                <p>Type d'occupation : ${data.typeOccupation}</p><br/>
                 <p>Voici les informations de chiffrage (avant personnalisation) :</p><br/>
                 <pre>${formatLocalStorageData()}</pre>
                 `,
@@ -156,10 +182,9 @@ const SauvegarderProgression = () => {
     <section className="flex-1 overflow-scroll">
       <div className="flex flex-col gap-4 w-full mx-auto h-full py-2">
         <p className="w-full md:w-2/3 mx-auto">
-          Dans la prochaine étape, vous allez personnaliser vos services et
-          choisir des options avant de valider votre budget final. Afin
-          d’améliorer votre expérience et enregistrer votre progression, merci
-          de renseigner vos informations suivantes :
+          {tSauver(
+            "dans-la-prochaine-etape-vous-allez-personnaliser-vos-services-et-choisir-des-options-avant-de-valider-votre-budget-final-afin-dameliorer-votre-experience-et-enregistrer-votre-progression-merci-de-renseigner-vos-informations-suivantes"
+          )}
         </p>
         <Form {...form}>
           <form
@@ -176,14 +201,13 @@ const SauvegarderProgression = () => {
                   handleChange={handleChange}
                 />
                 <InputWithLabel<InsertClientType>
-                  fieldTitle="N°de téléphone*"
+                  fieldTitle={tSauver("n-de-telephone")}
                   nameInSchema="phoneContact"
-                  placeholder="XX XX XX XX XX"
                   name="phoneContact"
                   handleChange={handleChange}
                 />
                 <InputWithLabel<InsertClientType>
-                  fieldTitle="Nom de l'entreprise*"
+                  fieldTitle={tSauver("nom-de-lentreprise")}
                   nameInSchema="nomEntreprise"
                   name="nomEntreprise"
                   handleChange={handleChange}
@@ -191,19 +215,19 @@ const SauvegarderProgression = () => {
               </div>
               <div className="w-full md:w-1/2 flex flex-col gap-4 ">
                 <InputWithLabel<InsertClientType>
-                  fieldTitle="Prénom du contact*"
+                  fieldTitle={tSauver("prenom-du-contact")}
                   nameInSchema="prenomContact"
                   name="prenomContact"
                   handleChange={handleChange}
                 />
                 <InputWithLabel<InsertClientType>
-                  fieldTitle="Nom du contact*"
+                  fieldTitle={tSauver("nom-du-contact")}
                   nameInSchema="nomContact"
                   name="nomContact"
                   handleChange={handleChange}
                 />
                 <InputWithLabel<InsertClientType>
-                  fieldTitle="Poste du contact*"
+                  fieldTitle={tSauver("poste-du-contact")}
                   nameInSchema="posteContact"
                   name="phoneContact"
                   handleChange={handleChange}
@@ -212,23 +236,28 @@ const SauvegarderProgression = () => {
             </div>
             <div className="w-full flex flex-col gap-6">
               <p>
-                Parce que nous ne sommes pas un comparateur en ligne comme les
-                autres, avant de valider cette étape, voici{" "}
-                <strong>3 engagements que nous prenons envers vous :</strong>
+                {tSauver(
+                  "parce-que-nous-ne-sommes-pas-un-comparateur-en-ligne-comme-les-autres-avant-de-valider-cette-etape-voici"
+                )}{" "}
+                <strong>
+                  {tSauver("3-engagements-que-nous-prenons-envers-vous")}
+                </strong>
               </p>
               <ul className="flex flex-col gap-2 ml-10 lg:ml-16">
                 <li className="list-handshake">
-                  Engagement N°1 : Vous allez bien obtenir un devis complet et
-                  définitif 100% en ligne
+                  {tSauver(
+                    "engagement-n-1-vous-allez-bien-obtenir-un-devis-complet-et-definitif-100-en-ligne"
+                  )}
                 </li>
                 <li className="list-handshake">
-                  Engagement N°2 : Sans engagement ! Créer un devis personnalisé
-                  est gratuit et ne vous engage à rien
+                  {tSauver(
+                    "engagement-n-2-sans-engagement-creer-un-devis-personnalise-est-gratuit-et-ne-vous-engage-a-rien"
+                  )}
                 </li>
                 <li className="list-handshake">
-                  Engagement N°3 : Pas de SPAM, vos informations sont sécurisées
-                  par fm4all et ne seront ni partagées, ni utilisées à des fins
-                  de prospection par un tiers
+                  {tSauver(
+                    "engagement-n-3-pas-de-spam-vos-informations-sont-securisees-par-fm4all-et-ne-seront-ni-partagees-ni-utilisees-a-des-fins-de-prospection-par-un-tiers"
+                  )}
                 </li>
               </ul>
             </div>
@@ -238,17 +267,18 @@ const SauvegarderProgression = () => {
                 onCheckedChange={(value: boolean) => setAccepte(value)}
                 className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                 id="acceptation"
-                aria-label="Acceptez les conditions"
+                aria-label={tSauver("acceptez-les-conditions")}
               />
               <Label htmlFor="acceptation">
-                J&apos;accepte que les informations saisies soient utilisées par
-                fm4all dans le cadre de ma demande et conformément à sa{" "}
+                {tSauver(
+                  "jaccepte-que-les-informations-saisies-soient-utilisees-par-fm4all-dans-le-cadre-de-ma-demande-et-conformement-a-sa"
+                )}{" "}
                 <Link
                   href="/confidentialite"
                   className="underline"
                   target="_blank"
                 >
-                  politique de confidentialité.
+                  {tSauver("politique-de-confidentialite")}
                 </Link>
               </Label>
             </div>
@@ -256,13 +286,13 @@ const SauvegarderProgression = () => {
               <Button
                 variant="destructive"
                 size="lg"
-                title="Sauvegarder ma progression"
+                title={tSauver("sauvegarder-ma-progression")}
                 className="text-base min-w-28"
               >
                 {isSavingClient || isSavingDevis ? (
                   <LoaderCircle className="animate-spin" />
                 ) : (
-                  "Suivant ↓"
+                  t("suivant")
                 )}
               </Button>
             </div>

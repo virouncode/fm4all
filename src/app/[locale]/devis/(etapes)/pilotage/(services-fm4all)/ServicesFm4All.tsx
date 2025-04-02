@@ -12,6 +12,7 @@ import { useRouter } from "@/i18n/navigation";
 import { SelectServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4AllOffresType";
 import { SelectServicesFm4AllTauxType } from "@/zod-schemas/servicesFm4AllTaux";
 import { HandPlatter } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
@@ -27,6 +28,7 @@ const ServicesFm4All = ({
   servicesFm4AllTaux,
   servicesFm4AllOffres,
 }: ServicesFm4AllProps) => {
+  const tFm4all = useTranslations("DevisPage.pilotage.servicesFm4all");
   const { setManagement } = useContext(ManagementContext);
   const { client } = useContext(ClientContext);
   const { totalServicesFm4All } = useContext(TotalServicesFm4AllContext);
@@ -63,9 +65,10 @@ const ServicesFm4All = ({
     if (!totalFinalServicesFm4All) {
       toast({
         variant: "destructive",
-        title: "Panier vide",
-        description:
-          "Vous n'avez choisi aucun service, veuillez sélectionner au moins un service",
+        title: tFm4all("panier-vide"),
+        description: tFm4all(
+          "vous-navez-choisi-aucun-service-veuillez-selectionner-au-moins-un-service"
+        ),
       });
       return;
     }
@@ -94,15 +97,19 @@ const ServicesFm4All = ({
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="2">
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
-          title="Services fm4all"
-          description="fm4all est votre interlocuteur unique pour toutes vos prestations. Regroupés sous un contrat et une facture, nous réalisons un pilotage à distance des prestations de services, gestion administrative et suivi qualité."
+          title={tFm4all("services-fm4all")}
+          description={tFm4all(
+            "fm4all-est-votre-interlocuteur-unique-pour-toutes-vos-prestations-regroupes-sous-un-contrat-et-une-facture-nous-realisons-un-pilotage-a-distance-des-prestations-de-services-gestion-administrative-et-suivi-qualite"
+          )}
           icon={HandPlatter}
           propositionsRef={propositionsRef}
         />
       ) : (
         <PropositionsTitle
-          title="Services fm4all"
-          description="fm4all est votre interlocuteur unique pour toutes vos prestations. Regroupés sous un contrat et une facture, nous réalisons un pilotage à distance des prestations de services, gestion administrative et suivi qualité."
+          title={tFm4all("services-fm4all")}
+          description={tFm4all(
+            "fm4all-est-votre-interlocuteur-unique-pour-toutes-vos-prestations-regroupes-sous-un-contrat-et-une-facture-nous-realisons-un-pilotage-a-distance-des-prestations-de-services-gestion-administrative-et-suivi-qualite"
+          )}
           icon={HandPlatter}
           handleClickPrevious={handleClickPrevious}
         />
@@ -121,9 +128,9 @@ const ServicesFm4All = ({
       ) : (
         <PropositionsFooter
           handleClickNext={handleClickNext}
-          comment={
-            "\u00B9remise de 0,5% à partir d'un chiffre d'affaires de 26 000€ HT/an, \u00B2remise de 0,5% pour le choix d'un Office Manager"
-          }
+          comment={tFm4all(
+            "u00b9remise-de-0-5-a-partir-dun-chiffre-daffaires-de-26-000eur-ht-an-u00b2remise-de-0-5-pour-le-choix-dun-office-manager"
+          )}
         />
       )}
     </div>

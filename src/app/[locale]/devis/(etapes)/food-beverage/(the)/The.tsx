@@ -4,6 +4,7 @@ import { CafeContext } from "@/context/CafeProvider";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { Leaf } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
@@ -15,6 +16,7 @@ type TheProps = {
 };
 
 const The = ({ theConsoTarifs }: TheProps) => {
+  const tThe = useTranslations("DevisPage.foodBeverage.the");
   const { cafe } = useContext(CafeContext);
   const { setFoodBeverage } = useContext(FoodBeverageContext);
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
@@ -37,16 +39,20 @@ const The = ({ theConsoTarifs }: TheProps) => {
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="2">
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
-          title="Thés variés"
+          title={tThe("thes-varies")}
           icon={Leaf}
-          description="Parce que tout le monde ne boit pas forcément du café, un choix de thés présentés en boîtes et coffrets. La gamme détermine la qualité du thé"
+          description={tThe(
+            "parce-que-tout-le-monde-ne-boit-pas-forcement-du-cafe-un-choix-de-thes-presentes-en-boites-et-coffrets-la-gamme-determine-la-qualite-du-the"
+          )}
           propositionsRef={propositionsRef}
         />
       ) : (
         <PropositionsTitle
-          title="Thés variés"
+          title={tThe("thes-varies")}
           icon={Leaf}
-          description="Parce que tout le monde ne boit pas forcément du café, un choix de thés présentés en boîtes et coffrets. La gamme détermine la qualité du thé"
+          description={tThe(
+            "parce-que-tout-le-monde-ne-boit-pas-forcement-du-cafe-un-choix-de-thes-presentes-en-boites-et-coffrets-la-gamme-determine-la-qualite-du-the"
+          )}
           handleClickPrevious={handleClickPrevious}
         />
       )}
@@ -57,7 +63,9 @@ const The = ({ theConsoTarifs }: TheProps) => {
         {!cafe.infos.fournisseurId ? (
           <div className="flex h-full items-center justify-center text-base lg:text-lg">
             <p className="text-center text-fm4alldestructive">
-              Veuillez d&apos;abord sélectionner une offre de Boissons chaudes.
+              {tThe(
+                "veuillez-dabord-selectionner-une-offre-de-boissons-chaudes"
+              )}
             </p>
           </div>
         ) : (

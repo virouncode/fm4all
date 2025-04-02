@@ -16,6 +16,7 @@ import { useMediaQuery } from "react-responsive";
 import PropositionsTitle from "../../../PropositionsTitle";
 import FontainesDesktopEspaces from "./(desktop)/FontainesDesktopEspaces";
 import FontainesMobileEspaces from "./(mobile)/FontainesMobileEspaces";
+import { useTranslations } from "next-intl";
 
 type FontainesProps = {
   fontainesModeles: SelectFontainesModelesType[];
@@ -23,6 +24,7 @@ type FontainesProps = {
 };
 
 const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
+  const tFontaines = useTranslations("DevisPage.foodBeverage.fontaines");
   const { client } = useContext(ClientContext);
   const { setFontaines } = useContext(FontainesContext);
   const { setTotalFontaines } = useContext(TotalFontainesContext);
@@ -81,15 +83,19 @@ const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
           icon={Droplets}
-          title="Fontaines à eau"
-          description="Eau fraîche ou pétillante, de l'eau pure filtrée pour tous. Adaptées à votre besoin, nos fontaines réseau sont à poser, sur pied ou sous comptoir. La gamme détermine le type de pose"
+          title={tFontaines("fontaines-a-eau")}
+          description={tFontaines(
+            "eau-fraiche-ou-petillante-de-leau-pure-filtree-pour-tous-adaptees-a-votre-besoin-nos-fontaines-reseau-sont-a-poser-sur-pied-ou-sous-comptoir-la-gamme-determine-le-type-de-pose"
+          )}
           propositionsRef={propositionsRef}
         />
       ) : (
         <PropositionsTitle
           icon={Droplets}
-          title="Fontaines à eau"
-          description="Eau fraîche ou pétillante, de l'eau pure filtrée pour tous. Adaptées à votre besoin, nos fontaines réseau sont à poser, sur pied ou sous comptoir. La gamme détermine le type de pose"
+          title={tFontaines("fontaines-a-eau")}
+          description={tFontaines(
+            "eau-fraiche-ou-petillante-de-leau-pure-filtree-pour-tous-adaptees-a-votre-besoin-nos-fontaines-reseau-sont-a-poser-sur-pied-ou-sous-comptoir-la-gamme-determine-le-type-de-pose"
+          )}
           handleClickPrevious={handleClickPrevious}
         />
       )}

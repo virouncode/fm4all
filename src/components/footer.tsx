@@ -78,7 +78,7 @@ const Footer = async () => {
               })}
             </ul>
           </div>
-          <div className="flex flex-col gap-2 w-52">
+          {/* <div className="flex flex-col gap-2 w-52">
             <p className="text-secondary text-xl">Articles</p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
               <li>
@@ -148,7 +148,7 @@ const Footer = async () => {
                 </Link>
               </li>
             </ul>
-          </div>
+          </div> */}
           <div className="flex flex-col gap-2 w-52">
             <p className="text-secondary text-xl">{t("prestataires")}</p>
             <ul className="text-secondary text-sm flex flex-col gap-2">

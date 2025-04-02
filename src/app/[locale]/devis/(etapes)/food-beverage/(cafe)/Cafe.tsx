@@ -14,6 +14,7 @@ import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { Coffee, SprayCan } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
@@ -41,6 +42,7 @@ const Cafe = ({
   theConsoTarifs,
   sucreConsoTarifs,
 }: CafeProps) => {
+  const t = useTranslations("DevisPage.foodBeverage.cafe");
   const { client } = useContext(ClientContext);
   const { setFoodBeverage } = useContext(FoodBeverageContext);
   const { cafe, setCafe } = useContext(CafeContext);
@@ -107,16 +109,20 @@ const Cafe = ({
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="1">
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
-          title="Boissons chaudes"
-          description="Café expresso, boissons lactées ou chocolatées, choisissez le type de boissons et le nombre de personnes pour votre espace café. Forfait mensuel tout compris (machine, café, consommables). La gamme détermine la qualité du café"
+          title={t("boissons-chaudes")}
+          description={t(
+            "cafe-expresso-boissons-lactees-ou-chocolatees-choisissez-le-type-de-boissons-et-le-nombre-de-personnes-pour-votre-espace-cafe-forfait-mensuel-tout-compris-machine-cafe-consommables-la-gamme-determine-la-qualite-du-cafe"
+          )}
           icon={SprayCan}
           propositionsRef={propositionsRef}
         />
       ) : (
         <PropositionsTitle
           icon={Coffee}
-          title="Boissons chaudes"
-          description="Café expresso, boissons lactées ou chocolatées, choisissez le type de boissons et le nombre de personnes pour votre espace café. Forfait mensuel tout compris (machine, café, consommables). La gamme détermine la qualité du café"
+          title={t("boissons-chaudes")}
+          description={t(
+            "cafe-expresso-boissons-lactees-ou-chocolatees-choisissez-le-type-de-boissons-et-le-nombre-de-personnes-pour-votre-espace-cafe-forfait-mensuel-tout-compris-machine-cafe-consommables-la-gamme-determine-la-qualite-du-cafe"
+          )}
           handleClickPrevious={handleClickPrevious}
           previousButton={false}
         />

@@ -1,10 +1,9 @@
 export const typesBoissons = [
   {
     id: "cafe",
-    description: "Café",
   },
-  { id: "lait", description: "Café+Lait" },
-  { id: "chocolat", description: "Café+Lait+Chocolat" },
+  { id: "lait" },
+  { id: "chocolat" },
 ];
 
 export type TypesBoissonsType = "cafe" | "lait" | "chocolat";

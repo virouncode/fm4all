@@ -24,6 +24,7 @@ import { gammes, GammeType } from "@/zod-schemas/gamme";
 import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import CafeDesktopEspacePropositions from "./(desktop)/CafeDesktopEspacePropositions";
@@ -52,6 +53,8 @@ const CafeEspacePropositions = ({
   theConsoTarifs,
   sucreConsoTarifs,
 }: CafeEspacePropositionsProps) => {
+  const tCafe = useTranslations("DevisPage.foodBeverage.cafe");
+  const t = useTranslations("DevisPage");
   const { client } = useContext(ClientContext);
   const { snacksFruits } = useContext(SnacksFruitsContext);
   const { setFoodBeverage } = useContext(FoodBeverageContext);
@@ -90,9 +93,9 @@ const CafeEspacePropositions = ({
     return (
       <div className="flex-1 flex items-center justify-center border rounded-xl">
         <p className="max-w-prose text-center text-base">
-          Le fournisseur choisi précédemment ne propose pas d&apos;offre pour
-          ces critères, veuillez changer le type de boissons ou le nombre de
-          personnes.
+          {tCafe(
+            "le-fournisseur-choisi-precedemment-ne-propose-pas-doffre-pour-ces-criteres-veuillez-changer-le-type-de-boissons-ou-le-nombre-de-personnes"
+          )}
         </p>
       </div>
     );
@@ -168,16 +171,16 @@ const CafeEspacePropositions = ({
       );
       const typeLait =
         espace.infos.typeBoissons !== "cafe"
-          ? machinesTarifFournisseur?.typeLait ?? null
+          ? (machinesTarifFournisseur?.typeLait ?? null)
           : null;
       const prixUnitaireConsoLait =
         typeLait === "dosettes"
-          ? consoLaitTarifFournisseur?.prixUnitaireDosette ?? null
+          ? (consoLaitTarifFournisseur?.prixUnitaireDosette ?? null)
           : typeLait === "frais"
-          ? consoLaitTarifFournisseur?.prixUnitaireFrais ?? null
-          : typeLait === "poudre"
-          ? consoLaitTarifFournisseur?.prixUnitairePoudre ?? null
-          : null;
+            ? (consoLaitTarifFournisseur?.prixUnitaireFrais ?? null)
+            : typeLait === "poudre"
+              ? (consoLaitTarifFournisseur?.prixUnitairePoudre ?? null)
+              : null;
       //CHOCOLAT
       const consoChocolatTarifFournisseur = chocolatConsoTarifs.find(
         (tarif) =>
@@ -186,14 +189,14 @@ const CafeEspacePropositions = ({
       );
       const typeChocolat =
         espace.infos.typeBoissons === "chocolat"
-          ? machinesTarifFournisseur?.typeChocolat ?? null
+          ? (machinesTarifFournisseur?.typeChocolat ?? null)
           : null;
       const prixUnitaireConsoChocolat =
         typeChocolat === "sachets"
-          ? consoChocolatTarifFournisseur?.prixUnitaireSachet ?? null
+          ? (consoChocolatTarifFournisseur?.prixUnitaireSachet ?? null)
           : typeChocolat === "poudre"
-          ? consoChocolatTarifFournisseur?.prixUnitairePoudre ?? null
-          : null;
+            ? (consoChocolatTarifFournisseur?.prixUnitairePoudre ?? null)
+            : null;
       //SUCRE
       const consoSucreTarifFournisseur = sucreConsoTarifs.find(
         (tarif) =>
@@ -217,22 +220,22 @@ const CafeEspacePropositions = ({
         nbPersonnes && totalLoc !== null ? totalLoc + totalConso : null;
       //Modele
       const modele = machinesTarifFournisseur
-        ? cafeMachines?.find(
+        ? (cafeMachines?.find(
             ({ id }) => id === machinesTarifFournisseur?.cafeMachineId
-          )?.modele ?? null
+          )?.modele ?? null)
         : null;
       const marque = machinesTarifFournisseur
-        ? cafeMachines?.find(
+        ? (cafeMachines?.find(
             ({ id }) => id === machinesTarifFournisseur?.cafeMachineId
-          )?.marque ?? null
+          )?.marque ?? null)
         : null;
       const imageUrl = machinesTarifFournisseur
-        ? cafeMachines?.find(
+        ? (cafeMachines?.find(
             ({ id }) => id === machinesTarifFournisseur?.cafeMachineId
-          )?.imageUrl ?? null
+          )?.imageUrl ?? null)
         : null;
       const reconditionne = machinesTarifFournisseur
-        ? machinesTarifFournisseur.reconditionne ?? null
+        ? (machinesTarifFournisseur.reconditionne ?? null)
         : null;
       return {
         id,
@@ -635,8 +638,11 @@ const CafeEspacePropositions = ({
 
       if (fournisseurId !== cafe.infos.fournisseurId) {
         toast({
-          title: "Fournisseur sélectionné",
-          description: `Vous avez choisi ${nomFournisseur} pour le café, ce prestataire assurera la prestation Thés variés`,
+          title: t("fournisseur-selectionne"),
+          description: tCafe(
+            "vous-avez-choisi-nomfournisseur-pour-le-cafe-ce-prestataire-assurera-la-prestation-thes-varies",
+            { nomFournisseur }
+          ),
         });
       }
       const newCafeInfos = {
@@ -753,12 +759,12 @@ const CafeEspacePropositions = ({
             : null;
         const itemPrixUnitaireConsoLait =
           itemTypeLait === "dosettes"
-            ? itemConsoLaitTarifFournisseur?.prixUnitaireDosette ?? null
+            ? (itemConsoLaitTarifFournisseur?.prixUnitaireDosette ?? null)
             : itemTypeLait === "frais"
-            ? itemConsoLaitTarifFournisseur?.prixUnitaireFrais ?? null
-            : itemTypeLait === "poudre"
-            ? itemConsoLaitTarifFournisseur?.prixUnitairePoudre ?? null
-            : null;
+              ? (itemConsoLaitTarifFournisseur?.prixUnitaireFrais ?? null)
+              : itemTypeLait === "poudre"
+                ? (itemConsoLaitTarifFournisseur?.prixUnitairePoudre ?? null)
+                : null;
 
         const itemConsoChocolatTarifFournisseur = chocolatConsoTarifs.find(
           (tarif) =>
@@ -771,10 +777,10 @@ const CafeEspacePropositions = ({
             : null;
         const itemPrixUnitaireConsoChocolat =
           itemTypeChocolat === "sachets"
-            ? itemConsoChocolatTarifFournisseur?.prixUnitaireSachet ?? null
+            ? (itemConsoChocolatTarifFournisseur?.prixUnitaireSachet ?? null)
             : itemTypeChocolat === "poudre"
-            ? itemConsoChocolatTarifFournisseur?.prixUnitairePoudre ?? null
-            : null;
+              ? (itemConsoChocolatTarifFournisseur?.prixUnitairePoudre ?? null)
+              : null;
         const itemConsoSucreTarifFournisseur = sucreConsoTarifs.find(
           (tarif) =>
             tarif.effectif === roundNbPersonnesCafeConso(itemNbPersonnes) &&
@@ -801,17 +807,17 @@ const CafeEspacePropositions = ({
         const itemTotalAnnuel =
           itemTotalLoc !== null ? itemTotalLoc + itemTotalConso : null;
         const itemModele = itemMachinesTarifFournisseur
-          ? cafeMachines?.find(
+          ? (cafeMachines?.find(
               ({ id }) => id === itemMachinesTarifFournisseur?.cafeMachineId
-            )?.modele ?? null
+            )?.modele ?? null)
           : null;
         const itemMarque = itemMachinesTarifFournisseur
-          ? cafeMachines?.find(
+          ? (cafeMachines?.find(
               ({ id }) => id === itemMachinesTarifFournisseur?.cafeMachineId
-            )?.marque ?? null
+            )?.marque ?? null)
           : null;
         const itemReconditionne = itemMachinesTarifFournisseur
-          ? itemMachinesTarifFournisseur.reconditionne ?? null
+          ? (itemMachinesTarifFournisseur.reconditionne ?? null)
           : null;
         newEspace.push({
           infos: {
@@ -910,8 +916,8 @@ const CafeEspacePropositions = ({
           prixPanierSnacksFruits >= (snacksFruits.prix.seuilFranco ?? 0)
             ? 0
             : isSameFournisseur
-            ? snacksFruits.prix.prixUnitaireLivraisonSiCafe
-            : snacksFruits.prix.prixUnitaireLivraison;
+              ? snacksFruits.prix.prixUnitaireLivraisonSiCafe
+              : snacksFruits.prix.prixUnitaireLivraison;
         const totalLivraison =
           prixLivraisonPanier !== null ? 52 * prixLivraisonPanier : null;
         setTotalSnacksFruits((prev) => ({
@@ -996,8 +1002,9 @@ const CafeEspacePropositions = ({
   const handleAlert = () => {
     if (!espace.infos.gammeCafeSelected) {
       toast({
-        description:
-          "Veuillez d'abord sélectionner une offre ou retirer tous les espaces",
+        description: tCafe(
+          "veuillez-dabord-selectionner-une-offre-ou-retirer-tous-les-espaces"
+        ),
         duration: 3000,
         variant: "destructive",
         className: "left-0",

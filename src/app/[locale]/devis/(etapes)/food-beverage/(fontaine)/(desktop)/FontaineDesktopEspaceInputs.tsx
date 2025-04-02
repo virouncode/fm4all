@@ -21,6 +21,7 @@ import {
   MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE,
 } from "@/context/FontainesProvider";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 
 type FontaineDesktopEspaceInputsProps = {
@@ -45,6 +46,9 @@ const FontaineDesktopEspaceInputs = ({
 }: FontaineDesktopEspaceInputsProps) => {
   const { fontaines } = useContext(FontainesContext);
   const { client } = useContext(ClientContext);
+  const t = useTranslations("DevisPage");
+  const tFontaines = useTranslations("DevisPage.foodBeverage.fontaines");
+  const tLocation = useTranslations("DevisPage.location");
   return (
     <TooltipProvider delayDuration={0}>
       <Tooltip>
@@ -61,10 +65,10 @@ const FontaineDesktopEspaceInputs = ({
                     disabled={true}
                     className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                     id="eau froide"
-                    aria-label="Sélectionner eau froide"
+                    aria-label={tFontaines("selectionner-eau-froide")}
                   />
                   <Label htmlFor="eau froide" className="text-sm">
-                    Eau froide
+                    {tFontaines("eau-froide")}
                   </Label>
                 </div>
                 <div className="flex items-center gap-2">
@@ -75,10 +79,10 @@ const FontaineDesktopEspaceInputs = ({
                     }
                     className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                     id="eau gazeuse"
-                    aria-label="Sélectionner eau gazeuse"
+                    aria-label={tFontaines("selectionner-eau-gazeuse")}
                   />
                   <Label htmlFor="eau gazeuse" className="text-sm">
-                    Eau gazeuse
+                    {tFontaines("eau-gazeuse")}
                   </Label>
                 </div>
                 <div className="flex items-center gap-2">
@@ -89,10 +93,10 @@ const FontaineDesktopEspaceInputs = ({
                     }
                     className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                     id="boissons"
-                    aria-label="Sélectionner eau chaude"
+                    aria-label={tFontaines("selectionner-eau-chaude")}
                   />
                   <Label htmlFor="Eau chaude" className="text-sm">
-                    Eau chaude
+                    {tFontaines("eau-chaude")}
                   </Label>
                 </div>
               </div>
@@ -115,17 +119,17 @@ const FontaineDesktopEspaceInputs = ({
                   htmlFor={`nbPersonnes_${espace.infos.espaceId}`}
                   className="text-base"
                 >
-                  personnes
+                  {t("personnes")}
                 </Label>
               </div>
               {espace.infos.espaceId === fontainesEspacesIds[0] && (
                 <Select
                   value={fontaines.infos.dureeLocation}
                   onValueChange={handleSelectDureeLocation}
-                  aria-label="Sélectionnez la durée de location"
+                  aria-label={t("selectionnez-la-duree-de-location")}
                 >
                   <SelectTrigger className={" max-w-xs w-1/4"}>
-                    <SelectValue placeholder="Choisir" />
+                    <SelectValue placeholder={t("choisir")} />
                   </SelectTrigger>
                   <SelectContent>
                     {locationFontaine.map((item) => (
@@ -133,7 +137,7 @@ const FontaineDesktopEspaceInputs = ({
                         key={`${location}_${item.id}`}
                         value={item.id}
                       >
-                        {item.description}
+                        {tLocation(item.id)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -144,12 +148,20 @@ const FontaineDesktopEspaceInputs = ({
         </TooltipTrigger>
         <TooltipContent className="max-w-60">
           <div>
-            <p>Pour votre espace fontaine à eau veuillez sélectionner :</p>
+            <p>
+              {tFontaines(
+                "pour-votre-espace-fontaine-a-eau-veuillez-selectionner"
+              )}
+            </p>
             <ul className="ml-10">
-              <li className="list-disc">Le type d&apos;eau</li>
-              <li className="list-disc">Le nombre de personnes (max 110)</li>
+              <li className="list-disc">{tFontaines("le-type-deau")}</li>
+              <li className="list-disc">
+                {tFontaines("le-nombre-de-personnes-max-110")}
+              </li>
               {fontainesEspacesIds[0] === espace.infos.espaceId && (
-                <li className="list-disc">La durée de location</li>
+                <li className="list-disc">
+                  {tFontaines("la-duree-de-location")}
+                </li>
               )}
             </ul>
           </div>

@@ -4,6 +4,7 @@ import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
 import { TotalOfficeManagerContext } from "@/context/TotalOfficeManagerProvider";
 import { SelectOfficeManagerQuantitesType } from "@/zod-schemas/officeManagerQuantites";
 import { SelectOfficeManagerTarifsType } from "@/zod-schemas/officeManagerTarifs";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import OfficeManagerDesktopPropositions from "./(desktop)/OfficeManagerDesktopPropositions";
@@ -18,6 +19,7 @@ const OfficeManagerPropositions = ({
   officeManagerQuantites,
   officeManagerTarifs,
 }: OfficeManagerPropositionsProps) => {
+  const tOfficeManager = useTranslations("DevisPage.pilotage.officeManager");
   const { officeManager, setOfficeManager } = useContext(OfficeManagerContext);
   const { setTotalOfficeManager } = useContext(TotalOfficeManagerContext);
 
@@ -40,12 +42,12 @@ const OfficeManagerPropositions = ({
       ? demiJParSemaine <= 1
         ? 20
         : demiJParSemaine <= 2
-        ? 15
-        : demiJParSemaine <= 3
-        ? 10
-        : demiJParSemaine <= 4
-        ? 5
-        : 0
+          ? 15
+          : demiJParSemaine <= 3
+            ? 10
+            : demiJParSemaine <= 4
+              ? 5
+              : 0
       : null;
 
   const propositions = officeManagerTarifs.map((tarif) => {
@@ -54,7 +56,7 @@ const OfficeManagerPropositions = ({
     if (fournisseurId === 14) {
       fournisseurId = 16;
       nomFournisseur = "FM4ALL";
-      slogan = "L'office management pour tous";
+      slogan = tOfficeManager("le-facility-management-pour-tous");
     }
     const demiTauxJournalier = officeManager.infos.premium
       ? demiTjmPremium
@@ -142,8 +144,8 @@ const OfficeManagerPropositions = ({
             ? demiJParSemaine < demiJParSemaineConfort
               ? "essentiel"
               : demiJParSemaine < demiJParSemaineExcellence
-              ? "confort"
-              : "excellence"
+                ? "confort"
+                : "excellence"
             : null,
       },
       quantites: {
@@ -174,12 +176,12 @@ const OfficeManagerPropositions = ({
         value[0] <= 1
           ? 20
           : value[0] <= 2
-          ? 15
-          : value[0] <= 3
-          ? 10
-          : value[0] <= 4
-          ? 5
-          : 0;
+            ? 15
+            : value[0] <= 3
+              ? 10
+              : value[0] <= 4
+                ? 5
+                : 0;
       const totalAnnuel =
         demiTauxJournalier !== null
           ? officeManager.infos.remplace
@@ -208,12 +210,12 @@ const OfficeManagerPropositions = ({
           ? demiJParSemaine <= 1
             ? 20
             : demiJParSemaine <= 2
-            ? 15
-            : demiJParSemaine <= 3
-            ? 10
-            : demiJParSemaine <= 4
-            ? 5
-            : 0
+              ? 15
+              : demiJParSemaine <= 3
+                ? 10
+                : demiJParSemaine <= 4
+                  ? 5
+                  : 0
           : null;
       const demiTauxJournalier = officeManager.infos.premium
         ? officeManager.prix.demiTjmPremium
@@ -254,12 +256,12 @@ const OfficeManagerPropositions = ({
           ? demiJParSemaine <= 1
             ? 20
             : demiJParSemaine <= 2
-            ? 15
-            : demiJParSemaine <= 3
-            ? 10
-            : demiJParSemaine <= 4
-            ? 5
-            : 0
+              ? 15
+              : demiJParSemaine <= 3
+                ? 10
+                : demiJParSemaine <= 4
+                  ? 5
+                  : 0
           : null;
       const demiTauxJournalier = checked
         ? officeManager.prix.demiTjmPremium

@@ -1,6 +1,7 @@
 import { ChangeEvent } from "react";
 import TheMobileInputs from "./TheMobileInputs";
 import TheMobilePropositionsCarousel from "./TheMobilePropositionsCarousel";
+import { useTranslations } from "next-intl";
 
 type TheMobilePropositionsProps = {
   nbPersonnes: number;
@@ -59,9 +60,10 @@ const TheMobilePropositions = ({
   handleIncrement,
   handleDecrement,
 }: TheMobilePropositionsProps) => {
+  const tThe = useTranslations("DevisPage.foodBeverage.the");
   return (
     <div className="flex flex-col gap-6 w-full">
-      <p className="font-bold text-xl -mb-4">Sachets de thé</p>
+      <p className="font-bold text-xl -mb-4">{tThe("sachets-de-the")}</p>
       <TheMobileInputs
         nbPersonnes={nbPersonnes}
         handleChangeNbPersonnes={handleChangeNbPersonnes}

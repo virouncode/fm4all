@@ -10,6 +10,7 @@ import { MARGE } from "@/constants/constants";
 import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { Info } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useContext } from "react";
 
@@ -46,6 +47,9 @@ const OfficeManagerPropositionCard = ({
   demiJParSemaineConfort,
   demiJParSemaineExcellence,
 }: OfficeManagerPropositionCardProps) => {
+  const t = useTranslations("DevisPage");
+  const tOfficeManager = useTranslations("DevisPage.pilotage.officeManager");
+  const tGlobal = useTranslations("Global");
   const { officeManager } = useContext(OfficeManagerContext);
   const color =
     proposition.demiJParSemaine !== null &&
@@ -54,8 +58,8 @@ const OfficeManagerPropositionCard = ({
       ? proposition.demiJParSemaine < demiJParSemaineConfort
         ? "fm4allessential"
         : proposition.demiJParSemaine < demiJParSemaineExcellence
-        ? "fm4allcomfort"
-        : "fm4allexcellence"
+          ? "fm4allcomfort"
+          : "fm4allexcellence"
       : "";
 
   if (!proposition.totalAnnuel) {
@@ -63,88 +67,120 @@ const OfficeManagerPropositionCard = ({
       <div
         className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4`}
       >
-        Non proposé
+        {t("non-propose")}
       </div>
     );
   }
   const totalMensuelText = (
     <p className="font-bold text-xl ml-4">
-      {formatNumber(Math.round((proposition.totalAnnuel * MARGE) / 12))} €/mois*
+      {formatNumber(Math.round((proposition.totalAnnuel * MARGE) / 12))}{" "}
+      {t("euros-mois")}*
     </p>
   );
 
   const demiJParSemaineText =
     proposition.demiJParSemaine !== null ? (
       <li className="list-check">
-        {proposition.demiJParSemaine / 2} j / semaine
+        {proposition.demiJParSemaine / 2} {tOfficeManager("j-semaine")}
       </li>
     ) : null;
 
   const presenceText = (
     <li className="list-check">
-      Présent {officeManager.infos.remplace ? "52" : "47"} semaines / an
+      {tOfficeManager("present")} {officeManager.infos.remplace ? "52" : "47"}{" "}
+      {tOfficeManager("semaines-an")}
     </li>
   );
 
   const premiumText = officeManager.infos.premium ? (
     <li className="list-check">
-      Profil premium : Anglais ou exp.longue, logiciel, compta, ADV ou ADC
+      {tOfficeManager(
+        "profil-premium-anglais-ou-exp-longue-logiciel-compta-adv-ou-adc"
+      )}
     </li>
   ) : null;
 
   const infosEssentiel = (
     <>
-      <li className="list-check">Coordination technique des locaux</li>
-      <li className="list-check">Suivi sous-traitants</li>
-      <li className="list-check">Contrôle et gestion prestataires</li>
-      <li className="list-check">Lien avec fm4all</li>
       <li className="list-check">
-        Lien avec propriétaire, Property ou Asset Manager
+        {tOfficeManager("coordination-technique-des-locaux")}
+      </li>
+      <li className="list-check">{tOfficeManager("suivi-sous-traitants")}</li>
+      <li className="list-check">
+        {tOfficeManager("controle-et-gestion-prestataires")}
+      </li>
+      <li className="list-check">{tOfficeManager("lien-avec-fm4all")}</li>
+      <li className="list-check">
+        {tOfficeManager("lien-avec-proprietaire-property-ou-asset-manager")}
       </li>
     </>
   );
 
   const infosConfort = (
     <>
-      <li className="list-check">Coordination technique des locaux</li>
-      <li className="list-check">Suivi sous-traitants</li>
-      <li className="list-check">Contrôle et gestion prestataires</li>
-      <li className="list-check">Lien avec fm4all</li>
       <li className="list-check">
-        Lien avec propriétaire, Property ou Asset Manager
+        {tOfficeManager("coordination-technique-des-locaux")}
       </li>
-      <li className="list-check">Gestion des contrats de services tiers</li>
-      <li className="list-check">Accueil des locaux</li>
-      <li className="list-check">Support administratif aux équipes</li>
+      <li className="list-check">{tOfficeManager("suivi-sous-traitants")}</li>
       <li className="list-check">
-        Gestion des logiciels internes (badges, flotte automobile, etc.)
+        {tOfficeManager("controle-et-gestion-prestataires")}
+      </li>
+      <li className="list-check">{tOfficeManager("lien-avec-fm4all")}</li>
+      <li className="list-check">
+        {tOfficeManager("lien-avec-proprietaire-property-ou-asset-manager")}
+      </li>
+      <li className="list-check">
+        {tOfficeManager("gestion-des-contrats-de-services-tiers")}
+      </li>
+      <li className="list-check">{tOfficeManager("accueil-des-locaux")}</li>
+      <li className="list-check">
+        {tOfficeManager("support-administratif-aux-equipes")}
+      </li>
+      <li className="list-check">
+        {tOfficeManager(
+          "gestion-des-logiciels-internes-badges-flotte-automobile-etc"
+        )}
       </li>
     </>
   );
 
   const infosExcellence = (
     <>
-      <li className="list-check">Coordination technique des locaux</li>
-      <li className="list-check">Suivi sous-traitants</li>
-      <li className="list-check">Contrôle et gestion prestataires</li>
-      <li className="list-check">Lien avec fm4all</li>
       <li className="list-check">
-        Lien avec propriétaire, Property ou Asset Manager
+        {tOfficeManager("coordination-technique-des-locaux")}
       </li>
-      <li className="list-check">Gestion des contrats de services tiers</li>
-      <li className="list-check">Accueil des locaux</li>
-      <li className="list-check">Support administratif aux équipes</li>
+      <li className="list-check">{tOfficeManager("suivi-sous-traitants")}</li>
       <li className="list-check">
-        Gestion des logiciels internes (badges, flotte automobile, etc.)
+        {tOfficeManager("controle-et-gestion-prestataires")}
+      </li>
+      <li className="list-check">{tOfficeManager("lien-avec-fm4all")}</li>
+      <li className="list-check">
+        {tOfficeManager("lien-avec-proprietaire-property-ou-asset-manager")}
       </li>
       <li className="list-check">
-        Animation du site (orga events, déj, soirées)
+        {tOfficeManager("gestion-des-contrats-de-services-tiers")}
       </li>
-      <li className="list-check">Onboarding nouveaux collaborateurs</li>
+      <li className="list-check">{tOfficeManager("accueil-des-locaux")}</li>
       <li className="list-check">
-        Création d&apos;un environnement travail positif
+        {tOfficeManager("support-administratif-aux-equipes")}
       </li>
-      <li className="list-check">Gestion de l’expérience utilisateur</li>
+      <li className="list-check">
+        {tOfficeManager(
+          "gestion-des-logiciels-internes-badges-flotte-automobile-etc"
+        )}
+      </li>
+      <li className="list-check">
+        {tOfficeManager("animation-du-site-orga-events-dej-soirees")}
+      </li>
+      <li className="list-check">
+        {tOfficeManager("onboarding-nouveaux-collaborateurs")}
+      </li>
+      <li className="list-check">
+        {tOfficeManager("creation-d-un-environnement-travail-positif")}
+      </li>
+      <li className="list-check">
+        {tOfficeManager("gestion-de-lexperience-utilisateur")}
+      </li>
     </>
   );
 
@@ -155,8 +191,8 @@ const OfficeManagerPropositionCard = ({
       ? proposition.demiJParSemaine < demiJParSemaineConfort
         ? infosEssentiel
         : proposition.demiJParSemaine < demiJParSemaineExcellence
-        ? infosConfort
-        : infosExcellence
+          ? infosConfort
+          : infosExcellence
       : null;
 
   const dialogTitle =
@@ -165,10 +201,10 @@ const OfficeManagerPropositionCard = ({
     demiJParSemaineExcellence !== null ? (
       <p className={`text-${color} text-center`}>
         {proposition.demiJParSemaine < demiJParSemaineConfort
-          ? "Essentiel"
+          ? tGlobal("essentiel")
           : proposition.demiJParSemaine < demiJParSemaineExcellence
-          ? "Confort"
-          : "Excellence"}
+            ? tGlobal("confort")
+            : tGlobal("excellence")}
       </p>
     ) : null;
 
@@ -176,7 +212,7 @@ const OfficeManagerPropositionCard = ({
     <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
       <Image
         src={"/img/services/office-managers.webp"}
-        alt={`illustration d'office managers`}
+        alt={tOfficeManager("illustration-doffice-managers")}
         fill={true}
         className="object-contain object-center cursor-pointer"
         quality={100}
@@ -201,7 +237,7 @@ const OfficeManagerPropositionCard = ({
         }
         onCheckedChange={() => handleClickProposition(proposition)}
         className="data-[state=checked]:bg-fm4alldestructive"
-        title="Sélectionner cette proposition"
+        title={t("selectionnez-cette-proposition")}
       />
       <div>
         <div className="flex gap-2 items-center">
@@ -221,7 +257,7 @@ const OfficeManagerPropositionCard = ({
               <div className="flex flex-col gap-4">
                 {imgProduit}
                 <p className="text-xs italic text-end">
-                  *photo non contractuelle
+                  {t("photo-non-contractuelle")}
                 </p>
                 <ul className="flex flex-col text-sm px-4 mx-auto">
                   {demiJParSemaineText}

@@ -1,4 +1,5 @@
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import SnacksFruitsMobilePropositionsCarousel from "./SnacksFruitsMobilePropositionsCarousel";
 
@@ -79,14 +80,17 @@ const SnacksFruitsMobilePropositions = ({
   formattedPropositions,
   handleClickProposition,
 }: SnacksFruitsMobilePropositionsProps) => {
+  const t = useTranslations("DevisPage");
+  const tSnacks = useTranslations("DevisPage.foodBeverage.snacks");
   const { snacksFruits } = useContext(SnacksFruitsContext);
   if (snacksFruits.infos.choix.length === 0) {
     return (
       <div className="flex flex-col gap-2 w-full text-fm4alldestructive">
-        <p>Nous n&apos;avons pas d&apos;offres correspondant à ces critères</p>
+        <p>{t("nous-navons-pas-doffres-correspondant-a-ces-criteres")}</p>
         <p>
-          Veuillez choisir au moins un produit parmi &quot;fruits, snacks et
-          boissons&quot;
+          {tSnacks(
+            "veuillez-choisir-au-moins-un-produit-parmi-fruits-snacks-et-boissons"
+          )}
         </p>
       </div>
     );
