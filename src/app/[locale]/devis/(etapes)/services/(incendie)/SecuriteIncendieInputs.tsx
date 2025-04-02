@@ -32,7 +32,6 @@ const SecuriteIncendieInputs = ({
   handleChangeNbr,
   incendieQuantite,
 }: SecuriteIncendieInputsProps) => {
-  const t = useTranslations("DevisPage");
   const tIncendie = useTranslations("DevisPage.services.incendie");
   return (
     <div className="flex flex-col gap-6 w-3/4">

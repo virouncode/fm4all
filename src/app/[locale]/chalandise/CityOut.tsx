@@ -5,7 +5,7 @@ import { InputWithLabel } from "@/components/formInputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { batiments } from "@/constants/batiments";
-import { occupations } from "@/constants/occupation";
+import { occupation } from "@/constants/occupation";
 import { ClientContext } from "@/context/ClientProvider";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";
@@ -83,8 +83,7 @@ const CityOut = ({ destination }: CityOutProps) => {
             batiments.find(({ id }) => id === data.typeBatiment)?.description
           }</p>
           <p>Type d'occupation : ${
-            occupations.find(({ id }) => id === data.typeOccupation)
-              ?.description
+            occupation.find(({ id }) => id === data.typeOccupation)?.description
           }</p>
           `,
         }),
@@ -93,7 +92,7 @@ const CityOut = ({ destination }: CityOutProps) => {
       executeSaveClient(data);
       setTimeout(() => {
         //pour laisser le temps au toast de s'afficher
-        if (destination) router.push(destination);
+        if (destination) router.push("/");
         else router.back();
       }, 1000);
     } catch (err) {

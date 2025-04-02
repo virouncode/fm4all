@@ -6,7 +6,7 @@ export const servicesSlugMappingsFrToEn: Record<string, string> = {
   "hygiene-sanitaire": "sanitary-supplies",
   "securite-incendie": "fire-safety",
   "machines-a-cafe-en-entreprise": "coffee-machines",
-  "fontaines-a-eau": "water-fountains",
+  "fontaines-a-eau-entreprise": "water-dispenser",
   "pilotage-fm4all": "fm4all-service-management",
   // Ajoutez tous vos autres services ici
 };

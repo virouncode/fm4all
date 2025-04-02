@@ -42,7 +42,6 @@ import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
-import router from "next/router";
 import { Dispatch, SetStateAction, useContext } from "react";
 
 type DevisButtonProps = {

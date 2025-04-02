@@ -113,3 +113,30 @@ export const routing = defineRouting({
 });
 
 export type Locale = "fr" | "en";
+export type PathnamesType =
+  | "/"
+  | "/services"
+  | "/services/[slug]"
+  | "/secteurs"
+  | "/secteurs/[slug]"
+  | "/blog"
+  | "/blog/[slug]"
+  | "/gammes"
+  | "/engagements"
+  | "/partenaires"
+  | "/faq"
+  | "/prestataire"
+  | "/contact"
+  | "/mentions"
+  | "/confidentialite"
+  | "/cookies"
+  | "/cgv"
+  | "/cgu"
+  | "/chalandise"
+  | "/devis/locaux"
+  | "/devis/services"
+  | "/devis/food-beverage"
+  | "/devis/pilotage"
+  | "/devis/sauvegarder"
+  | "/devis/personnaliser"
+  | "/devis/afficher";

@@ -19,7 +19,6 @@ type ThePropositionsProps = {
 
 const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
   const t = useTranslations("DevisPage");
-  const tCafe = useTranslations("DevisPage.foodBeverage.cafe");
   const tThe = useTranslations("DevisPage.foodBeverage.the");
   const { client } = useContext(ClientContext);
   const { cafe } = useContext(CafeContext);
