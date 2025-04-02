@@ -20,7 +20,7 @@ const Footer = async () => {
             <p className="text-secondary text-xl">fm4all</p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
               <li>
-                <Link href="/home" className="hover:opacity-80">
+                <Link href="/" className="hover:opacity-80">
                   {t("page-d-accueil")}
                 </Link>
               </li>

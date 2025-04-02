@@ -105,6 +105,10 @@ export const routing = defineRouting({
       fr: "/mon-devis/afficher-mon-devis",
       en: "/my-quote/view-my-quote",
     },
+    "/studio/[...tool]": {
+      fr: "/studio/[...tool]",
+      en: "/studio/[...tool]",
+    },
   },
 });
 
