@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -6,7 +5,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Link } from "@/i18n/navigation";
 
 const HofManager = () => {
   return (
@@ -27,7 +25,7 @@ const HofManager = () => {
               Manager. Hospitality, Office et Facility Manager, trois métiers
               qui chez fm4all ne font plus qu&apos;un : les HOF Managers.
             </p>
-            <Button
+            {/* <Button
               variant="outline"
               title="Decouvrir l'offre"
               className="flex justify-center items-center text-base"
@@ -35,7 +33,7 @@ const HofManager = () => {
               asChild
             >
               <Link href="/articles/hof-managers">Decouvrir l&apos;offre</Link>
-            </Button>
+            </Button> */}
           </CardContent>
         </Card>
       </div>
