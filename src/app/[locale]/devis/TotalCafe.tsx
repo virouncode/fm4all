@@ -3,9 +3,11 @@ import { CafeContext } from "@/context/CafeProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 
 const TotalCafe = () => {
+  const t = useTranslations("Total");
   const { cafe } = useContext(CafeContext);
   const { totalCafe } = useContext(TotalCafeContext);
   const total = totalCafe.totalEspaces
@@ -19,7 +21,9 @@ const TotalCafe = () => {
   return (
     <div className="flex flex-col gap-4 total-section" id="total-cafe">
       <div className="flex flex-col gap-4">
-        <div>Machines à Café ({cafe.infos.nomFournisseur})</div>
+        <div>
+          {t("machines-a-cafe")} ({cafe.infos.nomFournisseur})
+        </div>
         <div className="flex flex-col ml-4 text-xs ">
           {cafe.espaces
             .filter(
@@ -47,14 +51,14 @@ const TotalCafe = () => {
                         )?.total ?? 0) * MARGE
                       )
                     )}{" "}
-                    € HT/an
+                    {t("eur-ht-an")}
                   </p>
                 </div>
                 {totalCafe.totalEspaces.find(
                   (total) => total.espaceId === item.infos.espaceId
                 )?.totalInstallation ? (
                   <div className="flex items-center justify-between">
-                    <p>Installation</p>
+                    <p>{t("installation")}</p>
                     <p>
                       {formatNumber(
                         Math.round(
@@ -63,7 +67,7 @@ const TotalCafe = () => {
                           )?.totalInstallation ?? 0) * MARGE
                         )
                       )}{" "}
-                      € HT
+                      {t("eur-ht")}
                     </p>
                   </div>
                 ) : null}
@@ -73,14 +77,15 @@ const TotalCafe = () => {
             <div className="flex justify-between w-full">
               <p>TOTAL</p>
               <p className="text-end">
-                {formatNumber(Math.round(total * MARGE))} € HT/an
+                {formatNumber(Math.round(total * MARGE))} {t("eur-ht-an")}
               </p>
             </div>
             {totalInstallation ? (
               <div className="flex justify-between w-full">
-                <p>TOTAL INSTALLATION</p>
+                <p>{t("total-installation")}</p>
                 <p className="text-end">
-                  {formatNumber(Math.round(totalInstallation * MARGE))} € HT
+                  {formatNumber(Math.round(totalInstallation * MARGE))}{" "}
+                  {t("eur-ht")}
                 </p>
               </div>
             ) : null}

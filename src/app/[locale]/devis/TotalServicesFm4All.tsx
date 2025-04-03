@@ -4,9 +4,11 @@ import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
 import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 
 const TotalServicesFm4All = () => {
+  const t = useTranslations("Total");
   const { servicesFm4All } = useContext(ServicesFm4AllContext);
   const { totalServicesFm4All } = useContext(TotalServicesFm4AllContext);
 
@@ -49,15 +51,15 @@ const TotalServicesFm4All = () => {
   return (
     <div className="flex flex-col gap-4 total-section" id="total-fm4all">
       <div className="flex flex-col gap-4">
-        <div>Services fm4all</div>
+        <div>{t("services-fm4all")}</div>
         <div className={`flex flex-col ml-4 text-xs`}>
           {totalAssurance ? (
             <div
               className={`flex items-center justify-between text-${color} font-bold`}
             >
-              <p>Assurance</p>
+              <p>{t("assurance")}</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalAssurance))} € HT/an
+                {formatNumber(Math.round(totalAssurance))} {t("eur-ht-an")}
               </p>
             </div>
           ) : null}
@@ -65,28 +67,29 @@ const TotalServicesFm4All = () => {
             <div
               className={`flex items-center justify-between text-${color} font-bold`}
             >
-              <p>Plateforme</p>
+              <p>{t("plateforme")}</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalPlateforme))} € HT/an
+                {formatNumber(Math.round(totalPlateforme))} {t("eur-ht-an")}
               </p>
             </div>
           ) : null}
           <div
             className={`flex items-center justify-between text-${color} font-bold`}
           >
-            <p>Support Administratif</p>
-            <p className="text-end">inclus</p>
+            <p>{t("support-administratif")}</p>
+            <p className="text-end">{t("inclus")}</p>
           </div>
           {servicesFm4All.infos.gammeSelected !== "essentiel" &&
           totalSupportOp ? (
             <div
               className={`flex items-center justify-between text-${color} font-bold`}
             >
-              <p>Support Opérationnel</p>
+              <p>{t("support-operationnel")}</p>
               <p className="text-end">
                 {servicesFm4All.infos.gammeSelected === "confort"
-                  ? `${formatNumber(Math.round(totalSupportOp))} € HT/an`
-                  : "inclus"}
+                  ? `${formatNumber(Math.round(totalSupportOp))}` +
+                    t("eur-ht-an")
+                  : t("inclus")}
               </p>
             </div>
           ) : null}
@@ -95,9 +98,9 @@ const TotalServicesFm4All = () => {
             <div
               className={`flex items-center justify-between text-${color} font-bold`}
             >
-              <p>Account Manager</p>
+              <p>{t("account-manager")}</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalAccountManager))} € HT/an
+                {formatNumber(Math.round(totalAccountManager))} {t("eur-ht-an")}
               </p>
             </div>
           ) : null}
@@ -105,9 +108,9 @@ const TotalServicesFm4All = () => {
             <div
               className={`flex items-center justify-between text-${color} font-bold`}
             >
-              <p>Remise sur chiffre d&apos;affaires</p>
+              <p>{t("remise-sur-chiffre-daffaires")}</p>
               <p className="text-end">
-                {formatNumber(-Math.round(totalRemiseCa))} € HT/an
+                {formatNumber(-Math.round(totalRemiseCa))} {t("eur-ht-an")}
               </p>
             </div>
           ) : null}
@@ -115,16 +118,16 @@ const TotalServicesFm4All = () => {
             <div
               className={`flex items-center justify-between text-${color} font-bold`}
             >
-              <p>Remise Office Manager</p>
+              <p>{t("remise-office-manager")}</p>
               <p className="text-end">
-                {formatNumber(-Math.round(totalRemiseHof))} € HT/an
+                {formatNumber(-Math.round(totalRemiseHof))} {t("eur-ht-an")}
               </p>
             </div>
           ) : null}
           <div className="flex items-center justify-between border-t border-foreground mt-2">
             <p>TOTAL</p>
             <p className="text-end">
-              {formatNumber(Math.round(total))} € HT/an
+              {formatNumber(Math.round(total))} {t("eur-ht-an")}
             </p>
           </div>
         </div>

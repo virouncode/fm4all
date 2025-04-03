@@ -3,9 +3,11 @@ import { HygieneContext } from "@/context/HygieneProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 
 const TotalHygiene = () => {
+  const t = useTranslations("Total");
   const { hygiene } = useContext(HygieneContext);
   const { totalHygiene } = useContext(TotalHygieneContext);
   const {
@@ -38,15 +40,18 @@ const TotalHygiene = () => {
   return (
     <div className="flex flex-col gap-4 total-section" id="total-hygiene">
       <div className="flex flex-col gap-4">
-        <div>Hygiene ({hygiene.infos.nomFournisseur})</div>
+        <div>
+          {t("hygiene")} ({hygiene.infos.nomFournisseur})
+        </div>
         <div className="flex flex-col ml-4 text-xs ">
           {totalTrilogie ? (
             <div
               className={`flex items-center justify-between text-${colorTrilogie} font-bold`}
             >
-              <p>Trilogie EMP / Savon / PH</p>
+              <p>{t("trilogie-emp-savon-ph")}</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalTrilogie * MARGE))} € HT/an
+                {formatNumber(Math.round(totalTrilogie * MARGE))}{" "}
+                {t("eur-ht-an")}
               </p>
             </div>
           ) : null}
@@ -54,9 +59,10 @@ const TotalHygiene = () => {
             <div
               className={`flex items-center justify-between text-${colorDesinfectant} font-bold`}
             >
-              <p>Option désinfectant</p>
+              <p>{t("option-desinfectant")}</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalDesinfectant * MARGE))} € HT/an
+                {formatNumber(Math.round(totalDesinfectant * MARGE))}{" "}
+                {t("eur-ht-an")}
               </p>
             </div>
           ) : null}
@@ -64,9 +70,9 @@ const TotalHygiene = () => {
             <div
               className={`flex items-center justify-between text-${colorParfum} font-bold`}
             >
-              <p>Option parfum</p>
+              <p>{t("option-parfum")}</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalParfum * MARGE))} € HT/an
+                {formatNumber(Math.round(totalParfum * MARGE))} {t("eur-ht-an")}
               </p>
             </div>
           ) : null}
@@ -74,9 +80,9 @@ const TotalHygiene = () => {
             <div
               className={`flex items-center justify-between text-${colorBalai} font-bold`}
             >
-              <p>Option balais WC</p>
+              <p>{t("option-balais-wc")}</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalBalai * MARGE))} € HT/an
+                {formatNumber(Math.round(totalBalai * MARGE))} {t("eur-ht-an")}
               </p>
             </div>
           ) : null}
@@ -84,31 +90,34 @@ const TotalHygiene = () => {
             <div
               className={`flex items-center justify-between text-${colorPoubelle} font-bold`}
             >
-              <p>Option poubelle hygiène féminine</p>
+              <p>{t("option-poubelle-hygiene-feminine")}</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalPoubelle * MARGE))} € HT/an
+                {formatNumber(Math.round(totalPoubelle * MARGE))}{" "}
+                {t("eur-ht-an")}
               </p>
             </div>
           ) : null}
           {totalInstallation ? (
             <div className="flex items-center justify-between">
-              <p>Installation</p>
+              <p>{t("installation")}</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalInstallation * MARGE))} € HT
+                {formatNumber(Math.round(totalInstallation * MARGE))}{" "}
+                {t("eur-ht")}
               </p>
             </div>
           ) : null}
           <div className="flex items-center justify-between border-t border-foreground mt-2">
             <p>TOTAL</p>
             <p className="text-end">
-              {formatNumber(Math.round(total * MARGE))} € HT/an
+              {formatNumber(Math.round(total * MARGE))} {t("eur-ht-an")}
             </p>
           </div>
           {totalInstallation ? (
             <div className="flex justify-between w-full">
-              <p>TOTAL INSTALLATION</p>
+              <p>{t("total-installation")}</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalInstallation * MARGE))} € HT
+                {formatNumber(Math.round(totalInstallation * MARGE))}{" "}
+                {t("eur-ht")}
               </p>
             </div>
           ) : null}

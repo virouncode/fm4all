@@ -26,6 +26,7 @@ import { TotalTheContext } from "@/context/TotalTheProvider";
 import { useUpddateServicesFm4AllTotal } from "@/hooks/use-upddate-services-fm4All-total";
 import { formatNumber } from "@/lib/formatNumber";
 import { Calculator } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useContext, useEffect } from "react";
 import TotalCafe from "./TotalCafe";
 import TotalFontaines from "./TotalFontaines";
@@ -39,6 +40,7 @@ import TotalSnacksFruits from "./TotalSnacksFruits";
 import TotalThe from "./TotalThe";
 
 const Total = () => {
+  const t = useTranslations("Total");
   const { client } = useContext(ClientContext);
   const { servicesFm4All } = useContext(ServicesFm4AllContext);
   const { totalNettoyage } = useContext(TotalNettoyageContext);
@@ -153,22 +155,23 @@ const Total = () => {
           className="text-base fixed bottom-6 right-4 lg:absolute lg:top-[20px] lg:right-0 z-30"
         >
           <Calculator />
-          {formatNumber(Math.round(total.totalAnnuelHt ?? 0))} € HT/an
+          {formatNumber(Math.round(total.totalAnnuelHt ?? 0))} {t("eur-ht-an")}
         </Button>
       </SheetTrigger>
-      <SheetContent className="flex flex-col w-full lg:w-[calc(100%-20rem)]">
+      <SheetContent className="flex flex-col w-full">
         <SheetHeader>
           <SheetTitle>
             <span className="text-2xl">
-              Total: {formatNumber(Math.round(total.totalAnnuelHt ?? 0))} €
-              HT/an
+              Total: {formatNumber(Math.round(total.totalAnnuelHt ?? 0))}{" "}
+              {t("eur-ht-an")}
             </span>{" "}
           </SheetTitle>
           <SheetDescription>
             <span>
-              Soit {formatNumber(Math.round((total.totalAnnuelHt ?? 0) / 12))} €
-              HT/mois pour {client.effectif} personnes, {client.surface} m
-              <sup>2</sup>
+              {t("soit")}{" "}
+              {formatNumber(Math.round((total.totalAnnuelHt ?? 0) / 12))}{" "}
+              {t("eur-ht-mois-pour")} {client.effectif} {t("personnes")},{" "}
+              {client.surface} m<sup>2</sup>
             </span>
             <br />
             <span>
@@ -176,7 +179,7 @@ const Total = () => {
               {formatNumber(
                 Math.round((total.totalInstallationHt ?? 0) * MARGE)
               )}{" "}
-              € HT d&apos;installation
+              {t("eur-ht-dinstallation")}
             </span>
           </SheetDescription>
         </SheetHeader>

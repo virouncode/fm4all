@@ -2,9 +2,11 @@ import { MARGE } from "@/constants/constants";
 import { FontainesContext } from "@/context/FontainesProvider";
 import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
 import { formatNumber } from "@/lib/formatNumber";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 
 const TotalFontaines = () => {
+  const t = useTranslations("Total");
   const { fontaines } = useContext(FontainesContext);
   const { totalFontaines } = useContext(TotalFontainesContext);
   const total = totalFontaines.totalEspaces
@@ -19,7 +21,7 @@ const TotalFontaines = () => {
     <div className="flex flex-col gap-4 total-section" id="total-fontaines">
       <div className="flex flex-col gap-4">
         <div>
-          Fontaines à eau{" "}
+          {t("fontaines-a-eau")}{" "}
           <span
             className={`${
               fontaines.infos.fournisseurId === 13 ? "inline-block blur-sm" : ""
@@ -43,7 +45,7 @@ const TotalFontaines = () => {
                   )} font-bold"
                 >
                   <p>
-                    1 x{" "}
+                    {t("1-x")}{" "}
                     <span
                       className={`${
                         fontaines.infos.fournisseurId === 13
@@ -63,14 +65,14 @@ const TotalFontaines = () => {
                         )?.total ?? 0) * MARGE
                       )
                     )}{" "}
-                    € HT/an
+                    {t("eur-ht-an")}
                   </p>
                 </div>
                 {totalFontaines.totalEspaces.find(
                   (total) => total.espaceId === item.infos.espaceId
                 )?.totalInstallation ? (
                   <div className="flex items-center justify-between">
-                    <p>Installation</p>
+                    <p>{t("installation")}</p>
                     <p>
                       {formatNumber(
                         Math.round(
@@ -79,7 +81,7 @@ const TotalFontaines = () => {
                           )?.totalInstallation ?? 0) * MARGE
                         )
                       )}{" "}
-                      € HT
+                      {t("eur-ht")}
                     </p>
                   </div>
                 ) : null}
@@ -89,14 +91,15 @@ const TotalFontaines = () => {
             <div className="flex justify-between w-full">
               <p>TOTAL</p>
               <p className="text-end">
-                {formatNumber(Math.round(total * MARGE))} € HT/an
+                {formatNumber(Math.round(total * MARGE))} {t("eur-ht-an")}
               </p>
             </div>
             {totalInstallation ? (
               <div className="flex justify-between w-full">
-                <p>TOTAL INSTALLATION</p>
+                <p>{t("total-installation")}</p>
                 <p className="text-end">
-                  {formatNumber(Math.round(totalInstallation * MARGE))} € HT
+                  {formatNumber(Math.round(totalInstallation * MARGE))}{" "}
+                  {t("eur-ht")}
                 </p>
               </div>
             ) : null}

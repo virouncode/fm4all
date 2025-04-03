@@ -2,9 +2,12 @@ import { MARGE } from "@/constants/constants";
 import { IncendieContext } from "@/context/IncendieProvider";
 import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { formatNumber } from "@/lib/formatNumber";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 
 const TotalIncendie = () => {
+  const t = useTranslations("Total");
+  const tPersonnaliser = useTranslations("DevisPage.personnaliser");
   const { incendie } = useContext(IncendieContext);
   const { totalIncendie } = useContext(TotalIncendieContext);
   const totalTrilogie = totalIncendie.totalTrilogie;
@@ -48,122 +51,127 @@ const TotalIncendie = () => {
   return (
     <div className="flex flex-col gap-4 total-section" id="total-incendie">
       <div className="flex flex-col gap-4">
-        <div>Securité Incendie ({incendie.infos.nomFournisseur})</div>
+        <div>
+          {t("securite-incendie")} ({incendie.infos.nomFournisseur})
+        </div>
         <div className="flex flex-col ml-4 text-xs ">
           {totalTrilogie ? (
             <div className="flex items-center justify-between font-bold">
-              <p>Trilogie Extincteurs / BAES / Télécommandes</p>
+              <p>{t("trilogie-extincteurs-baes-telecommandes")}</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalTrilogie * MARGE))} € HT/an
+                {formatNumber(Math.round(totalTrilogie * MARGE))}{" "}
+                {t("eur-ht-an")}
               </p>
             </div>
           ) : null}
           {totalDeplacementTrilogie ? (
             <div className="flex items-center justify-between font-bold">
-              <p>Frais de déplacement</p>
+              <p>{t("frais-de-deplacement")}</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalDeplacementTrilogie * MARGE))} €
-                HT/an
+                {formatNumber(Math.round(totalDeplacementTrilogie * MARGE))}{" "}
+                {t("eur-ht-an")}
               </p>
             </div>
           ) : null}
           {totalExutoires ? (
             <div className="flex items-center justify-between font-bold">
-              <p>Exutoires de fumée</p>
+              <p>{tPersonnaliser("exutoires-de-fumee")}</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalExutoires * MARGE))} € HT/an
+                {formatNumber(Math.round(totalExutoires * MARGE))}{" "}
+                {t("eur-ht-an")}
               </p>
             </div>
           ) : null}
           {totalDeplacementExutoires ? (
             <div className="flex items-center justify-between font-bold">
-              <p>Frais de déplacement</p>
+              <p>{t("frais-de-deplacement")}</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalDeplacementExutoires * MARGE))} €
-                HT/an
+                {formatNumber(Math.round(totalDeplacementExutoires * MARGE))}{" "}
+                {t("eur-ht-an")}
               </p>
             </div>
           ) : null}
           {totalExutoiresParking ? (
             <div className="flex items-center justify-between font-bold">
-              <p>Exutoires de fumée (parking)</p>
+              <p>{tPersonnaliser("exutoires-de-fumee-parking")}</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalExutoiresParking * MARGE))} €
-                HT/an
+                {formatNumber(Math.round(totalExutoiresParking * MARGE))}{" "}
+                {t("eur-ht-an")}
               </p>
             </div>
           ) : null}
           {totalDeplacementExutoiresParking ? (
             <div className="flex items-center justify-between font-bold">
-              <p>Frais de déplacement</p>
+              <p>{t("frais-de-deplacement")}</p>
               <p className="text-end">
                 {formatNumber(
                   Math.round(totalDeplacementExutoiresParking * MARGE)
                 )}{" "}
-                € HT/an
+                {t("eur-ht-an")}
               </p>
             </div>
           ) : null}
           {totalAlarmes ? (
             <div className="flex items-center justify-between font-bold">
-              <p>Alarmes T4 / SSI</p>
+              <p>{t("alarmes-t4-ssi")}</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalAlarmes * MARGE))} € HT/an
+                {formatNumber(Math.round(totalAlarmes * MARGE))}{" "}
+                {t("eur-ht-an")}
               </p>
             </div>
           ) : null}
           {totalRIA ? (
             <div className="flex items-center justify-between font-bold">
-              <p>RIA</p>
+              <p>{tPersonnaliser("robinets-dincendie-armes")}</p>
               <p className="text-end">
-                {formatNumber(Math.round(totalRIA * MARGE))} € HT/an
+                {formatNumber(Math.round(totalRIA * MARGE))} {t("eur-ht-an")}
               </p>
             </div>
           ) : null}
           {totalPortesCoupeFeuBattantes ? (
             <div className="flex items-center justify-between font-bold">
-              <p>Portes coupe-feu battantes</p>
+              <p>{tPersonnaliser("portes-coupe-feu-battantes")}</p>
               <p className="text-end">
                 {formatNumber(Math.round(totalPortesCoupeFeuBattantes * MARGE))}{" "}
-                € HT/an
+                {t("eur-ht-an")}
               </p>
             </div>
           ) : null}
           {totalPortesCoupeFeuCoulissantes ? (
             <div className="flex items-center justify-between font-bold">
-              <p>Portes coupe-feu coulissantes</p>
+              <p>{tPersonnaliser("portes-coupe-feu-coulissantes")}</p>
               <p className="text-end">
                 {formatNumber(
                   Math.round(totalPortesCoupeFeuCoulissantes * MARGE)
                 )}{" "}
-                € HT/an
+                {t("eur-ht-an")}
               </p>
             </div>
           ) : null}
           {totalColonnesSechesStatiques ? (
             <div className="flex items-center justify-between font-bold">
-              <p>Colonnes sèches statiques</p>
+              <p>{tPersonnaliser("colonnes-seches-statiques")}</p>
               <p className="text-end">
                 {formatNumber(Math.round(totalColonnesSechesStatiques * MARGE))}{" "}
-                € HT/an
+                {t("eur-ht-an")}
               </p>
             </div>
           ) : null}
           {totalColonnesSechesDynamiques ? (
             <div className="flex items-center justify-between font-bold">
-              <p>Colonnes sèches dynamiques</p>
+              <p>{tPersonnaliser("colonnes-seches-dynamiques")}</p>
               <p className="text-end">
                 {formatNumber(
                   Math.round(totalColonnesSechesDynamiques * MARGE)
                 )}{" "}
-                € HT/an
+                {t("eur-ht-an")}
               </p>
             </div>
           ) : null}
           <div className="flex items-center justify-between border-t border-foreground mt-2">
             <p>TOTAL</p>
             <p className="text-end">
-              {formatNumber(Math.round(total * MARGE))} € HT/an
+              {formatNumber(Math.round(total * MARGE))} {t("eur-ht-an")}
             </p>
           </div>
         </div>
