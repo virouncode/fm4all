@@ -56,7 +56,7 @@ const ArticlesCarousel = async () => {
                   <p className="w-full overflow-hidden line-clamp-3">
                     {article.description}
                   </p>
-                  <div className="flex-1 underline">{t("lire-l-article")}</div>
+                  <div className="flex-1 underline">{t("lire-la-suite")}</div>
                 </div>
               </ImgCardVertical>
             </CarouselItem>
