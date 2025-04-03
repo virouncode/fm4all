@@ -25,7 +25,6 @@ const Header = () => {
 
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const path = usePathname();
-  console.log("path", path);
 
   const isActive = (href: string) => {
     if (href === "/") return path === "/";

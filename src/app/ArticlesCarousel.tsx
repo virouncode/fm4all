@@ -38,7 +38,6 @@ const ArticlesCarousel = async () => {
             : null; //TODO placeholder image
           const articleImageAlt =
             article.imagePrincipale?.alt ?? t("illustration-de-l-article");
-          console.log("articleCategory", article.categorie as ArticleCategory);
 
           const categorie = article.categorie as ArticleCategory;
           const articleSlug = categorie.slug?.current ?? "";
