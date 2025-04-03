@@ -35,7 +35,7 @@ const ArticlesCarousel = async () => {
             ? urlFor(article.imagePrincipale)
             : null; //TODO placeholder image
           const articleImageAlt =
-            article.imagePrincipale?.alt ?? t("illustration de l'article");
+            article.imagePrincipale?.alt ?? t("illustration-de-l-article");
           const articleSlug = article.categorie ?? "";
           const articleSubSlug = article.subSlug?.current ?? "";
           return articleImageUrl ? (

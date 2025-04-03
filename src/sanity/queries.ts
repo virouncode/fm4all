@@ -25,7 +25,7 @@ sousServicesAssocies[]->{
     },
   }`;
 
-export const LAST_ARTICLES_QUERY = `*[_type == "article" && language == $language]|order(date desc)[0...10]{ _id, titre, description, slug, subSlug, imagePrincipale }`;
+export const LAST_ARTICLES_QUERY = `*[_type == "article" && language == $language]|order(date desc)[0...10]{ _id, titre, description, categorie, subSlug, imagePrincipale }`;
 
 export const ARTICLES_OF_CATEGORY_QUERY = `*[_type == "article" && language == $language && slug===$slug]|order(date desc){ _id, titre, description, slug, imagePrincipale }`;
 
