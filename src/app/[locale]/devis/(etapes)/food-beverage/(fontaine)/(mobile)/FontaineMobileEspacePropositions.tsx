@@ -1,6 +1,7 @@
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
 import AddEspaceButton from "../../(cafe)/AddEspaceButton";
 import FontaineMobileEspacePropositionsCarousel from "./FontaineMobileEspacePropositionsCarousel";
+import { useTranslations } from "next-intl";
 
 type FontaineMobileEspacePropositionsProps = {
   formattedPropositions: {
@@ -93,6 +94,7 @@ const FontaineMobileEspacePropositions = ({
   fontainesEspacesIds,
   handleAddEspace,
 }: FontaineMobileEspacePropositionsProps) => {
+  const t = useTranslations("DevisPage.foodBeverage.fontaines");
   return (
     <div className="flex flex-col gap-6 w-full">
       {formattedPropositions.map((propositions) => (
@@ -108,7 +110,10 @@ const FontaineMobileEspacePropositions = ({
       {fontainesEspacesIds.slice(-1)[0] === espace.infos.espaceId &&
       espace.infos.poseSelected ? (
         <div className="flex justify-center gap-4 items-center mt-2">
-          <AddEspaceButton handleAddEspace={handleAddEspace} title="fontaine" />
+          <AddEspaceButton
+            handleAddEspace={handleAddEspace}
+            title={t("ajouter-un-espace-fontaine")}
+          />
         </div>
       ) : null}
     </div>

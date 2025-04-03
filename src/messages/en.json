@@ -1177,6 +1177,14 @@
     "account-manager": "Account Manager",
     "remise-sur-chiffre-daffaires": "Revenue discount",
     "remise-office-manager": "Office Manager discount",
-    "inclus": "included"
+    "inclus": "included",
+    "nettoyage-de-la-vitrerie": "Window cleaning",
+    "nous-avions-estime-la-surface-de-vos-vitres-et-de-vos-cloisons-vitrees-a-15-de-la-surface-de-vos-locaux": "We had estimated the surface area of your windows and glass partitions at 15% of your premises' total area.",
+    "vous-pouvez-renseigner-les-dimensions-exactes-si-vous-les-connaissez": "You can provide the exact dimensions if you know them:",
+    "surface-vitres-interieures-m": "Interior window area m²",
+    "surface-cloisons-vitrees-m": "Glass partition area m²",
+    "la-vitrerie-est-elle-totalement-accessible-de-plain-pied": "Are all windows accessible at ground level?",
+    "oui": "Yes",
+    "non": "No"
   }
 }

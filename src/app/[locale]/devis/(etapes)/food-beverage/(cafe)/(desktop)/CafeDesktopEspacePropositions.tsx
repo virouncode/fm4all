@@ -1,5 +1,6 @@
 import NextServiceButton from "@/app/[locale]/devis/NextServiceButton";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
+import { useTranslations } from "next-intl";
 import AddEspaceButton from "../AddEspaceButton";
 import CafeEspacePropositionFournisseurLogo from "../CafeEspacePropositionFournisseurLogo";
 import NextEspaceButton from "../NextEspaceButton";
@@ -127,6 +128,7 @@ const CafeDesktopEspacePropositions = ({
   handleClickNextEspace,
   handleAlert,
 }: CafeDesktopEspacePropositionsProps) => {
+  const t = useTranslations("DevisPage.foodBeverage.cafe");
   return (
     <div className="flex-1 flex flex-col gap-4 overflow-auto">
       <div className="flex-1 flex flex-col border rounded-xl overflow-auto">
@@ -154,7 +156,10 @@ const CafeDesktopEspacePropositions = ({
       {cafeEspacesIds.slice(-1)[0] === espace.infos.espaceId ? (
         <div className="flex justify-end gap-4 items-center">
           {espace.infos.gammeCafeSelected ? (
-            <AddEspaceButton handleAddEspace={handleAddEspace} />
+            <AddEspaceButton
+              handleAddEspace={handleAddEspace}
+              title={t("ajouter-un-espace-cafe")}
+            />
           ) : null}
           <NextServiceButton handleClickNext={handleClickNext} />
         </div>

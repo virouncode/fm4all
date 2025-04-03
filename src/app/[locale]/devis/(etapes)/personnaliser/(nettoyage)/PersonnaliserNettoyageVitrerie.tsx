@@ -7,12 +7,15 @@ import { NettoyageContext } from "@/context/NettoyageProvider";
 import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { SprayCan } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { ChangeEvent, useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 
 const PersonnaliserNettoyageVitrerie = () => {
+  const t = useTranslations("DevisPage.services.presentation.cards");
+  const tPersonnaliser = useTranslations("DevisPage.personnaliser");
   const { client } = useContext(ClientContext);
   const { nettoyage, setNettoyage } = useContext(NettoyageContext);
   const { setTotalNettoyage } = useContext(TotalNettoyageContext);
@@ -105,14 +108,14 @@ const PersonnaliserNettoyageVitrerie = () => {
     <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="2">
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
-          title="Nettoyage et propreté"
+          title={t("nettoyage-et-proprete")}
           description=""
           icon={SprayCan}
           propositionsRef={propositionsRef}
         />
       ) : (
         <PropositionsTitle
-          title="Nettoyage et propreté"
+          title={t("nettoyage-et-proprete")}
           description=""
           icon={SprayCan}
           handleClickPrevious={handleClickPrevious}
@@ -124,20 +127,25 @@ const PersonnaliserNettoyageVitrerie = () => {
         ref={propositionsRef}
       >
         <div className="flex flex-col gap-6">
-          <p className="text-2xl">Nettoyage de la vitrerie</p>
+          <p className="text-2xl">
+            {tPersonnaliser("nettoyage-de-la-vitrerie")}
+          </p>
           <p className="max-w-prose mx-auto hyphens-auto">
-            Nous avions estimé la surface de vos vitres et de vos cloisons
-            vitrées à 15% de la surface de vos locaux.
+            {tPersonnaliser(
+              "nous-avions-estime-la-surface-de-vos-vitres-et-de-vos-cloisons-vitrees-a-15-de-la-surface-de-vos-locaux"
+            )}
           </p>
           <div className="flex flex-col gap-4">
             <p className="max-w-prose mx-auto hyphens-auto font-bold">
-              Vous pouvez renseigner les dimensions exactes si vous les
-              connaissez :
+              {tPersonnaliser(
+                "vous-pouvez-renseigner-les-dimensions-exactes-si-vous-les-connaissez"
+              )}
             </p>
             <div className="flex items-center justify-center gap-6">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="vitres" className="text-base">
-                  Surface vitres intérieures m<sup>2</sup>
+                  {tPersonnaliser("surface-vitres-interieures-m")}
+                  <sup>2</sup>
                 </Label>
                 <Input
                   value={nettoyage.quantites.surfaceVitres ?? 0}
@@ -150,7 +158,8 @@ const PersonnaliserNettoyageVitrerie = () => {
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="cloisons" className="text-base">
-                  Surface cloisons vitrées m<sup>2</sup>
+                  {tPersonnaliser("surface-cloisons-vitrees-m")}
+                  <sup>2</sup>
                 </Label>
                 <Input
                   value={nettoyage.quantites.surfaceCloisons ?? 0}
@@ -165,7 +174,9 @@ const PersonnaliserNettoyageVitrerie = () => {
           </div>
           <div className="flex flex-col gap-4">
             <p className="max-w-prose mx-auto hyphens-auto font-bold">
-              La vitrerie est-elle totalement accessible de plain-pied ?
+              {tPersonnaliser(
+                "la-vitrerie-est-elle-totalement-accessible-de-plain-pied"
+              )}
             </p>
             <div className="flex items-center justify-center gap-14">
               <RadioGroup
@@ -175,12 +186,20 @@ const PersonnaliserNettoyageVitrerie = () => {
                 name="plainPied"
               >
                 <div className="flex gap-2 items-center">
-                  <RadioGroupItem value={"oui"} title={"Oui"} id="oui" />
-                  <Label htmlFor="oui">Oui</Label>
+                  <RadioGroupItem
+                    value={"oui"}
+                    title={tPersonnaliser("oui")}
+                    id="oui"
+                  />
+                  <Label htmlFor="oui">{tPersonnaliser("oui")}</Label>
                 </div>
                 <div className="flex gap-2 items-center">
-                  <RadioGroupItem value={"non"} title={"Non"} id="non" />
-                  <Label htmlFor="non">Non</Label>
+                  <RadioGroupItem
+                    value={"non"}
+                    title={tPersonnaliser("non")}
+                    id="non"
+                  />
+                  <Label htmlFor="non">{tPersonnaliser("non")}</Label>
                 </div>
               </RadioGroup>
             </div>

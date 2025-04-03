@@ -5,13 +5,10 @@ type AddEspaceButtonProps = {
   title?: string;
 };
 
-const AddEspaceButton = ({
-  handleAddEspace,
-  title = "café",
-}: AddEspaceButtonProps) => {
+const AddEspaceButton = ({ handleAddEspace, title }: AddEspaceButtonProps) => {
   return (
     <Button variant="outline" size="lg" onClick={handleAddEspace}>
-      Ajouter un espace {title}
+      {title}
     </Button>
   );
 };

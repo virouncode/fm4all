@@ -11,6 +11,7 @@ import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
 import { GammeType } from "@/zod-schemas/gamme";
 import { Info } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useContext } from "react";
 
@@ -65,6 +66,9 @@ const ServicesFm4AllPropositionCard = ({
   handleClickProposition,
   total,
 }: ServicesFm4AllPropositionCardProps) => {
+  const t = useTranslations("DevisPage");
+  const tFm4all = useTranslations("DevisPage.pilotage.servicesFm4all");
+  const tGlobal = useTranslations("Global");
   const { servicesFm4All } = useContext(ServicesFm4AllContext);
   const gamme = proposition.gamme;
   const color = getFm4AllColor(gamme);
@@ -72,12 +76,12 @@ const ServicesFm4AllPropositionCard = ({
     proposition.totalAnnuelSansRemise !== proposition.totalAnnuel ? (
       <p className="font-bold text-xl ml-4 line-through">
         {formatNumber(Math.round(proposition.totalAnnuelSansRemise / 12))}{" "}
-        €/mois
+        {t("euros-mois")}
       </p>
     ) : null;
   const totalMensuelText = (
     <p className="font-bold text-xl ml-4">
-      {formatNumber(Math.round(proposition.totalAnnuel / 12))} €/mois
+      {formatNumber(Math.round(proposition.totalAnnuel / 12))} {t("euros-mois")}
       {proposition.remiseCa ? "\u00B9" : ""}
       {proposition.remiseHof ? "\u00B2" : ""}
     </p>
@@ -86,10 +90,10 @@ const ServicesFm4AllPropositionCard = ({
   const dialogTitle = (
     <p className={`text-${color} text-center`}>
       {proposition.gamme === "essentiel"
-        ? "Essentiel"
+        ? tGlobal("essentiel")
         : proposition.gamme === "confort"
-        ? "Confort"
-        : "Excellence"}
+          ? tGlobal("confort")
+          : tGlobal("excellence")}
     </p>
   );
 
@@ -108,106 +112,118 @@ const ServicesFm4AllPropositionCard = ({
   const infosProduit =
     gamme === "essentiel" ? (
       <ul className="flex flex-col text-xs px-4 mx-auto">
-        <li className="list-check">Accès Services</li>
-        <li className="list-check">Frais bancaires & Assurance</li>
-        <li className="list-check">Garanties contractuelles</li>
-        <li className="list-check">Facturation centralisée</li>
+        <li className="list-check">{tFm4all("acces-services")}</li>
         <li className="list-check">
-          Service Support en ligne en ligne (24/48h)
+          {tFm4all("frais-bancaires-and-assurance")}
+        </li>
+        <li className="list-check">{tFm4all("garanties-contractuelles")}</li>
+        <li className="list-check">{tFm4all("facturation-centralisee")}</li>
+        <li className="list-check">
+          {tFm4all("service-support-en-ligne-en-ligne-24-48h")}
         </li>
       </ul>
     ) : gamme === "confort" ? (
       <ul className="flex flex-col text-xs px-4 mx-auto">
-        <li className="list-check">Accès Services</li>
-        <li className="list-check">Frais bancaires & Assurance</li>
-        <li className="list-check">Garanties contractuelles</li>
-        <li className="list-check">Facturation centralisée</li>
+        <li className="list-check">{tFm4all("acces-services")}</li>
         <li className="list-check">
-          Service Support en ligne en ligne (24/48h)
+          {tFm4all("frais-bancaires-and-assurance")}
+        </li>
+        <li className="list-check">{tFm4all("garanties-contractuelles")}</li>
+        <li className="list-check">{tFm4all("facturation-centralisee")}</li>
+        <li className="list-check">
+          {tFm4all("service-support-en-ligne-en-ligne-24-48h")}
         </li>
         <li className="list-check">
-          Service support opérationnel téléphonique
+          {tFm4all("service-support-operationnel-telephonique")}
         </li>
         <li className="list-check">
-          Suivi de la réalisation des interventions
+          {tFm4all("suivi-de-la-realisation-des-interventions")}
         </li>
-        <li className="list-check">Reporting personnalisé</li>
+        <li className="list-check">{tFm4all("reporting-personnalise")}</li>
       </ul>
     ) : (
       <ul className="flex flex-col text-xs px-4 mx-auto">
-        <li className="list-check">Accès Services</li>
-        <li className="list-check">Frais bancaires & Assurance</li>
-        <li className="list-check">Garanties contractuelles</li>
-        <li className="list-check">Facturation centralisée</li>
+        <li className="list-check">{tFm4all("acces-services")}</li>
         <li className="list-check">
-          Service Support en ligne en ligne (24/48h)
+          {tFm4all("frais-bancaires-and-assurance")}
+        </li>
+        <li className="list-check">{tFm4all("garanties-contractuelles")}</li>
+        <li className="list-check">{tFm4all("facturation-centralisee")}</li>
+        <li className="list-check">
+          {tFm4all("service-support-en-ligne-en-ligne-24-48h")}
         </li>
         <li className="list-check">
-          Service support opérationnel téléphonique
+          {tFm4all("service-support-operationnel-telephonique")}
         </li>
         <li className="list-check">
-          Suivi de la réalisation des interventions
+          {tFm4all("suivi-de-la-realisation-des-interventions")}
         </li>
-        <li className="list-check">Reporting personnalisé</li>
-        <li className="list-check">Account Manager dédié</li>
-        <li className="list-check">Conseils achats / audit</li>
+        <li className="list-check">{tFm4all("reporting-personnalise")}</li>
+        <li className="list-check">{tFm4all("account-manager-dedie")}</li>
+        <li className="list-check">{tFm4all("conseils-achats-audit")}</li>
         <li className="list-check">
-          Lien avec le propriétaire / Property Manager
+          {tFm4all("lien-avec-le-proprietaire-property-manager")}
         </li>
-        <li className="list-check">Audit opérationnel</li>
+        <li className="list-check">{tFm4all("audit-operationnel")}</li>
       </ul>
     );
 
   const infosProduitDialog =
     gamme === "essentiel" ? (
       <ul className="flex flex-col text-sm px-4 mx-auto">
-        <li className="list-check">Accès Services</li>
-        <li className="list-check">Frais bancaires & Assurance</li>
-        <li className="list-check">Garanties contractuelles</li>
-        <li className="list-check">Facturation centralisée</li>
+        <li className="list-check">{tFm4all("acces-services")}</li>
         <li className="list-check">
-          Service Support en ligne en ligne (24/48h)
+          {tFm4all("frais-bancaires-and-assurance")}
+        </li>
+        <li className="list-check">{tFm4all("garanties-contractuelles")}</li>
+        <li className="list-check">{tFm4all("facturation-centralisee")}</li>
+        <li className="list-check">
+          {tFm4all("service-support-en-ligne-en-ligne-24-48h")}
         </li>
       </ul>
     ) : gamme === "confort" ? (
       <ul className="flex flex-col text-sm px-4 mx-auto">
-        <li className="list-check">Accès Services</li>
-        <li className="list-check">Frais bancaires & Assurance</li>
-        <li className="list-check">Garanties contractuelles</li>
-        <li className="list-check">Facturation centralisée</li>
+        <li className="list-check">{tFm4all("acces-services")}</li>
         <li className="list-check">
-          Service Support en ligne en ligne (24/48h)
+          {tFm4all("frais-bancaires-and-assurance")}
+        </li>
+        <li className="list-check">{tFm4all("garanties-contractuelles")}</li>
+        <li className="list-check">{tFm4all("facturation-centralisee")}</li>
+        <li className="list-check">
+          {tFm4all("service-support-en-ligne-en-ligne-24-48h")}
         </li>
         <li className="list-check">
-          Service support opérationnel téléphonique
+          {tFm4all("service-support-operationnel-telephonique")}
         </li>
         <li className="list-check">
-          Suivi de la réalisation des interventions
+          {tFm4all("suivi-de-la-realisation-des-interventions")}
         </li>
-        <li className="list-check">Reporting personnalisé</li>
+        <li className="list-check">{tFm4all("reporting-personnalise")}</li>
       </ul>
     ) : (
       <ul className="flex flex-col text-sm px-4 mx-auto">
-        <li className="list-check">Accès Services</li>
-        <li className="list-check">Frais bancaires & Assurance</li>
-        <li className="list-check">Garanties contractuelles</li>
-        <li className="list-check">Facturation centralisée</li>
+        <li className="list-check">{tFm4all("acces-services")}</li>
         <li className="list-check">
-          Service Support en ligne en ligne (24/48h)
+          {tFm4all("frais-bancaires-and-assurance")}
+        </li>
+        <li className="list-check">{tFm4all("garanties-contractuelles")}</li>
+        <li className="list-check">{tFm4all("facturation-centralisee")}</li>
+        <li className="list-check">
+          {tFm4all("service-support-en-ligne-en-ligne-24-48h")}
         </li>
         <li className="list-check">
-          Service support opérationnel téléphonique
+          {tFm4all("service-support-operationnel-telephonique")}
         </li>
         <li className="list-check">
-          Suivi de la réalisation des interventions
+          {tFm4all("suivi-de-la-realisation-des-interventions")}
         </li>
-        <li className="list-check">Reporting personnalisé</li>
-        <li className="list-check">Account Manager dédié</li>
-        <li className="list-check">Conseils achats / audit</li>
+        <li className="list-check">{tFm4all("reporting-personnalise")}</li>
+        <li className="list-check">{tFm4all("account-manager-dedie")}</li>
+        <li className="list-check">{tFm4all("conseils-achats-audit")}</li>
         <li className="list-check">
-          Lien avec le propriétaire / Property Manager
+          {tFm4all("lien-avec-le-proprietaire-property-manager")}
         </li>
-        <li className="list-check">Audit opérationnel</li>
+        <li className="list-check">{tFm4all("audit-operationnel")}</li>
       </ul>
     );
 
@@ -246,7 +262,7 @@ const ServicesFm4AllPropositionCard = ({
               </DialogHeader>
               {imgProduit}
               <p className="text-xs italic text-end">
-                *photo non contractuelle
+                {t("photo-non-contractuelle")}
               </p>
               {infosProduitDialog}
             </DialogContent>

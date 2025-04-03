@@ -1176,6 +1176,14 @@
     "account-manager": "Account Manager",
     "remise-sur-chiffre-daffaires": "Remise sur chiffre d'affaires",
     "remise-office-manager": "Remise Office Manager",
-    "inclus": "inclus"
+    "inclus": "inclus",
+    "nettoyage-de-la-vitrerie": "Nettoyage de la vitrerie",
+    "nous-avions-estime-la-surface-de-vos-vitres-et-de-vos-cloisons-vitrees-a-15-de-la-surface-de-vos-locaux": "Nous avions estimé la surface de vos vitres et de vos cloisons vitrées à 15% de la surface de vos locaux.",
+    "vous-pouvez-renseigner-les-dimensions-exactes-si-vous-les-connaissez": "Vous pouvez renseigner les dimensions exactes si vous les connaissez :",
+    "surface-vitres-interieures-m": "Surface vitres intérieures m",
+    "surface-cloisons-vitrees-m": "Surface cloisons vitrées m",
+    "la-vitrerie-est-elle-totalement-accessible-de-plain-pied": "La vitrerie est-elle totalement accessible de plain-pied ?",
+    "oui": "Oui",
+    "non": "Non"
   }
 }

@@ -1,4 +1,5 @@
 import { CafeEspaceType } from "@/zod-schemas/cafe";
+import { useTranslations } from "next-intl";
 import AddEspaceButton from "../AddEspaceButton";
 import CafeMobileEspacePropositionsCarousel from "./CafeMobileEspacePropositionsCarousel";
 
@@ -118,6 +119,7 @@ const CafeMobileEspacePropositions = ({
   cafeEspacesIds,
   handleAddEspace,
 }: CafeMobileEspacePropositionsProps) => {
+  const t = useTranslations("DevisPage.foodBeverage.cafe");
   return (
     <div className="flex flex-col gap-6 w-full">
       {formattedPropositions.map((propositions) => (
@@ -133,7 +135,10 @@ const CafeMobileEspacePropositions = ({
       {cafeEspacesIds.slice(-1)[0] === espace.infos.espaceId &&
       espace.infos.gammeCafeSelected ? (
         <div className="flex justify-center gap-4 items-center mt-2">
-          <AddEspaceButton handleAddEspace={handleAddEspace} />
+          <AddEspaceButton
+            handleAddEspace={handleAddEspace}
+            title={t("ajouter-un-espace-cafe")}
+          />
         </div>
       ) : null}
     </div>

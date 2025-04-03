@@ -1,5 +1,6 @@
 import NextServiceButton from "@/app/[locale]/devis/NextServiceButton";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
+import { useTranslations } from "next-intl";
 import AddEspaceButton from "../../(cafe)/AddEspaceButton";
 import NextEspaceButton from "../../(cafe)/NextEspaceButton";
 import FontaineEspacePropositionCard from "../FontaineEspacePropositionCard";
@@ -102,6 +103,7 @@ const FontaineDesktopEspacePropositions = ({
   handleClickNextEspace,
   handleAlert,
 }: FontaineDesktopEspacePropositionsProps) => {
+  const t = useTranslations("DevisPage.foodBeverage.fontaines");
   return (
     <div className="flex-1 flex flex-col gap-4 overflow-auto">
       <div className="flex-1 flex flex-col border rounded-xl overflow-auto">
@@ -132,7 +134,7 @@ const FontaineDesktopEspacePropositions = ({
             {espace.infos.poseSelected ? (
               <AddEspaceButton
                 handleAddEspace={handleAddEspace}
-                title="fontaine"
+                title={t("ajouter-un-espace-fontaine")}
               />
             ) : null}
             <NextServiceButton handleClickNext={handleClickNext} />
