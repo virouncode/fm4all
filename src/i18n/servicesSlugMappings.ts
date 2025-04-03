@@ -4,9 +4,14 @@
 export const servicesSlugMappingsFrToEn: Record<string, string> = {
   nettoyage: "cleaning-services",
   "hygiene-sanitaire": "sanitary-supplies",
+  "maintenance-multitechnique": "technical-maintenance",
   "securite-incendie": "fire-safety",
   "machines-a-cafe-en-entreprise": "coffee-machines",
+  "livraison-fruits-entreprise": "office-fruit-basket-delivery",
+  "livraison-snacks-entreprise": "healthy-snack-delivery-office",
+  "livraison-boissons-entreprise": "office-drinks-delivery",
   "fontaines-a-eau-entreprise": "water-dispenser",
+  "office-manager": "outsourced-office-manager-france",
   "pilotage-fm4all": "fm4all-service-management",
   // Ajoutez tous vos autres services ici
 };
