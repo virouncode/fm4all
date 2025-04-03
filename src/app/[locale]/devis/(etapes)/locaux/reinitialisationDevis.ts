@@ -1,3 +1,4 @@
+import { MAX_NB_PERSONNES_PAR_ESPACE } from "@/constants/constants";
 import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/context/FontainesProvider";
 import { CafeType } from "@/zod-schemas/cafe";
 import { CommentairesType } from "@/zod-schemas/commentaires";
@@ -29,7 +30,6 @@ import {
   TotalTheType,
   TotalType,
 } from "@/zod-schemas/total";
-import { MAX_NB_PERSONNES_PAR_ESPACE } from "../food-beverage/(cafe)/CafeEspacePropositions";
 
 export const reinitialisationDevis = (
   surface: number,
@@ -227,7 +227,7 @@ export const reinitialisationDevis = (
           nbPersonnes:
             effectif > MAX_NB_PERSONNES_PAR_ESPACE
               ? MAX_NB_PERSONNES_PAR_ESPACE
-              : effectif ?? 0,
+              : (effectif ?? 0),
           nbMachines: null,
           nbPassagesParAn: null,
         },
@@ -306,7 +306,7 @@ export const reinitialisationDevis = (
           nbPersonnes:
             effectif > MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE
               ? MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE
-              : effectif ?? 0,
+              : (effectif ?? 0),
         },
         prix: {
           prixLoc: null,

@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { MAX_EFFECTIF } from "@/constants/constants";
 import { ClientContext } from "@/context/ClientProvider";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ChangeEvent, useContext } from "react";
-import { MAX_EFFECTIF } from "../../../locaux/MesLocaux";
 
 type TheMobileInputsProps = {
   nbPersonnes: number;

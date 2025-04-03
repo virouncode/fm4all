@@ -1,12 +1,12 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { MAX_EFFECTIF } from "@/constants/constants";
 import { TypesSnacksFruitsType } from "@/constants/typesSnacksFruits";
 import { ClientContext } from "@/context/ClientProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { useTranslations } from "next-intl";
 import { useContext } from "react";
-import { MAX_EFFECTIF } from "../../../locaux/MesLocaux";
 
 type SnacksFruitsDesktopInputsProps = {
   handleCheck: (type: TypesSnacksFruitsType) => void;

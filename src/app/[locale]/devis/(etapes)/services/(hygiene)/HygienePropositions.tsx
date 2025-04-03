@@ -1,3 +1,4 @@
+import { MAX_NB_EMP, MAX_NB_PH, MAX_NB_SAVON } from "@/constants/constants";
 import { ClientContext } from "@/context/ClientProvider";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
@@ -14,10 +15,6 @@ import {
   getFormattedHygienePropositions,
   getHygieneFournisseurTarifs,
 } from "./getFormattedHygienePropositions";
-
-export const MAX_NB_EMP = 100;
-export const MAX_NB_SAVON = 100;
-export const MAX_NB_PH = 100;
 
 type HygienePropositionsProps = {
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
@@ -873,8 +870,8 @@ const HygienePropositions = ({
     const totalTrilogie = !hygiene.infos.trilogieGammeSelected
       ? null
       : totalEmp === null && totalSavon === null && totalPh === null
-      ? null
-      : (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0);
+        ? null
+        : (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0);
 
     const totalDesinfectant =
       hygiene.infos.desinfectantGammeSelected &&

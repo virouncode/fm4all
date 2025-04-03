@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { MAX_EFFECTIF } from "@/constants/constants";
 import { locationCafeMachine } from "@/constants/locationCafeMachine";
 import { typesBoissons } from "@/constants/typesBoissons";
 import { CafeContext } from "@/context/CafeProvider";
@@ -17,7 +18,6 @@ import { CafeEspaceType } from "@/zod-schemas/cafe";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import React, { useContext } from "react";
-import { MAX_EFFECTIF } from "../../../locaux/MesLocaux";
 
 type CafeMobileEspaceInputsProps = {
   espace: CafeEspaceType;

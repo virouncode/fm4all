@@ -1,4 +1,11 @@
 import PropositionsTitleMobile from "@/app/[locale]/devis/PropositionsTitleMobile";
+import {
+  MAX_NB_ALARMES,
+  MAX_NB_COLONNES_SECHES,
+  MAX_NB_EXUTOIRES,
+  MAX_NB_PORTES_COUPES_FEU,
+  MAX_NB_RIA,
+} from "@/constants/constants";
 import { IncendieContext } from "@/context/IncendieProvider";
 import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
@@ -17,12 +24,6 @@ import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import SecuriteIncendieComplementsInputs from "./SecuriteIncendieComplementsInputs";
 import SecuriteIncendieMobileComplementsInputs from "./SecuriteIncendieMobileComplementsInputs";
-
-export const MAX_NB_EXUTOIRES = 100;
-export const MAX_NB_ALARMES = 100;
-export const MAX_NB_RIA = 100;
-export const MAX_NB_COLONNES_SECHES = 100;
-export const MAX_NB_PORTES_COUPES_FEU = 100;
 
 type PersonnaliserIncendieComplementsProps = {
   exutoiresTarifs?: SelectExutoiresTarifsType[];

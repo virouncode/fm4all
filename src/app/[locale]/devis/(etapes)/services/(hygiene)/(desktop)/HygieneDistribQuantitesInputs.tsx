@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { MAX_NB_EMP, MAX_NB_PH, MAX_NB_SAVON } from "@/constants/constants";
 import { locationDistribHygiene } from "@/constants/locationsDistribHygiene";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { DureeLocationHygieneType } from "@/zod-schemas/dureeLocation";
@@ -15,7 +16,6 @@ import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQ
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { useTranslations } from "next-intl";
 import { useContext } from "react";
-import { MAX_NB_EMP, MAX_NB_PH, MAX_NB_SAVON } from "../HygienePropositions";
 
 type HygieneDistribQuantitesInputsProps = {
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;

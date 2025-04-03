@@ -10,8 +10,7 @@ import { useMediaQuery } from "react-responsive";
 import HygieneMobileOptionsPropositions from "../(mobile)/HygieneMobileOptionsPropositions";
 import { getHygieneFournisseurTarifs } from "../getFormattedHygienePropositions";
 import HygieneDesktopOptionsPropositions from "./HygieneDesktopOptionsPropositions";
-
-export const MAX_NB_DISTRIB = 100;
+import { MAX_NB_DISTRIB } from "@/constants/constants";
 
 type HygieneOptionsPropositionsProps = {
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;

@@ -14,6 +14,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { MAX_EFFECTIF } from "@/constants/constants";
 import { locationCafeMachine } from "@/constants/locationCafeMachine";
 import { typesBoissons } from "@/constants/typesBoissons";
 import { CafeContext } from "@/context/CafeProvider";
@@ -21,7 +22,6 @@ import { ClientContext } from "@/context/ClientProvider";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
 import { useTranslations } from "next-intl";
 import { useContext } from "react";
-import { MAX_EFFECTIF } from "../../../locaux/MesLocaux";
 
 type CafeDesktopEspaceInputsProps = {
   espace: CafeEspaceType;

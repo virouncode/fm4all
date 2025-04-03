@@ -1,3 +1,4 @@
+import { MAX_EFFECTIF } from "@/constants/constants";
 import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { TheContext } from "@/context/TheProvider";
@@ -9,7 +10,6 @@ import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { useTranslations } from "next-intl";
 import { ChangeEvent, useContext } from "react";
 import { useMediaQuery } from "react-responsive";
-import { MAX_EFFECTIF } from "../../locaux/MesLocaux";
 import TheDesktopPropositions from "./(desktop)/TheDesktopPropositions";
 import TheMobilePropositions from "./(mobile)/TheMobilePropositions";
 

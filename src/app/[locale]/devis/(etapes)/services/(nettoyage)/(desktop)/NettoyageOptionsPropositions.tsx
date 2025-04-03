@@ -5,8 +5,7 @@ import { ChangeEvent, useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import NettoyageMobileOptionsPropositions from "../(mobile)/NettoyageMobileOptionsPropositions";
 import NettoyageDesktopOptionsPropositions from "./NettoyageDesktopOptionsPropositions";
-
-export const MAX_PASSAGES_VITRERIE = 24;
+import { MAX_PASSAGES_VITRERIE } from "@/constants/constants";
 
 type NettoyageOptionsPropositionsProps = {
   repasseProposition: {

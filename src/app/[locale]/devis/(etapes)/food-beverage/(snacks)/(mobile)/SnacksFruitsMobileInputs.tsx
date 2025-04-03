@@ -2,13 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { MAX_EFFECTIF } from "@/constants/constants";
 import { TypesSnacksFruitsType } from "@/constants/typesSnacksFruits";
 import { ClientContext } from "@/context/ClientProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import React, { useContext } from "react";
-import { MAX_EFFECTIF } from "../../../locaux/MesLocaux";
 
 type SnacksFruitsMobileInputsProps = {
   handleCheck: (type: TypesSnacksFruitsType) => void;

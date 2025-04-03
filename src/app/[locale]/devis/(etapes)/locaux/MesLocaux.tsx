@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { batiments } from "@/constants/batiments";
+import { MAX_EFFECTIF, MAX_SURFACE } from "@/constants/constants";
 import { departements } from "@/constants/departements";
 import { occupation } from "@/constants/occupation";
 import { CafeContext } from "@/context/CafeProvider";
@@ -59,9 +60,6 @@ import { useContext, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { reinitialisationDevis } from "./reinitialisationDevis";
 import ServicesLoader from "./ServicesLoader";
-
-export const MAX_SURFACE = 3000;
-export const MAX_EFFECTIF = 300;
 
 const MesLocaux = () => {
   const t = useTranslations("DevisPage.locaux.locauxForm");

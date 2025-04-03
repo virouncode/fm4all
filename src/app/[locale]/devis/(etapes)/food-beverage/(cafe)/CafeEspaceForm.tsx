@@ -1,6 +1,11 @@
 "use client";
 
-import { RATIO_CHOCO, RATIO_LAIT, RATIO_SUCRE } from "@/constants/constants";
+import {
+  MAX_NB_PERSONNES_PAR_ESPACE,
+  RATIO_CHOCO,
+  RATIO_LAIT,
+  RATIO_SUCRE,
+} from "@/constants/constants";
 import { TypesBoissonsType } from "@/constants/typesBoissons";
 import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
@@ -23,7 +28,6 @@ import { ChangeEvent, useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import CafeDesktopEspaceInputs from "./(desktop)/CafeDesktopEspaceInputs";
 import CafeMobileEspaceInputs from "./(mobile)/CafeMobileEspaceInputs";
-import { MAX_NB_PERSONNES_PAR_ESPACE } from "./CafeEspacePropositions";
 
 type CafeEspaceFormProps = {
   espace: CafeEspaceType;

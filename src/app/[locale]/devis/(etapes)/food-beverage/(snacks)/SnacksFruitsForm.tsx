@@ -1,4 +1,5 @@
 "use client";
+import { MAX_EFFECTIF } from "@/constants/constants";
 import { TypesSnacksFruitsType } from "@/constants/typesSnacksFruits";
 import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
@@ -16,7 +17,6 @@ import { SelectSnacksTarifsType } from "@/zod-schemas/snacksTarifs";
 import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
-import { MAX_EFFECTIF } from "../../locaux/MesLocaux";
 import SnacksFruitsDesktopInputs from "./(desktop)/SnacksFruitsDesktopInputs";
 import SnacksFruitsMobileInputs from "./(mobile)/SnacksFruitsMobileInputs";
 

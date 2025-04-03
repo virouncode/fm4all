@@ -1,15 +1,15 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useTranslations } from "next-intl";
-import React from "react";
 import {
   MAX_NB_ALARMES,
   MAX_NB_COLONNES_SECHES,
   MAX_NB_EXUTOIRES,
   MAX_NB_PORTES_COUPES_FEU,
   MAX_NB_RIA,
-} from "./PersonnaliserIncendieComplements";
+} from "@/constants/constants";
+import { useTranslations } from "next-intl";
+import React from "react";
 
 type SecuriteIncendieComplementsInputsProps = {
   exutoires: boolean;

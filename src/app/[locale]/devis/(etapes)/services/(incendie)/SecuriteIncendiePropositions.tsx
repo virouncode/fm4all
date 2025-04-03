@@ -8,10 +8,11 @@ import { ChangeEvent, useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import SecuriteIncendieDesktopPropositions from "./(desktop)/SecuriteIncendieDesktopPropositions";
 import SecuriteIncendieMobilePropositions from "./(mobile)/SecuriteIncendieMobilePropositions";
-
-export const MAX_NB_EXTINCTEURS = 100;
-export const MAX_NB_BAES = 100;
-export const MAX_NB_TEL_BAES = 10;
+import {
+  MAX_NB_EXTINCTEURS,
+  MAX_NB_BAES,
+  MAX_NB_TEL_BAES,
+} from "@/constants/constants";
 
 type SecuriteIncendiePropositionsProps = {
   incendieQuantite: SelectIncendieQuantitesType;

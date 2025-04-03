@@ -1,8 +1,8 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import React from "react";
-import { MAX_EFFECTIF } from "../../../locaux/MesLocaux";
+import { MAX_EFFECTIF } from "@/constants/constants";
 import { useTranslations } from "next-intl";
+import React from "react";
 
 type ThePropositionsInputProps = {
   nbPersonnes: number;
