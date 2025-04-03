@@ -35,7 +35,7 @@ const ArticlesCarousel = async () => {
             ? urlFor(article.imagePrincipale)
             : null; //TODO placeholder image
           const articleImageAlt =
-            article.imagePrincipale?.alt ?? "illustration de l'article";
+            article.imagePrincipale?.alt ?? t("illustration de l'article");
           const articleSlug = article.categorie ?? "";
           const articleSubSlug = article.subSlug?.current ?? "";
           return articleImageUrl ? (
@@ -56,7 +56,7 @@ const ArticlesCarousel = async () => {
                   <p className="w-full overflow-hidden line-clamp-3">
                     {article.description}
                   </p>
-                  <div className="flex-1 underline">{t("en-savoir-plus")}</div>
+                  <div className="flex-1 underline">{t("lire-l-article")}</div>
                 </div>
               </ImgCardVertical>
             </CarouselItem>

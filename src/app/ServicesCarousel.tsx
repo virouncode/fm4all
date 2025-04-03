@@ -35,7 +35,7 @@ const ServicesCarousel = async () => {
             ? urlFor(service.imagePrincipale)
             : null; //TODO placeholder image
           const serviceImageAlt =
-            service.imagePrincipale?.alt ?? "illustration du service";
+            service.imagePrincipale?.alt ?? t("illustration du service");
           const serviceUrl = service.slug?.current ?? "";
           return serviceImageUrl ? (
             <CarouselItem

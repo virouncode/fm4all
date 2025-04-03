@@ -141,71 +141,70 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
     : null; //TODO placeholder image
   const serviceImageAlt = service.imagePrincipale?.alt
     ? service.imagePrincipale.alt
-    : "illustration du service";
+    : tGlobal("illustration-du-service");
   const serviceImageBloc1Url = service.imageBloc1
     ? urlFor(service.imageBloc1)
     : null;
   const serviceImageBloc1Alt = service.imageBloc1?.alt
     ? service.imageBloc1.alt
-    : "illustration du service";
+    : tGlobal("illustration-du-service");
   const serviceImageBloc2Url = service.imageBloc2
     ? urlFor(service.imageBloc2)
     : null;
   const serviceImageBloc2Alt = service.imageBloc2?.alt
     ? service.imageBloc2.alt
-    : "illustration du service";
+    : tGlobal("illustration-du-service");
   const serviceImageBloc3Url = service.imageBloc3
     ? urlFor(service.imageBloc3)
     : null;
   const serviceImageBloc3Alt = service.imageBloc3?.alt
     ? service.imageBloc3.alt
-    : "illustration du service";
+    : tGlobal("illustration-du-service");
   const serviceImageBloc4Url = service.imageBloc4
     ? urlFor(service.imageBloc4)
     : null;
   const serviceImageBloc4Alt = service.imageBloc4?.alt
     ? service.imageBloc4.alt
-    : "illustration du service";
+    : tGlobal("illustration-du-service");
   const serviceImageBloc5Url = service.imageBloc5
     ? urlFor(service.imageBloc5)
     : null;
   const serviceImageBloc5Alt = service.imageBloc5?.alt
     ? service.imageBloc5.alt
-    : "illustration du service";
+    : tGlobal("illustration-du-service");
   const serviceImageBloc6Url = service.imageBloc6
     ? urlFor(service.imageBloc6)
     : null;
   const serviceImageBloc6Alt = service.imageBloc6?.alt
     ? service.imageBloc6.alt
-    : "illustration du service";
-
+    : tGlobal("illustration-du-service");
   const serviceImageBloc7Url = service.imageBloc7
     ? urlFor(service.imageBloc7)
     : null;
   const serviceImageBloc7Alt = service.imageBloc7?.alt
     ? service.imageBloc7.alt
-    : "illustration du service";
+    : tGlobal("illustration-du-service");
 
   const serviceImageBloc8Url = service.imageBloc8
     ? urlFor(service.imageBloc8)
     : null;
   const serviceImageBloc8Alt = service.imageBloc8?.alt
     ? service.imageBloc8.alt
-    : "illustration du service";
+    : tGlobal("illustration-du-service");
 
   const serviceImageBloc9Url = service.imageBloc9
     ? urlFor(service.imageBloc9)
     : null;
   const serviceImageBloc9Alt = service.imageBloc9?.alt
     ? service.imageBloc9.alt
-    : "illustration du service";
+    : tGlobal("illustration-du-service");
 
   const serviceImageBloc10Url = service.imageBloc10
     ? urlFor(service.imageBloc10)
     : null;
   const serviceImageBloc10Alt = service.imageBloc10?.alt
     ? service.imageBloc10.alt
-    : "illustration du service";
+    : tGlobal("illustration-du-service");
 
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20 hyphens-auto">

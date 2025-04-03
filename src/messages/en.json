@@ -10,7 +10,14 @@
     "contactCtaVisio": "Schedule a video call",
     "contactCtaMail": "Contact by e-mail",
     "contactCtaTel": "Contact by phone",
-    "en-savoir-plus": "Learn more"
+    "en-savoir-plus": "Learn more",
+    "lire-la-suite": "Read more",
+    "services-associes": "Associated services",
+    "articles-associes": "Associated posts",
+    "secteurs": "Sectors",
+    "illustration-du-service": "service illustration",
+    "illustration-de-l-article": "post illustration",
+    "illustration-du-secteur": "sector illustration"
   },
   "header": {
     "home": "Home",

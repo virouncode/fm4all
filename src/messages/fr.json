@@ -10,7 +10,14 @@
     "contactCtaVisio": "Je prends un rendez-vous en visio",
     "contactCtaMail": "Je contacte par e-mail",
     "contactCtaTel": "Je contacte par téléphone",
-    "en-savoir-plus": "En savoir plus"
+    "en-savoir-plus": "En savoir plus",
+    "lire-la-suite": "Lire la suite",
+    "services-associes": "Services associés",
+    "secteurs": "Secteurs",
+    "articles-associes": "Articles associés",
+    "illustration-du-service": "illustration du service",
+    "illustration-de-l-article": "illustration de l'article",
+    "illustration-du-secteur": "illustration du secteur"
   },
   "header": {
     "home": "Home",

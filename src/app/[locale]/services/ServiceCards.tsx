@@ -23,7 +23,7 @@ const ServiceCards = async () => {
           : null; //TODO placeholder image
         const serviceImageAlt = service.imagePrincipale?.alt
           ? service.imagePrincipale.alt
-          : "illustration du service";
+          : t("illustration du service");
         const serviceUrl = service.slug?.current ?? "";
         return serviceImageUrl ? (
           <ImgCardVertical
