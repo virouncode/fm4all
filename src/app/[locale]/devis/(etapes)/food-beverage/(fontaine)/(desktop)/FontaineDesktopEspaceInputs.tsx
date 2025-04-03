@@ -14,12 +14,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/constants/constants";
 import { locationFontaine } from "@/constants/locationFontaine";
 import { ClientContext } from "@/context/ClientProvider";
-import {
-  FontainesContext,
-  MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE,
-} from "@/context/FontainesProvider";
+import { FontainesContext } from "@/context/FontainesProvider";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
 import { useTranslations } from "next-intl";
 import { useContext } from "react";

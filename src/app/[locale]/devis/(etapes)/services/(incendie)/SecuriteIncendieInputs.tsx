@@ -6,13 +6,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { MAX_NB_BAES, MAX_NB_EXTINCTEURS } from "@/constants/constants";
 import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import {
-  MAX_NB_BAES,
-  MAX_NB_EXTINCTEURS,
-} from "./SecuriteIncendiePropositions";
 
 type SecuriteIncendieInputsProps = {
   nbExtincteurs: number;

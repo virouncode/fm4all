@@ -8,14 +8,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { MARGE } from "@/constants/constants";
+import { MARGE, MAX_PASSAGES_VITRERIE } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useContext } from "react";
-import { MAX_PASSAGES_VITRERIE } from "./NettoyageOptionsPropositions";
 
 type NettoyageOptionsVitrerieCardProps = {
   vitrerieProposition: {

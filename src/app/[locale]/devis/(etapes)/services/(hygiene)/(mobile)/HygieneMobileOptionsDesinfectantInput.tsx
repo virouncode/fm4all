@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { MAX_NB_DISTRIB } from "@/constants/constants";
 import { ClientContext } from "@/context/ClientProvider";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
@@ -8,7 +9,6 @@ import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQ
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useContext } from "react";
-import { MAX_NB_DISTRIB } from "../(desktop)/HygieneOptionsPropositions";
 
 type HygieneMobileOptionsDesinfectantInputProps = {
   nbDistribDesinfectant: number;

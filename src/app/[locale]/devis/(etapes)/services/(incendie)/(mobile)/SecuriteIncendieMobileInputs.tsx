@@ -1,16 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  MAX_NB_BAES,
+  MAX_NB_EXTINCTEURS,
+  MAX_NB_TEL_BAES,
+} from "@/constants/constants";
 import { IncendieContext } from "@/context/IncendieProvider";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import React, { useContext } from "react";
-import {
-  MAX_NB_BAES,
-  MAX_NB_EXTINCTEURS,
-  MAX_NB_TEL_BAES,
-} from "../SecuriteIncendiePropositions";
 
 type SecuriteIncendieMobileInputsProps = {
   nbExtincteurs: number;

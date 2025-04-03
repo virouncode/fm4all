@@ -1,5 +1,7 @@
-import { MAX_NB_PERSONNES_PAR_ESPACE } from "@/constants/constants";
-import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/context/FontainesProvider";
+import {
+  MAX_NB_PERSONNES_PAR_ESPACE,
+  MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE,
+} from "@/constants/constants";
 import { CafeType } from "@/zod-schemas/cafe";
 import { CommentairesType } from "@/zod-schemas/commentaires";
 import { DevisProgressType } from "@/zod-schemas/devisProgress";

@@ -1,22 +1,20 @@
 "use client";
 import PropositionsTitleMobile from "@/app/[locale]/devis/PropositionsTitleMobile";
+import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/constants/constants";
 import { ClientContext } from "@/context/ClientProvider";
-import {
-  FontainesContext,
-  MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE,
-} from "@/context/FontainesProvider";
+import { FontainesContext } from "@/context/FontainesProvider";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
 import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
 import useScrollIntoFontainesEspace from "@/hooks/use-scroll-into-fontaines-espace";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
 import { Droplets } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsTitle from "../../../PropositionsTitle";
 import FontainesDesktopEspaces from "./(desktop)/FontainesDesktopEspaces";
 import FontainesMobileEspaces from "./(mobile)/FontainesMobileEspaces";
-import { useTranslations } from "next-intl";
 
 type FontainesProps = {
   fontainesModeles: SelectFontainesModelesType[];

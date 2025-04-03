@@ -1,11 +1,9 @@
+import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/constants/constants";
 import { TypesEauType } from "@/constants/typesEau";
 import { typesPoseArray, TypesPoseType } from "@/constants/typesPose";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
-import {
-  FontainesContext,
-  MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE,
-} from "@/context/FontainesProvider";
+import { FontainesContext } from "@/context/FontainesProvider";
 import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";

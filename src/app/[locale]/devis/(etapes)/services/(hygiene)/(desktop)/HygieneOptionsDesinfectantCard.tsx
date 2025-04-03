@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { MARGE } from "@/constants/constants";
+import { MARGE, MAX_NB_DISTRIB } from "@/constants/constants";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
@@ -18,7 +18,6 @@ import { Info } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { ChangeEvent, useContext } from "react";
-import { MAX_NB_DISTRIB } from "./HygieneOptionsPropositions";
 
 type HygieneOptionsDesinfectantCardProps = {
   nbDistribDesinfectant: number;
