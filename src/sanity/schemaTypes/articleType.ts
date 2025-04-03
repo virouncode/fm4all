@@ -15,7 +15,8 @@ export const articleType = defineType({
     defineField({
       title: "Categorie",
       name: "categorie",
-      type: "string",
+      type: "reference",
+      to: { type: "articleCategory" },
       validation: (rule) => rule.required(),
     }),
     defineField({

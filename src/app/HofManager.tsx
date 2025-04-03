@@ -10,12 +10,12 @@ import { Link } from "@/i18n/navigation";
 import { client } from "@/sanity/lib/client";
 import { ARTICLE_QUERY } from "@/sanity/queries";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Article } from "../../sanity.types";
+import { Article, ArticleCategory } from "../../sanity.types";
 
 const HofManager = async () => {
   const t = await getTranslations("HomePage.hofManager");
   const locale = await getLocale();
-  const article = await client.fetch<Article>(
+  const article = await client.fetch<Article & { categorie: ArticleCategory }>(
     ARTICLE_QUERY,
     {
       subSlug:
@@ -25,6 +25,7 @@ const HofManager = async () => {
     }
     // options
   );
+  const categorie = article.categorie as ArticleCategory;
   return (
     <section className="hidden md:block w-full max-w-7xl mx-auto h-[600px] p-6">
       <div className="h-full bg-hof-img bg-cover bg-no-repeat rounded-lg flex items-end">
@@ -50,7 +51,7 @@ const HofManager = async () => {
                 href={{
                   pathname: "/blog/[slug]/[subSlug]",
                   params: {
-                    slug: article.categorie ?? "",
+                    slug: categorie.slug?.current ?? "",
                     subSlug: article.subSlug?.current ?? "",
                   },
                 }}

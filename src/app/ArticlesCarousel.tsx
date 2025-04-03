@@ -10,13 +10,15 @@ import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 import { LAST_ARTICLES_QUERY } from "@/sanity/queries";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Article } from "../../sanity.types";
+import { Article, ArticleCategory } from "../../sanity.types";
 
 const ArticlesCarousel = async () => {
   const t = await getTranslations("Global");
   // const options = { next: { revalidate: 30 } };
   const locale = await getLocale();
-  const articles = await client.fetch<Article[]>(
+  const articles = await client.fetch<
+    (Article & { categorie: ArticleCategory })[]
+  >(
     LAST_ARTICLES_QUERY,
     { language: locale }
     // options
@@ -36,7 +38,10 @@ const ArticlesCarousel = async () => {
             : null; //TODO placeholder image
           const articleImageAlt =
             article.imagePrincipale?.alt ?? t("illustration-de-l-article");
-          const articleSlug = article.categorie ?? "";
+          console.log("articleCategory", article.categorie as ArticleCategory);
+
+          const categorie = article.categorie as ArticleCategory;
+          const articleSlug = categorie.slug?.current ?? "";
           const articleSubSlug = article.subSlug?.current ?? "";
           return articleImageUrl ? (
             <CarouselItem

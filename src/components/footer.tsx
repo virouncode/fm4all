@@ -1,8 +1,8 @@
 import { Link } from "@/i18n/navigation";
 import { client } from "@/sanity/lib/client";
-import { SERVICES_QUERY } from "@/sanity/queries";
+import { LAST_ARTICLES_QUERY, SERVICES_QUERY } from "@/sanity/queries";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Service } from "../../sanity.types";
+import { Article, ArticleCategory, Service } from "../../sanity.types";
 
 const Footer = async () => {
   const t = await getTranslations("footer");
@@ -12,6 +12,10 @@ const Footer = async () => {
     { language: locale }
     // options
   );
+  const articles = await client.fetch<
+    (Article & { categorie: ArticleCategory })[]
+  >(LAST_ARTICLES_QUERY, { language: locale });
+
   return (
     <footer className="bg-fm4allsecondary">
       <div className="max-w-7xl mx-auto p-6">
@@ -72,6 +76,29 @@ const Footer = async () => {
                       className="hover:opacity-80"
                     >
                       {service.titre}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+          <div className="flex flex-col gap-2 w-52">
+            <p className="text-secondary text-xl">{t("derniers-articles")}</p>
+            <ul className="text-secondary text-sm flex flex-col gap-2">
+              {articles.map((article) => {
+                const categorie = article.categorie as ArticleCategory;
+                const articleSlug = categorie.slug?.current ?? "";
+                const articleSubSlug = article.subSlug?.current ?? "";
+                return (
+                  <li key={article._id}>
+                    <Link
+                      href={{
+                        pathname: "/blog/[slug]/[subSlug]",
+                        params: { slug: articleSlug, subSlug: articleSubSlug },
+                      }}
+                      className="hover:opacity-80"
+                    >
+                      {article.titre}
                     </Link>
                   </li>
                 );

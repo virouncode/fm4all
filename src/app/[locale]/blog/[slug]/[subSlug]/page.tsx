@@ -8,6 +8,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { capitalize } from "@/lib/capitalize";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 import { ARTICLE_QUERY } from "@/sanity/queries";
@@ -22,6 +23,7 @@ import {
 import Image from "next/image";
 import {
   Article,
+  ArticleCategory,
   Auteur,
   Secteur,
   Service,
@@ -103,6 +105,7 @@ const page = async ({ params }: { params: Promise<{ subSlug: string }> }) => {
   // const options = { next: { revalidate: 30 } };
   const article = await client.fetch<
     Article & {
+      categorie: ArticleCategory;
       auteur: Auteur;
       servicesAssocies: Service[];
       sousServicesAssocies: SousService[];
@@ -118,78 +121,79 @@ const page = async ({ params }: { params: Promise<{ subSlug: string }> }) => {
   const auteurImageUrl = auteur.image ? urlFor(auteur.image) : null; //TODO placeholder image
   const auteurImageAlt = auteur.image?.alt
     ? auteur.image.alt
-    : "illustration de l'auteur";
+    : tGlobal("illustration-de-l-auteur");
 
   const articleImageUrl = article.imagePrincipale
     ? urlFor(article.imagePrincipale)
     : null; //TODO placeholder image
   const articleImageAlt = article.imagePrincipale?.alt
     ? article.imagePrincipale.alt
-    : "illustration de l'article";
+    : tGlobal("illustration-de-l-article");
   const articleImageBloc1Url = article.imageBloc1
     ? urlFor(article.imageBloc1)
     : null;
   const articleImageBloc1Alt = article.imageBloc1?.alt
     ? article.imageBloc1.alt
-    : "illustration de l'article";
+    : tGlobal("illustration-de-l-article");
   const articleImageBloc2Url = article.imageBloc2
     ? urlFor(article.imageBloc2)
     : null;
   const articleImageBloc2Alt = article.imageBloc2?.alt
     ? article.imageBloc2.alt
-    : "illustration de l'article";
+    : tGlobal("illustration-de-l-article");
   const articleImageBloc3Url = article.imageBloc3
     ? urlFor(article.imageBloc3)
     : null;
   const articleImageBloc3Alt = article.imageBloc3?.alt
     ? article.imageBloc3.alt
-    : "illustration de l'article";
+    : tGlobal("illustration-de-l-article");
   const articleImageBloc4Url = article.imageBloc4
     ? urlFor(article.imageBloc4)
     : null;
   const articleImageBloc4Alt = article.imageBloc4?.alt
     ? article.imageBloc4.alt
-    : "illustration de l'article";
+    : tGlobal("illustration-de-l-article");
   const articleImageBloc5Url = article.imageBloc5
     ? urlFor(article.imageBloc5)
     : null;
   const articleImageBloc5Alt = article.imageBloc5?.alt
     ? article.imageBloc5.alt
-    : "illustration de l'article";
+    : tGlobal("illustration-de-l-article");
   const articleImageBloc6Url = article.imageBloc6
     ? urlFor(article.imageBloc6)
     : null;
   const articleImageBloc6Alt = article.imageBloc6?.alt
     ? article.imageBloc6.alt
-    : "illustration de l'article";
+    : tGlobal("illustration-de-l-article");
 
   const articleImageBloc7Url = article.imageBloc7
     ? urlFor(article.imageBloc7)
     : null;
   const articleImageBloc7Alt = article.imageBloc7?.alt
     ? article.imageBloc7.alt
-    : "illustration de l'article";
+    : tGlobal("illustration-de-l-article");
 
   const articleImageBloc8Url = article.imageBloc8
     ? urlFor(article.imageBloc8)
     : null;
   const articleImageBloc8Alt = article.imageBloc8?.alt
     ? article.imageBloc8.alt
-    : "illustration de l'article";
+    : tGlobal("illustration-de-l-article");
 
   const articleImageBloc9Url = article.imageBloc9
     ? urlFor(article.imageBloc9)
     : null;
   const articleImageBloc9Alt = article.imageBloc9?.alt
     ? article.imageBloc9.alt
-    : "illustration de l'article";
+    : tGlobal("illustration-de-l-article");
 
   const articleImageBloc10Url = article.imageBloc10
     ? urlFor(article.imageBloc10)
     : null;
   const articleImageBloc10Alt = article.imageBloc10?.alt
     ? article.imageBloc10.alt
-    : "illustration de l'article";
+    : tGlobal("illustration-de-l-article");
+  const categorie = article.categorie as ArticleCategory;
 
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20 hyphens-auto">
@@ -200,7 +204,14 @@ const page = async ({ params }: { params: Promise<{ subSlug: string }> }) => {
           </BreadcrumbLink>
           <BreadcrumbSeparator />
           <BreadcrumbLink href={"/blog"} className="flex items-center">
-            Articles
+            {tGlobal("articles")}
+          </BreadcrumbLink>
+          <BreadcrumbSeparator />
+          <BreadcrumbLink
+            href={`/blog/${categorie.slug?.current}`}
+            className="flex items-center"
+          >
+            {capitalize(categorie.titre)}
           </BreadcrumbLink>
           <BreadcrumbSeparator />
           <BreadcrumbPage>{article.titre}</BreadcrumbPage>

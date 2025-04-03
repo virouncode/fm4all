@@ -15,9 +15,12 @@
     "services-associes": "Services associés",
     "secteurs": "Secteurs",
     "articles-associes": "Articles associés",
+    "articles": "Articles",
     "illustration-du-service": "illustration du service",
     "illustration-de-l-article": "illustration de l'article",
-    "illustration-du-secteur": "illustration du secteur"
+    "illustration-du-secteur": "illustration du secteur",
+    "illustration-de-l-auteur": "photo de l'auteur",
+    "nos-articles-sur-and-quot": "Nos articles sur : "
   },
   "header": {
     "home": "Home",
@@ -47,7 +50,8 @@
     "articles": "Articles",
     "prestataires": "Prestataires",
     "devenir-prestataire": "Devenir prestataire",
-    "nous-contacter": "Nous contacter"
+    "nous-contacter": "Nous contacter",
+    "derniers-articles": "Derniers articles"
   },
   "devisButton": {
     "devis-en-cours": "Devis en cours",
@@ -1126,6 +1130,7 @@
     }
   },
   "BlogPage": {
-    "blog-nos-articles-sur-les-services-aux-entreprises": "Blog : nos articles sur les services aux entreprises"
+    "blog-nos-articles-sur-les-services-aux-entreprises": "Blog : nos articles sur les services aux entreprises",
+    "par-categorie": "Par catégorie"
   }
 }

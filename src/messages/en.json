@@ -14,10 +14,13 @@
     "lire-la-suite": "Read more",
     "services-associes": "Associated services",
     "articles-associes": "Associated posts",
+    "articles": "Posts",
     "secteurs": "Sectors",
     "illustration-du-service": "service illustration",
     "illustration-de-l-article": "post illustration",
-    "illustration-du-secteur": "sector illustration"
+    "illustration-du-secteur": "sector illustration",
+    "illustration-de-l-auteur": "author photo",
+    "nos-articles-sur-and-quot": "Our posts about : "
   },
   "header": {
     "home": "Home",
@@ -47,7 +50,8 @@
     "articles": "Articles",
     "prestataires": "Providers",
     "devenir-prestataire": "Become a provider",
-    "nous-contacter": "Contact us"
+    "nous-contacter": "Contact us",
+    "derniers-articles": "Last posts"
   },
   "cookieBanniere": {
     "nous-utilisons-des-cookies-et-des-technologies-similaires-necessaires-au-fonctionnement-de-notre-site-web": "We use cookies and similar technologies necessary for the operation of our website.",

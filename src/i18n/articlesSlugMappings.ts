@@ -1,6 +1,6 @@
 // src/i18n/slugMappings.ts
 export const articlesSlugMappingsFrToEn: Record<string, string> = {
-  "facility-management": "facility-management",
+  "facility-management": "facility-management-paris",
   nettoyage: "nettoyage",
   // Ajoutez tous vos autres services ici
 };

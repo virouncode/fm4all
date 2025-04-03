@@ -13,6 +13,7 @@ import { urlFor } from "@/sanity/lib/image";
 import { useTranslations } from "next-intl";
 import {
   Article,
+  ArticleCategory,
   Secteur,
   Service,
   SousService,
@@ -22,7 +23,7 @@ type ExpertiseCarouselProps = {
   services: Service[];
   sousServices: SousService[];
   secteurs: Secteur[];
-  articles?: Article[];
+  articles?: (Article & { categorie: ArticleCategory })[];
 };
 
 const ExpertiseCarousel = ({
@@ -160,7 +161,8 @@ const ExpertiseCarousel = ({
                 : null; //TODO placeholder image
               const articleImageAlt =
                 article.imagePrincipale?.alt ?? t("illustration-de-l-article");
-              const articleSlug = article.categorie ?? "";
+              const categorie = article.categorie as ArticleCategory;
+              const articleSlug = categorie.slug?.current ?? "";
               const articleSubSlug = article.subSlug?.current ?? "";
               return articleImageUrl ? (
                 <CarouselItem
