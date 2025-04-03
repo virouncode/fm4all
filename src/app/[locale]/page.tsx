@@ -11,6 +11,7 @@ import Services from "../Services";
 import Slogan from "../Slogan";
 import VideoPresentation from "../VideoPresentation";
 import Why from "../Why";
+import Articles from "../Articles";
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const locale = await getLocale();
@@ -39,7 +40,7 @@ export default function page() {
       <Why />
       <Mission />
       <HofManager />
-      {/* <Articles /> */}
+      <Articles />
     </main>
   );
 }

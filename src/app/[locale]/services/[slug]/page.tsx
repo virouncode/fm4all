@@ -117,8 +117,9 @@ export const generateMetadata = async ({
 };
 
 const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
+  const tGlobal = await getTranslations("Global");
+  const t = await getTranslations("ServicesPage");
   // const options = { next: { revalidate: 30 } };
-
   const service = await client.fetch<
     Service & {
       servicesAssocies: Service[];
@@ -178,8 +179,33 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
     ? service.imageBloc6.alt
     : "illustration du service";
 
-  const tGlobal = await getTranslations("Global");
-  const t = await getTranslations("ServicesPage");
+  const serviceImageBloc7Url = service.imageBloc7
+    ? urlFor(service.imageBloc7)
+    : null;
+  const serviceImageBloc7Alt = service.imageBloc7?.alt
+    ? service.imageBloc7.alt
+    : "illustration du service";
+
+  const serviceImageBloc8Url = service.imageBloc8
+    ? urlFor(service.imageBloc8)
+    : null;
+  const serviceImageBloc8Alt = service.imageBloc8?.alt
+    ? service.imageBloc8.alt
+    : "illustration du service";
+
+  const serviceImageBloc9Url = service.imageBloc9
+    ? urlFor(service.imageBloc9)
+    : null;
+  const serviceImageBloc9Alt = service.imageBloc9?.alt
+    ? service.imageBloc9.alt
+    : "illustration du service";
+
+  const serviceImageBloc10Url = service.imageBloc10
+    ? urlFor(service.imageBloc10)
+    : null;
+  const serviceImageBloc10Alt = service.imageBloc10?.alt
+    ? service.imageBloc10.alt
+    : "illustration du service";
 
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20 hyphens-auto">
@@ -365,7 +391,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
         </section>
       )}
 
-      {/* Bloc 5 */}
+      {/* Bloc 6 */}
       {Array.isArray(service.bloc5) && service.bloc5.length > 0 && (
         <section className="flex flex-row gap-10 mb-16">
           {serviceImageBloc5Url ? (
@@ -422,6 +448,121 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
           ) : null}
         </section>
       )}
+      {/* Bloc 7 */}
+      {Array.isArray(service.bloc7) && service.bloc7.length > 0 && (
+        <section className="flex flex-row gap-10 mb-16">
+          {serviceImageBloc7Url ? (
+            <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
+              <Image
+                src={serviceImageBloc7Url.url()}
+                alt={serviceImageBloc7Alt}
+                quality={100}
+                className="object-cover object-center"
+                fill={true}
+                unoptimized={true}
+              />
+            </div>
+          ) : null}
+          <div
+            className="flex-1 prose-lg 
+          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
+          prose-h3:font-bold prose-h3:text-xl
+          prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
+          prose-p:text-pretty prose-p:hyphens-auto
+          prose-li:list-check prose-li:m-0
+          prose-a:underline
+          "
+          >
+            <PortableText value={service.bloc7} components={ptComponents} />
+          </div>
+        </section>
+      )}
+      {/* Bloc 8 */}
+      {Array.isArray(service.bloc8) && service.bloc8.length > 0 && (
+        <section className="flex flex-row gap-10 mb-16">
+          <div
+            className="flex-1 prose-lg 
+          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
+          prose-h3:font-bold prose-h3:text-xl
+          prose-p:text-pretty prose-p:hyphens-auto
+          prose-li:list-check prose-li:m-0
+          prose-a:underline
+          "
+          >
+            <PortableText value={service.bloc8} components={ptComponents} />
+          </div>
+          {serviceImageBloc8Url ? (
+            <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
+              <Image
+                src={serviceImageBloc8Url.url()}
+                alt={serviceImageBloc8Alt}
+                quality={100}
+                className="object-cover object-center"
+                fill={true}
+                unoptimized={true}
+              />
+            </div>
+          ) : null}
+        </section>
+      )}
+      {/* Bloc 9 */}
+      {Array.isArray(service.bloc9) && service.bloc9.length > 0 && (
+        <section className="flex flex-row gap-10 mb-16">
+          {serviceImageBloc9Url ? (
+            <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
+              <Image
+                src={serviceImageBloc9Url.url()}
+                alt={serviceImageBloc9Alt}
+                quality={100}
+                className="object-cover object-center"
+                fill={true}
+                unoptimized={true}
+              />
+            </div>
+          ) : null}
+          <div
+            className="flex-1 prose-lg 
+          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
+          prose-h3:font-bold prose-h3:text-xl
+          prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
+          prose-p:text-pretty prose-p:hyphens-auto
+          prose-li:list-check prose-li:m-0
+          prose-a:underline
+          "
+          >
+            <PortableText value={service.bloc9} components={ptComponents} />
+          </div>
+        </section>
+      )}
+      {/* Bloc 10 */}
+      {Array.isArray(service.bloc10) && service.bloc10.length > 0 && (
+        <section className="flex flex-row gap-10 mb-16">
+          <div
+            className="flex-1 prose-lg 
+          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
+          prose-h3:font-bold prose-h3:text-xl
+          prose-p:text-pretty prose-p:hyphens-auto
+          prose-li:list-check prose-li:m-0
+          prose-a:underline
+          "
+          >
+            <PortableText value={service.bloc10} components={ptComponents} />
+          </div>
+          {serviceImageBloc10Url ? (
+            <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
+              <Image
+                src={serviceImageBloc10Url.url()}
+                alt={serviceImageBloc10Alt}
+                quality={100}
+                className="object-cover object-center"
+                fill={true}
+                unoptimized={true}
+              />
+            </div>
+          ) : null}
+        </section>
+      )}
+
       <CTAContactButtons />
     </main>
   );

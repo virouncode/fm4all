@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Form } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
+import { batiments } from "@/constants/batiments";
 import { departements } from "@/constants/departements";
+import { occupation } from "@/constants/occupation";
 import { ClientContext } from "@/context/ClientProvider";
 import { CommentairesContext } from "@/context/CommentairesProvider";
 import { MonDevisContext } from "@/context/MonDevisProvider";
@@ -215,8 +217,8 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                         <p>Ville : ${data.ville}</p>
                         <p>Surface des locaux : ${data.surface}</p>
                         <p>Nombre de personnes : ${data.effectif}</p>
-                        <p>Type de bâtiment : ${data.typeBatiment}</p>
-                        <p>Type d'occupation : ${data.typeOccupation}</p><br/>
+                        <p>Type de bâtiment : ${batiments.find(({ id }) => id === data.typeBatiment)?.description}</p>
+                        <p>Type d'occupation : ${occupation.find(({ id }) => id === data.typeOccupation)?.description}</p><br/>
                         <p>Commentaires du client : ${commentaires}</p><br/>
                         <p>Veuillez trouver en pièce jointe le devis</p>
                         `,

@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -5,8 +6,25 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Link } from "@/i18n/navigation";
+import { client } from "@/sanity/lib/client";
+import { ARTICLE_QUERY } from "@/sanity/queries";
+import { getLocale, getTranslations } from "next-intl/server";
+import { Article } from "../../sanity.types";
 
-const HofManager = () => {
+const HofManager = async () => {
+  const t = await getTranslations("HomePage.hofManager");
+  const locale = await getLocale();
+  const article = await client.fetch<Article>(
+    ARTICLE_QUERY,
+    {
+      subSlug:
+        locale === "fr"
+          ? "hof-managers-un-nouveau-concept"
+          : "hof-managers-a-new-concept",
+    }
+    // options
+  );
   return (
     <section className="hidden md:block w-full max-w-7xl mx-auto h-[600px] p-6">
       <div className="h-full bg-hof-img bg-cover bg-no-repeat rounded-lg flex items-end">
@@ -16,24 +34,30 @@ const HofManager = () => {
               <h3 className="text-4xl"></h3>
             </CardTitle>
             <CardDescription>
-              <h2 className="text-3xl border-l-2 px-4">HOF Managers</h2>
+              <h2 className="text-3xl border-l-2 px-4">{t("hof-managers")}</h2>
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-base mb-6">
-              fm4all réinvente le métier d&apos;Office Manager : les HOF
-              Manager. Hospitality, Office et Facility Manager, trois métiers
-              qui chez fm4all ne font plus qu&apos;un : les HOF Managers.
-            </p>
-            {/* <Button
+            <p className="text-base mb-6">{article.description}</p>
+            <Button
               variant="outline"
-              title="Decouvrir l'offre"
+              title={t("decouvrir-loffre")}
               className="flex justify-center items-center text-base"
               size="default"
               asChild
             >
-              <Link href="/articles/hof-managers">Decouvrir l&apos;offre</Link>
-            </Button> */}
+              <Link
+                href={{
+                  pathname: "/blog/[slug]/[subSlug]",
+                  params: {
+                    slug: article.categorie ?? "",
+                    subSlug: article.subSlug?.current ?? "",
+                  },
+                }}
+              >
+                {t("decouvrir-loffre")}
+              </Link>
+            </Button>
           </CardContent>
         </Card>
       </div>

@@ -21,14 +21,6 @@ export const routing = defineRouting({
       fr: "/secteurs/[slug]",
       en: "/sectors/[slug]",
     },
-    "/blog": {
-      fr: "/blog",
-      en: "/blog",
-    },
-    "/blog/[slug]": {
-      fr: "/blog/[slug]",
-      en: "/blog/[slug]",
-    },
     "/gammes": {
       fr: "/nos-3-gammes",
       en: "/our-3-tiers",
@@ -108,6 +100,18 @@ export const routing = defineRouting({
     "/studio/[...tool]": {
       fr: "/studio/[...tool]",
       en: "/studio/[...tool]",
+    },
+    "/blog": {
+      fr: "/articles",
+      en: "/posts",
+    },
+    "/blog/[slug]": {
+      fr: "/articles/[slug]",
+      en: "/posts/[slug]",
+    },
+    "/blog/[slug]/[subSlug]": {
+      fr: "/articles/[slug]/[subSlug]",
+      en: "/posts/[slug]/[subSlug]",
     },
   },
 });

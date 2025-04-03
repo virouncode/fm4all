@@ -153,6 +153,10 @@
       "beneficiez-de-notre-reseau-de-partenaires-en-quelques-clics": "Take advantage of our network of partners in just a few clicks",
       "beneficiez-de-notre-reseau": "Take advantage of our network"
     },
+    "hofManager": {
+      "decouvrir-loffre": "Discover the offer",
+      "hof-managers": "HOF Managers"
+    },
     "articles": {
       "nos-derniers-articles": "Our last posts",
       "voir-tous-les-articles": "Show all posts",
@@ -1114,5 +1118,8 @@
       "cliquez-ici": "Click here",
       "vous-avez-des-questions": "Do you have any questions?"
     }
+  },
+  "BlogPage": {
+    "blog-nos-articles-sur-les-services-aux-entreprises": "Blog: Our posts on business services"
   }
 }

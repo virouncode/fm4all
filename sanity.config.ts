@@ -14,10 +14,8 @@ import { structure } from "./src/sanity/structure";
 
 // Import schema types directly
 import { articleType } from "./src/sanity/schemaTypes/articleType";
-import { authorType } from "./src/sanity/schemaTypes/authorType";
-import { blockContentType } from "./src/sanity/schemaTypes/blockContentType";
+import { auteurType } from "./src/sanity/schemaTypes/auteurType";
 import { categoryType } from "./src/sanity/schemaTypes/categoryType";
-import { postType } from "./src/sanity/schemaTypes/postType";
 import { secteurType } from "./src/sanity/schemaTypes/secteurType";
 import { serviceType } from "./src/sanity/schemaTypes/serviceType";
 import { sousServiceType } from "./src/sanity/schemaTypes/sousServiceType";
@@ -31,10 +29,8 @@ const config = {
   dataset,
   schema: {
     types: [
-      blockContentType,
       categoryType,
-      postType,
-      authorType,
+      auteurType,
       articleType,
       serviceType,
       sousServiceType,

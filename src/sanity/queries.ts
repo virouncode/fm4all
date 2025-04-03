@@ -25,14 +25,18 @@ sousServicesAssocies[]->{
     },
   }`;
 
-export const ARTICLES_QUERY = `*[_type == "article" && language == $language]|order(date desc){ _id, titre, description, slug, imagePrincipale }`;
+export const LAST_ARTICLES_QUERY = `*[_type == "article" && language == $language]|order(date desc)[0...10]{ _id, titre, description, slug, subSlug, imagePrincipale }`;
 
-export const LAST_ARTICLES_QUERY = `*[_type == "article" && language == $language]|order(date desc)[0...10]{ _id, titre, description, slug, imagePrincipale }`;
+export const ARTICLES_OF_CATEGORY_QUERY = `*[_type == "article" && language == $language && slug===$slug]|order(date desc){ _id, titre, description, slug, imagePrincipale }`;
 
-export const ARTICLES_OF_CATEGORY_QUERY = `*[_type == "article" && language == $language && parentSlug===$parentSlug]|order(date desc){ _id, titre, description, slug, imagePrincipale }`;
-
-export const ARTICLE_QUERY = `*[_type == "article" && slug.current == $slug][0]{
+export const ARTICLE_QUERY = `*[_type == "article" && subSlug.current == $subSlug][0]{
     ...,
+    auteur->{
+      _id,
+      prenom,
+      nom,
+      image,
+      },
     servicesAssocies[]->{
         _id,
         titre,
@@ -45,6 +49,7 @@ export const ARTICLE_QUERY = `*[_type == "article" && slug.current == $slug][0]{
         titre,
         description,
         slug,
+        subSlug,
         imagePrincipale
       },
      secteursAssocies[]->{
@@ -53,5 +58,13 @@ export const ARTICLE_QUERY = `*[_type == "article" && slug.current == $slug][0]{
         description,
         slug,
         imagePrincipale
-        },
-      }`;
+      },
+      articlesAssocies[]->{
+        _id,
+        titre,
+        description,
+        slug,
+        subSlug,
+        imagePrincipale
+      },
+}`;

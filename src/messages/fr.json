@@ -153,6 +153,10 @@
       "beneficiez-de-notre-reseau-de-partenaires-en-quelques-clics": "Bénéficiez de notre réseau de partenaires en quelques clics",
       "beneficiez-de-notre-reseau": "Bénéficiez de notre réseau"
     },
+    "hofManager": {
+      "decouvrir-loffre": "Decouvrir l'offre",
+      "hof-managers": "HOF Managers"
+    },
     "articles": {
       "nos-derniers-articles": "Nos derniers articles",
       "voir-tous-les-articles": "Voir tous les articles",
@@ -1113,5 +1117,8 @@
       "cliquez-ici": "Cliquez ici",
       "vous-avez-des-questions": "Vous avez des questions ?"
     }
+  },
+  "BlogPage": {
+    "blog-nos-articles-sur-les-services-aux-entreprises": "Blog : nos articles sur les services aux entreprises"
   }
 }

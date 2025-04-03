@@ -6,12 +6,19 @@ type ImgCardVerticalProps = {
   src: string;
   alt: string;
   className?: string;
-  href: {
-    pathname: "/services/[slug]" | "/secteurs/[slug]";
-    params: {
-      slug: string;
-    };
-  };
+  href:
+    | {
+        pathname: "/services/[slug]";
+        params: { slug: string };
+      }
+    | {
+        pathname: "/secteurs/[slug]";
+        params: { slug: string };
+      }
+    | {
+        pathname: "/blog/[slug]/[subSlug]";
+        params: { slug: string; subSlug: string };
+      };
 };
 
 const ImgCardVertical = ({

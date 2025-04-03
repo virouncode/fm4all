@@ -6,6 +6,12 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  getArticlesSlugEn,
+  getArticlesSlugFr,
+  getArticlesSubSlugEn,
+  getArticlesSubSlugFr,
+} from "@/i18n/articlesSlugMappings";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import {
@@ -28,6 +34,8 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
   const searchParams = useSearchParams();
 
   const handleChangeLang = (newLocale: "fr" | "en") => {
+    console.log("pathname", pathname);
+
     if (newLocale === locale) return;
     const query: Record<string, string> = {};
     searchParams.forEach((value, key) => {
@@ -41,6 +49,35 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
             : getServicesSlugEn(params.slug);
         router.replace(
           { pathname, params: { slug: newSlug }, query },
+          { locale: newLocale }
+        );
+      }
+    } else if (pathname === "/blog/[slug]") {
+      if (typeof params.slug === "string") {
+        const newSlug =
+          newLocale === "fr"
+            ? getArticlesSlugFr(params.slug)
+            : getArticlesSlugEn(params.slug);
+        router.replace(
+          { pathname, params: { slug: newSlug }, query },
+          { locale: newLocale }
+        );
+      }
+    } else if (pathname === "/blog/[slug]/[subSlug]") {
+      if (
+        typeof params.slug === "string" &&
+        typeof params.subSlug === "string"
+      ) {
+        const newSlug =
+          newLocale === "fr"
+            ? getArticlesSlugFr(params.slug)
+            : getArticlesSlugEn(params.slug);
+        const newSubSlug =
+          newLocale === "fr"
+            ? getArticlesSubSlugFr(params.subSlug)
+            : getArticlesSubSlugEn(params.subSlug);
+        router.replace(
+          { pathname, params: { slug: newSlug, subSlug: newSubSlug }, query },
           { locale: newLocale }
         );
       }
