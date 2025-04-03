@@ -18,6 +18,7 @@ export const generateMetadata = async (): Promise<Metadata> => {
 };
 
 const page = async () => {
+  const locale = await getLocale();
   const t = await getTranslations("CGVPage");
   return (
     <main className="max-w-7xl min-h-[calc(100vh-4rem)] mx-auto mb-24 py-4 px-6 md:px-20">
@@ -27,7 +28,11 @@ const page = async () => {
           <p>
             {t("si-le-document-ne-s-affiche-pas-correctement")}{" "}
             <Link
-              href="https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/cgv/CGV%20fm4all%2020250303-Tmu6Vmvpwg7boAzkM9dFt3Vyc4Rw3n.pdf"
+              href={
+                locale === "fr"
+                  ? "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/cgv/CGV%20fm4all%2020250303-Tmu6Vmvpwg7boAzkM9dFt3Vyc4Rw3n.pdf"
+                  : "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/cgv/CGV%20fm4all%2020250303%20EN-Psupnta2bT9Mj7HoynMoDgZhEaQwXk.pdf"
+              }
               target="_blank"
               className="underline"
             >
@@ -37,7 +42,11 @@ const page = async () => {
         </div>
         <div className="w-full mt-6 mb-6">
           <iframe
-            src="https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/cgv/CGV%20fm4all%2020250303-Tmu6Vmvpwg7boAzkM9dFt3Vyc4Rw3n.pdf"
+            src={
+              locale === "fr"
+                ? "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/cgv/CGV%20fm4all%2020250303-Tmu6Vmvpwg7boAzkM9dFt3Vyc4Rw3n.pdf"
+                : "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/cgv/CGV%20fm4all%2020250303%20EN-Psupnta2bT9Mj7HoynMoDgZhEaQwXk.pdf"
+            }
             className="w-full h-screen"
           />
         </div>
