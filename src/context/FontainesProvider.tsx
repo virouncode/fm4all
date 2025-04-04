@@ -12,8 +12,7 @@ import {
   useState,
 } from "react";
 import { ClientContext } from "./ClientProvider";
-
-export const MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE = 110;
+import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/constants/constants";
 
 export const FontainesContext = createContext<{
   fontaines: FontainesType;
@@ -65,7 +64,7 @@ const FontainesProvider = ({ children }: PropsWithChildren) => {
           nbPersonnes:
             client.effectif > MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE
               ? MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE
-              : client.effectif ?? 0,
+              : (client.effectif ?? 0),
         },
         prix: {
           prixLoc: null,

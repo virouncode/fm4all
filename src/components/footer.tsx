@@ -1,6 +1,21 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
+import { client } from "@/sanity/lib/client";
+import { LAST_ARTICLES_QUERY, SERVICES_QUERY } from "@/sanity/queries";
+import { getLocale, getTranslations } from "next-intl/server";
+import { Article, ArticleCategory, Service } from "../../sanity.types";
 
-const Footer = () => {
+const Footer = async () => {
+  const t = await getTranslations("footer");
+  const locale = await getLocale();
+  const services = await client.fetch<Service[]>(
+    SERVICES_QUERY,
+    { language: locale }
+    // options
+  );
+  const articles = await client.fetch<
+    (Article & { categorie: ArticleCategory })[]
+  >(LAST_ARTICLES_QUERY, { language: locale });
+
   return (
     <footer className="bg-fm4allsecondary">
       <div className="max-w-7xl mx-auto p-6">
@@ -10,30 +25,27 @@ const Footer = () => {
             <ul className="text-secondary text-sm flex flex-col gap-2">
               <li>
                 <Link href="/" className="hover:opacity-80">
-                  Page d&apos;accueil
+                  {t("page-d-accueil")}
                 </Link>
               </li>
               <li>
                 <Link href="/contact" className="hover:opacity-80">
-                  Nous contacter
+                  {t("nous-contacter")}
                 </Link>
               </li>
               <li>
-                <Link href="/mentions-legales" className="hover:opacity-80">
-                  Mentions legales
+                <Link href="/mentions" className="hover:opacity-80">
+                  {t("mentions-legales")}
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/politique-de-confidentialite"
-                  className="hover:opacity-80"
-                >
-                  Politique de confidentialité
+                <Link href="/confidentialite" className="hover:opacity-80">
+                  {t("politique-de-confidentialite")}
                 </Link>
               </li>
               <li>
-                <Link href="/politique-de-cookies" className="hover:opacity-80">
-                  Politique de cookies
+                <Link href="/cookies" className="hover:opacity-80">
+                  {t("politique-de-cookies")}
                 </Link>
               </li>
               <li>
@@ -46,71 +58,62 @@ const Footer = () => {
                   CGU
                 </Link>
               </li>
-              <li>Touts droits résérvés &copy;fm4all</li>
+              <li>{t("touts-droits-reserves-and-copy-fm4all")}</li>
             </ul>
           </div>
           <div className="flex flex-col gap-2 w-52">
-            <p className="text-secondary text-xl">Services</p>
+            <p className="text-secondary text-xl">{t("services")}</p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
-              <li>
-                <Link href="/services/nettoyage" className="hover:opacity-80">
-                  Nettoyage
-                </Link>
-              </li>
-              <li>
-                <Link href="/services/hygiene" className="hover:opacity-80">
-                  Hygiene sanitaire
-                </Link>
-              </li>
-              <li>
-                <Link href="/services/maintenance" className="hover:opacity-80">
-                  Maintenance
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/services/securite-incendie"
-                  className="hover:opacity-80"
-                >
-                  Securité incendie
-                </Link>
-              </li>
-              <li>
-                <Link href="/services/cafe" className="hover:opacity-80">
-                  Café et boissons chaudes
-                </Link>
-              </li>
-              <li>
-                <Link href="/services/snack" className="hover:opacity-80">
-                  Snacks et fruits
-                </Link>
-              </li>
-              <li>
-                <Link href="/services/eau" className="hover:opacity-80">
-                  Fontaines à eau
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/services/office-manager"
-                  className="hover:opacity-80"
-                >
-                  Office manager
-                </Link>
-              </li>
-              <li>
-                <Link href="/services/fm4all" className="hover:opacity-80">
-                  Pilotage fm4all
-                </Link>
-              </li>
+              {services.map((service) => {
+                const serviceUrl = service.slug?.current ?? "";
+                return (
+                  <li key={service._id}>
+                    <Link
+                      href={{
+                        pathname: "/services/[slug]",
+                        params: { slug: serviceUrl },
+                      }}
+                      className="hover:opacity-80"
+                    >
+                      {service.titre}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </div>
           <div className="flex flex-col gap-2 w-52">
+            <p className="text-secondary text-xl">{t("derniers-articles")}</p>
+            <ul className="text-secondary text-sm flex flex-col gap-2">
+              {articles.map((article) => {
+                const categorie = article.categorie as ArticleCategory;
+                const articleSlug = categorie.slug?.current ?? "";
+                const articleSubSlug = article.subSlug?.current ?? "";
+                return (
+                  <li key={article._id}>
+                    <Link
+                      href={{
+                        pathname: "/blog/[slug]/[subSlug]",
+                        params: { slug: articleSlug, subSlug: articleSubSlug },
+                      }}
+                      className="hover:opacity-80"
+                    >
+                      {article.titre}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+          {/* <div className="flex flex-col gap-2 w-52">
             <p className="text-secondary text-xl">Articles</p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
               <li>
                 <Link
-                  href="/articles/le-fm-cest-quoi"
+                  href={{
+                    pathname: "/blog/[slug]",
+                    params: { slug: "le-fm-cest-quoi" },
+                  }}
                   className="hover:opacity-80"
                 >
                   Le FM c&apos;est quoi ?
@@ -118,7 +121,10 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/articles/missions-du-fm"
+                  href={{
+                    pathname: "/blog/[slug]",
+                    params: { slug: "les-missions-du-fm" },
+                  }}
                   className="hover:opacity-80"
                 >
                   Les missions du FM
@@ -126,7 +132,10 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/articles/lexternalisation-du-fm"
+                  href={{
+                    pathname: "/blog/[slug]",
+                    params: { slug: "histoire-de-lexternalisation-du-fm" },
+                  }}
                   className="hover:opacity-80"
                 >
                   Histoire de l&apos;externalisation du FM
@@ -134,7 +143,10 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/articles/le-fm-fait-il-faire-des-economies"
+                  href={{
+                    pathname: "/blog/[slug]",
+                    params: { slug: "le-fm-fait-il-faire-des-economies" },
+                  }}
                   className="hover:opacity-80"
                 >
                   Le FM fait-il faire des économies ?
@@ -142,7 +154,10 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/articles/histoire-du-nettoyage"
+                  href={{
+                    pathname: "/blog/[slug]",
+                    params: { slug: "histoire-du-nettoyage-industriel" },
+                  }}
                   className="hover:opacity-80"
                 >
                   Histoire du nettoyage industriel
@@ -150,20 +165,23 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/articles/hof-managers"
+                  href={{
+                    pathname: "/blog/[slug]",
+                    params: { slug: "hof-managers" },
+                  }}
                   className="hover:opacity-80"
                 >
                   Hof Managers
                 </Link>
               </li>
             </ul>
-          </div>
+          </div> */}
           <div className="flex flex-col gap-2 w-52">
-            <p className="text-secondary text-xl">Prestataires</p>
+            <p className="text-secondary text-xl">{t("prestataires")}</p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
               <li>
-                <Link href="/devenir-prestataire" className="hover:opacity-80">
-                  Devenir prestataire
+                <Link href="/prestataire" className="hover:opacity-80">
+                  {t("devenir-prestataire")}
                 </Link>
               </li>
             </ul>

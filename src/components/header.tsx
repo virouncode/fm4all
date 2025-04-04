@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Link, usePathname } from "@/i18n/navigation";
 import {
   CircleHelp,
   HandPlatter,
@@ -12,13 +13,16 @@ import {
   Star,
   X,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useState } from "react";
 import DevisButton from "./devis-button";
+import LocaleButton from "./locale-button";
 
 const Header = () => {
+  const tGlobal = useTranslations("Global");
+  const t = useTranslations("header");
+
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const path = usePathname();
 
@@ -41,7 +45,7 @@ const Header = () => {
             <Link href="/">
               <Image
                 src="/img/logo_full.webp"
-                alt="Logo"
+                alt="fm4all-Logo"
                 fill={true}
                 quality={100}
                 className="object-contain"
@@ -49,45 +53,45 @@ const Header = () => {
             </Link>
           </div>
           <nav className="hidden xl:flex items-center gap-4">
-            <div
+            {/* <div
               className={`flex gap-1 items-center ${
                 isActive("/") ? "text-destructive font-bold" : ""
               }`}
             >
               <Home size={15} />
-              <Link href="/">Home</Link>
-            </div>
+              <Link href="/">{t("home")}</Link>
+            </div> */}
             <div
               className={`flex gap-1 items-center ${
                 isActive("/services") ? "text-destructive font-bold" : ""
               }`}
             >
               <HandPlatter size={15} />
-              <Link href="/services">Nos services</Link>
+              <Link href="/services">{t("nos-services")}</Link>
             </div>
             <div
               className={`flex gap-1 items-center ${
-                isActive("/nos-3-gammes") ? "text-destructive font-bold" : ""
+                isActive("/gammes") ? "text-destructive font-bold" : ""
               }`}
             >
               <Star size={15} />
-              <Link href="/nos-3-gammes">Nos 3 gammes</Link>
+              <Link href="/gammes">{t("nos-3-gammes")}</Link>
             </div>
             <div
               className={`flex gap-1 items-center ${
-                isActive("/nos-engagements") ? "text-destructive font-bold" : ""
+                isActive("/engagements") ? "text-destructive font-bold" : ""
               }`}
             >
               <ScrollText size={15} />
-              <Link href="/nos-engagements">Nos engagements</Link>
+              <Link href="/engagements">{t("nos-engagements")}</Link>
             </div>
             <div
               className={`flex gap-1 items-center ${
-                isActive("/nos-partenaires") ? "text-destructive font-bold" : ""
+                isActive("/partenaires") ? "text-destructive font-bold" : ""
               }`}
             >
               <Handshake size={15} />
-              <Link href="/nos-partenaires">Nos partenaires</Link>
+              <Link href="/partenaires">{t("nos-partenaires")}</Link>
             </div>
             <div
               className={`flex gap-1 items-center ${
@@ -101,24 +105,25 @@ const Header = () => {
         </div>
         <div className="flex items-center gap-4">
           <DevisButton
-            title="Mon devis en ligne"
-            text="Mon devis en ligne"
+            title={tGlobal("mon-devis-en-ligne")}
+            text={tGlobal("mon-devis-en-ligne")}
             className="text-sm"
             disabled={path.includes("/mon-devis")}
             setIsMobileNavOpen={setIsMobileNavOpen}
           />
           <Button
-            title="Devenir prestataire"
+            title={t("devenir-prestataire")}
             variant="outline"
             className="hidden min-[600px]:flex justify-center items-center"
             size="default"
             asChild
             onClick={() => setIsMobileNavOpen(false)}
           >
-            <Link href="/devenir-prestataire">Devenir prestataire</Link>
+            <Link href="/prestataire">{t("devenir-prestataire")}</Link>
           </Button>
+          <LocaleButton className="hidden md:flex" />
           <Button
-            title="Nous contacter"
+            title={t("nous-contacter")}
             variant="outline"
             className="hidden min-[500px]:flex justify-center items-center rounded-full"
             size="icon"
@@ -158,6 +163,7 @@ const Header = () => {
           {/* <div className="absolute top-4 left-6">
             <ModeToggle />
           </div> */}
+          <LocaleButton className="absolute top-10 left-6 flex gap-1" />
           <div className="flex flex-col gap-4">
             <div className="flex-1 flex flex-col gap-4 ">
               <div
@@ -167,7 +173,7 @@ const Header = () => {
                 onClick={handleHideMobileNav}
               >
                 <Home size={30} />
-                <Link href="/">Home</Link>
+                <Link href="/">{t("home")}</Link>
               </div>
               <div
                 className={`flex gap-4 items-center ${
@@ -176,38 +182,34 @@ const Header = () => {
                 onClick={handleHideMobileNav}
               >
                 <HandPlatter size={30} />
-                <Link href="/services">Nos services</Link>
+                <Link href="/services">{t("nos-services")}</Link>
               </div>
               <div
                 className={`flex gap-4 items-center ${
-                  isActive("/nos-3-gammes") ? "text-destructive font-bold" : ""
+                  isActive("/gammes") ? "text-destructive font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
                 <Star size={30} />
-                <Link href="/nos-3-gammes">Nos 3 gammes</Link>
+                <Link href="/gammes">{t("nos-3-gammes")}</Link>
               </div>
               <div
                 className={`flex gap-4 items-center ${
-                  isActive("/nos-engagements")
-                    ? "text-destructive font-bold"
-                    : ""
+                  isActive("/engagements") ? "text-destructive font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
                 <ScrollText size={30} />
-                <Link href="/nos-engagements">Nos engagements</Link>
+                <Link href="/engagements">{t("nos-engagements")}</Link>
               </div>
               <div
                 className={`flex gap-4 items-center ${
-                  isActive("/nos-partenaires")
-                    ? "text-destructive font-bold"
-                    : ""
+                  isActive("/partenaires") ? "text-destructive font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
                 <Handshake size={30} />
-                <Link href="/nos-partenaires">Nos partenaires</Link>
+                <Link href="/partenaires">{t("nos-partenaires")}</Link>
               </div>
               <div
                 className={`flex gap-4 items-center ${
@@ -220,14 +222,12 @@ const Header = () => {
               </div>
               <div
                 className={`hidden max-[600px]:flex gap-4 items-center ${
-                  isActive("/devenir-prestataire")
-                    ? "text-destructive font-bold"
-                    : ""
+                  isActive("/prestataire") ? "text-destructive font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
                 <HandPlatter size={30} />
-                <Link href="/devenir-prestataire">Devenir prestataire</Link>
+                <Link href="/prestataire">{t("devenir-prestataire")}</Link>
               </div>
               <div
                 className={`hidden max-[600px]:flex gap-4 items-center ${
@@ -236,7 +236,7 @@ const Header = () => {
                 onClick={handleHideMobileNav}
               >
                 <Phone size={30} />
-                <Link href="/contact">Nous contacter</Link>
+                <Link href="/contact">{t("nous-contacter")}</Link>
               </div>
             </div>
           </div>
