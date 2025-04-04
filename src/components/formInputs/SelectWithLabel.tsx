@@ -14,11 +14,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslations } from "next-intl";
 import { useFormContext } from "react-hook-form";
 
 type DataObj = {
   id: string;
-  description: string;
   color?: string;
 };
 
@@ -31,6 +31,7 @@ type SelectWithLabelProps<S> = {
   containerClassName?: string;
   handleSelect?: (value: string, name: string) => void;
   disabled?: boolean;
+  translationPrefix?: string;
 };
 
 export function SelectWithLabel<S>({
@@ -41,10 +42,12 @@ export function SelectWithLabel<S>({
   containerClassName,
   handleSelect,
   disabled = false,
+  translationPrefix,
 }: SelectWithLabelProps<S>) {
   const { control, formState } = useFormContext();
   const error = formState.errors[nameInSchema];
   const hasError = Boolean(error);
+  const t = useTranslations(translationPrefix);
 
   return (
     <FormField
@@ -83,7 +86,7 @@ export function SelectWithLabel<S>({
                   value={item.id.toString() ?? ""}
                   style={{ color: item.color ?? "" }}
                 >
-                  {item.description}
+                  {t ? t(item.id) : ""}
                 </SelectItem>
               ))}
             </SelectContent>

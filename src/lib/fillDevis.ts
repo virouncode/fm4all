@@ -1,6 +1,6 @@
 import { batiments } from "@/constants/batiments";
 import { MARGE } from "@/constants/constants";
-import { occupations } from "@/constants/occupations";
+import { occupation } from "@/constants/occupation";
 import { toast } from "@/hooks/use-toast";
 import { InsertClientType } from "@/zod-schemas/client";
 import html2canvas from "html2canvas";
@@ -72,7 +72,7 @@ export const fillDevis = async (
       {
         fieldName: "typeOccupation_client",
         value:
-          occupations.find(({ id }) => id === client.typeOccupation)
+          occupation.find(({ id }) => id === client.typeOccupation)
             ?.description ?? "",
       },
       {
