@@ -1,4 +1,4 @@
-import ArticlesCarousel from "@/app/ArticlesCarousel";
+import ArticlesCarousel from "@/components/ArticlesCarousel";
 import { Link } from "@/i18n/navigation";
 import { generateAlternates } from "@/lib/metadata-helpers";
 import { client } from "@/sanity/lib/client";
@@ -7,10 +7,11 @@ import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ArticleCategory } from "../../../../sanity.types";
 import ArticlesCategorieCarousel from "./ArticlesCategorieCarousel";
+
 export const generateMetadata = async (): Promise<Metadata> => {
   const locale = await getLocale();
   return generateAlternates(
-    "cgu",
+    "blog",
     locale,
     locale === "fr" ? "Articles" : "Posts",
     locale === "fr"

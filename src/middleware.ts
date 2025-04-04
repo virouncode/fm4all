@@ -4,13 +4,13 @@ import { routing } from "./i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
 
-const allowedOrigins =
-  process.env.NODE_ENV === "production"
-    ? ["https://www.fm4all.com", "https://fm4all.com"]
-    : ["http://localhost:3000"];
-
 export function middleware(req: NextRequest) {
   const origin = req.headers.get("origin");
+  const allowedOrigins =
+    process.env.NODE_ENV === "production"
+      ? ["https://www.fm4all.com", "https://fm4all.com"]
+      : ["http://localhost:3000"];
+
   if (origin && allowedOrigins.includes(origin)) {
     const response = NextResponse.next(); //
     // Set CORS headers for the response

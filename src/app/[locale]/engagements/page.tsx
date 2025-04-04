@@ -1,4 +1,4 @@
-import WhyCards from "@/app/WhyCards";
+import WhyCards from "@/components/WhyCards";
 import CTAContactButtons from "@/components/cta-contact-buttons";
 import { generateAlternates } from "@/lib/metadata-helpers";
 import { Metadata } from "next";

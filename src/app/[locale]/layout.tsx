@@ -37,7 +37,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Metadata } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { getLocale } from "next-intl/server";
+import { getLocale, getMessages } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
 import { Didact_Gothic } from "next/font/google";
 import { notFound } from "next/navigation";
@@ -80,13 +80,14 @@ const didact = Didact_Gothic({
   display: "swap",
 });
 
-export default async function RootLayout({
+export default async function LocalizedLayout({
   children,
   params,
 }: Readonly<{
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 }>) {
+  const messages = await getMessages();
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) {
     notFound();
@@ -97,7 +98,7 @@ export default async function RootLayout({
         <GoogleAnalytics
           GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!}
         />
-        <NextIntlClientProvider>
+        <NextIntlClientProvider locale={locale} messages={messages}>
           <DevisProgressProvider>
             <ClientProvider>
               <ServicesProvider>

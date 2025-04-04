@@ -1,7 +1,7 @@
-import { Metadata } from "next";
-import CityOut from "./CityOut";
 import { generateAlternates } from "@/lib/metadata-helpers";
+import { Metadata } from "next";
 import { getLocale } from "next-intl/server";
+import CityOut from "./CityOut";
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const locale = await getLocale();

@@ -3,7 +3,7 @@ import { generateAlternates } from "@/lib/metadata-helpers";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import Image from "next/image";
-import Partenaires from "../../Partenaires";
+import Partenaires from "../../../components/Partenaires";
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const locale = await getLocale();

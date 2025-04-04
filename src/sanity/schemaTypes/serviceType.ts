@@ -11,6 +11,7 @@ export const serviceType = defineType({
       title: "Date",
       name: "date",
       type: "datetime",
+      validation: (rule) => rule.required(),
     }),
     defineField({
       title: "Slug",
@@ -66,6 +67,7 @@ export const serviceType = defineType({
           ],
         },
       ],
+      validation: (rule) => rule.required(),
     }),
     //Image principale
     defineField({
@@ -82,6 +84,7 @@ export const serviceType = defineType({
           title: "Texte alternatif",
         }),
       ],
+      validation: (rule) => rule.required(),
     }),
     //Notre expertise
     defineField({

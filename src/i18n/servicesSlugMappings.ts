@@ -12,7 +12,7 @@ export const servicesSlugMappingsFrToEn: Record<string, string> = {
   "livraison-boissons-entreprise": "office-drinks-delivery",
   "fontaines-a-eau-entreprise": "water-dispenser",
   "office-manager": "outsourced-office-manager-france",
-  "pilotage-fm4all": "fm4all-service-management",
+  "pilotage-facility-management": "facilities-management-outsourcing",
   // Ajoutez tous vos autres services ici
 };
 

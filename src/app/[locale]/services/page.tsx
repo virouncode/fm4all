@@ -1,7 +1,7 @@
+import { generateAlternates } from "@/lib/metadata-helpers";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import ServiceCards from "./ServiceCards";
-import { generateAlternates } from "@/lib/metadata-helpers";
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const locale = await getLocale();
@@ -10,8 +10,9 @@ export const generateMetadata = async (): Promise<Metadata> => {
     locale,
     locale === "fr" ? "Nos services" : "Our services",
     locale === "fr"
-      ? "Découvrez nos services de facility management"
-      : "Discover our facility management services"
+      ? "Découvrez nos services aux entreprises"
+      : "Discover our business services",
+    "/img/services/fm4all.webp"
   );
 };
 

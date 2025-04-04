@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 import { Didact_Gothic } from "next/font/google";
 import "./globals.css";
 
@@ -20,6 +21,7 @@ export default function GlobalError({
   reset: () => void;
 }) {
   console.log("Global error", error);
+  const t = useTranslations("Erreur");
 
   return (
     // global-error must include html and body tags
@@ -28,9 +30,11 @@ export default function GlobalError({
         className={`${didact.className} antialiased scroll-smooth h-dvh flex items-center justify-center`}
       >
         <div className="flex flex-col gap-10">
-          <h2 className="font-bold text-lg text-center">Erreur globale !</h2>
+          <h2 className="font-bold text-lg text-center">
+            {t("erreur-globale")}
+          </h2>
           <Button onClick={() => reset()} variant="secondary" size="lg">
-            Réessayer
+            {t("reessayer")}
           </Button>
         </div>
       </body>

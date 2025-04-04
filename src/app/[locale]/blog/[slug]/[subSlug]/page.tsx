@@ -8,7 +8,13 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import {
+  getArticlesSlugEn,
+  getArticlesSlugFr,
+  getArticlesSubSlugFr,
+} from "@/i18n/articlesSlugMappings";
 import { capitalize } from "@/lib/capitalize";
+import { generateAlternates } from "@/lib/metadata-helpers";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 import { ARTICLE_QUERY } from "@/sanity/queries";
@@ -96,6 +102,48 @@ const ptComponents = {
       );
     },
   },
+};
+
+export const generateMetadata = async ({
+  params,
+}: {
+  params: Promise<{ slug: string; subSlug: string }>;
+}) => {
+  const { slug, subSlug } = await params;
+  const locale = await getLocale();
+  const article = await client.fetch<
+    Article & {
+      categorie: ArticleCategory;
+      auteur: Auteur;
+      servicesAssocies: Service[];
+      sousServicesAssocies: SousService[];
+      secteursAssocies: Secteur[];
+      articlesAssocies: Article[];
+    }
+  >(
+    ARTICLE_QUERY,
+    { subSlug }
+    // options
+  );
+  return generateAlternates(
+    "blogArticle",
+    locale,
+    article.baliseTitle ?? "",
+    article.baliseDescription ?? "",
+    article.imagePrincipale
+      ? urlFor(article.imagePrincipale).url()
+      : "/img/logo_full_white.webp.png",
+    {
+      fr: {
+        slug: locale === "fr" ? slug : getArticlesSlugFr(slug),
+        subSlug: locale === "fr" ? subSlug : getArticlesSubSlugFr(slug),
+      },
+      en: {
+        slug: locale === "en" ? slug : getArticlesSlugEn(slug),
+        subSlug: locale === "en" ? subSlug : getArticlesSubSlugFr(slug),
+      },
+    }
+  );
 };
 
 const page = async ({ params }: { params: Promise<{ subSlug: string }> }) => {

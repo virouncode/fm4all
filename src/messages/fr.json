@@ -1185,5 +1185,11 @@
     "remise-sur-chiffre-daffaires": "Remise sur chiffre d'affaires",
     "remise-office-manager": "Remise Office Manager",
     "inclus": "inclus"
+  },
+  "Erreur": {
+    "erreur": "Erreur !",
+    "erreur-globale": "Erreur globale !",
+    "reessayer": "Réessayer",
+    "retour": "Retour"
   }
 }

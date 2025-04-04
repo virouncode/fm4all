@@ -1,4 +1,4 @@
-import DevisBreadcrumb from "@/components/devis/DevisBreadcrumb";
+import DevisBreadcrumb from "../DevisBreadcrumb";
 
 export default function AfficherMonDevisLayout({
   children,

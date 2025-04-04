@@ -5,12 +5,44 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import {
+  getArticlesSlugEn,
+  getArticlesSlugFr,
+} from "@/i18n/articlesSlugMappings";
+import { generateAlternates } from "@/lib/metadata-helpers";
 import { client } from "@/sanity/lib/client";
+import { urlFor } from "@/sanity/lib/image";
 import { CATEGORIE_QUERY } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ArticleCategory } from "../../../../../sanity.types";
 import ArticlesCards from "./ArticlesCards";
+
+export const generateMetadata = async ({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) => {
+  const locale = await getLocale();
+  const { slug } = await params;
+  const categorie = await client.fetch<ArticleCategory>(CATEGORIE_QUERY, {
+    language: locale,
+    slug,
+  });
+  return generateAlternates(
+    "blogCategorie",
+    locale,
+    categorie.baliseTitle ?? "",
+    categorie.baliseDescription ?? "",
+    categorie.imagePrincipale
+      ? urlFor(categorie.imagePrincipale).url()
+      : "/img/logo_full_white.webp.png",
+    {
+      fr: locale === "fr" ? slug : getArticlesSlugFr(slug),
+      en: locale === "en" ? slug : getArticlesSlugEn(slug),
+    }
+  );
+};
 
 const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const tGlobal = await getTranslations("Global");

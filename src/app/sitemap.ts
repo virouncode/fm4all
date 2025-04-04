@@ -1,180 +1,116 @@
-import type { MetadataRoute } from "next";
+import {
+  getArticlesSlugEn,
+  getArticlesSubSlugEn,
+} from "@/i18n/articlesSlugMappings";
+import { routing } from "@/i18n/routing";
+import { getServicesSlugEn } from "@/i18n/servicesSlugMappings";
+import {
+  fetchArticleCategories,
+  fetchArticleSlugs,
+  fetchServiceSlugs,
+} from "@/sanity/queries";
+import { MetadataRoute } from "next";
+const BASE_URL = "https://www.fm4all.com";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+const lastMod = new Date().toISOString();
+// Fonction pour générer les URLs des pages statiques
+const generateStaticUrls = () => {
+  const urls: MetadataRoute.Sitemap = [];
+
+  // Pour chaque locale et chaque route définie dans routing.ts
+  for (const locale of routing.locales) {
+    // Parcourir toutes les routes définies dans routing.pathnames
+    for (const [path, localized] of Object.entries(routing.pathnames)) {
+      // Ignorer les routes dynamiques avec paramètres
+      if (path.includes("[") && path.includes("]")) continue;
+
+      // Obtenir le chemin localisé
+      let localizedPath = "";
+      if (typeof localized == "string") {
+        localizedPath = localized;
+      } else if (localized && locale in localized) {
+        localizedPath = localized[locale];
+      } else {
+        localizedPath = path;
+      }
+
+      // Ajouter l'URL au sitemap
+      urls.push({
+        url: `${BASE_URL}/${locale}${localizedPath}`,
+        lastModified: lastMod,
+        changeFrequency: "weekly",
+        priority: 0.8,
+      });
+    }
+  }
+
+  return urls;
+};
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const staticUrls = generateStaticUrls();
+  const serviceSlugs = await fetchServiceSlugs();
+  const articlesCategories = await fetchArticleCategories();
+  const articleSlugs = await fetchArticleSlugs();
+
+  const servicesUrls: MetadataRoute.Sitemap = serviceSlugs.flatMap((slug) => {
+    if (!slug) return [];
+    return [
+      {
+        url: `${BASE_URL}/fr/services/${slug}`,
+        lastModified: lastMod,
+        changeFrequency: "weekly",
+        priority: 0.7,
+      },
+      {
+        url: `${BASE_URL}/en/services/${getServicesSlugEn(slug)}`,
+        lastModified: lastMod,
+        changeFrequency: "weekly",
+        priority: 0.7,
+      },
+    ];
+  });
+  const articlesCategoriesUrls: MetadataRoute.Sitemap =
+    articlesCategories.flatMap((slug) => {
+      if (!slug) return [];
+      return [
+        {
+          url: `${BASE_URL}/fr/articles/${slug}`,
+          lastModified: lastMod,
+          changeFrequency: "weekly",
+          priority: 0.7,
+        },
+        {
+          url: `${BASE_URL}/en/posts/${getArticlesSlugEn(slug)}`,
+          lastModified: lastMod,
+          changeFrequency: "weekly",
+          priority: 0.7,
+        },
+      ];
+    });
+  const articlesUrls: MetadataRoute.Sitemap = articleSlugs.flatMap(
+    (article) => {
+      return [
+        {
+          url: `${BASE_URL}/fr/articles/${article.slug}/${article.subSlug}`,
+          lastModified: lastMod,
+          changeFrequency: "weekly",
+          priority: 0.7,
+        },
+        {
+          url: `${BASE_URL}/en/posts/${getArticlesSlugEn(article.slug)}/${getArticlesSubSlugEn(article.subSlug)}`,
+          lastModified: lastMod,
+          changeFrequency: "weekly",
+          priority: 0.7,
+        },
+      ];
+    }
+  );
+
   return [
-    {
-      url: "https://www.fm4all.com",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 1,
-    },
-    {
-      url: "https://fm4all.com",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 1,
-    },
-    {
-      url: "https://www.fm4all.com/services",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: "https://www.fm4all.com/nos-3-gammes",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: "https://www.fm4all.com/nos-engagements",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: "https://www.fm4all.com/nos-partenaires",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: "https://www.fm4all.com/faq",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: "https://www.fm4all.com/services/nettoyage",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
-    {
-      url: "https://www.fm4all.com/services/hygiene",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
-    {
-      url: "https://www.fm4all.com/services/maintenance",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
-    {
-      url: "https://www.fm4all.com/services/securite-incendie",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
-    {
-      url: "https://www.fm4all.com/services/cafe",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
-    {
-      url: "https://www.fm4all.com/services/snack",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
-    {
-      url: "https://www.fm4all.com/services/eau",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
-    {
-      url: "https://www.fm4all.com/services/office-manager",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
-    {
-      url: "https://www.fm4all.com/services/fm4all",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
-    {
-      url: "https://www.fm4all.com/articles",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.6,
-    },
-    {
-      url: "https://www.fm4all.com/articles/le-fm-cest-quoi",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.6,
-    },
-    {
-      url: "https://www.fm4all.com/articles/missions-du-fm",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.6,
-    },
-    {
-      url: "https://www.fm4all.com/articles/lexternalisation-du-fm",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.6,
-    },
-    {
-      url: "https://www.fm4all.com/articles/le-fm-fait-il-faire-des-economies",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.6,
-    },
-    {
-      url: "https://www.fm4all.com/articles/histoire-du-nettoyage",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.6,
-    },
-    {
-      url: "https://www.fm4all.com/articles/hof-managers",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.6,
-    },
-    {
-      url: "https://www.fm4all.com/devenir-prestataire",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: "https://www.fm4all.com/contact",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: "https://www.fm4all.com/mentions-legales",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.4,
-    },
-    {
-      url: "https://www.fm4all.com/mon-devis/mes-locaux",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.5,
-    },
-    {
-      url: "https://www.fm4all.com/politique-de-confidentialite",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.5,
-    },
-    {
-      url: "https://www.fm4all.com/politique-de-cookies",
-      lastModified: "2025-03-02T09:35:25.103Z",
-      changeFrequency: "weekly",
-      priority: 0.5,
-    },
+    ...staticUrls,
+    ...servicesUrls,
+    ...articlesCategoriesUrls,
+    ...articlesUrls,
   ];
 }

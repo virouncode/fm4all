@@ -1,17 +1,22 @@
 import { generateAlternates } from "@/lib/metadata-helpers";
+import { generateLocaleParams } from "@/lib/staticParamsHelper";
 import { Metadata } from "next";
 import { getLocale } from "next-intl/server";
-import Hero from "../Hero";
-import HofManager from "../HofManager";
-import How from "../How";
-import Mission from "../Mission";
-import Partenaires from "../Partenaires";
-import Presentation from "../Presentation";
-import Services from "../Services";
-import Slogan from "../Slogan";
-import VideoPresentation from "../VideoPresentation";
-import Why from "../Why";
-import Articles from "../Articles";
+import Articles from "../../components/Articles";
+import Hero from "../../components/Hero";
+import HofManager from "../../components/HofManager";
+import How from "../../components/How";
+import Mission from "../../components/Mission";
+import Partenaires from "../../components/Partenaires";
+import Presentation from "../../components/Presentation";
+import Services from "../../components/Services";
+import Slogan from "../../components/Slogan";
+import VideoPresentation from "../../components/VideoPresentation";
+import Why from "../../components/Why";
+
+export const generateStaticParams = () => {
+  return generateLocaleParams();
+};
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const locale = await getLocale();

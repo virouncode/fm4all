@@ -11,6 +11,19 @@ export const articleCategoryType = defineType({
       title: "Titre",
       name: "titre",
       type: "string",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      title: "Balise Titre",
+      name: "baliseTitle",
+      type: "string",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      title: "Balise Description",
+      name: "baliseDescription",
+      type: "string",
+      validation: (rule) => rule.required(),
     }),
     defineField({
       title: "Slug",
@@ -19,6 +32,23 @@ export const articleCategoryType = defineType({
       options: {
         source: "titre",
       },
+      validation: (rule) => rule.required(),
+    }),
+    //Image principale
+    defineField({
+      title: "Image principale",
+      name: "imagePrincipale",
+      type: "image",
+      options: {
+        hotspot: true,
+      },
+      fields: [
+        defineField({
+          name: "alt",
+          type: "string",
+          title: "Texte alternatif",
+        }),
+      ],
     }),
     defineField({
       name: "language",
@@ -29,6 +59,7 @@ export const articleCategoryType = defineType({
           { title: "Français", value: "fr" },
         ],
       },
+      validation: (rule) => rule.required(),
     }),
   ],
 });

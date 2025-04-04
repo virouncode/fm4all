@@ -1,4 +1,4 @@
-import DevisBreadcrumb from "@/components/devis/DevisBreadcrumb";
+import DevisBreadcrumb from "../DevisBreadcrumb";
 import Total from "../Total";
 
 export default function MonDevisLayout({

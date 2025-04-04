@@ -1,7 +1,7 @@
 // src/i18n/slugMappings.ts
 export const articlesSlugMappingsFrToEn: Record<string, string> = {
-  "facility-management": "facility-management-paris",
-  nettoyage: "nettoyage",
+  "pilotage-facility-management": "facilities-management-outsourcing",
+  nettoyage: "cleaning-services",
   // Ajoutez tous vos autres services ici
 };
 // Mappings des slugs de services du français vers l'anglais

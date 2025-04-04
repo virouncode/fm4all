@@ -10,6 +10,10 @@ import {
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 
+import {
+  getServicesSlugEn,
+  getServicesSlugFr,
+} from "@/i18n/servicesSlugMappings";
 import { generateAlternates } from "@/lib/metadata-helpers";
 import { SERVICE_QUERY } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
@@ -93,26 +97,27 @@ const ptComponents = {
   },
 };
 
-// export const generateStaticParams = async () => {
-
-//   const services = await client
-//     .withConfig({ useCdn: false })
-//     .fetch<Service[]>(SERVICES_QUERY, {});
-//   return services.map((service) => ({ slug: service.slug?.current }));
-// };
-
 export const generateMetadata = async ({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> => {
-  const service = await client.fetch<Service>(SERVICE_QUERY, await params);
   const locale = await getLocale();
+  const { slug } = await params;
+  const service = await client.fetch<Service>(SERVICE_QUERY, { slug });
+
   return generateAlternates(
-    "services",
+    "servicePresentation",
     locale,
-    service.titre ?? "",
-    service.description ?? ""
+    service.baliseTitle ?? "",
+    service.baliseDescription ?? "",
+    service.imagePrincipale
+      ? urlFor(service.imagePrincipale).url()
+      : "/img/logo_full_white.webp.png",
+    {
+      fr: locale === "fr" ? slug : getServicesSlugFr(slug),
+      en: locale === "en" ? slug : getServicesSlugEn(slug),
+    }
   );
 };
 
