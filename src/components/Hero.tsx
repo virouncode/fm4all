@@ -1,6 +1,5 @@
 import DevisButton from "@/components/devis-button";
 import { getTranslations } from "next-intl/server";
-import Image from "next/image";
 
 const Hero = async () => {
   const tGlobal = await getTranslations("Global");
@@ -11,14 +10,14 @@ const Hero = async () => {
       id="hero"
     >
       <div className="absolute inset-0 z-0">
-        <Image
+        {/* <Image
           src={"/img/hero_wallpaper.webp"}
           alt="une image de bureaux modernes et lumineux avec des plantes vertes"
           className="object-cover"
           quality={75}
           priority
           fill
-        />
+        /> */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/40"></div>
       </div>
       <div className="relative z-10 w-11/12 max-w-7xl mx-auto flex flex-col items-center gap-8 px-4 py-12">
