@@ -332,7 +332,7 @@ const page = async ({ params }: { params: Promise<{ subSlug: string }> }) => {
             </h2>
             <ExpertiseCarousel
               services={article.servicesAssocies}
-              sousServices={article.sousServicesAssocies}
+              // sousServices={article.sousServicesAssocies}
               secteurs={article.secteursAssocies}
             />
           </div>
