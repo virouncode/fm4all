@@ -104,7 +104,6 @@ export const generateMetadata = async ({
   const locale = await getLocale();
   const { slug } = await params;
   const service = await getService(slug);
-
   return generateAlternates(
     "servicePresentation",
     locale,

@@ -81,6 +81,8 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     );
 
   const disallowUrls = [
+    "/fr/test-shadcn-colors",
+    "/en/test-shadcn-colors",
     "/fr/mon-devis/*",
     "/en/my-quote/*",
     ...wrongStaticUrls,
