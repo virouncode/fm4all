@@ -18,8 +18,6 @@ const Hero = async () => {
           quality={75}
           priority
           fill
-          sizes="(max-width: 768px) 100vw, 50vw"
-          loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/40"></div>
       </div>
