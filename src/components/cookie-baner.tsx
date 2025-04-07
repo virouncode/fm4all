@@ -64,7 +64,9 @@ const CookieBanner = () => {
       <SheetTrigger asChild></SheetTrigger>
       <SheetContent side="bottom" className="[&>button:first-child]:hidden">
         <SheetHeader>
-          <SheetTitle></SheetTitle>
+          <SheetTitle className="sr-only">
+            {t("banniere-de-consentement-aux-cookies")}
+          </SheetTitle>
         </SheetHeader>
         <div className="flex flex-col gap-6 justify-between text-sm px-6 lg:px-40 py-4 items-center md:flex-row">
           <div className="flex flex-col gap-2">
@@ -94,7 +96,7 @@ const CookieBanner = () => {
               <span>{t("pour-en-savoir-plus-veuillez-consulter-notre")} </span>
               <Link
                 href="/cookies"
-                className="text-fm4allsecondary cursor-pointer hover:opacity-80"
+                className="underline cursor-pointer hover:opacity-80"
                 target="_blank"
               >
                 {t("politique-relative-aux-cookies")}
