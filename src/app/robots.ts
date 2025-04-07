@@ -65,9 +65,20 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     `/en/posts/${article.slug}/${article.subSlug}`,
     `/en/posts/${article.slug}/${getArticlesSubSlugEn(article.subSlug)}`,
   ]);
-  const wrongTagsUrls = tagsSlugs.flatMap((slug) =>
-    slug ? [`/fr/tags/${getTagSlugEn(slug)}`, `/en/tags/${slug}`] : []
-  );
+  const wrongTagsUrls = tagsSlugs
+    .filter(
+      (slug) =>
+        slug !== "hygiene" &&
+        slug !== "maintenance" &&
+        slug !== "food-and-beverage" &&
+        slug !== "facility-manager" &&
+        slug !== "hospitality-manager" &&
+        slug !== "office-manager" &&
+        slug !== "fm"
+    )
+    .flatMap((slug) =>
+      slug ? [`/fr/tags/${getTagSlugEn(slug)}`, `/en/tags/${slug}`] : []
+    );
 
   const disallowUrls = [
     "/fr/mon-devis/*",

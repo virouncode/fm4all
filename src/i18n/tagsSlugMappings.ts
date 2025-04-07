@@ -14,6 +14,7 @@ export const tagsSlugMappingsFrToEn: Record<string, string> = {
   "hospitality-manager": "hospitality-manager",
   "pilotage-prestations": "service-management",
   FM: "FM",
+  proprete: "cleanliness",
   // Ajoutez tous vos autres services ici
 };
 
