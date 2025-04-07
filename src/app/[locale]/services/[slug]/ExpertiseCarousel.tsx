@@ -66,7 +66,7 @@ const ExpertiseCarousel = async ({
           }}
           className="w-full"
         >
-          <CarouselContent>
+          <CarouselContent className="py-1">
             {/* {[...(services || []), ...(sousServices || [])] */}
             {[...(services || [])].map((service) => {
               const serviceImageUrl = service.imagePrincipale
