@@ -15,9 +15,11 @@ const Hero = async () => {
           src={"/img/hero_wallpaper.webp"}
           alt="une image de bureaux modernes et lumineux avec des plantes vertes"
           className="object-cover"
-          quality={100}
+          quality={75}
           priority
           fill
+          sizes="(max-width: 768px) 100vw, 50vw"
+          loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/40"></div>
       </div>

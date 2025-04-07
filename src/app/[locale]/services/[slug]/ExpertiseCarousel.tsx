@@ -1,5 +1,3 @@
-"use client";
-
 import ImgCardVertical from "@/components/cards/ImgCardVertical";
 import {
   Carousel,
@@ -10,7 +8,7 @@ import {
 } from "@/components/ui/carousel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { urlFor } from "@/sanity/lib/image";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import {
   Article,
   ArticleCategory,
@@ -25,13 +23,13 @@ type ExpertiseCarouselProps = {
   articles?: (Article & { categorie: ArticleCategory })[];
 };
 
-const ExpertiseCarousel = ({
+const ExpertiseCarousel = async ({
   services,
   // sousServices,
   secteurs,
   articles,
 }: ExpertiseCarouselProps) => {
-  const t = useTranslations("Global");
+  const t = await getTranslations("Global");
 
   return (
     <Tabs defaultValue="services">

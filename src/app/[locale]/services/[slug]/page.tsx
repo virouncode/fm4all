@@ -27,7 +27,6 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Slug } from "../../../../../sanity.types";
 import ExpertiseCarousel from "./ExpertiseCarousel";
-import locale from "date-fns/locale/af";
 
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
