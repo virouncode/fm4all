@@ -12,7 +12,7 @@ const Hero = async () => {
     >
       <div className="absolute inset-0 z-0">
         <Image
-          src={"/img/hero_wallpaper.webp"}
+          src={"/img/hero_wallpaper_compressed.webp"}
           alt="une image de bureaux modernes et lumineux avec des plantes vertes"
           className="object-cover"
           quality={75}
