@@ -5,6 +5,9 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { getTagSlugEn, getTagSlugFr } from "@/i18n/tagsSlugMappings";
+import { capitalize } from "@/lib/capitalize";
+import { generateAlternates } from "@/lib/metadata-helpers";
 import {
   getTagNom,
   getTagRelatedArticles,
@@ -12,7 +15,30 @@ import {
   getTagRelatedServices,
 } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
+import { getLocale } from "next-intl/server";
 import ExpertiseCarousel from "../../services/[slug]/ExpertiseCarousel";
+
+export const generateMetadata = async ({
+  params,
+}: {
+  params: Promise<{ tag: string }>;
+}) => {
+  const { tag } = await params;
+  const locale = await getLocale();
+  return generateAlternates(
+    "tag",
+    locale,
+    capitalize(tag),
+    locale === "fr"
+      ? `Découvrez nos articles, services et secteurs associés au tag "${tag}"`
+      : `Discover our articles, services and sectors associated with the tag "${tag}"`,
+    "/img/logo_full_white.webp.png",
+    {
+      fr: locale === "fr" ? tag : getTagSlugFr(tag),
+      en: locale === "en" ? tag : getTagSlugEn(tag),
+    }
+  );
+};
 
 const page = async ({
   params,
