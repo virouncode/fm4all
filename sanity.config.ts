@@ -12,13 +12,14 @@ import { structureTool } from "sanity/structure";
 import { apiVersion, dataset, projectId } from "./src/sanity/env";
 import { structure } from "./src/sanity/structure";
 
-// Import schema types directly
+// Import schema types directly with relative paths
 import { articleCategoryType } from "./src/sanity/schemaTypes/articleCategoryType";
 import { articleType } from "./src/sanity/schemaTypes/articleType";
 import { auteurType } from "./src/sanity/schemaTypes/auteurType";
 import { secteurType } from "./src/sanity/schemaTypes/secteurType";
 import { serviceType } from "./src/sanity/schemaTypes/serviceType";
 import { sousServiceType } from "./src/sanity/schemaTypes/sousServiceType";
+import { tagType } from "./src/sanity/schemaTypes/tagType";
 
 const TRANSLATABLE_TYPES = ["article", "service", "sousService", "secteur"];
 
@@ -29,6 +30,7 @@ const config = {
   dataset,
   schema: {
     types: [
+      tagType,
       articleCategoryType,
       auteurType,
       articleType,

@@ -1,5 +1,6 @@
 import CTAContactButtons from "@/components/cta-contact-buttons";
 import DevisButton from "@/components/devis-button";
+import Tag from "@/components/Tag";
 import {
   Breadcrumb,
   BreadcrumbLink,
@@ -7,15 +8,13 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { client } from "@/sanity/lib/client";
-import { urlFor } from "@/sanity/lib/image";
-
 import {
   getServicesSlugEn,
   getServicesSlugFr,
 } from "@/i18n/servicesSlugMappings";
 import { generateAlternates } from "@/lib/metadata-helpers";
-import { SERVICE_QUERY } from "@/sanity/queries";
+import { urlFor } from "@/sanity/lib/image";
+import { getAssociated, getService } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -26,7 +25,6 @@ import {
 } from "next-sanity";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Secteur, Service, SousService } from "../../../../../sanity.types";
 import ExpertiseCarousel from "./ExpertiseCarousel";
 
 // Custom components for PortableText
@@ -104,7 +102,7 @@ export const generateMetadata = async ({
 }): Promise<Metadata> => {
   const locale = await getLocale();
   const { slug } = await params;
-  const service = await client.fetch<Service>(SERVICE_QUERY, { slug });
+  const service = await getService(slug);
 
   return generateAlternates(
     "servicePresentation",
@@ -125,16 +123,13 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const tGlobal = await getTranslations("Global");
   const t = await getTranslations("ServicesPage");
   // const options = { next: { revalidate: 30 } };
-  const service = await client.fetch<
-    Service & {
-      servicesAssocies: Service[];
-      sousServicesAssocies: SousService[];
-      secteursAssocies: Secteur[];
-    }
-  >(
-    SERVICE_QUERY,
-    await params
-    // options
+  const { slug } = await params;
+  const service = await getService(slug);
+  const tagsSortants = service.tagsSortants as { _id: string; nom: string }[];
+
+  const associated = await getAssociated(
+    tagsSortants.map((tag) => tag._id),
+    service._id
   );
 
   if (!service) {
@@ -227,8 +222,13 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
         </BreadcrumbList>
       </Breadcrumb>
       <section className="flex flex-row gap-10 mb-16">
-        <div className="flex flex-col flex-1 justify-start text-lg gap-10">
+        <div className="flex flex-col flex-1 justify-start text-lg gap-8">
           <h1 className="text-5xl">{service.titre}</h1>
+          <div className="flex flex-row gap-2 flex-wrap">
+            {tagsSortants.map((tag) => (
+              <Tag nom={tag.nom} key={tag._id} />
+            ))}
+          </div>
           <div
             className="flex flex-col gap-4 prose-lg 
           prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
@@ -263,23 +263,21 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
           </div>
         ) : null}
       </section>
-      {(service.secteursAssocies ||
-        service.servicesAssocies ||
-        service.sousServicesAssocies) && (
+      {(associated.articles || associated.services || associated.secteurs) && (
         <section className="flex flex-row gap-10 mb-16">
           <div className="w-full">
             <h2 className="border-l-2 px-4 text-4xl mb-10">
               {t("notre-expertise")}
             </h2>
             <ExpertiseCarousel
-              services={service.servicesAssocies}
-              sousServices={service.sousServicesAssocies}
-              secteurs={service.secteursAssocies}
+              services={associated.services}
+              // sousServices={service.sousServicesAssocies}
+              secteurs={associated.secteurs}
+              articles={associated.articles}
             />
           </div>
         </section>
       )}
-
       <section className="flex flex-row gap-10 mb-16">
         {serviceImageBloc1Url ? (
           <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">

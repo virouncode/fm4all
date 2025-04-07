@@ -157,7 +157,7 @@ const SnacksFruitsPropositions = ({
       (tarif) => tarif.fournisseurId === fournisseurId
     );
     const remiseSiCafe = isSameFournisseur
-      ? fraisLivraisonsFournisseur?.remiseSiCafe ?? 0
+      ? (fraisLivraisonsFournisseur?.remiseSiCafe ?? 0)
       : 0;
     const prixPanier =
       (1 - remiseSiCafe / 100) * (panierFruits + panierSnacks + panierBoissons);
@@ -166,10 +166,10 @@ const SnacksFruitsPropositions = ({
     const isPanierMin = panierMin === null || prixPanier >= panierMin;
 
     const prixUnitaireLivraisonSiCafe = isPanierMin
-      ? fraisLivraisonsFournisseur?.prixUnitaireSiCafe ?? null
+      ? (fraisLivraisonsFournisseur?.prixUnitaireSiCafe ?? null)
       : null;
     const prixUnitaireLivraison = isPanierMin
-      ? fraisLivraisonsFournisseur?.prixUnitaire ?? null
+      ? (fraisLivraisonsFournisseur?.prixUnitaire ?? null)
       : null;
 
     let fraisLivraisonPanier = isSameFournisseur

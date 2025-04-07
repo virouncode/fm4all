@@ -86,40 +86,29 @@ export const serviceType = defineType({
       ],
       validation: (rule) => rule.required(),
     }),
+    //Tags
     //Notre expertise
     defineField({
-      title: "Services associés",
-      name: "servicesAssocies",
+      title: "Tags entrants",
+      name: "tagsEntrants",
       type: "array",
       of: [
         defineArrayMember({
           type: "reference",
-          name: "service",
-          to: [{ type: "service" }],
+          name: "tag",
+          to: [{ type: "tag" }],
         }),
       ],
     }),
     defineField({
-      title: "Sous Services associés",
-      name: "sousServicesAssocies",
+      title: "Tags sortants",
+      name: "tagsSortants",
       type: "array",
       of: [
         defineArrayMember({
           type: "reference",
-          name: "sousService",
-          to: [{ type: "sousService" }],
-        }),
-      ],
-    }),
-    defineField({
-      title: "Secteurs associés",
-      name: "secteursAssocies",
-      type: "array",
-      of: [
-        defineArrayMember({
-          type: "reference",
-          name: "secteur",
-          to: [{ type: "secteur" }],
+          name: "tag",
+          to: [{ type: "tag" }],
         }),
       ],
     }),

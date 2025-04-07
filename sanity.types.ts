@@ -68,6 +68,16 @@ export type Geopoint = {
   alt?: number;
 };
 
+export type Tag = {
+  _id: string;
+  _type: "tag";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  nom?: string;
+  language?: "en" | "fr";
+};
+
 export type SanityAssistInstructionTask = {
   _type: "sanity.assist.instructionTask";
   path?: string;
@@ -862,26 +872,19 @@ export type Service = {
     alt?: string;
     _type: "image";
   };
-  servicesAssocies?: Array<{
+  tagsEntrants?: Array<{
     _ref: string;
     _type: "reference";
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: "service";
+    [internalGroqTypeReferenceTo]?: "tag";
   }>;
-  sousServicesAssocies?: Array<{
+  tagsSortants?: Array<{
     _ref: string;
     _type: "reference";
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: "sousService";
-  }>;
-  secteursAssocies?: Array<{
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    _key: string;
-    [internalGroqTypeReferenceTo]?: "secteur";
+    [internalGroqTypeReferenceTo]?: "tag";
   }>;
   imageBloc1?: {
     asset?: {
@@ -1354,6 +1357,20 @@ export type Article = {
     alt?: string;
     _type: "image";
   };
+  tagsEntrants?: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "tag";
+  }>;
+  tagsSortants?: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "tag";
+  }>;
   servicesAssocies?: Array<{
     _ref: string;
     _type: "reference";
@@ -1944,5 +1961,5 @@ export type InternationalizedArrayReference = Array<{
   _key: string;
 } & InternationalizedArrayReferenceValue>;
 
-export type AllSanitySchemaTypes = SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityFileAsset | Geopoint | SanityAssistInstructionTask | SanityAssistTaskStatus | SanityAssistSchemaTypeAnnotations | SanityAssistOutputType | SanityAssistOutputField | SanityAssistInstructionContext | AssistInstructionContext | SanityAssistInstructionUserInput | SanityAssistInstructionPrompt | SanityAssistInstructionFieldRef | SanityAssistInstruction | SanityAssistSchemaTypeField | TranslationMetadata | InternationalizedArrayReferenceValue | Secteur | SousService | Service | Article | Auteur | ArticleCategory | SanityImageCrop | SanityImageHotspot | SanityImageAsset | SanityAssetSourceData | SanityImageMetadata | Slug | InternationalizedArrayReference;
+export type AllSanitySchemaTypes = SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityFileAsset | Geopoint | Tag | SanityAssistInstructionTask | SanityAssistTaskStatus | SanityAssistSchemaTypeAnnotations | SanityAssistOutputType | SanityAssistOutputField | SanityAssistInstructionContext | AssistInstructionContext | SanityAssistInstructionUserInput | SanityAssistInstructionPrompt | SanityAssistInstructionFieldRef | SanityAssistInstruction | SanityAssistSchemaTypeField | TranslationMetadata | InternationalizedArrayReferenceValue | Secteur | SousService | Service | Article | Auteur | ArticleCategory | SanityImageCrop | SanityImageHotspot | SanityImageAsset | SanityAssetSourceData | SanityImageMetadata | Slug | InternationalizedArrayReference;
 export declare const internalGroqTypeReferenceTo: unique symbol;

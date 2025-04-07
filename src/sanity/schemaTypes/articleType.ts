@@ -88,8 +88,34 @@ export const articleType = defineType({
           title: "Texte alternatif",
         }),
       ],
+      validation: (rule) => rule.required(),
     }),
-    //Notre expertise
+    //Tags
+    defineField({
+      title: "Tags entrants",
+      name: "tagsEntrants",
+      type: "array",
+      of: [
+        defineArrayMember({
+          type: "reference",
+          name: "tag",
+          to: [{ type: "tag" }],
+        }),
+      ],
+    }),
+    defineField({
+      title: "Tags sortants",
+      name: "tagsSortants",
+      type: "array",
+      of: [
+        defineArrayMember({
+          type: "reference",
+          name: "tag",
+          to: [{ type: "tag" }],
+        }),
+      ],
+    }),
+    // //Notre expertise
     defineField({
       title: "Services associés",
       name: "servicesAssocies",

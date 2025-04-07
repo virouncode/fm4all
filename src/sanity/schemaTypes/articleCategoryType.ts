@@ -49,6 +49,7 @@ export const articleCategoryType = defineType({
           title: "Texte alternatif",
         }),
       ],
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: "language",

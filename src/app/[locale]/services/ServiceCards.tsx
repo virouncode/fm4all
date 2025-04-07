@@ -1,18 +1,12 @@
 import ImgCardVertical from "@/components/cards/ImgCardVertical";
-import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
-import { SERVICES_QUERY } from "@/sanity/queries";
+import { getAllServices } from "@/sanity/queries";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Service } from "../../../../sanity.types";
 
 const ServiceCards = async () => {
   // const options = { next: { revalidate: 30 } };
   const locale = await getLocale();
-  const services = await client.fetch<Service[]>(
-    SERVICES_QUERY,
-    { language: locale }
-    // options
-  );
+  const services = await getAllServices(locale as "fr" | "en");
   const t = await getTranslations("Global");
 
   return (

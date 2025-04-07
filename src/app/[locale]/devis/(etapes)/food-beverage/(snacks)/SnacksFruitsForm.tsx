@@ -160,6 +160,7 @@ const SnacksFruitsForm = ({
       const remiseSiCafe = isSameFournisseur
         ? (fraisLivraisonsFournisseur?.remiseSiCafe ?? 0)
         : 0;
+
       const prixPanier =
         (1 - remiseSiCafe / 100) *
         (panierFruits + panierSnacks + panierBoissons);

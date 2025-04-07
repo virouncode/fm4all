@@ -16,27 +16,32 @@ import {
   ArticleCategory,
   Secteur,
   Service,
-  SousService,
 } from "../../../../../sanity.types";
 
 type ExpertiseCarouselProps = {
   services: Service[];
-  sousServices: SousService[];
+  // sousServices: SousService[];
   secteurs: Secteur[];
   articles?: (Article & { categorie: ArticleCategory })[];
 };
 
 const ExpertiseCarousel = ({
   services,
-  sousServices,
+  // sousServices,
   secteurs,
   articles,
 }: ExpertiseCarouselProps) => {
   const t = useTranslations("Global");
+
   return (
     <Tabs defaultValue="services">
       <TabsList className="mb-10">
-        {[...(services || []), ...(sousServices || [])].length > 0 ? (
+        {/* {[...(services || []), ...(sousServices || [])].length > 0 ? (
+          <TabsTrigger value="services" className="text-lg">
+            {t("services-associes")}
+          </TabsTrigger>
+        ) : null} */}
+        {[...(services || [])].length > 0 ? (
           <TabsTrigger value="services" className="text-lg">
             {t("services-associes")}
           </TabsTrigger>
@@ -61,7 +66,8 @@ const ExpertiseCarousel = ({
           className="w-full"
         >
           <CarouselContent>
-            {[...(services || []), ...(sousServices || [])].map((service) => {
+            {/* {[...(services || []), ...(sousServices || [])] */}
+            {[...(services || [])].map((service) => {
               const serviceImageUrl = service.imagePrincipale
                 ? urlFor(service.imagePrincipale)
                 : null; //TODO placeholder image

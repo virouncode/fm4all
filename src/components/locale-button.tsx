@@ -34,8 +34,6 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
   const searchParams = useSearchParams();
 
   const handleChangeLang = (newLocale: "fr" | "en") => {
-    console.log("pathname", pathname);
-
     if (newLocale === locale) return;
     const query: Record<string, string> = {};
     searchParams.forEach((value, key) => {

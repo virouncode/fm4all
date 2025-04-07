@@ -1,17 +1,13 @@
 import { Link } from "@/i18n/navigation";
 import { client } from "@/sanity/lib/client";
-import { LAST_ARTICLES_QUERY, SERVICES_QUERY } from "@/sanity/queries";
+import { getAllServices, LAST_ARTICLES_QUERY } from "@/sanity/queries";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Article, ArticleCategory, Service } from "../../sanity.types";
+import { Article, ArticleCategory } from "../../sanity.types";
 
 const Footer = async () => {
   const t = await getTranslations("footer");
   const locale = await getLocale();
-  const services = await client.fetch<Service[]>(
-    SERVICES_QUERY,
-    { language: locale }
-    // options
-  );
+  const services = await getAllServices(locale as "fr" | "en");
   const articles = await client.fetch<
     (Article & { categorie: ArticleCategory })[]
   >(LAST_ARTICLES_QUERY, { language: locale });
