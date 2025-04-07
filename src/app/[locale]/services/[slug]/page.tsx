@@ -1,6 +1,6 @@
 import CTAContactButtons from "@/components/cta-contact-buttons";
 import DevisButton from "@/components/devis-button";
-import Tag from "@/components/Tag";
+import TagButton from "@/components/TagButton";
 import {
   Breadcrumb,
   BreadcrumbLink,
@@ -14,7 +14,7 @@ import {
 } from "@/i18n/servicesSlugMappings";
 import { generateAlternates } from "@/lib/metadata-helpers";
 import { urlFor } from "@/sanity/lib/image";
-import { getAssociated, getService } from "@/sanity/queries";
+import { getAssociatedToService, getService } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -25,6 +25,7 @@ import {
 } from "next-sanity";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { Slug } from "../../../../../sanity.types";
 import ExpertiseCarousel from "./ExpertiseCarousel";
 
 // Custom components for PortableText
@@ -125,9 +126,13 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
   // const options = { next: { revalidate: 30 } };
   const { slug } = await params;
   const service = await getService(slug);
-  const tagsSortants = service.tagsSortants as { _id: string; nom: string }[];
+  const tagsSortants = service.tagsSortants as {
+    _id: string;
+    nom: string;
+    slug: Slug;
+  }[];
 
-  const associated = await getAssociated(
+  const associated = await getAssociatedToService(
     tagsSortants.map((tag) => tag._id),
     service._id
   );
@@ -226,7 +231,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
           <h1 className="text-5xl">{service.titre}</h1>
           <div className="flex flex-row gap-2 flex-wrap">
             {tagsSortants.map((tag) => (
-              <Tag nom={tag.nom} key={tag._id} />
+              <TagButton tag={tag} key={tag._id} />
             ))}
           </div>
           <div

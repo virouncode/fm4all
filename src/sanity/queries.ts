@@ -1,4 +1,13 @@
-import { Article, ArticleCategory, Secteur, Service } from "../../sanity.types";
+import {
+  Article,
+  ArticleCategory,
+  internalGroqTypeReferenceTo,
+  SanityImageCrop,
+  SanityImageHotspot,
+  Secteur,
+  Service,
+  Slug,
+} from "../../sanity.types";
 import { client } from "./lib/client";
 
 //SERVICES
@@ -13,25 +22,27 @@ export const SERVICE_QUERY = `*[_type == "service" && slug.current == $slug][0]{
   ...,
   tagsEntrants[]->{
     _id,
-    nom
+    nom,
+    slug
   },
   tagsSortants[]->{
     _id,
-    nom
+    nom,
+    slug
   }
 }`;
 export const getService = async (slug: string) => {
   return await client.fetch<
     Service & {
-      tagsEntrants: { _id: string; nom: string }[];
-      tagsSortants: { _id: string; nom: string }[];
+      tagsEntrants: { _id: string; nom: string; slug: Slug }[];
+      tagsSortants: { _id: string; nom: string; slug: Slug }[];
     }
   >(SERVICE_QUERY, {
     slug,
   });
 };
 
-export const ASSOCIATED_QUERY = `
+export const ASSOCIATED_TO_SERVICE_QUERY = `
 {
   "articles": *[
     _type == "article" &&
@@ -40,7 +51,8 @@ export const ASSOCIATED_QUERY = `
     ...,
     tagsEntrants[]->{
       _id,
-      nom
+      nom,
+      slug
     },
     categorie->{
       _id,
@@ -56,7 +68,8 @@ export const ASSOCIATED_QUERY = `
     ...,
     tagsEntrants[]->{
       _id,
-      nom
+      nom,
+      slug
     }
   },
   "secteurs": *[
@@ -66,31 +79,147 @@ export const ASSOCIATED_QUERY = `
     ...,
     tagsEntrants[]->{
       _id,
-      nom
+      nom,
+      slug
     }
   }
 }`;
-export const getAssociated = async (
+export const getAssociatedToService = async (
   tagIds: string[],
   currentId: string
 ): Promise<{
   articles: (Article & {
-    tagsEntrants: { _id: string; nom: string }[];
+    tagsEntrants: { _id: string; nom: string; slug: Slug }[];
     categorie: ArticleCategory;
   })[];
   services: (Service & {
-    tagsEntrants: { _id: string; nom: string }[];
+    tagsEntrants: { _id: string; nom: string; slug: Slug }[];
   })[];
   secteurs: (Secteur & {
-    tagsEntrants: { _id: string; nom: string }[];
+    tagsEntrants: { _id: string; nom: string; slug: Slug }[];
   })[];
 }> => {
-  return await client.fetch(ASSOCIATED_QUERY, {
+  return await client.fetch(ASSOCIATED_TO_SERVICE_QUERY, {
     tagIds,
     currentId,
   });
 };
 
+export const ASSOCIATED_TO_ARTICLE_QUERY = `
+{
+  "articles": *[
+    _type == "article" &&
+    _id != $currentId &&
+    count(tagsEntrants[_ref in $tagIds]) > 0
+  ] | order(date desc){
+    ...,
+    tagsEntrants[]->{
+      _id,
+      nom,
+      slug
+    },
+    categorie->{
+      _id,
+      titre,
+      slug
+    }
+  },
+  "services": *[
+    _type == "service" &&
+    count(tagsEntrants[_ref in $tagIds]) > 0
+  ] | order(date desc){
+    ...,
+    tagsEntrants[]->{
+      _id,
+      nom,
+      slug
+    }
+  },
+  "secteurs": *[
+    _type == "secteur" &&
+    count(tagsEntrants[_ref in $tagIds]) > 0
+  ] | order(date desc){
+    ...,
+    tagsEntrants[]->{
+      _id,
+      nom,
+      slug
+    }
+  }
+}`;
+export const getAssociatedToArticle = async (
+  tagIds: string[],
+  currentId: string
+): Promise<{
+  articles: (Article & {
+    tagsEntrants: { _id: string; nom: string; slug: Slug }[];
+    categorie: ArticleCategory;
+  })[];
+  services: (Service & {
+    tagsEntrants: { _id: string; nom: string; slug: Slug }[];
+  })[];
+  secteurs: (Secteur & {
+    tagsEntrants: { _id: string; nom: string; slug: Slug }[];
+  })[];
+}> => {
+  return await client.fetch(ASSOCIATED_TO_ARTICLE_QUERY, {
+    tagIds,
+    currentId,
+  });
+};
+
+export const TAG_RELATED_SERVICES_QUERY = `*[_type == "service" && language == $language && $slug in tagsEntrants[]->slug.current
+]`;
+
+export const getTagRelatedServices = async (
+  locale: "fr" | "en",
+  slug: string
+): Promise<Service[]> => {
+  return await client.fetch<Service[]>(TAG_RELATED_SERVICES_QUERY, {
+    language: locale,
+    slug,
+  });
+};
+
+export const TAG_RELATED_ARTICLES_QUERY = `*[_type == "article" && language == $language && $slug in tagsEntrants[]->slug.current
+]`;
+
+export const getTagRelatedArticles = async (
+  locale: "fr" | "en",
+  slug: string
+): Promise<(Article & { categorie: ArticleCategory })[]> => {
+  return await client.fetch<(Article & { categorie: ArticleCategory })[]>(
+    TAG_RELATED_ARTICLES_QUERY,
+    {
+      language: locale,
+      slug,
+    }
+  );
+};
+
+export const TAG_RELATED_SECTEURS_QUERY = `*[_type == "secteur" && language == $language && $slug in tagsEntrants[]->slug.current
+]`;
+
+export const getTagRelatedSecteurs = async (
+  locale: "fr" | "en",
+  slug: string
+): Promise<Secteur[]> => {
+  return await client.fetch<Secteur[]>(TAG_RELATED_SECTEURS_QUERY, {
+    language: locale,
+    slug,
+  });
+};
+
+export const TAG_NOMS_QUERY = `*[_type == "tag" && slug.current == $slug][0]{
+nom}`;
+
+export const getTagNom = async (slug: string) => {
+  return await client.fetch<{ nom: string }>(TAG_NOMS_QUERY, {
+    slug,
+  });
+};
+
+//ARTICLES
 export const LAST_ARTICLES_QUERY = `*[_type == "article" && language == $language]|order(date desc)[0...10]{ 
 _id, titre, description, subSlug, imagePrincipale, 
 categorie->{
@@ -129,9 +258,47 @@ export const ARTICLE_QUERY = `*[_type == "article" && subSlug.current == $subSlu
       nom,
       image,
       },
+    tagsEntrants[]->{
+      _id,
+      nom,
+      slug
+      },
+    tagsSortants[]->{
+      _id,
+      nom,
+      slug
+      },
 }`;
-export const ARTICLES_ASSOCIES_QUERY = `*[_type == "article" && count(tagsEntrants[]._ref[ @ in $tags ]) > 0] | order(date desc)`;
+export const getArticle = async (subSlug: string) => {
+  return await client.fetch<
+    Article & {
+      categorie: ArticleCategory;
+      auteur: {
+        _id: string;
+        prenom: string;
+        nom: string;
+        image: {
+          asset?: {
+            _ref: string;
+            _type: "reference";
+            _weak?: boolean;
+            [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+          };
+          hotspot?: SanityImageHotspot;
+          crop?: SanityImageCrop;
+          alt?: string;
+          _type: "image";
+        };
+      };
+      tagsEntrants: { _id: string; nom: string; slug: Slug }[];
+      tagsSortants: { _id: string; nom: string; slug: Slug }[];
+    }
+  >(ARTICLE_QUERY, {
+    subSlug,
+  });
+};
 
+//SITEMAP
 export const fetchServiceSlugs = async () => {
   const query = `*[_type == "service" && language == "fr"]{slug{current}}`;
   const services = await client.fetch<Service[]>(query);

@@ -15,9 +15,8 @@ import {
 } from "@/i18n/articlesSlugMappings";
 import { capitalize } from "@/lib/capitalize";
 import { generateAlternates } from "@/lib/metadata-helpers";
-import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
-import { ARTICLE_QUERY } from "@/sanity/queries";
+import { getArticle, getAssociatedToArticle } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
 import { DateTime } from "luxon";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -28,13 +27,13 @@ import {
 } from "next-sanity";
 import Image from "next/image";
 import {
-  Article,
   ArticleCategory,
-  Auteur,
-  Secteur,
-  Service,
-  SousService,
+  internalGroqTypeReferenceTo,
+  SanityImageCrop,
+  SanityImageHotspot,
+  Slug,
 } from "../../../../../../sanity.types";
+import TagButton from "@/components/TagButton";
 
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
@@ -111,20 +110,7 @@ export const generateMetadata = async ({
 }) => {
   const { slug, subSlug } = await params;
   const locale = await getLocale();
-  const article = await client.fetch<
-    Article & {
-      categorie: ArticleCategory;
-      auteur: Auteur;
-      servicesAssocies: Service[];
-      sousServicesAssocies: SousService[];
-      secteursAssocies: Secteur[];
-      articlesAssocies: Article[];
-    }
-  >(
-    ARTICLE_QUERY,
-    { subSlug }
-    // options
-  );
+  const article = await getArticle(subSlug);
   return generateAlternates(
     "blogArticle",
     locale,
@@ -150,22 +136,35 @@ const page = async ({ params }: { params: Promise<{ subSlug: string }> }) => {
   const tGlobal = await getTranslations("Global");
   const t = await getTranslations("ServicesPage");
   const locale = await getLocale();
-  // const options = { next: { revalidate: 30 } };
-  const article = await client.fetch<
-    Article & {
-      categorie: ArticleCategory;
-      auteur: Auteur;
-      servicesAssocies: Service[];
-      sousServicesAssocies: SousService[];
-      secteursAssocies: Secteur[];
-      articlesAssocies: Article[];
-    }
-  >(
-    ARTICLE_QUERY,
-    await params
-    // options
+  // const options = { next: { revalidate: 30 } }
+  const { subSlug } = await params;
+  const article = await getArticle(subSlug);
+  const auteur = article.auteur as {
+    _id: string;
+    prenom: string;
+    nom: string;
+    image: {
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      _type: "image";
+    };
+  };
+  const tagsSortants = article.tagsSortants as {
+    _id: string;
+    nom: string;
+    slug: Slug;
+  }[];
+  const associated = await getAssociatedToArticle(
+    tagsSortants.map((tag) => tag._id),
+    article._id
   );
-  const auteur = article.auteur as Auteur;
   const auteurImageUrl = auteur.image ? urlFor(auteur.image) : null; //TODO placeholder image
   const auteurImageAlt = auteur.image?.alt
     ? auteur.image.alt
@@ -268,25 +267,10 @@ const page = async ({ params }: { params: Promise<{ subSlug: string }> }) => {
       <section className="flex flex-row gap-10 mb-16">
         <div className="flex flex-col flex-1 justify-start text-lg gap-10">
           <h1 className="text-5xl">{article.titre}</h1>
-          <div className="flex gap-4 items-center">
-            {auteurImageUrl ? (
-              <div className="rounded-full w-[40px] h-[40px] relative overflow-hidden">
-                <Image
-                  src={auteurImageUrl.url()}
-                  alt={auteurImageAlt}
-                  quality={100}
-                  className="object-cover object-center"
-                  fill={true}
-                  unoptimized={true}
-                />
-              </div>
-            ) : null}
-            <p>
-              {auteur.prenom} {auteur.nom}, le{" "}
-              {DateTime.fromISO(article.date || "")
-                .setLocale(locale)
-                .toLocaleString(DateTime.DATETIME_SHORT)}
-            </p>
+          <div className="flex flex-row gap-2 flex-wrap">
+            {tagsSortants.map((tag) => (
+              <TagButton tag={tag} key={tag._id} />
+            ))}
           </div>
           <div
             className="flex flex-col gap-4 prose-lg 
@@ -331,9 +315,10 @@ const page = async ({ params }: { params: Promise<{ subSlug: string }> }) => {
               {t("notre-expertise")}
             </h2>
             <ExpertiseCarousel
-              services={article.servicesAssocies}
+              services={associated.services}
               // sousServices={article.sousServicesAssocies}
-              secteurs={article.secteursAssocies}
+              secteurs={associated.secteurs}
+              articles={associated.articles}
             />
           </div>
         </section>
@@ -625,7 +610,26 @@ const page = async ({ params }: { params: Promise<{ subSlug: string }> }) => {
           ) : null}
         </section>
       )}
-
+      <div className="flex gap-4 items-center justify-end mb-10">
+        {auteurImageUrl ? (
+          <div className="rounded-full w-[40px] h-[40px] relative overflow-hidden">
+            <Image
+              src={auteurImageUrl.url()}
+              alt={auteurImageAlt}
+              quality={100}
+              className="object-cover object-center"
+              fill={true}
+              unoptimized={true}
+            />
+          </div>
+        ) : null}
+        <p>
+          {auteur.prenom} {auteur.nom}, le{" "}
+          {DateTime.fromISO(article.date || "")
+            .setLocale(locale)
+            .toLocaleString(DateTime.DATETIME_SHORT)}
+        </p>
+      </div>
       <CTAContactButtons />
     </main>
   );

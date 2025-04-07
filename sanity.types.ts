@@ -75,6 +75,7 @@ export type Tag = {
   _updatedAt: string;
   _rev: string;
   nom?: string;
+  slug?: Slug;
   language?: "en" | "fr";
 };
 

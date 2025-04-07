@@ -14,6 +14,13 @@ export const tagType = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      title: "Slug",
+      name: "slug",
+      type: "slug",
+      options: { source: "nom" },
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
       name: "language",
       type: "string",
       options: {
@@ -22,7 +29,6 @@ export const tagType = defineType({
           { title: "Français", value: "fr" },
         ],
       },
-      validation: (rule) => rule.required(),
     }),
   ],
 });

@@ -116,6 +116,10 @@ export const routing = defineRouting({
       fr: "/articles/[slug]/[subSlug]",
       en: "/posts/[slug]/[subSlug]",
     },
+    "/tag/[tag]": {
+      fr: "/tag/[tag]",
+      en: "/tag/[tag]",
+    },
   },
 });
 
@@ -146,4 +150,5 @@ export type PathnamesType =
   | "/devis/pilotage"
   | "/devis/sauvegarder"
   | "/devis/personnaliser"
-  | "/devis/afficher";
+  | "/devis/afficher"
+  | "/tag/[tag]";

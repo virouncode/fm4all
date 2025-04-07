@@ -35,25 +35,28 @@ const ExpertiseCarousel = ({
 
   return (
     <Tabs defaultValue="services">
-      <TabsList className="mb-10">
+      <TabsList className="mb-10 bg-transparent">
         {/* {[...(services || []), ...(sousServices || [])].length > 0 ? (
           <TabsTrigger value="services" className="text-lg">
             {t("services-associes")}
           </TabsTrigger>
         ) : null} */}
         {[...(services || [])].length > 0 ? (
-          <TabsTrigger value="services" className="text-lg">
-            {t("services-associes")}
+          <TabsTrigger
+            value="services"
+            className="text-lg border-none outline-none"
+          >
+            | {t("services-associes")}
           </TabsTrigger>
         ) : null}
         {[...(secteurs || [])].length > 0 ? (
           <TabsTrigger value="secteurs" className="text-lg">
-            {t("secteurs")}
+            | {t("secteurs")}
           </TabsTrigger>
         ) : null}
         {articles && [...(articles || [])].length > 0 ? (
           <TabsTrigger value="articles" className="text-lg">
-            {t("articles-associes")}
+            | {t("articles-associes")}
           </TabsTrigger>
         ) : null}
       </TabsList>

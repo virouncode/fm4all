@@ -18,6 +18,7 @@ import {
   getServicesSlugEn,
   getServicesSlugFr,
 } from "@/i18n/servicesSlugMappings";
+import { getTagSlugEn, getTagSlugFr } from "@/i18n/tagsSlugMappings";
 import { Flag } from "lucide-react";
 import { useLocale } from "next-intl";
 import { useParams, useSearchParams } from "next/navigation";
@@ -76,6 +77,17 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
             : getArticlesSubSlugEn(params.subSlug);
         router.replace(
           { pathname, params: { slug: newSlug, subSlug: newSubSlug }, query },
+          { locale: newLocale }
+        );
+      }
+    } else if (pathname === "/tag/[tag]") {
+      if (typeof params.tag === "string") {
+        const newSlug =
+          newLocale === "fr"
+            ? getTagSlugFr(params.tag)
+            : getTagSlugEn(params.tag);
+        router.replace(
+          { pathname, params: { tag: newSlug }, query },
           { locale: newLocale }
         );
       }
