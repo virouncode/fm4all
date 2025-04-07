@@ -4,10 +4,12 @@ import {
 } from "@/i18n/articlesSlugMappings";
 import { routing } from "@/i18n/routing";
 import { getServicesSlugEn } from "@/i18n/servicesSlugMappings";
+import { getTagSlugEn } from "@/i18n/tagsSlugMappings";
 import {
   fetchArticleCategories,
   fetchArticleSlugs,
   fetchServiceSlugs,
+  fetchTagsSlugs,
 } from "@/sanity/queries";
 import type { MetadataRoute } from "next";
 
@@ -47,6 +49,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
   const serviceSlugs = await fetchServiceSlugs();
   const articlesCategories = await fetchArticleCategories();
   const articleSlugs = await fetchArticleSlugs();
+  const tagsSlugs = await fetchTagsSlugs();
 
   const wrongServicesUrls = serviceSlugs.flatMap((slug) =>
     slug
@@ -62,6 +65,9 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     `/en/posts/${article.slug}/${article.subSlug}`,
     `/en/posts/${article.slug}/${getArticlesSubSlugEn(article.subSlug)}`,
   ]);
+  const wrongTagsUrls = tagsSlugs.flatMap((slug) =>
+    slug ? [`/fr/tags/${getTagSlugEn(slug)}`, `/en/tags/${slug}`] : []
+  );
 
   const disallowUrls = [
     "/fr/mon-devis/*",
@@ -70,6 +76,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     ...wrongServicesUrls,
     ...wrongArticlesCategoriesUrls,
     ...wrongArticlesUrls,
+    ...wrongTagsUrls,
   ];
 
   const uniqueDisallowUrls = [...new Set(disallowUrls)];

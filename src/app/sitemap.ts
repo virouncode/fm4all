@@ -4,10 +4,12 @@ import {
 } from "@/i18n/articlesSlugMappings";
 import { routing } from "@/i18n/routing";
 import { getServicesSlugEn } from "@/i18n/servicesSlugMappings";
+import { getTagSlugEn } from "@/i18n/tagsSlugMappings";
 import {
   fetchArticleCategories,
   fetchArticleSlugs,
   fetchServiceSlugs,
+  fetchTagsSlugs,
 } from "@/sanity/queries";
 import { MetadataRoute } from "next";
 const BASE_URL = "https://www.fm4all.com";
@@ -52,6 +54,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const serviceSlugs = await fetchServiceSlugs();
   const articlesCategories = await fetchArticleCategories();
   const articleSlugs = await fetchArticleSlugs();
+  const tagsSlugs = await fetchTagsSlugs();
 
   const servicesUrls: MetadataRoute.Sitemap = serviceSlugs.flatMap((slug) => {
     if (!slug) return [];
@@ -106,11 +109,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ];
     }
   );
+  const tagsUrls: MetadataRoute.Sitemap = tagsSlugs.flatMap((slug) => {
+    if (!slug) return [];
+    return [
+      {
+        url: `${BASE_URL}/fr/tags/${slug}`,
+        lastModified: lastMod,
+        changeFrequency: "weekly",
+        priority: 0.7,
+      },
+      {
+        url: `${BASE_URL}/en/tags/${getTagSlugEn(slug)}`,
+        lastModified: lastMod,
+        changeFrequency: "weekly",
+        priority: 0.7,
+      },
+    ];
+  });
 
   return [
     ...staticUrls,
     ...servicesUrls,
     ...articlesCategoriesUrls,
     ...articlesUrls,
+    ...tagsUrls,
   ];
 }

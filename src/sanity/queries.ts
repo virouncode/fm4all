@@ -7,6 +7,7 @@ import {
   Secteur,
   Service,
   Slug,
+  Tag,
 } from "../../sanity.types";
 import { client } from "./lib/client";
 
@@ -329,4 +330,9 @@ export const fetchArticleSlugs = async () => {
       };
     })
     .filter((item) => item.slug && item.subSlug);
+};
+export const fetchTagsSlugs = async () => {
+  const query = `*[_type == "tag" && (language == "fr" || language == null)]{slug{current}}`;
+  const tags = await client.fetch<Tag[]>(query);
+  return tags.map((tag) => tag.slug?.current).filter(Boolean);
 };
