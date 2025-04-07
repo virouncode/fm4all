@@ -1,18 +1,18 @@
+import Articles from "@/components/Articles";
+import Partenaires from "@/components/Partenaires";
+import Services from "@/components/Services";
+import VideoPresentation from "@/components/VideoPresentation";
+import Why from "@/components/Why";
 import { generateAlternates } from "@/lib/metadata-helpers";
 import { generateLocaleParams } from "@/lib/staticParamsHelper";
 import { Metadata } from "next";
 import { getLocale } from "next-intl/server";
-import Articles from "../../components/Articles";
 import Hero from "../../components/Hero";
 import HofManager from "../../components/HofManager";
 import How from "../../components/How";
 import Mission from "../../components/Mission";
-import Partenaires from "../../components/Partenaires";
 import Presentation from "../../components/Presentation";
-import Services from "../../components/Services";
 import Slogan from "../../components/Slogan";
-import VideoPresentation from "../../components/VideoPresentation";
-import Why from "../../components/Why";
 
 export const generateStaticParams = () => {
   return generateLocaleParams();

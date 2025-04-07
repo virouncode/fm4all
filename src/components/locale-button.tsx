@@ -22,6 +22,7 @@ import { getTagSlugEn, getTagSlugFr } from "@/i18n/tagsSlugMappings";
 import { Flag } from "lucide-react";
 import { useLocale } from "next-intl";
 import { useParams, useSearchParams } from "next/navigation";
+import { Button } from "./ui/button";
 
 type LocaleButtonProps = {
   className?: string;
@@ -101,12 +102,14 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
-        <div
+        <Button
           className={`flex items-center gap-1 text-sm hover:opacity-75 cursor-pointer rounded-md border w-16 h-9 justify-center ${className}`}
+          aria-label="Change language"
+          variant="outline"
         >
           <Flag size={14} />
           <span>{locale.toUpperCase()}</span>
-        </div>
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         {routing.locales.map((l) => (

@@ -1,9 +1,9 @@
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import Image from "next/image";
 import WhyCards from "./WhyCards";
 
-const Why = () => {
-  const t = useTranslations("HomePage.pourquoi");
+const Why = async () => {
+  const t = await getTranslations("HomePage.pourquoi");
   return (
     <section
       className="max-w-7xl w-full mx-auto flex flex-col gap-10 p-6"
@@ -83,6 +83,7 @@ const Why = () => {
               fill={true}
               className="w-full h-full object-cover"
               quality={100}
+              loading="lazy"
             />
           </div>
         </div>

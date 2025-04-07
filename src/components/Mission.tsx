@@ -1,8 +1,8 @@
 import DevisButton from "@/components/devis-button";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
-const Mission = () => {
-  const t = useTranslations("HomePage.mission");
+const Mission = async () => {
+  const t = await getTranslations("HomePage.mission");
   return (
     <section className="max-w-7xl w-full mx-auto flex flex-col gap-10 p-6">
       <h2 className="text-2xl md:text-3xl border-l-2 px-4">

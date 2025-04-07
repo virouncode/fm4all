@@ -1,10 +1,10 @@
 import DevisButton from "@/components/devis-button";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import Image from "next/image";
 
-const Presentation = () => {
-  const tGlobal = useTranslations("Global");
-  const t = useTranslations("HomePage.presentation");
+const Presentation = async () => {
+  const tGlobal = await getTranslations("Global");
+  const t = await getTranslations("HomePage.presentation");
   return (
     <section
       className="max-w-7xl w-full mx-auto flex flex-col gap-8 p-6 text-lg hyphens-auto text-wrap relative"
@@ -65,6 +65,8 @@ const Presentation = () => {
             alt={"image-collaboratrice-zen"}
             fill={true}
             className="object-cover object-center"
+            loading="lazy"
+            quality={100}
           />
         </div>
       </div>
