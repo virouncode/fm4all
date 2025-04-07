@@ -1372,34 +1372,6 @@ export type Article = {
     _key: string;
     [internalGroqTypeReferenceTo]?: "tag";
   }>;
-  servicesAssocies?: Array<{
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    _key: string;
-    [internalGroqTypeReferenceTo]?: "service";
-  }>;
-  sousServicesAssocies?: Array<{
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    _key: string;
-    [internalGroqTypeReferenceTo]?: "sousService";
-  }>;
-  secteursAssocies?: Array<{
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    _key: string;
-    [internalGroqTypeReferenceTo]?: "secteur";
-  }>;
-  articlesAssocies?: Array<{
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    _key: string;
-    [internalGroqTypeReferenceTo]?: "article";
-  }>;
   imageBloc1?: {
     asset?: {
       _ref: string;

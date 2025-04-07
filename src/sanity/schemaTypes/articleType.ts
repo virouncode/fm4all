@@ -115,55 +115,6 @@ export const articleType = defineType({
         }),
       ],
     }),
-    // //Notre expertise
-    defineField({
-      title: "Services associés",
-      name: "servicesAssocies",
-      type: "array",
-      of: [
-        defineArrayMember({
-          type: "reference",
-          name: "service",
-          to: [{ type: "service" }],
-        }),
-      ],
-    }),
-    defineField({
-      title: "Sous Services associés",
-      name: "sousServicesAssocies",
-      type: "array",
-      of: [
-        defineArrayMember({
-          type: "reference",
-          name: "sousService",
-          to: [{ type: "sousService" }],
-        }),
-      ],
-    }),
-    defineField({
-      title: "Secteurs associés",
-      name: "secteursAssocies",
-      type: "array",
-      of: [
-        defineArrayMember({
-          type: "reference",
-          name: "secteur",
-          to: [{ type: "secteur" }],
-        }),
-      ],
-    }),
-    defineField({
-      title: "Articles associés",
-      name: "articlesAssocies",
-      type: "array",
-      of: [
-        defineArrayMember({
-          type: "reference",
-          name: "article",
-          to: [{ type: "article" }],
-        }),
-      ],
-    }),
     //Corps de l'article
     defineField({
       title: "Image bloc 1",

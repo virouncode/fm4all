@@ -47,6 +47,7 @@ export const ASSOCIATED_TO_SERVICE_QUERY = `
 {
   "articles": *[
     _type == "article" &&
+    language == $language &&
     count(tagsEntrants[_ref in $tagIds]) > 0
   ] | order(date desc){
     ...,
@@ -64,6 +65,7 @@ export const ASSOCIATED_TO_SERVICE_QUERY = `
   "services": *[
     _type == "service" &&
     _id != $currentId &&
+    language == $language &&
     count(tagsEntrants[_ref in $tagIds]) > 0
   ] | order(date desc){
     ...,
@@ -75,6 +77,7 @@ export const ASSOCIATED_TO_SERVICE_QUERY = `
   },
   "secteurs": *[
     _type == "secteur" &&
+    language == $language &&
     count(tagsEntrants[_ref in $tagIds]) > 0
   ] | order(date desc){
     ...,
@@ -86,6 +89,7 @@ export const ASSOCIATED_TO_SERVICE_QUERY = `
   }
 }`;
 export const getAssociatedToService = async (
+  language: "fr" | "en",
   tagIds: string[],
   currentId: string
 ): Promise<{
@@ -101,6 +105,7 @@ export const getAssociatedToService = async (
   })[];
 }> => {
   return await client.fetch(ASSOCIATED_TO_SERVICE_QUERY, {
+    language,
     tagIds,
     currentId,
   });
@@ -111,6 +116,7 @@ export const ASSOCIATED_TO_ARTICLE_QUERY = `
   "articles": *[
     _type == "article" &&
     _id != $currentId &&
+    language == $language &&
     count(tagsEntrants[_ref in $tagIds]) > 0
   ] | order(date desc){
     ...,
@@ -127,6 +133,7 @@ export const ASSOCIATED_TO_ARTICLE_QUERY = `
   },
   "services": *[
     _type == "service" &&
+    language == $language &&
     count(tagsEntrants[_ref in $tagIds]) > 0
   ] | order(date desc){
     ...,
@@ -138,6 +145,7 @@ export const ASSOCIATED_TO_ARTICLE_QUERY = `
   },
   "secteurs": *[
     _type == "secteur" &&
+    language == $language &&
     count(tagsEntrants[_ref in $tagIds]) > 0
   ] | order(date desc){
     ...,
@@ -149,6 +157,7 @@ export const ASSOCIATED_TO_ARTICLE_QUERY = `
   }
 }`;
 export const getAssociatedToArticle = async (
+  language: "fr" | "en",
   tagIds: string[],
   currentId: string
 ): Promise<{
@@ -164,6 +173,7 @@ export const getAssociatedToArticle = async (
   })[];
 }> => {
   return await client.fetch(ASSOCIATED_TO_ARTICLE_QUERY, {
+    language,
     tagIds,
     currentId,
   });

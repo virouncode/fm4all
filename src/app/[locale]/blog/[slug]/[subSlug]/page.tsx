@@ -1,6 +1,7 @@
 import ExpertiseCarousel from "@/app/[locale]/services/[slug]/ExpertiseCarousel";
 import CTAContactButtons from "@/components/cta-contact-buttons";
 import DevisButton from "@/components/devis-button";
+import TagButton from "@/components/TagButton";
 import {
   Breadcrumb,
   BreadcrumbLink,
@@ -33,7 +34,6 @@ import {
   SanityImageHotspot,
   Slug,
 } from "../../../../../../sanity.types";
-import TagButton from "@/components/TagButton";
 
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
@@ -132,12 +132,15 @@ export const generateMetadata = async ({
   );
 };
 
-const page = async ({ params }: { params: Promise<{ subSlug: string }> }) => {
+const page = async ({
+  params,
+}: {
+  params: Promise<{ subSlug: string; locale: "fr" | "en" }>;
+}) => {
   const tGlobal = await getTranslations("Global");
   const t = await getTranslations("ServicesPage");
-  const locale = await getLocale();
   // const options = { next: { revalidate: 30 } }
-  const { subSlug } = await params;
+  const { subSlug, locale } = await params;
   const article = await getArticle(subSlug);
   const auteur = article.auteur as {
     _id: string;
@@ -162,6 +165,7 @@ const page = async ({ params }: { params: Promise<{ subSlug: string }> }) => {
     slug: Slug;
   }[];
   const associated = await getAssociatedToArticle(
+    locale,
     tagsSortants.map((tag) => tag._id),
     article._id
   );
@@ -306,9 +310,7 @@ const page = async ({ params }: { params: Promise<{ subSlug: string }> }) => {
           </div>
         ) : null}
       </section>
-      {(article.secteursAssocies ||
-        article.servicesAssocies ||
-        article.sousServicesAssocies) && (
+      {(associated.secteurs || associated.services || associated.articles) && (
         <section className="flex flex-row gap-10 mb-16">
           <div className="w-full">
             <h2 className="border-l-2 px-4 text-4xl mb-10">

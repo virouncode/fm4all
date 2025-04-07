@@ -27,6 +27,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Slug } from "../../../../../sanity.types";
 import ExpertiseCarousel from "./ExpertiseCarousel";
+import locale from "date-fns/locale/af";
 
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
@@ -120,11 +121,15 @@ export const generateMetadata = async ({
   );
 };
 
-const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
+const page = async ({
+  params,
+}: {
+  params: Promise<{ slug: string; locale: "fr" | "en" }>;
+}) => {
   const tGlobal = await getTranslations("Global");
   const t = await getTranslations("ServicesPage");
   // const options = { next: { revalidate: 30 } };
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const service = await getService(slug);
   const tagsSortants = service.tagsSortants as {
     _id: string;
@@ -133,6 +138,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
   }[];
 
   const associated = await getAssociatedToService(
+    locale,
     tagsSortants.map((tag) => tag._id),
     service._id
   );
