@@ -11,14 +11,18 @@ import {
 } from "../../sanity.types";
 import { client } from "./lib/client";
 
-//SERVICES
+//================================================================================================//
+//========================================= SERVICES =============================================//
+//================================================================================================//
+
+//TOUS LES SERVICES PAR LANGUE
 export const ALL_SERVICES_QUERY = `*[_type == "service" && language == $language]|order(date asc){ _id, titre, description, slug, imagePrincipale }`;
 export const getAllServices = async (locale: "fr" | "en") => {
   return await client.fetch<Service[]>(ALL_SERVICES_QUERY, {
     language: locale,
   });
 };
-
+//SERVICE PAR SLUG
 export const SERVICE_QUERY = `*[_type == "service" && slug.current == $slug][0]{
   ...,
   tagsEntrants[]->{
@@ -43,6 +47,7 @@ export const getService = async (slug: string) => {
   });
 };
 
+//SERVICES,ARTICLES ET SECTEURS ASSOCIES
 export const ASSOCIATED_TO_SERVICE_QUERY = `
 {
   "articles": *[
@@ -111,6 +116,134 @@ export const getAssociatedToService = async (
   });
 };
 
+//SERVICES POUR TAG DONNE
+export const TAG_RELATED_SERVICES_QUERY = `*[_type == "service" && language == $language && $slug in tagsEntrants[]->slug.current
+]`;
+export const getTagRelatedServices = async (
+  locale: "fr" | "en",
+  slug: string
+): Promise<Service[]> => {
+  return await client.fetch<Service[]>(TAG_RELATED_SERVICES_QUERY, {
+    language: locale,
+    slug,
+  });
+};
+
+//================================================================================================//
+//================================================================================================//
+//================================================================================================//
+
+//================================================================================================//
+//========================================= ARTICLES =============================================//
+//================================================================================================//
+export const LAST_ARTICLES_QUERY = `*[_type == "article" && language == $language]|order(date desc)[0...10]{ 
+  _id, titre, description, subSlug, imagePrincipale, 
+  categorie->{
+    _id,
+    titre,
+    slug}
+  }`;
+export const getLastArticles = async (locale: "fr" | "en") => {
+  return await client.fetch<
+    (Article & {
+      categorie: ArticleCategory;
+    })[]
+  >(LAST_ARTICLES_QUERY, {
+    language: locale,
+  });
+};
+
+export const CATEGORIE_QUERY = `*[_type == "articleCategory" && slug.current == $slug][0]{
+  _id,
+  titre,
+  baliseTitre,
+  baliseDescription,
+  slug}`;
+
+export const getCategorie = async (slug: string) => {
+  return await client.fetch<ArticleCategory>(CATEGORIE_QUERY, {
+    slug,
+  });
+};
+
+export const ALL_CATEGORIES_QUERY = `*[_type == "articleCategory" && language == $language]`;
+export const getAllCategories = async (locale: "fr" | "en") => {
+  return await client.fetch<ArticleCategory[]>(ALL_CATEGORIES_QUERY, {
+    language: locale,
+  });
+};
+
+export const ARTICLES_OF_CATEGORIE_QUERY = `*[_type == "article" && language == $language && references(*[_type == "articleCategory" && slug.current == $slug]._id)]|order(date desc){ 
+  _id, 
+  titre, 
+  description, 
+  subSlug, 
+  imagePrincipale 
+}`;
+export const getArticlesOfCategorie = async (
+  locale: "fr" | "en",
+  slug: string
+): Promise<Article[]> => {
+  return await client.fetch<Article[]>(ARTICLES_OF_CATEGORIE_QUERY, {
+    language: locale,
+    slug,
+  });
+};
+
+export const ARTICLE_QUERY = `*[_type == "article" && subSlug.current == $subSlug][0]{
+  ...,
+  categorie->{
+    _id,
+    titre,
+    slug
+    },
+  auteur->{
+    _id,
+    prenom,
+    nom,
+    image,
+    },
+  tagsEntrants[]->{
+    _id,
+    nom,
+    slug
+    },
+  tagsSortants[]->{
+    _id,
+    nom,
+    slug
+    },
+}`;
+
+export const getArticle = async (subSlug: string) => {
+  return await client.fetch<
+    Article & {
+      categorie: ArticleCategory;
+      auteur: {
+        _id: string;
+        prenom: string;
+        nom: string;
+        image: {
+          asset?: {
+            _ref: string;
+            _type: "reference";
+            _weak?: boolean;
+            [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+          };
+          hotspot?: SanityImageHotspot;
+          crop?: SanityImageCrop;
+          alt?: string;
+          _type: "image";
+        };
+      };
+      tagsEntrants: { _id: string; nom: string; slug: Slug }[];
+      tagsSortants: { _id: string; nom: string; slug: Slug }[];
+    }
+  >(ARTICLE_QUERY, {
+    subSlug,
+  });
+};
+
 export const ASSOCIATED_TO_ARTICLE_QUERY = `
 {
   "articles": *[
@@ -156,6 +289,7 @@ export const ASSOCIATED_TO_ARTICLE_QUERY = `
     }
   }
 }`;
+
 export const getAssociatedToArticle = async (
   language: "fr" | "en",
   tagIds: string[],
@@ -179,19 +313,6 @@ export const getAssociatedToArticle = async (
   });
 };
 
-export const TAG_RELATED_SERVICES_QUERY = `*[_type == "service" && language == $language && $slug in tagsEntrants[]->slug.current
-]`;
-
-export const getTagRelatedServices = async (
-  locale: "fr" | "en",
-  slug: string
-): Promise<Service[]> => {
-  return await client.fetch<Service[]>(TAG_RELATED_SERVICES_QUERY, {
-    language: locale,
-    slug,
-  });
-};
-
 export const TAG_RELATED_ARTICLES_QUERY = `*[_type == "article" && language == $language && $slug in tagsEntrants[]->slug.current
 ]`;
 
@@ -208,6 +329,109 @@ export const getTagRelatedArticles = async (
   );
 };
 
+//================================================================================================//
+//========================================= SECTEURS =============================================//
+//================================================================================================//
+export const ALL_SECTEURS_QUERY = `*[_type == "secteur" && language == $language]|order(date asc){ _id, titre, description, slug, imagePrincipale }`;
+export const getAllSecteurs = async (locale: "fr" | "en") => {
+  return await client.fetch<Secteur[]>(ALL_SECTEURS_QUERY, {
+    language: locale,
+  });
+};
+//SECTEUR PAR SLUG
+export const SECTEUR_QUERY = `*[_type == "secteur" && slug.current == $slug][0]{
+  ...,
+  tagsEntrants[]->{
+    _id,
+    nom,
+    slug
+  },
+  tagsSortants[]->{
+    _id,
+    nom,
+    slug
+  }
+}`;
+export const getSecteur = async (slug: string) => {
+  return await client.fetch<
+    Secteur & {
+      tagsEntrants: { _id: string; nom: string; slug: Slug }[];
+      tagsSortants: { _id: string; nom: string; slug: Slug }[];
+    }
+  >(SECTEUR_QUERY, {
+    slug,
+  });
+};
+
+export const ASSOCIATED_TO_SECTEUR_QUERY = `
+{
+  "articles": *[
+    _type == "article" &&
+    language == $language &&
+    count(tagsEntrants[_ref in $tagIds]) > 0
+  ] | order(date desc){
+    ...,
+    tagsEntrants[]->{
+      _id,
+      nom,
+      slug
+    },
+    categorie->{
+      _id,
+      titre,
+      slug
+    }
+  },
+  "services": *[
+    _type == "service" &&
+    language == $language &&
+    count(tagsEntrants[_ref in $tagIds]) > 0
+  ] | order(date desc){
+    ...,
+    tagsEntrants[]->{
+      _id,
+      nom,
+      slug
+    }
+  },
+  "secteurs": *[
+    _type == "secteur" &&
+     _id != $currentId &&
+    language == $language &&
+    count(tagsEntrants[_ref in $tagIds]) > 0
+  ] | order(date desc){
+    ...,
+    tagsEntrants[]->{
+      _id,
+      nom,
+      slug
+    }
+  }
+}`;
+export const getAssociatedToSecteur = async (
+  language: "fr" | "en",
+  tagIds: string[],
+  currentId: string
+): Promise<{
+  articles: (Article & {
+    tagsEntrants: { _id: string; nom: string; slug: Slug }[];
+    categorie: ArticleCategory;
+  })[];
+  services: (Service & {
+    tagsEntrants: { _id: string; nom: string; slug: Slug }[];
+  })[];
+  secteurs: (Secteur & {
+    tagsEntrants: { _id: string; nom: string; slug: Slug }[];
+  })[];
+}> => {
+  return await client.fetch(ASSOCIATED_TO_SECTEUR_QUERY, {
+    language,
+    tagIds,
+    currentId,
+  });
+};
+
+//SECTETURS POUR TAG DONNE
 export const TAG_RELATED_SECTEURS_QUERY = `*[_type == "secteur" && language == $language && $slug in tagsEntrants[]->slug.current
 ]`;
 
@@ -227,85 +451,6 @@ nom}`;
 export const getTagNom = async (slug: string) => {
   return await client.fetch<{ nom: string }>(TAG_NOMS_QUERY, {
     slug,
-  });
-};
-
-//ARTICLES
-export const LAST_ARTICLES_QUERY = `*[_type == "article" && language == $language]|order(date desc)[0...10]{ 
-_id, titre, description, subSlug, imagePrincipale, 
-categorie->{
-  _id,
-  titre,
-  slug}
-}`;
-
-export const ARTICLES_OF_CATEGORIE_QUERY = `*[_type == "article" && language == $language && references(*[_type == "articleCategory" && slug.current == $slug]._id)]|order(date desc){ 
-  _id, 
-  titre, 
-  description, 
-  subSlug, 
-  imagePrincipale 
-}`;
-
-export const CATEGORIE_QUERY = `*[_type == "articleCategory" && slug.current == $slug][0]{
-  _id,
-  titre,
-  baliseTitre,
-  baliseDescription,
-  slug}`;
-
-export const TOUTES_CATEGORIES_QUERY = `*[_type == "articleCategory" && language == $language]`;
-
-export const ARTICLE_QUERY = `*[_type == "article" && subSlug.current == $subSlug][0]{
-    ...,
-    categorie->{
-      _id,
-      titre,
-      slug
-      },
-    auteur->{
-      _id,
-      prenom,
-      nom,
-      image,
-      },
-    tagsEntrants[]->{
-      _id,
-      nom,
-      slug
-      },
-    tagsSortants[]->{
-      _id,
-      nom,
-      slug
-      },
-}`;
-export const getArticle = async (subSlug: string) => {
-  return await client.fetch<
-    Article & {
-      categorie: ArticleCategory;
-      auteur: {
-        _id: string;
-        prenom: string;
-        nom: string;
-        image: {
-          asset?: {
-            _ref: string;
-            _type: "reference";
-            _weak?: boolean;
-            [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-          };
-          hotspot?: SanityImageHotspot;
-          crop?: SanityImageCrop;
-          alt?: string;
-          _type: "image";
-        };
-      };
-      tagsEntrants: { _id: string; nom: string; slug: Slug }[];
-      tagsSortants: { _id: string; nom: string; slug: Slug }[];
-    }
-  >(ARTICLE_QUERY, {
-    subSlug,
   });
 };
 

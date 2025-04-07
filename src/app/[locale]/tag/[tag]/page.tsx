@@ -66,7 +66,7 @@ const page = async ({
         </BreadcrumbList>
       </Breadcrumb>
       <section className="flex flex-row gap-10 mb-16">
-        <div className="flex flex-col flex-1 justify-start text-lg gap-10">
+        <div className="flex flex-col flex-1 justify-start gap-10">
           <h1 className="text-5xl">Tag &quot;{nom}&quot;</h1>
           <ExpertiseCarousel
             services={services}

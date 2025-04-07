@@ -1,11 +1,9 @@
 import ArticlesCarousel from "@/components/ArticlesCarousel";
 import { Link } from "@/i18n/navigation";
 import { generateAlternates } from "@/lib/metadata-helpers";
-import { client } from "@/sanity/lib/client";
-import { TOUTES_CATEGORIES_QUERY } from "@/sanity/queries";
+import { getAllCategories } from "@/sanity/queries";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { ArticleCategory } from "../../../../sanity.types";
 import ArticlesCategorieCarousel from "./ArticlesCategorieCarousel";
 
 export const generateMetadata = async (): Promise<Metadata> => {
@@ -24,10 +22,7 @@ const page = async () => {
   const t = await getTranslations("BlogPage");
   const tArticles = await getTranslations("HomePage.articles");
   const locale = await getLocale();
-  const categories = await client.fetch<ArticleCategory[]>(
-    TOUTES_CATEGORIES_QUERY,
-    { language: locale }
-  );
+  const categories = await getAllCategories(locale as "fr" | "en");
 
   return (
     <main className="max-w-7xl min-h-[calc(100vh-4rem)] mx-auto mb-24 py-4 px-6 md:px-20">

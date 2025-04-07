@@ -1,7 +1,7 @@
 import { generateAlternates } from "@/lib/metadata-helpers";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import ServiceCards from "./ServiceCards";
+import ServicesCards from "./ServicesCards";
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const locale = await getLocale();
@@ -36,7 +36,7 @@ const page = async () => {
             </p>
             <p className="text-center">{t("nous-gerons-pour-vous")}</p>
           </div>
-          <ServiceCards />
+          <ServicesCards />
         </div>
         <div className="flex flex-col gap-4">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">

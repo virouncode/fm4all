@@ -31,7 +31,7 @@ const ImgCardVertical = ({
   return (
     <Link href={href}>
       <div
-        className={`flex flex-col gap-4 rounded-xl border bg-card text-card-foreground shadow overflow-hidden cursor-pointer hover:shadow-lg transition-shadow ${className}`}
+        className={`flex flex-col gap-4 rounded-xl border bg-card text-card-foreground shadow overflow-hidden cursor-pointer hover:shadow-lg hover:scale-[101%] transition-all ${className}`}
       >
         <div className="w-full h-64 relative mx-auto">
           <Image

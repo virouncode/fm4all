@@ -3,7 +3,7 @@ import { urlFor } from "@/sanity/lib/image";
 import { getAllServices } from "@/sanity/queries";
 import { getLocale, getTranslations } from "next-intl/server";
 
-const ServiceCards = async () => {
+const ServicesCards = async () => {
   // const options = { next: { revalidate: 30 } };
   const locale = await getLocale();
   const services = await getAllServices(locale as "fr" | "en");
@@ -31,10 +31,9 @@ const ServiceCards = async () => {
           >
             <div className="p-4 flex flex-col gap-4 h-52">
               <p className="text-2xl">{service.titre}</p>
-              <p className="w-full overflow-hidden line-clamp-3">
+              <p className="w-full overflow-hidden line-clamp-5">
                 {service.description}
               </p>
-              <div className="flex-1 underline">{t("en-savoir-plus")}</div>
             </div>
           </ImgCardVertical>
         ) : null;
@@ -43,4 +42,4 @@ const ServiceCards = async () => {
   );
 };
 
-export default ServiceCards;
+export default ServicesCards;

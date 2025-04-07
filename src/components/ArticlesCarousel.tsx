@@ -6,23 +6,19 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
-import { LAST_ARTICLES_QUERY } from "@/sanity/queries";
+import { getLastArticles } from "@/sanity/queries";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Article, ArticleCategory } from "../../sanity.types";
+import { ArticleCategory } from "../../sanity.types";
 
 const ArticlesCarousel = async () => {
   const t = await getTranslations("Global");
   // const options = { next: { revalidate: 30 } };
   const locale = await getLocale();
-  const articles = await client.fetch<
-    (Article & { categorie: ArticleCategory })[]
-  >(
-    LAST_ARTICLES_QUERY,
-    { language: locale }
-    // options
-  );
+  const articles = await getLastArticles(locale as "fr" | "en");
+
+  if (!articles || articles.length === 0) return null;
+
   return (
     <Carousel
       opts={{
@@ -31,7 +27,7 @@ const ArticlesCarousel = async () => {
       }}
       className="w-full"
     >
-      <CarouselContent>
+      <CarouselContent className="py-1">
         {articles.map((article) => {
           const articleImageUrl = article.imagePrincipale
             ? urlFor(article.imagePrincipale)
@@ -57,10 +53,9 @@ const ArticlesCarousel = async () => {
               >
                 <div className="p-4 flex flex-col gap-4 h-56">
                   <p className="text-2xl">{article.titre}</p>
-                  <p className="w-full overflow-hidden line-clamp-3">
+                  <p className="w-full overflow-hidden line-clamp-5">
                     {article.description}
                   </p>
-                  <div className="flex-1 underline">{t("lire-la-suite")}</div>
                 </div>
               </ImgCardVertical>
             </CarouselItem>

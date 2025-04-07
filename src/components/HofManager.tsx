@@ -7,23 +7,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
-import { client } from "@/sanity/lib/client";
-import { ARTICLE_QUERY } from "@/sanity/queries";
+import { getArticle } from "@/sanity/queries";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Article, ArticleCategory } from "../../sanity.types";
+import { ArticleCategory } from "../../sanity.types";
 
 const HofManager = async () => {
   const t = await getTranslations("HomePage.hofManager");
   const locale = await getLocale();
-  const article = await client.fetch<Article & { categorie: ArticleCategory }>(
-    ARTICLE_QUERY,
-    {
-      subSlug:
-        locale === "fr"
-          ? "hof-managers-un-nouveau-concept"
-          : "hof-managers-a-new-concept",
-    }
-    // options
+  const article = await getArticle(
+    locale === "fr"
+      ? "hof-managers-un-nouveau-concept"
+      : "hof-managers-a-new-concept"
   );
   const categorie = article.categorie as ArticleCategory;
   return (

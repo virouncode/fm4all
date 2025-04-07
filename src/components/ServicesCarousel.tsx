@@ -23,7 +23,7 @@ const ServicesCarousel = async () => {
       }}
       className="w-full"
     >
-      <CarouselContent>
+      <CarouselContent className="py-1">
         {services.map((service) => {
           const serviceImageUrl = service.imagePrincipale
             ? urlFor(service.imagePrincipale)
@@ -46,10 +46,9 @@ const ServicesCarousel = async () => {
               >
                 <div className="p-4 flex flex-col gap-4 h-56">
                   <p className="text-2xl">{service.titre}</p>
-                  <p className="w-full overflow-hidden line-clamp-3">
+                  <p className="w-full overflow-hidden line-clamp-5">
                     {service.description}
                   </p>
-                  <div className="flex-1 underline">{t("en-savoir-plus")}</div>
                 </div>
               </ImgCardVertical>
             </CarouselItem>

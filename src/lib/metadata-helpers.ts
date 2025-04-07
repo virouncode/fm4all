@@ -26,7 +26,9 @@ export type RouteKey =
   | "blog"
   | "blogCategorie"
   | "blogArticle"
-  | "tag";
+  | "tag"
+  | "secteurs"
+  | "secteurPresentation";
 
 export const routes: Record<RouteKey, Record<"fr" | "en", string>> = {
   home: {
@@ -132,6 +134,14 @@ export const routes: Record<RouteKey, Record<"fr" | "en", string>> = {
   tag: {
     fr: "/tags/[tag]",
     en: "/tags/[tag]",
+  },
+  secteurs: {
+    fr: "/secteurs",
+    en: "/sectors",
+  },
+  secteurPresentation: {
+    fr: "/secteurs/[slug]",
+    en: "/sectors/[slug]",
   },
 };
 
