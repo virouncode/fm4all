@@ -12,7 +12,6 @@ export default {
   theme: {
     extend: {
       backgroundImage: {
-        "hero-img": "url('/img/hero_wallpaper.webp')",
         "hof-img": "url('/img/hof_managers.webp')",
       },
       listStyleType: {

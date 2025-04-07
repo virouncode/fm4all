@@ -1,5 +1,6 @@
 import DevisButton from "@/components/devis-button";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 
 const Hero = () => {
   const tGlobal = useTranslations("Global");
@@ -9,8 +10,17 @@ const Hero = () => {
       className="flex items-center justify-center min-h-[calc(100vh-4rem)] md:min-h-[calc(100vh-4rem)] overflow-hidden relative"
       id="hero"
     >
-      <div className="absolute inset-0 z-0 bg-hero-img bg-cover bg-center">
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40"></div>
+      <div className="absolute inset-0 z-0">
+        <Image
+          src={"/img/hero_wallpaper.webp"}
+          alt="une image de bureaux modernes et lumineux avec des plantes vertes"
+          className="object-cover"
+          quality={100}
+          priority
+          fill
+        />
+
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/40"></div>
       </div>
       <div className="relative z-10 w-11/12 max-w-7xl mx-auto flex flex-col items-center gap-8 px-4 py-12">
         <div className="w-full max-w-3xl text-white">
