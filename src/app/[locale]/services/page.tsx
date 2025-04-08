@@ -8,10 +8,12 @@ export const generateMetadata = async (): Promise<Metadata> => {
   return generateAlternates(
     "services",
     locale,
-    locale === "fr" ? "Nos services" : "Our services",
     locale === "fr"
-      ? "Découvrez nos services aux entreprises"
-      : "Discover our business services",
+      ? "Nos services aux entreprises à Paris & Île-de-France"
+      : "Our office services in Paris",
+    locale === "fr"
+      ? "Découvrez nos services aux entreprises à Paris & Île-de-France : nettoyage, maintenance, sécurité incendie, machines à café, etc...Obtenez votre devis en ligne."
+      : "Discover our office services in Paris & Île-de-France: cleaning, maintenance, fire safety, coffee machines, etc... Get your online quote.",
     "/img/services/fm4all.webp"
   );
 };

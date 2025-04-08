@@ -45,26 +45,27 @@ import "./globals.css";
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const locale = await getLocale();
+  const titleTemplate = "%s | fm4all";
+  const title =
+    locale === "fr"
+      ? "SFacility Management à Paris & Île-de-France - Devis en ligne | fm4all"
+      : "Facility Management & Office Services in Paris – Instant Quote | fm4all";
+  const description =
+    locale === "fr"
+      ? "fm4all démocratise les services aux entreprises de toutes tailles à Paris & Île-de-France. Comparez les offres de nos prestataires et obtenez un devis en ligne."
+      : "fm4all makes business services accessible to companies of all sizes in Paris & Île-de-France. Compare offers from our providers and get an online quote.";
+  const canonicalUrl =
+    locale === "fr" ? "https://www.fm4all.com/fr" : "https://www.fm4all.com/en";
+
+  // Structure des métadonnées
   return {
     title: {
-      template:
-        locale === "fr"
-          ? "%s | fm4all Le Facility Management pour tous"
-          : "%s | fm4all Facility Management for all",
-      default:
-        locale === "fr"
-          ? "Les services aux entreprises au meilleur prix | fm4all"
-          : "Facility management services in Paris at the best price | fm4all",
+      template: titleTemplate,
+      default: title,
     },
-    description:
-      locale === "fr"
-        ? "fm4all démocratise les services généraux pour toutes les tailles d'entreprises. Utilisez notre comparateur et émetteur de devis en ligne pour les services aux entreprises."
-        : "fm4all democratizes facility management services for businesses in Paris. Use our online comparison tool and quote generator for business services.",
+    description: description,
     alternates: {
-      canonical:
-        locale === "fr"
-          ? "https://www.fm4all.com/fr"
-          : "https://www.fm4all.com/en",
+      canonical: canonicalUrl,
       languages: {
         fr: "https://www.fm4all.com/fr",
         en: "https://www.fm4all.com/en",

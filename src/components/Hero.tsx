@@ -19,7 +19,7 @@ const Hero = async () => {
           priority
           fill
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/40"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/60"></div>
       </div>
       <div className="relative z-10 w-11/12 max-w-7xl mx-auto flex flex-col items-center gap-8 px-4 py-12">
         <div className="w-full max-w-3xl text-white">

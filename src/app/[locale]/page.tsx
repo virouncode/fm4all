@@ -20,16 +20,18 @@ export const generateStaticParams = () => {
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const locale = await getLocale();
-  return generateAlternates(
-    "home",
-    locale,
+  const title =
     locale === "fr"
-      ? "Les services aux entreprises au meilleur prix"
-      : "Facility management services in Paris at the best price",
+      ? "Facility Management à Paris & Île-de-France - Devis en ligne | fm4all"
+      : "Facility Management & Business Services in Paris – Instant Quote | fm4all";
+
+  // Description basée sur la langue
+  const description =
     locale === "fr"
-      ? "fm4all démocratise les services généraux pour toutes les tailles d'entreprises. Utilisez notre comparateur et émetteur de devis en ligne pour les services aux entreprises."
-      : "fm4all democratizes facility management services for businesses in Paris. Use our online comparison tool and quote generator for business services."
-  );
+      ? "fm4all démocratise les services aux entreprises de toutes tailles à Paris & Île-de-France. Comparez les offres de nos prestataires et obtenez un devis en ligne."
+      : "fm4all makes business services accessible to companies of all sizes in Paris & Île-de-France. Compare offers from our providers and get an online quote.";
+
+  return generateAlternates("home", locale, title, description);
 };
 
 export default function page() {
