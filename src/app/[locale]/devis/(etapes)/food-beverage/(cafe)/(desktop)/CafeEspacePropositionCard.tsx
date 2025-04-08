@@ -231,13 +231,12 @@ const CafeEspacePropositionCard = ({
           <li className="list-check text-sm font-bold">
             {proposition.nbMachines} machine(s) {proposition.marque}{" "}
             {proposition.modele}{" "}
-            {proposition.reconditionne ? tCafe("reconditionnee-s") : ""}
+            {proposition.reconditionne ? t("reconditionnee-s") : ""}
           </li>
         ) : (
           <li className="list-check text-sm font-bold">
             {proposition.nbMachines} {proposition.marque} {proposition.modele}{" "}
-            {proposition.reconditionne ? tCafe("reconditionnee-s") : ""}{" "}
-            machine(s)
+            {proposition.reconditionne ? t("reconditionnee-s") : ""} machine(s)
           </li>
         )
       ) : null}
@@ -264,13 +263,12 @@ const CafeEspacePropositionCard = ({
           <li className="list-check text-sm font-bold">
             {proposition.nbMachines} machine(s) {proposition.marque}{" "}
             {proposition.modele}{" "}
-            {proposition.reconditionne ? tCafe("reconditionnee-s") : ""}
+            {proposition.reconditionne ? t("reconditionnee-s") : ""}
           </li>
         ) : (
           <li className="list-check text-sm font-bold">
             {proposition.nbMachines} {proposition.marque} {proposition.modele}{" "}
-            {proposition.reconditionne ? tCafe("reconditionnee-s") : ""}{" "}
-            machine(s)
+            {proposition.reconditionne ? t("reconditionnee-s") : ""} machine(s)
           </li>
         )
       ) : null}
