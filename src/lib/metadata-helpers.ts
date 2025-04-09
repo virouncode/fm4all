@@ -229,7 +229,11 @@ export function generateAlternates(
   let enUrl = "";
   let frUrl = "";
 
-  if (routeKey === "blogCategorie" && slugs) {
+  if (routeKey === "home") {
+    canonicalUrl = `https://www.fm4all.com/${locale}`;
+    enUrl = `https://www.fm4all.com/en`;
+    frUrl = `https://www.fm4all.com/fr`;
+  } else if (routeKey === "blogCategorie" && slugs) {
     canonicalUrl =
       `https://www.fm4all.com/${locale}${routes[routeKey][locale as "fr" | "en"]}`.replace(
         "[slug]",

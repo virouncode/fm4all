@@ -29,15 +29,19 @@ const Hero = async () => {
           <p className="text-xl md:text-2xl font-medium mb-8">
             {t("vos-locaux-font-moins-de-3000m")}
           </p>
-          <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 mb-8 border border-white/20">
-            <h2 className="text-base md:text-lg mb-6">
+          <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 mb-8 border border-white/20 flex flex-col gap-6 text-base md:text-lg">
+            <h2>
               {t("gagnez-du-temps-et-de-largent-sur-la")}{" "}
               <strong>{t("gestion-de-vos-prestations")}</strong>{" "}
               {t(
                 "de-nettoyage-hygiene-sanitaire-cafe-maintenance-multitechnique-securite-incendie-etc"
               )}
             </h2>
-            <ul className="space-y-4 mb-10 text-base md:text-lg">
+            <p className="text-center">
+              <strong>{t("contact-contrat-facture")}</strong>{" "}
+              {t("pour-tous-vos-services")}
+            </p>
+            <ul className="space-y-4 mb-10">
               <li className="flex items-start">
                 <span className="inline-flex items-center justify-center bg-fm4allsecondary text-white rounded-full w-6 h-6 mr-3 flex-shrink-0 mt-0.5">
                   ✓
