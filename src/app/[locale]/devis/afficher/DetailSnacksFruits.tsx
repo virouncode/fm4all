@@ -20,26 +20,35 @@ const DetailSnacksFruits = () => {
   const totalSnacks = totalSnacksFruits.totalSnacks;
   const totalBoissons = totalSnacksFruits.totalBoissons;
   const totalLivraison = totalSnacksFruits.totalLivraison ?? 0; //car on veut afficher même si 0
-  const total = totalSnacksFruits.total;
+  let total = totalSnacksFruits.total;
+  const totalSansRemise = totalSnacksFruits.totalSansRemise;
+  const remiseSiCafe =
+    totalSansRemise && total && totalSansRemise !== total
+      ? totalSansRemise - total
+      : null;
+
+  if (remiseSiCafe && totalSansRemise) {
+    total = totalSansRemise - remiseSiCafe;
+  }
 
   const previsionnelFruits =
     snacksFruits.infos.gammeSelected === "essentiel"
       ? "200g / personne / semaine"
       : snacksFruits.infos.gammeSelected === "confort"
-      ? "300g / personne / semaine"
-      : "400g / personne / semaine";
+        ? "300g / personne / semaine"
+        : "400g / personne / semaine";
   const previsionnelSnacks =
     snacksFruits.infos.gammeSelected === "essentiel"
       ? "1 portion / personne / semaine"
       : snacksFruits.infos.gammeSelected === "confort"
-      ? "2 portions / personne / semaine"
-      : "4 snacks / personne / semaine";
+        ? "2 portions / personne / semaine"
+        : "4 snacks / personne / semaine";
   const previsionnelBoissons =
     snacksFruits.infos.gammeSelected === "essentiel"
       ? "1 boisson / personne / semaine"
       : snacksFruits.infos.gammeSelected === "confort"
-      ? "2 boissons / personne / semaine"
-      : "4 boissons / personne / semaine";
+        ? "2 boissons / personne / semaine"
+        : "4 boissons / personne / semaine";
 
   if (!total) return null;
 
@@ -100,7 +109,6 @@ const DetailSnacksFruits = () => {
             </TableCell>
           </TableRow>
         ) : null}
-
         <TableRow>
           <TableCell>Livraison</TableCell>
           <TableCell>{snacksFruits.infos.nomFournisseur}</TableCell>
@@ -113,6 +121,20 @@ const DetailSnacksFruits = () => {
             {formatNumber(((totalLivraison ?? 0) * MARGE) / 12)}
           </TableCell>
         </TableRow>
+        {remiseSiCafe ? (
+          <TableRow>
+            <TableCell>Remise</TableCell>
+            <TableCell>{snacksFruits.infos.nomFournisseur}</TableCell>
+            <TableCell>N/A</TableCell>
+            <TableCell>N/A</TableCell>
+            <TableCell>N/A</TableCell>
+            <TableCell>N/A</TableCell>
+            <TableCell>N/A</TableCell>
+            <TableCell className="text-end">
+              {formatNumber((-remiseSiCafe * MARGE) / 12)}
+            </TableCell>
+          </TableRow>
+        ) : null}
       </TableBody>
       <TableFooter>
         <TableRow>
@@ -120,7 +142,7 @@ const DetailSnacksFruits = () => {
             Total Snacks & Fruits
           </TableCell>
           <TableCell className="text-end font-bold">
-            {formatNumber(((totalSnacksFruits.total ?? 0) * MARGE) / 12)}
+            {formatNumber(((total ?? 0) * MARGE) / 12)}
           </TableCell>
         </TableRow>
       </TableFooter>

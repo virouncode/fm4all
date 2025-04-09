@@ -1191,7 +1191,8 @@
     "account-manager": "Account Manager",
     "remise-sur-chiffre-daffaires": "Revenue discount",
     "remise-office-manager": "Office Manager discount",
-    "inclus": "included"
+    "inclus": "included",
+    "remise-cafe": "Discount"
   },
   "Erreur": {
     "erreur": "Error !",
