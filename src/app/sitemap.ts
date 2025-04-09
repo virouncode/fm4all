@@ -31,7 +31,7 @@ const generateStaticUrls = () => {
       if (typeof localized == "string") {
         localizedPath = localized;
       } else if (localized && locale in localized) {
-        localizedPath = localized[locale];
+        localizedPath = path === "/" ? "" : localized[locale];
       } else {
         localizedPath = path;
       }
