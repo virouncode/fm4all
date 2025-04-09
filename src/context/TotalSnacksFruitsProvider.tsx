@@ -22,6 +22,7 @@ export const TotalSnacksFruitsContext = createContext<{
     totalBoissons: null,
     totalLivraison: null,
     total: null,
+    totalSansRemise: null,
   },
   setTotalSnacksFruits: () => {},
 });
@@ -37,6 +38,7 @@ const TotalSnacksFruitsProvider = ({ children }: PropsWithChildren) => {
       totalBoissons: null,
       totalLivraison: null,
       total: null,
+      totalSansRemise: null,
     });
 
   useEffect(() => {

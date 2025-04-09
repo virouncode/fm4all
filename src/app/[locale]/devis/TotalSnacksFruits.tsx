@@ -15,6 +15,7 @@ const TotalSnacksFruits = () => {
   const totalBoissons = totalSnacksFruits.totalBoissons;
   const totalLivraison = totalSnacksFruits.totalLivraison ?? 0; //car on veut afficher même si 0
   const total = totalSnacksFruits.total;
+  const totalSansRemise = totalSnacksFruits.totalSansRemise;
   const color = getFm4AllColor(snacksFruits.infos.gammeSelected);
 
   if (!total) return null;
@@ -68,9 +69,17 @@ const TotalSnacksFruits = () => {
 
           <div className="flex items-center justify-between border-t border-foreground mt-2">
             <p>TOTAL</p>
-            <p className="text-end">
-              {formatNumber(Math.round(total * MARGE))} {t("eur-ht-an")}
-            </p>
+            <div>
+              {totalSansRemise && totalSansRemise !== total ? (
+                <p className="text-end line-through">
+                  {formatNumber(Math.round(totalSansRemise * MARGE))}{" "}
+                  {t("eur-ht-an")}
+                </p>
+              ) : null}
+              <p className="text-end">
+                {formatNumber(Math.round(total * MARGE))} {t("eur-ht-an")}
+              </p>
+            </div>
           </div>
         </div>
       </div>

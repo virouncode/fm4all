@@ -55,6 +55,7 @@ export const totalSnacksFruitsSchema = z.object({
   totalBoissons: z.number().nullable(),
   totalLivraison: z.number().nullable(),
   total: z.number().nullable(),
+  totalSansRemise: z.number().nullable(),
 });
 
 export const totalFontainesSchema = z.object({

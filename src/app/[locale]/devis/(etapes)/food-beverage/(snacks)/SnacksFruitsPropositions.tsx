@@ -190,6 +190,10 @@ const SnacksFruitsPropositions = ({
       fraisLivraisonPanier !== null && nbPersonnes
         ? 52 * (prixPanier + fraisLivraisonPanier)
         : null;
+    const totalSansRemise =
+      fraisLivraisonPanier !== null && nbPersonnes
+        ? 52 * (prixPanierSansRemise + fraisLivraisonPanier)
+        : null;
 
     return {
       //infos
@@ -225,6 +229,7 @@ const SnacksFruitsPropositions = ({
       panierMin,
       //total
       total,
+      totalSansRemise,
       totalFruits,
       totalSnacks,
       totalBoissons,
@@ -265,6 +270,7 @@ const SnacksFruitsPropositions = ({
         fraisLivraisonPanier: number | null;
         panierMin: number | null;
         total: number | null;
+        totalSansRemise: number | null;
         totalFruits: number;
         totalSnacks: number;
         totalBoissons: number;
@@ -316,6 +322,7 @@ const SnacksFruitsPropositions = ({
     fraisLivraisonPanier: number | null;
     panierMin: number | null;
     total: number | null;
+    totalSansRemise: number | null;
     totalFruits: number;
     totalSnacks: number;
     totalBoissons: number;
@@ -338,6 +345,7 @@ const SnacksFruitsPropositions = ({
       seuilFranco,
       panierMin,
       total,
+      totalSansRemise,
       totalFruits,
       totalSnacks,
       totalBoissons,
@@ -379,6 +387,7 @@ const SnacksFruitsPropositions = ({
         totalBoissons: null,
         totalLivraison: null,
         total: null,
+        totalSansRemise: null,
       });
       return;
     }
@@ -413,6 +422,7 @@ const SnacksFruitsPropositions = ({
       totalBoissons,
       totalLivraison,
       total,
+      totalSansRemise,
     });
   };
 

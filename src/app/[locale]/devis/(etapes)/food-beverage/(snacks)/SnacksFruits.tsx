@@ -1,6 +1,7 @@
 "use client";
 import PropositionsTitleMobile from "@/app/[locale]/devis/PropositionsTitleMobile";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
+import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { SelectBoissonsQuantitesType } from "@/zod-schemas/boissonsQuantites";
 import { SelectBoissonsTarifsType } from "@/zod-schemas/boissonsTarifs";
 import { SelectFoodLivraisonTarifsType } from "@/zod-schemas/foodLivraisonTarifs";
@@ -38,6 +39,7 @@ const SnacksFruits = ({
 }: SnacksFruitsType) => {
   const tSnacks = useTranslations("DevisPage.foodBeverage.snacks");
   const { setFoodBeverage } = useContext(FoodBeverageContext);
+  const { totalSnacksFruits } = useContext(TotalSnacksFruitsContext);
 
   const handleClickPrevious = () => {
     setFoodBeverage((prev) => ({
@@ -105,7 +107,12 @@ const SnacksFruits = ({
         />
       </div>
       {!isTabletOrMobile ? (
-        <PropositionsFooter handleClickNext={handleClickNext} />
+        <PropositionsFooter
+          handleClickNext={handleClickNext}
+          comment={tSnacks(
+            "ce-fournisseur-vous-propose-une-reduction-de-8-car-vous-lavez-choisi-pour-le-cafe"
+          )}
+        />
       ) : null}
     </div>
   );

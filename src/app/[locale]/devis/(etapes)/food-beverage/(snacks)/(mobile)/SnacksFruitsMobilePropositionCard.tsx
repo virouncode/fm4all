@@ -48,6 +48,7 @@ type SnacksFruitsMobilePropositionCardProps = {
     fraisLivraisonPanier: number | null;
     panierMin: number | null;
     total: number | null;
+    totalSansRemise: number | null;
     totalFruits: number;
     totalSnacks: number;
     totalBoissons: number;
@@ -83,6 +84,7 @@ type SnacksFruitsMobilePropositionCardProps = {
     fraisLivraisonPanier: number | null;
     panierMin: number | null;
     total: number | null;
+    totalSansRemise: number | null;
     totalFruits: number;
     totalSnacks: number;
     totalBoissons: number;
@@ -127,6 +129,14 @@ const SnacksFruitsMobilePropositionCard = ({
         ? true
         : false;
 
+  const totalMensuelSansRemiseText =
+    proposition.totalSansRemise &&
+    proposition.totalSansRemise !== proposition.total ? (
+      <p className="font-bold text-xl ml-4 line-through">
+        {formatNumber(Math.round((proposition.totalSansRemise * MARGE) / 12))}{" "}
+        {t("euros-mois")}
+      </p>
+    ) : null;
   const totalMensuelText =
     snacksFruits.infos.choix.includes("fruits") && !proposition.prixKgFruits ? (
       <p className="text-sm font-bold text-end">
@@ -143,9 +153,12 @@ const SnacksFruitsMobilePropositionCard = ({
         {t("non-propose-pour-ces-criteres")}
       </p>
     ) : total ? (
-      <p className="text-sm font-bold text-end">
-        {formatNumber(Math.round((total * MARGE) / 12))} {t("euros-mois")}
-      </p>
+      <>
+        {totalMensuelSansRemiseText}
+        <p className="text-sm font-bold text-end">
+          {formatNumber(Math.round((total * MARGE) / 12))} {t("euros-mois")}
+        </p>
+      </>
     ) : (
       <p className="text-sm font-bold text-end">
         {tSnacks("panier-minimum-hebdomadaire-non-atteint")}

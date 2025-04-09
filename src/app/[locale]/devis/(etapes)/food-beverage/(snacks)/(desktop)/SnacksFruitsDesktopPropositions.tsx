@@ -35,6 +35,7 @@ type SnacksFruitsDesktopPropositionsProps = {
     fraisLivraisonPanier: number | null;
     panierMin: number | null;
     total: number | null;
+    totalSansRemise: number | null;
     totalFruits: number;
     totalSnacks: number;
     totalBoissons: number;
@@ -70,6 +71,7 @@ type SnacksFruitsDesktopPropositionsProps = {
     fraisLivraisonPanier: number | null;
     panierMin: number | null;
     total: number | null;
+    totalSansRemise: number | null;
     totalFruits: number;
     totalSnacks: number;
     totalBoissons: number;

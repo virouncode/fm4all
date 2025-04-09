@@ -906,7 +906,8 @@
         "selectionner-snacks": "Select snacks",
         "snacks": "Snacks",
         "selectionner-boissons": "Select drinks",
-        "boissons": "Drinks"
+        "boissons": "Drinks",
+        "ce-fournisseur-vous-propose-une-reduction-de-8-car-vous-lavez-choisi-pour-le-cafe": "*this supplier is offering you an 8% discount because you chose them for coffee"
       },
       "fontaines": {
         "fontaines-a-eau": "Water fountains",

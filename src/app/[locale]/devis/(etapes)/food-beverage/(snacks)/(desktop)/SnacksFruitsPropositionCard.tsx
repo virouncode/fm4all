@@ -47,6 +47,7 @@ type SnacksFruitsPropositionCardProps = {
     fraisLivraisonPanier: number | null;
     panierMin: number | null;
     total: number | null;
+    totalSansRemise: number | null;
     totalFruits: number;
     totalSnacks: number;
     totalBoissons: number;
@@ -82,6 +83,7 @@ type SnacksFruitsPropositionCardProps = {
     fraisLivraisonPanier: number | null;
     panierMin: number | null;
     total: number | null;
+    totalSansRemise: number | null;
     totalFruits: number;
     totalSnacks: number;
     totalBoissons: number;
@@ -147,10 +149,19 @@ const SnacksFruitsPropositionCard = ({
       </div>
     );
   }
+  const totalMensuelSansRemiseText =
+    proposition.totalSansRemise &&
+    proposition.totalSansRemise !== proposition.total ? (
+      <p className="font-bold text-xl ml-4 line-through">
+        {formatNumber(Math.round((proposition.totalSansRemise * MARGE) / 12))}{" "}
+        {t("euros-mois")}
+      </p>
+    ) : null;
   const totalMensuelText = (
     <p className="font-bold text-xl ml-4">
       {formatNumber(Math.round((proposition.total * MARGE) / 12))}{" "}
       {t("euros-mois")}
+      {totalMensuelSansRemiseText ? "*" : null}
     </p>
   );
   const gFruitsParSemaineParPersonneText = snacksFruits.infos.choix.includes(
@@ -256,7 +267,11 @@ const SnacksFruitsPropositionCard = ({
       />
       <div>
         <div className="flex gap-2 items-center">
-          {totalMensuelText}
+          <div className="flex flex-col">
+            {totalMensuelSansRemiseText}
+            {totalMensuelText}
+          </div>
+
           <Dialog>
             <DialogTrigger asChild>
               <Info

@@ -160,7 +160,7 @@ const SnacksFruitsForm = ({
       const remiseSiCafe = isSameFournisseur
         ? (fraisLivraisonsFournisseur?.remiseSiCafe ?? 0)
         : 0;
-
+      const prixPanierSansRemise = panierFruits + panierSnacks + panierBoissons;
       const prixPanier =
         (1 - remiseSiCafe / 100) *
         (panierFruits + panierSnacks + panierBoissons);
@@ -193,6 +193,10 @@ const SnacksFruitsForm = ({
         fraisLivraisonPanier !== null && newNbPersonnes
           ? 52 * (prixPanier + fraisLivraisonPanier)
           : null;
+      const totalSansRemise =
+        fraisLivraisonPanier !== null && newNbPersonnes
+          ? 52 * (prixPanierSansRemise + fraisLivraisonPanier)
+          : null;
 
       setSnacksFruits((prev) => ({
         ...prev,
@@ -219,6 +223,7 @@ const SnacksFruitsForm = ({
         totalBoissons,
         totalLivraison,
         total,
+        totalSansRemise,
       });
     } else {
       setSnacksFruits((prev) => ({
@@ -314,6 +319,7 @@ const SnacksFruitsForm = ({
       const remiseSiCafe = isSameFournisseur
         ? (fraisLivraisonsFournisseur?.remiseSiCafe ?? 0)
         : 0;
+      const prixPanierSansRemise = panierFruits + panierSnacks + panierBoissons;
       const prixPanier =
         (1 - remiseSiCafe / 100) *
         (panierFruits + panierSnacks + panierBoissons);
@@ -337,6 +343,10 @@ const SnacksFruitsForm = ({
         fraisLivraisonPanier !== null && nbPersonnes
           ? 52 * (prixPanier + fraisLivraisonPanier)
           : null;
+      const totalSansRemise =
+        fraisLivraisonPanier !== null && nbPersonnes
+          ? 52 * (prixPanierSansRemise + fraisLivraisonPanier)
+          : null;
 
       setTotalSnacksFruits((prev) => ({
         ...prev,
@@ -345,6 +355,7 @@ const SnacksFruitsForm = ({
         totalBoissons,
         totalLivraison,
         total,
+        totalSansRemise,
       }));
     }
   };

@@ -442,6 +442,7 @@ export const fullReinitialisationDevis = (
     totalBoissons: null,
     totalLivraison: null,
     total: null,
+    totalSansRemise: null,
   });
   setTotalFontaines({
     totalEspaces: [

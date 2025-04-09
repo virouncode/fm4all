@@ -39,6 +39,7 @@ type SnacksFruitsMobilePropositionsCarouselProps = {
     fraisLivraisonPanier: number | null;
     panierMin: number | null;
     total: number | null;
+    totalSansRemise: number | null;
     totalFruits: number;
     totalSnacks: number;
     totalBoissons: number;
@@ -74,6 +75,7 @@ type SnacksFruitsMobilePropositionsCarouselProps = {
     fraisLivraisonPanier: number | null;
     panierMin: number | null;
     total: number | null;
+    totalSansRemise: number | null;
     totalFruits: number;
     totalSnacks: number;
     totalBoissons: number;
@@ -109,8 +111,8 @@ const SnacksFruitsMobilePropositionsCarousel = ({
         snacksFruits.infos.gammeSelected === "essentiel"
           ? 0
           : snacksFruits.infos.gammeSelected === "confort"
-          ? 1
-          : 2
+            ? 1
+            : 2
       );
     }
   }, [
