@@ -9,10 +9,12 @@ export const generateMetadata = async (): Promise<Metadata> => {
   return generateAlternates(
     "engagements",
     locale,
-    locale === "fr" ? "Nos engagements" : "Our commitments",
     locale === "fr"
-      ? "Nos engagements pour les services aux entreprises : Garantie, Simplicité, Gain de temps, Suivi opérationnel personnalisé, Garantie Qualité"
-      : "Our commitments for business services: Guarantee, Simplicity, Time saving, Personalized operational monitoring, Quality Guarantee"
+      ? "Nos engagements : Qualité, Simplicité, Gain de temps, Suivi"
+      : "Our commitments: Quality, Simplicity, Time saving, Monitoring",
+    locale === "fr"
+      ? "Nos engagements pour les services aux entreprises : Qualité, Simplicité, Gain de temps, Suivi opérationnel personnalisé. Vos attentes au coeur de nos priorités."
+      : "Our commitments for your business services: Quality, Simplicity, Time saving, Personalized operational monitoring. Your expectations at the heart of our goals."
   );
 };
 
@@ -331,6 +333,11 @@ const page = async () => {
             )}
           </p>
           <ul className="text-lg max-w-prose ml-10 md:mx-auto hyphens-auto text-wrap">
+            <li className="list-disc">
+              {t(
+                "formation-et-encadrement-nos-equipes-beneficient-dune-formation-continue-pour-maintenir-leurs-competences-et-leur-motivation"
+              )}
+            </li>
             <li className="list-disc">
               {t(
                 "proximite-et-ecoute-nos-equipes-sont-disponibles-pour-repondre-a-vos-questions-et-trouver-des-solutions-a-vos-problematiques"

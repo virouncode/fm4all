@@ -8,10 +8,12 @@ export const generateMetadata = async (): Promise<Metadata> => {
   return generateAlternates(
     "prestataires",
     locale,
-    locale === "fr" ? "Devenez prestataire" : "Become a service provider",
+    locale === "fr"
+      ? "Devenez prestataire de services pour entreprise"
+      : "Become a service provider for businesses",
     locale === "fr"
       ? "Vous êtes prestataire de service ? fm4all vous propose de devenir partenaire."
-      : "Are you a service provider? FM4All invites you to become a partner."
+      : "Are you a service provider? fm4all invites you to become a partner."
   );
 };
 

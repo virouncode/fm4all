@@ -13,8 +13,8 @@ export const generateMetadata = async (): Promise<Metadata> => {
       ? "Nos 3 gammes de services aux entreprises"
       : "Our 3 business service tiers",
     locale === "fr"
-      ? "Découvrez nos 3 gammes de services aux entreprises (essentiel, confort, excellence)."
-      : "Discover our 3 business service tiers (essential, comfort, excellence)."
+      ? "Découvrez nos 3 gammes de services aux entreprises : Essentiel, Confort et Excellence. Des solutions adaptées pour vos services à Paris & Île-de-France."
+      : "Discover our 3 business service packages: Essential, Comfort, and Excellence. Tailored solutions for your office services in Paris & Île-de-France."
   );
 };
 
@@ -125,6 +125,11 @@ const page = async () => {
             <Link href={"/cgv"} className="underline">
               {t("conditions-generales-de-vente-cgv")}
             </Link>{" "}
+          </p>
+          <p className="md:w-5/6 mx-auto">
+            {t(
+              "vous-avez-donc-la-garantie-dun-service-aligne-sur-vos-attentes"
+            )}
           </p>
         </div>
       </article>

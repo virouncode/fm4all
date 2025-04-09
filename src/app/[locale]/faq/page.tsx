@@ -8,7 +8,9 @@ export const generateMetadata = async (): Promise<Metadata> => {
   return generateAlternates(
     "faq",
     locale,
-    locale === "fr" ? "Foire aux questions" : "Frequently asked questions",
+    locale === "fr"
+      ? "Foire aux questions sur nos services aux entreprises"
+      : "Frequently asked questions about business services",
     locale === "fr"
       ? "Foire aux questions sur les services aux entreprises de fm4all"
       : "Frequently asked questions about fm4all business services"

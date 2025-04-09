@@ -33,8 +33,8 @@ const page = async () => {
               <strong>
                 {t("configurez-les-services-utiles-a-vos-bureaux")}
               </strong>{" "}
-              {t("et-confiez-nous-leur")} <strong>pilotage</strong>{" "}
-              {t("et-leur")} <strong>gestion</strong>.
+              {t("et-confiez-nous-leur")} <strong>{t("pilotage")}</strong>{" "}
+              {t("et-leur")} <strong>{t("gestion")}</strong>.
             </p>
             <p className="text-center">{t("nous-gerons-pour-vous")}</p>
           </div>

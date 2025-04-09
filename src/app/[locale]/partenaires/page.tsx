@@ -11,8 +11,8 @@ export const generateMetadata = async (): Promise<Metadata> => {
     "partenaires",
     locale,
     locale === "fr"
-      ? "Nos partenaires prestataires de services"
-      : "Our partner service providers",
+      ? "Nos prestataires de services aux entreprises"
+      : "Our business service providers",
     locale === "fr"
       ? "Avec nos partenaires, nous établissons une collaboration fondée sur la qualité et la confiance"
       : "With our partners, we build a collaboration founded on quality and trust."
