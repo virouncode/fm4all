@@ -113,7 +113,7 @@ const ServicesFm4allMobilePropositions = ({
         </CarouselContent>
         <CarouselGammesDots currentIndex={currentIndex} />
       </Carousel>
-      <p className="text-xs text-end italic">
+      <p className="text-xs text-end italic px-1">
         {tFm4all(
           "u00b9remise-de-0-5-a-partir-dun-chiffre-daffaires-de-26-000eur-ht-an-u00b2remise-de-0-5-pour-le-choix-dun-office-manager"
         )}

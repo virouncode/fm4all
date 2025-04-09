@@ -106,6 +106,11 @@ const SnacksFruitsMobilePropositions = ({
           handleClickProposition={handleClickProposition}
         />
       ))}
+      <p className="text-xs text-end italic px-1">
+        {tSnacks(
+          "ce-fournisseur-vous-propose-une-reduction-de-8-car-vous-lavez-choisi-pour-le-cafe"
+        )}
+      </p>
     </div>
   );
 };

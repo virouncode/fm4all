@@ -132,7 +132,7 @@ const SnacksFruitsMobilePropositionCard = ({
   const totalMensuelSansRemiseText =
     proposition.totalSansRemise &&
     proposition.totalSansRemise !== proposition.total ? (
-      <p className="font-bold text-xl ml-4 line-through">
+      <p className="text-sm font-bold text-end line-through">
         {formatNumber(Math.round((proposition.totalSansRemise * MARGE) / 12))}{" "}
         {t("euros-mois")}
       </p>
@@ -153,12 +153,13 @@ const SnacksFruitsMobilePropositionCard = ({
         {t("non-propose-pour-ces-criteres")}
       </p>
     ) : total ? (
-      <>
+      <div className="flex flex-col">
         {totalMensuelSansRemiseText}
         <p className="text-sm font-bold text-end">
           {formatNumber(Math.round((total * MARGE) / 12))} {t("euros-mois")}
+          {totalMensuelSansRemiseText ? "*" : null}
         </p>
-      </>
+      </div>
     ) : (
       <p className="text-sm font-bold text-end">
         {tSnacks("panier-minimum-hebdomadaire-non-atteint")}
