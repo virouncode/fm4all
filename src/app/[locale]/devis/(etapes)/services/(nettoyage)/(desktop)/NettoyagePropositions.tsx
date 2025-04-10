@@ -213,6 +213,7 @@ const NettoyagePropositions = ({
           paParPersonneSavon: null,
           paParPersonnePh: null,
           paParPersonneDesinfectant: null,
+          minFacturation: null,
         },
       }));
       setTotalHygiene({
@@ -377,6 +378,7 @@ const NettoyagePropositions = ({
           tarif.type === "poubelle" &&
           tarif.gamme === hygiene.infos.poubelleGammeSelected
       )?.[hygiene.infos.dureeLocation] ?? null;
+    const minFacturation = distribsTarifsFournisseur[0].minFacturation;
 
     const paParPersonneEmp = consosTarifFournisseur?.paParPersonneEmp ?? null;
     const paParPersonneSavon =
@@ -447,6 +449,7 @@ const NettoyagePropositions = ({
         paParPersonneSavon,
         paParPersonnePh,
         paParPersonneDesinfectant,
+        minFacturation,
       },
     }));
 
