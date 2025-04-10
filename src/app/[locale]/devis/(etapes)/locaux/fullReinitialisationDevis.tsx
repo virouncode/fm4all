@@ -162,6 +162,7 @@ export const fullReinitialisationDevis = (
       paParPersonneSavon: null,
       paParPersonnePh: null,
       paParPersonneDesinfectant: null,
+      minFacturation: null,
     },
   });
   setMaintenance({

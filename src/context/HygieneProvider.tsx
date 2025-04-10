@@ -53,6 +53,7 @@ export const HygieneContext = createContext<{
       paParPersonneSavon: null,
       paParPersonnePh: null,
       paParPersonneDesinfectant: null,
+      minFacturation: null,
     },
   },
   setHygiene: () => {},
@@ -100,6 +101,7 @@ const HygieneProvider = ({ children }: PropsWithChildren) => {
       paParPersonneSavon: null,
       paParPersonnePh: null,
       paParPersonneDesinfectant: null,
+      minFacturation: null,
     },
   });
 

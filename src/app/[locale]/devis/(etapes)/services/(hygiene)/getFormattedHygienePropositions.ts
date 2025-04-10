@@ -82,6 +82,7 @@ export const getFormattedHygienePropositions = (
     const nbClients = hygieneDistribTarifsFournisseur[0].nbClients;
     const noteGoogle = hygieneDistribTarifsFournisseur[0].noteGoogle;
     const nbAvis = hygieneDistribTarifsFournisseur[0].nbAvis;
+    const minFacturation = hygieneDistribTarifsFournisseur[0].minFacturation;
 
     const totalEmp =
       nbDistribEmp && prixDistribEmp !== null && paParPersonneEmp !== null
@@ -104,7 +105,18 @@ export const getFormattedHygienePropositions = (
         : 0;
 
     const totalAnnuelTrilogie =
-      totalEmp + totalPoubellEmp + totalSavon + totalPh || null;
+      totalEmp === null &&
+      totalPoubellEmp === null &&
+      totalSavon === null &&
+      totalPh === null
+        ? null
+        : Math.max(
+            (totalEmp ?? 0) +
+              (totalPoubellEmp ?? 0) +
+              (totalSavon ?? 0) +
+              (totalPh ?? 0),
+            minFacturation ?? 0
+          );
 
     return {
       gamme,
@@ -127,6 +139,7 @@ export const getFormattedHygienePropositions = (
       prixDistribPh,
       prixInstalDistrib,
       totalAnnuelTrilogie,
+      minFacturation,
       imageUrlEmp,
       imageUrlSavon,
       imageUrlPh,

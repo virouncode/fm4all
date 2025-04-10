@@ -74,6 +74,9 @@ export const getHygieneDistribTarifs = async () => {
       pa12M: result.pa12M ? result.pa12M / RATIO : null,
       pa24M: result.pa24M ? result.pa24M / RATIO : null,
       pa36M: result.pa36M ? result.pa36M / RATIO : null,
+      minFacturation: result.minFacturation
+        ? result.minFacturation / RATIO
+        : null,
     }));
     return data;
   } catch (err) {

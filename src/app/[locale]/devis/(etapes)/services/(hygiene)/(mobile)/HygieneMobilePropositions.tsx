@@ -40,6 +40,7 @@ type HygieneMobilePropositionsProps = {
     prixDistribPh: number | null;
     prixInstalDistrib: number | null;
     totalAnnuelTrilogie: number | null;
+    minFacturation: number | null;
     imageUrlEmp: string | null;
     imageUrlSavon: string | null;
     imageUrlPh: string | null;
@@ -66,6 +67,7 @@ type HygieneMobilePropositionsProps = {
     prixDistribPh: number | null;
     prixInstalDistrib: number | null;
     totalAnnuelTrilogie: number | null;
+    minFacturation: number | null;
     imageUrlEmp: string | null;
     imageUrlSavon: string | null;
     imageUrlPh: string | null;

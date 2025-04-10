@@ -49,6 +49,7 @@ export const hygieneSchema = z.object({
     paParPersonneSavon: z.number().nullable(),
     paParPersonnePh: z.number().nullable(),
     paParPersonneDesinfectant: z.number().nullable(),
+    minFacturation: z.number().nullable(),
   }),
 });
 

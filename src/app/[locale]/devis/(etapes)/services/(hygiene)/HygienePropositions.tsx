@@ -87,6 +87,7 @@ const HygienePropositions = ({
     prixDistribPh: number | null;
     prixInstalDistrib: number | null;
     totalAnnuelTrilogie: number | null;
+    minFacturation: number | null;
     imageUrlEmp: string | null;
     imageUrlSavon: string | null;
     imageUrlPh: string | null;
@@ -99,6 +100,7 @@ const HygienePropositions = ({
       prixDistribPh,
       prixInstalDistrib,
       totalAnnuelTrilogie,
+      minFacturation,
     } = proposition;
 
     //Je décoche la proposition
@@ -119,6 +121,7 @@ const HygienePropositions = ({
           paParPersonneEmp: null,
           paParPersonneSavon: null,
           paParPersonnePh: null,
+          minFacturation: null,
         },
       }));
       setTotalHygiene((prev) => ({
@@ -149,6 +152,7 @@ const HygienePropositions = ({
         paParPersonneEmp,
         paParPersonneSavon,
         paParPersonnePh,
+        minFacturation,
       },
     }));
     //Calculer total hygiene
@@ -264,6 +268,7 @@ const HygienePropositions = ({
       hygieneDistribTarifsFournisseur.find(
         (item) => item.type === "ph" && item.gamme === gamme
       )?.[hygiene.infos.dureeLocation] ?? null;
+    const minFacturation = hygieneDistribTarifsFournisseur[0].minFacturation;
 
     let totalEmp: number | null = null;
     let totalSavon: number | null = null;
@@ -304,7 +309,10 @@ const HygienePropositions = ({
         totalTrilogie =
           totalEmp === null && totalSavon === null && totalPh === null
             ? null
-            : (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0);
+            : Math.max(
+                (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0),
+                minFacturation ?? 0
+              );
 
         if (hygiene.infos.trilogieGammeSelected) {
           setTotalHygiene((prev) => ({
@@ -344,7 +352,10 @@ const HygienePropositions = ({
         totalTrilogie =
           totalEmp === null && totalSavon === null && totalPh === null
             ? null
-            : (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0);
+            : Math.max(
+                (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0),
+                hygiene.prix.minFacturation ?? 0
+              );
         if (hygiene.infos.trilogieGammeSelected) {
           setTotalHygiene((prev) => ({
             ...prev,
@@ -383,7 +394,10 @@ const HygienePropositions = ({
         totalTrilogie =
           totalEmp === null && totalSavon === null && totalPh === null
             ? null
-            : (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0);
+            : Math.max(
+                (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0),
+                hygiene.prix.minFacturation ?? 0
+              );
         if (hygiene.infos.trilogieGammeSelected) {
           setTotalHygiene((prev) => ({
             ...prev,
@@ -453,6 +467,7 @@ const HygienePropositions = ({
       hygieneDistribTarifsFournisseur.find(
         (item) => item.type === "ph" && item.gamme === gamme
       )?.[hygiene.infos.dureeLocation] ?? null;
+    const minFacturation = hygieneDistribTarifsFournisseur[0].minFacturation;
 
     let totalEmp: number | null = null;
     let totalSavon: number | null = null;
@@ -497,7 +512,10 @@ const HygienePropositions = ({
         totalTrilogie =
           totalEmp === null && totalSavon === null && totalPh === null
             ? null
-            : (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0);
+            : Math.max(
+                (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0),
+                minFacturation ?? 0
+              );
 
         if (hygiene.infos.trilogieGammeSelected) {
           setTotalHygiene((prev) => ({
@@ -541,7 +559,11 @@ const HygienePropositions = ({
         totalTrilogie =
           totalEmp === null && totalSavon === null && totalPh === null
             ? null
-            : (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0);
+            : Math.max(
+                (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0),
+                minFacturation ?? 0
+              );
+
         if (hygiene.infos.trilogieGammeSelected) {
           setTotalHygiene((prev) => ({
             ...prev,
@@ -583,7 +605,11 @@ const HygienePropositions = ({
         totalTrilogie =
           totalEmp === null && totalSavon === null && totalPh === null
             ? null
-            : (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0);
+            : Math.max(
+                (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0),
+                minFacturation ?? 0
+              );
+
         if (hygiene.infos.trilogieGammeSelected) {
           setTotalHygiene((prev) => ({
             ...prev,
@@ -654,6 +680,8 @@ const HygienePropositions = ({
         (item) => item.type === "ph" && item.gamme === gamme
       )?.[hygiene.infos.dureeLocation] ?? null;
 
+    const minFacturation = hygieneDistribTarifsFournisseur[0].minFacturation;
+
     let totalEmp: number | null = null;
     let totalSavon: number | null = null;
     let totalPh: number | null = null;
@@ -697,7 +725,10 @@ const HygienePropositions = ({
         totalTrilogie =
           totalEmp === null && totalSavon === null && totalPh === null
             ? null
-            : (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0);
+            : Math.max(
+                (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0),
+                minFacturation ?? 0
+              );
 
         if (hygiene.infos.trilogieGammeSelected) {
           setTotalHygiene((prev) => ({
@@ -741,7 +772,11 @@ const HygienePropositions = ({
         totalTrilogie =
           totalEmp === null && totalSavon === null && totalPh === null
             ? null
-            : (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0);
+            : Math.max(
+                (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0),
+                minFacturation ?? 0
+              );
+
         if (hygiene.infos.trilogieGammeSelected) {
           setTotalHygiene((prev) => ({
             ...prev,
@@ -783,7 +818,11 @@ const HygienePropositions = ({
         totalTrilogie =
           totalEmp === null && totalSavon === null && totalPh === null
             ? null
-            : (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0);
+            : Math.max(
+                (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0),
+                minFacturation ?? 0
+              );
+
         if (hygiene.infos.trilogieGammeSelected) {
           setTotalHygiene((prev) => ({
             ...prev,
@@ -849,6 +888,7 @@ const HygienePropositions = ({
     const nbDistribBalai = hygiene.quantites.nbDistribBalai;
     const nbDistribPoubelle = hygiene.quantites.nbDistribPoubelle;
     const paParPersonneDesinfectant = hygiene.prix.paParPersonneDesinfectant;
+    const minFacturation = hygieneDistribTarifsFournisseur[0].minFacturation;
 
     const totalEmp =
       nbDistribEmp &&
@@ -871,7 +911,10 @@ const HygienePropositions = ({
       ? null
       : totalEmp === null && totalSavon === null && totalPh === null
         ? null
-        : (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0);
+        : Math.max(
+            (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0),
+            minFacturation ?? 0
+          );
 
     const totalDesinfectant =
       hygiene.infos.desinfectantGammeSelected &&

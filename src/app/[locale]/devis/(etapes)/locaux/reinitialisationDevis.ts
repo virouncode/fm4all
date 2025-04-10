@@ -142,6 +142,7 @@ export const reinitialisationDevis = (
       paParPersonneSavon: null,
       paParPersonnePh: null,
       paParPersonneDesinfectant: null,
+      minFacturation: null,
     },
   });
   setMaintenance({

@@ -31,6 +31,7 @@ type HygieneMobilePropositionsProps = {
     prixDistribPh: number | null;
     prixInstalDistrib: number | null;
     totalAnnuelTrilogie: number | null;
+    minFacturation: number | null;
     imageUrlEmp: string | null;
     imageUrlSavon: string | null;
     imageUrlPh: string | null;
@@ -56,6 +57,7 @@ type HygieneMobilePropositionsProps = {
     prixDistribPh: number | null;
     prixInstalDistrib: number | null;
     totalAnnuelTrilogie: number | null;
+    minFacturation: number | null;
     imageUrlEmp: string | null;
     imageUrlSavon: string | null;
     imageUrlPh: string | null;
@@ -88,8 +90,8 @@ const HygieneMobileTrilogieCarousel = ({
         hygiene.infos.trilogieGammeSelected === "essentiel"
           ? 0
           : hygiene.infos.trilogieGammeSelected === "confort"
-          ? 1
-          : 2
+            ? 1
+            : 2
       );
     }
   }, [api, hygiene.infos.fournisseurId, hygiene.infos.trilogieGammeSelected]);

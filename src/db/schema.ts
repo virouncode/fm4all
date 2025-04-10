@@ -187,6 +187,7 @@ export const hygieneDistribTarifs = pgTable("hygiene_distrib_tarifs", {
   pa24M: integer("pa_24m"),
   pa36M: integer("pa_36m"),
   imageUrl: varchar(),
+  minFacturation: integer("min_facturation"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
