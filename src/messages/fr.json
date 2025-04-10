@@ -51,7 +51,9 @@
     "prestataires": "Prestataires",
     "devenir-prestataire": "Devenir prestataire",
     "nous-contacter": "Nous contacter",
-    "derniers-articles": "Derniers articles"
+    "derniers-articles": "Derniers articles",
+    "cgv": "CGV",
+    "cgu": "CGU"
   },
   "devisButton": {
     "devis-en-cours": "Devis en cours",
@@ -894,7 +896,7 @@
       "snacks": {
         "fruits-locaux-bio-eco-responsables-snacks-sains-et-gourmands-boissons-fraiches-chaque-semaine-faites-varier-les-plaisirs-dans-un-panier-qui-ravira-vos-equipes-la-gamme-determine-les-quantites-par-personne-par-semaine": "Fruits locaux, bio, eco-responsables, snacks sains et gourmands, boissons fraiches, chaque semaine faites varier les plaisirs dans un panier qui ravira vos équipes. La gamme détermine les quantités par personne par semaine",
         "veuillez-choisir-au-moins-un-produit-parmi-fruits-snacks-et-boissons": "Veuillez choisir au moins un produit parmi \"fruits, snacks et boissons\"",
-        "panier-minimum-hebdomadaire-non-atteint": "Panier minimum hebdomadaire non atteint",
+        "panier-minimum-hebdomadaire-non-atteint": "Panier minimum {panierMin} non atteint",
         "g-personne-semaine": "g / personne / semaine",
         "portion-s-personne-semaine": "portion(s) / personne / semaine",
         "boisson-s-personne-semaine": "boisson(s) / personne / semaine",
@@ -907,7 +909,8 @@
         "snacks": "Snacks",
         "selectionner-boissons": "Sélectionner boissons",
         "boissons": "Boissons",
-        "ce-fournisseur-vous-propose-une-reduction-de-8-car-vous-lavez-choisi-pour-le-cafe": "*ce fournisseur vous propose une réduction de 8% car vous l'avez choisi pour le café"
+        "ce-fournisseur-vous-propose-une-reduction-de-8-car-vous-lavez-choisi-pour-le-cafe": "*ce fournisseur vous propose une réduction de 8% car vous l'avez choisi pour le café",
+        "cafe-compris": "café compris"
       },
       "fontaines": {
         "fontaines-a-eau": "Fontaines à eau",

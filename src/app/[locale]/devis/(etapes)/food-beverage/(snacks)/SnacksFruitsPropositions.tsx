@@ -1,6 +1,7 @@
 import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
+import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { roundEffectif } from "@/lib/roundEffectif";
 import { SelectBoissonsQuantitesType } from "@/zod-schemas/boissonsQuantites";
@@ -39,6 +40,7 @@ const SnacksFruitsPropositions = ({
   const { setTotalSnacksFruits } = useContext(TotalSnacksFruitsContext);
   const { client } = useContext(ClientContext);
   const { cafe } = useContext(CafeContext);
+  const { totalCafe } = useContext(TotalCafeContext);
   const effectif = client.effectif ?? 0;
   const nbPersonnes = snacksFruits.quantites.nbPersonnes ?? effectif;
 
@@ -164,7 +166,14 @@ const SnacksFruitsPropositions = ({
       (1 - remiseSiCafe / 100) * (panierFruits + panierSnacks + panierBoissons);
 
     const panierMin = fraisLivraisonsFournisseur?.panierMin ?? null;
-    const isPanierMin = panierMin === null || prixPanier >= panierMin;
+    const isPanierMin =
+      panierMin === null ||
+      prixPanier +
+        totalCafe.totalEspaces
+          .map(({ total }) => total ?? 0)
+          .reduce((acc, curr) => acc + curr, 0) /
+          12 >=
+        panierMin;
 
     const prixUnitaireLivraisonSiCafe = isPanierMin
       ? (fraisLivraisonsFournisseur?.prixUnitaireSiCafe ?? null)

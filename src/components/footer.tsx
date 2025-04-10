@@ -46,12 +46,12 @@ const Footer = async () => {
               </li>
               <li>
                 <Link href="/cgv" className="hover:opacity-80">
-                  CGV
+                  {t("cgv")}
                 </Link>
               </li>
               <li>
                 <Link href="/cgu" className="hover:opacity-80">
-                  CGU
+                  {t("cgu")}
                 </Link>
               </li>
               <li>{t("touts-droits-reserves-and-copy-fm4all")}</li>

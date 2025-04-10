@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
+import { CafeContext } from "@/context/CafeProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
@@ -100,6 +101,7 @@ const SnacksFruitsMobilePropositionCard = ({
   const tSnacks = useTranslations("DevisPage.foodBeverage.snacks");
   const tGlobal = useTranslations("Global");
   const { snacksFruits } = useContext(SnacksFruitsContext);
+  const { cafe } = useContext(CafeContext);
   const {
     gamme,
     fournisseurId,
@@ -162,7 +164,11 @@ const SnacksFruitsMobilePropositionCard = ({
       </div>
     ) : (
       <p className="text-sm font-bold text-end">
-        {tSnacks("panier-minimum-hebdomadaire-non-atteint")}
+        {tSnacks("panier-minimum-hebdomadaire-non-atteint", {
+          panierMin: proposition.panierMin
+            ? `(${Math.round(proposition.panierMin * MARGE * 4.33)} ${t("euros-mois")} ${tSnacks("cafe-compris")})`
+            : "",
+        })}
       </p>
     );
   const gFruitsParSemaineParPersonneText = snacksFruits.infos.choix.includes(

@@ -4,6 +4,7 @@ import { TypesSnacksFruitsType } from "@/constants/typesSnacksFruits";
 import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
+import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { toast } from "@/hooks/use-toast";
 import { roundEffectif } from "@/lib/roundEffectif";
@@ -42,6 +43,7 @@ const SnacksFruitsForm = ({
   const t = useTranslations("DevisPage");
   const { client } = useContext(ClientContext);
   const { cafe } = useContext(CafeContext);
+  const { totalCafe } = useContext(TotalCafeContext);
   const { snacksFruits, setSnacksFruits } = useContext(SnacksFruitsContext);
   const { setTotalSnacksFruits } = useContext(TotalSnacksFruitsContext);
   const effectif = client.effectif ?? 0;
@@ -166,7 +168,14 @@ const SnacksFruitsForm = ({
         (panierFruits + panierSnacks + panierBoissons);
 
       const panierMin = fraisLivraisonsFournisseur?.panierMin ?? null;
-      const isPanierMin = panierMin === null || prixPanier >= panierMin;
+      const isPanierMin =
+        panierMin === null ||
+        prixPanier +
+          totalCafe.totalEspaces
+            .map(({ total }) => total ?? 0)
+            .reduce((acc, curr) => acc + curr, 0) /
+            12 >=
+          panierMin;
 
       const prixUnitaireLivraisonSiCafe = isPanierMin
         ? (fraisLivraisonsFournisseur?.prixUnitaireSiCafe ?? null)

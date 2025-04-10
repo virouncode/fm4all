@@ -51,7 +51,9 @@
     "prestataires": "Providers",
     "devenir-prestataire": "Become a provider",
     "nous-contacter": "Contact us",
-    "derniers-articles": "Last posts"
+    "derniers-articles": "Last posts",
+    "cgv": "Sales Terms & Conditions",
+    "cgu": "Terms of Use"
   },
   "cookieBanniere": {
     "nous-utilisons-des-cookies-et-des-technologies-similaires-necessaires-au-fonctionnement-de-notre-site-web": "We use cookies and similar technologies necessary for the operation of our website.",
@@ -894,7 +896,7 @@
       "snacks": {
         "fruits-locaux-bio-eco-responsables-snacks-sains-et-gourmands-boissons-fraiches-chaque-semaine-faites-varier-les-plaisirs-dans-un-panier-qui-ravira-vos-equipes-la-gamme-determine-les-quantites-par-personne-par-semaine": "Local, organic, eco-friendly fruits, healthy and delicious snacks, fresh drinks—every week, vary the pleasures with a box that will delight your teams. The tier determines the quantities per person per week.",
         "veuillez-choisir-au-moins-un-produit-parmi-fruits-snacks-et-boissons": "Please choose at least one product from 'fruits, snacks, and drinks'",
-        "panier-minimum-hebdomadaire-non-atteint": "Minimum weekly box not reached",
+        "panier-minimum-hebdomadaire-non-atteint": "Minimum box {panierMin} not reached",
         "g-personne-semaine": "g / person / week",
         "portion-s-personne-semaine": "portion(s) / person / week",
         "boisson-s-personne-semaine": "drink(s) / person / week",
@@ -907,7 +909,8 @@
         "snacks": "Snacks",
         "selectionner-boissons": "Select drinks",
         "boissons": "Drinks",
-        "ce-fournisseur-vous-propose-une-reduction-de-8-car-vous-lavez-choisi-pour-le-cafe": "*this supplier is offering you an 8% discount because you chose them for coffee"
+        "ce-fournisseur-vous-propose-une-reduction-de-8-car-vous-lavez-choisi-pour-le-cafe": "*this supplier is offering you an 8% discount because you chose them for coffee",
+        "cafe-compris": "coffee included"
       },
       "fontaines": {
         "fontaines-a-eau": "Water fountains",
