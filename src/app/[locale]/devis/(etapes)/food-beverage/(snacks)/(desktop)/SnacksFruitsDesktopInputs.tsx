@@ -24,7 +24,7 @@ const SnacksFruitsDesktopInputs = ({
   const { client } = useContext(ClientContext);
   const { snacksFruits } = useContext(SnacksFruitsContext);
   return (
-    <form className="w-2/3 flex items-center gap-8">
+    <form className="w-2/3 flex items-center gap-8 py-1">
       <div className="flex gap-4 items-center">
         <div className="flex items-center gap-2">
           <Checkbox
