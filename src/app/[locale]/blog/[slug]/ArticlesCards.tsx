@@ -30,7 +30,7 @@ const ArticlesCards = async ({ categorie }: ArticlesCardsProps) => {
         return articleImageUrl ? (
           <ImgCardVertical
             key={article._id}
-            src={articleImageUrl.width(800).url()}
+            src={articleImageUrl.width(500).height(500).url()}
             alt={articleImageAlt}
             href={{
               pathname: "/blog/[slug]/[subSlug]",

@@ -44,7 +44,7 @@ const ArticlesCarousel = async () => {
               key={article._id}
             >
               <ImgCardVertical
-                src={articleImageUrl.width(800).url()}
+                src={articleImageUrl.width(500).height(500).url()}
                 alt={articleImageAlt}
                 href={{
                   pathname: `/blog/[slug]/[subSlug]`,

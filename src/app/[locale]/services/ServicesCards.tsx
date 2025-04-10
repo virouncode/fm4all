@@ -22,7 +22,7 @@ const ServicesCards = async () => {
         return serviceImageUrl ? (
           <ImgCardVertical
             key={service._id}
-            src={serviceImageUrl.width(800).url()}
+            src={serviceImageUrl.width(500).height(500).url()}
             alt={serviceImageAlt}
             href={{
               pathname: `/services/[slug]`,

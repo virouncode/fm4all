@@ -33,7 +33,7 @@ const ExpertiseCarousel = async ({
 
   return (
     <Tabs defaultValue="services">
-      <TabsList className="mb-10 bg-transparent">
+      <TabsList className="mb-10 bg-transparent flex flex-col items-start md:flex-row md:items-center">
         {/* {[...(services || []), ...(sousServices || [])].length > 0 ? (
           <TabsTrigger value="services" className="text-lg">
             {t("services-associes")}
@@ -81,7 +81,7 @@ const ExpertiseCarousel = async ({
                   key={service._id}
                 >
                   <ImgCardVertical
-                    src={serviceImageUrl.url()}
+                    src={serviceImageUrl.width(500).height(500).url()}
                     alt={serviceImageAlt}
                     href={{
                       pathname: `/services/[slug]`,
@@ -125,7 +125,7 @@ const ExpertiseCarousel = async ({
                   key={secteur._id}
                 >
                   <ImgCardVertical
-                    src={secteurImageUrl.url()}
+                    src={secteurImageUrl.width(500).height(500).url()}
                     alt={secteurImageAlt}
                     href={{
                       pathname: `/secteurs/[slug]`,
@@ -171,7 +171,7 @@ const ExpertiseCarousel = async ({
                   key={article._id}
                 >
                   <ImgCardVertical
-                    src={articleImageUrl.url()}
+                    src={articleImageUrl.width(500).height(500).url()}
                     alt={articleImageAlt}
                     href={{
                       pathname: "/blog/[slug]/[subSlug]",

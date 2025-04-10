@@ -37,7 +37,7 @@ const ServicesCarousel = async () => {
               key={service._id}
             >
               <ImgCardVertical
-                src={serviceImageUrl.width(800).url()}
+                src={serviceImageUrl.width(500).height(500).url()}
                 alt={serviceImageAlt}
                 href={{
                   pathname: `/services/[slug]`,

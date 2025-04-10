@@ -29,7 +29,7 @@ const Hero = async () => {
           <p className="text-xl md:text-2xl font-medium mb-8 animate-appear text-center">
             {t("vos-locaux-font-moins-de-3000m")}
           </p>
-          <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 mb-8 border border-white/20 flex flex-col gap-6 text-base md:text-lg animate-appear">
+          <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 mb-8 border border-white/20 flex flex-col gap-6 text-base md:text-xl animate-appear">
             <h2>
               {t("gagnez-du-temps-et-de-largent-sur-la")}{" "}
               <strong>{t("gestion-de-vos-prestations")}</strong>{" "}
