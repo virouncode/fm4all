@@ -41,7 +41,7 @@ const generateStaticUrls = () => {
         url: `${BASE_URL}/${locale}${localizedPath}`,
         lastModified: lastMod,
         changeFrequency: "weekly",
-        priority: 0.8,
+        priority: localizedPath ? 0.8 : 1,
       });
     }
   }
