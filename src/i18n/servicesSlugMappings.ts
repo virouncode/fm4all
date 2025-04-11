@@ -4,7 +4,7 @@
 export const servicesSlugMappingsFrToEn: Record<string, string> = {
   nettoyage: "cleaning-services",
   "hygiene-sanitaire": "sanitary-supplies",
-  "maintenance-multitechnique": "technical-maintenance",
+  "maintenance-multitechnique": "multitechnical-maintenance",
   "securite-incendie": "fire-safety",
   "machines-a-cafe-en-entreprise": "coffee-machines",
   "livraison-fruits-entreprise": "office-fruit-basket-delivery",
