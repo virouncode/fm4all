@@ -132,8 +132,8 @@ export const routes: Record<RouteKey, Record<"fr" | "en", string>> = {
     en: "/posts/[slug]/[subSlug]",
   },
   tag: {
-    fr: "/tags/[tag]",
-    en: "/tags/[tag]",
+    fr: "/tag/[tag]",
+    en: "/tag/[tag]",
   },
   secteurs: {
     fr: "/secteurs",

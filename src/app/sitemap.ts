@@ -113,13 +113,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if (!slug) return [];
     return [
       {
-        url: `${BASE_URL}/fr/tags/${slug}`,
+        url: `${BASE_URL}/fr/tag/${slug}`,
         lastModified: lastMod,
         changeFrequency: "weekly",
         priority: 0.7,
       },
       {
-        url: `${BASE_URL}/en/tags/${getTagSlugEn(slug)}`,
+        url: `${BASE_URL}/en/tag/${getTagSlugEn(slug)}`,
         lastModified: lastMod,
         changeFrequency: "weekly",
         priority: 0.7,

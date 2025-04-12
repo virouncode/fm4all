@@ -77,7 +77,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
         slug !== "fm"
     )
     .flatMap((slug) =>
-      slug ? [`/fr/tags/${getTagSlugEn(slug)}`, `/en/tags/${slug}`] : []
+      slug ? [`/fr/tag/${getTagSlugEn(slug)}`, `/en/tag/${slug}`] : []
     );
 
   const disallowUrls = [
