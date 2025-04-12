@@ -215,6 +215,8 @@ const page = async ({
     ? service.imageBloc10.alt
     : tGlobal("illustration-du-service");
 
+  console.log("serviceImageBloc2Url", serviceImageBloc2Url);
+
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20 hyphens-auto">
       <Breadcrumb className="mb-10">

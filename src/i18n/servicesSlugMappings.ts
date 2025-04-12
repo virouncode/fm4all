@@ -10,7 +10,7 @@ export const servicesSlugMappingsFrToEn: Record<string, string> = {
   "livraison-fruits-entreprise": "office-fruit-basket-delivery",
   "livraison-snacks-entreprise": "healthy-snack-delivery-office",
   "livraison-boissons-entreprise": "office-drinks-delivery",
-  "fontaines-a-eau-entreprise": "water-dispenser",
+  "fontaines-a-eau-entreprise": "water-dispensers",
   "office-manager-externalise": "outsource-office-management",
   "pilotage-facility-management": "facilities-management-outsourcing",
   // Ajoutez tous vos autres services ici
