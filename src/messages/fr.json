@@ -720,7 +720,23 @@
           "batiment": "Type de batiment invalide",
           "occupation": "Type d'occupation invalide",
           "codePostal": "Code postal invalide,entrez 5 chiffres"
-        }
+        },
+        "le-code-postal-ne-correspond-a-aucune-ville-veullez-reessayer": "Le code postal ne correspond à aucune ville, veullez réessayer"
+      },
+      "cityOut": {
+        "succes": "Succès ! 🎉",
+        "erreur": "Erreur ! 😿",
+        "impossible-de-sauvegarder-vos-coordonnees-veuillez-reessayer": "Impossible de sauvegarder vos coordonnées: veuillez réessayer",
+        "impossible-denvoyer-vos-coordonnees-a-notre-equipe-veuillez-reessayer": "Impossible d'envoyer vos coordonnées à notre équipe. Veuillez réessayer.",
+        "notre-matrice-de-chiffrage-automatique-est-en-cours-de-developpement-pour-votre-region-cependant-vous-pouvez-etre-contacte-pour-un-devis-sur-mesure-ou-etre-averti-des-que-lautomatisation-sera-disponible-dans-votre-region": "Notre matrice de chiffrage automatique est en cours de développement pour votre région. Cependant, vous pouvez être contacté pour un devis sur mesure ou être averti dès que l'automatisation sera disponible dans votre région.",
+        "laissez-nous-vos-coordonnees-ici": "Laissez nous vos coordonnées ici :",
+        "nom-de-lentreprise": "Nom de l'entreprise*",
+        "email-du-contact": "Email du contact*",
+        "n-de-telephone": "N° de téléphone*",
+        "prenom-du-contact": "Prénom du contact*",
+        "nom-du-contact": "Nom du contact*",
+        "poste-du-contact": "Poste du contact*",
+        "envoyer-mes-coordonnees": "Envoyer mes coordonnées"
       }
     },
     "services": {

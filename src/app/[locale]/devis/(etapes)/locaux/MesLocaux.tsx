@@ -158,9 +158,10 @@ const MesLocaux = () => {
         setDevisProgress({ ...devisProgress, completedSteps: [] });
         toast({
           variant: "destructive",
-          title: "Code postal invalide",
-          description:
-            "Le code postal ne correspond à aucune ville, veullez réessayer",
+          title: t("code-postal-invalide"),
+          description: t(
+            "le-code-postal-ne-correspond-a-aucune-ville-veullez-reessayer"
+          ),
         });
         return;
       }

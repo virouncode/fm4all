@@ -626,7 +626,7 @@ const page = async ({
           </div>
         ) : null}
         <p>
-          {auteur.prenom} {auteur.nom},
+          {auteur.prenom} {auteur.nom},{" "}
           {DateTime.fromISO(article.date || "")
             .setLocale(locale)
             .toLocaleString(DateTime.DATETIME_SHORT)}

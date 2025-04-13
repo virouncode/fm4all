@@ -720,7 +720,23 @@
           "batiment": "Invalid building type",
           "occupation": "Invalid type of occupancy",
           "codePostal": "Invalid postal code, enter 5 digits"
-        }
+        },
+        "le-code-postal-ne-correspond-a-aucune-ville-veullez-reessayer": "The postal code does not match any city, please try again"
+      },
+      "cityOut": {
+        "succes": "Success! 🎉",
+        "erreur": "Error! 😿",
+        "impossible-de-sauvegarder-vos-coordonnees-veuillez-reessayer": "Unable to save your contact details: please try again",
+        "impossible-denvoyer-vos-coordonnees-a-notre-equipe-veuillez-reessayer": "Unable to send your contact details to our team. Please try again.",
+        "notre-matrice-de-chiffrage-automatique-est-en-cours-de-developpement-pour-votre-region-cependant-vous-pouvez-etre-contacte-pour-un-devis-sur-mesure-ou-etre-averti-des-que-lautomatisation-sera-disponible-dans-votre-region": "Our automatic pricing matrix is currently being developed for your region. However, you can be contacted for a custom quote or be notified as soon as automation becomes available in your area.",
+        "laissez-nous-vos-coordonnees-ici": "Leave us your contact details here:",
+        "nom-de-lentreprise": "Company name*",
+        "email-du-contact": "Contact email*",
+        "n-de-telephone": "Phone number*",
+        "prenom-du-contact": "Contact first name*",
+        "nom-du-contact": "Contact last name*",
+        "poste-du-contact": "Contact job*",
+        "envoyer-mes-coordonnees": "Send my contact details"
       }
     },
     "services": {

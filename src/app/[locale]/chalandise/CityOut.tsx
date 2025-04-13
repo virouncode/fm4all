@@ -9,9 +9,13 @@ import { occupation } from "@/constants/occupation";
 import { ClientContext } from "@/context/ClientProvider";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";
-import { insertClientSchema, InsertClientType } from "@/zod-schemas/client";
+import {
+  createInsertClientSchema,
+  InsertClientType,
+} from "@/zod-schemas/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useAction } from "next-safe-action/hooks";
 import { ChangeEvent, useContext } from "react";
 import { useForm } from "react-hook-form";
@@ -21,6 +25,8 @@ type CityOutProps = {
 };
 
 const CityOut = ({ destination }: CityOutProps) => {
+  const t = useTranslations("DevisPage.locaux.cityOut");
+  const tSauverErreurs = useTranslations("DevisPage.sauver.erreurs");
   const { client } = useContext(ClientContext);
   const router = useRouter();
   const defaultValues: InsertClientType = {
@@ -28,7 +34,28 @@ const CityOut = ({ destination }: CityOutProps) => {
   };
   const form = useForm<InsertClientType>({
     mode: "onBlur",
-    resolver: zodResolver(insertClientSchema),
+    resolver: zodResolver(
+      createInsertClientSchema({
+        nomEntreprise: tSauverErreurs("nom-de-lentreprise-obligatoire"),
+        siret: tSauverErreurs(
+          "siret-invalide-format-attendu-xxx-xxx-xxx-xxxxx"
+        ),
+        prenomContact: tSauverErreurs("prenom-du-contact-obligatoire"),
+        nomContact: tSauverErreurs("nom-du-contact-obligatoire"),
+        posteContact: tSauverErreurs("poste-du-contact-obligatoire"),
+        emailContact: tSauverErreurs("adresse-email-invalide"),
+        phoneContact: tSauverErreurs("numero-de-telephone-invalide"),
+        emailSignataire: tSauverErreurs("adresse-email-invalide"),
+        surface: tSauverErreurs("surface-obligatoire"),
+        surfaceMax: tSauverErreurs("surface-maximum-3000-m"),
+        effectif: tSauverErreurs("effectif-obligatoire"),
+        effectifMax: tSauverErreurs("effectif-maximum-300-personnes"),
+        typeBatiment: tSauverErreurs("batiment"),
+        typeOccupation: tSauverErreurs("type-doccupation-invalide"),
+        codePostal: tSauverErreurs("code-postal-invalide-entrez-5-chiffres"),
+        ville: tSauverErreurs("ville-obligatoire"),
+      })
+    ),
     defaultValues,
   });
   const { execute: executeSaveClient, isPending: isSavingClient } = useAction(
@@ -37,15 +64,17 @@ const CityOut = ({ destination }: CityOutProps) => {
       onSuccess: ({ data }) => {
         toast({
           variant: "default",
-          title: "Succès ! 🎉",
+          title: t("succes"),
           description: data?.message,
         });
       },
       onError: () => {
         toast({
           variant: "destructive",
-          title: "Erreur ! 😿",
-          description: `Impossible de sauvegarder vos coordonnées: veuillez réessayer`,
+          title: t("erreur"),
+          description: t(
+            "impossible-de-sauvegarder-vos-coordonnees-veuillez-reessayer"
+          ),
         });
       },
     }
@@ -99,10 +128,11 @@ const CityOut = ({ destination }: CityOutProps) => {
       console.log(err);
       if (err instanceof Error) {
         toast({
-          title: "Erreur ! 😿",
+          title: t("erreur"),
           variant: "destructive",
-          description:
-            "Impossible d'envoyer vos coordonnées à notre équipe. Veuillez réessayer.",
+          description: t(
+            "impossible-denvoyer-vos-coordonnees-a-notre-equipe-veuillez-reessayer"
+          ),
         });
       }
     }
@@ -112,12 +142,11 @@ const CityOut = ({ destination }: CityOutProps) => {
     <div className="flex flex-col gap-10 mt-6">
       <div className="w-full max-w-prose mx-auto text-base md:text-lg hyphens-auto text-wrap flex flex-col gap-4">
         <p>
-          Notre matrice de chiffrage automatique est en cours de développement
-          pour votre région. Cependant, vous pouvez être contacté pour un devis
-          sur mesure ou être averti dès que l&apos;automatisation sera
-          disponible dans votre région.
+          {t(
+            "notre-matrice-de-chiffrage-automatique-est-en-cours-de-developpement-pour-votre-region-cependant-vous-pouvez-etre-contacte-pour-un-devis-sur-mesure-ou-etre-averti-des-que-lautomatisation-sera-disponible-dans-votre-region"
+          )}
         </p>
-        <p className="text-center">Laissez nous vos coordonnées ici :</p>
+        <p className="text-center">{t("laissez-nous-vos-coordonnees-ici")}</p>
       </div>
       <Form {...form}>
         <form
@@ -127,35 +156,34 @@ const CityOut = ({ destination }: CityOutProps) => {
           <div className="flex flex-col md:flex-row gap-4 md:gap-8">
             <div className="flex-1 flex flex-col gap-4">
               <InputWithLabel<InsertClientType>
-                fieldTitle="Nom de l'entreprise*"
+                fieldTitle={t("nom-de-lentreprise")}
                 nameInSchema="nomEntreprise"
                 handleChange={handleChange}
               />
               <InputWithLabel<InsertClientType>
-                fieldTitle="Email du contact*"
+                fieldTitle={t("email-du-contact")}
                 nameInSchema="emailContact"
                 handleChange={handleChange}
               />
               <InputWithLabel<InsertClientType>
-                fieldTitle="N° de téléphone*"
+                fieldTitle={t("n-de-telephone")}
                 nameInSchema="phoneContact"
                 handleChange={handleChange}
-                placeholder="XX XX XX XX XX"
               />
             </div>
             <div className="flex-1 flex flex-col gap-4 ">
               <InputWithLabel<InsertClientType>
-                fieldTitle="Prénom du contact*"
+                fieldTitle={t("prenom-du-contact")}
                 nameInSchema="prenomContact"
                 handleChange={handleChange}
               />
               <InputWithLabel<InsertClientType>
-                fieldTitle="Nom du contact*"
+                fieldTitle={t("nom-du-contact")}
                 nameInSchema="nomContact"
                 handleChange={handleChange}
               />
               <InputWithLabel<InsertClientType>
-                fieldTitle="Poste du contact*"
+                fieldTitle={t("poste-du-contact")}
                 nameInSchema="posteContact"
                 handleChange={handleChange}
               />
@@ -165,13 +193,13 @@ const CityOut = ({ destination }: CityOutProps) => {
             <Button
               variant="destructive"
               size="lg"
-              title="Envoyer mes coordonnées"
+              title={t("envoyer-mes-coordonnees")}
               className="text-base min-w-28"
             >
               {isSavingClient ? (
                 <LoaderCircle className="animate-spin" />
               ) : (
-                "Envoyer mes coordonnées"
+                t("envoyer-mes-coordonnees")
               )}
             </Button>
           </div>
