@@ -17,6 +17,8 @@ export const tagsSlugMappingsFrToEn: Record<string, string> = {
   proprete: "cleanliness",
   "comparateur-en-ligne": "online-comparison-tool",
   "devis-en-ligne": "online-quote",
+  "demenagement-entreprise": "moving-in-new-offices",
+
   // Ajoutez tous vos autres services ici
 };
 
