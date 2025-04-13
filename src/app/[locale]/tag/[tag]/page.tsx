@@ -28,7 +28,9 @@ export const generateMetadata = async ({
   return generateAlternates(
     "tag",
     locale,
-    capitalize(tag),
+    locale === "fr"
+      ? `Page des articles, services et secteurs associés au tag : ${capitalize(tag)}`
+      : `Tag page for articles, services and sectors associated with: ${capitalize(tag)}`,
     locale === "fr"
       ? `Découvrez nos articles, services et secteurs associés au tag "${tag}"`
       : `Discover our articles, services and sectors associated with the tag "${tag}"`,

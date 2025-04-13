@@ -15,6 +15,8 @@ export const tagsSlugMappingsFrToEn: Record<string, string> = {
   "pilotage-prestations": "service-management",
   FM: "FM",
   proprete: "cleanliness",
+  "comparateur-en-ligne": "online-comparison-tool",
+  "devis-en-ligne": "online-quote",
   // Ajoutez tous vos autres services ici
 };
 
