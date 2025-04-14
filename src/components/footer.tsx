@@ -58,7 +58,11 @@ const Footer = async () => {
             </ul>
           </div>
           <div className="flex flex-col gap-2 w-52">
-            <p className="text-secondary text-xl">{t("services")}</p>
+            <p className="text-secondary text-xl">
+              <Link href="/services" className="hover:opacity-80">
+                {t("services")}
+              </Link>
+            </p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
               {services.map((service) => {
                 const serviceUrl = service.slug?.current ?? "";
@@ -79,7 +83,11 @@ const Footer = async () => {
             </ul>
           </div>
           <div className="flex flex-col gap-2 w-52">
-            <p className="text-secondary text-xl">{t("derniers-articles")}</p>
+            <p className="text-secondary text-xl">
+              <Link href="/blog" className="hover:opacity-80">
+                {t("derniers-articles")}
+              </Link>
+            </p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
               {articles.map((article) => {
                 const categorie = article.categorie as ArticleCategory;

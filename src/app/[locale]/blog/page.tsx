@@ -42,13 +42,13 @@ const page = async () => {
           </h2>
           <div className="flex flex-col gap-14">
             {categories.map((categorie) => (
-              <div key={categorie._id} className="flex flex-col gap-6">
+              <div key={categorie._id} className="flex flex-col gap-10">
                 <Link
                   href={{
                     pathname: "/blog/[slug]",
                     params: { slug: categorie.slug?.current ?? "" },
                   }}
-                  className="text-2xl underline hover:opacity-80"
+                  className="text-xl md:text-2xl underline hover:opacity-80"
                 >
                   {categorie.titre}
                 </Link>
