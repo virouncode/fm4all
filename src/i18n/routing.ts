@@ -116,6 +116,18 @@ export const routing = defineRouting({
       fr: "/tag/[tag]",
       en: "/tag/[tag]",
     },
+    "/auth/signin": {
+      fr: "/auth/signin",
+      en: "/auth/signin",
+    },
+    "/auth/signup": {
+      fr: "/auth/signup",
+      en: "/auth/signup",
+    },
+    "/dashboard": {
+      fr: "/dashboard",
+      en: "/dashboard",
+    },
   },
 });
 

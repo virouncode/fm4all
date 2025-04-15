@@ -11,6 +11,8 @@ const emailSchema = z.object({
   text: z.string().min(1, "Le message est obligatoire"),
   attachment: z.string().url().optional(),
   filename: z.string().optional(),
+  nomDestinataire: z.string().optional(),
+  prenomDestinataire: z.string().optional(),
 });
 
 type EmailType = {
@@ -49,6 +51,7 @@ export async function POST(req: NextRequest) {
     }
 
     const data = result.data;
+
     let fileBuffer;
 
     if (data.attachment) {
@@ -69,8 +72,8 @@ export async function POST(req: NextRequest) {
       subject: data.subject,
       template: "general",
       "h:X-Mailgun-Variables": JSON.stringify({
-        nom_destinataire: "Buffe",
-        prenom_destinataire: "Romuald",
+        nom_destinataire: data.nomDestinataire,
+        prenom_destinataire: data.prenomDestinataire,
         corps_message: data.text,
         subject: data.subject,
       }),
