@@ -24,6 +24,11 @@ export const auth = betterAuth({
         required: false,
         defaultValue: null,
       },
+      image: {
+        type: "string",
+        required: false,
+        defaultValue: null,
+      },
     },
   },
   database: drizzleAdapter(db, {

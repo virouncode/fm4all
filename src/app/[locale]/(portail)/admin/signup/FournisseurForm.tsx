@@ -4,7 +4,6 @@ import { InputWithLabel } from "@/components/formInputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
-import { capitalize } from "@/lib/capitalize";
 import {
   insertFournisseurSchema,
   InsertFournisseurType,
@@ -56,16 +55,7 @@ const FournisseurForm = () => {
   });
 
   const submitForm = async (data: InsertFournisseurType) => {
-    //insérer le fournisseur
-    const fournisseurToPost: InsertFournisseurType = {
-      ...data,
-      nomFournisseur: data.nomFournisseur.toUpperCase(),
-      prenomContact: capitalize(data.prenomContact),
-      nomContact: capitalize(data.nomContact),
-      emailContact: data.emailContact.toLowerCase(),
-    };
-    executeSaveFournisseur(fournisseurToPost);
-    //creer l'utilisateur
+    executeSaveFournisseur(data);
   };
 
   return (

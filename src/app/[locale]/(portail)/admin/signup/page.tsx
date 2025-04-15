@@ -15,10 +15,10 @@ import AdminForm from "./AdminForm";
 import ClientForm from "./ClientForm";
 import FournisseurForm from "./FournisseurForm";
 
-export type UserType = "fournisseur" | "client" | "admin";
+export type UserTypeType = "fournisseur" | "client" | "admin";
 
 export default function SignUp() {
-  const [type, setType] = useState<UserType>("fournisseur");
+  const [type, setType] = useState<UserTypeType>("fournisseur");
 
   return (
     <main className="max-w-7xl h-[calc(100vh-4rem)] mx-auto py-4 px-6 md:px-20">
@@ -51,7 +51,7 @@ export default function SignUp() {
                   Type de compte :
                 </Label>
                 <RadioGroup
-                  onValueChange={(value) => setType(value as UserType)}
+                  onValueChange={(value) => setType(value as UserTypeType)}
                   value={type}
                   className="flex gap-6 items-center"
                   name="type"

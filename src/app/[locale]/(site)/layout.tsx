@@ -33,7 +33,6 @@ import TotalServicesFm4AllProvider from "@/context/TotalServicesFm4AllProvider";
 import TotalSnacksFruitsProvider from "@/context/TotalSnacksFruitsProvider";
 import TotalTheProvider from "@/context/TotalTheProvider";
 import { routing } from "@/i18n/routing";
-import { getUser } from "@/lib/auth-session";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Metadata } from "next";
@@ -94,7 +93,6 @@ export default async function LocalizedLayout({
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
-  const user = await getUser();
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className={`${didact.className} antialiased scroll-smooth`}>
