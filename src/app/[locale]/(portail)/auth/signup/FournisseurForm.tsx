@@ -41,12 +41,13 @@ const FournisseurForm = () => {
         description: data?.message,
       });
     },
-    onError: () => {
+    onError: ({ error }) => {
       toast({
         variant: "destructive",
         title: "Erreur 😿",
         description:
-          "Une erreur est survenue lors de la création du fournisseur.",
+          error?.serverError ||
+          "Une erreur est survenue lors de la création de l'utilisateur",
       });
     },
   });
