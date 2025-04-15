@@ -12,7 +12,7 @@ import {
   fetchTagsSlugs,
 } from "@/sanity/queries";
 import { MetadataRoute } from "next";
-const BASE_URL = "https://www.fm4all.com";
+const APP_URL = "https://www.fm4all.com";
 
 const lastMod = new Date().toISOString();
 // Fonction pour générer les URLs des pages statiques
@@ -38,7 +38,7 @@ const generateStaticUrls = () => {
 
       // Ajouter l'URL au sitemap
       urls.push({
-        url: `${BASE_URL}/${locale}${localizedPath}`,
+        url: `${APP_URL}/${locale}${localizedPath}`,
         lastModified: lastMod,
         changeFrequency: "weekly",
         priority: localizedPath ? 0.8 : 1,
@@ -60,13 +60,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if (!slug) return [];
     return [
       {
-        url: `${BASE_URL}/fr/services/${slug}`,
+        url: `${APP_URL}/fr/services/${slug}`,
         lastModified: lastMod,
         changeFrequency: "weekly",
         priority: 0.7,
       },
       {
-        url: `${BASE_URL}/en/services/${getServicesSlugEn(slug)}`,
+        url: `${APP_URL}/en/services/${getServicesSlugEn(slug)}`,
         lastModified: lastMod,
         changeFrequency: "weekly",
         priority: 0.7,
@@ -78,13 +78,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       if (!slug) return [];
       return [
         {
-          url: `${BASE_URL}/fr/articles/${slug}`,
+          url: `${APP_URL}/fr/articles/${slug}`,
           lastModified: lastMod,
           changeFrequency: "weekly",
           priority: 0.7,
         },
         {
-          url: `${BASE_URL}/en/posts/${getArticlesSlugEn(slug)}`,
+          url: `${APP_URL}/en/posts/${getArticlesSlugEn(slug)}`,
           lastModified: lastMod,
           changeFrequency: "weekly",
           priority: 0.7,
@@ -95,13 +95,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     (article) => {
       return [
         {
-          url: `${BASE_URL}/fr/articles/${article.slug}/${article.subSlug}`,
+          url: `${APP_URL}/fr/articles/${article.slug}/${article.subSlug}`,
           lastModified: lastMod,
           changeFrequency: "weekly",
           priority: 0.7,
         },
         {
-          url: `${BASE_URL}/en/posts/${getArticlesSlugEn(article.slug)}/${getArticlesSubSlugEn(article.subSlug)}`,
+          url: `${APP_URL}/en/posts/${getArticlesSlugEn(article.slug)}/${getArticlesSubSlugEn(article.subSlug)}`,
           lastModified: lastMod,
           changeFrequency: "weekly",
           priority: 0.7,
@@ -113,13 +113,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if (!slug) return [];
     return [
       {
-        url: `${BASE_URL}/fr/tag/${slug}`,
+        url: `${APP_URL}/fr/tag/${slug}`,
         lastModified: lastMod,
         changeFrequency: "weekly",
         priority: 0.7,
       },
       {
-        url: `${BASE_URL}/en/tag/${getTagSlugEn(slug)}`,
+        url: `${APP_URL}/en/tag/${getTagSlugEn(slug)}`,
         lastModified: lastMod,
         changeFrequency: "weekly",
         priority: 0.7,
