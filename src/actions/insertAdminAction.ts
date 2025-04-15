@@ -22,10 +22,13 @@ export const insertAdminAction = actionClient
     async ({ parsedInput: adminInput }: { parsedInput: InsertAdminType }) => {
       const currentUser = await getUser();
       const locale = await getLocale();
-      if (currentUser?.role !== "admin") {
-        throw new Error(
-          "Vous n'avez pas les droits pour créer un utilisateur."
-        );
+      // if (currentUser?.role !== "admin") {
+      //   throw new Error(
+      //     "Vous n'avez pas les droits pour créer un utilisateur."
+      //   );
+      // }
+      if (adminInput.password !== adminInput.passwordConfirmation) {
+        throw new Error("Les mots de passe ne correspondent pas.");
       }
       const userToPost = {
         name: capitalize(adminInput.prenom) + " " + capitalize(adminInput.nom),
