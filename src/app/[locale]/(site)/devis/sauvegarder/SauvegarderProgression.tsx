@@ -13,6 +13,7 @@ import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { toast } from "@/hooks/use-toast";
 import { Link, useRouter } from "@/i18n/navigation";
 import { formatLocalStorageData } from "@/lib/formatLocalStorageData";
+import { sendEmailFromClient } from "@/lib/sendEmail";
 import {
   createInsertClientSchema,
   InsertClientType,
@@ -131,16 +132,11 @@ const SauvegarderProgression = () => {
     //cf onSuccess
     //TODO envoyez un email à Romu avec toutes les infos du devis grâce aux contextes
     try {
-      await fetch("/api/mailgun", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: "contact@fm4all.com",
-          from: "contact@fm4all.com",
-          subject: "Un client a sauvegardé sa progression",
-          text: `<p>Un client a sauvegardé sa progression dans le funnel.</p><br/>
+      await sendEmailFromClient({
+        to: "contact@fm4all.com",
+        from: "contact@fm4all.com",
+        subject: "Un client a sauvegardé sa progression",
+        text: `<p>Un client a sauvegardé sa progression dans le funnel.</p><br/>
                 <p>Voici ses coordonnées :</p><br/>
                 <p>Entreprise : ${data.nomEntreprise}</p>
                 <p>Nom du contact : ${data.nomContact}</p>
@@ -157,7 +153,6 @@ const SauvegarderProgression = () => {
                 <p>Voici les informations de chiffrage (avant personnalisation) :</p><br/>
                 <pre>${formatLocalStorageData()}</pre>
                 `,
-        }),
       });
     } catch (err) {
       console.log(err);

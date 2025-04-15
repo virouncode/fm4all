@@ -28,13 +28,17 @@ const UserButton = ({ setIsMobileNavOpen }: UserButtonProps) => {
   };
 
   const handleSignOut = async () => {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          router.push("/");
+    try {
+      await authClient.signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            router.push("/");
+          },
         },
-      },
-    });
+      });
+    } catch (err) {
+      console.error("Erreur lors de la deconnexion:", err);
+    }
   };
   return (
     <DropdownMenu modal={false}>
@@ -46,7 +50,7 @@ const UserButton = ({ setIsMobileNavOpen }: UserButtonProps) => {
           size="icon"
           asChild
         >
-          {user ? (
+          {session ? (
             user.image ? (
               <img
                 src={user.image}
@@ -63,7 +67,7 @@ const UserButton = ({ setIsMobileNavOpen }: UserButtonProps) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        {user && user?.role && (
+        {session && user?.role && (
           <DropdownMenuItem asChild onClick={() => setIsMobileNavOpen(false)}>
             <Link
               href={
@@ -80,7 +84,7 @@ const UserButton = ({ setIsMobileNavOpen }: UserButtonProps) => {
           </DropdownMenuItem>
         )}
         <DropdownMenuItem asChild onClick={() => setIsMobileNavOpen(false)}>
-          {user ? (
+          {session ? (
             <p onClick={handleSignOut}>Déconnexion</p>
           ) : (
             <Link href="/auth/signin" className="cursor-default">

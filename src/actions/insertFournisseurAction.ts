@@ -2,7 +2,7 @@
 import { db } from "@/db";
 import { fournisseurs } from "@/db/schema";
 import { auth } from "@/lib/auth";
-import { getUser } from "@/lib/auth-session";
+import { getSession } from "@/lib/auth-session";
 import { capitalize } from "@/lib/capitalize";
 import { generatePassword } from "@/lib/generatePassword";
 import { actionClient } from "@/lib/safe-actions";
@@ -25,7 +25,7 @@ export const insertFournisseurAction = actionClient
     }: {
       parsedInput: InsertFournisseurType;
     }) => {
-      const user = await getUser();
+      const user = (await getSession())?.user;
       if (user?.role !== "admin") {
         throw new Error(
           "Vous n'avez pas les droits pour créer un utilisateur."

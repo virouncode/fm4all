@@ -24,7 +24,7 @@ const EmailOkCard = () => {
   return (
     <Card className="max-w-md z-20">
       <CardHeader>
-        <CardTitle className="text-lg md:text-xl">
+        <CardTitle className="text-lg md:text-xl text-green-600">
           Adresse email vérifiée ! Merci.
         </CardTitle>
         <CardDescription className="text-xs md:text-sm">

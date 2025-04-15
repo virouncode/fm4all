@@ -9,6 +9,7 @@ import { occupation } from "@/constants/occupation";
 import { ClientContext } from "@/context/ClientProvider";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";
+import { sendEmailFromClient } from "@/lib/sendEmail";
 import {
   createInsertClientSchema,
   InsertClientType,
@@ -87,16 +88,11 @@ const CityOut = ({ destination }: CityOutProps) => {
   const submitForm = async (data: InsertClientType) => {
     //Envoyer email à Romu
     try {
-      await fetch("/api/mailgun", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: "contact@fm4all.com",
-          from: "contact@fm4all.com",
-          subject: "Nouveau client : région en cours de développement",
-          text: `<p>Un nouveau client a laissé ses coordonnées sur la page de chiffrage automatique. La matrice de chiffrage est en cours de développement pour sa région.</p><br/>
+      await sendEmailFromClient({
+        to: "contact@fm4all.com",
+        from: "contact@fm4all.com",
+        subject: "Nouveau client : région en cours de développement",
+        text: `<p>Un nouveau client a laissé ses coordonnées sur la page de chiffrage automatique. La matrice de chiffrage est en cours de développement pour sa région.</p><br/>
           <p>Voici ses coordonnées :</p><br/>
           <p>Entreprise : ${data.nomEntreprise}</p>
           <p>Nom du contact : ${data.nomContact}</p>
@@ -115,7 +111,6 @@ const CityOut = ({ destination }: CityOutProps) => {
             occupation.find(({ id }) => id === data.typeOccupation)?.description
           }</p>
           `,
-        }),
       });
       //Mettre les coordonnées dans la bdd
       executeSaveClient(data);

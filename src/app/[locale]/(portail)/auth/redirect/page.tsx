@@ -1,10 +1,10 @@
 import { redirect } from "@/i18n/navigation";
-import { getUser } from "@/lib/auth-session";
+import { getSession } from "@/lib/auth-session";
 import { getLocale } from "next-intl/server";
 
 export default async function AuthRedirect() {
   // Get the user from the session
-  const user = await getUser();
+  const user = (await getSession())?.user;
   const locale = await getLocale();
   // If no user is found, redirect to signin
   if (!user) {

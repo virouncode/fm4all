@@ -1,11 +1,23 @@
 import { db } from "@/db";
 import { account, session, user, verification } from "@/db/schema";
-import { betterAuth } from "better-auth";
+import { betterAuth, BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { inferAdditionalFields } from "better-auth/client/plugins";
 import { nextCookies } from "better-auth/next-js";
+import { openAPI } from "better-auth/plugins";
+import { sendEmailFromServer } from "./sendEmail";
 
 export const auth = betterAuth({
+  database: drizzleAdapter(db, {
+    provider: "pg",
+    schema: {
+      user,
+      session,
+      verification,
+      account,
+    },
+  }),
+
   user: {
     additionalFields: {
       role: {
@@ -31,59 +43,38 @@ export const auth = betterAuth({
       },
     },
   },
-  database: drizzleAdapter(db, {
-    provider: "pg",
-    schema: {
-      user,
-      session,
-      account,
-      verification,
-    },
-  }),
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
-    async sendResetPassword(data, request) {
-      await fetch(`${process.env.APP_URL}/api/mailgun`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: data.user.email,
-          from: "noreply@fm4all.com",
-          subject: "Réinitialisation de votre mot de passe",
-          text: `<p>Bonjour, vous avez demandé à réinitialiser votre mot de passe</p><br/>
+    sendResetPassword: async ({ user, url }) => {
+      await sendEmailFromServer({
+        to: user.email,
+        from: "noreply@fm4all.com",
+        subject: "Réinitialisation de votre mot de passe",
+        text: `<p>Bonjour, vous avez demandé à réinitialiser votre mot de passe</p><br/>
                 <p>Veuillez cliquer sur le lien suivant :</p><br/>
-                <p>${data.url}</p>
+                <p>${url}</p>
                 <p>Bien cordialement,</p>
                 <p>L'équipe FM4ALL</p>
                 `,
-        }),
       });
-      // Send an email to the user with a link to reset their password
     },
   },
   emailVerification: {
-    sendVerificationEmail: async ({ user, url, token }, request) => {
-      await fetch(`${process.env.APP_URL}/api/mailgun`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: user.email,
-          from: "noreply@fm4all.com",
-          subject: "Veuillez vérifier votre adresse email",
-          text: `<p>Nous venons de créer votre compte utilisateur. Bienvenue chez fm4all !</p><br/>
+    sendOnSignUp: true,
+    sendVerificationEmail: async ({ user, token }) => {
+      const verificationUrl = `${process.env.BETTER_AUTH_URL}/api/auth/verify-email?token=${token}&callbackURL=${process.env.APP_URL}/auth/email-ok`;
+      await sendEmailFromServer({
+        to: user.email,
+        from: "noreply@fm4all.com",
+        subject: "Veuillez vérifier votre adresse email",
+        text: `<p>Nous venons de créer votre compte utilisateur. Bienvenue chez fm4all !</p><br/>
                 <p>Veuillez cliquer sur le lien suivant pour vérifier votre email :</p><br/>
-                <p>${url}</p>
+                <p>${verificationUrl}</p>
                 `,
-          nomDestinataire: user.name,
-        }),
+        nomDestinataire: user.name,
       });
     },
-    sendOnSignUp: false,
   },
-  plugins: [nextCookies(), inferAdditionalFields<typeof user>()],
-});
+  plugins: [nextCookies(), inferAdditionalFields<typeof user>(), openAPI()], //api/auth/reference
+} satisfies BetterAuthOptions);

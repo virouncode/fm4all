@@ -1,5 +1,6 @@
 "use client";
 
+import { InputWithLabel } from "@/components/formInputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,21 +9,63 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Form } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";
-import { signIn } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth-client";
+import { InsertAdminType } from "@/zod-schemas/admin";
+import { signInSchema, SignInType } from "@/zod-schemas/signIn";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 export default function SignIn() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  const defaultValues: SignInType = {
+    email: "",
+    password: "",
+  };
+
+  const form = useForm<SignInType>({
+    mode: "onBlur",
+    resolver: zodResolver(signInSchema),
+    defaultValues,
+  });
+
+  const submitForm = async (data: SignInType) => {
+    await authClient.signIn.email(data, {
+      onRequest: () => {
+        setLoading(true);
+      },
+      onError: (ctx) => {
+        console.log("ctx", ctx);
+        if (ctx.error.status === 403) {
+          toast({
+            title: "Adresse email non vérifiée 😿",
+            description:
+              "Un nouveau lien de vérification vient de vous être envoyé. Merci de consulter votre boîte de réception.",
+            variant: "destructive",
+          });
+          return;
+        }
+        toast({
+          title: "Erreur 😿",
+          description:
+            ctx.error.message ||
+            "Une erreur est survenue lors de la connexion. Veuillez réessayer.",
+          variant: "destructive",
+        });
+      },
+      onSuccess: async () => {
+        router.push("/auth/redirect");
+      },
+    });
+    setLoading(false);
+  };
 
   return (
     <main className="max-w-7xl h-[calc(100vh-4rem)] mx-auto  py-4 px-6 md:px-20">
@@ -40,94 +83,40 @@ export default function SignIn() {
         </div>
         <Card className="max-w-md z-10">
           <CardHeader>
-            <CardTitle className="text-lg md:text-xl">Login</CardTitle>
+            <CardTitle className="text-lg md:text-xl">Connexion</CardTitle>
             <CardDescription className="text-xs md:text-sm">
               Entrez votre email et mot de passe pour vous connecter
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@exemple.com"
-                  required
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                  }}
-                  value={email}
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Mot de passe</Label>
-                  <Link
-                    href="#"
-                    className="ml-auto inline-block text-sm underline"
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(submitForm)}>
+                <div className="grid gap-4">
+                  <InputWithLabel<InsertAdminType>
+                    fieldTitle="Email"
+                    nameInSchema="email"
+                    type="email"
+                  />
+                  <InputWithLabel<InsertAdminType>
+                    fieldTitle="Mot de passe"
+                    nameInSchema="password"
+                    type="password"
+                  />
+                  <Button
+                    className="w-full text-base"
+                    disabled={loading || !form.formState.isValid}
+                    variant="destructive"
+                    size="lg"
                   >
-                    Mot de passe oublié ?
-                  </Link>
+                    {loading ? (
+                      <Loader2 size={16} className="animate-spin" />
+                    ) : (
+                      "Connexion"
+                    )}
+                  </Button>
                 </div>
-
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Mot de passe"
-                  autoComplete="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={loading}
-                onClick={async () => {
-                  const { data, error } = await signIn.email(
-                    {
-                      email,
-                      password,
-                    },
-                    {
-                      onRequest: (ctx) => {
-                        setLoading(true);
-                      },
-                      onResponse: (ctx) => {
-                        setLoading(false);
-                      },
-                      onError: (ctx) => {
-                        if (ctx.error.status === 403) {
-                          alert(
-                            "Veuillez d'abord vérifier votre adresse email en cliquant sur le lien que vous avez reçu"
-                          );
-                        }
-                      },
-                      onSuccess: async (ctx) => {
-                        router.push("/auth/redirect");
-                      },
-                    }
-                  );
-
-                  if (error) {
-                    toast({
-                      title: "Error",
-                      description: error.message,
-                      variant: "destructive",
-                    });
-                  }
-                }}
-              >
-                {loading ? (
-                  <Loader2 size={16} className="animate-spin" />
-                ) : (
-                  "Login"
-                )}
-              </Button>
-            </div>
+              </form>
+            </Form>
           </CardContent>
         </Card>
       </section>

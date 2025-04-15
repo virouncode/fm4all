@@ -1,15 +1,15 @@
 "use client";
-import { insertAdminAction } from "@/actions/insertAdminAction";
 import { InputWithLabel } from "@/components/formInputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
+import { authClient } from "@/lib/auth-client";
+import { capitalize } from "@/lib/capitalize";
 import { insertAdminSchema, InsertAdminType } from "@/zod-schemas/admin";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, X } from "lucide-react";
-import { useAction } from "next-safe-action/hooks";
 import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -17,6 +17,7 @@ import { useForm } from "react-hook-form";
 const AdminForm = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [image, setImage] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const defaultValues: InsertAdminType = {
     prenom: "",
@@ -32,33 +33,82 @@ const AdminForm = () => {
     resolver: zodResolver(insertAdminSchema),
     defaultValues,
   });
-  const {
-    execute: executeSaveAdmin,
-    isPending: isSavingAdmin,
-    reset: resetSaveAdminAction,
-  } = useAction(insertAdminAction, {
-    onSuccess: ({ data }) => {
-      toast({
-        variant: "default",
-        title: "Success! 🎉",
-        description: data?.message,
-      });
-      form.reset(defaultValues);
-      resetSaveAdminAction();
-      setImagePreview(null);
-    },
-    onError: ({ error }) => {
+  // const {
+  //   execute: executeSaveAdmin,
+  //   isPending: isSavingAdmin,
+  //   reset: resetSaveAdminAction,
+  // } = useAction(insertAdminAction, {
+  //   onSuccess: ({ data }) => {
+  //     toast({
+  //       variant: "default",
+  //       title: "Success! 🎉",
+  //       description: data?.message,
+  //     });
+  //     form.reset(defaultValues);
+  //     resetSaveAdminAction();
+  //     setImagePreview(null);
+  //   },
+  //   onError: ({ error }) => {
+  //     toast({
+  //       variant: "destructive",
+  //       title: "Erreur 😿",
+  //       description:
+  //         error?.serverError ||
+  //         "Une erreur est survenue lors de la création de l'utilisateur",
+  //     });
+  //   },
+  // });
+  const submitForm = async (data: InsertAdminType) => {
+    // executeSaveAdmin({ ...data, image: imagePreview });
+    if (data.password !== data.passwordConfirmation) {
       toast({
         variant: "destructive",
         title: "Erreur 😿",
-        description:
-          error?.serverError ||
-          "Une erreur est survenue lors de la création de l'utilisateur",
+        description: "Les mots de passe ne correspondent pas.",
       });
-    },
-  });
-  const submitForm = async (data: InsertAdminType) => {
-    executeSaveAdmin({ ...data, image: imagePreview });
+      return;
+    }
+    const response = await fetch(
+      `/api/vercelblob/upload?filename=${data.prenom}_${data.nom}_avatar&foldername=admin_avatars`,
+      {
+        method: "POST",
+        body: image,
+      }
+    );
+    const imageUrl: string = (await response.json()).url;
+    const userToPost = {
+      name: capitalize(data.prenom) + " " + capitalize(data.nom),
+      email: data.email.toLowerCase(),
+      password: data.password,
+      role: "admin",
+      image: imageUrl,
+    };
+    await authClient.signUp.email(userToPost, {
+      onRequest: () => {
+        setLoading(true);
+      },
+      onSuccess: () => {
+        toast({
+          variant: "default",
+          title: "Success! 🎉",
+          description: `Le compte utilisateur de ${userToPost.name} a été crée avec succès, un email avec un lien de vérification a été envoyé à ${userToPost.email}`,
+        });
+        form.reset(defaultValues);
+        // resetSaveAdminAction();
+        setImage(null);
+        setImagePreview(null);
+      },
+      onError: (ctx) => {
+        toast({
+          variant: "destructive",
+          title: "Erreur 😿",
+          description:
+            ctx.error.message ??
+            "Une erreur est survenue lors de la création de l'utilisateur",
+        });
+      },
+    });
+    setLoading(false);
   };
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -148,9 +198,9 @@ const AdminForm = () => {
               size="lg"
               title="Créer un compte"
               className="text-base"
-              disabled={!form.formState.isValid || isSavingAdmin}
+              disabled={!form.formState.isValid || loading}
             >
-              {isSavingAdmin ? (
+              {loading ? (
                 <Loader2 size={16} className="animate-spin" />
               ) : (
                 "Créer un compte"
