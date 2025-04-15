@@ -38,7 +38,7 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: true,
     async sendResetPassword(data, request) {
-      await fetch(`${process.env.BASE_URL}/api/mailgun`, {
+      await fetch(`${process.env.APP_URL}/api/mailgun`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -60,7 +60,7 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url, token }, request) => {
-      await fetch(`${process.env.BASE_URL}/api/mailgun`, {
+      await fetch(`${process.env.APP_URL}/api/mailgun`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
