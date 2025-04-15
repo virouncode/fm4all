@@ -34,7 +34,7 @@ export default function SignUp() {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40"></div>
         </div>
-        <Card className="z-50 rounded-md  h-[85%] w-2/3">
+        <Card className="z-50 rounded-md  h-[80%] w-2/3">
           <CardHeader>
             <CardTitle className="text-lg md:text-xl">
               Créer un compte utilisateur

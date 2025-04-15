@@ -83,8 +83,6 @@ export const auth = betterAuth({
         }),
       });
     },
-    sendOnSignUp: true,
-    autoSignInAfterVerification: true,
   },
   plugins: [nextCookies(), inferAdditionalFields<typeof user>()],
 });

@@ -45,6 +45,7 @@ const AdminForm = () => {
       });
       form.reset(defaultValues);
       resetSaveAdminAction();
+      setImagePreview(null);
     },
     onError: ({ error }) => {
       toast({
