@@ -128,6 +128,10 @@ export const routing = defineRouting({
       fr: "/auth/redirect",
       en: "/auth/redirect",
     },
+    "/auth/email-ok": {
+      fr: "/auth/email-ok",
+      en: "/auth/email-ok",
+    },
     "/admin/dashboard": {
       fr: "/admin/dashboard",
       en: "/admin/dashboard",
