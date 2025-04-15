@@ -3,7 +3,6 @@
 import { db } from "@/db";
 import { user } from "@/db/schema";
 import { auth } from "@/lib/auth";
-import { getUser } from "@/lib/auth-session";
 import { capitalize } from "@/lib/capitalize";
 import { actionClient } from "@/lib/safe-actions";
 import { insertAdminSchema, InsertAdminType } from "@/zod-schemas/admin";
@@ -18,12 +17,12 @@ export const insertAdminAction = actionClient
   })
   .action(
     async ({ parsedInput: adminInput }: { parsedInput: InsertAdminType }) => {
-      const currentUser = await getUser();
-      if (currentUser?.role !== "admin") {
-        throw new Error(
-          "Vous n'avez pas les droits pour créer un utilisateur."
-        );
-      }
+      // const currentUser = await getUser();
+      // if (currentUser?.role !== "admin") {
+      //   throw new Error(
+      //     "Vous n'avez pas les droits pour créer un utilisateur."
+      //   );
+      // }
       const userToPost = {
         name: capitalize(adminInput.prenom) + " " + capitalize(adminInput.nom),
         email: adminInput.email.toLowerCase(),
