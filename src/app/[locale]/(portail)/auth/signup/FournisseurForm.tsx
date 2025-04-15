@@ -13,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
+import DisplayServerActionResponse from "./DisplayServerActionResponse";
 
 const FournisseurForm = () => {
   const defaultValues: InsertFournisseurType = {
@@ -40,6 +41,8 @@ const FournisseurForm = () => {
         title: "Success! 🎉",
         description: data?.message,
       });
+      form.reset(defaultValues);
+      resetSaveFournisseurAction();
     },
     onError: ({ error }) => {
       toast({
@@ -67,7 +70,7 @@ const FournisseurForm = () => {
 
   return (
     <>
-      {/* <DisplayServerActionResponse result={resultSaveFournisseur} /> */}
+      <DisplayServerActionResponse result={resultSaveFournisseur} />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(submitForm)}>
           <div className="grid gap-2">

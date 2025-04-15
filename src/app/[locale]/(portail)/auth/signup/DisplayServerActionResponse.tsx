@@ -31,7 +31,7 @@ const DisplayServerActionResponse = ({
 }: DisplayServerActionResponseProps) => {
   const { data, serverError, validationErrors } = result;
   return (
-    <div className="z-20 h-20 border">
+    <div className="z-20">
       {data?.message && <MessageBox type="success" content={data.message} />}
       {serverError && <MessageBox type="error" content={serverError} />}
       {validationErrors && (
