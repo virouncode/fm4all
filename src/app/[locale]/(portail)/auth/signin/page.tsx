@@ -101,7 +101,9 @@ export default function SignIn() {
                       },
                       onError: (ctx) => {
                         if (ctx.error.status === 403) {
-                          alert("Please verify your email address");
+                          alert(
+                            "Veuillez d'abord vérifier votre adresse email en cliquant sur le lien que vous avez reçu"
+                          );
                         }
                       },
                       onSuccess: async (ctx) => {
