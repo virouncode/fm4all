@@ -124,9 +124,29 @@ export const routing = defineRouting({
       fr: "/auth/signup",
       en: "/auth/signup",
     },
-    "/dashboard": {
-      fr: "/dashboard",
-      en: "/dashboard",
+    "/auth/redirect": {
+      fr: "/auth/redirect",
+      en: "/auth/redirect",
+    },
+    "/admin/dashboard": {
+      fr: "/admin/dashboard",
+      en: "/admin/dashboard",
+    },
+    "/admin/comptes": {
+      fr: "/admin/comptes",
+      en: "/admin/accounts",
+    },
+    "/admin/signup": {
+      fr: "/admin/signup",
+      en: "/admin/signup",
+    },
+    "/client/dashboard": {
+      fr: "/client/dashboard",
+      en: "/client/dashboard",
+    },
+    "/fournisseur/dashboard": {
+      fr: "/fournisseur/dashboard",
+      en: "/fournisseur/dashboard",
     },
   },
 });

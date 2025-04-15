@@ -1,5 +1,4 @@
 import GoogleAnalytics from "@/components/GoogleAnalytics";
-import HeaderPortal from "@/components/header-portal";
 import { Toaster } from "@/components/ui/toaster";
 import { routing } from "@/i18n/routing";
 import { Analytics } from "@vercel/analytics/next";
@@ -75,7 +74,6 @@ export default async function PortalLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <HeaderPortal />
             {children}
             <Analytics />
             <SpeedInsights />

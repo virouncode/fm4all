@@ -106,7 +106,7 @@ const FournisseurForm = () => {
                 type="tel"
               />
             </div>
-            <div className="flex justify-center">
+            <div className="flex justify-center mt-6">
               <Button
                 variant="destructive"
                 size="lg"

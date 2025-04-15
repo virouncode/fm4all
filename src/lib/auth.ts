@@ -2,6 +2,7 @@ import { db } from "@/db";
 import { account, session, user, verification } from "@/db/schema";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { inferAdditionalFields } from "better-auth/client/plugins";
 import { nextCookies } from "better-auth/next-js";
 
 export const auth = betterAuth({
@@ -80,5 +81,5 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
   },
-  plugins: [nextCookies()],
+  plugins: [nextCookies(), inferAdditionalFields<typeof user>()],
 });

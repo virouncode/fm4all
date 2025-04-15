@@ -82,7 +82,12 @@ const Maintenance = ({
         </div>
       )}
       {isTabletOrMobile ? null : (
-        <PropositionsFooter handleClickNext={handleClickNext} />
+        <PropositionsFooter
+          handleClickNext={handleClickNext}
+          comment={t(
+            "batiment-entier-budget-a-confirmer-apres-visite-technique-des-installations-chaud-froid-clos-et-couverts"
+          )}
+        />
       )}
     </div>
   );

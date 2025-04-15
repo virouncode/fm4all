@@ -4,7 +4,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -20,29 +19,6 @@ export type UserType = "fournisseur" | "client" | "admin";
 
 export default function SignUp() {
   const [type, setType] = useState<UserType>("fournisseur");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState("fournisseur");
-  const [fournisseurId, setFournisseurId] = useState<number | null>(null);
-  const [clientId, setClientId] = useState<number | null>(null);
-  const [passwordConfirmation, setPasswordConfirmation] = useState("");
-  const [image, setImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
   return (
     <main className="max-w-7xl h-[calc(100vh-4rem)] mx-auto py-4 px-6 md:px-20">
@@ -58,7 +34,7 @@ export default function SignUp() {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40"></div>
         </div>
-        <Card className="z-50 rounded-md w-3/4 h-[85%]">
+        <Card className="z-50 rounded-md  h-[85%]">
           <CardHeader>
             <CardTitle className="text-lg md:text-xl">
               Créer un compte utilisateur
@@ -69,7 +45,7 @@ export default function SignUp() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-10">
+            <div className="grid gap-6">
               <div className="flex gap-4 items-center">
                 <Label htmlFor="type" className="text-base">
                   Type de compte :
@@ -94,7 +70,7 @@ export default function SignUp() {
                   </div>
                   <div className="flex gap-2 items-center">
                     <RadioGroupItem value="admin" title="Admin" id="admin" />
-                    <Label htmlFor="fournisseur">Admin</Label>
+                    <Label htmlFor="admin">Admin</Label>
                   </div>
                 </RadioGroup>
               </div>
@@ -240,13 +216,6 @@ export default function SignUp() {
               </Button> */}
             </div>
           </CardContent>
-          <CardFooter>
-            <div className="flex justify-center w-full border-t py-4">
-              <p className="text-center text-xs text-neutral-500">
-                Secured by <span className="text-orange-400">better-auth.</span>
-              </p>
-            </div>
-          </CardFooter>
         </Card>
       </section>
     </main>

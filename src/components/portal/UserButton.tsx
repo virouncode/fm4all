@@ -6,8 +6,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link, useRouter } from "@/i18n/navigation";
-import { authClient } from "@/lib/auth-client";
-import { User, UserCheck } from "lucide-react";
+import { authClient, useSession } from "@/lib/auth-client";
+import { User } from "better-auth";
+import { UserCheck, UserX } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Dispatch, SetStateAction } from "react";
@@ -19,9 +20,12 @@ type UserButtonProps = {
 const UserButton = ({ setIsMobileNavOpen }: UserButtonProps) => {
   const t = useTranslations("header");
   const router = useRouter();
-  const { data: session } = authClient.useSession();
-  const user = session?.user;
-  console.log("user", user);
+  const { data: session } = useSession();
+  const user = session?.user as User & {
+    role: string;
+    fournisseurId?: number;
+    clientId?: number;
+  };
 
   const handleSignOut = async () => {
     await authClient.signOut({
@@ -54,11 +58,27 @@ const UserButton = ({ setIsMobileNavOpen }: UserButtonProps) => {
               <UserCheck />
             )
           ) : (
-            <User />
+            <UserX />
           )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
+        {user && user?.role && (
+          <DropdownMenuItem asChild onClick={() => setIsMobileNavOpen(false)}>
+            <Link
+              href={
+                user?.role === "admin"
+                  ? "/admin/dashboard"
+                  : user?.role === "client"
+                    ? "/client/dashboard"
+                    : "/fournisseur/dashboard"
+              }
+              className="cursor-default"
+            >
+              Mon espace
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem asChild onClick={() => setIsMobileNavOpen(false)}>
           {user ? (
             <p onClick={handleSignOut}>Déconnexion</p>

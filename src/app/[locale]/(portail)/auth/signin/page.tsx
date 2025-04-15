@@ -104,10 +104,8 @@ export default function SignIn() {
                           alert("Please verify your email address");
                         }
                       },
-                      onSuccess: (ctx) => {
-                        console.log("ctx", ctx);
-
-                        router.push("/dashboard");
+                      onSuccess: async (ctx) => {
+                        router.push("/auth/redirect");
                       },
                     }
                   );

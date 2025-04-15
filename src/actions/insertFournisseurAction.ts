@@ -1,8 +1,10 @@
 "use server";
 import { db } from "@/db";
 import { fournisseurs } from "@/db/schema";
+import { signUp } from "@/lib/auth-client";
 import { getUser } from "@/lib/auth-session";
 import { capitalize } from "@/lib/capitalize";
+import { generatePassword } from "@/lib/generatePassword";
 import { actionClient } from "@/lib/safe-actions";
 import {
   insertFournisseurSchema,
@@ -55,9 +57,41 @@ export const insertFournisseurAction = actionClient
       if (!resultFournisseur[0]?.id) {
         throw new Error("Impossible de créer le compte fournisseur.");
       }
+      await signUp.email({
+        name: fournisseurToPost.nomFournisseur,
+        email: fournisseurToPost.emailContact,
+        password: generatePassword(),
+        //@ts-expect-error better-auth does bug
+        role: "fournisseur",
+        fournisseurId: resultFournisseur[0].id,
+        clientId: null,
+        image: "",
+        // fetchOptions: {
+        //   onResponse: () => {
+        //     setLoading(false);
+        //   },
+        //   onRequest: () => {
+        //     setLoading(true);
+        //   },
+        //   onError: (ctx) => {
+        //     toast({
+        //       variant: "destructive",
+        //       title: "Error",
+        //       description: ctx.error.message,
+        //     });
+        //   },
+        //   onSuccess: async () => {
+        //     toast({
+        //       title: "Success",
+        //       description: "Account created successfully",
+        //     });
+        //   },
+        // },
+      });
+
       return {
         success: true,
-        message: `Le fournisseur ${fournisseurToPost.nomFournisseur} a été crée avec succès`,
+        message: `Le compte du fournisseur ${fournisseurToPost.nomFournisseur} a été crée avec succès`,
         data: { fournisseurId: resultFournisseur[0]?.id },
       };
     }

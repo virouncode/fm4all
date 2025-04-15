@@ -67,6 +67,11 @@ const MaintenanceMobilePropositions = ({
           handleClickProposition={handleClickProposition}
         />
       ))}
+      <p className="text-xs text-end italic px-1">
+        {t(
+          "batiment-entier-budget-a-confirmer-apres-visite-technique-des-installations-chaud-froid-clos-et-couverts"
+        )}
+      </p>
     </div>
   );
 };
