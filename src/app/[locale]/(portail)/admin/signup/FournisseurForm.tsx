@@ -12,7 +12,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
-import DisplayServerActionResponse from "./DisplayServerActionResponse";
 
 const FournisseurForm = () => {
   const defaultValues: InsertFournisseurType = {
@@ -60,7 +59,7 @@ const FournisseurForm = () => {
 
   return (
     <>
-      <DisplayServerActionResponse result={resultSaveFournisseur} />
+      {/* <DisplayServerActionResponse result={resultSaveFournisseur} /> */}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(submitForm)}>
           <div className="grid gap-2">

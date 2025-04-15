@@ -9,7 +9,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
-import DisplayServerActionResponse from "./DisplayServerActionResponse";
 
 const AdminForm = () => {
   const defaultValues: InsertAdminType = {
@@ -56,7 +55,7 @@ const AdminForm = () => {
   };
   return (
     <>
-      <DisplayServerActionResponse result={resultSaveAdmin} />
+      {/* <DisplayServerActionResponse result={resultSaveAdmin} /> */}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(submitForm)}>
           <div className="grid gap-2">
