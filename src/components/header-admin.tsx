@@ -58,6 +58,7 @@ const HeaderAdmin = () => {
               />
             </Link>
           </div>
+          {/***************** Desktop navigation *****************/}
           <nav className="hidden xl:flex items-center gap-8">
             <div
               className={`flex gap-1 items-center ${

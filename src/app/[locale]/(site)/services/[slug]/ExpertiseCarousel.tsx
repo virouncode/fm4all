@@ -50,7 +50,7 @@ const ExpertiseCarousel = async ({
         ) : null}
         {[...(secteurs || [])].length > 0 ? (
           <TabsTrigger value="secteurs" className="text-lg">
-            | {t("secteurs-associés")}
+            | {t("secteurs-associes")}
           </TabsTrigger>
         ) : null}
         {articles && [...(articles || [])].length > 0 ? (
