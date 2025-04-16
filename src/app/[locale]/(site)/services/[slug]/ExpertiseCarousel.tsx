@@ -30,6 +30,7 @@ const ExpertiseCarousel = async ({
   articles,
 }: ExpertiseCarouselProps) => {
   const t = await getTranslations("Global");
+  console.log("articles", articles);
 
   return (
     <Tabs defaultValue="services">
@@ -49,7 +50,7 @@ const ExpertiseCarousel = async ({
         ) : null}
         {[...(secteurs || [])].length > 0 ? (
           <TabsTrigger value="secteurs" className="text-lg">
-            | {t("secteurs")}
+            | {t("secteurs-associés")}
           </TabsTrigger>
         ) : null}
         {articles && [...(articles || [])].length > 0 ? (
@@ -165,6 +166,8 @@ const ExpertiseCarousel = async ({
               const categorie = article.categorie as ArticleCategory;
               const articleSlug = categorie.slug?.current ?? "";
               const articleSubSlug = article.subSlug?.current ?? "";
+              console.log("articleSlug", articleSlug);
+
               return articleImageUrl ? (
                 <CarouselItem
                   className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
