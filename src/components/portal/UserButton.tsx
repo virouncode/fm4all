@@ -76,7 +76,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="text-base">
+      <DropdownMenuContent>
         {session && user?.role && (
           <DropdownMenuItem asChild onClick={() => setIsMobileNavOpen(false)}>
             <Link
@@ -87,7 +87,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
                     ? "/client/dashboard"
                     : "/fournisseur/dashboard"
               }
-              className="cursor-default"
+              className="cursor-default text-xl md:text-base"
             >
               {t("mon-espace")}
             </Link>
@@ -97,7 +97,10 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
           {session ? (
             <p onClick={handleSignOut}>{t("deconnexion")}</p>
           ) : (
-            <Link href="/auth/signin" className="cursor-default">
+            <Link
+              href="/auth/signin"
+              className="cursor-default text-xl md:text-base"
+            >
               {t("connexion")}
             </Link>
           )}

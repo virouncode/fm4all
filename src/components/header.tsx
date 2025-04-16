@@ -134,10 +134,7 @@ const Header = () => {
               <Phone />
             </Link>
           </Button>
-          <UserButton
-            setIsMobileNavOpen={setIsMobileNavOpen}
-            className="hidden"
-          />
+          <UserButton setIsMobileNavOpen={setIsMobileNavOpen} />
           {isMobileNavOpen ? (
             <X
               size={30}
