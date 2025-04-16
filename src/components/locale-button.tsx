@@ -117,7 +117,7 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
             key={l}
             checked={locale === l}
             onCheckedChange={() => handleChangeLang(l)}
-            className="text-lg md:text-base"
+            className="text-base"
           >
             {l.toUpperCase()}
           </DropdownMenuCheckboxItem>
