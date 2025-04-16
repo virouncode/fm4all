@@ -7,7 +7,6 @@ import {
   Handshake,
   Home,
   Menu,
-  Phone,
   ScrollText,
   Star,
   X,
@@ -15,6 +14,7 @@ import {
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useState } from "react";
+import ContactButton from "./contact-button";
 import DevisButton from "./devis-button";
 import LocaleButton from "./locale-button";
 import UserButton from "./portal/UserButton";
@@ -52,15 +52,8 @@ const Header = () => {
               />
             </Link>
           </div>
+          {/***************** Desktop navigation *****************/}
           <nav className="hidden xl:flex items-center gap-4">
-            {/* <div
-              className={`flex gap-1 items-center ${
-                isActive("/") ? "text-destructive font-bold" : ""
-              }`}
-            >
-              <Home size={15} />
-              <Link href="/">{t("home")}</Link>
-            </div> */}
             <div
               className={`flex gap-1 items-center ${
                 isActive("/services") ? "text-destructive font-bold" : ""
@@ -93,14 +86,6 @@ const Header = () => {
               <Handshake size={15} />
               <Link href="/partenaires">{t("nos-partenaires")}</Link>
             </div>
-            {/* <div
-              className={`flex gap-1 items-center ${
-                isActive("/faq") ? "text-destructive font-bold" : ""
-              }`}
-            >
-              <CircleHelp size={15} />
-              <Link href="/faq">FAQ</Link>
-            </div> */}
           </nav>
         </div>
         <div className="flex items-center gap-4">
@@ -122,19 +107,14 @@ const Header = () => {
             <Link href="/prestataire">{t("devenir-prestataire")}</Link>
           </Button>
           <LocaleButton className="hidden md:flex" />
-          <Button
-            title={t("nous-contacter")}
-            variant="outline"
-            className="hidden min-[500px]:flex justify-center items-center rounded-full"
-            size="icon"
-            asChild
-            onClick={() => setIsMobileNavOpen(false)}
-          >
-            <Link href="/contact">
-              <Phone />
-            </Link>
-          </Button>
-          <UserButton setIsMobileNavOpen={setIsMobileNavOpen} />
+          <ContactButton
+            setIsMobileNavOpen={setIsMobileNavOpen}
+            className="hidden md:flex"
+          />
+          <UserButton
+            setIsMobileNavOpen={setIsMobileNavOpen}
+            className="hidden md:flex"
+          />
           {isMobileNavOpen ? (
             <X
               size={30}
@@ -148,10 +128,8 @@ const Header = () => {
               onClick={handleShowMobileNav}
             />
           )}
-          {/* <div className="lg:flex hidden">
-            <ModeToggle />
-          </div> */}
         </div>
+        {/***************** Mobile navigation *****************/}
         <div
           className={`flex items-center justify-center fixed top-16 left-0 right-0 bg-background shadow-lg h-[calc(100vh-4rem)] text-2xl  ${
             isMobileNavOpen
@@ -161,11 +139,11 @@ const Header = () => {
           role="navigation"
           aria-label="Mobile navigation"
         >
-          <div className="absolute top-4 right-6 flex items-center gap-4">
+          <div className="md:hidden absolute top-4 right-6 flex items-center gap-4">
             <LocaleButton className="flex gap-1" />
+            <ContactButton setIsMobileNavOpen={setIsMobileNavOpen} />
             <UserButton setIsMobileNavOpen={setIsMobileNavOpen} />
           </div>
-
           <div className="flex flex-col gap-4">
             <div className="flex-1 flex flex-col gap-4 ">
               <div
@@ -221,15 +199,6 @@ const Header = () => {
               >
                 <HandPlatter size={30} />
                 <Link href="/prestataire">{t("devenir-prestataire")}</Link>
-              </div>
-              <div
-                className={`hidden max-[600px]:flex gap-4 items-center ${
-                  isActive("/contact") ? "text-destructive font-bold" : ""
-                }`}
-                onClick={handleHideMobileNav}
-              >
-                <Phone size={30} />
-                <Link href="/contact">{t("nous-contacter")}</Link>
               </div>
             </div>
           </div>

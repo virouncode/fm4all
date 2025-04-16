@@ -87,7 +87,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
                     ? "/client/dashboard"
                     : "/fournisseur/dashboard"
               }
-              className="cursor-default text-xl md:text-base"
+              className="cursor-default !text-lg md:text-base"
             >
               {t("mon-espace")}
             </Link>
@@ -99,7 +99,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
           ) : (
             <Link
               href="/auth/signin"
-              className="cursor-default text-xl md:text-base"
+              className="cursor-default !text-lg md:text-base"
             >
               {t("connexion")}
             </Link>
