@@ -132,6 +132,14 @@ export const routing = defineRouting({
       fr: "/auth/email-ok",
       en: "/auth/email-ok",
     },
+    "/auth/forgot-password": {
+      fr: "/auth/forgot-password",
+      en: "/auth/forgot-password",
+    },
+    "/auth/reset-password": {
+      fr: "/auth/reset-password",
+      en: "/auth/reset-password",
+    },
     "/admin/dashboard": {
       fr: "/admin/dashboard",
       en: "/admin/dashboard",

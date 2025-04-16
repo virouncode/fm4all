@@ -11,60 +11,50 @@ import {
 } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
-import { Link, useRouter } from "@/i18n/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth-client";
-import { InsertAdminType } from "@/zod-schemas/admin";
-import { signInSchema, SignInType } from "@/zod-schemas/signIn";
+import {
+  forgotPasswordSchema,
+  ForgotPasswordType,
+} from "@/zod-schemas/forgotPassword";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+
 import { useForm } from "react-hook-form";
 
-export default function SignIn() {
+export default function ForgotPassword() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-
-  const defaultValues: SignInType = {
+  const defaultValues: ForgotPasswordType = {
     email: "",
-    password: "",
   };
-
-  const form = useForm<SignInType>({
+  const form = useForm<ForgotPasswordType>({
     mode: "onBlur",
-    resolver: zodResolver(signInSchema),
+    resolver: zodResolver(forgotPasswordSchema),
     defaultValues,
   });
 
-  const submitForm = async (data: SignInType) => {
-    await authClient.signIn.email(data, {
-      onRequest: () => {
-        setLoading(true);
-      },
-      onError: (ctx) => {
-        console.log("ctx", ctx);
-        if (ctx.error.status === 403) {
-          toast({
-            title: "Adresse email non vérifiée 😿",
-            description:
-              "Un nouveau lien de vérification vient de vous être envoyé. Merci de consulter votre boîte de réception.",
-            variant: "destructive",
-          });
-          return;
-        }
-        toast({
-          title: "Erreur 😿",
-          description:
-            ctx.error.message ||
-            "Une erreur est survenue lors de la connexion. Veuillez réessayer.",
-          variant: "destructive",
-        });
-      },
-      onSuccess: async () => {
-        router.push("/auth/redirect");
-        router.refresh();
-      },
+  const submitForm = async (data: ForgotPasswordType) => {
+    setLoading(true);
+    const { error } = await authClient.forgetPassword({
+      email: data.email.toLowerCase(),
+      redirectTo: "/auth/reset-password",
     });
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Erreur 😿",
+        description: error.message,
+      });
+    } else {
+      toast({
+        title: "Email envoyé !",
+        description:
+          "Si un compte existe avec cette adresse email, vous recevrez un lien de réinitialisation de mot de passe.",
+      });
+    }
     setLoading(false);
   };
 
@@ -84,31 +74,22 @@ export default function SignIn() {
         </div>
         <Card className="max-w-md z-10">
           <CardHeader>
-            <CardTitle className="text-lg md:text-xl">Connexion</CardTitle>
+            <CardTitle className="text-lg md:text-xl">
+              Mot de passe oublié
+            </CardTitle>
             <CardDescription className="text-xs md:text-sm">
-              Entrez votre email et mot de passe pour vous connecter
+              Entrez votre email pour recevoir un lien de réinitialisation
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(submitForm)}>
                 <div className="grid gap-4">
-                  <InputWithLabel<InsertAdminType>
+                  <InputWithLabel<ForgotPasswordType>
                     fieldTitle="Email"
                     nameInSchema="email"
                     type="email"
                   />
-                  <InputWithLabel<InsertAdminType>
-                    fieldTitle="Mot de passe"
-                    nameInSchema="password"
-                    type="password"
-                  />
-                  <Link
-                    href="/auth/forgot-password"
-                    className="underline text-sm"
-                  >
-                    Mot de passe oublié ?
-                  </Link>
                   <Button
                     className="w-full text-base"
                     disabled={loading || !form.formState.isValid}
@@ -118,7 +99,7 @@ export default function SignIn() {
                     {loading ? (
                       <Loader2 size={16} className="animate-spin" />
                     ) : (
-                      "Connexion"
+                      "Envoyer le lien"
                     )}
                   </Button>
                 </div>

@@ -2,9 +2,45 @@ import createMiddleware from "next-intl/middleware";
 import { NextRequest, NextResponse } from "next/server";
 import { routing } from "./i18n/routing";
 
+const authRoutes = ["/auth/signin", "/admin/signup"];
+const passwordRoutes = ["/auth/forgot-password", "/auth/reset-password"];
+
 const intlMiddleware = createMiddleware(routing);
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
+  const pathname = req.nextUrl.pathname;
+  // const { data: session } = await betterFetch("/api/auth/get-session", {
+  //   baseURL: req.nextUrl.origin,
+  //   headers: {
+  //     cookie: req.headers.get("cookie") || "",
+  //   },
+  // });
+  // console.log("Session data:", session);
+  const sessionResponse = await fetch(
+    `${req.nextUrl.origin}/api/auth/get-session`,
+    {
+      headers: {
+        cookie: req.headers.get("cookie") || "",
+      },
+    }
+  );
+
+  const sessionData = await sessionResponse.json();
+  console.log("Session data:", sessionData);
+
+  const session = sessionData?.session;
+
+  if (!session) {
+    //Rediriger vers la page de connexion pour les routes /admin, /client et /fournisseur
+    if (
+      pathname.startsWith("/admin") ||
+      pathname.startsWith("/client") ||
+      pathname.startsWith("/fournisseur")
+    ) {
+      return NextResponse.redirect(new URL("/auth/signin", req.url));
+    }
+  }
+
   const origin = req.headers.get("origin");
   const allowedOrigins =
     process.env.NODE_ENV === "production"

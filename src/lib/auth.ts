@@ -51,11 +51,9 @@ export const auth = betterAuth({
         to: user.email,
         from: "noreply@fm4all.com",
         subject: "Réinitialisation de votre mot de passe",
-        text: `<p>Bonjour, vous avez demandé à réinitialiser votre mot de passe</p><br/>
+        text: `<p>Vous avez demandé à réinitialiser votre mot de passe</p><br/>
                 <p>Veuillez cliquer sur le lien suivant :</p><br/>
                 <p>${url}</p>
-                <p>Bien cordialement,</p>
-                <p>L'équipe FM4ALL</p>
                 `,
       });
     },
