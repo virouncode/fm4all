@@ -15,7 +15,7 @@
     "services-associes": "Associated services",
     "articles-associes": "Associated posts",
     "articles": "Posts",
-    "secteurs": "Sectors",
+    "secteurs-associes": "Associated sectors",
     "illustration-du-service": "service illustration",
     "illustration-de-l-article": "post illustration",
     "illustration-du-secteur": "sector illustration",
@@ -29,7 +29,8 @@
     "nos-partenaires": "Our partners",
     "nos-services": "Our services",
     "devenir-prestataire": "Become a service provider",
-    "nous-contacter": "Contact us"
+    "nous-contacter": "Contact us",
+    "connexion": "Login"
   },
   "footer": {
     "page-d-accueil": "Home page",
@@ -832,7 +833,8 @@
         "essentiel-recommandations-ars-petits-travaux-dentretien-tous-les-trois-mois": "Essential + ARS recommendations, minor maintenance work every three months",
         "controle-legionellose": "Legionella Inspection",
         "une-a-deux-fois-par-mois-passage-technicien-pour-maintenance-and-petits-travaux-lien-technique-avec-le-gestionnaire-de-limmeuble": "One to two times per month, technician visit for maintenance & minor repairs. Technical liaison with the building manager",
-        "controle-qualite-air": "Air Quality Inspection"
+        "controle-qualite-air": "Air Quality Inspection",
+        "batiment-entier-budget-a-confirmer-apres-visite-technique-des-installations-chaud-froid-clos-et-couverts": "*for an entire building: budget to be confirmed after technical inspection of the installations (heating/cooling/enclosed and covered, etc.)"
       },
       "incendie": {
         "securite-incendie": "Fire Safety",
@@ -1043,7 +1045,7 @@
       "sauvegarder-ma-progression": "Save my progress",
       "erreurs": {
         "nom-de-lentreprise-obligatoire": "Company name required",
-        "siret-invalide-format-attendu-xxx-xxx-xxx-xxxxx": "Invalid Siret number, expected format: XXX XXX XXX XXXXX",
+        "siret-invalide-format-attendu-xxx-xxx-xxx-xxxxx": "Invalid SIRET number",
         "prenom-du-contact-obligatoire": "Contact first name required",
         "nom-du-contact-obligatoire": "Contact last name required",
         "poste-du-contact-obligatoire": "Job title required",

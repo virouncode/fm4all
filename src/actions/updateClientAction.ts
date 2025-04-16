@@ -17,7 +17,7 @@ export const updateClientAction = actionClient
   .action(
     async ({ parsedInput: clientInput }: { parsedInput: UpdateClientType }) => {
       if (!clientInput.id) {
-        throw new Error("Patient ID is required");
+        throw new Error("Client ID is required");
       }
       const clientToUpdate: UpdateClientType = {
         ...clientInput,

@@ -316,3 +316,23 @@ export function generateAlternates(
     },
   };
 }
+
+export const getPathnameWithoutLocale = (pathname: string) => {
+  const supportedLocales = ["fr", "en"];
+  const parts = pathname.split("/").filter(Boolean);
+
+  if (supportedLocales.includes(parts[0])) {
+    // Enlève le segment de langue
+    return "/" + parts.slice(1).join("/");
+  }
+  return pathname;
+};
+
+export const getLocaleFromPathname = (pathname: string) => {
+  const supportedLocales = ["fr", "en"];
+  const parts = pathname.split("/").filter(Boolean);
+  if (supportedLocales.includes(parts[0])) {
+    return parts[0];
+  }
+  return null;
+};

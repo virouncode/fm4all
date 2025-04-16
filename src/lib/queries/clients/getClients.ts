@@ -20,3 +20,15 @@ export const getClientsWithEmailAndNomContact = async (
     errorHelper(err);
   }
 };
+
+export const getClients = async () => {
+  try {
+    const results = await db
+      .select()
+      .from(clients)
+      .orderBy(clients.nomEntreprise);
+    return results;
+  } catch (err) {
+    errorHelper(err);
+  }
+};

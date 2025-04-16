@@ -18,13 +18,27 @@ const lastMod = new Date().toISOString();
 // Fonction pour générer les URLs des pages statiques
 const generateStaticUrls = () => {
   const urls: MetadataRoute.Sitemap = [];
+  const pathsSecondaires = [
+    "/mentions,",
+    "/confidentialite",
+    "/cookies",
+    "/cgv",
+    "cgu",
+    "/chalandise",
+  ];
 
   // Pour chaque locale et chaque route définie dans routing.ts
   for (const locale of routing.locales) {
     // Parcourir toutes les routes définies dans routing.pathnames
     for (const [path, localized] of Object.entries(routing.pathnames)) {
       // Ignorer les routes dynamiques avec paramètres
-      if (path.includes("[") && path.includes("]")) continue;
+      if (
+        (path.includes("[") && path.includes("]")) ||
+        path.includes("/admin") ||
+        path.includes("/client") ||
+        path.includes("/fournisseur")
+      )
+        continue;
 
       // Obtenir le chemin localisé
       let localizedPath = "";
@@ -41,7 +55,11 @@ const generateStaticUrls = () => {
         url: `${APP_URL}/${locale}${localizedPath}`,
         lastModified: lastMod,
         changeFrequency: "weekly",
-        priority: localizedPath ? 0.8 : 1,
+        priority: localizedPath
+          ? pathsSecondaires.includes(path)
+            ? 0.5
+            : 0.8
+          : 1,
       });
     }
   }

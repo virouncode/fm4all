@@ -13,7 +13,7 @@
     "en-savoir-plus": "En savoir plus",
     "lire-la-suite": "Lire la suite",
     "services-associes": "Services associés",
-    "secteurs": "Secteurs",
+    "secteurs-associés": "Secteurs associés",
     "articles-associes": "Articles associés",
     "articles": "Articles",
     "illustration-du-service": "illustration du service",
@@ -29,7 +29,8 @@
     "nos-engagements": "Nos engagements",
     "nos-partenaires": "Nos partenaires",
     "devenir-prestataire": "Devenir prestataire",
-    "nous-contacter": "Nous contacter"
+    "nous-contacter": "Nous contacter",
+    "connexion": "Connexion"
   },
   "footer": {
     "page-d-accueil": "Page d'accueil",
@@ -832,7 +833,8 @@
         "essentiel-recommandations-ars-petits-travaux-dentretien-tous-les-trois-mois": "Essentiel + recommandations ARS, petits travaux d’entretien tous les trois mois",
         "controle-legionellose": "Contrôle Legionellose",
         "une-a-deux-fois-par-mois-passage-technicien-pour-maintenance-and-petits-travaux-lien-technique-avec-le-gestionnaire-de-limmeuble": "Une à deux fois par mois passage technicien pour maintenance & petits travaux. Lien technique avec le gestionnaire de l’immeuble",
-        "controle-qualite-air": "Contrôle Qualité Air"
+        "controle-qualite-air": "Contrôle Qualité Air",
+        "batiment-entier-budget-a-confirmer-apres-visite-technique-des-installations-chaud-froid-clos-et-couverts": "*pour un bâtiment entier : budget à confirmer après visite technique des installations (chaud/froid/clos et couverts...)"
       },
       "incendie": {
         "securite-incendie": "Sécurité Incendie",
@@ -1043,7 +1045,7 @@
       "sauvegarder-ma-progression": "Sauvegarder ma progression",
       "erreurs": {
         "nom-de-lentreprise-obligatoire": "Nom de l'entreprise obligatoire",
-        "siret-invalide-format-attendu-xxx-xxx-xxx-xxxxx": "Siret invalide, format attendu : XXX XXX XXX XXXXX",
+        "siret-invalide-format-attendu-xxx-xxx-xxx-xxxxx": "Siret invalide",
         "prenom-du-contact-obligatoire": "Prénom du contact obligatoire",
         "nom-du-contact-obligatoire": "Nom du contact obligatoire",
         "poste-du-contact-obligatoire": "Poste du contact obligatoire",

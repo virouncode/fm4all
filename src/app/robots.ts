@@ -23,7 +23,7 @@ const generateWrongStaticUrls = () => {
       // Ignorer les routes dynamiques avec paramètres
       if (
         (path.includes("[") && path.includes("]")) ||
-        path === "/services" ||
+        path === "/services" || //car services est pareil dans les 2 langues
         path === "/"
       )
         continue;
@@ -65,16 +65,15 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     `/en/posts/${article.slug}/${article.subSlug}`,
     `/en/posts/${article.slug}/${getArticlesSubSlugEn(article.subSlug)}`,
   ]);
+
   const wrongTagsUrls = tagsSlugs
     .filter(
       (slug) =>
-        slug !== "hygiene" &&
         slug !== "maintenance" &&
         slug !== "food-and-beverage" &&
-        slug !== "facility-manager" &&
-        slug !== "hospitality-manager" &&
+        slug !== "facility-management" &&
         slug !== "office-manager" &&
-        slug !== "fm"
+        slug !== "startups-scaleups"
     )
     .flatMap((slug) =>
       slug ? [`/fr/tag/${getTagSlugEn(slug)}`, `/en/tag/${slug}`] : []
@@ -85,6 +84,14 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     "/en/test-shadcn-colors",
     "/fr/mon-devis/*",
     "/en/my-quote/*",
+    "/fr/admin/*",
+    "/en/admin/*",
+    "/fr/client/*",
+    "/en/client/*",
+    "/fr/fournisseur/*",
+    "/en/fournisseur/*",
+    "/fr/auth/*",
+    "/en/auth/*",
     ...wrongStaticUrls,
     ...wrongServicesUrls,
     ...wrongArticlesCategoriesUrls,

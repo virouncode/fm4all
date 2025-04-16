@@ -116,6 +116,50 @@ export const routing = defineRouting({
       fr: "/tag/[tag]",
       en: "/tag/[tag]",
     },
+    "/auth/signin": {
+      fr: "/auth/signin",
+      en: "/auth/signin",
+    },
+    // "/auth/signup": {
+    //   fr: "/auth/signup",
+    //   en: "/auth/signup",
+    // },
+    "/auth/redirect": {
+      fr: "/auth/redirect",
+      en: "/auth/redirect",
+    },
+    "/auth/email-ok": {
+      fr: "/auth/email-ok",
+      en: "/auth/email-ok",
+    },
+    "/auth/forgot-password": {
+      fr: "/auth/forgot-password",
+      en: "/auth/forgot-password",
+    },
+    "/auth/reset-password": {
+      fr: "/auth/reset-password",
+      en: "/auth/reset-password",
+    },
+    "/admin/dashboard": {
+      fr: "/admin/dashboard",
+      en: "/admin/dashboard",
+    },
+    "/admin/comptes": {
+      fr: "/admin/comptes",
+      en: "/admin/accounts",
+    },
+    "/admin/signup": {
+      fr: "/admin/signup",
+      en: "/admin/signup",
+    },
+    "/client/dashboard": {
+      fr: "/client/dashboard",
+      en: "/client/dashboard",
+    },
+    "/fournisseur/dashboard": {
+      fr: "/fournisseur/dashboard",
+      en: "/fournisseur/dashboard",
+    },
   },
 });
 

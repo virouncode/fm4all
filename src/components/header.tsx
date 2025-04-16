@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Link, usePathname } from "@/i18n/navigation";
 import {
-  CircleHelp,
   HandPlatter,
   Handshake,
   Home,
@@ -11,6 +10,7 @@ import {
   Phone,
   ScrollText,
   Star,
+  User,
   X,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -18,6 +18,7 @@ import Image from "next/image";
 import { useState } from "react";
 import DevisButton from "./devis-button";
 import LocaleButton from "./locale-button";
+import UserButton from "./portal/UserButton";
 
 const Header = () => {
   const tGlobal = useTranslations("Global");
@@ -93,14 +94,14 @@ const Header = () => {
               <Handshake size={15} />
               <Link href="/partenaires">{t("nos-partenaires")}</Link>
             </div>
-            <div
+            {/* <div
               className={`flex gap-1 items-center ${
                 isActive("/faq") ? "text-destructive font-bold" : ""
               }`}
             >
               <CircleHelp size={15} />
               <Link href="/faq">FAQ</Link>
-            </div>
+            </div> */}
           </nav>
         </div>
         <div className="flex items-center gap-4">
@@ -134,6 +135,7 @@ const Header = () => {
               <Phone />
             </Link>
           </Button>
+          <UserButton setIsMobileNavOpen={setIsMobileNavOpen} />
           {isMobileNavOpen ? (
             <X
               size={30}
@@ -211,7 +213,7 @@ const Header = () => {
                 <Handshake size={30} />
                 <Link href="/partenaires">{t("nos-partenaires")}</Link>
               </div>
-              <div
+              {/* <div
                 className={`flex gap-4 items-center ${
                   isActive("/faq") ? "text-destructive font-bold" : ""
                 }`}
@@ -219,7 +221,7 @@ const Header = () => {
               >
                 <CircleHelp size={30} />
                 <Link href="/faq">FAQ</Link>
-              </div>
+              </div> */}
               <div
                 className={`hidden max-[600px]:flex gap-4 items-center ${
                   isActive("/prestataire") ? "text-destructive font-bold" : ""
@@ -237,6 +239,15 @@ const Header = () => {
               >
                 <Phone size={30} />
                 <Link href="/contact">{t("nous-contacter")}</Link>
+              </div>
+              <div
+                className={`hidden max-[600px]:flex gap-4 items-center ${
+                  isActive("/login") ? "text-destructive font-bold" : ""
+                }`}
+                onClick={handleHideMobileNav}
+              >
+                <User size={30} />
+                <Link href="/auth/signin">{t("connexion")}</Link>
               </div>
             </div>
           </div>

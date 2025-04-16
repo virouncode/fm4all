@@ -141,7 +141,7 @@ export const LAST_ARTICLES_QUERY = `*[_type == "article" && language == $languag
   categorie->{
     _id,
     titre,
-    slug}
+    slug }
   }`;
 export const getLastArticles = async (locale: "fr" | "en") => {
   return await client.fetch<
@@ -314,7 +314,13 @@ export const getAssociatedToArticle = async (
 };
 
 export const TAG_RELATED_ARTICLES_QUERY = `*[_type == "article" && language == $language && $slug in tagsEntrants[]->slug.current
-]`;
+]{..., 
+categorie->{
+      _id,
+      titre,
+      slug
+    }
+}`;
 
 export const getTagRelatedArticles = async (
   locale: "fr" | "en",
