@@ -40,7 +40,9 @@
     "mot-de-passe-oublie": "Forgot password?",
     "email-obligatoire": "Email required",
     "email-invalide": "Invalid email",
-    "mot-de-passe-obligatoire": "Password required"
+    "mot-de-passe-obligatoire": "Password required",
+    "connexion-reussie": "Sign In successful",
+    "vous-etes-maintenant-connecte": "You are now signed in"
   },
   "header": {
     "home": "Home",
@@ -1240,5 +1242,10 @@
     "erreur-globale": "Global error !",
     "reessayer": "Retry",
     "retour": "Back"
+  },
+  "admin": {
+    "utilisateurs": "Users",
+    "comptes": "Accounts",
+    "creer-un-compte": "Create an account"
   }
 }

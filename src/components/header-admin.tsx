@@ -7,28 +7,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link, usePathname } from "@/i18n/navigation";
-import {
-  CircleGauge,
-  HandPlatter,
-  Handshake,
-  Home,
-  Menu,
-  Phone,
-  ScrollText,
-  Star,
-  User,
-  UsersRound,
-  X,
-} from "lucide-react";
+import { CircleGauge, Menu, UsersRound, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useState } from "react";
+import ContactButton from "./contact-button";
 import LocaleButton from "./locale-button";
 import UserButton from "./portal/UserButton";
+import UsersAccountsButton from "./UsersAccountsButton";
 
 const HeaderAdmin = () => {
   const t = useTranslations("header");
-
+  const tAdmin = useTranslations("admin");
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const path = usePathname();
 
@@ -46,7 +36,7 @@ const HeaderAdmin = () => {
   return (
     <div className="w-full sticky top-0 h-16 bg-background z-50 shadow">
       <header className="max-w-7xl h-full flex justify-between items-center p-6 mx-auto">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-6 flex-1">
           <div className="relative h-[23px] w-[100px]">
             <Link href="/">
               <Image
@@ -59,7 +49,7 @@ const HeaderAdmin = () => {
             </Link>
           </div>
           {/***************** Desktop navigation *****************/}
-          <nav className="hidden xl:flex items-center gap-8">
+          <nav className="hidden lg:flex items-center gap-14 justify-center flex-1">
             <div
               className={`flex gap-1 items-center ${
                 isActive("/admin/dashboard") ? "text-destructive font-bold" : ""
@@ -68,53 +58,36 @@ const HeaderAdmin = () => {
               <CircleGauge size={15} />
               <Link href="/admin/dashboard">Dashboard</Link>
             </div>
-
-            <DropdownMenu modal={false}>
-              <DropdownMenuTrigger asChild className="cursor-pointer">
-                <div
-                  className={`flex gap-1 items-center ${
-                    isActive("/admin/comptes") || isActive("/admin/signup")
-                      ? "text-destructive font-bold"
-                      : ""
-                  }`}
-                >
-                  <UsersRound size={15} />
-                  <p>Utilisateurs</p>
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuCheckboxItem checked={isActive("/admin/comptes")}>
-                  <Link href="/admin/comptes">Comptes</Link>
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem checked={isActive("/admin/signup")}>
-                  <Link href="/admin/signup">Créer un compte</Link>
-                </DropdownMenuCheckboxItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <UsersAccountsButton isActive={isActive} />
           </nav>
         </div>
         <div className="flex items-center gap-4">
-          <LocaleButton className="hidden md:flex" />
-          <UserButton setIsMobileNavOpen={setIsMobileNavOpen} />
+          <LocaleButton className="hidden sm:flex" />
+          <ContactButton
+            setIsMobileNavOpen={setIsMobileNavOpen}
+            className="hidden sm:flex"
+          />
+          <UserButton
+            setIsMobileNavOpen={setIsMobileNavOpen}
+            className="hidden sm:flex"
+          />
           {isMobileNavOpen ? (
             <X
               size={30}
-              className="block xl:hidden"
+              className="block lg:hidden"
               onClick={handleHideMobileNav}
             />
           ) : (
             <Menu
               size={30}
-              className="block xl:hidden"
+              className="block lg:hidden"
               onClick={handleShowMobileNav}
             />
           )}
-          {/* <div className="lg:flex hidden">
-            <ModeToggle />
-          </div> */}
         </div>
+        {/***************** Mobile navigation *****************/}
         <div
-          className={`flex items-center justify-center fixed top-16 left-0 right-0 bg-background shadow-lg h-[calc(100vh-4rem)] text-2xl  ${
+          className={`flex items-center justify-center fixed top-16 left-0 right-0 bg-background shadow-lg h-[calc(100vh-4rem)] text-2xl z-50 ${
             isMobileNavOpen
               ? "translate-x-0 opacity-100"
               : "translate-x-full opacity-0"
@@ -122,93 +95,56 @@ const HeaderAdmin = () => {
           role="navigation"
           aria-label="Mobile navigation"
         >
-          {/* <div className="absolute top-4 left-6">
-            <ModeToggle />
-          </div> */}
-          <LocaleButton className="absolute top-10 left-6 flex gap-1" />
+          <div className="sm:hidden absolute top-4 right-6 flex items-center gap-4">
+            <LocaleButton className="flex gap-1" />
+            <ContactButton setIsMobileNavOpen={setIsMobileNavOpen} />
+            <UserButton setIsMobileNavOpen={setIsMobileNavOpen} />
+          </div>
           <div className="flex flex-col gap-4">
             <div className="flex-1 flex flex-col gap-4 ">
               <div
                 className={`flex gap-4 items-center ${
-                  isActive("/") ? "text-destructive font-bold" : ""
+                  isActive("/admin/dashboard")
+                    ? "text-destructive font-bold"
+                    : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
-                <Home size={30} />
-                <Link href="/">{t("home")}</Link>
+                <CircleGauge size={30} />
+                <Link href="/admin/dashboard">Dashboard</Link>
               </div>
-              <div
-                className={`flex gap-4 items-center ${
-                  isActive("/services") ? "text-destructive font-bold" : ""
-                }`}
-                onClick={handleHideMobileNav}
-              >
-                <HandPlatter size={30} />
-                <Link href="/services">{t("nos-services")}</Link>
-              </div>
-              <div
-                className={`flex gap-4 items-center ${
-                  isActive("/gammes") ? "text-destructive font-bold" : ""
-                }`}
-                onClick={handleHideMobileNav}
-              >
-                <Star size={30} />
-                <Link href="/gammes">{t("nos-3-gammes")}</Link>
-              </div>
-              <div
-                className={`flex gap-4 items-center ${
-                  isActive("/engagements") ? "text-destructive font-bold" : ""
-                }`}
-                onClick={handleHideMobileNav}
-              >
-                <ScrollText size={30} />
-                <Link href="/engagements">{t("nos-engagements")}</Link>
-              </div>
-              <div
-                className={`flex gap-4 items-center ${
-                  isActive("/partenaires") ? "text-destructive font-bold" : ""
-                }`}
-                onClick={handleHideMobileNav}
-              >
-                <Handshake size={30} />
-                <Link href="/partenaires">{t("nos-partenaires")}</Link>
-              </div>
-              {/* <div
-                className={`flex gap-4 items-center ${
-                  isActive("/faq") ? "text-destructive font-bold" : ""
-                }`}
-                onClick={handleHideMobileNav}
-              >
-                <CircleHelp size={30} />
-                <Link href="/faq">FAQ</Link>
-              </div> */}
-              <div
-                className={`hidden max-[600px]:flex gap-4 items-center ${
-                  isActive("/prestataire") ? "text-destructive font-bold" : ""
-                }`}
-                onClick={handleHideMobileNav}
-              >
-                <HandPlatter size={30} />
-                <Link href="/prestataire">{t("devenir-prestataire")}</Link>
-              </div>
-              <div
-                className={`hidden max-[600px]:flex gap-4 items-center ${
-                  isActive("/contact") ? "text-destructive font-bold" : ""
-                }`}
-                onClick={handleHideMobileNav}
-              >
-                <Phone size={30} />
-                <Link href="/contact">{t("nous-contacter")}</Link>
-              </div>
-              <div
-                className={`hidden max-[600px]:flex gap-4 items-center ${
-                  isActive("/login") ? "text-destructive font-bold" : ""
-                }`}
-                onClick={handleHideMobileNav}
-              >
-                <User size={30} />
-                <Link href="/auth/signin">{t("connexion")}</Link>
-              </div>
+              <DropdownMenu modal={false}>
+                <DropdownMenuTrigger asChild className="cursor-pointer">
+                  <div
+                    className={`flex gap-4 items-center ${
+                      isActive("/admin/comptes") || isActive("/admin/signup")
+                        ? "text-destructive font-bold"
+                        : ""
+                    }`}
+                  >
+                    <UsersRound size={30} />
+                    <p>{tAdmin("utilisateurs")}</p>
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuCheckboxItem
+                    checked={isActive("/admin/comptes")}
+                    onClick={handleHideMobileNav}
+                  >
+                    <Link href="/admin/comptes" className="!text-base">
+                      {tAdmin("comptes")}
+                    </Link>
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={isActive("/admin/signup")}
+                    onClick={handleHideMobileNav}
+                  >
+                    <Link href="/admin/signup" className="!text-base">
+                      {tAdmin("creer-un-compte")}
+                    </Link>
+                  </DropdownMenuCheckboxItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>

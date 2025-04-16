@@ -95,7 +95,9 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
         )}
         <DropdownMenuItem asChild onClick={() => setIsMobileNavOpen(false)}>
           {session ? (
-            <p onClick={handleSignOut}>{t("deconnexion")}</p>
+            <p onClick={handleSignOut} className="!text-base">
+              {t("deconnexion")}
+            </p>
           ) : (
             <Link href="/auth/signin" className="cursor-default !text-base">
               {t("connexion")}

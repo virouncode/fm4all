@@ -74,6 +74,11 @@ export default function SignIn() {
       onSuccess: async () => {
         router.push("/auth/redirect");
         router.refresh();
+        toast({
+          title: t("connexion-reussie"),
+          description: t("vous-etes-maintenant-connecte"),
+          variant: "default",
+        });
       },
     });
     setLoading(false);
@@ -95,7 +100,7 @@ export default function SignIn() {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40"></div>
         </div>
-        <Card className="max-w-md z-10 md:w-1/2 lg:w-1/3">
+        <Card className="max-w-md md:w-1/2 lg:w-1/3">
           <CardHeader>
             <CardTitle className="text-lg md:text-xl">
               {t("connexion")}

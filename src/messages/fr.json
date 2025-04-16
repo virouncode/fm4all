@@ -35,7 +35,7 @@
   "auth": {
     "deconnexion-reussie": "Déconnexion réussie",
     "vous-avez-ete-deconnecte-avec-succes": "Vous avez été déconnecté avec succès.",
-    "mon-espace": "Mon espace",
+    "mon-espace": "Mon compte",
     "deconnexion": "Déconnexion",
     "connexion": "Connexion",
     "adresse-email-non-verifiee": "Adresse email non vérifiée 😿",
@@ -49,7 +49,9 @@
     "mot-de-passe-oublie": "Mot de passe oublié ?",
     "email-obligatoire": "Email obligatoire",
     "email-invalide": "Email invalide",
-    "mot-de-passe-obligatoire": "Mot de passe obligatoire"
+    "mot-de-passe-obligatoire": "Mot de passe obligatoire",
+    "connexion-reussie": "Connexion réussie",
+    "vous-etes-maintenant-connecte": "Vous êtes maintenant connecté"
   },
   "footer": {
     "page-d-accueil": "Page d'accueil",
@@ -1239,5 +1241,10 @@
     "erreur-globale": "Erreur globale !",
     "reessayer": "Réessayer",
     "retour": "Retour"
+  },
+  "admin": {
+    "utilisateurs": "Utilisateurs",
+    "comptes": "Comptes",
+    "creer-un-compte": "Créer un compte"
   }
 }
