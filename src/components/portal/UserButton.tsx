@@ -17,9 +17,10 @@ import { Dispatch, SetStateAction } from "react";
 
 type UserButtonProps = {
   setIsMobileNavOpen: Dispatch<SetStateAction<boolean>>;
+  className?: string;
 };
 
-const UserButton = ({ setIsMobileNavOpen }: UserButtonProps) => {
+const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
   const t = useTranslations("auth");
 
   const router = useRouter();
@@ -50,11 +51,11 @@ const UserButton = ({ setIsMobileNavOpen }: UserButtonProps) => {
   };
   return (
     <DropdownMenu modal={false}>
-      <DropdownMenuTrigger asChild className="cursor-pointer">
+      <DropdownMenuTrigger asChild className={`cursor-pointer`}>
         <Button
           title={t("connexion")}
           variant="outline"
-          className={`hidden min-[500px]:flex justify-center items-center rounded-full ${!user?.image ? "p-2" : ""}`}
+          className={`flex justify-center items-center rounded-full ${!user?.image ? "p-2" : ""} ${className}`}
           size="icon"
           asChild
         >
@@ -75,7 +76,7 @@ const UserButton = ({ setIsMobileNavOpen }: UserButtonProps) => {
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent className="text-base">
         {session && user?.role && (
           <DropdownMenuItem asChild onClick={() => setIsMobileNavOpen(false)}>
             <Link

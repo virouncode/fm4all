@@ -10,7 +10,6 @@ import {
   Phone,
   ScrollText,
   Star,
-  User,
   X,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -135,7 +134,10 @@ const Header = () => {
               <Phone />
             </Link>
           </Button>
-          <UserButton setIsMobileNavOpen={setIsMobileNavOpen} />
+          <UserButton
+            setIsMobileNavOpen={setIsMobileNavOpen}
+            className="hidden"
+          />
           {isMobileNavOpen ? (
             <X
               size={30}
@@ -162,10 +164,11 @@ const Header = () => {
           role="navigation"
           aria-label="Mobile navigation"
         >
-          {/* <div className="absolute top-4 left-6">
-            <ModeToggle />
-          </div> */}
-          <LocaleButton className="absolute top-10 left-6 flex gap-1" />
+          <div className="absolute top-4 right-6 flex items-center gap-4">
+            <LocaleButton className="flex gap-1" />
+            <UserButton setIsMobileNavOpen={setIsMobileNavOpen} />
+          </div>
+
           <div className="flex flex-col gap-4">
             <div className="flex-1 flex flex-col gap-4 ">
               <div
@@ -213,15 +216,6 @@ const Header = () => {
                 <Handshake size={30} />
                 <Link href="/partenaires">{t("nos-partenaires")}</Link>
               </div>
-              {/* <div
-                className={`flex gap-4 items-center ${
-                  isActive("/faq") ? "text-destructive font-bold" : ""
-                }`}
-                onClick={handleHideMobileNav}
-              >
-                <CircleHelp size={30} />
-                <Link href="/faq">FAQ</Link>
-              </div> */}
               <div
                 className={`hidden max-[600px]:flex gap-4 items-center ${
                   isActive("/prestataire") ? "text-destructive font-bold" : ""
@@ -239,15 +233,6 @@ const Header = () => {
               >
                 <Phone size={30} />
                 <Link href="/contact">{t("nous-contacter")}</Link>
-              </div>
-              <div
-                className={`hidden max-[600px]:flex gap-4 items-center ${
-                  isActive("/login") ? "text-destructive font-bold" : ""
-                }`}
-                onClick={handleHideMobileNav}
-              >
-                <User size={30} />
-                <Link href="/auth/signin">{t("connexion")}</Link>
               </div>
             </div>
           </div>
