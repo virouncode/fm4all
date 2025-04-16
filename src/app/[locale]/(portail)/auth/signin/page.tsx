@@ -14,9 +14,10 @@ import { toast } from "@/hooks/use-toast";
 import { Link, useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth-client";
 import { InsertAdminType } from "@/zod-schemas/admin";
-import { signInSchema, SignInType } from "@/zod-schemas/signIn";
+import { createSignInSchema, SignInType } from "@/zod-schemas/signIn";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -24,6 +25,7 @@ import { useForm } from "react-hook-form";
 export default function SignIn() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const t = useTranslations("auth");
 
   const defaultValues: SignInType = {
     email: "",
@@ -32,7 +34,13 @@ export default function SignIn() {
 
   const form = useForm<SignInType>({
     mode: "onBlur",
-    resolver: zodResolver(signInSchema),
+    resolver: zodResolver(
+      createSignInSchema({
+        email: t("email-obligatoire"),
+        emailInvalid: t("email-invalide"),
+        password: t("mot-de-passe-obligatoire"),
+      })
+    ),
     defaultValues,
   });
 
@@ -45,18 +53,21 @@ export default function SignIn() {
         console.log("ctx", ctx);
         if (ctx.error.status === 403) {
           toast({
-            title: "Adresse email non vérifiée 😿",
-            description:
-              "Un nouveau lien de vérification vient de vous être envoyé. Merci de consulter votre boîte de réception.",
+            title: t("adresse-email-non-verifiee"),
+            description: t(
+              "un-nouveau-lien-de-verification-vient-de-vous-etre-envoye-merci-de-consulter-votre-boite-de-reception"
+            ),
             variant: "destructive",
           });
           return;
         }
         toast({
-          title: "Erreur 😿",
+          title: t("erreur"),
           description:
             ctx.error.message ||
-            "Une erreur est survenue lors de la connexion. Veuillez réessayer.",
+            t(
+              "une-erreur-est-survenue-lors-de-la-connexion-veuillez-reessayer"
+            ),
           variant: "destructive",
         });
       },
@@ -74,7 +85,9 @@ export default function SignIn() {
         <div className="absolute inset-0 z-0">
           <Image
             src={"/img/hero_wallpaper_compressed.webp"}
-            alt="une image de bureaux modernes et lumineux avec des plantes vertes"
+            alt={t(
+              "une-image-de-bureaux-modernes-et-lumineux-avec-des-plantes-vertes"
+            )}
             className="object-cover"
             quality={75}
             priority
@@ -82,11 +95,13 @@ export default function SignIn() {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40"></div>
         </div>
-        <Card className="max-w-md z-10">
+        <Card className="max-w-md z-10 md:w-1/2 lg:w-1/3">
           <CardHeader>
-            <CardTitle className="text-lg md:text-xl">Connexion</CardTitle>
+            <CardTitle className="text-lg md:text-xl">
+              {t("connexion")}
+            </CardTitle>
             <CardDescription className="text-xs md:text-sm">
-              Entrez votre email et mot de passe pour vous connecter
+              {t("entrez-votre-email-et-mot-de-passe-pour-vous-connecter")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -94,12 +109,12 @@ export default function SignIn() {
               <form onSubmit={form.handleSubmit(submitForm)}>
                 <div className="grid gap-4">
                   <InputWithLabel<InsertAdminType>
-                    fieldTitle="Email"
+                    fieldTitle={t("email")}
                     nameInSchema="email"
                     type="email"
                   />
                   <InputWithLabel<InsertAdminType>
-                    fieldTitle="Mot de passe"
+                    fieldTitle={t("mot-de-passe")}
                     nameInSchema="password"
                     type="password"
                   />
@@ -107,7 +122,7 @@ export default function SignIn() {
                     href="/auth/forgot-password"
                     className="underline text-sm"
                   >
-                    Mot de passe oublié ?
+                    {t("mot-de-passe-oublie")}
                   </Link>
                   <Button
                     className="w-full text-base"
@@ -118,7 +133,7 @@ export default function SignIn() {
                     {loading ? (
                       <Loader2 size={16} className="animate-spin" />
                     ) : (
-                      "Connexion"
+                      t("connexion")
                     )}
                   </Button>
                 </div>

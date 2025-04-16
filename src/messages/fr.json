@@ -32,6 +32,25 @@
     "nous-contacter": "Nous contacter",
     "connexion": "Connexion"
   },
+  "auth": {
+    "deconnexion-reussie": "Déconnexion réussie",
+    "vous-avez-ete-deconnecte-avec-succes": "Vous avez été déconnecté avec succès.",
+    "mon-espace": "Mon espace",
+    "deconnexion": "Déconnexion",
+    "connexion": "Connexion",
+    "adresse-email-non-verifiee": "Adresse email non vérifiée 😿",
+    "un-nouveau-lien-de-verification-vient-de-vous-etre-envoye-merci-de-consulter-votre-boite-de-reception": "Un nouveau lien de vérification vient de vous être envoyé. Merci de consulter votre boîte de réception.",
+    "erreur": "Erreur 😿",
+    "une-erreur-est-survenue-lors-de-la-connexion-veuillez-reessayer": "Une erreur est survenue lors de la connexion. Veuillez réessayer.",
+    "une-image-de-bureaux-modernes-et-lumineux-avec-des-plantes-vertes": "une image de bureaux modernes et lumineux avec des plantes vertes",
+    "entrez-votre-email-et-mot-de-passe-pour-vous-connecter": "Entrez votre email et mot de passe pour vous connecter",
+    "email": "Email",
+    "mot-de-passe": "Mot de passe",
+    "mot-de-passe-oublie": "Mot de passe oublié ?",
+    "email-obligatoire": "Email obligatoire",
+    "email-invalide": "Email invalide",
+    "mot-de-passe-obligatoire": "Mot de passe obligatoire"
+  },
   "footer": {
     "page-d-accueil": "Page d'accueil",
     "mentions-legales": "Mentions legales",

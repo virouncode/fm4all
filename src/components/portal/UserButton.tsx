@@ -5,6 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { toast } from "@/hooks/use-toast";
 import { Link, useRouter } from "@/i18n/navigation";
 import { authClient, useSession } from "@/lib/auth-client";
 import { User } from "better-auth";
@@ -19,7 +20,8 @@ type UserButtonProps = {
 };
 
 const UserButton = ({ setIsMobileNavOpen }: UserButtonProps) => {
-  const t = useTranslations("header");
+  const t = useTranslations("auth");
+
   const router = useRouter();
   const { data: session } = useSession();
   const user = session?.user as User & {
@@ -34,6 +36,11 @@ const UserButton = ({ setIsMobileNavOpen }: UserButtonProps) => {
         fetchOptions: {
           onSuccess: () => {
             router.push("/");
+            toast({
+              title: t("deconnexion-reussie"),
+              description: t("vous-avez-ete-deconnecte-avec-succes"),
+              variant: "default",
+            });
           },
         },
       });
@@ -81,16 +88,16 @@ const UserButton = ({ setIsMobileNavOpen }: UserButtonProps) => {
               }
               className="cursor-default"
             >
-              Mon espace
+              {t("mon-espace")}
             </Link>
           </DropdownMenuItem>
         )}
         <DropdownMenuItem asChild onClick={() => setIsMobileNavOpen(false)}>
           {session ? (
-            <p onClick={handleSignOut}>Déconnexion</p>
+            <p onClick={handleSignOut}>{t("deconnexion")}</p>
           ) : (
             <Link href="/auth/signin" className="cursor-default">
-              Connexion
+              {t("connexion")}
             </Link>
           )}
         </DropdownMenuItem>

@@ -22,6 +22,26 @@
     "illustration-de-l-auteur": "author photo",
     "nos-articles-sur-and-quot": "Our posts about : "
   },
+
+  "auth": {
+    "deconnexion-reussie": "Sign out successful",
+    "vous-avez-ete-deconnecte-avec-succes": "You have been successfully signed out.",
+    "mon-espace": "My account",
+    "deconnexion": "Sign out",
+    "connexion": "Sign in",
+    "adresse-email-non-verifiee": "Email not verified 😿",
+    "un-nouveau-lien-de-verification-vient-de-vous-etre-envoye-merci-de-consulter-votre-boite-de-reception": "A new verification link has just been sent to you. Please check your inbox.",
+    "erreur": "Error 😿",
+    "une-erreur-est-survenue-lors-de-la-connexion-veuillez-reessayer": "An error occurred during login. Please try again.",
+    "une-image-de-bureaux-modernes-et-lumineux-avec-des-plantes-vertes": "an image of modern, bright offices with green plants",
+    "entrez-votre-email-et-mot-de-passe-pour-vous-connecter": "Enter your email and password to sign in",
+    "email": "Email",
+    "mot-de-passe": "Password",
+    "mot-de-passe-oublie": "Forgot password?",
+    "email-obligatoire": "Email required",
+    "email-invalide": "Invalid email",
+    "mot-de-passe-obligatoire": "Password required"
+  },
   "header": {
     "home": "Home",
     "nos-3-gammes": "Our 3 tiers",

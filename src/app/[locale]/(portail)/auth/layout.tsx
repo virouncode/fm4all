@@ -1,4 +1,4 @@
-import HeaderAuth from "@/components/header-auth";
+import Header from "@/components/header";
 
 const AuthLayout = ({
   children,
@@ -7,7 +7,7 @@ const AuthLayout = ({
 }>) => {
   return (
     <>
-      <HeaderAuth />
+      <Header />
       {children}
     </>
   );
