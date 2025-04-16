@@ -120,10 +120,10 @@ export const routing = defineRouting({
       fr: "/auth/signin",
       en: "/auth/signin",
     },
-    "/auth/signup": {
-      fr: "/auth/signup",
-      en: "/auth/signup",
-    },
+    // "/auth/signup": {
+    //   fr: "/auth/signup",
+    //   en: "/auth/signup",
+    // },
     "/auth/redirect": {
       fr: "/auth/redirect",
       en: "/auth/redirect",

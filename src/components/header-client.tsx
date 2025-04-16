@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Link, usePathname } from "@/i18n/navigation";
 import {
+  CircleGauge,
   HandPlatter,
   Handshake,
   Home,
@@ -19,9 +19,8 @@ import { useState } from "react";
 import LocaleButton from "./locale-button";
 import UserButton from "./portal/UserButton";
 
-const HeaderPortal = () => {
+const HeaderClient = () => {
   const t = useTranslations("header");
-
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const path = usePathname();
 
@@ -51,21 +50,19 @@ const HeaderPortal = () => {
               />
             </Link>
           </div>
+          <nav className="hidden xl:flex items-center gap-8">
+            <div
+              className={`flex gap-1 items-center ${
+                isActive("/admin/dashboard") ? "text-destructive font-bold" : ""
+              }`}
+            >
+              <CircleGauge size={15} />
+              <Link href="/admin/dashboard">Dashboard</Link>
+            </div>
+          </nav>
         </div>
         <div className="flex items-center gap-4">
           <LocaleButton className="hidden md:flex" />
-          <Button
-            title={t("nous-contacter")}
-            variant="outline"
-            className="hidden min-[500px]:flex justify-center items-center rounded-full"
-            size="icon"
-            asChild
-            onClick={() => setIsMobileNavOpen(false)}
-          >
-            <Link href="/contact">
-              <Phone />
-            </Link>
-          </Button>
           <UserButton setIsMobileNavOpen={setIsMobileNavOpen} />
           {isMobileNavOpen ? (
             <X
@@ -80,9 +77,6 @@ const HeaderPortal = () => {
               onClick={handleShowMobileNav}
             />
           )}
-          {/* <div className="lg:flex hidden">
-            <ModeToggle />
-          </div> */}
         </div>
         <div
           className={`flex items-center justify-center fixed top-16 left-0 right-0 bg-background shadow-lg h-[calc(100vh-4rem)] text-2xl  ${
@@ -188,4 +182,4 @@ const HeaderPortal = () => {
   );
 };
 
-export default HeaderPortal;
+export default HeaderClient;

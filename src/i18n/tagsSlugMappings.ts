@@ -2,24 +2,28 @@
 
 // Mappings des slugs de services du français vers l'anglais
 export const tagsSlugMappingsFrToEn: Record<string, string> = {
-  nettoyage: "cleaning",
-  hygiene: "hygiene",
+  "ege-rse": "esg-and-csr-compliance",
+  "cabinet-medical": "medical-center",
+  "entrepot-logistique": "warehouses",
+  "local-commercial-et-retail": "retail-spaces",
+  "comparateur-devis-en-ligne": "online-quote-comparison-facility-services",
+  demenagement: "office-relocation-services",
+  "espace-coworking": "coworking-spaces",
+  "startups-scaleups": "startups-scaleups",
+  erp: "public-access-builidings",
+  "immeuble-mono-occupant": "single-tenant-building",
+  "evenementiel-bien-etre": "workplace-experience",
+  bureaux: "office-spaces",
+  "services-a-la-demande": "on-demand-services",
+  "cadeaux-d-entreprise-et-goodies": "corporate-gifts-and-goodies",
+  "travaux-a-la-demande": "on-demand-works-and-repairs",
+  "audit-et-conseil": "audit-and-advisory-consulting",
+  proprete: "cleaning",
   maintenance: "maintenance",
-  "securite-incendie": "fire-safety",
-  cafe: "coffee",
-  "food-beverage": "food-beverage",
-  "fontaines-a-eau": "water-dispensers",
   "office-manager": "office-manager",
-  "facility-manager": "facility-manager",
-  "hospitality-manager": "hospitality-manager",
-  "pilotage-prestations": "service-management",
-  FM: "FM",
-  proprete: "cleanliness",
-  "comparateur-en-ligne": "online-comparison-tool",
-  "devis-en-ligne": "online-quote",
-  "demenagement-entreprise": "moving-in-new-offices",
-
-  // Ajoutez tous vos autres services ici
+  "food-and-beverage": "food-and-beverage",
+  "facility-management": "facility-management",
+  "securite-incendie": "fire-safety",
 };
 
 // Fonction pour obtenir le slug français à partir du slug anglais
