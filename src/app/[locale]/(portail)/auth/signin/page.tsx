@@ -80,8 +80,8 @@ export default function SignIn() {
   };
 
   return (
-    <main className="max-w-7xl min-h-[calc(100vh-4rem)] md:h-[calc(100vh-4rem)] mx-auto py-4 px-6 md:px-20">
-      <section className="flex items-center justify-center min-h-[calc(100vh-4rem)] md:h-full">
+    <main className="max-w-7xl h-[calc(100vh-4rem)] mx-auto py-4 px-6 md:px-20">
+      <section className="flex items-center justify-center h-full">
         <div className="absolute inset-0 z-0">
           <Image
             src={"/img/hero_wallpaper_compressed.webp"}
