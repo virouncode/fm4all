@@ -80,7 +80,7 @@ export default function SignIn() {
   };
 
   return (
-    <main className="max-w-7xl h-[calc(100vh-4rem)] mx-auto py-4 px-6 md:px-20">
+    <main className="max-w-7xl h-[calc(100vh-4rem)] mx-auto py-4 px-6 md:px-20 relative">
       <section className="flex items-center justify-center h-full">
         <div className="absolute inset-0 z-0">
           <Image
