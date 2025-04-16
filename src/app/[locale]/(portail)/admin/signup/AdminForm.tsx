@@ -192,21 +192,19 @@ const AdminForm = () => {
             />
           </div>
 
-          <div className="flex justify-center mt-6">
-            <Button
-              variant="destructive"
-              size="lg"
-              title="Créer un compte"
-              className="text-base"
-              disabled={!form.formState.isValid || loading}
-            >
-              {loading ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : (
-                "Créer un compte"
-              )}
-            </Button>
-          </div>
+          <Button
+            variant="destructive"
+            size="lg"
+            title="Créer un compte"
+            className="text-base w-full mt-6"
+            disabled={!form.formState.isValid || loading}
+          >
+            {loading ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              "Créer un compte"
+            )}
+          </Button>
         </form>
       </Form>
     </>
@@ -214,12 +212,3 @@ const AdminForm = () => {
 };
 
 export default AdminForm;
-
-async function convertImageToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}

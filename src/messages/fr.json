@@ -1045,7 +1045,7 @@
       "sauvegarder-ma-progression": "Sauvegarder ma progression",
       "erreurs": {
         "nom-de-lentreprise-obligatoire": "Nom de l'entreprise obligatoire",
-        "siret-invalide-format-attendu-xxx-xxx-xxx-xxxxx": "Siret invalide, format attendu : XXX XXX XXX XXXXX",
+        "siret-invalide-format-attendu-xxx-xxx-xxx-xxxxx": "Siret invalide",
         "prenom-du-contact-obligatoire": "Prénom du contact obligatoire",
         "nom-du-contact-obligatoire": "Nom du contact obligatoire",
         "poste-du-contact-obligatoire": "Poste du contact obligatoire",

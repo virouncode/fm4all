@@ -46,7 +46,7 @@ export function InputWithLabel<S>({
           <FormControl>
             <Input
               id={nameInSchema}
-              className={`w-full max-w-xs disabled:text-blue-500 dark:disabled:text-yellow-300 disabled:opacity-75 ${className}`}
+              className={`w-full max-w-xs disabled:text-blue-500 dark:disabled:text-yellow-300 disabled:opacity-75 read-only:pointer-events-none read-only:text-slate-400 ${className}`}
               {...props}
               {...field} // Provides onChange, onBlur, name, ref, and value to the child component
               onChange={(e) => {

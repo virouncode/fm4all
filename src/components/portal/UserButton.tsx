@@ -10,6 +10,7 @@ import { authClient, useSession } from "@/lib/auth-client";
 import { User } from "better-auth";
 import { UserCheck, UserX } from "lucide-react";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 
 import { Dispatch, SetStateAction } from "react";
 
@@ -52,11 +53,12 @@ const UserButton = ({ setIsMobileNavOpen }: UserButtonProps) => {
         >
           {session ? (
             user.image ? (
-              <img
+              <Image
                 src={user.image}
                 alt="avatar-utilisateur"
                 width={32}
                 height={32}
+                className="object-cover"
               />
             ) : (
               <UserCheck />

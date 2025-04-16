@@ -337,13 +337,11 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                   nameInSchema="siret"
                   name="siret"
                   handleChange={handleChange}
-                  placeholder="XXX XXX XXX XXXXX"
                   className="w-full"
                 />
                 <InputWithLabel<InsertClientType>
                   fieldTitle={t("n-de-telephone")}
                   nameInSchema="phoneContact"
-                  placeholder="XX XX XX XX XX"
                   name="phoneContact"
                   handleChange={handleChange}
                   className="w-full"

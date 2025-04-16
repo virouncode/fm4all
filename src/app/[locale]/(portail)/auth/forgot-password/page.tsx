@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
-import { useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth-client";
 import {
   forgotPasswordSchema,
@@ -26,7 +25,6 @@ import { useForm } from "react-hook-form";
 
 export default function ForgotPassword() {
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
   const defaultValues: ForgotPasswordType = {
     email: "",
   };

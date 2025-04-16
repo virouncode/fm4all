@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
-import { CafeContext } from "@/context/CafeProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
@@ -98,7 +97,6 @@ const SnacksFruitsPropositionCard = ({
 }: SnacksFruitsPropositionCardProps) => {
   const t = useTranslations("DevisPage");
   const tSnacks = useTranslations("DevisPage.foodBeverage.snacks");
-  const { cafe } = useContext(CafeContext);
   const tGlobal = useTranslations("Global");
   const { snacksFruits } = useContext(SnacksFruitsContext);
   const gamme = proposition.gamme;

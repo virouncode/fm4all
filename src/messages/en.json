@@ -1045,7 +1045,7 @@
       "sauvegarder-ma-progression": "Save my progress",
       "erreurs": {
         "nom-de-lentreprise-obligatoire": "Company name required",
-        "siret-invalide-format-attendu-xxx-xxx-xxx-xxxxx": "Invalid Siret number, expected format: XXX XXX XXX XXXXX",
+        "siret-invalide-format-attendu-xxx-xxx-xxx-xxxxx": "Invalid SIRET number",
         "prenom-du-contact-obligatoire": "Contact first name required",
         "nom-du-contact-obligatoire": "Contact last name required",
         "poste-du-contact-obligatoire": "Job title required",

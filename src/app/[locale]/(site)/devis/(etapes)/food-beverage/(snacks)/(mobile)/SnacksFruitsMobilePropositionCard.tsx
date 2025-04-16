@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
-import { CafeContext } from "@/context/CafeProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { formatNumber } from "@/lib/formatNumber";
 import { getFm4AllColor } from "@/lib/getFm4AllColor";
@@ -101,7 +100,6 @@ const SnacksFruitsMobilePropositionCard = ({
   const tSnacks = useTranslations("DevisPage.foodBeverage.snacks");
   const tGlobal = useTranslations("Global");
   const { snacksFruits } = useContext(SnacksFruitsContext);
-  const { cafe } = useContext(CafeContext);
   const {
     gamme,
     fournisseurId,

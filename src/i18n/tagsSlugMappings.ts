@@ -2,7 +2,7 @@
 
 // Mappings des slugs de services du français vers l'anglais
 export const tagsSlugMappingsFrToEn: Record<string, string> = {
-  "ege-rse": "esg-and-csr-compliance",
+  "esg-rse": "esg-and-csr-compliance",
   "cabinet-medical": "medical-center",
   "entrepot-logistique": "warehouses",
   "local-commercial-et-retail": "retail-spaces",

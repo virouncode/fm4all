@@ -1,4 +1,5 @@
 import { fournisseurs } from "@/db/schema";
+import { isValidSIRET } from "@/lib/isValideSIRET";
 import {
   createInsertSchema,
   createSelectSchema,
@@ -9,7 +10,7 @@ import {
 export const selectFournisseurSchema = createSelectSchema(fournisseurs, {
   nomFournisseur: (schema) => schema.min(1, "Nom du fournisseur obligatoire"),
   siret: (schema) =>
-    schema.regex(/^\d{3} \d{3} \d{3} \d{5}$/, "Siret invalide"),
+    schema.refine((value) => !value || isValidSIRET(value), "Siret invalide"),
   prenomContact: (schema) =>
     schema.min(1, "Prénom du contact fournisseur obligatoire"),
   nomContact: (schema) =>
@@ -24,10 +25,7 @@ export type SelectFournisseurType = typeof selectFournisseurSchema._type;
 export const insertFournisseurSchema = createInsertSchema(fournisseurs, {
   nomFournisseur: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
   siret: (schema) =>
-    schema.refine(
-      (value) => !value || /^\d{3} \d{3} \d{3} \d{5}$/.test(value),
-      { message: "Siret invalide, format attendu: 123 456 789 12345" }
-    ),
+    schema.refine((value) => !value || isValidSIRET(value), "Siret invalide"),
   prenomContact: (schema) => schema.min(1, "Prénom du contact obligatoire"),
   nomContact: (schema) => schema.min(1, "Nom du contact obligatoire"),
   emailContact: (schema) => schema.email("Email du contact invalide"),
@@ -40,10 +38,7 @@ export type InsertFournisseurType = typeof insertFournisseurSchema._type;
 export const updateFournisseurSchema = createUpdateSchema(fournisseurs, {
   nomFournisseur: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
   siret: (schema) =>
-    schema.regex(
-      /^\d{3} \d{3} \d{3} \d{5}$/,
-      "Siret invalide, format attendu: 123 456 789 12345"
-    ),
+    schema.refine((value) => !value || isValidSIRET(value), "Siret invalide"),
   prenomContact: (schema) => schema.min(1, "Prénom du contact obligatoire"),
   nomContact: (schema) => schema.min(1, "Nom du contact obligatoire"),
   emailContact: (schema) => schema.email("Email du contact invalide"),

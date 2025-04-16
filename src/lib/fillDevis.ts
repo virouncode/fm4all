@@ -6,6 +6,7 @@ import { InsertClientType } from "@/zod-schemas/client";
 import html2canvas from "html2canvas";
 import { PDFDocument, PDFTextField, RotationTypes } from "pdf-lib";
 import { formatNumber } from "./formatNumber";
+import { formatSIRET } from "./isValideSIRET";
 import { sanitizeText } from "./sanitizeText";
 
 export const fillDevis = async (
@@ -63,7 +64,10 @@ export const fillDevis = async (
       { fieldName: "nom_emetteur", value: nomEmetteur },
       { fieldName: "nom_entreprise", value: client.nomEntreprise },
       { fieldName: "adresse_client", value: adresseClient },
-      { fieldName: "siret_client", value: client.siret ?? "" },
+      {
+        fieldName: "siret_client",
+        value: client.siret ? formatSIRET(client.siret) : "",
+      },
       { fieldName: "signataire_client", value: signataireClient },
       { fieldName: "poste_signataire_client", value: posteSignataireClient },
       { fieldName: "email_signataire_client", value: emailSignataireClient },

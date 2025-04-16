@@ -129,6 +129,9 @@ const page = async ({
   // const options = { next: { revalidate: 30 } };
   const { slug, locale } = await params;
   const service = await getService(slug);
+  if (!service) {
+    notFound();
+  }
   const tagsSortants = service.tagsSortants as {
     _id: string;
     nom: string;
@@ -140,10 +143,6 @@ const page = async ({
     tagsSortants.map((tag) => tag._id),
     service._id
   );
-
-  if (!service) {
-    notFound();
-  }
 
   const serviceImageUrl = service.imagePrincipale
     ? urlFor(service.imagePrincipale)

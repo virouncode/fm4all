@@ -21,7 +21,7 @@ import {
 import { InsertDevisType } from "@/zod-schemas/devis";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircle } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useAction } from "next-safe-action/hooks";
 import { ChangeEvent, useContext, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -34,7 +34,6 @@ const SauvegarderProgression = () => {
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const [accepte, setAccepte] = useState(false);
   const router = useRouter();
-  const locale = useLocale();
 
   const defaultValues: InsertClientType = {
     ...client,

@@ -5,7 +5,9 @@ import { auth } from "@/lib/auth";
 import { getSession } from "@/lib/auth-session";
 import { capitalize } from "@/lib/capitalize";
 import { generatePassword } from "@/lib/generatePassword";
+import { formatSIRET } from "@/lib/isValideSIRET";
 import { actionClient } from "@/lib/safe-actions";
+import { sendEmailFromServer } from "@/lib/sendEmail";
 import {
   insertFournisseurSchema,
   InsertFournisseurType,
@@ -33,6 +35,7 @@ export const insertFournisseurAction = actionClient
       }
       const fournisseurToPost: InsertFournisseurType = {
         ...fournisseurInput,
+        siret: formatSIRET(fournisseurInput.siret),
         nomFournisseur: fournisseurInput.nomFournisseur.toUpperCase(),
         prenomContact: capitalize(fournisseurInput.prenomContact),
         nomContact: capitalize(fournisseurInput.nomContact),
@@ -57,11 +60,12 @@ export const insertFournisseurAction = actionClient
       if (!resultFournisseur[0]?.id) {
         throw new Error("Impossible de créer le compte fournisseur.");
       }
+      const tempPassword = generatePassword();
       await auth.api.signUpEmail({
         body: {
           name: fournisseurToPost.nomFournisseur,
           email: fournisseurToPost.emailContact,
-          password: generatePassword(),
+          password: tempPassword,
           role: "fournisseur",
           fournisseurId: resultFournisseur[0].id,
           clientId: null,
@@ -88,6 +92,17 @@ export const insertFournisseurAction = actionClient
         //     });
         //   },
         // },
+      });
+      await sendEmailFromServer({
+        to: fournisseurToPost.emailContact,
+        from: "noreply@fm4all.com",
+        subject: "Création de votre compte fournisseur",
+        text: `<p>Votre compte fournisseur a été crée avec succès, bienvenue chez fm4all !</p><br/>
+        <p>Voici mot de passe temporaire : ${tempPassword}</p><br/>
+        <p>Nous vous conseillons de le changer dès votre première connexion dans votre espace.</p>
+        <p>Pensez aussi à vérifier votre adresse email en cliquant sur le lien que nous vous avons envoyé.</p>
+        `,
+        nomDestinataire: fournisseurToPost.nomFournisseur,
       });
 
       return {

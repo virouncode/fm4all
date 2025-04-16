@@ -129,6 +129,9 @@ const page = async ({
   // const options = { next: { revalidate: 30 } };
   const { slug, locale } = await params;
   const secteur = await getSecteur(slug);
+  if (!secteur) {
+    notFound();
+  }
   const tagsSortants = secteur.tagsSortants as {
     _id: string;
     nom: string;
@@ -140,10 +143,6 @@ const page = async ({
     tagsSortants.map((tag) => tag._id),
     secteur._id
   );
-
-  if (!secteur) {
-    notFound();
-  }
 
   const secteurImageUrl = secteur.imagePrincipale
     ? urlFor(secteur.imagePrincipale)
