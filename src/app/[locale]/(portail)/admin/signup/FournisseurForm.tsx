@@ -16,12 +16,13 @@ import { authClient } from "@/lib/auth-client";
 import { generatePassword } from "@/lib/generatePassword";
 import { sendEmailFromClient } from "@/lib/sendEmail";
 import {
-  insertFournisseurSchema,
+  createInsertFournisseurSchema,
   InsertFournisseurType,
   SelectFournisseurType,
 } from "@/zod-schemas/fournisseur";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useAction } from "next-safe-action/hooks";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -31,6 +32,8 @@ type FournisseurFormProps = {
 };
 
 const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
+  const tAuth = useTranslations("auth");
+  const tAdmin = useTranslations("admin");
   const [loading, setLoading] = useState(false);
   const [fournisseurId, setFournisseurId] = useState<number | null>(null);
   const defaultValues: InsertFournisseurType = {
@@ -43,7 +46,17 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
   };
   const form = useForm<InsertFournisseurType>({
     mode: "onBlur",
-    resolver: zodResolver(insertFournisseurSchema),
+    resolver: zodResolver(
+      createInsertFournisseurSchema({
+        nomFournisseur: tAdmin("nom-de-lentreprise-obligatoire"),
+        siret: tAdmin("siret-invalide"),
+        prenomContact: tAdmin("prenom-du-contact-obligatoire"),
+        nomContact: tAdmin("nom-du-contact-obligatoire"),
+        emailContact: tAdmin("email-du-contact-obligatoire"),
+        emailContactInvalid: tAdmin("email-du-contact-invalide"),
+        phoneContact: tAdmin("numero-de-telephone-obligatoire"),
+      })
+    ),
     defaultValues,
   });
   const {
@@ -54,7 +67,7 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
     onSuccess: ({ data }) => {
       toast({
         variant: "default",
-        title: "Success! 🎉",
+        title: tAuth("succes"),
         description: data?.message,
       });
       form.reset(defaultValues);
@@ -63,10 +76,10 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
     onError: ({ error }) => {
       toast({
         variant: "destructive",
-        title: "Erreur 😿",
+        title: tAuth("erreur"),
         description:
           error?.serverError ||
-          "Une erreur est survenue lors de la création de l'utilisateur",
+          tAdmin("une-erreur-est-survenue-lors-de-la-creation-de-lutilisateur"),
       });
     },
   });
@@ -91,8 +104,8 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
         console.error("Fournisseur non trouvé");
         toast({
           variant: "destructive",
-          title: "Erreur 😿",
-          description: "Fournisseur non trouvé",
+          title: tAuth("erreur"),
+          description: tAdmin("fournisseur-non-trouve"),
         });
       }
     } else {
@@ -120,8 +133,11 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
         onSuccess: async () => {
           toast({
             variant: "default",
-            title: "Success! 🎉",
-            description: `Le compte utilisateur de ${userToPost.name} a été crée avec succès, un email avec un lien de vérification a été envoyé à ${userToPost.email}`,
+            title: tAuth("succes"),
+            description: tAdmin(
+              "le-compte-utilisateur-de-usertopost-name-a-ete-cree-avec-succes-un-email-avec-un-lien-de-verification-a-ete-envoye-a-usertopost-email",
+              { userName: userToPost.name, userEmail: userToPost.email }
+            ),
           });
           try {
             await sendEmailFromClient({
@@ -140,10 +156,10 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
           } catch (err) {
             toast({
               variant: "destructive",
-              title: "Erreur 😿",
+              title: tAuth("erreur"),
               description:
                 (err as Error)?.message ??
-                "Une erreur est survenue lors de l'envoi de l'email",
+                tAdmin("une-erreur-est-survenue-lors-de-lenvoi-de-lemail"),
             });
           } finally {
             setLoading(false);
@@ -152,10 +168,12 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
         onError: (ctx) => {
           toast({
             variant: "destructive",
-            title: "Erreur 😿",
+            title: tAuth("erreur"),
             description:
               ctx.error.message ??
-              "Une erreur est survenue lors de la création du compte utilisateur",
+              tAdmin(
+                "une-erreur-est-survenue-lors-de-la-creation-du-compte-utilisateur"
+              ),
           });
         },
       });
@@ -165,20 +183,20 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
   return (
     <>
       {fournisseurs && fournisseurs.length > 0 && (
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col md:flex-row md:items-center gap-4">
           <Label className="text-base" htmlFor="fournisseur">
-            Fournisseur :
+            {tAdmin("fournisseur")}
           </Label>
           <Select
             value={fournisseurId?.toString() || "0"}
             onValueChange={handleSelectFournisseur}
-            aria-label="Sélectionner le fournisseur"
+            aria-label={tAdmin("selectionner-le-fournisseur")}
           >
             <SelectTrigger className={`w-full max-w-xs`} id="fournisseur">
-              <SelectValue placeholder="Choisir" />
+              <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="0">Nouveau fournisseur</SelectItem>
+              <SelectItem value="0">{tAdmin("nouveau-fournisseur")}</SelectItem>
               {fournisseurs.map((item) => (
                 <SelectItem key={`${item.id}`} value={item.id.toString()}>
                   {item.nomFournisseur}
@@ -193,31 +211,31 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(submitForm)}>
           <div className="grid gap-2">
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 gap-2 md:gap-6">
               <InputWithLabel<InsertFournisseurType>
-                fieldTitle="Nom de l'entreprise*"
+                fieldTitle={tAdmin("nom-de-lentreprise")}
                 nameInSchema="nomFournisseur"
                 readOnly={!!fournisseurId}
               />
               <InputWithLabel<InsertFournisseurType>
-                fieldTitle="Siret"
+                fieldTitle={tAdmin("siret")}
                 nameInSchema="siret"
                 readOnly={!!fournisseurId}
               />
             </div>
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 gap-2 md:gap-6">
               <InputWithLabel<InsertFournisseurType>
-                fieldTitle="Prénom du contact*"
+                fieldTitle={tAdmin("prenom-du-contact")}
                 nameInSchema="prenomContact"
                 readOnly={!!fournisseurId}
               />
               <InputWithLabel<InsertFournisseurType>
-                fieldTitle="Nom du contact*"
+                fieldTitle={tAdmin("nom-du-contact")}
                 nameInSchema="nomContact"
                 readOnly={!!fournisseurId}
               />
             </div>
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 gap-2 md:gap-6">
               <InputWithLabel<InsertFournisseurType>
                 fieldTitle="Email*"
                 nameInSchema="emailContact"
@@ -225,7 +243,7 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
                 readOnly={!!fournisseurId}
               />
               <InputWithLabel<InsertFournisseurType>
-                fieldTitle="N° de téléphone*"
+                fieldTitle={tAdmin("n-de-telephone")}
                 nameInSchema="phoneContact"
                 type="tel"
                 readOnly={!!fournisseurId}
@@ -235,14 +253,16 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
             <Button
               variant="destructive"
               size="lg"
-              title="Créer un compte"
+              title={tAdmin("creer-un-compte")}
               className="text-base mt-6 w-full"
-              disabled={!form.formState.isValid || isSavingFournisseur}
+              disabled={
+                !form.formState.isValid || isSavingFournisseur || loading
+              }
             >
-              {isSavingFournisseur ? (
+              {isSavingFournisseur || loading ? (
                 <Loader2 size={16} className="animate-spin" />
               ) : (
-                "Créer un compte"
+                tAdmin("creer-un-compte")
               )}
             </Button>
           </div>

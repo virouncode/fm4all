@@ -17,7 +17,6 @@ import UserButton from "./portal/UserButton";
 import UsersAccountsButton from "./UsersAccountsButton";
 
 const HeaderAdmin = () => {
-  const t = useTranslations("header");
   const tAdmin = useTranslations("admin");
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const path = usePathname();

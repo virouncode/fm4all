@@ -7,10 +7,6 @@ const page = async () => {
     getFournisseurs(),
     getClients(),
   ]);
-
-  console.log("fournisseurs", fournisseurs);
-  console.log("clients", clients);
-
   return <SignUp fournisseurs={fournisseurs} clients={clients} />;
 };
 

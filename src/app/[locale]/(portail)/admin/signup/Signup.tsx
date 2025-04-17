@@ -1,5 +1,6 @@
 "use client";
 
+import BackgroundClient from "@/components/BackgroundClient";
 import {
   Card,
   CardContent,
@@ -11,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SelectClientType } from "@/zod-schemas/client";
 import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
-import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import AdminForm from "./AdminForm";
 import ClientForm from "./ClientForm";
@@ -26,36 +27,28 @@ type SignUpProps = {
 
 export default function SignUp({ fournisseurs, clients }: SignUpProps) {
   const [type, setType] = useState<UserTypeType>("fournisseur");
+  const t = useTranslations("admin");
 
   return (
-    <main className="max-w-7xl h-[calc(100vh-4rem)] mx-auto py-4 px-6 md:px-20">
+    <main className="max-w-7xl md:h-[calc(100vh-4rem)] mx-auto py-4 px-6 md:px-20 relative md:static">
       <section className="flex items-center justify-center h-full">
-        <div className="absolute inset-0 z-0">
-          <Image
-            src={"/img/hero_wallpaper_compressed.webp"}
-            alt="une image de bureaux modernes et lumineux avec des plantes vertes"
-            className="object-cover"
-            quality={75}
-            priority
-            fill
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40"></div>
-        </div>
-        <Card className="z-50 rounded-md  h-[90%] w-2/3 overflow-y-auto">
+        <BackgroundClient />
+        <Card className="rounded-md h-[90%] w-full sm:w-3/4 md:w-2/3 overflow-y-auto">
           <CardHeader>
             <CardTitle className="text-lg md:text-xl">
-              Créer un compte utilisateur
+              {t("creer-un-compte-utilisateur")}
             </CardTitle>
             <CardDescription className="text-xs md:text-sm">
-              Choisissez votre type de compte et remplissez les informations
-              nécessaires.
+              {t(
+                "choisissez-votre-type-de-compte-et-remplissez-les-informations-necessaires"
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid gap-6">
-              <div className="flex gap-4 items-center">
+              <div className="flex flex-col md:flex-row gap-4 md:items-center">
                 <Label htmlFor="type" className="text-base">
-                  Type de compte :
+                  {t("type-de-compte")}
                 </Label>
                 <RadioGroup
                   onValueChange={(value) => setType(value as UserTypeType)}
@@ -66,18 +59,26 @@ export default function SignUp({ fournisseurs, clients }: SignUpProps) {
                   <div className="flex gap-2 items-center">
                     <RadioGroupItem
                       value="fournisseur"
-                      title="Fournisseur"
+                      title={t("fournisseur")}
                       id="fournisseur"
                     />
-                    <Label htmlFor="fournisseur">Fournisseur</Label>
+                    <Label htmlFor="fournisseur">{t("fournisseur")}</Label>
                   </div>
                   <div className="flex gap-2 items-center">
-                    <RadioGroupItem value="client" title="Client" id="client" />
-                    <Label htmlFor="client">Client</Label>
+                    <RadioGroupItem
+                      value="client"
+                      title={t("client")}
+                      id="client"
+                    />
+                    <Label htmlFor="client">{t("client")}</Label>
                   </div>
                   <div className="flex gap-2 items-center">
-                    <RadioGroupItem value="admin" title="Admin" id="admin" />
-                    <Label htmlFor="admin">Admin</Label>
+                    <RadioGroupItem
+                      value="admin"
+                      title={t("admin")}
+                      id="admin"
+                    />
+                    <Label htmlFor="admin">{t("admin")}</Label>
                   </div>
                 </RadioGroup>
               </div>

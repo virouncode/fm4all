@@ -22,14 +22,34 @@ export const selectFournisseurSchema = createSelectSchema(fournisseurs, {
 export type SelectFournisseurType = typeof selectFournisseurSchema._type;
 
 //INSERT
-export const insertFournisseurSchema = createInsertSchema(fournisseurs, {
-  nomFournisseur: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
-  siret: (schema) =>
-    schema.refine((value) => !value || isValidSIRET(value), "Siret invalide"),
-  prenomContact: (schema) => schema.min(1, "Prénom du contact obligatoire"),
-  nomContact: (schema) => schema.min(1, "Nom du contact obligatoire"),
-  emailContact: (schema) => schema.email("Email du contact invalide"),
-  phoneContact: (schema) => schema.min(1, "Numéro de téléphone obligatoire"),
+export const createInsertFournisseurSchema = (messages: {
+  nomFournisseur: string;
+  siret: string;
+  prenomContact: string;
+  nomContact: string;
+  emailContact: string;
+  emailContactInvalid: string;
+  phoneContact: string;
+}) => {
+  return createInsertSchema(fournisseurs, {
+    nomFournisseur: (schema) => schema.min(1, messages.nomFournisseur),
+    siret: (schema) =>
+      schema.refine((value) => !value || isValidSIRET(value), messages.siret),
+    prenomContact: (schema) => schema.min(1, messages.prenomContact),
+    nomContact: (schema) => schema.min(1, messages.nomContact),
+    emailContact: (schema) =>
+      schema.min(1, messages.emailContact).email(messages.emailContactInvalid),
+    phoneContact: (schema) => schema.min(1, messages.phoneContact),
+  });
+};
+export const insertFournisseurSchema = createInsertFournisseurSchema({
+  nomFournisseur: "Nom de l'entreprise obligatoire",
+  siret: "Siret invalide",
+  prenomContact: "Prénom du contact obligatoire",
+  nomContact: "Nom du contact obligatoire",
+  emailContact: "Email du contact obligatoire",
+  emailContactInvalid: "Email du contact invalide",
+  phoneContact: "Numéro de téléphone obligatoire",
 });
 
 export type InsertFournisseurType = typeof insertFournisseurSchema._type;
