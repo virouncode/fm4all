@@ -30,10 +30,14 @@ const ExpertiseCarousel = async ({
   articles,
 }: ExpertiseCarouselProps) => {
   const t = await getTranslations("Global");
-  console.log("articles", articles);
+  console.log("services", services);
 
   return (
-    <Tabs defaultValue="services">
+    <Tabs
+      defaultValue={
+        services.length ? "services" : secteurs.length ? "secteurs" : "articles"
+      }
+    >
       <TabsList className="mb-10 bg-transparent flex flex-col items-start md:flex-row md:items-center">
         {/* {[...(services || []), ...(sousServices || [])].length > 0 ? (
           <TabsTrigger value="services" className="text-lg">

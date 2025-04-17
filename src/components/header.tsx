@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Link, usePathname } from "@/i18n/navigation";
 import {
+  Factory,
   HandPlatter,
   Handshake,
   Home,
@@ -61,6 +62,14 @@ const Header = () => {
             >
               <HandPlatter size={15} />
               <Link href="/services">{t("nos-services")}</Link>
+            </div>
+            <div
+              className={`flex gap-1 items-center ${
+                isActive("/secteurs") ? "text-destructive font-bold" : ""
+              }`}
+            >
+              <Factory size={15} />
+              <Link href="/secteurs">{t("nos-secteurs")}</Link>
             </div>
             <div
               className={`flex gap-1 items-center ${
@@ -163,6 +172,15 @@ const Header = () => {
               >
                 <HandPlatter size={30} />
                 <Link href="/services">{t("nos-services")}</Link>
+              </div>
+              <div
+                className={`flex gap-4 items-center ${
+                  isActive("/secteurs") ? "text-destructive font-bold" : ""
+                }`}
+                onClick={handleHideMobileNav}
+              >
+                <Factory size={30} />
+                <Link href="/secteurs">{t("nos-secteurs")}</Link>
               </div>
               <div
                 className={`flex gap-4 items-center ${

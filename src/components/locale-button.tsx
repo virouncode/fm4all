@@ -19,7 +19,6 @@ import {
   getServicesSlugFr,
 } from "@/i18n/servicesSlugMappings";
 import { getTagSlugEn, getTagSlugFr } from "@/i18n/tagsSlugMappings";
-import { Flag } from "lucide-react";
 import { useLocale } from "next-intl";
 import { useParams, useSearchParams } from "next/navigation";
 import { Button } from "./ui/button";
@@ -107,8 +106,7 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
           aria-label="Change language"
           variant="outline"
         >
-          <Flag size={14} />
-          <span>{locale.toUpperCase()}</span>
+          {locale === "fr" ? "🇫🇷" : "🇬🇧"} {locale.toUpperCase()}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
@@ -119,7 +117,7 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
             onCheckedChange={() => handleChangeLang(l)}
             className="text-base"
           >
-            {l.toUpperCase()}
+            {l === "fr" ? "🇫🇷" : "🇬🇧"} {l.toUpperCase()}
           </DropdownMenuCheckboxItem>
         ))}
       </DropdownMenuContent>

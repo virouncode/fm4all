@@ -1,16 +1,21 @@
 import { Link } from "@/i18n/navigation";
-import { client } from "@/sanity/lib/client";
-import { getAllServices, LAST_ARTICLES_QUERY } from "@/sanity/queries";
+import {
+  getAllSecteurs,
+  getAllServices,
+  getLastArticles,
+} from "@/sanity/queries";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Article, ArticleCategory } from "../../sanity.types";
+import { ArticleCategory } from "../../sanity.types";
 
 const Footer = async () => {
   const t = await getTranslations("footer");
   const locale = await getLocale();
-  const services = await getAllServices(locale as "fr" | "en");
-  const articles = await client.fetch<
-    (Article & { categorie: ArticleCategory })[]
-  >(LAST_ARTICLES_QUERY, { language: locale });
+
+  const [services, articles, secteurs] = await Promise.all([
+    getAllServices(locale as "fr" | "en"),
+    getLastArticles(locale as "fr" | "en"),
+    getAllSecteurs(locale as "fr" | "en"),
+  ]);
 
   return (
     <footer className="bg-fm4allsecondary">
@@ -81,6 +86,31 @@ const Footer = async () => {
                       className="hover:opacity-80"
                     >
                       {service.titre}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+          <div className="flex flex-col gap-2 w-52">
+            <p className="text-secondary text-xl">
+              <Link href="/secteurs" className="hover:opacity-80">
+                {t("secteurs")}
+              </Link>
+            </p>
+            <ul className="text-secondary text-sm flex flex-col gap-2">
+              {secteurs.map((secteur) => {
+                const secteurUrl = secteur.slug?.current ?? "";
+                return (
+                  <li key={secteur._id}>
+                    <Link
+                      href={{
+                        pathname: "/secteurs/[slug]",
+                        params: { slug: secteurUrl },
+                      }}
+                      className="hover:opacity-80"
+                    >
+                      {secteur.titre}
                     </Link>
                   </li>
                 );

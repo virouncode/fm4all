@@ -268,9 +268,9 @@ const page = async ({
           <BreadcrumbPage>{article.titre}</BreadcrumbPage>
         </BreadcrumbList>
       </Breadcrumb>
+      <h1 className="text-4xl md:text-5xl mb-10">{article.titre}</h1>
       <section className="flex flex-row gap-10 mb-16">
         <div className="flex flex-col flex-1 justify-start text-lg gap-10">
-          <h1 className="text-5xl">{article.titre}</h1>
           <div className="flex flex-row gap-2 flex-wrap">
             {tagsSortants.map((tag) => (
               <TagButton tag={tag} key={tag._id} />
