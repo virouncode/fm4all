@@ -15,6 +15,17 @@ export async function middleware(req: NextRequest) {
   //SESSION
   let session;
   let user;
+  //Si pas de locale
+  if (!locale) return intlMiddleware(req);
+  //Si locale mais route publique
+  if (
+    !pathnameWithoutLocale.startsWith("/admin") &&
+    !pathnameWithoutLocale.startsWith("/client") &&
+    !pathnameWithoutLocale.startsWith("/fournisseur")
+  ) {
+    return intlMiddleware(req);
+  }
+
   try {
     const sessionResponse = await fetch(
       `${req.nextUrl.origin}/api/auth/get-session`,
@@ -40,15 +51,9 @@ export async function middleware(req: NextRequest) {
     console.error("Erreur lors de la récupération de la session:", error);
     // Continuer sans session
   }
-  //Si pas de locale
-  if (!locale) return intlMiddleware(req);
+
   //Si pas de session
-  if (
-    !session &&
-    (pathnameWithoutLocale.startsWith("/admin") ||
-      pathnameWithoutLocale.startsWith("/client") ||
-      pathnameWithoutLocale.startsWith("/fournisseur"))
-  ) {
+  if (!session) {
     return NextResponse.redirect(new URL(`/${locale}/auth/signin`, req.url));
   }
   //Si session et role invalide
