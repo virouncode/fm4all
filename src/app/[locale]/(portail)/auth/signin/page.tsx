@@ -89,7 +89,7 @@ export default function SignIn() {
     <main className="max-w-7xl h-[calc(100vh-4rem)] mx-auto py-4 px-6 md:px-20 relative md:static">
       <section className="flex items-center justify-center h-full">
         <BackgroundClient />
-        <Card className="max-w-md w-full sm:w-1/2 lg:w-1/3">
+        <Card className="max-w-md">
           <CardHeader>
             <CardTitle className="text-lg md:text-xl">
               {t("connexion")}

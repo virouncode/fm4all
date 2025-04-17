@@ -81,7 +81,6 @@ export const insertFournisseurAction = actionClient
           role: "fournisseur",
           fournisseurId: resultFournisseur[0].id,
           clientId: null,
-          image: "",
         },
         // fetchOptions: {
         //   onResponse: () => {

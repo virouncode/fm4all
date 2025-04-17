@@ -30,6 +30,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
     fournisseurId?: number;
     clientId?: number;
   };
+  console.log("user", user);
 
   const handleSignOut = async () => {
     try {
@@ -60,7 +61,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
           asChild
         >
           {session ? (
-            user.image ? (
+            user?.image ? (
               <Image
                 src={user.image}
                 alt="avatar-utilisateur"

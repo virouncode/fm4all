@@ -120,10 +120,9 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
       const userToPost = {
         name: data.nomFournisseur.toUpperCase(),
         email: data.emailContact.toLowerCase(),
-        password: generatePassword(),
+        password: tempPassword,
         role: "fournisseur",
         fournisseurId,
-        image: tempPassword,
       };
       await authClient.signUp.email(userToPost, {
         onRequest: () => {
