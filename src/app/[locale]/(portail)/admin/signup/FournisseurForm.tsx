@@ -174,6 +174,7 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
                 "une-erreur-est-survenue-lors-de-la-creation-du-compte-utilisateur"
               ),
           });
+          setLoading(false);
         },
       });
     }
