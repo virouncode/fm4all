@@ -13,6 +13,7 @@ import {
   InsertFournisseurType,
 } from "@/zod-schemas/fournisseur";
 import { and, eq } from "drizzle-orm";
+import { getLocale } from "next-intl/server";
 import { flattenValidationErrors } from "next-safe-action";
 
 export const insertFournisseurAction = actionClient
@@ -27,10 +28,13 @@ export const insertFournisseurAction = actionClient
     }: {
       parsedInput: InsertFournisseurType;
     }) => {
+      const locale = await getLocale();
       const user = (await getSession())?.user;
       if (user?.role !== "admin") {
         throw new Error(
-          "Vous n'avez pas les droits pour créer un utilisateur."
+          locale === "fr"
+            ? "Vous n'avez pas les droits pour créer un compte fournisseur."
+            : "You do not have permission to create a provider account."
         );
       }
       const fournisseurToPost: InsertFournisseurType = {
@@ -50,7 +54,11 @@ export const insertFournisseurAction = actionClient
         .limit(1);
 
       if (existingFournisseur.length > 0) {
-        throw new Error("Cet email est déjà utilisé par un fournisseur.");
+        throw new Error(
+          locale === "fr"
+            ? "Cette email est déjà utilisé par un fournisseur."
+            : "This email is already used by a provider account"
+        );
       }
       const resultFournisseur = await db
         .insert(fournisseurs)
@@ -58,7 +66,11 @@ export const insertFournisseurAction = actionClient
         .returning({ id: fournisseurs.id });
 
       if (!resultFournisseur[0]?.id) {
-        throw new Error("Impossible de créer le compte fournisseur.");
+        throw new Error(
+          locale === "fr"
+            ? "Impossible de créer le compte fournisseur."
+            : "Unable to create the provider account"
+        );
       }
       const tempPassword = generatePassword();
       await auth.api.signUpEmail({
@@ -107,7 +119,10 @@ export const insertFournisseurAction = actionClient
 
       return {
         success: true,
-        message: `Le compte du fournisseur ${fournisseurToPost.nomFournisseur} a été crée avec succès`,
+        message:
+          locale === "fr"
+            ? `Le compte du fournisseur ${fournisseurToPost.nomFournisseur} a été crée avec succès`
+            : `${fournisseurToPost.nomFournisseur}'s provider account has been successfully created`,
         data: { fournisseurId: resultFournisseur[0]?.id },
       };
     }

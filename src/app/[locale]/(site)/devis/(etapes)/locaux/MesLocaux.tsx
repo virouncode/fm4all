@@ -49,12 +49,9 @@ import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";
-import {
-  createMesLocauxSchema,
-  InsertClientType,
-  MesLocauxType,
-} from "@/zod-schemas/client";
+import { createMesLocauxSchema, MesLocauxType } from "@/zod-schemas/client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useContext, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -65,6 +62,7 @@ const MesLocaux = () => {
   const t = useTranslations("DevisPage.locaux.locauxForm");
   const tDevisButton = useTranslations("devisButton");
   const tErrors = useTranslations("DevisPage.locaux.locauxForm.erreurs");
+  const [loading, setLoading] = useState(false);
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const { setServices } = useContext(ServicesContext);
   const { setFoodBeverage } = useContext(FoodBeverageContext);
@@ -147,6 +145,7 @@ const MesLocaux = () => {
       effectif: parseInt(data.effectif as string),
       ville: "",
     };
+    setLoading(true);
     //La ville existe ?
     try {
       const response = await fetch(
@@ -163,6 +162,7 @@ const MesLocaux = () => {
             "le-code-postal-ne-correspond-a-aucune-ville-veullez-reessayer"
           ),
         });
+        setLoading(false);
         return;
       }
       dataToPost.ville = cityData[0].nom;
@@ -170,8 +170,10 @@ const MesLocaux = () => {
         ...client,
         ville: dataToPost.ville,
       });
+      setLoading(false);
     } catch (err) {
       console.log(err);
+      setLoading(false);
     }
     //Departement in ou out
     if (
@@ -182,7 +184,15 @@ const MesLocaux = () => {
       setDevisProgress({ ...devisProgress, completedSteps: [] });
       router.push({
         pathname: "/chalandise",
-        query: { destination: "/" },
+        query: {
+          destination: "/",
+          codePostal: dataToPost.codePostal,
+          ville: dataToPost.ville,
+          surface: dataToPost.surface,
+          effectif: dataToPost.effectif,
+          typeBatiment: dataToPost.typeBatiment,
+          typeOccupation: dataToPost.typeOccupation,
+        },
       }); //TODO
       return;
     }
@@ -295,19 +305,19 @@ const MesLocaux = () => {
       >
         <div className="flex flex-col gap-4 md:flex-row md:gap-8">
           <div className="w-full md:w-1/2 flex flex-col gap-4">
-            <InputWithLabel<InsertClientType>
+            <InputWithLabel<MesLocauxType>
               fieldTitle={t("code-postal")}
               nameInSchema="codePostal"
               placeholder="XXXXX"
             />
-            <InputWithLabel<InsertClientType>
+            <InputWithLabel<MesLocauxType>
               fieldTitle={t("surface-en-m")}
               nameInSchema="surface"
               type="number"
               min={50}
               max={MAX_SURFACE}
             />
-            <InputWithLabel<InsertClientType>
+            <InputWithLabel<MesLocauxType>
               fieldTitle={t("nombre-moyen-de-personnes")}
               nameInSchema="effectif"
               type="number"
@@ -316,14 +326,14 @@ const MesLocaux = () => {
             />
           </div>
           <div className="w-full md:w-1/2 flex flex-col gap-4 ">
-            <SelectWithLabel<InsertClientType>
+            <SelectWithLabel<MesLocauxType>
               fieldTitle={t("type-de-batiment")}
               nameInSchema="typeBatiment"
               data={batiments}
               handleSelect={handleSelect}
               translationPrefix="DevisPage.locaux.locauxForm.batiments"
             />
-            <SelectWithLabel<InsertClientType>
+            <SelectWithLabel<MesLocauxType>
               fieldTitle={t("type-doccupation")}
               nameInSchema="typeOccupation"
               data={occupation}
@@ -342,7 +352,7 @@ const MesLocaux = () => {
                   size="lg"
                   title={t("afficher-les-tarifs")}
                   className="text-base"
-                  disabled={!form.formState.isValid}
+                  disabled={loading}
                 >
                   {t("afficher-les-tarifs")}
                 </Button>
@@ -383,9 +393,13 @@ const MesLocaux = () => {
               size="lg"
               title={t("afficher-les-tarifs")}
               className="text-base"
-              disabled={!form.formState.isValid}
+              disabled={loading}
             >
-              {t("afficher-les-tarifs")}
+              {loading ? (
+                <Loader size={16} className="animate-spin" />
+              ) : (
+                t("afficher-les-tarifs")
+              )}
             </Button>
           </div>
         )}

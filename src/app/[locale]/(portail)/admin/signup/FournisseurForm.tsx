@@ -52,8 +52,7 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
         siret: tAdmin("siret-invalide"),
         prenomContact: tAdmin("prenom-du-contact-obligatoire"),
         nomContact: tAdmin("nom-du-contact-obligatoire"),
-        emailContact: tAdmin("email-du-contact-obligatoire"),
-        emailContactInvalid: tAdmin("email-du-contact-invalide"),
+        emailContact: tAdmin("email-du-contact-invalide"),
         phoneContact: tAdmin("numero-de-telephone-obligatoire"),
       })
     ),
@@ -255,9 +254,7 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
               size="lg"
               title={tAdmin("creer-un-compte")}
               className="text-base mt-6 w-full"
-              disabled={
-                !form.formState.isValid || isSavingFournisseur || loading
-              }
+              disabled={isSavingFournisseur || loading}
             >
               {isSavingFournisseur || loading ? (
                 <Loader2 size={16} className="animate-spin" />

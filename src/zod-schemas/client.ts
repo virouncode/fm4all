@@ -111,7 +111,7 @@ export const insertClientSchema = createInsertClientSchema({
   posteContact: "Poste du contact obligatoire",
   emailContact: "Adresse email invalide",
   phoneContact: "Numéro de téléphone invalide",
-  emailSignataire: "Adresse email invalide",
+  emailSignataire: "Adresse email du signataire invalide",
   surface: "Surface obligatoire",
   surfaceMax: "Surface maximum 3000 m²",
   effectif: "Effectif obligatoire",
@@ -158,7 +158,7 @@ export const createUpdateClientSchema = (messages: {
         messages.phoneContact
       ),
     emailSignataire: (schema) =>
-      schema.email(messages.emailContact).or(z.literal("")).nullable(),
+      schema.email(messages.emailContact).or(z.literal("")),
     surface: (schema) =>
       schema.min(1, messages.surface).max(3000, messages.surfaceMax),
     effectif: (schema) =>
@@ -189,7 +189,7 @@ export const updateClientSchema = createUpdateClientSchema({
   posteContact: "Poste du contact obligatoire",
   emailContact: "Adresse email invalide",
   phoneContact: "Numéro de téléphone invalide",
-  emailSignataire: "Adresse email invalide",
+  emailSignataire: "Adresse email du signataire invalide",
   surface: "Surface obligatoire",
   surfaceMax: "Surface maximum 3000 m²",
   effectif: "Effectif obligatoire",

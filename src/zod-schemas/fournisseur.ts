@@ -28,7 +28,6 @@ export const createInsertFournisseurSchema = (messages: {
   prenomContact: string;
   nomContact: string;
   emailContact: string;
-  emailContactInvalid: string;
   phoneContact: string;
 }) => {
   return createInsertSchema(fournisseurs, {
@@ -37,9 +36,12 @@ export const createInsertFournisseurSchema = (messages: {
       schema.refine((value) => !value || isValidSIRET(value), messages.siret),
     prenomContact: (schema) => schema.min(1, messages.prenomContact),
     nomContact: (schema) => schema.min(1, messages.nomContact),
-    emailContact: (schema) =>
-      schema.min(1, messages.emailContact).email(messages.emailContactInvalid),
-    phoneContact: (schema) => schema.min(1, messages.phoneContact),
+    emailContact: (schema) => schema.email(messages.emailContact),
+    phoneContact: (schema) =>
+      schema.regex(
+        /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{2,4}([-.\s]?\d{2,4}){2,3}$/,
+        messages.phoneContact
+      ),
   });
 };
 export const insertFournisseurSchema = createInsertFournisseurSchema({
@@ -47,8 +49,7 @@ export const insertFournisseurSchema = createInsertFournisseurSchema({
   siret: "Siret invalide",
   prenomContact: "Prénom du contact obligatoire",
   nomContact: "Nom du contact obligatoire",
-  emailContact: "Email du contact obligatoire",
-  emailContactInvalid: "Email du contact invalide",
+  emailContact: "Email du contact invalide",
   phoneContact: "Numéro de téléphone obligatoire",
 });
 

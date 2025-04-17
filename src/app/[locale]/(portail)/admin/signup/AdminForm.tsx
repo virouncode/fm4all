@@ -35,8 +35,7 @@ const AdminForm = () => {
     mode: "onBlur",
     resolver: zodResolver(
       createInsertAdminSchema({
-        email: tAuth("email-obligatoire"),
-        emailInvalide: tAuth("email-invalide"),
+        email: tAuth("email-invalide"),
         prenom: tAdmin("prenom-obligatoire"),
         nom: tAdmin("nom-obligatoire"),
         password: tAuth("mot-de-passe-obligatoire"),
@@ -195,7 +194,7 @@ const AdminForm = () => {
             size="lg"
             title={tAdmin("creer-un-compte")}
             className="text-base w-full mt-6"
-            disabled={!form.formState.isValid || loading}
+            disabled={loading}
           >
             {loading ? (
               <Loader2 size={16} className="animate-spin" />

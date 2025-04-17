@@ -738,7 +738,8 @@
         "prenom-du-contact": "Prénom du contact*",
         "nom-du-contact": "Nom du contact*",
         "poste-du-contact": "Poste du contact*",
-        "envoyer-mes-coordonnees": "Envoyer mes coordonnées"
+        "envoyer-mes-coordonnees": "Envoyer mes coordonnées",
+        "vos-coordonnees-ont-bien-ete-envoyees-a-notre-equipe-nous-vous-contacterons-dans-les-plus-brefs-delais": "Vos coordonnées ont bien été envoyées à notre équipe. Nous vous contacterons dans les plus brefs délais."
       }
     },
     "services": {
@@ -1050,6 +1051,7 @@
         "prenom-du-contact-obligatoire": "Prénom du contact obligatoire",
         "nom-du-contact-obligatoire": "Nom du contact obligatoire",
         "poste-du-contact-obligatoire": "Poste du contact obligatoire",
+        "adresse-email-obligatoire": "Adresse email obligatoire",
         "adresse-email-invalide": "Adresse email invalide",
         "numero-de-telephone-invalide": "Numéro de téléphone invalide",
         "surface-obligatoire": "Surface obligatoire",
@@ -1058,6 +1060,7 @@
         "effectif-maximum-300-personnes": "Effectif maximum 300 personnes",
         "batiment": "Type de bâtiment invalide",
         "type-doccupation-invalide": "Type d'occupation invalide",
+        "code-postal-obligatoire": "Code postal obligatoire",
         "code-postal-invalide-entrez-5-chiffres": "Code postal invalide, entrez 5 chiffres",
         "ville-obligatoire": "Ville obligatoire"
       }
@@ -1280,5 +1283,7 @@
     "prenom-obligatoire": "Prénom obligatoire",
     "nom-obligatoire": "Nom obligatoire",
     "confirmation-du-mot-de-passe-obligatoire": "Confirmation du mot de passe obligatoire"
-  }
+  },
+  "impossible-de-mettre-a-jour-vos-coordonnees": "Impossible de mettre à jour vos coordonnées.",
+  "impossible-denregistrer-vos-coordonnees": "Impossible d'enregistrer vos coordonnées."
 }

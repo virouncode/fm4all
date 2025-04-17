@@ -82,7 +82,7 @@ const ResetPasswordForm = ({ token }: ResetPasswordProps) => {
           />
           <Button
             className="w-full text-base"
-            disabled={loading || !form.formState.isValid}
+            disabled={loading}
             variant="destructive"
             size="lg"
           >

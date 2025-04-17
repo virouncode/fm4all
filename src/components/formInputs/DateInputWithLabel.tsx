@@ -14,9 +14,10 @@ import {
   PopoverTrigger,
 } from "@radix-ui/react-popover";
 import { format } from "date-fns";
-import { fr } from "date-fns/locale";
+import { enUS, fr } from "date-fns/locale";
 import { CalendarIcon, X } from "lucide-react";
 import { DateTime } from "luxon";
+import { useLocale } from "next-intl";
 import { useFormContext } from "react-hook-form";
 
 type DateInputWithLabelProps<S> = {
@@ -31,6 +32,7 @@ export function DateInputWithLabel<S>({
   handleChangeDate,
 }: DateInputWithLabelProps<S>) {
   const form = useFormContext();
+  const locale = useLocale();
   return (
     <FormField
       control={form.control}
@@ -52,9 +54,14 @@ export function DateInputWithLabel<S>({
                   )}
                 >
                   {field.value ? (
-                    format(field.value, "dd-MM-yyyy")
+                    format(
+                      field.value,
+                      locale === "fr" ? "dd-MM-yyyy" : "yyyy-MM-dd"
+                    )
                   ) : (
-                    <span>Choisir une date</span>
+                    <span>
+                      {locale === "fr" ? "Choisir une date" : "Pick a date"}
+                    </span>
                   )}
                   <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                   <span
@@ -71,10 +78,10 @@ export function DateInputWithLabel<S>({
                 </Button>
               </FormControl>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
+            <PopoverContent className="w-auto p-0 z-10" align="start">
               <Calendar
                 mode="single"
-                locale={fr}
+                locale={locale === "fr" ? fr : enUS}
                 selected={field.value}
                 onSelect={(e) => {
                   field.onChange(DateTime.fromJSDate(e as Date).toISODate());

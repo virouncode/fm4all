@@ -738,7 +738,8 @@
         "prenom-du-contact": "Contact first name*",
         "nom-du-contact": "Contact last name*",
         "poste-du-contact": "Contact job*",
-        "envoyer-mes-coordonnees": "Send my contact details"
+        "envoyer-mes-coordonnees": "Send my contact details",
+        "vos-coordonnees-ont-bien-ete-envoyees-a-notre-equipe-nous-vous-contacterons-dans-les-plus-brefs-delais": "Your contact information has been successfully sent to our team. We will get back to you as soon as possible."
       }
     },
     "services": {
@@ -1051,6 +1052,7 @@
         "nom-du-contact-obligatoire": "Contact last name required",
         "poste-du-contact-obligatoire": "Job title required",
         "adresse-email-invalide": "Invalid email address",
+        "adresse-email-obligatoire": "Email required",
         "numero-de-telephone-invalide": "Invalid phone number",
         "surface-obligatoire": "Surface area required",
         "surface-maximum-3000-m": "Maximum surface area 3000 m²",
@@ -1058,6 +1060,7 @@
         "effectif-maximum-300-personnes": "Maximum staff number 300 people",
         "batiment": "Invalid building type",
         "type-doccupation-invalide": "Invalid occupation type",
+        "code-postal-obligatoire": "Postal code required",
         "code-postal-invalide-entrez-5-chiffres": "Invalid postal code, enter 5 digits",
         "ville-obligatoire": "City required"
       }

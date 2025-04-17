@@ -9,6 +9,7 @@ import { capitalize } from "@/lib/capitalize";
 import { actionClient } from "@/lib/safe-actions";
 import { insertAdminSchema, InsertAdminType } from "@/zod-schemas/admin";
 import { and, eq } from "drizzle-orm";
+import { getLocale } from "next-intl/server";
 import { flattenValidationErrors } from "next-safe-action";
 
 export const insertAdminAction = actionClient
@@ -19,14 +20,21 @@ export const insertAdminAction = actionClient
   })
   .action(
     async ({ parsedInput: adminInput }: { parsedInput: InsertAdminType }) => {
+      const locale = await getLocale();
       const currentUser = (await getSession())?.user;
       if (currentUser?.role !== "admin") {
         throw new Error(
-          "Vous n'avez pas les droits pour créer un utilisateur."
+          locale === "fr"
+            ? "Vous n'avez pas les droits pour créer un compte administrateur."
+            : "You do not have permission to create an admin account."
         );
       }
       if (adminInput.password !== adminInput.passwordConfirmation) {
-        throw new Error("Les mots de passe ne correspondent pas.");
+        throw new Error(
+          locale === "fr"
+            ? "Les mots de passe ne correspondent pas."
+            : "Passwords do not match"
+        );
       }
       const userToPost = {
         name: capitalize(adminInput.prenom) + " " + capitalize(adminInput.nom),
@@ -44,17 +52,24 @@ export const insertAdminAction = actionClient
         .limit(1);
 
       if (existingUser.length > 0) {
-        throw new Error("Cet email est déjà utilisé par un administrateur.");
+        throw new Error(
+          locale === "fr"
+            ? "Cet email est déjà utilisé par un administrateur."
+            : "This email is already used by an admin account."
+        );
       }
-      const response = await auth.api.signUpEmail({
+      await auth.api.signUpEmail({
         returnHeaders: true,
         body: userToPost,
         asResponse: true,
       });
-      console.log("response", response);
       return {
         success: true,
-        message: `Le compte administrateur de ${userToPost.name} a été crée avec succès, un email avec un lien de vérification a été envoyé à ${userToPost.email}`,
+        message: `${
+          locale === "fr"
+            ? `Le compte administrateur de ${userToPost.name} a été crée avec succès, un email avec un lien de vérification a été envoyé à ${userToPost.email}`
+            : `${userToPost.name}'s admin account has been created, a verification email has been sent to ${userToPost.email}`
+        }`,
       };
     }
   );

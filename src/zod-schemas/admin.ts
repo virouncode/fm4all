@@ -4,15 +4,13 @@ import { z } from "zod";
 
 export const createInsertAdminSchema = (messages: {
   email: string;
-  emailInvalide: string;
   prenom: string;
   nom: string;
   password: string;
   passwordConfirmation: string;
 }) => {
   return createInsertSchema(user, {
-    email: (schema) =>
-      schema.min(1, messages.email).email(messages.emailInvalide),
+    email: (schema) => schema.email(messages.email),
   })
     .omit({
       id: true,
@@ -30,8 +28,7 @@ export const createInsertAdminSchema = (messages: {
 };
 
 export const insertAdminSchema = createInsertAdminSchema({
-  email: "Email obligatoire",
-  emailInvalide: "Email invalide",
+  email: "Email invalide",
   prenom: "Prénom obligatoire",
   nom: "Nom obligatoire",
   password: "Mot de passe obligatoire",

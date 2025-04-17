@@ -64,35 +64,34 @@ const SauvegarderProgression = () => {
     ),
     defaultValues,
   });
-  const {
-    execute: executeSaveClient,
-    isPending: isSavingClient,
-    // result: resultSaveClient,
-  } = useAction(insertClientAction, {
-    onSuccess: ({ data }) => {
-      toast({
-        variant: "default",
-        title: tSauver("succes"),
-        description: data?.message,
-      });
-      if (data?.data?.clientId) {
-        const devisToPost: InsertDevisType = {
-          clientId: data?.data?.clientId,
-          texte: formatLocalStorageData(),
-        };
-        executeSaveDevis(devisToPost);
-      }
-    },
-    onError: () => {
-      toast({
-        variant: "destructive",
-        title: tSauver("erreur"),
-        description: tSauver(
-          "impossible-de-sauvegarder-vos-coordonnees-veuillez-reessayer"
-        ),
-      });
-    },
-  });
+  const { execute: executeSaveClient, isPending: isSavingClient } = useAction(
+    insertClientAction,
+    {
+      onSuccess: ({ data }) => {
+        toast({
+          variant: "default",
+          title: tSauver("succes"),
+          description: data?.message,
+        });
+        if (data?.data?.clientId) {
+          const devisToPost: InsertDevisType = {
+            clientId: data?.data?.clientId,
+            texte: formatLocalStorageData(),
+          };
+          executeSaveDevis(devisToPost);
+        }
+      },
+      onError: () => {
+        toast({
+          variant: "destructive",
+          title: tSauver("erreur"),
+          description: tSauver(
+            "impossible-de-sauvegarder-vos-coordonnees-veuillez-reessayer"
+          ),
+        });
+      },
+    }
+  );
   const { execute: executeSaveDevis, isPending: isSavingDevis } = useAction(
     insertDevisAction,
     {
@@ -138,18 +137,18 @@ const SauvegarderProgression = () => {
         text: `<p>Un client a sauvegardé sa progression dans le funnel.</p><br/>
                 <p>Voici ses coordonnées :</p><br/>
                 <p>Entreprise : ${data.nomEntreprise}</p>
+                <p>Code postal : ${data.codePostal}</p>
+                <p>Ville : ${data.ville}</p>
+                <p>Surface des locaux : ${data.surface}</p>
+                <p>Effectif : ${data.effectif}</p>
+                <p>Type de bâtiment : ${batiments.find(({ id }) => id === data.typeBatiment)?.description}</p>
+                <p>Type d'occupation : ${occupation.find(({ id }) => id === data.typeOccupation)?.description}</p><br/>
                 <p>Nom du contact : ${data.nomContact}</p>
                 <p>Prénom du contact : ${data.prenomContact}</p>
                 <p>Poste du contact : ${data.posteContact}</p>
                 <p>Email du contact : ${data.emailContact}</p>
-                <p>N°Tél du contact : ${data.phoneContact}</p>
-                <p>Code postal : ${data.codePostal}</p>
-                <p>Ville : ${data.ville}</p>
-                <p>Surface des locaux : ${data.surface}</p>
-                <p>Nombre de personnes : ${data.effectif}</p>
-                <p>Type de bâtiment : ${batiments.find(({ id }) => id === data.typeBatiment)?.description}</p>
-                <p>Type d'occupation : ${occupation.find(({ id }) => id === data.typeOccupation)?.description}</p><br/>
-                <p>Voici les informations de chiffrage (avant personnalisation) :</p><br/>
+                <p>N°Tél du contact : ${data.phoneContact}</p><br/>
+                <p>Voici ses informations de chiffrage (avant personnalisation) :</p><br/>
                 <pre>${formatLocalStorageData()}</pre>
                 `,
       });
@@ -285,6 +284,7 @@ const SauvegarderProgression = () => {
                 size="lg"
                 title={tSauver("sauvegarder-ma-progression")}
                 className="text-base min-w-28"
+                disabled={!accepte}
               >
                 {isSavingClient || isSavingDevis ? (
                   <LoaderCircle className="animate-spin" />

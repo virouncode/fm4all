@@ -1,5 +1,6 @@
 "use client";
 
+import { insertClientAction } from "@/actions/insertClientAction";
 import { DateInputWithLabel } from "@/components/formInputs/DateInputWithLabel";
 import { InputWithLabel } from "@/components/formInputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ import { fr } from "date-fns/locale";
 import { Loader } from "lucide-react";
 import { DateTime } from "luxon";
 import { useTranslations } from "next-intl";
+import { useAction } from "next-safe-action/hooks";
 import {
   ChangeEvent,
   Dispatch,
@@ -45,6 +47,7 @@ type MonDevisFormProps = {
 const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
   const tDevisErreurs = useTranslations("DevisPage.sauver.erreurs");
   const t = useTranslations("DevisPage.afficher");
+  const tSauver = useTranslations("DevisPage.sauver");
   const { client, setClient } = useContext(ClientContext);
   const { total } = useContext(TotalContext);
   const { commentaires } = useContext(CommentairesContext);
@@ -110,6 +113,28 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
     defaultValues,
   });
 
+  const { execute: executeSaveClient, isPending: isSavingClient } = useAction(
+    insertClientAction,
+    {
+      onSuccess: ({ data }) => {
+        toast({
+          variant: "default",
+          title: tSauver("succes"),
+          description: data?.message,
+        });
+      },
+      onError: () => {
+        toast({
+          variant: "destructive",
+          title: tSauver("erreur"),
+          description: tSauver(
+            "impossible-de-sauvegarder-vos-coordonnees-veuillez-reessayer"
+          ),
+        });
+      },
+    }
+  );
+
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -154,7 +179,32 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
     } catch (err) {
       console.log(err);
     }
-    //TODO update client dans la bdd
+    const clientToPost: InsertClientType = {
+      nomEntreprise: data.nomEntreprise ?? "",
+      siret: data.siret ?? "",
+      prenomContact: data.prenomContact ?? "",
+      nomContact: data.nomContact ?? "",
+      posteContact: data.posteContact ?? "",
+      emailContact: data.emailContact ?? "",
+      phoneContact: data.phoneContact ?? "",
+      emailSignataire: data.emailSignataire ?? "",
+      surface: data.surface ?? 100,
+      effectif: data.effectif ?? 20,
+      typeBatiment: data.typeBatiment,
+      typeOccupation: data.typeOccupation,
+      codePostal: data.codePostal ?? "",
+      ville: data.ville ?? "",
+      id: client.id,
+      prenomSignataire: data.prenomSignataire,
+      nomSignataire: data.nomSignataire,
+      posteSignataire: data.posteSignataire,
+      adresseLigne1: data.adresseLigne1,
+      adresseLigne2: data.adresseLigne2,
+      dateDeDemarrage: data.dateDeDemarrage,
+      commentaires: data.commentaires,
+      createdAt: data.createdAt,
+    };
+    executeSaveClient(clientToPost);
 
     try {
       setLoading(true);
@@ -200,6 +250,15 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
             text: `<p>Un client a finalisé son devis.</p><br/>
                         <p>Voici ses coordonnées :</p><br/>
                         <p>Entreprise : ${data.nomEntreprise}</p>
+                        <p>Siret : ${data.siret}</p>
+                        <p>Adresse ligne 1 : ${data.adresseLigne1}</p>
+                        <p>Adresse ligne 2 : ${data.adresseLigne2}</p>
+                        <p>Code postal : ${data.codePostal}</p>
+                        <p>Ville : ${data.ville}</p>
+                        <p>Surface des locaux : ${data.surface}</p>
+                        <p>Effectif : ${data.effectif}</p>
+                        <p>Type de bâtiment : ${batiments.find(({ id }) => id === data.typeBatiment)?.description}</p>
+                        <p>Type d'occupation : ${occupation.find(({ id }) => id === data.typeOccupation)?.description}</p>
                         <p>Nom du contact : ${data.nomContact}</p>
                         <p>Prénom du contact : ${data.prenomContact}</p>
                         <p>Poste du contact : ${data.posteContact}</p>
@@ -209,12 +268,17 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                         <p>Prénom du signataire : ${data.prenomSignataire}</p>
                         <p>Poste du signataire : ${data.posteSignataire}</p>
                         <p>Email du signataire : ${data.emailSignataire}</p>
-                        <p>Code postal : ${data.codePostal}</p>
-                        <p>Ville : ${data.ville}</p>
-                        <p>Surface des locaux : ${data.surface}</p>
-                        <p>Nombre de personnes : ${data.effectif}</p>
-                        <p>Type de bâtiment : ${batiments.find(({ id }) => id === data.typeBatiment)?.description}</p>
-                        <p>Type d'occupation : ${occupation.find(({ id }) => id === data.typeOccupation)?.description}</p><br/>
+                        <p>Date de démarrage : ${
+                          data.dateDeDemarrage
+                            ? format(
+                                new Date(data.dateDeDemarrage),
+                                "dd/MM/yyyy",
+                                {
+                                  locale: fr,
+                                }
+                              )
+                            : data.dateDeDemarrage
+                        }</p></br>
                         <p>Commentaires du client : ${commentaires}</p><br/>
                         <p>Veuillez trouver en pièce jointe le devis</p>
                         `,
@@ -261,8 +325,8 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
           className="mt-6 p-1 md:p-4 w-full"
         >
           <div className="flex-1 flex flex-col gap-4 w-full">
-            <div className="flex flex-col gap-4 md:flex-row md:gap-20">
-              <div className="w-full md:w-1/4 flex flex-col">
+            <div className="flex flex-col gap-4 lg:flex-row lg:gap-20">
+              <div className="w-full lg:w-1/4 flex flex-col">
                 <InputWithLabel<InsertClientType>
                   fieldTitle={t("prenom-du-contact")}
                   nameInSchema="prenomContact"
@@ -293,7 +357,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                   className="w-full"
                 />
               </div>
-              <div className="w-full md:w-1/4 flex flex-col">
+              <div className="w-full lg:w-1/4 flex flex-col">
                 <InputWithLabel<InsertClientType>
                   fieldTitle={t("prenom-du-signataire")}
                   nameInSchema="prenomSignataire"
@@ -324,7 +388,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                   className="w-full"
                 />
               </div>
-              <div className="w-full md:w-1/4 flex flex-col">
+              <div className="w-full lg:w-1/4 flex flex-col">
                 <InputWithLabel<InsertClientType>
                   fieldTitle={t("nom-de-lentreprise")}
                   nameInSchema="nomEntreprise"
@@ -353,7 +417,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                 />
               </div>
 
-              <div className="w-full md:w-1/4 flex flex-col">
+              <div className="w-full lg:w-1/4 flex flex-col">
                 <InputWithLabel<InsertClientType>
                   fieldTitle={t("addresse-du-site-ligne-1")}
                   nameInSchema="adresseLigne1"
@@ -411,9 +475,9 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                 variant="destructive"
                 size="lg"
                 className="text-base min-w-[200px]"
-                disabled={loading || !accepte}
+                disabled={loading || isSavingClient || !accepte}
               >
-                {loading ? (
+                {loading || isSavingClient ? (
                   <Loader className="animate-spin" />
                 ) : (
                   t("afficher-mon-devis")
