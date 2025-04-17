@@ -21,8 +21,8 @@ const HofManager = async () => {
   );
   const categorie = article.categorie as ArticleCategory;
   return (
-    <section className="hidden md:block w-full max-w-7xl mx-auto h-[600px] p-6">
-      <div className="h-full bg-hof-img bg-cover bg-no-repeat rounded-lg flex items-end">
+    <section className="hidden md:block bg-hof-img bg-cover bg-no-repeat h-[600px]">
+      <div className="h-full max-w-7xl w-full mx-auto  p-6 rounded-lg flex items-end">
         <Card className="w-1/3 ml-10 mb-10">
           <CardHeader>
             <CardTitle>

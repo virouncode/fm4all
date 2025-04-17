@@ -6,7 +6,7 @@ const Why = async () => {
   const t = await getTranslations("HomePage.pourquoi");
   return (
     <section
-      className="max-w-7xl w-full mx-auto flex flex-col gap-10 p-6"
+      className="max-w-7xl w-full mx-auto flex flex-col gap-10 pt-8 pb-12 px-6"
       id="process"
     >
       <h2 className="text-2xl md:text-3xl border-l-2 px-4">

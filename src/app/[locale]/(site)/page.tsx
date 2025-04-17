@@ -36,7 +36,7 @@ export const generateMetadata = async (): Promise<Metadata> => {
 
 export default function page() {
   return (
-    <main className="flex flex-col gap-12 mb-24">
+    <main className="flex flex-col mb-24">
       <Hero />
       <Slogan />
       <Presentation />

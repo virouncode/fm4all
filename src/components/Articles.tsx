@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
-import ArticlesCarousel from "./ArticlesCarousel";
 import { getTranslations } from "next-intl/server";
+import ArticlesCarousel from "./ArticlesCarousel";
 
 const Articles = async () => {
   const t = await getTranslations("HomePage.articles");
   return (
-    <section className="max-w-7xl w-full mx-auto flex flex-col gap-10 p-6 relative">
+    <section className="max-w-7xl w-full mx-auto flex flex-col gap-10 pt-8 pb-12 px-6 relative">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl md:text-3xl border-l-2 px-4">
           {t("nos-derniers-articles")}
