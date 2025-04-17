@@ -6,10 +6,7 @@ const Presentation = async () => {
   const tGlobal = await getTranslations("Global");
   const t = await getTranslations("HomePage.presentation");
   return (
-    <section
-      className="bg-gradient-to-r from-[#f0c674]/100 to-[#f0c674]/70"
-      id="presentation"
-    >
+    <section id="presentation">
       <div className="max-w-7xl w-full mx-auto flex flex-col gap-8 text-lg hyphens-auto text-wrap relative pt-8 pb-12 px-6">
         <h2 className="text-2xl md:text-3xl border-l-2 px-4">
           {t("tpe-pme-en-ile-de-france")}

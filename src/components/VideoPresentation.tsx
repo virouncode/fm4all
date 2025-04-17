@@ -3,7 +3,7 @@ import { useLocale } from "next-intl";
 const VideoPresentation = () => {
   const locale = useLocale();
   return (
-    <section className=" flex items-center justify-center py-12 bg-gradient-to-r from-[#59a99b]/100 to-[#59a99b]/70">
+    <section className="flex items-center justify-center py-12">
       <div className="w-5/6 md:w-2/3 max-w-7xl mx-auto h-[200px] sm:h-[400px] md:h-[600px] border rounded-xl overflow-hidden">
         <iframe
           width="100%"
