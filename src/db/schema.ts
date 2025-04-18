@@ -120,6 +120,24 @@ export const logosFournisseurs = pgTable("logos_fournisseurs", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+//SERVICES
+export const services = pgTable("services", {
+  id: serial().primaryKey(),
+  nom: varchar("nom").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const servicesFournisseurs = pgTable("services_fournisseurs", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  serviceId: integer("service_id")
+    .notNull()
+    .references(() => services.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 //NETTOYAGE
 export const nettoyageQuantites = pgTable("nettoyage_quantites", {
   id: serial().primaryKey(),

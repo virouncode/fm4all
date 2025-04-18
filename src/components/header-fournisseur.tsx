@@ -4,7 +4,10 @@ import { Link, usePathname } from "@/i18n/navigation";
 import { useSession } from "@/lib/auth-client";
 import { User } from "better-auth";
 import {
+  Barcode,
   CircleGauge,
+  Euro,
+  FileUser,
   HandPlatter,
   Handshake,
   Home,
@@ -35,7 +38,7 @@ const HeaderFournisseur = () => {
 
   const isActive = (href: string) => {
     if (href === "/") return path === "/";
-    return path.includes(href);
+    return path === href;
   };
 
   const handleShowMobileNav = () => {
@@ -62,17 +65,7 @@ const HeaderFournisseur = () => {
           <nav className="hidden xl:flex items-center gap-8">
             <div
               className={`flex gap-1 items-center ${
-                isActive("/fournisseur/dashboard")
-                  ? "text-destructive font-bold"
-                  : ""
-              }`}
-            >
-              <CircleGauge size={15} />
-              <Link href="/fournisseur/dashboard">Dashboard</Link>
-            </div>
-            <div
-              className={`flex gap-1 items-center ${
-                isActive("/fournisseur/tarifs/[fournisseurId]")
+                isActive("/fournisseur/[fournisseurId]")
                   ? "text-destructive font-bold"
                   : ""
               }`}
@@ -80,11 +73,62 @@ const HeaderFournisseur = () => {
               <CircleGauge size={15} />
               <Link
                 href={{
-                  pathname: "/fournisseur/tarifs/[fournisseurId]",
+                  pathname: "/fournisseur/[fournisseurId]",
                   params: { fournisseurId: fournisseurId ?? 0 },
                 }}
               >
-                Tarifs
+                Dashboard
+              </Link>
+            </div>
+            <div
+              className={`flex gap-1 items-center ${
+                isActive("/fournisseur/[fournisseurId]/profil")
+                  ? "text-destructive font-bold"
+                  : ""
+              }`}
+            >
+              <FileUser size={15} />
+              <Link
+                href={{
+                  pathname: "/fournisseur/[fournisseurId]/profil",
+                  params: { fournisseurId: fournisseurId ?? 0 },
+                }}
+              >
+                Mon profil
+              </Link>
+            </div>
+            <div
+              className={`flex gap-1 items-center ${
+                isActive("/fournisseur/[fournisseurId]/tarifs")
+                  ? "text-destructive font-bold"
+                  : ""
+              }`}
+            >
+              <Euro size={15} />
+              <Link
+                href={{
+                  pathname: "/fournisseur/[fournisseurId]/tarifs",
+                  params: { fournisseurId: fournisseurId ?? 0 },
+                }}
+              >
+                Mes tarifs
+              </Link>
+            </div>
+            <div
+              className={`flex gap-1 items-center ${
+                isActive("/fournisseur/[fournisseurId]/produits")
+                  ? "text-destructive font-bold"
+                  : ""
+              }`}
+            >
+              <Barcode size={15} />
+              <Link
+                href={{
+                  pathname: "/fournisseur/[fournisseurId]/produits",
+                  params: { fournisseurId: fournisseurId ?? 0 },
+                }}
+              >
+                Mes produits
               </Link>
             </div>
           </nav>
@@ -115,9 +159,6 @@ const HeaderFournisseur = () => {
           role="navigation"
           aria-label="Mobile navigation"
         >
-          {/* <div className="absolute top-4 left-6">
-            <ModeToggle />
-          </div> */}
           <LocaleButton className="absolute top-10 left-6 flex gap-1" />
           <div className="flex flex-col gap-4">
             <div className="flex-1 flex flex-col gap-4 ">

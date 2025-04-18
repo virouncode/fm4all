@@ -140,33 +140,46 @@ export const routing = defineRouting({
       fr: "/auth/reset-password",
       en: "/auth/reset-password",
     },
-    "/admin/dashboard": {
-      fr: "/admin/dashboard",
-      en: "/admin/dashboard",
+
+    //ADMIN
+    "/admin/[adminId]": {
+      fr: "/admin/[adminId]",
+      en: "/admin/[adminId]",
     },
-    "/admin/comptes": {
-      fr: "/admin/comptes",
-      en: "/admin/accounts",
+    "/admin/[adminId]/comptes": {
+      fr: "/admin/[adminId]/comptes",
+      en: "/admin/[adminId]/accounts",
     },
-    "/admin/signup": {
-      fr: "/admin/signup",
-      en: "/admin/signup",
+    "/admin/[adminId]/signup": {
+      fr: "/admin/[adminId]/signup",
+      en: "/admin/[adminId]/signup",
     },
-    "/client/dashboard": {
-      fr: "/client/dashboard",
-      en: "/client/dashboard",
+    //CLIENT
+    "/client/[clientId]": {
+      fr: "/client/[clientId]",
+      en: "/client/[clientId]",
     },
-    "/fournisseur/dashboard": {
-      fr: "/fournisseur/dashboard",
-      en: "/fournisseur/dashboard",
+
+    //FOURNISSEURS
+    "/fournisseur/[fournisseurId]": {
+      fr: "/fournisseur/[fournisseurId]",
+      en: "/fournisseur/[fournisseurId]",
     },
-    "/fournisseur/tarifs": {
-      fr: "/fournisseur/tarifs",
-      en: "/fournisseur/tarifs",
+    "/fournisseur/[fournisseurId]/profil": {
+      fr: "/fournisseur/[fournisseurId]/profil",
+      en: "/fournisseur/[fournisseurId]/profil",
     },
-    "/fournisseur/tarifs/[fournisseurId]": {
-      fr: "/fournisseur/tarifs/[fournisseurId]",
-      en: "/fournisseur/tarifs/[fournisseurId]",
+    "/fournisseur/[fournisseurId]/tarifs": {
+      fr: "/fournisseur/[fournisseurId]/tarifs",
+      en: "/fournisseur/[fournisseurId]/tarifs",
+    },
+    "/fournisseur/[fournisseurId]/tarifs/[service]": {
+      fr: "/fournisseur/[fournisseurId]/tarifs/[service]",
+      en: "/fournisseur/[fournisseurId]/tarifs/[service]",
+    },
+    "/fournisseur/[fournisseurId]/produits": {
+      fr: "/fournisseur/[fournisseurId]/produits",
+      en: "/fournisseur/[fournisseurId]/produits",
     },
   },
 });

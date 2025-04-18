@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link, usePathname } from "@/i18n/navigation";
+import { useSession } from "@/lib/auth-client";
 import { CircleGauge, Menu, UsersRound, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
@@ -20,10 +21,11 @@ const HeaderAdmin = () => {
   const tAdmin = useTranslations("admin");
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const path = usePathname();
-
+  const sessionData = useSession().data;
+  const user = sessionData?.user;
   const isActive = (href: string) => {
     if (href === "/") return path === "/";
-    return path.includes(href);
+    return path === href;
   };
 
   const handleShowMobileNav = () => {
@@ -51,11 +53,18 @@ const HeaderAdmin = () => {
           <nav className="hidden lg:flex items-center gap-14 justify-center flex-1">
             <div
               className={`flex gap-1 items-center ${
-                isActive("/admin/dashboard") ? "text-destructive font-bold" : ""
+                isActive("/admin/[adminId]") ? "text-destructive font-bold" : ""
               }`}
             >
               <CircleGauge size={15} />
-              <Link href="/admin/dashboard">Dashboard</Link>
+              <Link
+                href={{
+                  pathname: "/admin/[adminId]",
+                  params: { adminId: user?.id ?? 0 },
+                }}
+              >
+                Dashboard
+              </Link>
             </div>
             <UsersAccountsButton isActive={isActive} />
           </nav>
@@ -103,20 +112,28 @@ const HeaderAdmin = () => {
             <div className="flex-1 flex flex-col gap-4 ">
               <div
                 className={`flex gap-4 items-center ${
-                  isActive("/admin/dashboard")
+                  isActive("/admin/[adminId]")
                     ? "text-destructive font-bold"
                     : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
                 <CircleGauge size={30} />
-                <Link href="/admin/dashboard">Dashboard</Link>
+                <Link
+                  href={{
+                    pathname: "/admin/[adminId]",
+                    params: { adminId: user?.id ?? 0 },
+                  }}
+                >
+                  Dashboard
+                </Link>
               </div>
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild className="cursor-pointer">
                   <div
                     className={`flex gap-4 items-center ${
-                      isActive("/admin/comptes") || isActive("/admin/signup")
+                      isActive("/admin/[adminId]/comptes") ||
+                      isActive("/admin/[adminId]/signup")
                         ? "text-destructive font-bold"
                         : ""
                     }`}
@@ -127,18 +144,30 @@ const HeaderAdmin = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuCheckboxItem
-                    checked={isActive("/admin/comptes")}
+                    checked={isActive("/admin/[adminId]/comptes")}
                     onClick={handleHideMobileNav}
                   >
-                    <Link href="/admin/comptes" className="!text-base">
+                    <Link
+                      href={{
+                        pathname: "/admin/[adminId]/comptes",
+                        params: { adminId: user?.id ?? 0 },
+                      }}
+                      className="!text-base"
+                    >
                       {tAdmin("comptes")}
                     </Link>
                   </DropdownMenuCheckboxItem>
                   <DropdownMenuCheckboxItem
-                    checked={isActive("/admin/signup")}
+                    checked={isActive("/admin/[adminId]/signup")}
                     onClick={handleHideMobileNav}
                   >
-                    <Link href="/admin/signup" className="!text-base">
+                    <Link
+                      href={{
+                        pathname: "/admin/[adminId]/signup",
+                        params: { adminId: user?.id ?? 0 },
+                      }}
+                      className="!text-base"
+                    >
                       {tAdmin("creer-un-compte")}
                     </Link>
                   </DropdownMenuCheckboxItem>

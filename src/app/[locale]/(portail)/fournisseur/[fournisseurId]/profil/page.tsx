@@ -1,5 +1,5 @@
 const page = () => {
-  return <div>Dashboard Client</div>;
+  return <div>Profil du fournisseur</div>;
 };
 
 export default page;

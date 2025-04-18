@@ -79,18 +79,37 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
       <DropdownMenuContent>
         {session && user?.role && (
           <DropdownMenuItem asChild onClick={() => setIsMobileNavOpen(false)}>
-            <Link
-              href={
-                user?.role === "admin"
-                  ? "/admin/dashboard"
-                  : user?.role === "client"
-                    ? "/client/dashboard"
-                    : "/fournisseur/dashboard"
-              }
-              className="cursor-default !text-base"
-            >
-              {t("mon-espace")}
-            </Link>
+            {user?.role === "admin" ? (
+              <Link
+                href={{
+                  pathname: "/admin/[adminId]",
+                  params: { adminId: user.id },
+                }}
+                className="cursor-default !text-base"
+              >
+                {t("mon-espace")}
+              </Link>
+            ) : user?.role === "client" ? (
+              <Link
+                href={{
+                  pathname: "/client/[clientId]",
+                  params: { clientId: user.clientId ?? 0 },
+                }}
+                className="cursor-default !text-base"
+              >
+                {t("mon-espace")}
+              </Link>
+            ) : (
+              <Link
+                href={{
+                  pathname: "/fournisseur/[fournisseurId]",
+                  params: { fournisseurId: user.fournisseurId ?? 0 },
+                }}
+                className="cursor-default !text-base"
+              >
+                {t("mon-espace")}
+              </Link>
+            )}
           </DropdownMenuItem>
         )}
         <DropdownMenuItem asChild onClick={() => setIsMobileNavOpen(false)}>

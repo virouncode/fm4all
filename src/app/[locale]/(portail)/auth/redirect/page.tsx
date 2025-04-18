@@ -13,11 +13,29 @@ export default async function AuthRedirect() {
 
   // Redirect based on user role
   if (user?.role === "admin") {
-    redirect({ locale, href: "/admin/dashboard" });
+    redirect({
+      locale,
+      href: {
+        pathname: "/admin/[adminId]",
+        params: { adminId: user.id },
+      },
+    });
   } else if (user?.role === "client") {
-    redirect({ locale, href: "/client/dashboard" });
+    redirect({
+      locale,
+      href: {
+        pathname: "/client/[clientId]",
+        params: { clientId: user.clientId ?? 0 },
+      },
+    });
   } else if (user?.role === "fournisseur") {
-    redirect({ locale, href: "/fournisseur/dashboard" });
+    redirect({
+      locale,
+      href: {
+        pathname: "/fournisseur/[fournisseurId]",
+        params: { fournisseurId: user.fournisseurId ?? 0 },
+      },
+    });
   } else {
     // Default redirect if role is not recognized
     // redirect("/dashboard");

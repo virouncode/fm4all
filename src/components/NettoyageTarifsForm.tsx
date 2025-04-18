@@ -18,6 +18,11 @@ import { Loader } from "lucide-react";
 import { ChangeEvent, useState } from "react";
 
 // Définition de l'interface Tarif
+const mapping = {
+  hParPassage: "Heures moyennes par passage",
+  tauxHoraire: "Taux horaire tout compris (€/h HT)",
+};
+
 export type NettoyageTarif = {
   id: number;
   fournisseurId: number;
@@ -127,6 +132,15 @@ export default function NettoyageTarifsForm({
           // S'assurer que la valeur est un nombre
           const value = tarif[field];
           if (typeof value === "number") {
+            if (value === 0) {
+              toast({
+                variant: "destructive",
+                title: "Erreur 😿",
+                description: `La valeur de "${mapping[field as "hParPassage" | "tauxHoraire"]}" ne peut être nulle ou mal formatée, entrez une valeur entière ou décimale`,
+              });
+              setSaving(false);
+              return;
+            }
             const result = await updateTarifAction(id, field, value * RATIO);
             if (!result.success) {
               success = false;
@@ -200,6 +214,12 @@ export default function NettoyageTarifsForm({
     );
   });
 
+  const handleCancel = () => {
+    // Réinitialiser les tarifs à leur état initial
+    setTarifs(initialTarifs);
+    setModifiedTarifs(new Set());
+  };
+
   return (
     <div className="relative space-y-4">
       {/* Bouton de sauvegarde et indicateur de modifications */}
@@ -211,21 +231,31 @@ export default function NettoyageTarifsForm({
             </div>
           )}
         </div>
-        <Button
-          onClick={handleSave}
-          disabled={!hasUnsavedChanges || saving}
-          variant="destructive"
-          size="lg"
-        >
-          {saving ? (
-            <div className="flex items-center gap-2">
-              <Loader className="animate-spin" />
-              <p>...Sauvegarde</p>
-            </div>
-          ) : (
-            "Sauvegarder"
-          )}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={handleSave}
+            disabled={!hasUnsavedChanges || saving}
+            variant="destructive"
+            size="lg"
+          >
+            {saving ? (
+              <div className="flex items-center gap-2">
+                <Loader className="animate-spin" />
+                <p>...Sauvegarde</p>
+              </div>
+            ) : (
+              "Sauvegarder"
+            )}
+          </Button>
+          <Button
+            onClick={handleCancel}
+            disabled={!hasUnsavedChanges || saving}
+            variant="outline"
+            size="lg"
+          >
+            Annuler
+          </Button>
+        </div>
       </div>
 
       {/* Tableau des tarifs */}
@@ -237,6 +267,7 @@ export default function NettoyageTarifsForm({
                 <TableHead>Surface (m²)</TableHead>
                 <TableHead>Gamme</TableHead>
                 <TableHead>Fréquence de passage (j/an)</TableHead>
+                <TableHead>Total Annuel (€ HT)</TableHead>
                 <TableHead>Cadence (m2/h)</TableHead>
                 <TableHead>Heures moyennes par passage</TableHead>
                 <TableHead>Taux horaire tout compris (€/h HT)</TableHead>
@@ -273,7 +304,11 @@ export default function NettoyageTarifsForm({
                         : tarif.gamme === "confort"
                           ? "bg-fm4allcomfort/5"
                           : "bg-fm4allexcellence/5"
-                    } ${isModified ? "bg-amber-50" : ""}`}
+                    } ${isModified ? "bg-amber-50" : ""} ${
+                      !tarif.hParPassage || !tarif.tauxHoraire
+                        ? "border-2 border-red-500"
+                        : ""
+                    }`}
                   >
                     <TableCell className="font-medium">
                       {tarif.surface}
@@ -293,6 +328,13 @@ export default function NettoyageTarifsForm({
                     </TableCell>
                     <TableCell className="font-medium">
                       {freqAnnuelle}
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {typeof freqAnnuelle === "number"
+                        ? Math.round(
+                            tarif.tauxHoraire * tarif.hParPassage * freqAnnuelle
+                          )
+                        : "-"}
                     </TableCell>
                     <TableCell className="font-medium">
                       {Math.round(tarif.surface / tarif.hParPassage)}
