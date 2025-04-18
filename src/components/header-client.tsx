@@ -1,6 +1,8 @@
 "use client";
 
 import { Link, usePathname } from "@/i18n/navigation";
+import { useSession } from "@/lib/auth-client";
+import { User } from "better-auth";
 import {
   CircleGauge,
   HandPlatter,
@@ -10,7 +12,7 @@ import {
   Phone,
   ScrollText,
   Star,
-  User,
+  User as UserIcon,
   X,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -23,10 +25,17 @@ const HeaderClient = () => {
   const t = useTranslations("header");
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const path = usePathname();
+  const { data: session } = useSession();
+  const user = session?.user as User & {
+    role: string;
+    fournisseurId?: number;
+    clientId?: number;
+  };
+  const clientId = user?.clientId;
 
   const isActive = (href: string) => {
     if (href === "/") return path === "/";
-    return path.includes(href);
+    return path === href;
   };
 
   const handleShowMobileNav = () => {
@@ -53,11 +62,20 @@ const HeaderClient = () => {
           <nav className="hidden xl:flex items-center gap-8">
             <div
               className={`flex gap-1 items-center ${
-                isActive("/admin/dashboard") ? "text-destructive font-bold" : ""
+                isActive("/client/[clientId]")
+                  ? "text-destructive font-bold"
+                  : ""
               }`}
             >
               <CircleGauge size={15} />
-              <Link href="/admin/dashboard">Dashboard</Link>
+              <Link
+                href={{
+                  pathname: "/client/[clientId]",
+                  params: { clientId: clientId ?? 0 },
+                }}
+              >
+                Dashboard
+              </Link>
             </div>
           </nav>
         </div>
@@ -171,7 +189,7 @@ const HeaderClient = () => {
                 }`}
                 onClick={handleHideMobileNav}
               >
-                <User size={30} />
+                <UserIcon size={30} />
                 <Link href="/auth/signin">{t("connexion")}</Link>
               </div>
             </div>
