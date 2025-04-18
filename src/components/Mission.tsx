@@ -5,7 +5,7 @@ const Mission = async () => {
   const t = await getTranslations("HomePage.mission");
   return (
     <section id="mission">
-      <div className="max-w-7xl w-full mx-auto flex flex-col gap-10 pt-8 pb-12 px-6">
+      <div className="max-w-7xl w-full mx-auto flex flex-col gap-10 pt-8 pb-20 px-6">
         <h2 className="text-2xl md:text-3xl border-l-2 px-4">
           {t("notre-mission")}
         </h2>

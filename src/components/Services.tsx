@@ -10,7 +10,7 @@ const Services = async () => {
     <section className="max-w-7xl w-full mx-auto flex flex-col gap-10 pt-8 pb-12 px-6 relative">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl md:text-3xl border-l-2 px-4">
-          {tHeader("nos-services")}
+          {t("nos-services")}
         </h2>
         <Button
           variant="outline"

@@ -105,9 +105,28 @@
       "un-seul-contact-un-seul-contrat-et-une-seule-facture-pour-toutes-vos-prestations": ": one point of contact, one contract, and one invoice for all your services.",
       "vous-emmenagez-dans-de-nouveaux-bureaux": "Are you relocating to new offices?"
     },
+    "concept": {
+      "notre-concept": "Our concept",
+      "un-comparateur": "A comparison tool",
+      "pour-chaque-service": "For each service,",
+      "comparez-les-offres-de-nos-prestataires-partenaires": "compare the offers of our partner providers",
+      "et-trouvez-la-formule-qui-vous-convient-le-mieux": "and find the solution that suits you best.",
+      "un-generateur-de-devis": "A quote generator",
+      "obtenez-un": "Get a",
+      "devis-clair-et-detaille": "clear and detailed quote",
+      "en-quelques-clics-sans-attendre-un-hypothetique-appel": "in just a few clicks, without waiting for a potential call.",
+      "un-accompagnement": "Comprehensive support",
+      "cahier-des-charges-contrats-factures-planification-nous-gerons-tout-cela-pour-vous": "Specifications, contracts, invoices, scheduling... we handle it all for you.",
+      "1-contact-1-contrat-1-facture": "1 contact, 1 contract, 1 invoice",
+      "pour-tous-vos-services": "for all your services."
+    },
     "services": {
+      "nos-services": "Our services",
       "tous-les-services": "All services",
       "voir-tous-les-services": "Show all services"
+    },
+    "partenaires": {
+      "nos-partenaires": "Our partners"
     },
     "comment": {
       "1-mes-locaux": "1. My premises",

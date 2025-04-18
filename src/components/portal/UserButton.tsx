@@ -30,7 +30,6 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
     fournisseurId?: number;
     clientId?: number;
   };
-  console.log("user", user);
 
   const handleSignOut = async () => {
     try {

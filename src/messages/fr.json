@@ -91,9 +91,9 @@
       "la-gestion-du-quotidien": "la gestion du quotidien"
     },
     "presentation": {
-      "tpe-pme-en-ile-de-france": "TPE/PME à Paris & Île-de-France?",
-      "vous-emmenagez-dans-de-nouveaux-bureaux": "Vous emménagez dans de nouveaux bureaux?",
-      "ou-envie-dameliorer-vos-services-actuels": "Ou envie d’améliorer vos services actuels ?",
+      "tpe-pme-en-ile-de-france": "TPE/PME à Paris et en Île-de-France ?",
+      "vous-emmenagez-dans-de-nouveaux-bureaux": "Vous emménagez dans de nouveaux bureaux ?",
+      "ou-envie-dameliorer-vos-services-actuels": "Envie d’améliorer vos services actuels ?",
       "simplifie-vos-demarches-dachats-et-de-gestion-avec-sa": "simplifie vos démarches d’achats et de gestion avec sa",
       "plateforme-de-facility-management": "plateforme de Facility Management",
       "un-seul-contact-un-seul-contrat-et-une-seule-facture-pour-toutes-vos-prestations": ": un seul contact, un seul contrat et une seule facture pour toutes vos prestations.",
@@ -105,9 +105,28 @@
       "pret-a-optimiser-la-gestion-de-vos-bureaux": "Prêt à optimiser la gestion de vos bureaux ?",
       "obtenez-votre-devis-en-quelques-clics": "Obtenez votre devis en quelques clics"
     },
+    "concept": {
+      "notre-concept": "Notre concept",
+      "un-comparateur": "Un comparateur",
+      "pour-chaque-service": "Pour chaque service,",
+      "comparez-les-offres-de-nos-prestataires-partenaires": "comparez les offres de nos prestataires partenaires",
+      "et-trouvez-la-formule-qui-vous-convient-le-mieux": "et trouvez la formule qui vous convient le mieux.",
+      "un-generateur-de-devis": "Un générateur de devis",
+      "obtenez-un": "Obtenez un",
+      "devis-clair-et-detaille": "devis clair et détaillé",
+      "en-quelques-clics-sans-attendre-un-hypothetique-appel": "en quelques clics, sans attendre un hypothétique appel.",
+      "un-accompagnement": "Un accompagnement",
+      "cahier-des-charges-contrats-factures-planification-nous-gerons-tout-cela-pour-vous": "Cahier des charges, contrats, factures, planification...Nous gérons tout cela pour vous.",
+      "1-contact-1-contrat-1-facture": "1 contact, 1 contrat, 1 facture",
+      "pour-tous-vos-services": "pour tous vos services."
+    },
     "services": {
+      "nos-services": "Nos services",
       "tous-les-services": "Tous les services",
       "voir-tous-les-services": "Voir tous les services"
+    },
+    "partenaires": {
+      "nos-partenaires": "Nos partenaires"
     },
     "comment": {
       "comment-ca-marche": "Comment ça marche ?",

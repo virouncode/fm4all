@@ -1,6 +1,8 @@
 "use client";
 
 import { Link, usePathname } from "@/i18n/navigation";
+import { useSession } from "@/lib/auth-client";
+import { User } from "better-auth";
 import {
   CircleGauge,
   HandPlatter,
@@ -10,7 +12,7 @@ import {
   Phone,
   ScrollText,
   Star,
-  User,
+  User as UserIcon,
   X,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -21,6 +23,13 @@ import UserButton from "./portal/UserButton";
 
 const HeaderFournisseur = () => {
   const t = useTranslations("header");
+  const { data: session } = useSession();
+  const user = session?.user as User & {
+    role: string;
+    fournisseurId?: number;
+    clientId?: number;
+  };
+  const fournisseurId = user?.fournisseurId;
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const path = usePathname();
 
@@ -53,11 +62,30 @@ const HeaderFournisseur = () => {
           <nav className="hidden xl:flex items-center gap-8">
             <div
               className={`flex gap-1 items-center ${
-                isActive("/admin/dashboard") ? "text-destructive font-bold" : ""
+                isActive("/fournisseur/dashboard")
+                  ? "text-destructive font-bold"
+                  : ""
               }`}
             >
               <CircleGauge size={15} />
-              <Link href="/admin/dashboard">Dashboard</Link>
+              <Link href="/fournisseur/dashboard">Dashboard</Link>
+            </div>
+            <div
+              className={`flex gap-1 items-center ${
+                isActive("/fournisseur/tarifs/[fournisseurId]")
+                  ? "text-destructive font-bold"
+                  : ""
+              }`}
+            >
+              <CircleGauge size={15} />
+              <Link
+                href={{
+                  pathname: "/fournisseur/tarifs/[fournisseurId]",
+                  params: { fournisseurId: fournisseurId ?? 0 },
+                }}
+              >
+                Tarifs
+              </Link>
             </div>
           </nav>
         </div>
@@ -171,7 +199,7 @@ const HeaderFournisseur = () => {
                 }`}
                 onClick={handleHideMobileNav}
               >
-                <User size={30} />
+                <UserIcon size={30} />
                 <Link href="/auth/signin">{t("connexion")}</Link>
               </div>
             </div>

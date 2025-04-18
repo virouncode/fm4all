@@ -160,6 +160,14 @@ export const routing = defineRouting({
       fr: "/fournisseur/dashboard",
       en: "/fournisseur/dashboard",
     },
+    "/fournisseur/tarifs": {
+      fr: "/fournisseur/tarifs",
+      en: "/fournisseur/tarifs",
+    },
+    "/fournisseur/tarifs/[fournisseurId]": {
+      fr: "/fournisseur/tarifs/[fournisseurId]",
+      en: "/fournisseur/tarifs/[fournisseurId]",
+    },
   },
 });
 

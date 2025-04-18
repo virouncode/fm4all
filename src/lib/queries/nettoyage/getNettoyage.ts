@@ -36,6 +36,26 @@ export const getNettoyageQuantites = async (surface: string) => {
   }
 };
 
+export const getNettoyageAllQuantites = async () => {
+  try {
+    const results = await db.select().from(nettoyageQuantites);
+    if (results.length === 0) return [];
+    // const validatedResults = results.map((result) =>
+    //   selectNettoyageQuantitesSchema.parse(result)
+    // );
+    // const data = validatedResults.map((result) => ({
+    //   ...result,
+    //   freqAnnuelle: result.freqAnnuelle / RATIO,
+    // }));
+    return results.map((result) => ({
+      ...result,
+      freqAnnuelle: result.freqAnnuelle / RATIO,
+    }));
+  } catch (err) {
+    errorHelper(err);
+  }
+};
+
 export const getNettoyageTarifs = async (surface: string) => {
   const roundedSurface = roundSurface(parseInt(surface));
   try {
@@ -145,6 +165,31 @@ export const getVitrerieTarifs = async () => {
       fraisDeplacement: validatedResult.fraisDeplacement / RATIO,
     }));
     return data;
+  } catch (err) {
+    errorHelper(err);
+  }
+};
+
+export const getNettoyageTarifsFournisseur = async (fournisseurId: number) => {
+  try {
+    const results = await db
+      .select()
+      .from(nettoyageTarifs)
+      .where(eq(nettoyageTarifs.fournisseurId, fournisseurId));
+    if (results.length === 0) return [];
+    // const validatedResults = results.map((result) =>
+    //   selectNettoyageTarifsSchema.parse(result)
+    // );
+    // const data = validatedResults.map((result) => ({
+    //   ...result,
+    //   hParPassage: result.hParPassage / RATIO,
+    //   tauxHoraire: result.tauxHoraire / RATIO,
+    // }));
+    return results.map((result) => ({
+      ...result,
+      hParPassage: result.hParPassage / RATIO,
+      tauxHoraire: result.tauxHoraire / RATIO,
+    }));
   } catch (err) {
     errorHelper(err);
   }

@@ -1,4 +1,5 @@
 import Articles from "@/components/Articles";
+import Concept from "@/components/Concept";
 import Hero from "@/components/Hero";
 import HofManager from "@/components/HofManager";
 import How from "@/components/How";
@@ -40,6 +41,7 @@ export default function page() {
       <Hero />
       <Slogan />
       <Presentation />
+      <Concept />
       <Services />
       <Partenaires />
       <VideoPresentation />

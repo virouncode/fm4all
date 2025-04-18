@@ -11,7 +11,7 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 
 const Partenaires = () => {
-  const t = useTranslations("header");
+  const t = useTranslations("HomePage.partenaires");
   return (
     <section className="bg-gradient-to-r from-[#f0c674]/100 to-[#f0c674]/70">
       <div className="max-w-7xl w-full mx-auto flex flex-col gap-10 pt-8 pb-12 px-6">
