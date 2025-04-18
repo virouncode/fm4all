@@ -60,7 +60,6 @@ export default function NettoyageTarifsForm({
   ) => {
     // Filtrer pour n'accepter que les chiffres et les virgules/points
     const inputValue = e.target.value;
-    console.log("inputValue", inputValue);
 
     // Convertir en nombre
     const value = inputValue ? parseFloat(inputValue) : 0;

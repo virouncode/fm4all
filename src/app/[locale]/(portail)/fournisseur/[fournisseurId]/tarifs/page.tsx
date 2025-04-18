@@ -22,8 +22,8 @@ const page = async ({
         <h1 className="text-4xl mb-10">Mes tarifs</h1>
 
         <div className="flex flex-col gap-2 px-10">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl mb-10">Mes services</h2>
+          <div className="flex justify-between items-center  mb-10">
+            <h2 className="text-2x">Mes services</h2>
             <Button variant="destructive" size="lg" title="Ajouter un service">
               Ajouter un service
             </Button>
