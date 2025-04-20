@@ -7,6 +7,7 @@ import {
 import { z } from "zod";
 import { isValidSIRET } from "./../lib/isValideSIRET";
 
+//SELECT
 export const selectClientSchema = createSelectSchema(clients, {
   nomEntreprise: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
   siret: (schema) =>
@@ -46,6 +47,7 @@ export const selectClientSchema = createSelectSchema(clients, {
 
 export type SelectClientType = z.infer<typeof selectClientSchema>;
 
+//INSERT
 export const createInsertClientSchema = (messages: {
   nomEntreprise: string;
   siret: string;
@@ -124,6 +126,7 @@ export const insertClientSchema = createInsertClientSchema({
 
 export type InsertClientType = z.infer<typeof insertClientSchema>;
 
+//UPDATE
 export const createUpdateClientSchema = (messages: {
   nomEntreprise: string;
   siret: string;
@@ -202,6 +205,7 @@ export const updateClientSchema = createUpdateClientSchema({
 
 export type UpdateClientType = z.infer<typeof updateClientSchema>;
 
+//MES LOCAUX
 export const createMesLocauxSchema = (messages: {
   surface: string;
   effectif: string;

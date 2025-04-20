@@ -632,12 +632,21 @@ export const servicesFm4AllOffres = pgTable("services_fm4all_offres", {
   audit: inclusEnum().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
-export const devis = pgTable("devis", {
+export const devisTemporaires = pgTable("devis_temporaires", {
   id: serial().primaryKey(),
   clientId: integer("client_id")
     .notNull()
     .references(() => clients.id),
   texte: varchar().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const devis = pgTable("devis", {
+  id: serial().primaryKey(),
+  clientId: integer("client_id")
+    .notNull()
+    .references(() => clients.id),
+  devisUrl: varchar("devis_url").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -650,11 +659,11 @@ export const user = pgTable("user", {
   email: text("email").unique().notNull(),
   emailVerified: boolean("email_verified").notNull(),
   image: text("image"),
-  createdAt: timestamp("created_at").notNull(),
-  updatedAt: timestamp("updated_at").notNull(),
   role: roleEnum("role").default("admin").notNull(),
   fournisseurId: integer("fournisseur_id").references(() => fournisseurs.id),
   clientId: integer("client_id").references(() => clients.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull(),
 });
 
 export const session = pgTable("session", {
@@ -699,7 +708,7 @@ export const verification = pgTable("verification", {
 
 //RELATIONS
 export const clientsRelations = relations(clients, ({ many }) => ({
-  devis: many(devis),
+  devis: many(devisTemporaires),
 }));
 export const fournisseursRelations = relations(
   fournisseurs,
@@ -1011,9 +1020,12 @@ export const officeManagerTarifsRelations = relations(
   })
 );
 
-export const devisRelations = relations(devis, ({ one }) => ({
-  client: one(clients, {
-    fields: [devis.clientId],
-    references: [clients.id],
-  }),
-}));
+export const devisTemporairesRelations = relations(
+  devisTemporaires,
+  ({ one }) => ({
+    client: one(clients, {
+      fields: [devisTemporaires.clientId],
+      references: [clients.id],
+    }),
+  })
+);

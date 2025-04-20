@@ -65,8 +65,6 @@ const CityOut = ({
   });
 
   const submitForm = async (data: CityOutType) => {
-    console.log("submit");
-
     setLoading(true);
     try {
       await sendEmailFromClient({
@@ -96,7 +94,6 @@ const CityOut = ({
           "vos-coordonnees-ont-bien-ete-envoyees-a-notre-equipe-nous-vous-contacterons-dans-les-plus-brefs-delais"
         ),
       });
-
       setTimeout(() => {
         //pour laisser le temps au toast de s'afficher
         if (destination) router.push("/");

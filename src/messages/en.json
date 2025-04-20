@@ -1281,6 +1281,7 @@
     "fournisseur": "Provider",
     "client": "Client",
     "une-erreur-est-survenue-lors-de-la-creation-de-lutilisateur": "An error occurred while creating the user",
+    "une-erreur-est-survenue-lors-de-la-mise-a-jour-de-lutilisateur": "An error occurred while updating the user",
     "fournisseur-non-trouve": "Provider not found",
     "le-compte-utilisateur-de-usertopost-name-a-ete-cree-avec-succes-un-email-avec-un-lien-de-verification-a-ete-envoye-a-usertopost-email": "The user account for {userName} was successfully created, a verification email has been sent to {userEmail}",
     "selectionner-le-fournisseur": "Select provider",
@@ -1308,7 +1309,13 @@
     "selectionner-le-client": "Select client",
     "choisir-le-client": "Choose client",
     "email-du-contact": "Contact email",
-    "cet-email-est-deja-utilise-par-un-autre-compte-utilisateur": "This email is already used by another user account"
+    "cet-email-est-deja-utilise-par-un-autre-compte-utilisateur": "This email is already used by another user account",
+    "les-mots-de-passe-ne-correspondent-pas": "Passwords do not match",
+    "image-invalide": "Invalid Avatar",
+    "mettre-a-jour": "Update info",
+    "mes-informations": "My information",
+    "mettez-a-jour-vos-informations-personnelles": "Update your personal information",
+    "id-de-ladministrateur-invalide": "Invalid admin ID"
   },
   "SecteursPage": {
     "nos-secteurs-dintervention": "Our business sectors",

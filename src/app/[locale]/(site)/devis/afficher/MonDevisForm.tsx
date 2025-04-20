@@ -1,6 +1,7 @@
 "use client";
 
-import { insertClientAction } from "@/actions/insertClientAction";
+import { insertClientAction } from "@/actions/clientAction";
+import { insertDevisAction } from "@/actions/devisAction";
 import { DateInputWithLabel } from "@/components/formInputs/DateInputWithLabel";
 import { InputWithLabel } from "@/components/formInputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
@@ -116,6 +117,133 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
   const { execute: executeSaveClient, isPending: isSavingClient } = useAction(
     insertClientAction,
     {
+      onSuccess: async ({ data }) => {
+        try {
+          setLoading(true);
+          const newClientData = data?.data.client;
+          if (!newClientData) return;
+          const numerosDevis = `${newClientData?.nomEntreprise}_${DateTime.local().toFormat(
+            "dd-MM-yyyy'T'HH:mm"
+          )}`;
+          const nomDevis = `Devis_fm4all_${numerosDevis}.pdf`;
+
+          const url = await fillDevis(
+            numerosDevis,
+            format(new Date(), "dd/MM/yyyy", { locale: fr }),
+            "FM4ALL comparateur en ligne",
+            newClientData,
+            total.totalAnnuelHt,
+            total.totalInstallationHt,
+            commentaires ?? "",
+            newClientData.dateDeDemarrage
+              ? format(new Date(newClientData.dateDeDemarrage), "dd/MM/yyyy", {
+                  locale: fr,
+                })
+              : ""
+          );
+          if (url) {
+            try {
+              //Le Fichier du devis
+              const responseBlob = await fetch(url);
+              const blob = await responseBlob.blob();
+              const file = new File([blob], nomDevis);
+              //Dans vercel blob
+              const response = await fetch(
+                `/api/vercelblob/upload?filename=${nomDevis}&foldername=devis`,
+                {
+                  method: "POST",
+                  body: file,
+                }
+              );
+              const urlToPost: string = (await response.json()).url;
+              executeSaveDevis({
+                clientId: newClientData.id,
+                devisUrl: urlToPost,
+              });
+              console.log("urlToPost", urlToPost);
+
+              setDevisUrl(urlToPost);
+              await sendEmailFromClient({
+                to: "contact@fm4all.com",
+                from: "devis@fm4all.com",
+                subject: "Un client a finalisé son devis",
+                text: `<p>Un client a finalisé son devis.</p><br/>
+                            <p>Voici ses coordonnées :</p><br/>
+                            <p>Entreprise : ${newClientData.nomEntreprise}</p>
+                            <p>Siret : ${newClientData.siret}</p>
+                            <p>Adresse ligne 1 : ${newClientData.adresseLigne1}</p>
+                            <p>Adresse ligne 2 : ${newClientData.adresseLigne2}</p>
+                            <p>Code postal : ${newClientData.codePostal}</p>
+                            <p>Ville : ${newClientData.ville}</p>
+                            <p>Surface des locaux : ${newClientData.surface}</p>
+                            <p>Effectif : ${newClientData.effectif}</p>
+                            <p>Type de bâtiment : ${batiments.find(({ id }) => id === newClientData.typeBatiment)?.description}</p>
+                            <p>Type d'occupation : ${occupation.find(({ id }) => id === newClientData.typeOccupation)?.description}</p>
+                            <p>Nom du contact : ${newClientData.nomContact}</p>
+                            <p>Prénom du contact : ${newClientData.prenomContact}</p>
+                            <p>Poste du contact : ${newClientData.posteContact}</p>
+                            <p>Email du contact : ${newClientData.emailContact}</p>
+                            <p>N°Tél du contact : ${newClientData.phoneContact}</p>
+                            <p>Nom du signataire : ${newClientData.nomSignataire}</p>
+                            <p>Prénom du signataire : ${newClientData.prenomSignataire}</p>
+                            <p>Poste du signataire : ${newClientData.posteSignataire}</p>
+                            <p>Email du signataire : ${newClientData.emailSignataire}</p>
+                            <p>Date de démarrage : ${
+                              newClientData.dateDeDemarrage
+                                ? format(
+                                    new Date(newClientData.dateDeDemarrage),
+                                    "dd/MM/yyyy",
+                                    {
+                                      locale: fr,
+                                    }
+                                  )
+                                : newClientData.dateDeDemarrage
+                            }</p></br>
+                            <p>Commentaires du client : ${commentaires}</p><br/>
+                            <p>Veuillez trouver en pièce jointe le devis</p>
+                            `,
+                attachment: urlToPost,
+                filename: nomDevis,
+              });
+            } catch (err) {
+              console.log(err);
+            }
+          }
+          setMonDevis({ currentMonDevisId: 2 });
+        } catch (err) {
+          if (err instanceof Error) {
+            toast({
+              variant: "destructive",
+              title: t("erreur"),
+              description: err.message,
+            });
+          } else console.log(err);
+        } finally {
+          setLoading(false);
+        }
+        // toast({
+        //   variant: "default",
+        //   title: tSauver("succes"),
+        //   description: data?.message,
+        // });
+      },
+      onError: ({ error }) => {
+        toast({
+          variant: "destructive",
+          title: tSauver("erreur"),
+          description:
+            error?.serverError ??
+            tSauver(
+              "impossible-de-sauvegarder-vos-coordonnees-veuillez-reessayer"
+            ),
+        });
+      },
+    }
+  );
+
+  const { execute: executeSaveDevis, isPending: isSavingDevis } = useAction(
+    insertDevisAction,
+    {
       onSuccess: ({ data }) => {
         toast({
           variant: "default",
@@ -123,13 +251,13 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
           description: data?.message,
         });
       },
-      onError: () => {
+      onError: ({ error }) => {
         toast({
           variant: "destructive",
           title: tSauver("erreur"),
-          description: tSauver(
-            "impossible-de-sauvegarder-vos-coordonnees-veuillez-reessayer"
-          ),
+          description:
+            error?.serverError ??
+            tSauver("impossible-de-sauvegarder-le-devis-veuillez-reessayer"),
         });
       },
     }
@@ -205,102 +333,6 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
       createdAt: data.createdAt,
     };
     executeSaveClient(clientToPost);
-
-    try {
-      setLoading(true);
-      const numerosDevis = `${client.nomEntreprise}_${DateTime.local().toFormat(
-        "dd-MM-yyyy'T'HH:mm"
-      )}`;
-      const nomDevis = `Devis_fm4all_${numerosDevis}.pdf`;
-
-      const url = await fillDevis(
-        numerosDevis,
-        format(new Date(), "dd/MM/yyyy", { locale: fr }),
-        "FM4ALL comparateur en ligne",
-        client,
-        total.totalAnnuelHt,
-        total.totalInstallationHt,
-        commentaires ?? "",
-        client.dateDeDemarrage
-          ? format(new Date(client.dateDeDemarrage), "dd/MM/yyyy", {
-              locale: fr,
-            })
-          : ""
-      );
-      if (url) {
-        try {
-          //Le Fichier du devis
-          const responseBlob = await fetch(url);
-          const blob = await responseBlob.blob();
-          const file = new File([blob], nomDevis);
-          //Dans vercel blob
-          const response = await fetch(
-            `/api/vercelblob/upload?filename=${nomDevis}`,
-            {
-              method: "POST",
-              body: file,
-            }
-          );
-          const urlToPost: string = (await response.json()).url;
-          setDevisUrl(urlToPost);
-          await sendEmailFromClient({
-            to: "contact@fm4all.com",
-            from: "devis@fm4all.com",
-            subject: "Un client a finalisé son devis",
-            text: `<p>Un client a finalisé son devis.</p><br/>
-                        <p>Voici ses coordonnées :</p><br/>
-                        <p>Entreprise : ${data.nomEntreprise}</p>
-                        <p>Siret : ${data.siret}</p>
-                        <p>Adresse ligne 1 : ${data.adresseLigne1}</p>
-                        <p>Adresse ligne 2 : ${data.adresseLigne2}</p>
-                        <p>Code postal : ${data.codePostal}</p>
-                        <p>Ville : ${data.ville}</p>
-                        <p>Surface des locaux : ${data.surface}</p>
-                        <p>Effectif : ${data.effectif}</p>
-                        <p>Type de bâtiment : ${batiments.find(({ id }) => id === data.typeBatiment)?.description}</p>
-                        <p>Type d'occupation : ${occupation.find(({ id }) => id === data.typeOccupation)?.description}</p>
-                        <p>Nom du contact : ${data.nomContact}</p>
-                        <p>Prénom du contact : ${data.prenomContact}</p>
-                        <p>Poste du contact : ${data.posteContact}</p>
-                        <p>Email du contact : ${data.emailContact}</p>
-                        <p>N°Tél du contact : ${data.phoneContact}</p>
-                        <p>Nom du signataire : ${data.nomSignataire}</p>
-                        <p>Prénom du signataire : ${data.prenomSignataire}</p>
-                        <p>Poste du signataire : ${data.posteSignataire}</p>
-                        <p>Email du signataire : ${data.emailSignataire}</p>
-                        <p>Date de démarrage : ${
-                          data.dateDeDemarrage
-                            ? format(
-                                new Date(data.dateDeDemarrage),
-                                "dd/MM/yyyy",
-                                {
-                                  locale: fr,
-                                }
-                              )
-                            : data.dateDeDemarrage
-                        }</p></br>
-                        <p>Commentaires du client : ${commentaires}</p><br/>
-                        <p>Veuillez trouver en pièce jointe le devis</p>
-                        `,
-            attachment: urlToPost,
-            filename: nomDevis,
-          });
-        } catch (err) {
-          console.log(err);
-        }
-      }
-      setMonDevis({ currentMonDevisId: 2 });
-    } catch (err) {
-      if (err instanceof Error) {
-        toast({
-          variant: "destructive",
-          title: t("erreur"),
-          description: err.message,
-        });
-      } else console.log(err);
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
@@ -475,9 +507,11 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                 variant="destructive"
                 size="lg"
                 className="text-base min-w-[200px]"
-                disabled={loading || isSavingClient || !accepte}
+                disabled={
+                  loading || isSavingClient || isSavingDevis || !accepte
+                }
               >
-                {loading || isSavingClient ? (
+                {loading || isSavingClient || isSavingDevis ? (
                   <Loader className="animate-spin" />
                 ) : (
                   t("afficher-mon-devis")

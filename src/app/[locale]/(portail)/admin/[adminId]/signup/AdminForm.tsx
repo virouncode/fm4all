@@ -1,16 +1,16 @@
 "use client";
+import { insertAdminAction } from "@/actions/adminActions";
 import { InputWithLabel } from "@/components/formInputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
-import { authClient } from "@/lib/auth-client";
-import { capitalize } from "@/lib/capitalize";
 import { createInsertAdminSchema, InsertAdminType } from "@/zod-schemas/admin";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, X } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useAction } from "next-safe-action/hooks";
 import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -20,16 +20,12 @@ const AdminForm = () => {
   const tAuth = useTranslations("auth");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [image, setImage] = useState<File | null>(null);
-  const [loading, setLoading] = useState(false);
 
   const defaultValues: InsertAdminType = {
     prenom: "",
     nom: "",
     email: "",
-    password: "",
-    passwordConfirmation: "",
     image: null,
-    role: "admin",
   };
   const form = useForm<InsertAdminType>({
     mode: "onBlur",
@@ -38,71 +34,57 @@ const AdminForm = () => {
         email: tAuth("email-invalide"),
         prenom: tAdmin("prenom-obligatoire"),
         nom: tAdmin("nom-obligatoire"),
-        password: tAuth("mot-de-passe-obligatoire"),
-        passwordConfirmation: tAdmin(
-          "confirmation-du-mot-de-passe-obligatoire"
-        ),
+        image: tAdmin("image-invalide"),
       })
     ),
     defaultValues,
   });
 
-  const submitForm = async (data: InsertAdminType) => {
-    // executeSaveAdmin({ ...data, image: imagePreview });
-    if (data.password !== data.passwordConfirmation) {
+  const {
+    execute: executeSaveAdmin,
+    isPending: isSavingAdmin,
+    reset: resetSaveAdminAction,
+  } = useAction(insertAdminAction, {
+    onSuccess: ({ data }) => {
+      toast({
+        variant: "default",
+        title: tAuth("succes"),
+        description: data?.message,
+      });
+      form.reset(defaultValues);
+      resetSaveAdminAction();
+      setImage(null);
+      setImagePreview(null);
+    },
+    onError: ({ error }) => {
       toast({
         variant: "destructive",
         title: tAuth("erreur"),
-        description: tAuth("les-mots-de-passe-ne-correspondent-pas"),
+        description:
+          error?.serverError ??
+          tAdmin("une-erreur-est-survenue-lors-de-la-creation-de-lutilisateur"),
       });
-      return;
+    },
+  });
+
+  const submitForm = async (data: InsertAdminType) => {
+    // executeSaveAdmin({ ...data, image: imagePreview });
+    let imageUrl: string | null = null;
+    if (image) {
+      const response = await fetch(
+        `/api/vercelblob/upload?filename=${data.prenom}_${data.nom}_avatar&foldername=admin_avatars`,
+        {
+          method: "POST",
+          body: image,
+        }
+      );
+      imageUrl = (await response.json()).url;
     }
-    const response = await fetch(
-      `/api/vercelblob/upload?filename=${data.prenom}_${data.nom}_avatar&foldername=admin_avatars`,
-      {
-        method: "POST",
-        body: image,
-      }
-    );
-    const imageUrl: string = (await response.json()).url;
-    const userToPost = {
-      name: capitalize(data.prenom) + " " + capitalize(data.nom),
-      email: data.email.toLowerCase(),
-      password: data.password,
-      role: "admin",
+    const adminToPost = {
+      ...data,
       image: imageUrl,
     };
-    await authClient.signUp.email(userToPost, {
-      onRequest: () => {
-        setLoading(true);
-      },
-      onSuccess: () => {
-        toast({
-          variant: "default",
-          title: tAuth("succes"),
-          description: tAdmin(
-            "le-compte-utilisateur-de-usertopost-name-a-ete-cree-avec-succes-un-email-avec-un-lien-de-verification-a-ete-envoye-a-usertopost-email",
-            { userName: userToPost.name, userEmail: userToPost.email }
-          ),
-        });
-        form.reset(defaultValues);
-        // resetSaveAdminAction();
-        setImage(null);
-        setImagePreview(null);
-      },
-      onError: (ctx) => {
-        toast({
-          variant: "destructive",
-          title: tAuth("erreur"),
-          description:
-            ctx.error.message ??
-            tAdmin(
-              "une-erreur-est-survenue-lors-de-la-creation-de-lutilisateur"
-            ),
-        });
-      },
-    });
-    setLoading(false);
+    executeSaveAdmin(adminToPost);
   };
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -115,6 +97,7 @@ const AdminForm = () => {
       reader.readAsDataURL(file);
     }
   };
+
   return (
     <>
       {/* <DisplayServerActionResponse result={resultSaveAdmin} /> */}
@@ -176,27 +159,14 @@ const AdminForm = () => {
               nameInSchema="nom"
             />
           </div>
-          <div className="grid md:grid-cols-2 gap-2 md:gap-6">
-            <InputWithLabel<InsertAdminType>
-              fieldTitle={tAdmin("mot-de-passe")}
-              nameInSchema="password"
-              type="password"
-            />
-            <InputWithLabel<InsertAdminType>
-              fieldTitle={tAdmin("confirmation-mot-de-passe")}
-              nameInSchema="passwordConfirmation"
-              type="password"
-            />
-          </div>
-
           <Button
             variant="destructive"
             size="lg"
             title={tAdmin("creer-un-compte")}
             className="text-base w-full mt-6"
-            disabled={loading}
+            disabled={isSavingAdmin}
           >
-            {loading ? (
+            {isSavingAdmin ? (
               <Loader2 size={16} className="animate-spin" />
             ) : (
               tAdmin("creer-un-compte")

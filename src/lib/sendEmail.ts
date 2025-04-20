@@ -26,6 +26,7 @@ export const sendEmailFromServer = async (body: {
   nomDestinataire?: string;
   prenomDestinataire?: string;
 }) => {
+  throw new Error("test error");
   await fetch(`${process.env.APP_URL}/api/mailgun`, {
     method: "POST",
     headers: {

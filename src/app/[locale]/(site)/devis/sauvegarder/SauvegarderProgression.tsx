@@ -1,6 +1,6 @@
 "use client";
-import { insertClientAction } from "@/actions/insertClientAction";
-import { insertDevisAction } from "@/actions/insertDevisAction";
+import { insertClientAction } from "@/actions/clientAction";
+import { insertDevisTemporaireAction } from "@/actions/devisAction";
 import { InputWithLabel } from "@/components/formInputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -18,7 +18,7 @@ import {
   createInsertClientSchema,
   InsertClientType,
 } from "@/zod-schemas/client";
-import { InsertDevisType } from "@/zod-schemas/devis";
+import { InsertDevisTemporaireType } from "@/zod-schemas/devis";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -73,12 +73,12 @@ const SauvegarderProgression = () => {
           title: tSauver("succes"),
           description: data?.message,
         });
-        if (data?.data?.clientId) {
-          const devisToPost: InsertDevisType = {
-            clientId: data?.data?.clientId,
+        if (data?.data.client.id) {
+          const devisToPost: InsertDevisTemporaireType = {
+            clientId: data?.data.client.id,
             texte: formatLocalStorageData(),
           };
-          executeSaveDevis(devisToPost);
+          executeSaveDevisTemporaire(devisToPost);
         }
       },
       onError: () => {
@@ -92,27 +92,27 @@ const SauvegarderProgression = () => {
       },
     }
   );
-  const { execute: executeSaveDevis, isPending: isSavingDevis } = useAction(
-    insertDevisAction,
-    {
-      onSuccess: ({ data }) => {
-        toast({
-          variant: "default",
-          title: tSauver("succes"),
-          description: data?.message,
-        });
-      },
-      onError: () => {
-        toast({
-          variant: "destructive",
-          title: tSauver("erreur"),
-          description: tSauver(
-            "impossible-de-sauvegarder-le-devis-veuillez-reessayer"
-          ),
-        });
-      },
-    }
-  );
+  const {
+    execute: executeSaveDevisTemporaire,
+    isPending: isSavingDevisTemporaire,
+  } = useAction(insertDevisTemporaireAction, {
+    onSuccess: ({ data }) => {
+      toast({
+        variant: "default",
+        title: tSauver("succes"),
+        description: data?.message,
+      });
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        title: tSauver("erreur"),
+        description: tSauver(
+          "impossible-de-sauvegarder-le-devis-veuillez-reessayer"
+        ),
+      });
+    },
+  });
 
   const submitForm = async (data: InsertClientType) => {
     if (!accepte) {
@@ -286,7 +286,7 @@ const SauvegarderProgression = () => {
                 className="text-base min-w-28"
                 disabled={!accepte}
               >
-                {isSavingClient || isSavingDevis ? (
+                {isSavingClient || isSavingDevisTemporaire ? (
                   <LoaderCircle className="animate-spin" />
                 ) : (
                   t("suivant")

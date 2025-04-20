@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useSession } from "@/lib/auth-client";
-import { CircleGauge, Menu, UsersRound, X } from "lucide-react";
+import { CircleGauge, Menu, User, UsersRound, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useState } from "react";
@@ -67,6 +67,23 @@ const HeaderAdmin = () => {
               </Link>
             </div>
             <UsersAccountsButton isActive={isActive} />
+            <div
+              className={`flex gap-1 items-center ${
+                isActive("/admin/[adminId]/info")
+                  ? "text-destructive font-bold"
+                  : ""
+              }`}
+            >
+              <User size={15} />
+              <Link
+                href={{
+                  pathname: "/admin/[adminId]/info",
+                  params: { adminId: user?.id ?? 0 },
+                }}
+              >
+                Mes informations
+              </Link>
+            </div>
           </nav>
         </div>
         <div className="flex items-center gap-4">

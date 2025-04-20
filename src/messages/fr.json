@@ -1281,6 +1281,7 @@
     "fournisseur": "Fournisseur",
     "client": "Client",
     "une-erreur-est-survenue-lors-de-la-creation-de-lutilisateur": "Une erreur est survenue lors de la création de l'utilisateur",
+    "une-erreur-est-survenue-lors-de-la-mise-a-jour-de-lutilisateur": "Une erreur est survenue lors de la misa à jour de l'utilisateur",
     "fournisseur-non-trouve": "Fournisseur non trouvé",
     "le-compte-utilisateur-de-usertopost-name-a-ete-cree-avec-succes-un-email-avec-un-lien-de-verification-a-ete-envoye-a-usertopost-email": "Le compte utilisateur de {userName} a été crée avec succès, un email avec un lien de vérification a été envoyé à {userEmail}",
     "selectionner-le-fournisseur": "Sélectionner le fournisseur",
@@ -1308,7 +1309,13 @@
     "selectionner-le-client": "Sélectionner le client",
     "choisir-le-client": "Choisir le client",
     "email-du-contact": "Email du contact",
-    "cet-email-est-deja-utilise-par-un-autre-compte-utilisateur": "Cet email est déjà utilisé par un autre compte utilisateur"
+    "cet-email-est-deja-utilise-par-un-autre-compte-utilisateur": "Cet email est déjà utilisé par un autre compte utilisateur",
+    "les-mots-de-passe-ne-correspondent-pas": "Les mots de passe ne correspondent pas",
+    "image-invalide": "Avatar invalide",
+    "mettre-a-jour": "Mettre à jour",
+    "mes-informations": "Mes informations",
+    "mettez-a-jour-vos-informations-personnelles": "Mettez à jour vos informations personnelles",
+    "id-de-ladministrateur-invalide": "ID de l'administrateur invalide"
   },
   "SecteursPage": {
     "nos-secteurs-dintervention": "Nos secteurs d'intervention",

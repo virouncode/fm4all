@@ -890,6 +890,20 @@
       "when": 1744987984735,
       "tag": "0126_small_toad",
       "breakpoints": true
+    },
+    {
+      "idx": 127,
+      "version": "7",
+      "when": 1745185552226,
+      "tag": "0127_shocking_dark_beast",
+      "breakpoints": true
+    },
+    {
+      "idx": 128,
+      "version": "7",
+      "when": 1745188306308,
+      "tag": "0128_bumpy_barracuda",
+      "breakpoints": true
     }
   ]
 }
