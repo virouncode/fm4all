@@ -84,7 +84,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
     adresseLigne2: client.adresseLigne2 ?? "",
     codePostal: client.codePostal ?? "",
     ville: client.ville ?? "",
-    dateDeDemarrage: client.dateDeDemarrage ?? "",
+    dateDeDemarrage: client.dateDeDemarrage ?? null,
     commentaires: client.commentaires ?? "",
   };
 

@@ -1,6 +1,9 @@
 "use client";
 
-import { Tarif, updateTarifAction } from "@/actions/getTarifsFournisseurAction";
+import {
+  Tarif,
+  updateTarifAction,
+} from "@/actions/updateTarifsFournisseurAction";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,7 +20,6 @@ import { SelectNettoyageQuantitesType } from "@/zod-schemas/nettoyageQuantites";
 import { Loader } from "lucide-react";
 import { ChangeEvent, useState } from "react";
 
-// Définition de l'interface Tarif
 const mapping = {
   hParPassage: "Heures moyennes par passage",
   tauxHoraire: "Taux horaire tout compris (€/h HT)",
@@ -33,16 +35,16 @@ export type NettoyageTarif = {
   createdAt: Date;
 };
 
-type NettoyageTarifsFormProps = {
-  initialTarifs: Tarif[];
+type NettoyageTarifsUpdateFormProps = {
+  initialTarifs: NettoyageTarif[];
   quantites: SelectNettoyageQuantitesType[];
 };
 
-export default function NettoyageTarifsForm({
+export default function NettoyageTarifsUpdateForm({
   initialTarifs,
   quantites,
-}: NettoyageTarifsFormProps) {
-  const [tarifs, setTarifs] = useState<Tarif[]>(initialTarifs);
+}: NettoyageTarifsUpdateFormProps) {
+  const [tarifs, setTarifs] = useState<NettoyageTarif[]>(initialTarifs);
   const [modifiedTarifs, setModifiedTarifs] = useState<Set<number>>(new Set());
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
@@ -56,7 +58,7 @@ export default function NettoyageTarifsForm({
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement>,
     id: number,
-    field: keyof Tarif
+    field: keyof NettoyageTarif
   ) => {
     // Filtrer pour n'accepter que les chiffres et les virgules/points
     const inputValue = e.target.value;
@@ -229,6 +231,12 @@ export default function NettoyageTarifsForm({
               Vous avez des modifications non sauvegardées
             </div>
           )}
+          {(tarifs.some((tarif) => !tarif.hParPassage) ||
+            tarifs.some((tarif) => !tarif.tauxHoraire)) && (
+            <div className="text-sm text-red-600 font-medium">
+              Vous avez entré des valeurs erronées
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -305,7 +313,7 @@ export default function NettoyageTarifsForm({
                           : "bg-fm4allexcellence/5"
                     } ${isModified ? "bg-amber-50" : ""} ${
                       !tarif.hParPassage || !tarif.tauxHoraire
-                        ? "border-2 border-red-500"
+                        ? "border-2 border-red-600"
                         : ""
                     }`}
                   >

@@ -16,39 +16,6 @@ export interface Tarif {
   createdAt: Date;
 }
 
-export async function getTarifsFournisseurAction(): Promise<Tarif[]> {
-  try {
-    const session = await getSession();
-    const user = session?.user;
-    const fournisseurId = user?.fournisseurId;
-
-    if (!fournisseurId) {
-      return [];
-    }
-
-    const results = await db
-      .select()
-      .from(nettoyageTarifs)
-      .where(eq(nettoyageTarifs.fournisseurId, fournisseurId));
-
-    if (results.length === 0) return [];
-
-    // Convert the values from the database (which might be multiplied by a ratio)
-    // to their actual values for display
-    const RATIO = 100; // Based on what I saw in the getNettoyage.ts file
-    const data = results.map((result) => ({
-      ...result,
-      hParPassage: result.hParPassage / RATIO,
-      tauxHoraire: result.tauxHoraire / RATIO,
-    }));
-
-    return data as Tarif[];
-  } catch (err) {
-    errorHelper(err);
-    return [];
-  }
-}
-
 export async function updateTarifAction(
   id: number,
   field: keyof Tarif,

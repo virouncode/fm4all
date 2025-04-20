@@ -5,8 +5,8 @@ import { getServicesForFournisseur } from "@/lib/queries/services/getServices";
 import { SprayCan, Toilet } from "lucide-react";
 
 const servicesIcons = {
-  nettoyage: <SprayCan size={16} />,
-  hygiene: <Toilet size={16} />,
+  nettoyage: <SprayCan />,
+  hygiene: <Toilet />,
 };
 
 const page = async ({
@@ -23,7 +23,7 @@ const page = async ({
 
         <div className="flex flex-col gap-2 px-10">
           <div className="flex justify-between items-center  mb-10">
-            <h2 className="text-2x">Mes services</h2>
+            <h2 className="text-2xl">Mes services</h2>
             <Button variant="destructive" size="lg" title="Ajouter un service">
               Ajouter un service
             </Button>

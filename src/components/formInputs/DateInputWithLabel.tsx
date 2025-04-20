@@ -67,9 +67,9 @@ export function DateInputWithLabel<S>({
                   <span
                     onClick={(e) => {
                       e.stopPropagation();
-                      field.onChange("");
+                      field.onChange(null);
                       if (handleChangeDate) {
-                        handleChangeDate("");
+                        handleChangeDate(null);
                       }
                     }}
                   >

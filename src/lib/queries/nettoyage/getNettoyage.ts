@@ -170,12 +170,40 @@ export const getVitrerieTarifs = async () => {
   }
 };
 
+//TODO valider le schema
 export const getNettoyageTarifsFournisseur = async (fournisseurId: number) => {
   try {
     const results = await db
       .select()
       .from(nettoyageTarifs)
       .where(eq(nettoyageTarifs.fournisseurId, fournisseurId));
+    if (results.length === 0) return [];
+    // const validatedResults = results.map((result) =>
+    //   selectNettoyageTarifsSchema.parse(result)
+    // );
+    // const data = validatedResults.map((result) => ({
+    //   ...result,
+    //   hParPassage: result.hParPassage / RATIO,
+    //   tauxHoraire: result.tauxHoraire / RATIO,
+    // }));
+    return results.map((result) => ({
+      ...result,
+      hParPassage: result.hParPassage / RATIO,
+      tauxHoraire: result.tauxHoraire / RATIO,
+    }));
+  } catch (err) {
+    errorHelper(err);
+  }
+};
+
+export const getNettoyageTarifsRepasseFournisseur = async (
+  fournisseurId: number
+) => {
+  try {
+    const results = await db
+      .select()
+      .from(nettoyageRepasseTarifs)
+      .where(eq(nettoyageRepasseTarifs.fournisseurId, fournisseurId));
     if (results.length === 0) return [];
     // const validatedResults = results.map((result) =>
     //   selectNettoyageTarifsSchema.parse(result)
