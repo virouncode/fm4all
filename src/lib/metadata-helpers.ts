@@ -311,6 +311,9 @@ export function generateAlternates(
       images: [
         {
           url: imageUrl ?? "/img/logo_full_white.webp",
+          width: 1200,
+          height: 630,
+          alt: title,
         },
       ],
     },
