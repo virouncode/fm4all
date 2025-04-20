@@ -310,7 +310,7 @@ export function generateAlternates(
     openGraph: {
       images: [
         {
-          url: imageUrl ?? "/img/logo_full_white.webp.png",
+          url: imageUrl ?? "/img/logo_full_white.webp",
         },
       ],
     },
