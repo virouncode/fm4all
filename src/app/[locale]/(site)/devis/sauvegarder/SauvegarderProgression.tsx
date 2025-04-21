@@ -73,7 +73,7 @@ const SauvegarderProgression = () => {
           title: tSauver("succes"),
           description: data?.message,
         });
-        if (data?.data.client.id) {
+        if (data?.data?.client?.id) {
           const devisToPost: InsertDevisTemporaireType = {
             clientId: data?.data.client.id,
             texte: formatLocalStorageData(),

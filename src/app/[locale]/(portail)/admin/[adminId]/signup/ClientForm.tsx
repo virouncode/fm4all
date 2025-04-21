@@ -1,5 +1,6 @@
 "use client";
 
+import { insertUserAction } from "@/actions/userAction";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -10,13 +11,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { authClient } from "@/lib/auth-client";
-import { generatePassword } from "@/lib/generatePassword";
-import { sendEmailFromClient } from "@/lib/sendEmail";
 import { SelectClientType } from "@/zod-schemas/client";
+import { InsertUserType } from "@/zod-schemas/user";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useAction } from "next-safe-action/hooks";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 type ClientFormProps = {
   clients?: SelectClientType[];
@@ -25,72 +26,62 @@ type ClientFormProps = {
 const ClientForm = ({ clients }: ClientFormProps) => {
   const tAdmin = useTranslations("admin");
   const tAuth = useTranslations("auth");
-  const [loading, setLoading] = useState(false);
   const [clientId, setClientId] = useState<number | null>(null);
   const client = clients?.find(({ id }) => id === clientId);
+
+  const defaultValues: InsertUserType = {
+    name: client?.nomEntreprise ?? "",
+    email: client?.emailContact ?? "",
+    password: "temp",
+    role: "client",
+    clientId,
+    image: null,
+  };
+  const form = useForm<InsertUserType>({
+    mode: "onBlur",
+    // resolver: zodResolver(insertUserSchema),
+    defaultValues,
+  });
+  const {
+    execute: executeSaveUser,
+    isPending: isSavingUser,
+    reset: resetSaveUserAction,
+  } = useAction(insertUserAction, {
+    onSuccess: ({ data }) => {
+      toast({
+        variant: "default",
+        title: tAuth("succes"),
+        description: data?.message,
+      });
+      resetSaveUserAction();
+      setClientId(null);
+      form.reset();
+    },
+    onError: ({ error }) => {
+      toast({
+        variant: "destructive",
+        title: tAuth("erreur"),
+        description:
+          error?.serverError ||
+          tAuth(
+            "une-erreur-est-survenue-lors-de-la-creation-du-compte-utilisateur"
+          ),
+      });
+    },
+  });
 
   const handleSelectClient = (value: string) => {
     const selectedClientId = value ? parseInt(value) : null;
     setClientId(selectedClientId);
   };
 
-  const handleSubmit = async () => {
+  const submitForm = async () => {
     if (!client) return;
-    const tempPassword = generatePassword();
-    const userToPost = {
-      name: client?.nomEntreprise.toUpperCase(),
-      email: client?.emailContact.toLowerCase(),
-      password: tempPassword,
-      role: "client",
-      clientId,
-    };
-    await authClient.signUp.email(userToPost, {
-      onRequest: () => {
-        setLoading(true);
-      },
-      onSuccess: async () => {
-        await sendEmailFromClient({
-          to: client.emailContact,
-          from: "noreply@fm4all.com",
-          subject: "Création de votre compte client",
-          text: `<p>Votre compte client a été crée avec succès, bienvenue chez fm4all !</p><br/>
-                    <p>Voici mot de passe temporaire : ${tempPassword}</p><br/>
-                    <p>Nous vous conseillons de le changer dès votre première connexion dans votre espace.</p>
-                    <p>Pensez aussi à vérifier votre adresse email en cliquant sur le lien que nous vous avons envoyé.</p>
-                    `,
-          nomDestinataire: userToPost.name,
-        });
-        toast({
-          variant: "default",
-          title: tAuth("succes"),
-          description: tAdmin(
-            "le-compte-utilisateur-de-usertopost-name-a-ete-cree-avec-succes-un-email-avec-un-lien-de-verification-a-ete-envoye-a-usertopost-email",
-            { userName: client.nomEntreprise, userEmail: client.nomContact }
-          ),
-        });
-        setLoading(false);
-      },
-      onError: (ctx) => {
-        toast({
-          variant: "destructive",
-          title: tAuth("erreur"),
-          description:
-            ctx.error.status === 422
-              ? tAdmin(
-                  "cet-email-est-deja-utilise-par-un-autre-compte-utilisateur"
-                )
-              : (ctx.error.message ??
-                tAdmin(
-                  "une-erreur-est-survenue-lors-de-la-creation-de-lutilisateur"
-                )),
-        });
-        setLoading(false);
-      },
-    });
+    executeSaveUser(defaultValues);
   };
 
   return (
-    <>
+    <form onSubmit={form.handleSubmit(submitForm)}>
       {clients && clients.length > 0 && (
         <div className="flex flex-col gap-10">
           <div className="flex gap-4 w-full items-center">
@@ -136,10 +127,9 @@ const ClientForm = ({ clients }: ClientFormProps) => {
             size="lg"
             title={tAdmin("creer-un-compte")}
             className="text-base mt-6 w-full"
-            disabled={loading || !clientId}
-            onClick={handleSubmit}
+            disabled={isSavingUser || !clientId}
           >
-            {loading ? (
+            {isSavingUser ? (
               <Loader2 size={16} className="animate-spin" />
             ) : (
               tAdmin("creer-un-compte")
@@ -147,7 +137,7 @@ const ClientForm = ({ clients }: ClientFormProps) => {
           </Button>
         </div>
       )}
-    </>
+    </form>
   );
 };
 

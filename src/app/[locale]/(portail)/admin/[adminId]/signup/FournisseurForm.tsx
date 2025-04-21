@@ -1,5 +1,6 @@
 "use client";
-import { insertFournisseurAction } from "@/actions/insertFournisseurAction";
+import { insertFournisseurAction } from "@/actions/fournisseurAction";
+import { insertUserAction } from "@/actions/userAction";
 import { InputWithLabel } from "@/components/formInputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
@@ -12,9 +13,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { authClient } from "@/lib/auth-client";
-import { generatePassword } from "@/lib/generatePassword";
-import { sendEmailFromClient } from "@/lib/sendEmail";
 import {
   createInsertFournisseurSchema,
   InsertFournisseurType,
@@ -34,7 +32,6 @@ type FournisseurFormProps = {
 const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
   const tAuth = useTranslations("auth");
   const tAdmin = useTranslations("admin");
-  const [loading, setLoading] = useState(false);
   const [fournisseurId, setFournisseurId] = useState<number | null>(null);
   const defaultValues: InsertFournisseurType = {
     nomFournisseur: "",
@@ -78,7 +75,36 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
         title: tAuth("erreur"),
         description:
           error?.serverError ||
-          tAdmin("une-erreur-est-survenue-lors-de-la-creation-de-lutilisateur"),
+          tAuth(
+            "une-erreur-est-survenue-lors-de-la-creation-du-compte-utilisateur"
+          ),
+      });
+    },
+  });
+
+  const {
+    execute: executeSaveUser,
+    isPending: isSavingUser,
+    reset: resetSaveUserAction,
+  } = useAction(insertUserAction, {
+    onSuccess: ({ data }) => {
+      toast({
+        variant: "default",
+        title: tAuth("succes"),
+        description: data?.message,
+      });
+      form.reset(defaultValues);
+      resetSaveUserAction();
+    },
+    onError: ({ error }) => {
+      toast({
+        variant: "destructive",
+        title: tAuth("erreur"),
+        description:
+          error?.serverError ||
+          tAuth(
+            "une-erreur-est-survenue-lors-de-la-creation-du-compte-utilisateur"
+          ),
       });
     },
   });
@@ -116,65 +142,13 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
     if (!fournisseurId) {
       executeSaveFournisseur(data);
     } else {
-      const tempPassword = generatePassword();
-      const userToPost = {
+      executeSaveUser({
         name: data.nomFournisseur.toUpperCase(),
         email: data.emailContact.toLowerCase(),
-        password: tempPassword,
+        password: "temp",
         role: "fournisseur",
         fournisseurId,
-      };
-      await authClient.signUp.email(userToPost, {
-        onRequest: () => {
-          setLoading(true);
-        },
-        onSuccess: async () => {
-          toast({
-            variant: "default",
-            title: tAuth("succes"),
-            description: tAdmin(
-              "le-compte-utilisateur-de-usertopost-name-a-ete-cree-avec-succes-un-email-avec-un-lien-de-verification-a-ete-envoye-a-usertopost-email",
-              { userName: userToPost.name, userEmail: userToPost.email }
-            ),
-          });
-          try {
-            await sendEmailFromClient({
-              to: userToPost.email,
-              from: "noreply@fm4all.com",
-              subject: "Création de votre compte fournisseur",
-              text: `<p>Votre compte fournisseur a été crée avec succès, bienvenue chez fm4all !</p><br/>
-                    <p>Voici mot de passe temporaire : ${tempPassword}</p><br/>
-                    <p>Nous vous conseillons de le changer dès votre première connexion dans votre espace.</p>
-                    <p>Pensez aussi à vérifier votre adresse email en cliquant sur le lien que nous vous avons envoyé.</p>
-                    `,
-              nomDestinataire: userToPost.name,
-            });
-            setFournisseurId(null);
-            form.reset(defaultValues);
-          } catch (err) {
-            toast({
-              variant: "destructive",
-              title: tAuth("erreur"),
-              description:
-                (err as Error)?.message ??
-                tAdmin("une-erreur-est-survenue-lors-de-lenvoi-de-lemail"),
-            });
-          } finally {
-            setLoading(false);
-          }
-        },
-        onError: (ctx) => {
-          toast({
-            variant: "destructive",
-            title: tAuth("erreur"),
-            description:
-              ctx.error.message ??
-              tAdmin(
-                "une-erreur-est-survenue-lors-de-la-creation-du-compte-utilisateur"
-              ),
-          });
-          setLoading(false);
-        },
+        image: null,
       });
     }
   };
@@ -254,9 +228,9 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
               size="lg"
               title={tAdmin("creer-un-compte")}
               className="text-base mt-6 w-full"
-              disabled={isSavingFournisseur || loading}
+              disabled={isSavingFournisseur || isSavingUser}
             >
-              {isSavingFournisseur || loading ? (
+              {isSavingFournisseur || isSavingUser ? (
                 <Loader2 size={16} className="animate-spin" />
               ) : (
                 tAdmin("creer-un-compte")

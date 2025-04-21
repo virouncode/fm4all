@@ -121,7 +121,14 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
         try {
           setLoading(true);
           const newClientData = data?.data.client;
-          if (!newClientData) return;
+          if (!newClientData) {
+            toast({
+              variant: "destructive",
+              title: t("erreur"),
+              description: t("une-erreur-est-survenue"),
+            });
+            return;
+          }
           const numerosDevis = `${newClientData?.nomEntreprise}_${DateTime.local().toFormat(
             "dd-MM-yyyy'T'HH:mm"
           )}`;

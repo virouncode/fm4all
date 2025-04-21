@@ -50,7 +50,7 @@ const HeaderFournisseur = () => {
   return (
     <div className="w-full sticky top-0 h-16 bg-background z-50 shadow">
       <header className="max-w-7xl h-full flex justify-between items-center p-6 mx-auto">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-6 flex-1">
           <div className="relative h-[23px] w-[100px]">
             <Link href="/">
               <Image
@@ -62,7 +62,7 @@ const HeaderFournisseur = () => {
               />
             </Link>
           </div>
-          <nav className="hidden xl:flex items-center gap-8">
+          <nav className="hidden xl:flex items-center gap-14 justify-center flex-1">
             <div
               className={`flex gap-1 items-center ${
                 isActive("/fournisseur/[fournisseurId]")

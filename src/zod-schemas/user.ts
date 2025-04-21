@@ -32,7 +32,5 @@ export const insertUserSchema = createInsertSchema(user, {
 export type InsertUserType = typeof insertUserSchema._type;
 
 //UPDATE
-export const updateUserSchema = createUpdateSchema(user).extend({
-  password: z.string().min(1, "Password is required"),
-});
+export const updateUserSchema = createUpdateSchema(user);
 export type UpdateUserType = typeof updateUserSchema._type;

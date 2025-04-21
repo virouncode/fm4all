@@ -11,6 +11,8 @@ import { sendEmailFromServer } from "@/lib/sendEmail";
 import {
   insertFournisseurSchema,
   InsertFournisseurType,
+  updateFournisseurSchema,
+  UpdateFournisseurType,
 } from "@/zod-schemas/fournisseur";
 import { and, eq } from "drizzle-orm";
 import { getLocale } from "next-intl/server";
@@ -29,8 +31,8 @@ export const insertFournisseurAction = actionClient
       parsedInput: InsertFournisseurType;
     }) => {
       const locale = await getLocale();
-      const user = (await getSession())?.user;
-      if (user?.role !== "admin") {
+      const currentUser = (await getSession())?.user;
+      if (currentUser?.role !== "admin") {
         throw new Error(
           locale === "fr"
             ? "Vous n'avez pas les droits pour créer un compte fournisseur."
@@ -56,8 +58,8 @@ export const insertFournisseurAction = actionClient
       if (existingFournisseur.length > 0) {
         throw new Error(
           locale === "fr"
-            ? "Cette email est déjà utilisé par un fournisseur."
-            : "This email is already used by a provider account"
+            ? "Cette email est déjà utilisé par un compte utilisateur."
+            : "This email is already used by a user account"
         );
       }
       const resultFournisseur = await db
@@ -82,27 +84,6 @@ export const insertFournisseurAction = actionClient
           fournisseurId: resultFournisseur[0].id,
           clientId: null,
         },
-        // fetchOptions: {
-        //   onResponse: () => {
-        //     setLoading(false);
-        //   },
-        //   onRequest: () => {
-        //     setLoading(true);
-        //   },
-        //   onError: (ctx) => {
-        //     toast({
-        //       variant: "destructive",
-        //       title: "Error",
-        //       description: ctx.error.message,
-        //     });
-        //   },
-        //   onSuccess: async () => {
-        //     toast({
-        //       title: "Success",
-        //       description: "Account created successfully",
-        //     });
-        //   },
-        // },
       });
       await sendEmailFromServer({
         to: fournisseurToPost.emailContact,
@@ -120,9 +101,71 @@ export const insertFournisseurAction = actionClient
         success: true,
         message:
           locale === "fr"
-            ? `Le compte du fournisseur ${fournisseurToPost.nomFournisseur} a été crée avec succès`
-            : `${fournisseurToPost.nomFournisseur}'s provider account has been successfully created`,
+            ? `Le compte du fournisseur ${fournisseurToPost.nomFournisseur} a été crée avec succès. Un email avec un lien de vérification a été envoyé à ${fournisseurToPost.emailContact}`
+            : `${fournisseurToPost.nomFournisseur}'s provider account has been successfully created. A verification email has been sent to ${fournisseurToPost.emailContact}`,
         data: { fournisseurId: resultFournisseur[0]?.id },
+      };
+    }
+  );
+
+export const updateFournisseurAction = actionClient
+  .metadata({ actionName: "updateFournisseurAction" })
+  .schema(updateFournisseurSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(
+    async ({
+      parsedInput: fournisseurInput,
+    }: {
+      parsedInput: UpdateFournisseurType;
+    }) => {
+      const locale = await getLocale();
+      const currentUser = (await getSession())?.user;
+      if (!currentUser) {
+        throw new Error(
+          locale === "fr"
+            ? "Vous devez être connecté pour mettre à jour vote compte fournisseur."
+            : "You must be logged in to update your provider account."
+        );
+      }
+      if (currentUser?.fournisseurId !== fournisseurInput.id) {
+        throw new Error(
+          locale === "fr"
+            ? "Vous n'avez pas les droits pour mettre à jour ce compte fournisseur."
+            : "You do not have permission to update this provider account."
+        );
+      }
+      const fournisseurToUpdate: UpdateFournisseurType = {
+        ...fournisseurInput,
+        nomFournisseur: fournisseurInput.nomFournisseur?.toUpperCase(),
+        siret: fournisseurInput.siret
+          ? formatSIRET(fournisseurInput.siret)
+          : "",
+        prenomContact: capitalize(fournisseurInput.prenomContact),
+        nomContact: capitalize(fournisseurInput.nomContact),
+        emailContact: fournisseurInput.emailContact?.toLowerCase(),
+      };
+
+      const resultFournisseur = await db
+        .update(fournisseurs)
+        .set(fournisseurToUpdate)
+        .returning();
+
+      if (!resultFournisseur[0]?.id) {
+        throw new Error(
+          locale === "fr"
+            ? "Impossible de créer mettre à jour le profil fournisseur."
+            : "Unable to update the provider profile"
+        );
+      }
+      return {
+        success: true,
+        message:
+          locale === "fr"
+            ? "Votre profil a bien été mis à jour."
+            : "Your profile has been successfully updated.",
+        data: { fournisseur: resultFournisseur[0] },
       };
     }
   );

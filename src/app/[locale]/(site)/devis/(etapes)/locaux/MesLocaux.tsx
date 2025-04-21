@@ -53,7 +53,7 @@ import { createMesLocauxSchema, MesLocauxType } from "@/zod-schemas/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useContext, useRef, useState } from "react";
+import { ChangeEvent, useContext, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { reinitialisationDevis } from "./reinitialisationDevis";
 import ServicesLoader from "./ServicesLoader";
@@ -250,29 +250,29 @@ const MesLocaux = () => {
     }, 3000);
   };
 
-  // const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-  //   const { name, value } = e.target;
-  //   if (name === "surface") {
-  //     const newValue = value ? parseInt(value) : 50;
-  //     setClient((prev) => ({
-  //       ...prev,
-  //       [name]: newValue > MAX_SURFACE ? MAX_SURFACE : newValue,
-  //     }));
-  //     return;
-  //   }
-  //   if (name === "effectif") {
-  //     const newValue = value ? parseInt(value) : 1;
-  //     setClient((prev) => ({
-  //       ...prev,
-  //       [name]: newValue > MAX_EFFECTIF ? MAX_EFFECTIF : newValue,
-  //     }));
-  //     return;
-  //   }
-  //   setClient((prev) => ({
-  //     ...prev,
-  //     [name]: value,
-  //   }));
-  // };
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (name === "surface") {
+      const newValue = value ? parseInt(value) : 50;
+      setClient((prev) => ({
+        ...prev,
+        [name]: newValue > MAX_SURFACE ? MAX_SURFACE : newValue,
+      }));
+      return;
+    }
+    if (name === "effectif") {
+      const newValue = value ? parseInt(value) : 1;
+      setClient((prev) => ({
+        ...prev,
+        [name]: newValue > MAX_EFFECTIF ? MAX_EFFECTIF : newValue,
+      }));
+      return;
+    }
+    setClient((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleSelect = (value: string, name: string) => {
     setClient((prev) => ({

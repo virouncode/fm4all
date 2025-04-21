@@ -36,7 +36,7 @@ export function FileInputWithLabel<S>({
       name={nameInSchema}
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="text-sm" htmlFor={nameInSchema}>
+          <FormLabel className="text-base" htmlFor={nameInSchema}>
             {fieldTitle}
           </FormLabel>
           <FormControl>
