@@ -19,6 +19,7 @@ import { useForm } from "react-hook-form";
 const AdminForm = () => {
   const tAdmin = useTranslations("admin");
   const tAuth = useTranslations("auth");
+  const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [image, setImage] = useState<File | null>(null);
 
@@ -71,6 +72,7 @@ const AdminForm = () => {
   const submitForm = async (data: InsertAdminType) => {
     // executeSaveAdmin({ ...data, image: imagePreview });
     let imageUrl: string | null = null;
+    setLoading(true);
     if (image) {
       imageUrl = await postVercelBlob({
         file: image,
@@ -83,6 +85,7 @@ const AdminForm = () => {
       image: imageUrl,
     };
     executeSaveAdmin(adminToPost);
+    setLoading(false);
   };
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

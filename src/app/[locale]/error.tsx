@@ -2,7 +2,6 @@
 
 import BackButton from "@/components/back-button";
 import { Button } from "@/components/ui/button";
-import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 
 export default function Error({
@@ -16,12 +15,10 @@ export default function Error({
     // Log the error to an error reporting service
     console.error(error);
   }, [error]);
-  const t = useTranslations("Erreur");
-
   return (
     <div className="flex items-center justify-center max-w-prose mx-auto h-[calc(100vh-4rem)]">
       <div className="flex flex-col gap-2">
-        <h2 className="font-bold text-lg text-center">{t("erreur")}</h2>
+        <h2 className="font-bold text-lg text-center">Erreur</h2>
         <p>{error.message}</p>
         <div className="flex gap-4">
           <Button
@@ -33,10 +30,10 @@ export default function Error({
             size="lg"
             className="flex-1"
           >
-            {t("reessayer")}
+            Réessayer
           </Button>
           <BackButton
-            title={t("retour")}
+            title="Retour"
             size="lg"
             variant="outline"
             className="flex-1"

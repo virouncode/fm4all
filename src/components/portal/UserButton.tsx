@@ -66,7 +66,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
                 alt="avatar-utilisateur"
                 width={32}
                 height={32}
-                className="object-cover"
+                className={`${user.role === "admin" ? "object-cover" : "object-contain"}`}
               />
             ) : (
               <UserCheck />

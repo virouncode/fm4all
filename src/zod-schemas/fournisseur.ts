@@ -5,6 +5,7 @@ import {
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-zod";
+import { z } from "zod";
 
 //SELECT
 export const selectFournisseurSchema = createSelectSchema(fournisseurs, {
@@ -61,7 +62,25 @@ export const insertFournisseurSchema = createInsertFournisseurSchema({
 export type InsertFournisseurType = typeof insertFournisseurSchema._type;
 
 //UPDATE
-export const createUpdateFournisseurSchema = (messages: {
+export const updateFournisseurSchema = createUpdateSchema(fournisseurs, {
+  nomFournisseur: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
+  siret: (schema) =>
+    schema.refine((value) => !value || isValidSIRET(value), {
+      message: "Siret invalide",
+    }),
+  prenomContact: (schema) => schema.min(1, "Prénom du contact obligatoire"),
+  nomContact: (schema) => schema.min(1, "Nom du contact obligatoire"),
+  emailContact: (schema) => schema.email("Email du contact invalide"),
+  phoneContact: (schema) =>
+    schema.regex(
+      /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{2,4}([-.\s]?\d{2,4}){2,3}$/,
+      "Numéro de téléphone invalide"
+    ),
+});
+
+export type UpdateFournisseurType = typeof updateFournisseurSchema._type;
+
+export const createUpdateFournisseurFormSchema = (messages: {
   nomFournisseur: string;
   siret: string;
   prenomContact: string;
@@ -81,9 +100,34 @@ export const createUpdateFournisseurSchema = (messages: {
         /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{2,4}([-.\s]?\d{2,4}){2,3}$/,
         messages.phoneContact
       ),
+    noteGoogle: (schema) =>
+      schema
+        .refine((value) => !value || value.match(/^\d+([.,]\d+)?$/), {
+          message: "Note Google invalide",
+        })
+        .nullable(),
+  }).extend({
+    anneeCreation: z
+      .string()
+      .refine((value) => !value || value.match(/^\d{4}$/), {
+        message: "Année de création invalide",
+      })
+      .nullable(),
+    nbClients: z
+      .string()
+      .refine((value) => !value || value.match(/^\d+$/), {
+        message: "Nombre de clients invalide",
+      })
+      .nullable(),
+    nbAvis: z
+      .string()
+      .refine((value) => !value || value.match(/^\d+$/), {
+        message: "Nombre d'avis invalide",
+      })
+      .nullable(),
   });
 };
-export const updateFournisseurSchema = createUpdateFournisseurSchema({
+export const updateFournisseurFormSchema = createUpdateFournisseurFormSchema({
   nomFournisseur: "Nom de l'entreprise obligatoire",
   siret: "Siret invalide",
   prenomContact: "Prénom du contact obligatoire",
@@ -92,4 +136,5 @@ export const updateFournisseurSchema = createUpdateFournisseurSchema({
   phoneContact: "Numéro de téléphone invalide",
 });
 
-export type UpdateFournisseurType = typeof updateFournisseurSchema._type;
+export type UpdateFournisseurFormType =
+  typeof updateFournisseurFormSchema._type;

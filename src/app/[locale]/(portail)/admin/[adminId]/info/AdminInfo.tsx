@@ -88,9 +88,8 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
     let imageUrl: string | null = null;
     setLoading(true);
     if (!imagePreview && info.image) {
-      deleteVercelBlob({ url: info.image });
-    }
-    if (image) {
+      await deleteVercelBlob({ url: info.image });
+    } else if (image) {
       if (info.image) await deleteVercelBlob({ url: info.image });
       imageUrl = await postVercelBlob({
         file: image,

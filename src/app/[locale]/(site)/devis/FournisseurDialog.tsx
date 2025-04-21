@@ -5,6 +5,7 @@ import Image from "next/image";
 type FournisseurDialogProps = {
   logoUrl: string | null;
   sloganFournisseur: string | null;
+  presentation?: string | null;
   locationUrl: string | null;
   nomFournisseur: string | null;
   anneeCreation: number | null;
@@ -19,6 +20,7 @@ const FournisseurDialog = ({
   logoUrl,
   locationUrl,
   sloganFournisseur,
+  presentation,
   nomFournisseur,
   anneeCreation,
   ca,
@@ -81,6 +83,11 @@ const FournisseurDialog = ({
           />
         </div>
       ) : null}
+      {presentation && (
+        <p className="whitespace-pre hyphens-auto text-wrap my-6">
+          {presentation}
+        </p>
+      )}
       <p>
         {t("annee-de-creation")} {anneeCreation}
       </p>

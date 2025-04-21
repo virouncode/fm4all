@@ -1,6 +1,6 @@
 "use server";
 import { db } from "@/db";
-import { fournisseurs } from "@/db/schema";
+import { fournisseurs, user } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { getSession } from "@/lib/auth-session";
 import { capitalize } from "@/lib/capitalize";
@@ -14,6 +14,7 @@ import {
   updateFournisseurSchema,
   UpdateFournisseurType,
 } from "@/zod-schemas/fournisseur";
+import { UpdateUserType } from "@/zod-schemas/user";
 import { and, eq } from "drizzle-orm";
 import { getLocale } from "next-intl/server";
 import { flattenValidationErrors } from "next-safe-action";
@@ -136,6 +137,7 @@ export const updateFournisseurAction = actionClient
             : "You do not have permission to update this provider account."
         );
       }
+
       const fournisseurToUpdate: UpdateFournisseurType = {
         ...fournisseurInput,
         nomFournisseur: fournisseurInput.nomFournisseur?.toUpperCase(),
@@ -146,10 +148,18 @@ export const updateFournisseurAction = actionClient
         nomContact: capitalize(fournisseurInput.nomContact),
         emailContact: fournisseurInput.emailContact?.toLowerCase(),
       };
+      if (!fournisseurToUpdate.id) {
+        throw new Error(
+          locale === "fr"
+            ? "Impossible de mettre à jour le profil fournisseur."
+            : "Unable to update the provider profile"
+        );
+      }
 
       const resultFournisseur = await db
         .update(fournisseurs)
         .set(fournisseurToUpdate)
+        .where(eq(fournisseurs.id, fournisseurToUpdate.id))
         .returning();
 
       if (!resultFournisseur[0]?.id) {
@@ -159,6 +169,21 @@ export const updateFournisseurAction = actionClient
             : "Unable to update the provider profile"
         );
       }
+      //mettre à jour l'avatar du fournisseur
+      const correspondingUser = await db
+        .select()
+        .from(user)
+        .where(eq(user.fournisseurId, fournisseurToUpdate.id))
+        .limit(1);
+      const userToUpdate: UpdateUserType = {
+        ...correspondingUser[0],
+        image: fournisseurInput.logoUrl,
+      };
+      await db
+        .update(user)
+        .set(userToUpdate)
+        .where(eq(user.id, correspondingUser[0].id));
+
       return {
         success: true,
         message:

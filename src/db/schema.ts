@@ -76,6 +76,7 @@ export const fournisseurs = pgTable("fournisseurs", {
   dateChiffrage: date("date_chiffrage", { mode: "string" }),
   status: statusEnum().notNull().default("active"),
   slogan: varchar(),
+  presentation: varchar(),
   logoUrl: varchar("logo_url"),
   locationUrl: varchar("location_url"),
   anneeCreation: integer("annee_creation"),
