@@ -22,6 +22,8 @@ import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
+import { deleteVercelBlob } from "@/lib/queries/deleteVercelBlob";
+import { postVercelBlob } from "@/lib/queries/postVercelBlob";
 import {
   createUpdateFournisseurSchema,
   SelectFournisseurType,
@@ -107,7 +109,24 @@ const FournisseurUpdateForm = ({
   };
 
   const submitForm = async (data: UpdateFournisseurType) => {
-    executeUpdateFournisseur(data);
+    let imageUrl: string | null = null;
+    if (!imagePreview && initialFournisseur.logoUrl) {
+      await deleteVercelBlob({ url: initialFournisseur.logoUrl });
+    }
+    if (image) {
+      if (initialFournisseur.logoUrl)
+        await deleteVercelBlob({ url: initialFournisseur.logoUrl });
+      imageUrl = await postVercelBlob({
+        file: image,
+        filename: `logo_${data.nomFournisseur}`,
+        foldername: "logos_fournisseurs",
+      });
+    }
+    const fournisseurToUpdate: UpdateFournisseurType = {
+      ...data,
+      logoUrl: imageUrl,
+    };
+    executeUpdateFournisseur(fournisseurToUpdate);
   };
 
   return (

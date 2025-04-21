@@ -6,6 +6,7 @@ import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
+import { postVercelBlob } from "@/lib/queries/postVercelBlob";
 import { createInsertAdminSchema, InsertAdminType } from "@/zod-schemas/admin";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, X } from "lucide-react";
@@ -71,16 +72,13 @@ const AdminForm = () => {
     // executeSaveAdmin({ ...data, image: imagePreview });
     let imageUrl: string | null = null;
     if (image) {
-      const response = await fetch(
-        `/api/vercelblob?filename=${data.prenom}_${data.nom}_avatar&foldername=admin_avatars`,
-        {
-          method: "POST",
-          body: image,
-        }
-      );
-      imageUrl = (await response.json()).url;
+      imageUrl = await postVercelBlob({
+        file: image,
+        filename: `${data.prenom}_${data.nom}_avatar`,
+        foldername: "admin_avatars",
+      });
     }
-    const adminToPost = {
+    const adminToPost: InsertAdminType = {
       ...data,
       image: imageUrl,
     };

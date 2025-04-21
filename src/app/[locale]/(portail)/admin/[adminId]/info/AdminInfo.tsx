@@ -15,6 +15,8 @@ import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
+import { deleteVercelBlob } from "@/lib/queries/deleteVercelBlob";
+import { postVercelBlob } from "@/lib/queries/postVercelBlob";
 import { createUpdateAdminSchema, UpdateAdminType } from "@/zod-schemas/admin";
 import { SelectUserType } from "@/zod-schemas/user";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -85,29 +87,16 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
   const submitForm = async (data: UpdateAdminType) => {
     let imageUrl: string | null = null;
     setLoading(true);
-    if (!imagePreview) {
-      await fetch(`/api/vercelblob?url=${info.image}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+    if (!imagePreview && info.image) {
+      deleteVercelBlob({ url: info.image });
     }
     if (image) {
-      await fetch(`/api/vercelblob?url=${info.image}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      if (info.image) await deleteVercelBlob({ url: info.image });
+      imageUrl = await postVercelBlob({
+        file: image,
+        filename: `${data.prenom}_${data.nom}_avatar`,
+        foldername: "admin_avatars",
       });
-      const response = await fetch(
-        `/api/vercelblob?filename=${data.prenom}_${data.nom}_avatar&foldername=admin_avatars`,
-        {
-          method: "POST",
-          body: image,
-        }
-      );
-      imageUrl = (await response.json()).url;
     }
     const adminToUpdate = {
       ...data,
