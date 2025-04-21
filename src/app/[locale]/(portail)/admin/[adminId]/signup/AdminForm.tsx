@@ -72,7 +72,7 @@ const AdminForm = () => {
     let imageUrl: string | null = null;
     if (image) {
       const response = await fetch(
-        `/api/vercelblob/upload?filename=${data.prenom}_${data.nom}_avatar&foldername=admin_avatars`,
+        `/api/vercelblob?filename=${data.prenom}_${data.nom}_avatar&foldername=admin_avatars`,
         {
           method: "POST",
           body: image,

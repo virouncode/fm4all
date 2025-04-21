@@ -149,7 +149,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
               const file = new File([blob], nomDevis);
               //Dans vercel blob
               const response = await fetch(
-                `/api/vercelblob/upload?filename=${nomDevis}&foldername=devis`,
+                `/api/vercelblob?filename=${nomDevis}&foldername=devis`,
                 {
                   method: "POST",
                   body: file,
@@ -160,8 +160,6 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                 clientId: newClientData.id,
                 devisUrl: urlToPost,
               });
-              console.log("urlToPost", urlToPost);
-
               setDevisUrl(urlToPost);
               await sendEmailFromClient({
                 to: "contact@fm4all.com",

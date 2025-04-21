@@ -14,7 +14,6 @@ import { Form } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
 import { Link, useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth-client";
-import { InsertAdminType } from "@/zod-schemas/admin";
 import { createSignInSchema, SignInType } from "@/zod-schemas/signIn";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
@@ -26,7 +25,6 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const t = useTranslations("auth");
-  const tGlobal = useTranslations("Global");
 
   const defaultValues: SignInType = {
     email: "",
@@ -102,12 +100,12 @@ export default function SignIn() {
             <Form {...form}>
               <form onSubmit={form.handleSubmit(submitForm)}>
                 <div className="grid gap-4">
-                  <InputWithLabel<InsertAdminType>
+                  <InputWithLabel<SignInType>
                     fieldTitle={t("email")}
                     nameInSchema="email"
                     type="email"
                   />
-                  <InputWithLabel<InsertAdminType>
+                  <InputWithLabel<SignInType>
                     fieldTitle={t("mot-de-passe")}
                     nameInSchema="password"
                     type="password"

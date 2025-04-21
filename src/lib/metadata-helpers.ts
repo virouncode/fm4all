@@ -198,8 +198,6 @@ export const isValidPathForLocale = (
   pathWithoutLocale: string,
   locale: "fr" | "en"
 ): boolean => {
-  // console.log("pathWithoutLocale", pathWithoutLocale);
-
   const validPaths = Object.values(routes).map((route) => route[locale]);
   // console.log("validPaths", validPaths);
   if (validPaths.includes(pathWithoutLocale)) return true;

@@ -32,6 +32,7 @@ type AdminInfoProps = {
 const AdminInfo = ({ info }: AdminInfoProps) => {
   const tAuth = useTranslations("auth");
   const tAdmin = useTranslations("admin");
+  const [loading, setLoading] = useState(false);
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(info.image);
   const defaultValues: UpdateAdminType = {
@@ -64,7 +65,9 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
         title: tAuth("succes"),
         description: data?.message,
       });
+      form.reset(defaultValues);
       resetUpdateAdminAction();
+      window.location.reload();
     },
     onError: ({ error }) => {
       toast({
@@ -81,11 +84,24 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
 
   const submitForm = async (data: UpdateAdminType) => {
     let imageUrl: string | null = null;
-    console.log("submit");
-
+    setLoading(true);
+    if (!imagePreview) {
+      await fetch(`/api/vercelblob?url=${info.image}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    }
     if (image) {
+      await fetch(`/api/vercelblob?url=${info.image}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       const response = await fetch(
-        `/api/vercelblob/upload?filename=${data.prenom}_${data.nom}_avatar&foldername=admin_avatars`,
+        `/api/vercelblob?filename=${data.prenom}_${data.nom}_avatar&foldername=admin_avatars`,
         {
           method: "POST",
           body: image,
@@ -98,6 +114,7 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
       image: imageUrl,
     };
     executeUpdateAdmin(adminToUpdate);
+    setLoading(false);
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -200,9 +217,9 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
                   size="lg"
                   title={tAdmin("mettre-a-jour")}
                   className="text-base w-full mt-6"
-                  disabled={isUpdatingAdmin}
+                  disabled={isUpdatingAdmin || loading}
                 >
-                  {isUpdatingAdmin ? (
+                  {isUpdatingAdmin || loading ? (
                     <Loader2 size={16} className="animate-spin" />
                   ) : (
                     tAdmin("mettre-a-jour")
