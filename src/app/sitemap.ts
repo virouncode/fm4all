@@ -3,6 +3,7 @@ import {
   getArticlesSubSlugEn,
 } from "@/i18n/articlesSlugMappings";
 import { routing } from "@/i18n/routing";
+import { getSecteurSlugEn } from "@/i18n/secteursSlugMappings";
 import { getServicesSlugEn } from "@/i18n/servicesSlugMappings";
 import { getTagSlugEn } from "@/i18n/tagsSlugMappings";
 import {
@@ -156,7 +157,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.7,
       },
       {
-        url: `${APP_URL}/en/sectors/${getTagSlugEn(slug)}`,
+        url: `${APP_URL}/en/sectors/${getSecteurSlugEn(slug)}`,
         lastModified: lastMod,
         changeFrequency: "weekly",
         priority: 0.7,
