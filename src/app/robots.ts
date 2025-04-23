@@ -8,6 +8,7 @@ import { getTagSlugEn } from "@/i18n/tagsSlugMappings";
 import {
   fetchArticleCategories,
   fetchArticleSlugs,
+  fetchSecteursSlugs,
   fetchServiceSlugs,
   fetchTagsSlugs,
 } from "@/sanity/queries";
@@ -38,7 +39,7 @@ const generateWrongStaticUrls = () => {
         localizedPath = path;
       }
       // Ajouter l'URL au sitemap
-      urls.push(`/${locale}${localizedPath}`);
+      urls.push(`/${locale}${localizedPath}/*`);
     }
   }
   return urls;
@@ -50,6 +51,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
   const articlesCategories = await fetchArticleCategories();
   const articleSlugs = await fetchArticleSlugs();
   const tagsSlugs = await fetchTagsSlugs();
+  const secteursSlugs = await fetchSecteursSlugs();
 
   const wrongServicesUrls = serviceSlugs.flatMap((slug) =>
     slug
@@ -65,6 +67,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     `/en/posts/${article.slug}/${article.subSlug}`,
     `/en/posts/${article.slug}/${getArticlesSubSlugEn(article.subSlug)}`,
   ]);
+  const wrongSecteursUrls = secteursSlugs.flatMap((slug) => []);
 
   const wrongTagsUrls = tagsSlugs
     .filter(

@@ -8,6 +8,7 @@ import { getTagSlugEn } from "@/i18n/tagsSlugMappings";
 import {
   fetchArticleCategories,
   fetchArticleSlugs,
+  fetchSecteursSlugs,
   fetchServiceSlugs,
   fetchTagsSlugs,
 } from "@/sanity/queries";
@@ -73,6 +74,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const articlesCategories = await fetchArticleCategories();
   const articleSlugs = await fetchArticleSlugs();
   const tagsSlugs = await fetchTagsSlugs();
+  const secteursSlugs = await fetchSecteursSlugs();
 
   const servicesUrls: MetadataRoute.Sitemap = serviceSlugs.flatMap((slug) => {
     if (!slug) return [];
@@ -144,6 +146,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       },
     ];
   });
+  const secteursUrls: MetadataRoute.Sitemap = secteursSlugs.flatMap((slug) => {
+    if (!slug) return [];
+    return [
+      {
+        url: `${APP_URL}/fr/secteurs/${slug}`,
+        lastModified: lastMod,
+        changeFrequency: "weekly",
+        priority: 0.7,
+      },
+      {
+        url: `${APP_URL}/en/sectors/${getTagSlugEn(slug)}`,
+        lastModified: lastMod,
+        changeFrequency: "weekly",
+        priority: 0.7,
+      },
+    ];
+  });
 
   return [
     ...staticUrls,
@@ -151,5 +170,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...articlesCategoriesUrls,
     ...articlesUrls,
     ...tagsUrls,
+    ...secteursUrls,
   ];
 }

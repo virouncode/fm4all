@@ -497,3 +497,9 @@ export const fetchTagsSlugs = async () => {
   const tags = await client.fetch<Tag[]>(query);
   return tags.map((tag) => tag.slug?.current).filter(Boolean);
 };
+
+export const fetchSecteursSlugs = async () => {
+  const query = `*[_type == "secteur" && (language == "fr" || language == null)]{slug{current}}`;
+  const secteurs = await client.fetch<Secteur[]>(query);
+  return secteurs.map((secteur) => secteur.slug?.current).filter(Boolean);
+};
