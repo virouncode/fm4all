@@ -25,20 +25,23 @@ const generateStaticUrls = () => {
     "/confidentialite",
     "/cookies",
     "/cgv",
-    "cgu",
-    "/chalandise",
+    "/cgu",
   ];
 
   // Pour chaque locale et chaque route définie dans routing.ts
   for (const locale of routing.locales) {
     // Parcourir toutes les routes définies dans routing.pathnames
     for (const [path, localized] of Object.entries(routing.pathnames)) {
-      // Ignorer les routes dynamiques avec paramètres
+      // Ignorer les routes dynamiques avec paramètres et les routes protégées
       if (
         (path.includes("[") && path.includes("]")) ||
         path.includes("/admin") ||
         path.includes("/client") ||
-        path.includes("/fournisseur")
+        path.includes("/fournisseur") ||
+        path.includes("/auth") ||
+        path.includes("/my-quote") ||
+        path.includes("/mon-devis") ||
+        path.includes("/chalandise")
       )
         continue;
 
@@ -137,13 +140,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: `${APP_URL}/fr/tag/${slug}`,
         lastModified: lastMod,
         changeFrequency: "weekly",
-        priority: 0.7,
+        priority: 0.5,
       },
       {
         url: `${APP_URL}/en/tag/${getTagSlugEn(slug)}`,
         lastModified: lastMod,
         changeFrequency: "weekly",
-        priority: 0.7,
+        priority: 0.5,
       },
     ];
   });
