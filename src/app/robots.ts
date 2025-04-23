@@ -114,7 +114,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/fr/mon-devis/mes-locaux", "/en/my-quote/my-premises"],
+        allow: ["/"],
         disallow: uniqueDisallowUrls,
       },
     ],
