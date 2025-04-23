@@ -3,6 +3,7 @@ import {
   getArticlesSubSlugEn,
 } from "@/i18n/articlesSlugMappings";
 import { routing } from "@/i18n/routing";
+import { getSecteurSlugEn } from "@/i18n/secteursSlugMappings";
 import { getServicesSlugEn } from "@/i18n/servicesSlugMappings";
 import { getTagSlugEn } from "@/i18n/tagsSlugMappings";
 import {
@@ -67,7 +68,11 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     `/en/posts/${article.slug}/${article.subSlug}`,
     `/en/posts/${article.slug}/${getArticlesSubSlugEn(article.subSlug)}`,
   ]);
-  const wrongSecteursUrls = secteursSlugs.flatMap((slug) => []);
+  const wrongSecteursUrls = secteursSlugs.flatMap((slug) =>
+    slug
+      ? [`/fr/secteurs/${getSecteurSlugEn(slug)}`, `/en/sectors/${slug}`]
+      : []
+  );
 
   const wrongTagsUrls = tagsSlugs
     .filter(
@@ -100,6 +105,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     ...wrongArticlesCategoriesUrls,
     ...wrongArticlesUrls,
     ...wrongTagsUrls,
+    ...wrongSecteursUrls,
   ];
 
   const uniqueDisallowUrls = [...new Set(disallowUrls)];
