@@ -1,5 +1,5 @@
 import { nettoyageTarifs } from "@/db/schema";
-import { createSelectSchema } from "drizzle-zod";
+import { createSelectSchema, createUpdateSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const selectNettoyageTarifsSchema = createSelectSchema(nettoyageTarifs, {
@@ -22,3 +22,23 @@ export const selectNettoyageTarifsSchema = createSelectSchema(nettoyageTarifs, {
 
 export type SelectNettoyageTarifsType =
   typeof selectNettoyageTarifsSchema._type;
+
+export const nettoyageTarifSchema = createSelectSchema(nettoyageTarifs, {
+  hParPassage: (schema) =>
+    schema.min(1, "Le nombre d'heures moyen par passage est obligatoire"),
+  tauxHoraire: (schema) => schema.min(1, "Le taux horaire est obligatoire"),
+  surface: (schema) => schema.min(1, "La surface est obligatoire"),
+});
+
+export type NettoyageTarifsType = typeof nettoyageTarifSchema._type;
+
+//UPDATE
+export const updateNettoyageTarifsSchema = createUpdateSchema(nettoyageTarifs, {
+  hParPassage: (schema) =>
+    schema.min(1, "Le nombre d'heures moyen par passage est obligatoire"),
+  tauxHoraire: (schema) => schema.min(1, "Le taux horaire est obligatoire"),
+  surface: (schema) => schema.min(1, "La surface est obligatoire"),
+});
+
+export type UpdateNettoyageTarifsType =
+  typeof updateNettoyageTarifsSchema._type;

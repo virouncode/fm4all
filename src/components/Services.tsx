@@ -4,7 +4,6 @@ import { getTranslations } from "next-intl/server";
 import ServicesCarousel from "./ServicesCarousel";
 
 const Services = async () => {
-  const tHeader = await getTranslations("header");
   const t = await getTranslations("HomePage.services");
   return (
     <section className="max-w-7xl w-full mx-auto flex flex-col gap-10 pt-8 pb-12 px-6 relative">

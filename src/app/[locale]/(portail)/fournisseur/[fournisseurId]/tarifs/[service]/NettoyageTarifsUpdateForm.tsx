@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  Tarif,
-  updateTarifAction,
-} from "@/actions/updateTarifsFournisseurAction";
+import { updateNettoyageTarifAction } from "@/actions/nettoyageTarifsAction";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,6 +14,7 @@ import {
 import { RATIO } from "@/constants/constants";
 import { useToast } from "@/hooks/use-toast";
 import { SelectNettoyageQuantitesType } from "@/zod-schemas/nettoyageQuantites";
+import { NettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { Loader } from "lucide-react";
 import { ChangeEvent, useState } from "react";
 
@@ -25,18 +23,8 @@ const mapping = {
   tauxHoraire: "Taux horaire tout compris (€/h HT)",
 };
 
-export type NettoyageTarif = {
-  id: number;
-  fournisseurId: number;
-  surface: number;
-  hParPassage: number;
-  tauxHoraire: number;
-  gamme: "essentiel" | "confort" | "excellence";
-  createdAt: Date;
-};
-
 type NettoyageTarifsUpdateFormProps = {
-  initialTarifs: NettoyageTarif[];
+  initialTarifs: NettoyageTarifsType[];
   quantites: SelectNettoyageQuantitesType[];
 };
 
@@ -44,7 +32,7 @@ export default function NettoyageTarifsUpdateForm({
   initialTarifs,
   quantites,
 }: NettoyageTarifsUpdateFormProps) {
-  const [tarifs, setTarifs] = useState<NettoyageTarif[]>(initialTarifs);
+  const [tarifs, setTarifs] = useState<NettoyageTarifsType[]>(initialTarifs);
   const [modifiedTarifs, setModifiedTarifs] = useState<Set<number>>(new Set());
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
@@ -58,7 +46,7 @@ export default function NettoyageTarifsUpdateForm({
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement>,
     id: number,
-    field: keyof NettoyageTarif
+    field: keyof NettoyageTarifsType
   ) => {
     // Filtrer pour n'accepter que les chiffres et les virgules/points
     const inputValue = e.target.value;
@@ -119,7 +107,7 @@ export default function NettoyageTarifsUpdateForm({
       if (!initialTarif) continue;
 
       // Vérifier quels champs ont été modifiés
-      const fieldsToUpdate: Array<keyof Tarif> = [];
+      const fieldsToUpdate: Array<keyof NettoyageTarifsType> = [];
       if (tarif.hParPassage !== initialTarif.hParPassage) {
         fieldsToUpdate.push("hParPassage");
       }
@@ -142,10 +130,17 @@ export default function NettoyageTarifsUpdateForm({
               setSaving(false);
               return;
             }
-            const result = await updateTarifAction(id, field, value * RATIO);
-            if (!result.success) {
+            const result = await updateNettoyageTarifAction({
+              id,
+              field,
+              value: value * RATIO,
+              table: "nettoyageTarifs",
+            });
+            if (!result?.data?.success) {
               success = false;
-              errorMessage = result.message;
+              errorMessage =
+                result?.data?.message ??
+                "Une erreur est survenue lors de la mise à jour";
               break;
             }
           }

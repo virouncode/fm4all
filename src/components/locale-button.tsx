@@ -15,6 +15,10 @@ import {
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import {
+  getSecteurSlugEn,
+  getSecteurSlugFr,
+} from "@/i18n/secteursSlugMappings";
+import {
   getServicesSlugEn,
   getServicesSlugFr,
 } from "@/i18n/servicesSlugMappings";
@@ -88,6 +92,17 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
             : getTagSlugEn(params.tag);
         router.replace(
           { pathname, params: { tag: newSlug }, query },
+          { locale: newLocale }
+        );
+      }
+    } else if (pathname === "/secteurs/[slug]") {
+      if (typeof params.slug === "string") {
+        const newSlug =
+          newLocale === "fr"
+            ? getSecteurSlugFr(params.slug)
+            : getSecteurSlugEn(params.slug);
+        router.replace(
+          { pathname, params: { slug: newSlug }, query },
           { locale: newLocale }
         );
       }

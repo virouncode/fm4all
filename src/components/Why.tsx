@@ -56,7 +56,7 @@ const Why = async () => {
           <strong>{t("le-probleme")}</strong>{" "}
           {t("un-marche-complexe-pour-les-petites-structures")}
         </p>
-        <div className="flex flex-col md:flex-row w-full lg:w-3/4 mx-auto border rounded-xl overflow-hidden">
+        <div className="flex flex-col md:flex-row w-full lg:w-3/4 mx-auto border rounded-xl overflow-hidden bg-[rgb(250,250,250)]">
           <div className="w-full md:w-2/3 p-6 md:py-10 md:px-16 flex flex-col gap-4 italic order-last md:order-first">
             <p>
               {t(

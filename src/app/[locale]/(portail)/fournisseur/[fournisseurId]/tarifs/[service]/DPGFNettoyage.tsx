@@ -6,10 +6,9 @@ import {
   getNettoyageTarifsRepasseFournisseur,
 } from "@/lib/queries/nettoyage/getNettoyage";
 import { SelectNettoyageQuantitesType } from "@/zod-schemas/nettoyageQuantites";
+import { NettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SprayCan } from "lucide-react";
-import NettoyageTarifsUpdateForm, {
-  NettoyageTarif,
-} from "./NettoyageTarifsUpdateForm";
+import NettoyageTarifsUpdateForm from "./NettoyageTarifsUpdateForm";
 
 type DPGFNettoyageProps = {
   fournisseurId: number;
@@ -22,11 +21,11 @@ const DPGFNettoyage = async ({ fournisseurId }: DPGFNettoyageProps) => {
     getNettoyageAllQuantites(),
   ]);
 
-  const tarifs: NettoyageTarif[] = tarifsData
+  const tarifs: NettoyageTarifsType[] = tarifsData
     ? tarifsData.sort((a, b) => a.surface - b.surface)
     : [];
 
-  const tarifsRepasse: NettoyageTarif[] = tarifsRepasseData
+  const tarifsRepasse: NettoyageTarifsType[] = tarifsRepasseData
     ? tarifsRepasseData.sort((a, b) => a.surface - b.surface)
     : [];
 
@@ -46,7 +45,15 @@ const DPGFNettoyage = async ({ fournisseurId }: DPGFNettoyageProps) => {
 
         <CalculatorDialog />
       </div>
+      <div className="border-l border-l-gray-500">
+        <h2 className="ml-4 mb-2 text-xl font-bold">Tarifs de nettoyage</h2>
+      </div>
       <NettoyageTarifsUpdateForm initialTarifs={tarifs} quantites={quantites} />
+      <div className="border-l mt-10 border-l-gray-500">
+        <h2 className="ml-4 mb-2  text-xl font-bold">
+          Tarifs de repasse sanitaire
+        </h2>
+      </div>
       <NettoyageTarifsUpdateForm
         initialTarifs={tarifsRepasse}
         quantites={quantites}

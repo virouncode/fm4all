@@ -11,7 +11,7 @@ const Presentation = async () => {
         <h2 className="text-2xl md:text-3xl border-l-2 px-4">
           {t("tpe-pme-en-ile-de-france")}
         </h2>
-        <div className="flex gap-8 justify-center items-center">
+        <div className="flex gap-8 justify-center items-center bg-[rgb(250,250,250)] rounded-xl p-8">
           <div className="flex flex-col gap-6">
             <div className="text-center fle flex-col font-bold text-xl">
               <p>{t("vous-emmenagez-dans-de-nouveaux-bureaux")}</p>
