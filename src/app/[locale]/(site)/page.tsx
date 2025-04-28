@@ -37,19 +37,21 @@ export const generateMetadata = async (): Promise<Metadata> => {
 
 export default function page() {
   return (
-    <main className="flex flex-col mb-24">
-      <Hero />
-      <Slogan />
-      <Presentation />
-      <Concept />
-      <Services />
-      <Partenaires />
-      <VideoPresentation />
-      <How />
-      <Why />
-      <Mission />
-      <HofManager />
-      <Articles />
-    </main>
+    <>
+      <main className="flex flex-col mb-24">
+        <Hero />
+        <Slogan />
+        <Presentation />
+        <Concept />
+        <Services />
+        <Partenaires />
+        <VideoPresentation />
+        <How />
+        <Why />
+        <Mission />
+        <HofManager />
+        <Articles />
+      </main>{" "}
+    </>
   );
 }
