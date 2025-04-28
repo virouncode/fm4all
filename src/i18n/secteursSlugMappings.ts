@@ -9,6 +9,8 @@ export const secteursSlugMappingsFrToEn: Record<string, string> = {
   "entrepot-logistique": "warehouses-and-logistics",
   coworking: "coworking-spaces",
   "start-up-scale-up": "start-up-and-scale-up",
+  erp: "public-access-buildings-erp",
+  "services-utilisateur-mono-occupant": "single-tenant-building",
 };
 
 // Fonction pour obtenir le slug français à partir du slug anglais
