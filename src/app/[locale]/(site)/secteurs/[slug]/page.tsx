@@ -126,6 +126,7 @@ const page = async ({
 }) => {
   const tGlobal = await getTranslations("Global");
   const t = await getTranslations("ServicesPage");
+  const tSecteurs = await getTranslations("SecteursPage");
   // const options = { next: { revalidate: 30 } };
   const { slug, locale } = await params;
   const secteur = await getSecteur(slug);
@@ -223,7 +224,7 @@ const page = async ({
           </BreadcrumbLink>
           <BreadcrumbSeparator />
           <BreadcrumbLink href={`/secteurs`} className="flex items-center">
-            Nos secteurs d&apos;activité
+            {tSecteurs("nos-secteurs-dintervention")}
           </BreadcrumbLink>
           <BreadcrumbSeparator />
           <BreadcrumbPage>{secteur.titre}</BreadcrumbPage>
