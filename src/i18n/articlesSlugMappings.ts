@@ -16,7 +16,8 @@ export const articlesSubSlugMappingsFrToEn: Record<string, string> = {
   "histoire-du-nettoyage-des-bureaux": "history-of-office-cleaning",
   "hof-managers-un-nouveau-concept": "hof-managers-a-new-concept",
   "accompagnement-demenagement-entreprise": "office-relocation-france",
-  // Ajoutez tous vos autres services ici
+  "demenagement-13-demarches-administratives-indispensables":
+    "office-move-in-france-checklist-13-essential-administrative-tasks",
 };
 export const getArticlesSlugFr = (articleSlugEn: string): string => {
   const entry = Object.entries(articlesSlugMappingsFrToEn).find(
