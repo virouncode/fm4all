@@ -18,6 +18,8 @@ export const articlesSubSlugMappingsFrToEn: Record<string, string> = {
   "accompagnement-demenagement-entreprise": "office-relocation-france",
   "demenagement-13-demarches-administratives-indispensables":
     "office-move-in-france-checklist-13-essential-administrative-tasks",
+  "comment-realiser-votre-duer-pour-vos-bureaux":
+    "create-your-risk-assessment-document-duer-for-your-office-in-france",
 };
 export const getArticlesSlugFr = (articleSlugEn: string): string => {
   const entry = Object.entries(articlesSlugMappingsFrToEn).find(
