@@ -6,7 +6,7 @@ import SecteursCards from "./SecteursCards";
 export const generateMetadata = async (): Promise<Metadata> => {
   const locale = await getLocale();
   return generateAlternates(
-    "services",
+    "secteurs",
     locale,
     locale === "fr"
       ? "Facility Management pour tous les secteurs à Paris & Île-de-France"
