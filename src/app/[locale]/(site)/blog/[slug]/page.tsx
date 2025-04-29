@@ -24,6 +24,7 @@ export const generateMetadata = async ({
   const locale = await getLocale();
   const { slug } = await params;
   const categorie = await getCategorie(slug);
+
   return generateAlternates(
     "blogCategorie",
     locale,

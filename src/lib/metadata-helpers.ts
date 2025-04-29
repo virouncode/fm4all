@@ -172,11 +172,11 @@ export function generateAlternates(
       );
     enUrl = `https://www.fm4all.com/en${routes[routeKey]["en"]}`.replace(
       "[slug]",
-      slugs[locale as "fr" | "en"] as string
+      slugs["en"] as string
     );
     frUrl = `https://www.fm4all.com/fr${routes[routeKey]["fr"]}`.replace(
       "[slug]",
-      slugs[locale as "fr" | "en"] as string
+      slugs["fr"] as string
     );
   } else if (routeKey === "blogArticle" && slugs) {
     canonicalUrl =
