@@ -290,6 +290,20 @@ export function generateAlternates(
       "[slug]",
       slugs["fr"] as string
     );
+  } else if (routeKey === "secteurPresentation" && slugs) {
+    canonicalUrl =
+      `https://www.fm4all.com/${locale}${routes[routeKey][locale as "fr" | "en"]}`.replace(
+        "[slug]",
+        slugs[locale as "fr" | "en"] as string
+      );
+    enUrl = `https://www.fm4all.com/en${routes[routeKey]["en"]}`.replace(
+      "[slug]",
+      slugs["en"] as string
+    );
+    frUrl = `https://www.fm4all.com/fr${routes[routeKey]["fr"]}`.replace(
+      "[slug]",
+      slugs["fr"] as string
+    );
   } else {
     canonicalUrl = `https://www.fm4all.com/${locale}${routes[routeKey][locale as "fr" | "en"]}`;
     enUrl = `https://www.fm4all.com/en${routes[routeKey]["en"]}`;
