@@ -59,6 +59,7 @@ export const generateMetadata = async (): Promise<Metadata> => {
 
   // Structure des métadonnées
   return {
+    metadataBase: new URL("https://www.fm4all.com"),
     title: {
       template: titleTemplate,
       default: title,
