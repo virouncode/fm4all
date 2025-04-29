@@ -68,7 +68,7 @@ const Partenaires = () => {
             <CarouselItem className="sm:basis-1/3 md:basis-1/4 lg:basis-1/5">
               <div className="w-full h-48 relative mx-auto">
                 <Image
-                  src="https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/logos_fournisseurs/logo_nikita-c8cCYDC4Q2JGCzwDMIdCJIhiT1iHDg.webp"
+                  src="https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/logos_fournisseurs/logo_NIKITA-RkaVBkIsb7qZveBaZnSIJJFlvVRQ5C"
                   alt="logo-nikita"
                   fill
                   quality={100}
