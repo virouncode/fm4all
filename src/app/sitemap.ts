@@ -39,8 +39,7 @@ const generateStaticUrls = () => {
         path.includes("/client") ||
         path.includes("/fournisseur") ||
         path.includes("/auth") ||
-        path.includes("/my-quote") ||
-        path.includes("/mon-devis") ||
+        path.includes("/devis") ||
         path.includes("/chalandise")
       )
         continue;
