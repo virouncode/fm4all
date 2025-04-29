@@ -12,6 +12,7 @@ import {
 import {
   getArticlesSlugEn,
   getArticlesSlugFr,
+  getArticlesSubSlugEn,
   getArticlesSubSlugFr,
 } from "@/i18n/articlesSlugMappings";
 import { capitalize } from "@/lib/capitalize";
@@ -111,6 +112,8 @@ export const generateMetadata = async ({
   const { slug, subSlug } = await params;
   const locale = await getLocale();
   const article = await getArticle(subSlug);
+  console.log();
+
   return generateAlternates(
     "blogArticle",
     locale,
@@ -126,7 +129,7 @@ export const generateMetadata = async ({
       },
       en: {
         slug: locale === "en" ? slug : getArticlesSlugEn(slug),
-        subSlug: locale === "en" ? subSlug : getArticlesSubSlugFr(slug),
+        subSlug: locale === "en" ? subSlug : getArticlesSubSlugEn(subSlug),
       },
     }
   );
