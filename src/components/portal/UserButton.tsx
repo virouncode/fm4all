@@ -51,7 +51,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
   };
   return (
     <DropdownMenu modal={false}>
-      <DropdownMenuTrigger asChild className={`cursor-pointer`}>
+      <DropdownMenuTrigger className={`cursor-pointer`}>
         <Button
           title={t("connexion")}
           variant="outline"
