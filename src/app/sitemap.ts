@@ -21,11 +21,12 @@ const lastMod = new Date().toISOString();
 const generateStaticUrls = () => {
   const urls: MetadataRoute.Sitemap = [];
   const pathsSecondaires = [
-    "/mentions,",
+    "/mentions",
     "/confidentialite",
     "/cookies",
     "/cgv",
     "/cgu",
+    "/contact",
   ];
 
   // Pour chaque locale et chaque route définie dans routing.ts
