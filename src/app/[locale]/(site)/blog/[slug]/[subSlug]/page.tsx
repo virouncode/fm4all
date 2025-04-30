@@ -349,7 +349,7 @@ const page = async ({
         prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
         prose-p:text-pretty prose-p:hyphens-auto
         prose-li:list-check prose-li:m-0
-        prose-a:underline
+         prose-a:underline
         "
         >
           {Array.isArray(article.bloc1) && (
