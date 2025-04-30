@@ -23,8 +23,8 @@ export const generateMetadata = async (): Promise<Metadata> => {
   const locale = await getLocale();
   const title =
     locale === "fr"
-      ? "Facility Management à Paris & Île-de-France - Devis en ligne | fm4all"
-      : "Facility Management & Business Services in Paris – Instant Quote | fm4all";
+      ? "Facility Management à Paris & Île-de-France - Devis en ligne"
+      : "Facility Management & Business Services in Paris – Instant Quote";
 
   // Description basée sur la langue
   const description =

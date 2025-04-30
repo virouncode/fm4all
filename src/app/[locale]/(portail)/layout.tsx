@@ -3,44 +3,25 @@ import { Toaster } from "@/components/ui/toaster";
 import { routing } from "@/i18n/routing";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Metadata } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { getMessages } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
 import { Didact_Gothic } from "next/font/google";
 import { notFound } from "next/navigation";
 import "../globals.css";
+import { Metadata } from "next";
 
-export const generateMetadata = async (): Promise<Metadata> => {
-  const locale = await getLocale();
-  const titleTemplate = "%s | fm4all";
-  const title =
-    locale === "fr"
-      ? "Facility Management à Paris & Île-de-France - Devis en ligne | fm4all"
-      : "Facility Management & Office Services in Paris – Instant Quote | fm4all";
-  const description =
-    locale === "fr"
-      ? "fm4all démocratise les services aux entreprises de toutes tailles à Paris & Île-de-France. Comparez les offres de nos prestataires et obtenez un devis en ligne."
-      : "fm4all makes business services accessible to companies of all sizes in Paris & Île-de-France. Compare offers from our providers and get an online quote.";
-  const canonicalUrl =
-    locale === "fr" ? "https://www.fm4all.com/fr" : "https://www.fm4all.com/en";
-
-  // Structure des métadonnées
+export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: {
-      template: titleTemplate,
-      default: title,
+    robots: {
+      index: false,
+      follow: false,
     },
-    description: description,
-    alternates: {
-      canonical: canonicalUrl,
-      languages: {
-        fr: "https://www.fm4all.com/fr",
-        en: "https://www.fm4all.com/en",
-      },
+    other: {
+      "X-Robots-Tag": "noindex, nofollow",
     },
   };
-};
+}
 
 const didact = Didact_Gothic({
   variable: "--font-didact-sans",
