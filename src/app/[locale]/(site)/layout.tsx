@@ -48,8 +48,8 @@ export const generateMetadata = async (): Promise<Metadata> => {
   const titleTemplate = "%s | fm4all";
   const title =
     locale === "fr"
-      ? "Facility Management à Paris & Île-de-France - Devis en ligne | fm4all"
-      : "Facility Management & Office Services in Paris – Instant Quote | fm4all";
+      ? "Facility Management à Paris & Île-de-France - Devis en ligne"
+      : "Facility Management & Office Services in Paris – Instant Quote";
   const description =
     locale === "fr"
       ? "fm4all démocratise les services aux entreprises de toutes tailles à Paris & Île-de-France. Comparez les offres de nos prestataires et obtenez un devis en ligne."
