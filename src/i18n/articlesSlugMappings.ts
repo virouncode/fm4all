@@ -20,6 +20,8 @@ export const articlesSubSlugMappingsFrToEn: Record<string, string> = {
     "office-move-in-france-checklist-13-essential-administrative-tasks",
   "comment-realiser-votre-duer-pour-vos-bureaux":
     "create-your-risk-assessment-document-duer-for-your-office-in-france",
+  "guide-pour-realiser-votre-plan-de-prevention":
+    "how-to-create-your-prevention-plan-in-france-guide-free-template",
 };
 export const getArticlesSlugFr = (articleSlugEn: string): string => {
   const entry = Object.entries(articlesSlugMappingsFrToEn).find(
