@@ -255,7 +255,9 @@ export function generateAlternates(
     openGraph: {
       images: [
         {
-          url: imageUrl ?? "/img/logo_full_white.webp",
+          url:
+            imageUrl ??
+            "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/fm4all_logo/logo_fm4all-npSiw7PiYrpkPsnBLuzDYGVO5rWVZb.png",
           width: 1200,
           height: 630,
           alt: title,

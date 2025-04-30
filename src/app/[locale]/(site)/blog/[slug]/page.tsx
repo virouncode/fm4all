@@ -32,7 +32,7 @@ export const generateMetadata = async ({
     categorie.baliseDescription ?? "",
     categorie.imagePrincipale
       ? urlFor(categorie.imagePrincipale).url()
-      : "/img/logo_full_white.webp.png",
+      : undefined,
     {
       fr: locale === "fr" ? slug : getArticlesSlugFr(slug),
       en: locale === "en" ? slug : getArticlesSlugEn(slug),

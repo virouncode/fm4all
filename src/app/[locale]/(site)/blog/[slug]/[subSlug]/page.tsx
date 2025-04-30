@@ -119,9 +119,7 @@ export const generateMetadata = async ({
     locale,
     article.baliseTitle ?? "",
     article.baliseDescription ?? "",
-    article.imagePrincipale
-      ? urlFor(article.imagePrincipale).url()
-      : "/img/logo_full_white.webp.png",
+    article.imagePrincipale ? urlFor(article.imagePrincipale).url() : undefined,
     {
       fr: {
         slug: locale === "fr" ? slug : getArticlesSlugFr(slug),

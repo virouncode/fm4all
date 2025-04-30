@@ -109,9 +109,7 @@ export const generateMetadata = async ({
     locale,
     service.baliseTitle ?? "",
     service.baliseDescription ?? "",
-    service.imagePrincipale
-      ? urlFor(service.imagePrincipale).url()
-      : "/img/logo_full_white.webp.png",
+    service.imagePrincipale ? urlFor(service.imagePrincipale).url() : undefined,
     {
       fr: locale === "fr" ? slug : getServicesSlugFr(slug),
       en: locale === "en" ? slug : getServicesSlugEn(slug),

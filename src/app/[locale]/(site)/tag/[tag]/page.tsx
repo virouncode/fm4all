@@ -34,7 +34,7 @@ export const generateMetadata = async ({
     locale === "fr"
       ? `Découvrez nos articles, services et secteurs associés au tag "${tag}"`
       : `Discover our articles, services and sectors associated with the tag "${tag}"`,
-    "/img/logo_full_white.webp.png",
+    undefined,
     {
       fr: locale === "fr" ? tag : getTagSlugFr(tag),
       en: locale === "en" ? tag : getTagSlugEn(tag),
