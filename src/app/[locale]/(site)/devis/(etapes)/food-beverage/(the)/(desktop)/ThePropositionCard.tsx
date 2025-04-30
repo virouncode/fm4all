@@ -8,8 +8,8 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { TheContext } from "@/context/TheProvider";
-import { formatNumber } from "@/lib/formatNumber";
-import { getFm4AllColor } from "@/lib/getFm4AllColor";
+import { formatNumber } from "@/lib/utils/formatNumber";
+import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";

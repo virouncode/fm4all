@@ -3,11 +3,11 @@ import { db } from "@/db";
 import { fournisseurs, user } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { getSession } from "@/lib/auth-session";
-import { capitalize } from "@/lib/capitalize";
-import { generatePassword } from "@/lib/generatePassword";
-import { formatSIRET } from "@/lib/isValideSIRET";
+import { sendEmailFromServer } from "@/lib/email/sendEmail";
 import { actionClient } from "@/lib/safe-actions";
-import { sendEmailFromServer } from "@/lib/sendEmail";
+import { capitalize } from "@/lib/utils/capitalize";
+import { generatePassword } from "@/lib/utils/generatePassword";
+import { formatSIRET } from "@/lib/utils/isValideSIRET";
 import {
   insertFournisseurSchema,
   InsertFournisseurType,

@@ -5,7 +5,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { inferAdditionalFields } from "better-auth/client/plugins";
 import { nextCookies } from "better-auth/next-js";
 import { openAPI } from "better-auth/plugins";
-import { sendEmailFromServer } from "./sendEmail";
+import { sendEmailFromServer } from "./email/sendEmail";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {

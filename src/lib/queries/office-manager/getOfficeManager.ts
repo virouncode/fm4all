@@ -6,8 +6,8 @@ import {
   officeManagerTarifs,
 } from "@/db/schema";
 import { errorHelper } from "@/lib/errorHelper";
-import { roundEffectifOfficeManager } from "@/lib/roundEffectifOfficeManager";
-import { roundSurface } from "@/lib/roundSurface";
+import { roundEffectifOfficeManager } from "@/lib/utils/roundEffectifOfficeManager";
+import { roundSurface } from "@/lib/utils/roundSurface";
 import { selectOfficeManagerQuantitesSchema } from "@/zod-schemas/officeManagerQuantites";
 import { selectOfficeManagerTarifsSchema } from "@/zod-schemas/officeManagerTarifs";
 import { eq, getTableColumns } from "drizzle-orm";

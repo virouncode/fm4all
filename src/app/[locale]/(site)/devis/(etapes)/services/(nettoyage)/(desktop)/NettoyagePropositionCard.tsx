@@ -9,8 +9,8 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
-import { formatNumber } from "@/lib/formatNumber";
-import { getFm4AllColor } from "@/lib/getFm4AllColor";
+import { formatNumber } from "@/lib/utils/formatNumber";
+import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { GammeType } from "@/zod-schemas/gamme";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";

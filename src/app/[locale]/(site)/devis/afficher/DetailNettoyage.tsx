@@ -10,7 +10,7 @@ import {
 import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
-import { formatNumber } from "@/lib/formatNumber";
+import { formatNumber } from "@/lib/utils/formatNumber";
 import { useContext } from "react";
 
 const DetailNettoyage = () => {

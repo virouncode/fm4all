@@ -3,7 +3,7 @@ import { ClientContext } from "@/context/ClientProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
-import { roundEffectif } from "@/lib/roundEffectif";
+import { roundEffectif } from "@/lib/utils/roundEffectif";
 import { SelectBoissonsQuantitesType } from "@/zod-schemas/boissonsQuantites";
 import { SelectBoissonsTarifsType } from "@/zod-schemas/boissonsTarifs";
 import { SelectFoodLivraisonTarifsType } from "@/zod-schemas/foodLivraisonTarifs";

@@ -1,4 +1,4 @@
-import { generateAlternates } from "@/lib/metadata-helpers";
+import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import SecteursCards from "./SecteursCards";

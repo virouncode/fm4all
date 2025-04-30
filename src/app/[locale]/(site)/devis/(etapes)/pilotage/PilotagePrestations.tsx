@@ -2,7 +2,7 @@ import { Link } from "@/i18n/navigation";
 import {
   getOfficeManagerQuantites,
   getOfficeManagerTarifs,
-} from "@/lib/queries/officeManager/getOfficeManager";
+} from "@/lib/queries/office-manager/getOfficeManager";
 import {
   getServicesFm4AllOffres,
   getServicesFm4AllTaux,

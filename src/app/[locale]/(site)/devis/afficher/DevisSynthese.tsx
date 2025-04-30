@@ -3,7 +3,7 @@
 import { MARGE } from "@/constants/constants";
 import { ClientContext } from "@/context/ClientProvider";
 import { TotalContext } from "@/context/TotalProvider";
-import { formatNumber } from "@/lib/formatNumber";
+import { formatNumber } from "@/lib/utils/formatNumber";
 import { useContext } from "react";
 import TotalCafe from "../TotalCafe";
 import TotalFontaines from "../TotalFontaines";

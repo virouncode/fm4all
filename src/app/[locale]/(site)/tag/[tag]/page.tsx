@@ -6,8 +6,8 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { getTagSlugEn, getTagSlugFr } from "@/i18n/tagsSlugMappings";
-import { capitalize } from "@/lib/capitalize";
-import { generateAlternates } from "@/lib/metadata-helpers";
+import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { capitalize } from "@/lib/utils/capitalize";
 import {
   getTagNom,
   getTagRelatedArticles,

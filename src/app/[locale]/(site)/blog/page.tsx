@@ -1,6 +1,6 @@
 import ArticlesCarousel from "@/components/carousel/ArticlesCarousel";
 import { Link } from "@/i18n/navigation";
-import { generateAlternates } from "@/lib/metadata-helpers";
+import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { getAllCategories } from "@/sanity/queries";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";

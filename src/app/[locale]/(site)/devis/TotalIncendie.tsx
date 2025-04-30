@@ -1,7 +1,7 @@
 import { MARGE } from "@/constants/constants";
 import { IncendieContext } from "@/context/IncendieProvider";
 import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
-import { formatNumber } from "@/lib/formatNumber";
+import { formatNumber } from "@/lib/utils/formatNumber";
 import { useTranslations } from "next-intl";
 import { useContext } from "react";
 

@@ -14,7 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { MARGE, MAX_PASSAGES_VITRERIE } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
-import { formatNumber } from "@/lib/formatNumber";
+import { formatNumber } from "@/lib/utils/formatNumber";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";

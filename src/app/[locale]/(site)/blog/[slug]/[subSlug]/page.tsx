@@ -15,8 +15,8 @@ import {
   getArticlesSubSlugEn,
   getArticlesSubSlugFr,
 } from "@/i18n/articlesSlugMappings";
-import { capitalize } from "@/lib/capitalize";
-import { generateAlternates } from "@/lib/metadata-helpers";
+import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { capitalize } from "@/lib/utils/capitalize";
 import { urlFor } from "@/sanity/lib/image";
 import { getArticle, getAssociatedToArticle } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";

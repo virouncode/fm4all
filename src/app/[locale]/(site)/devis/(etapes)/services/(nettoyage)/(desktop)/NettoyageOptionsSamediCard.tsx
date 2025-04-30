@@ -8,7 +8,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
-import { formatNumber } from "@/lib/formatNumber";
+import { formatNumber } from "@/lib/utils/formatNumber";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";

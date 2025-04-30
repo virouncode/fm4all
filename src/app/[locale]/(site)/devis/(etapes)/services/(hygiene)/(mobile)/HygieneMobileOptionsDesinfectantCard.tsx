@@ -11,8 +11,8 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { HygieneContext } from "@/context/HygieneProvider";
-import { formatNumber } from "@/lib/formatNumber";
-import { getFm4AllColor } from "@/lib/getFm4AllColor";
+import { formatNumber } from "@/lib/utils/formatNumber";
+import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { useContext } from "react";

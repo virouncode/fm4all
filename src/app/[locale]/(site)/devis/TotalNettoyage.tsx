@@ -2,8 +2,8 @@
 import { MARGE } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
-import { formatNumber } from "@/lib/formatNumber";
-import { getFm4AllColor } from "@/lib/getFm4AllColor";
+import { formatNumber } from "@/lib/utils/formatNumber";
+import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useTranslations } from "next-intl";
 import { useContext } from "react";
 

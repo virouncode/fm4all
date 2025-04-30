@@ -12,7 +12,7 @@ import {
   getServicesSlugEn,
   getServicesSlugFr,
 } from "@/i18n/servicesSlugMappings";
-import { generateAlternates } from "@/lib/metadata-helpers";
+import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { urlFor } from "@/sanity/lib/image";
 import { getAssociatedToService, getService } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";

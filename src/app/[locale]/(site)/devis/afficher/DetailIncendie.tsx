@@ -10,7 +10,7 @@ import {
 import { MARGE } from "@/constants/constants";
 import { IncendieContext } from "@/context/IncendieProvider";
 import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
-import { formatNumber } from "@/lib/formatNumber";
+import { formatNumber } from "@/lib/utils/formatNumber";
 import { useContext } from "react";
 
 const DetailIncendie = () => {

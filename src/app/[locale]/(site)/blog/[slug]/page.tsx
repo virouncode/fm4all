@@ -9,7 +9,7 @@ import {
   getArticlesSlugEn,
   getArticlesSlugFr,
 } from "@/i18n/articlesSlugMappings";
-import { generateAlternates } from "@/lib/metadata-helpers";
+import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { urlFor } from "@/sanity/lib/image";
 import { getCategorie } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";

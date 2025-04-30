@@ -1,11 +1,12 @@
 "use client";
 
+import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/constants/constants";
 import { TypesEauType } from "@/constants/typesEau";
 import { ClientContext } from "@/context/ClientProvider";
 import { FontainesContext } from "@/context/FontainesProvider";
 import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
 import { toast } from "@/hooks/use-toast";
-import { roundNbPersonnesFontaine } from "@/lib/roundNbPersonnesFontaine";
+import { roundNbPersonnesFontaine } from "@/lib/utils/roundNbPersonnesFontaine";
 import { DureeLocationFontaineType } from "@/zod-schemas/dureeLocation";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
@@ -16,7 +17,6 @@ import { useMediaQuery } from "react-responsive";
 import FontaineDesktopEspaceInputs from "./(desktop)/FontaineDesktopEspaceInputs";
 import FontaineMobileEspaceInputs from "./(mobile)/FontaineMobileEspaceInputs";
 import { getTypeFontaine } from "./getTypeFontaine";
-import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/constants/constants";
 type FontaineEspaceFormProps = {
   espace: FontaineEspaceType;
   fontainesModeles: SelectFontainesModelesType[];

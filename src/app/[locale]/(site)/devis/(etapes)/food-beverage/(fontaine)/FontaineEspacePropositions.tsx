@@ -7,7 +7,7 @@ import { FontainesContext } from "@/context/FontainesProvider";
 import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";
-import { roundNbPersonnesFontaine } from "@/lib/roundNbPersonnesFontaine";
+import { roundNbPersonnesFontaine } from "@/lib/utils/roundNbPersonnesFontaine";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";

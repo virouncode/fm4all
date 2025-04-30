@@ -2,8 +2,8 @@
 
 import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
 import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
-import { formatNumber } from "@/lib/formatNumber";
-import { getFm4AllColor } from "@/lib/getFm4AllColor";
+import { formatNumber } from "@/lib/utils/formatNumber";
+import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useTranslations } from "next-intl";
 import { useContext } from "react";
 

@@ -4,7 +4,7 @@ import { routing } from "./i18n/routing";
 import {
   getLocaleFromPathname,
   getPathnameWithoutLocale,
-} from "./lib/metadata-helpers";
+} from "./lib/metadata/metadata-helpers";
 
 const intlMiddleware = createMiddleware(routing);
 

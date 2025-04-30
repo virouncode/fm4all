@@ -11,8 +11,8 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
-import { formatNumber } from "@/lib/formatNumber";
-import { getFm4AllColor } from "@/lib/getFm4AllColor";
+import { formatNumber } from "@/lib/utils/formatNumber";
+import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useContext } from "react";

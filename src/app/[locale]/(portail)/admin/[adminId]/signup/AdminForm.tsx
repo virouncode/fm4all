@@ -6,7 +6,7 @@ import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
-import { postVercelBlob } from "@/lib/queries/postVercelBlob";
+import { postVercelBlob } from "@/lib/queries/vercel-blob/postVercelBlob";
 import { createInsertAdminSchema, InsertAdminType } from "@/zod-schemas/admin";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, X } from "lucide-react";

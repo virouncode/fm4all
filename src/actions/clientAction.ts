@@ -2,9 +2,9 @@
 
 import { db } from "@/db";
 import { clients } from "@/db/schema";
-import { capitalize } from "@/lib/capitalize";
-import { formatSIRET } from "@/lib/isValideSIRET";
 import { actionClient } from "@/lib/safe-actions";
+import { capitalize } from "@/lib/utils/capitalize";
+import { formatSIRET } from "@/lib/utils/isValideSIRET";
 import {
   insertClientSchema,
   InsertClientType,

@@ -1,7 +1,7 @@
 import ServicePresentationCard from "@/components/cards/ServicePresentationCard";
 import { Button } from "@/components/ui/button";
-import { capitalize } from "@/lib/capitalize";
 import { getServicesForFournisseur } from "@/lib/queries/services/getServices";
+import { capitalize } from "@/lib/utils/capitalize";
 import { SprayCan, Toilet } from "lucide-react";
 
 const servicesIcons = {

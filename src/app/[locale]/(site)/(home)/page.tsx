@@ -10,8 +10,8 @@ import Services from "@/app/[locale]/(site)/(home)/Services";
 import Slogan from "@/app/[locale]/(site)/(home)/Slogan";
 import VideoPresentation from "@/app/[locale]/(site)/(home)/VideoPresentation";
 import Why from "@/app/[locale]/(site)/(home)/Why";
-import { generateAlternates } from "@/lib/metadata-helpers";
-import { generateLocaleParams } from "@/lib/staticParamsHelper";
+import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
 import { getLocale } from "next-intl/server";
 

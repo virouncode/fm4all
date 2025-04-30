@@ -14,8 +14,8 @@ import { ManagementContext } from "@/context/ManagementProvider";
 import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import { Link } from "@/i18n/navigation";
-import { roundEffectif } from "@/lib/roundEffectif";
-import { roundSurface } from "@/lib/roundSurface";
+import { roundEffectif } from "@/lib/utils/roundEffectif";
+import { roundSurface } from "@/lib/utils/roundSurface";
 import { useLocale } from "next-intl";
 import { useContext } from "react";
 

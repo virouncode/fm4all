@@ -10,7 +10,7 @@ import {
 import { MARGE } from "@/constants/constants";
 import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
 import { TotalOfficeManagerContext } from "@/context/TotalOfficeManagerProvider";
-import { formatNumber } from "@/lib/formatNumber";
+import { formatNumber } from "@/lib/utils/formatNumber";
 import { useContext } from "react";
 
 const DetailOfficeManager = () => {

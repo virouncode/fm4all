@@ -18,8 +18,8 @@ import { TotalContext } from "@/context/TotalProvider";
 import useScrollIntoMonDevis from "@/hooks/use-scroll-into-mon-devis";
 import { toast } from "@/hooks/use-toast";
 import { Link, useRouter } from "@/i18n/navigation";
-import fillDevis from "@/lib/fillDevis";
-import { sendEmailFromClient } from "@/lib/sendEmail";
+import { sendEmailFromClient } from "@/lib/email/sendEmail";
+import fillDevis from "@/lib/utils/fillDevis";
 import {
   createUpdateClientSchema,
   InsertClientType,

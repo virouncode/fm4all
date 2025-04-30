@@ -4,7 +4,7 @@ import { ClientContext } from "@/context/ClientProvider";
 import { TheContext } from "@/context/TheProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { toast } from "@/hooks/use-toast";
-import { roundNbPersonnesCafeConso } from "@/lib/roundNbPersonnesCafeConso";
+import { roundNbPersonnesCafeConso } from "@/lib/utils/roundNbPersonnesCafeConso";
 import { GammeType } from "@/zod-schemas/gamme";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { useTranslations } from "next-intl";

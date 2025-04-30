@@ -11,8 +11,8 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { FontainesContext } from "@/context/FontainesProvider";
-import { capitalize } from "@/lib/capitalize";
-import { formatNumber } from "@/lib/formatNumber";
+import { capitalize } from "@/lib/utils/capitalize";
+import { formatNumber } from "@/lib/utils/formatNumber";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";

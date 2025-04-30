@@ -7,8 +7,8 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
-import { formatNumber } from "@/lib/formatNumber";
-import { getFm4AllColor } from "@/lib/getFm4AllColor";
+import { formatNumber } from "@/lib/utils/formatNumber";
+import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { GammeType } from "@/zod-schemas/gamme";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";

@@ -24,7 +24,7 @@ import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvide
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { useUpddateServicesFm4AllTotal } from "@/hooks/use-upddate-services-fm4All-total";
-import { formatNumber } from "@/lib/formatNumber";
+import { formatNumber } from "@/lib/utils/formatNumber";
 import { Calculator } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useContext, useEffect } from "react";

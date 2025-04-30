@@ -11,7 +11,7 @@ import { MARGE } from "@/constants/constants";
 import { typesBoissons } from "@/constants/typesBoissons";
 import { CafeContext } from "@/context/CafeProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
-import { formatNumber } from "@/lib/formatNumber";
+import { formatNumber } from "@/lib/utils/formatNumber";
 import { useContext } from "react";
 import { locationCafeMachine } from "../../../../../constants/locationCafeMachine";
 

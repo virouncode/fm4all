@@ -1,6 +1,6 @@
 import Partenaires from "@/app/[locale]/(site)/(home)/Partenaires";
 import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
-import { generateAlternates } from "@/lib/metadata-helpers";
+import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import Image from "next/image";

@@ -12,8 +12,8 @@ import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { toast } from "@/hooks/use-toast";
 import { Link, useRouter } from "@/i18n/navigation";
-import { formatLocalStorageData } from "@/lib/formatLocalStorageData";
-import { sendEmailFromClient } from "@/lib/sendEmail";
+import { sendEmailFromClient } from "@/lib/email/sendEmail";
+import { formatLocalStorageData } from "@/lib/utils/formatLocalStorageData";
 import {
   createInsertClientSchema,
   InsertClientType,

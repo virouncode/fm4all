@@ -10,7 +10,7 @@ import {
 import { MARGE } from "@/constants/constants";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
-import { formatNumber } from "@/lib/formatNumber";
+import { formatNumber } from "@/lib/utils/formatNumber";
 import { useContext } from "react";
 
 const DetailSnacksFruits = () => {

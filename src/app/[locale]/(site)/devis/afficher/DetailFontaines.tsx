@@ -12,7 +12,7 @@ import { locationFontaine } from "@/constants/locationFontaine";
 import { typesPose } from "@/constants/typesPose";
 import { FontainesContext } from "@/context/FontainesProvider";
 import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
-import { formatNumber } from "@/lib/formatNumber";
+import { formatNumber } from "@/lib/utils/formatNumber";
 import { useContext } from "react";
 
 const DetailFontaines = () => {

@@ -1,10 +1,10 @@
 import { Link } from "@/i18n/navigation";
-import { generateAlternates } from "@/lib/metadata-helpers";
+import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import ServicesLoader from "../(etapes)/locaux/ServicesLoader";
 import SauvegarderProgression from "./SauvegarderProgression";
-import { Metadata } from "next";
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const locale = await getLocale();

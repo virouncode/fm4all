@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
 import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
-import { formatNumber } from "@/lib/formatNumber";
+import { formatNumber } from "@/lib/utils/formatNumber";
 import { useContext } from "react";
 
 const DetailServicesFm4All = () => {

@@ -4,10 +4,10 @@ import { db } from "@/db";
 import { user } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { getSession } from "@/lib/auth-session";
-import { capitalize } from "@/lib/capitalize";
-import { generatePassword } from "@/lib/generatePassword";
+import { sendEmailFromServer } from "@/lib/email/sendEmail";
 import { actionClient } from "@/lib/safe-actions";
-import { sendEmailFromServer } from "@/lib/sendEmail";
+import { capitalize } from "@/lib/utils/capitalize";
+import { generatePassword } from "@/lib/utils/generatePassword";
 import {
   insertAdminSchema,
   InsertAdminType,

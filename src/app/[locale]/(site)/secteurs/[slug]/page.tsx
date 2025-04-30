@@ -12,7 +12,7 @@ import {
   getSecteurSlugEn,
   getSecteurSlugFr,
 } from "@/i18n/secteursSlugMappings";
-import { generateAlternates } from "@/lib/metadata-helpers";
+import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { urlFor } from "@/sanity/lib/image";
 import { getAssociatedToSecteur, getSecteur } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";

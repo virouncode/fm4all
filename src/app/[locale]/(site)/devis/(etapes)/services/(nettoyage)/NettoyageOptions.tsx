@@ -10,7 +10,7 @@ import { SprayCan } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useContext, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
-import { capitalize } from "../../../../../../../lib/capitalize";
+import { capitalize } from "../../../../../../../lib/utils/capitalize";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import NettoyageOptionsPropositions from "./(desktop)/NettoyageOptionsPropositions";

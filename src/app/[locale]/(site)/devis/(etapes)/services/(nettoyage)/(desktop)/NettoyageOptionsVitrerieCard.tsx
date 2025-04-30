@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { MARGE, MAX_PASSAGES_VITRERIE } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
-import { formatNumber } from "@/lib/formatNumber";
+import { formatNumber } from "@/lib/utils/formatNumber";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";

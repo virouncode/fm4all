@@ -11,7 +11,7 @@ import { MARGE } from "@/constants/constants";
 import { locationDistribHygiene } from "@/constants/locationsDistribHygiene";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
-import { formatNumber } from "@/lib/formatNumber";
+import { formatNumber } from "@/lib/utils/formatNumber";
 import { useContext } from "react";
 
 const DetailHygiene = () => {

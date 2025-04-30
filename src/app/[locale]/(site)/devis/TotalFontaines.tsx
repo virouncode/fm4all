@@ -1,7 +1,7 @@
 import { MARGE } from "@/constants/constants";
 import { FontainesContext } from "@/context/FontainesProvider";
 import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
-import { formatNumber } from "@/lib/formatNumber";
+import { formatNumber } from "@/lib/utils/formatNumber";
 import { useTranslations } from "next-intl";
 import { useContext } from "react";
 

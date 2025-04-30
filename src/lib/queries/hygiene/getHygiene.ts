@@ -8,7 +8,7 @@ import {
   hygieneInstalDistribTarifs,
 } from "@/db/schema";
 import { errorHelper } from "@/lib/errorHelper";
-import { roundEffectif } from "@/lib/roundEffectif";
+import { roundEffectif } from "@/lib/utils/roundEffectif";
 import { selectHygieneConsoTarifsSchema } from "@/zod-schemas/hygieneConsoTarifs";
 import { selectHygieneDistribQuantitesSchema } from "@/zod-schemas/hygieneDistribQuantites";
 import { selectHygieneDistribTarifsSchema } from "@/zod-schemas/hygieneDistribTarifs";

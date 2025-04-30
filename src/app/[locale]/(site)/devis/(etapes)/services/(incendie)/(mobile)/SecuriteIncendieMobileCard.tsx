@@ -10,7 +10,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { IncendieContext } from "@/context/IncendieProvider";
-import { formatNumber } from "@/lib/formatNumber";
+import { formatNumber } from "@/lib/utils/formatNumber";
 import { useTranslations } from "next-intl";
 
 import Image from "next/image";

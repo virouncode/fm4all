@@ -9,7 +9,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
-import { formatNumber } from "@/lib/formatNumber";
+import { formatNumber } from "@/lib/utils/formatNumber";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useContext } from "react";

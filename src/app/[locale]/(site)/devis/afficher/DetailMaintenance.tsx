@@ -10,7 +10,7 @@ import {
 import { MARGE } from "@/constants/constants";
 import { MaintenanceContext } from "@/context/MaintenanceProvider";
 import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
-import { formatNumber } from "@/lib/formatNumber";
+import { formatNumber } from "@/lib/utils/formatNumber";
 import { useContext } from "react";
 
 const DetailMaintenance = () => {

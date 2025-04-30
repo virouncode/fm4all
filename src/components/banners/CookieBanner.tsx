@@ -8,7 +8,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Link } from "@/i18n/navigation";
-import { getLocalStorage, setLocalStorage } from "@/lib/storageHelper";
+import { getLocalStorage, setLocalStorage } from "@/lib/utils/storageHelper";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { usePathname } from "next/navigation";

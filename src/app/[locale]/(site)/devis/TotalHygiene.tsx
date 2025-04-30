@@ -1,8 +1,8 @@
 import { MARGE } from "@/constants/constants";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
-import { formatNumber } from "@/lib/formatNumber";
-import { getFm4AllColor } from "@/lib/getFm4AllColor";
+import { formatNumber } from "@/lib/utils/formatNumber";
+import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useTranslations } from "next-intl";
 import { useContext } from "react";
 
