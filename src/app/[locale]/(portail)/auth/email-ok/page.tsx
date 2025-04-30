@@ -1,4 +1,4 @@
-import BackgroundServer from "@/components/BackgroundServer";
+import BackgroundServer from "@/components/backgrounds/BackgroundServer";
 import EmailOkCard from "./EmailOkCard";
 
 const page = () => {

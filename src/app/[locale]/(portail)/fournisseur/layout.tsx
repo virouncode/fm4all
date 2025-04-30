@@ -1,4 +1,4 @@
-import HeaderFournisseur from "@/components/header-fournisseur";
+import HeaderFournisseur from "@/components/header/header-fournisseur";
 
 const AdminLayout = ({
   children,

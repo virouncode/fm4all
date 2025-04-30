@@ -1,4 +1,4 @@
-import HeaderClient from "@/components/header-client";
+import HeaderClient from "@/components/header/header-client";
 
 const AdminLayout = ({
   children,

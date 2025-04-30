@@ -1,4 +1,4 @@
-import CarouselGammesDots from "@/components/CarouselGammesDots";
+import CarouselGammesDots from "@/components/carousel/CarouselGammesDots";
 import {
   Carousel,
   CarouselApi,
@@ -148,8 +148,8 @@ const CafeMobileEspacePropositionsCarousel = ({
         espace.infos.gammeCafeSelected === "essentiel"
           ? 0
           : espace.infos.gammeCafeSelected === "confort"
-          ? 1
-          : 2
+            ? 1
+            : 2
       );
     }
   }, [

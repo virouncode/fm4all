@@ -1,4 +1,4 @@
-import BackgroundServer from "@/components/BackgroundServer";
+import BackgroundServer from "@/components/backgrounds/BackgroundServer";
 
 const page = () => {
   return (

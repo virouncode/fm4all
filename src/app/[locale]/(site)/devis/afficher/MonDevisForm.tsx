@@ -2,8 +2,8 @@
 
 import { insertClientAction } from "@/actions/clientAction";
 import { insertDevisAction } from "@/actions/devisAction";
-import { DateInputWithLabel } from "@/components/formInputs/DateInputWithLabel";
-import { InputWithLabel } from "@/components/formInputs/InputWithLabel";
+import { DateInputWithLabel } from "@/components/form-inputs/DateInputWithLabel";
+import { InputWithLabel } from "@/components/form-inputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Form } from "@/components/ui/form";

@@ -1,6 +1,6 @@
 "use client";
 
-import BackgroundClient from "@/components/BackgroundClient";
+import BackgroundClient from "@/components/backgrounds/BackgroundClient";
 import {
   Card,
   CardContent,

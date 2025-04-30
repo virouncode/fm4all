@@ -1,7 +1,7 @@
-import CookieBanner from "@/components/cookie-baner";
-import Footer from "@/components/footer";
-import GoogleAnalytics from "@/components/GoogleAnalytics";
-import Header from "@/components/header";
+import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
+import CookieBanner from "@/components/banners/CookieBanner";
+import Footer from "@/components/footer/footer";
+import Header from "@/components/header/header";
 import { Toaster } from "@/components/ui/toaster";
 import CafeProvider from "@/context/CafeProvider";
 import ClientProvider from "@/context/ClientProvider";

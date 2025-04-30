@@ -1,4 +1,4 @@
-import ArticlesCarousel from "@/components/ArticlesCarousel";
+import ArticlesCarousel from "@/components/carousel/ArticlesCarousel";
 import { Link } from "@/i18n/navigation";
 import { generateAlternates } from "@/lib/metadata-helpers";
 import { getAllCategories } from "@/sanity/queries";

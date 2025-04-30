@@ -1,4 +1,4 @@
-import ServicePresentationCard from "@/components/ServicePresentationCard";
+import ServicePresentationCard from "@/components/cards/ServicePresentationCard";
 import { Button } from "@/components/ui/button";
 import { capitalize } from "@/lib/capitalize";
 import { getServicesForFournisseur } from "@/lib/queries/services/getServices";

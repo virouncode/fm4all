@@ -1,4 +1,4 @@
-import GoogleAnalytics from "@/components/GoogleAnalytics";
+import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 import { Toaster } from "@/components/ui/toaster";
 import { routing } from "@/i18n/routing";
 import { Analytics } from "@vercel/analytics/next";

@@ -1,6 +1,6 @@
 "use client";
 import { insertAdminAction } from "@/actions/adminActions";
-import { InputWithLabel } from "@/components/formInputs/InputWithLabel";
+import { InputWithLabel } from "@/components/form-inputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";

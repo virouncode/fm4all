@@ -1,4 +1,4 @@
-import BackgroundServer from "@/components/BackgroundServer";
+import BackgroundServer from "@/components/backgrounds/BackgroundServer";
 import UnauthorizedCard from "./UnauthorizedCard";
 
 const page = async ({

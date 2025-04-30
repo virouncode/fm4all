@@ -1,4 +1,4 @@
-import CTAContactButtons from "@/components/cta-contact-buttons";
+import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
 import { generateAlternates } from "@/lib/metadata-helpers";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";

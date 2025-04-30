@@ -1,6 +1,6 @@
 "use client"; // Error boundaries must be Client Components
 
-import BackButton from "@/components/back-button";
+import BackButton from "@/components/buttons/back-button";
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
 

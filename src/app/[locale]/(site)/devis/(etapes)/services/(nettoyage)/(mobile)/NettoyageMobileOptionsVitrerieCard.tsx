@@ -1,5 +1,5 @@
 import FournisseurDialog from "@/app/[locale]/(site)/devis/FournisseurDialog";
-import StarRating from "@/components/star-rating";
+import StarRating from "@/components/star/StarRating";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

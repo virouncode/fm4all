@@ -1,6 +1,6 @@
-import CTAContactButtons from "@/components/cta-contact-buttons";
-import DevisButton from "@/components/devis-button";
-import TagButton from "@/components/TagButton";
+import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
+import DevisButton from "@/components/buttons/devis-button";
+import TagButton from "@/components/tags/tag-button";
 import {
   Breadcrumb,
   BreadcrumbLink,

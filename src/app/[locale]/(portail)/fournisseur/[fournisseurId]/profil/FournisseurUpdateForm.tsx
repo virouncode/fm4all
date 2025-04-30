@@ -2,8 +2,8 @@
 
 import { updateFournisseurAction } from "@/actions/fournisseurAction";
 import FournisseurDialog from "@/app/[locale]/(site)/devis/FournisseurDialog";
-import { InputWithLabel } from "@/components/formInputs/InputWithLabel";
-import { TextAreaWithLabel } from "@/components/formInputs/TextAreaWithLabel";
+import { InputWithLabel } from "@/components/form-inputs/InputWithLabel";
+import { TextAreaWithLabel } from "@/components/form-inputs/TextAreaWithLabel";
 import { Button } from "@/components/ui/button";
 import {
   Card,

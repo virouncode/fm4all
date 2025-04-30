@@ -1,4 +1,4 @@
-import CarouselGammesDots from "@/components/CarouselGammesDots";
+import CarouselGammesDots from "@/components/carousel/CarouselGammesDots";
 import {
   Carousel,
   CarouselApi,

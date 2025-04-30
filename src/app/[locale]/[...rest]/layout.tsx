@@ -1,4 +1,4 @@
-import Header from "@/components/header";
+import Header from "@/components/header/header";
 import { Toaster } from "@/components/ui/toaster";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";

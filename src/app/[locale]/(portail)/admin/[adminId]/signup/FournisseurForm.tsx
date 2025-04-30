@@ -1,7 +1,7 @@
 "use client";
 import { insertFournisseurAction } from "@/actions/fournisseurAction";
 import { insertUserAction } from "@/actions/userAction";
-import { InputWithLabel } from "@/components/formInputs/InputWithLabel";
+import { InputWithLabel } from "@/components/form-inputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";

@@ -1,4 +1,4 @@
-import HeaderAdmin from "@/components/header-admin";
+import HeaderAdmin from "@/components/header/header-admin";
 
 const AdminLayout = ({
   children,

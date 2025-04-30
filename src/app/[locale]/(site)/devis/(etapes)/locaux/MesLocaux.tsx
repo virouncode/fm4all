@@ -1,7 +1,7 @@
 "use client";
 
-import { InputWithLabel } from "@/components/formInputs/InputWithLabel";
-import { SelectWithLabel } from "@/components/formInputs/SelectWithLabel";
+import { InputWithLabel } from "@/components/form-inputs/InputWithLabel";
+import { SelectWithLabel } from "@/components/form-inputs/SelectWithLabel";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -309,6 +309,7 @@ const MesLocaux = () => {
               fieldTitle={t("code-postal")}
               nameInSchema="codePostal"
               placeholder="XXXXX"
+              handleChange={handleChange}
             />
             <InputWithLabel<MesLocauxType>
               fieldTitle={t("surface-en-m")}
@@ -316,6 +317,7 @@ const MesLocaux = () => {
               type="number"
               min={50}
               max={MAX_SURFACE}
+              handleChange={handleChange}
             />
             <InputWithLabel<MesLocauxType>
               fieldTitle={t("nombre-moyen-de-personnes")}
@@ -323,6 +325,7 @@ const MesLocaux = () => {
               type="number"
               min={1}
               max={MAX_EFFECTIF}
+              handleChange={handleChange}
             />
           </div>
           <div className="w-full md:w-1/2 flex flex-col gap-4 ">

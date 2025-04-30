@@ -1,7 +1,7 @@
 import ExpertiseCarousel from "@/app/[locale]/(site)/services/[slug]/ExpertiseCarousel";
-import CTAContactButtons from "@/components/cta-contact-buttons";
-import DevisButton from "@/components/devis-button";
-import TagButton from "@/components/TagButton";
+import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
+import DevisButton from "@/components/buttons/devis-button";
+import TagButton from "@/components/tags/tag-button";
 import {
   Breadcrumb,
   BreadcrumbLink,
@@ -349,7 +349,7 @@ const page = async ({
         prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
         prose-p:text-pretty prose-p:hyphens-auto
         prose-li:list-check prose-li:m-0
-         prose-a:underline
+        prose-a:underline
         "
         >
           {Array.isArray(article.bloc1) && (

@@ -1,7 +1,7 @@
 "use client";
 
-import BackgroundClient from "@/components/BackgroundClient";
-import { InputWithLabel } from "@/components/formInputs/InputWithLabel";
+import BackgroundClient from "@/components/backgrounds/BackgroundClient";
+import { InputWithLabel } from "@/components/form-inputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
 import {
   Card,

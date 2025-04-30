@@ -1,4 +1,4 @@
-import CarouselGammesDots from "@/components/CarouselGammesDots";
+import CarouselGammesDots from "@/components/carousel/CarouselGammesDots";
 import {
   Carousel,
   CarouselApi,
@@ -92,8 +92,8 @@ const HygieneMobileOptionsPoubelleCarousel = ({
         hygiene.infos.poubelleGammeSelected === "essentiel"
           ? 0
           : hygiene.infos.poubelleGammeSelected === "confort"
-          ? 1
-          : 2
+            ? 1
+            : 2
       );
     }
   }, [api, hygiene.infos.poubelleGammeSelected, hygiene.infos.fournisseurId]);

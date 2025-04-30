@@ -1,4 +1,4 @@
-import CarouselGammesDots from "@/components/CarouselGammesDots";
+import CarouselGammesDots from "@/components/carousel/CarouselGammesDots";
 import {
   Carousel,
   CarouselApi,
@@ -123,8 +123,8 @@ const FontaineMobileEspacePropositionsCarousel = ({
         espace.infos.poseSelected === "aposer"
           ? 0
           : espace.infos.poseSelected === "colonne"
-          ? 1
-          : 2
+            ? 1
+            : 2
       );
     }
   }, [

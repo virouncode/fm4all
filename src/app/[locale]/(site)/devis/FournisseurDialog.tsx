@@ -1,4 +1,4 @@
-import StarRating from "@/components/star-rating";
+import StarRating from "@/components/star/StarRating";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 

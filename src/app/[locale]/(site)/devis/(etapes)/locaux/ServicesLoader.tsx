@@ -1,5 +1,5 @@
 import WhyCard from "@/components/cards/WhyCard";
-import Loader from "@/components/loader";
+import LoaderFm4all from "@/components/loaders/LoaderFm4all";
 import { Euro, Feather, Handshake, Rabbit, Waves } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -9,7 +9,7 @@ const ServicesLoader = () => {
   return (
     <section className="flex-1 overflow-hidden">
       <div className="flex flex-col gap-10">
-        <Loader src="/img/logo_simple.webp" alt="logo-fm4all-simple" />
+        <LoaderFm4all src="/img/logo_simple.webp" alt="logo-fm4all-simple" />
         <div className="text-lg mx-auto max-w-prose mt-10 animate-pulse text-center">
           {tLoader(
             "vous-allez-obtenir-des-devis-qui-beneficient-du-service-de-gestion-centralise-fm4all"

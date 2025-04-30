@@ -1,4 +1,4 @@
-import BackButton from "@/components/back-button";
+import BackButton from "@/components/buttons/back-button";
 import { getLocale } from "next-intl/server";
 
 export default async function NotFoundPage() {

@@ -1,5 +1,5 @@
-import { CalculatorDialog } from "@/components/Calculator";
-import ServicePresentationCard from "@/components/ServicePresentationCard";
+import { CalculatorDialog } from "@/components/calculator/CalculatorDialog";
+import ServicePresentationCard from "@/components/cards/ServicePresentationCard";
 import {
   getNettoyageAllQuantites,
   getNettoyageTarifsFournisseur,
