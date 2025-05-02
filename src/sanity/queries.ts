@@ -156,8 +156,9 @@ export const getLastArticles = async (locale: "fr" | "en") => {
 export const CATEGORIE_QUERY = `*[_type == "articleCategory" && slug.current == $slug][0]{
   _id,
   titre,
-  baliseTitre,
+  baliseTitle,
   baliseDescription,
+  imagePrincipale,
   slug}`;
 
 export const getCategorie = async (slug: string) => {
