@@ -1,5 +1,5 @@
 import { batiments } from "@/constants/batiments";
-import { MARGE } from "@/constants/constants";
+import { MARGE, TVA } from "@/constants/constants";
 import { occupation } from "@/constants/occupation";
 import { toast } from "@/hooks/use-toast";
 import { InsertClientType } from "@/zod-schemas/client";
@@ -35,9 +35,9 @@ export const fillDevis = async (
       (totalInstallationHT ?? 0) * MARGE
     );
     const totalInstallationTtcText = formatNumber(
-      (totalInstallationHT ?? 0) * MARGE * 1.2
+      (totalInstallationHT ?? 0) * MARGE * TVA
     );
-    const totalAnnuelTtcText = formatNumber((totalAnnuelHT ?? 0) * 1.2);
+    const totalAnnuelTtcText = formatNumber((totalAnnuelHT ?? 0) * TVA);
     const adresseClient =
       [client.adresseLigne1, client.adresseLigne2].filter(Boolean).join(" ") +
       " " +

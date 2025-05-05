@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { nettoyageRepasseTarifs, nettoyageTarifs } from "@/db/schema";
 import { getSession } from "@/lib/auth-session";
 import { actionClient } from "@/lib/safe-actions";
-import { NettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
+import { SelectNettoyageTarifFournisseurType } from "@/zod-schemas/nettoyageTarifs";
 import { eq } from "drizzle-orm";
 import { getLocale } from "next-intl/server";
 import { flattenValidationErrors } from "next-safe-action";
@@ -20,13 +20,14 @@ const tarifSchema = z.object({
     "gamme",
     "fournisseurId",
     "createdAt",
+    "updatedAt",
   ]),
   value: z.number().min(1, "La valeur est requise"),
   table: z.enum(["nettoyageTarifs", "nettoyageRepasseTarifs"]),
 });
 type Tarif = {
   id: number;
-  field: keyof NettoyageTarifsType;
+  field: keyof SelectNettoyageTarifFournisseurType;
   value: number;
   table: "nettoyageTarifs" | "nettoyageRepasseTarifs";
 };
@@ -118,6 +119,7 @@ export const updateNettoyageTarifAction = actionClient
         ) {
           valueToStore = nettoyageTarifInput.value;
         }
+
         await db
           .update(nettoyageRepasseTarifs)
           .set({ [nettoyageTarifInput.field]: valueToStore })

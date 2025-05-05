@@ -1,3 +1,4 @@
+import { MAJORATION_DIMANCHE } from "@/constants/constants";
 import { ClientContext } from "@/context/ClientProvider";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { NettoyageContext } from "@/context/NettoyageProvider";
@@ -299,7 +300,7 @@ const NettoyagePropositions = ({
       ? 52 * tauxHoraire * hParPassage
       : null;
     const totalDimanche = nettoyage.infos.dimancheSelected
-      ? 52 * tauxHoraire * hParPassage * 1.2
+      ? 52 * tauxHoraire * hParPassage * MAJORATION_DIMANCHE
       : null;
     const totalVitrerie =
       nettoyage.infos.vitrerieSelected &&

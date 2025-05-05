@@ -10,6 +10,8 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+import { updatedAt } from "./schema-helper";
+
 export const statusEnum = pgEnum("status", ["active", "inactive"]);
 export const typeBatimentEnum = pgEnum("typebatiment", [
   "bureaux",
@@ -86,6 +88,7 @@ export const fournisseurs = pgTable("fournisseurs", {
   noteGoogle: varchar("note_google"),
   nbAvis: integer("nb_avis"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const clients = pgTable("clients", {
@@ -112,6 +115,7 @@ export const clients = pgTable("clients", {
   dateDeDemarrage: date("date_de_demarrage", { mode: "string" }),
   commentaires: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const logosFournisseurs = pgTable("logos_fournisseurs", {
@@ -119,6 +123,7 @@ export const logosFournisseurs = pgTable("logos_fournisseurs", {
   url: varchar().notNull(),
   type: varchar().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 //SERVICES
@@ -126,6 +131,7 @@ export const services = pgTable("services", {
   id: serial().primaryKey(),
   nom: varchar("nom").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const servicesFournisseurs = pgTable("services_fournisseurs", {
@@ -137,6 +143,7 @@ export const servicesFournisseurs = pgTable("services_fournisseurs", {
     .notNull()
     .references(() => services.id),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 //NETTOYAGE
@@ -146,6 +153,7 @@ export const nettoyageQuantites = pgTable("nettoyage_quantites", {
   surface: integer().notNull(),
   gamme: gammeEnum().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const nettoyageTarifs = pgTable("nettoyage_tarifs", {
@@ -158,6 +166,7 @@ export const nettoyageTarifs = pgTable("nettoyage_tarifs", {
   surface: integer().notNull(),
   gamme: gammeEnum().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const nettoyageRepasseTarifs = pgTable("nettoyage_repasse_tarifs", {
@@ -170,6 +179,7 @@ export const nettoyageRepasseTarifs = pgTable("nettoyage_repasse_tarifs", {
   surface: integer().notNull(),
   gamme: gammeEnum().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const nettoyageVitrerieTarifs = pgTable("nettoyage_vitrerie_tarifs", {
@@ -183,6 +193,7 @@ export const nettoyageVitrerieTarifs = pgTable("nettoyage_vitrerie_tarifs", {
   minFacturation: integer("min_facturation").notNull(),
   fraisDeplacement: integer("frais_deplacement").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 //HYGIENE
@@ -193,6 +204,7 @@ export const hygieneDistribQuantites = pgTable("hygiene_distrib_quantites", {
   nbDistribSavon: integer("nb_distrib_savon").notNull(),
   nbDistribPh: integer("nb_distrib_ph").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const hygieneDistribTarifs = pgTable("hygiene_distrib_tarifs", {
@@ -209,6 +221,7 @@ export const hygieneDistribTarifs = pgTable("hygiene_distrib_tarifs", {
   imageUrl: varchar(),
   minFacturation: integer("min_facturation"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const hygieneInstalDistribTarifs = pgTable(
@@ -221,6 +234,7 @@ export const hygieneInstalDistribTarifs = pgTable(
     effectif: integer().notNull(),
     prixInstallation: integer("prix_installation").notNull(),
     createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt,
   }
 );
 
@@ -235,6 +249,7 @@ export const hygieneConsoTarifs = pgTable("hygiene_conso_tarifs", {
   paParPersonnePh: integer("pa_par_personne_ph").notNull(),
   paParPersonneDesinfectant: integer("pa_par_personne_desinfectant").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 //MAINTENANCE
 export const maintenanceQuantites = pgTable("maintenance_quantites", {
@@ -243,6 +258,7 @@ export const maintenanceQuantites = pgTable("maintenance_quantites", {
   freqAnnuelle: integer("freq_annuelle").notNull(),
   gamme: gammeEnum().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const maintenanceTarifs = pgTable("maintenance_tarifs", {
@@ -255,6 +271,7 @@ export const maintenanceTarifs = pgTable("maintenance_tarifs", {
   tauxHoraire: integer("taux_horaire").notNull(),
   gamme: gammeEnum().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const legioTarifs = pgTable("legio_tarifs", {
@@ -265,6 +282,7 @@ export const legioTarifs = pgTable("legio_tarifs", {
   surface: integer().notNull(),
   prixAnnuel: integer("prix_annuel").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const q18Tarifs = pgTable("q18_tarifs", {
@@ -275,6 +293,7 @@ export const q18Tarifs = pgTable("q18_tarifs", {
   surface: integer().notNull(),
   prixAnnuel: integer("prix_annuel").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const qualiteAirTarifs = pgTable("qualite_air_tarifs", {
@@ -285,6 +304,7 @@ export const qualiteAirTarifs = pgTable("qualite_air_tarifs", {
   surface: integer().notNull(),
   prixAnnuel: integer("prix_annuel").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 //INCENDIE
@@ -293,6 +313,7 @@ export const incendieQuantites = pgTable("incendie_quantites", {
   surface: integer().notNull(),
   nbExtincteurs: integer("nb_extincteurs").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const incendieTarifs = pgTable("incendie_tarifs", {
@@ -306,6 +327,7 @@ export const incendieTarifs = pgTable("incendie_tarifs", {
   prixParTelBaes: integer("prix_par_tel_baes").notNull(),
   fraisDeplacement: integer("frais_deplacement").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const exutoiresTarifs = pgTable("exutoires_tarifs", {
@@ -317,6 +339,7 @@ export const exutoiresTarifs = pgTable("exutoires_tarifs", {
   prixParExutoire: integer("prix_par_exutoire").notNull(),
   fraisDeplacement: integer("frais_deplacement").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const exutoiresParkingTarifs = pgTable("exutoires_parking_tarifs", {
@@ -328,6 +351,7 @@ export const exutoiresParkingTarifs = pgTable("exutoires_parking_tarifs", {
   prixParExutoire: integer("prix_par_exutoire").notNull(),
   fraisDeplacement: integer("frais_deplacement").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const alarmesTarifs = pgTable("alarmes_tarifs", {
@@ -338,6 +362,7 @@ export const alarmesTarifs = pgTable("alarmes_tarifs", {
   nbPoints: integer("nb_points").notNull(),
   prixParControle: integer("prix_par_controle").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const portesCoupeFeuTarifs = pgTable("portes_coupe_feu_tarifs", {
@@ -348,6 +373,7 @@ export const portesCoupeFeuTarifs = pgTable("portes_coupe_feu_tarifs", {
   type: typePorteEnum().notNull(),
   prixParPorte: integer("prix_par_porte").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const riaTarifs = pgTable("ria_tarifs", {
@@ -357,6 +383,7 @@ export const riaTarifs = pgTable("ria_tarifs", {
     .references(() => fournisseurs.id),
   prixParRIA: integer("prix_par_ria").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const colonnesSechesTarifs = pgTable("colonnes_seches_tarifs", {
@@ -367,6 +394,7 @@ export const colonnesSechesTarifs = pgTable("colonnes_seches_tarifs", {
   type: typeColonneEnum().notNull(),
   prixParColonne: integer("prix_par_colonne").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 //CAFE
@@ -384,6 +412,7 @@ export const cafeMachines = pgTable("cafe_machines", {
   infos: varchar(),
   imageUrl: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const cafeMachinesTarifs = pgTable("cafe_machines_tarifs", {
@@ -410,6 +439,7 @@ export const cafeMachinesTarifs = pgTable("cafe_machines_tarifs", {
   infos: varchar(),
   reconditionne: boolean().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const cafeConsoTarifs = pgTable("cafe_conso_tarifs", {
@@ -422,6 +452,7 @@ export const cafeConsoTarifs = pgTable("cafe_conso_tarifs", {
   prixUnitaire: integer("prix_unitaire"),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const theConsoTarifs = pgTable("the_conso_tarifs", {
@@ -434,6 +465,7 @@ export const theConsoTarifs = pgTable("the_conso_tarifs", {
   prixUnitaire: integer("prix_unitaire"),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const laitConsoTarifs = pgTable("lait_conso_tarifs", {
@@ -447,6 +479,7 @@ export const laitConsoTarifs = pgTable("lait_conso_tarifs", {
   prixUnitairePoudre: integer("prix_unitaire_poudre"),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const chocolatConsoTarifs = pgTable("chocolat_conso_tarifs", {
@@ -459,6 +492,7 @@ export const chocolatConsoTarifs = pgTable("chocolat_conso_tarifs", {
   prixUnitairePoudre: integer("prix_unitaire_poudre"),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const sucreConsoTarifs = pgTable("sucre_conso_tarifs", {
@@ -470,6 +504,7 @@ export const sucreConsoTarifs = pgTable("sucre_conso_tarifs", {
   prixUnitaire: integer("prix_unitaire"),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 //SNACKS FRUITS BOISSONS
@@ -479,6 +514,7 @@ export const fruitsQuantites = pgTable("fruits_quantites", {
   minKgParSemaine: integer("min_kg_par_semaine").notNull(),
   gamme: gammeEnum().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const fruitsTarifs = pgTable("fruits_tarifs", {
@@ -490,6 +526,7 @@ export const fruitsTarifs = pgTable("fruits_tarifs", {
   prixKg: integer("prix_kg"),
   gamme: gammeEnum().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const snacksQuantites = pgTable("snacks_quantites", {
@@ -500,6 +537,7 @@ export const snacksQuantites = pgTable("snacks_quantites", {
   minPortionsParSemaine: integer("min_portions_par_semaine").notNull(),
   gamme: gammeEnum().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const snacksTarifs = pgTable("snacks_tarifs", {
@@ -511,6 +549,7 @@ export const snacksTarifs = pgTable("snacks_tarifs", {
   prixUnitaire: integer("prix_unitaire"),
   gamme: gammeEnum().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const boissonsQuantites = pgTable("boissons_quantites", {
@@ -521,6 +560,7 @@ export const boissonsQuantites = pgTable("boissons_quantites", {
   gamme: gammeEnum().notNull(),
   minConsosParSemaine: integer("min_consos_par_semaine").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const boissonsTarifs = pgTable("boissons_tarifs", {
@@ -532,6 +572,7 @@ export const boissonsTarifs = pgTable("boissons_tarifs", {
   prixUnitaire: integer("prix_unitaire"),
   gamme: gammeEnum().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const foodLivraisonTarifs = pgTable("food_livraison_tarifs", {
@@ -546,6 +587,7 @@ export const foodLivraisonTarifs = pgTable("food_livraison_tarifs", {
   seuilFranco: integer("seuil_franco"),
   remiseSiCafe: integer("remise_si_cafe"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 //FONTAINES
@@ -556,6 +598,7 @@ export const fontaines = pgTable("fontaines", {
   infos: varchar(),
   imageUrl: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 export const fontainesTarifs = pgTable("fontaines_tarifs", {
   id: serial().primaryKey(),
@@ -582,6 +625,7 @@ export const fontainesTarifs = pgTable("fontaines_tarifs", {
   reconditionne: boolean().default(false),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const officeManagerQuantites = pgTable("office_manager_quantites", {
@@ -592,6 +636,7 @@ export const officeManagerQuantites = pgTable("office_manager_quantites", {
   demiJParSemaine: integer("demi_j_par_semaine").notNull(),
   majoration: integer().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const officeManagerTarifs = pgTable("office_manager_tarifs", {
@@ -602,6 +647,7 @@ export const officeManagerTarifs = pgTable("office_manager_tarifs", {
   demiTjm: integer("demi_tjm").notNull(),
   demiTjmPremium: integer("demi_tjm_premium").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const servicesFm4AllTaux = pgTable("services_fm4all_taux", {
@@ -620,6 +666,7 @@ export const servicesFm4AllTaux = pgTable("services_fm4all_taux", {
   remiseCa: integer("remise_ca").notNull(),
   remiseHof: integer("remise_hof").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const servicesFm4AllOffres = pgTable("services_fm4all_offres", {
@@ -632,6 +679,7 @@ export const servicesFm4AllOffres = pgTable("services_fm4all_offres", {
   accountManager: inclusEnum("account_manager").notNull(),
   audit: inclusEnum().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 export const devisTemporaires = pgTable("devis_temporaires", {
   id: serial().primaryKey(),
@@ -640,6 +688,7 @@ export const devisTemporaires = pgTable("devis_temporaires", {
     .references(() => clients.id),
   texte: varchar().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 export const devis = pgTable("devis", {
@@ -649,6 +698,7 @@ export const devis = pgTable("devis", {
     .references(() => clients.id),
   devisUrl: varchar("devis_url").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
 });
 
 //AUTH

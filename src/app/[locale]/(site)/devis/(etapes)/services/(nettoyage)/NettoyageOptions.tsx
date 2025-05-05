@@ -1,6 +1,7 @@
 "use client";
 
 import PropositionsTitleMobile from "@/app/[locale]/(site)/devis/PropositionsTitleMobile";
+import { MAJORATION_DIMANCHE } from "@/constants/constants";
 import { NettoyageContext } from "@/context/NettoyageProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import { SelectRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
@@ -158,7 +159,7 @@ const NettoyageOptions = ({
         noteGoogle,
         nbAvis,
       } = tarif;
-      const prixAnnuel = 52 * hParPassage * tauxHoraire * 1.2;
+      const prixAnnuel = 52 * hParPassage * tauxHoraire * MAJORATION_DIMANCHE;
       return {
         id,
         prixAnnuel,

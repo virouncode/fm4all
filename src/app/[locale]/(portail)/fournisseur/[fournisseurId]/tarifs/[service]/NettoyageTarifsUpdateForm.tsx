@@ -14,8 +14,11 @@ import {
 import { RATIO } from "@/constants/constants";
 import { useToast } from "@/hooks/use-toast";
 import { SelectNettoyageQuantitesType } from "@/zod-schemas/nettoyageQuantites";
-import { NettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
+import { SelectNettoyageTarifFournisseurType } from "@/zod-schemas/nettoyageTarifs";
+import { format } from "date-fns";
 import { Loader } from "lucide-react";
+import { DateTime } from "luxon";
+import { useLocale } from "next-intl";
 import { ChangeEvent, useState } from "react";
 
 const mapping = {
@@ -24,18 +27,31 @@ const mapping = {
 };
 
 type NettoyageTarifsUpdateFormProps = {
-  initialTarifs: NettoyageTarifsType[];
+  initialTarifs: SelectNettoyageTarifFournisseurType[];
   quantites: SelectNettoyageQuantitesType[];
+  title: string;
 };
 
 export default function NettoyageTarifsUpdateForm({
   initialTarifs,
   quantites,
+  title,
 }: NettoyageTarifsUpdateFormProps) {
-  const [tarifs, setTarifs] = useState<NettoyageTarifsType[]>(initialTarifs);
+  const [tarifs, setTarifs] =
+    useState<SelectNettoyageTarifFournisseurType[]>(initialTarifs);
   const [modifiedTarifs, setModifiedTarifs] = useState<Set<number>>(new Set());
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
+  const locale = useLocale() as "fr" | "en";
+
+  const lastUpdate = format(
+    initialTarifs.sort(
+      (a, b) =>
+        DateTime.fromJSDate(b.updatedAt).toMillis() -
+        DateTime.fromJSDate(a.updatedAt).toMillis()
+    )[0].updatedAt,
+    locale === "fr" ? "dd/MM/yyyy à HH:mm" : "yyyy/MM/dd at hh:mm a"
+  );
 
   // Vérifier s'il y a des modifications non sauvegardées
   const hasUnsavedChanges = modifiedTarifs.size > 0;
@@ -46,11 +62,10 @@ export default function NettoyageTarifsUpdateForm({
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement>,
     id: number,
-    field: keyof NettoyageTarifsType
+    field: keyof SelectNettoyageTarifFournisseurType
   ) => {
     // Filtrer pour n'accepter que les chiffres et les virgules/points
     const inputValue = e.target.value;
-
     // Convertir en nombre
     const value = inputValue ? parseFloat(inputValue) : 0;
 
@@ -74,12 +89,17 @@ export default function NettoyageTarifsUpdateForm({
       });
     } else {
       // Si la valeur est revenue à sa valeur initiale, retirer de la liste des modifiés
-      const currentTarif = tarifs.find((t) => t.id === id);
+      // Vérifier si tous les autres champs correspondent également
+      const otherField =
+        field === "hParPassage" ? "tauxHoraire" : "hParPassage";
+      const otherFieldValue = tarifs.find((t) => t.id === id)?.[otherField];
+
       const allFieldsMatch =
         initialTarif &&
-        currentTarif &&
-        initialTarif.hParPassage === currentTarif.hParPassage &&
-        initialTarif.tauxHoraire === currentTarif.tauxHoraire;
+        initialTarif.hParPassage ===
+          (field === "hParPassage" ? value : otherFieldValue) &&
+        initialTarif.tauxHoraire ===
+          (field === "tauxHoraire" ? value : otherFieldValue);
 
       if (allFieldsMatch) {
         setModifiedTarifs((prev) => {
@@ -107,7 +127,8 @@ export default function NettoyageTarifsUpdateForm({
       if (!initialTarif) continue;
 
       // Vérifier quels champs ont été modifiés
-      const fieldsToUpdate: Array<keyof NettoyageTarifsType> = [];
+      const fieldsToUpdate: Array<keyof SelectNettoyageTarifFournisseurType> =
+        [];
       if (tarif.hParPassage !== initialTarif.hParPassage) {
         fieldsToUpdate.push("hParPassage");
       }
@@ -120,6 +141,7 @@ export default function NettoyageTarifsUpdateForm({
         try {
           // S'assurer que la valeur est un nombre
           const value = tarif[field];
+
           if (typeof value === "number") {
             if (value === 0) {
               toast({
@@ -130,11 +152,14 @@ export default function NettoyageTarifsUpdateForm({
               setSaving(false);
               return;
             }
+
             const result = await updateNettoyageTarifAction({
               id,
               field,
-              value: value * RATIO,
-              table: "nettoyageTarifs",
+              value: Math.round(value * RATIO),
+              table: title.includes("Repasse")
+                ? "nettoyageRepasseTarifs"
+                : "nettoyageTarifs",
             });
             if (!result?.data?.success) {
               success = false;
@@ -164,6 +189,7 @@ export default function NettoyageTarifsUpdateForm({
         title: "Succès ! 🚀",
         description: "Les tarifs ont été mis à jour avec succès",
       });
+      window.location.reload();
     } else {
       toast({
         variant: "destructive",
@@ -217,161 +243,172 @@ export default function NettoyageTarifsUpdateForm({
   };
 
   return (
-    <div className="relative space-y-4">
-      {/* Bouton de sauvegarde et indicateur de modifications */}
-      <div className="flex justify-between items-center">
-        <div>
-          {hasUnsavedChanges && (
-            <div className="text-sm text-amber-600 font-medium">
-              Vous avez des modifications non sauvegardées
-            </div>
-          )}
-          {(tarifs.some((tarif) => !tarif.hParPassage) ||
-            tarifs.some((tarif) => !tarif.tauxHoraire)) && (
-            <div className="text-sm text-red-600 font-medium">
-              Vous avez entré des valeurs erronées
-            </div>
-          )}
+    <>
+      <div className="flex justify-between mt-14 mb-2 item-center">
+        <div className="border-l border-l-gray-500">
+          <h2 className="ml-4 text-xl font-bold">{title}</h2>
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            onClick={handleSave}
-            disabled={!hasUnsavedChanges || saving}
-            variant="destructive"
-            size="lg"
-          >
-            {saving ? (
-              <div className="flex items-center gap-2">
-                <Loader className="animate-spin" />
-                <p>...Sauvegarde</p>
+        <p className="text-sm italic">Dernière mise à jour : {lastUpdate}</p>
+      </div>
+      <div className="relative space-y-4">
+        {/* Bouton de sauvegarde et indicateur de modifications */}
+        <div className="flex justify-between items-center flex-col gap-4 md:flex-row md:gap-0">
+          <div>
+            {hasUnsavedChanges && (
+              <div className="text-sm text-amber-600 font-medium">
+                Vous avez des modifications non sauvegardées
               </div>
-            ) : (
-              "Sauvegarder"
             )}
-          </Button>
-          <Button
-            onClick={handleCancel}
-            disabled={!hasUnsavedChanges || saving}
-            variant="outline"
-            size="lg"
-          >
-            Annuler
-          </Button>
+            {(tarifs.some((tarif) => !tarif.hParPassage) ||
+              tarifs.some((tarif) => !tarif.tauxHoraire)) && (
+              <div className="text-sm text-red-600 font-medium">
+                Vous avez entré des valeurs erronées
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={handleSave}
+              disabled={!hasUnsavedChanges || saving}
+              variant="destructive"
+              size="lg"
+            >
+              {saving ? (
+                <div className="flex items-center gap-2">
+                  <Loader className="animate-spin" />
+                  <p>...Sauvegarde</p>
+                </div>
+              ) : (
+                "Sauvegarder"
+              )}
+            </Button>
+            <Button
+              onClick={handleCancel}
+              disabled={!hasUnsavedChanges || saving}
+              variant="outline"
+              size="lg"
+            >
+              Annuler
+            </Button>
+          </div>
+        </div>
+
+        {/* Tableau des tarifs */}
+        <div className="overflow-hidden border rounded-md">
+          <div className="max-h-[550px] overflow-y-auto">
+            <Table>
+              <TableHeader className="sticky top-0 bg-background z-10 shadow-sm">
+                <TableRow>
+                  <TableHead>Surface (m²)</TableHead>
+                  <TableHead>Gamme</TableHead>
+                  <TableHead>Fréquence de passage (j/an)</TableHead>
+                  <TableHead>Total Annuel (€ HT)</TableHead>
+                  <TableHead>Cadence (m2/h)</TableHead>
+                  <TableHead>Heures moyennes par passage*</TableHead>
+                  <TableHead>Taux horaire tout compris (€/h HT)*</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sortedTarifs.map((tarif, index) => {
+                  // Vérifier si c'est le dernier élément de cette surface
+                  const isLastOfSurface =
+                    index === sortedTarifs.length - 1 ||
+                    sortedTarifs[index + 1].surface !== tarif.surface;
+
+                  // Trouver la quantité correspondante
+                  const quantite = quantites.find(
+                    (q) =>
+                      q.surface === tarif.surface && q.gamme === tarif.gamme
+                  );
+
+                  // Calculer la fréquence annuelle
+                  const freqAnnuelle = quantite
+                    ? Math.round(quantite.freqAnnuelle)
+                    : "-";
+
+                  // Vérifier si ce tarif a été modifié
+                  const isModified = isTarifModified(tarif.id);
+
+                  return (
+                    <TableRow
+                      key={tarif.id}
+                      className={`${
+                        isLastOfSurface ? "border-b-2 border-gray-300" : ""
+                      } ${
+                        tarif.gamme === "essentiel"
+                          ? "bg-fm4allessential/5"
+                          : tarif.gamme === "confort"
+                            ? "bg-fm4allcomfort/5"
+                            : "bg-fm4allexcellence/5"
+                      } ${isModified ? "bg-amber-50" : ""} ${
+                        !tarif.hParPassage || !tarif.tauxHoraire
+                          ? "border-2 border-red-600"
+                          : ""
+                      }`}
+                    >
+                      <TableCell className="font-medium">
+                        {tarif.surface}
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        <span
+                          className={
+                            tarif.gamme === "essentiel"
+                              ? "text-fm4allessential font-bold"
+                              : tarif.gamme === "confort"
+                                ? "text-fm4allcomfort font-bold"
+                                : "text-fm4allexcellence font-bold"
+                          }
+                        >
+                          {tarif.gamme}
+                        </span>
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {freqAnnuelle}
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {typeof freqAnnuelle === "number"
+                          ? Math.round(
+                              tarif.tauxHoraire *
+                                tarif.hParPassage *
+                                freqAnnuelle
+                            )
+                          : "-"}
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {Math.round(tarif.surface / tarif.hParPassage)}
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          step="0.05"
+                          min={0}
+                          value={tarif.hParPassage || ""}
+                          onChange={(e) =>
+                            handleInputChange(e, tarif.id, "hParPassage")
+                          }
+                          className={`w-24 ${isModified ? "border-amber-500" : ""}`}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min={0}
+                          value={tarif.tauxHoraire || ""}
+                          onChange={(e) =>
+                            handleInputChange(e, tarif.id, "tauxHoraire")
+                          }
+                          className={`w-24 ${isModified ? "border-amber-500" : ""}`}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       </div>
-
-      {/* Tableau des tarifs */}
-      <div className="overflow-hidden border rounded-md">
-        <div className="max-h-[550px] overflow-y-auto">
-          <Table>
-            <TableHeader className="sticky top-0 bg-background z-10 shadow-sm">
-              <TableRow>
-                <TableHead>Surface (m²)</TableHead>
-                <TableHead>Gamme</TableHead>
-                <TableHead>Fréquence de passage (j/an)</TableHead>
-                <TableHead>Total Annuel (€ HT)</TableHead>
-                <TableHead>Cadence (m2/h)</TableHead>
-                <TableHead>Heures moyennes par passage</TableHead>
-                <TableHead>Taux horaire tout compris (€/h HT)</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sortedTarifs.map((tarif, index) => {
-                // Vérifier si c'est le dernier élément de cette surface
-                const isLastOfSurface =
-                  index === sortedTarifs.length - 1 ||
-                  sortedTarifs[index + 1].surface !== tarif.surface;
-
-                // Trouver la quantité correspondante
-                const quantite = quantites.find(
-                  (q) => q.surface === tarif.surface && q.gamme === tarif.gamme
-                );
-
-                // Calculer la fréquence annuelle
-                const freqAnnuelle = quantite
-                  ? Math.round(quantite.freqAnnuelle)
-                  : "-";
-
-                // Vérifier si ce tarif a été modifié
-                const isModified = isTarifModified(tarif.id);
-
-                return (
-                  <TableRow
-                    key={tarif.id}
-                    className={`${
-                      isLastOfSurface ? "border-b-2 border-gray-300" : ""
-                    } ${
-                      tarif.gamme === "essentiel"
-                        ? "bg-fm4allessential/5"
-                        : tarif.gamme === "confort"
-                          ? "bg-fm4allcomfort/5"
-                          : "bg-fm4allexcellence/5"
-                    } ${isModified ? "bg-amber-50" : ""} ${
-                      !tarif.hParPassage || !tarif.tauxHoraire
-                        ? "border-2 border-red-600"
-                        : ""
-                    }`}
-                  >
-                    <TableCell className="font-medium">
-                      {tarif.surface}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      <span
-                        className={
-                          tarif.gamme === "essentiel"
-                            ? "text-fm4allessential font-bold"
-                            : tarif.gamme === "confort"
-                              ? "text-fm4allcomfort font-bold"
-                              : "text-fm4allexcellence font-bold"
-                        }
-                      >
-                        {tarif.gamme}
-                      </span>
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {freqAnnuelle}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {typeof freqAnnuelle === "number"
-                        ? Math.round(
-                            tarif.tauxHoraire * tarif.hParPassage * freqAnnuelle
-                          )
-                        : "-"}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {Math.round(tarif.surface / tarif.hParPassage)}
-                    </TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        step="0.05"
-                        min={0}
-                        value={tarif.hParPassage || ""}
-                        onChange={(e) =>
-                          handleInputChange(e, tarif.id, "hParPassage")
-                        }
-                        className={`w-24 ${isModified ? "border-amber-500" : ""}`}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        min={0}
-                        value={tarif.tauxHoraire || ""}
-                        onChange={(e) =>
-                          handleInputChange(e, tarif.id, "tauxHoraire")
-                        }
-                        className={`w-24 ${isModified ? "border-amber-500" : ""}`}
-                      />
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
-    </div>
+    </>
   );
 }

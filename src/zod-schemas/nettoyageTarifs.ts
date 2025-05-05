@@ -20,17 +20,21 @@ export const selectNettoyageTarifsSchema = createSelectSchema(nettoyageTarifs, {
   nbAvis: z.number().nullable(),
 });
 
+export const selectNettoyageTarifsFournisseurSchema = createSelectSchema(
+  nettoyageTarifs,
+  {
+    hParPassage: (schema) =>
+      schema.min(1, "Le nombre d'heures moyen par passage est obligatoire"),
+    tauxHoraire: (schema) => schema.min(1, "Le taux horaire est obligatoire"),
+    surface: (schema) => schema.min(1, "La surface est obligatoire"),
+  }
+);
+
 export type SelectNettoyageTarifsType =
   typeof selectNettoyageTarifsSchema._type;
 
-export const nettoyageTarifSchema = createSelectSchema(nettoyageTarifs, {
-  hParPassage: (schema) =>
-    schema.min(1, "Le nombre d'heures moyen par passage est obligatoire"),
-  tauxHoraire: (schema) => schema.min(1, "Le taux horaire est obligatoire"),
-  surface: (schema) => schema.min(1, "La surface est obligatoire"),
-});
-
-export type NettoyageTarifsType = typeof nettoyageTarifSchema._type;
+export type SelectNettoyageTarifFournisseurType =
+  typeof selectNettoyageTarifsFournisseurSchema._type;
 
 //UPDATE
 export const updateNettoyageTarifsSchema = createUpdateSchema(nettoyageTarifs, {

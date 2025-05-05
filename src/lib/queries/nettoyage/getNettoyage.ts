@@ -11,8 +11,14 @@ import { errorHelper } from "@/lib/errorHelper";
 import { roundSurface } from "@/lib/utils/roundSurface";
 import { selectNettoyageQuantitesSchema } from "@/zod-schemas/nettoyageQuantites";
 import { selectRepasseTarifsSchema } from "@/zod-schemas/nettoyageRepasse";
-import { selectNettoyageTarifsSchema } from "@/zod-schemas/nettoyageTarifs";
-import { selectVitrerieTarifsSchema } from "@/zod-schemas/nettoyageVitrerie";
+import {
+  selectNettoyageTarifsFournisseurSchema,
+  selectNettoyageTarifsSchema,
+} from "@/zod-schemas/nettoyageTarifs";
+import {
+  selectVitrerieTarifsFournisseurSchema,
+  selectVitrerieTarifsSchema,
+} from "@/zod-schemas/nettoyageVitrerie";
 import { and, eq, getTableColumns } from "drizzle-orm";
 
 export const getNettoyageQuantites = async (surface: string) => {
@@ -40,17 +46,14 @@ export const getNettoyageAllQuantites = async () => {
   try {
     const results = await db.select().from(nettoyageQuantites);
     if (results.length === 0) return [];
-    // const validatedResults = results.map((result) =>
-    //   selectNettoyageQuantitesSchema.parse(result)
-    // );
-    // const data = validatedResults.map((result) => ({
-    //   ...result,
-    //   freqAnnuelle: result.freqAnnuelle / RATIO,
-    // }));
-    return results.map((result) => ({
+    const validatedResults = results.map((result) =>
+      selectNettoyageQuantitesSchema.parse(result)
+    );
+    const data = validatedResults.map((result) => ({
       ...result,
       freqAnnuelle: result.freqAnnuelle / RATIO,
     }));
+    return data;
   } catch (err) {
     errorHelper(err);
   }
@@ -82,6 +85,28 @@ export const getNettoyageTarifs = async (surface: string) => {
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
       selectNettoyageTarifsSchema.parse(result)
+    );
+    const data = validatedResults.map((result) => ({
+      ...result,
+      hParPassage: result.hParPassage / RATIO,
+      tauxHoraire: result.tauxHoraire / RATIO,
+    }));
+    return data;
+  } catch (err) {
+    errorHelper(err);
+  }
+};
+
+//TODO valider le schema
+export const getNettoyageTarifsFournisseur = async (fournisseurId: number) => {
+  try {
+    const results = await db
+      .select()
+      .from(nettoyageTarifs)
+      .where(eq(nettoyageTarifs.fournisseurId, fournisseurId));
+    if (results.length === 0) return [];
+    const validatedResults = results.map((result) =>
+      selectNettoyageTarifsFournisseurSchema.parse(result)
     );
     const data = validatedResults.map((result) => ({
       ...result,
@@ -133,6 +158,27 @@ export const getRepasseTarifs = async (surface: string) => {
   }
 };
 
+export const getRepasseTarifsFournisseur = async (fournisseurId: number) => {
+  try {
+    const results = await db
+      .select()
+      .from(nettoyageRepasseTarifs)
+      .where(eq(nettoyageRepasseTarifs.fournisseurId, fournisseurId));
+    if (results.length === 0) return [];
+    const validatedResults = results.map((result) =>
+      selectNettoyageTarifsFournisseurSchema.parse(result)
+    );
+    const data = validatedResults.map((result) => ({
+      ...result,
+      hParPassage: result.hParPassage / RATIO,
+      tauxHoraire: result.tauxHoraire / RATIO,
+    }));
+    return data;
+  } catch (err) {
+    errorHelper(err);
+  }
+};
+
 export const getVitrerieTarifs = async () => {
   try {
     const results = await db
@@ -170,54 +216,23 @@ export const getVitrerieTarifs = async () => {
   }
 };
 
-//TODO valider le schema
-export const getNettoyageTarifsFournisseur = async (fournisseurId: number) => {
+export const getVitrerieTarifsFournisseur = async (fournisseurId: number) => {
   try {
     const results = await db
       .select()
-      .from(nettoyageTarifs)
-      .where(eq(nettoyageTarifs.fournisseurId, fournisseurId));
-    if (results.length === 0) return [];
-    // const validatedResults = results.map((result) =>
-    //   selectNettoyageTarifsSchema.parse(result)
-    // );
-    // const data = validatedResults.map((result) => ({
-    //   ...result,
-    //   hParPassage: result.hParPassage / RATIO,
-    //   tauxHoraire: result.tauxHoraire / RATIO,
-    // }));
-    return results.map((result) => ({
-      ...result,
-      hParPassage: result.hParPassage / RATIO,
-      tauxHoraire: result.tauxHoraire / RATIO,
+      .from(nettoyageVitrerieTarifs)
+      .where(eq(nettoyageVitrerieTarifs.fournisseurId, fournisseurId));
+    if (results.length === 0) return null;
+    const validatedResults = results.map((result) =>
+      selectVitrerieTarifsFournisseurSchema.parse(result)
+    );
+    const data = validatedResults.map((validatedResult) => ({
+      ...validatedResult,
+      tauxHoraire: validatedResult.tauxHoraire / RATIO,
+      minFacturation: validatedResult.minFacturation / RATIO,
+      fraisDeplacement: validatedResult.fraisDeplacement / RATIO,
     }));
-  } catch (err) {
-    errorHelper(err);
-  }
-};
-
-export const getNettoyageTarifsRepasseFournisseur = async (
-  fournisseurId: number
-) => {
-  try {
-    const results = await db
-      .select()
-      .from(nettoyageRepasseTarifs)
-      .where(eq(nettoyageRepasseTarifs.fournisseurId, fournisseurId));
-    if (results.length === 0) return [];
-    // const validatedResults = results.map((result) =>
-    //   selectNettoyageTarifsSchema.parse(result)
-    // );
-    // const data = validatedResults.map((result) => ({
-    //   ...result,
-    //   hParPassage: result.hParPassage / RATIO,
-    //   tauxHoraire: result.tauxHoraire / RATIO,
-    // }));
-    return results.map((result) => ({
-      ...result,
-      hParPassage: result.hParPassage / RATIO,
-      tauxHoraire: result.tauxHoraire / RATIO,
-    }));
+    return data[0];
   } catch (err) {
     errorHelper(err);
   }
