@@ -11,8 +11,8 @@ const TagButton = ({ tag }: TagProps) => {
     <Button className="rounded-full" variant="outline" size="sm">
       <Link
         href={{
-          pathname: "/tag/[tag]",
-          params: { tag: tag.slug?.current ?? "" },
+          pathname: "/tag/[slug]",
+          params: { slug: tag.slug?.current ?? "" },
         }}
       >
         {tag.nom}

@@ -84,14 +84,14 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
           { locale: newLocale }
         );
       }
-    } else if (pathname === "/tag/[tag]") {
+    } else if (pathname === "/tag/[slug]") {
       if (typeof params.tag === "string") {
         const newSlug =
           newLocale === "fr"
             ? getTagSlugFr(params.tag)
             : getTagSlugEn(params.tag);
         router.replace(
-          { pathname, params: { tag: newSlug }, query },
+          { pathname, params: { slug: newSlug }, query },
           { locale: newLocale }
         );
       }

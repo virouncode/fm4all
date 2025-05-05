@@ -21,23 +21,24 @@ import ExpertiseCarousel from "../../services/[slug]/ExpertiseCarousel";
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ tag: string }>;
+  params: Promise<{ slug: string }>;
 }) => {
-  const { tag } = await params;
+  const { slug } = await params;
+
   const locale = await getLocale();
   return generateAlternates(
     "tag",
     locale,
     locale === "fr"
-      ? `Page des articles, services et secteurs associés au tag : ${capitalize(tag)}`
-      : `Tag page for articles, services and sectors associated with: ${capitalize(tag)}`,
+      ? `Page des articles, services et secteurs associés au tag : ${capitalize(slug)}`
+      : `Tag page for articles, services and sectors associated with: ${capitalize(slug)}`,
     locale === "fr"
-      ? `Découvrez nos articles, services et secteurs associés au tag "${tag}"`
-      : `Discover our articles, services and sectors associated with the tag "${tag}"`,
+      ? `Découvrez nos articles, services et secteurs associés au tag "${slug}"`
+      : `Discover our articles, services and sectors associated with the tag "${slug}"`,
     undefined,
     {
-      fr: locale === "fr" ? tag : getTagSlugFr(tag),
-      en: locale === "en" ? tag : getTagSlugEn(tag),
+      fr: locale === "fr" ? slug : getTagSlugFr(slug),
+      en: locale === "en" ? slug : getTagSlugEn(slug),
     }
   );
 };
@@ -45,16 +46,16 @@ export const generateMetadata = async ({
 const page = async ({
   params,
 }: {
-  params: Promise<{ tag: string; locale: "fr" | "en" }>;
+  params: Promise<{ slug: string; locale: "fr" | "en" }>;
 }) => {
-  const { tag, locale } = await params;
+  const { slug, locale } = await params;
   const query = Promise.all([
-    getTagRelatedServices(locale, tag),
-    getTagRelatedArticles(locale, tag),
-    getTagRelatedSecteurs(locale, tag),
+    getTagRelatedServices(locale, slug),
+    getTagRelatedArticles(locale, slug),
+    getTagRelatedSecteurs(locale, slug),
   ]);
   const [services, articles, secteurs] = await query;
-  const nom = (await getTagNom(tag)).nom;
+  const nom = (await getTagNom(slug)).nom;
 
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20 hyphens-auto">

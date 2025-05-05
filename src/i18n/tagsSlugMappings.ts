@@ -10,7 +10,7 @@ export const tagsSlugMappingsFrToEn: Record<string, string> = {
   demenagement: "office-relocation-services",
   "espace-coworking": "coworking-spaces",
   "startups-scaleups": "startups-scaleups",
-  erp: "public-access-builidings",
+  erp: "public-access-buildings",
   "immeuble-mono-occupant": "single-tenant-building",
   "evenementiel-bien-etre": "workplace-experience",
   bureaux: "office-spaces",
