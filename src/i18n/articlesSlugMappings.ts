@@ -22,6 +22,7 @@ export const articlesSubSlugMappingsFrToEn: Record<string, string> = {
     "create-your-risk-assessment-document-duer-for-your-office-in-france",
   "guide-pour-realiser-votre-plan-de-prevention":
     "how-to-create-your-prevention-plan-in-france-guide-free-template",
+  "guide-registre-securite-incendie": "guide-fire-safety-register-france",
 };
 export const getArticlesSlugFr = (articleSlugEn: string): string => {
   const entry = Object.entries(articlesSlugMappingsFrToEn).find(
