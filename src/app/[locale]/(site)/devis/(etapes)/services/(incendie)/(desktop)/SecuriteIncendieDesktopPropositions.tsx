@@ -1,3 +1,4 @@
+import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites";
 import { useTranslations } from "next-intl";
 import SecuriteIncendieFournisseurLogo from "../SecuriteIncendieFournisseurLogo";
 import SecuriteIncendieInputs from "../SecuriteIncendieInputs";
@@ -33,12 +34,7 @@ type SecuriteIncendieDesktopPropositionsProps = {
     e: React.ChangeEvent<HTMLInputElement>,
     type: "extincteur" | "baes" | "telBaes"
   ) => void;
-  incendieQuantite: {
-    nbExtincteurs: number;
-    id: number;
-    surface: number;
-    createdAt: Date;
-  };
+  incendieQuantite: SelectIncendieQuantitesType;
   handleClickProposition: (proposition: {
     id: number;
     fournisseurId: number;

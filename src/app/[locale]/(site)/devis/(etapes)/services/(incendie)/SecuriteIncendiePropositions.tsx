@@ -1,3 +1,8 @@
+import {
+  MAX_NB_BAES,
+  MAX_NB_EXTINCTEURS,
+  MAX_NB_TEL_BAES,
+} from "@/constants/constants";
 import { IncendieContext } from "@/context/IncendieProvider";
 import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { toast } from "@/hooks/use-toast";
@@ -8,11 +13,6 @@ import { ChangeEvent, useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import SecuriteIncendieDesktopPropositions from "./(desktop)/SecuriteIncendieDesktopPropositions";
 import SecuriteIncendieMobilePropositions from "./(mobile)/SecuriteIncendieMobilePropositions";
-import {
-  MAX_NB_EXTINCTEURS,
-  MAX_NB_BAES,
-  MAX_NB_TEL_BAES,
-} from "@/constants/constants";
 
 type SecuriteIncendiePropositionsProps = {
   incendieQuantite: SelectIncendieQuantitesType;
