@@ -60,7 +60,7 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
           <BreadcrumbPage>{categorie.titre}</BreadcrumbPage>
         </BreadcrumbList>
       </Breadcrumb>
-      <h1 className="text-5xl mb-10">
+      <h1 className="text-4xl mb-10">
         {tGlobal("nos-articles-sur-and-quot")}
         &quot;{categorie.titre}&quot;
       </h1>
