@@ -9,10 +9,19 @@ import {
 } from "@/db/schema";
 import { errorHelper } from "@/lib/errorHelper";
 import { roundEffectif } from "@/lib/utils/roundEffectif";
-import { selectHygieneConsoTarifsSchema } from "@/zod-schemas/hygieneConsoTarifs";
+import {
+  selectHygieneConsoTarifsFournisseurSchema,
+  selectHygieneConsoTarifsSchema,
+} from "@/zod-schemas/hygieneConsoTarifs";
 import { selectHygieneDistribQuantitesSchema } from "@/zod-schemas/hygieneDistribQuantites";
-import { selectHygieneDistribTarifsSchema } from "@/zod-schemas/hygieneDistribTarifs";
-import { selectHygieneInstalDistribTarifsSchema } from "@/zod-schemas/hygieneInstalDistribTarifs";
+import {
+  selectHygieneDistribTarifsFournisseurSchema,
+  selectHygieneDistribTarifsSchema,
+} from "@/zod-schemas/hygieneDistribTarifs";
+import {
+  selectHygieneInstalDistribTarifsFournisseurSchema,
+  selectHygieneInstalDistribTarifsSchema,
+} from "@/zod-schemas/hygieneInstalDistribTarifs";
 import { and, eq, getTableColumns } from "drizzle-orm";
 
 export const getHygieneDistribQuantite = async (effectif: string) => {
@@ -84,6 +93,36 @@ export const getHygieneDistribTarifs = async () => {
   }
 };
 
+export const getHygieneDistribTarifsFournisseur = async (
+  fournisseurId: number
+) => {
+  try {
+    const results = await db
+      .select()
+      .from(hygieneDistribTarifs)
+      .where(eq(hygieneDistribTarifs.fournisseurId, fournisseurId));
+    if (results.length === 0) {
+      return [];
+    }
+    const validatedResults = results.map((result) =>
+      selectHygieneDistribTarifsFournisseurSchema.parse(result)
+    );
+    const data = validatedResults.map((result) => ({
+      ...result,
+      oneShot: result.oneShot ? result.oneShot / RATIO : null,
+      pa12M: result.pa12M ? result.pa12M / RATIO : null,
+      pa24M: result.pa24M ? result.pa24M / RATIO : null,
+      pa36M: result.pa36M ? result.pa36M / RATIO : null,
+      minFacturation: result.minFacturation
+        ? result.minFacturation / RATIO
+        : null,
+    }));
+    return data;
+  } catch (err) {
+    errorHelper(err);
+  }
+};
+
 export const getHygieneInstalDistribTarifs = async (effectif: string) => {
   const roundedEffectif = roundEffectif(parseInt(effectif));
   try {
@@ -97,6 +136,31 @@ export const getHygieneInstalDistribTarifs = async (effectif: string) => {
     }
     const validatedResults = results.map((result) =>
       selectHygieneInstalDistribTarifsSchema.parse(result)
+    );
+    const data = validatedResults.map((validatedResult) => ({
+      ...validatedResult,
+      prixInstallation: validatedResult.prixInstallation / RATIO,
+    }));
+    return data;
+  } catch (err) {
+    errorHelper(err);
+  }
+};
+
+export const getHygieneInstalDistribTarifsFournisseur = async (
+  fournisseurId: number
+) => {
+  try {
+    const results = await db
+      .select()
+      .from(hygieneInstalDistribTarifs)
+      .where(eq(hygieneInstalDistribTarifs.fournisseurId, fournisseurId));
+
+    if (results.length === 0) {
+      return [];
+    }
+    const validatedResults = results.map((result) =>
+      selectHygieneInstalDistribTarifsFournisseurSchema.parse(result)
     );
     const data = validatedResults.map((validatedResult) => ({
       ...validatedResult,
@@ -137,6 +201,35 @@ export const getHygieneConsosTarifs = async (effectif: string) => {
     }
     const validatedResults = results.map((result) =>
       selectHygieneConsoTarifsSchema.parse(result)
+    );
+    const data = validatedResults.map((validatedResult) => ({
+      ...validatedResult,
+      paParPersonneEmp: validatedResult.paParPersonneEmp / RATIO,
+      paParPersonnePh: validatedResult.paParPersonnePh / RATIO,
+      paParPersonneSavon: validatedResult.paParPersonneSavon / RATIO,
+      paParPersonneDesinfectant:
+        validatedResult.paParPersonneDesinfectant / RATIO,
+    }));
+    return data;
+  } catch (err) {
+    errorHelper(err);
+  }
+};
+
+export const getHygieneConsosTarifsFournisseur = async (
+  fournisseurId: number
+) => {
+  try {
+    const results = await db
+      .select()
+      .from(hygieneConsoTarifs)
+      .where(eq(hygieneConsoTarifs.fournisseurId, fournisseurId));
+
+    if (results.length === 0) {
+      return [];
+    }
+    const validatedResults = results.map((result) =>
+      selectHygieneConsoTarifsFournisseurSchema.parse(result)
     );
     const data = validatedResults.map((validatedResult) => ({
       ...validatedResult,

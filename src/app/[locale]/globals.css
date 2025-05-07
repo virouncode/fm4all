@@ -13,6 +13,7 @@ body > div:last-child > span + img {
 html {
   min-height: 100%;
   overflow-y: auto;
+  scroll-behavior: smooth;
 }
 body {
   min-height: 100%;

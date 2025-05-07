@@ -1,5 +1,6 @@
 import { CalculatorDialog } from "@/components/calculator/CalculatorDialog";
 import ServicePresentationCard from "@/components/cards/ServicePresentationCard";
+import CDCNettoyage from "@/components/CDCNettoyage";
 import {
   getNettoyageAllQuantites,
   getNettoyageTarifsFournisseur,
@@ -9,6 +10,7 @@ import {
 import { SelectNettoyageQuantitesType } from "@/zod-schemas/nettoyageQuantites";
 import { SelectNettoyageTarifFournisseurType } from "@/zod-schemas/nettoyageTarifs";
 import { SprayCan } from "lucide-react";
+import CDCDialog from "./CDCDialog";
 import NettoyageTarifsUpdateForm from "./NettoyageTarifsUpdateForm";
 import VitrerieTarifsUpdateForm from "./VitrerieTarifsUpdateForm";
 
@@ -40,13 +42,15 @@ const DPGFNettoyage = async ({ fournisseurId }: DPGFNettoyageProps) => {
   return (
     <main className="container mx-auto p-6">
       <div className="flex items-center justify-between mb-6">
-        <div className="flex gap-8 items-center">
+        <div className="flex gap-4 items-center">
           <div className="w-[250px]">
             <ServicePresentationCard icon={<SprayCan />} title="Nettoyage" />
           </div>
-          <h1 className="text-2xl font-bold hidden sm:block">DPGF</h1>
+          <CalculatorDialog />
         </div>
-        <CalculatorDialog />
+        <CDCDialog>
+          <CDCNettoyage />
+        </CDCDialog>
       </div>
       <NettoyageTarifsUpdateForm
         initialTarifs={tarifs}

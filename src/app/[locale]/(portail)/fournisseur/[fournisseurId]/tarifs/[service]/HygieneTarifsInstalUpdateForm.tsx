@@ -1,6 +1,6 @@
 "use client";
 
-import { updateNettoyageTarifAction } from "@/actions/nettoyageTarifsAction";
+import { updateHygieneTarifInstalAction } from "@/actions/hygieneTarifsAction";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -13,8 +13,7 @@ import {
 } from "@/components/ui/table";
 import { RATIO } from "@/constants/constants";
 import { useToast } from "@/hooks/use-toast";
-import { SelectNettoyageQuantitesType } from "@/zod-schemas/nettoyageQuantites";
-import { SelectNettoyageTarifFournisseurType } from "@/zod-schemas/nettoyageTarifs";
+import { SelectHygieneInstalDistribTarifsFournisseurType } from "@/zod-schemas/hygieneInstalDistribTarifs";
 import { format } from "date-fns";
 import { Loader } from "lucide-react";
 import { DateTime } from "luxon";
@@ -22,23 +21,21 @@ import { useLocale } from "next-intl";
 import { ChangeEvent, useState } from "react";
 
 const mapping = {
-  hParPassage: "Heures moyennes par passage",
-  tauxHoraire: "Taux horaire tout compris (€/h HT)",
+  effectif: "Effectif",
+  prixInstallation: "Prix d&apos;installation (€ HT)",
 };
 
-type NettoyageTarifsUpdateFormProps = {
-  initialTarifs: SelectNettoyageTarifFournisseurType[];
-  quantites: SelectNettoyageQuantitesType[];
+type HygieneTarifsInstalUpdateFormProps = {
+  initialTarifs: SelectHygieneInstalDistribTarifsFournisseurType[];
   title: string;
 };
 
-export default function NettoyageTarifsUpdateForm({
+export default function HygieneTarifsInstalUpdateForm({
   initialTarifs,
-  quantites,
   title,
-}: NettoyageTarifsUpdateFormProps) {
+}: HygieneTarifsInstalUpdateFormProps) {
   const [tarifs, setTarifs] =
-    useState<SelectNettoyageTarifFournisseurType[]>(initialTarifs);
+    useState<SelectHygieneInstalDistribTarifsFournisseurType[]>(initialTarifs);
   const [modifiedTarifs, setModifiedTarifs] = useState<Set<number>>(new Set());
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
@@ -62,7 +59,7 @@ export default function NettoyageTarifsUpdateForm({
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement>,
     id: number,
-    field: keyof SelectNettoyageTarifFournisseurType
+    field: keyof SelectHygieneInstalDistribTarifsFournisseurType
   ) => {
     // Filtrer pour n'accepter que les chiffres et les virgules/points
     const inputValue = e.target.value;
@@ -88,18 +85,20 @@ export default function NettoyageTarifsUpdateForm({
         return newSet;
       });
     } else {
-      // Si la valeur est revenue à sa valeur initiale, retirer de la liste des modifiés
-      // Vérifier si tous les autres champs correspondent également
-      const otherField =
-        field === "hParPassage" ? "tauxHoraire" : "hParPassage";
-      const otherFieldValue = tarifs.find((t) => t.id === id)?.[otherField];
-
+      // Si la valeur est revenue à sa valeur initiale, vérifier si tous les autres champs correspondent également
       const allFieldsMatch =
         initialTarif &&
-        initialTarif.hParPassage ===
-          (field === "hParPassage" ? value : otherFieldValue) &&
-        initialTarif.tauxHoraire ===
-          (field === "tauxHoraire" ? value : otherFieldValue);
+        Object.entries(initialTarif).every(([key, val]) => {
+          if (key === field) {
+            return val === value;
+          }
+          return (
+            val ===
+            tarifs.find((t) => t.id === id)?.[
+              key as keyof SelectHygieneInstalDistribTarifsFournisseurType
+            ]
+          );
+        });
 
       if (allFieldsMatch) {
         setModifiedTarifs((prev) => {
@@ -127,13 +126,14 @@ export default function NettoyageTarifsUpdateForm({
       if (!initialTarif) continue;
 
       // Vérifier quels champs ont été modifiés
-      const fieldsToUpdate: Array<keyof SelectNettoyageTarifFournisseurType> =
-        [];
-      if (tarif.hParPassage !== initialTarif.hParPassage) {
-        fieldsToUpdate.push("hParPassage");
+      const fieldsToUpdate: Array<
+        keyof SelectHygieneInstalDistribTarifsFournisseurType
+      > = [];
+      if (tarif.effectif !== initialTarif.effectif) {
+        fieldsToUpdate.push("effectif");
       }
-      if (tarif.tauxHoraire !== initialTarif.tauxHoraire) {
-        fieldsToUpdate.push("tauxHoraire");
+      if (tarif.prixInstallation !== initialTarif.prixInstallation) {
+        fieldsToUpdate.push("prixInstallation");
       }
 
       // Mettre à jour chaque champ modifié
@@ -147,19 +147,16 @@ export default function NettoyageTarifsUpdateForm({
               toast({
                 variant: "destructive",
                 title: "Erreur 😿",
-                description: `La valeur de "${mapping[field as "hParPassage" | "tauxHoraire"]}" ne peut être nulle ou mal formatée, entrez une valeur entière ou décimale`,
+                description: `La valeur de "${mapping[field as keyof typeof mapping]}" ne peut être nulle ou mal formatée, entrez une valeur entière ou décimale`,
               });
               setSaving(false);
               return;
             }
 
-            const result = await updateNettoyageTarifAction({
+            const result = await updateHygieneTarifInstalAction({
               id,
               field,
               value: Math.round(value * RATIO),
-              table: title.includes("Repasse")
-                ? "nettoyageRepasseTarifs"
-                : "nettoyageTarifs",
             });
             if (!result?.data?.success) {
               success = false;
@@ -200,6 +197,12 @@ export default function NettoyageTarifsUpdateForm({
     }
   };
 
+  const handleCancel = () => {
+    // Réinitialiser les tarifs à leur état initial
+    setTarifs(initialTarifs);
+    setModifiedTarifs(new Set());
+  };
+
   if (tarifs.length === 0) {
     return (
       <div className="text-center p-8">
@@ -208,39 +211,9 @@ export default function NettoyageTarifsUpdateForm({
       </div>
     );
   }
-  if (quantites.length === 0) {
-    return (
-      <div className="text-center p-8">
-        Aucune quantité trouvée. Veuillez contacter l&apos;administrateur.
-      </div>
-    );
-  }
 
-  // Définir l'ordre des gammes
-  const gammeOrder = {
-    essentiel: 1,
-    confort: 2,
-    excellence: 3,
-  };
-
-  // Trier les tarifs par surface puis par gamme
-  const sortedTarifs = [...tarifs].sort((a, b) => {
-    // D'abord trier par surface
-    if (a.surface !== b.surface) {
-      return a.surface - b.surface;
-    }
-    // Ensuite trier par gamme dans l'ordre spécifié
-    return (
-      gammeOrder[a.gamme as keyof typeof gammeOrder] -
-      gammeOrder[b.gamme as keyof typeof gammeOrder]
-    );
-  });
-
-  const handleCancel = () => {
-    // Réinitialiser les tarifs à leur état initial
-    setTarifs(initialTarifs);
-    setModifiedTarifs(new Set());
-  };
+  // Trier les tarifs par effectif
+  const sortedTarifs = [...tarifs].sort((a, b) => a.effectif - b.effectif);
 
   return (
     <>
@@ -256,23 +229,9 @@ export default function NettoyageTarifsUpdateForm({
         {/* Bouton de sauvegarde et indicateur de modifications */}
         <div className="flex justify-between items-center flex-col gap-4 md:flex-row md:gap-0">
           <div>
-            {hasUnsavedChanges ? (
+            {hasUnsavedChanges && (
               <div className="text-sm text-amber-600 font-medium">
                 Vous avez des modifications non sauvegardées
-              </div>
-            ) : (
-              <Button
-                disabled={!hasUnsavedChanges || saving}
-                size="lg"
-                className="bg-fm4alldestructive"
-              >
-                Publier
-              </Button>
-            )}
-            {(tarifs.some((tarif) => !tarif.hParPassage) ||
-              tarifs.some((tarif) => !tarif.tauxHoraire)) && (
-              <div className="text-sm text-red-600 font-medium">
-                Vous avez entré des valeurs erronées
               </div>
             )}
           </div>
@@ -309,104 +268,33 @@ export default function NettoyageTarifsUpdateForm({
             <Table>
               <TableHeader className="sticky top-0 bg-background z-10 shadow-sm">
                 <TableRow>
-                  <TableHead>Surface (m²)</TableHead>
-                  <TableHead>Gamme</TableHead>
-                  <TableHead>Fréquence de passage (j/an)</TableHead>
-                  <TableHead>Total Annuel (€ HT)</TableHead>
-                  <TableHead>Cadence (m2/h)</TableHead>
-                  <TableHead>Heures moyennes par passage*</TableHead>
-                  <TableHead>Taux horaire tout compris (€/h HT)*</TableHead>
+                  <TableHead>Nombre moyen de personnes</TableHead>
+                  <TableHead>
+                    Prix d&apos;installation (€ HT, laisser vide si inclus)
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {sortedTarifs.map((tarif, index) => {
-                  // Vérifier si c'est le dernier élément de cette surface
-                  const isLastOfSurface =
-                    index === sortedTarifs.length - 1 ||
-                    sortedTarifs[index + 1].surface !== tarif.surface;
-
-                  // Trouver la quantité correspondante
-                  const quantite = quantites.find(
-                    (q) =>
-                      q.surface === tarif.surface && q.gamme === tarif.gamme
-                  );
-
-                  // Calculer la fréquence annuelle
-                  const freqAnnuelle = quantite
-                    ? Math.round(quantite.freqAnnuelle)
-                    : "-";
-
                   // Vérifier si ce tarif a été modifié
                   const isModified = isTarifModified(tarif.id);
 
                   return (
                     <TableRow
                       key={tarif.id}
-                      className={`${
-                        isLastOfSurface ? "border-b-2 border-gray-300" : ""
-                      } ${
-                        tarif.gamme === "essentiel"
-                          ? "bg-fm4allessential/5"
-                          : tarif.gamme === "confort"
-                            ? "bg-fm4allcomfort/5"
-                            : "bg-fm4allexcellence/5"
-                      } ${isModified ? "bg-amber-50" : ""} ${
-                        !tarif.hParPassage || !tarif.tauxHoraire
-                          ? "border-2 border-red-600"
-                          : ""
-                      }`}
+                      className={`${isModified ? "bg-amber-50" : ""}`}
                     >
                       <TableCell className="font-medium">
-                        {tarif.surface}
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        <span
-                          className={
-                            tarif.gamme === "essentiel"
-                              ? "text-fm4allessential font-bold"
-                              : tarif.gamme === "confort"
-                                ? "text-fm4allcomfort font-bold"
-                                : "text-fm4allexcellence font-bold"
-                          }
-                        >
-                          {tarif.gamme}
-                        </span>
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {freqAnnuelle}
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {typeof freqAnnuelle === "number"
-                          ? Math.round(
-                              tarif.tauxHoraire *
-                                tarif.hParPassage *
-                                freqAnnuelle
-                            )
-                          : "-"}
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {Math.round(tarif.surface / tarif.hParPassage)}
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          step="0.05"
-                          min={0}
-                          value={tarif.hParPassage || ""}
-                          onChange={(e) =>
-                            handleInputChange(e, tarif.id, "hParPassage")
-                          }
-                          className={`w-24 ${isModified ? "border-amber-500" : ""}`}
-                        />
+                        {tarif.effectif}
                       </TableCell>
                       <TableCell>
                         <Input
                           type="number"
                           step="0.01"
                           min={0}
-                          value={tarif.tauxHoraire || ""}
+                          value={tarif.prixInstallation || ""}
                           onChange={(e) =>
-                            handleInputChange(e, tarif.id, "tauxHoraire")
+                            handleInputChange(e, tarif.id, "prixInstallation")
                           }
                           className={`w-24 ${isModified ? "border-amber-500" : ""}`}
                         />

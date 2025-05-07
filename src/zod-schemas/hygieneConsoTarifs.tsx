@@ -28,5 +28,23 @@ export const selectHygieneConsoTarifsSchema = createSelectSchema(
   nbAvis: z.number().nullable(),
 });
 
+export const selectHygieneConsoTarifsFournisseurSchema = createSelectSchema(
+  hygieneConsoTarifs,
+  {
+    effectif: (schema) => schema.min(1, "L'effectif est obligatoire"),
+    paParPersonneEmp: (schema) =>
+      schema.min(1, "Le prix annuel par personne emp est obligatoire"),
+    paParPersonneSavon: (schema) =>
+      schema.min(1, "Le prix annuel par personne savon est obligatoire"),
+    paParPersonnePh: (schema) =>
+      schema.min(1, "Le prix annuel par personne ph est obligatoire"),
+    paParPersonneDesinfectant: (schema) =>
+      schema.min(1, "Le prix annuel par personne desinfectant est obligatoire"),
+  }
+);
+
 export type SelectHygieneConsoTarifsType =
   typeof selectHygieneConsoTarifsSchema._type;
+
+export type SelectHygieneConsoTarifsFournisseurType =
+  typeof selectHygieneConsoTarifsFournisseurSchema._type;

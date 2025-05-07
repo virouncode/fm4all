@@ -22,7 +22,6 @@ type UserButtonProps = {
 
 const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
   const t = useTranslations("auth");
-
   const router = useRouter();
   const { data: session } = useSession();
   const user = session?.user as User & {

@@ -1,5 +1,6 @@
 import { getSession } from "@/lib/auth-session";
 import DPGFNettoyage from "./DPGFNettoyage";
+import DPGFHygiene from "./DPGFHygiene";
 
 const page = async ({
   params,
@@ -19,6 +20,8 @@ const page = async ({
   switch (service) {
     case "nettoyage":
       return <DPGFNettoyage fournisseurId={fournisseurId} />;
+    case "hygiene":
+      return <DPGFHygiene fournisseurId={fournisseurId} />;
     default:
       return <div>Service not found</div>;
   }

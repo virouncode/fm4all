@@ -127,11 +127,11 @@ export function CalculatorDialog() {
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="icon" className="ml-2">
-          <Calculator className="h-4 w-4" />
+      <DialogTrigger asChild className="hidden md:block">
+        <div role="button" className="p-4 rounded-xl border border-slate-200">
+          <Calculator size={20} />
           <span className="sr-only">Calculatrice</span>
-        </Button>
+        </div>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[320px]">
         <DialogHeader>

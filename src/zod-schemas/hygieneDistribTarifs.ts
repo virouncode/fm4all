@@ -17,5 +17,11 @@ export const selectHygieneDistribTarifsSchema = createSelectSchema(
   nbAvis: z.number().nullable(),
 });
 
+export const selectHygieneDistribTarifsFournisseurSchema =
+  createSelectSchema(hygieneDistribTarifs);
+
 export type SelectHygieneDistribTarifsType =
   typeof selectHygieneDistribTarifsSchema._type;
+
+export type SelectHygieneDistribTarifsFournisseurType =
+  typeof selectHygieneDistribTarifsFournisseurSchema._type;

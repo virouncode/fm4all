@@ -137,7 +137,9 @@ export default function VitrerieTarifsUpdateForm({
         <div className="border-l border-l-gray-500">
           <h2 className="ml-4 text-xl font-bold">{title}</h2>
         </div>
-        <p className="text-sm italic">Dernière mise à jour : {lastUpdate}</p>
+        <p className="text-sm italic text-end">
+          Dernière mise à jour : {lastUpdate}
+        </p>
       </div>
       <Form {...form}>
         <form
@@ -147,10 +149,18 @@ export default function VitrerieTarifsUpdateForm({
           {/* Bouton de sauvegarde et indicateur de modifications */}
           <div className="flex justify-between items-center flex-col gap-4 md:flex-row md:gap-0">
             <div>
-              {hasUnsavedChanges && (
+              {hasUnsavedChanges ? (
                 <div className="text-sm text-amber-600 font-medium">
                   Vous avez des modifications non sauvegardées
                 </div>
+              ) : (
+                <Button
+                  disabled={!hasUnsavedChanges}
+                  size="lg"
+                  className="bg-fm4alldestructive"
+                >
+                  Publier
+                </Button>
               )}
             </div>
             <div className="flex items-center gap-2">
