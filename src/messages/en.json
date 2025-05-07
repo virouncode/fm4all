@@ -1242,7 +1242,7 @@
     "remise-cafe": "Discount"
   },
   "Erreur": {
-    "erreur": "Error !",
+    "erreur": "An Error occured !",
     "erreur-globale": "Global error !",
     "reessayer": "Retry",
     "retour": "Back"

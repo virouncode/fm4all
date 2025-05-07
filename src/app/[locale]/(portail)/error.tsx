@@ -19,28 +19,22 @@ export default function Error({
   const t = useTranslations("Erreur");
 
   return (
-    <div className="flex items-center justify-center max-w-prose mx-auto h-[calc(100vh-4rem)]">
-      <div className="flex flex-col gap-2">
-        <h2 className="font-bold text-lg text-center">{t("erreur")}</h2>
-        <p>{error.message}</p>
-        <div className="flex gap-4">
+    <div className="flex items-center justify-center w-44 mx-auto h-[calc(100vh-4rem)]">
+      <div className="flex flex-col gap-6 w-full">
+        <h2 className="font-bold text-lg text-center text-red-500">
+          {t("erreur")}
+        </h2>
+        <p className="text-center">{error.message}</p>
+        <div className="flex flex-col gap-4 w-full">
           <Button
             variant="default"
-            onClick={
-              // Attempt to recover by trying to re-render the segment
-              () => reset()
-            }
+            onClick={() => reset()}
             size="lg"
-            className="flex-1"
+            className="w-full"
           >
             {t("reessayer")}
           </Button>
-          <BackButton
-            title={t("retour")}
-            size="lg"
-            variant="outline"
-            className="flex-1"
-          />
+          <BackButton title={t("retour")} size="lg" />
         </div>
       </div>
     </div>

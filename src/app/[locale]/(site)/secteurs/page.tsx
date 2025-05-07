@@ -20,7 +20,6 @@ export const generateMetadata = async (): Promise<Metadata> => {
 
 const page = async () => {
   const t = await getTranslations("SecteursPage");
-
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
       <article className="mt-6 flex flex-col gap-10">

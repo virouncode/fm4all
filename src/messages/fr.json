@@ -1242,7 +1242,7 @@
     "remise-cafe": "Remise"
   },
   "Erreur": {
-    "erreur": "Erreur !",
+    "erreur": "Une erreur est survenue !",
     "erreur-globale": "Erreur globale !",
     "reessayer": "Réessayer",
     "retour": "Retour"

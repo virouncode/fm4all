@@ -128,6 +128,8 @@ const page = async ({
   const { slug, locale } = await params;
   const service = await getService(slug);
   if (!service) {
+    console.log("Service not found");
+
     notFound();
   }
   const tagsSortants = service.tagsSortants as {

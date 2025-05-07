@@ -12,7 +12,6 @@ export default async function NotFoundPage() {
         <BackButton
           title={locale === "fr" ? "Retour" : "Back"}
           size="lg"
-          variant="outline"
           className="text-base"
         />
       </div>

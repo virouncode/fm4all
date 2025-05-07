@@ -19,12 +19,6 @@ const page = async ({
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20 hyphens-auto">
       <section className="mt-6">
         <h1 className="text-4xl mb-14">Mon profil</h1>
-        {/* <div className="flex gap-2 items-center mb-6">
-          <Lightbulb size={20} />
-          <p className="text-base italic ">
-            Comment vous apparaissez dans le funnel
-          </p>
-        </div> */}
         <FournisseurUpdateForm initialFournisseur={fournisseur} />
       </section>
     </main>

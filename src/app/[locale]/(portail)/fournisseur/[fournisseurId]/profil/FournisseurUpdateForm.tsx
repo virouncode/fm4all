@@ -202,6 +202,15 @@ const FournisseurUpdateForm = ({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(submitForm)} className="grid gap-2">
             <div className="flex flex-col md:grid md:grid-cols-2 gap-2 md:gap-6">
+              <div className="col-span-2 mb-6 md:mb-0">
+                <TextAreaWithLabel<UpdateFournisseurFormType>
+                  fieldTitle="Slogan"
+                  nameInSchema="slogan"
+                  rows={3}
+                  className="resize-none"
+                  placeholder="Votre phrase d'accroche, votre slogan..."
+                />
+              </div>
               <div className="flex flex-col gap-2 col-span-2">
                 <Label className="text-base ">Logo de l&apos;entreprise</Label>
                 {!imagePreview ? (
@@ -269,10 +278,6 @@ const FournisseurUpdateForm = ({
                 fieldTitle="N° de téléphone*"
                 nameInSchema="phoneContact"
                 type="tel"
-              />
-              <InputWithLabel<UpdateFournisseurFormType>
-                fieldTitle="Slogan"
-                nameInSchema="slogan"
               />
               <InputWithLabel<UpdateFournisseurFormType>
                 fieldTitle="Annee de création"

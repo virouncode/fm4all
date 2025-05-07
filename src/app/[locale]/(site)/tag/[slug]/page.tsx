@@ -16,6 +16,7 @@ import {
 } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
 import { getLocale } from "next-intl/server";
+import { notFound } from "next/navigation";
 import ExpertiseCarousel from "../../services/[slug]/ExpertiseCarousel";
 
 export const generateMetadata = async ({
@@ -55,7 +56,13 @@ const page = async ({
     getTagRelatedSecteurs(locale, slug),
   ]);
   const [services, articles, secteurs] = await query;
-  const nom = (await getTagNom(slug)).nom;
+  const tag = await getTagNom(slug);
+
+  if (!tag) {
+    notFound();
+  }
+
+  const nom = tag.nom;
 
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20 hyphens-auto">

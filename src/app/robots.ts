@@ -5,13 +5,11 @@ import {
 import { routing } from "@/i18n/routing";
 import { getSecteurSlugEn } from "@/i18n/secteursSlugMappings";
 import { getServicesSlugEn } from "@/i18n/servicesSlugMappings";
-import { getTagSlugEn } from "@/i18n/tagsSlugMappings";
 import {
   fetchArticleCategories,
   fetchArticleSlugs,
   fetchSecteursSlugs,
   fetchServiceSlugs,
-  fetchTagsSlugs,
 } from "@/sanity/queries";
 import type { MetadataRoute } from "next";
 
@@ -51,7 +49,6 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
   const serviceSlugs = await fetchServiceSlugs();
   const articlesCategories = await fetchArticleCategories();
   const articleSlugs = await fetchArticleSlugs();
-  const tagsSlugs = await fetchTagsSlugs();
   const secteursSlugs = await fetchSecteursSlugs();
 
   const wrongServicesUrls = serviceSlugs.flatMap((slug) =>
@@ -74,22 +71,11 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
       : []
   );
 
-  const wrongTagsUrls = tagsSlugs
-    .filter(
-      (slug) =>
-        slug !== "maintenance" &&
-        slug !== "food-and-beverage" &&
-        slug !== "facility-management" &&
-        slug !== "office-manager" &&
-        slug !== "startups-scaleups"
-    )
-    .flatMap((slug) =>
-      slug ? [`/fr/tag/${getTagSlugEn(slug)}`, `/en/tag/${slug}`] : []
-    );
-
   const disallowUrls = [
     "/fr/test-shadcn-colors",
     "/en/test-shadcn-colors",
+    "/fr/tag/*",
+    "/en/tag/*",
     "/fr/mon-devis/*",
     "/en/my-quote/*",
     "/fr/admin/*",
@@ -104,7 +90,6 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     ...wrongServicesUrls,
     ...wrongArticlesCategoriesUrls,
     ...wrongArticlesUrls,
-    ...wrongTagsUrls,
     ...wrongSecteursUrls,
   ];
 

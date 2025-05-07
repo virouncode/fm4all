@@ -5,13 +5,11 @@ import {
 import { routing } from "@/i18n/routing";
 import { getSecteurSlugEn } from "@/i18n/secteursSlugMappings";
 import { getServicesSlugEn } from "@/i18n/servicesSlugMappings";
-import { getTagSlugEn } from "@/i18n/tagsSlugMappings";
 import {
   fetchArticleCategories,
   fetchArticleSlugs,
   fetchSecteursSlugs,
   fetchServiceSlugs,
-  fetchTagsSlugs,
 } from "@/sanity/queries";
 import { MetadataRoute } from "next";
 const APP_URL = "https://www.fm4all.com";
@@ -41,7 +39,8 @@ const generateStaticUrls = () => {
         path.includes("/fournisseur") ||
         path.includes("/auth") ||
         path.includes("/devis") ||
-        path.includes("/chalandise")
+        path.includes("/chalandise") ||
+        path.includes("/tag")
       )
         continue;
 
@@ -77,7 +76,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const serviceSlugs = await fetchServiceSlugs();
   const articlesCategories = await fetchArticleCategories();
   const articleSlugs = await fetchArticleSlugs();
-  const tagsSlugs = await fetchTagsSlugs();
   const secteursSlugs = await fetchSecteursSlugs();
 
   const servicesUrls: MetadataRoute.Sitemap = serviceSlugs.flatMap((slug) => {
@@ -133,23 +131,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ];
     }
   );
-  const tagsUrls: MetadataRoute.Sitemap = tagsSlugs.flatMap((slug) => {
-    if (!slug) return [];
-    return [
-      {
-        url: `${APP_URL}/fr/tag/${slug}`,
-        lastModified: lastMod,
-        changeFrequency: "weekly",
-        priority: 0.5,
-      },
-      {
-        url: `${APP_URL}/en/tag/${getTagSlugEn(slug)}`,
-        lastModified: lastMod,
-        changeFrequency: "weekly",
-        priority: 0.5,
-      },
-    ];
-  });
+
   const secteursUrls: MetadataRoute.Sitemap = secteursSlugs.flatMap((slug) => {
     if (!slug) return [];
     return [
@@ -173,7 +155,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...servicesUrls,
     ...articlesCategoriesUrls,
     ...articlesUrls,
-    ...tagsUrls,
     ...secteursUrls,
   ];
 }
