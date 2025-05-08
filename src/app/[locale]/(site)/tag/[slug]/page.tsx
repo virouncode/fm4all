@@ -18,6 +18,7 @@ import { HomeIcon } from "lucide-react";
 import { getLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import ExpertiseCarousel from "../../services/[slug]/ExpertiseCarousel";
+import { LocaleType } from "@/i18n/routing";
 
 export const generateMetadata = async ({
   params,
@@ -47,7 +48,7 @@ export const generateMetadata = async ({
 const page = async ({
   params,
 }: {
-  params: Promise<{ slug: string; locale: "fr" | "en" }>;
+  params: Promise<{ slug: string; locale: LocaleType }>;
 }) => {
   const { slug, locale } = await params;
   const query = Promise.all([

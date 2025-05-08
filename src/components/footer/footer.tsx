@@ -6,15 +6,16 @@ import {
 } from "@/sanity/queries";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ArticleCategory } from "../../../sanity.types";
+import { LocaleType } from "@/i18n/routing";
 
 const Footer = async () => {
   const t = await getTranslations("footer");
   const locale = await getLocale();
 
   const [services, articles, secteurs] = await Promise.all([
-    getAllServices(locale as "fr" | "en"),
-    getLastArticles(locale as "fr" | "en"),
-    getAllSecteurs(locale as "fr" | "en"),
+    getAllServices(locale as LocaleType),
+    getLastArticles(locale as LocaleType),
+    getAllSecteurs(locale as LocaleType),
   ]);
 
   return (

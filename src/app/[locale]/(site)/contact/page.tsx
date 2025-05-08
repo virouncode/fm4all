@@ -15,9 +15,12 @@ export const generateMetadata = async (): Promise<Metadata> => {
   );
 };
 
+// export const generateStaticParams = () => {
+//   generateLocalizedRouteParams(["/contact"]);
+// };
+
 const page = async () => {
   const t = await getTranslations("ContactPage");
-  throw new Error("Error loading translations");
   return (
     <main className="max-w-7xl h-[calc(100vh-4rem)] mx-auto mb-24 py-4 px-6 md:px-20">
       <section className="mt-6 flex flex-col gap-10">

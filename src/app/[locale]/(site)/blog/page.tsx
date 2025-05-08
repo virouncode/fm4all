@@ -1,5 +1,6 @@
 import ArticlesCarousel from "@/components/carousel/ArticlesCarousel";
 import { Link } from "@/i18n/navigation";
+import { LocaleType } from "@/i18n/routing";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { getAllCategories } from "@/sanity/queries";
 import { Metadata } from "next";
@@ -22,7 +23,7 @@ const page = async () => {
   const t = await getTranslations("BlogPage");
   const tArticles = await getTranslations("HomePage.articles");
   const locale = await getLocale();
-  const categories = await getAllCategories(locale as "fr" | "en");
+  const categories = await getAllCategories(locale as LocaleType);
 
   return (
     <main className="max-w-7xl min-h-[calc(100vh-4rem)] mx-auto mb-24 py-4 px-6 md:px-20">

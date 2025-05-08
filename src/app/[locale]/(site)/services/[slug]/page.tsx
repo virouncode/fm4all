@@ -27,6 +27,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Slug } from "../../../../../../sanity.types";
 import ExpertiseCarousel from "./ExpertiseCarousel";
+import { LocaleType } from "@/i18n/routing";
 
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
@@ -120,7 +121,7 @@ export const generateMetadata = async ({
 const page = async ({
   params,
 }: {
-  params: Promise<{ slug: string; locale: "fr" | "en" }>;
+  params: Promise<{ slug: string; locale: LocaleType }>;
 }) => {
   const tGlobal = await getTranslations("Global");
   const t = await getTranslations("ServicesPage");

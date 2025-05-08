@@ -1,3 +1,4 @@
+import { LocaleType } from "@/i18n/routing";
 import {
   Article,
   ArticleCategory,
@@ -17,7 +18,7 @@ import { client } from "./lib/client";
 
 //TOUS LES SERVICES PAR LANGUE
 export const ALL_SERVICES_QUERY = `*[_type == "service" && language == $language]|order(date asc){ _id, titre, description, slug, imagePrincipale }`;
-export const getAllServices = async (locale: "fr" | "en") => {
+export const getAllServices = async (locale: LocaleType) => {
   return await client.fetch<Service[]>(ALL_SERVICES_QUERY, {
     language: locale,
   });
@@ -94,7 +95,7 @@ export const ASSOCIATED_TO_SERVICE_QUERY = `
   }
 }`;
 export const getAssociatedToService = async (
-  language: "fr" | "en",
+  language: LocaleType,
   tagIds: string[],
   currentId: string
 ): Promise<{
@@ -120,7 +121,7 @@ export const getAssociatedToService = async (
 export const TAG_RELATED_SERVICES_QUERY = `*[_type == "service" && language == $language && $slug in tagsEntrants[]->slug.current
 ]`;
 export const getTagRelatedServices = async (
-  locale: "fr" | "en",
+  locale: LocaleType,
   slug: string
 ): Promise<Service[]> => {
   return await client.fetch<Service[]>(TAG_RELATED_SERVICES_QUERY, {
@@ -143,7 +144,7 @@ export const LAST_ARTICLES_QUERY = `*[_type == "article" && language == $languag
     titre,
     slug }
   }`;
-export const getLastArticles = async (locale: "fr" | "en") => {
+export const getLastArticles = async (locale: LocaleType) => {
   return await client.fetch<
     (Article & {
       categorie: ArticleCategory;
@@ -168,7 +169,7 @@ export const getCategorie = async (slug: string) => {
 };
 
 export const ALL_CATEGORIES_QUERY = `*[_type == "articleCategory" && language == $language]`;
-export const getAllCategories = async (locale: "fr" | "en") => {
+export const getAllCategories = async (locale: LocaleType) => {
   return await client.fetch<ArticleCategory[]>(ALL_CATEGORIES_QUERY, {
     language: locale,
   });
@@ -182,7 +183,7 @@ export const ARTICLES_OF_CATEGORIE_QUERY = `*[_type == "article" && language == 
   imagePrincipale 
 }`;
 export const getArticlesOfCategorie = async (
-  locale: "fr" | "en",
+  locale: LocaleType,
   slug: string
 ): Promise<Article[]> => {
   return await client.fetch<Article[]>(ARTICLES_OF_CATEGORIE_QUERY, {
@@ -292,7 +293,7 @@ export const ASSOCIATED_TO_ARTICLE_QUERY = `
 }`;
 
 export const getAssociatedToArticle = async (
-  language: "fr" | "en",
+  language: LocaleType,
   tagIds: string[],
   currentId: string
 ): Promise<{
@@ -324,7 +325,7 @@ categorie->{
 }`;
 
 export const getTagRelatedArticles = async (
-  locale: "fr" | "en",
+  locale: LocaleType,
   slug: string
 ): Promise<(Article & { categorie: ArticleCategory })[]> => {
   return await client.fetch<(Article & { categorie: ArticleCategory })[]>(
@@ -340,7 +341,7 @@ export const getTagRelatedArticles = async (
 //========================================= SECTEURS =============================================//
 //================================================================================================//
 export const ALL_SECTEURS_QUERY = `*[_type == "secteur" && language == $language]|order(date asc){ _id, titre, description, slug, imagePrincipale }`;
-export const getAllSecteurs = async (locale: "fr" | "en") => {
+export const getAllSecteurs = async (locale: LocaleType) => {
   return await client.fetch<Secteur[]>(ALL_SECTEURS_QUERY, {
     language: locale,
   });
@@ -416,7 +417,7 @@ export const ASSOCIATED_TO_SECTEUR_QUERY = `
   }
 }`;
 export const getAssociatedToSecteur = async (
-  language: "fr" | "en",
+  language: LocaleType,
   tagIds: string[],
   currentId: string
 ): Promise<{
@@ -443,7 +444,7 @@ export const TAG_RELATED_SECTEURS_QUERY = `*[_type == "secteur" && language == $
 ]`;
 
 export const getTagRelatedSecteurs = async (
-  locale: "fr" | "en",
+  locale: LocaleType,
   slug: string
 ): Promise<Secteur[]> => {
   return await client.fetch<Secteur[]>(TAG_RELATED_SECTEURS_QUERY, {

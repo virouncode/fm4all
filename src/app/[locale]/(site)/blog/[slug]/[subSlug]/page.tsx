@@ -35,6 +35,7 @@ import {
   SanityImageHotspot,
   Slug,
 } from "../../../../../../../sanity.types";
+import { LocaleType } from "@/i18n/routing";
 
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
@@ -136,7 +137,7 @@ export const generateMetadata = async ({
 const page = async ({
   params,
 }: {
-  params: Promise<{ subSlug: string; locale: "fr" | "en" }>;
+  params: Promise<{ subSlug: string; locale: LocaleType }>;
 }) => {
   const tGlobal = await getTranslations("Global");
   const t = await getTranslations("ServicesPage");

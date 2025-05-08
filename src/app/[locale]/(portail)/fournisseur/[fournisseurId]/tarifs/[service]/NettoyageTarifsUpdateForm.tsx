@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { RATIO } from "@/constants/constants";
 import { useToast } from "@/hooks/use-toast";
+import { LocaleType } from "@/i18n/routing";
 import { SelectNettoyageQuantitesType } from "@/zod-schemas/nettoyageQuantites";
 import { SelectNettoyageTarifFournisseurType } from "@/zod-schemas/nettoyageTarifs";
 import { format } from "date-fns";
@@ -42,7 +43,7 @@ export default function NettoyageTarifsUpdateForm({
   const [modifiedTarifs, setModifiedTarifs] = useState<Set<number>>(new Set());
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
-  const locale = useLocale() as "fr" | "en";
+  const locale = useLocale() as LocaleType;
 
   const lastUpdate = format(
     initialTarifs.sort(

@@ -18,11 +18,11 @@ const UnauthorizedCard = ({ type }: UnauthorizedCardProps) => {
     <Card className="max-w-md z-20">
       <CardHeader>
         <CardTitle className="text-lg md:text-xl text-red-600">
-          Page non autorisée
+          Page non autorisée !
         </CardTitle>
-        <CardDescription className="text-xs md:text-sm">
+        <CardDescription className="text-base">
           Vous n&apos;avez pas les droits d&apos;accès à cette page . Veuillez
-          vous connecter avec un compte <strong>{type ?? ""}</strong> valide.
+          vous connecter avec le bon compte <strong>{type ?? ""}</strong>.
         </CardDescription>
       </CardHeader>
       <CardContent>

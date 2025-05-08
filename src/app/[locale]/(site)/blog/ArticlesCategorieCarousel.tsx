@@ -10,6 +10,7 @@ import { urlFor } from "@/sanity/lib/image";
 import { getArticlesOfCategorie } from "@/sanity/queries";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ArticleCategory } from "../../../../../sanity.types";
+import { LocaleType } from "@/i18n/routing";
 
 type ArticlesCategorieCarouselProps = {
   categorie: ArticleCategory;
@@ -22,7 +23,7 @@ const ArticlesCategorieCarousel = async ({
   // const options = { next: { revalidate: 30 } };
   const locale = await getLocale();
   const articles = await getArticlesOfCategorie(
-    locale as "fr" | "en",
+    locale as LocaleType,
     categorie.slug?.current ?? ""
   );
   return (

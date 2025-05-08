@@ -69,6 +69,13 @@ export async function middleware(req: NextRequest) {
             new URL(`/${locale}/auth/unauthorized?type=fournisseur`, req.url)
           );
         }
+        //Récupérer le adminId dans les params
+        const adminId = pathnameWithoutLocale.split("/")[2];
+        if (adminId && parseInt(adminId) !== user.id) {
+          return NextResponse.redirect(
+            new URL(`/${locale}/auth/unauthorized?type=admin`, req.url)
+          );
+        }
         break;
       case "client":
         if (pathnameWithoutLocale.startsWith("/admin"))
@@ -79,6 +86,12 @@ export async function middleware(req: NextRequest) {
           return NextResponse.redirect(
             new URL(`/${locale}/auth/unauthorized?type=fournisseur`, req.url)
           );
+        const clientId = pathnameWithoutLocale.split("/")[2];
+        if (clientId && parseInt(clientId) !== user.clientId) {
+          return NextResponse.redirect(
+            new URL(`/${locale}/auth/unauthorized?type=client`, req.url)
+          );
+        }
         break;
 
       case "fournisseur":
@@ -90,6 +103,14 @@ export async function middleware(req: NextRequest) {
           return NextResponse.redirect(
             new URL(`/${locale}/auth/unauthorized?type=client`, req.url)
           );
+        const fournisseurId = pathnameWithoutLocale.split("/")[2];
+        console.log("fournisseurId:", fournisseurId);
+
+        if (fournisseurId && parseInt(fournisseurId) !== user.fournisseurId) {
+          return NextResponse.redirect(
+            new URL(`/${locale}/auth/unauthorized?type=fournisseur`, req.url)
+          );
+        }
         break;
       default:
         return NextResponse.redirect(
@@ -97,6 +118,7 @@ export async function middleware(req: NextRequest) {
         );
     }
   }
+
   return intlMiddleware(req);
 }
 

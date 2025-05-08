@@ -6,6 +6,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { LocaleType } from "@/i18n/routing";
 import { urlFor } from "@/sanity/lib/image";
 import { getAllServices } from "@/sanity/queries";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -14,7 +15,7 @@ const ServicesCarousel = async () => {
   const t = await getTranslations("Global");
   // const options = { next: { revalidate: 30 } };
   const locale = await getLocale();
-  const services = await getAllServices(locale as "fr" | "en");
+  const services = await getAllServices(locale as LocaleType);
   return (
     <Carousel
       opts={{

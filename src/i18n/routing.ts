@@ -140,7 +140,10 @@ export const routing = defineRouting({
       fr: "/auth/reset-password",
       en: "/auth/reset-password",
     },
-
+    "/auth/unauthorized": {
+      fr: "/auth/unauthorized",
+      en: "/auth/unauthorized",
+    },
     //ADMIN
     "/admin/[adminId]": {
       fr: "/admin/[adminId]",
@@ -188,32 +191,5 @@ export const routing = defineRouting({
   },
 });
 
-export type Locale = "fr" | "en";
-export type PathnamesType =
-  | "/"
-  | "/services"
-  | "/services/[slug]"
-  | "/secteurs"
-  | "/secteurs/[slug]"
-  | "/blog"
-  | "/blog/[slug]"
-  | "/gammes"
-  | "/engagements"
-  | "/partenaires"
-  | "/faq"
-  | "/prestataire"
-  | "/contact"
-  | "/mentions"
-  | "/confidentialite"
-  | "/cookies"
-  | "/cgv"
-  | "/cgu"
-  | "/chalandise"
-  | "/devis/locaux"
-  | "/devis/services"
-  | "/devis/food-beverage"
-  | "/devis/pilotage"
-  | "/devis/sauvegarder"
-  | "/devis/personnaliser"
-  | "/devis/afficher"
-  | "/tag/[slug]";
+export type LocaleType = (typeof routing.locales)[number];
+export type PathnamesType = keyof typeof routing.pathnames;

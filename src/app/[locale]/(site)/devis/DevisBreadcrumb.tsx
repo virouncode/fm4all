@@ -14,6 +14,7 @@ import { ManagementContext } from "@/context/ManagementProvider";
 import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import { Link } from "@/i18n/navigation";
+import { LocaleType } from "@/i18n/routing";
 import { roundEffectif } from "@/lib/utils/roundEffectif";
 import { roundSurface } from "@/lib/utils/roundSurface";
 import { useLocale } from "next-intl";
@@ -24,7 +25,7 @@ import { useContext } from "react";
 //Quand on clique sur une étape il faut renvoyer vers l'url avec les search params correspondants
 
 const DevisBreadcrumb = () => {
-  const locale = useLocale() as "fr" | "en";
+  const locale = useLocale() as LocaleType;
   const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
   const { client } = useContext(ClientContext);
   const { setServices } = useContext(ServicesContext);

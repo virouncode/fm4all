@@ -1,4 +1,5 @@
 import ImgCardVertical from "@/components/cards/ImgCardVertical";
+import { LocaleType } from "@/i18n/routing";
 import { urlFor } from "@/sanity/lib/image";
 import { getAllSecteurs } from "@/sanity/queries";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -6,7 +7,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 const SecteursCards = async () => {
   // const options = { next: { revalidate: 30 } };
   const locale = await getLocale();
-  const secteurs = await getAllSecteurs(locale as "fr" | "en");
+  const secteurs = await getAllSecteurs(locale as LocaleType);
   const t = await getTranslations("Global");
 
   return (

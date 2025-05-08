@@ -1,4 +1,4 @@
-import type { Locale, PathnamesType } from "@/i18n/routing";
+import type { LocaleType, PathnamesType } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
 
 export function generateLocaleParams() {
@@ -8,7 +8,7 @@ export function generateLocaleParams() {
 export function generateLocalizedRouteParams(paths: PathnamesType[]) {
   return routing.locales.flatMap((locale) =>
     paths.map((path) => {
-      const localizedPath = getLocalizedPath(path, locale as Locale);
+      const localizedPath = getLocalizedPath(path, locale);
       return {
         locale,
         path: localizedPath.startsWith("/")
@@ -19,7 +19,7 @@ export function generateLocalizedRouteParams(paths: PathnamesType[]) {
   );
 }
 
-function getLocalizedPath(path: PathnamesType, locale: Locale): string {
+function getLocalizedPath(path: PathnamesType, locale: LocaleType): string {
   const pathConfig = routing.pathnames[path];
   if (!pathConfig) return path;
   if (typeof pathConfig === "string") return pathConfig;

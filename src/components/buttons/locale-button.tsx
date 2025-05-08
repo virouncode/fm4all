@@ -14,7 +14,7 @@ import {
   getArticlesSubSlugFr,
 } from "@/i18n/articlesSlugMappings";
 import { usePathname, useRouter } from "@/i18n/navigation";
-import { routing } from "@/i18n/routing";
+import { LocaleType, routing } from "@/i18n/routing";
 import {
   getSecteurSlugEn,
   getSecteurSlugFr,
@@ -38,7 +38,7 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
   const params = useParams();
   const searchParams = useSearchParams();
 
-  const handleChangeLang = (newLocale: "fr" | "en") => {
+  const handleChangeLang = (newLocale: LocaleType) => {
     if (newLocale === locale) return;
     const query: Record<string, string> = {};
     searchParams.forEach((value, key) => {
