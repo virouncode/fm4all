@@ -6,6 +6,7 @@ import { getAllCategories } from "@/sanity/queries";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import ArticlesCategorieCarousel from "./ArticlesCategorieCarousel";
+import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const locale = await getLocale();
@@ -17,6 +18,10 @@ export const generateMetadata = async (): Promise<Metadata> => {
       ? "Blog : nos articles sur les services aux entreprises"
       : "Blog: Our posts on business services in Paris"
   );
+};
+
+export const generateStaticParams = () => {
+  return generateLocaleParams();
 };
 
 const page = async () => {

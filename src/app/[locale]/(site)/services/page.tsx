@@ -2,6 +2,7 @@ import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import ServicesCards from "./ServicesCards";
+import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const locale = await getLocale();
@@ -16,6 +17,10 @@ export const generateMetadata = async (): Promise<Metadata> => {
       : "Discover our office services in Paris & Île-de-France: cleaning, maintenance, fire safety, coffee machines, etc... Get your online quote.",
     "/img/services/fm4all.webp"
   );
+};
+
+export const generateStaticParams = () => {
+  return generateLocaleParams();
 };
 
 const page = async () => {

@@ -2,6 +2,7 @@ import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import SecteursCards from "./SecteursCards";
+import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const locale = await getLocale();
@@ -16,6 +17,10 @@ export const generateMetadata = async (): Promise<Metadata> => {
       : "fm4all supports all types of professional spaces: offices, retail stores, warehouses, healthcare facilities, or coworking spaces. Discover our FM solutions tailored to your sector.",
     "/img/services/fm4all.webp"
   );
+};
+
+export const generateStaticParams = () => {
+  return generateLocaleParams();
 };
 
 const page = async () => {
