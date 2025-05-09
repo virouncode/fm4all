@@ -1,5 +1,6 @@
 import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 
@@ -15,9 +16,9 @@ export const generateMetadata = async (): Promise<Metadata> => {
   );
 };
 
-// export const generateStaticParams = () => {
-//   generateLocalizedRouteParams(["/contact"]);
-// };
+export const generateStaticParams = () => {
+  return generateLocaleParams();
+};
 
 const page = async () => {
   const t = await getTranslations("ContactPage");

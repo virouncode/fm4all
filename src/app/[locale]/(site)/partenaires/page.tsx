@@ -1,6 +1,7 @@
 import Partenaires from "@/app/[locale]/(site)/(home)/Partenaires";
 import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import Image from "next/image";
@@ -17,6 +18,10 @@ export const generateMetadata = async (): Promise<Metadata> => {
       ? "Avec nos partenaires, nous établissons une collaboration fondée sur la qualité et la confiance"
       : "With our partners, we build a collaboration founded on quality and trust."
   );
+};
+
+export const generateStaticParams = () => {
+  return generateLocaleParams();
 };
 
 const page = async () => {

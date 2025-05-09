@@ -2,6 +2,7 @@ import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { Metadata } from "next";
 import { getLocale } from "next-intl/server";
 import CityOut from "./CityOut";
+import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const locale = await getLocale();
@@ -13,6 +14,10 @@ export const generateMetadata = async (): Promise<Metadata> => {
       ? "Notre matrice de chiffrage automatique est en cours de développement pour votre région"
       : "Our automatic pricing matrix is under development for your region"
   );
+};
+
+export const generateStaticParams = () => {
+  return generateLocaleParams();
 };
 
 const page = async ({

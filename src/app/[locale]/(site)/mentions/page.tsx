@@ -1,4 +1,5 @@
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 
@@ -12,6 +13,10 @@ export const generateMetadata = async (): Promise<Metadata> => {
       ? "Mentions légales du site fm4all.com"
       : "Legal notice of fm4all.com website"
   );
+};
+
+export const generateStaticParams = () => {
+  return generateLocaleParams();
 };
 
 const page = async () => {

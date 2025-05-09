@@ -1,5 +1,6 @@
 import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 
@@ -15,6 +16,10 @@ export const generateMetadata = async (): Promise<Metadata> => {
       ? "Vous êtes prestataire de service ? fm4all vous propose de devenir partenaire."
       : "Are you a service provider? fm4all invites you to become a partner."
   );
+};
+
+export const generateStaticParams = () => {
+  return generateLocaleParams();
 };
 
 const page = async () => {

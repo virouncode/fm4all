@@ -1,5 +1,6 @@
 import { Link } from "@/i18n/navigation";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import Image from "next/image";
@@ -16,6 +17,10 @@ export const generateMetadata = async (): Promise<Metadata> => {
       ? "Découvrez nos 3 gammes de services aux entreprises : Essentiel, Confort et Excellence. Des solutions adaptées pour vos services à Paris & Île-de-France."
       : "Discover our 3 business service packages: Essential, Comfort, and Excellence. Tailored solutions for your office services in Paris & Île-de-France."
   );
+};
+
+export const generateStaticParams = () => {
+  return generateLocaleParams();
 };
 
 const page = async () => {

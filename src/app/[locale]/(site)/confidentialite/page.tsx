@@ -1,5 +1,6 @@
 import { Link } from "@/i18n/navigation";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 
@@ -13,6 +14,10 @@ export const generateMetadata = async (): Promise<Metadata> => {
       ? "Lisez notre politique de confidentialité pour en savoir plus sur la collecte et le traitement de vos données personnelles."
       : "Read our privacy policy to learn more about the collection and processing of your personal data."
   );
+};
+
+export const generateStaticParams = () => {
+  return generateLocaleParams();
 };
 
 const page = async () => {

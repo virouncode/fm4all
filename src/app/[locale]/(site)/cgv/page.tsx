@@ -1,4 +1,5 @@
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
@@ -15,6 +16,10 @@ export const generateMetadata = async (): Promise<Metadata> => {
       ? "Lisez nos conditions générales de vente (CGV) pour en savoir plus sur les règles d'achat et de paiement."
       : "Read our sales terms and conditions to learn more about our purchasing and payment policies."
   );
+};
+
+export const generateStaticParams = () => {
+  return generateLocaleParams();
 };
 
 const page = async () => {

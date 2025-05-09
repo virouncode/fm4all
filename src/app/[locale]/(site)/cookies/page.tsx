@@ -8,6 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 
@@ -21,6 +22,10 @@ export const generateMetadata = async (): Promise<Metadata> => {
       ? "Lisez notre politique de cookies pour en savoir plus sur l'utilisation des cookies sur notre site."
       : "Read our cookie policy to learn more about the use of cookies on our website."
   );
+};
+
+export const generateStaticParams = () => {
+  return generateLocaleParams();
 };
 
 const page = async () => {

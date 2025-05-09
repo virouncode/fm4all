@@ -1,6 +1,7 @@
 import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
 import WhyCards from "@/components/cards/WhyCards";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 
@@ -16,6 +17,10 @@ export const generateMetadata = async (): Promise<Metadata> => {
       ? "Nos engagements pour les services aux entreprises : Qualité, Simplicité, Gain de temps, Suivi opérationnel personnalisé. Vos attentes au coeur de nos priorités."
       : "Our commitments for your business services: Quality, Simplicity, Time saving, Personalized operational monitoring. Your expectations at the heart of our goals."
   );
+};
+
+export const generateStaticParams = () => {
+  return generateLocaleParams();
 };
 
 const page = async () => {
