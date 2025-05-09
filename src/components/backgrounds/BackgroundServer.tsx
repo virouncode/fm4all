@@ -14,6 +14,7 @@ const BackgroundServer = async () => {
         quality={75}
         priority
         fill
+        sizes="100vw"
       />
       <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40"></div>
     </div>
