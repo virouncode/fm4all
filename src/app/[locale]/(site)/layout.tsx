@@ -37,7 +37,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Metadata } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { getLocale, getMessages, setRequestLocale } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
 import { Didact_Gothic } from "next/font/google";
 import { notFound } from "next/navigation";
@@ -94,6 +94,7 @@ export default async function LocalizedLayout({
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
+  setRequestLocale(locale);
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className={`${didact.className} antialiased scroll-smooth`}>

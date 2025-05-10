@@ -1,8 +1,8 @@
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import ServicesCards from "./ServicesCards";
-import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const locale = await getLocale();

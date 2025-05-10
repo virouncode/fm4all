@@ -24,6 +24,10 @@ const page = async () => {
   const t = await getTranslations("ContactPage");
   return (
     <main className="max-w-7xl h-[calc(100vh-4rem)] mx-auto mb-24 py-4 px-6 md:px-20">
+      <div style={{ fontSize: "10px", color: "#ccc" }}>
+        {" "}
+        Generated at: {new Date().toISOString()}
+      </div>
       <section className="mt-6 flex flex-col gap-10">
         <h1 className="text-4xl">{t("nous-contacter")}</h1>
         <div className="flex flex-col gap-6 text-xl max-w-prose mx-auto hyphens-auto text-wrap items-center">
