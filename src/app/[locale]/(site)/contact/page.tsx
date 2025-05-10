@@ -2,7 +2,7 @@ import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const locale = await getLocale();
@@ -20,7 +20,9 @@ export const generateStaticParams = () => {
   return generateLocaleParams();
 };
 
-const page = async () => {
+const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("ContactPage");
   return (
     <main className="max-w-7xl h-[calc(100vh-4rem)] mx-auto mb-24 py-4 px-6 md:px-20">

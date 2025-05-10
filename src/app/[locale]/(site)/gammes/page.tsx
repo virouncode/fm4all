@@ -2,7 +2,7 @@ import { Link } from "@/i18n/navigation";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import Image from "next/image";
 
 export const generateMetadata = async (): Promise<Metadata> => {
@@ -23,7 +23,9 @@ export const generateStaticParams = () => {
   return generateLocaleParams();
 };
 
-const page = async () => {
+const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const tGlobal = await getTranslations("Global");
   const t = await getTranslations("GammesPage");
   return (

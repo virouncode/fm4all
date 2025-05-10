@@ -2,14 +2,18 @@ import ArticlesCarousel from "@/components/carousel/ArticlesCarousel";
 import { Link } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { getAllCategories } from "@/sanity/queries";
 import { Metadata } from "next";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import ArticlesCategorieCarousel from "./ArticlesCategorieCarousel";
-import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 
-export const generateMetadata = async (): Promise<Metadata> => {
-  const locale = await getLocale();
+export const generateMetadata = async ({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> => {
+  const { locale } = await params;
   return generateAlternates(
     "blog",
     locale,
@@ -24,10 +28,11 @@ export const generateStaticParams = () => {
   return generateLocaleParams();
 };
 
-const page = async () => {
+const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("BlogPage");
   const tArticles = await getTranslations("HomePage.articles");
-  const locale = await getLocale();
   const categories = await getAllCategories(locale as LocaleType);
 
   return (

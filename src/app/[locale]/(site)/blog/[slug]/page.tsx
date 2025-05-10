@@ -10,20 +10,20 @@ import {
   getArticlesSlugFr,
 } from "@/i18n/articlesSlugMappings";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
-import { generateLocalizedDynamicRouteParams } from "@/lib/utils/staticParamsHelper";
 import { urlFor } from "@/sanity/lib/image";
 import { fetchArticleCategories, getCategorie } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
-import { getLocale, getTranslations } from "next-intl/server";
+import { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { notFound } from "next/navigation";
 import ArticlesCards from "./ArticlesCards";
 
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ slug: string }>;
-}) => {
-  const locale = await getLocale();
-  const { slug } = await params;
+  params: Promise<{ slug: string; locale: string }>;
+}): Promise<Metadata> => {
+  const { slug, locale } = await params;
   const categorie = await getCategorie(slug);
 
   return generateAlternates(
@@ -41,23 +41,33 @@ export const generateMetadata = async ({
   );
 };
 
+export const dynamic = "force-static";
+
 export const generateStaticParams = async () => {
   // Récupérer tous les slugs de services depuis Sanity
   const slugsFr = await fetchArticleCategories();
   const slugsEn = await fetchArticleCategories("en");
 
-  return generateLocalizedDynamicRouteParams(
-    "/blog/[slug]",
-    slugsFr,
-    slugsEn,
-    "slug"
-  );
+  return [
+    ...slugsFr.map((slug) => ({ slug, locale: "fr" })),
+    ...slugsEn.map((slug) => ({ slug, locale: "en" })),
+  ];
 };
 
-const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
+const page = async ({
+  params,
+}: {
+  params: Promise<{ slug: string; locale: string }>;
+}) => {
+  const { slug, locale } = await params;
+  setRequestLocale(locale);
   const tGlobal = await getTranslations("Global");
-  const { slug } = await params;
   const categorie = await getCategorie(slug);
+
+  if (!categorie) {
+    console.log("Categorie non trouvée");
+    notFound();
+  }
 
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20 hyphens-auto">

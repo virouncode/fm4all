@@ -1,8 +1,8 @@
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
-import { Metadata } from "next";
-import { getLocale } from "next-intl/server";
-import CityOut from "./CityOut";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
+import { Metadata } from "next";
+import { getLocale, setRequestLocale } from "next-intl/server";
+import CityOut from "./CityOut";
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const locale = await getLocale();
@@ -22,9 +22,13 @@ export const generateStaticParams = () => {
 
 const page = async ({
   searchParams,
+  params,
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
+  params: Promise<{ locale: string }>;
 }) => {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const {
     destination,
     codePostal,

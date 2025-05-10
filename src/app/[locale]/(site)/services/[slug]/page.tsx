@@ -14,7 +14,6 @@ import {
   getServicesSlugFr,
 } from "@/i18n/servicesSlugMappings";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
-import { generateLocalizedDynamicRouteParams } from "@/lib/utils/staticParamsHelper";
 import { urlFor } from "@/sanity/lib/image";
 import {
   fetchServiceSlugs,
@@ -23,7 +22,7 @@ import {
 } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
 import { Metadata } from "next";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import {
   PortableText,
   PortableTextBlock,
@@ -31,7 +30,7 @@ import {
 } from "next-sanity";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Slug } from "../../../../../../sanity.types";
+import { Slug } from "sanity";
 import ExpertiseCarousel from "./ExpertiseCarousel";
 
 // Custom components for PortableText
@@ -105,10 +104,9 @@ const ptComponents = {
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }): Promise<Metadata> => {
-  const locale = await getLocale();
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const service = await getService(slug);
   return generateAlternates(
     "servicePresentation",
@@ -123,32 +121,32 @@ export const generateMetadata = async ({
   );
 };
 
+export const dynamic = "force-static";
+
 export const generateStaticParams = async () => {
   // Récupérer tous les slugs de services depuis Sanity
   const slugsFr = await fetchServiceSlugs();
   const slugsEn = await fetchServiceSlugs("en");
 
-  return generateLocalizedDynamicRouteParams(
-    "/services/[slug]",
-    slugsFr,
-    slugsEn,
-    "slug"
-  );
+  return [
+    ...slugsFr.map((slug) => ({ slug, locale: "fr" })),
+    ...slugsEn.map((slug) => ({ slug, locale: "en" })),
+  ];
 };
 
 const page = async ({
   params,
 }: {
-  params: Promise<{ slug: string; locale: LocaleType }>;
+  params: Promise<{ slug: string; locale: string }>;
 }) => {
+  const { slug, locale } = await params;
+  setRequestLocale(locale);
+
   const tGlobal = await getTranslations("Global");
   const t = await getTranslations("ServicesPage");
-  // const options = { next: { revalidate: 30 } };
-  const { slug, locale } = await params;
   const service = await getService(slug);
   if (!service) {
     console.log("Service not found");
-
     notFound();
   }
   const tagsSortants = service.tagsSortants as {
@@ -158,7 +156,7 @@ const page = async ({
   }[];
 
   const associated = await getAssociatedToService(
-    locale,
+    locale as LocaleType,
     tagsSortants.map((tag) => tag._id),
     service._id
   );
@@ -257,8 +255,8 @@ const page = async ({
             ))}
           </div>
           <div
-            className="flex flex-col gap-4 prose-lg 
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
+            className="flex flex-col gap-4 prose-lg
+          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
           prose-h3:font-bold prose-h3:text-xl
           prose-p:text-pretty prose-p:hyphens-auto prose-p:m-0
           prose-li:list-check prose-li:m-0
@@ -319,8 +317,8 @@ const page = async ({
           </div>
         ) : null}
         <div
-          className="flex-1 prose-lg 
-        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
+          className="flex-1 prose-lg
+        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
         prose-h3:font-bold prose-h3:text-xl
         prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
         prose-p:text-pretty prose-p:hyphens-auto
@@ -335,8 +333,8 @@ const page = async ({
       </section>
       <section className="flex flex-row gap-10 mb-16">
         <div
-          className="flex-1 prose-lg 
-        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
+          className="flex-1 prose-lg
+        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
         prose-h3:font-bold prose-h3:text-xl
         prose-p:text-pretty prose-p:hyphens-auto
         prose-li:list-check prose-li:m-0
@@ -377,8 +375,8 @@ const page = async ({
             </div>
           ) : null}
           <div
-            className="flex-1 prose-lg 
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
+            className="flex-1 prose-lg
+          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
           prose-h3:font-bold prose-h3:text-xl
           prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
           prose-p:text-pretty prose-p:hyphens-auto
@@ -395,8 +393,8 @@ const page = async ({
       {Array.isArray(service.bloc4) && service.bloc4.length > 0 && (
         <section className="flex flex-row gap-10 mb-16">
           <div
-            className="flex-1 prose-lg 
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
+            className="flex-1 prose-lg
+          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
           prose-h3:font-bold prose-h3:text-xl
           prose-p:text-pretty prose-p:hyphens-auto
           prose-li:list-check prose-li:m-0
@@ -436,8 +434,8 @@ const page = async ({
             </div>
           ) : null}
           <div
-            className="flex-1 prose-lg 
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
+            className="flex-1 prose-lg
+          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
           prose-h3:font-bold prose-h3:text-xl
           prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
           prose-p:text-pretty prose-p:hyphens-auto
@@ -453,8 +451,8 @@ const page = async ({
       {Array.isArray(service.bloc6) && service.bloc6.length > 0 && (
         <section className="flex flex-row gap-10 mb-16">
           <div
-            className="flex-1 prose-lg 
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
+            className="flex-1 prose-lg
+          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
           prose-h3:font-bold prose-h3:text-xl
           prose-p:text-pretty prose-p:hyphens-auto
           prose-li:list-check prose-li:m-0
@@ -493,8 +491,8 @@ const page = async ({
             </div>
           ) : null}
           <div
-            className="flex-1 prose-lg 
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
+            className="flex-1 prose-lg
+          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
           prose-h3:font-bold prose-h3:text-xl
           prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
           prose-p:text-pretty prose-p:hyphens-auto
@@ -510,8 +508,8 @@ const page = async ({
       {Array.isArray(service.bloc8) && service.bloc8.length > 0 && (
         <section className="flex flex-row gap-10 mb-16">
           <div
-            className="flex-1 prose-lg 
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
+            className="flex-1 prose-lg
+          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
           prose-h3:font-bold prose-h3:text-xl
           prose-p:text-pretty prose-p:hyphens-auto
           prose-li:list-check prose-li:m-0
@@ -550,8 +548,8 @@ const page = async ({
             </div>
           ) : null}
           <div
-            className="flex-1 prose-lg 
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
+            className="flex-1 prose-lg
+          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
           prose-h3:font-bold prose-h3:text-xl
           prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
           prose-p:text-pretty prose-p:hyphens-auto
@@ -567,8 +565,8 @@ const page = async ({
       {Array.isArray(service.bloc10) && service.bloc10.length > 0 && (
         <section className="flex flex-row gap-10 mb-16">
           <div
-            className="flex-1 prose-lg 
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
+            className="flex-1 prose-lg
+          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
           prose-h3:font-bold prose-h3:text-xl
           prose-p:text-pretty prose-p:hyphens-auto
           prose-li:list-check prose-li:m-0

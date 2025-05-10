@@ -89,12 +89,13 @@ export default async function LocalizedLayout({
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 }>) {
-  const messages = await getMessages();
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
   setRequestLocale(locale);
+  const messages = await getMessages();
+
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className={`${didact.className} antialiased scroll-smooth`}>

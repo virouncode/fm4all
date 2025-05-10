@@ -13,7 +13,7 @@ import Why from "@/app/[locale]/(site)/(home)/Why";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
-import { getLocale } from "next-intl/server";
+import { getLocale, setRequestLocale } from "next-intl/server";
 
 export const generateStaticParams = () => {
   return generateLocaleParams();
@@ -35,7 +35,13 @@ export const generateMetadata = async (): Promise<Metadata> => {
   return generateAlternates("home", locale, title, description);
 };
 
-export default function page() {
+export default async function page({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <>
       <main className="flex flex-col mb-24">

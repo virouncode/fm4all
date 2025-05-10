@@ -14,7 +14,6 @@ import {
   getSecteurSlugFr,
 } from "@/i18n/secteursSlugMappings";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
-import { generateLocalizedDynamicRouteParams } from "@/lib/utils/staticParamsHelper";
 import { urlFor } from "@/sanity/lib/image";
 import {
   fetchSecteursSlugs,
@@ -23,7 +22,7 @@ import {
 } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
 import { Metadata } from "next";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import {
   PortableText,
   PortableTextBlock,
@@ -105,10 +104,9 @@ const ptComponents = {
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }): Promise<Metadata> => {
-  const locale = await getLocale();
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const secteur = await getSecteur(slug);
   return generateAlternates(
     "secteurPresentation",
@@ -123,16 +121,16 @@ export const generateMetadata = async ({
   );
 };
 
+export const dynamic = "force-static";
+
 export const generateStaticParams = async () => {
   // Récupérer tous les slugs de services depuis Sanity
   const slugsFr = await fetchSecteursSlugs();
   const slugsEn = await fetchSecteursSlugs("en");
-  return generateLocalizedDynamicRouteParams(
-    "/secteurs/[slug]",
-    slugsFr,
-    slugsEn,
-    "slug"
-  );
+  return [
+    ...slugsFr.map((slug) => ({ slug, locale: "fr" })),
+    ...slugsEn.map((slug) => ({ slug, locale: "en" })),
+  ];
 };
 
 const page = async ({
@@ -140,11 +138,13 @@ const page = async ({
 }: {
   params: Promise<{ slug: string; locale: LocaleType }>;
 }) => {
+  const { slug, locale } = await params;
+  setRequestLocale(locale);
   const tGlobal = await getTranslations("Global");
   const t = await getTranslations("ServicesPage");
   const tSecteurs = await getTranslations("SecteursPage");
   // const options = { next: { revalidate: 30 } };
-  const { slug, locale } = await params;
+
   const secteur = await getSecteur(slug);
   if (!secteur) {
     notFound();

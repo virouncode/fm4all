@@ -9,7 +9,6 @@ import { LocaleType } from "@/i18n/routing";
 import { getTagSlugEn, getTagSlugFr } from "@/i18n/tagsSlugMappings";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { capitalize } from "@/lib/utils/capitalize";
-import { generateLocalizedDynamicRouteParams } from "@/lib/utils/staticParamsHelper";
 import {
   fetchTagsSlugs,
   getTagNom,
@@ -18,18 +17,16 @@ import {
   getTagRelatedServices,
 } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
-import { getLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import ExpertiseCarousel from "../../services/[slug]/ExpertiseCarousel";
+import { setRequestLocale } from "next-intl/server";
 
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }) => {
-  const { slug } = await params;
-
-  const locale = await getLocale();
+  const { slug, locale } = await params;
   return generateAlternates(
     "tag",
     locale,
@@ -47,17 +44,17 @@ export const generateMetadata = async ({
   );
 };
 
+export const dynamic = "force-static";
+
 export const generateStaticParams = async () => {
   // Récupérer tous les slugs de services depuis Sanity
   const slugsFr = await fetchTagsSlugs();
   const slugsEn = await fetchTagsSlugs("en");
 
-  return generateLocalizedDynamicRouteParams(
-    "/tag/[slug]",
-    slugsFr,
-    slugsEn,
-    "slug"
-  );
+  return [
+    ...slugsFr.map((slug) => ({ slug, locale: "fr" })),
+    ...slugsEn.map((slug) => ({ slug, locale: "en" })),
+  ];
 };
 
 const page = async ({
@@ -66,6 +63,7 @@ const page = async ({
   params: Promise<{ slug: string; locale: LocaleType }>;
 }) => {
   const { slug, locale } = await params;
+  setRequestLocale(locale);
   const query = Promise.all([
     getTagRelatedServices(locale, slug),
     getTagRelatedArticles(locale, slug),

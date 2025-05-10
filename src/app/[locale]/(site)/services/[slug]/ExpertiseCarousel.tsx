@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/carousel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { urlFor } from "@/sanity/lib/image";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 import {
   Article,
   ArticleCategory,
@@ -23,13 +23,13 @@ type ExpertiseCarouselProps = {
   articles?: (Article & { categorie: ArticleCategory })[];
 };
 
-const ExpertiseCarousel = async ({
+const ExpertiseCarousel = ({
   services,
   // sousServices,
   secteurs,
   articles,
 }: ExpertiseCarouselProps) => {
-  const t = await getTranslations("Global");
+  const t = useTranslations("Global");
 
   return (
     <Tabs

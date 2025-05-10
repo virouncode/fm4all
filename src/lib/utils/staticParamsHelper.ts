@@ -32,6 +32,21 @@ export function generateLocalizedDynamicRouteParams<T extends string>(
   slugsEn: (string | undefined)[],
   paramName: T
 ): Array<{ locale: string } & Record<T, string>> {
+  console.log([
+    ...slugsFr.map((slug) => {
+      return {
+        locale: "fr",
+        [paramName]: slug,
+      } as { locale: string } & Record<T, string>;
+    }),
+    ...slugsEn.map((slug) => {
+      return {
+        locale: "en",
+        [paramName]: slug,
+      } as { locale: string } & Record<T, string>;
+    }),
+  ]);
+
   return [
     ...slugsFr.map((slug) => {
       return {
