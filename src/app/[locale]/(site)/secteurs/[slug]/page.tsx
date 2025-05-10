@@ -8,13 +8,19 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { LocaleType } from "@/i18n/routing";
 import {
   getSecteurSlugEn,
   getSecteurSlugFr,
 } from "@/i18n/secteursSlugMappings";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generateLocalizedDynamicRouteParams } from "@/lib/utils/staticParamsHelper";
 import { urlFor } from "@/sanity/lib/image";
-import { getAssociatedToSecteur, getSecteur } from "@/sanity/queries";
+import {
+  fetchSecteursSlugs,
+  getAssociatedToSecteur,
+  getSecteur,
+} from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -27,7 +33,6 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Slug } from "../../../../../../sanity.types";
 import ExpertiseCarousel from "../../services/[slug]/ExpertiseCarousel";
-import { LocaleType } from "@/i18n/routing";
 
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
@@ -115,6 +120,18 @@ export const generateMetadata = async ({
       fr: locale === "fr" ? slug : getSecteurSlugFr(slug),
       en: locale === "en" ? slug : getSecteurSlugEn(slug),
     }
+  );
+};
+
+export const generateStaticParams = async () => {
+  // Récupérer tous les slugs de services depuis Sanity
+  const slugsFr = await fetchSecteursSlugs();
+  const slugsEn = await fetchSecteursSlugs("en");
+  return generateLocalizedDynamicRouteParams(
+    "/secteurs/[slug]",
+    slugsFr,
+    slugsEn,
+    "slug"
   );
 };
 

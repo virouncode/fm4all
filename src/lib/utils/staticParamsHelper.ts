@@ -28,25 +28,22 @@ function getLocalizedPath(path: PathnamesType, locale: LocaleType): string {
 
 export function generateLocalizedDynamicRouteParams<T extends string>(
   path: PathnamesType,
-  slugs: string[],
+  slugsFr: (string | undefined)[],
+  slugsEn: (string | undefined)[],
   paramName: T
 ): Array<{ locale: string } & Record<T, string>> {
-  return routing.locales.flatMap((locale) =>
-    slugs.map((slug) => {
+  return [
+    ...slugsFr.map((slug) => {
       return {
-        locale,
+        locale: "fr",
         [paramName]: slug,
       } as { locale: string } & Record<T, string>;
-    })
-  );
+    }),
+    ...slugsEn.map((slug) => {
+      return {
+        locale: "en",
+        [paramName]: slug,
+      } as { locale: string } & Record<T, string>;
+    }),
+  ];
 }
-
-/**
- * Example usage for blog slugs:
- *
- * // In src/app/[locale]/blog/[slug]/page.tsx
- * export async function generateStaticParams() {
- *   const slugs = await fetchAllBlogSlugs();
- *   return generateLocalizedDynamicRouteParams('/blog/[slug]', slugs, 'slug');
- * }
- */

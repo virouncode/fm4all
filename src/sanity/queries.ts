@@ -463,20 +463,34 @@ export const getTagNom = async (slug: string) => {
 };
 
 //SITEMAP
-export const fetchServiceSlugs = async () => {
-  const query = `*[_type == "service" && language == "fr"]{slug{current}}`;
+export const fetchServiceSlugs = async (locale?: LocaleType) => {
+  const query =
+    locale && locale !== "fr"
+      ? `*[_type == "service" && language == "en"]{slug{current}}`
+      : `*[_type == "service" && language == "fr"]{slug{current}}`;
   const services = await client.fetch<Service[]>(query);
   return services.map((service) => service.slug?.current).filter(Boolean);
 };
 
-export const fetchArticleCategories = async () => {
-  const query = `*[_type == "articleCategory" && language == "fr"]{slug{current}}`;
+export const fetchArticleCategories = async (locale?: LocaleType) => {
+  const query =
+    locale && locale !== "fr"
+      ? `*[_type == "articleCategory" && language == "en"]{slug{current}}`
+      : `*[_type == "articleCategory" && language == "fr"]{slug{current}}`;
   const categories = await client.fetch<ArticleCategory[]>(query);
   return categories.map((categorie) => categorie.slug?.current).filter(Boolean);
 };
 
-export const fetchArticleSlugs = async () => {
-  const query = `*[_type == "article" && language == "fr"]{
+export const fetchArticleSlugs = async (locale?: LocaleType) => {
+  const query =
+    locale && locale !== "fr"
+      ? `*[_type == "article" && language == "en]{
+    subSlug { current },
+    categorie-> {
+      slug { current }
+    }
+  }`
+      : `*[_type == "article" && language == "fr"]{
     subSlug { current },
     categorie-> {
       slug { current }
@@ -494,14 +508,20 @@ export const fetchArticleSlugs = async () => {
     })
     .filter((item) => item.slug && item.subSlug);
 };
-export const fetchTagsSlugs = async () => {
-  const query = `*[_type == "tag" && (language == "fr" || language == null)]{slug{current}}`;
+export const fetchTagsSlugs = async (locale?: LocaleType) => {
+  const query =
+    locale && locale !== "fr"
+      ? `*[_type == "tag" && (language == "en")]{slug{current}}`
+      : `*[_type == "tag" && (language == "fr" || language == null)]{slug{current}}`;
   const tags = await client.fetch<Tag[]>(query);
   return tags.map((tag) => tag.slug?.current).filter(Boolean);
 };
 
-export const fetchSecteursSlugs = async () => {
-  const query = `*[_type == "secteur" && (language == "fr" || language == null)]{slug{current}}`;
+export const fetchSecteursSlugs = async (locale?: LocaleType) => {
+  const query =
+    locale && locale !== "fr"
+      ? `*[_type == "secteur" && (language == "en")]{slug{current}}`
+      : `*[_type == "secteur" && (language == "fr" || language == null)]{slug{current}}`;
   const secteurs = await client.fetch<Secteur[]>(query);
   return secteurs.map((secteur) => secteur.slug?.current).filter(Boolean);
 };

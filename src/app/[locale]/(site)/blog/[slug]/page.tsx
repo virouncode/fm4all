@@ -10,8 +10,9 @@ import {
   getArticlesSlugFr,
 } from "@/i18n/articlesSlugMappings";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generateLocalizedDynamicRouteParams } from "@/lib/utils/staticParamsHelper";
 import { urlFor } from "@/sanity/lib/image";
-import { getCategorie } from "@/sanity/queries";
+import { fetchArticleCategories, getCategorie } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import ArticlesCards from "./ArticlesCards";
@@ -37,6 +38,19 @@ export const generateMetadata = async ({
       fr: locale === "fr" ? slug : getArticlesSlugFr(slug),
       en: locale === "en" ? slug : getArticlesSlugEn(slug),
     }
+  );
+};
+
+export const generateStaticParams = async () => {
+  // Récupérer tous les slugs de services depuis Sanity
+  const slugsFr = await fetchArticleCategories();
+  const slugsEn = await fetchArticleCategories("en");
+
+  return generateLocalizedDynamicRouteParams(
+    "/blog/[slug]",
+    slugsFr,
+    slugsEn,
+    "slug"
   );
 };
 

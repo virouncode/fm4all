@@ -5,10 +5,13 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { LocaleType } from "@/i18n/routing";
 import { getTagSlugEn, getTagSlugFr } from "@/i18n/tagsSlugMappings";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { capitalize } from "@/lib/utils/capitalize";
+import { generateLocalizedDynamicRouteParams } from "@/lib/utils/staticParamsHelper";
 import {
+  fetchTagsSlugs,
   getTagNom,
   getTagRelatedArticles,
   getTagRelatedSecteurs,
@@ -18,7 +21,6 @@ import { HomeIcon } from "lucide-react";
 import { getLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import ExpertiseCarousel from "../../services/[slug]/ExpertiseCarousel";
-import { LocaleType } from "@/i18n/routing";
 
 export const generateMetadata = async ({
   params,
@@ -42,6 +44,19 @@ export const generateMetadata = async ({
       fr: locale === "fr" ? slug : getTagSlugFr(slug),
       en: locale === "en" ? slug : getTagSlugEn(slug),
     }
+  );
+};
+
+export const generateStaticParams = async () => {
+  // Récupérer tous les slugs de services depuis Sanity
+  const slugsFr = await fetchTagsSlugs();
+  const slugsEn = await fetchTagsSlugs("en");
+
+  return generateLocalizedDynamicRouteParams(
+    "/tag/[slug]",
+    slugsFr,
+    slugsEn,
+    "slug"
   );
 };
 
