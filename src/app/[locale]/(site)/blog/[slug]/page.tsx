@@ -72,7 +72,7 @@ const page = async ({
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20 hyphens-auto">
       <Breadcrumb className="mb-10">
-        <BreadcrumbList className="text-sm lg:text-base">
+        <BreadcrumbList className="text-sm lg:text-base flex flex-wrap">
           <BreadcrumbLink className="flex items-center" href={`/`}>
             <HomeIcon size={14} />
           </BreadcrumbLink>

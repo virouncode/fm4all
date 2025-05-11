@@ -10,6 +10,7 @@ const Slogan = async () => {
           src={"/img/logo_full.webp"}
           alt={"logo-fm4all"}
           fill={true}
+          sizes="300px"
           className="object-contain object-center"
           loading="lazy"
         />

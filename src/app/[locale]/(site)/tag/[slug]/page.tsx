@@ -17,9 +17,9 @@ import {
   getTagRelatedServices,
 } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
+import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import ExpertiseCarousel from "../../services/[slug]/ExpertiseCarousel";
-import { setRequestLocale } from "next-intl/server";
 
 export const generateMetadata = async ({
   params,
@@ -81,7 +81,7 @@ const page = async ({
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20 hyphens-auto">
       <Breadcrumb className="mb-10">
-        <BreadcrumbList className="text-sm lg:text-base">
+        <BreadcrumbList className="text-sm lg:text-base flex flex-wrap">
           <BreadcrumbLink className="flex items-center" href={`/`}>
             <HomeIcon size={14} />
           </BreadcrumbLink>

@@ -64,6 +64,7 @@ const Presentation = async () => {
               src={"/img/zen.webp"}
               alt={"image-collaboratrice-zen"}
               fill={true}
+              sizes="300px"
               className="object-cover object-center"
               loading="lazy"
               quality={100}
