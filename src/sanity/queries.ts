@@ -484,7 +484,7 @@ export const fetchArticleCategories = async (locale?: LocaleType) => {
 export const fetchArticleSlugs = async (locale?: LocaleType) => {
   const query =
     locale && locale !== "fr"
-      ? `*[_type == "article" && language == "en]{
+      ? `*[_type == "article" && language == "en"]{
     subSlug { current },
     categorie-> {
       slug { current }

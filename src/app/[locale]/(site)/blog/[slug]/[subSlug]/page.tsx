@@ -15,13 +15,18 @@ import {
   getArticlesSubSlugEn,
   getArticlesSubSlugFr,
 } from "@/i18n/articlesSlugMappings";
+import { LocaleType } from "@/i18n/routing";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { capitalize } from "@/lib/utils/capitalize";
 import { urlFor } from "@/sanity/lib/image";
-import { getArticle, getAssociatedToArticle } from "@/sanity/queries";
+import {
+  fetchArticleSlugs,
+  getArticle,
+  getAssociatedToArticle,
+} from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
 import { DateTime } from "luxon";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import {
   PortableText,
   PortableTextBlock,
@@ -35,7 +40,6 @@ import {
   SanityImageHotspot,
   Slug,
 } from "../../../../../../../sanity.types";
-import { LocaleType } from "@/i18n/routing";
 
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
@@ -108,12 +112,10 @@ const ptComponents = {
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ slug: string; subSlug: string }>;
+  params: Promise<{ slug: string; subSlug: string; locale: string }>;
 }) => {
-  const { slug, subSlug } = await params;
-  const locale = await getLocale();
+  const { slug, subSlug, locale } = await params;
   const article = await getArticle(subSlug);
-  console.log();
 
   return generateAlternates(
     "blogArticle",
@@ -134,15 +136,34 @@ export const generateMetadata = async ({
   );
 };
 
+export const dynamic = "force-static";
+
+export const generateStaticParams = async () => {
+  const slugsSubSlugsFr = await fetchArticleSlugs("fr");
+  const slugsSubSlugsEn = await fetchArticleSlugs("en");
+  return [
+    ...slugsSubSlugsFr.map((item) => ({
+      locale: "fr",
+      slug: item.slug,
+      subSlug: item.subSlug,
+    })),
+    ...slugsSubSlugsEn.map((item) => ({
+      locale: "en",
+      slug: item.slug,
+      subSlug: item.subSlug,
+    })),
+  ];
+};
+
 const page = async ({
   params,
 }: {
   params: Promise<{ subSlug: string; locale: LocaleType }>;
 }) => {
+  const { subSlug, locale } = await params;
+  setRequestLocale(locale);
   const tGlobal = await getTranslations("Global");
   const t = await getTranslations("ServicesPage");
-  // const options = { next: { revalidate: 30 } }
-  const { subSlug, locale } = await params;
   const article = await getArticle(subSlug);
   const auteur = article.auteur as {
     _id: string;
