@@ -102,8 +102,7 @@ const HygieneMobileOptionsDesinfectantCard = ({
   const color = getFm4AllColor(gamme);
   const prixMensuelDesinfectantText = totalDesinfectant ? (
     <p className="text-sm font-bold">
-      {formatNumber(Math.round((totalDesinfectant * MARGE) / 12))}{" "}
-      {t("euros-mois")}
+      {formatNumber((totalDesinfectant * MARGE) / 12)} {t("euros-mois")}
     </p>
   ) : (
     <p className="text-sm font-bold">{t("non-propose")}</p>

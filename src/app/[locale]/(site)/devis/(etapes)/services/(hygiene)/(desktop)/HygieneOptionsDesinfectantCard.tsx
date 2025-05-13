@@ -137,9 +137,7 @@ const HygieneOptionsDesinfectantCard = ({
         }
         const prixMensuelDesinfectantText = (
           <p className="font-bold text-xl ml-4">
-            {formatNumber(
-              Math.round((proposition.totalDesinfectant * MARGE) / 12)
-            )}{" "}
+            {formatNumber((proposition.totalDesinfectant * MARGE) / 12)}{" "}
             {t("euros-mois")}
           </p>
         );

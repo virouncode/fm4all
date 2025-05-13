@@ -18,11 +18,9 @@ const TotalNettoyage = () => {
     totalDimanche,
     totalVitrerie,
   } = totalNettoyage;
-  const total = Math.round(
-    Object.values(totalNettoyage)
-      .filter((item) => item !== null)
-      .reduce((sum, value) => sum + value, 0)
-  );
+  const total = Object.values(totalNettoyage)
+    .filter((item) => item !== null)
+    .reduce((sum, value) => sum + value, 0);
 
   if (!total) return null;
 

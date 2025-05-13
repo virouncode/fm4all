@@ -1,6 +1,7 @@
+import CacheInvalidationListener from "@/components/cache/CacheInvalidationListener";
 import HeaderFournisseur from "@/components/header/header-fournisseur";
 
-const AdminLayout = ({
+const FournisseurLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -8,9 +9,10 @@ const AdminLayout = ({
   return (
     <>
       <HeaderFournisseur />
+      <CacheInvalidationListener />
       {children}
     </>
   );
 };
 
-export default AdminLayout;
+export default FournisseurLayout;

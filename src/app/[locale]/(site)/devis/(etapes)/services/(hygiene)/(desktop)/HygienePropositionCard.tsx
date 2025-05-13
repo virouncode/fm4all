@@ -95,15 +95,14 @@ const HygienePropositionCard = ({
   }
   const totalMensuelText = (
     <p className="font-bold text-xl ml-4">
-      {formatNumber(Math.round((proposition.totalAnnuelTrilogie * MARGE) / 12))}{" "}
+      {formatNumber((proposition.totalAnnuelTrilogie * MARGE) / 12)}{" "}
       {t("euros-mois")}
     </p>
   );
 
   const prixInstallationText = prixInstalDistrib ? (
     <p className="font-bold text-base ml-4">
-      +{formatNumber(Math.round(prixInstalDistrib * MARGE))}{" "}
-      {t("euros-installation")}
+      +{formatNumber(prixInstalDistrib * MARGE)} {t("eur-d-installation")}
     </p>
   ) : null;
 

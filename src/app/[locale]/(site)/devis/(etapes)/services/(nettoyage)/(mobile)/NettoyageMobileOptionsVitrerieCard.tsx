@@ -79,7 +79,7 @@ const NettoyageMobileOptionsVitrerieCard = ({
   const { gammeSelected: gamme, nomFournisseur } = nettoyage.infos;
   const vitreriePrixMensuelText = vitrerieProposition.prixAnnuel ? (
     <p className="text-sm font-bold text-end">
-      {formatNumber(Math.round((vitrerieProposition.prixAnnuel * MARGE) / 12))}{" "}
+      {formatNumber((vitrerieProposition.prixAnnuel * MARGE) / 12)}{" "}
       {t("euros-mois")}
     </p>
   ) : (

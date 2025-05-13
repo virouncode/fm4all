@@ -1,9 +1,13 @@
 "use server";
 
+import { RATIO } from "@/constants/constants";
 import { db } from "@/db";
 import { nettoyageRepasseTarifs, nettoyageTarifs } from "@/db/schema";
 import { getSession } from "@/lib/auth-session";
+import { invalidateCacheTagsWithData } from "@/lib/cache-invalidation";
+import { getFournisseurTag, getSurfaceTag } from "@/lib/data-cache";
 import { actionClient } from "@/lib/safe-actions";
+import { GammeType } from "@/zod-schemas/gamme";
 import { SelectNettoyageTarifFournisseurType } from "@/zod-schemas/nettoyageTarifs";
 import { eq } from "drizzle-orm";
 import { getLocale } from "next-intl/server";
@@ -23,13 +27,17 @@ const tarifSchema = z.object({
     "updatedAt",
   ]),
   value: z.number().min(1, "La valeur est requise"),
+  surface: z.number().min(1, "La surface est requise"),
   table: z.enum(["nettoyageTarifs", "nettoyageRepasseTarifs"]),
+  gamme: z.enum(["essentiel", "confort", "excellence"]),
 });
 type Tarif = {
   id: number;
   field: keyof SelectNettoyageTarifFournisseurType;
   value: number;
+  surface: number;
   table: "nettoyageTarifs" | "nettoyageRepasseTarifs";
+  gamme: GammeType;
 };
 
 export const updateNettoyageTarifAction = actionClient
@@ -86,6 +94,27 @@ export const updateNettoyageTarifAction = actionClient
           .set({ [nettoyageTarifInput.field]: valueToStore })
           .where(eq(nettoyageTarifs.id, nettoyageTarifInput.id));
 
+        // Invalider le cache pour tous les utilisateurs avec les données mises à jour
+        await invalidateCacheTagsWithData(
+          [
+            getSurfaceTag(
+              "nettoyageTarifs",
+              nettoyageTarifInput.surface.toString()
+            ),
+            getFournisseurTag("nettoyageTarifs", fournisseurId),
+          ],
+          {
+            serviceType: "nettoyage",
+            tarifType: "standard",
+            tarifId: nettoyageTarifInput.id,
+            field: nettoyageTarifInput.field,
+            value: valueToStore / RATIO,
+            fournisseurId,
+            surface: nettoyageTarifInput.surface,
+            gamme: nettoyageTarifInput.gamme,
+          }
+        );
+
         return {
           success: true,
           message:
@@ -124,6 +153,26 @@ export const updateNettoyageTarifAction = actionClient
           .update(nettoyageRepasseTarifs)
           .set({ [nettoyageTarifInput.field]: valueToStore })
           .where(eq(nettoyageRepasseTarifs.id, nettoyageTarifInput.id));
+
+        await invalidateCacheTagsWithData(
+          [
+            getSurfaceTag(
+              "nettoyageTarifs",
+              nettoyageTarifInput.surface.toString()
+            ),
+            getFournisseurTag("nettoyageTarifs", fournisseurId),
+          ],
+          {
+            serviceType: "nettoyage",
+            tarifType: "repasse",
+            tarifId: nettoyageTarifInput.id,
+            field: nettoyageTarifInput.field,
+            value: valueToStore / RATIO,
+            fournisseurId,
+            surface: nettoyageTarifInput.surface,
+            gamme: tarif[0].gamme,
+          }
+        );
 
         return {
           success: true,

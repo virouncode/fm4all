@@ -137,7 +137,7 @@ const HygieneOptionsParfumCard = ({
         }
         const prixMensuelParfumText = (
           <p className="font-bold text-xl ml-4">
-            {formatNumber(Math.round((proposition.totalParfum * MARGE) / 12))}{" "}
+            {formatNumber((proposition.totalParfum * MARGE) / 12)}{" "}
             {t("euros-mois")}
           </p>
         );

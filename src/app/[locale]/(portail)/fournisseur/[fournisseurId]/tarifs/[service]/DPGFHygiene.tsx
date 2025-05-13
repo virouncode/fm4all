@@ -75,8 +75,6 @@ const DPGFHygiene = async ({ fournisseurId }: DPGFHygieneProps) => {
       })
     : [];
 
-  console.log("tarifsInstal", tarifsInstal);
-
   return (
     <main className="container mx-auto p-6">
       <div className="flex items-center justify-between mb-6">

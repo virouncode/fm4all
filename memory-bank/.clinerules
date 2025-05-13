@@ -1,0 +1,165 @@
+# FM4ALL Project Intelligence
+
+This file captures important patterns, preferences, and project intelligence that help me work more effectively with the FM4ALL service quotation platform.
+
+## Critical Implementation Paths
+
+1. **Cache Invalidation Flow**
+
+   - Data updates in server actions trigger cache invalidation events via `invalidateCacheTagsWithData()`
+   - Pusher broadcasts these events to all connected clients with specific data payloads
+   - `CacheInvalidationListener.tsx` components listen for these events with debouncing and deduplication
+   - Service-specific context updaters (e.g., `use-nettoyage-context-updater.ts`) process the data
+   - Components using the updated context automatically re-render with fresh information
+   - User receives toast notifications about the updates
+
+2. **Tarifs Update Flow**
+
+   - Supplier accesses tarifs update form (e.g., `HygieneTarifsDistribUpdateForm.tsx`)
+   - UI shows current tarifs with visual indicators for modified fields
+   - Validation prevents saving invalid data (e.g., zero or negative prices)
+   - Server action (e.g., `updateHygieneTarifDistribAction`) processes the update
+   - Cache invalidation is triggered with specific data payload
+   - All connected clients receive the update and recalculate affected quotes
+
+3. **Quote Reset Flow**
+   - Partial reset: `reinitialisationDevis.ts` resets specific parts of the quote
+   - Full reset: `fullReinitialisationDevis.tsx` resets the entire quote
+   - Reset functions update all relevant context providers
+   - Surface area and occupancy information is preserved
+   - Default values are calculated based on premises data
+   - UI components re-render to reflect the reset state
+
+## User Preferences and Workflow
+
+1. **Code Organization**
+
+   - Feature-based organization within the app directory
+   - Service-specific components in dedicated directories
+   - Separation of desktop and mobile components
+   - Context providers in `src/context/`
+   - Actions in `src/actions/`
+   - Zod schemas in `src/zod-schemas/`
+
+2. **Naming Conventions**
+
+   - PascalCase for React components and TypeScript types
+   - camelCase for functions, variables, and files
+   - French terms for domain-specific concepts (e.g., "devis" for quote, "nettoyage" for cleaning)
+   - Descriptive, domain-specific naming
+
+3. **State Management**
+   - React Context API for global and domain-specific state
+   - Service-specific providers (e.g., `NettoyageProvider.tsx`)
+   - Custom hooks for consuming and updating state
+   - Server Actions for data mutations
+   - localStorage for client-side persistence
+
+## Project-Specific Patterns
+
+1. **Cache Invalidation Pattern**
+
+   - Tag-based invalidation for targeted updates
+   - Data payloads for efficient context updates
+   - Debouncing and deduplication for stability
+   - Service-specific context updaters for maintainability
+
+2. **Form Management Pattern**
+
+   - Visual indicators for modified fields
+   - Client-side validation before submission
+   - Server-side validation in actions
+   - Optimistic UI updates with proper error handling
+
+3. **Price Calculation Pattern**
+
+   - Service-specific calculation logic
+   - Context-based state for pricing inputs
+   - Real-time updates on input changes
+   - Total aggregation across services
+
+4. **Service Module Pattern**
+   - Each service has its own:
+     - Context provider for state
+     - Schema for validation
+     - Action files for server operations
+     - UI components for configuration
+     - Total calculation logic
+
+## Known Challenges
+
+1. **Cache Consistency**
+
+   - Race conditions in concurrent updates
+   - Network failures during cache invalidation
+   - Browser tab synchronization
+   - Offline mode handling
+
+2. **State Complexity**
+
+   - Deep nested state objects
+   - Interdependencies between services
+   - Performance with large state objects
+   - Maintaining consistency across resets
+
+3. **Internationalization**
+
+   - Ensuring all content is properly translated
+   - Handling language-specific formatting
+   - Managing text expansion in different languages
+   - Date and currency formatting
+
+4. **Performance Optimization**
+   - Minimizing re-renders with context updates
+   - Efficient handling of large form state
+   - Optimizing real-time calculations
+   - Reducing bundle size with code splitting
+
+## Tool Usage Patterns
+
+1. **Development Workflow**
+
+   - Next.js development server for local development
+   - TypeScript for static type checking
+   - ESLint and Prettier for code quality
+   - pnpm for package management
+
+2. **Testing Approach**
+
+   - Component testing for UI elements
+   - Integration testing for critical flows
+   - End-to-end testing for user journeys
+   - Manual testing for complex interactions
+
+3. **Debugging Techniques**
+   - Console logging with descriptive messages
+   - React DevTools for component inspection
+   - Network monitoring for Pusher events
+   - localStorage inspection for state persistence
+
+## Evolution of Project Decisions
+
+1. **Cache Invalidation Strategy**
+
+   - Initial approach: Simple tag-based invalidation
+   - Current approach: Data payload with targeted context updates
+   - Future consideration: More sophisticated event filtering and prioritization
+
+2. **State Management**
+
+   - Initial approach: Monolithic context providers
+   - Current approach: Service-specific providers with custom hooks
+   - Future consideration: Optimizing for performance with large state objects
+
+3. **Form Management**
+
+   - Initial approach: Basic form handling
+   - Current approach: Sophisticated validation with visual feedback
+   - Future consideration: More dynamic form generation based on configuration
+
+4. **Quote Calculation**
+   - Initial approach: Simple formulas
+   - Current approach: Complex calculations with multiple variables
+   - Future consideration: Optimization for performance and accuracy
+
+This document will be updated as new patterns and preferences are discovered throughout the project.

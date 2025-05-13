@@ -8,12 +8,12 @@ export const createInsertDevisTemporaireSchema = (messages: {
     texte: (schema) => schema.min(1, messages.texte),
   });
 };
-export const insertDevisTempororaireSchema = createInsertDevisTemporaireSchema({
+export const insertDevisTemporaireSchema = createInsertDevisTemporaireSchema({
   texte: "Texte obligatoire",
 });
 
 export type InsertDevisTemporaireType =
-  typeof insertDevisTempororaireSchema._type;
+  typeof insertDevisTemporaireSchema._type;
 
 export const createInsertDevisSchema = (messages: { devisUrl: string }) => {
   return createInsertSchema(devis, {

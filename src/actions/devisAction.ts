@@ -5,8 +5,8 @@ import { devis, devisTemporaires } from "@/db/schema";
 import { actionClient } from "@/lib/safe-actions";
 import {
   insertDevisSchema,
+  insertDevisTemporaireSchema,
   InsertDevisTemporaireType,
-  insertDevisTempororaireSchema,
   InsertDevisType,
 } from "@/zod-schemas/devis";
 import { getLocale } from "next-intl/server";
@@ -14,7 +14,7 @@ import { flattenValidationErrors } from "next-safe-action";
 
 export const insertDevisTemporaireAction = actionClient
   .metadata({ actionName: "insertDevisTemporaireAction" })
-  .schema(insertDevisTempororaireSchema, {
+  .schema(insertDevisTemporaireSchema, {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
   })

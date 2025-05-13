@@ -163,6 +163,7 @@ const NettoyagePropositions = ({
       setNettoyage((prev) => ({
         infos: {
           ...prev.infos,
+          tarifSelectedId: null,
           fournisseurId: null,
           nomFournisseur: null,
           sloganFournisseur: null,
@@ -182,6 +183,7 @@ const NettoyagePropositions = ({
           tauxHoraireRepasse: null,
           tauxHoraireVitrerie: null,
           minFacturationVitrerie: null,
+          fraisDeplacementVitrerie: null,
         },
       }));
       setTotalNettoyage({
@@ -229,6 +231,7 @@ const NettoyagePropositions = ({
     }
     //Je coche la proposition
     const {
+      id,
       fournisseurId,
       nomFournisseur,
       sloganFournisseur,
@@ -261,12 +264,14 @@ const NettoyagePropositions = ({
     );
     const tauxHoraireVitrerie = vitrerieTarif?.tauxHoraire ?? null;
     const minFacturationVitrerie = vitrerieTarif?.minFacturation ?? null;
+    const fraisDeplacementVitrerie = vitrerieTarif?.fraisDeplacement ?? null;
     const cadenceVitres = vitrerieTarif?.cadenceVitres ?? null;
     const cadenceCloisons = vitrerieTarif?.cadenceCloisons ?? null;
 
     setNettoyage((prev) => ({
       infos: {
         ...prev.infos,
+        tarifSelectedId: id,
         fournisseurId,
         nomFournisseur,
         sloganFournisseur,
@@ -286,6 +291,7 @@ const NettoyagePropositions = ({
         tauxHoraireRepasse,
         tauxHoraireVitrerie,
         minFacturationVitrerie,
+        fraisDeplacementVitrerie,
       },
     }));
 

@@ -47,6 +47,7 @@ export const NettoyageContext = createContext<{
       tauxHoraireRepasse: null,
       tauxHoraireVitrerie: null,
       minFacturationVitrerie: null,
+      fraisDeplacementVitrerie: null,
     },
   },
   setNettoyage: () => {},
@@ -86,6 +87,7 @@ const NettoyageProvider = ({ children }: PropsWithChildren) => {
       tauxHoraireRepasse: null,
       tauxHoraireVitrerie: null,
       minFacturationVitrerie: null,
+      fraisDeplacementVitrerie: null,
     },
   });
 

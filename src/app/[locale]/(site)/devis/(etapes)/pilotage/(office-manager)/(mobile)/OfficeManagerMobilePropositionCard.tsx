@@ -65,7 +65,7 @@ const OfficeManagerMobilePropositionCard = ({
 
   const totalMensuelText = totalAnnuel ? (
     <p className="text-sm font-bold">
-      {formatNumber(Math.round((totalAnnuel * MARGE) / 12))} {t("euros-mois")}*
+      {formatNumber((totalAnnuel * MARGE) / 12)} {t("euros-mois")}*
     </p>
   ) : (
     <p className="text-sm font-bold">{t("non-propose")}</p>

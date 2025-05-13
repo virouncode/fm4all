@@ -1,8 +1,11 @@
 "use server";
 
+import { RATIO } from "@/constants/constants";
 import { db } from "@/db";
 import { nettoyageVitrerieTarifs } from "@/db/schema";
 import { getSession } from "@/lib/auth-session";
+import { invalidateCacheTagsWithData } from "@/lib/cache-invalidation";
+import { getFournisseurTag, getGlobalTag } from "@/lib/data-cache";
 import { actionClient } from "@/lib/safe-actions";
 import {
   updateVitrerieTarifsServerSchema,
@@ -80,6 +83,31 @@ export const updateVitrerieTarifAction = actionClient
         .update(nettoyageVitrerieTarifs)
         .set(vitrerieTarifInput)
         .where(eq(nettoyageVitrerieTarifs.id, vitrerieTarifInput.id));
+
+      // Invalider le cache pour tous les utilisateurs avec les données mises à jour
+      await invalidateCacheTagsWithData(
+        [
+          getFournisseurTag("vitrerieTarifs", fournisseurId),
+          getGlobalTag("vitrerieTarifs"),
+        ],
+        {
+          serviceType: "nettoyage",
+          tarifType: "vitrerie",
+          tarifId: vitrerieTarifInput.id,
+          fournisseurId,
+          cadenceVitres: vitrerieTarifInput.cadenceVitres as number,
+          cadenceCloisons: vitrerieTarifInput.cadenceCloisons as number,
+          tauxHoraireVitrerie: vitrerieTarifInput.tauxHoraire
+            ? vitrerieTarifInput.tauxHoraire / RATIO
+            : null,
+          minFacturationVitrerie: vitrerieTarifInput.minFacturation
+            ? vitrerieTarifInput.minFacturation / RATIO
+            : null,
+          fraisDeplacementVitrerie: vitrerieTarifInput.fraisDeplacement
+            ? vitrerieTarifInput.fraisDeplacement / RATIO
+            : null,
+        }
+      );
 
       return {
         success: true,

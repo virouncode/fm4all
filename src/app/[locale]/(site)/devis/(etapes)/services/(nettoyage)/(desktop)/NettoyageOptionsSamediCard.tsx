@@ -56,7 +56,7 @@ const NettoyageOptionsSamediCard = ({
   const { nettoyage } = useContext(NettoyageContext);
   const samediPrixMensuelText = samediProposition.prixAnnuel ? (
     <p className="font-bold text-xl ml-4">
-      {formatNumber(Math.round((samediProposition?.prixAnnuel * MARGE) / 12))}{" "}
+      {formatNumber((samediProposition?.prixAnnuel * MARGE) / 12)}{" "}
       {t("euros-mois")}
     </p>
   ) : (

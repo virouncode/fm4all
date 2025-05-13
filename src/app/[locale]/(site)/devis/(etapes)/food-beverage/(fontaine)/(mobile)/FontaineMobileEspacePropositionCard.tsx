@@ -134,7 +134,7 @@ const FontaineMobileEspacePropositionCard = ({
 
   const totalMensuelText = totalAnnuel ? (
     <p className="text-sm font-bold">
-      {formatNumber(Math.round((totalAnnuel * MARGE) / 12))} {t("euros-mois")}
+      {formatNumber((totalAnnuel * MARGE) / 12)} {t("euros-mois")}
     </p>
   ) : (
     <p className="text-sm font-bold text-end">
@@ -144,8 +144,7 @@ const FontaineMobileEspacePropositionCard = ({
 
   const prixInstallationText = totalInstallation ? (
     <p className="text-xs text-end">
-      + {formatNumber(Math.round(totalInstallation * MARGE))}{" "}
-      {t("eur-d-installation")}
+      + {formatNumber(totalInstallation * MARGE)} {t("eur-d-installation")}
     </p>
   ) : null;
 

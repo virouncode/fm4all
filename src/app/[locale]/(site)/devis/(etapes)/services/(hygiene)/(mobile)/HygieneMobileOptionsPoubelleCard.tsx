@@ -102,7 +102,7 @@ const HygieneMobileOptionsPoubelleCard = ({
   const color = getFm4AllColor(gamme);
   const prixMensuelPoubelleText = totalPoubelle ? (
     <p className="text-sm font-bold">
-      {formatNumber(Math.round((totalPoubelle * MARGE) / 12))} {t("euros-mois")}
+      {formatNumber((totalPoubelle * MARGE) / 12)} {t("euros-mois")}
     </p>
   ) : (
     <p className="text-sm font-bold">{t("non-propose")}</p>

@@ -102,6 +102,7 @@ export const reinitialisationDevis = (
       tauxHoraireRepasse: null,
       tauxHoraireVitrerie: null,
       minFacturationVitrerie: null,
+      fraisDeplacementVitrerie: null,
     },
   });
   setHygiene({

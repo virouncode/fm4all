@@ -709,6 +709,10 @@
     "espace-suivant-0": "Espace suivant ↓",
     "passer-a-letape-suivante": "Passer à l'étape suivante",
     "suivant-0": "Suivant →",
+    "tarifs-mis-a-jour": "⚠️ Tarifs mis à jour",
+    "les-tarifs-de-nettoyage-infos-nomfournisseur-ont-ete-mis-a-jour-votre-devis-a-ete-recalcule": "Les tarifs de {nomFournisseur} ont été mis à jour. Votre devis a été recalculé.",
+    "erreur-lors-de-linvalidation-du-cache": "Erreur lors de l'invalidation du cache",
+    "les-tarifs-ont-ete-mis-a-jour-par-un-fournisseur-la-page-a-ete-rechargee": "Les tarifs ont été mis à jour par un fournisseur. La page a été rechargée.",
     "loader": {
       "vous-allez-obtenir-des-devis-qui-beneficient-du-service-de-gestion-centralise-fm4all": "Vous allez obtenir des devis qui bénéficient du service de gestion centralisé fm4all :",
       "un-seul-interlocuteur-un-seul-contrat-une-seule-facture": "Un seul interlocuteur, un seul contrat, une seule facture..."

@@ -212,6 +212,7 @@ const NettoyageOptionsPropositions = ({
           ...prev.prix,
           tauxHoraireVitrerie: null,
           minFacturationVitrerie: null,
+          fraisDeplacementVitrerie: null,
         },
       }));
       setTotalNettoyage((prev) => ({
@@ -229,6 +230,7 @@ const NettoyageOptionsPropositions = ({
           ...prev.prix,
           tauxHoraireVitrerie: proposition.tauxHoraire,
           minFacturationVitrerie: proposition.minFacturation,
+          fraisDeplacementVitrerie: proposition.fraisDeplacement,
         },
       }));
       setTotalNettoyage((prev) => ({

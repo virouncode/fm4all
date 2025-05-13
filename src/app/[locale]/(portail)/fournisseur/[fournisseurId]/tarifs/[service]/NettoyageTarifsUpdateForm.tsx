@@ -161,6 +161,8 @@ export default function NettoyageTarifsUpdateForm({
               table: title.includes("Repasse")
                 ? "nettoyageRepasseTarifs"
                 : "nettoyageTarifs",
+              surface: tarif.surface,
+              gamme: tarif.gamme,
             });
             if (!result?.data?.success) {
               success = false;
@@ -190,7 +192,8 @@ export default function NettoyageTarifsUpdateForm({
         title: "Succès ! 🚀",
         description: "Les tarifs ont été mis à jour avec succès",
       });
-      window.location.reload();
+      // Ne pas recharger la page, l'invalidation du cache est gérée par l'action serveur
+      // et le composant CacheInvalidationListener s'occupera de rafraîchir les données
     } else {
       toast({
         variant: "destructive",

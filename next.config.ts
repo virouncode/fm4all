@@ -1,6 +1,6 @@
 import BundleAnalyzer from "@next/bundle-analyzer";
-import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin"; // Assurez-vous d'importer correctement
+import type { NextConfig } from "next/types";
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -23,6 +23,9 @@ const nextConfig: NextConfig = {
         hostname: "placehold.co",
       },
     ],
+  },
+  experimental: {
+    useCache: true,
   },
 };
 

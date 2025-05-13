@@ -103,7 +103,7 @@ const HygieneMobileOptionsParfumCard = ({
   const color = getFm4AllColor(gamme);
   const prixMensuelParfumText = totalParfum ? (
     <p className="text-sm font-bold">
-      {formatNumber(Math.round((totalParfum * MARGE) / 12))} €/mois
+      {formatNumber((totalParfum * MARGE) / 12)} {t("euros-mois")}
     </p>
   ) : (
     <p className="text-sm font-bold">{t("non-propose")}</p>

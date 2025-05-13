@@ -60,7 +60,7 @@ const NettoyageOptionsRepasseCard = ({
   const { nettoyage } = useContext(NettoyageContext);
   const totalMensuelText = repasseProposition?.prixAnnuel ? (
     <p className="font-bold text-xl ml-4">
-      {formatNumber(Math.round((repasseProposition.prixAnnuel * MARGE) / 12))}{" "}
+      {formatNumber((repasseProposition.prixAnnuel * MARGE) / 12)}{" "}
       {t("euros-mois")}
     </p>
   ) : (

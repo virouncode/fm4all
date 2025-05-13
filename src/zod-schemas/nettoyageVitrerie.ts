@@ -60,17 +60,17 @@ export const createVitrerieTarifsUpdateSchema = (messages: {
       ),
     tauxHoraire: (schema) =>
       z.preprocess(
-        (val) => (val === "" ? 0 : (Number(val) * RATIO).toFixed(0)),
+        (val) => (val === "" ? 0 : Number((Number(val) * RATIO).toFixed(0))),
         schema.refine((val) => val > 0, messages.tauxHoraire)
       ),
     minFacturation: (schema) =>
       z.preprocess(
-        (val) => (val === "" ? 0 : (Number(val) * RATIO).toFixed(0)),
+        (val) => (val === "" ? 0 : Number((Number(val) * RATIO).toFixed(0))),
         schema.refine((val) => !val || val > 0, messages.minFacturation)
       ),
     fraisDeplacement: (schema) =>
       z.preprocess(
-        (val) => (val === "" ? 0 : (Number(val) * RATIO).toFixed(0)),
+        (val) => (val === "" ? 0 : Number((Number(val) * RATIO).toFixed(0))),
         schema.refine((val) => !val || val > 0, messages.fraisDeplacement)
       ),
   });

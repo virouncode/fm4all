@@ -1,5 +1,6 @@
 "use server";
 
+import { RATIO } from "@/constants/constants";
 import { db } from "@/db";
 import {
   hygieneConsoTarifs,
@@ -7,7 +8,10 @@ import {
   hygieneInstalDistribTarifs,
 } from "@/db/schema";
 import { getSession } from "@/lib/auth-session";
+import { invalidateCacheTagsWithData } from "@/lib/cache-invalidation";
+import { getFournisseurTag, getGlobalTag } from "@/lib/data-cache";
 import { actionClient } from "@/lib/safe-actions";
+import { GammeType } from "@/zod-schemas/gamme";
 import { SelectHygieneConsoTarifsFournisseurType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribTarifsFournisseurType } from "@/zod-schemas/hygieneDistribTarifs";
 import { SelectHygieneInstalDistribTarifsFournisseurType } from "@/zod-schemas/hygieneInstalDistribTarifs";
@@ -33,11 +37,13 @@ const tarifSchema = z.object({
     "updatedAt",
   ]),
   value: z.number().min(1, "La valeur est requise"),
+  gamme: z.enum(["essentiel", "confort", "excellence"]),
 });
 type Tarif = {
   id: number;
   field: keyof SelectHygieneDistribTarifsFournisseurType;
   value: number;
+  gamme: GammeType;
 };
 
 export const updateHygieneTarifDistribAction = actionClient
@@ -97,6 +103,20 @@ export const updateHygieneTarifDistribAction = actionClient
         .set({ [hygieneTarifInput.field]: valueToStore })
         .where(eq(hygieneDistribTarifs.id, hygieneTarifInput.id));
 
+      await invalidateCacheTagsWithData(
+        [
+          getFournisseurTag("hygieneDistribTarifs", fournisseurId),
+          getGlobalTag("hygieneDistribTarifs"),
+        ],
+        {
+          serviceType: "hygiene",
+          tarifType: "trilogie",
+          field: hygieneTarifInput.field,
+          value: valueToStore / RATIO,
+          fournisseurId,
+          gamme: hygieneTarifInput.gamme,
+        }
+      );
       return {
         success: true,
         message:

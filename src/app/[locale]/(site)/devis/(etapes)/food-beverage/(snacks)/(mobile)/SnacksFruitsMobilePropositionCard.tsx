@@ -9,7 +9,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
-import { MARGE } from "@/constants/constants";
+import { MARGE, S_PAR_MOIS } from "@/constants/constants";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
@@ -133,7 +133,7 @@ const SnacksFruitsMobilePropositionCard = ({
     proposition.totalSansRemise &&
     proposition.totalSansRemise !== proposition.total ? (
       <p className="text-sm font-bold text-end line-through">
-        {formatNumber(Math.round((proposition.totalSansRemise * MARGE) / 12))}{" "}
+        {formatNumber((proposition.totalSansRemise * MARGE) / 12)}{" "}
         {t("euros-mois")}
       </p>
     ) : null;
@@ -156,7 +156,7 @@ const SnacksFruitsMobilePropositionCard = ({
       <div className="flex flex-col">
         {totalMensuelSansRemiseText}
         <p className="text-sm font-bold text-end">
-          {formatNumber(Math.round((total * MARGE) / 12))} {t("euros-mois")}
+          {formatNumber((total * MARGE) / 12)} {t("euros-mois")}
           {totalMensuelSansRemiseText ? "*" : null}
         </p>
       </div>
@@ -164,7 +164,7 @@ const SnacksFruitsMobilePropositionCard = ({
       <p className="text-sm font-bold text-end">
         {tSnacks("panier-minimum-hebdomadaire-non-atteint", {
           panierMin: proposition.panierMin
-            ? `(${Math.round(proposition.panierMin * MARGE * 4.33)} ${t("euros-mois")} ${tSnacks("cafe-compris")})`
+            ? `(${Math.round(proposition.panierMin * MARGE * S_PAR_MOIS)} ${t("euros-mois")} ${tSnacks("cafe-compris")})`
             : "",
         })}
       </p>

@@ -79,9 +79,7 @@ const SecuriteIncendiePropostionCard = ({
   const totalMensuelText = (
     <p className="font-bold text-xl ml-4">
       {formatNumber(
-        Math.round(
-          ((totalAnnuelTrilogie + fraisDeplacementTrilogie) * MARGE) / 12
-        )
+        ((totalAnnuelTrilogie + fraisDeplacementTrilogie) * MARGE) / 12
       )}{" "}
       {t("euros-mois")}
     </p>

@@ -29,6 +29,7 @@ export const nettoyageSchema = z.object({
     tauxHoraireRepasse: z.number().nullable(),
     tauxHoraireVitrerie: z.number().nullable(),
     minFacturationVitrerie: z.number().nullable(),
+    fraisDeplacementVitrerie: z.number().nullable(),
   }),
 });
 

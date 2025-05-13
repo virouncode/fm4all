@@ -75,13 +75,12 @@ const ServicesFm4AllPropositionCard = ({
   const totalMensuelSansRemiseText =
     proposition.totalAnnuelSansRemise !== proposition.totalAnnuel ? (
       <p className="font-bold text-xl ml-4 line-through">
-        {formatNumber(Math.round(proposition.totalAnnuelSansRemise / 12))}{" "}
-        {t("euros-mois")}
+        {formatNumber(proposition.totalAnnuelSansRemise / 12)} {t("euros-mois")}
       </p>
     ) : null;
   const totalMensuelText = (
     <p className="font-bold text-xl ml-4">
-      {formatNumber(Math.round(proposition.totalAnnuel / 12))} {t("euros-mois")}
+      {formatNumber(proposition.totalAnnuel / 12)} {t("euros-mois")}
       {proposition.remiseCa ? "\u00B9" : ""}
       {proposition.remiseHof ? "\u00B2" : ""}
     </p>

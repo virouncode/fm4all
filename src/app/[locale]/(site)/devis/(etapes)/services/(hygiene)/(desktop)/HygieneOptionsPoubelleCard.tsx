@@ -143,7 +143,7 @@ const HygieneOptionsPoubelleCard = ({
         }
         const prixMensuelPoubelleText = (
           <p className="font-bold text-xl ml-4">
-            {formatNumber(Math.round((proposition.totalPoubelle * MARGE) / 12))}{" "}
+            {formatNumber((proposition.totalPoubelle * MARGE) / 12)}{" "}
             {t("euros-mois")}
           </p>
         );

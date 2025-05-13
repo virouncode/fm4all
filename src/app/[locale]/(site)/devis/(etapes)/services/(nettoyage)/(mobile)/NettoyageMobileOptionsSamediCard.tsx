@@ -59,7 +59,7 @@ const NettoyageMobileOptionsSamediCard = ({
   const { gammeSelected: gamme, nomFournisseur } = nettoyage.infos;
   const samediPrixMensuelText = samediProposition.prixAnnuel ? (
     <p className="text-sm font-bold text-end">
-      {formatNumber(Math.round((samediProposition?.prixAnnuel * MARGE) / 12))}{" "}
+      {formatNumber((samediProposition?.prixAnnuel * MARGE) / 12)}{" "}
       {t("euros-mois")}
     </p>
   ) : (

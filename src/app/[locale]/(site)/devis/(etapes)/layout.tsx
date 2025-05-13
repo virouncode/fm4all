@@ -1,3 +1,4 @@
+import CacheInvalidationListener from "@/components/cache/CacheInvalidationListener";
 import DevisBreadcrumb from "../DevisBreadcrumb";
 import Total from "../Total";
 
@@ -13,6 +14,7 @@ export default function MonDevisLayout({
         <Total />
       </div>
       {children}
+      <CacheInvalidationListener />
     </main>
   );
 }

@@ -137,7 +137,7 @@ const HygieneOptionsBalaiCard = ({
         }
         const prixMensuelBalaiText = (
           <p className="font-bold text-xl ml-4">
-            {formatNumber(Math.round((proposition.totalBalai * MARGE) / 12))}{" "}
+            {formatNumber((proposition.totalBalai * MARGE) / 12)}{" "}
             {t("euros-mois")}
           </p>
         );

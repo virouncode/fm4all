@@ -8,6 +8,7 @@ import {
   q18Tarifs,
   qualiteAirTarifs,
 } from "@/db/schema";
+import { getSurfaceTag } from "@/lib/data-cache";
 import { errorHelper } from "@/lib/errorHelper";
 import { roundSurface } from "@/lib/utils/roundSurface";
 import { selectLegioTarifsSchema } from "@/zod-schemas/legioTarifs";
@@ -16,8 +17,12 @@ import { selectMaintenanceTarifsSchema } from "@/zod-schemas/maintenanceTarifs";
 import { selectQ18TarifsSchema } from "@/zod-schemas/q18Tarifs";
 import { selectQualiteAirTarifsSchema } from "@/zod-schemas/qualiteAirTarifs";
 import { eq, getTableColumns } from "drizzle-orm";
+import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
 export const getMaintenanceQuantites = async (surface: string) => {
+  "use cache";
+  cacheTag(getSurfaceTag("maintenanceQuantites", surface));
+  console.log(`🔍 DB REQUEST: getMaintenanceQuantites(${surface})`);
   const roundedSurface = roundSurface(parseInt(surface));
   try {
     const results = await db
@@ -39,6 +44,9 @@ export const getMaintenanceQuantites = async (surface: string) => {
 };
 
 export const getMaintenanceTarifs = async (surface: string) => {
+  "use cache";
+  cacheTag(getSurfaceTag("maintenanceTarifs", surface));
+  console.log(`🔍 DB REQUEST: getMaintenanceTarifs(${surface})`);
   const roundedSurface = roundSurface(parseInt(surface));
   try {
     const results = await db
@@ -77,6 +85,9 @@ export const getMaintenanceTarifs = async (surface: string) => {
 };
 
 export const getQ18Tarifs = async (surface: string) => {
+  "use cache";
+  cacheTag(getSurfaceTag("q18Tarifs", surface));
+  console.log(`🔍 DB REQUEST: getQ18Tarifs(${surface})`);
   const roundedSurface = roundSurface(parseInt(surface));
   try {
     const results = await db
@@ -98,6 +109,9 @@ export const getQ18Tarifs = async (surface: string) => {
 };
 
 export const getLegioTarifs = async (surface: string) => {
+  "use cache";
+  cacheTag(getSurfaceTag("legioTarifs", surface));
+  console.log(`🔍 DB REQUEST: getLegioTarifs(${surface})`);
   const roundedSurface = roundSurface(parseInt(surface));
   try {
     const results = await db
@@ -120,6 +134,9 @@ export const getLegioTarifs = async (surface: string) => {
 };
 
 export const getQualiteAirTarifs = async (surface: string) => {
+  "use cache";
+  cacheTag(getSurfaceTag("qualiteAirTarifs", surface));
+  console.log(`🔍 DB REQUEST: getQualiteAirTarifs(${surface})`);
   const roundedSurface = roundSurface(parseInt(surface));
   try {
     const results = await db

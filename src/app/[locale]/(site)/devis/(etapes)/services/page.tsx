@@ -1,7 +1,7 @@
 import { Link } from "@/i18n/navigation";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
-import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
+import { Metadata } from "next/types";
 import { Suspense } from "react";
 import ServicesLoader from "../locaux/ServicesLoader";
 import MesServices from "./MesServices";

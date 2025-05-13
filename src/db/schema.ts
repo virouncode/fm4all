@@ -1071,6 +1071,13 @@ export const officeManagerTarifsRelations = relations(
   })
 );
 
+export const devisRelations = relations(devis, ({ one }) => ({
+  client: one(clients, {
+    fields: [devis.clientId],
+    references: [clients.id],
+  }),
+}));
+
 export const devisTemporairesRelations = relations(
   devisTemporaires,
   ({ one }) => ({

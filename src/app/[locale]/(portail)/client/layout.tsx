@@ -1,6 +1,6 @@
 import HeaderClient from "@/components/header/header-client";
 
-const AdminLayout = ({
+const ClientLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -13,4 +13,4 @@ const AdminLayout = ({
   );
 };
 
-export default AdminLayout;
+export default ClientLayout;

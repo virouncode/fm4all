@@ -63,7 +63,7 @@ const NettoyageMobileOptionsRepasseCard = ({
   const { gammeSelected: gamme, nomFournisseur } = nettoyage.infos;
   const totalMensuelText = repasseProposition?.prixAnnuel ? (
     <p className="text-sm font-bold text-end">
-      {formatNumber(Math.round((repasseProposition.prixAnnuel * MARGE) / 12))}{" "}
+      {formatNumber((repasseProposition.prixAnnuel * MARGE) / 12)}{" "}
       {t("euros-mois")}
     </p>
   ) : (

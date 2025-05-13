@@ -95,7 +95,7 @@ const MaintenanceMobilePropositionCard = ({
   const color = getFm4AllColor(gamme);
   const totalMensuelText = totalAnnuel ? (
     <p className="font-bold text-sm">
-      {formatNumber(Math.round((totalAnnuel * MARGE) / 12))} {t("euros-mois")}
+      {formatNumber((totalAnnuel * MARGE) / 12)} {t("euros-mois")}
     </p>
   ) : (
     <p className="text-sm font-bold">{t("non-propose")}</p>

@@ -6,7 +6,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
-import { MARGE } from "@/constants/constants";
+import { MARGE, S_PAR_MOIS } from "@/constants/constants";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
@@ -146,7 +146,7 @@ const SnacksFruitsPropositionCard = ({
         <p className="text-center">
           {tSnacks("panier-minimum-hebdomadaire-non-atteint", {
             panierMin: proposition.panierMin
-              ? `(${Math.round(proposition.panierMin * MARGE * 4.33)} ${t("euros-mois")} ${tSnacks("cafe-compris")})`
+              ? `(${Math.round(proposition.panierMin * MARGE * S_PAR_MOIS)} ${t("euros-mois")} ${tSnacks("cafe-compris")})`
               : "",
           })}
         </p>
@@ -157,14 +157,13 @@ const SnacksFruitsPropositionCard = ({
     proposition.totalSansRemise &&
     proposition.totalSansRemise !== proposition.total ? (
       <p className="font-bold text-xl ml-4 line-through">
-        {formatNumber(Math.round((proposition.totalSansRemise * MARGE) / 12))}{" "}
+        {formatNumber((proposition.totalSansRemise * MARGE) / 12)}{" "}
         {t("euros-mois")}
       </p>
     ) : null;
   const totalMensuelText = (
     <p className="font-bold text-xl ml-4">
-      {formatNumber(Math.round((proposition.total * MARGE) / 12))}{" "}
-      {t("euros-mois")}
+      {formatNumber((proposition.total * MARGE) / 12)} {t("euros-mois")}
       {totalMensuelSansRemiseText ? "*" : null}
     </p>
   );

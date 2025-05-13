@@ -67,7 +67,6 @@ export default function VitrerieTarifsUpdateForm({
       });
       resetUpdateVitrerieTarifAction();
       setModifiedFields(new Set());
-      window.location.reload();
     },
     onError: ({ error }) => {
       toast({
@@ -191,7 +190,7 @@ export default function VitrerieTarifsUpdateForm({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6 border rounded-md">
-            <InputWithLabel
+            <InputWithLabel<UpdateVitrerieTarifsType>
               nameInSchema="cadenceVitres"
               fieldTitle="Cadence vitres intérieures (m2/h)*"
               type="number"
@@ -200,7 +199,7 @@ export default function VitrerieTarifsUpdateForm({
               handleChange={(e) => handleInputChange(e, "cadenceVitres")}
               className={`${isFieldModified("cadenceVitres") ? "border-amber-500" : ""}`}
             />
-            <InputWithLabel
+            <InputWithLabel<UpdateVitrerieTarifsType>
               nameInSchema="cadenceCloisons"
               fieldTitle="Cadence cloisons (m2/h)*"
               type="number"
@@ -209,7 +208,7 @@ export default function VitrerieTarifsUpdateForm({
               handleChange={(e) => handleInputChange(e, "cadenceCloisons")}
               className={`${isFieldModified("cadenceCloisons") ? "border-amber-500" : ""}`}
             />
-            <InputWithLabel
+            <InputWithLabel<UpdateVitrerieTarifsType>
               nameInSchema="tauxHoraire"
               fieldTitle="Taux horaire (€/h HT)*"
               type="number"
@@ -218,7 +217,7 @@ export default function VitrerieTarifsUpdateForm({
               handleChange={(e) => handleInputChange(e, "tauxHoraire")}
               className={`${isFieldModified("tauxHoraire") ? "border-amber-500" : ""}`}
             />
-            <InputWithLabel
+            <InputWithLabel<UpdateVitrerieTarifsType>
               nameInSchema="minFacturation"
               fieldTitle="Minimum de facturation (€ HT)"
               type="number"
@@ -227,9 +226,9 @@ export default function VitrerieTarifsUpdateForm({
               handleChange={(e) => handleInputChange(e, "minFacturation")}
               className={`${isFieldModified("minFacturation") ? "border-amber-500" : ""}`}
             />
-            <InputWithLabel
+            <InputWithLabel<UpdateVitrerieTarifsType>
               nameInSchema="fraisDeplacement"
-              fieldTitle="Frais de déplacement (€ HT)"
+              fieldTitle="Frais de déplacement par passage (€ HT)"
               type="number"
               step={0.01}
               min={0}

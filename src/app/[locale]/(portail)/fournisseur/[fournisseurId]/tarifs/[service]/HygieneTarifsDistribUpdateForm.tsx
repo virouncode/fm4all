@@ -181,6 +181,7 @@ export default function HygieneTarifsDistribUpdateForm({
               id,
               field,
               value: Math.round(value * RATIO),
+              gamme: tarif.gamme,
             });
             if (!result?.data?.success) {
               success = false;

@@ -102,7 +102,7 @@ const HygieneMobileOptionsBalaiCard = ({
   const color = getFm4AllColor(gamme);
   const prixMensuelBalaiText = totalBalai ? (
     <p className="text-sm font-bold">
-      {formatNumber(Math.round((totalBalai * MARGE) / 12))} {t("euros-mois")}
+      {formatNumber((totalBalai * MARGE) / 12)} {t("euros-mois")}
     </p>
   ) : (
     <p className="text-sm font-bold">{t("non-propose")}</p>

@@ -88,8 +88,7 @@ const MaintenancePropositionCard = ({
   }
   const totalMensuelText = (
     <p className="font-bold text-xl ml-4">
-      {formatNumber(Math.round((proposition.totalAnnuel * MARGE) / 12))}{" "}
-      {t("euros-mois")}
+      {formatNumber((proposition.totalAnnuel * MARGE) / 12)} {t("euros-mois")}
     </p>
   );
 

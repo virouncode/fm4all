@@ -130,14 +130,13 @@ const FontaineEspacePropositionCard = ({
 
   const totalMensuelText = (
     <p className="font-bold text-xl ml-4">
-      {formatNumber(Math.round((proposition.totalAnnuel * MARGE) / 12))}{" "}
-      {t("euros-mois")}
+      {formatNumber((proposition.totalAnnuel * MARGE) / 12)} {t("euros-mois")}
     </p>
   );
 
   const prixInstallationText = proposition.totalInstallation ? (
     <p className="text-base ml-4">
-      + {formatNumber(Math.round(proposition.totalInstallation * MARGE))}{" "}
+      + {formatNumber(proposition.totalInstallation * MARGE)}{" "}
       {t("eur-d-installation")}
     </p>
   ) : null;

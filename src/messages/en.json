@@ -709,6 +709,10 @@
     "espace-suivant-0": "Next space ↓",
     "passer-a-letape-suivante": "Go to next step",
     "suivant-0": "Next →",
+    "tarifs-mis-a-jour": "⚠️ Rates updated",
+    "les-tarifs-de-nettoyage-infos-nomfournisseur-ont-ete-mis-a-jour-votre-devis-a-ete-recalcule": "{nomFournisseur}'s rates have been updated. Your quote has been recalculated.",
+    "erreur-lors-de-linvalidation-du-cache": "Error while invalidating the cache",
+    "les-tarifs-ont-ete-mis-a-jour-par-un-fournisseur-la-page-a-ete-rechargee": "Prices have been updated by a provider. The page has been reloaded.",
     "loader": {
       "vous-allez-obtenir-des-devis-qui-beneficient-du-service-de-gestion-centralise-fm4all": "You will receive quotes that benefit from fm4all's centralized management service:",
       "un-seul-interlocuteur-un-seul-contrat-une-seule-facture": "One single point of contact, one contract, one invoice..."
