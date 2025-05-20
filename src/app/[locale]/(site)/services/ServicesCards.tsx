@@ -7,6 +7,8 @@ import { getLocale, getTranslations } from "next-intl/server";
 const ServicesCards = async () => {
   // const options = { next: { revalidate: 30 } };
   const locale = await getLocale();
+  console.log("locale", locale);
+
   const services = await getAllServices(locale as LocaleType);
   const t = await getTranslations("Global");
 

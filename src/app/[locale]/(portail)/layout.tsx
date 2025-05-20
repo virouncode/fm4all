@@ -3,13 +3,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { routing } from "@/i18n/routing";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Metadata } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
 import { Didact_Gothic } from "next/font/google";
 import { notFound } from "next/navigation";
 import "../globals.css";
-import { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -37,7 +36,7 @@ export default async function PortalLayout({
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 }>) {
-  const messages = await getMessages();
+  // const messages = await getMessages();
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) {
     notFound();
@@ -48,7 +47,7 @@ export default async function PortalLayout({
         <GoogleAnalytics
           GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!}
         />
-        <NextIntlClientProvider locale={locale} messages={messages}>
+        <NextIntlClientProvider locale={locale}>
           <ThemeProvider
             attribute="class"
             defaultTheme="light"

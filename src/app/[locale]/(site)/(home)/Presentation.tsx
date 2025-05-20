@@ -1,10 +1,10 @@
 import DevisButton from "@/components/buttons/devis-button";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 
-const Presentation = async () => {
-  const tGlobal = await getTranslations("Global");
-  const t = await getTranslations("HomePage.presentation");
+const Presentation = () => {
+  const tGlobal = useTranslations("Global");
+  const t = useTranslations("HomePage.presentation");
   return (
     <section id="presentation">
       <div className="max-w-7xl w-full mx-auto flex flex-col gap-8 text-lg hyphens-auto text-wrap relative pt-8 pb-12 px-6">

@@ -1,9 +1,9 @@
 import DevisButton from "@/components/buttons/devis-button";
 import HowCards from "@/components/cards/HowCards";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 
-const How = async () => {
-  const t = await getTranslations("HomePage.comment");
+const How = () => {
+  const t = useTranslations("HomePage.comment");
   return (
     <section id="process">
       <div className="max-w-7xl w-full mx-auto flex flex-col gap-10 pt-8 pb-12 px-6">

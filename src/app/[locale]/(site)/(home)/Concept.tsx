@@ -1,9 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Handshake, Scale, ScrollText } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 
-const Concept = async () => {
-  const t = await getTranslations("HomePage.concept");
+const Concept = () => {
+  const t = useTranslations("HomePage.concept");
   return (
     <section id="presentation">
       <div className="bg-gradient-to-r from-[#f0c674]/100 to-[#f0c674]/70">

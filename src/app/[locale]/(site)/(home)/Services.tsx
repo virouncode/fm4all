@@ -1,10 +1,10 @@
 import ServicesCarousel from "@/components/carousel/ServicesCarousel";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 
-const Services = async () => {
-  const t = await getTranslations("HomePage.services");
+const Services = () => {
+  const t = useTranslations("HomePage.services");
   return (
     <section className="max-w-7xl w-full mx-auto flex flex-col gap-10 pt-8 pb-12 px-6 relative">
       <div className="flex justify-between items-center">

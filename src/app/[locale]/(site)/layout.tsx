@@ -37,7 +37,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Metadata } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages, setRequestLocale } from "next-intl/server";
+import { getLocale, setRequestLocale } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
 import { Didact_Gothic } from "next/font/google";
 import { notFound } from "next/navigation";
@@ -94,7 +94,7 @@ export default async function LocalizedLayout({
     notFound();
   }
   setRequestLocale(locale);
-  const messages = await getMessages();
+  // const messages = await getMessages();
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -102,7 +102,7 @@ export default async function LocalizedLayout({
         <GoogleAnalytics
           GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!}
         />
-        <NextIntlClientProvider locale={locale} messages={messages}>
+        <NextIntlClientProvider locale={locale}>
           <DevisProgressProvider>
             <ClientProvider>
               <ServicesProvider>

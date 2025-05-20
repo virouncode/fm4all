@@ -1,3 +1,4 @@
+"use client";
 import ImgCardVertical from "@/components/cards/ImgCardVertical";
 import {
   Carousel,

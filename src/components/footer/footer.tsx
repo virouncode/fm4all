@@ -1,4 +1,5 @@
 import { Link } from "@/i18n/navigation";
+import { LocaleType } from "@/i18n/routing";
 import {
   getAllSecteurs,
   getAllServices,
@@ -6,7 +7,6 @@ import {
 } from "@/sanity/queries";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ArticleCategory } from "../../../sanity.types";
-import { LocaleType } from "@/i18n/routing";
 
 const Footer = async () => {
   const t = await getTranslations("footer");

@@ -1,10 +1,10 @@
 import BackgroundServer from "@/components/backgrounds/BackgroundServer";
 import DevisButton from "@/components/buttons/devis-button";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 
-const Hero = async () => {
-  const tGlobal = await getTranslations("Global");
-  const t = await getTranslations("HomePage.hero");
+const Hero = () => {
+  const tGlobal = useTranslations("Global");
+  const t = useTranslations("HomePage.hero");
   return (
     <section
       className="flex items-center justify-center min-h-[calc(100vh-4rem)] md:min-h-[calc(100vh-4rem)] overflow-hidden relative"

@@ -61,7 +61,7 @@ const page = async ({
 }) => {
   const { slug, locale } = await params;
   setRequestLocale(locale);
-  const tGlobal = await getTranslations("Global");
+  const tGlobal = await getTranslations({ locale, namespace: "Global" });
   const categorie = await getCategorie(slug);
 
   if (!categorie) {

@@ -16,11 +16,14 @@ import {
   Star,
   X,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { useState } from "react";
 
 const Header = () => {
+  const locale = useLocale();
+  console.log("locale", locale);
+
   const tGlobal = useTranslations("Global");
   const t = useTranslations("header");
 

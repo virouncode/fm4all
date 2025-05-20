@@ -1,5 +1,6 @@
 import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
 import DevisButton from "@/components/buttons/devis-button";
+import ImgCardVertical from "@/components/cards/ImgCardVertical";
 import TagButton from "@/components/tags/tag-button";
 import {
   Breadcrumb,
@@ -8,6 +9,14 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LocaleType } from "@/i18n/routing";
 import {
   getServicesSlugEn,
@@ -31,7 +40,7 @@ import {
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Slug } from "sanity";
-import ExpertiseCarousel from "./ExpertiseCarousel";
+import { ArticleCategory } from "../../../../../../sanity.types";
 
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
@@ -101,6 +110,17 @@ const ptComponents = {
   },
 };
 
+export const generateStaticParams = async () => {
+  // Récupérer tous les slugs de services depuis Sanity
+  const slugsFr = await fetchServiceSlugs();
+  const slugsEn = await fetchServiceSlugs("en");
+
+  return [
+    ...slugsFr.map((slug) => ({ slug, locale: "fr" })),
+    ...slugsEn.map((slug) => ({ slug, locale: "en" })),
+  ];
+};
+
 export const generateMetadata = async ({
   params,
 }: {
@@ -123,28 +143,16 @@ export const generateMetadata = async ({
 
 export const dynamic = "force-static";
 
-export const generateStaticParams = async () => {
-  // Récupérer tous les slugs de services depuis Sanity
-  const slugsFr = await fetchServiceSlugs();
-  const slugsEn = await fetchServiceSlugs("en");
-
-  return [
-    ...slugsFr.map((slug) => ({ slug, locale: "fr" })),
-    ...slugsEn.map((slug) => ({ slug, locale: "en" })),
-  ];
-};
-
-const page = async ({
+export default async function page({
   params,
 }: {
-  params: Promise<{ slug: string; locale: string }>;
-}) => {
+  params: Promise<{ slug: string; locale: LocaleType }>;
+}) {
   const { slug, locale } = await params;
   setRequestLocale(locale);
-  console.log("locale", locale);
+  const tGlobal = await getTranslations({ locale, namespace: "Global" }); //car force-static
+  const t = await getTranslations({ locale, namespace: "ServicesPage" });
 
-  const tGlobal = await getTranslations("Global");
-  const t = await getTranslations("ServicesPage");
   const service = await getService(slug);
   if (!service) {
     console.log("Service not found");
@@ -295,12 +303,184 @@ const page = async ({
             <h2 className="border-l-2 px-4 text-4xl mb-10">
               {t("notre-expertise")}
             </h2>
-            <ExpertiseCarousel
-              services={associated.services}
-              // sousServices={service.sousServicesAssocies}
-              secteurs={associated.secteurs}
-              articles={associated.articles}
-            />
+            <Tabs
+              defaultValue={
+                associated.services.length
+                  ? "services"
+                  : associated.secteurs.length
+                    ? "secteurs"
+                    : "articles"
+              }
+            >
+              <TabsList className="mb-10 bg-transparent flex flex-col items-start md:flex-row md:items-center">
+                {/* {[...(services || []), ...(sousServices || [])].length > 0 ? (
+          <TabsTrigger value="services" className="text-lg">
+            {t("services-associes")}
+          </TabsTrigger>
+        ) : null} */}
+                {[...(associated.services || [])].length > 0 ? (
+                  <TabsTrigger
+                    value="services"
+                    className="text-lg border-none outline-none"
+                  >
+                    | {tGlobal("services-associes")}
+                  </TabsTrigger>
+                ) : null}
+                {[...(associated.secteurs || [])].length > 0 ? (
+                  <TabsTrigger value="secteurs" className="text-lg">
+                    | {tGlobal("secteurs-associes")}
+                  </TabsTrigger>
+                ) : null}
+                {associated.articles &&
+                [...(associated.articles || [])].length > 0 ? (
+                  <TabsTrigger value="articles" className="text-lg">
+                    | {tGlobal("articles-associes")}
+                  </TabsTrigger>
+                ) : null}
+              </TabsList>
+              <TabsContent value="services">
+                <Carousel
+                  opts={{
+                    align: "start",
+                    loop: true,
+                  }}
+                  className="w-full"
+                >
+                  <CarouselContent className="py-1">
+                    {/* {[...(services || []), ...(sousServices || [])] */}
+                    {[...(associated.services || [])].map((service) => {
+                      const serviceImageUrl = service.imagePrincipale
+                        ? urlFor(service.imagePrincipale)
+                        : null; //TODO placeholder image
+                      const serviceImageAlt =
+                        service.imagePrincipale?.alt ??
+                        tGlobal("illustration-du-service");
+                      const serviceUrl = service.slug?.current ?? "";
+                      return serviceImageUrl ? (
+                        <CarouselItem
+                          className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+                          key={service._id}
+                        >
+                          <ImgCardVertical
+                            src={serviceImageUrl.width(500).height(500).url()}
+                            alt={serviceImageAlt}
+                            href={{
+                              pathname: `/services/[slug]`,
+                              params: { slug: serviceUrl },
+                            }}
+                          >
+                            <div className="p-4 flex flex-col gap-4 h-56">
+                              <p className="text-2xl">{service.titre}</p>
+                              <p className="w-full overflow-hidden line-clamp-5">
+                                {service.description}
+                              </p>
+                            </div>
+                          </ImgCardVertical>
+                        </CarouselItem>
+                      ) : null;
+                    })}
+                  </CarouselContent>
+                  <CarouselPrevious className="right-12 -top-9 translate-y-0 left-auto" />
+                  <CarouselNext className="right-0 -top-9 translate-y-0" />
+                </Carousel>
+              </TabsContent>
+              <TabsContent value="secteurs">
+                <Carousel
+                  opts={{
+                    align: "start",
+                    loop: true,
+                  }}
+                  className="w-full"
+                >
+                  <CarouselContent>
+                    {[...(associated.secteurs || [])].map((secteur) => {
+                      const secteurImageUrl = secteur.imagePrincipale
+                        ? urlFor(secteur.imagePrincipale)
+                        : null; //TODO placeholder image
+                      const secteurImageAlt =
+                        secteur.imagePrincipale?.alt ??
+                        tGlobal("illustration-du-secteur");
+                      const secteurUrl = secteur.slug?.current ?? "";
+                      return secteurImageUrl ? (
+                        <CarouselItem
+                          className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+                          key={secteur._id}
+                        >
+                          <ImgCardVertical
+                            src={secteurImageUrl.width(500).height(500).url()}
+                            alt={secteurImageAlt}
+                            href={{
+                              pathname: `/secteurs/[slug]`,
+                              params: { slug: secteurUrl },
+                            }}
+                          >
+                            <div className="p-4 flex flex-col gap-4 h-56">
+                              <p className="text-2xl">{secteur.titre}</p>
+                              <p className="w-full overflow-hidden line-clamp-5">
+                                {secteur.description}
+                              </p>
+                            </div>
+                          </ImgCardVertical>
+                        </CarouselItem>
+                      ) : null;
+                    })}
+                  </CarouselContent>
+                  <CarouselPrevious className="right-12 -top-9 translate-y-0 left-auto" />
+                  <CarouselNext className="right-0 -top-9 translate-y-0" />
+                </Carousel>
+              </TabsContent>
+              <TabsContent value="articles">
+                <Carousel
+                  opts={{
+                    align: "start",
+                    loop: true,
+                  }}
+                  className="w-full"
+                >
+                  <CarouselContent>
+                    {[...(associated.articles || [])].map((article) => {
+                      const articleImageUrl = article.imagePrincipale
+                        ? urlFor(article.imagePrincipale)
+                        : null; //TODO placeholder image
+                      const articleImageAlt =
+                        article.imagePrincipale?.alt ??
+                        tGlobal("illustration-de-l-article");
+                      const categorie = article.categorie as ArticleCategory;
+                      const articleSlug = categorie.slug?.current ?? "";
+                      const articleSubSlug = article.subSlug?.current ?? "";
+
+                      return articleImageUrl ? (
+                        <CarouselItem
+                          className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+                          key={article._id}
+                        >
+                          <ImgCardVertical
+                            src={articleImageUrl.width(500).height(500).url()}
+                            alt={articleImageAlt}
+                            href={{
+                              pathname: "/blog/[slug]/[subSlug]",
+                              params: {
+                                slug: articleSlug,
+                                subSlug: articleSubSlug,
+                              },
+                            }}
+                          >
+                            <div className="p-4 flex flex-col gap-4 h-56">
+                              <p className="text-2xl">{article.titre}</p>
+                              <p className="w-full overflow-hidden line-clamp-5">
+                                {article.description}
+                              </p>
+                            </div>
+                          </ImgCardVertical>
+                        </CarouselItem>
+                      ) : null;
+                    })}
+                  </CarouselContent>
+                  <CarouselPrevious className="right-12 -top-9 translate-y-0 left-auto" />
+                  <CarouselNext className="right-0 -top-9 translate-y-0" />
+                </Carousel>
+              </TabsContent>
+            </Tabs>
           </div>
         </section>
       )}
@@ -594,6 +774,4 @@ const page = async ({
       <CTAContactButtons />
     </main>
   );
-};
-
-export default page;
+}

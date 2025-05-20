@@ -1,8 +1,8 @@
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 
-const Slogan = async () => {
-  const t = await getTranslations("Global");
+const Slogan = () => {
+  const t = useTranslations("Global");
   return (
     <section className="flex flex-col lg:flex-row justify-center lg:gap-10 gap-6 items-center max-w-7xl w-full mx-auto p-12 relative">
       <div className="h-[50px] w-[200px] relative rounded-xl overflow-hidden ">
