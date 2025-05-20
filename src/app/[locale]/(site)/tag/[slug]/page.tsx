@@ -13,6 +13,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LocaleType } from "@/i18n/routing";
 import { getTagSlugEn, getTagSlugFr } from "@/i18n/tagsSlugMappings";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
@@ -25,7 +26,6 @@ import {
   getTagRelatedSecteurs,
   getTagRelatedServices,
 } from "@/sanity/queries";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 import { HomeIcon } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
