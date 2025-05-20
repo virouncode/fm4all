@@ -141,6 +141,7 @@ const page = async ({
 }) => {
   const { slug, locale } = await params;
   setRequestLocale(locale);
+  console.log("locale", locale);
 
   const tGlobal = await getTranslations("Global");
   const t = await getTranslations("ServicesPage");
