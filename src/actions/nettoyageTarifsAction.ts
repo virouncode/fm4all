@@ -157,10 +157,10 @@ export const updateNettoyageTarifAction = actionClient
         await invalidateCacheTagsWithData(
           [
             getSurfaceTag(
-              "nettoyageTarifs",
+              "repasseTarifs",
               nettoyageTarifInput.surface.toString()
             ),
-            getFournisseurTag("nettoyageTarifs", fournisseurId),
+            getFournisseurTag("repasseTarifs", fournisseurId),
           ],
           {
             serviceType: "nettoyage",

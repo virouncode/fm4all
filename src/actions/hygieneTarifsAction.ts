@@ -9,7 +9,11 @@ import {
 } from "@/db/schema";
 import { getSession } from "@/lib/auth-session";
 import { invalidateCacheTagsWithData } from "@/lib/cache-invalidation";
-import { getFournisseurTag, getGlobalTag } from "@/lib/data-cache";
+import {
+  getEffectifTag,
+  getFournisseurTag,
+  getGlobalTag,
+} from "@/lib/data-cache";
 import { actionClient } from "@/lib/safe-actions";
 import { GammeType } from "@/zod-schemas/gamme";
 import { SelectHygieneConsoTarifsFournisseurType } from "@/zod-schemas/hygieneConsoTarifs";
@@ -38,12 +42,31 @@ const tarifSchema = z.object({
   ]),
   value: z.number().min(1, "La valeur est requise"),
   gamme: z.enum(["essentiel", "confort", "excellence"]),
+  distributeurType: z.enum([
+    "emp",
+    "poubelleEmp",
+    "ph",
+    "savon",
+    "desinfectant",
+    "parfum",
+    "balai",
+    "poubelle",
+  ]),
 });
 type Tarif = {
   id: number;
   field: keyof SelectHygieneDistribTarifsFournisseurType;
   value: number;
   gamme: GammeType;
+  distributeurType:
+    | "emp"
+    | "poubelleEmp"
+    | "ph"
+    | "savon"
+    | "desinfectant"
+    | "parfum"
+    | "balai"
+    | "poubelle";
 };
 
 export const updateHygieneTarifDistribAction = actionClient
@@ -110,7 +133,8 @@ export const updateHygieneTarifDistribAction = actionClient
         ],
         {
           serviceType: "hygiene",
-          tarifType: "trilogie",
+          tarifType: "ditributeurs",
+          distributeurType: hygieneTarifInput.distributeurType,
           field: hygieneTarifInput.field,
           value: valueToStore / RATIO,
           fournisseurId,
@@ -138,11 +162,13 @@ const tarifInstalSchema = z.object({
     "updatedAt",
   ]),
   value: z.number().min(1, "La valeur est requise"),
+  effectif: z.number().min(1, "L'effectif est requis"),
 });
 type TarifInstal = {
   id: number;
   field: keyof SelectHygieneInstalDistribTarifsFournisseurType;
   value: number;
+  effectif: number;
 };
 
 export const updateHygieneTarifInstalAction = actionClient
@@ -203,6 +229,24 @@ export const updateHygieneTarifInstalAction = actionClient
         .set({ [hygieneTarifInput.field]: valueToStore })
         .where(eq(hygieneInstalDistribTarifs.id, hygieneTarifInput.id));
 
+      await invalidateCacheTagsWithData(
+        [
+          getEffectifTag(
+            "hygieneInstalDistribTarifs",
+            hygieneTarifInput.effectif.toString()
+          ),
+          getFournisseurTag("hygieneInstalDistribTarifs", fournisseurId),
+        ],
+        {
+          serviceType: "hygiene",
+          tarifType: "installation",
+          field: hygieneTarifInput.field,
+          value: valueToStore / RATIO,
+          fournisseurId,
+          effectif: hygieneTarifInput.effectif,
+        }
+      );
+
       return {
         success: true,
         message:
@@ -227,11 +271,13 @@ const tarifConsoSchema = z.object({
     "updatedAt",
   ]),
   value: z.number().min(1, "La valeur est requise"),
+  effectif: z.number().min(1, "L'effectif est requis"),
 });
 type TarifConso = {
   id: number;
   field: keyof SelectHygieneConsoTarifsFournisseurType;
   value: number;
+  effectif: number;
 };
 
 export const updateHygieneTarifConsoAction = actionClient
@@ -290,6 +336,24 @@ export const updateHygieneTarifConsoAction = actionClient
         .update(hygieneConsoTarifs)
         .set({ [hygieneTarifInput.field]: valueToStore })
         .where(eq(hygieneConsoTarifs.id, hygieneTarifInput.id));
+
+      await invalidateCacheTagsWithData(
+        [
+          getEffectifTag(
+            "hygieneConsosTarifs",
+            hygieneTarifInput.effectif.toString()
+          ),
+          getFournisseurTag("hygieneConsosTarifs", fournisseurId),
+        ],
+        {
+          serviceType: "hygiene",
+          tarifType: "consommables",
+          field: hygieneTarifInput.field,
+          value: valueToStore / RATIO,
+          fournisseurId,
+          effectif: hygieneTarifInput.effectif,
+        }
+      );
 
       return {
         success: true,

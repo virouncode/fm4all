@@ -1,5 +1,6 @@
 "use client";
 
+import { useHygieneContextUpdater } from "@/hooks/cache/use-hygiene-context-updater";
 import { useNettoyageContextUpdater } from "@/hooks/cache/use-nettoyage-context-updater";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";
@@ -33,6 +34,7 @@ export default function CacheInvalidationListener() {
 
   // Utiliser le hook personnalisé pour mettre à jour le contexte nettoyage
   const updateNettoyageContext = useNettoyageContextUpdater();
+  const updateHygieneContext = useHygieneContextUpdater();
 
   useEffect(() => {
     const channel = pusherClient.subscribe(CACHE_INVALIDATION.CHANNEL);
@@ -94,7 +96,16 @@ export default function CacheInvalidationListener() {
 
           // Nouvelle logique: mettre à jour les contextes en fonction des données reçues
           if (message.data) {
-            updateNettoyageContext(message.data);
+            switch (message.data.serviceType) {
+              case "nettoyage":
+                updateNettoyageContext(message.data);
+                break;
+              // case "hygiene":
+              //   updateHygieneContext(message.data);
+              //   break;
+              default:
+                break;
+            }
           }
 
           // Rafraîchir l'interface utilisateur

@@ -4,6 +4,8 @@ import { pusherServer } from "@/lib/pusher";
 const CACHE_CHANNEL = "cache-invalidation";
 const CACHE_EVENT = "invalidate-tag";
 
+//TODO mieux typer CacheInvalidationData
+
 export type CacheInvalidationData = Record<string, string | number | null>;
 
 export async function invalidateCacheTag(tag: CACHE_TAG | CACHE_TAG_RESULT) {

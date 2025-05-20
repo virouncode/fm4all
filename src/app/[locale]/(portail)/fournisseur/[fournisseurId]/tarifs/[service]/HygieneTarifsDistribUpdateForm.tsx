@@ -182,6 +182,7 @@ export default function HygieneTarifsDistribUpdateForm({
               field,
               value: Math.round(value * RATIO),
               gamme: tarif.gamme,
+              distributeurType: tarif.type,
             });
             if (!result?.data?.success) {
               success = false;

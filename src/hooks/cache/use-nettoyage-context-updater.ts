@@ -94,8 +94,6 @@ export function useNettoyageContextUpdater() {
                 }
               }
             } else {
-              console.log("toasting");
-
               toast({
                 title: t("tarifs-mis-a-jour"),
                 description: t(
