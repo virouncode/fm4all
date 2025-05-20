@@ -149,9 +149,11 @@ const page = async ({
   const { slug, locale } = await params;
   setRequestLocale(locale);
   const tGlobal = await getTranslations({ locale, namespace: "Global" });
-  const t = await getTranslations("ServicesPage");
-  const tSecteurs = await getTranslations("SecteursPage");
-  // const options = { next: { revalidate: 30 } };
+  const t = await getTranslations({ locale, namespace: "ServicesPage" });
+  const tSecteurs = await getTranslations({
+    locale,
+    namespace: "SecteursPage",
+  });
 
   const secteur = await getSecteur(slug);
   if (!secteur) {
@@ -367,6 +369,7 @@ const page = async ({
                               pathname: `/services/[slug]`,
                               params: { slug: serviceUrl },
                             }}
+                            locale={locale}
                           >
                             <div className="p-4 flex flex-col gap-4 h-56">
                               <p className="text-2xl">{service.titre}</p>
@@ -412,6 +415,7 @@ const page = async ({
                               pathname: `/secteurs/[slug]`,
                               params: { slug: secteurUrl },
                             }}
+                            locale={locale}
                           >
                             <div className="p-4 flex flex-col gap-4 h-56">
                               <p className="text-2xl">{secteur.titre}</p>
@@ -463,6 +467,7 @@ const page = async ({
                                 subSlug: articleSubSlug,
                               },
                             }}
+                            locale={locale}
                           >
                             <div className="p-4 flex flex-col gap-4 h-56">
                               <p className="text-2xl">{article.titre}</p>

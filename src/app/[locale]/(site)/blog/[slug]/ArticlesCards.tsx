@@ -1,17 +1,17 @@
 import ImgCardVertical from "@/components/cards/ImgCardVertical";
+import { LocaleType } from "@/i18n/routing";
 import { urlFor } from "@/sanity/lib/image";
 import { getArticlesOfCategorie } from "@/sanity/queries";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ArticleCategory } from "../../../../../../sanity.types";
-import { LocaleType } from "@/i18n/routing";
 
 type ArticlesCardsProps = {
   categorie: ArticleCategory;
 };
 
 const ArticlesCards = async ({ categorie }: ArticlesCardsProps) => {
-  const t = await getTranslations("Global");
   const locale = await getLocale();
+  const t = await getTranslations({ locale, namespace: "Global" });
   const articles = await getArticlesOfCategorie(
     locale as LocaleType,
     categorie.slug?.current ?? ""

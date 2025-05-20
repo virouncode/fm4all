@@ -167,6 +167,7 @@ const page = async ({
                             pathname: `/services/[slug]`,
                             params: { slug: serviceUrl },
                           }}
+                          locale={locale}
                         >
                           <div className="p-4 flex flex-col gap-4 h-56">
                             <p className="text-2xl">{service.titre}</p>
@@ -212,6 +213,7 @@ const page = async ({
                             pathname: `/secteurs/[slug]`,
                             params: { slug: secteurUrl },
                           }}
+                          locale={locale}
                         >
                           <div className="p-4 flex flex-col gap-4 h-56">
                             <p className="text-2xl">{secteur.titre}</p>
@@ -263,6 +265,7 @@ const page = async ({
                               subSlug: articleSubSlug,
                             },
                           }}
+                          locale={locale}
                         >
                           <div className="p-4 flex flex-col gap-4 h-56">
                             <p className="text-2xl">{article.titre}</p>

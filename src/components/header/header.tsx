@@ -16,7 +16,7 @@ import {
   Star,
   X,
 } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -24,8 +24,8 @@ const Header = () => {
   const locale = useLocale();
   console.log("locale", locale);
 
-  const tGlobal = useTranslations("Global");
-  const t = useTranslations("header");
+  // const tGlobal = useTranslations("Global");
+  // const t = useTranslations("header");
 
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const path = usePathname();
@@ -65,7 +65,7 @@ const Header = () => {
               }`}
             >
               <HandPlatter size={15} />
-              <Link href="/services">{t("nos-services")}</Link>
+              <Link href="/services">Services</Link>
             </div>
             <div
               className={`flex gap-1 items-center ${
@@ -73,7 +73,9 @@ const Header = () => {
               }`}
             >
               <Factory size={15} />
-              <Link href="/secteurs">{t("nos-secteurs")}</Link>
+              <Link href="/secteurs">
+                {locale === "fr" ? "Secteurs" : "Sectors"}
+              </Link>
             </div>
             <div
               className={`flex gap-1 items-center ${
@@ -81,7 +83,7 @@ const Header = () => {
               }`}
             >
               <Star size={15} />
-              <Link href="/gammes">{t("nos-3-gammes")}</Link>
+              <Link href="/gammes">{locale === "fr" ? "Gammes" : "Tiers"}</Link>
             </div>
             <div
               className={`flex gap-1 items-center ${
@@ -89,7 +91,9 @@ const Header = () => {
               }`}
             >
               <ScrollText size={15} />
-              <Link href="/engagements">{t("nos-engagements")}</Link>
+              <Link href="/engagements">
+                {locale == "fr" ? "Engagements" : "Commitments"}
+              </Link>
             </div>
             <div
               className={`flex gap-1 items-center ${
@@ -97,27 +101,33 @@ const Header = () => {
               }`}
             >
               <Handshake size={15} />
-              <Link href="/partenaires">{t("nos-partenaires")}</Link>
+              <Link href="/partenaires">
+                {locale === "fr" ? "Partenaires" : "Partners"}
+              </Link>
             </div>
           </nav>
         </div>
         <div className="flex items-center gap-4">
           <DevisButton
-            title={tGlobal("mon-devis-en-ligne")}
-            text={tGlobal("mon-devis-en-ligne")}
+            title={locale === "fr" ? "Mon devis en ligne" : "My online quote"}
+            text={locale === "fr" ? "Mon devis en ligne" : "My online quote"}
             className="text-sm"
             disabled={path.includes("/mon-devis")}
             setIsMobileNavOpen={setIsMobileNavOpen}
           />
           <Button
-            title={t("devenir-prestataire")}
+            title={
+              locale === "fr" ? "Devenir prestataire" : "Become a provider"
+            }
             variant="outline"
             className="hidden min-[600px]:flex justify-center items-center"
             size="default"
             asChild
             onClick={() => setIsMobileNavOpen(false)}
           >
-            <Link href="/prestataire">{t("devenir-prestataire")}</Link>
+            <Link href="/prestataire">
+              {locale === "fr" ? "Devenir prestataire" : "Become a provider"}
+            </Link>
           </Button>
           <LocaleButton className="hidden md:flex" />
           <ContactButton
@@ -166,7 +176,7 @@ const Header = () => {
                 onClick={handleHideMobileNav}
               >
                 <Home size={30} />
-                <Link href="/">{t("home")}</Link>
+                <Link href="/">{locale === "fr" ? "Accueil" : "Home"}</Link>
               </div>
               <div
                 className={`flex gap-4 items-center ${
@@ -175,7 +185,7 @@ const Header = () => {
                 onClick={handleHideMobileNav}
               >
                 <HandPlatter size={30} />
-                <Link href="/services">{t("nos-services")}</Link>
+                <Link href="/services">Services</Link>
               </div>
               <div
                 className={`flex gap-4 items-center ${
@@ -184,7 +194,9 @@ const Header = () => {
                 onClick={handleHideMobileNav}
               >
                 <Factory size={30} />
-                <Link href="/secteurs">{t("nos-secteurs")}</Link>
+                <Link href="/secteurs">
+                  {locale === "fr" ? "Secteurs" : "Sectors"}
+                </Link>
               </div>
               <div
                 className={`flex gap-4 items-center ${
@@ -193,7 +205,9 @@ const Header = () => {
                 onClick={handleHideMobileNav}
               >
                 <Star size={30} />
-                <Link href="/gammes">{t("nos-3-gammes")}</Link>
+                <Link href="/gammes">
+                  {locale === "fr" ? "Gammes" : "Tiers"}
+                </Link>
               </div>
               <div
                 className={`flex gap-4 items-center ${
@@ -202,7 +216,9 @@ const Header = () => {
                 onClick={handleHideMobileNav}
               >
                 <ScrollText size={30} />
-                <Link href="/engagements">{t("nos-engagements")}</Link>
+                <Link href="/engagements">
+                  {locale == "fr" ? "Engagements" : "Commitments"}
+                </Link>
               </div>
               <div
                 className={`flex gap-4 items-center ${
@@ -211,7 +227,9 @@ const Header = () => {
                 onClick={handleHideMobileNav}
               >
                 <Handshake size={30} />
-                <Link href="/partenaires">{t("nos-partenaires")}</Link>
+                <Link href="/partenaires">
+                  {locale === "fr" ? "Partenaires" : "Partners"}
+                </Link>
               </div>
               <div
                 className={`hidden max-[600px]:flex gap-4 items-center ${
@@ -220,7 +238,11 @@ const Header = () => {
                 onClick={handleHideMobileNav}
               >
                 <HandPlatter size={30} />
-                <Link href="/prestataire">{t("devenir-prestataire")}</Link>
+                <Link href="/prestataire">
+                  {locale === "fr"
+                    ? "Devenir prestataire"
+                    : "Become a provider"}
+                </Link>
               </div>
             </div>
           </div>

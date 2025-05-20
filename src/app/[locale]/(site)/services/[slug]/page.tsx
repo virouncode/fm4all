@@ -368,6 +368,7 @@ export default async function page({
                               pathname: `/services/[slug]`,
                               params: { slug: serviceUrl },
                             }}
+                            locale={locale}
                           >
                             <div className="p-4 flex flex-col gap-4 h-56">
                               <p className="text-2xl">{service.titre}</p>
@@ -413,6 +414,7 @@ export default async function page({
                               pathname: `/secteurs/[slug]`,
                               params: { slug: secteurUrl },
                             }}
+                            locale={locale}
                           >
                             <div className="p-4 flex flex-col gap-4 h-56">
                               <p className="text-2xl">{secteur.titre}</p>
@@ -464,6 +466,7 @@ export default async function page({
                                 subSlug: articleSubSlug,
                               },
                             }}
+                            locale={locale}
                           >
                             <div className="p-4 flex flex-col gap-4 h-56">
                               <p className="text-2xl">{article.titre}</p>
