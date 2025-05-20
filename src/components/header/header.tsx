@@ -22,7 +22,6 @@ import { useState } from "react";
 
 const Header = () => {
   const locale = useLocale();
-  console.log("locale", locale);
 
   // const tGlobal = useTranslations("Global");
   // const t = useTranslations("header");

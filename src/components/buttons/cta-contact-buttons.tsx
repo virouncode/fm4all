@@ -1,9 +1,12 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { useLocale } from "next-intl";
 import Link from "next/link";
 
 const CTAContactButtons = () => {
   const locale = useLocale();
+  console.log("locale", locale);
 
   return (
     <div className="w-full flex flex-col items-center justify-center gap-4">
