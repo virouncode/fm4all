@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import Link from "next/link";
 
 const CTAContactButtons = () => {
-  const t = useTranslations("Global");
+  const locale = useLocale();
+
   return (
     <div className="w-full flex flex-col items-center justify-center gap-4">
       <Button
@@ -16,7 +17,9 @@ const CTAContactButtons = () => {
           href="https://calendly.com/romuald-fm4all/rdv-fm4all"
           target="_blank"
         >
-          {t("contactCtaVisio")}
+          {locale === "fr"
+            ? "Je prends un rendez-vous en visio"
+            : "Schedule a video call"}
         </Link>
       </Button>
       <Button
@@ -25,7 +28,7 @@ const CTAContactButtons = () => {
         className="text-base w-full sm:w-2/3 lg:w-1/3 flex items-center justify-center"
         asChild
       >
-        <Link href="tel:+33669311046">{t("contactCtaTel")}</Link>
+        <Link href="tel:+33669311046">+33 6 69 31 10 46</Link>
       </Button>
       <Button
         variant="destructive"
@@ -33,7 +36,9 @@ const CTAContactButtons = () => {
         className="text-base w-full sm:w-2/3 lg:w-1/3 flex items-center justify-center"
         asChild
       >
-        <Link href="mailto:contact@fm4all.com">{t("contactCtaMail")}</Link>
+        <Link href="mailto:contact@fm4all.com">
+          {locale === "fr" ? "Je contact par email" : "Contact by e-mail"}
+        </Link>
       </Button>
     </div>
   );
