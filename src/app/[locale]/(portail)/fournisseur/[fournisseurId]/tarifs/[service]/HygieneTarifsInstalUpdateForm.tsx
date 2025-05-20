@@ -158,6 +158,7 @@ export default function HygieneTarifsInstalUpdateForm({
               id,
               field,
               value: Math.round(value * RATIO),
+              effectif: tarif.effectif,
             });
             if (!result?.data?.success) {
               success = false;
