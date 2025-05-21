@@ -290,8 +290,10 @@ const page = async ({
             <HomeIcon size={14} />
           </BreadcrumbLink>
           <BreadcrumbSeparator />
-          <BreadcrumbLink href={"/blog"} className="flex items-center">
-            {tGlobal("articles")}
+          <BreadcrumbLink className="flex items-center" asChild>
+            <Link href={"/blog"} locale={locale}>
+              {tGlobal("articles")}
+            </Link>
           </BreadcrumbLink>
           <BreadcrumbSeparator />
           {categorie.slug?.current && (

@@ -17,6 +17,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Link } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
 import {
   getSecteurSlugEn,
@@ -249,8 +250,10 @@ const page = async ({
             <HomeIcon size={14} />
           </BreadcrumbLink>
           <BreadcrumbSeparator />
-          <BreadcrumbLink href={`/secteurs`} className="flex items-center">
-            {tSecteurs("nos-secteurs-dintervention")}
+          <BreadcrumbLink className="flex items-center" asChild>
+            <Link href={`/secteurs`} locale={locale}>
+              {tSecteurs("nos-secteurs-dintervention")}
+            </Link>
           </BreadcrumbLink>
           <BreadcrumbSeparator />
           <BreadcrumbPage>{secteur.titre}</BreadcrumbPage>

@@ -17,6 +17,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Link } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
 import {
   getServicesSlugEn,
@@ -248,8 +249,10 @@ export default async function page({
             <HomeIcon size={14} />
           </BreadcrumbLink>
           <BreadcrumbSeparator />
-          <BreadcrumbLink href={`/services`} className="flex items-center">
-            {t("nos-services")}
+          <BreadcrumbLink className="flex items-center" asChild>
+            <Link href={`/services`} locale={locale}>
+              {t("nos-services")}
+            </Link>
           </BreadcrumbLink>
           <BreadcrumbSeparator />
           <BreadcrumbPage>{service.titre}</BreadcrumbPage>

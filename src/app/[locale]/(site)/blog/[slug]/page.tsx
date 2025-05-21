@@ -9,6 +9,7 @@ import {
   getArticlesSlugEn,
   getArticlesSlugFr,
 } from "@/i18n/articlesSlugMappings";
+import { Link } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { urlFor } from "@/sanity/lib/image";
@@ -86,8 +87,10 @@ const page = async ({
             <HomeIcon size={14} />
           </BreadcrumbLink>
           <BreadcrumbSeparator />
-          <BreadcrumbLink href={"/blog"} className="flex items-center">
-            {tGlobal("articles")}
+          <BreadcrumbLink className="flex items-center" asChild>
+            <Link href={"/blog"} locale={locale}>
+              {tGlobal("articles")}
+            </Link>
           </BreadcrumbLink>
           <BreadcrumbSeparator />
           <BreadcrumbPage>{categorie.titre}</BreadcrumbPage>
