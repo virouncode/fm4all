@@ -4,6 +4,7 @@ import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs";
+import { SelectHygieneMinFacturationType } from "@/zod-schemas/hygieneMinFacturation";
 
 export const getFormattedHygienePropositions = (
   effectif: number,
@@ -11,7 +12,8 @@ export const getFormattedHygienePropositions = (
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType,
   hygieneDistribTarifs: SelectHygieneDistribTarifsType[],
   hygieneDistribInstalTarifs: SelectHygieneInstalDistribTarifsType[],
-  hygieneConsosTarifs: SelectHygieneConsoTarifsType[]
+  hygieneConsosTarifs: SelectHygieneConsoTarifsType[],
+  hygieneMinFacturation: SelectHygieneMinFacturationType[]
 ) => {
   //Nombre de distributeurs
   const nbDistribEmp =
@@ -25,6 +27,7 @@ export const getFormattedHygienePropositions = (
   const dureeLocation = hygiene.infos.dureeLocation;
   const {
     hygieneDistribTarifsFournisseur,
+    hygieneMinFacturationFournisseur,
     prixInstalDistrib,
     paParPersonneEmp,
     paParPersonneSavon,
@@ -33,7 +36,8 @@ export const getFormattedHygienePropositions = (
     hygiene,
     hygieneDistribTarifs,
     hygieneConsosTarifs,
-    hygieneDistribInstalTarifs
+    hygieneDistribInstalTarifs,
+    hygieneMinFacturation
   );
 
   const propositions = gammes.map((gamme) => {
@@ -82,14 +86,15 @@ export const getFormattedHygienePropositions = (
     const nbClients = hygieneDistribTarifsFournisseur[0].nbClients;
     const noteGoogle = hygieneDistribTarifsFournisseur[0].noteGoogle;
     const nbAvis = hygieneDistribTarifsFournisseur[0].nbAvis;
-    const minFacturation = hygieneDistribTarifsFournisseur[0].minFacturation;
+    const minFacturation =
+      hygieneMinFacturationFournisseur?.minFacturation ?? null;
 
     const totalEmp =
       nbDistribEmp && prixDistribEmp !== null && paParPersonneEmp !== null
         ? nbDistribEmp * prixDistribEmp + paParPersonneEmp * effectif
         : 0;
 
-    const totalPoubellEmp =
+    const totalPoubelleEmp =
       nbDistribEmp && nbDistribEmpPoubelle && prixDistribEmpPoubelle !== null
         ? nbDistribEmpPoubelle * prixDistribEmpPoubelle
         : 0;
@@ -106,13 +111,13 @@ export const getFormattedHygienePropositions = (
 
     const totalAnnuelTrilogie =
       totalEmp === null &&
-      totalPoubellEmp === null &&
+      totalPoubelleEmp === null &&
       totalSavon === null &&
       totalPh === null
         ? null
         : Math.max(
             (totalEmp ?? 0) +
-              (totalPoubellEmp ?? 0) +
+              (totalPoubelleEmp ?? 0) +
               (totalSavon ?? 0) +
               (totalPh ?? 0),
             minFacturation ?? 0
@@ -152,19 +157,23 @@ export const getHygieneFournisseurTarifs = (
   hygiene: HygieneType,
   hygieneDistribTarifs: SelectHygieneDistribTarifsType[],
   hygieneConsosTarifs: SelectHygieneConsoTarifsType[],
-  hygieneDistribInstalTarifs?: SelectHygieneInstalDistribTarifsType[]
+  hygieneDistribInstalTarifs?: SelectHygieneInstalDistribTarifsType[],
+  hygieneMinFacturation?: SelectHygieneMinFacturationType[]
 ) => {
   const hygieneDistribTarifsFournisseur = hygieneDistribTarifs.filter(
     (item) => item.fournisseurId === hygiene.infos.fournisseurId
   );
-  const ditribInstalTarifFournisseur = hygieneDistribInstalTarifs
-    ? hygieneDistribInstalTarifs.find(
-        (item) => item.fournisseurId === hygiene.infos.fournisseurId
-      )
-    : null;
+  const ditribInstalTarifFournisseur =
+    hygieneDistribInstalTarifs?.find(
+      (item) => item.fournisseurId === hygiene.infos.fournisseurId
+    ) ?? null;
   const consosTarifFournisseur = hygieneConsosTarifs.find(
     (item) => item.fournisseurId === hygiene.infos.fournisseurId
   );
+  const hygieneMinFacturationFournisseur =
+    hygieneMinFacturation?.find(
+      (item) => item.fournisseurId === hygiene.infos.fournisseurId
+    ) ?? null;
   const prixInstalDistrib =
     ditribInstalTarifFournisseur?.prixInstallation ?? null;
   const paParPersonneEmp = consosTarifFournisseur?.paParPersonneEmp ?? null;
@@ -174,6 +183,7 @@ export const getHygieneFournisseurTarifs = (
     consosTarifFournisseur?.paParPersonneDesinfectant ?? null;
   return {
     hygieneDistribTarifsFournisseur,
+    hygieneMinFacturationFournisseur,
     prixInstalDistrib,
     paParPersonneEmp,
     paParPersonneSavon,

@@ -6,6 +6,7 @@ import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs";
+import { SelectHygieneMinFacturationType } from "@/zod-schemas/hygieneMinFacturation";
 import { SelectNettoyageQuantitesType } from "@/zod-schemas/nettoyageQuantites";
 import { SelectRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
 import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
@@ -27,6 +28,7 @@ type NettoyageProps = {
   hygieneDistribTarifs: SelectHygieneDistribTarifsType[];
   hygieneDistribInstalTarifs: SelectHygieneInstalDistribTarifsType[];
   hygieneConsosTarifs: SelectHygieneConsoTarifsType[];
+  hygieneMinFacturation: SelectHygieneMinFacturationType[];
 };
 
 const Nettoyage = ({
@@ -38,6 +40,7 @@ const Nettoyage = ({
   hygieneDistribTarifs,
   hygieneDistribInstalTarifs,
   hygieneConsosTarifs,
+  hygieneMinFacturation,
 }: NettoyageProps) => {
   const tPresentation = useTranslations(
     "DevisPage.services.presentation.cards"
@@ -96,6 +99,7 @@ const Nettoyage = ({
           hygieneDistribTarifs={hygieneDistribTarifs}
           hygieneDistribInstalTarifs={hygieneDistribInstalTarifs}
           hygieneConsosTarifs={hygieneConsosTarifs}
+          hygieneMinFacturation={hygieneMinFacturation}
         />
       </div>
       {isTabletOrMobile ? null : (

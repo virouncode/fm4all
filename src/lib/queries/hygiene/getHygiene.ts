@@ -6,6 +6,7 @@ import {
   hygieneDistribQuantites,
   hygieneDistribTarifs,
   hygieneInstalDistribTarifs,
+  hygieneMinFacturation,
 } from "@/db/schema";
 import {
   getEffectifTag,
@@ -27,6 +28,7 @@ import {
   selectHygieneInstalDistribTarifsFournisseurSchema,
   selectHygieneInstalDistribTarifsSchema,
 } from "@/zod-schemas/hygieneInstalDistribTarifs";
+import { selectHygieneMinFacturationSchema } from "@/zod-schemas/hygieneMinFacturation";
 import { and, eq, getTableColumns } from "drizzle-orm";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
@@ -95,6 +97,27 @@ export const getHygieneDistribTarifs = async () => {
       pa12M: result.pa12M ? result.pa12M / RATIO : null,
       pa24M: result.pa24M ? result.pa24M / RATIO : null,
       pa36M: result.pa36M ? result.pa36M / RATIO : null,
+    }));
+    return data;
+  } catch (err) {
+    errorHelper(err);
+  }
+};
+
+export const getHygieneMinFacturation = async () => {
+  "use cache";
+  cacheTag(getGlobalTag("hygieneMinFacturation"));
+  console.log(`🔍 DB REQUEST: getHygieneMinFacturation`);
+  try {
+    const results = await db.select().from(hygieneMinFacturation);
+    if (results.length === 0) {
+      return [];
+    }
+    const validatedResults = results.map((result) =>
+      selectHygieneMinFacturationSchema.parse(result)
+    );
+    const data = validatedResults.map((result) => ({
+      ...result,
       minFacturation: result.minFacturation
         ? result.minFacturation / RATIO
         : null,
@@ -130,9 +153,6 @@ export const getHygieneDistribTarifsFournisseur = async (
       pa12M: result.pa12M ? result.pa12M / RATIO : null,
       pa24M: result.pa24M ? result.pa24M / RATIO : null,
       pa36M: result.pa36M ? result.pa36M / RATIO : null,
-      minFacturation: result.minFacturation
-        ? result.minFacturation / RATIO
-        : null,
     }));
     return data;
   } catch (err) {

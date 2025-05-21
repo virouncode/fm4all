@@ -7,6 +7,7 @@ import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs";
+import { SelectHygieneMinFacturationType } from "@/zod-schemas/hygieneMinFacturation";
 import { Toilet } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useContext, useRef } from "react";
@@ -20,6 +21,7 @@ type HygieneProps = {
   hygieneDistribTarifs: SelectHygieneDistribTarifsType[];
   hygieneDistribInstalTarifs: SelectHygieneInstalDistribTarifsType[];
   hygieneConsosTarifs: SelectHygieneConsoTarifsType[];
+  hygieneMinFacturation: SelectHygieneMinFacturationType[];
 };
 
 const Hygiene = ({
@@ -27,6 +29,7 @@ const Hygiene = ({
   hygieneDistribTarifs,
   hygieneDistribInstalTarifs,
   hygieneConsosTarifs,
+  hygieneMinFacturation,
 }: HygieneProps) => {
   const tHygiene = useTranslations("DevisPage.services.hygiene");
   const tPresentation = useTranslations(
@@ -88,6 +91,7 @@ const Hygiene = ({
             hygieneDistribTarifs={hygieneDistribTarifs}
             hygieneDistribInstalTarifs={hygieneDistribInstalTarifs}
             hygieneConsosTarifs={hygieneConsosTarifs}
+            hygieneMinFacturation={hygieneMinFacturation}
           />
         )}
       </div>

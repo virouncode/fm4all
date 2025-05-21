@@ -36,18 +36,18 @@ export default async function PortalLayout({
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 }>) {
-  // const messages = await getMessages();
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
+  const messages = (await import(`../../../messages/${locale}.json`)).default;
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className={`${didact.className} antialiased scroll-smooth`}>
         <GoogleAnalytics
           GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!}
         />
-        <NextIntlClientProvider locale={locale}>
+        <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider
             attribute="class"
             defaultTheme="light"

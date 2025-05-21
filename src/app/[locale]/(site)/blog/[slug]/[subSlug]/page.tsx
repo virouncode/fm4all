@@ -360,7 +360,7 @@ const page = async ({
                     : "articles"
               }
             >
-              <TabsList className="mb-10 bg-transparent flex flex-col items-start md:flex-row md:items-center">
+              <TabsList className="my-20 md:my-10 bg-transparent flex flex-col items-start md:flex-row md:items-center">
                 {/* {[...(services || []), ...(sousServices || [])].length > 0 ? (
           <TabsTrigger value="services" className="text-lg">
             {t("services-associes")}

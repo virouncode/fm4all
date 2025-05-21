@@ -26,7 +26,6 @@ const prixMapping = {
   pa12M: "Loc 12 mois (€/an HT)",
   pa24M: "Loc 24 mois (€/an HT)",
   pa36M: "Loc 36 mois (€/an HT)",
-  minFacturation: "Min facturation avec consommables (€/an HT)",
 };
 
 const typeMapping = {
@@ -155,9 +154,6 @@ export default function HygieneTarifsDistribUpdateForm({
       }
       if (tarif.pa36M !== initialTarif.pa36M) {
         fieldsToUpdate.push("pa36M");
-      }
-      if (tarif.minFacturation !== initialTarif.minFacturation) {
-        fieldsToUpdate.push("minFacturation");
       }
 
       // Mettre à jour chaque champ modifié
@@ -339,9 +335,6 @@ export default function HygieneTarifsDistribUpdateForm({
                   <TableHead>Loc 12 mois (€/an HT)*</TableHead>
                   <TableHead>Loc 24 mois (€/an HT)*</TableHead>
                   <TableHead>Loc 36 mois (€/an HT)*</TableHead>
-                  <TableHead>
-                    Min facturation avec consommables (€/an HT)
-                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -427,18 +420,6 @@ export default function HygieneTarifsDistribUpdateForm({
                           value={tarif.pa36M || ""}
                           onChange={(e) =>
                             handleInputChange(e, tarif.id, "pa36M")
-                          }
-                          className={`w-24 ${isModified ? "border-amber-500" : ""}`}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          min={0}
-                          value={tarif.minFacturation || ""}
-                          onChange={(e) =>
-                            handleInputChange(e, tarif.id, "minFacturation")
                           }
                           className={`w-24 ${isModified ? "border-amber-500" : ""}`}
                         />

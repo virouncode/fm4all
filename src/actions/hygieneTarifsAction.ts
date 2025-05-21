@@ -34,7 +34,6 @@ const tarifSchema = z.object({
     "pa12M",
     "pa24M",
     "pa36M",
-    "minFacturation",
     "imageUrl",
     "fournisseurId",
     "createdAt",
@@ -115,8 +114,7 @@ export const updateHygieneTarifDistribAction = actionClient
         hygieneTarifInput.field === "oneShot" ||
         hygieneTarifInput.field === "pa12M" ||
         hygieneTarifInput.field === "pa24M" ||
-        hygieneTarifInput.field === "pa36M" ||
-        hygieneTarifInput.field === "minFacturation"
+        hygieneTarifInput.field === "pa36M"
       ) {
         valueToStore = hygieneTarifInput.value;
       }

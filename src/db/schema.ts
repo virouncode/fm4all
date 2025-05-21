@@ -219,6 +219,15 @@ export const hygieneDistribTarifs = pgTable("hygiene_distrib_tarifs", {
   pa24M: integer("pa_24m"),
   pa36M: integer("pa_36m"),
   imageUrl: varchar(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const hygieneMinFacturation = pgTable("hygiene_min_facturation", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
   minFacturation: integer("min_facturation"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
@@ -834,6 +843,16 @@ export const hygieneDistribTarifsRelations = relations(
   ({ one }) => ({
     fournisseur: one(fournisseurs, {
       fields: [hygieneDistribTarifs.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+  })
+);
+
+export const hygieneMinFacturationRelations = relations(
+  hygieneMinFacturation,
+  ({ one }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [hygieneMinFacturation.fournisseurId],
       references: [fournisseurs.id],
     }),
   })

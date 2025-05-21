@@ -10,6 +10,7 @@ import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs";
+import { SelectHygieneMinFacturationType } from "@/zod-schemas/hygieneMinFacturation";
 import { SelectNettoyageQuantitesType } from "@/zod-schemas/nettoyageQuantites";
 import { SelectRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
 import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
@@ -29,6 +30,7 @@ type NettoyagePropositionsProps = {
   hygieneDistribTarifs: SelectHygieneDistribTarifsType[];
   hygieneDistribInstalTarifs: SelectHygieneInstalDistribTarifsType[];
   hygieneConsosTarifs: SelectHygieneConsoTarifsType[];
+  hygieneMinFacturation: SelectHygieneMinFacturationType[];
 };
 
 const NettoyagePropositions = ({
@@ -40,6 +42,7 @@ const NettoyagePropositions = ({
   hygieneDistribTarifs,
   hygieneDistribInstalTarifs,
   hygieneConsosTarifs,
+  hygieneMinFacturation,
 }: NettoyagePropositionsProps) => {
   const t = useTranslations("DevisPage");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
@@ -337,6 +340,9 @@ const NettoyagePropositions = ({
     const consosTarifFournisseur = hygieneConsosTarifs.find(
       (tarif) => tarif.fournisseurId === hygieneFournisseurId
     );
+    const minFacturationFournisseur = hygieneMinFacturation.find(
+      (tarif) => tarif.fournisseurId === hygieneFournisseurId
+    );
     const prixDistribEmp =
       distribsTarifsFournisseur.find(
         (tarif) =>
@@ -385,7 +391,7 @@ const NettoyagePropositions = ({
           tarif.type === "poubelle" &&
           tarif.gamme === hygiene.infos.poubelleGammeSelected
       )?.[hygiene.infos.dureeLocation] ?? null;
-    const minFacturation = distribsTarifsFournisseur[0].minFacturation;
+    const minFacturation = minFacturationFournisseur?.minFacturation ?? null;
 
     const paParPersonneEmp = consosTarifFournisseur?.paParPersonneEmp ?? null;
     const paParPersonneSavon =

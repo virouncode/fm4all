@@ -4,6 +4,7 @@ import {
   getHygieneDistribQuantite,
   getHygieneDistribTarifs,
   getHygieneInstalDistribTarifs,
+  getHygieneMinFacturation,
 } from "@/lib/queries/hygiene/getHygiene";
 import {
   getIncendieQuantite,
@@ -49,6 +50,7 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
     hygieneDistribTarifs,
     hygieneDistribInstalTarifs,
     hygieneConsosTarifs,
+    hygieneMinFacturation,
     incendieQuantite,
     incendieTarifs,
     maintenanceQuantites,
@@ -65,6 +67,7 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
     getHygieneDistribTarifs(),
     getHygieneInstalDistribTarifs(effectif),
     getHygieneConsosTarifs(effectif),
+    getHygieneMinFacturation(),
     getIncendieQuantite(surface),
     getIncendieTarifs(surface),
     getMaintenanceQuantites(surface),
@@ -85,6 +88,8 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
     hygieneDistribTarifs.length === 0 ||
     !hygieneDistribInstalTarifs ||
     hygieneDistribInstalTarifs.length === 0 ||
+    !hygieneMinFacturation ||
+    hygieneMinFacturation.length === 0 ||
     !hygieneConsosTarifs ||
     hygieneConsosTarifs.length === 0 ||
     !incendieTarifs ||
@@ -131,6 +136,7 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
         hygieneDistribTarifs={hygieneDistribTarifs}
         hygieneDistribInstalTarifs={hygieneDistribInstalTarifs}
         hygieneConsosTarifs={hygieneConsosTarifs}
+        hygieneMinFacturation={hygieneMinFacturation}
       />
       <NettoyageOptions
         nettoyageTarifs={nettoyageTarifs}
@@ -142,6 +148,7 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
         hygieneDistribTarifs={hygieneDistribTarifs}
         hygieneDistribInstalTarifs={hygieneDistribInstalTarifs}
         hygieneConsosTarifs={hygieneConsosTarifs}
+        hygieneMinFacturation={hygieneMinFacturation}
       />
       <HygieneOptions
         hygieneDistribQuantite={hygieneDistribQuantite}

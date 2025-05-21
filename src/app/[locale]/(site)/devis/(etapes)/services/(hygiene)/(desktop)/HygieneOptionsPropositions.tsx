@@ -1,3 +1,4 @@
+import { MAX_NB_DISTRIB } from "@/constants/constants";
 import { ClientContext } from "@/context/ClientProvider";
 import { HygieneContext } from "@/context/HygieneProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
@@ -10,7 +11,6 @@ import { useMediaQuery } from "react-responsive";
 import HygieneMobileOptionsPropositions from "../(mobile)/HygieneMobileOptionsPropositions";
 import { getHygieneFournisseurTarifs } from "../getFormattedHygienePropositions";
 import HygieneDesktopOptionsPropositions from "./HygieneDesktopOptionsPropositions";
-import { MAX_NB_DISTRIB } from "@/constants/constants";
 
 type HygieneOptionsPropositionsProps = {
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;

@@ -100,9 +100,9 @@ export default function CacheInvalidationListener() {
               case "nettoyage":
                 updateNettoyageContext(message.data);
                 break;
-              // case "hygiene":
-              //   updateHygieneContext(message.data);
-              //   break;
+              case "hygiene":
+                updateHygieneContext(message.data);
+                break;
               default:
                 break;
             }

@@ -5,6 +5,7 @@ export type CACHE_TAG =
   | "vitrerieTarifs"
   | "hygieneDistribQuantites"
   | "hygieneDistribTarifs"
+  | "hygieneMinFacturation"
   | "hygieneInstalDistribTarifs"
   | "hygieneConsosTarifs"
   | "incendieQuantites"

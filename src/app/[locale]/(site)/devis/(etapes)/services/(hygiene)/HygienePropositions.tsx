@@ -7,6 +7,7 @@ import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs";
+import { SelectHygieneMinFacturationType } from "@/zod-schemas/hygieneMinFacturation";
 import { ChangeEvent, useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import HygieneDesktopPropositions from "./(desktop)/HygieneDesktopPropositions";
@@ -21,6 +22,7 @@ type HygienePropositionsProps = {
   hygieneDistribTarifs: SelectHygieneDistribTarifsType[];
   hygieneDistribInstalTarifs: SelectHygieneInstalDistribTarifsType[];
   hygieneConsosTarifs: SelectHygieneConsoTarifsType[];
+  hygieneMinFacturation: SelectHygieneMinFacturationType[];
 };
 
 const HygienePropositions = ({
@@ -28,6 +30,7 @@ const HygienePropositions = ({
   hygieneDistribTarifs,
   hygieneDistribInstalTarifs,
   hygieneConsosTarifs,
+  hygieneMinFacturation,
 }: HygienePropositionsProps) => {
   const { hygiene, setHygiene } = useContext(HygieneContext);
   const { client } = useContext(ClientContext);
@@ -46,6 +49,7 @@ const HygienePropositions = ({
   const dureeLocation = hygiene.infos.dureeLocation;
   const {
     hygieneDistribTarifsFournisseur,
+    hygieneMinFacturationFournisseur,
     prixInstalDistrib,
     paParPersonneEmp,
     paParPersonneSavon,
@@ -54,7 +58,8 @@ const HygienePropositions = ({
     hygiene,
     hygieneDistribTarifs,
     hygieneConsosTarifs,
-    hygieneDistribInstalTarifs
+    hygieneDistribInstalTarifs,
+    hygieneMinFacturation
   );
 
   const propositions = getFormattedHygienePropositions(
@@ -63,7 +68,8 @@ const HygienePropositions = ({
     hygieneDistribQuantite,
     hygieneDistribTarifs,
     hygieneDistribInstalTarifs,
-    hygieneConsosTarifs
+    hygieneConsosTarifs,
+    hygieneMinFacturation
   );
 
   const handleClickProposition = (proposition: {
@@ -268,7 +274,8 @@ const HygienePropositions = ({
       hygieneDistribTarifsFournisseur.find(
         (item) => item.type === "ph" && item.gamme === gamme
       )?.[hygiene.infos.dureeLocation] ?? null;
-    const minFacturation = hygieneDistribTarifsFournisseur[0].minFacturation;
+    const minFacturation =
+      hygieneMinFacturationFournisseur?.minFacturation ?? null;
 
     let totalEmp: number | null = null;
     let totalSavon: number | null = null;
@@ -467,7 +474,8 @@ const HygienePropositions = ({
       hygieneDistribTarifsFournisseur.find(
         (item) => item.type === "ph" && item.gamme === gamme
       )?.[hygiene.infos.dureeLocation] ?? null;
-    const minFacturation = hygieneDistribTarifsFournisseur[0].minFacturation;
+    const minFacturation =
+      hygieneMinFacturationFournisseur?.minFacturation ?? null;
 
     let totalEmp: number | null = null;
     let totalSavon: number | null = null;
@@ -680,7 +688,8 @@ const HygienePropositions = ({
         (item) => item.type === "ph" && item.gamme === gamme
       )?.[hygiene.infos.dureeLocation] ?? null;
 
-    const minFacturation = hygieneDistribTarifsFournisseur[0].minFacturation;
+    const minFacturation =
+      hygieneMinFacturationFournisseur?.minFacturation ?? null;
 
     let totalEmp: number | null = null;
     let totalSavon: number | null = null;
@@ -888,7 +897,8 @@ const HygienePropositions = ({
     const nbDistribBalai = hygiene.quantites.nbDistribBalai;
     const nbDistribPoubelle = hygiene.quantites.nbDistribPoubelle;
     const paParPersonneDesinfectant = hygiene.prix.paParPersonneDesinfectant;
-    const minFacturation = hygieneDistribTarifsFournisseur[0].minFacturation;
+    const minFacturation =
+      hygieneMinFacturationFournisseur?.minFacturation ?? null;
 
     const totalEmp =
       nbDistribEmp &&
