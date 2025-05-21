@@ -90,6 +90,7 @@ export default async function LocalizedLayout({
   params: Promise<{ locale: string }>;
 }>) {
   const { locale } = await params;
+
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
@@ -143,7 +144,11 @@ export default async function LocalizedLayout({
                                                                       <CookieBanner />
                                                                       <Analytics />
                                                                       <SpeedInsights />
-                                                                      <Footer />
+                                                                      <Footer
+                                                                        locale={
+                                                                          locale
+                                                                        }
+                                                                      />
                                                                       <Toaster />
                                                                     </ThemeProvider>
                                                                   </TotalServicesFm4AllProvider>

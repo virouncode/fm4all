@@ -1,7 +1,15 @@
 import Partenaires from "@/app/[locale]/(site)/(home)/Partenaires";
 import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
+import {
+  Breadcrumb,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
+import { HomeIcon } from "lucide-react";
 import { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Image from "next/image";
@@ -34,6 +42,15 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
   const t = await getTranslations("PartenairesPage");
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
+      <Breadcrumb className="mb-10">
+        <BreadcrumbList className="text-sm lg:text-base flex flex-wrap">
+          <BreadcrumbLink className="flex items-center" href={`/`}>
+            <HomeIcon size={14} />
+          </BreadcrumbLink>
+          <BreadcrumbSeparator />
+          <BreadcrumbPage>{t("nos-prestataires-partenaires")}</BreadcrumbPage>
+        </BreadcrumbList>
+      </Breadcrumb>
       <h1 className="text-4xl mt-6 mb-10">
         {t("nos-prestataires-partenaires")}
       </h1>

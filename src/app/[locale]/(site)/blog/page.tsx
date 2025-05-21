@@ -1,9 +1,17 @@
 import ArticlesCarousel from "@/components/carousel/ArticlesCarousel";
+import {
+  Breadcrumb,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Link } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { getAllCategories } from "@/sanity/queries";
+import { HomeIcon } from "lucide-react";
 import { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import ArticlesCategorieCarousel from "./ArticlesCategorieCarousel";
@@ -37,6 +45,15 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
 
   return (
     <main className="max-w-7xl min-h-[calc(100vh-4rem)] mx-auto mb-24 py-4 px-6 md:px-20">
+      <Breadcrumb className="mb-10">
+        <BreadcrumbList className="text-sm lg:text-base flex flex-wrap">
+          <BreadcrumbLink className="flex items-center" href={`/`}>
+            <HomeIcon size={14} />
+          </BreadcrumbLink>
+          <BreadcrumbSeparator />
+          <BreadcrumbPage>{t("articles")}</BreadcrumbPage>
+        </BreadcrumbList>
+      </Breadcrumb>
       <section className="mt-6 flex flex-col gap-20">
         <h1 className="text-4xl">
           {t("blog-nos-articles-sur-les-services-aux-entreprises")}

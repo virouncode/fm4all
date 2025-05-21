@@ -1196,6 +1196,7 @@
     }
   },
   "BlogPage": {
+    "articles": "Posts",
     "blog-nos-articles-sur-les-services-aux-entreprises": "Blog: Our posts on business services",
     "par-categorie": "By category"
   },

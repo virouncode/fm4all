@@ -97,6 +97,8 @@ const page = async ({
             <HomeIcon size={14} />
           </BreadcrumbLink>
           <BreadcrumbSeparator />
+          <BreadcrumbPage>tag</BreadcrumbPage>
+          <BreadcrumbSeparator />
           <BreadcrumbPage>{nom}</BreadcrumbPage>
         </BreadcrumbList>
       </Breadcrumb>

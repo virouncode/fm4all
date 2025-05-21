@@ -23,6 +23,7 @@ import {
   getArticlesSubSlugEn,
   getArticlesSubSlugFr,
 } from "@/i18n/articlesSlugMappings";
+import { Link } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { capitalize } from "@/lib/utils/capitalize";
@@ -293,12 +294,19 @@ const page = async ({
             {tGlobal("articles")}
           </BreadcrumbLink>
           <BreadcrumbSeparator />
-          <BreadcrumbLink
-            href={`/blog/${categorie.slug?.current}`}
-            className="flex items-center"
-          >
-            {capitalize(categorie.titre)}
-          </BreadcrumbLink>
+          {categorie.slug?.current && (
+            <BreadcrumbLink className="flex items-center" asChild>
+              <Link
+                href={{
+                  pathname: `/blog/[slug]`,
+                  params: { slug: categorie.slug?.current },
+                }}
+                locale={locale}
+              >
+                {capitalize(categorie.titre)}
+              </Link>
+            </BreadcrumbLink>
+          )}
           <BreadcrumbSeparator />
           <BreadcrumbPage>{article.titre}</BreadcrumbPage>
         </BreadcrumbList>
@@ -308,7 +316,7 @@ const page = async ({
         <div className="flex flex-col flex-1 justify-start text-lg gap-10">
           <div className="flex flex-row gap-2 flex-wrap">
             {tagsSortants.map((tag) => (
-              <TagButton tag={tag} key={tag._id} />
+              <TagButton tag={tag} key={tag._id} locale={locale} />
             ))}
           </div>
           <div

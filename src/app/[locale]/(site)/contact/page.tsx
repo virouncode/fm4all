@@ -1,6 +1,14 @@
 import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
+import {
+  Breadcrumb,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
+import { HomeIcon } from "lucide-react";
 import { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
@@ -30,10 +38,15 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
   const t = await getTranslations("ContactPage");
   return (
     <main className="max-w-7xl h-[calc(100vh-4rem)] mx-auto mb-24 py-4 px-6 md:px-20">
-      {/* <div style={{ fontSize: "10px", color: "#ccc" }}>
-        {" "}
-        Generated at: {new Date().toISOString()}
-      </div> */}
+      <Breadcrumb className="mb-10">
+        <BreadcrumbList className="text-sm lg:text-base flex flex-wrap">
+          <BreadcrumbLink className="flex items-center" href={`/`}>
+            <HomeIcon size={14} />
+          </BreadcrumbLink>
+          <BreadcrumbSeparator />
+          <BreadcrumbPage>{t("nous-contacter")}</BreadcrumbPage>
+        </BreadcrumbList>
+      </Breadcrumb>
       <section className="mt-6 flex flex-col gap-10">
         <h1 className="text-4xl">{t("nous-contacter")}</h1>
         <div className="flex flex-col gap-6 text-xl max-w-prose mx-auto hyphens-auto text-wrap items-center">

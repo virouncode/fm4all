@@ -5,12 +5,15 @@ import {
   getAllServices,
   getLastArticles,
 } from "@/sanity/queries";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import { ArticleCategory } from "../../../sanity.types";
 
-const Footer = async () => {
-  const t = await getTranslations("footer");
-  const locale = await getLocale();
+type FooterProps = {
+  locale: LocaleType;
+};
+
+const Footer = async ({ locale }: FooterProps) => {
+  const t = await getTranslations({ locale, namespace: "footer" });
 
   const [services, articles, secteurs] = await Promise.all([
     getAllServices(locale as LocaleType),

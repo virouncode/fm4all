@@ -260,7 +260,7 @@ export default async function page({
         <div className="flex flex-col flex-1 justify-start text-lg gap-8">
           <div className="flex flex-row gap-2 flex-wrap">
             {tagsSortants.map((tag) => (
-              <TagButton tag={tag} key={tag._id} />
+              <TagButton tag={tag} key={tag._id} locale={locale} />
             ))}
           </div>
           <div
