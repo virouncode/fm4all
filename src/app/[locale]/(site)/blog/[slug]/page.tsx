@@ -9,9 +9,14 @@ import {
   getArticlesSlugEn,
   getArticlesSlugFr,
 } from "@/i18n/articlesSlugMappings";
+import { LocaleType } from "@/i18n/routing";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { urlFor } from "@/sanity/lib/image";
-import { fetchArticleCategories, getCategorie } from "@/sanity/queries";
+import {
+  fetchArticleCategories,
+  getArticlesOfCategorie,
+  getCategorie,
+} from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
 import { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -63,6 +68,10 @@ const page = async ({
   setRequestLocale(locale);
   const tGlobal = await getTranslations({ locale, namespace: "Global" });
   const categorie = await getCategorie(slug);
+  const articles = await getArticlesOfCategorie(
+    locale as LocaleType,
+    categorie.slug?.current ?? ""
+  );
 
   if (!categorie) {
     console.log("Categorie non trouvée");
@@ -88,7 +97,11 @@ const page = async ({
         {tGlobal("nos-articles-sur-and-quot")}
         &quot;{categorie.titre}&quot;
       </h1>
-      <ArticlesCards categorie={categorie} />
+      <ArticlesCards
+        categorie={categorie}
+        articles={articles}
+        locale={locale as LocaleType}
+      />
     </main>
   );
 };

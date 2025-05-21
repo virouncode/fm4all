@@ -1,21 +1,22 @@
 import ImgCardVertical from "@/components/cards/ImgCardVertical";
 import { LocaleType } from "@/i18n/routing";
 import { urlFor } from "@/sanity/lib/image";
-import { getArticlesOfCategorie } from "@/sanity/queries";
-import { getLocale, getTranslations } from "next-intl/server";
-import { ArticleCategory } from "../../../../../../sanity.types";
+import { getTranslations } from "next-intl/server";
+import { Article, ArticleCategory } from "../../../../../../sanity.types";
 
 type ArticlesCardsProps = {
+  articles: Article[];
+  locale: LocaleType;
   categorie: ArticleCategory;
 };
 
-const ArticlesCards = async ({ categorie }: ArticlesCardsProps) => {
-  const locale = await getLocale();
+const ArticlesCards = async ({
+  articles,
+  locale,
+  categorie,
+}: ArticlesCardsProps) => {
   const t = await getTranslations({ locale, namespace: "Global" });
-  const articles = await getArticlesOfCategorie(
-    locale as LocaleType,
-    categorie.slug?.current ?? ""
-  );
+
   return (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 items-center mt-6 w-full">
       {articles.map((article) => {
