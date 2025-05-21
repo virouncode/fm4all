@@ -6,6 +6,7 @@ import {
   hygieneConsoTarifs,
   hygieneDistribTarifs,
   hygieneInstalDistribTarifs,
+  hygieneMinFacturation,
 } from "@/db/schema";
 import { getSession } from "@/lib/auth-session";
 import { invalidateCacheTagsWithData } from "@/lib/cache-invalidation";
@@ -23,6 +24,10 @@ import { eq } from "drizzle-orm";
 import { getLocale } from "next-intl/server";
 import { flattenValidationErrors } from "next-safe-action";
 import { z } from "zod";
+import {
+  updateHygieneMinFacturationServerSchema,
+  UpdateHygieneMinFacturationType,
+} from "./../zod-schemas/hygieneMinFacturation";
 
 const tarifSchema = z.object({
   id: z.number().min(1, "L'ID du tarif est requis"),
@@ -131,7 +136,7 @@ export const updateHygieneTarifDistribAction = actionClient
         ],
         {
           serviceType: "hygiene",
-          tarifType: "ditributeurs",
+          tarifType: "distributeurs",
           distributeurType: hygieneTarifInput.distributeurType,
           field: hygieneTarifInput.field,
           value: valueToStore / RATIO,
@@ -359,6 +364,99 @@ export const updateHygieneTarifConsoAction = actionClient
           locale === "fr"
             ? "Tarif de consommables mis à jour avec succès"
             : "Consumables rate updated successfully",
+      };
+    }
+  );
+
+export const updateHygieneMinFacturationAction = actionClient
+  .metadata({ actionName: "updateHygieneMinFacturationAction" })
+  .schema(updateHygieneMinFacturationServerSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(
+    async ({
+      parsedInput: hygieneMinFacturationInput,
+    }: {
+      parsedInput: UpdateHygieneMinFacturationType;
+    }) => {
+      console.log("ALOOOOOO");
+
+      const locale = await getLocale();
+      const session = await getSession();
+      const currentUser = session?.user;
+      const fournisseurId = currentUser?.fournisseurId;
+      if (!hygieneMinFacturationInput.id) {
+        return {
+          success: false,
+          message:
+            locale === "fr"
+              ? "L'ID du tarif est requis"
+              : "The tarif ID is required",
+        };
+      }
+      if (!fournisseurId) {
+        return {
+          success: false,
+          message:
+            locale === "fr"
+              ? "Vous devez être connecté pour mettre à jour vos tarifs d'hygiene."
+              : "You must be logged in to update your hygiene rates.",
+        };
+      }
+      // Check if the tarif belongs to the fournisseur
+      console.log("check");
+
+      const tarif = await db
+        .select()
+        .from(hygieneMinFacturation)
+        .where(
+          eq(hygieneMinFacturation.id, hygieneMinFacturationInput.id) &&
+            eq(hygieneMinFacturation.fournisseurId, fournisseurId)
+        )
+        .limit(1);
+
+      if (!tarif || tarif.length === 0) {
+        return {
+          success: false,
+          message:
+            locale === "fr"
+              ? "Ce tarif n'existe pas ou vous n'êtes pas autorisé à le modifier"
+              : "This rate does not exist or you are not authorized to modify it",
+        };
+      }
+      delete hygieneMinFacturationInput.updatedAt;
+      console.log("let's go", hygieneMinFacturationInput);
+
+      await db
+        .update(hygieneMinFacturation)
+        .set({
+          minFacturation: hygieneMinFacturationInput.minFacturation,
+        })
+        .where(eq(hygieneMinFacturation.id, hygieneMinFacturationInput.id));
+
+      await invalidateCacheTagsWithData(
+        [
+          getFournisseurTag("hygieneMinFacturation", fournisseurId),
+          getGlobalTag("hygieneMinFacturation"),
+        ],
+        {
+          serviceType: "hygiene",
+          tarifType: "minFacturation",
+          field: "minFacturation",
+          value: hygieneMinFacturationInput.minFacturation
+            ? hygieneMinFacturationInput.minFacturation / RATIO
+            : null,
+          fournisseurId,
+        }
+      );
+
+      return {
+        success: true,
+        message:
+          locale === "fr"
+            ? "Minimum annuel de facturation mis à jour avec succès"
+            : "Annual minimum billing updated successfully",
       };
     }
   );

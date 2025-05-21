@@ -96,11 +96,14 @@ export default function CacheInvalidationListener() {
 
           // Nouvelle logique: mettre à jour les contextes en fonction des données reçues
           if (message.data) {
+            console.log("CheckPoint1", message.data.serviceType);
+
             switch (message.data.serviceType) {
               case "nettoyage":
                 updateNettoyageContext(message.data);
                 break;
               case "hygiene":
+                console.log("CheckPoint2");
                 updateHygieneContext(message.data);
                 break;
               default:
@@ -135,7 +138,14 @@ export default function CacheInvalidationListener() {
       channel.unbind_all();
       pusherClient.unsubscribe(CACHE_INVALIDATION.CHANNEL);
     };
-  }, [router, toast, processedEvents, updateNettoyageContext, t]);
+  }, [
+    router,
+    toast,
+    processedEvents,
+    updateNettoyageContext,
+    t,
+    updateHygieneContext,
+  ]);
 
   // Ce composant ne rend rien visuellement
   return null;

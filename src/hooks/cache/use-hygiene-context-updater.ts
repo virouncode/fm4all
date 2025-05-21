@@ -33,7 +33,7 @@ export function useHygieneContextUpdater() {
   const t = useTranslations("DevisPage");
   const { toast } = useToast();
   const { hygiene, setHygiene } = useContext(HygieneContext);
-  const { setTotalHygiene } = useContext(TotalHygieneContext);
+  const { totalHygiene, setTotalHygiene } = useContext(TotalHygieneContext);
   const { client } = useContext(ClientContext);
 
   const updateHygieneContext = useCallback(
@@ -42,17 +42,21 @@ export function useHygieneContextUpdater() {
       const tarifType = data.tarifType as string;
       const clientEffectifRounded = roundEffectif(client.effectif);
       console.log(
-        `Mise à jour du contexte hygiene (${tarifType}): ${data.field} -> ${data.value}`
+        "mes datas",
+        data,
+        hygiene.infos.fournisseurId === data.fournisseurId
       );
 
       switch (tarifType) {
         case "distributeurs":
           const distributeurType = data.distributeurType as DistributeurType;
           if (hygiene.infos.fournisseurId === data.fournisseurId) {
+            console.log("checkPoint3");
             if (
               hygiene.infos.trilogieGammeSelected &&
               hygiene.infos.dureeLocation === data.field
             ) {
+              console.log("checkPoint4");
               setHygiene((prev) => ({
                 ...prev,
                 prix: {
@@ -374,6 +378,48 @@ export function useHygieneContextUpdater() {
             }
           }
           return;
+        case "minFacturation":
+          console.log("checkPoint4", data);
+          if (
+            hygiene.infos.fournisseurId === data.fournisseurId &&
+            hygiene.infos.trilogieGammeSelected
+          ) {
+            console.log("checkPoint5", data);
+
+            setHygiene((prev) => ({
+              ...prev,
+              prix: {
+                ...prev.prix,
+                minFacturation: data.value as number,
+              },
+            }));
+            //Comparaison de total hygiene avec data.value
+            if (data.value && totalHygiene.totalTrilogie) {
+              if (totalHygiene.totalTrilogie < (data.value as number)) {
+                setTotalHygiene((prev) => ({
+                  ...prev,
+                  totalTrilogie: data.value as number,
+                }));
+              }
+            }
+            toast({
+              title: t("tarifs-mis-a-jour"),
+              description: t(
+                "les-tarifs-de-nettoyage-infos-nomfournisseur-ont-ete-mis-a-jour-votre-devis-a-ete-recalcule",
+                { nomFournisseur: hygiene.infos.nomFournisseur || "" }
+              ),
+              duration: 4000,
+            });
+          } else {
+            toast({
+              title: t("tarifs-mis-a-jour"),
+              description: t(
+                "les-tarifs-ont-ete-mis-a-jour-par-un-fournisseur-la-page-a-ete-rechargee"
+              ),
+              duration: 3000,
+            });
+          }
+          return;
         default:
           return;
       }
@@ -413,6 +459,7 @@ export function useHygieneContextUpdater() {
       setTotalHygiene,
       t,
       toast,
+      totalHygiene.totalTrilogie,
     ]
   );
 

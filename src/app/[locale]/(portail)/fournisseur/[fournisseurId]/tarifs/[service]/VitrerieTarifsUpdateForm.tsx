@@ -27,11 +27,11 @@ export default function VitrerieTarifsUpdateForm({
   initialTarifs,
   title,
 }: VitrerieTarifsUpdateFormProps) {
+  const locale = useLocale();
   const tAuth = useTranslations("auth");
   const [modifiedFields, setModifiedFields] = useState<
     Set<keyof SelectVitrerieTarifFournisseurType>
   >(new Set<keyof SelectVitrerieTarifFournisseurType>());
-  const locale = useLocale();
 
   const lastUpdate = format(
     initialTarifs.updatedAt,

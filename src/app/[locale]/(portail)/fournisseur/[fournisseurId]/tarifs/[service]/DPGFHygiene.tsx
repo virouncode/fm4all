@@ -5,10 +5,12 @@ import {
   getHygieneConsosTarifsFournisseur,
   getHygieneDistribTarifsFournisseur,
   getHygieneInstalDistribTarifsFournisseur,
+  getHygieneMinFacturationFournisseur,
 } from "@/lib/queries/hygiene/getHygiene";
 import { SelectHygieneDistribTarifsFournisseurType } from "@/zod-schemas/hygieneDistribTarifs";
 import { Toilet } from "lucide-react";
 import CDCDialog from "./CDCDialog";
+import HygieneMinFacturationForm from "./HygieneMinFacturationForm";
 import HygieneTarifsConsosUpdateForm from "./HygieneTarifsConsosUpdateForm";
 import HygieneTarifsDistribUpdateForm from "./HygieneTarifsDistribUpdateForm";
 import HygieneTarifsInstalUpdateForm from "./HygieneTarifsInstalUpdateForm";
@@ -18,12 +20,17 @@ type DPGFHygieneProps = {
 };
 
 const DPGFHygiene = async ({ fournisseurId }: DPGFHygieneProps) => {
-  const [tarifsDistribData, tarifsInstalData, tarifsConsosData] =
-    await Promise.all([
-      getHygieneDistribTarifsFournisseur(fournisseurId),
-      getHygieneInstalDistribTarifsFournisseur(fournisseurId),
-      getHygieneConsosTarifsFournisseur(fournisseurId),
-    ]);
+  const [
+    tarifsDistribData,
+    tarifsInstalData,
+    tarifsConsosData,
+    tarifsMinFacturation,
+  ] = await Promise.all([
+    getHygieneDistribTarifsFournisseur(fournisseurId),
+    getHygieneInstalDistribTarifsFournisseur(fournisseurId),
+    getHygieneConsosTarifsFournisseur(fournisseurId),
+    getHygieneMinFacturationFournisseur(fournisseurId),
+  ]);
 
   // Define the order for type and gamme
   const typeOrder = [
@@ -91,6 +98,12 @@ const DPGFHygiene = async ({ fournisseurId }: DPGFHygieneProps) => {
           <CDCNettoyage />
         </CDCDialog>
       </div>
+      {tarifsMinFacturation && (
+        <HygieneMinFacturationForm
+          title="Minimum annuel de facturation"
+          initialTarif={tarifsMinFacturation}
+        />
+      )}
       <HygieneTarifsDistribUpdateForm
         initialTarifs={tarifsDistrib}
         title="Tarifs des distributeurs"

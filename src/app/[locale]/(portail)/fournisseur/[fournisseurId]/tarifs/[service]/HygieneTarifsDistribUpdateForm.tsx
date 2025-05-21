@@ -208,7 +208,6 @@ export default function HygieneTarifsDistribUpdateForm({
         title: "Succès ! 🚀",
         description: "Les tarifs ont été mis à jour avec succès",
       });
-      window.location.reload();
     } else {
       toast({
         variant: "destructive",

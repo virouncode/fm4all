@@ -128,6 +128,35 @@ export const getHygieneMinFacturation = async () => {
   }
 };
 
+export const getHygieneMinFacturationFournisseur = async (
+  fournisseurId: number
+) => {
+  "use cache";
+  cacheTag(getFournisseurTag("hygieneMinFacturation", fournisseurId));
+  console.log(`🔍 DB REQUEST: getHygieneMinFacturationFournisseur`);
+  try {
+    const results = await db
+      .select()
+      .from(hygieneMinFacturation)
+      .where(eq(hygieneMinFacturation.fournisseurId, fournisseurId));
+    if (results.length === 0) {
+      return null;
+    }
+    const validatedResults = results.map((result) =>
+      selectHygieneMinFacturationSchema.parse(result)
+    );
+    const data = validatedResults.map((result) => ({
+      ...result,
+      minFacturation: result.minFacturation
+        ? result.minFacturation / RATIO
+        : null,
+    }));
+    return data[0];
+  } catch (err) {
+    errorHelper(err);
+  }
+};
+
 export const getHygieneDistribTarifsFournisseur = async (
   fournisseurId: number
 ) => {

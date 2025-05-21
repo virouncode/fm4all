@@ -79,6 +79,7 @@ export const updateVitrerieTarifAction = actionClient
               : "This rate does not exist or you are not authorized to modify it",
         };
       }
+      delete vitrerieTarifInput.updatedAt;
       await db
         .update(nettoyageVitrerieTarifs)
         .set(vitrerieTarifInput)
