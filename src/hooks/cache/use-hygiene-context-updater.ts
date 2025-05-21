@@ -19,7 +19,15 @@ const distribPrixMapping = {
   poubelle: "prixDistribPoubelle",
 };
 
-type TrilogieDistributeurType = "emp" | "poubelleEmp" | "savon" | "ph";
+type DistributeurType =
+  | "emp"
+  | "poubelleEmp"
+  | "savon"
+  | "ph"
+  | "desinfectant"
+  | "parfum"
+  | "balai"
+  | "poubelle";
 
 export function useHygieneContextUpdater() {
   const t = useTranslations("DevisPage");
@@ -38,16 +46,11 @@ export function useHygieneContextUpdater() {
       );
 
       switch (tarifType) {
-        case "distributeurs": //TODO distributeurs OPTIONS
-          const distributeurType =
-            data.distributeurType as TrilogieDistributeurType;
+        case "distributeurs":
+          const distributeurType = data.distributeurType as DistributeurType;
           if (hygiene.infos.fournisseurId === data.fournisseurId) {
             if (
               hygiene.infos.trilogieGammeSelected &&
-              (data.distributeurType === "emp" ||
-                data.distributeurType === "poubelleEmp" ||
-                data.distributeurType === "ph" ||
-                data.distributeurType === "savon") &&
               hygiene.infos.dureeLocation === data.field
             ) {
               setHygiene((prev) => ({
@@ -55,7 +58,7 @@ export function useHygieneContextUpdater() {
                 prix: {
                   ...prev.prix,
                   [distribPrixMapping[
-                    data.distributeurType as TrilogieDistributeurType
+                    data.distributeurType as DistributeurType
                   ]]: data.value,
                 },
               }));
@@ -76,15 +79,39 @@ export function useHygieneContextUpdater() {
                 distributeurType === "ph"
                   ? (data.value as number)
                   : hygiene.prix.prixDistribPh;
+              const prixDistribDesinfectant =
+                distributeurType === "desinfectant"
+                  ? (data.value as number)
+                  : hygiene.prix.prixDistribDesinfectant;
+              const prixDistribParfum =
+                distributeurType === "parfum"
+                  ? (data.value as number)
+                  : hygiene.prix.prixDistribParfum;
+              const prixDistribBalai =
+                distributeurType === "balai"
+                  ? (data.value as number)
+                  : hygiene.prix.prixDistribBalai;
+              const prixDistribPoubelle =
+                distributeurType === "poubelle"
+                  ? (data.value as number)
+                  : hygiene.prix.prixDistribPoubelle;
+
               const nbDistribEmp = hygiene.quantites.nbDistribEmp;
               const nbDistribEmpPoubelle =
                 hygiene.quantites.nbDistribEmpPoubelle;
               const nbDistribSavon = hygiene.quantites.nbDistribSavon;
               const nbDistribPh = hygiene.quantites.nbDistribPh;
+              const nbDistribDesinfectant =
+                hygiene.quantites.nbDistribDesinfectant;
+              const nbDistribParfum = hygiene.quantites.nbDistribParfum;
+              const nbDistribBalai = hygiene.quantites.nbDistribBalai;
+              const nbDistribPoubelle = hygiene.quantites.nbDistribPoubelle;
 
               const paParPersonneEmp = hygiene.prix.paParPersonneEmp;
               const paParPersonneSavon = hygiene.prix.paParPersonneSavon;
               const paParPersonnePh = hygiene.prix.paParPersonnePh;
+              const paParPersonneDesinfectant =
+                hygiene.prix.paParPersonneDesinfectant;
               const minFacturation = hygiene.prix.minFacturation;
 
               const totalEmp =
@@ -129,9 +156,37 @@ export function useHygieneContextUpdater() {
                         (totalPh ?? 0),
                       minFacturation ?? 0
                     );
+
+              const totalDesinfectant = hygiene.infos.desinfectantGammeSelected
+                ? nbDistribDesinfectant &&
+                  prixDistribDesinfectant !== null &&
+                  paParPersonneDesinfectant !== null
+                  ? nbDistribDesinfectant * prixDistribDesinfectant +
+                    paParPersonneDesinfectant * client.effectif
+                  : 0
+                : null;
+              const totalParfum = hygiene.infos.parfumGammeSelected
+                ? nbDistribParfum && prixDistribParfum !== null
+                  ? nbDistribParfum * prixDistribParfum
+                  : 0
+                : null;
+              const totalBalai = hygiene.infos.balaiGammeSelected
+                ? nbDistribBalai && prixDistribBalai !== null
+                  ? nbDistribBalai * prixDistribBalai
+                  : 0
+                : null;
+              const totalPoubelle = hygiene.infos.poubelleGammeSelected
+                ? nbDistribPoubelle && prixDistribPoubelle !== null
+                  ? nbDistribPoubelle * prixDistribPoubelle
+                  : 0
+                : null;
               setTotalHygiene((prev) => ({
                 ...prev,
                 totalTrilogie: totalAnnuelTrilogie,
+                totalDesinfectant,
+                totalParfum,
+                totalBalai,
+                totalPoubelle,
               }));
               toast({
                 title: t("tarifs-mis-a-jour"),
@@ -193,6 +248,121 @@ export function useHygieneContextUpdater() {
                 },
               }));
               //Calcul de TotalHygiene
+              const prixDistribEmp = hygiene.prix.prixDistribEmp ?? 0;
+              const prixDistribEmpPoubelle =
+                hygiene.prix.prixDistribEmpPoubelle ?? 0;
+              const prixDistribSavon = hygiene.prix.prixDistribSavon ?? 0;
+              const prixDistribPh = hygiene.prix.prixDistribPh ?? 0;
+              const prixDistribDesinfectant =
+                hygiene.prix.prixDistribDesinfectant ?? 0;
+              const prixDistribParfum = hygiene.prix.prixDistribParfum ?? 0;
+              const prixDistribBalai = hygiene.prix.prixDistribBalai ?? 0;
+              const prixDistribPoubelle = hygiene.prix.prixDistribPoubelle ?? 0;
+              const nbDistribEmp = hygiene.quantites.nbDistribEmp;
+              const nbDistribEmpPoubelle =
+                hygiene.quantites.nbDistribEmpPoubelle;
+              const nbDistribSavon = hygiene.quantites.nbDistribSavon;
+              const nbDistribPh = hygiene.quantites.nbDistribPh;
+              const nbDistribDesinfectant =
+                hygiene.quantites.nbDistribDesinfectant;
+              const nbDistribParfum = hygiene.quantites.nbDistribParfum;
+              const nbDistribBalai = hygiene.quantites.nbDistribBalai;
+              const nbDistribPoubelle = hygiene.quantites.nbDistribPoubelle;
+              const paParPersonneEmp =
+                data.field === "paParPersonneEmp"
+                  ? (data.value as number)
+                  : hygiene.prix.paParPersonneEmp;
+              const paParPersonneSavon =
+                data.field === "paParPersonneSavon"
+                  ? (data.value as number)
+                  : hygiene.prix.paParPersonneSavon;
+              const paParPersonnePh =
+                data.field === "paParPersonnePh"
+                  ? (data.value as number)
+                  : hygiene.prix.paParPersonnePh;
+              const paParPersonneDesinfectant =
+                data.field === "paParPersonneDesinfectant"
+                  ? (data.value as number)
+                  : hygiene.prix.paParPersonneDesinfectant;
+              const minFacturation = hygiene.prix.minFacturation;
+
+              const totalEmp =
+                nbDistribEmp !== null &&
+                prixDistribEmp !== null &&
+                paParPersonneEmp !== null
+                  ? nbDistribEmp * prixDistribEmp +
+                    paParPersonneEmp * client.effectif
+                  : 0;
+              const totalPoubelleEmp =
+                nbDistribEmpPoubelle !== null && prixDistribEmpPoubelle !== null
+                  ? nbDistribEmpPoubelle * prixDistribEmpPoubelle
+                  : 0;
+              const totalSavon =
+                nbDistribSavon &&
+                prixDistribSavon !== null &&
+                paParPersonneSavon !== null
+                  ? nbDistribSavon * prixDistribSavon +
+                    paParPersonneSavon * client.effectif
+                  : 0;
+              const totalPh =
+                nbDistribPh &&
+                prixDistribPh !== null &&
+                paParPersonnePh !== null
+                  ? nbDistribPh * prixDistribPh +
+                    paParPersonnePh * client.effectif
+                  : 0;
+              const totalAnnuelTrilogie =
+                totalEmp === null &&
+                totalPoubelleEmp === null &&
+                totalSavon === null &&
+                totalPh === null
+                  ? null
+                  : Math.max(
+                      (totalEmp ?? 0) +
+                        (totalPoubelleEmp ?? 0) +
+                        (totalSavon ?? 0) +
+                        (totalPh ?? 0),
+                      minFacturation ?? 0
+                    );
+              const totalDesinfectant = hygiene.infos.desinfectantGammeSelected
+                ? nbDistribDesinfectant &&
+                  prixDistribDesinfectant !== null &&
+                  paParPersonneDesinfectant !== null
+                  ? nbDistribDesinfectant * prixDistribDesinfectant +
+                    paParPersonneDesinfectant * client.effectif
+                  : 0
+                : null;
+              const totalParfum = hygiene.infos.parfumGammeSelected
+                ? nbDistribParfum && prixDistribParfum !== null
+                  ? nbDistribParfum * prixDistribParfum
+                  : 0
+                : null;
+              const totalBalai = hygiene.infos.balaiGammeSelected
+                ? nbDistribBalai && prixDistribBalai !== null
+                  ? nbDistribBalai * prixDistribBalai
+                  : 0
+                : null;
+              const totalPoubelle = hygiene.infos.poubelleGammeSelected
+                ? nbDistribPoubelle && prixDistribPoubelle !== null
+                  ? nbDistribPoubelle * prixDistribPoubelle
+                  : 0
+                : null;
+              setTotalHygiene((prev) => ({
+                ...prev,
+                totalTrilogie: totalAnnuelTrilogie,
+                totalDesinfectant,
+                totalParfum,
+                totalBalai,
+                totalPoubelle,
+              }));
+              toast({
+                title: t("tarifs-mis-a-jour"),
+                description: t(
+                  "les-tarifs-de-nettoyage-infos-nomfournisseur-ont-ete-mis-a-jour-votre-devis-a-ete-recalcule",
+                  { nomFournisseur: hygiene.infos.nomFournisseur || "" }
+                ),
+                duration: 4000,
+              });
             } else {
               toast({
                 title: t("tarifs-mis-a-jour"),
@@ -210,21 +380,34 @@ export function useHygieneContextUpdater() {
     },
     [
       client.effectif,
+      hygiene.infos.balaiGammeSelected,
+      hygiene.infos.desinfectantGammeSelected,
       hygiene.infos.dureeLocation,
       hygiene.infos.fournisseurId,
       hygiene.infos.nomFournisseur,
+      hygiene.infos.parfumGammeSelected,
+      hygiene.infos.poubelleGammeSelected,
       hygiene.infos.trilogieGammeSelected,
       hygiene.prix.minFacturation,
+      hygiene.prix.paParPersonneDesinfectant,
       hygiene.prix.paParPersonneEmp,
       hygiene.prix.paParPersonnePh,
       hygiene.prix.paParPersonneSavon,
+      hygiene.prix.prixDistribBalai,
+      hygiene.prix.prixDistribDesinfectant,
       hygiene.prix.prixDistribEmp,
       hygiene.prix.prixDistribEmpPoubelle,
+      hygiene.prix.prixDistribParfum,
       hygiene.prix.prixDistribPh,
+      hygiene.prix.prixDistribPoubelle,
       hygiene.prix.prixDistribSavon,
+      hygiene.quantites.nbDistribBalai,
+      hygiene.quantites.nbDistribDesinfectant,
       hygiene.quantites.nbDistribEmp,
       hygiene.quantites.nbDistribEmpPoubelle,
+      hygiene.quantites.nbDistribParfum,
       hygiene.quantites.nbDistribPh,
+      hygiene.quantites.nbDistribPoubelle,
       hygiene.quantites.nbDistribSavon,
       setHygiene,
       setTotalHygiene,
