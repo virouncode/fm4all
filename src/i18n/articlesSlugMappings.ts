@@ -25,6 +25,8 @@ export const articlesSubSlugMappingsFrToEn: Record<string, string> = {
   "guide-registre-securite-incendie": "guide-fire-safety-register-france",
   "affichage-obligatoire-bureau": "mandatory-workplace-notices-france",
   "registre-unique-du-personnel": "employee-register-france",
+  "registre-accidents-travail-benins":
+    "minor-workplace-accident-register-france",
 };
 export const getArticlesSlugFr = (articleSlugEn: string): string => {
   const entry = Object.entries(articlesSlugMappingsFrToEn).find(
