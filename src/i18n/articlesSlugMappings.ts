@@ -27,6 +27,8 @@ export const articlesSubSlugMappingsFrToEn: Record<string, string> = {
   "registre-unique-du-personnel": "employee-register-france",
   "registre-accidents-travail-benins":
     "minor-workplace-accident-register-france",
+  "registre-controles-techniques-maintenance":
+    "technical-maintenance-log-france",
 };
 export const getArticlesSlugFr = (articleSlugEn: string): string => {
   const entry = Object.entries(articlesSlugMappingsFrToEn).find(
