@@ -29,6 +29,8 @@ export const articlesSubSlugMappingsFrToEn: Record<string, string> = {
     "minor-workplace-accident-register-france",
   "registre-controles-techniques-maintenance":
     "technical-maintenance-log-france",
+  "attestation-assurance-rc-entreprise":
+    "rc-insurance-certificate-business-france",
 };
 export const getArticlesSlugFr = (articleSlugEn: string): string => {
   const entry = Object.entries(articlesSlugMappingsFrToEn).find(
