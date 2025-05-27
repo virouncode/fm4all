@@ -4,6 +4,7 @@ import { MARGE } from "@/constants/constants";
 import { ClientContext } from "@/context/ClientProvider";
 import { TotalContext } from "@/context/TotalProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import TotalCafe from "../TotalCafe";
 import TotalFontaines from "../TotalFontaines";
@@ -21,6 +22,7 @@ import TotalThe from "../TotalThe";
 const DevisSynthese = () => {
   const { client } = useContext(ClientContext);
   const { total } = useContext(TotalContext);
+  const t = useTranslations("Total");
 
   return (
     <div
@@ -28,16 +30,18 @@ const DevisSynthese = () => {
     >
       <div id="total-summary">
         <p className="text-2xl">
-          Total: {formatNumber(Math.round(total.totalAnnuelHt ?? 0))} € HT/an
+          Total: {formatNumber(Math.round(total.totalAnnuelHt ?? 0))}{" "}
+          {t("eur-ht-an")}
         </p>
         <p>
-          Soit {formatNumber(Math.round((total.totalAnnuelHt ?? 0) / 12))} €
-          HT/mois pour {client.effectif} personnes, {client.surface} m
-          <sup>2</sup>
+          {t("soit")}{" "}
+          {formatNumber(Math.round((total.totalAnnuelHt ?? 0) / 12))}{" "}
+          {t("eur-ht-mois-pour")} {client.effectif} {t("personnes")},{" "}
+          {client.surface} m<sup>2</sup>
         </p>
         <p>
           + {formatNumber(Math.round((total.totalInstallationHt ?? 0) * MARGE))}{" "}
-          € HT d&apos;installation
+          {t("eur-ht-dinstallation")}
         </p>
       </div>
       <div className="flex flex-col gap-4">
