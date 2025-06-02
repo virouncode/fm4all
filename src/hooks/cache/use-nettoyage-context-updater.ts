@@ -173,8 +173,6 @@ export function useNettoyageContextUpdater() {
           }
           return;
         case "vitrerie":
-          console.log("vitrerieData", data);
-
           if (
             nettoyage.infos.vitrerieSelected &&
             nettoyage.infos.fournisseurId === data.fournisseurId
@@ -227,9 +225,6 @@ export function useNettoyageContextUpdater() {
                     (fraisDeplacementVitrerie ?? 0),
                   minFacturationVitrerie ?? 0
                 );
-
-              console.log("totalVitrerie", totalVitrerie);
-
               setTotalNettoyage((prev: TotalNettoyageType) => ({
                 ...prev,
                 totalVitrerie,

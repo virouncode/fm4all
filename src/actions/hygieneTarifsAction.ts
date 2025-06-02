@@ -380,8 +380,6 @@ export const updateHygieneMinFacturationAction = actionClient
     }: {
       parsedInput: UpdateHygieneMinFacturationType;
     }) => {
-      console.log("ALOOOOOO");
-
       const locale = await getLocale();
       const session = await getSession();
       const currentUser = session?.user;
@@ -405,8 +403,6 @@ export const updateHygieneMinFacturationAction = actionClient
         };
       }
       // Check if the tarif belongs to the fournisseur
-      console.log("check");
-
       const tarif = await db
         .select()
         .from(hygieneMinFacturation)
@@ -426,8 +422,6 @@ export const updateHygieneMinFacturationAction = actionClient
         };
       }
       delete hygieneMinFacturationInput.updatedAt;
-      console.log("let's go", hygieneMinFacturationInput);
-
       await db
         .update(hygieneMinFacturation)
         .set({

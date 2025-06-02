@@ -1,3 +1,5 @@
+"use client";
+
 import UserButton from "@/components/buttons/UserButton";
 import {
   Sidebar,
@@ -10,8 +12,10 @@ import {
   SidebarMenuItem,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { Link, usePathname } from "@/i18n/navigation";
 import {
   Barcode,
+  CalendarDays,
   CreditCard,
   EuroIcon,
   LayoutDashboard,
@@ -19,60 +23,77 @@ import {
   UserIcon,
 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 
-const items = [
-  {
-    title: "Tableau de bord",
-    href: {
-      pathname: "/fournisseur/19/dashboard" as const,
-      params: { fournisseurId: 19 },
-    },
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Mon profil",
-    href: {
-      pathname: "/fournisseur/19/profil" as const,
-      params: { fournisseurId: 19 },
-    },
-    icon: UserIcon,
-  },
-  {
-    title: "Mes tarifs",
-    href: {
-      pathname: "/fournisseur/19/tarifs" as const,
-      params: { fournisseurId: 19 },
-    },
-    icon: EuroIcon,
-  },
-  {
-    title: "Mes produits",
-    href: {
-      pathname: "/fournisseur/19/produits" as const,
-      params: { fournisseurId: 19 },
-    },
-    icon: Barcode,
-  },
-  {
-    title: "Factures et paiements",
-    href: {
-      pathname: "/fournisseur/19/factures" as const,
-      params: { fournisseurId: 19 },
-    },
-    icon: CreditCard,
-  },
-  {
-    title: "Mon compte",
-    href: {
-      pathname: "/fournisseur/19/compte" as const,
-      params: { fournisseurId: 19 },
-    },
-    icon: Settings,
-  },
-];
+type SidebarFournisseurProps = {
+  fournisseurId: number;
+};
 
-const SidebarFournisseur = () => {
+const SidebarFournisseur = ({ fournisseurId }: SidebarFournisseurProps) => {
+  const pathName = usePathname();
+  const items = [
+    {
+      title: "Tableau de bord",
+      href: {
+        pathname: "/fournisseur/[fournisseurId]/dashboard" as const,
+        params: { fournisseurId },
+      },
+      icon: LayoutDashboard,
+    },
+    {
+      title: "Mon profil",
+      href: {
+        pathname: "/fournisseur/[fournisseurId]/profil" as const,
+        params: { fournisseurId },
+      },
+      icon: UserIcon,
+    },
+    {
+      title: "Mes tarifs",
+      href: {
+        pathname: "/fournisseur/[fournisseurId]/tarifs" as const,
+        params: { fournisseurId },
+      },
+      icon: EuroIcon,
+    },
+    {
+      title: "Mes produits",
+      href: {
+        pathname: "/fournisseur/[fournisseurId]/produits" as const,
+        params: { fournisseurId },
+      },
+      icon: Barcode,
+    },
+    {
+      title: "Mes interventions",
+      href: {
+        pathname: "/fournisseur/[fournisseurId]/interventions" as const,
+        params: { fournisseurId },
+      },
+      icon: CalendarDays,
+    },
+    {
+      title: "Factures et paiements",
+      href: {
+        pathname: "/fournisseur/[fournisseurId]/factures" as const,
+        params: { fournisseurId },
+      },
+      icon: CreditCard,
+    },
+    {
+      title: "Mon compte",
+      href: {
+        pathname: "/fournisseur/[fournisseurId]/compte" as const,
+        params: { fournisseurId },
+      },
+      icon: Settings,
+    },
+  ];
+  const isActive = (href: {
+    pathname: string;
+    params: { fournisseurId: number };
+  }) => {
+    return pathName.includes(href.pathname);
+  };
   return (
     <Sidebar collapsible="icon" variant="sidebar">
       <SidebarTrigger />
@@ -97,9 +118,14 @@ const SidebarFournisseur = () => {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link href={item.href.pathname}>
-                      <item.icon />
+                  <SidebarMenuButton
+                    className={`${isActive(item.href) ? "bg-slate-300" : ""}`}
+                  >
+                    <Link
+                      href={item.href}
+                      className="flex items-center gap-2 w-full"
+                    >
+                      <item.icon size={15} />
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>

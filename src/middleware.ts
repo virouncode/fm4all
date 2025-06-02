@@ -104,7 +104,6 @@ export async function middleware(req: NextRequest) {
             new URL(`/${locale}/auth/unauthorized?type=client`, req.url)
           );
         const fournisseurId = pathnameWithoutLocale.split("/")[2];
-        console.log("fournisseurId:", fournisseurId);
 
         if (fournisseurId && parseInt(fournisseurId) !== user.fournisseurId) {
           return NextResponse.redirect(

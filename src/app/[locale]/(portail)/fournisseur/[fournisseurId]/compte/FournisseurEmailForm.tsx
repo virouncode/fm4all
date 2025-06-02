@@ -62,7 +62,6 @@ const FournisseurEmailForm = ({
     reset: resetUpdateFournisseurAction,
   } = useAction(updateFournisseurAction, {
     onSuccess: async ({ data }) => {
-      console.log("data", data);
       if (
         data?.data.fournisseur.emailContact &&
         data?.data.fournisseur.emailContact !== initialFournisseur.emailContact

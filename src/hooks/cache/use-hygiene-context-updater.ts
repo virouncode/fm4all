@@ -41,22 +41,14 @@ export function useHygieneContextUpdater() {
       if (data.serviceType !== "hygiene") return;
       const tarifType = data.tarifType as string;
       const clientEffectifRounded = roundEffectif(client.effectif);
-      console.log(
-        "mes datas",
-        data,
-        hygiene.infos.fournisseurId === data.fournisseurId
-      );
-
       switch (tarifType) {
         case "distributeurs":
           const distributeurType = data.distributeurType as DistributeurType;
           if (hygiene.infos.fournisseurId === data.fournisseurId) {
-            console.log("checkPoint3");
             if (
               hygiene.infos.trilogieGammeSelected &&
               hygiene.infos.dureeLocation === data.field
             ) {
-              console.log("checkPoint4");
               setHygiene((prev) => ({
                 ...prev,
                 prix: {
@@ -379,13 +371,10 @@ export function useHygieneContextUpdater() {
           }
           return;
         case "minFacturation":
-          console.log("checkPoint4", data);
           if (
             hygiene.infos.fournisseurId === data.fournisseurId &&
             hygiene.infos.trilogieGammeSelected
           ) {
-            console.log("checkPoint5", data);
-
             setHygiene((prev) => ({
               ...prev,
               prix: {

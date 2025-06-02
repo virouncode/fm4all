@@ -86,8 +86,6 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
       }
     } else if (pathname === "/tag/[slug]") {
       if (typeof params.slug === "string") {
-        console.log("newLocale", newLocale);
-
         const newSlug =
           newLocale === "fr"
             ? getTagSlugFr(params.slug)

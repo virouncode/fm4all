@@ -12,10 +12,10 @@ const servicesIcons = {
 const page = async ({
   params,
 }: {
-  params: Promise<{ fournisseurId: number }>;
+  params: Promise<{ fournisseurId: string }>;
 }) => {
   const { fournisseurId } = await params;
-  const services = await getServicesForFournisseur(fournisseurId);
+  const services = await getServicesForFournisseur(parseInt(fournisseurId));
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-6 hyphens-auto flex-1">
       <section className="mt-2">

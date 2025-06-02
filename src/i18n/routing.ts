@@ -200,6 +200,10 @@ export const routing = defineRouting({
       fr: "/fournisseur/[fournisseurId]/mon-compte",
       en: "/fournisseur/[fournisseurId]/my-account",
     },
+    "/fournisseur/[fournisseurId]/interventions": {
+      fr: "/fournisseur/[fournisseurId]/mes-interventions",
+      en: "/fournisseur/[fournisseurId]/my-interventions",
+    },
   },
 });
 

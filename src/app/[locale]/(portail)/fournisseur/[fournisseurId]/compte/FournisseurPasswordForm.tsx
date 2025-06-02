@@ -44,33 +44,33 @@ const FournisseurPasswordForm = () => {
       return;
     }
     try {
-      const response = await authClient.changePassword({
+      const { error } = await authClient.changePassword({
         newPassword: formData.newPassword,
         currentPassword: formData.currentPassword,
         revokeOtherSessions: true,
       });
-      if (response.error) {
+      if (error) {
         toast({
           variant: "destructive",
           title: tAuth("erreur"),
           description:
             "Une erreur est survenue lors du changement de mot de passe: " +
-            (response.error.message ?? "Erreur inconnue"),
+            error.message,
         });
-        return;
-      }
-      toast({
-        title: tAuth("succes"),
-        description:
-          "Votre mot de passe a été modifié avec succès. Veuillez vous reconnecter.",
-      });
-      await authClient.signOut({
-        fetchOptions: {
-          onSuccess: () => {
-            router.push("/auth/signin");
+      } else {
+        toast({
+          title: tAuth("succes"),
+          description:
+            "Votre mot de passe a été modifié avec succès. Veuillez vous reconnecter.",
+        });
+        await authClient.signOut({
+          fetchOptions: {
+            onSuccess: () => {
+              router.push("/auth/signin");
+            },
           },
-        },
-      });
+        });
+      }
     } catch (error) {
       console.error("Error changing password:", error);
       toast({
