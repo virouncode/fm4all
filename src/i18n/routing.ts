@@ -174,7 +174,7 @@ export const routing = defineRouting({
     },
     "/fournisseur/[fournisseurId]/profil": {
       fr: "/fournisseur/[fournisseurId]/profil",
-      en: "/fournisseur/[fournisseurId]/profil",
+      en: "/fournisseur/[fournisseurId]/profile",
     },
     "/fournisseur/[fournisseurId]/tarifs": {
       fr: "/fournisseur/[fournisseurId]/tarifs",
@@ -187,6 +187,18 @@ export const routing = defineRouting({
     "/fournisseur/[fournisseurId]/produits": {
       fr: "/fournisseur/[fournisseurId]/produits",
       en: "/fournisseur/[fournisseurId]/produits",
+    },
+    "/fournisseur/[fournisseurId]/dashboard": {
+      fr: "/fournisseur/[fournisseurId]/dashboard",
+      en: "/fournisseur/[fournisseurId]/dashboard",
+    },
+    "/fournisseur/[fournisseurId]/factures": {
+      fr: "/fournisseur/[fournisseurId]/factures",
+      en: "/fournisseur/[fournisseurId]/invoice",
+    },
+    "/fournisseur/[fournisseurId]/compte": {
+      fr: "/fournisseur/[fournisseurId]/mon-compte",
+      en: "/fournisseur/[fournisseurId]/my-account",
     },
   },
 });

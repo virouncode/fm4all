@@ -19,6 +19,20 @@ export const auth = betterAuth({
   }),
 
   user: {
+    changeEmail: {
+      enabled: true,
+      sendChangeEmailVerification: async ({ newEmail, url }) => {
+        await sendEmailFromServer({
+          to: newEmail,
+          from: "noreply@fm4all.com",
+          subject: "Changement d'adresse email",
+          text: `<p>Vous avez demandé à changer votre adresse email</p><br/>
+                 <p>Veuillez cliquer sur le lien suivant pour vérifier votre nouvel email :</p><br/>
+                <p>${url}</p>
+                `,
+        });
+      },
+    },
     additionalFields: {
       role: {
         type: "string",

@@ -18,7 +18,7 @@ import Image from "next/image";
 import { Dispatch, SetStateAction } from "react";
 
 type UserButtonProps = {
-  setIsMobileNavOpen: Dispatch<SetStateAction<boolean>>;
+  setIsMobileNavOpen?: Dispatch<SetStateAction<boolean>>;
   className?: string;
 };
 
@@ -79,7 +79,12 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         {session && user?.role && (
-          <DropdownMenuItem asChild onClick={() => setIsMobileNavOpen(false)}>
+          <DropdownMenuItem
+            asChild
+            onClick={
+              setIsMobileNavOpen ? () => setIsMobileNavOpen(false) : undefined
+            }
+          >
             {user?.role === "admin" ? (
               <Link
                 href={{
@@ -103,7 +108,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
             ) : (
               <Link
                 href={{
-                  pathname: "/fournisseur/[fournisseurId]",
+                  pathname: "/fournisseur/[fournisseurId]/dashboard",
                   params: { fournisseurId: user.fournisseurId ?? 0 },
                 }}
                 className="cursor-default !text-base"
@@ -113,7 +118,12 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
             )}
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem asChild onClick={() => setIsMobileNavOpen(false)}>
+        <DropdownMenuItem
+          asChild
+          onClick={
+            setIsMobileNavOpen ? () => setIsMobileNavOpen(false) : undefined
+          }
+        >
           {session ? (
             <p onClick={handleSignOut} className="!text-base">
               {t("deconnexion")}

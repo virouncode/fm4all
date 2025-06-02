@@ -1,5 +1,6 @@
 import CacheInvalidationListener from "@/components/cache/CacheInvalidationListener";
-import HeaderFournisseur from "@/components/header/header-fournisseur";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import SidebarFournisseur from "./SidebarFournisseur";
 
 const FournisseurLayout = ({
   children,
@@ -8,9 +9,12 @@ const FournisseurLayout = ({
 }>) => {
   return (
     <>
-      <HeaderFournisseur />
-      <CacheInvalidationListener />
-      {children}
+      {/* <HeaderFournisseur /> */}
+      <SidebarProvider>
+        <SidebarFournisseur />
+        <CacheInvalidationListener />
+        {children}
+      </SidebarProvider>
     </>
   );
 };

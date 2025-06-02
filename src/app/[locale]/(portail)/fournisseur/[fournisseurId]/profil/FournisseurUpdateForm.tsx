@@ -253,33 +253,6 @@ const FournisseurUpdateForm = ({
                 />
               </div>
               <InputWithLabel<UpdateFournisseurFormType>
-                fieldTitle="Nom de l'entreprise*"
-                nameInSchema="nomFournisseur"
-              />
-              <InputWithLabel<UpdateFournisseurFormType>
-                fieldTitle="SIRET*"
-                nameInSchema="siret"
-              />
-              <InputWithLabel<UpdateFournisseurFormType>
-                fieldTitle="Prenom du contact*"
-                nameInSchema="prenomContact"
-              />
-              <InputWithLabel<UpdateFournisseurFormType>
-                fieldTitle="Nom du contact*"
-                nameInSchema="nomContact"
-              />
-              <InputWithLabel<UpdateFournisseurFormType>
-                fieldTitle="Email*"
-                nameInSchema="emailContact"
-                type="email"
-                readOnly={true}
-              />
-              <InputWithLabel<UpdateFournisseurFormType>
-                fieldTitle="N° de téléphone*"
-                nameInSchema="phoneContact"
-                type="tel"
-              />
-              <InputWithLabel<UpdateFournisseurFormType>
                 fieldTitle="Annee de création"
                 nameInSchema="anneeCreation"
                 type="number"

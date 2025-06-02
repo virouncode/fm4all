@@ -1,5 +1,7 @@
 import { getFournisseur } from "@/lib/queries/fournisseurs/getFournisseurs";
-import FournisseurUpdateForm from "./FournisseurUpdateForm";
+import FournisseurAccountForm from "./FournisseurAccountForm";
+import FournisseurEmailForm from "./FournisseurEmailForm";
+import FournisseurPasswordForm from "./FournisseurPasswordForm";
 
 const page = async ({
   params,
@@ -14,12 +16,15 @@ const page = async ({
   if (!fournisseur) {
     return <div>Fournisseur non trouvé</div>;
   }
-
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-6 hyphens-auto flex-1">
       <section className="mt-2">
-        <h1 className="text-4xl mb-14">Mon profil</h1>
-        <FournisseurUpdateForm initialFournisseur={fournisseur} />
+        <h1 className="text-4xl mb-14">Mon compte</h1>
+        <div className="flex flex-col gap-14">
+          <FournisseurAccountForm initialFournisseur={fournisseur} />
+          <FournisseurEmailForm initialFournisseur={fournisseur} />
+          <FournisseurPasswordForm />
+        </div>
       </section>
     </main>
   );

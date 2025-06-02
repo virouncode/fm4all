@@ -32,7 +32,7 @@ export default async function AuthRedirect() {
     redirect({
       locale,
       href: {
-        pathname: "/fournisseur/[fournisseurId]",
+        pathname: "/fournisseur/[fournisseurId]/dashboard",
         params: { fournisseurId: user.fournisseurId ?? 0 },
       },
     });
