@@ -120,6 +120,7 @@ const SidebarFournisseur = ({ fournisseurId }: SidebarFournisseurProps) => {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     className={`${isActive(item.href) ? "bg-slate-300" : ""}`}
+                    asChild
                   >
                     <Link
                       href={item.href}
