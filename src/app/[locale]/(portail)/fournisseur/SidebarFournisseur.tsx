@@ -101,16 +101,18 @@ const SidebarFournisseur = ({ fournisseurId }: SidebarFournisseurProps) => {
         <SidebarGroup>
           <SidebarGroupLabel asChild className="mt-6 mb-14 w-full">
             <div className="flex items-center justify-center gap-6 w-full">
-              <div className="relative h-[23px] w-[100px]">
-                <Image
-                  src="/img/logo_full.webp"
-                  alt="fm4all-Logo"
-                  fill={true}
-                  sizes="300px"
-                  quality={100}
-                  className="object-contain"
-                />
-              </div>
+              <Link href="/">
+                <div className="relative h-[23px] w-[100px]">
+                  <Image
+                    src="/img/logo_full.webp"
+                    alt="fm4all-Logo"
+                    fill={true}
+                    sizes="300px"
+                    quality={100}
+                    className="object-contain"
+                  />
+                </div>
+              </Link>
               <UserButton />
             </div>
           </SidebarGroupLabel>
