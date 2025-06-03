@@ -1,5 +1,6 @@
 import CacheInvalidationListener from "@/components/cache/CacheInvalidationListener";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { notFound } from "next/navigation";
 import SidebarFournisseur from "../SidebarFournisseur";
 
 const FournisseurLayout = async ({
@@ -10,7 +11,9 @@ const FournisseurLayout = async ({
   params: Promise<{ fournisseurId: string }>;
 }>) => {
   const { fournisseurId } = await params;
-  console.log("Fournisseur ID from params:", fournisseurId);
+  if (!fournisseurId) {
+    return notFound();
+  }
 
   return (
     <>

@@ -78,7 +78,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        {session && user?.role && (
+        {/* {session && user?.role && (
           <DropdownMenuItem
             asChild
             onClick={
@@ -117,7 +117,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
               </Link>
             )}
           </DropdownMenuItem>
-        )}
+        )} */}
         <DropdownMenuItem
           asChild
           onClick={

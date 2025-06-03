@@ -1,18 +1,16 @@
 import { getFournisseur } from "@/lib/queries/fournisseurs/getFournisseurs";
 import FournisseurUpdateForm from "./FournisseurUpdateForm";
+import { notFound } from "next/navigation";
 
 const page = async ({
   params,
 }: {
-  params: Promise<{ fournisseurId: string | null }>;
+  params: Promise<{ fournisseurId: string }>;
 }) => {
   const { fournisseurId } = await params;
-  if (!fournisseurId) {
-    return <div>Fournisseur non trouvé</div>;
-  }
   const fournisseur = await getFournisseur(parseInt(fournisseurId));
   if (!fournisseur) {
-    return <div>Fournisseur non trouvé</div>;
+    notFound();
   }
 
   return (

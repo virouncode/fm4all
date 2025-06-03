@@ -1,3 +1,4 @@
+import ServicePresentationCard from "@/components/cards/ServicePresentationCard";
 import {
   Banana,
   Coffee,
@@ -18,68 +19,50 @@ const MesServicesPresentationCards = () => {
   const t = useTranslations("DevisPage.services.presentation.cards");
   return (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 items-center">
-      <div className="flex gap-4 items-center p-4 border rounded-xl">
-        <div className="flex items-center gap-1">
-          <SprayCan />
-        </div>
-        <p>{t("nettoyage-et-proprete")}</p>
-      </div>
-      <div className="flex gap-4 items-center p-4 border rounded-xl">
-        <div className="flex items-center gap-1">
-          <Toilet />
-        </div>
-        <p>{t("hygiene-sanitaire")}</p>
-      </div>
-      <div className="flex gap-4 items-center p-4 border rounded-xl">
-        <div className="flex items-center gap-1">
-          <Wrench />
-        </div>
-        <p>{t("maintenance")}</p>
-      </div>
-      <div className="flex gap-4 items-center p-4 border rounded-xl">
-        <div className="flex items-center gap-1">
-          <FireExtinguisher />
-        </div>
-        <p>{t("securite-incendie")}</p>
-      </div>
-      <div className="flex gap-4 items-center p-4 border rounded-xl">
-        <div className="flex items-center gap-1">
-          <Coffee />
-        </div>
-        <p>{t("boissons-chaudes")}</p>
-      </div>
-      <div className="flex gap-4 items-center p-4 border rounded-xl">
-        <div className="flex items-center gap-1">
-          <Leaf />
-        </div>
-        <p>{t("thes-varies")}</p>
-      </div>
-      <div className="flex gap-4 items-center p-4 border rounded-xl">
-        <div className="flex items-center gap-1">
-          <Cookie />
-          <Banana />
-          <CupSoda />
-        </div>
-        <p>{t("snacks-and-fruits")}</p>
-      </div>
-      <div className="flex gap-4 items-center p-4 border rounded-xl">
-        <div className="flex items-center gap-1">
-          <Droplet />
-        </div>
-        <p>{t("fontaines-a-eau")}</p>
-      </div>
-      <div className="flex gap-4 items-center p-4 border rounded-xl">
-        <div className="flex items-center gap-1">
-          <UserRoundCog />
-        </div>
-        <p>{t("office-hospitality-manager")}</p>
-      </div>
-      <div className="flex gap-4 items-center p-4 border rounded-xl">
-        <div className="flex items-center gap-1">
-          <HandPlatter />
-        </div>
-        <p>{t("services-fm4all")}</p>
-      </div>
+      <ServicePresentationCard
+        icons={[<SprayCan key="service-nettoyage" />]}
+        title={t("nettoyage-et-proprete")}
+      />
+      <ServicePresentationCard
+        icons={[<Toilet key="service-hygiene-sanitaire" />]}
+        title={t("hygiene-sanitaire")}
+      />
+      <ServicePresentationCard
+        icons={[<Wrench key="service-maintenance" />]}
+        title={t("maintenance")}
+      />
+      <ServicePresentationCard
+        icons={[<FireExtinguisher key="service-securite-incendie" />]}
+        title={t("securite-incendie")}
+      />
+      <ServicePresentationCard
+        icons={[<Coffee key="service-boissons-chaudes" />]}
+        title={t("boissons-chaudes")}
+      />
+      <ServicePresentationCard
+        icons={[<Leaf key="service-thes-varies" />]}
+        title={t("thes-varies")}
+      />
+      <ServicePresentationCard
+        icons={[
+          <Cookie key="service-snacks-and-fruits-cookie" />,
+          <Banana key="service-snacks-and-fruits-banana" />,
+          <CupSoda key="service-snacks-and-fruits-cup-soda" />,
+        ]}
+        title={t("snacks-and-fruits")}
+      />
+      <ServicePresentationCard
+        icons={[<Droplet key="service-fontaines-a-eau" />]}
+        title={t("fontaines-a-eau")}
+      />
+      <ServicePresentationCard
+        icons={[<UserRoundCog key="service-office-hospitality-manager" />]}
+        title={t("office-hospitality-manager")}
+      />
+      <ServicePresentationCard
+        icons={[<HandPlatter key="service-services-fm4all" />]}
+        title={t("services-fm4all")}
+      />
     </div>
   );
 };

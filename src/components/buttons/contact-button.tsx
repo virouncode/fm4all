@@ -15,18 +15,17 @@ const ContactButton = ({
 }: ContactButtonProps) => {
   const t = useTranslations("header");
   return (
-    <Button
-      title={t("nous-contacter")}
-      variant="outline"
-      className={`rounded-full ${className}`}
-      size="icon"
-      asChild
-      onClick={() => setIsMobileNavOpen(false)}
-    >
-      <Link href="/contact">
+    <Link href="/contact">
+      <Button
+        title={t("nous-contacter")}
+        variant="outline"
+        className={`rounded-full ${className}`}
+        size="icon"
+        onClick={() => setIsMobileNavOpen(false)}
+      >
         <Phone />
-      </Link>
-    </Button>
+      </Button>
+    </Link>
   );
 };
 

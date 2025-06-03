@@ -16,20 +16,28 @@ const ServicePresentationCard = ({
   onClick,
   className,
 }: ServicePresentationCardProps) => {
+  if (href)
+    return (
+      //@ts-expect-error oui je sais
+      <Link href={href}>
+        <div
+          className={`flex gap-4 items-center p-4 border rounded-xl ${href ? "hover:border-fm4allsecondary hover:text-fm4allsecondary hover:border-2" : ""} ${className}`}
+          onClick={onClick}
+        >
+          <div className="flex items-center gap-1">
+            {icons.map((icon) => icon)}
+          </div>
+          {title}
+        </div>
+      </Link>
+    );
   return (
     <div
       className={`flex gap-4 items-center p-4 border rounded-xl ${href ? "hover:border-fm4allsecondary hover:text-fm4allsecondary hover:border-2" : ""} ${className}`}
       onClick={onClick}
     >
       <div className="flex items-center gap-1">{icons.map((icon) => icon)}</div>
-      {href ? (
-        //@ts-expect-error oui je sais
-        <Link href={href} className="w-full">
-          {title}
-        </Link>
-      ) : (
-        <p className={onClick ? "cursor-pointer" : ""}>{title}</p>
-      )}
+      <p className={onClick ? "cursor-pointer" : ""}>{title}</p>
     </div>
   );
 };

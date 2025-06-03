@@ -1,27 +1,17 @@
-import { getSession } from "@/lib/auth-session";
-import DPGFNettoyage from "./DPGFNettoyage";
 import DPGFHygiene from "./DPGFHygiene";
+import DPGFNettoyage from "./DPGFNettoyage";
 
 const page = async ({
   params,
 }: {
-  params: Promise<{ fournisseurId: number; service: string }>;
+  params: Promise<{ fournisseurId: string; service: string }>;
 }) => {
   const { fournisseurId, service } = await params;
-  const session = await getSession();
-
-  if (session?.user.fournisseurId !== Number(fournisseurId)) {
-    return <div>Unauthorized</div>;
-  }
-  if (!fournisseurId) {
-    return <div>Fournisseur ID not found</div>;
-  }
-
   switch (service) {
     case "nettoyage":
-      return <DPGFNettoyage fournisseurId={fournisseurId} />;
+      return <DPGFNettoyage fournisseurId={parseInt(fournisseurId)} />;
     case "hygiene":
-      return <DPGFHygiene fournisseurId={fournisseurId} />;
+      return <DPGFHygiene fournisseurId={parseInt(fournisseurId)} />;
     default:
       return <div>Service not found</div>;
   }
