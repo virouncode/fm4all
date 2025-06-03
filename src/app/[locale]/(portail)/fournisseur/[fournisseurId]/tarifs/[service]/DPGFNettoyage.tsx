@@ -41,10 +41,14 @@ const DPGFNettoyage = async ({ fournisseurId }: DPGFNettoyageProps) => {
 
   return (
     <main className="container mx-auto p-6">
+      <h1 className="text-4xl mb-10">Mes tarifs</h1>
       <div className="flex items-center justify-between mb-6">
         <div className="flex gap-4 items-center">
           <div className="w-[250px]">
-            <ServicePresentationCard icon={<SprayCan />} title="Nettoyage" />
+            <ServicePresentationCard
+              icons={[<SprayCan key="spray-can" />]}
+              title="Nettoyage et propreté"
+            />
           </div>
           <CalculatorDialog />
         </div>

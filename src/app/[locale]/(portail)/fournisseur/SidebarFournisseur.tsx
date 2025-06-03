@@ -119,7 +119,7 @@ const SidebarFournisseur = ({ fournisseurId }: SidebarFournisseurProps) => {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
-                    className={`${isActive(item.href) ? "bg-slate-300" : ""}`}
+                    className={`${isActive(item.href) ? "bg-slate-100" : ""} hover:bg-slate-100`}
                     asChild
                   >
                     <Link

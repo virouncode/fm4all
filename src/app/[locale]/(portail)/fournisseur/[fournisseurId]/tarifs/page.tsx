@@ -1,13 +1,7 @@
 import ServicePresentationCard from "@/components/cards/ServicePresentationCard";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import { getServicesForFournisseur } from "@/lib/queries/services/getServices";
-import { capitalize } from "@/lib/utils/capitalize";
-import { SprayCan, Toilet } from "lucide-react";
-
-const servicesIcons = {
-  nettoyage: <SprayCan />,
-  hygiene: <Toilet />,
-};
 
 const page = async ({
   params,
@@ -22,14 +16,22 @@ const page = async ({
         <h1 className="text-4xl mb-10">Mes tarifs</h1>
         <div className="flex flex-col gap-14">
           <div className="flex flex-col gap-2 px-10">
-            <div className="flex justify-between items-center  mb-10">
+            <div className="flex justify-between items-center mb-10">
               <h2 className="text-2xl">Mes services</h2>
               <Button
                 variant="destructive"
                 size="lg"
                 title="Ajouter un service"
               >
-                Ajouter un service
+                <Link
+                  href={{
+                    pathname: "/fournisseur/[fournisseurId]/tarifs/ajouter",
+                    params: { fournisseurId },
+                  }}
+                  className="w-full"
+                >
+                  Ajouter un service
+                </Link>
               </Button>
             </div>
             <p className="mb-6 text-center">Accédez à vos DPGF : </p>
@@ -45,10 +47,8 @@ const page = async ({
                         service: service.nom,
                       },
                     }}
-                    icon={
-                      servicesIcons[service.nom as keyof typeof servicesIcons]
-                    }
-                    title={capitalize(service.nom)}
+                    icons={service.icons}
+                    title={service.titre}
                   />
                 ))}
             </div>

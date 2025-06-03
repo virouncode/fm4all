@@ -180,6 +180,10 @@ export const routing = defineRouting({
       fr: "/fournisseur/[fournisseurId]/tarifs",
       en: "/fournisseur/[fournisseurId]/tarifs",
     },
+    "/fournisseur/[fournisseurId]/tarifs/ajouter": {
+      fr: "/fournisseur/[fournisseurId]/tarifs/ajouter",
+      en: "/fournisseur/[fournisseurId]/tarifs/add",
+    },
     "/fournisseur/[fournisseurId]/tarifs/[service]": {
       fr: "/fournisseur/[fournisseurId]/tarifs/[service]",
       en: "/fournisseur/[fournisseurId]/tarifs/[service]",

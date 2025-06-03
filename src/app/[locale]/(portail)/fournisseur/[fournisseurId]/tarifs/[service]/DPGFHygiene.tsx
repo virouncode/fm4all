@@ -1,6 +1,6 @@
 import { CalculatorDialog } from "@/components/calculator/CalculatorDialog";
 import ServicePresentationCard from "@/components/cards/ServicePresentationCard";
-import CDCNettoyage from "@/components/CDCNettoyage";
+import CDCHygiene from "@/components/CDCHygiene";
 import {
   getHygieneConsosTarifsFournisseur,
   getHygieneDistribTarifsFournisseur,
@@ -84,18 +84,19 @@ const DPGFHygiene = async ({ fournisseurId }: DPGFHygieneProps) => {
 
   return (
     <main className="container mx-auto p-6">
+      <h1 className="text-4xl mb-10">Mes tarifs</h1>
       <div className="flex items-center justify-between mb-6">
         <div className="flex gap-4 items-center">
           <div className="w-[250px]">
             <ServicePresentationCard
-              icon={<Toilet />}
+              icons={[<Toilet key="toilet" />]}
               title="Hygiène sanitaire"
             />
           </div>
           <CalculatorDialog />
         </div>
         <CDCDialog>
-          <CDCNettoyage />
+          <CDCHygiene />
         </CDCDialog>
       </div>
       {tarifsMinFacturation && (

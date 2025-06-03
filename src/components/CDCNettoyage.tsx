@@ -13,7 +13,7 @@ import React from "react";
 // Types for our data structure
 type FrequencyValue = number | string | null;
 
-interface TaskRow {
+type TaskRowType = {
   id: number;
   task: string;
   essentiel: {
@@ -34,11 +34,11 @@ interface TaskRow {
     trimestrielle: FrequencyValue;
     semestrielle: FrequencyValue;
   };
-}
+};
 
 interface SectionData {
   title: string;
-  rows: TaskRow[];
+  rows: TaskRowType[];
 }
 
 // Component for the CDC Nettoyage table

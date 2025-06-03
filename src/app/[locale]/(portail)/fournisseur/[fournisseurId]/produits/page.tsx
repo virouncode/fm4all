@@ -1,12 +1,5 @@
 import ServicePresentationCard from "@/components/cards/ServicePresentationCard";
 import { getServicesForFournisseur } from "@/lib/queries/services/getServices";
-import { capitalize } from "@/lib/utils/capitalize";
-import { SprayCan, Toilet } from "lucide-react";
-
-const servicesIcons = {
-  nettoyage: <SprayCan />,
-  hygiene: <Toilet />,
-};
 
 const page = async ({
   params,
@@ -15,6 +8,7 @@ const page = async ({
 }) => {
   const { fournisseurId } = await params;
   const services = await getServicesForFournisseur(parseInt(fournisseurId));
+
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-6 hyphens-auto flex-1">
       <section className="mt-2">
@@ -38,10 +32,8 @@ const page = async ({
                         service: service.nom,
                       },
                     }}
-                    icon={
-                      servicesIcons[service.nom as keyof typeof servicesIcons]
-                    }
-                    title={capitalize(service.nom)}
+                    icons={service.icons}
+                    title={service.titre}
                   />
                 ))}
             </div>

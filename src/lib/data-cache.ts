@@ -20,7 +20,8 @@ export type CACHE_TAG =
   | "maintenanceTarifs"
   | "q18Tarifs"
   | "legioTarifs"
-  | "qualiteAirTarifs";
+  | "qualiteAirTarifs"
+  | "services";
 
 // Type helpers for tag functions
 type GlobalTagResult<T extends CACHE_TAG> = `global:${T}`;
