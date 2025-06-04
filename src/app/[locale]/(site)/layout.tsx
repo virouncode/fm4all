@@ -70,6 +70,7 @@ export const generateMetadata = async (): Promise<Metadata> => {
       languages: {
         fr: "https://www.fm4all.com/fr",
         en: "https://www.fm4all.com/en",
+        "x-default": "https://www.fm4all.com",
       },
     },
   };
