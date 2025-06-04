@@ -136,7 +136,7 @@ export const generateMetadata = async ({
     {
       fr: {
         slug: locale === "fr" ? slug : getArticlesSlugFr(slug),
-        subSlug: locale === "fr" ? subSlug : getArticlesSubSlugFr(slug),
+        subSlug: locale === "fr" ? subSlug : getArticlesSubSlugFr(subSlug),
       },
       en: {
         slug: locale === "en" ? slug : getArticlesSlugEn(slug),
