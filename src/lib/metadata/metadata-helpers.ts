@@ -257,29 +257,54 @@ export function generateAlternates(
     enUrl = `https://www.fm4all.com/en${routes[routeKey]["en"]}`;
     frUrl = `https://www.fm4all.com/fr${routes[routeKey]["fr"]}`;
   }
-  return {
-    title,
-    description,
-    alternates: {
-      canonical: canonicalUrl,
-      languages: {
-        en: enUrl,
-        fr: frUrl,
-      },
-    },
-    openGraph: {
-      images: [
-        {
-          url:
-            imageUrl ??
-            "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/fm4all_logo/logo_fm4all-npSiw7PiYrpkPsnBLuzDYGVO5rWVZb.png",
-          width: 1200,
-          height: 630,
-          alt: title,
+  return routeKey === "home"
+    ? {
+        title,
+        description,
+        alternates: {
+          canonical: canonicalUrl,
+          languages: {
+            en: enUrl,
+            fr: frUrl,
+            "x-default": "https://www.fm4all.com",
+          },
         },
-      ],
-    },
-  };
+        openGraph: {
+          images: [
+            {
+              url:
+                imageUrl ??
+                "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/fm4all_logo/logo_fm4all-npSiw7PiYrpkPsnBLuzDYGVO5rWVZb.png",
+              width: 1200,
+              height: 630,
+              alt: title,
+            },
+          ],
+        },
+      }
+    : {
+        title,
+        description,
+        alternates: {
+          canonical: canonicalUrl,
+          languages: {
+            en: enUrl,
+            fr: frUrl,
+          },
+        },
+        openGraph: {
+          images: [
+            {
+              url:
+                imageUrl ??
+                "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/fm4all_logo/logo_fm4all-npSiw7PiYrpkPsnBLuzDYGVO5rWVZb.png",
+              width: 1200,
+              height: 630,
+              alt: title,
+            },
+          ],
+        },
+      };
 }
 
 export const getPathnameWithoutLocale = (pathname: string) => {
