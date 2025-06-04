@@ -38,6 +38,7 @@ const ArticlesCards = async ({
               pathname: "/blog/[slug]/[subSlug]",
               params: { slug: articleSlug, subSlug: articleSubSlug },
             }}
+            locale={locale}
           >
             <div className="p-4 flex flex-col gap-4 h-52">
               <p className="text-2xl">{article.titre}</p>

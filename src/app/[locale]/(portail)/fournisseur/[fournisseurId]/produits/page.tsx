@@ -18,25 +18,32 @@ const page = async ({
             <div className="mb-10">
               <h2 className="text-2xl">Mes services</h2>
             </div>
-            <p className="mb-6 text-center">Accédez à vos produits : </p>
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 items-center justify-center">
-              {services &&
-                services.map((service) => (
-                  <ServicePresentationCard
-                    key={service.id}
-                    href={{
-                      pathname:
-                        "/fournisseur/[fournisseurId]/produits/[service]",
-                      params: {
-                        fournisseurId: fournisseurId,
-                        service: service.nom,
-                      },
-                    }}
-                    icons={service.icons}
-                    title={service.titre}
-                  />
-                ))}
-            </div>
+            {services && services.length > 0 ? (
+              <>
+                <p className="mb-6 text-center">Accédez à vos produits : </p>
+                <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 items-center justify-center">
+                  {services.map((service) => (
+                    <ServicePresentationCard
+                      key={service.id}
+                      href={{
+                        pathname:
+                          "/fournisseur/[fournisseurId]/produits/[service]",
+                        params: {
+                          fournisseurId: fournisseurId,
+                          service: service.nom,
+                        },
+                      }}
+                      icons={service.icons}
+                      title={service.titre}
+                    />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <p className="text-center hyphens-auto">
+                Veuillez ajouter un service dans &quot;Mes tarifs&quot;
+              </p>
+            )}
           </div>
         </div>
       </section>

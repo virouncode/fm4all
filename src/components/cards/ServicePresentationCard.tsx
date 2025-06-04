@@ -19,7 +19,7 @@ const ServicePresentationCard = ({
   if (href)
     return (
       //@ts-expect-error oui je sais
-      <Link href={href}>
+      <Link href={href} title={title}>
         <div
           className={`flex gap-4 items-center p-4 border rounded-xl ${href ? "hover:border-fm4allsecondary hover:text-fm4allsecondary hover:border-2" : ""} ${className}`}
           onClick={onClick}

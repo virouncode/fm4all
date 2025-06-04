@@ -149,6 +149,10 @@ export const routing = defineRouting({
       fr: "/admin/[adminId]",
       en: "/admin/[adminId]",
     },
+    "/admin/[adminId]/dashboard": {
+      fr: "/admin/[adminId]/dashboard",
+      en: "/admin/[adminId]/dashboard",
+    },
     "/admin/[adminId]/comptes": {
       fr: "/admin/[adminId]/comptes",
       en: "/admin/[adminId]/accounts",
@@ -165,6 +169,10 @@ export const routing = defineRouting({
     "/client/[clientId]": {
       fr: "/client/[clientId]",
       en: "/client/[clientId]",
+    },
+    "/client/[clientId]/dashboard": {
+      fr: "/client/[clientId]/dashboard",
+      en: "/client/[clientId]/dashboard",
     },
 
     //FOURNISSEURS

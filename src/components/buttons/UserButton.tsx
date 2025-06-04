@@ -88,7 +88,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
             {user?.role === "admin" ? (
               <Link
                 href={{
-                  pathname: "/admin/[adminId]",
+                  pathname: "/admin/[adminId]/dashboard",
                   params: { adminId: user.id },
                 }}
                 className="cursor-default !text-base"
@@ -98,7 +98,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
             ) : user?.role === "client" ? (
               <Link
                 href={{
-                  pathname: "/client/[clientId]",
+                  pathname: "/client/[clientId]/dashboard",
                   params: { clientId: user.clientId ?? 0 },
                 }}
                 className="cursor-default !text-base"
