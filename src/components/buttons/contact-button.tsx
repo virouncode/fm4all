@@ -15,7 +15,7 @@ const ContactButton = ({
 }: ContactButtonProps) => {
   const t = useTranslations("header");
   return (
-    <Link href="/contact">
+    <Link href="/contact" title={t("nous-contacter")}>
       <Button
         title={t("nous-contacter")}
         variant="outline"
