@@ -23,6 +23,8 @@ const tarifSchema = z.object({
     "surface",
     "gamme",
     "fournisseurId",
+    "imageUrl",
+    "infos",
     "createdAt",
     "updatedAt",
   ]),

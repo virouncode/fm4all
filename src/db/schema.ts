@@ -165,6 +165,8 @@ export const nettoyageTarifs = pgTable("nettoyage_tarifs", {
   tauxHoraire: integer("taux_horaire").notNull(),
   surface: integer().notNull(),
   gamme: gammeEnum().notNull(),
+  imageUrl: varchar(),
+  infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
 });
@@ -178,6 +180,8 @@ export const nettoyageRepasseTarifs = pgTable("nettoyage_repasse_tarifs", {
   tauxHoraire: integer("taux_horaire").notNull(),
   surface: integer().notNull(),
   gamme: gammeEnum().notNull(),
+  imageUrl: varchar(),
+  infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
 });
@@ -192,6 +196,8 @@ export const nettoyageVitrerieTarifs = pgTable("nettoyage_vitrerie_tarifs", {
   tauxHoraire: integer("taux_horaire").notNull(),
   minFacturation: integer("min_facturation").notNull(),
   fraisDeplacement: integer("frais_deplacement").notNull(),
+  imageUrl: varchar(),
+  infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
 });
@@ -219,6 +225,7 @@ export const hygieneDistribTarifs = pgTable("hygiene_distrib_tarifs", {
   pa24M: integer("pa_24m"),
   pa36M: integer("pa_36m"),
   imageUrl: varchar(),
+  infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
 });
@@ -257,6 +264,8 @@ export const hygieneConsoTarifs = pgTable("hygiene_conso_tarifs", {
   paParPersonneSavon: integer("pa_par_personne_savon").notNull(),
   paParPersonnePh: integer("pa_par_personne_ph").notNull(),
   paParPersonneDesinfectant: integer("pa_par_personne_desinfectant").notNull(),
+  imageUrl: varchar(),
+  infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
 });
@@ -279,6 +288,8 @@ export const maintenanceTarifs = pgTable("maintenance_tarifs", {
   hParPassage: integer("h_par_passage").notNull(),
   tauxHoraire: integer("taux_horaire").notNull(),
   gamme: gammeEnum().notNull(),
+  imageUrl: varchar(),
+  infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
 });
@@ -335,6 +346,8 @@ export const incendieTarifs = pgTable("incendie_tarifs", {
   prixParBaes: integer("prix_par_baes").notNull(),
   prixParTelBaes: integer("prix_par_tel_baes").notNull(),
   fraisDeplacement: integer("frais_deplacement").notNull(),
+  imageUrl: varchar(),
+  infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
 });
@@ -445,8 +458,9 @@ export const cafeMachinesTarifs = pgTable("cafe_machines_tarifs", {
   nbPassages: integer("nb_passages"),
   fraisInstallation: integer("frais_installation"),
   cafeMachineId: integer("cafe_machine_id").references(() => cafeMachines.id),
-  infos: varchar(),
   reconditionne: boolean().default(false),
+  imageUrl: varchar(),
+  infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
 });
@@ -459,6 +473,7 @@ export const cafeConsoTarifs = pgTable("cafe_conso_tarifs", {
   gamme: gammeEnum().notNull(),
   effectif: integer().notNull(),
   prixUnitaire: integer("prix_unitaire"),
+  imageUrl: varchar(),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
@@ -472,6 +487,7 @@ export const theConsoTarifs = pgTable("the_conso_tarifs", {
   gamme: gammeEnum().notNull(),
   effectif: integer().notNull(),
   prixUnitaire: integer("prix_unitaire"),
+  imageUrl: varchar(),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
@@ -534,6 +550,8 @@ export const fruitsTarifs = pgTable("fruits_tarifs", {
   effectif: integer().notNull(),
   prixKg: integer("prix_kg"),
   gamme: gammeEnum().notNull(),
+  imageUrl: varchar(),
+  infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
 });
@@ -557,6 +575,8 @@ export const snacksTarifs = pgTable("snacks_tarifs", {
   effectif: integer().notNull(),
   prixUnitaire: integer("prix_unitaire"),
   gamme: gammeEnum().notNull(),
+  imageUrl: varchar(),
+  infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
 });
@@ -580,6 +600,8 @@ export const boissonsTarifs = pgTable("boissons_tarifs", {
   effectif: integer().notNull(),
   prixUnitaire: integer("prix_unitaire"),
   gamme: gammeEnum().notNull(),
+  imageUrl: varchar(),
+  infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
 });
@@ -632,6 +654,7 @@ export const fontainesTarifs = pgTable("fontaines_tarifs", {
   paConsoEauChaude: integer("pa_conso_eau_chaude"),
   fontaineId: integer("fontaine_id").references(() => fontaines.id),
   reconditionne: boolean().default(false),
+  imageUrl: varchar(),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
@@ -655,6 +678,8 @@ export const officeManagerTarifs = pgTable("office_manager_tarifs", {
     .references(() => fournisseurs.id),
   demiTjm: integer("demi_tjm").notNull(),
   demiTjmPremium: integer("demi_tjm_premium").notNull(),
+  imageUrl: varchar(),
+  infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
 });

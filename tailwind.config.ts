@@ -14,14 +14,6 @@ export default {
       backgroundImage: {
         "hof-img": "url('/img/hof_managers.webp')",
       },
-      // listStyleType: {
-      //   rocket: "🚀  ",
-      //   thumb: "👍  ",
-      //   handshake: "🤝  ",
-      //   smile: "😊  ",
-      //   check: "✔  ",
-      //   finger: "👉  ",
-      // },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
