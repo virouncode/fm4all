@@ -326,7 +326,7 @@ const page = async ({
           prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
           prose-h3:font-bold prose-h3:text-xl
           prose-p:text-pretty prose-p:hyphens-auto prose-p:m-0
-          prose-li:list-check prose-li:m-0
+          prose-li:list-disc prose-li:m-0
           prose-a:underline"
           >
             <p className="font-bold">{article.description}</p>
@@ -565,7 +565,7 @@ const page = async ({
         prose-h3:font-bold prose-h3:text-xl
         prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
         prose-p:text-pretty prose-p:hyphens-auto
-        prose-li:list-check prose-li:m-0
+        prose-li:list-disc prose-li:m-0
         prose-a:underline
         "
         >
@@ -580,7 +580,7 @@ const page = async ({
         prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
         prose-h3:font-bold prose-h3:text-xl
         prose-p:text-pretty prose-p:hyphens-auto
-        prose-li:list-check prose-li:m-0
+        prose-li:list-disc prose-li:m-0
         prose-a:underline
         "
         >
@@ -623,7 +623,7 @@ const page = async ({
           prose-h3:font-bold prose-h3:text-xl
           prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
           prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-check prose-li:m-0
+          prose-li:list-disc prose-li:m-0
           prose-a:underline
           "
           >
@@ -640,7 +640,7 @@ const page = async ({
           prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
           prose-h3:font-bold prose-h3:text-xl
           prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-check prose-li:m-0
+          prose-li:list-disc prose-li:m-0
           prose-a:underline
           "
           >
@@ -682,7 +682,7 @@ const page = async ({
           prose-h3:font-bold prose-h3:text-xl
           prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
           prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-check prose-li:m-0
+          prose-li:list-disc prose-li:m-0
           prose-a:underline
           "
           >
@@ -698,7 +698,7 @@ const page = async ({
           prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
           prose-h3:font-bold prose-h3:text-xl
           prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-check prose-li:m-0
+          prose-li:list-disc prose-li:m-0
           prose-a:underline
           "
           >
@@ -739,7 +739,7 @@ const page = async ({
           prose-h3:font-bold prose-h3:text-xl
           prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
           prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-check prose-li:m-0
+          prose-li:list-disc prose-li:m-0
           prose-a:underline
           "
           >
@@ -755,7 +755,7 @@ const page = async ({
           prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
           prose-h3:font-bold prose-h3:text-xl
           prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-check prose-li:m-0
+          prose-li:list-disc prose-li:m-0
           prose-a:underline
           "
           >
@@ -796,7 +796,7 @@ const page = async ({
           prose-h3:font-bold prose-h3:text-xl
           prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
           prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-check prose-li:m-0
+          prose-li:list-disc prose-li:m-0
           prose-a:underline
           "
           >
@@ -812,7 +812,7 @@ const page = async ({
           prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
           prose-h3:font-bold prose-h3:text-xl
           prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-check prose-li:m-0
+          prose-li:list-disc prose-li:m-0
           prose-a:underline
           "
           >
