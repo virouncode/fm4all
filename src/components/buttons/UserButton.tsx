@@ -57,8 +57,8 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
           title={t("connexion")}
           variant="outline"
           className={`flex justify-center items-center rounded-full ${!user?.image ? "p-2" : ""} ${className}`}
+          aria-label="user menu"
           size="icon"
-          aria-label="menu user"
         >
           {session ? (
             user?.image ? (

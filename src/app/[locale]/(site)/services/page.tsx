@@ -43,7 +43,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20 hyphens-auto">
       <Breadcrumb className="mb-10">
         <BreadcrumbList className="text-sm lg:text-base flex flex-wrap">
-          <BreadcrumbLink className="flex items-center" href={`/`}>
+          <BreadcrumbLink className="flex items-center" href={`/`} asChild>
             <HomeIcon size={14} />
           </BreadcrumbLink>
           <BreadcrumbSeparator />
