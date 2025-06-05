@@ -108,3 +108,82 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom list style classes with pseudo-elements */
+.list-check {
+  list-style: none;
+  position: relative;
+  padding-left: 1.5em;
+}
+
+.list-check::before {
+  content: "✔";
+  position: absolute;
+  left: 0;
+  color: currentColor;
+}
+
+.list-rocket {
+  list-style: none;
+  position: relative;
+  padding-left: 1.5em;
+}
+
+.list-rocket::before {
+  content: "🚀";
+  position: absolute;
+  left: 0;
+  color: currentColor;
+}
+
+.list-thumb {
+  list-style: none;
+  position: relative;
+  padding-left: 1.5em;
+}
+
+.list-thumb::before {
+  content: "👍";
+  position: absolute;
+  left: 0;
+  color: currentColor;
+}
+
+.list-handshake {
+  list-style: none;
+  position: relative;
+  padding-left: 1.5em;
+}
+
+.list-handshake::before {
+  content: "🤝";
+  position: absolute;
+  left: 0;
+  color: currentColor;
+}
+
+.list-smile {
+  list-style: none;
+  position: relative;
+  padding-left: 1.5em;
+}
+
+.list-smile::before {
+  content: "😊";
+  position: absolute;
+  left: 0;
+  color: currentColor;
+}
+
+.list-finger {
+  list-style: none;
+  position: relative;
+  padding-left: 1.5em;
+}
+
+.list-finger::before {
+  content: "👉";
+  position: absolute;
+  left: 0;
+  color: currentColor;
+}
