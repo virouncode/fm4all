@@ -58,8 +58,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
           variant="outline"
           className={`flex justify-center items-center rounded-full ${!user?.image ? "p-2" : ""} ${className}`}
           size="icon"
-          asChild
-          aria-haspopup="menu"
+          aria-label="menu user"
         >
           {session ? (
             user?.image ? (
