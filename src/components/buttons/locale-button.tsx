@@ -118,8 +118,9 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
       <DropdownMenuTrigger asChild>
         <Button
           className={`flex items-center gap-1 text-sm hover:opacity-75 cursor-pointer rounded-md border w-16 h-9 justify-center ${className}`}
-          aria-label="Change language"
+          aria-label={locale === "fr" ? "Changer de langue" : "Change language"}
           variant="outline"
+          title={locale === "fr" ? "Changer de langue" : "Change language"}
         >
           {locale === "fr" ? "🇫🇷" : "🇬🇧"} {locale.toUpperCase()}
         </Button>

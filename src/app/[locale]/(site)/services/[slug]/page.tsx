@@ -4,6 +4,7 @@ import ImgCardVertical from "@/components/cards/ImgCardVertical";
 import TagButton from "@/components/tags/tag-button";
 import {
   Breadcrumb,
+  BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
@@ -245,17 +246,31 @@ export default async function page({
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20 hyphens-auto">
       <Breadcrumb className="mb-10">
         <BreadcrumbList className="text-sm lg:text-base flex flex-wrap">
-          <BreadcrumbLink className="flex items-center" href={`/`} asChild>
-            <HomeIcon size={14} />
-          </BreadcrumbLink>
+          <BreadcrumbItem>
+            <BreadcrumbLink
+              className="flex items-center"
+              href={`/`}
+              title={t("accueil")}
+            >
+              <HomeIcon size={14} />
+            </BreadcrumbLink>
+          </BreadcrumbItem>
           <BreadcrumbSeparator />
-          <BreadcrumbLink className="flex items-center" asChild>
-            <Link href={`/services`} locale={locale}>
-              {t("nos-services")}
-            </Link>
-          </BreadcrumbLink>
+          <BreadcrumbItem>
+            <BreadcrumbLink className="flex items-center" asChild>
+              <Link
+                href={`/services`}
+                locale={locale}
+                title={t("nos-services")}
+              >
+                {t("nos-services")}
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
           <BreadcrumbSeparator />
-          <BreadcrumbPage>{service.titre}</BreadcrumbPage>
+          <BreadcrumbItem>
+            <BreadcrumbPage>{service.titre}</BreadcrumbPage>
+          </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
       <h1 className="text-4xl md:text-5xl mb-10">{service.titre}</h1>

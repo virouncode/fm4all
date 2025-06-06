@@ -4,6 +4,7 @@ import ImgCardVertical from "@/components/cards/ImgCardVertical";
 import TagButton from "@/components/tags/tag-button";
 import {
   Breadcrumb,
+  BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
@@ -174,6 +175,10 @@ const page = async ({
   setRequestLocale(locale);
   const tGlobal = await getTranslations({ locale, namespace: "Global" });
   const t = await getTranslations({ locale, namespace: "ServicesPage" });
+  const tBlog = await getTranslations({
+    locale,
+    namespace: "BlogPage",
+  });
   const article = await getArticle(subSlug);
   if (!article) {
     notFound();
@@ -286,37 +291,49 @@ const page = async ({
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20 hyphens-auto">
       <Breadcrumb className="mb-10">
         <BreadcrumbList className="text-sm lg:text-base flex flex-wrap">
-          <BreadcrumbLink className="flex items-center" href={`/`} asChild>
-            <HomeIcon size={14} />
-          </BreadcrumbLink>
+          <BreadcrumbItem>
+            <BreadcrumbLink
+              className="flex items-center"
+              href={`/`}
+              title={tBlog("accueil")}
+            >
+              <HomeIcon size={14} />
+            </BreadcrumbLink>
+          </BreadcrumbItem>
           <BreadcrumbSeparator />
-          <BreadcrumbLink className="flex items-center" asChild>
-            <Link href={"/blog"} locale={locale}>
-              {tGlobal("articles")}
-            </Link>
-          </BreadcrumbLink>
-          <BreadcrumbSeparator />
-          {categorie.slug?.current && (
+          <BreadcrumbItem>
             <BreadcrumbLink className="flex items-center" asChild>
-              <Link
-                href={{
-                  pathname: `/blog/[slug]`,
-                  params: { slug: categorie.slug?.current },
-                }}
-                locale={locale}
-              >
-                {capitalize(categorie.titre)}
+              <Link href={"/blog"} locale={locale}>
+                {tGlobal("articles")}
               </Link>
             </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          {categorie.slug?.current && (
+            <BreadcrumbItem>
+              <BreadcrumbLink className="flex items-center" asChild>
+                <Link
+                  href={{
+                    pathname: `/blog/[slug]`,
+                    params: { slug: categorie.slug?.current },
+                  }}
+                  locale={locale}
+                >
+                  {capitalize(categorie.titre)}
+                </Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
           )}
           <BreadcrumbSeparator />
-          <BreadcrumbPage>{article.titre}</BreadcrumbPage>
+          <BreadcrumbItem>
+            <BreadcrumbPage>{article.titre}</BreadcrumbPage>
+          </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
       <h1 className="text-4xl md:text-5xl mb-10">{article.titre}</h1>
       <section className="flex flex-row gap-10 mb-16">
         <div className="flex flex-col flex-1 justify-start text-lg gap-10">
-          <div className="flex flex-row gap-2 flex-wrap">
+          <div className="flex flex-row gap-4 flex-wrap">
             {tagsSortants.map((tag) => (
               <TagButton tag={tag} key={tag._id} locale={locale} />
             ))}

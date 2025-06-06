@@ -1,5 +1,6 @@
 import {
   Breadcrumb,
+  BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
@@ -44,11 +45,19 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20">
       <Breadcrumb className="mb-10">
         <BreadcrumbList className="text-sm lg:text-base flex flex-wrap">
-          <BreadcrumbLink className="flex items-center" href={`/`} asChild>
-            <HomeIcon size={14} />
-          </BreadcrumbLink>
+          <BreadcrumbItem>
+            <BreadcrumbLink
+              className="flex items-center"
+              href={`/`}
+              title={t("accueil")}
+            >
+              <HomeIcon size={14} />
+            </BreadcrumbLink>
+          </BreadcrumbItem>
           <BreadcrumbSeparator />
-          <BreadcrumbPage>{t("nos-secteurs-dintervention")}</BreadcrumbPage>
+          <BreadcrumbItem>
+            <BreadcrumbPage>{t("nos-secteurs-dintervention")}</BreadcrumbPage>
+          </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
       <article className="mt-6 flex flex-col gap-10">

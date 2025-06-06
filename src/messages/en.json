@@ -21,7 +21,8 @@
     "illustration-du-secteur": "sector illustration",
     "illustration-de-l-auteur": "author photo",
     "nos-articles-sur-and-quot": "Our posts about : ",
-    "une-image-de-bureaux-modernes-et-lumineux-avec-des-plantes-vertes": "an image of modern, bright offices with green plants"
+    "une-image-de-bureaux-modernes-et-lumineux-avec-des-plantes-vertes": "an image of modern, bright offices with green plants",
+    "accueil": "Home page"
   },
   "header": {
     "home": "Home",
@@ -236,7 +237,8 @@
     "hospitality-manager-office-manager-facility-manager-ce-sont-eux-qui-gerent-le-bon-fonctionnement-de-vos-locaux-au-quotidien-tout-en-veillant-sur-vos-collaborateurs-chez-fm4all-offrez-vous-les-services-d-un-hof-manager": "Hospitality Manager, Office Manager, Facility Manager – these are the professionals ensuring the smooth operation of your premises and the well-being of your employees every day. With fm4all, treat yourself to the services of a HOF Manager —",
     "decouvrez-les-services-de-facility-management-proposes-par-fm4all-1": "Discover the Facility Management services offered by fm4all.",
     "une-personne-dediee": "a dedicated professional",
-    "chez-vous-a-partir-d-une-demi-journee-par-semaine": "at your location, starting from just half a day per week."
+    "chez-vous-a-partir-d-une-demi-journee-par-semaine": "at your location, starting from just half a day per week.",
+    "accueil": "Home page"
   },
   "GammesPage": {
     "nos-3-gammes": "Our 3 tiers",
@@ -256,7 +258,8 @@
     "la-bonne-nouvelle-cest-que-tous-les-prestataires-references-sur-notre-plateforme-ont-ete-rigoureusement-selectionnes-nous-collaborons-uniquement-avec-des-entreprises-qui-partagent-nos-valeurs-sens-du-service-reactivite-engagement-envers-la-qualite-et-tarifs-competitifs": "The good news is that every provider on our platform has been rigorously selected. We only partner with companies that share our core values: a strong service orientation, responsiveness, a commitment to quality, and competitive pricing.",
     "tous-nos-partenaires-respectent-une-charte-dachat-exigeante-et-sengagent-a-respecter-nos": "All our partners adhere to a demanding purchasing charter and commit to complying with our ",
     "conditions-generales-de-vente-cgv": "Terms and Conditions of Sale.",
-    "vous-avez-donc-la-garantie-dun-service-aligne-sur-vos-attentes": "You are therefore assured of a service that aligns with your expectations."
+    "vous-avez-donc-la-garantie-dun-service-aligne-sur-vos-attentes": "You are therefore assured of a service that aligns with your expectations.",
+    "accueil": "Home page"
   },
   "EngagementsPage": {
     "nos-engagements": "Our Commitments",
@@ -318,7 +321,8 @@
     "satisfaction-client-votre-bien-etre-et-celui-de-vos-collaborateurs-sont-notre-priorite-absolue": "Customer Satisfaction: Your well-being and that of your collaborators are our top priority.",
     "travaillons-ensemble-pour-un-avenir-durable-et-performant": "Let’s build a sustainable and high-performing future together",
     "en-choisissant-fm4all-vous-faites-le-choix-dun-partenaire-fiable-engage-et-a-lecoute-nous-ne-nous-contentons-pas-de-vous-accompagner-nous-nous-investissons-pleinement-pour-garantir-votre-satisfaction-et-celle-de-vos-equipes": "By choosing fm4all, you’re choosing a reliable, committed, and attentive partner. We don’t just support you — we fully invest ourselves to ensure your satisfaction and that of your teams.",
-    "envie-den-savoir-plus-sur-nos-engagements-ou-nos-services-contactez-nous-des-aujourdhui": "Want to learn more about our commitments or services? Contact us today!"
+    "envie-den-savoir-plus-sur-nos-engagements-ou-nos-services-contactez-nous-des-aujourdhui": "Want to learn more about our commitments or services? Contact us today!",
+    "accueil": "Home page"
   },
   "PartenairesPage": {
     "nos-prestataires-partenaires": "Our Partner Providers",
@@ -348,7 +352,8 @@
     "des-opportunites-de-croissance-integrez-un-ecosysteme-dynamique-qui-favorise-la-montee-en-competences-et-levolution-professionnelle": "Growth Opportunities: Integrate a dynamic ecosystem that promotes skill development and professional growth",
     "rejoignez-une-communaute-engagee": "Join a committed community",
     "chez-fm4all-nous-croyons-en-la-force-des-partenariats-pour-batir-un-environnement-de-travail-performant-et-harmonieux-nos-partenaires-ne-sont-pas-choisis-au-hasard-ils-incarnent-la-fiabilite-la-qualite-et-lexcellence-que-nous-souhaitons-offrir-a-nos-clients": "At fm4all, we believe in the power of partnerships to create a high-performing and harmonious work environment. Our partners are not chosen randomly—they embody the reliability, quality, and excellence we want to provide to our clients.",
-    "vous-etes-un-prestataire-qui-partage-nos-valeurs-rejoignez-notre-reseau-et-contribuez-a-transformer-la-gestion-des-services-generaux-en-une-experience-simple-efficace-et-ethique": "Are you a provider who shares our values? Join our network and help transform the management of business services into a simple, efficient, and ethical experience."
+    "vous-etes-un-prestataire-qui-partage-nos-valeurs-rejoignez-notre-reseau-et-contribuez-a-transformer-la-gestion-des-services-generaux-en-une-experience-simple-efficace-et-ethique": "Are you a provider who shares our values? Join our network and help transform the management of business services into a simple, efficient, and ethical experience.",
+    "accueil": "Home page"
   },
   "FAQPage": {
     "foire-aux-questions": "Frequently Asked Questions",
@@ -405,13 +410,15 @@
     "des-tarifs-preferentiels": "Preferential rates",
     "un-seul-point-de-contact-pour-gerer-tous-les-services-au-bureau": "A single point of contact to manage all office services",
     "un-office-manager-present-sur-site-selon-ses-besoins": "An Office Manager on-site as needed",
-    "un-outil-de-pilotage-en-ligne-performant": "A powerful online management tool"
+    "un-outil-de-pilotage-en-ligne-performant": "A powerful online management tool",
+    "accueil": "Home page"
   },
   "ContactPage": {
     "nous-contacter": "Contact us",
     "des-questions-sur-nos-services-ou-nos-offres-en-general": "Any questions about our services or our offers in general?",
     "nous-sommes-la": "We are here.",
-    "romuald-buffe-dirigeant-fm4all": "Romuald Buffe, fm4all CEO"
+    "romuald-buffe-dirigeant-fm4all": "Romuald Buffe, fm4all CEO",
+    "accueil": "Home page"
   },
   "MentionsPage": {
     "mentions-legales": "Legal Notice",
@@ -1198,7 +1205,8 @@
   "BlogPage": {
     "articles": "Posts",
     "blog-nos-articles-sur-les-services-aux-entreprises": "Blog: Our posts on business services",
-    "par-categorie": "By category"
+    "par-categorie": "By category",
+    "accueil": "Home page"
   },
   "Total": {
     "eur-ht-an": "€ ex VAT/year",
@@ -1383,6 +1391,7 @@
     "proprete-confort-gestion-des-stocks-accueil-creez-une-experience-premium-pour-vos-membres-sans-vous-soucier-de-la-logistique": "Cleanliness, comfort, stock management, reception—create a premium experience for your members without worrying about logistics.",
     "un-seul-partenaire-tous-vos-services": "One partner, all your services",
     "nettoyage-hygiene-maintenance-securite-accueil-cafe-petit-equipement": "Cleaning, hygiene, maintenance, security, reception, coffee, small equipment...",
-    "quel-que-soit-votre-secteur-nous-pilotons-pour-vous-lensemble-de-vos-contrats-de-services-generaux": "Whatever your sector, we manage all your general service contracts for you."
+    "quel-que-soit-votre-secteur-nous-pilotons-pour-vous-lensemble-de-vos-contrats-de-services-generaux": "Whatever your sector, we manage all your general service contracts for you.",
+    "accueil": "Home page"
   }
 }

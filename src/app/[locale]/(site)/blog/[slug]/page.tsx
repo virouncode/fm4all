@@ -1,5 +1,6 @@
 import {
   Breadcrumb,
+  BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
@@ -67,6 +68,7 @@ const page = async ({
 }) => {
   const { slug, locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations("BlogPage");
   const tGlobal = await getTranslations({ locale, namespace: "Global" });
   const categorie = await getCategorie(slug);
   const articles = await getArticlesOfCategorie(
@@ -83,17 +85,27 @@ const page = async ({
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20 hyphens-auto">
       <Breadcrumb className="mb-10">
         <BreadcrumbList className="text-sm lg:text-base flex flex-wrap">
-          <BreadcrumbLink className="flex items-center" href={`/`} asChild>
-            <HomeIcon size={14} />
-          </BreadcrumbLink>
+          <BreadcrumbItem>
+            <BreadcrumbLink
+              className="flex items-center"
+              href={`/`}
+              title={t("accueil")}
+            >
+              <HomeIcon size={14} />
+            </BreadcrumbLink>
+          </BreadcrumbItem>
           <BreadcrumbSeparator />
-          <BreadcrumbLink className="flex items-center" asChild>
-            <Link href={"/blog"} locale={locale}>
-              {tGlobal("articles")}
-            </Link>
-          </BreadcrumbLink>
+          <BreadcrumbItem>
+            <BreadcrumbLink className="flex items-center" asChild>
+              <Link href={"/blog"} locale={locale}>
+                {tGlobal("articles")}
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
           <BreadcrumbSeparator />
-          <BreadcrumbPage>{categorie.titre}</BreadcrumbPage>
+          <BreadcrumbItem>
+            <BreadcrumbPage>{categorie.titre}</BreadcrumbPage>
+          </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
       <h1 className="text-4xl mb-10">

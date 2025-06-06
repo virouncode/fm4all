@@ -92,6 +92,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
                   params: { adminId: user.id },
                 }}
                 className="cursor-default !text-base"
+                title={t("mon-espace")}
               >
                 {t("mon-espace")}
               </Link>
@@ -102,6 +103,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
                   params: { clientId: user.clientId ?? 0 },
                 }}
                 className="cursor-default !text-base"
+                title={t("mon-espace")}
               >
                 {t("mon-espace")}
               </Link>
@@ -112,6 +114,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
                   params: { fournisseurId: user.fournisseurId ?? 0 },
                 }}
                 className="cursor-default !text-base"
+                title={t("mon-espace")}
               >
                 {t("mon-espace")}
               </Link>
@@ -129,7 +132,11 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
               {t("deconnexion")}
             </p>
           ) : (
-            <Link href="/auth/signin" className="cursor-default !text-base">
+            <Link
+              href="/auth/signin"
+              className="cursor-default !text-base"
+              title={t("connexion")}
+            >
               {t("connexion")}
             </Link>
           )}
