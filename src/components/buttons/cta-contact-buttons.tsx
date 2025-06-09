@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Mail, Phone, Video } from "lucide-react";
 import { useLocale } from "next-intl";
 import Link from "next/link";
 
@@ -18,6 +19,7 @@ const CTAContactButtons = () => {
           size="lg"
           className="w-full text-base flex items-center justify-center"
         >
+          <Video />
           {locale === "fr"
             ? "Je prends un rendez-vous en visio"
             : "Schedule a video call"}
@@ -29,6 +31,7 @@ const CTAContactButtons = () => {
           size="lg"
           className="w-full text-base flex items-center justify-center"
         >
+          <Phone />
           +33 6 69 31 10 46
         </Button>
       </Link>
@@ -41,6 +44,7 @@ const CTAContactButtons = () => {
           size="lg"
           className="w-full text-base flex items-center justify-center"
         >
+          <Mail />
           {locale === "fr" ? "Je contacte par email" : "Contact by e-mail"}
         </Button>
       </Link>

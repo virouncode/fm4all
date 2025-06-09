@@ -41,6 +41,7 @@ import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvide
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { useRouter } from "@/i18n/navigation";
+import { ReceiptText } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Dispatch, SetStateAction, useContext } from "react";
 
@@ -233,13 +234,13 @@ const DevisButton = ({
           variant="destructive"
           size={size}
           title={text}
-          className={`text-base ${className}`}
+          className={`text-base shadow-md hover:shadow-lg ${className}`}
           disabled={disabled}
           onClick={
             setIsMobileNavOpen ? () => setIsMobileNavOpen(false) : undefined
           }
         >
-          {text}
+          <ReceiptText className="hidden sm:inline" /> {text}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
@@ -271,11 +272,11 @@ const DevisButton = ({
         variant="destructive"
         size={size}
         title={title}
-        className={`text-base ${className}`}
+        className={`text-base shadow-md hover:shadow-lg ${className}`}
         onClick={handleClickNouveau}
         disabled={disabled}
       >
-        {text}
+        <ReceiptText className="hidden sm:inline" /> {text}
       </Button>
     </div>
   );
