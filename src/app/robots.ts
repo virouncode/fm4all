@@ -13,7 +13,7 @@ import {
 } from "@/sanity/queries";
 import type { MetadataRoute } from "next";
 
-const generateWrongStaticUrls = () => {
+export const generateWrongStaticUrls = () => {
   const urls: string[] = [];
 
   // Pour chaque locale et chaque route définie dans routing.ts
