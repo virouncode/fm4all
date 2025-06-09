@@ -1,7 +1,6 @@
 import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
 import DevisButton from "@/components/buttons/devis-button";
 import ImgCardVertical from "@/components/cards/ImgCardVertical";
-import TagButton from "@/components/tags/tag-button";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -277,11 +276,11 @@ const page = async ({
       <h1 className="text-4xl md:text-5xl mb-10">{secteur.titre}</h1>
       <section className="flex flex-row gap-10 mb-16">
         <div className="flex flex-col flex-1 justify-start text-lg gap-8">
-          <div className="flex flex-row gap-2 flex-wrap">
+          {/* <div className="flex flex-row gap-2 flex-wrap">
             {tagsSortants.map((tag) => (
               <TagButton tag={tag} key={tag._id} locale={locale} />
             ))}
-          </div>
+          </div> */}
           <div
             className="flex flex-col gap-4 prose-lg 
           prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
