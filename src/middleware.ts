@@ -414,12 +414,24 @@ export const legacyRedirects: Record<string, string> = {
   "/articles/histoire-nettoyage":
     "/fr/articles/nettoyage/histoire-du-nettoyage-des-bureaux", // à adapter
   "/articles/devenir-prestataire": "/fr/devenir-prestataire",
+  "/services/office-manager": "/fr/services/outsource-office-management",
+  "/articles/le-fm-cest-quoi":
+    "/fr/articles/pilotage-facility-management/le-fm-c-est-quoi",
 
   // URLs avec structure correcte mais contenu déplacé
   "/fr/conditions-generales-d-utilisation":
     "/fr/conditions-generales-dutilisation",
   "/en/legal-notices": "/en/legal-notice",
   "/en/our-services": "/en/services",
+  "/en/services/outsourced-office-manager-france":
+    "/en/services/outsource-office-management",
+  "/en/services/technical-maintenance":
+    "/en/services/multitechnical-maintenance",
+  "/fr/articles/le-fm-fait-il-faire-des-economies":
+    "/fr/articles/pilotage-facility-management/le-facility-management-fait-il-faire-des-economies",
 };
 
-export const goneUrls: string[] = ["https://e99e300d.fm4all.com/"];
+export const goneUrls: string[] = [
+  "https://e99e300d.fm4all.com/",
+  "https://www.fm4all.com/services/petits-travaux",
+];
