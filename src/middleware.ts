@@ -417,6 +417,7 @@ export const legacyRedirects: Record<string, string> = {
   "/services/office-manager": "/fr/services/outsource-office-management",
   "/articles/le-fm-cest-quoi":
     "/fr/articles/pilotage-facility-management/le-fm-c-est-quoi",
+  "/sectors": "/en/sectors",
 
   // URLs avec structure correcte mais contenu déplacé
   "/fr/conditions-generales-d-utilisation":
