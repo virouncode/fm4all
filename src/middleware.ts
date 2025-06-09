@@ -36,11 +36,32 @@ export async function middleware(req: NextRequest) {
   const fullUrl = req.nextUrl.href;
   const pathnameWithoutLocale = getPathnameWithoutLocale(pathname);
   const locale = getLocaleFromPathname(pathname);
+  const hostname = req.headers.get("host") || "";
 
   console.log("pathname:", pathname);
   console.log("fullUrl:", fullUrl);
   console.log("pathnameWithoutLocale:", pathnameWithoutLocale);
   console.log("locale:", locale);
+  console.log("hostname:", hostname);
+
+  //REDIRECTIONS DE LA LANDING PAGE
+  // Rediriger www.fm4all.com/ vers www.fm4all.com/fr
+  if (pathname === "/" && hostname.includes("fm4all.com")) {
+    return NextResponse.redirect(new URL("/fr", req.url), 301);
+  }
+
+  // Rediriger fm4all.com vers www.fm4all.com
+  if (!hostname.startsWith("www.") && hostname.includes("fm4all.com")) {
+    return NextResponse.redirect(
+      new URL(`https://www.fm4all.com${pathname}`, req.url),
+      301
+    );
+  }
+
+  // Normaliser les trailing slashes pour la page d'accueil
+  if (pathname === "/fr/" || pathname === "/en/") {
+    return NextResponse.redirect(new URL(pathname.slice(0, -1), req.url), 301);
+  }
 
   //REDIRECTIONS DES ANCIENNES URLS
   if (goneUrls.includes(fullUrl) || goneUrls.includes(pathname)) {
@@ -430,6 +451,7 @@ export const legacyRedirects: Record<string, string> = {
     "/en/services/multitechnical-maintenance",
   "/fr/articles/le-fm-fait-il-faire-des-economies":
     "/fr/articles/pilotage-facility-management/le-facility-management-fait-il-faire-des-economies",
+  "/en/services/water-dispenser": "/en/services/water-dispensers",
 };
 
 export const goneUrls: string[] = [
