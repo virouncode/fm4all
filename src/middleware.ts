@@ -50,14 +50,6 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/fr", req.url), 301);
   }
 
-  // Rediriger fm4all.com vers www.fm4all.com
-  if (!hostname.startsWith("www.") && hostname.includes("fm4all.com")) {
-    return NextResponse.redirect(
-      new URL(`https://www.fm4all.com${pathname}`, req.url),
-      301
-    );
-  }
-
   // Normaliser les trailing slashes pour la page d'accueil
   if (pathname === "/fr/" || pathname === "/en/") {
     return NextResponse.redirect(new URL(pathname.slice(0, -1), req.url), 301);
