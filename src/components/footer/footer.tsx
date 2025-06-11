@@ -7,7 +7,6 @@ import {
 } from "@/sanity/queries";
 import { getTranslations } from "next-intl/server";
 import { ArticleCategory } from "../../../sanity.types";
-import { ObfuscatedLink } from "../links/ObfuscatedLink";
 
 type FooterProps = {
   locale: LocaleType;
@@ -35,67 +34,55 @@ const Footer = async ({ locale }: FooterProps) => {
                 </Link>
               </li>
               <li>
-                <ObfuscatedLink
+                <Link
                   href="/contact"
                   className="hover:opacity-80"
                   title={t("nous-contacter")}
                 >
                   {t("nous-contacter")}
-                </ObfuscatedLink>
+                </Link>
               </li>
               <li>
-                <ObfuscatedLink
-                  href="/faq"
-                  className="hover:opacity-80"
-                  title="FAQ"
-                >
+                <Link href="/faq" className="hover:opacity-80" title="FAQ">
                   FAQ
-                </ObfuscatedLink>
+                </Link>
               </li>
               <li>
-                <ObfuscatedLink
+                <Link
                   href="/mentions"
                   className="hover:opacity-80"
                   title={t("mentions-legales")}
                 >
                   {t("mentions-legales")}
-                </ObfuscatedLink>
+                </Link>
               </li>
               <li>
-                <ObfuscatedLink
+                <Link
                   href="/confidentialite"
                   className="hover:opacity-80"
                   title={t("politique-de-confidentialite")}
                 >
                   {t("politique-de-confidentialite")}
-                </ObfuscatedLink>
+                </Link>
               </li>
               <li>
-                <ObfuscatedLink
+                <Link
                   href="/cookies"
                   className="hover:opacity-80"
                   title={t("politique-de-cookies")}
                 >
                   {t("politique-de-cookies")}
-                </ObfuscatedLink>
+                </Link>
               </li>
               <li>
-                <ObfuscatedLink
-                  href="/cgv"
-                  className="hover:opacity-80"
-                  title={t("cgv")}
-                >
+                <Link href="/cgv" className="hover:opacity-80" title={t("cgv")}>
                   {t("cgv")}
-                </ObfuscatedLink>
+                </Link>
               </li>
               <li>
-                <ObfuscatedLink
-                  href="/cgu"
-                  className="hover:opacity-80"
-                  title={t("cgu")}
-                >
+                <Link href="/cgu" className="hover:opacity-80" title={t("cgu")}>
                   {t("cgu")}
-                </ObfuscatedLink>
+                </Link>
               </li>
               <li>{t("touts-droits-reserves-and-copy-fm4all")}</li>
             </ul>
@@ -146,7 +133,7 @@ const Footer = async ({ locale }: FooterProps) => {
                 const secteurUrl = secteur.slug?.current ?? "";
                 return (
                   <li key={secteur._id}>
-                    <ObfuscatedLink
+                    <Link
                       href={{
                         pathname: "/secteurs/[slug]",
                         params: { slug: secteurUrl },
@@ -155,7 +142,7 @@ const Footer = async ({ locale }: FooterProps) => {
                       title={secteur.titre || secteurUrl}
                     >
                       {secteur.titre}
-                    </ObfuscatedLink>
+                    </Link>
                   </li>
                 );
               })}
@@ -163,13 +150,13 @@ const Footer = async ({ locale }: FooterProps) => {
           </div>
           <div className="flex flex-col gap-2 w-52">
             <p className="text-secondary text-xl">
-              <ObfuscatedLink
+              <Link
                 href="/blog"
                 className="hover:opacity-80"
                 title={t("derniers-articles")}
               >
                 {t("derniers-articles")}
-              </ObfuscatedLink>
+              </Link>
             </p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
               {articles.map((article) => {
@@ -178,7 +165,7 @@ const Footer = async ({ locale }: FooterProps) => {
                 const articleSubSlug = article.subSlug?.current ?? "";
                 return (
                   <li key={article._id}>
-                    <ObfuscatedLink
+                    <Link
                       href={{
                         pathname: "/blog/[slug]/[subSlug]",
                         params: { slug: articleSlug, subSlug: articleSubSlug },
@@ -189,7 +176,7 @@ const Footer = async ({ locale }: FooterProps) => {
                       }
                     >
                       {article.titre}
-                    </ObfuscatedLink>
+                    </Link>
                   </li>
                 );
               })}
@@ -199,13 +186,13 @@ const Footer = async ({ locale }: FooterProps) => {
             <p className="text-secondary text-xl">{t("prestataires")}</p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
               <li>
-                <ObfuscatedLink
+                <Link
                   href="/prestataire"
                   className="hover:opacity-80"
                   title={t("devenir-prestataire")}
                 >
                   {t("devenir-prestataire")}
-                </ObfuscatedLink>
+                </Link>
               </li>
             </ul>
           </div>
