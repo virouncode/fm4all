@@ -122,6 +122,9 @@ importers:
       embla-carousel-react:
         specifier: ^8.5.2
         version: 8.5.2(react@19.0.0)
+      fm4all:
+        specifier: 'link:'
+        version: 'link:'
       form-data:
         specifier: ^4.0.1
         version: 4.0.1

@@ -1,10 +1,11 @@
 import BackgroundServer from "@/components/backgrounds/BackgroundServer";
 import DevisButton from "@/components/buttons/devis-button";
-import { useTranslations } from "next-intl";
+import { getLocale, getTranslations } from "next-intl/server";
 
-const Hero = () => {
-  const tGlobal = useTranslations("Global");
-  const t = useTranslations("HomePage.hero");
+const Hero = async () => {
+  const locale = await getLocale();
+  const tGlobal = await getTranslations("Global");
+  const t = await getTranslations("HomePage.hero");
   return (
     <section
       className="flex items-center justify-center min-h-[calc(100vh-4rem)] md:min-h-[calc(100vh-4rem)] overflow-hidden relative"
@@ -14,11 +15,15 @@ const Hero = () => {
       <div className="relative z-10 w-11/12 max-w-7xl mx-auto flex flex-col items-center gap-8 px-4 py-12">
         <div className="w-full max-w-3xl text-white">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-pretty animate-appear">
-            {t("vos-prestataires-de-services-au-meilleur-prix")}
+            {t("votre-entreprise-de")}{" "}
+            <span className="text-fm4alldestructive">
+              {t("facility-management")}
+            </span>
+            {locale === "fr" ? ". " : t("services-en-ile-de-france")}
           </h1>
-          <p className="text-xl md:text-2xl font-medium mb-8 animate-appear text-center">
-            {t("vos-locaux-font-moins-de-3000m")}
-          </p>
+          <h2 className="text-xl md:text-2xl font-medium mb-8 animate-appear text-center">
+            {t("les-services-aux-entreprises-au-meilleur-prix")}
+          </h2>
           <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 mb-8 border border-white/20 flex flex-col gap-6 text-base md:text-xl animate-appear">
             <h2>
               {t("gagnez-du-temps-et-de-largent-sur-la")}{" "}

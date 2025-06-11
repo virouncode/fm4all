@@ -50,6 +50,7 @@
     "embla-carousel-auto-scroll": "^8.5.2",
     "embla-carousel-autoplay": "^8.5.2",
     "embla-carousel-react": "^8.5.2",
+    "fm4all": "link:",
     "form-data": "^4.0.1",
     "html2canvas": "^1.4.1",
     "install": "^0.13.0",

@@ -9,22 +9,21 @@ const Presentation = () => {
     <section id="presentation">
       <div className="max-w-7xl w-full mx-auto flex flex-col gap-8 text-lg hyphens-auto text-wrap relative pt-8 pb-12 px-6">
         <h2 className="text-2xl md:text-3xl border-l-2 px-4">
-          {t("tpe-pme-en-ile-de-france")}
+          {t("notre-plateforme")}
         </h2>
         <div className="flex gap-8 justify-center items-center bg-[rgb(250,250,250)] rounded-xl p-8">
           <div className="flex flex-col gap-6">
             <div className="text-center fle flex-col font-bold text-xl">
+              <p>{t("tpe-pme-en-ile-de-france")}</p>
               <p>{t("vous-emmenagez-dans-de-nouveaux-bureaux")}</p>
               <p>{t("ou-envie-dameliorer-vos-services-actuels")}</p>
             </div>
             <div className="flex flex-col gap-4 max-w-prose mx-auto">
               <p>
                 <strong>fm4all</strong>{" "}
-                {t("simplifie-vos-demarches-dachats-et-de-gestion-avec-sa")}{" "}
-                <strong>{t("plateforme-de-facility-management")}</strong>{" "}
                 {t(
-                  "un-seul-contact-un-seul-contrat-et-une-seule-facture-pour-toutes-vos-prestations"
-                )}
+                  "simplifie-vos-demarches-dachats-et-de-gestion-avec-sa"
+                )}{" "}
               </p>
               <p>
                 {t("choisissez-en-ligne-des-prestataires-de-confiance")}{" "}
@@ -47,6 +46,12 @@ const Presentation = () => {
                   {tGlobal("excellence")}
                 </span>{" "}
                 {t("simplifiez-comparez-et-deleguez-en-quelques-clics")}
+                <span className="font-bold">
+                  {t(
+                    "obtenez-votre-devis-immediatemment-et-demarrez-vos-prestations"
+                  )}
+                </span>
+                .
               </p>
               <p className="mb-6">
                 {t("pret-a-optimiser-la-gestion-de-vos-bureaux")}

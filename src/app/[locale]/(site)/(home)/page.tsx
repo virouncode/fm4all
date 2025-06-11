@@ -14,6 +14,7 @@ import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
+import FAQ from "./FAQ";
 
 export const generateStaticParams = () => {
   return generateLocaleParams();
@@ -27,14 +28,14 @@ export const generateMetadata = async ({
   const { locale } = await params;
   const title =
     locale === "fr"
-      ? "Facility Management à Paris & Île-de-France - Devis en ligne"
-      : "Facility Management & Business Services in Paris – Instant Quote";
+      ? "Entreprise de facility management à Paris et en IDF"
+      : "Facility Management Company in Paris & Île-de-France";
 
   // Description basée sur la langue
   const description =
     locale === "fr"
-      ? "fm4all démocratise les services aux entreprises de toutes tailles à Paris & Île-de-France. Comparez les offres de nos prestataires et obtenez un devis en ligne."
-      : "fm4all makes business services accessible to companies of all sizes in Paris & Île-de-France. Compare offers from our providers and get an online quote.";
+      ? "fm4all gère vos services généraux à Paris et en IDF : propreté, maintenance, sécurité,... Simplifiez la gestion de vos locaux dès maintenant."
+      : "FM4All handles all your facility services in Paris: cleaning, maintenance, safety,... Simplify office management with expert solutions.";
 
   return generateAlternates("home", locale, title, description);
 };
@@ -60,7 +61,7 @@ export default async function page({
         <Why />
         <Mission />
         <HofManager />
-        {/* <FAQ /> */}
+        <FAQ />
         <Articles />
       </main>
     </>
