@@ -443,6 +443,7 @@ const page = async ({
                               params: { slug: serviceUrl },
                             }}
                             locale={locale}
+                            linkText={service.linkText ?? serviceUrl}
                           >
                             <div className="p-4 flex flex-col gap-4 h-56">
                               <p className="text-2xl">{service.titre}</p>
@@ -489,6 +490,7 @@ const page = async ({
                               params: { slug: secteurUrl },
                             }}
                             locale={locale}
+                            linkText={secteur.linkText ?? secteurUrl}
                           >
                             <div className="p-4 flex flex-col gap-4 h-56">
                               <p className="text-2xl">{secteur.titre}</p>
@@ -541,6 +543,7 @@ const page = async ({
                               },
                             }}
                             locale={locale}
+                            linkText={article.linkText ?? articleSubSlug}
                           >
                             <div className="p-4 flex flex-col gap-4 h-56">
                               <p className="text-2xl">{article.titre}</p>

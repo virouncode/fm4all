@@ -60,8 +60,9 @@ export default async function page({
         <Why />
         <Mission />
         <HofManager />
+        {/* <FAQ /> */}
         <Articles />
-      </main>{" "}
+      </main>
     </>
   );
 }

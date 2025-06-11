@@ -6,11 +6,11 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { LocaleType } from "@/i18n/routing";
 import { urlFor } from "@/sanity/lib/image";
 import { getArticlesOfCategorie } from "@/sanity/queries";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ArticleCategory } from "../../../../../sanity.types";
-import { LocaleType } from "@/i18n/routing";
 
 type ArticlesCategorieCarouselProps = {
   categorie: ArticleCategory;
@@ -55,6 +55,7 @@ const ArticlesCategorieCarousel = async ({
                   pathname: `/blog/[slug]/[subSlug]`,
                   params: { slug: articleSlug, subSlug: articleSubSlug },
                 }}
+                linkText={article.linkText ?? articleSubSlug}
               >
                 <div className="p-4 flex flex-col gap-4 h-56">
                   <p className="text-2xl">{article.titre}</p>

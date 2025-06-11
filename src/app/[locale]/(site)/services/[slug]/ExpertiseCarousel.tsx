@@ -92,6 +92,7 @@ const ExpertiseCarousel = ({
                       pathname: `/services/[slug]`,
                       params: { slug: serviceUrl },
                     }}
+                    linkText={service.linkText ?? serviceUrl}
                   >
                     <div className="p-4 flex flex-col gap-4 h-56">
                       <p className="text-2xl">{service.titre}</p>
@@ -136,6 +137,7 @@ const ExpertiseCarousel = ({
                       pathname: `/secteurs/[slug]`,
                       params: { slug: secteurUrl },
                     }}
+                    linkText={secteur.linkText ?? secteurUrl}
                   >
                     <div className="p-4 flex flex-col gap-4 h-56">
                       <p className="text-2xl">{secteur.titre}</p>
@@ -183,6 +185,7 @@ const ExpertiseCarousel = ({
                       pathname: "/blog/[slug]/[subSlug]",
                       params: { slug: articleSlug, subSlug: articleSubSlug },
                     }}
+                    linkText={article.linkText ?? articleSubSlug}
                   >
                     <div className="p-4 flex flex-col gap-4 h-56">
                       <p className="text-2xl">{article.titre}</p>

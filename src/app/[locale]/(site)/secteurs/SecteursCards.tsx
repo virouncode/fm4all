@@ -35,6 +35,8 @@ const SecteursCards = async () => {
               pathname: `/secteurs/[slug]`,
               params: { slug: secteurUrl },
             }}
+            locale={locale as LocaleType}
+            linkText={secteur.linkText ?? secteurUrl}
           >
             <div className="p-4 flex flex-col gap-4 h-52">
               <p className="text-2xl">{secteur.titre}</p>

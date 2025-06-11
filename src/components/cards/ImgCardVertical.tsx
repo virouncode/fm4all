@@ -6,7 +6,6 @@ import { PropsWithChildren } from "react";
 type ImgCardVerticalProps = {
   src: string;
   alt: string;
-  className?: string;
   href:
     | {
         pathname: "/services/[slug]";
@@ -20,7 +19,8 @@ type ImgCardVerticalProps = {
         pathname: "/blog/[slug]/[subSlug]";
         params: { slug: string; subSlug: string };
       };
-
+  linkText: string;
+  className?: string;
   locale?: LocaleType;
 };
 
@@ -30,13 +30,14 @@ const ImgCardVertical = ({
   className,
   children,
   href,
+  linkText,
   locale,
 }: PropsWithChildren<ImgCardVerticalProps>) => {
-  const cardContent = (
+  return (
     <div
-      className={`flex flex-col gap-4 rounded-xl border bg-card text-card-foreground shadow overflow-hidden cursor-pointer hover:shadow-lg hover:scale-[99%] transition-all ${className}`}
+      className={`relative group flex flex-col gap-4 rounded-xl border bg-card text-card-foreground shadow overflow-hidden transition-all hover:shadow-lg hover:scale-[99%] ${className}`}
     >
-      <div className="w-full h-64 relative mx-auto">
+      <div className="w-full h-64 relative">
         <Image
           src={src}
           alt={alt}
@@ -46,15 +47,31 @@ const ImgCardVertical = ({
           unoptimized={true}
         />
       </div>
+
       {children}
+
+      {/* Lien invisible en overlay */}
+      {locale ? (
+        <Link
+          href={href}
+          locale={locale}
+          title={linkText}
+          aria-label={linkText}
+          className="absolute inset-0 z-10"
+        >
+          <span className="sr-only">{linkText}</span>
+        </Link>
+      ) : (
+        <Link
+          href={href}
+          title={linkText}
+          aria-label={linkText}
+          className="absolute inset-0 z-10"
+        >
+          <span className="sr-only">{linkText}</span>
+        </Link>
+      )}
     </div>
-  );
-  return locale ? (
-    <Link href={href} locale={locale}>
-      {cardContent}
-    </Link>
-  ) : (
-    <Link href={href}>{cardContent}</Link>
   );
 };
 

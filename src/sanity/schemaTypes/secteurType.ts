@@ -27,6 +27,13 @@ export const secteurType = defineType({
       type: "string",
       validation: (rule) => rule.required(),
     }),
+    //link text
+    defineField({
+      title: "Texte du lien",
+      name: "linkText",
+      type: "string",
+      validation: (rule) => rule.required(),
+    }),
     //<title>
     defineField({
       title: "Balise titre",

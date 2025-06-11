@@ -29,6 +29,8 @@ const ServicesCards = async () => {
               pathname: `/services/[slug]`,
               params: { slug: serviceUrl },
             }}
+            locale={locale as LocaleType}
+            linkText={service.linkText ?? serviceUrl}
           >
             <div className="p-4 flex flex-col gap-4 h-52">
               <p className="text-2xl">{service.titre}</p>
