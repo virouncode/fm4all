@@ -17,7 +17,7 @@ import { client } from "./lib/client";
 //================================================================================================//
 
 //TOUS LES SERVICES PAR LANGUE
-export const ALL_SERVICES_QUERY = `*[_type == "service" && language == $language]|order(date asc){ _id, titre, description, slug, imagePrincipale }`;
+export const ALL_SERVICES_QUERY = `*[_type == "service" && language == $language]|order(date asc){ _id, titre, description, slug, linkText, imagePrincipale }`;
 export const getAllServices = async (locale: LocaleType) => {
   return await client.fetch<Service[]>(ALL_SERVICES_QUERY, {
     language: locale,
@@ -138,7 +138,7 @@ export const getTagRelatedServices = async (
 //========================================= ARTICLES =============================================//
 //================================================================================================//
 export const LAST_ARTICLES_QUERY = `*[_type == "article" && language == $language]|order(date desc)[0...10]{ 
-  _id, titre, description, subSlug, imagePrincipale, 
+  _id, titre, description, subSlug, imagePrincipale, linkText,
   categorie->{
     _id,
     titre,
@@ -180,6 +180,7 @@ export const ARTICLES_OF_CATEGORIE_QUERY = `*[_type == "article" && language == 
   titre, 
   description, 
   subSlug, 
+  linkText,
   imagePrincipale 
 }`;
 export const getArticlesOfCategorie = async (
@@ -340,7 +341,7 @@ export const getTagRelatedArticles = async (
 //================================================================================================//
 //========================================= SECTEURS =============================================//
 //================================================================================================//
-export const ALL_SECTEURS_QUERY = `*[_type == "secteur" && language == $language]|order(date asc){ _id, titre, description, slug, imagePrincipale }`;
+export const ALL_SECTEURS_QUERY = `*[_type == "secteur" && language == $language]|order(date asc){ _id, titre, description, slug, imagePrincipale, linkText }`;
 export const getAllSecteurs = async (locale: LocaleType) => {
   return await client.fetch<Secteur[]>(ALL_SECTEURS_QUERY, {
     language: locale,
