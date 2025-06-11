@@ -30,7 +30,6 @@ export const articleType = defineType({
       title: "Texte du lien",
       name: "linkText",
       type: "string",
-      validation: (rule) => rule.required(),
     }),
     //<title>
     defineField({

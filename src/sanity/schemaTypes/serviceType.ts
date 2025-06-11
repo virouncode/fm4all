@@ -39,7 +39,6 @@ export const serviceType = defineType({
       title: "Texte du lien",
       name: "linkText",
       type: "string",
-      validation: (rule) => rule.required(),
     }),
     //Description
     defineField({
