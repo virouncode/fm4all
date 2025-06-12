@@ -86,11 +86,11 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     "/en/fournisseur/*",
     "/fr/auth/*",
     "/en/auth/*",
-    ...wrongStaticUrls,
-    ...wrongServicesUrls,
-    ...wrongArticlesCategoriesUrls,
-    ...wrongArticlesUrls,
-    ...wrongSecteursUrls,
+    // ...wrongStaticUrls,
+    // ...wrongServicesUrls,
+    // ...wrongArticlesCategoriesUrls,
+    // ...wrongArticlesUrls,
+    // ...wrongSecteursUrls,
   ];
 
   const uniqueDisallowUrls = [...new Set(disallowUrls)];
