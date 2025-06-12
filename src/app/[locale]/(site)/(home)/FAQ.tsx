@@ -10,14 +10,33 @@ const FAQ = () => {
       id: 1,
       question: t("quest-ce-que-le-facility-management-en-entreprise"),
       answer: (
-        <div className="text-base hyphens-auto">
+        <div className="text-base hyphens-auto flex flex-col gap-4">
           <p>
-            <strong>
-              {t("le-facility-management-ou-gestion-des-services-generaux")}
-            </strong>
+            {t("le")} <strong>{t("facility-management")}</strong>
+            {t("qui-se-traduit-par")}{" "}
+            <strong>{t("gestion-des-services-generaux")}</strong>{" "}
             {t(
-              "designe-lensemble-des-activites-de-support-qui-permettent-a-une-entreprise-de-fonctionner-efficacement-au-quotidien-cela-inclut-la-gestion-des-batiments-la-maintenance-technique-la-proprete-la-securite-ou-encore-les-services-aux-occupants-accueil-courrier-espaces-verts-lobjectif-est-dassurer-un-environnement-de-travail-optimal-tout-en-reduisant-les-couts-et-en-ameliorant-la-performance-globale"
+              "en-francais-fait-reference-a-la-gestion-de-lensemble-des-activites-necessaires-pour-assurer-le-bon-fonctionnement-dune-societe"
+            )}{" "}
+          </p>
+          <p>
+            {t("cela-englobe-la")} <strong>{t("proprete")}</strong>{" "}
+            {t("nettoyage-et-hygiene-sanitaire-la")}{" "}
+            <strong>{t("gestion-des-batiments")}</strong>
+            {t("la")} <strong>{t("surete")}</strong>{" "}
+            {t("surveillance-securite-incendie-le")}{" "}
+            <strong>{t("bien-etre-au-travail")}</strong>{" "}
+            {t(
+              "location-de-machines-a-cafe-et-fontaines-a-eau-livraison-de-fruits-et-collations-ainsi-que-le"
             )}
+            <strong>{t("confort-des-occupants")}</strong>{" "}
+            {t("reception-courrier-espaces-verts")}
+          </p>
+          <p>
+            {t("le-but-est-d")}
+            <strong>{t("optimiser-les-couts")}</strong>{" "}
+            {t("associes-a-letablissement-dun")}{" "}
+            <strong>{t("environnement-de-travail-efficace-et-sain")}</strong>.
           </p>
         </div>
       ),
@@ -25,7 +44,7 @@ const FAQ = () => {
     {
       id: 2,
       question: t(
-        "quels-services-incluent-notre-solution-de-facility-management-pour-les-entreprises"
+        "quels-services-inclut-notre-solution-de-facility-management-pour-les-entreprises"
       ),
       answer: (
         <div className="text-base hyphens-auto flex flex-col gap-4">
@@ -36,34 +55,29 @@ const FAQ = () => {
           </p>
           <ul className="list-disc  ml-6">
             <li>
-              <strong>{t("nettoyage-et-hygiene-sanitaire")}</strong>{" "}
-              {t("des-locaux")}
+              {t("une-offre-complete")}{" "}
+              <strong>{t("multiservices-a-la-carte")}</strong>{" "}
+              {t(
+                "proprete-securite-maintenance-boissons-et-collations-office-manager-externalise-via-un"
+              )}{" "}
+              <strong>{t("comparateur-en-ligne")}</strong>{" "}
+              {t("des-offres-de-nos-differents-fournisseurs-partenaires")}
             </li>
             <li>
-              <strong>{t("maintenance")}</strong> {t("multi-technique")}
+              {t("le")} <strong>{t("pilotage-et-la-gestion")}</strong>{" "}
+              {t(
+                "des-services-devis-cahier-des-charges-contrats-factures-planification"
+              )}
             </li>
             <li>
-              <strong>{t("securite-incendie")}</strong>
+              {t("un")} <strong>{t("back-office")}</strong>{" "}
+              {t(
+                "pour-les-clients-et-les-fournisseurs-mise-a-jour-des-tarifs-pages-produits-signature-des-contrats-plannings-dintervention"
+              )}
             </li>
             <li>
-              {t("location-de")} <strong>{t("machines-a-cafe")}</strong>{" "}
-              {t("et-livraisons-de-consommables")}
-            </li>
-            <li>
-              {t("livraison-de")} <strong>{t("fruits-frais")}</strong> {t("et")}{" "}
-              <strong>{t("snacks-sains-et-gourmands")}</strong>
-            </li>
-            <li>
-              {t("livraison-de")} <strong>{t("boissons")}</strong>{" "}
-              {t("variees")}
-            </li>
-            <li>
-              {t("location-de")} <strong>{t("fontaines-a-eau")}</strong>{" "}
-              {t("sur-reseau")}
-            </li>
-            <li>
-              <strong>{t("office-manager-externalise")}</strong>{" "}
-              {t("pour-la-gestion-des-services")}
+              {t("un")} <strong>{t("accompagnement")}</strong>{" "}
+              {t("support-reclamations-controles-qualite")}
             </li>
           </ul>
         </div>
@@ -77,32 +91,40 @@ const FAQ = () => {
       answer: (
         <div className="text-base hyphens-auto flex flex-col gap-4">
           <p>
-            {t(
-              "externaliser-le-facility-management-presente-de-nombreux-benefices-pour-les-entreprises"
-            )}
+            {t("l")}
+            <strong>{t("externalisation-des-services-generaux")}</strong>{" "}
+            {t("presente-de-nombreux-avantages-pour-les-entreprises")}
           </p>
           <ul className="list-disc  ml-6">
             <li>
               <strong>{t("gain-de-temps")}</strong>{" "}
-              {t("focalisez-vous-sur-votre-coeur-de-metier")}
+              {t(
+                "vous-deleguez-la-gestion-de-vos-services-et-vous-vous-concentrez-sur-votre-coeur-de-metier"
+              )}
             </li>
             <li>
-              <strong>{t("reduction-des-couts")}</strong>{" "}
-              {t("mutualisation-des-services-et-optimisation-des-ressources")}
+              <strong>{t("optimisation-des-couts")}</strong>{" "}
+              {t(
+                "en-passant-par-notre-plateforme-de-facility-management-vous-profitez-de-tarifs-competitifs"
+              )}
             </li>
             <li>
               <strong>{t("flexibilite")}</strong>{" "}
-              {t("adaptation-rapide-a-levolution-de-vos-besoins")}
+              {t(
+                "nous-pouvons-adapter-rapidement-vos-contrats-a-levolution-de-vos-besoins"
+              )}
             </li>
             <li>
-              <strong>{t("suivi-de-la-qualite")}</strong>{" "}
-              {t("indicateurs-de-performance-et-engagement-contractuel")}
+              <strong>{t("qualite")}</strong>{" "}
+              {t(
+                "nos-prestataires-sont-selectionnes-selon-des-criteres-stricts-de-conformite-et-de-qualite"
+              )}
             </li>
           </ul>
           <p>
-            {t(
-              "cette-approche-permet-daugmenter-la-performance-operationnelle-tout-en-assurant-un-environnement-de-travail-de-qualite"
-            )}
+            {t("cette-approche-est-pour-vous-lassurance-dune")}{" "}
+            <strong>{t("tranquilite-desprit")}</strong> {t("et-dun")}{" "}
+            <strong>{t("environnement-de-travail-sain-et-performant")}</strong>.
           </p>
         </div>
       ),
@@ -119,13 +141,13 @@ const FAQ = () => {
           </p>
           <ul className="list-disc  ml-6">
             <li>
-              <strong>{t("TPE/PME")}</strong>{" "}
+              <strong>{t("tpe-pme")}</strong>{" "}
               {t(
                 "qui-souhaitent-optimiser-leurs-couts-et-ameliorer-leur-environnement-de-travail"
               )}
             </li>
             <li>
-              <strong>{t("start-up/scale-up")}</strong>{" "}
+              <strong>{t("start-ups/scale-ups")}</strong>{" "}
               {t(
                 "qui-ont-besoin-de-flexibilite-et-dagilite-dans-la-gestion-de-leurs-services"
               )}
@@ -133,7 +155,7 @@ const FAQ = () => {
             <li>
               <strong>{t("cabinets-medicaux")}</strong>{" "}
               {t(
-                "qui-necessitent-des-services-adaptes-a-leurs-normes-d-and-apos-hygiene"
+                "qui-necessitent-des-services-adaptes-a-leurs-normes-dhygiene"
               )}
             </li>
             <li>
@@ -166,35 +188,37 @@ const FAQ = () => {
       answer: (
         <div className="text-base hyphens-auto flex flex-col gap-4">
           <p>
-            {t(
-              "pour-bien-choisir-votre-prestataire-de-facility-management-voici-les-criteres-cles-a-prendre-en-compte"
-            )}
+            {t("pour-choisir-convenablement-votre")}{" "}
+            <strong>{t("societe-de-facility-management")}</strong>
+            {t("vous-devez-tenir-compte-des-criteres-suivants")}
           </p>
           <ul className="list-disc  ml-6">
             <li>
-              <strong>{t("experience-et-references")}</strong>{" "}
+              <strong>{t("lexperience-et-les-references")}</strong>
               {t("dans-votre-secteur-dactivite")}
             </li>
             <li>
-              {t("capacite-a-proposer-une")}{" "}
-              <strong>{t("offre-sur-mesure-et-evolutive")}</strong>
+              {t("la-capacite-a-offrir-une")}{" "}
+              <strong>{t("proposition-sur-mesure-et-evolutive")}</strong>
             </li>
             <li>
-              <strong>{t("transparence-et-engagements-contractuels")}</strong>
+              {t("la-transparence-et-les")}{" "}
+              <strong>{t("engagements-contractuels")}</strong>
             </li>
             <li>
-              <strong>
-                {t("respect-des-normes-et-des-meilleures-pratiques")}
-              </strong>
+              {t("le-respect-des-normes-et-des")}{" "}
+              <strong>{t("bonnes-pratiques")}</strong>
             </li>
             <li>
-              <strong>{t("approche-durable-et-innovante")}</strong>
+              {t("une-approche")} <strong>{t("durable-et-innovante")}</strong>
             </li>
           </ul>
           <p>
-            {t(
-              "un-bon-partenaire-saura-allier-performance-operationnelle-qualite-de-service-et-respect-de-vos-objectifs-strategiques"
-            )}
+            {t("un-bon-partenaire-conjuguera")}{" "}
+            <strong>
+              {t("performance-operationnelle-qualite-de-service")}
+            </strong>{" "}
+            {t("et-prise-en-compte-de-vos-objectifs-strategiques")}
           </p>
         </div>
       ),

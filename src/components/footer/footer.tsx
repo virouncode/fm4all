@@ -6,7 +6,6 @@ import {
   getLastArticles,
 } from "@/sanity/queries";
 import { getTranslations } from "next-intl/server";
-import { ArticleCategory } from "../../../sanity.types";
 
 type FooterProps = {
   locale: LocaleType;
@@ -118,7 +117,7 @@ const Footer = async ({ locale }: FooterProps) => {
               })}
             </ul>
           </div>
-          <div className="flex flex-col gap-2 w-52">
+          {/* <div className="flex flex-col gap-2 w-52">
             <p className="text-secondary text-xl">
               <Link
                 href="/secteurs"
@@ -147,8 +146,8 @@ const Footer = async ({ locale }: FooterProps) => {
                 );
               })}
             </ul>
-          </div>
-          <div className="flex flex-col gap-2 w-52">
+          </div> */}
+          {/* <div className="flex flex-col gap-2 w-52">
             <p className="text-secondary text-xl">
               <Link
                 href="/blog"
@@ -181,8 +180,8 @@ const Footer = async ({ locale }: FooterProps) => {
                 );
               })}
             </ul>
-          </div>
-          <div className="flex flex-col gap-2 w-52">
+          </div> */}
+          {/* <div className="flex flex-col gap-2 w-52">
             <p className="text-secondary text-xl">{t("prestataires")}</p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
               <li>
@@ -195,7 +194,7 @@ const Footer = async ({ locale }: FooterProps) => {
                 </Link>
               </li>
             </ul>
-          </div>
+          </div> */}
         </div>
       </div>
     </footer>

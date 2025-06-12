@@ -28,14 +28,14 @@ export const generateMetadata = async ({
   const { locale } = await params;
   const title =
     locale === "fr"
-      ? "Entreprise de facility management à Paris et en IDF"
-      : "Facility Management Company in Paris & Île-de-France";
+      ? "Entreprise de Facility Management Paris IDF | Devis"
+      : "Facility Management Services in Paris – Free Quote | fm4all";
 
   // Description basée sur la langue
   const description =
     locale === "fr"
-      ? "fm4all gère vos services généraux à Paris et en IDF : propreté, maintenance, sécurité,... Simplifiez la gestion de vos locaux dès maintenant."
-      : "fm4all handles all your facility services in Paris: cleaning, maintenance, safety,... Simplify office management with expert solutions.";
+      ? "fm4all gère vos services généraux à Paris et en IDF : propreté, maintenance, etc. Obtenez dès maintenant un devis gratuit pour vos locaux."
+      : "Facility Management services in Paris: fm4all provides cleaning, maintenance, fire safety, and more. Get your free quote online and simplify operations.";
 
   return generateAlternates("home", locale, title, description);
 };

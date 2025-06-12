@@ -14,12 +14,12 @@ const Hero = async () => {
       <BackgroundServer />
       <div className="relative z-10 w-11/12 max-w-7xl mx-auto flex flex-col items-center gap-8 px-4 py-12">
         <div className="w-full max-w-3xl text-white">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-pretty animate-appear">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-pretty animate-appear hyphens-auto">
             {t("votre-entreprise-de")}{" "}
             <span className="text-fm4alldestructive">
               {t("facility-management")}
             </span>
-            {locale === "fr" ? ". " : t("services-en-ile-de-france")}
+            {locale === "fr" ? "|" : t("services-en-ile-de-france")}
           </h1>
           <h2 className="text-xl md:text-2xl font-medium mb-8 animate-appear text-center">
             {t("les-services-aux-entreprises-au-meilleur-prix")}
