@@ -35,7 +35,7 @@ export const generateMetadata = async ({
   const description =
     locale === "fr"
       ? "fm4all gère vos services généraux à Paris et en IDF : propreté, maintenance, sécurité,... Simplifiez la gestion de vos locaux dès maintenant."
-      : "FM4All handles all your facility services in Paris: cleaning, maintenance, safety,... Simplify office management with expert solutions.";
+      : "fm4all handles all your facility services in Paris: cleaning, maintenance, safety,... Simplify office management with expert solutions.";
 
   return generateAlternates("home", locale, title, description);
 };

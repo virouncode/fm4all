@@ -48,12 +48,12 @@ export const generateMetadata = async (): Promise<Metadata> => {
   const titleTemplate = "%s | fm4all";
   const title =
     locale === "fr"
-      ? "Facility Management à Paris & Île-de-France - Devis en ligne"
-      : "Facility Management & Office Services in Paris – Instant Quote";
+      ? "Entreprise de facility management à Paris et en IDF - Devis en ligne"
+      : "Facility Management Company in Paris & Île-de-France – Instant Quote";
   const description =
     locale === "fr"
-      ? "fm4all démocratise les services aux entreprises de toutes tailles à Paris & Île-de-France. Comparez les offres de nos prestataires et obtenez un devis en ligne."
-      : "fm4all makes business services accessible to companies of all sizes in Paris & Île-de-France. Compare offers from our providers and get an online quote.";
+      ? "fm4all gère vos services généraux à Paris et en IDF : propreté, maintenance, sécurité,... Simplifiez la gestion de vos locaux dès maintenant."
+      : "fm4all handles all your facility services in Paris: cleaning, maintenance, safety,... Simplify office management with expert solutions.";
   const canonicalUrl =
     locale === "fr" ? "https://www.fm4all.com/fr" : "https://www.fm4all.com/en";
 

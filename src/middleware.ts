@@ -431,6 +431,14 @@ export const legacyRedirects: Record<string, string> = {
   "/articles/le-fm-cest-quoi":
     "/fr/articles/pilotage-facility-management/le-fm-c-est-quoi",
   "/sectors": "/en/sectors",
+  "/secteurs": "/fr/secteurs",
+  "/contact": "/fr/contactez-nous",
+  "/nos-3-gammes": "/fr/nos-3-gammes",
+  "/politique-de-confidentialite": "/fr/politique-de-confidentialite",
+  "/services/hygiene-sanitaire": "/fr/services/hygiene-sanitaire",
+  "/services/maintenance-multitechnique":
+    "/fr/services/maintenance-multitechnique",
+  "/nos-engagements": "/fr/nos-engagements",
 
   // URLs avec structure correcte mais contenu déplacé
   "/fr/conditions-generales-d-utilisation":
