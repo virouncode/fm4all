@@ -33,7 +33,7 @@ const ServicesCards = async () => {
             linkText={service.linkText ?? serviceUrl}
           >
             <div className="p-4 flex flex-col gap-4 h-52">
-              <p className="text-2xl">{service.titre}</p>
+              <p className="text-2xl">{service.titreCard}</p>
               <p className="w-full overflow-hidden line-clamp-5">
                 {service.description}
               </p>

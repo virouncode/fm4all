@@ -1001,6 +1001,7 @@ export type Service = {
   _rev: string;
   date?: string;
   slug?: Slug;
+  titreCard?: string;
   titre?: string;
   baliseTitle?: string;
   linkText?: string;
@@ -1489,6 +1490,24 @@ export type Service = {
     crop?: SanityImageCrop;
     alt?: string;
     _type: "image";
+    _key: string;
+  }>;
+  faq?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3" | "h4" | "essentiel" | "confort" | "excellence";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
     _key: string;
   }>;
   language?: "en" | "fr";

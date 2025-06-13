@@ -6,6 +6,8 @@ import {
   getLastArticles,
 } from "@/sanity/queries";
 import { getTranslations } from "next-intl/server";
+import { ArticleCategory } from "../../../sanity.types";
+import { ObfuscatedLink } from "../links/ObfuscatedLink";
 
 type FooterProps = {
   locale: LocaleType;
@@ -28,60 +30,45 @@ const Footer = async ({ locale }: FooterProps) => {
             <p className="text-secondary text-xl">fm4all</p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
               <li>
-                <Link href="/" className="hover:opacity-80">
+                <Link
+                  href="/"
+                  className="hover:opacity-80"
+                  title={t("page-d-accueil")}
+                  aria-label={t("page-d-accueil")}
+                >
                   {t("page-d-accueil")}
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/contact"
-                  className="hover:opacity-80"
-                  title={t("nous-contacter")}
-                >
+                <ObfuscatedLink href="/contact">
                   {t("nous-contacter")}
-                </Link>
+                </ObfuscatedLink>
               </li>
               <li>
-                <Link href="/faq" className="hover:opacity-80" title="FAQ">
-                  FAQ
-                </Link>
+                <ObfuscatedLink href="/faq">FAQ</ObfuscatedLink>
               </li>
               <li>
-                <Link
-                  href="/mentions"
-                  className="hover:opacity-80"
-                  title={t("mentions-legales")}
-                >
+                <ObfuscatedLink href="/mentions">
                   {t("mentions-legales")}
-                </Link>
+                </ObfuscatedLink>
               </li>
               <li>
-                <Link
-                  href="/confidentialite"
-                  className="hover:opacity-80"
-                  title={t("politique-de-confidentialite")}
-                >
+                <ObfuscatedLink href="/confidentialite">
                   {t("politique-de-confidentialite")}
-                </Link>
+                </ObfuscatedLink>
               </li>
               <li>
-                <Link
-                  href="/cookies"
-                  className="hover:opacity-80"
-                  title={t("politique-de-cookies")}
-                >
+                <ObfuscatedLink href="/cookies">
                   {t("politique-de-cookies")}
-                </Link>
+                </ObfuscatedLink>
               </li>
               <li>
-                <Link href="/cgv" className="hover:opacity-80" title={t("cgv")}>
+                <ObfuscatedLink href="/cgv" className="hover:opacity-80">
                   {t("cgv")}
-                </Link>
+                </ObfuscatedLink>
               </li>
               <li>
-                <Link href="/cgu" className="hover:opacity-80" title={t("cgu")}>
-                  {t("cgu")}
-                </Link>
+                <ObfuscatedLink href="/cgu">{t("cgu")}</ObfuscatedLink>
               </li>
               <li>{t("touts-droits-reserves-and-copy-fm4all")}</li>
             </ul>
@@ -117,45 +104,33 @@ const Footer = async ({ locale }: FooterProps) => {
               })}
             </ul>
           </div>
-          {/* <div className="flex flex-col gap-2 w-52">
+          <div className="flex flex-col gap-2 w-52">
             <p className="text-secondary text-xl">
-              <Link
-                href="/secteurs"
-                className="hover:opacity-80"
-                title={t("secteurs")}
-              >
-                {t("secteurs")}
-              </Link>
+              <ObfuscatedLink href="/secteurs">{t("secteurs")}</ObfuscatedLink>
             </p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
               {secteurs.map((secteur) => {
                 const secteurUrl = secteur.slug?.current ?? "";
                 return (
                   <li key={secteur._id}>
-                    <Link
+                    <ObfuscatedLink
                       href={{
                         pathname: "/secteurs/[slug]",
                         params: { slug: secteurUrl },
                       }}
-                      className="hover:opacity-80"
-                      title={secteur.titre || secteurUrl}
                     >
                       {secteur.titre}
-                    </Link>
+                    </ObfuscatedLink>
                   </li>
                 );
               })}
             </ul>
-          </div> */}
-          {/* <div className="flex flex-col gap-2 w-52">
+          </div>
+          <div className="flex flex-col gap-2 w-52">
             <p className="text-secondary text-xl">
-              <Link
-                href="/blog"
-                className="hover:opacity-80"
-                title={t("derniers-articles")}
-              >
+              <ObfuscatedLink href="/blog">
                 {t("derniers-articles")}
-              </Link>
+              </ObfuscatedLink>
             </p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
               {articles.map((article) => {
@@ -164,37 +139,29 @@ const Footer = async ({ locale }: FooterProps) => {
                 const articleSubSlug = article.subSlug?.current ?? "";
                 return (
                   <li key={article._id}>
-                    <Link
+                    <ObfuscatedLink
                       href={{
                         pathname: "/blog/[slug]/[subSlug]",
                         params: { slug: articleSlug, subSlug: articleSubSlug },
                       }}
-                      className="hover:opacity-80"
-                      title={
-                        article.linkText || article.titre || articleSubSlug
-                      }
                     >
                       {article.titre}
-                    </Link>
+                    </ObfuscatedLink>
                   </li>
                 );
               })}
             </ul>
-          </div> */}
-          {/* <div className="flex flex-col gap-2 w-52">
+          </div>
+          <div className="flex flex-col gap-2 w-52">
             <p className="text-secondary text-xl">{t("prestataires")}</p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
               <li>
-                <Link
-                  href="/prestataire"
-                  className="hover:opacity-80"
-                  title={t("devenir-prestataire")}
-                >
+                <ObfuscatedLink href="/prestataire">
                   {t("devenir-prestataire")}
-                </Link>
+                </ObfuscatedLink>
               </li>
             </ul>
-          </div> */}
+          </div>
         </div>
       </div>
     </footer>

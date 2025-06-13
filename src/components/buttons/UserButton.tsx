@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/hooks/use-toast";
-import { Link, useRouter } from "@/i18n/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { authClient, useSession } from "@/lib/auth-client";
 import { User } from "better-auth";
 import { UserCheck, UserX } from "lucide-react";
@@ -16,6 +16,7 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 
 import { Dispatch, SetStateAction } from "react";
+import { ObfuscatedLink } from "../links/ObfuscatedLink";
 
 type UserButtonProps = {
   setIsMobileNavOpen?: Dispatch<SetStateAction<boolean>>;
@@ -86,38 +87,37 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
             }
           >
             {user?.role === "admin" ? (
-              <Link
+              <ObfuscatedLink
                 href={{
                   pathname: "/admin/[adminId]/dashboard",
                   params: { adminId: user.id },
                 }}
                 className="cursor-default !text-base"
-                title={t("mon-espace")}
               >
                 {t("mon-espace")}
-              </Link>
+              </ObfuscatedLink>
             ) : user?.role === "client" ? (
-              <Link
+              <ObfuscatedLink
                 href={{
                   pathname: "/client/[clientId]/dashboard",
-                  params: { clientId: user.clientId ?? 0 },
+                  params: { clientId: user.clientId?.toString() ?? "0" },
                 }}
                 className="cursor-default !text-base"
-                title={t("mon-espace")}
               >
                 {t("mon-espace")}
-              </Link>
+              </ObfuscatedLink>
             ) : (
-              <Link
+              <ObfuscatedLink
                 href={{
                   pathname: "/fournisseur/[fournisseurId]/dashboard",
-                  params: { fournisseurId: user.fournisseurId ?? 0 },
+                  params: {
+                    fournisseurId: user.fournisseurId?.toString() ?? "0",
+                  },
                 }}
                 className="cursor-default !text-base"
-                title={t("mon-espace")}
               >
                 {t("mon-espace")}
-              </Link>
+              </ObfuscatedLink>
             )}
           </DropdownMenuItem>
         )}
@@ -132,13 +132,12 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
               {t("deconnexion")}
             </p>
           ) : (
-            <Link
+            <ObfuscatedLink
               href="/auth/signin"
               className="cursor-default !text-base"
-              title={t("connexion")}
             >
               {t("connexion")}
-            </Link>
+            </ObfuscatedLink>
           )}
         </DropdownMenuItem>
       </DropdownMenuContent>

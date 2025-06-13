@@ -1,6 +1,5 @@
 import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
 import DevisButton from "@/components/buttons/devis-button";
-import ImgCardVertical from "@/components/cards/ImgCardVertical";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,14 +8,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
 import {
@@ -25,11 +16,7 @@ import {
 } from "@/i18n/servicesSlugMappings";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { urlFor } from "@/sanity/lib/image";
-import {
-  fetchServiceSlugs,
-  getAssociatedToService,
-  getService,
-} from "@/sanity/queries";
+import { fetchServiceSlugs, getService } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
 import { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -41,7 +28,7 @@ import {
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Slug } from "sanity";
-import { ArticleCategory } from "../../../../../../sanity.types";
+import FAQService from "./FAQService";
 
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
@@ -73,7 +60,7 @@ const ptComponents = {
         return null;
       }
       return (
-        <div className="relative w-full  h-[200px] md:h-[400px] my-6 mx-auto">
+        <div className="relative w-full h-[200px] md:h-[400px] my-6 mx-auto">
           <Image
             quality={100}
             src={urlFor(value).url()}
@@ -165,11 +152,11 @@ export default async function page({
     slug: Slug;
   }[];
 
-  const associated = await getAssociatedToService(
-    locale as LocaleType,
-    tagsSortants.map((tag) => tag._id),
-    service._id
-  );
+  // const associated = await getAssociatedToService(
+  //   locale as LocaleType,
+  //   tagsSortants.map((tag) => tag._id),
+  //   service._id
+  // );
 
   const serviceImageUrl = service.imagePrincipale
     ? urlFor(service.imagePrincipale)
@@ -268,12 +255,14 @@ export default async function page({
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>{service.titre}</BreadcrumbPage>
+            <BreadcrumbPage>{service.titreCard}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <h1 className="text-4xl md:text-5xl mb-10">{service.titre}</h1>
-      <section className="flex flex-row gap-10 mb-16">
+      <h1 className="text-4xl md:text-5xl mb-10 text-center">
+        {service.titre}
+      </h1>
+      <section className="flex flex-row gap-10 mb-16 bg-[rgb(250,250,250)] rounded-xl p-14">
         <div className="flex flex-col flex-1 justify-start text-lg gap-8">
           {/* <div className="flex flex-row gap-2 flex-wrap">
             {tagsSortants.map((tag) => (
@@ -281,14 +270,14 @@ export default async function page({
             ))}
           </div> */}
           <div
-            className="flex flex-col gap-4 prose-lg
+            className="flex flex-col gap-6 prose-lg
           prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
           prose-h3:font-bold prose-h3:text-xl
-          prose-p:text-pretty prose-p:hyphens-auto prose-p:m-0
+          prose-p:text-lg prose-p:text-pretty prose-p:hyphens-auto prose-p:m-0
           prose-li:list-disc prose-li:m-0
           prose-a:underline"
           >
-            <p className="font-bold">{service.description}</p>
+            {/* <p className="font-bold">{service.description}</p> */}
             {Array.isArray(service.tltr) && (
               <PortableText value={service.tltr} />
             )}
@@ -314,7 +303,7 @@ export default async function page({
           </div>
         ) : null}
       </section>
-      {(associated.articles || associated.services || associated.secteurs) && (
+      {/* {(associated.articles || associated.services || associated.secteurs) && (
         <section className="flex flex-row gap-10 mb-16">
           <div className="w-full">
             <h2 className="border-l-2 px-4 text-4xl mb-10">
@@ -330,11 +319,6 @@ export default async function page({
               }
             >
               <TabsList className="my-20 md:my-10 bg-transparent flex flex-col items-start md:flex-row md:items-center">
-                {/* {[...(services || []), ...(sousServices || [])].length > 0 ? (
-          <TabsTrigger value="services" className="text-lg">
-            {t("services-associes")}
-          </TabsTrigger>
-        ) : null} */}
                 {[...(associated.services || [])].length > 0 ? (
                   <TabsTrigger
                     value="services"
@@ -364,11 +348,11 @@ export default async function page({
                   className="w-full"
                 >
                   <CarouselContent className="py-1">
-                    {/* {[...(services || []), ...(sousServices || [])] */}
+                    
                     {[...(associated.services || [])].map((service) => {
                       const serviceImageUrl = service.imagePrincipale
                         ? urlFor(service.imagePrincipale)
-                        : null; //TODO placeholder image
+                        : null; 
                       const serviceImageAlt =
                         service.imagePrincipale?.alt ??
                         tGlobal("illustration-du-service");
@@ -415,7 +399,7 @@ export default async function page({
                     {[...(associated.secteurs || [])].map((secteur) => {
                       const secteurImageUrl = secteur.imagePrincipale
                         ? urlFor(secteur.imagePrincipale)
-                        : null; //TODO placeholder image
+                        : null; 
                       const secteurImageAlt =
                         secteur.imagePrincipale?.alt ??
                         tGlobal("illustration-du-secteur");
@@ -506,7 +490,7 @@ export default async function page({
             </Tabs>
           </div>
         </section>
-      )}
+      )} */}
       <section className="flex flex-row gap-10 mb-16">
         {serviceImageBloc1Url ? (
           <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
@@ -523,9 +507,10 @@ export default async function page({
         <div
           className="flex-1 prose-lg
         prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
-        prose-h3:font-bold prose-h3:text-xl
+        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
         prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
-        prose-p:text-pretty prose-p:hyphens-auto
+        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
+        prose-ul:max-w-prose prose-ul:mx-auto
         prose-li:list-disc prose-li:m-0
         prose-a:underline
         "
@@ -539,8 +524,10 @@ export default async function page({
         <div
           className="flex-1 prose-lg
         prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
-        prose-h3:font-bold prose-h3:text-xl
-        prose-p:text-pretty prose-p:hyphens-auto
+        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
+        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
+        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
+        prose-ul:max-w-prose prose-ul:mx-auto
         prose-li:list-disc prose-li:m-0
         prose-a:underline
         "
@@ -580,13 +567,14 @@ export default async function page({
           ) : null}
           <div
             className="flex-1 prose-lg
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
-          prose-h3:font-bold prose-h3:text-xl
-          prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
-          prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-disc prose-li:m-0
-          prose-a:underline
-          "
+        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
+        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
+        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
+        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
+        prose-ul:max-w-prose prose-ul:mx-auto
+        prose-li:list-disc prose-li:m-0
+        prose-a:underline
+        "
           >
             <PortableText value={service.bloc3} components={ptComponents} />
           </div>
@@ -598,12 +586,14 @@ export default async function page({
         <section className="flex flex-row gap-10 mb-16">
           <div
             className="flex-1 prose-lg
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
-          prose-h3:font-bold prose-h3:text-xl
-          prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-disc prose-li:m-0
-          prose-a:underline
-          "
+        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
+        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
+        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
+        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
+        prose-ul:max-w-prose prose-ul:mx-auto
+        prose-li:list-disc prose-li:m-0
+        prose-a:underline
+        "
           >
             <PortableText value={service.bloc4} components={ptComponents} />
           </div>
@@ -639,13 +629,14 @@ export default async function page({
           ) : null}
           <div
             className="flex-1 prose-lg
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
-          prose-h3:font-bold prose-h3:text-xl
-          prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
-          prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-disc prose-li:m-0
-          prose-a:underline
-          "
+        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
+        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
+        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
+        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
+        prose-ul:max-w-prose prose-ul:mx-auto
+        prose-li:list-disc prose-li:m-0
+        prose-a:underline
+        "
           >
             <PortableText value={service.bloc5} components={ptComponents} />
           </div>
@@ -656,12 +647,14 @@ export default async function page({
         <section className="flex flex-row gap-10 mb-16">
           <div
             className="flex-1 prose-lg
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
-          prose-h3:font-bold prose-h3:text-xl
-          prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-disc prose-li:m-0
-          prose-a:underline
-          "
+        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
+        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
+        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
+        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
+        prose-ul:max-w-prose prose-ul:mx-auto
+        prose-li:list-disc prose-li:m-0
+        prose-a:underline
+        "
           >
             <PortableText value={service.bloc6} components={ptComponents} />
           </div>
@@ -696,13 +689,14 @@ export default async function page({
           ) : null}
           <div
             className="flex-1 prose-lg
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
-          prose-h3:font-bold prose-h3:text-xl
-          prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
-          prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-disc prose-li:m-0
-          prose-a:underline
-          "
+        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
+        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
+        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
+        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
+        prose-ul:max-w-prose prose-ul:mx-auto
+        prose-li:list-disc prose-li:m-0
+        prose-a:underline
+        "
           >
             <PortableText value={service.bloc7} components={ptComponents} />
           </div>
@@ -713,12 +707,14 @@ export default async function page({
         <section className="flex flex-row gap-10 mb-16">
           <div
             className="flex-1 prose-lg
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
-          prose-h3:font-bold prose-h3:text-xl
-          prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-disc prose-li:m-0
-          prose-a:underline
-          "
+        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
+        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
+        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
+        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
+        prose-ul:max-w-prose prose-ul:mx-auto
+        prose-li:list-disc prose-li:m-0
+        prose-a:underline
+        "
           >
             <PortableText value={service.bloc8} components={ptComponents} />
           </div>
@@ -753,13 +749,14 @@ export default async function page({
           ) : null}
           <div
             className="flex-1 prose-lg
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
-          prose-h3:font-bold prose-h3:text-xl
-          prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
-          prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-disc prose-li:m-0
-          prose-a:underline
-          "
+        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
+        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
+        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
+        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
+        prose-ul:max-w-prose prose-ul:mx-auto
+        prose-li:list-disc prose-li:m-0
+        prose-a:underline
+        "
           >
             <PortableText value={service.bloc9} components={ptComponents} />
           </div>
@@ -770,12 +767,14 @@ export default async function page({
         <section className="flex flex-row gap-10 mb-16">
           <div
             className="flex-1 prose-lg
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
-          prose-h3:font-bold prose-h3:text-xl
-          prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-disc prose-li:m-0
-          prose-a:underline
-          "
+        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
+        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
+        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
+        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
+        prose-ul:max-w-prose prose-ul:mx-auto
+        prose-li:list-disc prose-li:m-0
+        prose-a:underline
+        "
           >
             <PortableText value={service.bloc10} components={ptComponents} />
           </div>
@@ -793,8 +792,10 @@ export default async function page({
           ) : null}
         </section>
       )}
-
       <CTAContactButtons />
+      {service.faq && Array.isArray(service.faq) && service.faq.length > 0 && (
+        <FAQService service={service} locale={locale} />
+      )}
     </main>
   );
 }

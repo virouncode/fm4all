@@ -20,6 +20,11 @@ export const serviceType = defineType({
       options: { source: "titre" },
       validation: (rule) => rule.required(),
     }),
+    defineField({
+      title: "Titre Carte",
+      name: "titreCard",
+      type: "string",
+    }),
     //H1
     defineField({
       title: "Titre",
@@ -45,7 +50,6 @@ export const serviceType = defineType({
       title: "Description",
       name: "description",
       type: "string",
-      validation: (rule) => rule.required(),
     }),
     //<description>
     defineField({
@@ -585,6 +589,25 @@ export const serviceType = defineType({
               type: "string",
               title: "Text alternatif",
             }),
+          ],
+        },
+      ],
+    }),
+    defineField({
+      title: "Foire aux questions",
+      name: "faq",
+      type: "array",
+      of: [
+        {
+          type: "block",
+          styles: [
+            { title: "Normal", value: "normal" },
+            { title: "H2", value: "h2" },
+            { title: "H3", value: "h3" },
+            { title: "H4", value: "h4" },
+            { title: "Essentiel", value: "essentiel" },
+            { title: "Confort", value: "confort" },
+            { title: "Excellence", value: "excellence" },
           ],
         },
       ],

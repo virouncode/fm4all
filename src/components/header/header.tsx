@@ -19,6 +19,7 @@ import {
 import { useLocale } from "next-intl";
 import Image from "next/image";
 import { useState } from "react";
+import { ObfuscatedLink } from "../links/ObfuscatedLink";
 
 const Header = () => {
   const locale = useLocale();
@@ -64,7 +65,9 @@ const Header = () => {
               }`}
             >
               <HandPlatter size={15} />
-              <Link href="/services">Services</Link>
+              <Link href="/services" className="hover:opacity-80">
+                Services
+              </Link>
             </div>
             <div
               className={`flex gap-1 items-center ${
@@ -72,9 +75,9 @@ const Header = () => {
               }`}
             >
               <Factory size={15} />
-              <Link href="/secteurs">
+              <ObfuscatedLink href="/secteurs">
                 {locale === "fr" ? "Secteurs" : "Sectors"}
-              </Link>
+              </ObfuscatedLink>
             </div>
             <div
               className={`flex gap-1 items-center ${
@@ -82,7 +85,9 @@ const Header = () => {
               }`}
             >
               <Star size={15} />
-              <Link href="/gammes">{locale === "fr" ? "Gammes" : "Tiers"}</Link>
+              <ObfuscatedLink href="/gammes">
+                {locale === "fr" ? "Gammes" : "Tiers"}
+              </ObfuscatedLink>
             </div>
             <div
               className={`flex gap-1 items-center ${
@@ -90,9 +95,9 @@ const Header = () => {
               }`}
             >
               <ScrollText size={15} />
-              <Link href="/engagements">
+              <ObfuscatedLink href="/engagements">
                 {locale == "fr" ? "Engagements" : "Commitments"}
-              </Link>
+              </ObfuscatedLink>
             </div>
             <div
               className={`flex gap-1 items-center ${
@@ -100,9 +105,9 @@ const Header = () => {
               }`}
             >
               <Handshake size={15} />
-              <Link href="/partenaires">
+              <ObfuscatedLink href="/partenaires">
                 {locale === "fr" ? "Partenaires" : "Partners"}
-              </Link>
+              </ObfuscatedLink>
             </div>
           </nav>
         </div>
@@ -124,9 +129,9 @@ const Header = () => {
             asChild
             onClick={() => setIsMobileNavOpen(false)}
           >
-            <Link href="/prestataire">
+            <ObfuscatedLink href="/prestataire">
               {locale === "fr" ? "Devenir prestataire" : "Become a provider"}
-            </Link>
+            </ObfuscatedLink>
           </Button>
           <LocaleButton className="hidden md:flex" />
           <ContactButton

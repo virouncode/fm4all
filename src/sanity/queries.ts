@@ -17,7 +17,7 @@ import { client } from "./lib/client";
 //================================================================================================//
 
 //TOUS LES SERVICES PAR LANGUE
-export const ALL_SERVICES_QUERY = `*[_type == "service" && language == $language]|order(date asc){ _id, titre, description, slug, linkText, imagePrincipale }`;
+export const ALL_SERVICES_QUERY = `*[_type == "service" && language == $language]|order(date asc){ _id, titre, description, slug, linkText, titreCard, imagePrincipale }`;
 export const getAllServices = async (locale: LocaleType) => {
   return await client.fetch<Service[]>(ALL_SERVICES_QUERY, {
     language: locale,

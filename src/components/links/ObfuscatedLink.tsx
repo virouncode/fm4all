@@ -1,52 +1,60 @@
 "use client";
 
-import { Link } from "@/i18n/navigation";
-import { PathnamesType } from "@/i18n/routing";
-import { PropsWithChildren, useEffect, useState } from "react";
+import { useRouter } from "@/i18n/navigation";
 
 type ObfuscatedLinkProps = {
   href:
-    | PathnamesType
-    | {
-        pathname: "/services/[slug]";
-        params: { slug: string };
-      }
-    | {
-        pathname: "/secteurs/[slug]";
-        params: { slug: string };
-      }
+    | "/"
+    | "/secteurs"
+    | { pathname: "/secteurs/[slug]"; params: { slug: string } }
+    | "/blog"
+    | { pathname: "/blog/[slug]"; params: { slug: string } }
     | {
         pathname: "/blog/[slug]/[subSlug]";
         params: { slug: string; subSlug: string };
-      };
-  title: string;
+      }
+    | "/gammes"
+    | "/engagements"
+    | "/partenaires"
+    | "/faq"
+    | "/prestataire"
+    | "/contact"
+    | "/mentions"
+    | "/confidentialite"
+    | "/cookies"
+    | "/cgv"
+    | "/cgu"
+    | { pathname: "/admin/[adminId]/dashboard"; params: { adminId: string } }
+    | { pathname: "/client/[clientId]/dashboard"; params: { clientId: string } }
+    | {
+        pathname: "/fournisseur/[fournisseurId]/dashboard";
+        params: { fournisseurId: string };
+      }
+    | "/auth/signin";
+  children: React.ReactNode;
   className?: string;
 };
 
 export function ObfuscatedLink({
   href,
-  title,
-  className,
   children,
-}: PropsWithChildren<ObfuscatedLinkProps>) {
-  const [realHref, setRealHref] = useState<typeof href | null>(null);
+  className,
+}: ObfuscatedLinkProps) {
+  const router = useRouter();
 
-  useEffect(() => {
-    setRealHref(href);
-  }, [href]);
-
-  if (!realHref) return <span>{children}</span>;
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    router.push(href);
+  };
 
   return (
-    <Link
-      //@ts-expect-error oui je sais
-      href={realHref}
-      rel="nofollow"
-      className={className}
-      title={title}
-      aria-label={title}
+    <span
+      onClick={handleClick}
+      className={`cursor-pointer hover:opacity-80  ${className}`}
+      title={children as string}
+      aria-label={children as string}
     >
       {children}
-    </Link>
+    </span>
   );
 }
