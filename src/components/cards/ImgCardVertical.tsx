@@ -59,7 +59,10 @@ const ImgCardVertical = ({
           aria-label={linkText}
           className="absolute inset-0 z-10"
         >
-          <span className="sr-only">{linkText}</span>
+          {/* <span className="text-xs absolute -top-5 text-white">{linkText}</span> */}
+          <span className="absolute bottom-1 px-4 text-xs opacity-0 group-hover:opacity-100 transition italic">
+            {linkText}
+          </span>
         </Link>
       ) : (
         <Link
@@ -68,7 +71,7 @@ const ImgCardVertical = ({
           aria-label={linkText}
           className="absolute inset-0 z-10"
         >
-          <span className="sr-only">{linkText}</span>
+          <span className="text-xs absolute -top-5 text-white">{linkText}</span>
         </Link>
       )}
     </div>

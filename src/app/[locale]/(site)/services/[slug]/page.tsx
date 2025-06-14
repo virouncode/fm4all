@@ -263,7 +263,7 @@ export default async function page({
         {service.titre}
       </h1>
       <section className="flex flex-row gap-10 mb-16 bg-[rgb(250,250,250)] rounded-xl p-14">
-        <div className="flex flex-col flex-1 justify-start text-lg gap-8">
+        <div className="flex flex-col flex-1 justify-center text-lg gap-8">
           {/* <div className="flex flex-row gap-2 flex-wrap">
             {tagsSortants.map((tag) => (
               <TagButton tag={tag} key={tag._id} locale={locale} />

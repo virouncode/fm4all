@@ -67,7 +67,8 @@ const FAQService = ({ service, locale }: FAQServiceProps) => {
       <h2 className="text-2xl md:text-3xl border-l-2 px-4 mb-10">
         {locale === "fr"
           ? "Questions fréquemment posées"
-          : "Frequently Asked Questions"}
+          : "Frequently Asked Questions"}{" "}
+        - {service.linkText}
       </h2>
 
       <Accordion type="single" collapsible className="w-full lg:w-1/2 px-6">

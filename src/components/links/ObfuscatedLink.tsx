@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "@/i18n/navigation";
+import { title } from "process";
 
 type ObfuscatedLinkProps = {
   href:
@@ -42,17 +43,24 @@ export function ObfuscatedLink({
 }: ObfuscatedLinkProps) {
   const router = useRouter();
 
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
+  const handleClick = () => {
+    // e.preventDefault();
     router.push(href);
   };
 
   return (
     <span
+      role="link"
+      tabIndex={0}
       onClick={handleClick}
-      className={`cursor-pointer hover:opacity-80  ${className}`}
-      title={children as string}
-      aria-label={children as string}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") handleClick();
+      }}
+      className={`cursor-pointer hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary ${className}`}
+      title={title ?? (typeof children === "string" ? children : undefined)}
+      aria-label={
+        title ?? (typeof children === "string" ? children : undefined)
+      }
     >
       {children}
     </span>
