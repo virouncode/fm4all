@@ -262,7 +262,7 @@ export default async function page({
       <h1 className="text-4xl md:text-5xl mb-10 text-center">
         {service.titre}
       </h1>
-      <section className="flex flex-row gap-10 mb-16 bg-[rgb(250,250,250)] rounded-xl p-14">
+      <section className="flex flex-row gap-10 mb-16 bg-[rgb(250,250,250)] rounded-xl p-6 sm:p-14">
         <div className="flex flex-col flex-1 justify-center text-lg gap-8">
           {/* <div className="flex flex-row gap-2 flex-wrap">
             {tagsSortants.map((tag) => (
