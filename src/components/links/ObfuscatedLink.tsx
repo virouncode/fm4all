@@ -60,7 +60,7 @@ export function ObfuscatedLink({
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") handleClick();
       }}
-      className={`cursor-pointer hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary ${className}`}
+      className={`cursor-pointer hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary ${className}`}
       title={title ?? (typeof children === "string" ? children : undefined)}
       aria-label={
         title ?? (typeof children === "string" ? children : undefined)
