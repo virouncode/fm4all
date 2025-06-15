@@ -2,6 +2,7 @@ import { Link } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
 import Image from "next/image";
 import { PropsWithChildren } from "react";
+import { ObfuscatedLink } from "../links/ObfuscatedLink";
 
 type ImgCardVerticalProps = {
   src: string;
@@ -22,6 +23,7 @@ type ImgCardVerticalProps = {
   linkText: string;
   className?: string;
   locale?: LocaleType;
+  obfuscated?: boolean;
 };
 
 const ImgCardVertical = ({
@@ -32,6 +34,7 @@ const ImgCardVertical = ({
   href,
   linkText,
   locale,
+  obfuscated = false,
 }: PropsWithChildren<ImgCardVerticalProps>) => {
   return (
     <div
@@ -51,7 +54,14 @@ const ImgCardVertical = ({
       {children}
 
       {/* Lien invisible en overlay */}
-      {locale ? (
+      {obfuscated ? (
+        <ObfuscatedLink
+          className="absolute inset-0 z-10 px-4 text-xs opacity-0 group-hover:opacity-100 transition italic"
+          href={href}
+        >
+          {linkText}
+        </ObfuscatedLink>
+      ) : locale ? (
         <Link
           href={href}
           locale={locale}

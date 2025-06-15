@@ -52,8 +52,9 @@ const ArticlesCarousel = async () => {
                   params: { slug: articleSlug, subSlug: articleSubSlug },
                 }}
                 linkText={article.linkText ?? articleSubSlug}
+                obfuscated={true}
               >
-                <div className="p-4 flex flex-col gap-4 h-56">
+                <div className="p-4 flex flex-col gap-4 h-60">
                   <p className="text-2xl">{article.titre}</p>
                   <p className="w-full overflow-hidden line-clamp-5">
                     {article.description}

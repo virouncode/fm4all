@@ -27,16 +27,15 @@ const Footer = async ({ locale }: FooterProps) => {
       <div className="max-w-7xl mx-auto p-6">
         <div className="flex flex-wrap gap-6">
           <div className="flex flex-col gap-2 w-52">
-            <p className="text-secondary text-xl">fm4all</p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
-              <li>
+              <li className="text-xl">
                 <Link
                   href="/"
-                  className="hover:opacity-80"
+                  className="hover:opacity-80 hover:underline"
                   title={t("page-d-accueil")}
                   aria-label={t("page-d-accueil")}
                 >
-                  {t("page-d-accueil")}
+                  fm4all
                 </Link>
               </li>
               <li>
@@ -70,20 +69,22 @@ const Footer = async ({ locale }: FooterProps) => {
               <li>
                 <ObfuscatedLink href="/cgu">{t("cgu")}</ObfuscatedLink>
               </li>
-              <li>{t("touts-droits-reserves-and-copy-fm4all")}</li>
+              <li className="italic">
+                {t("touts-droits-reserves-and-copy-fm4all")}
+              </li>
             </ul>
           </div>
           <div className="flex flex-col gap-2 w-52">
-            <p className="text-secondary text-xl">
-              <Link
-                href="/services"
-                className="hover:opacity-80"
-                title={t("services")}
-              >
-                {t("services")}
-              </Link>
-            </p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
+              <li className="text-xl">
+                <Link
+                  href="/services"
+                  className="hover:opacity-80 hover:underline"
+                  title={t("services")}
+                >
+                  {t("services")}
+                </Link>
+              </li>
               {services.map((service) => {
                 const serviceUrl = service.slug?.current ?? "";
                 return (
@@ -93,7 +94,7 @@ const Footer = async ({ locale }: FooterProps) => {
                         pathname: "/services/[slug]",
                         params: { slug: serviceUrl },
                       }}
-                      className="hover:opacity-80"
+                      className="hover:opacity-80 hover:underline"
                       title={service.linkText}
                       aria-label={service.linkText}
                     >
@@ -105,10 +106,12 @@ const Footer = async ({ locale }: FooterProps) => {
             </ul>
           </div>
           <div className="flex flex-col gap-2 w-52">
-            <p className="text-secondary text-xl">
-              <ObfuscatedLink href="/secteurs">{t("secteurs")}</ObfuscatedLink>
-            </p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
+              <li className="text-secondary text-xl">
+                <ObfuscatedLink href="/secteurs">
+                  {t("secteurs")}
+                </ObfuscatedLink>
+              </li>
               {secteurs.map((secteur) => {
                 const secteurUrl = secteur.slug?.current ?? "";
                 return (
@@ -127,12 +130,12 @@ const Footer = async ({ locale }: FooterProps) => {
             </ul>
           </div>
           <div className="flex flex-col gap-2 w-52">
-            <p className="text-secondary text-xl">
-              <ObfuscatedLink href="/blog">
-                {t("derniers-articles")}
-              </ObfuscatedLink>
-            </p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
+              <li className="text-secondary text-xl">
+                <ObfuscatedLink href="/blog">
+                  {t("derniers-articles")}
+                </ObfuscatedLink>
+              </li>
               {articles.map((article) => {
                 const categorie = article.categorie as ArticleCategory;
                 const articleSlug = categorie.slug?.current ?? "";

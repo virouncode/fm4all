@@ -1,3 +1,4 @@
+import { ObfuscatedLink } from "@/components/links/ObfuscatedLink";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -6,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Link } from "@/i18n/navigation";
 import { getArticle } from "@/sanity/queries";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ArticleCategory } from "../../../../../sanity.types";
@@ -41,7 +41,7 @@ const HofManager = async () => {
               size="default"
               asChild
             >
-              <Link
+              <ObfuscatedLink
                 href={{
                   pathname: "/blog/[slug]/[subSlug]",
                   params: {
@@ -51,7 +51,7 @@ const HofManager = async () => {
                 }}
               >
                 {t("decouvrir-loffre")}
-              </Link>
+              </ObfuscatedLink>
             </Button>
           </CardContent>
         </Card>

@@ -31,7 +31,11 @@ type ObfuscatedLinkProps = {
         pathname: "/fournisseur/[fournisseurId]/dashboard";
         params: { fournisseurId: string };
       }
-    | "/auth/signin";
+    | "/auth/signin"
+    | {
+        pathname: "/services/[slug]";
+        params: { slug: string };
+      };
   children: React.ReactNode;
   className?: string;
 };
