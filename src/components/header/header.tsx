@@ -4,7 +4,6 @@ import ContactButton from "@/components/buttons/contact-button";
 import DevisButton from "@/components/buttons/devis-button";
 import LocaleButton from "@/components/buttons/locale-button";
 import UserButton from "@/components/buttons/UserButton";
-import { Button } from "@/components/ui/button";
 import { Link, usePathname } from "@/i18n/navigation";
 import {
   Factory,
@@ -65,7 +64,10 @@ const Header = () => {
               }`}
             >
               <HandPlatter size={15} />
-              <Link href="/services" className="hover:opacity-80">
+              <Link
+                href="/services"
+                className="hover:opacity-80 hover:underline"
+              >
                 Services
               </Link>
             </div>
@@ -119,7 +121,7 @@ const Header = () => {
             disabled={path.includes("/mon-devis")}
             setIsMobileNavOpen={setIsMobileNavOpen}
           />
-          <Button
+          {/* <Button
             title={
               locale === "fr" ? "Devenir prestataire" : "Become a provider"
             }
@@ -132,7 +134,7 @@ const Header = () => {
             <ObfuscatedLink href="/prestataire">
               {locale === "fr" ? "Devenir prestataire" : "Become a provider"}
             </ObfuscatedLink>
-          </Button>
+          </Button> */}
           <LocaleButton className="hidden md:flex" />
           <ContactButton
             setIsMobileNavOpen={setIsMobileNavOpen}

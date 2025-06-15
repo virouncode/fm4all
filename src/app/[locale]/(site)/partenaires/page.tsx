@@ -8,6 +8,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Link } from "@/i18n/navigation";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { HomeIcon } from "lucide-react";
@@ -230,8 +231,12 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             className="text-lg max-w-prose mx-auto
           hyphens-auto text-wrap"
           >
+            {t("vous-etes-un-prestataire-qui-partage-nos-valeurs")}{" "}
+            <Link href="/partenaires" className="underline hover:opacity-80">
+              {t("rejoignez-notre-reseau")}
+            </Link>{" "}
             {t(
-              "vous-etes-un-prestataire-qui-partage-nos-valeurs-rejoignez-notre-reseau-et-contribuez-a-transformer-la-gestion-des-services-generaux-en-une-experience-simple-efficace-et-ethique"
+              "et-contribuez-a-transformer-la-gestion-des-services-generaux-en-une-experience-simple-efficace-et-ethique"
             )}
           </p>
         </div>

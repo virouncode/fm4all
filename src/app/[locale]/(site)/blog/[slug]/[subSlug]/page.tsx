@@ -579,11 +579,12 @@ const page = async ({
           </div>
         ) : null}
         <div
-          className="flex-1 prose-lg 
-        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
-        prose-h3:font-bold prose-h3:text-xl
+          className="flex-1 prose-lg
+        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
+        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
         prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
-        prose-p:text-pretty prose-p:hyphens-auto
+        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
+        prose-ul:max-w-prose prose-ul:mx-auto
         prose-li:list-disc prose-li:m-0
         prose-a:underline
         "
@@ -595,10 +596,12 @@ const page = async ({
       </section>
       <section className="flex flex-row gap-10 mb-16">
         <div
-          className="flex-1 prose-lg 
-        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
-        prose-h3:font-bold prose-h3:text-xl
-        prose-p:text-pretty prose-p:hyphens-auto
+          className="flex-1 prose-lg
+        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
+        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
+        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
+        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
+        prose-ul:max-w-prose prose-ul:mx-auto
         prose-li:list-disc prose-li:m-0
         prose-a:underline
         "
@@ -637,14 +640,15 @@ const page = async ({
             </div>
           ) : null}
           <div
-            className="flex-1 prose-lg 
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
-          prose-h3:font-bold prose-h3:text-xl
-          prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
-          prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-disc prose-li:m-0
-          prose-a:underline
-          "
+            className="flex-1 prose-lg
+        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
+        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
+        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
+        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
+        prose-ul:max-w-prose prose-ul:mx-auto
+        prose-li:list-disc prose-li:m-0
+        prose-a:underline
+        "
           >
             <PortableText value={article.bloc3} components={ptComponents} />
           </div>
@@ -655,13 +659,15 @@ const page = async ({
       {Array.isArray(article.bloc4) && article.bloc4.length > 0 && (
         <section className="flex flex-row gap-10 mb-16">
           <div
-            className="flex-1 prose-lg 
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
-          prose-h3:font-bold prose-h3:text-xl
-          prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-disc prose-li:m-0
-          prose-a:underline
-          "
+            className="flex-1 prose-lg
+        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
+        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
+        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
+        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
+        prose-ul:max-w-prose prose-ul:mx-auto
+        prose-li:list-disc prose-li:m-0
+        prose-a:underline
+        "
           >
             <PortableText value={article.bloc4} components={ptComponents} />
           </div>
@@ -696,14 +702,15 @@ const page = async ({
             </div>
           ) : null}
           <div
-            className="flex-1 prose-lg 
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
-          prose-h3:font-bold prose-h3:text-xl
-          prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
-          prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-disc prose-li:m-0
-          prose-a:underline
-          "
+            className="flex-1 prose-lg
+        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
+        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
+        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
+        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
+        prose-ul:max-w-prose prose-ul:mx-auto
+        prose-li:list-disc prose-li:m-0
+        prose-a:underline
+        "
           >
             <PortableText value={article.bloc5} components={ptComponents} />
           </div>
@@ -713,13 +720,15 @@ const page = async ({
       {Array.isArray(article.bloc6) && article.bloc6.length > 0 && (
         <section className="flex flex-row gap-10 mb-16">
           <div
-            className="flex-1 prose-lg 
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
-          prose-h3:font-bold prose-h3:text-xl
-          prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-disc prose-li:m-0
-          prose-a:underline
-          "
+            className="flex-1 prose-lg
+        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
+        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
+        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
+        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
+        prose-ul:max-w-prose prose-ul:mx-auto
+        prose-li:list-disc prose-li:m-0
+        prose-a:underline
+        "
           >
             <PortableText value={article.bloc6} components={ptComponents} />
           </div>
@@ -753,14 +762,15 @@ const page = async ({
             </div>
           ) : null}
           <div
-            className="flex-1 prose-lg 
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
-          prose-h3:font-bold prose-h3:text-xl
-          prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
-          prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-disc prose-li:m-0
-          prose-a:underline
-          "
+            className="flex-1 prose-lg
+        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
+        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
+        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
+        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
+        prose-ul:max-w-prose prose-ul:mx-auto
+        prose-li:list-disc prose-li:m-0
+        prose-a:underline
+        "
           >
             <PortableText value={article.bloc7} components={ptComponents} />
           </div>
@@ -770,13 +780,15 @@ const page = async ({
       {Array.isArray(article.bloc8) && article.bloc8.length > 0 && (
         <section className="flex flex-row gap-10 mb-16">
           <div
-            className="flex-1 prose-lg 
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
-          prose-h3:font-bold prose-h3:text-xl
-          prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-disc prose-li:m-0
-          prose-a:underline
-          "
+            className="flex-1 prose-lg
+        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
+        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
+        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
+        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
+        prose-ul:max-w-prose prose-ul:mx-auto
+        prose-li:list-disc prose-li:m-0
+        prose-a:underline
+        "
           >
             <PortableText value={article.bloc8} components={ptComponents} />
           </div>
@@ -810,14 +822,15 @@ const page = async ({
             </div>
           ) : null}
           <div
-            className="flex-1 prose-lg 
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
-          prose-h3:font-bold prose-h3:text-xl
-          prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
-          prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-disc prose-li:m-0
-          prose-a:underline
-          "
+            className="flex-1 prose-lg
+        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
+        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
+        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
+        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
+        prose-ul:max-w-prose prose-ul:mx-auto
+        prose-li:list-disc prose-li:m-0
+        prose-a:underline
+        "
           >
             <PortableText value={article.bloc9} components={ptComponents} />
           </div>
@@ -827,13 +840,15 @@ const page = async ({
       {Array.isArray(article.bloc10) && article.bloc10.length > 0 && (
         <section className="flex flex-row gap-10 mb-16">
           <div
-            className="flex-1 prose-lg 
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
-          prose-h3:font-bold prose-h3:text-xl
-          prose-p:text-pretty prose-p:hyphens-auto
-          prose-li:list-disc prose-li:m-0
-          prose-a:underline
-          "
+            className="flex-1 prose-lg
+        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
+        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
+        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
+        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
+        prose-ul:max-w-prose prose-ul:mx-auto
+        prose-li:list-disc prose-li:m-0
+        prose-a:underline
+        "
           >
             <PortableText value={article.bloc10} components={ptComponents} />
           </div>

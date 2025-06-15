@@ -85,13 +85,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: `${APP_URL}/fr/services/${slug}`,
         lastModified: lastMod,
         changeFrequency: "weekly",
-        priority: 0.7,
+        priority: 0.9,
       },
       {
         url: `${APP_URL}/en/services/${getServicesSlugEn(slug)}`,
         lastModified: lastMod,
         changeFrequency: "weekly",
-        priority: 0.7,
+        priority: 0.9,
       },
     ];
   });
