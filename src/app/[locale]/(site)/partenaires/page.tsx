@@ -8,6 +8,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
@@ -61,9 +62,20 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <h1 className="text-4xl mt-6 mb-10">
-        {t("nos-prestataires-partenaires")}
-      </h1>
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mt-6 mb-10">
+        <h1 className="text-4xl">{t("nos-prestataires-partenaires")}</h1>
+        <Button
+          title={locale === "fr" ? "Devenir prestataire" : "Become a provider"}
+          variant="destructive"
+          className="min-[600px]:flex justify-center items-center"
+          size="lg"
+          asChild
+        >
+          <Link href="/prestataire">
+            {locale === "fr" ? "Devenir prestataire" : "Become a provider"}
+          </Link>
+        </Button>
+      </div>
       <article className="flex flex-col gap-10">
         <div className="flex flex-col gap-8">
           <p className="text-lg max-w-prose mx-auto hyphens-auto text-wrap font-bold">
