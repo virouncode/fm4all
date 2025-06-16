@@ -40,6 +40,7 @@ const Header = () => {
   const handleHideMobileNav = () => {
     setIsMobileNavOpen(false);
   };
+
   return (
     <div className="w-full sticky top-0 h-16 bg-background z-50 shadow">
       <header className="max-w-7xl h-full flex justify-between items-center p-6 mx-auto">
@@ -57,60 +58,72 @@ const Header = () => {
             </div>
           </Link>
           {/***************** Desktop navigation *****************/}
-          <nav className="hidden xl:flex items-center gap-4">
-            <div
-              className={`flex gap-1 items-center ${
-                isActive("/services") ? "text-destructive font-bold" : ""
-              }`}
-            >
-              <HandPlatter size={15} />
-              <Link
-                href="/services"
-                className="hover:opacity-80 hover:underline"
-              >
-                Services
-              </Link>
-            </div>
-            <div
-              className={`flex gap-1 items-center ${
-                isActive("/secteurs") ? "text-destructive font-bold" : ""
-              }`}
-            >
-              <Factory size={15} />
-              <ObfuscatedLink href="/secteurs">
-                {locale === "fr" ? "Secteurs" : "Sectors"}
-              </ObfuscatedLink>
-            </div>
-            <div
-              className={`flex gap-1 items-center ${
-                isActive("/gammes") ? "text-destructive font-bold" : ""
-              }`}
-            >
-              <Star size={15} />
-              <ObfuscatedLink href="/gammes">
-                {locale === "fr" ? "Gammes" : "Tiers"}
-              </ObfuscatedLink>
-            </div>
-            <div
-              className={`flex gap-1 items-center ${
-                isActive("/engagements") ? "text-destructive font-bold" : ""
-              }`}
-            >
-              <ScrollText size={15} />
-              <ObfuscatedLink href="/engagements">
-                {locale == "fr" ? "Engagements" : "Commitments"}
-              </ObfuscatedLink>
-            </div>
-            <div
-              className={`flex gap-1 items-center ${
-                isActive("/partenaires") ? "text-destructive font-bold" : ""
-              }`}
-            >
-              <Handshake size={15} />
-              <ObfuscatedLink href="/partenaires">
-                {locale === "fr" ? "Partenaires" : "Partners"}
-              </ObfuscatedLink>
-            </div>
+          <nav className="hidden lg:flex items-center gap-4">
+            <ul className="flex items-center gap-6">
+              <li>
+                <div
+                  className={`flex gap-1 items-center ${
+                    isActive("/services") ? "text-destructive font-bold" : ""
+                  }`}
+                >
+                  <HandPlatter size={15} />
+                  <Link
+                    href="/services"
+                    className="hover:opacity-80 hover:underline"
+                  >
+                    Services
+                  </Link>
+                </div>
+              </li>
+              <li>
+                <div
+                  className={`flex gap-1 items-center ${
+                    isActive("/secteurs") ? "text-destructive font-bold" : ""
+                  }`}
+                >
+                  <Factory size={15} />
+                  <ObfuscatedLink href="/secteurs">
+                    {locale === "fr" ? "Secteurs" : "Sectors"}
+                  </ObfuscatedLink>
+                </div>
+              </li>
+              <li>
+                <div
+                  className={`flex gap-1 items-center ${
+                    isActive("/gammes") ? "text-destructive font-bold" : ""
+                  }`}
+                >
+                  <Star size={15} />
+                  <ObfuscatedLink href="/gammes">
+                    {locale === "fr" ? "Gammes" : "Tiers"}
+                  </ObfuscatedLink>
+                </div>
+              </li>
+              <li>
+                <div
+                  className={`flex gap-1 items-center ${
+                    isActive("/engagements") ? "text-destructive font-bold" : ""
+                  }`}
+                >
+                  <ScrollText size={15} />
+                  <ObfuscatedLink href="/engagements">
+                    {locale == "fr" ? "Engagements" : "Commitments"}
+                  </ObfuscatedLink>
+                </div>
+              </li>
+              <li>
+                <div
+                  className={`flex gap-1 items-center ${
+                    isActive("/partenaires") ? "text-destructive font-bold" : ""
+                  }`}
+                >
+                  <Handshake size={15} />
+                  <ObfuscatedLink href="/partenaires">
+                    {locale === "fr" ? "Partenaires" : "Partners"}
+                  </ObfuscatedLink>
+                </div>
+              </li>
+            </ul>
           </nav>
         </div>
         <div className="flex items-center gap-4">
@@ -147,13 +160,13 @@ const Header = () => {
           {isMobileNavOpen ? (
             <X
               size={30}
-              className="block xl:hidden"
+              className="block lg:hidden"
               onClick={handleHideMobileNav}
             />
           ) : (
             <Menu
               size={30}
-              className="block xl:hidden"
+              className="block lg:hidden"
               onClick={handleShowMobileNav}
             />
           )}

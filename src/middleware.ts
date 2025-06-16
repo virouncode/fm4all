@@ -59,7 +59,9 @@ export async function middleware(req: NextRequest) {
   if (goneUrls.includes(fullUrl) || goneUrls.includes(pathname)) {
     return new NextResponse(null, { status: 410 });
   }
-  if (pathname.match(/\/(fr|en)\/tag\/\[tag\]$/)) {
+  if (pathname.match(/^\/(fr|en)\/tag\b/)) {
+    console.log("ok");
+
     return new NextResponse(null, { status: 410 });
   }
   if (legacyRedirects[pathname]) {
