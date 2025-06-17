@@ -52,6 +52,7 @@ type DevisButtonProps = {
   className?: string;
   disabled?: boolean;
   setIsMobileNavOpen?: Dispatch<SetStateAction<boolean>>;
+  withIcon?: boolean;
 };
 
 const DevisButton = ({
@@ -60,6 +61,7 @@ const DevisButton = ({
   className,
   size = "default",
   disabled = false,
+  withIcon = true,
   setIsMobileNavOpen,
 }: DevisButtonProps) => {
   const t = useTranslations("devisButton");
@@ -240,7 +242,7 @@ const DevisButton = ({
             setIsMobileNavOpen ? () => setIsMobileNavOpen(false) : undefined
           }
         >
-          <ReceiptText className="hidden sm:inline" /> {text}
+          {withIcon && <ReceiptText className="hidden sm:inline" />} {text}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
@@ -276,7 +278,7 @@ const DevisButton = ({
         onClick={handleClickNouveau}
         disabled={disabled}
       >
-        <ReceiptText className="hidden sm:inline" /> {text}
+        {withIcon && <ReceiptText className="hidden sm:inline" />} {text}
       </Button>
     </div>
   );
