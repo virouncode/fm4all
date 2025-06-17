@@ -18,6 +18,7 @@ import {
   Star,
 } from "lucide-react";
 
+import { ObfuscatedLink } from "@/components/links/ObfuscatedLink";
 import {
   Accordion,
   AccordionContent,
@@ -25,7 +26,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Link, usePathname } from "@/i18n/navigation";
-import { ObfuscatedLink } from "../links/ObfuscatedLink";
 
 type HeaderNavigationMenuProps = {
   locale: LocaleType;
@@ -62,6 +62,7 @@ const HeaderNavigationMenu = ({
     if (href === "/") return path === "/";
     return path.includes(href);
   };
+
   return orientation === "horizontal" ? (
     //DESKTOP
     <NavigationMenu>
@@ -77,10 +78,7 @@ const HeaderNavigationMenu = ({
           </NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid w-[400px]">
-              <li
-                className="hover:bg-accent px-4 py-2"
-                onClick={handleHideMobileNav}
-              >
+              <li className="hover:bg-accent px-4 py-2">
                 <NavigationMenuLink asChild className="w-full relative">
                   <Link
                     href={"/services"}
@@ -138,44 +136,24 @@ const HeaderNavigationMenu = ({
           </NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid w-[400px]">
-              <li
-                className="hover:bg-accent px-4 py-2"
-                onClick={handleHideMobileNav}
-              >
+              <li className="hover:bg-accent px-4 py-2">
                 <NavigationMenuLink asChild className="w-full relative">
-                  <Link
+                  <ObfuscatedLink
                     href={"/secteurs"}
-                    title={
-                      locale === "fr" ? "Tous nos secteurs" : "All our sectors"
-                    }
-                    aria-label={
-                      locale === "fr" ? "Tous nos secteurs" : "All our sectors"
-                    }
                     className="w-full flex items-center gap-4 hover:underline"
-                    locale={locale}
                   >
                     <Factory size={20} />
-                    <span>
-                      {locale === "fr"
-                        ? "Tous nos secteurs"
-                        : "All our sectors"}
-                    </span>
-                  </Link>
+                    {locale === "fr" ? "Tous nos secteurs" : "All our sectors"}
+                  </ObfuscatedLink>
                 </NavigationMenuLink>
               </li>
               {secteurs.map((secteur) => {
                 return (
-                  <li
-                    key={secteur.title}
-                    className="px-4 py-2 hover:bg-accent"
-                    onClick={handleHideMobileNav}
-                  >
+                  <li key={secteur.title} className="px-4 py-2 hover:bg-accent">
                     <NavigationMenuLink asChild>
                       <ObfuscatedLink
                         //@ts-expect-error ok - href is a complex object
                         href={secteur.href}
-                        title={secteur.title}
-                        aria-label={secteur.title}
                         className="w-full flex items-center gap-4"
                       >
                         <secteur.icon size={20} />
@@ -339,8 +317,6 @@ const HeaderNavigationMenu = ({
                     <ObfuscatedLink
                       //@ts-expect-error ok - href is a complex object
                       href={secteur.href}
-                      title={secteur.title}
-                      aria-label={secteur.title}
                       className="w-full flex items-center gap-4 hover:underline !text-lg"
                     >
                       <secteur.icon size={20} />

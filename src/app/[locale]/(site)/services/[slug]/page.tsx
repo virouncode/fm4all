@@ -27,7 +27,6 @@ import {
 } from "next-sanity";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Slug } from "sanity";
 import FAQService from "./FAQService";
 
 // Custom components for PortableText
@@ -146,11 +145,11 @@ export default async function page({
     console.log("Service not found");
     notFound();
   }
-  const tagsSortants = service.tagsSortants as {
-    _id: string;
-    nom: string;
-    slug: Slug;
-  }[];
+  // const tagsSortants = service.tagsSortants as {
+  //   _id: string;
+  //   nom: string;
+  //   slug: Slug;
+  // }[];
 
   // const associated = await getAssociatedToService(
   //   locale as LocaleType,
