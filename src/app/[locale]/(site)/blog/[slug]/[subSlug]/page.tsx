@@ -1,6 +1,5 @@
 import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
 import DevisButton from "@/components/buttons/devis-button";
-import ImgCardVertical from "@/components/cards/ImgCardVertical";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,14 +8,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   getArticlesSlugEn,
   getArticlesSlugFr,
@@ -371,7 +362,7 @@ const page = async ({
           </div>
         ) : null}
       </section>
-      {(associated.secteurs || associated.services || associated.articles) && (
+      {/* {(associated.secteurs || associated.services || associated.articles) && (
         <section className="flex flex-row gap-10 mb-16">
           <div className="w-full">
             <h2 className="border-l-2 px-4 text-4xl mb-10">
@@ -387,11 +378,6 @@ const page = async ({
               }
             >
               <TabsList className="my-20 md:my-10 bg-transparent flex flex-col items-start md:flex-row md:items-center">
-                {/* {[...(services || []), ...(sousServices || [])].length > 0 ? (
-          <TabsTrigger value="services" className="text-lg">
-            {t("services-associes")}
-          </TabsTrigger>
-        ) : null} */}
                 {[...(associated.services || [])].length > 0 ? (
                   <TabsTrigger
                     value="services"
@@ -421,7 +407,7 @@ const page = async ({
                   className="w-full"
                 >
                   <CarouselContent className="py-1">
-                    {/* {[...(services || []), ...(sousServices || [])] */}
+                    
                     {[...(associated.services || [])].map((service) => {
                       const serviceImageUrl = service.imagePrincipale
                         ? urlFor(service.imagePrincipale)
@@ -563,7 +549,7 @@ const page = async ({
             </Tabs>
           </div>
         </section>
-      )}
+      )} */}
 
       <section className="flex flex-row gap-10 mb-16">
         {articleImageBloc1Url ? (

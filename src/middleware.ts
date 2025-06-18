@@ -20,11 +20,6 @@ import {
   servicesSlugMappingsFrToEn,
 } from "./i18n/servicesSlugMappings";
 import {
-  getTagSlugEn,
-  getTagSlugFr,
-  tagsSlugMappingsFrToEn,
-} from "./i18n/tagsSlugMappings";
-import {
   getLocaleFromPathname,
   getPathnameWithoutLocale,
 } from "./lib/metadata/metadata-helpers";
@@ -53,7 +48,11 @@ export async function middleware(req: NextRequest) {
   if (goneUrls.includes(fullUrl) || goneUrls.includes(pathname)) {
     return new NextResponse(null, { status: 410 });
   }
-  if (pathname.match(/^\/(fr|en)\/tag\b/)) {
+  if (
+    pathname.match(/^\/(fr|en)\/tag\b/) ||
+    pathname.includes("[") ||
+    pathname.includes("]")
+  ) {
     return new NextResponse(null, { status: 410 });
   }
   if (legacyRedirects[pathname]) {
@@ -83,8 +82,8 @@ export async function middleware(req: NextRequest) {
     const secteurRedirect = handleSecteurRedirects(req, pathSegments, locale);
     if (secteurRedirect) return secteurRedirect;
     //TAGS
-    const tagRedirect = handleTagRedirects(req, pathSegments, locale);
-    if (tagRedirect) return tagRedirect;
+    // const tagRedirect = handleTagRedirects(req, pathSegments, locale);
+    // if (tagRedirect) return tagRedirect;
     //SINON, on continue avec le middleware intl
     return intlMiddleware(req);
   }
@@ -374,40 +373,40 @@ function handleSecteurRedirects(
   return null;
 }
 
-function isEnglishTagSlug(slug: string): boolean {
-  // Utiliser votre mapping de slugs pour vérifier
-  // Retourne true si c'est un slug anglais, false sinon
-  const frenchSlugs = Object.keys(tagsSlugMappingsFrToEn);
-  const englishSlugs = Object.values(tagsSlugMappingsFrToEn);
-  return englishSlugs.includes(slug) && !frenchSlugs.includes(slug);
-}
+// function isEnglishTagSlug(slug: string): boolean {
+//   // Utiliser votre mapping de slugs pour vérifier
+//   // Retourne true si c'est un slug anglais, false sinon
+//   const frenchSlugs = Object.keys(tagsSlugMappingsFrToEn);
+//   const englishSlugs = Object.values(tagsSlugMappingsFrToEn);
+//   return englishSlugs.includes(slug) && !frenchSlugs.includes(slug);
+// }
 
-function handleTagRedirects(
-  req: NextRequest,
-  pathSegments: string[],
-  locale: string
-): NextResponse | null {
-  if (pathSegments[0] !== "tag" || pathSegments.length < 2) {
-    return null; // Pas un secteur, on ne fait rien
-  }
+// function handleTagRedirects(
+//   req: NextRequest,
+//   pathSegments: string[],
+//   locale: string
+// ): NextResponse | null {
+//   if (pathSegments[0] !== "tag" || pathSegments.length < 2) {
+//     return null; // Pas un secteur, on ne fait rien
+//   }
 
-  const slug = pathSegments[1];
-  const basePath = "/tag/";
+//   const slug = pathSegments[1];
+//   const basePath = "/tag/";
 
-  // Vérifier si le slug principal est correct pour la locale
-  const isCorrectSlug =
-    locale === "fr" ? !isEnglishTagSlug(slug) : isEnglishTagSlug(slug);
+//   // Vérifier si le slug principal est correct pour la locale
+//   const isCorrectSlug =
+//     locale === "fr" ? !isEnglishTagSlug(slug) : isEnglishTagSlug(slug);
 
-  // Si le slug principal est incorrect, rediriger
-  if (!isCorrectSlug) {
-    const correctSlug =
-      locale === "fr" ? getTagSlugFr(slug) : getTagSlugEn(slug);
-    const newPath = `/${locale}${basePath}${correctSlug}`; // Sinon, rediriger juste avec le slug principal corrigé
-    return NextResponse.redirect(new URL(newPath, req.url), 301);
-  }
-  // Tout est correct, on ne fait pas de redirection
-  return null;
-}
+//   // Si le slug principal est incorrect, rediriger
+//   if (!isCorrectSlug) {
+//     const correctSlug =
+//       locale === "fr" ? getTagSlugFr(slug) : getTagSlugEn(slug);
+//     const newPath = `/${locale}${basePath}${correctSlug}`; // Sinon, rediriger juste avec le slug principal corrigé
+//     return NextResponse.redirect(new URL(newPath, req.url), 301);
+//   }
+//   // Tout est correct, on ne fait pas de redirection
+//   return null;
+// }
 
 export const legacyRedirects: Record<string, string> = {
   // URLs sans préfixe de locale
