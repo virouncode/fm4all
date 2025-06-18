@@ -421,7 +421,7 @@ export const legacyRedirects: Record<string, string> = {
   "/articles/histoire-nettoyage":
     "/fr/articles/nettoyage/histoire-du-nettoyage-des-bureaux", // à adapter
   "/articles/devenir-prestataire": "/fr/devenir-prestataire",
-  "/services/office-manager": "/fr/services/outsource-office-management",
+  "/services/office-manager": "/fr/services/office-manager-externalise",
   "/articles/le-fm-cest-quoi":
     "/fr/articles/pilotage-facility-management/le-fm-c-est-quoi",
   "/sectors": "/en/sectors",
