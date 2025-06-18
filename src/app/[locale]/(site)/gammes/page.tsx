@@ -68,6 +68,14 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
               {t(
                 "afin-de-simplifier-vos-choix-nous-avons-decline-l-ensemble-des-services-en"
               )}{" "}
+              <Link
+                href={"/services"}
+                className="underline hover:opacity-80"
+                title="fm4all services"
+                aria-label="fm4all services"
+              >
+                services
+              </Link>{" "}
               <strong>{t("3-gammes")}</strong> :
             </p>
             <div className="flex flex-wrap gap-10 justify-center text-2xl mb-10">

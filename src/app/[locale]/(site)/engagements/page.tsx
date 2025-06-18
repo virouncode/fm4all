@@ -8,6 +8,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Link } from "@/i18n/navigation";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { HomeIcon } from "lucide-react";
@@ -69,8 +70,17 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           </p>
           <WhyCards className="my-10" />
           <p className="text-lg max-w-prose mx-auto hyphens-auto text-wrap">
+            {t("chez-fm4all-nous-avons-concu-nos")}{" "}
+            <Link
+              href="/services"
+              title="fm4all services"
+              aria-label="fm4all-services"
+              className="underline hover:opacity-80"
+            >
+              services
+            </Link>{" "}
             {t(
-              "chez-fm4all-nous-avons-concu-nos-services-pour-repondre-aux-besoins-essentiels-de-vos-activites-avec-une-approche-basee-sur-cinq-piliers-fondamentaux-simplicite-rapidite-fiabilite-serenite-et-optimisation-des-couts-ces-engagements-sont-au-coeur-de-notre-mission-vous-offrir-une-gestion-sans-effort-et-des-prestations-a-la-hauteur-de-vos-attentes"
+              "pour-repondre-aux-besoins-essentiels-de-vos-activites-avec-une-approche-basee-sur-cinq-piliers-fondamentaux-simplicite-rapidite-fiabilite-serenite-et-optimisation-des-couts-ces-engagements-sont-au-coeur-de-notre-mission-vous-offrir-une-gestion-sans-effort-et-des-prestations-a-la-hauteur-de-vos-attentes"
             )}
           </p>
         </div>

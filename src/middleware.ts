@@ -447,6 +447,8 @@ export const legacyRedirects: Record<string, string> = {
     "/fr/articles/pilotage-facility-management/le-facility-management-fait-il-faire-des-economies",
   "/en/services/water-dispenser": "/en/services/water-dispensers",
   "/fr/services/machines-a-cafe": "/fr/services/machines-a-cafe-en-entreprise",
+  "/fr/services/livraison-snacks-entreprise":
+    "/fr/services/livraison-fruits-entreprise",
 };
 
 export const goneUrls: string[] = [

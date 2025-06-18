@@ -347,8 +347,8 @@
   },
   "GammesPage": {
     "nos-3-gammes": "Our 3 tiers",
-    "afin-de-simplifier-vos-choix-nous-avons-decline-l-ensemble-des-services-en": "To simplify your choices, we've divided all our services into",
-    "3-gammes": "3 tiers",
+    "afin-de-simplifier-vos-choix-nous-avons-decline-l-ensemble-des-services-en": "To simplify your choices, we've divided all our",
+    "3-gammes": "into 3 tiers",
     "gamme-essentiel": "Essential Tier",
     "vous-recherchez-des-services-efficaces-et-optimises-qui-couvrent-lessentiel-sans-superflu-cette-gamme-est-faite-pour-vous-elle-vous-garantit-le-respect-des-reglementations-et-vous-apporte-les-prestations-indispensables-pour-assurer-le-bon-fonctionnement-de-votre-site-simplicite-et-efficacite-sont-au-rendez-vous": "Looking for efficient and streamlined services that cover the essentials without any unnecessary extras? The Essential tier is for you. It guarantees regulatory compliance and provides all the basic services needed to ensure the smooth operation of your site. Simplicity and efficiency are at the core of this tier.",
     "gamme-confort": "Comfort Tier",
@@ -369,7 +369,8 @@
   "EngagementsPage": {
     "nos-engagements": "Our Commitments",
     "chez-fm4all-nous-avons-a-coeur-de-batir-des-relations-de-confiance-et-de-fournir-des-services-dexcellence-nos-engagements-refletent-notre-volonte-de-placer-vos-besoins-vos-attentes-et-vos-valeurs-au-centre-de-nos-priorites": "At fm4all, we are committed to building trusted relationships and delivering exceptional services. Our commitments reflect our dedication to putting your needs, expectations, and values at the heart of our priorities.",
-    "chez-fm4all-nous-avons-concu-nos-services-pour-repondre-aux-besoins-essentiels-de-vos-activites-avec-une-approche-basee-sur-cinq-piliers-fondamentaux-simplicite-rapidite-fiabilite-serenite-et-optimisation-des-couts-ces-engagements-sont-au-coeur-de-notre-mission-vous-offrir-une-gestion-sans-effort-et-des-prestations-a-la-hauteur-de-vos-attentes": "We have designed our services to meet the essential needs of your business with an approach based on five core pillars: Simplicity, Speed, Reliability, Peace of Mind, and Cost Optimization. These commitments are at the heart of our mission: to provide you with effortless management and services that meet your expectations.",
+    "chez-fm4all-nous-avons-concu-nos": "We have designed our",
+    "pour-repondre-aux-besoins-essentiels-de-vos-activites-avec-une-approche-basee-sur-cinq-piliers-fondamentaux-simplicite-rapidite-fiabilite-serenite-et-optimisation-des-couts-ces-engagements-sont-au-coeur-de-notre-mission-vous-offrir-une-gestion-sans-effort-et-des-prestations-a-la-hauteur-de-vos-attentes": "to meet the essential needs of your business with an approach based on five core pillars: Simplicity, Speed, Reliability, Peace of Mind, and Cost Optimization. These commitments are at the heart of our mission: to provide you with effortless management and services that meet your expectations.",
     "simplicite": "Simplicity",
     "nous-vous-simplifions-la-vie-en-prenant-en-charge-tous-les-aspects-lies-a-vos-services-generaux": "We simplify your life by taking care of all aspects related to your business services:",
     "gestion-centralisee-une-plateforme-unique-pour-gerer-vos-contrats-vos-factures-et-vos-reclamations": "Centralized Management: A single platform to manage your contracts, invoices, and claims",

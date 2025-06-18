@@ -187,3 +187,7 @@ body {
   left: 0;
   color: currentColor;
 }
+
+a:hover {
+  opacity: 0.8;
+}
