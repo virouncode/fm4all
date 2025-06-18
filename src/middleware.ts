@@ -449,6 +449,7 @@ export const legacyRedirects: Record<string, string> = {
   "/fr/services/machines-a-cafe": "/fr/services/machines-a-cafe-en-entreprise",
   "/fr/services/livraison-snacks-entreprise":
     "/fr/services/livraison-fruits-entreprise",
+  "/fr/services/hygiene-sanitaire": "/fr/services/nettoyage",
 };
 
 export const goneUrls: string[] = [
