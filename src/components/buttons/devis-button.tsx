@@ -236,7 +236,7 @@ const DevisButton = ({
           variant="destructive"
           size={size}
           title={text}
-          className={`text-base shadow-md hover:shadow-lg ${className}`}
+          className={`text-base shadow-md hover:shadow-lg ring-inset ring-2 ring-fm4alldestructive hover:scale-[101%] transition-transform ${className}`}
           disabled={disabled}
           onClick={
             setIsMobileNavOpen ? () => setIsMobileNavOpen(false) : undefined
@@ -274,7 +274,7 @@ const DevisButton = ({
         variant="destructive"
         size={size}
         title={title}
-        className={`text-base shadow-md hover:shadow-lg ${className}`}
+        className={`text-base shadow-md hover:shadow-lg ring-inset ring-2 ring-fm4alldestructive hover:scale-[101%] ${className}`}
         onClick={handleClickNouveau}
         disabled={disabled}
       >

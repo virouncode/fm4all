@@ -73,7 +73,7 @@ const Hero = async () => {
                 title={tGlobal("je-realise-mon-devis-en-ligne")}
                 text={tGlobal("je-realise-mon-devis-en-ligne")}
                 size="lg"
-                className="bg-fm4alldestructive hover:bg-fm4alldestructive/90 text-white border-none shadow-lg hover:shadow-xl"
+                className="bg-fm4alldestructive hover:bg-fm4alldestructive/90 text-white border-none shadow-lg hover:shadow-xl ring-white"
               />
             </div>
             <div className="md:hidden">
