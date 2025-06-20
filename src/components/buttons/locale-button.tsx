@@ -7,22 +7,22 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { usePathname, useRouter } from "@/i18n/navigation";
+import { LocaleType, routing } from "@/i18n/routing";
 import {
   getArticlesSlugEn,
   getArticlesSlugFr,
   getArticlesSubSlugEn,
   getArticlesSubSlugFr,
-} from "@/i18n/articlesSlugMappings";
-import { usePathname, useRouter } from "@/i18n/navigation";
-import { LocaleType, routing } from "@/i18n/routing";
+} from "@/redirects/articlesSlugMappings";
 import {
   getSecteurSlugEn,
   getSecteurSlugFr,
-} from "@/i18n/secteursSlugMappings";
+} from "@/redirects/secteursSlugMappings";
 import {
   getServicesSlugEn,
   getServicesSlugFr,
-} from "@/i18n/servicesSlugMappings";
+} from "@/redirects/servicesSlugMappings";
 import { useLocale } from "next-intl";
 import { useParams, useSearchParams } from "next/navigation";
 

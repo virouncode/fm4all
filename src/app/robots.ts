@@ -1,10 +1,10 @@
+import { routing } from "@/i18n/routing";
 import {
   getArticlesSlugEn,
   getArticlesSubSlugEn,
-} from "@/i18n/articlesSlugMappings";
-import { routing } from "@/i18n/routing";
-import { getSecteurSlugEn } from "@/i18n/secteursSlugMappings";
-import { getServicesSlugEn } from "@/i18n/servicesSlugMappings";
+} from "@/redirects/articlesSlugMappings";
+import { getSecteurSlugEn } from "@/redirects/secteursSlugMappings";
+import { getServicesSlugEn } from "@/redirects/servicesSlugMappings";
 import {
   fetchArticleCategories,
   fetchArticleSlugs,

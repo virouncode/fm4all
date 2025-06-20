@@ -10,11 +10,11 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Link } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
+import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import {
   getSecteurSlugEn,
   getSecteurSlugFr,
-} from "@/i18n/secteursSlugMappings";
-import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+} from "@/redirects/secteursSlugMappings";
 import { urlFor } from "@/sanity/lib/image";
 import {
   fetchSecteursSlugs,

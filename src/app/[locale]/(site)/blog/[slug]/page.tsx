@@ -6,13 +6,13 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import {
-  getArticlesSlugEn,
-  getArticlesSlugFr,
-} from "@/i18n/articlesSlugMappings";
 import { Link } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import {
+  getArticlesSlugEn,
+  getArticlesSlugFr,
+} from "@/redirects/articlesSlugMappings";
 import { urlFor } from "@/sanity/lib/image";
 import {
   fetchArticleCategories,

@@ -8,6 +8,12 @@ import { openAPI } from "better-auth/plugins";
 import { sendEmailFromServer } from "./email/sendEmail";
 
 export const auth = betterAuth({
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60, // par exemple
+    },
+  },
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {
@@ -88,5 +94,5 @@ export const auth = betterAuth({
       });
     },
   },
-  plugins: [nextCookies(), inferAdditionalFields<typeof user>(), openAPI()], //api/auth/reference
+  plugins: [inferAdditionalFields<typeof user>(), openAPI(), nextCookies()], //api/auth/reference
 } satisfies BetterAuthOptions);
