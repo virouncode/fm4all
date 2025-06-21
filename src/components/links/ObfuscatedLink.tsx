@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "@/i18n/navigation";
-import { title } from "process";
 
 type ObfuscatedLinkProps = {
   href:
@@ -61,10 +60,8 @@ export function ObfuscatedLink({
         if (e.key === "Enter" || e.key === " ") handleClick();
       }}
       className={`cursor-pointer hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary ${className}`}
-      title={title ?? (typeof children === "string" ? children : undefined)}
-      aria-label={
-        title ?? (typeof children === "string" ? children : undefined)
-      }
+      title={typeof children === "string" ? children : undefined}
+      aria-label={typeof children === "string" ? children : undefined}
     >
       {children}
     </span>

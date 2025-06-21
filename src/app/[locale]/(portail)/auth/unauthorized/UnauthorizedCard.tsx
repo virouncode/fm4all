@@ -1,5 +1,4 @@
 "use client";
-
 import {
   Card,
   CardContent,
@@ -7,29 +6,72 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Link } from "@/i18n/navigation";
+import { toast } from "@/hooks/use-toast";
+import { useRouter } from "@/i18n/navigation";
+import { authClient } from "@/lib/auth-client";
+import { useLocale, useTranslations } from "next-intl";
 
 type UnauthorizedCardProps = {
   type: string | null;
 };
 
 const UnauthorizedCard = ({ type }: UnauthorizedCardProps) => {
+  const locale = useLocale();
+  const t = useTranslations("auth");
+  const router = useRouter();
+  const {
+    data: session, //refetch the session
+  } = authClient.useSession();
+
+  const handleSignOut = async () => {
+    console.log("session", session);
+    if (!session) router.push("/auth/signin");
+    else {
+      try {
+        await authClient.signOut({
+          fetchOptions: {
+            onSuccess: () => {
+              router.push("/auth/signin");
+              toast({
+                title: t("deconnexion-reussie"),
+                description: t("vous-avez-ete-deconnecte-avec-succes"),
+                variant: "default",
+              });
+            },
+          },
+        });
+      } catch (err) {
+        console.error("Erreur lors de la deconnexion:", err);
+      }
+    }
+  };
   return (
     <Card className="max-w-md z-20">
       <CardHeader>
         <CardTitle className="text-lg md:text-xl text-red-600">
-          Page non autorisée !
+          {locale === "fr" ? "Page non autorisée !" : "Unauthorized Page!"}
         </CardTitle>
         <CardDescription className="text-base">
-          Vous n&apos;avez pas les droits d&apos;accès à cette page . Veuillez
-          vous connecter avec le bon compte <strong>{type ?? ""}</strong>.
+          {locale === "fr" ? (
+            <span>
+              Vous n&apos;avez pas les droits d&apos;accès à cette page .
+              Veuillez vous connecter avec le bon compte{" "}
+              <strong>{type ?? ""}</strong>
+            </span>
+          ) : (
+            <span>
+              You do not have access rights to this page. Please sign in with
+              the correct <strong>{type ?? ""}</strong> account
+            </span>
+          )}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="text-center">
-          <Link href="/auth/signin" className="underline">
-            Me connecter
-          </Link>
+        <p
+          className="text-center underline cursor-pointer"
+          onClick={handleSignOut}
+        >
+          {locale === "fr" ? "Me connecter" : "Sign in"}
         </p>
       </CardContent>
     </Card>

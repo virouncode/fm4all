@@ -49,7 +49,6 @@ export default function SignIn() {
         setLoading(true);
       },
       onError: (ctx) => {
-        console.log("ctx", ctx);
         if (ctx.error.status === 403) {
           toast({
             title: t("adresse-email-non-verifiee"),
@@ -69,6 +68,7 @@ export default function SignIn() {
             ),
           variant: "destructive",
         });
+        setLoading(false);
       },
       onSuccess: async () => {
         router.push("/auth/redirect");
@@ -80,7 +80,6 @@ export default function SignIn() {
         });
       },
     });
-    setLoading(false);
   };
 
   return (
