@@ -88,7 +88,6 @@ const Why = () => {
           </div>
         </div>
       </div>
-
       <div className="flex flex-col  text-lg gap-10">
         <p>
           <strong>{t("la-solution")}</strong>{" "}

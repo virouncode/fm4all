@@ -1,9 +1,47 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Handshake, Scale, ScrollText } from "lucide-react";
 import { useTranslations } from "next-intl";
+import ConceptCard from "./ConceptCard";
 
 const Concept = () => {
   const t = useTranslations("HomePage.concept");
+  const conceptCardsData = [
+    {
+      icon: Scale,
+      title: t("un-comparateur"),
+      description: (
+        <>
+          {t("pour-chaque-service")}{" "}
+          <strong>
+            {t("comparez-les-offres-de-nos-prestataires-partenaires")}
+          </strong>{" "}
+          {t("et-trouvez-la-formule-qui-vous-convient-le-mieux")}
+        </>
+      ),
+    },
+    {
+      icon: ScrollText,
+      title: t("un-generateur-de-devis"),
+      description: (
+        <>
+          {t("obtenez-un")} <strong>{t("devis-clair-et-detaille")}</strong>{" "}
+          {t("en-quelques-clics-sans-attendre-un-hypothetique-appel")}
+        </>
+      ),
+    },
+    {
+      icon: Handshake,
+      title: t("un-accompagnement"),
+      description: (
+        <>
+          {t(
+            "cahier-des-charges-contrats-factures-planification-nous-gerons-tout-cela-pour-vous"
+          )}{" "}
+          <strong>{t("1-contact-1-contrat-1-facture")}</strong>{" "}
+          {t("pour-tous-vos-services")}
+        </>
+      ),
+    },
+  ];
   return (
     <section id="presentation">
       <div className="bg-gradient-to-r from-[#f0c674]/100 to-[#f0c674]/70">
@@ -12,53 +50,14 @@ const Concept = () => {
             {t("notre-concept")}
           </h2>
           <div className="flex flex-col lg:flex-row justify-center gap-8 lg:px-14">
-            <Card className="w-full lg:w-1/3 p-4">
-              <CardHeader>
-                <CardTitle className="flex flex-col items-center justify-center gap-4">
-                  <Scale size={40} />
-                  <p className="text-2xl text-center">{t("un-comparateur")}</p>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-center">
-                {t("pour-chaque-service")}{" "}
-                <strong>
-                  {t("comparez-les-offres-de-nos-prestataires-partenaires")}
-                </strong>{" "}
-                {t("et-trouvez-la-formule-qui-vous-convient-le-mieux")}
-              </CardContent>
-            </Card>
-            <Card className="w-full lg:w-1/3 p-4">
-              <CardHeader>
-                <CardTitle className="flex flex-col items-center justify-center gap-4">
-                  <ScrollText size={40} />
-                  <p className="text-2xl text-center">
-                    {t("un-generateur-de-devis")}
-                  </p>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-center">
-                {t("obtenez-un")}{" "}
-                <strong>{t("devis-clair-et-detaille")}</strong>{" "}
-                {t("en-quelques-clics-sans-attendre-un-hypothetique-appel")}
-              </CardContent>
-            </Card>
-            <Card className="w-full lg:w-1/3 p-4">
-              <CardHeader>
-                <CardTitle className="flex flex-col items-center justify-center gap-4">
-                  <Handshake size={40} />
-                  <p className="text-2xl text-center">
-                    {t("un-accompagnement")}
-                  </p>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-center">
-                {t(
-                  "cahier-des-charges-contrats-factures-planification-nous-gerons-tout-cela-pour-vous"
-                )}{" "}
-                <strong>{t("1-contact-1-contrat-1-facture")}</strong>{" "}
-                {t("pour-tous-vos-services")}
-              </CardContent>
-            </Card>
+            {conceptCardsData.map(({ icon, title, description }) => (
+              <ConceptCard
+                key={title}
+                icon={icon}
+                title={title}
+                description={description}
+              />
+            ))}
           </div>
         </div>
       </div>

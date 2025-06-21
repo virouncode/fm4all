@@ -13,7 +13,6 @@ import { getLocale, getTranslations } from "next-intl/server";
 
 const ServicesCarousel = async () => {
   const t = await getTranslations("Global");
-  // const options = { next: { revalidate: 30 } };
   const locale = await getLocale();
   const services = await getAllServices(locale as LocaleType);
   return (
