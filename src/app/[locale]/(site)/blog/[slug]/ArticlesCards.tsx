@@ -26,10 +26,10 @@ const ArticlesCards = async ({
         const articleImageAlt = article.imagePrincipale?.alt
           ? article.imagePrincipale.alt
           : t("illustration-de-l-article");
-        const articleSlug = categorie.slug?.current ?? "";
-        const articleSubSlug = article.subSlug?.current ?? "";
+        const articleSlug = categorie.slug?.current;
+        const articleSubSlug = article.subSlug?.current;
 
-        return articleImageUrl ? (
+        return articleImageUrl && articleSlug && articleSubSlug ? (
           <ImgCardVertical
             key={article._id}
             src={articleImageUrl.width(500).height(500).url()}

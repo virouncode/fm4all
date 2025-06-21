@@ -30,8 +30,8 @@ const ServicesCarousel = async () => {
             : null; //TODO placeholder image
           const serviceImageAlt =
             service.imagePrincipale?.alt ?? t("illustration du service");
-          const serviceUrl = service.slug?.current ?? "";
-          return serviceImageUrl ? (
+          const serviceSlug = service.slug?.current;
+          return serviceImageUrl && serviceSlug ? (
             <CarouselItem
               className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
               key={service._id}
@@ -41,10 +41,10 @@ const ServicesCarousel = async () => {
                 alt={serviceImageAlt}
                 href={{
                   pathname: `/services/[slug]`,
-                  params: { slug: serviceUrl },
+                  params: { slug: serviceSlug },
                 }}
                 locale={locale as LocaleType}
-                linkText={service.linkText ?? serviceUrl}
+                linkText={service.linkText ?? serviceSlug}
               >
                 <div className="p-4 flex flex-col gap-4 h-52">
                   <p className="text-2xl">{service.titreCard}</p>

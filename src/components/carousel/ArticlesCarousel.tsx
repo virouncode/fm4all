@@ -12,7 +12,13 @@ import { getLastArticles } from "@/sanity/queries";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ArticleCategory } from "../../../sanity.types";
 
-const ArticlesCarousel = async () => {
+type ArticlesCarouselProps = {
+  obfuscated?: boolean;
+};
+
+const ArticlesCarousel = async ({
+  obfuscated = false,
+}: ArticlesCarouselProps) => {
   const t = await getTranslations("Global");
   // const options = { next: { revalidate: 30 } };
   const locale = await getLocale();
@@ -37,9 +43,9 @@ const ArticlesCarousel = async () => {
             article.imagePrincipale?.alt ?? t("illustration-de-l-article");
 
           const categorie = article.categorie as ArticleCategory;
-          const articleSlug = categorie.slug?.current ?? "";
-          const articleSubSlug = article.subSlug?.current ?? "";
-          return articleImageUrl ? (
+          const articleSlug = categorie.slug?.current;
+          const articleSubSlug = article.subSlug?.current;
+          return articleImageUrl && articleSlug && articleSubSlug ? (
             <CarouselItem
               className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
               key={article._id}
@@ -52,6 +58,7 @@ const ArticlesCarousel = async () => {
                   params: { slug: articleSlug, subSlug: articleSubSlug },
                 }}
                 linkText={article.linkText ?? articleSubSlug}
+                obfuscated={obfuscated}
               >
                 <div className="p-4 flex flex-col gap-4 h-60">
                   <p className="text-2xl">{article.titre}</p>

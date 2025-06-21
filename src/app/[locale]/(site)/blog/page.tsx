@@ -78,20 +78,22 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             {t("par-categorie")}
           </h2>
           <div className="flex flex-col gap-14">
-            {categories.map((categorie) => (
-              <div key={categorie._id} className="flex flex-col gap-10">
-                <Link
-                  href={{
-                    pathname: "/blog/[slug]",
-                    params: { slug: categorie.slug?.current ?? "" },
-                  }}
-                  className="text-xl md:text-2xl underline hover:opacity-80"
-                >
-                  {categorie.titre}
-                </Link>
-                <ArticlesCategorieCarousel categorie={categorie} />
-              </div>
-            ))}
+            {categories.map((categorie) =>
+              categorie.slug?.current ? (
+                <div key={categorie._id} className="flex flex-col gap-10">
+                  <Link
+                    href={{
+                      pathname: "/blog/[slug]",
+                      params: { slug: categorie.slug?.current },
+                    }}
+                    className="text-xl md:text-2xl underline hover:opacity-80"
+                  >
+                    {categorie.titre}
+                  </Link>
+                  <ArticlesCategorieCarousel categorie={categorie} />
+                </div>
+              ) : null
+            )}
           </div>
         </div>
       </section>

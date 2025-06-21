@@ -71,15 +71,14 @@ const page = async ({
   const t = await getTranslations("BlogPage");
   const tGlobal = await getTranslations({ locale, namespace: "Global" });
   const categorie = await getCategorie(slug);
-  const articles = await getArticlesOfCategorie(
-    locale as LocaleType,
-    categorie.slug?.current ?? ""
-  );
-
   if (!categorie) {
     console.log("Categorie non trouvée");
     notFound();
   }
+  const articles = await getArticlesOfCategorie(
+    locale as LocaleType,
+    categorie.slug?.current ?? ""
+  );
 
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20 hyphens-auto">

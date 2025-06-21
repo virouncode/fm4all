@@ -20,7 +20,6 @@ const ArticlesCategorieCarousel = async ({
   categorie,
 }: ArticlesCategorieCarouselProps) => {
   const t = await getTranslations("Global");
-  // const options = { next: { revalidate: 30 } };
   const locale = await getLocale();
   const articles = await getArticlesOfCategorie(
     locale as LocaleType,
@@ -41,9 +40,9 @@ const ArticlesCategorieCarousel = async ({
             : null; //TODO placeholder image
           const articleImageAlt =
             article.imagePrincipale?.alt ?? t("illustration-de-l-article");
-          const articleSlug = categorie.slug?.current ?? "";
-          const articleSubSlug = article.subSlug?.current ?? "";
-          return articleImageUrl ? (
+          const articleSlug = categorie.slug?.current;
+          const articleSubSlug = article.subSlug?.current;
+          return articleImageUrl && articleSlug && articleSubSlug ? (
             <CarouselItem
               className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
               key={article._id}
