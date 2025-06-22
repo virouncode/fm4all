@@ -1,16 +1,8 @@
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import CookiesTable from "./CookiesTable";
 
 export const generateMetadata = async ({
   params,
@@ -36,6 +28,229 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("CookiesPage");
+
+  const cookiesRows = [
+    {
+      nom: "_ga",
+      fournisseur: t("google-analytics"),
+      finalite: t("utilise-pour-distinguer-les-utilisateurs"),
+      duree: t("2-ans"),
+      type: t("suivi-analytique"),
+    },
+    {
+      nom: "_ga_GPWGXZXVW0",
+      fournisseur: t("google-analytics"),
+      finalite: t(
+        "identifie-de-maniere-unique-un-visiteur-sur-plusieurs-sessions"
+      ),
+      duree: t("2-ans"),
+      type: t("suivi-analytique"),
+    },
+    {
+      nom: "__Secure-better-auth.session_data",
+      fournisseur: t("librairie-better-auth"),
+      finalite: t(
+        "gestion-securisee-de-la-session-utilisateur-apres-authentification"
+      ),
+      duree: t("session"),
+      type: t("cookie-strictement-necessaire"),
+    },
+    {
+      nom: "__Secure-better-auth.session_token",
+      fournisseur: t("librairie-better-auth"),
+      finalite: t(
+        "assure-lidentification-securisee-de-lutilisateur-pendant-la-session"
+      ),
+      duree: t("session"),
+      type: t("cookie-strictement-necessaire"),
+    },
+    {
+      nom: "NEXT LOCALE",
+      fournisseur: t("librairie-next-intl"),
+      finalite: t("memorise-la-langue-preferee-de-lutilisateur"),
+      duree: t("indeterminee"),
+      type: t("personnalisation-de-lexperience-utilisateur"),
+    },
+    {
+      nom: "ADS_VISITOR_ID",
+      fournisseur: t("youtube-google"),
+      finalite: t(
+        "identifie-un-utilisateur-unique-pour-le-suivi-des-publicites-et-du-remarketing"
+      ),
+      duree: t("13-mois"),
+      type: t("suivi-publicitaire-et-analytique"),
+    },
+    {
+      nom: "AEC",
+      fournisseur: t("youtube-google"),
+      finalite: t(
+        "assure-que-les-requetes-des-utilisateurs-ne-sont-pas-falsifiees"
+      ),
+      duree: t("6-mois"),
+      type: t("securite"),
+    },
+    {
+      nom: "APISID",
+      fournisseur: t("youtube-google"),
+      finalite: t(
+        "stockage-des-preferences-et-informations-de-session-de-l-utilisateur"
+      ),
+      duree: t("2-ans"),
+      type: t("suivi-et-personnalisation"),
+    },
+    {
+      nom: "HSID",
+      fournisseur: t("youtube-google"),
+      finalite: t(
+        "stockage-des-informations-de-session-liees-a-l-authentification-et-la-securisation-des-comptes-google"
+      ),
+      duree: t("2-ans"),
+      type: t("securite-et-authentification"),
+    },
+    {
+      nom: "NID",
+      fournisseur: t("youtube-google"),
+      finalite: t(
+        "personnaliser-les-annonces-qui-sont-affichees-sur-google-et-ses-partenaires"
+      ),
+      duree: t("6-mois"),
+      type: t("suivi-publicitaire-et-personnalisation"),
+    },
+    {
+      nom: "OTZ",
+      fournisseur: t("youtube-google"),
+      finalite: t("optimiser-la-diffusion-des-publicites"),
+      duree: t("28-jours"),
+      type: t("suivi-publicitaire-et-personnalisation"),
+    },
+    {
+      nom: "SAPISID",
+      fournisseur: t("youtube-google"),
+      finalite: t(
+        "authentifier-un-utilisateur-lorsque-ce-dernier-est-connecte-a-son-compte-google"
+      ),
+      duree: t("2-ans"),
+      type: t("securite-et-authentification"),
+    },
+    {
+      nom: "SEARCH_SAMESITE",
+      fournisseur: t("youtube-google"),
+      finalite: t(
+        "proteger-les-utilisateurs-contre-certains-types-d-attaques-en-particulier-les-attaques-de-falsification-de-requetes-inter-sites"
+      ),
+      duree: t("quelques-h"),
+      type: t("securite-et-gestion-de-session"),
+    },
+    {
+      nom: "SID",
+      fournisseur: t("youtube-google"),
+      finalite: t(
+        "maintenir-l-authentification-active-lorsque-l-utilisateur-navigue-sur-des-services-comme-gmail-google-drive-youtube"
+      ),
+      duree: t("2-ans"),
+      type: t("securite-et-gestion-de-session"),
+    },
+    {
+      nom: "SIDCC",
+      fournisseur: t("youtube-google"),
+      finalite: t(
+        "renforcer-la-securite-de-la-session-de-l-utilisateur-connecte-a-son-compte-google"
+      ),
+      duree: t("3-mois"),
+      type: t("securite-et-personnalisation"),
+    },
+    {
+      nom: "SSID",
+      fournisseur: t("youtube-google"),
+      finalite: t(
+        "maintenir-la-session-d-un-utilisateur-qui-est-connecte-a-son-compte-google-en-garantissant-qu-il-ne-soit-pas-oblige-de-se-reconnecter-a-chaque-page"
+      ),
+      duree: t("2-ans"),
+      type: t("securite-et-gestion-de-session"),
+    },
+    {
+      nom: "__Secure-1PAPISID",
+      fournisseur: t("youtube-google"),
+      finalite: t(
+        "assurer-la-securite-des-sessions-utilisateurs-particulierement-dans-le-cadre-des-services-de-publicite-google"
+      ),
+      duree: t("2-ans"),
+      type: t("securite-et-personnalisation"),
+    },
+    {
+      nom: "__Secure-1PSID",
+      fournisseur: t("youtube-google"),
+      finalite: t(
+        "maintenir-et-securiser-la-session-des-utilisateurs-lorsqu-ils-sont-connectes-a-leurs-comptes-google"
+      ),
+      duree: t("2-ans"),
+      type: t("securite-et-personnalisation"),
+    },
+    {
+      nom: "__Secure-1PSIDCC",
+      fournisseur: t("youtube-google"),
+      finalite: t(
+        "empecher-les-utilisateurs-d-etre-deconnectes-lorsqu-ils-naviguent-entre-les-pages-des-services-google"
+      ),
+      duree: t("2-ans"),
+      type: t("securite-et-personnalisation"),
+    },
+    {
+      nom: "__Secure-1PSIDTS",
+      fournisseur: t("youtube-google"),
+      finalite: t(
+        "empecher-les-utilisateurs-d-etre-deconnectes-lorsqu-ils-naviguent-entre-les-pages-des-services-google"
+      ),
+      duree: t("2-ans"),
+      type: t("securite-et-personnalisation"),
+    },
+    {
+      nom: "__Secure-3PAPISID",
+      fournisseur: t("youtube-google"),
+      finalite: t(
+        "assurer-la-securite-des-sessions-utilisateurs-particulierement-lorsqu-ils-interagissent-avec-les-services-google"
+      ),
+      duree: t("2-ans"),
+      type: t("securite-et-personnalisation"),
+    },
+    {
+      nom: "__Secure-3PSID",
+      fournisseur: t("youtube-google"),
+      finalite: t(
+        "assurer-la-securite-des-sessions-utilisateurs-particulierement-lorsqu-ils-interagissent-avec-les-services-google"
+      ),
+      duree: t("2-ans"),
+      type: t("securite-et-personnalisation"),
+    },
+    {
+      nom: "__Secure-3PSIDCC",
+      fournisseur: t("youtube-google"),
+      finalite: t(
+        "assurer-la-securite-des-sessions-utilisateurs-particulierement-lorsqu-ils-interagissent-avec-les-services-google"
+      ),
+      duree: t("2-ans"),
+      type: t("securite-et-personnalisation"),
+    },
+    {
+      nom: "__Secure-3PSIDTS",
+      fournisseur: t("youtube-google"),
+      finalite: t(
+        "assurer-la-securite-des-sessions-utilisateurs-particulierement-lorsqu-ils-interagissent-avec-les-services-google"
+      ),
+      duree: t("2-ans"),
+      type: t("securite-et-personnalisation"),
+    },
+    {
+      nom: "__Secure-ENID",
+      fournisseur: t("youtube-google"),
+      finalite: t(
+        "assurer-la-securite-des-sessions-utilisateurs-particulierement-lorsqu-ils-interagissent-avec-les-services-google"
+      ),
+      duree: t("2-ans"),
+      type: t("securite-et-personnalisation"),
+    },
+  ];
+
   return (
     <main className="max-w-7xl min-h-[calc(100vh-4rem)] mx-auto mb-24 py-4 px-6 md:px-20">
       <section className="mt-6 flex flex-col gap-10">
@@ -102,264 +317,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             {t("3-liste-des-cookies-utilises")}
           </h2>
-          <div className="flex flex-col w-full md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2 overflow-x-auto">
-            <Table>
-              <TableCaption>{t("list-des-cookies-utilises")}</TableCaption>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t("nom-du-cookie")}</TableHead>
-                  <TableHead>{t("nom-du-fournisseur")}</TableHead>
-                  <TableHead>{t("finalite")}</TableHead>
-                  <TableHead>{t("duree-de-conservation")}</TableHead>
-                  <TableHead>{t("type-de-cookie")}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell>_ga</TableCell>
-                  <TableCell>{t("google-analytics")}</TableCell>
-                  <TableCell>
-                    {t("utilise-pour-distinguer-les-utilisateurs")}
-                  </TableCell>
-                  <TableCell>{t("2-ans")}</TableCell>
-                  <TableCell>{t("suivi-analytique")}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>_ga_GPWGXZXVW0</TableCell>
-                  <TableCell>{t("google-analytics")}</TableCell>
-                  <TableCell>
-                    {t(
-                      "identifie-de-maniere-unique-un-visiteur-sur-plusieurs-sessions"
-                    )}
-                  </TableCell>
-                  <TableCell>{t("2-ans")}</TableCell>
-                  <TableCell>{t("suivi-analytique")}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>ADS_VISITOR_ID</TableCell>
-                  <TableCell>{t("youtube-google")}</TableCell>
-                  <TableCell>
-                    {t(
-                      "identifie-un-utilisateur-unique-pour-le-suivi-des-publicites-et-du-remarketing"
-                    )}
-                  </TableCell>
-                  <TableCell>{t("13-mois")}</TableCell>
-                  <TableCell>{t("suivi-publicitaire-et-analytique")}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>AEC</TableCell>
-                  <TableCell>{t("youtube-google")}</TableCell>
-                  <TableCell>
-                    {t(
-                      "assure-que-les-requetes-des-utilisateurs-ne-sont-pas-falsifiees"
-                    )}
-                  </TableCell>
-                  <TableCell>{t("6-mois")}</TableCell>
-                  <TableCell>{t("securite")}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>APISID</TableCell>
-                  <TableCell>{t("youtube-google")}</TableCell>
-                  <TableCell>
-                    {t(
-                      "stockage-des-preferences-et-informations-de-session-de-l-utilisateur"
-                    )}
-                  </TableCell>
-                  <TableCell>{t("2-ans")}</TableCell>
-                  <TableCell>{t("suivi-et-personnalisation")}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>HSID</TableCell>
-                  <TableCell>{t("youtube-google")}</TableCell>
-                  <TableCell>
-                    {t(
-                      "stockage-des-informations-de-session-liees-a-l-authentification-et-la-securisation-des-comptes-google"
-                    )}
-                  </TableCell>
-                  <TableCell>{t("2-ans")}</TableCell>
-                  <TableCell>{t("securite-et-authentification")}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>NID</TableCell>
-                  <TableCell>{t("youtube-google")}</TableCell>
-                  <TableCell>
-                    {t(
-                      "personnaliser-les-annonces-qui-sont-affichees-sur-google-et-ses-partenaires"
-                    )}
-                  </TableCell>
-                  <TableCell>{t("6-mois")}</TableCell>
-                  <TableCell>
-                    {t("suivi-publicitaire-et-personnalisation")}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>OTZ</TableCell>
-                  <TableCell>{t("youtube-google")}</TableCell>
-                  <TableCell>
-                    {t("optimiser-la-diffusion-des-publicites")}
-                  </TableCell>
-                  <TableCell>{t("28-jours")}</TableCell>
-                  <TableCell>
-                    {t("suivi-publicitaire-et-personnalisation")}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>SAPISID</TableCell>
-                  <TableCell>{t("youtube-google")}</TableCell>
-                  <TableCell>
-                    {t(
-                      "authentifier-un-utilisateur-lorsque-ce-dernier-est-connecte-a-son-compte-google"
-                    )}
-                  </TableCell>
-                  <TableCell>{t("2-ans")}</TableCell>
-                  <TableCell>{t("securite-et-authentification")}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>SEARCH_SAMESITE</TableCell>
-                  <TableCell>{t("youtube-google")}</TableCell>
-                  <TableCell>
-                    {t(
-                      "proteger-les-utilisateurs-contre-certains-types-d-attaques-en-particulier-les-attaques-de-falsification-de-requetes-inter-sites"
-                    )}
-                  </TableCell>
-                  <TableCell>{t("quelques-h")}</TableCell>
-                  <TableCell>{t("securite-et-gestion-de-session")}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>SID</TableCell>
-                  <TableCell>{t("youtube-google")}</TableCell>
-                  <TableCell>
-                    {t(
-                      "maintenir-l-authentification-active-lorsque-l-utilisateur-navigue-sur-des-services-comme-gmail-google-drive-youtube"
-                    )}
-                  </TableCell>
-                  <TableCell>{t("2-ans")}</TableCell>
-                  <TableCell>{t("securite-et-gestion-de-session")}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>SIDCC</TableCell>
-                  <TableCell>{t("youtube-google")}</TableCell>
-                  <TableCell>
-                    {t(
-                      "renforcer-la-securite-de-la-session-de-l-utilisateur-connecte-a-son-compte-google"
-                    )}
-                  </TableCell>
-                  <TableCell>{t("3-mois")}</TableCell>
-                  <TableCell>{t("securite-et-personnalisation")}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>SSID</TableCell>
-                  <TableCell>{t("youtube-google")}</TableCell>
-                  <TableCell>
-                    {t(
-                      "maintenir-la-session-d-un-utilisateur-qui-est-connecte-a-son-compte-google-en-garantissant-qu-il-ne-soit-pas-oblige-de-se-reconnecter-a-chaque-page"
-                    )}
-                  </TableCell>
-                  <TableCell>{t("2-ans")}</TableCell>
-                  <TableCell>{t("securite-et-gestion-de-session")}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>__Secure-1PAPISID</TableCell>
-                  <TableCell>{t("youtube-google")}</TableCell>
-                  <TableCell>
-                    {t(
-                      "assurer-la-securite-des-sessions-utilisateurs-particulierement-dans-le-cadre-des-services-de-publicite-google"
-                    )}
-                  </TableCell>
-                  <TableCell>{t("2-ans")}</TableCell>
-                  <TableCell>{t("securite-et-personnalisation")}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>__Secure-1PSID</TableCell>
-                  <TableCell>{t("youtube-google")}</TableCell>
-                  <TableCell>
-                    {t(
-                      "maintenir-et-securiser-la-session-des-utilisateurs-lorsqu-ils-sont-connectes-a-leurs-comptes-google"
-                    )}
-                  </TableCell>
-                  <TableCell>{t("2-ans")}</TableCell>
-                  <TableCell>{t("securite-et-personnalisation")}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>__Secure-1PSIDCC</TableCell>
-                  <TableCell>{t("youtube-google")}</TableCell>
-                  <TableCell>
-                    {t(
-                      "empecher-les-utilisateurs-d-etre-deconnectes-lorsqu-ils-naviguent-entre-les-pages-des-services-google"
-                    )}
-                  </TableCell>
-                  <TableCell>{t("2-ans")}</TableCell>
-                  <TableCell>{t("securite-et-personnalisation")}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>__Secure-1PSIDTS</TableCell>
-                  <TableCell>{t("youtube-google")}</TableCell>
-                  <TableCell>
-                    {t(
-                      "empecher-les-utilisateurs-d-etre-deconnectes-lorsqu-ils-naviguent-entre-les-pages-des-services-google"
-                    )}
-                  </TableCell>
-                  <TableCell>{t("2-ans")}</TableCell>
-                  <TableCell>{t("securite-et-personnalisation")}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>__Secure-3PAPISID</TableCell>
-                  <TableCell>{t("youtube-google")}</TableCell>
-                  <TableCell>
-                    {t(
-                      "assurer-la-securite-des-sessions-utilisateurs-particulierement-lorsqu-ils-interagissent-avec-les-services-google"
-                    )}
-                  </TableCell>
-                  <TableCell>{t("2-ans")}</TableCell>
-                  <TableCell>{t("securite-et-personnalisation")}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>__Secure-3PSID</TableCell>
-                  <TableCell>{t("youtube-google")}</TableCell>
-                  <TableCell>
-                    {t(
-                      "assurer-la-securite-des-sessions-utilisateurs-particulierement-lorsqu-ils-interagissent-avec-les-services-google"
-                    )}
-                  </TableCell>
-                  <TableCell>{t("2-ans")}</TableCell>
-                  <TableCell>{t("securite-et-personnalisation")}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>__Secure-3PSIDCC</TableCell>
-                  <TableCell>{t("youtube-google")}</TableCell>
-                  <TableCell>
-                    {t(
-                      "assurer-la-securite-des-sessions-utilisateurs-particulierement-lorsqu-ils-interagissent-avec-les-services-google"
-                    )}
-                  </TableCell>
-                  <TableCell>{t("2-ans")}</TableCell>
-                  <TableCell>{t("securite-et-personnalisation")}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>__Secure-3PSIDTS</TableCell>
-                  <TableCell>{t("youtube-google")}</TableCell>
-                  <TableCell>
-                    {t(
-                      "assurer-la-securite-des-sessions-utilisateurs-particulierement-lorsqu-ils-interagissent-avec-les-services-google"
-                    )}
-                  </TableCell>
-                  <TableCell>{t("2-ans")}</TableCell>
-                  <TableCell>{t("securite-et-personnalisation")}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>__Secure-ENID</TableCell>
-                  <TableCell>{t("youtube-google")}</TableCell>
-                  <TableCell>
-                    {t(
-                      "assurer-la-securite-des-sessions-utilisateurs-particulierement-lorsqu-ils-interagissent-avec-les-services-google"
-                    )}
-                  </TableCell>
-                  <TableCell>{t("2-ans")}</TableCell>
-                  <TableCell>{t("securite-et-personnalisation")}</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </div>
+          <CookiesTable cookiesRows={cookiesRows} />
         </div>
         <div className="flex flex-col gap-6">
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">

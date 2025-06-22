@@ -678,6 +678,17 @@
     "utilise-pour-distinguer-les-utilisateurs": "Utilisé pour distinguer les utilisateurs",
     "2-ans": "2 ans",
     "suivi-analytique": "Suivi Analytique",
+    "pret-a-ameliorer-votre-environnement-de-travail": "Prêt à améliorer votre environnement de travail",
+    "page-non-autorisee": "Page non autorisée !",
+    "librairie-next-intl": "Librairie next-intl",
+    "memorise-la-langue-preferee-de-lutilisateur": "Mémorise la langue préférée de l'utilisateur",
+    "indeterminee": "Indéterminée",
+    "personnalisation-de-lexperience-utilisateur": "Personnalisation de l'expérience utilisateur",
+    "librairie-better-auth": "Librairie better-auth",
+    "gestion-securisee-de-la-session-utilisateur-apres-authentification": "Gestion sécurisée de la session utilisateur après authentification",
+    "session": "Session",
+    "cookie-strictement-necessaire": "Cookie strictement nécessaire",
+    "assure-lidentification-securisee-de-lutilisateur-pendant-la-session": "Assure l'identification sécurisée de l'utilisateur pendant la session",
     "identifie-de-maniere-unique-un-visiteur-sur-plusieurs-sessions": "Identifie de manière unique un visiteur sur plusieurs sessions",
     "youtube-google": "YouTube (Google)",
     "identifie-un-utilisateur-unique-pour-le-suivi-des-publicites-et-du-remarketing": "Identifie un utilisateur unique pour le suivi des publicités et du remarketing",
@@ -1500,7 +1511,5 @@
     "nettoyage-hygiene-maintenance-securite-accueil-cafe-petit-equipement": "Nettoyage, hygiène, maintenance, sécurité, accueil, café, petit équipement...",
     "quel-que-soit-votre-secteur-nous-pilotons-pour-vous-lensemble-de-vos-contrats-de-services-generaux": "Quel que soit votre secteur, nous pilotons pour vous l’ensemble de vos contrats de services généraux.",
     "accueil": "Page d'accueil"
-  },
-  "pret-a-ameliorer-votre-environnement-de-travail": "Prêt à améliorer votre environnement de travail",
-  "page-non-autorisee": "Page non autorisée !"
+  }
 }
