@@ -244,7 +244,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           hyphens-auto text-wrap"
           >
             {t("vous-etes-un-prestataire-qui-partage-nos-valeurs")}{" "}
-            <Link href="/partenaires" className="underline hover:opacity-80">
+            <Link href="/prestataire" className="underline hover:opacity-80">
               {t("rejoignez-notre-reseau")}
             </Link>{" "}
             {t(
