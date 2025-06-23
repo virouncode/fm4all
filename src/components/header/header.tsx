@@ -42,9 +42,6 @@ const Header = () => {
   const isTablet = useMediaQuery({
     query: "(max-width: 1024px)",
   });
-  const handleShowMobileNav = () => {
-    setIsMobileNavOpen(true);
-  };
   const handleHideMobileNav = () => {
     setIsMobileNavOpen(false);
   };
@@ -361,86 +358,6 @@ const Header = () => {
               orientation="vertical"
               handleHideMobileNav={handleHideMobileNav}
             />
-
-            {/* <div className="flex flex-col gap-4">
-              <div className="flex-1 flex flex-col gap-4 ">
-                <div
-                  className={`flex gap-4 items-center ${
-                    isActive("/") ? "text-destructive font-bold" : ""
-                  }`}
-                  onClick={handleHideMobileNav}
-                >
-                  <Home size={30} />
-                  <Link href="/">{locale === "fr" ? "Accueil" : "Home"}</Link>
-                </div>
-                <div
-                  className={`flex gap-4 items-center ${
-                    isActive("/services") ? "text-destructive font-bold" : ""
-                  }`}
-                  onClick={handleHideMobileNav}
-                >
-                  <HandPlatter size={30} />
-                  <Link href="/services">Services</Link>
-                </div>
-                <div
-                  className={`flex gap-4 items-center ${
-                    isActive("/secteurs") ? "text-destructive font-bold" : ""
-                  }`}
-                  onClick={handleHideMobileNav}
-                >
-                  <Factory size={30} />
-                  <Link href="/secteurs">
-                    {locale === "fr" ? "Secteurs" : "Sectors"}
-                  </Link>
-                </div>
-                <div
-                  className={`flex gap-4 items-center ${
-                    isActive("/gammes") ? "text-destructive font-bold" : ""
-                  }`}
-                  onClick={handleHideMobileNav}
-                >
-                  <Star size={30} />
-                  <Link href="/gammes">
-                    {locale === "fr" ? "Gammes" : "Tiers"}
-                  </Link>
-                </div>
-                <div
-                  className={`flex gap-4 items-center ${
-                    isActive("/engagements") ? "text-destructive font-bold" : ""
-                  }`}
-                  onClick={handleHideMobileNav}
-                >
-                  <ScrollText size={30} />
-                  <Link href="/engagements">
-                    {locale == "fr" ? "Engagements" : "Commitments"}
-                  </Link>
-                </div>
-                <div
-                  className={`flex gap-4 items-center ${
-                    isActive("/partenaires") ? "text-destructive font-bold" : ""
-                  }`}
-                  onClick={handleHideMobileNav}
-                >
-                  <Handshake size={30} />
-                  <Link href="/partenaires">
-                    {locale === "fr" ? "Partenaires" : "Partners"}
-                  </Link>
-                </div>
-                <div
-                  className={`hidden max-[600px]:flex gap-4 items-center ${
-                    isActive("/prestataire") ? "text-destructive font-bold" : ""
-                  }`}
-                  onClick={handleHideMobileNav}
-                >
-                  <HandPlatter size={30} />
-                  <Link href="/prestataire">
-                    {locale === "fr"
-                      ? "Devenir prestataire"
-                      : "Become a provider"}
-                  </Link>
-                </div>
-              </div>
-            </div> */}
           </div>
         )}
       </header>

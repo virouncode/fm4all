@@ -35,20 +35,6 @@ const HeaderButtons = ({
         setIsMobileNavOpen={setIsMobileNavOpen}
         withIcon={false}
       />
-      {/* <Button
-            title={
-              locale === "fr" ? "Devenir prestataire" : "Become a provider"
-            }
-            variant="outline"
-            className="hidden min-[600px]:flex justify-center items-center"
-            size="default"
-            asChild
-            onClick={() => setIsMobileNavOpen(false)}
-          >
-            <ObfuscatedLink href="/prestataire">
-              {locale === "fr" ? "Devenir prestataire" : "Become a provider"}
-            </ObfuscatedLink>
-          </Button> */}
       <LocaleButton className="hidden md:flex" />
       <ContactButton
         setIsMobileNavOpen={setIsMobileNavOpen}

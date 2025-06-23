@@ -1,5 +1,4 @@
 import ArticlesCarousel from "@/components/carousel/ArticlesCarousel";
-import { ObfuscatedLink } from "@/components/links/ObfuscatedLink";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
@@ -19,7 +18,7 @@ const Articles = () => {
           size="lg"
           asChild
         >
-          <ObfuscatedLink href="/blog">{t("tous-les-articles")}</ObfuscatedLink>
+          <Link href="/blog">{t("tous-les-articles")}</Link>
         </Button>
       </div>
       <ArticlesCarousel />

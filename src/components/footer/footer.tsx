@@ -39,35 +39,29 @@ const Footer = async ({ locale }: FooterProps) => {
                 </Link>
               </li>
               <li>
-                <ObfuscatedLink href="/contact">
-                  {t("nous-contacter")}
-                </ObfuscatedLink>
+                <Link href="/contact">{t("nous-contacter")}</Link>
               </li>
               <li>
-                <ObfuscatedLink href="/faq">FAQ</ObfuscatedLink>
+                <Link href="/faq">FAQ</Link>
               </li>
               <li>
-                <ObfuscatedLink href="/mentions">
-                  {t("mentions-legales")}
-                </ObfuscatedLink>
+                <Link href="/mentions">{t("mentions-legales")}</Link>
               </li>
               <li>
-                <ObfuscatedLink href="/confidentialite">
+                <Link href="/confidentialite">
                   {t("politique-de-confidentialite")}
-                </ObfuscatedLink>
+                </Link>
               </li>
               <li>
-                <ObfuscatedLink href="/cookies">
-                  {t("politique-de-cookies")}
-                </ObfuscatedLink>
+                <Link href="/cookies">{t("politique-de-cookies")}</Link>
               </li>
               <li>
-                <ObfuscatedLink href="/cgv" className="hover:opacity-80">
+                <Link href="/cgv" className="hover:opacity-80">
                   {t("cgv")}
-                </ObfuscatedLink>
+                </Link>
               </li>
               <li>
-                <ObfuscatedLink href="/cgu">{t("cgu")}</ObfuscatedLink>
+                <Link href="/cgu">{t("cgu")}</Link>
               </li>
               <li className="italic">
                 {t("touts-droits-reserves-and-copy-fm4all")}
@@ -108,9 +102,7 @@ const Footer = async ({ locale }: FooterProps) => {
           <div className="flex flex-col gap-2 w-52">
             <ul className="text-secondary text-sm flex flex-col gap-2">
               <li className="text-secondary text-xl">
-                <ObfuscatedLink href="/secteurs">
-                  {t("secteurs")}
-                </ObfuscatedLink>
+                <Link href="/secteurs">{t("secteurs")}</Link>
               </li>
               {secteurs.map((secteur) => {
                 const secteurUrl = secteur.slug?.current ?? "";
@@ -132,9 +124,7 @@ const Footer = async ({ locale }: FooterProps) => {
           <div className="flex flex-col gap-2 w-52">
             <ul className="text-secondary text-sm flex flex-col gap-2">
               <li className="text-secondary text-xl">
-                <ObfuscatedLink href="/blog">
-                  {t("derniers-articles")}
-                </ObfuscatedLink>
+                <Link href="/blog">{t("derniers-articles")}</Link>
               </li>
               {articles.map((article) => {
                 const categorie = article.categorie as ArticleCategory;
@@ -159,9 +149,7 @@ const Footer = async ({ locale }: FooterProps) => {
             <p className="text-secondary text-xl">{t("prestataires")}</p>
             <ul className="text-secondary text-sm flex flex-col gap-2">
               <li>
-                <ObfuscatedLink href="/prestataire">
-                  {t("devenir-prestataire")}
-                </ObfuscatedLink>
+                <Link href="/prestataire">{t("devenir-prestataire")}</Link>
               </li>
             </ul>
           </div>

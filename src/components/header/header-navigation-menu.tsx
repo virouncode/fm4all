@@ -18,7 +18,6 @@ import {
   Star,
 } from "lucide-react";
 
-import { ObfuscatedLink } from "@/components/links/ObfuscatedLink";
 import {
   Accordion,
   AccordionContent,
@@ -138,27 +137,27 @@ const HeaderNavigationMenu = ({
             <ul className="grid w-[400px]">
               <li className="hover:bg-accent px-4 py-2">
                 <NavigationMenuLink asChild className="w-full relative">
-                  <ObfuscatedLink
+                  <Link
                     href={"/secteurs"}
                     className="w-full flex items-center gap-4 hover:underline"
                   >
                     <Factory size={20} />
                     {locale === "fr" ? "Tous nos secteurs" : "All our sectors"}
-                  </ObfuscatedLink>
+                  </Link>
                 </NavigationMenuLink>
               </li>
               {secteurs.map((secteur) => {
                 return (
                   <li key={secteur.title} className="px-4 py-2 hover:bg-accent">
                     <NavigationMenuLink asChild>
-                      <ObfuscatedLink
+                      <Link
                         //@ts-expect-error ok - href is a complex object
                         href={secteur.href}
                         className="w-full flex items-center gap-4"
                       >
                         <secteur.icon size={20} />
                         {secteur.title}
-                      </ObfuscatedLink>
+                      </Link>
                     </NavigationMenuLink>
                   </li>
                 );
@@ -174,9 +173,7 @@ const HeaderNavigationMenu = ({
               }`}
             >
               <Star size={15} />
-              <ObfuscatedLink href="/gammes">
-                {locale === "fr" ? "Gammes" : "Tiers"}
-              </ObfuscatedLink>
+              <Link href="/gammes">{locale === "fr" ? "Gammes" : "Tiers"}</Link>
             </div>
           </NavigationMenuLink>
         </NavigationMenuItem>
@@ -188,9 +185,9 @@ const HeaderNavigationMenu = ({
               }`}
             >
               <ScrollText size={15} />
-              <ObfuscatedLink href="/engagements">
+              <Link href="/engagements">
                 {locale === "fr" ? "Engagements" : "Commitments"}
-              </ObfuscatedLink>
+              </Link>
             </div>
           </NavigationMenuLink>
         </NavigationMenuItem>
@@ -202,9 +199,9 @@ const HeaderNavigationMenu = ({
               }`}
             >
               <Handshake size={15} />
-              <ObfuscatedLink href="/partenaires">
+              <Link href="/partenaires">
                 {locale === "fr" ? "Partenaires" : "Partners"}
-              </ObfuscatedLink>
+              </Link>
             </div>
           </NavigationMenuLink>
         </NavigationMenuItem>
@@ -314,14 +311,14 @@ const HeaderNavigationMenu = ({
                     className="px-4 py-2 hover:bg-accent"
                     onClick={handleHideMobileNav}
                   >
-                    <ObfuscatedLink
+                    <Link
                       //@ts-expect-error ok - href is a complex object
                       href={secteur.href}
                       className="w-full flex items-center gap-4 hover:underline !text-lg"
                     >
                       <secteur.icon size={20} />
                       {secteur.title}
-                    </ObfuscatedLink>
+                    </Link>
                   </li>
                 );
               })}
@@ -333,9 +330,9 @@ const HeaderNavigationMenu = ({
             className={`flex items-center gap-2 py-4 ${isActive("/gammes") ? "text-destructive font-bold" : ""}`}
           >
             <Star />
-            <ObfuscatedLink href="/gammes" className="text-lg w-full">
+            <Link href="/gammes" className="text-lg w-full">
               {locale === "fr" ? "Gammes" : "Tiers"}
-            </ObfuscatedLink>
+            </Link>
           </div>
         </AccordionItem>
         <AccordionItem value={"engagements"} onClick={handleHideMobileNav}>
@@ -343,9 +340,9 @@ const HeaderNavigationMenu = ({
             className={`flex items-center gap-2 py-4 ${isActive("/engagements") ? "text-destructive font-bold" : ""}`}
           >
             <ScrollText />
-            <ObfuscatedLink href="/engagements" className="text-lg w-full">
+            <Link href="/engagements" className="text-lg w-full">
               {locale === "fr" ? "Engagements" : "Commitments"}
-            </ObfuscatedLink>
+            </Link>
           </div>
         </AccordionItem>
         <AccordionItem value={"partenaires"} onClick={handleHideMobileNav}>
@@ -353,9 +350,9 @@ const HeaderNavigationMenu = ({
             className={`flex items-center gap-2 py-4 ${isActive("/partenaires") ? "text-destructive font-bold" : ""}`}
           >
             <Handshake />
-            <ObfuscatedLink href="/partenaires" className="text-lg w-full">
+            <Link href="/partenaires" className="text-lg w-full">
               {locale === "fr" ? "Partenaires" : "Partners"}
-            </ObfuscatedLink>
+            </Link>
           </div>
         </AccordionItem>
       </Accordion>
