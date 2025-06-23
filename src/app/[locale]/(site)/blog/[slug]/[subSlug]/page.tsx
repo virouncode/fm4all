@@ -379,7 +379,6 @@ const page = async ({
         </BreadcrumbList>
       </Breadcrumb>
       <h1 className="text-4xl md:text-5xl mb-10">{article.titre}</h1>
-
       {article.description && article.tltr && articleImageUrl && (
         <TltrCard
           description={article.description}

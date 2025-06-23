@@ -1,5 +1,6 @@
+import Bloc from "@/components/blocs/Bloc";
 import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
-import DevisButton from "@/components/buttons/devis-button";
+import TltrCard from "@/components/cards/TltrCard";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -16,22 +17,13 @@ import {
   getSecteurSlugFr,
 } from "@/redirects/secteursSlugMappings";
 import { urlFor } from "@/sanity/lib/image";
-import {
-  fetchSecteursSlugs,
-  getAssociatedToSecteur,
-  getSecteur,
-} from "@/sanity/queries";
+import { fetchSecteursSlugs, getSecteur } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
 import { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import {
-  PortableText,
-  PortableTextBlock,
-  PortableTextComponentProps,
-} from "next-sanity";
+import { PortableTextBlock, PortableTextComponentProps } from "next-sanity";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Slug } from "../../../../../../sanity.types";
 
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
@@ -151,17 +143,6 @@ const page = async ({
   if (!secteur) {
     notFound();
   }
-  const tagsSortants = secteur.tagsSortants as {
-    _id: string;
-    nom: string;
-    slug: Slug;
-  }[];
-
-  const associated = await getAssociatedToSecteur(
-    locale,
-    tagsSortants.map((tag) => tag._id),
-    secteur._id
-  );
 
   const secteurImageUrl = secteur.imagePrincipale
     ? urlFor(secteur.imagePrincipale)
@@ -233,6 +214,79 @@ const page = async ({
     ? secteur.imageBloc10.alt
     : tGlobal("illustration-du-secteur");
 
+  const secteurBlocs = [
+    {
+      id: 1,
+      imageUrl: secteurImageBloc1Url,
+      imageAlt: secteurImageBloc1Alt,
+      bloc: secteur.bloc1,
+      side: "left" as const,
+    },
+    {
+      id: 2,
+      imageUrl: secteurImageBloc2Url,
+      imageAlt: secteurImageBloc2Alt,
+      bloc: secteur.bloc2,
+      side: "right" as const,
+    },
+    {
+      id: 3,
+      imageUrl: secteurImageBloc3Url,
+      imageAlt: secteurImageBloc3Alt,
+      bloc: secteur.bloc3,
+      side: "left" as const,
+    },
+    {
+      id: 4,
+      imageUrl: secteurImageBloc4Url,
+      imageAlt: secteurImageBloc4Alt,
+      bloc: secteur.bloc4,
+      side: "right" as const,
+    },
+    {
+      id: 5,
+      imageUrl: secteurImageBloc5Url,
+      imageAlt: secteurImageBloc5Alt,
+      bloc: secteur.bloc5,
+      side: "left" as const,
+    },
+    {
+      id: 6,
+      imageUrl: secteurImageBloc6Url,
+      imageAlt: secteurImageBloc6Alt,
+      bloc: secteur.bloc6,
+      side: "right" as const,
+    },
+    {
+      id: 7,
+      imageUrl: secteurImageBloc7Url,
+      imageAlt: secteurImageBloc7Alt,
+      bloc: secteur.bloc7,
+      side: "left" as const,
+    },
+    {
+      id: 8,
+      imageUrl: secteurImageBloc8Url,
+      imageAlt: secteurImageBloc8Alt,
+      bloc: secteur.bloc8,
+      side: "right" as const,
+    },
+    {
+      id: 9,
+      imageUrl: secteurImageBloc9Url,
+      imageAlt: secteurImageBloc9Alt,
+      bloc: secteur.bloc9,
+      side: "left" as const,
+    },
+    {
+      id: 10,
+      imageUrl: secteurImageBloc10Url,
+      imageAlt: secteurImageBloc10Alt,
+      bloc: secteur.bloc10,
+      side: "right" as const,
+    },
+  ];
+
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20 hyphens-auto">
       <Breadcrumb className="mb-10">
@@ -267,535 +321,33 @@ const page = async ({
       <h1 className="text-4xl md:text-5xl mb-10 text-center">
         {secteur.titre}
       </h1>
-      <section className="flex flex-row gap-10 mb-16 bg-[rgb(250,250,250)] rounded-xl p-6 sm:p-14">
-        <div className="flex flex-col flex-1 justify-start text-lg gap-8">
-          {/* <div className="flex flex-row gap-2 flex-wrap">
-            {tagsSortants.map((tag) => (
-              <TagButton tag={tag} key={tag._id} locale={locale} />
-            ))}
-          </div> */}
-          <div
-            className="flex flex-col gap-6 prose-lg
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
-          prose-h3:font-bold prose-h3:text-xl
-          prose-p:text-lg prose-p:text-pretty prose-p:hyphens-auto prose-p:m-0
-          prose-li:list-disc prose-li:m-0
-          prose-a:underline"
-          >
-            <p className="font-bold">{secteur.description}</p>
-            {Array.isArray(secteur.tltr) && (
-              <PortableText value={secteur.tltr} />
-            )}
-          </div>
-          <div className="flex justify-center">
-            <DevisButton
-              title={tGlobal("mon-devis-en-ligne")}
-              text={tGlobal("mon-devis-en-ligne")}
-              size="lg"
+      {secteur.description && secteur.tltr && secteurImageUrl && (
+        <TltrCard
+          description={secteur.description}
+          tltr={secteur.tltr}
+          devisButtonTitle={tGlobal("mon-devis-en-ligne")}
+          imageUrl={secteurImageUrl.url()}
+          imageAlt={secteurImageAlt}
+        />
+      )}
+      {secteurBlocs
+        .filter(
+          (item) =>
+            item.bloc && Array.isArray(item.bloc) && item.bloc.length > 0
+        )
+        .map(({ id, imageUrl, imageAlt, bloc, side }) => {
+          if (!bloc) return null;
+          return (
+            <Bloc
+              side={side}
+              key={id}
+              imageUrl={imageUrl?.url()}
+              imageAlt={imageAlt}
+              bloc={bloc}
+              ptComponents={ptComponents}
             />
-          </div>
-        </div>
-        {secteurImageUrl ? (
-          <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
-            <Image
-              src={secteurImageUrl.url()}
-              alt={secteurImageAlt}
-              quality={100}
-              className="object-cover object-center"
-              fill={true}
-              unoptimized={true}
-            />
-          </div>
-        ) : null}
-      </section>
-      {/* {(associated.articles || associated.services || associated.secteurs) && (
-        <section className="flex flex-row gap-10 mb-16">
-          <div className="w-full">
-            <h2 className="border-l-2 px-4 text-4xl mb-10">
-              {t("notre-expertise")}
-            </h2>
-            <Tabs
-              defaultValue={
-                associated.services.length
-                  ? "services"
-                  : associated.secteurs.length
-                    ? "secteurs"
-                    : "articles"
-              }
-            >
-              <TabsList className="my-20 md:my-10 bg-transparent flex flex-col items-start md:flex-row md:items-center">
-                {[...(associated.services || [])].length > 0 ? (
-                  <TabsTrigger
-                    value="services"
-                    className="text-lg border-none outline-none"
-                  >
-                    | {tGlobal("services-associes")}
-                  </TabsTrigger>
-                ) : null}
-                {[...(associated.secteurs || [])].length > 0 ? (
-                  <TabsTrigger value="secteurs" className="text-lg">
-                    | {tGlobal("secteurs-associes")}
-                  </TabsTrigger>
-                ) : null}
-                {associated.articles &&
-                [...(associated.articles || [])].length > 0 ? (
-                  <TabsTrigger value="articles" className="text-lg">
-                    | {tGlobal("articles-associes")}
-                  </TabsTrigger>
-                ) : null}
-              </TabsList>
-              <TabsContent value="services">
-                <Carousel
-                  opts={{
-                    align: "start",
-                    loop: true,
-                  }}
-                  className="w-full"
-                >
-                  <CarouselContent className="py-1">
-                    {[...(associated.services || [])].map((service) => {
-                      const serviceImageUrl = service.imagePrincipale
-                        ? urlFor(service.imagePrincipale)
-                        : null; //TODO placeholder image
-                      const serviceImageAlt =
-                        service.imagePrincipale?.alt ??
-                        tGlobal("illustration-du-service");
-                      const serviceUrl = service.slug?.current ?? "";
-                      return serviceImageUrl ? (
-                        <CarouselItem
-                          className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
-                          key={service._id}
-                        >
-                          <ImgCardVertical
-                            src={serviceImageUrl.width(500).height(500).url()}
-                            alt={serviceImageAlt}
-                            href={{
-                              pathname: `/services/[slug]`,
-                              params: { slug: serviceUrl },
-                            }}
-                            locale={locale}
-                            linkText={service.linkText ?? serviceUrl}
-                          >
-                            <div className="p-4 flex flex-col gap-4 h-56">
-                              <p className="text-2xl">{service.titre}</p>
-                              <p className="w-full overflow-hidden line-clamp-5">
-                                {service.description}
-                              </p>
-                            </div>
-                          </ImgCardVertical>
-                        </CarouselItem>
-                      ) : null;
-                    })}
-                  </CarouselContent>
-                  <CarouselPrevious className="right-12 -top-9 translate-y-0 left-auto" />
-                  <CarouselNext className="right-0 -top-9 translate-y-0" />
-                </Carousel>
-              </TabsContent>
-              <TabsContent value="secteurs">
-                <Carousel
-                  opts={{
-                    align: "start",
-                    loop: true,
-                  }}
-                  className="w-full"
-                >
-                  <CarouselContent>
-                    {[...(associated.secteurs || [])].map((secteur) => {
-                      const secteurImageUrl = secteur.imagePrincipale
-                        ? urlFor(secteur.imagePrincipale)
-                        : null; //TODO placeholder image
-                      const secteurImageAlt =
-                        secteur.imagePrincipale?.alt ??
-                        tGlobal("illustration-du-secteur");
-                      const secteurUrl = secteur.slug?.current ?? "";
-                      return secteurImageUrl ? (
-                        <CarouselItem
-                          className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
-                          key={secteur._id}
-                        >
-                          <ImgCardVertical
-                            src={secteurImageUrl.width(500).height(500).url()}
-                            alt={secteurImageAlt}
-                            href={{
-                              pathname: `/secteurs/[slug]`,
-                              params: { slug: secteurUrl },
-                            }}
-                            locale={locale}
-                            linkText={secteur.linkText ?? secteurUrl}
-                          >
-                            <div className="p-4 flex flex-col gap-4 h-56">
-                              <p className="text-2xl">{secteur.titre}</p>
-                              <p className="w-full overflow-hidden line-clamp-5">
-                                {secteur.description}
-                              </p>
-                            </div>
-                          </ImgCardVertical>
-                        </CarouselItem>
-                      ) : null;
-                    })}
-                  </CarouselContent>
-                  <CarouselPrevious className="right-12 -top-9 translate-y-0 left-auto" />
-                  <CarouselNext className="right-0 -top-9 translate-y-0" />
-                </Carousel>
-              </TabsContent>
-              <TabsContent value="articles">
-                <Carousel
-                  opts={{
-                    align: "start",
-                    loop: true,
-                  }}
-                  className="w-full"
-                >
-                  <CarouselContent>
-                    {[...(associated.articles || [])].map((article) => {
-                      const articleImageUrl = article.imagePrincipale
-                        ? urlFor(article.imagePrincipale)
-                        : null; //TODO placeholder image
-                      const articleImageAlt =
-                        article.imagePrincipale?.alt ??
-                        tGlobal("illustration-de-l-article");
-                      const categorie = article.categorie as ArticleCategory;
-                      const articleSlug = categorie.slug?.current ?? "";
-                      const articleSubSlug = article.subSlug?.current ?? "";
-
-                      return articleImageUrl ? (
-                        <CarouselItem
-                          className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
-                          key={article._id}
-                        >
-                          <ImgCardVertical
-                            src={articleImageUrl.width(500).height(500).url()}
-                            alt={articleImageAlt}
-                            href={{
-                              pathname: "/blog/[slug]/[subSlug]",
-                              params: {
-                                slug: articleSlug,
-                                subSlug: articleSubSlug,
-                              },
-                            }}
-                            locale={locale}
-                            linkText={article.linkText ?? articleSubSlug}
-                          >
-                            <div className="p-4 flex flex-col gap-4 h-56">
-                              <p className="text-2xl">{article.titre}</p>
-                              <p className="w-full overflow-hidden line-clamp-5">
-                                {article.description}
-                              </p>
-                            </div>
-                          </ImgCardVertical>
-                        </CarouselItem>
-                      ) : null;
-                    })}
-                  </CarouselContent>
-                  <CarouselPrevious className="right-12 -top-9 translate-y-0 left-auto" />
-                  <CarouselNext className="right-0 -top-9 translate-y-0" />
-                </Carousel>
-              </TabsContent>
-            </Tabs>
-          </div>
-        </section>
-      )} */}
-      <section className="flex flex-row gap-10 mb-16">
-        {secteurImageBloc1Url ? (
-          <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
-            <Image
-              src={secteurImageBloc1Url.url()}
-              alt={secteurImageBloc1Alt}
-              quality={100}
-              className="object-cover object-center"
-              fill={true}
-              unoptimized={true}
-            />
-          </div>
-        ) : null}
-        <div
-          className="flex-1 prose-lg
-        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
-        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
-        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
-        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
-        prose-ul:max-w-prose prose-ul:mx-auto
-        prose-li:list-disc prose-li:m-0
-        prose-a:underline
-        "
-        >
-          {Array.isArray(secteur.bloc1) && (
-            <PortableText value={secteur.bloc1} components={ptComponents} />
-          )}
-        </div>
-      </section>
-      <section className="flex flex-row gap-10 mb-16">
-        <div
-          className="flex-1 prose-lg
-        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
-        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
-        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
-        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
-        prose-ul:max-w-prose prose-ul:mx-auto
-        prose-li:list-disc prose-li:m-0
-        prose-a:underline
-        "
-        >
-          {Array.isArray(secteur.bloc2) && (
-            <PortableText value={secteur.bloc2} components={ptComponents} />
-          )}
-        </div>
-        {secteurImageBloc2Url ? (
-          <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
-            <Image
-              src={secteurImageBloc2Url.url()}
-              alt={secteurImageBloc2Alt}
-              quality={100}
-              className="object-cover object-center"
-              fill={true}
-              unoptimized={true}
-            />
-          </div>
-        ) : null}
-      </section>
-
-      {/* Bloc 3 */}
-      {Array.isArray(secteur.bloc3) && secteur.bloc3.length > 0 && (
-        <section className="flex flex-row gap-10 mb-16">
-          {secteurImageBloc3Url ? (
-            <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
-              <Image
-                src={secteurImageBloc3Url.url()}
-                alt={secteurImageBloc3Alt}
-                quality={100}
-                className="object-cover object-center"
-                fill={true}
-                unoptimized={true}
-              />
-            </div>
-          ) : null}
-          <div
-            className="flex-1 prose-lg
-        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
-        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
-        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
-        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
-        prose-ul:max-w-prose prose-ul:mx-auto
-        prose-li:list-disc prose-li:m-0
-        prose-a:underline
-        "
-          >
-            <PortableText value={secteur.bloc3} components={ptComponents} />
-          </div>
-        </section>
-      )}
-
-      {/* Bloc 4 */}
-      {Array.isArray(secteur.bloc4) && secteur.bloc4.length > 0 && (
-        <section className="flex flex-row gap-10 mb-16">
-          <div
-            className="flex-1 prose-lg
-        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
-        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
-        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
-        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
-        prose-ul:max-w-prose prose-ul:mx-auto
-        prose-li:list-disc prose-li:m-0
-        prose-a:underline
-        "
-          >
-            <PortableText value={secteur.bloc4} components={ptComponents} />
-          </div>
-          {secteurImageBloc4Url ? (
-            <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
-              <Image
-                src={secteurImageBloc4Url.url()}
-                alt={secteurImageBloc4Alt}
-                quality={100}
-                className="object-cover object-center"
-                fill={true}
-                unoptimized={true}
-              />
-            </div>
-          ) : null}
-        </section>
-      )}
-
-      {/* Bloc 6 */}
-      {Array.isArray(secteur.bloc5) && secteur.bloc5.length > 0 && (
-        <section className="flex flex-row gap-10 mb-16">
-          {secteurImageBloc5Url ? (
-            <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
-              <Image
-                src={secteurImageBloc5Url.url()}
-                alt={secteurImageBloc5Alt}
-                quality={100}
-                className="object-cover object-center"
-                fill={true}
-                unoptimized={true}
-              />
-            </div>
-          ) : null}
-          <div
-            className="flex-1 prose-lg
-        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
-        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
-        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
-        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
-        prose-ul:max-w-prose prose-ul:mx-auto
-        prose-li:list-disc prose-li:m-0
-        prose-a:underline
-        "
-          >
-            <PortableText value={secteur.bloc5} components={ptComponents} />
-          </div>
-        </section>
-      )}
-      {/* Bloc 6 */}
-      {Array.isArray(secteur.bloc6) && secteur.bloc6.length > 0 && (
-        <section className="flex flex-row gap-10 mb-16">
-          <div
-            className="flex-1 prose-lg
-        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
-        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
-        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
-        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
-        prose-ul:max-w-prose prose-ul:mx-auto
-        prose-li:list-disc prose-li:m-0
-        prose-a:underline
-        "
-          >
-            <PortableText value={secteur.bloc6} components={ptComponents} />
-          </div>
-          {secteurImageBloc6Url ? (
-            <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
-              <Image
-                src={secteurImageBloc6Url.url()}
-                alt={secteurImageBloc6Alt}
-                quality={100}
-                className="object-cover object-center"
-                fill={true}
-                unoptimized={true}
-              />
-            </div>
-          ) : null}
-        </section>
-      )}
-      {/* Bloc 7 */}
-      {Array.isArray(secteur.bloc7) && secteur.bloc7.length > 0 && (
-        <section className="flex flex-row gap-10 mb-16">
-          {secteurImageBloc7Url ? (
-            <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
-              <Image
-                src={secteurImageBloc7Url.url()}
-                alt={secteurImageBloc7Alt}
-                quality={100}
-                className="object-cover object-center"
-                fill={true}
-                unoptimized={true}
-              />
-            </div>
-          ) : null}
-          <div
-            className="flex-1 prose-lg
-        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
-        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
-        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
-        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
-        prose-ul:max-w-prose prose-ul:mx-auto
-        prose-li:list-disc prose-li:m-0
-        prose-a:underline
-        "
-          >
-            <PortableText value={secteur.bloc7} components={ptComponents} />
-          </div>
-        </section>
-      )}
-      {/* Bloc 8 */}
-      {Array.isArray(secteur.bloc8) && secteur.bloc8.length > 0 && (
-        <section className="flex flex-row gap-10 mb-16">
-          <div
-            className="flex-1 prose-lg
-        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
-        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
-        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
-        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
-        prose-ul:max-w-prose prose-ul:mx-auto
-        prose-li:list-disc prose-li:m-0
-        prose-a:underline
-        "
-          >
-            <PortableText value={secteur.bloc8} components={ptComponents} />
-          </div>
-          {secteurImageBloc8Url ? (
-            <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
-              <Image
-                src={secteurImageBloc8Url.url()}
-                alt={secteurImageBloc8Alt}
-                quality={100}
-                className="object-cover object-center"
-                fill={true}
-                unoptimized={true}
-              />
-            </div>
-          ) : null}
-        </section>
-      )}
-      {/* Bloc 9 */}
-      {Array.isArray(secteur.bloc9) && secteur.bloc9.length > 0 && (
-        <section className="flex flex-row gap-10 mb-16">
-          {secteurImageBloc9Url ? (
-            <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
-              <Image
-                src={secteurImageBloc9Url.url()}
-                alt={secteurImageBloc9Alt}
-                quality={100}
-                className="object-cover object-center"
-                fill={true}
-                unoptimized={true}
-              />
-            </div>
-          ) : null}
-          <div
-            className="flex-1 prose-lg
-        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
-        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
-        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
-        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
-        prose-ul:max-w-prose prose-ul:mx-auto
-        prose-li:list-disc prose-li:m-0
-        prose-a:underline
-        "
-          >
-            <PortableText value={secteur.bloc9} components={ptComponents} />
-          </div>
-        </section>
-      )}
-      {/* Bloc 10 */}
-      {Array.isArray(secteur.bloc10) && secteur.bloc10.length > 0 && (
-        <section className="flex flex-row gap-10 mb-16">
-          <div
-            className="flex-1 prose-lg
-        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
-        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
-        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
-        prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
-        prose-ul:max-w-prose prose-ul:mx-auto
-        prose-li:list-disc prose-li:m-0
-        prose-a:underline
-        "
-          >
-            <PortableText value={secteur.bloc10} components={ptComponents} />
-          </div>
-          {secteurImageBloc10Url ? (
-            <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
-              <Image
-                src={secteurImageBloc10Url.url()}
-                alt={secteurImageBloc10Alt}
-                quality={100}
-                className="object-cover object-center"
-                fill={true}
-                unoptimized={true}
-              />
-            </div>
-          ) : null}
-        </section>
-      )}
+          );
+        })}
       <CTAContactButtons />
     </main>
   );
