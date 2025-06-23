@@ -1511,5 +1511,10 @@
     "nettoyage-hygiene-maintenance-securite-accueil-cafe-petit-equipement": "Cleaning, hygiene, maintenance, security, reception, coffee, small equipment...",
     "quel-que-soit-votre-secteur-nous-pilotons-pour-vous-lensemble-de-vos-contrats-de-services-generaux": "Whatever your sector, we manage all your general service contracts for you.",
     "accueil": "Home page"
+  },
+  "NotFoundPage": {
+    "erreur-404-page-non-trouvee": "Error 404 : Page not found !",
+    "ce-service-nexiste-pas": "This service doesn't exist",
+    "retour": "Back"
   }
 }

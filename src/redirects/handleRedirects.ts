@@ -7,7 +7,7 @@ import {
   getArticlesSubSlugEn,
   getArticlesSubSlugFr,
 } from "./articlesSlugMappings";
-import { isEnglishSlug, isEnglishSubSlug } from "./isEnglishSlug";
+import { isEnglishSlug, isEnglishSubSlug, isFrenchSlug } from "./isEnglishSlug";
 import {
   getSecteurSlugEn,
   getSecteurSlugFr,
@@ -33,6 +33,17 @@ export const handleArticleRedirects = (
   const slug = pathSegments[1];
   const basePath = locale === "fr" ? "/articles/" : "/posts/";
   const subSlug = pathSegments.length >= 3 ? pathSegments[2] : null;
+
+  const isPossibleSlug =
+    isEnglishSlug(slug, articlesSlugMappingsFrToEn) ||
+    isFrenchSlug(slug, articlesSlugMappingsFrToEn);
+
+  const isPossibleSubSlug = subSlug
+    ? isEnglishSubSlug(subSlug, articlesSubSlugMappingsFrToEn) ||
+      isFrenchSlug(subSlug, articlesSubSlugMappingsFrToEn)
+    : true;
+
+  if (!isPossibleSlug && !isPossibleSubSlug) return null;
 
   // Vérifier si le slug principal est correct pour la locale
   const isCorrectSlug =
@@ -99,6 +110,11 @@ export const handleServiceRedirects = (
   const slug = pathSegments[1];
   const basePath = "/services/";
 
+  const isPossibleSlug =
+    isEnglishSlug(slug, servicesSlugMappingsFrToEn) ||
+    isFrenchSlug(slug, servicesSlugMappingsFrToEn);
+  if (!isPossibleSlug) return null;
+
   const isCorrectSlug =
     locale === "fr"
       ? !isEnglishSlug(slug, servicesSlugMappingsFrToEn)
@@ -126,6 +142,12 @@ export const handleSecteurRedirects = (
 
   const slug = pathSegments[1];
   const basePath = locale === "fr" ? "/secteurs/" : "/sectors/";
+
+  const isPossibleSlug =
+    isEnglishSlug(slug, secteursSlugMappingsFrToEn) ||
+    isFrenchSlug(slug, secteursSlugMappingsFrToEn);
+  if (!isPossibleSlug) return null;
+
   const isCorrectSlug =
     locale === "fr"
       ? !isEnglishSlug(slug, secteursSlugMappingsFrToEn)

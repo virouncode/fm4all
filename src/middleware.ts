@@ -73,9 +73,11 @@ export async function middleware(req: NextRequest) {
     if (articleRedirect) return articleRedirect;
     //SERVICES
     const serviceRedirect = handleServiceRedirects(req, pathSegments, locale);
+
     if (serviceRedirect) return serviceRedirect;
     //SECTEURS
     const secteurRedirect = handleSecteurRedirects(req, pathSegments, locale);
+
     if (secteurRedirect) return secteurRedirect;
     //******* ROUTE CORRECTE *******//
     return intlMiddleware(req);
