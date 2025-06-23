@@ -137,7 +137,7 @@ export const getTagRelatedServices = async (
 //================================================================================================//
 //========================================= ARTICLES =============================================//
 //================================================================================================//
-export const LAST_ARTICLES_QUERY = `*[_type == "article" && language == $language]|order(date desc)[0...5]{ 
+export const LAST_ARTICLES_QUERY = `*[_type == "article" && language == $language]|order(date desc)[0...10]{ 
   _id, titre, description, subSlug, imagePrincipale, linkText,
   categorie->{
     _id,
