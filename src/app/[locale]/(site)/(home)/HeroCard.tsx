@@ -55,7 +55,7 @@ const HeroCard = async () => {
           title={tGlobal("je-realise-mon-devis-en-ligne")}
           text={tGlobal("je-realise-mon-devis-en-ligne")}
           size="lg"
-          className="bg-fm4alldestructive hover:bg-fm4alldestructive/90 text-white border-none shadow-lg hover:shadow-xl ring-white"
+          className="bg-fm4alldestructive hover:bg-fm4alldestructive/90 text-white border-none shadow-lg hover:shadow-xl ring-fm4alldestructive"
         />
       </div>
       <div className="md:hidden">
@@ -63,7 +63,7 @@ const HeroCard = async () => {
           title={tGlobal("mon-devis-en-ligne")}
           text={tGlobal("mon-devis-en-ligne")}
           size="lg"
-          className="bg-fm4alldestructive hover:bg-fm4alldestructive/90 text-white border-none shadow-lg w-full ring-white"
+          className="bg-fm4alldestructive hover:bg-fm4alldestructive/90 text-white border-none shadow-lg w-full ring-fm4alldestructive"
         />
       </div>
     </div>
