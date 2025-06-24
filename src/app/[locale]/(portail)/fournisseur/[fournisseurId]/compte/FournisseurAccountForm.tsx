@@ -42,7 +42,7 @@ const FournisseurAccountForm = ({
     presentation: initialFournisseur.presentation ?? "",
   };
   const form = useForm<UpdateFournisseurFormType>({
-    mode: "onBlur",
+    mode: "all",
     resolver: zodResolver(
       createUpdateFournisseurFormSchema({
         nomFournisseur: "Nom de l'entreprise obligatoire",

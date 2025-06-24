@@ -42,7 +42,7 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
     phoneContact: "",
   };
   const form = useForm<InsertFournisseurType>({
-    mode: "onBlur",
+    mode: "all",
     resolver: zodResolver(
       createInsertFournisseurSchema({
         nomFournisseur: tAdmin("nom-de-lentreprise-obligatoire"),

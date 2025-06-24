@@ -28,7 +28,7 @@ const ResetPasswordForm = ({ token }: ResetPasswordProps) => {
   };
 
   const form = useForm<ResetPasswordType>({
-    mode: "onBlur",
+    mode: "all",
     resolver: zodResolver(resetPasswordSchema),
     defaultValues,
   });

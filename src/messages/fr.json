@@ -78,7 +78,7 @@
   "HomePage": {
     "hero": {
       "votre-entreprise-de": "fm4all | Votre entreprise de",
-      "facility-management": "Facility Management ",
+      "facility-management": "Facility Management",
       "les-services-aux-entreprises-au-meilleur-prix": "Les services aux entreprises au meilleur prix.",
       "gagnez-du-temps-et-de-largent-sur-la": "Gagnez du temps et de l’argent sur la",
       "gestion-de-vos-prestations": "gestion de vos services généraux : ",
@@ -867,7 +867,7 @@
           "batimentEntier": "Bâtiment entier"
         },
         "erreurs": {
-          "surface": "La surface doit être un nombre compris entre 50 et 3000 m²",
+          "surface": "La surface doit être un nombre entier compris entre 50 et 3000 m²",
           "effectif": "Le nombre de personnes doit être compris entre 1 et 300",
           "batiment": "Type de batiment invalide",
           "occupation": "Type d'occupation invalide",

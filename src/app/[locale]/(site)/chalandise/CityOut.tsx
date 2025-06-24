@@ -49,7 +49,7 @@ const CityOut = ({
     phoneContact: client?.phoneContact || "",
   };
   const form = useForm<CityOutType>({
-    mode: "onBlur",
+    mode: "all",
     resolver: zodResolver(
       createCityOutSchema({
         nomEntreprise: tSauverErreurs("nom-de-lentreprise-obligatoire"),

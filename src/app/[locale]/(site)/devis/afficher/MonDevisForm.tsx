@@ -90,7 +90,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
   };
 
   const form = useForm<UpdateClientType>({
-    mode: "onBlur",
+    mode: "all",
     resolver: zodResolver(
       createUpdateClientSchema({
         nomEntreprise: tDevisErreurs("nom-de-lentreprise-obligatoire"),

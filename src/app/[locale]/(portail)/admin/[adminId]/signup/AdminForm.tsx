@@ -30,7 +30,7 @@ const AdminForm = () => {
     image: null,
   };
   const form = useForm<InsertAdminType>({
-    mode: "onBlur",
+    mode: "all",
     resolver: zodResolver(
       createInsertAdminSchema({
         email: tAuth("email-invalide"),

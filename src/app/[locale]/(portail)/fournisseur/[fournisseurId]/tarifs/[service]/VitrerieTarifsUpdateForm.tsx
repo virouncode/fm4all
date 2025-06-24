@@ -40,7 +40,7 @@ export default function VitrerieTarifsUpdateForm({
 
   const defaultValues: UpdateVitrerieTarifsType = initialTarifs;
   const form = useForm<UpdateVitrerieTarifsType>({
-    mode: "onBlur",
+    mode: "all",
     resolver: zodResolver(
       createVitrerieTarifsUpdateSchema({
         cadenceVitres: "Cadence vitres intérieures invalide",

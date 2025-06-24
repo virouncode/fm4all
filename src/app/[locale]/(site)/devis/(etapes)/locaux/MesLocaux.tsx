@@ -53,7 +53,7 @@ import { createMesLocauxSchema, MesLocauxType } from "@/zod-schemas/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { ChangeEvent, useContext, useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { reinitialisationDevis } from "./reinitialisationDevis";
 import ServicesLoader from "./ServicesLoader";
@@ -117,15 +117,15 @@ const MesLocaux = () => {
   }
 
   const defaultValues: MesLocauxType = {
-    surface: client.surface.toString(),
-    effectif: client.effectif.toString(),
+    surface: client.surface,
+    effectif: client.effectif,
     typeBatiment: client.typeBatiment,
     typeOccupation: client.typeOccupation,
     codePostal: client.codePostal || "",
   };
 
   const form = useForm<MesLocauxType>({
-    mode: "onBlur",
+    mode: "all",
     resolver: zodResolver(
       createMesLocauxSchema({
         surface: tErrors("surface"),
@@ -141,12 +141,11 @@ const MesLocaux = () => {
   const submitForm = async (data: MesLocauxType) => {
     const dataToPost = {
       ...data,
-      surface: parseInt(data.surface as string),
-      effectif: parseInt(data.effectif as string),
       ville: "",
     };
+    console.log("submitForm dataToPost", dataToPost);
+
     setLoading(true);
-    //La ville existe ?
     try {
       const response = await fetch(
         `https://geo.api.gouv.fr/communes?codePostal=${dataToPost.codePostal}`
@@ -168,7 +167,7 @@ const MesLocaux = () => {
       dataToPost.ville = cityData[0].nom;
       setClient({
         ...client,
-        ville: dataToPost.ville,
+        ...dataToPost,
       });
       setLoading(false);
     } catch (err) {
@@ -193,7 +192,7 @@ const MesLocaux = () => {
           typeBatiment: dataToPost.typeBatiment,
           typeOccupation: dataToPost.typeOccupation,
         },
-      }); //TODO
+      });
       return;
     }
 
@@ -205,8 +204,8 @@ const MesLocaux = () => {
     //Réinitialisation de tous le devis
     reinitialisationDevis(
       //client
-      parseInt(data.surface as string),
-      parseInt(data.effectif as string),
+      data.surface,
+      data.effectif,
       //services
       setDevisProgress,
       setNettoyage,
@@ -240,8 +239,7 @@ const MesLocaux = () => {
       setTotal
     );
     setLoaderVisible(true);
-    window.scrollTo(0, 0);
-    //Passer à l'étape suivante
+    // window.scrollTo(0, 0);
     setTimeout(() => {
       router.push({
         pathname: "/devis/services",
@@ -250,43 +248,43 @@ const MesLocaux = () => {
     }, 3000);
   };
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    if (name === "surface") {
-      const newValue = value ? parseInt(value) : 50;
-      setClient((prev) => ({
-        ...prev,
-        [name]: newValue > MAX_SURFACE ? MAX_SURFACE : newValue,
-      }));
-      return;
-    }
-    if (name === "effectif") {
-      const newValue = value ? parseInt(value) : 1;
-      setClient((prev) => ({
-        ...prev,
-        [name]: newValue > MAX_EFFECTIF ? MAX_EFFECTIF : newValue,
-      }));
-      return;
-    }
-    setClient((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  // const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value } = e.target;
+  //   if (name === "surface") {
+  //     const newValue = value ? parseInt(value) : 50;
+  //     setClient((prev) => ({
+  //       ...prev,
+  //       [name]: newValue > MAX_SURFACE ? MAX_SURFACE : newValue,
+  //     }));
+  //     return;
+  //   }
+  //   if (name === "effectif") {
+  //     const newValue = value ? parseInt(value) : 1;
+  //     setClient((prev) => ({
+  //       ...prev,
+  //       [name]: newValue > MAX_EFFECTIF ? MAX_EFFECTIF : newValue,
+  //     }));
+  //     return;
+  //   }
+  //   setClient((prev) => ({
+  //     ...prev,
+  //     [name]: value,
+  //   }));
+  // };
 
-  const handleSelect = (value: string, name: string) => {
-    setClient((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  // const handleSelect = (value: string, name: string) => {
+  //   setClient((prev) => ({
+  //     ...prev,
+  //     [name]: value,
+  //   }));
+  // };
 
-  const handleClick = () => {
-    const dialogTrigger = dialogRef.current;
-    if (dialogTrigger && !form.formState.isValid) {
-      dialogTrigger.click();
-    }
-  };
+  // const handleClick = () => {
+  //   const dialogTrigger = dialogRef.current;
+  //   if (dialogTrigger && !form.formState.isValid) {
+  //     dialogTrigger.click();
+  //   }
+  // };
 
   // const handleClickReprendre = () => {
   //   const route = devisProgress.currentStep
@@ -309,7 +307,7 @@ const MesLocaux = () => {
               fieldTitle={t("code-postal")}
               nameInSchema="codePostal"
               placeholder="XXXXX"
-              handleChange={handleChange}
+              // handleChange={handleChange}
             />
             <InputWithLabel<MesLocauxType>
               fieldTitle={t("surface-en-m")}
@@ -317,7 +315,7 @@ const MesLocaux = () => {
               type="number"
               min={50}
               max={MAX_SURFACE}
-              handleChange={handleChange}
+              // handleChange={handleChange}
             />
             <InputWithLabel<MesLocauxType>
               fieldTitle={t("nombre-moyen-de-personnes")}
@@ -325,7 +323,7 @@ const MesLocaux = () => {
               type="number"
               min={1}
               max={MAX_EFFECTIF}
-              handleChange={handleChange}
+              // handleChange={handleChange}
             />
           </div>
           <div className="w-full md:w-1/2 flex flex-col gap-4 ">
@@ -333,21 +331,21 @@ const MesLocaux = () => {
               fieldTitle={t("type-de-batiment")}
               nameInSchema="typeBatiment"
               data={batiments}
-              handleSelect={handleSelect}
+              // handleSelect={handleSelect}
               translationPrefix="DevisPage.locaux.locauxForm.batiments"
             />
             <SelectWithLabel<MesLocauxType>
               fieldTitle={t("type-doccupation")}
               nameInSchema="typeOccupation"
               data={occupation}
-              handleSelect={handleSelect}
+              // handleSelect={handleSelect}
               translationPrefix="DevisPage.locaux.locauxForm.occupation"
             />
           </div>
         </div>
         {devisProgress.completedSteps.includes(1) ? (
           <Dialog>
-            <DialogTrigger asChild ref={dialogRef} onClick={handleClick}>
+            <DialogTrigger asChild ref={dialogRef}>
               <div className="flex justify-center">
                 <Button
                   type="button"

@@ -39,7 +39,7 @@ const SauvegarderProgression = () => {
     ...client,
   };
   const form = useForm<InsertClientType>({
-    mode: "onBlur",
+    mode: "all",
     resolver: zodResolver(
       createInsertClientSchema({
         nomEntreprise: tSauverErreurs("nom-de-lentreprise-obligatoire"),

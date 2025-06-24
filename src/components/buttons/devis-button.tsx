@@ -216,18 +216,6 @@ const DevisButton = ({
     router.push("/devis/locaux");
   };
 
-  // const handleAlert = () => {
-  //   toast({
-  //     description:
-  //       "Les devis en ligne ne sont pas encore possibles depuis un mobile. Essayez depuis un ordinateur ou contactez-nous",
-  //     action: (
-  //       <ToastAction altText="Contactez-nous" asChild>
-  //         <Link href="/contact">Contact</Link>
-  //       </ToastAction>
-  //     ),
-  //   });
-  // };
-
   return devisProgress.completedSteps.includes(1) ? (
     <Dialog>
       <DialogTrigger asChild>
@@ -236,7 +224,7 @@ const DevisButton = ({
           variant="destructive"
           size={size}
           title={text}
-          className={`text-base shadow-md hover:shadow-lg ring-offset-2 ring-2 ring-destructive hover:scale-[101%] transition-transform ${className}`}
+          className={`text-base shadow-md hover:shadow-lg ring-offset-2 ring-2 ring-destructive hover:scale-[101%] transition-all ${className}`}
           disabled={disabled}
           onClick={
             setIsMobileNavOpen ? () => setIsMobileNavOpen(false) : undefined
@@ -275,7 +263,7 @@ const DevisButton = ({
         size={size}
         title={title}
         className={`text-base shadow-md hover:shadow-lg
-          ring-offset-2 ring-2  ring-destructive hover:scale-[101%] ${className}`}
+          ring-offset-2 ring-2 ring-destructive hover:scale-[101%] transition-all ${className}`}
         onClick={handleClickNouveau}
         disabled={disabled}
       >

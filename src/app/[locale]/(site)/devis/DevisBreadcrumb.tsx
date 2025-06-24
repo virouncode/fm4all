@@ -60,8 +60,6 @@ const DevisBreadcrumb = () => {
     sauvegarderSearchParams.set("typeOccupation", client.typeOccupation);
   }
 
-  //mes-services searchParams : surface, effectif, fournisseurId, nettoyageGamme
-
   const devisRoutes: {
     id: number;
     pathname:
@@ -166,6 +164,7 @@ const DevisBreadcrumb = () => {
 
   return (
     <>
+      {/* DESKTOP BREADCRUMB */}
       <div className="justify-center hidden lg:flex">
         <Breadcrumb className="h-20 md:h-10 overflow-auto">
           <BreadcrumbList className="text-sm lg:text-base">
@@ -198,7 +197,6 @@ const DevisBreadcrumb = () => {
                     >
                       {route.name[locale]}
                     </Link>
-                    // )
                   )}
                 </BreadcrumbItem>
                 {index < devisRoutes.length - 1 && <BreadcrumbSeparator />}
@@ -207,7 +205,8 @@ const DevisBreadcrumb = () => {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      <div className="justify-between flex lg:hidden sticky -mt-4 top-[65px] bg-white z-20 py-4 border-slate-200 border-b">
+      {/* MOBILE BREADCRUMB */}
+      <div className="flex justify-between items-center lg:hidden sticky -mt-4 top-[65px] bg-white z-20 py-4 border-slate-200 border-b">
         <div>
           {previousRoute ? (
             <Link
@@ -264,5 +263,3 @@ const DevisBreadcrumb = () => {
 };
 
 export default DevisBreadcrumb;
-
-//Si j'ai complété les étapes d'avant je suis cliquable

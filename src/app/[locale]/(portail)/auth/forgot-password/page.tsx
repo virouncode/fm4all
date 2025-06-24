@@ -29,7 +29,7 @@ export default function ForgotPassword() {
     email: "",
   };
   const form = useForm<ForgotPasswordType>({
-    mode: "onBlur",
+    mode: "all",
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues,
   });

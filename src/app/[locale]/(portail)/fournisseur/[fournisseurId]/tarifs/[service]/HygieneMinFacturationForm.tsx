@@ -37,7 +37,7 @@ const HygieneMinFacturationForm = ({
   );
   const defaultValues: UpdateHygieneMinFacturationType = initialTarif;
   const form = useForm<UpdateHygieneMinFacturationType>({
-    mode: "onBlur",
+    mode: "all",
     resolver: zodResolver(updateHygieneMinFacturationSchema),
     defaultValues,
   });

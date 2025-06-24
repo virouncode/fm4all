@@ -17,7 +17,7 @@ const CTAContactButtons = () => {
         <Button
           variant="destructive"
           size="lg"
-          className="w-full text-base flex items-center justify-center"
+          className="w-full text-base flex items-center justify-center ring-offset-2 ring-2 ring-destructive hover:scale-[101%] transition-all"
         >
           <Video />
           {locale === "fr"
@@ -29,7 +29,7 @@ const CTAContactButtons = () => {
         <Button
           variant="destructive"
           size="lg"
-          className="w-full text-base flex items-center justify-center"
+          className="w-full text-base flex items-center justify-center ring-offset-2 ring-2 ring-destructive hover:scale-[101%] transition-all"
         >
           <Phone />
           +33 6 69 31 10 46
@@ -42,7 +42,7 @@ const CTAContactButtons = () => {
         <Button
           variant="destructive"
           size="lg"
-          className="w-full text-base flex items-center justify-center"
+          className="w-full text-base flex items-center justify-center ring-offset-2 ring-2 ring-destructive hover:scale-[101%] transition-all"
         >
           <Mail />
           {locale === "fr" ? "Je contacte par email" : "Contact by e-mail"}

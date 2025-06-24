@@ -214,24 +214,14 @@ export const createMesLocauxSchema = (messages: {
   codePostal: string;
 }) => {
   return z.object({
-    surface: z
-      .string()
-      .refine(
-        (value) =>
-          /^\d+$/.test(value) &&
-          parseInt(value, 10) >= 50 &&
-          parseInt(value, 10) <= 3000,
-        messages.surface
-      ),
-    effectif: z
-      .string()
-      .refine(
-        (value) =>
-          /^\d+$/.test(value) &&
-          parseInt(value, 10) >= 1 &&
-          parseInt(value, 10) <= 300,
-        messages.effectif
-      ),
+    surface: z.coerce
+      .number()
+      .min(50, messages.surface)
+      .max(3000, messages.surface),
+    effectif: z.coerce
+      .number()
+      .min(1, messages.effectif)
+      .max(300, messages.effectif),
     typeBatiment: z.enum(
       ["bureaux", "localCommercial", "entrepot", "cabinetMedical"],
       { message: messages.batiment }

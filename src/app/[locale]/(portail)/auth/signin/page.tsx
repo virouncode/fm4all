@@ -32,7 +32,7 @@ export default function SignIn() {
   };
 
   const form = useForm<SignInType>({
-    mode: "onBlur",
+    mode: "all",
     resolver: zodResolver(
       createSignInSchema({
         email: t("email-obligatoire"),

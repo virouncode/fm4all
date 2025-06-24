@@ -44,7 +44,7 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
     image: info.image,
   };
   const form = useForm<UpdateAdminType>({
-    mode: "onBlur",
+    mode: "all",
     resolver: zodResolver(
       createUpdateAdminSchema({
         id: tAdmin("id-de-ladministrateur-invalide"),

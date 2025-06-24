@@ -79,7 +79,7 @@
     "hero": {
       "votre-entreprise-de": "fm4all | Your",
       "facility-management": "Facility Management",
-      "services-en-ile-de-france": " services |",
+      "services-en-ile-de-france": " services",
       "les-services-aux-entreprises-au-meilleur-prix": "Facility services at the best price.",
       "gagnez-du-temps-et-de-largent-sur-la": "Save time and money on the",
       "gestion-de-vos-prestations": "management of your hard and soft services:",
@@ -867,7 +867,7 @@
           "batimentEntier": "Entire building"
         },
         "erreurs": {
-          "surface": "The area must be a number between 50 and 3000 m²",
+          "surface": "The area must be an integer between 50 and 3000 m²",
           "effectif": "The number of people must be between 1 and 300",
           "batiment": "Invalid building type",
           "occupation": "Invalid type of occupancy",

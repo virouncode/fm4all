@@ -38,7 +38,7 @@ const ClientForm = ({ clients }: ClientFormProps) => {
     image: null,
   };
   const form = useForm<InsertUserType>({
-    mode: "onBlur",
+    mode: "all",
     // resolver: zodResolver(insertUserSchema),
     defaultValues,
   });

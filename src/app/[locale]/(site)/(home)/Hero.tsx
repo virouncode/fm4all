@@ -18,7 +18,7 @@ const Hero = async () => {
             <span className="text-fm4alldestructive">
               {t("facility-management")}
             </span>
-            {locale === "fr" ? "|" : t("services-en-ile-de-france")}
+            {locale === "fr" ? "." : `${t("services-en-ile-de-france")}.`}
           </h1>
           <h2 className="text-xl md:text-2xl font-medium mb-8 animate-appear text-center">
             {t("les-services-aux-entreprises-au-meilleur-prix")}
