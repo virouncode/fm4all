@@ -239,7 +239,7 @@ const MesLocaux = () => {
       setTotal
     );
     setLoaderVisible(true);
-    // window.scrollTo(0, 0);
+    window.scrollTo(0, 0);
     setTimeout(() => {
       router.push({
         pathname: "/devis/services",
