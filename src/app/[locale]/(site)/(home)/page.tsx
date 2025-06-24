@@ -29,7 +29,7 @@ export const generateMetadata = async ({
   const title =
     locale === "fr"
       ? "Entreprise de Facility Management Paris IDF | Devis"
-      : "Facility Management Services in Paris – Free Quote | fm4all";
+      : "Facility Management Services in Paris | Instant Quote";
 
   // Description basée sur la langue
   const description =
