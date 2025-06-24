@@ -2,8 +2,6 @@ import { Link } from "@/i18n/navigation";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Suspense } from "react";
-import ServicesLoader from "../(etapes)/locaux/ServicesLoader";
 import SauvegarderProgression from "./SauvegarderProgression";
 
 export const generateMetadata = async (): Promise<Metadata> => {
@@ -71,9 +69,7 @@ const page = async ({
           {tSauver("5-sauvegarder-ma-progression")}
         </h1>
       </div>
-      <Suspense fallback={<ServicesLoader />}>
-        <SauvegarderProgression />
-      </Suspense>
+      <SauvegarderProgression />
     </>
   );
 };
