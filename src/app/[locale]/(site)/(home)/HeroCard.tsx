@@ -6,7 +6,14 @@ const HeroCard = async () => {
   const t = await getTranslations("HomePage.hero");
 
   return (
-    <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 mb-8 border border-white/20 flex flex-col gap-6 text-base md:text-xl animate-appear">
+    <div className="bg-blue-500/10 backdrop-blur-xl rounded-xl p-6 mb-8 border border-white/20 flex flex-col gap-6 text-base md:text-lg animate-appear">
+      <h2 className="text-xl md:text-2xl font-bold animate-appear text-center">
+        {t("les-services-aux-entreprises-au-meilleur-prix")}
+      </h2>
+      <p className="text-center">
+        🚀 <strong>{t("contact-contrat-facture")}</strong>{" "}
+        {t("pour-tous-vos-services")}
+      </p>
       <p>
         {t("gagnez-du-temps-et-de-largent-sur-la")}{" "}
         <strong>{t("gestion-de-vos-prestations")}</strong>{" "}
@@ -14,10 +21,7 @@ const HeroCard = async () => {
           "de-nettoyage-hygiene-sanitaire-cafe-maintenance-multitechnique-securite-incendie-etc"
         )}
       </p>
-      <p className="text-center">
-        <strong>{t("contact-contrat-facture")}</strong>{" "}
-        {t("pour-tous-vos-services")}
-      </p>
+
       <ul className="space-y-4 mb-10">
         <li className="flex items-start">
           <span className="inline-flex items-center justify-center bg-fm4allsecondary text-white rounded-full w-6 h-6 mr-3 flex-shrink-0 mt-0.5">
