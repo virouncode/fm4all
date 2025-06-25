@@ -11,8 +11,9 @@ export const auth = betterAuth({
   session: {
     cookieCache: {
       enabled: true,
-      maxAge: 5 * 60, // par exemple
+      maxAge: 3600,
     },
+    updateAge: 86400,
   },
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -23,7 +24,6 @@ export const auth = betterAuth({
       account,
     },
   }),
-
   user: {
     changeEmail: {
       enabled: true,

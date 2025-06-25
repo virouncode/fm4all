@@ -6,7 +6,7 @@ const HeroCard = async () => {
   const t = await getTranslations("HomePage.hero");
 
   return (
-    <div className="bg-blue-500/10 backdrop-blur-xl rounded-xl p-6 mb-8 border border-white/20 flex flex-col gap-6 text-base md:text-lg animate-appear">
+    <div className="bg-blue-500/10 backdrop-blur-xl rounded-xl p-6 border border-white/20 flex flex-col gap-6 text-base md:text-lg animate-appear">
       <h2 className="text-xl md:text-2xl font-bold animate-appear text-center">
         {t("les-services-aux-entreprises-au-meilleur-prix")}
       </h2>
@@ -21,39 +21,41 @@ const HeroCard = async () => {
           "de-nettoyage-hygiene-sanitaire-cafe-maintenance-multitechnique-securite-incendie-etc"
         )}
       </p>
-
-      <ul className="space-y-4 mb-10">
-        <li className="flex items-start">
-          <span className="inline-flex items-center justify-center bg-fm4allsecondary text-white rounded-full w-6 h-6 mr-3 flex-shrink-0 mt-0.5">
-            ✓
-          </span>
-          <span>
-            <strong className="text-white">{t("comparez")}</strong>{" "}
-            {t("par-gamme")}
-            <span className="font-bold ml-1">{tGlobal("essentiel")}</span>,{" "}
-            <span className="font-bold">{tGlobal("confort")}</span>,{" "}
-            <span className="font-bold">{tGlobal("excellence")}</span>
-          </span>
-        </li>
-        <li className="flex items-start">
-          <span className="inline-flex items-center justify-center bg-fm4allsecondary text-white rounded-full w-6 h-6 mr-3 flex-shrink-0 mt-0.5">
-            ✓
-          </span>
-          <span>
-            <strong className="text-white">{t("simplifiez")}</strong>{" "}
-            {t("la-mise-en-place-des-services")}
-          </span>
-        </li>
-        <li className="flex items-start">
-          <span className="inline-flex items-center justify-center bg-fm4allsecondary text-white rounded-full w-6 h-6 mr-3 flex-shrink-0 mt-0.5">
-            ✓
-          </span>
-          <span>
-            <strong className="text-white">{t("deleguez")}</strong>{" "}
-            {t("la-gestion-du-quotidien")}
-          </span>
-        </li>
-      </ul>
+      <div className="flex justify-center">
+        <ul className="space-y-4 mb-6">
+          <li className="flex items-start list-check">
+            {/* <span className="inline-flex items-center justify-center bg-fm4allsecondary text-white rounded-full w-6 h-6 mr-3 flex-shrink-0 mt-0.5">
+              ✓
+            </span> */}
+            <span>
+              <strong className="text-white">{t("comparez")}</strong>{" "}
+              {t("par-gamme")}
+              <span className="font-bold ml-1">
+                {tGlobal("essentiel")}
+              </span>, <span className="font-bold">{tGlobal("confort")}</span>,{" "}
+              <span className="font-bold">{tGlobal("excellence")}</span>
+            </span>
+          </li>
+          <li className="flex items-start list-check">
+            {/* <span className="inline-flex items-center justify-center bg-fm4allsecondary text-white rounded-full w-6 h-6 mr-3 flex-shrink-0 mt-0.5">
+              ✓
+            </span> */}
+            <span>
+              <strong className="text-white">{t("simplifiez")}</strong>{" "}
+              {t("la-mise-en-place-des-services")}
+            </span>
+          </li>
+          <li className="flex items-start list-check">
+            {/* <span className="inline-flex items-center justify-center bg-fm4allsecondary text-white rounded-full w-6 h-6 mr-3 flex-shrink-0 mt-0.5">
+              ✓
+            </span> */}
+            <span>
+              <strong className="text-white">{t("deleguez")}</strong>{" "}
+              {t("la-gestion-du-quotidien")}
+            </span>
+          </li>
+        </ul>
+      </div>
       <div className="hidden md:flex md:justify-center">
         <DevisButton
           title={tGlobal("je-realise-mon-devis-en-ligne")}

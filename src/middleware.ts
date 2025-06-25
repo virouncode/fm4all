@@ -12,6 +12,7 @@ import {
   handleServiceRedirects,
 } from "./redirects/handleRedirects";
 import { goneUrls, legacyRedirects } from "./redirects/urls";
+import { SelectUserType } from "./zod-schemas/user";
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -86,78 +87,121 @@ export async function middleware(req: NextRequest) {
 
   // //=============================== ROUTE PROTEGEE =============================//
   const sessionCookie = await getCookieCache(req);
-  const session = sessionCookie?.session;
-  const user = sessionCookie?.user;
+  const sessionInCookie = sessionCookie?.session;
+  const userInCookie = sessionCookie?.user;
 
-  //Si pas de session
-  if (!session) {
-    return NextResponse.redirect(new URL(`/${locale}/auth/signin`, req.url));
-  }
-  //Si session et role invalide
-  if (session && user) {
-    switch (user.role) {
-      case "admin":
-        if (pathnameWithoutLocale.startsWith("/client"))
-          return NextResponse.redirect(
-            new URL(`/${locale}/auth/unauthorized?type=client`, req.url)
-          );
-        if (pathnameWithoutLocale.startsWith("/fournisseur")) {
-          return NextResponse.redirect(
-            new URL(`/${locale}/auth/unauthorized?type=fournisseur`, req.url)
-          );
-        }
-        //Récupérer le adminId dans les params
-        const adminId = pathnameWithoutLocale.split("/")[2];
-        if (adminId && adminId !== user.id) {
-          return NextResponse.redirect(
-            new URL(`/${locale}/auth/unauthorized?type=admin`, req.url)
-          );
-        }
-        break;
-      case "client":
-        if (pathnameWithoutLocale.startsWith("/admin"))
-          return NextResponse.redirect(
-            new URL(`/${locale}/auth/unauthorized?type=admin`, req.url)
-          );
-        if (pathnameWithoutLocale.startsWith("/fournisseur"))
-          return NextResponse.redirect(
-            new URL(`/${locale}/auth/unauthorized?type=fournisseur`, req.url)
-          );
-        const clientId = pathnameWithoutLocale.split("/")[2];
-        if (clientId && parseInt(clientId) !== user.clientId) {
-          return NextResponse.redirect(
-            new URL(`/${locale}/auth/unauthorized?type=client`, req.url)
-          );
-        }
-        break;
-
-      case "fournisseur":
-        if (pathnameWithoutLocale.startsWith("/admin"))
-          return NextResponse.redirect(
-            new URL(`/${locale}/auth/unauthorized?type=admin`, req.url)
-          );
-        if (pathnameWithoutLocale.startsWith("/client"))
-          return NextResponse.redirect(
-            new URL(`/${locale}/auth/unauthorized?type=client`, req.url)
-          );
-        const fournisseurId = pathnameWithoutLocale.split("/")[2];
-
-        if (fournisseurId && parseInt(fournisseurId) !== user.fournisseurId) {
-          return NextResponse.redirect(
-            new URL(`/${locale}/auth/unauthorized?type=fournisseur`, req.url)
-          );
-        }
-        break;
-      default:
-        return NextResponse.redirect(
-          new URL(`/${locale}/auth/unauthorized`, req.url)
-        );
+  //L'utilisateur et la session sont dans le cookie
+  if (sessionInCookie && userInCookie) {
+    const checked = isAuthorizedRoute(
+      userInCookie.role,
+      pathnameWithoutLocale,
+      userInCookie as SelectUserType
+    );
+    if (!checked.authorized) {
+      //route non autorisée
+      return NextResponse.redirect(
+        new URL(`/${locale}/auth/unauthorized?type=${checked.type}`, req.url)
+      );
+    } else {
+      //route autorisée
+      return intlMiddleware(req);
     }
   }
-  return intlMiddleware(req);
-  //============================================================================//
+
+  //L'utilisateur et la session ne sont pas dans le cookie
+  try {
+    //On va récupérer la session depuis l'API
+    const sessionResponse = await fetch(
+      `${req.nextUrl.origin}/api/auth/get-session`,
+      {
+        headers: {
+          cookie: req.headers.get("cookie") || "",
+        },
+      }
+    );
+    if (!sessionResponse.ok) {
+      console.error(
+        "Erreur lors de la récupération de la session:",
+        sessionResponse.status
+      );
+      return NextResponse.redirect(new URL(`/${locale}/auth/signin`, req.url));
+    }
+    const sessionData = await sessionResponse.json();
+    const session = sessionData?.session;
+    const user = sessionData?.user;
+
+    if (session && user) {
+      // Si la session et l'utilisateur existent
+      const checked = isAuthorizedRoute(
+        user.role,
+        pathnameWithoutLocale,
+        user as SelectUserType
+      );
+      if (!checked.authorized) {
+        //route non autorisée
+        return NextResponse.redirect(
+          new URL(`/${locale}/auth/unauthorized?type=${checked.type}`, req.url)
+        );
+      } else {
+        //route autorisée
+        return intlMiddleware(req);
+      }
+    } else {
+      // Si la session ou l'utilisateur n'existe pas
+      return NextResponse.redirect(new URL(`/${locale}/auth/signin`, req.url));
+    }
+  } catch (err) {
+    console.error("Erreur lors de la récupération de la session:", err);
+    return NextResponse.redirect(new URL(`/${locale}/auth/signin`, req.url));
+  }
 }
+
+//============================================================================//
 
 export const config = {
   matcher: "/((?!api|trpc|_next|_vercel|.*\\..*).*)",
 };
+
+type Role = "admin" | "client" | "fournisseur";
+
+function isAuthorizedRoute(
+  role: Role,
+  pathnameWithoutLocale: string,
+  user: SelectUserType // Tu peux typer mieux selon ta structure
+): { authorized: boolean; type?: string } {
+  const segments = pathnameWithoutLocale.split("/").filter(Boolean);
+  const userId = segments[1];
+
+  console.log("Checking authorization for role:", role);
+  console.log("Pathname without locale:", pathnameWithoutLocale);
+  console.log("User ID from path:", userId);
+
+  if (role === "admin") {
+    if (pathnameWithoutLocale.startsWith("/client"))
+      return { authorized: false, type: "client" };
+    if (pathnameWithoutLocale.startsWith("/fournisseur"))
+      return { authorized: false, type: "fournisseur" };
+    if (userId && userId !== user.id)
+      return { authorized: false, type: "admin" };
+  }
+
+  if (role === "client") {
+    if (pathnameWithoutLocale.startsWith("/admin"))
+      return { authorized: false, type: "admin" };
+    if (pathnameWithoutLocale.startsWith("/fournisseur"))
+      return { authorized: false, type: "fournisseur" };
+    if (userId && parseInt(userId) !== user.clientId)
+      return { authorized: false, type: "client" };
+  }
+
+  if (role === "fournisseur") {
+    if (pathnameWithoutLocale.startsWith("/admin"))
+      return { authorized: false, type: "admin" };
+    if (pathnameWithoutLocale.startsWith("/client"))
+      return { authorized: false, type: "client" };
+    if (userId && parseInt(userId) !== user.fournisseurId)
+      return { authorized: false, type: "fournisseur" };
+  }
+
+  return { authorized: true };
+}
