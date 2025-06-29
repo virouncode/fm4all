@@ -5,7 +5,7 @@ import {
   createUpdateSchema,
 } from "drizzle-zod";
 import { z } from "zod";
-import { isValidSIRET } from "../lib/utils/isValideSIRET";
+import { isValidSIRET } from "../lib/utils/isValidSIRET";
 
 //SELECT
 export const selectClientSchema = createSelectSchema(clients, {

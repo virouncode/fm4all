@@ -33,13 +33,13 @@ export function generateLocalizedDynamicRouteParams<T extends string>(
   paramName: T
 ): Array<{ locale: string } & Record<T, string>> {
   return [
-    ...slugsFr.map((slug) => {
+    ...slugsFr.filter(Boolean).map((slug) => {
       return {
         locale: "fr",
         [paramName]: slug,
       } as { locale: string } & Record<T, string>;
     }),
-    ...slugsEn.map((slug) => {
+    ...slugsEn.filter(Boolean).map((slug) => {
       return {
         locale: "en",
         [paramName]: slug,

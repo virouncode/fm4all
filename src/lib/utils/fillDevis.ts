@@ -6,7 +6,7 @@ import { InsertClientType } from "@/zod-schemas/client";
 import html2canvas from "html2canvas";
 import { PDFDocument, PDFTextField, RotationTypes } from "pdf-lib";
 import { formatNumber } from "./formatNumber";
-import { formatSIRET } from "./isValideSIRET";
+import { formatSIRET } from "./isValidSIRET";
 import { sanitizeText } from "./sanitizeText";
 
 export const fillDevis = async (

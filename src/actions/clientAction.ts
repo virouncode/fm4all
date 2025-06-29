@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { clients } from "@/db/schema";
 import { actionClient } from "@/lib/safe-actions";
 import { capitalize } from "@/lib/utils/capitalize";
-import { formatSIRET } from "@/lib/utils/isValideSIRET";
+import { formatSIRET } from "@/lib/utils/isValidSIRET";
 import {
   insertClientSchema,
   InsertClientType,

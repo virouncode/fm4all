@@ -83,17 +83,6 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
           { locale: newLocale }
         );
       }
-      // } else if (pathname === "/tag/[slug]") {
-      //   if (typeof params.slug === "string") {
-      //     const newSlug =
-      //       newLocale === "fr"
-      //         ? getTagSlugFr(params.slug)
-      //         : getTagSlugEn(params.slug);
-      //     router.replace(
-      //       { pathname, params: { slug: newSlug }, query },
-      //       { locale: newLocale }
-      //     );
-      //   }
     } else if (pathname === "/secteurs/[slug]") {
       if (typeof params.slug === "string") {
         const newSlug =

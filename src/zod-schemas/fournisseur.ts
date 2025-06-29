@@ -1,5 +1,5 @@
 import { fournisseurs } from "@/db/schema";
-import { isValidSIRET } from "@/lib/utils/isValideSIRET";
+import { isValidSIRET } from "@/lib/utils/isValidSIRET";
 import {
   createInsertSchema,
   createSelectSchema,

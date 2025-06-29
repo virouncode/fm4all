@@ -7,11 +7,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Link } from "@/i18n/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 import { getLocalStorage, setLocalStorage } from "@/lib/utils/storageHelper";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+
 import { useEffect, useState } from "react";
 
 const COOKIE_EXPIRATION_MS = 1000 * 60 * 60 * 24;
@@ -21,6 +21,7 @@ const CookieBanner = () => {
   const t = useTranslations("cookieBanniere");
   const [cookieConsent, setCookieConsent] = useState<boolean | null>(null);
   const pathname = usePathname();
+
   useEffect(() => {
     const storedCookieConsent = getLocalStorage("cookie_consent", null);
     const storedConsentDate = getLocalStorage("cookie_consent_date", null);
@@ -58,9 +59,7 @@ const CookieBanner = () => {
     setCookieConsent(false);
   };
   return (
-    <Sheet
-      open={cookieConsent === null && pathname !== "/politique-de-cookies"}
-    >
+    <Sheet open={cookieConsent === null && pathname !== "/cookies"}>
       <SheetTrigger asChild></SheetTrigger>
       <SheetContent side="bottom" className="[&>button:first-child]:hidden">
         <SheetHeader>

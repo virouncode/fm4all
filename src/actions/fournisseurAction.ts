@@ -7,7 +7,7 @@ import { sendEmailFromServer } from "@/lib/email/sendEmail";
 import { actionClient } from "@/lib/safe-actions";
 import { capitalize } from "@/lib/utils/capitalize";
 import { generatePassword } from "@/lib/utils/generatePassword";
-import { formatSIRET } from "@/lib/utils/isValideSIRET";
+import { formatSIRET } from "@/lib/utils/isValidSIRET";
 import {
   insertFournisseurSchema,
   InsertFournisseurType,

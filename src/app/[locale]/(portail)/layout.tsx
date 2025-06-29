@@ -7,6 +7,7 @@ import { Metadata } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { ThemeProvider } from "next-themes";
 import { Didact_Gothic } from "next/font/google";
+
 import { notFound } from "next/navigation";
 import "../globals.css";
 

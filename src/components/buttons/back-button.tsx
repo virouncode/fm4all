@@ -1,7 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+
 import { ButtonHTMLAttributes } from "react";
 
 type BackButtonProps = {
