@@ -50,7 +50,6 @@ type DevisButtonProps = {
   text: string;
   size?: "default" | "sm" | "lg" | "icon" | null;
   className?: string;
-  disabled?: boolean;
   setIsMobileNavOpen?: Dispatch<SetStateAction<boolean>>;
   withIcon?: boolean;
 };
@@ -60,7 +59,6 @@ const DevisButton = ({
   text,
   className,
   size = "default",
-  disabled = false,
   withIcon = true,
   setIsMobileNavOpen,
 }: DevisButtonProps) => {
@@ -168,10 +166,9 @@ const DevisButton = ({
   ];
 
   const handleClickReprendre = () => {
-    const route = devisProgress.currentStep
-      ? (devisRoutes.find(({ id }) => id === devisProgress.currentStep) ??
-        devisRoutes[0])
-      : devisRoutes[0];
+    const route =
+      devisRoutes.find(({ id }) => id === devisProgress.currentStep) ??
+      devisRoutes[0];
 
     router.push({
       pathname: `/devis${route.pathname}`,
@@ -225,7 +222,6 @@ const DevisButton = ({
           size={size}
           title={text}
           className={`text-base shadow-md hover:shadow-lg ring-offset-2 ring-2 ring-destructive hover:scale-[101%] transition-all ${className}`}
-          disabled={disabled}
           onClick={
             setIsMobileNavOpen ? () => setIsMobileNavOpen(false) : undefined
           }
@@ -265,7 +261,6 @@ const DevisButton = ({
         className={`text-base shadow-md hover:shadow-lg
           ring-offset-2 ring-2 ring-destructive hover:scale-[101%] transition-all ${className}`}
         onClick={handleClickNouveau}
-        disabled={disabled}
       >
         {withIcon && <ReceiptText className="hidden sm:inline" />} {text}
       </Button>

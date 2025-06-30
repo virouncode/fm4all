@@ -15,13 +15,19 @@ describe("Author", () => {
     expect(screen.getByText(/jean dupont/i)).toBeInTheDocument();
   });
 
-  it("should render formatted date based on locale if date is provided", () => {
-    render(<Author {...baseProps} />);
-    const expectedDate = DateTime.fromISO(baseProps.date)
-      .setLocale("fr")
-      .toLocaleString(DateTime.DATETIME_SHORT);
-    expect(screen.getByText(new RegExp(expectedDate))).toBeInTheDocument();
-  });
+  it.each([
+    ["fr", "fr"],
+    ["en", "en"],
+  ])(
+    "should render formatted date based on locale %s if date is provided",
+    (locale) => {
+      render(<Author {...baseProps} locale={locale} />);
+      const expectedDate = DateTime.fromISO(baseProps.date)
+        .setLocale(locale)
+        .toLocaleString(DateTime.DATETIME_SHORT);
+      expect(screen.getByText(new RegExp(expectedDate))).toBeInTheDocument();
+    }
+  );
 
   it("should not render date if date is not provided", () => {
     render(<Author {...baseProps} date={undefined} />);
@@ -39,7 +45,7 @@ describe("Author", () => {
         portraitAlt="Portrait de Jean"
       />
     );
-    const img = screen.getByRole("img");
+    const img = screen.getByAltText("Portrait de Jean");
     expect(img).toBeInTheDocument();
     expect(img).toHaveAttribute("src", "/avatar.jpg");
   });

@@ -102,7 +102,7 @@ export function CalculatorDialog() {
       toast({
         variant: "destructive",
         title: "Erreur",
-        description: "Impossible de copier dans le presse-papiers.",
+        description: `Impossible de copier dans le presse-papiers`,
       });
     }
   };

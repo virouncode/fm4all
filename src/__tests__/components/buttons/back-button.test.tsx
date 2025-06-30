@@ -13,6 +13,10 @@ describe("BackButton", () => {
       button: screen.getByRole("button", { name: /retour/i }),
     };
   };
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   //Rendering
   it("should render a button with the right text", () => {
     const { button } = renderComponent();

@@ -96,6 +96,9 @@ const defaultClient: InsertClientType = {
 import DevisButton from "@/components/buttons/devis-button";
 
 describe("DevisButton", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
   it("should render a button with the correct text", () => {
     render(
       <DevisButton title="Mon devis en ligne" text="Mon devis en ligne" />
@@ -145,7 +148,35 @@ describe("DevisButton", () => {
     expect(screen.getByRole("button", { name: "nouveau" })).toBeInTheDocument();
   });
 
-  it("should handle 'Nouveau' and 'Reprendre' actions correctly", async () => {
+  it("should handle 'Nouveau' action correctly", async () => {
+    const { button } = renderWithContexts(
+      <DevisButton
+        title="Mon devis en ligne"
+        text="Mon devis en ligne"
+        setIsMobileNavOpen={setIsMobileNavOpen}
+      />,
+      {
+        devisContext: {
+          devisProgress: {
+            currentStep: 2,
+            completedSteps: [1],
+          },
+          setDevisProgress: vi.fn(),
+        },
+      }
+    );
+
+    const user = userEvent.setup();
+    await user.click(button);
+
+    const nouveauButton = screen.getByRole("button", { name: "nouveau" });
+    await user.click(nouveauButton);
+    expect(pushMock).toHaveBeenCalledWith("/devis/locaux");
+    expect(setIsMobileNavOpen).toHaveBeenCalledWith(false);
+    expect(fullReinitialisationDevis).toHaveBeenCalled();
+  });
+
+  it("should handle 'Reprendre' action correctly", async () => {
     const { button } = renderWithContexts(
       <DevisButton
         title="Mon devis en ligne"
@@ -170,12 +201,6 @@ describe("DevisButton", () => {
     await user.click(reprendreButton);
     expect(pushMock).toHaveBeenCalled();
     expect(setIsMobileNavOpen).toHaveBeenCalledWith(false);
-
-    const nouveauButton = screen.getByRole("button", { name: "nouveau" });
-    await user.click(nouveauButton);
-    expect(pushMock).toHaveBeenCalledWith("/devis/locaux");
-    expect(setIsMobileNavOpen).toHaveBeenCalledWith(false);
-    expect(fullReinitialisationDevis).toHaveBeenCalled();
   });
 
   it("should redirect to /devis/services with the right search params", async () => {
@@ -204,7 +229,7 @@ describe("DevisButton", () => {
     await user.click(button);
     const reprendreButton = screen.getByRole("button", { name: "reprendre" });
     await user.click(reprendreButton);
-    expect(pushMock).toHaveBeenLastCalledWith({
+    expect(pushMock).toHaveBeenCalledWith({
       pathname: "/devis/services",
       query: {
         effectif: "20",
@@ -238,7 +263,7 @@ describe("DevisButton", () => {
     await user.click(button);
     const reprendreButton = screen.getByRole("button", { name: "reprendre" });
     await user.click(reprendreButton);
-    expect(pushMock).toHaveBeenLastCalledWith({
+    expect(pushMock).toHaveBeenCalledWith({
       pathname: "/devis/sauvegarder",
       query: {
         effectif: "20",

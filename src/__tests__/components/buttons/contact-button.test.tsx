@@ -24,6 +24,9 @@ describe("ContactButton", () => {
       phoneIcon: screen.getByTestId("phone-icon"),
     };
   };
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
   //Rendering
   // it("should render a contact link and a phone icon", () => {
   //déjà vérifié par getByRole

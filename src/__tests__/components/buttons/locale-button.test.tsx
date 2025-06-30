@@ -7,6 +7,7 @@ import {
   paramsMock,
   pathnameMock,
   replaceMock,
+  setSearchParamsMock,
   useLocaleMock,
 } from "../mocks";
 
@@ -14,33 +15,46 @@ mocki18nNavigation();
 mockNextNavigation();
 mockNextIntl();
 
+let user: ReturnType<typeof userEvent.setup>;
+
 import LocaleButton from "@/components/buttons/locale-button";
 
 describe("LocaleButton", () => {
   beforeEach(() => {
-    vi.clearAllMocks(); //
+    vi.clearAllMocks();
+    setSearchParamsMock({});
+    user = userEvent.setup();
   });
+
   it("switches from fr to en and updates slug correctly for services", async () => {
     pathnameMock.mockReturnValue("/services/[slug]");
     paramsMock.mockReturnValue({ slug: "nettoyage" });
+    setSearchParamsMock({
+      surface: "100",
+      effectif: "20",
+    });
 
     render(<LocaleButton />);
 
     const button = screen.getByRole("button", { name: "Changer de langue" });
-    await userEvent.click(button);
+    await user.click(button);
 
     const enOption = screen.getByText("🇬🇧 EN");
-    await userEvent.click(enOption);
+    await user.click(enOption);
 
     expect(replaceMock).toHaveBeenCalledWith(
       {
         pathname: "/services/[slug]",
         params: { slug: "cleaning-services" },
-        query: {},
+        query: {
+          surface: "100",
+          effectif: "20",
+        },
       },
       { locale: "en" }
     );
   });
+
   it("switches from fr to en and updates slug correctly for sectors", async () => {
     pathnameMock.mockReturnValue("/secteurs/[slug]");
     paramsMock.mockReturnValue({
@@ -50,10 +64,10 @@ describe("LocaleButton", () => {
     render(<LocaleButton />);
 
     const button = screen.getByRole("button", { name: "Changer de langue" });
-    await userEvent.click(button);
+    await user.click(button);
 
     const enOption = screen.getByText("🇬🇧 EN");
-    await userEvent.click(enOption);
+    await user.click(enOption);
 
     expect(replaceMock).toHaveBeenCalledWith(
       {
@@ -66,6 +80,7 @@ describe("LocaleButton", () => {
       { locale: "en" }
     );
   });
+
   it("switches from fr to en and updates slug correctly for blog", async () => {
     pathnameMock.mockReturnValue("/blog/[slug]");
     paramsMock.mockReturnValue({
@@ -75,10 +90,10 @@ describe("LocaleButton", () => {
     render(<LocaleButton />);
 
     const button = screen.getByRole("button", { name: "Changer de langue" });
-    await userEvent.click(button);
+    await user.click(button);
 
     const enOption = screen.getByText("🇬🇧 EN");
-    await userEvent.click(enOption);
+    await user.click(enOption);
 
     expect(replaceMock).toHaveBeenCalledWith(
       {
@@ -91,6 +106,7 @@ describe("LocaleButton", () => {
       { locale: "en" }
     );
   });
+
   it("switches from fr to en and updates slug and subSlug correctly for blog", async () => {
     pathnameMock.mockReturnValue("/blog/[slug]/[subSlug]");
     paramsMock.mockReturnValue({
@@ -101,10 +117,10 @@ describe("LocaleButton", () => {
     render(<LocaleButton />);
 
     const button = screen.getByRole("button", { name: "Changer de langue" });
-    await userEvent.click(button);
+    await user.click(button);
 
     const enOption = screen.getByText("🇬🇧 EN");
-    await userEvent.click(enOption);
+    await user.click(enOption);
 
     expect(replaceMock).toHaveBeenCalledWith(
       {
@@ -118,6 +134,7 @@ describe("LocaleButton", () => {
       { locale: "en" }
     );
   });
+
   it("switches from en to fr and updates slug correctly for services", async () => {
     useLocaleMock.mockReturnValue("en");
     pathnameMock.mockReturnValue("/services/[slug]");
@@ -126,12 +143,12 @@ describe("LocaleButton", () => {
     render(<LocaleButton />);
 
     const button = screen.getByRole("button", { name: "Change language" });
-    await userEvent.click(button);
+    await user.click(button);
 
     const options = screen.getAllByRole("menuitemcheckbox");
     const frOption = options.find((el) => el.textContent?.includes("🇫🇷 FR"));
     if (!frOption) throw new Error("FR option not found");
-    await userEvent.click(frOption);
+    await user.click(frOption);
 
     expect(replaceMock).toHaveBeenCalledWith(
       {
@@ -142,6 +159,7 @@ describe("LocaleButton", () => {
       { locale: "fr" }
     );
   });
+
   it("switches from en to fr and updates slug correctly for sectors", async () => {
     useLocaleMock.mockReturnValue("en");
     pathnameMock.mockReturnValue("/secteurs/[slug]");
@@ -152,12 +170,12 @@ describe("LocaleButton", () => {
     render(<LocaleButton />);
 
     const button = screen.getByRole("button", { name: "Change language" });
-    await userEvent.click(button);
+    await user.click(button);
 
     const options = screen.getAllByRole("menuitemcheckbox");
     const frOption = options.find((el) => el.textContent?.includes("🇫🇷 FR"));
     if (!frOption) throw new Error("FR option not found");
-    await userEvent.click(frOption);
+    await user.click(frOption);
 
     expect(replaceMock).toHaveBeenCalledWith(
       {
@@ -168,6 +186,7 @@ describe("LocaleButton", () => {
       { locale: "fr" }
     );
   });
+
   it("switches from en to fr and updates slug correctly for blog", async () => {
     useLocaleMock.mockReturnValue("en");
     pathnameMock.mockReturnValue("/blog/[slug]");
@@ -178,12 +197,12 @@ describe("LocaleButton", () => {
     render(<LocaleButton />);
 
     const button = screen.getByRole("button", { name: "Change language" });
-    await userEvent.click(button);
+    await user.click(button);
 
     const options = screen.getAllByRole("menuitemcheckbox");
     const frOption = options.find((el) => el.textContent?.includes("🇫🇷 FR"));
     if (!frOption) throw new Error("FR option not found");
-    await userEvent.click(frOption);
+    await user.click(frOption);
 
     expect(replaceMock).toHaveBeenCalledWith(
       {
@@ -194,6 +213,7 @@ describe("LocaleButton", () => {
       { locale: "fr" }
     );
   });
+
   it("switches from en to fr and updates slug and subSlug correctly for blog", async () => {
     useLocaleMock.mockReturnValue("en");
     pathnameMock.mockReturnValue("/blog/[slug]/[subSlug]");
@@ -205,12 +225,12 @@ describe("LocaleButton", () => {
     render(<LocaleButton />);
 
     const button = screen.getByRole("button", { name: "Change language" });
-    await userEvent.click(button);
+    await user.click(button);
 
     const options = screen.getAllByRole("menuitemcheckbox");
     const frOption = options.find((el) => el.textContent?.includes("🇫🇷 FR"));
     if (!frOption) throw new Error("FR option not found");
-    await userEvent.click(frOption);
+    await user.click(frOption);
 
     expect(replaceMock).toHaveBeenCalledWith(
       {
@@ -224,6 +244,7 @@ describe("LocaleButton", () => {
       { locale: "fr" }
     );
   });
+
   it("does not call replace if new locale is the same as current", async () => {
     useLocaleMock.mockReturnValue("fr");
     pathnameMock.mockReturnValue("/services/[slug]");
@@ -231,12 +252,28 @@ describe("LocaleButton", () => {
 
     render(<LocaleButton />);
     const button = screen.getByRole("button", { name: "Changer de langue" });
-    await userEvent.click(button);
+    await user.click(button);
 
     const options = screen.getAllByRole("menuitemcheckbox");
     const frOption = options.find((el) => el.textContent?.includes("🇫🇷 FR"));
     if (!frOption) throw new Error("FR option not found");
-    await userEvent.click(frOption);
+    await user.click(frOption);
     expect(replaceMock).not.toHaveBeenCalled();
+  });
+
+  it("closes the dropdown menu after selecting a language", async () => {
+    useLocaleMock.mockReturnValue("fr");
+    pathnameMock.mockReturnValue("/services/[slug]");
+    paramsMock.mockReturnValue({ slug: "nettoyage" });
+
+    render(<LocaleButton />);
+
+    const button = screen.getByRole("button", { name: "Changer de langue" });
+    await user.click(button);
+    expect(screen.getByRole("menu")).toBeInTheDocument();
+
+    const enOption = screen.getByText("🇬🇧 EN");
+    await user.click(enOption);
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
   });
 });

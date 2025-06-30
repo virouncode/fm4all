@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { mockNextIntl } from "../mocks";
+import { mockNextIntl, useLocaleMock } from "../mocks";
 
 mockNextIntl();
 
@@ -12,26 +12,35 @@ vi.mock("lucide-react", () => ({
 import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
 
 describe("CTAContactButtons", () => {
-  const renderComponent = () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+  const renderComponent = (locale: "fr" | "en" = "fr") => {
     render(<CTAContactButtons />);
     return {
       videoButton: screen.getByRole("button", {
-        name: /je prends un rendez-vous en visio/i,
+        name:
+          locale === "fr"
+            ? /je prends un rendez-vous en visio/i
+            : /schedule a video call/i,
       }),
       phoneButton: screen.getByRole("button", {
         name: /\+33 6 69 31 10 46/i,
       }),
       emailButton: screen.getByRole("button", {
-        name: /je contacte par email/i,
+        name: locale === "fr" ? /je contacte par email/i : /contact by e-mail/i,
       }),
       visioLink: screen.getByRole("link", {
-        name: /je prends un rendez-vous en visio/i,
+        name:
+          locale === "fr"
+            ? /je prends un rendez-vous en visio/i
+            : /schedule a video call/i,
       }),
       phoneLink: screen.getByRole("link", {
         name: /\+33 6 69 31 10 46/i,
       }),
       emailLink: screen.getByRole("link", {
-        name: /je contacte par email/i,
+        name: locale === "fr" ? /je contacte par email/i : /contact by e-mail/i,
       }),
       videoIcon: screen.getByTestId("icon-video"),
       phoneIcon: screen.getByTestId("icon-phone"),
@@ -48,7 +57,7 @@ describe("CTAContactButtons", () => {
     );
   });
 
-  it("should render the phone button", () => {
+  it("should render the phone button with French text", () => {
     const { phoneButton, phoneLink } = renderComponent();
     expect(phoneButton).toHaveTextContent(/\+33 6 69 31 10 46/i);
     expect(phoneLink).toHaveAttribute("href", "tel:+33669311046");
@@ -57,6 +66,30 @@ describe("CTAContactButtons", () => {
   it("should render the email button with French text", () => {
     const { emailButton, emailLink } = renderComponent();
     expect(emailButton).toHaveTextContent(/je contacte par email/i);
+    expect(emailLink).toHaveAttribute("href", "mailto:contact@fm4all.com");
+  });
+
+  it("should render the video call button with English text", () => {
+    useLocaleMock.mockReturnValue("en");
+    const { videoButton, visioLink } = renderComponent("en");
+    expect(videoButton).toHaveTextContent(/schedule a video call/i);
+    expect(visioLink).toHaveAttribute(
+      "href",
+      expect.stringContaining("calendly")
+    );
+  });
+
+  it("should render the phone button with English text", () => {
+    useLocaleMock.mockReturnValue("en");
+    const { phoneButton, phoneLink } = renderComponent("en");
+    expect(phoneButton).toHaveTextContent(/\+33 6 69 31 10 46/i);
+    expect(phoneLink).toHaveAttribute("href", "tel:+33669311046");
+  });
+
+  it("should render the email button with English text", () => {
+    useLocaleMock.mockReturnValue("en");
+    const { emailButton, emailLink } = renderComponent("en");
+    expect(emailButton).toHaveTextContent(/contact by e-mail/i);
     expect(emailLink).toHaveAttribute("href", "mailto:contact@fm4all.com");
   });
 

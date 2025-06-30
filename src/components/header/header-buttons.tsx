@@ -19,6 +19,8 @@ const HeaderButtons = ({
   setIsMobileNavOpen,
 }: HeaderButtonsProps) => {
   const path = usePathname();
+  console.log("HeaderButtons path:", path);
+
   const handleShowMobileNav = () => {
     setIsMobileNavOpen(true);
   };
@@ -31,7 +33,6 @@ const HeaderButtons = ({
         title={locale === "fr" ? "Mon devis en ligne" : "My online quote"}
         text={locale === "fr" ? "Mon devis en ligne" : "My online quote"}
         className="text-sm"
-        disabled={path.includes("/mon-devis")}
         setIsMobileNavOpen={setIsMobileNavOpen}
         withIcon={false}
       />

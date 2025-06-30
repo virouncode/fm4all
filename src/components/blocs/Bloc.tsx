@@ -52,7 +52,7 @@ type BlocProps = {
         _key: string;
       }
   >;
-  ptComponents: PtComponentsType;
+  ptComponents?: PtComponentsType;
 };
 
 const Bloc = ({ imageUrl, imageAlt, side, bloc, ptComponents }: BlocProps) => {
@@ -62,7 +62,7 @@ const Bloc = ({ imageUrl, imageAlt, side, bloc, ptComponents }: BlocProps) => {
         <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
           <Image
             src={imageUrl}
-            alt={imageAlt ?? "illustation"}
+            alt={imageAlt ?? "illustration"}
             quality={100}
             className="object-cover object-center"
             fill={true}
@@ -89,7 +89,7 @@ const Bloc = ({ imageUrl, imageAlt, side, bloc, ptComponents }: BlocProps) => {
         <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
           <Image
             src={imageUrl}
-            alt={imageAlt ?? "illustation"}
+            alt={imageAlt ?? "illustration"}
             quality={100}
             className="object-cover object-center"
             fill={true}

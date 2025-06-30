@@ -1,11 +1,16 @@
 import { vi } from "vitest";
 
+let currentSearchParams = new URLSearchParams();
+
+export const setSearchParamsMock = (params: Record<string, string>) => {
+  currentSearchParams = new URLSearchParams(params);
+};
+
 export const paramsMock = vi.fn();
-export const searchParamsMock = () => new URLSearchParams();
 export const mockNextNavigation = () => {
   vi.mock("next/navigation", () => ({
     useParams: paramsMock,
-    useSearchParams: searchParamsMock,
+    useSearchParams: () => currentSearchParams,
   }));
 };
 export const backMock = vi.fn();
@@ -43,5 +48,15 @@ export const mockNextIntl = () => {
   vi.mock("next-intl", () => ({
     useLocale: useLocaleMock, // "fr par défaut"
     useTranslations: () => (key: string) => key,
+  }));
+};
+
+export const setLocalStorageMock = vi.fn();
+export const getLocalStorageMock = vi.fn();
+
+export const mockStorageHelper = () => {
+  vi.mock("@/lib/utils/storageHelper", () => ({
+    setLocalStorage: setLocalStorageMock,
+    getLocalStorage: getLocalStorageMock,
   }));
 };
