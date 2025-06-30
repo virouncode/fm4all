@@ -1,36 +1,29 @@
-import { render } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
-// Mock the dependencies
-vi.mock("@/components/ui/button", () => ({
-  Button: ({
-    children,
-    onClick,
-  }: {
-    children: React.ReactNode;
-    onClick?: () => void;
-  }) => <button onClick={onClick}>{children}</button>,
-}));
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { backMock, mocki18nNavigation, mockUIButton } from "../mocks";
 
-const backMock = vi.fn();
-
-vi.mock("@/i18n/navigation", () => ({
-  useRouter: () => ({
-    back: backMock,
-  }),
-}));
+mockUIButton();
+mocki18nNavigation();
 // Import the component after mocking its dependencies
 import BackButton from "@/components/buttons/back-button";
 
 describe("BackButton", () => {
-  it("should render a button with 'Retour' text", () => {
-    const { getByText } = render(<BackButton title="Retour" />);
-    expect(getByText("Retour")).toBeInTheDocument();
+  const renderComponent = () => {
+    render(<BackButton title="Retour" />);
+    return {
+      button: screen.getByRole("button", { name: /retour/i }),
+    };
+  };
+  //Rendering
+  it("should render a button with the right text", () => {
+    const { button } = renderComponent();
+    expect(button).toHaveTextContent(/retour/i);
   });
-
-  it("should call router.back when clicked", () => {
-    const { getByRole } = render(<BackButton title="Retour" />);
-    const button = getByRole("button");
-    button.click();
+  //Interaction
+  it("should call router.back when clicked", async () => {
+    const { button } = renderComponent();
+    const user = userEvent.setup();
+    await user.click(button);
     expect(backMock).toHaveBeenCalled();
   });
 });

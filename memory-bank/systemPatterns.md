@@ -158,10 +158,47 @@ The FM4ALL platform appears to be built using a modern web application architect
    5. Configuration is saved to quote
 
 4. **Internationalization Flow**
+
    1. User's locale is detected or selected
    2. Appropriate translations are loaded
    3. UI renders in the selected language
    4. Routes include locale parameter
    5. Content is displayed in the correct language
+
+5. **Testing Flow**
+   1. Unit tests verify utility functions
+   2. Component tests check rendering and interactions
+   3. Mocks simulate dependencies and external services
+   4. Tests mirror the source code structure
+   5. Vitest runs tests in a simulated DOM environment
+
+## Testing Patterns
+
+1. **Component Testing Pattern**
+
+   - Tests mirror the source code structure in `src/__tests__/`
+   - Each component has a corresponding test file
+   - Tests verify rendering, conditional logic, and interactions
+   - Example: `author.test.tsx` tests the `Author.tsx` component
+
+2. **Mock Pattern**
+
+   - Centralized mocks in `src/__tests__/components/mocks.tsx`
+   - Mock functions for external dependencies
+   - Mock components for UI elements
+   - Example: `mockUIButton()`, `mockNavigation()`, `mockNextIntl()`
+
+3. **Assertion Pattern**
+
+   - Testing Library queries to find elements
+   - Jest DOM matchers for assertions
+   - Verify presence, attributes, and content
+   - Example: `expect(screen.getByText(/jean dupont/i)).toBeInTheDocument()`
+
+4. **Utility Testing Pattern**
+   - Direct function testing for utilities
+   - Multiple test cases for different scenarios
+   - Focus on input/output verification
+   - Example: `capitalize.test.ts` tests the `capitalize` utility
 
 This document will be updated as more patterns are discovered or implemented in the system.

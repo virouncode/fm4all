@@ -1,47 +1,44 @@
-import { render } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { mocki18nNavigation, mockNextIntl, mockUIButton } from "../mocks";
 
-vi.mock("@/components/ui/button", () => ({
-  Button: ({
-    children,
-    onClick,
-  }: {
-    children: React.ReactNode;
-    onClick?: () => void;
-  }) => <button onClick={onClick}>{children}</button>,
-}));
-
-vi.mock("@/i18n/navigation", () => ({
-  Link: ({ href, children }: { href: string; children: React.ReactNode }) => (
-    <a href={href}>{children}</a>
-  ),
-}));
-
-vi.mock("next-intl", () => ({
-  useTranslations: () => (key: string) => key,
-}));
+mockUIButton();
+mocki18nNavigation();
+mockNextIntl();
 
 vi.mock("lucide-react", () => ({
-  Phone: () => <span data-testid="phone-icon">Phone</span>,
+  Phone: () => <span data-testid="phone-icon">📞</span>,
 }));
 
 // Import the component after mocking its dependencies
 import ContactButton from "@/components/buttons/contact-button";
+import { Dispatch, SetStateAction } from "react";
 
 describe("ContactButton", () => {
-  it("should render a contact link", () => {
-    const { container } = render(
-      <ContactButton setIsMobileNavOpen={() => {}} />
-    );
-    expect(container.querySelector("a[href='/contact']")).not.toBeNull();
+  const renderComponent = (
+    setIsMobileNavOpen: Dispatch<SetStateAction<boolean>>
+  ) => {
+    render(<ContactButton setIsMobileNavOpen={setIsMobileNavOpen} />);
+    return {
+      link: screen.getByRole("link", { name: /nous-contacter/i }),
+      button: screen.getByRole("button"),
+      phoneIcon: screen.getByTestId("phone-icon"),
+    };
+  };
+  //Rendering
+  // it("should render a contact link and a phone icon", () => {
+  //déjà vérifié par getByRole
+  // });
+  it("should render a link with the correct href", () => {
+    const { link } = renderComponent(() => {});
+    expect(link).toHaveAttribute("href", "/contact");
   });
-  it("should call setIsMobileNavOpen when clicked", () => {
+  //Interaction
+  it("should call setIsMobileNavOpen when clicked", async () => {
     const setIsMobileNavOpen = vi.fn();
-    const { getByRole } = render(
-      <ContactButton setIsMobileNavOpen={setIsMobileNavOpen} />
-    );
-    const button = getByRole("button");
-    button.click();
+    const { button } = renderComponent(setIsMobileNavOpen);
+    const user = userEvent.setup();
+    await user.click(button);
     expect(setIsMobileNavOpen).toHaveBeenCalledWith(false);
   });
 });

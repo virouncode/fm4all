@@ -4,7 +4,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useLocale } from "next-intl";
 import { useParams } from "next/navigation";
-import { describe, expect, it, vi, type Mock } from "vitest";
+import { Mock } from "vitest";
 
 vi.mock("next-intl", () => ({
   useLocale: vi.fn(),

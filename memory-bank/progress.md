@@ -40,10 +40,19 @@ Based on the project structure and code examination, the following features appe
    - Validation and error handling for pricing data
 
 6. **Quote Management**
+
    - Quote initialization based on premises data
    - Quote reset functionality (partial and full)
    - State persistence via localStorage
    - Multi-service quote calculation
+
+7. **Testing Infrastructure**
+   - Vitest configuration for component and utility testing
+   - Testing Library integration for component testing
+   - Jest DOM for extended DOM element matchers
+   - Centralized mocks for UI components, navigation, and internationalization
+   - Component tests for buttons, author components, and other UI elements
+   - Utility tests for helper functions like capitalize, formatNumber, etc.
 
 ## What's Left to Build
 
@@ -95,6 +104,7 @@ The project is in active development with a focus on enhancing the pricing and q
    - Extend context updaters beyond the cleaning service
    - Finalize tarifs update forms for all service types
    - Implement comprehensive quote reset functionality
+   - Expand test coverage for components and utilities
 
 2. **Medium Priority**
 
@@ -142,10 +152,17 @@ Based on the current focus areas, potential known issues include:
    - Supporting right-to-left languages if needed
 
 5. **Performance Concerns**
+
    - Real-time pricing calculations with complex formulas
    - Managing large state objects efficiently
    - Optimizing cache invalidation for multiple concurrent users
    - Ensuring responsive UI during intensive operations
+
+6. **Testing Coverage Gaps**
+   - Some components may lack comprehensive tests
+   - Complex interactions between components need integration tests
+   - Edge cases in utility functions may need additional test coverage
+   - Mock implementations may not fully simulate all real-world scenarios
 
 ## Evolution of Project Decisions
 

@@ -2,7 +2,7 @@
 
 ## Current Work Focus
 
-The current development focus is on enhancing the pricing and quotation system, with particular emphasis on:
+The current development focus is on enhancing the testing infrastructure and the pricing and quotation system, with particular emphasis on:
 
 1. **Cache Invalidation System**
 
@@ -88,10 +88,13 @@ Based on the current work focus, potential next steps include:
    - Add what-if scenarios for quote customization
 
 4. **Testing and Optimization**
+   - Implement component tests using Vitest and Testing Library
+   - Create centralized mocks for common dependencies
+   - Organize tests to mirror the source code structure
+   - Implement comprehensive test coverage for UI components and utilities
    - Perform end-to-end testing of the quotation flow with real-time updates
    - Optimize performance of cache invalidation system
    - Conduct load testing for concurrent pricing updates
-   - Implement automated tests for pricing calculations
 
 ## Active Decisions and Considerations
 
@@ -154,6 +157,45 @@ Based on the observed code structure and implementation:
    - Feature-specific components organized by service type
    - Reusable UI components in dedicated directories
    - Clear separation of concerns between components
+
+## Testing Approach
+
+The project uses a comprehensive testing approach with the following characteristics:
+
+1. **Test Organization**
+
+   - Tests are organized in `src/__tests__/` mirroring the source structure
+   - Component tests in `components/` directory
+   - Utility tests in `utils/` directory
+   - Centralized mocks in `components/mocks.tsx`
+
+2. **Component Testing**
+
+   - Testing rendering with different props
+   - Verifying conditional rendering logic
+   - Testing user interactions
+   - Mocking dependencies like UI components, navigation, and internationalization
+   - Example: `author.test.tsx` tests all rendering scenarios of the Author component
+
+3. **Utility Testing**
+
+   - Direct function testing with multiple scenarios
+   - Focus on input/output verification
+   - Comprehensive edge case coverage
+   - Example: `capitalize.test.ts` tests various string capitalization scenarios
+
+4. **Mock Implementation**
+
+   - Centralized mock functions in `mocks.tsx`
+   - Mock UI components to simplify testing
+   - Mock navigation functions to test routing behavior
+   - Mock internationalization to test with consistent locale
+
+5. **Testing Tools**
+   - Vitest as the test runner
+   - Testing Library for component queries
+   - Jest DOM for extended matchers
+   - JSDOM for browser environment simulation
 
 ## Learnings and Project Insights
 

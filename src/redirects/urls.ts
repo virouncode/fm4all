@@ -45,4 +45,5 @@ export const legacyRedirects: Record<string, string> = {
 export const goneUrls: string[] = [
   "https://e99e300d.fm4all.com/",
   "https://www.fm4all.com/services/petits-travaux",
+  "https://www.fm4all.com/services/agent-de-securite",
 ];

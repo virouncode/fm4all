@@ -154,9 +154,23 @@
 
 ### Testing
 
-- Unit tests for utility functions
-- Component tests for UI elements
-- Integration tests for critical flows
-- End-to-end tests for user journeys
+- **Vitest**: Testing framework for unit and component tests
+- **Testing Library**: For testing React components
+- **Jest DOM**: Extended DOM element matchers
+- **JSDOM**: Browser environment simulation
+- **Test Structure**:
+  - Unit tests for utility functions
+  - Component tests for UI elements
+  - Organized in `src/__tests__/` mirroring the source structure
+- **Testing Patterns**:
+  - Component rendering tests
+  - User interaction tests
+  - Conditional rendering tests
+  - Mock implementations for dependencies
+  - Centralized mocks in `src/__tests__/components/mocks.tsx`
+- **Test Scripts**:
+  - `npm test`: Run all tests
+  - `npm run test:watch`: Run tests in watch mode
+  - `npm run test:coverage`: Run tests with coverage reporting
 
 This document will be updated as the technical context evolves or new technologies are introduced to the project.

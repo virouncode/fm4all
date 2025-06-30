@@ -34,9 +34,13 @@ const Author = ({
       ) : null}
       <p>
         {prenom} {nom},{" "}
-        {DateTime.fromISO(date || "")
-          .setLocale(locale)
-          .toLocaleString(DateTime.DATETIME_SHORT)}
+        {date ? (
+          <span>
+            {DateTime.fromISO(date)
+              .setLocale(locale)
+              .toLocaleString(DateTime.DATETIME_SHORT)}
+          </span>
+        ) : null}
       </p>
     </div>
   );

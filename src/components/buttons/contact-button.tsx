@@ -15,7 +15,11 @@ const ContactButton = ({
 }: ContactButtonProps) => {
   const t = useTranslations("header");
   return (
-    <Link href="/contact" title={t("nous-contacter")}>
+    <Link
+      href="/contact"
+      title={t("nous-contacter")}
+      aria-label={t("nous-contacter")}
+    >
       <Button
         title={t("nous-contacter")}
         variant="outline"

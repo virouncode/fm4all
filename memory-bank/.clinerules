@@ -126,10 +126,14 @@ This file captures important patterns, preferences, and project intelligence tha
 
 2. **Testing Approach**
 
-   - Component testing for UI elements
-   - Integration testing for critical flows
-   - End-to-end testing for user journeys
-   - Manual testing for complex interactions
+   - Vitest for unit and component testing
+   - Testing Library for component queries and assertions
+   - Jest DOM for extended DOM element matchers
+   - JSDOM for browser environment simulation
+   - Component testing with centralized mocks
+   - Utility testing with multiple test cases
+   - Test organization mirroring source code structure
+   - Mock patterns for UI components, navigation, and internationalization
 
 3. **Debugging Techniques**
    - Console logging with descriptive messages
