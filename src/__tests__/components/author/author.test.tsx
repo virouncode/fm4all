@@ -2,14 +2,6 @@ import Author from "@/components/author/Author"; // ajuste le chemin si besoin
 import { render, screen } from "@testing-library/react";
 import { DateTime } from "luxon";
 
-// Mock Next.js Image
-vi.mock("next/image", () => ({
-  default: (props: React.ComponentProps<"img">) => {
-    // Simple mock for testing
-    return <img {...props} alt={props.alt || "image"} />;
-  },
-}));
-
 describe("Author", () => {
   const baseProps = {
     prenom: "Jean",

@@ -1,7 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import { mockNextIntl, mockUIButton } from "../mocks";
+import { mockNextIntl } from "../mocks";
 
-mockUIButton();
 mockNextIntl();
 
 vi.mock("lucide-react", () => ({
@@ -10,7 +9,6 @@ vi.mock("lucide-react", () => ({
   Mail: () => <span data-testid="icon-mail">📧</span>,
 }));
 
-// 👇 Import après les mocks
 import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
 
 describe("CTAContactButtons", () => {

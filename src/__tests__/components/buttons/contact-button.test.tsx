@@ -1,18 +1,17 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { mocki18nNavigation, mockNextIntl, mockUIButton } from "../mocks";
+import { Dispatch, SetStateAction } from "react";
+import { mocki18nNavigation, mockNextIntl } from "../mocks";
 
-mockUIButton();
 mocki18nNavigation();
 mockNextIntl();
-
 vi.mock("lucide-react", () => ({
   Phone: () => <span data-testid="phone-icon">📞</span>,
 }));
 
-// Import the component after mocking its dependencies
+//!!!!!!!!!!!! Import the component after mocking its dependencies !!!!!!!!!!!!!
+// This ensures that the mocked versions are used in the component.
 import ContactButton from "@/components/buttons/contact-button";
-import { Dispatch, SetStateAction } from "react";
 
 describe("ContactButton", () => {
   const renderComponent = (

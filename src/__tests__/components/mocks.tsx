@@ -1,19 +1,7 @@
 import { vi } from "vitest";
 
-export const mockUIButton = () => {
-  vi.mock("@/components/ui/button", () => ({
-    Button: ({
-      children,
-      onClick,
-    }: {
-      children: React.ReactNode;
-      onClick?: () => void;
-    }) => <button onClick={onClick}>{children}</button>,
-  }));
-};
-
 export const paramsMock = vi.fn();
-export const searchParamsMock = vi.fn();
+export const searchParamsMock = () => new URLSearchParams();
 export const mockNextNavigation = () => {
   vi.mock("next/navigation", () => ({
     useParams: paramsMock,
@@ -49,9 +37,11 @@ export const mocki18nNavigation = () => {
   }));
 };
 
+export const useLocaleMock = vi.fn(() => "fr"); // "fr" par défaut
+
 export const mockNextIntl = () => {
   vi.mock("next-intl", () => ({
-    useLocale: () => "fr", // "fr par défaut"
+    useLocale: useLocaleMock, // "fr par défaut"
     useTranslations: () => (key: string) => key,
   }));
 };

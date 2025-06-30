@@ -14,6 +14,18 @@ import Image from "next/image";
 
 import { useEffect, useState } from "react";
 
+declare global {
+  interface Window {
+    gtag: (
+      command: string,
+      action: string,
+      params?: {
+        [key: string]: unknown;
+      }
+    ) => void;
+  }
+}
+
 const COOKIE_EXPIRATION_MS = 1000 * 60 * 60 * 24;
 // const COOKIE_EXPIRATION_MS = 1000 * 60;
 

@@ -1,32 +1,28 @@
-import LocaleButton from "@/components/buttons/locale-button";
-import { usePathname, useRouter } from "@/i18n/navigation";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { useLocale } from "next-intl";
-import { useParams } from "next/navigation";
-import { Mock } from "vitest";
+import {
+  mocki18nNavigation,
+  mockNextIntl,
+  mockNextNavigation,
+  paramsMock,
+  pathnameMock,
+  replaceMock,
+  useLocaleMock,
+} from "../mocks";
 
-vi.mock("next-intl", () => ({
-  useLocale: vi.fn(),
-  useTranslations: () => (key: string) => key,
-}));
-vi.mock("@/i18n/navigation", () => ({
-  useRouter: vi.fn(),
-  usePathname: vi.fn(),
-}));
+mocki18nNavigation();
+mockNextNavigation();
+mockNextIntl();
 
-vi.mock("next/navigation", () => ({
-  useParams: vi.fn(),
-  useSearchParams: () => new URLSearchParams(),
-}));
+import LocaleButton from "@/components/buttons/locale-button";
 
 describe("LocaleButton", () => {
+  beforeEach(() => {
+    vi.clearAllMocks(); //
+  });
   it("switches from fr to en and updates slug correctly for services", async () => {
-    const mockReplace = vi.fn();
-    (useRouter as Mock).mockReturnValue({ replace: mockReplace });
-    (useLocale as Mock).mockReturnValue("fr");
-    (usePathname as Mock).mockReturnValue("/services/[slug]");
-    (useParams as Mock).mockReturnValue({ slug: "nettoyage" });
+    pathnameMock.mockReturnValue("/services/[slug]");
+    paramsMock.mockReturnValue({ slug: "nettoyage" });
 
     render(<LocaleButton />);
 
@@ -36,7 +32,7 @@ describe("LocaleButton", () => {
     const enOption = screen.getByText("🇬🇧 EN");
     await userEvent.click(enOption);
 
-    expect(mockReplace).toHaveBeenCalledWith(
+    expect(replaceMock).toHaveBeenCalledWith(
       {
         pathname: "/services/[slug]",
         params: { slug: "cleaning-services" },
@@ -46,11 +42,8 @@ describe("LocaleButton", () => {
     );
   });
   it("switches from fr to en and updates slug correctly for sectors", async () => {
-    const mockReplace = vi.fn();
-    (useRouter as Mock).mockReturnValue({ replace: mockReplace });
-    (useLocale as Mock).mockReturnValue("fr");
-    (usePathname as Mock).mockReturnValue("/secteurs/[slug]");
-    (useParams as Mock).mockReturnValue({
+    pathnameMock.mockReturnValue("/secteurs/[slug]");
+    paramsMock.mockReturnValue({
       slug: "gestion-services-facility-bureaux-paris",
     });
 
@@ -62,7 +55,7 @@ describe("LocaleButton", () => {
     const enOption = screen.getByText("🇬🇧 EN");
     await userEvent.click(enOption);
 
-    expect(mockReplace).toHaveBeenCalledWith(
+    expect(replaceMock).toHaveBeenCalledWith(
       {
         pathname: "/secteurs/[slug]",
         params: {
@@ -74,11 +67,8 @@ describe("LocaleButton", () => {
     );
   });
   it("switches from fr to en and updates slug correctly for blog", async () => {
-    const mockReplace = vi.fn();
-    (useRouter as Mock).mockReturnValue({ replace: mockReplace });
-    (useLocale as Mock).mockReturnValue("fr");
-    (usePathname as Mock).mockReturnValue("/blog/[slug]");
-    (useParams as Mock).mockReturnValue({
+    pathnameMock.mockReturnValue("/blog/[slug]");
+    paramsMock.mockReturnValue({
       slug: "pilotage-facility-management",
     });
 
@@ -90,7 +80,7 @@ describe("LocaleButton", () => {
     const enOption = screen.getByText("🇬🇧 EN");
     await userEvent.click(enOption);
 
-    expect(mockReplace).toHaveBeenCalledWith(
+    expect(replaceMock).toHaveBeenCalledWith(
       {
         pathname: "/blog/[slug]",
         params: {
@@ -102,11 +92,8 @@ describe("LocaleButton", () => {
     );
   });
   it("switches from fr to en and updates slug and subSlug correctly for blog", async () => {
-    const mockReplace = vi.fn();
-    (useRouter as Mock).mockReturnValue({ replace: mockReplace });
-    (useLocale as Mock).mockReturnValue("fr");
-    (usePathname as Mock).mockReturnValue("/blog/[slug]/[subSlug]");
-    (useParams as Mock).mockReturnValue({
+    pathnameMock.mockReturnValue("/blog/[slug]/[subSlug]");
+    paramsMock.mockReturnValue({
       slug: "pilotage-facility-management",
       subSlug: "le-fm-c-est-quoi",
     });
@@ -119,7 +106,7 @@ describe("LocaleButton", () => {
     const enOption = screen.getByText("🇬🇧 EN");
     await userEvent.click(enOption);
 
-    expect(mockReplace).toHaveBeenCalledWith(
+    expect(replaceMock).toHaveBeenCalledWith(
       {
         pathname: "/blog/[slug]/[subSlug]",
         params: {
@@ -132,11 +119,9 @@ describe("LocaleButton", () => {
     );
   });
   it("switches from en to fr and updates slug correctly for services", async () => {
-    const mockReplace = vi.fn();
-    (useRouter as Mock).mockReturnValue({ replace: mockReplace });
-    (useLocale as Mock).mockReturnValue("en");
-    (usePathname as Mock).mockReturnValue("/services/[slug]");
-    (useParams as Mock).mockReturnValue({ slug: "cleaning-services" });
+    useLocaleMock.mockReturnValue("en");
+    pathnameMock.mockReturnValue("/services/[slug]");
+    paramsMock.mockReturnValue({ slug: "cleaning-services" });
 
     render(<LocaleButton />);
 
@@ -148,7 +133,7 @@ describe("LocaleButton", () => {
     if (!frOption) throw new Error("FR option not found");
     await userEvent.click(frOption);
 
-    expect(mockReplace).toHaveBeenCalledWith(
+    expect(replaceMock).toHaveBeenCalledWith(
       {
         pathname: "/services/[slug]",
         params: { slug: "nettoyage" },
@@ -158,11 +143,9 @@ describe("LocaleButton", () => {
     );
   });
   it("switches from en to fr and updates slug correctly for sectors", async () => {
-    const mockReplace = vi.fn();
-    (useRouter as Mock).mockReturnValue({ replace: mockReplace });
-    (useLocale as Mock).mockReturnValue("en");
-    (usePathname as Mock).mockReturnValue("/secteurs/[slug]");
-    (useParams as Mock).mockReturnValue({
+    useLocaleMock.mockReturnValue("en");
+    pathnameMock.mockReturnValue("/secteurs/[slug]");
+    paramsMock.mockReturnValue({
       slug: "outsourced-facility-services-management-for-office-users-in-paris-area-france",
     });
 
@@ -176,7 +159,7 @@ describe("LocaleButton", () => {
     if (!frOption) throw new Error("FR option not found");
     await userEvent.click(frOption);
 
-    expect(mockReplace).toHaveBeenCalledWith(
+    expect(replaceMock).toHaveBeenCalledWith(
       {
         pathname: "/secteurs/[slug]",
         params: { slug: "gestion-services-facility-bureaux-paris" },
@@ -186,11 +169,9 @@ describe("LocaleButton", () => {
     );
   });
   it("switches from en to fr and updates slug correctly for blog", async () => {
-    const mockReplace = vi.fn();
-    (useRouter as Mock).mockReturnValue({ replace: mockReplace });
-    (useLocale as Mock).mockReturnValue("en");
-    (usePathname as Mock).mockReturnValue("/blog/[slug]");
-    (useParams as Mock).mockReturnValue({
+    useLocaleMock.mockReturnValue("en");
+    pathnameMock.mockReturnValue("/blog/[slug]");
+    paramsMock.mockReturnValue({
       slug: "facilities-management-outsourcing",
     });
 
@@ -204,7 +185,7 @@ describe("LocaleButton", () => {
     if (!frOption) throw new Error("FR option not found");
     await userEvent.click(frOption);
 
-    expect(mockReplace).toHaveBeenCalledWith(
+    expect(replaceMock).toHaveBeenCalledWith(
       {
         pathname: "/blog/[slug]",
         params: { slug: "pilotage-facility-management" },
@@ -214,11 +195,9 @@ describe("LocaleButton", () => {
     );
   });
   it("switches from en to fr and updates slug and subSlug correctly for blog", async () => {
-    const mockReplace = vi.fn();
-    (useRouter as Mock).mockReturnValue({ replace: mockReplace });
-    (useLocale as Mock).mockReturnValue("en");
-    (usePathname as Mock).mockReturnValue("/blog/[slug]/[subSlug]");
-    (useParams as Mock).mockReturnValue({
+    useLocaleMock.mockReturnValue("en");
+    pathnameMock.mockReturnValue("/blog/[slug]/[subSlug]");
+    paramsMock.mockReturnValue({
       slug: "facilities-management-outsourcing",
       subSlug: "what-is-fm",
     });
@@ -233,7 +212,7 @@ describe("LocaleButton", () => {
     if (!frOption) throw new Error("FR option not found");
     await userEvent.click(frOption);
 
-    expect(mockReplace).toHaveBeenCalledWith(
+    expect(replaceMock).toHaveBeenCalledWith(
       {
         pathname: "/blog/[slug]/[subSlug]",
         params: {
@@ -246,11 +225,9 @@ describe("LocaleButton", () => {
     );
   });
   it("does not call replace if new locale is the same as current", async () => {
-    const mockReplace = vi.fn();
-    (useRouter as Mock).mockReturnValue({ replace: mockReplace });
-    (useLocale as Mock).mockReturnValue("fr");
-    (usePathname as Mock).mockReturnValue("/services/[slug]");
-    (useParams as Mock).mockReturnValue({ slug: "nettoyage" });
+    useLocaleMock.mockReturnValue("fr");
+    pathnameMock.mockReturnValue("/services/[slug]");
+    paramsMock.mockReturnValue({ slug: "nettoyage" });
 
     render(<LocaleButton />);
     const button = screen.getByRole("button", { name: "Changer de langue" });
@@ -260,6 +237,6 @@ describe("LocaleButton", () => {
     const frOption = options.find((el) => el.textContent?.includes("🇫🇷 FR"));
     if (!frOption) throw new Error("FR option not found");
     await userEvent.click(frOption);
-    expect(mockReplace).not.toHaveBeenCalled();
+    expect(replaceMock).not.toHaveBeenCalled();
   });
 });

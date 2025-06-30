@@ -1,10 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { backMock, mocki18nNavigation, mockUIButton } from "../mocks";
+import { backMock, mocki18nNavigation } from "../mocks";
 
-mockUIButton();
 mocki18nNavigation();
-// Import the component after mocking its dependencies
+
 import BackButton from "@/components/buttons/back-button";
 
 describe("BackButton", () => {
