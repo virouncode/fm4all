@@ -1,5 +1,4 @@
 import { render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("next-sanity", () => ({
   PortableText: (props: { value: unknown; components?: unknown }) => {
@@ -28,7 +27,7 @@ describe("Bloc", () => {
     vi.clearAllMocks();
   });
 
-  it("should display an image on the left", () => {
+  it("renders an image on the left if side = left", () => {
     render(
       <Bloc
         imageUrl="/image.jpg"
@@ -41,7 +40,7 @@ describe("Bloc", () => {
     expect(img).toBeInTheDocument();
   });
 
-  it("should display an image on the right", () => {
+  it("renders an image on the right if side = right", () => {
     render(
       <Bloc
         imageUrl="/image.jpg"
@@ -55,13 +54,13 @@ describe("Bloc", () => {
     expect(img).toBeInTheDocument();
   });
 
-  it("should not display an image if no imageUrl", () => {
+  it("doesn't render an image if no imageUrl", () => {
     render(<Bloc side="left" bloc={sampleBloc} />);
 
     expect(screen.queryByRole("img")).not.toBeInTheDocument();
   });
 
-  it("should render the portable text component", () => {
+  it("renders the portable text component", () => {
     render(
       <Bloc
         imageUrl="/img.jpg"
@@ -74,12 +73,12 @@ describe("Bloc", () => {
     expect(screen.getByTestId("portable-text-mock")).toBeInTheDocument();
   });
 
-  it("qhould render alt text placeholder if no imageAlt", () => {
+  it("displays alt text placeholder if no imageAlt", () => {
     render(<Bloc imageUrl="/img.jpg" side="left" bloc={sampleBloc} />);
     expect(screen.getByAltText("illustration")).toBeInTheDocument();
   });
 
-  it("should render the portable text component, even if bloc is empty", () => {
+  it("renders the portable text component, even if bloc is empty", () => {
     render(<Bloc imageUrl="/img.jpg" side="left" bloc={[]} />);
     expect(screen.getByTestId("portable-text-mock")).toBeInTheDocument();
   });

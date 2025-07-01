@@ -21,6 +21,7 @@ const mockLocalStorage = (consent: boolean | null, date: number | null) => {
     return null;
   });
 };
+
 let user: ReturnType<typeof userEvent.setup>;
 
 import CookieBanner from "@/components/banners/CookieBanner";
@@ -37,25 +38,25 @@ describe("CookieBanner", () => {
   const bannerText =
     "nous-utilisons-des-cookies-et-des-technologies-similaires-necessaires-au-fonctionnement-de-notre-site-web";
 
-  it("should display the banner if no cookie consent", () => {
+  it("renders the banner if no cookie consent", () => {
     mockLocalStorage(null, null);
     render(<CookieBanner />);
     expect(screen.getByText(bannerText)).toBeInTheDocument();
   });
 
-  it("should not display the cookie banner if cookieConsent", () => {
+  it("doesn't render the banner if cookieConsent", () => {
     mockLocalStorage(true, Date.now());
     render(<CookieBanner />);
     expect(screen.queryByText(bannerText)).not.toBeInTheDocument();
   });
 
-  it("should not display the cookie banner if pathname is /cookies", () => {
+  it("doesn't render the banner if pathname is /cookies", () => {
     pathnameMock.mockReturnValue("/cookies");
     render(<CookieBanner />);
     expect(screen.queryByText(bannerText)).not.toBeInTheDocument();
   });
 
-  it("should accept consent when clicking on 'Accept'", async () => {
+  it("accepts consent when clicking on 'Accept'", async () => {
     mockLocalStorage(null, null);
     render(<CookieBanner />);
     const acceptBtn = screen.getByTitle("jaccepte");
@@ -70,7 +71,7 @@ describe("CookieBanner", () => {
     });
   });
 
-  it("should refuse consent when clicking on 'Refuse'", async () => {
+  it("refuses consent when clicking on 'Refuse'", async () => {
     mockLocalStorage(null, null);
     render(<CookieBanner />);
     const refuseBtn = screen.getByTitle("je-refuse");
@@ -84,7 +85,7 @@ describe("CookieBanner", () => {
     });
   });
 
-  it("should display the banner if cookie consent expired", async () => {
+  it("renders the banner if cookie consent expired", async () => {
     const oldDate = Date.now() - 1000 * 60 * 60 * 24 * 2; // 2 jours => expire
     mockLocalStorage(true, oldDate);
 
@@ -98,7 +99,7 @@ describe("CookieBanner", () => {
       expect(removeItemSpy).toHaveBeenCalledWith("cookie_consent_date");
     });
   });
-  it("should not display banner if cookie consent not expired", async () => {
+  it("doesn't render the banner if cookie consent not expired", async () => {
     const recentDate = Date.now() - 1000 * 60 * 5; // 5 min
     mockLocalStorage(true, recentDate);
 
@@ -107,7 +108,7 @@ describe("CookieBanner", () => {
       expect(screen.queryByText(bannerText)).not.toBeInTheDocument();
     });
   });
-  it("should not display banner if cookie consent is false", () => {
+  it("displays the banner if cookie consent is false", () => {
     mockLocalStorage(false, null);
     render(<CookieBanner />);
     expect(screen.getByText(bannerText)).toBeInTheDocument();

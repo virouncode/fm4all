@@ -18,12 +18,12 @@ describe("BackButton", () => {
   });
 
   //Rendering
-  it("should render a button with the right text", () => {
+  it("renders a button with the right text", () => {
     const { button } = renderComponent();
     expect(button).toHaveTextContent(/retour/i);
   });
   //Interaction
-  it("should call router.back when clicked", async () => {
+  it("calls router.back when clicked", async () => {
     const { button } = renderComponent();
     const user = userEvent.setup();
     await user.click(button);

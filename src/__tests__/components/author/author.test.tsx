@@ -10,7 +10,7 @@ describe("Author", () => {
     date: "2024-06-15T14:30:00Z",
   };
 
-  it("should render author's full name", () => {
+  it("renders author's full name", () => {
     render(<Author {...baseProps} />);
     expect(screen.getByText(/jean dupont/i)).toBeInTheDocument();
   });
@@ -19,7 +19,7 @@ describe("Author", () => {
     ["fr", "fr"],
     ["en", "en"],
   ])(
-    "should render formatted date based on locale %s if date is provided",
+    "renders formatted date based on locale %s if date is provided",
     (locale) => {
       render(<Author {...baseProps} locale={locale} />);
       const expectedDate = DateTime.fromISO(baseProps.date)
@@ -29,7 +29,7 @@ describe("Author", () => {
     }
   );
 
-  it("should not render date if date is not provided", () => {
+  it("doesn't render date if date is not provided", () => {
     render(<Author {...baseProps} date={undefined} />);
     const dateSpan = screen.queryByText((_, element) => {
       return element?.tagName === "SPAN";
@@ -37,7 +37,7 @@ describe("Author", () => {
     expect(dateSpan).not.toBeInTheDocument();
   });
 
-  it("should render portrait if portraitUrl is provided", () => {
+  it("renders portrait if portraitUrl is provided", () => {
     render(
       <Author
         {...baseProps}
@@ -50,13 +50,13 @@ describe("Author", () => {
     expect(img).toHaveAttribute("src", "/avatar.jpg");
   });
 
-  it("should not render portrait if portraitUrl is not provided", () => {
+  it("doesn't render portrait if portraitUrl is not provided", () => {
     render(<Author {...baseProps} portraitUrl={undefined} />);
     const images = screen.queryAllByRole("img");
     expect(images.length).toBe(0);
   });
 
-  it("should use default alt text if none is provided", () => {
+  it("uses default alt text if none is provided", () => {
     render(<Author {...baseProps} portraitUrl="/avatar.jpg" />);
     const img = screen.getByAltText("Portrait de l'auteur");
     expect(img).toBeInTheDocument();

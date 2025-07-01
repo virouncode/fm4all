@@ -27,16 +27,12 @@ describe("ContactButton", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
-  //Rendering
-  // it("should render a contact link and a phone icon", () => {
-  //déjà vérifié par getByRole
-  // });
-  it("should render a link with the correct href", () => {
+
+  it("renders a link with the correct href", () => {
     const { link } = renderComponent(() => {});
     expect(link).toHaveAttribute("href", "/contact");
   });
-  //Interaction
-  it("should call setIsMobileNavOpen when clicked", async () => {
+  it("calls setIsMobileNavOpen when clicked", async () => {
     const setIsMobileNavOpen = vi.fn();
     const { button } = renderComponent(setIsMobileNavOpen);
     const user = userEvent.setup();

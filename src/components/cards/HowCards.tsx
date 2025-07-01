@@ -1,9 +1,9 @@
 import { Euro, HandPlatter, House, ReceiptText, Star } from "lucide-react";
-import { getTranslations } from "next-intl/server";
 import WhyCard from "./WhyCard";
+import { useTranslations } from "next-intl";
 
-const HowCards = async () => {
-  const t = await getTranslations("HomePage.comment");
+const HowCards = () => {
+  const t = useTranslations("HomePage.comment");
   const howCardsData = [
     {
       title: t("1-mes-locaux"),
