@@ -65,6 +65,7 @@ const CafeDesktopEspaceInputs = ({
                         value={id}
                         title={tTypeBoisson(id)}
                         id={`${id}_${espace.infos.espaceId}`}
+                        data-testid={`type-boisson-${id}`}
                       />
                       <Label htmlFor={`${id}_${espace.infos.espaceId}`}>
                         {tTypeBoisson(id)}
@@ -101,7 +102,10 @@ const CafeDesktopEspaceInputs = ({
                   onValueChange={handleSelectDureeLocation}
                   aria-label={t("selectionnez-la-duree-de-location")}
                 >
-                  <SelectTrigger className={`w-full max-w-xs`}>
+                  <SelectTrigger
+                    className={`w-full max-w-xs`}
+                    data-testid={`duree-location-trigger-${espace.infos.espaceId}`}
+                  >
                     <SelectValue placeholder={t("choisir")} />
                   </SelectTrigger>
                   <SelectContent>
@@ -109,6 +113,7 @@ const CafeDesktopEspaceInputs = ({
                       <SelectItem
                         key={`${location}_${item.id}`}
                         value={item.id}
+                        data-testid={`duree-location-${item.id}-${espace.infos.espaceId}`}
                       >
                         {tLocation(item.id)}
                       </SelectItem>

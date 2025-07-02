@@ -55,7 +55,7 @@ const NettoyageOptionsDimancheCard = ({
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
   const { nettoyage } = useContext(NettoyageContext);
   const dimanchePrixMensuelText = dimancheProposition.prixAnnuel ? (
-    <p className="font-bold text-xl ml-4">
+    <p className="font-bold text-xl ml-4" data-testid="total-mensuel-dimanche">
       {formatNumber((dimancheProposition?.prixAnnuel * MARGE) / 12)}{" "}
       {t("euros-mois")}
     </p>
@@ -116,6 +116,7 @@ const NettoyageOptionsDimancheCard = ({
             }
             className="data-[state=checked]:bg-fm4alldestructive"
             title={t("selectionnez-cette-proposition")}
+            data-testid="dimanche-switch"
           />
         ) : null}
         <div>

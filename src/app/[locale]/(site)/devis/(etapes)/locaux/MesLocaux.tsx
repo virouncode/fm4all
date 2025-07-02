@@ -307,6 +307,7 @@ const MesLocaux = () => {
               fieldTitle={t("code-postal")}
               nameInSchema="codePostal"
               placeholder="XXXXX"
+              data-testid="code-postal-input"
               // handleChange={handleChange}
             />
             <InputWithLabel<MesLocauxType>
@@ -315,6 +316,7 @@ const MesLocaux = () => {
               type="number"
               min={50}
               max={MAX_SURFACE}
+              data-testid="surface-input"
               // handleChange={handleChange}
             />
             <InputWithLabel<MesLocauxType>
@@ -323,6 +325,7 @@ const MesLocaux = () => {
               type="number"
               min={1}
               max={MAX_EFFECTIF}
+              data-testid="effectif-input"
               // handleChange={handleChange}
             />
           </div>
@@ -332,6 +335,7 @@ const MesLocaux = () => {
               nameInSchema="typeBatiment"
               data={batiments}
               // handleSelect={handleSelect}
+              data-testid="type-batiment-select"
               translationPrefix="DevisPage.locaux.locauxForm.batiments"
             />
             <SelectWithLabel<MesLocauxType>
@@ -339,6 +343,7 @@ const MesLocaux = () => {
               nameInSchema="typeOccupation"
               data={occupation}
               // handleSelect={handleSelect}
+              data-testId="type-occupation-select"
               translationPrefix="DevisPage.locaux.locauxForm.occupation"
             />
           </div>
@@ -395,6 +400,7 @@ const MesLocaux = () => {
               title={t("afficher-les-tarifs")}
               className="text-base"
               disabled={loading}
+              data-testid="afficher-tarifs-button"
             >
               {loading ? (
                 <Loader size={16} className="animate-spin" />

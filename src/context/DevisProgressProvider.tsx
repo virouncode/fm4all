@@ -35,6 +35,9 @@ const DevisProgressProvider = ({ children }: PropsWithChildren) => {
       const storedDevisProgress = localStorage.getItem("devisProgress");
       if (storedDevisProgress) {
         setDevisProgress(JSON.parse(storedDevisProgress));
+        // document.cookie = `devisProgress=${encodeURIComponent(
+        //   storedDevisProgress
+        // )}; path=/; max-age=3600`;
       }
     }
   }, [isMounted]);
@@ -42,6 +45,9 @@ const DevisProgressProvider = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     if (isMounted) {
       localStorage.setItem("devisProgress", JSON.stringify(devisProgress));
+      // document.cookie = `devisProgress=${encodeURIComponent(
+      //   JSON.stringify(devisProgress)
+      // )}; path=/; max-age=3600`;
     }
   }, [devisProgress, isMounted]);
 

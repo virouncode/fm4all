@@ -261,6 +261,7 @@ const DevisButton = ({
         className={`text-base shadow-md hover:shadow-lg
           ring-offset-2 ring-2 ring-destructive hover:scale-[101%] transition-all ${className}`}
         onClick={handleClickNouveau}
+        data-testid="devis-button"
       >
         {withIcon && <ReceiptText className="hidden sm:inline" />} {text}
       </Button>

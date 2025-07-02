@@ -120,6 +120,7 @@ const CookieBanner = () => {
               title={t("jaccepte")}
               size="lg"
               onClick={handleAccept}
+              data-testid="cookie-accept-button"
             >
               {t("jaccepte")}
             </Button>

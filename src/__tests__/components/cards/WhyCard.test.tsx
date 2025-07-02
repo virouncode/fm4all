@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { House } from "lucide-react";
+import { describe, expect, it } from "vitest";
 
 vi.mock("lucide-react", () => ({
   House: () => <span data-testid="house-icon">House</span>,

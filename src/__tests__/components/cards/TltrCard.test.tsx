@@ -1,7 +1,11 @@
+import { mocki18nNavigation } from "@/__tests__/mocks/next-i18n";
+import { mockNextIntl } from "@/__tests__/mocks/next-intl";
 import { render, screen } from "@testing-library/react";
-import { mockNextIntl } from "../mocks";
+import { describe, expect, it } from "vitest";
 
 mockNextIntl();
+mocki18nNavigation();
+
 vi.mock("next-sanity", () => ({
   PortableText: (props: { value: unknown }) => {
     return <div data-testid="portable-text-mock" />;

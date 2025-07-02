@@ -67,6 +67,18 @@ export async function middleware(req: NextRequest) {
     !pathnameWithoutLocale.startsWith("/client") &&
     !pathnameWithoutLocale.startsWith("/fournisseur")
   ) {
+    // if (
+    //   pathnameWithoutLocale.startsWith("/mon-devis") ||
+    //   pathnameWithoutLocale.startsWith("/my-quote")
+    // ) {
+    //   return protectDevisRoutes({
+    //     req,
+    //     pathnameWithoutLocale,
+    //     locale,
+    //     intlMiddleware,
+    //   });
+    // }
+
     //****** REDIRECTION 301 si route hybride fr/en *****//
     const pathSegments = pathnameWithoutLocale.split("/").filter(Boolean);
     //BLOG
@@ -172,9 +184,9 @@ function isAuthorizedRoute(
   const segments = pathnameWithoutLocale.split("/").filter(Boolean);
   const userId = segments[1];
 
-  console.log("Checking authorization for role:", role);
-  console.log("Pathname without locale:", pathnameWithoutLocale);
-  console.log("User ID from path:", userId);
+  // console.log("Checking authorization for role:", role);
+  // console.log("Pathname without locale:", pathnameWithoutLocale);
+  // console.log("User ID from path:", userId);
 
   if (role === "admin") {
     if (pathnameWithoutLocale.startsWith("/client"))

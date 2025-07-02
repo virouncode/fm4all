@@ -1,13 +1,13 @@
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { mocki18nNavigation, pathnameMock } from "@/__tests__/mocks/next-i18n";
+import { mockNextIntl } from "@/__tests__/mocks/next-intl";
 import {
   getLocalStorageMock,
-  mocki18nNavigation,
-  mockNextIntl,
   mockStorageHelper,
-  pathnameMock,
   setLocalStorageMock,
-} from "../mocks";
+} from "@/__tests__/mocks/storage-helper";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it } from "vitest";
 
 mockNextIntl();
 mocki18nNavigation();

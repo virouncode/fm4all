@@ -38,7 +38,7 @@ const TotalNettoyage = () => {
               className={`flex items-center justify-between text-${color} font-bold`}
             >
               <p>{t("nettoyage")}</p>
-              <p className="text-end">
+              <p className="text-end" data-testid="total-service">
                 {formatNumber(Math.round(totalService * MARGE))}{" "}
                 {t("eur-ht-an")}
               </p>
@@ -49,7 +49,7 @@ const TotalNettoyage = () => {
               className={`flex items-center justify-between text-${color} font-bold`}
             >
               <p>{t("option-repasse")}</p>
-              <p className="text-end">
+              <p className="text-end" data-testid="total-repasse">
                 {formatNumber(Math.round(totalRepasse * MARGE))}{" "}
                 {t("eur-ht-an")}
               </p>
@@ -60,7 +60,7 @@ const TotalNettoyage = () => {
               className={`flex items-center justify-between text-${color} font-bold`}
             >
               <p>{t("option-samedi")}</p>
-              <p className="text-end">
+              <p className="text-end" data-testid="total-samedi">
                 {formatNumber(Math.round(totalSamedi * MARGE))} {t("eur-ht-an")}
               </p>
             </div>
@@ -70,7 +70,7 @@ const TotalNettoyage = () => {
               className={`flex items-center justify-between text-${color} font-bold`}
             >
               <p>{t("option-dimanche")}</p>
-              <p className="text-end">
+              <p className="text-end" data-testid="total-dimanche">
                 {formatNumber(Math.round(totalDimanche * MARGE))}{" "}
                 {t("eur-ht-an")}
               </p>
@@ -81,7 +81,7 @@ const TotalNettoyage = () => {
               className={`flex items-center justify-between text-${color} font-bold`}
             >
               <p>{t("option-vitrerie")}</p>
-              <p className="text-end">
+              <p className="text-end" data-testid="total-vitrerie">
                 {formatNumber(Math.round(totalVitrerie * MARGE))}{" "}
                 {t("eur-ht-an")}
               </p>

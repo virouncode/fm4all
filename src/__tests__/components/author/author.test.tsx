@@ -1,6 +1,7 @@
 import Author from "@/components/author/Author"; // ajuste le chemin si besoin
 import { render, screen } from "@testing-library/react";
 import { DateTime } from "luxon";
+import { describe, expect, it } from "vitest";
 
 describe("Author", () => {
   const baseProps = {

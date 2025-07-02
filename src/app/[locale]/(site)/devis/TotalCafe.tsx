@@ -43,7 +43,7 @@ const TotalCafe = () => {
                     {item.quantites.nbMachines} x {item.infos.marque}{" "}
                     {item.infos.modele}
                   </p>
-                  <p>
+                  <p data-testid={`total-cafe-${item.infos.espaceId}`}>
                     {formatNumber(
                       Math.round(
                         (totalCafe.totalEspaces.find(

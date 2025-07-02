@@ -308,7 +308,7 @@ const Header = () => {
     <div className="w-full sticky top-0 h-16 bg-background z-50 shadow">
       <header className="max-w-7xl h-full flex justify-between items-center p-6 mx-auto">
         <div className="flex items-center gap-6">
-          <Link href="/">
+          <Link href="/" data-testid="home-link">
             <div className="relative h-[23px] w-[100px]">
               <Image
                 src="/img/logo_full.webp"

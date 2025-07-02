@@ -13,7 +13,6 @@ import MesServicesPresentationGammesCarousel from "./MesServicesPresentationGamm
 const MesServicesPresentation = () => {
   const t = useTranslations("DevisPage.services.presentation");
   const { setServices } = useContext(ServicesContext);
-
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
   // const isGammeSelected = (gamme: GammeType) => gamme === gammeSelected;
   const handleClickNext = () => {
@@ -22,6 +21,7 @@ const MesServicesPresentation = () => {
       currentServiceId: 1,
     }));
   };
+
   return (
     <div
       className="flex flex-col gap-4 w-full mx-auto h-full py-2 mb-14 lg:mb-0"

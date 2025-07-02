@@ -7,7 +7,12 @@ type AddEspaceButtonProps = {
 
 const AddEspaceButton = ({ handleAddEspace, title }: AddEspaceButtonProps) => {
   return (
-    <Button variant="outline" size="lg" onClick={handleAddEspace}>
+    <Button
+      variant="outline"
+      size="lg"
+      onClick={handleAddEspace}
+      data-testid="add-espace-button"
+    >
       {title}
     </Button>
   );

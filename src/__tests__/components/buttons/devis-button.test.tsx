@@ -1,3 +1,5 @@
+import { mocki18nNavigation, pushMock } from "@/__tests__/mocks/next-i18n";
+import { mockNextIntl } from "@/__tests__/mocks/next-intl";
 import { fullReinitialisationDevis } from "@/app/[locale]/(site)/devis/(etapes)/locaux/fullReinitialisationDevis";
 import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
@@ -6,7 +8,7 @@ import { DevisProgressType } from "@/zod-schemas/devisProgress";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Dispatch, ReactNode, SetStateAction } from "react";
-import { mocki18nNavigation, mockNextIntl, pushMock } from "../mocks";
+import { describe, expect, it } from "vitest";
 
 mocki18nNavigation();
 mockNextIntl();

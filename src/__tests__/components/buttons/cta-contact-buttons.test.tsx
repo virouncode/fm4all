@@ -1,5 +1,6 @@
+import { mockNextIntl, useLocaleMock } from "@/__tests__/mocks/next-intl";
 import { render, screen } from "@testing-library/react";
-import { mockNextIntl, useLocaleMock } from "../mocks";
+import { describe, expect, it } from "vitest";
 
 mockNextIntl();
 

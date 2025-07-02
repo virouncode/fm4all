@@ -1,6 +1,7 @@
 import { Link } from "@/i18n/navigation";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { getLocale, getTranslations } from "next-intl/server";
+import { notFound } from "next/navigation";
 import { Metadata } from "next/types";
 import { Suspense } from "react";
 import ServicesLoader from "../locaux/ServicesLoader";
@@ -26,18 +27,9 @@ const page = async ({
   const t = await getTranslations("DevisPage");
   const tServices = await getTranslations("DevisPage.services");
   const { surface, effectif } = await searchParams;
+
   if (!surface || !effectif) {
-    return (
-      <section className="flex h-dvh items-center justify-center text-lg">
-        <p>
-          {t("vous-devez-d-abord-remplir-les-informations-sur-vos")}{" "}
-          <Link href="/devis/locaux" className="underline">
-            {t("vos-locaux")}
-          </Link>
-          .
-        </p>
-      </section>
-    );
+    notFound();
   }
   if (
     isNaN(parseInt(surface as string)) ||

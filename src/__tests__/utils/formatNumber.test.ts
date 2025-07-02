@@ -17,4 +17,12 @@ describe("formatNumber", () => {
   it("should format a negative number", () => {
     expect(formatNumber(-1234567.89)).toBe("-1\u202f234\u202f567,9");
   });
+
+  it("should format a negative number", () => {
+    expect(formatNumber(1.55)).toBe("1,6");
+  });
+
+  it("should format 1926 to 1 926", () => {
+    expect(formatNumber(1926)).toBe("1\u202f926");
+  });
 });

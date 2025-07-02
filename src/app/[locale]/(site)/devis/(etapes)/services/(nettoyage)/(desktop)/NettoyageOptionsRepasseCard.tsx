@@ -59,7 +59,7 @@ const NettoyageOptionsRepasseCard = ({
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
   const { nettoyage } = useContext(NettoyageContext);
   const totalMensuelText = repasseProposition?.prixAnnuel ? (
-    <p className="font-bold text-xl ml-4">
+    <p className="font-bold text-xl ml-4" data-testid="total-mensuel-repasse">
       {formatNumber((repasseProposition.prixAnnuel * MARGE) / 12)}{" "}
       {t("euros-mois")}
     </p>
@@ -138,6 +138,7 @@ const NettoyageOptionsRepasseCard = ({
             }
             className="data-[state=checked]:bg-fm4alldestructive"
             title={t("selectionnez-cette-proposition")}
+            data-testid="repasse-switch"
           />
         ) : null}
         <div>

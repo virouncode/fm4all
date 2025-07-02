@@ -26,6 +26,7 @@ const ContactButton = ({
         className={`rounded-full ${className}`}
         size="icon"
         onClick={() => setIsMobileNavOpen(false)}
+        data-testid="contact-link-button"
       >
         <Phone />
       </Button>

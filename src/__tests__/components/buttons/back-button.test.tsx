@@ -1,6 +1,7 @@
+import { backMock, mocki18nNavigation } from "@/__tests__/mocks/next-i18n";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { backMock, mocki18nNavigation } from "../mocks";
+import { describe, expect, it } from "vitest";
 
 mocki18nNavigation();
 

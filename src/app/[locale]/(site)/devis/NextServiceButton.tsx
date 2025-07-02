@@ -19,6 +19,7 @@ const NextServiceButton = ({
         className="text-base"
         onClick={handleClickNext}
         disabled={disabled}
+        data-testid="next-service-button"
       >
         {t("suivant")}
       </Button>

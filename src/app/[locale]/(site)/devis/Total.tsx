@@ -153,6 +153,7 @@ const Total = () => {
           variant="outline"
           size="lg"
           className="text-base fixed bottom-6 right-4 lg:absolute lg:top-[20px] lg:right-0 z-30"
+          data-testid="total-button"
         >
           <Calculator />
           {formatNumber(Math.round(total.totalAnnuelHt ?? 0))} {t("eur-ht-an")}

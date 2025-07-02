@@ -67,7 +67,10 @@ const HeaderNavigationMenu = ({
     <NavigationMenu>
       <NavigationMenuList className="flex items-center gap-4">
         <NavigationMenuItem>
-          <NavigationMenuTrigger className="px-0">
+          <NavigationMenuTrigger
+            className="px-0"
+            data-testid="services-trigger"
+          >
             <div
               className={`flex items-center gap-1 text-base  ${isActive("/services") ? "text-destructive font-bold" : ""}`}
             >
@@ -125,7 +128,10 @@ const HeaderNavigationMenu = ({
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <NavigationMenuTrigger className="px-0">
+          <NavigationMenuTrigger
+            className="px-0"
+            data-testid="secteurs-trigger"
+          >
             <div
               className={`flex items-center gap-1 text-base ${isActive("/secteurs") ? "text-destructive font-bold" : ""}`}
             >
@@ -166,7 +172,11 @@ const HeaderNavigationMenu = ({
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <NavigationMenuLink asChild onClick={handleHideMobileNav}>
+          <NavigationMenuLink
+            asChild
+            onClick={handleHideMobileNav}
+            data-testid="gammes-link"
+          >
             <div
               className={`flex gap-1 items-center ${
                 isActive("/gammes") ? "text-destructive font-bold" : ""
@@ -178,7 +188,11 @@ const HeaderNavigationMenu = ({
           </NavigationMenuLink>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <NavigationMenuLink asChild onClick={handleHideMobileNav}>
+          <NavigationMenuLink
+            asChild
+            onClick={handleHideMobileNav}
+            data-testid="engagements-link"
+          >
             <div
               className={`flex gap-1 items-center ${
                 isActive("/engagements") ? "text-destructive font-bold" : ""
@@ -192,7 +206,11 @@ const HeaderNavigationMenu = ({
           </NavigationMenuLink>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <NavigationMenuLink asChild onClick={handleHideMobileNav}>
+          <NavigationMenuLink
+            asChild
+            onClick={handleHideMobileNav}
+            data-testid="partenaires-link"
+          >
             <div
               className={`flex gap-1 items-center ${
                 isActive("/partenaires") ? "text-destructive font-bold" : ""

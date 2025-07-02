@@ -109,6 +109,7 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
           aria-label={locale === "fr" ? "Changer de langue" : "Change language"}
           variant="outline"
           title={locale === "fr" ? "Changer de langue" : "Change language"}
+          data-testid="locale-button"
         >
           {locale === "fr" ? "🇫🇷" : "🇬🇧"} {locale.toUpperCase()}
         </Button>
@@ -120,6 +121,7 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
             checked={locale === l}
             onCheckedChange={() => handleChangeLang(l)}
             className="text-base"
+            data-testid={`locale-${l}`}
           >
             {l === "fr" ? "🇫🇷" : "🇬🇧"} {l.toUpperCase()}
           </DropdownMenuCheckboxItem>

@@ -101,6 +101,7 @@ export const routing = defineRouting({
       fr: "/mon-devis/afficher-mon-devis",
       en: "/my-quote/view-my-quote",
     },
+
     "/blog": {
       fr: "/articles",
       en: "/posts",

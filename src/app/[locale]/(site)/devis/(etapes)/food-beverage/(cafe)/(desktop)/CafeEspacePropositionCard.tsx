@@ -149,7 +149,10 @@ const CafeEspacePropositionCard = ({
   }
 
   const totalMensuelText = (
-    <p className="font-bold text-xl ml-4">
+    <p
+      className="font-bold text-xl ml-4"
+      data-testid={`total-mensuel-cafe-${espace.infos.espaceId}`}
+    >
       {formatNumber((proposition.totalAnnuel * MARGE) / 12)} {t("euros-mois")}
     </p>
   );
@@ -313,6 +316,7 @@ const CafeEspacePropositionCard = ({
         }
         className="data-[state=checked]:bg-fm4alldestructive"
         title={t("selectionnez-cette-proposition")}
+        data-testid={`cafe-switch-${espace.infos.espaceId}`}
       />
       <div>
         <div className="flex gap-2 items-center">

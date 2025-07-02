@@ -136,7 +136,10 @@ const HygieneOptionsBalaiCard = ({
           );
         }
         const prixMensuelBalaiText = (
-          <p className="font-bold text-xl ml-4">
+          <p
+            className="font-bold text-xl ml-4"
+            data-testid="total-mensuel-balai"
+          >
             {formatNumber((proposition.totalBalai * MARGE) / 12)}{" "}
             {t("euros-mois")}
           </p>
@@ -249,6 +252,7 @@ const HygieneOptionsBalaiCard = ({
               }
               className="data-[state=checked]:bg-fm4alldestructive"
               title={t("selectionnez-cette-proposition")}
+              data-testid="balai-switch"
             />
             <div>
               <div className="flex gap-2 items-center">

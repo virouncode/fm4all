@@ -71,7 +71,7 @@ const NettoyageOptionsVitrerieCard = ({
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
   const { nettoyage } = useContext(NettoyageContext);
   const vitreriePrixMensuelText = vitrerieProposition.prixAnnuel ? (
-    <p className="font-bold text-xl ml-4">
+    <p className="font-bold text-xl ml-4" data-testid="total-mensuel-vitrerie">
       {formatNumber((vitrerieProposition.prixAnnuel * MARGE) / 12)}{" "}
       {t("euros-mois")}
     </p>
@@ -154,6 +154,7 @@ const NettoyageOptionsVitrerieCard = ({
             }
             className="data-[state=checked]:bg-fm4alldestructive"
             title={t("selectionnez-cette-proposition")}
+            data-testid="vitrerie-switch"
           />
         ) : null}
         <div>

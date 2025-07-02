@@ -15,7 +15,7 @@ export const fillDevis = async (
   dateEmission: string,
   nomEmetteur: string,
   client: InsertClientType,
-  totalAnnuelHT: number | null,
+  totalAnnuelHTMarge: number | null,
   totalInstallationHT: number | null,
   commentaires: string | null,
   dateDemarrage: string | null
@@ -28,16 +28,16 @@ export const fillDevis = async (
     const pdfDoc = await PDFDocument.load(formPdfBytes);
     const form = pdfDoc.getForm();
 
-    const totalAnnuelHtText = formatNumber(totalAnnuelHT ?? 0);
-    const totalMensuelHtText = formatNumber((totalAnnuelHT ?? 0) / 12);
-    const tvaText = formatNumber(0.2 * (totalAnnuelHT ?? 0));
+    const totalAnnuelHtText = formatNumber(totalAnnuelHTMarge ?? 0);
+    const totalMensuelHtText = formatNumber((totalAnnuelHTMarge ?? 0) / 12);
+    const tvaText = formatNumber(0.2 * (totalAnnuelHTMarge ?? 0));
     const totalInstallationHtText = formatNumber(
       (totalInstallationHT ?? 0) * MARGE
     );
     const totalInstallationTtcText = formatNumber(
       (totalInstallationHT ?? 0) * MARGE * TVA
     );
-    const totalAnnuelTtcText = formatNumber((totalAnnuelHT ?? 0) * TVA);
+    const totalAnnuelTtcText = formatNumber((totalAnnuelHTMarge ?? 0) * TVA);
     const adresseClient =
       [client.adresseLigne1, client.adresseLigne2].filter(Boolean).join(" ") +
       " " +

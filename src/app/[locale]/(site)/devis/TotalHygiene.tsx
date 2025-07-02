@@ -49,7 +49,7 @@ const TotalHygiene = () => {
               className={`flex items-center justify-between text-${colorTrilogie} font-bold`}
             >
               <p>{t("trilogie-emp-savon-ph")}</p>
-              <p className="text-end">
+              <p className="text-end" data-testid="total-trilogie">
                 {formatNumber(Math.round(totalTrilogie * MARGE))}{" "}
                 {t("eur-ht-an")}
               </p>
@@ -60,7 +60,7 @@ const TotalHygiene = () => {
               className={`flex items-center justify-between text-${colorDesinfectant} font-bold`}
             >
               <p>{t("option-desinfectant")}</p>
-              <p className="text-end">
+              <p className="text-end" data-testid="total-desinfectant">
                 {formatNumber(Math.round(totalDesinfectant * MARGE))}{" "}
                 {t("eur-ht-an")}
               </p>
@@ -71,7 +71,7 @@ const TotalHygiene = () => {
               className={`flex items-center justify-between text-${colorParfum} font-bold`}
             >
               <p>{t("option-parfum")}</p>
-              <p className="text-end">
+              <p className="text-end" data-testid="total-parfum">
                 {formatNumber(Math.round(totalParfum * MARGE))} {t("eur-ht-an")}
               </p>
             </div>
@@ -81,7 +81,7 @@ const TotalHygiene = () => {
               className={`flex items-center justify-between text-${colorBalai} font-bold`}
             >
               <p>{t("option-balais-wc")}</p>
-              <p className="text-end">
+              <p className="text-end" data-testid="total-balai">
                 {formatNumber(Math.round(totalBalai * MARGE))} {t("eur-ht-an")}
               </p>
             </div>
@@ -91,7 +91,7 @@ const TotalHygiene = () => {
               className={`flex items-center justify-between text-${colorPoubelle} font-bold`}
             >
               <p>{t("option-poubelle-hygiene-feminine")}</p>
-              <p className="text-end">
+              <p className="text-end" data-testid="total-poubelle">
                 {formatNumber(Math.round(totalPoubelle * MARGE))}{" "}
                 {t("eur-ht-an")}
               </p>

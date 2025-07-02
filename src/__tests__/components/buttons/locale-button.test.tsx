@@ -1,15 +1,17 @@
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import {
   mocki18nNavigation,
-  mockNextIntl,
-  mockNextNavigation,
-  paramsMock,
   pathnameMock,
   replaceMock,
+} from "@/__tests__/mocks/next-i18n";
+import { mockNextIntl, useLocaleMock } from "@/__tests__/mocks/next-intl";
+import {
+  mockNextNavigation,
+  paramsMock,
   setSearchParamsMock,
-  useLocaleMock,
-} from "../mocks";
+} from "@/__tests__/mocks/next-navigation";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it } from "vitest";
 
 mocki18nNavigation();
 mockNextNavigation();

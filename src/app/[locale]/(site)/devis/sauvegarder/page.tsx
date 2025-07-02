@@ -2,6 +2,7 @@ import { Link } from "@/i18n/navigation";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
+import { notFound } from "next/navigation";
 import SauvegarderProgression from "./SauvegarderProgression";
 
 export const generateMetadata = async (): Promise<Metadata> => {
@@ -27,17 +28,7 @@ const page = async ({
     await searchParams;
 
   if (!surface || !effectif || !typeBatiment || !typeOccupation) {
-    return (
-      <section className="flex h-dvh items-center justify-center text-lg">
-        <p>
-          {tSauver("vous-devez-d-abord-remplir-les-informations-sur-vos")}{" "}
-          <Link href="/devis/locaux" className="underline">
-            {t("vos-locaux")}
-          </Link>
-          .
-        </p>
-      </section>
-    );
+    notFound();
   }
   if (
     !["bureaux", "localCommercial", "entrepot", "cabinetMedical"].includes(
