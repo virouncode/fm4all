@@ -129,7 +129,10 @@ const FontaineEspacePropositionCard = ({
   }
 
   const totalMensuelText = (
-    <p className="font-bold text-xl ml-4">
+    <p
+      className="font-bold text-xl ml-4"
+      data-testid={`total-mensuel-fontaine-${espace.infos.espaceId}`}
+    >
       {formatNumber((proposition.totalAnnuel * MARGE) / 12)} {t("euros-mois")}
     </p>
   );
@@ -320,6 +323,7 @@ const FontaineEspacePropositionCard = ({
         }
         className="data-[state=checked]:bg-fm4alldestructive"
         title={t("selectionnez-cette-proposition")}
+        data-testid={`fontaine-switch-${espace.infos.espaceId}`}
       />
 
       <div>

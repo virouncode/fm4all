@@ -79,8 +79,13 @@ const ServicesFm4AllPropositionCard = ({
       </p>
     ) : null;
   const totalMensuelText = (
-    <p className="font-bold text-xl ml-4">
-      {formatNumber(proposition.totalAnnuel / 12)} {t("euros-mois")}
+    <p
+      className="font-bold text-xl ml-4"
+      data-testid={`total-mensuel-services-fm4all-${gamme}`}
+    >
+      <span>
+        {formatNumber(proposition.totalAnnuel / 12)} {t("euros-mois")}
+      </span>
       {proposition.remiseCa ? "\u00B9" : ""}
       {proposition.remiseHof ? "\u00B2" : ""}
     </p>
@@ -240,6 +245,7 @@ const ServicesFm4AllPropositionCard = ({
         onCheckedChange={() => handleClickProposition(proposition)}
         className="data-[state=checked]:bg-fm4alldestructive"
         title="Sélectionner cette proposition"
+        data-testid={`services-fm4all-switch-${gamme}`}
       />
       <div>
         <div className="flex gap-2 items-center">

@@ -78,6 +78,7 @@ const FontaineDesktopEspaceInputs = ({
                     className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                     id="eau gazeuse"
                     aria-label={tFontaines("selectionner-eau-gazeuse")}
+                    data-testid="eau-gazeuse-checkbox"
                   />
                   <Label htmlFor="eau gazeuse" className="text-sm">
                     {tFontaines("eau-gazeuse")}
@@ -92,6 +93,7 @@ const FontaineDesktopEspaceInputs = ({
                     className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                     id="boissons"
                     aria-label={tFontaines("selectionner-eau-chaude")}
+                    data-testid="eau-chaude-checkbox"
                   />
                   <Label htmlFor="Eau chaude" className="text-sm">
                     {tFontaines("eau-chaude")}

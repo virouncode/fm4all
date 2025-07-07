@@ -124,17 +124,18 @@ const SauvegarderProgression = () => {
       });
       return;
     }
-    //Server action pour insérer ou update le client dans la db
-    executeSaveClient(data);
-    //TODO: ecrire dans la bdd une log table du devis avec formatted data, client_id, createdAt
-    //cf onSuccess
-    //TODO envoyez un email à Romu avec toutes les infos du devis grâce aux contextes
-    try {
-      await sendEmailFromClient({
-        to: "contact@fm4all.com",
-        from: "contact@fm4all.com",
-        subject: "Un client a sauvegardé sa progression",
-        text: `<p>Un client a sauvegardé sa progression dans le funnel.</p><br/>
+    if (data.emailContact !== "virounk@gmail.com") {
+      //Server action pour insérer ou update le client dans la db
+      executeSaveClient(data);
+      //TODO: ecrire dans la bdd une log table du devis avec formatted data, client_id, createdAt
+      //cf onSuccess
+      //TODO envoyez un email à Romu avec toutes les infos du devis grâce aux contextes
+      try {
+        await sendEmailFromClient({
+          to: "contact@fm4all.com",
+          from: "contact@fm4all.com",
+          subject: "Un client a sauvegardé sa progression",
+          text: `<p>Un client a sauvegardé sa progression dans le funnel.</p><br/>
                 <p>Voici ses coordonnées :</p><br/>
                 <p>Entreprise : ${data.nomEntreprise}</p>
                 <p>Code postal : ${data.codePostal}</p>
@@ -151,9 +152,10 @@ const SauvegarderProgression = () => {
                 <p>Voici ses informations de chiffrage (avant personnalisation) :</p><br/>
                 <pre>${formatLocalStorageData()}</pre>
                 `,
-      });
-    } catch (err) {
-      console.log(err);
+        });
+      } catch (err) {
+        console.log(err);
+      }
     }
     //TODO envoyer un email au client, bienvenue blablabla
     const newCompletedSteps = [
@@ -195,18 +197,21 @@ const SauvegarderProgression = () => {
                   type="email"
                   name="emailContact"
                   handleChange={handleChange}
+                  data-testid="email-contact-input"
                 />
                 <InputWithLabel<InsertClientType>
                   fieldTitle={tSauver("n-de-telephone")}
                   nameInSchema="phoneContact"
                   name="phoneContact"
                   handleChange={handleChange}
+                  data-testid="phone-contact-input"
                 />
                 <InputWithLabel<InsertClientType>
                   fieldTitle={tSauver("nom-de-lentreprise")}
                   nameInSchema="nomEntreprise"
                   name="nomEntreprise"
                   handleChange={handleChange}
+                  data-testid="nom-entreprise-input"
                 />
               </div>
               <div className="w-full md:w-1/2 flex flex-col gap-4 ">
@@ -215,18 +220,21 @@ const SauvegarderProgression = () => {
                   nameInSchema="prenomContact"
                   name="prenomContact"
                   handleChange={handleChange}
+                  data-testid="prenom-contact-input"
                 />
                 <InputWithLabel<InsertClientType>
                   fieldTitle={tSauver("nom-du-contact")}
                   nameInSchema="nomContact"
                   name="nomContact"
                   handleChange={handleChange}
+                  data-testid="nom-contact-input"
                 />
                 <InputWithLabel<InsertClientType>
                   fieldTitle={tSauver("poste-du-contact")}
                   nameInSchema="posteContact"
                   name="phoneContact"
                   handleChange={handleChange}
+                  data-testid="poste-contact-input"
                 />
               </div>
             </div>
@@ -264,6 +272,7 @@ const SauvegarderProgression = () => {
                 className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                 id="acceptation"
                 aria-label={tSauver("acceptez-les-conditions")}
+                data-testid="sauvegarder-acceptation-checkbox"
               />
               <Label htmlFor="acceptation">
                 {tSauver(
@@ -285,6 +294,7 @@ const SauvegarderProgression = () => {
                 title={tSauver("sauvegarder-ma-progression")}
                 className="text-base min-w-28"
                 disabled={!accepte}
+                data-testid="sauvegarder-progression-button"
               >
                 {isSavingClient || isSavingDevisTemporaire ? (
                   <LoaderCircle className="animate-spin" />

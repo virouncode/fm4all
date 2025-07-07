@@ -66,7 +66,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       2,
       "Nettoyage"
     );
-    cy.get('[data-testid="sheet-overlay"]').click();
+    cy.get('[data-testid="sheet-overlay"]').as("sheetOverlay").click();
 
     // ➤ Étape 4 : Repasse sanitaire
     cy.get("[data-testid='next-service-button']").eq(1).click();
@@ -77,7 +77,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       0,
       "Repasse"
     );
-    cy.get('[data-testid="sheet-overlay"]').click();
+    cy.get("@sheetOverlay").click();
 
     // ➤ Étape 5 : Samedi
     cy.get("[data-testid='samedi-switch']").click();
@@ -87,7 +87,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       0,
       "Samedi"
     );
-    cy.get('[data-testid="sheet-overlay"]').click();
+    cy.get("@sheetOverlay").click();
 
     // ➤ Étape 6 : Dimanche
     cy.get("[data-testid='dimanche-switch']").click();
@@ -97,7 +97,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       0,
       "Dimanche"
     );
-    cy.get('[data-testid="sheet-overlay"]').click();
+    cy.get("@sheetOverlay").click();
 
     // ➤ Étape 7 : Vitrerie
     cy.get("[data-testid='vitrerie-switch']").click();
@@ -107,7 +107,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       0,
       "Vitrerie"
     );
-    cy.get('[data-testid="sheet-overlay"]').click();
+    cy.get("@sheetOverlay").click();
 
     // ➤ Étape 8 : Hygiene sanitaire
     cy.get("[data-testid='next-service-button']").eq(2).click();
@@ -120,7 +120,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       0,
       "Hygiene"
     );
-    cy.get('[data-testid="sheet-overlay"]').click();
+    cy.get("@sheetOverlay").click();
 
     // ➤ Étape 9 : Options d'hygiène
     cy.get("[data-testid='next-service-button']").eq(3).click();
@@ -131,7 +131,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       0,
       "Desinfectant"
     );
-    cy.get('[data-testid="sheet-overlay"]').click();
+    cy.get("@sheetOverlay").click();
     cy.get("[data-testid='parfum-switch']").eq(0).click();
     verifyMontantService(
       "[data-testid='total-mensuel-parfum']",
@@ -139,7 +139,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       0,
       "Parfum"
     );
-    cy.get('[data-testid="sheet-overlay"]').click();
+    cy.get("@sheetOverlay").click();
     cy.get("[data-testid='balai-switch']").eq(0).click();
     verifyMontantService(
       "[data-testid='total-mensuel-balai']",
@@ -147,7 +147,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       0,
       "Balai"
     );
-    cy.get('[data-testid="sheet-overlay"]').click();
+    cy.get("@sheetOverlay").click();
     cy.get("[data-testid='poubelle-switch']").eq(0).click();
     verifyMontantService(
       "[data-testid='total-mensuel-poubelle']",
@@ -155,7 +155,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       0,
       "Poubelle"
     );
-    cy.get('[data-testid="sheet-overlay"]').click();
+    cy.get("@sheetOverlay").click();
 
     // ➤ Étape 10 : Maintenance
     cy.get("[data-testid='next-service-button']").eq(4).click();
@@ -166,7 +166,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       0,
       "Maintenance"
     );
-    cy.get('[data-testid="sheet-overlay"]').click();
+    cy.get("@sheetOverlay").click();
 
     // ➤ Étape 11 : Sécurité incendie
     cy.get("[data-testid='next-service-button']").eq(5).click();
@@ -177,7 +177,9 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       0,
       "Incendie"
     );
-    cy.get('[data-testid="sheet-overlay"]').click();
+    cy.get("@sheetOverlay").click();
+    cy.get("[data-testid='next-service-button']").as("nextServiceButton");
+    cy.log("@nextServiceButton", "@nextServiceButton");
     cy.get("[data-testid='next-service-button']").eq(6).click();
     cy.url().should("include", "/food-and-beverage");
 
@@ -192,7 +194,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       0,
       "Cafe Espace 1"
     );
-    cy.get('[data-testid="sheet-overlay"]').click();
+    cy.get("@sheetOverlay").click();
     cy.get("[data-testid='add-espace-button']").eq(0).click();
     cy.get("[data-testid='cafe-switch-2']").eq(0).click();
     verifyMontantService(
@@ -201,6 +203,115 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       0,
       "Cafe Espace 2"
     );
-    cy.get('[data-testid="sheet-overlay"]').click();
+    cy.get("@sheetOverlay").click();
+    cy.get("[data-testid='next-service-button']").eq(0).click();
+
+    // ➤ Étape 13 : Thé
+    cy.get("[data-testid='the-switch']").eq(1).click();
+    verifyMontantService(
+      "[data-testid='total-mensuel-the']",
+      "[data-testid='total-the']",
+      1,
+      "The"
+    );
+    cy.get("@sheetOverlay").click();
+    cy.get("[data-testid='next-service-button']").eq(1).click();
+
+    // ➤ Étape 14 : Snacks & fruits
+    cy.get("[data-testid='snacksfruits-switch']").eq(2).click();
+    cy.get("[data-testid='snacks-checkbox']").eq(0).click();
+    cy.get("[data-testid='boissons-checkbox']").eq(0).click();
+    verifyMontantService(
+      "[data-testid='total-mensuel-snacksfruits']",
+      "[data-testid='total-snacksfruits']",
+      2,
+      "Snacks & fruits"
+    );
+    cy.get("@sheetOverlay").click();
+    cy.get("[data-testid='next-service-button']").eq(2).click();
+
+    // ➤ Étape 15 : Fontaine à eau
+    cy.get("[data-testid='fontaine-switch-1']").eq(0).click();
+    cy.get("[data-testid='eau-gazeuse-checkbox']").eq(0).click();
+    cy.get("[data-testid='eau-chaude-checkbox']").eq(0).click();
+    verifyMontantService(
+      "[data-testid='total-mensuel-fontaine-1']",
+      "[data-testid='total-fontaine-1']",
+      0,
+      "Fontaine à eau espace 1"
+    );
+    cy.get("@sheetOverlay").click();
+    cy.get("[data-testid='add-espace-button']").eq(1).click();
+    cy.get("[data-testid='fontaine-switch-2']").eq(0).click();
+    verifyMontantService(
+      "[data-testid='total-mensuel-fontaine-2']",
+      "[data-testid='total-fontaine-2']",
+      0,
+      "Fontaine à eau espace 2"
+    );
+    cy.get("@sheetOverlay").click();
+    cy.get("[data-testid='next-service-button']").eq(3).click();
+    cy.url().should("include", "/pilotage-prestations");
+
+    // ➤ Étape 16 : Office manager
+    cy.get("[data-testid='office-manager-switch']").eq(0).click();
+    verifyMontantService(
+      "[data-testid='total-mensuel-office-manager']",
+      "[data-testid='total-office-manager']",
+      0,
+      "Office manager"
+    );
+    cy.get("@sheetOverlay").click();
+    cy.get("[data-testid='next-service-button']").eq(0).click();
+
+    // ➤ Étape 17 : Services FM4All
+    cy.get("[data-testid='services-fm4all-switch-essentiel']")
+      .eq(0)
+      .should("have.attr", "data-state", "checked");
+    verifyMontantService(
+      "[data-testid='total-mensuel-services-fm4all-essentiel']",
+      "[data-testid='total-services-fm4all']",
+      0,
+      "Services fm4all"
+    );
+    cy.get("@sheetOverlay").click();
+    cy.get("[data-testid='next-service-button']").eq(1).click();
+    cy.url().should("include", "/sauvegarder-ma-progression");
+
+    // ➤ Étape 18 : Sauvegarder la progression
+    cy.get("[data-testid='sauvegarder-progression-button']").should(
+      "be.disabled"
+    );
+    cy.get("[data-testid='sauvegarder-acceptation-checkbox']").should(
+      "not.be.checked"
+    );
+    cy.get("[data-testid='sauvegarder-acceptation-checkbox']").click();
+    cy.get("[data-testid='sauvegarder-progression-button']").should(
+      "not.be.disabled"
+    );
+    cy.get("[data-testid='email-contact-input']").type("virounk@gmail.com");
+    cy.get("[data-testid='phone-contact-input']").type("0683267962");
+    cy.get("[data-testid='nom-entreprise-input']").type("Viroun Kattygnarath");
+    cy.get("[data-testid='prenom-contact-input']").type("Viroun");
+    cy.get("[data-testid='nom-contact-input']").type("Kattygnarath");
+    cy.get("[data-testid='poste-contact-input']").type("CTO");
+    cy.get("[data-testid='sauvegarder-progression-button']").click();
+    cy.url().should("include", "/personnaliser-mon-devis");
+
+    // ➤ Étape 19 : Personnaliser le devis
+    cy.get("[data-testid='next-service-button']").eq(0).click();
+    cy.get("[data-testid='next-service-button']").eq(1).click();
+    cy.get("[data-testid='next-service-button']").eq(2).click();
+    cy.get("[data-testid='next-service-button']").eq(3).click();
+    cy.get("[data-testid='valider-personnalisation']").click();
+    cy.url().should("include", "/afficher-mon-devis");
+
+    // ➤ Étape 20 : Afficher le devis
+    cy.get("[data-testid='acceptation-checkbox']").should("not.be.checked");
+    cy.get("[data-testid='afficher-devis-button']").should("be.disabled");
+    cy.get("[data-testid='acceptation-checkbox']").click();
+    cy.get("[data-testid='afficher-devis-button']").should("not.be.disabled");
+    cy.get("[data-testid='afficher-devis-button']").click();
+    cy.get("#2", { timeout: 50000 }).should("exist");
   });
 });

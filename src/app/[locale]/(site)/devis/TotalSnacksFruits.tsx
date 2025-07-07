@@ -89,7 +89,7 @@ const TotalSnacksFruits = () => {
 
           <div className="flex items-center justify-between border-t border-foreground mt-2">
             <p>TOTAL</p>
-            <p className="text-end">
+            <p className="text-end" data-testid="total-snacksfruits">
               {formatNumber(Math.round(total * MARGE))} {t("eur-ht-an")}
             </p>
           </div>

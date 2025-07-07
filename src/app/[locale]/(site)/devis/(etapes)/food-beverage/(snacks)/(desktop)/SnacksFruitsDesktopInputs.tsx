@@ -45,6 +45,7 @@ const SnacksFruitsDesktopInputs = ({
             className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             id="snacks"
             aria-label={tSnacks("selectionner-snacks")}
+            data-testid="snacks-checkbox"
           />
           <Label htmlFor={`snacks`} className="text-sm">
             {tSnacks("snacks")}
@@ -57,6 +58,7 @@ const SnacksFruitsDesktopInputs = ({
             className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
             id="boissons"
             aria-label={tSnacks("selectionner-boissons")}
+            data-testid="boissons-checkbox"
           />
           <Label htmlFor={`boissons`} className="text-sm">
             {tSnacks("boissons")}

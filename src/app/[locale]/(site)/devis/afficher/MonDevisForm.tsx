@@ -168,11 +168,12 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                 devisUrl: urlToPost,
               });
               setDevisUrl(urlToPost);
-              await sendEmailFromClient({
-                to: "contact@fm4all.com",
-                from: "devis@fm4all.com",
-                subject: "Un client a finalisé son devis",
-                text: `<p>Un client a finalisé son devis.</p><br/>
+              if (newClientData.nomContact !== "Kattygnarath") {
+                await sendEmailFromClient({
+                  to: "contact@fm4all.com",
+                  from: "devis@fm4all.com",
+                  subject: "Un client a finalisé son devis",
+                  text: `<p>Un client a finalisé son devis.</p><br/>
                             <p>Voici ses coordonnées :</p><br/>
                             <p>Entreprise : ${newClientData.nomEntreprise}</p>
                             <p>Siret : ${newClientData.siret}</p>
@@ -207,9 +208,10 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                             <p>Commentaires du client : ${commentaires}</p><br/>
                             <p>Veuillez trouver en pièce jointe le devis</p>
                             `,
-                attachment: urlToPost,
-                filename: nomDevis,
-              });
+                  attachment: urlToPost,
+                  filename: nomDevis,
+                });
+              }
             } catch (err) {
               console.log(err);
             }
@@ -492,6 +494,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                 className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
                 id="acceptation"
                 aria-label={t("acceptez-les-conditions")}
+                data-testid="acceptation-checkbox"
               />
               <Label htmlFor="acceptation" className="max-w-prose">
                 {t(
@@ -515,6 +518,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                 disabled={
                   loading || isSavingClient || isSavingDevis || !accepte
                 }
+                data-testid="afficher-devis-button"
               >
                 {loading || isSavingClient || isSavingDevis ? (
                   <Loader className="animate-spin" />

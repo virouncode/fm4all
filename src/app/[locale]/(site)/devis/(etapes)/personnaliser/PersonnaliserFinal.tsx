@@ -67,6 +67,7 @@ const PersonnaliserFinal = () => {
           variant="destructive"
           size="lg"
           className="text-base"
+          data-testid="valider-personnalisation"
         >
           {tPersonnaliser("valider")}
         </Button>

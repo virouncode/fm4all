@@ -267,12 +267,15 @@ const SnacksFruitsPropositionCard = ({
         onCheckedChange={() => handleClickProposition(proposition)}
         className="data-[state=checked]:bg-fm4alldestructive"
         title={t("selectionnez-cette-proposition")}
+        data-testid="snacksfruits-switch"
       />
       <div>
         <div className="flex gap-2 items-center">
           <div className="flex flex-col">
             {totalMensuelSansRemiseText}
-            {totalMensuelText}
+            <span data-testid="total-mensuel-snacksfruits">
+              {totalMensuelText}
+            </span>
           </div>
 
           <Dialog>

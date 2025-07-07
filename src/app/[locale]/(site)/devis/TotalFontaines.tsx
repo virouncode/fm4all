@@ -57,7 +57,7 @@ const TotalFontaines = () => {
                     </span>{" "}
                     {item.infos.modele}
                   </p>
-                  <p>
+                  <p data-testid={`total-fontaine-${item.infos.espaceId}`}>
                     {formatNumber(
                       Math.round(
                         (totalFontaines.totalEspaces.find(
