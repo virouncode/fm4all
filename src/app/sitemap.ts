@@ -4,7 +4,10 @@ import {
   getArticlesSubSlugEn,
 } from "@/redirects/articlesSlugMappings";
 import { getSecteurSlugEn } from "@/redirects/secteursSlugMappings";
-import { getServicesSlugEn } from "@/redirects/servicesSlugMappings";
+import {
+  getServicesSlugEn,
+  getServicesSubSlugEn,
+} from "@/redirects/servicesSlugMappings";
 import {
   fetchArticleCategories,
   fetchArticleSlugs,
@@ -106,13 +109,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           changeFrequency: "weekly",
           priority: 0.7,
         },
-        //PAS DE VERSION EN pour l'instant
-        // {
-        //   url: `${APP_URL}/en/services/${getServicesSlugEn(serviceVille.slug)}/${serviceVille.subSlug}`,
-        //   lastModified: lastMod,
-        //   changeFrequency: "weekly",
-        //   priority: 0.7,
-        // },
+        {
+          url: `${APP_URL}/en/services/${getServicesSlugEn(serviceVille.slug)}/${getServicesSubSlugEn(serviceVille.subSlug)}`,
+          lastModified: lastMod,
+          changeFrequency: "weekly",
+          priority: 0.7,
+        },
       ];
     }
   );

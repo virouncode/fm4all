@@ -38,18 +38,15 @@ export const getArticlesSlugFr = (articleSlugEn: string): string => {
   );
   return entry ? entry[0] : articleSlugEn;
 };
-// Fonction pour obtenir le slug français à partir du slug anglais
 export const getArticlesSubSlugFr = (articleSubSlugEn: string): string => {
   const entry = Object.entries(articlesSubSlugMappingsFrToEn).find(
     ([_, value]) => value === articleSubSlugEn
   );
   return entry ? entry[0] : articleSubSlugEn;
 };
-// Fonction pour obtenir le slug anglais à partir du slug français
 export const getArticlesSlugEn = (articleSlugFr: string): string => {
   return articlesSlugMappingsFrToEn[articleSlugFr] || articleSlugFr;
 };
-// Fonction pour obtenir le slug anglais à partir du slug français
 export const getArticlesSubSlugEn = (articleSubSlugFr: string): string => {
   return articlesSubSlugMappingsFrToEn[articleSubSlugFr] || articleSubSlugFr;
 };

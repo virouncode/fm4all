@@ -22,6 +22,8 @@ import {
 import {
   getServicesSlugEn,
   getServicesSlugFr,
+  getServicesSubSlugEn,
+  getServicesSubSlugFr,
 } from "@/redirects/servicesSlugMappings";
 import { useLocale } from "next-intl";
 import { useParams, useSearchParams } from "next/navigation";
@@ -51,6 +53,24 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
             : getServicesSlugEn(params.slug);
         router.replace(
           { pathname, params: { slug: newSlug }, query },
+          { locale: newLocale }
+        );
+      }
+    } else if (pathname === "/services/[slug]/[subSlug]") {
+      if (
+        typeof params.slug === "string" &&
+        typeof params.subSlug === "string"
+      ) {
+        const newSlug =
+          newLocale === "fr"
+            ? getServicesSlugFr(params.slug)
+            : getServicesSlugEn(params.slug);
+        const newSubSlug =
+          newLocale === "fr"
+            ? getServicesSubSlugFr(params.subSlug)
+            : getServicesSubSlugEn(params.subSlug);
+        router.replace(
+          { pathname, params: { slug: newSlug, subSlug: newSubSlug }, query },
           { locale: newLocale }
         );
       }

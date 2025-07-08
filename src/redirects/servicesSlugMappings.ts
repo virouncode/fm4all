@@ -16,7 +16,12 @@ export const servicesSlugMappingsFrToEn: Record<string, string> = {
   // Ajoutez tous vos autres services ici
 };
 
-// Fonction pour obtenir le slug français à partir du slug anglais
+export const servicesSubSlugMappingsFrToEn: Record<string, string> = {
+  gennevilliers: "gennevillers-city",
+  "neuilly-sur-seine": "neuilly-sur-seine-city",
+  alfortville: "alfortville-city",
+};
+
 export const getServicesSlugFr = (serviceSlugEn: string): string => {
   const entry = Object.entries(servicesSlugMappingsFrToEn).find(
     ([_, value]) => value === serviceSlugEn
@@ -24,7 +29,16 @@ export const getServicesSlugFr = (serviceSlugEn: string): string => {
   return entry ? entry[0] : serviceSlugEn;
 };
 
-// Fonction pour obtenir le slug anglais à partir du slug français
+export const getServicesSubSlugFr = (serviceSubSlugEn: string): string => {
+  const entry = Object.entries(servicesSubSlugMappingsFrToEn).find(
+    ([_, value]) => value === serviceSubSlugEn
+  );
+  return entry ? entry[0] : serviceSubSlugEn;
+};
+
 export const getServicesSlugEn = (serviceSlugFr: string): string => {
   return servicesSlugMappingsFrToEn[serviceSlugFr] || serviceSlugFr;
+};
+export const getServicesSubSlugEn = (serviceSubSlugFr: string): string => {
+  return servicesSubSlugMappingsFrToEn[serviceSubSlugFr] || serviceSubSlugFr;
 };

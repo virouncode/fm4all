@@ -17,6 +17,10 @@ export const routing = defineRouting({
       fr: "/services/[slug]",
       en: "/services/[slug]",
     },
+    "/services/[slug]/[subSlug]": {
+      fr: "/services/[slug]/[subSlug]",
+      en: "/services/[slug]/[subSlug]",
+    },
     "/secteurs": {
       fr: "/secteurs",
       en: "/sectors",

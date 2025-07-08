@@ -16,6 +16,7 @@ import { capitalize } from "@/lib/utils/capitalize";
 import {
   getServicesSlugEn,
   getServicesSlugFr,
+  getServicesSubSlugFr,
 } from "@/redirects/servicesSlugMappings";
 import { urlFor } from "@/sanity/lib/image";
 import { fetchServiceVilleSlugs, getServiceVille } from "@/sanity/queries";
@@ -112,11 +113,11 @@ export const generateMetadata = async ({
     {
       fr: {
         slug: locale === "fr" ? slug : getServicesSlugFr(slug),
-        subSlug,
+        subSlug: locale === "fr" ? subSlug : getServicesSubSlugFr(subSlug),
       },
       en: {
         slug: locale === "en" ? slug : getServicesSlugEn(slug),
-        subSlug,
+        subSlug: locale === "en" ? subSlug : getServicesSubSlugFr(subSlug),
       },
     }
   );
@@ -128,9 +129,6 @@ export const generateStaticParams = async () => {
   // Récupérer tous les slugs de services depuis Sanity
   const slugsSubSlugsFr = await fetchServiceVilleSlugs();
   const slugsSubSlugsEn = await fetchServiceVilleSlugs("en");
-
-  console.log("Slugs for services ville in French:", slugsSubSlugsFr);
-  console.log("Slugs for services ville in English:", slugsSubSlugsEn);
 
   return [
     ...slugsSubSlugsFr.map((item) => ({
