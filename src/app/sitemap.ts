@@ -10,6 +10,7 @@ import {
   fetchArticleSlugs,
   fetchSecteursSlugs,
   fetchServiceSlugs,
+  fetchServiceVilleSlugs,
 } from "@/sanity/queries";
 import { MetadataRoute } from "next";
 const APP_URL = "https://www.fm4all.com";
@@ -77,6 +78,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const articlesCategories = await fetchArticleCategories();
   const articleSlugs = await fetchArticleSlugs();
   const secteursSlugs = await fetchSecteursSlugs();
+  const servicesVillesSlugs = await fetchServiceVilleSlugs();
 
   const servicesUrls: MetadataRoute.Sitemap = serviceSlugs.flatMap((slug) => {
     if (!slug) return [];
@@ -95,6 +97,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       },
     ];
   });
+  const servicesVillesUrls: MetadataRoute.Sitemap = servicesVillesSlugs.flatMap(
+    (serviceVille) => {
+      return [
+        {
+          url: `${APP_URL}/fr/services/${serviceVille.slug}/${serviceVille.subSlug}`,
+          lastModified: lastMod,
+          changeFrequency: "weekly",
+          priority: 0.7,
+        },
+        //PAS DE VERSION EN pour l'instant
+        // {
+        //   url: `${APP_URL}/en/services/${getServicesSlugEn(serviceVille.slug)}/${serviceVille.subSlug}`,
+        //   lastModified: lastMod,
+        //   changeFrequency: "weekly",
+        //   priority: 0.7,
+        // },
+      ];
+    }
+  );
+
   const articlesCategoriesUrls: MetadataRoute.Sitemap =
     articlesCategories.flatMap((slug) => {
       if (!slug) return [];
@@ -153,6 +175,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticUrls,
     ...servicesUrls,
+    ...servicesVillesUrls,
     ...articlesCategoriesUrls,
     ...articlesUrls,
     ...secteursUrls,
