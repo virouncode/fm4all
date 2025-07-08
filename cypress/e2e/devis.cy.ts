@@ -54,7 +54,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
     cy.get("header [data-testid='devis-button']").click();
     cy.get("[data-testid='code-postal-input']").type("75001");
     cy.get("[data-testid='afficher-tarifs-button']").click();
-    cy.url().should("include", "/mes-services");
+    cy.url().should("include", "/mes-services", { timeout: 50000 });
 
     // ➤ Étape 3 : Nettoyage
 

@@ -7,6 +7,7 @@ import {
   SanityImageHotspot,
   Secteur,
   Service,
+  ServiceVille,
   Slug,
   Tag,
 } from "../../sanity.types";
@@ -127,6 +128,46 @@ export const getTagRelatedServices = async (
   return await client.fetch<Service[]>(TAG_RELATED_SERVICES_QUERY, {
     language: locale,
     slug,
+  });
+};
+
+//ServiceVille pour ville et service donnés
+export const SERVICE_VILLE_QUERY = `*[_type == "serviceVille" && subSlug.current == $subSlug && language == $language && references(*[_type == "service" && slug.current == $slug]._id)][0]{..., service->{
+    _id,
+    titreCard,
+    }
+  }`;
+
+export const getServiceVille = async (
+  slug: string,
+  subSlug: string,
+  locale: LocaleType
+) => {
+  return await client.fetch<
+    ServiceVille & {
+      service: Service;
+      auteur: {
+        _id: string;
+        prenom: string;
+        nom: string;
+        image: {
+          asset?: {
+            _ref: string;
+            _type: "reference";
+            _weak?: boolean;
+            [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+          };
+          hotspot?: SanityImageHotspot;
+          crop?: SanityImageCrop;
+          alt?: string;
+          _type: "image";
+        };
+      };
+    }
+  >(SERVICE_VILLE_QUERY, {
+    language: locale,
+    slug,
+    subSlug,
   });
 };
 
@@ -471,6 +512,32 @@ export const fetchServiceSlugs = async (locale?: LocaleType) => {
       : `*[_type == "service" && language == "fr"]{slug{current}}`;
   const services = await client.fetch<Service[]>(query);
   return services.map((service) => service.slug?.current).filter(Boolean);
+};
+
+export const fetchServiceVilleSlugs = async (locale?: LocaleType) => {
+  const query =
+    locale && locale !== "fr"
+      ? `*[_type == "serviceVille" && language == "en"]{
+      subSlug{current},
+      service->{
+        slug{current}
+      }
+    }`
+      : `*[_type == "serviceVille" && language == "fr"]{
+      subSlug{current},
+      service->{
+        slug{current}
+      }
+    }`;
+  const serviceVilles =
+    await client.fetch<(ServiceVille & { service: Service })[]>(query);
+  return serviceVilles.map((serviceVille) => {
+    const service = serviceVille.service as Service;
+    return {
+      slug: service?.slug?.current ?? "",
+      subSlug: serviceVille.subSlug?.current ?? "",
+    };
+  });
 };
 
 export const fetchArticleCategories = async (locale?: LocaleType) => {

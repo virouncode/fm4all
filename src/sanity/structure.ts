@@ -10,7 +10,7 @@ export const structure: StructureResolver = (S) =>
       S.documentTypeListItem("auteur").title("Auteurs"),
       S.documentTypeListItem("article").title("Articles"),
       S.documentTypeListItem("service").title("Services"),
-      S.documentTypeListItem("sousService").title("Sous Services"),
+      S.documentTypeListItem("serviceVille").title("Services Ville"),
       S.documentTypeListItem("secteur").title("Secteurs"),
       S.divider(),
       ...S.documentTypeListItems().filter(
@@ -22,7 +22,7 @@ export const structure: StructureResolver = (S) =>
             "auteur",
             "article",
             "service",
-            "sousService",
+            "serviceVille",
             "secteur",
           ].includes(item.getId()!)
       ),

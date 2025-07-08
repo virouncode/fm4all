@@ -2,10 +2,10 @@ import { Accordion } from "@/components/ui/accordion";
 import { LocaleType } from "@/i18n/routing";
 import { PortableText, PortableTextBlock } from "next-sanity";
 import FAQItem from "../../(home)/FAQItem";
-import { Service } from "../../../../../../sanity.types";
+import { Service, ServiceVille } from "../../../../../../sanity.types";
 
 interface FAQServiceProps {
-  service: Service;
+  service: Service | ServiceVille;
   locale: LocaleType;
 }
 

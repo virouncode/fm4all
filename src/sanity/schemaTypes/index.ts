@@ -5,8 +5,8 @@ import { articleType } from "./articleType";
 import { auteurType } from "./auteurType";
 import { secteurType } from "./secteurType";
 import { serviceType } from "./serviceType";
-import { sousServiceType } from "./sousServiceType";
 import { tagType } from "./tagType";
+import { serviceVilleType } from "./serviceVilleType";
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -15,7 +15,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     auteurType,
     articleType,
     serviceType,
-    sousServiceType,
+    serviceVilleType,
     secteurType,
   ],
 };

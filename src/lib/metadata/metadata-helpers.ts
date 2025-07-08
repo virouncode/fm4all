@@ -17,6 +17,7 @@ export type RouteKey =
   | "prestataires"
   | "services"
   | "servicePresentation"
+  | "serviceVille"
   | "locauxDevis"
   | "servicesDevis"
   | "foodDevis"
@@ -91,6 +92,10 @@ export const routes: Record<RouteKey, Record<LocaleType, string>> = {
   servicePresentation: {
     fr: "/services/[slug]",
     en: "/services/[slug]",
+  },
+  serviceVille: {
+    fr: "/services/[slug]/[subSlug]",
+    en: "/services/[slug]/[subSlug]",
   },
   locauxDevis: {
     fr: "/mon-devis/mes-locaux",
@@ -224,6 +229,37 @@ export function generateAlternates(
       "[slug]",
       slugs["fr"] as string
     );
+  } else if (routeKey === "serviceVille" && slugs) {
+    canonicalUrl =
+      `https://www.fm4all.com/${locale}${routes[routeKey][locale as LocaleType]}`
+        .replace(
+          "[slug]",
+          (slugs[locale as LocaleType] as { slug: string; subSlug?: string })
+            .slug
+        )
+        .replace(
+          "[subSlug]",
+          (slugs[locale as LocaleType] as { slug: string; subSlug?: string })
+            .subSlug || ""
+        );
+    enUrl = `https://www.fm4all.com/en${routes[routeKey]["en"]}`
+      .replace(
+        "[slug]",
+        (slugs["en"] as { slug: string; subSlug?: string }).slug
+      )
+      .replace(
+        "[subSlug]",
+        (slugs["en"] as { slug: string; subSlug?: string }).subSlug || ""
+      );
+    frUrl = `https://www.fm4all.com/fr${routes[routeKey]["fr"]}`
+      .replace(
+        "[slug]",
+        (slugs["fr"] as { slug: string; subSlug?: string }).slug
+      )
+      .replace(
+        "[subSlug]",
+        (slugs["fr"] as { slug: string; subSlug?: string }).subSlug || ""
+      );
   } else if (routeKey === "secteurPresentation" && slugs) {
     canonicalUrl =
       `https://www.fm4all.com/${locale}${routes[routeKey][locale as LocaleType]}`.replace(
