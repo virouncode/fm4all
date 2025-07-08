@@ -16,6 +16,7 @@ import { capitalize } from "@/lib/utils/capitalize";
 import {
   getServicesSlugEn,
   getServicesSlugFr,
+  getServicesSubSlugEn,
   getServicesSubSlugFr,
 } from "@/redirects/servicesSlugMappings";
 import { urlFor } from "@/sanity/lib/image";
@@ -117,7 +118,7 @@ export const generateMetadata = async ({
       },
       en: {
         slug: locale === "en" ? slug : getServicesSlugEn(slug),
-        subSlug: locale === "en" ? subSlug : getServicesSubSlugFr(subSlug),
+        subSlug: locale === "en" ? subSlug : getServicesSubSlugEn(subSlug),
       },
     }
   );
