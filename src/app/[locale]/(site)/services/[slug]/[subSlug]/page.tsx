@@ -346,7 +346,9 @@ export default async function page({
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>{capitalize(subSlug)}</BreadcrumbPage>
+            <BreadcrumbPage>
+              {capitalize(subSlug).replace("-City", "")}
+            </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
