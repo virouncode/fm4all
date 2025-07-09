@@ -60,7 +60,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
       </Breadcrumb>
       <article className="mt-6 flex flex-col gap-10">
         <h1 className="text-4xl">{t("devenir-prestataire")}</h1>
-        <div className="flex flex-col gap-6 text-lg w-full max-w-prose mx-auto hyphens-auto text-wrap">
+        <div className="flex flex-col gap-6 w-full max-w-prose mx-auto hyphens-auto text-wrap">
           <h2 className="text-center font-bold">
             {t("vous-etes-prestataire-de-service")} <br />
             {t("vous-cherchez-a-developper-votre-activite")}

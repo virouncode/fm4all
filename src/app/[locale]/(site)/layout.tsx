@@ -75,14 +75,14 @@ export const generateMetadata = async (): Promise<Metadata> => {
   };
 };
 
-const didact = Didact_Gothic({
+export const didact = Didact_Gothic({
   variable: "--font-didact-sans",
   weight: "400",
   subsets: ["latin"],
   display: "swap",
 });
 
-const inter = Inter({
+export const inter = Inter({
   subsets: ["latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
   style: ["normal", "italic"],
@@ -108,7 +108,7 @@ export default async function LocalizedLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
-        className={`${didact.className} antialiased scroll-smooth tracking-[-0.015em]`}
+        className={`${inter.className} antialiased scroll-smooth tracking-tight`}
       >
         <GoogleAnalytics
           GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!}

@@ -62,7 +62,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
       <article className="mt-6 flex flex-col gap-10">
         <h1 className="text-4xl">{t("nos-services")}</h1>
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap text-lg">
+          <div className="flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap">
             <p>
               {t("fm4all-democratise-le")}{" "}
               <strong>{t("facility-management")}</strong>{" "}
@@ -81,7 +81,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             {t("pourquoi-le-fm-pour-tous")}
           </h2>
-          <div className="text-lg flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap">
+          <div className="flex flex-col gap-4 mx-auto w-full max-w-prose hyphens-auto text-wrap">
             <p>
               {t(
                 "parce-que-nous-pensons-que-les-services-de-facility-management-ne-devraient-pas-etre-reserves-aux-grandes-entreprises"
@@ -126,7 +126,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             {t("gagnez-du-temps-et-de-l-argent")}
           </h2>
-          <div className="text-lg flex flex-col gap-4 w-full mx-auto max-w-prose hyphens-auto text-wrap">
+          <div className="flex flex-col gap-4 w-full mx-auto max-w-prose hyphens-auto text-wrap">
             <p>
               {t("en-passant-par-fm4all-vous-profitez-de")}{" "}
               <strong>{t("l-expertise-d-un-professionnel-du-fm")}</strong>
@@ -146,7 +146,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             {t("hof-managers")}
           </h2>
-          <div className="text-lg flex flex-col gap-4 w-full mx-auto max-w-prose hyphens-auto text-wrap">
+          <div className="flex flex-col gap-4 w-full mx-auto max-w-prose hyphens-auto text-wrap">
             <p>
               {t(
                 "hospitality-manager-office-manager-facility-manager-ce-sont-eux-qui-gerent-le-bon-fonctionnement-de-vos-locaux-au-quotidien-tout-en-veillant-sur-vos-collaborateurs-chez-fm4all-offrez-vous-les-services-d-un-hof-manager"

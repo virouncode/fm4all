@@ -257,9 +257,9 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
         <h1 className="text-4xl">
           {t("politique-relative-aux-cookies-de-fm4all")}
         </h1>
-        <div className="flex flex-col gap-2 md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto">
-          <p className="text-base">{t("derniere-mise-a-jour-04-03-2025")}</p>
-          <p className="text-base">
+        <div className="flex flex-col gap-6 md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto">
+          <p>{t("derniere-mise-a-jour-04-03-2025")}</p>
+          <p>
             {t(
               "la-presente-politique-relative-aux-cookies-explique-comment-fm4all-and-quot-nous-and-quot-and-quot-notre-and-quot-and-quot-nos-and-quot-utilise-des-cookies-et-des-technologies-similaires-sur-son-site-web-https-www-fm4all-com-le-and-quot-site-and-quot"
             )}
@@ -270,7 +270,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             {t("1-qu-est-ce-qu-un-cookie")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto">
-            <p className="text-base">
+            <p>
               {t(
                 "les-cookies-sont-de-petits-fichiers-texte-qui-sont-places-sur-votre-ordinateur-ou-votre-appareil-mobile-lorsque-vous-visitez-un-site-web-ils-sont-largement-utilises-pour-permettre-aux-sites-web-de-fonctionner-plus-efficacement-ainsi-que-pour-fournir-des-informations-aux-proprietaires-du-site"
               )}
@@ -281,11 +281,9 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             {t("2-types-de-cookies-que-nous-utilisons")}
           </h2>
-          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
-            <p className="text-base">
-              {t("nous-utilisons-les-types-de-cookies-suivants")}
-            </p>
-            <ul className="ml-10 flex flex-col gap-2">
+          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-6">
+            <p>{t("nous-utilisons-les-types-de-cookies-suivants")}</p>
+            <ul className="ml-10 flex flex-col gap-4">
               <li className="list-disc">
                 <strong>{t("cookies-strictement-necessaires")}</strong>{" "}
                 {t(
@@ -323,13 +321,13 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             {t("4-comment-gerer-les-cookies")}
           </h2>
-          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
-            <p className="text-base">
+          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-6">
+            <p>
               {t(
                 "vous-pouvez-gerer-vos-preferences-en-matiere-de-cookies-a-tout-moment"
               )}
             </p>
-            <ul className="ml-10 flex flex-col gap-2">
+            <ul className="ml-10 flex flex-col gap-4">
               <li className="list-disc">
                 <strong>{t("banniere-cookies")}</strong>{" "}
                 {t(
@@ -353,7 +351,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             {t("5-consentement-aux-cookies")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
-            <p className="text-base">
+            <p>
               {t(
                 "lors-de-votre-premiere-visite-sur-notre-site-une-banniere-de-consentement-aux-cookies-s-affiche-cette-banniere-vous-permet-d-accepter-ou-de-refuser-les-cookies-non-essentiels-votre-consentement-est-enregistre-pour-une-duree-de-6-mois"
               )}
@@ -365,7 +363,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             {t("6-modifications-de-cette-politique")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
-            <p className="text-base">
+            <p>
               {t(
                 "nous-pouvons-mettre-a-jour-cette-politique-relative-aux-cookies-de-temps-a-autre-toute-modification-sera-publiee-sur-cette-page-avec-une-date-de-mise-a-jour-revisee"
               )}
@@ -377,14 +375,14 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             {t("7-nous-contacter")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
-            <p className="text-base">
+            <p>
               {t(
                 "si-vous-avez-des-questions-concernant-cette-politique-relative-aux-cookies-veuillez-nous-contacter-a"
               )}
             </p>
-            <p className="text-base">fm4all</p>
-            <p className="text-base">{t("3-rue-de-nantes-75019-paris")}</p>
-            <p className="text-base">admin@fm4all.com</p>
+            <p>fm4all</p>
+            <p>{t("3-rue-de-nantes-75019-paris")}</p>
+            <p>admin@fm4all.com</p>
           </div>
         </div>
       </section>

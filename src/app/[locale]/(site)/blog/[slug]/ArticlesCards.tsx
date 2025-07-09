@@ -43,7 +43,7 @@ const ArticlesCards = async ({
           >
             <div className="p-4 flex flex-col gap-4 h-52">
               <p className="text-2xl">{article.titre}</p>
-              <p className="w-full overflow-hidden line-clamp-5">
+              <p className="w-full overflow-hidden line-clamp-5 text-sm">
                 {article.description}
               </p>
             </div>

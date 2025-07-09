@@ -34,7 +34,7 @@ const ServicesCards = async () => {
           >
             <div className="p-4 flex flex-col gap-4 h-52">
               <p className="text-2xl">{service.titreCard}</p>
-              <p className="w-full overflow-hidden line-clamp-5">
+              <p className="w-full overflow-hidden line-clamp-5 text-sm">
                 {service.description}
               </p>
             </div>

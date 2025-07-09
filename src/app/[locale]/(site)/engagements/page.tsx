@@ -63,13 +63,13 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
       <h1 className="text-4xl mt-6 mb-10">{t("nos-engagements")}</h1>
       <article className="flex flex-col gap-10">
         <div className="flex flex-col gap-8">
-          <p className="text-lg max-w-prose mx-auto hyphens-auto text-wrap font-bold">
+          <p className="max-w-prose mx-auto hyphens-auto text-wrap font-bold">
             {t(
               "chez-fm4all-nous-avons-a-coeur-de-batir-des-relations-de-confiance-et-de-fournir-des-services-dexcellence-nos-engagements-refletent-notre-volonte-de-placer-vos-besoins-vos-attentes-et-vos-valeurs-au-centre-de-nos-priorites"
             )}
           </p>
           <WhyCards className="my-10" />
-          <p className="text-lg max-w-prose mx-auto hyphens-auto text-wrap">
+          <p className="max-w-prose mx-auto hyphens-auto text-wrap">
             {t("chez-fm4all-nous-avons-concu-nos")}{" "}
             <Link
               href="/services"
@@ -90,25 +90,25 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             {t("simplicite")}
           </p>
           <p
-            className="text-lg max-w-prose mx-auto
+            className="max-w-prose mx-auto
           hyphens-auto text-wrap"
           >
             {t(
               "nous-vous-simplifions-la-vie-en-prenant-en-charge-tous-les-aspects-lies-a-vos-services-generaux"
             )}
           </p>
-          <ul className="text-lg max-w-prose ml-10 md:mx-auto hyphens-auto text-wrap">
-            <li className="list-disc">
+          <ul className="max-w-prose md:mx-auto hyphens-auto text-wrap flex flex-col gap-4">
+            <li className="list-disc  md:ml-10">
               {t(
                 "gestion-centralisee-une-plateforme-unique-pour-gerer-vos-contrats-vos-factures-et-vos-reclamations"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "selection-cle-en-main-nos-prestataires-ont-ete-rigoureusement-choisis-pour-vous-eviter-des-recherches-fastidieuses"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "experience-fluide-des-processus-simplifies-et-des-outils-intuitifs-pour-un-gain-de-temps-immediat"
               )}
@@ -118,25 +118,25 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
         <div className="flex flex-col gap-6">
           <p className="border-l-2 px-4 text-3xl mb-4 ml-6">{t("rapiditie")}</p>
           <p
-            className="text-lg max-w-prose mx-auto
+            className="max-w-prose mx-auto
           hyphens-auto text-wrap"
           >
             {t(
               "votre-temps-est-precieux-et-nous-nous-engageons-a-agir-avec-efficacite"
             )}
           </p>
-          <ul className="text-lg max-w-prose ml-10 md:mx-auto hyphens-auto text-wrap">
-            <li className="list-disc">
+          <ul className="max-w-prose  md:mx-auto hyphens-auto text-wrap flex flex-col gap-4">
+            <li className="list-disc  md:ml-10">
               {t(
                 "reactivite-maximale-nos-equipes-sont-disponibles-pour-repondre-a-vos-demandes-et-intervenir-rapidement-en-cas-de-besoin"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "mises-en-relation-rapides-trouvez-les-prestataires-adaptes-a-vos-besoins-en-un-clic-grace-a-notre-plateforme"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "traitement-accelere-que-ce-soit-pour-une-reclamation-ou-un-ajustement-contractuel-nous-agissons-sans-delai"
               )}
@@ -146,25 +146,25 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
         <div className="flex flex-col gap-6">
           <p className="border-l-2 px-4 text-3xl mb-4 ml-6">{t("fiabilite")}</p>
           <p
-            className="text-lg max-w-prose mx-auto
+            className="max-w-prose mx-auto
           hyphens-auto text-wrap"
           >
             {t(
               "faites-confiance-a-des-experts-pour-garantir-des-prestations-irreprochables"
             )}
           </p>
-          <ul className="text-lg max-w-prose ml-10 md:mx-auto hyphens-auto text-wrap">
-            <li className="list-disc">
+          <ul className="max-w-prose  md:mx-auto hyphens-auto text-wrap flex flex-col gap-4">
+            <li className="list-disc  md:ml-10">
               {t(
                 "partenaires-qualifies-tous-nos-prestataires-sont-selectionnes-selon-des-criteres-stricts-de-qualite-dexpertise-et-de-serieux"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "controles-reguliers-nous-verifions-systematiquement-la-conformite-des-services-pour-garantir-votre-satisfaction"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "engagement-sur-la-duree-nous-veillons-a-la-bonne-tenue-de-vos-contrats-et-a-la-constance-des-prestations"
               )}
@@ -174,25 +174,25 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
         <div className="flex flex-col gap-6">
           <p className="border-l-2 px-4 text-3xl mb-4 ml-6">{t("serenite")}</p>
           <p
-            className="text-lg max-w-prose mx-auto
+            className="max-w-prose mx-auto
           hyphens-auto text-wrap"
           >
             {t(
               "travaillez-en-toute-tranquillite-desprit-grace-a-notre-accompagnement-complet"
             )}
           </p>
-          <ul className="text-lg max-w-prose ml-10 md:mx-auto hyphens-auto text-wrap">
-            <li className="list-disc">
+          <ul className="max-w-prose  md:mx-auto hyphens-auto text-wrap flex flex-col gap-4">
+            <li className="list-disc  md:ml-10">
               {t(
                 "point-de-contact-unique-nous-sommes-votre-interlocuteur-dedie-pour-gerer-toutes-les-etapes-des-contrats-aux-eventuels-litiges"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "suivi-personnalise-nos-equipes-vous-accompagnent-pour-garantir-une-execution-optimale-de-vos-prestations"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "qualite-garantie-vous-pouvez-vous-concentrer-sur-votre-coeur-dactivite-pendant-que-nous-nous-occupons-du-reste"
               )}
@@ -204,25 +204,25 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             {t("optimisation-des-couts")}
           </p>
           <p
-            className="text-lg max-w-prose mx-auto
+            className="max-w-prose mx-auto
           hyphens-auto text-wrap"
           >
             {t(
               "nous-vous-aidons-a-maitriser-vos-depenses-tout-en-maintenant-un-haut-niveau-de-service"
             )}
           </p>
-          <ul className="text-lg max-w-prose ml-10 md:mx-auto hyphens-auto text-wrap">
-            <li className="list-disc">
+          <ul className="max-w-prose  md:mx-auto hyphens-auto text-wrap flex flex-col gap-4">
+            <li className="list-disc  md:ml-10">
               {t(
                 "solutions-adaptees-nos-gammes-essentiel-confort-excellence-sajustent-a-vos-besoins-et-a-votre-budget"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "economies-directes-et-indirectes-en-optimisant-la-gestion-administrative-et-en-reduisant-les-efforts-internes-nous-diminuons-vos-couts-caches"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "transparence-tarifaire-vous-beneficiez-de-tarifs-competitifs-et-dune-visibilite-complete-sur-vos-depenses"
               )}
@@ -234,7 +234,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             {t("travaillons-ensemble-pour-une-gestion-optimisee-et-sereine")}
           </p>
           <p
-            className="text-lg max-w-prose mx-auto
+            className="max-w-prose mx-auto
           hyphens-auto text-wrap"
           >
             {t(
@@ -242,8 +242,8 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             )}
           </p>
           <p
-            className="text-lg max-w-prose mx-auto
-          hyphens-auto text-wrap"
+            className="max-w-prose mx-auto
+          hyphens-auto text-wrap mb-10"
           >
             {t(
               "pret-a-simplifier-votre-quotidien-contactez-nous-des-aujourdhui-et-decouvrez-comment-nous-pouvons-transformer-la-gestion-de-vos-services"
@@ -257,25 +257,25 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             {t("1-qualite-et-excellence-au-service-de-nos-clients")}
           </p>
           <p
-            className="text-lg max-w-prose mx-auto
+            className="max-w-prose mx-auto
           hyphens-auto text-wrap"
           >
             {t(
               "nous-nous-engageons-a-vous-offrir-des-prestations-irreprochables-adaptees-a-vos-exigences"
             )}
           </p>
-          <ul className="text-lg max-w-prose ml-10 md:mx-auto hyphens-auto text-wrap">
-            <li className="list-disc">
+          <ul className="max-w-prose  md:mx-auto hyphens-auto text-wrap flex flex-col gap-4">
+            <li className="list-disc  md:ml-10">
               {t(
                 "selection-rigoureuse-des-partenaires-tous-nos-prestataires-sont-minutieusement-choisis-selon-des-criteres-stricts-de-qualite-de-fiabilite-et-dexpertise"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "controles-reguliers-nous-evaluons-en-continu-la-performance-des-services-fournis-pour-garantir-un-haut-niveau-de-satisfaction"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "flexibilite-et-personnalisation-que-vous-soyez-une-tpe-ou-une-grande-entreprise-nos-solutions-sadaptent-a-vos-besoins-specifiques"
               )}
@@ -287,25 +287,25 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             {t("2-transparence-et-gestion-simplifiee")}
           </p>
           <p
-            className="text-lg max-w-prose mx-auto
+            className="max-w-prose mx-auto
           hyphens-auto text-wrap"
           >
             {t(
               "notre-plateforme-est-concue-pour-vous-offrir-une-experience-fluide-et-sans-surprise"
             )}
           </p>
-          <ul className="text-lg max-w-prose ml-10 md:mx-auto hyphens-auto text-wrap">
-            <li className="list-disc">
+          <ul className="max-w-prose  md:mx-auto hyphens-auto text-wrap flex flex-col gap-4">
+            <li className="list-disc  md:ml-10">
               {t(
                 "gestion-centralisee-contrats-factures-reclamations-tout-est-regroupe-pour-vous-faire-gagner-du-temps"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "communication-claire-vous-beneficiez-dun-suivi-detaille-et-dun-acces-en-temps-reel-aux-informations-de-vos-prestations"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "zero-souci-administratif-nous-nous-occupons-de-toute-la-gestion-pour-que-vous-puissiez-vous-concentrer-sur-votre-coeur-dactivite"
               )}
@@ -317,25 +317,25 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             {t("3-engagement-ecologique-et-responsable")}
           </p>
           <p
-            className="text-lg max-w-prose mx-auto
+            className="max-w-prose mx-auto
           hyphens-auto text-wrap"
           >
             {t(
               "nous-croyons-en-un-avenir-durable-et-integrons-des-pratiques-ecoresponsables-dans-chacun-de-nos-services"
             )}
           </p>
-          <ul className="text-lg max-w-prose ml-10 md:mx-auto hyphens-auto text-wrap">
-            <li className="list-disc">
+          <ul className="max-w-prose  md:mx-auto hyphens-auto text-wrap flex flex-col gap-4">
+            <li className="list-disc  md:ml-10">
               {t(
                 "sourcing-responsable-nos-produits-tels-que-les-cafes-snacks-ou-fruits-frais-sont-selectionnes-avec-soin-aupres-de-fournisseurs-privilegiant-des-filieres-ethiques-et-locales"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "reduction-des-dechets-nous-favorisons-des-solutions-respectueuses-de-lenvironnement-comme-les-fontaines-a-eau-sur-reseau-plutot-que-les-bouteilles-en-plastique"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "optimisation-energetique-nos-equipements-et-partenaires-suivent-des-normes-strictes-pour-limiter-leur-empreinte-carbone"
               )}
@@ -347,20 +347,20 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             {t("4-inclusion-et-solidarite")}
           </p>
           <p
-            className="text-lg max-w-prose mx-auto
+            className="max-w-prose mx-auto
           hyphens-auto text-wrap"
           >
             {t(
               "nous-nous-engageons-a-collaborer-avec-des-entreprises-adaptees-et-a-encourager-linclusion-sociale"
             )}
           </p>
-          <ul className="text-lg max-w-prose ml-10 md:mx-auto hyphens-auto text-wrap">
-            <li className="list-disc">
+          <ul className="max-w-prose  md:mx-auto hyphens-auto text-wrap flex flex-col gap-4">
+            <li className="list-disc  md:ml-10">
               {t(
                 "partenariat-avec-des-entreprises-adaptees-vous-avez-la-possibilite-de-soutenir-lemploi-de-personnes-en-situation-de-handicap-en-choisissant-nos-prestations"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "diversite-et-egalite-nous-travaillons-avec-des-partenaires-respectant-des-politiques-inclusives-et-equitables"
               )}
@@ -372,30 +372,30 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             {t("5-engagement-humain")}
           </p>
           <p
-            className="text-lg max-w-prose mx-auto
+            className="max-w-prose mx-auto
           hyphens-auto text-wrap"
           >
             {t(
               "nous-savons-que-la-reussite-passe-avant-tout-par-des-relations-humaines-fortes"
             )}
           </p>
-          <ul className="text-lg max-w-prose ml-10 md:mx-auto hyphens-auto text-wrap">
-            <li className="list-disc">
+          <ul className="max-w-prose  md:mx-auto hyphens-auto text-wrap flex flex-col gap-4">
+            <li className="list-disc  md:ml-10">
               {t(
                 "formation-et-encadrement-nos-equipes-beneficient-dune-formation-continue-pour-maintenir-leurs-competences-et-leur-motivation"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "proximite-et-ecoute-nos-equipes-sont-disponibles-pour-repondre-a-vos-questions-et-trouver-des-solutions-a-vos-problematiques"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "soutien-continu-quil-sagisse-de-resoudre-un-litige-ou-doptimiser-vos-services-nous-restons-a-vos-cotes-tout-au-long-de-notre-collaboration"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "satisfaction-client-votre-bien-etre-et-celui-de-vos-collaborateurs-sont-notre-priorite-absolue"
               )}
@@ -407,7 +407,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             {t("travaillons-ensemble-pour-un-avenir-durable-et-performant")}
           </p>
           <p
-            className="text-lg max-w-prose mx-auto
+            className="max-w-prose mx-auto
           hyphens-auto text-wrap"
           >
             {t(
@@ -415,8 +415,8 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             )}
           </p>
           <p
-            className="text-lg max-w-prose mx-auto
-          hyphens-auto text-wrap"
+            className="max-w-prose mx-auto
+          hyphens-auto text-wrap mb-10"
           >
             {t(
               "envie-den-savoir-plus-sur-nos-engagements-ou-nos-services-contactez-nous-des-aujourdhui"

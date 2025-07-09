@@ -22,10 +22,7 @@ const Articles = () => {
         </Button>
       </div>
       <ArticlesCarousel />
-      <Link
-        href="/blog"
-        className="underline text-fm4allsecondary text-lg md:hidden"
-      >
+      <Link href="/blog" className="underline text-fm4allsecondary md:hidden">
         {t("voir-tous-les-articles")}
       </Link>
     </section>

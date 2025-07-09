@@ -63,7 +63,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
       <article className="mt-6 flex flex-col gap-10">
         <h1 className="text-4xl">{t("nos-3-gammes")}</h1>
         <div className="flex flex-col gap-10 w-full mx-auto hyphens-auto text-wrap">
-          <div className="flex flex-col gap-10 text-lg">
+          <div className="flex flex-col gap-10">
             <p className="text-center max-w-prose mx-auto text-pretty">
               {t(
                 "afin-de-simplifier-vos-choix-nous-avons-decline-l-ensemble-des-services-en"
@@ -91,31 +91,31 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             </div>
           </div>
           <div className="flex flex-col gap-16">
-            <div className="flex flex-col gap-4 mx-auto">
+            <div className="flex flex-col gap-8 mx-auto">
               <h2 className="border-l-4 border-fm4allessential px-4 text-2xl md:text-3xl text-fm4allessential">
                 {t("gamme-essentiel")}
               </h2>
-              <p className="text-lg md:ml-10 max-w-prose mx-auto">
+              <p className="md:ml-10 max-w-prose mx-auto">
                 {t(
                   "vous-recherchez-des-services-efficaces-et-optimises-qui-couvrent-lessentiel-sans-superflu-cette-gamme-est-faite-pour-vous-elle-vous-garantit-le-respect-des-reglementations-et-vous-apporte-les-prestations-indispensables-pour-assurer-le-bon-fonctionnement-de-votre-site-simplicite-et-efficacite-sont-au-rendez-vous"
                 )}
               </p>
             </div>
-            <div className="flex flex-col gap-4 mx-auto">
+            <div className="flex flex-col gap-8 mx-auto">
               <h2 className="border-l-4 border-fm4allcomfort px-4 text-2xl md:text-3xl text-fm4allcomfort">
                 {t("gamme-confort")}
               </h2>
-              <p className="text-lg md:ml-10 max-w-prose mx-auto">
+              <p className="md:ml-10 max-w-prose mx-auto">
                 {t(
                   "pour-vous-le-bon-equilibre-entre-qualite-et-prix-est-essentiel-si-le-strict-minimum-ne-suffit-pas-la-gamme-confort-offre-une-solution-cle-en-main-sans-contraintes-vous-beneficiez-dune-gestion-complete-des-prestations-pour-un-confort-optimal-tout-en-restant-dans-une-logique-de-maitrise-des-couts"
                 )}
               </p>
             </div>
-            <div className="flex flex-col gap-4 mx-auto">
+            <div className="flex flex-col gap-8 mx-auto">
               <h2 className="border-l-4 border-fm4allexcellence px-4 text-2xl md:text-3xl text-fm4allexcellence">
                 {t("gamme-excellence")}
               </h2>
-              <p className="text-lg md:ml-10 max-w-prose mx-auto">
+              <p className="md:ml-10 max-w-prose mx-auto">
                 {t(
                   "vous-placez-le-bien-etre-de-vos-collaborateurs-au-coeur-de-vos-priorites-avec-la-gamme-excellence-vous-investissez-dans-des-services-premium-qui-valorisent-votre-entreprise-et-garantissent-une-experience-optimale-lexcellence-du-service-vous-offre-une-tranquillite-desprit-totale-tout-en-renforcant-votre-marque-employeur"
                 )}
@@ -123,7 +123,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             </div>
           </div>
         </div>
-        <div className="flex flex-col gap-6 w-full mx-auto hyphens-auto text-wrap text-lg mt-10">
+        <div className="flex flex-col gap-6 w-full mx-auto hyphens-auto text-wrap mt-10">
           <p className="border-l-2 px-4 text-3xl mb-4 ml-6">
             {t("quelle-gamme-de-services-choisir")}
           </p>
@@ -154,7 +154,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             )}
           </p>
         </div>
-        <div className="flex flex-col gap-6 w-full mx-auto hyphens-auto text-wrap text-lg">
+        <div className="flex flex-col gap-6 w-full mx-auto hyphens-auto text-wrap">
           <p className="border-l-2 px-4 text-3xl mb-4 ml-6">
             {t("quels-prestataires-choisir")}
           </p>

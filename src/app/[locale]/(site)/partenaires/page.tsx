@@ -78,7 +78,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
       </div>
       <article className="flex flex-col gap-10">
         <div className="flex flex-col gap-8">
-          <p className="text-lg max-w-prose mx-auto hyphens-auto text-wrap font-bold">
+          <p className="max-w-prose mx-auto hyphens-auto text-wrap font-bold">
             {t("une-collaboration-fondee-sur-la-qualite-et-la-confiance")}
           </p>
           <div className="w-full md:w-3/4 h-[400px] rounded-lg relative overflow-hidden mx-auto">
@@ -90,7 +90,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
               fill={true}
             />
           </div>
-          <p className="text-lg max-w-prose mx-auto hyphens-auto text-wrap">
+          <p className="max-w-prose mx-auto hyphens-auto text-wrap">
             {t(
               "chez-fm4all-nos-partenaires-sont-bien-plus-que-de-simples-prestataires-ils-sont-des-acteurs-essentiels-de-notre-mission-doffrir-des-services-de-qualite-a-nos-clients-cest-pourquoi-nous-avons-mis-en-place-un-processus-de-selection-rigoureux-et-exigeant-ainsi-quun-cadre-de-suivi-collaboratif-base-sur-des-engagements-clairs-et-partages"
             )}
@@ -102,30 +102,30 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             {t("un-processus-de-selection-exigeant")}
           </p>
           <p
-            className="text-lg max-w-prose mx-auto
+            className=" max-w-prose mx-auto
           hyphens-auto text-wrap"
           >
             {t(
               "nous-ne-travaillons-quavec-des-partenaires-qui-partagent-nos-valeurs-dexcellence-de-fiabilite-et-de-respect-notre-selection-repose-sur-plusieurs-criteres-cles"
             )}
           </p>
-          <ul className="text-lg max-w-prose ml-10 md:mx-auto hyphens-auto text-wrap">
-            <li className="list-disc">
+          <ul className="max-w-prose md:mx-auto hyphens-auto text-wrap flex flex-col gap-4">
+            <li className="list-disc  md:ml-10">
               {t(
                 "experience-et-expertise-les-prestataires-doivent-justifier-dune-experience-reconnue-et-dune-expertise-averee-dans-leur-domaine-dactivite"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "references-verifiables-chaque-candidat-est-evalue-sur-la-base-de-ses-realisations-passees-et-des-recommandations-de-ses-clients-existants"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "capacite-dadaptation-nous-privilegions-des-partenaires-capables-de-repondre-rapidement-et-efficacement-aux-besoins-specifiques-de-nos-clients"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "respect-des-normes-tous-les-prestataires-doivent-se-conformer-aux-normes-reglementaires-et-aux-meilleures-pratiques-de-leur-secteur"
               )}
@@ -137,30 +137,30 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             {t("une-charte-de-partenariat-engageante")}
           </p>
           <p
-            className="text-lg max-w-prose mx-auto
+            className=" max-w-prose mx-auto
           hyphens-auto text-wrap"
           >
             {t(
               "pour-garantir-un-service-irreprochable-nous-demandons-a-nos-partenaires-de-signer-une-charte-de-qualite-et-de-responsabilite-cette-charte-inclut-des-engagements-forts"
             )}
           </p>
-          <ul className="text-lg max-w-prose ml-10 md:mx-auto hyphens-auto text-wrap">
-            <li className="list-disc">
+          <ul className=" max-w-prose md:mx-auto hyphens-auto text-wrap flex flex-col gap-4">
+            <li className="list-disc  md:ml-10">
               {t(
                 "qualite-de-service-maintenir-un-haut-niveau-de-prestation-conformement-aux-attentes-des-clients-et-aux-standards-de-fm4all"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "reactivite-et-transparence-assurer-une-communication-fluide-traiter-rapidement-les-reclamations-et-partager-les-informations-necessaires-pour-un-suivi-efficace"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "engagement-environnemental-privilegier-des-pratiques-ecoresponsables-comme-lutilisation-de-produits-durables-et-le-respect-des-principes-de-developpement-durable"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "ethique-professionnelle-respecter-les-droits-des-employes-garantir-des-conditions-de-travail-justes-et-adopter-une-conduite-exemplaire"
               )}
@@ -172,25 +172,25 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             {t("un-suivi-continu-pour-une-qualite-durable")}
           </p>
           <p
-            className="text-lg max-w-prose mx-auto
+            className=" max-w-prose mx-auto
           hyphens-auto text-wrap"
           >
             {t(
               "collaborer-avec-fm4all-cest-rejoindre-un-reseau-ou-la-qualite-est-une-priorite-permanente-nous-effectuons"
             )}
           </p>
-          <ul className="text-lg max-w-prose ml-10 md:mx-auto hyphens-auto text-wrap">
-            <li className="list-disc">
+          <ul className=" max-w-prose md:mx-auto hyphens-auto text-wrap flex flex-col gap-4">
+            <li className="list-disc  md:ml-10">
               {t(
                 "des-audits-reguliers-pour-evaluer-la-performance-des-prestations-et-identifier-les-axes-damelioration"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "un-suivi-des-retours-clients-les-retours-des-utilisateurs-finaux-sont-systematiquement-pris-en-compte-pour-ajuster-les-prestations-si-necessaire"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "des-points-de-contact-dedies-nos-partenaires-beneficient-dun-interlocuteur-unique-pour-faciliter-les-echanges-et-garantir-une-collaboration-harmonieuse"
               )}
@@ -202,25 +202,25 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             {t("des-avantages-pour-nos-partenaires")}
           </p>
           <p
-            className="text-lg max-w-prose mx-auto
+            className=" max-w-prose mx-auto
           hyphens-auto text-wrap"
           >
             {t(
               "rejoindre-le-reseau-fm4all-cest-aussi-beneficier-de-nombreux-avantages"
             )}
           </p>
-          <ul className="text-lg max-w-prose ml-10 md:mx-auto hyphens-auto text-wrap">
-            <li className="list-disc">
+          <ul className=" max-w-prose md:mx-auto hyphens-auto text-wrap flex flex-col gap-4">
+            <li className="list-disc  md:ml-10">
               {t(
                 "une-visibilite-accrue-accedez-a-un-portefeuille-de-clients-diversifie-et-en-constante-expansion"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "un-accompagnement-administratif-nous-prenons-en-charge-la-gestion-contractuelle-la-facturation-et-les-aspects-administratifs-pour-vous-permettre-de-vous-concentrer-sur-votre-coeur-de-metier"
               )}
             </li>
-            <li className="list-disc">
+            <li className="list-disc  md:ml-10">
               {t(
                 "des-opportunites-de-croissance-integrez-un-ecosysteme-dynamique-qui-favorise-la-montee-en-competences-et-levolution-professionnelle"
               )}
@@ -232,7 +232,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             {t("rejoignez-une-communaute-engagee")}
           </p>
           <p
-            className="text-lg max-w-prose mx-auto
+            className=" max-w-prose mx-auto
           hyphens-auto text-wrap"
           >
             {t(
@@ -240,7 +240,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             )}
           </p>
           <p
-            className="text-lg max-w-prose mx-auto
+            className=" max-w-prose mx-auto
           hyphens-auto text-wrap"
           >
             {t("vous-etes-un-prestataire-qui-partage-nos-valeurs")}{" "}

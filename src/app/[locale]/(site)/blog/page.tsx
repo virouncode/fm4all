@@ -86,7 +86,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
                       pathname: "/blog/[slug]",
                       params: { slug: categorie.slug?.current },
                     }}
-                    className="text-xl md:text-2xl underline hover:opacity-80"
+                    className="text-lg underline hover:opacity-80"
                   >
                     {categorie.titre}
                   </Link>

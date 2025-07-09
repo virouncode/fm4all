@@ -318,18 +318,19 @@ export default async function page({
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <h1 className="text-4xl md:text-5xl mb-10 text-center">
-        {service.titre}
-      </h1>
-      {service.description && service.tltr && serviceImageUrl && (
-        <TltrCard
-          description={service.description}
-          tltr={service.tltr}
-          devisButtonTitle={tGlobal("mon-devis-en-ligne")}
-          imageUrl={serviceImageUrl.url()}
-          imageAlt={serviceImageAlt}
-        />
-      )}
+      {service.titre &&
+        service.description &&
+        service.tltr &&
+        serviceImageUrl && (
+          <TltrCard
+            description={service.description}
+            tltr={service.tltr}
+            devisButtonTitle={tGlobal("mon-devis-en-ligne")}
+            imageUrl={serviceImageUrl.url()}
+            imageAlt={serviceImageAlt}
+            titre={service.titre}
+          />
+        )}
       {serviceBlocs
         .filter(
           (item) =>

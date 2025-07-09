@@ -13,7 +13,7 @@ const Why = () => {
         {t("pourquoi-ca-marche")}
       </h2>
       <WhyCards />
-      <div className="text-lg flex flex-col gap-6 w-full max-w-prose mx-auto hyphens-auto text-wrap">
+      <div className="flex flex-col gap-6 w-full max-w-prose mx-auto hyphens-auto text-wrap">
         <p className="text-center font-bold">
           {t("parce-que-tout-le-monde-est-gagnant-prestataires-comme-clients")}
         </p>
@@ -52,11 +52,11 @@ const Why = () => {
         </ul>
       </div>
       <div className="flex flex-col gap-10">
-        <p className="text-lg">
+        <p>
           <strong>{t("le-probleme")}</strong>{" "}
           {t("un-marche-complexe-pour-les-petites-structures")}
         </p>
-        <div className="flex flex-col md:flex-row w-full lg:w-3/4 mx-auto border rounded-xl overflow-hidden bg-[rgb(250,250,250)]">
+        <div className="flex flex-col md:flex-row w-full lg:w-3/4 mx-auto border rounded-xl overflow-hidden bg-[rgb(250,250,250)] text-sm">
           <div className="w-full md:w-2/3 p-6 md:py-10 md:px-16 flex flex-col gap-4 italic order-last md:order-first">
             <p>
               {t(
@@ -88,7 +88,7 @@ const Why = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col  text-lg gap-10">
+      <div className="flex flex-col gap-10">
         <p>
           <strong>{t("la-solution")}</strong>{" "}
           {t(

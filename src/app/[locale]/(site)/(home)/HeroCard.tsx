@@ -6,7 +6,7 @@ const HeroCard = async () => {
   const t = await getTranslations("HomePage.hero");
 
   return (
-    <div className="bg-blue-500/10 backdrop-blur-xl rounded-xl p-6 border border-white/20 flex flex-col gap-6 text-base md:text-lg animate-appear">
+    <div className="bg-blue-500/10 backdrop-blur-xl rounded-xl p-6 border border-white/20 flex flex-col gap-6 text-base  animate-appear">
       <h2 className="text-xl md:text-2xl font-bold animate-appear text-center">
         {t("les-services-aux-entreprises-au-meilleur-prix")}
       </h2>

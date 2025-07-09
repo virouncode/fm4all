@@ -79,7 +79,7 @@ const FAQService = ({ service, locale }: FAQServiceProps) => {
             question={faq.question}
           >
             <div
-              className="flex-1 prose-lg
+              className="flex-1 prose-base
         prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
         prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
         prose-h4:text-center prose-h4:mx-auto prose-h4:my-8

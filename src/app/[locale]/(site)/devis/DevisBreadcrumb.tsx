@@ -167,7 +167,7 @@ const DevisBreadcrumb = () => {
       {/* DESKTOP BREADCRUMB */}
       <div className="justify-center hidden lg:flex">
         <Breadcrumb className="h-20 md:h-10 overflow-auto">
-          <BreadcrumbList className="text-sm lg:text-base">
+          <BreadcrumbList className="text-sm">
             {devisRoutes.map((route, index) => (
               <div key={route.id} className="flex gap-2 items-center">
                 <BreadcrumbItem className="flex items-center">

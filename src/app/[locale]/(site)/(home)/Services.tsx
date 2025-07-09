@@ -24,7 +24,7 @@ const Services = () => {
       <ServicesCarousel />
       <Link
         href="/services"
-        className="underline text-fm4allsecondary text-lg md:hidden"
+        className="underline text-fm4allsecondary md:hidden"
       >
         {t("voir-tous-les-services")}
       </Link>

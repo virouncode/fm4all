@@ -21,7 +21,7 @@ const Presentation = () => {
               <p>{t("vous-emmenagez-dans-de-nouveaux-bureaux")}</p>
               <p>{t("ou-envie-dameliorer-vos-services-actuels")}</p>
             </div> */}
-            <div className="flex flex-col gap-6 max-w-prose mx-auto w-full md:w-auto">
+            <div className="flex flex-col gap-6 max-w-prose mx-auto w-full md:w-auto text-base">
               <p>
                 {t("fm4all-est-une")}{" "}
                 <strong>{t("entreprise-de-facility-management")}</strong>{" "}

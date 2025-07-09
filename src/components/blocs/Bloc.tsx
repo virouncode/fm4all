@@ -71,12 +71,12 @@ const Bloc = ({ imageUrl, imageAlt, side, bloc, ptComponents }: BlocProps) => {
         </div>
       ) : null}
       <div
-        className="flex-1 prose-lg
-            prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
+        className="flex-1 prose-base
+            prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-3xl
             prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
             prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
             prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
-            prose-ul:max-w-prose prose-ul:mx-auto
+            prose-ul:max-w-prose prose-ul:mx-auto prose-ul:flex prose-ul:flex-col prose-ul:gap-4
             prose-li:list-disc prose-li:m-0
             prose-a:underline
             "

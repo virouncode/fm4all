@@ -378,18 +378,19 @@ const page = async ({
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <h1 className="text-4xl md:text-5xl mb-10 text-center">
-        {article.titre}
-      </h1>
-      {article.description && article.tltr && articleImageUrl && (
-        <TltrCard
-          description={article.description}
-          tltr={article.tltr}
-          devisButtonTitle={tGlobal("mon-devis-en-ligne")}
-          imageUrl={articleImageUrl.url()}
-          imageAlt={articleImageAlt}
-        />
-      )}
+      {article.titre &&
+        article.description &&
+        article.tltr &&
+        articleImageUrl && (
+          <TltrCard
+            description={article.description}
+            tltr={article.tltr}
+            devisButtonTitle={tGlobal("mon-devis-en-ligne")}
+            imageUrl={articleImageUrl.url()}
+            imageAlt={articleImageAlt}
+            titre={article.titre}
+          />
+        )}
       {articleBlocs
         .filter(
           (item) =>

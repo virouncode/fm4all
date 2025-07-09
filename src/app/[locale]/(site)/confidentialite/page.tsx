@@ -32,13 +32,13 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
     <main className="max-w-7xl min-h-[calc(100vh-4rem)] mx-auto mb-24 py-4 px-6 md:px-20">
       <section className="mt-6 flex flex-col gap-10">
         <h1 className="text-4xl">{t("politique-de-confidentialite")}</h1>
-        <div className="flex flex-col gap-2 md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto">
-          <p className="text-base">
+        <div className="flex flex-col gap-6 md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto">
+          <p>
             {t(
               "chez-fm4all-societe-par-actions-simplifiee-en-cours-d-immatriculation-numero-siret-communique-des-obtention-domiciliee-au-3-rue-de-nantes-75019-paris-nous-accordons-une-grande-importance-a-la-protection-de-vos-donnees-personnelles"
             )}
           </p>
-          <p className="text-base">
+          <p>
             {t(
               "la-presente-politique-de-confidentialite-explique-comment-nous-collectons-utilisons-partageons-et-protegeons-vos-donnees-conformement-au-reglement-general-sur-la-protection-des-donnees-rgpd-et-a-la-loi-informatique-et-libertes"
             )}
@@ -49,7 +49,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             {t("1-qui-sommes-nous")}
           </h2>
           <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto">
-            <p className="text-base">
+            <p>
               {t(
                 "le-responsable-du-traitement-des-donnees-est-la-societe-fm4all-societe-par-actions-simplifiee-en-cours-d-immatriculation-numero-siret-communique-des-obtention-domiciliee-au-3-rue-de-nantes-75019-paris-vous-pouvez-nous-contacter-pour-toute-question-relative-a-la-protection-des-donnees-a-l-adresse-suivante-admin-fm4all-com"
               )}
@@ -60,13 +60,13 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             {t("2-quelles-donnees-personnelles-collectons-nous")}
           </h2>
-          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
-            <p className="text-base">
+          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-6">
+            <p>
               {t(
                 "nous-collectons-les-categories-de-donnees-personnelles-suivantes"
               )}
             </p>
-            <ul className="ml-10 flex flex-col gap-2">
+            <ul className="ml-10 flex flex-col gap-4">
               <li className="list-disc">
                 <strong>{t("donnees-d-identification")}</strong>{" "}
                 {t(
@@ -120,13 +120,13 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             {t("3-pourquoi-collectons-nous-vos-donnees-personnelles")}
           </h2>
-          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
-            <p className="text-base">
+          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-6">
+            <p>
               {t(
                 "nous-collectons-vos-donnees-personnelles-pour-les-finalites-suivantes"
               )}
             </p>
-            <ul className="ml-10 flex flex-col gap-2">
+            <ul className="ml-10 flex flex-col gap-4">
               <li className="list-disc">
                 <strong>{t("donnees-d-identification")}</strong>{" "}
                 {t(
@@ -187,13 +187,13 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             {t("4-qui-sont-les-destinataires-de-vos-donnees")}
           </h2>
-          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
-            <p className="text-base">
+          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-6">
+            <p>
               {t(
                 "vos-donnees-personnelles-peuvent-etre-communiquees-aux-destinataires-suivants"
               )}
             </p>
-            <ul className="ml-10 flex flex-col gap-2">
+            <ul className="ml-10 flex flex-col gap-4">
               <li className="list-disc">
                 <strong>
                   {t(
@@ -213,7 +213,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
                 {t("en-cas-d-obligation-legale-ou-de-demande-judiciaire")}
               </li>
             </ul>
-            <p className="text-base">
+            <p>
               {t(
                 "nous-nous-assurons-que-nos-partenaires-et-prestataires-respectent-les-memes-exigences-en-matiere-de-protection-des-donnees-que-les-notres-notamment-par-le-biais-de-contrats-incluant-les-clauses-contractuelles-types-de-la-commission-europeenne-si-des-transferts-hors-ue-ont-lieu"
               )}
@@ -225,13 +225,13 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             {t("5-combien-de-temps-conservons-nous-vos-donnees")}
           </h2>
-          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
-            <p className="text-base">
+          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-6">
+            <p>
               {t(
                 "nous-conservons-vos-donnees-personnelles-pendant-les-durees-suivantes"
               )}
             </p>
-            <ul className="ml-10 flex flex-col gap-2">
+            <ul className="ml-10 flex flex-col gap-4">
               <li className="list-disc">
                 <strong>{t("donnees-relatives-a-la-gestion-de-compte")}</strong>{" "}
                 {t(
@@ -270,13 +270,13 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             {t("6-quels-sont-vos-droits")}
           </h2>
-          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
-            <p className="text-base">
+          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-6">
+            <p>
               {t(
                 "conformement-a-la-reglementation-applicable-vous-disposez-des-droits-suivants"
               )}
             </p>
-            <ul className="ml-10 flex flex-col gap-2">
+            <ul className="ml-10 flex flex-col gap-4">
               <li className="list-disc">
                 <strong>{t("droit-d-acces")}</strong>{" "}
                 {t(
@@ -322,7 +322,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
                 )}
               </li>
             </ul>
-            <p className="text-base">
+            <p>
               {t(
                 "pour-exercer-vos-droits-vous-pouvez-nous-contacter-par-email-a-admin-fm4all-com-ou-par-courrier-a-l-adresse-mentionnee-au-point-1-veuillez-joindre-une-copie-de-votre-piece-d-identite-a-votre-demande"
               )}
@@ -334,8 +334,8 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             {t("7-utilisation-des-cookies")}
           </h2>
-          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
-            <p className="text-base">
+          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-6">
+            <p>
               {t(
                 "notre-site-web-utilise-des-cookies-pour-en-savoir-plus-sur-les-types-de-cookies-que-nous-utilisons-leur-finalite-et-comment-les-gerer-veuillez-consulter-notre"
               )}{" "}
@@ -353,8 +353,8 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             {t("8-securite-des-donnees")}
           </h2>
-          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
-            <p className="text-base">
+          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-6">
+            <p>
               {t(
                 "nous-mettons-en-oeuvre-des-mesures-de-securite-techniques-et-organisationnelles-appropriees-pour-proteger-vos-donnees-personnelles-contre-tout-acces-non-autorise-toute-divulgation-toute-alteration-ou-toute-destruction-notamment-le-chiffrement-des-donnees-en-transit-https-le-controle-d-acces-aux-donnees-et-des-mesures-de-protection-contre-les-intrusions"
               )}
@@ -366,8 +366,8 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
             {t("9-modifications-de-la-politique-de-confidentialite")}
           </h2>
-          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2">
-            <p className="text-base">
+          <div className="flex flex-col md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-6">
+            <p>
               {t(
                 "nous-nous-reservons-le-droit-de-modifier-la-presente-politique-de-confidentialite-a-tout-moment-les-modifications-seront-publiees-sur-notre-site-web-et-nous-vous-informerons-des-changements-importants-par-un-message-sur-la-plateforme-ou-par-email"
               )}

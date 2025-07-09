@@ -19,7 +19,7 @@ const FAQItem = ({
 }: PropsWithChildren<FAQItemProps>) => {
   return (
     <AccordionItem value={value}>
-      <AccordionTrigger className="text-lg">{question}</AccordionTrigger>
+      <AccordionTrigger className="text-base">{question}</AccordionTrigger>
       <AccordionContent className={`flex flex-col gap-4 ${className}`}>
         {children}
       </AccordionContent>
