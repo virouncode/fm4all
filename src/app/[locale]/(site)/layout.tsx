@@ -108,7 +108,7 @@ export default async function LocalizedLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
-        className={`${didact.className} antialiased scroll-smooth tracking-[-0.02em]`}
+        className={`${didact.className} antialiased scroll-smooth tracking-[-0.015em]`}
       >
         <GoogleAnalytics
           GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!}
