@@ -12,11 +12,9 @@ const Presentation = () => {
           {t("notre-plateforme")}
         </h2>
         <div
-          className="flex gap-8 justify-center items-center bg-[rgb(250,250,250)] rounded-xl p-8 md:px-20 md:py-14
+          className="flex gap-8 justify-center items-center md:items-start rounded-xl p-10 md:px-16 md:py-14
           bg-gradient-to-r from-fm4allsecondary/100 to-fm4allsecondary/60
-         text-white
-       
-        "
+         text-white"
         >
           <div className="flex flex-col gap-6">
             {/* <div className="text-center fle flex-col font-bold text-xl">
