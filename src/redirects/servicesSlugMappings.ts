@@ -17,7 +17,7 @@ export const servicesSlugMappingsFrToEn: Record<string, string> = {
 };
 
 export const servicesSubSlugMappingsFrToEn: Record<string, string> = {
-  gennevilliers: "gennevillers-city",
+  gennevilliers: "gennevilliers-city",
   "neuilly-sur-seine": "neuilly-sur-seine-city",
   alfortville: "alfortville-city",
 };
