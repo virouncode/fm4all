@@ -23,7 +23,7 @@ const Footer = async ({ locale }: FooterProps) => {
   ]);
 
   return (
-    <footer className="bg-fm4allsecondary">
+    <footer className="bg-gradient-to-r from-fm4allsecondary/100 to-fm4allsecondary/60">
       <div className="max-w-7xl mx-auto p-6">
         <div className="flex flex-wrap gap-6">
           <div className="flex flex-col gap-2 w-52">

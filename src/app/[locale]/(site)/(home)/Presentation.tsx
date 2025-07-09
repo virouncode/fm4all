@@ -11,12 +11,18 @@ const Presentation = () => {
         <h2 className="text-2xl md:text-3xl border-l-2 px-4">
           {t("notre-plateforme")}
         </h2>
-        <div className="flex gap-8 justify-center items-center bg-[rgb(250,250,250)] rounded-xl p-8">
+        <div
+          className="flex gap-8 justify-center items-center bg-[rgb(250,250,250)] rounded-xl p-8 md:px-20 md:py-14
+          bg-gradient-to-r from-fm4allsecondary/100 to-fm4allsecondary/60
+         text-white
+       
+        "
+        >
           <div className="flex flex-col gap-6">
-            <div className="text-center fle flex-col font-bold text-xl">
+            {/* <div className="text-center fle flex-col font-bold text-xl">
               <p>{t("vous-emmenagez-dans-de-nouveaux-bureaux")}</p>
               <p>{t("ou-envie-dameliorer-vos-services-actuels")}</p>
-            </div>
+            </div> */}
             <div className="flex flex-col gap-4 max-w-prose mx-auto">
               <p>
                 {t("fm4all-est-une")}{" "}
@@ -44,17 +50,10 @@ const Presentation = () => {
               </p>
               <p>
                 {t("gamme")}{" "}
-                <span className="text-fm4allessential font-bold">
-                  {tGlobal("essentiel")}
-                </span>
-                ,{" "}
-                <span className="text-fm4allcomfort font-bold">
-                  {tGlobal("confort")}
-                </span>{" "}
+                <span className="font-bold">{tGlobal("essentiel")}</span>,{" "}
+                <span className="font-bold">{tGlobal("confort")}</span>{" "}
                 {tGlobal("ou")}{" "}
-                <span className="text-fm4allexcellence font-bold">
-                  {tGlobal("excellence")}
-                </span>{" "}
+                <span className="font-bold">{tGlobal("excellence")}</span>{" "}
                 {t("tiers")}
                 {t("simplifiez-comparez-et-deleguez-en-quelques-clics")}
               </p>
@@ -71,7 +70,7 @@ const Presentation = () => {
                 title={t("obtenez-votre-devis-en-quelques-clics")}
                 text={t("obtenez-votre-devis-en-quelques-clics")}
                 size="lg"
-                className="self-start mx-auto mt-10"
+                className="self-start mx-auto mt-10 bg-fm4alldestructive hover:bg-fm4alldestructive/90 text-white border-none shadow-lg ring-fm4alldestructive"
               />
             </div>
           </div>
