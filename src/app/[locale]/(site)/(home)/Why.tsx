@@ -13,7 +13,7 @@ const Why = () => {
         {t("pourquoi-ca-marche")}
       </h2>
       <WhyCards />
-      <div className="text-lg flex flex-col gap-4 w-full max-w-prose mx-auto hyphens-auto text-wrap">
+      <div className="text-lg flex flex-col gap-6 w-full max-w-prose mx-auto hyphens-auto text-wrap">
         <p className="text-center font-bold">
           {t("parce-que-tout-le-monde-est-gagnant-prestataires-comme-clients")}
         </p>

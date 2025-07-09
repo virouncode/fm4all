@@ -9,7 +9,7 @@ const Mission = () => {
         <h2 className="text-2xl md:text-3xl border-l-2 px-4">
           {t("notre-mission")}
         </h2>
-        <div className="flex flex-col gap-4 text-lg w-full max-w-prose hyphens-auto text-wrap mx-auto">
+        <div className="flex flex-col gap-6 text-lg w-full max-w-prose hyphens-auto text-wrap mx-auto">
           <p>
             {t(
               "fm4all-a-analyse-des-centaines-dappels-doffres-de-matrices-de-chiffrage-et-contrats-pour-chaque-service-forts-de-cette-analyse-nous-avons-modelise-des"

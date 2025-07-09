@@ -39,7 +39,7 @@ import { Metadata } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getLocale, setRequestLocale } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
-import { Didact_Gothic } from "next/font/google";
+import { Didact_Gothic, Inter } from "next/font/google";
 import { notFound } from "next/navigation";
 import "../globals.css";
 
@@ -82,6 +82,14 @@ const didact = Didact_Gothic({
   display: "swap",
 });
 
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  style: ["normal", "italic"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
 export default async function LocalizedLayout({
   children,
   params,
@@ -99,7 +107,9 @@ export default async function LocalizedLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={`${didact.className} antialiased scroll-smooth`}>
+      <body
+        className={`${didact.className} antialiased scroll-smooth tracking-[-0.02em]`}
+      >
         <GoogleAnalytics
           GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!}
         />

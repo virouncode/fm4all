@@ -12,16 +12,16 @@ const Presentation = () => {
           {t("notre-plateforme")}
         </h2>
         <div
-          className="flex gap-8 justify-center items-center md:items-start rounded-xl p-10 md:px-16 md:py-14
+          className="flex gap-8 justify-center items-center md:items-start rounded-xl p-8 md:px-16 md:py-14
           bg-gradient-to-r from-fm4allsecondary/100 to-fm4allsecondary/60
          text-white"
         >
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-6 md:w-auto w-full">
             {/* <div className="text-center fle flex-col font-bold text-xl">
               <p>{t("vous-emmenagez-dans-de-nouveaux-bureaux")}</p>
               <p>{t("ou-envie-dameliorer-vos-services-actuels")}</p>
             </div> */}
-            <div className="flex flex-col gap-4 max-w-prose mx-auto">
+            <div className="flex flex-col gap-6 max-w-prose mx-auto w-full md:w-auto">
               <p>
                 {t("fm4all-est-une")}{" "}
                 <strong>{t("entreprise-de-facility-management")}</strong>{" "}
@@ -68,7 +68,7 @@ const Presentation = () => {
                 title={t("obtenez-votre-devis-en-quelques-clics")}
                 text={t("obtenez-votre-devis-en-quelques-clics")}
                 size="lg"
-                className="self-start mx-auto mt-10 bg-fm4alldestructive hover:bg-fm4alldestructive/90 text-white border-none shadow-lg ring-fm4alldestructive"
+                className="self-start mx-auto mt-10 bg-fm4alldestructive hover:bg-fm4alldestructive/90 text-white border-none shadow-lg ring-fm4alldestructive md:w-auto w-full"
               />
             </div>
           </div>

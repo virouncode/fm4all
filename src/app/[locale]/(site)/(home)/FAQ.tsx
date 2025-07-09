@@ -10,7 +10,7 @@ const FAQ = () => {
       id: 1,
       question: t("quest-ce-que-le-facility-management-en-entreprise"),
       answer: (
-        <div className="text-base hyphens-auto flex flex-col gap-4">
+        <div className="text-base hyphens-auto flex flex-col gap-6">
           <p>
             {t("le")} <strong>{t("facility-management")}</strong>
             {t("qui-se-traduit-par")}{" "}
@@ -47,7 +47,7 @@ const FAQ = () => {
         "quels-services-inclut-notre-solution-de-facility-management-pour-les-entreprises"
       ),
       answer: (
-        <div className="text-base hyphens-auto flex flex-col gap-4">
+        <div className="text-base hyphens-auto flex flex-col gap-6">
           <p>
             {t(
               "notre-solution-de-facility-management-est-complete-et-modulable-selon-les-besoins-de-chaque-entreprise-elle-comprend"
@@ -89,7 +89,7 @@ const FAQ = () => {
         "quels-sont-les-avantages-a-externaliser-le-facility-management"
       ),
       answer: (
-        <div className="text-base hyphens-auto flex flex-col gap-4">
+        <div className="text-base hyphens-auto flex flex-col gap-6">
           <p>
             {t("l")}
             <strong>{t("externalisation-des-services-generaux")}</strong>{" "}
@@ -133,7 +133,7 @@ const FAQ = () => {
       id: 4,
       question: t("a-qui-sadressent-nos-prestations-de-facility-management"),
       answer: (
-        <div className="text-base hyphens-auto flex flex-col gap-4">
+        <div className="text-base hyphens-auto flex flex-col gap-6">
           <p>
             {t(
               "nos-prestations-de-facility-management-sadressent-a-une-large-variete-dacteurs-professionnels"
@@ -186,7 +186,7 @@ const FAQ = () => {
       id: 5,
       question: t("comment-choisir-son-prestataire-de-facility-management"),
       answer: (
-        <div className="text-base hyphens-auto flex flex-col gap-4">
+        <div className="text-base hyphens-auto flex flex-col gap-6">
           <p>
             {t("pour-choisir-convenablement-votre")}{" "}
             <strong>{t("societe-de-facility-management")}</strong>
