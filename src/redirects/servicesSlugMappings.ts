@@ -21,6 +21,7 @@ export const servicesSubSlugMappingsFrToEn: Record<string, string> = {
   "neuilly-sur-seine": "neuilly-sur-seine-city",
   alfortville: "alfortville-city",
   bagnolet: "bagnolet-city",
+  "rosny-sous-bois": "rosny-sous-bois-city",
 };
 
 export const getServicesSlugFr = (serviceSlugEn: string): string => {
