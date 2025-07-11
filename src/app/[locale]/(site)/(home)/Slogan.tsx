@@ -15,7 +15,7 @@ const Slogan = () => {
           loading="lazy"
         />
       </div>
-      <h2 className="text-5xl text-center text-destructive font-bold">
+      <h2 className="text-5xl text-center text-destructive font-bold tracking-tighter">
         {t("le-facility-management-pour-tous")}
       </h2>
     </section>
