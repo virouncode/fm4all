@@ -79,8 +79,8 @@ const HeaderNavigationMenu = ({
             </div>
           </NavigationMenuTrigger>
           <NavigationMenuContent>
-            <ul className="grid w-[400px]">
-              <li className="hover:bg-accent px-4 py-2">
+            <ul className="grid w-[400px] py-2">
+              <li className="hover:bg-accent px-6 py-2">
                 <NavigationMenuLink asChild className="w-full relative">
                   <Link
                     href={"/services"}
@@ -105,7 +105,7 @@ const HeaderNavigationMenu = ({
                 return (
                   <li
                     key={service.title}
-                    className="hover:bg-accent px-4 py-2"
+                    className="hover:bg-accent px-6 py-2"
                     onClick={handleHideMobileNav}
                   >
                     <NavigationMenuLink asChild className="w-full relative">
@@ -140,8 +140,8 @@ const HeaderNavigationMenu = ({
             </div>
           </NavigationMenuTrigger>
           <NavigationMenuContent>
-            <ul className="grid w-[400px]">
-              <li className="hover:bg-accent px-4 py-2">
+            <ul className="grid w-[400px] py-2">
+              <li className="hover:bg-accent px-6 py-2">
                 <NavigationMenuLink asChild className="w-full relative">
                   <Link
                     href={"/secteurs"}
@@ -154,7 +154,7 @@ const HeaderNavigationMenu = ({
               </li>
               {secteurs.map((secteur) => {
                 return (
-                  <li key={secteur.title} className="px-4 py-2 hover:bg-accent">
+                  <li key={secteur.title} className="px-6 py-2 hover:bg-accent">
                     <NavigationMenuLink asChild>
                       <Link
                         //@ts-expect-error ok - href is a complex object
