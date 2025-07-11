@@ -26,6 +26,7 @@ export const servicesSubSlugMappingsFrToEn: Record<string, string> = {
   "champs-sur-marne": "champs-sur-marne-city",
   serris: "serris-city",
   bezons: "bezons-city",
+  "les-ulis": "les-ulis-city",
 };
 
 export const getServicesSlugFr = (serviceSlugEn: string): string => {
