@@ -1,8 +1,10 @@
 import BackButton from "@/components/buttons/back-button";
-import { getLocale } from "next-intl/server";
+import { useLocale } from "next-intl";
 
-export default async function NotFoundPage() {
-  const locale = await getLocale();
+export default function NotFoundPage() {
+  const locale = useLocale();
+  console.log("NotFoundPage locale:", locale);
+
   return (
     <div className="flex items-center justify-center mx-auto h-[calc(100vh-4rem)]">
       <div className="flex flex-col gap-6 mt-4">
