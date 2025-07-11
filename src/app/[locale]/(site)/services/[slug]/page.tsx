@@ -26,6 +26,8 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import FAQService from "./FAQService";
 
+export const dynamic = "force-static";
+export const dynamicParams = false;
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
 type SanityImageValue = {
@@ -124,8 +126,6 @@ export const generateMetadata = async ({
     }
   );
 };
-
-export const dynamic = "force-static";
 
 export default async function page({
   params,

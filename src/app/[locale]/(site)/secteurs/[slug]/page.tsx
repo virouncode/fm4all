@@ -25,6 +25,9 @@ import { PortableTextBlock, PortableTextComponentProps } from "next-sanity";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
+export const dynamic = "force-static";
+export const dynamicParams = false;
+
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
 type SanityImageValue = {
@@ -112,8 +115,6 @@ export const generateMetadata = async ({
     }
   );
 };
-
-export const dynamic = "force-static";
 
 export const generateStaticParams = async () => {
   // Récupérer tous les slugs de services depuis Sanity

@@ -34,6 +34,9 @@ import {
   SanityImageHotspot,
 } from "../../../../../../../sanity.types";
 
+export const dynamic = "force-static";
+export const dynamicParams = false;
+
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
 type SanityImageValue = {
@@ -130,8 +133,6 @@ export const generateMetadata = async ({
     }
   );
 };
-
-export const dynamic = "force-static";
 
 export const generateStaticParams = async () => {
   const slugsSubSlugsFr = await fetchArticleSlugs("fr");

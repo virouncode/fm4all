@@ -25,6 +25,9 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import ArticlesCards from "./ArticlesCards";
 
+export const dynamic = "force-static";
+export const dynamicParams = false;
+
 export const generateMetadata = async ({
   params,
 }: {
@@ -47,8 +50,6 @@ export const generateMetadata = async ({
     }
   );
 };
-
-export const dynamic = "force-static";
 
 export const generateStaticParams = async () => {
   // Récupérer tous les slugs de services depuis Sanity

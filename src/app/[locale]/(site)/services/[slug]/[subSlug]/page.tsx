@@ -30,6 +30,9 @@ import { notFound } from "next/navigation";
 import { Service } from "../../../../../../../sanity.types";
 import FAQService from "../FAQService";
 
+export const dynamic = "force-static";
+export const dynamicParams = false;
+
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
 type SanityImageValue = {
@@ -123,8 +126,6 @@ export const generateMetadata = async ({
     }
   );
 };
-
-export const dynamic = "force-static";
 
 export const generateStaticParams = async () => {
   // Récupérer tous les slugs de services depuis Sanity
