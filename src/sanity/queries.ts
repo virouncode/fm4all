@@ -171,6 +171,56 @@ export const getServiceVille = async (
   });
 };
 
+//Tous les services villes :
+export const SERVICES_VILLES_QUERY = `*[_type == "serviceVille" && language == $language]{_id, titreCard, subSlug, service->{
+    _id,slug, titreCard}}`;
+
+export const getServicesVilles = async (locale: LocaleType) => {
+  const response = await client.fetch<
+    {
+      _id: string;
+      service: {
+        _id: string;
+        slug: { _type: "slug"; current: string };
+        titreCard: string;
+      };
+      subSlug: { _type: "slug"; current: string };
+      titreCard: string;
+    }[]
+  >(SERVICES_VILLES_QUERY, {
+    language: locale,
+  });
+  return groupVillesByService(response);
+};
+
+function groupVillesByService(
+  data: {
+    _id: string;
+    service: {
+      _id: string;
+      slug: { _type: "slug"; current: string };
+      titreCard: string;
+    };
+    subSlug: { _type: "slug"; current: string };
+    titreCard: string;
+  }[]
+) {
+  return data.reduce(
+    (acc, item) => {
+      const nomService = item.service.titreCard;
+
+      if (!acc[nomService]) {
+        acc[nomService] = [];
+      }
+
+      acc[nomService].push(item);
+
+      return acc;
+    },
+    {} as Record<string, typeof data>
+  );
+}
+
 //================================================================================================//
 //================================================================================================//
 //================================================================================================//

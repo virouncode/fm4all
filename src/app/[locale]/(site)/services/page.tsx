@@ -6,8 +6,11 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Link } from "@/i18n/navigation";
+import { LocaleType } from "@/i18n/routing";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
+import { getServicesVilles } from "@/sanity/queries";
 import { HomeIcon } from "lucide-react";
 import { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -40,6 +43,9 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("ServicesPage");
+  const servicesVilles = await getServicesVilles(locale as LocaleType);
+  console.log("Services Villes:", servicesVilles);
+
   return (
     <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20 hyphens-auto">
       <Breadcrumb className="mb-10">
@@ -154,6 +160,38 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
               <strong>{t("une-personne-dediee")}</strong>{" "}
               {t("chez-vous-a-partir-d-une-demi-journee-par-semaine")}
             </p>
+          </div>
+        </div>
+        <div className="flex flex-col gap-4">
+          <h2 className="border-l-2 px-4 text-3xl mb-4 ml-6">
+            {t("nos-services-par-villes")}
+          </h2>
+          <div className="flex gap-8 flex-wrap justify-between mt-10">
+            {Object.entries(servicesVilles).map(([serviceName, villes]) => {
+              // Tri alphabétique des villes par titreCard
+              const sortedVilles = [...villes].sort((a, b) =>
+                a.titreCard.localeCompare(b.titreCard, "fr")
+              );
+
+              return (
+                <div key={serviceName}>
+                  <h2 className="text-xl font-bold mb-4">{serviceName}</h2>
+                  <ul className="space-y-2">
+                    {sortedVilles.map((ville) => (
+                      <li key={ville._id}>
+                        <Link
+                          //@ts-expect-error je sais
+                          href={`/services/${ville.service.slug.current}/${ville.subSlug.current}`}
+                          className="underline"
+                        >
+                          {ville.titreCard}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
           </div>
         </div>
       </article>
