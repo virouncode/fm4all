@@ -29,6 +29,7 @@ export const servicesSubSlugMappingsFrToEn: Record<string, string> = {
   "les-ulis": "les-ulis-city",
   "la-defense": "la-defense-city",
   "boulogne-billancourt": "boulogne-billancourt-city",
+  "levallois-perret": "levallois-perret-city",
 };
 
 export const getServicesSlugFr = (serviceSlugEn: string): string => {
