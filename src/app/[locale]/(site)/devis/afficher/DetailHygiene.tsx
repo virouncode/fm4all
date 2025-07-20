@@ -51,7 +51,7 @@ const DetailHygiene = () => {
                 <TableCell>
                   {
                     locationDistribHygiene.find(
-                      ({ id }) => id === hygiene.infos.dureeLocation
+                      ({ id }) => id === hygiene.infos.dureeLocation,
                     )?.description
                   }
                 </TableCell>
@@ -67,7 +67,7 @@ const DetailHygiene = () => {
                 <TableCell>
                   {
                     locationDistribHygiene.find(
-                      ({ id }) => id === hygiene.infos.dureeLocation
+                      ({ id }) => id === hygiene.infos.dureeLocation,
                     )?.description
                   }
                 </TableCell>
@@ -83,7 +83,7 @@ const DetailHygiene = () => {
                 <TableCell>
                   {
                     locationDistribHygiene.find(
-                      ({ id }) => id === hygiene.infos.dureeLocation
+                      ({ id }) => id === hygiene.infos.dureeLocation,
                     )?.description
                   }
                 </TableCell>
@@ -129,7 +129,7 @@ const DetailHygiene = () => {
               <TableCell>
                 {
                   locationDistribHygiene.find(
-                    ({ id }) => id === hygiene.infos.dureeLocation
+                    ({ id }) => id === hygiene.infos.dureeLocation,
                   )?.description
                 }
               </TableCell>
@@ -150,7 +150,7 @@ const DetailHygiene = () => {
               <TableCell>
                 {
                   locationDistribHygiene.find(
-                    ({ id }) => id === hygiene.infos.dureeLocation
+                    ({ id }) => id === hygiene.infos.dureeLocation,
                   )?.description
                 }
               </TableCell>
@@ -170,7 +170,7 @@ const DetailHygiene = () => {
               <TableCell>
                 {
                   locationDistribHygiene.find(
-                    ({ id }) => id === hygiene.infos.dureeLocation
+                    ({ id }) => id === hygiene.infos.dureeLocation,
                   )?.description
                 }
               </TableCell>
@@ -190,7 +190,7 @@ const DetailHygiene = () => {
               <TableCell>
                 {
                   locationDistribHygiene.find(
-                    ({ id }) => id === hygiene.infos.dureeLocation
+                    ({ id }) => id === hygiene.infos.dureeLocation,
                   )?.description
                 }
               </TableCell>

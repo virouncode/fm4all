@@ -38,7 +38,7 @@ export default function SignIn() {
         email: t("email-obligatoire"),
         emailInvalid: t("email-invalide"),
         password: t("mot-de-passe-obligatoire"),
-      })
+      }),
     ),
     defaultValues,
   });
@@ -53,7 +53,7 @@ export default function SignIn() {
           toast({
             title: t("adresse-email-non-verifiee"),
             description: t(
-              "un-nouveau-lien-de-verification-vient-de-vous-etre-envoye-merci-de-consulter-votre-boite-de-reception"
+              "un-nouveau-lien-de-verification-vient-de-vous-etre-envoye-merci-de-consulter-votre-boite-de-reception",
             ),
             variant: "destructive",
           });
@@ -64,7 +64,7 @@ export default function SignIn() {
           description:
             ctx.error.message ||
             t(
-              "une-erreur-est-survenue-lors-de-la-connexion-veuillez-reessayer"
+              "une-erreur-est-survenue-lors-de-la-connexion-veuillez-reessayer",
             ),
           variant: "destructive",
         });
@@ -83,8 +83,8 @@ export default function SignIn() {
   };
 
   return (
-    <main className="max-w-7xl h-[calc(100vh-4rem)] mx-auto py-4 px-6 md:px-20 relative md:static">
-      <section className="flex items-center justify-center h-full">
+    <main className="relative mx-auto h-[calc(100vh-4rem)] max-w-7xl px-6 py-4 md:static md:px-20">
+      <section className="flex h-full items-center justify-center">
         <BackgroundClient />
         <Card className="max-w-md">
           <CardHeader>
@@ -111,7 +111,7 @@ export default function SignIn() {
                   />
                   <Link
                     href="/auth/forgot-password"
-                    className="underline text-sm"
+                    className="text-sm underline"
                   >
                     {t("mot-de-passe-oublie")}
                   </Link>

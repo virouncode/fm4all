@@ -15,7 +15,7 @@ export const generateMetadata = async (): Promise<Metadata> => {
     locale === "fr" ? "Mes services" : "My services",
     locale === "fr"
       ? "Etape 2 du devis : choisissez vos services"
-      : "Quote Step 2: Choose your services"
+      : "Quote Step 2: Choose your services",
   );
 };
 
@@ -39,7 +39,7 @@ const page = async ({
       <section className="flex h-dvh items-center justify-center text-lg">
         <p>
           {t(
-            "les-valeurs-de-surface-et-effectif-renseignees-ne-sont-pas-valides"
+            "les-valeurs-de-surface-et-effectif-renseignees-ne-sont-pas-valides",
           )}{" "}
           <Link href="/devis/locaux" className="underline">
             {t("veuillez-reessayer")}
@@ -52,7 +52,7 @@ const page = async ({
 
   return (
     <>
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <h1 className="text-3xl md:text-4xl">{tServices("2-mes-services")}</h1>
       </div>
       <Suspense fallback={<ServicesLoader />}>

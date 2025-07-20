@@ -7,21 +7,17 @@ const Presentation = () => {
   const t = useTranslations("HomePage.presentation");
   return (
     <section id="presentation">
-      <div className="max-w-7xl w-full mx-auto flex flex-col gap-8 text-lg hyphens-auto text-wrap relative pt-8 pb-12 px-6">
-        <h2 className="text-2xl md:text-3xl border-l-2 px-4">
+      <div className="relative mx-auto flex w-full max-w-7xl flex-col gap-8 hyphens-auto text-wrap px-6 pb-12 pt-8 text-lg">
+        <h2 className="border-l-2 px-4 text-2xl md:text-3xl">
           {t("notre-plateforme")}
         </h2>
-        <div
-          className="flex gap-8 justify-center items-center md:items-start rounded-xl p-8 md:px-16 md:py-14
-          bg-gradient-to-r from-fm4allsecondary/100 to-fm4allsecondary/60
-         text-white"
-        >
-          <div className="flex flex-col gap-6 md:w-auto w-full">
+        <div className="flex items-center justify-center gap-8 rounded-xl bg-gradient-to-r from-fm4allsecondary/100 to-fm4allsecondary/60 p-8 text-white md:items-start md:px-16 md:py-14">
+          <div className="flex w-full flex-col gap-6 md:w-auto">
             {/* <div className="text-center fle flex-col font-bold text-xl">
               <p>{t("vous-emmenagez-dans-de-nouveaux-bureaux")}</p>
               <p>{t("ou-envie-dameliorer-vos-services-actuels")}</p>
             </div> */}
-            <div className="flex flex-col gap-6 max-w-prose mx-auto w-full md:w-auto text-base">
+            <div className="mx-auto flex w-full max-w-prose flex-col gap-6 text-base md:w-auto">
               <p>
                 {t("fm4all-est-une")}{" "}
                 <strong>{t("entreprise-de-facility-management")}</strong>{" "}
@@ -43,7 +39,7 @@ const Presentation = () => {
                 {t("choisissez-en-ligne-des-prestataires-de-confiance")}
                 <strong> {t("au-meilleur-prix")} </strong>
                 {t(
-                  "nettoyage-cafe-fontaine-a-eau-securite-incendie-office-management-et-plus-encore"
+                  "nettoyage-cafe-fontaine-a-eau-securite-incendie-office-management-et-plus-encore",
                 )}
               </p>
               <p>
@@ -68,11 +64,11 @@ const Presentation = () => {
                 title={t("obtenez-votre-devis-en-quelques-clics")}
                 text={t("obtenez-votre-devis-en-quelques-clics")}
                 size="lg"
-                className="self-start mx-auto mt-10 bg-fm4alldestructive hover:bg-fm4alldestructive/90 text-white border-none shadow-lg ring-fm4alldestructive md:w-auto w-full"
+                className="mx-auto mt-10 w-full self-start border-none bg-fm4alldestructive text-white shadow-lg ring-fm4alldestructive hover:bg-fm4alldestructive/90 md:w-auto"
               />
             </div>
           </div>
-          <div className="h-[500px] w-[450px] relative md:block hidden rounded-xl overflow-hidden">
+          <div className="relative hidden h-[500px] w-[450px] overflow-hidden rounded-xl md:block">
             <Image
               src={"/img/zen.webp"}
               alt={"image-collaboratrice-zen"}

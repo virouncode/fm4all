@@ -99,19 +99,19 @@ const ServicesFm4AllMobilePropositionCard = ({
   );
 
   const imgProduit = (
-    <div className="w-1/3 h-full relative rounded-xl overflow-hidden bg-slate-200">
+    <div className="relative h-full w-1/3 overflow-hidden rounded-xl bg-slate-200">
       <Image
         src={"/img/services/fm4all.webp"}
         alt={`illustration de pilotes fm4all`}
         fill
         quality={100}
-        className="object-contain cursor-pointer"
+        className="cursor-pointer object-contain"
       />
     </div>
   );
 
   const imgProduitDialog = (
-    <div className="w-full h-60 relative mx-auto rounded-lg border-slate-200 border bg-slate-100">
+    <div className="relative mx-auto h-60 w-full rounded-lg border border-slate-200 bg-slate-100">
       <Image
         src={"/img/services/fm4all.webp"}
         alt={`illustration de pilotes fm4all`}
@@ -124,7 +124,7 @@ const ServicesFm4AllMobilePropositionCard = ({
 
   const infosProduit =
     gamme === "essentiel" ? (
-      <ul className="flex flex-col text-xs px-4 w-2/3">
+      <ul className="flex w-2/3 flex-col px-4 text-xs">
         <li className="list-check">{tFm4all("acces-services")}</li>
         <li className="list-check">
           {tFm4all("frais-bancaires-and-assurance")}
@@ -136,7 +136,7 @@ const ServicesFm4AllMobilePropositionCard = ({
         </li>
       </ul>
     ) : gamme === "confort" ? (
-      <ul className="flex flex-col text-xs px-4 w-2/3">
+      <ul className="flex w-2/3 flex-col px-4 text-xs">
         <li className="list-check">{tFm4all("acces-services")}</li>
         <li className="list-check">
           {tFm4all("frais-bancaires-and-assurance")}
@@ -155,7 +155,7 @@ const ServicesFm4AllMobilePropositionCard = ({
         <li className="list-check">{tFm4all("reporting-personnalise")}</li>
       </ul>
     ) : (
-      <ul className="flex flex-col text-xs px-4 w-2/3">
+      <ul className="flex w-2/3 flex-col px-4 text-xs">
         <li className="list-check">{tFm4all("acces-services")}</li>
         <li className="list-check">
           {tFm4all("frais-bancaires-and-assurance")}
@@ -183,7 +183,7 @@ const ServicesFm4AllMobilePropositionCard = ({
 
   const infosProduitDialog =
     gamme === "essentiel" ? (
-      <ul className="flex flex-col text-sm px-4 mx-auto">
+      <ul className="mx-auto flex flex-col px-4 text-sm">
         <li className="list-check">{tFm4all("acces-services")}</li>
         <li className="list-check">
           {tFm4all("frais-bancaires-and-assurance")}
@@ -195,7 +195,7 @@ const ServicesFm4AllMobilePropositionCard = ({
         </li>
       </ul>
     ) : gamme === "confort" ? (
-      <ul className="flex flex-col text-sm px-4 mx-auto">
+      <ul className="mx-auto flex flex-col px-4 text-sm">
         <li className="list-check">{tFm4all("acces-services")}</li>
         <li className="list-check">
           {tFm4all("frais-bancaires-and-assurance")}
@@ -214,7 +214,7 @@ const ServicesFm4AllMobilePropositionCard = ({
         <li className="list-check">{tFm4all("reporting-personnalise")}</li>
       </ul>
     ) : (
-      <ul className="flex flex-col text-sm px-4 mx-auto">
+      <ul className="mx-auto flex flex-col px-4 text-sm">
         <li className="list-check">{tFm4all("acces-services")}</li>
         <li className="list-check">
           {tFm4all("frais-bancaires-and-assurance")}
@@ -243,49 +243,49 @@ const ServicesFm4AllMobilePropositionCard = ({
   return (
     <CarouselItem>
       <div
-        className={`bg-${color} flex flex-col h-[450px] border border-slate-200 rounded-xl p-4 text-white ${
+        className={`bg-${color} flex h-[450px] flex-col rounded-xl border border-slate-200 p-4 text-white ${
           servicesFm4All.infos.gammeSelected === gamme
             ? "ring-4 ring-inset ring-fm4alldestructive"
             : ""
-        }${!total ? "opacity-50 pointer-events-none" : ""}`}
+        }${!total ? "pointer-events-none opacity-50" : ""}`}
       >
-        <div className="flex items-center h-1/3 gap-2 border-b pb-2 border-slate-200">
+        <div className="flex h-1/3 items-center gap-2 border-b border-slate-200 pb-2">
           <Dialog>
             <DialogTrigger asChild>{imgProduit}</DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
+            <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
               <DialogHeader>
                 <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
-              <div className="flex flex-col gap-4 items-center">
+              <div className="flex flex-col items-center gap-4">
                 {imgProduitDialog}
-                <p className="text-xs italic text-end">
+                <p className="text-end text-xs italic">
                   {t("photo-non-contractuelle")}
                 </p>
                 {infosProduitDialog}
               </div>
             </DialogContent>
           </Dialog>
-          <div className="w-2/3 flex flex-col gap-1 h-full">
-            <p className="font-bold text-sm">{"fm4all"}</p>
+          <div className="flex h-full w-2/3 flex-col gap-1">
+            <p className="text-sm font-bold">{"fm4all"}</p>
             <Dialog>
               <DialogTrigger asChild>
-                <div className="h-10 relative">
+                <div className="relative h-10">
                   <Image
                     src={"/img/logo_full_white.webp"}
                     alt={`logo-de-fm4all`}
                     fill={true}
-                    className="object-contain object-left cursor-pointer"
+                    className="cursor-pointer object-contain object-left"
                     quality={100}
                   />
                 </div>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
+              <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
                 <DialogHeader>
                   <DialogTitle>{"fm4all"}</DialogTitle>
                 </DialogHeader>
                 <FournisseurDialog
                   sloganFournisseur={tGlobal(
-                    "le-facility-management-pour-tous"
+                    "le-facility-management-pour-tous",
                   )}
                   logoUrl={"/img/logo_full_white.webp"}
                   nomFournisseur={"fm4all"}
@@ -309,11 +309,11 @@ const ServicesFm4AllMobilePropositionCard = ({
           </div>
         </div>
         <div
-          className="flex h-2/3 pt-2 justify-between"
+          className="flex h-2/3 justify-between pt-2"
           onClick={() => handleClickProposition(proposition)}
         >
           {infosProduit}
-          <div className="flex flex-col gap-2 items-end w-1/3">
+          <div className="flex w-1/3 flex-col items-end gap-2">
             <div className="flex flex-col gap-2">
               {totalMensuelSansRemiseText}
               {totalMensuelText}

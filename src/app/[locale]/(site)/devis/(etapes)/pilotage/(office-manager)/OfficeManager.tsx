@@ -36,12 +36,12 @@ const OfficeManager = ({
   const propositionsRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="1">
+    <div className="mx-auto flex h-full w-full flex-col gap-4 py-2" id="1">
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
           title="Office/Hospitality Manager"
           description={tPilotage(
-            "gestion-operationnelle-sur-site-animation-des-bureaux-contact-direct-avec-les-occupants-gestion-des-imprevus-en-temps-reel-un-expert-metier-dedie-directement-chez-vous-pour-tout-gerer-le-nombre-de-demi-journees-dintervention-determine-la-gamme"
+            "gestion-operationnelle-sur-site-animation-des-bureaux-contact-direct-avec-les-occupants-gestion-des-imprevus-en-temps-reel-un-expert-metier-dedie-directement-chez-vous-pour-tout-gerer-le-nombre-de-demi-journees-dintervention-determine-la-gamme",
           )}
           icon={UserRoundCog}
           propositionsRef={propositionsRef}
@@ -50,7 +50,7 @@ const OfficeManager = ({
         <PropositionsTitle
           title="Office/Hospitality Manager"
           description={tPilotage(
-            "gestion-operationnelle-sur-site-animation-des-bureaux-contact-direct-avec-les-occupants-gestion-des-imprevus-en-temps-reel-un-expert-metier-dedie-directement-chez-vous-pour-tout-gerer-le-nombre-de-demi-journees-dintervention-determine-la-gamme"
+            "gestion-operationnelle-sur-site-animation-des-bureaux-contact-direct-avec-les-occupants-gestion-des-imprevus-en-temps-reel-un-expert-metier-dedie-directement-chez-vous-pour-tout-gerer-le-nombre-de-demi-journees-dintervention-determine-la-gamme",
           )}
           icon={UserRoundCog}
           handleClickPrevious={handleClickPrevious}
@@ -70,7 +70,7 @@ const OfficeManager = ({
         <PropositionsFooter
           handleClickNext={handleClickNext}
           comment={tPilotage(
-            "selon-lieu-dexecution-les-demi-journees-pourront-etre-proposees-en-teletravail"
+            "selon-lieu-dexecution-les-demi-journees-pourront-etre-proposees-en-teletravail",
           )}
         />
       ) : null}

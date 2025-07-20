@@ -18,7 +18,7 @@ export const getServicesForFournisseur = async (fournisseurId: number) => {
       .from(services)
       .innerJoin(
         servicesFournisseurs,
-        eq(servicesFournisseurs.serviceId, services.id)
+        eq(servicesFournisseurs.serviceId, services.id),
       )
       .where(eq(servicesFournisseurs.fournisseurId, fournisseurId))
       .orderBy(servicesFournisseurs.serviceId);

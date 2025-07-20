@@ -49,7 +49,7 @@ export default async function page({
   setRequestLocale(locale);
   return (
     <>
-      <main className="flex flex-col mb-24">
+      <main className="mb-24 flex flex-col">
         <Hero />
         <Slogan />
         <Presentation />

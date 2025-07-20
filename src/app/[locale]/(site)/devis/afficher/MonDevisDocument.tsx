@@ -16,12 +16,12 @@ const MonDevisDocument = ({ devisUrl }: MonDevisDocumentProps) => {
   const { client } = useContext(ClientContext);
 
   return (
-    <div className="flex flex-col gap-6 h-full overflow-auto" id="2">
-      <p className="text-lg font-bold max-w-prose mx-auto">
+    <div className="flex h-full flex-col gap-6 overflow-auto" id="2">
+      <p className="mx-auto max-w-prose text-lg font-bold">
         {client.prenomContact} {client.nomContact},
       </p>
-      <div className="flex-1 flex flex-col items-center gap-6 overflow-auto">
-        <div className="flex flex-col gap-4 mx-auto max-w-prose items-center hyphens-auto text-wrap">
+      <div className="flex flex-1 flex-col items-center gap-6 overflow-auto">
+        <div className="mx-auto flex max-w-prose flex-col items-center gap-4 hyphens-auto text-wrap">
           <p>
             {t("votre-devis-complet-et-personnalise-vous-attend-ci-dessous")}
           </p>
@@ -33,7 +33,7 @@ const MonDevisDocument = ({ devisUrl }: MonDevisDocumentProps) => {
           </p>
           <p>
             {t(
-              "ce-devis-vous-convient-gagnez-encore-du-temps-en-nous-laissant-rediger-pour-vous-les-cahiers-des-charges-et-le-contrat-final-afin-de-demarrer-au-plus-vite"
+              "ce-devis-vous-convient-gagnez-encore-du-temps-en-nous-laissant-rediger-pour-vous-les-cahiers-des-charges-et-le-contrat-final-afin-de-demarrer-au-plus-vite",
             )}
           </p>
           <p>
@@ -41,11 +41,11 @@ const MonDevisDocument = ({ devisUrl }: MonDevisDocumentProps) => {
           </p>
         </div>
         <CTAContactButtons />
-        <div className="flex flex-col gap-4 w-full mx-auto max-w-prose items-center">
+        <div className="mx-auto flex w-full max-w-prose flex-col items-center gap-4">
           <a
             href={devisUrl}
             download={`Devis_fm4all_${DateTime.local().toFormat(
-              "dd-MM-yyyy'T'HH:mm"
+              "dd-MM-yyyy'T'HH:mm",
             )}.pdf`}
             className="underline"
           >
@@ -58,8 +58,8 @@ const MonDevisDocument = ({ devisUrl }: MonDevisDocumentProps) => {
             </Link>
           </p>
         </div>
-        <div className="w-full mt-6 mb-6 flex justify-center">
-          <iframe src={devisUrl} className="w-full h-screen" />
+        <div className="mb-6 mt-6 flex w-full justify-center">
+          <iframe src={devisUrl} className="h-screen w-full" />
         </div>
       </div>
     </div>

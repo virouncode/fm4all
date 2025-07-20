@@ -12,7 +12,7 @@ const PersonnaliserPresentation = () => {
   const tPersonnaliser = useTranslations("DevisPage.personnaliser");
   const { client } = useContext(ClientContext);
   const { personnalisation, setPersonnalisation } = useContext(
-    PersonnalisationContext
+    PersonnalisationContext,
   );
 
   const handleClickNext = () => {
@@ -27,58 +27,58 @@ const PersonnaliserPresentation = () => {
 
   return (
     <div
-      className="flex flex-col gap-6 w-full mx-auto h-full py-2 overflow-auto"
+      className="mx-auto flex h-full w-full flex-col gap-6 overflow-auto py-2"
       id="1"
     >
-      <div className="flex-1 flex flex-col gap-4">
-        <p className="max-w-prose mx-auto">
+      <div className="flex flex-1 flex-col gap-4">
+        <p className="mx-auto max-w-prose">
           {client.prenomContact} {client.nomContact},{" "}
         </p>
-        <p className="max-w-prose mx-auto">
+        <p className="mx-auto max-w-prose">
           {tPersonnaliser(
-            "dans-cette-etape-vous-allez-pouvoir-personnaliser-votre-devis-et-confirmer-certaines-informations-ces-complements-vont-nous-permettre-de-vous-donner-un-tarif-definitif-pour-votre-futur-contrat-de-prestations-de-services"
+            "dans-cette-etape-vous-allez-pouvoir-personnaliser-votre-devis-et-confirmer-certaines-informations-ces-complements-vont-nous-permettre-de-vous-donner-un-tarif-definitif-pour-votre-futur-contrat-de-prestations-de-services",
           )}
         </p>
-        <p className="max-w-prose mx-auto">
+        <p className="mx-auto max-w-prose">
           {tPersonnaliser("avec-fm4all-vous-avez")}{" "}
           <strong>
             {tPersonnaliser("5-bonnes-raisons-dameliorer-votre-quotidien")}
           </strong>{" "}
           :
         </p>
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-2 mt-6">
+        <div className="mt-6 grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-2">
           <WhyCard
             title={tPourquoi("simplicite")}
             content={tPourquoi(
-              "3-gammes-de-services-standardisees-pour-une-comparaison-et-un-choix-faciles"
+              "3-gammes-de-services-standardisees-pour-une-comparaison-et-un-choix-faciles",
             )}
             icon={Feather}
           />
           <WhyCard
             title={tPourquoi("rapidite")}
             content={tPourquoi(
-              "devis-personnalises-en-ligne-en-quelques-minutes-pret-a-demarrer"
+              "devis-personnalises-en-ligne-en-quelques-minutes-pret-a-demarrer",
             )}
             icon={Rabbit}
           />
           <WhyCard
             title={tPourquoi("fiabilite")}
             content={tPourquoi(
-              "contrats-clairs-et-partenaires-de-confiance-rigoureusement-selectionnes"
+              "contrats-clairs-et-partenaires-de-confiance-rigoureusement-selectionnes",
             )}
             icon={Handshake}
           />
           <WhyCard
             title={tPourquoi("serenite")}
             content={tPourquoi(
-              "centralisation-des-demandes-du-suivi-qualite-et-des-escalades-pour-une-tranquillite-desprit-garantie"
+              "centralisation-des-demandes-du-suivi-qualite-et-des-escalades-pour-une-tranquillite-desprit-garantie",
             )}
             icon={Waves}
           />
           <WhyCard
             title={tPourquoi("optimise")}
             content={tPourquoi(
-              "10-en-moyenne-grace-aux-offres-groupees-de-nos-partenaires"
+              "10-en-moyenne-grace-aux-offres-groupees-de-nos-partenaires",
             )}
             icon={Euro}
           />

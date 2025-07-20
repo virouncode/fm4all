@@ -4,8 +4,8 @@ import Image from "next/image";
 const Slogan = () => {
   const t = useTranslations("Global");
   return (
-    <section className="flex flex-col lg:flex-row justify-center lg:gap-10 gap-6 items-center max-w-7xl w-full mx-auto p-12 relative">
-      <div className="h-[50px] w-[200px] relative rounded-xl overflow-hidden ">
+    <section className="relative mx-auto flex w-full max-w-7xl flex-col items-center justify-center gap-6 p-12 lg:flex-row lg:gap-10">
+      <div className="relative h-[50px] w-[200px] overflow-hidden rounded-xl">
         <Image
           src={"/img/logo_full.webp"}
           alt={"logo-fm4all"}
@@ -15,7 +15,7 @@ const Slogan = () => {
           loading="lazy"
         />
       </div>
-      <h2 className="text-5xl text-center text-destructive font-bold tracking-tighter">
+      <h2 className="text-center text-5xl font-bold tracking-tighter text-destructive">
         {t("le-facility-management-pour-tous")}
       </h2>
     </section>

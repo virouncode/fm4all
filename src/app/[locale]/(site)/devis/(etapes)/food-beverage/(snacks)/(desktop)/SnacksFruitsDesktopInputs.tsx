@@ -24,13 +24,13 @@ const SnacksFruitsDesktopInputs = ({
   const { client } = useContext(ClientContext);
   const { snacksFruits } = useContext(SnacksFruitsContext);
   return (
-    <form className="w-2/3 flex items-center gap-8 py-1">
-      <div className="flex gap-4 items-center">
+    <form className="flex w-2/3 items-center gap-8 py-1">
+      <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
           <Checkbox
             checked={snacksFruits.infos.choix.includes("fruits")}
             onCheckedChange={() => handleCheck("fruits")}
-            className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+            className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
             id="fruits"
             aria-label={tSnacks("selectionner-fruits")}
           />
@@ -42,7 +42,7 @@ const SnacksFruitsDesktopInputs = ({
           <Checkbox
             checked={snacksFruits.infos.choix.includes("snacks")}
             onCheckedChange={() => handleCheck("snacks")}
-            className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+            className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
             id="snacks"
             aria-label={tSnacks("selectionner-snacks")}
             data-testid="snacks-checkbox"
@@ -55,7 +55,7 @@ const SnacksFruitsDesktopInputs = ({
           <Checkbox
             checked={snacksFruits.infos.choix.includes("boissons")}
             onCheckedChange={() => handleCheck("boissons")}
-            className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+            className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
             id="boissons"
             aria-label={tSnacks("selectionner-boissons")}
             data-testid="boissons-checkbox"
@@ -65,9 +65,9 @@ const SnacksFruitsDesktopInputs = ({
           </Label>
         </div>
       </div>
-      <div className="flex gap-2 items-center">
+      <div className="flex items-center gap-2">
         <Input
-          className={`w-full max-w-xs min-w-20 ${
+          className={`w-full min-w-20 max-w-xs ${
             snacksFruits.quantites.nbPersonnes === client.effectif
               ? "text-fm4alldestructive"
               : ""

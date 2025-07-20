@@ -59,7 +59,7 @@ const DetailIncendie = () => {
                     ((incendie.quantites.nbExtincteurs ?? 0) *
                       (incendie.prix.prixParExtincteur ?? 0) *
                       MARGE) /
-                      12
+                      12,
                   )}
                 </TableCell>
               </TableRow>
@@ -76,7 +76,7 @@ const DetailIncendie = () => {
                     ((incendie.quantites.nbBaes ?? 0) *
                       (incendie.prix.prixParBaes ?? 0) *
                       MARGE) /
-                      12
+                      12,
                   )}
                 </TableCell>
               </TableRow>
@@ -93,7 +93,7 @@ const DetailIncendie = () => {
                     ((incendie.quantites.nbTelBaes ?? 0) *
                       (incendie.prix.prixParTelBaes ?? 0) *
                       MARGE) /
-                      12
+                      12,
                   )}
                 </TableCell>
               </TableRow>
@@ -107,7 +107,8 @@ const DetailIncendie = () => {
                 <TableCell>N/A</TableCell>
                 <TableCell className="text-end">
                   {formatNumber(
-                    ((totalIncendie.totalDeplacementTrilogie ?? 0) * MARGE) / 12
+                    ((totalIncendie.totalDeplacementTrilogie ?? 0) * MARGE) /
+                      12,
                   )}
                 </TableCell>
               </TableRow>
@@ -124,7 +125,7 @@ const DetailIncendie = () => {
                 (((totalIncendie.totalTrilogie ?? 0) +
                   (totalIncendie.totalDeplacementTrilogie ?? 0)) *
                   MARGE) /
-                  12
+                  12,
               )}
             </TableCell>
           </TableRow>
@@ -169,7 +170,7 @@ const DetailIncendie = () => {
                 <TableCell className="text-end">
                   {formatNumber(
                     ((totalIncendie.totalDeplacementExutoires ?? 0) * MARGE) /
-                      12
+                      12,
                   )}
                 </TableCell>
               </TableRow>
@@ -187,7 +188,7 @@ const DetailIncendie = () => {
                 <TableCell>N/A</TableCell>
                 <TableCell className="text-end">
                   {formatNumber(
-                    (totalIncendie.totalExutoiresParking * MARGE) / 12
+                    (totalIncendie.totalExutoiresParking * MARGE) / 12,
                   )}
                 </TableCell>
               </TableRow>
@@ -203,7 +204,7 @@ const DetailIncendie = () => {
                   {formatNumber(
                     ((totalIncendie.totalDeplacementExutoiresParking ?? 0) *
                       MARGE) /
-                      12
+                      12,
                   )}
                 </TableCell>
               </TableRow>
@@ -238,7 +239,7 @@ const DetailIncendie = () => {
               <TableCell className="text-end">
                 {formatNumber(
                   ((totalIncendie.totalPortesCoupeFeuBattantes ?? 0) * MARGE) /
-                    12
+                    12,
                 )}
               </TableCell>
             </TableRow>
@@ -258,7 +259,7 @@ const DetailIncendie = () => {
                 {formatNumber(
                   ((totalIncendie.totalPortesCoupeFeuCoulissantes ?? 0) *
                     MARGE) /
-                    12
+                    12,
                 )}
               </TableCell>
             </TableRow>
@@ -277,7 +278,7 @@ const DetailIncendie = () => {
               <TableCell className="text-end">
                 {formatNumber(
                   ((totalIncendie.totalColonnesSechesStatiques ?? 0) * MARGE) /
-                    12
+                    12,
                 )}
               </TableCell>
             </TableRow>
@@ -296,7 +297,7 @@ const DetailIncendie = () => {
               <TableCell className="text-end">
                 {formatNumber(
                   ((totalIncendie.totalColonnesSechesDynamiques ?? 0) * MARGE) /
-                    12
+                    12,
                 )}
               </TableCell>
             </TableRow>

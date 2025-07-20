@@ -71,7 +71,7 @@ export const updateNettoyageTarifAction = actionClient
           .from(nettoyageTarifs)
           .where(
             eq(nettoyageTarifs.id, nettoyageTarifInput.id) &&
-              eq(nettoyageTarifs.fournisseurId, fournisseurId)
+              eq(nettoyageTarifs.fournisseurId, fournisseurId),
           )
           .limit(1);
 
@@ -101,7 +101,7 @@ export const updateNettoyageTarifAction = actionClient
           [
             getSurfaceTag(
               "nettoyageTarifs",
-              nettoyageTarifInput.surface.toString()
+              nettoyageTarifInput.surface.toString(),
             ),
             getFournisseurTag("nettoyageTarifs", fournisseurId),
           ],
@@ -114,7 +114,7 @@ export const updateNettoyageTarifAction = actionClient
             fournisseurId,
             surface: nettoyageTarifInput.surface,
             gamme: nettoyageTarifInput.gamme,
-          }
+          },
         );
 
         return {
@@ -130,7 +130,7 @@ export const updateNettoyageTarifAction = actionClient
           .from(nettoyageRepasseTarifs)
           .where(
             eq(nettoyageRepasseTarifs.id, nettoyageTarifInput.id) &&
-              eq(nettoyageRepasseTarifs.fournisseurId, fournisseurId)
+              eq(nettoyageRepasseTarifs.fournisseurId, fournisseurId),
           )
           .limit(1);
 
@@ -160,7 +160,7 @@ export const updateNettoyageTarifAction = actionClient
           [
             getSurfaceTag(
               "repasseTarifs",
-              nettoyageTarifInput.surface.toString()
+              nettoyageTarifInput.surface.toString(),
             ),
             getFournisseurTag("repasseTarifs", fournisseurId),
           ],
@@ -173,7 +173,7 @@ export const updateNettoyageTarifAction = actionClient
             fournisseurId,
             surface: nettoyageTarifInput.surface,
             gamme: tarif[0].gamme,
-          }
+          },
         );
 
         return {
@@ -184,5 +184,5 @@ export const updateNettoyageTarifAction = actionClient
               : "Rate updated successfully",
         };
       }
-    }
+    },
   );

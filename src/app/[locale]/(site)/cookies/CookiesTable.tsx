@@ -22,7 +22,7 @@ type CookiesTableProps = {
 const CookiesTable = ({ cookiesRows }: CookiesTableProps) => {
   const t = useTranslations("CookiesPage");
   return (
-    <div className="flex flex-col w-full md:3/4 lg:w-2/3 hyphens-auto text-wrap mx-auto gap-2 overflow-x-auto">
+    <div className="md:3/4 mx-auto flex w-full flex-col gap-2 overflow-x-auto hyphens-auto text-wrap lg:w-2/3">
       <Table>
         <TableCaption>{t("list-des-cookies-utilises")}</TableCaption>
         <TableHeader>

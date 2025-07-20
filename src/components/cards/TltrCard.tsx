@@ -44,18 +44,11 @@ const TltrCard = ({
   titre,
 }: TltrCardProps) => {
   return (
-    <section className="flex flex-col gap-14 mb-16 bg-gradient-to-r from-fm4allsecondary/100 to-fm4allsecondary/60 text-white rounded-xl p-6 sm:p-14">
-      <h1 className="text-3xl md:text-4xl text-center">{titre}</h1>
+    <section className="mb-16 flex flex-col gap-14 rounded-xl bg-gradient-to-r from-fm4allsecondary/100 to-fm4allsecondary/60 p-6 text-white sm:p-14">
+      <h1 className="text-center text-3xl md:text-4xl">{titre}</h1>
       <div className="flex flex-row gap-10">
-        <div className="flex flex-col flex-1 justify-start text-lg gap-10">
-          <div
-            className="flex flex-col gap-6 prose-base 
-          prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl 
-          prose-h3:font-bold prose-h3:text-xl
-          prose-p:text-pretty prose-p:hyphens-auto prose-p:m-0
-          prose-li:list-disc prose-li:m-0
-          prose-a:underline"
-          >
+        <div className="flex flex-1 flex-col justify-start gap-10 text-lg">
+          <div className="prose-base flex flex-col gap-6 prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl prose-h3:text-xl prose-h3:font-bold prose-p:m-0 prose-p:hyphens-auto prose-p:text-pretty prose-a:underline prose-li:m-0 prose-li:list-disc">
             <p className="font-bold">{description}</p>
             {Array.isArray(tltr) && <PortableText value={tltr} />}
           </div>
@@ -64,11 +57,11 @@ const TltrCard = ({
               title={devisButtonTitle}
               text={devisButtonTitle}
               size="lg"
-              className="bg-fm4alldestructive hover:bg-fm4alldestructive/90 text-white border-none shadow-lg ring-fm4alldestructive md:w-auto w-full"
+              className="w-full border-none bg-fm4alldestructive text-white shadow-lg ring-fm4alldestructive hover:bg-fm4alldestructive/90 md:w-auto"
             />
           </div>
         </div>
-        <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
+        <div className="relative mx-auto hidden min-h-[400px] flex-1 overflow-hidden rounded-lg md:block">
           <Image
             src={imageUrl}
             alt={imageAlt}

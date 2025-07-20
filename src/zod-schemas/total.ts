@@ -42,7 +42,7 @@ export const totalCafeSchema = z.object({
         espaceId: z.number(),
         total: z.number().nullable(),
         totalInstallation: z.number().nullable(),
-      })
+      }),
     )
     .default([]),
 });
@@ -65,7 +65,7 @@ export const totalFontainesSchema = z.object({
         espaceId: z.number(),
         total: z.number().nullable(),
         totalInstallation: z.number().nullable(),
-      })
+      }),
     )
     .default([]),
 });

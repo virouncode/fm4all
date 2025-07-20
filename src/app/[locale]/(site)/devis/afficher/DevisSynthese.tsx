@@ -26,7 +26,7 @@ const DevisSynthese = () => {
 
   return (
     <div
-      className={`flex flex-col gap-6 w-[18cm] mx-auto border rounded-xl p-4 absolute -translate-x-[3000px]`}
+      className={`absolute mx-auto flex w-[18cm] -translate-x-[3000px] flex-col gap-6 rounded-xl border p-4`}
     >
       <div id="total-summary">
         <p className="text-2xl">

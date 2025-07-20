@@ -30,7 +30,7 @@ type FontaineDesktopEspaceInputsProps = {
   fontainesEspacesIds: number[];
   handleCheck: (
     checked: boolean,
-    type: "Eau froide" | "Eau gazeuse" | "Eau chaude"
+    type: "Eau froide" | "Eau gazeuse" | "Eau chaude",
   ) => void;
 };
 
@@ -52,8 +52,8 @@ const FontaineDesktopEspaceInputs = ({
       <Tooltip>
         <TooltipTrigger asChild>
           <form className="w-2/3">
-            <div className="flex gap-8 items-center mb-4">
-              <div className="flex gap-4 items-center">
+            <div className="mb-4 flex items-center gap-8">
+              <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
                   <Checkbox
                     checked={espace.infos.typeEau.includes("Eau froide")}
@@ -61,7 +61,7 @@ const FontaineDesktopEspaceInputs = ({
                       handleCheck(checked, "Eau froide")
                     }
                     disabled={true}
-                    className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+                    className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
                     id="eau froide"
                     aria-label={tFontaines("selectionner-eau-froide")}
                   />
@@ -75,7 +75,7 @@ const FontaineDesktopEspaceInputs = ({
                     onCheckedChange={(checked: boolean) =>
                       handleCheck(checked, "Eau gazeuse")
                     }
-                    className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+                    className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
                     id="eau gazeuse"
                     aria-label={tFontaines("selectionner-eau-gazeuse")}
                     data-testid="eau-gazeuse-checkbox"
@@ -90,7 +90,7 @@ const FontaineDesktopEspaceInputs = ({
                     onCheckedChange={(checked: boolean) =>
                       handleCheck(checked, "Eau chaude")
                     }
-                    className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+                    className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
                     id="boissons"
                     aria-label={tFontaines("selectionner-eau-chaude")}
                     data-testid="eau-chaude-checkbox"
@@ -100,9 +100,9 @@ const FontaineDesktopEspaceInputs = ({
                   </Label>
                 </div>
               </div>
-              <div className="flex gap-2 items-center">
+              <div className="flex items-center gap-2">
                 <Input
-                  className={`w-full max-w-xs min-w-20 ${
+                  className={`w-full min-w-20 max-w-xs ${
                     nbPersonnes === client.effectif
                       ? "text-fm4alldestructive"
                       : ""
@@ -128,7 +128,7 @@ const FontaineDesktopEspaceInputs = ({
                   onValueChange={handleSelectDureeLocation}
                   aria-label={t("selectionnez-la-duree-de-location")}
                 >
-                  <SelectTrigger className={" max-w-xs w-1/4"}>
+                  <SelectTrigger className={"w-1/4 max-w-xs"}>
                     <SelectValue placeholder={t("choisir")} />
                   </SelectTrigger>
                   <SelectContent>
@@ -150,7 +150,7 @@ const FontaineDesktopEspaceInputs = ({
           <div>
             <p>
               {tFontaines(
-                "pour-votre-espace-fontaine-a-eau-veuillez-selectionner"
+                "pour-votre-espace-fontaine-a-eau-veuillez-selectionner",
               )}
             </p>
             <ul className="ml-10">

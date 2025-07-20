@@ -94,7 +94,7 @@ const MaintenanceMobilePropositionCard = ({
 
   const color = getFm4AllColor(gamme);
   const totalMensuelText = totalAnnuel ? (
-    <p className="font-bold text-sm">
+    <p className="text-sm font-bold">
       {formatNumber((totalAnnuel * MARGE) / 12)} {t("euros-mois")}
     </p>
   ) : (
@@ -110,36 +110,36 @@ const MaintenanceMobilePropositionCard = ({
     </p>
   );
   const imgProduit = (
-    <div className="w-1/3 h-full relative rounded-xl overflow-hidden bg-slate-100">
+    <div className="relative h-full w-1/3 overflow-hidden rounded-xl bg-slate-100">
       <Image
         src={`${"/img/services/maintenance.webp"}`}
         alt={`illustration de maintenance`}
         fill={true}
-        className="object-contain cursor-pointer"
+        className="cursor-pointer object-contain"
         quality={100}
       />
     </div>
   );
 
   const imgProduitDialog = (
-    <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+    <div className="relative h-60 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-200">
       <Image
         src={`${"/img/services/maintenance.webp"}`}
         alt={`illustration de maintenance`}
         fill={true}
-        className="object-contain cursor-pointer"
+        className="cursor-pointer object-contain"
         quality={100}
       />
     </div>
   );
   const nbPassagesText = (
-    <li className="list-check ">
+    <li className="list-check">
       {freqAnnuelle} {t("passage-s-de")} {hParPassage} {t("h-an")}
     </li>
   );
   const infosEssentiel = (
     <>
-      <li className="list-check ">
+      <li className="list-check">
         {tMaintenance("obligation-legale-et-controles-reglementaires")}
       </li>
       <li className="list-check">{tMaintenance("controle-q18")}</li>
@@ -148,32 +148,32 @@ const MaintenanceMobilePropositionCard = ({
   );
   const infosConfort = (
     <>
-      <li className="list-check ">
+      <li className="list-check">
         {tMaintenance(
-          "essentiel-recommandations-ars-petits-travaux-dentretien-tous-les-trois-mois"
+          "essentiel-recommandations-ars-petits-travaux-dentretien-tous-les-trois-mois",
         )}
       </li>
-      <li className="list-check ">{tMaintenance("controle-q18")}</li>
-      <li className="list-check ">{tMaintenance("controle-legionellose")}</li>
+      <li className="list-check">{tMaintenance("controle-q18")}</li>
+      <li className="list-check">{tMaintenance("controle-legionellose")}</li>
       {nbPassagesText}
     </>
   );
   const infosExcellence = (
     <>
-      <li className="list-check ">
+      <li className="list-check">
         {tMaintenance(
-          "une-a-deux-fois-par-mois-passage-technicien-pour-maintenance-and-petits-travaux-lien-technique-avec-le-gestionnaire-de-limmeuble"
+          "une-a-deux-fois-par-mois-passage-technicien-pour-maintenance-and-petits-travaux-lien-technique-avec-le-gestionnaire-de-limmeuble",
         )}
       </li>
-      <li className="list-check ">{tMaintenance("controle-q18")}</li>
-      <li className="list-check ">{tMaintenance("controle-legionellose")}</li>
-      <li className="list-check ">{tMaintenance("controle-qualite-air")}</li>
+      <li className="list-check">{tMaintenance("controle-q18")}</li>
+      <li className="list-check">{tMaintenance("controle-legionellose")}</li>
+      <li className="list-check">{tMaintenance("controle-qualite-air")}</li>
       {nbPassagesText}
     </>
   );
 
   const infosProduit = (
-    <ul className="flex flex-col text-xs px-4">
+    <ul className="flex flex-col px-4 text-xs">
       {gamme === "essentiel"
         ? infosEssentiel
         : gamme === "confort"
@@ -183,7 +183,7 @@ const MaintenanceMobilePropositionCard = ({
   );
 
   const infosProduitDialog = (
-    <ul className="flex flex-col text-sm px-4 mx-auto">
+    <ul className="mx-auto flex flex-col px-4 text-sm">
       {gamme === "essentiel"
         ? infosEssentiel
         : gamme === "confort"
@@ -195,46 +195,46 @@ const MaintenanceMobilePropositionCard = ({
   return (
     <CarouselItem>
       <div
-        className={`bg-${color} flex flex-col h-72 border border-slate-200 rounded-xl p-4 text-white  ${
+        className={`bg-${color} flex h-72 flex-col rounded-xl border border-slate-200 p-4 text-white ${
           maintenance.infos.fournisseurId === fournisseurId &&
           maintenance.infos.gammeSelected === gamme
             ? "ring-4 ring-inset ring-fm4alldestructive"
             : ""
         }`}
       >
-        <div className="flex items-center h-1/3 gap-2 border-b pb-2 border-slate-200">
+        <div className="flex h-1/3 items-center gap-2 border-b border-slate-200 pb-2">
           <Dialog>
             <DialogTrigger asChild>{imgProduit}</DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
+            <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
               <DialogHeader>
                 <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
               <div className="flex flex-col gap-4">
                 {imgProduitDialog}
-                <p className="text-xs italic text-end">
+                <p className="text-end text-xs italic">
                   {t("photo-non-contractuelle")}
                 </p>
                 {infosProduitDialog}
               </div>
             </DialogContent>
           </Dialog>
-          <div className="w-2/3 flex flex-col gap-1 h-full">
-            <p className="font-bold text-sm">{nomFournisseur}</p>
+          <div className="flex h-full w-2/3 flex-col gap-1">
+            <p className="text-sm font-bold">{nomFournisseur}</p>
             <Dialog>
               <DialogTrigger asChild>
                 {logoUrl ? (
-                  <div className="h-10 relative">
+                  <div className="relative h-10">
                     <Image
                       src={logoUrl}
                       alt={`logo-de-${nomFournisseur}`}
                       fill={true}
-                      className="object-contain object-left cursor-pointer"
+                      className="cursor-pointer object-contain object-left"
                       quality={100}
                     />
                   </div>
                 ) : null}
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
+              <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
                 <DialogHeader>
                   <DialogTitle>{nomFournisseur}</DialogTitle>
                 </DialogHeader>
@@ -262,7 +262,7 @@ const MaintenanceMobilePropositionCard = ({
           </div>
         </div>
         <div
-          className="flex h-2/3 pt-2 justify-between"
+          className="flex h-2/3 justify-between pt-2"
           onClick={
             totalMensuelText
               ? () => handleClickProposition(proposition)
@@ -270,7 +270,7 @@ const MaintenanceMobilePropositionCard = ({
           }
         >
           {infosProduit}
-          <div className="flex flex-col gap-2 items-end w-1/3">
+          <div className="flex w-1/3 flex-col items-end gap-2">
             {totalMensuelText}
             {totalMensuelText ? (
               <Switch

@@ -20,7 +20,7 @@ const PersonnaliserNettoyageVitrerie = () => {
   const { nettoyage, setNettoyage } = useContext(NettoyageContext);
   const { setTotalNettoyage } = useContext(TotalNettoyageContext);
   const { personnalisation, setPersonnalisation } = useContext(
-    PersonnalisationContext
+    PersonnalisationContext,
   );
   const handleClickPrevious = () => {};
   const handleClickNext = () => {
@@ -49,7 +49,7 @@ const PersonnaliserNettoyageVitrerie = () => {
           ? Math.max(
               (newSurface / cadenceVitres + surfaceCloisons / cadenceCloisons) *
                 tauxHoraireVitrerie,
-              minFacturationVitrerie ?? 0
+              minFacturationVitrerie ?? 0,
             )
           : null;
 
@@ -77,7 +77,7 @@ const PersonnaliserNettoyageVitrerie = () => {
           ? Math.max(
               (surfaceVitres / cadenceVitres + newSurface / cadenceCloisons) *
                 tauxHoraireVitrerie,
-              minFacturationVitrerie ?? 0
+              minFacturationVitrerie ?? 0,
             )
           : null;
       const totalVitrerie =
@@ -105,7 +105,7 @@ const PersonnaliserNettoyageVitrerie = () => {
   const propositionsRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="2">
+    <div className="mx-auto flex h-full w-full flex-col gap-4 py-2" id="2">
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
           title={t("nettoyage-et-proprete")}
@@ -123,22 +123,22 @@ const PersonnaliserNettoyageVitrerie = () => {
         />
       )}
       <div
-        className="w-full flex-1 flex flex-col gap-6 mb-6"
+        className="mb-6 flex w-full flex-1 flex-col gap-6"
         ref={propositionsRef}
       >
         <div className="flex flex-col gap-6">
           <p className="text-2xl">
             {tPersonnaliser("nettoyage-de-la-vitrerie")}
           </p>
-          <p className="max-w-prose mx-auto hyphens-auto">
+          <p className="mx-auto max-w-prose hyphens-auto">
             {tPersonnaliser(
-              "nous-avions-estime-la-surface-de-vos-vitres-et-de-vos-cloisons-vitrees-a-15-de-la-surface-de-vos-locaux"
+              "nous-avions-estime-la-surface-de-vos-vitres-et-de-vos-cloisons-vitrees-a-15-de-la-surface-de-vos-locaux",
             )}
           </p>
           <div className="flex flex-col gap-4">
-            <p className="max-w-prose mx-auto hyphens-auto font-bold">
+            <p className="mx-auto max-w-prose hyphens-auto font-bold">
               {tPersonnaliser(
-                "vous-pouvez-renseigner-les-dimensions-exactes-si-vous-les-connaissez"
+                "vous-pouvez-renseigner-les-dimensions-exactes-si-vous-les-connaissez",
               )}
             </p>
             <div className="flex items-center justify-center gap-6">
@@ -173,19 +173,19 @@ const PersonnaliserNettoyageVitrerie = () => {
             </div>
           </div>
           <div className="flex flex-col gap-4">
-            <p className="max-w-prose mx-auto hyphens-auto font-bold">
+            <p className="mx-auto max-w-prose hyphens-auto font-bold">
               {tPersonnaliser(
-                "la-vitrerie-est-elle-totalement-accessible-de-plain-pied"
+                "la-vitrerie-est-elle-totalement-accessible-de-plain-pied",
               )}
             </p>
             <div className="flex items-center justify-center gap-14">
               <RadioGroup
                 onValueChange={handleChangePleinPied}
                 value={nettoyage.infos.plainPied ? "oui" : "non"}
-                className="flex gap-10 items-center"
+                className="flex items-center gap-10"
                 name="plainPied"
               >
-                <div className="flex gap-2 items-center">
+                <div className="flex items-center gap-2">
                   <RadioGroupItem
                     value={"oui"}
                     title={tPersonnaliser("oui")}
@@ -193,7 +193,7 @@ const PersonnaliserNettoyageVitrerie = () => {
                   />
                   <Label htmlFor="oui">{tPersonnaliser("oui")}</Label>
                 </div>
-                <div className="flex gap-2 items-center">
+                <div className="flex items-center gap-2">
                   <RadioGroupItem
                     value={"non"}
                     title={tPersonnaliser("non")}

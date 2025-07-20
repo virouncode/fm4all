@@ -27,12 +27,12 @@ const TotalNettoyage = () => {
   const color = getFm4AllColor(nettoyage.infos.gammeSelected);
 
   return (
-    <div className="flex flex-col gap-4 total-section" id="total-nettoyage">
+    <div className="total-section flex flex-col gap-4" id="total-nettoyage">
       <div className="flex flex-col gap-4">
         <div>
           {t("nettoyage")} ({nettoyage.infos.nomFournisseur})
         </div>
-        <div className="flex flex-col ml-4 text-xs">
+        <div className="ml-4 flex flex-col text-xs">
           {totalService ? (
             <div
               className={`flex items-center justify-between text-${color} font-bold`}
@@ -87,7 +87,7 @@ const TotalNettoyage = () => {
               </p>
             </div>
           ) : null}
-          <div className="flex items-center justify-between border-t border-foreground mt-2">
+          <div className="mt-2 flex items-center justify-between border-t border-foreground">
             <p>TOTAL</p>
             <p className="text-end">
               {formatNumber(Math.round(total * MARGE))} {t("eur-ht-an")}

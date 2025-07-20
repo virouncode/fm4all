@@ -152,14 +152,14 @@ const Total = () => {
         <Button
           variant="outline"
           size="lg"
-          className="text-base fixed bottom-6 right-4 lg:absolute lg:top-[20px] lg:right-0 z-30"
+          className="fixed bottom-6 right-4 z-30 text-base lg:absolute lg:right-0 lg:top-[20px]"
           data-testid="total-button"
         >
           <Calculator />
           {formatNumber(Math.round(total.totalAnnuelHt ?? 0))} {t("eur-ht-an")}
         </Button>
       </SheetTrigger>
-      <SheetContent className="flex flex-col w-full">
+      <SheetContent className="flex w-full flex-col">
         <SheetHeader>
           <SheetTitle>
             <span className="text-2xl">
@@ -178,13 +178,13 @@ const Total = () => {
             <span>
               +{" "}
               {formatNumber(
-                Math.round((total.totalInstallationHt ?? 0) * MARGE)
+                Math.round((total.totalInstallationHt ?? 0) * MARGE),
               )}{" "}
               {t("eur-ht-dinstallation")}
             </span>
           </SheetDescription>
         </SheetHeader>
-        <div className="flex flex-col gap-6 overflow-scroll flex-1 bg-inherit">
+        <div className="flex flex-1 flex-col gap-6 overflow-scroll bg-inherit">
           <TotalNettoyage />
           <TotalHygiene />
           <TotalMaintenance />

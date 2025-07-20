@@ -80,7 +80,7 @@ const NettoyageMobilePropositionsCarousel = ({
           ? 0
           : nettoyage.infos.gammeSelected === "confort"
             ? 1
-            : 2
+            : 2,
       );
     }
   }, [
@@ -95,7 +95,7 @@ const NettoyageMobilePropositionsCarousel = ({
         align: "start",
         loop: true,
       }}
-      className="w-full relative"
+      className="relative w-full"
       setApi={setApi}
     >
       <CarouselContent>

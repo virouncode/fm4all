@@ -92,8 +92,8 @@ const Partenaires = () => {
   const t = useTranslations("HomePage.partenaires");
   return (
     <section className="bg-gradient-to-r from-[#f0c674]/100 to-[#f0c674]/70">
-      <div className="max-w-7xl w-full mx-auto flex flex-col gap-10 pt-8 pb-12 px-6">
-        <h2 className="text-2xl md:text-3xl border-l-2 px-4">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-6 pb-12 pt-8">
+        <h2 className="border-l-2 px-4 text-2xl md:text-3xl">
           {t("nos-partenaires")}
         </h2>
         <Carousel
@@ -115,7 +115,7 @@ const Partenaires = () => {
                 className="sm:basis-1/3 md:basis-1/4 lg:basis-1/5"
                 key={alt}
               >
-                <div className="w-full h-48 relative mx-auto">
+                <div className="relative mx-auto h-48 w-full">
                   <Image
                     src={logoUrl}
                     alt={alt}

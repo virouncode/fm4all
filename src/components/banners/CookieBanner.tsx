@@ -21,7 +21,7 @@ declare global {
       action: string,
       params?: {
         [key: string]: unknown;
-      }
+      },
     ) => void;
   }
 }
@@ -79,9 +79,9 @@ const CookieBanner = () => {
             {t("banniere-de-consentement-aux-cookies")}
           </SheetTitle>
         </SheetHeader>
-        <div className="flex flex-col gap-6 justify-between text-sm px-6 lg:px-40 py-4 items-center md:flex-row">
+        <div className="flex flex-col items-center justify-between gap-6 px-6 py-4 text-sm md:flex-row lg:px-40">
           <div className="flex flex-col gap-2">
-            <div className="w-[100px] h-[40px] relative">
+            <div className="relative h-[40px] w-[100px]">
               <Image
                 src={"/img/logo_full.webp"}
                 alt={`logo-de-fm4all`}
@@ -93,12 +93,12 @@ const CookieBanner = () => {
             <div>
               <p>
                 {t(
-                  "nous-utilisons-des-cookies-et-des-technologies-similaires-necessaires-au-fonctionnement-de-notre-site-web"
+                  "nous-utilisons-des-cookies-et-des-technologies-similaires-necessaires-au-fonctionnement-de-notre-site-web",
                 )}
               </p>
               <p>
                 {t(
-                  "nous-utilisons-egalement-des-cookies-d-analyse-de-fonctionnalite-pour-analyser-le-traffic-de-notre-site"
+                  "nous-utilisons-egalement-des-cookies-d-analyse-de-fonctionnalite-pour-analyser-le-traffic-de-notre-site",
                 )}
               </p>
             </div>
@@ -107,14 +107,14 @@ const CookieBanner = () => {
               <span>{t("pour-en-savoir-plus-veuillez-consulter-notre")} </span>
               <Link
                 href="/cookies"
-                className="underline cursor-pointer hover:opacity-80"
+                className="cursor-pointer underline hover:opacity-80"
                 target="_blank"
               >
                 {t("politique-relative-aux-cookies")}
               </Link>
             </div>
           </div>
-          <div className="flex flex-col gap-2 w-full md:w-72">
+          <div className="flex w-full flex-col gap-2 md:w-72">
             <Button
               variant="destructive"
               title={t("jaccepte")}

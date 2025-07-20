@@ -8,7 +8,7 @@ export default function useScrollIntoService() {
   useEffect(() => {
     if (isTabletOrMobile) return;
     const currentService = document.getElementById(
-      services.currentServiceId.toString()
+      services.currentServiceId.toString(),
     );
     if (currentService) {
       currentService.scrollIntoView({ behavior: "smooth", block: "nearest" });

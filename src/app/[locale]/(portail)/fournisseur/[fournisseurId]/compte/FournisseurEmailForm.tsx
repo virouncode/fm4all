@@ -52,7 +52,7 @@ const FournisseurEmailForm = ({
         nomContact: "Nom du contact obligatoire",
         emailContact: "Email du contact invalide",
         phoneContact: "Numéro de téléphone obligatoire",
-      })
+      }),
     ),
     defaultValues,
   });
@@ -92,7 +92,7 @@ const FournisseurEmailForm = ({
         description:
           error?.serverError ||
           tAuth(
-            "une-erreur-est-survenue-lors-de-la-mise-a-jour-du-fournisseur"
+            "une-erreur-est-survenue-lors-de-la-mise-a-jour-du-fournisseur",
           ),
       });
     },
@@ -109,12 +109,12 @@ const FournisseurEmailForm = ({
     setLoading(false);
   };
   return (
-    <Card className="rounded-md h-[60%] w-full sm:w-3/4 lg:w-2/3 mx-auto">
+    <Card className="mx-auto h-[60%] w-full rounded-md sm:w-3/4 lg:w-2/3">
       <CardHeader>
         <CardTitle className="text-lg md:text-xl">
           <p>Email</p>
         </CardTitle>
-        <CardDescription className="text-sm md:text-base  italic">
+        <CardDescription className="text-sm italic md:text-base">
           👉 Changez votre email (Attention : le nouvel email sera utilisé pour
           vos futures connexions)
         </CardDescription>
@@ -122,7 +122,7 @@ const FournisseurEmailForm = ({
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(submitForm)} className="grid gap-2">
-            <div className="flex flex-col md:grid md:grid-cols-2 gap-2 md:gap-6">
+            <div className="flex flex-col gap-2 md:grid md:grid-cols-2 md:gap-6">
               <InputWithLabel<UpdateFournisseurFormType>
                 fieldTitle="Email*"
                 nameInSchema="emailContact"
@@ -133,7 +133,7 @@ const FournisseurEmailForm = ({
               variant="destructive"
               size="lg"
               title={tAdmin("mettre-a-jour")}
-              className="text-base w-full mt-6"
+              className="mt-6 w-full text-base"
               disabled={isUpdatingFournisseur || loading}
             >
               {isUpdatingFournisseur || loading ? (

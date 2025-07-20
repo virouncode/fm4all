@@ -5,6 +5,6 @@ export const getFm4AllColor = (gamme: GammeType | null) => {
   return gamme === "essentiel"
     ? "fm4allessential"
     : gamme === "confort"
-    ? "fm4allcomfort"
-    : "fm4allexcellence";
+      ? "fm4allcomfort"
+      : "fm4allexcellence";
 };

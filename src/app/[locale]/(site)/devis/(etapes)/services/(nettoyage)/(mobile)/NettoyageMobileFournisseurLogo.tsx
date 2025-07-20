@@ -40,22 +40,22 @@ const NettoyageMobileFournisseurLogo = ({
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="flex w-full h-auto p-2 shadow rounded-xl"
+          className="flex h-auto w-full rounded-xl p-2 shadow"
           asChild
           title="Infos sur le fournisseur"
         >
-          <div className="flex items-center justify-between w-full">
+          <div className="flex w-full items-center justify-between">
             <div className="flex flex-1 items-center gap-2">
               <p className="text-sm font-bold text-foreground">
                 {nomFournisseur}
               </p>
               {logoUrl ? (
-                <div className="flex-1 h-10 relative">
+                <div className="relative h-10 flex-1">
                   <Image
                     src={logoUrl}
                     alt={`logo-de-${nomFournisseur}`}
                     fill={true}
-                    className="object-contain object-left cursor-pointer"
+                    className="cursor-pointer object-contain object-left"
                     quality={100}
                   />
                 </div>
@@ -70,7 +70,7 @@ const NettoyageMobileFournisseurLogo = ({
           </div>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
+      <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
         <DialogHeader>
           <DialogTitle>{nomFournisseur}</DialogTitle>
         </DialogHeader>

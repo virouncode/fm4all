@@ -35,7 +35,7 @@ export default function VitrerieTarifsUpdateForm({
 
   const lastUpdate = format(
     initialTarifs.updatedAt,
-    locale === "fr" ? "dd/MM/yyyy à HH:mm" : "yyyy/MM/dd at hh:mm a"
+    locale === "fr" ? "dd/MM/yyyy à HH:mm" : "yyyy/MM/dd at hh:mm a",
   );
 
   const defaultValues: UpdateVitrerieTarifsType = initialTarifs;
@@ -49,7 +49,7 @@ export default function VitrerieTarifsUpdateForm({
         minFacturation: "Le minimum de facturation doit être supérieur à 0",
         fraisDeplacement:
           "Les frais de déplacement doivent être supérieurs à 0",
-      })
+      }),
     ),
     defaultValues,
   });
@@ -84,7 +84,7 @@ export default function VitrerieTarifsUpdateForm({
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement>,
-    field: keyof SelectVitrerieTarifFournisseurType
+    field: keyof SelectVitrerieTarifFournisseurType,
   ) => {
     const inputValue = e.target.value;
     const value = inputValue ? parseFloat(inputValue) : 0;
@@ -117,13 +117,13 @@ export default function VitrerieTarifsUpdateForm({
 
   const isFieldModified = (fieldName: string) => {
     return modifiedFields.has(
-      fieldName as keyof SelectVitrerieTarifFournisseurType
+      fieldName as keyof SelectVitrerieTarifFournisseurType,
     );
   };
 
   if (!initialTarifs) {
     return (
-      <div className="text-center p-8">
+      <div className="p-8 text-center">
         Aucun tarif trouvé. Veuillez contacter l&apos;administrateur pour
         configurer vos tarifs.
       </div>
@@ -132,11 +132,11 @@ export default function VitrerieTarifsUpdateForm({
 
   return (
     <>
-      <div className="flex justify-between mt-14 mb-2 item-center">
+      <div className="item-center mb-2 mt-14 flex justify-between">
         <div className="border-l border-l-gray-500">
           <h2 className="ml-4 text-xl font-bold">{title}</h2>
         </div>
-        <p className="text-sm italic text-end">
+        <p className="text-end text-sm italic">
           Dernière mise à jour : {lastUpdate}
         </p>
       </div>
@@ -146,10 +146,10 @@ export default function VitrerieTarifsUpdateForm({
           onSubmit={form.handleSubmit(submitForm)}
         >
           {/* Bouton de sauvegarde et indicateur de modifications */}
-          <div className="flex justify-between items-center flex-col gap-4 md:flex-row md:gap-0">
+          <div className="flex flex-col items-center justify-between gap-4 md:flex-row md:gap-0">
             <div>
               {hasUnsavedChanges ? (
-                <div className="text-sm text-amber-600 font-medium">
+                <div className="text-sm font-medium text-amber-600">
                   Vous avez des modifications non sauvegardées
                 </div>
               ) : (
@@ -189,7 +189,7 @@ export default function VitrerieTarifsUpdateForm({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6 border rounded-md">
+          <div className="grid grid-cols-1 gap-6 rounded-md border p-6 md:grid-cols-2 lg:grid-cols-3">
             <InputWithLabel<UpdateVitrerieTarifsType>
               nameInSchema="cadenceVitres"
               fieldTitle="Cadence vitres intérieures (m2/h)*"

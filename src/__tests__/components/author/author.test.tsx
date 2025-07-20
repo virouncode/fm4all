@@ -27,7 +27,7 @@ describe("Author", () => {
         .setLocale(locale)
         .toLocaleString(DateTime.DATETIME_SHORT);
       expect(screen.getByText(new RegExp(expectedDate))).toBeInTheDocument();
-    }
+    },
   );
 
   it("doesn't render date if date is not provided", () => {
@@ -44,7 +44,7 @@ describe("Author", () => {
         {...baseProps}
         portraitUrl="/avatar.jpg"
         portraitAlt="Portrait de Jean"
-      />
+      />,
     );
     const img = screen.getByAltText("Portrait de Jean");
     expect(img).toBeInTheDocument();

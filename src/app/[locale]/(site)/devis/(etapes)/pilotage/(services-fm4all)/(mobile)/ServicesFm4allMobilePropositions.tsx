@@ -85,20 +85,20 @@ const ServicesFm4allMobilePropositions = ({
             ? 1
             : servicesFm4All.infos.gammeSelected === "excellence"
               ? 2
-              : 0
+              : 0,
       );
     }
   }, [api, servicesFm4All.infos.gammeSelected]);
 
   return (
-    <div className="flex flex-col gap-6 w-full">
-      <p className="font-bold text-xl -mb-4">{tFm4all("services-fm4all")}</p>
+    <div className="flex w-full flex-col gap-6">
+      <p className="-mb-4 text-xl font-bold">{tFm4all("services-fm4all")}</p>
       <Carousel
         opts={{
           align: "start",
           loop: true,
         }}
-        className="w-full relative"
+        className="relative w-full"
         setApi={setApi}
       >
         <CarouselContent>
@@ -113,9 +113,9 @@ const ServicesFm4allMobilePropositions = ({
         </CarouselContent>
         <CarouselGammesDots currentIndex={currentIndex} />
       </Carousel>
-      <p className="text-xs text-end italic px-1">
+      <p className="px-1 text-end text-xs italic">
         {tFm4all(
-          "u00b9remise-de-0-5-a-partir-dun-chiffre-daffaires-de-26-000eur-ht-an-u00b2remise-de-0-5-pour-le-choix-dun-office-manager"
+          "u00b9remise-de-0-5-a-partir-dun-chiffre-daffaires-de-26-000eur-ht-an-u00b2remise-de-0-5-pour-le-choix-dun-office-manager",
         )}
       </p>
     </div>

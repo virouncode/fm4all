@@ -23,7 +23,7 @@ const ArticlesCategorieCarousel = async ({
   const locale = await getLocale();
   const articles = await getArticlesOfCategorie(
     locale as LocaleType,
-    categorie.slug?.current ?? ""
+    categorie.slug?.current ?? "",
   );
   return (
     <Carousel
@@ -56,9 +56,9 @@ const ArticlesCategorieCarousel = async ({
                 }}
                 linkText={article.linkText ?? articleSubSlug}
               >
-                <div className="p-4 flex flex-col gap-4 h-56">
+                <div className="flex h-56 flex-col gap-4 p-4">
                   <p className="text-2xl">{article.titre}</p>
-                  <p className="w-full overflow-hidden line-clamp-5 text-sm">
+                  <p className="line-clamp-5 w-full overflow-hidden text-sm">
                     {article.description}
                   </p>
                 </div>
@@ -67,8 +67,8 @@ const ArticlesCategorieCarousel = async ({
           ) : null;
         })}
       </CarouselContent>
-      <CarouselPrevious className="right-12 -top-9 translate-y-0 left-auto" />
-      <CarouselNext className="right-0 -top-9 translate-y-0" />
+      <CarouselPrevious className="-top-9 left-auto right-12 translate-y-0" />
+      <CarouselNext className="-top-9 right-0 translate-y-0" />
     </Carousel>
   );
 };

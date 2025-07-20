@@ -32,7 +32,7 @@ const SnacksFruitsMobileInputs = ({
 
   return (
     <div className="flex flex-col gap-8">
-      <p className="font-bold text-xl hyphens-auto">
+      <p className="hyphens-auto text-xl font-bold">
         {tSnacks("fruits-snacks-et-boissons")}
       </p>
       <div className="flex flex-col gap-4">
@@ -41,13 +41,13 @@ const SnacksFruitsMobileInputs = ({
           <strong>{tSnacks("produits-que-vous-souhaitez-recevoir")}</strong>{" "}
           {tSnacks("dans-votre-panier-hebdomadaire")}
         </p>
-        <div className="flex flex-col w-full p-1 gap-2">
-          <div className="flex gap-4 ">
+        <div className="flex w-full flex-col gap-2 p-1">
+          <div className="flex gap-4">
             <div className="flex items-center gap-2">
               <Checkbox
                 checked={snacksFruits.infos.choix.includes("fruits")}
                 onCheckedChange={() => handleCheck("fruits")}
-                className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+                className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
                 id="fruits"
                 aria-label={tSnacks("selectionner-fruits")}
               />
@@ -59,7 +59,7 @@ const SnacksFruitsMobileInputs = ({
               <Checkbox
                 checked={snacksFruits.infos.choix.includes("snacks")}
                 onCheckedChange={() => handleCheck("snacks")}
-                className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+                className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
                 id="snacks"
                 aria-label={tSnacks("selectionner-snacks")}
               />
@@ -71,7 +71,7 @@ const SnacksFruitsMobileInputs = ({
               <Checkbox
                 checked={snacksFruits.infos.choix.includes("boissons")}
                 onCheckedChange={() => handleCheck("boissons")}
-                className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+                className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
                 id="boissons"
                 aria-label={tSnacks("selectionner-boissons")}
               />
@@ -87,14 +87,14 @@ const SnacksFruitsMobileInputs = ({
           {t("indiquez-le")}{" "}
           <strong>{t("nombre-de-personnes").toLowerCase()}</strong> :
         </p>
-        <div className="flex flex-col w-full p-1 gap-2">
-          <Label htmlFor="nbPersonnesFood" className="text-sm flex-1">
+        <div className="flex w-full flex-col gap-2 p-1">
+          <Label htmlFor="nbPersonnesFood" className="flex-1 text-sm">
             {t("nombre-de-personnes")}
           </Label>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-2">
               <Input
-                className={`w-full max-w-xs min-w-20 ${
+                className={`w-full min-w-20 max-w-xs ${
                   snacksFruits.quantites.nbPersonnes === client.effectif
                     ? "text-fm4alldestructive"
                     : ""

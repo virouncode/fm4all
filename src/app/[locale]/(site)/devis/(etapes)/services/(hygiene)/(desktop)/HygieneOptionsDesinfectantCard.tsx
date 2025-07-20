@@ -48,11 +48,11 @@ type HygieneOptionsDesinfectantCardProps = {
       imageUrlParfum: string | null;
       imageUrlBalai: string | null;
       imageUrlPoubelle: string | null;
-    }
+    },
   ) => void;
   handleChangeDistribNbr: (
     e: ChangeEvent<HTMLInputElement>,
-    type: string
+    type: string,
   ) => void;
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
   propositions: {
@@ -96,11 +96,11 @@ const HygieneOptionsDesinfectantCard = ({
   const locale = useLocale();
   const { hygiene } = useContext(HygieneContext);
   return (
-    <div className="flex border-b flex-1">
-      <div className="flex w-1/4 items-center justify-center flex-col gap-2 p-2">
+    <div className="flex flex-1 border-b">
+      <div className="flex w-1/4 flex-col items-center justify-center gap-2 p-2">
         <p className="text-base">{tHygiene("desinfectant-pour-cuvettes")}</p>
-        <div className="text-sm flex flex-col gap-2">
-          <div className="flex gap-4 items-center justify-center w-full">
+        <div className="flex flex-col gap-2 text-sm">
+          <div className="flex w-full items-center justify-center gap-4">
             <Input
               type="number"
               value={nbDistribDesinfectant || ""}
@@ -128,7 +128,7 @@ const HygieneOptionsDesinfectantCard = ({
         if (!proposition.totalDesinfectant) {
           return (
             <div
-              className={`flex flex-1 bg-${color} text-slate-200 items-center p-2 justify-center text-xl gap-4 `}
+              className={`flex flex-1 bg-${color} items-center justify-center gap-4 p-2 text-xl text-slate-200`}
               key={"desinfectant" + gamme}
             >
               {t("non-propose")}
@@ -137,7 +137,7 @@ const HygieneOptionsDesinfectantCard = ({
         }
         const prixMensuelDesinfectantText = (
           <p
-            className="font-bold text-xl ml-4"
+            className="ml-4 text-xl font-bold"
             data-testid="total-mensuel-desinfectant"
           >
             {formatNumber((proposition.totalDesinfectant * MARGE) / 12)}{" "}
@@ -154,7 +154,7 @@ const HygieneOptionsDesinfectantCard = ({
           </p>
         );
         const imgProduit = proposition.imageUrlDesinfectant ? (
-          <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-100">
+          <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
             <Image
               src={proposition.imageUrlDesinfectant}
               alt="illustration-distributeur-desinfectant"
@@ -165,7 +165,7 @@ const HygieneOptionsDesinfectantCard = ({
           </div>
         ) : null;
         const infosProduit = (
-          <ul className="flex flex-col text-xs px-4 mx-auto">
+          <ul className="mx-auto flex flex-col px-4 text-xs">
             {locale === "fr" ? (
               <li className="list-check">
                 {tHygiene("distributeurs")}{" "}
@@ -202,7 +202,7 @@ const HygieneOptionsDesinfectantCard = ({
         );
 
         const infosProduitDialog = (
-          <ul className="flex flex-col text-sm px-4 mx-auto">
+          <ul className="mx-auto flex flex-col px-4 text-sm">
             {locale === "fr" ? (
               <li className="list-check">
                 {tHygiene("distributeurs")}{" "}
@@ -240,7 +240,7 @@ const HygieneOptionsDesinfectantCard = ({
 
         return (
           <div
-            className={`flex flex-1 bg-${color} text-slate-200 items-center p-2 justify-center text-xl gap-4 cursor-pointer ${
+            className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-2 text-xl text-slate-200 ${
               hygiene.infos.desinfectantGammeSelected === gamme
                 ? "ring-4 ring-inset ring-fm4alldestructive"
                 : ""
@@ -258,7 +258,7 @@ const HygieneOptionsDesinfectantCard = ({
               data-testid="desinfectant-switch"
             />
             <div>
-              <div className="flex gap-2 items-center">
+              <div className="flex items-center gap-2">
                 {prixMensuelDesinfectantText}
                 <Dialog>
                   <DialogTrigger asChild>
@@ -273,7 +273,7 @@ const HygieneOptionsDesinfectantCard = ({
                       <DialogTitle>{dialogTitle}</DialogTitle>
                     </DialogHeader>
                     {imgProduit}
-                    <p className="text-xs italic text-end">
+                    <p className="text-end text-xs italic">
                       {t("photo-non-contractuelle")}
                     </p>
                     {infosProduitDialog}

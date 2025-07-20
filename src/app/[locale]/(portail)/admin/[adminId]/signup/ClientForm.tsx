@@ -64,7 +64,7 @@ const ClientForm = ({ clients }: ClientFormProps) => {
         description:
           error?.serverError ||
           tAuth(
-            "une-erreur-est-survenue-lors-de-la-creation-du-compte-utilisateur"
+            "une-erreur-est-survenue-lors-de-la-creation-du-compte-utilisateur",
           ),
       });
     },
@@ -84,7 +84,7 @@ const ClientForm = ({ clients }: ClientFormProps) => {
     <form onSubmit={form.handleSubmit(submitForm)}>
       {clients && clients.length > 0 && (
         <div className="flex flex-col gap-10">
-          <div className="flex gap-4 w-full items-center">
+          <div className="flex w-full items-center gap-4">
             <Label className="text-base" htmlFor="client">
               {tAdmin("creer-un-compte-client-pour")}
             </Label>
@@ -110,11 +110,11 @@ const ClientForm = ({ clients }: ClientFormProps) => {
           </div>
 
           <div className="flex flex-col gap-4">
-            <div className="flex gap-4 w-full items-center">
+            <div className="flex w-full items-center gap-4">
               <Label className="text-base">{tAdmin("nom-du-contact")} :</Label>
               {client && <p>{client.nomContact}</p>}
             </div>
-            <div className="flex gap-4 w-full items-center">
+            <div className="flex w-full items-center gap-4">
               <Label className="text-base">
                 {tAdmin("email-du-contact")} :
               </Label>
@@ -126,7 +126,7 @@ const ClientForm = ({ clients }: ClientFormProps) => {
             variant="destructive"
             size="lg"
             title={tAdmin("creer-un-compte")}
-            className="text-base mt-6 w-full"
+            className="mt-6 w-full text-base"
             disabled={isSavingUser || !clientId}
           >
             {isSavingUser ? (

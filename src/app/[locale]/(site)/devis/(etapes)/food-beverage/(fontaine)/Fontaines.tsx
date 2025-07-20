@@ -77,13 +77,13 @@ const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
   const propositionsRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="4">
+    <div className="mx-auto flex h-full w-full flex-col gap-4 py-2" id="4">
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
           icon={Droplets}
           title={tFontaines("fontaines-a-eau")}
           description={tFontaines(
-            "eau-fraiche-ou-petillante-de-leau-pure-filtree-pour-tous-adaptees-a-votre-besoin-nos-fontaines-reseau-sont-a-poser-sur-pied-ou-sous-comptoir-la-gamme-determine-le-type-de-pose"
+            "eau-fraiche-ou-petillante-de-leau-pure-filtree-pour-tous-adaptees-a-votre-besoin-nos-fontaines-reseau-sont-a-poser-sur-pied-ou-sous-comptoir-la-gamme-determine-le-type-de-pose",
           )}
           propositionsRef={propositionsRef}
         />
@@ -92,7 +92,7 @@ const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
           icon={Droplets}
           title={tFontaines("fontaines-a-eau")}
           description={tFontaines(
-            "eau-fraiche-ou-petillante-de-leau-pure-filtree-pour-tous-adaptees-a-votre-besoin-nos-fontaines-reseau-sont-a-poser-sur-pied-ou-sous-comptoir-la-gamme-determine-le-type-de-pose"
+            "eau-fraiche-ou-petillante-de-leau-pure-filtree-pour-tous-adaptees-a-votre-besoin-nos-fontaines-reseau-sont-a-poser-sur-pied-ou-sous-comptoir-la-gamme-determine-le-type-de-pose",
           )}
           handleClickPrevious={handleClickPrevious}
         />

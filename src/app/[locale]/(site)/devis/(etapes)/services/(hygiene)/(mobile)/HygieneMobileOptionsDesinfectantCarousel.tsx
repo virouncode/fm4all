@@ -62,7 +62,7 @@ type HygieneMobileOptionsDesinfectantCarouselProps = {
       imageUrlParfum: string | null;
       imageUrlBalai: string | null;
       imageUrlPoubelle: string | null;
-    }
+    },
   ) => void;
 };
 
@@ -93,7 +93,7 @@ const HygieneMobileOptionsDesinfectantCarousel = ({
           ? 0
           : hygiene.infos.desinfectantGammeSelected === "confort"
             ? 1
-            : 2
+            : 2,
       );
     }
   }, [
@@ -108,7 +108,7 @@ const HygieneMobileOptionsDesinfectantCarousel = ({
         align: "start",
         loop: true,
       }}
-      className="w-full relative"
+      className="relative w-full"
       setApi={setApi}
     >
       <CarouselContent>

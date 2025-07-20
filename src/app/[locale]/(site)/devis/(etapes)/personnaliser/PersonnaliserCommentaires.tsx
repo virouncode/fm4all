@@ -15,7 +15,7 @@ const PersonnaliserCommentaires = () => {
   const tPersonnaliser = useTranslations("DevisPage.personnaliser");
   const { commentaires, setCommentaires } = useContext(CommentairesContext);
   const { personnalisation, setPersonnalisation } = useContext(
-    PersonnalisationContext
+    PersonnalisationContext,
   );
   const router = useRouter();
   const handleClickPrevious = () => {
@@ -57,7 +57,7 @@ const PersonnaliserCommentaires = () => {
   const propositionsRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="13">
+    <div className="mx-auto flex h-full w-full flex-col gap-4 py-2" id="13">
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
           title={tPersonnaliser("commentaires-remarques")}
@@ -74,7 +74,7 @@ const PersonnaliserCommentaires = () => {
         />
       )}
       <div
-        className="w-full flex-1 flex flex-col gap-6 px-2"
+        className="flex w-full flex-1 flex-col gap-6 px-2"
         ref={propositionsRef}
       >
         <p className="text-2xl">
@@ -86,7 +86,7 @@ const PersonnaliserCommentaires = () => {
         <Textarea
           id="commentaires-nettoyage"
           onChange={handleChange}
-          className="resize-none h-60 lg:flex-1"
+          className="h-60 resize-none lg:flex-1"
           value={commentaires ?? ""}
         />
       </div>

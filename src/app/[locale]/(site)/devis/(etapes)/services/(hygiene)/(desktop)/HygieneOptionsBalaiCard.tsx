@@ -48,11 +48,11 @@ type HygieneOptionsBalaiCardProps = {
       imageUrlParfum: string | null;
       imageUrlBalai: string | null;
       imageUrlPoubelle: string | null;
-    }
+    },
   ) => void;
   handleChangeDistribNbr: (
     e: ChangeEvent<HTMLInputElement>,
-    type: string
+    type: string,
   ) => void;
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
   propositions: {
@@ -96,11 +96,11 @@ const HygieneOptionsBalaiCard = ({
   const locale = useLocale();
   const { hygiene } = useContext(HygieneContext);
   return (
-    <div className="flex border-b flex-1">
-      <div className="flex w-1/4 items-center justify-center flex-col gap-2 p-2">
+    <div className="flex flex-1 border-b">
+      <div className="flex w-1/4 flex-col items-center justify-center gap-2 p-2">
         <p className="text-base">{tHygiene("balais-wc")}</p>
-        <div className="text-sm flex flex-col gap-2">
-          <div className="flex gap-4 items-center justify-center w-full">
+        <div className="flex flex-col gap-2 text-sm">
+          <div className="flex w-full items-center justify-center gap-4">
             <Input
               type="number"
               value={nbDistribBalai || ""}
@@ -128,7 +128,7 @@ const HygieneOptionsBalaiCard = ({
         if (!proposition.totalBalai) {
           return (
             <div
-              className={`flex flex-1 bg-${color} text-slate-200 items-center p-2 justify-center text-xl gap-4 `}
+              className={`flex flex-1 bg-${color} items-center justify-center gap-4 p-2 text-xl text-slate-200`}
               key={"balai" + gamme}
             >
               {t("non-propose")}
@@ -137,7 +137,7 @@ const HygieneOptionsBalaiCard = ({
         }
         const prixMensuelBalaiText = (
           <p
-            className="font-bold text-xl ml-4"
+            className="ml-4 text-xl font-bold"
             data-testid="total-mensuel-balai"
           >
             {formatNumber((proposition.totalBalai * MARGE) / 12)}{" "}
@@ -154,7 +154,7 @@ const HygieneOptionsBalaiCard = ({
           </p>
         );
         const imgProduit = proposition.imageUrlBalai ? (
-          <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-100">
+          <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
             <Image
               src={proposition.imageUrlBalai}
               alt="illustration-balai-wc"
@@ -165,7 +165,7 @@ const HygieneOptionsBalaiCard = ({
           </div>
         ) : null;
         const infosProduit = (
-          <ul className="flex flex-col text-xs px-4 mx-auto">
+          <ul className="mx-auto flex flex-col px-4 text-xs">
             {locale === "fr" ? (
               <li className="list-check">
                 {tHygiene("socle-et-manche")}{" "}
@@ -200,7 +200,7 @@ const HygieneOptionsBalaiCard = ({
           </ul>
         );
         const infosProduitDialog = (
-          <ul className="flex flex-col text-sm px-4 mx-auto">
+          <ul className="mx-auto flex flex-col px-4 text-sm">
             {locale === "fr" ? (
               <li className="list-check">
                 {tHygiene("socle-et-manche")}{" "}
@@ -237,7 +237,7 @@ const HygieneOptionsBalaiCard = ({
 
         return (
           <div
-            className={`flex flex-1 bg-${color} text-slate-200 items-center p-2 justify-center text-xl gap-4 cursor-pointer ${
+            className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-2 text-xl text-slate-200 ${
               hygiene.infos.balaiGammeSelected === gamme
                 ? "ring-4 ring-inset ring-fm4alldestructive"
                 : ""
@@ -255,7 +255,7 @@ const HygieneOptionsBalaiCard = ({
               data-testid="balai-switch"
             />
             <div>
-              <div className="flex gap-2 items-center">
+              <div className="flex items-center gap-2">
                 {prixMensuelBalaiText}
                 <Dialog>
                   <DialogTrigger asChild>
@@ -270,7 +270,7 @@ const HygieneOptionsBalaiCard = ({
                       <DialogTitle>{dialogTitle}</DialogTitle>
                     </DialogHeader>
                     {imgProduit}
-                    <p className="text-xs italic text-end">
+                    <p className="text-end text-xs italic">
                       {t("photo-non-contractuelle")}
                     </p>
                     {infosProduitDialog}

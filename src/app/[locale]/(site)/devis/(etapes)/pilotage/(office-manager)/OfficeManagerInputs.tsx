@@ -16,7 +16,7 @@ type OfficeManagerInputsProps = {
   demiJParSemaineEssentiel: number | null;
   handleChangeDemiJParSemaine: (
     value: number[],
-    demiTauxJournalier: number | null
+    demiTauxJournalier: number | null,
   ) => void;
   demiTjm: number | null;
   demiTjmPremium: number | null;
@@ -35,14 +35,14 @@ const OfficeManagerInputs = ({
   const tOfficeManager = useTranslations("DevisPage.pilotage.officeManager");
   const { officeManager } = useContext(OfficeManagerContext);
   const tooltipText = tOfficeManager(
-    "selectionnez-le-nombre-de-jour-qui-vous-convient-en-fonction-des-taches-a-realiser"
+    "selectionnez-le-nombre-de-jour-qui-vous-convient-en-fonction-des-taches-a-realiser",
   );
   return (
     <>
       <TooltipProvider delayDuration={0}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="flex gap-2 items-center flex-col w-full">
+            <div className="flex w-full flex-col items-center gap-2">
               <Slider
                 value={[
                   (officeManager.quantites.demiJParSemaine ||
@@ -52,7 +52,7 @@ const OfficeManagerInputs = ({
                 onValueChange={(value: number[]) =>
                   handleChangeDemiJParSemaine(
                     value,
-                    officeManager.infos.premium ? demiTjmPremium : demiTjm
+                    officeManager.infos.premium ? demiTjmPremium : demiTjm,
                   )
                 }
                 min={1}
@@ -60,7 +60,7 @@ const OfficeManagerInputs = ({
                 step={1}
                 title={tOfficeManager("nombre-de-demi-journees-par-semaine")}
               />
-              <Label htmlFor="demiJParSemaine" className="text-sm flex-1">
+              <Label htmlFor="demiJParSemaine" className="flex-1 text-sm">
                 {officeManager.quantites.demiJParSemaine ??
                   demiJParSemaineEssentiel}{" "}
                 {tOfficeManager("demi-journee-s-semaine")}
@@ -71,15 +71,15 @@ const OfficeManagerInputs = ({
         </Tooltip>
       </TooltipProvider>
 
-      <div className="flex gap-2 justify-center items-center">
+      <div className="flex items-center justify-center gap-2">
         <Checkbox
           id="premium"
-          className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+          className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
           checked={officeManager.infos.premium}
           onCheckedChange={handleCheckPremium}
           aria-label={tOfficeManager("selectionner-loption-premium")}
         />
-        <Label htmlFor="premium" className="text-sm flex-1">
+        <Label htmlFor="premium" className="flex-1 text-sm">
           {tOfficeManager("anglais-courant-ou-expertise-sup")}
         </Label>
       </div>
@@ -87,10 +87,10 @@ const OfficeManagerInputs = ({
         <RadioGroup
           onValueChange={handleChangeRemplace}
           value={officeManager.infos.remplace ? "remplace" : "non remplace"}
-          className="flex gap-4 flex-col items-center"
+          className="flex flex-col items-center gap-4"
           name="office_manager_remplacement"
         >
-          <div className="flex gap-2 items-center">
+          <div className="flex items-center gap-2">
             <RadioGroupItem
               value={"remplace"}
               title={tOfficeManager("remplace-pendant-conges")}
@@ -100,7 +100,7 @@ const OfficeManagerInputs = ({
               {tOfficeManager("remplace-pendant-conges")}
             </Label>
           </div>
-          <div className="flex gap-2 items-center">
+          <div className="flex items-center gap-2">
             <RadioGroupItem
               value={"non remplace"}
               title={tOfficeManager("non-remplace-pendant-conges")}

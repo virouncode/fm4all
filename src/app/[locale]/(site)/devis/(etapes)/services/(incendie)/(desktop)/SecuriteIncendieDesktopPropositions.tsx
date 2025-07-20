@@ -32,7 +32,7 @@ type SecuriteIncendieDesktopPropositionsProps = {
   nbTelBaes: number;
   handleChangeNbr: (
     e: React.ChangeEvent<HTMLInputElement>,
-    type: "extincteur" | "baes" | "telBaes"
+    type: "extincteur" | "baes" | "telBaes",
   ) => void;
   incendieQuantite: SelectIncendieQuantitesType;
   handleClickProposition: (proposition: {
@@ -70,11 +70,11 @@ const SecuriteIncendieDesktopPropositions = ({
 }: SecuriteIncendieDesktopPropositionsProps) => {
   const t = useTranslations("DevisPage");
   return (
-    <div className="h-full flex flex-col border rounded-xl overflow-auto">
+    <div className="flex h-full flex-col overflow-auto rounded-xl border">
       {propositions.length > 0 &&
         propositions.map((proposition) => (
-          <div className="flex border-b flex-1" key={proposition.id}>
-            <div className="flex w-1/4 items-center justify-between flex-col gap-10 p-4">
+          <div className="flex flex-1 border-b" key={proposition.id}>
+            <div className="flex w-1/4 flex-col items-center justify-between gap-10 p-4">
               <SecuriteIncendieFournisseurLogo {...proposition} />
               <SecuriteIncendieInputs
                 nbExtincteurs={nbExtincteurs}
@@ -83,9 +83,9 @@ const SecuriteIncendieDesktopPropositions = ({
                 handleChangeNbr={handleChangeNbr}
                 incendieQuantite={incendieQuantite}
               />
-              <p className="text-xs text-fm4alldestructive italic px-2 text-center">
+              <p className="px-2 text-center text-xs italic text-fm4alldestructive">
                 {t(
-                  "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer"
+                  "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
                 )}
               </p>
             </div>

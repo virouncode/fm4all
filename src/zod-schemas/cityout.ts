@@ -22,7 +22,7 @@ export const createCityOutSchema = (messages: {
       .string()
       .regex(
         /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{2,4}([-.\s]?\d{2,4}){2,3}$/,
-        messages.phoneContact
+        messages.phoneContact,
       ),
   });
 };

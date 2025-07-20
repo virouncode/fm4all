@@ -96,7 +96,7 @@ const FontaineMobileEspacePropositions = ({
 }: FontaineMobileEspacePropositionsProps) => {
   const t = useTranslations("DevisPage.foodBeverage.fontaines");
   return (
-    <div className="flex flex-col gap-6 w-full">
+    <div className="flex w-full flex-col gap-6">
       {formattedPropositions.map((propositions) => (
         <FontaineMobileEspacePropositionsCarousel
           propositions={propositions}
@@ -109,7 +109,7 @@ const FontaineMobileEspacePropositions = ({
       ))}
       {fontainesEspacesIds.slice(-1)[0] === espace.infos.espaceId &&
       espace.infos.poseSelected ? (
-        <div className="flex justify-center gap-4 items-center mt-2">
+        <div className="mt-2 flex items-center justify-center gap-4">
           <AddEspaceButton
             handleAddEspace={handleAddEspace}
             title={t("ajouter-un-espace-fontaine")}

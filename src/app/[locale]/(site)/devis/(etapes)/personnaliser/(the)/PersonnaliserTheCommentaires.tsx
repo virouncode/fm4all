@@ -11,12 +11,12 @@ import PropositionsTitle from "../../../PropositionsTitle";
 const PersonnaliserTheCommentaires = () => {
   const { the, setThe } = useContext(TheContext);
   const { personnalisation, setPersonnalisation } = useContext(
-    PersonnalisationContext
+    PersonnalisationContext,
   );
   const router = useRouter();
   const handleClickPrevious = () => {
     const currentIndex = personnalisation.personnalisationIds.indexOf(
-      personnalisation.currentPersonnalisationId as number
+      personnalisation.currentPersonnalisationId as number,
     );
     setPersonnalisation((prev) => ({
       ...prev,
@@ -26,7 +26,7 @@ const PersonnaliserTheCommentaires = () => {
   };
   const handleClickNext = () => {
     const currentIndex = personnalisation.personnalisationIds.indexOf(
-      personnalisation.currentPersonnalisationId as number
+      personnalisation.currentPersonnalisationId as number,
     );
     if (currentIndex + 1 === personnalisation.personnalisationIds.length) {
       setPersonnalisation((prev) => ({
@@ -54,14 +54,14 @@ const PersonnaliserTheCommentaires = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="9">
+    <div className="mx-auto flex h-full w-full flex-col gap-4 py-2" id="9">
       <PropositionsTitle
         title="Thés variés"
         description=""
         icon={Leaf}
         handleClickPrevious={handleClickPrevious}
       />
-      <div className="w-full flex-1 flex flex-col gap-6">
+      <div className="flex w-full flex-1 flex-col gap-6">
         <p className="text-2xl">Commentaires et remarques</p>
         <Label htmlFor="commentaires-the" className="text-base">
           Ajoutez des précisions pour le service de thés :
@@ -69,7 +69,7 @@ const PersonnaliserTheCommentaires = () => {
         <Textarea
           id="commentaires-the"
           onChange={handleChange}
-          className="resize-none flex-1"
+          className="flex-1 resize-none"
           value={the.infos.commentaires ?? ""}
         />
       </div>

@@ -36,11 +36,11 @@ const ExpertiseCarousel = ({
         services.length ? "services" : secteurs.length ? "secteurs" : "articles"
       }
     >
-      <TabsList className="my-20 md:my-10 bg-transparent flex flex-col items-start md:flex-row md:items-center">
+      <TabsList className="my-20 flex flex-col items-start bg-transparent md:my-10 md:flex-row md:items-center">
         {[...(services || [])].length > 0 ? (
           <TabsTrigger
             value="services"
-            className="text-lg border-none outline-none"
+            className="border-none text-lg outline-none"
           >
             | {t("services-associes")}
           </TabsTrigger>
@@ -86,9 +86,9 @@ const ExpertiseCarousel = ({
                     }}
                     linkText={service.linkText ?? serviceUrl}
                   >
-                    <div className="p-4 flex flex-col gap-4 h-56">
+                    <div className="flex h-56 flex-col gap-4 p-4">
                       <p className="text-2xl">{service.titre}</p>
-                      <p className="w-full overflow-hidden line-clamp-5">
+                      <p className="line-clamp-5 w-full overflow-hidden">
                         {service.description}
                       </p>
                     </div>
@@ -97,8 +97,8 @@ const ExpertiseCarousel = ({
               ) : null;
             })}
           </CarouselContent>
-          <CarouselPrevious className="right-12 -top-9 translate-y-0 left-auto" />
-          <CarouselNext className="right-0 -top-9 translate-y-0" />
+          <CarouselPrevious className="-top-9 left-auto right-12 translate-y-0" />
+          <CarouselNext className="-top-9 right-0 translate-y-0" />
         </Carousel>
       </TabsContent>
       <TabsContent value="secteurs">
@@ -131,9 +131,9 @@ const ExpertiseCarousel = ({
                     }}
                     linkText={secteur.linkText ?? secteurUrl}
                   >
-                    <div className="p-4 flex flex-col gap-4 h-56">
+                    <div className="flex h-56 flex-col gap-4 p-4">
                       <p className="text-2xl">{secteur.titre}</p>
-                      <p className="w-full overflow-hidden line-clamp-5">
+                      <p className="line-clamp-5 w-full overflow-hidden">
                         {secteur.description}
                       </p>
                     </div>
@@ -142,8 +142,8 @@ const ExpertiseCarousel = ({
               ) : null;
             })}
           </CarouselContent>
-          <CarouselPrevious className="right-12 -top-9 translate-y-0 left-auto" />
-          <CarouselNext className="right-0 -top-9 translate-y-0" />
+          <CarouselPrevious className="-top-9 left-auto right-12 translate-y-0" />
+          <CarouselNext className="-top-9 right-0 translate-y-0" />
         </Carousel>
       </TabsContent>
       <TabsContent value="articles">
@@ -179,9 +179,9 @@ const ExpertiseCarousel = ({
                     }}
                     linkText={article.linkText ?? articleSubSlug}
                   >
-                    <div className="p-4 flex flex-col gap-4 h-56">
+                    <div className="flex h-56 flex-col gap-4 p-4">
                       <p className="text-2xl">{article.titre}</p>
-                      <p className="w-full overflow-hidden line-clamp-5">
+                      <p className="line-clamp-5 w-full overflow-hidden">
                         {article.description}
                       </p>
                     </div>
@@ -190,8 +190,8 @@ const ExpertiseCarousel = ({
               ) : null;
             })}
           </CarouselContent>
-          <CarouselPrevious className="right-12 -top-9 translate-y-0 left-auto" />
-          <CarouselNext className="right-0 -top-9 translate-y-0" />
+          <CarouselPrevious className="-top-9 left-auto right-12 translate-y-0" />
+          <CarouselNext className="-top-9 right-0 translate-y-0" />
         </Carousel>
       </TabsContent>
     </Tabs>

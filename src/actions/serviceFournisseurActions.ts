@@ -32,14 +32,14 @@ export const insertServiceFournisseurAction = actionClient
         throw new Error(
           locale === "fr"
             ? "Vous devez être connecté pour mettre à jour vos services."
-            : "You must be logged in to update your services."
+            : "You must be logged in to update your services.",
         );
       }
       if (fournisseurId !== serviceFournisseurInput.fournisseurId) {
         throw new Error(
           locale === "fr"
             ? "Vous n'avez pas les droits pour mettre à jour ce compte fournisseur."
-            : "You do not have permission to update this provider account."
+            : "You do not have permission to update this provider account.",
         );
       }
       const result = await db
@@ -50,7 +50,7 @@ export const insertServiceFournisseurAction = actionClient
         throw new Error(
           locale === "fr"
             ? "Impossible d'enregistrer le nouveau service."
-            : "Unable to save your new service"
+            : "Unable to save your new service",
         );
       }
       invalidateCacheTag(getFournisseurTag("services", fournisseurId));
@@ -59,5 +59,5 @@ export const insertServiceFournisseurAction = actionClient
         message: locale === "fr" ? "Service ajouté" : "Service added",
         data: { client: result[0] },
       };
-    }
+    },
   );

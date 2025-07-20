@@ -53,7 +53,7 @@ describe("LocaleButton", () => {
           effectif: "20",
         },
       },
-      { locale: "en" }
+      { locale: "en" },
     );
   });
 
@@ -79,7 +79,7 @@ describe("LocaleButton", () => {
         },
         query: {},
       },
-      { locale: "en" }
+      { locale: "en" },
     );
   });
 
@@ -105,7 +105,7 @@ describe("LocaleButton", () => {
         },
         query: {},
       },
-      { locale: "en" }
+      { locale: "en" },
     );
   });
 
@@ -133,7 +133,7 @@ describe("LocaleButton", () => {
         },
         query: {},
       },
-      { locale: "en" }
+      { locale: "en" },
     );
   });
 
@@ -158,7 +158,7 @@ describe("LocaleButton", () => {
         params: { slug: "nettoyage" },
         query: {},
       },
-      { locale: "fr" }
+      { locale: "fr" },
     );
   });
 
@@ -185,7 +185,7 @@ describe("LocaleButton", () => {
         params: { slug: "gestion-services-facility-bureaux-paris" },
         query: {},
       },
-      { locale: "fr" }
+      { locale: "fr" },
     );
   });
 
@@ -212,7 +212,7 @@ describe("LocaleButton", () => {
         params: { slug: "pilotage-facility-management" },
         query: {},
       },
-      { locale: "fr" }
+      { locale: "fr" },
     );
   });
 
@@ -243,7 +243,7 @@ describe("LocaleButton", () => {
         },
         query: {},
       },
-      { locale: "fr" }
+      { locale: "fr" },
     );
   });
 

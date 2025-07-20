@@ -37,7 +37,7 @@ export const insertFournisseurAction = actionClient
         throw new Error(
           locale === "fr"
             ? "Vous n'avez pas les droits pour créer un compte fournisseur."
-            : "You do not have permission to create a provider account."
+            : "You do not have permission to create a provider account.",
         );
       }
       const fournisseurToPost: InsertFournisseurType = {
@@ -52,7 +52,7 @@ export const insertFournisseurAction = actionClient
         .select({ id: fournisseurs.id })
         .from(fournisseurs)
         .where(
-          and(eq(fournisseurs.emailContact, fournisseurToPost.emailContact))
+          and(eq(fournisseurs.emailContact, fournisseurToPost.emailContact)),
         )
         .limit(1);
 
@@ -60,7 +60,7 @@ export const insertFournisseurAction = actionClient
         throw new Error(
           locale === "fr"
             ? "Cette email est déjà utilisé par un compte utilisateur."
-            : "This email is already used by a user account"
+            : "This email is already used by a user account",
         );
       }
       const resultFournisseur = await db
@@ -72,7 +72,7 @@ export const insertFournisseurAction = actionClient
         throw new Error(
           locale === "fr"
             ? "Impossible de créer le compte fournisseur."
-            : "Unable to create the provider account"
+            : "Unable to create the provider account",
         );
       }
       const tempPassword = generatePassword();
@@ -106,7 +106,7 @@ export const insertFournisseurAction = actionClient
             : `${fournisseurToPost.nomFournisseur}'s provider account has been successfully created. A verification email has been sent to ${fournisseurToPost.emailContact}`,
         data: { fournisseurId: resultFournisseur[0]?.id },
       };
-    }
+    },
   );
 
 export const updateFournisseurAction = actionClient
@@ -127,14 +127,14 @@ export const updateFournisseurAction = actionClient
         throw new Error(
           locale === "fr"
             ? "Vous devez être connecté pour mettre à jour vote compte fournisseur."
-            : "You must be logged in to update your provider account."
+            : "You must be logged in to update your provider account.",
         );
       }
       if (currentUser?.fournisseurId !== fournisseurInput.id) {
         throw new Error(
           locale === "fr"
             ? "Vous n'avez pas les droits pour mettre à jour ce compte fournisseur."
-            : "You do not have permission to update this provider account."
+            : "You do not have permission to update this provider account.",
         );
       }
 
@@ -152,7 +152,7 @@ export const updateFournisseurAction = actionClient
         throw new Error(
           locale === "fr"
             ? "Impossible de mettre à jour le profil fournisseur."
-            : "Unable to update the provider profile"
+            : "Unable to update the provider profile",
         );
       }
 
@@ -166,7 +166,7 @@ export const updateFournisseurAction = actionClient
         throw new Error(
           locale === "fr"
             ? "Impossible de créer mettre à jour le profil fournisseur."
-            : "Unable to update the provider profile"
+            : "Unable to update the provider profile",
         );
       }
       //mettre à jour l'avatar du fournisseur
@@ -192,5 +192,5 @@ export const updateFournisseurAction = actionClient
             : "Your profile has been successfully updated.",
         data: { fournisseur: resultFournisseur[0] },
       };
-    }
+    },
   );

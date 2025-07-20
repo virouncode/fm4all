@@ -52,8 +52,8 @@ const ServicesFm4allDesktopPropositions = ({
   total,
 }: ServicesFm4allDesktopPropositionsProps) => {
   return (
-    <div className="h-full flex flex-col border rounded-xl overflow-auto">
-      <div className="flex border-b flex-1">
+    <div className="flex h-full flex-col overflow-auto rounded-xl border">
+      <div className="flex flex-1 border-b">
         <ServicesFm4AllFournisseurLogo />
         {formattedPropositions.map((proposition) => (
           <ServicesFm4AllPropositionCard

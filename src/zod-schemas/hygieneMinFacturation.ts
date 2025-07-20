@@ -4,7 +4,7 @@ import { createSelectSchema, createUpdateSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const selectHygieneMinFacturationSchema = createSelectSchema(
-  hygieneMinFacturation
+  hygieneMinFacturation,
 );
 
 export const updateHygieneMinFacturationSchema = createUpdateSchema(
@@ -15,14 +15,14 @@ export const updateHygieneMinFacturationSchema = createUpdateSchema(
         (val) => (val === "" ? 0 : Number((Number(val) * RATIO).toFixed(0))),
         schema.refine(
           (val) => val > 0,
-          "Le minimum de facturation doit être supérieur à 0"
-        )
+          "Le minimum de facturation doit être supérieur à 0",
+        ),
       ),
-  }
+  },
 );
 
 export const updateHygieneMinFacturationServerSchema = createUpdateSchema(
-  hygieneMinFacturation
+  hygieneMinFacturation,
 );
 
 export type SelectHygieneMinFacturationType =

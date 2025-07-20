@@ -18,8 +18,8 @@ const CDCHygiene = () => {
         <Table className="border-collapse">
           <TableHeader className="sticky top-0 z-20 bg-white">
             <TableRow className="bg-white">
-              <TableCell className="p-0 sticky left-0 z-10" colSpan={2}>
-                <div className="bg-fm4allsecondary text-white text-center p-4">
+              <TableCell className="sticky left-0 z-10 p-0" colSpan={2}>
+                <div className="bg-fm4allsecondary p-4 text-center text-white">
                   <h1 className="text-xl">Cahier des charges - Hygiene</h1>
                   <p>Finition des distributeurs</p>
                 </div>
@@ -29,8 +29,7 @@ const CDCHygiene = () => {
           <TableBody>
             <TableRow>
               <TableCell
-                className={`w-80 sticky left-0 z-10
- text-right text-white font-bold bg-${getFm4AllColor("essentiel")}`}
+                className={`sticky left-0 z-10 w-80 text-right font-bold text-white bg-${getFm4AllColor("essentiel")}`}
               >
                 Essentiel
               </TableCell>
@@ -38,8 +37,7 @@ const CDCHygiene = () => {
             </TableRow>
             <TableRow>
               <TableCell
-                className={`w-80 sticky left-0 z-10
- text-right text-white font-bold bg-${getFm4AllColor("confort")}`}
+                className={`sticky left-0 z-10 w-80 text-right font-bold text-white bg-${getFm4AllColor("confort")}`}
               >
                 Confort
               </TableCell>
@@ -47,8 +45,7 @@ const CDCHygiene = () => {
             </TableRow>
             <TableRow>
               <TableCell
-                className={`w-80 sticky left-0 z-10
- text-right text-white font-bold bg-${getFm4AllColor("excellence")}`}
+                className={`sticky left-0 z-10 w-80 text-right font-bold text-white bg-${getFm4AllColor("excellence")}`}
               >
                 Excellence
               </TableCell>

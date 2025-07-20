@@ -148,7 +148,7 @@ const NettoyageDesktopOptionsPropositions = ({
   color,
 }: NettoyageOptionsPropositionsProps) => {
   return (
-    <div className="h-full flex-col border rounded-xl overflow-auto hidden lg:flex">
+    <div className="hidden h-full flex-col overflow-auto rounded-xl border lg:flex">
       <NettoyageOptionsRepasseCard
         repasseProposition={repasseProposition}
         handleClickRepasseProposition={handleClickRepasseProposition}

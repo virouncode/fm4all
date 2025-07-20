@@ -124,7 +124,7 @@ const FontaineMobileEspacePropositionsCarousel = ({
           ? 0
           : espace.infos.poseSelected === "colonne"
             ? 1
-            : 2
+            : 2,
       );
     }
   }, [
@@ -140,7 +140,7 @@ const FontaineMobileEspacePropositionsCarousel = ({
         align: "start",
         loop: true,
       }}
-      className="w-full relative"
+      className="relative w-full"
       setApi={setApi}
     >
       <CarouselContent>

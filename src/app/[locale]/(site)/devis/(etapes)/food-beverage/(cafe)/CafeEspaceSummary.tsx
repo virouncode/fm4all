@@ -6,7 +6,7 @@ type CafeEspaceSummaryProps = {
 
 const CafeEspaceSummary = ({ espace }: CafeEspaceSummaryProps) => {
   return (
-    <p className="font-bold text-center mb-4">
+    <p className="mb-4 text-center font-bold">
       Espace café n°{espace.infos.espaceId}
       {espace.infos.gammeCafeSelected && (
         <span className="font-normal">

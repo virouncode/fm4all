@@ -37,7 +37,7 @@ const AdminForm = () => {
         prenom: tAdmin("prenom-obligatoire"),
         nom: tAdmin("nom-obligatoire"),
         image: tAdmin("image-invalide"),
-      })
+      }),
     ),
     defaultValues,
   });
@@ -104,7 +104,7 @@ const AdminForm = () => {
       {/* <DisplayServerActionResponse result={resultSaveAdmin} /> */}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(submitForm)} className="grid gap-2">
-          <div className="grid md:grid-cols-2 gap-2 md:gap-6">
+          <div className="grid gap-2 md:grid-cols-2 md:gap-6">
             <InputWithLabel<InsertAdminType>
               fieldTitle="Email*"
               nameInSchema="email"
@@ -117,10 +117,10 @@ const AdminForm = () => {
               >
                 Avatar
               </Label>
-              <div className="flex items-end gap-4 relative">
+              <div className="relative flex items-end gap-4">
                 {imagePreview ? (
-                  <div className="flex items-center gap-4 w-full justify-center absolute -top-20 md:-top-6">
-                    <div className="relative rounded-full w-20 h-20 overflow-hidden">
+                  <div className="absolute -top-20 flex w-full items-center justify-center gap-4 md:-top-6">
+                    <div className="relative h-20 w-20 overflow-hidden rounded-full">
                       <Image
                         src={imagePreview}
                         alt="avatar preview"
@@ -137,20 +137,20 @@ const AdminForm = () => {
                     />
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2 w-full">
+                  <div className="flex w-full items-center gap-2">
                     <Input
                       id="image"
                       type="file"
                       accept="image/*"
                       onChange={handleImageChange}
-                      className="className={`w-full max-w-xs disabled:text-blue-500 dark:disabled:text-yellow-300 disabled:opacity-75 mb-6"
+                      className="className={`w-full mb-6 max-w-xs disabled:text-blue-500 disabled:opacity-75 dark:disabled:text-yellow-300"
                     />
                   </div>
                 )}
               </div>
             </div>
           </div>
-          <div className="grid md:grid-cols-2 gap-2 md:gap-6">
+          <div className="grid gap-2 md:grid-cols-2 md:gap-6">
             <InputWithLabel<InsertAdminType>
               fieldTitle={tAdmin("prenom")}
               nameInSchema="prenom"
@@ -164,7 +164,7 @@ const AdminForm = () => {
             variant="destructive"
             size="lg"
             title={tAdmin("creer-un-compte")}
-            className="text-base w-full mt-6"
+            className="mt-6 w-full text-base"
             disabled={isSavingAdmin}
           >
             {isSavingAdmin ? (

@@ -53,44 +53,44 @@ const SnacksFruitsForm = ({
   const updateSnacksFruits = (newNbPersonnes: number) => {
     if (snacksFruits.infos.gammeSelected && snacksFruits.infos.fournisseurId) {
       const fruitsTarifsPourNbPersonnes = fruitsTarifs.filter(
-        (item) => item.effectif === roundEffectif(newNbPersonnes)
+        (item) => item.effectif === roundEffectif(newNbPersonnes),
       );
       const snacksTarifsPourNbPersonnes = snacksTarifs.filter(
-        (item) => item.effectif === roundEffectif(newNbPersonnes)
+        (item) => item.effectif === roundEffectif(newNbPersonnes),
       );
       const boissonsTarifsPourNbPersonnes = boissonsTarifs.filter(
-        (item) => item.effectif === roundEffectif(newNbPersonnes)
+        (item) => item.effectif === roundEffectif(newNbPersonnes),
       );
       const gFruitsParSemaineParPersonne =
         fruitsQuantites.find(
-          (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected
+          (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected,
         )?.gParSemaineParPersonne ?? null;
       const minKgFruitsParSemaine =
         fruitsQuantites.find(
-          (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected
+          (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected,
         )?.minKgParSemaine ?? null;
       const portionsSnacksParSemaineParPersonne =
         snacksQuantites.find(
-          (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected
+          (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected,
         )?.portionsParSemaineParPersonne ?? null;
       const minPortionsSnacksParSemaine =
         snacksQuantites.find(
-          (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected
+          (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected,
         )?.minPortionsParSemaine ?? null;
       const consosBoissonsParSemaineParPersonne =
         boissonsQuantites.find(
-          (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected
+          (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected,
         )?.consosParSemaineParPersonne ?? null;
       const minConsosBoissonsParSemaine =
         boissonsQuantites.find(
-          (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected
+          (quantite) => quantite.gamme === snacksFruits.infos.gammeSelected,
         )?.minConsosParSemaine ?? null;
 
       const fruitsKgParSemaine =
         gFruitsParSemaineParPersonne !== null && minKgFruitsParSemaine !== null
           ? Math.max(
               (gFruitsParSemaineParPersonne * newNbPersonnes) / 1000,
-              minKgFruitsParSemaine
+              minKgFruitsParSemaine,
             )
           : null;
       const snacksPortionsParSemaine =
@@ -98,7 +98,7 @@ const SnacksFruitsForm = ({
         minPortionsSnacksParSemaine !== null
           ? Math.max(
               portionsSnacksParSemaineParPersonne * newNbPersonnes,
-              minPortionsSnacksParSemaine
+              minPortionsSnacksParSemaine,
             )
           : null;
       const boissonsConsosParSemaine =
@@ -106,7 +106,7 @@ const SnacksFruitsForm = ({
         minConsosBoissonsParSemaine !== null
           ? Math.max(
               consosBoissonsParSemaineParPersonne * newNbPersonnes,
-              minConsosBoissonsParSemaine
+              minConsosBoissonsParSemaine,
             )
           : null;
       const isSameFournisseur =
@@ -117,20 +117,20 @@ const SnacksFruitsForm = ({
         fruitsTarifsPourNbPersonnes.find(
           (tarif) =>
             tarif.gamme === snacksFruits.infos.gammeSelected &&
-            tarif.fournisseurId === snacksFruits.infos.fournisseurId
+            tarif.fournisseurId === snacksFruits.infos.fournisseurId,
         )?.prixKg ?? null;
 
       const prixUnitaireSnacks =
         snacksTarifsPourNbPersonnes.find(
           (tarif) =>
             tarif.gamme === snacksFruits.infos.gammeSelected &&
-            tarif.fournisseurId === snacksFruits.infos.fournisseurId
+            tarif.fournisseurId === snacksFruits.infos.fournisseurId,
         )?.prixUnitaire ?? null;
       const prixUnitaireBoissons =
         boissonsTarifsPourNbPersonnes.find(
           (tarif) =>
             tarif.gamme === snacksFruits.infos.gammeSelected &&
-            tarif.fournisseurId === snacksFruits.infos.fournisseurId
+            tarif.fournisseurId === snacksFruits.infos.fournisseurId,
         )?.prixUnitaire ?? null;
       const panierFruits =
         snacksFruits.infos.choix.includes("fruits") &&
@@ -157,7 +157,7 @@ const SnacksFruitsForm = ({
       //Prix livraison / panier
       const fraisLivraisonsFournisseur = foodLivraisonTarifs.find(
         ({ fournisseurId }) =>
-          fournisseurId === snacksFruits.infos.fournisseurId
+          fournisseurId === snacksFruits.infos.fournisseurId,
       );
       const remiseSiCafe = isSameFournisseur
         ? (fraisLivraisonsFournisseur?.remiseSiCafe ?? 0)
@@ -259,7 +259,7 @@ const SnacksFruitsForm = ({
       toast({
         title: t("limite-atteinte"),
         description: t(
-          "nous-ne-proposons-pas-de-livraisons-pour-plus-de-300-personnes"
+          "nous-ne-proposons-pas-de-livraisons-pour-plus-de-300-personnes",
         ),
         duration: 7000,
       });
@@ -321,7 +321,7 @@ const SnacksFruitsForm = ({
       const totalBoissons = 52 * panierBoissons;
 
       const fraisLivraisonsFournisseur = foodLivraisonTarifs.find(
-        (tarif) => tarif.fournisseurId === snacksFruits.infos.fournisseurId
+        (tarif) => tarif.fournisseurId === snacksFruits.infos.fournisseurId,
       );
       const isSameFournisseur =
         snacksFruits.infos.fournisseurId === cafe.infos.fournisseurId;

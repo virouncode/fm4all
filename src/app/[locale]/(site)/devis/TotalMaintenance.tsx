@@ -24,13 +24,13 @@ const TotalMaintenance = () => {
   const color = getFm4AllColor(maintenance.infos.gammeSelected);
 
   return (
-    <div className="flex flex-col gap-4 total-section" id="total-maintenance">
+    <div className="total-section flex flex-col gap-4" id="total-maintenance">
       <div className="flex flex-col gap-4">
         <div>
           {tMaintenance("maintenance-multi-technique")} (
           {maintenance.infos.nomFournisseur})
         </div>
-        <div className="flex flex-col ml-4 text-xs ">
+        <div className="ml-4 flex flex-col text-xs">
           {totalService ? (
             <div
               className={`flex items-center justify-between text-${color} font-bold`}
@@ -108,7 +108,7 @@ const TotalMaintenance = () => {
               </div>
             </>
           ) : null}
-          <div className="flex items-center justify-between border-t border-foreground mt-2">
+          <div className="mt-2 flex items-center justify-between border-t border-foreground">
             <p>TOTAL</p>
             <p className="text-end" data-testid="total-maintenance">
               {formatNumber(Math.round(total * MARGE))} {t("eur-ht-an")}

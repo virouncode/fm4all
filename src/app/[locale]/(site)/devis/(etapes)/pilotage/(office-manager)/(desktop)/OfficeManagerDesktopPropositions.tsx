@@ -19,7 +19,7 @@ type OfficeManagerDesktopPropositionsProps = {
   demiJParSemaineExcellence: number | null;
   handleChangeDemiJParSemaine: (
     value: number[],
-    demiTauxJournalier: number | null
+    demiTauxJournalier: number | null,
   ) => void;
   handleChangeRemplace: (value: string) => void;
   handleCheckPremium: (checked: boolean) => void;
@@ -47,14 +47,14 @@ const OfficeManagerDesktopPropositions = ({
   handleClickProposition,
 }: OfficeManagerDesktopPropositionsProps) => {
   return (
-    <div className="h-full flex flex-col border rounded-xl overflow-auto">
+    <div className="flex h-full flex-col overflow-auto rounded-xl border">
       {propositions.length > 0
         ? propositions.map((proposition) => (
             <div
-              className="flex border-b flex-1"
+              className="flex flex-1 border-b"
               key={proposition.fournisseurId}
             >
-              <div className="flex w-1/4 items-center justify-center flex-col gap-6 p-4">
+              <div className="flex w-1/4 flex-col items-center justify-center gap-6 p-4">
                 <OfficeManagerFournisseurLogo {...proposition} />
                 <OfficeManagerInputs
                   demiJParSemaineEssentiel={demiJParSemaineEssentiel}

@@ -9,10 +9,10 @@ type HygieneDesktopPropositionsProps = {
   hygieneDistribTarifs: SelectHygieneDistribTarifsType[];
   handleChangeDistribNbr: (
     e: React.ChangeEvent<HTMLInputElement>,
-    type: string
+    type: string,
   ) => void;
   handleChangeDureeLocation: (
-    value: "oneShot" | "pa12M" | "pa24M" | "pa36M"
+    value: "oneShot" | "pa12M" | "pa24M" | "pa36M",
   ) => void;
   nbDistribEmp: number;
   nbDistribSavon: number;
@@ -87,9 +87,9 @@ const HygieneDesktopPropositions = ({
   propositions,
 }: HygieneDesktopPropositionsProps) => {
   return (
-    <div className="h-full flex flex-col border rounded-xl overflow-auto">
-      <div className="flex border-b flex-1">
-        <div className="flex w-1/4 items-center justify-center flex-col p-4">
+    <div className="flex h-full flex-col overflow-auto rounded-xl border">
+      <div className="flex flex-1 border-b">
+        <div className="flex w-1/4 flex-col items-center justify-center p-4">
           <HygieneFournisseurLogo {...propositions[0]} />
           <HygieneDistribQuantitesInputs
             hygieneDistribQuantite={hygieneDistribQuantite}

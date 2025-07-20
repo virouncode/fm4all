@@ -58,12 +58,12 @@ const NettoyageMobileOptionsSamediCard = ({
   const { nettoyage } = useContext(NettoyageContext);
   const { gammeSelected: gamme, nomFournisseur } = nettoyage.infos;
   const samediPrixMensuelText = samediProposition.prixAnnuel ? (
-    <p className="text-sm font-bold text-end">
+    <p className="text-end text-sm font-bold">
       {formatNumber((samediProposition?.prixAnnuel * MARGE) / 12)}{" "}
       {t("euros-mois")}
     </p>
   ) : (
-    <p className="text-xs font-bold text-end">{t("non-propose")}</p>
+    <p className="text-end text-xs font-bold">{t("non-propose")}</p>
   );
   const dialogTitle = (
     <p className={`text-${color} text-center`}>
@@ -81,7 +81,7 @@ const NettoyageMobileOptionsSamediCard = ({
     </li>
   );
   const infosProduit = (
-    <ul className="flex flex-col text-xs px-4 w-2/3">
+    <ul className="flex w-2/3 flex-col px-4 text-xs">
       <li className="list-check">
         {tNettoyage("ajoute-une-journee-a-la-frequence-de-nettoyage")}
       </li>
@@ -89,7 +89,7 @@ const NettoyageMobileOptionsSamediCard = ({
     </ul>
   );
   const infosProduitDialog = (
-    <ul className="flex flex-col text-sm px-4 mx-auto">
+    <ul className="mx-auto flex flex-col px-4 text-sm">
       <li className="list-check">
         {tNettoyage("ajoute-une-journee-a-la-frequence-de-nettoyage")}
       </li>
@@ -98,23 +98,23 @@ const NettoyageMobileOptionsSamediCard = ({
   );
 
   const imgProduit = (
-    <div className="w-1/3 h-full relative rounded-xl overflow-hidden bg-slate-100">
+    <div className="relative h-full w-1/3 overflow-hidden rounded-xl bg-slate-100">
       <Image
         src={"/img/services/nettoyage.webp"}
         alt={`illustration de nettoyage`}
         fill={true}
-        className="object-contain cursor-pointer"
+        className="cursor-pointer object-contain"
         quality={100}
       />
     </div>
   );
   const imgProduitDialog = (
-    <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+    <div className="relative h-60 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-200">
       <Image
         src={"/img/services/nettoyage.webp"}
         alt={`illustration de nettoyage`}
         fill={true}
-        className="object-contain object-center cursor-pointer"
+        className="cursor-pointer object-contain object-center"
         quality={100}
       />
     </div>
@@ -122,51 +122,51 @@ const NettoyageMobileOptionsSamediCard = ({
 
   return (
     <div className="flex flex-col gap-1">
-      <p className="font-bold text-xl">
+      <p className="text-xl font-bold">
         {tNettoyage("nettoyage-supplementaire-tous-les-samedis")}
       </p>
       <div
-        className={`bg-${color} flex flex-col h-64 border border-slate-200 rounded-xl p-4 text-white  ${
+        className={`bg-${color} flex h-64 flex-col rounded-xl border border-slate-200 p-4 text-white ${
           nettoyage.infos.samediSelected
             ? "ring-4 ring-inset ring-fm4alldestructive"
             : ""
         }`}
       >
-        <div className="flex items-center h-1/2 gap-2 border-b pb-2 border-slate-200">
+        <div className="flex h-1/2 items-center gap-2 border-b border-slate-200 pb-2">
           <Dialog>
             <DialogTrigger asChild>{imgProduit}</DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
+            <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
               <DialogHeader>
                 <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
               <div className="flex flex-col gap-4">
                 {imgProduitDialog}
-                <p className="text-xs italic text-end">
+                <p className="text-end text-xs italic">
                   {t("photo-non-contractuelle")}
                 </p>
                 {infosProduitDialog}
               </div>
             </DialogContent>
           </Dialog>
-          <div className="w-2/3 flex flex-col gap-1 h-full">
-            <p className="font-bold text-sm">{nomFournisseur}</p>
+          <div className="flex h-full w-2/3 flex-col gap-1">
+            <p className="text-sm font-bold">{nomFournisseur}</p>
             {samediProposition.prixAnnuel ? (
               <>
                 <Dialog>
                   <DialogTrigger asChild>
                     {nettoyage.infos.logoUrl ? (
-                      <div className="h-10 relative">
+                      <div className="relative h-10">
                         <Image
                           src={nettoyage.infos.logoUrl}
                           alt={`logo-de-${nettoyage.infos.nomFournisseur}`}
                           fill={true}
-                          className="object-contain object-left cursor-pointer"
+                          className="cursor-pointer object-contain object-left"
                           quality={100}
                         />
                       </div>
                     ) : null}
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
+                  <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
                     <DialogHeader>
                       <DialogTitle>{nomFournisseur}</DialogTitle>
                     </DialogHeader>
@@ -199,12 +199,12 @@ const NettoyageMobileOptionsSamediCard = ({
                 )}
               </>
             ) : nettoyage.infos.logoUrl ? (
-              <div className="h-10 relative">
+              <div className="relative h-10">
                 <Image
                   src={nettoyage.infos.logoUrl}
                   alt={`logo-de-${nettoyage.infos.nomFournisseur}`}
                   fill={true}
-                  className="object-contain object-left cursor-pointer"
+                  className="cursor-pointer object-contain object-left"
                   quality={100}
                 />
               </div>
@@ -212,11 +212,11 @@ const NettoyageMobileOptionsSamediCard = ({
           </div>
         </div>
         <div
-          className="flex h-1/2 pt-2 justify-between gap-6"
+          className="flex h-1/2 justify-between gap-6 pt-2"
           onClick={() => handleClickSamediProposition(samediProposition)}
         >
           {infosProduit}
-          <div className="flex flex-col gap-2 items-end w-1/3">
+          <div className="flex w-1/3 flex-col items-end gap-2">
             {samediPrixMensuelText}
             {samediProposition.prixAnnuel ? (
               <Switch

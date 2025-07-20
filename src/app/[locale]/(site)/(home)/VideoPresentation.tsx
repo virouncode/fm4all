@@ -4,7 +4,7 @@ const VideoPresentation = () => {
   const locale = useLocale();
   return (
     <section className="flex items-center justify-center py-12">
-      <div className="w-5/6 md:w-2/3 max-w-7xl mx-auto h-[200px] sm:h-[400px] md:h-[600px] border rounded-xl overflow-hidden">
+      <div className="mx-auto h-[200px] w-5/6 max-w-7xl overflow-hidden rounded-xl border sm:h-[400px] md:h-[600px] md:w-2/3">
         <iframe
           width="100%"
           height="100%"

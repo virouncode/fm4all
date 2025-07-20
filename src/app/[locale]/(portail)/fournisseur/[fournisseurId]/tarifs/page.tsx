@@ -11,12 +11,12 @@ const page = async ({
   const { fournisseurId } = await params;
   const services = await getServicesForFournisseur(parseInt(fournisseurId));
   return (
-    <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-6 hyphens-auto flex-1">
+    <main className="mx-auto mb-24 max-w-7xl flex-1 hyphens-auto px-6 py-4 md:px-6">
       <section className="mt-2">
-        <h1 className="text-4xl mb-10">Mes tarifs</h1>
+        <h1 className="mb-10 text-4xl">Mes tarifs</h1>
         <div className="flex flex-col gap-14">
           <div className="flex flex-col gap-2 px-10">
-            <div className="flex justify-between items-center mb-10">
+            <div className="mb-10 flex items-center justify-between">
               <h2 className="text-2xl">Mes services</h2>
               <Link
                 href={{
@@ -36,7 +36,7 @@ const page = async ({
             {services && services.length > 0 && (
               <>
                 <p className="mb-6 text-center">Accédez à vos DPGF : </p>
-                <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 items-center justify-center">
+                <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] items-center justify-center gap-6">
                   {services.map((service) => (
                     <ServicePresentationCard
                       key={service.id}

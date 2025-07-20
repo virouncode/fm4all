@@ -18,7 +18,7 @@ import { useTranslations } from "next-intl";
 const MesServicesPresentationCards = () => {
   const t = useTranslations("DevisPage.services.presentation.cards");
   return (
-    <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 items-center">
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] items-center gap-6">
       <ServicePresentationCard
         icons={[<SprayCan key="service-nettoyage" />]}
         title={t("nettoyage-et-proprete")}

@@ -128,7 +128,7 @@ export function CalculatorDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild className="hidden md:block">
-        <div role="button" className="p-4 rounded-xl border border-slate-200">
+        <div role="button" className="rounded-xl border border-slate-200 p-4">
           <Calculator size={20} />
           <span className="sr-only">Calculatrice</span>
         </div>
@@ -146,14 +146,14 @@ export function CalculatorDialog() {
               className="h-8 w-8"
             >
               {copied ? (
-                <Check className="h-4 w-4 text-green-500" />
+                <Check className="size-4 text-green-500" />
               ) : (
-                <Copy className="h-4 w-4" />
+                <Copy className="size-4" />
               )}
               <span className="sr-only">Copier</span>
             </Button>
             <div
-              className="w-full text-right text-2xl overflow-hidden"
+              className="w-full overflow-hidden text-right text-2xl"
               style={{ textOverflow: "ellipsis", whiteSpace: "nowrap" }}
             >
               {display}

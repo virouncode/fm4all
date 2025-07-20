@@ -46,9 +46,9 @@ const UnauthorizedCard = ({ type }: UnauthorizedCardProps) => {
     }
   };
   return (
-    <Card className="max-w-md z-20">
+    <Card className="z-20 max-w-md">
       <CardHeader>
-        <CardTitle className="text-lg md:text-xl text-red-600">
+        <CardTitle className="text-lg text-red-600 md:text-xl">
           {locale === "fr" ? "Page non autorisée !" : "Unauthorized Page!"}
         </CardTitle>
         <CardDescription className="text-base">
@@ -68,7 +68,7 @@ const UnauthorizedCard = ({ type }: UnauthorizedCardProps) => {
       </CardHeader>
       <CardContent>
         <p
-          className="text-center underline cursor-pointer"
+          className="cursor-pointer text-center underline"
           onClick={handleSignOut}
         >
           {locale === "fr" ? "Me connecter" : "Sign in"}

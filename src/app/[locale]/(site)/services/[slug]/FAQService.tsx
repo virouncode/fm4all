@@ -63,32 +63,22 @@ const FAQService = ({ service, locale }: FAQServiceProps) => {
   }
 
   return (
-    <section className="mt-16 flex flex-col ">
-      <h2 className="text-2xl md:text-3xl border-l-2 px-4 mb-10">
+    <section className="mt-16 flex flex-col">
+      <h2 className="mb-10 border-l-2 px-4 text-2xl md:text-3xl">
         {locale === "fr"
           ? "Questions fréquemment posées"
           : "Frequently Asked Questions"}{" "}
         - {service.linkText}
       </h2>
 
-      <Accordion type="single" collapsible className="w-full lg:w-1/2 px-6">
+      <Accordion type="single" collapsible className="w-full px-6 lg:w-1/2">
         {faqItems.map((faq) => (
           <FAQItem
             key={faq.id}
             value={`item-${faq.id}`}
             question={faq.question}
           >
-            <div
-              className="flex-1 prose-base
-        prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl
-        prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
-        prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
-        prose-p:text-base prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
-        prose-ul:max-w-prose prose-ul:mx-auto prose-ul:text-base
-        prose-li:list-disc prose-li:m-0
-        prose-a:underline
-        "
-            >
+            <div className="prose-base flex-1 prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl prose-h3:ml-10 prose-h3:text-xl prose-h3:font-bold prose-h3:italic prose-h4:mx-auto prose-h4:my-8 prose-h4:text-center prose-p:mx-auto prose-p:max-w-prose prose-p:hyphens-auto prose-p:text-pretty prose-p:text-base prose-a:underline prose-ul:mx-auto prose-ul:max-w-prose prose-ul:text-base prose-li:m-0 prose-li:list-disc">
               <PortableText value={faq.answer} />
             </div>
           </FAQItem>

@@ -32,8 +32,8 @@ const TheMobileInputs = ({
         <strong>{t("nombre-de-personnes").toLowerCase()}</strong>{" "}
         {tThe("consommant-du-the").toLowerCase()}{" "}
       </p>
-      <div className="flex flex-col w-full p-1 gap-2">
-        <Label htmlFor="nbDistribEmp" className="text-sm flex-1">
+      <div className="flex w-full flex-col gap-2 p-1">
+        <Label htmlFor="nbDistribEmp" className="flex-1 text-sm">
           {t("nombre-de-personnes")}
         </Label>
         <div className="flex items-center gap-2">
@@ -69,7 +69,7 @@ const TheMobileInputs = ({
         </div>
         <p className="text-xs italic text-fm4alldestructive">
           {tThe(
-            "les-quantites-sont-estimees-pour-vous-environ-15-de-votre-effectif-mais-vous-pouvez-les-changer"
+            "les-quantites-sont-estimees-pour-vous-environ-15-de-votre-effectif-mais-vous-pouvez-les-changer",
           )}
         </p>
       </div>

@@ -56,7 +56,7 @@ const SnacksFruits = ({
   const propositionsRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="3">
+    <div className="mx-auto flex h-full w-full flex-col gap-4 py-2" id="3">
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
           icon={Cookie}
@@ -64,7 +64,7 @@ const SnacksFruits = ({
           icon3={CupSoda}
           title="Snacks & Fruits"
           description={tSnacks(
-            "fruits-locaux-bio-eco-responsables-snacks-sains-et-gourmands-boissons-fraiches-chaque-semaine-faites-varier-les-plaisirs-dans-un-panier-qui-ravira-vos-equipes-la-gamme-determine-les-quantites-par-personne-par-semaine"
+            "fruits-locaux-bio-eco-responsables-snacks-sains-et-gourmands-boissons-fraiches-chaque-semaine-faites-varier-les-plaisirs-dans-un-panier-qui-ravira-vos-equipes-la-gamme-determine-les-quantites-par-personne-par-semaine",
           )}
           propositionsRef={propositionsRef}
         />
@@ -75,14 +75,14 @@ const SnacksFruits = ({
           icon3={CupSoda}
           title="Snacks & Fruits"
           description={tSnacks(
-            "fruits-locaux-bio-eco-responsables-snacks-sains-et-gourmands-boissons-fraiches-chaque-semaine-faites-varier-les-plaisirs-dans-un-panier-qui-ravira-vos-equipes-la-gamme-determine-les-quantites-par-personne-par-semaine"
+            "fruits-locaux-bio-eco-responsables-snacks-sains-et-gourmands-boissons-fraiches-chaque-semaine-faites-varier-les-plaisirs-dans-un-panier-qui-ravira-vos-equipes-la-gamme-determine-les-quantites-par-personne-par-semaine",
           )}
           handleClickPrevious={handleClickPrevious}
         />
       )}
 
       <div
-        className="w-full flex-1 flex flex-col overflow-auto transition gap-4"
+        className="flex w-full flex-1 flex-col gap-4 overflow-auto transition"
         ref={propositionsRef}
       >
         <SnacksFruitsForm
@@ -108,7 +108,7 @@ const SnacksFruits = ({
         <PropositionsFooter
           handleClickNext={handleClickNext}
           comment={tSnacks(
-            "ce-fournisseur-vous-propose-une-reduction-de-8-car-vous-lavez-choisi-pour-le-cafe"
+            "ce-fournisseur-vous-propose-une-reduction-de-8-car-vous-lavez-choisi-pour-le-cafe",
           )}
         />
       ) : null}

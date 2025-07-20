@@ -36,13 +36,13 @@ const The = ({ theConsoTarifs }: TheProps) => {
   };
 
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="2">
+    <div className="mx-auto flex h-full w-full flex-col gap-4 py-2" id="2">
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
           title={tThe("thes-varies")}
           icon={Leaf}
           description={tThe(
-            "parce-que-tout-le-monde-ne-boit-pas-forcement-du-cafe-un-choix-de-thes-presentes-en-boites-et-coffrets-la-gamme-determine-la-qualite-du-the"
+            "parce-que-tout-le-monde-ne-boit-pas-forcement-du-cafe-un-choix-de-thes-presentes-en-boites-et-coffrets-la-gamme-determine-la-qualite-du-the",
           )}
           propositionsRef={propositionsRef}
         />
@@ -51,7 +51,7 @@ const The = ({ theConsoTarifs }: TheProps) => {
           title={tThe("thes-varies")}
           icon={Leaf}
           description={tThe(
-            "parce-que-tout-le-monde-ne-boit-pas-forcement-du-cafe-un-choix-de-thes-presentes-en-boites-et-coffrets-la-gamme-determine-la-qualite-du-the"
+            "parce-que-tout-le-monde-ne-boit-pas-forcement-du-cafe-un-choix-de-thes-presentes-en-boites-et-coffrets-la-gamme-determine-la-qualite-du-the",
           )}
           handleClickPrevious={handleClickPrevious}
         />
@@ -64,7 +64,7 @@ const The = ({ theConsoTarifs }: TheProps) => {
           <div className="flex h-full items-center justify-center text-base lg:text-lg">
             <p className="text-center text-fm4alldestructive">
               {tThe(
-                "veuillez-dabord-selectionner-une-offre-de-boissons-chaudes"
+                "veuillez-dabord-selectionner-une-offre-de-boissons-chaudes",
               )}
             </p>
           </div>

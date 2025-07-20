@@ -7,7 +7,7 @@ export const selectHygieneInstalDistribTarifsSchema = createSelectSchema(
     effectif: (schema) => schema.min(1, "L'effectif est obligatoire"),
     prixInstallation: (schema) =>
       schema.min(0, "Le prix d'installation est obligatoire"),
-  }
+  },
 );
 
 export const selectHygieneInstalDistribTarifsFournisseurSchema =

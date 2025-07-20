@@ -68,7 +68,7 @@ const CafeEspace = ({
         setThe,
         setTotalCafe,
         setTotalThe,
-        client
+        client,
       );
       return;
     }
@@ -80,12 +80,12 @@ const CafeEspace = ({
         currentEspaceId: cafeEspacesIds[indexOfCurrentEspace - 1],
       },
       espaces: prev.espaces.filter(
-        (item) => item.infos.espaceId !== espace.infos.espaceId
+        (item) => item.infos.espaceId !== espace.infos.espaceId,
       ),
     }));
     setTotalCafe((prev) => ({
       totalEspaces: prev.totalEspaces.filter(
-        (item) => item.espaceId !== espace.infos.espaceId
+        (item) => item.espaceId !== espace.infos.espaceId,
       ),
     }));
   };
@@ -105,11 +105,11 @@ const CafeEspace = ({
 
   return (
     <div
-      className="h-full flex flex-col overflow-hidden"
+      className="flex h-full flex-col overflow-hidden"
       id={`espace_${espace.infos.espaceId}`}
     >
       {/* <CafeEspaceSummary espace={espace} /> */}
-      <div className="w-full flex justify-between items-start py-1 overflow-hidden">
+      <div className="flex w-full items-start justify-between overflow-hidden py-1">
         <CafeEspaceForm
           espace={espace}
           cafeMachines={cafeMachines}
@@ -119,7 +119,7 @@ const CafeEspace = ({
           chocolatConsoTarifs={chocolatConsoTarifs}
           sucreConsoTarifs={sucreConsoTarifs}
         />
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center gap-2">
           {cafeEspacesIds[0] !== espace.infos.espaceId && (
             <PreviousEspaceButton
               handleClickPreviousEspace={handleClickPreviousEspace}

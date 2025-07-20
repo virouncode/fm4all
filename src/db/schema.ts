@@ -251,7 +251,7 @@ export const hygieneInstalDistribTarifs = pgTable(
     prixInstallation: integer("prix_installation").notNull(),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt,
-  }
+  },
 );
 
 export const hygieneConsoTarifs = pgTable("hygiene_conso_tarifs", {
@@ -559,7 +559,7 @@ export const fruitsTarifs = pgTable("fruits_tarifs", {
 export const snacksQuantites = pgTable("snacks_quantites", {
   id: serial().primaryKey(),
   portionsParSemaineParPersonne: integer(
-    "portions_par_semaine_par_personne"
+    "portions_par_semaine_par_personne",
   ).notNull(),
   minPortionsParSemaine: integer("min_portions_par_semaine").notNull(),
   gamme: gammeEnum().notNull(),
@@ -584,7 +584,7 @@ export const snacksTarifs = pgTable("snacks_tarifs", {
 export const boissonsQuantites = pgTable("boissons_quantites", {
   id: serial().primaryKey(),
   consosParSemaineParPersonne: integer(
-    "consos_par_semaine_par_personne"
+    "consos_par_semaine_par_personne",
   ).notNull(),
   gamme: gammeEnum().notNull(),
   minConsosParSemaine: integer("min_consos_par_semaine").notNull(),
@@ -694,7 +694,7 @@ export const servicesFm4AllTaux = pgTable("services_fm4all_taux", {
   minFacturationSupportOp: integer("min_facturation_support_op").notNull(),
   accountManager: integer("account_manager").notNull(),
   minFacturationAccountManager: integer(
-    "min_facturation_account_manager"
+    "min_facturation_account_manager",
   ).notNull(),
   remiseCaSeuil: integer("remise_ca_seuil").notNull(),
   remiseCa: integer("remise_ca").notNull(),
@@ -830,7 +830,7 @@ export const fournisseursRelations = relations(
     boissonsTarifs: many(boissonsTarifs),
     foodLivraisonTarifs: many(foodLivraisonTarifs),
     fontainesTarifs: many(fontainesTarifs),
-  })
+  }),
 );
 
 export const nettoyageTarifsRelations = relations(
@@ -840,7 +840,7 @@ export const nettoyageTarifsRelations = relations(
       fields: [nettoyageTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
-  })
+  }),
 );
 
 export const nettoyageRepasseTarifsRelations = relations(
@@ -850,7 +850,7 @@ export const nettoyageRepasseTarifsRelations = relations(
       fields: [nettoyageRepasseTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
-  })
+  }),
 );
 
 export const nettoyageVitrerieTarifsRelations = relations(
@@ -860,7 +860,7 @@ export const nettoyageVitrerieTarifsRelations = relations(
       fields: [nettoyageVitrerieTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
-  })
+  }),
 );
 
 export const hygieneDistribTarifsRelations = relations(
@@ -870,7 +870,7 @@ export const hygieneDistribTarifsRelations = relations(
       fields: [hygieneDistribTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
-  })
+  }),
 );
 
 export const hygieneMinFacturationRelations = relations(
@@ -880,7 +880,7 @@ export const hygieneMinFacturationRelations = relations(
       fields: [hygieneMinFacturation.fournisseurId],
       references: [fournisseurs.id],
     }),
-  })
+  }),
 );
 
 export const hygieneInstalDistribTarifsRelations = relations(
@@ -890,7 +890,7 @@ export const hygieneInstalDistribTarifsRelations = relations(
       fields: [hygieneInstalDistribTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
-  })
+  }),
 );
 
 export const hygieneConsoTarifsRelations = relations(
@@ -900,7 +900,7 @@ export const hygieneConsoTarifsRelations = relations(
       fields: [hygieneConsoTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
-  })
+  }),
 );
 
 export const incendieTarifsRelations = relations(incendieTarifs, ({ one }) => ({
@@ -917,7 +917,7 @@ export const exutoiresTarifsRelations = relations(
       fields: [exutoiresTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
-  })
+  }),
 );
 
 export const exutoiresParkingTarifsRelations = relations(
@@ -927,7 +927,7 @@ export const exutoiresParkingTarifsRelations = relations(
       fields: [exutoiresParkingTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
-  })
+  }),
 );
 
 export const alarmesTarifsRelations = relations(alarmesTarifs, ({ one }) => ({
@@ -944,7 +944,7 @@ export const portesCoupeFeuTarifsRelations = relations(
       fields: [portesCoupeFeuTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
-  })
+  }),
 );
 
 export const riaTarifsRelations = relations(riaTarifs, ({ one }) => ({
@@ -961,7 +961,7 @@ export const colonnesSechesTarifsRelations = relations(
       fields: [colonnesSechesTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
-  })
+  }),
 );
 
 export const maintenanceTarifsRelations = relations(
@@ -971,7 +971,7 @@ export const maintenanceTarifsRelations = relations(
       fields: [maintenanceTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
-  })
+  }),
 );
 
 export const legioTarifsRelations = relations(legioTarifs, ({ one }) => ({
@@ -995,7 +995,7 @@ export const qualiteAirTarifsRelations = relations(
       fields: [qualiteAirTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
-  })
+  }),
 );
 export const cafeMachinesRelations = relations(cafeMachines, ({ many }) => ({
   cafeMachinesTarif: many(cafeMachinesTarifs),
@@ -1009,7 +1009,7 @@ export const cafeMachinesTarifsRelations = relations(
       references: [fournisseurs.id],
     }),
     cafeMachine: one(cafeMachines),
-  })
+  }),
 );
 
 export const cafeConsoTarifsRelations = relations(
@@ -1019,7 +1019,7 @@ export const cafeConsoTarifsRelations = relations(
       fields: [cafeConsoTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
-  })
+  }),
 );
 
 export const theConsoTarifsRelations = relations(theConsoTarifs, ({ one }) => ({
@@ -1036,7 +1036,7 @@ export const laitConsoTarifsRelations = relations(
       fields: [laitConsoTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
-  })
+  }),
 );
 
 export const chocolatConsoTarifsRelations = relations(
@@ -1046,7 +1046,7 @@ export const chocolatConsoTarifsRelations = relations(
       fields: [chocolatConsoTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
-  })
+  }),
 );
 
 export const sucreConsoTarifsRelations = relations(
@@ -1056,7 +1056,7 @@ export const sucreConsoTarifsRelations = relations(
       fields: [sucreConsoTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
-  })
+  }),
 );
 
 export const fruitsTarifsRelations = relations(fruitsTarifs, ({ one }) => ({
@@ -1087,7 +1087,7 @@ export const foodLivraisonTarifsRelations = relations(
       fields: [foodLivraisonTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
-  })
+  }),
 );
 
 export const fontainesRelations = relations(fontaines, ({ many }) => ({
@@ -1102,7 +1102,7 @@ export const fontainesTarifsRelations = relations(
       references: [fournisseurs.id],
     }),
     fontaine: one(fontaines),
-  })
+  }),
 );
 
 export const officeManagerTarifsRelations = relations(
@@ -1112,7 +1112,7 @@ export const officeManagerTarifsRelations = relations(
       fields: [officeManagerTarifs.fournisseurId],
       references: [fournisseurs.id],
     }),
-  })
+  }),
 );
 
 export const devisRelations = relations(devis, ({ one }) => ({
@@ -1129,5 +1129,5 @@ export const devisTemporairesRelations = relations(
       fields: [devisTemporaires.clientId],
       references: [clients.id],
     }),
-  })
+  }),
 );

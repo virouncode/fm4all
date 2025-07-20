@@ -29,7 +29,7 @@ export const tagsSlugMappingsFrToEn: Record<string, string> = {
 // Fonction pour obtenir le slug français à partir du slug anglais
 export const getTagSlugFr = (tagSlugEn: string): string => {
   const entry = Object.entries(tagsSlugMappingsFrToEn).find(
-    ([_, value]) => value === tagSlugEn
+    ([_, value]) => value === tagSlugEn,
   );
   return entry ? entry[0] : tagSlugEn;
 };

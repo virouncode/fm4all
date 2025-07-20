@@ -31,8 +31,8 @@ export function CheckboxWithLabel<S>({
       control={form.control}
       name={nameInSchema}
       render={({ field }) => (
-        <FormItem className="w-full flex items-center gap-2">
-          <FormLabel className="text-base w-1/3 mt-2" htmlFor={nameInSchema}>
+        <FormItem className="flex w-full items-center gap-2">
+          <FormLabel className="mt-2 w-1/3 text-base" htmlFor={nameInSchema}>
             {fieldTitle}
           </FormLabel>
           <div className="flex items-center gap-2">

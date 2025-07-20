@@ -15,9 +15,9 @@ export const selectOfficeManagerQuantitesSchema = createSelectSchema(
     demiJParSemaine: (schema) =>
       schema.min(
         1,
-        "Le nombre de demi-journées par semaine doit être au moins de 1"
+        "Le nombre de demi-journées par semaine doit être au moins de 1",
       ),
-  }
+  },
 );
 
 export type SelectOfficeManagerQuantitesType =

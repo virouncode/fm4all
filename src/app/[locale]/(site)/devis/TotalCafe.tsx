@@ -19,24 +19,24 @@ const TotalCafe = () => {
 
   if (!total) return null;
   return (
-    <div className="flex flex-col gap-4 total-section" id="total-cafe">
+    <div className="total-section flex flex-col gap-4" id="total-cafe">
       <div className="flex flex-col gap-4">
         <div>
           {t("machines-a-cafe")} ({cafe.infos.nomFournisseur})
         </div>
-        <div className="flex flex-col ml-4 text-xs ">
+        <div className="ml-4 flex flex-col text-xs">
           {cafe.espaces
             .filter(
               (item) =>
                 totalCafe.totalEspaces.find(
-                  ({ espaceId }) => espaceId === item.infos.espaceId
-                )?.total ?? 0 > 0
+                  ({ espaceId }) => espaceId === item.infos.espaceId,
+                )?.total ?? 0 > 0,
             )
             .map((item) => (
               <div key={item.infos.espaceId} className="flex flex-col">
                 <div
                   className={`flex items-center justify-between text-${getFm4AllColor(
-                    item.infos.gammeCafeSelected
+                    item.infos.gammeCafeSelected,
                   )} font-bold`}
                 >
                   <p>
@@ -47,15 +47,15 @@ const TotalCafe = () => {
                     {formatNumber(
                       Math.round(
                         (totalCafe.totalEspaces.find(
-                          (total) => total.espaceId === item.infos.espaceId
-                        )?.total ?? 0) * MARGE
-                      )
+                          (total) => total.espaceId === item.infos.espaceId,
+                        )?.total ?? 0) * MARGE,
+                      ),
                     )}{" "}
                     {t("eur-ht-an")}
                   </p>
                 </div>
                 {totalCafe.totalEspaces.find(
-                  (total) => total.espaceId === item.infos.espaceId
+                  (total) => total.espaceId === item.infos.espaceId,
                 )?.totalInstallation ? (
                   <div className="flex items-center justify-between">
                     <p>{t("installation")}</p>
@@ -63,9 +63,9 @@ const TotalCafe = () => {
                       {formatNumber(
                         Math.round(
                           (totalCafe.totalEspaces.find(
-                            (total) => total.espaceId === item.infos.espaceId
-                          )?.totalInstallation ?? 0) * MARGE
-                        )
+                            (total) => total.espaceId === item.infos.espaceId,
+                          )?.totalInstallation ?? 0) * MARGE,
+                        ),
                       )}{" "}
                       {t("eur-ht")}
                     </p>
@@ -73,15 +73,15 @@ const TotalCafe = () => {
                 ) : null}
               </div>
             ))}
-          <div className="flex flex-col border-t border-foreground mt-2">
-            <div className="flex justify-between w-full">
+          <div className="mt-2 flex flex-col border-t border-foreground">
+            <div className="flex w-full justify-between">
               <p>TOTAL</p>
               <p className="text-end">
                 {formatNumber(Math.round(total * MARGE))} {t("eur-ht-an")}
               </p>
             </div>
             {totalInstallation ? (
-              <div className="flex justify-between w-full">
+              <div className="flex w-full justify-between">
                 <p>{t("total-installation")}</p>
                 <p className="text-end">
                   {formatNumber(Math.round(totalInstallation * MARGE))}{" "}

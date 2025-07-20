@@ -25,7 +25,7 @@ export const getFruitsQuantites = async () => {
     const results = await db.select().from(fruitsQuantites);
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectFruitsQuantitesSchema.parse(result)
+      selectFruitsQuantitesSchema.parse(result),
     );
     return validatedResults;
   } catch (err) {
@@ -53,7 +53,7 @@ export const getFruitsTarifs = async () => {
       .innerJoin(fournisseurs, eq(fruitsTarifs.fournisseurId, fournisseurs.id));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectFruitsTarifsSchema.parse(result)
+      selectFruitsTarifsSchema.parse(result),
     );
     return validatedResults.map((result) => ({
       ...result,
@@ -69,7 +69,7 @@ export const getSnacksQuantites = async () => {
     const results = await db.select().from(snacksQuantites);
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectSnacksQuantitesSchema.parse(result)
+      selectSnacksQuantitesSchema.parse(result),
     );
     return validatedResults;
   } catch (err) {
@@ -97,7 +97,7 @@ export const getSnacksTarifs = async () => {
       .innerJoin(fournisseurs, eq(snacksTarifs.fournisseurId, fournisseurs.id));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectSnacksTarifsSchema.parse(result)
+      selectSnacksTarifsSchema.parse(result),
     );
     return validatedResults.map((result) => ({
       ...result,
@@ -113,7 +113,7 @@ export const getBoissonsQuantites = async () => {
     const results = await db.select().from(boissonsQuantites);
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectBoissonsQuantitesSchema.parse(result)
+      selectBoissonsQuantitesSchema.parse(result),
     );
     return validatedResults;
   } catch (err) {
@@ -140,11 +140,11 @@ export const getBoissonsTarifs = async () => {
       .from(boissonsTarifs)
       .innerJoin(
         fournisseurs,
-        eq(boissonsTarifs.fournisseurId, fournisseurs.id)
+        eq(boissonsTarifs.fournisseurId, fournisseurs.id),
       );
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectBoissonsTarifsSchema.parse(result)
+      selectBoissonsTarifsSchema.parse(result),
     );
     return validatedResults.map((result) => ({
       ...result,
@@ -167,11 +167,11 @@ export const getFoodLivraisonTarifs = async () => {
       .from(foodLivraisonTarifs)
       .innerJoin(
         fournisseurs,
-        eq(fournisseurs.id, foodLivraisonTarifs.fournisseurId)
+        eq(fournisseurs.id, foodLivraisonTarifs.fournisseurId),
       );
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectFoodLivraisonTarifsSchema.parse(result)
+      selectFoodLivraisonTarifsSchema.parse(result),
     );
     return validatedResults.map((result) => ({
       ...result,

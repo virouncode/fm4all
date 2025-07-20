@@ -14,7 +14,7 @@ type HygieneMobileOptionsDesinfectantInputProps = {
   nbDistribDesinfectant: number;
   handleChangeDistribNbr: (
     e: React.ChangeEvent<HTMLInputElement>,
-    type: string
+    type: string,
   ) => void;
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
   hygieneDistribTarifsFournisseur: {
@@ -77,7 +77,7 @@ const HygieneMobileOptionsDesinfectantInput = ({
         hygieneDistribTarifsFournisseur.find(
           (tarif) =>
             tarif.type === "desinfectant" &&
-            tarif.gamme === hygiene.infos.desinfectantGammeSelected
+            tarif.gamme === hygiene.infos.desinfectantGammeSelected,
         )?.[hygiene.infos.dureeLocation] ?? null;
 
       const totalDesinfectant =
@@ -109,7 +109,7 @@ const HygieneMobileOptionsDesinfectantInput = ({
         hygieneDistribTarifsFournisseur.find(
           (tarif) =>
             tarif.type === "desinfectant" &&
-            tarif.gamme === hygiene.infos.desinfectantGammeSelected
+            tarif.gamme === hygiene.infos.desinfectantGammeSelected,
         )?.[hygiene.infos.dureeLocation] ?? null;
 
       const totalDesinfectant =
@@ -129,14 +129,14 @@ const HygieneMobileOptionsDesinfectantInput = ({
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="font-bold text-xl">
+      <p className="text-xl font-bold">
         {tHygiene("desinfectant-pour-cuvettes")}
       </p>
       <p>
         {t("indiquez-le-nombre-de")}{" "}
         <strong>{tHygiene("distributeurs-de-desinfectant")}</strong> :{" "}
       </p>
-      <div className="flex flex-col w-full p-1 gap-2">
+      <div className="flex w-full flex-col gap-2 p-1">
         <Label htmlFor="nbDistribDesinfectant" className="text-sm">
           {tHygiene("nombre-de-distributeurs")}
         </Label>
@@ -176,7 +176,7 @@ const HygieneMobileOptionsDesinfectantInput = ({
 
         <p className="text-xs italic text-fm4alldestructive">
           {t(
-            "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer"
+            "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
           )}
         </p>
       </div>

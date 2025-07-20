@@ -11,7 +11,7 @@ import DetailThe from "./DetailThe";
 
 const DevisDetails = () => {
   return (
-    <div className="flex flex-col gap-4 w-[1360px] mx-auto absolute -translate-x-[3000px]">
+    <div className="absolute mx-auto flex w-[1360px] -translate-x-[3000px] flex-col gap-4">
       {/* <DetailInfos /> */}
       <DetailNettoyage />
       <DetailHygiene />

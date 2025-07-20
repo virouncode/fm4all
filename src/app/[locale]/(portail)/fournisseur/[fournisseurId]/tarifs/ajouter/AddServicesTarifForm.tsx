@@ -61,7 +61,7 @@ const AddServicesTarifForm = ({
 
   return (
     <div className="flex flex-col gap-20">
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 items-center">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] items-center gap-6">
         {servicesMapping
           .filter(({ nom }) => !fournisseurServices?.includes(nom))
           .map((service) => (
@@ -72,7 +72,7 @@ const AddServicesTarifForm = ({
               onClick={() => handleAddService(service.id)}
               className={
                 selectedServicesIds.includes(service.id)
-                  ? "cursor-pointer border-fm4allsecondary text-fm4allsecondary border-2"
+                  ? "cursor-pointer border-2 border-fm4allsecondary text-fm4allsecondary"
                   : "cursor-pointer"
               }
             />
@@ -84,7 +84,7 @@ const AddServicesTarifForm = ({
         title="ajouter"
         onClick={handleSubmit}
         disabled={selectedServicesIds.length === 0 || loading}
-        className="w-60 mx-auto"
+        className="mx-auto w-60"
       >
         {loading ? <Loader2 size={16} className="animate-spin" /> : "Ajouter"}
       </Button>

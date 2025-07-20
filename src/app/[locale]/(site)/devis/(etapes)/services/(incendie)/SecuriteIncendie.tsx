@@ -57,13 +57,13 @@ const SecuriteIncendie = ({
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="6">
+    <div className="mx-auto flex h-full w-full flex-col gap-4 py-2" id="6">
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
           icon={FireExtinguisher}
           title={t("securite-incendie")}
           description={t(
-            "extincteurs-blocs-autonomes-declairage-de-securite-baes-telecommande-baes-laissez-nos-experts-verifier-vos-installations"
+            "extincteurs-blocs-autonomes-declairage-de-securite-baes-telecommande-baes-laissez-nos-experts-verifier-vos-installations",
           )}
           propositionsRef={propositionsRef}
         />
@@ -72,7 +72,7 @@ const SecuriteIncendie = ({
           icon={FireExtinguisher}
           title={t("securite-incendie")}
           description={t(
-            "extincteurs-blocs-autonomes-declairage-de-securite-baes-telecommande-baes-laissez-nos-experts-verifier-vos-installations"
+            "extincteurs-blocs-autonomes-declairage-de-securite-baes-telecommande-baes-laissez-nos-experts-verifier-vos-installations",
           )}
           handleClickPrevious={handleClickPrevious}
         />

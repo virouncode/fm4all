@@ -53,7 +53,7 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
             : getServicesSlugEn(params.slug);
         router.replace(
           { pathname, params: { slug: newSlug }, query },
-          { locale: newLocale }
+          { locale: newLocale },
         );
       }
     } else if (pathname === "/services/[slug]/[subSlug]") {
@@ -71,7 +71,7 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
             : getServicesSubSlugEn(params.subSlug);
         router.replace(
           { pathname, params: { slug: newSlug, subSlug: newSubSlug }, query },
-          { locale: newLocale }
+          { locale: newLocale },
         );
       }
     } else if (pathname === "/blog/[slug]") {
@@ -82,7 +82,7 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
             : getArticlesSlugEn(params.slug);
         router.replace(
           { pathname, params: { slug: newSlug }, query },
-          { locale: newLocale }
+          { locale: newLocale },
         );
       }
     } else if (pathname === "/blog/[slug]/[subSlug]") {
@@ -100,7 +100,7 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
             : getArticlesSubSlugEn(params.subSlug);
         router.replace(
           { pathname, params: { slug: newSlug, subSlug: newSubSlug }, query },
-          { locale: newLocale }
+          { locale: newLocale },
         );
       }
     } else if (pathname === "/secteurs/[slug]") {
@@ -111,7 +111,7 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
             : getSecteurSlugEn(params.slug);
         router.replace(
           { pathname, params: { slug: newSlug }, query },
-          { locale: newLocale }
+          { locale: newLocale },
         );
       }
     } else {
@@ -125,7 +125,7 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button
-          className={`flex items-center gap-1 text-sm hover:opacity-75 cursor-pointer rounded-md border w-16 h-9 justify-center ${className}`}
+          className={`flex h-9 w-16 cursor-pointer items-center justify-center gap-1 rounded-md border text-sm hover:opacity-75 ${className}`}
           aria-label={locale === "fr" ? "Changer de langue" : "Change language"}
           variant="outline"
           title={locale === "fr" ? "Changer de langue" : "Change language"}

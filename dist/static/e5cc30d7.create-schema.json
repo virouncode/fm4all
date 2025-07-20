@@ -111,12 +111,7 @@
       },
       {
         "options": {
-          "list": [
-            "article",
-            "service",
-            "serviceVille",
-            "secteur"
-          ]
+          "list": ["article", "service", "serviceVille", "secteur"]
         },
         "description": "Optional: Used to filter the reference fields above so all translations share the same types.",
         "of": [
@@ -672,10 +667,7 @@
             "rules": [
               {
                 "flag": "valid",
-                "constraint": [
-                  "en",
-                  "fr"
-                ]
+                "constraint": ["en", "fr"]
               },
               {
                 "flag": "presence",

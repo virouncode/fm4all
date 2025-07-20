@@ -34,7 +34,7 @@ export const fontainesSchema = z.object({
         prixUnitaireConsoCO2: z.number().nullable(),
         prixUnitaireConsoEauChaude: z.number().nullable(),
       }),
-    })
+    }),
   ),
 });
 
@@ -52,7 +52,7 @@ export const fontainesEspaceFormSchema = z.object({
         /^\d+$/.test(value) &&
         parseInt(value, 10) >= 1 &&
         parseInt(value, 10) <= 110,
-      "Le nombre de personnes doit être compris entre 1 et 110"
+      "Le nombre de personnes doit être compris entre 1 et 110",
     ),
   nbMachines: z.number(),
 });

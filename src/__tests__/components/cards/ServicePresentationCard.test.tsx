@@ -24,7 +24,7 @@ describe("ServicePresentationCard", () => {
 
   it("renders correctly with href (link case)", () => {
     render(
-      <ServicePresentationCard title={title} icons={icons} href="/test" />
+      <ServicePresentationCard title={title} icons={icons} href="/test" />,
     );
     expect(screen.getByRole("link", { name: title })).toBeInTheDocument();
     expect(screen.getByText(title)).toBeInTheDocument();
@@ -42,7 +42,7 @@ describe("ServicePresentationCard", () => {
   it("calls onClick when clicked (without href)", async () => {
     const onClick = vi.fn();
     render(
-      <ServicePresentationCard title={title} icons={icons} onClick={onClick} />
+      <ServicePresentationCard title={title} icons={icons} onClick={onClick} />,
     );
 
     await user.click(screen.getByText(title));
@@ -57,7 +57,7 @@ describe("ServicePresentationCard", () => {
         icons={icons}
         href="/with-link"
         onClick={onClick}
-      />
+      />,
     );
 
     await user.click(screen.getByText(title));

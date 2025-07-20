@@ -22,9 +22,9 @@ const EmailOkCard = () => {
     return () => clearTimeout(timer);
   }, [router]);
   return (
-    <Card className="max-w-md z-20">
+    <Card className="z-20 max-w-md">
       <CardHeader>
-        <CardTitle className="text-lg md:text-xl text-green-600">
+        <CardTitle className="text-lg text-green-600 md:text-xl">
           Adresse email vérifiée ! Merci.
         </CardTitle>
         <CardDescription className="text-xs md:text-sm">

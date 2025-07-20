@@ -108,7 +108,7 @@ const SnacksFruitsPropositionCard = ({
   ) {
     return (
       <div
-        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-base gap-4 min-h-36 text-center font-bold`}
+        className={`flex flex-1 bg-${color} min-h-36 items-center justify-center gap-4 p-4 text-center text-base font-bold text-slate-200`}
       >
         <p>{t("non-propose-pour-ces-criteres")}</p>
       </div>
@@ -120,7 +120,7 @@ const SnacksFruitsPropositionCard = ({
   ) {
     return (
       <div
-        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-xl gap-4 min-h-36`}
+        className={`flex flex-1 bg-${color} min-h-36 items-center justify-center gap-4 p-4 text-xl text-slate-200`}
       >
         <p>{t("non-propose")}</p>
       </div>
@@ -132,7 +132,7 @@ const SnacksFruitsPropositionCard = ({
   ) {
     return (
       <div
-        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-xl gap-4 min-h-36`}
+        className={`flex flex-1 bg-${color} min-h-36 items-center justify-center gap-4 p-4 text-xl text-slate-200`}
       >
         <p>{t("non-propose")}</p>
       </div>
@@ -141,7 +141,7 @@ const SnacksFruitsPropositionCard = ({
   if (!proposition.total) {
     return (
       <div
-        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-base gap-4 min-h-36 font-bold`}
+        className={`flex flex-1 bg-${color} min-h-36 items-center justify-center gap-4 p-4 text-base font-bold text-slate-200`}
       >
         <p className="text-center">
           {tSnacks("panier-minimum-hebdomadaire-non-atteint", {
@@ -156,19 +156,19 @@ const SnacksFruitsPropositionCard = ({
   const totalMensuelSansRemiseText =
     proposition.totalSansRemise &&
     proposition.totalSansRemise !== proposition.total ? (
-      <p className="font-bold text-xl ml-4 line-through">
+      <p className="ml-4 text-xl font-bold line-through">
         {formatNumber((proposition.totalSansRemise * MARGE) / 12)}{" "}
         {t("euros-mois")}
       </p>
     ) : null;
   const totalMensuelText = (
-    <p className="font-bold text-xl ml-4">
+    <p className="ml-4 text-xl font-bold">
       {formatNumber((proposition.total * MARGE) / 12)} {t("euros-mois")}
       {totalMensuelSansRemiseText ? "*" : null}
     </p>
   );
   const gFruitsParSemaineParPersonneText = snacksFruits.infos.choix.includes(
-    "fruits"
+    "fruits",
   ) ? (
     <li className="list-check">
       {proposition.gFruitsParSemaineParPersonne} {tSnacks("g-personne-semaine")}
@@ -202,7 +202,7 @@ const SnacksFruitsPropositionCard = ({
   );
 
   const infosProduit = (
-    <ul className="flex flex-col text-xs px-4 mx-auto">
+    <ul className="mx-auto flex flex-col px-4 text-xs">
       {gFruitsParSemaineParPersonneText}
       {portionsSnacksParSemaineParPersonneText}
       {consosBoissonsParSemaineParPersonneText}
@@ -210,7 +210,7 @@ const SnacksFruitsPropositionCard = ({
   );
 
   const infosProduitDialog = (
-    <ul className="flex flex-col text-sm px-4 mx-auto">
+    <ul className="mx-auto flex flex-col px-4 text-sm">
       {gFruitsParSemaineParPersonneText}
       {portionsSnacksParSemaineParPersonneText}
       {consosBoissonsParSemaineParPersonneText}
@@ -219,7 +219,7 @@ const SnacksFruitsPropositionCard = ({
 
   const imgProduit = (
     <div className="flex items-center justify-between gap-2">
-      <div className="w-full h-40 relative mx-auto rounded-lg border-slate-300 border bg-slate-100 overflow-hidden">
+      <div className="relative mx-auto h-40 w-full overflow-hidden rounded-lg border border-slate-300 bg-slate-100">
         <Image
           src="/img/services/fruits.webp"
           alt="illustration-corbeille-fruits"
@@ -228,7 +228,7 @@ const SnacksFruitsPropositionCard = ({
           className="object-cover"
         />
       </div>
-      <div className="w-full h-40 relative mx-auto rounded-lg border-slate-300 border bg-slate-100 overflow-hidden">
+      <div className="relative mx-auto h-40 w-full overflow-hidden rounded-lg border border-slate-300 bg-slate-100">
         <Image
           src="/img/services/snacks.webp"
           alt="illustration-snacks"
@@ -237,7 +237,7 @@ const SnacksFruitsPropositionCard = ({
           className="object-cover"
         />
       </div>
-      <div className="w-full h-40 relative mx-auto rounded-lg border-slate-300 border bg-slate-100 overflow-hidden">
+      <div className="relative mx-auto h-40 w-full overflow-hidden rounded-lg border border-slate-300 bg-slate-100">
         <Image
           src="/img/services/boissons.webp"
           alt="illustration-boissons"
@@ -251,7 +251,7 @@ const SnacksFruitsPropositionCard = ({
 
   return (
     <div
-      className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 p-4 cursor-pointer min-h-36 ${
+      className={`flex flex-1 bg-${color} min-h-36 cursor-pointer items-center justify-center gap-4 p-4 text-2xl text-slate-200 ${
         snacksFruits.infos.fournisseurId === proposition.fournisseurId &&
         snacksFruits.infos.gammeSelected === gamme
           ? "ring-4 ring-inset ring-fm4alldestructive"
@@ -270,7 +270,7 @@ const SnacksFruitsPropositionCard = ({
         data-testid="snacksfruits-switch"
       />
       <div>
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center gap-2">
           <div className="flex flex-col">
             {totalMensuelSansRemiseText}
             <span data-testid="total-mensuel-snacksfruits">
@@ -291,7 +291,7 @@ const SnacksFruitsPropositionCard = ({
                 <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
               {imgProduit}
-              <p className="text-xs italic text-end">
+              <p className="text-end text-xs italic">
                 {t("photos-non-contractuelles")}
               </p>
               {infosProduitDialog}

@@ -1,6 +1,6 @@
 export const isEnglishSlug = (
   slug: string,
-  mapping: Record<string, string>
+  mapping: Record<string, string>,
 ): boolean => {
   // Utiliser votre mapping de slugs pour vérifier
   // Retourne true si c'est un slug anglais, false sinon
@@ -10,7 +10,7 @@ export const isEnglishSlug = (
 
 export const isFrenchSlug = (
   slug: string,
-  mapping: Record<string, string>
+  mapping: Record<string, string>,
 ): boolean => {
   // Utiliser votre mapping de slugs pour vérifier
   // Retourne true si c'est un slug français, false sinon
@@ -20,7 +20,7 @@ export const isFrenchSlug = (
 
 export const isEnglishSubSlug = (
   subSlug: string,
-  mapping: Record<string, string>
+  mapping: Record<string, string>,
 ): boolean => {
   // Utiliser votre mapping de slugs pour vérifier
   // Retourne true si c'est un slug anglais, false sinon
@@ -30,7 +30,7 @@ export const isEnglishSubSlug = (
 
 export const isFrenchSubSlug = (
   subSlug: string,
-  mapping: Record<string, string>
+  mapping: Record<string, string>,
 ): boolean => {
   // Utiliser votre mapping de slugs pour vérifier
   // Retourne true si c'est un slug français, false sinon

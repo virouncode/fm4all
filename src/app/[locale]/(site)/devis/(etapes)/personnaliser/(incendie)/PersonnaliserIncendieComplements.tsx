@@ -47,48 +47,48 @@ const PersonnaliserIncendieComplements = ({
   const { incendie, setIncendie } = useContext(IncendieContext);
   const { totalIncendie, setTotalIncendie } = useContext(TotalIncendieContext);
   const { personnalisation, setPersonnalisation } = useContext(
-    PersonnalisationContext
+    PersonnalisationContext,
   );
   const [exutoires, setExutoires] = useState(
-    totalIncendie.totalExutoires ? true : false
+    totalIncendie.totalExutoires ? true : false,
   );
   const [exutoiresParking, setExutoiresParking] = useState(
-    totalIncendie.totalExutoiresParking ? true : false
+    totalIncendie.totalExutoiresParking ? true : false,
   );
   const [portesCoupeFeuBattantes, setPortesCoupeFeuBattantes] = useState(
-    totalIncendie.totalPortesCoupeFeuBattantes ? true : false
+    totalIncendie.totalPortesCoupeFeuBattantes ? true : false,
   );
   const [portesCoupeFeuCoulissantes, setPortesCoupeFeuCoulissantes] = useState(
-    totalIncendie.totalPortesCoupeFeuCoulissantes ? true : false
+    totalIncendie.totalPortesCoupeFeuCoulissantes ? true : false,
   );
   const [colonnesSechesStatiques, setColonnesStatiques] = useState(
-    totalIncendie.totalColonnesSechesStatiques ? true : false
+    totalIncendie.totalColonnesSechesStatiques ? true : false,
   );
   const [colonnesSechesDynamiques, setColonnesDynamiques] = useState(
-    totalIncendie.totalColonnesSechesDynamiques ? true : false
+    totalIncendie.totalColonnesSechesDynamiques ? true : false,
   );
   const [ria, setRia] = useState(totalIncendie.totalRIA ? true : false);
   const [alarmes, setAlarmes] = useState(
-    totalIncendie.totalAlarmes ? true : false
+    totalIncendie.totalAlarmes ? true : false,
   );
 
   const exutoiresTarifsFournisseur = exutoiresTarifs?.filter(
-    (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
+    (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
   );
   const exutoiresParkingTarifsFournisseur = exutoiresParkingTarifs?.filter(
-    (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
+    (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
   );
   const alarmesTarifsFournisseur = alarmesTarifs?.filter(
-    (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
+    (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
   );
   const riaTarifFournisseur = riaTarifs?.find(
-    (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
+    (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
   );
   const colonnesSechesTarifsFournisseur = colonnesSechesTarifs?.filter(
-    (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
+    (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
   );
   const portesCoupeFeuTarifsFournisseur = portesCoupeFeuTarifs?.filter(
-    (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
+    (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
   );
   const nbExutoires = incendie.quantites.nbExutoires || 1;
   const nbExutoiresParking = incendie.quantites.nbExutoiresParking || 1;
@@ -136,13 +136,13 @@ const PersonnaliserIncendieComplements = ({
           newNb > MAX_NB_EXUTOIRES ? MAX_NB_EXUTOIRES : newNb;
         const prixParExutoire =
           exutoiresTarifsFournisseur?.find(
-            (tarif) => tarif.nbExutoires === roundNbExutoires(newNbrExutoires)
+            (tarif) => tarif.nbExutoires === roundNbExutoires(newNbrExutoires),
           )?.prixParExutoire ?? null;
         const totalExutoires =
           prixParExutoire !== null ? prixParExutoire * newNbrExutoires : null;
         const fraisDeplacementExutoires =
           exutoiresTarifsFournisseur?.find(
-            (tarif) => tarif.nbExutoires === roundNbExutoires(newNbrExutoires)
+            (tarif) => tarif.nbExutoires === roundNbExutoires(newNbrExutoires),
           )?.fraisDeplacement ?? null;
         setIncendie((prev) => ({
           ...prev,
@@ -165,7 +165,7 @@ const PersonnaliserIncendieComplements = ({
         const prixParExutoireParking =
           exutoiresParkingTarifsFournisseur?.find(
             (tarif) =>
-              tarif.nbExutoires === roundNbExutoires(newNbrExutoiresParking)
+              tarif.nbExutoires === roundNbExutoires(newNbrExutoiresParking),
           )?.prixParExutoire ?? null;
         const totalExutoiresParking =
           prixParExutoireParking !== null
@@ -174,7 +174,7 @@ const PersonnaliserIncendieComplements = ({
         const fraisDeplacementExutoiresParking =
           exutoiresParkingTarifsFournisseur?.find(
             (tarif) =>
-              tarif.nbExutoires === roundNbExutoires(newNbrExutoiresParking)
+              tarif.nbExutoires === roundNbExutoires(newNbrExutoiresParking),
           )?.fraisDeplacement ?? null;
         setIncendie((prev) => ({
           ...prev,
@@ -198,7 +198,7 @@ const PersonnaliserIncendieComplements = ({
         const newNbrAlarmes = newNb > MAX_NB_ALARMES ? MAX_NB_ALARMES : newNb;
         const totalAlarmes =
           alarmesTarifsFournisseur?.find(
-            (tarif) => tarif.nbPoints === roundNbAlarmes(newNbrAlarmes)
+            (tarif) => tarif.nbPoints === roundNbAlarmes(newNbrAlarmes),
           )?.prixParControle ?? null;
         const prixParAlarme =
           totalAlarmes !== null
@@ -219,7 +219,7 @@ const PersonnaliserIncendieComplements = ({
           newNb > MAX_NB_PORTES_COUPES_FEU ? MAX_NB_PORTES_COUPES_FEU : newNb;
         const prixParPorteCoupeFeuBattante =
           portesCoupeFeuTarifsFournisseur?.find(
-            (tarif) => tarif.type === "vantaux"
+            (tarif) => tarif.type === "vantaux",
           )?.prixParPorte ?? null;
         const totalPortesCoupeFeuBattantes =
           prixParPorteCoupeFeuBattante !== null
@@ -244,7 +244,7 @@ const PersonnaliserIncendieComplements = ({
           newNb > MAX_NB_PORTES_COUPES_FEU ? MAX_NB_PORTES_COUPES_FEU : newNb;
         const prixParProteCoupeFeuCoulissante =
           portesCoupeFeuTarifsFournisseur?.find(
-            (tarif) => tarif.type === "coulissante"
+            (tarif) => tarif.type === "coulissante",
           )?.prixParPorte ?? null;
         const totalPortesCoupeFeuCoulissantes =
           prixParProteCoupeFeuCoulissante !== null
@@ -268,7 +268,7 @@ const PersonnaliserIncendieComplements = ({
           newNb > MAX_NB_COLONNES_SECHES ? MAX_NB_COLONNES_SECHES : newNb;
         const prixParColonneSecheStatique =
           colonnesSechesTarifsFournisseur?.find(
-            (tarif) => tarif.type === "statique"
+            (tarif) => tarif.type === "statique",
           )?.prixParColonne ?? null;
         const totalColonnesSechesStatiques =
           prixParColonneSecheStatique !== null
@@ -292,7 +292,7 @@ const PersonnaliserIncendieComplements = ({
           newNb > MAX_NB_COLONNES_SECHES ? MAX_NB_COLONNES_SECHES : newNb;
         const prixParColonneSecheDynamique =
           colonnesSechesTarifsFournisseur?.find(
-            (tarif) => tarif.type === "dynamique"
+            (tarif) => tarif.type === "dynamique",
           )?.prixParColonne ?? null;
         const totalColonnesSechesDynamiques =
           prixParColonneSecheDynamique !== null
@@ -419,13 +419,13 @@ const PersonnaliserIncendieComplements = ({
         } else {
           const prixParExutoire =
             exutoiresTarifsFournisseur?.find(
-              (tarif) => tarif.nbExutoires === roundNbExutoires(nbExutoires)
+              (tarif) => tarif.nbExutoires === roundNbExutoires(nbExutoires),
             )?.prixParExutoire ?? null;
           const totalExutoires =
             prixParExutoire !== null ? prixParExutoire * nbExutoires : null;
           const fraisDeplacementExutoires =
             exutoiresTarifsFournisseur?.find(
-              (tarif) => tarif.nbExutoires === roundNbExutoires(nbExutoires)
+              (tarif) => tarif.nbExutoires === roundNbExutoires(nbExutoires),
             )?.fraisDeplacement ?? null;
           setIncendie((prev) => ({
             ...prev,
@@ -459,7 +459,7 @@ const PersonnaliserIncendieComplements = ({
           const prixParExutoireParking =
             exutoiresTarifsFournisseur?.find(
               (tarif) =>
-                tarif.nbExutoires === roundNbExutoires(nbExutoiresParking)
+                tarif.nbExutoires === roundNbExutoires(nbExutoiresParking),
             )?.prixParExutoire ?? null;
           const totalExutoiresParking =
             prixParExutoireParking !== null
@@ -468,7 +468,7 @@ const PersonnaliserIncendieComplements = ({
           const fraisDeplacementExutoiresParking =
             exutoiresParkingTarifsFournisseur?.find(
               (tarif) =>
-                tarif.nbExutoires === roundNbExutoires(nbExutoiresParking)
+                tarif.nbExutoires === roundNbExutoires(nbExutoiresParking),
             )?.fraisDeplacement ?? null;
           setIncendie((prev) => ({
             ...prev,
@@ -501,7 +501,7 @@ const PersonnaliserIncendieComplements = ({
         } else {
           const totalAlarmes =
             alarmesTarifsFournisseur?.find(
-              (tarif) => tarif.nbPoints === roundNbAlarmes(nbAlarmes)
+              (tarif) => tarif.nbPoints === roundNbAlarmes(nbAlarmes),
             )?.prixParControle ?? null;
           const prixParAlarme =
             totalAlarmes !== null
@@ -533,7 +533,7 @@ const PersonnaliserIncendieComplements = ({
         } else {
           const prixParPorteCoupeFeuBattante =
             portesCoupeFeuTarifsFournisseur?.find(
-              (tarif) => tarif.type === "vantaux"
+              (tarif) => tarif.type === "vantaux",
             )?.prixParPorte ?? null;
           const totalPortesCoupeFeuBattantes =
             prixParPorteCoupeFeuBattante !== null
@@ -568,7 +568,7 @@ const PersonnaliserIncendieComplements = ({
         } else {
           const prixParProteCoupeFeuCoulissante =
             portesCoupeFeuTarifsFournisseur?.find(
-              (tarif) => tarif.type === "coulissante"
+              (tarif) => tarif.type === "coulissante",
             )?.prixParPorte ?? null;
           const totalPortesCoupeFeuCoulissantes =
             prixParProteCoupeFeuCoulissante !== null
@@ -603,7 +603,7 @@ const PersonnaliserIncendieComplements = ({
         } else {
           const prixParColonneSecheStatique =
             colonnesSechesTarifsFournisseur?.find(
-              (tarif) => tarif.type === "statique"
+              (tarif) => tarif.type === "statique",
             )?.prixParColonne ?? null;
           const totalColonnesSechesStatiques =
             prixParColonneSecheStatique !== null
@@ -638,7 +638,7 @@ const PersonnaliserIncendieComplements = ({
         } else {
           const prixParColonneSecheDynamique =
             colonnesSechesTarifsFournisseur?.find(
-              (tarif) => tarif.type === "dynamique"
+              (tarif) => tarif.type === "dynamique",
             )?.prixParColonne ?? null;
           const totalColonnesSechesDynamiques =
             prixParColonneSecheDynamique !== null
@@ -687,7 +687,7 @@ const PersonnaliserIncendieComplements = ({
   const propositionsRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="6">
+    <div className="mx-auto flex h-full w-full flex-col gap-4 py-2" id="6">
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
           title={tIncendie("securite-incendie")}
@@ -704,16 +704,16 @@ const PersonnaliserIncendieComplements = ({
         />
       )}
       <div
-        className="w-full flex-1 flex flex-col gap-6 overflow-auto"
+        className="flex w-full flex-1 flex-col gap-6 overflow-auto"
         ref={propositionsRef}
       >
         <div className="flex flex-col gap-6">
           <p className="text-2xl">{tPersonnaliser("complements")}</p>
-          <p className="max-w-prose mx-auto hyphens-auto"></p>
+          <p className="mx-auto max-w-prose hyphens-auto"></p>
           <div className="flex flex-col gap-8">
-            <p className="max-w-prose mx-auto hyphens-auto font-bold">
+            <p className="mx-auto max-w-prose hyphens-auto font-bold">
               {tPersonnaliser(
-                "en-complement-des-baes-et-extincteurs-souhaitez-vous-nous-confier-le-controle-de"
+                "en-complement-des-baes-et-extincteurs-souhaitez-vous-nous-confier-le-controle-de",
               )}
             </p>
             {isTabletOrMobile ? (

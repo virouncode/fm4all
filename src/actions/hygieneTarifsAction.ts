@@ -102,7 +102,7 @@ export const updateHygieneTarifDistribAction = actionClient
         .from(hygieneDistribTarifs)
         .where(
           eq(hygieneDistribTarifs.id, hygieneTarifInput.id) &&
-            eq(hygieneDistribTarifs.fournisseurId, fournisseurId)
+            eq(hygieneDistribTarifs.fournisseurId, fournisseurId),
         )
         .limit(1);
 
@@ -144,7 +144,7 @@ export const updateHygieneTarifDistribAction = actionClient
           value: valueToStore / RATIO,
           fournisseurId,
           gamme: hygieneTarifInput.gamme,
-        }
+        },
       );
       return {
         success: true,
@@ -153,7 +153,7 @@ export const updateHygieneTarifDistribAction = actionClient
             ? "Tarif mis à jour avec succès"
             : "Rate updated successfully",
       };
-    }
+    },
   );
 
 const tarifInstalSchema = z.object({
@@ -207,7 +207,7 @@ export const updateHygieneTarifInstalAction = actionClient
         .from(hygieneInstalDistribTarifs)
         .where(
           eq(hygieneInstalDistribTarifs.id, hygieneTarifInput.id) &&
-            eq(hygieneInstalDistribTarifs.fournisseurId, fournisseurId)
+            eq(hygieneInstalDistribTarifs.fournisseurId, fournisseurId),
         )
         .limit(1);
 
@@ -238,7 +238,7 @@ export const updateHygieneTarifInstalAction = actionClient
         [
           getEffectifTag(
             "hygieneInstalDistribTarifs",
-            hygieneTarifInput.effectif.toString()
+            hygieneTarifInput.effectif.toString(),
           ),
           getFournisseurTag("hygieneInstalDistribTarifs", fournisseurId),
         ],
@@ -249,7 +249,7 @@ export const updateHygieneTarifInstalAction = actionClient
           value: valueToStore / RATIO,
           fournisseurId,
           effectif: hygieneTarifInput.effectif,
-        }
+        },
       );
 
       return {
@@ -259,7 +259,7 @@ export const updateHygieneTarifInstalAction = actionClient
             ? "Tarif d'installation mis à jour avec succès"
             : "Installation rate updated successfully",
       };
-    }
+    },
   );
 
 const tarifConsoSchema = z.object({
@@ -314,7 +314,7 @@ export const updateHygieneTarifConsoAction = actionClient
         .from(hygieneConsoTarifs)
         .where(
           eq(hygieneConsoTarifs.id, hygieneTarifInput.id) &&
-            eq(hygieneConsoTarifs.fournisseurId, fournisseurId)
+            eq(hygieneConsoTarifs.fournisseurId, fournisseurId),
         )
         .limit(1);
 
@@ -348,7 +348,7 @@ export const updateHygieneTarifConsoAction = actionClient
         [
           getEffectifTag(
             "hygieneConsosTarifs",
-            hygieneTarifInput.effectif.toString()
+            hygieneTarifInput.effectif.toString(),
           ),
           getFournisseurTag("hygieneConsosTarifs", fournisseurId),
         ],
@@ -359,7 +359,7 @@ export const updateHygieneTarifConsoAction = actionClient
           value: valueToStore / RATIO,
           fournisseurId,
           effectif: hygieneTarifInput.effectif,
-        }
+        },
       );
 
       return {
@@ -369,7 +369,7 @@ export const updateHygieneTarifConsoAction = actionClient
             ? "Tarif de consommables mis à jour avec succès"
             : "Consumables rate updated successfully",
       };
-    }
+    },
   );
 
 export const updateHygieneMinFacturationAction = actionClient
@@ -412,7 +412,7 @@ export const updateHygieneMinFacturationAction = actionClient
         .from(hygieneMinFacturation)
         .where(
           eq(hygieneMinFacturation.id, hygieneMinFacturationInput.id) &&
-            eq(hygieneMinFacturation.fournisseurId, fournisseurId)
+            eq(hygieneMinFacturation.fournisseurId, fournisseurId),
         )
         .limit(1);
 
@@ -446,7 +446,7 @@ export const updateHygieneMinFacturationAction = actionClient
             ? hygieneMinFacturationInput.minFacturation / RATIO
             : null,
           fournisseurId,
-        }
+        },
       );
 
       return {
@@ -456,5 +456,5 @@ export const updateHygieneMinFacturationAction = actionClient
             ? "Minimum annuel de facturation mis à jour avec succès"
             : "Annual minimum billing updated successfully",
       };
-    }
+    },
   );

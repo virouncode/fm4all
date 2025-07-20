@@ -14,11 +14,11 @@ const CDCDialog = ({ children }: CDCDialogProps) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <p className="text-base md:text-lg font-bold underline cursor-pointer text-right">
+        <p className="cursor-pointer text-right text-base font-bold underline md:text-lg">
           Cahier des charges
         </p>
       </DialogTrigger>
-      <DialogContent className="w-full rounded-xl max-h-[95%] overflow-y-auto md:max-w-[95%] max-w-none">
+      <DialogContent className="max-h-[95%] w-full max-w-none overflow-y-auto rounded-xl md:max-w-[95%]">
         <DialogHeader>
           <DialogTitle></DialogTitle>
         </DialogHeader>

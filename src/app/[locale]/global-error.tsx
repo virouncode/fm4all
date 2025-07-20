@@ -27,10 +27,10 @@ export default function GlobalError({
     // global-error must include html and body tags
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${didact.className} antialiased scroll-smooth h-dvh flex items-center justify-center`}
+        className={`${didact.className} flex h-dvh items-center justify-center scroll-smooth antialiased`}
       >
         <div className="flex flex-col gap-10">
-          <h2 className="font-bold text-lg text-center">
+          <h2 className="text-center text-lg font-bold">
             {t("erreur-globale")}
           </h2>
           <Button onClick={() => reset()} variant="secondary" size="lg">

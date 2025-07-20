@@ -8,7 +8,7 @@ export const reinitialisationCafeThe = (
   setThe: (the: TheType) => void,
   setTotalCafe: (totalCafe: TotalCafeType) => void,
   setTotalThe: (totalThe: TotalTheType) => void,
-  client: Partial<SelectClientType>
+  client: Partial<SelectClientType>,
 ) => {
   setCafe({
     infos: {

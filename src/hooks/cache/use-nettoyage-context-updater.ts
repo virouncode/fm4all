@@ -29,7 +29,7 @@ export function useNettoyageContextUpdater() {
       const tarifType = data.tarifType as string;
       const clientSurfaceRounded = roundSurface(client.surface);
       console.log(
-        `Mise à jour du contexte nettoyage (${tarifType}): ${data.field} -> ${data.value}`
+        `Mise à jour du contexte nettoyage (${tarifType}): ${data.field} -> ${data.value}`,
       );
 
       switch (tarifType) {
@@ -87,7 +87,7 @@ export function useNettoyageContextUpdater() {
                     title: t("tarifs-mis-a-jour"),
                     description: t(
                       "les-tarifs-de-nettoyage-infos-nomfournisseur-ont-ete-mis-a-jour-votre-devis-a-ete-recalcule",
-                      { nomFournisseur: nettoyage.infos.nomFournisseur || "" }
+                      { nomFournisseur: nettoyage.infos.nomFournisseur || "" },
                     ),
                     duration: 4000,
                   });
@@ -97,7 +97,7 @@ export function useNettoyageContextUpdater() {
               toast({
                 title: t("tarifs-mis-a-jour"),
                 description: t(
-                  "les-tarifs-ont-ete-mis-a-jour-par-un-fournisseur-la-page-a-ete-rechargee"
+                  "les-tarifs-ont-ete-mis-a-jour-par-un-fournisseur-la-page-a-ete-rechargee",
                 ),
                 duration: 3000,
               });
@@ -155,7 +155,7 @@ export function useNettoyageContextUpdater() {
                     title: t("tarifs-mis-a-jour"),
                     description: t(
                       "les-tarifs-de-nettoyage-infos-nomfournisseur-ont-ete-mis-a-jour-votre-devis-a-ete-recalcule",
-                      { nomFournisseur: nettoyage.infos.nomFournisseur || "" }
+                      { nomFournisseur: nettoyage.infos.nomFournisseur || "" },
                     ),
                     duration: 4000,
                   });
@@ -165,7 +165,7 @@ export function useNettoyageContextUpdater() {
               toast({
                 title: t("tarifs-mis-a-jour"),
                 description: t(
-                  "les-tarifs-ont-ete-mis-a-jour-par-un-fournisseur-la-page-a-ete-rechargee"
+                  "les-tarifs-ont-ete-mis-a-jour-par-un-fournisseur-la-page-a-ete-rechargee",
                 ),
                 duration: 3000,
               });
@@ -223,7 +223,7 @@ export function useNettoyageContextUpdater() {
                     surfaceVitres / cadenceVitres) *
                     tauxHoraireVitrerie +
                     (fraisDeplacementVitrerie ?? 0),
-                  minFacturationVitrerie ?? 0
+                  minFacturationVitrerie ?? 0,
                 );
               setTotalNettoyage((prev: TotalNettoyageType) => ({
                 ...prev,
@@ -233,7 +233,7 @@ export function useNettoyageContextUpdater() {
                 title: t("tarifs-mis-a-jour"),
                 description: t(
                   "les-tarifs-de-nettoyage-infos-nomfournisseur-ont-ete-mis-a-jour-votre-devis-a-ete-recalcule",
-                  { nomFournisseur: nettoyage.infos.nomFournisseur || "" }
+                  { nomFournisseur: nettoyage.infos.nomFournisseur || "" },
                 ),
                 duration: 4000,
               });
@@ -242,7 +242,7 @@ export function useNettoyageContextUpdater() {
             toast({
               title: t("tarifs-mis-a-jour"),
               description: t(
-                "les-tarifs-ont-ete-mis-a-jour-par-un-fournisseur-la-page-a-ete-rechargee"
+                "les-tarifs-ont-ete-mis-a-jour-par-un-fournisseur-la-page-a-ete-rechargee",
               ),
               duration: 3000,
             });
@@ -273,7 +273,7 @@ export function useNettoyageContextUpdater() {
       setTotalNettoyage,
       t,
       toast,
-    ]
+    ],
   );
 
   return updateNettoyageContext;

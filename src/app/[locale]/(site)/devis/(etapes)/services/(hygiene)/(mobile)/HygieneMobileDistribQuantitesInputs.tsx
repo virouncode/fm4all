@@ -22,10 +22,10 @@ type HygieneMobileDistribQuantitesInputsProps = {
   hygieneDistribTarifs: SelectHygieneDistribTarifsType[];
   handleChangeDistribNbr: (
     e: React.ChangeEvent<HTMLInputElement>,
-    type: string
+    type: string,
   ) => void;
   handleChangeDureeLocation: (
-    value: "oneShot" | "pa12M" | "pa24M" | "pa36M"
+    value: "oneShot" | "pa12M" | "pa24M" | "pa36M",
   ) => void;
   nbDistribEmp: number;
   nbDistribSavon: number;
@@ -59,8 +59,8 @@ const HygieneMobileDistribQuantitesInputs = ({
           {t("indiquez-la")} <strong>{t("duree-d-engagement")}</strong>{" "}
           {t("souhaitee")}{" "}
         </p>
-        <div className="flex flex-col w-full p-1 gap-2">
-          <Label htmlFor="nbDistribPh" className="text-sm flex-1">
+        <div className="flex w-full flex-col gap-2 p-1">
+          <Label htmlFor="nbDistribPh" className="flex-1 text-sm">
             {t("duree-de-location")}
           </Label>
           <Select
@@ -80,8 +80,8 @@ const HygieneMobileDistribQuantitesInputs = ({
                     ["pa12M", "pa24M", "pa36M"].some(
                       (key) =>
                         tarif[key as keyof typeof tarif] &&
-                        item.id.toString() === key
-                    )
+                        item.id.toString() === key,
+                    ),
                   );
                   return (
                     <SelectItem
@@ -102,8 +102,8 @@ const HygieneMobileDistribQuantitesInputs = ({
           {t("indiquez-le-nombre-de")}{" "}
           <strong>{tHygiene("distributeurs-essuie-mains-papier")}</strong> :
         </p>
-        <div className="flex flex-col w-full p-1 gap-2">
-          <Label htmlFor="nbDistribEmp" className="text-sm flex-1">
+        <div className="flex w-full flex-col gap-2 p-1">
+          <Label htmlFor="nbDistribEmp" className="flex-1 text-sm">
             {tHygiene("nombre-de-distributeurs")}
           </Label>
           <div className="flex items-center gap-2">
@@ -142,7 +142,7 @@ const HygieneMobileDistribQuantitesInputs = ({
 
           <p className="text-xs italic text-fm4alldestructive">
             {t(
-              "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer"
+              "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
             )}
           </p>
         </div>
@@ -152,8 +152,8 @@ const HygieneMobileDistribQuantitesInputs = ({
           {t("indiquez-le-nombre-de")}{" "}
           <strong>{tHygiene("distributeurs-de-savon")}</strong> :
         </p>
-        <div className="flex flex-col w-full p-1 gap-2">
-          <Label htmlFor="nbDistribSavon" className="text-sm flex-1">
+        <div className="flex w-full flex-col gap-2 p-1">
+          <Label htmlFor="nbDistribSavon" className="flex-1 text-sm">
             {tHygiene("nombre-de-distributeurs")}
           </Label>
           <div className="flex items-center gap-2">
@@ -192,7 +192,7 @@ const HygieneMobileDistribQuantitesInputs = ({
 
           <p className="text-xs italic text-fm4alldestructive">
             {t(
-              "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer"
+              "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
             )}
           </p>
         </div>
@@ -202,8 +202,8 @@ const HygieneMobileDistribQuantitesInputs = ({
           {t("indiquez-le-nombre-de")}{" "}
           <strong>{tHygiene("distributeurs-de-papier-hygienique")}</strong> :
         </p>
-        <div className="flex flex-col w-full p-1 gap-2">
-          <Label htmlFor="nbDistribPh" className="text-sm flex-1">
+        <div className="flex w-full flex-col gap-2 p-1">
+          <Label htmlFor="nbDistribPh" className="flex-1 text-sm">
             {tHygiene("nombre-de-distributeurs")}
           </Label>
           <div className="flex items-center gap-2">
@@ -242,7 +242,7 @@ const HygieneMobileDistribQuantitesInputs = ({
 
           <p className="text-xs italic text-fm4alldestructive">
             {t(
-              "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer"
+              "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
             )}
           </p>
         </div>

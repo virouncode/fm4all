@@ -27,7 +27,7 @@ export const selectNettoyageTarifsFournisseurSchema = createSelectSchema(
       schema.min(1, "Le nombre d'heures moyen par passage est obligatoire"),
     tauxHoraire: (schema) => schema.min(1, "Le taux horaire est obligatoire"),
     surface: (schema) => schema.min(1, "La surface est obligatoire"),
-  }
+  },
 );
 
 export type SelectNettoyageTarifsType =

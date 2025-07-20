@@ -176,14 +176,14 @@ const SecuriteIncendiePropositions = ({
     }));
     toast({
       description: t(
-        "veillez-a-re-selectionner-vos-options-de-securite-incendie-dans-letape-6-personnaliser"
+        "veillez-a-re-selectionner-vos-options-de-securite-incendie-dans-letape-6-personnaliser",
       ),
     });
   };
 
   const handleChangeNbr = (
     e: ChangeEvent<HTMLInputElement>,
-    type: "extincteur" | "baes" | "telBaes"
+    type: "extincteur" | "baes" | "telBaes",
   ) => {
     const value = e.target.value;
     switch (type) {
@@ -201,7 +201,7 @@ const SecuriteIncendiePropositions = ({
         }));
         if (incendie.infos.fournisseurId) {
           const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
+            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
           );
           const prixParExtincteur =
             tarifsFournisseur?.prixParExtincteur ?? null;
@@ -235,7 +235,7 @@ const SecuriteIncendiePropositions = ({
         }));
         if (incendie.infos.fournisseurId) {
           const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
+            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
           );
           const prixParExtincteur =
             tarifsFournisseur?.prixParExtincteur ?? null;
@@ -266,7 +266,7 @@ const SecuriteIncendiePropositions = ({
         }));
         if (incendie.infos.fournisseurId) {
           const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
+            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
           );
           const prixParExtincteur =
             tarifsFournisseur?.prixParExtincteur ?? null;
@@ -302,7 +302,7 @@ const SecuriteIncendiePropositions = ({
         }));
         if (incendie.infos.fournisseurId) {
           const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
+            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
           );
           const prixParExtincteur =
             tarifsFournisseur?.prixParExtincteur ?? null;
@@ -332,7 +332,7 @@ const SecuriteIncendiePropositions = ({
         }));
         if (incendie.infos.fournisseurId) {
           const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
+            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
           );
           const prixParExtincteur =
             tarifsFournisseur?.prixParExtincteur ?? null;
@@ -361,7 +361,7 @@ const SecuriteIncendiePropositions = ({
         }));
         if (incendie.infos.fournisseurId) {
           const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
+            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
           );
           const prixParExtincteur =
             tarifsFournisseur?.prixParExtincteur ?? null;
@@ -396,7 +396,7 @@ const SecuriteIncendiePropositions = ({
         }));
         if (incendie.infos.fournisseurId) {
           const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
+            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
           );
           const prixParExtincteur =
             tarifsFournisseur?.prixParExtincteur ?? null;
@@ -426,7 +426,7 @@ const SecuriteIncendiePropositions = ({
         }));
         if (incendie.infos.fournisseurId) {
           const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
+            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
           );
           const prixParExtincteur =
             tarifsFournisseur?.prixParExtincteur ?? null;
@@ -455,7 +455,7 @@ const SecuriteIncendiePropositions = ({
         }));
         if (incendie.infos.fournisseurId) {
           const tarifsFournisseur = incendieTarifs.find(
-            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId
+            (tarif) => tarif.fournisseurId === incendie.infos.fournisseurId,
           );
           const prixParExtincteur =
             tarifsFournisseur?.prixParExtincteur ?? null;

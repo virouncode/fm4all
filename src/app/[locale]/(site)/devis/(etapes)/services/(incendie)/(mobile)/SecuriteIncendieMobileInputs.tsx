@@ -18,7 +18,7 @@ type SecuriteIncendieMobileInputsProps = {
   nbTelBaes: number;
   handleChangeNbr: (
     e: React.ChangeEvent<HTMLInputElement>,
-    type: "extincteur" | "baes" | "telBaes"
+    type: "extincteur" | "baes" | "telBaes",
   ) => void;
   incendieQuantite: {
     nbExtincteurs: number;
@@ -45,7 +45,7 @@ const SecuriteIncendieMobileInputs = ({
 
   return (
     <div className="flex flex-col gap-8">
-      <p className="font-bold text-xl hyphens-auto">
+      <p className="hyphens-auto text-xl font-bold">
         {tIncendie("controle-des-extincteurs-baes-telecommandes-baes")}
       </p>
       <div className="flex flex-col gap-4">
@@ -53,7 +53,7 @@ const SecuriteIncendieMobileInputs = ({
           {tIncendie("indiquez-votre-nombre-d")}
           <strong>{tIncendie("extincteurs").toLowerCase()}</strong> :
         </p>
-        <div className="flex flex-col w-full p-1 gap-2">
+        <div className="flex w-full flex-col gap-2 p-1">
           <Label htmlFor="nbExtincteurs" className="text-sm">
             {tIncendie("nombre-d-extincteurs")}
           </Label>
@@ -92,7 +92,7 @@ const SecuriteIncendieMobileInputs = ({
           </div>
           <p className="text-xs italic text-fm4alldestructive">
             {t(
-              "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer"
+              "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
             )}
           </p>
         </div>
@@ -102,23 +102,23 @@ const SecuriteIncendieMobileInputs = ({
           {tIncendie("indiquez-votre-nombre-de")}{" "}
           <strong>
             {tIncendie(
-              "baes-blocs-autonomes-d-eclairage-de-securite"
+              "baes-blocs-autonomes-d-eclairage-de-securite",
             ).toLowerCase()}
           </strong>{" "}
           :
         </p>
-        <div className="w-24 h-16 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+        <div className="relative h-16 w-24 overflow-hidden rounded-xl border border-slate-200 bg-slate-200">
           <Image
             src={"/img/services/baes.webp"}
             alt={tIncendie(
-              "illustration-de-bloc-autonome-declairage-de-securite"
+              "illustration-de-bloc-autonome-declairage-de-securite",
             )}
             fill={true}
-            className="object-cover cursor-pointer"
+            className="cursor-pointer object-cover"
             quality={100}
           />
         </div>
-        <div className="flex flex-col w-full p-1 gap-2">
+        <div className="flex w-full flex-col gap-2 p-1">
           <Label htmlFor="nbBaes" className="text-sm">
             {tIncendie("nombre-de-baes")}
           </Label>
@@ -157,7 +157,7 @@ const SecuriteIncendieMobileInputs = ({
           </div>
           <p className="text-xs italic text-fm4alldestructive">
             {t(
-              "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer"
+              "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
             )}
           </p>
         </div>
@@ -167,18 +167,18 @@ const SecuriteIncendieMobileInputs = ({
           {tIncendie("indiquez-votre-nombre-de")}{" "}
           <strong>{tIncendie("telecommandes-baes").toLowerCase()}</strong> :
         </p>
-        <div className="w-24 h-16 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+        <div className="relative h-16 w-24 overflow-hidden rounded-xl border border-slate-200 bg-slate-200">
           <Image
             src={"/img/services/tel_baes.webp"}
             alt={tIncendie(
-              "illustration-de-telecommande-de-bloc-autonome-declairage-de-securite"
+              "illustration-de-telecommande-de-bloc-autonome-declairage-de-securite",
             )}
             fill={true}
-            className="object-cover cursor-pointer"
+            className="cursor-pointer object-cover"
             quality={100}
           />
         </div>
-        <div className="flex flex-col w-full p-1 gap-2">
+        <div className="flex w-full flex-col gap-2 p-1">
           <Label htmlFor="nbTelBaes" className="text-sm">
             {tIncendie("nombre-de-telecommandes")}
           </Label>
@@ -217,7 +217,7 @@ const SecuriteIncendieMobileInputs = ({
 
           <p className="text-xs italic text-fm4alldestructive">
             {t(
-              "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer"
+              "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
             )}
           </p>
         </div>

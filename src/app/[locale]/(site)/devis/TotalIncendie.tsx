@@ -49,12 +49,12 @@ const TotalIncendie = () => {
   if (!total) return null;
 
   return (
-    <div className="flex flex-col gap-4 total-section" id="total-incendie">
+    <div className="total-section flex flex-col gap-4" id="total-incendie">
       <div className="flex flex-col gap-4">
         <div>
           {t("securite-incendie")} ({incendie.infos.nomFournisseur})
         </div>
-        <div className="flex flex-col ml-4 text-xs ">
+        <div className="ml-4 flex flex-col text-xs">
           {totalTrilogie ? (
             <div className="flex items-center justify-between font-bold">
               <p>{t("trilogie-extincteurs-baes-telecommandes")}</p>
@@ -105,7 +105,7 @@ const TotalIncendie = () => {
               <p>{t("frais-de-deplacement")}</p>
               <p className="text-end">
                 {formatNumber(
-                  Math.round(totalDeplacementExutoiresParking * MARGE)
+                  Math.round(totalDeplacementExutoiresParking * MARGE),
                 )}{" "}
                 {t("eur-ht-an")}
               </p>
@@ -142,7 +142,7 @@ const TotalIncendie = () => {
               <p>{tPersonnaliser("portes-coupe-feu-coulissantes")}</p>
               <p className="text-end">
                 {formatNumber(
-                  Math.round(totalPortesCoupeFeuCoulissantes * MARGE)
+                  Math.round(totalPortesCoupeFeuCoulissantes * MARGE),
                 )}{" "}
                 {t("eur-ht-an")}
               </p>
@@ -162,13 +162,13 @@ const TotalIncendie = () => {
               <p>{tPersonnaliser("colonnes-seches-dynamiques")}</p>
               <p className="text-end">
                 {formatNumber(
-                  Math.round(totalColonnesSechesDynamiques * MARGE)
+                  Math.round(totalColonnesSechesDynamiques * MARGE),
                 )}{" "}
                 {t("eur-ht-an")}
               </p>
             </div>
           ) : null}
-          <div className="flex items-center justify-between border-t border-foreground mt-2">
+          <div className="mt-2 flex items-center justify-between border-t border-foreground">
             <p>TOTAL</p>
             <p className="text-end" data-testid="total-incendie">
               {formatNumber(Math.round(total * MARGE))} {t("eur-ht-an")}

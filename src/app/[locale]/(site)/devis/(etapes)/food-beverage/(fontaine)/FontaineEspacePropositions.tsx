@@ -40,7 +40,7 @@ const FontaineEspacePropositions = ({
   const router = useRouter();
   //Calcul des propositions
   const fontainesEspacesIds = fontaines.espaces.map(
-    (espace) => espace.infos.espaceId
+    (espace) => espace.infos.espaceId,
   );
   const effectif = client.effectif ?? 0;
   const nbPersonnes =
@@ -51,13 +51,13 @@ const FontaineEspacePropositions = ({
   const tarifs = fontainesTarifs.filter(
     (tarif) =>
       tarif.nbPersonnes === roundNbPersonnesFontaine(nbPersonnes) &&
-      tarif.type === getTypeFontaine(espace.infos.typeEau)
+      tarif.type === getTypeFontaine(espace.infos.typeEau),
   );
   const fournisseursCompatiblesIds = [
     ...new Set(
       tarifs
         ?.filter((tarif) => tarif[fontaines.infos.dureeLocation] !== null)
-        .map(({ fournisseurId }) => fournisseurId)
+        .map(({ fournisseurId }) => fournisseurId),
     ),
   ];
 
@@ -67,10 +67,10 @@ const FontaineEspacePropositions = ({
     !fournisseursCompatiblesIds.includes(fontaines.infos.fournisseurId)
   ) {
     return (
-      <div className="flex-1 flex items-center justify-center border rounded-xl">
+      <div className="flex flex-1 items-center justify-center rounded-xl border">
         <p className="max-w-prose text-center text-base">
           {tFontaines(
-            "le-fournisseur-choisi-precedemment-ne-propose-pas-doffre-pour-ces-criteres-veuillez-changer-le-type-deau-ou-le-nombre-de-personnes"
+            "le-fournisseur-choisi-precedemment-ne-propose-pas-doffre-pour-ces-criteres-veuillez-changer-le-type-deau-ou-le-nombre-de-personnes",
           )}
         </p>
       </div>
@@ -184,7 +184,7 @@ const FontaineEspacePropositions = ({
     acc[fournisseurId].push(item);
     acc[fournisseurId].sort(
       (a, b) =>
-        typesPoseArray.indexOf(a.typePose) - typesPoseArray.indexOf(b.typePose)
+        typesPoseArray.indexOf(a.typePose) - typesPoseArray.indexOf(b.typePose),
     );
     return acc;
   }, {});
@@ -262,7 +262,7 @@ const FontaineEspacePropositions = ({
                   prixUnitaireConsoEauChaude: null,
                 },
               }
-            : item
+            : item,
         ),
       }));
       setTotalFontaines((prev) => ({
@@ -273,7 +273,7 @@ const FontaineEspacePropositions = ({
                 total: null,
                 totalInstallation: null,
               }
-            : item
+            : item,
         ),
       }));
     } else {
@@ -300,7 +300,7 @@ const FontaineEspacePropositions = ({
                   prixUnitaireConsoEauChaude,
                 },
               }
-            : item
+            : item,
         ),
       }));
       setTotalFontaines((prev) => ({
@@ -311,7 +311,7 @@ const FontaineEspacePropositions = ({
                 total: totalAnnuel,
                 totalInstallation,
               }
-            : item
+            : item,
         ),
       }));
     }
@@ -466,7 +466,7 @@ const FontaineEspacePropositions = ({
             tarif.type === getTypeFontaine(item.infos.typeEau) &&
             tarif.typePose === item.infos.poseSelected &&
             tarif[fontaines.infos.dureeLocation] !== null &&
-            tarif.fournisseurId === fournisseurId
+            tarif.fournisseurId === fournisseurId,
         );
         if (!itemMachinesTarifFournisseur) {
           newEspace.push(item);
@@ -508,12 +508,12 @@ const FontaineEspacePropositions = ({
           itemTotalLoc !== null ? itemTotalLoc + itemTotalConso : null;
         const itemModele = itemMachinesTarifFournisseur
           ? (fontainesModeles?.find(
-              ({ id }) => id === itemMachinesTarifFournisseur?.fontaineId
+              ({ id }) => id === itemMachinesTarifFournisseur?.fontaineId,
             )?.modele ?? null)
           : null;
         const itemMarque = itemMachinesTarifFournisseur
           ? (fontainesModeles?.find(
-              ({ id }) => id === itemMachinesTarifFournisseur?.fontaineId
+              ({ id }) => id === itemMachinesTarifFournisseur?.fontaineId,
             )?.marque ?? null)
           : null;
         const itemReconditionne = itemMachinesTarifFournisseur
@@ -606,7 +606,7 @@ const FontaineEspacePropositions = ({
     if (!espace.infos.poseSelected) {
       toast({
         description: t(
-          "veuillez-dabord-selectionner-une-offre-ou-retirer-tous-les-espaces"
+          "veuillez-dabord-selectionner-une-offre-ou-retirer-tous-les-espaces",
         ),
         duration: 3000,
         variant: "destructive",
@@ -618,7 +618,7 @@ const FontaineEspacePropositions = ({
 
   const handleClickNextEspace = () => {
     const indexOfCurrentEspace = fontainesEspacesIds.indexOf(
-      espace.infos.espaceId
+      espace.infos.espaceId,
     );
     setFontaines((prev) => ({
       ...prev,

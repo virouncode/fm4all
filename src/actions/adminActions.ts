@@ -33,7 +33,7 @@ export const insertAdminAction = actionClient
         throw new Error(
           locale === "fr"
             ? "Vous n'avez pas les droits pour créer un compte administrateur."
-            : "You do not have permission to create an admin account."
+            : "You do not have permission to create an admin account.",
         );
       }
       const tempPassword = generatePassword();
@@ -56,7 +56,7 @@ export const insertAdminAction = actionClient
         throw new Error(
           locale === "fr"
             ? "Cet email est déjà utilisé par un autre administrateur."
-            : "This email is already used by an admin account."
+            : "This email is already used by an admin account.",
         );
       }
       await auth.api.signUpEmail({
@@ -83,7 +83,7 @@ export const insertAdminAction = actionClient
             : `${userToPost.name}'s admin account has been created, a verification email has been sent to ${userToPost.email}`
         }`,
       };
-    }
+    },
   );
 
 export const updateAdminAction = actionClient
@@ -100,14 +100,14 @@ export const updateAdminAction = actionClient
         throw new Error(
           locale === "fr"
             ? "Vous n'avez pas les droits pour mettre à jour un compte administrateur."
-            : "You do not have permission to update an admin account."
+            : "You do not have permission to update an admin account.",
         );
       }
       if (adminInput.id !== currentUser.id) {
         throw new Error(
           locale === "fr"
             ? "Vous n'avez pas les droits pour mettre à jour le compte de cet administrateur."
-            : "You do not have permission to update this admin account."
+            : "You do not have permission to update this admin account.",
         );
       }
 
@@ -121,7 +121,7 @@ export const updateAdminAction = actionClient
         throw new Error(
           locale === "fr"
             ? "L'ID ne correspond à aucun administrateur."
-            : "This ID does not match any admin."
+            : "This ID does not match any admin.",
         );
       }
       await db.update(user).set(adminInput).where(eq(user.id, adminInput.id));
@@ -134,5 +134,5 @@ export const updateAdminAction = actionClient
             : "Your admin account information has been updated successfully"
         }`,
       };
-    }
+    },
   );

@@ -3,7 +3,7 @@ import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const selectHygieneDistribTarifsSchema = createSelectSchema(
-  hygieneDistribTarifs
+  hygieneDistribTarifs,
 ).extend({
   nomFournisseur: z.string().nonempty("Le nom de l'entreprise est requis"),
   slogan: z.string().nullable(),

@@ -8,7 +8,7 @@ type LoaderFm4allProps = {
 const LoaderFm4all = ({ src, alt }: LoaderFm4allProps) => {
   return (
     <div className="flex items-center justify-center">
-      <div className="h-[80px] w-[80px] relative animate-spin opacity-30">
+      <div className="relative h-[80px] w-[80px] animate-spin opacity-30">
         <Image src={src} alt={alt} fill={true} />
       </div>
     </div>

@@ -10,10 +10,10 @@ type HygieneMobilePropositionsProps = {
   hygieneDistribTarifs: SelectHygieneDistribTarifsType[];
   handleChangeDistribNbr: (
     e: React.ChangeEvent<HTMLInputElement>,
-    type: string
+    type: string,
   ) => void;
   handleChangeDureeLocation: (
-    value: "oneShot" | "pa12M" | "pa24M" | "pa36M"
+    value: "oneShot" | "pa12M" | "pa24M" | "pa36M",
   ) => void;
   nbDistribEmp: number;
   nbDistribSavon: number;
@@ -94,8 +94,8 @@ const HygieneMobilePropositions = ({
 }: HygieneMobilePropositionsProps) => {
   const t = useTranslations("DevisPage.services.hygiene");
   return (
-    <div className="flex flex-col gap-6 w-full">
-      <p className="font-bold text-xl lg:hidden">
+    <div className="flex w-full flex-col gap-6">
+      <p className="text-xl font-bold lg:hidden">
         {t("essuie-mains-papier-savon-papier-hygienique")}
       </p>
       <HygieneMobileDistribQuantitesInputs

@@ -6,8 +6,8 @@ const How = () => {
   const t = useTranslations("HomePage.comment");
   return (
     <section id="process">
-      <div className="max-w-7xl w-full mx-auto flex flex-col gap-10 pt-8 pb-12 px-6">
-        <h2 className="text-2xl md:text-3xl border-l-2 px-4">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-6 pb-12 pt-8">
+        <h2 className="border-l-2 px-4 text-2xl md:text-3xl">
           {t("comment-ca-marche")}
         </h2>
         <HowCards />
@@ -15,7 +15,7 @@ const How = () => {
           title={t("demarrez-maintenant")}
           text={t("demarrez-maintenant")}
           size="lg"
-          className="self-start mx-auto"
+          className="mx-auto self-start"
         />
       </div>
     </section>

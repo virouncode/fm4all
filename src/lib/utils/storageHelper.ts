@@ -2,7 +2,7 @@ import "client-only";
 
 export function getLocalStorage(
   key: string,
-  defaultValue: string | boolean | null
+  defaultValue: string | boolean | null,
 ) {
   const stickyValue = localStorage.getItem(key);
 

@@ -6,14 +6,14 @@ import { useTranslations } from "next-intl";
 const Services = () => {
   const t = useTranslations("HomePage.services");
   return (
-    <section className="max-w-7xl w-full mx-auto flex flex-col gap-10 pt-8 pb-12 px-6 relative">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl md:text-3xl border-l-2 px-4">
+    <section className="relative mx-auto flex w-full max-w-7xl flex-col gap-10 px-6 pb-12 pt-8">
+      <div className="flex items-center justify-between">
+        <h2 className="border-l-2 px-4 text-2xl md:text-3xl">
           {t("nos-services")}
         </h2>
         <Button
           variant="outline"
-          className="hidden md:flex text-base justify-center items-center"
+          className="hidden items-center justify-center text-base md:flex"
           title={t("tous-les-services")}
           size="lg"
           asChild
@@ -24,7 +24,7 @@ const Services = () => {
       <ServicesCarousel />
       <Link
         href="/services"
-        className="underline text-fm4allsecondary md:hidden"
+        className="text-fm4allsecondary underline md:hidden"
       >
         {t("voir-tous-les-services")}
       </Link>

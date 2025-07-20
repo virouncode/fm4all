@@ -24,12 +24,12 @@ const FontaineEspace = ({
   const { fontaines, setFontaines } = useContext(FontainesContext);
   const { setTotalFontaines } = useContext(TotalFontainesContext);
   const fontainesEspacesIds = fontaines.espaces.map(
-    (espace) => espace.infos.espaceId
+    (espace) => espace.infos.espaceId,
   );
 
   const handleClickPreviousEspace = () => {
     const currentEspaceIdIndex = fontainesEspacesIds.indexOf(
-      espace.infos.espaceId
+      espace.infos.espaceId,
     );
     setFontaines((prev) => ({
       ...prev,
@@ -62,7 +62,7 @@ const FontaineEspace = ({
       return;
     }
     const indexOfCurrentEspace = fontainesEspacesIds.indexOf(
-      espace.infos.espaceId
+      espace.infos.espaceId,
     );
     setFontaines((prev) => ({
       ...prev,
@@ -71,12 +71,12 @@ const FontaineEspace = ({
         currentEspaceId: fontainesEspacesIds[indexOfCurrentEspace - 1],
       },
       espaces: prev.espaces.filter(
-        (item) => item.infos.espaceId !== espace.infos.espaceId
+        (item) => item.infos.espaceId !== espace.infos.espaceId,
       ),
     }));
     setTotalFontaines((prev) => ({
       totalEspaces: prev.totalEspaces.filter(
-        (item) => item.espaceId !== espace.infos.espaceId
+        (item) => item.espaceId !== espace.infos.espaceId,
       ),
     }));
   };
@@ -96,17 +96,17 @@ const FontaineEspace = ({
 
   return (
     <div
-      className="h-full flex flex-col overflow-hidden"
+      className="flex h-full flex-col overflow-hidden"
       id={`espace_fontaine_${espace.infos.espaceId}`}
     >
       {/* <FontaineEspaceSummary espace={espace} /> */}
-      <div className="w-full flex justify-between items-start py-1 overflow-hidden">
+      <div className="flex w-full items-start justify-between overflow-hidden py-1">
         <FontaineEspaceForm
           espace={espace}
           fontainesModeles={fontainesModeles}
           fontainesTarifs={fontainesTarifs}
         />
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center gap-2">
           {fontainesEspacesIds[0] !== espace.infos.espaceId && (
             <PreviousEspaceButton
               handleClickPreviousEspace={handleClickPreviousEspace}

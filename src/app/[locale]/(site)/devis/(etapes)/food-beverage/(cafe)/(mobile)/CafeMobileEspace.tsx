@@ -56,7 +56,7 @@ const CafeMobileEspace = ({
         setThe,
         setTotalCafe,
         setTotalThe,
-        client
+        client,
       );
       return;
     }
@@ -68,12 +68,12 @@ const CafeMobileEspace = ({
         currentEspaceId: cafeEspacesIds[indexOfCurrentEspace - 1],
       },
       espaces: prev.espaces.filter(
-        (item) => item.infos.espaceId !== espace.infos.espaceId
+        (item) => item.infos.espaceId !== espace.infos.espaceId,
       ),
     }));
     setTotalCafe((prev) => ({
       totalEspaces: prev.totalEspaces.filter(
-        (item) => item.espaceId !== espace.infos.espaceId
+        (item) => item.espaceId !== espace.infos.espaceId,
       ),
     }));
   };
@@ -92,7 +92,7 @@ const CafeMobileEspace = ({
   };
   return (
     <div
-      className="h-full flex flex-col overflow-hidden gap-4 mt-10"
+      className="mt-10 flex h-full flex-col gap-4 overflow-hidden"
       id={`espace_${espace.infos.espaceId}`}
     >
       <div className="flex items-center justify-between">

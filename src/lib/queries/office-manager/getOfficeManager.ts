@@ -14,7 +14,7 @@ import { eq, getTableColumns } from "drizzle-orm";
 
 export const getOfficeManagerQuantites = async (
   surface: string,
-  effectif: string
+  effectif: string,
 ) => {
   const roundedSurface = roundSurface(parseInt(surface));
   const roundedEffectif = roundEffectifOfficeManager(parseInt(effectif));
@@ -38,7 +38,7 @@ export const getOfficeManagerQuantites = async (
         ? resultsSurface
         : resultsEffectif;
     const validatedResults = results.map((result) =>
-      selectOfficeManagerQuantitesSchema.parse(result)
+      selectOfficeManagerQuantitesSchema.parse(result),
     );
     return validatedResults;
   } catch (err) {
@@ -58,13 +58,13 @@ export const getOfficeManagerTarifs = async () => {
       .from(officeManagerTarifs)
       .innerJoin(
         fournisseurs,
-        eq(fournisseurs.id, officeManagerTarifs.fournisseurId)
+        eq(fournisseurs.id, officeManagerTarifs.fournisseurId),
       );
 
     if (results.length === 0) return [];
 
     const validatedResults = results.map((result) =>
-      selectOfficeManagerTarifsSchema.parse(result)
+      selectOfficeManagerTarifsSchema.parse(result),
     );
     const data = validatedResults.map((result) => ({
       ...result,

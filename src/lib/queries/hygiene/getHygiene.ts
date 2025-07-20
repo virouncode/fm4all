@@ -83,13 +83,13 @@ export const getHygieneDistribTarifs = async () => {
       .from(hygieneDistribTarifs)
       .innerJoin(
         fournisseurs,
-        eq(hygieneDistribTarifs.fournisseurId, fournisseurs.id)
+        eq(hygieneDistribTarifs.fournisseurId, fournisseurs.id),
       );
     if (results.length === 0) {
       return [];
     }
     const validatedResults = results.map((result) =>
-      selectHygieneDistribTarifsSchema.parse(result)
+      selectHygieneDistribTarifsSchema.parse(result),
     );
     const data = validatedResults.map((result) => ({
       ...result,
@@ -114,7 +114,7 @@ export const getHygieneMinFacturation = async () => {
       return [];
     }
     const validatedResults = results.map((result) =>
-      selectHygieneMinFacturationSchema.parse(result)
+      selectHygieneMinFacturationSchema.parse(result),
     );
     const data = validatedResults.map((result) => ({
       ...result,
@@ -129,7 +129,7 @@ export const getHygieneMinFacturation = async () => {
 };
 
 export const getHygieneMinFacturationFournisseur = async (
-  fournisseurId: number
+  fournisseurId: number,
 ) => {
   "use cache";
   cacheTag(getFournisseurTag("hygieneMinFacturation", fournisseurId));
@@ -143,7 +143,7 @@ export const getHygieneMinFacturationFournisseur = async (
       return null;
     }
     const validatedResults = results.map((result) =>
-      selectHygieneMinFacturationSchema.parse(result)
+      selectHygieneMinFacturationSchema.parse(result),
     );
     const data = validatedResults.map((result) => ({
       ...result,
@@ -158,12 +158,12 @@ export const getHygieneMinFacturationFournisseur = async (
 };
 
 export const getHygieneDistribTarifsFournisseur = async (
-  fournisseurId: number
+  fournisseurId: number,
 ) => {
   "use cache";
   cacheTag(getFournisseurTag("hygieneDistribTarifs", fournisseurId));
   console.log(
-    `🔍 DB REQUEST: getHygieneDistribTarifsFournisseur(${fournisseurId})`
+    `🔍 DB REQUEST: getHygieneDistribTarifsFournisseur(${fournisseurId})`,
   );
   try {
     const results = await db
@@ -174,7 +174,7 @@ export const getHygieneDistribTarifsFournisseur = async (
       return [];
     }
     const validatedResults = results.map((result) =>
-      selectHygieneDistribTarifsFournisseurSchema.parse(result)
+      selectHygieneDistribTarifsFournisseurSchema.parse(result),
     );
     const data = validatedResults.map((result) => ({
       ...result,
@@ -204,7 +204,7 @@ export const getHygieneInstalDistribTarifs = async (effectif: string) => {
       return [];
     }
     const validatedResults = results.map((result) =>
-      selectHygieneInstalDistribTarifsSchema.parse(result)
+      selectHygieneInstalDistribTarifsSchema.parse(result),
     );
     const data = validatedResults.map((validatedResult) => ({
       ...validatedResult,
@@ -217,12 +217,12 @@ export const getHygieneInstalDistribTarifs = async (effectif: string) => {
 };
 
 export const getHygieneInstalDistribTarifsFournisseur = async (
-  fournisseurId: number
+  fournisseurId: number,
 ) => {
   "use cache";
   cacheTag(getFournisseurTag("hygieneInstalDistribTarifs", fournisseurId));
   console.log(
-    `🔍 DB REQUEST: getHygieneInstalDistribTarifsFournisseur(${fournisseurId})`
+    `🔍 DB REQUEST: getHygieneInstalDistribTarifsFournisseur(${fournisseurId})`,
   );
   try {
     const results = await db
@@ -234,7 +234,7 @@ export const getHygieneInstalDistribTarifsFournisseur = async (
       return [];
     }
     const validatedResults = results.map((result) =>
-      selectHygieneInstalDistribTarifsFournisseurSchema.parse(result)
+      selectHygieneInstalDistribTarifsFournisseurSchema.parse(result),
     );
     const data = validatedResults.map((validatedResult) => ({
       ...validatedResult,
@@ -269,7 +269,7 @@ export const getHygieneConsosTarifs = async (effectif: string) => {
       .from(hygieneConsoTarifs)
       .innerJoin(
         fournisseurs,
-        eq(hygieneConsoTarifs.fournisseurId, fournisseurs.id)
+        eq(hygieneConsoTarifs.fournisseurId, fournisseurs.id),
       )
       .where(and(eq(hygieneConsoTarifs.effectif, roundedEffectif)));
 
@@ -277,7 +277,7 @@ export const getHygieneConsosTarifs = async (effectif: string) => {
       return [];
     }
     const validatedResults = results.map((result) =>
-      selectHygieneConsoTarifsSchema.parse(result)
+      selectHygieneConsoTarifsSchema.parse(result),
     );
     const data = validatedResults.map((validatedResult) => ({
       ...validatedResult,
@@ -294,12 +294,12 @@ export const getHygieneConsosTarifs = async (effectif: string) => {
 };
 
 export const getHygieneConsosTarifsFournisseur = async (
-  fournisseurId: number
+  fournisseurId: number,
 ) => {
   "use cache";
   cacheTag(getFournisseurTag("hygieneConsosTarifs", fournisseurId));
   console.log(
-    `🔍 DB REQUEST: getHygieneConsosTarifsFournisseur(${fournisseurId})`
+    `🔍 DB REQUEST: getHygieneConsosTarifsFournisseur(${fournisseurId})`,
   );
   try {
     const results = await db
@@ -311,7 +311,7 @@ export const getHygieneConsosTarifsFournisseur = async (
       return [];
     }
     const validatedResults = results.map((result) =>
-      selectHygieneConsoTarifsFournisseurSchema.parse(result)
+      selectHygieneConsoTarifsFournisseurSchema.parse(result),
     );
     const data = validatedResults.map((validatedResult) => ({
       ...validatedResult,

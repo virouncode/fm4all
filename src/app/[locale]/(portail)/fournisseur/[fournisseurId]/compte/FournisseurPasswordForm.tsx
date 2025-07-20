@@ -85,18 +85,18 @@ const FournisseurPasswordForm = () => {
     }
   };
   return (
-    <Card className="rounded-md h-[60%] w-full sm:w-3/4 lg:w-2/3 mx-auto">
+    <Card className="mx-auto h-[60%] w-full rounded-md sm:w-3/4 lg:w-2/3">
       <CardHeader>
         <CardTitle className="text-lg md:text-xl">
           <p>Mot de passe</p>
         </CardTitle>
-        <CardDescription className="text-sm md:text-base  italic">
+        <CardDescription className="text-sm italic md:text-base">
           👉 Changez votre mot de passe
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form className="grid gap-2" onSubmit={handleSubmit}>
-          <div className="flex flex-col md:grid md:grid-cols-2 gap-2 md:gap-6">
+          <div className="flex flex-col gap-2 md:grid md:grid-cols-2 md:gap-6">
             <Label htmlFor="currentPassword" className="text-base">
               Mot de passe actuel*
             </Label>
@@ -108,7 +108,7 @@ const FournisseurPasswordForm = () => {
               onChange={handleChange}
             />
           </div>
-          <div className="flex flex-col md:grid md:grid-cols-2 gap-2 md:gap-6">
+          <div className="flex flex-col gap-2 md:grid md:grid-cols-2 md:gap-6">
             <Label htmlFor="newPassword" className="text-base">
               Nouveau mot de passe*
             </Label>
@@ -120,7 +120,7 @@ const FournisseurPasswordForm = () => {
               onChange={handleChange}
             />
           </div>
-          <div className="flex flex-col md:grid md:grid-cols-2 gap-2 md:gap-6">
+          <div className="flex flex-col gap-2 md:grid md:grid-cols-2 md:gap-6">
             <Label htmlFor="newPasswordConfirm" className="text-base">
               Confirmation du nouveau mot de passe*
             </Label>
@@ -136,7 +136,7 @@ const FournisseurPasswordForm = () => {
             variant="destructive"
             size="lg"
             title={tAdmin("mettre-a-jour")}
-            className="text-base w-full mt-6"
+            className="mt-6 w-full text-base"
             disabled={loading}
           >
             {loading ? (

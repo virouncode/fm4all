@@ -9,7 +9,7 @@ const MonDevis = () => {
   const [devisUrl, setDevisUrl] = useState<string | null>(null);
 
   return (
-    <section className="flex-1 flex flex-col gap-20">
+    <section className="flex flex-1 flex-col gap-20">
       <MonDevisForm setDevisUrl={setDevisUrl} />
       {devisUrl ? <MonDevisDocument devisUrl={devisUrl} /> : null}
       <DevisSynthese />

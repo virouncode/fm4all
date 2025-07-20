@@ -14,7 +14,7 @@ export const selectHygieneConsoTarifsSchema = createSelectSchema(
       schema.min(1, "Le prix annuel par personne ph est obligatoire"),
     paParPersonneDesinfectant: (schema) =>
       schema.min(1, "Le prix annuel par personne desinfectant est obligatoire"),
-  }
+  },
 ).extend({
   nomFournisseur: z.string().nonempty("Le nom de l'entreprise est requis"),
   slogan: z.string().nullable(),
@@ -40,7 +40,7 @@ export const selectHygieneConsoTarifsFournisseurSchema = createSelectSchema(
       schema.min(1, "Le prix annuel par personne ph est obligatoire"),
     paParPersonneDesinfectant: (schema) =>
       schema.min(1, "Le prix annuel par personne desinfectant est obligatoire"),
-  }
+  },
 );
 
 export type SelectHygieneConsoTarifsType =

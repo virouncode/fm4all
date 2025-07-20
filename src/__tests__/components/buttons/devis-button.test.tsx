@@ -28,7 +28,7 @@ vi.mock(
   "@/app/[locale]/(site)/devis/(etapes)/locaux/fullReinitialisationDevis",
   () => ({
     fullReinitialisationDevis: vi.fn(),
-  })
+  }),
 );
 
 const renderWithContexts = (
@@ -42,7 +42,7 @@ const renderWithContexts = (
       client: InsertClientType;
       setClient: Dispatch<SetStateAction<InsertClientType>>;
     };
-  }
+  },
 ) => {
   const { devisContext, clientContext } = options ?? {};
 
@@ -62,7 +62,7 @@ const renderWithContexts = (
       ) : (
         children
       )}
-    </DevisProgressContext.Provider>
+    </DevisProgressContext.Provider>,
   );
 
   return {
@@ -103,7 +103,7 @@ describe("DevisButton", () => {
   });
   it("should render a button with the correct text", () => {
     render(
-      <DevisButton title="Mon devis en ligne" text="Mon devis en ligne" />
+      <DevisButton title="Mon devis en ligne" text="Mon devis en ligne" />,
     );
     screen.getByRole("button", { name: "Mon devis en ligne" });
   });
@@ -119,7 +119,7 @@ describe("DevisButton", () => {
           },
           setDevisProgress: vi.fn(),
         },
-      }
+      },
     );
     const user = userEvent.setup();
     await user.click(button);
@@ -137,15 +137,15 @@ describe("DevisButton", () => {
           },
           setDevisProgress: vi.fn(),
         },
-      }
+      },
     );
     const user = userEvent.setup();
     await user.click(button);
     expect(
-      screen.getByRole("heading", { name: "devis-en-cours" })
+      screen.getByRole("heading", { name: "devis-en-cours" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "reprendre" })
+      screen.getByRole("button", { name: "reprendre" }),
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "nouveau" })).toBeInTheDocument();
   });
@@ -165,7 +165,7 @@ describe("DevisButton", () => {
           },
           setDevisProgress: vi.fn(),
         },
-      }
+      },
     );
 
     const user = userEvent.setup();
@@ -193,7 +193,7 @@ describe("DevisButton", () => {
           },
           setDevisProgress: vi.fn(),
         },
-      }
+      },
     );
 
     const user = userEvent.setup();
@@ -224,7 +224,7 @@ describe("DevisButton", () => {
           client: defaultClient,
           setClient: vi.fn(),
         },
-      }
+      },
     );
 
     const user = userEvent.setup();
@@ -258,7 +258,7 @@ describe("DevisButton", () => {
           client: defaultClient,
           setClient: vi.fn(),
         },
-      }
+      },
     );
 
     const user = userEvent.setup();

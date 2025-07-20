@@ -8,7 +8,7 @@ type HygieneMobileOptionsParfumProps = {
   nbDistribParfum: number;
   handleChangeDistribNbr: (
     e: ChangeEvent<HTMLInputElement>,
-    type: string
+    type: string,
   ) => void;
   propositions: {
     nomFournisseur: string;
@@ -63,7 +63,7 @@ type HygieneMobileOptionsParfumProps = {
       imageUrlParfum: string | null;
       imageUrlBalai: string | null;
       imageUrlPoubelle: string | null;
-    }
+    },
   ) => void;
   hygieneDistribTarifsFournisseur: {
     id: number;

@@ -46,7 +46,7 @@ const NextEtapeSauverButton = () => {
         variant: "destructive",
         title: tFm4all("panier-vide"),
         description: tFm4all(
-          "vous-navez-choisi-aucun-service-veuillez-selectionner-au-moins-un-service"
+          "vous-navez-choisi-aucun-service-veuillez-selectionner-au-moins-un-service",
         ),
       });
       return;

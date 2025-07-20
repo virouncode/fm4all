@@ -54,7 +54,7 @@ describe("CTAContactButtons", () => {
     expect(videoButton).toHaveTextContent(/je prends un rendez-vous en visio/i);
     expect(visioLink).toHaveAttribute(
       "href",
-      expect.stringContaining("calendly")
+      expect.stringContaining("calendly"),
     );
   });
 
@@ -76,7 +76,7 @@ describe("CTAContactButtons", () => {
     expect(videoButton).toHaveTextContent(/schedule a video call/i);
     expect(visioLink).toHaveAttribute(
       "href",
-      expect.stringContaining("calendly")
+      expect.stringContaining("calendly"),
     );
   });
 

@@ -35,7 +35,7 @@ describe("Bloc", () => {
         imageAlt="Image gauche"
         side="left"
         bloc={sampleBloc}
-      />
+      />,
     );
     const img = screen.getByAltText("Image gauche");
     expect(img).toBeInTheDocument();
@@ -48,7 +48,7 @@ describe("Bloc", () => {
         imageAlt="Image droite"
         side="right"
         bloc={sampleBloc}
-      />
+      />,
     );
 
     const img = screen.getByAltText("Image droite");
@@ -68,7 +68,7 @@ describe("Bloc", () => {
         imageAlt="Texte test"
         side="left"
         bloc={sampleBloc}
-      />
+      />,
     );
     // Ici on cherche notre mock via data-testid
     expect(screen.getByTestId("portable-text-mock")).toBeInTheDocument();

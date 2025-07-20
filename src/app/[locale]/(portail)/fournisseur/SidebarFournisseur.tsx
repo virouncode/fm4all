@@ -99,8 +99,8 @@ const SidebarFournisseur = ({ fournisseurId }: SidebarFournisseurProps) => {
       <SidebarTrigger />
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel asChild className="mt-6 mb-14 w-full">
-            <div className="flex items-center justify-center gap-6 w-full">
+          <SidebarGroupLabel asChild className="mb-14 mt-6 w-full">
+            <div className="flex w-full items-center justify-center gap-6">
               <Link href="/" title="Accueil">
                 <div className="relative h-[23px] w-[100px]">
                   <Image
@@ -126,7 +126,7 @@ const SidebarFournisseur = ({ fournisseurId }: SidebarFournisseurProps) => {
                   >
                     <Link
                       href={item.href}
-                      className="flex items-center gap-2 w-full"
+                      className="flex w-full items-center gap-2"
                     >
                       <item.icon size={15} />
                       <span>{item.title}</span>

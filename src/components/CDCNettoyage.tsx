@@ -1525,12 +1525,8 @@ const CDCNettoyage = () => {
         <Table className="border-collapse">
           <TableHeader className="sticky top-0 z-20 bg-white">
             <TableRow className="bg-white">
-              <TableCell
-                colSpan={13}
-                className="p-0 sticky left-0 z-10
-"
-              >
-                <div className="bg-fm4allsecondary text-white text-center p-4">
+              <TableCell colSpan={13} className="sticky left-0 z-10 p-0">
+                <div className="bg-fm4allsecondary p-4 text-center text-white">
                   <h1 className="text-xl">Cahier des charges - Nettoyage</h1>
                   <p>Fréquences minimum de prestations par zone</p>
                 </div>
@@ -1539,8 +1535,7 @@ const CDCNettoyage = () => {
             <TableRow>
               <TableCell
                 colSpan={13}
-                className="text-center font-bold py-2 sticky left-0 z-10
-"
+                className="sticky left-0 z-10 py-2 text-center font-bold"
               >
                 Notes pour le chiffrage
               </TableCell>
@@ -1548,8 +1543,7 @@ const CDCNettoyage = () => {
             {notes.map((note, index) => (
               <TableRow key={`note-${index}`}>
                 <TableCell
-                  className={`w-80 sticky left-0 z-10
- text-right text-white font-bold bg-${getFm4AllColor(note.title.toLowerCase() as GammeType)}`}
+                  className={`sticky left-0 z-10 w-80 text-right font-bold text-white bg-${getFm4AllColor(note.title.toLowerCase() as GammeType)}`}
                 >
                   {note.title}
                 </TableCell>
@@ -1558,25 +1552,24 @@ const CDCNettoyage = () => {
             ))}
             <TableRow>
               <TableHead
-                className="bg-fm4allsecondary text-white sticky left-0 z-10
-"
+                className="sticky left-0 z-10 bg-fm4allsecondary text-white"
                 rowSpan={2}
               ></TableHead>
               <TableHead
                 colSpan={4}
-                className="text-center bg-fm4allessential text-white w-8"
+                className="w-8 bg-fm4allessential text-center text-white"
               >
                 Gamme Essentiel
               </TableHead>
               <TableHead
                 colSpan={4}
-                className="text-center bg-fm4allcomfort text-white w-8"
+                className="w-8 bg-fm4allcomfort text-center text-white"
               >
                 Gamme Confort
               </TableHead>
               <TableHead
                 colSpan={4}
-                className="text-center bg-fm4allexcellence text-white w-8"
+                className="w-8 bg-fm4allexcellence text-center text-white"
               >
                 Gamme Excellence
               </TableHead>
@@ -1584,42 +1577,42 @@ const CDCNettoyage = () => {
 
             <TableRow>
               {/* Essentiel Headers */}
-              <TableHead className="text-center bg-fm4allessential text-white h-28 w-14 p-0">
+              <TableHead className="h-28 w-14 bg-fm4allessential p-0 text-center text-white">
                 <div className="-rotate-90">Hebdomadaire</div>
               </TableHead>
-              <TableHead className="text-center bg-fm4allessential text-white h-28 w-14 p-0">
+              <TableHead className="h-28 w-14 bg-fm4allessential p-0 text-center text-white">
                 <div className="-rotate-90">Mensuelle</div>
               </TableHead>
-              <TableHead className="text-center bg-fm4allessential text-white h-28 w-14 p-0">
+              <TableHead className="h-28 w-14 bg-fm4allessential p-0 text-center text-white">
                 <div className="-rotate-90">Trimestrielle</div>
               </TableHead>
-              <TableHead className="text-center bg-fm4allessential text-white h-28 w-14 p-0">
+              <TableHead className="h-28 w-14 bg-fm4allessential p-0 text-center text-white">
                 <div className="-rotate-90">Semestrielle</div>
               </TableHead>
               {/* Confort Headers */}
-              <TableHead className="text-center bg-fm4allcomfort text-white h-28 w-14 p-0">
+              <TableHead className="h-28 w-14 bg-fm4allcomfort p-0 text-center text-white">
                 <div className="-rotate-90">Hebdomadaire</div>
               </TableHead>
-              <TableHead className="text-center bg-fm4allcomfort text-white h-28 w-14 p-0">
+              <TableHead className="h-28 w-14 bg-fm4allcomfort p-0 text-center text-white">
                 <div className="-rotate-90">Mensuelle</div>
               </TableHead>
-              <TableHead className="text-center bg-fm4allcomfort text-white h-28 w-14 p-0">
+              <TableHead className="h-28 w-14 bg-fm4allcomfort p-0 text-center text-white">
                 <div className="-rotate-90">Trimestrielle</div>
               </TableHead>
-              <TableHead className="text-center bg-fm4allcomfort text-white h-28 w-14 p-0">
+              <TableHead className="h-28 w-14 bg-fm4allcomfort p-0 text-center text-white">
                 <div className="-rotate-90">Semestrielle</div>
               </TableHead>
               {/* Excellence Headers */}
-              <TableHead className="text-center bg-fm4allexcellence text-white h-28 w-14 p-0">
+              <TableHead className="h-28 w-14 bg-fm4allexcellence p-0 text-center text-white">
                 <div className="-rotate-90">Hebdomadaire</div>
               </TableHead>
-              <TableHead className="text-center bg-fm4allexcellence text-white h-28 w-14 p-0">
+              <TableHead className="h-28 w-14 bg-fm4allexcellence p-0 text-center text-white">
                 <div className="-rotate-90">Mensuelle</div>
               </TableHead>
-              <TableHead className="text-center bg-fm4allexcellence text-white h-28 w-14 p-0">
+              <TableHead className="h-28 w-14 bg-fm4allexcellence p-0 text-center text-white">
                 <div className="-rotate-90">Trimestrielle</div>
               </TableHead>
-              <TableHead className="text-center bg-fm4allexcellence text-white h-28 w-14 p-0">
+              <TableHead className="h-28 w-14 bg-fm4allexcellence p-0 text-center text-white">
                 <div className="-rotate-90">Semestrielle</div>
               </TableHead>
             </TableRow>
@@ -1631,8 +1624,7 @@ const CDCNettoyage = () => {
                 <TableRow>
                   <TableCell
                     colSpan={13}
-                    className="bg-fm4allsecondary text-white text-center font-bold py-2 sticky left-0 z-10 
-"
+                    className="sticky left-0 z-10 bg-fm4allsecondary py-2 text-center font-bold text-white"
                   >
                     {section.title}
                   </TableCell>
@@ -1646,44 +1638,44 @@ const CDCNettoyage = () => {
                     </TableCell>
 
                     {/* Essentiel Cells */}
-                    <TableCell className="text-center bg-fm4allessential/40">
+                    <TableCell className="bg-fm4allessential/40 text-center">
                       {row.essentiel.hebdomadaire}
                     </TableCell>
-                    <TableCell className="text-center bg-fm4allessential/40">
+                    <TableCell className="bg-fm4allessential/40 text-center">
                       {row.essentiel.mensuelle}
                     </TableCell>
-                    <TableCell className="text-center bg-fm4allessential/40">
+                    <TableCell className="bg-fm4allessential/40 text-center">
                       {row.essentiel.trimestrielle}
                     </TableCell>
-                    <TableCell className="text-center bg-fm4allessential/40">
+                    <TableCell className="bg-fm4allessential/40 text-center">
                       {row.essentiel.semestrielle}
                     </TableCell>
 
                     {/* Confort Cells */}
-                    <TableCell className="text-center bg-fm4allcomfort/40">
+                    <TableCell className="bg-fm4allcomfort/40 text-center">
                       {row.confort.hebdomadaire}
                     </TableCell>
-                    <TableCell className="text-center bg-fm4allcomfort/40">
+                    <TableCell className="bg-fm4allcomfort/40 text-center">
                       {row.confort.mensuelle}
                     </TableCell>
-                    <TableCell className="text-center bg-fm4allcomfort/40">
+                    <TableCell className="bg-fm4allcomfort/40 text-center">
                       {row.confort.trimestrielle}
                     </TableCell>
-                    <TableCell className="text-center bg-fm4allcomfort/40">
+                    <TableCell className="bg-fm4allcomfort/40 text-center">
                       {row.confort.semestrielle}
                     </TableCell>
 
                     {/* Excellence Cells */}
-                    <TableCell className="text-center bg-fm4allexcellence/40">
+                    <TableCell className="bg-fm4allexcellence/40 text-center">
                       {row.excellence.hebdomadaire}
                     </TableCell>
-                    <TableCell className="text-center bg-fm4allexcellence/40">
+                    <TableCell className="bg-fm4allexcellence/40 text-center">
                       {row.excellence.mensuelle}
                     </TableCell>
-                    <TableCell className="text-center bg-fm4allexcellence/40">
+                    <TableCell className="bg-fm4allexcellence/40 text-center">
                       {row.excellence.trimestrielle}
                     </TableCell>
-                    <TableCell className="text-center bg-fm4allexcellence/40">
+                    <TableCell className="bg-fm4allexcellence/40 text-center">
                       {row.excellence.semestrielle}
                     </TableCell>
                   </TableRow>
@@ -1697,8 +1689,7 @@ const CDCNettoyage = () => {
                 <TableRow>
                   <TableCell
                     colSpan={13}
-                    className="bg-fm4allsecondary text-white text-center font-bold py-2 sticky left-0 z-10
-"
+                    className="sticky left-0 z-10 bg-fm4allsecondary py-2 text-center font-bold text-white"
                   >
                     {section.title}
                   </TableCell>
@@ -1707,8 +1698,7 @@ const CDCNettoyage = () => {
                 <TableRow>
                   <TableCell
                     colSpan={13}
-                    className="text-center font-bold py-2 sticky left-0 z-10
-"
+                    className="sticky left-0 z-10 py-2 text-center font-bold"
                   >
                     Notes pour le chiffrage
                   </TableCell>
@@ -1716,7 +1706,7 @@ const CDCNettoyage = () => {
                 {notes.map((note, index) => (
                   <TableRow key={`permanence-${index}`}>
                     <TableCell
-                      className={`text-right text-white sticky left-0 z-10 font-bold bg-${getFm4AllColor(note.title.toLowerCase() as GammeType)}`}
+                      className={`sticky left-0 z-10 text-right font-bold text-white bg-${getFm4AllColor(note.title.toLowerCase() as GammeType)}`}
                     >
                       {note.title}
                     </TableCell>
@@ -1732,44 +1722,44 @@ const CDCNettoyage = () => {
                     </TableCell>
 
                     {/* Essentiel Cells */}
-                    <TableCell className="text-center bg-fm4allessential/40">
+                    <TableCell className="bg-fm4allessential/40 text-center">
                       {row.essentiel.hebdomadaire}
                     </TableCell>
-                    <TableCell className="text-center bg-fm4allessential/40">
+                    <TableCell className="bg-fm4allessential/40 text-center">
                       {row.essentiel.mensuelle}
                     </TableCell>
-                    <TableCell className="text-center bg-fm4allessential/40">
+                    <TableCell className="bg-fm4allessential/40 text-center">
                       {row.essentiel.trimestrielle}
                     </TableCell>
-                    <TableCell className="text-center bg-fm4allessential/40">
+                    <TableCell className="bg-fm4allessential/40 text-center">
                       {row.essentiel.semestrielle}
                     </TableCell>
 
                     {/* Confort Cells */}
-                    <TableCell className="text-center bg-fm4allcomfort/40">
+                    <TableCell className="bg-fm4allcomfort/40 text-center">
                       {row.confort.hebdomadaire}
                     </TableCell>
-                    <TableCell className="text-center bg-fm4allcomfort/40">
+                    <TableCell className="bg-fm4allcomfort/40 text-center">
                       {row.confort.mensuelle}
                     </TableCell>
-                    <TableCell className="text-center bg-fm4allcomfort/40">
+                    <TableCell className="bg-fm4allcomfort/40 text-center">
                       {row.confort.trimestrielle}
                     </TableCell>
-                    <TableCell className="text-center bg-fm4allcomfort/40">
+                    <TableCell className="bg-fm4allcomfort/40 text-center">
                       {row.confort.semestrielle}
                     </TableCell>
 
                     {/* Excellence Cells */}
-                    <TableCell className="text-center bg-fm4allexcellence/40">
+                    <TableCell className="bg-fm4allexcellence/40 text-center">
                       {row.excellence.hebdomadaire}
                     </TableCell>
-                    <TableCell className="text-center bg-fm4allexcellence/40">
+                    <TableCell className="bg-fm4allexcellence/40 text-center">
                       {row.excellence.mensuelle}
                     </TableCell>
-                    <TableCell className="text-center bg-fm4allexcellence/40">
+                    <TableCell className="bg-fm4allexcellence/40 text-center">
                       {row.excellence.trimestrielle}
                     </TableCell>
-                    <TableCell className="text-center bg-fm4allexcellence/40">
+                    <TableCell className="bg-fm4allexcellence/40 text-center">
                       {row.excellence.semestrielle}
                     </TableCell>
                   </TableRow>

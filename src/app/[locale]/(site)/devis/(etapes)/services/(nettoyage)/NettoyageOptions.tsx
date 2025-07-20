@@ -58,7 +58,7 @@ const NettoyageOptions = ({
             .filter(
               (tarif) =>
                 tarif.fournisseurId === nettoyage.infos.fournisseurId &&
-                tarif.gamme === nettoyage.infos.gammeSelected
+                tarif.gamme === nettoyage.infos.gammeSelected,
             )
             .map((tarif) => {
               const {
@@ -101,7 +101,7 @@ const NettoyageOptions = ({
     .filter(
       (tarif) =>
         tarif.fournisseurId === nettoyage.infos.fournisseurId &&
-        tarif.gamme === nettoyage.infos.gammeSelected
+        tarif.gamme === nettoyage.infos.gammeSelected,
     )
     .map((tarif) => {
       const {
@@ -141,7 +141,7 @@ const NettoyageOptions = ({
     .filter(
       (tarif) =>
         tarif.fournisseurId === nettoyage.infos.fournisseurId &&
-        tarif.gamme === nettoyage.infos.gammeSelected
+        tarif.gamme === nettoyage.infos.gammeSelected,
     )
     .map((tarif) => {
       const {
@@ -205,7 +205,7 @@ const NettoyageOptions = ({
                 nettoyage.quantites.surfaceVitres / cadenceVitres) *
                 tauxHoraire +
                 fraisDeplacement,
-              minFacturation
+              minFacturation,
             )
           : null;
       return {
@@ -230,7 +230,7 @@ const NettoyageOptions = ({
     })[0];
 
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="2">
+    <div className="mx-auto flex h-full w-full flex-col gap-4 py-2" id="2">
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
           title={tNettoyage("nettoyage-et-proprete-options")}
@@ -241,7 +241,7 @@ const NettoyageOptions = ({
                   {
                     gamme: capitalize(nettoyage.infos.gammeSelected),
                     nomFournisseur: nettoyage.infos.nomFournisseur ?? "",
-                  }
+                  },
                 )
               : ""
           }
@@ -258,7 +258,7 @@ const NettoyageOptions = ({
                   {
                     gamme: capitalize(nettoyage.infos.gammeSelected),
                     nomFournisseur: nettoyage.infos.nomFournisseur ?? "",
-                  }
+                  },
                 )
               : ""
           }
@@ -271,7 +271,7 @@ const NettoyageOptions = ({
           <div className="flex h-full items-center justify-center text-base lg:text-lg">
             <p className="text-center text-fm4alldestructive">
               {tNettoyage(
-                "veuillez-d-abord-selectionner-une-offre-de-nettoyage"
+                "veuillez-d-abord-selectionner-une-offre-de-nettoyage",
               )}
             </p>
           </div>

@@ -18,11 +18,11 @@ export const fillDevis = async (
   totalAnnuelHTMarge: number | null,
   totalInstallationHT: number | null,
   commentaires: string | null,
-  dateDemarrage: string | null
+  dateDemarrage: string | null,
 ) => {
   try {
     const formPdfBytes = await fetch("/pdf/fm4all_devis_template_NEW.pdf").then(
-      (res) => res.arrayBuffer()
+      (res) => res.arrayBuffer(),
     );
     // Load the PDF document
     const pdfDoc = await PDFDocument.load(formPdfBytes);
@@ -32,10 +32,10 @@ export const fillDevis = async (
     const totalMensuelHtText = formatNumber((totalAnnuelHTMarge ?? 0) / 12);
     const tvaText = formatNumber(0.2 * (totalAnnuelHTMarge ?? 0));
     const totalInstallationHtText = formatNumber(
-      (totalInstallationHT ?? 0) * MARGE
+      (totalInstallationHT ?? 0) * MARGE,
     );
     const totalInstallationTtcText = formatNumber(
-      (totalInstallationHT ?? 0) * MARGE * TVA
+      (totalInstallationHT ?? 0) * MARGE * TVA,
     );
     const totalAnnuelTtcText = formatNumber((totalAnnuelHTMarge ?? 0) * TVA);
     const adresseClient =
@@ -109,10 +109,10 @@ export const fillDevis = async (
       const LIMIT_HEIGHT = 800;
       const totalSummary = document.getElementById("total-summary");
       const sections = Array.from(
-        document.querySelectorAll(".total-section")
+        document.querySelectorAll(".total-section"),
       ) as HTMLElement[];
       const sectionsHeights = sections.map(
-        (section) => section.getBoundingClientRect().height
+        (section) => section.getBoundingClientRect().height,
       );
 
       let sum = 120; // Padding top + en-tête + gap
@@ -149,11 +149,11 @@ export const fillDevis = async (
           "mx-auto",
           "p-4",
           "border",
-          "rounded-xl"
+          "rounded-xl",
         );
         if (index === 0) {
           const totalSummaryClone = totalSummary?.cloneNode(
-            true
+            true,
           ) as HTMLElement;
           totalSummaryClone.style.marginBottom = "16px";
           wrapper.appendChild(totalSummaryClone);
@@ -202,10 +202,10 @@ export const fillDevis = async (
     try {
       const LIMIT_HEIGHT = 1800;
       const sections = Array.from(
-        document.querySelectorAll(".detail-section")
+        document.querySelectorAll(".detail-section"),
       ) as HTMLElement[];
       const sectionsHeights = sections.map(
-        (section) => section.getBoundingClientRect().height
+        (section) => section.getBoundingClientRect().height,
       );
       let sum = 0; // Padding top + en-tête + gap
       let currentGroup: HTMLElement[] = [];
@@ -241,7 +241,7 @@ export const fillDevis = async (
           "mx-auto",
           "p-4",
           "border",
-          "rounded-xl"
+          "rounded-xl",
         );
         group.forEach((section) => {
           wrapper.appendChild(section.cloneNode(true));
@@ -288,7 +288,7 @@ export const fillDevis = async (
     const pdfBytes = await pdfDoc.save();
 
     const docUrl = URL.createObjectURL(
-      new Blob([pdfBytes], { type: "application/pdf" })
+      new Blob([pdfBytes], { type: "application/pdf" }),
     );
     return docUrl;
   } catch (error) {

@@ -39,18 +39,18 @@ const DevisBreadcrumb = () => {
   if (client.effectif) {
     serviceSearchParams.set(
       "effectif",
-      roundEffectif(client.effectif).toString()
+      roundEffectif(client.effectif).toString(),
     );
     sauvegarderSearchParams.set(
       "effectif",
-      roundEffectif(client.effectif).toString()
+      roundEffectif(client.effectif).toString(),
     );
   }
   if (client.surface) {
     serviceSearchParams.set("surface", roundSurface(client.surface).toString());
     sauvegarderSearchParams.set(
       "surface",
-      roundSurface(client.surface).toString()
+      roundSurface(client.surface).toString(),
     );
   }
   if (client.typeBatiment) {
@@ -156,20 +156,20 @@ const DevisBreadcrumb = () => {
   };
 
   const previousRoute = devisRoutes.find(
-    ({ id }) => id === devisProgress.currentStep - 1
+    ({ id }) => id === devisProgress.currentStep - 1,
   );
   const nextRoute = devisRoutes.find(
-    ({ id }) => id === devisProgress.currentStep + 1
+    ({ id }) => id === devisProgress.currentStep + 1,
   );
 
   return (
     <>
       {/* DESKTOP BREADCRUMB */}
-      <div className="justify-center hidden lg:flex">
-        <Breadcrumb className="h-20 md:h-10 overflow-auto">
+      <div className="hidden justify-center lg:flex">
+        <Breadcrumb className="h-20 overflow-auto md:h-10">
           <BreadcrumbList className="text-sm">
             {devisRoutes.map((route, index) => (
-              <div key={route.id} className="flex gap-2 items-center">
+              <div key={route.id} className="flex items-center gap-2">
                 <BreadcrumbItem className="flex items-center">
                   {route.id === devisProgress.currentStep ? (
                     <BreadcrumbPage className="font-bold hover:opacity-80">
@@ -206,7 +206,7 @@ const DevisBreadcrumb = () => {
         </Breadcrumb>
       </div>
       {/* MOBILE BREADCRUMB */}
-      <div className="flex justify-between items-center lg:hidden sticky -mt-4 top-[65px] bg-white z-20 py-4 border-slate-200 border-b">
+      <div className="sticky top-[65px] z-20 -mt-4 flex items-center justify-between border-b border-slate-200 bg-white py-4 lg:hidden">
         <div>
           {previousRoute ? (
             <Link

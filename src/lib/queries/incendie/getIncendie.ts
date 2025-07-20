@@ -64,12 +64,12 @@ export const getIncendieTarifs = async (surface: string) => {
       .from(incendieTarifs)
       .innerJoin(
         fournisseurs,
-        eq(fournisseurs.id, incendieTarifs.fournisseurId)
+        eq(fournisseurs.id, incendieTarifs.fournisseurId),
       )
       .where(eq(incendieTarifs.surface, roundedSurface));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectIncendieTarifsSchema.parse(result)
+      selectIncendieTarifsSchema.parse(result),
     );
     const data = validatedResults.map((result) => ({
       ...result,
@@ -92,7 +92,7 @@ export const getExutoiresTarifs = async () => {
     const results = await db.select().from(exutoiresTarifs);
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectExutoiresTarifsSchema.parse(result)
+      selectExutoiresTarifsSchema.parse(result),
     );
     return validatedResults.map((result) => ({
       ...result,
@@ -111,7 +111,7 @@ export const getExutoiresParkingsTarifs = async () => {
     const results = await db.select().from(exutoiresParkingTarifs);
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectExutoiresTarifsSchema.parse(result)
+      selectExutoiresTarifsSchema.parse(result),
     );
     return validatedResults.map((result) => ({
       ...result,
@@ -131,7 +131,7 @@ export const getAlarmesTarifs = async () => {
     const results = await db.select().from(alarmesTarifs);
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectAlarmesTarifsSchema.parse(result)
+      selectAlarmesTarifsSchema.parse(result),
     );
     return validatedResults.map((result) => ({
       ...result,
@@ -150,7 +150,7 @@ export const getRiaTarifs = async () => {
     const results = await db.select().from(riaTarifs);
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectRiaTarifsSchema.parse(result)
+      selectRiaTarifsSchema.parse(result),
     );
     return validatedResults.map((result) => ({
       ...result,
@@ -169,7 +169,7 @@ export const getColonnesSechesTarifs = async () => {
     const results = await db.select().from(colonnesSechesTarifs);
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectColonnesSechesTarifsSchema.parse(result)
+      selectColonnesSechesTarifsSchema.parse(result),
     );
     return validatedResults.map((result) => ({
       ...result,
@@ -188,7 +188,7 @@ export const getPortesCoupeFeuTarifs = async () => {
     const results = await db.select().from(portesCoupeFeuTarifs);
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectPortesCoupeFeuTarifsSchema.parse(result)
+      selectPortesCoupeFeuTarifsSchema.parse(result),
     );
     return validatedResults.map((result) => ({
       ...result,

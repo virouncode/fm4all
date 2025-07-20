@@ -18,7 +18,7 @@ const ArticlesCards = async ({
   const t = await getTranslations({ locale, namespace: "Global" });
 
   return (
-    <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 items-center mt-6 w-full">
+    <div className="mt-6 grid w-full grid-cols-[repeat(auto-fit,minmax(250px,1fr))] items-center gap-6">
       {articles.map((article) => {
         const articleImageUrl = article.imagePrincipale
           ? urlFor(article.imagePrincipale)
@@ -41,9 +41,9 @@ const ArticlesCards = async ({
             locale={locale}
             linkText={article.linkText ?? articleSubSlug}
           >
-            <div className="p-4 flex flex-col gap-4 h-52">
+            <div className="flex h-52 flex-col gap-4 p-4">
               <p className="text-2xl">{article.titre}</p>
-              <p className="w-full overflow-hidden line-clamp-5 text-sm">
+              <p className="line-clamp-5 w-full overflow-hidden text-sm">
                 {article.description}
               </p>
             </div>

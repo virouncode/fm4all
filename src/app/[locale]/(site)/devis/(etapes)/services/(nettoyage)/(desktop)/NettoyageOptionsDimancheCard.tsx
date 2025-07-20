@@ -55,12 +55,12 @@ const NettoyageOptionsDimancheCard = ({
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
   const { nettoyage } = useContext(NettoyageContext);
   const dimanchePrixMensuelText = dimancheProposition.prixAnnuel ? (
-    <p className="font-bold text-xl ml-4" data-testid="total-mensuel-dimanche">
+    <p className="ml-4 text-xl font-bold" data-testid="total-mensuel-dimanche">
       {formatNumber((dimancheProposition?.prixAnnuel * MARGE) / 12)}{" "}
       {t("euros-mois")}
     </p>
   ) : (
-    <p className="font-bold text-base">{t("non-propose")}</p>
+    <p className="text-base font-bold">{t("non-propose")}</p>
   );
 
   const dimancheNbPassagesParSemaineText = (
@@ -80,28 +80,28 @@ const NettoyageOptionsDimancheCard = ({
     </p>
   );
   const imgProduit = (
-    <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+    <div className="relative h-60 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-200">
       <Image
         src={"/img/services/nettoyage.webp"}
         alt={`illustration de nettoyage`}
         fill={true}
-        className="object-contain object-center cursor-pointer"
+        className="cursor-pointer object-contain object-center"
         quality={100}
       />
     </div>
   );
 
   return (
-    <div className="flex border-b flex-1">
-      <div className="flex w-1/4 items-center justify-center text-base text-center p-4">
+    <div className="flex flex-1 border-b">
+      <div className="flex w-1/4 items-center justify-center p-4 text-center text-base">
         {tNettoyage("nettoyage-supplementaire-tous-les-dimanches")}
       </div>
       <div
-        className={`flex w-3/4 items-center p-4 justify-center ${
+        className={`flex w-3/4 items-center justify-center p-4 ${
           nettoyage.infos.dimancheSelected
             ? "ring-4 ring-inset ring-fm4alldestructive"
             : ""
-        } bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer`}
+        } bg-${color} cursor-pointer items-center justify-center gap-4 text-2xl text-slate-200`}
         onClick={
           dimancheProposition.prixAnnuel
             ? () => handleClickDimancheProposition(dimancheProposition)
@@ -120,7 +120,7 @@ const NettoyageOptionsDimancheCard = ({
           />
         ) : null}
         <div>
-          <div className="flex gap-2 items-center">
+          <div className="flex items-center gap-2">
             {dimanchePrixMensuelText}
             <Dialog>
               <DialogTrigger asChild>
@@ -136,10 +136,10 @@ const NettoyageOptionsDimancheCard = ({
                 </DialogHeader>
                 <div className="flex flex-col gap-4">
                   {imgProduit}
-                  <p className="text-xs italic text-end">
+                  <p className="text-end text-xs italic">
                     {t("photo-non-contractuelle")}
                   </p>
-                  <ul className="flex flex-col text-sm px-4 mx-auto">
+                  <ul className="mx-auto flex flex-col px-4 text-sm">
                     {infosProduit}
                     {dimancheNbPassagesParSemaineText}
                   </ul>
@@ -147,7 +147,7 @@ const NettoyageOptionsDimancheCard = ({
               </DialogContent>
             </Dialog>
           </div>
-          <ul className="flex flex-col text-xs ml-4">
+          <ul className="ml-4 flex flex-col text-xs">
             {infosProduit}
             {dimancheNbPassagesParSemaineText}
           </ul>

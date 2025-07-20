@@ -50,7 +50,7 @@ const FournisseurUpdateForm = ({
   const tAdmin = useTranslations("admin");
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(
-    initialFournisseur.logoUrl
+    initialFournisseur.logoUrl,
   );
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -72,7 +72,7 @@ const FournisseurUpdateForm = ({
         nomContact: "Nom du contact obligatoire",
         emailContact: "Email du contact invalide",
         phoneContact: "Numéro de téléphone obligatoire",
-      })
+      }),
     ),
     defaultValues,
   });
@@ -98,7 +98,7 @@ const FournisseurUpdateForm = ({
         description:
           error?.serverError ||
           tAuth(
-            "une-erreur-est-survenue-lors-de-la-mise-a-jour-du-fournisseur"
+            "une-erreur-est-survenue-lors-de-la-mise-a-jour-du-fournisseur",
           ),
       });
     },
@@ -146,10 +146,10 @@ const FournisseurUpdateForm = ({
   };
 
   return (
-    <Card className="rounded-md h-[60%] w-full sm:w-3/4 lg:w-2/3 mx-auto">
+    <Card className="mx-auto h-[60%] w-full rounded-md sm:w-3/4 lg:w-2/3">
       <CardHeader>
         <CardTitle className="text-lg md:text-xl">
-          <div className="flex justify-between items-center">
+          <div className="flex items-center justify-between">
             <p>Mon profil</p>
             <Dialog>
               <DialogTrigger asChild>
@@ -161,7 +161,7 @@ const FournisseurUpdateForm = ({
                   Aperçu
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl max-h-[90%] overflow-y-auto">
+              <DialogContent className="max-h-[90%] w-5/6 overflow-y-auto rounded-xl sm:max-w-[425px] lg:w-auto">
                 <DialogHeader>
                   <DialogTitle>{form.getValues().nomFournisseur}</DialogTitle>
                 </DialogHeader>
@@ -194,14 +194,14 @@ const FournisseurUpdateForm = ({
             </Dialog>
           </div>
         </CardTitle>
-        <CardDescription className="text-sm md:text-base max-w-prose italic">
+        <CardDescription className="max-w-prose text-sm italic md:text-base">
           👉 Comment vous apparaissez sur les offres du funnel
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(submitForm)} className="grid gap-2">
-            <div className="flex flex-col md:grid md:grid-cols-2 gap-2 md:gap-6">
+            <div className="flex flex-col gap-2 md:grid md:grid-cols-2 md:gap-6">
               <div className="col-span-2 mb-6 md:mb-0">
                 <TextAreaWithLabel<UpdateFournisseurFormType>
                   fieldTitle="Slogan"
@@ -211,21 +211,21 @@ const FournisseurUpdateForm = ({
                   placeholder="Votre phrase d'accroche, votre slogan..."
                 />
               </div>
-              <div className="flex flex-col gap-2 col-span-2">
-                <Label className="text-base ">Logo de l&apos;entreprise</Label>
+              <div className="col-span-2 flex flex-col gap-2">
+                <Label className="text-base">Logo de l&apos;entreprise</Label>
                 {!imagePreview ? (
                   <Input
                     type="file"
                     accept="image/*"
                     onChange={handleImageChange}
                     className={
-                      "w-full max-w-xs disabled:text-blue-500 dark:disabled:text-yellow-300 disabled:opacity-75 mb-6"
+                      "mb-6 w-full max-w-xs disabled:text-blue-500 disabled:opacity-75 dark:disabled:text-yellow-300"
                     }
                     ref={fileInputRef}
                   />
                 ) : (
-                  <div className="flex items-center gap-4 w-full">
-                    <div className="rounded-full object-cover overflow-hidden flex-1 h-24 relative">
+                  <div className="flex w-full items-center gap-4">
+                    <div className="relative h-24 flex-1 overflow-hidden rounded-full object-cover">
                       <Image
                         src={imagePreview}
                         alt="Logo de l'entreprise"
@@ -282,7 +282,7 @@ const FournisseurUpdateForm = ({
               variant="destructive"
               size="lg"
               title={tAdmin("mettre-a-jour")}
-              className="text-base w-full mt-6"
+              className="mt-6 w-full text-base"
               disabled={isUpdatingFournisseur || loading}
             >
               {isUpdatingFournisseur || loading ? (

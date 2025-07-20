@@ -17,7 +17,7 @@ const MessageBox = ({
 }) => {
   return (
     <div
-      className={`bg-accent px-4 py-2 my-2 rounded-lg ${
+      className={`my-2 rounded-lg bg-accent px-4 py-2 ${
         type === "error" ? "text-red-500" : ""
       }`}
     >

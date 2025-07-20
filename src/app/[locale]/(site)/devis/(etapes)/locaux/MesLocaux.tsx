@@ -133,7 +133,7 @@ const MesLocaux = () => {
         batiment: tErrors("batiment"),
         occupation: tErrors("occupation"),
         codePostal: tErrors("codePostal"),
-      })
+      }),
     ),
     defaultValues,
   });
@@ -148,7 +148,7 @@ const MesLocaux = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `https://geo.api.gouv.fr/communes?codePostal=${dataToPost.codePostal}`
+        `https://geo.api.gouv.fr/communes?codePostal=${dataToPost.codePostal}`,
       );
       const cityData = await response.json();
 
@@ -158,7 +158,7 @@ const MesLocaux = () => {
           variant: "destructive",
           title: t("code-postal-invalide"),
           description: t(
-            "le-code-postal-ne-correspond-a-aucune-ville-veullez-reessayer"
+            "le-code-postal-ne-correspond-a-aucune-ville-veullez-reessayer",
           ),
         });
         setLoading(false);
@@ -177,7 +177,7 @@ const MesLocaux = () => {
     //Departement in ou out
     if (
       !departements.find(
-        ({ id }) => id === dataToPost.codePostal?.substring(0, 2)
+        ({ id }) => id === dataToPost.codePostal?.substring(0, 2),
       )
     ) {
       setDevisProgress({ ...devisProgress, completedSteps: [] });
@@ -236,7 +236,7 @@ const MesLocaux = () => {
       setTotalFontaines,
       setTotalOfficeManager,
       setTotalServicesFm4All,
-      setTotal
+      setTotal,
     );
     setLoaderVisible(true);
     window.scrollTo(0, 0);
@@ -299,10 +299,10 @@ const MesLocaux = () => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(submitForm)}
-        className="flex flex-col gap-14 mx-auto w-full md:w-2/3 mt-6 md:mt-10 p-1"
+        className="mx-auto mt-6 flex w-full flex-col gap-14 p-1 md:mt-10 md:w-2/3"
       >
         <div className="flex flex-col gap-4 md:flex-row md:gap-8">
-          <div className="w-full md:w-1/2 flex flex-col gap-4">
+          <div className="flex w-full flex-col gap-4 md:w-1/2">
             <InputWithLabel<MesLocauxType>
               fieldTitle={t("code-postal")}
               nameInSchema="codePostal"
@@ -329,7 +329,7 @@ const MesLocaux = () => {
               // handleChange={handleChange}
             />
           </div>
-          <div className="w-full md:w-1/2 flex flex-col gap-4 ">
+          <div className="flex w-full flex-col gap-4 md:w-1/2">
             <SelectWithLabel<MesLocauxType>
               fieldTitle={t("type-de-batiment")}
               nameInSchema="typeBatiment"
@@ -365,18 +365,18 @@ const MesLocaux = () => {
               </div>
             </DialogTrigger>
 
-            <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
+            <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
               <DialogHeader>
                 <DialogTitle>{tDevisButton("devis-en-cours")}</DialogTitle>
                 <DialogDescription>
                   {t(
-                    "un-devis-est-deja-en-cours-souaitez-vous-recommencer-un-nouveau-devis-vos-informations-actuelles-seront-perdues"
+                    "un-devis-est-deja-en-cours-souaitez-vous-recommencer-un-nouveau-devis-vos-informations-actuelles-seront-perdues",
                   )}
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
                 <DialogClose asChild>
-                  <div className="flex gap-4 justify-center mx-auto">
+                  <div className="mx-auto flex justify-center gap-4">
                     <Button
                       variant="destructive"
                       onClick={() => form.handleSubmit(submitForm)()}

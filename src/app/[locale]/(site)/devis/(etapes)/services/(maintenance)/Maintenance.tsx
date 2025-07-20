@@ -50,12 +50,12 @@ const Maintenance = ({
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="5">
+    <div className="mx-auto flex h-full w-full flex-col gap-4 py-2" id="5">
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
           title={t("maintenance")}
           description={t(
-            "obligations-legales-and-veille-reglementaire-bien-etre-petits-travaux-lien-avec-le-gestionnaire-de-limmeuble-deleguez-la-maintenance-et-le-suivi-de-vos-controles"
+            "obligations-legales-and-veille-reglementaire-bien-etre-petits-travaux-lien-avec-le-gestionnaire-de-limmeuble-deleguez-la-maintenance-et-le-suivi-de-vos-controles",
           )}
           icon={Wrench}
           propositionsRef={propositionsRef}
@@ -64,7 +64,7 @@ const Maintenance = ({
         <PropositionsTitle
           title={t("maintenance")}
           description={t(
-            "obligations-legales-and-veille-reglementaire-bien-etre-petits-travaux-lien-avec-le-gestionnaire-de-limmeuble-deleguez-la-maintenance-et-le-suivi-de-vos-controles"
+            "obligations-legales-and-veille-reglementaire-bien-etre-petits-travaux-lien-avec-le-gestionnaire-de-limmeuble-deleguez-la-maintenance-et-le-suivi-de-vos-controles",
           )}
           icon={Wrench}
           handleClickPrevious={handleClickPrevious}
@@ -85,7 +85,7 @@ const Maintenance = ({
         <PropositionsFooter
           handleClickNext={handleClickNext}
           comment={t(
-            "batiment-entier-budget-a-confirmer-apres-visite-technique-des-installations-chaud-froid-clos-et-couverts"
+            "batiment-entier-budget-a-confirmer-apres-visite-technique-des-installations-chaud-froid-clos-et-couverts",
           )}
         />
       )}

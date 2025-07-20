@@ -25,7 +25,7 @@ export default function PortalCacheInvalidationListener() {
   const DEBOUNCE_DELAY = 2000;
   const MAX_PROCESSED_EVENTS = 100;
   const [processedEvents, setProcessedEvents] = useState<Set<number>>(
-    new Set()
+    new Set(),
   );
 
   useEffect(() => {
@@ -93,7 +93,7 @@ export default function PortalCacheInvalidationListener() {
         } finally {
           isInvalidatingRef.current = false;
         }
-      }
+      },
     );
 
     // Nettoyer l'abonnement lors du démontage du composant

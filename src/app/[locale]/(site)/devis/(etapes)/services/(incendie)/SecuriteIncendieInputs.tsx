@@ -17,7 +17,7 @@ type SecuriteIncendieInputsProps = {
   nbTelBaes: number;
   handleChangeNbr: (
     e: React.ChangeEvent<HTMLInputElement>,
-    type: "extincteur" | "baes" | "telBaes"
+    type: "extincteur" | "baes" | "telBaes",
   ) => void;
   incendieQuantite: SelectIncendieQuantitesType;
 };
@@ -31,11 +31,11 @@ const SecuriteIncendieInputs = ({
 }: SecuriteIncendieInputsProps) => {
   const tIncendie = useTranslations("DevisPage.services.incendie");
   return (
-    <div className="flex flex-col gap-6 w-3/4">
+    <div className="flex w-3/4 flex-col gap-6">
       <TooltipProvider delayDuration={0}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="flex gap-4 items-center  w-full">
+            <div className="flex w-full items-center gap-4">
               <Input
                 type="number"
                 value={nbExtincteurs || ""}
@@ -50,18 +50,18 @@ const SecuriteIncendieInputs = ({
                 }`}
                 id="nbExtincteurs"
               />
-              <Label htmlFor="nbExtincteurs" className="text-sm flex-1">
+              <Label htmlFor="nbExtincteurs" className="flex-1 text-sm">
                 {tIncendie("extincteurs").toLowerCase()}
               </Label>
             </div>
           </TooltipTrigger>
           <TooltipContent className="max-w-60">
-            <div className="w-40 h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+            <div className="relative h-60 w-40 overflow-hidden rounded-xl border border-slate-200 bg-slate-200">
               <Image
                 src={"/img/services/extincteur.webp"}
                 alt={`illustration de nettoyage`}
                 fill={true}
-                className="object-contain object-center cursor-pointer"
+                className="cursor-pointer object-contain object-center"
                 quality={100}
               />
             </div>
@@ -71,7 +71,7 @@ const SecuriteIncendieInputs = ({
       <TooltipProvider delayDuration={0}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="flex gap-4 items-center w-full">
+            <div className="flex w-full items-center gap-4">
               <Input
                 id="nbBaes"
                 type="number"
@@ -86,22 +86,22 @@ const SecuriteIncendieInputs = ({
                     : ""
                 }`}
               />
-              <Label htmlFor="nbBaes" className="text-sm flex-1">
+              <Label htmlFor="nbBaes" className="flex-1 text-sm">
                 {tIncendie(
-                  "baes-blocs-autonomes-d-eclairage-de-securite"
+                  "baes-blocs-autonomes-d-eclairage-de-securite",
                 ).toLowerCase()}
               </Label>
             </div>
           </TooltipTrigger>
           <TooltipContent className="max-w-60">
-            <div className="w-40 h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+            <div className="relative h-60 w-40 overflow-hidden rounded-xl border border-slate-200 bg-slate-200">
               <Image
                 src={"/img/services/baes.webp"}
                 alt={tIncendie(
-                  "illustration-de-bloc-autonome-declairage-de-securite"
+                  "illustration-de-bloc-autonome-declairage-de-securite",
                 )}
                 fill={true}
-                className="object-contain object-center cursor-pointer"
+                className="cursor-pointer object-contain object-center"
                 quality={100}
               />
             </div>
@@ -111,7 +111,7 @@ const SecuriteIncendieInputs = ({
       <TooltipProvider delayDuration={0}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="flex gap-4 items-center w-full">
+            <div className="flex w-full items-center gap-4">
               <Input
                 type="number"
                 value={nbTelBaes || ""}
@@ -124,20 +124,20 @@ const SecuriteIncendieInputs = ({
                 }`}
                 id="nbTelBaes"
               />
-              <Label htmlFor="nbTelBaes" className="text-sm flex-1">
+              <Label htmlFor="nbTelBaes" className="flex-1 text-sm">
                 {tIncendie("telecommandes-baes").toLowerCase()}
               </Label>
             </div>
           </TooltipTrigger>
           <TooltipContent className="max-w-60">
-            <div className="w-40 h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+            <div className="relative h-60 w-40 overflow-hidden rounded-xl border border-slate-200 bg-slate-200">
               <Image
                 src={"/img/services/tel_baes.webp"}
                 alt={tIncendie(
-                  "illustration-de-telecommande-de-bloc-autonome-declairage-de-securite"
+                  "illustration-de-telecommande-de-bloc-autonome-declairage-de-securite",
                 )}
                 fill={true}
-                className="object-contain object-center cursor-pointer"
+                className="cursor-pointer object-contain object-center"
                 quality={100}
               />
             </div>

@@ -67,10 +67,10 @@ const MaintenancePropositions = ({
       gamme === "essentiel"
         ? totalAnnuelQ18
         : gamme === "confort"
-        ? (totalAnnuelQ18 ?? 0) + (totalAnnuelLegio ?? 0)
-        : (totalAnnuelQ18 ?? 0) +
-          (totalAnnuelLegio ?? 0) +
-          (totalAnnuelQualiteAir ?? 0);
+          ? (totalAnnuelQ18 ?? 0) + (totalAnnuelLegio ?? 0)
+          : (totalAnnuelQ18 ?? 0) +
+            (totalAnnuelLegio ?? 0) +
+            (totalAnnuelQualiteAir ?? 0);
     const totalAnnuel = totalAnnuelService
       ? totalAnnuelService + (totalAnnuelControlesSupplementaires ?? 0)
       : null;
@@ -134,7 +134,7 @@ const MaintenancePropositions = ({
     // Add the item to the appropriate array
     acc[fournisseurId].push(item);
     acc[fournisseurId].sort(
-      (a, b) => gammes.indexOf(a.gamme) - gammes.indexOf(b.gamme)
+      (a, b) => gammes.indexOf(a.gamme) - gammes.indexOf(b.gamme),
     );
     return acc;
   }, {});

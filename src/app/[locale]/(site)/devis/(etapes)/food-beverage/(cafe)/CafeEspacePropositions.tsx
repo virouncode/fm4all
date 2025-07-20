@@ -81,7 +81,7 @@ const CafeEspacePropositions = ({
   const machinesTarifs = cafeMachinesTarifs.filter(
     (tarif) =>
       tarif.nbPersonnes === roundNbPersonnesCafeMachines(nbPersonnes) &&
-      tarif.type === espace.infos.typeBoissons
+      tarif.type === espace.infos.typeBoissons,
   ); //1 ligne par fournisseur
 
   const fournisseursCompatiblesIds = machinesTarifs
@@ -94,10 +94,10 @@ const CafeEspacePropositions = ({
     !fournisseursCompatiblesIds.includes(cafe.infos.fournisseurId)
   ) {
     return (
-      <div className="flex-1 flex items-center justify-center border rounded-xl">
+      <div className="flex flex-1 items-center justify-center rounded-xl border">
         <p className="max-w-prose text-center text-base">
           {tCafe(
-            "le-fournisseur-choisi-precedemment-ne-propose-pas-doffre-pour-ces-criteres-veuillez-changer-le-type-de-boissons-ou-le-nombre-de-personnes"
+            "le-fournisseur-choisi-precedemment-ne-propose-pas-doffre-pour-ces-criteres-veuillez-changer-le-type-de-boissons-ou-le-nombre-de-personnes",
           )}
         </p>
       </div>
@@ -127,7 +127,7 @@ const CafeEspacePropositions = ({
     .filter(
       (tarif) =>
         tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
-        fournisseursIds.includes(tarif.fournisseurId)
+        fournisseursIds.includes(tarif.fournisseurId),
     )
     .map((tarif) => {
       const {
@@ -149,7 +149,7 @@ const CafeEspacePropositions = ({
       } = tarif;
       //MACHINES
       const machinesTarifFournisseur = machinesTarifs.find(
-        (item) => item.fournisseurId === fournisseurId
+        (item) => item.fournisseurId === fournisseurId,
       );
 
       const nbMachines = machinesTarifFournisseur?.nbMachines ?? null;
@@ -170,7 +170,7 @@ const CafeEspacePropositions = ({
       const consoLaitTarifFournisseur = laitConsoTarifs.find(
         (tarif) =>
           tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
-          tarif.fournisseurId === fournisseurId
+          tarif.fournisseurId === fournisseurId,
       );
       const typeLait =
         espace.infos.typeBoissons !== "cafe"
@@ -188,7 +188,7 @@ const CafeEspacePropositions = ({
       const consoChocolatTarifFournisseur = chocolatConsoTarifs.find(
         (tarif) =>
           tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
-          tarif.fournisseurId === fournisseurId
+          tarif.fournisseurId === fournisseurId,
       );
       const typeChocolat =
         espace.infos.typeBoissons === "chocolat"
@@ -204,7 +204,7 @@ const CafeEspacePropositions = ({
       const consoSucreTarifFournisseur = sucreConsoTarifs.find(
         (tarif) =>
           tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes) &&
-          tarif.fournisseurId === fournisseurId
+          tarif.fournisseurId === fournisseurId,
       );
       const prixUnitaireConsoSucre =
         consoSucreTarifFournisseur?.prixUnitaire ?? null;
@@ -224,17 +224,17 @@ const CafeEspacePropositions = ({
       //Modele
       const modele = machinesTarifFournisseur
         ? (cafeMachines?.find(
-            ({ id }) => id === machinesTarifFournisseur?.cafeMachineId
+            ({ id }) => id === machinesTarifFournisseur?.cafeMachineId,
           )?.modele ?? null)
         : null;
       const marque = machinesTarifFournisseur
         ? (cafeMachines?.find(
-            ({ id }) => id === machinesTarifFournisseur?.cafeMachineId
+            ({ id }) => id === machinesTarifFournisseur?.cafeMachineId,
           )?.marque ?? null)
         : null;
       const imageUrl = machinesTarifFournisseur
         ? (cafeMachines?.find(
-            ({ id }) => id === machinesTarifFournisseur?.cafeMachineId
+            ({ id }) => id === machinesTarifFournisseur?.cafeMachineId,
           )?.imageUrl ?? null)
         : null;
       const reconditionne = machinesTarifFournisseur
@@ -322,7 +322,7 @@ const CafeEspacePropositions = ({
     // Add the item to the appropriate array
     acc[fournisseurId].push(item);
     acc[fournisseurId].sort(
-      (a, b) => gammes.indexOf(a.gamme) - gammes.indexOf(b.gamme)
+      (a, b) => gammes.indexOf(a.gamme) - gammes.indexOf(b.gamme),
     );
     return acc;
   }, {});
@@ -418,7 +418,7 @@ const CafeEspacePropositions = ({
                   prixUnitaireConsoSucre: null,
                 },
               }
-            : item
+            : item,
         ),
       }));
       setTotalCafe((prev) => ({
@@ -429,7 +429,7 @@ const CafeEspacePropositions = ({
                 total: null,
                 totalInstallation: null,
               }
-            : item
+            : item,
         ),
       }));
     } else {
@@ -464,7 +464,7 @@ const CafeEspacePropositions = ({
                   prixUnitaireConsoSucre,
                 },
               }
-            : item
+            : item,
         ),
       }));
       setTotalCafe((prev) => ({
@@ -475,7 +475,7 @@ const CafeEspacePropositions = ({
                 total: totalAnnuel,
                 totalInstallation,
               }
-            : item
+            : item,
         ),
       }));
     }
@@ -622,7 +622,7 @@ const CafeEspacePropositions = ({
               );
             return acc;
           },
-          0
+          0,
         );
         const prixLivraisonPanier =
           prixPanierSnacksFruits >= (snacksFruits.prix.seuilFranco ?? 0)
@@ -644,7 +644,7 @@ const CafeEspacePropositions = ({
           title: t("fournisseur-selectionne"),
           description: tCafe(
             "vous-avez-choisi-nomfournisseur-pour-le-cafe-ce-prestataire-assurera-la-prestation-thes-varies",
-            { nomFournisseur }
+            { nomFournisseur },
           ),
         });
       }
@@ -722,7 +722,7 @@ const CafeEspacePropositions = ({
               roundNbPersonnesCafeMachines(itemNbPersonnes) &&
             tarif.type === item.infos.typeBoissons &&
             tarif[cafe.infos.dureeLocation] !== null &&
-            tarif.fournisseurId === fournisseurId
+            tarif.fournisseurId === fournisseurId,
         );
         if (!itemMachinesTarifFournisseur) {
           newEspace.push(item);
@@ -749,12 +749,12 @@ const CafeEspacePropositions = ({
             (tarif) =>
               tarif.effectif === roundNbPersonnesCafeConso(itemNbPersonnes) &&
               tarif.fournisseurId === fournisseurId &&
-              tarif.gamme === item.infos.gammeCafeSelected
+              tarif.gamme === item.infos.gammeCafeSelected,
           )?.prixUnitaire ?? null;
         const itemConsoLaitTarifFournisseur = laitConsoTarifs.find(
           (tarif) =>
             tarif.effectif === roundNbPersonnesCafeConso(itemNbPersonnes) &&
-            tarif.fournisseurId === fournisseurId
+            tarif.fournisseurId === fournisseurId,
         );
         const itemTypeLait =
           espace.infos.typeBoissons !== "cafe"
@@ -772,7 +772,7 @@ const CafeEspacePropositions = ({
         const itemConsoChocolatTarifFournisseur = chocolatConsoTarifs.find(
           (tarif) =>
             tarif.effectif === roundNbPersonnesCafeConso(itemNbPersonnes) &&
-            tarif.fournisseurId === fournisseurId
+            tarif.fournisseurId === fournisseurId,
         );
         const itemTypeChocolat =
           espace.infos.typeBoissons === "chocolat"
@@ -787,7 +787,7 @@ const CafeEspacePropositions = ({
         const itemConsoSucreTarifFournisseur = sucreConsoTarifs.find(
           (tarif) =>
             tarif.effectif === roundNbPersonnesCafeConso(itemNbPersonnes) &&
-            tarif.fournisseurId === fournisseurId
+            tarif.fournisseurId === fournisseurId,
         );
         const itemPrixUnitaireConsoSucre =
           itemConsoSucreTarifFournisseur?.prixUnitaire ?? null;
@@ -811,12 +811,12 @@ const CafeEspacePropositions = ({
           itemTotalLoc !== null ? itemTotalLoc + itemTotalConso : null;
         const itemModele = itemMachinesTarifFournisseur
           ? (cafeMachines?.find(
-              ({ id }) => id === itemMachinesTarifFournisseur?.cafeMachineId
+              ({ id }) => id === itemMachinesTarifFournisseur?.cafeMachineId,
             )?.modele ?? null)
           : null;
         const itemMarque = itemMachinesTarifFournisseur
           ? (cafeMachines?.find(
-              ({ id }) => id === itemMachinesTarifFournisseur?.cafeMachineId
+              ({ id }) => id === itemMachinesTarifFournisseur?.cafeMachineId,
             )?.marque ?? null)
           : null;
         const itemReconditionne = itemMachinesTarifFournisseur
@@ -868,7 +868,7 @@ const CafeEspacePropositions = ({
           (tarif) =>
             tarif.effectif === roundEffectif(nbPersonnesThe) &&
             tarif.fournisseurId === fournisseurId &&
-            tarif.gamme === the.infos.gammeSelected
+            tarif.gamme === the.infos.gammeSelected,
         );
         const prixUnitaireThe = theConsoTarifFournisseur?.prixUnitaire ?? null;
         const totalThe =
@@ -911,7 +911,7 @@ const CafeEspacePropositions = ({
               );
             return acc;
           },
-          0
+          0,
         );
         const isSameFournisseur =
           snacksFruits.infos.fournisseurId === fournisseurId;
@@ -1006,7 +1006,7 @@ const CafeEspacePropositions = ({
     if (!espace.infos.gammeCafeSelected) {
       toast({
         description: tCafe(
-          "veuillez-dabord-selectionner-une-offre-ou-retirer-tous-les-espaces"
+          "veuillez-dabord-selectionner-une-offre-ou-retirer-tous-les-espaces",
         ),
         duration: 3000,
         variant: "destructive",

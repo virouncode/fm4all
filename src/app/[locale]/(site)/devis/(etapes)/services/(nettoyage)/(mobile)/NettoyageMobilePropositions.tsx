@@ -49,8 +49,8 @@ const NettoyageMobilePropositions = ({
 }: NettoyageMobilePropositionsProps) => {
   const t = useTranslations("DevisPage.services.nettoyage");
   return (
-    <div className="flex flex-col gap-6 w-full">
-      <p className="font-bold text-xl -mb-4">{t("nettoyage")}</p>
+    <div className="flex w-full flex-col gap-6">
+      <p className="-mb-4 text-xl font-bold">{t("nettoyage")}</p>
       {formattedPropositions.map((propositions) => (
         <NettoyageMobilePropositionsCarousel
           propositions={propositions}

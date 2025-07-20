@@ -34,14 +34,14 @@ export const servicesSubSlugMappingsFrToEn: Record<string, string> = {
 
 export const getServicesSlugFr = (serviceSlugEn: string): string => {
   const entry = Object.entries(servicesSlugMappingsFrToEn).find(
-    ([_, value]) => value === serviceSlugEn
+    ([_, value]) => value === serviceSlugEn,
   );
   return entry ? entry[0] : serviceSlugEn;
 };
 
 export const getServicesSubSlugFr = (serviceSubSlugEn: string): string => {
   const entry = Object.entries(servicesSubSlugMappingsFrToEn).find(
-    ([_, value]) => value === serviceSubSlugEn
+    ([_, value]) => value === serviceSubSlugEn,
   );
   return entry ? entry[0] : serviceSubSlugEn;
 };

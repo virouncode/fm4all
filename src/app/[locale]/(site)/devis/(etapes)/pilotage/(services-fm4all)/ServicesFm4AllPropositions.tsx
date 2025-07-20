@@ -29,7 +29,7 @@ const ServicesFm4AllPropositions = ({
   servicesFm4AllOffres,
 }: ServicesFm4AllPropositionsProps) => {
   const { servicesFm4All, setServicesFm4All } = useContext(
-    ServicesFm4AllContext
+    ServicesFm4AllContext,
   );
   const { setTotalServicesFm4All } = useContext(TotalServicesFm4AllContext);
   const { totalNettoyage } = useContext(TotalNettoyageContext);
@@ -104,35 +104,35 @@ const ServicesFm4AllPropositions = ({
       assurance === "non propose"
         ? null
         : assurance === "inclus"
-        ? 0
-        : tauxAssurance * total * MARGE;
+          ? 0
+          : tauxAssurance * total * MARGE;
     const prixPlateforme =
       plateforme === "non propose"
         ? null
         : plateforme === "inclus"
-        ? 0
-        : Math.max(tauxPlateforme * total * MARGE, minFacturationPlateforme);
+          ? 0
+          : Math.max(tauxPlateforme * total * MARGE, minFacturationPlateforme);
     const prixSupportAdmin =
       supportAdmin === "non propose"
         ? null
         : supportAdmin === "inclus"
-        ? 0
-        : tauxSupportAdmin * total * MARGE;
+          ? 0
+          : tauxSupportAdmin * total * MARGE;
     const prixSupportOp =
       supportOp === "non propose"
         ? null
         : supportOp === "inclus"
-        ? 0
-        : Math.max(tauxSupportOp * total * MARGE, minFacturationSupportOp);
+          ? 0
+          : Math.max(tauxSupportOp * total * MARGE, minFacturationSupportOp);
     const prixAccountManager =
       accountManager === "non propose"
         ? null
         : accountManager === "inclus"
-        ? 0
-        : Math.max(
-            tauxAccountManager * total * MARGE,
-            minFacturationAccountManager
-          );
+          ? 0
+          : Math.max(
+              tauxAccountManager * total * MARGE,
+              minFacturationAccountManager,
+            );
     const remiseCa =
       total * MARGE >= remiseCaSeuil ? tauxRemiseCa * total * MARGE : 0;
     const remiseHof = officeManager.infos.gammeSelected

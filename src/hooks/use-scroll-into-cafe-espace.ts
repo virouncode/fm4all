@@ -15,7 +15,7 @@ export default function useScrollIntoCafeEspace() {
     )
       return;
     const currentEspace = document.getElementById(
-      `espace_${cafe.infos.currentEspaceId.toString()}`
+      `espace_${cafe.infos.currentEspaceId.toString()}`,
     );
     if (currentEspace) {
       currentEspace.scrollIntoView({ behavior: "smooth", block: "nearest" });

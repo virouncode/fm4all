@@ -44,7 +44,7 @@ const SauvegarderProgression = () => {
       createInsertClientSchema({
         nomEntreprise: tSauverErreurs("nom-de-lentreprise-obligatoire"),
         siret: tSauverErreurs(
-          "siret-invalide-format-attendu-xxx-xxx-xxx-xxxxx"
+          "siret-invalide-format-attendu-xxx-xxx-xxx-xxxxx",
         ),
         prenomContact: tSauverErreurs("prenom-du-contact-obligatoire"),
         nomContact: tSauverErreurs("nom-du-contact-obligatoire"),
@@ -60,7 +60,7 @@ const SauvegarderProgression = () => {
         typeOccupation: tSauverErreurs("type-doccupation-invalide"),
         codePostal: tSauverErreurs("code-postal-invalide-entrez-5-chiffres"),
         ville: tSauverErreurs("ville-obligatoire"),
-      })
+      }),
     ),
     defaultValues,
   });
@@ -86,11 +86,11 @@ const SauvegarderProgression = () => {
           variant: "destructive",
           title: tSauver("erreur"),
           description: tSauver(
-            "impossible-de-sauvegarder-vos-coordonnees-veuillez-reessayer"
+            "impossible-de-sauvegarder-vos-coordonnees-veuillez-reessayer",
           ),
         });
       },
-    }
+    },
   );
   const {
     execute: executeSaveDevisTemporaire,
@@ -108,7 +108,7 @@ const SauvegarderProgression = () => {
         variant: "destructive",
         title: tSauver("erreur"),
         description: tSauver(
-          "impossible-de-sauvegarder-le-devis-veuillez-reessayer"
+          "impossible-de-sauvegarder-le-devis-veuillez-reessayer",
         ),
       });
     },
@@ -119,7 +119,7 @@ const SauvegarderProgression = () => {
       toast({
         variant: "destructive",
         description: tSauver(
-          "veuillez-accepter-notre-politique-de-confidentialite-avant-de-continuer"
+          "veuillez-accepter-notre-politique-de-confidentialite-avant-de-continuer",
         ),
       });
       return;
@@ -178,19 +178,19 @@ const SauvegarderProgression = () => {
 
   return (
     <section className="flex-1 overflow-scroll">
-      <div className="flex flex-col gap-4 w-full mx-auto h-full py-2">
-        <p className="w-full md:w-2/3 mx-auto">
+      <div className="mx-auto flex h-full w-full flex-col gap-4 py-2">
+        <p className="mx-auto w-full md:w-2/3">
           {tSauver(
-            "dans-la-prochaine-etape-vous-allez-personnaliser-vos-services-et-choisir-des-options-avant-de-valider-votre-budget-final-afin-dameliorer-votre-experience-et-enregistrer-votre-progression-merci-de-renseigner-vos-informations-suivantes"
+            "dans-la-prochaine-etape-vous-allez-personnaliser-vos-services-et-choisir-des-options-avant-de-valider-votre-budget-final-afin-dameliorer-votre-experience-et-enregistrer-votre-progression-merci-de-renseigner-vos-informations-suivantes",
           )}
         </p>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(submitForm)}
-            className="flex flex-col gap-8 mx-auto w-full md:w-2/3 mt-6"
+            className="mx-auto mt-6 flex w-full flex-col gap-8 md:w-2/3"
           >
-            <div className="flex flex-col gap-4 md:flex-row md:gap-8 px-1">
-              <div className="w-full md:w-1/2 flex flex-col gap-4">
+            <div className="flex flex-col gap-4 px-1 md:flex-row md:gap-8">
+              <div className="flex w-full flex-col gap-4 md:w-1/2">
                 <InputWithLabel<InsertClientType>
                   fieldTitle="Email*"
                   nameInSchema="emailContact"
@@ -214,7 +214,7 @@ const SauvegarderProgression = () => {
                   data-testid="nom-entreprise-input"
                 />
               </div>
-              <div className="w-full md:w-1/2 flex flex-col gap-4 ">
+              <div className="flex w-full flex-col gap-4 md:w-1/2">
                 <InputWithLabel<InsertClientType>
                   fieldTitle={tSauver("prenom-du-contact")}
                   nameInSchema="prenomContact"
@@ -238,45 +238,45 @@ const SauvegarderProgression = () => {
                 />
               </div>
             </div>
-            <div className="w-full flex flex-col gap-6">
+            <div className="flex w-full flex-col gap-6">
               <p>
                 {tSauver(
-                  "parce-que-nous-ne-sommes-pas-un-comparateur-en-ligne-comme-les-autres-avant-de-valider-cette-etape-voici"
+                  "parce-que-nous-ne-sommes-pas-un-comparateur-en-ligne-comme-les-autres-avant-de-valider-cette-etape-voici",
                 )}{" "}
                 <strong>
                   {tSauver("3-engagements-que-nous-prenons-envers-vous")}
                 </strong>
               </p>
-              <ul className="flex flex-col gap-2 ml-10 lg:ml-16">
+              <ul className="ml-10 flex flex-col gap-2 lg:ml-16">
                 <li className="list-handshake">
                   {tSauver(
-                    "engagement-n-1-vous-allez-bien-obtenir-un-devis-complet-et-definitif-100-en-ligne"
+                    "engagement-n-1-vous-allez-bien-obtenir-un-devis-complet-et-definitif-100-en-ligne",
                   )}
                 </li>
                 <li className="list-handshake">
                   {tSauver(
-                    "engagement-n-2-sans-engagement-creer-un-devis-personnalise-est-gratuit-et-ne-vous-engage-a-rien"
+                    "engagement-n-2-sans-engagement-creer-un-devis-personnalise-est-gratuit-et-ne-vous-engage-a-rien",
                   )}
                 </li>
                 <li className="list-handshake">
                   {tSauver(
-                    "engagement-n-3-pas-de-spam-vos-informations-sont-securisees-par-fm4all-et-ne-seront-ni-partagees-ni-utilisees-a-des-fins-de-prospection-par-un-tiers"
+                    "engagement-n-3-pas-de-spam-vos-informations-sont-securisees-par-fm4all-et-ne-seront-ni-partagees-ni-utilisees-a-des-fins-de-prospection-par-un-tiers",
                   )}
                 </li>
               </ul>
             </div>
-            <div className="flex gap-4 items-center">
+            <div className="flex items-center gap-4">
               <Checkbox
                 checked={accepte}
                 onCheckedChange={(value: boolean) => setAccepte(value)}
-                className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+                className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
                 id="acceptation"
                 aria-label={tSauver("acceptez-les-conditions")}
                 data-testid="sauvegarder-acceptation-checkbox"
               />
               <Label htmlFor="acceptation">
                 {tSauver(
-                  "jaccepte-que-les-informations-saisies-soient-utilisees-par-fm4all-dans-le-cadre-de-ma-demande-et-conformement-a-sa"
+                  "jaccepte-que-les-informations-saisies-soient-utilisees-par-fm4all-dans-le-cadre-de-ma-demande-et-conformement-a-sa",
                 )}{" "}
                 <Link
                   href="/confidentialite"
@@ -292,7 +292,7 @@ const SauvegarderProgression = () => {
                 variant="destructive"
                 size="lg"
                 title={tSauver("sauvegarder-ma-progression")}
-                className="text-base min-w-28"
+                className="min-w-28 text-base"
                 disabled={!accepte}
                 data-testid="sauvegarder-progression-button"
               >

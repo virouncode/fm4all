@@ -54,10 +54,12 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
   const wrongServicesUrls = serviceSlugs.flatMap((slug) =>
     slug
       ? [`/fr/services/${getServicesSlugEn(slug)}`, `/en/services/${slug}`]
-      : []
+      : [],
   );
   const wrongArticlesCategoriesUrls = articlesCategories.flatMap((slug) =>
-    slug ? [`/fr/articles/${getArticlesSlugEn(slug)}`, `/en/posts/${slug}`] : []
+    slug
+      ? [`/fr/articles/${getArticlesSlugEn(slug)}`, `/en/posts/${slug}`]
+      : [],
   );
   const wrongArticlesUrls = articleSlugs.flatMap((article) => [
     `/fr/articles/${getArticlesSlugEn(article.slug)}/${article.subSlug}`,
@@ -68,7 +70,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
   const wrongSecteursUrls = secteursSlugs.flatMap((slug) =>
     slug
       ? [`/fr/secteurs/${getSecteurSlugEn(slug)}`, `/en/sectors/${slug}`]
-      : []
+      : [],
   );
 
   const disallowUrls = [

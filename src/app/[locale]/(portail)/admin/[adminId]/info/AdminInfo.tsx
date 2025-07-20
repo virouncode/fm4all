@@ -51,7 +51,7 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
         prenom: tAdmin("prenom-obligatoire"),
         nom: tAdmin("nom-obligatoire"),
         image: tAdmin("image-invalide"),
-      })
+      }),
     ),
     defaultValues,
   });
@@ -78,7 +78,7 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
         description:
           error?.serverError ??
           tAdmin(
-            "une-erreur-est-survenue-lors-de-la-mise-a-jour-de-lutilisateur"
+            "une-erreur-est-survenue-lors-de-la-mise-a-jour-de-lutilisateur",
           ),
       });
     },
@@ -118,10 +118,10 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
   };
 
   return (
-    <main className="max-w-7xl min-h-[calc(100vh-4rem)] md:h-[calc(100vh-4rem)] mx-auto py-4 px-6 md:px-20 relative md:static">
-      <section className="flex items-center justify-center min-h-[calc(95vh-4rem)] md:h-full">
+    <main className="relative mx-auto min-h-[calc(100vh-4rem)] max-w-7xl px-6 py-4 md:static md:h-[calc(100vh-4rem)] md:px-20">
+      <section className="flex min-h-[calc(95vh-4rem)] items-center justify-center md:h-full">
         <BackgroundClient />
-        <Card className="rounded-md h-[60%] w-full sm:w-3/4 md:w-2/3 overflow-y-auto">
+        <Card className="h-[60%] w-full overflow-y-auto rounded-md sm:w-3/4 md:w-2/3">
           <CardHeader>
             <CardTitle className="text-lg md:text-xl">
               {tAdmin("mes-informations")}
@@ -136,7 +136,7 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
                 onSubmit={form.handleSubmit(submitForm)}
                 className="grid gap-2"
               >
-                <div className="grid md:grid-cols-2 gap-2 md:gap-6">
+                <div className="grid gap-2 md:grid-cols-2 md:gap-6">
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="email" className="text-base">
                       Email*
@@ -144,7 +144,7 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
                     <Input
                       id="email"
                       type="email"
-                      className="w-full max-w-xs disabled:text-blue-500 dark:disabled:text-yellow-300 disabled:opacity-75 read-only:pointer-events-none read-only:text-slate-400"
+                      className="w-full max-w-xs read-only:pointer-events-none read-only:text-slate-400 disabled:text-blue-500 disabled:opacity-75 dark:disabled:text-yellow-300"
                       value={info.email}
                       readOnly={true}
                     />
@@ -157,10 +157,10 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
                     >
                       Avatar
                     </Label>
-                    <div className="flex items-end gap-4 relative">
+                    <div className="relative flex items-end gap-4">
                       {imagePreview ? (
-                        <div className="flex items-center gap-4 w-full justify-center absolute -top-20 md:-top-12">
-                          <div className="relative rounded-full w-20 h-20 overflow-hidden">
+                        <div className="absolute -top-20 flex w-full items-center justify-center gap-4 md:-top-12">
+                          <div className="relative h-20 w-20 overflow-hidden rounded-full">
                             <Image
                               src={imagePreview}
                               alt="avatar preview"
@@ -177,20 +177,20 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
                           />
                         </div>
                       ) : (
-                        <div className="flex items-center gap-2 w-full">
+                        <div className="flex w-full items-center gap-2">
                           <Input
                             id="image"
                             type="file"
                             accept="image/*"
                             onChange={handleImageChange}
-                            className="className={`w-full max-w-xs disabled:text-blue-500 dark:disabled:text-yellow-300 disabled:opacity-75 mb-6"
+                            className="className={`w-full mb-6 max-w-xs disabled:text-blue-500 disabled:opacity-75 dark:disabled:text-yellow-300"
                           />
                         </div>
                       )}
                     </div>
                   </div>
                 </div>
-                <div className="grid md:grid-cols-2 gap-2 md:gap-6">
+                <div className="grid gap-2 md:grid-cols-2 md:gap-6">
                   <InputWithLabel<UpdateAdminType>
                     fieldTitle={tAdmin("prenom")}
                     nameInSchema="prenom"
@@ -204,7 +204,7 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
                   variant="destructive"
                   size="lg"
                   title={tAdmin("mettre-a-jour")}
-                  className="text-base w-full mt-6"
+                  className="mt-6 w-full text-base"
                   disabled={isUpdatingAdmin || loading}
                 >
                   {isUpdatingAdmin || loading ? (

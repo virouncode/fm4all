@@ -7,7 +7,7 @@ export const selectMaintenanceQuantitesSchema = createSelectSchema(
     surface: (schema) => schema.min(1, "La surface est obligatoire"),
     freqAnnuelle: (schema) =>
       schema.min(1, "La fréquence annuelle est obligatoire"),
-  }
+  },
 );
 
 export type SelectMaintenanceQuantitesType =

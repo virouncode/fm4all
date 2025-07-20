@@ -31,7 +31,7 @@ type SecuriteIncendieMobilePropositionsProps = {
   nbTelBaes: number;
   handleChangeNbr: (
     e: React.ChangeEvent<HTMLInputElement>,
-    type: "extincteur" | "baes" | "telBaes"
+    type: "extincteur" | "baes" | "telBaes",
   ) => void;
   incendieQuantite: {
     nbExtincteurs: number;
@@ -78,8 +78,8 @@ const SecuriteIncendieMobilePropositions = ({
 }: SecuriteIncendieMobilePropositionsProps) => {
   const t = useTranslations("DevisPage.services.incendie");
   return (
-    <div className="flex flex-col gap-6 w-full">
-      <p className="font-bold text-xl lg:hidden">
+    <div className="flex w-full flex-col gap-6">
+      <p className="text-xl font-bold lg:hidden">
         {t("securite-incendie-controles-obligatoires")}
       </p>
       <SecuriteIncendieMobileInputs

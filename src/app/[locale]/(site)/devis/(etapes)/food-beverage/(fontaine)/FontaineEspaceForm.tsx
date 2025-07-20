@@ -34,7 +34,7 @@ const FontaineEspaceForm = ({
   const { fontaines, setFontaines } = useContext(FontainesContext);
   const { setTotalFontaines } = useContext(TotalFontainesContext);
   const fontainesEspacesIds = fontaines.espaces.map(
-    (espace) => espace.infos.espaceId
+    (espace) => espace.infos.espaceId,
   );
   const effectif = client.effectif ?? 0;
   const nbPersonnes =
@@ -63,7 +63,7 @@ const FontaineEspaceForm = ({
                   typeEau: newTypeEau,
                 },
               }
-            : item
+            : item,
         ),
       }));
       return;
@@ -76,7 +76,7 @@ const FontaineEspaceForm = ({
         tarif.type === typeFontaine &&
         tarif.typePose === espace.infos.poseSelected &&
         tarif.fournisseurId === fontaines.infos.fournisseurId &&
-        tarif[fontaines.infos.dureeLocation] !== null
+        tarif[fontaines.infos.dureeLocation] !== null,
     ); //1 ligne par fournisseur
     //Il se peut que mon fournisseur n'ait pas de tarif pour ces critères
     if (!fontainesTarifFournisseur) {
@@ -129,7 +129,7 @@ const FontaineEspaceForm = ({
                     prixUnitaireConsoCO2: null,
                     prixUnitaireConsoEauChaude: null,
                   },
-                }
+                },
           ),
         }));
         setTotalFontaines((prev) => ({
@@ -164,7 +164,7 @@ const FontaineEspaceForm = ({
                     prixUnitaireConsoEauChaude: null,
                   },
                 }
-              : item
+              : item,
           ),
         }));
         setTotalFontaines((prev) => ({
@@ -175,7 +175,7 @@ const FontaineEspaceForm = ({
                   total: null,
                   totalInstallation: null,
                 }
-              : item
+              : item,
           ),
         }));
       }
@@ -206,12 +206,12 @@ const FontaineEspaceForm = ({
     //Modele
     const modele = fontainesTarifFournisseur
       ? (fontainesModeles?.find(
-          ({ id }) => id === fontainesTarifFournisseur?.fontaineId
+          ({ id }) => id === fontainesTarifFournisseur?.fontaineId,
         )?.modele ?? null)
       : null;
     const marque = fontainesTarifFournisseur
       ? (fontainesModeles?.find(
-          ({ id }) => id === fontainesTarifFournisseur?.fontaineId
+          ({ id }) => id === fontainesTarifFournisseur?.fontaineId,
         )?.marque ?? null)
       : null;
     const reconditionne = fontainesTarifFournisseur
@@ -240,7 +240,7 @@ const FontaineEspaceForm = ({
                 prixUnitaireConsoEauChaude,
               },
             }
-          : item
+          : item,
       ),
     }));
     //Je mets à jour les totaux si la gamme a été choisie
@@ -253,7 +253,7 @@ const FontaineEspaceForm = ({
                 total: totalAnnuel,
                 totalInstallation: totalInstallation,
               }
-            : item
+            : item,
         ),
       }));
     }
@@ -273,7 +273,7 @@ const FontaineEspaceForm = ({
                   nbPersonnes: newNbPersonnes,
                 },
               }
-            : item
+            : item,
         ),
       }));
       return;
@@ -286,7 +286,7 @@ const FontaineEspaceForm = ({
         tarif.type === typeFontaine &&
         tarif.typePose === espace.infos.poseSelected &&
         tarif.fournisseurId === fontaines.infos.fournisseurId &&
-        tarif[fontaines.infos.dureeLocation] !== null
+        tarif[fontaines.infos.dureeLocation] !== null,
     );
 
     //Il se peut que mon fournisseur n'ait pas de tarif pour ces critères
@@ -342,7 +342,7 @@ const FontaineEspaceForm = ({
                     prixUnitaireConsoCO2: null,
                     prixUnitaireConsoEauChaude: null,
                   },
-                }
+                },
           ),
         }));
         setTotalFontaines((prev) => ({
@@ -379,7 +379,7 @@ const FontaineEspaceForm = ({
                     prixUnitaireConsoEauChaude: null,
                   },
                 }
-              : item
+              : item,
           ),
         }));
         setTotalFontaines((prev) => ({
@@ -390,7 +390,7 @@ const FontaineEspaceForm = ({
                   total: null,
                   totalInstallation: null,
                 }
-              : item
+              : item,
           ),
         }));
       }
@@ -421,12 +421,12 @@ const FontaineEspaceForm = ({
     //Modele
     const modele = fontainesTarifFournisseur
       ? (fontainesModeles?.find(
-          ({ id }) => id === fontainesTarifFournisseur?.fontaineId
+          ({ id }) => id === fontainesTarifFournisseur?.fontaineId,
         )?.modele ?? null)
       : null;
     const marque = fontainesTarifFournisseur
       ? (fontainesModeles?.find(
-          ({ id }) => id === fontainesTarifFournisseur?.fontaineId
+          ({ id }) => id === fontainesTarifFournisseur?.fontaineId,
         )?.marque ?? null)
       : null;
     const reconditionne = fontainesTarifFournisseur
@@ -459,7 +459,7 @@ const FontaineEspaceForm = ({
                 prixUnitaireConsoEauChaude,
               },
             }
-          : item
+          : item,
       ),
     }));
     //Je mets à jour les totaux si la gamme a été choisie
@@ -472,7 +472,7 @@ const FontaineEspaceForm = ({
                 total: totalAnnuel,
                 totalInstallation,
               }
-            : item
+            : item,
         ),
       }));
     }
@@ -487,7 +487,7 @@ const FontaineEspaceForm = ({
         title: t("limite-atteinte"),
         variant: "destructive",
         description: tFontaines(
-          "le-nombre-de-personnes-par-espace-fontaine-a-eau-est-limite-a-110-choisissez-une-offre-puis-ajoutez-un-espace-fontaine-a-eau-si-besoin"
+          "le-nombre-de-personnes-par-espace-fontaine-a-eau-est-limite-a-110-choisissez-une-offre-puis-ajoutez-un-espace-fontaine-a-eau-si-besoin",
         ),
         duration: 7000,
       });
@@ -503,7 +503,7 @@ const FontaineEspaceForm = ({
         title: t("limite-atteinte"),
         variant: "destructive",
         description: tFontaines(
-          "le-nombre-de-personnes-par-espace-fontaine-a-eau-est-limite-a-110-choisissez-une-offre-puis-ajoutez-un-espace-fontaine-a-eau-si-besoin"
+          "le-nombre-de-personnes-par-espace-fontaine-a-eau-est-limite-a-110-choisissez-une-offre-puis-ajoutez-un-espace-fontaine-a-eau-si-besoin",
         ),
         duration: 7000,
       });
@@ -539,7 +539,7 @@ const FontaineEspaceForm = ({
         tarif.type === typeFontaine &&
         tarif.typePose === espace.infos.poseSelected &&
         tarif[value as DureeLocationFontaineType] !== null &&
-        tarif.fournisseurId === fontaines.infos.fournisseurId
+        tarif.fournisseurId === fontaines.infos.fournisseurId,
     );
     //Il se peut que mon fournisseur n'ait pas de tarif ces critères
     if (!fontainesTarifFournisseur) {
@@ -591,7 +591,7 @@ const FontaineEspaceForm = ({
                   prixUnitaireConsoCO2: null,
                   prixUnitaireConsoEauChaude: null,
                 },
-              }
+              },
         ),
       }));
       setTotalFontaines((prev) => ({
@@ -629,12 +629,12 @@ const FontaineEspaceForm = ({
     //Modele
     const modele = fontainesTarifFournisseur
       ? (fontainesModeles?.find(
-          ({ id }) => id === fontainesTarifFournisseur?.fontaineId
+          ({ id }) => id === fontainesTarifFournisseur?.fontaineId,
         )?.modele ?? null)
       : null;
     const marque = fontainesTarifFournisseur
       ? (fontainesModeles?.find(
-          ({ id }) => id === fontainesTarifFournisseur?.fontaineId
+          ({ id }) => id === fontainesTarifFournisseur?.fontaineId,
         )?.marque ?? null)
       : null;
     const reconditionne = fontainesTarifFournisseur
@@ -666,7 +666,7 @@ const FontaineEspaceForm = ({
                 prixUnitaireConsoEauChaude,
               },
             }
-          : item
+          : item,
       ),
     }));
     //Je mets à jour les totaux si la gamme a été choisie
@@ -679,7 +679,7 @@ const FontaineEspaceForm = ({
                 total: totalAnnuel,
                 totalInstallation: totalInstallation,
               }
-            : item
+            : item,
         ),
       }));
     }

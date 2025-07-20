@@ -109,7 +109,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
         typeOccupation: tDevisErreurs("type-doccupation-invalide"),
         codePostal: tDevisErreurs("code-postal-invalide-entrez-5-chiffres"),
         ville: tDevisErreurs("ville-obligatoire"),
-      })
+      }),
     ),
     defaultValues,
   });
@@ -130,7 +130,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
             return;
           }
           const numerosDevis = `${newClientData?.nomEntreprise}_${DateTime.local().toFormat(
-            "dd-MM-yyyy'T'HH:mm"
+            "dd-MM-yyyy'T'HH:mm",
           )}`;
           const nomDevis = `Devis_fm4all_${numerosDevis}.pdf`;
 
@@ -146,7 +146,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
               ? format(new Date(newClientData.dateDeDemarrage), "dd/MM/yyyy", {
                   locale: fr,
                 })
-              : ""
+              : "",
           );
           if (url) {
             try {
@@ -160,7 +160,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                 {
                   method: "POST",
                   body: file,
-                }
+                },
               );
               const urlToPost: string = (await response.json()).url;
               executeSaveDevis({
@@ -201,7 +201,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                                     "dd/MM/yyyy",
                                     {
                                       locale: fr,
-                                    }
+                                    },
                                   )
                                 : newClientData.dateDeDemarrage
                             }</p></br>
@@ -241,11 +241,11 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
           description:
             error?.serverError ??
             tSauver(
-              "impossible-de-sauvegarder-vos-coordonnees-veuillez-reessayer"
+              "impossible-de-sauvegarder-vos-coordonnees-veuillez-reessayer",
             ),
         });
       },
-    }
+    },
   );
 
   const { execute: executeSaveDevis, isPending: isSavingDevis } = useAction(
@@ -267,11 +267,11 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
             tSauver("impossible-de-sauvegarder-le-devis-veuillez-reessayer"),
         });
       },
-    }
+    },
   );
 
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setClient((prev) => ({
@@ -297,7 +297,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
     //La ville existe ?
     try {
       const response = await fetch(
-        `https://geo.api.gouv.fr/communes?codePostal=${data.codePostal}`
+        `https://geo.api.gouv.fr/communes?codePostal=${data.codePostal}`,
       );
       const cityData = await response.json();
 
@@ -306,7 +306,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
           variant: "destructive",
           title: t("code-postal-invalide"),
           description: t(
-            "le-code-postal-ne-correspond-a-aucune-ville-veuillez-reessayer"
+            "le-code-postal-ne-correspond-a-aucune-ville-veuillez-reessayer",
           ),
         });
         return;
@@ -344,28 +344,28 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
 
   return (
     <div
-      className="flex flex-col items-center gap-4 h-full overflow-auto"
+      className="flex h-full flex-col items-center gap-4 overflow-auto"
       id="1"
     >
       <p className="text-2xl font-bold">
         {t("felicitations")} {client.prenomContact} {client.nomContact} !
       </p>
       <p className="text-lg">{t("votre-devis-final-est-pret")}</p>
-      <p className="text-base max-w-prose mx-auto hyphens-auto text-wrap">
+      <p className="mx-auto max-w-prose hyphens-auto text-wrap text-base">
         {t("afin-de-donner-une")} <strong>{t("entete-a-votre-devis")}</strong>{" "}
         {t(
-          "et-faciliter-vos-futures-demarches-vous-pouvez-nous-communiquer-vos-coordonnees-ainsi-que-celles-du-signataire-du-contrat-si-differentes"
+          "et-faciliter-vos-futures-demarches-vous-pouvez-nous-communiquer-vos-coordonnees-ainsi-que-celles-du-signataire-du-contrat-si-differentes",
         )}
       </p>
 
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(submitForm)}
-          className="mt-6 p-1 md:p-4 w-full"
+          className="mt-6 w-full p-1 md:p-4"
         >
-          <div className="flex-1 flex flex-col gap-4 w-full">
+          <div className="flex w-full flex-1 flex-col gap-4">
             <div className="flex flex-col gap-4 lg:flex-row lg:gap-20">
-              <div className="w-full lg:w-1/4 flex flex-col">
+              <div className="flex w-full flex-col lg:w-1/4">
                 <InputWithLabel<InsertClientType>
                   fieldTitle={t("prenom-du-contact")}
                   nameInSchema="prenomContact"
@@ -396,7 +396,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                   className="w-full"
                 />
               </div>
-              <div className="w-full lg:w-1/4 flex flex-col">
+              <div className="flex w-full flex-col lg:w-1/4">
                 <InputWithLabel<InsertClientType>
                   fieldTitle={t("prenom-du-signataire")}
                   nameInSchema="prenomSignataire"
@@ -427,7 +427,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                   className="w-full"
                 />
               </div>
-              <div className="w-full lg:w-1/4 flex flex-col">
+              <div className="flex w-full flex-col lg:w-1/4">
                 <InputWithLabel<InsertClientType>
                   fieldTitle={t("nom-de-lentreprise")}
                   nameInSchema="nomEntreprise"
@@ -456,7 +456,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                 />
               </div>
 
-              <div className="w-full lg:w-1/4 flex flex-col">
+              <div className="flex w-full flex-col lg:w-1/4">
                 <InputWithLabel<InsertClientType>
                   fieldTitle={t("addresse-du-site-ligne-1")}
                   nameInSchema="adresseLigne1"
@@ -487,18 +487,18 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                 />
               </div>
             </div>
-            <div className="flex gap-4 items-center justify-center mb-6">
+            <div className="mb-6 flex items-center justify-center gap-4">
               <Checkbox
                 checked={accepte}
                 onCheckedChange={(value: boolean) => setAccepte(value)}
-                className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+                className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
                 id="acceptation"
                 aria-label={t("acceptez-les-conditions")}
                 data-testid="acceptation-checkbox"
               />
               <Label htmlFor="acceptation" className="max-w-prose">
                 {t(
-                  "en-cochant-cette-case-je-reconnais-avoir-lu-compris-et-accepte-sans-reserve-les"
+                  "en-cochant-cette-case-je-reconnais-avoir-lu-compris-et-accepte-sans-reserve-les",
                 )}{" "}
                 <Link href="/cgu" className="underline" target="_blank">
                   {t("conditions-generales-dutilisation-cgu")}
@@ -514,7 +514,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
               <Button
                 variant="destructive"
                 size="lg"
-                className="text-base min-w-[200px]"
+                className="min-w-[200px] text-base"
                 disabled={
                   loading || isSavingClient || isSavingDevis || !accepte
                 }

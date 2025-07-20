@@ -52,7 +52,7 @@ const SecuriteIncendieMobileCards = ({
   handleClickProposition,
 }: SecuriteIncendieMobileCardsProps) => {
   return (
-    <div className="flex flex-col gap-6 w-full">
+    <div className="flex w-full flex-col gap-6">
       {propositions.map((proposition) => (
         <SecuriteIncendieMobileCard
           key={proposition.fournisseurId}

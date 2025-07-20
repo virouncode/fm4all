@@ -87,18 +87,18 @@ const SnacksFruitsMobilePropositions = ({
   const { snacksFruits } = useContext(SnacksFruitsContext);
   if (snacksFruits.infos.choix.length === 0) {
     return (
-      <div className="flex flex-col gap-2 w-full text-fm4alldestructive">
+      <div className="flex w-full flex-col gap-2 text-fm4alldestructive">
         <p>{t("nous-navons-pas-doffres-correspondant-a-ces-criteres")}</p>
         <p>
           {tSnacks(
-            "veuillez-choisir-au-moins-un-produit-parmi-fruits-snacks-et-boissons"
+            "veuillez-choisir-au-moins-un-produit-parmi-fruits-snacks-et-boissons",
           )}
         </p>
       </div>
     );
   }
   return (
-    <div className="flex flex-col gap-6 w-full">
+    <div className="flex w-full flex-col gap-6">
       {formattedPropositions.map((propositions) => (
         <SnacksFruitsMobilePropositionsCarousel
           propositions={propositions}
@@ -106,9 +106,9 @@ const SnacksFruitsMobilePropositions = ({
           handleClickProposition={handleClickProposition}
         />
       ))}
-      <p className="text-xs text-end italic px-1">
+      <p className="px-1 text-end text-xs italic">
         {tSnacks(
-          "ce-fournisseur-vous-propose-une-reduction-de-8-car-vous-lavez-choisi-pour-le-cafe"
+          "ce-fournisseur-vous-propose-une-reduction-de-8-car-vous-lavez-choisi-pour-le-cafe",
         )}
       </p>
     </div>

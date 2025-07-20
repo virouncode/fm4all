@@ -112,7 +112,7 @@ const SnacksFruitsMobilePropositionsCarousel = ({
           ? 0
           : snacksFruits.infos.gammeSelected === "confort"
             ? 1
-            : 2
+            : 2,
       );
     }
   }, [
@@ -128,7 +128,7 @@ const SnacksFruitsMobilePropositionsCarousel = ({
         align: "start",
         loop: true,
       }}
-      className="w-full relative"
+      className="relative w-full"
       setApi={setApi}
     >
       <CarouselContent>

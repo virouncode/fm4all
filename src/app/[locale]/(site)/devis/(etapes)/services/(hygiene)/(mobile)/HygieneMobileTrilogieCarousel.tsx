@@ -91,7 +91,7 @@ const HygieneMobileTrilogieCarousel = ({
           ? 0
           : hygiene.infos.trilogieGammeSelected === "confort"
             ? 1
-            : 2
+            : 2,
       );
     }
   }, [api, hygiene.infos.fournisseurId, hygiene.infos.trilogieGammeSelected]);
@@ -101,7 +101,7 @@ const HygieneMobileTrilogieCarousel = ({
         align: "start",
         loop: true,
       }}
-      className="w-full relative"
+      className="relative w-full"
       setApi={setApi}
     >
       <CarouselContent>

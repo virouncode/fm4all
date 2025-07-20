@@ -89,22 +89,22 @@ const SnacksFruitsDesktopPropositions = ({
 
   if (snacksFruits.infos.choix.length === 0) {
     return (
-      <div className="h-full flex flex-col items-center justify-center border rounded-xl overflow-hidden">
+      <div className="flex h-full flex-col items-center justify-center overflow-hidden rounded-xl border">
         <p>{t("nous-navons-pas-doffres-correspondant-a-ces-criteres")}</p>
         <p>
           {tSnacks(
-            "veuillez-choisir-au-moins-un-produit-parmi-fruits-snacks-et-boissons"
+            "veuillez-choisir-au-moins-un-produit-parmi-fruits-snacks-et-boissons",
           )}
         </p>
       </div>
     );
   }
   return (
-    <div className="flex-1 flex flex-col border rounded-xl overflow-auto">
+    <div className="flex flex-1 flex-col overflow-auto rounded-xl border">
       {formattedPropositions.length > 0
         ? formattedPropositions.map((propositions) => (
             <div
-              className="flex border-b flex-1"
+              className="flex flex-1 border-b"
               key={propositions[0].fournisseurId}
             >
               <SnacksFruitsPropositionLogo {...propositions[0]} />

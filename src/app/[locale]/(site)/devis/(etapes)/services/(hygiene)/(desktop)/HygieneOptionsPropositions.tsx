@@ -42,43 +42,43 @@ const HygieneOptionsPropositions = ({
     getHygieneFournisseurTarifs(
       hygiene,
       hygieneDistribTarifs,
-      hygieneConsosTarifs
+      hygieneConsosTarifs,
     );
 
   const propositions = gammes.map((gamme) => {
     //la gamme suffit pour identifier la proposition car il n'y a qu'un fournisseur
     const prixDistribDesinfectant =
       hygieneDistribTarifsFournisseur.find(
-        (tarif) => tarif.type === "desinfectant" && tarif.gamme === gamme
+        (tarif) => tarif.type === "desinfectant" && tarif.gamme === gamme,
       )?.[dureeLocation] ?? null;
     const prixDistribParfum =
       hygieneDistribTarifsFournisseur.find(
-        (tarif) => tarif.type === "parfum" && tarif.gamme === gamme
+        (tarif) => tarif.type === "parfum" && tarif.gamme === gamme,
       )?.[dureeLocation] ?? null;
     const prixDistribBalai =
       hygieneDistribTarifsFournisseur.find(
-        (tarif) => tarif.type === "balai" && tarif.gamme === gamme
+        (tarif) => tarif.type === "balai" && tarif.gamme === gamme,
       )?.[dureeLocation] ?? null;
     const prixDistribPoubelle =
       hygieneDistribTarifsFournisseur.find(
-        (tarif) => tarif.type === "poubelle" && tarif.gamme === gamme
+        (tarif) => tarif.type === "poubelle" && tarif.gamme === gamme,
       )?.[dureeLocation] ?? null;
 
     const imageUrlDesinfectant =
       hygieneDistribTarifsFournisseur.find(
-        (tarif) => tarif.type === "desinfectant" && tarif.gamme === gamme
+        (tarif) => tarif.type === "desinfectant" && tarif.gamme === gamme,
       )?.imageUrl ?? null;
     const imageUrlParfum =
       hygieneDistribTarifsFournisseur.find(
-        (tarif) => tarif.type === "parfum" && tarif.gamme === gamme
+        (tarif) => tarif.type === "parfum" && tarif.gamme === gamme,
       )?.imageUrl ?? null;
     const imageUrlBalai =
       hygieneDistribTarifsFournisseur.find(
-        (tarif) => tarif.type === "balai" && tarif.gamme === gamme
+        (tarif) => tarif.type === "balai" && tarif.gamme === gamme,
       )?.imageUrl ?? null;
     const imageUrlPoubelle =
       hygieneDistribTarifsFournisseur.find(
-        (tarif) => tarif.type === "poubelle" && tarif.gamme === gamme
+        (tarif) => tarif.type === "poubelle" && tarif.gamme === gamme,
       )?.imageUrl ?? null;
 
     const totalDesinfectant =
@@ -167,7 +167,7 @@ const HygieneOptionsPropositions = ({
       imageUrlParfum: string | null;
       imageUrlBalai: string | null;
       imageUrlPoubelle: string | null;
-    }
+    },
   ) => {
     const {
       gamme,
@@ -307,7 +307,7 @@ const HygieneOptionsPropositions = ({
 
   const handleChangeDistribNbr = (
     e: ChangeEvent<HTMLInputElement>,
-    type: string
+    type: string,
   ) => {
     const value = e.target.value;
     switch (type) {
@@ -327,7 +327,7 @@ const HygieneOptionsPropositions = ({
             hygieneDistribTarifsFournisseur.find(
               (tarif) =>
                 tarif.type === "desinfectant" &&
-                tarif.gamme === hygiene.infos.desinfectantGammeSelected
+                tarif.gamme === hygiene.infos.desinfectantGammeSelected,
             )?.[dureeLocation] ?? null;
 
           const totalDesinfectant =
@@ -360,7 +360,7 @@ const HygieneOptionsPropositions = ({
             hygieneDistribTarifsFournisseur.find(
               (tarif) =>
                 tarif.type === "parfum" &&
-                tarif.gamme === hygiene.infos.parfumGammeSelected
+                tarif.gamme === hygiene.infos.parfumGammeSelected,
             )?.[dureeLocation] ?? null;
 
           const totalParfum =
@@ -390,7 +390,7 @@ const HygieneOptionsPropositions = ({
             hygieneDistribTarifsFournisseur.find(
               (tarif) =>
                 tarif.type === "balai" &&
-                tarif.gamme === hygiene.infos.balaiGammeSelected
+                tarif.gamme === hygiene.infos.balaiGammeSelected,
             )?.[dureeLocation] ?? null;
 
           const totalBalai =
@@ -420,7 +420,7 @@ const HygieneOptionsPropositions = ({
             hygieneDistribTarifsFournisseur.find(
               (tarif) =>
                 tarif.type === "poubelle" &&
-                tarif.gamme === hygiene.infos.poubelleGammeSelected
+                tarif.gamme === hygiene.infos.poubelleGammeSelected,
             )?.[dureeLocation] ?? null;
 
           const totalPoubelle =

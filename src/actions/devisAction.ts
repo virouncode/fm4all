@@ -36,7 +36,7 @@ export const insertDevisTemporaireAction = actionClient
           throw new Error(
             locale === "fr"
               ? "Impossible d'enregistrer le devis temporaire."
-              : "Unable to save temp quote."
+              : "Unable to save temp quote.",
           );
         }
         insertedDevisId = resultDevisTemporaire[0].id;
@@ -54,7 +54,7 @@ export const insertDevisTemporaireAction = actionClient
             ? "Votre progression a bien été enregistrée, merci !"
             : "Your progress has been saved, thank you!",
       };
-    }
+    },
   );
 
 export const insertDevisAction = actionClient
@@ -77,7 +77,7 @@ export const insertDevisAction = actionClient
           throw new Error(
             locale === "fr"
               ? "Impossible d'enregistrer le devis."
-              : "Unable to save quote."
+              : "Unable to save quote.",
           );
         }
         insertedDevisId = resultDevis[0].id;
@@ -95,5 +95,5 @@ export const insertDevisAction = actionClient
             ? "Votre devis a bien été enregistrée, nous vous contacterons dans les plus brefs délais, merci !"
             : "Your quote has been saved, we will contact you as soon as possible, thank you!",
       };
-    }
+    },
   );

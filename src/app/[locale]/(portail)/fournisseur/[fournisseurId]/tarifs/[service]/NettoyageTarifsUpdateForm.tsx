@@ -49,9 +49,9 @@ export default function NettoyageTarifsUpdateForm({
     initialTarifs.sort(
       (a, b) =>
         DateTime.fromJSDate(b.updatedAt).toMillis() -
-        DateTime.fromJSDate(a.updatedAt).toMillis()
+        DateTime.fromJSDate(a.updatedAt).toMillis(),
     )[0].updatedAt,
-    locale === "fr" ? "dd/MM/yyyy à HH:mm" : "yyyy/MM/dd at hh:mm a"
+    locale === "fr" ? "dd/MM/yyyy à HH:mm" : "yyyy/MM/dd at hh:mm a",
   );
 
   // Vérifier s'il y a des modifications non sauvegardées
@@ -63,7 +63,7 @@ export default function NettoyageTarifsUpdateForm({
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement>,
     id: number,
-    field: keyof SelectNettoyageTarifFournisseurType
+    field: keyof SelectNettoyageTarifFournisseurType,
   ) => {
     // Filtrer pour n'accepter que les chiffres et les virgules/points
     const inputValue = e.target.value;
@@ -77,8 +77,8 @@ export default function NettoyageTarifsUpdateForm({
     // Mettre à jour l'UI immédiatement
     setTarifs((prevTarifs) =>
       prevTarifs.map((tarif) =>
-        tarif.id === id ? { ...tarif, [field]: value } : tarif
-      )
+        tarif.id === id ? { ...tarif, [field]: value } : tarif,
+      ),
     );
 
     // Mettre à jour la liste des tarifs modifiés
@@ -206,7 +206,7 @@ export default function NettoyageTarifsUpdateForm({
 
   if (tarifs.length === 0) {
     return (
-      <div className="text-center p-8">
+      <div className="p-8 text-center">
         Aucun tarif trouvé. Veuillez contacter l&apos;administrateur pour
         configurer vos tarifs.
       </div>
@@ -214,7 +214,7 @@ export default function NettoyageTarifsUpdateForm({
   }
   if (quantites.length === 0) {
     return (
-      <div className="text-center p-8">
+      <div className="p-8 text-center">
         Aucune quantité trouvée. Veuillez contacter l&apos;administrateur.
       </div>
     );
@@ -248,20 +248,20 @@ export default function NettoyageTarifsUpdateForm({
 
   return (
     <>
-      <div className="flex justify-between mt-14 mb-2 item-center">
+      <div className="item-center mb-2 mt-14 flex justify-between">
         <div className="border-l border-l-gray-500">
           <h2 className="ml-4 text-xl font-bold">{title}</h2>
         </div>
-        <p className="text-sm text-end italic">
+        <p className="text-end text-sm italic">
           Dernière mise à jour : {lastUpdate}
         </p>
       </div>
       <div className="relative space-y-4">
         {/* Bouton de sauvegarde et indicateur de modifications */}
-        <div className="flex justify-between items-center flex-col gap-4 md:flex-row md:gap-0">
+        <div className="flex flex-col items-center justify-between gap-4 md:flex-row md:gap-0">
           <div>
             {hasUnsavedChanges ? (
-              <div className="text-sm text-amber-600 font-medium">
+              <div className="text-sm font-medium text-amber-600">
                 Vous avez des modifications non sauvegardées
               </div>
             ) : (
@@ -275,7 +275,7 @@ export default function NettoyageTarifsUpdateForm({
             )}
             {(tarifs.some((tarif) => !tarif.hParPassage) ||
               tarifs.some((tarif) => !tarif.tauxHoraire)) && (
-              <div className="text-sm text-red-600 font-medium">
+              <div className="text-sm font-medium text-red-600">
                 Vous avez entré des valeurs erronées
               </div>
             )}
@@ -308,10 +308,10 @@ export default function NettoyageTarifsUpdateForm({
         </div>
 
         {/* Tableau des tarifs */}
-        <div className="overflow-hidden border rounded-md">
+        <div className="overflow-hidden rounded-md border">
           <div className="max-h-[550px] overflow-y-auto">
             <Table>
-              <TableHeader className="sticky top-0 bg-background z-10 shadow-sm">
+              <TableHeader className="sticky top-0 z-10 bg-background shadow-sm">
                 <TableRow>
                   <TableHead>Surface (m²)</TableHead>
                   <TableHead>Gamme</TableHead>
@@ -332,7 +332,7 @@ export default function NettoyageTarifsUpdateForm({
                   // Trouver la quantité correspondante
                   const quantite = quantites.find(
                     (q) =>
-                      q.surface === tarif.surface && q.gamme === tarif.gamme
+                      q.surface === tarif.surface && q.gamme === tarif.gamme,
                   );
 
                   // Calculer la fréquence annuelle
@@ -367,10 +367,10 @@ export default function NettoyageTarifsUpdateForm({
                         <span
                           className={
                             tarif.gamme === "essentiel"
-                              ? "text-fm4allessential font-bold"
+                              ? "font-bold text-fm4allessential"
                               : tarif.gamme === "confort"
-                                ? "text-fm4allcomfort font-bold"
-                                : "text-fm4allexcellence font-bold"
+                                ? "font-bold text-fm4allcomfort"
+                                : "font-bold text-fm4allexcellence"
                           }
                         >
                           {tarif.gamme}
@@ -384,7 +384,7 @@ export default function NettoyageTarifsUpdateForm({
                           ? Math.round(
                               tarif.tauxHoraire *
                                 tarif.hParPassage *
-                                freqAnnuelle
+                                freqAnnuelle,
                             )
                           : "-"}
                       </TableCell>

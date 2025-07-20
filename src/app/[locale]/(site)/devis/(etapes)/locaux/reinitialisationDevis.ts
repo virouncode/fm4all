@@ -63,9 +63,9 @@ export const reinitialisationDevis = (
   setTotalFontaines: (totalFontaines: TotalFontainesType) => void,
   setTotalOfficeManager: (totalOfficeManager: TotalOfficeManagerType) => void,
   setTotalServicesFm4All: (
-    totalServicesFm4All: TotalServicesFm4AllType
+    totalServicesFm4All: TotalServicesFm4AllType,
   ) => void,
-  setTotal: (total: TotalType) => void
+  setTotal: (total: TotalType) => void,
 ) => {
   //Devis
   setDevisProgress({

@@ -40,7 +40,7 @@ export const getNettoyageQuantites = async (surface: string) => {
       .where(eq(nettoyageQuantites.surface, roundedSurface));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectNettoyageQuantitesSchema.parse(result)
+      selectNettoyageQuantitesSchema.parse(result),
     );
     const data = validatedResults.map((result) => ({
       ...result,
@@ -61,7 +61,7 @@ export const getNettoyageAllQuantites = async () => {
     const results = await db.select().from(nettoyageQuantites);
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectNettoyageQuantitesSchema.parse(result)
+      selectNettoyageQuantitesSchema.parse(result),
     );
     const data = validatedResults.map((result) => ({
       ...result,
@@ -96,12 +96,12 @@ export const getNettoyageTarifs = async (surface: string) => {
       .from(nettoyageTarifs)
       .innerJoin(
         fournisseurs,
-        eq(fournisseurs.id, nettoyageTarifs.fournisseurId)
+        eq(fournisseurs.id, nettoyageTarifs.fournisseurId),
       )
       .where(eq(nettoyageTarifs.surface, roundedSurface));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectNettoyageTarifsSchema.parse(result)
+      selectNettoyageTarifsSchema.parse(result),
     );
     const data = validatedResults.map((result) => ({
       ...result,
@@ -126,7 +126,7 @@ export const getNettoyageTarifsFournisseur = async (fournisseurId: number) => {
       .where(eq(nettoyageTarifs.fournisseurId, fournisseurId));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectNettoyageTarifsFournisseurSchema.parse(result)
+      selectNettoyageTarifsFournisseurSchema.parse(result),
     );
     const data = validatedResults.map((result) => ({
       ...result,
@@ -162,12 +162,12 @@ export const getRepasseTarifs = async (surface: string) => {
       .from(nettoyageRepasseTarifs)
       .innerJoin(
         fournisseurs,
-        eq(fournisseurs.id, nettoyageRepasseTarifs.fournisseurId)
+        eq(fournisseurs.id, nettoyageRepasseTarifs.fournisseurId),
       )
       .where(and(eq(nettoyageRepasseTarifs.surface, roundedSurface)));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectRepasseTarifsSchema.parse(result)
+      selectRepasseTarifsSchema.parse(result),
     );
 
     const data = validatedResults.map((validatedResult) => ({
@@ -192,7 +192,7 @@ export const getRepasseTarifsFournisseur = async (fournisseurId: number) => {
       .where(eq(nettoyageRepasseTarifs.fournisseurId, fournisseurId));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectNettoyageTarifsFournisseurSchema.parse(result)
+      selectNettoyageTarifsFournisseurSchema.parse(result),
     );
     const data = validatedResults.map((result) => ({
       ...result,
@@ -227,11 +227,11 @@ export const getVitrerieTarifs = async () => {
       .from(nettoyageVitrerieTarifs)
       .innerJoin(
         fournisseurs,
-        eq(fournisseurs.id, nettoyageVitrerieTarifs.fournisseurId)
+        eq(fournisseurs.id, nettoyageVitrerieTarifs.fournisseurId),
       );
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectVitrerieTarifsSchema.parse(result)
+      selectVitrerieTarifsSchema.parse(result),
     );
     const data = validatedResults.map((validatedResult) => ({
       ...validatedResult,
@@ -256,7 +256,7 @@ export const getVitrerieTarifsFournisseur = async (fournisseurId: number) => {
       .where(eq(nettoyageVitrerieTarifs.fournisseurId, fournisseurId));
     if (results.length === 0) return null;
     const validatedResults = results.map((result) =>
-      selectVitrerieTarifsFournisseurSchema.parse(result)
+      selectVitrerieTarifsFournisseurSchema.parse(result),
     );
     const data = validatedResults.map((validatedResult) => ({
       ...validatedResult,

@@ -21,7 +21,7 @@ export const selectClientSchema = createSelectSchema(clients, {
   phoneContact: (schema) =>
     schema.regex(
       /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{2,4}([-.\s]?\d{2,4}){2,3}$/,
-      "Numéro de téléphone invalide"
+      "Numéro de téléphone invalide",
     ),
   emailSignataire: (schema) =>
     schema.email("Adresse email invalide").or(z.literal("")).nullable(),
@@ -33,7 +33,7 @@ export const selectClientSchema = createSelectSchema(clients, {
       .max(300, "Effectif maximum 300 personnes"),
   typeBatiment: z.enum(
     ["bureaux", "localCommercial", "entrepot", "cabinetMedical"],
-    { message: "Type de batiment invalide" }
+    { message: "Type de batiment invalide" },
   ),
   typeOccupation: z.enum(["partieEtage", "plateauComplet", "batimentEntier"], {
     message: "Type d'occupation invalide",
@@ -79,7 +79,7 @@ export const createInsertClientSchema = (messages: {
     phoneContact: (schema) =>
       schema.regex(
         /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{2,4}([-.\s]?\d{2,4}){2,3}$/,
-        messages.phoneContact
+        messages.phoneContact,
       ),
     emailSignataire: (schema) =>
       schema.email(messages.emailContact).or(z.literal("")).nullable(),
@@ -89,13 +89,13 @@ export const createInsertClientSchema = (messages: {
       schema.min(1, messages.effectif).max(300, messages.effectifMax),
     typeBatiment: z.enum(
       ["bureaux", "localCommercial", "entrepot", "cabinetMedical"],
-      { message: messages.typeBatiment }
+      { message: messages.typeBatiment },
     ),
     typeOccupation: z.enum(
       ["partieEtage", "plateauComplet", "batimentEntier"],
       {
         message: messages.typeOccupation,
-      }
+      },
     ),
     codePostal: (schema) =>
       schema.refine((value) => /^\d{5}$/.test(value), {
@@ -158,7 +158,7 @@ export const createUpdateClientSchema = (messages: {
     phoneContact: (schema) =>
       schema.regex(
         /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{2,4}([-.\s]?\d{2,4}){2,3}$/,
-        messages.phoneContact
+        messages.phoneContact,
       ),
     emailSignataire: (schema) =>
       schema.email(messages.emailContact).or(z.literal("")),
@@ -168,13 +168,13 @@ export const createUpdateClientSchema = (messages: {
       schema.min(1, messages.effectif).max(300, messages.effectifMax),
     typeBatiment: z.enum(
       ["bureaux", "localCommercial", "entrepot", "cabinetMedical"],
-      { message: messages.typeBatiment }
+      { message: messages.typeBatiment },
     ),
     typeOccupation: z.enum(
       ["partieEtage", "plateauComplet", "batimentEntier"],
       {
         message: messages.typeOccupation,
-      }
+      },
     ),
     codePostal: (schema) =>
       schema.refine((value) => /^\d{5}$/.test(value), {
@@ -224,11 +224,11 @@ export const createMesLocauxSchema = (messages: {
       .max(300, messages.effectif),
     typeBatiment: z.enum(
       ["bureaux", "localCommercial", "entrepot", "cabinetMedical"],
-      { message: messages.batiment }
+      { message: messages.batiment },
     ),
     typeOccupation: z.enum(
       ["partieEtage", "plateauComplet", "batimentEntier"],
-      { message: messages.occupation }
+      { message: messages.occupation },
     ),
     codePostal: z.string().refine((value) => /^\d{5}$/.test(value), {
       message: messages.codePostal,

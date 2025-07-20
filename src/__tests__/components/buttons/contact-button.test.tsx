@@ -17,7 +17,7 @@ import ContactButton from "@/components/buttons/contact-button";
 
 describe("ContactButton", () => {
   const renderComponent = (
-    setIsMobileNavOpen: Dispatch<SetStateAction<boolean>>
+    setIsMobileNavOpen: Dispatch<SetStateAction<boolean>>,
   ) => {
     render(<ContactButton setIsMobileNavOpen={setIsMobileNavOpen} />);
     return {

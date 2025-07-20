@@ -44,7 +44,7 @@ export default async function PortalLayout({
   const messages = (await import(`../../../messages/${locale}.json`)).default;
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={`${didact.className} antialiased scroll-smooth`}>
+      <body className={`${didact.className} scroll-smooth antialiased`}>
         <GoogleAnalytics
           GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!}
         />

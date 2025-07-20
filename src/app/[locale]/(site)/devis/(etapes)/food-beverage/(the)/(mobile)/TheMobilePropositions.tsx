@@ -62,8 +62,8 @@ const TheMobilePropositions = ({
 }: TheMobilePropositionsProps) => {
   const tThe = useTranslations("DevisPage.foodBeverage.the");
   return (
-    <div className="flex flex-col gap-6 w-full">
-      <p className="font-bold text-xl -mb-4">{tThe("sachets-de-the")}</p>
+    <div className="flex w-full flex-col gap-6">
+      <p className="-mb-4 text-xl font-bold">{tThe("sachets-de-the")}</p>
       <TheMobileInputs
         nbPersonnes={nbPersonnes}
         handleChangeNbPersonnes={handleChangeNbPersonnes}

@@ -11,7 +11,7 @@ const WhyCard = ({ title, content, icon: Icon }: WhyCardProps) => {
   return (
     <Card className="flex-1">
       <CardHeader>
-        <CardTitle className="flex gap-2 items-center">
+        <CardTitle className="flex items-center gap-2">
           <p>{title}</p>
           <Icon size={20} />
         </CardTitle>

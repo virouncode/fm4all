@@ -41,18 +41,18 @@ const MaintenanceFournisseurLogo = ({
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          className="flex w-1/4 h-full items-center justify-center p-4 relative bg-transparent hover:bg-transparent shadow-none"
+          className="relative flex h-full w-1/4 items-center justify-center bg-transparent p-4 shadow-none hover:bg-transparent"
           asChild
           title="Infos sur le fournisseur"
         >
           <div>
             {logoUrl ? (
-              <div className="w-full h-full relative">
+              <div className="relative h-full w-full">
                 <Image
                   src={logoUrl}
                   alt={`logo-de-${nomFournisseur}`}
                   fill={true}
-                  className="w-full h-full object-contain cursor-pointer"
+                  className="h-full w-full cursor-pointer object-contain"
                   quality={100}
                 />
               </div>

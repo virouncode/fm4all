@@ -5,9 +5,9 @@ const page = async ({
 }) => {
   const { fournisseurId, service } = await params;
   return (
-    <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-6 hyphens-auto flex-1">
+    <main className="mx-auto mb-24 max-w-7xl flex-1 hyphens-auto px-6 py-4 md:px-6">
       <section className="mt-2">
-        <h1 className="text-4xl mb-14">Mes produits</h1>
+        <h1 className="mb-14 text-4xl">Mes produits</h1>
       </section>
     </main>
   );

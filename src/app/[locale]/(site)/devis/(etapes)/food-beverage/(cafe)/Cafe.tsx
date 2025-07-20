@@ -106,12 +106,12 @@ const Cafe = ({
 
   //Le container exterieur pour faire defiler les machines
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="1">
+    <div className="mx-auto flex h-full w-full flex-col gap-4 py-2" id="1">
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
           title={t("boissons-chaudes")}
           description={t(
-            "cafe-expresso-boissons-lactees-ou-chocolatees-choisissez-le-type-de-boissons-et-le-nombre-de-personnes-pour-votre-espace-cafe-forfait-mensuel-tout-compris-machine-cafe-consommables-la-gamme-determine-la-qualite-du-cafe"
+            "cafe-expresso-boissons-lactees-ou-chocolatees-choisissez-le-type-de-boissons-et-le-nombre-de-personnes-pour-votre-espace-cafe-forfait-mensuel-tout-compris-machine-cafe-consommables-la-gamme-determine-la-qualite-du-cafe",
           )}
           icon={SprayCan}
           propositionsRef={propositionsRef}
@@ -121,7 +121,7 @@ const Cafe = ({
           icon={Coffee}
           title={t("boissons-chaudes")}
           description={t(
-            "cafe-expresso-boissons-lactees-ou-chocolatees-choisissez-le-type-de-boissons-et-le-nombre-de-personnes-pour-votre-espace-cafe-forfait-mensuel-tout-compris-machine-cafe-consommables-la-gamme-determine-la-qualite-du-cafe"
+            "cafe-expresso-boissons-lactees-ou-chocolatees-choisissez-le-type-de-boissons-et-le-nombre-de-personnes-pour-votre-espace-cafe-forfait-mensuel-tout-compris-machine-cafe-consommables-la-gamme-determine-la-qualite-du-cafe",
           )}
           handleClickPrevious={handleClickPrevious}
           previousButton={false}

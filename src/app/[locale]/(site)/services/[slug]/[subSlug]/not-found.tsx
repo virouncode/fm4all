@@ -6,9 +6,9 @@ export default function NotFoundPage() {
   console.log("NotFoundPage locale:", locale);
 
   return (
-    <div className="flex items-center justify-center mx-auto h-[calc(100vh-4rem)]">
-      <div className="flex flex-col gap-6 mt-4">
-        <h2 className="font-bold text-lg text-center text-red-500">
+    <div className="mx-auto flex h-[calc(100vh-4rem)] items-center justify-center">
+      <div className="mt-4 flex flex-col gap-6">
+        <h2 className="text-center text-lg font-bold text-red-500">
           {locale === "fr"
             ? "Erreur 404 : Page non trouvée !"
             : "404 Error: Page not found!"}

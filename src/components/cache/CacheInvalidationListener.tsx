@@ -29,7 +29,7 @@ export default function CacheInvalidationListener() {
   const DEBOUNCE_DELAY = 2000;
   const MAX_PROCESSED_EVENTS = 100;
   const [processedEvents, setProcessedEvents] = useState<Set<number>>(
-    new Set()
+    new Set(),
   );
 
   // Utiliser le hook personnalisé pour mettre à jour le contexte nettoyage
@@ -119,7 +119,7 @@ export default function CacheInvalidationListener() {
             toast({
               title: t("tarifs-mis-a-jour"),
               description: t(
-                "les-tarifs-ont-ete-mis-a-jour-par-un-fournisseur-la-page-a-ete-rechargee"
+                "les-tarifs-ont-ete-mis-a-jour-par-un-fournisseur-la-page-a-ete-rechargee",
               ),
               duration: 3000,
             });
@@ -130,7 +130,7 @@ export default function CacheInvalidationListener() {
         } finally {
           isInvalidatingRef.current = false;
         }
-      }
+      },
     );
 
     // Nettoyer l'abonnement lors du démontage du composant

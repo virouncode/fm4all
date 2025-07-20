@@ -63,13 +63,13 @@ const ptComponents = {
         return null;
       }
       return (
-        <div className="relative w-full h-[200px] md:h-[400px] my-6 mx-auto">
+        <div className="relative mx-auto my-6 h-[200px] w-full md:h-[400px]">
           <Image
             quality={100}
             src={urlFor(value).url()}
             alt={value.alt || "illustration du service et et de la ville"}
             fill
-            className="object-contain m-0"
+            className="m-0 object-contain"
             unoptimized={true}
           />
         </div>
@@ -79,21 +79,21 @@ const ptComponents = {
   block: {
     essentiel: (props: BlockComponentProps) => {
       return (
-        <p className="text-fm4allessential font-bold text-2xl mt-10">
+        <p className="mt-10 text-2xl font-bold text-fm4allessential">
           {props.children}
         </p>
       );
     },
     confort: (props: BlockComponentProps) => {
       return (
-        <p className="text-fm4allcomfort font-bold text-2xl mt-10">
+        <p className="mt-10 text-2xl font-bold text-fm4allcomfort">
           {props.children}
         </p>
       );
     },
     excellence: (props: BlockComponentProps) => {
       return (
-        <p className="text-fm4allexcellence font-bold text-2xl mt-10">
+        <p className="mt-10 text-2xl font-bold text-fm4allexcellence">
           {props.children}
         </p>
       );
@@ -123,7 +123,7 @@ export const generateMetadata = async ({
         slug: locale === "en" ? slug : getServicesSlugEn(slug),
         subSlug: locale === "en" ? subSlug : getServicesSubSlugEn(subSlug),
       },
-    }
+    },
   );
 };
 
@@ -309,9 +309,9 @@ export default async function page({
   ];
 
   return (
-    <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20 hyphens-auto">
+    <main className="mx-auto mb-24 max-w-7xl hyphens-auto px-6 py-4 md:px-20">
       <Breadcrumb className="mb-10">
-        <BreadcrumbList className="text-sm lg:text-base flex flex-wrap">
+        <BreadcrumbList className="flex flex-wrap text-sm lg:text-base">
           <BreadcrumbItem>
             <BreadcrumbLink
               className="flex items-center"
@@ -369,7 +369,7 @@ export default async function page({
       {serviceBlocs
         .filter(
           (item) =>
-            item.bloc && Array.isArray(item.bloc) && item.bloc.length > 0
+            item.bloc && Array.isArray(item.bloc) && item.bloc.length > 0,
         )
         .map(({ id, imageUrl, imageAlt, bloc, side }) => {
           if (!bloc) return null;

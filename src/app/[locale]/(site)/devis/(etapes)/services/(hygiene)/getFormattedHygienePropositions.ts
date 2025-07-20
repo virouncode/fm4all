@@ -13,7 +13,7 @@ export const getFormattedHygienePropositions = (
   hygieneDistribTarifs: SelectHygieneDistribTarifsType[],
   hygieneDistribInstalTarifs: SelectHygieneInstalDistribTarifsType[],
   hygieneConsosTarifs: SelectHygieneConsoTarifsType[],
-  hygieneMinFacturation: SelectHygieneMinFacturationType[]
+  hygieneMinFacturation: SelectHygieneMinFacturationType[],
 ) => {
   //Nombre de distributeurs
   const nbDistribEmp =
@@ -37,43 +37,43 @@ export const getFormattedHygienePropositions = (
     hygieneDistribTarifs,
     hygieneConsosTarifs,
     hygieneDistribInstalTarifs,
-    hygieneMinFacturation
+    hygieneMinFacturation,
   );
 
   const propositions = gammes.map((gamme) => {
     const prixDistribEmp =
       hygieneDistribTarifsFournisseur.find(
-        (tarif) => tarif.type === "emp" && tarif.gamme === gamme
+        (tarif) => tarif.type === "emp" && tarif.gamme === gamme,
       )?.[dureeLocation] ?? null;
 
     const prixDistribEmpPoubelle =
       hygieneDistribTarifsFournisseur.find(
-        (tarif) => tarif.type === "poubelleEmp" && tarif.gamme === gamme
+        (tarif) => tarif.type === "poubelleEmp" && tarif.gamme === gamme,
       )?.[dureeLocation] ?? null;
 
     const prixDistribSavon =
       hygieneDistribTarifsFournisseur.find(
-        (tarif) => tarif.type === "savon" && tarif.gamme === gamme
+        (tarif) => tarif.type === "savon" && tarif.gamme === gamme,
       )?.[dureeLocation] ?? null;
 
     const prixDistribPh =
       hygieneDistribTarifsFournisseur.find(
-        (tarif) => tarif.type === "ph" && tarif.gamme === gamme
+        (tarif) => tarif.type === "ph" && tarif.gamme === gamme,
       )?.[dureeLocation] ?? null;
 
     const imageUrlEmp =
       hygieneDistribTarifsFournisseur.find(
-        (tarif) => tarif.type === "emp" && tarif.gamme === gamme
+        (tarif) => tarif.type === "emp" && tarif.gamme === gamme,
       )?.imageUrl ?? null;
 
     const imageUrlSavon =
       hygieneDistribTarifsFournisseur.find(
-        (tarif) => tarif.type === "savon" && tarif.gamme === gamme
+        (tarif) => tarif.type === "savon" && tarif.gamme === gamme,
       )?.imageUrl ?? null;
 
     const imageUrlPh =
       hygieneDistribTarifsFournisseur.find(
-        (tarif) => tarif.type === "ph" && tarif.gamme === gamme
+        (tarif) => tarif.type === "ph" && tarif.gamme === gamme,
       )?.imageUrl ?? null;
 
     const nomFournisseur = hygieneDistribTarifsFournisseur[0].nomFournisseur;
@@ -120,7 +120,7 @@ export const getFormattedHygienePropositions = (
               (totalPoubelleEmp ?? 0) +
               (totalSavon ?? 0) +
               (totalPh ?? 0),
-            minFacturation ?? 0
+            minFacturation ?? 0,
           );
 
     return {
@@ -158,21 +158,21 @@ export const getHygieneFournisseurTarifs = (
   hygieneDistribTarifs: SelectHygieneDistribTarifsType[],
   hygieneConsosTarifs: SelectHygieneConsoTarifsType[],
   hygieneDistribInstalTarifs?: SelectHygieneInstalDistribTarifsType[],
-  hygieneMinFacturation?: SelectHygieneMinFacturationType[]
+  hygieneMinFacturation?: SelectHygieneMinFacturationType[],
 ) => {
   const hygieneDistribTarifsFournisseur = hygieneDistribTarifs.filter(
-    (item) => item.fournisseurId === hygiene.infos.fournisseurId
+    (item) => item.fournisseurId === hygiene.infos.fournisseurId,
   );
   const ditribInstalTarifFournisseur =
     hygieneDistribInstalTarifs?.find(
-      (item) => item.fournisseurId === hygiene.infos.fournisseurId
+      (item) => item.fournisseurId === hygiene.infos.fournisseurId,
     ) ?? null;
   const consosTarifFournisseur = hygieneConsosTarifs.find(
-    (item) => item.fournisseurId === hygiene.infos.fournisseurId
+    (item) => item.fournisseurId === hygiene.infos.fournisseurId,
   );
   const hygieneMinFacturationFournisseur =
     hygieneMinFacturation?.find(
-      (item) => item.fournisseurId === hygiene.infos.fournisseurId
+      (item) => item.fournisseurId === hygiene.infos.fournisseurId,
     ) ?? null;
   const prixInstalDistrib =
     ditribInstalTarifFournisseur?.prixInstallation ?? null;

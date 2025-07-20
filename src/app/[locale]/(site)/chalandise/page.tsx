@@ -16,7 +16,7 @@ export const generateMetadata = async ({
     locale === "fr" ? "Zone non couverte" : "Area not covered",
     locale === "fr"
       ? "Notre matrice de chiffrage automatique est en cours de développement pour votre région"
-      : "Our automatic pricing matrix is under development for your region"
+      : "Our automatic pricing matrix is under development for your region",
   );
 };
 
@@ -44,7 +44,7 @@ const page = async ({
   } = await searchParams;
 
   return (
-    <main className="max-w-7xl mx-auto pt-4 px-6  pb-10 md:px-20 min-h-[calc(100vh-4rem)] flex flex-col gap-4">
+    <main className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl flex-col gap-4 px-6 pb-10 pt-4 md:px-20">
       <CityOut
         destination={destination}
         codePostal={codePostal}

@@ -11,7 +11,7 @@ const ServicesCards = async () => {
   const t = await getTranslations("Global");
 
   return (
-    <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 items-center mt-6 w-full">
+    <div className="mt-6 grid w-full grid-cols-[repeat(auto-fit,minmax(250px,1fr))] items-center gap-6">
       {services.map((service) => {
         const serviceImageUrl = service.imagePrincipale
           ? urlFor(service.imagePrincipale)
@@ -32,9 +32,9 @@ const ServicesCards = async () => {
             locale={locale as LocaleType}
             linkText={service.linkText ?? serviceUrl}
           >
-            <div className="p-4 flex flex-col gap-4 h-52">
+            <div className="flex h-52 flex-col gap-4 p-4">
               <p className="text-2xl">{service.titreCard}</p>
-              <p className="w-full overflow-hidden line-clamp-5 text-sm">
+              <p className="line-clamp-5 w-full overflow-hidden text-sm">
                 {service.description}
               </p>
             </div>

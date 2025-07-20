@@ -130,11 +130,11 @@ const CafeDesktopEspacePropositions = ({
 }: CafeDesktopEspacePropositionsProps) => {
   const t = useTranslations("DevisPage.foodBeverage.cafe");
   return (
-    <div className="flex-1 flex flex-col gap-4 overflow-auto">
-      <div className="flex-1 flex flex-col border rounded-xl overflow-auto">
+    <div className="flex flex-1 flex-col gap-4 overflow-auto">
+      <div className="flex flex-1 flex-col overflow-auto rounded-xl border">
         {formattedPropositions.map((propositions) => (
           <div
-            className="flex border-b flex-1"
+            className="flex flex-1 border-b"
             key={propositions[0].fournisseurId}
           >
             <CafeEspacePropositionFournisseurLogo {...propositions[0]} />
@@ -154,7 +154,7 @@ const CafeDesktopEspacePropositions = ({
         ))}
       </div>
       {cafeEspacesIds.slice(-1)[0] === espace.infos.espaceId ? (
-        <div className="flex justify-end gap-4 items-center">
+        <div className="flex items-center justify-end gap-4">
           {espace.infos.gammeCafeSelected ? (
             <AddEspaceButton
               handleAddEspace={handleAddEspace}

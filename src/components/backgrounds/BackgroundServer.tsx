@@ -8,7 +8,7 @@ const BackgroundServer = async () => {
       <Image
         src={"/img/hero_wallpaper_compressed.webp"}
         alt={tGlobal(
-          "une-image-de-bureaux-modernes-et-lumineux-avec-des-plantes-vertes"
+          "une-image-de-bureaux-modernes-et-lumineux-avec-des-plantes-vertes",
         )}
         className="object-cover"
         quality={75}

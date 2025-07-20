@@ -44,7 +44,7 @@ const DetailNettoyage = () => {
             <TableCell>N/A</TableCell>
             <TableCell>
               {formatNumber(
-                (nettoyage.quantites.freqAnnuelle ?? 0) / S_OUVREES_PAR_AN
+                (nettoyage.quantites.freqAnnuelle ?? 0) / S_OUVREES_PAR_AN,
               )}{" "}
               passage(s) de {nettoyage.quantites.hParPassage}h / semaine
             </TableCell>
@@ -63,7 +63,7 @@ const DetailNettoyage = () => {
             <TableCell>N/A</TableCell>
             <TableCell>
               {formatNumber(
-                (nettoyage.quantites.freqAnnuelle ?? 0) / S_OUVREES_PAR_AN
+                (nettoyage.quantites.freqAnnuelle ?? 0) / S_OUVREES_PAR_AN,
               )}{" "}
               passage(s) de {nettoyage.quantites.hParPassage} h / semaine
             </TableCell>

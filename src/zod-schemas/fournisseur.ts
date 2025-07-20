@@ -21,7 +21,7 @@ export const selectFournisseurSchema = createSelectSchema(fournisseurs, {
   phoneContact: (schema) =>
     schema.regex(
       /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{2,4}([-.\s]?\d{2,4}){2,3}$/,
-      "Numéro de téléphone invalide"
+      "Numéro de téléphone invalide",
     ),
 });
 
@@ -46,7 +46,7 @@ export const createInsertFournisseurSchema = (messages: {
     phoneContact: (schema) =>
       schema.regex(
         /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{2,4}([-.\s]?\d{2,4}){2,3}$/,
-        messages.phoneContact
+        messages.phoneContact,
       ),
   });
 };
@@ -74,7 +74,7 @@ export const updateFournisseurSchema = createUpdateSchema(fournisseurs, {
   phoneContact: (schema) =>
     schema.regex(
       /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{2,4}([-.\s]?\d{2,4}){2,3}$/,
-      "Numéro de téléphone invalide"
+      "Numéro de téléphone invalide",
     ),
 });
 
@@ -98,7 +98,7 @@ export const createUpdateFournisseurFormSchema = (messages: {
     phoneContact: (schema) =>
       schema.regex(
         /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{2,4}([-.\s]?\d{2,4}){2,3}$/,
-        messages.phoneContact
+        messages.phoneContact,
       ),
     noteGoogle: (schema) =>
       schema

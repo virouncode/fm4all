@@ -15,7 +15,7 @@ export function generateLocalizedRouteParams(paths: PathnamesType[]) {
           ? localizedPath.substring(1)
           : localizedPath,
       };
-    })
+    }),
   );
 }
 
@@ -30,7 +30,7 @@ export function generateLocalizedDynamicRouteParams<T extends string>(
   path: PathnamesType,
   slugsFr: (string | undefined)[],
   slugsEn: (string | undefined)[],
-  paramName: T
+  paramName: T,
 ): Array<{ locale: string } & Record<T, string>> {
   return [
     ...slugsFr.filter(Boolean).map((slug) => {

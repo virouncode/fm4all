@@ -42,11 +42,11 @@ const DetailCafe = () => {
       <TableBody>
         {cafe.espaces.map((espace) => {
           const totalEspace = totalCafe.totalEspaces.find(
-            ({ espaceId }) => espace.infos.espaceId === espaceId
+            ({ espaceId }) => espace.infos.espaceId === espaceId,
           );
           if (!totalEspace) return null;
           const typeBoisson = typesBoissons.find(
-            ({ id }) => id === espace.infos.typeBoissons
+            ({ id }) => id === espace.infos.typeBoissons,
           )?.description;
           return (
             <TableRow key={espace.infos.espaceId}>
@@ -64,7 +64,7 @@ const DetailCafe = () => {
               <TableCell>
                 {
                   locationCafeMachine.find(
-                    ({ id }) => id === cafe.infos.dureeLocation
+                    ({ id }) => id === cafe.infos.dureeLocation,
                   )?.description
                 }
               </TableCell>

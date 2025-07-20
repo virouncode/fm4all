@@ -43,7 +43,7 @@ export default async function AuthRedirect() {
 
   // This is just a fallback and should never be displayed
   return (
-    <div className="flex items-center justify-center h-screen">
+    <div className="flex h-screen items-center justify-center">
       <p>Redirection en cours...</p>
     </div>
   );

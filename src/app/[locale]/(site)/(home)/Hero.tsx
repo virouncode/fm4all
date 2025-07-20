@@ -7,14 +7,14 @@ const Hero = async () => {
   const t = await getTranslations("HomePage.hero");
   return (
     <section
-      className="flex items-center justify-center min-h-[calc(100vh-4rem)] md:min-h-[calc(100vh-4rem)] overflow-hidden relative"
+      className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden md:min-h-[calc(100vh-4rem)]"
       id="hero"
     >
       <BackgroundServer />
-      <div className="relative z-10 w-11/12 max-w-7xl mx-auto flex flex-col items-center gap-8 px-4 py-12">
+      <div className="relative z-10 mx-auto flex w-11/12 max-w-7xl flex-col items-center gap-8 px-4 py-12">
         <div className="w-full max-w-3xl text-white">
           <h1
-            className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-14 text-pretty animate-appear hyphens-auto tracking-tighter`}
+            className={`mb-14 animate-appear hyphens-auto text-pretty text-4xl font-bold tracking-tighter md:text-5xl lg:text-6xl`}
           >
             {t("votre-entreprise-de")}{" "}
             <span className="text-fm4alldestructive">

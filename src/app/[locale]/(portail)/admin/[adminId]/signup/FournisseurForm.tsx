@@ -51,7 +51,7 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
         nomContact: tAdmin("nom-du-contact-obligatoire"),
         emailContact: tAdmin("email-du-contact-invalide"),
         phoneContact: tAdmin("numero-de-telephone-obligatoire"),
-      })
+      }),
     ),
     defaultValues,
   });
@@ -76,7 +76,7 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
         description:
           error?.serverError ||
           tAuth(
-            "une-erreur-est-survenue-lors-de-la-creation-du-compte-utilisateur"
+            "une-erreur-est-survenue-lors-de-la-creation-du-compte-utilisateur",
           ),
       });
     },
@@ -103,7 +103,7 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
         description:
           error?.serverError ||
           tAuth(
-            "une-erreur-est-survenue-lors-de-la-creation-du-compte-utilisateur"
+            "une-erreur-est-survenue-lors-de-la-creation-du-compte-utilisateur",
           ),
       });
     },
@@ -114,7 +114,7 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
     setFournisseurId(selectedFournisseurId);
     if (selectedFournisseurId) {
       const fournisseur = fournisseurs?.find(
-        ({ id }) => id === selectedFournisseurId
+        ({ id }) => id === selectedFournisseurId,
       );
       if (fournisseur) {
         form.reset({
@@ -156,7 +156,7 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
   return (
     <>
       {fournisseurs && fournisseurs.length > 0 && (
-        <div className="flex flex-col md:flex-row md:items-center gap-4">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center">
           <Label className="text-base" htmlFor="fournisseur">
             {tAdmin("fournisseur")}
           </Label>
@@ -184,7 +184,7 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(submitForm)}>
           <div className="grid gap-2">
-            <div className="grid md:grid-cols-2 gap-2 md:gap-6">
+            <div className="grid gap-2 md:grid-cols-2 md:gap-6">
               <InputWithLabel<InsertFournisseurType>
                 fieldTitle={tAdmin("nom-de-lentreprise")}
                 nameInSchema="nomFournisseur"
@@ -196,7 +196,7 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
                 readOnly={!!fournisseurId}
               />
             </div>
-            <div className="grid md:grid-cols-2 gap-2 md:gap-6">
+            <div className="grid gap-2 md:grid-cols-2 md:gap-6">
               <InputWithLabel<InsertFournisseurType>
                 fieldTitle={tAdmin("prenom-du-contact")}
                 nameInSchema="prenomContact"
@@ -208,7 +208,7 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
                 readOnly={!!fournisseurId}
               />
             </div>
-            <div className="grid md:grid-cols-2 gap-2 md:gap-6">
+            <div className="grid gap-2 md:grid-cols-2 md:gap-6">
               <InputWithLabel<InsertFournisseurType>
                 fieldTitle="Email*"
                 nameInSchema="emailContact"
@@ -227,7 +227,7 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
               variant="destructive"
               size="lg"
               title={tAdmin("creer-un-compte")}
-              className="text-base mt-6 w-full"
+              className="mt-6 w-full text-base"
               disabled={isSavingFournisseur || isSavingUser}
             >
               {isSavingFournisseur || isSavingUser ? (

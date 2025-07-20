@@ -24,7 +24,7 @@ export default async function CatchAllLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={`${didact.className} antialiased scroll-smooth`}>
+      <body className={`${didact.className} scroll-smooth antialiased`}>
         <NextIntlClientProvider locale={locale}>
           <ThemeProvider
             attribute="class"

@@ -163,7 +163,7 @@ const OfficeManagerPropositions = ({
 
   const handleChangeDemiJParSemaine = (
     value: number[],
-    demiTauxJournalier: number | null
+    demiTauxJournalier: number | null,
   ) => {
     setOfficeManager((prev) => ({
       ...prev,

@@ -39,12 +39,12 @@ export const getCafeMachinesTarifs = async () => {
       .from(cafeMachinesTarifs)
       .innerJoin(
         fournisseurs,
-        eq(cafeMachinesTarifs.fournisseurId, fournisseurs.id)
+        eq(cafeMachinesTarifs.fournisseurId, fournisseurs.id),
       );
 
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectCafeMachinesTarifsSchema.parse(result)
+      selectCafeMachinesTarifsSchema.parse(result),
     );
     return validatedResults.map((result) => ({
       ...result,
@@ -86,12 +86,12 @@ export const getCafeConsoTarifs = async () => {
       .from(cafeConsoTarifs)
       .innerJoin(
         fournisseurs,
-        eq(fournisseurs.id, cafeConsoTarifs.fournisseurId)
+        eq(fournisseurs.id, cafeConsoTarifs.fournisseurId),
       );
 
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectCafeConsoTarifsSchema.parse(result)
+      selectCafeConsoTarifsSchema.parse(result),
     );
     return validatedResults.map((result) => ({
       ...result,
@@ -114,12 +114,12 @@ export const getLaitConsoTarifs = async () => {
       .from(laitConsoTarifs)
       .innerJoin(
         fournisseurs,
-        eq(fournisseurs.id, laitConsoTarifs.fournisseurId)
+        eq(fournisseurs.id, laitConsoTarifs.fournisseurId),
       );
 
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectLaitConsoTarifsSchema.parse(result)
+      selectLaitConsoTarifsSchema.parse(result),
     );
     return validatedResults.map((result) => ({
       ...result,
@@ -153,12 +153,12 @@ export const getChocolatConsoTarifs = async () => {
       .from(chocolatConsoTarifs)
       .innerJoin(
         fournisseurs,
-        eq(fournisseurs.id, chocolatConsoTarifs.fournisseurId)
+        eq(fournisseurs.id, chocolatConsoTarifs.fournisseurId),
       );
 
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectChocolatConsoTarifsSchema.parse(result)
+      selectChocolatConsoTarifsSchema.parse(result),
     );
     return validatedResults.map((result) => ({
       ...result,
@@ -195,11 +195,11 @@ export const getTheConsoTarifs = async () => {
       .from(theConsoTarifs)
       .innerJoin(
         fournisseurs,
-        eq(fournisseurs.id, theConsoTarifs.fournisseurId)
+        eq(fournisseurs.id, theConsoTarifs.fournisseurId),
       );
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectTheConsoTarifsSchema.parse(result)
+      selectTheConsoTarifsSchema.parse(result),
     );
     return validatedResults.map((result) => ({
       ...result,
@@ -223,11 +223,11 @@ export const getSucreConsoTarifs = async () => {
       .from(sucreConsoTarifs)
       .innerJoin(
         fournisseurs,
-        eq(fournisseurs.id, sucreConsoTarifs.fournisseurId)
+        eq(fournisseurs.id, sucreConsoTarifs.fournisseurId),
       );
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectSucreConsoTarifsSchema.parse(result)
+      selectSucreConsoTarifsSchema.parse(result),
     );
     return validatedResults.map((result) => ({
       ...result,

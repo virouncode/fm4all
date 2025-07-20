@@ -7,14 +7,14 @@ export const selectBoissonsQuantitesSchema = createSelectSchema(
     consosParSemaineParPersonne: (schema) =>
       schema.min(
         1,
-        "Le nombre de consommations par semaine par personne est obligatoire"
+        "Le nombre de consommations par semaine par personne est obligatoire",
       ),
     minConsosParSemaine: (schema) =>
       schema.min(
         1,
-        "Le nombre minimum de consommations par semaine est obligatoire"
+        "Le nombre minimum de consommations par semaine est obligatoire",
       ),
-  }
+  },
 );
 
 export type SelectBoissonsQuantitesType =

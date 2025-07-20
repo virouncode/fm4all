@@ -49,10 +49,10 @@ const TotalServicesFm4All = () => {
   if (total === 0) return null;
 
   return (
-    <div className="flex flex-col gap-4 total-section" id="total-fm4all">
+    <div className="total-section flex flex-col gap-4" id="total-fm4all">
       <div className="flex flex-col gap-4">
         <div>{t("services-fm4all")}</div>
-        <div className={`flex flex-col ml-4 text-xs`}>
+        <div className={`ml-4 flex flex-col text-xs`}>
           {totalAssurance ? (
             <div
               className={`flex items-center justify-between text-${color} font-bold`}
@@ -124,7 +124,7 @@ const TotalServicesFm4All = () => {
               </p>
             </div>
           ) : null}
-          <div className="flex items-center justify-between border-t border-foreground mt-2">
+          <div className="mt-2 flex items-center justify-between border-t border-foreground">
             <p>TOTAL</p>
             <p className="text-end" data-testid="total-services-fm4all">
               {formatNumber(Math.round(total))} {t("eur-ht-an")}

@@ -62,7 +62,7 @@ type HygieneMobileOptionsParfumCarouselProps = {
       imageUrlParfum: string | null;
       imageUrlBalai: string | null;
       imageUrlPoubelle: string | null;
-    }
+    },
   ) => void;
 };
 
@@ -93,7 +93,7 @@ const HygieneMobileOptionsParfumCarousel = ({
           ? 0
           : hygiene.infos.parfumGammeSelected === "confort"
             ? 1
-            : 2
+            : 2,
       );
     }
   }, [api, hygiene.infos.parfumGammeSelected, hygiene.infos.fournisseurId]);
@@ -104,7 +104,7 @@ const HygieneMobileOptionsParfumCarousel = ({
         align: "start",
         loop: true,
       }}
-      className="w-full relative"
+      className="relative w-full"
       setApi={setApi}
     >
       <CarouselContent>

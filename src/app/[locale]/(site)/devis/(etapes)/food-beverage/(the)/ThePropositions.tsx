@@ -35,7 +35,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
     ?.filter(
       (tarif) =>
         tarif.effectif === roundNbPersonnesCafeConso(nbPersonnes / 0.15) &&
-        tarif.fournisseurId === cafe.infos.fournisseurId
+        tarif.fournisseurId === cafe.infos.fournisseurId,
     )
     .map((tarif) => ({
       ...tarif,
@@ -54,7 +54,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
         (tarif) =>
           tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnes / 0.15) &&
           tarif.fournisseurId === cafe.infos.fournisseurId &&
-          tarif.gamme === the.infos.gammeSelected
+          tarif.gamme === the.infos.gammeSelected,
       )?.prixUnitaire ?? null;
     const totalAnnuel =
       newNbPersonnes && prixUnitaire !== null
@@ -87,7 +87,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
         (tarif) =>
           tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnes / 0.15) &&
           tarif.fournisseurId === cafe.infos.fournisseurId &&
-          tarif.gamme === the.infos.gammeSelected
+          tarif.gamme === the.infos.gammeSelected,
       )?.prixUnitaire ?? null;
     const totalAnnuel =
       newNbPersonnes && prixUnitaire !== null
@@ -120,7 +120,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
       toast({
         title: t("limite-atteinte"),
         description: tThe(
-          "nous-ne-proposons-pas-de-livraisons-de-the-pour-plus-de-300-personnes"
+          "nous-ne-proposons-pas-de-livraisons-de-the-pour-plus-de-300-personnes",
         ),
         duration: 7000,
       });

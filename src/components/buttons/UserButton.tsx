@@ -55,7 +55,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger className={`cursor-pointer`} asChild>
         <Button
-          className={`flex justify-center items-center rounded-full ${!user?.image ? "p-2" : ""} ${className}`}
+          className={`flex items-center justify-center rounded-full ${!user?.image ? "p-2" : ""} ${className}`}
           aria-label="user menu"
           variant="outline"
           title={t("connexion")}

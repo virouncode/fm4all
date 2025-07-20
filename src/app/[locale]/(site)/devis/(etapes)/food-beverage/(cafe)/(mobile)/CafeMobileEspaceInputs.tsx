@@ -55,8 +55,8 @@ const CafeMobileEspaceInputs = ({
             {t("indiquez-la")} <strong>{t("duree-d-engagement")}</strong>{" "}
             {t("souhaitee")}:{" "}
           </p>
-          <div className="flex flex-col w-full p-1 gap-2">
-            <Label htmlFor="nbDistribPh" className="text-sm flex-1">
+          <div className="flex w-full flex-col gap-2 p-1">
+            <Label htmlFor="nbDistribPh" className="flex-1 text-sm">
               {t("duree-de-location")}
             </Label>
             <Select
@@ -90,7 +90,7 @@ const CafeMobileEspaceInputs = ({
           name="typeBoissons"
         >
           {typesBoissons.map(({ id }) => (
-            <div key={id} className="flex gap-2 items-center">
+            <div key={id} className="flex items-center gap-2">
               <RadioGroupItem
                 value={id}
                 title={tTypeBoisson(id)}
@@ -112,16 +112,16 @@ const CafeMobileEspaceInputs = ({
           <strong>{t("nombre-de-personnes").toLowerCase()}</strong>{" "}
           {tCafe("pour-lespace-cafe")}
         </p>
-        <div className="flex flex-col w-full p-1 gap-2">
+        <div className="flex w-full flex-col gap-2 p-1">
           <Label
             htmlFor={`nbPersonnes_${espace.infos.espaceId}`}
-            className="text-sm flex-1"
+            className="flex-1 text-sm"
           >
             {t("nombre-de-personnes")}
           </Label>
           <div className="flex items-center gap-2">
             <Input
-              className={`w-16 max-w-xs min-w-20 ${
+              className={`w-16 min-w-20 max-w-xs ${
                 nbPersonnes === client.effectif ? "text-fm4alldestructive" : ""
               }`}
               type="number"

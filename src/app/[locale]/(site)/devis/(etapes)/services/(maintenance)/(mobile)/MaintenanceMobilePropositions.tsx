@@ -56,8 +56,8 @@ const MaintenanceMobilePropositions = ({
 }: MaintenanceMobilePropositionsProps) => {
   const t = useTranslations("DevisPage.services.maintenance");
   return (
-    <div className="flex flex-col gap-6 w-full">
-      <p className="font-bold text-xl lg:hidden">
+    <div className="flex w-full flex-col gap-6">
+      <p className="text-xl font-bold lg:hidden">
         {t("maintenance-multi-technique")}
       </p>
       {formattedPropositions.map((propositions) => (
@@ -67,9 +67,9 @@ const MaintenanceMobilePropositions = ({
           handleClickProposition={handleClickProposition}
         />
       ))}
-      <p className="text-xs text-end italic px-1">
+      <p className="px-1 text-end text-xs italic">
         {t(
-          "batiment-entier-budget-a-confirmer-apres-visite-technique-des-installations-chaud-froid-clos-et-couverts"
+          "batiment-entier-budget-a-confirmer-apres-visite-technique-des-installations-chaud-froid-clos-et-couverts",
         )}
       </p>
     </div>

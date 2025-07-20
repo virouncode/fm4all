@@ -3,7 +3,7 @@ type PropositionsCommentProps = {
 };
 
 const PropositionsComment = ({ text }: PropositionsCommentProps) => {
-  return <p className="text-sm italic text-end px-1">{text}</p>;
+  return <p className="px-1 text-end text-sm italic">{text}</p>;
 };
 
 export default PropositionsComment;

@@ -71,7 +71,7 @@ type HygieneMobileOptionsParfumCardProps = {
       imageUrlParfum: string | null;
       imageUrlBalai: string | null;
       imageUrlPoubelle: string | null;
-    }
+    },
   ) => void;
 };
 
@@ -120,31 +120,31 @@ const HygieneMobileOptionsParfumCard = ({
   );
 
   const imgProduit = (
-    <div className="w-1/3 h-full relative rounded-xl overflow-hidden bg-slate-100">
+    <div className="relative h-full w-1/3 overflow-hidden rounded-xl bg-slate-100">
       <Image
         src={`${imageUrlParfum || "/img/services/hygiene.webp"}`}
         alt={`illustration de distributeur de parfum`}
         fill={true}
-        className="object-contain cursor-pointer"
+        className="cursor-pointer object-contain"
         quality={100}
       />
     </div>
   );
 
   const imgProduitDialog = (
-    <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+    <div className="relative h-60 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-200">
       <Image
         src={`${imageUrlParfum || "/img/services/hygiene.webp"}`}
         alt={`illustration de distributeur de parfum`}
         fill={true}
-        className="object-contain cursor-pointer"
+        className="cursor-pointer object-contain"
         quality={100}
       />
     </div>
   );
 
   const infosProduit = (
-    <ul className="flex flex-col text-xs px-4">
+    <ul className="flex flex-col px-4 text-xs">
       {locale === "fr" ? (
         <li className="list-check">
           {tHygiene("diffuseurs")}{" "}
@@ -180,7 +180,7 @@ const HygieneMobileOptionsParfumCard = ({
     </ul>
   );
   const infosProduitDialog = (
-    <ul className="flex flex-col text-sm px-4 mx-auto">
+    <ul className="mx-auto flex flex-col px-4 text-sm">
       {locale === "fr" ? (
         <li className="list-check">
           {tHygiene("diffuseurs")}{" "}
@@ -219,45 +219,45 @@ const HygieneMobileOptionsParfumCard = ({
   return (
     <CarouselItem>
       <div
-        className={`bg-${color} flex flex-col h-56 border border-slate-200 rounded-xl p-4 text-white  ${
+        className={`bg-${color} flex h-56 flex-col rounded-xl border border-slate-200 p-4 text-white ${
           hygiene.infos.parfumGammeSelected === gamme
             ? "ring-4 ring-inset ring-fm4alldestructive"
             : ""
         }`}
       >
-        <div className="flex items-center h-1/2 gap-2 border-b pb-2 border-slate-200">
+        <div className="flex h-1/2 items-center gap-2 border-b border-slate-200 pb-2">
           <Dialog>
             <DialogTrigger asChild>{imgProduit}</DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
+            <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
               <DialogHeader>
                 <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
               <div className="flex flex-col gap-4">
                 {imgProduitDialog}
-                <p className="text-xs italic text-end">
+                <p className="text-end text-xs italic">
                   {t("photo-non-contractuelle")}
                 </p>
                 {infosProduitDialog}
               </div>
             </DialogContent>
           </Dialog>
-          <div className="w-2/3 flex flex-col gap-1 h-full">
-            <p className="font-bold text-sm">{nomFournisseur}</p>
+          <div className="flex h-full w-2/3 flex-col gap-1">
+            <p className="text-sm font-bold">{nomFournisseur}</p>
             <Dialog>
               <DialogTrigger asChild>
                 {logoUrl ? (
-                  <div className="h-10 relative">
+                  <div className="relative h-10">
                     <Image
                       src={logoUrl}
                       alt={`logo-de-${nomFournisseur}`}
                       fill={true}
-                      className="object-contain object-left cursor-pointer"
+                      className="cursor-pointer object-contain object-left"
                       quality={100}
                     />
                   </div>
                 ) : null}
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
+              <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
                 <DialogHeader>
                   <DialogTitle>{nomFournisseur}</DialogTitle>
                 </DialogHeader>
@@ -285,7 +285,7 @@ const HygieneMobileOptionsParfumCard = ({
           </div>
         </div>
         <div
-          className="flex h-1/2 pt-2 justify-between"
+          className="flex h-1/2 justify-between pt-2"
           onClick={
             totalParfum
               ? () => handleClickProposition("parfum", proposition)
@@ -293,7 +293,7 @@ const HygieneMobileOptionsParfumCard = ({
           }
         >
           {infosProduit}
-          <div className="flex flex-col gap-2 items-end">
+          <div className="flex flex-col items-end gap-2">
             {prixMensuelParfumText}
             {totalParfum ? (
               <Switch

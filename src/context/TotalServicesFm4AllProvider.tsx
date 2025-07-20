@@ -56,7 +56,7 @@ const TotalServicesFm4AllProvider = ({ children }: PropsWithChildren) => {
     if (isMounted) {
       localStorage.setItem(
         "totalServicesFm4All",
-        JSON.stringify(totalServicesFm4All)
+        JSON.stringify(totalServicesFm4All),
       );
     }
   }, [totalServicesFm4All, isMounted]);

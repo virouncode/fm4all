@@ -8,7 +8,7 @@ import Link from "next/link";
 const CTAContactButtons = () => {
   const locale = useLocale();
   return (
-    <div className="w-full flex flex-col items-center justify-center gap-4">
+    <div className="flex w-full flex-col items-center justify-center gap-4">
       <Link
         href="https://calendly.com/romuald-fm4all/rdv-fm4all"
         target="_blank"
@@ -17,7 +17,7 @@ const CTAContactButtons = () => {
         <Button
           variant="destructive"
           size="lg"
-          className="w-full text-base flex items-center justify-center ring-offset-2 ring-2 ring-destructive hover:scale-[101%] transition-all"
+          className="flex w-full items-center justify-center text-base ring-2 ring-destructive ring-offset-2 transition-all hover:scale-[101%]"
         >
           <Video />
           {locale === "fr"
@@ -29,7 +29,7 @@ const CTAContactButtons = () => {
         <Button
           variant="destructive"
           size="lg"
-          className="w-full text-base flex items-center justify-center ring-offset-2 ring-2 ring-destructive hover:scale-[101%] transition-all"
+          className="flex w-full items-center justify-center text-base ring-2 ring-destructive ring-offset-2 transition-all hover:scale-[101%]"
         >
           <Phone />
           +33 6 69 31 10 46
@@ -42,7 +42,7 @@ const CTAContactButtons = () => {
         <Button
           variant="destructive"
           size="lg"
-          className="w-full text-base flex items-center justify-center ring-offset-2 ring-2 ring-destructive hover:scale-[101%] transition-all"
+          className="flex w-full items-center justify-center text-base ring-2 ring-destructive ring-offset-2 transition-all hover:scale-[101%]"
         >
           <Mail />
           {locale === "fr" ? "Je contacte par email" : "Contact by e-mail"}

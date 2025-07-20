@@ -12,9 +12,9 @@ const SecteursCards = async () => {
 
   return (
     <div
-      className={`grid gap-6 items-center mt-6 w-full ${
+      className={`mt-6 grid w-full items-center gap-6 ${
         secteurs.length === 1
-          ? "grid-cols-1 max-w-[250px]"
+          ? "max-w-[250px] grid-cols-1"
           : "grid-cols-[repeat(auto-fit,minmax(250px,1fr))]"
       }`}
     >
@@ -38,9 +38,9 @@ const SecteursCards = async () => {
             locale={locale as LocaleType}
             linkText={secteur.linkText ?? secteurUrl}
           >
-            <div className="p-4 flex flex-col gap-4 h-52">
+            <div className="flex h-52 flex-col gap-4 p-4">
               <p className="text-2xl">{secteur.titre}</p>
-              <p className="w-full overflow-hidden line-clamp-5 text-sm">
+              <p className="line-clamp-5 w-full overflow-hidden text-sm">
                 {secteur.description}
               </p>
             </div>

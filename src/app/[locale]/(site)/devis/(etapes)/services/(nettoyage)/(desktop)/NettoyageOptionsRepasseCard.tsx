@@ -59,14 +59,14 @@ const NettoyageOptionsRepasseCard = ({
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
   const { nettoyage } = useContext(NettoyageContext);
   const totalMensuelText = repasseProposition?.prixAnnuel ? (
-    <p className="font-bold text-xl ml-4" data-testid="total-mensuel-repasse">
+    <p className="ml-4 text-xl font-bold" data-testid="total-mensuel-repasse">
       {formatNumber((repasseProposition.prixAnnuel * MARGE) / 12)}{" "}
       {t("euros-mois")}
     </p>
   ) : (
-    <p className="font-bold text-base">
+    <p className="text-base font-bold">
       {tNettoyage(
-        "non-propose-pour-une-frequence-inferieure-a-5-passages-semaine"
+        "non-propose-pour-une-frequence-inferieure-a-5-passages-semaine",
       )}
     </p>
   );
@@ -76,7 +76,7 @@ const NettoyageOptionsRepasseCard = ({
       <li className="list-check">
         {formatNumber(
           (repasseProposition.hParPassage * nettoyage.quantites.freqAnnuelle) /
-            S_OUVREES_PAR_AN
+            S_OUVREES_PAR_AN,
         )}{" "}
         {tNettoyage("h-semaine-en-plus")}
       </li>
@@ -91,7 +91,7 @@ const NettoyageOptionsRepasseCard = ({
   const infosProduit = (
     <li className="list-check">
       {tNettoyage(
-        "second-passage-dans-la-meme-journee-pour-entretenir-sanitaires-et-zones-sensibles"
+        "second-passage-dans-la-meme-journee-pour-entretenir-sanitaires-et-zones-sensibles",
       )}
     </li>
   );
@@ -102,20 +102,20 @@ const NettoyageOptionsRepasseCard = ({
   );
 
   const imgProduit = (
-    <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+    <div className="relative h-60 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-200">
       <Image
         src={"/img/services/nettoyage.webp"}
         alt={`illustration de nettoyage`}
         fill={true}
-        className="object-contain object-center cursor-pointer"
+        className="cursor-pointer object-contain object-center"
         quality={100}
       />
     </div>
   );
 
   return (
-    <div className="flex border-b flex-1">
-      <div className="flex w-1/4 items-center justify-center text-base p-4">
+    <div className="flex flex-1 border-b">
+      <div className="flex w-1/4 items-center justify-center p-4 text-base">
         {tNettoyage("repasse-sanitaire")}
       </div>
       <div
@@ -123,7 +123,7 @@ const NettoyageOptionsRepasseCard = ({
           nettoyage.infos.repasseSelected && repasseProposition
             ? "ring-4 ring-inset ring-fm4alldestructive"
             : ""
-        } bg-${color} text-slate-200 items-center justify-center  text-2xl gap-4 cursor-pointer`}
+        } bg-${color} cursor-pointer items-center justify-center gap-4 text-2xl text-slate-200`}
         onClick={
           repasseProposition
             ? () => handleClickRepasseProposition(repasseProposition)
@@ -142,7 +142,7 @@ const NettoyageOptionsRepasseCard = ({
           />
         ) : null}
         <div>
-          <div className="flex gap-2 items-center">
+          <div className="flex items-center gap-2">
             {totalMensuelText}
             <Dialog>
               <DialogTrigger asChild>
@@ -158,10 +158,10 @@ const NettoyageOptionsRepasseCard = ({
                 </DialogHeader>
                 <div className="flex flex-col gap-4">
                   {imgProduit}
-                  <p className="text-xs italic text-end">
+                  <p className="text-end text-xs italic">
                     {t("photo-non-contractuelle")}
                   </p>
-                  <ul className="flex flex-col text-sm px-4 mx-auto">
+                  <ul className="mx-auto flex flex-col px-4 text-sm">
                     {infosProduit}
                     {repasseHParSemaineText}
                     {repasseNbPassagesParSemaineText}
@@ -170,7 +170,7 @@ const NettoyageOptionsRepasseCard = ({
               </DialogContent>
             </Dialog>
           </div>
-          <ul className="flex flex-col text-xs ml-4 max-w-72">
+          <ul className="ml-4 flex max-w-72 flex-col text-xs">
             {infosProduit}
             {repasseHParSemaineText}
             {repasseNbPassagesParSemaineText}

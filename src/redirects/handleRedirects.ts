@@ -30,7 +30,7 @@ import {
 export const handleArticleRedirects = (
   req: NextRequest,
   pathSegments: string[],
-  locale: string
+  locale: string,
 ): NextResponse | null => {
   if (
     (pathSegments[0] !== "articles" && pathSegments[0] !== "posts") ||
@@ -77,7 +77,7 @@ export const handleArticleRedirects = (
 
       return NextResponse.redirect(
         new URL(`${newPath}/${correctSubSlug}`, req.url),
-        301
+        301,
       );
     }
     return NextResponse.redirect(new URL(newPath, req.url), 301);
@@ -98,7 +98,7 @@ export const handleArticleRedirects = (
 
       return NextResponse.redirect(
         new URL(`/${locale}${basePath}${slug}/${correctSubSlug}`, req.url),
-        301
+        301,
       );
     }
   }
@@ -109,7 +109,7 @@ export const handleArticleRedirects = (
 export const handleServiceRedirects = (
   req: NextRequest,
   pathSegments: string[],
-  locale: string
+  locale: string,
 ): NextResponse | null => {
   if (pathSegments[0] !== "services" || pathSegments.length < 2) {
     return null; // Pas un service, on ne fait rien
@@ -152,7 +152,7 @@ export const handleServiceRedirects = (
 
       return NextResponse.redirect(
         new URL(`${newPath}/${correctSubSlug}`, req.url),
-        301
+        301,
       );
     }
 
@@ -171,7 +171,7 @@ export const handleServiceRedirects = (
           : getServicesSubSlugEn(subSlug);
       return NextResponse.redirect(
         new URL(`/${locale}${basePath}${slug}/${correctSubSlug}`, req.url),
-        301
+        301,
       );
     }
   }
@@ -182,7 +182,7 @@ export const handleServiceRedirects = (
 export const handleSecteurRedirects = (
   req: NextRequest,
   pathSegments: string[],
-  locale: string
+  locale: string,
 ): NextResponse | null => {
   if (
     (pathSegments[0] !== "secteurs" && pathSegments[0] !== "sectors") ||

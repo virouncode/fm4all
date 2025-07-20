@@ -15,7 +15,7 @@ export const postVercelBlob = async ({
         "Content-Type": "application/json",
       },
       body: file,
-    }
+    },
   );
   return (await response.json()).url as string;
 };

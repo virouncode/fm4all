@@ -66,7 +66,7 @@ export const updateVitrerieTarifAction = actionClient
         .from(nettoyageVitrerieTarifs)
         .where(
           eq(nettoyageVitrerieTarifs.id, vitrerieTarifInput.id) &&
-            eq(nettoyageVitrerieTarifs.fournisseurId, fournisseurId)
+            eq(nettoyageVitrerieTarifs.fournisseurId, fournisseurId),
         )
         .limit(1);
 
@@ -107,7 +107,7 @@ export const updateVitrerieTarifAction = actionClient
           fraisDeplacementVitrerie: vitrerieTarifInput.fraisDeplacement
             ? vitrerieTarifInput.fraisDeplacement / RATIO
             : null,
-        }
+        },
       );
 
       return {
@@ -117,5 +117,5 @@ export const updateVitrerieTarifAction = actionClient
             ? "Tarif de vitrerie mis à jour avec succès"
             : "Window rate updated successfully",
       };
-    }
+    },
   );

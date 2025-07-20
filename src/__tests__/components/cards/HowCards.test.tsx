@@ -45,19 +45,19 @@ describe("HowCards", () => {
     expect(screen.getByText("Mon contrat")).toBeInTheDocument();
 
     expect(
-      screen.getByText("Je précise mètres carrés, type et effectif")
+      screen.getByText("Je précise mètres carrés, type et effectif"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Je sélectionne ce qui m'intéresse à la carte")
+      screen.getByText("Je sélectionne ce qui m'intéresse à la carte"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Je choisis le niveau de chaque service")
+      screen.getByText("Je choisis le niveau de chaque service"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Je compare en ligne mes prestataires")
+      screen.getByText("Je compare en ligne mes prestataires"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Je valide la date de démarrage et go")
+      screen.getByText("Je valide la date de démarrage et go"),
     ).toBeInTheDocument();
 
     expect(screen.getByTestId("icon-house")).toBeInTheDocument();

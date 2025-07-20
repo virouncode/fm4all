@@ -15,7 +15,7 @@ export const errorHandler = (err: unknown) => {
           message: `Erreurs de validation : ${messages}`,
         },
       },
-      { status: 422 }
+      { status: 422 },
     );
   }
   if (err instanceof Error)
@@ -29,6 +29,6 @@ export const errorHandler = (err: unknown) => {
         message: "Une erreur interne est survenue",
       },
     },
-    { status: 500 }
+    { status: 500 },
   );
 };

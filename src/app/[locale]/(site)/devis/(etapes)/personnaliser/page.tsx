@@ -21,7 +21,7 @@ export const generateMetadata = async (): Promise<Metadata> => {
     locale === "fr" ? "Personnaliser mon devis" : "Customize my quote",
     locale === "fr"
       ? "Etape 6 du devis: personnaliser votre devis"
-      : "Quote Step 6: customize your quote"
+      : "Quote Step 6: customize your quote",
   );
 };
 
@@ -44,7 +44,7 @@ const page = async () => {
   ]);
   return (
     <>
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <h1 className="text-3xl md:text-4xl">
           {tPersonnaliser("6-personnaliser-mon-devis")}
         </h1>

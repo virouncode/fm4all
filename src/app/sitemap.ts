@@ -116,7 +116,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           priority: 0.7,
         },
       ];
-    }
+    },
   );
 
   const articlesCategoriesUrls: MetadataRoute.Sitemap =
@@ -153,7 +153,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           priority: 0.7,
         },
       ];
-    }
+    },
   );
 
   const secteursUrls: MetadataRoute.Sitemap = secteursSlugs.flatMap((slug) => {

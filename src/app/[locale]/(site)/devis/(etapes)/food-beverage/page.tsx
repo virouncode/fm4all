@@ -13,14 +13,14 @@ export const generateMetadata = async (): Promise<Metadata> => {
     "Food & Beverage",
     locale === "fr"
       ? "Etape 3 du devis: optez pour des boissons chaudes, des fruits et des snacks sains et gourmands"
-      : "Quote Step 3: choose from hot drinks, fruits, and healthy, delicious snacks."
+      : "Quote Step 3: choose from hot drinks, fruits, and healthy, delicious snacks.",
   );
 };
 
 const page = () => {
   return (
     <>
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <h1 className="text-3xl md:text-4xl">3. Food & Beverage</h1>
       </div>
       <Suspense fallback={<ServicesLoader />}>

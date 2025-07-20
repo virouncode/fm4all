@@ -31,19 +31,19 @@ const TotalHygiene = () => {
 
   const colorTrilogie = getFm4AllColor(hygiene.infos.trilogieGammeSelected);
   const colorDesinfectant = getFm4AllColor(
-    hygiene.infos.desinfectantGammeSelected
+    hygiene.infos.desinfectantGammeSelected,
   );
   const colorParfum = getFm4AllColor(hygiene.infos.parfumGammeSelected);
   const colorBalai = getFm4AllColor(hygiene.infos.balaiGammeSelected);
   const colorPoubelle = getFm4AllColor(hygiene.infos.poubelleGammeSelected);
 
   return (
-    <div className="flex flex-col gap-4 total-section" id="total-hygiene">
+    <div className="total-section flex flex-col gap-4" id="total-hygiene">
       <div className="flex flex-col gap-4">
         <div>
           {t("hygiene")} ({hygiene.infos.nomFournisseur})
         </div>
-        <div className="flex flex-col ml-4 text-xs ">
+        <div className="ml-4 flex flex-col text-xs">
           {totalTrilogie ? (
             <div
               className={`flex items-center justify-between text-${colorTrilogie} font-bold`}
@@ -106,14 +106,14 @@ const TotalHygiene = () => {
               </p>
             </div>
           ) : null}
-          <div className="flex items-center justify-between border-t border-foreground mt-2">
+          <div className="mt-2 flex items-center justify-between border-t border-foreground">
             <p>TOTAL</p>
             <p className="text-end">
               {formatNumber(Math.round(total * MARGE))} {t("eur-ht-an")}
             </p>
           </div>
           {totalInstallation ? (
-            <div className="flex justify-between w-full">
+            <div className="flex w-full justify-between">
               <p>{t("total-installation")}</p>
               <p className="text-end">
                 {formatNumber(Math.round(totalInstallation * MARGE))}{" "}

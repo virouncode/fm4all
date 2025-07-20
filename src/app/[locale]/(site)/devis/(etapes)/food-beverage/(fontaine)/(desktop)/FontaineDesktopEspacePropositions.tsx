@@ -105,11 +105,11 @@ const FontaineDesktopEspacePropositions = ({
 }: FontaineDesktopEspacePropositionsProps) => {
   const t = useTranslations("DevisPage.foodBeverage.fontaines");
   return (
-    <div className="flex-1 flex flex-col gap-4 overflow-auto">
-      <div className="flex-1 flex flex-col border rounded-xl overflow-auto">
+    <div className="flex flex-1 flex-col gap-4 overflow-auto">
+      <div className="flex flex-1 flex-col overflow-auto rounded-xl border">
         {formattedPropositions.map((propositions) => (
           <div
-            className="flex border-b flex-1"
+            className="flex flex-1 border-b"
             key={propositions[0].fournisseurId}
           >
             <FontaineEspacePropositionFournisseurLogo {...propositions[0]} />
@@ -130,7 +130,7 @@ const FontaineDesktopEspacePropositions = ({
       </div>
       <div className="flex flex-col gap-1">
         {fontainesEspacesIds.slice(-1)[0] === espace.infos.espaceId ? (
-          <div className="flex justify-end gap-4 items-center">
+          <div className="flex items-center justify-end gap-4">
             {espace.infos.poseSelected ? (
               <AddEspaceButton
                 handleAddEspace={handleAddEspace}

@@ -40,7 +40,7 @@ describe("ImgCardVertical", () => {
     render(
       <ImgCardVertical {...baseProps}>
         <div data-testid="child-content">Child</div>
-      </ImgCardVertical>
+      </ImgCardVertical>,
     );
     expect(screen.getByTestId("child-content")).toBeInTheDocument();
     expect(screen.getByTestId("child-content")).toHaveTextContent("Child");

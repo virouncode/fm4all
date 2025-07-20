@@ -54,7 +54,7 @@ const TotalSnacksFruitsProvider = ({ children }: PropsWithChildren) => {
     if (isMounted) {
       localStorage.setItem(
         "totalSnacksFruits",
-        JSON.stringify(totalSnacksFruits)
+        JSON.stringify(totalSnacksFruits),
       );
     }
   }, [totalSnacksFruits, isMounted]);

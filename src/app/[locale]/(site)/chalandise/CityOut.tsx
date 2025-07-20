@@ -59,7 +59,7 @@ const CityOut = ({
         emailContact: tSauverErreurs("adresse-email-obligatoire"),
         emailContactInvalide: tSauverErreurs("adresse-email-invalide"),
         phoneContact: tSauverErreurs("numero-de-telephone-invalide"),
-      })
+      }),
     ),
     defaultValues,
   });
@@ -91,7 +91,7 @@ const CityOut = ({
         variant: "default",
         title: t("succes"),
         description: t(
-          "vos-coordonnees-ont-bien-ete-envoyees-a-notre-equipe-nous-vous-contacterons-dans-les-plus-brefs-delais"
+          "vos-coordonnees-ont-bien-ete-envoyees-a-notre-equipe-nous-vous-contacterons-dans-les-plus-brefs-delais",
         ),
       });
       setTimeout(() => {
@@ -106,7 +106,7 @@ const CityOut = ({
           title: t("erreur"),
           variant: "destructive",
           description: t(
-            "impossible-denvoyer-vos-coordonnees-a-notre-equipe-veuillez-reessayer"
+            "impossible-denvoyer-vos-coordonnees-a-notre-equipe-veuillez-reessayer",
           ),
         });
       }
@@ -116,11 +116,11 @@ const CityOut = ({
   };
 
   return (
-    <div className="flex flex-col gap-10 mt-6">
-      <div className="w-full max-w-prose mx-auto text-base md:text-lg hyphens-auto text-wrap flex flex-col gap-4">
+    <div className="mt-6 flex flex-col gap-10">
+      <div className="mx-auto flex w-full max-w-prose flex-col gap-4 hyphens-auto text-wrap text-base md:text-lg">
         <p>
           {t(
-            "notre-matrice-de-chiffrage-automatique-est-en-cours-de-developpement-pour-votre-region-cependant-vous-pouvez-etre-contacte-pour-un-devis-sur-mesure-ou-etre-averti-des-que-lautomatisation-sera-disponible-dans-votre-region"
+            "notre-matrice-de-chiffrage-automatique-est-en-cours-de-developpement-pour-votre-region-cependant-vous-pouvez-etre-contacte-pour-un-devis-sur-mesure-ou-etre-averti-des-que-lautomatisation-sera-disponible-dans-votre-region",
           )}
         </p>
         <p className="text-center">{t("laissez-nous-vos-coordonnees-ici")}</p>
@@ -128,10 +128,10 @@ const CityOut = ({
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(submitForm)}
-          className="flex flex-col gap-10 mx-auto w-full md:w-2/3"
+          className="mx-auto flex w-full flex-col gap-10 md:w-2/3"
         >
-          <div className="flex flex-col md:flex-row gap-4 md:gap-8">
-            <div className="flex-1 flex flex-col gap-4">
+          <div className="flex flex-col gap-4 md:flex-row md:gap-8">
+            <div className="flex flex-1 flex-col gap-4">
               <InputWithLabel<CityOutType>
                 fieldTitle={t("nom-de-lentreprise")}
                 nameInSchema="nomEntreprise"
@@ -145,7 +145,7 @@ const CityOut = ({
                 nameInSchema="phoneContact"
               />
             </div>
-            <div className="flex-1 flex flex-col gap-4 ">
+            <div className="flex flex-1 flex-col gap-4">
               <InputWithLabel<CityOutType>
                 fieldTitle={t("prenom-du-contact")}
                 nameInSchema="prenomContact"
@@ -165,7 +165,7 @@ const CityOut = ({
               variant="destructive"
               size="lg"
               title={t("envoyer-mes-coordonnees")}
-              className="text-base min-w-28"
+              className="min-w-28 text-base"
               disabled={loading}
             >
               {loading ? (

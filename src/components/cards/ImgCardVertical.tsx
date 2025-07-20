@@ -38,9 +38,9 @@ const ImgCardVertical = ({
 }: PropsWithChildren<ImgCardVerticalProps>) => {
   return (
     <div
-      className={`relative group flex flex-col gap-4 rounded-xl border bg-card text-card-foreground shadow overflow-hidden transition-all hover:shadow-lg hover:scale-[99%] ${className}`}
+      className={`group relative flex flex-col gap-4 overflow-hidden rounded-xl border bg-card text-card-foreground shadow transition-all hover:scale-[99%] hover:shadow-lg ${className}`}
     >
-      <div className="w-full h-64 relative">
+      <div className="relative h-64 w-full">
         <Image
           src={src}
           alt={alt}
@@ -56,7 +56,7 @@ const ImgCardVertical = ({
       {/* Lien invisible en overlay */}
       {obfuscated ? (
         <ObfuscatedLink
-          className="absolute inset-0 z-10 px-4 text-xs opacity-0 group-hover:opacity-100 transition italic"
+          className="absolute inset-0 z-10 px-4 text-xs italic opacity-0 transition group-hover:opacity-100"
           href={href}
         >
           {linkText}
@@ -69,7 +69,7 @@ const ImgCardVertical = ({
           aria-label={linkText}
           className="absolute inset-0 z-10"
         >
-          <span className="absolute px-4 text-xs opacity-0 group-hover:opacity-100 transition italic">
+          <span className="absolute px-4 text-xs italic opacity-0 transition group-hover:opacity-100">
             {linkText}
           </span>
         </Link>
@@ -80,7 +80,7 @@ const ImgCardVertical = ({
           aria-label={linkText}
           className="absolute inset-0 z-10"
         >
-          <span className="absolute px-4 text-xs opacity-0 group-hover:opacity-100 transition italic">
+          <span className="absolute px-4 text-xs italic opacity-0 transition group-hover:opacity-100">
             {linkText}
           </span>
         </Link>

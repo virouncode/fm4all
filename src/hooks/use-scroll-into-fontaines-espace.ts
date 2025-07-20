@@ -21,7 +21,7 @@ export default function useScrollIntoFontainesEspace() {
     }
 
     const currentEspace = document.getElementById(
-      `espace_fontaine_${fontaines.infos.currentEspaceId.toString()}`
+      `espace_fontaine_${fontaines.infos.currentEspaceId.toString()}`,
     );
 
     if (currentEspace) {

@@ -19,7 +19,7 @@ type OfficeManagerMobilePropositionsProps = {
   demiJParSemaineExcellence: number | null;
   handleChangeDemiJParSemaine: (
     value: number[],
-    demiTauxJournalier: number | null
+    demiTauxJournalier: number | null,
   ) => void;
   handleChangeRemplace: (value: string) => void;
   handleCheckPremium: (checked: boolean) => void;
@@ -48,8 +48,8 @@ const OfficeManagerMobilePropositions = ({
 }: OfficeManagerMobilePropositionsProps) => {
   const tPilotage = useTranslations("DevisPage.pilotage");
   return (
-    <div className="flex flex-col gap-6 w-full">
-      <p className="font-bold text-xl lg:hidden">
+    <div className="flex w-full flex-col gap-6">
+      <p className="text-xl font-bold lg:hidden">
         Office & Hospitality Manager
       </p>
       <OfficeManagerMobileInputs
@@ -69,7 +69,7 @@ const OfficeManagerMobilePropositions = ({
       ))}
       <p className="text-xs">
         {tPilotage(
-          "selon-lieu-dexecution-les-demi-journees-pourront-etre-proposees-en-teletravail"
+          "selon-lieu-dexecution-les-demi-journees-pourront-etre-proposees-en-teletravail",
         )}
       </p>
     </div>

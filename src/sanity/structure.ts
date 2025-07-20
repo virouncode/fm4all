@@ -24,6 +24,6 @@ export const structure: StructureResolver = (S) =>
             "service",
             "serviceVille",
             "secteur",
-          ].includes(item.getId()!)
+          ].includes(item.getId()!),
       ),
     ]);

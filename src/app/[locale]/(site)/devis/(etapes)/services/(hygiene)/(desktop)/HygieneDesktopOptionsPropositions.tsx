@@ -13,7 +13,7 @@ type HygieneDesktopOptionsPropositionsProps = {
   nbDistribPoubelle: number;
   handleChangeDistribNbr: (
     e: ChangeEvent<HTMLInputElement>,
-    type: string
+    type: string,
   ) => void;
   propositions: {
     nomFournisseur: string;
@@ -68,7 +68,7 @@ type HygieneDesktopOptionsPropositionsProps = {
       imageUrlParfum: string | null;
       imageUrlBalai: string | null;
       imageUrlPoubelle: string | null;
-    }
+    },
   ) => void;
 };
 
@@ -83,7 +83,7 @@ const HygieneDesktopOptionsPropositions = ({
   propositions,
 }: HygieneDesktopOptionsPropositionsProps) => {
   return (
-    <div className="h-full flex flex-col border rounded-xl overflow-auto">
+    <div className="flex h-full flex-col overflow-auto rounded-xl border">
       {/*1ère ligne */}
       <HygieneOptionsDesinfectantCard
         nbDistribDesinfectant={nbDistribDesinfectant}

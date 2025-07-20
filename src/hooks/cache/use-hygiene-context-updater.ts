@@ -150,7 +150,7 @@ export function useHygieneContextUpdater() {
                         (totalPoubelleEmp ?? 0) +
                         (totalSavon ?? 0) +
                         (totalPh ?? 0),
-                      minFacturation ?? 0
+                      minFacturation ?? 0,
                     );
 
               const totalDesinfectant = hygiene.infos.desinfectantGammeSelected
@@ -188,7 +188,7 @@ export function useHygieneContextUpdater() {
                 title: t("tarifs-mis-a-jour"),
                 description: t(
                   "les-tarifs-de-nettoyage-infos-nomfournisseur-ont-ete-mis-a-jour-votre-devis-a-ete-recalcule",
-                  { nomFournisseur: hygiene.infos.nomFournisseur || "" }
+                  { nomFournisseur: hygiene.infos.nomFournisseur || "" },
                 ),
                 duration: 4000,
               });
@@ -197,7 +197,7 @@ export function useHygieneContextUpdater() {
             toast({
               title: t("tarifs-mis-a-jour"),
               description: t(
-                "les-tarifs-ont-ete-mis-a-jour-par-un-fournisseur-la-page-a-ete-rechargee"
+                "les-tarifs-ont-ete-mis-a-jour-par-un-fournisseur-la-page-a-ete-rechargee",
               ),
               duration: 3000,
             });
@@ -224,7 +224,7 @@ export function useHygieneContextUpdater() {
             toast({
               title: t("tarifs-mis-a-jour"),
               description: t(
-                "les-tarifs-ont-ete-mis-a-jour-par-un-fournisseur-la-page-a-ete-rechargee"
+                "les-tarifs-ont-ete-mis-a-jour-par-un-fournisseur-la-page-a-ete-rechargee",
               ),
               duration: 3000,
             });
@@ -318,7 +318,7 @@ export function useHygieneContextUpdater() {
                         (totalPoubelleEmp ?? 0) +
                         (totalSavon ?? 0) +
                         (totalPh ?? 0),
-                      minFacturation ?? 0
+                      minFacturation ?? 0,
                     );
               const totalDesinfectant = hygiene.infos.desinfectantGammeSelected
                 ? nbDistribDesinfectant &&
@@ -355,7 +355,7 @@ export function useHygieneContextUpdater() {
                 title: t("tarifs-mis-a-jour"),
                 description: t(
                   "les-tarifs-de-nettoyage-infos-nomfournisseur-ont-ete-mis-a-jour-votre-devis-a-ete-recalcule",
-                  { nomFournisseur: hygiene.infos.nomFournisseur || "" }
+                  { nomFournisseur: hygiene.infos.nomFournisseur || "" },
                 ),
                 duration: 4000,
               });
@@ -363,7 +363,7 @@ export function useHygieneContextUpdater() {
               toast({
                 title: t("tarifs-mis-a-jour"),
                 description: t(
-                  "les-tarifs-ont-ete-mis-a-jour-par-un-fournisseur-la-page-a-ete-rechargee"
+                  "les-tarifs-ont-ete-mis-a-jour-par-un-fournisseur-la-page-a-ete-rechargee",
                 ),
                 duration: 3000,
               });
@@ -395,7 +395,7 @@ export function useHygieneContextUpdater() {
               title: t("tarifs-mis-a-jour"),
               description: t(
                 "les-tarifs-de-nettoyage-infos-nomfournisseur-ont-ete-mis-a-jour-votre-devis-a-ete-recalcule",
-                { nomFournisseur: hygiene.infos.nomFournisseur || "" }
+                { nomFournisseur: hygiene.infos.nomFournisseur || "" },
               ),
               duration: 4000,
             });
@@ -403,7 +403,7 @@ export function useHygieneContextUpdater() {
             toast({
               title: t("tarifs-mis-a-jour"),
               description: t(
-                "les-tarifs-ont-ete-mis-a-jour-par-un-fournisseur-la-page-a-ete-rechargee"
+                "les-tarifs-ont-ete-mis-a-jour-par-un-fournisseur-la-page-a-ete-rechargee",
               ),
               duration: 3000,
             });
@@ -449,7 +449,7 @@ export function useHygieneContextUpdater() {
       t,
       toast,
       totalHygiene.totalTrilogie,
-    ]
+    ],
   );
 
   return updateHygieneContext;

@@ -11,7 +11,7 @@ export const selectVitrerieTarifsSchema = createSelectSchema(
     cadenceCloisons: (schema) =>
       schema.min(1, "La cadence cloisons est obligatoire"),
     tauxHoraire: (schema) => schema.min(1, "Le taux horaire est obligatoire"),
-  }
+  },
 ).extend({
   nomFournisseur: z.string().nonempty("Nom de fournisseur invalide"),
   slogan: z.string().nullable(),
@@ -33,7 +33,7 @@ export const selectVitrerieTarifsFournisseurSchema = createSelectSchema(
     cadenceCloisons: (schema) =>
       schema.min(1, "La cadence cloisons est obligatoire"),
     tauxHoraire: (schema) => schema.min(1, "Le taux horaire est obligatoire"),
-  }
+  },
 );
 
 export type SelectVitrerieTarifsType = typeof selectVitrerieTarifsSchema._type;
@@ -51,27 +51,27 @@ export const createVitrerieTarifsUpdateSchema = (messages: {
     cadenceVitres: (schema) =>
       z.preprocess(
         (val) => (val === "" ? 0 : Number(val)),
-        schema.min(1, messages.cadenceVitres)
+        schema.min(1, messages.cadenceVitres),
       ),
     cadenceCloisons: (schema) =>
       z.preprocess(
         (val) => (val === "" ? 0 : Number(val)),
-        schema.min(1, messages.cadenceCloisons)
+        schema.min(1, messages.cadenceCloisons),
       ),
     tauxHoraire: (schema) =>
       z.preprocess(
         (val) => (val === "" ? 0 : Number((Number(val) * RATIO).toFixed(0))),
-        schema.refine((val) => val > 0, messages.tauxHoraire)
+        schema.refine((val) => val > 0, messages.tauxHoraire),
       ),
     minFacturation: (schema) =>
       z.preprocess(
         (val) => (val === "" ? 0 : Number((Number(val) * RATIO).toFixed(0))),
-        schema.refine((val) => !val || val > 0, messages.minFacturation)
+        schema.refine((val) => !val || val > 0, messages.minFacturation),
       ),
     fraisDeplacement: (schema) =>
       z.preprocess(
         (val) => (val === "" ? 0 : Number((Number(val) * RATIO).toFixed(0))),
-        schema.refine((val) => !val || val > 0, messages.fraisDeplacement)
+        schema.refine((val) => !val || val > 0, messages.fraisDeplacement),
       ),
   });
 

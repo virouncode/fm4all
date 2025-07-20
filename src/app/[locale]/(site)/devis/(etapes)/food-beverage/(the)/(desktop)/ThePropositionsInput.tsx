@@ -18,8 +18,8 @@ const ThePropositionsInput = ({
   const t = useTranslations("DevisPage");
   const tThe = useTranslations("DevisPage.foodBeverage.the");
   return (
-    <div className="flex flex-col gap-6 w-full p-4">
-      <div className="flex gap-4 items-center justify-center w-full">
+    <div className="flex w-full flex-col gap-6 p-4">
+      <div className="flex w-full items-center justify-center gap-4">
         <Input
           type="number"
           value={nbPersonnes || ""}
@@ -37,9 +37,9 @@ const ThePropositionsInput = ({
           {t("personnes")}
         </Label>
       </div>
-      <p className="text-xs text-fm4alldestructive italic px-2 text-center">
+      <p className="px-2 text-center text-xs italic text-fm4alldestructive">
         {tThe(
-          "les-quantites-sont-estimees-pour-vous-environ-15-de-votre-effectif-mais-vous-pouvez-les-changer"
+          "les-quantites-sont-estimees-pour-vous-environ-15-de-votre-effectif-mais-vous-pouvez-les-changer",
         )}
       </p>
     </div>

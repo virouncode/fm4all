@@ -141,7 +141,7 @@ const CafeEspacePropositionCard = ({
   if (!proposition.totalAnnuel) {
     return (
       <div
-        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center min-h-28 text-base gap-4 text-center font-bold`}
+        className={`flex flex-1 bg-${color} min-h-28 items-center justify-center gap-4 p-4 text-center text-base font-bold text-slate-200`}
       >
         {t("non-propose-pour-ces-criteres")}
       </div>
@@ -150,7 +150,7 @@ const CafeEspacePropositionCard = ({
 
   const totalMensuelText = (
     <p
-      className="font-bold text-xl ml-4"
+      className="ml-4 text-xl font-bold"
       data-testid={`total-mensuel-cafe-${espace.infos.espaceId}`}
     >
       {formatNumber((proposition.totalAnnuel * MARGE) / 12)} {t("euros-mois")}
@@ -158,7 +158,7 @@ const CafeEspacePropositionCard = ({
   );
 
   const prixInstallationText = proposition.totalInstallation ? (
-    <p className="text-base ml-4">
+    <p className="ml-4 text-base">
       + {formatNumber(proposition.totalInstallation * MARGE)}{" "}
       {t("eur-d-installation")}
     </p>
@@ -193,7 +193,7 @@ const CafeEspacePropositionCard = ({
     );
 
   const imgProduit = proposition.imageUrl ? (
-    <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-100">
+    <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
       <Image
         src={proposition.imageUrl}
         alt={`illustration ${proposition.marque} ${proposition.modele}`}
@@ -227,7 +227,7 @@ const CafeEspacePropositionCard = ({
   );
 
   const infosProduit = (
-    <ul className="flex flex-col text-xs px-4 mx-auto">
+    <ul className="mx-auto flex flex-col px-4 text-xs">
       {totalAnnuel ? (
         locale === "fr" ? (
           <li className="list-check text-sm font-bold">
@@ -259,7 +259,7 @@ const CafeEspacePropositionCard = ({
   );
 
   const infosProduitDialog = (
-    <ul className="flex flex-col text-sm px-4 mx-auto">
+    <ul className="mx-auto flex flex-col px-4 text-sm">
       {totalAnnuel ? (
         locale === "fr" ? (
           <li className="list-check text-sm font-bold">
@@ -292,7 +292,7 @@ const CafeEspacePropositionCard = ({
 
   return (
     <div
-      className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4 cursor-pointer  ${
+      className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-4 text-2xl text-slate-200 ${
         espace.infos.gammeCafeSelected === gamme &&
         cafe.infos.fournisseurId === proposition.fournisseurId
           ? "ring-4 ring-inset ring-fm4alldestructive"
@@ -319,7 +319,7 @@ const CafeEspacePropositionCard = ({
         data-testid={`cafe-switch-${espace.infos.espaceId}`}
       />
       <div>
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center gap-2">
           {totalMensuelText}
           <Dialog>
             <DialogTrigger asChild>
@@ -334,7 +334,7 @@ const CafeEspacePropositionCard = ({
                 <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
               {imgProduit}
-              <p className="text-xs italic text-end">
+              <p className="text-end text-xs italic">
                 {t("photo-non-contractuelle")}
               </p>
               {infosProduitDialog}

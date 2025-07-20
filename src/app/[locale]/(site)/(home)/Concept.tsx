@@ -34,7 +34,7 @@ const Concept = () => {
       description: (
         <>
           {t(
-            "cahier-des-charges-contrats-factures-planification-nous-gerons-tout-cela-pour-vous"
+            "cahier-des-charges-contrats-factures-planification-nous-gerons-tout-cela-pour-vous",
           )}{" "}
           <strong>{t("1-contact-1-contrat-1-facture")}</strong>{" "}
           {t("pour-tous-vos-services")}
@@ -45,11 +45,11 @@ const Concept = () => {
   return (
     <section id="presentation">
       <div className="bg-gradient-to-r from-[#f0c674]/100 to-[#f0c674]/70">
-        <div className="max-w-7xl w-full mx-auto flex flex-col gap-10 pt-8 pb-12 px-6">
-          <h2 className="text-2xl md:text-3xl border-l-2 px-4">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-6 pb-12 pt-8">
+          <h2 className="border-l-2 px-4 text-2xl md:text-3xl">
             {t("notre-concept")}
           </h2>
-          <div className="flex flex-col lg:flex-row justify-center gap-8 lg:px-14">
+          <div className="flex flex-col justify-center gap-8 lg:flex-row lg:px-14">
             {conceptCardsData.map(({ icon, title, description }) => (
               <ConceptCard
                 key={title}

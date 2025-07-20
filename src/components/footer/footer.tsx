@@ -24,14 +24,14 @@ const Footer = async ({ locale }: FooterProps) => {
 
   return (
     <footer className="bg-gradient-to-r from-fm4allsecondary/100 to-fm4allsecondary/60">
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="mx-auto max-w-7xl p-6">
         <div className="flex flex-wrap gap-6">
-          <div className="flex flex-col gap-2 w-52">
-            <ul className="text-secondary text-sm flex flex-col gap-2">
+          <div className="flex w-52 flex-col gap-2">
+            <ul className="flex flex-col gap-2 text-sm text-secondary">
               <li className="text-xl">
                 <Link
                   href="/"
-                  className="hover:opacity-80 hover:underline"
+                  className="hover:underline hover:opacity-80"
                   title={t("page-d-accueil")}
                   aria-label={t("page-d-accueil")}
                 >
@@ -68,12 +68,12 @@ const Footer = async ({ locale }: FooterProps) => {
               </li>
             </ul>
           </div>
-          <div className="flex flex-col gap-2 w-52">
-            <ul className="text-secondary text-sm flex flex-col gap-2">
+          <div className="flex w-52 flex-col gap-2">
+            <ul className="flex flex-col gap-2 text-sm text-secondary">
               <li className="text-xl">
                 <Link
                   href="/services"
-                  className="hover:opacity-80 hover:underline"
+                  className="hover:underline hover:opacity-80"
                   title={t("services")}
                 >
                   {t("services")}
@@ -88,7 +88,7 @@ const Footer = async ({ locale }: FooterProps) => {
                         pathname: "/services/[slug]",
                         params: { slug: serviceUrl },
                       }}
-                      className="hover:opacity-80 hover:underline"
+                      className="hover:underline hover:opacity-80"
                       title={service.linkText}
                       aria-label={service.linkText}
                     >
@@ -99,9 +99,9 @@ const Footer = async ({ locale }: FooterProps) => {
               })}
             </ul>
           </div>
-          <div className="flex flex-col gap-2 w-52">
-            <ul className="text-secondary text-sm flex flex-col gap-2">
-              <li className="text-secondary text-xl">
+          <div className="flex w-52 flex-col gap-2">
+            <ul className="flex flex-col gap-2 text-sm text-secondary">
+              <li className="text-xl text-secondary">
                 <Link href="/secteurs">{t("secteurs")}</Link>
               </li>
               {secteurs.map((secteur) => {
@@ -121,9 +121,9 @@ const Footer = async ({ locale }: FooterProps) => {
               })}
             </ul>
           </div>
-          <div className="flex flex-col gap-2 w-52">
-            <ul className="text-secondary text-sm flex flex-col gap-2">
-              <li className="text-secondary text-xl">
+          <div className="flex w-52 flex-col gap-2">
+            <ul className="flex flex-col gap-2 text-sm text-secondary">
+              <li className="text-xl text-secondary">
                 <Link href="/blog">{t("derniers-articles")}</Link>
               </li>
               {articles.map((article) => {
@@ -145,9 +145,9 @@ const Footer = async ({ locale }: FooterProps) => {
               })}
             </ul>
           </div>
-          <div className="flex flex-col gap-2 w-52">
-            <p className="text-secondary text-xl">{t("prestataires")}</p>
-            <ul className="text-secondary text-sm flex flex-col gap-2">
+          <div className="flex w-52 flex-col gap-2">
+            <p className="text-xl text-secondary">{t("prestataires")}</p>
+            <ul className="flex flex-col gap-2 text-sm text-secondary">
               <li>
                 <Link href="/prestataire">{t("devenir-prestataire")}</Link>
               </li>

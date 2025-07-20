@@ -98,7 +98,7 @@ export const ASSOCIATED_TO_SERVICE_QUERY = `
 export const getAssociatedToService = async (
   language: LocaleType,
   tagIds: string[],
-  currentId: string
+  currentId: string,
 ): Promise<{
   articles: (Article & {
     tagsEntrants: { _id: string; nom: string; slug: Slug }[];
@@ -123,7 +123,7 @@ export const TAG_RELATED_SERVICES_QUERY = `*[_type == "service" && language == $
 ]`;
 export const getTagRelatedServices = async (
   locale: LocaleType,
-  slug: string
+  slug: string,
 ): Promise<Service[]> => {
   return await client.fetch<Service[]>(TAG_RELATED_SERVICES_QUERY, {
     language: locale,
@@ -141,7 +141,7 @@ export const SERVICE_VILLE_QUERY = `*[_type == "serviceVille" && subSlug.current
 export const getServiceVille = async (
   slug: string,
   subSlug: string,
-  locale: LocaleType
+  locale: LocaleType,
 ) => {
   return await client.fetch<
     ServiceVille & {
@@ -203,7 +203,7 @@ function groupVillesByService(
     };
     subSlug: { _type: "slug"; current: string };
     titreCard: string;
-  }[]
+  }[],
 ) {
   return data.reduce(
     (acc, item) => {
@@ -217,7 +217,7 @@ function groupVillesByService(
 
       return acc;
     },
-    {} as Record<string, typeof data>
+    {} as Record<string, typeof data>,
   );
 }
 
@@ -276,7 +276,7 @@ export const ARTICLES_OF_CATEGORIE_QUERY = `*[_type == "article" && language == 
 }`;
 export const getArticlesOfCategorie = async (
   locale: LocaleType,
-  slug: string
+  slug: string,
 ): Promise<Article[]> => {
   return await client.fetch<Article[]>(ARTICLES_OF_CATEGORIE_QUERY, {
     language: locale,
@@ -387,7 +387,7 @@ export const ASSOCIATED_TO_ARTICLE_QUERY = `
 export const getAssociatedToArticle = async (
   language: LocaleType,
   tagIds: string[],
-  currentId: string
+  currentId: string,
 ): Promise<{
   articles: (Article & {
     tagsEntrants: { _id: string; nom: string; slug: Slug }[];
@@ -418,14 +418,14 @@ categorie->{
 
 export const getTagRelatedArticles = async (
   locale: LocaleType,
-  slug: string
+  slug: string,
 ): Promise<(Article & { categorie: ArticleCategory })[]> => {
   return await client.fetch<(Article & { categorie: ArticleCategory })[]>(
     TAG_RELATED_ARTICLES_QUERY,
     {
       language: locale,
       slug,
-    }
+    },
   );
 };
 
@@ -511,7 +511,7 @@ export const ASSOCIATED_TO_SECTEUR_QUERY = `
 export const getAssociatedToSecteur = async (
   language: LocaleType,
   tagIds: string[],
-  currentId: string
+  currentId: string,
 ): Promise<{
   articles: (Article & {
     tagsEntrants: { _id: string; nom: string; slug: Slug }[];
@@ -537,7 +537,7 @@ export const TAG_RELATED_SECTEURS_QUERY = `*[_type == "secteur" && language == $
 
 export const getTagRelatedSecteurs = async (
   locale: LocaleType,
-  slug: string
+  slug: string,
 ): Promise<Secteur[]> => {
   return await client.fetch<Secteur[]>(TAG_RELATED_SECTEURS_QUERY, {
     language: locale,

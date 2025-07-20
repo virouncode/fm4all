@@ -39,35 +39,35 @@ export type CACHE_TAG_RESULT =
   | IdTagResult<CACHE_TAG>;
 
 export const getGlobalTag = <T extends CACHE_TAG>(
-  tag: T
+  tag: T,
 ): GlobalTagResult<T> => {
   return `global:${tag}`;
 };
 
 export const getSurfaceTag = <T extends CACHE_TAG>(
   tag: T,
-  surface: string
+  surface: string,
 ): SurfaceTagResult<T> => {
   return `surface:${surface}-${tag}`;
 };
 
 export const getEffectifTag = <T extends CACHE_TAG>(
   tag: T,
-  effectif: string
+  effectif: string,
 ): EffectifTagResult<T> => {
   return `effectif:${effectif}-${tag}`;
 };
 
 export const getFournisseurTag = <T extends CACHE_TAG>(
   tag: T,
-  fournisseurId: number
+  fournisseurId: number,
 ): FournisseurTagResult<T> => {
   return `fournisseur:${fournisseurId}-${tag}`;
 };
 
 export const getIdTag = <T extends CACHE_TAG>(
   tag: T,
-  id: number
+  id: number,
 ): IdTagResult<T> => {
   return `id:${id}-${tag}`;
 };

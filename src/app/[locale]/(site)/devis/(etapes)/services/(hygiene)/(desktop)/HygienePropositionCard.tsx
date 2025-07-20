@@ -87,21 +87,21 @@ const HygienePropositionCard = ({
   if (!proposition.totalAnnuelTrilogie) {
     return (
       <div
-        className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 p-4`}
+        className={`flex flex-1 bg-${color} items-center justify-center gap-4 p-4 text-2xl text-slate-200`}
       >
         {t("non-propose")}
       </div>
     );
   }
   const totalMensuelText = (
-    <p className="font-bold text-xl ml-4" data-testid="total-mensuel-trilogie">
+    <p className="ml-4 text-xl font-bold" data-testid="total-mensuel-trilogie">
       {formatNumber((proposition.totalAnnuelTrilogie * MARGE) / 12)}{" "}
       {t("euros-mois")}
     </p>
   );
 
   const prixInstallationText = prixInstalDistrib ? (
-    <p className="font-bold text-base ml-4">
+    <p className="ml-4 text-base font-bold">
       +{formatNumber(prixInstalDistrib * MARGE)} {t("eur-d-installation")}
     </p>
   ) : null;
@@ -119,7 +119,7 @@ const HygienePropositionCard = ({
   const imgProduit = (
     <div className="flex items-center justify-between gap-2">
       {proposition.imageUrlEmp ? (
-        <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-100">
+        <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
           <Image
             src={proposition.imageUrlEmp}
             alt={tHygiene("illustration-essuie-mains-papier")}
@@ -130,7 +130,7 @@ const HygienePropositionCard = ({
         </div>
       ) : null}
       {proposition.imageUrlPh ? (
-        <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-100">
+        <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
           <Image
             src={proposition.imageUrlPh}
             alt={tHygiene("illustration-distributeur-papier-hygienique")}
@@ -141,7 +141,7 @@ const HygienePropositionCard = ({
         </div>
       ) : null}
       {proposition.imageUrlSavon ? (
-        <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-100">
+        <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
           <Image
             src={proposition.imageUrlSavon}
             alt={tHygiene("illustration-distributeur-savon")}
@@ -155,7 +155,7 @@ const HygienePropositionCard = ({
   );
 
   const infosProduit = (
-    <ul className="flex flex-col text-xs px-4 mx-auto">
+    <ul className="mx-auto flex flex-col px-4 text-xs">
       {locale === "fr" ? (
         <li className="list-check">
           {tHygiene("distributeurs")}{" "}
@@ -192,7 +192,7 @@ const HygienePropositionCard = ({
   );
 
   const infosProduitDialog = (
-    <ul className="flex flex-col text-sm px-4 mx-auto">
+    <ul className="mx-auto flex flex-col px-4 text-sm">
       {locale === "fr" ? (
         <li className="list-check">
           {tHygiene("distributeurs")}{" "}
@@ -230,7 +230,7 @@ const HygienePropositionCard = ({
 
   return (
     <div
-      className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer p-4 ${
+      className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-4 text-2xl text-slate-200 ${
         hygiene.infos.trilogieGammeSelected === gamme
           ? "ring-4 ring-inset ring-fm4alldestructive"
           : ""
@@ -245,7 +245,7 @@ const HygienePropositionCard = ({
         data-testid="hygiene-switch"
       />
       <div>
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center gap-2">
           {totalMensuelText}
           <Dialog>
             <DialogTrigger asChild>
@@ -260,7 +260,7 @@ const HygienePropositionCard = ({
                 <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
               {imgProduit}
-              <p className="text-xs italic text-end">
+              <p className="text-end text-xs italic">
                 {t("photos-non-contractuelles")}
               </p>
               {infosProduitDialog}

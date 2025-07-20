@@ -55,7 +55,7 @@ export async function middleware(req: NextRequest) {
   if (legacyRedirects[pathname]) {
     return NextResponse.redirect(
       new URL(legacyRedirects[pathname], req.url),
-      301
+      301,
     );
   }
   //Pas de locale
@@ -107,12 +107,12 @@ export async function middleware(req: NextRequest) {
     const checked = isAuthorizedRoute(
       userInCookie.role,
       pathnameWithoutLocale,
-      userInCookie as SelectUserType
+      userInCookie as SelectUserType,
     );
     if (!checked.authorized) {
       //route non autorisée
       return NextResponse.redirect(
-        new URL(`/${locale}/auth/unauthorized?type=${checked.type}`, req.url)
+        new URL(`/${locale}/auth/unauthorized?type=${checked.type}`, req.url),
       );
     } else {
       //route autorisée
@@ -129,12 +129,12 @@ export async function middleware(req: NextRequest) {
         headers: {
           cookie: req.headers.get("cookie") || "",
         },
-      }
+      },
     );
     if (!sessionResponse.ok) {
       console.error(
         "Erreur lors de la récupération de la session:",
-        sessionResponse.status
+        sessionResponse.status,
       );
       return NextResponse.redirect(new URL(`/${locale}/auth/signin`, req.url));
     }
@@ -147,12 +147,12 @@ export async function middleware(req: NextRequest) {
       const checked = isAuthorizedRoute(
         user.role,
         pathnameWithoutLocale,
-        user as SelectUserType
+        user as SelectUserType,
       );
       if (!checked.authorized) {
         //route non autorisée
         return NextResponse.redirect(
-          new URL(`/${locale}/auth/unauthorized?type=${checked.type}`, req.url)
+          new URL(`/${locale}/auth/unauthorized?type=${checked.type}`, req.url),
         );
       } else {
         //route autorisée
@@ -179,7 +179,7 @@ type Role = "admin" | "client" | "fournisseur";
 function isAuthorizedRoute(
   role: Role,
   pathnameWithoutLocale: string,
-  user: SelectUserType // Tu peux typer mieux selon ta structure
+  user: SelectUserType, // Tu peux typer mieux selon ta structure
 ): { authorized: boolean; type?: string } {
   const segments = pathnameWithoutLocale.split("/").filter(Boolean);
   const userId = segments[1];

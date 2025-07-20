@@ -41,7 +41,7 @@ describe("TltrCard", () => {
         devisButtonTitle="Devis"
         imageUrl="/test.jpg"
         imageAlt="Image test"
-      />
+      />,
     );
 
     expect(screen.getByText("Description")).toBeInTheDocument();
@@ -55,11 +55,11 @@ describe("TltrCard", () => {
         devisButtonTitle="Demander un devis"
         imageUrl="/img.jpg"
         imageAlt="Image devis"
-      />
+      />,
     );
 
     expect(
-      screen.getByRole("button", { name: "Demander un devis" })
+      screen.getByRole("button", { name: "Demander un devis" }),
     ).toBeInTheDocument();
   });
 
@@ -71,7 +71,7 @@ describe("TltrCard", () => {
         devisButtonTitle="Devis"
         imageUrl="/img.jpg"
         imageAlt="Alt test"
-      />
+      />,
     );
 
     expect(screen.getByAltText("Alt test")).toBeInTheDocument();
@@ -85,7 +85,7 @@ describe("TltrCard", () => {
         devisButtonTitle="Devis"
         imageUrl="/img.jpg"
         imageAlt="Image alt"
-      />
+      />,
     );
 
     expect(screen.getByTestId("portable-text-mock")).toBeInTheDocument();
@@ -99,7 +99,7 @@ describe("TltrCard", () => {
         devisButtonTitle="Devis"
         imageUrl="/img.jpg"
         imageAlt="Image alt"
-      />
+      />,
     );
 
     expect(screen.getByTestId("portable-text-mock")).toBeInTheDocument();

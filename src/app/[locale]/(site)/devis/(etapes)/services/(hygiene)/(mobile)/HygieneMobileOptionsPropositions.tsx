@@ -14,7 +14,7 @@ type HygieneMobielOptionsPropositionsProps = {
   nbDistribPoubelle: number;
   handleChangeDistribNbr: (
     e: ChangeEvent<HTMLInputElement>,
-    type: string
+    type: string,
   ) => void;
   propositions: {
     nomFournisseur: string;
@@ -69,7 +69,7 @@ type HygieneMobielOptionsPropositionsProps = {
       imageUrlParfum: string | null;
       imageUrlBalai: string | null;
       imageUrlPoubelle: string | null;
-    }
+    },
   ) => void;
   hygieneDistribTarifsFournisseur: {
     id: number;
@@ -115,7 +115,7 @@ const HygieneMobileOptionsPropositions = ({
   hygieneDistribTarifsFournisseur,
 }: HygieneMobielOptionsPropositionsProps) => {
   return (
-    <div className="flex flex-col gap-6 w-full">
+    <div className="flex w-full flex-col gap-6">
       <HygieneMobileOptionsDesinfectant
         nbDistribDesinfectant={nbDistribDesinfectant}
         handleChangeDistribNbr={handleChangeDistribNbr}

@@ -18,7 +18,7 @@ const TotalFontaines = () => {
 
   if (!total) return null;
   return (
-    <div className="flex flex-col gap-4 total-section" id="total-fontaines">
+    <div className="total-section flex flex-col gap-4" id="total-fontaines">
       <div className="flex flex-col gap-4">
         <div>
           {t("fontaines-a-eau")}{" "}
@@ -30,20 +30,17 @@ const TotalFontaines = () => {
             ({fontaines.infos.nomFournisseur})
           </span>
         </div>
-        <div className="flex flex-col ml-4 text-xs ">
+        <div className="ml-4 flex flex-col text-xs">
           {fontaines.espaces
             .filter(
               (item) =>
                 totalFontaines.totalEspaces.find(
-                  ({ espaceId }) => espaceId === item.infos.espaceId
-                )?.total ?? 0 > 0
+                  ({ espaceId }) => espaceId === item.infos.espaceId,
+                )?.total ?? 0 > 0,
             )
             .map((item) => (
               <div key={item.infos.espaceId} className="flex flex-col">
-                <div
-                  className="flex items-center justify-between 
-                  )} font-bold"
-                >
+                <div className=")} flex items-center justify-between font-bold">
                   <p>
                     {t("1-x")}{" "}
                     <span
@@ -61,15 +58,15 @@ const TotalFontaines = () => {
                     {formatNumber(
                       Math.round(
                         (totalFontaines.totalEspaces.find(
-                          (total) => total.espaceId === item.infos.espaceId
-                        )?.total ?? 0) * MARGE
-                      )
+                          (total) => total.espaceId === item.infos.espaceId,
+                        )?.total ?? 0) * MARGE,
+                      ),
                     )}{" "}
                     {t("eur-ht-an")}
                   </p>
                 </div>
                 {totalFontaines.totalEspaces.find(
-                  (total) => total.espaceId === item.infos.espaceId
+                  (total) => total.espaceId === item.infos.espaceId,
                 )?.totalInstallation ? (
                   <div className="flex items-center justify-between">
                     <p>{t("installation")}</p>
@@ -77,9 +74,9 @@ const TotalFontaines = () => {
                       {formatNumber(
                         Math.round(
                           (totalFontaines.totalEspaces.find(
-                            (total) => total.espaceId === item.infos.espaceId
-                          )?.totalInstallation ?? 0) * MARGE
-                        )
+                            (total) => total.espaceId === item.infos.espaceId,
+                          )?.totalInstallation ?? 0) * MARGE,
+                        ),
                       )}{" "}
                       {t("eur-ht")}
                     </p>
@@ -87,15 +84,15 @@ const TotalFontaines = () => {
                 ) : null}
               </div>
             ))}
-          <div className="flex flex-col border-t border-foreground mt-2">
-            <div className="flex justify-between w-full">
+          <div className="mt-2 flex flex-col border-t border-foreground">
+            <div className="flex w-full justify-between">
               <p>TOTAL</p>
               <p className="text-end">
                 {formatNumber(Math.round(total * MARGE))} {t("eur-ht-an")}
               </p>
             </div>
             {totalInstallation ? (
-              <div className="flex justify-between w-full">
+              <div className="flex w-full justify-between">
                 <p>{t("total-installation")}</p>
                 <p className="text-end">
                   {formatNumber(Math.round(totalInstallation * MARGE))}{" "}

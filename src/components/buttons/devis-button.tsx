@@ -207,7 +207,7 @@ const DevisButton = ({
       setTotalFontaines,
       setTotalOfficeManager,
       setTotalServicesFm4All,
-      setTotal
+      setTotal,
     );
     if (setIsMobileNavOpen) setIsMobileNavOpen(false);
     router.push("/devis/locaux");
@@ -221,7 +221,7 @@ const DevisButton = ({
           variant="destructive"
           size={size}
           title={text}
-          className={`text-base shadow-md hover:shadow-lg ring-offset-2 ring-2 ring-destructive hover:scale-[101%] transition-all ${className}`}
+          className={`text-base shadow-md ring-2 ring-destructive ring-offset-2 transition-all hover:scale-[101%] hover:shadow-lg ${className}`}
           onClick={
             setIsMobileNavOpen ? () => setIsMobileNavOpen(false) : undefined
           }
@@ -229,18 +229,18 @@ const DevisButton = ({
           {withIcon && <ReceiptText className="hidden sm:inline" />} {text}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
+      <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
         <DialogHeader>
           <DialogTitle>{t("devis-en-cours")}</DialogTitle>
           <DialogDescription>
             {t(
-              "un-devis-est-deja-en-cours-souhaitez-vous-le-reprendre-ou-en-creer-un-nouveau-vos-informations-seront-perdues"
+              "un-devis-est-deja-en-cours-souhaitez-vous-le-reprendre-ou-en-creer-un-nouveau-vos-informations-seront-perdues",
             )}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
-            <div className="flex gap-4 justify-center mx-auto">
+            <div className="mx-auto flex justify-center gap-4">
               <Button variant="destructive" onClick={handleClickNouveau}>
                 {t("nouveau")}
               </Button>
@@ -258,8 +258,7 @@ const DevisButton = ({
         variant="destructive"
         size={size}
         title={title}
-        className={`text-base shadow-md hover:shadow-lg
-          ring-offset-2 ring-2 ring-destructive hover:scale-[101%] transition-all ${className}`}
+        className={`text-base shadow-md ring-2 ring-destructive ring-offset-2 transition-all hover:scale-[101%] hover:shadow-lg ${className}`}
         onClick={handleClickNouveau}
         data-testid="devis-button"
       >

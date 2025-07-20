@@ -47,7 +47,7 @@ export const generateMetadata = async ({
     {
       fr: locale === "fr" ? slug : getArticlesSlugFr(slug),
       en: locale === "en" ? slug : getArticlesSlugEn(slug),
-    }
+    },
   );
 };
 
@@ -78,13 +78,13 @@ const page = async ({
   }
   const articles = await getArticlesOfCategorie(
     locale as LocaleType,
-    categorie.slug?.current ?? ""
+    categorie.slug?.current ?? "",
   );
 
   return (
-    <main className="max-w-7xl mx-auto mb-24 py-4 px-6 md:px-20 hyphens-auto">
+    <main className="mx-auto mb-24 max-w-7xl hyphens-auto px-6 py-4 md:px-20">
       <Breadcrumb className="mb-10">
-        <BreadcrumbList className="text-sm lg:text-base flex flex-wrap">
+        <BreadcrumbList className="flex flex-wrap text-sm lg:text-base">
           <BreadcrumbItem>
             <BreadcrumbLink
               className="flex items-center"
@@ -108,7 +108,7 @@ const page = async ({
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <h1 className="text-4xl mb-10">
+      <h1 className="mb-10 text-4xl">
         {tGlobal("nos-articles-sur-and-quot")}
         &quot;{categorie.titre}&quot;
       </h1>

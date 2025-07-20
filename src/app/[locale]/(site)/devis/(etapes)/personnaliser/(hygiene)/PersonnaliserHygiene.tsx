@@ -11,12 +11,12 @@ import PropositionsTitle from "../../../PropositionsTitle";
 const PersonnaliserHygieneCommentaires = () => {
   const { hygiene, setHygiene } = useContext(HygieneContext);
   const { personnalisation, setPersonnalisation } = useContext(
-    PersonnalisationContext
+    PersonnalisationContext,
   );
   const router = useRouter();
   const handleClickPrevious = () => {
     const currentIndex = personnalisation.personnalisationIds.indexOf(
-      personnalisation.currentPersonnalisationId as number
+      personnalisation.currentPersonnalisationId as number,
     );
     setPersonnalisation((prev) => ({
       ...prev,
@@ -26,7 +26,7 @@ const PersonnaliserHygieneCommentaires = () => {
   };
   const handleClickNext = () => {
     const currentIndex = personnalisation.personnalisationIds.indexOf(
-      personnalisation.currentPersonnalisationId as number
+      personnalisation.currentPersonnalisationId as number,
     );
     if (currentIndex + 1 === personnalisation.personnalisationIds.length) {
       setPersonnalisation((prev) => ({
@@ -56,14 +56,14 @@ const PersonnaliserHygieneCommentaires = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="4">
+    <div className="mx-auto flex h-full w-full flex-col gap-4 py-2" id="4">
       <PropositionsTitle
         title="Hygiène et propreté"
         description=""
         icon={Toilet}
         handleClickPrevious={handleClickPrevious}
       />
-      <div className="w-full flex-1 flex flex-col gap-6">
+      <div className="flex w-full flex-1 flex-col gap-6">
         <p className="text-2xl">Commentaires et remarques</p>
         <Label htmlFor="commentaires-hygiene" className="text-base">
           Ajoutez des précisions pour le service d&apos;hygiène :
@@ -71,7 +71,7 @@ const PersonnaliserHygieneCommentaires = () => {
         <Textarea
           id="commentaires-hygiene"
           onChange={handleChange}
-          className="resize-none flex-1"
+          className="flex-1 resize-none"
           value={hygiene.infos.commentaires ?? ""}
         />
       </div>

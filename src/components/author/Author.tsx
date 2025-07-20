@@ -19,9 +19,9 @@ const Author = ({
   locale,
 }: AuthorProps) => {
   return (
-    <div className="flex gap-4 items-center justify-end mb-10">
+    <div className="mb-10 flex items-center justify-end gap-4">
       {portraitUrl ? (
-        <div className="rounded-full w-[40px] h-[40px] relative overflow-hidden">
+        <div className="relative h-[40px] w-[40px] overflow-hidden rounded-full">
           <Image
             src={portraitUrl}
             alt={portraitAlt ?? "Portrait de l'auteur"}

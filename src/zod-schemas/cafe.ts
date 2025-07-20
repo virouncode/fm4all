@@ -41,7 +41,7 @@ export const cafeSchema = z.object({
         prixUnitaireConsoChocolat: z.number().nullable(),
         prixUnitaireConsoSucre: z.number().nullable(),
       }),
-    })
+    }),
   ),
 });
 
@@ -59,7 +59,7 @@ export const cafeEspaceFormSchema = z.object({
         /^\d+$/.test(value) &&
         parseInt(value, 10) >= 1 &&
         parseInt(value, 10) <= 150,
-      "Le nombre de personnes doit être compris entre 1 et 150"
+      "Le nombre de personnes doit être compris entre 1 et 150",
     ),
   nbMachines: z.number(),
 });

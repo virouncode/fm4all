@@ -72,20 +72,20 @@ const SecuriteIncendiePropostionCard = ({
 
   if (!totalAnnuelTrilogie)
     return (
-      <div className="w-3/4 flex items-center justify-center text-xl gap-4 p-4 cursor-pointer bg-slate-100">
+      <div className="flex w-3/4 cursor-pointer items-center justify-center gap-4 bg-slate-100 p-4 text-xl">
         {t("non-propose")}
       </div>
     );
   const totalMensuelText = (
-    <p className="font-bold text-xl ml-4" data-testid="total-mensuel-incendie">
+    <p className="ml-4 text-xl font-bold" data-testid="total-mensuel-incendie">
       {formatNumber(
-        ((totalAnnuelTrilogie + fraisDeplacementTrilogie) * MARGE) / 12
+        ((totalAnnuelTrilogie + fraisDeplacementTrilogie) * MARGE) / 12,
       )}{" "}
       {t("euros-mois")}
     </p>
   );
   const infosProduit = (
-    <ul className="flex flex-col text-sm px-4">
+    <ul className="flex flex-col px-4 text-sm">
       <li className="list-check">
         {tIncendie("1-passage-an-pour-le-controle-obligatoire-de")}
         <ul className="ml-4">
@@ -105,7 +105,7 @@ const SecuriteIncendiePropostionCard = ({
   );
 
   const infosProduitDialog = (
-    <ul className="flex flex-col text-sm px-4 mx-auto">
+    <ul className="mx-auto flex flex-col px-4 text-sm">
       <li className="list-check">
         {tIncendie("1-passage-par-an-pour-le-controle-obligatoire-de")}
         <ul className="ml-4">
@@ -127,11 +127,11 @@ const SecuriteIncendiePropostionCard = ({
   const infosText = (
     <p className="text-sm">
       {tIncendie(
-        "pour-la-securite-de-tous-verification-annuelle-obligatoire-norme"
+        "pour-la-securite-de-tous-verification-annuelle-obligatoire-norme",
       )}
       <strong> {tIncendie("nf-s61-919")}</strong>
       {tIncendie(
-        "conseils-sur-limplantation-remplacement-ou-rechargement-si-necessaire-au-bpu"
+        "conseils-sur-limplantation-remplacement-ou-rechargement-si-necessaire-au-bpu",
       )}
     </p>
   );
@@ -141,12 +141,12 @@ const SecuriteIncendiePropostionCard = ({
   );
 
   const imgProduit = (
-    <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+    <div className="relative h-60 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-200">
       <Image
         src={"/img/services/incendie.webp"}
         alt={`illustration de securité incendie`}
         fill={true}
-        className="object-contain object-center cursor-pointer"
+        className="cursor-pointer object-contain object-center"
         quality={100}
       />
     </div>
@@ -154,7 +154,7 @@ const SecuriteIncendiePropostionCard = ({
 
   return (
     <div
-      className={`w-3/4 flex items-center justify-center text-xl gap-4 p-4 cursor-pointer bg-slate-100 ${
+      className={`flex w-3/4 cursor-pointer items-center justify-center gap-4 bg-slate-100 p-4 text-xl ${
         incendie.infos.fournisseurId === proposition.fournisseurId
           ? "ring-4 ring-inset ring-fm4alldestructive"
           : ""
@@ -169,7 +169,7 @@ const SecuriteIncendiePropostionCard = ({
         data-testid="incendie-switch"
       />
       <div>
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center gap-2">
           {totalMensuelText}
           <Dialog>
             <DialogTrigger asChild>
@@ -186,7 +186,7 @@ const SecuriteIncendiePropostionCard = ({
               <div className="flex flex-col gap-4">
                 {infosText}
                 {imgProduit}
-                <p className="text-xs italic text-end">
+                <p className="text-end text-xs italic">
                   {t("photo-non-contractuelle")}
                 </p>
                 {infosProduitDialog}

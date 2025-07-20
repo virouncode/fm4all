@@ -1,6 +1,6 @@
 export const capitalize = (
   input: string | null | undefined,
-  capitalizeAll = true
+  capitalizeAll = true,
 ) => {
   if (!input?.trim()) return "";
   input = input.trim();
@@ -11,9 +11,10 @@ export const capitalize = (
         word
           .split("-")
           .map(
-            (part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
+            (part) =>
+              part.charAt(0).toUpperCase() + part.slice(1).toLowerCase(),
           )
-          .join("-")
+          .join("-"),
       )
       .join(" ");
   } else {
@@ -22,7 +23,7 @@ export const capitalize = (
       firstWord
         .split("-")
         .map(
-          (part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
+          (part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase(),
         )
         .join("-"),
       ...rest.join(" "),

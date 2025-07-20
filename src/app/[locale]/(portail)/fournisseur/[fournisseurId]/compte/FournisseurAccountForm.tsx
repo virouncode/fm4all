@@ -51,7 +51,7 @@ const FournisseurAccountForm = ({
         nomContact: "Nom du contact obligatoire",
         emailContact: "Email du contact invalide",
         phoneContact: "Numéro de téléphone obligatoire",
-      })
+      }),
     ),
     defaultValues,
   });
@@ -75,7 +75,7 @@ const FournisseurAccountForm = ({
         description:
           error?.serverError ||
           tAuth(
-            "une-erreur-est-survenue-lors-de-la-mise-a-jour-du-fournisseur"
+            "une-erreur-est-survenue-lors-de-la-mise-a-jour-du-fournisseur",
           ),
       });
     },
@@ -92,19 +92,19 @@ const FournisseurAccountForm = ({
     setLoading(false);
   };
   return (
-    <Card className="rounded-md h-[60%] w-full sm:w-3/4 lg:w-2/3 mx-auto">
+    <Card className="mx-auto h-[60%] w-full rounded-md sm:w-3/4 lg:w-2/3">
       <CardHeader>
         <CardTitle className="text-lg md:text-xl">
           <p>Mes informations</p>
         </CardTitle>
-        <CardDescription className="text-sm md:text-base max-w-prose italic">
+        <CardDescription className="max-w-prose text-sm italic md:text-base">
           👉 Renseignez vos informations
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(submitForm)} className="grid gap-2">
-            <div className="flex flex-col md:grid md:grid-cols-2 gap-2 md:gap-6">
+            <div className="flex flex-col gap-2 md:grid md:grid-cols-2 md:gap-6">
               <InputWithLabel<UpdateFournisseurFormType>
                 fieldTitle="Nom de l'entreprise*"
                 nameInSchema="nomFournisseur"
@@ -137,7 +137,7 @@ const FournisseurAccountForm = ({
               variant="destructive"
               size="lg"
               title={tAdmin("mettre-a-jour")}
-              className="text-base w-full mt-6"
+              className="mt-6 w-full text-base"
               disabled={isUpdatingFournisseur || loading}
             >
               {isUpdatingFournisseur || loading ? (

@@ -7,7 +7,7 @@ export const selectIncendieQuantitesSchema = createSelectSchema(
     surface: (schema) => schema.min(1, "La surface est obligatoire"),
     nbExtincteurs: (schema) =>
       schema.min(1, "Le nombre d'extincteurs est obligatoire"),
-  }
+  },
 );
 
 export type SelectIncendieQuantitesType =

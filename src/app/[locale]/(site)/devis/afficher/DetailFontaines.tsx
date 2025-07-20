@@ -42,7 +42,7 @@ const DetailFontaines = () => {
       <TableBody>
         {fontaines.espaces.map((espace) => {
           const totalEspace = totalFontaines.totalEspaces.find(
-            ({ espaceId }) => espace.infos.espaceId === espaceId
+            ({ espaceId }) => espace.infos.espaceId === espaceId,
           );
           if (!totalEspace) return null;
           return (
@@ -62,7 +62,7 @@ const DetailFontaines = () => {
               <TableCell>
                 {
                   locationFontaine.find(
-                    ({ id }) => id === fontaines.infos.dureeLocation
+                    ({ id }) => id === fontaines.infos.dureeLocation,
                   )?.description
                 }
               </TableCell>

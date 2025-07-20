@@ -25,11 +25,11 @@ export const getFontainesTarifs = async () => {
       .from(fontainesTarifs)
       .innerJoin(
         fournisseurs,
-        eq(fontainesTarifs.fournisseurId, fournisseurs.id)
+        eq(fontainesTarifs.fournisseurId, fournisseurs.id),
       );
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectFontainesTarifsSchema.parse(result)
+      selectFontainesTarifsSchema.parse(result),
     );
     return validatedResults.map((result) => ({
       ...result,
@@ -65,7 +65,7 @@ export const getFontaines = async () => {
     const results = await db.select().from(fontaines);
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectFontainesModelesSchema.parse(result)
+      selectFontainesModelesSchema.parse(result),
     );
     return validatedResults;
   } catch (err) {

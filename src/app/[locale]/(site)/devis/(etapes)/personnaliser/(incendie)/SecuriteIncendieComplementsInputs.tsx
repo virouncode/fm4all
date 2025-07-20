@@ -54,18 +54,18 @@ const SecuriteIncendieComplementsInputs = ({
 }: SecuriteIncendieComplementsInputsProps) => {
   const tPersonnaliser = useTranslations("DevisPage.personnaliser");
   return (
-    <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-12 w-full md:mx-auto flex-1 overflow-auto p-2">
+    <div className="grid w-full flex-1 grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-12 overflow-auto p-2 md:mx-auto">
       <div className="flex items-center gap-2">
         <Checkbox
           id="exutoires"
-          className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+          className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
           checked={exutoires}
           onCheckedChange={(checked: boolean) =>
             handleCheck(checked, "exutoires")
           }
           aria-label={tPersonnaliser("selectionner-exutoires-de-fumee")}
         />
-        <Label htmlFor="exutoires" className="text-base flex-1">
+        <Label htmlFor="exutoires" className="flex-1 text-base">
           {tPersonnaliser("exutoires-de-fumee")}
         </Label>
         {exutoires && (
@@ -83,14 +83,14 @@ const SecuriteIncendieComplementsInputs = ({
       <div className="flex items-center gap-2">
         <Checkbox
           id="exutoiresParking"
-          className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+          className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
           checked={exutoiresParking}
           onCheckedChange={(checked: boolean) =>
             handleCheck(checked, "exutoiresParking")
           }
           aria-label={tPersonnaliser("selectionner-exutoires-de-fumee-parking")}
         />
-        <Label htmlFor="exutoiresParking" className="text-base flex-1">
+        <Label htmlFor="exutoiresParking" className="flex-1 text-base">
           {tPersonnaliser("exutoires-de-fumee-parking")}
         </Label>
         {exutoiresParking && (
@@ -108,14 +108,14 @@ const SecuriteIncendieComplementsInputs = ({
       <div className="flex items-center gap-2">
         <Checkbox
           id="alarmes"
-          className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+          className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
           checked={alarmes}
           onCheckedChange={(checked: boolean) =>
             handleCheck(checked, "alarmes")
           }
           aria-label={tPersonnaliser("selectionner-alarmes-t4")}
         />
-        <Label htmlFor="alarmes" className="text-base flex-1">
+        <Label htmlFor="alarmes" className="flex-1 text-base">
           {tPersonnaliser("alarmes-t4")}
         </Label>
         {alarmes && (
@@ -133,14 +133,14 @@ const SecuriteIncendieComplementsInputs = ({
       <div className="flex items-center gap-2">
         <Checkbox
           id="portesCoupeFeuBattantes"
-          className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+          className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
           checked={portesCoupeFeuBattantes}
           onCheckedChange={(checked: boolean) =>
             handleCheck(checked, "portesCoupeFeuBattantes")
           }
           aria-label={tPersonnaliser("selectionner-portes-coupe-feu-battantes")}
         />
-        <Label htmlFor="portesCoupeFeuBattantes" className="text-base flex-1">
+        <Label htmlFor="portesCoupeFeuBattantes" className="flex-1 text-base">
           {tPersonnaliser("portes-coupe-feu-battantes")}
         </Label>
         {portesCoupeFeuBattantes && (
@@ -158,18 +158,18 @@ const SecuriteIncendieComplementsInputs = ({
       <div className="flex items-center gap-2">
         <Checkbox
           id="portesCoupeFeuCoulissantes"
-          className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+          className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
           checked={portesCoupeFeuCoulissantes}
           onCheckedChange={(checked: boolean) =>
             handleCheck(checked, "portesCoupeFeuCoulissantes")
           }
           aria-label={tPersonnaliser(
-            "selectionner-portes-coupe-feu-coulissantes"
+            "selectionner-portes-coupe-feu-coulissantes",
           )}
         />
         <Label
           htmlFor="portesCoupeFeuCoulissantes"
-          className="text-base flex-1"
+          className="flex-1 text-base"
         >
           {tPersonnaliser("portes-coupe-feu-coulissantes")}
         </Label>
@@ -188,14 +188,14 @@ const SecuriteIncendieComplementsInputs = ({
       <div className="flex items-center gap-2">
         <Checkbox
           id="colonnesSechesStatiques"
-          className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+          className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
           checked={colonnesSechesStatiques}
           onCheckedChange={(checked: boolean) =>
             handleCheck(checked, "colonnesSechesStatiques")
           }
           aria-label={tPersonnaliser("selectionner-colonnes-seches-statiques")}
         />
-        <Label htmlFor="colonnesSechesStatiques" className="text-base flex-1">
+        <Label htmlFor="colonnesSechesStatiques" className="flex-1 text-base">
           {tPersonnaliser("colonnes-seches-statiques")}
         </Label>
         {colonnesSechesStatiques && (
@@ -213,14 +213,14 @@ const SecuriteIncendieComplementsInputs = ({
       <div className="flex items-center gap-2">
         <Checkbox
           id="colonnesSechesDynamiques"
-          className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+          className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
           checked={colonnesSechesDynamiques}
           onCheckedChange={(checked: boolean) =>
             handleCheck(checked, "colonnesSechesDynamiques")
           }
           aria-label={tPersonnaliser("selectionner-colonnes-seches-dynamiques")}
         />
-        <Label htmlFor="colonnesSechesDynamiques" className="text-base flex-1">
+        <Label htmlFor="colonnesSechesDynamiques" className="flex-1 text-base">
           {tPersonnaliser("colonnes-seches-dynamiques")}
         </Label>
         {colonnesSechesDynamiques && (
@@ -238,12 +238,12 @@ const SecuriteIncendieComplementsInputs = ({
       <div className="flex items-center gap-2">
         <Checkbox
           id="ria"
-          className="data-[state=checked]:text-foreground bg-background data-[state=checked]:bg-background font-bold"
+          className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
           checked={ria}
           onCheckedChange={(checked: boolean) => handleCheck(checked, "ria")}
           aria-label={tPersonnaliser("selectionner-robinets-dincendie-armes")}
         />
-        <Label htmlFor="ria" className="text-base flex-1">
+        <Label htmlFor="ria" className="flex-1 text-base">
           {tPersonnaliser("robinets-dincendie-armes")}
         </Label>
         {ria && (

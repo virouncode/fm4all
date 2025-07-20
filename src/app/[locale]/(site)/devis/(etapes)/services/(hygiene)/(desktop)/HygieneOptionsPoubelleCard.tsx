@@ -49,11 +49,11 @@ type HygieneOptionsPoubelleCardProps = {
       imageUrlParfum: string | null;
       imageUrlBalai: string | null;
       imageUrlPoubelle: string | null;
-    }
+    },
   ) => void;
   handleChangeDistribNbr: (
     e: ChangeEvent<HTMLInputElement>,
-    type: string
+    type: string,
   ) => void;
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
   propositions: {
@@ -97,11 +97,11 @@ const HygieneOptionsPoubelleCard = ({
   const locale = useLocale();
   const { hygiene } = useContext(HygieneContext);
   return (
-    <div className="flex border-b flex-1">
-      <div className="flex w-1/4 items-center justify-center flex-col gap-2 p-2">
+    <div className="flex flex-1 border-b">
+      <div className="flex w-1/4 flex-col items-center justify-center gap-2 p-2">
         <p className="text-base">{tHygiene("poubelle-hygiene-feminine")}</p>
-        <div className="text-sm flex flex-col gap-2">
-          <div className="flex gap-4 items-center justify-center w-full">
+        <div className="flex flex-col gap-2 text-sm">
+          <div className="flex w-full items-center justify-center gap-4">
             <Input
               type="number"
               value={nbDistribPoubelle || ""}
@@ -121,9 +121,9 @@ const HygieneOptionsPoubelleCard = ({
               {tHygiene("receptacles").toLocaleLowerCase()}
             </Label>
           </div>
-          <p className="text-xs text-fm4alldestructive italic px-2 text-center">
+          <p className="px-2 text-center text-xs italic text-fm4alldestructive">
             {t(
-              "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer"
+              "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
             )}
           </p>
         </div>
@@ -134,7 +134,7 @@ const HygieneOptionsPoubelleCard = ({
         if (!proposition.totalPoubelle) {
           return (
             <div
-              className={`flex-1 bg-${color} text-xl font-bold text-slate-200 flex items-center justify-center p-2`}
+              className={`flex-1 bg-${color} flex items-center justify-center p-2 text-xl font-bold text-slate-200`}
               key={"poubelle" + gamme}
             >
               <p>{t("non-propose")}</p>
@@ -143,7 +143,7 @@ const HygieneOptionsPoubelleCard = ({
         }
         const prixMensuelPoubelleText = (
           <p
-            className="font-bold text-xl ml-4"
+            className="ml-4 text-xl font-bold"
             data-testid="total-mensuel-poubelle"
           >
             {formatNumber((proposition.totalPoubelle * MARGE) / 12)}{" "}
@@ -160,7 +160,7 @@ const HygieneOptionsPoubelleCard = ({
           </p>
         );
         const imgProduit = proposition.imageUrlPoubelle ? (
-          <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-100">
+          <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
             <Image
               src={proposition.imageUrlPoubelle}
               alt="illustration-poubelle-hygiene-feminine"
@@ -171,7 +171,7 @@ const HygieneOptionsPoubelleCard = ({
           </div>
         ) : null;
         const infosProduit = (
-          <ul className="flex flex-col text-xs px-4 mx-auto">
+          <ul className="mx-auto flex flex-col px-4 text-xs">
             {locale === "fr" ? (
               <li className="list-check">
                 {tHygiene("receptacles")}{" "}
@@ -206,7 +206,7 @@ const HygieneOptionsPoubelleCard = ({
           </ul>
         );
         const infosProduitDialog = (
-          <ul className="flex flex-col text-sm px-4 mx-auto">
+          <ul className="mx-auto flex flex-col px-4 text-sm">
             {locale === "fr" ? (
               <li className="list-check">
                 {tHygiene("receptacles")}{" "}
@@ -243,7 +243,7 @@ const HygieneOptionsPoubelleCard = ({
 
         return (
           <div
-            className={`flex flex-1 bg-${color} text-slate-200 items-center p-2 justify-center text-xl gap-4 cursor-pointer ${
+            className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-2 text-xl text-slate-200 ${
               hygiene.infos.poubelleGammeSelected === gamme
                 ? "ring-4 ring-inset ring-fm4alldestructive"
                 : ""
@@ -261,7 +261,7 @@ const HygieneOptionsPoubelleCard = ({
               data-testid="poubelle-switch"
             />
             <div>
-              <div className="flex gap-2 items-center">
+              <div className="flex items-center gap-2">
                 {prixMensuelPoubelleText}
                 <Dialog>
                   <DialogTrigger asChild>
@@ -276,7 +276,7 @@ const HygieneOptionsPoubelleCard = ({
                       <DialogTitle>{dialogTitle}</DialogTitle>
                     </DialogHeader>
                     {imgProduit}
-                    <p className="text-xs italic text-end">
+                    <p className="text-end text-xs italic">
                       {t("photo-non-contractuelle")}
                     </p>
                     {infosProduitDialog}

@@ -33,7 +33,7 @@ export const insertUserAction = actionClient
         throw new Error(
           locale === "fr"
             ? "Vous n'avez pas les droits pour créer un compte fournisseur."
-            : "You do not have permission to create a provider account."
+            : "You do not have permission to create a provider account.",
         );
       }
       const existingEmail = await db
@@ -45,7 +45,7 @@ export const insertUserAction = actionClient
         throw new Error(
           locale === "fr"
             ? "Cette adresse email est déjà utilisée par un autre compte utilisateur."
-            : "This email address is already used by another user account."
+            : "This email address is already used by another user account.",
         );
       }
       const tempPassword = generatePassword();
@@ -72,7 +72,7 @@ export const insertUserAction = actionClient
             : `${userInput.name}'s user account has been successfully created.
               An email with a verification link has been sent to ${userInput.email}.`,
       };
-    }
+    },
   );
 
 export const updateUserAction = actionClient
@@ -91,14 +91,14 @@ export const updateUserAction = actionClient
         throw new Error(
           locale === "fr"
             ? "Vous devez être connecté pour mettre à jour vote compte utilisateur."
-            : "You must be logged in to update your user account."
+            : "You must be logged in to update your user account.",
         );
       }
       if (currentUser?.id !== userInput.id) {
         throw new Error(
           locale === "fr"
             ? "Vous n'avez pas les droits pour mettre à jour ce compte utilisateur."
-            : "You do not have permission to update this user account."
+            : "You do not have permission to update this user account.",
         );
       }
       const resultUser = await db
@@ -110,7 +110,7 @@ export const updateUserAction = actionClient
         throw new Error(
           locale === "fr"
             ? "Impossible de mettre à jour le compte utilisateur."
-            : "Unable to update the user account."
+            : "Unable to update the user account.",
         );
       }
       return {
@@ -120,5 +120,5 @@ export const updateUserAction = actionClient
             ? `Votre compte utilisateur a été mis à jour avec succès.`
             : `Your user account has been successfully updated.`,
       };
-    }
+    },
   );

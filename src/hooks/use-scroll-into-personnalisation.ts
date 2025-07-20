@@ -9,7 +9,7 @@ export default function useScrollIntoPersonnalisation() {
     if (isTabletOrMobile) return;
     if (!personnalisation.currentPersonnalisationId) return;
     const currentService = document.getElementById(
-      personnalisation.currentPersonnalisationId.toString()
+      personnalisation.currentPersonnalisationId.toString(),
     );
     if (currentService) {
       currentService.scrollIntoView({ behavior: "smooth", block: "nearest" });

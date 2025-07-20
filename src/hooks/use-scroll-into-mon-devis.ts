@@ -8,7 +8,7 @@ export default function useScrollIntoMonDevis() {
   useEffect(() => {
     if (!isTabletOrMobile || monDevis.currentMonDevisId !== 2) return;
     const currentMonDevis = document.getElementById(
-      monDevis.currentMonDevisId.toString()
+      monDevis.currentMonDevisId.toString(),
     );
     if (currentMonDevis) {
       currentMonDevis.scrollIntoView({ behavior: "smooth", block: "end" });

@@ -23,8 +23,8 @@ const PropositionsTitle = ({
   previousButton = true,
 }: PropositionsTitleProps) => {
   return (
-    <div className="flex flex-col gap-4 lg:gap-0 lg:flex-row justify-between items-center">
-      <div className="flex justify-center lg:justify-start gap-4 items-center p-4 border-2 rounded-xl w-full lg:w-auto text-fm4allsecondary border-fm4allsecondary">
+    <div className="flex flex-col items-center justify-between gap-4 lg:flex-row lg:gap-0">
+      <div className="flex w-full items-center justify-center gap-4 rounded-xl border-2 border-fm4allsecondary p-4 text-fm4allsecondary lg:w-auto lg:justify-start">
         <div className="flex items-center gap-1">
           <Icon />
           {Icon2 && <Icon2 />}
@@ -32,7 +32,7 @@ const PropositionsTitle = ({
         </div>
         <p className="font-bold">{title}</p>
       </div>
-      <p className="text-base flex-1 px-4 hyphens-auto text-wrap">
+      <p className="flex-1 hyphens-auto text-wrap px-4 text-base">
         {description}
       </p>
       <PreviousServiceButton

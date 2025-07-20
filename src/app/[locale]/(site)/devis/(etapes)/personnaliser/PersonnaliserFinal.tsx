@@ -11,7 +11,7 @@ const PersonnaliserFinal = () => {
   const tPersonnaliser = useTranslations("DevisPage.personnaliser");
   const { setDevisProgress } = useContext(DevisProgressContext);
   const { personnalisation, setPersonnalisation } = useContext(
-    PersonnalisationContext
+    PersonnalisationContext,
   );
   const router = useRouter();
   const handleAfficherDevis = () => {
@@ -36,7 +36,7 @@ const PersonnaliserFinal = () => {
 
   return (
     <div
-      className="flex flex-col gap-4 w-full mx-auto h-full py-2 overflow-auto"
+      className="mx-auto flex h-full w-full flex-col gap-4 overflow-auto py-2"
       id="14"
     >
       {!isTabletOrMobile ? (
@@ -44,16 +44,16 @@ const PersonnaliserFinal = () => {
           <PreviousServiceButton handleClickPrevious={handleClickPrevious} />
         </div>
       ) : null}
-      <div className="flex flex-col gap-4 py-6 items-center max-w-prose hyphens-auto mx-auto">
+      <div className="mx-auto flex max-w-prose flex-col items-center gap-4 hyphens-auto py-6">
         <p>
           {tPersonnaliser(
-            "encore-un-doute-sur-une-prestation-besoin-de-precisions-supplementaires"
+            "encore-un-doute-sur-une-prestation-besoin-de-precisions-supplementaires",
           )}
         </p>
         <p className="text-center">{tPersonnaliser("pas-dinquietude")}</p>
         <p>
           {tPersonnaliser(
-            "apres-cette-etape-vous-pourrez-nous-contacter-pour-des-demandes-ou-questions-specifiques-avant-de-valider-votre-contrat"
+            "apres-cette-etape-vous-pourrez-nous-contacter-pour-des-demandes-ou-questions-specifiques-avant-de-valider-votre-contrat",
           )}
         </p>
         <p className="text-center">

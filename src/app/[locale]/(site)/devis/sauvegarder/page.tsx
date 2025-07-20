@@ -13,7 +13,7 @@ export const generateMetadata = async (): Promise<Metadata> => {
     locale === "fr" ? "Sauvegarder ma progression" : "Save my progress",
     locale === "fr"
       ? "Etape 5 du devis: sauvegarder votre progression"
-      : "Quote Step 5: save your progress"
+      : "Quote Step 5: save your progress",
   );
 };
 
@@ -32,17 +32,17 @@ const page = async ({
   }
   if (
     !["bureaux", "localCommercial", "entrepot", "cabinetMedical"].includes(
-      typeBatiment
+      typeBatiment,
     ) ||
     !["partieEtage", "plateauComplet", "batimentEntier"].includes(
-      typeOccupation
+      typeOccupation,
     )
   ) {
     return (
       <section className="flex h-dvh items-center justify-center text-lg">
         <p>
           {tSauver(
-            "les-informations-sur-votre-type-de-batiment-ou-doccupation-ne-sont-pas-valides"
+            "les-informations-sur-votre-type-de-batiment-ou-doccupation-ne-sont-pas-valides",
           )}{" "}
           <Link href="/devis/locaux" className="underline">
             {t("veuillez-reessayer")}
@@ -55,7 +55,7 @@ const page = async ({
 
   return (
     <>
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <h1 className="text-3xl md:text-4xl">
           {tSauver("5-sauvegarder-ma-progression")}
         </h1>

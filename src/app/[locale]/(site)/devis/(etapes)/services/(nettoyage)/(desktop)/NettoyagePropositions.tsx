@@ -131,7 +131,7 @@ const NettoyagePropositions = ({
     // Add the item to the appropriate array
     acc[fournisseurId].push(item);
     acc[fournisseurId].sort(
-      (a, b) => gammes.indexOf(a.gamme) - gammes.indexOf(b.gamme)
+      (a, b) => gammes.indexOf(a.gamme) - gammes.indexOf(b.gamme),
     );
     return acc;
   }, {});
@@ -251,19 +251,19 @@ const NettoyagePropositions = ({
         title: t("fournisseur-selectionne"),
         description: tNettoyage(
           "vous-avez-choisi-nomfournisseur-pour-le-nettoyage-ce-prestataire-ou-son-partenaire-assurera-la-prestation-hygiene-sanitaire",
-          { nomFournisseur }
+          { nomFournisseur },
         ),
       });
     }
 
     //NETTOYAGE
     const repasseTarif = repasseTarifs.find(
-      (tarif) => tarif.fournisseurId === fournisseurId && tarif.gamme === gamme
+      (tarif) => tarif.fournisseurId === fournisseurId && tarif.gamme === gamme,
     );
     const hParPassageRepasse = repasseTarif?.hParPassage ?? null;
     const tauxHoraireRepasse = repasseTarif?.tauxHoraire ?? null;
     const vitrerieTarif = vitrerieTarifs.find(
-      (tarif) => tarif.fournisseurId === fournisseurId
+      (tarif) => tarif.fournisseurId === fournisseurId,
     );
     const tauxHoraireVitrerie = vitrerieTarif?.tauxHoraire ?? null;
     const minFacturationVitrerie = vitrerieTarif?.minFacturation ?? null;
@@ -320,7 +320,7 @@ const NettoyagePropositions = ({
           Math.max(
             ((surface * 0.15) / cadenceVitres) * tauxHoraireVitrerie +
               ((surface * 0.15) / cadenceCloisons) * tauxHoraireVitrerie,
-            minFacturationVitrerie ?? 0
+            minFacturationVitrerie ?? 0,
           )
         : null;
     const totalService = totalAnnuel;
@@ -335,61 +335,61 @@ const NettoyagePropositions = ({
     const hygieneFournisseurId = fournisseurId === 9 ? 12 : fournisseurId;
     const hygieneFournisseurNom = fournisseurId === 9 ? "EPCH" : nomFournisseur;
     const distribsTarifsFournisseur = hygieneDistribTarifs.filter(
-      (tarif) => tarif.fournisseurId === hygieneFournisseurId
+      (tarif) => tarif.fournisseurId === hygieneFournisseurId,
     );
     const consosTarifFournisseur = hygieneConsosTarifs.find(
-      (tarif) => tarif.fournisseurId === hygieneFournisseurId
+      (tarif) => tarif.fournisseurId === hygieneFournisseurId,
     );
     const minFacturationFournisseur = hygieneMinFacturation.find(
-      (tarif) => tarif.fournisseurId === hygieneFournisseurId
+      (tarif) => tarif.fournisseurId === hygieneFournisseurId,
     );
     const prixDistribEmp =
       distribsTarifsFournisseur.find(
         (tarif) =>
           tarif.type === "emp" &&
-          tarif.gamme === hygiene.infos.trilogieGammeSelected
+          tarif.gamme === hygiene.infos.trilogieGammeSelected,
       )?.[hygiene.infos.dureeLocation] ?? null;
     const prixDistribEmpPoubelle =
       distribsTarifsFournisseur.find(
         (tarif) =>
           tarif.type === "poubelleEmp" &&
-          tarif.gamme === hygiene.infos.trilogieGammeSelected
+          tarif.gamme === hygiene.infos.trilogieGammeSelected,
       )?.[hygiene.infos.dureeLocation] ?? null;
     const prixDistribSavon =
       distribsTarifsFournisseur.find(
         (tarif) =>
           tarif.type === "savon" &&
-          tarif.gamme === hygiene.infos.trilogieGammeSelected
+          tarif.gamme === hygiene.infos.trilogieGammeSelected,
       )?.[hygiene.infos.dureeLocation] ?? null;
     const prixDistribPh =
       distribsTarifsFournisseur.find(
         (tarif) =>
           tarif.type === "ph" &&
-          tarif.gamme === hygiene.infos.trilogieGammeSelected
+          tarif.gamme === hygiene.infos.trilogieGammeSelected,
       )?.[hygiene.infos.dureeLocation] ?? null;
     const prixDistribDesinfectant =
       distribsTarifsFournisseur.find(
         (tarif) =>
           tarif.type === "desinfectant" &&
-          tarif.gamme === hygiene.infos.desinfectantGammeSelected
+          tarif.gamme === hygiene.infos.desinfectantGammeSelected,
       )?.[hygiene.infos.dureeLocation] ?? null;
     const prixDistribParfum =
       distribsTarifsFournisseur.find(
         (tarif) =>
           tarif.type === "parfum" &&
-          tarif.gamme === hygiene.infos.parfumGammeSelected
+          tarif.gamme === hygiene.infos.parfumGammeSelected,
       )?.[hygiene.infos.dureeLocation] ?? null;
     const prixDistribBalai =
       distribsTarifsFournisseur.find(
         (tarif) =>
           tarif.type === "balai" &&
-          tarif.gamme === hygiene.infos.balaiGammeSelected
+          tarif.gamme === hygiene.infos.balaiGammeSelected,
       )?.[hygiene.infos.dureeLocation] ?? null;
     const prixDistribPoubelle =
       distribsTarifsFournisseur.find(
         (tarif) =>
           tarif.type === "poubelle" &&
-          tarif.gamme === hygiene.infos.poubelleGammeSelected
+          tarif.gamme === hygiene.infos.poubelleGammeSelected,
       )?.[hygiene.infos.dureeLocation] ?? null;
     const minFacturation = minFacturationFournisseur?.minFacturation ?? null;
 
@@ -402,7 +402,7 @@ const NettoyagePropositions = ({
 
     const prixInstalDistrib =
       hygieneDistribInstalTarifs.find(
-        (tarif) => tarif.fournisseurId === hygieneFournisseurId
+        (tarif) => tarif.fournisseurId === hygieneFournisseurId,
       )?.prixInstallation ?? null;
 
     const nbDistribEmp =

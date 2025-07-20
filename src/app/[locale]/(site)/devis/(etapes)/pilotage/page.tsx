@@ -14,7 +14,7 @@ export const generateMetadata = async (): Promise<Metadata> => {
     locale === "fr" ? "Pilotage Prestations" : "Service Management",
     locale === "fr"
       ? "Etape 4 du devis: pourquoi pas un office manager dans vos locaux ?"
-      : "Quote Step 4: why not have an office manager in your premises?"
+      : "Quote Step 4: why not have an office manager in your premises?",
   );
 };
 
@@ -47,7 +47,7 @@ const page = async ({
       <section className="flex h-dvh items-center justify-center text-lg">
         <p>
           {t(
-            "les-valeurs-de-surface-et-effectif-renseignees-ne-sont-pas-valides"
+            "les-valeurs-de-surface-et-effectif-renseignees-ne-sont-pas-valides",
           )}{" "}
           <Link href="/devis/locaux" className="underline">
             {t("veuillez-reessayer")}
@@ -60,7 +60,7 @@ const page = async ({
 
   return (
     <>
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <h1 className="text-3xl md:text-4xl">
           {tPilotage("4-pilotage-prestations")}
         </h1>

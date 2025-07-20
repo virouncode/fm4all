@@ -31,7 +31,7 @@ export const getMaintenanceQuantites = async (surface: string) => {
       .where(eq(maintenanceQuantites.surface, roundedSurface));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectMaintenanceQuantitesSchema.parse(result)
+      selectMaintenanceQuantitesSchema.parse(result),
     );
     const data = validatedResults.map((result) => ({
       ...result,
@@ -66,12 +66,12 @@ export const getMaintenanceTarifs = async (surface: string) => {
       .from(maintenanceTarifs)
       .innerJoin(
         fournisseurs,
-        eq(fournisseurs.id, maintenanceTarifs.fournisseurId)
+        eq(fournisseurs.id, maintenanceTarifs.fournisseurId),
       )
       .where(eq(maintenanceTarifs.surface, roundedSurface));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectMaintenanceTarifsSchema.parse(result)
+      selectMaintenanceTarifsSchema.parse(result),
     );
     const data = validatedResults.map((result) => ({
       ...result,
@@ -96,7 +96,7 @@ export const getQ18Tarifs = async (surface: string) => {
       .where(eq(q18Tarifs.surface, roundedSurface));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectQ18TarifsSchema.parse(result)
+      selectQ18TarifsSchema.parse(result),
     );
     const data = validatedResults.map((result) => ({
       ...result,
@@ -121,7 +121,7 @@ export const getLegioTarifs = async (surface: string) => {
     if (results.length === 0) return [];
 
     const validatedResults = results.map((result) =>
-      selectLegioTarifsSchema.parse(result)
+      selectLegioTarifsSchema.parse(result),
     );
     const data = validatedResults.map((result) => ({
       ...result,
@@ -145,7 +145,7 @@ export const getQualiteAirTarifs = async (surface: string) => {
       .where(eq(qualiteAirTarifs.surface, roundedSurface));
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectQualiteAirTarifsSchema.parse(result)
+      selectQualiteAirTarifsSchema.parse(result),
     );
     const data = validatedResults.map((result) => ({
       ...result,

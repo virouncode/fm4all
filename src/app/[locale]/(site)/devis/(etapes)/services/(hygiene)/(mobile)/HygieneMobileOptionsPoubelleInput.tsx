@@ -13,7 +13,7 @@ type HygieneMobileOptionsPoubelleInputProps = {
   nbDistribPoubelle: number;
   handleChangeDistribNbr: (
     e: ChangeEvent<HTMLInputElement>,
-    type: string
+    type: string,
   ) => void;
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
   hygieneDistribTarifsFournisseur: {
@@ -75,7 +75,7 @@ const HygieneMobileOptionsPoubelleInput = ({
         hygieneDistribTarifsFournisseur.find(
           (tarif) =>
             tarif.type === "poubelle" &&
-            tarif.gamme === hygiene.infos.poubelleGammeSelected
+            tarif.gamme === hygiene.infos.poubelleGammeSelected,
         )?.[hygiene.infos.dureeLocation] ?? null;
 
       const totalPoubelle =
@@ -103,7 +103,7 @@ const HygieneMobileOptionsPoubelleInput = ({
         hygieneDistribTarifsFournisseur.find(
           (tarif) =>
             tarif.type === "poubelle" &&
-            tarif.gamme === hygiene.infos.poubelleGammeSelected
+            tarif.gamme === hygiene.infos.poubelleGammeSelected,
         )?.[hygiene.infos.dureeLocation] ?? null;
 
       const totalPoubelle =
@@ -119,14 +119,14 @@ const HygieneMobileOptionsPoubelleInput = ({
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="font-bold text-xl">
+      <p className="text-xl font-bold">
         {tHygiene("poubelle-hygiene-feminine")}
       </p>
       <p>
         {t("indiquez-le-nombre-de")}{" "}
         <strong>{tHygiene("receptacles").toLowerCase()}</strong> :
       </p>
-      <div className="flex flex-col w-full p-1 gap-2">
+      <div className="flex w-full flex-col gap-2 p-1">
         <Label htmlFor="nbDistribPoubelle" className="text-sm">
           {tHygiene("nombre-de-receptacles")}
         </Label>
@@ -166,7 +166,7 @@ const HygieneMobileOptionsPoubelleInput = ({
 
         <p className="text-xs italic text-fm4alldestructive">
           {t(
-            "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer"
+            "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
           )}
         </p>
       </div>

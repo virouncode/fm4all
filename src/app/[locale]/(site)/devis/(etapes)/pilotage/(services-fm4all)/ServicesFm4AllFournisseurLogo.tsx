@@ -15,12 +15,12 @@ const ServicesFm4AllFournisseurLogo = () => {
         <TooltipTrigger asChild>
           <div className="flex w-1/4 items-center justify-center p-4">
             {logoFournisseurUrl ? (
-              <div className="w-full h-full relative">
+              <div className="relative h-full w-full">
                 <Image
                   src={logoFournisseurUrl}
                   alt={`logo-de-fm4All`}
                   fill={true}
-                  className="w-full h-full object-contain"
+                  className="h-full w-full object-contain"
                   quality={100}
                 />
               </div>

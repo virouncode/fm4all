@@ -132,36 +132,36 @@ const SnacksFruitsMobilePropositionCard = ({
   const totalMensuelSansRemiseText =
     proposition.totalSansRemise &&
     proposition.totalSansRemise !== proposition.total ? (
-      <p className="text-sm font-bold text-end line-through">
+      <p className="text-end text-sm font-bold line-through">
         {formatNumber((proposition.totalSansRemise * MARGE) / 12)}{" "}
         {t("euros-mois")}
       </p>
     ) : null;
   const totalMensuelText =
     snacksFruits.infos.choix.includes("fruits") && !proposition.prixKgFruits ? (
-      <p className="text-sm font-bold text-end">
+      <p className="text-end text-sm font-bold">
         {t("non-propose-pour-ces-criteres")}
       </p>
     ) : snacksFruits.infos.choix.includes("snacks") &&
       !proposition.prixUnitaireSnacks ? (
-      <p className="text-sm font-bold text-end">
+      <p className="text-end text-sm font-bold">
         {t("non-propose-pour-ces-criteres")}
       </p>
     ) : snacksFruits.infos.choix.includes("boissons") &&
       !proposition.prixUnitaireBoissons ? (
-      <p className="text-sm font-bold text-end">
+      <p className="text-end text-sm font-bold">
         {t("non-propose-pour-ces-criteres")}
       </p>
     ) : total ? (
       <div className="flex flex-col">
         {totalMensuelSansRemiseText}
-        <p className="text-sm font-bold text-end">
+        <p className="text-end text-sm font-bold">
           {formatNumber((total * MARGE) / 12)} {t("euros-mois")}
           {totalMensuelSansRemiseText ? "*" : null}
         </p>
       </div>
     ) : (
-      <p className="text-sm font-bold text-end">
+      <p className="text-end text-sm font-bold">
         {tSnacks("panier-minimum-hebdomadaire-non-atteint", {
           panierMin: proposition.panierMin
             ? `(${Math.round(proposition.panierMin * MARGE * S_PAR_MOIS)} ${t("euros-mois")} ${tSnacks("cafe-compris")})`
@@ -170,7 +170,7 @@ const SnacksFruitsMobilePropositionCard = ({
       </p>
     );
   const gFruitsParSemaineParPersonneText = snacksFruits.infos.choix.includes(
-    "fruits"
+    "fruits",
   ) ? (
     <li className="list-check">
       {proposition.gFruitsParSemaineParPersonne} {tSnacks("g-personne-semaine")}
@@ -204,7 +204,7 @@ const SnacksFruitsMobilePropositionCard = ({
   );
 
   const infosProduit = (
-    <ul className="flex flex-col text-xs px-4 w-2/3">
+    <ul className="flex w-2/3 flex-col px-4 text-xs">
       {gFruitsParSemaineParPersonneText}
       {portionsSnacksParSemaineParPersonneText}
       {consosBoissonsParSemaineParPersonneText}
@@ -212,7 +212,7 @@ const SnacksFruitsMobilePropositionCard = ({
   );
 
   const infosProduitDialog = (
-    <ul className="flex flex-col text-sm px-4 mx-auto">
+    <ul className="mx-auto flex flex-col px-4 text-sm">
       {gFruitsParSemaineParPersonneText}
       {portionsSnacksParSemaineParPersonneText}
       {consosBoissonsParSemaineParPersonneText}
@@ -220,12 +220,12 @@ const SnacksFruitsMobilePropositionCard = ({
   );
 
   const imgProduit = (
-    <div className="w-1/3 h-full relative rounded-xl overflow-hidden bg-slate-100">
+    <div className="relative h-full w-1/3 overflow-hidden rounded-xl bg-slate-100">
       <Image
         src={"/img/services/snacks-fruits.webp"}
         alt={`illustration de nettoyage`}
         fill={true}
-        className="object-contain cursor-pointer"
+        className="cursor-pointer object-contain"
         quality={100}
       />
     </div>
@@ -233,7 +233,7 @@ const SnacksFruitsMobilePropositionCard = ({
 
   const imgProduitDialog = (
     <div className="flex items-center justify-between gap-2">
-      <div className="w-full h-40 relative mx-auto rounded-lg border-slate-300 border bg-slate-100 overflow-hidden">
+      <div className="relative mx-auto h-40 w-full overflow-hidden rounded-lg border border-slate-300 bg-slate-100">
         <Image
           src="/img/services/fruits.webp"
           alt="illustration-corbeille-fruits"
@@ -242,7 +242,7 @@ const SnacksFruitsMobilePropositionCard = ({
           className="object-cover"
         />
       </div>
-      <div className="w-full h-40 relative mx-auto rounded-lg border-slate-300 border bg-slate-100 overflow-hidden">
+      <div className="relative mx-auto h-40 w-full overflow-hidden rounded-lg border border-slate-300 bg-slate-100">
         <Image
           src="/img/services/snacks.webp"
           alt="illustration-snacks"
@@ -251,7 +251,7 @@ const SnacksFruitsMobilePropositionCard = ({
           className="object-cover"
         />
       </div>
-      <div className="w-full h-40 relative mx-auto rounded-lg border-slate-300 border bg-slate-100 overflow-hidden">
+      <div className="relative mx-auto h-40 w-full overflow-hidden rounded-lg border border-slate-300 bg-slate-100">
         <Image
           src="/img/services/boissons.webp"
           alt="illustration-boissons"
@@ -266,46 +266,46 @@ const SnacksFruitsMobilePropositionCard = ({
   return (
     <CarouselItem>
       <div
-        className={`bg-${color} flex flex-col h-56 border border-slate-200 rounded-xl p-4 text-white  ${
+        className={`bg-${color} flex h-56 flex-col rounded-xl border border-slate-200 p-4 text-white ${
           snacksFruits.infos.fournisseurId === fournisseurId &&
           snacksFruits.infos.gammeSelected === gamme
             ? "ring-4 ring-inset ring-fm4alldestructive"
             : ""
         }`}
       >
-        <div className="flex items-center h-1/2 gap-2 border-b pb-2 border-slate-200">
+        <div className="flex h-1/2 items-center gap-2 border-b border-slate-200 pb-2">
           <Dialog>
             <DialogTrigger asChild>{imgProduit}</DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
+            <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
               <DialogHeader>
                 <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
               <div className="flex flex-col gap-4">
                 {imgProduitDialog}
-                <p className="text-xs italic text-end">
+                <p className="text-end text-xs italic">
                   {t("photo-non-contractuelle")}
                 </p>
                 {infosProduitDialog}
               </div>
             </DialogContent>
           </Dialog>
-          <div className="w-2/3 flex flex-col gap-1 h-full">
-            <p className="font-bold text-sm">{nomFournisseur}</p>
+          <div className="flex h-full w-2/3 flex-col gap-1">
+            <p className="text-sm font-bold">{nomFournisseur}</p>
             <Dialog>
               <DialogTrigger asChild>
                 {logoUrl ? (
-                  <div className="h-10 relative">
+                  <div className="relative h-10">
                     <Image
                       src={logoUrl}
                       alt={`logo-de-${nomFournisseur}`}
                       fill={true}
-                      className="object-contain object-left cursor-pointer"
+                      className="cursor-pointer object-contain object-left"
                       quality={100}
                     />
                   </div>
                 ) : null}
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
+              <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
                 <DialogHeader>
                   <DialogTitle>{nomFournisseur}</DialogTitle>
                 </DialogHeader>
@@ -333,13 +333,13 @@ const SnacksFruitsMobilePropositionCard = ({
           </div>
         </div>
         <div
-          className="flex h-1/2 pt-2 justify-between"
+          className="flex h-1/2 justify-between pt-2"
           onClick={
             isClickable ? () => handleClickProposition(proposition) : undefined
           }
         >
           {infosProduit}
-          <div className="flex flex-col gap-2 items-end w-1/3">
+          <div className="flex w-1/3 flex-col items-end gap-2">
             {totalMensuelText}
             {isClickable ? (
               <Switch

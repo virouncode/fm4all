@@ -9,7 +9,7 @@ export default function useScrollIntoManagement() {
   useEffect(() => {
     if (isTabletOrMobile) return;
     const currentManagement = document.getElementById(
-      management.currentManagementId.toString()
+      management.currentManagementId.toString(),
     );
     if (currentManagement) {
       currentManagement.scrollIntoView({

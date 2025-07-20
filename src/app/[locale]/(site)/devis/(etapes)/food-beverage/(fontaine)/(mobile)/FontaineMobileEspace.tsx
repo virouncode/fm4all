@@ -26,7 +26,7 @@ const FontaineMobileEspace = ({
   const { fontaines, setFontaines } = useContext(FontainesContext);
   const { setTotalFontaines } = useContext(TotalFontainesContext);
   const fontainesEspacesIds = fontaines.espaces.map(
-    (espace) => espace.infos.espaceId
+    (espace) => espace.infos.espaceId,
   );
 
   const handleClickRemove = () => {
@@ -51,7 +51,7 @@ const FontaineMobileEspace = ({
       return;
     }
     const indexOfCurrentEspace = fontainesEspacesIds.indexOf(
-      espace.infos.espaceId
+      espace.infos.espaceId,
     );
     setFontaines((prev) => ({
       ...prev,
@@ -60,12 +60,12 @@ const FontaineMobileEspace = ({
         currentEspaceId: fontainesEspacesIds[indexOfCurrentEspace - 1],
       },
       espaces: prev.espaces.filter(
-        (item) => item.infos.espaceId !== espace.infos.espaceId
+        (item) => item.infos.espaceId !== espace.infos.espaceId,
       ),
     }));
     setTotalFontaines((prev) => ({
       totalEspaces: prev.totalEspaces.filter(
-        (item) => item.espaceId !== espace.infos.espaceId
+        (item) => item.espaceId !== espace.infos.espaceId,
       ),
     }));
   };
@@ -85,7 +85,7 @@ const FontaineMobileEspace = ({
 
   return (
     <div
-      className="h-full flex flex-col overflow-hidden gap-4 mt-10"
+      className="mt-10 flex h-full flex-col gap-4 overflow-hidden"
       id={`espace_${espace.infos.espaceId}`}
     >
       <div className="flex items-center justify-between">

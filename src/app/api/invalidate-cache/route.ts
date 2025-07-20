@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     console.error("Erreur lors de l'invalidation du cache:", error);
     return NextResponse.json(
       { success: false, error: "Erreur d'invalidation" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

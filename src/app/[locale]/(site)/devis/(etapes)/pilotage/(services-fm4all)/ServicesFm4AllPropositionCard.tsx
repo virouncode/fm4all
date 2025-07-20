@@ -74,13 +74,13 @@ const ServicesFm4AllPropositionCard = ({
   const color = getFm4AllColor(gamme);
   const totalMensuelSansRemiseText =
     proposition.totalAnnuelSansRemise !== proposition.totalAnnuel ? (
-      <p className="font-bold text-xl ml-4 line-through">
+      <p className="ml-4 text-xl font-bold line-through">
         {formatNumber(proposition.totalAnnuelSansRemise / 12)} {t("euros-mois")}
       </p>
     ) : null;
   const totalMensuelText = (
     <p
-      className="font-bold text-xl ml-4"
+      className="ml-4 text-xl font-bold"
       data-testid={`total-mensuel-services-fm4all-${gamme}`}
     >
       <span>
@@ -102,7 +102,7 @@ const ServicesFm4AllPropositionCard = ({
   );
 
   const imgProduit = (
-    <div className="w-full h-64 relative mx-auto rounded-lg border-slate-300 border bg-slate-100">
+    <div className="relative mx-auto h-64 w-full rounded-lg border border-slate-300 bg-slate-100">
       <Image
         src={"/img/services/fm4all.webp"}
         alt={`illustration de pilotes fm4all`}
@@ -115,7 +115,7 @@ const ServicesFm4AllPropositionCard = ({
 
   const infosProduit =
     gamme === "essentiel" ? (
-      <ul className="flex flex-col text-xs px-4 mx-auto">
+      <ul className="mx-auto flex flex-col px-4 text-xs">
         <li className="list-check">{tFm4all("acces-services")}</li>
         <li className="list-check">
           {tFm4all("frais-bancaires-and-assurance")}
@@ -127,7 +127,7 @@ const ServicesFm4AllPropositionCard = ({
         </li>
       </ul>
     ) : gamme === "confort" ? (
-      <ul className="flex flex-col text-xs px-4 mx-auto">
+      <ul className="mx-auto flex flex-col px-4 text-xs">
         <li className="list-check">{tFm4all("acces-services")}</li>
         <li className="list-check">
           {tFm4all("frais-bancaires-and-assurance")}
@@ -146,7 +146,7 @@ const ServicesFm4AllPropositionCard = ({
         <li className="list-check">{tFm4all("reporting-personnalise")}</li>
       </ul>
     ) : (
-      <ul className="flex flex-col text-xs px-4 mx-auto">
+      <ul className="mx-auto flex flex-col px-4 text-xs">
         <li className="list-check">{tFm4all("acces-services")}</li>
         <li className="list-check">
           {tFm4all("frais-bancaires-and-assurance")}
@@ -174,7 +174,7 @@ const ServicesFm4AllPropositionCard = ({
 
   const infosProduitDialog =
     gamme === "essentiel" ? (
-      <ul className="flex flex-col text-sm px-4 mx-auto">
+      <ul className="mx-auto flex flex-col px-4 text-sm">
         <li className="list-check">{tFm4all("acces-services")}</li>
         <li className="list-check">
           {tFm4all("frais-bancaires-and-assurance")}
@@ -186,7 +186,7 @@ const ServicesFm4AllPropositionCard = ({
         </li>
       </ul>
     ) : gamme === "confort" ? (
-      <ul className="flex flex-col text-sm px-4 mx-auto">
+      <ul className="mx-auto flex flex-col px-4 text-sm">
         <li className="list-check">{tFm4all("acces-services")}</li>
         <li className="list-check">
           {tFm4all("frais-bancaires-and-assurance")}
@@ -205,7 +205,7 @@ const ServicesFm4AllPropositionCard = ({
         <li className="list-check">{tFm4all("reporting-personnalise")}</li>
       </ul>
     ) : (
-      <ul className="flex flex-col text-sm px-4 mx-auto">
+      <ul className="mx-auto flex flex-col px-4 text-sm">
         <li className="list-check">{tFm4all("acces-services")}</li>
         <li className="list-check">
           {tFm4all("frais-bancaires-and-assurance")}
@@ -233,11 +233,11 @@ const ServicesFm4AllPropositionCard = ({
 
   return (
     <div
-      className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4 cursor-pointer ${
+      className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-4 text-2xl text-slate-200 ${
         servicesFm4All.infos.gammeSelected === gamme
           ? "ring-4 ring-inset ring-fm4alldestructive"
           : ""
-      } ${!total ? "opacity-50 pointer-events-none" : ""}`}
+      } ${!total ? "pointer-events-none opacity-50" : ""}`}
       onClick={() => handleClickProposition(proposition)}
     >
       <Switch
@@ -248,7 +248,7 @@ const ServicesFm4AllPropositionCard = ({
         data-testid={`services-fm4all-switch-${gamme}`}
       />
       <div>
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center gap-2">
           <div className="flex flex-col gap-2">
             {totalMensuelSansRemiseText}
             {totalMensuelText}
@@ -266,7 +266,7 @@ const ServicesFm4AllPropositionCard = ({
                 <DialogTitle>{dialogTitle}</DialogTitle>
               </DialogHeader>
               {imgProduit}
-              <p className="text-xs italic text-end">
+              <p className="text-end text-xs italic">
                 {t("photo-non-contractuelle")}
               </p>
               {infosProduitDialog}

@@ -21,14 +21,14 @@ const OfficeManagerFournisseurLogo = ({
     <TooltipProvider delayDuration={0}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className="flex items-center justify-center p-4 h-1/2 w-full">
+          <div className="flex h-1/2 w-full items-center justify-center p-4">
             {logoUrl ? (
-              <div className="w-full h-full relative">
+              <div className="relative h-full w-full">
                 <Image
                   src={logoUrl}
                   alt={`logo-de-${nomFournisseur}`}
                   fill={true}
-                  className="w-full h-full object-contain"
+                  className="h-full w-full object-contain"
                   quality={100}
                 />
               </div>

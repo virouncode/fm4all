@@ -46,13 +46,13 @@ const SnacksFruitsPropositions = ({
 
   //Calcul des propositions
   const fruitsTarifsPourNbPersonnes = fruitsTarifs.filter(
-    (item) => item.effectif === roundEffectif(nbPersonnes)
+    (item) => item.effectif === roundEffectif(nbPersonnes),
   );
   const snacksTarifsPourNbPersonnes = snacksTarifs.filter(
-    (item) => item.effectif === roundEffectif(nbPersonnes)
+    (item) => item.effectif === roundEffectif(nbPersonnes),
   );
   const boissonsTarifsPourNbPersonnes = boissonsTarifs.filter(
-    (item) => item.effectif === roundEffectif(nbPersonnes)
+    (item) => item.effectif === roundEffectif(nbPersonnes),
   );
 
   const propositions = fruitsTarifsPourNbPersonnes.map((item) => {
@@ -96,7 +96,7 @@ const SnacksFruitsPropositions = ({
       gFruitsParSemaineParPersonne !== null && minKgFruitsParSemaine !== null
         ? Math.max(
             (gFruitsParSemaineParPersonne * nbPersonnes) / 1000,
-            minKgFruitsParSemaine
+            minKgFruitsParSemaine,
           )
         : null;
 
@@ -105,7 +105,7 @@ const SnacksFruitsPropositions = ({
       minPortionsSnacksParSemaine !== null
         ? Math.max(
             portionsSnacksParSemaineParPersonne * nbPersonnes,
-            minPortionsSnacksParSemaine
+            minPortionsSnacksParSemaine,
           )
         : null;
     const boissonsConsosParSemaine =
@@ -113,7 +113,7 @@ const SnacksFruitsPropositions = ({
       minConsosBoissonsParSemaine !== null
         ? Math.max(
             consosBoissonsParSemaineParPersonne * nbPersonnes,
-            minConsosBoissonsParSemaine
+            minConsosBoissonsParSemaine,
           )
         : null;
     const isSameFournisseur = fournisseurId === cafe.infos.fournisseurId;
@@ -123,12 +123,12 @@ const SnacksFruitsPropositions = ({
     const prixUnitaireSnacks =
       snacksTarifsPourNbPersonnes.find(
         (tarif) =>
-          tarif.gamme === gamme && tarif.fournisseurId === fournisseurId
+          tarif.gamme === gamme && tarif.fournisseurId === fournisseurId,
       )?.prixUnitaire ?? null;
     const prixUnitaireBoissons =
       boissonsTarifsPourNbPersonnes.find(
         (tarif) =>
-          tarif.gamme === gamme && tarif.fournisseurId === fournisseurId
+          tarif.gamme === gamme && tarif.fournisseurId === fournisseurId,
       )?.prixUnitaire ?? null;
 
     //Prix panier
@@ -156,7 +156,7 @@ const SnacksFruitsPropositions = ({
 
     //Prix livraison / panier
     const fraisLivraisonsFournisseur = foodLivraisonTarifs.find(
-      (tarif) => tarif.fournisseurId === fournisseurId
+      (tarif) => tarif.fournisseurId === fournisseurId,
     );
     const remiseSiCafe = isSameFournisseur
       ? (fraisLivraisonsFournisseur?.remiseSiCafe ?? 0)
@@ -294,7 +294,7 @@ const SnacksFruitsPropositions = ({
     // Add the item to the appropriate array
     acc[fournisseurId].push(item);
     acc[fournisseurId].sort(
-      (a, b) => gammes.indexOf(a.gamme) - gammes.indexOf(b.gamme)
+      (a, b) => gammes.indexOf(a.gamme) - gammes.indexOf(b.gamme),
     );
     return acc;
   }, {});

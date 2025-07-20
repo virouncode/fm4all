@@ -11,12 +11,12 @@ import PropositionsTitle from "../../../PropositionsTitle";
 const PersonnaliserOfficeManagerCommentaires = () => {
   const { officeManager, setOfficeManager } = useContext(OfficeManagerContext);
   const { personnalisation, setPersonnalisation } = useContext(
-    PersonnalisationContext
+    PersonnalisationContext,
   );
   const router = useRouter();
   const handleClickPrevious = () => {
     const currentIndex = personnalisation.personnalisationIds.indexOf(
-      personnalisation.currentPersonnalisationId as number
+      personnalisation.currentPersonnalisationId as number,
     );
     setPersonnalisation((prev) => ({
       ...prev,
@@ -26,7 +26,7 @@ const PersonnaliserOfficeManagerCommentaires = () => {
   };
   const handleClickNext = () => {
     const currentIndex = personnalisation.personnalisationIds.indexOf(
-      personnalisation.currentPersonnalisationId as number
+      personnalisation.currentPersonnalisationId as number,
     );
     if (currentIndex + 1 === personnalisation.personnalisationIds.length) {
       setPersonnalisation((prev) => ({
@@ -56,14 +56,14 @@ const PersonnaliserOfficeManagerCommentaires = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="11">
+    <div className="mx-auto flex h-full w-full flex-col gap-4 py-2" id="11">
       <PropositionsTitle
         title="Office Manager"
         description=""
         icon={UserRoundCog}
         handleClickPrevious={handleClickPrevious}
       />
-      <div className="w-full flex-1 flex flex-col gap-6">
+      <div className="flex w-full flex-1 flex-col gap-6">
         <p className="text-2xl">Commentaires et remarques</p>
         <Label htmlFor="commentaires-officeManager" className="text-base">
           Ajoutez des précisions pour le service d&apos;Office Manager :
@@ -71,7 +71,7 @@ const PersonnaliserOfficeManagerCommentaires = () => {
         <Textarea
           id="commentaires-officeManager"
           onChange={handleChange}
-          className="resize-none flex-1"
+          className="flex-1 resize-none"
           value={officeManager.infos.commentaires ?? ""}
         />
       </div>

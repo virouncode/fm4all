@@ -48,9 +48,9 @@ const HeaderFournisseur = () => {
     setIsMobileNavOpen(false);
   };
   return (
-    <div className="w-full sticky top-0 h-16 bg-background z-50 shadow">
-      <header className="max-w-7xl h-full flex justify-between items-center p-6 mx-auto">
-        <div className="flex items-center gap-6 flex-1">
+    <div className="sticky top-0 z-50 h-16 w-full bg-background shadow">
+      <header className="mx-auto flex h-full max-w-7xl items-center justify-between p-6">
+        <div className="flex flex-1 items-center gap-6">
           <div className="relative h-[23px] w-[100px]">
             <Link href="/">
               <Image
@@ -62,11 +62,11 @@ const HeaderFournisseur = () => {
               />
             </Link>
           </div>
-          <nav className="hidden xl:flex items-center gap-14 justify-center flex-1">
+          <nav className="hidden flex-1 items-center justify-center gap-14 xl:flex">
             <div
-              className={`flex gap-1 items-center ${
+              className={`flex items-center gap-1 ${
                 isActive("/fournisseur/[fournisseurId]")
-                  ? "text-destructive font-bold"
+                  ? "font-bold text-destructive"
                   : ""
               }`}
             >
@@ -81,9 +81,9 @@ const HeaderFournisseur = () => {
               </Link>
             </div>
             <div
-              className={`flex gap-1 items-center ${
+              className={`flex items-center gap-1 ${
                 isActive("/fournisseur/[fournisseurId]/profil")
-                  ? "text-destructive font-bold"
+                  ? "font-bold text-destructive"
                   : ""
               }`}
             >
@@ -98,9 +98,9 @@ const HeaderFournisseur = () => {
               </Link>
             </div>
             <div
-              className={`flex gap-1 items-center ${
+              className={`flex items-center gap-1 ${
                 isActive("/fournisseur/[fournisseurId]/tarifs")
-                  ? "text-destructive font-bold"
+                  ? "font-bold text-destructive"
                   : ""
               }`}
             >
@@ -115,9 +115,9 @@ const HeaderFournisseur = () => {
               </Link>
             </div>
             <div
-              className={`flex gap-1 items-center ${
+              className={`flex items-center gap-1 ${
                 isActive("/fournisseur/[fournisseurId]/produits")
-                  ? "text-destructive font-bold"
+                  ? "font-bold text-destructive"
                   : ""
               }`}
             >
@@ -151,20 +151,20 @@ const HeaderFournisseur = () => {
           )}
         </div>
         <div
-          className={`flex items-center justify-center fixed top-16 left-0 right-0 bg-background shadow-lg h-[calc(100vh-4rem)] text-2xl  ${
+          className={`fixed left-0 right-0 top-16 flex h-[calc(100vh-4rem)] items-center justify-center bg-background text-2xl shadow-lg ${
             isMobileNavOpen
               ? "translate-x-0 opacity-100"
               : "translate-x-full opacity-0"
-          } transition-all ease-in-out duration-300`}
+          } transition-all duration-300 ease-in-out`}
           role="navigation"
           aria-label="Mobile navigation"
         >
-          <LocaleButton className="absolute top-10 left-6 flex gap-1" />
+          <LocaleButton className="absolute left-6 top-10 flex gap-1" />
           <div className="flex flex-col gap-4">
-            <div className="flex-1 flex flex-col gap-4 ">
+            <div className="flex flex-1 flex-col gap-4">
               <div
-                className={`flex gap-4 items-center ${
-                  isActive("/") ? "text-destructive font-bold" : ""
+                className={`flex items-center gap-4 ${
+                  isActive("/") ? "font-bold text-destructive" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
@@ -172,8 +172,8 @@ const HeaderFournisseur = () => {
                 <Link href="/">{t("home")}</Link>
               </div>
               <div
-                className={`flex gap-4 items-center ${
-                  isActive("/services") ? "text-destructive font-bold" : ""
+                className={`flex items-center gap-4 ${
+                  isActive("/services") ? "font-bold text-destructive" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
@@ -181,8 +181,8 @@ const HeaderFournisseur = () => {
                 <Link href="/services">{t("nos-services")}</Link>
               </div>
               <div
-                className={`flex gap-4 items-center ${
-                  isActive("/gammes") ? "text-destructive font-bold" : ""
+                className={`flex items-center gap-4 ${
+                  isActive("/gammes") ? "font-bold text-destructive" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
@@ -190,8 +190,8 @@ const HeaderFournisseur = () => {
                 <Link href="/gammes">{t("nos-3-gammes")}</Link>
               </div>
               <div
-                className={`flex gap-4 items-center ${
-                  isActive("/engagements") ? "text-destructive font-bold" : ""
+                className={`flex items-center gap-4 ${
+                  isActive("/engagements") ? "font-bold text-destructive" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
@@ -199,8 +199,8 @@ const HeaderFournisseur = () => {
                 <Link href="/engagements">{t("nos-engagements")}</Link>
               </div>
               <div
-                className={`flex gap-4 items-center ${
-                  isActive("/partenaires") ? "text-destructive font-bold" : ""
+                className={`flex items-center gap-4 ${
+                  isActive("/partenaires") ? "font-bold text-destructive" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
@@ -217,8 +217,8 @@ const HeaderFournisseur = () => {
                 <Link href="/faq">FAQ</Link>
               </div> */}
               <div
-                className={`hidden max-[600px]:flex gap-4 items-center ${
-                  isActive("/prestataire") ? "text-destructive font-bold" : ""
+                className={`hidden items-center gap-4 max-[600px]:flex ${
+                  isActive("/prestataire") ? "font-bold text-destructive" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
@@ -226,8 +226,8 @@ const HeaderFournisseur = () => {
                 <Link href="/prestataire">{t("devenir-prestataire")}</Link>
               </div>
               <div
-                className={`hidden max-[600px]:flex gap-4 items-center ${
-                  isActive("/contact") ? "text-destructive font-bold" : ""
+                className={`hidden items-center gap-4 max-[600px]:flex ${
+                  isActive("/contact") ? "font-bold text-destructive" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
@@ -235,8 +235,8 @@ const HeaderFournisseur = () => {
                 <Link href="/contact">{t("nous-contacter")}</Link>
               </div>
               <div
-                className={`hidden max-[600px]:flex gap-4 items-center ${
-                  isActive("/login") ? "text-destructive font-bold" : ""
+                className={`hidden items-center gap-4 max-[600px]:flex ${
+                  isActive("/login") ? "font-bold text-destructive" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >

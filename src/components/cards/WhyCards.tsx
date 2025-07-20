@@ -12,28 +12,28 @@ const WhyCards = ({ className }: WhyCardProps) => {
     {
       title: t("simplicite"),
       content: t(
-        "3-gammes-de-services-standardisees-pour-une-comparaison-et-un-choix-faciles"
+        "3-gammes-de-services-standardisees-pour-une-comparaison-et-un-choix-faciles",
       ),
       icon: Feather,
     },
     {
       title: t("rapidite"),
       content: t(
-        "devis-personnalises-en-ligne-en-quelques-minutes-pret-a-demarrer"
+        "devis-personnalises-en-ligne-en-quelques-minutes-pret-a-demarrer",
       ),
       icon: Rabbit,
     },
     {
       title: t("fiabilite"),
       content: t(
-        "contrats-clairs-et-partenaires-de-confiance-rigoureusement-selectionnes"
+        "contrats-clairs-et-partenaires-de-confiance-rigoureusement-selectionnes",
       ),
       icon: Handshake,
     },
     {
       title: t("serenite"),
       content: t(
-        "centralisation-des-demandes-du-suivi-qualite-et-des-escalades-pour-une-tranquillite-desprit-garantie"
+        "centralisation-des-demandes-du-suivi-qualite-et-des-escalades-pour-une-tranquillite-desprit-garantie",
       ),
       icon: Waves,
     },

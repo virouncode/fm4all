@@ -19,14 +19,14 @@ export async function invalidateCacheTag(tag: CACHE_TAG | CACHE_TAG_RESULT) {
   } catch (error) {
     console.error(
       `Erreur lors de l'invalidation du cache pour le tag: ${tag}`,
-      error
+      error,
     );
     return false;
   }
 }
 
 export async function invalidateCacheTags(
-  tags: (CACHE_TAG | CACHE_TAG_RESULT)[]
+  tags: (CACHE_TAG | CACHE_TAG_RESULT)[],
 ) {
   try {
     await pusherServer.trigger(CACHE_CHANNEL, CACHE_EVENT, {
@@ -38,7 +38,7 @@ export async function invalidateCacheTags(
   } catch (error) {
     console.error(
       `Erreur lors de l'invalidation du cache pour les tags: ${tags.join(", ")}`,
-      error
+      error,
     );
     return false;
   }
@@ -52,7 +52,7 @@ export const CACHE_INVALIDATION = {
 
 export async function invalidateCacheTagsWithData(
   tags: (CACHE_TAG | CACHE_TAG_RESULT)[],
-  data: CacheInvalidationData
+  data: CacheInvalidationData,
 ) {
   try {
     await pusherServer.trigger(CACHE_CHANNEL, CACHE_EVENT, {
@@ -61,13 +61,13 @@ export async function invalidateCacheTagsWithData(
       timestamp: Date.now(),
     });
     console.log(
-      `Cache invalidé avec succès pour les tags: ${tags.join(", ")} avec données`
+      `Cache invalidé avec succès pour les tags: ${tags.join(", ")} avec données`,
     );
     return true;
   } catch (error) {
     console.error(
       `Erreur lors de l'invalidation du cache pour les tags: ${tags.join(", ")}`,
-      error
+      error,
     );
     return false;
   }

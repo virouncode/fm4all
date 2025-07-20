@@ -44,7 +44,7 @@ const TotalOfficeManagerProvider = ({ children }: PropsWithChildren) => {
     if (isMounted) {
       localStorage.setItem(
         "totalOfficeManager",
-        JSON.stringify(totalOfficeManager)
+        JSON.stringify(totalOfficeManager),
       );
     }
   }, [totalOfficeManager, isMounted]);

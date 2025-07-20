@@ -53,15 +53,15 @@ const PropositionsTitleMobile = ({
   return (
     <>
       <div
-        className="py-2 sticky top-[7.6rem] bg-white z-[15] cursor-pointer"
+        className="sticky top-[7.6rem] z-[15] cursor-pointer bg-white py-2"
         onClick={handleClickTitle}
         ref={containerRef}
       >
         <div
-          className="flex items-center p-4 justify-between border-2 rounded-xl w-full text-fm4allsecondary border-fm4allsecondary font-bold"
+          className="flex w-full items-center justify-between rounded-xl border-2 border-fm4allsecondary p-4 font-bold text-fm4allsecondary"
           ref={titleRef}
         >
-          <div className="flex-1 flex items-center  gap-4">
+          <div className="flex flex-1 items-center gap-4">
             <div className="flex items-center gap-1">
               <Icon />
               {Icon2 && <Icon2 />}
@@ -78,7 +78,7 @@ const PropositionsTitleMobile = ({
         </div>
       </div>
       <p
-        className="text-base flex-1 px-4 hyphens-auto text-wrap"
+        className="flex-1 hyphens-auto text-wrap px-4 text-base"
         ref={descriptionRef}
       >
         {description}

@@ -22,7 +22,7 @@ type HygieneDistribQuantitesInputsProps = {
   hygieneDistribTarifs: SelectHygieneDistribTarifsType[];
   handleChangeDistribNbr: (
     e: React.ChangeEvent<HTMLInputElement>,
-    key: string
+    key: string,
   ) => void;
   handleChangeDureeLocation: (value: DureeLocationHygieneType) => void;
   nbDistribEmp: number;
@@ -46,8 +46,8 @@ const HygieneDistribQuantitesInputs = ({
   const tLocation = useTranslations("DevisPage.location");
   const { hygiene } = useContext(HygieneContext);
   return (
-    <div className="flex flex-col gap-6 w-full">
-      <div className="flex gap-4 items-center w-full">
+    <div className="flex w-full flex-col gap-6">
+      <div className="flex w-full items-center gap-4">
         <Input
           type="number"
           value={nbDistribEmp || ""}
@@ -63,11 +63,11 @@ const HygieneDistribQuantitesInputs = ({
           }`}
           id="nbDistribEmp"
         />
-        <Label htmlFor="nbDistribEmp" className="text-sm flex-1">
+        <Label htmlFor="nbDistribEmp" className="flex-1 text-sm">
           {tHygiene("distributeurs-essuie-mains-papier")}
         </Label>
       </div>
-      <div className="flex gap-4 items-center w-full">
+      <div className="flex w-full items-center gap-4">
         <Input
           type="number"
           value={nbDistribSavon || ""}
@@ -83,11 +83,11 @@ const HygieneDistribQuantitesInputs = ({
           }`}
           id="nbDistribSavon"
         />
-        <Label htmlFor="nbDistribSavon" className="text-sm flex-1">
+        <Label htmlFor="nbDistribSavon" className="flex-1 text-sm">
           {tHygiene("distributeurs-de-savon")}
         </Label>
       </div>
-      <div className="flex gap-4 items-center w-full">
+      <div className="flex w-full items-center gap-4">
         <Input
           type="number"
           value={nbDistribPh || ""}
@@ -103,7 +103,7 @@ const HygieneDistribQuantitesInputs = ({
           }`}
           id="nbDistribPh"
         />
-        <Label htmlFor="nbDistribPh" className="text-sm flex-1">
+        <Label htmlFor="nbDistribPh" className="flex-1 text-sm">
           {tHygiene("distributeurs-de-papier-hygienique")}
         </Label>
       </div>
@@ -125,8 +125,8 @@ const HygieneDistribQuantitesInputs = ({
                   ["pa12M", "pa24M", "pa36M"].some(
                     (key) =>
                       tarif[key as keyof typeof tarif] &&
-                      item.id.toString() === key
-                  )
+                      item.id.toString() === key,
+                  ),
                 );
                 return (
                   <SelectItem
@@ -141,9 +141,9 @@ const HygieneDistribQuantitesInputs = ({
           </SelectContent>
         </Select>
       </div>
-      <p className="text-xs text-fm4alldestructive italic px-2 text-center">
+      <p className="px-2 text-center text-xs italic text-fm4alldestructive">
         {t(
-          "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer"
+          "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
         )}
       </p>
     </div>

@@ -50,20 +50,20 @@ export function DateInputWithLabel<S>({
                   className={cn(
                     "w-full max-w-xs pl-3 text-left font-normal",
                     !field.value && "text-muted-foreground",
-                    "flex items-center w-full"
+                    "flex w-full items-center",
                   )}
                 >
                   {field.value ? (
                     format(
                       field.value,
-                      locale === "fr" ? "dd-MM-yyyy" : "yyyy-MM-dd"
+                      locale === "fr" ? "dd-MM-yyyy" : "yyyy-MM-dd",
                     )
                   ) : (
                     <span>
                       {locale === "fr" ? "Choisir une date" : "Pick a date"}
                     </span>
                   )}
-                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                  <CalendarIcon className="ml-auto size-4 opacity-50" />
                   <span
                     onClick={(e) => {
                       e.stopPropagation();
@@ -73,12 +73,12 @@ export function DateInputWithLabel<S>({
                       }
                     }}
                   >
-                    <X size="icon" className="h-4 w-4 opacity-50" />
+                    <X size="icon" className="size-4 opacity-50" />
                   </span>
                 </Button>
               </FormControl>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 z-10" align="start">
+            <PopoverContent className="z-10 w-auto p-0" align="start">
               <Calendar
                 mode="single"
                 locale={locale === "fr" ? fr : enUS}
@@ -87,13 +87,13 @@ export function DateInputWithLabel<S>({
                   field.onChange(DateTime.fromJSDate(e as Date).toISODate());
                   if (handleChangeDate) {
                     handleChangeDate(
-                      DateTime.fromJSDate(e as Date).toISODate()
+                      DateTime.fromJSDate(e as Date).toISODate(),
                     );
                   }
                 }}
                 disabled={(date: Date) => date < new Date()}
                 initialFocus
-                className="bg-background border-2 rounded-xl"
+                className="rounded-xl border-2 bg-background"
                 fromDate={new Date()}
               />
             </PopoverContent>

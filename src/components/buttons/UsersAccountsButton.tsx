@@ -24,10 +24,10 @@ const UsersAccountsButton = ({
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild className="cursor-pointer">
         <div
-          className={`flex gap-1 items-center ${
+          className={`flex items-center gap-1 ${
             isActive("/admin/[adminId]/comptes") ||
             isActive("/admin/[adminId]/signup")
-              ? "text-destructive font-bold"
+              ? "font-bold text-destructive"
               : ""
           } ${className}`}
         >

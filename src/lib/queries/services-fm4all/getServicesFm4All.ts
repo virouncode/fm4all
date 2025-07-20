@@ -10,7 +10,7 @@ export const getServicesFm4AllTaux = async () => {
     const results = await db.select().from(servicesFm4AllTaux);
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectServicesFm4AllTauxSchema.parse(result)
+      selectServicesFm4AllTauxSchema.parse(result),
     );
     return validatedResults.map((validatedResult) => ({
       ...validatedResult,
@@ -38,7 +38,7 @@ export const getServicesFm4AllOffres = async () => {
     const results = await db.select().from(servicesFm4AllOffres);
     if (results.length === 0) return [];
     const validatedResults = results.map((result) =>
-      selectServicesFm4AllOffresSchema.parse(result)
+      selectServicesFm4AllOffresSchema.parse(result),
     );
     return validatedResults;
   } catch (err) {

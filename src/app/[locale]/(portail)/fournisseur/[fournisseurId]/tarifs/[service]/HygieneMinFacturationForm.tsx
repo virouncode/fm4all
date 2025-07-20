@@ -33,7 +33,7 @@ const HygieneMinFacturationForm = ({
   >(new Set<keyof SelectHygieneMinFacturationType>());
   const lastUpdate = format(
     initialTarif.updatedAt,
-    locale === "fr" ? "dd/MM/yyyy à HH:mm" : "yyyy/MM/dd at hh:mm a"
+    locale === "fr" ? "dd/MM/yyyy à HH:mm" : "yyyy/MM/dd at hh:mm a",
   );
   const defaultValues: UpdateHygieneMinFacturationType = initialTarif;
   const form = useForm<UpdateHygieneMinFacturationType>({
@@ -70,7 +70,7 @@ const HygieneMinFacturationForm = ({
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement>,
-    field: keyof SelectHygieneMinFacturationType
+    field: keyof SelectHygieneMinFacturationType,
   ) => {
     const inputValue = e.target.value;
     const value = inputValue ? parseFloat(inputValue) : 0;
@@ -99,7 +99,7 @@ const HygieneMinFacturationForm = ({
 
   const isFieldModified = (fieldName: string) => {
     return modifiedFields.has(
-      fieldName as keyof SelectHygieneMinFacturationType
+      fieldName as keyof SelectHygieneMinFacturationType,
     );
   };
   const submitForm = async (data: UpdateHygieneMinFacturationType) => {
@@ -107,11 +107,11 @@ const HygieneMinFacturationForm = ({
   };
   return (
     <>
-      <div className="flex justify-between mt-14 mb-2 item-center">
+      <div className="item-center mb-2 mt-14 flex justify-between">
         <div className="border-l border-l-gray-500">
           <h2 className="ml-4 text-xl font-bold">{title}</h2>
         </div>
-        <p className="text-sm italic text-end">
+        <p className="text-end text-sm italic">
           Dernière mise à jour : {lastUpdate}
         </p>
       </div>
@@ -121,10 +121,10 @@ const HygieneMinFacturationForm = ({
           onSubmit={form.handleSubmit(submitForm)}
         >
           {/* Bouton de sauvegarde et indicateur de modifications */}
-          <div className="flex justify-between items-center flex-col gap-4 md:flex-row md:gap-0">
+          <div className="flex flex-col items-center justify-between gap-4 md:flex-row md:gap-0">
             <div>
               {hasUnsavedChanges ? (
-                <div className="text-sm text-amber-600 font-medium">
+                <div className="text-sm font-medium text-amber-600">
                   Vous avez des modifications non sauvegardées
                 </div>
               ) : (

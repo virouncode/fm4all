@@ -80,7 +80,7 @@ const TheMobilePropositionsCarousel = ({
           ? 0
           : the.infos.gammeSelected === "confort"
             ? 1
-            : 2
+            : 2,
       );
     }
   }, [api, the.infos.gammeSelected]);
@@ -91,7 +91,7 @@ const TheMobilePropositionsCarousel = ({
         align: "start",
         loop: true,
       }}
-      className="w-full relative"
+      className="relative w-full"
       setApi={setApi}
     >
       <CarouselContent>

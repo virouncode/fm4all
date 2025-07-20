@@ -48,11 +48,11 @@ const NettoyageDesktopPropositions = ({
   handleClickProposition,
 }: NettoyageDesktopPropositionsProps) => {
   return (
-    <div className="h-full flex flex-col border rounded-xl overflow-auto">
+    <div className="flex h-full flex-col overflow-auto rounded-xl border">
       {formattedPropositions.length > 0
         ? formattedPropositions.map((propositions) => (
             <div
-              className="flex border-b flex-1"
+              className="flex flex-1 border-b"
               key={propositions[0].fournisseurId}
             >
               <NettoyageFournisseurLogo {...propositions[0]} />

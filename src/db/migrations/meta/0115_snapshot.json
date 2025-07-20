@@ -46,12 +46,8 @@
           "name": "alarmes_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "alarmes_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -156,12 +152,8 @@
           "name": "boissons_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "boissons_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -227,12 +219,8 @@
           "name": "cafe_conso_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "cafe_conso_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -480,12 +468,8 @@
           "name": "cafe_machines_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "cafe_machines_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -493,12 +477,8 @@
           "name": "cafe_machines_tarifs_cafe_machine_id_cafe_machines_id_fk",
           "tableFrom": "cafe_machines_tarifs",
           "tableTo": "cafe_machines",
-          "columnsFrom": [
-            "cafe_machine_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["cafe_machine_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -563,12 +543,8 @@
           "name": "chocolat_conso_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "chocolat_conso_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -776,12 +752,8 @@
           "name": "colonnes_seches_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "colonnes_seches_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -828,12 +800,8 @@
           "name": "devis_client_id_clients_id_fk",
           "tableFrom": "devis",
           "tableTo": "clients",
-          "columnsFrom": [
-            "client_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["client_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -892,12 +860,8 @@
           "name": "exutoires_parking_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "exutoires_parking_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -956,12 +920,8 @@
           "name": "exutoires_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "exutoires_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1169,12 +1129,8 @@
           "name": "fontaines_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "fontaines_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1182,12 +1138,8 @@
           "name": "fontaines_tarifs_fontaine_id_fontaines_id_fk",
           "tableFrom": "fontaines_tarifs",
           "tableTo": "fontaines",
-          "columnsFrom": [
-            "fontaine_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fontaine_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1264,12 +1216,8 @@
           "name": "food_livraison_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "food_livraison_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1361,9 +1309,7 @@
         "fournisseurs_email_contact_unique": {
           "name": "fournisseurs_email_contact_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email_contact"
-          ]
+          "columns": ["email_contact"]
         }
       },
       "policies": {},
@@ -1464,12 +1410,8 @@
           "name": "fruits_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "fruits_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1540,12 +1482,8 @@
           "name": "hygiene_conso_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "hygiene_conso_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1674,12 +1612,8 @@
           "name": "hygiene_distrib_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "hygiene_distrib_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1732,12 +1666,8 @@
           "name": "hygiene_instal_distrib_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "hygiene_instal_distrib_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1846,12 +1776,8 @@
           "name": "incendie_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "incendie_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1922,12 +1848,8 @@
           "name": "lait_conso_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "lait_conso_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1980,12 +1902,8 @@
           "name": "legio_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "legio_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2134,12 +2052,8 @@
           "name": "maintenance_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "maintenance_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2250,12 +2164,8 @@
           "name": "nettoyage_repasse_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "nettoyage_repasse_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2321,12 +2231,8 @@
           "name": "nettoyage_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "nettoyage_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2397,12 +2303,8 @@
           "name": "nettoyage_vitrerie_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "nettoyage_vitrerie_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2512,12 +2414,8 @@
           "name": "office_manager_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "office_manager_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2571,12 +2469,8 @@
           "name": "portes_coupe_feu_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "portes_coupe_feu_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2629,12 +2523,8 @@
           "name": "q18_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "q18_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2687,12 +2577,8 @@
           "name": "qualite_air_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "qualite_air_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2739,12 +2625,8 @@
           "name": "ria_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "ria_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -3016,12 +2898,8 @@
           "name": "snacks_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "snacks_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -3080,12 +2958,8 @@
           "name": "sucre_conso_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "sucre_conso_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -3151,12 +3025,8 @@
           "name": "the_conso_tarifs_fournisseur_id_fournisseurs_id_fk",
           "tableFrom": "the_conso_tarifs",
           "tableTo": "fournisseurs",
-          "columnsFrom": [
-            "fournisseur_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fournisseur_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -3172,74 +3042,42 @@
     "public.gamme": {
       "name": "gamme",
       "schema": "public",
-      "values": [
-        "essentiel",
-        "confort",
-        "excellence"
-      ]
+      "values": ["essentiel", "confort", "excellence"]
     },
     "public.inclus": {
       "name": "inclus",
       "schema": "public",
-      "values": [
-        "inclus",
-        "non inclus",
-        "non propose",
-        "sur demande"
-      ]
+      "values": ["inclus", "non inclus", "non propose", "sur demande"]
     },
     "public.possibilite": {
       "name": "possibilite",
       "schema": "public",
-      "values": [
-        "possible",
-        "non",
-        "obligatoire"
-      ]
+      "values": ["possible", "non", "obligatoire"]
     },
     "public.status": {
       "name": "status",
       "schema": "public",
-      "values": [
-        "active",
-        "inactive"
-      ]
+      "values": ["active", "inactive"]
     },
     "public.typebatiment": {
       "name": "typebatiment",
       "schema": "public",
-      "values": [
-        "bureaux",
-        "localCommercial",
-        "entrepot",
-        "cabinetMedical"
-      ]
+      "values": ["bureaux", "localCommercial", "entrepot", "cabinetMedical"]
     },
     "public.typechocolat": {
       "name": "typechocolat",
       "schema": "public",
-      "values": [
-        "sachets",
-        "poudre"
-      ]
+      "values": ["sachets", "poudre"]
     },
     "public.typecolonne": {
       "name": "typecolonne",
       "schema": "public",
-      "values": [
-        "statique",
-        "dynamique"
-      ]
+      "values": ["statique", "dynamique"]
     },
     "public.typeeau": {
       "name": "typeeau",
       "schema": "public",
-      "values": [
-        "EF",
-        "EC",
-        "EG",
-        "ECG"
-      ]
+      "values": ["EF", "EC", "EG", "ECG"]
     },
     "public.typehygiene": {
       "name": "typehygiene",
@@ -3258,46 +3096,27 @@
     "public.typelait": {
       "name": "typelait",
       "schema": "public",
-      "values": [
-        "dosettes",
-        "frais",
-        "poudre"
-      ]
+      "values": ["dosettes", "frais", "poudre"]
     },
     "public.typemachine": {
       "name": "typemachine",
       "schema": "public",
-      "values": [
-        "cafe",
-        "lait",
-        "chocolat"
-      ]
+      "values": ["cafe", "lait", "chocolat"]
     },
     "public.typeoccupation": {
       "name": "typeoccupation",
       "schema": "public",
-      "values": [
-        "partieEtage",
-        "plateauComplet",
-        "batimentEntier"
-      ]
+      "values": ["partieEtage", "plateauComplet", "batimentEntier"]
     },
     "public.typeporte": {
       "name": "typeporte",
       "schema": "public",
-      "values": [
-        "vantaux",
-        "coulissante"
-      ]
+      "values": ["vantaux", "coulissante"]
     },
     "public.typepose": {
       "name": "typepose",
       "schema": "public",
-      "values": [
-        "aposer",
-        "colonne",
-        "comptoir"
-      ]
+      "values": ["aposer", "colonne", "comptoir"]
     }
   },
   "schemas": {},

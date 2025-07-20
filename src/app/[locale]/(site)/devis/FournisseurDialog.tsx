@@ -66,12 +66,12 @@ const FournisseurDialog = ({
       {nomFournisseur === "CASTALIE" && (
         <p>
           {t(
-            "entreprise-francaise-leader-sur-son-marche-souhaitant-travailler-en-marque-blanche"
+            "entreprise-francaise-leader-sur-son-marche-souhaitant-travailler-en-marque-blanche",
           )}
         </p>
       )}
       {logoUrl ? (
-        <div className="w-full h-[50px] relative">
+        <div className="relative h-[50px] w-full">
           <Image
             src={logoUrl}
             alt={`logo-de-${nomFournisseur}`}
@@ -84,7 +84,7 @@ const FournisseurDialog = ({
         </div>
       ) : null}
       {presentation && (
-        <p className="whitespace-pre hyphens-auto text-wrap my-6">
+        <p className="my-6 hyphens-auto whitespace-pre text-wrap">
           {presentation}
         </p>
       )}

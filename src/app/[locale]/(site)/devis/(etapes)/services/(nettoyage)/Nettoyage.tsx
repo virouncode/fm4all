@@ -43,7 +43,7 @@ const Nettoyage = ({
   hygieneMinFacturation,
 }: NettoyageProps) => {
   const tPresentation = useTranslations(
-    "DevisPage.services.presentation.cards"
+    "DevisPage.services.presentation.cards",
   );
   const t = useTranslations("DevisPage.services.nettoyage");
   const { setServices } = useContext(ServicesContext);
@@ -66,12 +66,12 @@ const Nettoyage = ({
   const propositionsRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="1">
+    <div className="mx-auto flex h-full w-full flex-col gap-4 py-2" id="1">
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
           title={tPresentation("nettoyage-et-proprete")}
           description={t(
-            "dun-nettoyage-essentiel-a-une-experience-5-etoiles-choisissez-la-prestation-proprete-qui-vous-ressemble-la-gamme-determine-la-frequence-de-passage-et-la-cadence-de-nettoyage"
+            "dun-nettoyage-essentiel-a-une-experience-5-etoiles-choisissez-la-prestation-proprete-qui-vous-ressemble-la-gamme-determine-la-frequence-de-passage-et-la-cadence-de-nettoyage",
           )}
           icon={SprayCan}
           propositionsRef={propositionsRef}
@@ -81,7 +81,7 @@ const Nettoyage = ({
           icon={SprayCan}
           title={tPresentation("nettoyage-et-proprete")}
           description={t(
-            "dun-nettoyage-essentiel-a-une-experience-5-etoiles-choisissez-la-prestation-proprete-qui-vous-ressemble-la-gamme-determine-la-frequence-de-passage-et-la-cadence-de-nettoyage"
+            "dun-nettoyage-essentiel-a-une-experience-5-etoiles-choisissez-la-prestation-proprete-qui-vous-ressemble-la-gamme-determine-la-frequence-de-passage-et-la-cadence-de-nettoyage",
           )}
           handleClickPrevious={handleClickPrevious}
         />

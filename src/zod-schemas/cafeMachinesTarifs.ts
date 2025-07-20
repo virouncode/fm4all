@@ -3,7 +3,7 @@ import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const selectCafeMachinesTarifsSchema = createSelectSchema(
-  cafeMachinesTarifs
+  cafeMachinesTarifs,
 ).extend({
   nomFournisseur: z.string().nonempty("Le nom du fournisseur est obligatoire"),
   slogan: z.string().nullable(),

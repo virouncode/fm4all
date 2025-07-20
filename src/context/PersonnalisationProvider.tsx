@@ -46,7 +46,7 @@ const PersonnalisationProvider = ({ children }: PropsWithChildren) => {
     if (isMounted) {
       localStorage.setItem(
         "personnalisation",
-        JSON.stringify(personnalisation)
+        JSON.stringify(personnalisation),
       );
     }
   }, [personnalisation, isMounted]);

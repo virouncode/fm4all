@@ -17,7 +17,7 @@ const StarRating = ({ score }: StarRatingProps) => {
       {hasHalfStar && (
         <div className="relative">
           <Star fill="gray" stroke="gray" size={12} />
-          <div className="absolute top-0 left-0 w-1/2 h-full overflow-hidden">
+          <div className="absolute left-0 top-0 h-full w-1/2 overflow-hidden">
             <Star fill="#fabc05" stroke="#fabc05" size={12} />
           </div>
         </div>

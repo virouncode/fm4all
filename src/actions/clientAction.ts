@@ -50,8 +50,8 @@ export const insertClientAction = actionClient
         .where(
           and(
             eq(clients.emailContact, clientToPost.emailContact),
-            eq(clients.nomContact, clientToPost.nomContact)
-          )
+            eq(clients.nomContact, clientToPost.nomContact),
+          ),
         )
         .limit(1);
       //Si le client existe déjà, on met à jour ses coordonnées
@@ -76,7 +76,7 @@ export const insertClientAction = actionClient
         throw new Error(
           locale === "fr"
             ? "Impossible d'enregistrer vos coordonnées."
-            : "Unable to save your contact information"
+            : "Unable to save your contact information",
         );
       }
       return {
@@ -84,7 +84,7 @@ export const insertClientAction = actionClient
         message: `${clientToPost.nomEntreprise}, ${locale === "fr" ? "vos coordonnées ont été enregistrées, nous prendrons contact avec vous dans les plus brefs délais. A bientôt !" : "your contact information has been saved. We will get in touch with you as soon as possible. See you soon!"}`,
         data: { client: resultClient[0] },
       };
-    }
+    },
   );
 
 export const updateClientAction = actionClient
@@ -100,7 +100,7 @@ export const updateClientAction = actionClient
         throw new Error(
           locale === "fr"
             ? "Impossible de mettre à jour vos informations."
-            : "Unable to update your information."
+            : "Unable to update your information.",
         );
       }
       const clientToUpdate: UpdateClientType = {
@@ -132,7 +132,7 @@ export const updateClientAction = actionClient
         throw new Error(
           locale === "fr"
             ? "Impossible de mettre à jour vos informations."
-            : "Unable to update your information."
+            : "Unable to update your information.",
         );
       }
       return {
@@ -140,5 +140,5 @@ export const updateClientAction = actionClient
         message: `${clientToUpdate.nomEntreprise}, ${locale === "fr" ? "vos coordonnées ont été mises à jour." : "your contact information has been updated."}`,
         data: { client: resultClient[0] },
       };
-    }
+    },
   );

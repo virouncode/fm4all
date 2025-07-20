@@ -39,10 +39,10 @@ const FontaineEspacePropositionFournisseurLogo = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="flex w-1/4 h-full items-center justify-center p-2 relative">
+        <div className="relative flex h-full w-1/4 items-center justify-center p-2">
           {logoUrl ? (
             <div
-              className={`w-full h-full relative ${
+              className={`relative h-full w-full ${
                 fournisseurId === 13 ? "blur-lg" : ""
               }`}
             >
@@ -50,7 +50,7 @@ const FontaineEspacePropositionFournisseurLogo = ({
                 src={logoUrl}
                 alt={`logo-de-${nomFournisseur}`}
                 fill={true}
-                className="w-full h-full object-contain cursor-pointer"
+                className="h-full w-full cursor-pointer object-contain"
                 quality={100}
               />
             </div>

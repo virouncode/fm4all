@@ -51,16 +51,16 @@ const CafeDesktopEspaceInputs = ({
       <Tooltip>
         <TooltipTrigger asChild>
           <form className="w-2/3">
-            <div className="flex gap-8 items-center mb-4">
+            <div className="mb-4 flex items-center gap-8">
               <div>
                 <RadioGroup
                   onValueChange={handleChangeTypeBoissons}
                   value={espace.infos.typeBoissons}
-                  className="flex gap-4 items-center"
+                  className="flex items-center gap-4"
                   name="typeBoissons"
                 >
                   {typesBoissons.map(({ id }) => (
-                    <div key={id} className="flex gap-2 items-center">
+                    <div key={id} className="flex items-center gap-2">
                       <RadioGroupItem
                         value={id}
                         title={tTypeBoisson(id)}
@@ -74,9 +74,9 @@ const CafeDesktopEspaceInputs = ({
                   ))}
                 </RadioGroup>
               </div>
-              <div className="flex gap-2 items-center">
+              <div className="flex items-center gap-2">
                 <Input
-                  className={`w-full max-w-xs min-w-20 ${
+                  className={`w-full min-w-20 max-w-xs ${
                     nbPersonnes === client.effectif
                       ? "text-fm4alldestructive"
                       : ""
@@ -126,7 +126,7 @@ const CafeDesktopEspaceInputs = ({
         </TooltipTrigger>
         <TooltipContent className="max-w-60">
           {tCafe(
-            "choisissez-le-type-de-boissons-avec-ou-sans-lait-cacao-le-nombre-de-personnes-pour-votre-espace-cafe-et-la-duree-dengagement"
+            "choisissez-le-type-de-boissons-avec-ou-sans-lait-cacao-le-nombre-de-personnes-pour-votre-espace-cafe-et-la-duree-dengagement",
           )}
         </TooltipContent>
       </Tooltip>

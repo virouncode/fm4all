@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
           message: "La clé API Mailgun est manquante.",
         },
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { success: true, data: response, message: "Email envoyé avec succès" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (err) {
     return errorHandler(err);

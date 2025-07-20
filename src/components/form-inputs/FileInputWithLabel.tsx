@@ -42,7 +42,7 @@ export function FileInputWithLabel<S>({
           <FormControl>
             <Input
               id={nameInSchema}
-              className={`w-full max-w-xs disabled:text-blue-500 dark:disabled:text-yellow-300 disbaled:opacity-75 ${className}`}
+              className={`disbaled:opacity-75 w-full max-w-xs disabled:text-blue-500 dark:disabled:text-yellow-300 ${className}`}
               type="file"
               onChange={(e) => {
                 field.onChange(e);

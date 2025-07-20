@@ -67,7 +67,7 @@ const ServicesFm4All = ({
         variant: "destructive",
         title: tFm4all("panier-vide"),
         description: tFm4all(
-          "vous-navez-choisi-aucun-service-veuillez-selectionner-au-moins-un-service"
+          "vous-navez-choisi-aucun-service-veuillez-selectionner-au-moins-un-service",
         ),
       });
       return;
@@ -94,12 +94,12 @@ const ServicesFm4All = ({
   const propositionsRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="2">
+    <div className="mx-auto flex h-full w-full flex-col gap-4 py-2" id="2">
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
           title={tFm4all("services-fm4all")}
           description={tFm4all(
-            "fm4all-est-votre-interlocuteur-unique-pour-toutes-vos-prestations-regroupes-sous-un-contrat-et-une-facture-nous-realisons-un-pilotage-a-distance-des-prestations-de-services-gestion-administrative-et-suivi-qualite"
+            "fm4all-est-votre-interlocuteur-unique-pour-toutes-vos-prestations-regroupes-sous-un-contrat-et-une-facture-nous-realisons-un-pilotage-a-distance-des-prestations-de-services-gestion-administrative-et-suivi-qualite",
           )}
           icon={HandPlatter}
           propositionsRef={propositionsRef}
@@ -108,7 +108,7 @@ const ServicesFm4All = ({
         <PropositionsTitle
           title={tFm4all("services-fm4all")}
           description={tFm4all(
-            "fm4all-est-votre-interlocuteur-unique-pour-toutes-vos-prestations-regroupes-sous-un-contrat-et-une-facture-nous-realisons-un-pilotage-a-distance-des-prestations-de-services-gestion-administrative-et-suivi-qualite"
+            "fm4all-est-votre-interlocuteur-unique-pour-toutes-vos-prestations-regroupes-sous-un-contrat-et-une-facture-nous-realisons-un-pilotage-a-distance-des-prestations-de-services-gestion-administrative-et-suivi-qualite",
           )}
           icon={HandPlatter}
           handleClickPrevious={handleClickPrevious}
@@ -129,7 +129,7 @@ const ServicesFm4All = ({
         <PropositionsFooter
           handleClickNext={handleClickNext}
           comment={tFm4all(
-            "u00b9remise-de-0-5-a-partir-dun-chiffre-daffaires-de-26-000eur-ht-an-u00b2remise-de-0-5-pour-le-choix-dun-office-manager"
+            "u00b9remise-de-0-5-a-partir-dun-chiffre-daffaires-de-26-000eur-ht-an-u00b2remise-de-0-5-pour-le-choix-dun-office-manager",
           )}
         />
       )}

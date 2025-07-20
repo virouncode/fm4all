@@ -9,7 +9,7 @@ export default function useScrollIntoFood() {
   useEffect(() => {
     if (isTabletOrMobile) return;
     const currentFoodBeverage = document.getElementById(
-      foodBeverage.currentFoodBeverageId.toString()
+      foodBeverage.currentFoodBeverageId.toString(),
     );
     if (currentFoodBeverage) {
       currentFoodBeverage.scrollIntoView({

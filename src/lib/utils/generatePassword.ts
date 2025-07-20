@@ -4,7 +4,7 @@ export const generatePassword = () => {
   const listSpecial = "!?@&";
   let resLettersNumbers = "";
   const resSpecial = listSpecial.charAt(
-    Math.floor(Math.random() * listSpecial.length)
+    Math.floor(Math.random() * listSpecial.length),
   );
 
   for (let i = 0; i < 8; i++) {

@@ -33,7 +33,7 @@ const Hygiene = ({
 }: HygieneProps) => {
   const tHygiene = useTranslations("DevisPage.services.hygiene");
   const tPresentation = useTranslations(
-    "DevisPage.services.presentation.cards"
+    "DevisPage.services.presentation.cards",
   );
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
   const { nettoyage } = useContext(NettoyageContext);
@@ -56,13 +56,13 @@ const Hygiene = ({
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto h-full py-2" id="3">
+    <div className="mx-auto flex h-full w-full flex-col gap-4 py-2" id="3">
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
           icon={Toilet}
           title={tPresentation("hygiene-sanitaire")}
           description={tHygiene(
-            "un-tarif-forfaitaire-tout-compris-pour-vos-sanitaires-avec-distributeurs-et-consommables-mis-en-place-essuie-main-papier-savon-and-papier-hygienique-la-gamme-determine-la-finition-des-distributeurs"
+            "un-tarif-forfaitaire-tout-compris-pour-vos-sanitaires-avec-distributeurs-et-consommables-mis-en-place-essuie-main-papier-savon-and-papier-hygienique-la-gamme-determine-la-finition-des-distributeurs",
           )}
           propositionsRef={propositionsRef}
         />
@@ -71,7 +71,7 @@ const Hygiene = ({
           icon={Toilet}
           title={tPresentation("hygiene-sanitaire")}
           description={tHygiene(
-            "un-tarif-forfaitaire-tout-compris-pour-vos-sanitaires-avec-distributeurs-et-consommables-mis-en-place-essuie-main-papier-savon-and-papier-hygienique-la-gamme-determine-la-finition-des-distributeurs"
+            "un-tarif-forfaitaire-tout-compris-pour-vos-sanitaires-avec-distributeurs-et-consommables-mis-en-place-essuie-main-papier-savon-and-papier-hygienique-la-gamme-determine-la-finition-des-distributeurs",
           )}
           handleClickPrevious={handleClickPrevious}
         />
@@ -81,7 +81,7 @@ const Hygiene = ({
           <div className="flex h-full items-center justify-center text-base lg:text-lg">
             <p className="text-center text-fm4alldestructive">
               {tNettoyage(
-                "veuillez-d-abord-selectionner-une-offre-de-nettoyage"
+                "veuillez-d-abord-selectionner-une-offre-de-nettoyage",
               )}
             </p>
           </div>

@@ -86,7 +86,7 @@ const MaintenanceMobilePropositionsCarousel = ({
           ? 0
           : maintenance.infos.gammeSelected === "confort"
             ? 1
-            : 2
+            : 2,
       );
     }
   }, [
@@ -101,7 +101,7 @@ const MaintenanceMobilePropositionsCarousel = ({
         align: "start",
         loop: true,
       }}
-      className="w-full relative"
+      className="relative w-full"
       setApi={setApi}
     >
       <CarouselContent>

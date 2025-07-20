@@ -72,23 +72,23 @@ const NettoyagePropositionCard = ({
   if (!proposition.totalAnnuel) {
     return (
       <div
-        className={`flex flex-1 bg-${color} text-slate-200 items-center p-4 justify-center text-2xl gap-4`}
+        className={`flex flex-1 bg-${color} items-center justify-center gap-4 p-4 text-2xl text-slate-200`}
       >
         {t("non-propose")}
       </div>
     );
   }
   const totalMensuelText = (
-    <p className="font-bold text-xl ml-4" data-testid="total-mensuel-nettoyage">
+    <p className="ml-4 text-xl font-bold" data-testid="total-mensuel-nettoyage">
       {formatNumber((proposition.totalAnnuel * MARGE) / 12)} {t("euros-mois")}
     </p>
   );
   const hParSemaineText =
     proposition.hParPassage && proposition.freqAnnuelle ? (
-      <li className="list-check ">
+      <li className="list-check">
         {formatNumber(
           (proposition.hParPassage * proposition.freqAnnuelle) /
-            S_OUVREES_PAR_AN
+            S_OUVREES_PAR_AN,
         )}{" "}
         {t("h-semaine")}
       </li>
@@ -96,7 +96,7 @@ const NettoyagePropositionCard = ({
 
   const nbPassagesParSemaineText =
     proposition.freqAnnuelle && proposition.hParPassage ? (
-      <li className="list-check ">
+      <li className="list-check">
         {formatNumber(proposition.freqAnnuelle / S_OUVREES_PAR_AN)}{" "}
         {t("passage-s-de")} {proposition.hParPassage}
         {t("h-semaine")}
@@ -136,12 +136,12 @@ const NettoyagePropositionCard = ({
   );
 
   const imgProduit = (
-    <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+    <div className="relative h-60 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-200">
       <Image
         src={"/img/services/nettoyage.webp"}
         alt={`illustration de nettoyage`}
         fill={true}
-        className="object-contain object-center cursor-pointer"
+        className="cursor-pointer object-contain object-center"
         quality={100}
       />
     </div>
@@ -149,7 +149,7 @@ const NettoyagePropositionCard = ({
 
   return (
     <div
-      className={`flex flex-1 bg-${color} text-slate-200 items-center justify-center text-2xl gap-4 cursor-pointer p-4 ${
+      className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-4 text-2xl text-slate-200 ${
         nettoyage.infos.fournisseurId === proposition.fournisseurId &&
         nettoyage.infos.gammeSelected === proposition.gamme
           ? "ring-4 ring-inset ring-fm4alldestructive"
@@ -168,7 +168,7 @@ const NettoyagePropositionCard = ({
         data-testid="nettoyage-proposition-switch"
       />
       <div>
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center gap-2">
           {totalMensuelText}
           <Dialog>
             <DialogTrigger asChild>
@@ -184,10 +184,10 @@ const NettoyagePropositionCard = ({
               </DialogHeader>
               <div className="flex flex-col gap-4">
                 {imgProduit}
-                <p className="text-xs italic text-end">
+                <p className="text-end text-xs italic">
                   {t("photo-non-contractuelle")}
                 </p>
-                <ul className="flex flex-col text-sm px-4 mx-auto">
+                <ul className="mx-auto flex flex-col px-4 text-sm">
                   {infosProduit}
                   {hParSemaineText}
                   {nbPassagesParSemaineText}
@@ -196,7 +196,7 @@ const NettoyagePropositionCard = ({
             </DialogContent>
           </Dialog>
         </div>
-        <ul className="flex flex-col text-xs ml-4">
+        <ul className="ml-4 flex flex-col text-xs">
           {infosProduit}
           {hParSemaineText}
           {nbPassagesParSemaineText}

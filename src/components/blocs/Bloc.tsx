@@ -57,9 +57,9 @@ type BlocProps = {
 
 const Bloc = ({ imageUrl, imageAlt, side, bloc, ptComponents }: BlocProps) => {
   return (
-    <section className="flex flex-row gap-10 mb-16">
+    <section className="mb-16 flex flex-row gap-10">
       {imageUrl && side === "left" ? (
-        <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
+        <div className="relative mx-auto hidden min-h-[400px] flex-1 overflow-hidden rounded-lg md:block">
           <Image
             src={imageUrl}
             alt={imageAlt ?? "illustration"}
@@ -70,23 +70,13 @@ const Bloc = ({ imageUrl, imageAlt, side, bloc, ptComponents }: BlocProps) => {
           />
         </div>
       ) : null}
-      <div
-        className="flex-1 prose-base
-            prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-3xl
-            prose-h3:font-bold prose-h3:text-xl prose-h3:ml-10 prose-h3:italic
-            prose-h4:text-center prose-h4:mx-auto prose-h4:my-8
-            prose-p:max-w-prose prose-p:mx-auto prose-p:text-pretty prose-p:hyphens-auto
-            prose-ul:max-w-prose prose-ul:mx-auto prose-ul:flex prose-ul:flex-col prose-ul:gap-4
-            prose-li:list-disc prose-li:m-0
-            prose-a:underline
-            "
-      >
+      <div className="prose-base flex-1 prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-3xl prose-h3:ml-10 prose-h3:text-xl prose-h3:font-bold prose-h3:italic prose-h4:mx-auto prose-h4:my-8 prose-h4:text-center prose-p:mx-auto prose-p:max-w-prose prose-p:hyphens-auto prose-p:text-pretty prose-a:underline prose-ul:mx-auto prose-ul:flex prose-ul:max-w-prose prose-ul:flex-col prose-ul:gap-4 prose-li:m-0 prose-li:list-disc">
         {Array.isArray(bloc) && (
           <PortableText value={bloc} components={ptComponents} />
         )}
       </div>
       {imageUrl && side === "right" ? (
-        <div className="flex-1 rounded-lg relative overflow-hidden mx-auto min-h-[400px] hidden md:block">
+        <div className="relative mx-auto hidden min-h-[400px] flex-1 overflow-hidden rounded-lg md:block">
           <Image
             src={imageUrl}
             alt={imageAlt ?? "illustration"}

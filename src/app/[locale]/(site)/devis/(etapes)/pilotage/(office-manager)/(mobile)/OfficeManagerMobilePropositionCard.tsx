@@ -88,7 +88,7 @@ const OfficeManagerMobilePropositionCard = ({
   const premiumText = officeManager.infos.premium ? (
     <li className="list-check">
       {tOfficeManager(
-        "profil-premium-anglais-ou-exp-longue-logiciel-compta-adv-ou-adc"
+        "profil-premium-anglais-ou-exp-longue-logiciel-compta-adv-ou-adc",
       )}
     </li>
   ) : null;
@@ -131,7 +131,7 @@ const OfficeManagerMobilePropositionCard = ({
       </li>
       <li className="list-check">
         {tOfficeManager(
-          "gestion-des-logiciels-internes-badges-flotte-automobile-etc"
+          "gestion-des-logiciels-internes-badges-flotte-automobile-etc",
         )}
       </li>
     </>
@@ -159,7 +159,7 @@ const OfficeManagerMobilePropositionCard = ({
       </li>
       <li className="list-check">
         {tOfficeManager(
-          "gestion-des-logiciels-internes-badges-flotte-automobile-etc"
+          "gestion-des-logiciels-internes-badges-flotte-automobile-etc",
         )}
       </li>
       <li className="list-check">
@@ -178,7 +178,7 @@ const OfficeManagerMobilePropositionCard = ({
   );
 
   const infosProduit = (
-    <ul className="flex flex-col text-xs px-4 w-2/3">
+    <ul className="flex w-2/3 flex-col px-4 text-xs">
       {demiJParSemaineText}
       {presenceText}
       {premiumText}
@@ -195,7 +195,7 @@ const OfficeManagerMobilePropositionCard = ({
   );
 
   const infosProduitDialog = (
-    <ul className="flex flex-col text-sm px-4 mx-auto">
+    <ul className="mx-auto flex flex-col px-4 text-sm">
       {demiJParSemaineText}
       {presenceText}
       {premiumText}
@@ -225,19 +225,19 @@ const OfficeManagerMobilePropositionCard = ({
     ) : null;
 
   const imgProduit = (
-    <div className="w-1/3 h-full relative rounded-xl overflow-hidden bg-slate-100">
+    <div className="relative h-full w-1/3 overflow-hidden rounded-xl bg-slate-100">
       <Image
         src={"/img/services/office-managers.webp"}
         alt={tOfficeManager("illustration-doffice-managers")}
         fill={true}
-        className="object-contain cursor-pointer"
+        className="cursor-pointer object-contain"
         quality={100}
       />
     </div>
   );
 
   const imgProduitDialog = (
-    <div className="w-full h-60 relative rounded-xl overflow-hidden border border-slate-200 bg-slate-200">
+    <div className="relative h-60 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-200">
       <Image
         src={"/img/services/office-managers.webp"}
         alt={tOfficeManager("illustration-doffice-managers")}
@@ -250,50 +250,50 @@ const OfficeManagerMobilePropositionCard = ({
 
   return (
     <div
-      className={`bg-${color} flex flex-col h-[570px] border border-slate-200 rounded-xl p-4 text-white  ${
+      className={`bg-${color} flex h-[570px] flex-col rounded-xl border border-slate-200 p-4 text-white ${
         officeManager.infos.fournisseurId === fournisseurId &&
         officeManager.infos.gammeSelected !== null
           ? "ring-4 ring-inset ring-fm4alldestructive"
           : ""
       }`}
     >
-      <div className="flex items-center h-1/4 gap-2 border-b pb-2 border-slate-200">
+      <div className="flex h-1/4 items-center gap-2 border-b border-slate-200 pb-2">
         <Dialog>
           <DialogTrigger asChild>{imgProduit}</DialogTrigger>
-          <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
+          <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
             <DialogHeader>
               <DialogTitle>{dialogTitle}</DialogTitle>
             </DialogHeader>
             <div className="flex flex-col gap-4">
               {imgProduitDialog}
-              <p className="text-xs italic text-end">
+              <p className="text-end text-xs italic">
                 {t("photo-non-contractuelle")}
               </p>
               {infosProduitDialog}
             </div>
           </DialogContent>
         </Dialog>
-        <div className="w-2/3 flex flex-col gap-1 h-full">
-          <p className="font-bold text-sm">fm4all</p>
+        <div className="flex h-full w-2/3 flex-col gap-1">
+          <p className="text-sm font-bold">fm4all</p>
           <Dialog>
             <DialogTrigger asChild>
-              <div className="h-10 relative">
+              <div className="relative h-10">
                 <Image
                   src={"/img/logo_full_white.webp"}
                   alt={`logo-de-fm4all`}
                   fill={true}
-                  className="object-contain object-left cursor-pointer"
+                  className="cursor-pointer object-contain object-left"
                   quality={100}
                 />
               </div>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] w-5/6 lg:w-auto rounded-xl">
+            <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
               <DialogHeader>
                 <DialogTitle>fm4all</DialogTitle>
               </DialogHeader>
               <FournisseurDialog
                 sloganFournisseur={tOfficeManager(
-                  "le-facility-management-pour-tous"
+                  "le-facility-management-pour-tous",
                 )}
                 logoUrl={"/img/logo_full.webp"}
                 nomFournisseur={"fm4all"}
@@ -317,13 +317,13 @@ const OfficeManagerMobilePropositionCard = ({
         </div>
       </div>
       <div
-        className="flex h-3/4 pt-2 justify-between"
+        className="flex h-3/4 justify-between pt-2"
         onClick={
           totalAnnuel ? () => handleClickProposition(proposition) : undefined
         }
       >
         {infosProduit}
-        <div className="flex flex-col gap-2 items-end">
+        <div className="flex flex-col items-end gap-2">
           {totalMensuelText}
           {totalAnnuel ? (
             <Switch

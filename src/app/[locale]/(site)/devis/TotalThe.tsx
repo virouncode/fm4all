@@ -19,12 +19,12 @@ const TotalThe = () => {
   const color = getFm4AllColor(the.infos.gammeSelected);
 
   return (
-    <div className="flex flex-col gap-4 total-section" id="total-the">
+    <div className="total-section flex flex-col gap-4" id="total-the">
       <div className="flex flex-col gap-4">
         <div>
           {t("thes")} ({cafe.infos.nomFournisseur})
         </div>
-        <div className="flex flex-col ml-4 text-xs ">
+        <div className="ml-4 flex flex-col text-xs">
           <div
             className={`flex items-center justify-between text-${color} font-bold`}
           >
@@ -33,7 +33,7 @@ const TotalThe = () => {
               {formatNumber(Math.round(total * MARGE))} {t("eur-ht-an")}
             </p>
           </div>
-          <div className="flex items-center justify-between border-t border-foreground mt-2">
+          <div className="mt-2 flex items-center justify-between border-t border-foreground">
             <p>TOTAL</p>
             <p className="text-end" data-testid="total-the">
               {formatNumber(Math.round(total * MARGE))} {t("eur-ht-an")}

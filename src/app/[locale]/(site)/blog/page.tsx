@@ -29,7 +29,7 @@ export const generateMetadata = async ({
     locale === "fr" ? "Articles" : "Posts",
     locale === "fr"
       ? "Blog : nos articles sur les services aux entreprises"
-      : "Blog: Our posts on business services in Paris"
+      : "Blog: Our posts on business services in Paris",
   );
 };
 
@@ -45,9 +45,9 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
   const categories = await getAllCategories(locale as LocaleType);
 
   return (
-    <main className="max-w-7xl min-h-[calc(100vh-4rem)] mx-auto mb-24 py-4 px-6 md:px-20">
+    <main className="mx-auto mb-24 min-h-[calc(100vh-4rem)] max-w-7xl px-6 py-4 md:px-20">
       <Breadcrumb className="mb-10">
-        <BreadcrumbList className="text-sm lg:text-base flex flex-wrap">
+        <BreadcrumbList className="flex flex-wrap text-sm lg:text-base">
           <BreadcrumbItem>
             <BreadcrumbLink
               className="flex items-center"
@@ -68,13 +68,13 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           {t("blog-nos-articles-sur-les-services-aux-entreprises")}
         </h1>
         <div className="flex flex-col gap-6">
-          <h2 className="border-l-2 px-4 text-3xl mb-4">
+          <h2 className="mb-4 border-l-2 px-4 text-3xl">
             {tArticles("nos-derniers-articles")}
           </h2>
           <ArticlesCarousel />
         </div>
         <div className="flex flex-col gap-6">
-          <h2 className="border-l-2 px-4 text-3xl mb-4">
+          <h2 className="mb-4 border-l-2 px-4 text-3xl">
             {t("par-categorie")}
           </h2>
           <div className="flex flex-col gap-14">
@@ -92,7 +92,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
                   </Link>
                   <ArticlesCategorieCarousel categorie={categorie} />
                 </div>
-              ) : null
+              ) : null,
             )}
           </div>
         </div>

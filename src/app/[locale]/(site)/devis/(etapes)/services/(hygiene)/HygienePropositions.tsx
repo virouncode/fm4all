@@ -59,7 +59,7 @@ const HygienePropositions = ({
     hygieneDistribTarifs,
     hygieneConsosTarifs,
     hygieneDistribInstalTarifs,
-    hygieneMinFacturation
+    hygieneMinFacturation,
   );
 
   const propositions = getFormattedHygienePropositions(
@@ -69,7 +69,7 @@ const HygienePropositions = ({
     hygieneDistribTarifs,
     hygieneDistribInstalTarifs,
     hygieneConsosTarifs,
-    hygieneMinFacturation
+    hygieneMinFacturation,
   );
 
   const handleClickProposition = (proposition: {
@@ -212,7 +212,7 @@ const HygienePropositions = ({
 
   const handleChangeDistribNbr = (
     e: ChangeEvent<HTMLInputElement>,
-    type: string
+    type: string,
   ) => {
     const value = e.target.value;
 
@@ -260,19 +260,19 @@ const HygienePropositions = ({
     const gamme = hygiene.infos.trilogieGammeSelected;
     const prixDistribEmp =
       hygieneDistribTarifsFournisseur.find(
-        (item) => item.type === "emp" && item.gamme === gamme
+        (item) => item.type === "emp" && item.gamme === gamme,
       )?.[dureeLocation] ?? null;
     const prixDistribEmpPoubelle =
       hygieneDistribTarifsFournisseur.find(
-        (item) => item.type === "poubelleEmp" && item.gamme === gamme
+        (item) => item.type === "poubelleEmp" && item.gamme === gamme,
       )?.[dureeLocation] ?? null;
     const prixDistribSavon =
       hygieneDistribTarifsFournisseur.find(
-        (item) => item.type === "savon" && item.gamme === gamme
+        (item) => item.type === "savon" && item.gamme === gamme,
       )?.[dureeLocation] ?? null;
     const prixDistribPh =
       hygieneDistribTarifsFournisseur.find(
-        (item) => item.type === "ph" && item.gamme === gamme
+        (item) => item.type === "ph" && item.gamme === gamme,
       )?.[hygiene.infos.dureeLocation] ?? null;
     const minFacturation =
       hygieneMinFacturationFournisseur?.minFacturation ?? null;
@@ -318,7 +318,7 @@ const HygienePropositions = ({
             ? null
             : Math.max(
                 (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0),
-                minFacturation ?? 0
+                minFacturation ?? 0,
               );
 
         if (hygiene.infos.trilogieGammeSelected) {
@@ -361,7 +361,7 @@ const HygienePropositions = ({
             ? null
             : Math.max(
                 (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0),
-                hygiene.prix.minFacturation ?? 0
+                hygiene.prix.minFacturation ?? 0,
               );
         if (hygiene.infos.trilogieGammeSelected) {
           setTotalHygiene((prev) => ({
@@ -403,7 +403,7 @@ const HygienePropositions = ({
             ? null
             : Math.max(
                 (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0),
-                hygiene.prix.minFacturation ?? 0
+                hygiene.prix.minFacturation ?? 0,
               );
         if (hygiene.infos.trilogieGammeSelected) {
           setTotalHygiene((prev) => ({
@@ -460,19 +460,19 @@ const HygienePropositions = ({
     const gamme = hygiene.infos.trilogieGammeSelected;
     const prixDistribEmp =
       hygieneDistribTarifsFournisseur.find(
-        (item) => item.type === "emp" && item.gamme === gamme
+        (item) => item.type === "emp" && item.gamme === gamme,
       )?.[dureeLocation] ?? null;
     const prixDistribEmpPoubelle =
       hygieneDistribTarifsFournisseur.find(
-        (item) => item.type === "poubelleEmp" && item.gamme === gamme
+        (item) => item.type === "poubelleEmp" && item.gamme === gamme,
       )?.[dureeLocation] ?? null;
     const prixDistribSavon =
       hygieneDistribTarifsFournisseur.find(
-        (item) => item.type === "savon" && item.gamme === gamme
+        (item) => item.type === "savon" && item.gamme === gamme,
       )?.[dureeLocation] ?? null;
     const prixDistribPh =
       hygieneDistribTarifsFournisseur.find(
-        (item) => item.type === "ph" && item.gamme === gamme
+        (item) => item.type === "ph" && item.gamme === gamme,
       )?.[hygiene.infos.dureeLocation] ?? null;
     const minFacturation =
       hygieneMinFacturationFournisseur?.minFacturation ?? null;
@@ -522,7 +522,7 @@ const HygienePropositions = ({
             ? null
             : Math.max(
                 (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0),
-                minFacturation ?? 0
+                minFacturation ?? 0,
               );
 
         if (hygiene.infos.trilogieGammeSelected) {
@@ -569,7 +569,7 @@ const HygienePropositions = ({
             ? null
             : Math.max(
                 (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0),
-                minFacturation ?? 0
+                minFacturation ?? 0,
               );
 
         if (hygiene.infos.trilogieGammeSelected) {
@@ -615,7 +615,7 @@ const HygienePropositions = ({
             ? null
             : Math.max(
                 (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0),
-                minFacturation ?? 0
+                minFacturation ?? 0,
               );
 
         if (hygiene.infos.trilogieGammeSelected) {
@@ -673,19 +673,19 @@ const HygienePropositions = ({
     const gamme = hygiene.infos.trilogieGammeSelected;
     const prixDistribEmp =
       hygieneDistribTarifsFournisseur.find(
-        (item) => item.type === "emp" && item.gamme === gamme
+        (item) => item.type === "emp" && item.gamme === gamme,
       )?.[dureeLocation] ?? null;
     const prixDistribEmpPoubelle =
       hygieneDistribTarifsFournisseur.find(
-        (item) => item.type === "poubelleEmp" && item.gamme === gamme
+        (item) => item.type === "poubelleEmp" && item.gamme === gamme,
       )?.[dureeLocation] ?? null;
     const prixDistribSavon =
       hygieneDistribTarifsFournisseur.find(
-        (item) => item.type === "savon" && item.gamme === gamme
+        (item) => item.type === "savon" && item.gamme === gamme,
       )?.[dureeLocation] ?? null;
     const prixDistribPh =
       hygieneDistribTarifsFournisseur.find(
-        (item) => item.type === "ph" && item.gamme === gamme
+        (item) => item.type === "ph" && item.gamme === gamme,
       )?.[hygiene.infos.dureeLocation] ?? null;
 
     const minFacturation =
@@ -736,7 +736,7 @@ const HygienePropositions = ({
             ? null
             : Math.max(
                 (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0),
-                minFacturation ?? 0
+                minFacturation ?? 0,
               );
 
         if (hygiene.infos.trilogieGammeSelected) {
@@ -783,7 +783,7 @@ const HygienePropositions = ({
             ? null
             : Math.max(
                 (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0),
-                minFacturation ?? 0
+                minFacturation ?? 0,
               );
 
         if (hygiene.infos.trilogieGammeSelected) {
@@ -829,7 +829,7 @@ const HygienePropositions = ({
             ? null
             : Math.max(
                 (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0),
-                minFacturation ?? 0
+                minFacturation ?? 0,
               );
 
         if (hygiene.infos.trilogieGammeSelected) {
@@ -847,49 +847,49 @@ const HygienePropositions = ({
       hygieneDistribTarifsFournisseur.find(
         (tarif) =>
           tarif.type === "emp" &&
-          tarif.gamme === hygiene.infos.trilogieGammeSelected
+          tarif.gamme === hygiene.infos.trilogieGammeSelected,
       )?.[value] ?? null;
     const prixDistribEmpPoubelle =
       hygieneDistribTarifsFournisseur.find(
         (tarif) =>
           tarif.type === "poubelleEmp" &&
-          tarif.gamme === hygiene.infos.trilogieGammeSelected
+          tarif.gamme === hygiene.infos.trilogieGammeSelected,
       )?.[value] ?? null;
     const prixDistribSavon =
       hygieneDistribTarifsFournisseur.find(
         (tarif) =>
           tarif.type === "savon" &&
-          tarif.gamme === hygiene.infos.trilogieGammeSelected
+          tarif.gamme === hygiene.infos.trilogieGammeSelected,
       )?.[value] ?? null;
     const prixDistribPh =
       hygieneDistribTarifsFournisseur.find(
         (tarif) =>
           tarif.type === "ph" &&
-          tarif.gamme === hygiene.infos.trilogieGammeSelected
+          tarif.gamme === hygiene.infos.trilogieGammeSelected,
       )?.[value] ?? null;
     const prixDistribDesinfectant =
       hygieneDistribTarifsFournisseur.find(
         (tarif) =>
           tarif.type === "desinfectant" &&
-          tarif.gamme === hygiene.infos.desinfectantGammeSelected
+          tarif.gamme === hygiene.infos.desinfectantGammeSelected,
       )?.[value] ?? null;
     const prixDistribParfum =
       hygieneDistribTarifsFournisseur.find(
         (tarif) =>
           tarif.type === "parfum" &&
-          tarif.gamme === hygiene.infos.parfumGammeSelected
+          tarif.gamme === hygiene.infos.parfumGammeSelected,
       )?.[value] ?? null;
     const prixDistribBalai =
       hygieneDistribTarifsFournisseur.find(
         (tarif) =>
           tarif.type === "balai" &&
-          tarif.gamme === hygiene.infos.balaiGammeSelected
+          tarif.gamme === hygiene.infos.balaiGammeSelected,
       )?.[value] ?? null;
     const prixDistribPoubelle =
       hygieneDistribTarifsFournisseur.find(
         (tarif) =>
           tarif.type === "poubelle" &&
-          tarif.gamme === hygiene.infos.poubelleGammeSelected
+          tarif.gamme === hygiene.infos.poubelleGammeSelected,
       )?.[value] ?? null;
 
     const nbDistribDesinfectant = hygiene.quantites.nbDistribDesinfectant;
@@ -923,7 +923,7 @@ const HygienePropositions = ({
         ? null
         : Math.max(
             (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0),
-            minFacturation ?? 0
+            minFacturation ?? 0,
           );
 
     const totalDesinfectant =

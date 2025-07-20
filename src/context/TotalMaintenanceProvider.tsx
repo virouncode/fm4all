@@ -50,7 +50,7 @@ const TotalMaintenanceProvider = ({ children }: PropsWithChildren) => {
     if (isMounted) {
       localStorage.setItem(
         "totalMaintenance",
-        JSON.stringify(totalMaintenance)
+        JSON.stringify(totalMaintenance),
       );
     }
   }, [totalMaintenance, isMounted]);

@@ -14,7 +14,7 @@ function verifyMontantService(
   mensualSelector: string,
   annuelSelector: string,
   index = 0,
-  label = ""
+  label = "",
 ) {
   cy.log(`Vérification du service : **${label || mensualSelector}**`);
   cy.get(mensualSelector)
@@ -64,7 +64,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       "[data-testid='total-mensuel-nettoyage']",
       "[data-testid='total-service']",
       2,
-      "Nettoyage"
+      "Nettoyage",
     );
     cy.get('[data-testid="sheet-overlay"]').as("sheetOverlay").click();
 
@@ -75,7 +75,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       "[data-testid='total-mensuel-repasse']",
       "[data-testid='total-repasse']",
       0,
-      "Repasse"
+      "Repasse",
     );
     cy.get("@sheetOverlay").click();
 
@@ -85,7 +85,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       "[data-testid='total-mensuel-samedi']",
       "[data-testid='total-samedi']",
       0,
-      "Samedi"
+      "Samedi",
     );
     cy.get("@sheetOverlay").click();
 
@@ -95,7 +95,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       "[data-testid='total-mensuel-dimanche']",
       "[data-testid='total-dimanche']",
       0,
-      "Dimanche"
+      "Dimanche",
     );
     cy.get("@sheetOverlay").click();
 
@@ -105,7 +105,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       "[data-testid='total-mensuel-vitrerie']",
       "[data-testid='total-vitrerie']",
       0,
-      "Vitrerie"
+      "Vitrerie",
     );
     cy.get("@sheetOverlay").click();
 
@@ -118,7 +118,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       "[data-testid='total-mensuel-trilogie']",
       "[data-testid='total-trilogie']",
       0,
-      "Hygiene"
+      "Hygiene",
     );
     cy.get("@sheetOverlay").click();
 
@@ -129,7 +129,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       "[data-testid='total-mensuel-desinfectant']",
       "[data-testid='total-desinfectant']",
       0,
-      "Desinfectant"
+      "Desinfectant",
     );
     cy.get("@sheetOverlay").click();
     cy.get("[data-testid='parfum-switch']").eq(0).click();
@@ -137,7 +137,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       "[data-testid='total-mensuel-parfum']",
       "[data-testid='total-parfum']",
       0,
-      "Parfum"
+      "Parfum",
     );
     cy.get("@sheetOverlay").click();
     cy.get("[data-testid='balai-switch']").eq(0).click();
@@ -145,7 +145,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       "[data-testid='total-mensuel-balai']",
       "[data-testid='total-balai']",
       0,
-      "Balai"
+      "Balai",
     );
     cy.get("@sheetOverlay").click();
     cy.get("[data-testid='poubelle-switch']").eq(0).click();
@@ -153,7 +153,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       "[data-testid='total-mensuel-poubelle']",
       "[data-testid='total-poubelle']",
       0,
-      "Poubelle"
+      "Poubelle",
     );
     cy.get("@sheetOverlay").click();
 
@@ -164,7 +164,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       "[data-testid='total-mensuel-maintenance']",
       "[data-testid='total-maintenance']",
       0,
-      "Maintenance"
+      "Maintenance",
     );
     cy.get("@sheetOverlay").click();
 
@@ -175,7 +175,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       "[data-testid='total-mensuel-incendie']",
       "[data-testid='total-incendie']",
       0,
-      "Incendie"
+      "Incendie",
     );
     cy.get("@sheetOverlay").click();
     cy.get("[data-testid='next-service-button']").as("nextServiceButton");
@@ -192,7 +192,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       "[data-testid='total-mensuel-cafe-1']",
       "[data-testid='total-cafe-1']",
       0,
-      "Cafe Espace 1"
+      "Cafe Espace 1",
     );
     cy.get("@sheetOverlay").click();
     cy.get("[data-testid='add-espace-button']").eq(0).click();
@@ -201,7 +201,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       "[data-testid='total-mensuel-cafe-2']",
       "[data-testid='total-cafe-2']",
       0,
-      "Cafe Espace 2"
+      "Cafe Espace 2",
     );
     cy.get("@sheetOverlay").click();
     cy.get("[data-testid='next-service-button']").eq(0).click();
@@ -212,7 +212,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       "[data-testid='total-mensuel-the']",
       "[data-testid='total-the']",
       1,
-      "The"
+      "The",
     );
     cy.get("@sheetOverlay").click();
     cy.get("[data-testid='next-service-button']").eq(1).click();
@@ -225,7 +225,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       "[data-testid='total-mensuel-snacksfruits']",
       "[data-testid='total-snacksfruits']",
       2,
-      "Snacks & fruits"
+      "Snacks & fruits",
     );
     cy.get("@sheetOverlay").click();
     cy.get("[data-testid='next-service-button']").eq(2).click();
@@ -238,7 +238,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       "[data-testid='total-mensuel-fontaine-1']",
       "[data-testid='total-fontaine-1']",
       0,
-      "Fontaine à eau espace 1"
+      "Fontaine à eau espace 1",
     );
     cy.get("@sheetOverlay").click();
     cy.get("[data-testid='add-espace-button']").eq(1).click();
@@ -247,7 +247,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       "[data-testid='total-mensuel-fontaine-2']",
       "[data-testid='total-fontaine-2']",
       0,
-      "Fontaine à eau espace 2"
+      "Fontaine à eau espace 2",
     );
     cy.get("@sheetOverlay").click();
     cy.get("[data-testid='next-service-button']").eq(3).click();
@@ -259,7 +259,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       "[data-testid='total-mensuel-office-manager']",
       "[data-testid='total-office-manager']",
       0,
-      "Office manager"
+      "Office manager",
     );
     cy.get("@sheetOverlay").click();
     cy.get("[data-testid='next-service-button']").eq(0).click();
@@ -272,7 +272,7 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
       "[data-testid='total-mensuel-services-fm4all-essentiel']",
       "[data-testid='total-services-fm4all']",
       0,
-      "Services fm4all"
+      "Services fm4all",
     );
     cy.get("@sheetOverlay").click();
     cy.get("[data-testid='next-service-button']").eq(1).click();
@@ -280,14 +280,14 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
 
     // ➤ Étape 18 : Sauvegarder la progression
     cy.get("[data-testid='sauvegarder-progression-button']").should(
-      "be.disabled"
+      "be.disabled",
     );
     cy.get("[data-testid='sauvegarder-acceptation-checkbox']").should(
-      "not.be.checked"
+      "not.be.checked",
     );
     cy.get("[data-testid='sauvegarder-acceptation-checkbox']").click();
     cy.get("[data-testid='sauvegarder-progression-button']").should(
-      "not.be.disabled"
+      "not.be.disabled",
     );
     cy.get("[data-testid='email-contact-input']").type("virounk@gmail.com");
     cy.get("[data-testid='phone-contact-input']").type("0683267962");

@@ -268,7 +268,7 @@ const NettoyageOptionsPropositions = ({
               nettoyage.quantites.surfaceVitres /
                 nettoyage.quantites.cadenceVitres) *
               nettoyage.prix.tauxHoraireVitrerie,
-            nettoyage.prix.minFacturationVitrerie
+            nettoyage.prix.minFacturationVitrerie,
           )
         : null;
     setTotalNettoyage((prev) => ({

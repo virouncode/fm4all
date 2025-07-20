@@ -149,7 +149,7 @@ const CafeMobileEspacePropositionsCarousel = ({
           ? 0
           : espace.infos.gammeCafeSelected === "confort"
             ? 1
-            : 2
+            : 2,
       );
     }
   }, [
@@ -165,7 +165,7 @@ const CafeMobileEspacePropositionsCarousel = ({
         align: "start",
         loop: true,
       }}
-      className="w-full relative"
+      className="relative w-full"
       setApi={setApi}
     >
       <CarouselContent>
