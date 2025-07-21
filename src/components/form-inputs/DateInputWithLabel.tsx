@@ -50,7 +50,7 @@ export function DateInputWithLabel<S>({
                   className={cn(
                     "w-full max-w-xs pl-3 text-left font-normal",
                     !field.value && "text-muted-foreground",
-                    "flex w-full items-center",
+                    "flex items-center",
                   )}
                 >
                   {field.value ? (
