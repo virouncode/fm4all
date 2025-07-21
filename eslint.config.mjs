@@ -16,8 +16,7 @@ const eslintConfig = [
       "@typescript-eslint/no-unused-vars": "warn",
       "no-unused-vars": "off",
     },
-  }),
-  // AJOUTEZ LA CONFIGURATION POUR ESLINT-PLUGIN-TAILWINDCS
+  }), // AJOUTEZ LA CONFIGURATION POUR ESLINT-PLUGIN-TAILWINDCS
   ...compat.config({
     extends: [
       "plugin:tailwindcss/recommended", // Utilise la configuration recommandée du plugin Tailwind,
@@ -39,5 +38,4 @@ const eslintConfig = [
     },
   }),
 ];
-
 export default eslintConfig;
