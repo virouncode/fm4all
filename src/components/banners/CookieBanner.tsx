@@ -73,13 +73,16 @@ const CookieBanner = () => {
   return (
     <Sheet open={cookieConsent === null && pathname !== "/cookies"}>
       <SheetTrigger asChild></SheetTrigger>
-      <SheetContent side="bottom" className="[&>button:first-child]:hidden">
+      <SheetContent
+        side="bottom"
+        className="gap-0 [&>button:first-child]:hidden"
+      >
         <SheetHeader>
           <SheetTitle className="sr-only">
             {t("banniere-de-consentement-aux-cookies")}
           </SheetTitle>
         </SheetHeader>
-        <div className="flex flex-col items-center justify-between gap-6 px-6 py-4 text-sm md:flex-row lg:px-40">
+        <div className="flex flex-col items-center justify-between gap-6 px-6 pt-4 pb-10 text-sm md:flex-row lg:px-40">
           <div className="flex flex-col gap-2">
             <div className="relative h-[40px] w-[100px]">
               <Image
