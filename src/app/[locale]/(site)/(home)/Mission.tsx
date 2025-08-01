@@ -5,11 +5,11 @@ const Mission = () => {
   const t = useTranslations("HomePage.mission");
   return (
     <section id="mission">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-6 pb-20 pt-8">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-6 pt-8 pb-20">
         <h2 className="border-l-2 px-4 text-2xl md:text-3xl">
           {t("notre-mission")}
         </h2>
-        <div className="mx-auto flex w-full max-w-prose flex-col gap-6 hyphens-auto text-wrap">
+        <div className="mx-auto flex w-full max-w-prose flex-col gap-6 text-wrap hyphens-auto">
           <p>
             {t(
               "fm4all-a-analyse-des-centaines-dappels-doffres-de-matrices-de-chiffrage-et-contrats-pour-chaque-service-forts-de-cette-analyse-nous-avons-modelise-des",

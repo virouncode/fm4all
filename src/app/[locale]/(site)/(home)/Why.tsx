@@ -6,14 +6,14 @@ const Why = () => {
   const t = useTranslations("HomePage.pourquoi");
   return (
     <section
-      className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-6 pb-12 pt-8"
+      className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-6 pt-8 pb-12"
       id="process"
     >
       <h2 className="border-l-2 px-4 text-2xl md:text-3xl">
         {t("pourquoi-ca-marche")}
       </h2>
       <WhyCards />
-      <div className="mx-auto flex w-full max-w-prose flex-col gap-6 hyphens-auto text-wrap">
+      <div className="mx-auto flex w-full max-w-prose flex-col gap-6 text-wrap hyphens-auto">
         <p className="text-center font-bold">
           {t("parce-que-tout-le-monde-est-gagnant-prestataires-comme-clients")}
         </p>
@@ -96,7 +96,7 @@ const Why = () => {
           )}
         </p>
         <div className="mx-auto max-w-prose text-center">
-          <div className="mb-10 flex flex-col gap-1 text-5xl font-bold text-fm4allsecondary">
+          <div className="text-fm4allsecondary mb-10 flex flex-col gap-1 text-5xl font-bold">
             <p>{t("1-contact")}</p>
             <p>{t("1-contrat")}</p>
             <p>{t("1-facture")}</p>

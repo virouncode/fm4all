@@ -138,6 +138,7 @@ const NettoyagePropositions = ({
 
   //Un tableau de tableaux de propositions de nettoyage par fournisseur pour itérer
   const formattedPropositions = Object.values(propositionsByFournisseurId);
+  console.log("formattedPropositions", formattedPropositions);
 
   const handleClickProposition = (proposition: {
     id: number;

@@ -253,7 +253,7 @@ const OfficeManagerMobilePropositionCard = ({
       className={`bg-${color} flex h-[570px] flex-col rounded-xl border border-slate-200 p-4 text-white ${
         officeManager.infos.fournisseurId === fournisseurId &&
         officeManager.infos.gammeSelected !== null
-          ? "ring-4 ring-inset ring-fm4alldestructive"
+          ? "ring-fm4alldestructive ring-4 ring-inset"
           : ""
       }`}
     >

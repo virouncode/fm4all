@@ -121,7 +121,7 @@ const HygieneOptionsPoubelleCard = ({
               {tHygiene("receptacles").toLocaleLowerCase()}
             </Label>
           </div>
-          <p className="px-2 text-center text-xs italic text-fm4alldestructive">
+          <p className="text-fm4alldestructive px-2 text-center text-xs italic">
             {t(
               "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
             )}
@@ -245,7 +245,7 @@ const HygieneOptionsPoubelleCard = ({
           <div
             className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-2 text-xl text-slate-200 ${
               hygiene.infos.poubelleGammeSelected === gamme
-                ? "ring-4 ring-inset ring-fm4alldestructive"
+                ? "ring-fm4alldestructive ring-4 ring-inset"
                 : ""
             }`}
             key={"poubelle" + gamme}

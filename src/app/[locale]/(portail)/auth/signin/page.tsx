@@ -86,12 +86,12 @@ export default function SignIn() {
     <main className="relative mx-auto h-[calc(100vh-4rem)] max-w-7xl px-6 py-4 md:static md:px-20">
       <section className="flex h-full items-center justify-center">
         <BackgroundClient />
-        <Card className="max-w-md">
+        <Card className="w-sm">
           <CardHeader>
             <CardTitle className="text-lg md:text-xl">
               {t("connexion")}
             </CardTitle>
-            <CardDescription className="text-xs md:text-sm">
+            <CardDescription className="w-full text-xs md:text-sm">
               {t("entrez-votre-email-et-mot-de-passe-pour-vous-connecter")}
             </CardDescription>
           </CardHeader>

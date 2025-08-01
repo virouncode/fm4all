@@ -217,7 +217,7 @@ const HygieneMobileOptionsBalaiCard = ({
       <div
         className={`bg-${color} flex h-56 flex-col rounded-xl border border-slate-200 p-4 text-white ${
           hygiene.infos.balaiGammeSelected === gamme
-            ? "ring-4 ring-inset ring-fm4alldestructive"
+            ? "ring-fm4alldestructive ring-4 ring-inset"
             : ""
         }`}
       >

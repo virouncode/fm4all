@@ -72,16 +72,16 @@ const HeaderNavigationMenu = ({
             data-testid="services-trigger"
           >
             <div
-              className={`flex items-center gap-1 text-base ${isActive("/services") ? "font-bold text-destructive" : ""}`}
+              className={`flex items-center gap-1 text-base ${isActive("/services") ? "text-destructive font-bold" : ""}`}
             >
               <HandPlatter size={15} />
               <p>Services</p>
             </div>
           </NavigationMenuTrigger>
           <NavigationMenuContent>
-            <ul className="grid w-[400px] py-2">
-              <li className="px-6 py-2 hover:bg-accent">
-                <NavigationMenuLink asChild className="relative w-full">
+            <ul className="grid w-[400px]">
+              <li className="hover:bg-accent px-6">
+                <NavigationMenuLink asChild className="text-base">
                   <Link
                     href={"/services"}
                     title={
@@ -90,9 +90,9 @@ const HeaderNavigationMenu = ({
                     aria-label={
                       locale === "fr" ? "Tous nos services" : "All our services"
                     }
-                    className="flex w-full items-center gap-4 hover:underline"
+                    className="flex w-full flex-row items-center gap-4 hover:underline"
                   >
-                    <HandPlatter size={20} />
+                    <HandPlatter className="size-5" />
                     <span>
                       {locale === "fr"
                         ? "Tous nos services"
@@ -105,18 +105,18 @@ const HeaderNavigationMenu = ({
                 return (
                   <li
                     key={service.title}
-                    className="px-6 py-2 hover:bg-accent"
+                    className="hover:bg-accent px-6"
                     onClick={handleHideMobileNav}
                   >
-                    <NavigationMenuLink asChild className="relative w-full">
+                    <NavigationMenuLink asChild className="text-base">
                       <Link
                         //@ts-expect-error ok - href is a complex object
                         href={service.href}
                         title={service.linkText}
                         aria-label={service.linkText}
-                        className="flex w-full items-center gap-4 hover:underline"
+                        className="flex w-full flex-row items-center gap-4 hover:underline"
                       >
-                        <service.icon size={20} />
+                        <service.icon className="size-5" />
                         <span>{service.title}</span>
                         <span className="sr-only">{service.linkText}</span>
                       </Link>
@@ -133,35 +133,35 @@ const HeaderNavigationMenu = ({
             data-testid="secteurs-trigger"
           >
             <div
-              className={`flex items-center gap-1 text-base ${isActive("/secteurs") ? "font-bold text-destructive" : ""}`}
+              className={`flex items-center gap-1 text-base ${isActive("/secteurs") ? "text-destructive font-bold" : ""}`}
             >
               <Factory size={15} />
               <p>{locale === "fr" ? "Secteurs" : "Sectors"}</p>
             </div>
           </NavigationMenuTrigger>
           <NavigationMenuContent>
-            <ul className="grid w-[400px] py-2">
-              <li className="px-6 py-2 hover:bg-accent">
-                <NavigationMenuLink asChild className="relative w-full">
+            <ul className="grid w-[400px]">
+              <li className="hover:bg-accent px-6">
+                <NavigationMenuLink asChild className="text-base">
                   <Link
                     href={"/secteurs"}
-                    className="flex w-full items-center gap-4 hover:underline"
+                    className="flex w-full flex-row items-center gap-4 hover:underline"
                   >
-                    <Factory size={20} />
+                    <Factory className="size-5" />
                     {locale === "fr" ? "Tous nos secteurs" : "All our sectors"}
                   </Link>
                 </NavigationMenuLink>
               </li>
               {secteurs.map((secteur) => {
                 return (
-                  <li key={secteur.title} className="px-6 py-2 hover:bg-accent">
-                    <NavigationMenuLink asChild>
+                  <li key={secteur.title} className="hover:bg-accent px-6">
+                    <NavigationMenuLink asChild className="text-base">
                       <Link
                         //@ts-expect-error ok - href is a complex object
                         href={secteur.href}
-                        className="flex w-full items-center gap-4"
+                        className="flex w-full flex-row items-center gap-4 hover:underline"
                       >
-                        <secteur.icon size={20} />
+                        <secteur.icon className="size-5" />
                         {secteur.title}
                       </Link>
                     </NavigationMenuLink>
@@ -176,10 +176,11 @@ const HeaderNavigationMenu = ({
             asChild
             onClick={handleHideMobileNav}
             data-testid="gammes-link"
+            className="text-base"
           >
             <div
-              className={`flex items-center gap-1 ${
-                isActive("/gammes") ? "font-bold text-destructive" : ""
+              className={`flex flex-row items-center gap-1 ${
+                isActive("/gammes") ? "text-destructive font-bold" : ""
               }`}
             >
               <Star size={15} />
@@ -192,10 +193,11 @@ const HeaderNavigationMenu = ({
             asChild
             onClick={handleHideMobileNav}
             data-testid="engagements-link"
+            className="text-base"
           >
             <div
-              className={`flex items-center gap-1 ${
-                isActive("/engagements") ? "font-bold text-destructive" : ""
+              className={`flex flex-row items-center gap-1 ${
+                isActive("/engagements") ? "text-destructive font-bold" : ""
               }`}
             >
               <ScrollText size={15} />
@@ -210,10 +212,11 @@ const HeaderNavigationMenu = ({
             asChild
             onClick={handleHideMobileNav}
             data-testid="partenaires-link"
+            className="text-base"
           >
             <div
-              className={`flex items-center gap-1 ${
-                isActive("/partenaires") ? "font-bold text-destructive" : ""
+              className={`flex flex-row items-center gap-1 ${
+                isActive("/partenaires") ? "text-destructive font-bold" : ""
               }`}
             >
               <Handshake size={15} />
@@ -236,7 +239,7 @@ const HeaderNavigationMenu = ({
         <AccordionItem value={"services"}>
           <AccordionTrigger className="text-lg">
             <div
-              className={`flex items-center gap-2 ${isActive("/services") ? "font-bold text-destructive" : ""}`}
+              className={`flex items-center gap-2 ${isActive("/services") ? "text-destructive font-bold" : ""}`}
             >
               <HandPlatter />
               <span>Services</span>
@@ -245,7 +248,7 @@ const HeaderNavigationMenu = ({
           <AccordionContent>
             <ul className="flex flex-col gap-2">
               <li
-                className="px-4 py-2 hover:bg-accent"
+                className="hover:bg-accent px-4 py-2"
                 onClick={handleHideMobileNav}
               >
                 <Link
@@ -258,7 +261,7 @@ const HeaderNavigationMenu = ({
                   }
                   className="flex w-full items-center gap-4 !text-lg hover:underline"
                 >
-                  <HandPlatter size={20} />
+                  <HandPlatter className="size-5" />
                   <span>
                     {locale === "fr" ? "Tous nos services" : "All our services"}
                   </span>
@@ -268,7 +271,7 @@ const HeaderNavigationMenu = ({
                 return (
                   <li
                     key={service.title}
-                    className="px-4 py-2 hover:bg-accent"
+                    className="hover:bg-accent px-4 py-2"
                     onClick={handleHideMobileNav}
                   >
                     <Link
@@ -278,7 +281,7 @@ const HeaderNavigationMenu = ({
                       aria-label={service.linkText}
                       className="flex w-full items-center gap-4 !text-lg hover:underline"
                     >
-                      <service.icon size={20} />
+                      <service.icon className="size-5" />
                       <span>{service.title}</span>
                       <span className="sr-only">{service.linkText}</span>
                     </Link>
@@ -291,7 +294,7 @@ const HeaderNavigationMenu = ({
         <AccordionItem value={"secteurs"}>
           <AccordionTrigger className="text-lg">
             <div
-              className={`flex items-center gap-2 ${isActive("/secteurs") ? "font-bold text-destructive" : ""}`}
+              className={`flex items-center gap-2 ${isActive("/secteurs") ? "text-destructive font-bold" : ""}`}
             >
               <Factory />
               <span>{locale === "fr" ? "Secteurs" : "Sectors"}</span>
@@ -300,7 +303,7 @@ const HeaderNavigationMenu = ({
           <AccordionContent>
             <ul className="flex flex-col gap-2">
               <li
-                className="px-4 py-2 hover:bg-accent"
+                className="hover:bg-accent px-4 py-2"
                 onClick={handleHideMobileNav}
               >
                 <Link
@@ -314,7 +317,7 @@ const HeaderNavigationMenu = ({
                   className="flex w-full items-center gap-4 !text-lg hover:underline"
                   locale={locale}
                 >
-                  <Factory size={20} />
+                  <Factory className="size-5" />
                   <span>
                     {locale === "fr" ? "Tous nos secteurs" : "All our sectors"}
                   </span>
@@ -324,7 +327,7 @@ const HeaderNavigationMenu = ({
                 return (
                   <li
                     key={secteur.title}
-                    className="px-4 py-2 hover:bg-accent"
+                    className="hover:bg-accent px-4 py-2"
                     onClick={handleHideMobileNav}
                   >
                     <Link
@@ -332,7 +335,7 @@ const HeaderNavigationMenu = ({
                       href={secteur.href}
                       className="flex w-full items-center gap-4 !text-lg hover:underline"
                     >
-                      <secteur.icon size={20} />
+                      <secteur.icon className="size-5" />
                       {secteur.title}
                     </Link>
                   </li>
@@ -343,7 +346,7 @@ const HeaderNavigationMenu = ({
         </AccordionItem>
         <AccordionItem value={"gammes"} onClick={handleHideMobileNav}>
           <div
-            className={`flex items-center gap-2 py-4 ${isActive("/gammes") ? "font-bold text-destructive" : ""}`}
+            className={`flex items-center gap-2 py-4 ${isActive("/gammes") ? "text-destructive font-bold" : ""}`}
           >
             <Star />
             <Link href="/gammes" className="w-full text-lg">
@@ -353,7 +356,7 @@ const HeaderNavigationMenu = ({
         </AccordionItem>
         <AccordionItem value={"engagements"} onClick={handleHideMobileNav}>
           <div
-            className={`flex items-center gap-2 py-4 ${isActive("/engagements") ? "font-bold text-destructive" : ""}`}
+            className={`flex items-center gap-2 py-4 ${isActive("/engagements") ? "text-destructive font-bold" : ""}`}
           >
             <ScrollText />
             <Link href="/engagements" className="w-full text-lg">
@@ -363,7 +366,7 @@ const HeaderNavigationMenu = ({
         </AccordionItem>
         <AccordionItem value={"partenaires"} onClick={handleHideMobileNav}>
           <div
-            className={`flex items-center gap-2 py-4 ${isActive("/partenaires") ? "font-bold text-destructive" : ""}`}
+            className={`flex items-center gap-2 py-4 ${isActive("/partenaires") ? "text-destructive font-bold" : ""}`}
           >
             <Handshake />
             <Link href="/partenaires" className="w-full text-lg">

@@ -152,7 +152,7 @@ const NettoyagePropositionCard = ({
       className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-4 text-2xl text-slate-200 ${
         nettoyage.infos.fournisseurId === proposition.fournisseurId &&
         nettoyage.infos.gammeSelected === proposition.gamme
-          ? "ring-4 ring-inset ring-fm4alldestructive"
+          ? "ring-fm4alldestructive ring-4 ring-inset"
           : ""
       }`}
       onClick={() => handleClickProposition(proposition)}

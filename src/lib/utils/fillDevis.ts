@@ -3,7 +3,7 @@ import { MARGE, TVA } from "@/constants/constants";
 import { occupation } from "@/constants/occupation";
 import { toast } from "@/hooks/use-toast";
 import { InsertClientType } from "@/zod-schemas/client";
-import html2canvas from "html2canvas";
+import html2canvas from "html2canvas-pro";
 import { PDFDocument, PDFTextField, RotationTypes } from "pdf-lib";
 import { formatNumber } from "./formatNumber";
 import { formatSIRET } from "./isValidSIRET";

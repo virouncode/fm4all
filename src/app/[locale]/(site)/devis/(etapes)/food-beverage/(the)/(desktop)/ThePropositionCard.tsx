@@ -88,34 +88,28 @@ const ThePropositionCard = ({
 
   const infosEssentiel = (
     <>
-      <li className="list-check font-bold">
+      <li className="list-check">
         {tThe("the-en-sachet-un-ou-deux-au-choix")}
       </li>
-      {proposition.infos && (
-        <li className="list-check font-bold">{proposition.infos}</li>
-      )}
+      {proposition.infos && <li className="list-check">{proposition.infos}</li>}
     </>
   );
 
   const infosConfort = (
     <>
-      <li className="list-check font-bold">
+      <li className="list-check">
         {tThe("choix-de-plusieurs-thes-en-sachets")}
       </li>
-      {proposition.infos && (
-        <li className="list-check font-bold">{proposition.infos}</li>
-      )}
+      {proposition.infos && <li className="list-check">{proposition.infos}</li>}
     </>
   );
 
   const infosExcellence = (
     <>
-      <li className="list-check font-bold">
+      <li className="list-check">
         {tThe("thes-premium-en-boite-bois-ou-presentoir")}
       </li>
-      {proposition.infos && (
-        <li className="list-check font-bold">{proposition.infos}</li>
-      )}
+      {proposition.infos && <li className="list-check">{proposition.infos}</li>}
     </>
   );
 
@@ -173,7 +167,7 @@ const ThePropositionCard = ({
     <div
       className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-4 text-2xl text-slate-200 ${
         the.infos.gammeSelected === proposition.gamme
-          ? "ring-4 ring-inset ring-fm4alldestructive"
+          ? "ring-fm4alldestructive ring-4 ring-inset"
           : ""
       }`}
       onClick={() => handleClickProposition(proposition)}

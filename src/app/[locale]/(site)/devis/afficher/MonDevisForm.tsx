@@ -224,6 +224,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
               title: t("erreur"),
               description: err.message,
             });
+            console.log(err);
           } else console.log(err);
         } finally {
           setLoading(false);
@@ -351,7 +352,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
         {t("felicitations")} {client.prenomContact} {client.nomContact} !
       </p>
       <p className="text-lg">{t("votre-devis-final-est-pret")}</p>
-      <p className="mx-auto max-w-prose hyphens-auto text-wrap text-base">
+      <p className="mx-auto max-w-prose text-base text-wrap hyphens-auto">
         {t("afin-de-donner-une")} <strong>{t("entete-a-votre-devis")}</strong>{" "}
         {t(
           "et-faciliter-vos-futures-demarches-vous-pouvez-nous-communiquer-vos-coordonnees-ainsi-que-celles-du-signataire-du-contrat-si-differentes",
@@ -491,12 +492,12 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
               <Checkbox
                 checked={accepte}
                 onCheckedChange={(value: boolean) => setAccepte(value)}
-                className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
+                className="bg-background data-[state=checked]:bg-background data-[state=checked]:text-foreground font-bold"
                 id="acceptation"
                 aria-label={t("acceptez-les-conditions")}
                 data-testid="acceptation-checkbox"
               />
-              <Label htmlFor="acceptation" className="max-w-prose">
+              <Label htmlFor="acceptation" className="inline max-w-prose">
                 {t(
                   "en-cochant-cette-case-je-reconnais-avoir-lu-compris-et-accepte-sans-reserve-les",
                 )}{" "}

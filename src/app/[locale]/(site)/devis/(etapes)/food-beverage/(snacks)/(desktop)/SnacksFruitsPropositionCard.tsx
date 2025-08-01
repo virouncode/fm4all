@@ -254,7 +254,7 @@ const SnacksFruitsPropositionCard = ({
       className={`flex flex-1 bg-${color} min-h-36 cursor-pointer items-center justify-center gap-4 p-4 text-2xl text-slate-200 ${
         snacksFruits.infos.fournisseurId === proposition.fournisseurId &&
         snacksFruits.infos.gammeSelected === gamme
-          ? "ring-4 ring-inset ring-fm4alldestructive"
+          ? "ring-fm4alldestructive ring-4 ring-inset"
           : ""
       }`}
       onClick={() => handleClickProposition(proposition)}

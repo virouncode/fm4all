@@ -249,7 +249,7 @@ const NettoyageMobileOptionsVitrerieCard = ({
           </Button>
         </div>
 
-        <p className="text-xs italic text-fm4alldestructive">
+        <p className="text-fm4alldestructive text-xs italic">
           {t(
             "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
           )}
@@ -258,7 +258,7 @@ const NettoyageMobileOptionsVitrerieCard = ({
       <div
         className={`bg-${color} flex h-64 flex-col rounded-xl border border-slate-200 p-4 text-white ${
           nettoyage.infos.vitrerieSelected && vitrerieProposition.prixAnnuel
-            ? "ring-4 ring-inset ring-fm4alldestructive"
+            ? "ring-fm4alldestructive ring-4 ring-inset"
             : ""
         }`}
       >

@@ -52,7 +52,6 @@
 ### Configuration Files
 
 - **next.config.ts**: Next.js configuration
-- **tailwind.config.ts**: Tailwind CSS configuration
 - **tsconfig.json**: TypeScript configuration
 - **drizzle.config.ts**: Drizzle ORM configuration
 - **eslint.config.mjs**: ESLint configuration

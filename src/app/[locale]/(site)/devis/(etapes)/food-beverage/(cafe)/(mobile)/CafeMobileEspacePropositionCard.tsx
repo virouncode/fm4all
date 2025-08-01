@@ -225,21 +225,21 @@ const CafeMobileEspacePropositionCard = ({
   );
 
   const infosEssentiel = (
-    <li className="list-check font-bold">
+    <li className="list-check">
       {proposition.infos
         ? proposition.infos
         : tCafe("cafe-conventionnel-dit-classique-blend")}
     </li>
   );
   const infosConfort = (
-    <li className="list-check font-bold">
+    <li className="list-check">
       {proposition.infos
         ? proposition.infos
         : tCafe("cafe-superieur-100-arabica")}
     </li>
   );
   const infosExcellence = (
-    <li className="list-check font-bold">
+    <li className="list-check">
       {proposition.infos
         ? proposition.infos
         : tCafe("cafe-de-specialite-premium-cafe-dexception-bio")}
@@ -317,7 +317,7 @@ const CafeMobileEspacePropositionCard = ({
           cafe.infos.fournisseurId === fournisseurId &&
           espace.infos.gammeCafeSelected === gamme &&
           totalAnnuel
-            ? "ring-4 ring-inset ring-fm4alldestructive"
+            ? "ring-fm4alldestructive ring-4 ring-inset"
             : ""
         }`}
       >
