@@ -98,34 +98,28 @@ const TheMobilePropositionCard = ({
 
   const infosEssentiel = (
     <>
-      <li className="list-check font-bold">
+      <li className="list-check">
         {tThe("the-en-sachet-un-ou-deux-au-choix")}
       </li>
-      {proposition.infos && (
-        <li className="list-check font-bold">{proposition.infos}</li>
-      )}
+      {proposition.infos && <li className="list-check">{proposition.infos}</li>}
     </>
   );
 
   const infosConfort = (
     <>
-      <li className="list-check font-bold">
+      <li className="list-check">
         {tThe("choix-de-plusieurs-thes-en-sachets")}
       </li>
-      {proposition.infos && (
-        <li className="list-check font-bold">{proposition.infos}</li>
-      )}
+      {proposition.infos && <li className="list-check">{proposition.infos}</li>}
     </>
   );
 
   const infosExcellence = (
     <>
-      <li className="list-check font-bold">
+      <li className="list-check">
         {tThe("thes-premium-en-boite-bois-ou-presentoir")}
       </li>
-      {proposition.infos && (
-        <li className="list-check font-bold">{proposition.infos}</li>
-      )}
+      {proposition.infos && <li className="list-check">{proposition.infos}</li>}
     </>
   );
 
@@ -201,7 +195,7 @@ const TheMobilePropositionCard = ({
       <div
         className={`bg-${color} flex h-64 flex-col rounded-xl border border-slate-200 p-4 text-white ${
           the.infos.gammeSelected === gamme
-            ? "ring-4 ring-inset ring-fm4alldestructive"
+            ? "ring-fm4alldestructive ring-4 ring-inset"
             : ""
         }`}
       >

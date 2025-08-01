@@ -205,21 +205,21 @@ const CafeEspacePropositionCard = ({
   ) : null;
 
   const infosEssentiel = (
-    <li className="list-check font-bold">
+    <li className="list-check">
       {proposition.infos
         ? proposition.infos
         : tCafe("cafe-conventionnel-dit-classique-blend")}
     </li>
   );
   const infosConfort = (
-    <li className="list-check font-bold">
+    <li className="list-check">
       {proposition.infos
         ? proposition.infos
         : tCafe("cafe-superieur-100-arabica")}
     </li>
   );
   const infosExcellence = (
-    <li className="list-check font-bold">
+    <li className="list-check">
       {proposition.infos
         ? proposition.infos
         : tCafe("cafe-de-specialite-premium-cafe-dexception-bio")}
@@ -295,7 +295,7 @@ const CafeEspacePropositionCard = ({
       className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-4 text-2xl text-slate-200 ${
         espace.infos.gammeCafeSelected === gamme &&
         cafe.infos.fournisseurId === proposition.fournisseurId
-          ? "ring-4 ring-inset ring-fm4alldestructive"
+          ? "ring-fm4alldestructive ring-4 ring-inset"
           : ""
       }`}
       onClick={() =>

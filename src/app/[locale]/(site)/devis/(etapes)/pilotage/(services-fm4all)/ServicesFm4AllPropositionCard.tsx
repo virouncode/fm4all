@@ -235,7 +235,7 @@ const ServicesFm4AllPropositionCard = ({
     <div
       className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-4 text-2xl text-slate-200 ${
         servicesFm4All.infos.gammeSelected === gamme
-          ? "ring-4 ring-inset ring-fm4alldestructive"
+          ? "ring-fm4alldestructive ring-4 ring-inset"
           : ""
       } ${!total ? "pointer-events-none opacity-50" : ""}`}
       onClick={() => handleClickProposition(proposition)}

@@ -156,7 +156,7 @@ const SecuriteIncendiePropostionCard = ({
     <div
       className={`flex w-3/4 cursor-pointer items-center justify-center gap-4 bg-slate-100 p-4 text-xl ${
         incendie.infos.fournisseurId === proposition.fournisseurId
-          ? "ring-4 ring-inset ring-fm4alldestructive"
+          ? "ring-fm4alldestructive ring-4 ring-inset"
           : ""
       }`}
       onClick={() => handleClickProposition(proposition)}

@@ -328,7 +328,7 @@ const FontaineMobileEspacePropositionCard = ({
         className={`flex h-72 flex-col rounded-xl border border-slate-200 bg-slate-100 p-4 ${
           fontaines.infos.fournisseurId === proposition.fournisseurId &&
           espace.infos.poseSelected === proposition.typePose
-            ? "ring-4 ring-inset ring-fm4alldestructive"
+            ? "ring-fm4alldestructive ring-4 ring-inset"
             : ""
         }`}
       >

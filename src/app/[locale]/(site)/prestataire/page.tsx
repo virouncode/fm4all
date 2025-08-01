@@ -60,7 +60,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
       </Breadcrumb>
       <article className="mt-6 flex flex-col gap-10">
         <h1 className="text-4xl">{t("devenir-prestataire")}</h1>
-        <div className="mx-auto flex w-full max-w-prose flex-col gap-6 hyphens-auto text-wrap">
+        <div className="mx-auto flex w-full max-w-prose flex-col gap-6 text-wrap hyphens-auto">
           <h2 className="text-center font-bold">
             {t("vous-etes-prestataire-de-service")} <br />
             {t("vous-cherchez-a-developper-votre-activite")}
@@ -69,7 +69,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             {t("fm4all-vous-propose-de-devenir-partenaire")}
           </p>
         </div>
-        <div className="mx-auto flex w-full max-w-prose flex-col gap-4 hyphens-auto text-wrap text-lg">
+        <div className="mx-auto flex w-full max-w-prose flex-col gap-4 text-wrap hyphens-auto">
           <ul className="ml-10 md:ml-20">
             <li className="list-rocket">{t("apports-d-affaires-gratuits")}</li>
             <li className="list-rocket">
@@ -98,11 +98,11 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             </li>
           </ul>
         </div>
-        <div className="flex flex-col gap-4 text-lg">
+        <div className="flex flex-col gap-4">
           <h2 className="mb-4 ml-6 border-l-2 px-4 text-2xl md:text-3xl">
             {t("nos-engagements")}
           </h2>
-          <div className="mx-auto flex w-full max-w-prose flex-col gap-4 hyphens-auto text-wrap">
+          <div className="mx-auto flex w-full max-w-prose flex-col gap-4 text-wrap hyphens-auto">
             <ul className="ml-10 md:ml-20">
               <li className="list-thumb">
                 {t("apports-d-affaires-sans-aucun-frais")}
@@ -125,11 +125,11 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             </ul>
           </div>
         </div>
-        <div className="flex flex-col gap-4 text-lg">
+        <div className="flex flex-col gap-4">
           <h2 className="mb-4 ml-6 border-l-2 px-4 text-2xl md:text-3xl">
             {t("votre-contrepartie")}
           </h2>
-          <div className="mx-auto flex w-full max-w-prose flex-col gap-4 hyphens-auto text-wrap">
+          <div className="mx-auto flex w-full max-w-prose flex-col gap-4 text-wrap hyphens-auto">
             <ul className="ml-10 md:ml-20">
               <li className="list-handshake">
                 {t(
@@ -160,11 +160,11 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             </ul>
           </div>
         </div>
-        <div className="flex flex-col gap-4 text-lg">
+        <div className="flex flex-col gap-4">
           <h2 className="mb-4 ml-6 border-l-2 px-4 text-2xl md:text-3xl">
             {t("le-benefice-client")}
           </h2>
-          <div className="mx-auto flex w-full max-w-prose flex-col gap-4 hyphens-auto text-wrap">
+          <div className="mx-auto flex w-full max-w-prose flex-col gap-4 text-wrap hyphens-auto">
             <ul className="ml-10 md:ml-20">
               <li className="list-smile">
                 {t("un-grand-choix-de-prestations-sur-une-meme-plateforme")}

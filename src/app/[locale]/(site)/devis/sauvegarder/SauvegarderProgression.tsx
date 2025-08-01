@@ -269,12 +269,12 @@ const SauvegarderProgression = () => {
               <Checkbox
                 checked={accepte}
                 onCheckedChange={(value: boolean) => setAccepte(value)}
-                className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
+                className="bg-background data-[state=checked]:bg-background data-[state=checked]:text-foreground font-bold"
                 id="acceptation"
                 aria-label={tSauver("acceptez-les-conditions")}
                 data-testid="sauvegarder-acceptation-checkbox"
               />
-              <Label htmlFor="acceptation">
+              <Label htmlFor="acceptation" className="inline">
                 {tSauver(
                   "jaccepte-que-les-informations-saisies-soient-utilisees-par-fm4all-dans-le-cadre-de-ma-demande-et-conformement-a-sa",
                 )}{" "}

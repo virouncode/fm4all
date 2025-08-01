@@ -2,6 +2,8 @@ import type { Preview } from "@storybook/nextjs-vite";
 import "../src/app/[locale]/globals.css"; // Import global styles
 import nextIntl from "./next-intl";
 
+import { withThemeByClassName } from "@storybook/addon-themes";
+
 const preview: Preview = {
   initialGlobals: {
     locale: "fr",
@@ -10,6 +12,7 @@ const preview: Preview = {
       fr: "Français",
     },
   },
+
   parameters: {
     // controls: {
     //   matchers: {
@@ -25,6 +28,15 @@ const preview: Preview = {
     // },
     nextIntl,
   },
+
+  decorators: [withThemeByClassName({
+      themes: {
+          // nameOfTheme: 'classNameForTheme',
+          light: '',
+          dark: 'dark',
+      },
+      defaultTheme: 'light',
+  })]
 };
 
 export default preview;

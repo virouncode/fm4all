@@ -269,7 +269,7 @@ const SnacksFruitsMobilePropositionCard = ({
         className={`bg-${color} flex h-56 flex-col rounded-xl border border-slate-200 p-4 text-white ${
           snacksFruits.infos.fournisseurId === fournisseurId &&
           snacksFruits.infos.gammeSelected === gamme
-            ? "ring-4 ring-inset ring-fm4alldestructive"
+            ? "ring-fm4alldestructive ring-4 ring-inset"
             : ""
         }`}
       >

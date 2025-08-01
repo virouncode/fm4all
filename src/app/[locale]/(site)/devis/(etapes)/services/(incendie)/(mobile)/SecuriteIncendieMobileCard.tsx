@@ -102,7 +102,7 @@ const SecuriteIncendieMobileCard = ({
   );
 
   const imgProduit = (
-    <div className="relative h-full w-1/3 overflow-hidden rounded-xl bg-slate-200">
+    <div className="relative h-full w-1/3 overflow-hidden rounded-xl bg-slate-100">
       <Image
         src={"/img/services/incendie.webp"}
         alt={`illustration de sécurité incendie`}
@@ -142,15 +142,6 @@ const SecuriteIncendieMobileCard = ({
           </li>
         </ul>
       </li>
-      <li className="list-check">
-        {tIncendie(
-          "pour-la-securite-de-tous-verification-annuelle-obligatoire-norme",
-        )}
-        <strong> {tIncendie("nf-s61-919")}</strong>
-        {tIncendie(
-          "conseils-sur-limplantation-remplacement-ou-rechargement-si-necessaire-au-bpu",
-        )}
-      </li>
     </ul>
   );
 
@@ -185,9 +176,9 @@ const SecuriteIncendieMobileCard = ({
 
   return (
     <div
-      className={`flex h-80 flex-col rounded-xl border border-slate-200 bg-slate-100 p-4 ${
+      className={`flex h-72 flex-col rounded-xl border border-slate-200 bg-slate-100 p-4 ${
         incendie.infos.fournisseurId === proposition.fournisseurId
-          ? "ring-4 ring-inset ring-fm4alldestructive"
+          ? "ring-fm4alldestructive ring-4 ring-inset"
           : ""
       }`}
     >

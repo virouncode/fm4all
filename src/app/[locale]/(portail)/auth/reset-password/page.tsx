@@ -24,7 +24,7 @@ export default async function page({ searchParams }: ResetPasswordProps) {
       <main className="mx-auto h-[calc(100vh-4rem)] max-w-7xl px-6 py-4 md:px-20">
         <section className="flex h-full items-center justify-center">
           <BackgroundServer />
-          <Card className="z-10 max-w-md">
+          <Card className="z-10 w-sm">
             <CardHeader>
               <CardTitle className="text-lg md:text-xl">
                 Lien de réinitialisation invalide
@@ -56,7 +56,7 @@ export default async function page({ searchParams }: ResetPasswordProps) {
     <main className="mx-auto h-[calc(100vh-4rem)] max-w-7xl px-6 py-4 md:px-20">
       <section className="flex h-full items-center justify-center">
         <BackgroundServer />
-        <Card className="z-10 max-w-md">
+        <Card className="z-10 w-sm">
           <CardHeader>
             <CardTitle className="text-lg md:text-xl">
               Réinitialisation du mot de passe

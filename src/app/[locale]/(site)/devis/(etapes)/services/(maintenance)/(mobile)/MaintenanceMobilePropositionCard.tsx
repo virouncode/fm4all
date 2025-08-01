@@ -198,7 +198,7 @@ const MaintenanceMobilePropositionCard = ({
         className={`bg-${color} flex h-72 flex-col rounded-xl border border-slate-200 p-4 text-white ${
           maintenance.infos.fournisseurId === fournisseurId &&
           maintenance.infos.gammeSelected === gamme
-            ? "ring-4 ring-inset ring-fm4alldestructive"
+            ? "ring-fm4alldestructive ring-4 ring-inset"
             : ""
         }`}
       >

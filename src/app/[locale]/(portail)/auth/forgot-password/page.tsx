@@ -60,7 +60,7 @@ export default function ForgotPassword() {
     <main className="mx-auto h-[calc(100vh-4rem)] max-w-7xl px-6 py-4 md:px-20">
       <section className="flex h-full items-center justify-center">
         <BackgroundClient />
-        <Card className="z-10 max-w-md">
+        <Card className="z-10 w-sm">
           <CardHeader>
             <CardTitle className="text-lg md:text-xl">
               Mot de passe oublié

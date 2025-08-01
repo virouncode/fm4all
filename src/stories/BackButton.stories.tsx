@@ -1,11 +1,13 @@
 import BackButton from "@/components/buttons/back-button";
 import { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { NextIntlClientProvider } from "next-intl";
 import { ComponentProps } from "react";
 import { fn } from "storybook/test";
 
 type StoryProps = ComponentProps<typeof BackButton>;
 
 const meta: Meta<StoryProps> = {
+  title: "Design System/Atoms/Buttons/BackButton",
   component: BackButton,
   tags: ["autodocs"],
   parameters: {
@@ -62,7 +64,11 @@ export const Default: Story = {
     variant: "default",
     size: "lg",
   },
-  render: (args) => <BackButton {...args} />,
+  render: (args) => (
+    <NextIntlClientProvider locale="fr">
+      <BackButton {...args} />
+    </NextIntlClientProvider>
+  ),
 };
 
 export const Destructive: Story = {
@@ -71,7 +77,11 @@ export const Destructive: Story = {
     variant: "destructive",
     size: "lg",
   },
-  render: (args) => <BackButton {...args} />,
+  render: (args) => (
+    <NextIntlClientProvider locale="fr">
+      <BackButton {...args} />
+    </NextIntlClientProvider>
+  ),
 };
 
 export const Outline: Story = {
@@ -80,7 +90,11 @@ export const Outline: Story = {
     variant: "outline",
     size: "lg",
   },
-  render: (args) => <BackButton {...args} />,
+  render: (args) => (
+    <NextIntlClientProvider locale="fr">
+      <BackButton {...args} />
+    </NextIntlClientProvider>
+  ),
 };
 
 export const Secondary: Story = {
@@ -89,7 +103,11 @@ export const Secondary: Story = {
     variant: "secondary",
     size: "lg",
   },
-  render: (args) => <BackButton {...args} />,
+  render: (args) => (
+    <NextIntlClientProvider locale="fr">
+      <BackButton {...args} />
+    </NextIntlClientProvider>
+  ),
 };
 
 export const Ghost: Story = {
@@ -98,7 +116,11 @@ export const Ghost: Story = {
     variant: "ghost",
     size: "lg",
   },
-  render: (args) => <BackButton {...args} />,
+  render: (args) => (
+    <NextIntlClientProvider locale="fr">
+      <BackButton {...args} />
+    </NextIntlClientProvider>
+  ),
 };
 
 export const Link: Story = {
@@ -107,5 +129,9 @@ export const Link: Story = {
     variant: "link",
     size: "lg",
   },
-  render: (args) => <BackButton {...args} />,
+  render: (args) => (
+    <NextIntlClientProvider locale="fr">
+      <BackButton {...args} />
+    </NextIntlClientProvider>
+  ),
 };

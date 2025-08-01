@@ -14,7 +14,7 @@ const Hero = async () => {
       <div className="relative z-10 mx-auto flex w-11/12 max-w-7xl flex-col items-center gap-8 px-4 py-12">
         <div className="w-full max-w-3xl text-white">
           <h1
-            className={`mb-14 animate-appear hyphens-auto text-pretty text-4xl font-bold tracking-tighter md:text-5xl lg:text-6xl`}
+            className={`animate-appear mb-14 text-4xl font-bold tracking-tighter text-pretty hyphens-auto md:text-5xl lg:text-6xl`}
           >
             {t("votre-entreprise-de")}{" "}
             <span className="text-fm4alldestructive">

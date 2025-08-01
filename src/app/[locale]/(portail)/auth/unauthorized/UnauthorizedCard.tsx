@@ -46,7 +46,7 @@ const UnauthorizedCard = ({ type }: UnauthorizedCardProps) => {
     }
   };
   return (
-    <Card className="z-20 max-w-md">
+    <Card className="z-20 w-sm">
       <CardHeader>
         <CardTitle className="text-lg text-red-600 md:text-xl">
           {locale === "fr" ? "Page non autorisée !" : "Unauthorized Page!"}

@@ -239,7 +239,7 @@ const HygieneOptionsBalaiCard = ({
           <div
             className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-2 text-xl text-slate-200 ${
               hygiene.infos.balaiGammeSelected === gamme
-                ? "ring-4 ring-inset ring-fm4alldestructive"
+                ? "ring-fm4alldestructive ring-4 ring-inset"
                 : ""
             }`}
             key={"balai" + gamme}

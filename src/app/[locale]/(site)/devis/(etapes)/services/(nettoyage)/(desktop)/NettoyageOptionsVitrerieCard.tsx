@@ -127,7 +127,7 @@ const NettoyageOptionsVitrerieCard = ({
               {t("passages-an")}
             </Label>
           </div>
-          <p className="px-2 text-center text-xs italic text-fm4alldestructive">
+          <p className="text-fm4alldestructive px-2 text-center text-xs italic">
             {t(
               "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
             )}
@@ -137,7 +137,7 @@ const NettoyageOptionsVitrerieCard = ({
       <div
         className={`flex w-3/4 items-center justify-center p-4 ${
           nettoyage.infos.vitrerieSelected && vitrerieProposition.prixAnnuel
-            ? "ring-4 ring-inset ring-fm4alldestructive"
+            ? "ring-fm4alldestructive ring-4 ring-inset"
             : ""
         } bg-${color} cursor-pointer items-center justify-center gap-4 text-2xl text-slate-200`}
         onClick={
