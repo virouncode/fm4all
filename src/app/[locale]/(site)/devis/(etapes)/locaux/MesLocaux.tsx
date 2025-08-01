@@ -240,6 +240,9 @@ const MesLocaux = () => {
     );
     setLoaderVisible(true);
     window.scrollTo(0, 0);
+    const serviceSearchParams = new URLSearchParams();
+    serviceSearchParams.set("effectif", dataToPost.effectif.toString());
+    serviceSearchParams.set("surface", dataToPost.surface.toString());
     setTimeout(() => {
       router.push({
         pathname: "/devis/services",

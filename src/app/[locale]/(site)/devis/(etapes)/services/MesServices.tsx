@@ -76,22 +76,6 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
     getLegioTarifs(surface),
     getQualiteAirTarifs(surface),
   ]);
-  // console.log("nettoyageQuantites", nettoyageQuantites);
-  // console.log("nettoyageTarifs", nettoyageTarifs);
-  // console.log("repasseTarifs", repasseTarifs);
-  // console.log("vitrerieTarifs", vitrerieTarifs);
-  // console.log("hygieneDistribQuantite", hygieneDistribQuantite);
-  // console.log("hygieneDistribTarifs", hygieneDistribTarifs);
-  // console.log("hygieneDistribInstalTarifs", hygieneDistribInstalTarifs);
-  // console.log("hygieneConsosTarifs", hygieneConsosTarifs);
-  // console.log("hygieneMinFacturation", hygieneMinFacturation);
-  // console.log("incendieQuantite", incendieQuantite);
-  // console.log("incendieTarifs", incendieTarifs);
-  // console.log("maintenanceQuantites", maintenanceQuantites);
-  // console.log("maintenanceTarifs", maintenanceTarifs);
-  // console.log("q18Tarifs", q18Tarifs);
-  // console.log("legioTarifs", legioTarifs);
-  // console.log("qualiteAirTarifs", qualiteAirTarifs);
 
   if (
     !nettoyageTarifs ||
