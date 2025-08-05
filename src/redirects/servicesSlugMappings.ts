@@ -30,6 +30,7 @@ export const servicesSubSlugMappingsFrToEn: Record<string, string> = {
   "la-defense": "la-defense-city",
   "boulogne-billancourt": "boulogne-billancourt-city",
   "levallois-perret": "levallois-perret-city",
+  nanterre: "nanterre-city",
 };
 
 export const getServicesSlugFr = (serviceSlugEn: string): string => {
