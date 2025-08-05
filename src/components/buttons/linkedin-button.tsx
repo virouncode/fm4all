@@ -18,6 +18,8 @@ const LinkedinButton = ({
       href="https://www.linkedin.com/company/fm4all/"
       title={t("notre-profil-linkedin")}
       aria-label={t("notre-profil-linkedin")}
+      target="_blank"
+      rel="noopener"
     >
       <Button
         title={t("notre-profil-linkedin")}
