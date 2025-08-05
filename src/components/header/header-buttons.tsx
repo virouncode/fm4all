@@ -4,6 +4,7 @@ import { usePathname } from "@/i18n/navigation";
 import { Menu, X } from "lucide-react";
 import ContactButton from "../buttons/contact-button";
 import DevisButton from "../buttons/devis-button";
+import LinkedinButton from "../buttons/linkedin-button";
 import LocaleButton from "../buttons/locale-button";
 import UserButton from "../buttons/UserButton";
 
@@ -38,6 +39,10 @@ const HeaderButtons = ({
       />
       <LocaleButton className="hidden md:flex" />
       <ContactButton
+        setIsMobileNavOpen={setIsMobileNavOpen}
+        className="hidden md:flex"
+      />
+      <LinkedinButton
         setIsMobileNavOpen={setIsMobileNavOpen}
         className="hidden md:flex"
       />

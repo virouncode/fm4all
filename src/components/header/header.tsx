@@ -29,6 +29,7 @@ import { useLocale } from "next-intl";
 import Image from "next/image";
 import { useState } from "react";
 import { useMediaQuery } from "react-responsive";
+import LinkedinButton from "../buttons/linkedin-button";
 import HeaderButtons from "./header-buttons";
 import HeaderNavigationMenu from "./header-navigation-menu";
 
@@ -305,7 +306,7 @@ const Header = () => {
   ];
 
   return (
-    <div className="sticky top-0 z-50 h-16 w-full bg-background shadow">
+    <div className="bg-background sticky top-0 z-50 h-16 w-full shadow">
       <header className="mx-auto flex h-full max-w-7xl items-center justify-between p-6">
         <div className="flex items-center gap-6">
           <Link href="/" data-testid="home-link">
@@ -338,7 +339,7 @@ const Header = () => {
         {/***************** MOBILE NAVIGATION *****************/}
         {isTablet && (
           <div
-            className={`fixed left-0 right-0 top-16 flex h-[calc(100vh-4rem)] items-start justify-center bg-background text-2xl shadow-lg ${
+            className={`bg-background fixed top-16 right-0 left-0 flex h-[calc(100vh-4rem)] items-start justify-center text-2xl shadow-lg ${
               isMobileNavOpen
                 ? "translate-x-0 opacity-100"
                 : "translate-x-full opacity-0"
@@ -346,9 +347,10 @@ const Header = () => {
             role="navigation"
             aria-label="Mobile navigation"
           >
-            <div className="absolute right-6 top-4 flex items-center gap-4 md:hidden">
+            <div className="absolute top-4 right-6 flex items-center gap-4 md:hidden">
               <LocaleButton className="flex gap-1" />
               <ContactButton setIsMobileNavOpen={setIsMobileNavOpen} />
+              <LinkedinButton setIsMobileNavOpen={setIsMobileNavOpen} />
               <UserButton setIsMobileNavOpen={setIsMobileNavOpen} />
             </div>
             <HeaderNavigationMenu
