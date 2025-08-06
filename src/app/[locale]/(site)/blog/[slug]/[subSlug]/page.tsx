@@ -67,7 +67,7 @@ const ptComponents = {
         return null;
       }
       return (
-        <div className="relative mx-auto my-6 h-[200px] w-full md:h-[400px]">
+        <div className="relative mx-auto my-6 mb-20 h-[200px] w-full md:h-[400px]">
           <Image
             quality={100}
             src={urlFor(value).url()}
@@ -83,21 +83,21 @@ const ptComponents = {
   block: {
     essentiel: (props: BlockComponentProps) => {
       return (
-        <p className="mt-10 text-2xl font-bold text-fm4allessential">
+        <p className="text-fm4allessential mt-10 text-2xl font-bold">
           {props.children}
         </p>
       );
     },
     confort: (props: BlockComponentProps) => {
       return (
-        <p className="mt-10 text-2xl font-bold text-fm4allcomfort">
+        <p className="text-fm4allcomfort mt-10 text-2xl font-bold">
           {props.children}
         </p>
       );
     },
     excellence: (props: BlockComponentProps) => {
       return (
-        <p className="mt-10 text-2xl font-bold text-fm4allexcellence">
+        <p className="text-fm4allexcellence mt-10 text-2xl font-bold">
           {props.children}
         </p>
       );
@@ -337,7 +337,7 @@ const page = async ({
   ];
 
   return (
-    <main className="mx-auto mb-24 max-w-7xl hyphens-auto px-6 py-4 md:px-20">
+    <main className="mx-auto mb-24 max-w-7xl px-6 py-4 hyphens-auto md:px-20">
       <Breadcrumb className="mb-10">
         <BreadcrumbList className="flex flex-wrap text-sm lg:text-base">
           <BreadcrumbItem>
