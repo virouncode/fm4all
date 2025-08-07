@@ -37,7 +37,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Metadata } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { getLocale, setRequestLocale } from "next-intl/server";
+import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
 import { Didact_Gothic, Inter } from "next/font/google";
 import { notFound } from "next/navigation";
@@ -104,6 +104,10 @@ export default async function LocalizedLayout({
   }
   setRequestLocale(locale);
   // const messages = await getMessages();
+  const tCookieBanner = await getTranslations({
+    locale,
+    namespace: "cookieBanniere",
+  });
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -151,7 +155,11 @@ export default async function LocalizedLayout({
                                                                     >
                                                                       <Header />
                                                                       {children}
-                                                                      <CookieBanner />
+                                                                      <CookieBanner
+                                                                        t={
+                                                                          tCookieBanner
+                                                                        }
+                                                                      />
                                                                       <Analytics />
                                                                       <SpeedInsights />
                                                                       <Footer
