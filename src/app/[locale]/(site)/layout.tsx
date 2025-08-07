@@ -155,11 +155,7 @@ export default async function LocalizedLayout({
                                                                     >
                                                                       <Header />
                                                                       {children}
-                                                                      <CookieBanner
-                                                                        t={
-                                                                          tCookieBanner
-                                                                        }
-                                                                      />
+                                                                      <CookieBanner />
                                                                       <Analytics />
                                                                       <SpeedInsights />
                                                                       <Footer

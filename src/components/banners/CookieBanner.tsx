@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/sheet";
 import { Link, usePathname } from "@/i18n/navigation";
 import { getLocalStorage, setLocalStorage } from "@/lib/utils/storageHelper";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 
 import { useEffect, useState } from "react";
@@ -28,11 +29,8 @@ declare global {
 const COOKIE_EXPIRATION_MS = 1000 * 60 * 60 * 24;
 // const COOKIE_EXPIRATION_MS = 1000 * 60;
 
-type CookieBannerProps = {
-  t: (key: string) => string;
-};
-
-const CookieBanner = ({ t }: CookieBannerProps) => {
+const CookieBanner = () => {
+  const t = useTranslations("cookieBanniere");
   const [cookieConsent, setCookieConsent] = useState<boolean | null>(null);
   const pathname = usePathname();
 
