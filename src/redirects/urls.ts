@@ -48,6 +48,8 @@ export const legacyRedirects: Record<string, string> = {
     "/fr/services/livraison-fruits-entreprise",
   "/fr/services/hygiene-sanitaire": "/fr/services/nettoyage",
   "/en/services/sanitary-supplies": "/en/services/cleaning-services",
+  "/en/services/healthy-snack-delivery-office":
+    "/en/services/office-fruit-basket-delivery",
 };
 
 export const goneUrls: string[] = [
