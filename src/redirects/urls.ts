@@ -3,12 +3,13 @@ export const legacyRedirects: Record<string, string> = {
   "/nos-services": "/fr/services",
   "/nous-contacter": "/fr/contactez-nous",
   "/nos-3-engagements": "/fr/nos-engagements",
+  "/politique-de-cookies": "/fr/politique-de-cookies",
 
   // Anciennes structures d'URL
   "/articles/nos-3-gammes": "/fr/nos-3-gammes",
   "/articles/nos-services": "/fr/services",
   "/articles/histoire-nettoyage":
-    "/fr/articles/nettoyage/histoire-du-nettoyage-des-bureaux", // à adapter
+    "/fr/articles/nettoyage/histoire-du-nettoyage-des-bureaux",
   "/articles/devenir-prestataire": "/fr/devenir-prestataire",
   "/services/office-manager": "/fr/services/office-manager-externalise",
   "/articles/le-fm-cest-quoi":
@@ -22,6 +23,13 @@ export const legacyRedirects: Record<string, string> = {
   "/services/maintenance-multitechnique":
     "/fr/services/maintenance-multitechnique",
   "/nos-engagements": "/fr/nos-engagements",
+  "/cgu": "/fr/conditions-generales-dutilisation",
+  "/faq": "/fr/foire-aux-questions",
+  "/cookies": "/fr/politique-de-cookies",
+  "/mentions": "/fr/mentions-legales",
+  "/blog": "/fr/articles",
+  "/prestataire": "/fr/devenir-prestataire",
+  "/confidentialite": "/fr/politique-de-confidentialite",
 
   // URLs avec structure correcte mais contenu déplacé
   "/fr/conditions-generales-d-utilisation":
