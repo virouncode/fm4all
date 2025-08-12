@@ -36,6 +36,7 @@ export const servicesSubSlugMappingsFrToEn: Record<string, string> = {
   puteaux: "puteaux-city",
   clichy: "clichy-city",
   montreuil: "montreuil-city",
+  "saint-denis": "saint-denis-city",
 };
 
 export const getServicesSlugFr = (serviceSlugEn: string): string => {
