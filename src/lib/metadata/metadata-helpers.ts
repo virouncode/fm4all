@@ -39,7 +39,7 @@ export const routes: Record<RouteKey, Record<LocaleType, string>> = {
   },
   cgu: {
     fr: "/conditions-generales-d-utilisation",
-    en: "/terms-and-conditions-of-use",
+    en: "/terms-of-use",
   },
   cgv: {
     fr: "/conditions-generales-de-vente",
