@@ -30,11 +30,6 @@ const nextConfig: NextConfig = {
   headers: async () => [
     {
       source: "/:path*",
-      has: [{ type: "host", value: "fmforall.fr" }],
-      headers: [{ key: "X-Robots-Tag", value: "noindex" }],
-    },
-    {
-      source: "/:path*",
       has: [{ type: "host", value: "fm4all.vercel.app" }],
       headers: [{ key: "X-Robots-Tag", value: "noindex" }],
     },
