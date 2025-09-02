@@ -28,7 +28,6 @@ const generateStaticUrls = () => {
     "/cookies",
     "/cgv",
     "/cgu",
-    "/contact",
   ];
 
   // Pour chaque locale et chaque route définie dans routing.ts
