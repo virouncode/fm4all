@@ -1,0 +1,7 @@
+-- ALTER TABLE "logos_fournisseurs" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
+-- DROP TABLE "logos_fournisseurs" CASCADE;--> statement-breakpoint
+-- ALTER TABLE "fournisseurs" DROP CONSTRAINT "fournisseurs_logo_id_logos_fournisseurs_id_fk";
+-- --> statement-breakpoint
+-- ALTER TABLE "cafe_machines" ADD COLUMN "image_url" varchar;--> statement-breakpoint
+-- ALTER TABLE "fournisseurs" ADD COLUMN "logo_url" varchar;--> statement-breakpoint
+-- ALTER TABLE "fournisseurs" DROP COLUMN "logo_id";

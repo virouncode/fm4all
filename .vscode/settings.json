@@ -1,0 +1,7 @@
+{
+  "i18n-ally.localesPaths": ["src/i18n", "src/messages"],
+  "i18n-ally.keystyle": "nested",
+  "i18n-ally.sourceLanguage": "fr",
+  "i18n-ally.enabledParsers": ["js", "ts"],
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}

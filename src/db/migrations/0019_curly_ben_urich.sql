@@ -1,0 +1,1 @@
+ALTER TABLE "cafe_machines_tarifs" ADD COLUMN "type" "typemachine" NOT NULL;

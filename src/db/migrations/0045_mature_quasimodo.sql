@@ -1,0 +1,2 @@
+-- ALTER TABLE "services_fm4all_taux" ALTER COLUMN "min_facturation_plateforme" SET DEFAULT 0;--> statement-breakpoint
+-- ALTER TABLE "services_fm4all_taux" ALTER COLUMN "support_admin" DROP DEFAULT;

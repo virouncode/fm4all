@@ -1,0 +1,1 @@
+DROP TABLE "boissons_tarifs" CASCADE;

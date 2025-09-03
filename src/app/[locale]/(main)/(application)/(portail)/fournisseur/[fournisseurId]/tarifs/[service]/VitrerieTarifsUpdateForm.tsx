@@ -1,0 +1,243 @@
+"use client";
+
+import { updateVitrerieTarifAction } from "@/actions/vitrerieTarifsAction";
+import { InputWithLabel } from "@/components/form-inputs/InputWithLabel";
+import { Button } from "@/components/ui/button";
+import { Form } from "@/components/ui/form";
+import { toast } from "@/hooks/use-toast";
+import {
+  createVitrerieTarifsUpdateSchema,
+  SelectVitrerieTarifFournisseurType,
+  UpdateVitrerieTarifsType,
+} from "@/zod-schemas/nettoyageVitrerie";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
+import { Loader } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { useAction } from "next-safe-action/hooks";
+import { ChangeEvent, useState } from "react";
+import { useForm } from "react-hook-form";
+
+type VitrerieTarifsUpdateFormProps = {
+  initialTarifs: SelectVitrerieTarifFournisseurType;
+  title: string;
+};
+
+export default function VitrerieTarifsUpdateForm({
+  initialTarifs,
+  title,
+}: VitrerieTarifsUpdateFormProps) {
+  const locale = useLocale();
+  const tAuth = useTranslations("auth");
+  const [modifiedFields, setModifiedFields] = useState<
+    Set<keyof SelectVitrerieTarifFournisseurType>
+  >(new Set<keyof SelectVitrerieTarifFournisseurType>());
+
+  const lastUpdate = format(
+    initialTarifs.updatedAt,
+    locale === "fr" ? "dd/MM/yyyy à HH:mm" : "yyyy/MM/dd at hh:mm a",
+  );
+
+  const defaultValues: UpdateVitrerieTarifsType = initialTarifs;
+  const form = useForm<UpdateVitrerieTarifsType>({
+    mode: "all",
+    resolver: zodResolver(
+      createVitrerieTarifsUpdateSchema({
+        cadenceVitres: "Cadence vitres intérieures invalide",
+        cadenceCloisons: "Cadence cloisons invalide",
+        tauxHoraire: "Taux horaire invalide",
+        minFacturation: "Le minimum de facturation doit être supérieur à 0",
+        fraisDeplacement:
+          "Les frais de déplacement doivent être supérieurs à 0",
+      }),
+    ),
+    defaultValues,
+  });
+
+  const {
+    execute: executeUpdateVitrerieTarif,
+    isPending: isUpdatingVitrerieTarif,
+    reset: resetUpdateVitrerieTarifAction,
+  } = useAction(updateVitrerieTarifAction, {
+    onSuccess: ({ data }) => {
+      toast({
+        variant: "default",
+        title: tAuth("succes"),
+        description: data?.message,
+      });
+      resetUpdateVitrerieTarifAction();
+      setModifiedFields(new Set());
+    },
+    onError: ({ error }) => {
+      toast({
+        variant: "destructive",
+        title: tAuth("erreur"),
+        description:
+          error?.serverError ??
+          "Une erreur est survenue lors de la mise à jour des tarifs de vitrerie",
+      });
+    },
+  });
+
+  // Vérifier s'il y a des modifications non sauvegardées
+  const hasUnsavedChanges = modifiedFields.size > 0;
+
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement>,
+    field: keyof SelectVitrerieTarifFournisseurType,
+  ) => {
+    const inputValue = e.target.value;
+    const value = inputValue ? parseFloat(inputValue) : 0;
+
+    const hasChanged = initialTarifs[field] !== value;
+
+    if (hasChanged) {
+      setModifiedFields((prev) => {
+        const newSet = new Set(prev);
+        newSet.add(field);
+        return newSet;
+      });
+    } else {
+      setModifiedFields((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(field);
+        return newSet;
+      });
+    }
+  };
+
+  const handleCancel = () => {
+    form.reset(defaultValues);
+    setModifiedFields(new Set());
+  };
+
+  const submitForm = async (data: UpdateVitrerieTarifsType) => {
+    executeUpdateVitrerieTarif(data);
+  };
+
+  const isFieldModified = (fieldName: string) => {
+    return modifiedFields.has(
+      fieldName as keyof SelectVitrerieTarifFournisseurType,
+    );
+  };
+
+  if (!initialTarifs) {
+    return (
+      <div className="p-8 text-center">
+        Aucun tarif trouvé. Veuillez contacter l&apos;administrateur pour
+        configurer vos tarifs.
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="item-center mb-2 mt-14 flex justify-between">
+        <div className="border-l border-l-gray-500">
+          <h2 className="ml-4 text-xl font-bold">{title}</h2>
+        </div>
+        <p className="text-end text-sm italic">
+          Dernière mise à jour : {lastUpdate}
+        </p>
+      </div>
+      <Form {...form}>
+        <form
+          className="relative space-y-4"
+          onSubmit={form.handleSubmit(submitForm)}
+        >
+          {/* Bouton de sauvegarde et indicateur de modifications */}
+          <div className="flex flex-col items-center justify-between gap-4 md:flex-row md:gap-0">
+            <div>
+              {hasUnsavedChanges ? (
+                <div className="text-sm font-medium text-amber-600">
+                  Vous avez des modifications non sauvegardées
+                </div>
+              ) : (
+                <Button
+                  disabled={!hasUnsavedChanges}
+                  size="lg"
+                  className="bg-fm4alldestructive"
+                >
+                  Publier
+                </Button>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                disabled={!hasUnsavedChanges || isUpdatingVitrerieTarif}
+                variant="destructive"
+                size="lg"
+              >
+                {isUpdatingVitrerieTarif ? (
+                  <div className="flex items-center gap-2">
+                    <Loader className="animate-spin" />
+                    <p>...Sauvegarde</p>
+                  </div>
+                ) : (
+                  "Sauvegarder"
+                )}
+              </Button>
+              <Button
+                onClick={handleCancel}
+                disabled={isUpdatingVitrerieTarif}
+                variant="outline"
+                size="lg"
+                type="button"
+              >
+                Annuler
+              </Button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 rounded-md border p-6 md:grid-cols-2 lg:grid-cols-3">
+            <InputWithLabel<UpdateVitrerieTarifsType>
+              nameInSchema="cadenceVitres"
+              fieldTitle="Cadence vitres intérieures (m2/h)*"
+              type="number"
+              step={1}
+              min={0}
+              handleChange={(e) => handleInputChange(e, "cadenceVitres")}
+              className={`${isFieldModified("cadenceVitres") ? "border-amber-500" : ""}`}
+            />
+            <InputWithLabel<UpdateVitrerieTarifsType>
+              nameInSchema="cadenceCloisons"
+              fieldTitle="Cadence cloisons (m2/h)*"
+              type="number"
+              step={1}
+              min={0}
+              handleChange={(e) => handleInputChange(e, "cadenceCloisons")}
+              className={`${isFieldModified("cadenceCloisons") ? "border-amber-500" : ""}`}
+            />
+            <InputWithLabel<UpdateVitrerieTarifsType>
+              nameInSchema="tauxHoraire"
+              fieldTitle="Taux horaire (€/h HT)*"
+              type="number"
+              step={0.01}
+              min={0}
+              handleChange={(e) => handleInputChange(e, "tauxHoraire")}
+              className={`${isFieldModified("tauxHoraire") ? "border-amber-500" : ""}`}
+            />
+            <InputWithLabel<UpdateVitrerieTarifsType>
+              nameInSchema="minFacturation"
+              fieldTitle="Minimum de facturation (€ HT)"
+              type="number"
+              step={0.01}
+              min={0}
+              handleChange={(e) => handleInputChange(e, "minFacturation")}
+              className={`${isFieldModified("minFacturation") ? "border-amber-500" : ""}`}
+            />
+            <InputWithLabel<UpdateVitrerieTarifsType>
+              nameInSchema="fraisDeplacement"
+              fieldTitle="Frais de déplacement par passage (€ HT)"
+              type="number"
+              step={0.01}
+              min={0}
+              handleChange={(e) => handleInputChange(e, "fraisDeplacement")}
+              className={`${isFieldModified("fraisDeplacement") ? "border-amber-500" : ""}`}
+            />
+          </div>
+        </form>
+      </Form>
+    </>
+  );
+}

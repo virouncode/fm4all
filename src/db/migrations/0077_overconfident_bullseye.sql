@@ -1,0 +1,1 @@
+DROP TABLE "nettoyage_vitrerie_tarifs" CASCADE;

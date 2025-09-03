@@ -1,0 +1,1 @@
+ALTER TABLE "office_manager_tarifs" ADD COLUMN "demi_tjm_premium" integer ;

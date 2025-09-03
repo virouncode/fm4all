@@ -1,0 +1,1 @@
+ALTER TABLE "cafe_machines" ADD COLUMN "infos" varchar;

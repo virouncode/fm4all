@@ -1,0 +1,1 @@
+ALTER TABLE "fournisseurs" ADD COLUMN "location_url" varchar;

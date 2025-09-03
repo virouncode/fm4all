@@ -1,0 +1,3 @@
+-- ALTER TABLE "services_fm4all_taux" ALTER COLUMN "min_facturation_plateforme" DROP NOT NULL;--> statement-breakpoint
+-- ALTER TABLE "services_fm4all_taux" ALTER COLUMN "min_facturation_support_op" DROP NOT NULL;--> statement-breakpoint
+-- ALTER TABLE "services_fm4all_taux" ALTER COLUMN "min_facturation_account_manager" DROP NOT NULL;

@@ -1,0 +1,9 @@
+-- CREATE TABLE "logos_fournisseurs" (
+-- 	"id" serial PRIMARY KEY NOT NULL,
+-- 	"url" varchar NOT NULL,
+-- 	"type" varchar NOT NULL,
+-- 	"created_at" timestamp DEFAULT now() NOT NULL
+-- );
+-- --> statement-breakpoint
+-- ALTER TABLE "cafe_machines" DROP COLUMN "image_url";--> statement-breakpoint
+-- ALTER TABLE "fournisseurs" DROP COLUMN "logo_url";

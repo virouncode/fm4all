@@ -1,0 +1,1 @@
+DROP TABLE "hygiene_conso_tarifs" CASCADE;

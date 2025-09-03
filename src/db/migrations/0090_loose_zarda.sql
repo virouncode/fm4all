@@ -1,0 +1,1 @@
+DROP TABLE "incendie_quantites" CASCADE;

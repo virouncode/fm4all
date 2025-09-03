@@ -1,0 +1,1 @@
+ALTER TABLE "fournisseurs" ALTER COLUMN "ca" SET DATA TYPE varchar;

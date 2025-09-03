@@ -1,0 +1,1 @@
+DROP TABLE "legio_tarifs" CASCADE;

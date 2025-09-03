@@ -1,0 +1,1 @@
+DROP TABLE "exutoires_tarifs" CASCADE;

@@ -1,0 +1,1 @@
+ALTER TABLE "food_livraison_tarifs" ALTER COLUMN "prix_unitaire" SET NOT NULL;

@@ -1,0 +1,1 @@
+ALTER TABLE "cafe_machines" RENAME COLUMN "evacutaion_reseau" TO "evacuation_reseau";

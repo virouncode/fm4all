@@ -1,0 +1,1 @@
+DROP TABLE "snacks_tarifs" CASCADE;
