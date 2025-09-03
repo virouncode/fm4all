@@ -11,35 +11,75 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { CafeContext } from "@/context/CafeProvider";
-import { ClientContext } from "@/context/ClientProvider";
-import { CommentairesContext } from "@/context/CommentairesProvider";
-import { DevisProgressContext } from "@/context/DevisProgressProvider";
-import { FontainesContext } from "@/context/FontainesProvider";
-import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
-import { HygieneContext } from "@/context/HygieneProvider";
-import { IncendieContext } from "@/context/IncendieProvider";
-import { MaintenanceContext } from "@/context/MaintenanceProvider";
-import { ManagementContext } from "@/context/ManagementProvider";
-import { MonDevisContext } from "@/context/MonDevisProvider";
-import { NettoyageContext } from "@/context/NettoyageProvider";
-import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
-import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
-import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
-import { ServicesContext } from "@/context/ServicesProvider";
-import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
-import { TheContext } from "@/context/TheProvider";
-import { TotalCafeContext } from "@/context/TotalCafeProvider";
-import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
-import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
-import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
-import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
-import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
-import { TotalOfficeManagerContext } from "@/context/TotalOfficeManagerProvider";
-import { TotalContext } from "@/context/TotalProvider";
-import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
-import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
-import { TotalTheContext } from "@/context/TotalTheProvider";
+import CafeProvider, { CafeContext } from "@/context/CafeProvider";
+import ClientProvider, { ClientContext } from "@/context/ClientProvider";
+import CommentairesProvider, {
+  CommentairesContext,
+} from "@/context/CommentairesProvider";
+import DevisProgressProvider, {
+  DevisProgressContext,
+} from "@/context/DevisProgressProvider";
+import FontainesProvider, {
+  FontainesContext,
+} from "@/context/FontainesProvider";
+import FoodBeverageProvider, {
+  FoodBeverageContext,
+} from "@/context/FoodBeverageProvider";
+import HygieneProvider, { HygieneContext } from "@/context/HygieneProvider";
+import IncendieProvider, { IncendieContext } from "@/context/IncendieProvider";
+import MaintenanceProvider, {
+  MaintenanceContext,
+} from "@/context/MaintenanceProvider";
+import ManagementProvider, {
+  ManagementContext,
+} from "@/context/ManagementProvider";
+import MonDevisProvider, { MonDevisContext } from "@/context/MonDevisProvider";
+import NettoyageProvider, {
+  NettoyageContext,
+} from "@/context/NettoyageProvider";
+import OfficeManagerProvider, {
+  OfficeManagerContext,
+} from "@/context/OfficeManagerProvider";
+import PersonnalisationProvider, {
+  PersonnalisationContext,
+} from "@/context/PersonnalisationProvider";
+import ServicesFm4AllProvider, {
+  ServicesFm4AllContext,
+} from "@/context/ServicesFm4AllProvider";
+import ServicesProvider, { ServicesContext } from "@/context/ServicesProvider";
+import SnacksFruitsProvider, {
+  SnacksFruitsContext,
+} from "@/context/SnacksFruitsProvider";
+import TheProvider, { TheContext } from "@/context/TheProvider";
+import TotalCafeProvider, {
+  TotalCafeContext,
+} from "@/context/TotalCafeProvider";
+import TotalFontainesProvider, {
+  TotalFontainesContext,
+} from "@/context/TotalFontainesProvider";
+import TotalHygieneProvider, {
+  TotalHygieneContext,
+} from "@/context/TotalHygieneProvider";
+import TotalIncendieProvider, {
+  TotalIncendieContext,
+} from "@/context/TotalIncendieProvider";
+import TotalMaintenanceProvider, {
+  TotalMaintenanceContext,
+} from "@/context/TotalMaintenanceProvider";
+import TotalNettoyageProvider, {
+  TotalNettoyageContext,
+} from "@/context/TotalNettoyageProvider";
+import TotalOfficeManagerProvider, {
+  TotalOfficeManagerContext,
+} from "@/context/TotalOfficeManagerProvider";
+import TotalProvider, { TotalContext } from "@/context/TotalProvider";
+import TotalServicesFm4AllProvider, {
+  TotalServicesFm4AllContext,
+} from "@/context/TotalServicesFm4AllProvider";
+import TotalSnacksFruitsProvider, {
+  TotalSnacksFruitsContext,
+} from "@/context/TotalSnacksFruitsProvider";
+import TotalTheProvider, { TotalTheContext } from "@/context/TotalTheProvider";
 import { useRouter } from "@/i18n/navigation";
 import { ReceiptText } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -213,58 +253,161 @@ const DevisButton = ({
     router.push("/devis/locaux");
   };
 
-  return devisProgress.completedSteps.includes(1) ? (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button
-          type="button"
-          variant="destructive"
-          size={size}
-          title={text}
-          className={`ring-destructive text-base shadow-md ring-2 ring-offset-2 transition-all hover:scale-[101%] hover:shadow-lg ${className}`}
-          onClick={
-            setIsMobileNavOpen ? () => setIsMobileNavOpen(false) : undefined
-          }
-        >
-          {withIcon && <ReceiptText className="hidden sm:inline" />} {text}
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
-        <DialogHeader>
-          <DialogTitle>{t("devis-en-cours")}</DialogTitle>
-          <DialogDescription>
-            {t(
-              "un-devis-est-deja-en-cours-souhaitez-vous-le-reprendre-ou-en-creer-un-nouveau-vos-informations-seront-perdues",
-            )}
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <DialogClose asChild>
-            <div className="mx-auto flex justify-center gap-4">
-              <Button variant="destructive" onClick={handleClickNouveau}>
-                {t("nouveau")}
-              </Button>
-              <Button onClick={handleClickReprendre} variant="outline">
-                {t("reprendre")}
-              </Button>
-            </div>
-          </DialogClose>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  ) : (
-    <div className="flex justify-center">
-      <Button
-        variant="destructive"
-        size={size}
-        title={title}
-        className={`ring-destructive text-base shadow-md ring-2 ring-offset-2 transition-all hover:scale-[101%] hover:shadow-lg ${className}`}
-        onClick={handleClickNouveau}
-        data-testid="devis-button"
-      >
-        {withIcon && <ReceiptText className="hidden sm:inline" />} {text}
-      </Button>
-    </div>
+  return (
+    <DevisProgressProvider>
+      <ClientProvider>
+        <ServicesProvider>
+          <PersonnalisationProvider>
+            <MonDevisProvider>
+              <NettoyageProvider>
+                <HygieneProvider>
+                  <IncendieProvider>
+                    <MaintenanceProvider>
+                      <FoodBeverageProvider>
+                        <CafeProvider>
+                          <TheProvider>
+                            <SnacksFruitsProvider>
+                              <FontainesProvider>
+                                <ManagementProvider>
+                                  <OfficeManagerProvider>
+                                    <ServicesFm4AllProvider>
+                                      <CommentairesProvider>
+                                        <TotalProvider>
+                                          <TotalNettoyageProvider>
+                                            <TotalHygieneProvider>
+                                              <TotalIncendieProvider>
+                                                <TotalMaintenanceProvider>
+                                                  <TotalCafeProvider>
+                                                    <TotalTheProvider>
+                                                      <TotalSnacksFruitsProvider>
+                                                        <TotalFontainesProvider>
+                                                          <TotalOfficeManagerProvider>
+                                                            <TotalServicesFm4AllProvider>
+                                                              {devisProgress.completedSteps.includes(
+                                                                1,
+                                                              ) ? (
+                                                                <Dialog>
+                                                                  <DialogTrigger
+                                                                    asChild
+                                                                  >
+                                                                    <Button
+                                                                      type="button"
+                                                                      variant="destructive"
+                                                                      size={
+                                                                        size
+                                                                      }
+                                                                      title={
+                                                                        text
+                                                                      }
+                                                                      className={`ring-destructive text-base shadow-md ring-2 ring-offset-2 transition-all hover:scale-[101%] hover:shadow-lg ${className}`}
+                                                                      onClick={
+                                                                        setIsMobileNavOpen
+                                                                          ? () =>
+                                                                              setIsMobileNavOpen(
+                                                                                false,
+                                                                              )
+                                                                          : undefined
+                                                                      }
+                                                                    >
+                                                                      {withIcon && (
+                                                                        <ReceiptText className="hidden sm:inline" />
+                                                                      )}{" "}
+                                                                      {text}
+                                                                    </Button>
+                                                                  </DialogTrigger>
+                                                                  <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
+                                                                    <DialogHeader>
+                                                                      <DialogTitle>
+                                                                        {t(
+                                                                          "devis-en-cours",
+                                                                        )}
+                                                                      </DialogTitle>
+                                                                      <DialogDescription>
+                                                                        {t(
+                                                                          "un-devis-est-deja-en-cours-souhaitez-vous-le-reprendre-ou-en-creer-un-nouveau-vos-informations-seront-perdues",
+                                                                        )}
+                                                                      </DialogDescription>
+                                                                    </DialogHeader>
+                                                                    <DialogFooter>
+                                                                      <DialogClose
+                                                                        asChild
+                                                                      >
+                                                                        <div className="mx-auto flex justify-center gap-4">
+                                                                          <Button
+                                                                            variant="destructive"
+                                                                            onClick={
+                                                                              handleClickNouveau
+                                                                            }
+                                                                          >
+                                                                            {t(
+                                                                              "nouveau",
+                                                                            )}
+                                                                          </Button>
+                                                                          <Button
+                                                                            onClick={
+                                                                              handleClickReprendre
+                                                                            }
+                                                                            variant="outline"
+                                                                          >
+                                                                            {t(
+                                                                              "reprendre",
+                                                                            )}
+                                                                          </Button>
+                                                                        </div>
+                                                                      </DialogClose>
+                                                                    </DialogFooter>
+                                                                  </DialogContent>
+                                                                </Dialog>
+                                                              ) : (
+                                                                <div className="flex justify-center">
+                                                                  <Button
+                                                                    variant="destructive"
+                                                                    size={size}
+                                                                    title={
+                                                                      title
+                                                                    }
+                                                                    className={`ring-destructive text-base shadow-md ring-2 ring-offset-2 transition-all hover:scale-[101%] hover:shadow-lg ${className}`}
+                                                                    onClick={
+                                                                      handleClickNouveau
+                                                                    }
+                                                                    data-testid="devis-button"
+                                                                  >
+                                                                    {withIcon && (
+                                                                      <ReceiptText className="hidden sm:inline" />
+                                                                    )}{" "}
+                                                                    {text}
+                                                                  </Button>
+                                                                </div>
+                                                              )}
+                                                            </TotalServicesFm4AllProvider>
+                                                          </TotalOfficeManagerProvider>
+                                                        </TotalFontainesProvider>
+                                                      </TotalSnacksFruitsProvider>
+                                                    </TotalTheProvider>
+                                                  </TotalCafeProvider>
+                                                </TotalMaintenanceProvider>
+                                              </TotalIncendieProvider>
+                                            </TotalHygieneProvider>
+                                          </TotalNettoyageProvider>
+                                        </TotalProvider>
+                                      </CommentairesProvider>
+                                    </ServicesFm4AllProvider>
+                                  </OfficeManagerProvider>
+                                </ManagementProvider>
+                              </FontainesProvider>
+                            </SnacksFruitsProvider>
+                          </TheProvider>
+                        </CafeProvider>
+                      </FoodBeverageProvider>
+                    </MaintenanceProvider>
+                  </IncendieProvider>
+                </HygieneProvider>
+              </NettoyageProvider>
+            </MonDevisProvider>
+          </PersonnalisationProvider>
+        </ServicesProvider>
+      </ClientProvider>
+    </DevisProgressProvider>
   );
 };
 
