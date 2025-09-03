@@ -44,10 +44,9 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
   setRequestLocale(locale);
   const t = await getTranslations("ServicesPage");
   const servicesVilles = await getServicesVilles(locale as LocaleType);
-  console.log("Services Villes:", servicesVilles);
 
   return (
-    <main className="mx-auto mb-24 max-w-7xl hyphens-auto px-6 py-4 md:px-20">
+    <main className="mx-auto mb-24 max-w-7xl px-6 py-4 hyphens-auto md:px-20">
       <Breadcrumb className="mb-10">
         <BreadcrumbList className="flex flex-wrap text-sm lg:text-base">
           <BreadcrumbItem>
@@ -68,7 +67,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
       <article className="mt-6 flex flex-col gap-10">
         <h1 className="text-4xl">{t("nos-services")}</h1>
         <div className="flex flex-col gap-4">
-          <div className="mx-auto flex w-full max-w-prose flex-col gap-4 hyphens-auto text-wrap">
+          <div className="mx-auto flex w-full max-w-prose flex-col gap-4 text-wrap hyphens-auto">
             <p>
               {t("fm4all-democratise-le")}{" "}
               <strong>{t("facility-management")}</strong>{" "}
@@ -87,7 +86,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("pourquoi-le-fm-pour-tous")}
           </h2>
-          <div className="mx-auto flex w-full max-w-prose flex-col gap-4 hyphens-auto text-wrap">
+          <div className="mx-auto flex w-full max-w-prose flex-col gap-4 text-wrap hyphens-auto">
             <p>
               {t(
                 "parce-que-nous-pensons-que-les-services-de-facility-management-ne-devraient-pas-etre-reserves-aux-grandes-entreprises",
@@ -132,7 +131,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("gagnez-du-temps-et-de-l-argent")}
           </h2>
-          <div className="mx-auto flex w-full max-w-prose flex-col gap-4 hyphens-auto text-wrap">
+          <div className="mx-auto flex w-full max-w-prose flex-col gap-4 text-wrap hyphens-auto">
             <p>
               {t("en-passant-par-fm4all-vous-profitez-de")}{" "}
               <strong>{t("l-expertise-d-un-professionnel-du-fm")}</strong>
@@ -152,7 +151,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("hof-managers")}
           </h2>
-          <div className="mx-auto flex w-full max-w-prose flex-col gap-4 hyphens-auto text-wrap">
+          <div className="mx-auto flex w-full max-w-prose flex-col gap-4 text-wrap hyphens-auto">
             <p>
               {t(
                 "hospitality-manager-office-manager-facility-manager-ce-sont-eux-qui-gerent-le-bon-fonctionnement-de-vos-locaux-au-quotidien-tout-en-veillant-sur-vos-collaborateurs-chez-fm4all-offrez-vous-les-services-d-un-hof-manager",

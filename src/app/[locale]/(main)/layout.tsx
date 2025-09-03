@@ -1,5 +1,6 @@
 import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 import Footer from "@/components/footer/footer";
+import Header from "@/components/header/header";
 import { Toaster } from "@/components/ui/toaster";
 import { routing } from "@/i18n/routing";
 import { Analytics } from "@vercel/analytics/next";
@@ -55,8 +56,8 @@ export default async function LocalizedLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <Header />
             {children}
-
             <Analytics />
             <SpeedInsights />
             <Footer locale={locale} />

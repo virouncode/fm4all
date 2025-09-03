@@ -5,13 +5,11 @@ import { SelectWithLabel } from "@/components/form-inputs/SelectWithLabel";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { batiments } from "@/constants/batiments";
@@ -53,8 +51,9 @@ import { createMesLocauxSchema, MesLocauxType } from "@/zod-schemas/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useContext, useRef, useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
+import { fullReinitialisationDevis } from "./fullReinitialisationDevis";
 import { reinitialisationDevis } from "./reinitialisationDevis";
 import ServicesLoader from "./ServicesLoader";
 
@@ -92,11 +91,10 @@ const MesLocaux = () => {
   const { setTotalOfficeManager } = useContext(TotalOfficeManagerContext);
   const { setTotalServicesFm4All } = useContext(TotalServicesFm4AllContext);
   const { setTotal } = useContext(TotalContext);
-  const dialogRef = useRef<HTMLButtonElement>(null);
   const [loaderVisible, setLoaderVisible] = useState(false);
-
   const router = useRouter();
   const { toast } = useToast();
+  const [showModal, setShowModal] = useState(true);
 
   const serviceSearchParams = new URLSearchParams();
   const sauvegarderSearchParams = new URLSearchParams();
@@ -115,14 +113,68 @@ const MesLocaux = () => {
   if (client.typeOccupation) {
     sauvegarderSearchParams.set("typeOccupation", client.typeOccupation);
   }
+  const devisRoutes: {
+    id: number;
+    pathname:
+      | "/locaux"
+      | "/services"
+      | "/food-beverage"
+      | "/pilotage"
+      | "/sauvegarder"
+      | "/personnaliser"
+      | "/afficher";
+    searchParams?: URLSearchParams;
+    name: string;
+  }[] = [
+    {
+      id: 1,
+      pathname: "/locaux",
+      name: "Mes locaux",
+    },
+    {
+      id: 2,
+      pathname: "/services",
+      searchParams: serviceSearchParams,
+      name: "Mes services",
+    },
+    {
+      id: 3,
+      pathname: "/food-beverage",
+      name: "Food & Beverage",
+    },
+    {
+      id: 4,
+      pathname: "/pilotage",
+      searchParams: serviceSearchParams,
+      name: "Office Management",
+    },
+    {
+      id: 5,
+      pathname: "/sauvegarder",
+      searchParams: sauvegarderSearchParams,
+      name: "Sauvegarder",
+    },
+    {
+      id: 6,
+      pathname: "/personnaliser",
+      name: "Personnaliser",
+    },
+    {
+      id: 7,
+      pathname: "/afficher",
+      name: "Afficher mon devis",
+    },
+  ];
 
   const defaultValues: MesLocauxType = {
     surface: client.surface,
     effectif: client.effectif,
     typeBatiment: client.typeBatiment,
     typeOccupation: client.typeOccupation,
-    codePostal: client.codePostal || "",
+    codePostal: "",
   };
+
+  console.log("defaultValues", defaultValues);
 
   const form = useForm<MesLocauxType>({
     mode: "all",
@@ -143,7 +195,6 @@ const MesLocaux = () => {
       ...data,
       ville: "",
     };
-    console.log("submitForm dataToPost", dataToPost);
 
     setLoading(true);
     try {
@@ -282,21 +333,84 @@ const MesLocaux = () => {
   //   }));
   // };
 
-  // const handleClick = () => {
-  //   const dialogTrigger = dialogRef.current;
-  //   if (dialogTrigger && !form.formState.isValid) {
-  //     dialogTrigger.click();
-  //   }
-  // };
+  const handleClickNouveau = async () => {
+    fullReinitialisationDevis(
+      setClient,
+      setDevisProgress,
+      setNettoyage,
+      setHygiene,
+      setMaintenance,
+      setIncendie,
+      setCafe,
+      setThe,
+      setSnacksFruits,
+      setFontaines,
+      setOfficeManager,
+      setServicesFm4All,
+      setCommentaires,
+      setServices,
+      setFoodBeverage,
+      setManagement,
+      setPersonnalisation,
+      setMonDevis,
+      setTotalNettoyage,
+      setTotalHygiene,
+      setTotalMaintenance,
+      setTotalIncendie,
+      setTotalCafe,
+      setTotalThe,
+      setTotalSnacksFruits,
+      setTotalFontaines,
+      setTotalOfficeManager,
+      setTotalServicesFm4All,
+      setTotal,
+    );
+    form.reset(defaultValues);
+    setShowModal(false);
+  };
+  const handleClickReprendre = () => {
+    const route =
+      devisRoutes.find(({ id }) => id === devisProgress.currentStep) ??
+      devisRoutes[0];
 
-  // const handleClickReprendre = () => {
-  //   const route = devisProgress.currentStep
-  //     ? devisRoutes.find(({ id }) => id === devisProgress.currentStep) ??
-  //       devisRoutes[0]
-  //     : devisRoutes[0];
-  //   const url = route.url;
-  //   router.push(`/mon-devis${url}`);
-  // };
+    router.push({
+      pathname: `/devis${route.pathname}`,
+      query: route.searchParams
+        ? Object.fromEntries(route.searchParams.entries())
+        : {},
+    });
+    setShowModal(false);
+  };
+
+  if (!loaderVisible && devisProgress.completedSteps.includes(1))
+    return (
+      <Dialog open={showModal} onOpenChange={() => {}}>
+        <DialogContent
+          className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto [&>button]:hidden"
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+        >
+          <DialogHeader>
+            <DialogTitle>{tDevisButton("devis-en-cours")}</DialogTitle>
+            <DialogDescription>
+              {tDevisButton(
+                "un-devis-est-deja-en-cours-souhaitez-vous-le-reprendre-ou-en-creer-un-nouveau-vos-informations-seront-perdues",
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <div className="mx-auto flex justify-center gap-4">
+              <Button variant="destructive" onClick={handleClickNouveau}>
+                {tDevisButton("nouveau")}
+              </Button>
+              <Button onClick={handleClickReprendre} variant="outline">
+                {tDevisButton("reprendre")}
+              </Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
 
   return !loaderVisible ? (
     <Form {...form}>
@@ -311,6 +425,7 @@ const MesLocaux = () => {
               nameInSchema="codePostal"
               placeholder="XXXXX"
               data-testid="code-postal-input"
+              autoFocus
               // handleChange={handleChange}
             />
             <InputWithLabel<MesLocauxType>
@@ -351,7 +466,7 @@ const MesLocaux = () => {
             />
           </div>
         </div>
-        {devisProgress.completedSteps.includes(1) ? (
+        {/* {devisProgress.completedSteps.includes(1) ? (
           <Dialog>
             <DialogTrigger asChild ref={dialogRef}>
               <div className="flex justify-center">
@@ -389,30 +504,30 @@ const MesLocaux = () => {
                     {/* <Button variant="outline" onClick={handleClickReprendre}>
                       Reprendre
                     </Button> */}
-                    <Button variant="outline">{t("annuler")}</Button>
+        {/* <Button variant="outline">{t("annuler")}</Button>
                   </div>
                 </DialogClose>
               </DialogFooter>
             </DialogContent>
-          </Dialog>
-        ) : (
-          <div className="flex justify-center">
-            <Button
-              variant="destructive"
-              size="lg"
-              title={t("afficher-les-tarifs")}
-              className="text-base"
-              disabled={loading}
-              data-testid="afficher-tarifs-button"
-            >
-              {loading ? (
-                <Loader size={16} className="animate-spin" />
-              ) : (
-                t("afficher-les-tarifs")
-              )}
-            </Button>
-          </div>
-        )}
+          </Dialog> */}
+        {/* ) : ( } */}
+        <div className="flex justify-center">
+          <Button
+            variant="destructive"
+            size="lg"
+            title={t("afficher-les-tarifs")}
+            className="text-base"
+            disabled={loading}
+            data-testid="afficher-tarifs-button"
+          >
+            {loading ? (
+              <Loader size={16} className="animate-spin" />
+            ) : (
+              t("afficher-les-tarifs")
+            )}
+          </Button>
+        </div>
+        {/* // )} */}
       </form>
     </Form>
   ) : (

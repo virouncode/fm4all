@@ -49,10 +49,10 @@ const DevisProgressProvider = ({ children }: PropsWithChildren) => {
       //   JSON.stringify(devisProgress)
       // )}; path=/; max-age=3600`;
     }
-  }, [devisProgress, isMounted]);
+  }, [devisProgress]);
 
-  if (!isMounted) return null;
-
+  // if (!isMounted) return null; //Pour éviter les erreurs d'hydratation
+  console.log("DevisProgressProvider render:", devisProgress);
   return (
     <DevisProgressContext.Provider value={{ devisProgress, setDevisProgress }}>
       {children}

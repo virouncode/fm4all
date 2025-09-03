@@ -1,5 +1,4 @@
 import CookieBanner from "@/components/banners/CookieBanner";
-import Header from "@/components/header/header";
 import { routing } from "@/i18n/routing";
 
 import { Metadata } from "next";
@@ -55,7 +54,6 @@ export default async function SiteLayout({
 
   return (
     <>
-      <Header />
       {children}
       <CookieBanner />
     </>

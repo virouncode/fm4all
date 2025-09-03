@@ -24,7 +24,6 @@ const UnauthorizedCard = ({ type }: UnauthorizedCardProps) => {
   } = authClient.useSession();
 
   const handleSignOut = async () => {
-    console.log("session", session);
     if (!session) router.push("/auth/signin");
     else {
       try {

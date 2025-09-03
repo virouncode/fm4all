@@ -3,6 +3,7 @@ import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/P
 import { MAX_NB_PERSONNES_PAR_ESPACE } from "@/constants/constants";
 import { CafeContext } from "@/context/CafeProvider";
 import { ClientContext } from "@/context/ClientProvider";
+import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import useScrollIntoCafeEspace from "@/hooks/use-scroll-into-cafe-espace";
@@ -47,9 +48,12 @@ const Cafe = ({
   const { setFoodBeverage } = useContext(FoodBeverageContext);
   const { cafe, setCafe } = useContext(CafeContext);
   const { setTotalCafe } = useContext(TotalCafeContext);
+  const { devisProgress } = useContext(DevisProgressContext);
   const effectif = client.effectif ?? 0;
   useScrollIntoFood();
   useScrollIntoCafeEspace();
+
+  // console.log("devisProgress in Cafe", devisProgress);
 
   const handleClickPrevious = () => {};
 

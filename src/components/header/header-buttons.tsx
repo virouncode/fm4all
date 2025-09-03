@@ -2,12 +2,12 @@
 
 import { usePathname } from "@/i18n/navigation";
 import { Menu, X } from "lucide-react";
+import { Suspense } from "react";
 import ContactButton from "../buttons/contact-button";
 import DevisButton from "../buttons/devis-button";
 import LinkedinButton from "../buttons/linkedin-button";
 import LocaleButton from "../buttons/locale-button";
 import UserButton from "../buttons/UserButton";
-import { Suspense } from "react";
 
 type HeaderButtonsProps = {
   locale: string;
