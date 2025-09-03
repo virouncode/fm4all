@@ -138,10 +138,11 @@ const DevisBreadcrumb = () => {
       en: string;
     };
   }) => {
-    setDevisProgress((prev) => ({
-      ...prev,
-      currentStep: route.id,
-    }));
+    if (route.id !== 1)
+      setDevisProgress((prev) => ({
+        ...prev,
+        currentStep: route.id,
+      }));
     if (route.id === 2)
       setServices((prev) => ({ ...prev, currentServiceId: 1 }));
     if (route.id === 3)
