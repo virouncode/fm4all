@@ -40,7 +40,7 @@ export default function GoogleAnalytics({
       />
       <Script
         async
-        src="https://www.googletagmanager.com/gtag/js?id=AW-17523808696"
+        src="https://www.googletagmanager.com/gtag/js?id=AW-17528670078"
       />
       <Script
         strategy="afterInteractive"
@@ -49,7 +49,7 @@ export default function GoogleAnalytics({
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
-                gtag('config', 'AW-17523808696');
+                gtag('config', 'AW-17528670078');
                 `,
         }}
       />
