@@ -1,0 +1,57 @@
+import ImgCardVertical from "@/components/cards/ImgCardVertical";
+import { LocaleType } from "@/i18n/routing";
+import { urlFor } from "@/sanity/lib/image";
+import { getTranslations } from "next-intl/server";
+import { Article, ArticleCategory } from "../../../../../../sanity.types";
+
+type ArticlesCardsProps = {
+  articles: Article[];
+  locale: LocaleType;
+  categorie: ArticleCategory;
+};
+
+const ArticlesCards = async ({
+  articles,
+  locale,
+  categorie,
+}: ArticlesCardsProps) => {
+  const t = await getTranslations({ locale, namespace: "Global" });
+
+  return (
+    <div className="mt-6 grid w-full grid-cols-[repeat(auto-fit,minmax(250px,1fr))] items-center gap-6">
+      {articles.map((article) => {
+        const articleImageUrl = article.imagePrincipale
+          ? urlFor(article.imagePrincipale)
+          : null; //TODO placeholder image
+        const articleImageAlt = article.imagePrincipale?.alt
+          ? article.imagePrincipale.alt
+          : t("illustration-de-l-article");
+        const articleSlug = categorie.slug?.current;
+        const articleSubSlug = article.subSlug?.current;
+
+        return articleImageUrl && articleSlug && articleSubSlug ? (
+          <ImgCardVertical
+            key={article._id}
+            src={articleImageUrl.width(500).height(500).url()}
+            alt={articleImageAlt}
+            href={{
+              pathname: "/blog/[slug]/[subSlug]",
+              params: { slug: articleSlug, subSlug: articleSubSlug },
+            }}
+            locale={locale}
+            linkText={article.linkText ?? articleSubSlug}
+          >
+            <div className="flex h-52 flex-col gap-4 p-4">
+              <p className="text-2xl">{article.titre}</p>
+              <p className="line-clamp-5 w-full overflow-hidden text-sm">
+                {article.description}
+              </p>
+            </div>
+          </ImgCardVertical>
+        ) : null;
+      })}
+    </div>
+  );
+};
+
+export default ArticlesCards;
