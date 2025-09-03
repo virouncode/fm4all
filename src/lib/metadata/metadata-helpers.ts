@@ -75,7 +75,7 @@ export const routes: Record<RouteKey, Record<LocaleType, string>> = {
   },
   mentions: {
     fr: "/mentions-legales",
-    en: "/legal-notices",
+    en: "/legal-notice",
   },
   partenaires: {
     fr: "/nos-partenaires",
