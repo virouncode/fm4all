@@ -10,7 +10,7 @@ const BackgroundServer = async () => {
         alt={tGlobal(
           "une-image-de-bureaux-modernes-et-lumineux-avec-des-plantes-vertes",
         )}
-        className="object-fit object-center"
+        className="object-cover"
         quality={75}
         fill
         sizes="100vw"
