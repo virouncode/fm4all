@@ -1,13 +1,15 @@
-// "use cache";
 import { servicesMapping } from "@/constants/services";
 import { db } from "@/db";
 import { services, servicesFournisseurs } from "@/db/schema";
+import { getFournisseurTag } from "@/lib/data-cache";
 import { errorHelper } from "@/lib/errorHelper";
 import { eq, getTableColumns } from "drizzle-orm";
+import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
 export const getServicesForFournisseur = async (fournisseurId: number) => {
-  // cacheTag(getFournisseurTag("services", fournisseurId));
-  // console.log(`🔍 DB REQUEST: getServicesForFournisseur(${fournisseurId})`);
+  "use cache";
+  cacheTag(getFournisseurTag("services", fournisseurId));
+  console.log(`🔍 DB REQUEST: getServicesForFournisseur(${fournisseurId})`);
   try {
     const results = await db
       .select({

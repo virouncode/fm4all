@@ -11,6 +11,7 @@ import {
   portesCoupeFeuTarifs,
   riaTarifs,
 } from "@/db/schema";
+import { getGlobalTag, getSurfaceTag } from "@/lib/data-cache";
 import { errorHelper } from "@/lib/errorHelper";
 import { roundSurface } from "@/lib/utils/roundSurface";
 import { selectAlarmesTarifsSchema } from "@/zod-schemas/alarmesTarifs";
@@ -21,13 +22,14 @@ import { selectIncendieTarifsSchema } from "@/zod-schemas/incendieTarifs";
 import { selectPortesCoupeFeuTarifsSchema } from "@/zod-schemas/portesCoupeFeuTarifs";
 import { selectRiaTarifsSchema } from "@/zod-schemas/riaTarifs";
 import { eq, getTableColumns } from "drizzle-orm";
+import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
 export const getIncendieQuantite = async (surface: string) => {
-  // "use cache";
-  // console.log("surface", surface);
+  "use cache";
+  console.log("surface", surface);
 
-  // cacheTag(getSurfaceTag("incendieQuantites", surface));
-  // console.log(`🔍 DB REQUEST: getIncendieQuantite(${surface})`);
+  cacheTag(getSurfaceTag("incendieQuantites", surface));
+  console.log(`🔍 DB REQUEST: getIncendieQuantite(${surface})`);
   const roundedSurface = roundSurface(parseInt(surface));
   try {
     const results = await db
@@ -42,9 +44,9 @@ export const getIncendieQuantite = async (surface: string) => {
 };
 
 export const getIncendieTarifs = async (surface: string) => {
-  // "use cache";
-  // cacheTag(getSurfaceTag("incendieTarifs", surface));
-  // console.log(`🔍 DB REQUEST: getIncendieTarifs(${surface})`);
+  "use cache";
+  cacheTag(getSurfaceTag("incendieTarifs", surface));
+  console.log(`🔍 DB REQUEST: getIncendieTarifs(${surface})`);
   const roundedSurface = roundSurface(parseInt(surface));
   console.log("roundedSurface", roundedSurface);
 
@@ -87,9 +89,9 @@ export const getIncendieTarifs = async (surface: string) => {
 };
 
 export const getExutoiresTarifs = async () => {
-  // "use cache";
-  // cacheTag(getGlobalTag("exutoiresTarifs"));
-  // console.log(`🔍 DB REQUEST: getExutoiresTarifs`);
+  "use cache";
+  cacheTag(getGlobalTag("exutoiresTarifs"));
+  console.log(`🔍 DB REQUEST: getExutoiresTarifs`);
   try {
     const results = await db.select().from(exutoiresTarifs);
     if (results.length === 0) return [];
@@ -106,9 +108,9 @@ export const getExutoiresTarifs = async () => {
   }
 };
 export const getExutoiresParkingsTarifs = async () => {
-  // "use cache";
-  // cacheTag(getGlobalTag("exutoiresParkingTarifs"));
-  // console.log(`🔍 DB REQUEST: getExutoiresParkingsTarifs`);
+  "use cache";
+  cacheTag(getGlobalTag("exutoiresParkingTarifs"));
+  console.log(`🔍 DB REQUEST: getExutoiresParkingsTarifs`);
   try {
     const results = await db.select().from(exutoiresParkingTarifs);
     if (results.length === 0) return [];
@@ -126,9 +128,9 @@ export const getExutoiresParkingsTarifs = async () => {
 };
 
 export const getAlarmesTarifs = async () => {
-  // "use cache";
-  // cacheTag(getGlobalTag("alarmesTarifs"));
-  // console.log(`🔍 DB REQUEST: getAlarmesTarifs`);
+  "use cache";
+  cacheTag(getGlobalTag("alarmesTarifs"));
+  console.log(`🔍 DB REQUEST: getAlarmesTarifs`);
   try {
     const results = await db.select().from(alarmesTarifs);
     if (results.length === 0) return [];
@@ -145,9 +147,9 @@ export const getAlarmesTarifs = async () => {
 };
 
 export const getRiaTarifs = async () => {
-  // "use cache";
-  // cacheTag(getGlobalTag("riaTarifs"));
-  // console.log(`🔍 DB REQUEST: getRiaTarifs`);
+  "use cache";
+  cacheTag(getGlobalTag("riaTarifs"));
+  console.log(`🔍 DB REQUEST: getRiaTarifs`);
   try {
     const results = await db.select().from(riaTarifs);
     if (results.length === 0) return [];
@@ -164,9 +166,9 @@ export const getRiaTarifs = async () => {
 };
 
 export const getColonnesSechesTarifs = async () => {
-  // "use cache";
-  // cacheTag(getGlobalTag("colonnesSechesTarifs"));
-  // console.log(`🔍 DB REQUEST: getColonnesSechesTarifs`);
+  "use cache";
+  cacheTag(getGlobalTag("colonnesSechesTarifs"));
+  console.log(`🔍 DB REQUEST: getColonnesSechesTarifs`);
   try {
     const results = await db.select().from(colonnesSechesTarifs);
     if (results.length === 0) return [];
@@ -183,9 +185,9 @@ export const getColonnesSechesTarifs = async () => {
 };
 
 export const getPortesCoupeFeuTarifs = async () => {
-  // "use cache";
-  // cacheTag(getGlobalTag("portesCoupeFeuTarifs"));
-  // console.log(`🔍 DB REQUEST: getPortesCoupeFeuTarifs`);
+  "use cache";
+  cacheTag(getGlobalTag("portesCoupeFeuTarifs"));
+  console.log(`🔍 DB REQUEST: getPortesCoupeFeuTarifs`);
   try {
     const results = await db.select().from(portesCoupeFeuTarifs);
     if (results.length === 0) return [];

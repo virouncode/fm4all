@@ -71,21 +71,21 @@ export default function PortalCacheInvalidationListener() {
         lastInvalidationTimeRef.current = now;
 
         try {
-          // const response = await fetch("/api/invalidate-cache", {
-          //   method: "POST",
-          //   headers: {
-          //     "Content-Type": "application/json",
-          //   },
-          //   body: JSON.stringify({
-          //     tag: message.tag,
-          //     tags: message.tags,
-          //   }),
-          // });
-          // if (!response.ok) {
-          //   throw new Error(t("erreur-lors-de-linvalidation-du-cache"));
-          // }
-          // Rafraîchir l'interface utilisateur
-          // router.refresh();
+          const response = await fetch("/api/invalidate-cache", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              tag: message.tag,
+              tags: message.tags,
+            }),
+          });
+          if (!response.ok) {
+            throw new Error(t("erreur-lors-de-linvalidation-du-cache"));
+          }
+          //Rafraîchir l'interface utilisateur
+          router.refresh();
         } catch (error) {
           console.error("Erreur lors de l'invalidation du cache:", error);
           // ...

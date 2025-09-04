@@ -24,9 +24,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // experimental: {
-  //   useCache: true,
-  // },
+  experimental: {
+    useCache: true,
+  },
   headers: async () => [
     {
       source: "/:path*",

@@ -79,20 +79,20 @@ export default function CacheInvalidationListener() {
         lastInvalidationTimeRef.current = now;
 
         try {
-          // const response = await fetch("/api/invalidate-cache", {
-          //   method: "POST",
-          //   headers: {
-          //     "Content-Type": "application/json",
-          //   },
-          //   body: JSON.stringify({
-          //     tag: message.tag,
-          //     tags: message.tags,
-          //   }),
-          // });
+          const response = await fetch("/api/invalidate-cache", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              tag: message.tag,
+              tags: message.tags,
+            }),
+          });
 
-          // if (!response.ok) {
-          //   throw new Error(t("erreur-lors-de-linvalidation-du-cache"));
-          // }
+          if (!response.ok) {
+            throw new Error(t("erreur-lors-de-linvalidation-du-cache"));
+          }
 
           // Nouvelle logique: mettre à jour les contextes en fonction des données reçues
           if (message.data) {
@@ -112,7 +112,7 @@ export default function CacheInvalidationListener() {
           }
 
           // Rafraîchir l'interface utilisateur
-          // router.refresh();
+          router.refresh();
 
           // Si aucune donnée spécifique n'est fournie, afficher une notification générique
           if (!message.data) {

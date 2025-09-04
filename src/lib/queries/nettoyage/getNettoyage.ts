@@ -7,6 +7,11 @@ import {
   nettoyageTarifs,
   nettoyageVitrerieTarifs,
 } from "@/db/schema";
+import {
+  getFournisseurTag,
+  getGlobalTag,
+  getSurfaceTag,
+} from "@/lib/data-cache";
 import { errorHelper } from "@/lib/errorHelper";
 import { roundSurface } from "@/lib/utils/roundSurface";
 import { selectNettoyageQuantitesSchema } from "@/zod-schemas/nettoyageQuantites";
@@ -20,11 +25,12 @@ import {
   selectVitrerieTarifsSchema,
 } from "@/zod-schemas/nettoyageVitrerie";
 import { and, eq, getTableColumns } from "drizzle-orm";
+import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
 export const getNettoyageQuantites = async (surface: string) => {
-  // "use cache";
-  // cacheTag(getSurfaceTag("nettoyageQuantites", surface));
-  // console.log(`🔍 DB REQUEST: getNettoyageQuantites(${surface})`);
+  "use cache";
+  cacheTag(getSurfaceTag("nettoyageQuantites", surface));
+  console.log(`🔍 DB REQUEST: getNettoyageQuantites(${surface})`);
 
   const roundedSurface = roundSurface(parseInt(surface));
   try {
@@ -47,9 +53,9 @@ export const getNettoyageQuantites = async (surface: string) => {
 };
 
 export const getNettoyageAllQuantites = async () => {
-  // "use cache";
-  // cacheTag(getGlobalTag("nettoyageQuantites"));
-  // console.log(`🔍 DB REQUEST: getNettoyageQuantites`);
+  "use cache";
+  cacheTag(getGlobalTag("nettoyageQuantites"));
+  console.log(`🔍 DB REQUEST: getNettoyageQuantites`);
   try {
     console.log(`🔍 DB REQUEST: getNettoyageAllQuantites`);
     const results = await db.select().from(nettoyageQuantites);
@@ -68,9 +74,9 @@ export const getNettoyageAllQuantites = async () => {
 };
 
 export const getNettoyageTarifs = async (surface: string) => {
-  // "use cache";
-  // cacheTag(getSurfaceTag("nettoyageTarifs", surface));
-  // console.log(`🔍 DB REQUEST: getNettoyageTarifs(${surface})`);
+  "use cache";
+  cacheTag(getSurfaceTag("nettoyageTarifs", surface));
+  console.log(`🔍 DB REQUEST: getNettoyageTarifs(${surface})`);
   const roundedSurface = roundSurface(parseInt(surface));
   try {
     const results = await db
@@ -110,9 +116,9 @@ export const getNettoyageTarifs = async (surface: string) => {
 
 //TODO valider le schema
 export const getNettoyageTarifsFournisseur = async (fournisseurId: number) => {
-  // "use cache";
-  // cacheTag(getFournisseurTag("nettoyageTarifs", fournisseurId));
-  // console.log(`🔍 DB REQUEST: getNettoyageTarifsFournisseur(${fournisseurId})`);
+  "use cache";
+  cacheTag(getFournisseurTag("nettoyageTarifs", fournisseurId));
+  console.log(`🔍 DB REQUEST: getNettoyageTarifsFournisseur(${fournisseurId})`);
   try {
     const results = await db
       .select()
@@ -134,9 +140,9 @@ export const getNettoyageTarifsFournisseur = async (fournisseurId: number) => {
 };
 
 export const getRepasseTarifs = async (surface: string) => {
-  // "use cache";
-  // cacheTag(getSurfaceTag("repasseTarifs", surface));
-  // console.log(`🔍 DB REQUEST: getRepasseTarifs(${surface})`);
+  "use cache";
+  cacheTag(getSurfaceTag("repasseTarifs", surface));
+  console.log(`🔍 DB REQUEST: getRepasseTarifs(${surface})`);
   const roundedSurface = roundSurface(parseInt(surface));
   try {
     const results = await db
@@ -176,9 +182,9 @@ export const getRepasseTarifs = async (surface: string) => {
 };
 
 export const getRepasseTarifsFournisseur = async (fournisseurId: number) => {
-  // "use cache";
-  // cacheTag(getFournisseurTag("repasseTarifs", fournisseurId));
-  // console.log(`🔍 DB REQUEST: getRepasseTarifsFournisseur(${fournisseurId})`);
+  "use cache";
+  cacheTag(getFournisseurTag("repasseTarifs", fournisseurId));
+  console.log(`🔍 DB REQUEST: getRepasseTarifsFournisseur(${fournisseurId})`);
   try {
     const results = await db
       .select()
@@ -200,9 +206,9 @@ export const getRepasseTarifsFournisseur = async (fournisseurId: number) => {
 };
 
 export const getVitrerieTarifs = async () => {
-  // "use cache";
-  // cacheTag(getGlobalTag("vitrerieTarifs"));
-  // console.log(`🔍 DB REQUEST: getVitrerieTarifs`);
+  "use cache";
+  cacheTag(getGlobalTag("vitrerieTarifs"));
+  console.log(`🔍 DB REQUEST: getVitrerieTarifs`);
   try {
     const results = await db
       .select({
@@ -240,9 +246,9 @@ export const getVitrerieTarifs = async () => {
 };
 
 export const getVitrerieTarifsFournisseur = async (fournisseurId: number) => {
-  // "use cache";
-  // cacheTag(getFournisseurTag("vitrerieTarifs", fournisseurId));
-  // console.log(`🔍 DB REQUEST: getVitrerieTarifsFournisseur(${fournisseurId})`);
+  "use cache";
+  cacheTag(getFournisseurTag("vitrerieTarifs", fournisseurId));
+  console.log(`🔍 DB REQUEST: getVitrerieTarifsFournisseur(${fournisseurId})`);
   try {
     const results = await db
       .select()
