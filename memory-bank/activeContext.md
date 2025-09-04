@@ -2,24 +2,21 @@
 
 ## Current Work Focus
 
-The current development focus is on enhancing the testing infrastructure and the pricing and quotation system, with particular emphasis on:
+La priorité de développement actuelle est l'amélioration du système d'invalidation de cache et l'optimisation des requêtes de services, avec un accent particulier sur :
 
-1. **Cache Invalidation System**
+1. **Système d'Invalidation de Cache**
+   - Perfectionnement du système de mise à jour en temps réel des données de tarification via Pusher
+   - Garantie de la cohérence des données entre les sessions utilisateurs avec debouncing et suivi des événements
+   - Développement de composants d'écoute d'invalidation de cache (`CacheInvalidationListener.tsx`, `PortalCacheInvalidationListener.tsx`)
+   - Gestion des scénarios complexes d'invalidation de cache avec une gestion appropriée des erreurs
 
-   - Implementing real-time updates for pricing data using Pusher
-   - Ensuring consistent data across user sessions with debouncing and event tracking
-   - Creating service-specific context updaters (e.g., `use-nettoyage-context-updater.ts`)
-   - Handling complex cache invalidation scenarios with proper error management
-
-2. **Tarifs Update Forms**
-
-   - Building supplier-facing forms for updating service pricing (`HygieneTarifsDistribUpdateForm.tsx`, `VitrerieTarifsUpdateForm.tsx`)
-   - Implementing validation and error handling for pricing updates
-   - Managing UI state for modified tarifs with visual indicators
-   - Supporting internationalization in the forms
+2. **Optimisation des Requêtes de Services**
+   - Refactorisation des requêtes pour différents services (`getHygiene.ts`, `getIncendie.ts`, `getMaintenance.ts`, `getNettoyage.ts`, `getServices.ts`)
+   - Amélioration de la performance et de la fiabilité des requêtes de données
+   - Mise en place de stratégies de mise en cache efficaces pour les données de services
+   - Intégration avec le système d'invalidation de cache pour des mises à jour cohérentes
 
 3. **Real-time Quote Recalculation**
-
    - Implementing service-specific pricing calculations based on updated tarifs
    - Ensuring quotes reflect the latest pricing data through cache invalidation
    - Providing user notifications when prices are updated
@@ -31,30 +28,27 @@ The current development focus is on enhancing the testing infrastructure and the
    - Ensuring proper state management during resets
    - Maintaining data consistency across multiple service contexts
 
-## Recent Changes
+## Changements Récents
 
-Based on the open files and code examination, recent work includes:
+D'après les fichiers ouverts et l'examen du code, les travaux récents comprennent :
 
-1. **Enhanced Cache Invalidation System**
+1. **Amélioration du Système d'Invalidation de Cache**
+   - Perfectionnement de `CacheInvalidationListener.tsx` et `PortalCacheInvalidationListener.tsx` avec debouncing et prévention des événements dupliqués
+   - Mise en place d'une route API dédiée pour l'invalidation du cache (`invalidate-cache/route.ts`)
+   - Optimisation de la gestion des données spécifiques aux services dans les événements d'invalidation de cache
+   - Ajout de journalisation détaillée pour les événements d'invalidation de cache
 
-   - Improved `CacheInvalidationListener.tsx` with debouncing and duplicate event prevention
-   - Added service-specific data handling in cache invalidation events
-   - Implemented `use-nettoyage-context-updater.ts` for targeted context updates
-   - Added detailed logging for cache invalidation events
+2. **Refactorisation des Requêtes de Services**
+   - Optimisation des requêtes pour les services d'hygiène, d'incendie, de maintenance et de nettoyage
+   - Amélioration de la structure et de l'organisation des requêtes pour une meilleure maintenabilité
+   - Mise en œuvre de stratégies de mise en cache efficaces pour les données de services
+   - Standardisation des patterns de requêtes à travers les différents services
 
-2. **Tarifs Update Forms Refinement**
-
-   - Enhanced UI for tarifs update forms with visual indicators for modified fields
-   - Added validation to prevent saving invalid pricing data
-   - Implemented optimistic UI updates with confirmation toasts
-   - Added sorting and categorization of tarifs in the forms
-
-3. **Pricing Action Improvements**
-
-   - Updated server actions (`nettoyageTarifsAction.ts`, `vitrerieTarifsAction.ts`, `hygieneTarifsAction.ts`) with better validation
-   - Added data transformation for proper storage and retrieval
-   - Implemented cache invalidation with detailed data payloads
-   - Enhanced error handling and user feedback
+3. **Améliorations de l'Interface Utilisateur**
+   - Travail sur les composants de la page d'accueil (`Hero.tsx`, `HeroCard.tsx`)
+   - Optimisation des arrière-plans et des éléments visuels (`BackgroundServer.tsx`)
+   - Amélioration de la page de contact pour une meilleure expérience utilisateur
+   - Perfectionnement de l'interface responsive pour tous les appareils
 
 4. **Context Management Optimization**
    - Refined state management in service providers (e.g., `NettoyageProvider.tsx`)
@@ -62,30 +56,27 @@ Based on the open files and code examination, recent work includes:
    - Enhanced initialization logic for service contexts
    - Added conditional rendering for client-side components
 
-## Next Steps
+## Prochaines Étapes
 
-Based on the current work focus, potential next steps include:
+Sur la base du focus de travail actuel, les prochaines étapes potentielles comprennent :
 
-1. **Complete Cache Invalidation System**
+1. **Finalisation du Système d'Invalidation de Cache**
+   - Extension du pattern d'écouteur d'invalidation à d'autres parties de l'application
+   - Implémentation d'un filtrage et d'une priorisation des événements plus sophistiqués
+   - Ajout d'un support hors ligne avec gestion de file d'attente
+   - Amélioration de la surveillance des performances pour les mises à jour en temps réel
 
-   - Extend the context updater pattern to other services beyond nettoyage
-   - Implement more sophisticated event filtering and prioritization
-   - Add offline support with queue management
-   - Enhance performance monitoring for real-time updates
+2. **Amélioration des Performances des Requêtes**
+   - Optimisation supplémentaire des requêtes de services pour réduire la latence
+   - Mise en œuvre de stratégies de préchargement pour les données fréquemment utilisées
+   - Développement de mécanismes de mise en cache plus avancés
+   - Mise en place de métriques de performance pour surveiller l'efficacité des requêtes
 
-2. **Expand Tarifs Management**
-
-   - Create additional tarifs update forms for remaining services
-   - Implement bulk update functionality for pricing data
-   - Add historical pricing data and trend visualization
-   - Implement approval workflows for significant price changes
-
-3. **Quote Calculation Enhancements**
-
-   - Optimize performance of complex pricing calculations
-   - Add more detailed breakdown of pricing components
-   - Implement comparison features between different service options
-   - Add what-if scenarios for quote customization
+3. **Enrichissement de l'Interface Utilisateur**
+   - Développement de nouvelles fonctionnalités pour le site vitrine
+   - Amélioration de l'expérience utilisateur sur la page de contact
+   - Optimisation des composants visuels et des arrière-plans
+   - Perfectionnement de l'accessibilité et de l'internationalisation
 
 4. **Testing and Optimization**
    - Implement component tests using Vitest and Testing Library
@@ -96,30 +87,27 @@ Based on the current work focus, potential next steps include:
    - Optimize performance of cache invalidation system
    - Conduct load testing for concurrent pricing updates
 
-## Active Decisions and Considerations
+## Décisions et Considérations Actives
 
-Current technical and product decisions being considered:
+Décisions techniques et produit actuellement à l'étude :
 
-1. **Cache Strategy Refinement**
+1. **Raffinement de la Stratégie de Cache**
+   - Comment gérer les événements d'invalidation de cache à haute fréquence
+   - Quand utiliser des mises à jour de contexte ciblées vs des rafraîchissements complets de page
+   - Comment équilibrer la mise en cache côté client avec la fraîcheur des données
+   - Stratégies pour gérer les échecs réseau pendant l'invalidation du cache
 
-   - How to handle high-frequency cache invalidation events
-   - When to use targeted context updates vs. full page refreshes
-   - How to balance client-side caching with data freshness
-   - Strategies for handling network failures during cache invalidation
+2. **Approche de Gestion des Requêtes**
+   - Évaluation de différentes stratégies de mise en cache pour les requêtes de services
+   - Considération des implications de performance pour les requêtes complexes
+   - Gestion des interdépendances entre les différents services
+   - Exploration d'alternatives pour optimiser les requêtes dans des cas spécifiques
 
-2. **State Management Approach**
-
-   - Evaluating the granularity of context providers
-   - Considering performance implications of large state objects
-   - Managing interdependencies between different service states
-   - Exploring alternatives to context for specific use cases
-
-3. **User Experience for Price Changes**
-
-   - How to notify users of price changes during quote creation
-   - When to automatically recalculate quotes vs. requiring user action
-   - How to present pricing history and changes
-   - Balancing transparency with simplicity in price presentation
+3. **Expérience Utilisateur du Site Vitrine**
+   - Comment améliorer l'engagement des utilisateurs sur la page d'accueil
+   - Quand utiliser des animations vs des éléments statiques pour l'interface
+   - Comment présenter les services de manière claire et attrayante
+   - Équilibrer l'esthétique avec la performance et les temps de chargement
 
 4. **Performance Considerations**
    - Optimizing real-time updates without excessive re-renders
@@ -132,21 +120,18 @@ Current technical and product decisions being considered:
 Based on the observed code structure and implementation:
 
 1. **File Organization**
-
    - Feature-based organization within the app directory
    - Service-specific components in dedicated directories
    - Separation of desktop and mobile components
    - Clear separation of actions, components, and hooks
 
 2. **Naming Conventions**
-
    - PascalCase for React components and TypeScript types
    - camelCase for functions, variables, and files
    - French terms for domain-specific concepts (e.g., "devis" for quote, "nettoyage" for cleaning)
    - Descriptive, domain-specific naming
 
 3. **State Management**
-
    - React Context for global and domain-specific state
    - Custom hooks for consuming and updating state
    - Server Actions for data mutations
@@ -163,14 +148,12 @@ Based on the observed code structure and implementation:
 The project uses a comprehensive testing approach with the following characteristics:
 
 1. **Test Organization**
-
    - Tests are organized in `src/__tests__/` mirroring the source structure
    - Component tests in `components/` directory
    - Utility tests in `utils/` directory
    - Centralized mocks in `components/mocks.tsx`
 
 2. **Component Testing**
-
    - Testing rendering with different props
    - Verifying conditional rendering logic
    - Testing user interactions
@@ -178,14 +161,12 @@ The project uses a comprehensive testing approach with the following characteris
    - Example: `author.test.tsx` tests all rendering scenarios of the Author component
 
 3. **Utility Testing**
-
    - Direct function testing with multiple scenarios
    - Focus on input/output verification
    - Comprehensive edge case coverage
    - Example: `capitalize.test.ts` tests various string capitalization scenarios
 
 4. **Mock Implementation**
-
    - Centralized mock functions in `mocks.tsx`
    - Mock UI components to simplify testing
    - Mock navigation functions to test routing behavior
@@ -202,21 +183,18 @@ The project uses a comprehensive testing approach with the following characteris
 Key insights from the current development work:
 
 1. **Real-time Data Challenges**
-
    - Managing cache invalidation across multiple services requires careful coordination
    - Debouncing and event deduplication are essential for stable real-time updates
    - Balancing immediate updates with system stability is an ongoing challenge
    - Providing clear user feedback for background updates improves user experience
 
 2. **Complex State Management**
-
    - Service-specific context updaters improve maintainability
    - Targeted state updates perform better than full context replacements
    - Local storage persistence requires careful synchronization
    - Clear separation of concerns in state management simplifies debugging
 
 3. **Form Management Complexity**
-
    - Visual indicators for modified fields improve user experience
    - Validation at both client and server sides ensures data integrity
    - Optimistic UI updates with proper error handling improve perceived performance

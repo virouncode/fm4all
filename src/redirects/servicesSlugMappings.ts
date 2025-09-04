@@ -8,7 +8,6 @@ export const servicesSlugMappingsFrToEn: Record<string, string> = {
   "securite-incendie": "fire-safety",
   "machines-a-cafe-en-entreprise": "coffee-machines",
   "livraison-fruits-entreprise": "office-fruit-basket-delivery",
-  "livraison-snacks-entreprise": "healthy-snack-delivery-office",
   "livraison-boissons-entreprise": "office-drinks-delivery",
   "fontaines-a-eau-entreprise": "water-dispensers",
   "office-manager-externalise": "outsource-office-management",

@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Link } from "@/i18n/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { ReceiptText } from "lucide-react";
 import { Dispatch } from "react";
 type DevisButtonProps = {
@@ -20,19 +20,23 @@ const DevisButton = ({
   withIcon = false,
   setIsMobileNavOpen,
 }: DevisButtonProps) => {
+  const router = useRouter();
   return (
-    <Link href="/devis/locaux">
+    <div className="flex justify-center">
       <Button
         variant="destructive"
         size={size}
         title={title}
         className={`ring-destructive text-base shadow-md ring-2 ring-offset-2 transition-all hover:scale-[101%] hover:shadow-lg ${className}`}
         data-testid="devis-button"
-        onClick={() => setIsMobileNavOpen?.(false)}
+        onClick={() => {
+          setIsMobileNavOpen?.(false);
+          router.push("/devis/locaux");
+        }}
       >
         {withIcon && <ReceiptText className="hidden sm:inline" />} {text}
       </Button>
-    </Link>
+    </div>
   );
 };
 

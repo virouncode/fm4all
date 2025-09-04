@@ -7,11 +7,11 @@ const Presentation = () => {
   const t = useTranslations("HomePage.presentation");
   return (
     <section id="presentation">
-      <div className="relative mx-auto flex w-full max-w-7xl flex-col gap-8 hyphens-auto text-wrap px-6 pb-12 pt-8 text-lg">
+      <div className="relative mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 pt-8 pb-12 text-lg text-wrap hyphens-auto">
         <h2 className="border-l-2 px-4 text-2xl md:text-3xl">
           {t("notre-plateforme")}
         </h2>
-        <div className="flex items-center justify-center gap-8 rounded-xl bg-gradient-to-r from-fm4allsecondary/100 to-fm4allsecondary/60 p-8 text-white md:items-start md:px-16 md:py-14">
+        <div className="from-fm4allsecondary/100 to-fm4allsecondary/60 flex items-center justify-center gap-8 rounded-xl bg-gradient-to-r p-8 text-white md:items-start md:px-16 md:py-14">
           <div className="flex w-full flex-col gap-6 md:w-auto">
             {/* <div className="text-center fle flex-col font-bold text-xl">
               <p>{t("vous-emmenagez-dans-de-nouveaux-bureaux")}</p>
@@ -64,7 +64,7 @@ const Presentation = () => {
                 title={t("obtenez-votre-devis-en-quelques-clics")}
                 text={t("obtenez-votre-devis-en-quelques-clics")}
                 size="lg"
-                className="mx-auto mt-10 w-full self-start border-none bg-fm4alldestructive text-white shadow-lg ring-fm4alldestructive hover:bg-fm4alldestructive/90 md:w-auto"
+                className="bg-fm4alldestructive ring-fm4alldestructive hover:bg-fm4alldestructive/90 mx-auto mt-10 w-full self-start border-none text-white shadow-lg md:w-auto"
               />
             </div>
           </div>
