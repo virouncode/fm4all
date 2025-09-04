@@ -12,6 +12,7 @@ import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { GammeType } from "@/zod-schemas/gamme";
+import { ServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4All";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useContext } from "react";
@@ -32,6 +33,15 @@ type ServicesFm4AllMobilePropositionCardProps = {
     prixSupportAdmin: number | null;
     prixSupportOp: number | null;
     prixAccountManager: number | null;
+    assurance: ServicesFm4AllOffresType;
+    plateforme: ServicesFm4AllOffresType;
+    supportAdmin: ServicesFm4AllOffresType;
+    supportOp: ServicesFm4AllOffresType;
+    accountManager: ServicesFm4AllOffresType;
+    audit: ServicesFm4AllOffresType;
+    minFacturationPlateforme: number;
+    minFacturationSupportOp: number;
+    minFacturationAccountManager: number;
     remiseCaSeuil: number;
     remiseCa: number;
     remiseHof: number;
@@ -40,7 +50,7 @@ type ServicesFm4AllMobilePropositionCardProps = {
   };
   handleClickProposition: (proposition: {
     id: number;
-    gamme: "essentiel" | "excellence" | "confort";
+    gamme: GammeType;
     tauxAssurance: number;
     tauxPlateforme: number;
     tauxSupportAdmin: number;
@@ -53,6 +63,15 @@ type ServicesFm4AllMobilePropositionCardProps = {
     prixSupportAdmin: number | null;
     prixSupportOp: number | null;
     prixAccountManager: number | null;
+    assurance: ServicesFm4AllOffresType;
+    plateforme: ServicesFm4AllOffresType;
+    supportAdmin: ServicesFm4AllOffresType;
+    supportOp: ServicesFm4AllOffresType;
+    accountManager: ServicesFm4AllOffresType;
+    audit: ServicesFm4AllOffresType;
+    minFacturationPlateforme: number;
+    minFacturationSupportOp: number;
+    minFacturationAccountManager: number;
     remiseCaSeuil: number;
     remiseCa: number;
     remiseHof: number;

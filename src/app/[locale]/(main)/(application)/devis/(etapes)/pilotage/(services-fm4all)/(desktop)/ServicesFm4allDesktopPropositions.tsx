@@ -1,10 +1,12 @@
+import { GammeType } from "@/zod-schemas/gamme";
+import { ServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4All";
 import ServicesFm4AllFournisseurLogo from "../ServicesFm4AllFournisseurLogo";
 import ServicesFm4AllPropositionCard from "../ServicesFm4AllPropositionCard";
 
 type ServicesFm4allDesktopPropositionsProps = {
   formattedPropositions: {
     id: number;
-    gamme: "essentiel" | "confort" | "excellence";
+    gamme: GammeType;
     tauxAssurance: number;
     tauxPlateforme: number;
     tauxSupportAdmin: number;
@@ -17,6 +19,15 @@ type ServicesFm4allDesktopPropositionsProps = {
     prixSupportAdmin: number | null;
     prixSupportOp: number | null;
     prixAccountManager: number | null;
+    assurance: ServicesFm4AllOffresType;
+    plateforme: ServicesFm4AllOffresType;
+    supportAdmin: ServicesFm4AllOffresType;
+    supportOp: ServicesFm4AllOffresType;
+    accountManager: ServicesFm4AllOffresType;
+    audit: ServicesFm4AllOffresType;
+    minFacturationPlateforme: number;
+    minFacturationSupportOp: number;
+    minFacturationAccountManager: number;
     remiseCaSeuil: number;
     remiseCa: number;
     remiseHof: number;
@@ -25,7 +36,7 @@ type ServicesFm4allDesktopPropositionsProps = {
   }[];
   handleClickProposition: (proposition: {
     id: number;
-    gamme: "essentiel" | "confort" | "excellence";
+    gamme: GammeType;
     tauxAssurance: number;
     tauxPlateforme: number;
     tauxSupportAdmin: number;
@@ -38,10 +49,20 @@ type ServicesFm4allDesktopPropositionsProps = {
     prixSupportAdmin: number | null;
     prixSupportOp: number | null;
     prixAccountManager: number | null;
+    assurance: ServicesFm4AllOffresType;
+    plateforme: ServicesFm4AllOffresType;
+    supportAdmin: ServicesFm4AllOffresType;
+    supportOp: ServicesFm4AllOffresType;
+    accountManager: ServicesFm4AllOffresType;
+    audit: ServicesFm4AllOffresType;
+    minFacturationPlateforme: number;
+    minFacturationSupportOp: number;
+    minFacturationAccountManager: number;
     remiseCaSeuil: number;
     remiseCa: number;
     remiseHof: number;
     totalAnnuel: number;
+    totalAnnuelSansRemise: number;
   }) => void;
   total: number;
 };

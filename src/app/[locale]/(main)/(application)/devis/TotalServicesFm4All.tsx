@@ -22,6 +22,8 @@ const TotalServicesFm4All = () => {
     totalRemiseHof,
   } = totalServicesFm4All;
 
+  console.log("totalServicesFm4All", totalServicesFm4All);
+
   const total =
     servicesFm4All.infos.gammeSelected === "essentiel"
       ? (totalAssurance ?? 0) +
@@ -124,7 +126,7 @@ const TotalServicesFm4All = () => {
               </p>
             </div>
           ) : null}
-          <div className="mt-2 flex items-center justify-between border-t border-foreground">
+          <div className="border-foreground mt-2 flex items-center justify-between border-t">
             <p>TOTAL</p>
             <p className="text-end" data-testid="total-services-fm4all">
               {formatNumber(Math.round(total))} {t("eur-ht-an")}

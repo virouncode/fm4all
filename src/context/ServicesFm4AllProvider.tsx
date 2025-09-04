@@ -1,5 +1,6 @@
 "use client";
 
+import { SERVICES_FM4ALL_DEFAULT_VALUES } from "@/constants/constants";
 import { useClientOnly } from "@/hooks/use-client-only";
 import { ServicesFm4AllType } from "@/zod-schemas/servicesFm4All";
 import {
@@ -15,22 +16,7 @@ export const ServicesFm4AllContext = createContext<{
   servicesFm4All: ServicesFm4AllType;
   setServicesFm4All: Dispatch<SetStateAction<ServicesFm4AllType>>;
 }>({
-  servicesFm4All: {
-    infos: {
-      gammeSelected: "essentiel",
-      commentaires: null,
-    },
-    prix: {
-      tauxAssurance: null,
-      tauxPlateforme: null,
-      tauxSupportAdmin: null,
-      tauxSupportOp: null,
-      tauxAccountManager: null,
-      remiseCaSeuil: null,
-      tauxRemiseCa: null,
-      tauxRemiseHof: null,
-    },
-  },
+  servicesFm4All: SERVICES_FM4ALL_DEFAULT_VALUES,
   setServicesFm4All: () => {},
 });
 
@@ -38,22 +24,9 @@ const ServicesFm4AllProvider = ({ children }: PropsWithChildren) => {
   const isMounted = useClientOnly();
 
   // Always initialize state
-  const [servicesFm4All, setServicesFm4All] = useState<ServicesFm4AllType>({
-    infos: {
-      gammeSelected: "essentiel",
-      commentaires: null,
-    },
-    prix: {
-      tauxAssurance: null,
-      tauxPlateforme: null,
-      tauxSupportAdmin: null,
-      tauxSupportOp: null,
-      tauxAccountManager: null,
-      remiseCaSeuil: null,
-      tauxRemiseCa: null,
-      tauxRemiseHof: null,
-    },
-  });
+  const [servicesFm4All, setServicesFm4All] = useState<ServicesFm4AllType>(
+    SERVICES_FM4ALL_DEFAULT_VALUES,
+  );
 
   useEffect(() => {
     if (isMounted) {

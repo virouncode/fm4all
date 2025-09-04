@@ -1,6 +1,7 @@
 import {
   MAX_NB_PERSONNES_PAR_ESPACE,
   MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE,
+  SERVICES_FM4ALL_DEFAULT_VALUES,
 } from "@/constants/constants";
 import { CafeType } from "@/zod-schemas/cafe";
 import { CommentairesType } from "@/zod-schemas/commentaires";
@@ -342,22 +343,7 @@ export const reinitialisationDevis = (
       demiTjmPremium: null,
     },
   });
-  setServicesFm4All({
-    infos: {
-      gammeSelected: "essentiel",
-      commentaires: null,
-    },
-    prix: {
-      tauxAssurance: null,
-      tauxPlateforme: null,
-      tauxSupportAdmin: null,
-      tauxSupportOp: null,
-      tauxAccountManager: null,
-      remiseCaSeuil: null,
-      tauxRemiseCa: null,
-      tauxRemiseHof: null,
-    },
-  });
+  setServicesFm4All(SERVICES_FM4ALL_DEFAULT_VALUES);
   setCommentaires(null);
   //Navigation
   setServices({
@@ -455,6 +441,7 @@ export const reinitialisationDevis = (
   });
   setTotal({
     totalAnnuelHt: null,
+    totalAnnuelHtSansServicesFm4all: null,
     totalInstallationHt: null,
   });
 };

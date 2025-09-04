@@ -5,6 +5,8 @@ import {
   CarouselContent,
 } from "@/components/ui/carousel";
 import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
+import { GammeType } from "@/zod-schemas/gamme";
+import { ServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4All";
 import { useTranslations } from "next-intl";
 import { useContext, useEffect, useState } from "react";
 import ServicesFm4AllMobilePropositionCard from "./ServicesFm4AllMobilePropositionCard";
@@ -12,7 +14,7 @@ import ServicesFm4AllMobilePropositionCard from "./ServicesFm4AllMobilePropositi
 type ServicesFm4allMobilePropositionsProps = {
   formattedPropositions: {
     id: number;
-    gamme: "essentiel" | "confort" | "excellence";
+    gamme: GammeType;
     tauxAssurance: number;
     tauxPlateforme: number;
     tauxSupportAdmin: number;
@@ -25,6 +27,15 @@ type ServicesFm4allMobilePropositionsProps = {
     prixSupportAdmin: number | null;
     prixSupportOp: number | null;
     prixAccountManager: number | null;
+    assurance: ServicesFm4AllOffresType;
+    plateforme: ServicesFm4AllOffresType;
+    supportAdmin: ServicesFm4AllOffresType;
+    supportOp: ServicesFm4AllOffresType;
+    accountManager: ServicesFm4AllOffresType;
+    audit: ServicesFm4AllOffresType;
+    minFacturationPlateforme: number;
+    minFacturationSupportOp: number;
+    minFacturationAccountManager: number;
     remiseCaSeuil: number;
     remiseCa: number;
     remiseHof: number;
@@ -33,7 +44,7 @@ type ServicesFm4allMobilePropositionsProps = {
   }[];
   handleClickProposition: (proposition: {
     id: number;
-    gamme: "essentiel" | "confort" | "excellence";
+    gamme: GammeType;
     tauxAssurance: number;
     tauxPlateforme: number;
     tauxSupportAdmin: number;
@@ -46,10 +57,20 @@ type ServicesFm4allMobilePropositionsProps = {
     prixSupportAdmin: number | null;
     prixSupportOp: number | null;
     prixAccountManager: number | null;
+    assurance: ServicesFm4AllOffresType;
+    plateforme: ServicesFm4AllOffresType;
+    supportAdmin: ServicesFm4AllOffresType;
+    supportOp: ServicesFm4AllOffresType;
+    accountManager: ServicesFm4AllOffresType;
+    audit: ServicesFm4AllOffresType;
+    minFacturationPlateforme: number;
+    minFacturationSupportOp: number;
+    minFacturationAccountManager: number;
     remiseCaSeuil: number;
     remiseCa: number;
     remiseHof: number;
     totalAnnuel: number;
+    totalAnnuelSansRemise: number;
   }) => void;
   total: number;
 };

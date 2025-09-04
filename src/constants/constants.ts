@@ -1,3 +1,5 @@
+import { ServicesFm4AllType } from "@/zod-schemas/servicesFm4All";
+
 export const MARGE = 1.11111111;
 export const RATIO = 10000;
 export const RATIO_LAIT = 0.2;
@@ -31,3 +33,29 @@ export const MAX_NB_ALARMES = 100;
 export const MAX_NB_RIA = 100;
 export const MAX_NB_COLONNES_SECHES = 100;
 export const MAX_NB_PORTES_COUPES_FEU = 100;
+
+export const SERVICES_FM4ALL_DEFAULT_VALUES: ServicesFm4AllType = {
+  infos: {
+    gammeSelected: "essentiel",
+    commentaires: null,
+    assurance: "non inclus",
+    plateforme: "non inclus",
+    supportAdmin: "inclus",
+    supportOp: "non propose",
+    accountManager: "non propose",
+    audit: "sur demande",
+  },
+  prix: {
+    tauxAssurance: 0.0108,
+    tauxPlateforme: 0.01,
+    tauxSupportAdmin: 0,
+    tauxSupportOp: 0.0219,
+    tauxAccountManager: 0.0399,
+    tauxRemiseCa: 0.005,
+    tauxRemiseHof: 0.005,
+    remiseCaSeuil: 26000,
+    minFacturationPlateforme: 249,
+    minFacturationSupportOp: 1190,
+    minFacturationAccountManager: 2050,
+  },
+};

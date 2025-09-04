@@ -174,8 +174,6 @@ const MesLocaux = () => {
     codePostal: "",
   };
 
-  console.log("defaultValues", defaultValues);
-
   const form = useForm<MesLocauxType>({
     mode: "all",
     resolver: zodResolver(

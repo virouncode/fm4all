@@ -12,6 +12,7 @@ import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvide
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { GammeType } from "@/zod-schemas/gamme";
+import { ServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4All";
 import { SelectServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4AllOffresType";
 import { SelectServicesFm4AllTauxType } from "@/zod-schemas/servicesFm4AllTaux";
 import { useContext } from "react";
@@ -98,6 +99,7 @@ const ServicesFm4AllPropositions = ({
       supportAdmin,
       supportOp,
       accountManager,
+      audit,
       gamme,
     } = offre;
     const prixAssurance =
@@ -169,6 +171,15 @@ const ServicesFm4AllPropositions = ({
       prixSupportAdmin,
       prixSupportOp,
       prixAccountManager,
+      assurance,
+      plateforme,
+      supportAdmin,
+      supportOp,
+      accountManager,
+      audit,
+      minFacturationPlateforme,
+      minFacturationSupportOp,
+      minFacturationAccountManager,
       remiseCaSeuil,
       remiseCa,
       remiseHof,
@@ -192,10 +203,20 @@ const ServicesFm4AllPropositions = ({
     prixSupportAdmin: number | null;
     prixSupportOp: number | null;
     prixAccountManager: number | null;
+    assurance: ServicesFm4AllOffresType;
+    plateforme: ServicesFm4AllOffresType;
+    supportAdmin: ServicesFm4AllOffresType;
+    supportOp: ServicesFm4AllOffresType;
+    accountManager: ServicesFm4AllOffresType;
+    audit: ServicesFm4AllOffresType;
+    minFacturationPlateforme: number;
+    minFacturationSupportOp: number;
+    minFacturationAccountManager: number;
     remiseCaSeuil: number;
     remiseCa: number;
     remiseHof: number;
     totalAnnuel: number;
+    totalAnnuelSansRemise: number;
   }) => {
     const {
       gamme,
@@ -211,6 +232,15 @@ const ServicesFm4AllPropositions = ({
       prixSupportAdmin,
       prixSupportOp,
       prixAccountManager,
+      assurance,
+      plateforme,
+      supportAdmin,
+      supportOp,
+      accountManager,
+      audit,
+      minFacturationPlateforme,
+      minFacturationSupportOp,
+      minFacturationAccountManager,
       remiseCaSeuil,
       remiseCa,
       remiseHof,
@@ -222,6 +252,12 @@ const ServicesFm4AllPropositions = ({
       infos: {
         ...prev.infos,
         gammeSelected: gamme,
+        assurance,
+        plateforme,
+        supportAdmin,
+        supportOp,
+        accountManager,
+        audit,
       },
       prix: {
         tauxAssurance,
@@ -232,17 +268,20 @@ const ServicesFm4AllPropositions = ({
         remiseCaSeuil,
         tauxRemiseCa,
         tauxRemiseHof,
+        minFacturationPlateforme,
+        minFacturationSupportOp,
+        minFacturationAccountManager,
       },
     }));
-    setTotalServicesFm4All({
-      totalAssurance: prixAssurance,
-      totalPlateforme: prixPlateforme,
-      totalSupportAdmin: prixSupportAdmin,
-      totalSupportOp: prixSupportOp,
-      totalAccountManager: prixAccountManager,
-      totalRemiseCa: remiseCa,
-      totalRemiseHof: remiseHof,
-    });
+    // setTotalServicesFm4All({
+    //   totalAssurance: prixAssurance,
+    //   totalPlateforme: prixPlateforme,
+    //   totalSupportAdmin: prixSupportAdmin,
+    //   totalSupportOp: prixSupportOp,
+    //   totalAccountManager: prixAccountManager,
+    //   totalRemiseCa: remiseCa,
+    //   totalRemiseHof: remiseHof,
+    // });
   };
 
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });

@@ -104,7 +104,7 @@ const DetailHygiene = () => {
           </TableRow>
         </TableFooter>
       </Table>
-      <Table className="detail-section">
+      <Table className="detail-section border">
         <TableHeader>
           <TableRow>
             <TableHead>Service</TableHead>

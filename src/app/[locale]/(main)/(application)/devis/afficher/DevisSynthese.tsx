@@ -30,12 +30,17 @@ const DevisSynthese = () => {
     >
       <div id="total-summary">
         <p className="text-2xl">
-          Total: {formatNumber(Math.round(total.totalAnnuelHt ?? 0))}{" "}
+          Total:{" "}
+          {total.totalAnnuelHtSansServicesFm4all
+            ? formatNumber(Math.round(total.totalAnnuelHt ?? 0))
+            : 0}{" "}
           {t("eur-ht-an")}
         </p>
         <p>
           {t("soit")}{" "}
-          {formatNumber(Math.round((total.totalAnnuelHt ?? 0) / 12))}{" "}
+          {total.totalAnnuelHtSansServicesFm4all
+            ? formatNumber(Math.round((total.totalAnnuelHt ?? 0) / 12))
+            : 0}{" "}
           {t("eur-ht-mois-pour")} {client.effectif} {t("personnes")},{" "}
           {client.surface} m<sup>2</sup>
         </p>
@@ -54,7 +59,7 @@ const DevisSynthese = () => {
         <TotalSnacksFruits />
         <TotalFontaines />
         <TotalOfficeManager />
-        <TotalServicesFm4All />
+        {total.totalAnnuelHtSansServicesFm4all ? <TotalServicesFm4All /> : null}
       </div>
     </div>
   );

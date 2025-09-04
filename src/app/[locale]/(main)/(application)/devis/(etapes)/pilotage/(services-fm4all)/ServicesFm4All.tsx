@@ -28,6 +28,8 @@ const ServicesFm4All = ({
   servicesFm4AllTaux,
   servicesFm4AllOffres,
 }: ServicesFm4AllProps) => {
+  console.log("servicesFm4AllTaux", servicesFm4AllTaux);
+
   const tFm4all = useTranslations("DevisPage.pilotage.servicesFm4all");
   const { setManagement } = useContext(ManagementContext);
   const { client } = useContext(ClientContext);

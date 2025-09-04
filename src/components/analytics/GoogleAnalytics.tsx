@@ -38,6 +38,22 @@ export default function GoogleAnalytics({
                 `,
         }}
       />
+      {/* Compte viroun@fm4all.com <Script
+        async
+        src="https://www.googletagmanager.com/gtag/js?id=AW-17523808696"
+      />
+      <Script
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'AW-17523808696');
+                `,
+        }}
+      /> */}
+      {/* Compte viroun.gads@gmail.com */}
       <Script
         async
         src="https://www.googletagmanager.com/gtag/js?id=AW-17528670078"

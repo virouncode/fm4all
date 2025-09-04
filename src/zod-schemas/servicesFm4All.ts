@@ -4,17 +4,42 @@ export const servicesFm4AllSchema = z.object({
   infos: z.object({
     gammeSelected: z.enum(["essentiel", "confort", "excellence"]).nullable(),
     commentaires: z.string().nullable(),
+    assurance: z.enum(["inclus", "non inclus", "non propose", "sur demande"]),
+    plateforme: z.enum(["inclus", "non inclus", "non propose", "sur demande"]),
+    supportAdmin: z.enum([
+      "inclus",
+      "non inclus",
+      "non propose",
+      "sur demande",
+    ]),
+    supportOp: z.enum(["inclus", "non inclus", "non propose", "sur demande"]),
+    accountManager: z.enum([
+      "inclus",
+      "non inclus",
+      "non propose",
+      "sur demande",
+    ]),
+    audit: z.enum(["inclus", "non inclus", "non propose", "sur demande"]),
   }),
   prix: z.object({
-    tauxAssurance: z.number().nullable(),
-    tauxPlateforme: z.number().nullable(),
-    tauxSupportAdmin: z.number().nullable(),
-    tauxSupportOp: z.number().nullable(),
-    tauxAccountManager: z.number().nullable(),
-    remiseCaSeuil: z.number().nullable(),
-    tauxRemiseCa: z.number().nullable(),
-    tauxRemiseHof: z.number().nullable(),
+    tauxAssurance: z.number(),
+    tauxPlateforme: z.number(),
+    tauxSupportAdmin: z.number(),
+    tauxSupportOp: z.number(),
+    tauxAccountManager: z.number(),
+    remiseCaSeuil: z.number(),
+    tauxRemiseCa: z.number(),
+    tauxRemiseHof: z.number(),
+    minFacturationPlateforme: z.number(),
+    minFacturationSupportOp: z.number(),
+    minFacturationAccountManager: z.number(),
   }),
 });
 
 export type ServicesFm4AllType = z.infer<typeof servicesFm4AllSchema>;
+
+export type ServicesFm4AllOffresType =
+  | "non inclus"
+  | "inclus"
+  | "non propose"
+  | "sur demande";

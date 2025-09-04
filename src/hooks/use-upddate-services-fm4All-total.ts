@@ -63,6 +63,11 @@ export const useUpddateServicesFm4AllTotal = () => {
       totalFinalFontaines +
       totalFinalOfficeManager;
 
+    const assurance = servicesFm4All.infos.assurance;
+    const plateforme = servicesFm4All.infos.plateforme;
+    const supportAdmin = servicesFm4All.infos.supportAdmin;
+    const supportOp = servicesFm4All.infos.supportOp;
+    const accountManager = servicesFm4All.infos.accountManager;
     const tauxAssurance = servicesFm4All.prix.tauxAssurance;
     const tauxPlateforme = servicesFm4All.prix.tauxPlateforme;
     const tauxSupportAdmin = servicesFm4All.prix.tauxSupportAdmin;
@@ -71,18 +76,49 @@ export const useUpddateServicesFm4AllTotal = () => {
     const tauxRemiseCa = servicesFm4All.prix.tauxRemiseCa;
     const tauxRemiseHof = servicesFm4All.prix.tauxRemiseHof;
     const remiseCaSeuil = servicesFm4All.prix.remiseCaSeuil;
+    const minFacturationPlateforme =
+      servicesFm4All.prix.minFacturationPlateforme;
+    const minFacturationSupportOp = servicesFm4All.prix.minFacturationSupportOp;
+    const minFacturationAccountManager =
+      servicesFm4All.prix.minFacturationAccountManager;
 
-    const prixAssurance = (tauxAssurance ?? 0.0108) * total * MARGE;
-    const prixPlateforme = (tauxPlateforme ?? 0.01) * total * MARGE;
-    const prixSupportAdmin = (tauxSupportAdmin ?? 0) * total * MARGE;
-    const prixSupportOp = (tauxSupportOp ?? 0.0219) * total * MARGE;
-    const prixAccountManager = (tauxAccountManager ?? 0.0399) * total * MARGE;
+    const prixAssurance =
+      assurance === "non propose"
+        ? null
+        : assurance === "inclus"
+          ? 0
+          : tauxAssurance * total * MARGE;
+    const prixPlateforme =
+      plateforme === "non propose"
+        ? null
+        : plateforme === "inclus"
+          ? 0
+          : Math.max(tauxPlateforme * total * MARGE, minFacturationPlateforme);
+    const prixSupportAdmin =
+      supportAdmin === "non propose"
+        ? null
+        : supportAdmin === "inclus"
+          ? 0
+          : tauxSupportAdmin * total * MARGE;
+    const prixSupportOp =
+      supportOp === "non propose"
+        ? null
+        : supportOp === "inclus"
+          ? 0
+          : Math.max(tauxSupportOp * total * MARGE, minFacturationSupportOp);
+    const prixAccountManager =
+      accountManager === "non propose"
+        ? null
+        : accountManager === "inclus"
+          ? 0
+          : Math.max(
+              tauxAccountManager * total * MARGE,
+              minFacturationAccountManager,
+            );
     const remiseCa =
-      total * MARGE > (remiseCaSeuil ?? 26000)
-        ? total * MARGE * (tauxRemiseCa ?? 0.005)
-        : 0;
+      total * MARGE >= remiseCaSeuil ? tauxRemiseCa * total * MARGE : 0;
     const remiseHof = officeManager.infos.gammeSelected
-      ? total * MARGE * (tauxRemiseHof ?? 0.005)
+      ? tauxRemiseHof * total * MARGE
       : 0;
 
     setTotalServicesFm4All({
@@ -95,24 +131,17 @@ export const useUpddateServicesFm4AllTotal = () => {
       totalRemiseHof: remiseHof,
     });
   }, [
-    officeManager.infos.gammeSelected,
-    servicesFm4All.prix.remiseCaSeuil,
-    servicesFm4All.prix.tauxAccountManager,
-    servicesFm4All.prix.tauxAssurance,
-    servicesFm4All.prix.tauxPlateforme,
-    servicesFm4All.prix.tauxRemiseCa,
-    servicesFm4All.prix.tauxRemiseHof,
-    servicesFm4All.prix.tauxSupportAdmin,
-    servicesFm4All.prix.tauxSupportOp,
-    setTotalServicesFm4All,
-    totalCafe.totalEspaces,
-    totalHygiene,
-    totalIncendie,
-    totalMaintenance,
     totalNettoyage,
-    totalOfficeManager.totalService,
+    totalHygiene,
+    totalMaintenance,
+    totalIncendie,
+    totalCafe.totalEspaces,
+    totalThe.totalService,
     totalSnacksFruits.total,
     totalFontaines.totalEspaces,
-    totalThe.totalService,
+    totalOfficeManager.totalService,
+    officeManager.infos.gammeSelected,
+    servicesFm4All,
+    setTotalServicesFm4All,
   ]);
 };

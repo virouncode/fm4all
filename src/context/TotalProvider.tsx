@@ -18,6 +18,7 @@ export const TotalContext = createContext<{
 }>({
   total: {
     totalAnnuelHt: null,
+    totalAnnuelHtSansServicesFm4all: null,
     totalInstallationHt: null,
   },
   setTotal: () => {},
@@ -29,6 +30,7 @@ const TotalProvider = ({ children }: PropsWithChildren) => {
   // Always initialize state
   const [total, setTotal] = useState<TotalType>({
     totalAnnuelHt: null,
+    totalAnnuelHtSansServicesFm4all: null,
     totalInstallationHt: null,
   });
 

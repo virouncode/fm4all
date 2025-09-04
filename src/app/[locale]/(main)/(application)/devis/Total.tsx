@@ -102,7 +102,8 @@ const Total = () => {
             (totalServicesFm4All.totalAccountManager ?? 0) -
             (totalServicesFm4All.totalRemiseCa ?? 0) -
             (totalServicesFm4All.totalRemiseHof ?? 0);
-    const totalAnnuelHt =
+
+    const totalAnnuelHtSansServicesFm4all =
       (totalFinalNettoyage +
         totalFinalHygiene +
         totalFinalMaintenance +
@@ -112,8 +113,9 @@ const Total = () => {
         totalFinalSnacksFruits +
         totalFinalFontaines +
         totalFinalOfficeManager) *
-        MARGE +
-      totalFinalServicesFm4All;
+      MARGE;
+    const totalAnnuelHt =
+      totalAnnuelHtSansServicesFm4all + totalFinalServicesFm4All;
 
     const totalInstallationHt =
       (totalHygiene.totalInstallation ?? 0) +
@@ -124,7 +126,11 @@ const Total = () => {
         .map(({ totalInstallation }) => totalInstallation ?? 0)
         .reduce((acc, curr) => acc + curr, 0);
 
-    setTotal({ totalAnnuelHt, totalInstallationHt });
+    setTotal({
+      totalAnnuelHt,
+      totalInstallationHt,
+      totalAnnuelHtSansServicesFm4all,
+    });
   }, [
     servicesFm4All.infos.gammeSelected,
     setTotal,
@@ -156,21 +162,29 @@ const Total = () => {
           data-testid="total-button"
         >
           <Calculator />
-          {formatNumber(Math.round(total.totalAnnuelHt ?? 0))} {t("eur-ht-an")}
+          {total.totalAnnuelHtSansServicesFm4all
+            ? formatNumber(Math.round(total.totalAnnuelHt ?? 0))
+            : 0}{" "}
+          {t("eur-ht-an")}
         </Button>
       </SheetTrigger>
       <SheetContent className="flex w-full flex-col p-6">
         <SheetHeader className="p-0">
           <SheetTitle>
             <span className="text-2xl">
-              Total: {formatNumber(Math.round(total.totalAnnuelHt ?? 0))}{" "}
+              Total:{" "}
+              {total.totalAnnuelHtSansServicesFm4all
+                ? formatNumber(Math.round(total.totalAnnuelHt ?? 0))
+                : 0}{" "}
               {t("eur-ht-an")}
             </span>{" "}
           </SheetTitle>
           <SheetDescription>
             <span>
               {t("soit")}{" "}
-              {formatNumber(Math.round((total.totalAnnuelHt ?? 0) / 12))}{" "}
+              {total.totalAnnuelHtSansServicesFm4all
+                ? formatNumber(Math.round((total.totalAnnuelHt ?? 0) / 12))
+                : 0}{" "}
               {t("eur-ht-mois-pour")} {client.effectif} {t("personnes")},{" "}
               {client.surface} m<sup>2</sup>
             </span>
@@ -194,7 +208,9 @@ const Total = () => {
           <TotalSnacksFruits />
           <TotalFontaines />
           <TotalOfficeManager />
-          <TotalServicesFm4All />
+          {total.totalAnnuelHtSansServicesFm4all ? (
+            <TotalServicesFm4All />
+          ) : null}
         </div>
       </SheetContent>
     </Sheet>

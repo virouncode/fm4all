@@ -51,8 +51,7 @@ const DevisProgressProvider = ({ children }: PropsWithChildren) => {
     }
   }, [devisProgress]);
 
-  // if (!isMounted) return null; //Pour éviter les erreurs d'hydratation
-  console.log("DevisProgressProvider render:", devisProgress);
+  if (!isMounted) return null; //Pour éviter les erreurs d'hydratation
   return (
     <DevisProgressContext.Provider value={{ devisProgress, setDevisProgress }}>
       {children}

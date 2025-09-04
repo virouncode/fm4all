@@ -86,6 +86,7 @@ export const totalServicesFm4AllSchema = z.object({
 
 export const totalSchema = z.object({
   totalAnnuelHt: z.number().nullable(),
+  totalAnnuelHtSansServicesFm4all: z.number().nullable(),
   totalInstallationHt: z.number().nullable(),
 });
 
