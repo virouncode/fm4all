@@ -24,9 +24,6 @@ const HeroCard = async () => {
       <div className="flex justify-center">
         <ul className="mb-6 space-y-4">
           <li className="list-check">
-            {/* <span className="inline-flex items-center justify-center bg-fm4allsecondary text-white rounded-full w-6 h-6 mr-3 flex-shrink-0 mt-0.5">
-              ✓
-            </span> */}
             <span>
               <strong className="text-white">{t("comparez")}</strong>{" "}
               {t("par-gamme")}
@@ -37,18 +34,12 @@ const HeroCard = async () => {
             </span>
           </li>
           <li className="list-check">
-            {/* <span className="inline-flex items-center justify-center bg-fm4allsecondary text-white rounded-full w-6 h-6 mr-3 flex-shrink-0 mt-0.5">
-              ✓
-            </span> */}
             <span>
               <strong className="text-white">{t("simplifiez")}</strong>{" "}
               {t("la-mise-en-place-des-services")}
             </span>
           </li>
           <li className="list-check">
-            {/* <span className="inline-flex items-center justify-center bg-fm4allsecondary text-white rounded-full w-6 h-6 mr-3 flex-shrink-0 mt-0.5">
-              ✓
-            </span> */}
             <span>
               <strong className="text-white">{t("deleguez")}</strong>{" "}
               {t("la-gestion-du-quotidien")}

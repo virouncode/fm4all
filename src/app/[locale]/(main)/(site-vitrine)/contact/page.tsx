@@ -1,4 +1,5 @@
 import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -64,7 +65,14 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
         </div>
         <div className="flex flex-col gap-8">
           <CTAContactButtons />
-          <div className="flex w-full items-center justify-center">
+          <div className="flex w-full items-center justify-center gap-4">
+            <Avatar className="size-14">
+              <AvatarImage
+                src="/img/portrait-dg.webp"
+                alt="Portrait de Romuald Buffe, dirigeant de FM4ALL"
+                className="object-cover"
+              />
+            </Avatar>
             <p className="text-center">{t("romuald-buffe-dirigeant-fm4all")}</p>
           </div>
         </div>
