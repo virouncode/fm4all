@@ -55,18 +55,6 @@ function Carousel({
     {
       ...opts,
       axis: orientation === "horizontal" ? "x" : "y",
-      // Optimisations pour les performances mobile
-      dragFree: false,
-      containScroll: "trimSnaps",
-      skipSnaps: false,
-      // Réduire la sensibilité tactile
-      startIndex: 0,
-      loop: false,
-      // Optimiser les transitions
-      duration: 25,
-      // Réduire les calculs pendant le drag
-      watchResize: false,
-      watchSlides: false,
     },
     plugins,
   );
