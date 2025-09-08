@@ -43,6 +43,29 @@ export default async function LocalizedLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
+      <head>
+        {/* Preconnect pour les domaines critiques */}
+        <link rel="preconnect" href="https://cdn.sanity.io" crossOrigin="" />
+        <link
+          rel="preconnect"
+          href="https://6njvcatb4pcugmyl.public.blob.vercel-storage.com"
+          crossOrigin=""
+        />
+        <link
+          rel="preconnect"
+          href="https://fonts.googleapis.com"
+          crossOrigin=""
+        />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin=""
+        />
+
+        {/* DNS prefetch pour les analytics */}
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
+      </head>
       <body
         className={`${inter.className} scroll-smooth tracking-tight antialiased`}
       >
