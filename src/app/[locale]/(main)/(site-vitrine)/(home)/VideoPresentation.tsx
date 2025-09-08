@@ -10,8 +10,8 @@ const VideoPresentation = () => {
           height="100%"
           src={
             locale === "fr"
-              ? "https://www.youtube-nocookie.com/embed/mUEuuTMyPts?si=HnV8B75-TEXeFhwv?modestbranding=1&rel=0&enablejsapi=1&origin=https://www.fm4all.com"
-              : "https://www.youtube-nocookie.com/embed/wQJaJ32W0to?si=_drbqbc-KBEUv7lz?modestbranding=1&rel=0&enablejsapi=1&origin=https://www.fm4all.com"
+              ? "https://www.youtube-nocookie.com/embed/mUEuuTMyPts?si=HnV8B75-TEXeFhwv?modestbranding=1&rel=0&enablejsapi=1&origin=https://www.fm4all.com/fr"
+              : "https://www.youtube-nocookie.com/embed/wQJaJ32W0to?si=_drbqbc-KBEUv7lz?modestbranding=1&rel=0&enablejsapi=1&origin=https://www.fm4all.com/en"
           }
           title="fm4all-presentation-video"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
