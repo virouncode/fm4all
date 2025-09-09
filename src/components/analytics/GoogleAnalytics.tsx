@@ -38,6 +38,7 @@ export default function GoogleAnalytics({
                 `,
         }}
       />
+
       {/* Compte viroun@fm4all.com <Script
         async
         src="https://www.googletagmanager.com/gtag/js?id=AW-17523808696"
@@ -66,6 +67,14 @@ export default function GoogleAnalytics({
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
                 gtag('config', 'AW-17528670078');
+                `,
+        }}
+      />
+      <Script
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+                function gtag_report_conversion(url) { var callback = function () { if (typeof(url) != 'undefined') { window.location = url; } }; gtag('event', 'conversion', { 'send_to': 'AW-17528670078/IMiZCLDHxpcbEP6OqaZB', 'value': 1.0, 'currency': 'EUR', 'event_callback': callback }); return false; }
                 `,
         }}
       />

@@ -5,6 +5,37 @@ import { Mail, Phone, Video } from "lucide-react";
 import { useLocale } from "next-intl";
 import Link from "next/link";
 
+export const gtag_report_conversion_tel = () => {
+  if (typeof window.gtag !== "undefined") {
+    window.gtag("event", "conversion", {
+      send_to: "AW-17528670078/zv70CMzfu5cbEP6OqaZB",
+      value: 1.0,
+    });
+  }
+
+  return false;
+};
+
+export const gtag_report_conversion_email = () => {
+  if (typeof window.gtag !== "undefined") {
+    window.gtag("event", "conversion", {
+      send_to: "AW-17528670078/6oRqCKTAu5cbEP6OqaZB",
+      value: 1.0,
+    });
+  }
+
+  return false;
+};
+
+export const gtag_report_conversion_rdv = () => {
+  if (typeof window.gtag !== "undefined") {
+    window.gtag("event", "conversion", {
+      send_to: "AW-17528670078/2epzCPent5cbEP6OqaZB",
+      value: 1.0,
+    });
+  }
+};
+
 const CTAContactButtons = () => {
   const locale = useLocale();
   return (
@@ -17,7 +48,8 @@ const CTAContactButtons = () => {
         <Button
           variant="destructive"
           size="lg"
-          className="flex w-full items-center justify-center text-base ring-2 ring-destructive ring-offset-2 transition-all hover:scale-[101%]"
+          className="ring-destructive flex w-full items-center justify-center text-base ring-2 ring-offset-2 transition-all hover:scale-[101%]"
+          onClick={gtag_report_conversion_rdv}
         >
           <Video />
           {locale === "fr"
@@ -29,7 +61,8 @@ const CTAContactButtons = () => {
         <Button
           variant="destructive"
           size="lg"
-          className="flex w-full items-center justify-center text-base ring-2 ring-destructive ring-offset-2 transition-all hover:scale-[101%]"
+          className="ring-destructive flex w-full items-center justify-center text-base ring-2 ring-offset-2 transition-all hover:scale-[101%]"
+          onClick={gtag_report_conversion_tel}
         >
           <Phone />
           +33 6 69 31 10 46
@@ -42,7 +75,8 @@ const CTAContactButtons = () => {
         <Button
           variant="destructive"
           size="lg"
-          className="flex w-full items-center justify-center text-base ring-2 ring-destructive ring-offset-2 transition-all hover:scale-[101%]"
+          className="ring-destructive flex w-full items-center justify-center text-base ring-2 ring-offset-2 transition-all hover:scale-[101%]"
+          onClick={gtag_report_conversion_email}
         >
           <Mail />
           {locale === "fr" ? "Je contacte par email" : "Contact by e-mail"}
