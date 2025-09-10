@@ -9,6 +9,8 @@ export const gtag_report_conversion_contact = (
   url?: string,
 ) => {
   if (typeof window.gtag !== "undefined") {
+    console.log("sendTo", sendTo);
+
     window.gtag("event", "conversion", {
       send_to: `AW-17528670078/${sendTo}`,
       value: 1.0,
@@ -20,46 +22,10 @@ export const gtag_report_conversion_contact = (
   return false;
 };
 
-export const gtag_report_conversion_tel = () => {
-  if (typeof window.gtag !== "undefined") {
-    window.gtag("event", "conversion", {
-      send_to: "AW-17528670078/zv70CMzfu5cbEP6OqaZB",
-      value: 1.0,
-    });
-  }
-
-  return false;
-};
-
-export const gtag_report_conversion_email = () => {
-  if (typeof window.gtag !== "undefined") {
-    window.gtag("event", "conversion", {
-      send_to: "AW-17528670078/6oRqCKTAu5cbEP6OqaZB",
-      value: 1.0,
-    });
-  }
-
-  return false;
-};
-
-export const gtag_report_conversion_rdv = () => {
-  if (typeof window.gtag !== "undefined") {
-    window.gtag("event", "conversion", {
-      send_to: "AW-17528670078/2epzCPent5cbEP6OqaZB",
-      value: 1.0,
-    });
-  }
-};
-
 const CTAContactButtons = () => {
   const locale = useLocale();
   return (
     <div className="flex w-full flex-col items-center justify-center gap-4">
-      {/* <Link
-        href="https://calendly.com/romuald-fm4all/rdv-fm4all"
-        target="_blank"
-        className="w-full sm:w-2/3 lg:w-1/3"
-      > */}
       <Button
         variant="destructive"
         size="lg"
@@ -76,8 +42,6 @@ const CTAContactButtons = () => {
           ? "Je prends un rendez-vous en visio"
           : "Schedule a video call"}
       </Button>
-      {/* </Link> */}
-      {/* <Link href="tel:+33669311046" className="w-full sm:w-2/3 lg:w-1/3"> */}
       <Button
         variant="destructive"
         size="lg"
@@ -92,11 +56,7 @@ const CTAContactButtons = () => {
         <Phone />
         +33 6 69 31 10 46
       </Button>
-      {/* </Link> */}
-      {/* <Link
-        href="mailto:contact@fm4all.com"
-        className="w-full sm:w-2/3 lg:w-1/3"
-      > */}
+
       <Button
         variant="destructive"
         size="lg"
@@ -111,7 +71,6 @@ const CTAContactButtons = () => {
         <Mail />
         {locale === "fr" ? "Je contacte par email" : "Contact by e-mail"}
       </Button>
-      {/* </Link> */}
     </div>
   );
 };
