@@ -1,5 +1,6 @@
 import BackgroundServer from "@/components/backgrounds/BackgroundServer";
 import { getLocale, getTranslations } from "next-intl/server";
+import Image from "next/image";
 import HeroCard from "./HeroCard";
 
 const Hero = async () => {
@@ -24,6 +25,16 @@ const Hero = async () => {
           </h1>
           <HeroCard />
         </div>
+      </div>
+
+      <div className="absolute right-4 bottom-3 z-50 h-20 w-20 rounded-2xl bg-white">
+        <Image
+          src="https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/logos_fournisseurs/logo_french-tech.webp"
+          alt="logo-french-tech"
+          fill
+          quality={100}
+          className="object-contain"
+        />
       </div>
     </section>
   );

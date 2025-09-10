@@ -5,13 +5,6 @@ export default function GoogleAnalytics({
 }: {
   GA_MEASUREMENT_ID: string;
 }) {
-  // const pathname = usePathname();
-  // const searchParams = useSearchParams();
-
-  // useEffect(() => {
-  //   const url = pathname + searchParams.toString();
-  //   pageview(GA_MEASUREMENT_ID, url);
-  // }, [pathname, searchParams, GA_MEASUREMENT_ID]);
   return (
     <>
       <Script
@@ -38,8 +31,6 @@ export default function GoogleAnalytics({
                 `,
         }}
       />
-
-      {/* Compte viroun.gads@gmail.com */}
       <Script
         async
         src="https://www.googletagmanager.com/gtag/js?id=AW-17528670078"
