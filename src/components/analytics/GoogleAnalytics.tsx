@@ -59,7 +59,7 @@ export default function GoogleAnalytics({
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
-                function gtag_report_conversion(url) { var callback = function () { if (typeof(url) != 'undefined') { window.location = url; } }; gtag('event', 'conversion', { 'send_to': 'AW-17528670078', 'value': 1.0, 'currency': 'EUR', 'event_callback': callback }); return false; }
+                function gtag_report_conversion(url) { var callback = function () { if (typeof(url) != 'undefined') { window.location = url; } }; gtag('event', 'conversion', { 'send_to': 'AW-17528670078','event_callback': callback }); return false; }
                 `,
         }}
       />
