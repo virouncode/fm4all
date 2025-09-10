@@ -7,6 +7,7 @@ import { useLocale } from "next-intl";
 export const gtag_report_conversion_contact = (
   sendTo: string,
   url?: string,
+  newTab: boolean = false,
 ) => {
   if (typeof window.gtag !== "undefined") {
     console.log("sendTo", sendTo);
@@ -16,6 +17,10 @@ export const gtag_report_conversion_contact = (
     });
     if (url) {
       setTimeout(() => {
+        if (newTab) {
+          window.open(url, "_blank");
+          return;
+        }
         window.location.href = url;
       }, 300);
     }
@@ -35,6 +40,7 @@ const CTAContactButtons = () => {
           gtag_report_conversion_contact(
             "2epzCPent5cbEP6OqaZB",
             "https://calendly.com/romuald-fm4all/rdv-fm4all",
+            true,
           )
         }
       >
