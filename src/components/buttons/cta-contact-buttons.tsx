@@ -13,11 +13,12 @@ export const gtag_report_conversion_contact = (
 
     window.gtag("event", "conversion", {
       send_to: `AW-17528670078/${sendTo}`,
-      value: 1.0,
-      event_callback: () => {
-        if (url) window.location.href = url;
-      },
     });
+    if (url) {
+      setTimeout(() => {
+        window.location.href = url;
+      }, 300);
+    }
   }
   return false;
 };
