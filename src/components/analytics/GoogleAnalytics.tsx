@@ -39,21 +39,6 @@ export default function GoogleAnalytics({
         }}
       />
 
-      {/* Compte viroun@fm4all.com <Script
-        async
-        src="https://www.googletagmanager.com/gtag/js?id=AW-17523808696"
-      />
-      <Script
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: `
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', 'AW-17523808696');
-                `,
-        }}
-      /> */}
       {/* Compte viroun.gads@gmail.com */}
       <Script
         async
@@ -74,7 +59,7 @@ export default function GoogleAnalytics({
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
-                function gtag_report_conversion(url) { var callback = function () { if (typeof(url) != 'undefined') { window.location = url; } }; gtag('event', 'conversion', { 'send_to': 'AW-17528670078/IMiZCLDHxpcbEP6OqaZB', 'value': 1.0, 'currency': 'EUR', 'event_callback': callback }); return false; }
+                function gtag_report_conversion(url) { var callback = function () { if (typeof(url) != 'undefined') { window.location = url; } }; gtag('event', 'conversion', { 'send_to': 'AW-17528670078', 'value': 1.0, 'currency': 'EUR', 'event_callback': callback }); return false; }
                 `,
         }}
       />
