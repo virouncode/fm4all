@@ -32,6 +32,10 @@ export const legacyRedirects: Record<string, string> = {
   "/confidentialite": "/fr/politique-de-confidentialite",
   "/services/machines-a-cafe": "/fr/services/machines-a-cafe-en-entreprise",
   "/fr/nos-services": "/fr/services",
+  "/services/pilotage-fm4all": "/fr/services/pilotage-facility-management",
+  "/services/fontaines-a-eau": "/fr/services/fontaines-a-eau-entreprise",
+  "/articles/histoire-du-nettoyage":
+    "/fr/articles/nettoyage/histoire-du-nettoyage-des-bureaux",
 
   // URLs avec structure correcte mais contenu déplacé
   "/fr/conditions-generales-d-utilisation":
@@ -52,11 +56,14 @@ export const legacyRedirects: Record<string, string> = {
   "/en/services/sanitary-supplies": "/en/services/cleaning-services",
   "/en/services/healthy-snack-delivery-office":
     "/en/services/office-fruit-basket-delivery",
+  "/fr/articles/histoire-externalisation-fm":
+    "/fr/articles/pilotage-facility-management/histoire-de-l-externalisation-du-facility-management",
 };
 
 export const goneUrls: string[] = [
   "https://e99e300d.fm4all.com/",
   "https://www.fm4all.com/services/petits-travaux",
   "https://www.fm4all.com/services/agent-de-securite",
-  "/secteurs/[slug]",
+  "https://www.fm4all.com/secteurs/[slug]",
+  "https://www.fm4all.com/blog/[slug]/[subSlug]",
 ];
