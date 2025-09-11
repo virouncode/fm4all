@@ -30,6 +30,8 @@ export const legacyRedirects: Record<string, string> = {
   "/blog": "/fr/articles",
   "/prestataire": "/fr/devenir-prestataire",
   "/confidentialite": "/fr/politique-de-confidentialite",
+  "/services/machines-a-cafe": "/fr/services/machines-a-cafe-en-entreprise",
+  "/fr/nos-services": "/fr/services",
 
   // URLs avec structure correcte mais contenu déplacé
   "/fr/conditions-generales-d-utilisation":
@@ -56,4 +58,5 @@ export const goneUrls: string[] = [
   "https://e99e300d.fm4all.com/",
   "https://www.fm4all.com/services/petits-travaux",
   "https://www.fm4all.com/services/agent-de-securite",
+  "/secteurs/[slug]",
 ];
