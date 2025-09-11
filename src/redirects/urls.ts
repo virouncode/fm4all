@@ -59,7 +59,6 @@ export const legacyRedirects: Record<string, string> = {
   "/fr/articles/histoire-externalisation-fm":
     "/fr/articles/pilotage-facility-management/histoire-de-l-externalisation-du-facility-management",
 };
-
 export const goneUrls: string[] = [
   "https://e99e300d.fm4all.com/",
   "https://www.fm4all.com/services/petits-travaux",
