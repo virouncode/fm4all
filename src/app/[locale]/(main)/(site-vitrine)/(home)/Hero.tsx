@@ -27,7 +27,7 @@ const Hero = async () => {
         </div>
       </div>
 
-      <div className="absolute right-4 bottom-3 z-50 h-20 w-20 rounded-2xl bg-white">
+      <div className="absolute right-4 bottom-3 z-10 h-20 w-20 rounded-2xl bg-white">
         <Image
           src="https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/logos_fournisseurs/logo_french-tech.webp"
           alt="logo-french-tech"
