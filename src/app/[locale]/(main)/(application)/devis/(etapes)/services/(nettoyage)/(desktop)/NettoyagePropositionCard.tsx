@@ -8,14 +8,13 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
-import { NettoyageContext } from "@/context/NettoyageProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import { useNettoyageStore } from "@/stores/nettoyageStore";
 import { GammeType } from "@/zod-schemas/gamme";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { useContext } from "react";
 
 type NettoyagePropositionCardProps = {
   handleClickProposition: (proposition: {
@@ -65,7 +64,7 @@ const NettoyagePropositionCard = ({
   const t = useTranslations("DevisPage");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
   const tGlobal = useTranslations("Global");
-  const { nettoyage } = useContext(NettoyageContext);
+  const { nettoyage } = useNettoyageStore();
   const gamme = proposition.gamme;
   const color = getFm4AllColor(gamme);
 

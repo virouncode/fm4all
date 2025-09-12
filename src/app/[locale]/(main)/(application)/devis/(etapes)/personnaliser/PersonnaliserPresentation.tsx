@@ -1,5 +1,4 @@
 import WhyCard from "@/components/cards/WhyCard";
-import { ClientContext } from "@/context/ClientProvider";
 import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { Euro, Feather, Handshake, Rabbit, Waves } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -10,7 +9,7 @@ import NextServiceButton from "../../NextServiceButton";
 const PersonnaliserPresentation = () => {
   const tPourquoi = useTranslations("HomePage.pourquoi");
   const tPersonnaliser = useTranslations("DevisPage.personnaliser");
-  const { client } = useContext(ClientContext);
+  const client = useClientStore((s) => s.client);
   const { personnalisation, setPersonnalisation } = useContext(
     PersonnalisationContext,
   );

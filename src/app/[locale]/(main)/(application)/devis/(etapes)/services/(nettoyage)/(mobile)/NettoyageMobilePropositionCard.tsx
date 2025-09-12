@@ -10,12 +10,11 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
-import { NettoyageContext } from "@/context/NettoyageProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import { useNettoyageStore } from "@/stores/nettoyageStore";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { useContext } from "react";
 
 type NettoyageMobilePropositionCardProps = {
   handleClickProposition: (proposition: {
@@ -65,7 +64,7 @@ const NettoyageMobilePropositionCard = ({
   const t = useTranslations("DevisPage");
   const tGlobal = useTranslations("Global");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
-  const { nettoyage } = useContext(NettoyageContext);
+  const { nettoyage } = useNettoyageStore();
   const {
     fournisseurId,
     gamme,

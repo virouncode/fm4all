@@ -2,8 +2,8 @@
 
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
 import { MAJORATION_DIMANCHE } from "@/constants/constants";
-import { NettoyageContext } from "@/context/NettoyageProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
+import { useNettoyageStore } from "@/stores/nettoyageStore";
 import { SelectRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
 import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
@@ -29,7 +29,7 @@ const NettoyageOptions = ({
 }: NettoyageOptionsProps) => {
   const t = useTranslations("DevisPage");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
-  const { nettoyage } = useContext(NettoyageContext);
+  const { nettoyage } = useNettoyageStore();
   const { setServices } = useContext(ServicesContext);
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
   const propositionsRef = useRef<HTMLDivElement>(null);

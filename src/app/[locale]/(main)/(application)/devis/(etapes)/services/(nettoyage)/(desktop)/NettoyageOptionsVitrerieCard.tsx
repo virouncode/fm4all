@@ -9,12 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { MARGE, MAX_PASSAGES_VITRERIE } from "@/constants/constants";
-import { NettoyageContext } from "@/context/NettoyageProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
+import { useNettoyageStore } from "@/stores/nettoyageStore";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { useContext } from "react";
 
 type NettoyageOptionsVitrerieCardProps = {
   vitrerieProposition: {
@@ -69,7 +68,7 @@ const NettoyageOptionsVitrerieCard = ({
 }: NettoyageOptionsVitrerieCardProps) => {
   const t = useTranslations("DevisPage");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
-  const { nettoyage } = useContext(NettoyageContext);
+  const { nettoyage } = useNettoyageStore();
   const vitreriePrixMensuelText = vitrerieProposition.prixAnnuel ? (
     <p className="ml-4 text-xl font-bold" data-testid="total-mensuel-vitrerie">
       {formatNumber((vitrerieProposition.prixAnnuel * MARGE) / 12)}{" "}

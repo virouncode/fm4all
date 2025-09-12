@@ -4,9 +4,9 @@ import {
   CarouselApi,
   CarouselContent,
 } from "@/components/ui/carousel";
-import { CafeContext } from "@/context/CafeProvider";
+import { useCafeStore } from "@/stores/cafeStore";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import CafeMobileEspacePropositionCard from "./CafeMobileEspacePropositionCard";
 
 type CafeMobileEspacePropositionsCarouselProps = {
@@ -123,7 +123,7 @@ const CafeMobileEspacePropositionsCarousel = ({
   handleClickFirstEspaceProposition,
   cafeEspacesIds,
 }: CafeMobileEspacePropositionsCarouselProps) => {
-  const { cafe } = useContext(CafeContext);
+  const cafe = useCafeStore((s) => s.cafe);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
 

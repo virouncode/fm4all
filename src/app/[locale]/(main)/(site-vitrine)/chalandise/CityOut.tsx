@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { batiments } from "@/constants/batiments";
 import { occupation } from "@/constants/occupation";
-import { ClientContext } from "@/context/ClientProvider";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";
 import { sendEmailFromClient } from "@/lib/email/sendEmail";
@@ -13,7 +12,7 @@ import { CityOutType, createCityOutSchema } from "@/zod-schemas/cityout";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 type CityOutProps = {
@@ -37,7 +36,7 @@ const CityOut = ({
 }: CityOutProps) => {
   const t = useTranslations("DevisPage.locaux.cityOut");
   const tSauverErreurs = useTranslations("DevisPage.sauver.erreurs");
-  const { client } = useContext(ClientContext);
+  const client = useClientStore((s) => s.client);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const defaultValues: CityOutType = {
@@ -117,7 +116,7 @@ const CityOut = ({
 
   return (
     <div className="mt-6 flex flex-col gap-10">
-      <div className="mx-auto flex w-full max-w-prose flex-col gap-4 hyphens-auto text-wrap text-base md:text-lg">
+      <div className="mx-auto flex w-full max-w-prose flex-col gap-4 text-base text-wrap hyphens-auto md:text-lg">
         <p>
           {t(
             "notre-matrice-de-chiffrage-automatique-est-en-cours-de-developpement-pour-votre-region-cependant-vous-pouvez-etre-contacte-pour-un-devis-sur-mesure-ou-etre-averti-des-que-lautomatisation-sera-disponible-dans-votre-region",

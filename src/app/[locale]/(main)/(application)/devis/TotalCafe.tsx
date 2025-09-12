@@ -1,15 +1,14 @@
 import { MARGE } from "@/constants/constants";
-import { CafeContext } from "@/context/CafeProvider";
-import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import { useCafeStore } from "@/stores/cafeStore";
+import { useTotalCafeStore } from "@/stores/totalCafeStore";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 
 const TotalCafe = () => {
   const t = useTranslations("Total");
-  const { cafe } = useContext(CafeContext);
-  const { totalCafe } = useContext(TotalCafeContext);
+  const cafe = useCafeStore((s) => s.cafe);
+  const totalCafe = useTotalCafeStore((s) => s.totalCafe);
   const total = totalCafe.totalEspaces
     .map(({ total }) => total ?? 0)
     .reduce((acc, curr) => acc + curr, 0);
@@ -73,7 +72,7 @@ const TotalCafe = () => {
                 ) : null}
               </div>
             ))}
-          <div className="mt-2 flex flex-col border-t border-foreground">
+          <div className="border-foreground mt-2 flex flex-col border-t">
             <div className="flex w-full justify-between">
               <p>TOTAL</p>
               <p className="text-end">

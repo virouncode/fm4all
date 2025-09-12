@@ -1,10 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { FontainesContext } from "@/context/FontainesProvider";
+import { useFontainesStore } from "@/stores/fontainesStore";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
-import { useContext } from "react";
-import FontaineMobileEspace from "./FontaineMobileEspace";
 import { useTranslations } from "next-intl";
+import FontaineMobileEspace from "./FontaineMobileEspace";
 
 type FontainesMobileEspacesProps = {
   fontainesModeles: SelectFontainesModelesType[];
@@ -18,7 +17,7 @@ const FontainesMobileEspaces = ({
   handleAddEspace,
 }: FontainesMobileEspacesProps) => {
   const tFontaines = useTranslations("DevisPage.foodBeverage.fontaines");
-  const { fontaines } = useContext(FontainesContext);
+  const fontaines = useFontainesStore((s) => s.fontaines);
   return fontaines.nbEspaces && fontaines.nbEspaces > 0 ? (
     fontaines.espaces.map((espace) => (
       <FontaineMobileEspace

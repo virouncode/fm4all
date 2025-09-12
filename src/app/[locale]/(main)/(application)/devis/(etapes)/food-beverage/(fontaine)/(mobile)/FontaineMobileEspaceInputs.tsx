@@ -11,12 +11,11 @@ import {
 } from "@/components/ui/select";
 import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/constants/constants";
 import { locationFontaine } from "@/constants/locationFontaine";
-import { ClientContext } from "@/context/ClientProvider";
-import { FontainesContext } from "@/context/FontainesProvider";
+import { useClientStore } from "@/stores/clientStore";
+import { useFontainesStore } from "@/stores/fontainesStore";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 
 type FontaineMobileEspaceInputsProps = {
   espace: FontaineEspaceType;
@@ -46,8 +45,8 @@ const FontaineMobileEspaceInputs = ({
   const tFontaines = useTranslations("DevisPage.foodBeverage.fontaines");
   const tLocation = useTranslations("DevisPage.location");
 
-  const { fontaines } = useContext(FontainesContext);
-  const { client } = useContext(ClientContext);
+  const fontaines = useFontainesStore((s) => s.fontaines);
+  const client = useClientStore((s) => s.client);
   return (
     <div className="flex flex-col gap-8">
       {espace.infos.espaceId === fontainesEspacesIds[0] && (
@@ -91,7 +90,7 @@ const FontaineMobileEspaceInputs = ({
                 handleCheck(checked, "Eau froide")
               }
               disabled={true}
-              className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
+              className="bg-background data-[state=checked]:bg-background data-[state=checked]:text-foreground font-bold"
               id="eau froide"
               aria-label={tFontaines("selectionner-eau-froide")}
             />
@@ -105,7 +104,7 @@ const FontaineMobileEspaceInputs = ({
               onCheckedChange={(checked: boolean) =>
                 handleCheck(checked, "Eau gazeuse")
               }
-              className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
+              className="bg-background data-[state=checked]:bg-background data-[state=checked]:text-foreground font-bold"
               id="eau gazeuse"
               aria-label={tFontaines("selectionner-eau-gazeuse")}
             />
@@ -119,7 +118,7 @@ const FontaineMobileEspaceInputs = ({
               onCheckedChange={(checked: boolean) =>
                 handleCheck(checked, "Eau chaude")
               }
-              className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
+              className="bg-background data-[state=checked]:bg-background data-[state=checked]:text-foreground font-bold"
               id="eau chaude"
               aria-label={tFontaines("selectionner-eau-chaude")}
             />
@@ -144,7 +143,7 @@ const FontaineMobileEspaceInputs = ({
           </Label>
           <div className="flex items-center gap-2">
             <Input
-              className={`w-16 min-w-20 max-w-xs ${
+              className={`w-16 max-w-xs min-w-20 ${
                 nbPersonnes === client.effectif ? "text-fm4alldestructive" : ""
               }`}
               type="number"

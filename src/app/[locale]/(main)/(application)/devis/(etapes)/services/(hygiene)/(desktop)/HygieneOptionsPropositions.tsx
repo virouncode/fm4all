@@ -1,6 +1,4 @@
 import { MAX_NB_DISTRIB } from "@/constants/constants";
-import { ClientContext } from "@/context/ClientProvider";
-import { HygieneContext } from "@/context/HygieneProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { gammes } from "@/zod-schemas/gamme";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
@@ -23,8 +21,11 @@ const HygieneOptionsPropositions = ({
   hygieneDistribTarifs,
   hygieneConsosTarifs,
 }: HygieneOptionsPropositionsProps) => {
-  const { hygiene, setHygiene } = useContext(HygieneContext);
-  const { client } = useContext(ClientContext);
+  const { hygiene, setHygiene } = useHygieneStore((s) => ({
+    hygiene: s.hygiene,
+    setHygiene: s.setHygiene,
+  }));
+  const client = useClientStore((s) => s.client);
   const { setTotalHygiene } = useContext(TotalHygieneContext);
   //Formatter les propositions d'options en hygiene
   const nbDistribDesinfectant =

@@ -1,13 +1,12 @@
 "use client";
 import { MAX_EFFECTIF } from "@/constants/constants";
 import { TypesSnacksFruitsType } from "@/constants/typesSnacksFruits";
-import { CafeContext } from "@/context/CafeProvider";
-import { ClientContext } from "@/context/ClientProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { toast } from "@/hooks/use-toast";
 import { roundEffectif } from "@/lib/utils/roundEffectif";
+import { useCafeStore } from "@/stores/cafeStore";
 import { SelectBoissonsQuantitesType } from "@/zod-schemas/boissonsQuantites";
 import { SelectBoissonsTarifsType } from "@/zod-schemas/boissonsTarifs";
 import { SelectFoodLivraisonTarifsType } from "@/zod-schemas/foodLivraisonTarifs";
@@ -41,8 +40,8 @@ const SnacksFruitsForm = ({
   foodLivraisonTarifs,
 }: SnacksFruitsFormProps) => {
   const t = useTranslations("DevisPage");
-  const { client } = useContext(ClientContext);
-  const { cafe } = useContext(CafeContext);
+  const client = useClientStore((s) => s.client);
+  const cafe = useCafeStore((s) => s.cafe);
   const { totalCafe } = useContext(TotalCafeContext);
   const { snacksFruits, setSnacksFruits } = useContext(SnacksFruitsContext);
   const { setTotalSnacksFruits } = useContext(TotalSnacksFruitsContext);

@@ -7,11 +7,9 @@ import {
   Dispatch,
   PropsWithChildren,
   SetStateAction,
-  useContext,
   useEffect,
   useState,
 } from "react";
-import { ClientContext } from "./ClientProvider";
 
 export const TheContext = createContext<{
   the: TheType;
@@ -34,7 +32,7 @@ export const TheContext = createContext<{
 
 const TheProvider = ({ children }: PropsWithChildren) => {
   const isMounted = useClientOnly();
-  const { client } = useContext(ClientContext);
+  const client = useClientStore((s) => s.client);
 
   // Always initialize state
   const [the, setThe] = useState<TheType>({

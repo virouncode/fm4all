@@ -9,14 +9,14 @@ import {
 } from "@/components/ui/table";
 import { MARGE } from "@/constants/constants";
 import { typesBoissons } from "@/constants/typesBoissons";
-import { CafeContext } from "@/context/CafeProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
+import { useCafeStore } from "@/stores/cafeStore";
 import { useContext } from "react";
 import { locationCafeMachine } from "../../../../../../constants/locationCafeMachine";
 
 const DetailCafe = () => {
-  const { cafe } = useContext(CafeContext);
+  const cafe = useCafeStore((s) => s.cafe);
   const { totalCafe } = useContext(TotalCafeContext);
   const total = totalCafe.totalEspaces
     .map(({ total }) => total ?? 0)

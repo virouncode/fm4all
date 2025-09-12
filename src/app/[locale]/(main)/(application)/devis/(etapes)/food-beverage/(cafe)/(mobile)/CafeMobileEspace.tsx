@@ -1,9 +1,9 @@
-import { CafeContext } from "@/context/CafeProvider";
-import { ClientContext } from "@/context/ClientProvider";
 import { TheContext } from "@/context/TheProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { toast } from "@/hooks/use-toast";
+import { useCafeStore } from "@/stores/cafeStore";
+import { useClientStore } from "@/stores/clientStore";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine";
@@ -12,12 +12,12 @@ import { SelectChocolatConsoTarifsType } from "@/zod-schemas/chocolatConsoTarifs
 import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
+import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import CafeEspaceForm from "../CafeEspaceForm";
 import CafeEspacePropositions from "../CafeEspacePropositions";
 import { reinitialisationCafeThe } from "../reinitialisationCafeThe";
 import RetirerEspaceButton from "../RetirerEspaceButton";
-import { useTranslations } from "next-intl";
 
 type CafeMobileEspaceProps = {
   espace: CafeEspaceType;
@@ -41,8 +41,11 @@ const CafeMobileEspace = ({
   sucreConsoTarifs,
 }: CafeMobileEspaceProps) => {
   const t = useTranslations("DevisPage.foodBeverage.cafe");
-  const { client } = useContext(ClientContext);
-  const { cafe, setCafe } = useContext(CafeContext);
+  const client = useClientStore((s) => s.client);
+  const { cafe, setCafe } = useCafeStore((s) => ({
+    cafe: s.cafe,
+    setCafe: s.setCafe,
+  }));
   const { setThe } = useContext(TheContext);
   const { setTotalCafe } = useContext(TotalCafeContext);
   const { setTotalThe } = useContext(TotalTheContext);

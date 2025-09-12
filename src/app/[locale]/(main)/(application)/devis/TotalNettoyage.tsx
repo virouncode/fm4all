@@ -1,15 +1,15 @@
 "use client";
 import { MARGE } from "@/constants/constants";
-import { NettoyageContext } from "@/context/NettoyageProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import { useNettoyageStore } from "@/stores/nettoyageStore";
 import { useTranslations } from "next-intl";
 import { useContext } from "react";
 
 const TotalNettoyage = () => {
   const t = useTranslations("Total");
-  const { nettoyage } = useContext(NettoyageContext);
+  const { nettoyage } = useNettoyageStore();
   const { totalNettoyage } = useContext(TotalNettoyageContext);
   const {
     totalService,
@@ -87,7 +87,7 @@ const TotalNettoyage = () => {
               </p>
             </div>
           ) : null}
-          <div className="mt-2 flex items-center justify-between border-t border-foreground">
+          <div className="border-foreground mt-2 flex items-center justify-between border-t">
             <p>TOTAL</p>
             <p className="text-end">
               {formatNumber(Math.round(total * MARGE))} {t("eur-ht-an")}

@@ -7,18 +7,17 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { ClientContext } from "@/context/ClientProvider";
-import { DevisProgressContext } from "@/context/DevisProgressProvider";
-import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
-import { ManagementContext } from "@/context/ManagementProvider";
-import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
-import { ServicesContext } from "@/context/ServicesProvider";
 import { Link } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
 import { roundEffectif } from "@/lib/utils/roundEffectif";
 import { roundSurface } from "@/lib/utils/roundSurface";
+import { useClientStore } from "@/stores/clientStore";
+import { useDevisProgressStore } from "@/stores/devisProgressStore";
+import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
+import { useManagementStore } from "@/stores/managementStore";
+import { usePersonnalisationStore } from "@/stores/personnalisationStore";
+import { useServicesStore } from "@/stores/servicesStore";
 import { useLocale } from "next-intl";
-import { useContext } from "react";
 
 //Pour naviguer dans le Funnel de devis
 //Il faut que le client ait rempli les étapes précédentes pour pouvoir cliquer sur l'étape suivante
@@ -26,12 +25,17 @@ import { useContext } from "react";
 
 const DevisBreadcrumb = () => {
   const locale = useLocale() as LocaleType;
-  const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
-  const { client } = useContext(ClientContext);
-  const { setServices } = useContext(ServicesContext);
-  const { setFoodBeverage } = useContext(FoodBeverageContext);
-  const { setManagement } = useContext(ManagementContext);
-  const { setPersonnalisation } = useContext(PersonnalisationContext);
+  const { devisProgress, setDevisProgress } = useDevisProgressStore((s) => ({
+    devisProgress: s.devisProgress,
+    setDevisProgress: s.setDevisProgress,
+  }));
+  const client = useClientStore((s) => s.client);
+  const setServices = useServicesStore((s) => s.setServices);
+  const setFoodBeverage = useFoodBeverageStore((s) => s.setFoodBeverage);
+  const setManagement = useManagementStore((s) => s.setManagement);
+  const setPersonnalisation = usePersonnalisationStore(
+    (s) => s.setPersonnalisation,
+  );
 
   const serviceSearchParams = new URLSearchParams();
   const sauvegarderSearchParams = new URLSearchParams();

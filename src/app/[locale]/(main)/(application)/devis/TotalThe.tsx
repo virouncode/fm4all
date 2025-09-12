@@ -1,15 +1,15 @@
 import { MARGE } from "@/constants/constants";
-import { CafeContext } from "@/context/CafeProvider";
 import { TheContext } from "@/context/TheProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import { useCafeStore } from "@/stores/cafeStore";
 import { useTranslations } from "next-intl";
 import { useContext } from "react";
 
 const TotalThe = () => {
   const t = useTranslations("Total");
-  const { cafe } = useContext(CafeContext);
+  const cafe = useCafeStore((s) => s.cafe);
   const { the } = useContext(TheContext);
   const { totalThe } = useContext(TotalTheContext);
 
@@ -33,7 +33,7 @@ const TotalThe = () => {
               {formatNumber(Math.round(total * MARGE))} {t("eur-ht-an")}
             </p>
           </div>
-          <div className="mt-2 flex items-center justify-between border-t border-foreground">
+          <div className="border-foreground mt-2 flex items-center justify-between border-t">
             <p>TOTAL</p>
             <p className="text-end" data-testid="total-the">
               {formatNumber(Math.round(total * MARGE))} {t("eur-ht-an")}

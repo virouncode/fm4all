@@ -7,12 +7,11 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
-import { NettoyageContext } from "@/context/NettoyageProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
+import { useNettoyageStore } from "@/stores/nettoyageStore";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { useContext } from "react";
 
 type NettoyageOptionsSamediCardProps = {
   samediProposition: {
@@ -53,7 +52,7 @@ const NettoyageOptionsSamediCard = ({
 }: NettoyageOptionsSamediCardProps) => {
   const t = useTranslations("DevisPage");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
-  const { nettoyage } = useContext(NettoyageContext);
+  const { nettoyage } = useNettoyageStore();
 
   const samediPrixMensuelText = samediProposition.prixAnnuel ? (
     <p className="ml-4 text-xl font-bold" data-testid="total-mensuel-samedi">

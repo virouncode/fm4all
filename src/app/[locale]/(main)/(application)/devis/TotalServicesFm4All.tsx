@@ -1,16 +1,17 @@
 "use client";
 
-import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
-import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import { useServicesFm4AllStore } from "@/stores/servicesFm4AllStore";
+import { useTotalServicesFm4AllStore } from "@/stores/totalServicesFm4AllStore";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 
 const TotalServicesFm4All = () => {
   const t = useTranslations("Total");
-  const { servicesFm4All } = useContext(ServicesFm4AllContext);
-  const { totalServicesFm4All } = useContext(TotalServicesFm4AllContext);
+  const servicesFm4All = useServicesFm4AllStore((s) => s.servicesFm4All);
+  const totalServicesFm4All = useTotalServicesFm4AllStore(
+    (s) => s.totalServicesFm4All,
+  );
 
   const {
     totalAssurance,

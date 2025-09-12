@@ -1,9 +1,9 @@
-import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
-import { useContext, useEffect } from "react";
+import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
+import { useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
 
 export default function useScrollIntoFood() {
-  const { foodBeverage } = useContext(FoodBeverageContext);
+  const foodBeverage = useFoodBeverageStore((s) => s.foodBeverage);
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1023px)" });
 
   useEffect(() => {

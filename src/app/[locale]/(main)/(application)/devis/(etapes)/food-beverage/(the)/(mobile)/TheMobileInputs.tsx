@@ -2,10 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MAX_EFFECTIF } from "@/constants/constants";
-import { ClientContext } from "@/context/ClientProvider";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent } from "react";
 
 type TheMobileInputsProps = {
   nbPersonnes: number;
@@ -22,7 +21,7 @@ const TheMobileInputs = ({
 }: TheMobileInputsProps) => {
   const t = useTranslations("DevisPage");
   const tThe = useTranslations("DevisPage.foodBeverage.the");
-  const { client } = useContext(ClientContext);
+  const client = useClientStore((s) => s.client);
   const effectif = client.effectif ?? 0;
 
   return (
@@ -67,7 +66,7 @@ const TheMobileInputs = ({
             <Plus />
           </Button>
         </div>
-        <p className="text-xs italic text-fm4alldestructive">
+        <p className="text-fm4alldestructive text-xs italic">
           {tThe(
             "les-quantites-sont-estimees-pour-vous-environ-15-de-votre-effectif-mais-vous-pouvez-les-changer",
           )}

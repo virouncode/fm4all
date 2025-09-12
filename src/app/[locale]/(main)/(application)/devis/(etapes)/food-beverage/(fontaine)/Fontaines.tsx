@@ -1,20 +1,20 @@
 "use client";
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
 import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/constants/constants";
-import { ClientContext } from "@/context/ClientProvider";
-import { FontainesContext } from "@/context/FontainesProvider";
-import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
-import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
 import useScrollIntoFontainesEspace from "@/hooks/use-scroll-into-fontaines-espace";
+import { useTotalFontainesStore } from "@/stores/totalFontainesStore";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
 import { Droplets } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useContext, useRef } from "react";
+import { useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsTitle from "../../../PropositionsTitle";
 import FontainesDesktopEspaces from "./(desktop)/FontainesDesktopEspaces";
 import FontainesMobileEspaces from "./(mobile)/FontainesMobileEspaces";
+import { useClientStore } from "@/stores/clientStore";
+import { useFontainesStore } from "@/stores/fontainesStore";
+import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
 
 type FontainesProps = {
   fontainesModeles: SelectFontainesModelesType[];
@@ -23,10 +23,10 @@ type FontainesProps = {
 
 const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
   const tFontaines = useTranslations("DevisPage.foodBeverage.fontaines");
-  const { client } = useContext(ClientContext);
-  const { setFontaines } = useContext(FontainesContext);
-  const { setTotalFontaines } = useContext(TotalFontainesContext);
-  const { setFoodBeverage } = useContext(FoodBeverageContext);
+  const client = useClientStore((s) => s.client);
+  const setFontaines = useFontainesStore((s) => s.setFontaines);
+  const setTotalFontaines = useTotalFontainesStore((s) => s.setTotalFontaines);
+  const setFoodBeverage = useFoodBeverageStore((s) => s.setFoodBeverage);
   const effectif = client.effectif ?? 0;
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
   useScrollIntoFontainesEspace();

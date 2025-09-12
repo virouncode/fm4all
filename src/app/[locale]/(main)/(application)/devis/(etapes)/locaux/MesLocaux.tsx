@@ -16,42 +16,42 @@ import { batiments } from "@/constants/batiments";
 import { MAX_EFFECTIF, MAX_SURFACE } from "@/constants/constants";
 import { departements } from "@/constants/departements";
 import { occupation } from "@/constants/occupation";
-import { CafeContext } from "@/context/CafeProvider";
-import { ClientContext } from "@/context/ClientProvider";
-import { CommentairesContext } from "@/context/CommentairesProvider";
-import { DevisProgressContext } from "@/context/DevisProgressProvider";
-import { FontainesContext } from "@/context/FontainesProvider";
-import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
-import { HygieneContext } from "@/context/HygieneProvider";
-import { IncendieContext } from "@/context/IncendieProvider";
-import { MaintenanceContext } from "@/context/MaintenanceProvider";
-import { ManagementContext } from "@/context/ManagementProvider";
-import { MonDevisContext } from "@/context/MonDevisProvider";
-import { NettoyageContext } from "@/context/NettoyageProvider";
-import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
-import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
-import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
-import { ServicesContext } from "@/context/ServicesProvider";
-import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
-import { TheContext } from "@/context/TheProvider";
-import { TotalCafeContext } from "@/context/TotalCafeProvider";
-import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
-import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
-import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
-import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
-import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
-import { TotalOfficeManagerContext } from "@/context/TotalOfficeManagerProvider";
-import { TotalContext } from "@/context/TotalProvider";
-import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
-import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
-import { TotalTheContext } from "@/context/TotalTheProvider";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";
+import { useCafeStore } from "@/stores/cafeStore";
+import { useClientStore } from "@/stores/clientStore";
+import { useCommentairesStore } from "@/stores/commentairesStore";
+import { useDevisProgressStore } from "@/stores/devisProgressStore";
+import { useFontainesStore } from "@/stores/fontainesStore";
+import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
+import { useHygieneStore } from "@/stores/hygieneStore";
+import { useIncendieStore } from "@/stores/incendieStore";
+import { useMaintenanceStore } from "@/stores/maintenanceStore";
+import { useManagementStore } from "@/stores/managementStore";
+import { useMonDevisStore } from "@/stores/monDevisStore";
+import { useNettoyageStore } from "@/stores/nettoyageStore";
+import { useOfficeManagerStore } from "@/stores/officeManagerStore";
+import { usePersonnalisationStore } from "@/stores/personnalisationStore";
+import { useServicesFm4AllStore } from "@/stores/servicesFm4AllStore";
+import { useServicesStore } from "@/stores/servicesStore";
+import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
+import { useTheStore } from "@/stores/theStore";
+import { useTotalCafeStore } from "@/stores/totalCafeStore";
+import { useTotalFontainesStore } from "@/stores/totalFontainesStore";
+import { useTotalHygieneStore } from "@/stores/totalHygieneStore";
+import { useTotalIncendieStore } from "@/stores/totalIncendieStore";
+import { useTotalMaintenanceStore } from "@/stores/totalMaintenanceStore";
+import { useTotalNettoyageStore } from "@/stores/totalNettoyageStore";
+import { useTotalOfficeManagerStore } from "@/stores/totalOfficeManagerStore";
+import { useTotalServicesFm4AllStore } from "@/stores/totalServicesFm4AllStore";
+import { useTotalSnacksFruitsStore } from "@/stores/totalSnacksFruitsStore";
+import { useTotalStore } from "@/stores/totalStore";
+import { useTotalTheStore } from "@/stores/totalTheStore";
 import { createMesLocauxSchema, MesLocauxType } from "@/zod-schemas/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { fullReinitialisationDevis } from "./fullReinitialisationDevis";
 import { reinitialisationDevis } from "./reinitialisationDevis";
@@ -62,35 +62,51 @@ const MesLocaux = () => {
   const tDevisButton = useTranslations("devisButton");
   const tErrors = useTranslations("DevisPage.locaux.locauxForm.erreurs");
   const [loading, setLoading] = useState(false);
-  const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
-  const { setServices } = useContext(ServicesContext);
-  const { setFoodBeverage } = useContext(FoodBeverageContext);
-  const { setManagement } = useContext(ManagementContext);
-  const { setPersonnalisation } = useContext(PersonnalisationContext);
-  const { setMonDevis } = useContext(MonDevisContext);
-  const { client, setClient } = useContext(ClientContext);
-  const { setNettoyage } = useContext(NettoyageContext);
-  const { setHygiene } = useContext(HygieneContext);
-  const { setMaintenance } = useContext(MaintenanceContext);
-  const { setIncendie } = useContext(IncendieContext);
-  const { setCafe } = useContext(CafeContext);
-  const { setThe } = useContext(TheContext);
-  const { setTotalThe } = useContext(TotalTheContext);
-  const { setSnacksFruits } = useContext(SnacksFruitsContext);
-  const { setFontaines } = useContext(FontainesContext);
-  const { setOfficeManager } = useContext(OfficeManagerContext);
-  const { setServicesFm4All } = useContext(ServicesFm4AllContext);
-  const { setCommentaires } = useContext(CommentairesContext);
-  const { setTotalNettoyage } = useContext(TotalNettoyageContext);
-  const { setTotalHygiene } = useContext(TotalHygieneContext);
-  const { setTotalIncendie } = useContext(TotalIncendieContext);
-  const { setTotalMaintenance } = useContext(TotalMaintenanceContext);
-  const { setTotalCafe } = useContext(TotalCafeContext);
-  const { setTotalSnacksFruits } = useContext(TotalSnacksFruitsContext);
-  const { setTotalFontaines } = useContext(TotalFontainesContext);
-  const { setTotalOfficeManager } = useContext(TotalOfficeManagerContext);
-  const { setTotalServicesFm4All } = useContext(TotalServicesFm4AllContext);
-  const { setTotal } = useContext(TotalContext);
+  const { devisProgress, setDevisProgress } = useDevisProgressStore((s) => ({
+    devisProgress: s.devisProgress,
+    setDevisProgress: s.setDevisProgress,
+  }));
+  const setServices = useServicesStore((s) => s.setServices);
+  const setFoodBeverage = useFoodBeverageStore((s) => s.setFoodBeverage);
+  const setManagement = useManagementStore((s) => s.setManagement);
+  const setPersonnalisation = usePersonnalisationStore(
+    (s) => s.setPersonnalisation,
+  );
+  const setMonDevis = useMonDevisStore((s) => s.setMonDevis);
+  const { client, setClient } = useClientStore((s) => ({
+    client: s.client,
+    setClient: s.setClient,
+  }));
+  const { setNettoyage } = useNettoyageStore();
+  const setHygiene = useHygieneStore((s) => s.setHygiene);
+  const setMaintenance = useMaintenanceStore((s) => s.setMaintenance);
+  const setIncendie = useIncendieStore((s) => s.setIncendie);
+  const setCafe = useCafeStore((s) => s.setCafe);
+  const setThe = useTheStore((s) => s.setThe);
+  const setTotalThe = useTotalTheStore((s) => s.setTotalThe);
+  const setSnacksFruits = useSnacksFruitsStore((s) => s.setSnacksFruits);
+  const setFontaines = useFontainesStore((s) => s.setFontaines);
+  const setOfficeManager = useOfficeManagerStore((s) => s.setOfficeManager);
+  const setServicesFm4All = useServicesFm4AllStore((s) => s.setServicesFm4All);
+  const setCommentaires = useCommentairesStore((s) => s.setCommentaires);
+  const setTotalNettoyage = useTotalNettoyageStore((s) => s.setTotalNettoyage);
+  const setTotalHygiene = useTotalHygieneStore((s) => s.setTotalHygiene);
+  const setTotalIncendie = useTotalIncendieStore((s) => s.setTotalIncendie);
+  const setTotalMaintenance = useTotalMaintenanceStore(
+    (s) => s.setTotalMaintenance,
+  );
+  const setTotalCafe = useTotalCafeStore((s) => s.setTotalCafe);
+  const setTotalSnacksFruits = useTotalSnacksFruitsStore(
+    (s) => s.setTotalSnacksFruits,
+  );
+  const setTotalFontaines = useTotalFontainesStore((s) => s.setTotalFontaines);
+  const setTotalOfficeManager = useTotalOfficeManagerStore(
+    (s) => s.setTotalOfficeManager,
+  );
+  const setTotalServicesFm4All = useTotalServicesFm4AllStore(
+    (s) => s.setTotalServicesFm4All,
+  );
+  const setTotal = useTotalStore((s) => s.setTotal);
   const [loaderVisible, setLoaderVisible] = useState(false);
   const router = useRouter();
   const { toast } = useToast();

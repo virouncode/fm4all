@@ -7,11 +7,9 @@ import {
   Dispatch,
   PropsWithChildren,
   SetStateAction,
-  useContext,
   useEffect,
   useState,
 } from "react";
-import { ClientContext } from "./ClientProvider";
 
 // Initialization
 export const NettoyageContext = createContext<{
@@ -54,7 +52,7 @@ export const NettoyageContext = createContext<{
 });
 
 const NettoyageProvider = ({ children }: PropsWithChildren) => {
-  const { client } = useContext(ClientContext);
+  const client = useClientStore((s) => s.client);
   const isMounted = useClientOnly();
 
   // Always initialize state

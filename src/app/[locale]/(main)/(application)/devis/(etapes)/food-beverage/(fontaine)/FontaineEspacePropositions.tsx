@@ -1,13 +1,12 @@
 import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/constants/constants";
 import { TypesEauType } from "@/constants/typesEau";
 import { typesPoseArray, TypesPoseType } from "@/constants/typesPose";
-import { ClientContext } from "@/context/ClientProvider";
-import { DevisProgressContext } from "@/context/DevisProgressProvider";
-import { FontainesContext } from "@/context/FontainesProvider";
 import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";
 import { roundNbPersonnesFontaine } from "@/lib/utils/roundNbPersonnesFontaine";
+import { useClientStore } from "@/stores/clientStore";
+import { useDevisProgressStore } from "@/stores/devisProgressStore";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
@@ -17,6 +16,7 @@ import { useMediaQuery } from "react-responsive";
 import FontaineDesktopEspacePropositions from "./(desktop)/FontaineDesktopEspacePropositions";
 import FontaineMobileEspacePropositions from "./(mobile)/FontaineMobileEspacePropositions";
 import { getTypeFontaine } from "./getTypeFontaine";
+import { useFontainesStore } from "@/stores/fontainesStore";
 
 type FontaineEspacePropositionsProps = {
   fontainesModeles: SelectFontainesModelesType[];
@@ -31,9 +31,12 @@ const FontaineEspacePropositions = ({
 }: FontaineEspacePropositionsProps) => {
   const t = useTranslations("DevisPage");
   const tFontaines = useTranslations("DevisPage.foodBeverage.fontaines");
-  const { client } = useContext(ClientContext);
-  const { setDevisProgress } = useContext(DevisProgressContext);
-  const { fontaines, setFontaines } = useContext(FontainesContext);
+  const client = useClientStore((s) => s.client);
+  const setDevisProgress = useDevisProgressStore((s) => s.setDevisProgress);
+  const { fontaines, setFontaines } = useFontainesStore((s) => ({
+    fontaines: s.fontaines,
+    setFontaines: s.setFontaines,
+  }));
   const { setTotalFontaines } = useContext(TotalFontainesContext);
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 

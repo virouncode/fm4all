@@ -1,5 +1,4 @@
 import React from "react";
-import CafeProvider from "./CafeProvider";
 import ClientProvider from "./ClientProvider";
 import CommentairesProvider from "./CommentairesProvider";
 import DevisProgressProvider from "./DevisProgressProvider";
@@ -10,7 +9,6 @@ import IncendieProvider from "./IncendieProvider";
 import MaintenanceProvider from "./MaintenanceProvider";
 import ManagementProvider from "./ManagementProvider";
 import MonDevisProvider from "./MonDevisProvider";
-import NettoyageProvider from "./NettoyageProvider";
 import OfficeManagerProvider from "./OfficeManagerProvider";
 import PersonnalisationProvider from "./PersonnalisationProvider";
 import ServicesFm4AllProvider from "./ServicesFm4AllProvider";
@@ -40,55 +38,51 @@ const ContextWrapper = ({ children }: ContextWrapperProps) => {
         <ServicesProvider>
           <PersonnalisationProvider>
             <MonDevisProvider>
-              <NettoyageProvider>
-                <HygieneProvider>
-                  <IncendieProvider>
-                    <MaintenanceProvider>
-                      <FoodBeverageProvider>
-                        <CafeProvider>
-                          <TheProvider>
-                            <SnacksFruitsProvider>
-                              <FontainesProvider>
-                                <ManagementProvider>
-                                  <OfficeManagerProvider>
-                                    <ServicesFm4AllProvider>
-                                      <CommentairesProvider>
-                                        <TotalProvider>
-                                          <TotalNettoyageProvider>
-                                            <TotalHygieneProvider>
-                                              <TotalIncendieProvider>
-                                                <TotalMaintenanceProvider>
-                                                  <TotalCafeProvider>
-                                                    <TotalTheProvider>
-                                                      <TotalSnacksFruitsProvider>
-                                                        <TotalFontainesProvider>
-                                                          <TotalOfficeManagerProvider>
-                                                            <TotalServicesFm4AllProvider>
-                                                              {children}
-                                                            </TotalServicesFm4AllProvider>
-                                                          </TotalOfficeManagerProvider>
-                                                        </TotalFontainesProvider>
-                                                      </TotalSnacksFruitsProvider>
-                                                    </TotalTheProvider>
-                                                  </TotalCafeProvider>
-                                                </TotalMaintenanceProvider>
-                                              </TotalIncendieProvider>
-                                            </TotalHygieneProvider>
-                                          </TotalNettoyageProvider>
-                                        </TotalProvider>
-                                      </CommentairesProvider>
-                                    </ServicesFm4AllProvider>
-                                  </OfficeManagerProvider>
-                                </ManagementProvider>
-                              </FontainesProvider>
-                            </SnacksFruitsProvider>
-                          </TheProvider>
-                        </CafeProvider>
-                      </FoodBeverageProvider>
-                    </MaintenanceProvider>
-                  </IncendieProvider>
-                </HygieneProvider>
-              </NettoyageProvider>
+              <HygieneProvider>
+                <IncendieProvider>
+                  <MaintenanceProvider>
+                    <FoodBeverageProvider>
+                      <TheProvider>
+                        <SnacksFruitsProvider>
+                          <FontainesProvider>
+                            <ManagementProvider>
+                              <OfficeManagerProvider>
+                                <ServicesFm4AllProvider>
+                                  <CommentairesProvider>
+                                    <TotalProvider>
+                                      <TotalNettoyageProvider>
+                                        <TotalHygieneProvider>
+                                          <TotalIncendieProvider>
+                                            <TotalMaintenanceProvider>
+                                              <TotalCafeProvider>
+                                                <TotalTheProvider>
+                                                  <TotalSnacksFruitsProvider>
+                                                    <TotalFontainesProvider>
+                                                      <TotalOfficeManagerProvider>
+                                                        <TotalServicesFm4AllProvider>
+                                                          {children}
+                                                        </TotalServicesFm4AllProvider>
+                                                      </TotalOfficeManagerProvider>
+                                                    </TotalFontainesProvider>
+                                                  </TotalSnacksFruitsProvider>
+                                                </TotalTheProvider>
+                                              </TotalCafeProvider>
+                                            </TotalMaintenanceProvider>
+                                          </TotalIncendieProvider>
+                                        </TotalHygieneProvider>
+                                      </TotalNettoyageProvider>
+                                    </TotalProvider>
+                                  </CommentairesProvider>
+                                </ServicesFm4AllProvider>
+                              </OfficeManagerProvider>
+                            </ManagementProvider>
+                          </FontainesProvider>
+                        </SnacksFruitsProvider>
+                      </TheProvider>
+                    </FoodBeverageProvider>
+                  </MaintenanceProvider>
+                </IncendieProvider>
+              </HygieneProvider>
             </MonDevisProvider>
           </PersonnalisationProvider>
         </ServicesProvider>

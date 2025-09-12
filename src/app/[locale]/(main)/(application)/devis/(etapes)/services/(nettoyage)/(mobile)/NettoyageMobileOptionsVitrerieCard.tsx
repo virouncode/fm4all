@@ -12,9 +12,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { MARGE, MAX_PASSAGES_VITRERIE } from "@/constants/constants";
-import { NettoyageContext } from "@/context/NettoyageProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
+import { useNettoyageStore } from "@/stores/nettoyageStore";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
@@ -74,7 +74,7 @@ const NettoyageMobileOptionsVitrerieCard = ({
   const t = useTranslations("DevisPage");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
   const tGlobal = useTranslations("Global");
-  const { nettoyage, setNettoyage } = useContext(NettoyageContext);
+  const { nettoyage, setNettoyage } = useNettoyageStore();
   const { setTotalNettoyage } = useContext(TotalNettoyageContext);
   const { gammeSelected: gamme, nomFournisseur } = nettoyage.infos;
   const vitreriePrixMensuelText = vitrerieProposition.prixAnnuel ? (

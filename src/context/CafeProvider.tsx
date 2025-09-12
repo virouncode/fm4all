@@ -8,11 +8,9 @@ import {
   Dispatch,
   PropsWithChildren,
   SetStateAction,
-  useContext,
   useEffect,
   useState,
 } from "react";
-import { ClientContext } from "./ClientProvider";
 
 export const CafeContext = createContext<{
   cafe: CafeType;
@@ -36,7 +34,7 @@ export const CafeContext = createContext<{
 
 const CafeProvider = ({ children }: PropsWithChildren) => {
   const isMounted = useClientOnly();
-  const { client } = useContext(ClientContext);
+  const client = useClientStore((s) => s.client);
 
   // Always initialize state
   const [cafe, setCafe] = useState<CafeType>({

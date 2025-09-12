@@ -1,15 +1,14 @@
 import { MARGE } from "@/constants/constants";
-import { HygieneContext } from "@/context/HygieneProvider";
-import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import { useHygieneStore } from "@/stores/hygieneStore";
+import { useTotalHygieneStore } from "@/stores/totalHygieneStore";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 
 const TotalHygiene = () => {
   const t = useTranslations("Total");
-  const { hygiene } = useContext(HygieneContext);
-  const { totalHygiene } = useContext(TotalHygieneContext);
+  const hygiene = useHygieneStore((s) => s.hygiene);
+  const totalHygiene = useTotalHygieneStore((s) => s.totalHygiene);
   const {
     totalTrilogie,
     totalDesinfectant,
@@ -106,7 +105,7 @@ const TotalHygiene = () => {
               </p>
             </div>
           ) : null}
-          <div className="mt-2 flex items-center justify-between border-t border-foreground">
+          <div className="border-foreground mt-2 flex items-center justify-between border-t">
             <p>TOTAL</p>
             <p className="text-end">
               {formatNumber(Math.round(total * MARGE))} {t("eur-ht-an")}

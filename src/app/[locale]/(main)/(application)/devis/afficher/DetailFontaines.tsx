@@ -10,13 +10,13 @@ import {
 import { MARGE } from "@/constants/constants";
 import { locationFontaine } from "@/constants/locationFontaine";
 import { typesPose } from "@/constants/typesPose";
-import { FontainesContext } from "@/context/FontainesProvider";
 import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
+import { useFontainesStore } from "@/stores/fontainesStore";
 import { useContext } from "react";
 
 const DetailFontaines = () => {
-  const { fontaines } = useContext(FontainesContext);
+  const fontaines = useFontainesStore((s) => s.fontaines);
   const { totalFontaines } = useContext(TotalFontainesContext);
   const total = totalFontaines.totalEspaces
     .map(({ total }) => total ?? 0)

@@ -3,7 +3,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MAX_EFFECTIF } from "@/constants/constants";
 import { TypesSnacksFruitsType } from "@/constants/typesSnacksFruits";
-import { ClientContext } from "@/context/ClientProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { useTranslations } from "next-intl";
 import { useContext } from "react";
@@ -21,7 +20,7 @@ const SnacksFruitsDesktopInputs = ({
 }: SnacksFruitsDesktopInputsProps) => {
   const t = useTranslations("DevisPage");
   const tSnacks = useTranslations("DevisPage.foodBeverage.snacks");
-  const { client } = useContext(ClientContext);
+  const client = useClientStore((s) => s.client);
   const { snacksFruits } = useContext(SnacksFruitsContext);
   return (
     <form className="flex w-2/3 items-center gap-8 py-1">
@@ -30,7 +29,7 @@ const SnacksFruitsDesktopInputs = ({
           <Checkbox
             checked={snacksFruits.infos.choix.includes("fruits")}
             onCheckedChange={() => handleCheck("fruits")}
-            className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
+            className="bg-background data-[state=checked]:bg-background data-[state=checked]:text-foreground font-bold"
             id="fruits"
             aria-label={tSnacks("selectionner-fruits")}
           />
@@ -42,7 +41,7 @@ const SnacksFruitsDesktopInputs = ({
           <Checkbox
             checked={snacksFruits.infos.choix.includes("snacks")}
             onCheckedChange={() => handleCheck("snacks")}
-            className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
+            className="bg-background data-[state=checked]:bg-background data-[state=checked]:text-foreground font-bold"
             id="snacks"
             aria-label={tSnacks("selectionner-snacks")}
             data-testid="snacks-checkbox"
@@ -55,7 +54,7 @@ const SnacksFruitsDesktopInputs = ({
           <Checkbox
             checked={snacksFruits.infos.choix.includes("boissons")}
             onCheckedChange={() => handleCheck("boissons")}
-            className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
+            className="bg-background data-[state=checked]:bg-background data-[state=checked]:text-foreground font-bold"
             id="boissons"
             aria-label={tSnacks("selectionner-boissons")}
             data-testid="boissons-checkbox"
@@ -67,7 +66,7 @@ const SnacksFruitsDesktopInputs = ({
       </div>
       <div className="flex items-center gap-2">
         <Input
-          className={`w-full min-w-20 max-w-xs ${
+          className={`w-full max-w-xs min-w-20 ${
             snacksFruits.quantites.nbPersonnes === client.effectif
               ? "text-fm4alldestructive"
               : ""

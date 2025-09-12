@@ -2,8 +2,6 @@
 
 import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/constants/constants";
 import { TypesEauType } from "@/constants/typesEau";
-import { ClientContext } from "@/context/ClientProvider";
-import { FontainesContext } from "@/context/FontainesProvider";
 import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
 import { toast } from "@/hooks/use-toast";
 import { roundNbPersonnesFontaine } from "@/lib/utils/roundNbPersonnesFontaine";
@@ -17,6 +15,8 @@ import { useMediaQuery } from "react-responsive";
 import FontaineDesktopEspaceInputs from "./(desktop)/FontaineDesktopEspaceInputs";
 import FontaineMobileEspaceInputs from "./(mobile)/FontaineMobileEspaceInputs";
 import { getTypeFontaine } from "./getTypeFontaine";
+import { useClientStore } from "@/stores/clientStore";
+import { useFontainesStore } from "@/stores/fontainesStore";
 type FontaineEspaceFormProps = {
   espace: FontaineEspaceType;
   fontainesModeles: SelectFontainesModelesType[];
@@ -30,8 +30,11 @@ const FontaineEspaceForm = ({
 }: FontaineEspaceFormProps) => {
   const t = useTranslations("DevisPage");
   const tFontaines = useTranslations("DevisPage.foodBeverage.fontaines");
-  const { client } = useContext(ClientContext);
-  const { fontaines, setFontaines } = useContext(FontainesContext);
+  const client = useClientStore((s) => s.client);
+  const { fontaines, setFontaines } = useFontainesStore((s) => ({
+    fontaines: s.fontaines,
+    setFontaines: s.setFontaines,
+  }));
   const { setTotalFontaines } = useContext(TotalFontainesContext);
   const fontainesEspacesIds = fontaines.espaces.map(
     (espace) => espace.infos.espaceId,

@@ -1,16 +1,18 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ClientContext } from "@/context/ClientProvider";
-import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { useRouter } from "@/i18n/navigation";
+import { useClientStore } from "@/stores/clientStore";
+import { useDevisProgressStore } from "@/stores/devisProgressStore";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 
 const NextEtapePilotageButton = () => {
   const t = useTranslations("DevisPage");
-  const { client } = useContext(ClientContext);
-  const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
+  const client = useClientStore((s) => s.client);
+  const { devisProgress, setDevisProgress } = useDevisProgressStore((s) => ({
+    devisProgress: s.devisProgress,
+    setDevisProgress: s.setDevisProgress,
+  }));
   const router = useRouter();
 
   const handleClickNext = () => {

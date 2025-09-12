@@ -1,5 +1,3 @@
-import { ClientContext } from "@/context/ClientProvider";
-import { HygieneContext } from "@/context/HygieneProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { CacheInvalidationData } from "@/lib/cache-invalidation";
 import { roundEffectif } from "@/lib/utils/roundEffectif";
@@ -32,9 +30,12 @@ type DistributeurType =
 export function useHygieneContextUpdater() {
   const t = useTranslations("DevisPage");
   const { toast } = useToast();
-  const { hygiene, setHygiene } = useContext(HygieneContext);
+  const { hygiene, setHygiene } = useHygieneStore((s) => ({
+    hygiene: s.hygiene,
+    setHygiene: s.setHygiene,
+  }));
   const { totalHygiene, setTotalHygiene } = useContext(TotalHygieneContext);
-  const { client } = useContext(ClientContext);
+  const client = useClientStore((s) => s.client);
 
   const updateHygieneContext = useCallback(
     (data: CacheInvalidationData) => {

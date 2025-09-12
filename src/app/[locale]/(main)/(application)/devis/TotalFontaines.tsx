@@ -1,14 +1,13 @@
 import { MARGE } from "@/constants/constants";
-import { FontainesContext } from "@/context/FontainesProvider";
-import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
+import { useFontainesStore } from "@/stores/fontainesStore";
+import { useTotalFontainesStore } from "@/stores/totalFontainesStore";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 
 const TotalFontaines = () => {
   const t = useTranslations("Total");
-  const { fontaines } = useContext(FontainesContext);
-  const { totalFontaines } = useContext(TotalFontainesContext);
+  const fontaines = useFontainesStore((s) => s.fontaines);
+  const totalFontaines = useTotalFontainesStore((s) => s.totalFontaines);
   const total = totalFontaines.totalEspaces
     .map(({ total }) => total ?? 0)
     .reduce((acc, curr) => acc + curr, 0);
@@ -84,7 +83,7 @@ const TotalFontaines = () => {
                 ) : null}
               </div>
             ))}
-          <div className="mt-2 flex flex-col border-t border-foreground">
+          <div className="border-foreground mt-2 flex flex-col border-t">
             <div className="flex w-full justify-between">
               <p>TOTAL</p>
               <p className="text-end">

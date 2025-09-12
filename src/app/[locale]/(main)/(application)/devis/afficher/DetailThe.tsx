@@ -8,14 +8,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { MARGE } from "@/constants/constants";
-import { CafeContext } from "@/context/CafeProvider";
 import { TheContext } from "@/context/TheProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { useContext } from "react";
 
 const DetailThe = () => {
-  const { cafe } = useContext(CafeContext);
+  const cafe = useCafeStore((s) => s.cafe);
   const { the } = useContext(TheContext);
   const { totalThe } = useContext(TotalTheContext);
   if (!totalThe.totalService) return null;

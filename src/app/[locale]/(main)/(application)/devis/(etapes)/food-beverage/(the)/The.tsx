@@ -1,11 +1,11 @@
 "use client";
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
-import { CafeContext } from "@/context/CafeProvider";
-import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
+import { useCafeStore } from "@/stores/cafeStore";
+import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { Leaf } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useContext, useRef } from "react";
+import { useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
@@ -17,8 +17,8 @@ type TheProps = {
 
 const The = ({ theConsoTarifs }: TheProps) => {
   const tThe = useTranslations("DevisPage.foodBeverage.the");
-  const { cafe } = useContext(CafeContext);
-  const { setFoodBeverage } = useContext(FoodBeverageContext);
+  const cafe = useCafeStore((s) => s.cafe);
+  const setFoodBeverage = useFoodBeverageStore((s) => s.setFoodBeverage);
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
   const propositionsRef = useRef<HTMLDivElement>(null);
 

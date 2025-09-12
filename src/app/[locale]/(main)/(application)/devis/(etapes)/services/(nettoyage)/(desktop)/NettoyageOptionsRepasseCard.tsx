@@ -7,12 +7,11 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
-import { NettoyageContext } from "@/context/NettoyageProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
+import { useNettoyageStore } from "@/stores/nettoyageStore";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { useContext } from "react";
 
 type NettoyageOptionsRepasseCardProps = {
   repasseProposition: {
@@ -57,7 +56,7 @@ const NettoyageOptionsRepasseCard = ({
 }: NettoyageOptionsRepasseCardProps) => {
   const t = useTranslations("DevisPage");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
-  const { nettoyage } = useContext(NettoyageContext);
+  const { nettoyage } = useNettoyageStore();
   const totalMensuelText = repasseProposition?.prixAnnuel ? (
     <p className="ml-4 text-xl font-bold" data-testid="total-mensuel-repasse">
       {formatNumber((repasseProposition.prixAnnuel * MARGE) / 12)}{" "}

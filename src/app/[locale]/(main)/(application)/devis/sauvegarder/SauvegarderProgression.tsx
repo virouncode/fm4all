@@ -8,12 +8,11 @@ import { Form } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { batiments } from "@/constants/batiments";
 import { occupation } from "@/constants/occupation";
-import { ClientContext } from "@/context/ClientProvider";
-import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { toast } from "@/hooks/use-toast";
 import { Link, useRouter } from "@/i18n/navigation";
 import { sendEmailFromClient } from "@/lib/email/sendEmail";
 import { formatLocalStorageData } from "@/lib/utils/formatLocalStorageData";
+import { useClientStore } from "@/stores/clientStore";
 import {
   createInsertClientSchema,
   InsertClientType,
@@ -23,15 +22,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useAction } from "next-safe-action/hooks";
-import { ChangeEvent, useContext, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { useForm } from "react-hook-form";
 
 const SauvegarderProgression = () => {
   const t = useTranslations("DevisPage");
   const tSauverErreurs = useTranslations("DevisPage.sauver.erreurs");
   const tSauver = useTranslations("DevisPage.sauver");
-  const { client, setClient } = useContext(ClientContext);
-  const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
+  const { client, setClient } = useClientStore((s) => ({
+    client: s.client,
+    setClient: s.setClient,
+  }));
+  const { devisProgress, setDevisProgress } = useDevisProgressStore((s) => ({
+    devisProgress: s.devisProgress,
+    setDevisProgress: s.setDevisProgress,
+  }));
   const [accepte, setAccepte] = useState(false);
   const router = useRouter();
 

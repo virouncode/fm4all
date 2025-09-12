@@ -8,18 +8,15 @@ import {
 } from "@/constants/constants";
 import { TypesBoissonsType } from "@/constants/typesBoissons";
 import { TypesSnacksFruitsType } from "@/constants/typesSnacksFruits";
-import { CafeContext } from "@/context/CafeProvider";
-import { ClientContext } from "@/context/ClientProvider";
-import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
-import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
-import { TheContext } from "@/context/TheProvider";
-import { TotalCafeContext } from "@/context/TotalCafeProvider";
-import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
-import { TotalTheContext } from "@/context/TotalTheProvider";
 import { toast } from "@/hooks/use-toast";
 import { roundEffectif } from "@/lib/utils/roundEffectif";
 import { roundNbPersonnesCafeConso } from "@/lib/utils/roundNbPersonnesCafeConso";
 import { roundNbPersonnesCafeMachines } from "@/lib/utils/roundNbPersonnesCafeMachines";
+import { useCafeStore } from "@/stores/cafeStore";
+import { useClientStore } from "@/stores/clientStore";
+import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
+import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
+import { useTotalSnacksFruitsStore } from "@/stores/totalSnacksFruitsStore";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine";
@@ -30,10 +27,12 @@ import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import CafeDesktopEspacePropositions from "./(desktop)/CafeDesktopEspacePropositions";
 import CafeMobileEspacePropositions from "./(mobile)/CafeMobileEspacePropositions";
+import { useTheStore } from "@/stores/theStore";
+import { useTotalCafeStore } from "@/stores/totalCafeStore";
+import { useTotalTheStore } from "@/stores/totalTheStore";
 
 type CafeEspacePropositionsProps = {
   espace: CafeEspaceType;
@@ -58,14 +57,22 @@ const CafeEspacePropositions = ({
 }: CafeEspacePropositionsProps) => {
   const tCafe = useTranslations("DevisPage.foodBeverage.cafe");
   const t = useTranslations("DevisPage");
-  const { client } = useContext(ClientContext);
-  const { snacksFruits } = useContext(SnacksFruitsContext);
-  const { setFoodBeverage } = useContext(FoodBeverageContext);
-  const { cafe, setCafe } = useContext(CafeContext);
-  const { the, setThe } = useContext(TheContext);
-  const { setTotalCafe } = useContext(TotalCafeContext);
-  const { setTotalThe } = useContext(TotalTheContext);
-  const { setTotalSnacksFruits } = useContext(TotalSnacksFruitsContext);
+  const client = useClientStore((s) => s.client);
+  const snacksFruits = useSnacksFruitsStore((s) => s.snacksFruits);
+  const setFoodBeverage = useFoodBeverageStore((s) => s.setFoodBeverage);
+  const { cafe, setCafe } = useCafeStore((s) => ({
+    cafe: s.cafe,
+    setCafe: s.setCafe,
+  }));
+  const { the, setThe } = useTheStore((s) => ({
+    the: s.the,
+    setThe: s.setThe,
+  }));
+  const setTotalCafe = useTotalCafeStore((s) => s.setTotalCafe);
+  const setTotalThe = useTotalTheStore((s) => s.setTotalThe);
+  const setTotalSnacksFruits = useTotalSnacksFruitsStore(
+    (s) => s.setTotalSnacksFruits,
+  );
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 
   //Calcul des propositions

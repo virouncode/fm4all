@@ -1,11 +1,10 @@
 "use client";
 
 import { MARGE } from "@/constants/constants";
-import { ClientContext } from "@/context/ClientProvider";
-import { TotalContext } from "@/context/TotalProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
+import { useClientStore } from "@/stores/clientStore";
+import { useTotalStore } from "@/stores/totalStore";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 import TotalCafe from "../TotalCafe";
 import TotalFontaines from "../TotalFontaines";
 import TotalHygiene from "../TotalHygiene";
@@ -20,8 +19,8 @@ import TotalThe from "../TotalThe";
 // Font files can be colocated inside of `pages`
 
 const DevisSynthese = () => {
-  const { client } = useContext(ClientContext);
-  const { total } = useContext(TotalContext);
+  const client = useClientStore((s) => s.client);
+  const { total } = useTotalStore();
   const t = useTranslations("Total");
 
   return (

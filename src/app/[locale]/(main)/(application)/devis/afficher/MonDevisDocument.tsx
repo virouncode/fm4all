@@ -1,11 +1,9 @@
 "use client";
 
 import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
-import { ClientContext } from "@/context/ClientProvider";
 import { DateTime } from "luxon";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { useContext } from "react";
 
 type MonDevisDocumentProps = {
   devisUrl: string;
@@ -13,7 +11,7 @@ type MonDevisDocumentProps = {
 
 const MonDevisDocument = ({ devisUrl }: MonDevisDocumentProps) => {
   const t = useTranslations("DevisPage.afficher");
-  const { client } = useContext(ClientContext);
+  const client = useClientStore((s) => s.client);
 
   return (
     <div className="flex h-full flex-col gap-6 overflow-auto" id="2">
@@ -21,7 +19,7 @@ const MonDevisDocument = ({ devisUrl }: MonDevisDocumentProps) => {
         {client.prenomContact} {client.nomContact},
       </p>
       <div className="flex flex-1 flex-col items-center gap-6 overflow-auto">
-        <div className="mx-auto flex max-w-prose flex-col items-center gap-4 hyphens-auto text-wrap">
+        <div className="mx-auto flex max-w-prose flex-col items-center gap-4 text-wrap hyphens-auto">
           <p>
             {t("votre-devis-complet-et-personnalise-vous-attend-ci-dessous")}
           </p>
@@ -58,7 +56,7 @@ const MonDevisDocument = ({ devisUrl }: MonDevisDocumentProps) => {
             </Link>
           </p>
         </div>
-        <div className="mb-6 mt-6 flex w-full justify-center">
+        <div className="mt-6 mb-6 flex w-full justify-center">
           <iframe src={devisUrl} className="h-screen w-full" />
         </div>
       </div>

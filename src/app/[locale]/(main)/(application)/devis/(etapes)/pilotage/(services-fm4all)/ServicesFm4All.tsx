@@ -2,13 +2,12 @@
 
 import NextEtapeSauverButton from "@/app/[locale]/(main)/(application)/devis/NextEtapeSauverButton";
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
-import { ClientContext } from "@/context/ClientProvider";
-import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { ManagementContext } from "@/context/ManagementProvider";
 import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
 import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";
+import { useDevisProgressStore } from "@/stores/devisProgressStore";
 import { SelectServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4AllOffresType";
 import { SelectServicesFm4AllTauxType } from "@/zod-schemas/servicesFm4AllTaux";
 import { HandPlatter } from "lucide-react";
@@ -18,6 +17,7 @@ import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import ServicesFm4AllPropositions from "./ServicesFm4AllPropositions";
+import { useClientStore } from "@/stores/clientStore";
 
 type ServicesFm4AllProps = {
   servicesFm4AllTaux: SelectServicesFm4AllTauxType[];
@@ -32,10 +32,13 @@ const ServicesFm4All = ({
 
   const tFm4all = useTranslations("DevisPage.pilotage.servicesFm4all");
   const { setManagement } = useContext(ManagementContext);
-  const { client } = useContext(ClientContext);
+  const client = useClientStore((s) => s.client);
   const { totalServicesFm4All } = useContext(TotalServicesFm4AllContext);
   const { servicesFm4All } = useContext(ServicesFm4AllContext);
-  const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
+  const { devisProgress, setDevisProgress } = useDevisProgressStore((s) => ({
+    devisProgress: s.devisProgress,
+    setDevisProgress: s.setDevisProgress,
+  }));
   const router = useRouter();
   const handleClickPrevious = () => {
     setManagement((prev) => ({

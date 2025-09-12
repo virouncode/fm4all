@@ -1,9 +1,8 @@
 import { Button } from "@/components//ui/button";
-import { FontainesContext } from "@/context/FontainesProvider";
+import { useFontainesStore } from "@/stores/fontainesStore";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 import FontaineEspace from "../FontaineEspace";
 
 type FontainesDesktopEspacesProps = {
@@ -18,7 +17,7 @@ const FontainesDesktopEspaces = ({
   handleAddEspace,
 }: FontainesDesktopEspacesProps) => {
   const tFontaines = useTranslations("DevisPage.foodBeverage.fontaines");
-  const { fontaines } = useContext(FontainesContext);
+  const fontaines = useFontainesStore((s) => s.fontaines);
   return fontaines.nbEspaces && fontaines.nbEspaces > 0 ? (
     fontaines.espaces.map((espace) => (
       <FontaineEspace

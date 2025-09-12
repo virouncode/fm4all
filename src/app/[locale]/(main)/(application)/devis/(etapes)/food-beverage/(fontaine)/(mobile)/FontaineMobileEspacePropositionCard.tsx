@@ -10,13 +10,12 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
-import { FontainesContext } from "@/context/FontainesProvider";
 import { capitalize } from "@/lib/utils/capitalize";
 import { formatNumber } from "@/lib/utils/formatNumber";
+import { useFontainesStore } from "@/stores/fontainesStore";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
-import { useContext } from "react";
 import { getTypeFontaine } from "../getTypeFontaine";
 
 type FontaineMobileEspacePropositionsCard = {
@@ -111,7 +110,7 @@ const FontaineMobileEspacePropositionCard = ({
   const t = useTranslations("DevisPage");
   const tFontaines = useTranslations("DevisPage.foodBeverage.fontaines");
   const locale = useLocale();
-  const { fontaines } = useContext(FontainesContext);
+  const fontaines = useFontainesStore((s) => s.fontaines);
   const {
     typePose,
     fournisseurId,

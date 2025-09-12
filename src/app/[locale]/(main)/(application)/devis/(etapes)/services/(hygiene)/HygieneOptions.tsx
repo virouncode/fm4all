@@ -2,8 +2,8 @@
 
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
 import { HygieneContext } from "@/context/HygieneProvider";
-import { NettoyageContext } from "@/context/NettoyageProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
+import { useNettoyageStore } from "@/stores/nettoyageStore";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
@@ -28,7 +28,7 @@ const HygieneOptions = ({
 }: HygieneOptionsProps) => {
   const t = useTranslations("DevisPage.services.hygiene");
   const { hygiene } = useContext(HygieneContext);
-  const { nettoyage } = useContext(NettoyageContext);
+  const { nettoyage } = useNettoyageStore();
   const { setServices } = useContext(ServicesContext);
   const propositionsRef = useRef<HTMLDivElement>(null);
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });

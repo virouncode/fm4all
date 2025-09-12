@@ -1,10 +1,9 @@
 import { MAX_EFFECTIF } from "@/constants/constants";
-import { CafeContext } from "@/context/CafeProvider";
-import { ClientContext } from "@/context/ClientProvider";
 import { TheContext } from "@/context/TheProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { toast } from "@/hooks/use-toast";
 import { roundNbPersonnesCafeConso } from "@/lib/utils/roundNbPersonnesCafeConso";
+import { useCafeStore } from "@/stores/cafeStore";
 import { GammeType } from "@/zod-schemas/gamme";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { useTranslations } from "next-intl";
@@ -20,8 +19,8 @@ type ThePropositionsProps = {
 const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
   const t = useTranslations("DevisPage");
   const tThe = useTranslations("DevisPage.foodBeverage.the");
-  const { client } = useContext(ClientContext);
-  const { cafe } = useContext(CafeContext);
+  const client = useClientStore((s) => s.client);
+  const cafe = useCafeStore((s) => s.cafe);
   const { the, setThe } = useContext(TheContext);
   const { setTotalThe } = useContext(TotalTheContext);
   const effectif = client.effectif ?? 0;

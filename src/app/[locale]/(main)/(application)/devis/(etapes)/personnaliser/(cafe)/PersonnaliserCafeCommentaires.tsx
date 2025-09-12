@@ -1,15 +1,18 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { CafeContext } from "@/context/CafeProvider";
 import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { useRouter } from "@/i18n/navigation";
+import { useCafeStore } from "@/stores/cafeStore";
 import { Coffee } from "lucide-react";
 import { ChangeEvent, useContext } from "react";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 
 const PersonnaliserCafeCommentaires = () => {
-  const { cafe, setCafe } = useContext(CafeContext);
+  const { cafe, setCafe } = useCafeStore((s) => ({
+    cafe: s.cafe,
+    setCafe: s.setCafe,
+  }));
   const { personnalisation, setPersonnalisation } = useContext(
     PersonnalisationContext,
   );

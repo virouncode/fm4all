@@ -4,9 +4,9 @@ import {
   CarouselApi,
   CarouselContent,
 } from "@/components/ui/carousel";
-import { NettoyageContext } from "@/context/NettoyageProvider";
+import { useNettoyageStore } from "@/stores/nettoyageStore";
 import { GammeType } from "@/zod-schemas/gamme";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import NettoyageMobilePropositionCard from "./NettoyageMobilePropositionCard";
 
 type NettoyageMobilePropositionsCarouselProps = {
@@ -54,7 +54,7 @@ const NettoyageMobilePropositionsCarousel = ({
   propositions,
   handleClickProposition,
 }: NettoyageMobilePropositionsCarouselProps) => {
-  const { nettoyage } = useContext(NettoyageContext);
+  const { nettoyage } = useNettoyageStore();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
 

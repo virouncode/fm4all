@@ -2,16 +2,16 @@
 import { useContext, useEffect, useMemo } from "react";
 
 import { IncendieContext } from "@/context/IncendieProvider";
-import { NettoyageContext } from "@/context/NettoyageProvider";
 import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
+import { useNettoyageStore } from "@/stores/nettoyageStore";
 
 export const usePersonnalisation = () => {
   // Extract all contexts
-  const { nettoyage } = useContext(NettoyageContext);
+  const { nettoyage } = useNettoyageStore();
   // const { hygiene } = useContext(HygieneContext);
   // const { maintenance } = useContext(MaintenanceContext);
   const { incendie } = useContext(IncendieContext);
-  // const { cafe } = useContext(CafeContext);
+  // const  cafe = useCafeStore(s=>s.cafe);
   // const { the } = useContext(TheContext);
   // const { snacksFruits } = useContext(SnacksFruitsContext);
   // const { officeManager } = useContext(OfficeManagerContext);

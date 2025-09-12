@@ -1,15 +1,14 @@
 import { MARGE } from "@/constants/constants";
-import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
-import { TotalOfficeManagerContext } from "@/context/TotalOfficeManagerProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import { useOfficeManagerStore } from "@/stores/officeManagerStore";
+import { useTotalOfficeManagerStore } from "@/stores/totalOfficeManagerStore";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 
 const TotalOfficeManager = () => {
   const t = useTranslations("Total");
-  const { officeManager } = useContext(OfficeManagerContext);
-  const { totalOfficeManager } = useContext(TotalOfficeManagerContext);
+  const { officeManager } = useOfficeManagerStore();
+  const { totalOfficeManager } = useTotalOfficeManagerStore();
   const total = totalOfficeManager.totalService;
   const color = getFm4AllColor(officeManager.infos.gammeSelected);
 
@@ -34,7 +33,7 @@ const TotalOfficeManager = () => {
             </p>
           </div>
 
-          <div className="mt-2 flex items-center justify-between border-t border-foreground">
+          <div className="border-foreground mt-2 flex items-center justify-between border-t">
             <p>TOTAL</p>
             <p className="text-end" data-testid="total-office-manager">
               {formatNumber(Math.round(total * MARGE))} {t("eur-ht-an")}

@@ -1,7 +1,7 @@
 import { MAX_PASSAGES_VITRERIE } from "@/constants/constants";
-import { NettoyageContext } from "@/context/NettoyageProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import { useNettoyageStore } from "@/stores/nettoyageStore";
 import { ChangeEvent, useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import NettoyageMobileOptionsPropositions from "../(mobile)/NettoyageMobileOptionsPropositions";
@@ -79,7 +79,7 @@ const NettoyageOptionsPropositions = ({
   dimancheProposition,
   vitrerieProposition,
 }: NettoyageOptionsPropositionsProps) => {
-  const { nettoyage, setNettoyage } = useContext(NettoyageContext);
+  const { nettoyage, setNettoyage } = useNettoyageStore();
   const { setTotalNettoyage } = useContext(TotalNettoyageContext);
   const color = getFm4AllColor(nettoyage.infos.gammeSelected);
 

@@ -1,6 +1,5 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { CommentairesContext } from "@/context/CommentairesProvider";
 import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { useRouter } from "@/i18n/navigation";
 import { MessageSquareText } from "lucide-react";
@@ -10,10 +9,14 @@ import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../PropositionsFooter";
 import PropositionsTitle from "../../PropositionsTitle";
 import PropositionsTitleMobile from "../../PropositionsTitleMobile";
+import { useCommentairesStore } from "@/stores/commentairesStore";
 
 const PersonnaliserCommentaires = () => {
   const tPersonnaliser = useTranslations("DevisPage.personnaliser");
-  const { commentaires, setCommentaires } = useContext(CommentairesContext);
+  const { commentaires, setCommentaires } = useCommentairesStore((s) => ({
+    commentaires: s.commentaires,
+    setCommentaires: s.setCommentaires,
+  }));
   const { personnalisation, setPersonnalisation } = useContext(
     PersonnalisationContext,
   );

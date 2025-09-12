@@ -1,10 +1,10 @@
 import { MAJORATION_DIMANCHE } from "@/constants/constants";
-import { ClientContext } from "@/context/ClientProvider";
-import { HygieneContext } from "@/context/HygieneProvider";
-import { NettoyageContext } from "@/context/NettoyageProvider";
-import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
-import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { toast } from "@/hooks/use-toast";
+import { useClientStore } from "@/stores/clientStore";
+import { useHygieneStore } from "@/stores/hygieneStore";
+import { useNettoyageStore } from "@/stores/nettoyageStore";
+import { useTotalHygieneStore } from "@/stores/totalHygieneStore";
+import { useTotalNettoyageStore } from "@/stores/totalNettoyageStore";
 import { gammes, GammeType } from "@/zod-schemas/gamme";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
@@ -16,7 +16,6 @@ import { SelectRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
 import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import NettoyageMobilePropositions from "../(mobile)/NettoyageMobilePropositions";
 import NettoyageDesktopPropositions from "./NettoyageDesktopPropositions";
@@ -46,12 +45,15 @@ const NettoyagePropositions = ({
 }: NettoyagePropositionsProps) => {
   const t = useTranslations("DevisPage");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
-  const { client } = useContext(ClientContext);
-  const { hygiene } = useContext(HygieneContext);
-  const { nettoyage, setNettoyage } = useContext(NettoyageContext);
-  const { setHygiene } = useContext(HygieneContext);
-  const { setTotalNettoyage } = useContext(TotalNettoyageContext);
-  const { setTotalHygiene } = useContext(TotalHygieneContext);
+  const client = useClientStore((s) => s.client);
+  const hygiene = useHygieneStore((s) => s.hygiene);
+  const { nettoyage, setNettoyage } = useNettoyageStore((s) => ({
+    nettoyage: s.nettoyage,
+    setNettoyage: s.setNettoyage,
+  }));
+  const setHygiene = useHygieneStore((s) => s.setHygiene);
+  const setTotalNettoyage = useTotalNettoyageStore((s) => s.setTotalNettoyage);
+  const setTotalHygiene = useTotalHygieneStore((s) => s.setTotalHygiene);
   const effectif = client.effectif ?? 0;
   const surface = client.surface ?? 0;
 

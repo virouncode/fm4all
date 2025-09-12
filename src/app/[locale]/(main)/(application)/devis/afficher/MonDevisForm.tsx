@@ -11,8 +11,6 @@ import { Label } from "@/components/ui/label";
 import { batiments } from "@/constants/batiments";
 import { departements } from "@/constants/departements";
 import { occupation } from "@/constants/occupation";
-import { ClientContext } from "@/context/ClientProvider";
-import { CommentairesContext } from "@/context/CommentairesProvider";
 import { MonDevisContext } from "@/context/MonDevisProvider";
 import { TotalContext } from "@/context/TotalProvider";
 import useScrollIntoMonDevis from "@/hooks/use-scroll-into-mon-devis";
@@ -20,6 +18,8 @@ import { toast } from "@/hooks/use-toast";
 import { Link, useRouter } from "@/i18n/navigation";
 import { sendEmailFromClient } from "@/lib/email/sendEmail";
 import fillDevis from "@/lib/utils/fillDevis";
+import { useClientStore } from "@/stores/clientStore";
+import { useCommentairesStore } from "@/stores/commentairesStore";
 import {
   createUpdateClientSchema,
   InsertClientType,
@@ -49,9 +49,12 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
   const tDevisErreurs = useTranslations("DevisPage.sauver.erreurs");
   const t = useTranslations("DevisPage.afficher");
   const tSauver = useTranslations("DevisPage.sauver");
-  const { client, setClient } = useContext(ClientContext);
+  const { client, setClient } = useClientStore((s) => ({
+    client: s.client,
+    setClient: s.setClient,
+  }));
   const { total } = useContext(TotalContext);
-  const { commentaires } = useContext(CommentairesContext);
+  const commentaires = useCommentairesStore((s) => s.commentaires);
   const { setMonDevis } = useContext(MonDevisContext);
   const [loading, setLoading] = useState(false);
   const [accepte, setAccepte] = useState(false);

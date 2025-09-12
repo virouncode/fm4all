@@ -1,13 +1,12 @@
 "use client";
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
 import { MAX_NB_PERSONNES_PAR_ESPACE } from "@/constants/constants";
-import { CafeContext } from "@/context/CafeProvider";
-import { ClientContext } from "@/context/ClientProvider";
-import { DevisProgressContext } from "@/context/DevisProgressProvider";
-import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import useScrollIntoCafeEspace from "@/hooks/use-scroll-into-cafe-espace";
 import useScrollIntoFood from "@/hooks/use-scroll-into-food";
+import { useCafeStore } from "@/stores/cafeStore";
+import { useClientStore } from "@/stores/clientStore";
+import { useDevisProgressStore } from "@/stores/devisProgressStore";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine";
 import { SelectCafeMachinesTarifsType } from "@/zod-schemas/cafeMachinesTarifs";
@@ -23,6 +22,7 @@ import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import CafeDesktopEspaces from "./(desktop)/CafeDesktopEspaces";
 import CafeMobileEspaces from "./(mobile)/CafeMobileEspaces";
+import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
 
 type CafeProps = {
   cafeMachines: SelectCafeMachinesType[];
@@ -44,11 +44,14 @@ const Cafe = ({
   sucreConsoTarifs,
 }: CafeProps) => {
   const t = useTranslations("DevisPage.foodBeverage.cafe");
-  const { client } = useContext(ClientContext);
-  const { setFoodBeverage } = useContext(FoodBeverageContext);
-  const { cafe, setCafe } = useContext(CafeContext);
+  const client = useClientStore((s) => s.client);
+  const setFoodBeverage = useFoodBeverageStore((s) => s.setFoodBeverage);
+  const { cafe, setCafe } = useCafeStore((s) => ({
+    cafe: s.cafe,
+    setCafe: s.setCafe,
+  }));
   const { setTotalCafe } = useContext(TotalCafeContext);
-  const { devisProgress } = useContext(DevisProgressContext);
+  const devisProgress = useDevisProgressStore((s) => s.devisProgress);
   const effectif = client.effectif ?? 0;
   useScrollIntoFood();
   useScrollIntoCafeEspace();

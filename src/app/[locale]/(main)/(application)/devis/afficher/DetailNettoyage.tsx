@@ -8,13 +8,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
-import { NettoyageContext } from "@/context/NettoyageProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
+import { useNettoyageStore } from "@/stores/nettoyageStore";
 import { useContext } from "react";
 
 const DetailNettoyage = () => {
-  const { nettoyage } = useContext(NettoyageContext);
+  const { nettoyage } = useNettoyageStore();
   const { totalNettoyage } = useContext(TotalNettoyageContext);
   const total = Object.values(totalNettoyage)
     .filter((item) => item !== null)

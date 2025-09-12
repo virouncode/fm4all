@@ -12,12 +12,11 @@ import {
 import { MAX_EFFECTIF } from "@/constants/constants";
 import { locationCafeMachine } from "@/constants/locationCafeMachine";
 import { typesBoissons } from "@/constants/typesBoissons";
-import { CafeContext } from "@/context/CafeProvider";
-import { ClientContext } from "@/context/ClientProvider";
+import { useCafeStore } from "@/stores/cafeStore";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
-import React, { useContext } from "react";
+import React from "react";
 
 type CafeMobileEspaceInputsProps = {
   espace: CafeEspaceType;
@@ -44,8 +43,8 @@ const CafeMobileEspaceInputs = ({
   const tCafe = useTranslations("DevisPage.foodBeverage.cafe");
   const tTypeBoisson = useTranslations("DevisPage.foodBeverage.cafe.types");
   const tLocation = useTranslations("DevisPage.location");
-  const { client } = useContext(ClientContext);
-  const { cafe } = useContext(CafeContext);
+  const client = useClientStore((s) => s.client);
+  const cafe = useCafeStore((s) => s.cafe);
 
   return (
     <div className="flex flex-col gap-8">
@@ -121,7 +120,7 @@ const CafeMobileEspaceInputs = ({
           </Label>
           <div className="flex items-center gap-2">
             <Input
-              className={`w-16 min-w-20 max-w-xs ${
+              className={`w-16 max-w-xs min-w-20 ${
                 nbPersonnes === client.effectif ? "text-fm4alldestructive" : ""
               }`}
               type="number"

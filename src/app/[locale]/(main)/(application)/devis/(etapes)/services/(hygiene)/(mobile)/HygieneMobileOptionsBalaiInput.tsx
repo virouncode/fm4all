@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MAX_NB_DISTRIB } from "@/constants/constants";
-import { HygieneContext } from "@/context/HygieneProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { Minus, Plus } from "lucide-react";
@@ -57,7 +56,10 @@ const HygieneMobileOptionsBalaiInput = ({
   const t = useTranslations("DevisPage");
   const tHygiene = useTranslations("DevisPage.services.hygiene");
 
-  const { hygiene, setHygiene } = useContext(HygieneContext);
+  const { hygiene, setHygiene } = useHygieneStore((s) => ({
+    hygiene: s.hygiene,
+    setHygiene: s.setHygiene,
+  }));
   const { setTotalHygiene } = useContext(TotalHygieneContext);
 
   const handleIncrement = () => {
@@ -159,7 +161,7 @@ const HygieneMobileOptionsBalaiInput = ({
             <Plus />
           </Button>
         </div>
-        <p className="text-xs italic text-fm4alldestructive">
+        <p className="text-fm4alldestructive text-xs italic">
           {t(
             "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
           )}

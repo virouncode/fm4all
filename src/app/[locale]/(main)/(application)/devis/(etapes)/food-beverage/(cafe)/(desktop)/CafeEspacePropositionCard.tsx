@@ -7,15 +7,14 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
-import { CafeContext } from "@/context/CafeProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import { useCafeStore } from "@/stores/cafeStore";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
 import { GammeType } from "@/zod-schemas/gamme";
 import { Info } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
-import { useContext } from "react";
 
 type CafeEspacePropositionCardProps = {
   proposition: {
@@ -134,7 +133,7 @@ const CafeEspacePropositionCard = ({
   const tCafe = useTranslations("DevisPage.foodBeverage.cafe");
   const tGlobal = useTranslations("Global");
   const locale = useLocale();
-  const { cafe } = useContext(CafeContext);
+  const cafe = useCafeStore((s) => s.cafe);
   const { gamme, totalAnnuel } = proposition;
   const color = getFm4AllColor(gamme);
 

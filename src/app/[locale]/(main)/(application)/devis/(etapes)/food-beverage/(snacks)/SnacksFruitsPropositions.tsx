@@ -1,9 +1,8 @@
-import { CafeContext } from "@/context/CafeProvider";
-import { ClientContext } from "@/context/ClientProvider";
 import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { roundEffectif } from "@/lib/utils/roundEffectif";
+import { useCafeStore } from "@/stores/cafeStore";
 import { SelectBoissonsQuantitesType } from "@/zod-schemas/boissonsQuantites";
 import { SelectBoissonsTarifsType } from "@/zod-schemas/boissonsTarifs";
 import { SelectFoodLivraisonTarifsType } from "@/zod-schemas/foodLivraisonTarifs";
@@ -38,8 +37,8 @@ const SnacksFruitsPropositions = ({
 }: SnacksFruitsPropositionsType) => {
   const { snacksFruits, setSnacksFruits } = useContext(SnacksFruitsContext);
   const { setTotalSnacksFruits } = useContext(TotalSnacksFruitsContext);
-  const { client } = useContext(ClientContext);
-  const { cafe } = useContext(CafeContext);
+  const client = useClientStore((s) => s.client);
+  const cafe = useCafeStore((s) => s.cafe);
   const { totalCafe } = useContext(TotalCafeContext);
   const effectif = client.effectif ?? 0;
   const nbPersonnes = snacksFruits.quantites.nbPersonnes ?? effectif;

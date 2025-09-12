@@ -1,11 +1,14 @@
-import { FontainesContext } from "@/context/FontainesProvider";
-import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
-import { useContext, useEffect } from "react";
+import { useFontainesStore } from "@/stores/fontainesStore";
+import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
+import { useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
 
 export default function useScrollIntoFontainesEspace() {
-  const { fontaines, setFontaines } = useContext(FontainesContext);
-  const { foodBeverage } = useContext(FoodBeverageContext);
+  const { fontaines, setFontaines } = useFontainesStore((s) => ({
+    fontaines: s.fontaines,
+    setFontaines: s.setFontaines,
+  }));
+  const foodBeverage = useFoodBeverageStore((s) => s.foodBeverage);
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
   useEffect(() => {
     if (isTabletOrMobile) return;

@@ -7,14 +7,13 @@ import {
   RATIO_SUCRE,
 } from "@/constants/constants";
 import { TypesBoissonsType } from "@/constants/typesBoissons";
-import { CafeContext } from "@/context/CafeProvider";
-import { ClientContext } from "@/context/ClientProvider";
 import { TheContext } from "@/context/TheProvider";
 import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import { TotalTheContext } from "@/context/TotalTheProvider";
 import { toast } from "@/hooks/use-toast";
 import { roundNbPersonnesCafeConso } from "@/lib/utils/roundNbPersonnesCafeConso";
 import { roundNbPersonnesCafeMachines } from "@/lib/utils/roundNbPersonnesCafeMachines";
+import { useCafeStore } from "@/stores/cafeStore";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine";
@@ -28,6 +27,7 @@ import { ChangeEvent, useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import CafeDesktopEspaceInputs from "./(desktop)/CafeDesktopEspaceInputs";
 import CafeMobileEspaceInputs from "./(mobile)/CafeMobileEspaceInputs";
+import { useClientStore } from "@/stores/clientStore";
 
 type CafeEspaceFormProps = {
   espace: CafeEspaceType;
@@ -50,8 +50,11 @@ const CafeEspaceForm = ({
 }: CafeEspaceFormProps) => {
   const t = useTranslations("DevisPage");
   const tCafe = useTranslations("DevisPage.foodBeverage.cafe");
-  const { client } = useContext(ClientContext);
-  const { cafe, setCafe } = useContext(CafeContext);
+  const client = useClientStore((s) => s.client);
+  const { cafe, setCafe } = useCafeStore((s) => ({
+    cafe: s.cafe,
+    setCafe: s.setCafe,
+  }));
   const { setThe } = useContext(TheContext);
   const { setTotalCafe } = useContext(TotalCafeContext);
   const { setTotalThe } = useContext(TotalTheContext);

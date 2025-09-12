@@ -4,10 +4,10 @@ import {
   CarouselApi,
   CarouselContent,
 } from "@/components/ui/carousel";
-import { FontainesContext } from "@/context/FontainesProvider";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import FontaineMobileEspacePropositionCard from "./FontaineMobileEspacePropositionCard";
+import { useFontainesStore } from "@/stores/fontainesStore";
 
 type FontaineMobileEspacePropositionsCarouselProps = {
   propositions: {
@@ -98,7 +98,7 @@ const FontaineMobileEspacePropositionsCarousel = ({
   handleClickFirstEspaceProposition,
   fontainesEspacesIds,
 }: FontaineMobileEspacePropositionsCarouselProps) => {
-  const { fontaines } = useContext(FontainesContext);
+  const fontaines = useFontainesStore((s) => s.fontaines);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
 

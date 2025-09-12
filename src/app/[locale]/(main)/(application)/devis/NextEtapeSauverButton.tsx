@@ -1,22 +1,24 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ClientContext } from "@/context/ClientProvider";
-import { DevisProgressContext } from "@/context/DevisProgressProvider";
-import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
-import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";
+import { useClientStore } from "@/stores/clientStore";
+import { useDevisProgressStore } from "@/stores/devisProgressStore";
+import { useServicesFm4AllStore } from "@/stores/servicesFm4AllStore";
+import { useTotalServicesFm4AllStore } from "@/stores/totalServicesFm4AllStore";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 
 const NextEtapeSauverButton = () => {
   const t = useTranslations("DevisPage");
   const tFm4all = useTranslations("DevisPage.pilotage.servicesFm4all");
-  const { client } = useContext(ClientContext);
-  const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
-  const { servicesFm4All } = useContext(ServicesFm4AllContext);
-  const { totalServicesFm4All } = useContext(TotalServicesFm4AllContext);
+  const client = useClientStore((s) => s.client);
+  const { devisProgress, setDevisProgress } = useDevisProgressStore((s) => ({
+    devisProgress: s.devisProgress,
+    setDevisProgress: s.setDevisProgress,
+  }));
+  const { servicesFm4All } = useServicesFm4AllStore();
+  const { totalServicesFm4All } = useTotalServicesFm4AllStore();
   const router = useRouter();
 
   const handleClickNext = () => {

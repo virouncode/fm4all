@@ -1,11 +1,11 @@
-import { CafeContext } from "@/context/CafeProvider";
-import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
-import { useContext, useEffect } from "react";
+import { useCafeStore } from "@/stores/cafeStore";
+import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
+import { useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
 
 export default function useScrollIntoCafeEspace() {
-  const { cafe } = useContext(CafeContext);
-  const { foodBeverage } = useContext(FoodBeverageContext);
+  const cafe = useCafeStore((s) => s.cafe);
+  const foodBeverage = useFoodBeverageStore((s) => s.foodBeverage);
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
   useEffect(() => {
     if (isTabletOrMobile) return;

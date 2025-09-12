@@ -1,6 +1,4 @@
 import { MAX_NB_EMP, MAX_NB_PH, MAX_NB_SAVON } from "@/constants/constants";
-import { ClientContext } from "@/context/ClientProvider";
-import { HygieneContext } from "@/context/HygieneProvider";
 import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { DureeLocationHygieneType } from "@/zod-schemas/dureeLocation";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
@@ -16,6 +14,8 @@ import {
   getFormattedHygienePropositions,
   getHygieneFournisseurTarifs,
 } from "./getFormattedHygienePropositions";
+import { useClientStore } from "@/stores/clientStore";
+import { useHygieneStore } from "@/stores/hygieneStore";
 
 type HygienePropositionsProps = {
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
@@ -32,8 +32,11 @@ const HygienePropositions = ({
   hygieneConsosTarifs,
   hygieneMinFacturation,
 }: HygienePropositionsProps) => {
-  const { hygiene, setHygiene } = useContext(HygieneContext);
-  const { client } = useContext(ClientContext);
+  const { hygiene, setHygiene } = useHygieneStore((s) => ({
+    hygiene: s.hygiene,
+    setHygiene: s.setHygiene,
+  }));
+  const client = useClientStore((s) => s.client);
   const { setTotalHygiene } = useContext(TotalHygieneContext);
 
   //Calcul des propositions : 1 fournisseur 3 gammes.

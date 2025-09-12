@@ -10,24 +10,24 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { MARGE } from "@/constants/constants";
-import { ClientContext } from "@/context/ClientProvider";
-import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
-import { TotalCafeContext } from "@/context/TotalCafeProvider";
-import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
-import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
-import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
-import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
-import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
-import { TotalOfficeManagerContext } from "@/context/TotalOfficeManagerProvider";
-import { TotalContext } from "@/context/TotalProvider";
-import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
-import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
-import { TotalTheContext } from "@/context/TotalTheProvider";
 import { useUpddateServicesFm4AllTotal } from "@/hooks/use-upddate-services-fm4All-total";
 import { formatNumber } from "@/lib/utils/formatNumber";
+import { useClientStore } from "@/stores/clientStore";
+import { useServicesFm4AllStore } from "@/stores/servicesFm4AllStore";
+import { useTotalCafeStore } from "@/stores/totalCafeStore";
+import { useTotalFontainesStore } from "@/stores/totalFontainesStore";
+import { useTotalHygieneStore } from "@/stores/totalHygieneStore";
+import { useTotalIncendieStore } from "@/stores/totalIncendieStore";
+import { useTotalMaintenanceStore } from "@/stores/totalMaintenanceStore";
+import { useTotalNettoyageStore } from "@/stores/totalNettoyageStore";
+import { useTotalOfficeManagerStore } from "@/stores/totalOfficeManagerStore";
+import { useTotalServicesFm4AllStore } from "@/stores/totalServicesFm4AllStore";
+import { useTotalSnacksFruitsStore } from "@/stores/totalSnacksFruitsStore";
+import { useTotalStore } from "@/stores/totalStore";
+import { useTotalTheStore } from "@/stores/totalTheStore";
 import { Calculator } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import TotalCafe from "./TotalCafe";
 import TotalFontaines from "./TotalFontaines";
 import TotalHygiene from "./TotalHygiene";
@@ -41,19 +41,28 @@ import TotalThe from "./TotalThe";
 
 const Total = () => {
   const t = useTranslations("Total");
-  const { client } = useContext(ClientContext);
-  const { servicesFm4All } = useContext(ServicesFm4AllContext);
-  const { totalNettoyage } = useContext(TotalNettoyageContext);
-  const { totalHygiene } = useContext(TotalHygieneContext);
-  const { totalMaintenance } = useContext(TotalMaintenanceContext);
-  const { totalIncendie } = useContext(TotalIncendieContext);
-  const { totalCafe } = useContext(TotalCafeContext);
-  const { totalThe } = useContext(TotalTheContext);
-  const { totalSnacksFruits } = useContext(TotalSnacksFruitsContext);
-  const { totalFontaines } = useContext(TotalFontainesContext);
-  const { totalOfficeManager } = useContext(TotalOfficeManagerContext);
-  const { totalServicesFm4All } = useContext(TotalServicesFm4AllContext);
-  const { total, setTotal } = useContext(TotalContext);
+  const client = useClientStore((s) => s.client);
+  const servicesFm4All = useServicesFm4AllStore((s) => s.servicesFm4All);
+  const totalNettoyage = useTotalNettoyageStore((s) => s.totalNettoyage);
+  const totalHygiene = useTotalHygieneStore((s) => s.totalHygiene);
+  const totalMaintenance = useTotalMaintenanceStore((s) => s.totalMaintenance);
+  const totalIncendie = useTotalIncendieStore((s) => s.totalIncendie);
+  const totalCafe = useTotalCafeStore((s) => s.totalCafe);
+  const totalThe = useTotalTheStore((s) => s.totalThe);
+  const totalSnacksFruits = useTotalSnacksFruitsStore(
+    (s) => s.totalSnacksFruits,
+  );
+  const totalFontaines = useTotalFontainesStore((s) => s.totalFontaines);
+  const totalOfficeManager = useTotalOfficeManagerStore(
+    (s) => s.totalOfficeManager,
+  );
+  const totalServicesFm4All = useTotalServicesFm4AllStore(
+    (s) => s.totalServicesFm4All,
+  );
+  const { total, setTotal } = useTotalStore((s) => ({
+    total: s.total,
+    setTotal: s.setTotal,
+  }));
   useUpddateServicesFm4AllTotal();
 
   useEffect(() => {

@@ -1,0 +1,38 @@
+import { TotalServicesFm4AllType } from "@/zod-schemas/total";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+
+interface TotalServicesFm4AllStore {
+  totalServicesFm4All: TotalServicesFm4AllType;
+  setTotalServicesFm4All: (
+    value:
+      | TotalServicesFm4AllType
+      | ((prev: TotalServicesFm4AllType) => TotalServicesFm4AllType),
+  ) => void;
+}
+
+export const useTotalServicesFm4AllStore = create<TotalServicesFm4AllStore>()(
+  persist(
+    (set) => ({
+      totalServicesFm4All: {
+        totalAssurance: null,
+        totalPlateforme: null,
+        totalSupportAdmin: null,
+        totalSupportOp: null,
+        totalAccountManager: null,
+        totalRemiseCa: null,
+        totalRemiseHof: null,
+      },
+      setTotalServicesFm4All: (value) =>
+        set((state) => ({
+          totalServicesFm4All:
+            typeof value === "function"
+              ? value(state.totalServicesFm4All)
+              : value,
+        })),
+    }),
+    {
+      name: "totalServicesFm4All",
+    },
+  ),
+);

@@ -1,6 +1,6 @@
-import { FontainesContext } from "@/context/FontainesProvider";
 import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
 import { toast } from "@/hooks/use-toast";
+import { useFontainesStore } from "@/stores/fontainesStore";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
@@ -23,7 +23,10 @@ const FontaineMobileEspace = ({
 }: FontainesMobileEspacesProps) => {
   const tFontaines = useTranslations("DevisPage.foodBeverage.fontaines");
   const tCafe = useTranslations("DevisPage.foodBeverage.cafe");
-  const { fontaines, setFontaines } = useContext(FontainesContext);
+  const { fontaines, setFontaines } = useFontainesStore((s) => ({
+    fontaines: s.fontaines,
+    setFontaines: s.setFontaines,
+  }));
   const { setTotalFontaines } = useContext(TotalFontainesContext);
   const fontainesEspacesIds = fontaines.espaces.map(
     (espace) => espace.infos.espaceId,

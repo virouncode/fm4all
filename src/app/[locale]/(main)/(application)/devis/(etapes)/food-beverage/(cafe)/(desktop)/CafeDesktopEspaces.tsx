@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { CafeContext } from "@/context/CafeProvider";
+import { useCafeStore } from "@/stores/cafeStore";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine";
 import { SelectCafeMachinesTarifsType } from "@/zod-schemas/cafeMachinesTarifs";
@@ -8,7 +8,6 @@ import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 import CafeEspace from "./CafeEspace";
 
 type CafeDesktopEspacesProps = {
@@ -33,7 +32,7 @@ const CafeDesktopEspaces = ({
   handleAddEspace,
 }: CafeDesktopEspacesProps) => {
   const t = useTranslations("DevisPage.foodBeverage.cafe");
-  const { cafe } = useContext(CafeContext);
+  const cafe = useCafeStore((s) => s.cafe);
   return cafe.nbEspaces && cafe.nbEspaces > 0 ? (
     cafe.espaces.map((espace) => (
       <CafeEspace

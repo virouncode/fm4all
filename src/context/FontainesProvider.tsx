@@ -1,5 +1,6 @@
 "use client";
 
+import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/constants/constants";
 import { useClientOnly } from "@/hooks/use-client-only";
 import { FontainesType } from "@/zod-schemas/fontaines";
 import {
@@ -7,12 +8,9 @@ import {
   Dispatch,
   PropsWithChildren,
   SetStateAction,
-  useContext,
   useEffect,
   useState,
 } from "react";
-import { ClientContext } from "./ClientProvider";
-import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/constants/constants";
 
 export const FontainesContext = createContext<{
   fontaines: FontainesType;
@@ -36,7 +34,7 @@ export const FontainesContext = createContext<{
 
 const FontainesProvider = ({ children }: PropsWithChildren) => {
   const isMounted = useClientOnly();
-  const { client } = useContext(ClientContext);
+  const client = useClientStore((s) => s.client);
 
   // Always initialize state
   const [fontaines, setFontaines] = useState<FontainesType>({

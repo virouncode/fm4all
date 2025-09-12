@@ -1,9 +1,9 @@
 "use client";
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
-import { ClientContext } from "@/context/ClientProvider";
-import { DevisProgressContext } from "@/context/DevisProgressProvider";
 import { ServicesContext } from "@/context/ServicesProvider";
 import { useRouter } from "@/i18n/navigation";
+import { useClientStore } from "@/stores/clientStore";
+import { useDevisProgressStore } from "@/stores/devisProgressStore";
 import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites";
 import { SelectIncendieTarifsType } from "@/zod-schemas/incendieTarifs";
 import { FireExtinguisher } from "lucide-react";
@@ -24,9 +24,12 @@ const SecuriteIncendie = ({
   incendieTarifs,
 }: SecuriteIncendieProps) => {
   const t = useTranslations("DevisPage.services.incendie");
-  const { client } = useContext(ClientContext);
+  const client = useClientStore((s) => s.client);
   const { setServices } = useContext(ServicesContext);
-  const { devisProgress, setDevisProgress } = useContext(DevisProgressContext);
+  const { devisProgress, setDevisProgress } = useDevisProgressStore((s) => ({
+    devisProgress: s.devisProgress,
+    setDevisProgress: s.setDevisProgress,
+  }));
   const propositionsRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 

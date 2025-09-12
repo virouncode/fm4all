@@ -1,15 +1,15 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { NettoyageContext } from "@/context/NettoyageProvider";
 import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { useRouter } from "@/i18n/navigation";
 import { SprayCan } from "lucide-react";
 import { ChangeEvent, useContext } from "react";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
+import { useNettoyageStore } from "@/stores/nettoyageStore";
 
 const PersonnaliserNettoyageCommentaires = () => {
-  const { nettoyage, setNettoyage } = useContext(NettoyageContext);
+  const { nettoyage, setNettoyage } = useNettoyageStore();
   const { personnalisation, setPersonnalisation } = useContext(
     PersonnalisationContext,
   );

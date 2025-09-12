@@ -1,12 +1,11 @@
 "use client";
 
 import { MAJORATION_DIMANCHE } from "@/constants/constants";
-import { ClientContext } from "@/context/ClientProvider";
-import { NettoyageContext } from "@/context/NettoyageProvider";
 import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { useToast } from "@/hooks/use-toast";
 import { CacheInvalidationData } from "@/lib/cache-invalidation";
 import { roundSurface } from "@/lib/utils/roundSurface";
+import { useNettoyageStore } from "@/stores/nettoyageStore";
 import { NettoyageType } from "@/zod-schemas/nettoyage";
 import { TotalNettoyageType } from "@/zod-schemas/total";
 import { useTranslations } from "next-intl";
@@ -19,9 +18,9 @@ import { useCallback, useContext } from "react";
 export function useNettoyageContextUpdater() {
   const t = useTranslations("DevisPage");
   const { toast } = useToast();
-  const { nettoyage, setNettoyage } = useContext(NettoyageContext);
+  const { nettoyage, setNettoyage } = useNettoyageStore();
   const { setTotalNettoyage } = useContext(TotalNettoyageContext);
-  const { client } = useContext(ClientContext);
+  const client = useClientStore((s) => s.client);
 
   const updateNettoyageContext = useCallback(
     (data: CacheInvalidationData) => {

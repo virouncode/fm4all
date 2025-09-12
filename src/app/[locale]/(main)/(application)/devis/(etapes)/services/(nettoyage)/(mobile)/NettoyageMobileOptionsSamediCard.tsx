@@ -1,5 +1,7 @@
 import FournisseurDialog from "@/app/[locale]/(main)/(application)/devis/FournisseurDialog";
 import StarRating from "@/components/star/StarRating";
+import { useNettoyageStore } from "@/stores/nettoyageStore";
+
 import {
   Dialog,
   DialogContent,
@@ -9,11 +11,9 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
-import { NettoyageContext } from "@/context/NettoyageProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { useContext } from "react";
 
 type NettoyageMobileOptionsSamediPropositionsProps = {
   samediProposition: {
@@ -55,7 +55,7 @@ const NettoyageMobileOptionsSamediCard = ({
   const t = useTranslations("DevisPage");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
   const tGlobal = useTranslations("Global");
-  const { nettoyage } = useContext(NettoyageContext);
+  const { nettoyage } = useNettoyageStore();
   const { gammeSelected: gamme, nomFournisseur } = nettoyage.infos;
   const samediPrixMensuelText = samediProposition.prixAnnuel ? (
     <p className="text-end text-sm font-bold">
