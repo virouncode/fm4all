@@ -1,17 +1,26 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
-import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { useRouter } from "@/i18n/navigation";
+import { usePersonnalisationStore } from "@/stores/personnalisationStore";
+import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
 import { Banana, Cookie, CupSoda } from "lucide-react";
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent } from "react";
+import { useShallow } from "zustand/shallow";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 
 const PersonnaliserSnacksFruitsCommentaires = () => {
-  const { snacksFruits, setSnacksFruits } = useContext(SnacksFruitsContext);
-  const { personnalisation, setPersonnalisation } = useContext(
-    PersonnalisationContext,
+  const { snacksFruits, setSnacksFruits } = useSnacksFruitsStore(
+    useShallow((s) => ({
+      snacksFruits: s.snacksFruits,
+      setSnacksFruits: s.setSnacksFruits,
+    })),
+  );
+  const { personnalisation, setPersonnalisation } = usePersonnalisationStore(
+    useShallow((s) => ({
+      personnalisation: s.personnalisation,
+      setPersonnalisation: s.setPersonnalisation,
+    })),
   );
   const router = useRouter();
   const handleClickPrevious = () => {

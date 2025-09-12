@@ -1,9 +1,9 @@
-import { ManagementContext } from "@/context/ManagementProvider";
-import { useContext, useEffect } from "react";
+import { useManagementStore } from "@/stores/managementStore";
+import { useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
 
 export default function useScrollIntoManagement() {
-  const { management } = useContext(ManagementContext);
+  const management = useManagementStore((s) => s.management);
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 
   useEffect(() => {

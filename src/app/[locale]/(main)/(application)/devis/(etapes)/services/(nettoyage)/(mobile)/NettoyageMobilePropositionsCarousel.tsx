@@ -54,7 +54,7 @@ const NettoyageMobilePropositionsCarousel = ({
   propositions,
   handleClickProposition,
 }: NettoyageMobilePropositionsCarouselProps) => {
-  const { nettoyage } = useNettoyageStore();
+  const nettoyage = useNettoyageStore((s) => s.nettoyage);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
 

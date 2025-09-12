@@ -10,12 +10,11 @@ import {
 } from "@/components/ui/select";
 import { MAX_NB_EMP, MAX_NB_PH, MAX_NB_SAVON } from "@/constants/constants";
 import { locationDistribHygiene } from "@/constants/locationsDistribHygiene";
-import { HygieneContext } from "@/context/HygieneProvider";
+import { useHygieneStore } from "@/stores/hygieneStore";
 import { DureeLocationHygieneType } from "@/zod-schemas/dureeLocation";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 
 type HygieneDistribQuantitesInputsProps = {
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
@@ -44,7 +43,7 @@ const HygieneDistribQuantitesInputs = ({
   const t = useTranslations("DevisPage");
   const tHygiene = useTranslations("DevisPage.services.hygiene");
   const tLocation = useTranslations("DevisPage.location");
-  const { hygiene } = useContext(HygieneContext);
+  const hygiene = useHygieneStore((s) => s.hygiene);
   return (
     <div className="flex w-full flex-col gap-6">
       <div className="flex w-full items-center gap-4">
@@ -141,7 +140,7 @@ const HygieneDistribQuantitesInputs = ({
           </SelectContent>
         </Select>
       </div>
-      <p className="px-2 text-center text-xs italic text-fm4alldestructive">
+      <p className="text-fm4alldestructive px-2 text-center text-xs italic">
         {t(
           "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
         )}

@@ -1,7 +1,6 @@
-import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 import SnacksFruitsMobilePropositionsCarousel from "./SnacksFruitsMobilePropositionsCarousel";
+import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
 
 type SnacksFruitsMobilePropositionsProps = {
   formattedPropositions: {
@@ -84,10 +83,10 @@ const SnacksFruitsMobilePropositions = ({
 }: SnacksFruitsMobilePropositionsProps) => {
   const t = useTranslations("DevisPage");
   const tSnacks = useTranslations("DevisPage.foodBeverage.snacks");
-  const { snacksFruits } = useContext(SnacksFruitsContext);
+  const snacksFruits = useSnacksFruitsStore((s) => s.snacksFruits);
   if (snacksFruits.infos.choix.length === 0) {
     return (
-      <div className="flex w-full flex-col gap-2 text-fm4alldestructive">
+      <div className="text-fm4alldestructive flex w-full flex-col gap-2">
         <p>{t("nous-navons-pas-doffres-correspondant-a-ces-criteres")}</p>
         <p>
           {tSnacks(

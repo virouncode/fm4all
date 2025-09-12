@@ -9,14 +9,13 @@ import {
 } from "@/components/ui/table";
 import { MARGE } from "@/constants/constants";
 import { locationDistribHygiene } from "@/constants/locationsDistribHygiene";
-import { HygieneContext } from "@/context/HygieneProvider";
-import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { useContext } from "react";
+import { useHygieneStore } from "@/stores/hygieneStore";
+import { useTotalHygieneStore } from "@/stores/totalHygieneStore";
 
 const DetailHygiene = () => {
-  const { hygiene } = useContext(HygieneContext);
-  const { totalHygiene } = useContext(TotalHygieneContext);
+  const hygiene = useHygieneStore((s) => s.hygiene);
+  const totalHygiene = useTotalHygieneStore((s) => s.totalHygiene);
   const totalOptions =
     (totalHygiene.totalDesinfectant ?? 0) +
     (totalHygiene.totalParfum ?? 0) +

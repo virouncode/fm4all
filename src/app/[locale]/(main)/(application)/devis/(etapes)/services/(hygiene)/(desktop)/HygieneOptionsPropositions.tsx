@@ -1,11 +1,14 @@
 import { MAX_NB_DISTRIB } from "@/constants/constants";
-import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
+import { useClientStore } from "@/stores/clientStore";
+import { useHygieneStore } from "@/stores/hygieneStore";
+import { useTotalHygieneStore } from "@/stores/totalHygieneStore";
 import { gammes } from "@/zod-schemas/gamme";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent } from "react";
 import { useMediaQuery } from "react-responsive";
+import { useShallow } from "zustand/shallow";
 import HygieneMobileOptionsPropositions from "../(mobile)/HygieneMobileOptionsPropositions";
 import { getHygieneFournisseurTarifs } from "../getFormattedHygienePropositions";
 import HygieneDesktopOptionsPropositions from "./HygieneDesktopOptionsPropositions";
@@ -21,12 +24,14 @@ const HygieneOptionsPropositions = ({
   hygieneDistribTarifs,
   hygieneConsosTarifs,
 }: HygieneOptionsPropositionsProps) => {
-  const { hygiene, setHygiene } = useHygieneStore((s) => ({
-    hygiene: s.hygiene,
-    setHygiene: s.setHygiene,
-  }));
+  const { hygiene, setHygiene } = useHygieneStore(
+    useShallow((s) => ({
+      hygiene: s.hygiene,
+      setHygiene: s.setHygiene,
+    })),
+  );
   const client = useClientStore((s) => s.client);
-  const { setTotalHygiene } = useContext(TotalHygieneContext);
+  const setTotalHygiene = useTotalHygieneStore((s) => s.setTotalHygiene);
   //Formatter les propositions d'options en hygiene
   const nbDistribDesinfectant =
     hygiene.quantites.nbDistribDesinfectant ??

@@ -3,14 +3,15 @@ import {
   MAX_NB_EXTINCTEURS,
   MAX_NB_TEL_BAES,
 } from "@/constants/constants";
-import { IncendieContext } from "@/context/IncendieProvider";
-import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { toast } from "@/hooks/use-toast";
+import { useIncendieStore } from "@/stores/incendieStore";
+import { useTotalIncendieStore } from "@/stores/totalIncendieStore";
 import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites";
 import { SelectIncendieTarifsType } from "@/zod-schemas/incendieTarifs";
 import { useTranslations } from "next-intl";
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent } from "react";
 import { useMediaQuery } from "react-responsive";
+import { useShallow } from "zustand/shallow";
 import SecuriteIncendieDesktopPropositions from "./(desktop)/SecuriteIncendieDesktopPropositions";
 import SecuriteIncendieMobilePropositions from "./(mobile)/SecuriteIncendieMobilePropositions";
 
@@ -24,8 +25,13 @@ const SecuriteIncendiePropositions = ({
   incendieTarifs,
 }: SecuriteIncendiePropositionsProps) => {
   const t = useTranslations("DevisPage.services.incendie");
-  const { incendie, setIncendie } = useContext(IncendieContext);
-  const { setTotalIncendie } = useContext(TotalIncendieContext);
+  const { incendie, setIncendie } = useIncendieStore(
+    useShallow((s) => ({
+      incendie: s.incendie,
+      setIncendie: s.setIncendie,
+    })),
+  );
+  const setTotalIncendie = useTotalIncendieStore((s) => s.setTotalIncendie);
 
   //Calcul des propositions
   const nbExtincteurs =

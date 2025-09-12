@@ -1,15 +1,14 @@
 import { MARGE } from "@/constants/constants";
-import { IncendieContext } from "@/context/IncendieProvider";
-import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
+import { useIncendieStore } from "@/stores/incendieStore";
+import { useTotalIncendieStore } from "@/stores/totalIncendieStore";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 
 const TotalIncendie = () => {
   const t = useTranslations("Total");
   const tPersonnaliser = useTranslations("DevisPage.personnaliser");
-  const { incendie } = useContext(IncendieContext);
-  const { totalIncendie } = useContext(TotalIncendieContext);
+  const incendie = useIncendieStore((s) => s.incendie);
+  const totalIncendie = useTotalIncendieStore((s) => s.totalIncendie);
   const totalTrilogie = totalIncendie.totalTrilogie;
   const totalExutoires = totalIncendie.totalExutoires;
   const totalExutoiresParking = totalIncendie.totalExutoiresParking;
@@ -168,7 +167,7 @@ const TotalIncendie = () => {
               </p>
             </div>
           ) : null}
-          <div className="mt-2 flex items-center justify-between border-t border-foreground">
+          <div className="border-foreground mt-2 flex items-center justify-between border-t">
             <p>TOTAL</p>
             <p className="text-end" data-testid="total-incendie">
               {formatNumber(Math.round(total * MARGE))} {t("eur-ht-an")}

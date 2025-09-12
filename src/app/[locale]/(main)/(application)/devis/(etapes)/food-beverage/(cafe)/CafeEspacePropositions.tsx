@@ -16,7 +16,10 @@ import { useCafeStore } from "@/stores/cafeStore";
 import { useClientStore } from "@/stores/clientStore";
 import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
 import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
+import { useTheStore } from "@/stores/theStore";
+import { useTotalCafeStore } from "@/stores/totalCafeStore";
 import { useTotalSnacksFruitsStore } from "@/stores/totalSnacksFruitsStore";
+import { useTotalTheStore } from "@/stores/totalTheStore";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine";
@@ -28,11 +31,10 @@ import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { useTranslations } from "next-intl";
 import { useMediaQuery } from "react-responsive";
+import { useShallow } from "zustand/shallow";
 import CafeDesktopEspacePropositions from "./(desktop)/CafeDesktopEspacePropositions";
 import CafeMobileEspacePropositions from "./(mobile)/CafeMobileEspacePropositions";
-import { useTheStore } from "@/stores/theStore";
-import { useTotalCafeStore } from "@/stores/totalCafeStore";
-import { useTotalTheStore } from "@/stores/totalTheStore";
+import { client } from "@/sanity/lib/client";
 
 type CafeEspacePropositionsProps = {
   espace: CafeEspaceType;
@@ -60,14 +62,18 @@ const CafeEspacePropositions = ({
   const client = useClientStore((s) => s.client);
   const snacksFruits = useSnacksFruitsStore((s) => s.snacksFruits);
   const setFoodBeverage = useFoodBeverageStore((s) => s.setFoodBeverage);
-  const { cafe, setCafe } = useCafeStore((s) => ({
-    cafe: s.cafe,
-    setCafe: s.setCafe,
-  }));
-  const { the, setThe } = useTheStore((s) => ({
-    the: s.the,
-    setThe: s.setThe,
-  }));
+  const { cafe, setCafe } = useCafeStore(
+    useShallow((s) => ({
+      cafe: s.cafe,
+      setCafe: s.setCafe,
+    })),
+  );
+  const { the, setThe } = useTheStore(
+    useShallow((s) => ({
+      the: s.the,
+      setThe: s.setThe,
+    })),
+  );
   const setTotalCafe = useTotalCafeStore((s) => s.setTotalCafe);
   const setTotalThe = useTotalTheStore((s) => s.setTotalThe);
   const setTotalSnacksFruits = useTotalSnacksFruitsStore(

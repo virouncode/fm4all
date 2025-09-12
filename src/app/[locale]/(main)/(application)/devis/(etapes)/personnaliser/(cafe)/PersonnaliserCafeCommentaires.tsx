@@ -1,20 +1,26 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { useRouter } from "@/i18n/navigation";
 import { useCafeStore } from "@/stores/cafeStore";
+import { usePersonnalisationStore } from "@/stores/personnalisationStore";
 import { Coffee } from "lucide-react";
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent } from "react";
+import { useShallow } from "zustand/shallow";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 
 const PersonnaliserCafeCommentaires = () => {
-  const { cafe, setCafe } = useCafeStore((s) => ({
-    cafe: s.cafe,
-    setCafe: s.setCafe,
-  }));
-  const { personnalisation, setPersonnalisation } = useContext(
-    PersonnalisationContext,
+  const { cafe, setCafe } = useCafeStore(
+    useShallow((s) => ({
+      cafe: s.cafe,
+      setCafe: s.setCafe,
+    })),
+  );
+  const { personnalisation, setPersonnalisation } = usePersonnalisationStore(
+    useShallow((s) => ({
+      personnalisation: s.personnalisation,
+      setPersonnalisation: s.setPersonnalisation,
+    })),
   );
   const router = useRouter();
   const handleClickPrevious = () => {

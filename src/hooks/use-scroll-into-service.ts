@@ -1,9 +1,9 @@
-import { ServicesContext } from "@/context/ServicesProvider";
-import { useContext, useEffect } from "react";
+import { useServicesStore } from "@/stores/servicesStore";
+import { useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
 
 export default function useScrollIntoService() {
-  const { services } = useContext(ServicesContext);
+  const services = useServicesStore((s) => s.services);
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
   useEffect(() => {
     if (isTabletOrMobile) return;

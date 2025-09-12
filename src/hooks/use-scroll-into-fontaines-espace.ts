@@ -2,12 +2,15 @@ import { useFontainesStore } from "@/stores/fontainesStore";
 import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
 import { useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
+import { useShallow } from "zustand/shallow";
 
 export default function useScrollIntoFontainesEspace() {
-  const { fontaines, setFontaines } = useFontainesStore((s) => ({
-    fontaines: s.fontaines,
-    setFontaines: s.setFontaines,
-  }));
+  const { fontaines, setFontaines } = useFontainesStore(
+    useShallow((s) => ({
+      fontaines: s.fontaines,
+      setFontaines: s.setFontaines,
+    })),
+  );
   const foodBeverage = useFoodBeverageStore((s) => s.foodBeverage);
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
   useEffect(() => {

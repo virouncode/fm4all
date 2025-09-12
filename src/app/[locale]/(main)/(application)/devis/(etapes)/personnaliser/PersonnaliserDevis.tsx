@@ -1,5 +1,4 @@
 "use client";
-import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { usePersonnalisation } from "@/hooks/use-personnalisation";
 import useScrollIntoPersonnalisation from "@/hooks/use-scroll-into-personnalisation";
 import { SelectAlarmesTarifsType } from "@/zod-schemas/alarmesTarifs";
@@ -7,12 +6,12 @@ import { SelectColonnesSechesTarifsType } from "@/zod-schemas/colonnesSechesTari
 import { SelectExutoiresTarifsType } from "@/zod-schemas/exutoiresTarifs";
 import { SelectPortesCoupeFeuTarifsType } from "@/zod-schemas/portesCoupeFeuTarifs";
 import { SelectRiaTarifsType } from "@/zod-schemas/riaTarifs";
-import { useContext } from "react";
 import PersonnaliserIncendieComplements from "./(incendie)/PersonnaliserIncendieComplements";
 import PersonnaliserNettoyageVitrerie from "./(nettoyage)/PersonnaliserNettoyageVitrerie";
 import PersonnaliserCommentaires from "./PersonnaliserCommentaires";
 import PersonnaliserFinal from "./PersonnaliserFinal";
 import PersonnaliserPresentation from "./PersonnaliserPresentation";
+import { usePersonnalisationStore } from "@/stores/personnalisationStore";
 
 type PersonnaliserDevisProps = {
   exutoiresTarifs?: SelectExutoiresTarifsType[];
@@ -31,7 +30,7 @@ const PersonnaliserDevis = ({
   colonnesSechesTarifs,
   portesCoupeFeuTarifs,
 }: PersonnaliserDevisProps) => {
-  const { personnalisation } = useContext(PersonnalisationContext);
+  const personnalisation = usePersonnalisationStore((s) => s.personnalisation);
   const personnalisationIds = personnalisation.personnalisationIds;
   usePersonnalisation();
   useScrollIntoPersonnalisation();

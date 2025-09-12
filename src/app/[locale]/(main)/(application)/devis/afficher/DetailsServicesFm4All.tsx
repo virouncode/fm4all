@@ -7,14 +7,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
-import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { useContext } from "react";
+import { useServicesFm4AllStore } from "@/stores/servicesFm4AllStore";
+import { useTotalServicesFm4AllStore } from "@/stores/totalServicesFm4AllStore";
 
 const DetailServicesFm4All = () => {
-  const { servicesFm4All } = useContext(ServicesFm4AllContext);
-  const { totalServicesFm4All } = useContext(TotalServicesFm4AllContext);
+  const servicesFm4All = useServicesFm4AllStore((s) => s.servicesFm4All);
+  const totalServicesFm4All = useTotalServicesFm4AllStore(
+    (s) => s.totalServicesFm4All,
+  );
   const {
     totalAssurance,
     totalPlateforme,

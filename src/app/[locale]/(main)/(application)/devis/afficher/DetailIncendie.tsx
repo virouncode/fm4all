@@ -8,14 +8,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { MARGE } from "@/constants/constants";
-import { IncendieContext } from "@/context/IncendieProvider";
-import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { useContext } from "react";
+import { useIncendieStore } from "@/stores/incendieStore";
+import { useTotalIncendieStore } from "@/stores/totalIncendieStore";
 
 const DetailIncendie = () => {
-  const { incendie } = useContext(IncendieContext);
-  const { totalIncendie } = useContext(TotalIncendieContext);
+  const incendie = useIncendieStore((s) => s.incendie);
+  const totalIncendie = useTotalIncendieStore((s) => s.totalIncendie);
   const totalOptions =
     (totalIncendie.totalExutoires ?? 0) +
     (totalIncendie.totalExutoiresParking ?? 0) +

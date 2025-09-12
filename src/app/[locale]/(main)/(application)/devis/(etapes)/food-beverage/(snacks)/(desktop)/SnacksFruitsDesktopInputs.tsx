@@ -3,9 +3,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MAX_EFFECTIF } from "@/constants/constants";
 import { TypesSnacksFruitsType } from "@/constants/typesSnacksFruits";
-import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
+import { useClientStore } from "@/stores/clientStore";
+import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 
 type SnacksFruitsDesktopInputsProps = {
   handleCheck: (type: TypesSnacksFruitsType) => void;
@@ -21,7 +21,7 @@ const SnacksFruitsDesktopInputs = ({
   const t = useTranslations("DevisPage");
   const tSnacks = useTranslations("DevisPage.foodBeverage.snacks");
   const client = useClientStore((s) => s.client);
-  const { snacksFruits } = useContext(SnacksFruitsContext);
+  const snacksFruits = useSnacksFruitsStore((s) => s.snacksFruits);
   return (
     <form className="flex w-2/3 items-center gap-8 py-1">
       <div className="flex items-center gap-4">

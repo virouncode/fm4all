@@ -2,22 +2,23 @@
 
 import NextEtapeSauverButton from "@/app/[locale]/(main)/(application)/devis/NextEtapeSauverButton";
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
-import { ManagementContext } from "@/context/ManagementProvider";
-import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
-import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";
+import { useClientStore } from "@/stores/clientStore";
 import { useDevisProgressStore } from "@/stores/devisProgressStore";
+import { useManagementStore } from "@/stores/managementStore";
+import { useServicesFm4AllStore } from "@/stores/servicesFm4AllStore";
+import { useTotalServicesFm4AllStore } from "@/stores/totalServicesFm4AllStore";
 import { SelectServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4AllOffresType";
 import { SelectServicesFm4AllTauxType } from "@/zod-schemas/servicesFm4AllTaux";
 import { HandPlatter } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useContext, useRef } from "react";
+import { useRef } from "react";
 import { useMediaQuery } from "react-responsive";
+import { useShallow } from "zustand/react/shallow";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import ServicesFm4AllPropositions from "./ServicesFm4AllPropositions";
-import { useClientStore } from "@/stores/clientStore";
 
 type ServicesFm4AllProps = {
   servicesFm4AllTaux: SelectServicesFm4AllTauxType[];
@@ -31,14 +32,18 @@ const ServicesFm4All = ({
   console.log("servicesFm4AllTaux", servicesFm4AllTaux);
 
   const tFm4all = useTranslations("DevisPage.pilotage.servicesFm4all");
-  const { setManagement } = useContext(ManagementContext);
+  const setManagement = useManagementStore((s) => s.setManagement);
   const client = useClientStore((s) => s.client);
-  const { totalServicesFm4All } = useContext(TotalServicesFm4AllContext);
-  const { servicesFm4All } = useContext(ServicesFm4AllContext);
-  const { devisProgress, setDevisProgress } = useDevisProgressStore((s) => ({
-    devisProgress: s.devisProgress,
-    setDevisProgress: s.setDevisProgress,
-  }));
+  const totalServicesFm4All = useTotalServicesFm4AllStore(
+    (s) => s.totalServicesFm4All,
+  );
+  const servicesFm4All = useServicesFm4AllStore((s) => s.servicesFm4All);
+  const { devisProgress, setDevisProgress } = useDevisProgressStore(
+    useShallow((s) => ({
+      devisProgress: s.devisProgress,
+      setDevisProgress: s.setDevisProgress,
+    })),
+  );
   const router = useRouter();
   const handleClickPrevious = () => {
     setManagement((prev) => ({

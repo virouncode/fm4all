@@ -1,18 +1,17 @@
 "use client";
 
-import { ServicesContext } from "@/context/ServicesProvider";
 import { Info, SquareArrowOutUpRight } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import NextServiceButton from "../../../NextServiceButton";
 import MesServicesPresentationCards from "./MesServicesPresentationCards";
 import MesServicesPresentationGammes from "./MesServicesPresentationGammes";
 import MesServicesPresentationGammesCarousel from "./MesServicesPresentationGammesCarousel";
+import { useServicesStore } from "@/stores/servicesStore";
 
 const MesServicesPresentation = () => {
   const t = useTranslations("DevisPage.services.presentation");
-  const { setServices } = useContext(ServicesContext);
+  const setServices = useServicesStore((s) => s.setServices);
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
   // const isGammeSelected = (gamme: GammeType) => gamme === gammeSelected;
   const handleClickNext = () => {

@@ -10,12 +10,12 @@ import {
 } from "@/components/ui/select";
 import { MAX_NB_EMP, MAX_NB_PH, MAX_NB_SAVON } from "@/constants/constants";
 import { locationDistribHygiene } from "@/constants/locationsDistribHygiene";
-import { HygieneContext } from "@/context/HygieneProvider";
+import { useHygieneStore } from "@/stores/hygieneStore";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
-import React, { useContext } from "react";
+import React from "react";
 
 type HygieneMobileDistribQuantitesInputsProps = {
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
@@ -50,7 +50,7 @@ const HygieneMobileDistribQuantitesInputs = ({
   const t = useTranslations("DevisPage");
   const tHygiene = useTranslations("DevisPage.services.hygiene");
   const tLocation = useTranslations("DevisPage.location");
-  const { hygiene } = useContext(HygieneContext);
+  const hygiene = useHygieneStore((s) => s.hygiene);
 
   return (
     <div className="flex flex-col gap-8">
@@ -140,7 +140,7 @@ const HygieneMobileDistribQuantitesInputs = ({
             </Button>
           </div>
 
-          <p className="text-xs italic text-fm4alldestructive">
+          <p className="text-fm4alldestructive text-xs italic">
             {t(
               "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
             )}
@@ -190,7 +190,7 @@ const HygieneMobileDistribQuantitesInputs = ({
             </Button>
           </div>
 
-          <p className="text-xs italic text-fm4alldestructive">
+          <p className="text-fm4alldestructive text-xs italic">
             {t(
               "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
             )}
@@ -240,7 +240,7 @@ const HygieneMobileDistribQuantitesInputs = ({
             </Button>
           </div>
 
-          <p className="text-xs italic text-fm4alldestructive">
+          <p className="text-fm4alldestructive text-xs italic">
             {t(
               "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
             )}

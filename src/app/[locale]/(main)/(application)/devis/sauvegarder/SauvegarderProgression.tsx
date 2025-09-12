@@ -13,6 +13,7 @@ import { Link, useRouter } from "@/i18n/navigation";
 import { sendEmailFromClient } from "@/lib/email/sendEmail";
 import { formatLocalStorageData } from "@/lib/utils/formatLocalStorageData";
 import { useClientStore } from "@/stores/clientStore";
+import { useDevisProgressStore } from "@/stores/devisProgressStore";
 import {
   createInsertClientSchema,
   InsertClientType,
@@ -24,19 +25,24 @@ import { useTranslations } from "next-intl";
 import { useAction } from "next-safe-action/hooks";
 import { ChangeEvent, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useShallow } from "zustand/shallow";
 
 const SauvegarderProgression = () => {
   const t = useTranslations("DevisPage");
   const tSauverErreurs = useTranslations("DevisPage.sauver.erreurs");
   const tSauver = useTranslations("DevisPage.sauver");
-  const { client, setClient } = useClientStore((s) => ({
-    client: s.client,
-    setClient: s.setClient,
-  }));
-  const { devisProgress, setDevisProgress } = useDevisProgressStore((s) => ({
-    devisProgress: s.devisProgress,
-    setDevisProgress: s.setDevisProgress,
-  }));
+  const { client, setClient } = useClientStore(
+    useShallow((s) => ({
+      client: s.client,
+      setClient: s.setClient,
+    })),
+  );
+  const { devisProgress, setDevisProgress } = useDevisProgressStore(
+    useShallow((s) => ({
+      devisProgress: s.devisProgress,
+      setDevisProgress: s.setDevisProgress,
+    })),
+  );
   const [accepte, setAccepte] = useState(false);
   const router = useRouter();
 

@@ -10,12 +10,11 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
-import { MaintenanceContext } from "@/context/MaintenanceProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import { useMaintenanceStore } from "@/stores/maintenanceStore";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { useContext } from "react";
 
 type MaintenanceMobilePropositionCardProps = {
   handleClickProposition: (proposition: {
@@ -73,7 +72,7 @@ const MaintenanceMobilePropositionCard = ({
   const t = useTranslations("DevisPage");
   const tMaintenance = useTranslations("DevisPage.services.maintenance");
   const tGlobal = useTranslations("Global");
-  const { maintenance } = useContext(MaintenanceContext);
+  const maintenance = useMaintenanceStore((s) => s.maintenance);
   const {
     gamme,
     fournisseurId,

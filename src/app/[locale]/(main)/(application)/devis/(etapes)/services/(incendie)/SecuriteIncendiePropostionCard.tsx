@@ -7,12 +7,11 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
-import { IncendieContext } from "@/context/IncendieProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
+import { useIncendieStore } from "@/stores/incendieStore";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { useContext } from "react";
 
 type SecuriteIncendiePropostionCardProps = {
   proposition: {
@@ -67,7 +66,7 @@ const SecuriteIncendiePropostionCard = ({
 }: SecuriteIncendiePropostionCardProps) => {
   const t = useTranslations("DevisPage");
   const tIncendie = useTranslations("DevisPage.services.incendie");
-  const { incendie } = useContext(IncendieContext);
+  const incendie = useIncendieStore((s) => s.incendie);
   const { totalAnnuelTrilogie, fraisDeplacementTrilogie } = proposition;
 
   if (!totalAnnuelTrilogie)

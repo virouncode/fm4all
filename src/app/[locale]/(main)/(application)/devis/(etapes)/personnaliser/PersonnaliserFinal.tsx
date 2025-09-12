@@ -1,17 +1,20 @@
 import { Button } from "@/components/ui/button";
-import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { useRouter } from "@/i18n/navigation";
+import { useDevisProgressStore } from "@/stores/devisProgressStore";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import PreviousServiceButton from "../../PreviousServiceButton";
-import { useDevisProgressStore } from "@/stores/devisProgressStore";
+import { usePersonnalisationStore } from "@/stores/personnalisationStore";
+import { useShallow } from "zustand/shallow";
 
 const PersonnaliserFinal = () => {
   const tPersonnaliser = useTranslations("DevisPage.personnaliser");
   const setDevisProgress = useDevisProgressStore((s) => s.setDevisProgress);
-  const { personnalisation, setPersonnalisation } = useContext(
-    PersonnalisationContext,
+  const { personnalisation, setPersonnalisation } = usePersonnalisationStore(
+    useShallow((s) => ({
+      personnalisation: s.personnalisation,
+      setPersonnalisation: s.setPersonnalisation,
+    })),
   );
   const router = useRouter();
   const handleAfficherDevis = () => {

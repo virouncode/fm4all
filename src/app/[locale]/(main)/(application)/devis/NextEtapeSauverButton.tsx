@@ -8,17 +8,22 @@ import { useDevisProgressStore } from "@/stores/devisProgressStore";
 import { useServicesFm4AllStore } from "@/stores/servicesFm4AllStore";
 import { useTotalServicesFm4AllStore } from "@/stores/totalServicesFm4AllStore";
 import { useTranslations } from "next-intl";
+import { useShallow } from "zustand/shallow";
 
 const NextEtapeSauverButton = () => {
   const t = useTranslations("DevisPage");
   const tFm4all = useTranslations("DevisPage.pilotage.servicesFm4all");
   const client = useClientStore((s) => s.client);
-  const { devisProgress, setDevisProgress } = useDevisProgressStore((s) => ({
-    devisProgress: s.devisProgress,
-    setDevisProgress: s.setDevisProgress,
-  }));
-  const { servicesFm4All } = useServicesFm4AllStore();
-  const { totalServicesFm4All } = useTotalServicesFm4AllStore();
+  const { devisProgress, setDevisProgress } = useDevisProgressStore(
+    useShallow((s) => ({
+      devisProgress: s.devisProgress,
+      setDevisProgress: s.setDevisProgress,
+    })),
+  );
+  const servicesFm4All = useServicesFm4AllStore((s) => s.servicesFm4All);
+  const totalServicesFm4All = useTotalServicesFm4AllStore(
+    (s) => s.totalServicesFm4All,
+  );
   const router = useRouter();
 
   const handleClickNext = () => {

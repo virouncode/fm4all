@@ -7,8 +7,10 @@ import { useTranslations } from "next-intl";
 
 const TotalOfficeManager = () => {
   const t = useTranslations("Total");
-  const { officeManager } = useOfficeManagerStore();
-  const { totalOfficeManager } = useTotalOfficeManagerStore();
+  const officeManager = useOfficeManagerStore((s) => s.officeManager);
+  const totalOfficeManager = useTotalOfficeManagerStore(
+    (s) => s.totalOfficeManager,
+  );
   const total = totalOfficeManager.totalService;
   const color = getFm4AllColor(officeManager.infos.gammeSelected);
 

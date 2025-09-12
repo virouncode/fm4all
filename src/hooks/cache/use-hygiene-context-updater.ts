@@ -1,8 +1,11 @@
-import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
 import { CacheInvalidationData } from "@/lib/cache-invalidation";
 import { roundEffectif } from "@/lib/utils/roundEffectif";
+import { useClientStore } from "@/stores/clientStore";
+import { useHygieneStore } from "@/stores/hygieneStore";
+import { useTotalHygieneStore } from "@/stores/totalHygieneStore";
 import { useTranslations } from "next-intl";
-import { useCallback, useContext } from "react";
+import { useCallback } from "react";
+import { useShallow } from "zustand/shallow";
 import { useToast } from "../use-toast";
 
 //ATTENTION A EPCH !!!!!!!!
@@ -30,11 +33,18 @@ type DistributeurType =
 export function useHygieneContextUpdater() {
   const t = useTranslations("DevisPage");
   const { toast } = useToast();
-  const { hygiene, setHygiene } = useHygieneStore((s) => ({
-    hygiene: s.hygiene,
-    setHygiene: s.setHygiene,
-  }));
-  const { totalHygiene, setTotalHygiene } = useContext(TotalHygieneContext);
+  const { hygiene, setHygiene } = useHygieneStore(
+    useShallow((s) => ({
+      hygiene: s.hygiene,
+      setHygiene: s.setHygiene,
+    })),
+  );
+  const { totalHygiene, setTotalHygiene } = useTotalHygieneStore(
+    useShallow((s) => ({
+      totalHygiene: s.totalHygiene,
+      setTotalHygiene: s.setTotalHygiene,
+    })),
+  );
   const client = useClientStore((s) => s.client);
 
   const updateHygieneContext = useCallback(

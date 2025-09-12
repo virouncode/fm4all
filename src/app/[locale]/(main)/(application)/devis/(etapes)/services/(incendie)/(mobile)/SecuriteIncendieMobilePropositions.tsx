@@ -1,7 +1,7 @@
+import { useTranslations } from "next-intl";
 import React from "react";
 import SecuriteIncendieMobileCards from "./SecuriteIncendieMobileCards";
 import SecuriteIncendieMobileInputs from "./SecuriteIncendieMobileInputs";
-import { useTranslations } from "next-intl";
 
 type SecuriteIncendieMobilePropositionsProps = {
   propositions: {

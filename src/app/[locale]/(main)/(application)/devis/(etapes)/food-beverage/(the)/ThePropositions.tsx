@@ -1,16 +1,18 @@
 import { MAX_EFFECTIF } from "@/constants/constants";
-import { TheContext } from "@/context/TheProvider";
-import { TotalTheContext } from "@/context/TotalTheProvider";
 import { toast } from "@/hooks/use-toast";
 import { roundNbPersonnesCafeConso } from "@/lib/utils/roundNbPersonnesCafeConso";
 import { useCafeStore } from "@/stores/cafeStore";
+import { useClientStore } from "@/stores/clientStore";
+import { useTheStore } from "@/stores/theStore";
+import { useTotalTheStore } from "@/stores/totalTheStore";
 import { GammeType } from "@/zod-schemas/gamme";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { useTranslations } from "next-intl";
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent } from "react";
 import { useMediaQuery } from "react-responsive";
 import TheDesktopPropositions from "./(desktop)/TheDesktopPropositions";
 import TheMobilePropositions from "./(mobile)/TheMobilePropositions";
+import { useShallow } from "zustand/shallow";
 
 type ThePropositionsProps = {
   theConsoTarifs: SelectTheConsoTarifsType[];
@@ -21,8 +23,13 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
   const tThe = useTranslations("DevisPage.foodBeverage.the");
   const client = useClientStore((s) => s.client);
   const cafe = useCafeStore((s) => s.cafe);
-  const { the, setThe } = useContext(TheContext);
-  const { setTotalThe } = useContext(TotalTheContext);
+  const { the, setThe } = useTheStore(
+    useShallow((s) => ({
+      the: s.the,
+      setThe: s.setThe,
+    })),
+  );
+  const setTotalThe = useTotalTheStore((s) => s.setTotalThe);
   const effectif = client.effectif ?? 0;
 
   //Calcul des propositions

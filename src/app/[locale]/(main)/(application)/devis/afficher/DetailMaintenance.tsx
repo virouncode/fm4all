@@ -8,14 +8,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { MARGE } from "@/constants/constants";
-import { MaintenanceContext } from "@/context/MaintenanceProvider";
-import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { useContext } from "react";
+import { useMaintenanceStore } from "@/stores/maintenanceStore";
+import { useTotalMaintenanceStore } from "@/stores/totalMaintenanceStore";
 
 const DetailMaintenance = () => {
-  const { maintenance } = useContext(MaintenanceContext);
-  const { totalMaintenance } = useContext(TotalMaintenanceContext);
+  const maintenance = useMaintenanceStore((s) => s.maintenance);
+  const totalMaintenance = useTotalMaintenanceStore((s) => s.totalMaintenance);
   const total = Object.values(totalMaintenance)
     .filter((item) => item !== null)
     .reduce((sum, value) => sum + value, 0);

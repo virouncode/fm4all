@@ -1,12 +1,14 @@
 import { MAX_NB_EMP, MAX_NB_PH, MAX_NB_SAVON } from "@/constants/constants";
-import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
+import { useClientStore } from "@/stores/clientStore";
+import { useHygieneStore } from "@/stores/hygieneStore";
+import { useTotalHygieneStore } from "@/stores/totalHygieneStore";
 import { DureeLocationHygieneType } from "@/zod-schemas/dureeLocation";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
 import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInstalDistribTarifs";
 import { SelectHygieneMinFacturationType } from "@/zod-schemas/hygieneMinFacturation";
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent } from "react";
 import { useMediaQuery } from "react-responsive";
 import HygieneDesktopPropositions from "./(desktop)/HygieneDesktopPropositions";
 import HygieneMobilePropositions from "./(mobile)/HygieneMobilePropositions";
@@ -14,8 +16,7 @@ import {
   getFormattedHygienePropositions,
   getHygieneFournisseurTarifs,
 } from "./getFormattedHygienePropositions";
-import { useClientStore } from "@/stores/clientStore";
-import { useHygieneStore } from "@/stores/hygieneStore";
+import { useShallow } from "zustand/shallow";
 
 type HygienePropositionsProps = {
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
@@ -32,12 +33,14 @@ const HygienePropositions = ({
   hygieneConsosTarifs,
   hygieneMinFacturation,
 }: HygienePropositionsProps) => {
-  const { hygiene, setHygiene } = useHygieneStore((s) => ({
-    hygiene: s.hygiene,
-    setHygiene: s.setHygiene,
-  }));
+  const { hygiene, setHygiene } = useHygieneStore(
+    useShallow((s) => ({
+      hygiene: s.hygiene,
+      setHygiene: s.setHygiene,
+    })),
+  );
   const client = useClientStore((s) => s.client);
-  const { setTotalHygiene } = useContext(TotalHygieneContext);
+  const setTotalHygiene = useTotalHygieneStore((s) => s.setTotalHygiene);
 
   //Calcul des propositions : 1 fournisseur 3 gammes.
   const effectif = client.effectif ?? 0;

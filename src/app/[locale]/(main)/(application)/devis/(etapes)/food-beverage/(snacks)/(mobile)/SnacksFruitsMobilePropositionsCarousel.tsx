@@ -4,9 +4,9 @@ import {
   CarouselApi,
   CarouselContent,
 } from "@/components/ui/carousel";
-import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import SnacksFruitsMobilePropositionCard from "./SnacksFruitsMobilePropositionCard";
+import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
 
 type SnacksFruitsMobilePropositionsCarouselProps = {
   propositions: {
@@ -87,7 +87,7 @@ const SnacksFruitsMobilePropositionsCarousel = ({
   propositions,
   handleClickProposition,
 }: SnacksFruitsMobilePropositionsCarouselProps) => {
-  const { snacksFruits } = useContext(SnacksFruitsContext);
+  const snacksFruits = useSnacksFruitsStore((s) => s.snacksFruits);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
   useEffect(() => {

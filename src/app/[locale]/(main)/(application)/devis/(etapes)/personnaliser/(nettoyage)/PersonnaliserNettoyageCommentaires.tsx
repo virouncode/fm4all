@@ -1,17 +1,26 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { useRouter } from "@/i18n/navigation";
+import { useNettoyageStore } from "@/stores/nettoyageStore";
+import { usePersonnalisationStore } from "@/stores/personnalisationStore";
 import { SprayCan } from "lucide-react";
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent } from "react";
+import { useShallow } from "zustand/shallow";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
-import { useNettoyageStore } from "@/stores/nettoyageStore";
 
 const PersonnaliserNettoyageCommentaires = () => {
-  const { nettoyage, setNettoyage } = useNettoyageStore();
-  const { personnalisation, setPersonnalisation } = useContext(
-    PersonnalisationContext,
+  const { nettoyage, setNettoyage } = useNettoyageStore(
+    useShallow((s) => ({
+      nettoyage: s.nettoyage,
+      setNettoyage: s.setNettoyage,
+    })),
+  );
+  const { personnalisation, setPersonnalisation } = usePersonnalisationStore(
+    useShallow((s) => ({
+      personnalisation: s.personnalisation,
+      setPersonnalisation: s.setPersonnalisation,
+    })),
   );
   const router = useRouter();
   const handleClickPrevious = () => {

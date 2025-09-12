@@ -1,6 +1,7 @@
 "use client";
 
 import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
+import { useClientStore } from "@/stores/clientStore";
 import { DateTime } from "luxon";
 import { useTranslations } from "next-intl";
 import Link from "next/link";

@@ -1,17 +1,17 @@
 "use client";
 
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
-import { ManagementContext } from "@/context/ManagementProvider";
 import useScrollIntoManagement from "@/hooks/use-scroll-into-management";
 import { SelectOfficeManagerQuantitesType } from "@/zod-schemas/officeManagerQuantites";
 import { SelectOfficeManagerTarifsType } from "@/zod-schemas/officeManagerTarifs";
 import { UserRoundCog } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useContext, useRef } from "react";
+import { useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import OfficeManagerPropositions from "./OfficeManagerPropositions";
+import { useManagementStore } from "@/stores/managementStore";
 
 type OfficeManagerProps = {
   officeManagerQuantites: SelectOfficeManagerQuantitesType[];
@@ -23,7 +23,7 @@ const OfficeManager = ({
   officeManagerTarifs,
 }: OfficeManagerProps) => {
   const tPilotage = useTranslations("DevisPage.pilotage");
-  const { setManagement } = useContext(ManagementContext);
+  const setManagement = useManagementStore((s) => s.setManagement);
   const handleClickPrevious = () => {};
   const handleClickNext = () => {
     setManagement((prev) => ({

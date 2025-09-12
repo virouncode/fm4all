@@ -1,14 +1,14 @@
 "use client";
 
-import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
-import { TotalOfficeManagerContext } from "@/context/TotalOfficeManagerProvider";
+import { useOfficeManagerStore } from "@/stores/officeManagerStore";
+import { useTotalOfficeManagerStore } from "@/stores/totalOfficeManagerStore";
 import { SelectOfficeManagerQuantitesType } from "@/zod-schemas/officeManagerQuantites";
 import { SelectOfficeManagerTarifsType } from "@/zod-schemas/officeManagerTarifs";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import OfficeManagerDesktopPropositions from "./(desktop)/OfficeManagerDesktopPropositions";
 import OfficeManagerMobilePropositions from "./(mobile)/OfficeManagerMobilePropositions";
+import { useShallow } from "zustand/shallow";
 
 type OfficeManagerPropositionsProps = {
   officeManagerQuantites: SelectOfficeManagerQuantitesType[];
@@ -20,8 +20,15 @@ const OfficeManagerPropositions = ({
   officeManagerTarifs,
 }: OfficeManagerPropositionsProps) => {
   const tOfficeManager = useTranslations("DevisPage.pilotage.officeManager");
-  const { officeManager, setOfficeManager } = useContext(OfficeManagerContext);
-  const { setTotalOfficeManager } = useContext(TotalOfficeManagerContext);
+  const { officeManager, setOfficeManager } = useOfficeManagerStore(
+    useShallow((s) => ({
+      officeManager: s.officeManager,
+      setOfficeManager: s.setOfficeManager,
+    })),
+  );
+  const setTotalOfficeManager = useTotalOfficeManagerStore(
+    (s) => s.setTotalOfficeManager,
+  );
 
   //Calcul des propositions
   const demiJParSemaineEssentiel =

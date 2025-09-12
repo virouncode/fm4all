@@ -6,11 +6,11 @@ import {
   MAX_NB_EXTINCTEURS,
   MAX_NB_TEL_BAES,
 } from "@/constants/constants";
-import { IncendieContext } from "@/context/IncendieProvider";
+import { useIncendieStore } from "@/stores/incendieStore";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import React, { useContext } from "react";
+import React from "react";
 
 type SecuriteIncendieMobileInputsProps = {
   nbExtincteurs: number;
@@ -41,11 +41,11 @@ const SecuriteIncendieMobileInputs = ({
 }: SecuriteIncendieMobileInputsProps) => {
   const t = useTranslations("DevisPage");
   const tIncendie = useTranslations("DevisPage.services.incendie");
-  const { incendie } = useContext(IncendieContext);
+  const incendie = useIncendieStore((s) => s.incendie);
 
   return (
     <div className="flex flex-col gap-8">
-      <p className="hyphens-auto text-xl font-bold">
+      <p className="text-xl font-bold hyphens-auto">
         {tIncendie("controle-des-extincteurs-baes-telecommandes-baes")}
       </p>
       <div className="flex flex-col gap-4">
@@ -90,7 +90,7 @@ const SecuriteIncendieMobileInputs = ({
               <Plus />
             </Button>
           </div>
-          <p className="text-xs italic text-fm4alldestructive">
+          <p className="text-fm4alldestructive text-xs italic">
             {t(
               "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
             )}
@@ -155,7 +155,7 @@ const SecuriteIncendieMobileInputs = ({
               <Plus />
             </Button>
           </div>
-          <p className="text-xs italic text-fm4alldestructive">
+          <p className="text-fm4alldestructive text-xs italic">
             {t(
               "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
             )}
@@ -215,7 +215,7 @@ const SecuriteIncendieMobileInputs = ({
             </Button>
           </div>
 
-          <p className="text-xs italic text-fm4alldestructive">
+          <p className="text-fm4alldestructive text-xs italic">
             {t(
               "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
             )}

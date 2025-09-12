@@ -1,7 +1,6 @@
 "use client";
 
-import { TotalContext } from "@/context/TotalProvider";
-import { useContext } from "react";
+import { useTotalStore } from "@/stores/totalStore";
 import DetailCafe from "./DetailCafe";
 import DetailFontaines from "./DetailFontaines";
 import DetailHygiene from "./DetailHygiene";
@@ -14,7 +13,7 @@ import DetailServicesFm4All from "./DetailsServicesFm4All";
 import DetailThe from "./DetailThe";
 
 const DevisDetails = () => {
-  const { total } = useContext(TotalContext);
+  const total = useTotalStore((s) => s.total);
   return (
     <div className="absolute mx-auto flex w-[1360px] -translate-x-[3000px] flex-col gap-4">
       {/* <DetailInfos /> */}

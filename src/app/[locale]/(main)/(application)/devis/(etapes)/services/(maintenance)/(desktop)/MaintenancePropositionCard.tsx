@@ -9,14 +9,13 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
-import { MaintenanceContext } from "@/context/MaintenanceProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import { useMaintenanceStore } from "@/stores/maintenanceStore";
 import { GammeType } from "@/zod-schemas/gamme";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { useContext } from "react";
 
 type MaintenancePropositionCardProps = {
   proposition: {
@@ -74,7 +73,7 @@ const MaintenancePropositionCard = ({
   const t = useTranslations("DevisPage");
   const tMaintenance = useTranslations("DevisPage.services.maintenance");
   const tGlobal = useTranslations("Global");
-  const { maintenance } = useContext(MaintenanceContext);
+  const maintenance = useMaintenanceStore((s) => s.maintenance);
   const gamme = proposition.gamme;
   const color = getFm4AllColor(gamme);
   if (!proposition.totalAnnuel) {

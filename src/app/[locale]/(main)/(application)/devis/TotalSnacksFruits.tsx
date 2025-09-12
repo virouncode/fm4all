@@ -1,15 +1,16 @@
 import { MARGE } from "@/constants/constants";
-import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
-import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
+import { useTotalSnacksFruitsStore } from "@/stores/totalSnacksFruitsStore";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 
 const TotalSnacksFruits = () => {
   const t = useTranslations("Total");
-  const { snacksFruits } = useContext(SnacksFruitsContext);
-  const { totalSnacksFruits } = useContext(TotalSnacksFruitsContext);
+  const snacksFruits = useSnacksFruitsStore((s) => s.snacksFruits);
+  const totalSnacksFruits = useTotalSnacksFruitsStore(
+    (s) => s.totalSnacksFruits,
+  );
   const totalFruits = totalSnacksFruits.totalFruits;
   const totalSnacks = totalSnacksFruits.totalSnacks;
   const totalBoissons = totalSnacksFruits.totalBoissons;
@@ -87,7 +88,7 @@ const TotalSnacksFruits = () => {
             </div>
           ) : null}
 
-          <div className="mt-2 flex items-center justify-between border-t border-foreground">
+          <div className="border-foreground mt-2 flex items-center justify-between border-t">
             <p>TOTAL</p>
             <p className="text-end" data-testid="total-snacksfruits">
               {formatNumber(Math.round(total * MARGE))} {t("eur-ht-an")}

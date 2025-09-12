@@ -18,6 +18,7 @@ import { useManagementStore } from "@/stores/managementStore";
 import { usePersonnalisationStore } from "@/stores/personnalisationStore";
 import { useServicesStore } from "@/stores/servicesStore";
 import { useLocale } from "next-intl";
+import { useShallow } from "zustand/shallow";
 
 //Pour naviguer dans le Funnel de devis
 //Il faut que le client ait rempli les étapes précédentes pour pouvoir cliquer sur l'étape suivante
@@ -25,10 +26,12 @@ import { useLocale } from "next-intl";
 
 const DevisBreadcrumb = () => {
   const locale = useLocale() as LocaleType;
-  const { devisProgress, setDevisProgress } = useDevisProgressStore((s) => ({
-    devisProgress: s.devisProgress,
-    setDevisProgress: s.setDevisProgress,
-  }));
+  const { devisProgress, setDevisProgress } = useDevisProgressStore(
+    useShallow((s) => ({
+      devisProgress: s.devisProgress,
+      setDevisProgress: s.setDevisProgress,
+    })),
+  );
   const client = useClientStore((s) => s.client);
   const setServices = useServicesStore((s) => s.setServices);
   const setFoodBeverage = useFoodBeverageStore((s) => s.setFoodBeverage);

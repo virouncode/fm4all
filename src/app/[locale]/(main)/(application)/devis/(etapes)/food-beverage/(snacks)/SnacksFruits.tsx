@@ -1,6 +1,6 @@
 "use client";
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
-import { FoodBeverageContext } from "@/context/FoodBeverageProvider";
+import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
 import { SelectBoissonsQuantitesType } from "@/zod-schemas/boissonsQuantites";
 import { SelectBoissonsTarifsType } from "@/zod-schemas/boissonsTarifs";
 import { SelectFoodLivraisonTarifsType } from "@/zod-schemas/foodLivraisonTarifs";
@@ -10,7 +10,7 @@ import { SelectSnacksQuantitesType } from "@/zod-schemas/snacksQuantites";
 import { SelectSnacksTarifsType } from "@/zod-schemas/snacksTarifs";
 import { Banana, Cookie, CupSoda } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useContext, useRef } from "react";
+import { useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
@@ -37,7 +37,7 @@ const SnacksFruits = ({
   foodLivraisonTarifs,
 }: SnacksFruitsType) => {
   const tSnacks = useTranslations("DevisPage.foodBeverage.snacks");
-  const { setFoodBeverage } = useContext(FoodBeverageContext);
+  const setFoodBeverage = useFoodBeverageStore((s) => s.setFoodBeverage);
 
   const handleClickPrevious = () => {
     setFoodBeverage((prev) => ({

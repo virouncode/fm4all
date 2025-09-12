@@ -1,12 +1,13 @@
 "use client";
 import { MAX_EFFECTIF } from "@/constants/constants";
 import { TypesSnacksFruitsType } from "@/constants/typesSnacksFruits";
-import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
-import { TotalCafeContext } from "@/context/TotalCafeProvider";
-import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { toast } from "@/hooks/use-toast";
 import { roundEffectif } from "@/lib/utils/roundEffectif";
 import { useCafeStore } from "@/stores/cafeStore";
+import { useClientStore } from "@/stores/clientStore";
+import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
+import { useTotalCafeStore } from "@/stores/totalCafeStore";
+import { useTotalSnacksFruitsStore } from "@/stores/totalSnacksFruitsStore";
 import { SelectBoissonsQuantitesType } from "@/zod-schemas/boissonsQuantites";
 import { SelectBoissonsTarifsType } from "@/zod-schemas/boissonsTarifs";
 import { SelectFoodLivraisonTarifsType } from "@/zod-schemas/foodLivraisonTarifs";
@@ -15,10 +16,10 @@ import { SelectFruitsTarifsType } from "@/zod-schemas/fruitsTarifs";
 import { SelectSnacksQuantitesType } from "@/zod-schemas/snacksQuantites";
 import { SelectSnacksTarifsType } from "@/zod-schemas/snacksTarifs";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import SnacksFruitsDesktopInputs from "./(desktop)/SnacksFruitsDesktopInputs";
 import SnacksFruitsMobileInputs from "./(mobile)/SnacksFruitsMobileInputs";
+import { useShallow } from "zustand/shallow";
 
 type SnacksFruitsFormProps = {
   fruitsQuantites: SelectFruitsQuantitesType[];
@@ -42,9 +43,16 @@ const SnacksFruitsForm = ({
   const t = useTranslations("DevisPage");
   const client = useClientStore((s) => s.client);
   const cafe = useCafeStore((s) => s.cafe);
-  const { totalCafe } = useContext(TotalCafeContext);
-  const { snacksFruits, setSnacksFruits } = useContext(SnacksFruitsContext);
-  const { setTotalSnacksFruits } = useContext(TotalSnacksFruitsContext);
+  const totalCafe = useTotalCafeStore((s) => s.totalCafe);
+  const { snacksFruits, setSnacksFruits } = useSnacksFruitsStore(
+    useShallow((s) => ({
+      snacksFruits: s.snacksFruits,
+      setSnacksFruits: s.setSnacksFruits,
+    })),
+  );
+  const setTotalSnacksFruits = useTotalSnacksFruitsStore(
+    (s) => s.setTotalSnacksFruits,
+  );
   const effectif = client.effectif ?? 0;
   const nbPersonnes = snacksFruits.quantites.nbPersonnes ?? effectif;
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });

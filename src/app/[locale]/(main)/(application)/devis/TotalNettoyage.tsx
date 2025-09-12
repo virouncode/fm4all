@@ -1,16 +1,15 @@
 "use client";
 import { MARGE } from "@/constants/constants";
-import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useNettoyageStore } from "@/stores/nettoyageStore";
+import { useTotalNettoyageStore } from "@/stores/totalNettoyageStore";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 
 const TotalNettoyage = () => {
   const t = useTranslations("Total");
-  const { nettoyage } = useNettoyageStore();
-  const { totalNettoyage } = useContext(TotalNettoyageContext);
+  const nettoyage = useNettoyageStore((s) => s.nettoyage);
+  const totalNettoyage = useTotalNettoyageStore((s) => s.totalNettoyage);
   const {
     totalService,
     totalRepasse,

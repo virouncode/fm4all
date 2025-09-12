@@ -4,11 +4,11 @@ import {
   CarouselApi,
   CarouselContent,
 } from "@/components/ui/carousel";
-import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
+import { useServicesFm4AllStore } from "@/stores/servicesFm4AllStore";
 import { GammeType } from "@/zod-schemas/gamme";
 import { ServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4All";
 import { useTranslations } from "next-intl";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ServicesFm4AllMobilePropositionCard from "./ServicesFm4AllMobilePropositionCard";
 
 type ServicesFm4allMobilePropositionsProps = {
@@ -81,7 +81,7 @@ const ServicesFm4allMobilePropositions = ({
   total,
 }: ServicesFm4allMobilePropositionsProps) => {
   const tFm4all = useTranslations("DevisPage.pilotage.servicesFm4all");
-  const { servicesFm4All } = useContext(ServicesFm4AllContext);
+  const servicesFm4All = useServicesFm4AllStore((s) => s.servicesFm4All);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
 

@@ -10,12 +10,11 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
-import { HygieneContext } from "@/context/HygieneProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import { useHygieneStore } from "@/stores/hygieneStore";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
-import { useContext } from "react";
 
 type HygieneMobileOptionsParfumCardProps = {
   proposition: {
@@ -84,7 +83,7 @@ const HygieneMobileOptionsParfumCard = ({
   const tGlobal = useTranslations("Global");
   const locale = useLocale();
 
-  const { hygiene } = useContext(HygieneContext);
+  const hygiene = useHygieneStore((s) => s.hygiene);
   const {
     gamme,
     imageUrlParfum,

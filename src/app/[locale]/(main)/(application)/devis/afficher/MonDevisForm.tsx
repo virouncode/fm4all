@@ -11,8 +11,6 @@ import { Label } from "@/components/ui/label";
 import { batiments } from "@/constants/batiments";
 import { departements } from "@/constants/departements";
 import { occupation } from "@/constants/occupation";
-import { MonDevisContext } from "@/context/MonDevisProvider";
-import { TotalContext } from "@/context/TotalProvider";
 import useScrollIntoMonDevis from "@/hooks/use-scroll-into-mon-devis";
 import { toast } from "@/hooks/use-toast";
 import { Link, useRouter } from "@/i18n/navigation";
@@ -20,6 +18,8 @@ import { sendEmailFromClient } from "@/lib/email/sendEmail";
 import fillDevis from "@/lib/utils/fillDevis";
 import { useClientStore } from "@/stores/clientStore";
 import { useCommentairesStore } from "@/stores/commentairesStore";
+import { useMonDevisStore } from "@/stores/monDevisStore";
+import { useTotalStore } from "@/stores/totalStore";
 import {
   createUpdateClientSchema,
   InsertClientType,
@@ -32,14 +32,9 @@ import { Loader } from "lucide-react";
 import { DateTime } from "luxon";
 import { useTranslations } from "next-intl";
 import { useAction } from "next-safe-action/hooks";
-import {
-  ChangeEvent,
-  Dispatch,
-  SetStateAction,
-  useContext,
-  useState,
-} from "react";
+import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useShallow } from "zustand/shallow";
 
 type MonDevisFormProps = {
   setDevisUrl: Dispatch<SetStateAction<string | null>>;
@@ -49,13 +44,15 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
   const tDevisErreurs = useTranslations("DevisPage.sauver.erreurs");
   const t = useTranslations("DevisPage.afficher");
   const tSauver = useTranslations("DevisPage.sauver");
-  const { client, setClient } = useClientStore((s) => ({
-    client: s.client,
-    setClient: s.setClient,
-  }));
-  const { total } = useContext(TotalContext);
+  const { client, setClient } = useClientStore(
+    useShallow((s) => ({
+      client: s.client,
+      setClient: s.setClient,
+    })),
+  );
+  const total = useTotalStore((s) => s.total);
   const commentaires = useCommentairesStore((s) => s.commentaires);
-  const { setMonDevis } = useContext(MonDevisContext);
+  const setMonDevis = useMonDevisStore((s) => s.setMonDevis);
   const [loading, setLoading] = useState(false);
   const [accepte, setAccepte] = useState(false);
   const router = useRouter();

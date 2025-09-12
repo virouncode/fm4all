@@ -19,6 +19,7 @@ import { useTranslations } from "next-intl";
 import { useMediaQuery } from "react-responsive";
 import NettoyageMobilePropositions from "../(mobile)/NettoyageMobilePropositions";
 import NettoyageDesktopPropositions from "./NettoyageDesktopPropositions";
+import { useShallow } from "zustand/shallow";
 
 type NettoyagePropositionsProps = {
   nettoyageQuantites: SelectNettoyageQuantitesType[];
@@ -47,10 +48,12 @@ const NettoyagePropositions = ({
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
   const client = useClientStore((s) => s.client);
   const hygiene = useHygieneStore((s) => s.hygiene);
-  const { nettoyage, setNettoyage } = useNettoyageStore((s) => ({
-    nettoyage: s.nettoyage,
-    setNettoyage: s.setNettoyage,
-  }));
+  const { nettoyage, setNettoyage } = useNettoyageStore(
+    useShallow((s) => ({
+      nettoyage: s.nettoyage,
+      setNettoyage: s.setNettoyage,
+    })),
+  );
   const setHygiene = useHygieneStore((s) => s.setHygiene);
   const setTotalNettoyage = useTotalNettoyageStore((s) => s.setTotalNettoyage);
   const setTotalHygiene = useTotalHygieneStore((s) => s.setTotalHygiene);

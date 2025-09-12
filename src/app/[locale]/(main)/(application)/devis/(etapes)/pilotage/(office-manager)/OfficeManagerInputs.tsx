@@ -8,9 +8,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
+import { useOfficeManagerStore } from "@/stores/officeManagerStore";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 
 type OfficeManagerInputsProps = {
   demiJParSemaineEssentiel: number | null;
@@ -33,7 +32,7 @@ const OfficeManagerInputs = ({
   demiTjmPremium,
 }: OfficeManagerInputsProps) => {
   const tOfficeManager = useTranslations("DevisPage.pilotage.officeManager");
-  const { officeManager } = useContext(OfficeManagerContext);
+  const officeManager = useOfficeManagerStore((s) => s.officeManager);
   const tooltipText = tOfficeManager(
     "selectionnez-le-nombre-de-jour-qui-vous-convient-en-fonction-des-taches-a-realiser",
   );
@@ -74,7 +73,7 @@ const OfficeManagerInputs = ({
       <div className="flex items-center justify-center gap-2">
         <Checkbox
           id="premium"
-          className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
+          className="bg-background data-[state=checked]:bg-background data-[state=checked]:text-foreground font-bold"
           checked={officeManager.infos.premium}
           onCheckedChange={handleCheckPremium}
           aria-label={tOfficeManager("selectionner-loption-premium")}

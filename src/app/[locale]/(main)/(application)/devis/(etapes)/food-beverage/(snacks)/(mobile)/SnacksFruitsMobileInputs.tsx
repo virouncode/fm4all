@@ -4,10 +4,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MAX_EFFECTIF } from "@/constants/constants";
 import { TypesSnacksFruitsType } from "@/constants/typesSnacksFruits";
-import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
+import { useClientStore } from "@/stores/clientStore";
+import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
-import React, { useContext } from "react";
+import React from "react";
 
 type SnacksFruitsMobileInputsProps = {
   handleCheck: (type: TypesSnacksFruitsType) => void;
@@ -27,7 +28,7 @@ const SnacksFruitsMobileInputs = ({
   const t = useTranslations("DevisPage");
   const tSnacks = useTranslations("DevisPage.foodBeverage.snacks");
   const client = useClientStore((s) => s.client);
-  const { snacksFruits } = useContext(SnacksFruitsContext);
+  const snacksFruits = useSnacksFruitsStore((s) => s.snacksFruits);
 
   return (
     <div className="flex flex-col gap-8">

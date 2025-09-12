@@ -4,9 +4,9 @@ import {
   CarouselApi,
   CarouselContent,
 } from "@/components/ui/carousel";
-import { HygieneContext } from "@/context/HygieneProvider";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import HygieneMobileOptionsPoubelleCard from "./HygieneMobileOptionsPoubelleCard";
+import { useHygieneStore } from "@/stores/hygieneStore";
 
 type HygieneMobileOptionsPoubelleCarouselProps = {
   propositions: {
@@ -70,7 +70,7 @@ const HygieneMobileOptionsPoubelleCarousel = ({
   propositions,
   handleClickProposition,
 }: HygieneMobileOptionsPoubelleCarouselProps) => {
-  const { hygiene } = useContext(HygieneContext);
+  const hygiene = useHygieneStore((s) => s.hygiene);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
 

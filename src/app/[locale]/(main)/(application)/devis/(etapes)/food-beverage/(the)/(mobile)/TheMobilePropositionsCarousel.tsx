@@ -4,9 +4,9 @@ import {
   CarouselApi,
   CarouselContent,
 } from "@/components/ui/carousel";
-import { TheContext } from "@/context/TheProvider";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import TheMobilePropositionCard from "./TheMobilePropositionCard";
+import { useTheStore } from "@/stores/theStore";
 
 type TheMobilePropositionsCarouselProps = {
   propositions: {
@@ -57,7 +57,7 @@ const TheMobilePropositionsCarousel = ({
   handleClickProposition,
   nbTassesParJour,
 }: TheMobilePropositionsCarouselProps) => {
-  const { the } = useContext(TheContext);
+  const the = useTheStore((s) => s.the);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
 

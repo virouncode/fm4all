@@ -1,22 +1,22 @@
 import { MARGE } from "@/constants/constants";
-import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
-import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
-import { TotalCafeContext } from "@/context/TotalCafeProvider";
-import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
-import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
-import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
-import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
-import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
-import { TotalOfficeManagerContext } from "@/context/TotalOfficeManagerProvider";
-import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
-import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
-import { TotalTheContext } from "@/context/TotalTheProvider";
+import { useOfficeManagerStore } from "@/stores/officeManagerStore";
+import { useServicesFm4AllStore } from "@/stores/servicesFm4AllStore";
+import { useTotalCafeStore } from "@/stores/totalCafeStore";
+import { useTotalFontainesStore } from "@/stores/totalFontainesStore";
+import { useTotalHygieneStore } from "@/stores/totalHygieneStore";
+import { useTotalIncendieStore } from "@/stores/totalIncendieStore";
+import { useTotalMaintenanceStore } from "@/stores/totalMaintenanceStore";
+import { useTotalNettoyageStore } from "@/stores/totalNettoyageStore";
+import { useTotalOfficeManagerStore } from "@/stores/totalOfficeManagerStore";
+import { useTotalServicesFm4AllStore } from "@/stores/totalServicesFm4AllStore";
+import { useTotalSnacksFruitsStore } from "@/stores/totalSnacksFruitsStore";
+import { useTotalTheStore } from "@/stores/totalTheStore";
 import { GammeType } from "@/zod-schemas/gamme";
 import { ServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4All";
 import { SelectServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4AllOffresType";
 import { SelectServicesFm4AllTauxType } from "@/zod-schemas/servicesFm4AllTaux";
-import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
+import { useShallow } from "zustand/shallow";
 import ServicesFm4allDesktopPropositions from "./(desktop)/ServicesFm4allDesktopPropositions";
 import ServicesFm4allMobilePropositions from "./(mobile)/ServicesFm4allMobilePropositions";
 
@@ -29,20 +29,29 @@ const ServicesFm4AllPropositions = ({
   servicesFm4AllTaux,
   servicesFm4AllOffres,
 }: ServicesFm4AllPropositionsProps) => {
-  const { servicesFm4All, setServicesFm4All } = useContext(
-    ServicesFm4AllContext,
+  const { servicesFm4All, setServicesFm4All } = useServicesFm4AllStore(
+    useShallow((s) => ({
+      servicesFm4All: s.servicesFm4All,
+      setServicesFm4All: s.setServicesFm4All,
+    })),
   );
-  const { setTotalServicesFm4All } = useContext(TotalServicesFm4AllContext);
-  const { totalNettoyage } = useContext(TotalNettoyageContext);
-  const { totalHygiene } = useContext(TotalHygieneContext);
-  const { totalMaintenance } = useContext(TotalMaintenanceContext);
-  const { totalIncendie } = useContext(TotalIncendieContext);
-  const { totalCafe } = useContext(TotalCafeContext);
-  const { totalThe } = useContext(TotalTheContext);
-  const { totalSnacksFruits } = useContext(TotalSnacksFruitsContext);
-  const { totalFontaines } = useContext(TotalFontainesContext);
-  const { totalOfficeManager } = useContext(TotalOfficeManagerContext);
-  const { officeManager } = useContext(OfficeManagerContext);
+  const setTotalServicesFm4All = useTotalServicesFm4AllStore(
+    (s) => s.setTotalServicesFm4All,
+  );
+  const totalNettoyage = useTotalNettoyageStore((s) => s.totalNettoyage);
+  const totalHygiene = useTotalHygieneStore((s) => s.totalHygiene);
+  const totalMaintenance = useTotalMaintenanceStore((s) => s.totalMaintenance);
+  const totalIncendie = useTotalIncendieStore((s) => s.totalIncendie);
+  const totalCafe = useTotalCafeStore((s) => s.totalCafe);
+  const totalThe = useTotalTheStore((s) => s.totalThe);
+  const totalSnacksFruits = useTotalSnacksFruitsStore(
+    (s) => s.totalSnacksFruits,
+  );
+  const totalFontaines = useTotalFontainesStore((s) => s.totalFontaines);
+  const totalOfficeManager = useTotalOfficeManagerStore(
+    (s) => s.totalOfficeManager,
+  );
+  const officeManager = useOfficeManagerStore((s) => s.officeManager);
   const {
     assurance: tauxAssurance,
     plateforme: tauxPlateforme,

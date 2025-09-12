@@ -7,14 +7,13 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
-import { HygieneContext } from "@/context/HygieneProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import { useHygieneStore } from "@/stores/hygieneStore";
 import { GammeType } from "@/zod-schemas/gamme";
 import { Info } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
-import { useContext } from "react";
 
 type HygienePropositionCardProps = {
   proposition: {
@@ -81,7 +80,7 @@ const HygienePropositionCard = ({
   const tHygiene = useTranslations("DevisPage.services.hygiene");
   const tGlobal = useTranslations("Global");
   const locale = useLocale();
-  const { hygiene } = useContext(HygieneContext);
+  const hygiene = useHygieneStore((s) => s.hygiene);
   const gamme = proposition.gamme;
   const color = getFm4AllColor(gamme);
   if (!proposition.totalAnnuelTrilogie) {

@@ -1,17 +1,26 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
-import { TheContext } from "@/context/TheProvider";
 import { useRouter } from "@/i18n/navigation";
+import { usePersonnalisationStore } from "@/stores/personnalisationStore";
+import { useTheStore } from "@/stores/theStore";
 import { Leaf } from "lucide-react";
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent } from "react";
+import { useShallow } from "zustand/shallow";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 
 const PersonnaliserTheCommentaires = () => {
-  const { the, setThe } = useContext(TheContext);
-  const { personnalisation, setPersonnalisation } = useContext(
-    PersonnalisationContext,
+  const { the, setThe } = useTheStore(
+    useShallow((s) => ({
+      the: s.the,
+      setThe: s.setThe,
+    })),
+  );
+  const { personnalisation, setPersonnalisation } = usePersonnalisationStore(
+    useShallow((s) => ({
+      personnalisation: s.personnalisation,
+      setPersonnalisation: s.setPersonnalisation,
+    })),
   );
   const router = useRouter();
   const handleClickPrevious = () => {

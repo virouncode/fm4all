@@ -12,13 +12,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { MARGE, MAX_PASSAGES_VITRERIE } from "@/constants/constants";
-import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { useNettoyageStore } from "@/stores/nettoyageStore";
+import { useTotalNettoyageStore } from "@/stores/totalNettoyageStore";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import React, { useContext } from "react";
+import React from "react";
+import { useShallow } from "zustand/shallow";
 
 type NettoyageMobileOptionsVitrerieCardProps = {
   vitrerieProposition: {
@@ -74,8 +75,13 @@ const NettoyageMobileOptionsVitrerieCard = ({
   const t = useTranslations("DevisPage");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
   const tGlobal = useTranslations("Global");
-  const { nettoyage, setNettoyage } = useNettoyageStore();
-  const { setTotalNettoyage } = useContext(TotalNettoyageContext);
+  const { nettoyage, setNettoyage } = useNettoyageStore(
+    useShallow((s) => ({
+      nettoyage: s.nettoyage,
+      setNettoyage: s.setNettoyage,
+    })),
+  );
+  const setTotalNettoyage = useTotalNettoyageStore((s) => s.setTotalNettoyage);
   const { gammeSelected: gamme, nomFournisseur } = nettoyage.infos;
   const vitreriePrixMensuelText = vitrerieProposition.prixAnnuel ? (
     <p className="text-end text-sm font-bold">

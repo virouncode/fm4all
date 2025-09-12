@@ -1,22 +1,22 @@
 import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/constants/constants";
 import { TypesEauType } from "@/constants/typesEau";
 import { typesPoseArray, TypesPoseType } from "@/constants/typesPose";
-import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";
 import { roundNbPersonnesFontaine } from "@/lib/utils/roundNbPersonnesFontaine";
 import { useClientStore } from "@/stores/clientStore";
 import { useDevisProgressStore } from "@/stores/devisProgressStore";
+import { useFontainesStore } from "@/stores/fontainesStore";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import FontaineDesktopEspacePropositions from "./(desktop)/FontaineDesktopEspacePropositions";
 import FontaineMobileEspacePropositions from "./(mobile)/FontaineMobileEspacePropositions";
 import { getTypeFontaine } from "./getTypeFontaine";
-import { useFontainesStore } from "@/stores/fontainesStore";
+import { useTotalFontainesStore } from "@/stores/totalFontainesStore";
+import { useShallow } from "zustand/shallow";
 
 type FontaineEspacePropositionsProps = {
   fontainesModeles: SelectFontainesModelesType[];
@@ -33,11 +33,13 @@ const FontaineEspacePropositions = ({
   const tFontaines = useTranslations("DevisPage.foodBeverage.fontaines");
   const client = useClientStore((s) => s.client);
   const setDevisProgress = useDevisProgressStore((s) => s.setDevisProgress);
-  const { fontaines, setFontaines } = useFontainesStore((s) => ({
-    fontaines: s.fontaines,
-    setFontaines: s.setFontaines,
-  }));
-  const { setTotalFontaines } = useContext(TotalFontainesContext);
+  const { fontaines, setFontaines } = useFontainesStore(
+    useShallow((s) => ({
+      fontaines: s.fontaines,
+      setFontaines: s.setFontaines,
+    })),
+  );
+  const setTotalFontaines = useTotalFontainesStore((s) => s.setTotalFontaines);
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 
   const router = useRouter();

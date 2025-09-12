@@ -8,11 +8,10 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
-import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
+import { useOfficeManagerStore } from "@/stores/officeManagerStore";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { useContext } from "react";
 
 type OfficeManagerMobilePropositionCardProps = {
   proposition: {
@@ -50,7 +49,7 @@ const OfficeManagerMobilePropositionCard = ({
   const t = useTranslations("DevisPage");
   const tOfficeManager = useTranslations("DevisPage.pilotage.officeManager");
   const tGlobal = useTranslations("Global");
-  const { officeManager } = useContext(OfficeManagerContext);
+  const officeManager = useOfficeManagerStore((s) => s.officeManager);
   const { fournisseurId, totalAnnuel } = proposition;
   const color =
     proposition.demiJParSemaine !== null &&

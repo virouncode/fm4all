@@ -1,17 +1,21 @@
 import WhyCard from "@/components/cards/WhyCard";
-import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { Euro, Feather, Handshake, Rabbit, Waves } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import NextServiceButton from "../../NextServiceButton";
+import { useClientStore } from "@/stores/clientStore";
+import { usePersonnalisationStore } from "@/stores/personnalisationStore";
+import { useShallow } from "zustand/shallow";
 
 const PersonnaliserPresentation = () => {
   const tPourquoi = useTranslations("HomePage.pourquoi");
   const tPersonnaliser = useTranslations("DevisPage.personnaliser");
   const client = useClientStore((s) => s.client);
-  const { personnalisation, setPersonnalisation } = useContext(
-    PersonnalisationContext,
+  const { personnalisation, setPersonnalisation } = usePersonnalisationStore(
+    useShallow((s) => ({
+      personnalisation: s.personnalisation,
+      setPersonnalisation: s.setPersonnalisation,
+    })),
   );
 
   const handleClickNext = () => {

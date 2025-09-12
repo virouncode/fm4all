@@ -1,12 +1,13 @@
 "use client";
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
 import { MAX_NB_PERSONNES_PAR_ESPACE } from "@/constants/constants";
-import { TotalCafeContext } from "@/context/TotalCafeProvider";
 import useScrollIntoCafeEspace from "@/hooks/use-scroll-into-cafe-espace";
 import useScrollIntoFood from "@/hooks/use-scroll-into-food";
 import { useCafeStore } from "@/stores/cafeStore";
 import { useClientStore } from "@/stores/clientStore";
 import { useDevisProgressStore } from "@/stores/devisProgressStore";
+import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
+import { useTotalCafeStore } from "@/stores/totalCafeStore";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine";
 import { SelectCafeMachinesTarifsType } from "@/zod-schemas/cafeMachinesTarifs";
@@ -16,13 +17,13 @@ import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { Coffee, SprayCan } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useContext, useRef } from "react";
+import { useRef } from "react";
 import { useMediaQuery } from "react-responsive";
+import { useShallow } from "zustand/shallow";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import CafeDesktopEspaces from "./(desktop)/CafeDesktopEspaces";
 import CafeMobileEspaces from "./(mobile)/CafeMobileEspaces";
-import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
 
 type CafeProps = {
   cafeMachines: SelectCafeMachinesType[];
@@ -46,11 +47,13 @@ const Cafe = ({
   const t = useTranslations("DevisPage.foodBeverage.cafe");
   const client = useClientStore((s) => s.client);
   const setFoodBeverage = useFoodBeverageStore((s) => s.setFoodBeverage);
-  const { cafe, setCafe } = useCafeStore((s) => ({
-    cafe: s.cafe,
-    setCafe: s.setCafe,
-  }));
-  const { setTotalCafe } = useContext(TotalCafeContext);
+  const { cafe, setCafe } = useCafeStore(
+    useShallow((s) => ({
+      cafe: s.cafe,
+      setCafe: s.setCafe,
+    })),
+  );
+  const setTotalCafe = useTotalCafeStore((s) => s.setTotalCafe);
   const devisProgress = useDevisProgressStore((s) => s.devisProgress);
   const effectif = client.effectif ?? 0;
   useScrollIntoFood();

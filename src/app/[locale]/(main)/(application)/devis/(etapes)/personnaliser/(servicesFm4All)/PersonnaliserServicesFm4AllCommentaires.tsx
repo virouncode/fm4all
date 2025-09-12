@@ -1,19 +1,26 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
-import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
 import { useRouter } from "@/i18n/navigation";
+import { usePersonnalisationStore } from "@/stores/personnalisationStore";
+import { useServicesFm4AllStore } from "@/stores/servicesFm4AllStore";
 import { HandPlatter } from "lucide-react";
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent } from "react";
+import { useShallow } from "zustand/shallow";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 
 const PersonnaliserServicesFm4AllCommentaires = () => {
-  const { servicesFm4All, setServicesFm4All } = useContext(
-    ServicesFm4AllContext,
+  const { servicesFm4All, setServicesFm4All } = useServicesFm4AllStore(
+    useShallow((s) => ({
+      servicesFm4All: s.servicesFm4All,
+      setServicesFm4All: s.setServicesFm4All,
+    })),
   );
-  const { personnalisation, setPersonnalisation } = useContext(
-    PersonnalisationContext,
+  const { personnalisation, setPersonnalisation } = usePersonnalisationStore(
+    useShallow((s) => ({
+      personnalisation: s.personnalisation,
+      setPersonnalisation: s.setPersonnalisation,
+    })),
   );
   const router = useRouter();
   const handleClickPrevious = () => {

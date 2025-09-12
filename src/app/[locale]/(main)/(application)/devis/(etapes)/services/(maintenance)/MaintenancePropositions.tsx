@@ -1,15 +1,15 @@
-import { MaintenanceContext } from "@/context/MaintenanceProvider";
-import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
+import { useMaintenanceStore } from "@/stores/maintenanceStore";
+import { useTotalMaintenanceStore } from "@/stores/totalMaintenanceStore";
 import { gammes } from "@/zod-schemas/gamme";
 import { SelectLegioTarifsType } from "@/zod-schemas/legioTarifs";
 import { SelectMaintenanceQuantitesType } from "@/zod-schemas/maintenanceQuantites";
 import { SelectMaintenanceTarifsType } from "@/zod-schemas/maintenanceTarifs";
 import { SelectQ18TarifsType } from "@/zod-schemas/q18Tarifs";
 import { SelectQualiteAirTarifsType } from "@/zod-schemas/qualiteAirTarifs";
-import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import MaintenanceDesktopPropositions from "./(desktop)/MaintenanceDesktopPropositions";
 import MaintenanceMobilePropositions from "./(mobile)/MaintenanceMobilePropositions";
+import { useShallow } from "zustand/shallow";
 
 type MaintenancePropositionsProps = {
   maintenanceQuantites: SelectMaintenanceQuantitesType[];
@@ -26,8 +26,15 @@ const MaintenancePropositions = ({
   legioTarifs,
   qualiteAirTarifs,
 }: MaintenancePropositionsProps) => {
-  const { maintenance, setMaintenance } = useContext(MaintenanceContext);
-  const { setTotalMaintenance } = useContext(TotalMaintenanceContext);
+  const { maintenance, setMaintenance } = useMaintenanceStore(
+    useShallow((s) => ({
+      maintenance: s.maintenance,
+      setMaintenance: s.setMaintenance,
+    })),
+  );
+  const setTotalMaintenance = useTotalMaintenanceStore(
+    (s) => s.setTotalMaintenance,
+  );
 
   //Calcul des propositions
   const propositions = maintenanceTarifs.map((tarif) => {

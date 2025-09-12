@@ -52,7 +52,7 @@ const NettoyageOptionsSamediCard = ({
 }: NettoyageOptionsSamediCardProps) => {
   const t = useTranslations("DevisPage");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
-  const { nettoyage } = useNettoyageStore();
+  const nettoyage = useNettoyageStore((s) => s.nettoyage);
 
   const samediPrixMensuelText = samediProposition.prixAnnuel ? (
     <p className="ml-4 text-xl font-bold" data-testid="total-mensuel-samedi">

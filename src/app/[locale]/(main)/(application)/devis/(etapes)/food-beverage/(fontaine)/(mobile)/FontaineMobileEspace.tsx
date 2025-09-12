@@ -1,14 +1,14 @@
-import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
 import { toast } from "@/hooks/use-toast";
 import { useFontainesStore } from "@/stores/fontainesStore";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 import RetirerEspaceButton from "../../(cafe)/RetirerEspaceButton";
 import FontaineEspaceForm from "../FontaineEspaceForm";
 import FontaineEspacePropositions from "../FontaineEspacePropositions";
+import { useTotalFontainesStore } from "@/stores/totalFontainesStore";
+import { useShallow } from "zustand/shallow";
 
 type FontainesMobileEspacesProps = {
   espace: FontaineEspaceType;
@@ -23,11 +23,13 @@ const FontaineMobileEspace = ({
 }: FontainesMobileEspacesProps) => {
   const tFontaines = useTranslations("DevisPage.foodBeverage.fontaines");
   const tCafe = useTranslations("DevisPage.foodBeverage.cafe");
-  const { fontaines, setFontaines } = useFontainesStore((s) => ({
-    fontaines: s.fontaines,
-    setFontaines: s.setFontaines,
-  }));
-  const { setTotalFontaines } = useContext(TotalFontainesContext);
+  const { fontaines, setFontaines } = useFontainesStore(
+    useShallow((s) => ({
+      fontaines: s.fontaines,
+      setFontaines: s.setFontaines,
+    })),
+  );
+  const setTotalFontaines = useTotalFontainesStore((s) => s.setTotalFontaines);
   const fontainesEspacesIds = fontaines.espaces.map(
     (espace) => espace.infos.espaceId,
   );

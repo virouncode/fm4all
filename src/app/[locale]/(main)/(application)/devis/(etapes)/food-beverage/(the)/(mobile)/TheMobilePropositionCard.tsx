@@ -10,12 +10,11 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
-import { TheContext } from "@/context/TheProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import { useTheStore } from "@/stores/theStore";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { useContext } from "react";
 
 type TheMobilePropositionCardProps = {
   proposition: {
@@ -70,7 +69,7 @@ const TheMobilePropositionCard = ({
   const t = useTranslations("DevisPage");
   const tThe = useTranslations("DevisPage.foodBeverage.the");
   const tCafe = useTranslations("DevisPage.foodBeverage.cafe");
-  const { the } = useContext(TheContext);
+  const the = useTheStore((s) => s.the);
   const {
     gamme,
     nomFournisseur,

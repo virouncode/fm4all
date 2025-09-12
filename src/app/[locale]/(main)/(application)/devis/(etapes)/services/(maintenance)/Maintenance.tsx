@@ -1,6 +1,5 @@
 "use client";
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
-import { ServicesContext } from "@/context/ServicesProvider";
 import { SelectLegioTarifsType } from "@/zod-schemas/legioTarifs";
 import { SelectMaintenanceQuantitesType } from "@/zod-schemas/maintenanceQuantites";
 import { SelectMaintenanceTarifsType } from "@/zod-schemas/maintenanceTarifs";
@@ -8,11 +7,12 @@ import { SelectQ18TarifsType } from "@/zod-schemas/q18Tarifs";
 import { SelectQualiteAirTarifsType } from "@/zod-schemas/qualiteAirTarifs";
 import { Wrench } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useContext, useRef } from "react";
+import { useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import MaintenancePropositions from "./MaintenancePropositions";
+import { useServicesStore } from "@/stores/servicesStore";
 
 type MaintenanceProps = {
   maintenanceQuantites: SelectMaintenanceQuantitesType[];
@@ -30,7 +30,7 @@ const Maintenance = ({
   qualiteAirTarifs,
 }: MaintenanceProps) => {
   const t = useTranslations("DevisPage.services.maintenance");
-  const { setServices } = useContext(ServicesContext);
+  const setServices = useServicesStore((s) => s.setServices);
   const propositionsRef = useRef<HTMLDivElement>(null);
 
   const handleClickNext = () => {

@@ -1,15 +1,17 @@
 "use client";
 
 import { MAJORATION_DIMANCHE } from "@/constants/constants";
-import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { useToast } from "@/hooks/use-toast";
 import { CacheInvalidationData } from "@/lib/cache-invalidation";
 import { roundSurface } from "@/lib/utils/roundSurface";
+import { useClientStore } from "@/stores/clientStore";
 import { useNettoyageStore } from "@/stores/nettoyageStore";
+import { useTotalNettoyageStore } from "@/stores/totalNettoyageStore";
 import { NettoyageType } from "@/zod-schemas/nettoyage";
 import { TotalNettoyageType } from "@/zod-schemas/total";
 import { useTranslations } from "next-intl";
-import { useCallback, useContext } from "react";
+import { useCallback } from "react";
+import { useShallow } from "zustand/shallow";
 
 /**
  * Hook personnalisé pour mettre à jour le contexte nettoyage en fonction des données reçues via Pusher
@@ -18,8 +20,13 @@ import { useCallback, useContext } from "react";
 export function useNettoyageContextUpdater() {
   const t = useTranslations("DevisPage");
   const { toast } = useToast();
-  const { nettoyage, setNettoyage } = useNettoyageStore();
-  const { setTotalNettoyage } = useContext(TotalNettoyageContext);
+  const { nettoyage, setNettoyage } = useNettoyageStore(
+    useShallow((s) => ({
+      nettoyage: s.nettoyage,
+      setNettoyage: s.setNettoyage,
+    })),
+  );
+  const setTotalNettoyage = useTotalNettoyageStore((s) => s.setTotalNettoyage);
   const client = useClientStore((s) => s.client);
 
   const updateNettoyageContext = useCallback(

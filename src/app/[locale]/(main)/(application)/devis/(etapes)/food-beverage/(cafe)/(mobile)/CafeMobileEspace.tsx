@@ -1,9 +1,9 @@
-import { TheContext } from "@/context/TheProvider";
-import { TotalCafeContext } from "@/context/TotalCafeProvider";
-import { TotalTheContext } from "@/context/TotalTheProvider";
 import { toast } from "@/hooks/use-toast";
 import { useCafeStore } from "@/stores/cafeStore";
 import { useClientStore } from "@/stores/clientStore";
+import { useTheStore } from "@/stores/theStore";
+import { useTotalCafeStore } from "@/stores/totalCafeStore";
+import { useTotalTheStore } from "@/stores/totalTheStore";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine";
@@ -13,7 +13,7 @@ import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
+import { useShallow } from "zustand/shallow";
 import CafeEspaceForm from "../CafeEspaceForm";
 import CafeEspacePropositions from "../CafeEspacePropositions";
 import { reinitialisationCafeThe } from "../reinitialisationCafeThe";
@@ -42,13 +42,15 @@ const CafeMobileEspace = ({
 }: CafeMobileEspaceProps) => {
   const t = useTranslations("DevisPage.foodBeverage.cafe");
   const client = useClientStore((s) => s.client);
-  const { cafe, setCafe } = useCafeStore((s) => ({
-    cafe: s.cafe,
-    setCafe: s.setCafe,
-  }));
-  const { setThe } = useContext(TheContext);
-  const { setTotalCafe } = useContext(TotalCafeContext);
-  const { setTotalThe } = useContext(TotalTheContext);
+  const { cafe, setCafe } = useCafeStore(
+    useShallow((s) => ({
+      cafe: s.cafe,
+      setCafe: s.setCafe,
+    })),
+  );
+  const setThe = useTheStore((s) => s.setThe);
+  const setTotalCafe = useTotalCafeStore((s) => s.setTotalCafe);
+  const setTotalThe = useTotalTheStore((s) => s.setTotalThe);
   const cafeEspacesIds = cafe.espaces.map((espace) => espace.infos.espaceId);
 
   const handleClickRemove = () => {

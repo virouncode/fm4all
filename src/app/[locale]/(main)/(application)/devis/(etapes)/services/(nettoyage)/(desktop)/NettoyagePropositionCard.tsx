@@ -64,7 +64,7 @@ const NettoyagePropositionCard = ({
   const t = useTranslations("DevisPage");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
   const tGlobal = useTranslations("Global");
-  const { nettoyage } = useNettoyageStore();
+  const nettoyage = useNettoyageStore((s) => s.nettoyage);
   const gamme = proposition.gamme;
   const color = getFm4AllColor(gamme);
 

@@ -1,24 +1,30 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { useRouter } from "@/i18n/navigation";
+import { useCommentairesStore } from "@/stores/commentairesStore";
+import { usePersonnalisationStore } from "@/stores/personnalisationStore";
 import { MessageSquareText } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { ChangeEvent, useContext, useRef } from "react";
+import { ChangeEvent, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
+import { useShallow } from "zustand/shallow";
 import PropositionsFooter from "../../PropositionsFooter";
 import PropositionsTitle from "../../PropositionsTitle";
 import PropositionsTitleMobile from "../../PropositionsTitleMobile";
-import { useCommentairesStore } from "@/stores/commentairesStore";
 
 const PersonnaliserCommentaires = () => {
   const tPersonnaliser = useTranslations("DevisPage.personnaliser");
-  const { commentaires, setCommentaires } = useCommentairesStore((s) => ({
-    commentaires: s.commentaires,
-    setCommentaires: s.setCommentaires,
-  }));
-  const { personnalisation, setPersonnalisation } = useContext(
-    PersonnalisationContext,
+  const { commentaires, setCommentaires } = useCommentairesStore(
+    useShallow((s) => ({
+      commentaires: s.commentaires,
+      setCommentaires: s.setCommentaires,
+    })),
+  );
+  const { personnalisation, setPersonnalisation } = usePersonnalisationStore(
+    useShallow((s) => ({
+      personnalisation: s.personnalisation,
+      setPersonnalisation: s.setPersonnalisation,
+    })),
   );
   const router = useRouter();
   const handleClickPrevious = () => {

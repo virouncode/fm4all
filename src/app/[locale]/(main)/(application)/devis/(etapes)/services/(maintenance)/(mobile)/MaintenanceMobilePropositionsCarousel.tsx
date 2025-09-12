@@ -4,9 +4,9 @@ import {
   CarouselApi,
   CarouselContent,
 } from "@/components/ui/carousel";
-import { MaintenanceContext } from "@/context/MaintenanceProvider";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import MaintenanceMobilePropositionCard from "./MaintenanceMobilePropositionCard";
+import { useMaintenanceStore } from "@/stores/maintenanceStore";
 
 type MaintenanceMobilePropositionsCarouselProps = {
   handleClickProposition: (proposition: {
@@ -61,7 +61,7 @@ const MaintenanceMobilePropositionsCarousel = ({
   propositions,
   handleClickProposition,
 }: MaintenanceMobilePropositionsCarouselProps) => {
-  const { maintenance } = useContext(MaintenanceContext);
+  const maintenance = useMaintenanceStore((s) => s.maintenance);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
   useEffect(() => {

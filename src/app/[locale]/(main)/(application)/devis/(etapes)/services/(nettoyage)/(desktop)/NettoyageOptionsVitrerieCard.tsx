@@ -68,7 +68,7 @@ const NettoyageOptionsVitrerieCard = ({
 }: NettoyageOptionsVitrerieCardProps) => {
   const t = useTranslations("DevisPage");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
-  const { nettoyage } = useNettoyageStore();
+  const nettoyage = useNettoyageStore((s) => s.nettoyage);
   const vitreriePrixMensuelText = vitrerieProposition.prixAnnuel ? (
     <p className="ml-4 text-xl font-bold" data-testid="total-mensuel-vitrerie">
       {formatNumber((vitrerieProposition.prixAnnuel * MARGE) / 12)}{" "}

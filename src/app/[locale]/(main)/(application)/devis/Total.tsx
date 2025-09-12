@@ -38,6 +38,7 @@ import TotalOfficeManager from "./TotalOfficeManager";
 import TotalServicesFm4All from "./TotalServicesFm4All";
 import TotalSnacksFruits from "./TotalSnacksFruits";
 import TotalThe from "./TotalThe";
+import { useShallow } from "zustand/shallow";
 
 const Total = () => {
   const t = useTranslations("Total");
@@ -59,10 +60,12 @@ const Total = () => {
   const totalServicesFm4All = useTotalServicesFm4AllStore(
     (s) => s.totalServicesFm4All,
   );
-  const { total, setTotal } = useTotalStore((s) => ({
-    total: s.total,
-    setTotal: s.setTotal,
-  }));
+  const { total, setTotal } = useTotalStore(
+    useShallow((s) => ({
+      total: s.total,
+      setTotal: s.setTotal,
+    })),
+  );
   useUpddateServicesFm4AllTotal();
 
   useEffect(() => {

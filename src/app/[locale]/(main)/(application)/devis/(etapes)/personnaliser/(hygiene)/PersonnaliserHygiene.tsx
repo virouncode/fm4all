@@ -1,20 +1,26 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { useRouter } from "@/i18n/navigation";
 import { useHygieneStore } from "@/stores/hygieneStore";
+import { usePersonnalisationStore } from "@/stores/personnalisationStore";
 import { Toilet } from "lucide-react";
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent } from "react";
+import { useShallow } from "zustand/shallow";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 
 const PersonnaliserHygieneCommentaires = () => {
-  const { hygiene, setHygiene } = useHygieneStore((s) => ({
-    hygiene: s.hygiene,
-    setHygiene: s.setHygiene,
-  }));
-  const { personnalisation, setPersonnalisation } = useContext(
-    PersonnalisationContext,
+  const { hygiene, setHygiene } = useHygieneStore(
+    useShallow((s) => ({
+      hygiene: s.hygiene,
+      setHygiene: s.setHygiene,
+    })),
+  );
+  const { personnalisation, setPersonnalisation } = usePersonnalisationStore(
+    useShallow((s) => ({
+      personnalisation: s.personnalisation,
+      setPersonnalisation: s.setPersonnalisation,
+    })),
   );
   const router = useRouter();
   const handleClickPrevious = () => {

@@ -10,12 +10,11 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE, S_PAR_MOIS } from "@/constants/constants";
-import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { useContext } from "react";
 
 type SnacksFruitsMobilePropositionCardProps = {
   proposition: {
@@ -99,7 +98,7 @@ const SnacksFruitsMobilePropositionCard = ({
   const t = useTranslations("DevisPage");
   const tSnacks = useTranslations("DevisPage.foodBeverage.snacks");
   const tGlobal = useTranslations("Global");
-  const { snacksFruits } = useContext(SnacksFruitsContext);
+  const snacksFruits = useSnacksFruitsStore((s) => s.snacksFruits);
   const {
     gamme,
     fournisseurId,

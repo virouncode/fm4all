@@ -2,19 +2,19 @@
 
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
 import { MAJORATION_DIMANCHE } from "@/constants/constants";
-import { ServicesContext } from "@/context/ServicesProvider";
 import { useNettoyageStore } from "@/stores/nettoyageStore";
 import { SelectRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
 import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
 import { SprayCan } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useContext, useRef } from "react";
+import { useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import { capitalize } from "../../../../../../../../lib/utils/capitalize";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import NettoyageOptionsPropositions from "./(desktop)/NettoyageOptionsPropositions";
+import { useServicesStore } from "@/stores/servicesStore";
 
 type NettoyageOptionsProps = {
   nettoyageTarifs: SelectNettoyageTarifsType[];
@@ -29,8 +29,8 @@ const NettoyageOptions = ({
 }: NettoyageOptionsProps) => {
   const t = useTranslations("DevisPage");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
-  const { nettoyage } = useNettoyageStore();
-  const { setServices } = useContext(ServicesContext);
+  const nettoyage = useNettoyageStore((s) => s.nettoyage);
+  const setServices = useServicesStore((s) => s.setServices);
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
   const propositionsRef = useRef<HTMLDivElement>(null);
 

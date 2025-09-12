@@ -2,21 +2,22 @@
 
 import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/constants/constants";
 import { TypesEauType } from "@/constants/typesEau";
-import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
 import { toast } from "@/hooks/use-toast";
 import { roundNbPersonnesFontaine } from "@/lib/utils/roundNbPersonnesFontaine";
+import { useClientStore } from "@/stores/clientStore";
+import { useFontainesStore } from "@/stores/fontainesStore";
+import { useTotalFontainesStore } from "@/stores/totalFontainesStore";
 import { DureeLocationFontaineType } from "@/zod-schemas/dureeLocation";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
 import { useTranslations } from "next-intl";
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent } from "react";
 import { useMediaQuery } from "react-responsive";
+import { useShallow } from "zustand/shallow";
 import FontaineDesktopEspaceInputs from "./(desktop)/FontaineDesktopEspaceInputs";
 import FontaineMobileEspaceInputs from "./(mobile)/FontaineMobileEspaceInputs";
 import { getTypeFontaine } from "./getTypeFontaine";
-import { useClientStore } from "@/stores/clientStore";
-import { useFontainesStore } from "@/stores/fontainesStore";
 type FontaineEspaceFormProps = {
   espace: FontaineEspaceType;
   fontainesModeles: SelectFontainesModelesType[];
@@ -31,11 +32,13 @@ const FontaineEspaceForm = ({
   const t = useTranslations("DevisPage");
   const tFontaines = useTranslations("DevisPage.foodBeverage.fontaines");
   const client = useClientStore((s) => s.client);
-  const { fontaines, setFontaines } = useFontainesStore((s) => ({
-    fontaines: s.fontaines,
-    setFontaines: s.setFontaines,
-  }));
-  const { setTotalFontaines } = useContext(TotalFontainesContext);
+  const { fontaines, setFontaines } = useFontainesStore(
+    useShallow((s) => ({
+      fontaines: s.fontaines,
+      setFontaines: s.setFontaines,
+    })),
+  );
+  const setTotalFontaines = useTotalFontainesStore((s) => s.setTotalFontaines);
   const fontainesEspacesIds = fontaines.espaces.map(
     (espace) => espace.infos.espaceId,
   );

@@ -2,11 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MAX_NB_DISTRIB } from "@/constants/constants";
-import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
+import { useHygieneStore } from "@/stores/hygieneStore";
+import { useTotalHygieneStore } from "@/stores/totalHygieneStore";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent } from "react";
+import { useShallow } from "zustand/shallow";
 
 type HygieneMobileOptionsBalaiInputProps = {
   nbDistribBalai: number;
@@ -56,11 +58,13 @@ const HygieneMobileOptionsBalaiInput = ({
   const t = useTranslations("DevisPage");
   const tHygiene = useTranslations("DevisPage.services.hygiene");
 
-  const { hygiene, setHygiene } = useHygieneStore((s) => ({
-    hygiene: s.hygiene,
-    setHygiene: s.setHygiene,
-  }));
-  const { setTotalHygiene } = useContext(TotalHygieneContext);
+  const { hygiene, setHygiene } = useHygieneStore(
+    useShallow((s) => ({
+      hygiene: s.hygiene,
+      setHygiene: s.setHygiene,
+    })),
+  );
+  const setTotalHygiene = useTotalHygieneStore((s) => s.setTotalHygiene);
 
   const handleIncrement = () => {
     let newNbDistribBalai = nbDistribBalai + 1;

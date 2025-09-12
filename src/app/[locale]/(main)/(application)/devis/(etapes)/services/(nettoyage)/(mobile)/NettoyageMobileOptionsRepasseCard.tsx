@@ -58,7 +58,7 @@ const NettoyageMobileOptionsRepasseCard = ({
   const t = useTranslations("DevisPage");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
   const tGlobal = useTranslations("Global");
-  const { nettoyage } = useNettoyageStore();
+  const nettoyage = useNettoyageStore((s) => s.nettoyage);
   const { gammeSelected: gamme, nomFournisseur } = nettoyage.infos;
   const totalMensuelText = repasseProposition?.prixAnnuel ? (
     <p className="text-end text-sm font-bold">

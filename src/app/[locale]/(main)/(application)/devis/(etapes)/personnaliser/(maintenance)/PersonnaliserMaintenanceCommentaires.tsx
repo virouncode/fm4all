@@ -1,17 +1,26 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { MaintenanceContext } from "@/context/MaintenanceProvider";
-import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { useRouter } from "@/i18n/navigation";
+import { useMaintenanceStore } from "@/stores/maintenanceStore";
+import { usePersonnalisationStore } from "@/stores/personnalisationStore";
 import { Wrench } from "lucide-react";
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent } from "react";
+import { useShallow } from "zustand/shallow";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 
 const PersonnaliserMaintenanceCommentaires = () => {
-  const { maintenance, setMaintenance } = useContext(MaintenanceContext);
-  const { personnalisation, setPersonnalisation } = useContext(
-    PersonnalisationContext,
+  const { maintenance, setMaintenance } = useMaintenanceStore(
+    useShallow((s) => ({
+      maintenance: s.maintenance,
+      setMaintenance: s.setMaintenance,
+    })),
+  );
+  const { personnalisation, setPersonnalisation } = usePersonnalisationStore(
+    useShallow((s) => ({
+      personnalisation: s.personnalisation,
+      setPersonnalisation: s.setPersonnalisation,
+    })),
   );
   const router = useRouter();
   const handleClickPrevious = () => {

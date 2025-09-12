@@ -6,11 +6,11 @@ import {
   MAX_NB_PORTES_COUPES_FEU,
   MAX_NB_RIA,
 } from "@/constants/constants";
-import { IncendieContext } from "@/context/IncendieProvider";
-import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
-import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
 import { roundNbAlarmes } from "@/lib/utils/roundAlarmes";
 import { roundNbExutoires } from "@/lib/utils/roundNbExutoires";
+import { useIncendieStore } from "@/stores/incendieStore";
+import { usePersonnalisationStore } from "@/stores/personnalisationStore";
+import { useTotalIncendieStore } from "@/stores/totalIncendieStore";
 import { SelectAlarmesTarifsType } from "@/zod-schemas/alarmesTarifs";
 import { SelectColonnesSechesTarifsType } from "@/zod-schemas/colonnesSechesTarifs";
 import { SelectExutoiresTarifsType } from "@/zod-schemas/exutoiresTarifs";
@@ -18,8 +18,9 @@ import { SelectPortesCoupeFeuTarifsType } from "@/zod-schemas/portesCoupeFeuTari
 import { SelectRiaTarifsType } from "@/zod-schemas/riaTarifs";
 import { FireExtinguisher } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { ChangeEvent, useContext, useRef, useState } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 import { useMediaQuery } from "react-responsive";
+import { useShallow } from "zustand/shallow";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import SecuriteIncendieComplementsInputs from "./SecuriteIncendieComplementsInputs";
@@ -44,10 +45,23 @@ const PersonnaliserIncendieComplements = ({
 }: PersonnaliserIncendieComplementsProps) => {
   const tIncendie = useTranslations("DevisPage.services.incendie");
   const tPersonnaliser = useTranslations("DevisPage.personnaliser");
-  const { incendie, setIncendie } = useContext(IncendieContext);
-  const { totalIncendie, setTotalIncendie } = useContext(TotalIncendieContext);
-  const { personnalisation, setPersonnalisation } = useContext(
-    PersonnalisationContext,
+  const { incendie, setIncendie } = useIncendieStore(
+    useShallow((s) => ({
+      incendie: s.incendie,
+      setIncendie: s.setIncendie,
+    })),
+  );
+  const { totalIncendie, setTotalIncendie } = useTotalIncendieStore(
+    useShallow((s) => ({
+      totalIncendie: s.totalIncendie,
+      setTotalIncendie: s.setTotalIncendie,
+    })),
+  );
+  const { personnalisation, setPersonnalisation } = usePersonnalisationStore(
+    useShallow((s) => ({
+      personnalisation: s.personnalisation,
+      setPersonnalisation: s.setPersonnalisation,
+    })),
   );
   const [exutoires, setExutoires] = useState(
     totalIncendie.totalExutoires ? true : false,

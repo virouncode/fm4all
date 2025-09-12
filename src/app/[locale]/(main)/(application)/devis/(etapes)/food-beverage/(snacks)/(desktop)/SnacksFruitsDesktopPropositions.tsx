@@ -1,6 +1,5 @@
-import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
+import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 import SnacksFruitsPropositionCard from "./SnacksFruitsPropositionCard";
 import SnacksFruitsPropositionLogo from "./SnacksFruitsPropositionLogo";
 
@@ -85,7 +84,7 @@ const SnacksFruitsDesktopPropositions = ({
 }: SnacksFruitsDesktopPropositionsProps) => {
   const t = useTranslations("DevisPage");
   const tSnacks = useTranslations("DevisPage.foodBeverage.snacks");
-  const { snacksFruits } = useContext(SnacksFruitsContext);
+  const snacksFruits = useSnacksFruitsStore((s) => s.snacksFruits);
 
   if (snacksFruits.infos.choix.length === 0) {
     return (

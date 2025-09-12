@@ -1,8 +1,8 @@
 "use client";
 
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
-import { ServicesContext } from "@/context/ServicesProvider";
 import { useNettoyageStore } from "@/stores/nettoyageStore";
+import { useServicesStore } from "@/stores/servicesStore";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
@@ -10,11 +10,12 @@ import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInsta
 import { SelectHygieneMinFacturationType } from "@/zod-schemas/hygieneMinFacturation";
 import { Toilet } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useContext, useRef } from "react";
+import { useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import HygienePropositions from "./HygienePropositions";
+import { useShallow } from "zustand/shallow";
 
 type HygieneProps = {
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
@@ -36,8 +37,13 @@ const Hygiene = ({
     "DevisPage.services.presentation.cards",
   );
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
-  const { nettoyage } = useNettoyageStore();
-  const { services, setServices } = useContext(ServicesContext);
+  const nettoyage = useNettoyageStore((s) => s.nettoyage);
+  const { services, setServices } = useServicesStore(
+    useShallow((s) => ({
+      services: s.services,
+      setServices: s.setServices,
+    })),
+  );
   const propositionsRef = useRef<HTMLDivElement>(null);
 
   const handleClickPrevious = () => {

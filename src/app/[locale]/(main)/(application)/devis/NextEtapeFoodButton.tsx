@@ -5,14 +5,17 @@ import { useRouter } from "@/i18n/navigation";
 import { useClientStore } from "@/stores/clientStore";
 import { useDevisProgressStore } from "@/stores/devisProgressStore";
 import { useTranslations } from "next-intl";
+import { useShallow } from "zustand/shallow";
 
 const NextEtapeFoodButton = () => {
   const t = useTranslations("DevisPage");
   const client = useClientStore((s) => s.client);
-  const { devisProgress, setDevisProgress } = useDevisProgressStore((s) => ({
-    devisProgress: s.devisProgress,
-    setDevisProgress: s.setDevisProgress,
-  }));
+  const { devisProgress, setDevisProgress } = useDevisProgressStore(
+    useShallow((s) => ({
+      devisProgress: s.devisProgress,
+      setDevisProgress: s.setDevisProgress,
+    })),
+  );
   const router = useRouter();
 
   const handleClickNext = () => {

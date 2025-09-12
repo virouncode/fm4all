@@ -1,6 +1,5 @@
 "use client";
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
-import { ServicesContext } from "@/context/ServicesProvider";
 import useScrollIntoService from "@/hooks/use-scroll-into-service";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
@@ -13,11 +12,12 @@ import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
 import { SprayCan } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useContext, useRef } from "react";
+import { useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import NettoyagePropositions from "./(desktop)/NettoyagePropositions";
+import { useServicesStore } from "@/stores/servicesStore";
 
 type NettoyageProps = {
   nettoyageQuantites: SelectNettoyageQuantitesType[];
@@ -46,7 +46,7 @@ const Nettoyage = ({
     "DevisPage.services.presentation.cards",
   );
   const t = useTranslations("DevisPage.services.nettoyage");
-  const { setServices } = useContext(ServicesContext);
+  const setServices = useServicesStore((s) => s.setServices);
   useScrollIntoService();
 
   const handleClickPrevious = () => {

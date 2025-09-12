@@ -7,12 +7,11 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
-import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
+import { useOfficeManagerStore } from "@/stores/officeManagerStore";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { useContext } from "react";
 
 type OfficeManagerPropositionCardProps = {
   proposition: {
@@ -50,7 +49,7 @@ const OfficeManagerPropositionCard = ({
   const t = useTranslations("DevisPage");
   const tOfficeManager = useTranslations("DevisPage.pilotage.officeManager");
   const tGlobal = useTranslations("Global");
-  const { officeManager } = useContext(OfficeManagerContext);
+  const officeManager = useOfficeManagerStore((s) => s.officeManager);
   const color =
     proposition.demiJParSemaine !== null &&
     demiJParSemaineConfort !== null &&

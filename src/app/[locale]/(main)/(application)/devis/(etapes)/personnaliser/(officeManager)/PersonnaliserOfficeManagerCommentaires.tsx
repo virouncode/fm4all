@@ -1,17 +1,26 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
-import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
 import { useRouter } from "@/i18n/navigation";
+import { useOfficeManagerStore } from "@/stores/officeManagerStore";
+import { usePersonnalisationStore } from "@/stores/personnalisationStore";
 import { UserRoundCog } from "lucide-react";
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent } from "react";
+import { useShallow } from "zustand/shallow";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 
 const PersonnaliserOfficeManagerCommentaires = () => {
-  const { officeManager, setOfficeManager } = useContext(OfficeManagerContext);
-  const { personnalisation, setPersonnalisation } = useContext(
-    PersonnalisationContext,
+  const { officeManager, setOfficeManager } = useOfficeManagerStore(
+    useShallow((s) => ({
+      officeManager: s.officeManager,
+      setOfficeManager: s.setOfficeManager,
+    })),
+  );
+  const { personnalisation, setPersonnalisation } = usePersonnalisationStore(
+    useShallow((s) => ({
+      personnalisation: s.personnalisation,
+      setPersonnalisation: s.setPersonnalisation,
+    })),
   );
   const router = useRouter();
   const handleClickPrevious = () => {

@@ -1,9 +1,9 @@
-import { MonDevisContext } from "@/context/MonDevisProvider";
-import { useContext, useEffect } from "react";
+import { useMonDevisStore } from "@/stores/monDevisStore";
+import { useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
 
 export default function useScrollIntoMonDevis() {
-  const { monDevis } = useContext(MonDevisContext);
+  const monDevis = useMonDevisStore((s) => s.monDevis);
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
   useEffect(() => {
     if (!isTabletOrMobile || monDevis.currentMonDevisId !== 2) return;

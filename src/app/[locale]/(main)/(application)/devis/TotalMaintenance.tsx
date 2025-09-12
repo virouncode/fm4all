@@ -1,16 +1,15 @@
 import { MARGE } from "@/constants/constants";
-import { MaintenanceContext } from "@/context/MaintenanceProvider";
-import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import { useMaintenanceStore } from "@/stores/maintenanceStore";
+import { useTotalMaintenanceStore } from "@/stores/totalMaintenanceStore";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 
 const TotalMaintenance = () => {
   const t = useTranslations("Total");
   const tMaintenance = useTranslations("DevisPage.services.maintenance");
-  const { maintenance } = useContext(MaintenanceContext);
-  const { totalMaintenance } = useContext(TotalMaintenanceContext);
+  const maintenance = useMaintenanceStore((s) => s.maintenance);
+  const totalMaintenance = useTotalMaintenanceStore((s) => s.totalMaintenance);
 
   const { totalService, totalQ18, totalLegio, totalQualiteAir } =
     totalMaintenance;
@@ -108,7 +107,7 @@ const TotalMaintenance = () => {
               </div>
             </>
           ) : null}
-          <div className="mt-2 flex items-center justify-between border-t border-foreground">
+          <div className="border-foreground mt-2 flex items-center justify-between border-t">
             <p>TOTAL</p>
             <p className="text-end" data-testid="total-maintenance">
               {formatNumber(Math.round(total * MARGE))} {t("eur-ht-an")}

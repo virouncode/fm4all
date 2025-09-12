@@ -8,14 +8,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
-import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import { useServicesFm4AllStore } from "@/stores/servicesFm4AllStore";
 import { GammeType } from "@/zod-schemas/gamme";
 import { ServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4All";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { useContext } from "react";
 
 type ServicesFm4AllMobilePropositionCardProps = {
   proposition: {
@@ -89,7 +88,7 @@ const ServicesFm4AllMobilePropositionCard = ({
   const t = useTranslations("DevisPage");
   const tFm4all = useTranslations("DevisPage.pilotage.servicesFm4all");
   const tGlobal = useTranslations("Global");
-  const { servicesFm4All } = useContext(ServicesFm4AllContext);
+  const servicesFm4All = useServicesFm4AllStore((s) => s.servicesFm4All);
   const { gamme, totalAnnuelSansRemise } = proposition;
   const color = getFm4AllColor(gamme);
 

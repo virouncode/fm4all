@@ -2,13 +2,15 @@ import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/P
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
-import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
+import { useClientStore } from "@/stores/clientStore";
 import { useNettoyageStore } from "@/stores/nettoyageStore";
+import { usePersonnalisationStore } from "@/stores/personnalisationStore";
+import { useTotalNettoyageStore } from "@/stores/totalNettoyageStore";
 import { SprayCan } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { ChangeEvent, useContext, useRef } from "react";
+import { ChangeEvent, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
+import { useShallow } from "zustand/shallow";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 
@@ -16,10 +18,18 @@ const PersonnaliserNettoyageVitrerie = () => {
   const t = useTranslations("DevisPage.services.presentation.cards");
   const tPersonnaliser = useTranslations("DevisPage.personnaliser");
   const client = useClientStore((s) => s.client);
-  const { nettoyage, setNettoyage } = useNettoyageStore();
-  const { setTotalNettoyage } = useContext(TotalNettoyageContext);
-  const { personnalisation, setPersonnalisation } = useContext(
-    PersonnalisationContext,
+  const { nettoyage, setNettoyage } = useNettoyageStore(
+    useShallow((s) => ({
+      nettoyage: s.nettoyage,
+      setNettoyage: s.setNettoyage,
+    })),
+  );
+  const setTotalNettoyage = useTotalNettoyageStore((s) => s.setTotalNettoyage);
+  const { personnalisation, setPersonnalisation } = usePersonnalisationStore(
+    useShallow((s) => ({
+      personnalisation: s.personnalisation,
+      setPersonnalisation: s.setPersonnalisation,
+    })),
   );
   const handleClickPrevious = () => {};
   const handleClickNext = () => {

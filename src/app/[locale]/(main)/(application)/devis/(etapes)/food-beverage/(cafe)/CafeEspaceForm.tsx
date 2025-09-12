@@ -7,13 +7,14 @@ import {
   RATIO_SUCRE,
 } from "@/constants/constants";
 import { TypesBoissonsType } from "@/constants/typesBoissons";
-import { TheContext } from "@/context/TheProvider";
-import { TotalCafeContext } from "@/context/TotalCafeProvider";
-import { TotalTheContext } from "@/context/TotalTheProvider";
 import { toast } from "@/hooks/use-toast";
 import { roundNbPersonnesCafeConso } from "@/lib/utils/roundNbPersonnesCafeConso";
 import { roundNbPersonnesCafeMachines } from "@/lib/utils/roundNbPersonnesCafeMachines";
 import { useCafeStore } from "@/stores/cafeStore";
+import { useClientStore } from "@/stores/clientStore";
+import { useTheStore } from "@/stores/theStore";
+import { useTotalCafeStore } from "@/stores/totalCafeStore";
+import { useTotalTheStore } from "@/stores/totalTheStore";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine";
@@ -23,11 +24,11 @@ import { DureeLocationCafeType } from "@/zod-schemas/dureeLocation";
 import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { useTranslations } from "next-intl";
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent } from "react";
 import { useMediaQuery } from "react-responsive";
+import { useShallow } from "zustand/shallow";
 import CafeDesktopEspaceInputs from "./(desktop)/CafeDesktopEspaceInputs";
 import CafeMobileEspaceInputs from "./(mobile)/CafeMobileEspaceInputs";
-import { useClientStore } from "@/stores/clientStore";
 
 type CafeEspaceFormProps = {
   espace: CafeEspaceType;
@@ -51,13 +52,15 @@ const CafeEspaceForm = ({
   const t = useTranslations("DevisPage");
   const tCafe = useTranslations("DevisPage.foodBeverage.cafe");
   const client = useClientStore((s) => s.client);
-  const { cafe, setCafe } = useCafeStore((s) => ({
-    cafe: s.cafe,
-    setCafe: s.setCafe,
-  }));
-  const { setThe } = useContext(TheContext);
-  const { setTotalCafe } = useContext(TotalCafeContext);
-  const { setTotalThe } = useContext(TotalTheContext);
+  const { cafe, setCafe } = useCafeStore(
+    useShallow((s) => ({
+      cafe: s.cafe,
+      setCafe: s.setCafe,
+    })),
+  );
+  const setThe = useTheStore((s) => s.setThe);
+  const setTotalCafe = useTotalCafeStore((s) => s.setTotalCafe);
+  const setTotalThe = useTotalTheStore((s) => s.setTotalThe);
   const isTabletOrMobile = useMediaQuery({ maxWidth: 1024 });
   const cafeEspacesIds = cafe.espaces.map((espace) => espace.infos.espaceId);
   const effectif = client.effectif ?? 0;

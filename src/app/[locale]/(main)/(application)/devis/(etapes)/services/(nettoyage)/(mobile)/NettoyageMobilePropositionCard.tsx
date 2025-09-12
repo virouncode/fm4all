@@ -64,7 +64,7 @@ const NettoyageMobilePropositionCard = ({
   const t = useTranslations("DevisPage");
   const tGlobal = useTranslations("Global");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
-  const { nettoyage } = useNettoyageStore();
+  const nettoyage = useNettoyageStore((s) => s.nettoyage);
   const {
     fournisseurId,
     gamme,

@@ -1,11 +1,12 @@
 import { MAX_PASSAGES_VITRERIE } from "@/constants/constants";
-import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useNettoyageStore } from "@/stores/nettoyageStore";
-import { ChangeEvent, useContext } from "react";
+import { useTotalNettoyageStore } from "@/stores/totalNettoyageStore";
+import { ChangeEvent } from "react";
 import { useMediaQuery } from "react-responsive";
 import NettoyageMobileOptionsPropositions from "../(mobile)/NettoyageMobileOptionsPropositions";
 import NettoyageDesktopOptionsPropositions from "./NettoyageDesktopOptionsPropositions";
+import { useShallow } from "zustand/shallow";
 
 type NettoyageOptionsPropositionsProps = {
   repasseProposition: {
@@ -79,8 +80,13 @@ const NettoyageOptionsPropositions = ({
   dimancheProposition,
   vitrerieProposition,
 }: NettoyageOptionsPropositionsProps) => {
-  const { nettoyage, setNettoyage } = useNettoyageStore();
-  const { setTotalNettoyage } = useContext(TotalNettoyageContext);
+  const { nettoyage, setNettoyage } = useNettoyageStore(
+    useShallow((s) => ({
+      nettoyage: s.nettoyage,
+      setNettoyage: s.setNettoyage,
+    })),
+  );
+  const setTotalNettoyage = useTotalNettoyageStore((s) => s.setTotalNettoyage);
   const color = getFm4AllColor(nettoyage.infos.gammeSelected);
 
   const handleClickRepasseProposition = (proposition: {

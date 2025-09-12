@@ -1,22 +1,17 @@
 "use client";
-import { useContext, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
-import { IncendieContext } from "@/context/IncendieProvider";
-import { PersonnalisationContext } from "@/context/PersonnalisationProvider";
+import { useIncendieStore } from "@/stores/incendieStore";
 import { useNettoyageStore } from "@/stores/nettoyageStore";
+import { usePersonnalisationStore } from "@/stores/personnalisationStore";
 
 export const usePersonnalisation = () => {
   // Extract all contexts
-  const { nettoyage } = useNettoyageStore();
-  // const { hygiene } = useContext(HygieneContext);
-  // const { maintenance } = useContext(MaintenanceContext);
-  const { incendie } = useContext(IncendieContext);
-  // const  cafe = useCafeStore(s=>s.cafe);
-  // const { the } = useContext(TheContext);
-  // const { snacksFruits } = useContext(SnacksFruitsContext);
-  // const { officeManager } = useContext(OfficeManagerContext);
-  // const { servicesFm4All } = useContext(ServicesFm4AllContext);
-  const { setPersonnalisation } = useContext(PersonnalisationContext);
+  const nettoyage = useNettoyageStore((s) => s.nettoyage);
+  const incendie = useIncendieStore((s) => s.incendie);
+  const setPersonnalisation = usePersonnalisationStore(
+    (s) => s.setPersonnalisation,
+  );
 
   // Utility function to derive personalization IDs
   const newPersonnalisationIds = useMemo(() => {

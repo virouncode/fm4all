@@ -1,32 +1,38 @@
 "use client";
 import { MARGE } from "@/constants/constants";
-import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
-import { ServicesFm4AllContext } from "@/context/ServicesFm4AllProvider";
-import { TotalCafeContext } from "@/context/TotalCafeProvider";
-import { TotalFontainesContext } from "@/context/TotalFontainesProvider";
-import { TotalHygieneContext } from "@/context/TotalHygieneProvider";
-import { TotalIncendieContext } from "@/context/TotalIncendieProvider";
-import { TotalMaintenanceContext } from "@/context/TotalMaintenanceProvider";
-import { TotalNettoyageContext } from "@/context/TotalNettoyageProvider";
-import { TotalOfficeManagerContext } from "@/context/TotalOfficeManagerProvider";
-import { TotalServicesFm4AllContext } from "@/context/TotalServicesFm4AllProvider";
-import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
-import { TotalTheContext } from "@/context/TotalTheProvider";
-import { useContext, useEffect } from "react";
+import { useOfficeManagerStore } from "@/stores/officeManagerStore";
+import { useServicesFm4AllStore } from "@/stores/servicesFm4AllStore";
+import { useTotalCafeStore } from "@/stores/totalCafeStore";
+import { useTotalFontainesStore } from "@/stores/totalFontainesStore";
+import { useTotalHygieneStore } from "@/stores/totalHygieneStore";
+import { useTotalIncendieStore } from "@/stores/totalIncendieStore";
+import { useTotalMaintenanceStore } from "@/stores/totalMaintenanceStore";
+import { useTotalNettoyageStore } from "@/stores/totalNettoyageStore";
+import { useTotalOfficeManagerStore } from "@/stores/totalOfficeManagerStore";
+import { useTotalServicesFm4AllStore } from "@/stores/totalServicesFm4AllStore";
+import { useTotalSnacksFruitsStore } from "@/stores/totalSnacksFruitsStore";
+import { useTotalTheStore } from "@/stores/totalTheStore";
+import { useEffect } from "react";
 
 export const useUpddateServicesFm4AllTotal = () => {
-  const { totalNettoyage } = useContext(TotalNettoyageContext);
-  const { totalHygiene } = useContext(TotalHygieneContext);
-  const { totalMaintenance } = useContext(TotalMaintenanceContext);
-  const { totalIncendie } = useContext(TotalIncendieContext);
-  const { totalCafe } = useContext(TotalCafeContext);
-  const { totalThe } = useContext(TotalTheContext);
-  const { totalSnacksFruits } = useContext(TotalSnacksFruitsContext);
-  const { totalFontaines } = useContext(TotalFontainesContext);
-  const { totalOfficeManager } = useContext(TotalOfficeManagerContext);
-  const { setTotalServicesFm4All } = useContext(TotalServicesFm4AllContext);
-  const { servicesFm4All } = useContext(ServicesFm4AllContext);
-  const { officeManager } = useContext(OfficeManagerContext);
+  const totalNettoyage = useTotalNettoyageStore((s) => s.totalNettoyage);
+  const totalHygiene = useTotalHygieneStore((s) => s.totalHygiene);
+  const totalMaintenance = useTotalMaintenanceStore((s) => s.totalMaintenance);
+  const totalIncendie = useTotalIncendieStore((s) => s.totalIncendie);
+  const totalCafe = useTotalCafeStore((s) => s.totalCafe);
+  const totalThe = useTotalTheStore((s) => s.totalThe);
+  const totalSnacksFruits = useTotalSnacksFruitsStore(
+    (s) => s.totalSnacksFruits,
+  );
+  const totalFontaines = useTotalFontainesStore((s) => s.totalFontaines);
+  const totalOfficeManager = useTotalOfficeManagerStore(
+    (s) => s.totalOfficeManager,
+  );
+  const setTotalServicesFm4All = useTotalServicesFm4AllStore(
+    (s) => s.setTotalServicesFm4All,
+  );
+  const servicesFm4All = useServicesFm4AllStore((s) => s.servicesFm4All);
+  const officeManager = useOfficeManagerStore((s) => s.officeManager);
 
   useEffect(() => {
     //mettra à jour le total des services FM4ALL

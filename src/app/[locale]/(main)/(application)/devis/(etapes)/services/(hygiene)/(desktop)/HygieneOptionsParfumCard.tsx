@@ -10,14 +10,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
-import { HygieneContext } from "@/context/HygieneProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import { useHygieneStore } from "@/stores/hygieneStore";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { Info } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent } from "react";
 
 type HygieneOptionsParfumCardProps = {
   nbDistribParfum: number;
@@ -94,7 +94,7 @@ const HygieneOptionsParfumCard = ({
   const tGlobal = useTranslations("Global");
   const tHygiene = useTranslations("DevisPage.services.hygiene");
   const locale = useLocale();
-  const { hygiene } = useContext(HygieneContext);
+  const hygiene = useHygieneStore((s) => s.hygiene);
   return (
     <div className="flex flex-1 border-b">
       <div className="flex w-1/4 flex-col items-center justify-center gap-2 p-2">

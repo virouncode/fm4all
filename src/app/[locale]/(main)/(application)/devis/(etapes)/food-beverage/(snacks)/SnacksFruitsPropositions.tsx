@@ -1,8 +1,9 @@
-import { SnacksFruitsContext } from "@/context/SnacksFruitsProvider";
-import { TotalCafeContext } from "@/context/TotalCafeProvider";
-import { TotalSnacksFruitsContext } from "@/context/TotalSnacksFruitsProvider";
 import { roundEffectif } from "@/lib/utils/roundEffectif";
 import { useCafeStore } from "@/stores/cafeStore";
+import { useClientStore } from "@/stores/clientStore";
+import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
+import { useTotalCafeStore } from "@/stores/totalCafeStore";
+import { useTotalSnacksFruitsStore } from "@/stores/totalSnacksFruitsStore";
 import { SelectBoissonsQuantitesType } from "@/zod-schemas/boissonsQuantites";
 import { SelectBoissonsTarifsType } from "@/zod-schemas/boissonsTarifs";
 import { SelectFoodLivraisonTarifsType } from "@/zod-schemas/foodLivraisonTarifs";
@@ -11,10 +12,10 @@ import { SelectFruitsTarifsType } from "@/zod-schemas/fruitsTarifs";
 import { gammes, GammeType } from "@/zod-schemas/gamme";
 import { SelectSnacksQuantitesType } from "@/zod-schemas/snacksQuantites";
 import { SelectSnacksTarifsType } from "@/zod-schemas/snacksTarifs";
-import { useContext } from "react";
 import { useMediaQuery } from "react-responsive";
 import SnacksFruitsDesktopPropositions from "./(desktop)/SnacksFruitsDesktopPropositions";
 import SnacksFruitsMobilePropositions from "./(mobile)/SnacksFruitsMobilePropositions";
+import { useShallow } from "zustand/shallow";
 
 type SnacksFruitsPropositionsType = {
   fruitsQuantites: SelectFruitsQuantitesType[];
@@ -35,11 +36,18 @@ const SnacksFruitsPropositions = ({
   boissonsTarifs,
   foodLivraisonTarifs,
 }: SnacksFruitsPropositionsType) => {
-  const { snacksFruits, setSnacksFruits } = useContext(SnacksFruitsContext);
-  const { setTotalSnacksFruits } = useContext(TotalSnacksFruitsContext);
+  const { snacksFruits, setSnacksFruits } = useSnacksFruitsStore(
+    useShallow((s) => ({
+      snacksFruits: s.snacksFruits,
+      setSnacksFruits: s.setSnacksFruits,
+    })),
+  );
+  const setTotalSnacksFruits = useTotalSnacksFruitsStore(
+    (s) => s.setTotalSnacksFruits,
+  );
   const client = useClientStore((s) => s.client);
   const cafe = useCafeStore((s) => s.cafe);
-  const { totalCafe } = useContext(TotalCafeContext);
+  const totalCafe = useTotalCafeStore((s) => s.totalCafe);
   const effectif = client.effectif ?? 0;
   const nbPersonnes = snacksFruits.quantites.nbPersonnes ?? effectif;
 

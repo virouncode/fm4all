@@ -53,6 +53,7 @@ import { Loader } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useShallow } from "zustand/shallow";
 import { fullReinitialisationDevis } from "./fullReinitialisationDevis";
 import { reinitialisationDevis } from "./reinitialisationDevis";
 import ServicesLoader from "./ServicesLoader";
@@ -62,10 +63,12 @@ const MesLocaux = () => {
   const tDevisButton = useTranslations("devisButton");
   const tErrors = useTranslations("DevisPage.locaux.locauxForm.erreurs");
   const [loading, setLoading] = useState(false);
-  const { devisProgress, setDevisProgress } = useDevisProgressStore((s) => ({
-    devisProgress: s.devisProgress,
-    setDevisProgress: s.setDevisProgress,
-  }));
+  const { devisProgress, setDevisProgress } = useDevisProgressStore(
+    useShallow((s) => ({
+      devisProgress: s.devisProgress,
+      setDevisProgress: s.setDevisProgress,
+    })),
+  );
   const setServices = useServicesStore((s) => s.setServices);
   const setFoodBeverage = useFoodBeverageStore((s) => s.setFoodBeverage);
   const setManagement = useManagementStore((s) => s.setManagement);
@@ -73,11 +76,13 @@ const MesLocaux = () => {
     (s) => s.setPersonnalisation,
   );
   const setMonDevis = useMonDevisStore((s) => s.setMonDevis);
-  const { client, setClient } = useClientStore((s) => ({
-    client: s.client,
-    setClient: s.setClient,
-  }));
-  const { setNettoyage } = useNettoyageStore();
+  const { client, setClient } = useClientStore(
+    useShallow((s) => ({
+      client: s.client,
+      setClient: s.setClient,
+    })),
+  );
+  const setNettoyage = useNettoyageStore((s) => s.setNettoyage);
   const setHygiene = useHygieneStore((s) => s.setHygiene);
   const setMaintenance = useMaintenanceStore((s) => s.setMaintenance);
   const setIncendie = useIncendieStore((s) => s.setIncendie);

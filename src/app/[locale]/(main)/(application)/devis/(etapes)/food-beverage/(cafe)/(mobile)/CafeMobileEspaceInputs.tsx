@@ -13,6 +13,7 @@ import { MAX_EFFECTIF } from "@/constants/constants";
 import { locationCafeMachine } from "@/constants/locationCafeMachine";
 import { typesBoissons } from "@/constants/typesBoissons";
 import { useCafeStore } from "@/stores/cafeStore";
+import { useClientStore } from "@/stores/clientStore";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";

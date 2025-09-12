@@ -2,9 +2,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
-import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
+import { useOfficeManagerStore } from "@/stores/officeManagerStore";
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 
 type OfficeManagerMobileInputsProps = {
   demiJParSemaineEssentiel: number | null;
@@ -24,7 +23,7 @@ const OfficeManagerMobileInputs = ({
 }: OfficeManagerMobileInputsProps) => {
   const t = useTranslations("DevisPage");
   const tOfficeManager = useTranslations("DevisPage.pilotage.officeManager");
-  const { officeManager } = useContext(OfficeManagerContext);
+  const officeManager = useOfficeManagerStore((s) => s.officeManager);
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-4">
@@ -40,7 +39,7 @@ const OfficeManagerMobileInputs = ({
         <div className="flex items-center gap-2">
           <Checkbox
             id="premium"
-            className="bg-background font-bold data-[state=checked]:bg-background data-[state=checked]:text-foreground"
+            className="bg-background data-[state=checked]:bg-background data-[state=checked]:text-foreground font-bold"
             checked={officeManager.infos.premium}
             onCheckedChange={handleCheckPremium}
             aria-label={tOfficeManager("selectionner-loption-premium")}

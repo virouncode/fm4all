@@ -20,7 +20,7 @@ import TotalThe from "../TotalThe";
 
 const DevisSynthese = () => {
   const client = useClientStore((s) => s.client);
-  const { total } = useTotalStore();
+  const total = useTotalStore((s) => s.total);
   const t = useTranslations("Total");
 
   return (

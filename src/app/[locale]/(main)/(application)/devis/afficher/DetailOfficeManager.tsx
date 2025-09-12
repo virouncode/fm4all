@@ -8,14 +8,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { MARGE } from "@/constants/constants";
-import { OfficeManagerContext } from "@/context/OfficeManagerProvider";
-import { TotalOfficeManagerContext } from "@/context/TotalOfficeManagerProvider";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { useContext } from "react";
+import { useOfficeManagerStore } from "@/stores/officeManagerStore";
+import { useTotalOfficeManagerStore } from "@/stores/totalOfficeManagerStore";
 
 const DetailOfficeManager = () => {
-  const { officeManager } = useContext(OfficeManagerContext);
-  const { totalOfficeManager } = useContext(TotalOfficeManagerContext);
+  const officeManager = useOfficeManagerStore((s) => s.officeManager);
+  const totalOfficeManager = useTotalOfficeManagerStore(
+    (s) => s.totalOfficeManager,
+  );
   if (!totalOfficeManager.totalService) return null;
   return (
     <Table className="detail-section border">
