@@ -15,6 +15,7 @@ import useScrollIntoMonDevis from "@/hooks/use-scroll-into-mon-devis";
 import { toast } from "@/hooks/use-toast";
 import { Link, useRouter } from "@/i18n/navigation";
 import { sendEmailFromClient } from "@/lib/email/sendEmail";
+import { postVercelBlob } from "@/lib/queries/vercel-blob/postVercelBlob";
 import fillDevis from "@/lib/utils/fillDevis";
 import { useClientStore } from "@/stores/clientStore";
 import { useCommentairesStore } from "@/stores/commentairesStore";
@@ -155,14 +156,11 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
               const blob = await responseBlob.blob();
               const file = new File([blob], nomDevis);
               //Dans vercel blob
-              const response = await fetch(
-                `/api/vercelblob?filename=${nomDevis}&foldername=devis`,
-                {
-                  method: "POST",
-                  body: file,
-                },
-              );
-              const urlToPost: string = (await response.json()).url;
+              const urlToPost: string = await postVercelBlob({
+                file,
+                filename: nomDevis,
+                foldername: "devis",
+              });
               executeSaveDevis({
                 clientId: newClientData.id,
                 devisUrl: urlToPost,
