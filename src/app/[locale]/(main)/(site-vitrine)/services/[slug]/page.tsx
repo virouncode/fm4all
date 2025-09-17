@@ -27,7 +27,7 @@ import { notFound } from "next/navigation";
 import FAQService from "./FAQService";
 
 export const dynamic = "force-static";
-export const dynamicParams = false;
+// export const dynamicParams = false; //permet de retourner 404 si le slug n'existe pas, mais on préfère appeler nous memes notFound() pour personnaliser la page 404
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
 type SanityImageValue = {
