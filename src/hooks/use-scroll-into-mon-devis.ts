@@ -5,8 +5,10 @@ import { useMediaQuery } from "react-responsive";
 export default function useScrollIntoMonDevis() {
   const monDevis = useMonDevisStore((s) => s.monDevis);
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
+  console.log("useScrollIntoMonDevis", monDevis);
+
   useEffect(() => {
-    if (!isTabletOrMobile || monDevis.currentMonDevisId !== 2) return;
+    if (isTabletOrMobile || monDevis.currentMonDevisId !== 2) return;
     const currentMonDevis = document.getElementById(
       monDevis.currentMonDevisId.toString(),
     );
