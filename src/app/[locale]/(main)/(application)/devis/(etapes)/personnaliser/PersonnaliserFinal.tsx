@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { useRouter } from "@/i18n/navigation";
 import { useDevisProgressStore } from "@/stores/devisProgressStore";
+import { usePersonnalisationStore } from "@/stores/personnalisationStore";
 import { useTranslations } from "next-intl";
 import { useMediaQuery } from "react-responsive";
-import PreviousServiceButton from "../../PreviousServiceButton";
-import { usePersonnalisationStore } from "@/stores/personnalisationStore";
 import { useShallow } from "zustand/shallow";
+import PreviousServiceButton from "../../PreviousServiceButton";
 
 const PersonnaliserFinal = () => {
   const tPersonnaliser = useTranslations("DevisPage.personnaliser");
@@ -17,6 +17,7 @@ const PersonnaliserFinal = () => {
     })),
   );
   const router = useRouter();
+
   const handleAfficherDevis = () => {
     setDevisProgress({
       currentStep: 7,
@@ -26,6 +27,7 @@ const PersonnaliserFinal = () => {
       pathname: "/devis/afficher",
     });
   };
+
   const handleClickPrevious = () => {
     const currentIndex = personnalisation.personnalisationIds.indexOf(14);
     setPersonnalisation((prev) => ({

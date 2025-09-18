@@ -31,6 +31,7 @@ const SauvegarderProgression = () => {
   const t = useTranslations("DevisPage");
   const tSauverErreurs = useTranslations("DevisPage.sauver.erreurs");
   const tSauver = useTranslations("DevisPage.sauver");
+  const [loading, setLoading] = useState(false);
   const { client, setClient } = useClientStore(
     useShallow((s) => ({
       client: s.client,
@@ -126,6 +127,8 @@ const SauvegarderProgression = () => {
   });
 
   const submitForm = async (data: InsertClientType) => {
+    console.log("submit");
+
     if (!accepte) {
       toast({
         variant: "destructive",
@@ -174,12 +177,15 @@ const SauvegarderProgression = () => {
     ].sort((a, b) => a - b);
     setDevisProgress({ currentStep: 6, completedSteps: newCompletedSteps });
     setClient(data);
+    setLoading(true);
     setTimeout(() => {
       router.push("/devis/personnaliser");
     }, 1000);
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    console.log("handle change", client);
+
     const { name, value } = e.target;
     setClient((prev) => ({
       ...prev,
@@ -307,7 +313,7 @@ const SauvegarderProgression = () => {
                 disabled={!accepte}
                 data-testid="sauvegarder-progression-button"
               >
-                {isSavingClient || isSavingDevisTemporaire ? (
+                {isSavingClient || isSavingDevisTemporaire || loading ? (
                   <LoaderCircle className="animate-spin" />
                 ) : (
                   t("suivant")

@@ -21,9 +21,9 @@ export const fillDevis = async (
   dateDemarrage: string | null,
 ) => {
   try {
-    const formPdfBytes = await fetch("/pdf/fm4all_devis_template_NEW.pdf").then(
-      (res) => res.arrayBuffer(),
-    );
+    const formPdfBytes = await fetch(
+      "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/fm4all_devis_template_NEW.pdf",
+    ).then((res) => res.arrayBuffer());
     // Load the PDF document
     const pdfDoc = await PDFDocument.load(formPdfBytes);
     const form = pdfDoc.getForm();

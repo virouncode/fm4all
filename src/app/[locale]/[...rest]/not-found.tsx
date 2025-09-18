@@ -9,7 +9,6 @@ export default function NotFoundPage() {
         <h2 className="text-center text-lg font-bold text-red-500">
           {t("erreur-404-page-non-trouvee")}
         </h2>
-
         <BackButton title={t("retour")} size="lg" className="text-base" />
       </div>
     </div>
