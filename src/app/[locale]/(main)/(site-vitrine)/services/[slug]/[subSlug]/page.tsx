@@ -30,8 +30,8 @@ import { notFound } from "next/navigation";
 import { Service } from "../../../../../../../../sanity.types";
 import FAQService from "../FAQService";
 
-export const dynamic = "force-static";
-export const dynamicParams = false;
+// export const dynamic = "force-static";
+// export const dynamicParams = false;
 
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
@@ -111,9 +111,11 @@ export const generateMetadata = async ({
   return generateAlternates(
     "serviceVille",
     locale,
-    service.baliseTitle ?? "",
-    service.baliseDescription ?? "",
-    service.imagePrincipale ? urlFor(service.imagePrincipale).url() : undefined,
+    service?.baliseTitle ?? "",
+    service?.baliseDescription ?? "",
+    service?.imagePrincipale
+      ? urlFor(service.imagePrincipale).url()
+      : undefined,
     {
       fr: {
         slug: locale === "fr" ? slug : getServicesSlugFr(slug),
@@ -159,7 +161,6 @@ export default async function page({
   const service = await getServiceVille(slug, subSlug, locale as LocaleType);
 
   if (!service) {
-    console.log("Service not found");
     notFound();
   }
 
@@ -324,11 +325,7 @@ export default async function page({
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink className="flex items-center" asChild>
-              <Link
-                href={`/services`}
-                locale={locale}
-                title={t("nos-services")}
-              >
+              <Link href={`/services`} title={t("nos-services")}>
                 {t("nos-services")}
               </Link>
             </BreadcrumbLink>
@@ -338,7 +335,6 @@ export default async function page({
             <BreadcrumbLink className="flex items-center" asChild>
               <Link
                 href={{ pathname: `/services/[slug]`, params: { slug: slug } }}
-                locale={locale}
                 title={serviceAssocie.titreCard}
               >
                 {serviceAssocie.titreCard}
@@ -386,7 +382,7 @@ export default async function page({
         })}
       <CTAContactButtons />
       {service.faq && Array.isArray(service.faq) && service.faq.length > 0 && (
-        <FAQService service={service} locale={locale} />
+        <FAQService service={service} />
       )}
     </main>
   );

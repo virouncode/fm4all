@@ -26,8 +26,9 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import FAQService from "./FAQService";
 
-export const dynamic = "force-static";
-// export const dynamicParams = false; //permet de retourner 404 si le slug n'existe pas, mais on préfère appeler nous memes notFound() pour personnaliser la page 404
+// export const dynamic = "force-static";
+// export const revalidate = 60;
+// export const dynamicParams = false; //permet de retourner 404 si le slug n'existe pas, mais on préfère appeler nous-memes notFound() pour personnaliser la page 404
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
 type SanityImageValue = {
@@ -117,9 +118,11 @@ export const generateMetadata = async ({
   return generateAlternates(
     "servicePresentation",
     locale,
-    service.baliseTitle ?? "",
-    service.baliseDescription ?? "",
-    service.imagePrincipale ? urlFor(service.imagePrincipale).url() : undefined,
+    service?.baliseTitle ?? "",
+    service?.baliseDescription ?? "",
+    service?.imagePrincipale
+      ? urlFor(service.imagePrincipale).url()
+      : undefined,
     {
       fr: locale === "fr" ? slug : getServicesSlugFr(slug),
       en: locale === "en" ? slug : getServicesSlugEn(slug),
@@ -140,7 +143,6 @@ export default async function page({
   const service = await getService(slug);
 
   if (!service) {
-    console.log("Service not found");
     notFound();
   }
 
@@ -303,11 +305,7 @@ export default async function page({
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink className="flex items-center" asChild>
-              <Link
-                href={`/services`}
-                locale={locale}
-                title={t("nos-services")}
-              >
+              <Link href={`/services`} title={t("nos-services")}>
                 {t("nos-services")}
               </Link>
             </BreadcrumbLink>
@@ -351,7 +349,7 @@ export default async function page({
         })}
       <CTAContactButtons />
       {service.faq && Array.isArray(service.faq) && service.faq.length > 0 && (
-        <FAQService service={service} locale={locale} />
+        <FAQService service={service} />
       )}
     </main>
   );

@@ -25,8 +25,8 @@ import { PortableTextBlock, PortableTextComponentProps } from "next-sanity";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
-export const dynamic = "force-static";
-export const dynamicParams = false;
+// export const dynamic = "force-static";
+// export const dynamicParams = false;
 
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
@@ -106,9 +106,11 @@ export const generateMetadata = async ({
   return generateAlternates(
     "secteurPresentation",
     locale,
-    secteur.baliseTitle ?? "",
-    secteur.baliseDescription ?? "",
-    secteur.imagePrincipale ? urlFor(secteur.imagePrincipale).url() : undefined,
+    secteur?.baliseTitle ?? "",
+    secteur?.baliseDescription ?? "",
+    secteur?.imagePrincipale
+      ? urlFor(secteur.imagePrincipale).url()
+      : undefined,
     {
       fr: locale === "fr" ? slug : getSecteurSlugFr(slug),
       en: locale === "en" ? slug : getSecteurSlugEn(slug),
@@ -306,7 +308,6 @@ const page = async ({
             <BreadcrumbLink className="flex items-center" asChild>
               <Link
                 href={`/secteurs`}
-                locale={locale}
                 title={tSecteurs("nos-secteurs-dintervention")}
               >
                 {tSecteurs("nos-secteurs-dintervention")}

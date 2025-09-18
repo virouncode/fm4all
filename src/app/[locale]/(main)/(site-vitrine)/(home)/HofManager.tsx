@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { getArticle } from "@/sanity/queries";
 import { getLocale, getTranslations } from "next-intl/server";
+import Image from "next/image";
 import { ArticleCategory } from "../../../../../../sanity.types";
 
 const HofManager = async () => {
@@ -19,11 +20,22 @@ const HofManager = async () => {
       ? "hof-managers-un-nouveau-concept"
       : "hof-managers-a-new-concept",
   );
+  if (!article) return null;
   const categorie = article.categorie as ArticleCategory;
   return (
     article.subSlug?.current &&
-    categorie.slug?.current && (
-      <section className="bg-hof-img hidden h-[600px] bg-cover bg-no-repeat md:block">
+    categorie?.slug?.current && (
+      <section className="relative hidden h-[600px] bg-cover bg-no-repeat md:block">
+        <div className="absolute inset-0 -z-10">
+          <Image
+            src="/img/hof_managers.webp"
+            alt="un hof manager"
+            className="object-cover"
+            quality={75}
+            fill
+            sizes="100vw"
+          />
+        </div>
         <div className="mx-auto flex h-full w-full max-w-7xl items-end rounded-lg p-6">
           <Card className="mb-10 ml-10 w-1/3">
             <CardHeader>

@@ -10,8 +10,6 @@ export const gtag_report_conversion_contact = (
   newTab: boolean = false,
 ) => {
   if (typeof window.gtag !== "undefined") {
-    console.log("sendTo", sendTo);
-
     window.gtag("event", "conversion", {
       send_to: `AW-17528670078/${sendTo}`,
     });

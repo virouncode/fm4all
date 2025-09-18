@@ -1,7 +1,7 @@
 import CacheInvalidationListener from "@/components/cache/CacheInvalidationListener";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { notFound } from "next/navigation";
-import SidebarFournisseur from "../SidebarFournisseur";
+import SidebarFournisseur from "./SidebarFournisseur";
 
 const FournisseurLayout = async ({
   children,
@@ -17,7 +17,6 @@ const FournisseurLayout = async ({
 
   return (
     <>
-      {/* <HeaderFournisseur /> */}
       <SidebarProvider>
         <SidebarFournisseur fournisseurId={parseInt(fournisseurId)} />
         <CacheInvalidationListener />

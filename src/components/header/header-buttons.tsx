@@ -2,6 +2,7 @@
 
 import { usePathname } from "@/i18n/navigation";
 import { Menu, X } from "lucide-react";
+import { useLocale } from "next-intl";
 import { Suspense } from "react";
 import ContactButton from "../buttons/contact-button";
 import DevisButton from "../buttons/devis-button";
@@ -10,16 +11,15 @@ import LocaleButton from "../buttons/locale-button";
 import UserButton from "../buttons/UserButton";
 
 type HeaderButtonsProps = {
-  locale: string;
   isMobileNavOpen: boolean;
   setIsMobileNavOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const HeaderButtons = ({
-  locale,
   isMobileNavOpen,
   setIsMobileNavOpen,
 }: HeaderButtonsProps) => {
+  const locale = useLocale();
   const path = usePathname();
   const handleShowMobileNav = () => {
     setIsMobileNavOpen(true);

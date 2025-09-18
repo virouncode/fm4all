@@ -1,4 +1,5 @@
 import CookieBanner from "@/components/banners/CookieBanner";
+import Footer from "@/components/footer/footer";
 import Header from "@/components/header/header";
 import { routing } from "@/i18n/routing";
 
@@ -57,6 +58,7 @@ export default async function SiteLayout({
     <>
       <Header />
       {children}
+      <Footer />
       <CookieBanner />
     </>
   );

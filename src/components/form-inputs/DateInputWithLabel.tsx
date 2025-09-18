@@ -93,7 +93,7 @@ export function DateInputWithLabel<S>({
                 }}
                 disabled={(date: Date) => date < new Date()}
                 initialFocus
-                className="rounded-xl border-2 bg-background"
+                className="bg-background rounded-xl border-2"
                 fromDate={new Date()}
               />
             </PopoverContent>

@@ -4,7 +4,7 @@ import ContactButton from "@/components/buttons/contact-button";
 import LocaleButton from "@/components/buttons/locale-button";
 import UserButton from "@/components/buttons/UserButton";
 import { Link } from "@/i18n/navigation";
-import { LocaleType, PathnamesType } from "@/i18n/routing";
+import { PathnamesType } from "@/i18n/routing";
 import {
   Banana,
   Building,
@@ -323,7 +323,6 @@ const Header = () => {
           </Link>
           {!isTablet && (
             <HeaderNavigationMenu
-              locale={locale as LocaleType}
               services={services}
               secteurs={secteurs}
               orientation="horizontal"
@@ -332,7 +331,6 @@ const Header = () => {
           )}
         </div>
         <HeaderButtons
-          locale={locale as LocaleType}
           isMobileNavOpen={isMobileNavOpen}
           setIsMobileNavOpen={setIsMobileNavOpen}
         />
@@ -356,7 +354,6 @@ const Header = () => {
               <UserButton setIsMobileNavOpen={setIsMobileNavOpen} />
             </div>
             <HeaderNavigationMenu
-              locale={locale as LocaleType}
               services={services}
               secteurs={secteurs}
               orientation="vertical"

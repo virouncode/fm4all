@@ -83,6 +83,8 @@ export async function middleware(req: NextRequest) {
     const pathSegments = pathnameWithoutLocale.split("/").filter(Boolean);
     //BLOG
     const articleRedirect = handleArticleRedirects(req, pathSegments, locale);
+    console.log("Article Redirect:", articleRedirect);
+
     if (articleRedirect) return articleRedirect;
     //SERVICES
     const serviceRedirect = handleServiceRedirects(req, pathSegments, locale);

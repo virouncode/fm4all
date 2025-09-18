@@ -26,8 +26,6 @@ import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
 export const getIncendieQuantite = async (surface: string) => {
   "use cache";
-  console.log("surface", surface);
-
   cacheTag(getSurfaceTag("incendieQuantites", surface));
   console.log(`🔍 DB REQUEST: getIncendieQuantite(${surface})`);
   const roundedSurface = roundSurface(parseInt(surface));

@@ -1,21 +1,15 @@
 import ImgCardVertical from "@/components/cards/ImgCardVertical";
-import { LocaleType } from "@/i18n/routing";
 import { urlFor } from "@/sanity/lib/image";
 import { getTranslations } from "next-intl/server";
 import { Article, ArticleCategory } from "../../../../../../../sanity.types";
 
 type ArticlesCardsProps = {
   articles: Article[];
-  locale: LocaleType;
   categorie: ArticleCategory;
 };
 
-const ArticlesCards = async ({
-  articles,
-  locale,
-  categorie,
-}: ArticlesCardsProps) => {
-  const t = await getTranslations({ locale, namespace: "Global" });
+const ArticlesCards = async ({ articles, categorie }: ArticlesCardsProps) => {
+  const t = await getTranslations("Global");
 
   return (
     <div className="mt-6 grid w-full grid-cols-[repeat(auto-fit,minmax(250px,1fr))] items-center gap-6">
@@ -38,7 +32,6 @@ const ArticlesCards = async ({
               pathname: "/blog/[slug]/[subSlug]",
               params: { slug: articleSlug, subSlug: articleSubSlug },
             }}
-            locale={locale}
             linkText={article.linkText ?? articleSubSlug}
           >
             <div className="flex h-52 flex-col gap-4 p-4">

@@ -8,7 +8,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { LocaleType, PathnamesType } from "@/i18n/routing";
+import { PathnamesType } from "@/i18n/routing";
 import {
   Factory,
   HandPlatter,
@@ -25,9 +25,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Link, usePathname } from "@/i18n/navigation";
+import { useLocale } from "next-intl";
 
 type HeaderNavigationMenuProps = {
-  locale: LocaleType;
   services: {
     title: string;
     href: {
@@ -50,12 +50,12 @@ type HeaderNavigationMenuProps = {
 };
 
 const HeaderNavigationMenu = ({
-  locale,
   services,
   secteurs,
   orientation,
   handleHideMobileNav,
 }: HeaderNavigationMenuProps) => {
+  const locale = useLocale();
   const path = usePathname();
   const isActive = (href: string) => {
     if (href === "/") return path === "/";
@@ -315,7 +315,6 @@ const HeaderNavigationMenu = ({
                     locale === "fr" ? "Tous nos secteurs" : "All our sectors"
                   }
                   className="flex w-full items-center gap-4 !text-lg hover:underline"
-                  locale={locale}
                 >
                   <Factory className="size-5" />
                   <span>

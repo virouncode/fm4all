@@ -34,8 +34,8 @@ import {
   SanityImageHotspot,
 } from "../../../../../../../../sanity.types";
 
-export const dynamic = "force-static";
-export const dynamicParams = false;
+// export const dynamic = "force-static";
+// export const dynamicParams = false;
 
 // Custom components for PortableText
 type BlockComponentProps = PortableTextComponentProps<PortableTextBlock>;
@@ -118,9 +118,11 @@ export const generateMetadata = async ({
   return generateAlternates(
     "blogArticle",
     locale,
-    article.baliseTitle ?? "",
-    article.baliseDescription ?? "",
-    article.imagePrincipale ? urlFor(article.imagePrincipale).url() : undefined,
+    article?.baliseTitle ?? "",
+    article?.baliseDescription ?? "",
+    article?.imagePrincipale
+      ? urlFor(article.imagePrincipale).url()
+      : undefined,
     {
       fr: {
         slug: locale === "fr" ? slug : getArticlesSlugFr(slug),
@@ -352,9 +354,7 @@ const page = async ({
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink className="flex items-center" asChild>
-              <Link href={"/blog"} locale={locale}>
-                {tGlobal("articles")}
-              </Link>
+              <Link href={"/blog"}>{tGlobal("articles")}</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -366,7 +366,6 @@ const page = async ({
                     pathname: `/blog/[slug]`,
                     params: { slug: categorieSlug },
                   }}
-                  locale={locale}
                 >
                   {capitalize(categorie.titre)}
                 </Link>
@@ -416,7 +415,6 @@ const page = async ({
         prenom={auteur.prenom}
         nom={auteur.nom}
         date={article.date}
-        locale={locale}
       />
       <CTAContactButtons />
     </main>

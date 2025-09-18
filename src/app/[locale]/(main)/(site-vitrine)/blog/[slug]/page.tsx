@@ -25,8 +25,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import ArticlesCards from "./ArticlesCards";
 
-export const dynamic = "force-static";
-export const dynamicParams = false;
+// export const dynamic = "force-static";
+// export const dynamicParams = false;
 
 export const generateMetadata = async ({
   params,
@@ -39,9 +39,9 @@ export const generateMetadata = async ({
   return generateAlternates(
     "blogCategorie",
     locale,
-    categorie.baliseTitle ?? "",
-    categorie.baliseDescription ?? "",
-    categorie.imagePrincipale
+    categorie?.baliseTitle ?? "",
+    categorie?.baliseDescription ?? "",
+    categorie?.imagePrincipale
       ? urlFor(categorie.imagePrincipale).url()
       : undefined,
     {
@@ -73,7 +73,6 @@ const page = async ({
   const tGlobal = await getTranslations({ locale, namespace: "Global" });
   const categorie = await getCategorie(slug);
   if (!categorie) {
-    console.log("Categorie non trouvée");
     notFound();
   }
   const articles = await getArticlesOfCategorie(
@@ -97,9 +96,7 @@ const page = async ({
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink className="flex items-center" asChild>
-              <Link href={"/blog"} locale={locale}>
-                {tGlobal("articles")}
-              </Link>
+              <Link href={"/blog"}>{tGlobal("articles")}</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -112,11 +109,7 @@ const page = async ({
         {tGlobal("nos-articles-sur-and-quot")}
         &quot;{categorie.titre}&quot;
       </h1>
-      <ArticlesCards
-        categorie={categorie}
-        articles={articles}
-        locale={locale as LocaleType}
-      />
+      <ArticlesCards categorie={categorie} articles={articles} />
     </main>
   );
 };

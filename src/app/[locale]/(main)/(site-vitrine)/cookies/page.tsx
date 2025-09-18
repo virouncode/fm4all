@@ -257,7 +257,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
         <h1 className="text-4xl">
           {t("politique-relative-aux-cookies-de-fm4all")}
         </h1>
-        <div className="md:3/4 mx-auto flex flex-col gap-6 hyphens-auto text-wrap lg:w-2/3">
+        <div className="md:3/4 mx-auto flex flex-col gap-6 text-wrap hyphens-auto lg:w-2/3">
           <p>{t("derniere-mise-a-jour-04-03-2025")}</p>
           <p>
             {t(
@@ -269,7 +269,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("1-qu-est-ce-qu-un-cookie")}
           </h2>
-          <div className="md:3/4 mx-auto flex flex-col hyphens-auto text-wrap lg:w-2/3">
+          <div className="md:3/4 mx-auto flex flex-col text-wrap hyphens-auto lg:w-2/3">
             <p>
               {t(
                 "les-cookies-sont-de-petits-fichiers-texte-qui-sont-places-sur-votre-ordinateur-ou-votre-appareil-mobile-lorsque-vous-visitez-un-site-web-ils-sont-largement-utilises-pour-permettre-aux-sites-web-de-fonctionner-plus-efficacement-ainsi-que-pour-fournir-des-informations-aux-proprietaires-du-site",
@@ -281,7 +281,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("2-types-de-cookies-que-nous-utilisons")}
           </h2>
-          <div className="md:3/4 mx-auto flex flex-col gap-6 hyphens-auto text-wrap lg:w-2/3">
+          <div className="md:3/4 mx-auto flex flex-col gap-6 text-wrap hyphens-auto lg:w-2/3">
             <p>{t("nous-utilisons-les-types-de-cookies-suivants")}</p>
             <ul className="ml-10 flex flex-col gap-4">
               <li className="list-disc">
@@ -321,7 +321,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("4-comment-gerer-les-cookies")}
           </h2>
-          <div className="md:3/4 mx-auto flex flex-col gap-6 hyphens-auto text-wrap lg:w-2/3">
+          <div className="md:3/4 mx-auto flex flex-col gap-6 text-wrap hyphens-auto lg:w-2/3">
             <p>
               {t(
                 "vous-pouvez-gerer-vos-preferences-en-matiere-de-cookies-a-tout-moment",
@@ -350,7 +350,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("5-consentement-aux-cookies")}
           </h2>
-          <div className="md:3/4 mx-auto flex flex-col gap-2 hyphens-auto text-wrap lg:w-2/3">
+          <div className="md:3/4 mx-auto flex flex-col gap-2 text-wrap hyphens-auto lg:w-2/3">
             <p>
               {t(
                 "lors-de-votre-premiere-visite-sur-notre-site-une-banniere-de-consentement-aux-cookies-s-affiche-cette-banniere-vous-permet-d-accepter-ou-de-refuser-les-cookies-non-essentiels-votre-consentement-est-enregistre-pour-une-duree-de-6-mois",
@@ -362,7 +362,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("6-modifications-de-cette-politique")}
           </h2>
-          <div className="md:3/4 mx-auto flex flex-col gap-2 hyphens-auto text-wrap lg:w-2/3">
+          <div className="md:3/4 mx-auto flex flex-col gap-2 text-wrap hyphens-auto lg:w-2/3">
             <p>
               {t(
                 "nous-pouvons-mettre-a-jour-cette-politique-relative-aux-cookies-de-temps-a-autre-toute-modification-sera-publiee-sur-cette-page-avec-une-date-de-mise-a-jour-revisee",
@@ -374,7 +374,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("7-nous-contacter")}
           </h2>
-          <div className="md:3/4 mx-auto flex flex-col gap-2 hyphens-auto text-wrap lg:w-2/3">
+          <div className="md:3/4 mx-auto flex flex-col gap-2 text-wrap hyphens-auto lg:w-2/3">
             <p>
               {t(
                 "si-vous-avez-des-questions-concernant-cette-politique-relative-aux-cookies-veuillez-nous-contacter-a",

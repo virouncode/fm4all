@@ -1,4 +1,5 @@
 import { DateTime } from "luxon";
+import { useLocale } from "next-intl";
 import Image from "next/image";
 
 type AuthorProps = {
@@ -7,7 +8,6 @@ type AuthorProps = {
   prenom: string;
   nom: string;
   date?: string;
-  locale: string;
 };
 
 const Author = ({
@@ -16,8 +16,8 @@ const Author = ({
   prenom,
   nom,
   date,
-  locale,
 }: AuthorProps) => {
+  const locale = useLocale();
   return (
     <div className="mb-10 flex items-center justify-end gap-4">
       {portraitUrl ? (

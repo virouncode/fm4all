@@ -22,7 +22,7 @@ describe("Author", () => {
   ])(
     "renders formatted date based on locale %s if date is provided",
     (locale) => {
-      render(<Author {...baseProps} locale={locale} />);
+      render(<Author {...baseProps} />);
       const expectedDate = DateTime.fromISO(baseProps.date)
         .setLocale(locale)
         .toLocaleString(DateTime.DATETIME_SHORT);

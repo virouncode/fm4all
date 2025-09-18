@@ -38,72 +38,55 @@ export const handleArticleRedirects = (
   ) {
     return null;
   }
-  const slug = pathSegments[1];
   const basePath = locale === "fr" ? "/articles/" : "/posts/";
+  const slug = pathSegments[1];
   const subSlug = pathSegments.length >= 3 ? pathSegments[2] : null;
 
-  const isPossibleSlug =
-    isEnglishSlug(slug, articlesSlugMappingsFrToEn) ||
-    isFrenchSlug(slug, articlesSlugMappingsFrToEn);
-
-  const isPossibleSubSlug = subSlug
-    ? isEnglishSubSlug(subSlug, articlesSubSlugMappingsFrToEn) ||
-      isFrenchSubSlug(subSlug, articlesSubSlugMappingsFrToEn)
-    : true;
-
-  if (!isPossibleSlug && !isPossibleSubSlug) return null;
-
-  // Vérifier si le slug principal est correct pour la locale
-  const isCorrectSlug =
-    locale === "fr"
-      ? !isEnglishSlug(slug, articlesSlugMappingsFrToEn)
-      : isEnglishSlug(slug, articlesSlugMappingsFrToEn);
-
-  // Si le slug principal est incorrect, rediriger
-  if (!isCorrectSlug) {
-    const correctSlug =
-      locale === "fr" ? getArticlesSlugFr(slug) : getArticlesSlugEn(slug);
-    const newPath = `/${locale}${basePath}${correctSlug}`;
-    if (subSlug) {
-      const isCorrectSubSlug =
-        locale === "fr"
-          ? !isEnglishSubSlug(subSlug, articlesSubSlugMappingsFrToEn)
-          : isEnglishSubSlug(subSlug, articlesSubSlugMappingsFrToEn);
-      const correctSubSlug = isCorrectSubSlug
-        ? subSlug
-        : locale === "fr"
-          ? getArticlesSubSlugFr(subSlug)
-          : getArticlesSubSlugEn(subSlug);
-
-      return NextResponse.redirect(
-        new URL(`${newPath}/${correctSubSlug}`, req.url),
-        301,
-      );
-    }
-    return NextResponse.redirect(new URL(newPath, req.url), 301);
-  }
-
-  // Si le slug principal est correct mais qu'on a un sous-slug incorrect
-  if (isCorrectSlug && subSlug) {
+  if (subSlug) {
+    // /articles/[slug]/[subSlug]
+    const isPossibleSlug =
+      isEnglishSlug(slug, articlesSlugMappingsFrToEn) ||
+      isFrenchSlug(slug, articlesSlugMappingsFrToEn);
+    if (!isPossibleSlug) return null; //Le slug principal ne correspond à aucun slug connu, on laisse passer pour gérer le 404 plus tard
+    const isPossibleSubSlug =
+      isEnglishSubSlug(subSlug, articlesSubSlugMappingsFrToEn) ||
+      isFrenchSubSlug(subSlug, articlesSubSlugMappingsFrToEn);
+    if (!isPossibleSubSlug) return null; //Le sous-slug ne correspond à aucun slug connu, on laisse passer pour gérer le 404 plus tard
+    const isCorrectSlug =
+      locale === "fr"
+        ? !isEnglishSlug(slug, articlesSlugMappingsFrToEn)
+        : isEnglishSlug(slug, articlesSlugMappingsFrToEn);
     const isCorrectSubSlug =
       locale === "fr"
         ? !isEnglishSubSlug(subSlug, articlesSubSlugMappingsFrToEn)
         : isEnglishSubSlug(subSlug, articlesSubSlugMappingsFrToEn);
-
-    if (!isCorrectSubSlug) {
-      const correctSubSlug =
-        locale === "fr"
-          ? getArticlesSubSlugFr(subSlug)
-          : getArticlesSubSlugEn(subSlug);
-
-      return NextResponse.redirect(
-        new URL(`/${locale}${basePath}${slug}/${correctSubSlug}`, req.url),
-        301,
-      );
-    }
+    if (isCorrectSlug && isCorrectSubSlug) return null; //Tout est correct, on ne fait pas de redirection
+    //Soit le slug principal est incorrect, soit le sous-slug est incorrect, soit les deux sont incorrects
+    const correctSlug =
+      locale === "fr" ? getArticlesSlugFr(slug) : getArticlesSlugEn(slug);
+    const correctSubSlug =
+      locale === "fr"
+        ? getArticlesSubSlugFr(subSlug)
+        : getArticlesSubSlugEn(subSlug);
+    const newPath = `/${locale}${basePath}${correctSlug}/${correctSubSlug}`;
+    return NextResponse.redirect(new URL(newPath, req.url), 301);
+  } // /articles/[slug]
+  else {
+    const isPossibleSlug =
+      isEnglishSlug(slug, articlesSlugMappingsFrToEn) ||
+      isFrenchSlug(slug, articlesSlugMappingsFrToEn);
+    if (!isPossibleSlug) return null; //Le slug principal ne correspond à aucun slug connu, on laisse passer pour gérer le 404 plus tard
+    const isCorrectSlug =
+      locale === "fr"
+        ? !isEnglishSlug(slug, articlesSlugMappingsFrToEn)
+        : isEnglishSlug(slug, articlesSlugMappingsFrToEn);
+    if (isCorrectSlug) return null; //Tout est correct, on ne fait pas de redirection
+    //Le slug principal est incorrect, on redirige vers le bon slug
+    const correctSlug =
+      locale === "fr" ? getArticlesSlugFr(slug) : getArticlesSlugEn(slug);
+    const newPath = `/${locale}${basePath}${correctSlug}`;
+    return NextResponse.redirect(new URL(newPath, req.url), 301);
   }
-  // Tout est correct, on ne fait pas de redirection
-  return null;
 };
 
 export const handleServiceRedirects = (
@@ -115,68 +98,55 @@ export const handleServiceRedirects = (
     return null; // Pas un service, on ne fait rien
   }
 
-  const slug = pathSegments[1];
   const basePath = "/services/";
+  const slug = pathSegments[1];
   const subSlug = pathSegments.length >= 3 ? pathSegments[2] : null;
 
-  const isPossibleSlug =
-    isEnglishSlug(slug, servicesSlugMappingsFrToEn) ||
-    isFrenchSlug(slug, servicesSlugMappingsFrToEn);
-  if (!isPossibleSlug) return null;
-
-  const isPossibleSubSlug = subSlug
-    ? isEnglishSubSlug(subSlug, servicesSubSlugMappingsFrToEn) ||
-      isFrenchSubSlug(subSlug, servicesSubSlugMappingsFrToEn)
-    : true;
-
-  if (!isPossibleSlug && !isPossibleSubSlug) return null;
-
-  const isCorrectSlug =
-    locale === "fr"
-      ? !isEnglishSlug(slug, servicesSlugMappingsFrToEn)
-      : isEnglishSlug(slug, servicesSlugMappingsFrToEn);
-  if (!isCorrectSlug) {
-    const correctSlug =
-      locale === "fr" ? getServicesSlugFr(slug) : getServicesSlugEn(slug);
-    const newPath = `/${locale}${basePath}${correctSlug}`;
-    if (subSlug) {
-      const isCorrectSubSlug =
-        locale === "fr"
-          ? !isEnglishSubSlug(subSlug, servicesSubSlugMappingsFrToEn)
-          : isEnglishSubSlug(subSlug, servicesSubSlugMappingsFrToEn);
-      const correctSubSlug = isCorrectSubSlug
-        ? subSlug
-        : locale === "fr"
-          ? getServicesSubSlugFr(subSlug)
-          : getServicesSubSlugEn(subSlug);
-
-      return NextResponse.redirect(
-        new URL(`${newPath}/${correctSubSlug}`, req.url),
-        301,
-      );
-    }
-
-    return NextResponse.redirect(new URL(newPath, req.url), 301);
-  }
-  // Si le slug principal est correct mais qu'on a un sous-slug incorrect
-  if (isCorrectSlug && subSlug) {
+  ///services/[slug]/[subSlug]
+  if (subSlug) {
+    const isPossibleSlug =
+      isEnglishSlug(slug, servicesSlugMappingsFrToEn) ||
+      isFrenchSlug(slug, servicesSlugMappingsFrToEn);
+    if (!isPossibleSlug) return null; //Le slug principal ne correspond à aucun slug connu, on laisse passer pour gérer le 404 plus tard
+    const isPossibleSubSlug =
+      isEnglishSubSlug(subSlug, servicesSubSlugMappingsFrToEn) ||
+      isFrenchSubSlug(subSlug, servicesSubSlugMappingsFrToEn);
+    if (!isPossibleSubSlug) return null; //Le sous-slug ne correspond à aucun slug connu, on laisse passer pour gérer le 404 plus tard
+    const isCorrectSlug =
+      locale === "fr"
+        ? !isEnglishSlug(slug, servicesSlugMappingsFrToEn)
+        : isEnglishSlug(slug, servicesSlugMappingsFrToEn);
     const isCorrectSubSlug =
       locale === "fr"
         ? !isEnglishSubSlug(subSlug, servicesSubSlugMappingsFrToEn)
         : isEnglishSubSlug(subSlug, servicesSubSlugMappingsFrToEn);
-    if (!isCorrectSubSlug) {
-      const correctSubSlug =
-        locale === "fr"
-          ? getServicesSubSlugFr(subSlug)
-          : getServicesSubSlugEn(subSlug);
-      return NextResponse.redirect(
-        new URL(`/${locale}${basePath}${slug}/${correctSubSlug}`, req.url),
-        301,
-      );
-    }
+    if (isCorrectSlug && isCorrectSubSlug) return null; //Tout est correct, on ne fait pas de redirection
+    //Soit le slug principal est incorrect, soit le sous-slug est incorrect, soit les deux sont incorrects
+    const correctSlug =
+      locale === "fr" ? getServicesSlugFr(slug) : getServicesSlugEn(slug);
+    const correctSubSlug =
+      locale === "fr"
+        ? getServicesSubSlugFr(subSlug)
+        : getServicesSubSlugEn(subSlug);
+    const newPath = `/${locale}${basePath}${correctSlug}/${correctSubSlug}`;
+    return NextResponse.redirect(new URL(newPath, req.url), 301);
+  } //services/[slug]
+  else {
+    const isPossibleSlug =
+      isEnglishSlug(slug, servicesSlugMappingsFrToEn) ||
+      isFrenchSlug(slug, servicesSlugMappingsFrToEn);
+    if (!isPossibleSlug) return null; //Le slug principal ne correspond à aucun slug connu, on laisse passer pour gérer le 404 plus tard
+    const isCorrectSlug =
+      locale === "fr"
+        ? !isEnglishSlug(slug, servicesSlugMappingsFrToEn)
+        : isEnglishSlug(slug, servicesSlugMappingsFrToEn);
+    if (isCorrectSlug) return null; //Tout est correct, on ne fait pas de redirection
+    //Le slug principal est incorrect, on redirige vers le bon slug
+    const correctSlug =
+      locale === "fr" ? getServicesSlugFr(slug) : getServicesSlugEn(slug);
+    const newPath = `/${locale}${basePath}${correctSlug}`;
+    return NextResponse.redirect(new URL(newPath, req.url), 301);
   }
-  // Tout est correct, on ne fait pas de redirection
-  return null;
 };
 
 export const handleSecteurRedirects = (
@@ -197,6 +167,7 @@ export const handleSecteurRedirects = (
   const isPossibleSlug =
     isEnglishSlug(slug, secteursSlugMappingsFrToEn) ||
     isFrenchSlug(slug, secteursSlugMappingsFrToEn);
+
   if (!isPossibleSlug) return null;
 
   const isCorrectSlug =
@@ -204,11 +175,10 @@ export const handleSecteurRedirects = (
       ? !isEnglishSlug(slug, secteursSlugMappingsFrToEn)
       : isEnglishSlug(slug, secteursSlugMappingsFrToEn);
 
-  if (!isCorrectSlug) {
-    const correctSlug =
-      locale === "fr" ? getSecteurSlugFr(slug) : getSecteurSlugEn(slug);
-    const newPath = `/${locale}${basePath}${correctSlug}`;
-    return NextResponse.redirect(new URL(newPath, req.url), 301);
-  }
-  return null;
+  if (isCorrectSlug) return null; //Tout est correct, on ne fait pas de redirection
+
+  const correctSlug =
+    locale === "fr" ? getSecteurSlugFr(slug) : getSecteurSlugEn(slug);
+  const newPath = `/${locale}${basePath}${correctSlug}`;
+  return NextResponse.redirect(new URL(newPath, req.url), 301);
 };

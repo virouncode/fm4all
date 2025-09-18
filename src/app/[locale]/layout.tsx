@@ -1,5 +1,4 @@
 import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
-import Footer from "@/components/footer/footer";
 import { Toaster } from "@/components/ui/toaster";
 import { routing } from "@/i18n/routing";
 import { Analytics } from "@vercel/analytics/next";
@@ -9,7 +8,7 @@ import { setRequestLocale } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
 import { Didact_Gothic, Inter } from "next/font/google";
 import { notFound } from "next/navigation";
-import "../globals.css";
+import "./globals.css";
 
 export const didact = Didact_Gothic({
   variable: "--font-didact-sans",
@@ -71,17 +70,16 @@ export default async function LocalizedLayout({
         <GoogleAnalytics
           GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!}
         />
-        <NextIntlClientProvider locale={locale}>
+        <NextIntlClientProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="light"
             enableSystem
             disableTransitionOnChange
           >
-            {children}
             <Analytics />
             <SpeedInsights />
-            <Footer locale={locale} />
+            {children}
             <Toaster />
           </ThemeProvider>
         </NextIntlClientProvider>

@@ -23,8 +23,6 @@ const TotalServicesFm4All = () => {
     totalRemiseHof,
   } = totalServicesFm4All;
 
-  console.log("totalServicesFm4All", totalServicesFm4All);
-
   const total =
     servicesFm4All.infos.gammeSelected === "essentiel"
       ? (totalAssurance ?? 0) +

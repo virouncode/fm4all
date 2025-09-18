@@ -53,7 +53,6 @@ export const protectDevisRoutes = ({
 
   if (cookie?.value) {
     const { completedSteps } = JSON.parse(decodeURIComponent(cookie.value));
-    console.log("Completed steps:", completedSteps);
 
     if (["skip", stepsByLocale[locale][0]].includes(step)) {
       return intlMiddleware(req);

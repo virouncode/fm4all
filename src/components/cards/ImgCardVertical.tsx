@@ -1,5 +1,4 @@
 import { Link } from "@/i18n/navigation";
-import { LocaleType } from "@/i18n/routing";
 import Image from "next/image";
 import { PropsWithChildren } from "react";
 import { ObfuscatedLink } from "../links/ObfuscatedLink";
@@ -22,7 +21,6 @@ type ImgCardVerticalProps = {
       };
   linkText: string;
   className?: string;
-  locale?: LocaleType;
   obfuscated?: boolean;
 };
 
@@ -33,12 +31,11 @@ const ImgCardVertical = ({
   children,
   href,
   linkText,
-  locale,
   obfuscated = false,
 }: PropsWithChildren<ImgCardVerticalProps>) => {
   return (
     <div
-      className={`group relative flex flex-col gap-4 overflow-hidden rounded-xl border bg-card text-card-foreground shadow transition-all hover:scale-[99%] hover:shadow-lg ${className}`}
+      className={`group bg-card text-card-foreground relative flex flex-col gap-4 overflow-hidden rounded-xl border shadow transition-all hover:scale-[99%] hover:shadow-lg ${className}`}
     >
       <div className="relative h-64 w-full">
         <Image
@@ -61,18 +58,6 @@ const ImgCardVertical = ({
         >
           {linkText}
         </ObfuscatedLink>
-      ) : locale ? (
-        <Link
-          href={href}
-          locale={locale}
-          title={linkText}
-          aria-label={linkText}
-          className="absolute inset-0 z-10"
-        >
-          <span className="absolute px-4 text-xs italic opacity-0 transition group-hover:opacity-100">
-            {linkText}
-          </span>
-        </Link>
       ) : (
         <Link
           href={href}

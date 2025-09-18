@@ -43,7 +43,6 @@ const ServicesCarousel = async () => {
                   pathname: `/services/[slug]`,
                   params: { slug: serviceSlug },
                 }}
-                locale={locale as LocaleType}
                 linkText={service.linkText ?? serviceSlug}
               >
                 <div className="flex h-52 flex-col gap-4 p-4">
@@ -57,7 +56,7 @@ const ServicesCarousel = async () => {
           ) : null;
         })}
       </CarouselContent>
-      <CarouselPrevious className="-top-9 left-auto right-12 translate-y-0" />
+      <CarouselPrevious className="-top-9 right-12 left-auto translate-y-0" />
       <CarouselNext className="-top-9 right-0 translate-y-0" />
     </Carousel>
   );

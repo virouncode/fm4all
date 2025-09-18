@@ -1513,5 +1513,15 @@
     "nettoyage-hygiene-maintenance-securite-accueil-cafe-petit-equipement": "Nettoyage, hygiène, maintenance, sécurité, accueil, café, petit équipement...",
     "quel-que-soit-votre-secteur-nous-pilotons-pour-vous-lensemble-de-vos-contrats-de-services-generaux": "Quel que soit votre secteur, nous pilotons pour vous l’ensemble de vos contrats de services généraux.",
     "accueil": "Page d'accueil"
+  },
+  "NotFoundPage": {
+    "erreur-404-page-non-trouvee": "Erreur 404 - Page non trouvée !",
+    "retour": "Retour",
+    "ce-service-nexiste-pas": "Ce service n'existe pas.",
+    "ce-service-nexiste-pas-dans-cette-ville": "Ce service n'existe pas dans cette ville.",
+    "cet-article-nexiste-pas": "Cet article n'existe pas.",
+    "ce-secteur-nexiste-pas": "Ce secteur n'existe pas.",
+    "cette-categorie-nexiste-pas": "Cette catégorie n'existe pas.",
+    "ce-fournisseur-nexiste-pas": "Ce fournisseur n'existe pas."
   }
 }

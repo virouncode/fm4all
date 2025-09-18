@@ -1,15 +1,15 @@
 import { Accordion } from "@/components/ui/accordion";
-import { LocaleType } from "@/i18n/routing";
+import { useLocale } from "next-intl";
 import { PortableText, PortableTextBlock } from "next-sanity";
 import FAQItem from "../../(home)/FAQItem";
 import { Service, ServiceVille } from "../../../../../../../sanity.types";
 
-interface FAQServiceProps {
+type FAQServiceProps = {
   service: Service | ServiceVille;
-  locale: LocaleType;
-}
+};
 
-const FAQService = ({ service, locale }: FAQServiceProps) => {
+const FAQService = ({ service }: FAQServiceProps) => {
+  const locale = useLocale();
   // Vérifier si le service a un champ FAQ et s'il contient des données
   if (!service.faq || !Array.isArray(service.faq) || service.faq.length === 0) {
     return null;
