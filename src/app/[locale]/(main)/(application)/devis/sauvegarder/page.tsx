@@ -1,9 +1,14 @@
 import { Link } from "@/i18n/navigation";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import SauvegarderProgression from "./SauvegarderProgression";
+
+export const generateStaticParams = () => {
+  return generateLocaleParams();
+};
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const locale = await getLocale();
@@ -18,10 +23,14 @@ export const generateMetadata = async (): Promise<Metadata> => {
 };
 
 const page = async ({
+  params,
   searchParams,
 }: {
+  params: Promise<{ locale: string }>;
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) => {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("DevisPage");
   const tSauver = await getTranslations("DevisPage.sauver");
   const { surface, effectif, typeBatiment, typeOccupation } =

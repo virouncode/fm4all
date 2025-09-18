@@ -7,11 +7,16 @@ import {
   getPortesCoupeFeuTarifs,
   getRiaTarifs,
 } from "@/lib/queries/incendie/getIncendie";
+import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 import ServicesLoader from "../locaux/ServicesLoader";
 import PersonnaliserDevis from "./PersonnaliserDevis";
+
+export const generateStaticParams = () => {
+  return generateLocaleParams();
+};
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const locale = await getLocale();
@@ -25,7 +30,9 @@ export const generateMetadata = async (): Promise<Metadata> => {
   );
 };
 
-const page = async () => {
+const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const tPersonnaliser = await getTranslations("DevisPage.personnaliser");
   const [
     exutoiresTarifs,

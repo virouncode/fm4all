@@ -132,10 +132,7 @@ const FontaineDesktopEspaceInputs = ({
                   </SelectTrigger>
                   <SelectContent>
                     {locationFontaine.map((item) => (
-                      <SelectItem
-                        key={`${location}_${item.id}`}
-                        value={item.id}
-                      >
+                      <SelectItem key={`location_${item.id}`} value={item.id}>
                         {tLocation(item.id)}
                       </SelectItem>
                     ))}

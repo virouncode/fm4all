@@ -1,11 +1,16 @@
 import { Link } from "@/i18n/navigation";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
-import { getLocale, getTranslations } from "next-intl/server";
+import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
+import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Metadata } from "next/types";
 import { Suspense } from "react";
 import ServicesLoader from "../locaux/ServicesLoader";
 import MesServices from "./MesServices";
+
+export const generateStaticParams = () => {
+  return generateLocaleParams();
+};
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const locale = await getLocale();
@@ -20,10 +25,14 @@ export const generateMetadata = async (): Promise<Metadata> => {
 };
 
 const page = async ({
+  params,
   searchParams,
 }: {
+  params: Promise<{ locale: string }>;
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) => {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("DevisPage");
   const tServices = await getTranslations("DevisPage.services");
   const { surface, effectif } = await searchParams;

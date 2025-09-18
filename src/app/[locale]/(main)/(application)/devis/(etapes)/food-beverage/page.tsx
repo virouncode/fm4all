@@ -1,9 +1,14 @@
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { Metadata } from "next";
-import { getLocale } from "next-intl/server";
+import { getLocale, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 import ServicesLoader from "../locaux/ServicesLoader";
 import FoodBeverage from "./FoodBeverage";
+
+export const generateStaticParams = () => {
+  return generateLocaleParams();
+};
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const locale = await getLocale();
@@ -17,7 +22,10 @@ export const generateMetadata = async (): Promise<Metadata> => {
   );
 };
 
-const page = () => {
+const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   return (
     <>
       <div className="flex items-center justify-between">

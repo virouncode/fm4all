@@ -110,7 +110,7 @@ const CafeDesktopEspaceInputs = ({
                   <SelectContent>
                     {locationCafeMachine.map((item) => (
                       <SelectItem
-                        key={`${location}_${item.id}`}
+                        key={`location_${item.id}`}
                         value={item.id}
                         data-testid={`duree-location-${item.id}-${espace.infos.espaceId}`}
                       >
