@@ -291,8 +291,8 @@ const FontaineEspacePropositionCard = ({
         }
         alt={`illustration ${proposition.marque} ${proposition.modele}`}
         fill
-        quality={100}
         className="object-contain"
+        sizes="(min-width:768px) 33vw"
       />
     </div>
   );

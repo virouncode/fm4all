@@ -25,10 +25,9 @@ const Author = ({
           <Image
             src={portraitUrl}
             alt={portraitAlt ?? "Portrait de l'auteur"}
-            quality={100}
             className="object-cover object-center"
-            fill={true}
-            unoptimized={true}
+            fill
+            sizes="40px"
           />
         </div>
       ) : null}

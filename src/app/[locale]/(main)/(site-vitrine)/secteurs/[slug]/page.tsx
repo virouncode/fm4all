@@ -60,12 +60,10 @@ const ptComponents = {
       return (
         <div className="relative mx-auto my-6 mb-20 h-[200px] w-full md:h-[400px]">
           <Image
-            quality={100}
             src={urlFor(value).url()}
             alt={value.alt || "illustration du secteur"}
             fill
-            className="m-0 object-contain"
-            unoptimized={true}
+            sizes="(min-width:768px) 100vw"
           />
         </div>
       );

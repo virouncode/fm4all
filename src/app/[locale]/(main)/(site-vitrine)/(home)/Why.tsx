@@ -80,10 +80,9 @@ const Why = () => {
             <Image
               src="/img/portrait-dg.webp"
               alt="portrait-du-directeur-general"
-              fill={true}
+              fill
               className="h-full w-full object-cover"
-              quality={100}
-              loading="lazy"
+              sizes="(max-width:768px) 100vw, 33vw"
             />
           </div>
         </div>

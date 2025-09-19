@@ -155,9 +155,9 @@ const NettoyageMobilePropositionCard = ({
       <Image
         src={"/img/services/nettoyage.webp"}
         alt={`illustration de nettoyage`}
-        fill={true}
+        fill
         className="cursor-pointer object-contain"
-        quality={100}
+        sizes="(max-width:768px) 33vw"
       />
     </div>
   );
@@ -167,9 +167,9 @@ const NettoyageMobilePropositionCard = ({
       <Image
         src={"/img/services/nettoyage.webp"}
         alt={`illustration de nettoyage`}
-        fill={true}
+        fill
         className="object-contain object-center"
-        quality={100}
+        sizes="(max-width:768px) 100vw"
       />
     </div>
   );
@@ -209,9 +209,9 @@ const NettoyageMobilePropositionCard = ({
                     <Image
                       src={logoUrl}
                       alt={`logo-de-${nomFournisseur}`}
-                      fill={true}
+                      fill
                       className="cursor-pointer object-contain object-left"
-                      quality={100}
+                      sizes="(max-width:768px) 100vw"
                     />
                   </div>
                 ) : null}

@@ -75,16 +75,16 @@ const FournisseurDialog = ({
           <Image
             src={logoUrl}
             alt={`logo-de-${nomFournisseur}`}
-            fill={true}
+            fill
             className={`object-contain ${
               nomFournisseur === "CASTALIE" ? "blur-lg" : ""
             }`}
-            quality={100}
+            sizes="(max-width:768px) 25vw, 100vw"
           />
         </div>
       ) : null}
       {presentation && (
-        <p className="my-6 hyphens-auto whitespace-pre text-wrap">
+        <p className="my-6 text-wrap hyphens-auto whitespace-pre">
           {presentation}
         </p>
       )}

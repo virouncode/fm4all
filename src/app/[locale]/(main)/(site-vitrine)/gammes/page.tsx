@@ -62,9 +62,9 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
       </Breadcrumb>
       <article className="mt-6 flex flex-col gap-10">
         <h1 className="text-4xl">{t("nos-3-gammes")}</h1>
-        <div className="mx-auto flex w-full flex-col gap-10 hyphens-auto text-wrap">
+        <div className="mx-auto flex w-full flex-col gap-10 text-wrap hyphens-auto">
           <div className="flex flex-col gap-10">
-            <p className="mx-auto max-w-prose text-pretty text-center">
+            <p className="mx-auto max-w-prose text-center text-pretty">
               {t(
                 "afin-de-simplifier-vos-choix-nous-avons-decline-l-ensemble-des-services-en",
               )}{" "}
@@ -79,20 +79,20 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
               <strong>{t("3-gammes")}</strong> :
             </p>
             <div className="mb-10 flex flex-wrap justify-center gap-10 text-2xl">
-              <div className="w-48 rounded-lg bg-fm4allessential px-6 py-10 text-center font-bold text-slate-200">
+              <div className="bg-fm4allessential w-48 rounded-lg px-6 py-10 text-center font-bold text-slate-200">
                 {tGlobal("essentiel")}
               </div>
-              <div className="w-48 rounded-lg bg-fm4allcomfort px-6 py-10 text-center font-bold text-slate-200">
+              <div className="bg-fm4allcomfort w-48 rounded-lg px-6 py-10 text-center font-bold text-slate-200">
                 {tGlobal("confort")}
               </div>
-              <div className="w-48 rounded-lg bg-fm4allexcellence px-6 py-10 text-center font-bold text-slate-200">
+              <div className="bg-fm4allexcellence w-48 rounded-lg px-6 py-10 text-center font-bold text-slate-200">
                 {tGlobal("excellence")}
               </div>
             </div>
           </div>
           <div className="flex flex-col gap-16">
             <div className="mx-auto flex flex-col gap-8">
-              <h2 className="border-l-4 border-fm4allessential px-4 text-2xl text-fm4allessential md:text-3xl">
+              <h2 className="border-fm4allessential text-fm4allessential border-l-4 px-4 text-2xl md:text-3xl">
                 {t("gamme-essentiel")}
               </h2>
               <p className="mx-auto max-w-prose md:ml-10">
@@ -102,7 +102,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
               </p>
             </div>
             <div className="mx-auto flex flex-col gap-8">
-              <h2 className="border-l-4 border-fm4allcomfort px-4 text-2xl text-fm4allcomfort md:text-3xl">
+              <h2 className="border-fm4allcomfort text-fm4allcomfort border-l-4 px-4 text-2xl md:text-3xl">
                 {t("gamme-confort")}
               </h2>
               <p className="mx-auto max-w-prose md:ml-10">
@@ -112,7 +112,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
               </p>
             </div>
             <div className="mx-auto flex flex-col gap-8">
-              <h2 className="border-l-4 border-fm4allexcellence px-4 text-2xl text-fm4allexcellence md:text-3xl">
+              <h2 className="border-fm4allexcellence text-fm4allexcellence border-l-4 px-4 text-2xl md:text-3xl">
                 {t("gamme-excellence")}
               </h2>
               <p className="mx-auto max-w-prose md:ml-10">
@@ -123,7 +123,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             </div>
           </div>
         </div>
-        <div className="mx-auto mt-10 flex w-full flex-col gap-6 hyphens-auto text-wrap">
+        <div className="mx-auto mt-10 flex w-full flex-col gap-6 text-wrap hyphens-auto">
           <p className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("quelle-gamme-de-services-choisir")}
           </p>
@@ -132,7 +132,8 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
               <Image
                 src={"/img/baer_otis.webp"}
                 alt={"photo Edouard Baer Asterix"}
-                fill={true}
+                fill
+                sizes="300px"
               />
             </div>
             <div className="flex flex-1 flex-col gap-4">
@@ -154,7 +155,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             )}
           </p>
         </div>
-        <div className="mx-auto flex w-full flex-col gap-6 hyphens-auto text-wrap">
+        <div className="mx-auto flex w-full flex-col gap-6 text-wrap hyphens-auto">
           <p className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("quels-prestataires-choisir")}
           </p>

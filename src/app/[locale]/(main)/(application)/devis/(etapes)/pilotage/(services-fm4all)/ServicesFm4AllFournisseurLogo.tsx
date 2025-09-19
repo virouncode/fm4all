@@ -19,9 +19,9 @@ const ServicesFm4AllFournisseurLogo = () => {
                 <Image
                   src={logoFournisseurUrl}
                   alt={`logo-de-fm4All`}
-                  fill={true}
+                  fill
                   className="h-full w-full object-contain"
-                  quality={100}
+                  sizes="(min-width:768px) 100vw"
                 />
               </div>
             ) : (

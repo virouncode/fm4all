@@ -113,9 +113,9 @@ const SecuriteIncendieMobileInputs = ({
             alt={tIncendie(
               "illustration-de-bloc-autonome-declairage-de-securite",
             )}
-            fill={true}
+            fill
             className="cursor-pointer object-cover"
-            quality={100}
+            sizes="(max-width:768px) 33vw"
           />
         </div>
         <div className="flex w-full flex-col gap-2 p-1">
@@ -173,9 +173,9 @@ const SecuriteIncendieMobileInputs = ({
             alt={tIncendie(
               "illustration-de-telecommande-de-bloc-autonome-declairage-de-securite",
             )}
-            fill={true}
+            fill
             className="cursor-pointer object-cover"
-            quality={100}
+            sizes="(max-width:768px) 33vw"
           />
         </div>
         <div className="flex w-full flex-col gap-2 p-1">

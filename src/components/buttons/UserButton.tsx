@@ -69,6 +69,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
                 width={32}
                 height={32}
                 className={`${user.role === "admin" ? "object-cover" : "object-contain"}`}
+                sizes="32px"
               />
             ) : (
               <UserCheck />

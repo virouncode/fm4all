@@ -164,8 +164,9 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
                             <Image
                               src={imagePreview}
                               alt="avatar preview"
-                              fill={true}
+                              fill
                               className="object-cover object-center"
+                              sizes="80px"
                             />
                           </div>
                           <X

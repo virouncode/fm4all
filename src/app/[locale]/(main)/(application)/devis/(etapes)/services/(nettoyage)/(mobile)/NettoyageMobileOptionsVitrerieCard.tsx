@@ -129,9 +129,9 @@ const NettoyageMobileOptionsVitrerieCard = ({
       <Image
         src={"/img/services/nettoyage.webp"}
         alt={`illustration de nettoyage`}
-        fill={true}
+        fill
         className="cursor-pointer object-contain"
-        quality={100}
+        sizes="(max-width:768px) 33vw"
       />
     </div>
   );
@@ -140,9 +140,9 @@ const NettoyageMobileOptionsVitrerieCard = ({
       <Image
         src={"/img/services/nettoyage.webp"}
         alt={`illustration de nettoyage`}
-        fill={true}
+        fill
         className="cursor-pointer object-contain object-center"
-        quality={100}
+        sizes="(max-width:768px) 100vw"
       />
     </div>
   );
@@ -295,9 +295,9 @@ const NettoyageMobileOptionsVitrerieCard = ({
                         <Image
                           src={nettoyage.infos.logoUrl}
                           alt={`logo-de-${nettoyage.infos.nomFournisseur}`}
-                          fill={true}
+                          fill
                           className="cursor-pointer object-contain object-left"
-                          quality={100}
+                          sizes="(max-width:768px) 100vw"
                         />
                       </div>
                     ) : null}
@@ -342,9 +342,9 @@ const NettoyageMobileOptionsVitrerieCard = ({
                 <Image
                   src={nettoyage.infos.logoUrl}
                   alt={`logo-de-${nettoyage.infos.nomFournisseur}`}
-                  fill={true}
+                  fill
                   className="cursor-pointer object-contain object-left"
-                  quality={100}
+                  sizes="(max-width:768px) 100vw"
                 />
               </div>
             ) : null}

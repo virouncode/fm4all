@@ -158,9 +158,9 @@ const MaintenancePropositionCard = ({
       <Image
         src={"/img/services/maintenance.webp"}
         alt={`illustration de maintenance`}
-        fill={true}
+        fill
         className="cursor-pointer object-contain object-center"
-        quality={100}
+        sizes="(min-width:768px) 33vw"
       />
     </div>
   );

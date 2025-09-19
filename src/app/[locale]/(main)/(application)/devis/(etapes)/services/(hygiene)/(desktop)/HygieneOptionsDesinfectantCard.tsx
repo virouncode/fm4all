@@ -159,8 +159,8 @@ const HygieneOptionsDesinfectantCard = ({
               src={proposition.imageUrlDesinfectant}
               alt="illustration-distributeur-desinfectant"
               fill
-              quality={100}
               className="object-contain"
+              sizes="(min-width:768px) 33vw"
             />
           </div>
         ) : null;

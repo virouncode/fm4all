@@ -229,8 +229,9 @@ const FournisseurUpdateForm = ({
                       <Image
                         src={imagePreview}
                         alt="Logo de l'entreprise"
-                        fill={true}
+                        fill
                         className="object-contain object-center"
+                        sizes="(max-width:768px) 50vw, 100vw"
                       />
                     </div>
                     <X

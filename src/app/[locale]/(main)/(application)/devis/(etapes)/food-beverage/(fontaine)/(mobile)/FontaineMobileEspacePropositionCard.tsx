@@ -296,8 +296,8 @@ const FontaineMobileEspacePropositionCard = ({
         }
         alt={`illustration ${marque} ${modele}`}
         fill
-        quality={100}
         className="cursor-pointer object-contain"
+        sizes="(max-width:768px) 33vw"
       />
     </div>
   );
@@ -315,8 +315,8 @@ const FontaineMobileEspacePropositionCard = ({
         }
         alt={`illustration ${marque} ${modele}`}
         fill
-        quality={100}
         className="object-contain"
+        sizes="(max-width:768px) 100vw"
       />
     </div>
   );
@@ -366,7 +366,7 @@ const FontaineMobileEspacePropositionCard = ({
                       alt={`logo-de-${nomFournisseur}`}
                       fill={true}
                       className="cursor-pointer object-contain object-left"
-                      quality={100}
+                      sizes="(max-width:768px) 100vw"
                     />
                   </div>
                 ) : null}

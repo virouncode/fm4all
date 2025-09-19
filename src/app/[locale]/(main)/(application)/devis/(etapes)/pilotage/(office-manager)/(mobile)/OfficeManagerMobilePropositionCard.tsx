@@ -228,9 +228,9 @@ const OfficeManagerMobilePropositionCard = ({
       <Image
         src={"/img/services/office-managers.webp"}
         alt={tOfficeManager("illustration-doffice-managers")}
-        fill={true}
+        fill
         className="cursor-pointer object-contain"
-        quality={100}
+        sizes="(max-width:768px) 33vw"
       />
     </div>
   );
@@ -240,9 +240,9 @@ const OfficeManagerMobilePropositionCard = ({
       <Image
         src={"/img/services/office-managers.webp"}
         alt={tOfficeManager("illustration-doffice-managers")}
-        fill={true}
+        fill
         className="object-contain object-center"
-        quality={100}
+        sizes="(max-width:768px) 100vw"
       />
     </div>
   );
@@ -280,9 +280,9 @@ const OfficeManagerMobilePropositionCard = ({
                 <Image
                   src={"/img/logo_full_white.webp"}
                   alt={`logo-de-fm4all`}
-                  fill={true}
+                  fill
                   className="cursor-pointer object-contain object-left"
-                  quality={100}
+                  sizes="(max-width:768px) 100vw"
                 />
               </div>
             </DialogTrigger>

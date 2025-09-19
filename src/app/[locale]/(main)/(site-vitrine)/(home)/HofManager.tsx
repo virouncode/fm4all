@@ -31,7 +31,6 @@ const HofManager = async () => {
             src="/img/hof_managers.webp"
             alt="un hof manager"
             className="object-cover"
-            quality={75}
             fill
             sizes="100vw"
           />

@@ -12,7 +12,6 @@ const BackgroundClient = () => {
           "une-image-de-bureaux-modernes-et-lumineux-avec-des-plantes-vertes",
         )}
         className="object-cover"
-        quality={75}
         priority
         fill
         sizes="100vw"

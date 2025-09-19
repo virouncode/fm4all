@@ -130,9 +130,9 @@ const HygieneMobilePropositionCard = ({
           "/img/services/hygiene.webp"
         }
         alt={tHygiene("illustration-hygiene-sanitaire")}
-        fill={true}
+        fill
         className="cursor-pointer object-contain"
-        quality={100}
+        sizes="(max-width:768px) 33vw"
       />
     </div>
   );
@@ -144,8 +144,8 @@ const HygieneMobilePropositionCard = ({
             src={proposition.imageUrlEmp}
             alt="illustration-essuie-mains-papier"
             fill
-            quality={100}
             className="object-contain"
+            sizes="(max-width:768px) 33vw"
           />
         </div>
       ) : null}
@@ -155,8 +155,8 @@ const HygieneMobilePropositionCard = ({
             src={proposition.imageUrlPh}
             alt={tHygiene("illustration-distributeur-papier-hygienique")}
             fill
-            quality={100}
             className="object-contain"
+            sizes="(max-width:768px) 33vw"
           />
         </div>
       ) : null}
@@ -166,8 +166,8 @@ const HygieneMobilePropositionCard = ({
             src={proposition.imageUrlSavon}
             alt={tHygiene("illustration-distributeur-savon")}
             fill
-            quality={100}
             className="object-contain"
+            sizes="(max-width:768px) 33vw"
           />
         </div>
       ) : null}
@@ -279,9 +279,9 @@ const HygieneMobilePropositionCard = ({
                     <Image
                       src={logoUrl}
                       alt={`logo-de-${nomFournisseur}`}
-                      fill={true}
+                      fill
                       className="cursor-pointer object-contain object-left"
-                      quality={100}
+                      sizes="(max-width:768px) 100vw"
                     />
                   </div>
                 ) : null}

@@ -60,9 +60,9 @@ const SecuriteIncendieInputs = ({
               <Image
                 src={"/img/services/extincteur.webp"}
                 alt={`illustration de nettoyage`}
-                fill={true}
+                fill
                 className="cursor-pointer object-contain object-center"
-                quality={100}
+                sizes="(min-width:768px) 15vw"
               />
             </div>
           </TooltipContent>
@@ -100,9 +100,9 @@ const SecuriteIncendieInputs = ({
                 alt={tIncendie(
                   "illustration-de-bloc-autonome-declairage-de-securite",
                 )}
-                fill={true}
+                fill
                 className="cursor-pointer object-contain object-center"
-                quality={100}
+                sizes="(min-width:768px) 15vw"
               />
             </div>
           </TooltipContent>
@@ -136,9 +136,9 @@ const SecuriteIncendieInputs = ({
                 alt={tIncendie(
                   "illustration-de-telecommande-de-bloc-autonome-declairage-de-securite",
                 )}
-                fill={true}
+                fill
                 className="cursor-pointer object-contain object-center"
-                quality={100}
+                sizes="(min-width:768px) 15vw"
               />
             </div>
           </TooltipContent>

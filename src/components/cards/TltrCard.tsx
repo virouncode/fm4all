@@ -44,11 +44,11 @@ const TltrCard = ({
   titre,
 }: TltrCardProps) => {
   return (
-    <section className="mb-16 flex flex-col gap-14 rounded-xl bg-gradient-to-r from-fm4allsecondary/100 to-fm4allsecondary/60 p-6 text-white sm:p-14">
+    <section className="from-fm4allsecondary/100 to-fm4allsecondary/60 mb-16 flex flex-col gap-14 rounded-xl bg-gradient-to-r p-6 text-white sm:p-14">
       <h1 className="text-center text-3xl md:text-4xl">{titre}</h1>
       <div className="flex flex-row gap-10">
         <div className="flex flex-1 flex-col justify-start gap-10 text-lg">
-          <div className="prose-base flex flex-col gap-6 prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl prose-h3:text-xl prose-h3:font-bold prose-p:m-0 prose-p:hyphens-auto prose-p:text-pretty prose-a:underline prose-li:m-0 prose-li:list-disc">
+          <div className="prose-base prose-h2:border-l-2 prose-h2:px-4 prose-h2:text-4xl prose-h3:text-xl prose-h3:font-bold prose-p:m-0 prose-p:hyphens-auto prose-p:text-pretty prose-a:underline prose-li:m-0 prose-li:list-disc flex flex-col gap-6">
             <p className="font-bold">{description}</p>
             {Array.isArray(tltr) && <PortableText value={tltr} />}
           </div>
@@ -57,7 +57,7 @@ const TltrCard = ({
               title={devisButtonTitle}
               text={devisButtonTitle}
               size="lg"
-              className="w-full border-none bg-fm4alldestructive text-white shadow-lg ring-fm4alldestructive hover:bg-fm4alldestructive/90 md:w-auto"
+              className="bg-fm4alldestructive ring-fm4alldestructive hover:bg-fm4alldestructive/90 w-full border-none text-white shadow-lg md:w-auto"
             />
           </div>
         </div>
@@ -65,10 +65,9 @@ const TltrCard = ({
           <Image
             src={imageUrl}
             alt={imageAlt}
-            quality={100}
             className="object-cover object-center"
-            fill={true}
-            unoptimized={true}
+            fill
+            sizes="(max-width: 768px) 50vw"
           />
         </div>
       </div>

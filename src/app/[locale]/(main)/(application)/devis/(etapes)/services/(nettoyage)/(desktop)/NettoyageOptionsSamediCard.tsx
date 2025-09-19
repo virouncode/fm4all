@@ -84,9 +84,9 @@ const NettoyageOptionsSamediCard = ({
       <Image
         src={"/img/services/nettoyage.webp"}
         alt={`illustration de nettoyage`}
-        fill={true}
+        fill
         className="cursor-pointer object-contain object-center"
-        quality={100}
+        sizes="(max-width:768px) 33vw"
       />
     </div>
   );

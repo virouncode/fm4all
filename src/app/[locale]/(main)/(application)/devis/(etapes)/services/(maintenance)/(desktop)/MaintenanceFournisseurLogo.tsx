@@ -53,7 +53,7 @@ const MaintenanceFournisseurLogo = ({
                   alt={`logo-de-${nomFournisseur}`}
                   fill={true}
                   className="h-full w-full cursor-pointer object-contain"
-                  quality={100}
+                  sizes="(min-width:768px) 100vw"
                 />
               </div>
             ) : (

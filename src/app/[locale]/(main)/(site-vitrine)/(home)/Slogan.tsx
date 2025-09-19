@@ -9,13 +9,12 @@ const Slogan = () => {
         <Image
           src={"/img/logo_full.webp"}
           alt={"logo-fm4all"}
-          fill={true}
-          sizes="300px"
+          fill
+          sizes="200px"
           className="object-contain object-center"
-          loading="lazy"
         />
       </div>
-      <h2 className="text-center text-5xl font-bold tracking-tighter text-destructive">
+      <h2 className="text-destructive text-center text-5xl font-bold tracking-tighter">
         {t("le-facility-management-pour-tous")}
       </h2>
     </section>

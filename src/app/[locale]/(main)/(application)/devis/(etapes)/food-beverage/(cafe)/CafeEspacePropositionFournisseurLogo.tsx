@@ -43,9 +43,9 @@ const CafeEspacePropositionFournisseurLogo = ({
               <Image
                 src={logoUrl}
                 alt={`logo-de-${nomFournisseur}`}
-                fill={true}
+                fill
                 className="h-full w-full cursor-pointer object-contain"
-                quality={100}
+                sizes="(min-width:768px) 100vw"
               />
             </div>
           ) : (

@@ -144,9 +144,9 @@ const SecuriteIncendiePropostionCard = ({
       <Image
         src={"/img/services/incendie.webp"}
         alt={`illustration de securité incendie`}
-        fill={true}
+        fill
         className="cursor-pointer object-contain object-center"
-        quality={100}
+        sizes="(min-width:768px) 33vw"
       />
     </div>
   );

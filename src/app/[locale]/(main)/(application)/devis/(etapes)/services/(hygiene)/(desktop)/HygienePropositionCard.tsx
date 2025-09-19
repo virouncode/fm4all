@@ -123,8 +123,8 @@ const HygienePropositionCard = ({
             src={proposition.imageUrlEmp}
             alt={tHygiene("illustration-essuie-mains-papier")}
             fill
-            quality={100}
             className="object-contain"
+            sizes="(min-width:768px) 20vw"
           />
         </div>
       ) : null}
@@ -134,8 +134,8 @@ const HygienePropositionCard = ({
             src={proposition.imageUrlPh}
             alt={tHygiene("illustration-distributeur-papier-hygienique")}
             fill
-            quality={100}
             className="object-contain"
+            sizes="(min-width:768px) 20vw"
           />
         </div>
       ) : null}
@@ -145,8 +145,8 @@ const HygienePropositionCard = ({
             src={proposition.imageUrlSavon}
             alt={tHygiene("illustration-distributeur-savon")}
             fill
-            quality={100}
             className="object-contain"
+            sizes="(min-width:768px) 20vw"
           />
         </div>
       ) : null}

@@ -165,8 +165,8 @@ const HygieneOptionsPoubelleCard = ({
               src={proposition.imageUrlPoubelle}
               alt="illustration-poubelle-hygiene-feminine"
               fill
-              quality={100}
               className="object-contain"
+              sizes="(min-width:768px) 33vw"
             />
           </div>
         ) : null;

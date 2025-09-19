@@ -122,9 +122,9 @@ const HygieneMobileOptionsPoubelleCard = ({
       <Image
         src={`${imageUrlPoubelle || "/img/services/hygiene.webp"}`}
         alt={`illustration de poubelle hygiene féminine`}
-        fill={true}
+        fill
         className="cursor-pointer object-contain"
-        quality={100}
+        sizes="(max-width:768px) 33vw"
       />
     </div>
   );
@@ -134,9 +134,9 @@ const HygieneMobileOptionsPoubelleCard = ({
       <Image
         src={`${imageUrlPoubelle || "/img/services/hygiene.webp"}`}
         alt={`illustration de poubelle hygiene féminine`}
-        fill={true}
+        fill
         className="cursor-pointer object-contain"
-        quality={100}
+        sizes="(max-width:768px) 100vw"
       />
     </div>
   );
@@ -246,9 +246,9 @@ const HygieneMobileOptionsPoubelleCard = ({
                     <Image
                       src={logoUrl}
                       alt={`logo-de-${nomFournisseur}`}
-                      fill={true}
+                      fill
                       className="cursor-pointer object-contain object-left"
-                      quality={100}
+                      sizes="(max-width:768px) 100vw"
                     />
                   </div>
                 ) : null}

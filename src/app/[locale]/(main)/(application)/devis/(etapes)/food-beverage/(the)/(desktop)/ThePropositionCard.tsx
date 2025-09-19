@@ -156,8 +156,8 @@ const ThePropositionCard = ({
         }
         alt={`illustration de thés variés`}
         fill
-        quality={100}
         className="object-contain"
+        sizes="(min-width:768px) 33vw"
       />
     </div>
   );

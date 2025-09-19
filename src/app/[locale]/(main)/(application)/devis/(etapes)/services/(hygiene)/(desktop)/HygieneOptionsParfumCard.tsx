@@ -159,8 +159,8 @@ const HygieneOptionsParfumCard = ({
               src={proposition.imageUrlParfum}
               alt="illustration-diffuseur-parfum"
               fill
-              quality={100}
               className="object-contain"
+              sizes="(min-width:768px) 33vw"
             />
           </div>
         ) : null;

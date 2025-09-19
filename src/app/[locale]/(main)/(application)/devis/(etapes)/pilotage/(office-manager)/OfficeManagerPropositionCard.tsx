@@ -216,7 +216,7 @@ const OfficeManagerPropositionCard = ({
         alt={tOfficeManager("illustration-doffice-managers")}
         fill={true}
         className="cursor-pointer object-contain object-center"
-        quality={100}
+        sizes="(min-width:768px) 33vw"
       />
     </div>
   );

@@ -88,9 +88,9 @@ const CookieBanner = () => {
               <Image
                 src={"/img/logo_full.webp"}
                 alt={`logo-de-fm4all`}
-                fill={true}
+                fill
                 className="object-contain"
-                quality={100}
+                sizes="100px"
               />
             </div>
             <div>

@@ -45,9 +45,9 @@ const HeaderAuth = () => {
               <Image
                 src="/img/logo_full.webp"
                 alt="fm4all-Logo"
-                fill={true}
-                quality={100}
+                fill
                 className="object-contain"
+                sizes="100px"
               />
             </Link>
           </div>

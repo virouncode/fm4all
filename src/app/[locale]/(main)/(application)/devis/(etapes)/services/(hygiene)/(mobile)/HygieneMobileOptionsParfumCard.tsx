@@ -123,9 +123,9 @@ const HygieneMobileOptionsParfumCard = ({
       <Image
         src={`${imageUrlParfum || "/img/services/hygiene.webp"}`}
         alt={`illustration de distributeur de parfum`}
-        fill={true}
+        fill
         className="cursor-pointer object-contain"
-        quality={100}
+        sizes="(max-width:768px) 33vw"
       />
     </div>
   );
@@ -135,9 +135,9 @@ const HygieneMobileOptionsParfumCard = ({
       <Image
         src={`${imageUrlParfum || "/img/services/hygiene.webp"}`}
         alt={`illustration de distributeur de parfum`}
-        fill={true}
+        fill
         className="cursor-pointer object-contain"
-        quality={100}
+        sizes="(max-width:768px) 100vw"
       />
     </div>
   );
@@ -249,9 +249,9 @@ const HygieneMobileOptionsParfumCard = ({
                     <Image
                       src={logoUrl}
                       alt={`logo-de-${nomFournisseur}`}
-                      fill={true}
+                      fill
                       className="cursor-pointer object-contain object-left"
-                      quality={100}
+                      sizes="(max-width:768px) 100vw"
                     />
                   </div>
                 ) : null}

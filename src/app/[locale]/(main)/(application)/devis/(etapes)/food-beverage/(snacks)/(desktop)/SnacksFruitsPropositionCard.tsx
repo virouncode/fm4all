@@ -223,8 +223,8 @@ const SnacksFruitsPropositionCard = ({
           src="/img/services/fruits.webp"
           alt="illustration-corbeille-fruits"
           fill
-          quality={100}
           className="object-cover"
+          sizes="(min-width:768px) 20vw"
         />
       </div>
       <div className="relative mx-auto h-40 w-full overflow-hidden rounded-lg border border-slate-300 bg-slate-100">
@@ -232,8 +232,8 @@ const SnacksFruitsPropositionCard = ({
           src="/img/services/snacks.webp"
           alt="illustration-snacks"
           fill
-          quality={100}
           className="object-cover"
+          sizes="(min-width:768px) 20vw"
         />
       </div>
       <div className="relative mx-auto h-40 w-full overflow-hidden rounded-lg border border-slate-300 bg-slate-100">
@@ -241,8 +241,8 @@ const SnacksFruitsPropositionCard = ({
           src="/img/services/boissons.webp"
           alt="illustration-boissons"
           fill
-          quality={100}
           className="object-cover"
+          sizes="(min-width:768px) 20vw"
         />
       </div>
     </div>

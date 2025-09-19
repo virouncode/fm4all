@@ -105,9 +105,9 @@ const SecuriteIncendieMobileCard = ({
       <Image
         src={"/img/services/incendie.webp"}
         alt={`illustration de sécurité incendie`}
-        fill={true}
+        fill
         className="cursor-pointer object-contain"
-        quality={100}
+        sizes="(max-width:768px) 33vw"
       />
     </div>
   );
@@ -117,9 +117,9 @@ const SecuriteIncendieMobileCard = ({
       <Image
         src={"/img/services/incendie.webp"}
         alt={`illustration de sécurité incendie`}
-        fill={true}
+        fill
         className="object-contain"
-        quality={100}
+        sizes="(max-width:768px) 100vw"
       />
     </div>
   );
@@ -206,9 +206,9 @@ const SecuriteIncendieMobileCard = ({
                   <Image
                     src={logoUrl}
                     alt={`logo-de-${nomFournisseur}`}
-                    fill={true}
+                    fill
                     className="cursor-pointer object-contain object-left"
-                    quality={100}
+                    sizes="(max-width:768px) 100vw"
                   />
                 </div>
               ) : null}

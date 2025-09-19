@@ -223,9 +223,9 @@ const SnacksFruitsMobilePropositionCard = ({
       <Image
         src={"/img/services/snacks-fruits.webp"}
         alt={`illustration de nettoyage`}
-        fill={true}
+        fill
         className="cursor-pointer object-contain"
-        quality={100}
+        sizes="(max-width:768px) 33vw"
       />
     </div>
   );
@@ -237,8 +237,8 @@ const SnacksFruitsMobilePropositionCard = ({
           src="/img/services/fruits.webp"
           alt="illustration-corbeille-fruits"
           fill
-          quality={100}
           className="object-cover"
+          sizes="(max-width:768px) 33vw"
         />
       </div>
       <div className="relative mx-auto h-40 w-full overflow-hidden rounded-lg border border-slate-300 bg-slate-100">
@@ -246,8 +246,8 @@ const SnacksFruitsMobilePropositionCard = ({
           src="/img/services/snacks.webp"
           alt="illustration-snacks"
           fill
-          quality={100}
           className="object-cover"
+          sizes="(max-width:768px) 33vw"
         />
       </div>
       <div className="relative mx-auto h-40 w-full overflow-hidden rounded-lg border border-slate-300 bg-slate-100">
@@ -255,8 +255,8 @@ const SnacksFruitsMobilePropositionCard = ({
           src="/img/services/boissons.webp"
           alt="illustration-boissons"
           fill
-          quality={100}
           className="object-cover"
+          sizes="(max-width:768px) 33vw"
         />
       </div>
     </div>
@@ -299,7 +299,7 @@ const SnacksFruitsMobilePropositionCard = ({
                       alt={`logo-de-${nomFournisseur}`}
                       fill={true}
                       className="cursor-pointer object-contain object-left"
-                      quality={100}
+                      sizes="(max-width:768px) 100vw"
                     />
                   </div>
                 ) : null}

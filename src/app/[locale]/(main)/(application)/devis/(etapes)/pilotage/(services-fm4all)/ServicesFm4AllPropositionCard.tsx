@@ -125,8 +125,8 @@ const ServicesFm4AllPropositionCard = ({
         src={"/img/services/fm4all.webp"}
         alt={`illustration de pilotes fm4all`}
         fill
-        quality={100}
         className="object-contain"
+        sizes="(min-width:768px) 33vw"
       />
     </div>
   );

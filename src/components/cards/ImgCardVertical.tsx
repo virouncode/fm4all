@@ -42,9 +42,8 @@ const ImgCardVertical = ({
           src={src}
           alt={alt}
           fill
-          quality={100}
           className="object-cover object-center"
-          unoptimized={true}
+          sizes="(max-width: 768px) 100vw, 33vw"
         />
       </div>
 

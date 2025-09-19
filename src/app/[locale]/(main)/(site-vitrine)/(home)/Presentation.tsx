@@ -72,11 +72,9 @@ const Presentation = () => {
             <Image
               src={"/img/zen.webp"}
               alt={"image-collaboratrice-zen"}
-              fill={true}
-              sizes="300px"
+              fill
+              sizes="450px"
               className="object-cover object-center"
-              loading="lazy"
-              quality={100}
             />
           </div>
         </div>

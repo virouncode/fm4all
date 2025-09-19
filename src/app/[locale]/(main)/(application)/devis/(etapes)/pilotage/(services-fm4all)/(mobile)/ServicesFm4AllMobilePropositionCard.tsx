@@ -122,8 +122,8 @@ const ServicesFm4AllMobilePropositionCard = ({
         src={"/img/services/fm4all.webp"}
         alt={`illustration de pilotes fm4all`}
         fill
-        quality={100}
         className="cursor-pointer object-contain"
+        sizes="(max-width:768px) 33vw"
       />
     </div>
   );
@@ -134,8 +134,8 @@ const ServicesFm4AllMobilePropositionCard = ({
         src={"/img/services/fm4all.webp"}
         alt={`illustration de pilotes fm4all`}
         fill
-        quality={100}
         className="object-contain"
+        sizes="(max-width:768px) 100vw"
       />
     </div>
   );
@@ -291,9 +291,9 @@ const ServicesFm4AllMobilePropositionCard = ({
                   <Image
                     src={"/img/logo_full_white.webp"}
                     alt={`logo-de-fm4all`}
-                    fill={true}
+                    fill
                     className="cursor-pointer object-contain object-left"
-                    quality={100}
+                    sizes="(max-width:768px) 100vw"
                   />
                 </div>
               </DialogTrigger>

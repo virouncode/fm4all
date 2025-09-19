@@ -32,8 +32,8 @@ const Hero = async () => {
           src="https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/logos_fournisseurs/logo_french-tech.webp"
           alt="logo-french-tech"
           fill
-          quality={100}
           className="object-contain"
+          sizes="80px"
         />
       </div>
     </section>

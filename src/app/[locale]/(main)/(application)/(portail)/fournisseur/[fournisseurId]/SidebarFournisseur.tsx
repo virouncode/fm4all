@@ -99,16 +99,15 @@ const SidebarFournisseur = ({ fournisseurId }: SidebarFournisseurProps) => {
       <SidebarTrigger />
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel asChild className="mb-14 mt-6 w-full">
+          <SidebarGroupLabel asChild className="mt-6 mb-14 w-full">
             <div className="flex w-full items-center justify-center gap-6">
               <Link href="/" title="Accueil">
                 <div className="relative h-[23px] w-[100px]">
                   <Image
                     src="/img/logo_full.webp"
                     alt="fm4all-Logo"
-                    fill={true}
-                    sizes="300px"
-                    quality={100}
+                    fill
+                    sizes="100px"
                     className="object-contain"
                   />
                 </div>

@@ -314,10 +314,9 @@ const Header = () => {
               <Image
                 src="/img/logo_full.webp"
                 alt="fm4all-Logo"
-                fill={true}
-                sizes="300px"
-                quality={100}
+                fill
                 className="object-contain"
+                sizes="100px"
               />
             </div>
           </Link>

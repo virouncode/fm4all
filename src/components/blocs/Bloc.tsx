@@ -63,10 +63,9 @@ const Bloc = ({ imageUrl, imageAlt, side, bloc, ptComponents }: BlocProps) => {
           <Image
             src={imageUrl}
             alt={imageAlt ?? "illustration"}
-            quality={100}
             className="object-cover object-center"
-            fill={true}
-            unoptimized={true}
+            fill
+            sizes="50vw"
           />
         </div>
       ) : null}
@@ -80,10 +79,9 @@ const Bloc = ({ imageUrl, imageAlt, side, bloc, ptComponents }: BlocProps) => {
           <Image
             src={imageUrl}
             alt={imageAlt ?? "illustration"}
-            quality={100}
             className="object-cover object-center"
-            fill={true}
-            unoptimized={true}
+            fill
+            sizes="50vw"
           />
         </div>
       ) : null}

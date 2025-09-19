@@ -85,9 +85,9 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             <Image
               src={"/img/partenaires.webp"}
               alt="illustration-partenaires"
-              quality={100}
               className="object-cover object-center"
-              fill={true}
+              fill
+              sizes="100vw"
             />
           </div>
           <p className="mx-auto max-w-prose text-wrap hyphens-auto">

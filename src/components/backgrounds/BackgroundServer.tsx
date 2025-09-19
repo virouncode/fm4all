@@ -11,10 +11,10 @@ const BackgroundServer = async () => {
           "une-image-de-bureaux-modernes-et-lumineux-avec-des-plantes-vertes",
         )}
         className="object-cover"
-        quality={75}
         fill
         sizes="100vw"
         priority
+        quality={100}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-black/90"></div>
     </div>
