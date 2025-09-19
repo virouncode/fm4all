@@ -87,7 +87,11 @@ const HeaderAdmin = () => {
           </nav>
         </div>
         <div className="flex items-center gap-4">
-          <Suspense>
+          <Suspense
+            fallback={
+              <div className="flex h-9 w-16 animate-pulse cursor-pointer items-center justify-center gap-1 rounded-md border text-sm hover:opacity-75"></div>
+            }
+          >
             <LocaleButton className="hidden sm:flex" />
           </Suspense>
 
@@ -124,7 +128,11 @@ const HeaderAdmin = () => {
           aria-label="Mobile navigation"
         >
           <div className="absolute top-4 right-6 flex items-center gap-4 sm:hidden">
-            <Suspense>
+            <Suspense
+              fallback={
+                <div className="flex h-9 w-16 animate-pulse cursor-pointer items-center justify-center gap-1 rounded-md border text-sm hover:opacity-75"></div>
+              }
+            >
               <LocaleButton className="flex gap-1" />
             </Suspense>
 

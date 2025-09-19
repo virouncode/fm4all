@@ -3,6 +3,7 @@
 import { usePathname } from "@/i18n/navigation";
 import { Menu, X } from "lucide-react";
 import { useLocale } from "next-intl";
+import { Suspense } from "react";
 import ContactButton from "../buttons/contact-button";
 import DevisButton from "../buttons/devis-button";
 import LinkedinButton from "../buttons/linkedin-button";
@@ -35,9 +36,13 @@ const HeaderButtons = ({
         setIsMobileNavOpen={setIsMobileNavOpen}
         withIcon={false}
       />
-
-      <LocaleButton className="hidden md:flex" />
-
+      <Suspense
+        fallback={
+          <div className="flex h-9 w-16 animate-pulse cursor-pointer items-center justify-center gap-1 rounded-md border text-sm hover:opacity-75"></div>
+        }
+      >
+        <LocaleButton className="hidden md:flex" />
+      </Suspense>
       <ContactButton
         setIsMobileNavOpen={setIsMobileNavOpen}
         className="hidden md:flex"

@@ -53,7 +53,11 @@ const HeaderAuth = () => {
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <Suspense>
+          <Suspense
+            fallback={
+              <div className="flex h-9 w-16 animate-pulse cursor-pointer items-center justify-center gap-1 rounded-md border text-sm hover:opacity-75"></div>
+            }
+          >
             <LocaleButton className="hidden md:flex" />
           </Suspense>
           <Button
@@ -98,7 +102,11 @@ const HeaderAuth = () => {
           {/* <div className="absolute top-4 left-6">
             <ModeToggle />
           </div> */}
-          <Suspense>
+          <Suspense
+            fallback={
+              <div className="flex h-9 w-16 animate-pulse cursor-pointer items-center justify-center gap-1 rounded-md border text-sm hover:opacity-75"></div>
+            }
+          >
             <LocaleButton className="absolute top-10 left-6 flex gap-1" />
           </Suspense>
           <div className="flex flex-col gap-4">
