@@ -13,6 +13,7 @@ const BackgroundClient = () => {
         )}
         className="object-cover"
         priority
+        fetchPriority="high"
         fill
         sizes="100vw"
       />
