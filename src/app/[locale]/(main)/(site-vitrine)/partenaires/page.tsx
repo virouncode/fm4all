@@ -88,6 +88,8 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
               className="object-cover object-center"
               fill
               sizes="100vw"
+              priority
+              fetchPriority="high"
             />
           </div>
           <p className="mx-auto max-w-prose text-wrap hyphens-auto">

@@ -68,6 +68,8 @@ const TltrCard = ({
             className="object-cover object-center"
             fill
             sizes="(max-width: 768px) 50vw"
+            priority
+            fetchPriority="high"
           />
         </div>
       </div>

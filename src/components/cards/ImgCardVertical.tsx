@@ -22,6 +22,8 @@ type ImgCardVerticalProps = {
   linkText: string;
   className?: string;
   obfuscated?: boolean;
+  priority?: boolean;
+  fetchPriority?: "auto" | "high" | "low";
 };
 
 const ImgCardVertical = ({
@@ -32,6 +34,8 @@ const ImgCardVertical = ({
   href,
   linkText,
   obfuscated = false,
+  priority = false,
+  fetchPriority = "auto",
 }: PropsWithChildren<ImgCardVerticalProps>) => {
   return (
     <div
@@ -44,6 +48,8 @@ const ImgCardVertical = ({
           fill
           className="object-cover object-center"
           sizes="(max-width: 768px) 100vw, 33vw"
+          priority={priority}
+          fetchPriority={fetchPriority}
         />
       </div>
 

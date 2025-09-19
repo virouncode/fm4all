@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 import { useLocale } from "next-intl";
 import Image from "next/image";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import LinkedinButton from "../buttons/linkedin-button";
 import HeaderButtons from "./header-buttons";
@@ -40,9 +40,13 @@ const Header = () => {
   // const t = useTranslations("header");
 
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
-  const isTablet = useMediaQuery({
-    query: "(max-width: 1024px)",
-  });
+  const [isTablet, setIsTablet] = useState(false);
+  const mediaQuery = useMediaQuery({ query: "(max-width: 1024px)" });
+
+  useEffect(() => {
+    setIsTablet(mediaQuery);
+  }, [mediaQuery]);
+
   const handleHideMobileNav = () => {
     setIsMobileNavOpen(false);
   };

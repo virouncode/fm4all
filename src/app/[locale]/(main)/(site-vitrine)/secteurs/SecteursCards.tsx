@@ -18,7 +18,7 @@ const SecteursCards = async () => {
           : "grid-cols-[repeat(auto-fit,minmax(250px,1fr))]"
       }`}
     >
-      {secteurs.map((secteur) => {
+      {secteurs.map((secteur, index) => {
         const secteurImageUrl = secteur.imagePrincipale
           ? urlFor(secteur.imagePrincipale)
           : null; //TODO placeholder image
@@ -36,6 +36,8 @@ const SecteursCards = async () => {
               params: { slug: secteurUrl },
             }}
             linkText={secteur.linkText ?? secteurUrl}
+            priority={index === 0}
+            fetchPriority={index === 0 ? "high" : "auto"}
           >
             <div className="flex h-52 flex-col gap-4 p-4">
               <p className="text-2xl">{secteur.titre}</p>

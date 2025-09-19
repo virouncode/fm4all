@@ -13,7 +13,7 @@ const ArticlesCards = async ({ articles, categorie }: ArticlesCardsProps) => {
 
   return (
     <div className="mt-6 grid w-full grid-cols-[repeat(auto-fit,minmax(250px,1fr))] items-center gap-6">
-      {articles.map((article) => {
+      {articles.map((article, index) => {
         const articleImageUrl = article.imagePrincipale
           ? urlFor(article.imagePrincipale)
           : null; //TODO placeholder image
@@ -33,6 +33,8 @@ const ArticlesCards = async ({ articles, categorie }: ArticlesCardsProps) => {
               params: { slug: articleSlug, subSlug: articleSubSlug },
             }}
             linkText={article.linkText ?? articleSubSlug}
+            priority={index === 0}
+            fetchPriority={index === 0 ? "high" : "auto"}
           >
             <div className="flex h-52 flex-col gap-4 p-4">
               <p className="text-2xl">{article.titre}</p>

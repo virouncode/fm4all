@@ -35,7 +35,7 @@ const ArticlesCarousel = async ({
       className="w-full"
     >
       <CarouselContent className="py-1">
-        {articles.map((article) => {
+        {articles.map((article, index) => {
           const articleImageUrl = article.imagePrincipale
             ? urlFor(article.imagePrincipale)
             : null; //TODO placeholder image
@@ -59,6 +59,8 @@ const ArticlesCarousel = async ({
                 }}
                 linkText={article.linkText ?? articleSubSlug}
                 obfuscated={obfuscated}
+                priority={index === 0}
+                fetchPriority={index === 0 ? "high" : "auto"}
               >
                 <div className="flex h-60 flex-col gap-4 p-4">
                   <p className="text-2xl">{article.titre}</p>
@@ -71,7 +73,7 @@ const ArticlesCarousel = async ({
           ) : null;
         })}
       </CarouselContent>
-      <CarouselPrevious className="-top-9 left-auto right-12 translate-y-0" />
+      <CarouselPrevious className="-top-9 right-12 left-auto translate-y-0" />
       <CarouselNext className="-top-9 right-0 translate-y-0" />
     </Carousel>
   );
