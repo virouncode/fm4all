@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 import { useLocale } from "next-intl";
 import Image from "next/image";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import LinkedinButton from "../buttons/linkedin-button";
 import HeaderButtons from "./header-buttons";
 import HeaderNavigationMenu from "./header-navigation-menu";
@@ -316,7 +316,6 @@ const Header = () => {
               />
             </div>
           </Link>
-
           <HeaderNavigationMenu
             services={services}
             secteurs={secteurs}
@@ -341,9 +340,7 @@ const Header = () => {
           aria-label="Mobile navigation"
         >
           <div className="absolute top-4 right-6 flex items-center gap-4 md:hidden">
-            <Suspense>
-              <LocaleButton className="flex gap-1" />
-            </Suspense>
+            <LocaleButton className="flex gap-1" />
             <ContactButton setIsMobileNavOpen={setIsMobileNavOpen} />
             <LinkedinButton setIsMobileNavOpen={setIsMobileNavOpen} />
             <UserButton setIsMobileNavOpen={setIsMobileNavOpen} />
