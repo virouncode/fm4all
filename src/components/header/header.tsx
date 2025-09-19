@@ -322,7 +322,7 @@ const Header = () => {
             secteurs={secteurs}
             orientation="horizontal"
             handleHideMobileNav={handleHideMobileNav}
-            className="hidden lg:block"
+            className="hidden min-[1160px]:block"
           />
         </div>
         <HeaderButtons
@@ -336,7 +336,7 @@ const Header = () => {
             isMobileNavOpen
               ? "translate-x-0 opacity-100"
               : "translate-x-full opacity-0"
-          } block transition-all duration-300 ease-in-out lg:hidden`}
+          } min-[1160px]:block:hidden block transition-all duration-300 ease-in-out`}
           role="navigation"
           aria-label="Mobile navigation"
         >
