@@ -27,8 +27,7 @@ import {
 } from "lucide-react";
 import { useLocale } from "next-intl";
 import Image from "next/image";
-import { Suspense, useEffect, useState } from "react";
-import { useMediaQuery } from "react-responsive";
+import { Suspense, useState } from "react";
 import LinkedinButton from "../buttons/linkedin-button";
 import HeaderButtons from "./header-buttons";
 import HeaderNavigationMenu from "./header-navigation-menu";
@@ -40,13 +39,6 @@ const Header = () => {
   // const t = useTranslations("header");
 
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
-  const [isTablet, setIsTablet] = useState(false);
-  const mediaQuery = useMediaQuery({ query: "(max-width: 1024px)" });
-
-  useEffect(() => {
-    setIsTablet(mediaQuery);
-  }, [mediaQuery]);
-
   const handleHideMobileNav = () => {
     setIsMobileNavOpen(false);
   };
@@ -324,46 +316,45 @@ const Header = () => {
               />
             </div>
           </Link>
-          {!isTablet && (
-            <HeaderNavigationMenu
-              services={services}
-              secteurs={secteurs}
-              orientation="horizontal"
-              handleHideMobileNav={handleHideMobileNav}
-            />
-          )}
+
+          <HeaderNavigationMenu
+            services={services}
+            secteurs={secteurs}
+            orientation="horizontal"
+            handleHideMobileNav={handleHideMobileNav}
+            className="hidden lg:block"
+          />
         </div>
         <HeaderButtons
           isMobileNavOpen={isMobileNavOpen}
           setIsMobileNavOpen={setIsMobileNavOpen}
         />
         {/***************** MOBILE NAVIGATION *****************/}
-        {isTablet && (
-          <div
-            className={`bg-background fixed top-16 right-0 left-0 flex h-[calc(100vh-4rem)] items-start justify-center text-2xl shadow-lg ${
-              isMobileNavOpen
-                ? "translate-x-0 opacity-100"
-                : "translate-x-full opacity-0"
-            } transition-all duration-300 ease-in-out`}
-            role="navigation"
-            aria-label="Mobile navigation"
-          >
-            <div className="absolute top-4 right-6 flex items-center gap-4 md:hidden">
-              <Suspense>
-                <LocaleButton className="flex gap-1" />
-              </Suspense>
-              <ContactButton setIsMobileNavOpen={setIsMobileNavOpen} />
-              <LinkedinButton setIsMobileNavOpen={setIsMobileNavOpen} />
-              <UserButton setIsMobileNavOpen={setIsMobileNavOpen} />
-            </div>
-            <HeaderNavigationMenu
-              services={services}
-              secteurs={secteurs}
-              orientation="vertical"
-              handleHideMobileNav={handleHideMobileNav}
-            />
+
+        <div
+          className={`bg-background fixed top-16 right-0 left-0 flex h-[calc(100vh-4rem)] items-start justify-center text-2xl shadow-lg ${
+            isMobileNavOpen
+              ? "translate-x-0 opacity-100"
+              : "translate-x-full opacity-0"
+          } block transition-all duration-300 ease-in-out lg:hidden`}
+          role="navigation"
+          aria-label="Mobile navigation"
+        >
+          <div className="absolute top-4 right-6 flex items-center gap-4 md:hidden">
+            <Suspense>
+              <LocaleButton className="flex gap-1" />
+            </Suspense>
+            <ContactButton setIsMobileNavOpen={setIsMobileNavOpen} />
+            <LinkedinButton setIsMobileNavOpen={setIsMobileNavOpen} />
+            <UserButton setIsMobileNavOpen={setIsMobileNavOpen} />
           </div>
-        )}
+          <HeaderNavigationMenu
+            services={services}
+            secteurs={secteurs}
+            orientation="vertical"
+            handleHideMobileNav={handleHideMobileNav}
+          />
+        </div>
       </header>
     </div>
   );

@@ -47,6 +47,7 @@ type HeaderNavigationMenuProps = {
   }[];
   orientation: "horizontal" | "vertical";
   handleHideMobileNav: () => void;
+  className?: string;
 };
 
 const HeaderNavigationMenu = ({
@@ -54,6 +55,7 @@ const HeaderNavigationMenu = ({
   secteurs,
   orientation,
   handleHideMobileNav,
+  className,
 }: HeaderNavigationMenuProps) => {
   const locale = useLocale();
   const path = usePathname();
@@ -64,7 +66,7 @@ const HeaderNavigationMenu = ({
 
   return orientation === "horizontal" ? (
     //DESKTOP
-    <NavigationMenu>
+    <NavigationMenu className={`${className}`}>
       <NavigationMenuList className="flex items-center gap-4">
         <NavigationMenuItem>
           <NavigationMenuTrigger
