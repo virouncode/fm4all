@@ -46,12 +46,10 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
       <Breadcrumb className="mb-10">
         <BreadcrumbList className="flex flex-wrap text-sm lg:text-base">
           <BreadcrumbItem>
-            <BreadcrumbLink
-              className="flex items-center"
-              href={`/`}
-              title={t("accueil")}
-            >
-              <HomeIcon size={14} />
+            <BreadcrumbLink className="flex items-center" asChild>
+              <Link href={`/`} title={t("accueil")}>
+                <HomeIcon size={14} />
+              </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -60,16 +58,16 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <h1 className="mb-10 mt-6 text-4xl">{t("nos-engagements")}</h1>
+      <h1 className="mt-6 mb-10 text-4xl">{t("nos-engagements")}</h1>
       <article className="flex flex-col gap-10">
         <div className="flex flex-col gap-8">
-          <p className="mx-auto max-w-prose hyphens-auto text-wrap font-bold">
+          <p className="mx-auto max-w-prose font-bold text-wrap hyphens-auto">
             {t(
               "chez-fm4all-nous-avons-a-coeur-de-batir-des-relations-de-confiance-et-de-fournir-des-services-dexcellence-nos-engagements-refletent-notre-volonte-de-placer-vos-besoins-vos-attentes-et-vos-valeurs-au-centre-de-nos-priorites",
             )}
           </p>
           <WhyCards className="my-10" />
-          <p className="mx-auto max-w-prose hyphens-auto text-wrap">
+          <p className="mx-auto max-w-prose text-wrap hyphens-auto">
             {t("chez-fm4all-nous-avons-concu-nos")}{" "}
             <Link
               href="/services"
@@ -89,12 +87,12 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <p className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("simplicite")}
           </p>
-          <p className="mx-auto max-w-prose hyphens-auto text-wrap">
+          <p className="mx-auto max-w-prose text-wrap hyphens-auto">
             {t(
               "nous-vous-simplifions-la-vie-en-prenant-en-charge-tous-les-aspects-lies-a-vos-services-generaux",
             )}
           </p>
-          <ul className="flex max-w-prose flex-col gap-4 hyphens-auto text-wrap md:mx-auto">
+          <ul className="flex max-w-prose flex-col gap-4 text-wrap hyphens-auto md:mx-auto">
             <li className="list-disc md:ml-10">
               {t(
                 "gestion-centralisee-une-plateforme-unique-pour-gerer-vos-contrats-vos-factures-et-vos-reclamations",
@@ -114,12 +112,12 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
         </div>
         <div className="flex flex-col gap-6">
           <p className="mb-4 ml-6 border-l-2 px-4 text-3xl">{t("rapiditie")}</p>
-          <p className="mx-auto max-w-prose hyphens-auto text-wrap">
+          <p className="mx-auto max-w-prose text-wrap hyphens-auto">
             {t(
               "votre-temps-est-precieux-et-nous-nous-engageons-a-agir-avec-efficacite",
             )}
           </p>
-          <ul className="flex max-w-prose flex-col gap-4 hyphens-auto text-wrap md:mx-auto">
+          <ul className="flex max-w-prose flex-col gap-4 text-wrap hyphens-auto md:mx-auto">
             <li className="list-disc md:ml-10">
               {t(
                 "reactivite-maximale-nos-equipes-sont-disponibles-pour-repondre-a-vos-demandes-et-intervenir-rapidement-en-cas-de-besoin",
@@ -139,12 +137,12 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
         </div>
         <div className="flex flex-col gap-6">
           <p className="mb-4 ml-6 border-l-2 px-4 text-3xl">{t("fiabilite")}</p>
-          <p className="mx-auto max-w-prose hyphens-auto text-wrap">
+          <p className="mx-auto max-w-prose text-wrap hyphens-auto">
             {t(
               "faites-confiance-a-des-experts-pour-garantir-des-prestations-irreprochables",
             )}
           </p>
-          <ul className="flex max-w-prose flex-col gap-4 hyphens-auto text-wrap md:mx-auto">
+          <ul className="flex max-w-prose flex-col gap-4 text-wrap hyphens-auto md:mx-auto">
             <li className="list-disc md:ml-10">
               {t(
                 "partenaires-qualifies-tous-nos-prestataires-sont-selectionnes-selon-des-criteres-stricts-de-qualite-dexpertise-et-de-serieux",
@@ -164,12 +162,12 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
         </div>
         <div className="flex flex-col gap-6">
           <p className="mb-4 ml-6 border-l-2 px-4 text-3xl">{t("serenite")}</p>
-          <p className="mx-auto max-w-prose hyphens-auto text-wrap">
+          <p className="mx-auto max-w-prose text-wrap hyphens-auto">
             {t(
               "travaillez-en-toute-tranquillite-desprit-grace-a-notre-accompagnement-complet",
             )}
           </p>
-          <ul className="flex max-w-prose flex-col gap-4 hyphens-auto text-wrap md:mx-auto">
+          <ul className="flex max-w-prose flex-col gap-4 text-wrap hyphens-auto md:mx-auto">
             <li className="list-disc md:ml-10">
               {t(
                 "point-de-contact-unique-nous-sommes-votre-interlocuteur-dedie-pour-gerer-toutes-les-etapes-des-contrats-aux-eventuels-litiges",
@@ -191,12 +189,12 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <p className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("optimisation-des-couts")}
           </p>
-          <p className="mx-auto max-w-prose hyphens-auto text-wrap">
+          <p className="mx-auto max-w-prose text-wrap hyphens-auto">
             {t(
               "nous-vous-aidons-a-maitriser-vos-depenses-tout-en-maintenant-un-haut-niveau-de-service",
             )}
           </p>
-          <ul className="flex max-w-prose flex-col gap-4 hyphens-auto text-wrap md:mx-auto">
+          <ul className="flex max-w-prose flex-col gap-4 text-wrap hyphens-auto md:mx-auto">
             <li className="list-disc md:ml-10">
               {t(
                 "solutions-adaptees-nos-gammes-essentiel-confort-excellence-sajustent-a-vos-besoins-et-a-votre-budget",
@@ -218,12 +216,12 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <p className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("travaillons-ensemble-pour-une-gestion-optimisee-et-sereine")}
           </p>
-          <p className="mx-auto max-w-prose hyphens-auto text-wrap">
+          <p className="mx-auto max-w-prose text-wrap hyphens-auto">
             {t(
               "en-nous-confiant-vos-services-generaux-vous-faites-le-choix-dune-approche-moderne-responsable-et-centree-sur-vos-priorites-avec-fm4all-vous-gagnez-du-temps-reduisez-vos-efforts-et-optimisez-vos-ressources-tout-en-vous-assurant-des-prestations-fiables-et-rapides",
             )}
           </p>
-          <p className="mx-auto mb-10 max-w-prose hyphens-auto text-wrap">
+          <p className="mx-auto mb-10 max-w-prose text-wrap hyphens-auto">
             {t(
               "pret-a-simplifier-votre-quotidien-contactez-nous-des-aujourdhui-et-decouvrez-comment-nous-pouvons-transformer-la-gestion-de-vos-services",
             )}
@@ -235,12 +233,12 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <p className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("1-qualite-et-excellence-au-service-de-nos-clients")}
           </p>
-          <p className="mx-auto max-w-prose hyphens-auto text-wrap">
+          <p className="mx-auto max-w-prose text-wrap hyphens-auto">
             {t(
               "nous-nous-engageons-a-vous-offrir-des-prestations-irreprochables-adaptees-a-vos-exigences",
             )}
           </p>
-          <ul className="flex max-w-prose flex-col gap-4 hyphens-auto text-wrap md:mx-auto">
+          <ul className="flex max-w-prose flex-col gap-4 text-wrap hyphens-auto md:mx-auto">
             <li className="list-disc md:ml-10">
               {t(
                 "selection-rigoureuse-des-partenaires-tous-nos-prestataires-sont-minutieusement-choisis-selon-des-criteres-stricts-de-qualite-de-fiabilite-et-dexpertise",
@@ -262,12 +260,12 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <p className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("2-transparence-et-gestion-simplifiee")}
           </p>
-          <p className="mx-auto max-w-prose hyphens-auto text-wrap">
+          <p className="mx-auto max-w-prose text-wrap hyphens-auto">
             {t(
               "notre-plateforme-est-concue-pour-vous-offrir-une-experience-fluide-et-sans-surprise",
             )}
           </p>
-          <ul className="flex max-w-prose flex-col gap-4 hyphens-auto text-wrap md:mx-auto">
+          <ul className="flex max-w-prose flex-col gap-4 text-wrap hyphens-auto md:mx-auto">
             <li className="list-disc md:ml-10">
               {t(
                 "gestion-centralisee-contrats-factures-reclamations-tout-est-regroupe-pour-vous-faire-gagner-du-temps",
@@ -289,12 +287,12 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <p className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("3-engagement-ecologique-et-responsable")}
           </p>
-          <p className="mx-auto max-w-prose hyphens-auto text-wrap">
+          <p className="mx-auto max-w-prose text-wrap hyphens-auto">
             {t(
               "nous-croyons-en-un-avenir-durable-et-integrons-des-pratiques-ecoresponsables-dans-chacun-de-nos-services",
             )}
           </p>
-          <ul className="flex max-w-prose flex-col gap-4 hyphens-auto text-wrap md:mx-auto">
+          <ul className="flex max-w-prose flex-col gap-4 text-wrap hyphens-auto md:mx-auto">
             <li className="list-disc md:ml-10">
               {t(
                 "sourcing-responsable-nos-produits-tels-que-les-cafes-snacks-ou-fruits-frais-sont-selectionnes-avec-soin-aupres-de-fournisseurs-privilegiant-des-filieres-ethiques-et-locales",
@@ -316,12 +314,12 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <p className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("4-inclusion-et-solidarite")}
           </p>
-          <p className="mx-auto max-w-prose hyphens-auto text-wrap">
+          <p className="mx-auto max-w-prose text-wrap hyphens-auto">
             {t(
               "nous-nous-engageons-a-collaborer-avec-des-entreprises-adaptees-et-a-encourager-linclusion-sociale",
             )}
           </p>
-          <ul className="flex max-w-prose flex-col gap-4 hyphens-auto text-wrap md:mx-auto">
+          <ul className="flex max-w-prose flex-col gap-4 text-wrap hyphens-auto md:mx-auto">
             <li className="list-disc md:ml-10">
               {t(
                 "partenariat-avec-des-entreprises-adaptees-vous-avez-la-possibilite-de-soutenir-lemploi-de-personnes-en-situation-de-handicap-en-choisissant-nos-prestations",
@@ -338,12 +336,12 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <p className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("5-engagement-humain")}
           </p>
-          <p className="mx-auto max-w-prose hyphens-auto text-wrap">
+          <p className="mx-auto max-w-prose text-wrap hyphens-auto">
             {t(
               "nous-savons-que-la-reussite-passe-avant-tout-par-des-relations-humaines-fortes",
             )}
           </p>
-          <ul className="flex max-w-prose flex-col gap-4 hyphens-auto text-wrap md:mx-auto">
+          <ul className="flex max-w-prose flex-col gap-4 text-wrap hyphens-auto md:mx-auto">
             <li className="list-disc md:ml-10">
               {t(
                 "formation-et-encadrement-nos-equipes-beneficient-dune-formation-continue-pour-maintenir-leurs-competences-et-leur-motivation",
@@ -370,12 +368,12 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <p className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("travaillons-ensemble-pour-un-avenir-durable-et-performant")}
           </p>
-          <p className="mx-auto max-w-prose hyphens-auto text-wrap">
+          <p className="mx-auto max-w-prose text-wrap hyphens-auto">
             {t(
               "en-choisissant-fm4all-vous-faites-le-choix-dun-partenaire-fiable-engage-et-a-lecoute-nous-ne-nous-contentons-pas-de-vous-accompagner-nous-nous-investissons-pleinement-pour-garantir-votre-satisfaction-et-celle-de-vos-equipes",
             )}
           </p>
-          <p className="mx-auto mb-10 max-w-prose hyphens-auto text-wrap">
+          <p className="mx-auto mb-10 max-w-prose text-wrap hyphens-auto">
             {t(
               "envie-den-savoir-plus-sur-nos-engagements-ou-nos-services-contactez-nous-des-aujourdhui",
             )}

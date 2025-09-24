@@ -8,6 +8,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Link } from "@/i18n/navigation";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { HomeIcon } from "lucide-react";
@@ -43,12 +44,10 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
       <Breadcrumb className="mb-10">
         <BreadcrumbList className="flex flex-wrap text-sm lg:text-base">
           <BreadcrumbItem>
-            <BreadcrumbLink
-              className="flex items-center"
-              href={`/`}
-              title={t("accueil")}
-            >
-              <HomeIcon size={14} />
+            <BreadcrumbLink className="flex items-center" asChild>
+              <Link href={`/`} title={t("accueil")}>
+                <HomeIcon size={14} />
+              </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />

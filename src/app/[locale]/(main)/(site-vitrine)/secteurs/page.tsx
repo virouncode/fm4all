@@ -6,6 +6,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Link } from "@/i18n/navigation";
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
 import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import { HomeIcon } from "lucide-react";
@@ -46,12 +47,10 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
       <Breadcrumb className="mb-10">
         <BreadcrumbList className="flex flex-wrap text-sm lg:text-base">
           <BreadcrumbItem>
-            <BreadcrumbLink
-              className="flex items-center"
-              href={`/`}
-              title={t("accueil")}
-            >
-              <HomeIcon size={14} />
+            <BreadcrumbLink className="flex items-center" asChild>
+              <Link href={`/`} title={t("accueil")}>
+                <HomeIcon size={14} />
+              </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -63,7 +62,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
       <article className="mt-6 flex flex-col gap-10">
         <h1 className="text-4xl">{t("nos-secteurs-dintervention")}</h1>
         <div className="flex flex-col gap-6">
-          <div className="mx-auto flex w-full max-w-prose flex-col gap-6 hyphens-auto text-wrap">
+          <div className="mx-auto flex w-full max-w-prose flex-col gap-6 text-wrap hyphens-auto">
             <p>
               <strong>
                 {t(
@@ -84,7 +83,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("pourquoi-une-approche-sectorielle")}
           </h2>
-          <div className="mx-auto flex w-full max-w-prose flex-col gap-6 hyphens-auto text-wrap">
+          <div className="mx-auto flex w-full max-w-prose flex-col gap-6 text-wrap hyphens-auto">
             <p>
               {t("parce-que")}{" "}
               <strong>{t("chaque-secteur-a-ses-specificites")}</strong>
@@ -105,7 +104,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           </h2>
           <div className="flex flex-col gap-8">
             <h3 className="text-center text-xl font-bold">{t("bureaux")}</h3>
-            <div className="mx-auto flex w-full max-w-prose flex-col gap-6 hyphens-auto text-wrap">
+            <div className="mx-auto flex w-full max-w-prose flex-col gap-6 text-wrap hyphens-auto">
               <p>
                 {t(
                   "que-vous-soyez-une-pme-un-siege-social-ou-un-cabinet-professionnel-nos-services-sadaptent-a-vos-rythmes-et-a-vos-contraintes-nettoyage-cafe-maintenance-securite-tout-est-centralise",
@@ -115,7 +114,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             <h3 className="text-center text-xl font-bold">
               {t("locaux-commerciaux-and-retail")}
             </h3>
-            <div className="mx-auto flex w-full max-w-prose flex-col gap-6 hyphens-auto text-wrap">
+            <div className="mx-auto flex w-full max-w-prose flex-col gap-6 text-wrap hyphens-auto">
               <p>
                 {t(
                   "assurez-lhygiene-laccueil-et-la-securite-de-vos-espaces-ouverts-au-public-nous-vous-accompagnons-dans-la-gestion-quotidienne-de-vos-services-avec-discretion-et-efficacite",
@@ -123,7 +122,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
               </p>
             </div>
             <h3 className="text-center text-xl font-bold">{t("entrepots")}</h3>
-            <div className="mx-auto flex w-full max-w-prose flex-col gap-6 hyphens-auto text-wrap">
+            <div className="mx-auto flex w-full max-w-prose flex-col gap-6 text-wrap hyphens-auto">
               <p>
                 {t(
                   "vos-sites-logistiques-necessitent-une-approche-rigoureuse-maintenance-eclairage-securite-incendie-gestion-des-nuisibles-nos-equipes-vous-proposent-des-solutions-operationnelles",
@@ -133,7 +132,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             <h3 className="text-center text-xl font-bold">
               {t("cabinets-medicaux")}
             </h3>
-            <div className="mx-auto flex w-full max-w-prose flex-col gap-6 hyphens-auto text-wrap">
+            <div className="mx-auto flex w-full max-w-prose flex-col gap-6 text-wrap hyphens-auto">
               <p>
                 {t(
                   "hygiene-renforcee-suivi-des-dechets-medicaux-protocoles-stricts-nous-accompagnons-les-professionnels-de-sante-dans-le-respect-de-leurs-obligations",
@@ -143,7 +142,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             <h3 className="text-center text-xl font-bold">
               {t("utilisateurs-dimmeubles-entiers-tours-de-bureaux")}
             </h3>
-            <div className="mx-auto flex w-full max-w-prose flex-col gap-6 hyphens-auto text-wrap">
+            <div className="mx-auto flex w-full max-w-prose flex-col gap-6 text-wrap hyphens-auto">
               <p>
                 <strong>
                   {t("pilotez-lensemble-de-votre-site-avec-un-seul-partenaire")}
@@ -178,7 +177,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             <h3 className="text-center text-xl font-bold">
               {t("proprietaires-et-gestionnaires-dimmeubles-de-bureaux")}
             </h3>
-            <div className="mx-auto flex w-full max-w-prose flex-col gap-6 hyphens-auto text-wrap">
+            <div className="mx-auto flex w-full max-w-prose flex-col gap-6 text-wrap hyphens-auto">
               <p>
                 <strong>
                   {t(
@@ -230,7 +229,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             <h3 className="text-center text-xl font-bold">
               {t("erp-etablissements-recevant-du-public")}
             </h3>
-            <div className="mx-auto flex w-full max-w-prose flex-col gap-6 hyphens-auto text-wrap">
+            <div className="mx-auto flex w-full max-w-prose flex-col gap-6 text-wrap hyphens-auto">
               <p>
                 {t(
                   "accessibilite-securite-incendie-affichages-obligatoires-nettoyage-aux-normes-nous-vous-aidons-a-repondre-a-toutes-les-obligations-legales-des-erp",
@@ -238,7 +237,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
               </p>
             </div>
             <h3 className="text-center text-xl font-bold">{t("pme-pmi")}</h3>
-            <div className="mx-auto flex w-full max-w-prose flex-col gap-6 hyphens-auto text-wrap">
+            <div className="mx-auto flex w-full max-w-prose flex-col gap-6 text-wrap hyphens-auto">
               <p>
                 {t(
                   "une-gestion-sur-mesure-adaptee-aux-entreprises-industrielles-ou-de-production-avec-un-acces-facilite-aux-services-essentiels-du-quotidien",
@@ -248,7 +247,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             <h3 className="text-center text-xl font-bold">
               {t("start-up-and-scale-up")}
             </h3>
-            <div className="mx-auto flex w-full max-w-prose flex-col gap-6 hyphens-auto text-wrap">
+            <div className="mx-auto flex w-full max-w-prose flex-col gap-6 text-wrap hyphens-auto">
               <p>
                 {t(
                   "des-solutions-flexibles-evolutives-et-rapides-a-mettre-en-place-pour-soutenir-votre-croissance-moins-dadministratif-plus-de-concentration-sur-vos-objectifs",
@@ -256,7 +255,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
               </p>
             </div>
             <h3 className="text-center text-xl font-bold">Co-Working</h3>
-            <div className="mx-auto flex w-full max-w-prose flex-col gap-6 hyphens-auto text-wrap">
+            <div className="mx-auto flex w-full max-w-prose flex-col gap-6 text-wrap hyphens-auto">
               <p>
                 {t(
                   "proprete-confort-gestion-des-stocks-accueil-creez-une-experience-premium-pour-vos-membres-sans-vous-soucier-de-la-logistique",
@@ -269,7 +268,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <h2 className="mb-4 ml-6 border-l-2 px-4 text-3xl">
             {t("un-seul-partenaire-tous-vos-services")}
           </h2>
-          <div className="mx-auto flex w-full max-w-prose flex-col gap-6 hyphens-auto text-wrap">
+          <div className="mx-auto flex w-full max-w-prose flex-col gap-6 text-wrap hyphens-auto">
             <p>
               <strong>
                 {t(
