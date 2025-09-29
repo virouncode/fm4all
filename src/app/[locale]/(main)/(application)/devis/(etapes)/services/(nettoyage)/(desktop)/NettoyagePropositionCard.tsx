@@ -10,61 +10,28 @@ import { Switch } from "@/components/ui/switch";
 import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
-import { useNettoyageStore } from "@/stores/nettoyageStore";
-import { GammeType } from "@/zod-schemas/gamme";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 
 type NettoyagePropositionCardProps = {
-  handleClickProposition: (proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-    freqAnnuelle: number | null;
-    hParPassage: number;
-    tauxHoraire: number;
-    gamme: GammeType;
-    totalAnnuel: number | null;
-  }) => void;
   proposition: {
-    id: number;
-    fournisseurId: number;
-    nomFournisseur: string;
-    sloganFournisseur: string | null;
+    id: number | undefined;
     logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectifFournisseur: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
     freqAnnuelle: number | null;
-    hParPassage: number;
-    tauxHoraire: number;
-    gamme: GammeType;
+    hParPassage: number | undefined;
+    gamme: "essentiel" | "confort" | "excellence" | undefined;
     totalAnnuel: number | null;
   };
 };
 
 const NettoyagePropositionCard = ({
-  handleClickProposition,
   proposition,
 }: NettoyagePropositionCardProps) => {
   const t = useTranslations("DevisPage");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
   const tGlobal = useTranslations("Global");
-  const nettoyage = useNettoyageStore((s) => s.nettoyage);
+  // const nettoyage = useNettoyageStore((s) => s.nettoyage);
   const gamme = proposition.gamme;
   const color = getFm4AllColor(gamme);
 
@@ -146,21 +113,26 @@ const NettoyagePropositionCard = ({
     </div>
   );
 
+  const handleClickProposition = (proposition: {
+    id: number | undefined;
+    logoUrl: string | null;
+    freqAnnuelle: number | null;
+    hParPassage: number | undefined;
+    gamme: "essentiel" | "confort" | "excellence" | undefined;
+    totalAnnuel: number | null;
+  }) => {};
+
   return (
     <div
-      className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-4 text-2xl text-slate-200 ${
-        nettoyage.infos.fournisseurId === proposition.fournisseurId &&
-        nettoyage.infos.gammeSelected === proposition.gamme
-          ? "ring-fm4alldestructive ring-4 ring-inset"
-          : ""
-      }`}
+      className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-4 text-2xl text-slate-200`}
       onClick={() => handleClickProposition(proposition)}
     >
       <Switch
-        checked={
-          nettoyage.infos.fournisseurId === proposition.fournisseurId &&
-          nettoyage.infos.gammeSelected === proposition.gamme
-        }
+        // checked={
+        //   nettoyage.infos.fournisseurId === proposition.fournisseurId &&
+        //   nettoyage.infos.gammeSelected === proposition.gamme
+        // }
+        checked={true}
         onCheckedChange={() => handleClickProposition(proposition)}
         className="data-[state=checked]:bg-fm4alldestructive"
         title={t("selectionnez-cette-proposition")}

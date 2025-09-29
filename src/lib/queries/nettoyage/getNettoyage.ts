@@ -2,6 +2,8 @@ import { RATIO } from "@/constants/constants";
 import { db } from "@/db";
 import {
   fournisseurs,
+  nettoyageOffres,
+  nettoyageProduits,
   nettoyageQuantites,
   nettoyageRepasseTarifs,
   nettoyageTarifs,
@@ -10,10 +12,13 @@ import {
 import {
   getFournisseurTag,
   getGlobalTag,
+  getProduitTag,
   getSurfaceTag,
 } from "@/lib/data-cache";
 import { errorHelper } from "@/lib/errorHelper";
 import { roundSurface } from "@/lib/utils/roundSurface";
+import { selectNettoyageOffreSchema } from "@/zod-schemas/nettoyageOffre";
+import { selectNettoyageProduitSchema } from "@/zod-schemas/nettoyageProduit";
 import { selectNettoyageQuantitesSchema } from "@/zod-schemas/nettoyageQuantites";
 import { selectRepasseTarifsSchema } from "@/zod-schemas/nettoyageRepasse";
 import {
@@ -68,6 +73,53 @@ export const getNettoyageAllQuantites = async () => {
       freqAnnuelle: result.freqAnnuelle / RATIO,
     }));
     return data;
+  } catch (err) {
+    errorHelper(err);
+  }
+};
+
+export const getNettoyageProduits = async (surface: string) => {
+  "use cache";
+  cacheTag(getSurfaceTag("nettoyageProduits", surface));
+  console.log(`🔍 DB REQUEST: getNettoyageProduits(${surface})`);
+  const roundedSurface = roundSurface(parseInt(surface));
+  try {
+    const results = await db
+      .select()
+      .from(nettoyageProduits)
+      .where(eq(nettoyageProduits.surface, roundedSurface));
+    if (results.length === 0) return [];
+    const validatedResults = results.map((result) =>
+      selectNettoyageProduitSchema.parse(result),
+    );
+    const data = validatedResults.map((result) => ({
+      ...result,
+      hParPassage: result.hParPassage / RATIO,
+    }));
+    return data;
+  } catch (err) {
+    errorHelper(err);
+  }
+};
+
+export const getNettoyageOffres = async (produitId: number) => {
+  "use cache";
+  cacheTag(getProduitTag("nettoyageOffres", produitId));
+  console.log(`🔍 DB REQUEST: getNettoyageOffres(${produitId})`);
+  try {
+    const results = await db
+      .select()
+      .from(nettoyageOffres)
+      .where(eq(nettoyageOffres.produitId, produitId));
+    if (results.length === 0) return null;
+    const validatedResults = results.map((result) =>
+      selectNettoyageOffreSchema.parse(result),
+    );
+    const data = validatedResults.map((result) => ({
+      ...result,
+      tauxHoraire: result.tauxHoraire / RATIO,
+    }));
+    return data[0];
   } catch (err) {
     errorHelper(err);
   }

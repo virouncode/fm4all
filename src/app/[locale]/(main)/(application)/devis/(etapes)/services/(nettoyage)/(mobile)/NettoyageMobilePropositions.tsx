@@ -1,6 +1,7 @@
+"use client";
 import { GammeType } from "@/zod-schemas/gamme";
-import NettoyageMobilePropositionsCarousel from "./NettoyageMobilePropositionsCarousel";
 import { useTranslations } from "next-intl";
+import NettoyageMobilePropositionsCarousel from "./NettoyageMobilePropositionsCarousel";
 
 type NettoyageMobilePropositionsProps = {
   handleClickProposition: (proposition: {

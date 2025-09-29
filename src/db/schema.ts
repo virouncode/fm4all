@@ -34,10 +34,57 @@ export const typeHygieneEnum = pgEnum("typehygiene", [
   "balai",
   "poubelle",
 ]);
+
+export const typeHygieneDistribEnum = pgEnum("typehygienedistrib", [
+  "emp",
+  "poubelleEmp",
+  "savon",
+  "ph",
+  "desinfectant",
+  "parfum",
+  "balai",
+  "poubelle",
+]);
+
+export const typeHygieneConsoEnum = pgEnum("typehygieneconso", [
+  "emp",
+  "savon",
+  "ph",
+  "desinfectant",
+]);
+
+export const typePorteCoupeFeuEnum = pgEnum("typeportecoupefeu", [
+  "vantaux",
+  "coulissante",
+]);
+
+export const typeColonneSecheEnum = pgEnum("typecolonneseche", [
+  "statique",
+  "dynamique",
+]);
+
+export const typeOfficeManagerEnum = pgEnum("typeofficemanager", [
+  "standard",
+  "premium",
+]);
+
 export const typeOccupationEnum = pgEnum("typeoccupation", [
   "partieEtage",
   "plateauComplet",
   "batimentEntier",
+]);
+export const typeLocationEnum = pgEnum("typelocation", [
+  "oneShot",
+  "12m",
+  "24m",
+  "36m",
+  "48m",
+  "60m",
+]);
+export const typeIncendieTrilogieEnum = pgEnum("typeincendietrilogie", [
+  "extincteur",
+  "baes",
+  "telBaes",
 ]);
 export const possibiliteEnum = pgEnum("possibilite", [
   "possible",
@@ -165,7 +212,7 @@ export const nettoyageTarifs = pgTable("nettoyage_tarifs", {
   tauxHoraire: integer("taux_horaire").notNull(),
   surface: integer().notNull(),
   gamme: gammeEnum().notNull(),
-  imageUrl: varchar(),
+  imageUrl: varchar("image_url"),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
@@ -180,7 +227,7 @@ export const nettoyageRepasseTarifs = pgTable("nettoyage_repasse_tarifs", {
   tauxHoraire: integer("taux_horaire").notNull(),
   surface: integer().notNull(),
   gamme: gammeEnum().notNull(),
-  imageUrl: varchar(),
+  imageUrl: varchar("image_url"),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
@@ -196,7 +243,7 @@ export const nettoyageVitrerieTarifs = pgTable("nettoyage_vitrerie_tarifs", {
   tauxHoraire: integer("taux_horaire").notNull(),
   minFacturation: integer("min_facturation").notNull(),
   fraisDeplacement: integer("frais_deplacement").notNull(),
-  imageUrl: varchar(),
+  imageUrl: varchar("image_url"),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
@@ -224,7 +271,7 @@ export const hygieneDistribTarifs = pgTable("hygiene_distrib_tarifs", {
   pa12M: integer("pa_12m"),
   pa24M: integer("pa_24m"),
   pa36M: integer("pa_36m"),
-  imageUrl: varchar(),
+  imageUrl: varchar("image_url"),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
@@ -264,7 +311,7 @@ export const hygieneConsoTarifs = pgTable("hygiene_conso_tarifs", {
   paParPersonneSavon: integer("pa_par_personne_savon").notNull(),
   paParPersonnePh: integer("pa_par_personne_ph").notNull(),
   paParPersonneDesinfectant: integer("pa_par_personne_desinfectant").notNull(),
-  imageUrl: varchar(),
+  imageUrl: varchar("image_url"),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
@@ -288,7 +335,7 @@ export const maintenanceTarifs = pgTable("maintenance_tarifs", {
   hParPassage: integer("h_par_passage").notNull(),
   tauxHoraire: integer("taux_horaire").notNull(),
   gamme: gammeEnum().notNull(),
-  imageUrl: varchar(),
+  imageUrl: varchar("image_url"),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
@@ -346,7 +393,7 @@ export const incendieTarifs = pgTable("incendie_tarifs", {
   prixParBaes: integer("prix_par_baes").notNull(),
   prixParTelBaes: integer("prix_par_tel_baes").notNull(),
   fraisDeplacement: integer("frais_deplacement").notNull(),
-  imageUrl: varchar(),
+  imageUrl: varchar("image_url"),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
@@ -432,7 +479,7 @@ export const cafeMachines = pgTable("cafe_machines", {
   lactee: boolean().notNull(),
   gourmande: boolean().notNull(),
   infos: varchar(),
-  imageUrl: varchar(),
+  imageUrl: varchar("image_url"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
 });
@@ -459,7 +506,7 @@ export const cafeMachinesTarifs = pgTable("cafe_machines_tarifs", {
   fraisInstallation: integer("frais_installation"),
   cafeMachineId: integer("cafe_machine_id").references(() => cafeMachines.id),
   reconditionne: boolean().default(false),
-  imageUrl: varchar(),
+  imageUrl: varchar("image_url"),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
@@ -473,7 +520,7 @@ export const cafeConsoTarifs = pgTable("cafe_conso_tarifs", {
   gamme: gammeEnum().notNull(),
   effectif: integer().notNull(),
   prixUnitaire: integer("prix_unitaire"),
-  imageUrl: varchar(),
+  imageUrl: varchar("image_url"),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
@@ -487,7 +534,7 @@ export const theConsoTarifs = pgTable("the_conso_tarifs", {
   gamme: gammeEnum().notNull(),
   effectif: integer().notNull(),
   prixUnitaire: integer("prix_unitaire"),
-  imageUrl: varchar(),
+  imageUrl: varchar("image_url"),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
@@ -550,7 +597,7 @@ export const fruitsTarifs = pgTable("fruits_tarifs", {
   effectif: integer().notNull(),
   prixKg: integer("prix_kg"),
   gamme: gammeEnum().notNull(),
-  imageUrl: varchar(),
+  imageUrl: varchar("image_url"),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
@@ -575,7 +622,7 @@ export const snacksTarifs = pgTable("snacks_tarifs", {
   effectif: integer().notNull(),
   prixUnitaire: integer("prix_unitaire"),
   gamme: gammeEnum().notNull(),
-  imageUrl: varchar(),
+  imageUrl: varchar("image_url"),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
@@ -600,7 +647,7 @@ export const boissonsTarifs = pgTable("boissons_tarifs", {
   effectif: integer().notNull(),
   prixUnitaire: integer("prix_unitaire"),
   gamme: gammeEnum().notNull(),
-  imageUrl: varchar(),
+  imageUrl: varchar("image_url"),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
@@ -627,7 +674,7 @@ export const fontaines = pgTable("fontaines", {
   marque: varchar().notNull(),
   modele: varchar().notNull(),
   infos: varchar(),
-  imageUrl: varchar(),
+  imageUrl: varchar("image_url"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
 });
@@ -654,7 +701,7 @@ export const fontainesTarifs = pgTable("fontaines_tarifs", {
   paConsoEauChaude: integer("pa_conso_eau_chaude"),
   fontaineId: integer("fontaine_id").references(() => fontaines.id),
   reconditionne: boolean().default(false),
-  imageUrl: varchar(),
+  imageUrl: varchar("image_url"),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
@@ -678,7 +725,7 @@ export const officeManagerTarifs = pgTable("office_manager_tarifs", {
     .references(() => fournisseurs.id),
   demiTjm: integer("demi_tjm").notNull(),
   demiTjmPremium: integer("demi_tjm_premium").notNull(),
-  imageUrl: varchar(),
+  imageUrl: varchar("image_url"),
   infos: varchar(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt,
@@ -1000,7 +1047,6 @@ export const qualiteAirTarifsRelations = relations(
 export const cafeMachinesRelations = relations(cafeMachines, ({ many }) => ({
   cafeMachinesTarif: many(cafeMachinesTarifs),
 }));
-
 export const cafeMachinesTarifsRelations = relations(
   cafeMachinesTarifs,
   ({ one }) => ({
@@ -1131,3 +1177,1290 @@ export const devisTemporairesRelations = relations(
     }),
   }),
 );
+
+//NEW
+
+export const nettoyageProduits = pgTable("nettoyage_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  hParPassage: integer("h_par_passage").notNull(),
+  surface: integer().notNull(),
+  gamme: gammeEnum().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const nettoyageOffres = pgTable("nettoyage_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => nettoyageProduits.id),
+  tauxHoraire: integer("taux_horaire").notNull(),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const nettoyageRepasseProduits = pgTable("nettoyage_repasse_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  hParPassage: integer("h_par_passage").notNull(),
+  surface: integer().notNull(),
+  gamme: gammeEnum().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const nettoyageRepasseOffres = pgTable("nettoyage_repasse_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => nettoyageRepasseProduits.id),
+  tauxHoraire: integer("taux_horaire").notNull(),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const nettoyageVitrerieProduits = pgTable(
+  "nettoyage_vitrerie_produits",
+  {
+    id: serial().primaryKey(),
+    fournisseurId: integer("fournisseur_id")
+      .notNull()
+      .references(() => fournisseurs.id),
+    cadenceVitres: integer("cadence_vitres").notNull(),
+    cadenceCloisons: integer("cadence_cloisons").notNull(),
+    minFacturation: integer("min_facturation").notNull(),
+    fraisDeplacement: integer("frais_deplacement").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt,
+  },
+);
+
+export const nettoyageVitrerieOffres = pgTable("nettoyage_vitrerie_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => nettoyageVitrerieProduits.id),
+  tauxHoraire: integer("taux_horaire").notNull(),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const hygieneDistribProduits = pgTable("hygiene_distrib_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  type: typeHygieneDistribEnum().notNull(),
+  gamme: gammeEnum().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const hygieneDistribOffres = pgTable("hygiene_distrib_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => hygieneDistribProduits.id),
+  typeLocation: typeLocationEnum("type_location").notNull(),
+  prixUnitaire: integer("prix_unitaire"),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const hygieneInstalDistribProduits = pgTable(
+  "hygiene_instal_distrib_produits",
+  {
+    id: serial().primaryKey(),
+    fournisseurId: integer("fournisseur_id")
+      .notNull()
+      .references(() => fournisseurs.id),
+    effectif: integer().notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt,
+  },
+);
+
+export const hygieneInstalDistribOffres = pgTable(
+  "hygiene_instal_distrib_offres",
+  {
+    id: serial().primaryKey(),
+    produitId: integer("produit_id")
+      .notNull()
+      .references(() => hygieneInstalDistribProduits.id),
+    prixInstallation: integer("prix_installation").notNull(),
+    infos: varchar(),
+    imageUrl: varchar("image_url"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt,
+  },
+);
+
+export const hygieneConsoProduits = pgTable("hygiene_conso_produits", {
+  id: serial().primaryKey(),
+  effectif: integer(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const hygieneConsoOffres = pgTable("hygiene_conso_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => hygieneConsoProduits.id),
+  type: typeHygieneConsoEnum().notNull(),
+  paParPersonne: integer("pa_par_personne").notNull(),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const maintenanceProduits = pgTable("maintenance_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  surface: integer().notNull(),
+  hParPassage: integer("h_par_passage").notNull(),
+  gamme: gammeEnum().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const maintenanceOffres = pgTable("maintenance_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => maintenanceProduits.id),
+  tauxHoraire: integer("taux_horaire").notNull(),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const legioProduits = pgTable("legio_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  surface: integer().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const legioOffres = pgTable("legio_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => legioProduits.id),
+  prixAnnuel: integer("prix_annuel").notNull(),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const q18Produits = pgTable("q18_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  surface: integer().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const q18Offres = pgTable("q18_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => q18Produits.id),
+  prixAnnuel: integer("prix_annuel").notNull(),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const qualiteAirProduits = pgTable("qualite_air_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  surface: integer().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const qualiteAirOffres = pgTable("qualite_air_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => qualiteAirProduits.id),
+  prixAnnuel: integer("prix_annuel").notNull(),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const incendieProduits = pgTable("incendie_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  surface: integer().notNull(),
+  fraisDeplacement: integer("frais_deplacement").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const incendieOffres = pgTable("incendie_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => incendieProduits.id),
+  type: typeIncendieTrilogieEnum().notNull(),
+  prixUnitaire: integer("prix_unitaire").notNull(),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const exutoiresProduits = pgTable("exutoires_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id"),
+  nbExutoires: integer("nb_exutoires").notNull(),
+  fraisDeplacement: integer("frais_deplacement").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const exutoiresOffres = pgTable("exutoires_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => exutoiresProduits.id),
+  prixUnitaire: integer("prix_unitaire").notNull(),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const exutoiresParkingProduits = pgTable("exutoires_parking_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id"),
+  nbExutoires: integer("nb_exutoires").notNull(),
+  fraisDeplacement: integer("frais_deplacement").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const exutoiresParkingOffres = pgTable("exutoires_parking_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => exutoiresParkingProduits.id),
+  prixUnitaire: integer("prix_unitaire").notNull(),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const alarmesProduits = pgTable("alarmes_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  nbPoints: integer("nb_points").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const alarmesOffres = pgTable("alarmes_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => alarmesProduits.id),
+  prixTotal: integer("prix_total").notNull(),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const portesCoupeFeuProduits = pgTable("portes_coupe_feu_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  type: typePorteCoupeFeuEnum().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const portesCoupeFeuOffres = pgTable("portes_coupe_feu_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => portesCoupeFeuProduits.id),
+  prixUnitaire: integer("prix_unitaire").notNull(),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const riaProduits = pgTable("ria_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const riaOffres = pgTable("ria_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => riaProduits.id),
+  prixUnitaire: integer("prix_unitaire").notNull(),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const colonnesSechesProduits = pgTable("colonnes_seches_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  type: typeColonneSecheEnum().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const colonnesSechesOffres = pgTable("colonnes_seches_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => colonnesSechesProduits.id),
+  prixUnitaire: integer("prix_unitaire").notNull(),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const cafeMachinesProduits = pgTable("cafe_machines_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  type: typeMachineEnum().notNull(),
+  nbPersonnes: integer("nb_personnes").notNull(),
+  nbMachines: integer("nb_machines"),
+  typeLait: typeLaitEnum("type_lait"),
+  typeChocolat: typeChocolatEnum("type_chocolat"),
+  paMaintenance: integer("pa_maintenance"),
+  nbPassages: integer("nb_passages"),
+  fraisInstallation: integer("frais_installation"),
+  cafeMachineId: integer("cafe_machine_id").references(() => cafeMachines.id),
+  reconditionne: boolean().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const cafeMachinesOffres = pgTable("cafe_machines_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => cafeMachinesProduits.id),
+  typeLocation: typeLocationEnum("type_location").notNull(),
+  prixUnitaire: integer("prix_unitaire"),
+  rac: integer("rac"),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const cafeConsoProduits = pgTable("cafe_conso_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  effectif: integer().notNull(),
+  gamme: gammeEnum().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const cafeConsoOffres = pgTable("cafe_conso_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => cafeConsoProduits.id),
+  prixUnitaire: integer("prix_unitaire"),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const theConsoProduits = pgTable("the_conso_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  effectif: integer().notNull(),
+  gamme: gammeEnum().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const theConsoOffres = pgTable("the_conso_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => theConsoProduits.id),
+  prixUnitaire: integer("prix_unitaire"),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const laitConsoProduits = pgTable("lait_conso_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  effectif: integer().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const laitConsoOffres = pgTable("lait_conso_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => laitConsoProduits.id),
+  type: typeLaitEnum().notNull(),
+  prixUnitaire: integer("prix_unitaire"),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const chocolatConsoProduits = pgTable("chocolat_conso_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  effectif: integer().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const chocolatConsoOffres = pgTable("chocolat_conso_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => chocolatConsoProduits.id),
+  type: typeChocolatEnum().notNull(),
+  prixUnitaire: integer("prix_unitaire"),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const sucreConsoProduits = pgTable("sucre_conso_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  effectif: integer().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const sucreConsoOffres = pgTable("sucre_conso_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => sucreConsoProduits.id),
+  prixUnitaire: integer("prix_unitaire"),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const fruitsProduits = pgTable("fruits_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  effectif: integer().notNull(),
+  gamme: gammeEnum().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const fruitsOffres = pgTable("fruits_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => fruitsProduits.id),
+  prixKg: integer("prix_kg"),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const snacksProduits = pgTable("snacks_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  effectif: integer().notNull(),
+  gamme: gammeEnum().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const snacksOffres = pgTable("snacks_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => snacksProduits.id),
+  prixUnitaire: integer("prix_unitaire"),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const boissonsProduits = pgTable("boissons_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  effectif: integer().notNull(),
+  gamme: gammeEnum().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const boissonsOffres = pgTable("boissons_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => boissonsProduits.id),
+  prixUnitaire: integer("prix_unitaire"),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const fontainesProduits = pgTable("fontaines_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  type: typeEau().notNull(),
+  typePose: typePose("type_pose").notNull(),
+  nbPersonnes: integer("nb_personnes").notNull(),
+  paMaintenance: integer("pa_maintenance"),
+  fraisInstallation: integer("frais_installation"),
+  paConsoFiltres: integer("pa_conso_filtres"),
+  paConsoCO2: integer("pa_conso_co2"),
+  paConsoEauChaude: integer("pa_conso_eau_chaude"),
+  fontaineId: integer("fontaine_id").references(() => fontaines.id),
+  reconditionne: boolean().default(false),
+  infos: varchar(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const fontainesOffres = pgTable("fontaines_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => fontainesProduits.id),
+  typeLocation: typeLocationEnum("type_location").notNull(),
+  prixUnitaire: integer("prix_unitaire"),
+  rac: integer("rac"),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const officeManagerProduits = pgTable("office_manager_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+});
+
+export const officeManagerOffres = pgTable("office_manager_offres", {
+  id: serial().primaryKey(),
+  produitId: integer("produit_id")
+    .notNull()
+    .references(() => officeManagerProduits.id),
+  type: typeOfficeManagerEnum().notNull(),
+  demiTjm: integer("demi_tjm").notNull(),
+  infos: varchar(),
+  imageUrl: varchar("image_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+export const servicesFm4allProduits = pgTable("services_fm4all_produits", {
+  id: serial().primaryKey(),
+  fournisseurId: integer("fournisseur_id")
+    .notNull()
+    .references(() => fournisseurs.id),
+  gamme: gammeEnum().notNull(),
+  assurance: inclusEnum().notNull(),
+  minFacturationPlateforme: integer("min_facturation_plateforme").notNull(),
+  plateforme: inclusEnum().notNull(),
+  supportAdmin: inclusEnum("support_admin").notNull(),
+  minFacturationSupportOp: integer("min_facturation_support_op"),
+  supportOp: inclusEnum("support_op").notNull(),
+  minFacturationAccountManager: integer("min_facturation_account_manager"),
+  accountManager: inclusEnum("account_manager").notNull(),
+  audit: inclusEnum().notNull(),
+  remiseCaSeuil: integer("remise_ca_seuil").notNull(),
+  remiseCa: integer().notNull(),
+  remiseHof: integer("remise_hof").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt,
+});
+
+// export const servicesFm4allOffres = pgTable("services_fm4all_offres", {
+//   id: serial().primaryKey(),
+//   produitId: integer("produit_id")
+//     .notNull()
+//     .references(() => servicesFm4allProduits.id),
+//   tauxAssurance: integer("taux_assurance").notNull(),
+//   tauxPlateforme: integer("taux_plateforme").notNull(),
+//   tauxSupportAdmin: integer("taux_support_admin").notNull(),
+//   tauxSupportOp: integer("taux_support_op"),
+//   tauxAccountManager: integer("taux_account_manager"),
+//   infos: varchar(),
+//   imageUrl: varchar("image_url"),
+//   createdAt: timestamp("created_at").notNull().defaultNow(),
+//   updatedAt,
+// });
+
+//RELATIONS
+export const nettoyageProduitsRelations = relations(
+  nettoyageProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [nettoyageProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(nettoyageOffres),
+  }),
+);
+
+export const nettoyageOffresRelations = relations(
+  nettoyageOffres,
+  ({ one }) => ({
+    produit: one(nettoyageProduits, {
+      fields: [nettoyageOffres.produitId],
+      references: [nettoyageProduits.id],
+    }),
+  }),
+);
+
+export const nettoyageRepasseProduitsRelations = relations(
+  nettoyageRepasseProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [nettoyageRepasseProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(nettoyageRepasseOffres),
+  }),
+);
+
+export const nettoyageRepasseOffresRelations = relations(
+  nettoyageRepasseOffres,
+  ({ one }) => ({
+    produit: one(nettoyageRepasseProduits, {
+      fields: [nettoyageRepasseOffres.produitId],
+      references: [nettoyageRepasseProduits.id],
+    }),
+  }),
+);
+
+export const nettoyageVitrerieProduitsRelations = relations(
+  nettoyageVitrerieProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [nettoyageVitrerieProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(nettoyageVitrerieOffres),
+  }),
+);
+
+export const nettoyageVitrerieOffresRelations = relations(
+  nettoyageVitrerieOffres,
+  ({ one }) => ({
+    produit: one(nettoyageVitrerieProduits, {
+      fields: [nettoyageVitrerieOffres.produitId],
+      references: [nettoyageVitrerieProduits.id],
+    }),
+  }),
+);
+
+export const hygieneDistribProduitsRelations = relations(
+  hygieneDistribProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [hygieneDistribProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(hygieneDistribOffres),
+  }),
+);
+
+export const hygieneDistribOffresRelations = relations(
+  hygieneDistribOffres,
+  ({ one }) => ({
+    produit: one(hygieneDistribProduits, {
+      fields: [hygieneDistribOffres.produitId],
+      references: [hygieneDistribProduits.id],
+    }),
+  }),
+);
+
+export const hygieneInstalDistribProduitsRelations = relations(
+  hygieneInstalDistribProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [hygieneInstalDistribProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(hygieneInstalDistribOffres),
+  }),
+);
+
+export const hygieneInstalDistribOffresRelations = relations(
+  hygieneInstalDistribOffres,
+  ({ one }) => ({
+    produit: one(hygieneInstalDistribProduits, {
+      fields: [hygieneInstalDistribOffres.produitId],
+      references: [hygieneInstalDistribProduits.id],
+    }),
+  }),
+);
+
+export const hygieneConsoProduitsRelations = relations(
+  hygieneConsoProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [hygieneConsoProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(hygieneConsoOffres),
+  }),
+);
+
+export const hygieneConsoOffresRelations = relations(
+  hygieneConsoOffres,
+  ({ one }) => ({
+    produit: one(hygieneConsoProduits, {
+      fields: [hygieneConsoOffres.produitId],
+      references: [hygieneConsoProduits.id],
+    }),
+  }),
+);
+
+export const maintenanceProduitsRelations = relations(
+  maintenanceProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [maintenanceProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(maintenanceOffres),
+  }),
+);
+export const maintenanceOffresRelations = relations(
+  maintenanceOffres,
+  ({ one }) => ({
+    produit: one(maintenanceProduits, {
+      fields: [maintenanceOffres.produitId],
+      references: [maintenanceProduits.id],
+    }),
+  }),
+);
+
+export const legioProduitsRelations = relations(
+  legioProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [legioProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(legioOffres),
+  }),
+);
+
+export const legioOffresRelations = relations(legioOffres, ({ one }) => ({
+  produit: one(legioProduits, {
+    fields: [legioOffres.produitId],
+    references: [legioProduits.id],
+  }),
+}));
+
+export const q18ProduitsRelations = relations(q18Produits, ({ one, many }) => ({
+  fournisseur: one(fournisseurs, {
+    fields: [q18Produits.fournisseurId],
+    references: [fournisseurs.id],
+  }),
+  offres: many(q18Offres),
+}));
+
+export const q18OffresRelations = relations(q18Offres, ({ one }) => ({
+  produit: one(q18Produits, {
+    fields: [q18Offres.produitId],
+    references: [q18Produits.id],
+  }),
+}));
+
+export const qualiteAirProduitsRelations = relations(
+  qualiteAirProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [qualiteAirProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(qualiteAirOffres),
+  }),
+);
+
+export const qualiteAirOffresRelations = relations(
+  qualiteAirOffres,
+  ({ one }) => ({
+    produit: one(qualiteAirProduits, {
+      fields: [qualiteAirOffres.produitId],
+      references: [qualiteAirProduits.id],
+    }),
+  }),
+);
+
+export const incendieProduitsRelations = relations(
+  incendieProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [incendieProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(incendieOffres),
+  }),
+);
+
+export const incendieOffresRelations = relations(incendieOffres, ({ one }) => ({
+  produit: one(incendieProduits, {
+    fields: [incendieOffres.produitId],
+    references: [incendieProduits.id],
+  }),
+}));
+export const exutoiresProduitsRelations = relations(
+  exutoiresProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [exutoiresProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(exutoiresOffres),
+  }),
+);
+
+export const exutoiresOffresRelations = relations(
+  exutoiresOffres,
+  ({ one }) => ({
+    produit: one(exutoiresProduits, {
+      fields: [exutoiresOffres.produitId],
+      references: [exutoiresProduits.id],
+    }),
+  }),
+);
+
+export const exutoiresParkingProduitsRelations = relations(
+  exutoiresParkingProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [exutoiresParkingProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(exutoiresParkingOffres),
+  }),
+);
+
+export const exutoiresParkingOffresRelations = relations(
+  exutoiresParkingOffres,
+  ({ one }) => ({
+    produit: one(exutoiresParkingProduits, {
+      fields: [exutoiresParkingOffres.produitId],
+      references: [exutoiresParkingProduits.id],
+    }),
+  }),
+);
+
+export const alarmesProduitsRelations = relations(
+  alarmesProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [alarmesProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(alarmesOffres),
+  }),
+);
+
+export const alarmesOffresRelations = relations(alarmesOffres, ({ one }) => ({
+  produit: one(alarmesProduits, {
+    fields: [alarmesOffres.produitId],
+    references: [alarmesProduits.id],
+  }),
+}));
+
+export const portesCoupeFeuProduitsRelations = relations(
+  portesCoupeFeuProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [portesCoupeFeuProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(portesCoupeFeuOffres),
+  }),
+);
+
+export const portesCoupeFeuOffresRelations = relations(
+  portesCoupeFeuOffres,
+  ({ one }) => ({
+    produit: one(portesCoupeFeuProduits, {
+      fields: [portesCoupeFeuOffres.produitId],
+      references: [portesCoupeFeuProduits.id],
+    }),
+  }),
+);
+
+export const riaProduitsRelations = relations(riaProduits, ({ one, many }) => ({
+  fournisseur: one(fournisseurs, {
+    fields: [riaProduits.fournisseurId],
+    references: [fournisseurs.id],
+  }),
+  offres: many(riaOffres),
+}));
+
+export const riaOffresRelations = relations(riaOffres, ({ one }) => ({
+  produit: one(riaProduits, {
+    fields: [riaOffres.produitId],
+    references: [riaProduits.id],
+  }),
+}));
+
+export const colonnesSechesProduitsRelations = relations(
+  colonnesSechesProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [colonnesSechesProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(colonnesSechesOffres),
+  }),
+);
+
+export const colonnesSechesOffresRelations = relations(
+  colonnesSechesOffres,
+  ({ one }) => ({
+    produit: one(colonnesSechesProduits, {
+      fields: [colonnesSechesOffres.produitId],
+      references: [colonnesSechesProduits.id],
+    }),
+  }),
+);
+
+export const cafeMachinesProduitsRelations = relations(
+  cafeMachinesProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [cafeMachinesProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    cafeMachine: one(cafeMachines, {
+      fields: [cafeMachinesProduits.cafeMachineId],
+      references: [cafeMachines.id],
+    }),
+    offres: many(cafeMachinesOffres),
+  }),
+);
+
+export const cafeMachinesOffresRelations = relations(
+  cafeMachinesOffres,
+  ({ one }) => ({
+    produit: one(cafeMachinesProduits, {
+      fields: [cafeMachinesOffres.produitId],
+      references: [cafeMachinesProduits.id],
+    }),
+  }),
+);
+
+export const cafeConsoProduitsRelations = relations(
+  cafeConsoProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [cafeConsoProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(cafeConsoOffres),
+  }),
+);
+
+export const cafeConsoOffresRelations = relations(
+  cafeConsoOffres,
+  ({ one }) => ({
+    produit: one(cafeConsoProduits, {
+      fields: [cafeConsoOffres.produitId],
+      references: [cafeConsoProduits.id],
+    }),
+  }),
+);
+
+export const theConsoProduitsRelations = relations(
+  theConsoProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [theConsoProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(theConsoOffres),
+  }),
+);
+
+export const theConsoOffresRelations = relations(theConsoOffres, ({ one }) => ({
+  produit: one(theConsoProduits, {
+    fields: [theConsoOffres.produitId],
+    references: [theConsoProduits.id],
+  }),
+}));
+
+export const laitConsoProduitsRelations = relations(
+  laitConsoProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [laitConsoProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(laitConsoOffres),
+  }),
+);
+
+export const laitConsoOffresRelations = relations(
+  laitConsoOffres,
+  ({ one }) => ({
+    produit: one(laitConsoProduits, {
+      fields: [laitConsoOffres.produitId],
+      references: [laitConsoProduits.id],
+    }),
+  }),
+);
+
+export const chocolatConsoProduitsRelations = relations(
+  chocolatConsoProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [chocolatConsoProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(chocolatConsoOffres),
+  }),
+);
+
+export const chocolatConsoOffresRelations = relations(
+  chocolatConsoOffres,
+  ({ one }) => ({
+    produit: one(chocolatConsoProduits, {
+      fields: [chocolatConsoOffres.produitId],
+      references: [chocolatConsoProduits.id],
+    }),
+  }),
+);
+
+export const sucreConsoProduitsRelations = relations(
+  sucreConsoProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [sucreConsoProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(sucreConsoOffres),
+  }),
+);
+
+export const sucreConsoOffresRelations = relations(
+  sucreConsoOffres,
+  ({ one }) => ({
+    produit: one(sucreConsoProduits, {
+      fields: [sucreConsoOffres.produitId],
+      references: [sucreConsoProduits.id],
+    }),
+  }),
+);
+
+export const fruitsProduitsRelations = relations(
+  fruitsProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [fruitsProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(fruitsOffres),
+  }),
+);
+
+export const fruitsOffresRelations = relations(fruitsOffres, ({ one }) => ({
+  produit: one(fruitsProduits, {
+    fields: [fruitsOffres.produitId],
+    references: [fruitsProduits.id],
+  }),
+}));
+
+export const snacksProduitsRelations = relations(
+  snacksProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [snacksProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(snacksOffres),
+  }),
+);
+
+export const snacksOffresRelations = relations(snacksOffres, ({ one }) => ({
+  produit: one(snacksProduits, {
+    fields: [snacksOffres.produitId],
+    references: [snacksProduits.id],
+  }),
+}));
+
+export const boissonsProduitsRelations = relations(
+  boissonsProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [boissonsProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(boissonsOffres),
+  }),
+);
+
+export const boissonsOffresRelations = relations(boissonsOffres, ({ one }) => ({
+  produit: one(boissonsProduits, {
+    fields: [boissonsOffres.produitId],
+    references: [boissonsProduits.id],
+  }),
+}));
+
+export const fontainesProduitsRelations = relations(
+  fontainesProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [fontainesProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    fontaine: one(fontaines, {
+      fields: [fontainesProduits.fontaineId],
+      references: [fontaines.id],
+    }),
+    offres: many(fontainesOffres),
+  }),
+);
+
+export const fontainesOffresRelations = relations(
+  fontainesOffres,
+  ({ one }) => ({
+    produit: one(fontainesProduits, {
+      fields: [fontainesOffres.produitId],
+      references: [fontainesProduits.id],
+    }),
+  }),
+);
+
+export const officeManagerProduitsRelations = relations(
+  officeManagerProduits,
+  ({ one, many }) => ({
+    fournisseur: one(fournisseurs, {
+      fields: [officeManagerProduits.fournisseurId],
+      references: [fournisseurs.id],
+    }),
+    offres: many(officeManagerOffres),
+  }),
+);
+
+export const officeManagerOffresRelations = relations(
+  officeManagerOffres,
+  ({ one }) => ({
+    produit: one(officeManagerProduits, {
+      fields: [officeManagerOffres.produitId],
+      references: [officeManagerProduits.id],
+    }),
+  }),
+);
+
+// export const servicesFm4allProduitsRelations = relations(
+//   servicesFm4allProduits,
+//   ({ one, many }) => ({
+//     fournisseur: one(fournisseurs, {
+//       fields: [servicesFm4allProduits.fournisseurId],
+//       references: [fournisseurs.id],
+//     }),
+//     offres: many(servicesFm4allOffres),
+//   }),
+// );
+
+// export const servicesFm4allOffresRelations = relations(
+//   servicesFm4allOffres,
+//   ({ one }) => ({
+//     produit: one(servicesFm4allProduits, {
+//       fields: [servicesFm4allOffres.produitId],
+//       references: [servicesFm4allProduits.id],
+//     }),
+//   }),
+// );

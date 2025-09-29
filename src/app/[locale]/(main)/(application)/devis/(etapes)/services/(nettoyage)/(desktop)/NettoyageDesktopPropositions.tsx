@@ -1,3 +1,4 @@
+"use client";
 import { GammeType } from "@/zod-schemas/gamme";
 import NettoyageFournisseurLogo from "./NettoyageFournisseurLogo";
 import NettoyagePropositionCard from "./NettoyagePropositionCard";

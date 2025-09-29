@@ -1,6 +1,6 @@
 import { GammeType } from "@/zod-schemas/gamme";
 
-export const getFm4AllColor = (gamme: GammeType | null) => {
+export const getFm4AllColor = (gamme: GammeType | null | undefined) => {
   if (!gamme) return "";
   return gamme === "essentiel"
     ? "fm4allessential"

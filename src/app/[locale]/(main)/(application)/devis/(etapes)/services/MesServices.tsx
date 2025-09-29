@@ -18,19 +18,15 @@ import {
   getQualiteAirTarifs,
 } from "@/lib/queries/maintenance/getMaintenance";
 import {
+  getNettoyageProduits,
   getNettoyageQuantites,
   getNettoyageTarifs,
   getRepasseTarifs,
   getVitrerieTarifs,
 } from "@/lib/queries/nettoyage/getNettoyage";
 import { getTranslations } from "next-intl/server";
-import NextEtapeFoodButton from "../../NextEtapeFoodButton";
-import Hygiene from "./(hygiene)/Hygiene";
-import HygieneOptions from "./(hygiene)/HygieneOptions";
-import SecuriteIncendie from "./(incendie)/SecuriteIncendie";
-import Maintenance from "./(maintenance)/Maintenance";
 import Nettoyage from "./(nettoyage)/Nettoyage";
-import NettoyageOptions from "./(nettoyage)/NettoyageOptions";
+import ServiceWrapper from "./(nettoyage)/ServiceWrapper";
 import MesServicesPresentation from "./(presentation)/MesServicesPresentation";
 
 type MesServicesProps = {
@@ -43,6 +39,7 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
   //Infos filtrées par surface et effectif
   const [
     nettoyageQuantites,
+    nettoyageProduits,
     nettoyageTarifs,
     repasseTarifs,
     vitrerieTarifs,
@@ -60,6 +57,7 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
     qualiteAirTarifs,
   ] = await Promise.all([
     getNettoyageQuantites(surface),
+    getNettoyageProduits(surface),
     getNettoyageTarifs(surface),
     getRepasseTarifs(surface),
     getVitrerieTarifs(),
@@ -80,6 +78,8 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
   if (
     !nettoyageTarifs ||
     nettoyageTarifs.length === 0 ||
+    !nettoyageProduits ||
+    nettoyageProduits.length === 0 ||
     !repasseTarifs ||
     repasseTarifs.length === 0 ||
     !vitrerieTarifs ||
@@ -124,21 +124,18 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
     );
   }
 
+  console.log("nettoyageProduits", nettoyageProduits);
+
   return (
     <section className="flex-1 lg:overflow-hidden">
       <MesServicesPresentation />
-      <Nettoyage
-        nettoyageQuantites={nettoyageQuantites}
-        nettoyageTarifs={nettoyageTarifs}
-        repasseTarifs={repasseTarifs}
-        vitrerieTarifs={vitrerieTarifs}
-        hygieneDistribQuantite={hygieneDistribQuantite}
-        hygieneDistribTarifs={hygieneDistribTarifs}
-        hygieneDistribInstalTarifs={hygieneDistribInstalTarifs}
-        hygieneConsosTarifs={hygieneConsosTarifs}
-        hygieneMinFacturation={hygieneMinFacturation}
-      />
-      <NettoyageOptions
+      <ServiceWrapper serviceId={1}>
+        <Nettoyage
+          nettoyageQuantites={nettoyageQuantites}
+          nettoyageProduits={nettoyageProduits}
+        />
+      </ServiceWrapper>
+      {/* <NettoyageOptions
         nettoyageTarifs={nettoyageTarifs}
         repasseTarifs={repasseTarifs}
         vitrerieTarifs={vitrerieTarifs}
@@ -166,7 +163,7 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
         incendieQuantite={incendieQuantite}
         incendieTarifs={incendieTarifs}
       />
-      <NextEtapeFoodButton />
+      <NextEtapeFoodButton /> */}
     </section>
   );
 };

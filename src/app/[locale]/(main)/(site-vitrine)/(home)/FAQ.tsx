@@ -1,10 +1,11 @@
 import { Accordion } from "@/components/ui/accordion";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { ReactNode } from "react";
 import FAQItem from "./FAQItem";
 
 const FAQ = () => {
   const t = useTranslations("HomePage.faq");
+  const locale = useLocale();
   const faqs: { id: number; question: string; answer: ReactNode }[] = [
     {
       id: 1,
@@ -76,7 +77,8 @@ const FAQ = () => {
               )}
             </li>
             <li>
-              {t("un")} <strong>{t("accompagnement")}</strong>{" "}
+              {locale === "fr" && t("un")}{" "}
+              <strong>{t("accompagnement")}</strong>{" "}
               {t("support-reclamations-controles-qualite")}
             </li>
           </ul>

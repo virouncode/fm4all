@@ -15,10 +15,10 @@ type NettoyageFournisseurLogoProps = {
   nomFournisseur: string | null;
   logoUrl: string | null;
   locationUrl: string | null;
-  sloganFournisseur: string | null;
+  slogan: string | null;
   anneeCreation: number | null;
   ca: string | null;
-  effectifFournisseur: string | null;
+  effectif: string | null;
   nbClients: number | null;
   noteGoogle: string | null;
   nbAvis: number | null;
@@ -28,10 +28,10 @@ const NettoyageFournisseurLogo = ({
   nomFournisseur,
   logoUrl,
   locationUrl,
-  sloganFournisseur,
+  slogan: sloganFournisseur,
   anneeCreation,
   ca,
-  effectifFournisseur,
+  effectif: effectifFournisseur,
   nbClients,
   noteGoogle,
   nbAvis,
