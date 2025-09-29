@@ -1,3 +1,5 @@
+import { Link } from "@/i18n/navigation";
+
 export default function MonDevisLayout({
   children,
 }: Readonly<{
@@ -15,6 +17,11 @@ export default function MonDevisLayout({
         Cette partie du site est en maintenance. Veuillez revenir plus tard.
         <br />
         This part of the website is under maintenance, please come back later.
+        <br />
+        Pour toute demande,{" "}
+        <Link href="/contact" className="underline hover:opacity-80">
+          Contactez-nous
+        </Link>
       </div>
     </main>
   );
