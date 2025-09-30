@@ -1,4 +1,6 @@
-import { Link } from "@/i18n/navigation";
+import CacheInvalidationListener from "@/components/cache/CacheInvalidationListener";
+import DevisBreadcrumb from "../DevisBreadcrumb";
+import Total from "../Total";
 
 export default function MonDevisLayout({
   children,
@@ -7,13 +9,13 @@ export default function MonDevisLayout({
 }>) {
   return (
     <main className="mx-auto flex max-w-7xl flex-col gap-4 px-6 pt-4 pb-10 md:px-20 lg:h-[calc(100vh-4rem)]">
-      {/* <DevisBreadcrumb />
+      <DevisBreadcrumb />
       <div className="lg:relative">
         <Total />
       </div>
       {children}
-      <CacheInvalidationListener /> */}
-      <div>
+      <CacheInvalidationListener />
+      {/* <div>
         Cette partie du site est en maintenance. Veuillez revenir plus tard.
         <br />
         This part of the website is under maintenance, please come back later.
@@ -22,7 +24,7 @@ export default function MonDevisLayout({
         <Link href="/contact" className="underline hover:opacity-80">
           Contactez-nous
         </Link>
-      </div>
+      </div> */}
     </main>
   );
 }
