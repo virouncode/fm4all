@@ -1,4 +1,3 @@
-"use client";
 import {
   Dialog,
   DialogContent,
@@ -23,15 +22,20 @@ type NettoyagePropositionCardProps = {
     gamme: "essentiel" | "confort" | "excellence" | undefined;
     totalAnnuel: number | null;
   };
+  onToggle: (id?: string) => void;
+  isPending: boolean;
+  selectedId?: string;
 };
 
 const NettoyagePropositionCard = ({
   proposition,
+  onToggle,
+  isPending,
+  selectedId,
 }: NettoyagePropositionCardProps) => {
   const t = useTranslations("DevisPage");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
   const tGlobal = useTranslations("Global");
-  // const nettoyage = useNettoyageStore((s) => s.nettoyage);
   const gamme = proposition.gamme;
   const color = getFm4AllColor(gamme);
 
@@ -113,27 +117,15 @@ const NettoyagePropositionCard = ({
     </div>
   );
 
-  const handleClickProposition = (proposition: {
-    id: number | undefined;
-    logoUrl: string | null;
-    freqAnnuelle: number | null;
-    hParPassage: number | undefined;
-    gamme: "essentiel" | "confort" | "excellence" | undefined;
-    totalAnnuel: number | null;
-  }) => {};
-
   return (
     <div
       className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-4 text-2xl text-slate-200`}
-      onClick={() => handleClickProposition(proposition)}
+      onClick={() => onToggle(proposition.id?.toString())}
     >
       <Switch
-        // checked={
-        //   nettoyage.infos.fournisseurId === proposition.fournisseurId &&
-        //   nettoyage.infos.gammeSelected === proposition.gamme
-        // }
-        checked={true}
-        onCheckedChange={() => handleClickProposition(proposition)}
+        checked={selectedId === proposition.id?.toString()}
+        onCheckedChange={() => onToggle(proposition.id?.toString())}
+        onClick={(e) => e.stopPropagation()}
         className="data-[state=checked]:bg-fm4alldestructive"
         title={t("selectionnez-cette-proposition")}
         data-testid="nettoyage-proposition-switch"

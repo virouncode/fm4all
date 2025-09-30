@@ -1,5 +1,3 @@
-"use client";
-
 import FournisseurDialog from "@/app/[locale]/(main)/(application)/devis/FournisseurDialog";
 import {
   Dialog,

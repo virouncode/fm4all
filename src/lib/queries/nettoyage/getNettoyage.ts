@@ -5,18 +5,24 @@ import {
   nettoyageOffres,
   nettoyageProduits,
   nettoyageQuantites,
+  nettoyageRepasseProduits,
   nettoyageRepasseTarifs,
   nettoyageTarifs,
+  nettoyageVitrerieOffres,
+  nettoyageVitrerieProduits,
   nettoyageVitrerieTarifs,
 } from "@/db/schema";
 import {
+  getFournisseurSurfaceGammeTag,
   getFournisseurTag,
   getGlobalTag,
+  getOffreTag,
   getProduitTag,
   getSurfaceTag,
 } from "@/lib/data-cache";
 import { errorHelper } from "@/lib/errorHelper";
 import { roundSurface } from "@/lib/utils/roundSurface";
+import { GammeType } from "@/zod-schemas/gamme";
 import { selectNettoyageOffreSchema } from "@/zod-schemas/nettoyageOffre";
 import { selectNettoyageProduitSchema } from "@/zod-schemas/nettoyageProduit";
 import { selectNettoyageQuantitesSchema } from "@/zod-schemas/nettoyageQuantites";
@@ -29,6 +35,8 @@ import {
   selectVitrerieTarifsFournisseurSchema,
   selectVitrerieTarifsSchema,
 } from "@/zod-schemas/nettoyageVitrerie";
+import { selectNettoyageVitrerieOffreSchema } from "@/zod-schemas/nettoyageVitrerieOffre";
+import { selectNettoyageVitrerieProduitSchema } from "@/zod-schemas/nettoyageVitrerieProduit";
 import { and, eq, getTableColumns } from "drizzle-orm";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
@@ -102,6 +110,29 @@ export const getNettoyageProduits = async (surface: string) => {
   }
 };
 
+export const getNettoyageProduit = async (produitId: number) => {
+  "use cache";
+  cacheTag(getProduitTag("nettoyageProduit", produitId));
+  console.log(`🔍 DB REQUEST: getNettoyageProduit(${produitId})`);
+  try {
+    const results = await db
+      .select()
+      .from(nettoyageProduits)
+      .where(eq(nettoyageProduits.id, produitId));
+    if (results.length === 0) return null;
+    const validatedResults = results.map((result) =>
+      selectNettoyageProduitSchema.parse(result),
+    );
+    const data = validatedResults.map((result) => ({
+      ...result,
+      hParPassage: result.hParPassage / RATIO,
+    }));
+    return data[0];
+  } catch (err) {
+    errorHelper(err);
+  }
+};
+
 export const getNettoyageOffres = async (produitId: number) => {
   "use cache";
   cacheTag(getProduitTag("nettoyageOffres", produitId));
@@ -111,6 +142,29 @@ export const getNettoyageOffres = async (produitId: number) => {
       .select()
       .from(nettoyageOffres)
       .where(eq(nettoyageOffres.produitId, produitId));
+    if (results.length === 0) return null;
+    const validatedResults = results.map((result) =>
+      selectNettoyageOffreSchema.parse(result),
+    );
+    const data = validatedResults.map((result) => ({
+      ...result,
+      tauxHoraire: result.tauxHoraire / RATIO,
+    }));
+    return data[0];
+  } catch (err) {
+    errorHelper(err);
+  }
+};
+
+export const getNettoyageOffre = async (offreId: number) => {
+  "use cache";
+  cacheTag(getOffreTag("nettoyageOffre", offreId));
+  console.log(`🔍 DB REQUEST: getNettoyageOffre(${offreId})`);
+  try {
+    const results = await db
+      .select()
+      .from(nettoyageOffres)
+      .where(eq(nettoyageOffres.id, offreId));
     if (results.length === 0) return null;
     const validatedResults = results.map((result) =>
       selectNettoyageOffreSchema.parse(result),
@@ -186,6 +240,70 @@ export const getNettoyageTarifsFournisseur = async (fournisseurId: number) => {
       tauxHoraire: result.tauxHoraire / RATIO,
     }));
     return data;
+  } catch (err) {
+    errorHelper(err);
+  }
+};
+
+export const getRepasseProduit = async (
+  fournisseurId: number,
+  roundedSurface: number,
+  gamme: GammeType,
+) => {
+  "use cache";
+  console.log(
+    `🔍 DB REQUEST: getRepasseProduit(${fournisseurId}, ${roundedSurface}, ${gamme})`,
+  );
+  cacheTag(
+    getFournisseurSurfaceGammeTag(
+      "repasseProduit",
+      fournisseurId,
+      roundedSurface,
+      gamme,
+    ),
+  );
+  try {
+    const results = await db
+      .select()
+      .from(nettoyageRepasseProduits)
+      .where(
+        and(
+          eq(nettoyageRepasseProduits.surface, roundedSurface),
+          eq(nettoyageRepasseProduits.gamme, gamme),
+        ),
+      );
+    if (results.length === 0) return null;
+    const validatedResults = results.map((result) =>
+      selectNettoyageProduitSchema.parse(result),
+    );
+    const data = validatedResults.map((result) => ({
+      ...result,
+      hParPassage: result.hParPassage / RATIO,
+    }));
+    return data[0];
+  } catch (err) {
+    errorHelper(err);
+  }
+};
+
+export const getRepasseOffre = async (produitId: number) => {
+  "use cache";
+  cacheTag(getProduitTag("repasseOffre", produitId));
+  console.log(`🔍 DB REQUEST: getRepasseOffre(${produitId})`);
+  try {
+    const results = await db
+      .select()
+      .from(nettoyageOffres)
+      .where(eq(nettoyageOffres.produitId, produitId));
+    if (results.length === 0) return null;
+    const validatedResults = results.map((result) =>
+      selectNettoyageOffreSchema.parse(result),
+    );
+    const data = validatedResults.map((result) => ({
+      ...result,
+      tauxHoraire: result.tauxHoraire / RATIO,
+    }));
+    return data[0];
   } catch (err) {
     errorHelper(err);
   }
@@ -292,6 +410,55 @@ export const getVitrerieTarifs = async () => {
       fraisDeplacement: validatedResult.fraisDeplacement / RATIO,
     }));
     return data;
+  } catch (err) {
+    errorHelper(err);
+  }
+};
+
+export const getVitrerieProduitForFournisseur = async (
+  fournisseurId: number,
+) => {
+  "use cache";
+  cacheTag(getFournisseurTag("vitrerieProduit", fournisseurId));
+  console.log(
+    `🔍 DB REQUEST: getVitrerieProduitForFournisseur(${fournisseurId})`,
+  );
+  try {
+    const results = await db
+      .select()
+      .from(nettoyageVitrerieProduits)
+      .where(eq(nettoyageVitrerieProduits.fournisseurId, fournisseurId));
+    if (results.length === 0) return null;
+    const validatedResults = results.map((result) =>
+      selectNettoyageVitrerieProduitSchema.parse(result),
+    );
+    const data = validatedResults.map((validatedResult) => ({
+      ...validatedResult,
+      minFacturation: validatedResult.minFacturation / RATIO,
+      fraisDeplacement: validatedResult.fraisDeplacement / RATIO,
+    }));
+    return data[0];
+  } catch (err) {
+    errorHelper(err);
+  }
+};
+
+export const getVitrerieOffre = async (produitId: number) => {
+  "use cache";
+  cacheTag(getProduitTag("vitrerieOffre", produitId));
+  console.log(`🔍 DB REQUEST: getVitrerieOffre(${produitId})`);
+  try {
+    const result = await db
+      .select()
+      .from(nettoyageVitrerieOffres)
+      .where(eq(nettoyageVitrerieOffres.produitId, produitId))
+      .limit(1);
+    if (result.length === 0) return null;
+    const validatedResult = selectNettoyageVitrerieOffreSchema.parse(result[0]);
+    return {
+      ...validatedResult,
+      tauxHoraire: validatedResult.tauxHoraire / RATIO,
+    };
   } catch (err) {
     errorHelper(err);
   }

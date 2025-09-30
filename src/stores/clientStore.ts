@@ -28,6 +28,8 @@ export const useClientStore = create<ClientStore>()(
         posteSignataire: null,
         emailSignataire: null,
         surface: 100,
+        surfaceCloisons: 100 * 0.15,
+        surfaceVitres: 100 * 0.15,
         effectif: 20,
         typeBatiment: "bureaux",
         typeOccupation: "partieEtage",

@@ -1,29 +1,43 @@
 "use client";
 
-import { title } from "process";
+import { useServicesStore } from "@/stores/servicesStore";
+import PreviousServiceButton from "./PreviousServiceButton";
 
 type PropositionsTitleProps = {
-  serviceId: number;
+  service: {
+    id: number;
+    icon: React.ReactNode;
+    title: string;
+    description: string;
+  };
+  previousButton?: boolean;
 };
 
-const PropositionsTitle = ({ serviceId }: PropositionsTitleProps) => {
+const PropositionsTitle = ({
+  service,
+  previousButton = true,
+}: PropositionsTitleProps) => {
+  const setServices = useServicesStore((s) => s.setServices);
+  const handleClickPrevious = () => {
+    setServices((prev) => ({
+      ...prev,
+      currentServiceId: prev.currentServiceId - 1,
+    }));
+  };
+
   return (
     <div className="flex flex-col items-center justify-between gap-4 lg:flex-row lg:gap-0">
       <div className="border-fm4allsecondary text-fm4allsecondary flex w-full items-center justify-center gap-4 rounded-xl border-2 p-4 lg:w-auto lg:justify-start">
-        <div className="flex items-center gap-1">
-          {/* <Icon />
-          {Icon2 && <Icon2 />}
-          {Icon3 && <Icon3 />} */}
-        </div>
-        <p className="font-bold">{title}</p>
+        <div className="flex items-center gap-1">{service.icon}</div>
+        <p className="font-bold">{service.title}</p>
       </div>
       <p className="flex-1 px-4 text-base text-wrap hyphens-auto">
-        {/* {description} */}
+        {service.description}
       </p>
-      {/* <PreviousServiceButton
+      <PreviousServiceButton
         handleClickPrevious={handleClickPrevious}
         className={previousButton ? "" : "hidden"}
-      /> */}
+      />
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import { nettoyageVitrerieProduits } from "@/db/schema";
 import { createSelectSchema } from "drizzle-zod";
 
-export const selectNEttoyageVitrerieProduit = createSelectSchema(
+export const selectNettoyageVitrerieProduitSchema = createSelectSchema(
   nettoyageVitrerieProduits,
   {
     cadenceVitres: (schema) =>
@@ -12,4 +12,4 @@ export const selectNEttoyageVitrerieProduit = createSelectSchema(
 );
 
 export type SelectNettoyageVitrerieProduitType =
-  typeof selectNEttoyageVitrerieProduit._type;
+  typeof selectNettoyageVitrerieProduitSchema._type;

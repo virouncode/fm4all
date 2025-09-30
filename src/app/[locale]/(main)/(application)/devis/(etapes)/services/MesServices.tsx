@@ -20,12 +20,12 @@ import {
 import {
   getNettoyageProduits,
   getNettoyageQuantites,
-  getNettoyageTarifs,
-  getRepasseTarifs,
-  getVitrerieTarifs,
 } from "@/lib/queries/nettoyage/getNettoyage";
+import { getPanier } from "@/lib/queries/panier/getPanier";
+import { SprayCan, Toilet } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Nettoyage from "./(nettoyage)/Nettoyage";
+import NettoyageOptions from "./(nettoyage)/NettoyageOptions";
 import ServiceWrapper from "./(nettoyage)/ServiceWrapper";
 import MesServicesPresentation from "./(presentation)/MesServicesPresentation";
 
@@ -36,13 +36,14 @@ type MesServicesProps = {
 
 const MesServices = async ({ surface, effectif }: MesServicesProps) => {
   const t = await getTranslations("DevisPage");
+  const tNettoyage = await getTranslations("DevisPage.services.nettoyage");
+  const tHygiene = await getTranslations("DevisPage.services.hygiene");
+  const tMaintenance = await getTranslations("DevisPage.services.maintenance");
+  const tIncendie = await getTranslations("DevisPage.services.incendie");
   //Infos filtrées par surface et effectif
   const [
     nettoyageQuantites,
     nettoyageProduits,
-    nettoyageTarifs,
-    repasseTarifs,
-    vitrerieTarifs,
     hygieneDistribQuantite,
     hygieneDistribTarifs,
     hygieneDistribInstalTarifs,
@@ -58,9 +59,6 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
   ] = await Promise.all([
     getNettoyageQuantites(surface),
     getNettoyageProduits(surface),
-    getNettoyageTarifs(surface),
-    getRepasseTarifs(surface),
-    getVitrerieTarifs(),
     getHygieneDistribQuantite(effectif),
     getHygieneDistribTarifs(),
     getHygieneInstalDistribTarifs(effectif),
@@ -76,14 +74,8 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
   ]);
 
   if (
-    !nettoyageTarifs ||
-    nettoyageTarifs.length === 0 ||
     !nettoyageProduits ||
     nettoyageProduits.length === 0 ||
-    !repasseTarifs ||
-    repasseTarifs.length === 0 ||
-    !vitrerieTarifs ||
-    vitrerieTarifs.length === 0 ||
     !hygieneDistribTarifs ||
     hygieneDistribTarifs.length === 0 ||
     !hygieneDistribInstalTarifs ||
@@ -124,17 +116,80 @@ const MesServices = async ({ surface, effectif }: MesServicesProps) => {
     );
   }
 
-  console.log("nettoyageProduits", nettoyageProduits);
+  const panier = await getPanier();
+  const nettoyageOffreId = Object.keys(panier ?? {})
+    .find((k) => k.startsWith("Nettoyage:"))
+    ?.split(":")[1];
+  const nettoyageProduit = nettoyageProduits.find((p) =>
+    nettoyageOffreId ? p.id === parseInt(nettoyageOffreId) : false,
+  );
+
+  const gammeNettoyage = nettoyageProduit?.gamme ?? null;
+
+  const services: {
+    id: number;
+    title: string;
+    icon: React.ReactNode;
+    description: string;
+  }[] = [
+    {
+      id: 1,
+      title: tNettoyage("nettoyage-et-proprete"),
+      icon: <SprayCan />,
+      description: tNettoyage(
+        "dun-nettoyage-essentiel-a-une-experience-5-etoiles-choisissez-la-prestation-proprete-qui-vous-ressemble-la-gamme-determine-la-frequence-de-passage-et-la-cadence-de-nettoyage",
+      ),
+    },
+    {
+      id: 2,
+      title: tNettoyage("nettoyage-et-proprete-options"),
+      icon: <SprayCan />,
+      description: gammeNettoyage
+        ? tNettoyage(
+            "choisissez-vos-options-en-gamme-capitalize-nettoyage-infos-gammeselected-chez-nettoyage-infos-nomfournisseur",
+            { gamme: gammeNettoyage, nomFournisseur: "FM4ALL" },
+          )
+        : "",
+    },
+    {
+      id: 3,
+      title: "Hygiène sanitaire",
+      icon: <Toilet />,
+      description: tHygiene(
+        "un-tarif-forfaitaire-tout-compris-pour-vos-sanitaires-avec-distributeurs-et-consommables-mis-en-place-essuie-main-papier-savon-and-papier-hygienique-la-gamme-determine-la-finition-des-distributeurs",
+      ),
+    },
+    {
+      id: 4,
+      title: "Maintenance",
+      icon: <SprayCan />,
+      description: tMaintenance(
+        "Obligations légales & veille réglementaire, bien-être, petits travaux, lien avec le gestionnaire de l’immeuble... déléguez la maintenance et le suivi de vos contrôles.",
+      ),
+    },
+    {
+      id: 5,
+      title: "Sécurité Incendie",
+      icon: <SprayCan />,
+      description: tIncendie(
+        "Extincteurs, blocs autonomes d'éclairage de sécurité (BAES), télécommande BAES, laissez nos experts vérifier vos installations.",
+      ),
+    },
+  ];
 
   return (
     <section className="flex-1 lg:overflow-hidden">
       <MesServicesPresentation />
-      <ServiceWrapper serviceId={1}>
+      <ServiceWrapper service={services[0]}>
         <Nettoyage
           nettoyageQuantites={nettoyageQuantites}
           nettoyageProduits={nettoyageProduits}
         />
       </ServiceWrapper>
+      <ServiceWrapper service={services[1]}>
+        <NettoyageOptions nettoyageQuantites={nettoyageQuantites} />
+      </ServiceWrapper>
+
       {/* <NettoyageOptions
         nettoyageTarifs={nettoyageTarifs}
         repasseTarifs={repasseTarifs}

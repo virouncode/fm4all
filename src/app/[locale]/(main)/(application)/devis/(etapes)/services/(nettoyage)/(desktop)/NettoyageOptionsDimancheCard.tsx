@@ -1,3 +1,4 @@
+import { setOffreDansPanierAction } from "@/actions/panierActions";
 import {
   Dialog,
   DialogContent,
@@ -7,52 +8,36 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
+import { toast } from "@/hooks/use-toast";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { useNettoyageStore } from "@/stores/nettoyageStore";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
+import { useOptimistic, useTransition } from "react";
 
 type NettoyageOptionsDimancheCardProps = {
   dimancheProposition: {
     id: number;
     prixAnnuel: number;
-    nomFournisseur: string;
-    slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectif: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
+    hParPassage: number;
   };
-  handleClickDimancheProposition: (dimancheProposition: {
-    id: number;
-    prixAnnuel: number;
-    nomFournisseur: string;
-    slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectif: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-  }) => void;
   color: string;
+  selectedDimancheId?: string;
 };
 
 const NettoyageOptionsDimancheCard = ({
   dimancheProposition,
-  handleClickDimancheProposition,
   color,
+  selectedDimancheId,
 }: NettoyageOptionsDimancheCardProps) => {
   const t = useTranslations("DevisPage");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
-  const nettoyage = useNettoyageStore((state) => state.nettoyage);
+
+  const [selectedId, setSelectedId] = useOptimistic(selectedDimancheId);
+  const [optimisticSelectedId, setOptimisticSelectedId] =
+    useOptimistic(selectedDimancheId);
+  const [isPending, startTransition] = useTransition();
+
   const dimanchePrixMensuelText = dimancheProposition.prixAnnuel ? (
     <p className="ml-4 text-xl font-bold" data-testid="total-mensuel-dimanche">
       {formatNumber((dimancheProposition?.prixAnnuel * MARGE) / 12)}{" "}
@@ -64,7 +49,7 @@ const NettoyageOptionsDimancheCard = ({
 
   const dimancheNbPassagesParSemaineText = (
     <li className="list-check">
-      {t("1-passage-de")} {nettoyage.quantites.hParPassage}{" "}
+      {t("1-passage-de")} {dimancheProposition.hParPassage}{" "}
       {tNettoyage("h-semaine-en-plus")}
     </li>
   );
@@ -90,6 +75,34 @@ const NettoyageOptionsDimancheCard = ({
     </div>
   );
 
+  const onToggle = async (id?: string) => {
+    if (!id || isPending) return;
+    const next = optimisticSelectedId === id ? undefined : id;
+    const prev = optimisticSelectedId;
+    startTransition(() => {
+      setOptimisticSelectedId(next);
+    });
+    try {
+      const res = await setOffreDansPanierAction({
+        offreId: id,
+        quantite: next ? 1 : 0,
+        categorieId: "NettoyageDimanche",
+      });
+      setSelectedId(next);
+      await fetch("/api/panier/sync", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ panierId: res?.data?.panierId }),
+        keepalive: true,
+      });
+    } catch {
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue, veuillez réessayer.",
+        variant: "destructive",
+      });
+    }
+  };
   return (
     <div className="flex flex-1 border-b">
       <div className="flex w-1/4 items-center justify-center p-4 text-center text-base">
@@ -97,22 +110,16 @@ const NettoyageOptionsDimancheCard = ({
       </div>
       <div
         className={`flex w-3/4 items-center justify-center p-4 ${
-          nettoyage.infos.dimancheSelected
+          optimisticSelectedId === dimancheProposition.id.toString()
             ? "ring-fm4alldestructive ring-4 ring-inset"
             : ""
         } bg-${color} cursor-pointer items-center justify-center gap-4 text-2xl text-slate-200`}
-        onClick={
-          dimancheProposition.prixAnnuel
-            ? () => handleClickDimancheProposition(dimancheProposition)
-            : undefined
-        }
+        onClick={() => onToggle(dimancheProposition.id?.toString())}
       >
         {dimancheProposition.prixAnnuel ? (
           <Switch
-            checked={nettoyage.infos.dimancheSelected}
-            onCheckedChange={() =>
-              handleClickDimancheProposition(dimancheProposition)
-            }
+            checked={optimisticSelectedId === dimancheProposition.id.toString()}
+            onCheckedChange={() => onToggle(dimancheProposition.id?.toString())}
             className="data-[state=checked]:bg-fm4alldestructive"
             title={t("selectionnez-cette-proposition")}
             data-testid="dimanche-switch"

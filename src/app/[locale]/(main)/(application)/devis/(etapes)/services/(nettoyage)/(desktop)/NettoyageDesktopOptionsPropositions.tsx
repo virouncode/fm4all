@@ -1,4 +1,3 @@
-import { ChangeEvent } from "react";
 import NettoyageOptionsDimancheCard from "./NettoyageOptionsDimancheCard";
 import NettoyageOptionsRepasseCard from "./NettoyageOptionsRepasseCard";
 import NettoyageOptionsSamediCard from "./NettoyageOptionsSamediCard";
@@ -7,92 +6,20 @@ import NettoyageOptionsVitrerieCard from "./NettoyageOptionsVitrerieCard";
 type NettoyageOptionsPropositionsProps = {
   repasseProposition: {
     id: number;
+    freqAnnuelle: number | undefined;
     hParPassage: number;
-    tauxHoraire: number;
-    prixAnnuel: number;
-    nomFournisseur: string;
-    slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectif: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
+    prixAnnuel: number | null;
   } | null;
-  handleClickRepasseProposition: (proposition: {
-    id: number;
-    hParPassage: number;
-    tauxHoraire: number;
-    prixAnnuel: number;
-    nomFournisseur: string;
-    slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectif: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-  }) => void;
   samediProposition: {
     id: number;
     prixAnnuel: number;
-    nomFournisseur: string;
-    slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectif: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
+    hParPassage: number;
   };
-  handleClickSamediProposition: (proposition: {
-    id: number;
-    prixAnnuel: number;
-    nomFournisseur: string;
-    slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectif: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-  }) => void;
   dimancheProposition: {
     id: number;
     prixAnnuel: number;
-    nomFournisseur: string;
-    slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectif: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
+    hParPassage: number;
   };
-  handleClickDimancheProposition: (proposition: {
-    id: number;
-    prixAnnuel: number;
-    nomFournisseur: string;
-    slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectif: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-  }) => void;
   vitrerieProposition: {
     id: number;
     tauxHoraire: number;
@@ -100,74 +27,48 @@ type NettoyageOptionsPropositionsProps = {
     cadenceVitres: number;
     minFacturation: number;
     fraisDeplacement: number;
-    prixAnnuel: number | null;
-    nomFournisseur: string;
-    slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectif: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-  };
-  handleClickVitrerieProposition: (proposition: {
-    id: number;
-    tauxHoraire: number;
-    cadenceCloisons: number;
-    cadenceVitres: number;
-    minFacturation: number;
-    fraisDeplacement: number;
-    prixAnnuel: number | null;
-    nomFournisseur: string;
-    slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectif: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-  }) => void;
-  handleChangeNbPassageVitrerie: (e: ChangeEvent<HTMLInputElement>) => void;
+  } | null;
   color: string;
+  initialSelectedRepasseId?: string;
+  initialSelectedSamediId?: string;
+  initialSelectedDimancheId?: string;
+  initialSelectedVitrerieId?: string;
+  initialSelectedNbPassagesVitrerie?: number;
 };
 
 const NettoyageDesktopOptionsPropositions = ({
+  initialSelectedRepasseId,
+  initialSelectedSamediId,
+  initialSelectedDimancheId,
+  initialSelectedVitrerieId,
+  initialSelectedNbPassagesVitrerie,
   repasseProposition,
-  handleClickRepasseProposition,
   samediProposition,
-  handleClickSamediProposition,
   dimancheProposition,
-  handleClickDimancheProposition,
   vitrerieProposition,
-  handleClickVitrerieProposition,
-  handleChangeNbPassageVitrerie,
   color,
 }: NettoyageOptionsPropositionsProps) => {
   return (
     <div className="hidden h-full flex-col overflow-auto rounded-xl border lg:flex">
       <NettoyageOptionsRepasseCard
         repasseProposition={repasseProposition}
-        handleClickRepasseProposition={handleClickRepasseProposition}
+        selectedRepasseId={initialSelectedRepasseId}
         color={color}
       />
       <NettoyageOptionsSamediCard
         samediProposition={samediProposition}
-        handleClickSamediProposition={handleClickSamediProposition}
+        selectedSamediId={initialSelectedSamediId}
         color={color}
       />
       <NettoyageOptionsDimancheCard
         dimancheProposition={dimancheProposition}
-        handleClickDimancheProposition={handleClickDimancheProposition}
+        selectedDimancheId={initialSelectedDimancheId}
         color={color}
       />
       <NettoyageOptionsVitrerieCard
         vitrerieProposition={vitrerieProposition}
-        handleClickVitrerieProposition={handleClickVitrerieProposition}
-        handleChangeNbPassageVitrerie={handleChangeNbPassageVitrerie}
+        selectedVitrerieId={initialSelectedVitrerieId}
+        selectedNbPassagesVitrerie={initialSelectedNbPassagesVitrerie}
         color={color}
       />
     </div>

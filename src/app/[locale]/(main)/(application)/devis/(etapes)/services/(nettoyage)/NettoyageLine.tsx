@@ -1,3 +1,4 @@
+import { getPanier } from "@/actions/panierActions";
 import { getFournisseur } from "@/lib/queries/fournisseurs/getFournisseurs";
 import { getNettoyageOffres } from "@/lib/queries/nettoyage/getNettoyage";
 import { SelectNettoyageProduitType } from "@/zod-schemas/nettoyageProduit";
@@ -26,7 +27,7 @@ const NettoyageLine = async ({
     return null;
   }
 
-  console.log("nettoyageQuantites", nettoyageQuantites);
+  const panier = await getPanier();
 
   const propositions = nettoyageOffres.map((offre) => {
     const produit = nettoyageProduits.find(({ id }) => id === offre?.produitId);
@@ -48,15 +49,6 @@ const NettoyageLine = async ({
     };
   });
 
-  const handleClickProposition = (proposition: {
-    id: number | undefined;
-    logoUrl: string | null;
-    freqAnnuelle: number | null;
-    hParPassage: number | undefined;
-    gamme: "essentiel" | "confort" | "excellence" | undefined;
-    totalAnnuel: number | null;
-  }) => {};
-
   return (
     <div className="flex flex-1 border-b">
       <NettoyageFournisseurLogo {...fournisseur} />
@@ -64,6 +56,7 @@ const NettoyageLine = async ({
         <NettoyagePropositionCard
           key={proposition.id}
           proposition={proposition}
+          panier={panier}
         />
       ))}
     </div>

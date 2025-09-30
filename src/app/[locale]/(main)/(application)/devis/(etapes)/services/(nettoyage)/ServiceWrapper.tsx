@@ -10,10 +10,15 @@ import PropositionsTitleMobile from "../../../PropositionsTitleMobile";
 
 const ServiceWrapper = ({
   children,
-  serviceId,
+  service,
 }: {
   children: React.ReactNode;
-  serviceId: number;
+  service: {
+    id: number;
+    icon: React.ReactNode;
+    title: string;
+    description: string;
+  };
 }) => {
   const tPresentation = useTranslations(
     "DevisPage.services.presentation.cards",
@@ -22,18 +27,19 @@ const ServiceWrapper = ({
   useScrollIntoService();
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
   const propositionsRef = useRef<HTMLDivElement>(null);
+
   return (
     <div
       className="mx-auto flex h-full w-full flex-col gap-4 py-2"
-      id={serviceId.toString()}
+      id={service.id.toString()}
     >
       {isTabletOrMobile ? (
         <PropositionsTitleMobile
-          serviceId={serviceId}
+          service={service}
           propositionsRef={propositionsRef}
         />
       ) : (
-        <PropositionsTitle serviceId={serviceId} />
+        <PropositionsTitle service={service} />
       )}
       <div
         className="w-full flex-1 overflow-auto transition"
@@ -41,7 +47,7 @@ const ServiceWrapper = ({
       >
         {children}
       </div>
-      {isTabletOrMobile ? null : <PropositionsFooter serviceId={serviceId} />}
+      {isTabletOrMobile ? null : <PropositionsFooter service={service} />}
     </div>
   );
 };

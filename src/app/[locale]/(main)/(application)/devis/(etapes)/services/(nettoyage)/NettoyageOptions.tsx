@@ -1,291 +1,148 @@
-"use client";
-
-import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
 import { MAJORATION_DIMANCHE } from "@/constants/constants";
-import { useNettoyageStore } from "@/stores/nettoyageStore";
-import { SelectRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
-import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
-import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
-import { SprayCan } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useRef } from "react";
-import { useMediaQuery } from "react-responsive";
-import { capitalize } from "../../../../../../../../lib/utils/capitalize";
-import PropositionsFooter from "../../../PropositionsFooter";
-import PropositionsTitle from "../../../PropositionsTitle";
+import { getFournisseur } from "@/lib/queries/fournisseurs/getFournisseurs";
+import {
+  getNettoyageOffre,
+  getNettoyageProduit,
+  getRepasseOffre,
+  getRepasseProduit,
+  getVitrerieOffre,
+  getVitrerieProduitForFournisseur,
+} from "@/lib/queries/nettoyage/getNettoyage";
+import { getPanier } from "@/lib/queries/panier/getPanier";
+import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
+import { SelectNettoyageQuantitesType } from "@/zod-schemas/nettoyageQuantites";
+import { getTranslations } from "next-intl/server";
 import NettoyageOptionsPropositions from "./(desktop)/NettoyageOptionsPropositions";
-import { useServicesStore } from "@/stores/servicesStore";
 
 type NettoyageOptionsProps = {
-  nettoyageTarifs: SelectNettoyageTarifsType[];
-  repasseTarifs: SelectRepasseTarifsType[];
-  vitrerieTarifs: SelectVitrerieTarifsType[];
+  nettoyageQuantites: SelectNettoyageQuantitesType[];
 };
 
-const NettoyageOptions = ({
-  nettoyageTarifs,
-  repasseTarifs,
-  vitrerieTarifs,
+const NettoyageOptions = async ({
+  nettoyageQuantites,
 }: NettoyageOptionsProps) => {
-  const t = useTranslations("DevisPage");
-  const tNettoyage = useTranslations("DevisPage.services.nettoyage");
-  const nettoyage = useNettoyageStore((s) => s.nettoyage);
-  const setServices = useServicesStore((s) => s.setServices);
-  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
-  const propositionsRef = useRef<HTMLDivElement>(null);
+  const tNettoyage = await getTranslations("DevisPage.services.nettoyage");
+  const panier = await getPanier();
+  const nettoyageOffreId = Object.keys(panier ?? {})
+    .find((k) => k.startsWith("Nettoyage:"))
+    ?.split(":")[1];
 
-  const handleClickPrevious = () => {
-    setServices((prev) => ({
-      ...prev,
-      currentServiceId: prev.currentServiceId - 1,
-    }));
-  };
-  const handleClickNext = () => {
-    setServices((prev) => ({
-      ...prev,
-      currentServiceId: prev.currentServiceId + 1,
-    }));
-  };
+  if (!nettoyageOffreId) return null;
+  const nettoyageOffre = await getNettoyageOffre(parseInt(nettoyageOffreId));
+  if (!nettoyageOffre) return null;
+  const nettoyageProduit = await getNettoyageProduit(nettoyageOffre.produitId);
+  if (!nettoyageProduit) return null;
 
-  // Calcul des propositions
-  const freqAnnuelle = nettoyage.quantites.freqAnnuelle;
+  const fournisseurId = nettoyageProduit.fournisseurId;
+  const fournisseur = await getFournisseur(fournisseurId);
+  if (!fournisseur) return null;
+  const gamme = nettoyageProduit.gamme;
+  const color = getFm4AllColor(gamme);
+  const surface = nettoyageProduit.surface;
+  const freqAnnuelle = nettoyageQuantites.find(
+    (q) => q.surface === surface && q.gamme === gamme,
+  )?.freqAnnuelle;
+
+  const repasseProduit = await getRepasseProduit(fournisseurId, surface, gamme);
+
+  let repasseOffre = null;
+  if (repasseProduit) repasseOffre = await getRepasseOffre(repasseProduit.id);
+
   const repasseProposition =
-    freqAnnuelle === null
-      ? null
-      : freqAnnuelle < 260.04
-        ? null
-        : repasseTarifs
-            .filter(
-              (tarif) =>
-                tarif.fournisseurId === nettoyage.infos.fournisseurId &&
-                tarif.gamme === nettoyage.infos.gammeSelected,
-            )
-            .map((tarif) => {
-              const {
-                id,
-                hParPassage,
-                tauxHoraire,
-                nomFournisseur,
-                gamme,
-                slogan,
-                logoUrl,
-                locationUrl,
-                anneeCreation,
-                ca,
-                effectif,
-                nbClients,
-                noteGoogle,
-                nbAvis,
-              } = tarif;
+    repasseOffre && repasseProduit
+      ? {
+          id: repasseOffre.id,
+          hParPassage: repasseProduit?.hParPassage,
+          freqAnnuelle: freqAnnuelle,
+          prixAnnuel: freqAnnuelle
+            ? freqAnnuelle *
+              repasseProduit.hParPassage *
+              repasseOffre.tauxHoraire
+            : null,
+        }
+      : null;
 
-              const prixAnnuel = freqAnnuelle * hParPassage * tauxHoraire;
-              return {
-                id,
-                hParPassage,
-                tauxHoraire,
-                prixAnnuel,
-                nomFournisseur,
-                gamme,
-                slogan,
-                logoUrl,
-                locationUrl,
-                anneeCreation,
-                ca,
-                effectif,
-                nbClients,
-                noteGoogle,
-                nbAvis,
-              };
-            })[0];
-  const samediProposition = nettoyageTarifs
-    .filter(
-      (tarif) =>
-        tarif.fournisseurId === nettoyage.infos.fournisseurId &&
-        tarif.gamme === nettoyage.infos.gammeSelected,
-    )
-    .map((tarif) => {
-      const {
-        id,
-        gamme,
-        hParPassage,
-        tauxHoraire,
-        nomFournisseur,
-        slogan,
-        logoUrl,
-        locationUrl,
-        anneeCreation,
-        ca,
-        effectif,
-        nbClients,
-        noteGoogle,
-        nbAvis,
-      } = tarif;
-      const prixAnnuel = 52 * hParPassage * tauxHoraire;
-      return {
-        id,
-        gamme,
-        prixAnnuel,
-        nomFournisseur,
-        slogan,
-        logoUrl,
-        locationUrl,
-        anneeCreation,
-        ca,
-        effectif,
-        nbClients,
-        noteGoogle,
-        nbAvis,
-      };
-    })[0];
-  const dimancheProposition = nettoyageTarifs
-    .filter(
-      (tarif) =>
-        tarif.fournisseurId === nettoyage.infos.fournisseurId &&
-        tarif.gamme === nettoyage.infos.gammeSelected,
-    )
-    .map((tarif) => {
-      const {
-        id,
-        hParPassage,
-        tauxHoraire,
-        nomFournisseur,
-        slogan,
-        logoUrl,
-        locationUrl,
-        anneeCreation,
-        ca,
-        effectif,
-        nbClients,
-        noteGoogle,
-        nbAvis,
-      } = tarif;
-      const prixAnnuel = 52 * hParPassage * tauxHoraire * MAJORATION_DIMANCHE;
-      return {
-        id,
-        prixAnnuel,
-        nomFournisseur,
-        slogan,
-        logoUrl,
-        locationUrl,
-        anneeCreation,
-        ca,
-        effectif,
-        nbClients,
-        noteGoogle,
-        nbAvis,
-      };
-    })[0];
-  const vitrerieProposition = vitrerieTarifs
-    .filter((tarif) => tarif.fournisseurId === nettoyage.infos.fournisseurId)
-    .map((tarif) => {
-      const {
-        id,
-        tauxHoraire,
-        cadenceCloisons,
-        cadenceVitres,
-        minFacturation,
-        fraisDeplacement,
-        nomFournisseur,
-        slogan,
-        logoUrl,
-        locationUrl,
-        anneeCreation,
-        ca,
-        effectif,
-        nbClients,
-        noteGoogle,
-        nbAvis,
-      } = tarif;
+  const samediProposition = {
+    id: nettoyageOffre.id,
+    prixAnnuel: 52 * nettoyageProduit.hParPassage * nettoyageOffre.tauxHoraire,
+    hParPassage: nettoyageProduit.hParPassage,
+  };
 
-      const prixAnnuel =
-        nettoyage.quantites.surfaceCloisons && nettoyage.quantites.surfaceVitres
-          ? nettoyage.quantites.nbPassagesVitrerie *
-            Math.max(
-              (nettoyage.quantites.surfaceCloisons / cadenceCloisons +
-                nettoyage.quantites.surfaceVitres / cadenceVitres) *
-                tauxHoraire +
-                fraisDeplacement,
-              minFacturation,
-            )
-          : null;
-      return {
-        id,
-        tauxHoraire,
-        cadenceCloisons,
-        cadenceVitres,
-        minFacturation,
-        fraisDeplacement,
-        prixAnnuel,
-        nomFournisseur,
-        slogan,
-        logoUrl,
-        locationUrl,
-        anneeCreation,
-        ca,
-        effectif,
-        nbClients,
-        noteGoogle,
-        nbAvis,
-      };
-    })[0];
+  const dimancheProposition = {
+    id: nettoyageOffre.id,
+    prixAnnuel:
+      52 *
+      nettoyageProduit.hParPassage *
+      nettoyageOffre.tauxHoraire *
+      MAJORATION_DIMANCHE,
+    hParPassage: nettoyageProduit.hParPassage,
+  };
+
+  const vitrerieProduit = await getVitrerieProduitForFournisseur(fournisseurId);
+
+  let vitrerieOffre = null;
+  if (vitrerieProduit)
+    vitrerieOffre = await getVitrerieOffre(vitrerieProduit.id);
+
+  const vitrerieProposition =
+    vitrerieOffre && vitrerieProduit
+      ? {
+          id: vitrerieOffre.id,
+          tauxHoraire: vitrerieOffre.tauxHoraire,
+          cadenceCloisons: vitrerieProduit.cadenceCloisons,
+          cadenceVitres: vitrerieProduit.cadenceVitres,
+          minFacturation: vitrerieProduit.minFacturation,
+          fraisDeplacement: vitrerieProduit.fraisDeplacement,
+        }
+      : null;
+
+  //Offres déjà dans le panier
+
+  const initialSelectedRepasseId = Object.keys(panier ?? {})
+    .find((k) => k.startsWith("NettoyageRepasse:"))
+    ?.split(":")[1];
+  const initialSelectedSamediId = Object.keys(panier ?? {})
+    .find((k) => k.startsWith("NettoyageSamedi:"))
+    ?.split(":")[1];
+  const initialSelectedDimancheId = Object.keys(panier ?? {})
+    .find((k) => k.startsWith("NettoyageDimanche:"))
+    ?.split(":")[1];
+  const initialSelectedVitrerieId = Object.keys(panier ?? {})
+    .find((k) => k.startsWith("NettoyageVitrerie:"))
+    ?.split(":")[1];
+
+  let initialSelectedNbPassagesVitrerie = undefined;
+  if (
+    panier &&
+    Object.keys(panier ?? {}).find(
+      (k) => k === `NettoyageVitrerie:${initialSelectedVitrerieId}`,
+    )
+  )
+    initialSelectedNbPassagesVitrerie = panier
+      ? panier[`NettoyageVitrerie:${initialSelectedVitrerieId}`]
+      : undefined;
 
   return (
-    <div className="mx-auto flex h-full w-full flex-col gap-4 py-2" id="2">
-      {isTabletOrMobile ? (
-        <PropositionsTitleMobile
-          title={tNettoyage("nettoyage-et-proprete-options")}
-          description={
-            nettoyage.infos.fournisseurId && nettoyage.infos.gammeSelected
-              ? t(
-                  "choisissez-vos-options-en-gamme-capitalize-nettoyage-infos-gammeselected-chez-nettoyage-infos-nomfournisseur",
-                  {
-                    gamme: capitalize(nettoyage.infos.gammeSelected),
-                    nomFournisseur: nettoyage.infos.nomFournisseur ?? "",
-                  },
-                )
-              : ""
-          }
-          icon={SprayCan}
-          propositionsRef={propositionsRef}
-        />
+    <div className="w-full flex-1 overflow-auto">
+      {!nettoyageOffre ? (
+        <div className="flex h-full items-center justify-center text-base lg:text-lg">
+          <p className="text-fm4alldestructive text-center">
+            {tNettoyage("veuillez-d-abord-selectionner-une-offre-de-nettoyage")}
+          </p>
+        </div>
       ) : (
-        <PropositionsTitle
-          title={tNettoyage("nettoyage-et-proprete-options")}
-          description={
-            nettoyage.infos.fournisseurId && nettoyage.infos.gammeSelected
-              ? t(
-                  "choisissez-vos-options-en-gamme-capitalize-nettoyage-infos-gammeselected-chez-nettoyage-infos-nomfournisseur",
-                  {
-                    gamme: capitalize(nettoyage.infos.gammeSelected),
-                    nomFournisseur: nettoyage.infos.nomFournisseur ?? "",
-                  },
-                )
-              : ""
-          }
-          icon={SprayCan}
-          handleClickPrevious={handleClickPrevious}
+        <NettoyageOptionsPropositions
+          samediProposition={samediProposition}
+          dimancheProposition={dimancheProposition}
+          repasseProposition={repasseProposition}
+          vitrerieProposition={vitrerieProposition}
+          color={color}
+          initialSelectedRepasseId={initialSelectedRepasseId}
+          initialSelectedSamediId={initialSelectedSamediId}
+          initialSelectedDimancheId={initialSelectedDimancheId}
+          initialSelectedVitrerieId={initialSelectedVitrerieId}
+          initialSelectedNbPassagesVitrerie={initialSelectedNbPassagesVitrerie}
         />
-      )}
-      <div className="w-full flex-1 overflow-auto" ref={propositionsRef}>
-        {!nettoyage.infos.fournisseurId || !nettoyage.infos.gammeSelected ? (
-          <div className="flex h-full items-center justify-center text-base lg:text-lg">
-            <p className="text-fm4alldestructive text-center">
-              {tNettoyage(
-                "veuillez-d-abord-selectionner-une-offre-de-nettoyage",
-              )}
-            </p>
-          </div>
-        ) : (
-          <NettoyageOptionsPropositions
-            samediProposition={samediProposition}
-            dimancheProposition={dimancheProposition}
-            repasseProposition={repasseProposition}
-            vitrerieProposition={vitrerieProposition}
-          />
-        )}
-      </div>
-      {isTabletOrMobile ? null : (
-        <PropositionsFooter handleClickNext={handleClickNext} />
       )}
     </div>
   );

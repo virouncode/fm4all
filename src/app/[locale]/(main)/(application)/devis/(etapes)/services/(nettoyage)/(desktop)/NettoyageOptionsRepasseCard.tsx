@@ -1,3 +1,4 @@
+import { setOffreDansPanierAction } from "@/actions/panierActions";
 import {
   Dialog,
   DialogContent,
@@ -7,56 +8,36 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
+import { toast } from "@/hooks/use-toast";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { useNettoyageStore } from "@/stores/nettoyageStore";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
+import { useOptimistic, useTransition } from "react";
 
 type NettoyageOptionsRepasseCardProps = {
   repasseProposition: {
     id: number;
+    freqAnnuelle: number | undefined;
     hParPassage: number;
-    tauxHoraire: number;
-    prixAnnuel: number;
-    nomFournisseur: string;
-    slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectif: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
+    prixAnnuel: number | null;
   } | null;
-  handleClickRepasseProposition: (repasseProposition: {
-    id: number;
-    hParPassage: number;
-    tauxHoraire: number;
-    prixAnnuel: number;
-    nomFournisseur: string;
-    slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectif: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-  }) => void;
   color: string;
+  selectedRepasseId?: string;
 };
 
 const NettoyageOptionsRepasseCard = ({
   repasseProposition,
-  handleClickRepasseProposition,
   color,
+  selectedRepasseId,
 }: NettoyageOptionsRepasseCardProps) => {
   const t = useTranslations("DevisPage");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
-  const nettoyage = useNettoyageStore((s) => s.nettoyage);
+  const [selectedId, setSelectedId] = useOptimistic(selectedRepasseId);
+  const [optimisticSelectedId, setOptimisticSelectedId] =
+    useOptimistic(selectedRepasseId);
+  const [isPending, startTransition] = useTransition();
+
   const totalMensuelText = repasseProposition?.prixAnnuel ? (
     <p className="ml-4 text-xl font-bold" data-testid="total-mensuel-repasse">
       {formatNumber((repasseProposition.prixAnnuel * MARGE) / 12)}{" "}
@@ -71,19 +52,19 @@ const NettoyageOptionsRepasseCard = ({
   );
 
   const repasseHParSemaineText =
-    repasseProposition && nettoyage.quantites.freqAnnuelle ? (
+    repasseProposition && repasseProposition.freqAnnuelle ? (
       <li className="list-check">
         {formatNumber(
-          (repasseProposition.hParPassage * nettoyage.quantites.freqAnnuelle) /
+          (repasseProposition.hParPassage * repasseProposition.freqAnnuelle) /
             S_OUVREES_PAR_AN,
         )}{" "}
         {tNettoyage("h-semaine-en-plus")}
       </li>
     ) : null;
   const repasseNbPassagesParSemaineText =
-    repasseProposition && nettoyage.quantites.freqAnnuelle ? (
+    repasseProposition && repasseProposition.freqAnnuelle ? (
       <li className="list-check">
-        {formatNumber(nettoyage.quantites.freqAnnuelle / S_OUVREES_PAR_AN)}{" "}
+        {formatNumber(repasseProposition.freqAnnuelle / S_OUVREES_PAR_AN)}{" "}
         {t("passage-s-de")} {repasseProposition.hParPassage} {t("h-semaine")}
       </li>
     ) : null;
@@ -112,6 +93,34 @@ const NettoyageOptionsRepasseCard = ({
     </div>
   );
 
+  const onToggle = async (id?: string) => {
+    if (!id || isPending) return;
+    const next = optimisticSelectedId === id ? undefined : id;
+    startTransition(() => {
+      setOptimisticSelectedId(next);
+    });
+    try {
+      const res = await setOffreDansPanierAction({
+        offreId: id,
+        quantite: next ? 1 : 0,
+        categorieId: "NettoyageRepasse",
+      });
+      setSelectedId(next);
+      await fetch("/api/panier/sync", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ panierId: res?.data?.panierId }),
+        keepalive: true,
+      });
+    } catch {
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue, veuillez réessayer.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="flex flex-1 border-b">
       <div className="flex w-1/4 items-center justify-center p-4 text-base">
@@ -119,22 +128,18 @@ const NettoyageOptionsRepasseCard = ({
       </div>
       <div
         className={`flex w-3/4 items-center justify-center p-4 ${
-          nettoyage.infos.repasseSelected && repasseProposition
+          optimisticSelectedId === repasseProposition?.id?.toString()
             ? "ring-fm4alldestructive ring-4 ring-inset"
             : ""
         } bg-${color} cursor-pointer items-center justify-center gap-4 text-2xl text-slate-200`}
-        onClick={
-          repasseProposition
-            ? () => handleClickRepasseProposition(repasseProposition)
-            : undefined
-        }
+        onClick={() => onToggle(repasseProposition?.id?.toString())}
       >
         {repasseProposition ? (
           <Switch
-            checked={nettoyage.infos.repasseSelected}
-            onCheckedChange={() =>
-              handleClickRepasseProposition(repasseProposition)
+            checked={
+              optimisticSelectedId === repasseProposition?.id?.toString()
             }
+            onCheckedChange={() => onToggle(repasseProposition.id?.toString())}
             className="data-[state=checked]:bg-fm4alldestructive"
             title={t("selectionnez-cette-proposition")}
             data-testid="repasse-switch"

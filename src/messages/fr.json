@@ -792,7 +792,6 @@
     "effectif": "Effectif :",
     "nombre-de-clients": "Nombre de clients :",
     "avis-google": "Avis Google :",
-    "choisissez-vos-options-en-gamme-capitalize-nettoyage-infos-gammeselected-chez-nettoyage-infos-nomfournisseur": "Choisissez vos options en gamme {gamme} chez {nomFournisseur}",
     "1-passage-de": "1 passage de",
     "passages-an": "passages / an",
     "passages-par-an": "passages par an",
@@ -927,6 +926,7 @@
         }
       },
       "nettoyage": {
+        "nettoyage-et-proprete": "Nettoyage et propreté",
         "dun-nettoyage-essentiel-a-une-experience-5-etoiles-choisissez-la-prestation-proprete-qui-vous-ressemble-la-gamme-determine-la-frequence-de-passage-et-la-cadence-de-nettoyage": "D’un nettoyage essentiel à une expérience 5 étoiles, choisissez la prestation propreté qui vous ressemble. La gamme détermine la fréquence de passage et la cadence de nettoyage",
         "vous-avez-choisi-nomfournisseur-pour-le-nettoyage-ce-prestataire-ou-son-partenaire-assurera-la-prestation-hygiene-sanitaire": "Vous avez choisi {nomFournisseur} pour le nettoyage, ce prestataire ou son partenaire assurera la prestation Hygiène Sanitaire",
         "nettoyage": "Nettoyage",
@@ -934,6 +934,7 @@
         "equilibre-parfait-entre-qualite-et-efficacite": "Equilibre parfait entre qualité et efficacité",
         "un-standard-de-proprete-exemplaire": "Un standard de propreté exemplaire",
         "nettoyage-et-proprete-options": "Nettoyage et propreté (options)",
+        "choisissez-vos-options-en-gamme-capitalize-nettoyage-infos-gammeselected-chez-nettoyage-infos-nomfournisseur": "Choisissez vos options en gamme {gamme} chez {nomFournisseur}",
         "veuillez-d-abord-selectionner-une-offre-de-nettoyage": "Veuillez d'abord sélectionner une offre de Nettoyage.",
         "non-propose-pour-une-frequence-inferieure-a-5-passages-semaine": "Non proposé pour une fréquence inférieure à 5 passages/semaine",
         "h-semaine-en-plus": "h / semaine en plus",

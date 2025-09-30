@@ -793,7 +793,6 @@
     "effectif": "Headcount:",
     "nombre-de-clients": "Number of clients:",
     "avis-google": "Google reviews:",
-    "choisissez-vos-options-en-gamme-capitalize-nettoyage-infos-gammeselected-chez-nettoyage-infos-nomfournisseur": "Choose your options in the {gamme} range at {nomFournisseur}",
     "1-passage-de": "1 visit of",
     "passages-an": "visits / year",
     "passages-par-an": "visits per year",
@@ -927,6 +926,7 @@
         }
       },
       "nettoyage": {
+        "nettoyage-et-proprete": "Cleaning Services",
         "dun-nettoyage-essentiel-a-une-experience-5-etoiles-choisissez-la-prestation-proprete-qui-vous-ressemble-la-gamme-determine-la-frequence-de-passage-et-la-cadence-de-nettoyage": "From essential cleaning to a 5-star experience, choose the cleaning service that suits you. The tier determines the frequency of visits and the cleaning schedule.",
         "vous-avez-choisi-nomfournisseur-pour-le-nettoyage-ce-prestataire-ou-son-partenaire-assurera-la-prestation-hygiene-sanitaire": "You have chosen {nomFournisseur} for cleaning. This provider or its partner will ensure the Hygiene Supplies service.",
         "nettoyage": "Cleaning",
@@ -934,6 +934,7 @@
         "equilibre-parfait-entre-qualite-et-efficacite": "The perfect balance between quality and efficiency",
         "un-standard-de-proprete-exemplaire": "An exemplary standard of office cleanliness",
         "nettoyage-et-proprete-options": "Cleaning Services (options)",
+        "choisissez-vos-options-en-gamme-capitalize-nettoyage-infos-gammeselected-chez-nettoyage-infos-nomfournisseur": "Choose your options in the {gamme} tier at {nomFournisseur}",
         "veuillez-d-abord-selectionner-une-offre-de-nettoyage": "Please select a cleaning offer first.",
         "non-propose-pour-une-frequence-inferieure-a-5-passages-semaine": "Not offered for a frequency of less than 5 visits/week",
         "h-semaine-en-plus": "h / week additional",

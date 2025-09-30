@@ -1,3 +1,4 @@
+import { setOffreDansPanierAction } from "@/actions/panierActions";
 import {
   Dialog,
   DialogContent,
@@ -7,52 +8,35 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
+import { toast } from "@/hooks/use-toast";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { useNettoyageStore } from "@/stores/nettoyageStore";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
+import { useOptimistic, useTransition } from "react";
 
 type NettoyageOptionsSamediCardProps = {
   samediProposition: {
     id: number;
     prixAnnuel: number;
-    nomFournisseur: string;
-    slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectif: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
+    hParPassage: number;
   };
-  handleClickSamediProposition: (samediProposition: {
-    id: number;
-    prixAnnuel: number;
-    nomFournisseur: string;
-    slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectif: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-  }) => void;
   color: string;
+  selectedSamediId?: string;
 };
 
 const NettoyageOptionsSamediCard = ({
   samediProposition,
-  handleClickSamediProposition,
   color,
+  selectedSamediId,
 }: NettoyageOptionsSamediCardProps) => {
   const t = useTranslations("DevisPage");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
-  const nettoyage = useNettoyageStore((s) => s.nettoyage);
+
+  const [selectedId, setSelectedId] = useOptimistic(selectedSamediId);
+  const [optimisticSelectedId, setOptimisticSelectedId] =
+    useOptimistic(selectedSamediId);
+  const [isPending, startTransition] = useTransition();
 
   const samediPrixMensuelText = samediProposition.prixAnnuel ? (
     <p className="ml-4 text-xl font-bold" data-testid="total-mensuel-samedi">
@@ -65,7 +49,7 @@ const NettoyageOptionsSamediCard = ({
 
   const samediNbPassagesParSemaineText = (
     <li className="list-check">
-      {t("1-passage-de")} {nettoyage.quantites.hParPassage}{" "}
+      {t("1-passage-de")} {samediProposition.hParPassage}{" "}
       {tNettoyage("h-semaine-en-plus")}
     </li>
   );
@@ -90,6 +74,35 @@ const NettoyageOptionsSamediCard = ({
       />
     </div>
   );
+
+  const onToggle = async (id?: string) => {
+    if (!id || isPending) return;
+    const next = optimisticSelectedId === id ? undefined : id;
+    const prev = optimisticSelectedId;
+    startTransition(() => {
+      setOptimisticSelectedId(next);
+    });
+    try {
+      const res = await setOffreDansPanierAction({
+        offreId: id,
+        quantite: next ? 1 : 0,
+        categorieId: "NettoyageSamedi",
+      });
+      setSelectedId(next);
+      await fetch("/api/panier/sync", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ panierId: res?.data?.panierId }),
+        keepalive: true,
+      });
+    } catch {
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue, veuillez réessayer.",
+        variant: "destructive",
+      });
+    }
+  };
   return (
     <div className="flex flex-1 border-b">
       <div className="flex w-1/4 items-center justify-center p-4 text-center text-base">
@@ -97,22 +110,16 @@ const NettoyageOptionsSamediCard = ({
       </div>
       <div
         className={`flex w-3/4 items-center justify-center p-4 ${
-          nettoyage.infos.samediSelected
+          optimisticSelectedId === samediProposition.id.toString()
             ? "ring-fm4alldestructive ring-4 ring-inset"
             : ""
         } bg-${color} cursor-pointer items-center justify-center gap-4 text-2xl text-slate-200`}
-        onClick={
-          samediProposition.prixAnnuel
-            ? () => handleClickSamediProposition(samediProposition)
-            : undefined
-        }
+        onClick={() => onToggle(samediProposition.id.toString())}
       >
         {samediProposition.prixAnnuel ? (
           <Switch
-            checked={nettoyage.infos.samediSelected}
-            onCheckedChange={() =>
-              handleClickSamediProposition(samediProposition)
-            }
+            checked={optimisticSelectedId === samediProposition.id.toString()}
+            onCheckedChange={() => onToggle(samediProposition.id.toString())}
             className="data-[state=checked]:bg-fm4alldestructive"
             title={t("selectionnez-cette-proposition")}
             data-testid="samedi-switch"

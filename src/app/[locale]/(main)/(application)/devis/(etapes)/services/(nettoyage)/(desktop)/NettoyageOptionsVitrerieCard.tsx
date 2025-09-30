@@ -1,3 +1,4 @@
+import { setOffreDansPanierAction } from "@/actions/panierActions";
 import {
   Dialog,
   DialogContent,
@@ -9,11 +10,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { MARGE, MAX_PASSAGES_VITRERIE } from "@/constants/constants";
+import { toast } from "@/hooks/use-toast";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { useNettoyageStore } from "@/stores/nettoyageStore";
+import { useClientStore } from "@/stores/clientStore";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
+import { useEffect, useOptimistic, useState, useTransition } from "react";
 
 type NettoyageOptionsVitrerieCardProps = {
   vitrerieProposition: {
@@ -23,63 +26,58 @@ type NettoyageOptionsVitrerieCardProps = {
     cadenceVitres: number;
     minFacturation: number;
     fraisDeplacement: number;
-    prixAnnuel: number | null;
-    nomFournisseur: string;
-    slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectif: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-  };
-  handleClickVitrerieProposition: (vitrerieProposition: {
-    id: number;
-    tauxHoraire: number;
-    cadenceCloisons: number;
-    cadenceVitres: number;
-    minFacturation: number;
-    fraisDeplacement: number;
-    prixAnnuel: number | null;
-    nomFournisseur: string;
-    slogan: string | null;
-    logoUrl: string | null;
-    locationUrl: string | null;
-    anneeCreation: number | null;
-    ca: string | null;
-    effectif: string | null;
-    nbClients: number | null;
-    noteGoogle: string | null;
-    nbAvis: number | null;
-  }) => void;
-  handleChangeNbPassageVitrerie: (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => void;
+  } | null;
   color: string;
+  selectedVitrerieId?: string;
+  selectedNbPassagesVitrerie?: number;
 };
 
 const NettoyageOptionsVitrerieCard = ({
   vitrerieProposition,
-  handleClickVitrerieProposition,
-  handleChangeNbPassageVitrerie,
   color,
+  selectedVitrerieId,
+  selectedNbPassagesVitrerie,
 }: NettoyageOptionsVitrerieCardProps) => {
   const t = useTranslations("DevisPage");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
-  const nettoyage = useNettoyageStore((s) => s.nettoyage);
-  const vitreriePrixMensuelText = vitrerieProposition.prixAnnuel ? (
+  const client = useClientStore((state) => state.client);
+
+  const [selectedId, setSelectedId] = useOptimistic(selectedVitrerieId);
+  const [optimisticSelectedId, setOptimisticSelectedId] =
+    useOptimistic(selectedVitrerieId);
+
+  const [nbPassagesVitrerie, setNbPassagesVitrerie] = useState(
+    selectedNbPassagesVitrerie ?? 2,
+  );
+
+  const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    setNbPassagesVitrerie(selectedNbPassagesVitrerie ?? 2);
+  }, [selectedNbPassagesVitrerie]);
+
+  const prixAnnuel =
+    client.surfaceCloisons && client.surfaceVitres && vitrerieProposition
+      ? nbPassagesVitrerie *
+        Math.max(
+          (client.surfaceCloisons / vitrerieProposition.cadenceCloisons +
+            client.surfaceVitres / vitrerieProposition.cadenceVitres) *
+            vitrerieProposition.tauxHoraire +
+            vitrerieProposition.fraisDeplacement,
+          vitrerieProposition.minFacturation,
+        )
+      : null;
+
+  const vitreriePrixMensuelText = prixAnnuel ? (
     <p className="ml-4 text-xl font-bold" data-testid="total-mensuel-vitrerie">
-      {formatNumber((vitrerieProposition.prixAnnuel * MARGE) / 12)}{" "}
-      {t("euros-mois")}
+      {formatNumber((prixAnnuel * MARGE) / 12)} {t("euros-mois")}
     </p>
   ) : (
     <p className="text-base font-bold">{t("non-propose")}</p>
   );
   const nbPassagesVitrerieText = (
     <li className="list-check">
-      {nettoyage.quantites.nbPassagesVitrerie} {t("passages-an")}
+      {nbPassagesVitrerie} {t("passages-an")}
     </li>
   );
   const infosProduit = (
@@ -103,6 +101,58 @@ const NettoyageOptionsVitrerieCard = ({
       />
     </div>
   );
+
+  const onToggle = async (id?: string) => {
+    if (!id || isPending) return;
+    const next = optimisticSelectedId === id ? undefined : id;
+    const prev = optimisticSelectedId;
+    startTransition(() => {
+      setOptimisticSelectedId(next);
+    });
+    try {
+      const res = await setOffreDansPanierAction({
+        offreId: id,
+        quantite: next ? nbPassagesVitrerie : 0,
+        categorieId: "NettoyageVitrerie",
+      });
+      setSelectedId(next);
+      await fetch("/api/panier/sync", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ panierId: res?.data?.panierId }),
+        keepalive: true,
+      });
+    } catch {
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue, veuillez réessayer.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleChangeNbPassageVitrerie = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    let value = parseInt(e.target.value);
+    setNbPassagesVitrerie(value);
+
+    if (!selectedVitrerieId) return;
+    try {
+      await setOffreDansPanierAction({
+        offreId: selectedVitrerieId,
+        quantite: value,
+        categorieId: "NettoyageVitrerie",
+      });
+    } catch {
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue, veuillez réessayer.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="flex flex-1 border-b">
       <div className="flex w-1/4 items-center justify-center p-4">
@@ -111,15 +161,13 @@ const NettoyageOptionsVitrerieCard = ({
           <div className="flex w-full items-center justify-center gap-4">
             <Input
               type="number"
-              value={nettoyage.quantites.nbPassagesVitrerie || ""}
+              value={nbPassagesVitrerie}
               min={1}
               max={MAX_PASSAGES_VITRERIE}
               step={1}
               onChange={handleChangeNbPassageVitrerie}
               className={`w-16 ${
-                nettoyage.quantites.nbPassagesVitrerie === 2
-                  ? "text-fm4alldestructive"
-                  : ""
+                nbPassagesVitrerie === 2 ? "text-fm4alldestructive" : ""
               }`}
             />
             <Label htmlFor="nbDePassagesVitrerie" className="text-sm">
@@ -135,21 +183,19 @@ const NettoyageOptionsVitrerieCard = ({
       </div>
       <div
         className={`flex w-3/4 items-center justify-center p-4 ${
-          nettoyage.infos.vitrerieSelected && vitrerieProposition.prixAnnuel
+          optimisticSelectedId === vitrerieProposition?.id?.toString()
             ? "ring-fm4alldestructive ring-4 ring-inset"
             : ""
         } bg-${color} cursor-pointer items-center justify-center gap-4 text-2xl text-slate-200`}
-        onClick={
-          vitrerieProposition.prixAnnuel
-            ? () => handleClickVitrerieProposition(vitrerieProposition)
-            : undefined
-        }
+        onClick={() => onToggle(vitrerieProposition?.id?.toString())}
       >
-        {vitrerieProposition.prixAnnuel ? (
+        {prixAnnuel ? (
           <Switch
-            checked={nettoyage.infos.vitrerieSelected}
+            checked={
+              optimisticSelectedId === vitrerieProposition?.id?.toString()
+            }
             onCheckedChange={() =>
-              handleClickVitrerieProposition(vitrerieProposition)
+              onToggle(vitrerieProposition?.id?.toString())
             }
             className="data-[state=checked]:bg-fm4alldestructive"
             title={t("selectionnez-cette-proposition")}

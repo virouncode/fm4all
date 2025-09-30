@@ -5,12 +5,17 @@ import { title } from "process";
 import { useRef } from "react";
 
 type PropositionsTitleMobileProps = {
-  serviceId: number;
+  service: {
+    id: number;
+    icon: React.ReactNode;
+    title: string;
+    description: string;
+  };
   propositionsRef: React.RefObject<HTMLDivElement | null>;
 };
 
 const PropositionsTitleMobile = ({
-  serviceId,
+  service,
   propositionsRef,
 }: PropositionsTitleMobileProps) => {
   const descriptionRef = useRef<HTMLParagraphElement>(null);
@@ -43,6 +48,7 @@ const PropositionsTitleMobile = ({
       window.scroll(0, containerRef.current.offsetTop - 120);
     }
   };
+
   return (
     <>
       <div
@@ -55,11 +61,7 @@ const PropositionsTitleMobile = ({
           ref={titleRef}
         >
           <div className="flex flex-1 items-center gap-4">
-            <div className="flex items-center gap-1">
-              {/* <Icon />
-              {Icon2 && <Icon2 />}
-              {Icon3 && <Icon3 />} */}
-            </div>
+            <div className="flex items-center gap-1">{/*icon*/}</div>
             <p>{title}</p>
           </div>
           <Triangle

@@ -1,6 +1,9 @@
+import { getFournisseur } from "@/lib/queries/fournisseurs/getFournisseurs";
+import { getNettoyageOffres } from "@/lib/queries/nettoyage/getNettoyage";
+import { getPanier } from "@/lib/queries/panier/getPanier";
 import { SelectNettoyageProduitType } from "@/zod-schemas/nettoyageProduit";
 import { SelectNettoyageQuantitesType } from "@/zod-schemas/nettoyageQuantites";
-import NettoyageLine from "./NettoyageLine";
+import NettoyageList from "./NettoyageList";
 
 type NettoyageProps = {
   nettoyageQuantites: SelectNettoyageQuantitesType[];
@@ -11,26 +14,60 @@ const Nettoyage = async ({
   nettoyageQuantites,
   nettoyageProduits,
 }: NettoyageProps) => {
+  const panier = await getPanier();
+
   const fournisseursIds = [
     ...new Set(nettoyageProduits.map((p) => p.fournisseurId)),
   ];
-  const nettoyageProduitsByFournisseur = fournisseursIds.map((id) =>
-    nettoyageProduits.filter((p) => p.fournisseurId === id),
+
+  //Regrouper les offres par fournisseur (par ligne)
+  const lines = await Promise.all(
+    fournisseursIds.map(async (fid) => {
+      const produits = nettoyageProduits.filter((p) => p.fournisseurId === fid);
+      const fournisseur = await getFournisseur(fid);
+      const offres = await Promise.all(
+        produits.map((p) => getNettoyageOffres(p.id)),
+      );
+
+      const propositions = offres.map((offre, i) => {
+        const produit = produits[i];
+        const gamme = produit?.gamme;
+        const freqAnnuelle =
+          nettoyageQuantites.find((q) => q.gamme === gamme)?.freqAnnuelle ??
+          null;
+        const totalAnnuel =
+          freqAnnuelle && produit?.hParPassage && offre?.tauxHoraire
+            ? freqAnnuelle * produit.hParPassage * offre.tauxHoraire
+            : null;
+
+        return {
+          id: offre?.id ?? undefined,
+          logoUrl: fournisseur?.logoUrl ?? null,
+          freqAnnuelle,
+          hParPassage: produit?.hParPassage,
+          gamme,
+          totalAnnuel,
+        };
+      });
+
+      return {
+        fournisseur,
+        propositions: propositions.filter((p) => p.id != null),
+      };
+    }),
   );
 
-  console.log("nettoyageProduitsByFournisseur", nettoyageProduitsByFournisseur);
+  //Offre déjà dans le panier
+  const initialSelectedId = Object.keys(panier ?? {})
+    .find((k) => k.startsWith("Nettoyage:"))
+    ?.split(":")[1];
 
   return (
     <div className="flex h-full flex-col overflow-auto rounded-xl border">
-      {fournisseursIds.length > 0
-        ? nettoyageProduitsByFournisseur.map((nettoyageProduits) => (
-            <NettoyageLine
-              nettoyageProduits={nettoyageProduits}
-              nettoyageQuantites={nettoyageQuantites}
-              key={nettoyageProduits[0].fournisseurId}
-            />
-          ))
-        : null}
+      <NettoyageList
+        lines={lines.filter((l) => l.fournisseur)}
+        initialSelectedId={initialSelectedId}
+      />
     </div>
   );
 };

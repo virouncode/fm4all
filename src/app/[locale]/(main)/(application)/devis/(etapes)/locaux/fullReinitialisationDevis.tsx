@@ -78,6 +78,8 @@ export const fullReinitialisationDevis = (
     emailSignataire: null,
     phoneContact: "",
     surface: 100,
+    surfaceCloisons: 100 * 0.15,
+    surfaceVitres: 100 * 0.15,
     effectif: 20,
     typeBatiment: "bureaux",
     typeOccupation: "partieEtage",
