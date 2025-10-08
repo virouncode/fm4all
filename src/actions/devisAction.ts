@@ -14,7 +14,7 @@ import { flattenValidationErrors } from "next-safe-action";
 
 export const insertDevisTemporaireAction = actionClient
   .metadata({ actionName: "insertDevisTemporaireAction" })
-  .schema(insertDevisTemporaireSchema, {
+  .inputSchema(insertDevisTemporaireSchema, {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
   })

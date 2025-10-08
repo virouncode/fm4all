@@ -17,7 +17,7 @@ import { flattenValidationErrors } from "next-safe-action";
 
 export const updateVitrerieTarifAction = actionClient
   .metadata({ actionName: "updateVitrerieTarifAction" })
-  .schema(updateVitrerieTarifsServerSchema, {
+  .inputSchema(updateVitrerieTarifsServerSchema, {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
   })

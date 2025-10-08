@@ -1,6 +1,7 @@
 "use client";
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
 import useScrollIntoService from "@/hooks/use-scroll-into-service";
+import { useServicesStore } from "@/stores/servicesStore";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
@@ -17,7 +18,6 @@ import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import NettoyagePropositions from "./(desktop)/NettoyagePropositions";
-import { useServicesStore } from "@/stores/servicesStore";
 
 type NettoyageProps = {
   nettoyageQuantites: SelectNettoyageQuantitesType[];

@@ -21,7 +21,7 @@ import { flattenValidationErrors } from "next-safe-action";
 
 export const insertAdminAction = actionClient
   .metadata({ actionName: "insertAdminAction" })
-  .schema(insertAdminSchema, {
+  .inputSchema(insertAdminSchema, {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
   })
@@ -88,7 +88,7 @@ export const insertAdminAction = actionClient
 
 export const updateAdminAction = actionClient
   .metadata({ actionName: "updateAdminAction" })
-  .schema(updateAdminSchema, {
+  .inputSchema(updateAdminSchema, {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
   })

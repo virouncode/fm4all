@@ -85,12 +85,14 @@ const page = async ({
       <Breadcrumb className="mb-10">
         <BreadcrumbList className="flex flex-wrap text-sm lg:text-base">
           <BreadcrumbItem>
-            <BreadcrumbLink
-              className="flex items-center"
-              href={`/`}
-              title={t("accueil")}
-            >
-              <HomeIcon size={14} />
+            <BreadcrumbLink asChild>
+              <Link
+                className="flex items-center"
+                href={`/`}
+                title={t("accueil")}
+              >
+                <HomeIcon size={14} />
+              </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />

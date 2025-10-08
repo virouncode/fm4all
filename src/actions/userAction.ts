@@ -21,7 +21,7 @@ export const insertUserAction = actionClient
   .metadata({
     actionName: "insertUserAction",
   })
-  .schema(insertUserSchema, {
+  .inputSchema(insertUserSchema, {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
   })
