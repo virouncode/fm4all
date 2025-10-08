@@ -83,6 +83,13 @@ const FournisseurUpdateForm = ({
     reset: resetUpdateFournisseurAction,
   } = useAction(updateFournisseurAction, {
     onSuccess: ({ data }) => {
+      if (!data?.success) {
+        return toast({
+          variant: "destructive",
+          title: tAuth("erreur"),
+          description: data?.message,
+        });
+      }
       toast({
         variant: "default",
         title: tAuth("succes"),
@@ -121,18 +128,53 @@ const FournisseurUpdateForm = ({
     setLoading(true);
     //Si je ne vois pas d'image à l'ecran et que le fournisseur a une image, je la supprime
     if (!imagePreview && initialFournisseur.logoUrl) {
-      await deleteVercelBlob({ url: initialFournisseur.logoUrl });
+      try {
+        const res = await deleteVercelBlob({ url: initialFournisseur.logoUrl });
+        if (!res.ok) {
+          throw new Error("Erreur lors de la suppression de l'image");
+        }
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: tAdmin("erreur"),
+          description:
+            error instanceof Error
+              ? error.message
+              : "Une erreur est survenue lors de la mise à jour du fournisseur",
+        });
+        setLoading(false);
+        return;
+      }
     } else if (image) {
-      //Je vois une nouvelle image à l'écran
-      if (initialFournisseur.logoUrl)
-        // Si j'avais une image avant, je la supprime
-        await deleteVercelBlob({ url: initialFournisseur.logoUrl });
-      imageUrl = await postVercelBlob({
-        // Je charge la nouvelle image
-        file: image,
-        filename: `logo_${data.nomFournisseur}`,
-        foldername: "logos_fournisseurs",
-      });
+      try {
+        //Je vois une nouvelle image à l'écran
+        if (initialFournisseur.logoUrl) {
+          // Si j'avais une image avant, je la supprime
+          const res = await deleteVercelBlob({
+            url: initialFournisseur.logoUrl,
+          });
+          if (!res.ok) {
+            throw new Error("Erreur lors de la suppression de l'image");
+          }
+        }
+        imageUrl = await postVercelBlob({
+          // Je charge la nouvelle image
+          file: image,
+          filename: `logo_${data.nomFournisseur}`,
+          foldername: "logos_fournisseurs",
+        });
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: tAdmin("erreur"),
+          description:
+            error instanceof Error
+              ? error.message
+              : "Une erreur est survenue lors de la mise à jour du fournisseur",
+        });
+        setLoading(false);
+        return;
+      }
     }
     const fournisseurToUpdate: UpdateFournisseurType = {
       ...data,

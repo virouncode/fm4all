@@ -61,6 +61,13 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
     reset: resetSaveFournisseurAction,
   } = useAction(insertFournisseurAction, {
     onSuccess: ({ data }) => {
+      if (!data?.success) {
+        return toast({
+          variant: "destructive",
+          title: tAuth("erreur"),
+          description: data?.message,
+        });
+      }
       toast({
         variant: "default",
         title: tAuth("succes"),

@@ -178,7 +178,7 @@ type TarifInstal = {
 
 export const updateHygieneTarifInstalAction = actionClient
   .metadata({ actionName: "updateHygieneTarifInstalAction" })
-  .schema(tarifInstalSchema, {
+  .inputSchema(tarifInstalSchema, {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
   })
@@ -289,7 +289,7 @@ type TarifConso = {
 
 export const updateHygieneTarifConsoAction = actionClient
   .metadata({ actionName: "updateHygieneTarifConsoAction" })
-  .schema(tarifConsoSchema, {
+  .inputSchema(tarifConsoSchema, {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
   })

@@ -26,33 +26,20 @@ export const insertDevisTemporaireAction = actionClient
     }) => {
       const locale = await getLocale();
       let insertedDevisId: number | null = null;
-      try {
-        const resultDevisTemporaire = await db
-          .insert(devisTemporaires)
-          .values(devisTemporaireInput)
-          .returning({ id: devisTemporaires.id });
 
-        if (!resultDevisTemporaire[0]?.id) {
-          throw new Error(
-            locale === "fr"
-              ? "Impossible d'enregistrer le devis temporaire."
-              : "Unable to save temp quote.",
-          );
-        }
-        insertedDevisId = resultDevisTemporaire[0].id;
-      } catch (err) {
-        if (err instanceof Error) {
-          console.log(err.message);
-        }
-        throw err;
-      }
+      const resultDevisTemporaire = await db
+        .insert(devisTemporaires)
+        .values(devisTemporaireInput)
+        .returning({ id: devisTemporaires.id });
+      insertedDevisId = resultDevisTemporaire[0].id;
+
       return {
         success: true,
-        data: { id: insertedDevisId },
         message:
           locale === "fr"
             ? "Votre progression a bien été enregistrée, merci !"
             : "Your progress has been saved, thank you!",
+        data: { id: insertedDevisId },
       };
     },
   );
@@ -67,33 +54,21 @@ export const insertDevisAction = actionClient
     async ({ parsedInput: devisInput }: { parsedInput: InsertDevisType }) => {
       const locale = await getLocale();
       let insertedDevisId: number | null = null;
-      try {
-        const resultDevis = await db
-          .insert(devis)
-          .values(devisInput)
-          .returning({ id: devis.id });
 
-        if (!resultDevis[0]?.id) {
-          throw new Error(
-            locale === "fr"
-              ? "Impossible d'enregistrer le devis."
-              : "Unable to save quote.",
-          );
-        }
-        insertedDevisId = resultDevis[0].id;
-      } catch (err) {
-        if (err instanceof Error) {
-          console.log(err.message);
-        }
-        throw err;
-      }
+      const resultDevis = await db
+        .insert(devis)
+        .values(devisInput)
+        .returning({ id: devis.id });
+
+      insertedDevisId = resultDevis[0].id;
+
       return {
         success: true,
-        data: { id: insertedDevisId },
         message:
           locale === "fr"
             ? "Votre devis a bien été enregistrée, nous vous contacterons dans les plus brefs délais, merci !"
             : "Your quote has been saved, we will contact you as soon as possible, thank you!",
+        data: { id: insertedDevisId },
       };
     },
   );

@@ -27,6 +27,7 @@ import {
   UpdateClientType,
 } from "@/zod-schemas/client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import console from "console";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Loader } from "lucide-react";
@@ -119,22 +120,21 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
     insertClientAction,
     {
       onSuccess: async ({ data }) => {
+        if (!data?.success || !data?.data?.client) {
+          toast({
+            variant: "destructive",
+            title: t("erreur"),
+            description: t("une-erreur-est-survenue"),
+          });
+          return;
+        }
+        const newClientData = data?.data.client;
+        const numerosDevis = `${newClientData?.nomEntreprise}_${DateTime.local().toFormat(
+          "dd-MM-yyyy'T'HH:mm",
+        )}`;
+        const nomDevis = `Devis_fm4all_${numerosDevis}.pdf`;
+        setLoading(true);
         try {
-          setLoading(true);
-          const newClientData = data?.data.client;
-          if (!newClientData) {
-            toast({
-              variant: "destructive",
-              title: t("erreur"),
-              description: t("une-erreur-est-survenue"),
-            });
-            return;
-          }
-          const numerosDevis = `${newClientData?.nomEntreprise}_${DateTime.local().toFormat(
-            "dd-MM-yyyy'T'HH:mm",
-          )}`;
-          const nomDevis = `Devis_fm4all_${numerosDevis}.pdf`;
-
           const url = await fillDevis(
             numerosDevis,
             format(new Date(), "dd/MM/yyyy", { locale: fr }),
@@ -149,29 +149,29 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                 })
               : "",
           );
-          if (url) {
-            try {
-              //Le Fichier du devis
-              const responseBlob = await fetch(url);
-              const blob = await responseBlob.blob();
-              const file = new File([blob], nomDevis);
-              //Dans vercel blob
-              const urlToPost: string = await postVercelBlob({
-                file,
-                filename: nomDevis,
-                foldername: "devis",
-              });
-              executeSaveDevis({
-                clientId: newClientData.id,
-                devisUrl: urlToPost,
-              });
-              setDevisUrl(urlToPost);
-              if (newClientData.nomContact !== "Kattygnarath") {
-                await sendEmailFromClient({
-                  to: "contact@fm4all.com",
-                  from: "devis@fm4all.com",
-                  subject: "Un client a finalisé son devis",
-                  text: `<p>Un client a finalisé son devis.</p><br/>
+          if (!url) throw new Error("Erreur lors de la génération du devis.");
+
+          //Le Fichier du devis
+          const responseBlob = await fetch(url);
+          const blob = await responseBlob.blob();
+          const file = new File([blob], nomDevis);
+          //Dans vercel blob
+          const urlToPost: string = await postVercelBlob({
+            file,
+            filename: nomDevis,
+            foldername: "devis",
+          });
+          executeSaveDevis({
+            clientId: newClientData.id,
+            devisUrl: urlToPost,
+          });
+          setDevisUrl(urlToPost);
+          if (newClientData.nomContact !== "Kattygnarath") {
+            const response = await sendEmailFromClient({
+              to: "contact@fm4all.com",
+              from: "devis@fm4all.com",
+              subject: "Un client a finalisé son devis",
+              text: `<p>Un client a finalisé son devis.</p><br/>
                             <p>Voici ses coordonnées :</p><br/>
                             <p>Entreprise : ${newClientData.nomEntreprise}</p>
                             <p>Siret : ${newClientData.siret}</p>
@@ -206,24 +206,28 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
                             <p>Commentaires du client : ${commentaires}</p><br/>
                             <p>Veuillez trouver en pièce jointe le devis</p>
                             `,
-                  attachment: urlToPost,
-                  filename: nomDevis,
-                });
-              }
-            } catch (err) {
-              console.log(err);
+              attachment: urlToPost,
+              filename: nomDevis,
+            });
+            if (!response.ok) {
+              response.json().then((body) =>
+                toast({
+                  variant: "destructive",
+                  title: t("erreur"),
+                  description: body?.message ?? t("une-erreur-est-survenue"),
+                }),
+              );
+              return;
             }
           }
           setMonDevis({ currentMonDevisId: 2 });
         } catch (err) {
-          if (err instanceof Error) {
-            toast({
-              variant: "destructive",
-              title: t("erreur"),
-              description: err.message,
-            });
-            console.log(err);
-          } else console.log(err);
+          toast({
+            variant: "destructive",
+            title: t("erreur"),
+            description:
+              err instanceof Error ? err.message : t("une-erreur-est-survenue"),
+          });
         } finally {
           setLoading(false);
         }
@@ -251,6 +255,13 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
     insertDevisAction,
     {
       onSuccess: ({ data }) => {
+        if (!data?.success) {
+          return toast({
+            variant: "destructive",
+            title: tSauver("erreur"),
+            description: data?.message,
+          });
+        }
         toast({
           variant: "default",
           title: tSauver("succes"),

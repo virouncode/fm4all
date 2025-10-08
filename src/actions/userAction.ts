@@ -55,7 +55,7 @@ export const insertUserAction = actionClient
       });
       await sendEmailFromServer({
         to: userInput.email,
-        from: "noreply@fm4all.com",
+        from: "noreply@mg.fm4all.com",
         subject: "Création de votre compte utilisateur",
         text: `<p>Votre compte utilisateur a été crée avec succès, bienvenue chez fm4all !</p><br/>
               <p>Voici mot de passe temporaire : ${tempPassword}</p><br/>

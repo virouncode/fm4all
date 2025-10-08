@@ -48,6 +48,13 @@ const AdminForm = () => {
     reset: resetSaveAdminAction,
   } = useAction(insertAdminAction, {
     onSuccess: ({ data }) => {
+      if (!data?.success) {
+        return toast({
+          variant: "destructive",
+          title: tAuth("erreur"),
+          description: data?.message,
+        });
+      }
       toast({
         variant: "default",
         title: tAuth("succes"),
@@ -63,7 +70,7 @@ const AdminForm = () => {
         variant: "destructive",
         title: tAuth("erreur"),
         description:
-          error?.serverError ??
+          error?.serverError ?? //le message d'erreur custom depuis handleServerError dans safe-actions.ts
           tAdmin("une-erreur-est-survenue-lors-de-la-creation-de-lutilisateur"),
       });
     },

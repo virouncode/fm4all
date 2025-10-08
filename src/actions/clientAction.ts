@@ -63,7 +63,7 @@ export const insertClientAction = actionClient
         return {
           success: true,
           message: `${clientToPost.nomEntreprise}, ${locale === "fr" ? "vos coordonnées ont été mises à jour." : "your contact information has been updated."}`,
-          data: { client: updatedClient?.data?.data.client },
+          data: { client: updatedClient?.data?.data?.client },
         };
       }
       //Si le client n'existe pas, on l'insère
@@ -72,13 +72,6 @@ export const insertClientAction = actionClient
         .values(clientToPost)
         .returning();
 
-      if (!resultClient[0]?.id) {
-        throw new Error(
-          locale === "fr"
-            ? "Impossible d'enregistrer vos coordonnées."
-            : "Unable to save your contact information",
-        );
-      }
       return {
         success: true,
         message: `${clientToPost.nomEntreprise}, ${locale === "fr" ? "vos coordonnées ont été enregistrées, nous prendrons contact avec vous dans les plus brefs délais. A bientôt !" : "your contact information has been saved. We will get in touch with you as soon as possible. See you soon!"}`,
@@ -89,7 +82,7 @@ export const insertClientAction = actionClient
 
 export const updateClientAction = actionClient
   .metadata({ actionName: "updateClientAction" })
-  .schema(updateClientSchema, {
+  .inputSchema(updateClientSchema, {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
   })
@@ -97,11 +90,13 @@ export const updateClientAction = actionClient
     async ({ parsedInput: clientInput }: { parsedInput: UpdateClientType }) => {
       const locale = await getLocale();
       if (!clientInput.id) {
-        throw new Error(
-          locale === "fr"
-            ? "Impossible de mettre à jour vos informations."
-            : "Unable to update your information.",
-        );
+        return {
+          success: false,
+          message:
+            locale === "fr"
+              ? "L'id du client est requis pour la mise à jour."
+              : "Client ID is required for update.",
+        };
       }
       const clientToUpdate: UpdateClientType = {
         ...clientInput,
@@ -128,13 +123,7 @@ export const updateClientAction = actionClient
         .set(clientToUpdate)
         .where(eq(clients.id, clientInput.id))
         .returning();
-      if (!resultClient[0]?.id) {
-        throw new Error(
-          locale === "fr"
-            ? "Impossible de mettre à jour vos informations."
-            : "Unable to update your information.",
-        );
-      }
+
       return {
         success: true,
         message: `${clientToUpdate.nomEntreprise}, ${locale === "fr" ? "vos coordonnées ont été mises à jour." : "your contact information has been updated."}`,

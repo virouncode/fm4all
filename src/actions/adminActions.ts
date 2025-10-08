@@ -19,6 +19,8 @@ import { and, eq } from "drizzle-orm";
 import { getLocale } from "next-intl/server";
 import { flattenValidationErrors } from "next-safe-action";
 
+//pas besoin de try/catch ici, tout ce qui est throw est automatiquement catché par handleServerError dans safe-actions.ts
+
 export const insertAdminAction = actionClient
   .metadata({ actionName: "insertAdminAction" })
   .inputSchema(insertAdminSchema, {
@@ -30,11 +32,13 @@ export const insertAdminAction = actionClient
       const locale = await getLocale();
       const currentUser = (await getSession())?.user;
       if (currentUser?.role !== "admin") {
-        throw new Error(
-          locale === "fr"
-            ? "Vous n'avez pas les droits pour créer un compte administrateur."
-            : "You do not have permission to create an admin account.",
-        );
+        return {
+          success: false,
+          message:
+            locale === "fr"
+              ? "Vous n'avez pas les droits pour créer un compte administrateur."
+              : "You do not have permission to create an admin account.",
+        };
       }
       const tempPassword = generatePassword();
       const userToPost: InsertUserType = {
@@ -53,12 +57,15 @@ export const insertAdminAction = actionClient
         .limit(1);
 
       if (existingUser.length > 0) {
-        throw new Error(
-          locale === "fr"
-            ? "Cet email est déjà utilisé par un autre administrateur."
-            : "This email is already used by an admin account.",
-        );
+        return {
+          success: false,
+          message:
+            locale === "fr"
+              ? "Cet email est déjà utilisé par un autre administrateur."
+              : "This email is already used by an admin account.",
+        };
       }
+
       await auth.api.signUpEmail({
         returnHeaders: true,
         body: userToPost,
@@ -66,7 +73,7 @@ export const insertAdminAction = actionClient
       });
       await sendEmailFromServer({
         to: userToPost.email,
-        from: "noreply@fm4all.com",
+        from: "noreply@mg.fm4all.com",
         subject: "Création de votre compte administrateur",
         text: `<p>Votre compte administrateur a été crée avec succès, bienvenue chez fm4all !</p><br/>
           <p>Voici mot de passe temporaire : ${tempPassword}</p><br/>
@@ -75,6 +82,7 @@ export const insertAdminAction = actionClient
           `,
         nomDestinataire: userToPost.name,
       });
+
       return {
         success: true,
         message: `${
@@ -97,18 +105,22 @@ export const updateAdminAction = actionClient
       const locale = await getLocale();
       const currentUser = (await getSession())?.user;
       if (currentUser?.role !== "admin") {
-        throw new Error(
-          locale === "fr"
-            ? "Vous n'avez pas les droits pour mettre à jour un compte administrateur."
-            : "You do not have permission to update an admin account.",
-        );
+        return {
+          success: false,
+          message:
+            locale === "fr"
+              ? "Vous n'avez pas les droits pour mettre à jour un compte administrateur."
+              : "You do not have permission to update an admin account.",
+        };
       }
       if (adminInput.id !== currentUser.id) {
-        throw new Error(
-          locale === "fr"
-            ? "Vous n'avez pas les droits pour mettre à jour le compte de cet administrateur."
-            : "You do not have permission to update this admin account.",
-        );
+        return {
+          success: false,
+          message:
+            locale === "fr"
+              ? "Vous n'avez pas les droits pour mettre à jour le compte de cet administrateur."
+              : "You do not have permission to update this admin account.",
+        };
       }
 
       const existingUser = await db
@@ -118,12 +130,15 @@ export const updateAdminAction = actionClient
         .limit(1);
 
       if (!existingUser || existingUser.length === 0) {
-        throw new Error(
-          locale === "fr"
-            ? "L'ID ne correspond à aucun administrateur."
-            : "This ID does not match any admin.",
-        );
+        return {
+          success: false,
+          message:
+            locale === "fr"
+              ? "L'ID ne correspond à aucun administrateur."
+              : "This ID does not match any admin.",
+        };
       }
+
       await db.update(user).set(adminInput).where(eq(user.id, adminInput.id));
 
       return {

@@ -62,26 +62,29 @@ const FournisseurEmailForm = ({
     reset: resetUpdateFournisseurAction,
   } = useAction(updateFournisseurAction, {
     onSuccess: async ({ data }) => {
-      if (
-        data?.data.fournisseur.emailContact &&
-        data?.data.fournisseur.emailContact !== initialFournisseur.emailContact
-      ) {
-        await authClient.changeEmail({
-          newEmail: data?.data.fournisseur.emailContact,
-          callbackURL: "/auth/email-ok",
-        });
-        toast({
-          variant: "default",
-          title: tAuth("succes"),
+      if (!data?.success) {
+        return toast({
+          variant: "destructive",
+          title: tAuth("erreur"),
           description: data?.message,
         });
-        resetUpdateFournisseurAction();
-        return;
       }
+
+      const fournisseur = data.data?.fournisseur;
+      if (
+        fournisseur?.emailContact &&
+        fournisseur.emailContact !== initialFournisseur.emailContact
+      ) {
+        await authClient.changeEmail({
+          newEmail: fournisseur.emailContact,
+          callbackURL: "/auth/email-ok",
+        });
+      }
+
       toast({
         variant: "default",
         title: tAuth("succes"),
-        description: data?.message,
+        description: data.message,
       });
       resetUpdateFournisseurAction();
     },

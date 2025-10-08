@@ -80,6 +80,13 @@ const SauvegarderProgression = () => {
     insertClientAction,
     {
       onSuccess: ({ data }) => {
+        if (!data?.success) {
+          return toast({
+            variant: "destructive",
+            title: tSauver("erreur"),
+            description: data?.message,
+          });
+        }
         toast({
           variant: "default",
           title: tSauver("succes"),
@@ -109,19 +116,26 @@ const SauvegarderProgression = () => {
     isPending: isSavingDevisTemporaire,
   } = useAction(insertDevisTemporaireAction, {
     onSuccess: ({ data }) => {
+      if (!data?.success) {
+        return toast({
+          variant: "destructive",
+          title: tSauver("erreur"),
+          description: data?.message,
+        });
+      }
       toast({
         variant: "default",
         title: tSauver("succes"),
         description: data?.message,
       });
     },
-    onError: () => {
+    onError: ({ error }) => {
       toast({
         variant: "destructive",
         title: tSauver("erreur"),
-        description: tSauver(
-          "impossible-de-sauvegarder-le-devis-veuillez-reessayer",
-        ),
+        description:
+          error?.serverError ??
+          tSauver("impossible-de-sauvegarder-le-devis-veuillez-reessayer"),
       });
     },
   });

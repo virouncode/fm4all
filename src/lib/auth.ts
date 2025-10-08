@@ -30,7 +30,7 @@ export const auth = betterAuth({
       sendChangeEmailVerification: async ({ newEmail, url }) => {
         await sendEmailFromServer({
           to: newEmail,
-          from: "noreply@fm4all.com",
+          from: "noreply@mg.fm4all.com",
           subject: "Changement d'adresse email",
           text: `<p>Vous avez demandé à changer votre adresse email</p><br/>
                  <p>Veuillez cliquer sur le lien suivant pour vérifier votre nouvel email :</p><br/>
@@ -69,7 +69,7 @@ export const auth = betterAuth({
     sendResetPassword: async ({ user, url }) => {
       await sendEmailFromServer({
         to: user.email,
-        from: "noreply@fm4all.com",
+        from: "noreply@mg.fm4all.com",
         subject: "Réinitialisation de votre mot de passe",
         text: `<p>Vous avez demandé à réinitialiser votre mot de passe</p><br/>
                 <p>Veuillez cliquer sur le lien suivant :</p><br/>
@@ -84,7 +84,7 @@ export const auth = betterAuth({
       const verificationUrl = `${process.env.BETTER_AUTH_URL}/api/auth/verify-email?token=${token}&callbackURL=${process.env.APP_URL}/auth/email-ok`;
       await sendEmailFromServer({
         to: user.email,
-        from: "noreply@fm4all.com",
+        from: "noreply@mg.fm4all.com",
         subject: "Veuillez vérifier votre adresse email",
         text: `<p>Nous venons de créer votre compte utilisateur. Bienvenue chez fm4all !</p><br/>
                 <p>Veuillez cliquer sur le lien suivant pour vérifier votre email :</p><br/>

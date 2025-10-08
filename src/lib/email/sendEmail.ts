@@ -8,7 +8,7 @@ export const sendEmailFromClient = async (body: {
   nomDestinataire?: string;
   prenomDestinataire?: string;
 }) => {
-  await fetch("/api/mailgun", {
+  return await fetch("/api/mailgun", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -26,7 +26,7 @@ export const sendEmailFromServer = async (body: {
   nomDestinataire?: string;
   prenomDestinataire?: string;
 }) => {
-  await fetch(`${process.env.APP_URL}/api/mailgun`, {
+  return await fetch(`${process.env.APP_URL}/api/mailgun`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

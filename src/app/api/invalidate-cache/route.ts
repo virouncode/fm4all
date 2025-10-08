@@ -1,6 +1,7 @@
 // src/app/api/invalidate-cache/route.ts
 import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
+import { ApiResponseBody } from "../types/apiResponseBody";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -14,12 +15,17 @@ export async function POST(request: NextRequest) {
         revalidateTag(t);
       }
     }
-    return NextResponse.json({ success: true });
+    const responseBody: ApiResponseBody = {
+      message: "Cache invalidé avec succès.",
+      success: true,
+    };
+    return NextResponse.json(responseBody, { status: 200 });
   } catch (error) {
     console.error("Erreur lors de l'invalidation du cache:", error);
-    return NextResponse.json(
-      { success: false, error: "Erreur d'invalidation" },
-      { status: 500 },
-    );
+    const responseBody = {
+      message: "Erreur d'invalidation du cache",
+      success: false,
+    };
+    return NextResponse.json(responseBody, { status: 500 });
   }
 }

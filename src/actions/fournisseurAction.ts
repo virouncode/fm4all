@@ -34,11 +34,13 @@ export const insertFournisseurAction = actionClient
       const locale = await getLocale();
       const currentUser = (await getSession())?.user;
       if (currentUser?.role !== "admin") {
-        throw new Error(
-          locale === "fr"
-            ? "Vous n'avez pas les droits pour créer un compte fournisseur."
-            : "You do not have permission to create a provider account.",
-        );
+        return {
+          success: false,
+          message:
+            locale === "fr"
+              ? "Vous n'avez pas les droits pour créer un compte fournisseur."
+              : "You do not have permission to create a provider account.",
+        };
       }
       const fournisseurToPost: InsertFournisseurType = {
         ...fournisseurInput,
@@ -57,24 +59,20 @@ export const insertFournisseurAction = actionClient
         .limit(1);
 
       if (existingFournisseur.length > 0) {
-        throw new Error(
-          locale === "fr"
-            ? "Cette email est déjà utilisé par un compte utilisateur."
-            : "This email is already used by a user account",
-        );
+        return {
+          success: false,
+          message:
+            locale === "fr"
+              ? "Un fournisseur avec cette adresse email existe déjà."
+              : "A provider with this email address already exists.",
+        };
       }
+
       const resultFournisseur = await db
         .insert(fournisseurs)
         .values(fournisseurToPost)
         .returning({ id: fournisseurs.id });
 
-      if (!resultFournisseur[0]?.id) {
-        throw new Error(
-          locale === "fr"
-            ? "Impossible de créer le compte fournisseur."
-            : "Unable to create the provider account",
-        );
-      }
       const tempPassword = generatePassword();
       await auth.api.signUpEmail({
         body: {
@@ -88,10 +86,10 @@ export const insertFournisseurAction = actionClient
       });
       await sendEmailFromServer({
         to: fournisseurToPost.emailContact,
-        from: "noreply@fm4all.com",
+        from: "noreply@mg.fm4all.com",
         subject: "Création de votre compte fournisseur",
         text: `<p>Votre compte fournisseur a été crée avec succès, bienvenue chez fm4all !</p><br/>
-        <p>Voici mot de passe temporaire : ${tempPassword}</p><br/>
+        <p>Voici votre mot de passe temporaire : ${tempPassword}</p><br/>
         <p>Nous vous conseillons de le changer dès votre première connexion dans votre espace.</p>
         <p>Pensez aussi à vérifier votre adresse email en cliquant sur le lien que nous vous avons envoyé.</p>
         `,
@@ -111,7 +109,7 @@ export const insertFournisseurAction = actionClient
 
 export const updateFournisseurAction = actionClient
   .metadata({ actionName: "updateFournisseurAction" })
-  .schema(updateFournisseurSchema, {
+  .inputSchema(updateFournisseurSchema, {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
   })
@@ -124,18 +122,22 @@ export const updateFournisseurAction = actionClient
       const locale = await getLocale();
       const currentUser = (await getSession())?.user;
       if (!currentUser) {
-        throw new Error(
-          locale === "fr"
-            ? "Vous devez être connecté pour mettre à jour vote compte fournisseur."
-            : "You must be logged in to update your provider account.",
-        );
+        return {
+          success: false,
+          message:
+            locale === "fr"
+              ? "Vous devez être connecté pour mettre à jour vote compte fournisseur."
+              : "You must be logged in to update your provider account.",
+        };
       }
       if (currentUser?.fournisseurId !== fournisseurInput.id) {
-        throw new Error(
-          locale === "fr"
-            ? "Vous n'avez pas les droits pour mettre à jour ce compte fournisseur."
-            : "You do not have permission to update this provider account.",
-        );
+        return {
+          success: false,
+          message:
+            locale === "fr"
+              ? "Vous n'avez pas les droits pour mettre à jour le compte de ce fournisseur."
+              : "You do not have permission to update this provider account.",
+        };
       }
 
       const fournisseurToUpdate: UpdateFournisseurType = {
@@ -148,41 +150,30 @@ export const updateFournisseurAction = actionClient
         nomContact: capitalize(fournisseurInput.nomContact),
         emailContact: fournisseurInput.emailContact?.toLowerCase(),
       };
-      if (!fournisseurToUpdate.id) {
-        throw new Error(
-          locale === "fr"
-            ? "Impossible de mettre à jour le profil fournisseur."
-            : "Unable to update the provider profile",
-        );
-      }
 
       const resultFournisseur = await db
         .update(fournisseurs)
         .set(fournisseurToUpdate)
-        .where(eq(fournisseurs.id, fournisseurToUpdate.id))
+        .where(eq(fournisseurs.id, fournisseurToUpdate.id ?? 0))
         .returning();
 
-      if (!resultFournisseur[0]?.id) {
-        throw new Error(
-          locale === "fr"
-            ? "Impossible de créer mettre à jour le profil fournisseur."
-            : "Unable to update the provider profile",
-        );
-      }
       //mettre à jour l'avatar du fournisseur
       const correspondingUser = await db
         .select()
         .from(user)
-        .where(eq(user.fournisseurId, fournisseurToUpdate.id))
+        .where(eq(user.fournisseurId, fournisseurToUpdate.id ?? 0))
         .limit(1);
-      const userToUpdate: UpdateUserType = {
-        ...correspondingUser[0],
-        image: fournisseurInput.logoUrl,
-      };
-      await db
-        .update(user)
-        .set(userToUpdate)
-        .where(eq(user.id, correspondingUser[0].id));
+
+      if (correspondingUser.length > 0) {
+        const userToUpdate: UpdateUserType = {
+          ...correspondingUser[0],
+          image: fournisseurInput.logoUrl,
+        };
+        await db
+          .update(user)
+          .set(userToUpdate)
+          .where(eq(user.id, correspondingUser[0].id));
+      }
 
       return {
         success: true,

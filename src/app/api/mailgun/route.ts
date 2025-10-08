@@ -3,6 +3,7 @@ import formData from "form-data";
 import Mailgun from "mailgun.js";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { ApiResponseBody } from "../types/apiResponseBody";
 
 const emailSchema = z.object({
   from: z.string().email(),
@@ -29,16 +30,12 @@ export async function POST(req: NextRequest) {
   const apiKey = process.env.MAILGUN_API_KEY;
 
   if (!apiKey) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: {
-          code: "CONFIG_ERROR",
-          message: "La clé API Mailgun est manquante.",
-        },
-      },
-      { status: 500 },
-    );
+    const responseBody: ApiResponseBody = {
+      success: false,
+      message: "La clé API Mailgun est manquante.",
+      code: "CONFIG_ERROR",
+    };
+    return NextResponse.json(responseBody, { status: 500 });
   }
 
   const mg = mailgun.client({ username: "api", key: apiKey });
@@ -52,7 +49,7 @@ export async function POST(req: NextRequest) {
 
     const data = result.data;
 
-    let fileBuffer;
+    let fileBuffer: Buffer | undefined;
 
     if (data.attachment) {
       try {
@@ -88,10 +85,12 @@ export async function POST(req: NextRequest) {
 
     const response = await mg.messages.create("mg.fm4all.com", emailOptions);
 
-    return NextResponse.json(
-      { success: true, data: response, message: "Email envoyé avec succès" },
-      { status: 200 },
-    );
+    const responseBody: ApiResponseBody = {
+      success: true,
+      message: "Email envoyé avec succès",
+      data: { id: response.id, message: response.message },
+    };
+    return NextResponse.json(responseBody, { status: 200 });
   } catch (err) {
     return errorHandler(err);
   }

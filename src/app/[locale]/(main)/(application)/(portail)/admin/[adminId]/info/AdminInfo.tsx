@@ -62,6 +62,13 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
     reset: resetUpdateAdminAction,
   } = useAction(updateAdminAction, {
     onSuccess: ({ data }) => {
+      if (!data?.success) {
+        return toast({
+          variant: "destructive",
+          title: tAuth("erreur"),
+          description: data?.message,
+        });
+      }
       toast({
         variant: "default",
         title: tAuth("succes"),
@@ -88,14 +95,47 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
     let imageUrl: string | null = null;
     setLoading(true);
     if (!imagePreview && info.image) {
-      await deleteVercelBlob({ url: info.image });
+      try {
+        const res = await deleteVercelBlob({ url: info.image });
+        if (!res.ok) {
+          throw new Error("Erreur lors de la suppression de l'image");
+        }
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: tAdmin("erreur"),
+          description:
+            error instanceof Error
+              ? error.message
+              : "Une erreur est survenue lors de la mise à jour de l'administrateur",
+        });
+        setLoading(false);
+        return;
+      }
     } else if (image) {
-      if (info.image) await deleteVercelBlob({ url: info.image });
-      imageUrl = await postVercelBlob({
-        file: image,
-        filename: `${data.prenom}_${data.nom}_avatar`,
-        foldername: "admin_avatars",
-      });
+      try {
+        if (info.image) {
+          const res = await deleteVercelBlob({ url: info.image });
+          if (!res.ok) {
+            throw new Error("Erreur lors de la suppression de l'image");
+          }
+        }
+
+        imageUrl = await postVercelBlob({
+          file: image,
+          filename: `${data.prenom}_${data.nom}_avatar`,
+          foldername: "admin_avatars",
+        });
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: tAdmin("erreur"),
+          description:
+            "Une erreur est survenue lors de la mise à jour de l'administrateur",
+        });
+        setLoading(false);
+        return;
+      }
     }
     const adminToUpdate = {
       ...data,
