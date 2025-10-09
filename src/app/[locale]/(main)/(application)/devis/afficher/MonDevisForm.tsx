@@ -27,7 +27,6 @@ import {
   UpdateClientType,
 } from "@/zod-schemas/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import console from "console";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Loader } from "lucide-react";

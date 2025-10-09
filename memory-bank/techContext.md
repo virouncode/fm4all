@@ -60,7 +60,7 @@
 ### Environment Variables
 
 - **.env.local**: Local environment variables
-- **.env.development.local**: Development-specific environment variables
+- **.env.local**: Development-specific environment variables
 
 ## Technical Constraints
 

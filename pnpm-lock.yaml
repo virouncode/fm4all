@@ -13526,7 +13526,7 @@ snapshots:
 
   acorn-walk@8.3.4:
     dependencies:
-      acorn: 8.14.0
+      acorn: 8.15.0
 
   acorn@8.14.0: {}
 
