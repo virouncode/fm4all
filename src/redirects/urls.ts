@@ -1,11 +1,8 @@
 export const legacyRedirects: Record<string, string> = {
-  // URLs sans préfixe de locale
   "/nos-services": "/fr/services",
   "/nous-contacter": "/fr/contactez-nous",
   "/nos-3-engagements": "/fr/nos-engagements",
   "/politique-de-cookies": "/fr/politique-de-cookies",
-
-  // Anciennes structures d'URL
   "/articles/nos-3-gammes": "/fr/nos-3-gammes",
   "/articles/nos-services": "/fr/services",
   "/articles/histoire-nettoyage":
@@ -36,8 +33,6 @@ export const legacyRedirects: Record<string, string> = {
   "/services/fontaines-a-eau": "/fr/services/fontaines-a-eau-entreprise",
   "/articles/histoire-du-nettoyage":
     "/fr/articles/nettoyage/histoire-du-nettoyage-des-bureaux",
-
-  // URLs avec structure correcte mais contenu déplacé
   "/fr/conditions-generales-d-utilisation":
     "/fr/conditions-generales-dutilisation",
   "/en/legal-notices": "/en/legal-notice",
@@ -63,6 +58,4 @@ export const goneUrls: string[] = [
   "https://e99e300d.fm4all.com/",
   "https://www.fm4all.com/services/petits-travaux",
   "https://www.fm4all.com/services/agent-de-securite",
-  "https://www.fm4all.com/secteurs/[slug]",
-  "https://www.fm4all.com/blog/[slug]/[subSlug]",
 ];

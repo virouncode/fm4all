@@ -88,6 +88,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     "/en/fournisseur/*",
     "/fr/auth/*",
     "/en/auth/*",
+    "/_next/*",
     // ...wrongStaticUrls,
     // ...wrongServicesUrls,
     // ...wrongArticlesCategoriesUrls,
