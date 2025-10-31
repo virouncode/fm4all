@@ -57,6 +57,7 @@
     "prestataires": "Providers",
     "devenir-prestataire": "Become a provider",
     "nous-contacter": "Contact us",
+    "carriere": "Career",
     "derniers-articles": "Last posts",
     "cgv": "Sales Terms & Conditions",
     "cgu": "Terms of Use"
@@ -526,9 +527,18 @@
   "ContactPage": {
     "nous-contacter": "Contact us",
     "des-questions-sur-nos-services-ou-nos-offres-en-general": "Any questions about our services or our offers in general?",
-    "nous-sommes-la": "We are here.",
+    "nous-sommes-la": "Let’s get in touch!",
     "romuald-buffe-dirigeant-fm4all": "Romuald Buffe, fm4all CEO",
-    "accueil": "Home page"
+    "accueil": "Home page",
+    "vous-souhaitez-travailler-chez-fm4all": "You want to work at fm4all? ",
+    "cest-par-ici": "This way!"
+  },
+  "TravailPage": {
+    "accueil": "Home page",
+    "carriere": "Career",
+    "rejoignez-nous": "Join us",
+    "ecrivez-nous": "Write to us!",
+    "vous-cherchez-a-rejoindre-une-equipe-dynamique-et-engagee-dans-la-transformation-du-facility-management": "Are you looking to join a dynamic team committed to transforming Facility Management?"
   },
   "MentionsPage": {
     "mentions-legales": "Legal Notice",

@@ -1,5 +1,4 @@
-import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import CTAContactButtonsNoConversion from "@/components/buttons/cta-contact-buttons-no-conversion";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -28,17 +27,17 @@ export const generateMetadata = async ({
   return generateAlternates(
     "contact",
     locale,
-    locale === "fr" ? "Nous contacter" : "Contact us",
+    locale === "fr" ? "Travailler chez fm4all" : "Work at fm4all",
     locale === "fr"
-      ? "Contactez-nous pour des questions sur nos services de facility managment"
-      : "Contact us for questions about our facility management services",
+      ? "Rejoignez l'équipe fm4all et contribuez à notre mission."
+      : "Join the fm4all team and contribute to our mission.",
   );
 };
 
 const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations("ContactPage");
+  const t = await getTranslations("TravailPage");
   return (
     <main className="mx-auto mb-24 min-h-[calc(100vh-4rem)] max-w-7xl px-6 py-4 md:px-20">
       <Breadcrumb className="mb-10">
@@ -52,39 +51,27 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>{t("nous-contacter")}</BreadcrumbPage>
+            <BreadcrumbPage>{t("carriere")}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
       <section className="mt-6 flex flex-col gap-10 text-lg md:gap-20">
-        <h1 className="text-4xl">{t("nous-contacter")}</h1>
+        <h1 className="text-4xl">{t("rejoignez-nous")}</h1>
         <div className="flex flex-col gap-8">
-          <div className="mx-auto flex max-w-prose flex-col items-center gap-6 text-wrap hyphens-auto">
+          <div className="mx-auto flex max-w-prose flex-col items-center gap-6 text-center text-wrap hyphens-auto">
             <p>
-              {t("vous-souhaitez-travailler-chez-fm4all")}
-              <Link href="/travail" className="underline hover:opacity-80">
-                {t("cest-par-ici")}
-              </Link>
+              {t(
+                "vous-cherchez-a-rejoindre-une-equipe-dynamique-et-engagee-dans-la-transformation-du-facility-management",
+              )}
             </p>
-            <p>
-              {t("des-questions-sur-nos-services-ou-nos-offres-en-general")}
-            </p>
-            <p>{t("nous-sommes-la")}</p>
+            <p>{t("ecrivez-nous")}</p>
           </div>
           <div className="flex flex-col gap-8">
-            <CTAContactButtons />
-            <div className="flex w-full items-center justify-center gap-4">
-              <Avatar className="size-14">
-                <AvatarImage
-                  src="/img/portrait-dg.webp"
-                  alt="Portrait de Romuald Buffe, dirigeant de FM4ALL"
-                  className="object-cover"
-                />
-              </Avatar>
-              <p className="text-center">
-                {t("romuald-buffe-dirigeant-fm4all")}
-              </p>
-            </div>
+            <CTAContactButtonsNoConversion
+              withVisio={false}
+              withPhone={false}
+              orientation="horizontal"
+            />
           </div>
         </div>
       </section>

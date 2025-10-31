@@ -57,6 +57,7 @@
     "prestataires": "Prestataires",
     "devenir-prestataire": "Devenir prestataire",
     "nous-contacter": "Nous contacter",
+    "carriere": "Carrière",
     "derniers-articles": "Derniers articles",
     "cgv": "CGV",
     "cgu": "CGU"
@@ -526,7 +527,16 @@
     "des-questions-sur-nos-services-ou-nos-offres-en-general": "Des questions sur nos services ou nos offres en général ?",
     "nous-sommes-la": "Nous sommes là.",
     "romuald-buffe-dirigeant-fm4all": "Romuald Buffe, Dirigeant fm4all",
-    "accueil": "Page d'accueil"
+    "accueil": "Page d'accueil",
+    "vous-souhaitez-travailler-chez-fm4all": "Vous souhaitez travailler chez fm4all ? ",
+    "cest-par-ici": "C'est par ici !"
+  },
+  "TravailPage": {
+    "accueil": "Page d'accueil",
+    "carriere": "Carrière",
+    "rejoignez-nous": "Rejoignez-nous",
+    "ecrivez-nous": "Ecrivez-nous !",
+    "vous-cherchez-a-rejoindre-une-equipe-dynamique-et-engagee-dans-la-transformation-du-facility-management": "Vous cherchez à rejoindre une équipe dynamique et engagée dans la transformation du Facility Management ?"
   },
   "MentionsPage": {
     "mentions-legales": "Mentions légales",

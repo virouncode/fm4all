@@ -39,6 +39,9 @@ const Footer = async () => {
                 <Link href="/contact">{t("nous-contacter")}</Link>
               </li>
               <li>
+                <Link href="/travail">{t("carriere")}</Link>
+              </li>
+              <li>
                 <Link href="/faq">FAQ</Link>
               </li>
               <li>

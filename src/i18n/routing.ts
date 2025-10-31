@@ -123,6 +123,10 @@ export const routing = defineRouting({
       fr: "/articles/[slug]/[subSlug]",
       en: "/posts/[slug]/[subSlug]",
     },
+    "/travail": {
+      fr: "/carriere",
+      en: "/careers",
+    },
     // "/tag/[slug]": {
     //   fr: "/tag/[slug]",
     //   en: "/tag/[slug]",

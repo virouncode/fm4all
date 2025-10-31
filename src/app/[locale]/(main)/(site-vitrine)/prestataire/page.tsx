@@ -1,4 +1,4 @@
-import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
+import CTAContactButtonsNoConversion from "@/components/buttons/cta-contact-buttons-no-conversion";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -183,7 +183,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             </ul>
           </div>
         </div>
-        <CTAContactButtons />
+        <CTAContactButtonsNoConversion />
       </article>
     </main>
   );
