@@ -1,5 +1,5 @@
 import Partenaires from "@/app/[locale]/(main)/(site-vitrine)/(home)/Partenaires";
-import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
+import CTAContactButtonsNoConversion from "@/components/buttons/cta-contact-buttons-no-conversion";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -235,7 +235,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           </p>
         </div>
         <Partenaires />
-        <CTAContactButtons />
+        <CTAContactButtonsNoConversion email="prestataire@fm4all.com" />
       </article>
     </main>
   );
