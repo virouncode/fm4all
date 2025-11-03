@@ -71,6 +71,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
               withVisio={false}
               withPhone={false}
               orientation="horizontal"
+              email="emploi@fm4all.com"
             />
           </div>
         </div>

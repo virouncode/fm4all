@@ -183,7 +183,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             </ul>
           </div>
         </div>
-        <CTAContactButtonsNoConversion />
+        <CTAContactButtonsNoConversion email="prestataire@fm4all.com" />
       </article>
     </main>
   );

@@ -9,11 +9,13 @@ type CTAContactButtonsNoConversionProps = {
   withVisio?: boolean;
   orientation?: "vertical" | "horizontal";
   withPhone?: boolean;
+  email?: string;
 };
 const CTAContactButtonsNoConversion = ({
   withVisio = true,
   orientation = "vertical",
   withPhone = true,
+  email = "contact@fm4all.com",
 }: CTAContactButtonsNoConversionProps) => {
   const locale = useLocale();
   return (
@@ -70,7 +72,7 @@ const CTAContactButtonsNoConversion = ({
         asChild
       >
         <Link
-          href="mailto:contact@fm4all.com"
+          href={`mailto:${email}`}
           className="flex items-center justify-center gap-2"
           title={locale === "fr" ? "Contacter par email" : "Contact by email"}
         >
