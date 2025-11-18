@@ -28,6 +28,7 @@ export type RouteKey =
   | "blog"
   | "blogCategorie"
   | "blogArticle"
+  | "travail"
   // | "tag"
   | "secteurs"
   | "secteurPresentation";
@@ -136,6 +137,10 @@ export const routes: Record<RouteKey, Record<LocaleType, string>> = {
   blogArticle: {
     fr: "/articles/[slug]/[subSlug]",
     en: "/posts/[slug]/[subSlug]",
+  },
+  travail: {
+    fr: "/carriere",
+    en: "/careers",
   },
   // tag: {
   //   fr: "/tag/[slug]",
