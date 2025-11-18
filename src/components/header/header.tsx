@@ -345,7 +345,7 @@ const Header = () => {
     icon: LucideIcon;
   }[] = [
     {
-      title: locale === "fr" ? "Carrières" : "Careers",
+      title: locale === "fr" ? "Carrière" : "Career",
       href: {
         pathname: "/travail",
       },
