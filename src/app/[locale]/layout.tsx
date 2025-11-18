@@ -6,7 +6,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
-import { Didact_Gothic, Inter } from "next/font/google";
+import { Didact_Gothic, Geist, Inter } from "next/font/google";
 import { notFound } from "next/navigation";
 import "./globals.css";
 
@@ -22,6 +22,14 @@ export const inter = Inter({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
   style: ["normal", "italic"],
   variable: "--font-inter",
+  display: "swap",
+});
+
+export const geist = Geist({
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  style: ["normal"],
+  variable: "--font-geist",
   display: "swap",
 });
 
@@ -65,7 +73,7 @@ export default async function LocalizedLayout({
         <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
       </head>
       <body
-        className={`${inter.className} scroll-smooth tracking-tight antialiased`}
+        className={`${geist.className} scroll-smooth tracking-tight antialiased`}
       >
         <GoogleAnalytics
           GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!}

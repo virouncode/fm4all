@@ -14,12 +14,17 @@ import {
   CupSoda,
   Droplet,
   FireExtinguisher,
+  Handshake,
+  HardHat,
   HeartPulse,
   LayoutDashboard,
   LucideIcon,
   MonitorStop,
+  Network,
+  ScrollText,
   Shirt,
   SprayCan,
+  Star,
   UserRoundCog,
   UsersRound,
   Warehouse,
@@ -211,6 +216,7 @@ const Header = () => {
               : "outsourced-facility-services-management-for-office-users-in-paris-area-france",
         },
       },
+
       icon: MonitorStop,
     },
     {
@@ -301,6 +307,59 @@ const Header = () => {
     },
   ];
 
+  const decouvrir: {
+    title: string;
+    href: {
+      pathname: PathnamesType;
+    };
+    icon: LucideIcon;
+  }[] = [
+    {
+      title: locale === "fr" ? "Nos 3 gammes" : "Our 3 tiers",
+      href: {
+        pathname: "/gammes",
+      },
+      icon: Star,
+    },
+    {
+      title: locale === "fr" ? "Nos engagements" : "Our commitments",
+      href: {
+        pathname: "/engagements",
+      },
+      icon: ScrollText,
+    },
+    {
+      title: locale === "fr" ? "Nos partenaires" : "Our partners",
+      href: {
+        pathname: "/partenaires",
+      },
+      icon: Handshake,
+    },
+  ];
+
+  const rejoindre: {
+    title: string;
+    href: {
+      pathname: PathnamesType;
+    };
+    icon: LucideIcon;
+  }[] = [
+    {
+      title: locale === "fr" ? "Carrières" : "Careers",
+      href: {
+        pathname: "/travail",
+      },
+      icon: Network,
+    },
+    {
+      title: locale === "fr" ? "Devenir prestataire" : "Become a provider",
+      href: {
+        pathname: "/prestataire",
+      },
+      icon: HardHat,
+    },
+  ];
+
   return (
     <div className="bg-background sticky top-0 z-50 h-16 w-full shadow">
       <header className="mx-auto flex h-full max-w-7xl items-center justify-between p-6">
@@ -320,6 +379,8 @@ const Header = () => {
           <HeaderNavigationMenu
             services={services}
             secteurs={secteurs}
+            decouvrir={decouvrir}
+            rejoindre={rejoindre}
             orientation="horizontal"
             handleHideMobileNav={handleHideMobileNav}
             className="hidden min-[1160px]:block"
@@ -355,6 +416,8 @@ const Header = () => {
           <HeaderNavigationMenu
             services={services}
             secteurs={secteurs}
+            decouvrir={decouvrir}
+            rejoindre={rejoindre}
             orientation="vertical"
             handleHideMobileNav={handleHideMobileNav}
           />

@@ -11,7 +11,7 @@ const HeroCard = async () => {
         {t("les-services-aux-entreprises-au-meilleur-prix")}
       </h2>
       <p className="text-center">
-        🚀 <strong>{t("contact-contrat-facture")}</strong>{" "}
+        <strong>{t("contact-contrat-facture")}</strong>{" "}
         {t("pour-tous-vos-services")}
       </p>
       <p>

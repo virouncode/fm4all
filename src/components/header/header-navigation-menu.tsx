@@ -12,10 +12,9 @@ import { PathnamesType } from "@/i18n/routing";
 import {
   Factory,
   HandPlatter,
-  Handshake,
   LucideIcon,
-  ScrollText,
-  Star,
+  Telescope,
+  Users,
 } from "lucide-react";
 
 import {
@@ -24,6 +23,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
 
@@ -45,6 +45,20 @@ type HeaderNavigationMenuProps = {
     };
     icon: LucideIcon;
   }[];
+  rejoindre: {
+    title: string;
+    href: {
+      pathname: PathnamesType;
+    };
+    icon: LucideIcon;
+  }[];
+  decouvrir: {
+    title: string;
+    href: {
+      pathname: PathnamesType;
+    };
+    icon: LucideIcon;
+  }[];
   orientation: "horizontal" | "vertical";
   handleHideMobileNav: () => void;
   className?: string;
@@ -53,6 +67,8 @@ type HeaderNavigationMenuProps = {
 const HeaderNavigationMenu = ({
   services,
   secteurs,
+  decouvrir,
+  rejoindre,
   orientation,
   handleHideMobileNav,
   className,
@@ -63,11 +79,12 @@ const HeaderNavigationMenu = ({
     if (href === "/") return path === "/";
     return path.includes(href);
   };
+  const isMobile = useIsMobile();
 
   return orientation === "horizontal" ? (
     //DESKTOP
-    <NavigationMenu className={`${className}`}>
-      <NavigationMenuList className="flex items-center gap-4">
+    <NavigationMenu className={`${className}`} viewport={isMobile}>
+      <NavigationMenuList className="flex items-center gap-6">
         <NavigationMenuItem>
           <NavigationMenuTrigger
             className="px-0"
@@ -81,8 +98,8 @@ const HeaderNavigationMenu = ({
             </div>
           </NavigationMenuTrigger>
           <NavigationMenuContent>
-            <ul className="grid w-[400px]">
-              <li className="hover:bg-accent px-6">
+            <ul className="grid w-[250px]">
+              <li className="hover:bg-accent px-2">
                 <NavigationMenuLink asChild className="text-base">
                   <Link
                     href={"/services"}
@@ -107,7 +124,7 @@ const HeaderNavigationMenu = ({
                 return (
                   <li
                     key={service.title}
-                    className="hover:bg-accent px-6"
+                    className="hover:bg-accent px-2"
                     onClick={handleHideMobileNav}
                   >
                     <NavigationMenuLink asChild className="text-base">
@@ -142,8 +159,8 @@ const HeaderNavigationMenu = ({
             </div>
           </NavigationMenuTrigger>
           <NavigationMenuContent>
-            <ul className="grid w-[400px]">
-              <li className="hover:bg-accent px-6">
+            <ul className="grid w-[250px]">
+              <li className="hover:bg-accent px-2">
                 <NavigationMenuLink asChild className="text-base">
                   <Link
                     href={"/secteurs"}
@@ -156,7 +173,7 @@ const HeaderNavigationMenu = ({
               </li>
               {secteurs.map((secteur) => {
                 return (
-                  <li key={secteur.title} className="hover:bg-accent px-6">
+                  <li key={secteur.title} className="hover:bg-accent px-2">
                     <NavigationMenuLink asChild className="text-base">
                       <Link
                         //@ts-expect-error ok - href is a complex object
@@ -174,59 +191,70 @@ const HeaderNavigationMenu = ({
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <NavigationMenuLink
-            asChild
-            onClick={handleHideMobileNav}
-            data-testid="gammes-link"
-            className="text-base"
+          <NavigationMenuTrigger
+            className="px-0"
+            data-testid="decouvrir-trigger"
           >
             <div
-              className={`flex flex-row items-center gap-1 ${
-                isActive("/gammes") ? "text-destructive font-bold" : ""
-              }`}
+              className={`flex items-center gap-1 text-base ${isActive("/gammes") || isActive("/engagements") || isActive("/partenaires") ? "text-destructive font-bold" : ""}`}
             >
-              <Star size={15} />
-              <Link href="/gammes">{locale === "fr" ? "Gammes" : "Tiers"}</Link>
+              <Telescope size={15} />
+              <p>{locale === "fr" ? "Découvrir" : "Discover"}</p>
             </div>
-          </NavigationMenuLink>
+          </NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <ul className="grid w-[250px]">
+              {decouvrir.map((item) => {
+                return (
+                  <li key={item.title} className="hover:bg-accent px-2">
+                    <NavigationMenuLink asChild className="text-base">
+                      <Link
+                        //@ts-expect-error ok - href is a complex object
+                        href={item.href}
+                        className="flex w-full flex-row items-center gap-4 hover:underline"
+                      >
+                        <item.icon className="size-5" />
+                        {item.title}
+                      </Link>
+                    </NavigationMenuLink>
+                  </li>
+                );
+              })}
+            </ul>
+          </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <NavigationMenuLink
-            asChild
-            onClick={handleHideMobileNav}
-            data-testid="engagements-link"
-            className="text-base"
+          <NavigationMenuTrigger
+            className="px-0"
+            data-testid="decouvrir-trigger"
           >
             <div
-              className={`flex flex-row items-center gap-1 ${
-                isActive("/engagements") ? "text-destructive font-bold" : ""
-              }`}
+              className={`flex items-center gap-1 text-base ${isActive("/travail") || isActive("/prestataire") ? "text-destructive font-bold" : ""}`}
             >
-              <ScrollText size={15} />
-              <Link href="/engagements">
-                {locale === "fr" ? "Engagements" : "Commitments"}
-              </Link>
+              <Users size={15} />
+              <p>{locale === "fr" ? "Nous rejoindre" : "Join Us"}</p>
             </div>
-          </NavigationMenuLink>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <NavigationMenuLink
-            asChild
-            onClick={handleHideMobileNav}
-            data-testid="partenaires-link"
-            className="text-base"
-          >
-            <div
-              className={`flex flex-row items-center gap-1 ${
-                isActive("/partenaires") ? "text-destructive font-bold" : ""
-              }`}
-            >
-              <Handshake size={15} />
-              <Link href="/partenaires">
-                {locale === "fr" ? "Partenaires" : "Partners"}
-              </Link>
-            </div>
-          </NavigationMenuLink>
+          </NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <ul className="grid w-[250px]">
+              {rejoindre.map((item) => {
+                return (
+                  <li key={item.title} className="hover:bg-accent px-2">
+                    <NavigationMenuLink asChild className="text-base">
+                      <Link
+                        //@ts-expect-error ok - href is a complex object
+                        href={item.href}
+                        className="flex w-full flex-row items-center gap-4 hover:underline"
+                      >
+                        <item.icon className="size-5" />
+                        {item.title}
+                      </Link>
+                    </NavigationMenuLink>
+                  </li>
+                );
+              })}
+            </ul>
+          </NavigationMenuContent>
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
@@ -335,6 +363,7 @@ const HeaderNavigationMenu = ({
                       //@ts-expect-error ok - href is a complex object
                       href={secteur.href}
                       className="flex w-full items-center gap-4 !text-lg hover:underline"
+                      title={secteur.href.pathname}
                     >
                       <secteur.icon className="size-5" />
                       {secteur.title}
@@ -345,35 +374,75 @@ const HeaderNavigationMenu = ({
             </ul>
           </AccordionContent>
         </AccordionItem>
-        <AccordionItem value={"gammes"} onClick={handleHideMobileNav}>
-          <div
-            className={`flex items-center gap-2 py-4 ${isActive("/gammes") ? "text-destructive font-bold" : ""}`}
-          >
-            <Star />
-            <Link href="/gammes" className="w-full text-lg">
-              {locale === "fr" ? "Gammes" : "Tiers"}
-            </Link>
-          </div>
+        <AccordionItem value={"decouvrir"}>
+          <AccordionTrigger className="text-lg">
+            <div
+              className={`flex items-center gap-2 ${isActive("/gammes") || isActive("/engagements") || isActive("/partenaires") ? "text-destructive font-bold" : ""}`}
+            >
+              <Telescope />
+              <span>{locale === "fr" ? "Découvrir" : "Discover"}</span>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent>
+            <ul className="flex flex-col gap-2">
+              {decouvrir.map((item) => {
+                return (
+                  <li
+                    key={item.title}
+                    className="hover:bg-accent px-4 py-2"
+                    onClick={handleHideMobileNav}
+                  >
+                    <Link
+                      //@ts-expect-error ok - href is a complex object
+                      href={item.href}
+                      title={item.title}
+                      aria-label={item.title}
+                      className="flex w-full items-center gap-4 !text-lg hover:underline"
+                    >
+                      <item.icon className="size-5" />
+                      <span>{item.title}</span>
+                      <span className="sr-only">{item.title}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </AccordionContent>
         </AccordionItem>
-        <AccordionItem value={"engagements"} onClick={handleHideMobileNav}>
-          <div
-            className={`flex items-center gap-2 py-4 ${isActive("/engagements") ? "text-destructive font-bold" : ""}`}
-          >
-            <ScrollText />
-            <Link href="/engagements" className="w-full text-lg">
-              {locale === "fr" ? "Engagements" : "Commitments"}
-            </Link>
-          </div>
-        </AccordionItem>
-        <AccordionItem value={"partenaires"} onClick={handleHideMobileNav}>
-          <div
-            className={`flex items-center gap-2 py-4 ${isActive("/partenaires") ? "text-destructive font-bold" : ""}`}
-          >
-            <Handshake />
-            <Link href="/partenaires" className="w-full text-lg">
-              {locale === "fr" ? "Partenaires" : "Partners"}
-            </Link>
-          </div>
+        <AccordionItem value={"rejoindre"}>
+          <AccordionTrigger className="text-lg">
+            <div
+              className={`flex items-center gap-2 ${isActive("/travail") || isActive("/prestataire") ? "text-destructive font-bold" : ""}`}
+            >
+              <Users />
+              <span>{locale === "fr" ? "Nous rejoindre" : "Join Us"}</span>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent>
+            <ul className="flex flex-col gap-2">
+              {rejoindre.map((item) => {
+                return (
+                  <li
+                    key={item.title}
+                    className="hover:bg-accent px-4 py-2"
+                    onClick={handleHideMobileNav}
+                  >
+                    <Link
+                      //@ts-expect-error ok - href is a complex object
+                      href={item.href}
+                      title={item.title}
+                      aria-label={item.title}
+                      className="flex w-full items-center gap-4 !text-lg hover:underline"
+                    >
+                      <item.icon className="size-5" />
+                      <span>{item.title}</span>
+                      <span className="sr-only">{item.title}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </AccordionContent>
         </AccordionItem>
       </Accordion>
     </nav>
