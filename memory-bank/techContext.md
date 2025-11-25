@@ -1,175 +1,175 @@
-# Technical Context: FM4ALL Service Quotation Platform
+# Contexte Technique : Plateforme de Devis de Services FM4ALL
 
-## Technologies Used
+## Technologies Utilisées
 
 ### Frontend
 
-- **Next.js**: React framework for server-rendered applications
-- **React**: JavaScript library for building user interfaces
-- **TypeScript**: Typed superset of JavaScript
-- **Tailwind CSS**: Utility-first CSS framework
-- **shadcn/ui**: Component library based on Radix UI
+- **Next.js** : Framework React pour applications rendues côté serveur
+- **React** : Bibliothèque JavaScript pour construire des interfaces utilisateur
+- **TypeScript** : Superset typé de JavaScript
+- **Tailwind CSS** : Framework CSS utility-first
+- **shadcn/ui** : Bibliothèque de composants basée sur Radix UI
 
 ### Backend
 
-- **Next.js API Routes**: Serverless functions for API endpoints
-- **Server Actions**: Next.js feature for server-side mutations
-- **Drizzle ORM**: TypeScript ORM for SQL databases
-- **Sanity CMS**: Headless content management system
-- **Pusher**: Real-time websocket communication
+- **Routes API Next.js** : Fonctions serverless pour les endpoints API
+- **Server Actions** : Fonctionnalité Next.js pour les mutations côté serveur
+- **Drizzle ORM** : ORM TypeScript pour bases de données SQL
+- **Sanity CMS** : Système de gestion de contenu headless
+- **Pusher** : Communication websocket temps réel
 
-### Data Validation & Type Safety
+### Validation de Données & Sécurité de Types
 
-- **Zod**: Schema validation library
-- **TypeScript**: Static type checking
+- **Zod** : Bibliothèque de validation de schémas
+- **TypeScript** : Vérification de types statique
 
-### Internationalization
+### Internationalisation
 
-- **next-intl**: Internationalization library for Next.js
-- **Message files**: JSON-based translation files
+- **next-intl** : Bibliothèque d'internationalisation pour Next.js
+- **Fichiers de messages** : Fichiers de traduction basés sur JSON
 
-### Authentication
+### Authentification
 
-- **NextAuth.js**: Authentication solution for Next.js
-- **JWT**: JSON Web Tokens for session management
+- **NextAuth.js** : Solution d'authentification pour Next.js
+- **JWT** : JSON Web Tokens pour la gestion de sessions
 
-### Build & Development
+### Build & Développement
 
-- **pnpm**: Fast, disk space efficient package manager
-- **ESLint**: JavaScript linting utility
-- **Prettier**: Code formatter
-- **PostCSS**: Tool for transforming CSS with JavaScript
+- **pnpm** : Gestionnaire de paquets rapide et économe en espace disque
+- **ESLint** : Utilitaire de linting JavaScript
+- **Prettier** : Formateur de code
+- **PostCSS** : Outil pour transformer le CSS avec JavaScript
 
-## Development Setup
+## Configuration de Développement
 
-### Environment
+### Environnement
 
-- **Node.js**: JavaScript runtime
-- **TypeScript**: Programming language
-- **pnpm**: Package manager
-- **Next.js development server**: Local development environment
+- **Node.js** : Runtime JavaScript
+- **TypeScript** : Langage de programmation
+- **pnpm** : Gestionnaire de paquets
+- **Serveur de développement Next.js** : Environnement de développement local
 
-### Configuration Files
+### Fichiers de Configuration
 
-- **next.config.ts**: Next.js configuration
-- **tsconfig.json**: TypeScript configuration
-- **drizzle.config.ts**: Drizzle ORM configuration
-- **eslint.config.mjs**: ESLint configuration
-- **postcss.config.mjs**: PostCSS configuration
+- **next.config.ts** : Configuration Next.js
+- **tsconfig.json** : Configuration TypeScript
+- **drizzle.config.ts** : Configuration Drizzle ORM
+- **eslint.config.mjs** : Configuration ESLint
+- **postcss.config.mjs** : Configuration PostCSS
 
-### Environment Variables
+### Variables d'Environnement
 
-- **.env.local**: Local environment variables
-- **.env.local**: Development-specific environment variables
+- **.env.local** : Variables d'environnement locales
+- **.env.local** : Variables d'environnement spécifiques au développement
 
-## Technical Constraints
+## Contraintes Techniques
 
 ### Performance
 
-- **Server-side Rendering**: Critical for SEO and initial load performance
-- **Client-side Hydration**: For interactive components
-- **Optimized Assets**: For fast page loads
-- **Efficient State Management**: To prevent unnecessary re-renders
+- **Rendu Côté Serveur** : Critique pour le SEO et les performances de chargement initial
+- **Hydratation Côté Client** : Pour les composants interactifs
+- **Assets Optimisés** : Pour des chargements de page rapides
+- **Gestion d'État Efficace** : Pour éviter les re-rendus inutiles
 
-### Scalability
+### Scalabilité
 
-- **Component-based Architecture**: For maintainability and reusability
-- **Modular Design**: Service modules can be added/removed independently
-- **Stateless Components**: Where possible for better performance
+- **Architecture Basée sur les Composants** : Pour la maintenabilité et la réutilisabilité
+- **Design Modulaire** : Les modules de services peuvent être ajoutés/supprimés indépendamment
+- **Composants Sans État** : Quand possible pour de meilleures performances
 
-### Security
+### Sécurité
 
-- **Input Validation**: Using Zod schemas
-- **Authentication**: Secure user authentication
-- **Authorization**: Role-based access control
-- **Data Protection**: Secure handling of user data
+- **Validation des Entrées** : Utilisation des schémas Zod
+- **Authentification** : Authentification utilisateur sécurisée
+- **Autorisation** : Contrôle d'accès basé sur les rôles
+- **Protection des Données** : Gestion sécurisée des données utilisateur
 
-### Accessibility
+### Accessibilité
 
-- **WCAG Compliance**: Web Content Accessibility Guidelines
-- **Keyboard Navigation**: Full keyboard support
-- **Screen Reader Support**: Semantic HTML and ARIA attributes
+- **Conformité WCAG** : Directives d'accessibilité du contenu web
+- **Navigation Clavier** : Support complet du clavier
+- **Support des Lecteurs d'Écran** : HTML sémantique et attributs ARIA
 
-### Browser Compatibility
+### Compatibilité Navigateur
 
-- **Modern Browsers**: Chrome, Firefox, Safari, Edge
-- **Progressive Enhancement**: Core functionality works in all browsers
-- **Responsive Design**: Works on all device sizes
+- **Navigateurs Modernes** : Chrome, Firefox, Safari, Edge
+- **Amélioration Progressive** : Fonctionnalités de base fonctionnent dans tous les navigateurs
+- **Design Responsive** : Fonctionne sur toutes les tailles d'appareil
 
-## Dependencies
+## Dépendances
 
-### Core Dependencies
+### Dépendances Principales
 
-- **next**: React framework
-- **react**: UI library
-- **react-dom**: DOM-specific methods for React
-- **typescript**: TypeScript language
-- **tailwindcss**: CSS framework
-- **drizzle-orm**: Database ORM
-- **zod**: Schema validation
-- **pusher**: Real-time updates
-- **pusher-js**: Pusher client
-- **next-intl**: Internationalization
-- **sanity**: Content management
+- **next** : Framework React
+- **react** : Bibliothèque UI
+- **react-dom** : Méthodes spécifiques au DOM pour React
+- **typescript** : Langage TypeScript
+- **tailwindcss** : Framework CSS
+- **drizzle-orm** : ORM de base de données
+- **zod** : Validation de schémas
+- **pusher** : Mises à jour temps réel
+- **pusher-js** : Client Pusher
+- **next-intl** : Internationalisation
+- **sanity** : Gestion de contenu
 
-### Development Dependencies
+### Dépendances de Développement
 
-- **eslint**: Code linting
-- **prettier**: Code formatting
-- **postcss**: CSS processing
-- **autoprefixer**: CSS vendor prefixing
-- **@types/react**: TypeScript types for React
-- **@types/node**: TypeScript types for Node.js
+- **eslint** : Linting de code
+- **prettier** : Formatage de code
+- **postcss** : Traitement CSS
+- **autoprefixer** : Préfixage CSS vendor
+- **@types/react** : Types TypeScript pour React
+- **@types/node** : Types TypeScript pour Node.js
 
-## Tool Usage Patterns
+## Patterns d'Usage des Outils
 
-### Data Fetching
+### Récupération de Données
 
-- Server Actions for data mutations
-- Server Components for initial data loading
-- Client Components for interactive UI elements
-- Cache-first strategy with invalidation
+- Server Actions pour les mutations de données
+- Composants Serveur pour le chargement initial des données
+- Composants Client pour les éléments UI interactifs
+- Stratégie cache-first avec invalidation
 
-### State Management
+### Gestion d'État
 
-- React Context for global state
-- Provider pattern for service-specific state
-- Custom hooks for consuming state
-- Pusher for real-time updates
+- React Context pour l'état global
+- Pattern Provider pour l'état spécifique aux services
+- Hooks personnalisés pour consommer l'état
+- Pusher pour les mises à jour temps réel
 
-### Form Handling
+### Gestion des Formulaires
 
-- Controlled components
-- Zod schema validation
-- Error handling and display
-- Real-time validation feedback
+- Composants contrôlés
+- Validation par schémas Zod
+- Gestion et affichage des erreurs
+- Feedback de validation temps réel
 
-### Styling
+### Stylisation
 
-- Tailwind CSS utility classes
-- Component-based styling
-- Responsive design patterns
-- Theme customization
+- Classes utilitaires Tailwind CSS
+- Stylisation basée sur les composants
+- Patterns de design responsive
+- Personnalisation de thème
 
-### Testing
+### Tests
 
-- **Vitest**: Testing framework for unit and component tests
-- **Testing Library**: For testing React components
-- **Jest DOM**: Extended DOM element matchers
-- **JSDOM**: Browser environment simulation
-- **Test Structure**:
-  - Unit tests for utility functions
-  - Component tests for UI elements
-  - Organized in `src/__tests__/` mirroring the source structure
-- **Testing Patterns**:
-  - Component rendering tests
-  - User interaction tests
-  - Conditional rendering tests
-  - Mock implementations for dependencies
-  - Centralized mocks in `src/__tests__/components/mocks.tsx`
-- **Test Scripts**:
-  - `npm test`: Run all tests
-  - `npm run test:watch`: Run tests in watch mode
-  - `npm run test:coverage`: Run tests with coverage reporting
+- **Vitest** : Framework de tests pour les tests unitaires et de composants
+- **Testing Library** : Pour tester les composants React
+- **Jest DOM** : Matchers étendus pour éléments DOM
+- **JSDOM** : Simulation d'environnement navigateur
+- **Structure des Tests** :
+  - Tests unitaires pour les fonctions utilitaires
+  - Tests de composants pour les éléments UI
+  - Organisés dans `src/__tests__/` reflétant la structure source
+- **Patterns de Tests** :
+  - Tests de rendu de composants
+  - Tests d'interaction utilisateur
+  - Tests de rendu conditionnel
+  - Implémentations de mocks pour les dépendances
+  - Mocks centralisés dans `src/__tests__/components/mocks.tsx`
+- **Scripts de Tests** :
+  - `npm test` : Exécuter tous les tests
+  - `npm run test:watch` : Exécuter les tests en mode watch
+  - `npm run test:coverage` : Exécuter les tests avec rapport de couverture
 
-This document will be updated as the technical context evolves or new technologies are introduced to the project.
+Ce document sera mis à jour au fur et à mesure que le contexte technique évolue ou que de nouvelles technologies sont introduites dans le projet.

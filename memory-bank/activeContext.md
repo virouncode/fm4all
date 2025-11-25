@@ -1,8 +1,8 @@
-# Active Context: FM4ALL Service Quotation Platform
+# Contexte Actif : Plateforme de Devis de Services FM4ALL
 
-## Current Work Focus
+## Focus de Travail Actuel
 
-La priorité de développement actuelle est l'amélioration du système d'invalidation de cache et l'optimisation des requêtes de services, avec un accent particulier sur :
+La priorité de développement actuelle est l'amélioration continue du système d'invalidation de cache et l'optimisation des requêtes de services, avec un accent particulier sur :
 
 1. **Système d'Invalidation de Cache**
    - Perfectionnement du système de mise à jour en temps réel des données de tarification via Pusher
@@ -16,17 +16,17 @@ La priorité de développement actuelle est l'amélioration du système d'invali
    - Mise en place de stratégies de mise en cache efficaces pour les données de services
    - Intégration avec le système d'invalidation de cache pour des mises à jour cohérentes
 
-3. **Real-time Quote Recalculation**
-   - Implementing service-specific pricing calculations based on updated tarifs
-   - Ensuring quotes reflect the latest pricing data through cache invalidation
-   - Providing user notifications when prices are updated
-   - Handling edge cases like partial updates and validation failures
+3. **Recalcul des Devis en Temps Réel**
+   - Implémentation des calculs de prix spécifiques aux services basés sur les tarifs mis à jour
+   - Garantie que les devis reflètent les dernières données de tarification via l'invalidation du cache
+   - Fourniture de notifications utilisateur lors des mises à jour de prix
+   - Gestion des cas limites comme les mises à jour partielles et les échecs de validation
 
-4. **Quote Reset Functionality**
-   - Implementing mechanisms to reset or reinitialize quotes (`reinitialisationDevis.ts`, `fullReinitialisationDevis.tsx`)
-   - Handling partial and full quote resets
-   - Ensuring proper state management during resets
-   - Maintaining data consistency across multiple service contexts
+4. **Fonctionnalité de Réinitialisation des Devis**
+   - Implémentation des mécanismes de réinitialisation des devis (`reinitialisationDevis.ts`, `fullReinitialisationDevis.tsx`)
+   - Gestion des réinitialisations partielles et complètes des devis
+   - Garantie d'une gestion d'état appropriée pendant les réinitialisations
+   - Maintien de la cohérence des données entre multiples contextes de services
 
 ## Changements Récents
 
@@ -50,11 +50,11 @@ D'après les fichiers ouverts et l'examen du code, les travaux récents comprenn
    - Amélioration de la page de contact pour une meilleure expérience utilisateur
    - Perfectionnement de l'interface responsive pour tous les appareils
 
-4. **Context Management Optimization**
-   - Refined state management in service providers (e.g., `NettoyageProvider.tsx`)
-   - Improved localStorage persistence for quote data
-   - Enhanced initialization logic for service contexts
-   - Added conditional rendering for client-side components
+4. **Optimisation de la Gestion de Contexte**
+   - Perfectionnement de la gestion d'état dans les fournisseurs de services (ex: `NettoyageProvider.tsx`)
+   - Amélioration de la persistance localStorage pour les données de devis
+   - Logique d'initialisation améliorée pour les contextes de services
+   - Ajout de rendu conditionnel pour les composants côté client
 
 ## Prochaines Étapes
 
@@ -78,14 +78,14 @@ Sur la base du focus de travail actuel, les prochaines étapes potentielles comp
    - Optimisation des composants visuels et des arrière-plans
    - Perfectionnement de l'accessibilité et de l'internationalisation
 
-4. **Testing and Optimization**
-   - Implement component tests using Vitest and Testing Library
-   - Create centralized mocks for common dependencies
-   - Organize tests to mirror the source code structure
-   - Implement comprehensive test coverage for UI components and utilities
-   - Perform end-to-end testing of the quotation flow with real-time updates
-   - Optimize performance of cache invalidation system
-   - Conduct load testing for concurrent pricing updates
+4. **Tests et Optimisation**
+   - Implémentation de tests de composants avec Vitest et Testing Library
+   - Création de mocks centralisés pour les dépendances communes
+   - Organisation des tests pour refléter la structure du code source
+   - Implémentation d'une couverture de tests complète pour les composants UI et utilitaires
+   - Réalisation de tests end-to-end du flux de devis avec mises à jour en temps réel
+   - Optimisation des performances du système d'invalidation de cache
+   - Tests de charge pour les mises à jour de prix concurrentes
 
 ## Décisions et Considérations Actives
 
@@ -109,101 +109,101 @@ Décisions techniques et produit actuellement à l'étude :
    - Comment présenter les services de manière claire et attrayante
    - Équilibrer l'esthétique avec la performance et les temps de chargement
 
-4. **Performance Considerations**
-   - Optimizing real-time updates without excessive re-renders
-   - Managing large state objects efficiently
-   - Ensuring responsive UI during complex calculations
-   - Handling concurrent updates from multiple suppliers
+4. **Considérations de Performance**
+   - Optimisation des mises à jour en temps réel sans re-rendus excessifs
+   - Gestion efficace des objets d'état volumineux
+   - Garantie d'une interface utilisateur réactive pendant les calculs complexes
+   - Gestion des mises à jour concurrentes de plusieurs fournisseurs
 
-## Important Patterns and Preferences
+## Patterns et Préférences Importants
 
-Based on the observed code structure and implementation:
+Basé sur la structure de code observée et l'implémentation :
 
-1. **File Organization**
-   - Feature-based organization within the app directory
-   - Service-specific components in dedicated directories
-   - Separation of desktop and mobile components
-   - Clear separation of actions, components, and hooks
+1. **Organisation des Fichiers**
+   - Organisation basée sur les fonctionnalités dans le répertoire app
+   - Composants spécifiques aux services dans des répertoires dédiés
+   - Séparation des composants desktop et mobile
+   - Séparation claire entre actions, composants et hooks
 
-2. **Naming Conventions**
-   - PascalCase for React components and TypeScript types
-   - camelCase for functions, variables, and files
-   - French terms for domain-specific concepts (e.g., "devis" for quote, "nettoyage" for cleaning)
-   - Descriptive, domain-specific naming
+2. **Conventions de Nommage**
+   - PascalCase pour les composants React et les types TypeScript
+   - camelCase pour les fonctions, variables et fichiers
+   - Termes français pour les concepts spécifiques au domaine (ex: "devis" pour quote, "nettoyage" pour cleaning)
+   - Nommage descriptif et spécifique au domaine
 
-3. **State Management**
-   - React Context for global and domain-specific state
-   - Custom hooks for consuming and updating state
-   - Server Actions for data mutations
-   - Local storage for persistence between sessions
+3. **Gestion d'État**
+   - React Context pour l'état global et spécifique au domaine
+   - Hooks personnalisés pour consommer et mettre à jour l'état
+   - Server Actions pour les mutations de données
+   - Local storage pour la persistance entre les sessions
 
-4. **Component Structure**
-   - Separation of form and display components
-   - Feature-specific components organized by service type
-   - Reusable UI components in dedicated directories
-   - Clear separation of concerns between components
+4. **Structure des Composants**
+   - Séparation des composants de formulaire et d'affichage
+   - Composants spécifiques aux fonctionnalités organisés par type de service
+   - Composants UI réutilisables dans des répertoires dédiés
+   - Séparation claire des préoccupations entre les composants
 
-## Testing Approach
+## Approche de Tests
 
-The project uses a comprehensive testing approach with the following characteristics:
+Le projet utilise une approche de tests complète avec les caractéristiques suivantes :
 
-1. **Test Organization**
-   - Tests are organized in `src/__tests__/` mirroring the source structure
-   - Component tests in `components/` directory
-   - Utility tests in `utils/` directory
-   - Centralized mocks in `components/mocks.tsx`
+1. **Organisation des Tests**
+   - Les tests sont organisés dans `src/__tests__/` reflétant la structure du code source
+   - Tests de composants dans le répertoire `components/`
+   - Tests d'utilitaires dans le répertoire `utils/`
+   - Mocks centralisés dans `components/mocks.tsx`
 
-2. **Component Testing**
-   - Testing rendering with different props
-   - Verifying conditional rendering logic
-   - Testing user interactions
-   - Mocking dependencies like UI components, navigation, and internationalization
-   - Example: `author.test.tsx` tests all rendering scenarios of the Author component
+2. **Tests de Composants**
+   - Test du rendu avec différentes props
+   - Vérification de la logique de rendu conditionnel
+   - Tests des interactions utilisateur
+   - Mocking des dépendances comme les composants UI, la navigation et l'internationalisation
+   - Exemple : `author.test.tsx` teste tous les scénarios de rendu du composant Author
 
-3. **Utility Testing**
-   - Direct function testing with multiple scenarios
-   - Focus on input/output verification
-   - Comprehensive edge case coverage
-   - Example: `capitalize.test.ts` tests various string capitalization scenarios
+3. **Tests d'Utilitaires**
+   - Tests directs des fonctions avec plusieurs scénarios
+   - Focus sur la vérification entrée/sortie
+   - Couverture complète des cas limites
+   - Exemple : `capitalize.test.ts` teste divers scénarios de capitalisation de chaînes
 
-4. **Mock Implementation**
-   - Centralized mock functions in `mocks.tsx`
-   - Mock UI components to simplify testing
-   - Mock navigation functions to test routing behavior
-   - Mock internationalization to test with consistent locale
+4. **Implémentation de Mocks**
+   - Fonctions de mock centralisées dans `mocks.tsx`
+   - Mock des composants UI pour simplifier les tests
+   - Mock des fonctions de navigation pour tester le comportement de routage
+   - Mock de l'internationalisation pour tester avec une locale cohérente
 
-5. **Testing Tools**
-   - Vitest as the test runner
-   - Testing Library for component queries
-   - Jest DOM for extended matchers
-   - JSDOM for browser environment simulation
+5. **Outils de Tests**
+   - Vitest comme test runner
+   - Testing Library pour les requêtes de composants
+   - Jest DOM pour les matchers étendus
+   - JSDOM pour la simulation d'environnement navigateur
 
-## Learnings and Project Insights
+## Apprentissages et Insights du Projet
 
-Key insights from the current development work:
+Insights clés du travail de développement actuel :
 
-1. **Real-time Data Challenges**
-   - Managing cache invalidation across multiple services requires careful coordination
-   - Debouncing and event deduplication are essential for stable real-time updates
-   - Balancing immediate updates with system stability is an ongoing challenge
-   - Providing clear user feedback for background updates improves user experience
+1. **Défis des Données en Temps Réel**
+   - Gérer l'invalidation de cache à travers plusieurs services nécessite une coordination minutieuse
+   - Le debouncing et la déduplication d'événements sont essentiels pour des mises à jour stables en temps réel
+   - Équilibrer les mises à jour immédiates avec la stabilité du système est un défi continu
+   - Fournir un feedback utilisateur clair pour les mises à jour en arrière-plan améliore l'expérience utilisateur
 
-2. **Complex State Management**
-   - Service-specific context updaters improve maintainability
-   - Targeted state updates perform better than full context replacements
-   - Local storage persistence requires careful synchronization
-   - Clear separation of concerns in state management simplifies debugging
+2. **Gestion d'État Complexe**
+   - Les mises à jour de contexte spécifiques aux services améliorent la maintenabilité
+   - Les mises à jour d'état ciblées performent mieux que les remplacements complets de contexte
+   - La persistance local storage nécessite une synchronisation minutieuse
+   - Une séparation claire des préoccupations dans la gestion d'état simplifie le débogage
 
-3. **Form Management Complexity**
-   - Visual indicators for modified fields improve user experience
-   - Validation at both client and server sides ensures data integrity
-   - Optimistic UI updates with proper error handling improve perceived performance
-   - Sorting and categorization of form data improves usability
+3. **Complexité de Gestion des Formulaires**
+   - Les indicateurs visuels pour les champs modifiés améliorent l'expérience utilisateur
+   - La validation côté client et serveur assure l'intégrité des données
+   - Les mises à jour UI optimistes avec gestion d'erreur appropriée améliorent la performance perçue
+   - Le tri et la catégorisation des données de formulaire améliorent l'utilisabilité
 
-4. **Pricing Logic Complexity**
-   - Service pricing involves multiple variables and conditions
-   - Real-time pricing updates need to be efficient and accurate
-   - Zod schemas help ensure data integrity for pricing calculations
-   - Proper transformation between display and storage formats is essential
+4. **Complexité de la Logique de Tarification**
+   - La tarification des services implique de multiples variables et conditions
+   - Les mises à jour de prix en temps réel doivent être efficaces et précises
+   - Les schémas Zod aident à assurer l'intégrité des données pour les calculs de prix
+   - Une transformation appropriée entre les formats d'affichage et de stockage est essentielle
 
-This document will be updated as the active context evolves with ongoing development work.
+Ce document sera mis à jour au fur et à mesure que le contexte actif évolue avec le travail de développement en cours.

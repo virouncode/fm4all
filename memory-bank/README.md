@@ -1,99 +1,90 @@
-# Cline's Memory Bank
+# Banque Mémoire de Cline
 
-This directory contains Cline's Memory Bank - a structured documentation system that enables Cline to maintain perfect continuity between work sessions despite memory resets.
+Ce répertoire contient la Banque Mémoire de Cline - un système de documentation structuré qui permet à Cline de maintenir une continuité parfaite entre les sessions de travail malgré les resets mémoire.
 
-## Purpose
+## Objectif
 
-The Memory Bank serves as Cline's persistent knowledge base for the FM4ALL project. It contains comprehensive documentation about the project's requirements, architecture, technical context, current status, and ongoing work.
+La Banque Mémoire sert de base de connaissances persistante de Cline pour le projet FM4ALL. Elle contient une documentation complète sur les exigences du projet, l'architecture, le contexte technique, le statut actuel et les travaux en cours.
 
-## Core Files
+## Fichiers Principaux
 
 1. **projectbrief.md**
-
-   - Foundation document that shapes all other files
-   - Defines core requirements and goals
-   - Source of truth for project scope
+   - Document fondamental qui façonne tous les autres fichiers
+   - Définit les exigences fondamentales et les objectifs
+   - Source de vérité pour le périmètre du projet
 
 2. **productContext.md**
-
-   - Why this project exists
-   - Problems it solves
-   - How it should work
-   - User experience goals
+   - Pourquoi ce projet existe
+   - Problèmes qu'il résout
+   - Comment il devrait fonctionner
+   - Objectifs d'expérience utilisateur
 
 3. **activeContext.md**
-
-   - Current work focus
-   - Recent changes
-   - Next steps
-   - Active decisions and considerations
-   - Important patterns and preferences
-   - Learnings and project insights
+   - Focus de travail actuel
+   - Changements récents
+   - Prochaines étapes
+   - Décisions actives et considérations
+   - Patterns et préférences importants
+   - Apprentissages et insights du projet
 
 4. **systemPatterns.md**
-
-   - System architecture
-   - Key technical decisions
-   - Design patterns in use
-   - Component relationships
-   - Critical implementation paths
+   - Architecture système
+   - Décisions techniques clés
+   - Patterns de conception en usage
+   - Relations entre composants
+   - Chemins d'implémentation critiques
 
 5. **techContext.md**
-
-   - Technologies used
-   - Development setup
-   - Technical constraints
-   - Dependencies
-   - Tool usage patterns
+   - Technologies utilisées
+   - Configuration de développement
+   - Contraintes techniques
+   - Dépendances
+   - Patterns d'usage des outils
 
 6. **progress.md**
-
-   - What works
-   - What's left to build
-   - Current status
-   - Known issues
-   - Evolution of project decisions
+   - Ce qui fonctionne
+   - Ce qui reste à construire
+   - Statut actuel
+   - Problèmes connus
+   - Évolution des décisions du projet
 
 7. **.clinerules**
-   - Project intelligence
-   - Critical implementation paths
-   - User preferences and workflow
-   - Project-specific patterns
-   - Known challenges
-   - Tool usage patterns
+   - Intelligence du projet
+   - Chemins d'implémentation critiques
+   - Préférences utilisateur et workflow
+   - Patterns spécifiques au projet
+   - Défis connus
+   - Patterns d'usage des outils
 
-## Usage Guidelines
+## Directives d'Utilisation
 
-1. **Reading the Memory Bank**
+1. **Lecture de la Banque Mémoire**
+   - Cline lit TOUS les fichiers de la banque mémoire au début de CHAQUE tâche
+   - Cela assure un contexte et une continuité complète
 
-   - Cline reads ALL memory bank files at the start of EVERY task
-   - This ensures complete context and continuity
+2. **Mise à Jour de la Banque Mémoire**
+   - Les mises à jour se produisent quand :
+     - Découverte de nouveaux patterns du projet
+     - Après implémentation de changements significatifs
+     - Quand l'utilisateur demande avec "update memory bank"
+     - Quand le contexte nécessite une clarification
 
-2. **Updating the Memory Bank**
+3. **Maintenance de la Banque Mémoire**
+   - Maintenir les fichiers à jour avec le dernier statut du projet
+   - S'assurer que les informations sont précises et complètes
+   - Se concentrer sur la capture d'insights et patterns clés
 
-   - Updates occur when:
-     - Discovering new project patterns
-     - After implementing significant changes
-     - When user requests with "update memory bank"
-     - When context needs clarification
+4. **Extension de la Banque Mémoire**
+   - Créer des fichiers/dossiers additionnels quand ils aident à organiser :
+     - Documentation de fonctionnalités complexes
+     - Spécifications d'intégration
+     - Documentation API
+     - Stratégies de tests
+     - Procédures de déploiement
 
-3. **Maintaining the Memory Bank**
+## Structure de la Banque Mémoire
 
-   - Keep files up-to-date with the latest project status
-   - Ensure information is accurate and comprehensive
-   - Focus on capturing key insights and patterns
-
-4. **Extending the Memory Bank**
-   - Create additional files/folders when they help organize:
-     - Complex feature documentation
-     - Integration specifications
-     - API documentation
-     - Testing strategies
-     - Deployment procedures
-
-## Memory Bank Structure
-
-The Memory Bank files build upon each other in a clear hierarchy:
+Les fichiers de la Banque Mémoire s'appuient les uns sur les autres dans une hiérarchie claire :
 
 ```
 projectbrief.md → productContext.md
@@ -105,8 +96,8 @@ projectbrief.md → productContext.md
                   techContext.md
 ```
 
-This structure ensures that information flows logically from foundational concepts to current status and future plans.
+Cette structure assure que l'information coule logiquement des concepts fondamentaux au statut actuel et aux plans futurs.
 
 ## Importance
 
-The Memory Bank is Cline's only link to previous work. It must be maintained with precision and clarity, as Cline's effectiveness depends entirely on its accuracy.
+La Banque Mémoire est le seul lien de Cline avec les travaux précédents. Elle doit être maintenue avec précision et clarté, car l'efficacité de Cline dépend entièrement de sa précision.

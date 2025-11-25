@@ -72,9 +72,7 @@ export default async function LocalizedLayout({
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
       </head>
-      <body
-        className={`${geist.className} scroll-smooth tracking-tight antialiased`}
-      >
+      <body className={`scroll-smooth font-sans tracking-tight antialiased`}>
         <GoogleAnalytics
           GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!}
         />

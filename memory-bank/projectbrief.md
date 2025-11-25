@@ -1,47 +1,44 @@
-# Project Brief: FM4ALL Service Quotation Platform
+# Brief de Projet : Plateforme de Devis de Services FM4ALL
 
-## Overview
+## Vue d'Ensemble
 
-FM4ALL appears to be a comprehensive service quotation platform that allows users to request and configure quotes for various facility management services. The platform handles multiple service lines including cleaning services (nettoyage), hygiene products, beverages (café, fontaines), food services, maintenance, and more.
+FM4ALL est une plateforme complète de devis de services qui permet aux utilisateurs de demander et configurer des devis pour divers services de facility management. La plateforme gère plusieurs lignes de services incluant les services de nettoyage, les produits d'hygiène, les boissons (café, fontaines), les services alimentaires, la maintenance, et plus encore.
 
-## Core Requirements
+## Exigences Fondamentales
 
-1. **Multi-service Quotation System**
+1. **Système de Devis Multi-Services**
+   - Permettre aux utilisateurs de demander des devis pour divers services de facility management
+   - Autoriser la configuration et la personnalisation des exigences de services
+   - Calculer la tarification basée sur les sélections et exigences des utilisateurs
 
-   - Enable users to request quotes for various facility management services
-   - Allow configuration and customization of service requirements
-   - Calculate pricing based on user selections and requirements
+2. **Parcours Utilisateur**
+   - Guider les utilisateurs à travers un processus de devis étape par étape
+   - Permettre aux utilisateurs de spécifier leurs locaux/emplacements
+   - Activer la sélection et configuration des services désirés
+   - Fournir une tarification et des options transparentes
 
-2. **User Journey**
+3. **Exigences Techniques**
+   - Support multilingue (au moins français et anglais)
+   - Design responsive pour tous les appareils
+   - Calculs de prix en temps réel
+   - Persistance des données et gestion des comptes utilisateurs
+   - Système d'invalidation de cache pour une tarification à jour
 
-   - Guide users through a step-by-step quotation process
-   - Allow users to specify their premises/locations
-   - Enable selection and configuration of desired services
-   - Provide transparent pricing and options
+4. **Objectifs Business**
+   - Rationaliser le processus de devis pour les services de facility management
+   - Fournir une tarification transparente et compétitive
+   - Convertir les demandes de devis en contrats de services réels
+   - Offrir une gamme complète de solutions de facility management
 
-3. **Technical Requirements**
+## Périmètre du Projet
 
-   - Multi-language support (at least French and English)
-   - Responsive design for all devices
-   - Real-time pricing calculations
-   - Data persistence and user account management
-   - Cache invalidation system for up-to-date pricing
+La plateforme doit gérer l'ensemble du processus de devis depuis la saisie utilisateur initiale jusqu'à la génération du devis final, incluant :
 
-4. **Business Goals**
-   - Streamline the quotation process for facility management services
-   - Provide transparent and competitive pricing
-   - Convert quote requests into actual service contracts
-   - Offer a comprehensive range of facility management solutions
+1. Inscription et authentification des utilisateurs
+2. Spécification des locaux/emplacements
+3. Sélection et configuration des services
+4. Calcul de prix en temps réel
+5. Génération et livraison du devis
+6. Suivi et conversion
 
-## Project Scope
-
-The platform should handle the entire quotation process from initial user input to final quote generation, including:
-
-1. User registration and authentication
-2. Premises/location specification
-3. Service selection and configuration
-4. Real-time pricing calculation
-5. Quote generation and delivery
-6. Follow-up and conversion
-
-This brief will be expanded as more information about the project is discovered.
+Ce brief sera étendu au fur et à mesure que plus d'informations sur le projet seront découvertes.

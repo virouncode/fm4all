@@ -1,109 +1,97 @@
-# Product Context: FM4ALL Service Quotation Platform
+# Contexte Produit : Plateforme de Devis de Services FM4ALL
 
-## Why This Project Exists
+## Pourquoi ce Projet Existe
 
-The FM4ALL platform exists to simplify and streamline the process of obtaining quotes for facility management services. Traditional methods of requesting quotes for such services often involve:
+La plateforme FM4ALL existe pour simplifier et rationaliser le processus d'obtention de devis pour les services de facility management. Les méthodes traditionnelles de demande de devis pour de tels services impliquent souvent :
 
-1. Multiple phone calls or emails to different service providers
-2. Lengthy consultation processes
-3. Difficulty in comparing options and prices
-4. Lack of transparency in pricing structures
-5. Delays in receiving final quotes
+1. Appels téléphoniques ou emails multiples à différents prestataires de services
+2. Processus de consultation longs
+3. Difficulté à comparer les options et les prix
+4. Manque de transparence dans les structures tarifaires
+5. Délais dans la réception des devis finaux
 
-FM4ALL addresses these pain points by providing a digital platform where users can configure their service needs and receive transparent, immediate quotations.
+FM4ALL répond à ces points de douleur en fournissant une plateforme digitale où les utilisateurs peuvent configurer leurs besoins de services et recevoir des devis transparents et immédiats.
 
-## Problems It Solves
+## Problèmes qu'il Résout
 
-1. **Complexity in Service Configuration**
+1. **Complexité dans la Configuration des Services**
+   - Simplifie le processus de spécification des exigences exactes de services
+   - Élimine la confusion concernant les options et fonctionnalités des services
+   - Fournit une catégorisation claire des services (nettoyage, hygiène, boissons, etc.)
 
-   - Simplifies the process of specifying exact service requirements
-   - Eliminates confusion about service options and features
-   - Provides clear categorization of services (cleaning, hygiene, beverages, etc.)
+2. **Transparence Tarifaire**
+   - Offre une tarification en temps réel basée sur les sélections utilisateur
+   - Élimine les coûts cachés et les surprises
+   - Permet aux utilisateurs d'ajuster les exigences pour respecter les contraintes budgétaires
 
-2. **Pricing Transparency**
+3. **Efficacité Temporelle**
+   - Réduit le temps de la demande au devis de jours/semaines à minutes
+   - Élimine les communications d'aller-retour pour les clarifications
+   - Fournit un feedback immédiat sur l'impact des changements sur la tarification
 
-   - Offers real-time pricing based on user selections
-   - Eliminates hidden costs and surprises
-   - Allows users to adjust requirements to fit budget constraints
+4. **Prise de Décision**
+   - Permet la comparaison facile entre différentes configurations de services
+   - Fournit des informations claires pour soutenir des décisions éclairées
+   - Met en évidence les propositions de valeur pour chaque option de service
 
-3. **Time Efficiency**
+## Comment ça Devrait Fonctionner
 
-   - Reduces the time from inquiry to quote from days/weeks to minutes
-   - Eliminates back-and-forth communications for clarifications
-   - Provides immediate feedback on how changes affect pricing
+1. **Inscription/Authentification Utilisateur**
+   - Processus d'inscription simple
+   - Authentification sécurisée
+   - Gestion de profil pour les utilisateurs récurrents
 
-4. **Decision Making**
-   - Enables easy comparison between different service configurations
-   - Provides clear information to support informed decisions
-   - Highlights value propositions for each service option
+2. **Spécification des Locaux**
+   - Saisie des détails de localisation
+   - Spécification du type et des caractéristiques du bâtiment
+   - Définition de l'usage et des exigences de l'espace
 
-## How It Should Work
+3. **Sélection et Configuration des Services**
+   - Navigation des catégories de services disponibles
+   - Configuration détaillée de chaque service sélectionné
+   - Ajout/suppression de services selon les besoins
 
-1. **User Registration/Authentication**
+4. **Génération de Devis en Temps Réel**
+   - Calculs de prix dynamiques basés sur les sélections
+   - Ventilation transparente des coûts
+   - Options d'ajustements pour respecter les contraintes budgétaires
 
-   - Simple sign-up process
-   - Secure authentication
-   - Profile management for recurring users
+5. **Finalisation et Soumission du Devis**
+   - Révision du devis complet
+   - Soumission digitale
+   - Génération PDF pour archivage
 
-2. **Premises Specification**
+6. **Processus de Suivi**
+   - Confirmation de réception du devis
+   - Chronologie pour la mise en œuvre du service
+   - Options de contact pour questions ou modifications
 
-   - Input of location details
-   - Specification of building type and characteristics
-   - Definition of space usage and requirements
+## Objectifs d'Expérience Utilisateur
 
-3. **Service Selection and Configuration**
+1. **Navigation Intuitive**
+   - Processus étape par étape clair
+   - Flux logique d'une section à la suivante
+   - Retour en arrière et modification faciles
 
-   - Browsing available service categories
-   - Detailed configuration of each selected service
-   - Addition/removal of services as needed
+2. **Clarté Visuelle**
+   - Interface propre et désencombrée
+   - Représentations visuelles des services le cas échéant
+   - Mise en évidence claire des options sélectionnées
 
-4. **Real-time Quote Generation**
+3. **Feedback Réactif**
+   - Mises à jour immédiates de la tarification lors des changements
+   - Validation claire des saisies utilisateur
+   - Messages d'erreur utiles quand nécessaire
 
-   - Dynamic pricing calculations based on selections
-   - Transparent breakdown of costs
-   - Options for adjustments to meet budget constraints
+4. **Accessibilité**
+   - Support multilingue
+   - Design responsive pour tous les appareils
+   - Considération pour les utilisateurs en situation de handicap
 
-5. **Quote Finalization and Submission**
+5. **Construction de Confiance**
+   - Tarification transparente
+   - Termes et conditions clairs
+   - Indicateurs de sécurité pour les données utilisateur
+   - Présentation professionnelle de la marque FM4ALL
 
-   - Review of complete quote
-   - Digital submission
-   - PDF generation for record-keeping
-
-6. **Follow-up Process**
-   - Confirmation of quote receipt
-   - Timeline for service implementation
-   - Contact options for questions or modifications
-
-## User Experience Goals
-
-1. **Intuitive Navigation**
-
-   - Clear step-by-step process
-   - Logical flow from one section to the next
-   - Easy backtracking and modification
-
-2. **Visual Clarity**
-
-   - Clean, uncluttered interface
-   - Visual representations of services where appropriate
-   - Clear highlighting of selected options
-
-3. **Responsive Feedback**
-
-   - Immediate updates to pricing when changes are made
-   - Clear validation of user inputs
-   - Helpful error messages when needed
-
-4. **Accessibility**
-
-   - Multi-language support
-   - Responsive design for all devices
-   - Consideration for users with disabilities
-
-5. **Trust Building**
-   - Transparent pricing
-   - Clear terms and conditions
-   - Security indicators for user data
-   - Professional presentation of the FM4ALL brand
-
-The platform aims to transform the facility management quotation process from a complex, time-consuming task into a straightforward, user-friendly experience that empowers clients to make informed decisions about their facility management needs.
+La plateforme vise à transformer le processus de devis de facility management d'une tâche complexe et chronophage en une expérience simple et conviviale qui permet aux clients de prendre des décisions éclairées concernant leurs besoins de facility management.

@@ -1,204 +1,180 @@
-# System Patterns: FM4ALL Service Quotation Platform
+# Patterns Système : Plateforme de Devis de Services FM4ALL
 
-## System Architecture
+## Architecture Système
 
-The FM4ALL platform appears to be built using a modern web application architecture with the following key components:
+La plateforme FM4ALL semble être construite avec une architecture d'application web moderne avec les composants clés suivants :
 
-1. **Frontend Framework**
+1. **Framework Frontend**
+   - Next.js comme framework React
+   - Rendu côté serveur et hydratation côté client
+   - Pattern App Router avec routage basé sur les fichiers
 
-   - Next.js as the React framework
-   - Server-side rendering and client-side hydration
-   - App Router pattern with file-based routing
+2. **Services Backend**
+   - Server Actions pour les mutations de données
+   - Routes API pour les intégrations externes
+   - Sanity CMS pour la gestion de contenu
 
-2. **Backend Services**
+3. **Gestion des Données**
+   - Drizzle ORM pour les opérations de base de données
+   - Zod pour la validation de schémas et la sécurité de types
+   - Context API pour la gestion d'état
 
-   - Server Actions for data mutations
-   - API routes for external integrations
-   - Sanity CMS for content management
+4. **Fonctionnalités Temps Réel**
+   - Pusher pour les mises à jour temps réel
+   - Système d'invalidation de cache pour la fraîcheur des données
 
-3. **Data Management**
-
-   - Drizzle ORM for database operations
-   - Zod for schema validation and type safety
-   - Context API for state management
-
-4. **Real-time Features**
-   - Pusher for real-time updates
-   - Cache invalidation system for data freshness
-
-## Key Technical Decisions
+## Décisions Techniques Clés
 
 1. **Next.js App Router**
+   - Système de routage basé sur les fichiers
+   - Composants serveur pour performance améliorée
+   - Internationalisation via paramètres de route ([locale])
 
-   - File-based routing system
-   - Server components for improved performance
-   - Internationalization through route parameters ([locale])
+2. **Gestion d'État**
+   - React Context API pour l'état global
+   - Pattern Provider pour l'état spécifique aux services
+   - Hooks pour consommer et mettre à jour l'état
 
-2. **State Management**
+3. **Validation des Données**
+   - Schémas Zod pour la validation runtime
+   - TypeScript pour la vérification de types statique
+   - Gestion de formulaires basée sur les schémas
 
-   - React Context API for global state
-   - Provider pattern for service-specific state
-   - Hooks for consuming and updating state
+4. **Approche de Stylisation**
+   - Tailwind CSS pour la stylisation utility-first
+   - Bibliothèque de composants UI basée sur les composants
+   - Patterns de design responsive
 
-3. **Data Validation**
+5. **Récupération de Données**
+   - Server Actions pour les mutations de données
+   - Stratégie cache-first avec invalidation
+   - Mises à jour temps réel via Pusher
 
-   - Zod schemas for runtime validation
-   - TypeScript for static type checking
-   - Schema-based form handling
+## Patterns de Conception en Usage
 
-4. **Styling Approach**
+1. **Pattern Provider**
+   - Fournisseurs de contexte pour différents domaines de services
+   - Gestion d'état hiérarchique
+   - Exemple : `NettoyageProvider.tsx`, `HygieneProvider.tsx`
 
-   - Tailwind CSS for utility-first styling
-   - Component-based UI library
-   - Responsive design patterns
+2. **Pattern Observer**
+   - Listeners d'invalidation de cache
+   - Mises à jour de données temps réel via Pusher
+   - Exemple : `CacheInvalidationListener.tsx`
 
-5. **Data Fetching**
-   - Server Actions for data mutations
-   - Cache-first strategy with invalidation
-   - Real-time updates for collaborative features
+3. **Pattern Factory**
+   - Factories de configuration de services
+   - Génération de formulaires dynamiques
+   - Structures de données standardisées
 
-## Design Patterns in Use
+4. **Pattern Repository**
+   - Accès aux données abstrait
+   - Opérations de données centralisées
+   - Exemple : Fichiers Actions comme `nettoyageTarifsAction.ts`
 
-1. **Provider Pattern**
+5. **Pattern Strategy**
+   - Différentes stratégies de tarification
+   - Logique de calcul spécifique aux services
+   - Modules de services pluggables
 
-   - Context providers for different service domains
-   - Hierarchical state management
-   - Example: `NettoyageProvider.tsx`, `HygieneProvider.tsx`
+6. **Pattern Composite**
+   - Construction d'UIs complexes à partir de composants simples
+   - Hiérarchies de composants imbriqués
+   - Blocs de construction UI réutilisables
 
-2. **Observer Pattern**
+## Relations entre Composants
 
-   - Cache invalidation listeners
-   - Real-time data updates via Pusher
-   - Example: `CacheInvalidationListener.tsx`
+1. **Composants de Page**
+   - Composants de niveau supérieur qui représentent les routes
+   - Composent plusieurs composants de fonctionnalités
+   - Gèrent l'état et les effets au niveau page
 
-3. **Factory Pattern**
+2. **Composants de Fonctionnalités**
+   - Implémentent des fonctionnalités métier spécifiques
+   - Consomment le contexte des fournisseurs
+   - Exemple : `NettoyagePropositions.tsx`
 
-   - Service configuration factories
-   - Dynamic form generation
-   - Standardized data structures
+3. **Composants UI**
+   - Composants réutilisables et de présentation
+   - Stylés avec Tailwind CSS
+   - Situés dans `src/components/ui/`
 
-4. **Repository Pattern**
+4. **Composants Provider**
+   - Gèrent l'état pour des domaines spécifiques
+   - Fournissent le contexte aux composants enfants
+   - Exemple : `NettoyageProvider.tsx`
 
-   - Abstracted data access
-   - Centralized data operations
-   - Example: Actions files like `nettoyageTarifsAction.ts`
+5. **Relations des Hooks**
+   - Les hooks personnalisés consomment le contexte
+   - Les hooks fournissent une logique réutilisable
+   - Exemple : `use-nettoyage-tarifs-watcher.ts`
 
-5. **Strategy Pattern**
+6. **Relations des Actions**
+   - Les server actions sont appelées depuis les composants
+   - Les actions effectuent les mutations de données
+   - Exemple : `nettoyageTarifsAction.ts`
 
-   - Different pricing strategies
-   - Service-specific calculation logic
-   - Pluggable service modules
+## Chemins d'Implémentation Critiques
 
-6. **Composite Pattern**
-   - Building complex UIs from simpler components
-   - Nested component hierarchies
-   - Reusable UI building blocks
+1. **Flux de Génération de Devis**
+   1. L'utilisateur saisit les informations des locaux
+   2. Sélectionne les services désirés
+   3. Configure les détails des services
+   4. Le système calcule la tarification
+   5. Le devis est généré et présenté
 
-## Component Relationships
+2. **Flux d'Invalidation de Cache**
+   1. Les données sont mises à jour via une server action
+   2. L'événement d'invalidation de cache est déclenché
+   3. Pusher diffuse l'événement
+   4. Les listeners reçoivent l'événement
+   5. Les composants affectés se re-rendent avec des données fraîches
 
-1. **Page Components**
+3. **Flux de Configuration de Services**
+   1. L'utilisateur sélectionne une catégorie de service
+   2. Le formulaire spécifique au service est présenté
+   3. L'utilisateur configure les paramètres du service
+   4. Les mises à jour de tarification temps réel sont affichées
+   5. La configuration est sauvegardée dans le devis
 
-   - Top-level components that represent routes
-   - Compose multiple feature components
-   - Handle page-level state and effects
+4. **Flux d'Internationalisation**
+   1. Le locale de l'utilisateur est détecté ou sélectionné
+   2. Les traductions appropriées sont chargées
+   3. L'UI se rend dans la langue sélectionnée
+   4. Les routes incluent le paramètre locale
+   5. Le contenu est affiché dans la langue correcte
 
-2. **Feature Components**
+5. **Flux de Tests**
+   1. Les tests unitaires vérifient les fonctions utilitaires
+   2. Les tests de composants vérifient le rendu et les interactions
+   3. Les mocks simulent les dépendances et services externes
+   4. Les tests reflètent la structure du code source
+   5. Vitest exécute les tests dans un environnement DOM simulé
 
-   - Implement specific business features
-   - Consume context from providers
-   - Example: `NettoyagePropositions.tsx`
+## Patterns de Tests
 
-3. **UI Components**
+1. **Pattern de Tests de Composants**
+   - Les tests reflètent la structure du code source dans `src/__tests__/`
+   - Chaque composant a un fichier de test correspondant
+   - Les tests vérifient le rendu, la logique conditionnelle et les interactions
+   - Exemple : `author.test.tsx` teste le composant `Author.tsx`
 
-   - Reusable, presentational components
-   - Styled with Tailwind CSS
-   - Located in `src/components/ui/`
+2. **Pattern Mock**
+   - Mocks centralisés dans `src/__tests__/components/mocks.tsx`
+   - Fonctions mock pour les dépendances externes
+   - Composants mock pour les éléments UI
+   - Exemple : `mockUIButton()`, `mockNavigation()`, `mockNextIntl()`
 
-4. **Provider Components**
+3. **Pattern d'Assertion**
+   - Requêtes Testing Library pour trouver les éléments
+   - Matchers Jest DOM pour les assertions
+   - Vérification de la présence, attributs et contenu
+   - Exemple : `expect(screen.getByText(/jean dupont/i)).toBeInTheDocument()`
 
-   - Manage state for specific domains
-   - Provide context to child components
-   - Example: `NettoyageProvider.tsx`
+4. **Pattern de Tests d'Utilitaires**
+   - Tests directs de fonctions pour les utilitaires
+   - Cas de tests multiples pour différents scénarios
+   - Focus sur la vérification entrée/sortie
+   - Exemple : `capitalize.test.ts` teste l'utilitaire `capitalize`
 
-5. **Hook Relationships**
-
-   - Custom hooks consume context
-   - Hooks provide reusable logic
-   - Example: `use-nettoyage-tarifs-watcher.ts`
-
-6. **Action Relationships**
-   - Server actions called from components
-   - Actions perform data mutations
-   - Example: `nettoyageTarifsAction.ts`
-
-## Critical Implementation Paths
-
-1. **Quote Generation Flow**
-
-   1. User inputs premises information
-   2. Selects desired services
-   3. Configures service details
-   4. System calculates pricing
-   5. Quote is generated and presented
-
-2. **Cache Invalidation Flow**
-
-   1. Data is updated via server action
-   2. Cache invalidation event is triggered
-   3. Pusher broadcasts the event
-   4. Listeners receive the event
-   5. Affected components re-render with fresh data
-
-3. **Service Configuration Flow**
-
-   1. User selects a service category
-   2. Service-specific form is presented
-   3. User configures service parameters
-   4. Real-time pricing updates are shown
-   5. Configuration is saved to quote
-
-4. **Internationalization Flow**
-
-   1. User's locale is detected or selected
-   2. Appropriate translations are loaded
-   3. UI renders in the selected language
-   4. Routes include locale parameter
-   5. Content is displayed in the correct language
-
-5. **Testing Flow**
-   1. Unit tests verify utility functions
-   2. Component tests check rendering and interactions
-   3. Mocks simulate dependencies and external services
-   4. Tests mirror the source code structure
-   5. Vitest runs tests in a simulated DOM environment
-
-## Testing Patterns
-
-1. **Component Testing Pattern**
-
-   - Tests mirror the source code structure in `src/__tests__/`
-   - Each component has a corresponding test file
-   - Tests verify rendering, conditional logic, and interactions
-   - Example: `author.test.tsx` tests the `Author.tsx` component
-
-2. **Mock Pattern**
-
-   - Centralized mocks in `src/__tests__/components/mocks.tsx`
-   - Mock functions for external dependencies
-   - Mock components for UI elements
-   - Example: `mockUIButton()`, `mockNavigation()`, `mockNextIntl()`
-
-3. **Assertion Pattern**
-
-   - Testing Library queries to find elements
-   - Jest DOM matchers for assertions
-   - Verify presence, attributes, and content
-   - Example: `expect(screen.getByText(/jean dupont/i)).toBeInTheDocument()`
-
-4. **Utility Testing Pattern**
-   - Direct function testing for utilities
-   - Multiple test cases for different scenarios
-   - Focus on input/output verification
-   - Example: `capitalize.test.ts` tests the `capitalize` utility
-
-This document will be updated as more patterns are discovered or implemented in the system.
+Ce document sera mis à jour au fur et à mesure que plus de patterns sont découverts ou implémentés dans le système.

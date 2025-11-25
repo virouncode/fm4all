@@ -196,7 +196,7 @@
     --fm4all-comfort: hsl(200 75% 25%);
     --fm4all-excellence: hsl(238 38% 16%);
   }
-  body {
+  /* body {
     font-family:
       system-ui,
       -apple-system,
@@ -209,7 +209,7 @@
       "Open Sans",
       "Helvetica Neue",
       sans-serif;
-  }
+  } */
   body > div:last-child > span + img {
     /*pour html2canvas */
     display: inline !important;
@@ -232,6 +232,10 @@
   a:hover {
     opacity: 0.8;
   }
+}
+
+@theme {
+  --font-sans: system-ui, var(--font-geist), sans-serif;
 }
 
 @utility list-check {

@@ -1,169 +1,154 @@
-# FM4ALL Project Intelligence
+# Intelligence du Projet FM4ALL
 
-This file captures important patterns, preferences, and project intelligence that help me work more effectively with the FM4ALL service quotation platform.
+Ce fichier capture les patterns importants, préférences et intelligence du projet qui m'aident à travailler plus efficacement avec la plateforme de devis de services FM4ALL.
 
-## Critical Implementation Paths
+## Chemins d'Implémentation Critiques
 
-1. **Cache Invalidation Flow**
+1. **Flux d'Invalidation de Cache**
+   - Les mises à jour de données dans les server actions déclenchent des événements d'invalidation de cache via `invalidateCacheTagsWithData()`
+   - Pusher diffuse ces événements à tous les clients connectés avec des payloads de données spécifiques
+   - Les composants `CacheInvalidationListener.tsx` écoutent ces événements avec debouncing et déduplication
+   - Les mises à jour de contexte spécifiques aux services (ex: `use-nettoyage-context-updater.ts`) traitent les données
+   - Les composants utilisant le contexte mis à jour se re-rendent automatiquement avec les informations fraîches
+   - L'utilisateur reçoit des notifications toast concernant les mises à jour
 
-   - Data updates in server actions trigger cache invalidation events via `invalidateCacheTagsWithData()`
-   - Pusher broadcasts these events to all connected clients with specific data payloads
-   - `CacheInvalidationListener.tsx` components listen for these events with debouncing and deduplication
-   - Service-specific context updaters (e.g., `use-nettoyage-context-updater.ts`) process the data
-   - Components using the updated context automatically re-render with fresh information
-   - User receives toast notifications about the updates
+2. **Flux de Mise à Jour des Tarifs**
+   - Le fournisseur accède au formulaire de mise à jour des tarifs (ex: `HygieneTarifsDistribUpdateForm.tsx`)
+   - L'UI montre les tarifs actuels avec indicateurs visuels pour les champs modifiés
+   - La validation empêche la sauvegarde de données invalides (ex: prix zéro ou négatifs)
+   - La server action (ex: `updateHygieneTarifDistribAction`) traite la mise à jour
+   - L'invalidation de cache est déclenchée avec un payload de données spécifique
+   - Tous les clients connectés reçoivent la mise à jour et recalculent les devis affectés
 
-2. **Tarifs Update Flow**
+3. **Flux de Réinitialisation de Devis**
+   - Réinitialisation partielle : `reinitialisationDevis.ts` remet à zéro des parties spécifiques du devis
+   - Réinitialisation complète : `fullReinitialisationDevis.tsx` remet à zéro l'ensemble du devis
+   - Les fonctions de réinitialisation mettent à jour tous les fournisseurs de contexte pertinents
+   - Les informations de surface et d'occupation sont préservées
+   - Les valeurs par défaut sont calculées basées sur les données des locaux
+   - Les composants UI se re-rendent pour refléter l'état réinitialisé
 
-   - Supplier accesses tarifs update form (e.g., `HygieneTarifsDistribUpdateForm.tsx`)
-   - UI shows current tarifs with visual indicators for modified fields
-   - Validation prevents saving invalid data (e.g., zero or negative prices)
-   - Server action (e.g., `updateHygieneTarifDistribAction`) processes the update
-   - Cache invalidation is triggered with specific data payload
-   - All connected clients receive the update and recalculate affected quotes
+## Préférences Utilisateur et Workflow
 
-3. **Quote Reset Flow**
-   - Partial reset: `reinitialisationDevis.ts` resets specific parts of the quote
-   - Full reset: `fullReinitialisationDevis.tsx` resets the entire quote
-   - Reset functions update all relevant context providers
-   - Surface area and occupancy information is preserved
-   - Default values are calculated based on premises data
-   - UI components re-render to reflect the reset state
+1. **Organisation du Code**
+   - Organisation basée sur les fonctionnalités dans le répertoire app
+   - Composants spécifiques aux services dans des répertoires dédiés
+   - Séparation des composants desktop et mobile
+   - Fournisseurs de contexte dans `src/context/`
+   - Actions dans `src/actions/`
+   - Schémas Zod dans `src/zod-schemas/`
 
-## User Preferences and Workflow
+2. **Conventions de Nommage**
+   - PascalCase pour les composants React et types TypeScript
+   - camelCase pour les fonctions, variables et fichiers
+   - Termes français pour les concepts spécifiques au domaine (ex: "devis" pour quote, "nettoyage" pour cleaning)
+   - Nommage descriptif et spécifique au domaine
 
-1. **Code Organization**
+3. **Gestion d'État**
+   - React Context API pour l'état global et spécifique au domaine
+   - Fournisseurs spécifiques aux services (ex: `NettoyageProvider.tsx`)
+   - Hooks personnalisés pour consommer et mettre à jour l'état
+   - Server Actions pour les mutations de données
+   - localStorage pour la persistance côté client
 
-   - Feature-based organization within the app directory
-   - Service-specific components in dedicated directories
-   - Separation of desktop and mobile components
-   - Context providers in `src/context/`
-   - Actions in `src/actions/`
-   - Zod schemas in `src/zod-schemas/`
+## Patterns Spécifiques au Projet
 
-2. **Naming Conventions**
+1. **Pattern d'Invalidation de Cache**
+   - Invalidation basée sur les tags pour mises à jour ciblées
+   - Payloads de données pour mises à jour de contexte efficaces
+   - Debouncing et déduplication pour la stabilité
+   - Mises à jour de contexte spécifiques aux services pour la maintenabilité
 
-   - PascalCase for React components and TypeScript types
-   - camelCase for functions, variables, and files
-   - French terms for domain-specific concepts (e.g., "devis" for quote, "nettoyage" for cleaning)
-   - Descriptive, domain-specific naming
+2. **Pattern de Gestion de Formulaires**
+   - Indicateurs visuels pour les champs modifiés
+   - Validation côté client avant soumission
+   - Validation côté serveur dans les actions
+   - Mises à jour UI optimistes avec gestion d'erreur appropriée
 
-3. **State Management**
-   - React Context API for global and domain-specific state
-   - Service-specific providers (e.g., `NettoyageProvider.tsx`)
-   - Custom hooks for consuming and updating state
-   - Server Actions for data mutations
-   - localStorage for client-side persistence
+3. **Pattern de Calcul de Prix**
+   - Logique de calcul spécifique aux services
+   - État basé sur le contexte pour les entrées de prix
+   - Mises à jour temps réel sur les changements d'entrée
+   - Agrégation totale à travers les services
 
-## Project-Specific Patterns
+4. **Pattern de Module de Service**
+   - Chaque service a son propre :
+     - Fournisseur de contexte pour l'état
+     - Schéma pour la validation
+     - Fichiers d'actions pour les opérations serveur
+     - Composants UI pour la configuration
+     - Logique de calcul de total
 
-1. **Cache Invalidation Pattern**
+## Défis Connus
 
-   - Tag-based invalidation for targeted updates
-   - Data payloads for efficient context updates
-   - Debouncing and deduplication for stability
-   - Service-specific context updaters for maintainability
+1. **Cohérence du Cache**
+   - Conditions de course dans les mises à jour concurrentes
+   - Échecs réseau pendant l'invalidation de cache
+   - Synchronisation des onglets navigateur
+   - Gestion du mode hors ligne
 
-2. **Form Management Pattern**
+2. **Complexité de l'État**
+   - Objets d'état profondément imbriqués
+   - Interdépendances entre les services
+   - Performance avec de gros objets d'état
+   - Maintien de la cohérence à travers les réinitialisations
 
-   - Visual indicators for modified fields
-   - Client-side validation before submission
-   - Server-side validation in actions
-   - Optimistic UI updates with proper error handling
+3. **Internationalisation**
+   - S'assurer que tout le contenu est correctement traduit
+   - Gérer le formatage spécifique à la langue
+   - Gérer l'expansion de texte dans différentes langues
+   - Formatage des dates et devises
 
-3. **Price Calculation Pattern**
+4. **Optimisation de Performance**
+   - Minimiser les re-rendus avec les mises à jour de contexte
+   - Gestion efficace des grands états de formulaire
+   - Optimiser les calculs temps réel
+   - Réduire la taille du bundle avec le code splitting
 
-   - Service-specific calculation logic
-   - Context-based state for pricing inputs
-   - Real-time updates on input changes
-   - Total aggregation across services
+## Patterns d'Usage des Outils
 
-4. **Service Module Pattern**
-   - Each service has its own:
-     - Context provider for state
-     - Schema for validation
-     - Action files for server operations
-     - UI components for configuration
-     - Total calculation logic
+1. **Workflow de Développement**
+   - Serveur de développement Next.js pour le développement local
+   - TypeScript pour la vérification de types statique
+   - ESLint et Prettier pour la qualité du code
+   - pnpm pour la gestion des paquets
 
-## Known Challenges
+2. **Approche de Tests**
+   - Vitest pour les tests unitaires et de composants
+   - Testing Library pour les requêtes et assertions de composants
+   - Jest DOM pour les matchers d'éléments DOM étendus
+   - JSDOM pour la simulation d'environnement navigateur
+   - Tests de composants avec mocks centralisés
+   - Tests d'utilitaires avec cas de tests multiples
+   - Organisation des tests reflétant la structure du code source
+   - Patterns de mocks pour composants UI, navigation et internationalisation
 
-1. **Cache Consistency**
+3. **Techniques de Débogage**
+   - Logging console avec messages descriptifs
+   - React DevTools pour l'inspection de composants
+   - Monitoring réseau pour les événements Pusher
+   - Inspection localStorage pour la persistance d'état
 
-   - Race conditions in concurrent updates
-   - Network failures during cache invalidation
-   - Browser tab synchronization
-   - Offline mode handling
+## Évolution des Décisions du Projet
 
-2. **State Complexity**
+1. **Stratégie d'Invalidation de Cache**
+   - Approche initiale : Invalidation simple basée sur les tags
+   - Approche actuelle : Payload de données avec mises à jour de contexte ciblées
+   - Considération future : Filtrage d'événements et priorisation plus sophistiqués
 
-   - Deep nested state objects
-   - Interdependencies between services
-   - Performance with large state objects
-   - Maintaining consistency across resets
+2. **Gestion d'État**
+   - Approche initiale : Fournisseurs de contexte monolithiques
+   - Approche actuelle : Fournisseurs spécifiques aux services avec hooks personnalisés
+   - Considération future : Optimisation pour la performance avec de gros objets d'état
 
-3. **Internationalization**
+3. **Gestion de Formulaires**
+   - Approche initiale : Gestion de formulaires basique
+   - Approche actuelle : Validation sophistiquée avec feedback visuel
+   - Considération future : Génération de formulaires plus dynamique basée sur la configuration
 
-   - Ensuring all content is properly translated
-   - Handling language-specific formatting
-   - Managing text expansion in different languages
-   - Date and currency formatting
+4. **Calcul de Devis**
+   - Approche initiale : Formules simples
+   - Approche actuelle : Calculs complexes avec variables multiples
+   - Considération future : Optimisation pour performance et précision
 
-4. **Performance Optimization**
-   - Minimizing re-renders with context updates
-   - Efficient handling of large form state
-   - Optimizing real-time calculations
-   - Reducing bundle size with code splitting
-
-## Tool Usage Patterns
-
-1. **Development Workflow**
-
-   - Next.js development server for local development
-   - TypeScript for static type checking
-   - ESLint and Prettier for code quality
-   - pnpm for package management
-
-2. **Testing Approach**
-
-   - Vitest for unit and component testing
-   - Testing Library for component queries and assertions
-   - Jest DOM for extended DOM element matchers
-   - JSDOM for browser environment simulation
-   - Component testing with centralized mocks
-   - Utility testing with multiple test cases
-   - Test organization mirroring source code structure
-   - Mock patterns for UI components, navigation, and internationalization
-
-3. **Debugging Techniques**
-   - Console logging with descriptive messages
-   - React DevTools for component inspection
-   - Network monitoring for Pusher events
-   - localStorage inspection for state persistence
-
-## Evolution of Project Decisions
-
-1. **Cache Invalidation Strategy**
-
-   - Initial approach: Simple tag-based invalidation
-   - Current approach: Data payload with targeted context updates
-   - Future consideration: More sophisticated event filtering and prioritization
-
-2. **State Management**
-
-   - Initial approach: Monolithic context providers
-   - Current approach: Service-specific providers with custom hooks
-   - Future consideration: Optimizing for performance with large state objects
-
-3. **Form Management**
-
-   - Initial approach: Basic form handling
-   - Current approach: Sophisticated validation with visual feedback
-   - Future consideration: More dynamic form generation based on configuration
-
-4. **Quote Calculation**
-   - Initial approach: Simple formulas
-   - Current approach: Complex calculations with multiple variables
-   - Future consideration: Optimization for performance and accuracy
-
-This document will be updated as new patterns and preferences are discovered throughout the project.
+Ce document sera mis à jour au fur et à mesure que de nouveaux patterns et préférences sont découverts tout au long du projet.

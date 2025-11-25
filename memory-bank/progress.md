@@ -1,4 +1,4 @@
-# Progress: FM4ALL Service Quotation Platform
+# Progrès : Plateforme de Devis de Services FM4ALL
 
 ## Ce Qui Fonctionne
 
@@ -197,4 +197,4 @@ Au fur et à mesure de l'évolution du projet, plusieurs décisions clés ont fa
    - Séparation claire des préoccupations entre UI, état et actions
    - Structure de dossiers cohérente pour les requêtes de services
 
-This document will be updated as the project progresses and more features are implemented or issues are resolved.
+Ce document sera mis à jour au fur et à mesure de l'évolution du projet et de l'implémentation de nouvelles fonctionnalités ou de la résolution des problèmes.
