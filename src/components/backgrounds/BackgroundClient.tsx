@@ -7,7 +7,7 @@ const BackgroundClient = () => {
   return (
     <div className="absolute inset-0 -z-10">
       <Image
-        src={"/img/hero_wallpaper_compressed.webp"}
+        src={"/img/hero_background.webp"}
         alt={tGlobal(
           "une-image-de-bureaux-modernes-et-lumineux-avec-des-plantes-vertes",
         )}

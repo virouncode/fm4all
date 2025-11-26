@@ -4,6 +4,9 @@ import type { NextConfig } from "next/types";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  devIndicators: {
+    position: "bottom-right",
+  },
   transpilePackages: ["sanity"],
   images: {
     remotePatterns: [

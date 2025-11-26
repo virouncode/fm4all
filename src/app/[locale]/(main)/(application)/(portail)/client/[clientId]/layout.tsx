@@ -1,16 +1,28 @@
-import HeaderClient from "@/components/header/header-client";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { ReactNode } from "react";
+import ClientSidebar from "./ClientSidebar";
 
-const ClientLayout = ({
+export default async function ClientLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) => {
+  params,
+}: {
+  children: ReactNode;
+  params: Promise<{ clientId: string }>;
+}) {
+  const { clientId } = await params;
   return (
-    <>
-      <HeaderClient />
-      {children}
-    </>
-  );
-};
+    <SidebarProvider>
+      <div className="bg-background flex h-screen w-full overflow-hidden">
+        <ClientSidebar clientId={Number(clientId)} />
+        <main className="flex h-full flex-1 flex-col overflow-hidden">
+          {/* Header sticky */}
+          <header className="bg-background sticky top-0 z-10 border-b p-4">
+            <h1 className="text-xl font-semibold">Portail Client</h1>
+          </header>
 
-export default ClientLayout;
+          <div className="flex-1 overflow-y-auto p-6">{children}</div>
+        </main>
+      </div>
+    </SidebarProvider>
+  );
+}

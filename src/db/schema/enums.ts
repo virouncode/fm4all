@@ -1,0 +1,64 @@
+import { pgEnum } from "drizzle-orm/pg-core";
+
+export const statusEnum = pgEnum("status", ["active", "inactive"]);
+export const typeBatimentEnum = pgEnum("typebatiment", [
+  "bureaux",
+  "localCommercial",
+  "entrepot",
+  "cabinetMedical",
+]);
+export const gammeEnum = pgEnum("gamme", [
+  "essentiel",
+  "confort",
+  "excellence",
+]);
+export const typeHygieneEnum = pgEnum("typehygiene", [
+  "emp",
+  "poubelleEmp",
+  "savon",
+  "ph",
+  "desinfectant",
+  "parfum",
+  "balai",
+  "poubelle",
+]);
+export const typeOccupationEnum = pgEnum("typeoccupation", [
+  "partieEtage",
+  "plateauComplet",
+  "batimentEntier",
+]);
+export const possibiliteEnum = pgEnum("possibilite", [
+  "possible",
+  "non",
+  "obligatoire",
+]);
+export const typeMachineEnum = pgEnum("typemachine", [
+  "cafe",
+  "lait",
+  "chocolat",
+]);
+export const typeLaitEnum = pgEnum("typelait", ["dosettes", "frais", "poudre"]);
+export const typeChocolatEnum = pgEnum("typechocolat", ["sachets", "poudre"]);
+export const inclusEnum = pgEnum("inclus", [
+  "inclus",
+  "non inclus",
+  "non propose",
+  "sur demande",
+]);
+export const typePorteEnum = pgEnum("typeporte", ["vantaux", "coulissante"]);
+export const typeColonneEnum = pgEnum("typecolonne", ["statique", "dynamique"]);
+export const typeEau = pgEnum("typeeau", ["EF", "EC", "EG", "ECG"]);
+export const typePose = pgEnum("typepose", ["aposer", "colonne", "comptoir"]);
+export const roleEnum = pgEnum("role", ["admin", "fournisseur", "client"]);
+export const ticketStatusEnum = pgEnum("ticket_status", [
+  "nouveau",
+  "en_cours",
+  "a_valider",
+  "clos",
+]);
+export const ticketPrioriteEnum = pgEnum("ticket_priorite", [
+  "basse",
+  "normale",
+  "haute",
+  "critique",
+]);

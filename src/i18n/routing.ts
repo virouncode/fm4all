@@ -185,9 +185,106 @@ export const routing = defineRouting({
       fr: "/client/[clientId]",
       en: "/client/[clientId]",
     },
-    "/client/[clientId]/dashboard": {
-      fr: "/client/[clientId]/dashboard",
-      en: "/client/[clientId]/dashboard",
+
+    // ----- Tickets -----
+    "/client/[clientId]/tickets/nouveau-ticket": {
+      fr: "/client/[clientId]/tickets/nouveau-ticket",
+      en: "/client/[clientId]/tickets/nouveau-ticket",
+    },
+
+    "/client/[clientId]/tickets/tickets-en-cours": {
+      fr: "/client/[clientId]/tickets/tickets-en-cours",
+      en: "/client/[clientId]/tickets/tickets-en-cours",
+    },
+
+    "/client/[clientId]/tickets/tickets-a-valider": {
+      fr: "/client/[clientId]/tickets/tickets-a-valider",
+      en: "/client/[clientId]/tickets/tickets-a-valider",
+    },
+
+    // ----- Interventions -----
+    "/client/[clientId]/interventions/programmer-intervention": {
+      fr: "/client/[clientId]/interventions/programmer-intervention",
+      en: "/client/[clientId]/interventions/programmer-intervention",
+    },
+
+    "/client/[clientId]/interventions/mes-interventions": {
+      fr: "/client/[clientId]/interventions/mes-interventions",
+      en: "/client/[clientId]/interventions/mes-interventions",
+    },
+
+    "/client/[clientId]/interventions/rapports-intervention": {
+      fr: "/client/[clientId]/interventions/rapports-intervention",
+      en: "/client/[clientId]/interventions/rapports-intervention",
+    },
+
+    // ----- Devis -----
+    "/client/[clientId]/devis/nouveau-devis": {
+      fr: "/client/[clientId]/devis/nouveau-devis",
+      en: "/client/[clientId]/devis/nouveau-devis",
+    },
+
+    "/client/[clientId]/devis/devis-en-cours": {
+      fr: "/client/[clientId]/devis/devis-en-cours",
+      en: "/client/[clientId]/devis/devis-en-cours",
+    },
+
+    "/client/[clientId]/devis/devis-acceptes": {
+      fr: "/client/[clientId]/devis/devis-acceptes",
+      en: "/client/[clientId]/devis/devis-acceptes",
+    },
+
+    "/client/[clientId]/devis/historique-devis": {
+      fr: "/client/[clientId]/devis/historique-devis",
+      en: "/client/[clientId]/devis/historique-devis",
+    },
+
+    // ----- Contrats -----
+    "/client/[clientId]/contrats/mes-contrats": {
+      fr: "/client/[clientId]/contrats/mes-contrats",
+      en: "/client/[clientId]/contrats/mes-contrats",
+    },
+
+    "/client/[clientId]/contrats/depenses-et-factures": {
+      fr: "/client/[clientId]/contrats/depenses-et-factures",
+      en: "/client/[clientId]/contrats/depenses-et-factures",
+    },
+
+    "/client/[clientId]/contrats/forfaits": {
+      fr: "/client/[clientId]/contrats/forfaits",
+      en: "/client/[clientId]/contrats/forfaits",
+    },
+
+    // ----- Sites -----
+    "/client/[clientId]/sites/mes-sites": {
+      fr: "/client/[clientId]/sites/mes-sites",
+      en: "/client/[clientId]/sites/mes-sites",
+    },
+
+    "/client/[clientId]/sites/nouveau-site": {
+      fr: "/client/[clientId]/sites/nouveau-site",
+      en: "/client/[clientId]/sites/nouveau-site",
+    },
+
+    // ----- Compte -----
+    "/client/[clientId]/compte/mon-profil": {
+      fr: "/client/[clientId]/compte/mon-profil",
+      en: "/client/[clientId]/compte/mon-profil",
+    },
+
+    "/client/[clientId]/compte/mon-equipe": {
+      fr: "/client/[clientId]/compte/mon-equipe",
+      en: "/client/[clientId]/compte/mon-equipe",
+    },
+
+    "/client/[clientId]/compte/notifications": {
+      fr: "/client/[clientId]/compte/notifications",
+      en: "/client/[clientId]/compte/notifications",
+    },
+
+    "/client/[clientId]/compte/preferences": {
+      fr: "/client/[clientId]/compte/preferences",
+      en: "/client/[clientId]/compte/preferences",
     },
 
     //FOURNISSEURS
