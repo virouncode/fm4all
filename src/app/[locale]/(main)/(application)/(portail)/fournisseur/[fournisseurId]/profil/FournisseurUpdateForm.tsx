@@ -130,9 +130,6 @@ const FournisseurUpdateForm = ({
     if (!imagePreview && initialFournisseur.logoUrl) {
       try {
         const res = await deleteVercelBlob({ url: initialFournisseur.logoUrl });
-        if (!res.ok) {
-          throw new Error("Erreur lors de la suppression de l'image");
-        }
       } catch (error) {
         toast({
           variant: "destructive",
@@ -153,16 +150,14 @@ const FournisseurUpdateForm = ({
           const res = await deleteVercelBlob({
             url: initialFournisseur.logoUrl,
           });
-          if (!res.ok) {
-            throw new Error("Erreur lors de la suppression de l'image");
-          }
         }
-        imageUrl = await postVercelBlob({
+        const response = await postVercelBlob({
           // Je charge la nouvelle image
           file: image,
           filename: `logo_${data.nomFournisseur}`,
           foldername: "logos_fournisseurs",
         });
+        imageUrl = response.url;
       } catch (error) {
         toast({
           variant: "destructive",

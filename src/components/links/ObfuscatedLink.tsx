@@ -25,7 +25,7 @@ type ObfuscatedLinkProps = {
     | "/cgv"
     | "/cgu"
     | { pathname: "/admin/[adminId]/dashboard"; params: { adminId: string } }
-    | { pathname: "/client/[clientId]/dashboard"; params: { clientId: string } }
+    | { pathname: "/client/[clientId]"; params: { clientId: string } }
     | {
         pathname: "/fournisseur/[fournisseurId]/dashboard";
         params: { fournisseurId: string };
@@ -35,6 +35,7 @@ type ObfuscatedLinkProps = {
         pathname: "/services/[slug]";
         params: { slug: string };
       };
+
   children: React.ReactNode;
   className?: string;
 };
@@ -59,7 +60,7 @@ export function ObfuscatedLink({
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") handleClick();
       }}
-      className={`cursor-pointer hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${className}`}
+      className={`focus-visible:ring-primary cursor-pointer hover:underline focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none ${className}`}
       title={typeof children === "string" ? children : undefined}
       aria-label={typeof children === "string" ? children : undefined}
     >

@@ -67,7 +67,7 @@ export const fullReinitialisationDevis = (
   //Client
   setClient({
     nomEntreprise: "",
-    siret: null,
+    siret: "",
     prenomContact: "",
     nomContact: "",
     posteContact: "",

@@ -106,8 +106,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
         surfaceMax: tDevisErreurs("surface-maximum-3000-m"),
         effectif: tDevisErreurs("effectif-obligatoire"),
         effectifMax: tDevisErreurs("effectif-maximum-300-personnes"),
-        typeBatiment: tDevisErreurs("batiment"),
-        typeOccupation: tDevisErreurs("type-doccupation-invalide"),
+
         codePostal: tDevisErreurs("code-postal-invalide-entrez-5-chiffres"),
         ville: tDevisErreurs("ville-obligatoire"),
       }),
@@ -155,11 +154,12 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
           const blob = await responseBlob.blob();
           const file = new File([blob], nomDevis);
           //Dans vercel blob
-          const urlToPost: string = await postVercelBlob({
+          const response = await postVercelBlob({
             file,
             filename: nomDevis,
             foldername: "devis",
           });
+          const urlToPost = response.url;
           executeSaveDevis({
             clientId: newClientData.id,
             devisUrl: urlToPost,

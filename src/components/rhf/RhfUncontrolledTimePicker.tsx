@@ -5,6 +5,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  NativeSelect,
+  NativeSelectOption,
+} from "@/components/ui/native-select";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 import {
@@ -15,16 +19,15 @@ import {
   type Path,
   type PathValue,
 } from "react-hook-form";
-import { NativeSelect, NativeSelectOption } from "../native-select";
 
 const hours12 = Array.from({ length: 12 }, (_, i) =>
-  String(i + 1).padStart(2, "0")
+  String(i + 1).padStart(2, "0"),
 ); // 01..12
 const hours24 = Array.from({ length: 24 }, (_, i) =>
-  String(i).padStart(2, "0")
+  String(i).padStart(2, "0"),
 ); // 00..23
 const minutes = Array.from({ length: 12 }, (_, i) =>
-  String(i * 5).padStart(2, "0")
+  String(i * 5).padStart(2, "0"),
 ); // 00..55
 const periods = ["AM", "PM"] as const;
 
@@ -56,7 +59,7 @@ type RhfUncontrolledTimePickerProps<S extends FieldValues> = {
 
 function getErrorAtPath<S extends FieldValues>(
   errors: FieldErrors<S>,
-  path: string
+  path: string,
 ): FieldError | undefined {
   let cur: unknown = errors;
   for (const key of path.split(".")) {
@@ -139,7 +142,7 @@ export function RhfUncontrolledTimePicker<S extends FieldValues>({
         orientation === "horizontal"
           ? "flex flex-row items-center"
           : "flex flex-col",
-        className
+        className,
       )}
     >
       {/*================= LABEL ================= */}

@@ -83,27 +83,6 @@ export const createUpdateFournisseurSchema = (messages: {
         message: messages.noteGoogle,
       })
       .nullable(),
-    anneeCreation: z
-      .string()
-      .trim()
-      .refine((val) => !val || /^\d{4}$/.test(val), {
-        message: messages.anneeCreation,
-      })
-      .nullable(),
-    nbClients: z
-      .string()
-      .trim()
-      .refine((val) => !val || /^\d+$/.test(val), {
-        message: messages.nbClients,
-      })
-      .nullable(),
-    nbAvis: z
-      .string()
-      .trim()
-      .refine((val) => !val || /^\d+$/.test(val), {
-        message: messages.nbAvis,
-      })
-      .nullable(),
   });
 };
 

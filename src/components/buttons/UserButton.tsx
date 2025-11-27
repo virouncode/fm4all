@@ -100,7 +100,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
             ) : user?.role === "client" ? (
               <ObfuscatedLink
                 href={{
-                  pathname: "/client/[clientId]/dashboard",
+                  pathname: "/client/[clientId]",
                   params: { clientId: user.clientId?.toString() ?? "0" },
                 }}
                 className="cursor-default !text-base"

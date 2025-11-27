@@ -4,6 +4,7 @@ import {
   FormItem,
   FormLabel,
 } from "@/components/ui/form";
+import { NativeSelect } from "@/components/ui/native-select";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 import {
@@ -14,7 +15,6 @@ import {
   type FieldValues,
   type Path,
 } from "react-hook-form";
-import { NativeSelect } from "../native-select";
 
 type BaseProps = React.JSX.IntrinsicElements["select"];
 
@@ -51,7 +51,7 @@ function assignRef<T>(ref: React.Ref<T> | undefined, value: T | null) {
 //Le composant n'est pas contrôlé donc on doit lire nous mêmes les erreurs dans formState.errors, or les erreurs rhf sont imbriquées comme les données du formulaire
 function getErrorAtPath<S extends FieldValues>(
   errors: FieldErrors<S>,
-  path: Path<S>
+  path: Path<S>,
 ): FieldError | undefined {
   // Implémentation runtime simple : navigation par clés "a.b.0.c"
   let cur: unknown = errors as unknown;
@@ -113,7 +113,7 @@ export function RhfUncontrolledSelect<S extends FieldValues>({
         orientation === "horizontal"
           ? "flex flex-row items-center"
           : "flex flex-col",
-        className
+        className,
       )}
     >
       {/*======================== LABEL =======================*/}
@@ -160,7 +160,7 @@ export function RhfUncontrolledSelect<S extends FieldValues>({
 
       {/*======================== ERREUR DE VALIDATION =======================*/}
       {withError && (
-        <div id={errorId} className="min-h-[19px] text-sm text-destructive">
+        <div id={errorId} className="text-destructive min-h-[19px] text-sm">
           {errorMessage ?? null}
         </div>
       )}

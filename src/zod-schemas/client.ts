@@ -18,7 +18,7 @@ export type TypeOccupationType = z.infer<typeof typeOccupationSchema>;
 //SELECT
 export const selectClientSchema = createSelectSchema(clients, {
   nomEntreprise: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
-  siret: siretSchema("Siret invalide"),
+  siret: siretSchema("Siret invalide").nullable(),
   prenomContact: (schema) => schema.min(1, "Prénom du contact obligatoire"),
   nomContact: (schema) => schema.min(1, "Nom du contact obligatoire"),
   posteContact: (schema) => schema.min(1, "Poste du contact obligatoire"),
@@ -59,7 +59,7 @@ export const createInsertClientSchema = (messages: {
 }) => {
   return createInsertSchema(clients, {
     nomEntreprise: (schema) => schema.min(1, messages.nomEntreprise),
-    siret: siretSchema(messages.siret),
+    siret: siretSchema(messages.siret).nullable(),
     prenomContact: (schema) => schema.min(1, messages.prenomContact),
     nomContact: (schema) => schema.min(1, messages.nomContact),
     posteContact: (schema) => schema.min(1, messages.posteContact),
@@ -116,7 +116,7 @@ export const createUpdateClientSchema = (messages: {
 }) => {
   return createUpdateSchema(clients, {
     nomEntreprise: (schema) => schema.min(1, messages.nomEntreprise),
-    siret: siretSchema(messages.siret),
+    siret: siretSchema(messages.siret).nullable(),
     prenomContact: (schema) => schema.min(1, messages.prenomContact),
     nomContact: (schema) => schema.min(1, messages.nomContact),
     posteContact: (schema) => schema.min(1, messages.posteContact),

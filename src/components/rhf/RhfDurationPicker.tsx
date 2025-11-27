@@ -1,10 +1,3 @@
-import { cn } from "@/lib/utils";
-import {
-  useFormContext,
-  type FieldValues,
-  type Path,
-  type PathValue,
-} from "react-hook-form";
 import {
   FormControl,
   FormDescription,
@@ -12,20 +5,27 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../form";
+} from "@/components/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../select";
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import {
+  useFormContext,
+  type FieldValues,
+  type Path,
+  type PathValue,
+} from "react-hook-form";
 
 // 00..24 (24h autorisé -> minutes forcées à 00)
 const HOURS = Array.from({ length: 25 }, (_, i) => String(i).padStart(2, "0"));
 // 00..55 par pas de 5
 const MINUTES = Array.from({ length: 12 }, (_, i) =>
-  String(i * 5).padStart(2, "0")
+  String(i * 5).padStart(2, "0"),
 );
 
 type NumberFieldPath<S extends FieldValues> = {
@@ -121,7 +121,7 @@ export function RhfDurationPicker<S extends FieldValues>({
               orientation === "horizontal"
                 ? "flex flex-row items-center"
                 : "flex flex-col",
-              className
+              className,
             )}
           >
             {label && (
@@ -151,7 +151,7 @@ export function RhfDurationPicker<S extends FieldValues>({
                   >
                     <div className="flex w-full items-center justify-between">
                       <SelectValue placeholder="00" />
-                      <span className="ml-2 text-xs text-muted-foreground">
+                      <span className="text-muted-foreground ml-2 text-xs">
                         h
                       </span>
                     </div>
@@ -180,7 +180,7 @@ export function RhfDurationPicker<S extends FieldValues>({
                   >
                     <div className="flex w-full items-center justify-between">
                       <SelectValue placeholder="00" />
-                      <span className="ml-2 text-xs text-muted-foreground">
+                      <span className="text-muted-foreground ml-2 text-xs">
                         min
                       </span>
                     </div>

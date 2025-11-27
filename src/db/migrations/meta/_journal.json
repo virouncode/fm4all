@@ -995,6 +995,13 @@
       "when": 1764265150121,
       "tag": "0141_deep_spirit",
       "breakpoints": true
+    },
+    {
+      "idx": 142,
+      "version": "7",
+      "when": 1764281728462,
+      "tag": "0142_left_blazing_skull",
+      "breakpoints": true
     }
   ]
 }

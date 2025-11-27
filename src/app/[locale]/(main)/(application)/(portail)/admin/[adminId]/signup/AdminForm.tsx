@@ -81,11 +81,12 @@ const AdminForm = () => {
     let imageUrl: string | null = null;
     setLoading(true);
     if (image) {
-      imageUrl = await postVercelBlob({
+      const response = await postVercelBlob({
         file: image,
         filename: `${data.prenom}_${data.nom}_avatar`,
         foldername: "admin_avatars",
       });
+      imageUrl = response.url;
     }
     const adminToPost: InsertAdminType = {
       ...data,

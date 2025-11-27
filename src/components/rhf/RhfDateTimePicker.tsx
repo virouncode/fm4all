@@ -17,8 +17,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { TIMEZONE } from "@/constants/time";
 import { cn } from "@/lib/utils";
-import { TIMEZONE, toTimestampFromMidnight } from "@calvinemr/shared";
+import { toTimestampFromMidnight } from "@/lib/utils/formatDates";
 import { CalendarIcon } from "lucide-react";
 import { DateTime } from "luxon";
 import React, { useMemo, useState, type ComponentPropsWithoutRef } from "react";
@@ -40,13 +41,13 @@ type NumberFieldPath<S extends FieldValues> = {
 }[Path<S>];
 
 const hours12 = Array.from({ length: 12 }, (_, i) =>
-  String(i + 1).padStart(2, "0")
+  String(i + 1).padStart(2, "0"),
 ); // 01..12
 const hours24 = Array.from({ length: 24 }, (_, i) =>
-  String(i).padStart(2, "0")
+  String(i).padStart(2, "0"),
 ); // 00..23
 const minutes5 = Array.from({ length: 12 }, (_, i) =>
-  String(i * 5).padStart(2, "0")
+  String(i * 5).padStart(2, "0"),
 ); // 00..55
 const periods = ["AM", "PM"] as const;
 
@@ -127,7 +128,7 @@ export function RhfDateTimePicker<S extends FieldValues>({
         const ts = (field.value ?? undefined) as number | undefined;
         // décompose la valeur actuelle (ou now)
         const dt = (ts ? DateTime.fromMillis(ts) : DateTime.now()).setZone(
-          zone
+          zone,
         );
 
         const dateStartMs = dt.startOf("day").toMillis();
@@ -154,7 +155,7 @@ export function RhfDateTimePicker<S extends FieldValues>({
               month: picked.getMonth() + 1,
               day: picked.getDate(),
             },
-            { zone }
+            { zone },
           )
             .startOf("day")
             .toMillis();
@@ -201,7 +202,7 @@ export function RhfDateTimePicker<S extends FieldValues>({
               orientation === "horizontal"
                 ? "flex flex-row items-center"
                 : "flex flex-col",
-              className
+              className,
             )}
           >
             {label && (
@@ -215,7 +216,7 @@ export function RhfDateTimePicker<S extends FieldValues>({
               <div
                 className={cn(
                   "flex gap-1",
-                  orientation === "horizontal" && "items-center"
+                  orientation === "horizontal" && "items-center",
                 )}
               >
                 {/* ======= DATE PICKER ======= */}
@@ -228,7 +229,7 @@ export function RhfDateTimePicker<S extends FieldValues>({
                       {...buttonProps}
                       className={cn(
                         "w-48 justify-between font-normal",
-                        buttonClassName
+                        buttonClassName,
                       )}
                       aria-invalid={hasError || undefined}
                       aria-describedby={describedBy}
