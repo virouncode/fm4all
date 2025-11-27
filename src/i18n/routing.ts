@@ -197,6 +197,11 @@ export const routing = defineRouting({
       en: "/client/[clientId]/tickets/tickets-en-cours",
     },
 
+    "/client/[clientId]/tickets/action-requise": {
+      fr: "/client/[clientId]/tickets/action-requise",
+      en: "/client/[clientId]/tickets/action-requise",
+    },
+
     "/client/[clientId]/tickets/tickets-a-valider": {
       fr: "/client/[clientId]/tickets/tickets-a-valider",
       en: "/client/[clientId]/tickets/tickets-a-valider",

@@ -67,9 +67,7 @@ export default function NouveauTicketForm({
       ...data,
       fournisseurId: data.fournisseurId === 0 ? null : data.fournisseurId,
     };
-    // TODO: appeler la server action ici
     executeInsertTicket(payload);
-    //
   };
 
   const isSubmitDisabled = !isDirty || isSubmitting || isSavingTicket;
@@ -84,6 +82,7 @@ export default function NouveauTicketForm({
         clientId={clientId}
         sites={sites}
         fournisseurs={fournisseurs}
+        userRole="client"
       />
     </Form>
   );

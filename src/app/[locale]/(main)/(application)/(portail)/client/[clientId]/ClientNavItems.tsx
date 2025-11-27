@@ -150,6 +150,24 @@ export default function ClientNavItems() {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive("action-requise")}
+                  >
+                    <Link
+                      href={{
+                        pathname: "/client/[clientId]/tickets/action-requise",
+                        params: { clientId },
+                        query: {
+                          status: "en_attente_client",
+                        },
+                      }}
+                    >
+                      Action requise
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
 
                 {/* Tickets à valider */}
                 <SidebarMenuItem>

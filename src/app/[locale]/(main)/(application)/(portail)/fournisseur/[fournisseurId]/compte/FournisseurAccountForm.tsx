@@ -91,9 +91,9 @@ const FournisseurAccountForm = ({
     setLoading(true);
     const fournisseurToUpdate: UpdateFournisseurType = {
       ...data,
-      nbAvis: data.nbAvis ? parseInt(data.nbAvis) : null,
-      nbClients: data.nbClients ? parseInt(data.nbClients) : null,
-      anneeCreation: data.anneeCreation ? parseInt(data.anneeCreation) : null,
+      nbAvis: data.nbAvis ?? null,
+      nbClients: data.nbClients ?? null,
+      anneeCreation: data.anneeCreation ?? null,
     };
     executeUpdateFournisseur(fournisseurToUpdate);
     setLoading(false);

@@ -20,6 +20,7 @@ import {
   InsertTicketFormType,
   UpdateTicketFormType,
 } from "@/zod-schemas/ticket";
+import { UserRoleType } from "@/zod-schemas/user";
 import { useFieldArray, useFormContext } from "react-hook-form";
 
 type TicketFormProps<TFormValues> = {
@@ -30,6 +31,7 @@ type TicketFormProps<TFormValues> = {
   clientId: number;
   sites: SelectSiteType[];
   fournisseurs: SelectFournisseurType[];
+  userRole: UserRoleType;
 };
 
 type TicketFormValues = InsertTicketFormType | UpdateTicketFormType;
@@ -42,6 +44,7 @@ const TicketForm = <TFormValues,>({
   clientId,
   sites,
   fournisseurs,
+  userRole,
 }: TicketFormProps<TFormValues>) => {
   const form = useFormContext<TicketFormValues>();
   const { control, watch } = form;
@@ -96,20 +99,39 @@ const TicketForm = <TFormValues,>({
             </RhfControlledSelect>
           </div>
 
+          {userRole === "admin" && (
+            <div className="grid gap-4 md:grid-cols-2 md:gap-14">
+              <RhfControlledSelect<TicketFormValues>
+                name="priorite"
+                label="Priorité"
+                requiredMark
+                className="w-full md:col-span-1"
+                selectClassName="w-full"
+              >
+                {ticketPrioriteCT.map((priorite) => (
+                  <SelectItem key={priorite.code} value={priorite.code}>
+                    {priorite.name}
+                  </SelectItem>
+                ))}
+              </RhfControlledSelect>
+              {mode === "edit" && (
+                <RhfControlledSelect<TicketFormValues>
+                  name="status"
+                  label="État"
+                  requiredMark
+                  className="w-full md:col-span-1"
+                  selectClassName="w-full"
+                >
+                  {ticketStatusCT.map((status) => (
+                    <SelectItem key={status.code} value={status.code}>
+                      {status.name}
+                    </SelectItem>
+                  ))}
+                </RhfControlledSelect>
+              )}
+            </div>
+          )}
           <div className="grid gap-4 md:grid-cols-2 md:gap-14">
-            <RhfControlledSelect<TicketFormValues>
-              name="priorite"
-              label="Priorité"
-              requiredMark
-              className="w-full md:col-span-1"
-              selectClassName="w-full"
-            >
-              {ticketPrioriteCT.map((priorite) => (
-                <SelectItem key={priorite.code} value={priorite.code}>
-                  {priorite.name}
-                </SelectItem>
-              ))}
-            </RhfControlledSelect>
             <RhfControlledSelect<TicketFormValues>
               name="siteId"
               label="Site"
@@ -124,8 +146,6 @@ const TicketForm = <TFormValues,>({
                 </SelectItem>
               ))}
             </RhfControlledSelect>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2 md:gap-14">
             <RhfControlledSelect<TicketFormValues>
               name="fournisseurId"
               label="Fournisseur"
@@ -144,21 +164,6 @@ const TicketForm = <TFormValues,>({
                 </SelectItem>
               ))}
             </RhfControlledSelect>
-            {mode === "edit" && (
-              <RhfControlledSelect<TicketFormValues>
-                name="status"
-                label="État"
-                requiredMark
-                className="w-full md:col-span-1"
-                selectClassName="w-full"
-              >
-                {ticketStatusCT.map((status) => (
-                  <SelectItem key={status.code} value={status.code}>
-                    {status.name}
-                  </SelectItem>
-                ))}
-              </RhfControlledSelect>
-            )}
           </div>
 
           {/* Description */}

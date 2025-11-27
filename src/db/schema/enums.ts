@@ -2,6 +2,7 @@ import {
   ticketCategorieCodes,
   ticketPrioriteCodes,
   ticketStatusCodes,
+  userRoleCodes,
 } from "@/constants/codeTables";
 import { pgEnum } from "drizzle-orm/pg-core";
 
@@ -54,7 +55,7 @@ export const typePorteEnum = pgEnum("typeporte", ["vantaux", "coulissante"]);
 export const typeColonneEnum = pgEnum("typecolonne", ["statique", "dynamique"]);
 export const typeEau = pgEnum("typeeau", ["EF", "EC", "EG", "ECG"]);
 export const typePose = pgEnum("typepose", ["aposer", "colonne", "comptoir"]);
-export const roleEnum = pgEnum("role", ["admin", "fournisseur", "client"]);
+export const roleEnum = pgEnum("role", userRoleCodes);
 export const ticketStatusEnum = pgEnum("ticket_status", ticketStatusCodes);
 export const ticketPrioriteEnum = pgEnum(
   "ticket_priorite",

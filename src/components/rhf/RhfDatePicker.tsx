@@ -146,7 +146,7 @@ export function RhfDatePicker<S extends FieldValues>(
           fromDate ?? // si min est défini, on ouvre sur lui
           new Date();
 
-        const buttonLabel = dt?.toFormat("yyyy-LL-dd") ?? "Pick a date";
+        const buttonLabel = dt?.toFormat("yyyy-LL-dd") ?? "Choisr une date";
 
         return (
           <FormItem

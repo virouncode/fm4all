@@ -122,3 +122,63 @@ export const updateFournisseurSchema = createUpdateFournisseurSchema({
 });
 
 export type UpdateFournisseurType = z.infer<typeof updateFournisseurSchema>;
+
+export const createUpdateFournisseurFormSchema = (messages: {
+  nomFournisseur: string;
+  siret: string;
+  prenomContact: string;
+  nomContact: string;
+  emailContact: string;
+  phoneContact: string;
+}) => {
+  return createUpdateSchema(fournisseurs, {
+    nomFournisseur: (schema) => schema.min(1, messages.nomFournisseur),
+    siret: siretSchema(messages.siret),
+    prenomContact: (schema) => schema.min(1, messages.prenomContact),
+    nomContact: (schema) => schema.min(1, messages.nomContact),
+    emailContact: (schema) => schema.email(messages.emailContact),
+    phoneContact: phoneNumberSchema(messages.phoneContact),
+    noteGoogle: (schema) =>
+      schema
+        .refine((value) => !value || value.match(/^\d+([.,]\d+)?$/), {
+          message: "Note Google invalide",
+        })
+        .nullable(),
+  }).extend({
+    noteGoogle: z
+      .string()
+      .refine((value) => !value || value.match(/^\d+([.,]\d+)?$/), {
+        message: "Note Google invalide",
+      })
+      .nullable(),
+    anneeCreation: z
+      .string()
+      .refine((value) => !value || value.match(/^\d{4}$/), {
+        message: "Année de création invalide",
+      })
+      .nullable(),
+    nbClients: z
+      .string()
+      .refine((value) => !value || value.match(/^\d+$/), {
+        message: "Nombre de clients invalide",
+      })
+      .nullable(),
+    nbAvis: z
+      .string()
+      .refine((value) => !value || value.match(/^\d+$/), {
+        message: "Nombre d'avis invalide",
+      })
+      .nullable(),
+  });
+};
+export const updateFournisseurFormSchema = createUpdateFournisseurFormSchema({
+  nomFournisseur: "Nom de l'entreprise obligatoire",
+  siret: "Siret invalide",
+  prenomContact: "Prénom du contact obligatoire",
+  nomContact: "Nom du contact obligatoire",
+  emailContact: "Email du contact invalide",
+  phoneContact: "Numéro de téléphone invalide",
+});
+
+export type UpdateFournisseurFormType =
+  typeof updateFournisseurFormSchema._type;

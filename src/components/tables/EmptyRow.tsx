@@ -8,7 +8,7 @@ const EmptyRow = ({ colSpan }: EmptyRowProps) => {
   return (
     <TableRow>
       <TableCell colSpan={colSpan} className="text-gray-500">
-        No data available.
+        Pas de résultats à afficher.
       </TableCell>
     </TableRow>
   );

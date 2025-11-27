@@ -97,9 +97,6 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
     if (!imagePreview && info.image) {
       try {
         const res = await deleteVercelBlob({ url: info.image });
-        if (!res.ok) {
-          throw new Error("Erreur lors de la suppression de l'image");
-        }
       } catch (error) {
         toast({
           variant: "destructive",
@@ -116,11 +113,7 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
       try {
         if (info.image) {
           const res = await deleteVercelBlob({ url: info.image });
-          if (!res.ok) {
-            throw new Error("Erreur lors de la suppression de l'image");
-          }
         }
-
         imageUrl = await postVercelBlob({
           file: image,
           filename: `${data.prenom}_${data.nom}_avatar`,

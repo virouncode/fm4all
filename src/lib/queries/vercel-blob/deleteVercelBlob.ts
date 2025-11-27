@@ -3,7 +3,6 @@ import {
   VercelBlobDeleteResponse,
 } from "@/zod-schemas/vercelBlob";
 
-// lib/deleteVercelBlob.ts
 export const deleteVercelBlob = async ({
   url,
 }: {

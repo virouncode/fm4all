@@ -1,8 +1,12 @@
 export const ticketStatusCT = [
   { code: "nouveau", name: "Nouveau" },
-  { code: "en_cours", name: "En cours" },
+  { code: "pris_en_charge", name: "Pris en charge" },
+  { code: "en_attent_fournisseur", name: "En attente fournisseur" },
+  { code: "en_attente_client", name: "En attente client" },
   { code: "a_valider", name: "À valider" },
   { code: "clos", name: "Clos" },
+  { code: "annule", name: "Annulé" },
+  { code: "rejete", name: "Rejeté / Hors périmètre" },
 ] as const;
 
 export const ticketStatusCodes = ticketStatusCT.map(
@@ -46,6 +50,17 @@ export const ticketCategorieCodes = ticketCategorieCT.map(
 ) as unknown as [
   (typeof ticketCategorieCT)[number]["code"],
   ...(typeof ticketCategorieCT)[number]["code"][],
+];
+
+export const userRoleCT = [
+  { code: "admin", name: "Administrateur" },
+  { code: "fournisseur", name: "Fournisseur" },
+  { code: "client", name: "Client" },
+] as const;
+
+export const userRoleCodes = userRoleCT.map((i) => i.code) as unknown as [
+  (typeof userRoleCT)[number]["code"],
+  ...(typeof userRoleCT)[number]["code"][],
 ];
 
 export const toCodeTableName = (

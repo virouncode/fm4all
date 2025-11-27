@@ -1,10 +1,13 @@
-import { user } from "@/db/schema";
+import { roleEnum, user } from "@/db/schema";
 import {
   createInsertSchema,
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-zod";
 import { z } from "zod";
+
+export const userRoleSchema = z.enum(roleEnum.enumValues);
+export type UserRoleType = z.infer<typeof userRoleSchema>;
 
 //SELECT
 export const selectUserSchema = createSelectSchema(user, {
