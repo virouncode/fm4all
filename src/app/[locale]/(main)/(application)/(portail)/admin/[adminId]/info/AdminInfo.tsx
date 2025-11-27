@@ -114,11 +114,12 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
         if (info.image) {
           const res = await deleteVercelBlob({ url: info.image });
         }
-        imageUrl = await postVercelBlob({
+        const response = await postVercelBlob({
           file: image,
           filename: `${data.prenom}_${data.nom}_avatar`,
           foldername: "admin_avatars",
         });
+        imageUrl = response.url;
       } catch (error) {
         toast({
           variant: "destructive",
