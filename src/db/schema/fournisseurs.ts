@@ -1,11 +1,4 @@
-import {
-  date,
-  index,
-  integer,
-  pgTable,
-  serial,
-  varchar,
-} from "drizzle-orm/pg-core";
+import { date, index, pgTable, serial, varchar } from "drizzle-orm/pg-core";
 import { createdAt, updatedAt } from "../schema-helper";
 import { statusEnum } from "./enums";
 
@@ -25,12 +18,12 @@ export const fournisseurs = pgTable(
     presentation: varchar(),
     logoUrl: varchar("logo_url"),
     locationUrl: varchar("location_url"),
-    anneeCreation: integer("annee_creation"),
+    anneeCreation: varchar("annee_creation"),
     ca: varchar(),
     effectif: varchar(),
-    nbClients: integer("nb_clients"),
+    nbClients: varchar("nb_clients"),
     noteGoogle: varchar("note_google"),
-    nbAvis: integer("nb_avis"),
+    nbAvis: varchar("nb_avis"),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
