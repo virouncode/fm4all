@@ -1,0 +1,90 @@
+"use client";
+
+import { updateTicketAction } from "@/actions/ticketsActions";
+import { Form } from "@/components/ui/form";
+import { toast } from "@/hooks/use-toast";
+import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
+import { SelectSiteType } from "@/zod-schemas/site";
+import {
+  insertTicketFormSchema,
+  InsertTicketFormType,
+  UpdateTicketFormType,
+} from "@/zod-schemas/ticket";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useAction } from "next-safe-action/hooks";
+import { useForm } from "react-hook-form";
+import TicketForm from "../nouveau-ticket/TicketForm";
+
+type UpdateTicketFormProps = {
+  defaultValues: UpdateTicketFormType;
+  clientId: number;
+  sites: SelectSiteType[];
+  fournisseurs: SelectFournisseurType[];
+};
+
+export default function UpdateTicketForm({
+  defaultValues,
+  clientId,
+  sites,
+  fournisseurs,
+}: UpdateTicketFormProps) {
+  const form = useForm<InsertTicketFormType>({
+    defaultValues,
+    mode: "onTouched",
+    resolver: zodResolver(insertTicketFormSchema),
+  });
+
+  const {
+    formState: { isDirty, isSubmitting },
+  } = form;
+
+  const { execute: executeUpdateTicket, isPending: isSavingTicket } = useAction(
+    updateTicketAction,
+    {
+      onSuccess: ({ data }) => {
+        toast({
+          variant: "default",
+          title: "Succès",
+          description: data.message,
+        });
+      },
+      onError: ({ error }) => {
+        const message =
+          (typeof error.serverError === "string" && error.serverError) ||
+          "Impossible de créer le ticket, veuillez réessayer.";
+
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: message,
+        });
+      },
+    },
+  );
+
+  const submitForm = (data: InsertTicketFormType) => {
+    const payload = {
+      ...data,
+      fournisseurId: data.fournisseurId === 0 ? null : data.fournisseurId,
+    };
+    // TODO: appeler la server action ici
+    executeUpdateTicket(payload);
+    //
+  };
+
+  const isSubmitDisabled = !isDirty || isSubmitting || isSavingTicket;
+
+  return (
+    <Form {...form}>
+      <TicketForm<UpdateTicketFormType>
+        mode="edit"
+        onSubmit={form.handleSubmit(submitForm)}
+        isSubmitting={isSubmitting}
+        isSubmitDisabled={isSubmitDisabled}
+        clientId={clientId}
+        sites={sites}
+        fournisseurs={fournisseurs}
+      />
+    </Form>
+  );
+}

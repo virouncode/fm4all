@@ -1,47 +1,40 @@
-import { clients } from "@/db/schema";
+import { clients, typeBatimentEnum, typeOccupationEnum } from "@/db/schema";
 import {
   createInsertSchema,
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-zod";
 import { z } from "zod";
-import { isValidSIRET } from "../lib/utils/isValidSIRET";
+import { codePostalSchema } from "./codePostal";
+import { phoneNumberSchema } from "./phone";
+import { siretSchema } from "./siret";
+
+export const typeBatimentSchema = z.enum(typeBatimentEnum.enumValues);
+export type TypeBatimentType = z.infer<typeof typeBatimentSchema>;
+
+export const typeOccupationSchema = z.enum(typeOccupationEnum.enumValues);
+export type TypeOccupationType = z.infer<typeof typeOccupationSchema>;
 
 //SELECT
 export const selectClientSchema = createSelectSchema(clients, {
   nomEntreprise: (schema) => schema.min(1, "Nom de l'entreprise obligatoire"),
-  siret: (schema) =>
-    schema.refine((value) => !value || isValidSIRET(value), {
-      message: "Siret invalide",
-    }),
+  siret: siretSchema("Siret invalide"),
   prenomContact: (schema) => schema.min(1, "Prénom du contact obligatoire"),
   nomContact: (schema) => schema.min(1, "Nom du contact obligatoire"),
   posteContact: (schema) => schema.min(1, "Poste du contact obligatoire"),
   emailContact: (schema) => schema.email("Adresse email invalide"),
-  phoneContact: (schema) =>
-    schema.regex(
-      /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{2,4}([-.\s]?\d{2,4}){2,3}$/,
-      "Numéro de téléphone invalide",
-    ),
+  phoneContact: phoneNumberSchema("Numéro de téléphone invalide"),
   emailSignataire: (schema) =>
-    schema.email("Adresse email invalide").or(z.literal("")).nullable(),
+    schema.email("Adresse email invalide").nullable(),
   surface: (schema) =>
     schema.min(1, "Surface obligatoire").max(3000, "Surface maximum 3000 m²"),
   effectif: (schema) =>
     schema
       .min(1, "Effectif obligatoire")
       .max(300, "Effectif maximum 300 personnes"),
-  typeBatiment: z.enum(
-    ["bureaux", "localCommercial", "entrepot", "cabinetMedical"],
-    { message: "Type de batiment invalide" },
-  ),
-  typeOccupation: z.enum(["partieEtage", "plateauComplet", "batimentEntier"], {
-    message: "Type d'occupation invalide",
-  }),
-  codePostal: (schema) =>
-    schema.refine((value) => /^\d{5}$/.test(value), {
-      message: "Code postal invalide, entrez 5 chiffres",
-    }),
+  typeBatiment: typeBatimentSchema,
+  typeOccupation: typeOccupationSchema,
+  codePostal: codePostalSchema,
   ville: (schema) => schema.min(1, "Ville obligatoire"),
 });
 
@@ -61,46 +54,26 @@ export const createInsertClientSchema = (messages: {
   surfaceMax: string;
   effectif: string;
   effectifMax: string;
-  typeBatiment: string;
-  typeOccupation: string;
   codePostal: string;
   ville: string;
 }) => {
   return createInsertSchema(clients, {
     nomEntreprise: (schema) => schema.min(1, messages.nomEntreprise),
-    siret: (schema) =>
-      schema.refine((value) => !value || isValidSIRET(value), {
-        message: messages.siret,
-      }),
+    siret: siretSchema(messages.siret),
     prenomContact: (schema) => schema.min(1, messages.prenomContact),
     nomContact: (schema) => schema.min(1, messages.nomContact),
     posteContact: (schema) => schema.min(1, messages.posteContact),
     emailContact: (schema) => schema.email(messages.emailContact),
-    phoneContact: (schema) =>
-      schema.regex(
-        /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{2,4}([-.\s]?\d{2,4}){2,3}$/,
-        messages.phoneContact,
-      ),
+    phoneContact: phoneNumberSchema(messages.phoneContact),
     emailSignataire: (schema) =>
-      schema.email(messages.emailContact).or(z.literal("")).nullable(),
+      schema.email(messages.emailSignataire).nullable(),
     surface: (schema) =>
       schema.min(1, messages.surface).max(3000, messages.surfaceMax),
     effectif: (schema) =>
       schema.min(1, messages.effectif).max(300, messages.effectifMax),
-    typeBatiment: z.enum(
-      ["bureaux", "localCommercial", "entrepot", "cabinetMedical"],
-      { message: messages.typeBatiment },
-    ),
-    typeOccupation: z.enum(
-      ["partieEtage", "plateauComplet", "batimentEntier"],
-      {
-        message: messages.typeOccupation,
-      },
-    ),
-    codePostal: (schema) =>
-      schema.refine((value) => /^\d{5}$/.test(value), {
-        message: messages.codePostal,
-      }),
+    typeBatiment: typeBatimentSchema,
+    typeOccupation: typeOccupationSchema,
+    codePostal: codePostalSchema,
     ville: (schema) => schema.min(1, messages.ville),
   });
 };
@@ -118,8 +91,6 @@ export const insertClientSchema = createInsertClientSchema({
   surfaceMax: "Surface maximum 3000 m²",
   effectif: "Effectif obligatoire",
   effectifMax: "Effectif maximum 300 personnes",
-  typeBatiment: "Type de batiment invalide",
-  typeOccupation: "Type d'occupation invalide",
   codePostal: "Code postal invalide, entrez 5 chiffres",
   ville: "Ville obligatoire",
 });
@@ -140,46 +111,26 @@ export const createUpdateClientSchema = (messages: {
   surfaceMax: string;
   effectif: string;
   effectifMax: string;
-  typeBatiment: string;
-  typeOccupation: string;
   codePostal: string;
   ville: string;
 }) => {
   return createUpdateSchema(clients, {
     nomEntreprise: (schema) => schema.min(1, messages.nomEntreprise),
-    siret: (schema) =>
-      schema.refine((value) => !value || isValidSIRET(value), {
-        message: messages.siret,
-      }),
+    siret: siretSchema(messages.siret),
     prenomContact: (schema) => schema.min(1, messages.prenomContact),
     nomContact: (schema) => schema.min(1, messages.nomContact),
     posteContact: (schema) => schema.min(1, messages.posteContact),
     emailContact: (schema) => schema.email(messages.emailContact),
-    phoneContact: (schema) =>
-      schema.regex(
-        /^(?:\+|00)?\d{1,4}[-.\s]?(?:\(?\d{1,4}\)?[-.\s]?)?\d{2,4}([-.\s]?\d{2,4}){2,3}$/,
-        messages.phoneContact,
-      ),
+    phoneContact: phoneNumberSchema(messages.phoneContact),
     emailSignataire: (schema) =>
-      schema.email(messages.emailContact).or(z.literal("")),
+      schema.email(messages.emailSignataire).nullable(),
     surface: (schema) =>
       schema.min(1, messages.surface).max(3000, messages.surfaceMax),
     effectif: (schema) =>
       schema.min(1, messages.effectif).max(300, messages.effectifMax),
-    typeBatiment: z.enum(
-      ["bureaux", "localCommercial", "entrepot", "cabinetMedical"],
-      { message: messages.typeBatiment },
-    ),
-    typeOccupation: z.enum(
-      ["partieEtage", "plateauComplet", "batimentEntier"],
-      {
-        message: messages.typeOccupation,
-      },
-    ),
-    codePostal: (schema) =>
-      schema.refine((value) => /^\d{5}$/.test(value), {
-        message: messages.codePostal,
-      }),
+    typeBatiment: typeBatimentSchema,
+    typeOccupation: typeOccupationSchema,
+    codePostal: codePostalSchema,
     ville: (schema) => schema.min(1, messages.ville),
   });
 };
@@ -197,8 +148,6 @@ export const updateClientSchema = createUpdateClientSchema({
   surfaceMax: "Surface maximum 3000 m²",
   effectif: "Effectif obligatoire",
   effectifMax: "Effectif maximum 300 personnes",
-  typeBatiment: "Type de batiment invalide",
-  typeOccupation: "Type d'occupation invalide",
   codePostal: "Code postal invalide, entrez 5 chiffres",
   ville: "Ville obligatoire",
 });
@@ -222,17 +171,9 @@ export const createMesLocauxSchema = (messages: {
       .number()
       .min(1, messages.effectif)
       .max(300, messages.effectif),
-    typeBatiment: z.enum(
-      ["bureaux", "localCommercial", "entrepot", "cabinetMedical"],
-      { message: messages.batiment },
-    ),
-    typeOccupation: z.enum(
-      ["partieEtage", "plateauComplet", "batimentEntier"],
-      { message: messages.occupation },
-    ),
-    codePostal: z.string().refine((value) => /^\d{5}$/.test(value), {
-      message: messages.codePostal,
-    }),
+    typeBatiment: typeBatimentSchema,
+    typeOccupation: typeOccupationSchema,
+    codePostal: codePostalSchema,
   });
 };
 

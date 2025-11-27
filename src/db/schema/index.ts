@@ -1,13 +1,10 @@
 import { relations } from "drizzle-orm";
-
-// Import all enums
-export * from "./enums";
-
-// Import all tables
 export * from "./auth";
 export * from "./cafe";
+export * from "./clientFournisseurs";
 export * from "./clients";
 export * from "./devis";
+export * from "./enums";
 export * from "./fontaines";
 export * from "./food";
 export * from "./fournisseurs";
@@ -19,6 +16,7 @@ export * from "./office-manager";
 export * from "./services";
 export * from "./services-fm4all";
 export * from "./sites";
+export * from "./tickets";
 
 // Import tables for relations
 import { user } from "./auth";
@@ -31,6 +29,7 @@ import {
   sucreConsoTarifs,
   theConsoTarifs,
 } from "./cafe";
+import { clientFournisseurs } from "./clientFournisseurs";
 import { clients } from "./clients";
 import { devis, devisTemporaires } from "./devis";
 import { fontaines, fontainesTarifs } from "./fontaines";
@@ -69,7 +68,8 @@ import {
 } from "./nettoyage";
 import { officeManagerTarifs } from "./office-manager";
 import { services, servicesFournisseurs } from "./services";
-import { clientFournisseurs, sites, tickets } from "./sites";
+import { sites } from "./sites";
+import { tickets } from "./tickets";
 
 // Relations
 export const clientsRelations = relations(clients, ({ many }) => ({
@@ -485,7 +485,7 @@ export const ticketsRelations = relations(tickets, ({ one }) => ({
     references: [fournisseurs.id],
   }),
   createdBy: one(user, {
-    fields: [tickets.createdByUserId],
+    fields: [tickets.createdById],
     references: [user.id],
   }),
 }));

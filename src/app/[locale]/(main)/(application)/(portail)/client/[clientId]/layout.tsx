@@ -10,6 +10,7 @@ export default async function ClientLayout({
   params: Promise<{ clientId: string }>;
 }) {
   const { clientId } = await params;
+
   return (
     <SidebarProvider>
       <div className="bg-background flex h-screen w-full overflow-hidden">
@@ -20,7 +21,7 @@ export default async function ClientLayout({
             <h1 className="text-xl font-semibold">Portail Client</h1>
           </header>
 
-          <div className="flex-1 overflow-y-auto p-6">{children}</div>
+          <div className="flex-1 overflow-y-auto">{children}</div>
         </main>
       </div>
     </SidebarProvider>

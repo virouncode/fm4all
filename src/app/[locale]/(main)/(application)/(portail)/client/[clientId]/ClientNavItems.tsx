@@ -162,6 +162,9 @@ export default function ClientNavItems() {
                         pathname:
                           "/client/[clientId]/tickets/tickets-a-valider",
                         params: { clientId },
+                        query: {
+                          status: "a_valider",
+                        },
                       }}
                     >
                       Tickets à valider

@@ -32,8 +32,8 @@ export const insertUserAction = actionClient
       if (currentUser?.role !== "admin") {
         throw new Error(
           locale === "fr"
-            ? "Vous n'avez pas les droits pour créer un compte fournisseur."
-            : "You do not have permission to create a provider account.",
+            ? "Vous n'avez pas les droits pour créer un compte utilisateur."
+            : "You do not have permission to create a user account.",
         );
       }
       const existingEmail = await db
@@ -79,7 +79,7 @@ export const updateUserAction = actionClient
   .metadata({
     actionName: "updateUserAction",
   })
-  .schema(updateUserSchema, {
+  .inputSchema(updateUserSchema, {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
   })

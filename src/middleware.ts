@@ -145,12 +145,12 @@ export async function middleware(req: NextRequest) {
   // ============================================================================
   // 0. TEMP : désactiver la protection pour /client
   // ============================================================================
-  if (pathnameWithoutLocale.startsWith("/client")) {
-    log("TEMP: bypass auth pour /client");
-    // on laisse juste next-intl gérer la locale
-    if (!locale) return intlMiddleware(req);
-    return intlMiddleware(req);
-  }
+  // if (pathnameWithoutLocale.startsWith("/client")) {
+  //   log("TEMP: bypass auth pour /client");
+  //   // on laisse juste next-intl gérer la locale
+  //   if (!locale) return intlMiddleware(req);
+  //   return intlMiddleware(req);
+  // }
   // ============================================================================
   // 1. Redirections SEO / legacy
   // ============================================================================

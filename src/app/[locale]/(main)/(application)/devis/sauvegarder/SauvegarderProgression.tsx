@@ -68,8 +68,6 @@ const SauvegarderProgression = () => {
         surfaceMax: tSauverErreurs("surface-maximum-3000-m"),
         effectif: tSauverErreurs("effectif-obligatoire"),
         effectifMax: tSauverErreurs("effectif-maximum-300-personnes"),
-        typeBatiment: tSauverErreurs("batiment"),
-        typeOccupation: tSauverErreurs("type-doccupation-invalide"),
         codePostal: tSauverErreurs("code-postal-invalide-entrez-5-chiffres"),
         ville: tSauverErreurs("ville-obligatoire"),
       }),

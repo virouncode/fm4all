@@ -1,3 +1,8 @@
+import {
+  ticketCategorieCodes,
+  ticketPrioriteCodes,
+  ticketStatusCodes,
+} from "@/constants/codeTables";
 import { pgEnum } from "drizzle-orm/pg-core";
 
 export const statusEnum = pgEnum("status", ["active", "inactive"]);
@@ -50,15 +55,12 @@ export const typeColonneEnum = pgEnum("typecolonne", ["statique", "dynamique"]);
 export const typeEau = pgEnum("typeeau", ["EF", "EC", "EG", "ECG"]);
 export const typePose = pgEnum("typepose", ["aposer", "colonne", "comptoir"]);
 export const roleEnum = pgEnum("role", ["admin", "fournisseur", "client"]);
-export const ticketStatusEnum = pgEnum("ticket_status", [
-  "nouveau",
-  "en_cours",
-  "a_valider",
-  "clos",
-]);
-export const ticketPrioriteEnum = pgEnum("ticket_priorite", [
-  "basse",
-  "normale",
-  "haute",
-  "critique",
-]);
+export const ticketStatusEnum = pgEnum("ticket_status", ticketStatusCodes);
+export const ticketPrioriteEnum = pgEnum(
+  "ticket_priorite",
+  ticketPrioriteCodes,
+);
+export const ticketCategorieEnum = pgEnum(
+  "ticket_categorie",
+  ticketCategorieCodes,
+);
