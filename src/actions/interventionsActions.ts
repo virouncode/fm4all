@@ -165,11 +165,13 @@ export const updateInterventionAction = actionClient
     const newFinDate = parsedInput.dateFinPrevue;
 
     const debutHasChanged =
-      typeof newDebutDate !== "undefined" &&
+      newDebutDate &&
+      oldDebutDate &&
       new Date(newDebutDate).getTime() !== new Date(oldDebutDate).getTime();
 
     const finHasChanged =
-      typeof newFinDate !== "undefined" &&
+      newFinDate &&
+      oldFinDate &&
       new Date(newFinDate).getTime() !== new Date(oldFinDate).getTime();
 
     const datesHaveChanged = debutHasChanged || finHasChanged;
