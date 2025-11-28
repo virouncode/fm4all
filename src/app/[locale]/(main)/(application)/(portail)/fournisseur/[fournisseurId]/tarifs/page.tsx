@@ -11,7 +11,7 @@ const page = async ({
   const { fournisseurId } = await params;
   const services = await getServicesForFournisseur(parseInt(fournisseurId));
   return (
-    <main className="mx-auto mb-24 max-w-7xl flex-1 hyphens-auto px-6 py-4 md:px-6">
+    <main className="mx-auto mb-24 max-w-7xl flex-1 px-6 py-4 hyphens-auto md:px-6">
       <section className="mt-2">
         <h1 className="mb-10 text-4xl">Mes tarifs</h1>
         <div className="flex flex-col gap-14">
@@ -24,11 +24,7 @@ const page = async ({
                   params: { fournisseurId },
                 }}
               >
-                <Button
-                  variant="destructive"
-                  size="lg"
-                  title="Ajouter un service"
-                >
+                <Button size="lg" title="Ajouter un service">
                   Ajouter un service
                 </Button>
               </Link>

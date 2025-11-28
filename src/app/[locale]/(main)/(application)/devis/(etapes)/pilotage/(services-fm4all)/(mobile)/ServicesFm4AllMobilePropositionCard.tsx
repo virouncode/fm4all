@@ -263,7 +263,7 @@ const ServicesFm4AllMobilePropositionCard = ({
       <div
         className={`bg-${color} flex h-[450px] flex-col rounded-xl border border-slate-200 p-4 text-white ${
           servicesFm4All.infos.gammeSelected === gamme
-            ? "ring-fm4alldestructive ring-4 ring-inset"
+            ? "ring-destructive ring-4 ring-inset"
             : ""
         }${!total ? "pointer-events-none opacity-50" : ""}`}
       >
@@ -340,7 +340,7 @@ const ServicesFm4AllMobilePropositionCard = ({
               <Switch
                 className={`${
                   servicesFm4All.infos.gammeSelected === gamme
-                    ? "data-[state=checked]:bg-fm4alldestructive"
+                    ? "data-[state=checked]:bg-destructive"
                     : ""
                 }`}
                 checked={servicesFm4All.infos.gammeSelected === gamme}

@@ -118,7 +118,7 @@ const NettoyageOptionsVitrerieCard = ({
               onChange={handleChangeNbPassageVitrerie}
               className={`w-16 ${
                 nettoyage.quantites.nbPassagesVitrerie === 2
-                  ? "text-fm4alldestructive"
+                  ? "text-destructive"
                   : ""
               }`}
             />
@@ -126,7 +126,7 @@ const NettoyageOptionsVitrerieCard = ({
               {t("passages-an")}
             </Label>
           </div>
-          <p className="text-fm4alldestructive px-2 text-center text-xs italic">
+          <p className="text-destructive px-2 text-center text-xs italic">
             {t(
               "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
             )}
@@ -136,7 +136,7 @@ const NettoyageOptionsVitrerieCard = ({
       <div
         className={`flex w-3/4 items-center justify-center p-4 ${
           nettoyage.infos.vitrerieSelected && vitrerieProposition.prixAnnuel
-            ? "ring-fm4alldestructive ring-4 ring-inset"
+            ? "ring-destructive ring-4 ring-inset"
             : ""
         } bg-${color} cursor-pointer items-center justify-center gap-4 text-2xl text-slate-200`}
         onClick={
@@ -151,7 +151,7 @@ const NettoyageOptionsVitrerieCard = ({
             onCheckedChange={() =>
               handleClickVitrerieProposition(vitrerieProposition)
             }
-            className="data-[state=checked]:bg-fm4alldestructive"
+            className="data-[state=checked]:bg-destructive"
             title={t("selectionnez-cette-proposition")}
             data-testid="vitrerie-switch"
           />

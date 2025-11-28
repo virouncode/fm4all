@@ -30,8 +30,8 @@ const PropositionsTitleMobile = ({
       initialContainerTop = containerRef.current.getBoundingClientRect().top;
     }
     if (titleRef?.current) {
-      titleRef.current.classList.toggle("text-fm4allsecondary");
-      titleRef.current.classList.toggle("border-fm4allsecondary");
+      titleRef.current.classList.toggle("text-primary");
+      titleRef.current.classList.toggle("border-primary");
       titleRef.current.classList.toggle("border-2");
       titleRef.current.classList.toggle("border");
       titleRef.current.classList.toggle("font-bold");
@@ -58,7 +58,7 @@ const PropositionsTitleMobile = ({
         ref={containerRef}
       >
         <div
-          className="flex w-full items-center justify-between rounded-xl border-2 border-fm4allsecondary p-4 font-bold text-fm4allsecondary"
+          className="border-primary text-primary flex w-full items-center justify-between rounded-xl border-2 p-4 font-bold"
           ref={titleRef}
         >
           <div className="flex flex-1 items-center gap-4">
@@ -78,7 +78,7 @@ const PropositionsTitleMobile = ({
         </div>
       </div>
       <p
-        className="flex-1 hyphens-auto text-wrap px-4 text-base"
+        className="flex-1 px-4 text-base text-wrap hyphens-auto"
         ref={descriptionRef}
       >
         {description}

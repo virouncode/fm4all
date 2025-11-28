@@ -191,7 +191,6 @@ const FournisseurUpdateForm = ({
             <Dialog>
               <DialogTrigger asChild>
                 <Button
-                  variant="destructive"
                   size="lg"
                   title="Comment vous apparaissez dans le funnel"
                 >
@@ -317,7 +316,6 @@ const FournisseurUpdateForm = ({
               />
             </div>
             <Button
-              variant="destructive"
               size="lg"
               title={tAdmin("mettre-a-jour")}
               className="mt-6 w-full text-base"

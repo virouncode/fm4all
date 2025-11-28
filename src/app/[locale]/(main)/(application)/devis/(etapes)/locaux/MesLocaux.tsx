@@ -419,7 +419,7 @@ const MesLocaux = () => {
           </DialogHeader>
           <DialogFooter>
             <div className="mx-auto flex justify-center gap-4">
-              <Button variant="destructive" onClick={handleClickNouveau}>
+              <Button onClick={handleClickNouveau}>
                 {tDevisButton("nouveau")}
               </Button>
               <Button onClick={handleClickReprendre} variant="outline">
@@ -491,7 +491,6 @@ const MesLocaux = () => {
               <div className="flex justify-center">
                 <Button
                   type="button"
-                  variant="destructive"
                   size="lg"
                   title={t("afficher-les-tarifs")}
                   className="text-base"
@@ -515,7 +514,6 @@ const MesLocaux = () => {
                 <DialogClose asChild>
                   <div className="mx-auto flex justify-center gap-4">
                     <Button
-                      variant="destructive"
                       onClick={() => form.handleSubmit(submitForm)()}
                     >
                       {tDevisButton("nouveau")}
@@ -532,7 +530,6 @@ const MesLocaux = () => {
         {/* ) : ( } */}
         <div className="flex justify-center">
           <Button
-            variant="destructive"
             size="lg"
             title={t("afficher-les-tarifs")}
             className="text-base"

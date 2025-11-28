@@ -1526,7 +1526,7 @@ const CDCNettoyage = () => {
           <TableHeader className="sticky top-0 z-20 bg-white">
             <TableRow className="bg-white">
               <TableCell colSpan={13} className="sticky left-0 z-10 p-0">
-                <div className="bg-fm4allsecondary p-4 text-center text-white">
+                <div className="bg-primary p-4 text-center text-white">
                   <h1 className="text-xl">Cahier des charges - Nettoyage</h1>
                   <p>Fréquences minimum de prestations par zone</p>
                 </div>
@@ -1552,24 +1552,24 @@ const CDCNettoyage = () => {
             ))}
             <TableRow>
               <TableHead
-                className="sticky left-0 z-10 bg-fm4allsecondary text-white"
+                className="bg-primary sticky left-0 z-10 text-white"
                 rowSpan={2}
               ></TableHead>
               <TableHead
                 colSpan={4}
-                className="w-8 bg-fm4allessential text-center text-white"
+                className="bg-fm4allessential w-8 text-center text-white"
               >
                 Gamme Essentiel
               </TableHead>
               <TableHead
                 colSpan={4}
-                className="w-8 bg-fm4allcomfort text-center text-white"
+                className="bg-fm4allcomfort w-8 text-center text-white"
               >
                 Gamme Confort
               </TableHead>
               <TableHead
                 colSpan={4}
-                className="w-8 bg-fm4allexcellence text-center text-white"
+                className="bg-fm4allexcellence w-8 text-center text-white"
               >
                 Gamme Excellence
               </TableHead>
@@ -1577,42 +1577,42 @@ const CDCNettoyage = () => {
 
             <TableRow>
               {/* Essentiel Headers */}
-              <TableHead className="h-28 w-14 bg-fm4allessential p-0 text-center text-white">
+              <TableHead className="bg-fm4allessential h-28 w-14 p-0 text-center text-white">
                 <div className="-rotate-90">Hebdomadaire</div>
               </TableHead>
-              <TableHead className="h-28 w-14 bg-fm4allessential p-0 text-center text-white">
+              <TableHead className="bg-fm4allessential h-28 w-14 p-0 text-center text-white">
                 <div className="-rotate-90">Mensuelle</div>
               </TableHead>
-              <TableHead className="h-28 w-14 bg-fm4allessential p-0 text-center text-white">
+              <TableHead className="bg-fm4allessential h-28 w-14 p-0 text-center text-white">
                 <div className="-rotate-90">Trimestrielle</div>
               </TableHead>
-              <TableHead className="h-28 w-14 bg-fm4allessential p-0 text-center text-white">
+              <TableHead className="bg-fm4allessential h-28 w-14 p-0 text-center text-white">
                 <div className="-rotate-90">Semestrielle</div>
               </TableHead>
               {/* Confort Headers */}
-              <TableHead className="h-28 w-14 bg-fm4allcomfort p-0 text-center text-white">
+              <TableHead className="bg-fm4allcomfort h-28 w-14 p-0 text-center text-white">
                 <div className="-rotate-90">Hebdomadaire</div>
               </TableHead>
-              <TableHead className="h-28 w-14 bg-fm4allcomfort p-0 text-center text-white">
+              <TableHead className="bg-fm4allcomfort h-28 w-14 p-0 text-center text-white">
                 <div className="-rotate-90">Mensuelle</div>
               </TableHead>
-              <TableHead className="h-28 w-14 bg-fm4allcomfort p-0 text-center text-white">
+              <TableHead className="bg-fm4allcomfort h-28 w-14 p-0 text-center text-white">
                 <div className="-rotate-90">Trimestrielle</div>
               </TableHead>
-              <TableHead className="h-28 w-14 bg-fm4allcomfort p-0 text-center text-white">
+              <TableHead className="bg-fm4allcomfort h-28 w-14 p-0 text-center text-white">
                 <div className="-rotate-90">Semestrielle</div>
               </TableHead>
               {/* Excellence Headers */}
-              <TableHead className="h-28 w-14 bg-fm4allexcellence p-0 text-center text-white">
+              <TableHead className="bg-fm4allexcellence h-28 w-14 p-0 text-center text-white">
                 <div className="-rotate-90">Hebdomadaire</div>
               </TableHead>
-              <TableHead className="h-28 w-14 bg-fm4allexcellence p-0 text-center text-white">
+              <TableHead className="bg-fm4allexcellence h-28 w-14 p-0 text-center text-white">
                 <div className="-rotate-90">Mensuelle</div>
               </TableHead>
-              <TableHead className="h-28 w-14 bg-fm4allexcellence p-0 text-center text-white">
+              <TableHead className="bg-fm4allexcellence h-28 w-14 p-0 text-center text-white">
                 <div className="-rotate-90">Trimestrielle</div>
               </TableHead>
-              <TableHead className="h-28 w-14 bg-fm4allexcellence p-0 text-center text-white">
+              <TableHead className="bg-fm4allexcellence h-28 w-14 p-0 text-center text-white">
                 <div className="-rotate-90">Semestrielle</div>
               </TableHead>
             </TableRow>
@@ -1624,7 +1624,7 @@ const CDCNettoyage = () => {
                 <TableRow>
                   <TableCell
                     colSpan={13}
-                    className="sticky left-0 z-10 bg-fm4allsecondary py-2 text-center font-bold text-white"
+                    className="bg-primary sticky left-0 z-10 py-2 text-center font-bold text-white"
                   >
                     {section.title}
                   </TableCell>
@@ -1689,7 +1689,7 @@ const CDCNettoyage = () => {
                 <TableRow>
                   <TableCell
                     colSpan={13}
-                    className="sticky left-0 z-10 bg-fm4allsecondary py-2 text-center font-bold text-white"
+                    className="bg-primary sticky left-0 z-10 py-2 text-center font-bold text-white"
                   >
                     {section.title}
                   </TableCell>

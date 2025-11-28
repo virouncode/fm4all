@@ -151,7 +151,7 @@ const NettoyagePropositionCard = ({
       className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-4 text-2xl text-slate-200 ${
         nettoyage.infos.fournisseurId === proposition.fournisseurId &&
         nettoyage.infos.gammeSelected === proposition.gamme
-          ? "ring-fm4alldestructive ring-4 ring-inset"
+          ? "ring-destructive ring-4 ring-inset"
           : ""
       }`}
       onClick={() => handleClickProposition(proposition)}
@@ -162,7 +162,7 @@ const NettoyagePropositionCard = ({
           nettoyage.infos.gammeSelected === proposition.gamme
         }
         onCheckedChange={() => handleClickProposition(proposition)}
-        className="data-[state=checked]:bg-fm4alldestructive"
+        className="data-[state=checked]:bg-destructive"
         title={t("selectionnez-cette-proposition")}
         data-testid="nettoyage-proposition-switch"
       />

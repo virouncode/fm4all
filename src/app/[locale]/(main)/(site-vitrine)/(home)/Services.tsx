@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 const Services = () => {
   const t = useTranslations("HomePage.services");
   return (
-    <section className="relative mx-auto flex w-full max-w-7xl flex-col gap-10 px-6 pb-12 pt-8">
+    <section className="relative mx-auto flex w-full max-w-7xl flex-col gap-10 px-6 pt-8 pb-12">
       <div className="flex items-center justify-between">
         <h2 className="border-l-2 px-4 text-2xl md:text-3xl">
           {t("nos-services")}
@@ -22,10 +22,7 @@ const Services = () => {
         </Button>
       </div>
       <ServicesCarousel />
-      <Link
-        href="/services"
-        className="text-fm4allsecondary underline md:hidden"
-      >
+      <Link href="/services" className="text-primary underline md:hidden">
         {t("voir-tous-les-services")}
       </Link>
     </section>

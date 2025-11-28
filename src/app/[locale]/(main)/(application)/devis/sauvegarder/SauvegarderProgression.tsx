@@ -318,7 +318,6 @@ const SauvegarderProgression = () => {
             </div>
             <div className="flex justify-center">
               <Button
-                variant="destructive"
                 size="lg"
                 title={tSauver("sauvegarder-ma-progression")}
                 className="min-w-28 text-base"

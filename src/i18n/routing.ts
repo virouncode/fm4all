@@ -180,6 +180,10 @@ export const routing = defineRouting({
       fr: "/admin/[adminId]/info",
       en: "/admin/[adminId]/info",
     },
+    "/admin/[adminId]/interventions/creer-intervention": {
+      fr: "/admin/[adminId]/interventions/creer-intervention",
+      en: "/admin/[adminId]/interventions/creer-intervention",
+    },
     //CLIENT
     "/client/[clientId]": {
       fr: "/client/[clientId]",
@@ -208,11 +212,6 @@ export const routing = defineRouting({
     },
 
     // ----- Interventions -----
-    "/client/[clientId]/interventions/programmer-intervention": {
-      fr: "/client/[clientId]/interventions/programmer-intervention",
-      en: "/client/[clientId]/interventions/programmer-intervention",
-    },
-
     "/client/[clientId]/interventions/mes-interventions": {
       fr: "/client/[clientId]/interventions/mes-interventions",
       en: "/client/[clientId]/interventions/mes-interventions",

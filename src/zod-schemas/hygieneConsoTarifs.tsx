@@ -44,7 +44,7 @@ export const selectHygieneConsoTarifsFournisseurSchema = createSelectSchema(
 );
 
 export type SelectHygieneConsoTarifsType =
-  typeof selectHygieneConsoTarifsSchema._type;
+  z.infer<typeof selectHygieneConsoTarifsSchema>;
 
 export type SelectHygieneConsoTarifsFournisseurType =
-  typeof selectHygieneConsoTarifsFournisseurSchema._type;
+  z.infer<typeof selectHygieneConsoTarifsFournisseurSchema>;

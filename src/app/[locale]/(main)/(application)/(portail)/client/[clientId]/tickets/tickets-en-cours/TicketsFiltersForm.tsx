@@ -97,14 +97,14 @@ const TicketsFiltersForm = ({ clientId }: TicketsFiltersFormProps) => {
         <RhfDatePicker<TicketsQueryFiltersType>
           label="Du"
           name="createdFrom"
-          buttonClassName="w-36"
+          buttonClassName="w-40"
           withError={false}
         />
         <RhfDatePicker<TicketsQueryFiltersType>
           label="Au"
           name="createdTo"
           min={minTo}
-          buttonClassName="w-36"
+          buttonClassName="w-40"
           withError={false}
         />
         <RhfControlledSelect<TicketsQueryFiltersType>

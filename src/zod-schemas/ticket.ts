@@ -188,7 +188,7 @@ export type TicketsQueryFrontendType = z.infer<
   typeof ticketsQueryFrontendSchema
 >;
 
-//Fonction qui résupère les query params de l'URL et les parse en TicketsQueryBackendType
+//Fonction qui récupère les query params de l'URL et les parse en TicketsQueryBackendType
 export function parseTicketsQuery(
   raw: RawSearchParams,
 ): TicketsQueryBackendType {

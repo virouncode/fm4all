@@ -62,7 +62,7 @@ const The = ({ theConsoTarifs }: TheProps) => {
       >
         {!cafe.infos.fournisseurId ? (
           <div className="flex h-full items-center justify-center text-base lg:text-lg">
-            <p className="text-fm4alldestructive text-center">
+            <p className="text-destructive text-center">
               {tThe(
                 "veuillez-dabord-selectionner-une-offre-de-boissons-chaudes",
               )}

@@ -1,5 +1,6 @@
 import { snacksQuantites } from "@/db/schema";
 import { createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
 
 export const selectSnacksQuantitesSchema = createSelectSchema(snacksQuantites, {
   portionsParSemaineParPersonne: (schema) =>
@@ -12,4 +13,4 @@ export const selectSnacksQuantitesSchema = createSelectSchema(snacksQuantites, {
 });
 
 export type SelectSnacksQuantitesType =
-  typeof selectSnacksQuantitesSchema._type;
+  z.infer<typeof selectSnacksQuantitesSchema>;

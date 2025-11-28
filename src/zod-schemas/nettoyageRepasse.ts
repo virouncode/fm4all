@@ -23,4 +23,4 @@ export const selectRepasseTarifsSchema = createSelectSchema(
   nbAvis: z.number().nullable(),
 });
 
-export type SelectRepasseTarifsType = typeof selectRepasseTarifsSchema._type;
+export type SelectRepasseTarifsType = z.infer<typeof selectRepasseTarifsSchema>;

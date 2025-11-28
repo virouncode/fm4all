@@ -111,7 +111,7 @@ const HygieneOptionsDesinfectantCard = ({
               className={`w-16 ${
                 hygiene.quantites.nbDistribDesinfectant ===
                 hygieneDistribQuantite.nbDistribDesinfectant
-                  ? "text-fm4alldestructive"
+                  ? "text-destructive"
                   : ""
               }`}
               id="nbDistribDesinfectant"
@@ -242,7 +242,7 @@ const HygieneOptionsDesinfectantCard = ({
           <div
             className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-2 text-xl text-slate-200 ${
               hygiene.infos.desinfectantGammeSelected === gamme
-                ? "ring-fm4alldestructive ring-4 ring-inset"
+                ? "ring-destructive ring-4 ring-inset"
                 : ""
             }`}
             key={"desinfectant" + gamme}
@@ -253,7 +253,7 @@ const HygieneOptionsDesinfectantCard = ({
               onCheckedChange={() =>
                 handleClickProposition("desinfectant", proposition)
               }
-              className="data-[state=checked]:bg-fm4alldestructive"
+              className="data-[state=checked]:bg-destructive"
               title={t("selectionnez-cette-proposition")}
               data-testid="desinfectant-switch"
             />

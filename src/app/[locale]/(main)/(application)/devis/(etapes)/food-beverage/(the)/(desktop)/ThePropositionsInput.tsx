@@ -29,7 +29,7 @@ const ThePropositionsInput = ({
           onChange={handleChange}
           className={`w-16 ${
             nbPersonnes === Math.round(effectif * 0.15)
-              ? "text-fm4alldestructive"
+              ? "text-destructive"
               : ""
           }`}
         />
@@ -37,7 +37,7 @@ const ThePropositionsInput = ({
           {t("personnes")}
         </Label>
       </div>
-      <p className="px-2 text-center text-xs italic text-fm4alldestructive">
+      <p className="text-destructive px-2 text-center text-xs italic">
         {tThe(
           "les-quantites-sont-estimees-pour-vous-environ-15-de-votre-effectif-mais-vous-pouvez-les-changer",
         )}

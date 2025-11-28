@@ -160,4 +160,4 @@ export const updateFournisseurFormSchema = createUpdateFournisseurFormSchema({
 });
 
 export type UpdateFournisseurFormType =
-  typeof updateFournisseurFormSchema._type;
+  z.infer<typeof updateFournisseurFormSchema>;

@@ -64,7 +64,6 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
         <h1 className="text-4xl">{t("nos-prestataires-partenaires")}</h1>
         <Button
           title={locale === "fr" ? "Devenir prestataire" : "Become a provider"}
-          variant="destructive"
           className="items-center justify-center min-[600px]:flex"
           size="lg"
           asChild

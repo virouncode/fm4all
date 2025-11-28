@@ -32,4 +32,4 @@ export const selectHygieneDistribQuantitesSchema = createSelectSchema(
 });
 
 export type SelectHygieneDistribQuantitesType =
-  typeof selectHygieneDistribQuantitesSchema._type;
+  z.infer<typeof selectHygieneDistribQuantitesSchema>;

@@ -76,9 +76,7 @@ const CafeDesktopEspaceInputs = ({
               <div className="flex items-center gap-2">
                 <Input
                   className={`w-full max-w-xs min-w-20 ${
-                    nbPersonnes === client.effectif
-                      ? "text-fm4alldestructive"
-                      : ""
+                    nbPersonnes === client.effectif ? "text-destructive" : ""
                   }`}
                   type="number"
                   min={1}

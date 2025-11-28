@@ -521,7 +521,6 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
             </div>
             <div className="flex justify-center">
               <Button
-                variant="destructive"
                 size="lg"
                 className="min-w-[200px] text-base"
                 disabled={

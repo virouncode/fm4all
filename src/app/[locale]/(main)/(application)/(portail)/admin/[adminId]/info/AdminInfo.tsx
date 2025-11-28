@@ -236,7 +236,6 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
                   />
                 </div>
                 <Button
-                  variant="destructive"
                   size="lg"
                   title={tAdmin("mettre-a-jour")}
                   className="mt-6 w-full text-base"

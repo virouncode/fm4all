@@ -226,23 +226,6 @@ export default function ClientNavItems() {
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild
-                    isActive={isActive("programmer-intervention")}
-                  >
-                    <Link
-                      href={{
-                        pathname:
-                          "/client/[clientId]/interventions/programmer-intervention",
-                        params: { clientId },
-                      }}
-                    >
-                      Programmer
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
                     isActive={isActive("mes-interventions")}
                   >
                     <Link

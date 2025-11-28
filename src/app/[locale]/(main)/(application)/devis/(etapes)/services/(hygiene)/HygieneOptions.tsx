@@ -3,6 +3,7 @@
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
 import { useHygieneStore } from "@/stores/hygieneStore";
 import { useNettoyageStore } from "@/stores/nettoyageStore";
+import { useServicesStore } from "@/stores/servicesStore";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";
@@ -13,7 +14,6 @@ import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import HygieneOptionsPropositions from "./(desktop)/HygieneOptionsPropositions";
-import { useServicesStore } from "@/stores/servicesStore";
 
 type HygieneOptionsProps = {
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
@@ -87,7 +87,7 @@ const HygieneOptions = ({
         !nettoyage.infos.fournisseurId ||
         !hygiene.infos.trilogieGammeSelected ? (
           <div className="flex h-full items-center justify-center text-base lg:text-lg">
-            <p className="text-fm4alldestructive text-center">
+            <p className="text-destructive text-center">
               {t(
                 "veuillez-d-abord-selectionner-une-offre-de-nettoyage-et-une-offre-d-hygiene-sanitaire",
               )}

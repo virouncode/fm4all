@@ -219,7 +219,7 @@ const HygieneMobileOptionsDesinfectantCard = ({
       <div
         className={`bg-${color} flex h-56 flex-col rounded-xl border border-slate-200 p-4 text-white ${
           hygiene.infos.desinfectantGammeSelected === gamme
-            ? "ring-fm4alldestructive ring-4 ring-inset"
+            ? "ring-destructive ring-4 ring-inset"
             : ""
         }`}
       >
@@ -297,7 +297,7 @@ const HygieneMobileOptionsDesinfectantCard = ({
               <Switch
                 className={`${
                   hygiene.infos.desinfectantGammeSelected === gamme
-                    ? "data-[state=checked]:bg-fm4alldestructive"
+                    ? "data-[state=checked]:bg-destructive"
                     : ""
                 }`}
                 checked={hygiene.infos.desinfectantGammeSelected === gamme}

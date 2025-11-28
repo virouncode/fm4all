@@ -24,9 +24,8 @@ const CTAContactButtonsNoConversion = ({
     >
       {withVisio && (
         <Button
-          variant="destructive"
           size="lg"
-          className="ring-destructive flex w-full items-center justify-center text-base ring-2 ring-offset-2 transition-all hover:scale-[101%] sm:w-2/3 lg:w-1/3"
+          className="ring-primary flex w-full items-center justify-center text-base ring-2 ring-offset-2 transition-all hover:scale-[101%] sm:w-2/3 lg:w-1/3"
           asChild
         >
           <Link
@@ -49,9 +48,8 @@ const CTAContactButtonsNoConversion = ({
       )}
       {withPhone && (
         <Button
-          variant="destructive"
           size="lg"
-          className="ring-destructive flex w-full items-center justify-center text-base ring-2 ring-offset-2 transition-all hover:scale-[101%] sm:w-2/3 lg:w-1/3"
+          className="ring-primary flex w-full items-center justify-center text-base ring-2 ring-offset-2 transition-all hover:scale-[101%] sm:w-2/3 lg:w-1/3"
           asChild
         >
           <Link
@@ -66,9 +64,8 @@ const CTAContactButtonsNoConversion = ({
       )}
 
       <Button
-        variant="destructive"
         size="lg"
-        className="ring-destructive flex w-full items-center justify-center text-base ring-2 ring-offset-2 transition-all hover:scale-[101%] sm:w-2/3 lg:w-1/3"
+        className="ring-primary flex w-full items-center justify-center text-base ring-2 ring-offset-2 transition-all hover:scale-[101%] sm:w-2/3 lg:w-1/3"
         asChild
       >
         <Link

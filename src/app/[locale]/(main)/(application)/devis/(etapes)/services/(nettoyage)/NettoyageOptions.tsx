@@ -3,6 +3,7 @@
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
 import { MAJORATION_DIMANCHE } from "@/constants/constants";
 import { useNettoyageStore } from "@/stores/nettoyageStore";
+import { useServicesStore } from "@/stores/servicesStore";
 import { SelectRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
 import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
@@ -14,7 +15,6 @@ import { capitalize } from "../../../../../../../../lib/utils/capitalize";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import NettoyageOptionsPropositions from "./(desktop)/NettoyageOptionsPropositions";
-import { useServicesStore } from "@/stores/servicesStore";
 
 type NettoyageOptionsProps = {
   nettoyageTarifs: SelectNettoyageTarifsType[];
@@ -269,7 +269,7 @@ const NettoyageOptions = ({
       <div className="w-full flex-1 overflow-auto" ref={propositionsRef}>
         {!nettoyage.infos.fournisseurId || !nettoyage.infos.gammeSelected ? (
           <div className="flex h-full items-center justify-center text-base lg:text-lg">
-            <p className="text-fm4alldestructive text-center">
+            <p className="text-destructive text-center">
               {tNettoyage(
                 "veuillez-d-abord-selectionner-une-offre-de-nettoyage",
               )}

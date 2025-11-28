@@ -19,10 +19,14 @@ import {
 } from "@/components/ui/popover";
 import { TIMEZONE } from "@/constants/time";
 import { cn } from "@/lib/utils";
-import { toTimestampFromMidnight } from "@/lib/utils/formatDates";
 import { CalendarIcon } from "lucide-react";
 import { DateTime } from "luxon";
-import React, { useMemo, useState, type ComponentPropsWithoutRef } from "react";
+import {
+  useMemo,
+  useState,
+  type ComponentPropsWithoutRef,
+  type ReactNode,
+} from "react";
 import type { Matcher } from "react-day-picker";
 import {
   useFormContext,
@@ -36,8 +40,9 @@ export type TimePickerValue = {
   min: string;
   ampm?: "AM" | "PM";
 };
-type NumberFieldPath<S extends FieldValues> = {
-  [K in Path<S>]: PathValue<S, K> extends number | undefined | null ? K : never;
+
+type StringFieldPath<S extends FieldValues> = {
+  [K in Path<S>]: PathValue<S, K> extends string | null | undefined ? K : never;
 }[Path<S>];
 
 const hours12 = Array.from({ length: 12 }, (_, i) =>
@@ -54,18 +59,26 @@ const periods = ["AM", "PM"] as const;
 type BaseButtonProps = ComponentPropsWithoutRef<typeof Button>;
 
 type RhfDateTimePickerProps<S extends FieldValues> = {
-  name: NumberFieldPath<S>; //(timestamp ms)
+  name: StringFieldPath<S>; // ✅ string, comme RhfDatePicker
   label?: string;
-  description?: React.ReactNode;
+  description?: ReactNode;
   orientation?: "horizontal" | "vertical";
   requiredMark?: boolean;
   className?: string;
-  buttonClassName?: string; // style du bouton date
-  selectClassName?: string; // style de chaque select
+  buttonClassName?: string;
+  selectClassName?: string;
   zone?: string;
   timeFormat?: "24" | "ampm";
-  min?: number; // borne datetime min (ms)
-  max?: number; // borne datetime max (ms)
+  /**
+   * Borne minimale au format ISO "YYYY-MM-DD"
+   * (jour civil dans le fuseau `zone`)
+   */
+  min?: string;
+  /**
+   * Borne maximale au format ISO "YYYY-MM-DD"
+   * (jour civil dans le fuseau `zone`)
+   */
+  max?: string;
   id?: string;
   dateDisabled?: boolean;
   timeDisabled?: boolean;
@@ -101,15 +114,20 @@ export function RhfDateTimePicker<S extends FieldValues>({
   const errorId = `${id}-error`;
   const descriptionId = description ? `${id}-description` : undefined;
 
-  // pour Calendar (bornes)
-  const fromDate =
-    typeof min === "number"
-      ? DateTime.fromMillis(min).setZone(zone).startOf("day").toJSDate()
-      : undefined;
-  const toDate =
-    typeof max === "number"
-      ? DateTime.fromMillis(max).setZone(zone).startOf("day").toJSDate()
-      : undefined;
+  // ====== Bornes ISO -> DateTime (comme RhfDatePicker) ======
+  const minDt = useMemo(
+    () => (min ? DateTime.fromISO(min, { zone }).startOf("day") : null),
+    [min, zone],
+  );
+
+  const maxDt = useMemo(
+    () => (max ? DateTime.fromISO(max, { zone }).endOf("day") : null),
+    [max, zone],
+  );
+
+  const fromDate = minDt?.toJSDate();
+  const toDate = maxDt?.toJSDate();
+
   const disabledMatchers = useMemo<Matcher[] | undefined>(() => {
     const arr: Matcher[] = [];
     if (fromDate) arr.push({ before: fromDate });
@@ -117,7 +135,6 @@ export function RhfDateTimePicker<S extends FieldValues>({
     return arr.length ? arr : undefined;
   }, [fromDate, toDate]);
 
-  // Sous-UI TimePicker interne (non RHF)
   const HoursOptions = timeFormat === "24" ? hours24 : hours12;
 
   return (
@@ -125,15 +142,21 @@ export function RhfDateTimePicker<S extends FieldValues>({
       control={control}
       name={name}
       render={({ field, fieldState }) => {
-        const ts = (field.value ?? undefined) as number | undefined;
-        // décompose la valeur actuelle (ou now)
-        const dt = (ts ? DateTime.fromMillis(ts) : DateTime.now()).setZone(
-          zone,
-        );
+        const rawValue = field.value as string | null | undefined;
+        const isEmpty =
+          rawValue == null ||
+          (typeof rawValue === "string" && rawValue.trim() === "");
 
-        const dateStartMs = dt.startOf("day").toMillis();
-        const curH24 = dt.hour;
-        const curMin = roundTo5(dt.minute) % 60;
+        // dt = valeur du champ (ISO) interprétée dans le fuseau clinique
+        const dt = !isEmpty
+          ? DateTime.fromISO(rawValue as string, { zone })
+          : null;
+
+        const base = (dt ?? DateTime.now().setZone(zone)).setZone(zone);
+
+        const dateStart = base.startOf("day");
+        const curH24 = base.hour;
+        const curMin = roundTo5(base.minute) % 60;
 
         const timeParts: TimePickerValue =
           timeFormat === "24"
@@ -147,32 +170,61 @@ export function RhfDateTimePicker<S extends FieldValues>({
                 ampm: curH24 >= 12 ? "PM" : "AM",
               };
 
-        // helpers de mise à jour
+        const applyTime = (
+          date: DateTime,
+          parts: TimePickerValue,
+        ): DateTime => {
+          let hour24: number;
+          if (timeFormat === "24") {
+            hour24 = parseInt(parts.hours, 10) || 0;
+          } else {
+            const h12 = parseInt(parts.hours, 10) || 12;
+            const isPM = parts.ampm === "PM";
+            hour24 = (h12 % 12) + (isPM ? 12 : 0);
+          }
+          const minute = parseInt(parts.min, 10) || 0;
+
+          return date.set({
+            hour: hour24,
+            minute,
+            second: 0,
+            millisecond: 0,
+          });
+        };
+
+        const clampToBounds = (value: DateTime): DateTime => {
+          let next = value;
+          if (minDt && next < minDt) next = minDt;
+          if (maxDt && next > maxDt) next = maxDt;
+          return next;
+        };
+
         const setDateOnly = (picked: Date) => {
-          const pickedStart = DateTime.fromObject(
+          // d est un Date à minuit dans le fuseau local (même si timeZone est passé à Calendar)
+          // Date civile choisie interprétée dans le fuseau clinique
+          let pickedDt = DateTime.fromObject(
             {
               year: picked.getFullYear(),
               month: picked.getMonth() + 1,
               day: picked.getDate(),
             },
             { zone },
-          )
-            .startOf("day")
-            .toMillis();
-          const composed = pickedStart + toTimestampFromMidnight(timeParts);
-          let next = composed;
-          if (typeof min === "number") next = Math.max(next, min);
-          if (typeof max === "number") next = Math.min(next, max);
-          field.onChange(next);
+          ).startOf("day");
+
+          pickedDt = applyTime(pickedDt, timeParts);
+          pickedDt = clampToBounds(pickedDt);
+
+          const iso = pickedDt.toISO() ?? "";
+          field.onChange(iso);
         };
 
         const setTimePart = (patch: Partial<TimePickerValue>) => {
           const nextParts: TimePickerValue = { ...timeParts, ...patch };
-          const composed = dateStartMs + toTimestampFromMidnight(nextParts);
-          let next = composed;
-          if (typeof min === "number") next = Math.max(next, min);
-          if (typeof max === "number") next = Math.min(next, max);
-          field.onChange(next);
+          let nextDt = applyTime(dateStart, nextParts);
+          nextDt = clampToBounds(nextDt);
+
+          const iso = nextDt.toISO() ?? "";
+          field.onChange(iso);
         };
 
         const hasError = !!fieldState.error;
@@ -181,19 +233,13 @@ export function RhfDateTimePicker<S extends FieldValues>({
             .filter(Boolean)
             .join(" ") || undefined;
 
-        // libellé bouton date
-        const buttonLabel = DateTime.fromMillis(dateStartMs)
-          .setZone(zone)
-          .toFormat("yyyy-LL-dd");
+        const buttonLabel = dt?.toFormat("dd-LL-yyyy") ?? "Choisir une date";
 
-        const selectedDate = DateTime.fromMillis(dateStartMs, {
-          zone,
-        }).toJSDate();
-        const defaultMonthDate = ts
-          ? DateTime.fromMillis(dateStartMs, { zone })
-          : typeof min === "number"
-            ? DateTime.fromMillis(min, { zone }).startOf("day")
-            : DateTime.now().setZone(zone);
+        const selectedDate = dt?.startOf("day").toJSDate();
+        const defaultMonth =
+          selectedDate ??
+          fromDate ?? // si min est défini, on ouvre sur lui
+          new Date();
 
         return (
           <FormItem
@@ -228,7 +274,7 @@ export function RhfDateTimePicker<S extends FieldValues>({
                       id={id}
                       {...buttonProps}
                       className={cn(
-                        "w-48 justify-between font-normal",
+                        "w-64 justify-between font-normal",
                         buttonClassName,
                       )}
                       aria-invalid={hasError || undefined}
@@ -254,18 +300,21 @@ export function RhfDateTimePicker<S extends FieldValues>({
                     <Calendar
                       mode="single"
                       selected={selectedDate}
-                      defaultMonth={defaultMonthDate.toJSDate()}
+                      defaultMonth={defaultMonth}
                       captionLayout="dropdown"
-                      onSelect={(d) => {
+                      timeZone={zone}
+                      disabled={disabledMatchers}
+                      onSelect={(d: Date | undefined) => {
                         if (!d) return;
+                        // d est un Date à minuit dans le fuseau local
+                        // Date civile choisie interprétée dans le fuseau clinique
                         setDateOnly(d);
                         setOpen(false);
                       }}
-                      timeZone={zone}
-                      disabled={disabledMatchers}
                     />
                   </PopoverContent>
                 </Popover>
+
                 {/* ======= TIME PICKER ======= */}
                 <div
                   className="flex items-center gap-1"
@@ -289,6 +338,7 @@ export function RhfDateTimePicker<S extends FieldValues>({
                       </NativeSelectOption>
                     ))}
                   </NativeSelect>
+
                   {/* minutes */}
                   <NativeSelect
                     value={timeParts.min}
@@ -305,6 +355,7 @@ export function RhfDateTimePicker<S extends FieldValues>({
                       </NativeSelectOption>
                     ))}
                   </NativeSelect>
+
                   {/* am/pm */}
                   {timeFormat === "ampm" && (
                     <NativeSelect
@@ -328,11 +379,13 @@ export function RhfDateTimePicker<S extends FieldValues>({
                 </div>
               </div>
             </FormControl>
+
             {description ? (
               <FormDescription id={descriptionId}>
                 {description}
               </FormDescription>
             ) : null}
+
             {withError && (
               <div className="min-h-[19px]">
                 <FormMessage id={errorId} />

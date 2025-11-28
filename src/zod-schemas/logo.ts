@@ -4,6 +4,7 @@ import {
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-zod";
+import { z } from "zod";
 
 export const selectLogoSchema = createSelectSchema(logosFournisseurs, {
   url: (schema) =>
@@ -11,7 +12,7 @@ export const selectLogoSchema = createSelectSchema(logosFournisseurs, {
   type: (schema) => schema.min(1, "Type du logo obligatoire"),
 });
 
-export type SelectLogoType = typeof selectLogoSchema._type;
+export type SelectLogoType = z.infer<typeof selectLogoSchema>;
 
 export const insertLogoSchema = createInsertSchema(logosFournisseurs, {
   url: (schema) =>
@@ -19,7 +20,7 @@ export const insertLogoSchema = createInsertSchema(logosFournisseurs, {
   type: (schema) => schema.min(1, "Type du logo obligatoire"),
 });
 
-export type InsertLogoType = typeof insertLogoSchema._type;
+export type InsertLogoType = z.infer<typeof insertLogoSchema>;
 
 export const updateLogoSchema = createUpdateSchema(logosFournisseurs, {
   url: (schema) =>
@@ -27,4 +28,4 @@ export const updateLogoSchema = createUpdateSchema(logosFournisseurs, {
   type: (schema) => schema.min(1, "Type du logo obligatoire"),
 });
 
-export type UpdateLogoType = typeof updateLogoSchema._type;
+export type UpdateLogoType = z.infer<typeof updateLogoSchema>;

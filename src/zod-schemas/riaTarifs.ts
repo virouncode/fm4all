@@ -1,5 +1,6 @@
 import { riaTarifs } from "@/db/schema";
 import { createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
 
 export const selectRiaTarifsSchema = createSelectSchema(riaTarifs);
-export type SelectRiaTarifsType = typeof selectRiaTarifsSchema._type;
+export type SelectRiaTarifsType = z.infer<typeof selectRiaTarifsSchema>;

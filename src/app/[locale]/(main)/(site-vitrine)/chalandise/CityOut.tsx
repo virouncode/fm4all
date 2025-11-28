@@ -162,7 +162,6 @@ const CityOut = ({
           </div>
           <div className="flex justify-center">
             <Button
-              variant="destructive"
               size="lg"
               title={t("envoyer-mes-coordonnees")}
               className="min-w-28 text-base"

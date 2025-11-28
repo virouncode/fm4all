@@ -53,7 +53,7 @@ const HeaderAdmin = () => {
           <nav className="hidden flex-1 items-center justify-center gap-14 lg:flex">
             <div
               className={`flex items-center gap-1 ${
-                isActive("/admin/[adminId]") ? "text-destructive font-bold" : ""
+                isActive("/admin/[adminId]") ? "text-primary font-bold" : ""
               }`}
             >
               <CircleGauge size={15} />
@@ -70,7 +70,7 @@ const HeaderAdmin = () => {
             <div
               className={`flex items-center gap-1 ${
                 isActive("/admin/[adminId]/info")
-                  ? "text-destructive font-bold"
+                  ? "text-primary font-bold"
                   : ""
               }`}
             >
@@ -143,9 +143,7 @@ const HeaderAdmin = () => {
             <div className="flex flex-1 flex-col gap-4">
               <div
                 className={`flex items-center gap-4 ${
-                  isActive("/admin/[adminId]")
-                    ? "text-destructive font-bold"
-                    : ""
+                  isActive("/admin/[adminId]") ? "text-primary font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
@@ -165,7 +163,7 @@ const HeaderAdmin = () => {
                     className={`flex items-center gap-4 ${
                       isActive("/admin/[adminId]/comptes") ||
                       isActive("/admin/[adminId]/signup")
-                        ? "text-destructive font-bold"
+                        ? "text-primary font-bold"
                         : ""
                     }`}
                   >

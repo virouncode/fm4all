@@ -226,7 +226,7 @@ const OfficeManagerPropositionCard = ({
       className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-4 text-2xl text-slate-200 ${
         officeManager.infos.fournisseurId === proposition.fournisseurId &&
         officeManager.infos.gammeSelected !== null
-          ? "ring-fm4alldestructive ring-4 ring-inset"
+          ? "ring-destructive ring-4 ring-inset"
           : ""
       }`}
       onClick={() => handleClickProposition(proposition)}
@@ -237,7 +237,7 @@ const OfficeManagerPropositionCard = ({
           officeManager.infos.gammeSelected !== null
         }
         onCheckedChange={() => handleClickProposition(proposition)}
-        className="data-[state=checked]:bg-fm4alldestructive"
+        className="data-[state=checked]:bg-destructive"
         title={t("selectionnez-cette-proposition")}
         data-testid={`office-manager-switch`}
       />

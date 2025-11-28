@@ -1,5 +1,6 @@
 import { q18Tarifs } from "@/db/schema";
 import { createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
 
 export const selectQ18TarifsSchema = createSelectSchema(q18Tarifs, {
   surface: (schema) =>
@@ -9,4 +10,4 @@ export const selectQ18TarifsSchema = createSelectSchema(q18Tarifs, {
   prixAnnuel: (schema) => schema.min(0, "Le prix annuel est obligatoire"),
 });
 
-export type SelectQ18TarifsType = typeof selectQ18TarifsSchema._type;
+export type SelectQ18TarifsType = z.infer<typeof selectQ18TarifsSchema>;

@@ -31,8 +31,8 @@ export const getTicketsAction = actionClient
     if (!currentUser) {
       throw new Error(
         locale === "fr"
-          ? "Vous n'avez pas de compte utilisateur"
-          : "You do not have a user account",
+          ? "Vous n'êtes pas authentifié."
+          : "You are not authenticated.",
       );
     }
 
@@ -98,9 +98,9 @@ export const insertTicketAction = actionClient
       );
     }
 
-    const createdById = currentUser.id ?? null;
-    const updatedById = currentUser.id ?? null;
-    const uploadedById = currentUser.id ?? null;
+    const createdById = currentUser.id;
+    const updatedById = currentUser.id;
+    const uploadedById = currentUser.id;
 
     const {
       attachments = [],
@@ -233,8 +233,8 @@ export const updateTicketAction = actionClient
       );
     }
 
-    const updatedById = currentUser.id ?? null;
-    const uploadedById = currentUser.id ?? null;
+    const updatedById = currentUser.id;
+    const uploadedById = currentUser.id;
 
     // On suppose que l'input contient l'id du ticket
     const {

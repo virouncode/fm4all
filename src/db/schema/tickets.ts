@@ -34,6 +34,7 @@ export const tickets = pgTable(
     priorite: ticketPrioriteEnum("priorite").notNull().default("normale"),
     status: ticketStatusEnum("status").notNull().default("nouveau"),
     dateCloture: timestamp("date_cloture", {
+      withTimezone: true,
       mode: "date",
       precision: 3,
     }),

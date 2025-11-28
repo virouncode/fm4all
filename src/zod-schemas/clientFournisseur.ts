@@ -14,7 +14,7 @@ export const createInsertClientFournisseurSchema = (messages: {
 export const insertClientFournisseurSchema =
   createInsertClientFournisseurSchema({
     clientId: "Client requis",
-    fournisseurId: "Fournisseur requis",
+    fournisseurId: "Prestataire requis",
   });
 
 export type InsertClientFournisseurType = z.infer<

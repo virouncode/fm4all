@@ -60,9 +60,8 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
       <div className="mt-6 mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-4xl">{t("rejoignez-nous")}</h1>
         <Button
-          variant="destructive"
           size="lg"
-          className="ring-destructive flex items-center justify-center text-base ring-2 ring-offset-2 transition-all hover:scale-[101%]"
+          className="ring-primary flex items-center justify-center text-base ring-2 ring-offset-2 transition-all hover:scale-[101%]"
           asChild
         >
           <Link

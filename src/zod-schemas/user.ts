@@ -15,7 +15,7 @@ export const selectUserSchema = createSelectSchema(user, {
   email: (schema) => schema.email("Email is invalid"),
   image: (schema) => schema.url("Image is invalid").nullable(),
 });
-export type SelectUserType = typeof selectUserSchema._type;
+export type SelectUserType = z.infer<typeof selectUserSchema>;
 
 //INSERT
 export const insertUserSchema = createInsertSchema(user, {
@@ -32,8 +32,8 @@ export const insertUserSchema = createInsertSchema(user, {
     password: z.string().min(1, "Password is required"),
   });
 
-export type InsertUserType = typeof insertUserSchema._type;
+export type InsertUserType = z.infer<typeof insertUserSchema>;
 
 //UPDATE
 export const updateUserSchema = createUpdateSchema(user);
-export type UpdateUserType = typeof updateUserSchema._type;
+export type UpdateUserType = z.infer<typeof updateUserSchema>;

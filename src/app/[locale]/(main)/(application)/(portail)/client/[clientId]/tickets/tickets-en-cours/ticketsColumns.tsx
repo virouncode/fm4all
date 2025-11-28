@@ -18,7 +18,7 @@ export const ticketsIdLabelMap = new Map<string, string>([
   ["priorite", "Priorité"],
   ["status", "État"],
   ["siteId", "Site"],
-  ["fournisseurId", "Fournisseur"],
+  ["fournisseurId", "Prestataire"],
   ["titre", "Titre"],
   ["dateCloture", "Date de clôture"],
   ["description", "Description"],

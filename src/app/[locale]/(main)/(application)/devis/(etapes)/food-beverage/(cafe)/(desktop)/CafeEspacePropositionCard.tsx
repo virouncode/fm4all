@@ -294,7 +294,7 @@ const CafeEspacePropositionCard = ({
       className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-4 text-2xl text-slate-200 ${
         espace.infos.gammeCafeSelected === gamme &&
         cafe.infos.fournisseurId === proposition.fournisseurId
-          ? "ring-fm4alldestructive ring-4 ring-inset"
+          ? "ring-destructive ring-4 ring-inset"
           : ""
       }`}
       onClick={() =>
@@ -313,7 +313,7 @@ const CafeEspacePropositionCard = ({
             ? handleClickFirstEspaceProposition(proposition)
             : handleClickProposition(proposition)
         }
-        className="data-[state=checked]:bg-fm4alldestructive"
+        className="data-[state=checked]:bg-destructive"
         title={t("selectionnez-cette-proposition")}
         data-testid={`cafe-switch-${espace.infos.espaceId}`}
       />

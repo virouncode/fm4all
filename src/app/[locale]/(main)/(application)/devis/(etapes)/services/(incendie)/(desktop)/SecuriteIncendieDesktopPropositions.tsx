@@ -83,7 +83,7 @@ const SecuriteIncendieDesktopPropositions = ({
                 handleChangeNbr={handleChangeNbr}
                 incendieQuantite={incendieQuantite}
               />
-              <p className="px-2 text-center text-xs italic text-fm4alldestructive">
+              <p className="text-destructive px-2 text-center text-xs italic">
                 {t(
                   "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
                 )}

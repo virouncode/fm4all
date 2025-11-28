@@ -118,7 +118,6 @@ export default function SignIn() {
                   <Button
                     className="w-full text-base"
                     disabled={loading}
-                    variant="destructive"
                     size="lg"
                   >
                     {loading ? (

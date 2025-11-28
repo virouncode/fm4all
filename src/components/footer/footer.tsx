@@ -20,7 +20,7 @@ const Footer = async () => {
   ]);
 
   return (
-    <footer className="from-fm4allsecondary/100 to-fm4allsecondary/60 bg-gradient-to-r">
+    <footer className="from-primary/100 to-primary/60 bg-gradient-to-r">
       <div className="mx-auto max-w-7xl p-6">
         <div className="flex flex-wrap gap-6">
           <div className="flex w-52 flex-col gap-2">

@@ -1,8 +1,9 @@
 import { servicesFournisseurs } from "@/db/schema";
 import { createInsertSchema } from "drizzle-zod";
+import { z } from "zod";
 
 export const insertServiceFournisseurSchema =
   createInsertSchema(servicesFournisseurs);
 
 export type InsertServiceFournisseurType =
-  typeof insertServiceFournisseurSchema._type;
+  z.infer<typeof insertServiceFournisseurSchema>;

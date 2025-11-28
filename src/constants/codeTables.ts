@@ -54,13 +54,43 @@ export const ticketCategorieCodes = ticketCategorieCT.map(
 
 export const userRoleCT = [
   { code: "admin", name: "Administrateur" },
-  { code: "fournisseur", name: "Fournisseur" },
+  { code: "fournisseur", name: "Prestataire" },
   { code: "client", name: "Client" },
 ] as const;
 
 export const userRoleCodes = userRoleCT.map((i) => i.code) as unknown as [
   (typeof userRoleCT)[number]["code"],
   ...(typeof userRoleCT)[number]["code"][],
+];
+
+export const interventionStatusCT = [
+  { code: "en_attente_confirmation", name: "En attente de confirmation" },
+  { code: "planifiee", name: "Planifiée" },
+  { code: "en_cours", name: "En cours" },
+  { code: "realisee", name: "Réalisée" },
+  { code: "annulee", name: "Annulée" },
+  { code: "non_honoree", name: "Non honorée" },
+];
+
+export const interventionStatusCodes = interventionStatusCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof interventionStatusCT)[number]["code"],
+  ...(typeof interventionStatusCT)[number]["code"][],
+];
+
+export const interventionTypeCT = [
+  { code: "corrective", name: "Corrective" },
+  { code: "preventive", name: "Préventive" },
+  { code: "audit", name: "Audit" },
+  { code: "autre", name: "Autre" },
+];
+
+export const interventionTypeCodes = interventionTypeCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof interventionTypeCT)[number]["code"],
+  ...(typeof interventionTypeCT)[number]["code"][],
 ];
 
 export const toCodeTableName = (

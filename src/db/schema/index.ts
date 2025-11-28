@@ -10,6 +10,7 @@ export * from "./food";
 export * from "./fournisseurs";
 export * from "./hygiene";
 export * from "./incendie";
+export * from "./interventions";
 export * from "./maintenance";
 export * from "./nettoyage";
 export * from "./office-manager";
@@ -55,6 +56,7 @@ import {
   portesCoupeFeuTarifs,
   riaTarifs,
 } from "./incendie";
+import { interventions } from "./interventions";
 import {
   legioTarifs,
   maintenanceTarifs,
@@ -79,6 +81,7 @@ export const clientsRelations = relations(clients, ({ many }) => ({
   clientFournisseurs: many(clientFournisseurs),
   sites: many(sites),
   tickets: many(tickets),
+  interventions: many(interventions),
 }));
 
 export const fournisseursRelations = relations(
@@ -117,6 +120,7 @@ export const fournisseursRelations = relations(
     users: many(user),
     clientFournisseurs: many(clientFournisseurs),
     tickets: many(tickets),
+    interventions: many(interventions),
   }),
 );
 
@@ -469,9 +473,10 @@ export const sitesRelations = relations(sites, ({ one, many }) => ({
     references: [clients.id],
   }),
   tickets: many(tickets),
+  interventions: many(interventions),
 }));
 
-export const ticketsRelations = relations(tickets, ({ one }) => ({
+export const ticketsRelations = relations(tickets, ({ one, many }) => ({
   client: one(clients, {
     fields: [tickets.clientId],
     references: [clients.id],
@@ -487,5 +492,25 @@ export const ticketsRelations = relations(tickets, ({ one }) => ({
   createdBy: one(user, {
     fields: [tickets.createdById],
     references: [user.id],
+  }),
+  interventions: many(interventions),
+}));
+
+export const interventionsRelations = relations(interventions, ({ one }) => ({
+  client: one(clients, {
+    fields: [interventions.clientId],
+    references: [clients.id],
+  }),
+  site: one(sites, {
+    fields: [interventions.siteId],
+    references: [sites.id],
+  }),
+  fournisseur: one(fournisseurs, {
+    fields: [interventions.fournisseurId],
+    references: [fournisseurs.id],
+  }),
+  ticket: one(tickets, {
+    fields: [interventions.ticketId],
+    references: [tickets.id],
   }),
 }));

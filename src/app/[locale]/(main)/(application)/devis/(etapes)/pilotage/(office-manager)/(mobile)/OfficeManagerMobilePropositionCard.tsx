@@ -252,7 +252,7 @@ const OfficeManagerMobilePropositionCard = ({
       className={`bg-${color} flex h-[570px] flex-col rounded-xl border border-slate-200 p-4 text-white ${
         officeManager.infos.fournisseurId === fournisseurId &&
         officeManager.infos.gammeSelected !== null
-          ? "ring-fm4alldestructive ring-4 ring-inset"
+          ? "ring-destructive ring-4 ring-inset"
           : ""
       }`}
     >
@@ -329,7 +329,7 @@ const OfficeManagerMobilePropositionCard = ({
               className={`${
                 officeManager.infos.fournisseurId === fournisseurId &&
                 officeManager.infos.gammeSelected !== null
-                  ? "data-[state=checked]:bg-fm4alldestructive"
+                  ? "data-[state=checked]:bg-destructive"
                   : ""
               }`}
               checked={

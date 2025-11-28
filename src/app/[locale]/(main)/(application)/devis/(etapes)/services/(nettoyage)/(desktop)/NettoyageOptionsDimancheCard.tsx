@@ -98,7 +98,7 @@ const NettoyageOptionsDimancheCard = ({
       <div
         className={`flex w-3/4 items-center justify-center p-4 ${
           nettoyage.infos.dimancheSelected
-            ? "ring-fm4alldestructive ring-4 ring-inset"
+            ? "ring-destructive ring-4 ring-inset"
             : ""
         } bg-${color} cursor-pointer items-center justify-center gap-4 text-2xl text-slate-200`}
         onClick={
@@ -113,7 +113,7 @@ const NettoyageOptionsDimancheCard = ({
             onCheckedChange={() =>
               handleClickDimancheProposition(dimancheProposition)
             }
-            className="data-[state=checked]:bg-fm4alldestructive"
+            className="data-[state=checked]:bg-destructive"
             title={t("selectionnez-cette-proposition")}
             data-testid="dimanche-switch"
           />

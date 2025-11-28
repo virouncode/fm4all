@@ -253,7 +253,7 @@ const ServicesFm4AllPropositionCard = ({
     <div
       className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-4 text-2xl text-slate-200 ${
         servicesFm4All.infos.gammeSelected === gamme
-          ? "ring-fm4alldestructive ring-4 ring-inset"
+          ? "ring-destructive ring-4 ring-inset"
           : ""
       } ${!total ? "pointer-events-none opacity-50" : ""}`}
       onClick={() => handleClickProposition(proposition)}
@@ -261,7 +261,7 @@ const ServicesFm4AllPropositionCard = ({
       <Switch
         checked={servicesFm4All.infos.gammeSelected === gamme}
         onCheckedChange={() => handleClickProposition(proposition)}
-        className="data-[state=checked]:bg-fm4alldestructive"
+        className="data-[state=checked]:bg-destructive"
         title="Sélectionner cette proposition"
         data-testid={`services-fm4all-switch-${gamme}`}
       />

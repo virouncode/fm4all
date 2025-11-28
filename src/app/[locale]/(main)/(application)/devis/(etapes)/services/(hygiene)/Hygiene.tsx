@@ -12,10 +12,10 @@ import { Toilet } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRef } from "react";
 import { useMediaQuery } from "react-responsive";
+import { useShallow } from "zustand/shallow";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import HygienePropositions from "./HygienePropositions";
-import { useShallow } from "zustand/shallow";
 
 type HygieneProps = {
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
@@ -85,7 +85,7 @@ const Hygiene = ({
       <div className="w-full flex-1 overflow-auto" ref={propositionsRef}>
         {!nettoyage.infos.fournisseurId || !nettoyage.infos.gammeSelected ? (
           <div className="flex h-full items-center justify-center text-base lg:text-lg">
-            <p className="text-fm4alldestructive text-center">
+            <p className="text-destructive text-center">
               {tNettoyage(
                 "veuillez-d-abord-selectionner-une-offre-de-nettoyage",
               )}

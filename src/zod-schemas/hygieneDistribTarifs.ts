@@ -20,8 +20,10 @@ export const selectHygieneDistribTarifsSchema = createSelectSchema(
 export const selectHygieneDistribTarifsFournisseurSchema =
   createSelectSchema(hygieneDistribTarifs);
 
-export type SelectHygieneDistribTarifsType =
-  typeof selectHygieneDistribTarifsSchema._type;
+export type SelectHygieneDistribTarifsType = z.infer<
+  typeof selectHygieneDistribTarifsSchema
+>;
 
-export type SelectHygieneDistribTarifsFournisseurType =
-  typeof selectHygieneDistribTarifsFournisseurSchema._type;
+export type SelectHygieneDistribTarifsFournisseurType = z.infer<
+  typeof selectHygieneDistribTarifsFournisseurSchema
+>;

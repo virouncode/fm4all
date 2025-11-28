@@ -148,13 +148,13 @@ const TicketForm = <TFormValues,>({
             </RhfControlledSelect>
             <RhfControlledSelect<TicketFormValues>
               name="fournisseurId"
-              label="Fournisseur"
+              label="Prestataire"
               className="w-full md:col-span-1"
               selectClassName="w-full"
               valueType="number"
-              placeholder="Sélectionner un fournisseur"
+              placeholder="Sélectionner un prestataire"
             >
-              <SelectItem value="0">Sélectionner un fournisseur</SelectItem>
+              <SelectItem value="0">Sélectionner un prestataire</SelectItem>
               {fournisseurs.map((fournisseur) => (
                 <SelectItem
                   key={fournisseur.id}

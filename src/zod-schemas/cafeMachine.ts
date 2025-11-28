@@ -1,5 +1,6 @@
 import { cafeMachines } from "@/db/schema";
 import { createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
 
 export const selectCafeMachinesSchema = createSelectSchema(cafeMachines, {
   marque: (schema) => schema.min(1, "La marque de la machine est obligatoire"),
@@ -10,4 +11,4 @@ export const selectCafeMachinesSchema = createSelectSchema(cafeMachines, {
     schema.min(1, "Le nombre de tasses par jour est obligatoire"),
 });
 
-export type SelectCafeMachinesType = typeof selectCafeMachinesSchema._type;
+export type SelectCafeMachinesType = z.infer<typeof selectCafeMachinesSchema>;

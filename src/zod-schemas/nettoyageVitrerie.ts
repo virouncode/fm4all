@@ -36,9 +36,9 @@ export const selectVitrerieTarifsFournisseurSchema = createSelectSchema(
   },
 );
 
-export type SelectVitrerieTarifsType = typeof selectVitrerieTarifsSchema._type;
+export type SelectVitrerieTarifsType = z.infer<typeof selectVitrerieTarifsSchema>;
 export type SelectVitrerieTarifFournisseurType =
-  typeof selectVitrerieTarifsFournisseurSchema._type;
+  z.infer<typeof selectVitrerieTarifsFournisseurSchema>;
 
 export const createVitrerieTarifsUpdateSchema = (messages: {
   cadenceVitres: string;
@@ -82,7 +82,7 @@ export const updateVitrerieTarifsSchema = createVitrerieTarifsUpdateSchema({
   minFacturation: "Le minimum de facturation doit être supérieur à 0",
   fraisDeplacement: "Les frais de déplacement doivent être supérieurs à 0",
 });
-export type UpdateVitrerieTarifsType = typeof updateVitrerieTarifsSchema._type;
+export type UpdateVitrerieTarifsType = z.infer<typeof updateVitrerieTarifsSchema>;
 
 export const createUpdateVitrerieTarifsServerSchema = (messages: {
   cadenceVitres: string;
@@ -110,4 +110,4 @@ export const updateVitrerieTarifsServerSchema =
     fraisDeplacement: "Les frais de déplacement doivent être supérieurs à 0",
   });
 export type UpdateVitrerieTarifsServerType =
-  typeof updateVitrerieTarifsServerSchema._type;
+  z.infer<typeof updateVitrerieTarifsServerSchema>;

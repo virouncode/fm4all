@@ -145,7 +145,7 @@ const HygieneMobileOptionsParfumInput = ({
             className={`w-16 ${
               hygiene.quantites.nbDistribParfum ===
               hygieneDistribQuantite.nbDistribParfum
-                ? "text-fm4alldestructive"
+                ? "text-destructive"
                 : ""
             }`}
             id="nbDistribParfum"
@@ -168,7 +168,7 @@ const HygieneMobileOptionsParfumInput = ({
           </Button>
         </div>
 
-        <p className="text-fm4alldestructive text-xs italic">
+        <p className="text-destructive text-xs italic">
           {t(
             "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
           )}

@@ -170,7 +170,6 @@ const AdminForm = () => {
             />
           </div>
           <Button
-            variant="destructive"
             size="lg"
             title={tAdmin("creer-un-compte")}
             className="mt-6 w-full text-base"

@@ -81,51 +81,59 @@ const TicketsTable = ({
         const newOrderBy = first.id as TicketsQueryBackendType["orderBy"];
         const newOrderDir = first.desc ? "desc" : "asc";
 
-        // on met à jour la query locale
-        const newQuery: TicketsQueryBackendType = {
-          ...query,
+        // ⚠️ ici : on ne fait QUE mettre à jour la query
+        setQuery((prevQuery) => ({
+          ...prevQuery,
           orderBy: newOrderBy,
           orderDir: newOrderDir,
           page: 1,
-        };
-        setQuery(newQuery);
-
-        (async () => {
-          try {
-            setIsLoading(true);
-            setIsError(false);
-
-            const res = await getTicketsAction(newQuery);
-
-            if (res.serverError || res.validationErrors) {
-              console.error("Error sorting tickets:", res);
-              setIsError(true);
-              return;
-            }
-
-            if (!res.data) {
-              setIsError(true);
-              return;
-            }
-
-            const data = res.data;
-
-            setItems(data.items);
-            setTotal(data.total);
-            setHasMore(data.hasMore);
-            setPage(data.page);
-          } catch (error) {
-            console.error("Error sorting tickets:", error);
-            setIsError(true);
-          } finally {
-            setIsLoading(false);
-          }
-        })();
+        }));
       }
 
       return nextSorting;
     });
   };
+  useEffect(() => {
+    // si tu veux éviter un refetch initial inutile tu peux ajouter un guard ici
+
+    let cancelled = false;
+
+    const fetch = async () => {
+      try {
+        setIsLoading(true);
+        setIsError(false);
+
+        const res = await getTicketsAction(query);
+
+        if (cancelled) return;
+
+        if (res.serverError || res.validationErrors || !res.data) {
+          console.error("Error fetching sorted tickets:", res);
+          setIsError(true);
+          return;
+        }
+
+        const data = res.data;
+
+        setItems(data.items);
+        setTotal(data.total);
+        setHasMore(data.hasMore);
+        setPage(data.page);
+      } catch (error) {
+        if (cancelled) return;
+        console.error("Error fetching sorted tickets:", error);
+        setIsError(true);
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+
+    fetch();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [query.orderBy, query.orderDir, query.page]);
 
   // infinite scroll : charger la page suivante
   const loadMore = useCallback(async () => {

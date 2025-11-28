@@ -80,12 +80,7 @@ const ResetPasswordForm = ({ token }: ResetPasswordProps) => {
             nameInSchema="passwordConfirmation"
             type="password"
           />
-          <Button
-            className="w-full text-base"
-            disabled={loading}
-            variant="destructive"
-            size="lg"
-          >
+          <Button className="w-full text-base" disabled={loading} size="lg">
             {loading ? (
               <Loader2 size={16} className="animate-spin" />
             ) : (
