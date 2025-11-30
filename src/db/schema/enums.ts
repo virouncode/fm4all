@@ -2,17 +2,14 @@ import {
   ticketCategorieCodes,
   ticketPrioriteCodes,
   ticketStatusCodes,
+  typeBatimentCodes,
+  typeOccupationCodes,
   userRoleCodes,
 } from "@/constants/codeTables";
 import { pgEnum } from "drizzle-orm/pg-core";
 
 export const statusEnum = pgEnum("status", ["active", "inactive"]);
-export const typeBatimentEnum = pgEnum("typebatiment", [
-  "bureaux",
-  "localCommercial",
-  "entrepot",
-  "cabinetMedical",
-]);
+export const typeBatimentEnum = pgEnum("typebatiment", typeBatimentCodes);
 export const gammeEnum = pgEnum("gamme", [
   "essentiel",
   "confort",
@@ -28,11 +25,7 @@ export const typeHygieneEnum = pgEnum("typehygiene", [
   "balai",
   "poubelle",
 ]);
-export const typeOccupationEnum = pgEnum("typeoccupation", [
-  "partieEtage",
-  "plateauComplet",
-  "batimentEntier",
-]);
+export const typeOccupationEnum = pgEnum("typeoccupation", typeOccupationCodes);
 export const possibiliteEnum = pgEnum("possibilite", [
   "possible",
   "non",

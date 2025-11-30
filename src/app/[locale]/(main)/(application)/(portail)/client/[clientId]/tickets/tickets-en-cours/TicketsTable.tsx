@@ -108,7 +108,7 @@ const TicketsTable = ({
         if (cancelled) return;
 
         if (res.serverError || res.validationErrors || !res.data) {
-          console.error("Error fetching sorted tickets:", res);
+          console.error("Erreur lors de la récupération des tickets:", res);
           setIsError(true);
           return;
         }
@@ -121,7 +121,7 @@ const TicketsTable = ({
         setPage(data.page);
       } catch (error) {
         if (cancelled) return;
-        console.error("Error fetching sorted tickets:", error);
+        console.error("Erreur lors de la récupération des tickets:", error);
         setIsError(true);
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -155,7 +155,7 @@ const TicketsTable = ({
       setHasMore(result.data?.hasMore ?? false);
       setPage(result.data?.page ?? 1);
     } catch (error) {
-      console.error("Error loading more tickets:", error);
+      console.error("Erreur lors du chargement de plus de tickets:", error);
       setIsError(true);
     } finally {
       setIsLoadingMore(false);

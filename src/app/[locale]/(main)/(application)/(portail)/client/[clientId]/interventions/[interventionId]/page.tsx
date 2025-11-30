@@ -23,7 +23,18 @@ const page = async ({
 }) => {
   const { clientId, interventionId } = await params;
   const [sites, fournisseurs, initialIntervention] = await Promise.all([
-    getClientSites(parseInt(clientId)),
+    getClientSites({
+      clientId: parseInt(clientId),
+      query: {
+        nomSite: undefined,
+        codePostal: undefined,
+        ville: undefined,
+        typeBatiment: undefined,
+        typeOccupation: undefined,
+        orderBy: "nomSite",
+        orderDir: "asc",
+      },
+    }),
     getClientFournisseurs(parseInt(clientId)),
     getIntervention(parseInt(interventionId)),
   ]);

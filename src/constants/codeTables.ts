@@ -93,6 +93,33 @@ export const interventionTypeCodes = interventionTypeCT.map(
   ...(typeof interventionTypeCT)[number]["code"][],
 ];
 
+export const typeBatimentCT = [
+  { code: "bureaux", name: "Bureaux" },
+  { code: "localCommercial", name: "Local commercial" },
+  { code: "entrepot", name: "Entrepot" },
+  { code: "cabinetMedical", name: "Cabinet médical" },
+] as const;
+
+export const typeBatimentCodes = typeBatimentCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof typeBatimentCT)[number]["code"],
+  ...(typeof typeBatimentCT)[number]["code"][],
+];
+
+export const typeOccupationCT = [
+  { code: "partieEtage", name: "Partie d'étage" },
+  { code: "plateauComplet", name: "Plateau complet" },
+  { code: "batimentEntier", name: "Bâtiment entier" },
+] as const;
+
+export const typeOccupationCodes = typeOccupationCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof typeOccupationCT)[number]["code"],
+  ...(typeof typeOccupationCT)[number]["code"][],
+];
+
 export const toCodeTableName = (
   code: string,
   table: readonly { code: string; name: string }[],

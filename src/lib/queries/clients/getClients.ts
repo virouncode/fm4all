@@ -3,8 +3,12 @@ import { clientFournisseurs, clients, fournisseurs, sites } from "@/db/schema";
 import { errorHelper } from "@/lib/errorHelper";
 import { selectClientSchema } from "@/zod-schemas/client";
 import { selectFournisseurSchema } from "@/zod-schemas/fournisseur";
-import { selectSiteSchema } from "@/zod-schemas/site";
-import { and, eq } from "drizzle-orm";
+import {
+  selectSiteSchema,
+  SitesQueryBackendType,
+  SORTABLE_SITES_COLUMNS,
+} from "@/zod-schemas/site";
+import { and, asc, desc, eq, ilike, SQL } from "drizzle-orm";
 
 export const getClientsWithEmailAndNomContact = async (
   emailContact: string,
@@ -38,13 +42,47 @@ export const getClients = async () => {
   }
 };
 
-export const getClientSites = async (clientId: number) => {
+export const getClientSites = async (params: {
+  clientId: number;
+  query: SitesQueryBackendType;
+}) => {
+  const { clientId } = params;
+  const {
+    nomSite,
+    codePostal,
+    ville,
+    typeBatiment,
+    typeOccupation,
+    orderBy,
+    orderDir,
+  } = params.query;
+
+  console.log("getClientSites params:", params);
+
+  const whereClauses: SQL[] = [];
+  whereClauses.push(eq(sites.clientId, clientId));
+
+  if (nomSite) whereClauses.push(ilike(sites.nomSite, `%${nomSite}%`));
+  if (codePostal) whereClauses.push(eq(sites.codePostal, codePostal));
+  if (ville) whereClauses.push(ilike(sites.ville, `%${ville}%`));
+  if (typeBatiment) whereClauses.push(eq(sites.typeBatiment, typeBatiment));
+  if (typeOccupation)
+    whereClauses.push(eq(sites.typeOccupation, typeOccupation));
+
+  const orderColumn =
+    SORTABLE_SITES_COLUMNS[orderBy] ?? SORTABLE_SITES_COLUMNS.nomSite;
+
+  const orderDirection = orderDir === "asc" ? asc : desc;
+  const orderExpr = orderDirection(orderColumn);
+
+  const where = whereClauses.length > 0 ? and(...whereClauses) : undefined;
+
   try {
     const results = await db
       .select()
       .from(sites)
-      .where(eq(sites.clientId, clientId))
-      .orderBy(sites.nomSite);
+      .where(where)
+      .orderBy(orderExpr);
     const parsedResult = results.map((s) => selectSiteSchema.parse(s));
     return parsedResult;
   } catch (err) {
@@ -72,5 +110,23 @@ export const getClientFournisseurs = async (clientId: number) => {
   } catch (err) {
     errorHelper(err);
     return [];
+  }
+};
+
+export const getClientSiteById = async (siteId: number) => {
+  try {
+    const result = await db
+      .select()
+      .from(sites)
+      .where(eq(sites.id, siteId))
+      .limit(1);
+    if (result.length === 0) {
+      return null;
+    }
+    const parsedResult = selectSiteSchema.parse(result[0]);
+    return parsedResult;
+  } catch (err) {
+    errorHelper(err);
+    return null;
   }
 };

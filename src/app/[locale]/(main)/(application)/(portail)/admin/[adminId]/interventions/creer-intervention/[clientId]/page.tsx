@@ -3,9 +3,9 @@ import {
   getClientFournisseurs,
   getClientSites,
 } from "@/lib/queries/clients/getClients";
+import { InsertInterventionType } from "@/zod-schemas/intervention";
 import { ReactNode } from "react";
 import NouveauInterventionForm from "./NouveauInterventionForm";
-import { InsertInterventionType } from "@/zod-schemas/intervention";
 
 const page = async ({
   params,
@@ -15,7 +15,18 @@ const page = async ({
   const { clientId } = await params;
 
   const [sites, fournisseurs] = await Promise.all([
-    getClientSites(parseInt(clientId)),
+    getClientSites({
+      clientId: parseInt(clientId),
+      query: {
+        nomSite: undefined,
+        codePostal: undefined,
+        ville: undefined,
+        typeBatiment: undefined,
+        typeOccupation: undefined,
+        orderBy: "nomSite",
+        orderDir: "asc",
+      },
+    }),
     getClientFournisseurs(parseInt(clientId)),
   ]);
 

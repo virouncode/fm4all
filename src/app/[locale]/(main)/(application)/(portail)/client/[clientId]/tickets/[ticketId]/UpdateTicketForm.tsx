@@ -6,8 +6,7 @@ import { toast } from "@/hooks/use-toast";
 import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
 import { SelectSiteType } from "@/zod-schemas/site";
 import {
-  insertTicketFormSchema,
-  InsertTicketFormType,
+  updateTicketFormSchema,
   UpdateTicketFormType,
 } from "@/zod-schemas/ticket";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,10 +27,10 @@ export default function UpdateTicketForm({
   sites,
   fournisseurs,
 }: UpdateTicketFormProps) {
-  const form = useForm<InsertTicketFormType>({
+  const form = useForm<UpdateTicketFormType>({
     defaultValues,
     mode: "onTouched",
-    resolver: zodResolver(insertTicketFormSchema),
+    resolver: zodResolver(updateTicketFormSchema),
   });
 
   const {
@@ -51,7 +50,7 @@ export default function UpdateTicketForm({
       onError: ({ error }) => {
         const message =
           (typeof error.serverError === "string" && error.serverError) ||
-          "Impossible de créer le ticket, veuillez réessayer.";
+          "Impossible de mettre à jour le ticket, veuillez réessayer.";
 
         toast({
           variant: "destructive",
@@ -62,7 +61,7 @@ export default function UpdateTicketForm({
     },
   );
 
-  const submitForm = (data: InsertTicketFormType) => {
+  const submitForm = (data: UpdateTicketFormType) => {
     const payload = {
       ...data,
       fournisseurId: data.fournisseurId === 0 ? null : data.fournisseurId,
