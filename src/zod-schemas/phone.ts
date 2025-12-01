@@ -8,11 +8,11 @@ export const phoneNumberSchema = (message: string) =>
     .trim()
     .refine(
       (val) => {
-        const phone = parsePhoneNumberFromString(val);
+        const phone = parsePhoneNumberFromString(val, "FR");
         return phone?.isValid() ?? false;
       },
       {
         message,
       },
     )
-    .transform((val) => parsePhoneNumberFromString(val)!.format("E.164"));
+    .transform((val) => parsePhoneNumberFromString(val, "FR")!.format("E.164"));

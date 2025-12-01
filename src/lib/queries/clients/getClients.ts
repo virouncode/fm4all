@@ -1,13 +1,29 @@
 import { db } from "@/db";
-import { clientFournisseurs, clients, fournisseurs, sites } from "@/db/schema";
+import {
+  clientFournisseurs,
+  clients,
+  fournisseurs,
+  sites,
+  user,
+} from "@/db/schema";
 import { errorHelper } from "@/lib/errorHelper";
-import { selectClientSchema } from "@/zod-schemas/client";
-import { selectFournisseurSchema } from "@/zod-schemas/fournisseur";
+import { selectClientSchema, SelectClientType } from "@/zod-schemas/client";
+import {
+  selectFournisseurSchema,
+  SelectFournisseurType,
+} from "@/zod-schemas/fournisseur";
 import {
   selectSiteSchema,
+  SelectSiteType,
   SitesQueryBackendType,
   SORTABLE_SITES_COLUMNS,
 } from "@/zod-schemas/site";
+import {
+  ClientUsersQueryBackendType,
+  selectUserSchema,
+  SelectUserType,
+  SORTABLE_CLIENT_USERS_COLUMNS,
+} from "@/zod-schemas/user";
 import { and, asc, desc, eq, ilike, SQL } from "drizzle-orm";
 
 export const getClientsWithEmailAndNomContact = async (
@@ -25,10 +41,11 @@ export const getClientsWithEmailAndNomContact = async (
     return result;
   } catch (err) {
     errorHelper(err);
+    return 0;
   }
 };
 
-export const getClients = async () => {
+export const getClients = async (): Promise<SelectClientType[]> => {
   try {
     const results = await db
       .select()
@@ -45,7 +62,7 @@ export const getClients = async () => {
 export const getClientSites = async (params: {
   clientId: number;
   query: SitesQueryBackendType;
-}) => {
+}): Promise<SelectSiteType[]> => {
   const { clientId } = params;
   const {
     nomSite,
@@ -56,8 +73,6 @@ export const getClientSites = async (params: {
     orderBy,
     orderDir,
   } = params.query;
-
-  console.log("getClientSites params:", params);
 
   const whereClauses: SQL[] = [];
   whereClauses.push(eq(sites.clientId, clientId));
@@ -91,7 +106,9 @@ export const getClientSites = async (params: {
   }
 };
 
-export const getClientFournisseurs = async (clientId: number) => {
+export const getClientFournisseurs = async (
+  clientId: number,
+): Promise<SelectFournisseurType[]> => {
   try {
     const results = await db
       .select({
@@ -113,7 +130,9 @@ export const getClientFournisseurs = async (clientId: number) => {
   }
 };
 
-export const getClientSiteById = async (siteId: number) => {
+export const getClientSiteById = async (
+  siteId: number,
+): Promise<SelectSiteType | null> => {
   try {
     const result = await db
       .select()
@@ -128,5 +147,37 @@ export const getClientSiteById = async (siteId: number) => {
   } catch (err) {
     errorHelper(err);
     return null;
+  }
+};
+
+export const getClientUsers = async (params: {
+  clientId: number;
+  query: ClientUsersQueryBackendType;
+}): Promise<SelectUserType[]> => {
+  try {
+    const { lastName, firstName, email, orderBy, orderDir } = params.query;
+
+    const whereClauses: SQL[] = [];
+    whereClauses.push(eq(user.clientId, params.clientId));
+
+    if (lastName) whereClauses.push(ilike(user.lastName, `%${lastName}%`));
+    if (firstName) whereClauses.push(ilike(user.firstName, `%${firstName}%`));
+    if (email) whereClauses.push(ilike(user.email, `%${email}%`));
+
+    const orderColumn =
+      SORTABLE_CLIENT_USERS_COLUMNS[orderBy] ??
+      SORTABLE_CLIENT_USERS_COLUMNS.lastName;
+
+    const orderDirection = orderDir === "asc" ? asc : desc;
+    const orderExpr = orderDirection(orderColumn);
+
+    const where = whereClauses.length > 0 ? and(...whereClauses) : undefined;
+
+    const result = await db.select().from(user).where(where).orderBy(orderExpr);
+    const parsedResult = result.map((u) => selectUserSchema.parse(u));
+    return parsedResult;
+  } catch (err) {
+    errorHelper(err);
+    return [];
   }
 };

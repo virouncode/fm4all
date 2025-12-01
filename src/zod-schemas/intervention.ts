@@ -4,7 +4,8 @@ import {
   interventionStatusEnum,
   interventionTypeEnum,
 } from "@/db/schema";
-import { emptyStringToUndefined } from "@/normalize/emptyStringToUndefined";
+import { emptyStringToUndefinedOptional } from "@/normalize/emptyStringToUndefined";
+
 import {
   normalizeSearchParams,
   RawSearchParams,
@@ -122,27 +123,26 @@ export type InterventionsQueryBackendType = z.infer<
 
 //========= FRONTEND ========//
 //filtres
-export const interventionsQueryFiltersSchema = z.object({
-  dateDebutPrevueFrom: emptyStringToUndefined,
-  dateDebutPrevueTo: emptyStringToUndefined,
-  type: interventionTypeSchema.or(z.literal("all")).optional(),
-  status: interventionStatusSchema.or(z.literal("all")).optional(),
-  fournisseurId: emptyStringToUndefined,
-  siteId: emptyStringToUndefined,
-});
+export const interventionsQueryFiltersSchema = z
+  .object({
+    dateDebutPrevueFrom: emptyStringToUndefinedOptional,
+    dateDebutPrevueTo: emptyStringToUndefinedOptional,
+    type: interventionTypeSchema.or(z.literal("all")).optional(),
+    status: interventionStatusSchema.or(z.literal("all")).optional(),
+    fournisseurId: emptyStringToUndefinedOptional,
+    siteId: emptyStringToUndefinedOptional,
+  })
+  .partial();
 
 export type InterventionsQueryFiltersType = z.infer<
   typeof interventionsQueryFiltersSchema
 >;
 
 //filtres + tri + pagination
-export const interventionsQueryFrontendSchema = interventionsQueryFiltersSchema
-  .merge(createSortSchema(SORTABLE_INTERVENTIONS_COLUMNS, "dateDebutPrevue"))
-  .extend({
-    //pagination
-    page: z.coerce.number().int().positive().default(1),
-    pageSize: z.coerce.number().int().positive().default(DEFAULT_PAGE_SIZE),
-  });
+export const interventionsQueryFrontendSchema =
+  interventionsQueryFiltersSchema.merge(
+    createSortSchema(SORTABLE_INTERVENTIONS_COLUMNS, "dateDebutPrevue"),
+  );
 export type InterventionsQueryFrontendType = z.infer<
   typeof interventionsQueryFrontendSchema
 >;
@@ -185,7 +185,5 @@ export function parseInterventionsQuery(raw: RawSearchParams) {
     type,
     orderBy: urlQuery.orderBy,
     orderDir: urlQuery.orderDir,
-    page: urlQuery.page,
-    pageSize: urlQuery.pageSize,
   });
 }

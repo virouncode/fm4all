@@ -17,7 +17,7 @@ const page = async ({
   const query = parseTicketsQuery(await searchParams); // <-- Backend type
 
   const initialData = await getTickets({
-    clientId: parseInt(clientId, 10),
+    clientId: parseInt(clientId),
     query,
   });
 
@@ -30,14 +30,14 @@ const page = async ({
       </div>
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="border-b p-4">
-          <TicketsFiltersForm clientId={parseInt(clientId, 10)} />
+          <TicketsFiltersForm initialFilters={query} />
         </div>
         <div className="min-h-0 flex-1 p-4">
           <TicketsTable
-            initialQuery={query}
             initialData={initialData}
+            initialQuery={query}
             idLabelMap={ticketsIdLabelMap}
-            clientId={parseInt(clientId, 10)}
+            clientId={parseInt(clientId)}
           />
         </div>
       </div>

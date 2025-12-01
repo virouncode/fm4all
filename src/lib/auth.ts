@@ -2,7 +2,6 @@ import { db } from "@/db";
 import { account, session, user, verification } from "@/db/schema";
 import { betterAuth, BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { inferAdditionalFields } from "better-auth/client/plugins";
 import { nextCookies } from "better-auth/next-js";
 import { openAPI } from "better-auth/plugins";
 import { sendEmailFromServer } from "./email/sendEmail";
@@ -44,7 +43,6 @@ export const auth = betterAuth({
         type: "string",
         required: true,
         defaultValue: "admin",
-        input: true,
       },
       fournisseurId: {
         type: "number",
@@ -56,10 +54,17 @@ export const auth = betterAuth({
         required: false,
         defaultValue: null,
       },
-      image: {
+      firstName: {
+        type: "string",
+        required: true,
+      },
+      lastName: {
+        type: "string",
+        required: true,
+      },
+      phone: {
         type: "string",
         required: false,
-        defaultValue: null,
       },
     },
   },
@@ -94,5 +99,8 @@ export const auth = betterAuth({
       });
     },
   },
-  plugins: [inferAdditionalFields<typeof user>(), openAPI(), nextCookies()], //api/auth/reference
+  plugins: [openAPI(), nextCookies()], //api/auth/reference
 } satisfies BetterAuthOptions);
+
+export type AuthSession = typeof auth.$Infer.Session;
+export type AuthUser = AuthSession["user"];

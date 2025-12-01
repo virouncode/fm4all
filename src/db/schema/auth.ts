@@ -14,6 +14,9 @@ export const user = pgTable(
   {
     id: text("id").primaryKey(),
     name: text("name").notNull(),
+    firstName: text("first_name").notNull(),
+    lastName: text("last_name").notNull(),
+    phone: text("phone"),
     email: text("email").unique().notNull(),
     emailVerified: boolean("email_verified").notNull(),
     image: text("image"),
@@ -24,10 +27,13 @@ export const user = pgTable(
     updatedAt: updatedAt(),
   },
   (table) => [
-    // email est déjà unique() → index implicite
     index("user_role_idx").on(table.role),
     index("user_fournisseur_id_idx").on(table.fournisseurId),
+    index("user_email_idx").on(table.email),
     index("user_client_id_idx").on(table.clientId),
+    index("user_first_name_idx").on(table.firstName),
+    index("user_last_name_idx").on(table.lastName),
+    index("user_phone_idx").on(table.phone),
   ],
 );
 

@@ -15,12 +15,10 @@ const page = async ({
 }) => {
   const { clientId } = await params;
   const query = parseSitesQuery(await searchParams);
-  const initialData = await getClientSites({
+  const sites = await getClientSites({
     clientId: parseInt(clientId),
     query,
   });
-
-  console.log("initialData", initialData);
 
   return (
     <main className="flex h-full w-full flex-col overflow-hidden md:border-x">
@@ -29,14 +27,13 @@ const page = async ({
       </div>
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="border-b p-4">
-          <ClientSitesFiltersForm clientId={parseInt(clientId)} />
+          <ClientSitesFiltersForm initialFilters={query} />
         </div>
         <div className="min-h-0 flex-1 p-4">
           <ClientSitesTable
-            initialQuery={query}
-            initialData={initialData}
+            items={sites}
             idLabelMap={sitesIdLabelMap}
-            clientId={parseInt(clientId, 10)}
+            clientId={parseInt(clientId)}
           />
         </div>
       </div>

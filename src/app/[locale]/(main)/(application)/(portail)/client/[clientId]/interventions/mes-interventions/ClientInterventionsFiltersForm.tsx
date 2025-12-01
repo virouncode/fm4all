@@ -8,46 +8,50 @@ import {
   interventionStatusCT,
   interventionTypeCT,
 } from "@/constants/codeTables";
-import { DEFAULT_PAGE_SIZE } from "@/constants/pagination";
 import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
 import {
-  interventionsQueryFiltersSchema,
+  InterventionsQueryBackendType,
   InterventionsQueryFiltersType,
 } from "@/zod-schemas/intervention";
 import { SelectSiteType } from "@/zod-schemas/site";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { DateTime } from "luxon";
-import { useRouter } from "next/navigation";
-import qs from "query-string";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 type ClientInterventionsFiltersFormProps = {
-  clientId: number;
+  initialFilters: InterventionsQueryBackendType;
   sites: SelectSiteType[];
   fournisseurs: SelectFournisseurType[];
 };
 
 const ClientInterventionsFiltersForm = ({
-  clientId,
+  initialFilters,
   sites,
   fournisseurs,
 }: ClientInterventionsFiltersFormProps) => {
   const { replace } = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const defaultValues: InterventionsQueryFiltersType = {
-    dateDebutPrevueFrom: "",
-    dateDebutPrevueTo: "",
+    dateDebutPrevueFrom: initialFilters.dateDebutPrevueFrom
+      ? initialFilters.dateDebutPrevueFrom.toISOString().slice(0, 10)
+      : "",
+    dateDebutPrevueTo: initialFilters.dateDebutPrevueTo
+      ? initialFilters.dateDebutPrevueTo.toISOString().slice(0, 10)
+      : "",
     type: "all",
     status: "all",
-    fournisseurId: "0",
-    siteId: "0",
+    fournisseurId: initialFilters.fournisseurId
+      ? String(initialFilters.fournisseurId)
+      : "0",
+    siteId: initialFilters.siteId ? String(initialFilters.siteId) : "0",
   };
 
   const form = useForm<InterventionsQueryFiltersType>({
     defaultValues,
     mode: "onTouched",
-    resolver: zodResolver(interventionsQueryFiltersSchema),
   });
   const filters = useWatch({ control: form.control });
   const start = useWatch({
@@ -85,26 +89,34 @@ const ClientInterventionsFiltersForm = ({
   }, [start]);
 
   useEffect(() => {
-    if (!filters) return;
-    const newQuery = {
-      ...filters,
-      page: 1,
-      pageSize: DEFAULT_PAGE_SIZE,
-    };
-    if (newQuery.fournisseurId === "0") delete newQuery.fournisseurId;
-    if (newQuery.siteId === "0") delete newQuery.siteId;
-    const url = qs.stringifyUrl(
-      {
-        url: `/client/${clientId}/interventions/mes-interventions`,
-        query: Object.fromEntries(
-          Object.entries(newQuery).filter(([_, v]) => v && v !== "all"),
-        ),
-      },
-      { skipNull: true, skipEmptyString: true },
-    );
+    const params = new URLSearchParams();
 
-    replace(url);
-  }, [filters, replace]);
+    if (filters.dateDebutPrevueFrom) {
+      params.set("dateDebutPrevueFrom", filters.dateDebutPrevueFrom);
+    }
+    if (filters.dateDebutPrevueTo) {
+      params.set("dateDebutPrevueTo", filters.dateDebutPrevueTo);
+    }
+    if (filters.type) {
+      params.set("type", filters.type);
+    }
+    if (filters.status) {
+      params.set("status", filters.status);
+    }
+    if (filters.fournisseurId) {
+      params.set("fournisseurId", filters.fournisseurId);
+    }
+    if (filters.siteId) {
+      params.set("siteId", filters.siteId);
+    }
+
+    const next = `${pathname}?${params.toString()}`;
+    const current = `${pathname}?${searchParams.toString()}`;
+
+    if (next !== current) {
+      replace(next, { scroll: false });
+    }
+  }, [filters, pathname, replace]);
 
   return (
     <Form {...form}>

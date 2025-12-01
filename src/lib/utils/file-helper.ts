@@ -36,7 +36,7 @@ const splitName = (filename: string) => {
   return { base, ext };
 };
 
-export const buildFinalBlobPath = (opts: {
+export const buildFinalTicketAttachmentBlobPath = (opts: {
   clientId: number | string;
   ticketId: number | string;
   filename: string;
@@ -52,7 +52,7 @@ export const buildFinalBlobPath = (opts: {
  * Promeut un fichier temp -> chemin définitif et supprime l’ancien.
  * Si le fichier n’est pas dans /temp/, il est renvoyé tel quel.
  */
-export const promoteTempBlob = async (
+export const promoteTempTicketAttachment = async (
   attachment: TempAttachmentInput,
   {
     clientId,
@@ -71,7 +71,7 @@ export const promoteTempBlob = async (
     return attachment;
   }
 
-  const targetPath = buildFinalBlobPath({
+  const targetPath = buildFinalTicketAttachmentBlobPath({
     clientId,
     ticketId,
     filename,
@@ -98,4 +98,48 @@ export const promoteTempBlob = async (
     url: newBlob.url,
     // size et mimeType peuvent rester ceux d’origine (ils ne changent pas)
   };
+};
+
+const buildFinalAvatarBlobPath = (avatarUrl: string, userRole: string) => {
+  const parsed = new URL(avatarUrl);
+  const filenameFromUrl = parsed.pathname.split("/").pop() || "avatar.bin";
+
+  const { base, ext } = splitName(filenameFromUrl);
+
+  // On ajoute un timestamp pour éviter les collisions
+  return `avatars/${userRole}/${base}_${Date.now()}.${ext}`;
+};
+
+export const promoteTempAvatarUrl = async (
+  avatarUrl: string | null | undefined,
+  userRole: string,
+): Promise<string | null | undefined> => {
+  // Si ce n’est pas un fichier temp, on ne fait rien
+  if (!avatarUrl) {
+    return avatarUrl;
+  }
+  if (!isTempBlob(avatarUrl)) {
+    return avatarUrl;
+  }
+
+  const targetPath = buildFinalAvatarBlobPath(avatarUrl, userRole);
+
+  // On lit le blob public existant
+  const res = await fetch(avatarUrl);
+  if (!res.ok || !res.body) {
+    throw new Error("Impossible de lire l'avatar temporaire pour promotion.");
+  }
+
+  const contentType = res.headers.get("content-type") ?? undefined;
+
+  // On ré-upload dans le chemin définitif
+  const newBlob = await put(targetPath, res.body, {
+    access: "public",
+    contentType,
+  });
+
+  // On supprime l’ancien dans /temp
+  await del(avatarUrl); // del accepte une URL complète
+
+  return newBlob.url;
 };

@@ -103,7 +103,10 @@ const HygieneMinFacturationForm = ({
     );
   };
   const submitForm = async (data: UpdateHygieneMinFacturationType) => {
-    executeUpdateHygieneMinFacturation(data);
+    executeUpdateHygieneMinFacturation({
+      ...data,
+      minFacturation: Number(data.minFacturation),
+    });
   };
   return (
     <>

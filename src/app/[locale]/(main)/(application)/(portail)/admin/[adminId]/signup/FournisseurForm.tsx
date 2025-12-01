@@ -156,6 +156,9 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
         role: "fournisseur",
         fournisseurId,
         image: null,
+        firstName: data.prenomContact,
+        lastName: data.nomContact,
+        phone: data.phoneContact,
       });
     }
   };

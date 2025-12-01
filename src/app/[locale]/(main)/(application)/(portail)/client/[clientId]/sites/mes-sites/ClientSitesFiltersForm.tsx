@@ -6,72 +6,87 @@ import { SelectItem } from "@/components/ui/select";
 import { typeBatimentCT, typeOccupationCT } from "@/constants/codeTables";
 import { useDebounce } from "@/hooks/use-debounce";
 import {
-  sitesQueryFiltersSchema,
+  SitesQueryBackendType,
   SitesQueryFiltersType,
 } from "@/zod-schemas/site";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import qs from "query-string";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 type ClientSitesFiltersFormProps = {
-  clientId: number;
+  initialFilters: SitesQueryBackendType;
 };
 
-const ClientSitesFiltersForm = ({ clientId }: ClientSitesFiltersFormProps) => {
+const ClientSitesFiltersForm = ({
+  initialFilters,
+}: ClientSitesFiltersFormProps) => {
   const { replace } = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const defaultValues: SitesQueryFiltersType = {
-    nomSite: "",
-    codePostal: "",
-    ville: "",
-    typeBatiment: "all",
-    typeOccupation: "all",
+    ...initialFilters,
+    nomSite: initialFilters.nomSite ?? "",
+    codePostal: initialFilters.codePostal ?? "",
+    ville: initialFilters.ville ?? "",
+    typeBatiment: initialFilters.typeBatiment ?? "all",
+    typeOccupation: initialFilters.typeOccupation ?? "all",
   };
 
   const form = useForm<SitesQueryFiltersType>({
     defaultValues,
-    mode: "onTouched",
-    resolver: zodResolver(sitesQueryFiltersSchema),
+    mode: "onChange",
   });
+
+  // 1) on observe TOUT le form
   const filters = useWatch({ control: form.control });
-  const debouncedNomSite = useDebounce(filters.nomSite, 300);
-  const debouncedCodePostal = useDebounce(filters.codePostal, 300);
-  const debouncedVille = useDebounce(filters.ville, 300);
-  const effectiveFilters: SitesQueryFiltersType = {
-    ...filters,
-    nomSite: debouncedNomSite || "", // garde la même shape
-    codePostal: debouncedCodePostal || "",
-    ville: debouncedVille || "",
+
+  /**
+   * 2) On extrait ce qui doit être debounced (inputs texte)
+   */
+  const textFilters = {
+    nomSite: filters.nomSite,
+    codePostal: filters.codePostal,
+    ville: filters.ville,
   };
+
+  // 3) On debounce UNIQUEMENT les champs texte
+  const debouncedTextFilters = useDebounce(textFilters, 400);
+
   useEffect(() => {
-    const newQuery: Partial<SitesQueryFiltersType> = {
-      nomSite: debouncedNomSite || undefined,
-      codePostal: debouncedCodePostal || undefined,
-      ville: debouncedVille || undefined,
-      typeBatiment: filters.typeBatiment,
-      typeOccupation: filters.typeOccupation,
-    };
+    // 1) On reconstruit l'URL cible à partir des filtres
+    const params = new URLSearchParams();
 
-    const url = qs.stringifyUrl(
-      {
-        url: `/client/${clientId}/sites/mes-sites`,
-        query: Object.fromEntries(
-          Object.entries(newQuery).filter(([_, v]) => v && v !== "all"),
-        ),
-      },
-      { skipNull: true, skipEmptyString: true },
-    );
+    if (debouncedTextFilters.nomSite) {
+      params.set("nomSite", debouncedTextFilters.nomSite);
+    }
+    if (debouncedTextFilters.codePostal) {
+      params.set("codePostal", debouncedTextFilters.codePostal);
+    }
+    if (debouncedTextFilters.ville) {
+      params.set("ville", debouncedTextFilters.ville);
+    }
+    if (filters.typeBatiment) {
+      params.set("typeBatiment", filters.typeBatiment);
+    }
+    if (filters.typeOccupation) {
+      params.set("typeOccupation", filters.typeOccupation);
+    }
 
-    replace(url);
+    const next = `${pathname}?${params.toString()}`;
+    const current = `${pathname}?${searchParams.toString()}`;
+
+    // 2) Très important : NE NAVIGUER QUE SI ÇA CHANGE
+    if (next !== current) {
+      replace(next, { scroll: false });
+    }
   }, [
-    clientId,
-    debouncedNomSite,
-    debouncedCodePostal,
-    debouncedVille,
+    debouncedTextFilters.nomSite,
+    debouncedTextFilters.codePostal,
+    debouncedTextFilters.ville,
     filters.typeBatiment,
     filters.typeOccupation,
+    pathname,
     replace,
   ]);
 
@@ -81,13 +96,12 @@ const ClientSitesFiltersForm = ({ clientId }: ClientSitesFiltersFormProps) => {
         <RhfInput<SitesQueryFiltersType>
           name="nomSite"
           label="Nom du site"
-          placeholder="Rechercher par nom de site"
           className="w-40"
         />
         <RhfInput<SitesQueryFiltersType>
           name="codePostal"
           label="Code postal"
-          placeholder="Rechercher par code postal"
+          placeholder="XXXXX"
           className="w-40"
         />
         <RhfInput<SitesQueryFiltersType>

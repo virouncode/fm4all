@@ -6,7 +6,8 @@ import {
   ticketsAttachments,
   ticketStatusEnum,
 } from "@/db/schema";
-import { emptyStringToUndefined } from "@/normalize/emptyStringToUndefined";
+import { emptyStringToUndefinedOptional } from "@/normalize/emptyStringToUndefined";
+
 import {
   normalizeSearchParams,
   RawSearchParams,
@@ -162,27 +163,23 @@ export type TicketsQueryBackendType = z.infer<typeof ticketsQueryBackendSchema>;
 
 //========= FRONTEND ========//
 //filtres
-export const ticketsQueryFiltersSchema = z.object({
-  createdFrom: emptyStringToUndefined,
-  createdTo: emptyStringToUndefined,
-  categorie: ticketCategorieSchema.or(z.literal("all")).optional(),
-  priorite: ticketPrioriteSchema.or(z.literal("all")).optional(),
-  status: ticketStatusSchema.or(z.literal("all")).optional(),
-  fournisseurId: emptyStringToUndefined,
-  siteId: emptyStringToUndefined,
-});
+export const ticketsQueryFiltersSchema = z
+  .object({
+    createdFrom: emptyStringToUndefinedOptional,
+    createdTo: emptyStringToUndefinedOptional,
+    categorie: ticketCategorieSchema.or(z.literal("all")).optional(),
+    priorite: ticketPrioriteSchema.or(z.literal("all")).optional(),
+    status: ticketStatusSchema.or(z.literal("all")).optional(),
+    fournisseurId: emptyStringToUndefinedOptional,
+    siteId: emptyStringToUndefinedOptional,
+  })
+  .partial();
 export type TicketsQueryFiltersType = z.infer<typeof ticketsQueryFiltersSchema>;
 
 //filtres + tri + pagination
-export const ticketsQueryFrontendSchema = ticketsQueryFiltersSchema
-  .merge(
-    createSortSchema(SORTABLE_TICKETS_COLUMNS, "createdAt"), // orderBy, orderDir
-  )
-  .extend({
-    //pagination
-    page: z.coerce.number().int().positive().default(1),
-    pageSize: z.coerce.number().int().positive().default(DEFAULT_PAGE_SIZE),
-  });
+export const ticketsQueryFrontendSchema = ticketsQueryFiltersSchema.merge(
+  createSortSchema(SORTABLE_TICKETS_COLUMNS, "createdAt"), // orderBy, orderDir
+);
 
 export type TicketsQueryFrontendType = z.infer<
   typeof ticketsQueryFrontendSchema
@@ -251,8 +248,6 @@ export function parseTicketsQuery(
     siteId,
     orderBy,
     orderDir,
-    page: urlQuery.page,
-    pageSize: urlQuery.pageSize,
   });
 }
 

@@ -25,8 +25,10 @@ export const updateHygieneMinFacturationServerSchema = createUpdateSchema(
   hygieneMinFacturation,
 );
 
-export type SelectHygieneMinFacturationType =
-  z.infer<typeof selectHygieneMinFacturationSchema>;
+export type SelectHygieneMinFacturationType = z.infer<
+  typeof selectHygieneMinFacturationSchema
+>;
 
-export type UpdateHygieneMinFacturationType =
-  z.infer<typeof updateHygieneMinFacturationSchema>;
+export type UpdateHygieneMinFacturationType = z.input<
+  typeof updateHygieneMinFacturationSchema
+>;

@@ -271,9 +271,9 @@ export const routing = defineRouting({
     },
 
     // ----- Compte -----
-    "/client/[clientId]/compte/mon-profil": {
-      fr: "/client/[clientId]/compte/mon-profil",
-      en: "/client/[clientId]/compte/mon-profil",
+    "/client/[clientId]/compte/mon-profil/[userId]": {
+      fr: "/client/[clientId]/compte/mon-profil/[userId]",
+      en: "/client/[clientId]/compte/mon-profil/[userId]",
     },
 
     "/client/[clientId]/compte/mon-equipe": {
@@ -289,6 +289,10 @@ export const routing = defineRouting({
     "/client/[clientId]/compte/preferences": {
       fr: "/client/[clientId]/compte/preferences",
       en: "/client/[clientId]/compte/preferences",
+    },
+    "/client/[clientId]/compte/mon-equipe/ajouter": {
+      fr: "/client/[clientId]/compte/mon-equipe/ajouter",
+      en: "/client/[clientId]/compte/mon-equipe/ajouter",
     },
 
     //FOURNISSEURS

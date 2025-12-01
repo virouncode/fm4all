@@ -9,38 +9,47 @@ import {
   ticketPrioriteCT,
   ticketStatusCT,
 } from "@/constants/codeTables";
-import { DEFAULT_PAGE_SIZE } from "@/constants/pagination";
 import {
-  ticketsQueryFiltersSchema,
+  TicketsQueryBackendType,
   TicketsQueryFiltersType,
 } from "@/zod-schemas/ticket";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { DateTime } from "luxon";
-import { useRouter } from "next/navigation";
-import qs from "query-string";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 type TicketsFiltersFormProps = {
-  clientId: number;
+  initialFilters: TicketsQueryBackendType;
 };
 
-const TicketsFiltersForm = ({ clientId }: TicketsFiltersFormProps) => {
+const TicketsFiltersForm = ({ initialFilters }: TicketsFiltersFormProps) => {
   const { replace } = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const defaultValues: TicketsQueryFiltersType = {
-    createdFrom: "",
-    createdTo: "",
-    categorie: "all",
-    priorite: "all",
-    status: "all",
-    fournisseurId: "",
-    siteId: "",
+    // dates → string (yyyy-mm-dd) ou ""
+    createdFrom: initialFilters.createdFrom
+      ? initialFilters.createdFrom.toISOString().slice(0, 10)
+      : "",
+    createdTo: initialFilters.createdTo
+      ? initialFilters.createdTo.toISOString().slice(0, 10)
+      : "",
+
+    // enums → valeur ou "all"
+    categorie: initialFilters.categorie ?? "all",
+    priorite: initialFilters.priorite ?? "all",
+    status: initialFilters.status ?? "all",
+
+    // ids → string ou ""
+    fournisseurId: initialFilters.fournisseurId
+      ? String(initialFilters.fournisseurId)
+      : "",
+    siteId: initialFilters.siteId ? String(initialFilters.siteId) : "",
   };
   const form = useForm<TicketsQueryFiltersType>({
     defaultValues,
     mode: "onTouched",
-    resolver: zodResolver(ticketsQueryFiltersSchema),
   });
   const filters = useWatch({ control: form.control });
   const start = useWatch({ control: form.control, name: "createdFrom" });
@@ -72,24 +81,37 @@ const TicketsFiltersForm = ({ clientId }: TicketsFiltersFormProps) => {
   }, [start]);
 
   useEffect(() => {
-    if (!filters) return;
-    const newQuery = {
-      ...filters,
-      page: 1,
-      pageSize: DEFAULT_PAGE_SIZE,
-    };
-    const url = qs.stringifyUrl(
-      {
-        url: `/client/${clientId}/tickets/tickets-en-cours`,
-        query: Object.fromEntries(
-          Object.entries(newQuery).filter(([_, v]) => v && v !== "all"),
-        ),
-      },
-      { skipNull: true, skipEmptyString: true },
-    );
+    const params = new URLSearchParams();
 
-    replace(url);
-  }, [filters, replace]);
+    if (filters.createdFrom) {
+      params.set("createdFrom", filters.createdFrom);
+    }
+    if (filters.createdTo) {
+      params.set("createdTo", filters.createdTo);
+    }
+    if (filters.categorie) {
+      params.set("categorie", filters.categorie);
+    }
+    if (filters.priorite) {
+      params.set("priorite", filters.priorite);
+    }
+    if (filters.status) {
+      params.set("status", filters.status);
+    }
+    if (filters.fournisseurId) {
+      params.set("fournisseurId", String(filters.fournisseurId));
+    }
+    if (filters.siteId) {
+      params.set("siteId", String(filters.siteId));
+    }
+
+    const next = `${pathname}?${params.toString()}`;
+    const current = `${pathname}?${searchParams.toString()}`;
+
+    if (next !== current) {
+      replace(next, { scroll: false });
+    }
+  }, [filters, pathname, replace]);
 
   return (
     <Form {...form}>

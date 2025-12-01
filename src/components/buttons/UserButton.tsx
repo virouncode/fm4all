@@ -13,8 +13,9 @@ import { authClient, useSession } from "@/lib/auth-client";
 import { User } from "better-auth";
 import { UserCheck, UserX } from "lucide-react";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
 
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { AvatarImage } from "@radix-ui/react-avatar";
 import { Dispatch, SetStateAction } from "react";
 import { ObfuscatedLink } from "../links/ObfuscatedLink";
 
@@ -61,22 +62,15 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
           title={t("connexion")}
           size="icon"
         >
-          {session ? (
-            user?.image ? (
-              <Image
-                src={user.image}
-                alt="avatar-utilisateur"
-                width={32}
-                height={32}
-                className={`${user.role === "admin" ? "object-cover" : "object-contain"}`}
-                sizes="32px"
-              />
+          <Avatar>
+            {session && user?.image ? (
+              <AvatarImage src={user.image} alt="avatar-utilisateur" />
             ) : (
-              <UserCheck />
-            )
-          ) : (
-            <UserX />
-          )}
+              <AvatarFallback>
+                {session ? <UserCheck /> : <UserX />}
+              </AvatarFallback>
+            )}
+          </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>

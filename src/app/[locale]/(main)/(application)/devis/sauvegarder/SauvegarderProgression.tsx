@@ -139,8 +139,6 @@ const SauvegarderProgression = () => {
   });
 
   const submitForm = async (data: InsertClientType) => {
-    console.log("submit");
-
     if (!accepte) {
       toast({
         variant: "destructive",
@@ -196,8 +194,6 @@ const SauvegarderProgression = () => {
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log("handle change", client);
-
     const { name, value } = e.target;
     setClient((prev) => ({
       ...prev,

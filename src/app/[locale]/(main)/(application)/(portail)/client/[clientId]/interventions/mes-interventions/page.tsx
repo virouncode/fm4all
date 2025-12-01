@@ -51,7 +51,7 @@ const page = async ({
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="border-b p-4">
           <ClientInterventionsFiltersForm
-            clientId={parseInt(clientId)}
+            initialFilters={query}
             sites={sites}
             fournisseurs={fournisseurs}
           />

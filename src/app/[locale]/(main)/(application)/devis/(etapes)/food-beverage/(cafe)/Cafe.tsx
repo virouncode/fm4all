@@ -59,8 +59,6 @@ const Cafe = ({
   useScrollIntoFood();
   useScrollIntoCafeEspace();
 
-  // console.log("devisProgress in Cafe", devisProgress);
-
   const handleClickPrevious = () => {};
 
   const handleClickNext = () => {

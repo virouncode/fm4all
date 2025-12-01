@@ -13,18 +13,24 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { toast } from "@/hooks/use-toast";
-import { Link, useRouter } from "@/i18n/navigation";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
+import { AuthUser } from "@/lib/auth";
 import { authClient } from "@/lib/auth-client";
 import { User2 } from "lucide-react";
 
 type ClientSidebarFooterProps = {
   clientId: number;
+  currentUser: AuthUser;
 };
 
 export default function ClientSidebarFooter({
   clientId,
+  currentUser,
 }: ClientSidebarFooterProps) {
   const router = useRouter();
+  const pathname = usePathname();
+
+  const isActive = (segment: string) => pathname.includes(segment);
   const handleSignOut = async () => {
     try {
       await authClient.signOut({
@@ -43,6 +49,9 @@ export default function ClientSidebarFooter({
       console.error("Erreur lors de la deconnexion:", err);
     }
   };
+  const initials =
+    `${currentUser.firstName?.[0] ?? ""}${currentUser.lastName?.[0] ?? ""}`.toUpperCase();
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -50,26 +59,55 @@ export default function ClientSidebarFooter({
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton className="sidebar-footer-button">
               <Avatar>
-                <AvatarImage src="/img/alice_dubois.webp" />
+                {currentUser.image && (
+                  <AvatarImage
+                    src={currentUser.image}
+                    alt={`${currentUser.firstName} ${currentUser.lastName}`}
+                  />
+                )}
                 <AvatarFallback>
-                  <User2 />
+                  <div className="flex h-full w-full items-center justify-center">
+                    {initials ? (
+                      <span className="text-primary text-xs font-bold">
+                        {initials}
+                      </span>
+                    ) : (
+                      <User2 className="h-4 w-4" />
+                    )}
+                  </div>
                 </AvatarFallback>
               </Avatar>
-              <span className="sidebar-footer-text">Alice Dubois</span>
+              <span className="sidebar-footer-text">
+                {currentUser.firstName} {currentUser.lastName}
+              </span>
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="top" align="start">
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              className={
+                isActive("mon-profil")
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                  : ""
+              }
+              asChild
+            >
               <Link
                 href={{
-                  pathname: "/client/[clientId]/compte/mon-profil",
-                  params: { clientId },
+                  pathname: "/client/[clientId]/compte/mon-profil/[userId]",
+                  params: { clientId, userId: currentUser.id },
                 }}
               >
                 Mon profil
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              className={
+                isActive("mon-equipe")
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                  : ""
+              }
+              asChild
+            >
               <Link
                 href={{
                   pathname: "/client/[clientId]/compte/mon-equipe",
@@ -79,7 +117,14 @@ export default function ClientSidebarFooter({
                 Mon équipe
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            {/* <DropdownMenuItem
+              className={
+                isActive("notifications")
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                  : ""
+              }
+              asChild
+            >
               <Link
                 href={{
                   pathname: "/client/[clientId]/compte/notifications",
@@ -88,8 +133,8 @@ export default function ClientSidebarFooter({
               >
                 Notifications
               </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
+            </DropdownMenuItem> */}
+            {/* <DropdownMenuItem>
               <Link
                 href={{
                   pathname: "/client/[clientId]/compte/preferences",
@@ -98,7 +143,7 @@ export default function ClientSidebarFooter({
               >
                 Préférences
               </Link>
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
             <DropdownMenuItem>
               <p onClick={handleSignOut}>Deconnexion</p>
             </DropdownMenuItem>

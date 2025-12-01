@@ -36,6 +36,9 @@ const ClientForm = ({ clients }: ClientFormProps) => {
     role: "client",
     clientId,
     image: null,
+    firstName: "",
+    lastName: "",
+    phone: "",
   };
   const form = useForm<InsertUserType>({
     mode: "all",

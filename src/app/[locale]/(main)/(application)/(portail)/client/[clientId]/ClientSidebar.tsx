@@ -6,14 +6,19 @@ import {
   SidebarFooter,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { AuthUser } from "@/lib/auth";
 import ClientNavItems from "./ClientNavItems";
 import ClientSidebarFooter from "./ClientSidebarFooter";
 
 type ClientSidebarProps = {
   clientId: number;
+  currentUser: AuthUser;
 };
 
-export default function ClientSidebar({ clientId }: ClientSidebarProps) {
+export default function ClientSidebar({
+  clientId,
+  currentUser,
+}: ClientSidebarProps) {
   return (
     <Sidebar collapsible="icon" variant="sidebar">
       <SidebarTrigger />
@@ -21,7 +26,7 @@ export default function ClientSidebar({ clientId }: ClientSidebarProps) {
         <ClientNavItems />
       </SidebarContent>
       <SidebarFooter className="border-t">
-        <ClientSidebarFooter clientId={clientId} />
+        <ClientSidebarFooter clientId={clientId} currentUser={currentUser} />
       </SidebarFooter>
     </Sidebar>
   );

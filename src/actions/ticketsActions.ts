@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { getSession } from "@/lib/auth-session";
 import { getTickets } from "@/lib/queries/tickets/getTickets";
 import { actionClient } from "@/lib/safe-actions";
-import { promoteTempBlob } from "@/lib/utils/file-helper";
+import { promoteTempTicketAttachment } from "@/lib/utils/file-helper";
 import {
   insertTicketAttachmentSchema,
   insertTicketSchema,
@@ -144,7 +144,7 @@ export const insertTicketAction = actionClient
         attachments.length > 0
           ? await Promise.all(
               attachments.map((att) =>
-                promoteTempBlob(att, {
+                promoteTempTicketAttachment(att, {
                   clientId,
                   ticketId,
                   tableName: "tickets",
@@ -355,7 +355,7 @@ export const updateTicketAction = actionClient
       if (toInsertRaw.length > 0) {
         const promotedAttachments = await Promise.all(
           toInsertRaw.map((att) =>
-            promoteTempBlob(att, {
+            promoteTempTicketAttachment(att, {
               clientId,
               ticketId,
               tableName: "tickets",

@@ -63,7 +63,6 @@ export default function NouveauInterventionForm({
   });
 
   const submitForm = (data: InsertInterventionType) => {
-    console.log("Payload Intervention:", data);
     executeInsertIntervention(data);
   };
 

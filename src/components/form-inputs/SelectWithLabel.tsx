@@ -64,7 +64,7 @@ export function SelectWithLabel<S>({
               field.onChange(e);
               if (handleSelect) handleSelect(e, nameInSchema);
             }}
-            value={field.value.toString()}
+            value={field.value?.toString()}
           >
             <FormControl>
               <SelectTrigger

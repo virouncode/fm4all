@@ -185,4 +185,4 @@ export const mesLocauxSchema = createMesLocauxSchema({
   codePostal: "Code postal invalide, entrez 5 chiffres",
 });
 
-export type MesLocauxType = z.infer<typeof mesLocauxSchema>;
+export type MesLocauxType = z.input<typeof mesLocauxSchema>;

@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import {
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
   useReactTable,
   type ColumnDef,
   type SortingState,
@@ -36,21 +37,20 @@ import { getColumnLabel } from "./getColumnLabel";
 type InfiniteDataTableProps<T> = {
   columns: ColumnDef<T>[];
   items: T[];
-  // état global
   isLoading: boolean;
   isError: boolean;
-  // infinite scroll
   isLoadingMore: boolean;
   hasMore: boolean;
   loadMore: () => Promise<void> | void;
-  // sorting
-  sorting: SortingState;
-  setSorting: Dispatch<SetStateAction<SortingState>>;
-  // divers
   idLabelMap: Map<string, string>;
   total: number;
   onRowClick?: (row: T) => void;
   getRowId?: (row: T, index: number) => string;
+
+  // 💡 seulement si tu veux ACTIVER le tri client
+  enableClientSorting?: boolean;
+  sorting?: SortingState;
+  setSorting?: Dispatch<SetStateAction<SortingState>>;
 };
 
 const InfiniteDataTable = <T,>({
@@ -61,12 +61,13 @@ const InfiniteDataTable = <T,>({
   isLoadingMore,
   hasMore,
   loadMore,
-  sorting,
-  setSorting,
   idLabelMap,
   total,
   onRowClick,
   getRowId,
+  enableClientSorting = false,
+  sorting,
+  setSorting,
 }: InfiniteDataTableProps<T>) => {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
@@ -80,16 +81,26 @@ const InfiniteDataTable = <T,>({
     data: items,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    manualSorting: true,
-    state: {
-      sorting,
-      columnVisibility,
-    },
-    onSortingChange: (updater) => {
-      setSorting((old) =>
-        typeof updater === "function" ? updater(old) : updater,
-      );
-    },
+    ...(enableClientSorting && {
+      manualSorting: false as const,
+      getSortedRowModel: getSortedRowModel(),
+      state: {
+        sorting: sorting ?? [],
+        columnVisibility,
+      },
+      onSortingChange: (updater) => {
+        if (!setSorting) return;
+        setSorting((old) =>
+          typeof updater === "function" ? updater(old) : updater,
+        );
+      },
+    }),
+    ...(!enableClientSorting && {
+      manualSorting: true as const,
+      state: {
+        columnVisibility,
+      },
+    }),
     onColumnVisibilityChange: setColumnVisibility,
     ...(getRowId && { getRowId }),
   });

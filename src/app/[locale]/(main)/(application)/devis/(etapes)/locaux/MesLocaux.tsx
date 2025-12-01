@@ -238,6 +238,8 @@ const MesLocaux = () => {
       setClient({
         ...client,
         ...dataToPost,
+        surface: Number(dataToPost.surface),
+        effectif: Number(dataToPost.effectif),
       });
       setLoading(false);
     } catch (err) {
@@ -257,8 +259,8 @@ const MesLocaux = () => {
           destination: "/",
           codePostal: dataToPost.codePostal,
           ville: dataToPost.ville,
-          surface: dataToPost.surface,
-          effectif: dataToPost.effectif,
+          surface: Number(dataToPost.surface),
+          effectif: Number(dataToPost.effectif),
           typeBatiment: dataToPost.typeBatiment,
           typeOccupation: dataToPost.typeOccupation,
         },
@@ -270,12 +272,14 @@ const MesLocaux = () => {
     setClient((prev) => ({
       ...prev,
       ...dataToPost,
+      surface: Number(dataToPost.surface),
+      effectif: Number(dataToPost.effectif),
     }));
     //Réinitialisation de tous le devis
     reinitialisationDevis(
       //client
-      data.surface,
-      data.effectif,
+      Number(data.surface),
+      Number(data.effectif),
       //services
       setDevisProgress,
       setNettoyage,
@@ -311,8 +315,8 @@ const MesLocaux = () => {
     setLoaderVisible(true);
     window.scrollTo(0, 0);
     const serviceSearchParams = new URLSearchParams();
-    serviceSearchParams.set("effectif", dataToPost.effectif.toString());
-    serviceSearchParams.set("surface", dataToPost.surface.toString());
+    serviceSearchParams.set("effectif", Number(dataToPost.effectif).toString());
+    serviceSearchParams.set("surface", Number(dataToPost.surface).toString());
     setTimeout(() => {
       router.push({
         pathname: "/devis/services",

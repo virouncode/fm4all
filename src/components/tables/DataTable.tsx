@@ -1,3 +1,5 @@
+"use client";
+
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -34,25 +36,35 @@ import { getColumnLabel } from "./getColumnLabel";
 type DataTableProps<T> = {
   columns: ColumnDef<T>[];
   items?: T[];
-  isLoading: boolean;
-  isError: boolean;
-  sorting: SortingState;
-  setSorting: Dispatch<SetStateAction<SortingState>>;
+  isLoading?: boolean; // ⬅️ optionnel
+  isError?: boolean; // ⬅️ optionnel
   idLabelMap: Map<string, string>;
   onRowClick?: (row: T) => void;
+
+  /**
+   * Si true => tri client via TanStack
+   * Si false (default) => tri entièrement géré par le serveur (URL/SSR)
+   */
   enableClientSorting?: boolean;
+
+  /**
+   * Utilisés uniquement si enableClientSorting = true.
+   * Tu peux les laisser undefined pour les tables SSR comme "mes-sites".
+   */
+  sorting?: SortingState;
+  setSorting?: Dispatch<SetStateAction<SortingState>>;
 };
 
 const DataTable = <T,>({
   columns,
   items,
-  isLoading,
-  isError,
-  sorting,
-  setSorting,
+  isLoading = false,
+  isError = false,
   idLabelMap,
   onRowClick,
   enableClientSorting = false,
+  sorting,
+  setSorting,
 }: DataTableProps<T>) => {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
@@ -60,17 +72,32 @@ const DataTable = <T,>({
     data: items || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
-    ...(enableClientSorting && { getSortedRowModel: getSortedRowModel() }), // 👈 active le tri client
-    manualSorting: !enableClientSorting, // 👈 si client-side, on laisse TanStack gérer
-    state: {
-      sorting,
-      columnVisibility,
-    },
-    onSortingChange: (updater) => {
-      setSorting((old) =>
-        typeof updater === "function" ? updater(old) : updater,
-      );
-    },
+
+    // 🧠 Tri client activé uniquement si enableClientSorting = true
+    ...(enableClientSorting && {
+      getSortedRowModel: getSortedRowModel(),
+      manualSorting: false as const,
+      state: {
+        sorting: sorting ?? [],
+        columnVisibility,
+      },
+      onSortingChange: (updater) => {
+        if (!setSorting) return;
+        setSorting((old) =>
+          typeof updater === "function" ? updater(old) : updater,
+        );
+      },
+    }),
+
+    // 🧠 Mode SSR (tri géré par l'URL + serveur) :
+    // on NE TOUCHE PAS AU TRI côté client.
+    ...(!enableClientSorting && {
+      manualSorting: true as const,
+      state: {
+        columnVisibility,
+      },
+    }),
+
     onColumnVisibilityChange: setColumnVisibility,
   });
 

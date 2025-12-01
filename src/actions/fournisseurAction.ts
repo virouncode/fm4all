@@ -76,12 +76,15 @@ export const insertFournisseurAction = actionClient
       const tempPassword = generatePassword();
       await auth.api.signUpEmail({
         body: {
+          firstName: fournisseurToPost.prenomContact,
+          lastName: fournisseurToPost.nomContact,
           name: fournisseurToPost.nomFournisseur,
           email: fournisseurToPost.emailContact,
           password: tempPassword,
           role: "fournisseur",
           fournisseurId: resultFournisseur[0].id,
           clientId: null,
+          phone: "+3312345678", //numéro provisoire : TODO changer
         },
       });
       await sendEmailFromServer({

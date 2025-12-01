@@ -3,7 +3,7 @@ import { z } from "zod";
 export const errorHelper = (err: unknown) => {
   if (err instanceof z.ZodError) {
     const messages = err.issues
-      .map((issue) => `${issue.path[0]} : ${issue.message}`)
+      .map((issue) => `${String(issue.path[0])} : ${issue.message}`)
       .join(", ");
     console.error(`Erreurs de validation du schéma : ${messages}`);
     throw new Error(

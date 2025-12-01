@@ -42,6 +42,8 @@ export const insertAdminAction = actionClient
       }
       const tempPassword = generatePassword();
       const userToPost: InsertUserType = {
+        firstName: capitalize(adminInput.prenom),
+        lastName: capitalize(adminInput.nom),
         name: capitalize(adminInput.prenom) + " " + capitalize(adminInput.nom),
         email: adminInput.email.toLowerCase(),
         password: tempPassword,
@@ -49,6 +51,7 @@ export const insertAdminAction = actionClient
         fournisseurId: null,
         clientId: null,
         image: adminInput.image,
+        phone: "+33612345678", //numéro provisoire : TODO changer
       };
       const existingUser = await db
         .select({ id: user.id })

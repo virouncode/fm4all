@@ -1,4 +1,4 @@
-import { emptyStringToUndefined } from "@/normalize/emptyStringToUndefined";
+import { emptyStringToUndefinedOptional } from "@/normalize/emptyStringToUndefined";
 import {
   RawSearchParams,
   normalizeSearchParams,
@@ -163,13 +163,15 @@ export const sitesQueryBackendSchema = z.object({
 
 export type SitesQueryBackendType = z.infer<typeof sitesQueryBackendSchema>;
 
-export const sitesQueryFiltersSchema = z.object({
-  nomSite: emptyStringToUndefined,
-  codePostal: emptyStringToUndefined,
-  ville: emptyStringToUndefined,
-  typeBatiment: typeBatimentSchema.or(z.literal("all")).optional(),
-  typeOccupation: typeOccupationSchema.or(z.literal("all")).optional(),
-});
+export const sitesQueryFiltersSchema = z
+  .object({
+    nomSite: emptyStringToUndefinedOptional,
+    codePostal: emptyStringToUndefinedOptional,
+    ville: emptyStringToUndefinedOptional,
+    typeBatiment: typeBatimentSchema.or(z.literal("all")).optional(),
+    typeOccupation: typeOccupationSchema.or(z.literal("all")).optional(),
+  })
+  .partial();
 
 export type SitesQueryFiltersType = z.infer<typeof sitesQueryFiltersSchema>;
 

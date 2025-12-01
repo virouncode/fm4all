@@ -112,7 +112,14 @@ export default function VitrerieTarifsUpdateForm({
   };
 
   const submitForm = async (data: UpdateVitrerieTarifsType) => {
-    executeUpdateVitrerieTarif(data);
+    executeUpdateVitrerieTarif({
+      ...data,
+      cadenceVitres: Number(data.cadenceVitres),
+      cadenceCloisons: Number(data.cadenceCloisons),
+      tauxHoraire: Number(data.tauxHoraire),
+      minFacturation: Number(data.minFacturation),
+      fraisDeplacement: Number(data.fraisDeplacement),
+    });
   };
 
   const isFieldModified = (fieldName: string) => {

@@ -11,6 +11,7 @@ import {
 } from "@/zod-schemas/ticket";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import TicketForm from "../nouveau-ticket/TicketForm";
 
@@ -27,6 +28,7 @@ export default function UpdateTicketForm({
   sites,
   fournisseurs,
 }: UpdateTicketFormProps) {
+  const router = useRouter();
   const form = useForm<UpdateTicketFormType>({
     defaultValues,
     mode: "onTouched",
@@ -46,7 +48,9 @@ export default function UpdateTicketForm({
           title: "Succès",
           description: data.message,
         });
+        router.push(`/client/${clientId}/tickets/tickets-en-cours`);
       },
+
       onError: ({ error }) => {
         const message =
           (typeof error.serverError === "string" && error.serverError) ||
