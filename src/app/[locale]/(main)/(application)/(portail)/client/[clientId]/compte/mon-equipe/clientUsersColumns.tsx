@@ -10,6 +10,7 @@ export const clientUsersIdLabelMap = new Map<string, string>([
   ["lastName", "Nom"],
   ["firstName", "Prénom"],
   ["email", "Email"],
+  ["phone", "N° de téléphone"],
   ["createdAt", "Date de création"],
   ["updatedAt", "Dernière mise à jour"],
 ]);
@@ -55,6 +56,16 @@ export const clientUsersColumns: ColumnDef<SelectUserType>[] = [
       />
     ),
     accessorFn: (row) => row.email,
+  },
+  {
+    accessorKey: "phone",
+    header: ({ column }) => (
+      <SortableHeader
+        column={column}
+        label={getColumnLabel("phone", clientUsersIdLabelMap)}
+      />
+    ),
+    accessorFn: (row) => row.phone,
   },
   {
     accessorKey: "createdAt",
