@@ -72,14 +72,13 @@ const AddServicesTarifForm = ({
               onClick={() => handleAddService(service.id)}
               className={
                 selectedServicesIds.includes(service.id)
-                  ? "cursor-pointer border-2 border-fm4allsecondary text-fm4allsecondary"
+                  ? "border-primary text-primary cursor-pointer border-2"
                   : "cursor-pointer"
               }
             />
           ))}
       </div>
       <Button
-        variant="destructive"
         size="lg"
         title="ajouter"
         onClick={handleSubmit}

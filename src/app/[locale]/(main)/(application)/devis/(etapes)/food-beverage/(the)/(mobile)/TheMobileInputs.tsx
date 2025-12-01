@@ -46,7 +46,7 @@ const TheMobileInputs = ({
             onChange={handleChangeNbPersonnes}
             className={`w-16 ${
               nbPersonnes === Math.round(effectif * 0.15)
-                ? "text-fm4alldestructive"
+                ? "text-destructive"
                 : ""
             }`}
           />
@@ -67,7 +67,7 @@ const TheMobileInputs = ({
             <Plus />
           </Button>
         </div>
-        <p className="text-fm4alldestructive text-xs italic">
+        <p className="text-destructive text-xs italic">
           {tThe(
             "les-quantites-sont-estimees-pour-vous-environ-15-de-votre-effectif-mais-vous-pouvez-les-changer",
           )}

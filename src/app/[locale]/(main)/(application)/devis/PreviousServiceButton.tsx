@@ -13,7 +13,6 @@ const PreviousServiceButton = ({
   const t = useTranslations("DevisPage");
   return (
     <Button
-      variant="destructive"
       size="lg"
       className={`text-base ${className}`}
       onClick={handleClickPrevious}

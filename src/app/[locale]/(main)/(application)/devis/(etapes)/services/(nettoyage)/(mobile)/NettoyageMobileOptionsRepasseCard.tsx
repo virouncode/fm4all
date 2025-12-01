@@ -153,7 +153,7 @@ const NettoyageMobileOptionsRepasseCard = ({
       <div
         className={`bg-${color} flex h-64 flex-col rounded-xl border border-slate-200 p-4 text-white ${
           nettoyage.infos.repasseSelected && repasseProposition
-            ? "ring-fm4alldestructive ring-4 ring-inset"
+            ? "ring-destructive ring-4 ring-inset"
             : ""
         }`}
       >
@@ -251,7 +251,7 @@ const NettoyageMobileOptionsRepasseCard = ({
               <Switch
                 className={`${
                   nettoyage.infos.repasseSelected
-                    ? "data-[state=checked]:bg-fm4alldestructive"
+                    ? "data-[state=checked]:bg-destructive"
                     : ""
                 }`}
                 checked={nettoyage.infos.repasseSelected}

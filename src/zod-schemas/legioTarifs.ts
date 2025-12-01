@@ -1,5 +1,6 @@
 import { legioTarifs } from "@/db/schema";
 import { createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
 
 export const selectLegioTarifsSchema = createSelectSchema(legioTarifs, {
   surface: (schema) =>
@@ -9,4 +10,4 @@ export const selectLegioTarifsSchema = createSelectSchema(legioTarifs, {
   prixAnnuel: (schema) => schema.min(0, "Le prix annuel est obligatoire"),
 });
 
-export type SelectLegioTarifsType = typeof selectLegioTarifsSchema._type;
+export type SelectLegioTarifsType = z.infer<typeof selectLegioTarifsSchema>;

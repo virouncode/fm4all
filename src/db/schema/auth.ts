@@ -14,6 +14,9 @@ export const user = pgTable(
   {
     id: text("id").primaryKey(),
     name: text("name").notNull(),
+    firstName: text("first_name").notNull(),
+    lastName: text("last_name").notNull(),
+    phone: text("phone"),
     email: text("email").unique().notNull(),
     emailVerified: boolean("email_verified").notNull(),
     image: text("image"),
@@ -24,10 +27,13 @@ export const user = pgTable(
     updatedAt: updatedAt(),
   },
   (table) => [
-    // email est déjà unique() → index implicite
     index("user_role_idx").on(table.role),
     index("user_fournisseur_id_idx").on(table.fournisseurId),
+    index("user_email_idx").on(table.email),
     index("user_client_id_idx").on(table.clientId),
+    index("user_first_name_idx").on(table.firstName),
+    index("user_last_name_idx").on(table.lastName),
+    index("user_phone_idx").on(table.phone),
   ],
 );
 
@@ -35,7 +41,11 @@ export const session = pgTable(
   "session",
   {
     id: text("id").primaryKey(),
-    expiresAt: timestamp("expires_at").notNull(),
+    expiresAt: timestamp("expires_at", {
+      withTimezone: true,
+      mode: "date",
+      precision: 3,
+    }).notNull(),
     token: text("token").notNull().unique(),
     ipAddress: text("ip_address"),
     userAgent: text("user_agent"),
@@ -60,8 +70,16 @@ export const account = pgTable(
     accessToken: text("access_token"),
     refreshToken: text("refresh_token"),
     idToken: text("id_token"),
-    accessTokenExpiresAt: timestamp("access_token_expires_at"),
-    refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+    accessTokenExpiresAt: timestamp("access_token_expires_at", {
+      withTimezone: true,
+      mode: "date",
+      precision: 3,
+    }),
+    refreshTokenExpiresAt: timestamp("refresh_token_expires_at", {
+      withTimezone: true,
+      mode: "date",
+      precision: 3,
+    }),
     scope: text("scope"),
     password: text("password"),
     createdAt: createdAt(),
@@ -79,7 +97,11 @@ export const verification = pgTable(
     id: text("id").primaryKey(),
     identifier: text("identifier").notNull(),
     value: text("value").notNull(),
-    expiresAt: timestamp("expires_at").notNull(),
+    expiresAt: timestamp("expires_at", {
+      withTimezone: true,
+      mode: "date",
+      precision: 3,
+    }).notNull(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },

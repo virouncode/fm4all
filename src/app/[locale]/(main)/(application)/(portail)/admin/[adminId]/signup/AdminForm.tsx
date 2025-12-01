@@ -81,11 +81,12 @@ const AdminForm = () => {
     let imageUrl: string | null = null;
     setLoading(true);
     if (image) {
-      imageUrl = await postVercelBlob({
+      const response = await postVercelBlob({
         file: image,
         filename: `${data.prenom}_${data.nom}_avatar`,
         foldername: "admin_avatars",
       });
+      imageUrl = response.url;
     }
     const adminToPost: InsertAdminType = {
       ...data,
@@ -169,7 +170,6 @@ const AdminForm = () => {
             />
           </div>
           <Button
-            variant="destructive"
             size="lg"
             title={tAdmin("creer-un-compte")}
             className="mt-6 w-full text-base"

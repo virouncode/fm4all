@@ -1,6 +1,6 @@
+import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
 import { useTranslations } from "next-intl";
 import SnacksFruitsMobilePropositionsCarousel from "./SnacksFruitsMobilePropositionsCarousel";
-import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
 
 type SnacksFruitsMobilePropositionsProps = {
   formattedPropositions: {
@@ -86,7 +86,7 @@ const SnacksFruitsMobilePropositions = ({
   const snacksFruits = useSnacksFruitsStore((s) => s.snacksFruits);
   if (snacksFruits.infos.choix.length === 0) {
     return (
-      <div className="text-fm4alldestructive flex w-full flex-col gap-2">
+      <div className="text-destructive flex w-full flex-col gap-2">
         <p>{t("nous-navons-pas-doffres-correspondant-a-ces-criteres")}</p>
         <p>
           {tSnacks(

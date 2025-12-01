@@ -180,7 +180,7 @@ const NettoyageMobilePropositionCard = ({
         className={`bg-${color} flex h-56 flex-col rounded-xl border border-slate-200 p-4 text-white ${
           nettoyage.infos.fournisseurId === fournisseurId &&
           nettoyage.infos.gammeSelected === gamme
-            ? "ring-fm4alldestructive ring-4 ring-inset"
+            ? "ring-destructive ring-4 ring-inset"
             : ""
         }`}
       >
@@ -255,7 +255,7 @@ const NettoyageMobilePropositionCard = ({
                 className={`${
                   nettoyage.infos.fournisseurId === fournisseurId &&
                   nettoyage.infos.gammeSelected === gamme
-                    ? "data-[state=checked]:bg-fm4alldestructive"
+                    ? "data-[state=checked]:bg-destructive"
                     : ""
                 }`}
                 checked={

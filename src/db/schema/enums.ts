@@ -1,12 +1,15 @@
+import {
+  ticketCategorieCodes,
+  ticketPrioriteCodes,
+  ticketStatusCodes,
+  typeBatimentCodes,
+  typeOccupationCodes,
+  userRoleCodes,
+} from "@/constants/codeTables";
 import { pgEnum } from "drizzle-orm/pg-core";
 
 export const statusEnum = pgEnum("status", ["active", "inactive"]);
-export const typeBatimentEnum = pgEnum("typebatiment", [
-  "bureaux",
-  "localCommercial",
-  "entrepot",
-  "cabinetMedical",
-]);
+export const typeBatimentEnum = pgEnum("typebatiment", typeBatimentCodes);
 export const gammeEnum = pgEnum("gamme", [
   "essentiel",
   "confort",
@@ -22,11 +25,7 @@ export const typeHygieneEnum = pgEnum("typehygiene", [
   "balai",
   "poubelle",
 ]);
-export const typeOccupationEnum = pgEnum("typeoccupation", [
-  "partieEtage",
-  "plateauComplet",
-  "batimentEntier",
-]);
+export const typeOccupationEnum = pgEnum("typeoccupation", typeOccupationCodes);
 export const possibiliteEnum = pgEnum("possibilite", [
   "possible",
   "non",
@@ -49,16 +48,13 @@ export const typePorteEnum = pgEnum("typeporte", ["vantaux", "coulissante"]);
 export const typeColonneEnum = pgEnum("typecolonne", ["statique", "dynamique"]);
 export const typeEau = pgEnum("typeeau", ["EF", "EC", "EG", "ECG"]);
 export const typePose = pgEnum("typepose", ["aposer", "colonne", "comptoir"]);
-export const roleEnum = pgEnum("role", ["admin", "fournisseur", "client"]);
-export const ticketStatusEnum = pgEnum("ticket_status", [
-  "nouveau",
-  "en_cours",
-  "a_valider",
-  "clos",
-]);
-export const ticketPrioriteEnum = pgEnum("ticket_priorite", [
-  "basse",
-  "normale",
-  "haute",
-  "critique",
-]);
+export const roleEnum = pgEnum("role", userRoleCodes);
+export const ticketStatusEnum = pgEnum("ticket_status", ticketStatusCodes);
+export const ticketPrioriteEnum = pgEnum(
+  "ticket_priorite",
+  ticketPrioriteCodes,
+);
+export const ticketCategorieEnum = pgEnum(
+  "ticket_categorie",
+  ticketCategorieCodes,
+);

@@ -180,6 +180,10 @@ export const routing = defineRouting({
       fr: "/admin/[adminId]/info",
       en: "/admin/[adminId]/info",
     },
+    "/admin/[adminId]/interventions/creer-intervention": {
+      fr: "/admin/[adminId]/interventions/creer-intervention",
+      en: "/admin/[adminId]/interventions/creer-intervention",
+    },
     //CLIENT
     "/client/[clientId]": {
       fr: "/client/[clientId]",
@@ -197,17 +201,17 @@ export const routing = defineRouting({
       en: "/client/[clientId]/tickets/tickets-en-cours",
     },
 
+    "/client/[clientId]/tickets/action-requise": {
+      fr: "/client/[clientId]/tickets/action-requise",
+      en: "/client/[clientId]/tickets/action-requise",
+    },
+
     "/client/[clientId]/tickets/tickets-a-valider": {
       fr: "/client/[clientId]/tickets/tickets-a-valider",
       en: "/client/[clientId]/tickets/tickets-a-valider",
     },
 
     // ----- Interventions -----
-    "/client/[clientId]/interventions/programmer-intervention": {
-      fr: "/client/[clientId]/interventions/programmer-intervention",
-      en: "/client/[clientId]/interventions/programmer-intervention",
-    },
-
     "/client/[clientId]/interventions/mes-interventions": {
       fr: "/client/[clientId]/interventions/mes-interventions",
       en: "/client/[clientId]/interventions/mes-interventions",
@@ -267,9 +271,9 @@ export const routing = defineRouting({
     },
 
     // ----- Compte -----
-    "/client/[clientId]/compte/mon-profil": {
-      fr: "/client/[clientId]/compte/mon-profil",
-      en: "/client/[clientId]/compte/mon-profil",
+    "/client/[clientId]/compte/mon-profil/[userId]": {
+      fr: "/client/[clientId]/compte/mon-profil/[userId]",
+      en: "/client/[clientId]/compte/mon-profil/[userId]",
     },
 
     "/client/[clientId]/compte/mon-equipe": {
@@ -285,6 +289,10 @@ export const routing = defineRouting({
     "/client/[clientId]/compte/preferences": {
       fr: "/client/[clientId]/compte/preferences",
       en: "/client/[clientId]/compte/preferences",
+    },
+    "/client/[clientId]/compte/mon-equipe/ajouter": {
+      fr: "/client/[clientId]/compte/mon-equipe/ajouter",
+      en: "/client/[clientId]/compte/mon-equipe/ajouter",
     },
 
     //FOURNISSEURS

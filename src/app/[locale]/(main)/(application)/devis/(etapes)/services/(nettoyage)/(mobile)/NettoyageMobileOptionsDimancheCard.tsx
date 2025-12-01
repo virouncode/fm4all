@@ -127,7 +127,7 @@ const NettoyageMobileOptionsDimancheCard = ({
       <div
         className={`bg-${color} flex h-64 flex-col rounded-xl border border-slate-200 p-4 text-white ${
           nettoyage.infos.dimancheSelected
-            ? "ring-fm4alldestructive ring-4 ring-inset"
+            ? "ring-destructive ring-4 ring-inset"
             : ""
         }`}
       >
@@ -224,7 +224,7 @@ const NettoyageMobileOptionsDimancheCard = ({
               <Switch
                 className={`${
                   nettoyage.infos.dimancheSelected
-                    ? "data-[state=checked]:bg-fm4alldestructive"
+                    ? "data-[state=checked]:bg-destructive"
                     : ""
                 }`}
                 checked={nettoyage.infos.dimancheSelected}

@@ -327,7 +327,7 @@ const FontaineMobileEspacePropositionCard = ({
         className={`flex h-72 flex-col rounded-xl border border-slate-200 bg-slate-100 p-4 ${
           fontaines.infos.fournisseurId === proposition.fournisseurId &&
           espace.infos.poseSelected === proposition.typePose
-            ? "ring-fm4alldestructive ring-4 ring-inset"
+            ? "ring-destructive ring-4 ring-inset"
             : ""
         }`}
       >
@@ -422,7 +422,7 @@ const FontaineMobileEspacePropositionCard = ({
                 className={`${
                   espace.infos.poseSelected === typePose &&
                   fontaines.infos.fournisseurId === fournisseurId
-                    ? "data-[state=checked]:bg-fm4alldestructive"
+                    ? "data-[state=checked]:bg-destructive"
                     : ""
                 }`}
                 checked={

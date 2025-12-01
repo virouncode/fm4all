@@ -11,7 +11,7 @@ const Presentation = () => {
         <h2 className="border-l-2 px-4 text-2xl md:text-3xl">
           {t("notre-plateforme")}
         </h2>
-        <div className="from-fm4allsecondary/100 to-fm4allsecondary/60 flex items-center justify-center gap-8 rounded-xl bg-gradient-to-r p-8 text-white md:items-start md:px-16 md:py-14">
+        <div className="from-primary/100 to-primary/60 flex items-center justify-center gap-8 rounded-xl bg-gradient-to-r p-8 text-white md:items-start md:px-16 md:py-14">
           <div className="flex w-full flex-col gap-6 md:w-auto">
             {/* <div className="text-center fle flex-col font-bold text-xl">
               <p>{t("vous-emmenagez-dans-de-nouveaux-bureaux")}</p>
@@ -64,7 +64,7 @@ const Presentation = () => {
                 title={t("obtenez-votre-devis-en-quelques-clics")}
                 text={t("obtenez-votre-devis-en-quelques-clics")}
                 size="lg"
-                className="bg-fm4alldestructive ring-fm4alldestructive hover:bg-fm4alldestructive/90 mx-auto mt-10 w-full self-start border-none text-white shadow-lg md:w-auto"
+                className="bg-destructive ring-destructive hover:bg-destructive/90 mx-auto mt-10 w-full self-start border-none text-white shadow-lg md:w-auto"
               />
             </div>
           </div>

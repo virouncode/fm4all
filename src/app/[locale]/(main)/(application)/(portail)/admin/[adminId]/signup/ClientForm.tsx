@@ -36,6 +36,9 @@ const ClientForm = ({ clients }: ClientFormProps) => {
     role: "client",
     clientId,
     image: null,
+    firstName: "",
+    lastName: "",
+    phone: "",
   };
   const form = useForm<InsertUserType>({
     mode: "all",
@@ -123,7 +126,6 @@ const ClientForm = ({ clients }: ClientFormProps) => {
           </div>
 
           <Button
-            variant="destructive"
             size="lg"
             title={tAdmin("creer-un-compte")}
             className="mt-6 w-full text-base"

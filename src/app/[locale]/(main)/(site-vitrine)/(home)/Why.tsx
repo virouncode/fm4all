@@ -95,7 +95,7 @@ const Why = () => {
           )}
         </p>
         <div className="mx-auto max-w-prose text-center">
-          <div className="text-fm4allsecondary mb-10 flex flex-col gap-1 text-5xl font-bold">
+          <div className="text-primary mb-10 flex flex-col gap-1 text-5xl font-bold">
             <p>{t("1-contact")}</p>
             <p>{t("1-contrat")}</p>
             <p>{t("1-facture")}</p>

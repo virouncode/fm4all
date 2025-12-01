@@ -216,7 +216,7 @@ const HygieneMobileOptionsBalaiCard = ({
       <div
         className={`bg-${color} flex h-56 flex-col rounded-xl border border-slate-200 p-4 text-white ${
           hygiene.infos.balaiGammeSelected === gamme
-            ? "ring-fm4alldestructive ring-4 ring-inset"
+            ? "ring-destructive ring-4 ring-inset"
             : ""
         }`}
       >
@@ -290,7 +290,7 @@ const HygieneMobileOptionsBalaiCard = ({
               <Switch
                 className={`${
                   hygiene.infos.balaiGammeSelected === gamme
-                    ? "data-[state=checked]:bg-fm4alldestructive"
+                    ? "data-[state=checked]:bg-destructive"
                     : ""
                 }`}
                 checked={hygiene.infos.balaiGammeSelected === gamme}

@@ -429,7 +429,7 @@ export const updateHygieneMinFacturationAction = actionClient
       await db
         .update(hygieneMinFacturation)
         .set({
-          minFacturation: hygieneMinFacturationInput.minFacturation,
+          minFacturation: Number(hygieneMinFacturationInput.minFacturation),
         })
         .where(eq(hygieneMinFacturation.id, hygieneMinFacturationInput.id));
 
@@ -443,7 +443,7 @@ export const updateHygieneMinFacturationAction = actionClient
           tarifType: "minFacturation",
           field: "minFacturation",
           value: hygieneMinFacturationInput.minFacturation
-            ? hygieneMinFacturationInput.minFacturation / RATIO
+            ? Number(hygieneMinFacturationInput.minFacturation) / RATIO
             : null,
           fournisseurId,
         },

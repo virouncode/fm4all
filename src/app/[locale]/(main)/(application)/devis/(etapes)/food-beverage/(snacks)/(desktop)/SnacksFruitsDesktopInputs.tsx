@@ -68,7 +68,7 @@ const SnacksFruitsDesktopInputs = ({
         <Input
           className={`w-full max-w-xs min-w-20 ${
             snacksFruits.quantites.nbPersonnes === client.effectif
-              ? "text-fm4alldestructive"
+              ? "text-destructive"
               : ""
           }`}
           type="number"

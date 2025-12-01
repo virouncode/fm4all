@@ -111,7 +111,7 @@ const HygieneOptionsParfumCard = ({
               className={`w-16 ${
                 hygiene.quantites.nbDistribParfum ===
                 hygieneDistribQuantite.nbDistribParfum
-                  ? "text-fm4alldestructive"
+                  ? "text-destructive"
                   : ""
               }`}
               id="nbDistribParfum"
@@ -240,7 +240,7 @@ const HygieneOptionsParfumCard = ({
           <div
             className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-2 text-xl text-slate-200 ${
               hygiene.infos.parfumGammeSelected === gamme
-                ? "ring-fm4alldestructive ring-4 ring-inset"
+                ? "ring-destructive ring-4 ring-inset"
                 : ""
             }`}
             key={"parfum" + gamme}
@@ -251,7 +251,7 @@ const HygieneOptionsParfumCard = ({
               onCheckedChange={() =>
                 handleClickProposition("parfum", proposition)
               }
-              className="data-[state=checked]:bg-fm4alldestructive"
+              className="data-[state=checked]:bg-destructive"
               title={t("selectionnez-cette-proposition")}
               data-testid="parfum-switch"
             />

@@ -17,4 +17,4 @@ export const selectTheConsoTarifsSchema = createSelectSchema(theConsoTarifs, {
   nbAvis: z.number().nullable(),
 });
 
-export type SelectTheConsoTarifsType = typeof selectTheConsoTarifsSchema._type;
+export type SelectTheConsoTarifsType = z.infer<typeof selectTheConsoTarifsSchema>;

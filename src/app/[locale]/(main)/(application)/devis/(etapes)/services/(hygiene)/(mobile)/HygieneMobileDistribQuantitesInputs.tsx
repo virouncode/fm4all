@@ -117,7 +117,7 @@ const HygieneMobileDistribQuantitesInputs = ({
               className={`w-16 ${
                 hygiene.quantites.nbDistribEmp ===
                 hygieneDistribQuantite?.nbDistribEmp
-                  ? "text-fm4alldestructive"
+                  ? "text-destructive"
                   : ""
               }`}
               id="nbDistribEmp"
@@ -140,7 +140,7 @@ const HygieneMobileDistribQuantitesInputs = ({
             </Button>
           </div>
 
-          <p className="text-fm4alldestructive text-xs italic">
+          <p className="text-destructive text-xs italic">
             {t(
               "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
             )}
@@ -167,7 +167,7 @@ const HygieneMobileDistribQuantitesInputs = ({
               className={`w-16 ${
                 hygiene.quantites.nbDistribSavon ===
                 hygieneDistribQuantite?.nbDistribSavon
-                  ? "text-fm4alldestructive"
+                  ? "text-destructive"
                   : ""
               }`}
               id="nbDistribSavon"
@@ -190,7 +190,7 @@ const HygieneMobileDistribQuantitesInputs = ({
             </Button>
           </div>
 
-          <p className="text-fm4alldestructive text-xs italic">
+          <p className="text-destructive text-xs italic">
             {t(
               "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
             )}
@@ -217,7 +217,7 @@ const HygieneMobileDistribQuantitesInputs = ({
               className={`w-16 ${
                 hygiene.quantites.nbDistribPh ===
                 hygieneDistribQuantite?.nbDistribPh
-                  ? "text-fm4alldestructive"
+                  ? "text-destructive"
                   : ""
               }`}
               id="nbDistribPh"
@@ -240,7 +240,7 @@ const HygieneMobileDistribQuantitesInputs = ({
             </Button>
           </div>
 
-          <p className="text-fm4alldestructive text-xs italic">
+          <p className="text-destructive text-xs italic">
             {t(
               "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
             )}

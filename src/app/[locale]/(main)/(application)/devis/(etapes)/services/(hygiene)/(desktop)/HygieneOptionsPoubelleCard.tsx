@@ -112,7 +112,7 @@ const HygieneOptionsPoubelleCard = ({
               className={`w-16 ${
                 hygiene.quantites.nbDistribPoubelle ===
                 hygieneDistribQuantite.nbDistribPoubelle
-                  ? "text-fm4alldestructive"
+                  ? "text-destructive"
                   : ""
               }`}
               id="nbDistribPoubelle"
@@ -121,7 +121,7 @@ const HygieneOptionsPoubelleCard = ({
               {tHygiene("receptacles").toLocaleLowerCase()}
             </Label>
           </div>
-          <p className="text-fm4alldestructive px-2 text-center text-xs italic">
+          <p className="text-destructive px-2 text-center text-xs italic">
             {t(
               "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
             )}
@@ -245,7 +245,7 @@ const HygieneOptionsPoubelleCard = ({
           <div
             className={`flex flex-1 bg-${color} cursor-pointer items-center justify-center gap-4 p-2 text-xl text-slate-200 ${
               hygiene.infos.poubelleGammeSelected === gamme
-                ? "ring-fm4alldestructive ring-4 ring-inset"
+                ? "ring-destructive ring-4 ring-inset"
                 : ""
             }`}
             key={"poubelle" + gamme}
@@ -256,7 +256,7 @@ const HygieneOptionsPoubelleCard = ({
               onCheckedChange={() =>
                 handleClickProposition("poubelle", proposition)
               }
-              className="data-[state=checked]:bg-fm4alldestructive"
+              className="data-[state=checked]:bg-destructive"
               title={t("selectionnez-cette-proposition")}
               data-testid="poubelle-switch"
             />

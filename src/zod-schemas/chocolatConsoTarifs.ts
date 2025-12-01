@@ -14,4 +14,4 @@ export const selectChocolatConsoTarifsSchema = createSelectSchema(
 });
 
 export type SelectChocolatConsoTarifsType =
-  typeof selectChocolatConsoTarifsSchema._type;
+  z.infer<typeof selectChocolatConsoTarifsSchema>;

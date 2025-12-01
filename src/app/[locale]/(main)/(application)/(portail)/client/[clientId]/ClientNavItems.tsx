@@ -150,6 +150,24 @@ export default function ClientNavItems() {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive("action-requise")}
+                  >
+                    <Link
+                      href={{
+                        pathname: "/client/[clientId]/tickets/action-requise",
+                        params: { clientId },
+                        query: {
+                          status: "en_attente_client",
+                        },
+                      }}
+                    >
+                      Action requise
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
 
                 {/* Tickets à valider */}
                 <SidebarMenuItem>
@@ -162,6 +180,9 @@ export default function ClientNavItems() {
                         pathname:
                           "/client/[clientId]/tickets/tickets-a-valider",
                         params: { clientId },
+                        query: {
+                          status: "a_valider",
+                        },
                       }}
                     >
                       Tickets à valider
@@ -202,23 +223,6 @@ export default function ClientNavItems() {
               </SidebarMenuItem>
 
               <CollapsibleContent className="animate-collapsible-down ml-8 border-l pl-2">
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive("programmer-intervention")}
-                  >
-                    <Link
-                      href={{
-                        pathname:
-                          "/client/[clientId]/interventions/programmer-intervention",
-                        params: { clientId },
-                      }}
-                    >
-                      Programmer
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild

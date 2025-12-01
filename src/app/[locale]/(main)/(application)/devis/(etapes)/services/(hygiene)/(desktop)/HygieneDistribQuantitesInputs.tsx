@@ -57,7 +57,7 @@ const HygieneDistribQuantitesInputs = ({
           className={`w-16 ${
             hygiene.quantites.nbDistribEmp ===
             hygieneDistribQuantite?.nbDistribEmp
-              ? "text-fm4alldestructive"
+              ? "text-destructive"
               : ""
           }`}
           id="nbDistribEmp"
@@ -77,7 +77,7 @@ const HygieneDistribQuantitesInputs = ({
           className={`w-16 ${
             hygiene.quantites.nbDistribSavon ===
             hygieneDistribQuantite?.nbDistribSavon
-              ? "text-fm4alldestructive"
+              ? "text-destructive"
               : ""
           }`}
           id="nbDistribSavon"
@@ -97,7 +97,7 @@ const HygieneDistribQuantitesInputs = ({
           className={`w-16 ${
             hygiene.quantites.nbDistribPh ===
             hygieneDistribQuantite?.nbDistribPh
-              ? "text-fm4alldestructive"
+              ? "text-destructive"
               : ""
           }`}
           id="nbDistribPh"
@@ -140,7 +140,7 @@ const HygieneDistribQuantitesInputs = ({
           </SelectContent>
         </Select>
       </div>
-      <p className="text-fm4alldestructive px-2 text-center text-xs italic">
+      <p className="text-destructive px-2 text-center text-xs italic">
         {t(
           "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
         )}

@@ -31,10 +31,10 @@ export const selectNettoyageTarifsFournisseurSchema = createSelectSchema(
 );
 
 export type SelectNettoyageTarifsType =
-  typeof selectNettoyageTarifsSchema._type;
+  z.infer<typeof selectNettoyageTarifsSchema>;
 
 export type SelectNettoyageTarifFournisseurType =
-  typeof selectNettoyageTarifsFournisseurSchema._type;
+  z.infer<typeof selectNettoyageTarifsFournisseurSchema>;
 
 //UPDATE
 export const updateNettoyageTarifsSchema = createUpdateSchema(nettoyageTarifs, {
@@ -45,4 +45,4 @@ export const updateNettoyageTarifsSchema = createUpdateSchema(nettoyageTarifs, {
 });
 
 export type UpdateNettoyageTarifsType =
-  typeof updateNettoyageTarifsSchema._type;
+  z.infer<typeof updateNettoyageTarifsSchema>;

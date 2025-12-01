@@ -4,9 +4,7 @@ import { z } from "zod";
 
 export const errorHandler = (err: unknown): NextResponse<ApiResponseBody> => {
   if (err instanceof z.ZodError) {
-    const messages = err.issues
-      .map((issue) => `${issue.path[0]} : ${issue.message}`)
-      .join(", ");
+    const messages = err.issues.map((issue) => String(issue.path.join(".")));
     console.error(`Erreurs de validation du schéma : ${messages}`);
 
     const responseBody: ApiResponseBody = {

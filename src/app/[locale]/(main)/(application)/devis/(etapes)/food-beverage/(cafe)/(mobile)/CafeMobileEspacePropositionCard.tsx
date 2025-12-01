@@ -316,7 +316,7 @@ const CafeMobileEspacePropositionCard = ({
           cafe.infos.fournisseurId === fournisseurId &&
           espace.infos.gammeCafeSelected === gamme &&
           totalAnnuel
-            ? "ring-fm4alldestructive ring-4 ring-inset"
+            ? "ring-destructive ring-4 ring-inset"
             : ""
         }`}
       >
@@ -397,7 +397,7 @@ const CafeMobileEspacePropositionCard = ({
                 className={`${
                   espace.infos.gammeCafeSelected === gamme &&
                   cafe.infos.fournisseurId === proposition.fournisseurId
-                    ? "data-[state=checked]:bg-fm4alldestructive"
+                    ? "data-[state=checked]:bg-destructive"
                     : ""
                 }`}
                 checked={

@@ -17,4 +17,4 @@ export const selectFontainesTarifsSchema = createSelectSchema(
   nbAvis: z.number().nullable(),
 });
 export type SelectFontainesTarifsType =
-  typeof selectFontainesTarifsSchema._type;
+  z.infer<typeof selectFontainesTarifsSchema>;

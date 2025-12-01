@@ -18,9 +18,7 @@ const Hero = async () => {
             className={`animate-appear mb-14 text-4xl font-bold tracking-tighter text-pretty hyphens-auto md:text-5xl lg:text-6xl`}
           >
             {t("votre-entreprise-de")}{" "}
-            <span className="text-fm4alldestructive">
-              {t("facility-management")}
-            </span>
+            <span className="text-destructive">{t("facility-management")}</span>
             {locale === "fr" ? "." : `${t("services-en-ile-de-france")}.`}
           </h1>
           <HeroCard />

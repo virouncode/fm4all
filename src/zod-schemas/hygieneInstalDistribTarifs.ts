@@ -1,5 +1,6 @@
 import { hygieneInstalDistribTarifs } from "@/db/schema";
 import { createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
 
 export const selectHygieneInstalDistribTarifsSchema = createSelectSchema(
   hygieneInstalDistribTarifs,
@@ -18,6 +19,6 @@ export const selectHygieneInstalDistribTarifsFournisseurSchema =
   });
 
 export type SelectHygieneInstalDistribTarifsType =
-  typeof selectHygieneInstalDistribTarifsSchema._type;
+  z.infer<typeof selectHygieneInstalDistribTarifsSchema>;
 export type SelectHygieneInstalDistribTarifsFournisseurType =
-  typeof selectHygieneInstalDistribTarifsFournisseurSchema._type;
+  z.infer<typeof selectHygieneInstalDistribTarifsFournisseurSchema>;

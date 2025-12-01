@@ -18,4 +18,4 @@ export const selectFoodLivraisonTarifsSchema = createSelectSchema(
 });
 
 export type SelectFoodLivraisonTarifsType =
-  typeof selectFoodLivraisonTarifsSchema._type;
+  z.infer<typeof selectFoodLivraisonTarifsSchema>;

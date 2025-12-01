@@ -220,7 +220,7 @@ const HygieneMobileOptionsParfumCard = ({
       <div
         className={`bg-${color} flex h-56 flex-col rounded-xl border border-slate-200 p-4 text-white ${
           hygiene.infos.parfumGammeSelected === gamme
-            ? "ring-fm4alldestructive ring-4 ring-inset"
+            ? "ring-destructive ring-4 ring-inset"
             : ""
         }`}
       >
@@ -298,7 +298,7 @@ const HygieneMobileOptionsParfumCard = ({
               <Switch
                 className={`${
                   hygiene.infos.parfumGammeSelected === gamme
-                    ? "data-[state=checked]:bg-fm4alldestructive"
+                    ? "data-[state=checked]:bg-destructive"
                     : ""
                 }`}
                 checked={hygiene.infos.parfumGammeSelected === gamme}

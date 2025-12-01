@@ -21,7 +21,7 @@ const ServicePresentationCard = ({
       //@ts-expect-error oui je sais
       <Link href={href} title={title}>
         <div
-          className={`flex items-center gap-4 rounded-xl border p-4 ${href ? "hover:border-2 hover:border-fm4allsecondary hover:text-fm4allsecondary" : ""} ${className}`}
+          className={`flex items-center gap-4 rounded-xl border p-4 ${href ? "hover:border-primary hover:text-primary hover:border-2" : ""} ${className}`}
           onClick={onClick}
         >
           <div className="flex items-center gap-1">
@@ -33,7 +33,7 @@ const ServicePresentationCard = ({
     );
   return (
     <div
-      className={`flex items-center gap-4 rounded-xl border p-4 ${href ? "hover:border-2 hover:border-fm4allsecondary hover:text-fm4allsecondary" : ""} ${className}`}
+      className={`flex items-center gap-4 rounded-xl border p-4 ${href ? "hover:border-primary hover:text-primary hover:border-2" : ""} ${className}`}
       onClick={onClick}
     >
       <div className="flex items-center gap-1">{icons.map((icon) => icon)}</div>

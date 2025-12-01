@@ -1,5 +1,6 @@
 import { officeManagerQuantites } from "@/db/schema";
 import { createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
 
 export const selectOfficeManagerQuantitesSchema = createSelectSchema(
   officeManagerQuantites,
@@ -21,4 +22,4 @@ export const selectOfficeManagerQuantitesSchema = createSelectSchema(
 );
 
 export type SelectOfficeManagerQuantitesType =
-  typeof selectOfficeManagerQuantitesSchema._type;
+  z.infer<typeof selectOfficeManagerQuantitesSchema>;

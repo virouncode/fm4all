@@ -253,7 +253,7 @@ const SnacksFruitsPropositionCard = ({
       className={`flex flex-1 bg-${color} min-h-36 cursor-pointer items-center justify-center gap-4 p-4 text-2xl text-slate-200 ${
         snacksFruits.infos.fournisseurId === proposition.fournisseurId &&
         snacksFruits.infos.gammeSelected === gamme
-          ? "ring-fm4alldestructive ring-4 ring-inset"
+          ? "ring-destructive ring-4 ring-inset"
           : ""
       }`}
       onClick={() => handleClickProposition(proposition)}
@@ -264,7 +264,7 @@ const SnacksFruitsPropositionCard = ({
           snacksFruits.infos.gammeSelected === gamme
         }
         onCheckedChange={() => handleClickProposition(proposition)}
-        className="data-[state=checked]:bg-fm4alldestructive"
+        className="data-[state=checked]:bg-destructive"
         title={t("selectionnez-cette-proposition")}
         data-testid="snacksfruits-switch"
       />

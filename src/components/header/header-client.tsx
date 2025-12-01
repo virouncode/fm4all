@@ -62,9 +62,7 @@ const HeaderClient = () => {
           <nav className="hidden items-center gap-8 xl:flex">
             <div
               className={`flex items-center gap-1 ${
-                isActive("/client/[clientId]")
-                  ? "text-destructive font-bold"
-                  : ""
+                isActive("/client/[clientId]") ? "text-primary font-bold" : ""
               }`}
             >
               <CircleGauge size={15} />
@@ -125,7 +123,7 @@ const HeaderClient = () => {
             <div className="flex flex-1 flex-col gap-4">
               <div
                 className={`flex items-center gap-4 ${
-                  isActive("/") ? "text-destructive font-bold" : ""
+                  isActive("/") ? "text-primary font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
@@ -134,7 +132,7 @@ const HeaderClient = () => {
               </div>
               <div
                 className={`flex items-center gap-4 ${
-                  isActive("/services") ? "text-destructive font-bold" : ""
+                  isActive("/services") ? "text-primary font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
@@ -143,7 +141,7 @@ const HeaderClient = () => {
               </div>
               <div
                 className={`flex items-center gap-4 ${
-                  isActive("/gammes") ? "text-destructive font-bold" : ""
+                  isActive("/gammes") ? "text-primary font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
@@ -152,7 +150,7 @@ const HeaderClient = () => {
               </div>
               <div
                 className={`flex items-center gap-4 ${
-                  isActive("/engagements") ? "text-destructive font-bold" : ""
+                  isActive("/engagements") ? "text-primary font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
@@ -161,7 +159,7 @@ const HeaderClient = () => {
               </div>
               <div
                 className={`flex items-center gap-4 ${
-                  isActive("/partenaires") ? "text-destructive font-bold" : ""
+                  isActive("/partenaires") ? "text-primary font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
@@ -170,7 +168,7 @@ const HeaderClient = () => {
               </div>
               {/* <div
                 className={`flex gap-4 items-center ${
-                  isActive("/faq") ? "text-destructive font-bold" : ""
+                  isActive("/faq") ? "text-primary font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
@@ -179,7 +177,7 @@ const HeaderClient = () => {
               </div> */}
               <div
                 className={`hidden items-center gap-4 max-[600px]:flex ${
-                  isActive("/prestataire") ? "text-destructive font-bold" : ""
+                  isActive("/prestataire") ? "text-primary font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
@@ -188,7 +186,7 @@ const HeaderClient = () => {
               </div>
               <div
                 className={`hidden items-center gap-4 max-[600px]:flex ${
-                  isActive("/contact") ? "text-destructive font-bold" : ""
+                  isActive("/contact") ? "text-primary font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >
@@ -197,7 +195,7 @@ const HeaderClient = () => {
               </div>
               <div
                 className={`hidden items-center gap-4 max-[600px]:flex ${
-                  isActive("/login") ? "text-destructive font-bold" : ""
+                  isActive("/login") ? "text-primary font-bold" : ""
                 }`}
                 onClick={handleHideMobileNav}
               >

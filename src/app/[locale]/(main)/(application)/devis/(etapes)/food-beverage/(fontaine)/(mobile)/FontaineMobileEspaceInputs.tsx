@@ -144,7 +144,7 @@ const FontaineMobileEspaceInputs = ({
           <div className="flex items-center gap-2">
             <Input
               className={`w-16 max-w-xs min-w-20 ${
-                nbPersonnes === client.effectif ? "text-fm4alldestructive" : ""
+                nbPersonnes === client.effectif ? "text-destructive" : ""
               }`}
               type="number"
               min={1}

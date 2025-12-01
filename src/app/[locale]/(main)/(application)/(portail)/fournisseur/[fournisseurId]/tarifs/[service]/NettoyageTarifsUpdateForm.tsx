@@ -248,7 +248,7 @@ export default function NettoyageTarifsUpdateForm({
 
   return (
     <>
-      <div className="item-center mb-2 mt-14 flex justify-between">
+      <div className="item-center mt-14 mb-2 flex justify-between">
         <div className="border-l border-l-gray-500">
           <h2 className="ml-4 text-xl font-bold">{title}</h2>
         </div>
@@ -268,7 +268,7 @@ export default function NettoyageTarifsUpdateForm({
               <Button
                 disabled={!hasUnsavedChanges || saving}
                 size="lg"
-                className="bg-fm4alldestructive"
+                className="bg-destructive"
               >
                 Publier
               </Button>
@@ -284,7 +284,6 @@ export default function NettoyageTarifsUpdateForm({
             <Button
               onClick={handleSave}
               disabled={!hasUnsavedChanges || saving}
-              variant="destructive"
               size="lg"
             >
               {saving ? (
@@ -311,7 +310,7 @@ export default function NettoyageTarifsUpdateForm({
         <div className="overflow-hidden rounded-md border">
           <div className="max-h-[550px] overflow-y-auto">
             <Table>
-              <TableHeader className="sticky top-0 z-10 bg-background shadow-sm">
+              <TableHeader className="bg-background sticky top-0 z-10 shadow-sm">
                 <TableRow>
                   <TableHead>Surface (m²)</TableHead>
                   <TableHead>Gamme</TableHead>
@@ -367,10 +366,10 @@ export default function NettoyageTarifsUpdateForm({
                         <span
                           className={
                             tarif.gamme === "essentiel"
-                              ? "font-bold text-fm4allessential"
+                              ? "text-fm4allessential font-bold"
                               : tarif.gamme === "confort"
-                                ? "font-bold text-fm4allcomfort"
-                                : "font-bold text-fm4allexcellence"
+                                ? "text-fm4allcomfort font-bold"
+                                : "text-fm4allexcellence font-bold"
                           }
                         >
                           {tarif.gamme}

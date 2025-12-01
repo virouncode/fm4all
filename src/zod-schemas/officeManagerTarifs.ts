@@ -17,4 +17,4 @@ export const selectOfficeManagerTarifsSchema = createSelectSchema(
 });
 
 export type SelectOfficeManagerTarifsType =
-  typeof selectOfficeManagerTarifsSchema._type;
+  z.infer<typeof selectOfficeManagerTarifsSchema>;

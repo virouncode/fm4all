@@ -38,7 +38,6 @@ const NextEtapeFoodButton = () => {
   return (
     <div className="text-center lg:hidden">
       <Button
-        variant="destructive"
         size="lg"
         className="text-base"
         title={t("passer-a-letape-suivante")}

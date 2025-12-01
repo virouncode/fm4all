@@ -14,4 +14,4 @@ export const selectSucreConsoTarifsSchema = createSelectSchema(
 });
 
 export type SelectSucreConsoTarifsType =
-  typeof selectSucreConsoTarifsSchema._type;
+  z.infer<typeof selectSucreConsoTarifsSchema>;

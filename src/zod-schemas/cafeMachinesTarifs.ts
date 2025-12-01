@@ -18,4 +18,4 @@ export const selectCafeMachinesTarifsSchema = createSelectSchema(
 });
 
 export type SelectCafeMachinesTarifsType =
-  typeof selectCafeMachinesTarifsSchema._type;
+  z.infer<typeof selectCafeMachinesTarifsSchema>;

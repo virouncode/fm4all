@@ -155,7 +155,7 @@ const SecuriteIncendiePropostionCard = ({
     <div
       className={`flex w-3/4 cursor-pointer items-center justify-center gap-4 bg-slate-100 p-4 text-xl ${
         incendie.infos.fournisseurId === proposition.fournisseurId
-          ? "ring-fm4alldestructive ring-4 ring-inset"
+          ? "ring-destructive ring-4 ring-inset"
           : ""
       }`}
       onClick={() => handleClickProposition(proposition)}
@@ -163,7 +163,7 @@ const SecuriteIncendiePropostionCard = ({
       <Switch
         checked={incendie.infos.fournisseurId === proposition.fournisseurId}
         onCheckedChange={() => handleClickProposition(proposition)}
-        className="data-[state=checked]:bg-fm4alldestructive"
+        className="data-[state=checked]:bg-destructive"
         title={t("selectionnez-cette-proposition")}
         data-testid="incendie-switch"
       />

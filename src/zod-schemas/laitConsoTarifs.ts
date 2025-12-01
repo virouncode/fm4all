@@ -11,4 +11,4 @@ export const selectLaitConsoTarifsSchema = createSelectSchema(laitConsoTarifs, {
 });
 
 export type SelectLaitConsoTarifsType =
-  typeof selectLaitConsoTarifsSchema._type;
+  z.infer<typeof selectLaitConsoTarifsSchema>;

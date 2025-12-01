@@ -194,7 +194,7 @@ const TheMobilePropositionCard = ({
       <div
         className={`bg-${color} flex h-64 flex-col rounded-xl border border-slate-200 p-4 text-white ${
           the.infos.gammeSelected === gamme
-            ? "ring-fm4alldestructive ring-4 ring-inset"
+            ? "ring-destructive ring-4 ring-inset"
             : ""
         }`}
       >
@@ -270,7 +270,7 @@ const TheMobilePropositionCard = ({
               <Switch
                 className={`${
                   the.infos.gammeSelected === gamme
-                    ? "data-[state=checked]:bg-fm4alldestructive"
+                    ? "data-[state=checked]:bg-destructive"
                     : ""
                 }`}
                 checked={the.infos.gammeSelected === gamme}

@@ -14,7 +14,6 @@ const NextServiceButton = ({
   return (
     <div className="text-center lg:text-end">
       <Button
-        variant="destructive"
         size="lg"
         className="text-base"
         onClick={handleClickNext}

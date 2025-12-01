@@ -1,24 +1,23 @@
 import { relations } from "drizzle-orm";
-
-// Import all enums
-export * from "./enums";
-
-// Import all tables
 export * from "./auth";
 export * from "./cafe";
+export * from "./clientFournisseurs";
 export * from "./clients";
 export * from "./devis";
+export * from "./enums";
 export * from "./fontaines";
 export * from "./food";
 export * from "./fournisseurs";
 export * from "./hygiene";
 export * from "./incendie";
+export * from "./interventions";
 export * from "./maintenance";
 export * from "./nettoyage";
 export * from "./office-manager";
 export * from "./services";
 export * from "./services-fm4all";
 export * from "./sites";
+export * from "./tickets";
 
 // Import tables for relations
 import { user } from "./auth";
@@ -31,6 +30,7 @@ import {
   sucreConsoTarifs,
   theConsoTarifs,
 } from "./cafe";
+import { clientFournisseurs } from "./clientFournisseurs";
 import { clients } from "./clients";
 import { devis, devisTemporaires } from "./devis";
 import { fontaines, fontainesTarifs } from "./fontaines";
@@ -56,6 +56,7 @@ import {
   portesCoupeFeuTarifs,
   riaTarifs,
 } from "./incendie";
+import { interventions } from "./interventions";
 import {
   legioTarifs,
   maintenanceTarifs,
@@ -69,7 +70,8 @@ import {
 } from "./nettoyage";
 import { officeManagerTarifs } from "./office-manager";
 import { services, servicesFournisseurs } from "./services";
-import { clientFournisseurs, sites, tickets } from "./sites";
+import { sites } from "./sites";
+import { tickets } from "./tickets";
 
 // Relations
 export const clientsRelations = relations(clients, ({ many }) => ({
@@ -79,6 +81,7 @@ export const clientsRelations = relations(clients, ({ many }) => ({
   clientFournisseurs: many(clientFournisseurs),
   sites: many(sites),
   tickets: many(tickets),
+  interventions: many(interventions),
 }));
 
 export const fournisseursRelations = relations(
@@ -117,6 +120,7 @@ export const fournisseursRelations = relations(
     users: many(user),
     clientFournisseurs: many(clientFournisseurs),
     tickets: many(tickets),
+    interventions: many(interventions),
   }),
 );
 
@@ -469,9 +473,10 @@ export const sitesRelations = relations(sites, ({ one, many }) => ({
     references: [clients.id],
   }),
   tickets: many(tickets),
+  interventions: many(interventions),
 }));
 
-export const ticketsRelations = relations(tickets, ({ one }) => ({
+export const ticketsRelations = relations(tickets, ({ one, many }) => ({
   client: one(clients, {
     fields: [tickets.clientId],
     references: [clients.id],
@@ -485,7 +490,27 @@ export const ticketsRelations = relations(tickets, ({ one }) => ({
     references: [fournisseurs.id],
   }),
   createdBy: one(user, {
-    fields: [tickets.createdByUserId],
+    fields: [tickets.createdById],
     references: [user.id],
+  }),
+  interventions: many(interventions),
+}));
+
+export const interventionsRelations = relations(interventions, ({ one }) => ({
+  client: one(clients, {
+    fields: [interventions.clientId],
+    references: [clients.id],
+  }),
+  site: one(sites, {
+    fields: [interventions.siteId],
+    references: [sites.id],
+  }),
+  fournisseur: one(fournisseurs, {
+    fields: [interventions.fournisseurId],
+    references: [fournisseurs.id],
+  }),
+  ticket: one(tickets, {
+    fields: [interventions.ticketId],
+    references: [tickets.id],
   }),
 }));

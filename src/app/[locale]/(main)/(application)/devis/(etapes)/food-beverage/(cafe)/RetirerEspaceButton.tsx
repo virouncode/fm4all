@@ -18,7 +18,6 @@ const RetirerEspaceButton = ({
   const t = useTranslations("DevisPage.foodBeverage.cafe");
   return (
     <Button
-      variant="destructive"
       size="sm"
       title={t("retirer")}
       onClick={handleClickRemove}

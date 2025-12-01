@@ -103,11 +103,14 @@ const HygieneMinFacturationForm = ({
     );
   };
   const submitForm = async (data: UpdateHygieneMinFacturationType) => {
-    executeUpdateHygieneMinFacturation(data);
+    executeUpdateHygieneMinFacturation({
+      ...data,
+      minFacturation: Number(data.minFacturation),
+    });
   };
   return (
     <>
-      <div className="item-center mb-2 mt-14 flex justify-between">
+      <div className="item-center mt-14 mb-2 flex justify-between">
         <div className="border-l border-l-gray-500">
           <h2 className="ml-4 text-xl font-bold">{title}</h2>
         </div>
@@ -131,7 +134,7 @@ const HygieneMinFacturationForm = ({
                 <Button
                   disabled={!hasUnsavedChanges}
                   size="lg"
-                  className="bg-fm4alldestructive"
+                  className="bg-destructive"
                 >
                   Publier
                 </Button>
@@ -140,7 +143,6 @@ const HygieneMinFacturationForm = ({
             <div className="flex items-center gap-2">
               <Button
                 disabled={!hasUnsavedChanges || isUpdatingHygieneMinFacturation}
-                variant="destructive"
                 size="lg"
               >
                 {isUpdatingHygieneMinFacturation ? (

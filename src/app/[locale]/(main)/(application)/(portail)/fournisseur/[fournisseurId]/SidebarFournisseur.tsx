@@ -32,7 +32,7 @@ const SidebarFournisseur = ({ fournisseurId }: SidebarFournisseurProps) => {
   const pathName = usePathname();
   const items = [
     {
-      title: "Tableau de bord",
+      title: "Dashboard",
       href: {
         pathname: "/fournisseur/[fournisseurId]/dashboard" as const,
         params: { fournisseurId },

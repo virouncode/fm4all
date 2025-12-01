@@ -29,11 +29,21 @@ export const insertUserAction = actionClient
     async ({ parsedInput: userInput }: { parsedInput: InsertUserType }) => {
       const locale = await getLocale();
       const currentUser = (await getSession())?.user;
-      if (currentUser?.role !== "admin") {
+      if (!currentUser) {
         throw new Error(
           locale === "fr"
-            ? "Vous n'avez pas les droits pour créer un compte fournisseur."
-            : "You do not have permission to create a provider account.",
+            ? "Vous devez être connecté pour créer un compte utilisateur."
+            : "You must be logged in to create a user account.",
+        );
+      }
+      if (
+        currentUser?.role !== "admin" &&
+        currentUser?.clientId !== userInput.clientId
+      ) {
+        throw new Error(
+          locale === "fr"
+            ? "Vous n'avez pas les droits pour créer un compte utilisateur."
+            : "You do not have permission to create a user account.",
         );
       }
       const existingEmail = await db
@@ -50,8 +60,18 @@ export const insertUserAction = actionClient
       }
       const tempPassword = generatePassword();
 
+      const promotedImageUrl = await promoteTempAvatarUrl(
+        userInput.image,
+        userInput.role,
+      );
+      userInput.image = promotedImageUrl ?? null;
+
       await auth.api.signUpEmail({
-        body: { ...userInput, password: tempPassword },
+        body: {
+          ...userInput,
+          password: tempPassword,
+          name: userInput.firstName + " " + userInput.lastName,
+        },
       });
       await sendEmailFromServer({
         to: userInput.email,
@@ -75,50 +95,105 @@ export const insertUserAction = actionClient
     },
   );
 
+import { promoteTempAvatarUrl } from "@/lib/utils/file-helper";
+import { headers } from "next/headers";
+
 export const updateUserAction = actionClient
   .metadata({
     actionName: "updateUserAction",
   })
-  .schema(updateUserSchema, {
+  .inputSchema(updateUserSchema, {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
   })
   .action(
     async ({ parsedInput: userInput }: { parsedInput: UpdateUserType }) => {
       const locale = await getLocale();
-      const currentUser = (await getSession())?.user;
+      const currentSession = await getSession();
+      const currentUser = currentSession?.user;
+
       if (!currentUser) {
         throw new Error(
           locale === "fr"
-            ? "Vous devez être connecté pour mettre à jour vote compte utilisateur."
-            : "You must be logged in to update your user account.",
+            ? "Vous devez être connecté pour mettre à jour ce compte utilisateur."
+            : "You must be logged in to update this user account.",
         );
       }
-      if (currentUser?.id !== userInput.id) {
-        throw new Error(
-          locale === "fr"
-            ? "Vous n'avez pas les droits pour mettre à jour ce compte utilisateur."
-            : "You do not have permission to update this user account.",
-        );
-      }
-      const resultUser = await db
-        .update(user)
-        .set(userInput)
+
+      // Autorisation : admin peut tout, sinon seulement lui-même
+      // if (currentUser.role !== "admin" && currentUser.id !== userInput.id) {
+      //   throw new Error(
+      //     locale === "fr"
+      //       ? "Vous n'avez pas les droits pour mettre à jour ce compte utilisateur."
+      //       : "You do not have permission to update this user account.",
+      //   );
+      // }
+
+      const [existingUser] = await db
+        .select()
+        .from(user)
         .where(eq(user.id, userInput.id))
-        .returning();
-      if (!resultUser[0]?.id) {
+        .limit(1);
+
+      if (!existingUser) {
         throw new Error(
           locale === "fr"
-            ? "Impossible de mettre à jour le compte utilisateur."
-            : "Unable to update the user account.",
+            ? "Le compte utilisateur que vous essayez de mettre à jour n'existe pas."
+            : "The user account you are trying to update does not exist.",
         );
       }
+
+      const promotedImageUrl = await promoteTempAvatarUrl(
+        userInput.image,
+        existingUser.role,
+      );
+      // Cas 1 : l'utilisateur met à jour SON propre compte → on passe par Better Auth
+      if (currentUser.id === userInput.id) {
+        const h = await headers();
+
+        const res = await auth.api.updateUser({
+          headers: h,
+          body: {
+            name: userInput.firstName + " " + userInput.lastName,
+            firstName: userInput.firstName,
+            lastName: userInput.lastName,
+            image: promotedImageUrl ?? undefined,
+            phone: userInput.phone,
+          },
+        });
+
+        if ("error" in res && res.error) {
+          const err = res.error as { message?: string };
+          throw new Error(
+            err.message ??
+              (locale === "fr"
+                ? "Impossible de mettre à jour le compte utilisateur."
+                : "Unable to update the user account."),
+          );
+        }
+      } else {
+        // Cas 2 : un admin met à jour un autre utilisateur → update direct BDD
+        const resultUser = await db
+          .update(user)
+          .set({ ...userInput, image: promotedImageUrl ?? undefined })
+          .where(eq(user.id, userInput.id))
+          .returning();
+
+        if (!resultUser[0]?.id) {
+          throw new Error(
+            locale === "fr"
+              ? "Impossible de mettre à jour le compte utilisateur."
+              : "Unable to update the user account.",
+          );
+        }
+      }
+
       return {
         success: true,
         message:
           locale === "fr"
-            ? `Votre compte utilisateur a été mis à jour avec succès.`
-            : `Your user account has been successfully updated.`,
+            ? `Le compte utilisateur a été mis à jour avec succès.`
+            : `The user account has been successfully updated.`,
       };
     },
   );

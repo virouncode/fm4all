@@ -235,7 +235,7 @@ const NettoyageMobileOptionsVitrerieCard = ({
             onChange={handleChangeNbPassageVitrerie}
             className={`w-16 ${
               nettoyage.quantites.nbPassagesVitrerie === 2
-                ? "text-fm4alldestructive"
+                ? "text-destructive"
                 : ""
             }`}
           />
@@ -255,7 +255,7 @@ const NettoyageMobileOptionsVitrerieCard = ({
           </Button>
         </div>
 
-        <p className="text-fm4alldestructive text-xs italic">
+        <p className="text-destructive text-xs italic">
           {t(
             "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
           )}
@@ -264,7 +264,7 @@ const NettoyageMobileOptionsVitrerieCard = ({
       <div
         className={`bg-${color} flex h-64 flex-col rounded-xl border border-slate-200 p-4 text-white ${
           nettoyage.infos.vitrerieSelected && vitrerieProposition.prixAnnuel
-            ? "ring-fm4alldestructive ring-4 ring-inset"
+            ? "ring-destructive ring-4 ring-inset"
             : ""
         }`}
       >
@@ -361,7 +361,7 @@ const NettoyageMobileOptionsVitrerieCard = ({
               <Switch
                 className={`${
                   nettoyage.infos.vitrerieSelected
-                    ? "data-[state=checked]:bg-fm4alldestructive"
+                    ? "data-[state=checked]:bg-destructive"
                     : ""
                 }`}
                 checked={nettoyage.infos.vitrerieSelected}

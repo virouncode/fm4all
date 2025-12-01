@@ -68,8 +68,6 @@ const SauvegarderProgression = () => {
         surfaceMax: tSauverErreurs("surface-maximum-3000-m"),
         effectif: tSauverErreurs("effectif-obligatoire"),
         effectifMax: tSauverErreurs("effectif-maximum-300-personnes"),
-        typeBatiment: tSauverErreurs("batiment"),
-        typeOccupation: tSauverErreurs("type-doccupation-invalide"),
         codePostal: tSauverErreurs("code-postal-invalide-entrez-5-chiffres"),
         ville: tSauverErreurs("ville-obligatoire"),
       }),
@@ -141,8 +139,6 @@ const SauvegarderProgression = () => {
   });
 
   const submitForm = async (data: InsertClientType) => {
-    console.log("submit");
-
     if (!accepte) {
       toast({
         variant: "destructive",
@@ -198,8 +194,6 @@ const SauvegarderProgression = () => {
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log("handle change", client);
-
     const { name, value } = e.target;
     setClient((prev) => ({
       ...prev,
@@ -320,7 +314,6 @@ const SauvegarderProgression = () => {
             </div>
             <div className="flex justify-center">
               <Button
-                variant="destructive"
                 size="lg"
                 title={tSauver("sauvegarder-ma-progression")}
                 className="min-w-28 text-base"

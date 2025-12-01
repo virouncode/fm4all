@@ -268,7 +268,7 @@ const SnacksFruitsMobilePropositionCard = ({
         className={`bg-${color} flex h-56 flex-col rounded-xl border border-slate-200 p-4 text-white ${
           snacksFruits.infos.fournisseurId === fournisseurId &&
           snacksFruits.infos.gammeSelected === gamme
-            ? "ring-fm4alldestructive ring-4 ring-inset"
+            ? "ring-destructive ring-4 ring-inset"
             : ""
         }`}
       >
@@ -345,7 +345,7 @@ const SnacksFruitsMobilePropositionCard = ({
                 className={`${
                   snacksFruits.infos.fournisseurId === fournisseurId &&
                   snacksFruits.infos.gammeSelected === gamme
-                    ? "data-[state=checked]:bg-fm4alldestructive"
+                    ? "data-[state=checked]:bg-destructive"
                     : ""
                 }`}
                 checked={

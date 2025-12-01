@@ -301,7 +301,7 @@ const FontaineEspacePropositionCard = ({
       className={`flex flex-1 cursor-pointer items-center justify-center gap-4 border-r bg-slate-100 p-4 text-2xl ${
         fontaines.infos.fournisseurId === proposition.fournisseurId &&
         espace.infos.poseSelected === proposition.typePose
-          ? "ring-fm4alldestructive ring-4 ring-inset"
+          ? "ring-destructive ring-4 ring-inset"
           : ""
       }`}
       onClick={() =>
@@ -320,7 +320,7 @@ const FontaineEspacePropositionCard = ({
             ? handleClickFirstEspaceProposition(proposition)
             : handleClickProposition(proposition)
         }
-        className="data-[state=checked]:bg-fm4alldestructive"
+        className="data-[state=checked]:bg-destructive"
         title={t("selectionnez-cette-proposition")}
         data-testid={`fontaine-switch-${espace.infos.espaceId}`}
       />

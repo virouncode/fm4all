@@ -1,5 +1,6 @@
 import { devis, devisTemporaires } from "@/db/schema";
 import { createInsertSchema } from "drizzle-zod";
+import { z } from "zod";
 
 export const createInsertDevisTemporaireSchema = (messages: {
   texte: string;
@@ -13,7 +14,7 @@ export const insertDevisTemporaireSchema = createInsertDevisTemporaireSchema({
 });
 
 export type InsertDevisTemporaireType =
-  typeof insertDevisTemporaireSchema._type;
+  z.infer<typeof insertDevisTemporaireSchema>;
 
 export const createInsertDevisSchema = (messages: { devisUrl: string }) => {
   return createInsertSchema(devis, {
@@ -25,4 +26,4 @@ export const insertDevisSchema = createInsertDevisSchema({
   devisUrl: "URL du devis obligatoire",
 });
 
-export type InsertDevisType = typeof insertDevisSchema._type;
+export type InsertDevisType = z.infer<typeof insertDevisSchema>;

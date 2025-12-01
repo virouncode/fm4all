@@ -68,7 +68,7 @@ const SecuriteIncendieMobileInputs = ({
               className={`w-16 ${
                 incendie.quantites.nbExtincteurs ===
                 incendieQuantite.nbExtincteurs
-                  ? "text-fm4alldestructive"
+                  ? "text-destructive"
                   : ""
               }`}
               id="nbExtincteurs"
@@ -90,7 +90,7 @@ const SecuriteIncendieMobileInputs = ({
               <Plus />
             </Button>
           </div>
-          <p className="text-fm4alldestructive text-xs italic">
+          <p className="text-destructive text-xs italic">
             {t(
               "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
             )}
@@ -133,7 +133,7 @@ const SecuriteIncendieMobileInputs = ({
               className={`w-16 ${
                 incendie.quantites.nbBaes ===
                 Math.ceil(incendieQuantite.nbExtincteurs * 2.3)
-                  ? "text-fm4alldestructive"
+                  ? "text-destructive"
                   : ""
               }`}
               id="nbBaes"
@@ -155,7 +155,7 @@ const SecuriteIncendieMobileInputs = ({
               <Plus />
             </Button>
           </div>
-          <p className="text-fm4alldestructive text-xs italic">
+          <p className="text-destructive text-xs italic">
             {t(
               "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
             )}
@@ -191,9 +191,7 @@ const SecuriteIncendieMobileInputs = ({
               step={1}
               onChange={(e) => handleChangeNbr(e, "telBaes")}
               className={`w-16 ${
-                incendie.quantites.nbTelBaes === 1
-                  ? "text-fm4alldestructive"
-                  : ""
+                incendie.quantites.nbTelBaes === 1 ? "text-destructive" : ""
               }`}
               id="nbTelBaes"
             />
@@ -215,7 +213,7 @@ const SecuriteIncendieMobileInputs = ({
             </Button>
           </div>
 
-          <p className="text-fm4alldestructive text-xs italic">
+          <p className="text-destructive text-xs italic">
             {t(
               "les-quantites-sont-estimees-pour-vous-mais-vous-pouvez-les-changer",
             )}

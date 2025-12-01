@@ -24,10 +24,9 @@ const DevisButton = ({
   return (
     <div className="flex justify-center">
       <Button
-        variant="destructive"
         size={size}
         title={title}
-        className={`ring-destructive text-base shadow-md ring-2 ring-offset-2 transition-all hover:scale-[101%] hover:shadow-lg ${className}`}
+        className={`ring-primary text-base shadow-md ring-2 ring-offset-2 transition-all hover:scale-[101%] hover:shadow-lg ${className}`}
         data-testid="devis-button"
         onClick={() => {
           setIsMobileNavOpen?.(false);

@@ -97,9 +97,6 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
     if (!imagePreview && info.image) {
       try {
         const res = await deleteVercelBlob({ url: info.image });
-        if (!res.ok) {
-          throw new Error("Erreur lors de la suppression de l'image");
-        }
       } catch (error) {
         toast({
           variant: "destructive",
@@ -116,16 +113,13 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
       try {
         if (info.image) {
           const res = await deleteVercelBlob({ url: info.image });
-          if (!res.ok) {
-            throw new Error("Erreur lors de la suppression de l'image");
-          }
         }
-
-        imageUrl = await postVercelBlob({
+        const response = await postVercelBlob({
           file: image,
           filename: `${data.prenom}_${data.nom}_avatar`,
           foldername: "admin_avatars",
         });
+        imageUrl = response.url;
       } catch (error) {
         toast({
           variant: "destructive",
@@ -242,7 +236,6 @@ const AdminInfo = ({ info }: AdminInfoProps) => {
                   />
                 </div>
                 <Button
-                  variant="destructive"
                   size="lg"
                   title={tAdmin("mettre-a-jour")}
                   className="mt-6 w-full text-base"

@@ -19,7 +19,7 @@ const CDCHygiene = () => {
           <TableHeader className="sticky top-0 z-20 bg-white">
             <TableRow className="bg-white">
               <TableCell className="sticky left-0 z-10 p-0" colSpan={2}>
-                <div className="bg-fm4allsecondary p-4 text-center text-white">
+                <div className="bg-primary p-4 text-center text-white">
                   <h1 className="text-xl">Cahier des charges - Hygiene</h1>
                   <p>Finition des distributeurs</p>
                 </div>

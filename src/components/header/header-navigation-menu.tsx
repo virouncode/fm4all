@@ -91,7 +91,7 @@ const HeaderNavigationMenu = ({
             data-testid="services-trigger"
           >
             <div
-              className={`flex items-center gap-1 text-base ${isActive("/services") ? "text-destructive font-bold" : ""}`}
+              className={`flex items-center gap-1 text-base ${isActive("/services") ? "text-primary font-bold" : ""}`}
             >
               <HandPlatter size={15} />
               <p>Services</p>
@@ -152,7 +152,7 @@ const HeaderNavigationMenu = ({
             data-testid="secteurs-trigger"
           >
             <div
-              className={`flex items-center gap-1 text-base ${isActive("/secteurs") ? "text-destructive font-bold" : ""}`}
+              className={`flex items-center gap-1 text-base ${isActive("/secteurs") ? "text-primary font-bold" : ""}`}
             >
               <Factory size={15} />
               <p>{locale === "fr" ? "Secteurs" : "Sectors"}</p>
@@ -196,7 +196,7 @@ const HeaderNavigationMenu = ({
             data-testid="decouvrir-trigger"
           >
             <div
-              className={`flex items-center gap-1 text-base ${isActive("/gammes") || isActive("/engagements") || isActive("/partenaires") ? "text-destructive font-bold" : ""}`}
+              className={`flex items-center gap-1 text-base ${isActive("/gammes") || isActive("/engagements") || isActive("/partenaires") ? "text-primary font-bold" : ""}`}
             >
               <Telescope size={15} />
               <p>{locale === "fr" ? "Découvrir" : "Discover"}</p>
@@ -229,7 +229,7 @@ const HeaderNavigationMenu = ({
             data-testid="decouvrir-trigger"
           >
             <div
-              className={`flex items-center gap-1 text-base ${isActive("/travail") || isActive("/prestataire") ? "text-destructive font-bold" : ""}`}
+              className={`flex items-center gap-1 text-base ${isActive("/travail") || isActive("/prestataire") ? "text-primary font-bold" : ""}`}
             >
               <Users size={15} />
               <p>{locale === "fr" ? "Nous rejoindre" : "Join Us"}</p>
@@ -269,7 +269,7 @@ const HeaderNavigationMenu = ({
         <AccordionItem value={"services"}>
           <AccordionTrigger className="text-lg">
             <div
-              className={`flex items-center gap-2 ${isActive("/services") ? "text-destructive font-bold" : ""}`}
+              className={`flex items-center gap-2 ${isActive("/services") ? "text-primary font-bold" : ""}`}
             >
               <HandPlatter />
               <span>Services</span>
@@ -324,7 +324,7 @@ const HeaderNavigationMenu = ({
         <AccordionItem value={"secteurs"}>
           <AccordionTrigger className="text-lg">
             <div
-              className={`flex items-center gap-2 ${isActive("/secteurs") ? "text-destructive font-bold" : ""}`}
+              className={`flex items-center gap-2 ${isActive("/secteurs") ? "text-primary font-bold" : ""}`}
             >
               <Factory />
               <span>{locale === "fr" ? "Secteurs" : "Sectors"}</span>
@@ -377,7 +377,7 @@ const HeaderNavigationMenu = ({
         <AccordionItem value={"decouvrir"}>
           <AccordionTrigger className="text-lg">
             <div
-              className={`flex items-center gap-2 ${isActive("/gammes") || isActive("/engagements") || isActive("/partenaires") ? "text-destructive font-bold" : ""}`}
+              className={`flex items-center gap-2 ${isActive("/gammes") || isActive("/engagements") || isActive("/partenaires") ? "text-primary font-bold" : ""}`}
             >
               <Telescope />
               <span>{locale === "fr" ? "Découvrir" : "Discover"}</span>
@@ -412,7 +412,7 @@ const HeaderNavigationMenu = ({
         <AccordionItem value={"rejoindre"}>
           <AccordionTrigger className="text-lg">
             <div
-              className={`flex items-center gap-2 ${isActive("/travail") || isActive("/prestataire") ? "text-destructive font-bold" : ""}`}
+              className={`flex items-center gap-2 ${isActive("/travail") || isActive("/prestataire") ? "text-primary font-bold" : ""}`}
             >
               <Users />
               <span>{locale === "fr" ? "Nous rejoindre" : "Join Us"}</span>

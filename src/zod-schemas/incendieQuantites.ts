@@ -1,5 +1,6 @@
 import { incendieQuantites } from "@/db/schema";
 import { createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
 
 export const selectIncendieQuantitesSchema = createSelectSchema(
   incendieQuantites,
@@ -11,4 +12,4 @@ export const selectIncendieQuantitesSchema = createSelectSchema(
 );
 
 export type SelectIncendieQuantitesType =
-  typeof selectIncendieQuantitesSchema._type;
+  z.infer<typeof selectIncendieQuantitesSchema>;

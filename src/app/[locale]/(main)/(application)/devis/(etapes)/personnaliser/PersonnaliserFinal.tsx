@@ -69,7 +69,6 @@ const PersonnaliserFinal = () => {
       <div className="flex justify-center">
         <Button
           onClick={handleAfficherDevis}
-          variant="destructive"
           size="lg"
           className="text-base"
           data-testid="valider-personnalisation"

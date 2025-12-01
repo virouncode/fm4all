@@ -119,7 +119,6 @@ const CookieBanner = () => {
           </div>
           <div className="flex w-full flex-col gap-2 md:w-72">
             <Button
-              variant="destructive"
               title={t("jaccepte")}
               size="lg"
               onClick={handleAccept}

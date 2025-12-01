@@ -112,7 +112,14 @@ export default function VitrerieTarifsUpdateForm({
   };
 
   const submitForm = async (data: UpdateVitrerieTarifsType) => {
-    executeUpdateVitrerieTarif(data);
+    executeUpdateVitrerieTarif({
+      ...data,
+      cadenceVitres: Number(data.cadenceVitres),
+      cadenceCloisons: Number(data.cadenceCloisons),
+      tauxHoraire: Number(data.tauxHoraire),
+      minFacturation: Number(data.minFacturation),
+      fraisDeplacement: Number(data.fraisDeplacement),
+    });
   };
 
   const isFieldModified = (fieldName: string) => {
@@ -132,7 +139,7 @@ export default function VitrerieTarifsUpdateForm({
 
   return (
     <>
-      <div className="item-center mb-2 mt-14 flex justify-between">
+      <div className="item-center mt-14 mb-2 flex justify-between">
         <div className="border-l border-l-gray-500">
           <h2 className="ml-4 text-xl font-bold">{title}</h2>
         </div>
@@ -156,7 +163,7 @@ export default function VitrerieTarifsUpdateForm({
                 <Button
                   disabled={!hasUnsavedChanges}
                   size="lg"
-                  className="bg-fm4alldestructive"
+                  className="bg-destructive"
                 >
                   Publier
                 </Button>
@@ -165,7 +172,6 @@ export default function VitrerieTarifsUpdateForm({
             <div className="flex items-center gap-2">
               <Button
                 disabled={!hasUnsavedChanges || isUpdatingVitrerieTarif}
-                variant="destructive"
                 size="lg"
               >
                 {isUpdatingVitrerieTarif ? (

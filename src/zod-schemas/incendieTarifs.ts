@@ -24,4 +24,4 @@ export const selectIncendieTarifsSchema = createSelectSchema(incendieTarifs, {
   nbAvis: z.number().nullable(),
 });
 
-export type SelectIncendieTarifsType = typeof selectIncendieTarifsSchema._type;
+export type SelectIncendieTarifsType = z.infer<typeof selectIncendieTarifsSchema>;
