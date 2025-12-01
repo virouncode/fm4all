@@ -94,6 +94,7 @@ export const SORTABLE_CLIENT_USERS_COLUMNS = {
   email: user.email,
   createdAt: user.createdAt,
   updatedAt: user.updatedAt,
+  phone: user.phone,
 } as const;
 
 export const clientUsersOrderBySchema = z.enum([
@@ -101,6 +102,7 @@ export const clientUsersOrderBySchema = z.enum([
   "lastName",
   "firstName",
   "email",
+  "phone",
   "createdAt",
   "updatedAt",
 ]);
