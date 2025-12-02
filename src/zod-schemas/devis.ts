@@ -1,6 +1,12 @@
 import { devis, devisTemporaires } from "@/db/schema";
-import { createInsertSchema } from "drizzle-zod";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
+import { insertProspectSchema } from "./prospect";
+
+export const selectDevisTemporaireSchema = createSelectSchema(devisTemporaires);
+export type SelectDevisTemporaireType = z.infer<
+  typeof selectDevisTemporaireSchema
+>;
 
 export const createInsertDevisTemporaireSchema = (messages: {
   texte: string;
@@ -13,8 +19,9 @@ export const insertDevisTemporaireSchema = createInsertDevisTemporaireSchema({
   texte: "Texte obligatoire",
 });
 
-export type InsertDevisTemporaireType =
-  z.infer<typeof insertDevisTemporaireSchema>;
+export type InsertDevisTemporaireType = z.infer<
+  typeof insertDevisTemporaireSchema
+>;
 
 export const createInsertDevisSchema = (messages: { devisUrl: string }) => {
   return createInsertSchema(devis, {
@@ -27,3 +34,9 @@ export const insertDevisSchema = createInsertDevisSchema({
 });
 
 export type InsertDevisType = z.infer<typeof insertDevisSchema>;
+
+export const saveProgressSchema = z.object({
+  prospect: insertProspectSchema,
+  texte: insertDevisTemporaireSchema.shape.texte,
+});
+export type SaveProgressType = z.infer<typeof saveProgressSchema>;

@@ -46,7 +46,6 @@ export const insertAdminAction = actionClient
         lastName: capitalize(adminInput.nom),
         name: capitalize(adminInput.prenom) + " " + capitalize(adminInput.nom),
         email: adminInput.email.toLowerCase(),
-        password: tempPassword,
         role: "admin",
         fournisseurId: null,
         clientId: null,
@@ -71,7 +70,7 @@ export const insertAdminAction = actionClient
 
       await auth.api.signUpEmail({
         returnHeaders: true,
-        body: userToPost,
+        body: { ...userToPost, password: tempPassword },
         asResponse: true,
       });
       await sendEmailFromServer({
@@ -84,6 +83,7 @@ export const insertAdminAction = actionClient
           <p>Pensez aussi à vérifier votre adresse email en cliquant sur le lien que nous vous avons envoyé.</p>
           `,
         nomDestinataire: userToPost.name,
+        useTemplate: true,
       });
 
       return {

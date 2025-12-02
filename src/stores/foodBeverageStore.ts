@@ -9,6 +9,7 @@ type FoodBeverageStore = {
   setFoodBeverage: (
     value: FoodBeverageType | ((prev: FoodBeverageType) => FoodBeverageType),
   ) => void;
+  reset: () => void;
 };
 
 export const useFoodBeverageStore = create<FoodBeverageStore>()(
@@ -22,6 +23,7 @@ export const useFoodBeverageStore = create<FoodBeverageStore>()(
           foodBeverage:
             typeof value === "function" ? value(state.foodBeverage) : value,
         })),
+      reset: () => set({ foodBeverage: { currentFoodBeverageId: 1 } }),
     }),
     { name: "foodBeverage" },
   ),

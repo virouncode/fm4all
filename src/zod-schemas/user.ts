@@ -10,43 +10,31 @@ import {
   createUpdateSchema,
 } from "drizzle-zod";
 import { z } from "zod";
-import { phoneNumberSchema } from "./phone";
 import { AttachmentFieldValue } from "./ticket";
 
 export const userRoleSchema = z.enum(roleEnum.enumValues);
 export type UserRoleType = z.infer<typeof userRoleSchema>;
 
 //SELECT
-export const selectUserSchema = createSelectSchema(user, {
-  name: (schema) => schema.min(1, "Nom invalide"),
-  firstName: (schema) => schema.min(1, "Prénom invalide"),
-  lastName: (schema) => schema.min(1, "Nom de famille invalide"),
-  email: z.email("Email invalide"),
-  image: z.url("Url de l'avatar invalide").nullable(),
-});
+export const selectUserSchema = createSelectSchema(user);
 export type SelectUserType = z.infer<typeof selectUserSchema>;
 
-//INSERT
-export const insertUserSchema = createInsertSchema(user, {
-  name: (schema) => schema.min(1, "Nom obligatoire"),
-  firstName: (schema) => schema.min(1, "Prénom obligatoire"),
-  lastName: (schema) => schema.min(1, "Nom de famille obligatoire"),
-  email: z.email("Email invalide"),
-  image: z.url("Url de l'avatar invalide").nullable(),
-  phone: phoneNumberSchema("Numéro de téléphone invalide"),
-  role: userRoleSchema,
-})
-  .omit({
-    id: true,
-    emailVerified: true,
-    updatedAt: true,
-  })
-  .extend({
-    password: z.string().min(1, "Password is required"),
-  });
-
+export const insertUserSchema = createInsertSchema(user).omit({
+  id: true,
+  emailVerified: true,
+  updatedAt: true,
+  createdAt: true,
+});
 export type InsertUserType = z.infer<typeof insertUserSchema>;
 
+export const updateUserSchema = createUpdateSchema(user).omit({
+  createdAt: true,
+  updatedAt: true,
+  emailVerified: true,
+});
+export type UpdateUserType = z.infer<typeof updateUserSchema>;
+
+//======================= FORM SCHEMAS ==========================//
 export const insertUserFormSchema = insertUserSchema
   .omit({ name: true, password: true })
   .extend({
@@ -63,13 +51,6 @@ export const insertUserFormSchema = insertUserSchema
 export type InsertUserFormType = z.input<typeof insertUserFormSchema> & {
   avatarAttachment: AttachmentFieldValue | null;
 };
-
-//UPDATE
-export const updateUserSchema = createUpdateSchema(user, {
-  id: z.string().min(1, "ID utilisateur obligatoire"),
-  phone: phoneNumberSchema("Numéro de téléphone invalide").nullable(),
-});
-export type UpdateUserType = z.infer<typeof updateUserSchema>;
 
 export const updateUserFormSchema = updateUserSchema.extend({
   avatarAttachment: z

@@ -32,7 +32,6 @@ const ClientForm = ({ clients }: ClientFormProps) => {
   const defaultValues: InsertUserType = {
     name: client?.nomEntreprise ?? "",
     email: client?.emailContact ?? "",
-    password: "temp",
     role: "client",
     clientId,
     image: null,

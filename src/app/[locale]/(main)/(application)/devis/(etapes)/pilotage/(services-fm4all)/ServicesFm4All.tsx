@@ -4,9 +4,9 @@ import NextEtapeSauverButton from "@/app/[locale]/(main)/(application)/devis/Nex
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";
-import { useClientStore } from "@/stores/clientStore";
 import { useDevisProgressStore } from "@/stores/devisProgressStore";
 import { useManagementStore } from "@/stores/managementStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useServicesFm4AllStore } from "@/stores/servicesFm4AllStore";
 import { useTotalServicesFm4AllStore } from "@/stores/totalServicesFm4AllStore";
 import { SelectServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4AllOffresType";
@@ -31,7 +31,7 @@ const ServicesFm4All = ({
 }: ServicesFm4AllProps) => {
   const tFm4all = useTranslations("DevisPage.pilotage.servicesFm4all");
   const setManagement = useManagementStore((s) => s.setManagement);
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const totalServicesFm4All = useTotalServicesFm4AllStore(
     (s) => s.totalServicesFm4All,
   );
@@ -81,13 +81,14 @@ const ServicesFm4All = ({
       return;
     }
     const searchParams = new URLSearchParams();
-    if (client.effectif)
-      searchParams.set("effectif", client.effectif.toString());
-    if (client.surface) searchParams.set("surface", client.surface.toString());
-    if (client.typeBatiment)
-      searchParams.set("typeBatiment", client.typeBatiment);
-    if (client.typeOccupation)
-      searchParams.set("typeOccupation", client.typeOccupation);
+    if (prospect.effectif)
+      searchParams.set("effectif", prospect.effectif.toString());
+    if (prospect.surface)
+      searchParams.set("surface", prospect.surface.toString());
+    if (prospect.typeBatiment)
+      searchParams.set("typeBatiment", prospect.typeBatiment);
+    if (prospect.typeOccupation)
+      searchParams.set("typeOccupation", prospect.typeOccupation);
     const newCompletedSteps = [
       ...new Set([...devisProgress.completedSteps, 1, 2, 3, 4]),
     ].sort((a, b) => a - b);

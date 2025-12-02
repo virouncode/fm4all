@@ -9,6 +9,7 @@ type MonDevisStore = {
   setMonDevis: (
     value: MonDevisType | ((prev: MonDevisType) => MonDevisType),
   ) => void;
+  reset: () => void;
 };
 
 export const useMonDevisStore = create<MonDevisStore>()(
@@ -21,6 +22,7 @@ export const useMonDevisStore = create<MonDevisStore>()(
         set((state) => ({
           monDevis: typeof value === "function" ? value(state.monDevis) : value,
         })),
+      reset: () => set({ monDevis: { currentMonDevisId: 1 } }),
     }),
     { name: "monDevis" },
   ),

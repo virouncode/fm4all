@@ -9,6 +9,7 @@ interface TotalSnacksFruitsStore {
       | TotalSnacksFruitsType
       | ((prev: TotalSnacksFruitsType) => TotalSnacksFruitsType),
   ) => void;
+  reset: () => void;
 }
 
 export const useTotalSnacksFruitsStore = create<TotalSnacksFruitsStore>()(
@@ -29,6 +30,17 @@ export const useTotalSnacksFruitsStore = create<TotalSnacksFruitsStore>()(
               ? value(state.totalSnacksFruits)
               : value,
         })),
+      reset: () =>
+        set({
+          totalSnacksFruits: {
+            totalFruits: null,
+            totalSnacks: null,
+            totalBoissons: null,
+            totalLivraison: null,
+            total: null,
+            totalSansRemise: null,
+          },
+        }),
     }),
     {
       name: "totalSnacksFruits",

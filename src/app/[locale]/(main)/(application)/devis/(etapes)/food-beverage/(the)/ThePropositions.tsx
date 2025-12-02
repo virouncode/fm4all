@@ -2,7 +2,7 @@ import { MAX_EFFECTIF } from "@/constants/constants";
 import { toast } from "@/hooks/use-toast";
 import { roundNbPersonnesCafeConso } from "@/lib/utils/roundNbPersonnesCafeConso";
 import { useCafeStore } from "@/stores/cafeStore";
-import { useClientStore } from "@/stores/clientStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useTheStore } from "@/stores/theStore";
 import { useTotalTheStore } from "@/stores/totalTheStore";
 import { GammeType } from "@/zod-schemas/gamme";
@@ -10,9 +10,9 @@ import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { useTranslations } from "next-intl";
 import { ChangeEvent } from "react";
 import { useMediaQuery } from "react-responsive";
+import { useShallow } from "zustand/shallow";
 import TheDesktopPropositions from "./(desktop)/TheDesktopPropositions";
 import TheMobilePropositions from "./(mobile)/TheMobilePropositions";
-import { useShallow } from "zustand/shallow";
 
 type ThePropositionsProps = {
   theConsoTarifs: SelectTheConsoTarifsType[];
@@ -21,7 +21,7 @@ type ThePropositionsProps = {
 const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
   const t = useTranslations("DevisPage");
   const tThe = useTranslations("DevisPage.foodBeverage.the");
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const cafe = useCafeStore((s) => s.cafe);
   const { the, setThe } = useTheStore(
     useShallow((s) => ({
@@ -30,7 +30,8 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
     })),
   );
   const setTotalThe = useTotalTheStore((s) => s.setTotalThe);
-  const effectif = client.effectif ?? 0;
+  const resetTotalThe = useTotalTheStore((s) => s.reset);
+  const effectif = prospect.effectif ?? 0;
 
   //Calcul des propositions
   const nbPersonnes = the.quantites.nbPersonnes ?? Math.round(effectif * 0.15);
@@ -54,36 +55,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
     const value = e.target.value;
     let newNbPersonnes = value ? parseInt(value) : 0;
     if (newNbPersonnes > MAX_EFFECTIF) newNbPersonnes = MAX_EFFECTIF;
-    const nbThesParAn = newNbPersonnes * 400;
-    const prixUnitaire =
-      theConsoTarifs.find(
-        (tarif) =>
-          tarif.effectif === roundNbPersonnesCafeConso(newNbPersonnes / 0.15) &&
-          tarif.fournisseurId === cafe.infos.fournisseurId &&
-          tarif.gamme === the.infos.gammeSelected,
-      )?.prixUnitaire ?? null;
-    const totalAnnuel =
-      newNbPersonnes && prixUnitaire !== null
-        ? nbThesParAn * prixUnitaire
-        : null;
-
-    setThe((prev) => ({
-      ...prev,
-      quantites: {
-        ...prev.quantites,
-        nbPersonnes: newNbPersonnes,
-      },
-      prix: {
-        prixUnitaire: the.infos.gammeSelected
-          ? prixUnitaire
-          : prev.prix.prixUnitaire,
-      },
-    }));
-    if (the.infos.gammeSelected) {
-      setTotalThe({
-        totalService: totalAnnuel,
-      });
-    }
+    updateThe(newNbPersonnes);
   };
 
   const updateThe = (newNbPersonnes: number) => {
@@ -171,9 +143,7 @@ const ThePropositions = ({ theConsoTarifs }: ThePropositionsProps) => {
           prixUnitaire: null,
         },
       }));
-      setTotalThe({
-        totalService: null,
-      });
+      resetTotalThe();
       return;
     }
     setThe((prev) => ({

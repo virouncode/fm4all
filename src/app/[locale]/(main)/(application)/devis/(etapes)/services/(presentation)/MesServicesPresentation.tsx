@@ -1,5 +1,6 @@
 "use client";
 
+import { useServicesStore } from "@/stores/servicesStore";
 import { Info, SquareArrowOutUpRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMediaQuery } from "react-responsive";
@@ -7,7 +8,6 @@ import NextServiceButton from "../../../NextServiceButton";
 import MesServicesPresentationCards from "./MesServicesPresentationCards";
 import MesServicesPresentationGammes from "./MesServicesPresentationGammes";
 import MesServicesPresentationGammesCarousel from "./MesServicesPresentationGammesCarousel";
-import { useServicesStore } from "@/stores/servicesStore";
 
 const MesServicesPresentation = () => {
   const t = useTranslations("DevisPage.services.presentation");

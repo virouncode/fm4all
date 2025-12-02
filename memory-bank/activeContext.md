@@ -23,7 +23,7 @@ La priorité de développement actuelle est l'amélioration continue du système
    - Gestion des cas limites comme les mises à jour partielles et les échecs de validation
 
 4. **Fonctionnalité de Réinitialisation des Devis**
-   - Implémentation des mécanismes de réinitialisation des devis (`reinitialisationDevis.ts`, `fullReinitialisationDevis.tsx`)
+   - Implémentation des mécanismes de réinitialisation des devis (`initialisationDevis.ts`, `fullReinitialisationDevis.tsx`)
    - Gestion des réinitialisations partielles et complètes des devis
    - Garantie d'une gestion d'état appropriée pendant les réinitialisations
    - Maintien de la cohérence des données entre multiples contextes de services

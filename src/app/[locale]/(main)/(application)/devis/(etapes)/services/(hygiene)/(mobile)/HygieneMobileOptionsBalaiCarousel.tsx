@@ -4,9 +4,10 @@ import {
   CarouselApi,
   CarouselContent,
 } from "@/components/ui/carousel";
+import { useHygieneStore } from "@/stores/hygieneStore";
 import { useEffect, useState } from "react";
 import HygieneMobileOptionsBalaiCard from "./HygieneMobileOptionsBalaiCard";
-import { useHygieneStore } from "@/stores/hygieneStore";
+import { HygieneOptionsType } from "../(desktop)/HygieneOptionsPropositions";
 
 type HygieneMobileOptionsBalaiCarouselProps = {
   propositions: {
@@ -36,7 +37,7 @@ type HygieneMobileOptionsBalaiCarouselProps = {
     imageUrlPoubelle: string | null;
   }[];
   handleClickProposition: (
-    type: string,
+    type: HygieneOptionsType,
     proposition: {
       nomFournisseur: string;
       sloganFournisseur: string | null;

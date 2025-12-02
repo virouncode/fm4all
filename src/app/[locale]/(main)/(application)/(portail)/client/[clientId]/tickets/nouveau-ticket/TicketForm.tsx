@@ -138,7 +138,6 @@ const TicketForm = <TFormValues,>({
               requiredMark
               className="w-full md:col-span-1"
               selectClassName="w-full"
-              valueType="number"
             >
               {sites.map((site) => (
                 <SelectItem key={site.id} value={site.id.toString()}>
@@ -151,7 +150,6 @@ const TicketForm = <TFormValues,>({
               label="Prestataire"
               className="w-full md:col-span-1"
               selectClassName="w-full"
-              valueType="number"
               placeholder="Sélectionner un prestataire"
             >
               <SelectItem value="0">Sélectionner un prestataire</SelectItem>

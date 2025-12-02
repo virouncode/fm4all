@@ -61,7 +61,7 @@ type CommonProps<S extends FieldValues> = {
   zone?: string;
   withError?: boolean;
   name: StringFieldPath<S>;
-} & Omit<BaseProps, "onBlur">;
+} & Omit<BaseProps, "onBlur" | "onChange" | "ref">;
 
 function assignRef<T>(ref: React.Ref<T> | undefined, value: T | null) {
   if (!ref) return;

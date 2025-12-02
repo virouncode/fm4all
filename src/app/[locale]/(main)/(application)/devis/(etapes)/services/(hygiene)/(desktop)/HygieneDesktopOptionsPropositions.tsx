@@ -4,6 +4,7 @@ import HygieneOptionsBalaiCard from "./HygieneOptionsBalaiCard";
 import HygieneOptionsDesinfectantCard from "./HygieneOptionsDesinfectantCard";
 import HygieneOptionsParfumCard from "./HygieneOptionsParfumCard";
 import HygieneOptionsPoubelleCard from "./HygieneOptionsPoubelleCard";
+import { HygieneOptionsType } from "./HygieneOptionsPropositions";
 
 type HygieneDesktopOptionsPropositionsProps = {
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
@@ -13,7 +14,7 @@ type HygieneDesktopOptionsPropositionsProps = {
   nbDistribPoubelle: number;
   handleChangeDistribNbr: (
     e: ChangeEvent<HTMLInputElement>,
-    type: string,
+    type: HygieneOptionsType,
   ) => void;
   propositions: {
     nomFournisseur: string;
@@ -42,7 +43,7 @@ type HygieneDesktopOptionsPropositionsProps = {
     imageUrlPoubelle: string | null;
   }[];
   handleClickProposition: (
-    type: string,
+    type: HygieneOptionsType,
     proposition: {
       nomFournisseur: string;
       sloganFournisseur: string | null;

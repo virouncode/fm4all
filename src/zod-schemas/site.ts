@@ -3,61 +3,25 @@ import {
   RawSearchParams,
   normalizeSearchParams,
 } from "@/normalize/normalizeSearchParams";
+import { capitalizeWords } from "@/zod-helpers/normalize";
+import {
+  createInsertSchema,
+  createSelectSchema,
+  createUpdateSchema,
+} from "drizzle-zod";
 import { z } from "zod";
 import { sites } from "../db/schema";
 import { typeBatimentSchema, typeOccupationSchema } from "./client"; // adapte le chemin si besoin
 import { codePostalSchema } from "./codePostal";
 
-// ================== SELECT ================== //
-
-export const selectSiteSchema = z.object({
-  id: z.number().positive("ID du site invalide"),
-  clientId: z.number().positive("ID du client invalide"),
-  nomSite: z.string().min(1, "Nom du site obligatoire"),
-  adresseLigne1: z.string().min(1, "Adresse ligne 1 obligatoire"),
-  adresseLigne2: z.string().nullable(),
-  codePostal: codePostalSchema,
-  ville: z.string().min(1, "Ville obligatoire"),
-  surface: z
-    .number()
-    .min(1, "Surface minimum 1 m²")
-    .max(3000, "Surface maximum 3000 m²"),
-  effectif: z
-    .number()
-    .min(1, "Effectif minimum 1 personne")
-    .max(300, "Effectif maximum 300 personnes"),
-  typeBatiment: typeBatimentSchema,
-  typeOccupation: typeOccupationSchema,
-  commentaires: z.string().nullable(),
-  createdById: z.string().nullable(),
-  updatedById: z.string().nullable(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-});
+export const selectSiteSchema = createSelectSchema(sites);
 export type SelectSiteType = z.infer<typeof selectSiteSchema>;
 
-// ================== INSERT ================== //
-
-export const insertSiteSchema = z.object({
-  clientId: z.number().positive("ID du client invalide"),
-  nomSite: z.string().min(1, "Nom du site obligatoire"),
-  adresseLigne1: z.string().min(1, "Adresse ligne 1 obligatoire"),
-  adresseLigne2: z.string().nullable(),
-  codePostal: codePostalSchema,
-  ville: z.string().min(1, "Ville obligatoire"),
-  surface: z
-    .number()
-    .min(1, "Surface minimum 1 m²")
-    .max(3000, "Surface maximum 3000 m²"),
-  effectif: z
-    .number()
-    .min(1, "Effectif minimum 1 personne")
-    .max(300, "Effectif maximum 300 personnes"),
-  typeBatiment: typeBatimentSchema,
-  typeOccupation: typeOccupationSchema,
-  commentaires: z.string().nullable(),
+export const insertSiteSchema = createInsertSchema(sites).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 });
-
 export type InsertSiteType = z.infer<typeof insertSiteSchema>;
 
 export const insertSiteToDbSchema = insertSiteSchema.extend({
@@ -66,15 +30,16 @@ export const insertSiteToDbSchema = insertSiteSchema.extend({
     .string() //c'est normal que ce soit un string ici car dans la table users id est un string
     .min(1, "ID de l'utilisateur modificateur obligatoire"),
 });
-
 export type InsertSiteToDbType = z.infer<typeof insertSiteToDbSchema>;
 
-// ================== UPDATE ================== //
-
-export const updateSiteSchema = insertSiteSchema
-  .partial()
-  .extend({ id: z.number().positive("ID du site invalide") });
-
+export const updateSiteSchema = createUpdateSchema(sites)
+  .omit({
+    createdAt: true,
+    updatedAt: true,
+  })
+  .extend({
+    id: z.number().positive("ID du site invalide"),
+  });
 export type UpdateSiteType = z.infer<typeof updateSiteSchema>;
 
 export const updateSiteInDbSchema = updateSiteSchema.extend({
@@ -85,37 +50,46 @@ export const updateSiteInDbSchema = updateSiteSchema.extend({
 
 export type UpdateSiteInDbType = z.infer<typeof updateSiteInDbSchema>;
 
-//================= FORMS =================//
-
+//======================= FORM SCHEMAS ==========================//
+//On ne peut pas appliquer des transform de type mais on peut appliquer des transform de nettoyage
 export const insertSiteFormSchema = z.object({
-  nomSite: z.string().min(1, "Nom du site obligatoire"),
-  adresseLigne1: z.string().min(1, "Adresse ligne 1 obligatoire"),
-  adresseLigne2: z.string().nullable(),
-  codePostal: codePostalSchema,
-  ville: z.string().min(1, "Ville obligatoire"),
-  surface: z.coerce
-    .number("Surface invalide")
-    .int("Surface doit être un entier")
-    .min(1, "Surface minimum 1 m²")
-    .max(3000, "Surface maximum 3000 m²"),
-
-  effectif: z.coerce
-    .number("Effectif invalide")
-    .int("Effectif doit être un entier")
-    .min(1, "Effectif minimum 1 personne")
-    .max(300, "Effectif maximum 300 personnes"),
+  nomSite: z
+    .string()
+    .min(1, "Nom du site obligatoire")
+    .transform((v) => capitalizeWords(v)),
+  adresseLigne1: z
+    .string()
+    .min(1, "Adresse ligne 1 obligatoire")
+    .transform((v) => capitalizeWords(v)),
+  adresseLigne2: z.string().transform((v) => capitalizeWords(v)),
+  codePostal: codePostalSchema("Code postal invalide"),
+  ville: z
+    .string()
+    .min(1, "Ville obligatoire")
+    .transform((v) => capitalizeWords(v)),
+  surface: z
+    .string()
+    .refine(
+      (v) => !isNaN(Number(v)) && Number(v) >= 50 && Number(v) <= 3000,
+      "La surface doit être un nombre entre 50 et 3000 m²",
+    ),
+  effectif: z
+    .string()
+    .refine(
+      (v) => !isNaN(Number(v)) && Number(v) >= 1 && Number(v) <= 300,
+      "L'effectif doit être un nombre entre 1 et 300 personnes",
+    ),
   typeBatiment: typeBatimentSchema,
   typeOccupation: typeOccupationSchema,
-  commentaires: z.string().nullable(),
+  commentaires: z.string(),
 });
-
-export type InsertSiteFormType = z.input<typeof insertSiteFormSchema>;
+export type InsertSiteFormType = z.infer<typeof insertSiteFormSchema>;
 
 export const updateSiteFormSchema = insertSiteFormSchema.partial().extend({
   id: z.number().positive("ID du site invalide"),
 });
 
-export type UpdateSiteFormType = z.input<typeof updateSiteFormSchema>;
+export type UpdateSiteFormType = z.infer<typeof updateSiteFormSchema>;
 
 // ================== FILTERS + SORT ================== //
 export const SORTABLE_SITES_COLUMNS = {

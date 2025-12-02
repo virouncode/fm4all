@@ -12,7 +12,7 @@ import {
 import { MARGE } from "@/constants/constants";
 import { useUpddateServicesFm4AllTotal } from "@/hooks/use-upddate-services-fm4All-total";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { useClientStore } from "@/stores/clientStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useServicesFm4AllStore } from "@/stores/servicesFm4AllStore";
 import { useTotalCafeStore } from "@/stores/totalCafeStore";
 import { useTotalFontainesStore } from "@/stores/totalFontainesStore";
@@ -28,6 +28,7 @@ import { useTotalTheStore } from "@/stores/totalTheStore";
 import { Calculator } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
+import { useShallow } from "zustand/shallow";
 import TotalCafe from "./TotalCafe";
 import TotalFontaines from "./TotalFontaines";
 import TotalHygiene from "./TotalHygiene";
@@ -38,11 +39,10 @@ import TotalOfficeManager from "./TotalOfficeManager";
 import TotalServicesFm4All from "./TotalServicesFm4All";
 import TotalSnacksFruits from "./TotalSnacksFruits";
 import TotalThe from "./TotalThe";
-import { useShallow } from "zustand/shallow";
 
 const Total = () => {
   const t = useTranslations("Total");
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const servicesFm4All = useServicesFm4AllStore((s) => s.servicesFm4All);
   const totalNettoyage = useTotalNettoyageStore((s) => s.totalNettoyage);
   const totalHygiene = useTotalHygieneStore((s) => s.totalHygiene);
@@ -197,8 +197,8 @@ const Total = () => {
               {total.totalAnnuelHtSansServicesFm4all
                 ? formatNumber(Math.round((total.totalAnnuelHt ?? 0) / 12))
                 : 0}{" "}
-              {t("eur-ht-mois-pour")} {client.effectif} {t("personnes")},{" "}
-              {client.surface} m<sup>2</sup>
+              {t("eur-ht-mois-pour")} {prospect.effectif} {t("personnes")},{" "}
+              {prospect.surface} m<sup>2</sup>
             </span>
             <br />
             <span>

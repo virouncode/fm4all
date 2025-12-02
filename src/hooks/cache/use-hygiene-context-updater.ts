@@ -1,7 +1,8 @@
+"use client";
 import { CacheInvalidationData } from "@/lib/cache-invalidation";
 import { roundEffectif } from "@/lib/utils/roundEffectif";
-import { useClientStore } from "@/stores/clientStore";
 import { useHygieneStore } from "@/stores/hygieneStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useTotalHygieneStore } from "@/stores/totalHygieneStore";
 import { useTranslations } from "next-intl";
 import { useCallback } from "react";
@@ -45,13 +46,13 @@ export function useHygieneContextUpdater() {
       setTotalHygiene: s.setTotalHygiene,
     })),
   );
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
 
   const updateHygieneContext = useCallback(
     (data: CacheInvalidationData) => {
       if (data.serviceType !== "hygiene") return;
       const tarifType = data.tarifType as string;
-      const clientEffectifRounded = roundEffectif(client.effectif);
+      const clientEffectifRounded = roundEffectif(prospect.effectif);
       switch (tarifType) {
         case "distributeurs":
           const distributeurType = data.distributeurType as DistributeurType;
@@ -126,7 +127,7 @@ export function useHygieneContextUpdater() {
                 prixDistribEmp !== null &&
                 paParPersonneEmp !== null
                   ? nbDistribEmp * prixDistribEmp +
-                    paParPersonneEmp * client.effectif
+                    paParPersonneEmp * prospect.effectif
                   : 0;
 
               const totalPoubelleEmp =
@@ -139,7 +140,7 @@ export function useHygieneContextUpdater() {
                 prixDistribSavon !== null &&
                 paParPersonneSavon !== null
                   ? nbDistribSavon * prixDistribSavon +
-                    paParPersonneSavon * client.effectif
+                    paParPersonneSavon * prospect.effectif
                   : 0;
 
               const totalPh =
@@ -147,7 +148,7 @@ export function useHygieneContextUpdater() {
                 prixDistribPh !== null &&
                 paParPersonnePh !== null
                   ? nbDistribPh * prixDistribPh +
-                    paParPersonnePh * client.effectif
+                    paParPersonnePh * prospect.effectif
                   : 0;
 
               const totalAnnuelTrilogie =
@@ -169,7 +170,7 @@ export function useHygieneContextUpdater() {
                   prixDistribDesinfectant !== null &&
                   paParPersonneDesinfectant !== null
                   ? nbDistribDesinfectant * prixDistribDesinfectant +
-                    paParPersonneDesinfectant * client.effectif
+                    paParPersonneDesinfectant * prospect.effectif
                   : 0
                 : null;
               const totalParfum = hygiene.infos.parfumGammeSelected
@@ -298,7 +299,7 @@ export function useHygieneContextUpdater() {
                 prixDistribEmp !== null &&
                 paParPersonneEmp !== null
                   ? nbDistribEmp * prixDistribEmp +
-                    paParPersonneEmp * client.effectif
+                    paParPersonneEmp * prospect.effectif
                   : 0;
               const totalPoubelleEmp =
                 nbDistribEmpPoubelle !== null && prixDistribEmpPoubelle !== null
@@ -309,14 +310,14 @@ export function useHygieneContextUpdater() {
                 prixDistribSavon !== null &&
                 paParPersonneSavon !== null
                   ? nbDistribSavon * prixDistribSavon +
-                    paParPersonneSavon * client.effectif
+                    paParPersonneSavon * prospect.effectif
                   : 0;
               const totalPh =
                 nbDistribPh &&
                 prixDistribPh !== null &&
                 paParPersonnePh !== null
                   ? nbDistribPh * prixDistribPh +
-                    paParPersonnePh * client.effectif
+                    paParPersonnePh * prospect.effectif
                   : 0;
               const totalAnnuelTrilogie =
                 totalEmp === null &&
@@ -336,7 +337,7 @@ export function useHygieneContextUpdater() {
                   prixDistribDesinfectant !== null &&
                   paParPersonneDesinfectant !== null
                   ? nbDistribDesinfectant * prixDistribDesinfectant +
-                    paParPersonneDesinfectant * client.effectif
+                    paParPersonneDesinfectant * prospect.effectif
                   : 0
                 : null;
               const totalParfum = hygiene.infos.parfumGammeSelected
@@ -425,7 +426,7 @@ export function useHygieneContextUpdater() {
       }
     },
     [
-      client.effectif,
+      prospect.effectif,
       hygiene.infos.balaiGammeSelected,
       hygiene.infos.desinfectantGammeSelected,
       hygiene.infos.dureeLocation,

@@ -12,6 +12,7 @@ type ServicesFm4AllStore = {
       | ServicesFm4AllType
       | ((prev: ServicesFm4AllType) => ServicesFm4AllType),
   ) => void;
+  reset: () => void;
 };
 
 export const useServicesFm4AllStore = create<ServicesFm4AllStore>()(
@@ -23,6 +24,7 @@ export const useServicesFm4AllStore = create<ServicesFm4AllStore>()(
           servicesFm4All:
             typeof value === "function" ? value(state.servicesFm4All) : value,
         })),
+      reset: () => set({ servicesFm4All: SERVICES_FM4ALL_DEFAULT_VALUES }),
     }),
     { name: "servicesFm4All" },
   ),

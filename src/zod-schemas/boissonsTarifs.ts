@@ -2,9 +2,9 @@ import { boissonsTarifs } from "@/db/schema";
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const selectBoissonsTarifsSchema = createSelectSchema(boissonsTarifs, {
-  effectif: (schema) => schema.min(1, "L'effectif est obligatoire"),
-}).extend({
+export const selectBoissonsTarifsSchema = createSelectSchema(
+  boissonsTarifs,
+).extend({
   nomFournisseur: z.string().nonempty("Le nom du fournisseur est obligatoire"),
   slogan: z.string().nullable(),
   logoUrl: z.string().nullable(),
@@ -17,4 +17,6 @@ export const selectBoissonsTarifsSchema = createSelectSchema(boissonsTarifs, {
   nbAvis: z.number().nullable(),
 });
 
-export type SelectBoissonsTarifsType = z.infer<typeof selectBoissonsTarifsSchema>;
+export type SelectBoissonsTarifsType = z.infer<
+  typeof selectBoissonsTarifsSchema
+>;

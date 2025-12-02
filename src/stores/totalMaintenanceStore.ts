@@ -9,6 +9,7 @@ interface TotalMaintenanceStore {
       | TotalMaintenanceType
       | ((prev: TotalMaintenanceType) => TotalMaintenanceType),
   ) => void;
+  reset: () => void;
 }
 
 export const useTotalMaintenanceStore = create<TotalMaintenanceStore>()(
@@ -25,6 +26,15 @@ export const useTotalMaintenanceStore = create<TotalMaintenanceStore>()(
           totalMaintenance:
             typeof value === "function" ? value(state.totalMaintenance) : value,
         })),
+      reset: () =>
+        set({
+          totalMaintenance: {
+            totalService: null,
+            totalQ18: null,
+            totalLegio: null,
+            totalQualiteAir: null,
+          },
+        }),
     }),
     {
       name: "totalMaintenance",

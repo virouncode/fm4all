@@ -2,11 +2,8 @@
 import { updateSiteAction } from "@/actions/sitesActions";
 import { Form } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
-import {
-  updateSiteFormSchema,
-  UpdateSiteFormType,
-  UpdateSiteType,
-} from "@/zod-schemas/site";
+import { normalizeForSubmit } from "@/zod-helpers/normalize";
+import { updateSiteFormSchema, UpdateSiteFormType } from "@/zod-schemas/site";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
@@ -59,13 +56,10 @@ const ClientUpdateSiteForm = ({
   );
 
   const submitForm = (data: UpdateSiteFormType) => {
-    const payload: UpdateSiteType = {
-      ...data,
-      adresseLigne2: data.adresseLigne2 ?? null,
-      commentaires: data.commentaires ?? null,
-      surface: Number(data.surface),
-      effectif: Number(data.effectif),
-    };
+    const payload = normalizeForSubmit(data, {
+      requiredNumbers: ["surface", "effectif"],
+      optionalStrings: ["adresseLigne2", "commentaires"],
+    });
     executeUpdateSite(payload);
   };
 

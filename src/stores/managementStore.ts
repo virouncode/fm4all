@@ -9,6 +9,7 @@ type ManagementStore = {
   setManagement: (
     value: ManagementType | ((prev: ManagementType) => ManagementType),
   ) => void;
+  reset: () => void;
 };
 
 export const useManagementStore = create<ManagementStore>()(
@@ -22,6 +23,7 @@ export const useManagementStore = create<ManagementStore>()(
           management:
             typeof value === "function" ? value(state.management) : value,
         })),
+      reset: () => set({ management: { currentManagementId: 1 } }),
     }),
     { name: "management" },
   ),

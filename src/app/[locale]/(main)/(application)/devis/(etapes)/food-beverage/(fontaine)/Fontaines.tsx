@@ -2,6 +2,9 @@
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
 import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/constants/constants";
 import useScrollIntoFontainesEspace from "@/hooks/use-scroll-into-fontaines-espace";
+import { useFontainesStore } from "@/stores/fontainesStore";
+import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useTotalFontainesStore } from "@/stores/totalFontainesStore";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
@@ -12,9 +15,6 @@ import { useMediaQuery } from "react-responsive";
 import PropositionsTitle from "../../../PropositionsTitle";
 import FontainesDesktopEspaces from "./(desktop)/FontainesDesktopEspaces";
 import FontainesMobileEspaces from "./(mobile)/FontainesMobileEspaces";
-import { useClientStore } from "@/stores/clientStore";
-import { useFontainesStore } from "@/stores/fontainesStore";
-import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
 
 type FontainesProps = {
   fontainesModeles: SelectFontainesModelesType[];
@@ -23,11 +23,11 @@ type FontainesProps = {
 
 const Fontaines = ({ fontainesModeles, fontainesTarifs }: FontainesProps) => {
   const tFontaines = useTranslations("DevisPage.foodBeverage.fontaines");
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const setFontaines = useFontainesStore((s) => s.setFontaines);
   const setTotalFontaines = useTotalFontainesStore((s) => s.setTotalFontaines);
   const setFoodBeverage = useFoodBeverageStore((s) => s.setFoodBeverage);
-  const effectif = client.effectif ?? 0;
+  const effectif = prospect.effectif ?? 0;
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
   useScrollIntoFontainesEspace();
 

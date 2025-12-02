@@ -28,35 +28,39 @@ const PersonnaliserCommentaires = () => {
   );
   const router = useRouter();
   const handleClickPrevious = () => {
-    const currentIndex = personnalisation.personnalisationIds.indexOf(13);
-
-    setPersonnalisation((prev) => ({
-      ...prev,
-      currentPersonnalisationId:
-        personnalisation.personnalisationIds[currentIndex - 1],
-    }));
-  };
-  const handleClickNext = () => {
-    const currentIndex = personnalisation.personnalisationIds.indexOf(13);
-    if (currentIndex + 1 === personnalisation.personnalisationIds.length) {
-      setPersonnalisation((prev) => ({
+    setPersonnalisation((prev) => {
+      const currentIndex = prev.personnalisationIds.indexOf(
+        prev.currentPersonnalisationId as number,
+      );
+      if (currentIndex <= 0) return prev;
+      return {
         ...prev,
-        currentPersonnalisationId: 1,
-      }));
-      router.push({
-        pathname: "/devis/afficher",
-        query: {
-          personnalisationId: 1,
-        },
-      });
-      return;
-    }
-    setPersonnalisation((prev) => ({
-      ...prev,
-      currentPersonnalisationId:
-        personnalisation.personnalisationIds[currentIndex + 1],
-    }));
+        currentPersonnalisationId: prev.personnalisationIds[currentIndex - 1],
+      };
+    });
   };
+
+  const handleClickNext = () => {
+    setPersonnalisation((prev) => {
+      const currentIndex = prev.personnalisationIds.indexOf(
+        prev.currentPersonnalisationId as number,
+      );
+      if (currentIndex + 1 === prev.personnalisationIds.length) {
+        const nextState = {
+          ...prev,
+          currentPersonnalisationId: 1,
+        };
+        router.push({ pathname: "/devis/afficher" });
+        return nextState;
+      }
+
+      return {
+        ...prev,
+        currentPersonnalisationId: prev.personnalisationIds[currentIndex + 1],
+      };
+    });
+  };
+
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     setCommentaires(value);
@@ -95,7 +99,7 @@ const PersonnaliserCommentaires = () => {
         <Textarea
           id="commentaires-nettoyage"
           onChange={handleChange}
-          className="h-60 resize-none lg:flex-1"
+          className="min-h-60 flex-1 resize-none"
           value={commentaires ?? ""}
         />
       </div>

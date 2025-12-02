@@ -1,7 +1,7 @@
 "use client";
 
-import { InputWithLabel } from "@/components/form-inputs/InputWithLabel";
-import { SelectWithLabel } from "@/components/form-inputs/SelectWithLabel";
+import { RhfControlledSelect } from "@/components/rhf/RhfControlledSelect";
+import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,50 +12,26 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
-import { batiments } from "@/constants/batiments";
-import { MAX_EFFECTIF, MAX_SURFACE } from "@/constants/constants";
+import { SelectItem } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
+import { typeBatimentCT, typeOccupationCT } from "@/constants/codeTables";
 import { departements } from "@/constants/departements";
-import { occupation } from "@/constants/occupation";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";
-import { useCafeStore } from "@/stores/cafeStore";
-import { useClientStore } from "@/stores/clientStore";
-import { useCommentairesStore } from "@/stores/commentairesStore";
 import { useDevisProgressStore } from "@/stores/devisProgressStore";
-import { useFontainesStore } from "@/stores/fontainesStore";
-import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
-import { useHygieneStore } from "@/stores/hygieneStore";
-import { useIncendieStore } from "@/stores/incendieStore";
-import { useMaintenanceStore } from "@/stores/maintenanceStore";
-import { useManagementStore } from "@/stores/managementStore";
-import { useMonDevisStore } from "@/stores/monDevisStore";
-import { useNettoyageStore } from "@/stores/nettoyageStore";
-import { useOfficeManagerStore } from "@/stores/officeManagerStore";
-import { usePersonnalisationStore } from "@/stores/personnalisationStore";
-import { useServicesFm4AllStore } from "@/stores/servicesFm4AllStore";
-import { useServicesStore } from "@/stores/servicesStore";
-import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
-import { useTheStore } from "@/stores/theStore";
-import { useTotalCafeStore } from "@/stores/totalCafeStore";
-import { useTotalFontainesStore } from "@/stores/totalFontainesStore";
-import { useTotalHygieneStore } from "@/stores/totalHygieneStore";
-import { useTotalIncendieStore } from "@/stores/totalIncendieStore";
-import { useTotalMaintenanceStore } from "@/stores/totalMaintenanceStore";
-import { useTotalNettoyageStore } from "@/stores/totalNettoyageStore";
-import { useTotalOfficeManagerStore } from "@/stores/totalOfficeManagerStore";
-import { useTotalServicesFm4AllStore } from "@/stores/totalServicesFm4AllStore";
-import { useTotalSnacksFruitsStore } from "@/stores/totalSnacksFruitsStore";
-import { useTotalStore } from "@/stores/totalStore";
-import { useTotalTheStore } from "@/stores/totalTheStore";
-import { createMesLocauxSchema, MesLocauxType } from "@/zod-schemas/client";
+import { useProspectStore } from "@/stores/prospectStore";
+import { normalizeForSubmit } from "@/zod-helpers/normalize";
+import {
+  createMesLocauxFormSchema,
+  MesLocauxFormType,
+} from "@/zod-schemas/mesLocaux";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useShallow } from "zustand/shallow";
 import { fullReinitialisationDevis } from "./fullReinitialisationDevis";
-import { reinitialisationDevis } from "./reinitialisationDevis";
+import { initialisationDevis } from "./initialisationDevis";
 import ServicesLoader from "./ServicesLoader";
 
 const MesLocaux = () => {
@@ -69,49 +45,8 @@ const MesLocaux = () => {
       setDevisProgress: s.setDevisProgress,
     })),
   );
-  const setServices = useServicesStore((s) => s.setServices);
-  const setFoodBeverage = useFoodBeverageStore((s) => s.setFoodBeverage);
-  const setManagement = useManagementStore((s) => s.setManagement);
-  const setPersonnalisation = usePersonnalisationStore(
-    (s) => s.setPersonnalisation,
-  );
-  const setMonDevis = useMonDevisStore((s) => s.setMonDevis);
-  const { client, setClient } = useClientStore(
-    useShallow((s) => ({
-      client: s.client,
-      setClient: s.setClient,
-    })),
-  );
-  const setNettoyage = useNettoyageStore((s) => s.setNettoyage);
-  const setHygiene = useHygieneStore((s) => s.setHygiene);
-  const setMaintenance = useMaintenanceStore((s) => s.setMaintenance);
-  const setIncendie = useIncendieStore((s) => s.setIncendie);
-  const setCafe = useCafeStore((s) => s.setCafe);
-  const setThe = useTheStore((s) => s.setThe);
-  const setTotalThe = useTotalTheStore((s) => s.setTotalThe);
-  const setSnacksFruits = useSnacksFruitsStore((s) => s.setSnacksFruits);
-  const setFontaines = useFontainesStore((s) => s.setFontaines);
-  const setOfficeManager = useOfficeManagerStore((s) => s.setOfficeManager);
-  const setServicesFm4All = useServicesFm4AllStore((s) => s.setServicesFm4All);
-  const setCommentaires = useCommentairesStore((s) => s.setCommentaires);
-  const setTotalNettoyage = useTotalNettoyageStore((s) => s.setTotalNettoyage);
-  const setTotalHygiene = useTotalHygieneStore((s) => s.setTotalHygiene);
-  const setTotalIncendie = useTotalIncendieStore((s) => s.setTotalIncendie);
-  const setTotalMaintenance = useTotalMaintenanceStore(
-    (s) => s.setTotalMaintenance,
-  );
-  const setTotalCafe = useTotalCafeStore((s) => s.setTotalCafe);
-  const setTotalSnacksFruits = useTotalSnacksFruitsStore(
-    (s) => s.setTotalSnacksFruits,
-  );
-  const setTotalFontaines = useTotalFontainesStore((s) => s.setTotalFontaines);
-  const setTotalOfficeManager = useTotalOfficeManagerStore(
-    (s) => s.setTotalOfficeManager,
-  );
-  const setTotalServicesFm4All = useTotalServicesFm4AllStore(
-    (s) => s.setTotalServicesFm4All,
-  );
-  const setTotal = useTotalStore((s) => s.setTotal);
+  const prospect = useProspectStore((s) => s.prospect);
+  const setProspect = useProspectStore((s) => s.setProspect);
   const [loaderVisible, setLoaderVisible] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
@@ -120,19 +55,19 @@ const MesLocaux = () => {
   const serviceSearchParams = new URLSearchParams();
   const sauvegarderSearchParams = new URLSearchParams();
 
-  if (client.effectif) {
-    serviceSearchParams.set("effectif", client.effectif.toString());
-    sauvegarderSearchParams.set("effectif", client.effectif.toString());
+  if (prospect.effectif) {
+    serviceSearchParams.set("effectif", prospect.effectif.toString());
+    sauvegarderSearchParams.set("effectif", prospect.effectif.toString());
   }
-  if (client.surface) {
-    serviceSearchParams.set("surface", client.surface.toString());
-    sauvegarderSearchParams.set("surface", client.surface.toString());
+  if (prospect.surface) {
+    serviceSearchParams.set("surface", prospect.surface.toString());
+    sauvegarderSearchParams.set("surface", prospect.surface.toString());
   }
-  if (client.typeBatiment) {
-    sauvegarderSearchParams.set("typeBatiment", client.typeBatiment);
+  if (prospect.typeBatiment) {
+    sauvegarderSearchParams.set("typeBatiment", prospect.typeBatiment);
   }
-  if (client.typeOccupation) {
-    sauvegarderSearchParams.set("typeOccupation", client.typeOccupation);
+  if (prospect.typeOccupation) {
+    sauvegarderSearchParams.set("typeOccupation", prospect.typeOccupation);
   }
   const devisRoutes: {
     id: number;
@@ -187,18 +122,18 @@ const MesLocaux = () => {
     },
   ];
 
-  const defaultValues: MesLocauxType = {
-    surface: client.surface,
-    effectif: client.effectif,
-    typeBatiment: client.typeBatiment,
-    typeOccupation: client.typeOccupation,
-    codePostal: "",
+  const defaultValues: MesLocauxFormType = {
+    surface: prospect.surface != null ? prospect.surface.toString() : "",
+    effectif: prospect.effectif != null ? prospect.effectif.toString() : "",
+    typeBatiment: prospect.typeBatiment,
+    typeOccupation: prospect.typeOccupation,
+    codePostal: prospect.codePostal,
   };
 
-  const form = useForm<MesLocauxType>({
+  const form = useForm<MesLocauxFormType>({
     mode: "all",
     resolver: zodResolver(
-      createMesLocauxSchema({
+      createMesLocauxFormSchema({
         surface: tErrors("surface"),
         effectif: tErrors("effectif"),
         batiment: tErrors("batiment"),
@@ -209,17 +144,23 @@ const MesLocaux = () => {
     defaultValues,
   });
 
-  const submitForm = async (data: MesLocauxType) => {
-    const dataToPost = {
-      ...data,
-      ville: "",
-    };
-
+  const submitForm = async (data: MesLocauxFormType) => {
+    const payload = normalizeForSubmit(
+      { ...data, ville: "" },
+      {
+        requiredNumbers: ["surface", "effectif"],
+      },
+    );
     setLoading(true);
+
     try {
       const response = await fetch(
-        `https://geo.api.gouv.fr/communes?codePostal=${dataToPost.codePostal}`,
+        `https://geo.api.gouv.fr/communes?codePostal=${payload.codePostal}`,
       );
+      if (!response.ok) {
+        throw new Error(`Geo API error: ${response.status}`);
+      }
+
       const cityData = await response.json();
 
       if (cityData.length === 0) {
@@ -228,95 +169,64 @@ const MesLocaux = () => {
           variant: "destructive",
           title: t("code-postal-invalide"),
           description: t(
-            "le-code-postal-ne-correspond-a-aucune-ville-veullez-reessayer",
+            "le-code-postal-ne-correspond-a-aucune-ville-veuillez-reessayer",
           ),
         });
         setLoading(false);
         return;
       }
-      dataToPost.ville = cityData[0].nom;
-      setClient({
-        ...client,
-        ...dataToPost,
-        surface: Number(dataToPost.surface),
-        effectif: Number(dataToPost.effectif),
-      });
-      setLoading(false);
+
+      payload.ville = cityData[0].nom;
+      setProspect((prev) => ({
+        ...prev,
+        ...payload,
+      }));
     } catch (err) {
-      console.log(err);
+      console.error(err);
+      toast({
+        variant: "default",
+        title: t("ville-non-verifiee"),
+        description: t(
+          "nous-navons-pas-pu-verifier-la-ville-mais-vous-pouvez-continuer-votre-devis",
+        ),
+      });
+      setProspect((prev) => ({
+        ...prev,
+        ...payload,
+        ville: "",
+      }));
+    } finally {
       setLoading(false);
     }
-    //Departement in ou out
+
     if (
-      !departements.find(
-        ({ id }) => id === dataToPost.codePostal?.substring(0, 2),
-      )
+      !departements.find(({ id }) => id === payload.codePostal.substring(0, 2))
     ) {
       setDevisProgress({ ...devisProgress, completedSteps: [] });
       router.push({
         pathname: "/chalandise",
         query: {
           destination: "/",
-          codePostal: dataToPost.codePostal,
-          ville: dataToPost.ville,
-          surface: Number(dataToPost.surface),
-          effectif: Number(dataToPost.effectif),
-          typeBatiment: dataToPost.typeBatiment,
-          typeOccupation: dataToPost.typeOccupation,
+          codePostal: payload.codePostal,
+          ville: payload.ville, // peut être vide si catch, mais pas bloquant
+          surface: payload.surface.toString(),
+          effectif: payload.effectif.toString(),
+          typeBatiment: payload.typeBatiment,
+          typeOccupation: payload.typeOccupation,
         },
       });
       return;
     }
 
-    //Update client
-    setClient((prev) => ({
-      ...prev,
-      ...dataToPost,
-      surface: Number(dataToPost.surface),
-      effectif: Number(dataToPost.effectif),
-    }));
-    //Réinitialisation de tous le devis
-    reinitialisationDevis(
-      //client
-      Number(data.surface),
-      Number(data.effectif),
-      //services
-      setDevisProgress,
-      setNettoyage,
-      setHygiene,
-      setMaintenance,
-      setIncendie,
-      setCafe,
-      setThe,
-      setSnacksFruits,
-      setFontaines,
-      setOfficeManager,
-      setServicesFm4All,
-      setCommentaires,
-      //navigation
-      setServices,
-      setFoodBeverage,
-      setManagement,
-      setPersonnalisation,
-      setMonDevis,
-      //Total
-      setTotalNettoyage,
-      setTotalHygiene,
-      setTotalMaintenance,
-      setTotalIncendie,
-      setTotalCafe,
-      setTotalThe,
-      setTotalSnacksFruits,
-      setTotalFontaines,
-      setTotalOfficeManager,
-      setTotalServicesFm4All,
-      setTotal,
-    );
+    // Réinitialisation de tous le devis
+    initialisationDevis();
     setLoaderVisible(true);
     window.scrollTo(0, 0);
+
     const serviceSearchParams = new URLSearchParams();
-    serviceSearchParams.set("effectif", Number(dataToPost.effectif).toString());
-    serviceSearchParams.set("surface", Number(dataToPost.surface).toString());
+    serviceSearchParams.set("effectif", payload.effectif.toString());
+    serviceSearchParams.set("surface", payload.surface.toString());
+
     setTimeout(() => {
       router.push({
         pathname: "/devis/services",
@@ -325,72 +235,21 @@ const MesLocaux = () => {
     }, 3000);
   };
 
-  // const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-  //   const { name, value } = e.target;
-  //   if (name === "surface") {
-  //     const newValue = value ? parseInt(value) : 50;
-  //     setClient((prev) => ({
-  //       ...prev,
-  //       [name]: newValue > MAX_SURFACE ? MAX_SURFACE : newValue,
-  //     }));
-  //     return;
-  //   }
-  //   if (name === "effectif") {
-  //     const newValue = value ? parseInt(value) : 1;
-  //     setClient((prev) => ({
-  //       ...prev,
-  //       [name]: newValue > MAX_EFFECTIF ? MAX_EFFECTIF : newValue,
-  //     }));
-  //     return;
-  //   }
-  //   setClient((prev) => ({
-  //     ...prev,
-  //     [name]: value,
-  //   }));
-  // };
-
-  // const handleSelect = (value: string, name: string) => {
-  //   setClient((prev) => ({
-  //     ...prev,
-  //     [name]: value,
-  //   }));
-  // };
-
-  const handleClickNouveau = async () => {
-    fullReinitialisationDevis(
-      setClient,
-      setDevisProgress,
-      setNettoyage,
-      setHygiene,
-      setMaintenance,
-      setIncendie,
-      setCafe,
-      setThe,
-      setSnacksFruits,
-      setFontaines,
-      setOfficeManager,
-      setServicesFm4All,
-      setCommentaires,
-      setServices,
-      setFoodBeverage,
-      setManagement,
-      setPersonnalisation,
-      setMonDevis,
-      setTotalNettoyage,
-      setTotalHygiene,
-      setTotalMaintenance,
-      setTotalIncendie,
-      setTotalCafe,
-      setTotalThe,
-      setTotalSnacksFruits,
-      setTotalFontaines,
-      setTotalOfficeManager,
-      setTotalServicesFm4All,
-      setTotal,
-    );
-    form.reset(defaultValues);
+  const handleClickNouveau = () => {
+    fullReinitialisationDevis();
+    const freshProspect = useProspectStore.getState().prospect;
+    form.reset({
+      surface:
+        freshProspect.surface != null ? freshProspect.surface.toString() : "",
+      effectif:
+        freshProspect.effectif != null ? freshProspect.effectif.toString() : "",
+      typeBatiment: freshProspect.typeBatiment ?? "",
+      typeOccupation: freshProspect.typeOccupation ?? "",
+      codePostal: freshProspect.codePostal ?? "",
+    });
     setShowModal(false);
   };
+
   const handleClickReprendre = () => {
     const route =
       devisRoutes.find(({ id }) => id === devisProgress.currentStep) ??
@@ -441,97 +300,56 @@ const MesLocaux = () => {
         onSubmit={form.handleSubmit(submitForm)}
         className="mx-auto mt-6 flex w-full flex-col gap-14 p-1 md:mt-10 md:w-2/3"
       >
-        <div className="flex flex-col gap-4 md:flex-row md:gap-8">
+        <div className="flex flex-col md:flex-row md:gap-14">
           <div className="flex w-full flex-col gap-4 md:w-1/2">
-            <InputWithLabel<MesLocauxType>
-              fieldTitle={t("code-postal")}
-              nameInSchema="codePostal"
+            <RhfInput<MesLocauxFormType>
+              label={t("code-postal")}
+              name="codePostal"
               placeholder="XXXXX"
               data-testid="code-postal-input"
               autoFocus
-              // handleChange={handleChange}
+              requiredMark
             />
-            <InputWithLabel<MesLocauxType>
-              fieldTitle={t("surface-en-m")}
-              nameInSchema="surface"
-              type="number"
-              min={50}
-              max={MAX_SURFACE}
+            <RhfInput<MesLocauxFormType>
+              label={t("surface-en-m")}
+              name="surface"
               data-testid="surface-input"
-              // handleChange={handleChange}
+              requiredMark
             />
-            <InputWithLabel<MesLocauxType>
-              fieldTitle={t("nombre-moyen-de-personnes")}
-              nameInSchema="effectif"
-              type="number"
-              min={1}
-              max={MAX_EFFECTIF}
+            <RhfInput<MesLocauxFormType>
+              label={t("nombre-moyen-de-personnes")}
+              name="effectif"
               data-testid="effectif-input"
-              // handleChange={handleChange}
+              requiredMark
             />
           </div>
           <div className="flex w-full flex-col gap-4 md:w-1/2">
-            <SelectWithLabel<MesLocauxType>
-              fieldTitle={t("type-de-batiment")}
-              nameInSchema="typeBatiment"
-              data={batiments}
-              // handleSelect={handleSelect}
+            <RhfControlledSelect<MesLocauxFormType>
+              label={t("type-de-batiment")}
+              name="typeBatiment"
               data-testid="type-batiment-select"
-              translationPrefix="DevisPage.locaux.locauxForm.batiments"
-            />
-            <SelectWithLabel<MesLocauxType>
-              fieldTitle={t("type-doccupation")}
-              nameInSchema="typeOccupation"
-              data={occupation}
-              // handleSelect={handleSelect}
-              data-testId="type-occupation-select"
-              translationPrefix="DevisPage.locaux.locauxForm.occupation"
-            />
+              selectClassName="w-full"
+            >
+              {typeBatimentCT.map((tb) => (
+                <SelectItem key={tb.code} value={tb.code}>
+                  {t(tb.name)}
+                </SelectItem>
+              ))}
+            </RhfControlledSelect>
+            <RhfControlledSelect<MesLocauxFormType>
+              label={t("type-doccupation")}
+              name="typeOccupation"
+              data-testid="type-occupation-select"
+              selectClassName="w-full"
+            >
+              {typeOccupationCT.map((to) => (
+                <SelectItem key={to.code} value={to.code}>
+                  {t(to.name)}
+                </SelectItem>
+              ))}
+            </RhfControlledSelect>
           </div>
         </div>
-        {/* {devisProgress.completedSteps.includes(1) ? (
-          <Dialog>
-            <DialogTrigger asChild ref={dialogRef}>
-              <div className="flex justify-center">
-                <Button
-                  type="button"
-                  size="lg"
-                  title={t("afficher-les-tarifs")}
-                  className="text-base"
-                  disabled={loading}
-                >
-                  {t("afficher-les-tarifs")}
-                </Button>
-              </div>
-            </DialogTrigger>
-
-            <DialogContent className="w-5/6 rounded-xl sm:max-w-[425px] lg:w-auto">
-              <DialogHeader>
-                <DialogTitle>{tDevisButton("devis-en-cours")}</DialogTitle>
-                <DialogDescription>
-                  {t(
-                    "un-devis-est-deja-en-cours-souaitez-vous-recommencer-un-nouveau-devis-vos-informations-actuelles-seront-perdues",
-                  )}
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <div className="mx-auto flex justify-center gap-4">
-                    <Button
-                      onClick={() => form.handleSubmit(submitForm)()}
-                    >
-                      {tDevisButton("nouveau")}
-                    </Button>
-                    {/* <Button variant="outline" onClick={handleClickReprendre}>
-                      Reprendre
-                    </Button> */}
-        {/* <Button variant="outline">{t("annuler")}</Button>
-                  </div>
-                </DialogClose>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog> */}
-        {/* ) : ( } */}
         <div className="flex justify-center">
           <Button
             size="lg"
@@ -540,14 +358,10 @@ const MesLocaux = () => {
             disabled={loading}
             data-testid="afficher-tarifs-button"
           >
-            {loading ? (
-              <Loader size={16} className="animate-spin" />
-            ) : (
-              t("afficher-les-tarifs")
-            )}
+            {loading && <Spinner />}
+            {t("afficher-les-tarifs")}
           </Button>
         </div>
-        {/* // )} */}
       </form>
     </Form>
   ) : (

@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MAX_EFFECTIF } from "@/constants/constants";
-import { useClientStore } from "@/stores/clientStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ChangeEvent } from "react";
@@ -22,8 +22,8 @@ const TheMobileInputs = ({
 }: TheMobileInputsProps) => {
   const t = useTranslations("DevisPage");
   const tThe = useTranslations("DevisPage.foodBeverage.the");
-  const client = useClientStore((s) => s.client);
-  const effectif = client.effectif ?? 0;
+  const prospect = useProspectStore((s) => s.prospect);
+  const effectif = prospect.effectif ?? 0;
 
   return (
     <div className="flex flex-col gap-4">

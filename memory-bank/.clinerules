@@ -21,7 +21,7 @@ Ce fichier capture les patterns importants, préférences et intelligence du pro
    - Tous les clients connectés reçoivent la mise à jour et recalculent les devis affectés
 
 3. **Flux de Réinitialisation de Devis**
-   - Réinitialisation partielle : `reinitialisationDevis.ts` remet à zéro des parties spécifiques du devis
+   - Réinitialisation partielle : `initialisationDevis.ts` remet à zéro des parties spécifiques du devis
    - Réinitialisation complète : `fullReinitialisationDevis.tsx` remet à zéro l'ensemble du devis
    - Les fonctions de réinitialisation mettent à jour tous les fournisseurs de contexte pertinents
    - Les informations de surface et d'occupation sont préservées

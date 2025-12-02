@@ -3,6 +3,7 @@
 import { insertTicketAction } from "@/actions/ticketsActions";
 import { Form } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
+import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
 import { SelectSiteType } from "@/zod-schemas/site";
 import {
@@ -63,10 +64,11 @@ export default function NouveauTicketForm({
   );
 
   const submitForm = (data: InsertTicketFormType) => {
-    const payload = {
-      ...data,
-      fournisseurId: data.fournisseurId === 0 ? null : data.fournisseurId,
-    };
+    const payload = normalizeForSubmit(data, {
+      requiredNumbers: ["siteId"],
+      optionalNumbers: ["fournisseurId"],
+      optionalStrings: ["description"],
+    });
     executeInsertTicket(payload);
   };
 

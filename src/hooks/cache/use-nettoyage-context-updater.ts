@@ -4,8 +4,8 @@ import { MAJORATION_DIMANCHE } from "@/constants/constants";
 import { useToast } from "@/hooks/use-toast";
 import { CacheInvalidationData } from "@/lib/cache-invalidation";
 import { roundSurface } from "@/lib/utils/roundSurface";
-import { useClientStore } from "@/stores/clientStore";
 import { useNettoyageStore } from "@/stores/nettoyageStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useTotalNettoyageStore } from "@/stores/totalNettoyageStore";
 import { NettoyageType } from "@/zod-schemas/nettoyage";
 import { TotalNettoyageType } from "@/zod-schemas/total";
@@ -27,13 +27,13 @@ export function useNettoyageContextUpdater() {
     })),
   );
   const setTotalNettoyage = useTotalNettoyageStore((s) => s.setTotalNettoyage);
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
 
   const updateNettoyageContext = useCallback(
     (data: CacheInvalidationData) => {
       if (data.serviceType !== "nettoyage") return;
       const tarifType = data.tarifType as string;
-      const clientSurfaceRounded = roundSurface(client.surface);
+      const clientSurfaceRounded = roundSurface(prospect.surface);
       console.log(
         `Mise à jour du contexte nettoyage (${tarifType}): ${data.field} -> ${data.value}`,
       );
@@ -259,7 +259,7 @@ export function useNettoyageContextUpdater() {
       }
     },
     [
-      client.surface,
+      prospect.surface,
       nettoyage.infos.dimancheSelected,
       nettoyage.infos.fournisseurId,
       nettoyage.infos.gammeSelected,

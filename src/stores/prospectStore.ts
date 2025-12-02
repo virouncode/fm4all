@@ -1,49 +1,80 @@
 "use client";
 
-import { InsertClientType } from "@/zod-schemas/client";
+import { InsertProspectType } from "@/zod-schemas/prospect";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-type ClientStore = {
-  client: InsertClientType;
-  setClient: (
-    value: InsertClientType | ((prev: InsertClientType) => InsertClientType),
+type ProspectStore = {
+  prospect: InsertProspectType & { id?: number };
+  setProspect: (
+    value:
+      | (InsertProspectType & { id?: number })
+      | ((
+          prev: InsertProspectType & { id?: number },
+        ) => InsertProspectType & { id?: number }),
   ) => void;
+  reset: () => void;
 };
 
-export const useClientStore = create<ClientStore>()(
+export const useProspectStore = create<ProspectStore>()(
   persist(
     (set) => ({
-      client: {
+      prospect: {
         //initial state
         nomEntreprise: "",
-        siret: null,
         prenomContact: "",
         nomContact: "",
         posteContact: "",
         emailContact: "",
         phoneContact: "",
-        prenomSignataire: null,
-        nomSignataire: null,
-        posteSignataire: null,
-        emailSignataire: null,
         surface: 100,
         effectif: 20,
         typeBatiment: "bureaux",
         typeOccupation: "partieEtage",
-        adresseLigne1: null,
-        adresseLigne2: null,
         codePostal: "",
         ville: "",
+        siret: null,
+        prenomSignataire: null,
+        nomSignataire: null,
+        posteSignataire: null,
+        emailSignataire: null,
+        adresseLigne1: null,
+        adresseLigne2: null,
         dateDeDemarrage: null,
         commentaires: null,
       },
-      setClient: (value) =>
+      setProspect: (value) =>
         set((state) => ({
-          client: typeof value === "function" ? value(state.client) : value,
+          prospect: typeof value === "function" ? value(state.prospect) : value,
+        })),
+      reset: () =>
+        set(() => ({
+          prospect: {
+            nomEntreprise: "",
+            prenomContact: "",
+            nomContact: "",
+            posteContact: "",
+            emailContact: "",
+            phoneContact: "",
+            surface: 100,
+            effectif: 20,
+            typeBatiment: "bureaux",
+            typeOccupation: "partieEtage",
+            codePostal: "",
+            ville: "",
+            siret: null,
+            prenomSignataire: null,
+            nomSignataire: null,
+            posteSignataire: null,
+            emailSignataire: null,
+            adresseLigne1: null,
+            adresseLigne2: null,
+            dateDeDemarrage: null,
+            commentaires: null,
+          },
         })),
     }),
-    { name: "client" },
+    { name: "prospect" },
   ),
 );
 

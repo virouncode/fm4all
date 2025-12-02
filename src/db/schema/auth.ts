@@ -20,7 +20,7 @@ export const user = pgTable(
     email: text("email").unique().notNull(),
     emailVerified: boolean("email_verified").notNull(),
     image: text("image"),
-    role: roleEnum("role").default("admin").notNull(),
+    role: roleEnum("role").notNull(),
     fournisseurId: integer("fournisseur_id"),
     clientId: integer("client_id"),
     createdAt: createdAt(),

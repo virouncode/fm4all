@@ -9,6 +9,7 @@ interface TotalOfficeManagerStore {
       | TotalOfficeManagerType
       | ((prev: TotalOfficeManagerType) => TotalOfficeManagerType),
   ) => void;
+  reset: () => void;
 }
 
 export const useTotalOfficeManagerStore = create<TotalOfficeManagerStore>()(
@@ -24,6 +25,12 @@ export const useTotalOfficeManagerStore = create<TotalOfficeManagerStore>()(
               ? value(state.totalOfficeManager)
               : value,
         })),
+      reset: () =>
+        set({
+          totalOfficeManager: {
+            totalService: null,
+          },
+        }),
     }),
     {
       name: "totalOfficeManager",

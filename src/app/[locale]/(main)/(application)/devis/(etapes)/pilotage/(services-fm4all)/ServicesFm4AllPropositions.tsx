@@ -282,15 +282,6 @@ const ServicesFm4AllPropositions = ({
         minFacturationAccountManager,
       },
     }));
-    // setTotalServicesFm4All({
-    //   totalAssurance: prixAssurance,
-    //   totalPlateforme: prixPlateforme,
-    //   totalSupportAdmin: prixSupportAdmin,
-    //   totalSupportOp: prixSupportOp,
-    //   totalAccountManager: prixAccountManager,
-    //   totalRemiseCa: remiseCa,
-    //   totalRemiseHof: remiseHof,
-    // });
   };
 
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });

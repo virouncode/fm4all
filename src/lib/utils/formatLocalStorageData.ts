@@ -13,7 +13,7 @@ export const formatLocalStorageData = (): string => {
     "personnalisation",
   ];
   const predefinedOrder = [
-    "client",
+    "prospect",
     "nettoyage",
     "totalNettoyage",
     "hygiene",

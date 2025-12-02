@@ -2,19 +2,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MAX_NB_DISTRIB } from "@/constants/constants";
-import { useClientStore } from "@/stores/clientStore";
 import { useHygieneStore } from "@/stores/hygieneStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useTotalHygieneStore } from "@/stores/totalHygieneStore";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/shallow";
+import { HygieneOptionsType } from "../(desktop)/HygieneOptionsPropositions";
 
 type HygieneMobileOptionsDesinfectantInputProps = {
   nbDistribDesinfectant: number;
   handleChangeDistribNbr: (
     e: React.ChangeEvent<HTMLInputElement>,
-    type: string,
+    type: HygieneOptionsType,
   ) => void;
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
   hygieneDistribTarifsFournisseur: {
@@ -64,7 +65,7 @@ const HygieneMobileOptionsDesinfectantInput = ({
     })),
   );
   const setTotalHygiene = useTotalHygieneStore((s) => s.setTotalHygiene);
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
 
   const handleIncrement = () => {
     let newNbDistribDesinfectant = nbDistribDesinfectant + 1;
@@ -91,7 +92,7 @@ const HygieneMobileOptionsDesinfectantInput = ({
         hygiene.prix.paParPersonneDesinfectant !== null &&
         newNbDistribDesinfectant
           ? newNbDistribDesinfectant * prixDistribDesinfectant +
-            hygiene.prix.paParPersonneDesinfectant * (client.effectif ?? 0)
+            hygiene.prix.paParPersonneDesinfectant * (prospect.effectif ?? 0)
           : null;
       setTotalHygiene((prev) => ({
         ...prev,
@@ -123,7 +124,7 @@ const HygieneMobileOptionsDesinfectantInput = ({
         hygiene.prix.paParPersonneDesinfectant !== null &&
         newNbDistribDesinfectant
           ? newNbDistribDesinfectant * prixDistribDesinfectant +
-            hygiene.prix.paParPersonneDesinfectant * (client.effectif ?? 0)
+            hygiene.prix.paParPersonneDesinfectant * (prospect.effectif ?? 0)
           : null;
       setTotalHygiene((prev) => ({
         ...prev,

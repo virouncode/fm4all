@@ -1,5 +1,6 @@
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { ChangeEvent } from "react";
+import { HygieneOptionsType } from "../(desktop)/HygieneOptionsPropositions";
 import HygieneMobileOptionsBalaiCarousel from "./HygieneMobileOptionsBalaiCarousel";
 import HygieneMobileOptionsBalaiInput from "./HygieneMobileOptionsBalaiInput";
 
@@ -8,7 +9,7 @@ type HygieneMobileOptionsBalaiProps = {
   nbDistribBalai: number;
   handleChangeDistribNbr: (
     e: ChangeEvent<HTMLInputElement>,
-    type: string,
+    type: HygieneOptionsType,
   ) => void;
   propositions: {
     nomFournisseur: string;
@@ -37,7 +38,7 @@ type HygieneMobileOptionsBalaiProps = {
     imageUrlPoubelle: string | null;
   }[];
   handleClickProposition: (
-    type: string,
+    type: HygieneOptionsType,
     proposition: {
       nomFournisseur: string;
       sloganFournisseur: string | null;

@@ -8,6 +8,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { typeBatimentCT, typeOccupationCT } from "@/constants/codeTables";
 import { InsertSiteFormType, UpdateSiteFormType } from "@/zod-schemas/site";
 import { UserRoleType } from "@/zod-schemas/user";
+import { useTranslations } from "next-intl";
 import React from "react";
 
 type SiteFormProps<TFormValues> = {
@@ -29,6 +30,7 @@ const SiteForm = <TFormValues,>({
   clientId,
   userRole,
 }: SiteFormProps<TFormValues>) => {
+  const t = useTranslations("DevisPage.locaux.locauxForm");
   return (
     <form onSubmit={onSubmit}>
       <FieldSet>
@@ -96,7 +98,7 @@ const SiteForm = <TFormValues,>({
             >
               {typeBatimentCT.map((type) => (
                 <SelectItem key={type.code} value={type.code}>
-                  {type.name}
+                  {t(type.name)}
                 </SelectItem>
               ))}
             </RhfControlledSelect>
@@ -109,7 +111,7 @@ const SiteForm = <TFormValues,>({
             >
               {typeOccupationCT.map((type) => (
                 <SelectItem key={type.code} value={type.code}>
-                  {type.name}
+                  {t(type.name)}
                 </SelectItem>
               ))}
             </RhfControlledSelect>

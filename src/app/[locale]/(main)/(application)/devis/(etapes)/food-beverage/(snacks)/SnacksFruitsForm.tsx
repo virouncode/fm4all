@@ -4,7 +4,7 @@ import { TypesSnacksFruitsType } from "@/constants/typesSnacksFruits";
 import { toast } from "@/hooks/use-toast";
 import { roundEffectif } from "@/lib/utils/roundEffectif";
 import { useCafeStore } from "@/stores/cafeStore";
-import { useClientStore } from "@/stores/clientStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
 import { useTotalCafeStore } from "@/stores/totalCafeStore";
 import { useTotalSnacksFruitsStore } from "@/stores/totalSnacksFruitsStore";
@@ -17,9 +17,9 @@ import { SelectSnacksQuantitesType } from "@/zod-schemas/snacksQuantites";
 import { SelectSnacksTarifsType } from "@/zod-schemas/snacksTarifs";
 import { useTranslations } from "next-intl";
 import { useMediaQuery } from "react-responsive";
+import { useShallow } from "zustand/shallow";
 import SnacksFruitsDesktopInputs from "./(desktop)/SnacksFruitsDesktopInputs";
 import SnacksFruitsMobileInputs from "./(mobile)/SnacksFruitsMobileInputs";
-import { useShallow } from "zustand/shallow";
 
 type SnacksFruitsFormProps = {
   fruitsQuantites: SelectFruitsQuantitesType[];
@@ -41,7 +41,7 @@ const SnacksFruitsForm = ({
   foodLivraisonTarifs,
 }: SnacksFruitsFormProps) => {
   const t = useTranslations("DevisPage");
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const cafe = useCafeStore((s) => s.cafe);
   const totalCafe = useTotalCafeStore((s) => s.totalCafe);
   const { snacksFruits, setSnacksFruits } = useSnacksFruitsStore(
@@ -53,7 +53,7 @@ const SnacksFruitsForm = ({
   const setTotalSnacksFruits = useTotalSnacksFruitsStore(
     (s) => s.setTotalSnacksFruits,
   );
-  const effectif = client.effectif ?? 0;
+  const effectif = prospect.effectif ?? 0;
   const nbPersonnes = snacksFruits.quantites.nbPersonnes ?? effectif;
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1024px)" });
 

@@ -2,7 +2,6 @@
 
 import { MARGE } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { useClientStore } from "@/stores/clientStore";
 import { useTotalStore } from "@/stores/totalStore";
 import { useTranslations } from "next-intl";
 import TotalCafe from "../TotalCafe";
@@ -15,11 +14,12 @@ import TotalOfficeManager from "../TotalOfficeManager";
 import TotalServicesFm4All from "../TotalServicesFm4All";
 import TotalSnacksFruits from "../TotalSnacksFruits";
 import TotalThe from "../TotalThe";
+import { useProspectStore } from "@/stores/prospectStore";
 
 // Font files can be colocated inside of `pages`
 
 const DevisSynthese = () => {
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const total = useTotalStore((s) => s.total);
   const t = useTranslations("Total");
 
@@ -40,8 +40,8 @@ const DevisSynthese = () => {
           {total.totalAnnuelHtSansServicesFm4all
             ? formatNumber(Math.round((total.totalAnnuelHt ?? 0) / 12))
             : 0}{" "}
-          {t("eur-ht-mois-pour")} {client.effectif} {t("personnes")},{" "}
-          {client.surface} m<sup>2</sup>
+          {t("eur-ht-mois-pour")} {prospect.effectif} {t("personnes")},{" "}
+          {prospect.surface} m<sup>2</sup>
         </p>
         <p>
           + {formatNumber(Math.round((total.totalInstallationHt ?? 0) * MARGE))}{" "}

@@ -19,11 +19,12 @@ import { Info } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { ChangeEvent } from "react";
+import { HygieneOptionsType } from "./HygieneOptionsPropositions";
 
 type HygieneOptionsPoubelleCardProps = {
   nbDistribPoubelle: number;
   handleClickProposition: (
-    type: string,
+    type: HygieneOptionsType,
     proposition: {
       nomFournisseur: string;
       sloganFournisseur: string | null;
@@ -53,7 +54,7 @@ type HygieneOptionsPoubelleCardProps = {
   ) => void;
   handleChangeDistribNbr: (
     e: ChangeEvent<HTMLInputElement>,
-    type: string,
+    type: HygieneOptionsType,
   ) => void;
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
   propositions: {

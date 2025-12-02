@@ -2,7 +2,7 @@ import { batiments } from "@/constants/batiments";
 import { MARGE, TVA } from "@/constants/constants";
 import { occupation } from "@/constants/occupation";
 import { toast } from "@/hooks/use-toast";
-import { InsertClientType } from "@/zod-schemas/client";
+import { UpdateProspectType } from "@/zod-schemas/prospect";
 import html2canvas from "html2canvas-pro";
 import { PDFDocument, PDFTextField, RotationTypes } from "pdf-lib";
 import { formatNumber } from "./formatNumber";
@@ -14,7 +14,7 @@ export const fillDevis = async (
   numeroDevis: string,
   dateEmission: string,
   nomEmetteur: string,
-  client: InsertClientType,
+  prospect: UpdateProspectType,
   totalAnnuelHTMarge: number | null,
   totalInstallationHT: number | null,
   commentaires: string | null,
@@ -39,21 +39,23 @@ export const fillDevis = async (
     );
     const totalAnnuelTtcText = formatNumber((totalAnnuelHTMarge ?? 0) * TVA);
     const adresseClient =
-      [client.adresseLigne1, client.adresseLigne2].filter(Boolean).join(" ") +
+      [prospect.adresseLigne1, prospect.adresseLigne2]
+        .filter(Boolean)
+        .join(" ") +
       " " +
-      client.codePostal +
+      prospect.codePostal +
       " " +
-      client.ville;
+      prospect.ville;
     const signataireClient =
-      client.prenomSignataire && client.nomSignataire
-        ? client.prenomSignataire + " " + client.nomSignataire
-        : client.prenomContact + " " + client.nomContact;
-    const posteSignataireClient = client.posteSignataire
-      ? client.posteSignataire
-      : client.posteContact;
-    const emailSignataireClient = client.emailSignataire
-      ? client.emailSignataire
-      : client.emailContact;
+      prospect.prenomSignataire && prospect.nomSignataire
+        ? prospect.prenomSignataire + " " + prospect.nomSignataire
+        : prospect.prenomContact + " " + prospect.nomContact;
+    const posteSignataireClient = prospect.posteSignataire
+      ? prospect.posteSignataire
+      : prospect.posteContact;
+    const emailSignataireClient = prospect.emailSignataire
+      ? prospect.emailSignataire
+      : prospect.emailContact;
 
     const textFieldsDatas = [
       {
@@ -62,28 +64,28 @@ export const fillDevis = async (
       },
       { fieldName: "date_emission", value: dateEmission },
       { fieldName: "nom_emetteur", value: nomEmetteur },
-      { fieldName: "nom_entreprise", value: client.nomEntreprise },
+      { fieldName: "nom_entreprise", value: prospect.nomEntreprise },
       { fieldName: "adresse_client", value: adresseClient },
       {
         fieldName: "siret_client",
-        value: client.siret ? formatSIRET(client.siret) : "",
+        value: prospect.siret ? formatSIRET(prospect.siret) : "",
       },
       { fieldName: "signataire_client", value: signataireClient },
       { fieldName: "poste_signataire_client", value: posteSignataireClient },
       { fieldName: "email_signataire_client", value: emailSignataireClient },
-      { fieldName: "phone_signataire_client", value: client.phoneContact },
-      { fieldName: "effectif_client", value: client.effectif.toString() },
+      { fieldName: "phone_signataire_client", value: prospect.phoneContact },
+      { fieldName: "effectif_client", value: prospect.effectif?.toString() },
       {
         fieldName: "typeOccupation_client",
         value:
-          occupation.find(({ id }) => id === client.typeOccupation)
+          occupation.find(({ id }) => id === prospect.typeOccupation)
             ?.description ?? "",
       },
       {
         fieldName: "typeBatiment_client",
         value:
-          batiments.find(({ id }) => id === client.typeBatiment)?.description ??
-          "",
+          batiments.find(({ id }) => id === prospect.typeBatiment)
+            ?.description ?? "",
       },
       { fieldName: "total_annuel_ht", value: totalAnnuelHtText },
       { fieldName: "total_mensuel_ht", value: totalMensuelHtText },
@@ -98,7 +100,7 @@ export const fillDevis = async (
     // Loop through the text fields and populate
     for (const data of textFieldsDatas) {
       const field = form.getFieldMaybe(data.fieldName);
-      if (field && field instanceof PDFTextField) {
+      if (field && field instanceof PDFTextField && data.value) {
         field.setText(sanitizeText(data.value));
       }
     }
@@ -284,12 +286,11 @@ export const fillDevis = async (
       console.log(err);
     }
 
-    // Save and return the PDF
     const pdfBytes = await pdfDoc.save();
-
-    const docUrl = URL.createObjectURL(
-      new Blob([pdfBytes], { type: "application/pdf" }),
-    );
+    const blob = new Blob([pdfBytes.buffer as ArrayBuffer], {
+      type: "application/pdf",
+    });
+    const docUrl = URL.createObjectURL(blob);
     return docUrl;
   } catch (error) {
     console.error("Error processing PDF form: ", error);

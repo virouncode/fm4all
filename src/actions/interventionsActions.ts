@@ -6,8 +6,10 @@ import { getInterventions } from "@/lib/queries/interventions/getInterventions";
 import { actionClient } from "@/lib/safe-actions";
 import {
   insertInterventionSchema,
+  insertInterventionToDbSchema,
   interventionsQueryBackendSchema,
   selectInterventionSchema,
+  updateInterventionInDbSchema,
   updateInterventionSchema,
 } from "@/zod-schemas/intervention";
 import { and, eq } from "drizzle-orm";
@@ -66,20 +68,21 @@ export const insertInterventionAction = actionClient
     const createdById = currentUser.id;
     const updatedById = currentUser.id;
 
+    const payload = insertInterventionToDbSchema.parse({
+      ...parsedInput,
+      createdById,
+      updatedById,
+      confirmeeClient: currentUser.role === "client",
+      confirmeeFournisseur: currentUser.role === "fournisseur",
+      clientConfirmedAt: currentUser.role === "client" ? new Date() : null,
+      fournisseurConfirmedAt:
+        currentUser.role === "fournisseur" ? new Date() : null,
+    });
+
     const result = await db.transaction(async (tx) => {
       const [insertedIntervention] = await tx
         .insert(interventions)
-        .values({
-          ...parsedInput,
-          createdById,
-          updatedById,
-          ...(currentUser.role === "client"
-            ? { clientConfirmedAt: new Date() }
-            : {}),
-          ...(currentUser.role === "fournisseur"
-            ? { fournisseurConfirmedAt: new Date() }
-            : {}),
-        })
+        .values(payload)
         .returning();
       if (!insertedIntervention) {
         throw new Error(
@@ -239,12 +242,14 @@ export const updateInterventionAction = actionClient
       }
     }
 
+    const payload = updateInterventionInDbSchema.parse({
+      ...parsedInput,
+      updatedById,
+    });
+
     const [updatedIntervention] = await db
       .update(interventions)
-      .set({
-        ...parsedInput,
-        updatedById,
-      })
+      .set(payload)
       .where(
         and(
           eq(interventions.id, interventionId),

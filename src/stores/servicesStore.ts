@@ -7,6 +7,7 @@ interface ServicesStore {
   setServices: (
     value: ServicesType | ((prev: ServicesType) => ServicesType),
   ) => void;
+  reset: () => void;
 }
 
 export const useServicesStore = create<ServicesStore>()(
@@ -17,6 +18,7 @@ export const useServicesStore = create<ServicesStore>()(
         set((state) => ({
           services: typeof value === "function" ? value(state.services) : value,
         })),
+      reset: () => set({ services: { currentServiceId: 0 } }),
     }),
     {
       name: "services",

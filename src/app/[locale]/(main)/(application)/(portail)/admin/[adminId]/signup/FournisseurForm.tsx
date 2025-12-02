@@ -152,7 +152,6 @@ const FournisseurForm = ({ fournisseurs }: FournisseurFormProps) => {
       executeSaveUser({
         name: data.nomFournisseur.toUpperCase(),
         email: data.emailContact.toLowerCase(),
-        password: "temp",
         role: "fournisseur",
         fournisseurId,
         image: null,

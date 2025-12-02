@@ -1,6 +1,6 @@
 import { MAX_NB_DISTRIB } from "@/constants/constants";
-import { useClientStore } from "@/stores/clientStore";
 import { useHygieneStore } from "@/stores/hygieneStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useTotalHygieneStore } from "@/stores/totalHygieneStore";
 import { gammes } from "@/zod-schemas/gamme";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
@@ -12,6 +12,12 @@ import { useShallow } from "zustand/shallow";
 import HygieneMobileOptionsPropositions from "../(mobile)/HygieneMobileOptionsPropositions";
 import { getHygieneFournisseurTarifs } from "../getFormattedHygienePropositions";
 import HygieneDesktopOptionsPropositions from "./HygieneDesktopOptionsPropositions";
+
+export type HygieneOptionsType =
+  | "desinfectant"
+  | "parfum"
+  | "balai"
+  | "poubelle";
 
 type HygieneOptionsPropositionsProps = {
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
@@ -30,7 +36,7 @@ const HygieneOptionsPropositions = ({
       setHygiene: s.setHygiene,
     })),
   );
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const setTotalHygiene = useTotalHygieneStore((s) => s.setTotalHygiene);
   //Formatter les propositions d'options en hygiene
   const nbDistribDesinfectant =
@@ -92,7 +98,7 @@ const HygieneOptionsPropositions = ({
       prixDistribDesinfectant !== null &&
       nbDistribDesinfectant
         ? nbDistribDesinfectant * prixDistribDesinfectant +
-          paParPersonneDesinfectant * (client.effectif ?? 0)
+          paParPersonneDesinfectant * (prospect.effectif ?? 0)
         : null;
     const totalParfum =
       prixDistribParfum !== null && nbDistribParfum
@@ -147,7 +153,7 @@ const HygieneOptionsPropositions = ({
   });
 
   const handleClickProposition = (
-    type: string,
+    type: HygieneOptionsType,
     proposition: {
       nomFournisseur: string;
       sloganFournisseur: string | null;
@@ -288,6 +294,10 @@ const HygieneOptionsPropositions = ({
           setHygiene((prev) => ({
             ...prev,
             infos: { ...prev.infos, poubelleGammeSelected: null },
+            prix: {
+              ...prev.prix,
+              prixDistribPoubelle: null,
+            },
           }));
           setTotalHygiene((prev) => ({
             ...prev,
@@ -305,7 +315,7 @@ const HygieneOptionsPropositions = ({
         }));
         setTotalHygiene((prev) => ({
           ...prev,
-          totalPoubelle: totalPoubelle,
+          totalPoubelle,
         }));
         return;
     }
@@ -313,7 +323,7 @@ const HygieneOptionsPropositions = ({
 
   const handleChangeDistribNbr = (
     e: ChangeEvent<HTMLInputElement>,
-    type: string,
+    type: HygieneOptionsType,
   ) => {
     const value = e.target.value;
     switch (type) {
@@ -342,7 +352,7 @@ const HygieneOptionsPropositions = ({
             paParPersonneDesinfectant !== null &&
             newNbDistribDesinfectant
               ? newNbDistribDesinfectant * prixDistribDesinfectant +
-                paParPersonneDesinfectant * (client.effectif ?? 0)
+                paParPersonneDesinfectant * (prospect.effectif ?? 0)
               : null;
           setTotalHygiene((prev) => ({
             ...prev,

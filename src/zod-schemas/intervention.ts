@@ -11,7 +11,12 @@ import {
   RawSearchParams,
 } from "@/normalize/normalizeSearchParams";
 import { createSortSchema } from "@/zod-helpers/createSortSchema";
-import { createSelectSchema, createUpdateSchema } from "drizzle-zod";
+import { capitalizeFirstWord } from "@/zod-helpers/normalize";
+import {
+  createInsertSchema,
+  createSelectSchema,
+  createUpdateSchema,
+} from "drizzle-zod";
 import { z } from "zod";
 
 export const interventionTypeSchema = z.enum(interventionTypeEnum.enumValues);
@@ -22,46 +27,82 @@ export const interventionStatusSchema = z.enum(
 );
 export type InterventionStatusType = z.infer<typeof interventionStatusSchema>;
 
-//SELECT
-export const selectInterventionSchema = createSelectSchema(interventions, {
-  titre: (schema) => schema.min(1, "Le titre est obligatoire"),
-});
-
+export const selectInterventionSchema = createSelectSchema(interventions);
 export type SelectInterventionType = z.infer<typeof selectInterventionSchema>;
 
-//INSERT
-export const insertInterventionSchema = z.object({
-  type: interventionTypeSchema,
-  fournisseurId: z.int().min(1, "Le prestataire est obligatoire"),
-  clientId: z.int().min(1, "Le client est obligatoire"),
-  siteId: z.int().min(1, "Le site est obligatoire"),
-  titre: z.string().min(1, "Le titre est obligatoire"),
-  description: z.string().optional(),
-});
-
-export type InsertInterventionType = z.infer<typeof insertInterventionSchema>;
-
-//UPDATE
-export const updateInterventionSchema = createUpdateSchema(interventions, {
-  titre: (schema) => schema.min(1, "Le titre est obligatoire"),
-}).omit({
-  createdById: true,
-  updatedById: true, // Will be set server-side
+export const insertInterventionSchema = createInsertSchema(interventions).omit({
+  id: true,
   createdAt: true,
   updatedAt: true,
-  clientId: true, // Immutable
+  confirmeeClient: true,
+  confirmeeFournisseur: true,
+  clientConfirmedAt: true,
+  fournisseurConfirmedAt: true,
 });
+export type InsertInterventionType = z.infer<typeof insertInterventionSchema>;
+
+export const insertInterventionToDbSchema = insertInterventionSchema.extend({
+  createdById: z.string().min(1, "ID de l'utilisateur créateur obligatoire"),
+  updatedById: z
+    .string()
+    .min(1, "ID de l'utilisateur modificateur obligatoire"),
+  confirmeeClient: z.boolean(),
+  confirmeeFournisseur: z.boolean(),
+  clientConfirmedAt: z.date().optional().nullable(),
+  fournisseurConfirmedAt: z.date().optional().nullable(),
+});
+export type InsertInterventionToDbType = z.infer<
+  typeof insertInterventionToDbSchema
+>;
+
+//UPDATE
+export const updateInterventionSchema = createUpdateSchema(interventions)
+  .omit({
+    createdAt: true,
+    updatedAt: true,
+  })
+  .extend({
+    id: z.number().positive("ID de l'intervention invalide"),
+  });
 export type UpdateInterventionType = z.infer<typeof updateInterventionSchema>;
 
-export const clientUpdateInterventionFormSchema =
-  updateInterventionSchema.extend({
-    dateDebutPrevue: z
-      .string()
-      .min(1, "La date de début prévue est obligatoire"),
-    dateFinPrevue: z.string().optional(),
+export const updateInterventionInDbSchema = updateInterventionSchema.extend({
+  updatedById: z
+    .string()
+    .min(1, "ID de l'utilisateur modificateur obligatoire"),
+});
+export type UpdateInterventionInDbType = z.infer<
+  typeof updateInterventionInDbSchema
+>;
+
+//======================= FORM SCHEMAS ==========================//
+//On ne peut pas appliquer des transform de type mais on peut appliquer des transform de nettoyage
+
+export const insertInterventionFormSchema = z.object({
+  titre: z
+    .string()
+    .min(1, "Le titre de l'intervention est obligatoire")
+    .transform((v) => capitalizeFirstWord(v)),
+  type: interventionTypeSchema,
+  siteId: z.string().min(1, "Le site est obligatoire"), //select
+  clientId: z.string().min(1, "Le client est obligatoire"), //select
+  fournisseurId: z.string().min(1, "Le fournisseur est obligatoire"), //select
+  dateDebutPrevue: z.string().min(1, "La date de début prévue est obligatoire"),
+  dateFinPrevue: z.string().optional(),
+  description: z.string().optional(),
+});
+export type InsertInterventionFormType = z.infer<
+  typeof insertInterventionFormSchema
+>;
+
+export const updateInterventionFormSchema = insertInterventionFormSchema
+  .partial()
+  .extend({
+    id: z.number().positive("ID de l'intervention invalide"),
   });
-export type ClientUpdateInterventionFormType = z.infer<
-  typeof clientUpdateInterventionFormSchema
+
+export type UpdateInterventionFormType = z.infer<
+  typeof updateInterventionFormSchema
 >;
 
 //=========================== QUERY: SORT, FILTERS, ETC.============================//

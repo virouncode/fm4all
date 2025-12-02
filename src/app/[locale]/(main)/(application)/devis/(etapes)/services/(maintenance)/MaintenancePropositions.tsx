@@ -7,9 +7,9 @@ import { SelectMaintenanceTarifsType } from "@/zod-schemas/maintenanceTarifs";
 import { SelectQ18TarifsType } from "@/zod-schemas/q18Tarifs";
 import { SelectQualiteAirTarifsType } from "@/zod-schemas/qualiteAirTarifs";
 import { useMediaQuery } from "react-responsive";
+import { useShallow } from "zustand/shallow";
 import MaintenanceDesktopPropositions from "./(desktop)/MaintenanceDesktopPropositions";
 import MaintenanceMobilePropositions from "./(mobile)/MaintenanceMobilePropositions";
-import { useShallow } from "zustand/shallow";
 
 type MaintenancePropositionsProps = {
   maintenanceQuantites: SelectMaintenanceQuantitesType[];
@@ -35,6 +35,7 @@ const MaintenancePropositions = ({
   const setTotalMaintenance = useTotalMaintenanceStore(
     (s) => s.setTotalMaintenance,
   );
+  const resetTotalMaintenance = useTotalMaintenanceStore((s) => s.reset);
 
   //Calcul des propositions
   const propositions = maintenanceTarifs.map((tarif) => {
@@ -218,12 +219,7 @@ const MaintenancePropositions = ({
             prixQualiteAir: null,
           },
         }));
-        setTotalMaintenance({
-          totalService: null,
-          totalQ18: null,
-          totalLegio: null,
-          totalQualiteAir: null,
-        });
+        resetTotalMaintenance();
         return;
       }
     }

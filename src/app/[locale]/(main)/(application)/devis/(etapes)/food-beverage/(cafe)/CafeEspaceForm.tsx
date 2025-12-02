@@ -11,7 +11,7 @@ import { toast } from "@/hooks/use-toast";
 import { roundNbPersonnesCafeConso } from "@/lib/utils/roundNbPersonnesCafeConso";
 import { roundNbPersonnesCafeMachines } from "@/lib/utils/roundNbPersonnesCafeMachines";
 import { useCafeStore } from "@/stores/cafeStore";
-import { useClientStore } from "@/stores/clientStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useTheStore } from "@/stores/theStore";
 import { useTotalCafeStore } from "@/stores/totalCafeStore";
 import { useTotalTheStore } from "@/stores/totalTheStore";
@@ -51,7 +51,7 @@ const CafeEspaceForm = ({
 }: CafeEspaceFormProps) => {
   const t = useTranslations("DevisPage");
   const tCafe = useTranslations("DevisPage.foodBeverage.cafe");
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const { cafe, setCafe } = useCafeStore(
     useShallow((s) => ({
       cafe: s.cafe,
@@ -63,7 +63,7 @@ const CafeEspaceForm = ({
   const setTotalThe = useTotalTheStore((s) => s.setTotalThe);
   const isTabletOrMobile = useMediaQuery({ maxWidth: 1024 });
   const cafeEspacesIds = cafe.espaces.map((espace) => espace.infos.espaceId);
-  const effectif = client.effectif ?? 0;
+  const effectif = prospect.effectif ?? 0;
   const nbPersonnes =
     espace.quantites.nbPersonnes ??
     (effectif > MAX_NB_PERSONNES_PAR_ESPACE

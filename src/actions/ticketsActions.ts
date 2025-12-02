@@ -6,11 +6,13 @@ import { getTickets } from "@/lib/queries/tickets/getTickets";
 import { actionClient } from "@/lib/safe-actions";
 import { promoteTempTicketAttachment } from "@/lib/utils/file-helper";
 import {
-  insertTicketAttachmentSchema,
-  insertTicketSchema,
+  insertTicketAttachmentToDbSchema,
+  insertTicketInputSchema,
+  insertTicketToDbSchema,
   selectTicketSchema,
   ticketsQueryBackendSchema,
-  updateTicketSchema,
+  updateTicketInDbSchema,
+  updateTicketInputSchema,
 } from "@/zod-schemas/ticket";
 import { and, eq, inArray } from "drizzle-orm";
 import { getLocale } from "next-intl/server";
@@ -53,21 +55,6 @@ export const getTicketsAction = actionClient
     });
 
     return tickets;
-  });
-
-const insertTicketAttachmentForActionSchema = insertTicketAttachmentSchema
-  .omit({
-    ticketId: true,
-    uploadedById: true,
-  })
-  .array()
-  .optional();
-
-const insertTicketInputSchema = insertTicketSchema
-  // le client NE fournit PAS clientId, on le prend dans la session
-  .omit({ clientId: true })
-  .extend({
-    attachments: insertTicketAttachmentForActionSchema,
   });
 
 export const insertTicketAction = actionClient
@@ -113,20 +100,19 @@ export const insertTicketAction = actionClient
     if (ticketData.status === "clos") {
       dateClotureValue = new Date();
     }
+    const payload = insertTicketToDbSchema.parse({
+      ...ticketData,
+      clientId,
+      dateCloture: dateClotureValue,
+      createdById,
+      updatedById,
+    });
 
     const result = await db.transaction(async (tx) => {
       // 1) Insert du ticket
       const [insertedTicket] = await tx
         .insert(tickets)
-        .values({
-          ...ticketData,
-          clientId,
-          dateCloture: dateClotureValue,
-          status: ticketData.status ?? "nouveau",
-          priorite: ticketData.priorite ?? "normale",
-          createdById,
-          updatedById,
-        })
+        .values(payload)
         .returning();
 
       if (!insertedTicket) {
@@ -156,14 +142,16 @@ export const insertTicketAction = actionClient
       // 3) Insert des attachments en base avec les URL finales
       if (promotedAttachments.length > 0) {
         await tx.insert(ticketsAttachments).values(
-          promotedAttachments.map((att) => ({
-            ticketId,
-            uploadedById,
-            url: att.url,
-            filename: att.filename,
-            mimeType: att.mimeType,
-            size: att.size, // si ta colonne existe bien côté DB
-          })),
+          promotedAttachments.map((att) =>
+            insertTicketAttachmentToDbSchema.parse({
+              ticketId,
+              uploadedById,
+              url: att.url,
+              filename: att.filename,
+              mimeType: att.mimeType,
+              size: att.size, // si ta colonne existe bien côté DB
+            }),
+          ),
         );
       }
 
@@ -198,12 +186,6 @@ export const insertTicketAction = actionClient
  *   - ceux qui ont disparu sont supprimés (DB + blob)
  *   - ceux qui arrivent depuis /temp/ sont promus + insérés
  */
-const updateTicketInputSchema = updateTicketSchema
-  // le client NE fournit PAS clientId, on le prend dans la session
-  .omit({ clientId: true })
-  .extend({
-    attachments: insertTicketAttachmentForActionSchema,
-  });
 
 export const updateTicketAction = actionClient
   .metadata({ actionName: "updateTicketAction" })
@@ -274,16 +256,17 @@ export const updateTicketAction = actionClient
       dateClotureValue = new Date();
     }
 
+    const payload = updateTicketInDbSchema.parse({
+      ...ticketData,
+      dateCloture: dateClotureValue,
+      updatedById,
+    });
+
     const result = await db.transaction(async (tx) => {
       // 1) Mise à jour du ticket
       const [updatedTicket] = await tx
         .update(tickets)
-        .set({
-          ...ticketData,
-          dateCloture: dateClotureValue,
-          updatedById,
-          updatedAt: new Date(),
-        })
+        .set(payload)
         .where(eq(tickets.id, ticketIdFromInput))
         .returning();
 
@@ -364,14 +347,16 @@ export const updateTicketAction = actionClient
         );
 
         await tx.insert(ticketsAttachments).values(
-          promotedAttachments.map((att) => ({
-            ticketId,
-            uploadedById,
-            url: att.url,
-            filename: att.filename,
-            mimeType: att.mimeType,
-            size: att.size,
-          })),
+          promotedAttachments.map((att) =>
+            insertTicketAttachmentToDbSchema.parse({
+              ticketId,
+              uploadedById,
+              url: att.url,
+              filename: att.filename,
+              mimeType: att.mimeType,
+              size: att.size,
+            }),
+          ),
         );
       }
 
