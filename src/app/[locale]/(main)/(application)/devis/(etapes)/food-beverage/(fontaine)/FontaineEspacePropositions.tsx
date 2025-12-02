@@ -4,19 +4,19 @@ import { typesPoseArray, TypesPoseType } from "@/constants/typesPose";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";
 import { roundNbPersonnesFontaine } from "@/lib/utils/roundNbPersonnesFontaine";
-import { useClientStore } from "@/stores/clientStore";
 import { useDevisProgressStore } from "@/stores/devisProgressStore";
 import { useFontainesStore } from "@/stores/fontainesStore";
+import { useProspectStore } from "@/stores/prospectStore";
+import { useTotalFontainesStore } from "@/stores/totalFontainesStore";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
 import { useTranslations } from "next-intl";
 import { useMediaQuery } from "react-responsive";
+import { useShallow } from "zustand/shallow";
 import FontaineDesktopEspacePropositions from "./(desktop)/FontaineDesktopEspacePropositions";
 import FontaineMobileEspacePropositions from "./(mobile)/FontaineMobileEspacePropositions";
 import { getTypeFontaine } from "./getTypeFontaine";
-import { useTotalFontainesStore } from "@/stores/totalFontainesStore";
-import { useShallow } from "zustand/shallow";
 
 type FontaineEspacePropositionsProps = {
   fontainesModeles: SelectFontainesModelesType[];
@@ -31,7 +31,7 @@ const FontaineEspacePropositions = ({
 }: FontaineEspacePropositionsProps) => {
   const t = useTranslations("DevisPage");
   const tFontaines = useTranslations("DevisPage.foodBeverage.fontaines");
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const setDevisProgress = useDevisProgressStore((s) => s.setDevisProgress);
   const { fontaines, setFontaines } = useFontainesStore(
     useShallow((s) => ({
@@ -47,9 +47,9 @@ const FontaineEspacePropositions = ({
   const fontainesEspacesIds = fontaines.espaces.map(
     (espace) => espace.infos.espaceId,
   );
-  const effectif = client.effectif ?? 0;
+  const effectif = prospect.effectif ?? 0;
   const nbPersonnes =
-    espace.quantites.nbPersonnes ||
+    espace.quantites.nbPersonnes ??
     (effectif > MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE
       ? MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE
       : effectif);
@@ -461,7 +461,7 @@ const FontaineEspacePropositions = ({
         }
         //selection existante je recalcule tout
         const itemNbPersonnes =
-          item.quantites.nbPersonnes ||
+          item.quantites.nbPersonnes ??
           (effectif > MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE
             ? MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE
             : effectif);
@@ -636,9 +636,10 @@ const FontaineEspacePropositions = ({
 
   const handleClickNext = () => {
     const searchParams = new URLSearchParams();
-    if (client.effectif)
-      searchParams.set("effectif", client.effectif.toString());
-    if (client.surface) searchParams.set("surface", client.surface.toString());
+    if (prospect.effectif)
+      searchParams.set("effectif", prospect.effectif.toString());
+    if (prospect.surface)
+      searchParams.set("surface", prospect.surface.toString());
     setDevisProgress({ currentStep: 4, completedSteps: [1, 2, 3] });
     router.push({
       pathname: "/devis/pilotage",

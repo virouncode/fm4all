@@ -9,9 +9,10 @@ import { Spinner } from "@/components/ui/spinner";
 import { interventionTypeCT } from "@/constants/codeTables";
 import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
 import {
-  ClientUpdateInterventionFormType,
-  InsertInterventionType,
+  InsertInterventionFormType,
+  UpdateInterventionFormType,
 } from "@/zod-schemas/intervention";
+
 import { SelectSiteType } from "@/zod-schemas/site";
 import { UserRoleType } from "@/zod-schemas/user";
 import { useRouter } from "next/navigation";
@@ -30,8 +31,8 @@ type InterventionFormProps<TFormValues> = {
 };
 
 type InterventionFormValues =
-  | InsertInterventionType
-  | ClientUpdateInterventionFormType;
+  | InsertInterventionFormType
+  | UpdateInterventionFormType;
 
 const InterventionForm = <TFormValues,>({
   mode,
@@ -90,7 +91,6 @@ const InterventionForm = <TFormValues,>({
               requiredMark
               className="w-full md:col-span-1"
               selectClassName="w-full"
-              valueType="number"
               disabled={isReadOnly}
             >
               {sites.map((site) => (
@@ -106,7 +106,6 @@ const InterventionForm = <TFormValues,>({
               requiredMark
               className="w-full md:col-span-1"
               selectClassName="w-full"
-              valueType="number"
               disabled={isReadOnly || userRole === "fournisseur"}
             >
               {fournisseurs.map((fournisseur) => (

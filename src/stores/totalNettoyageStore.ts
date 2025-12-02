@@ -9,6 +9,7 @@ interface TotalNettoyageStore {
       | TotalNettoyageType
       | ((prev: TotalNettoyageType) => TotalNettoyageType),
   ) => void;
+  reset: () => void;
 }
 
 export const useTotalNettoyageStore = create<TotalNettoyageStore>()(
@@ -26,6 +27,16 @@ export const useTotalNettoyageStore = create<TotalNettoyageStore>()(
           totalNettoyage:
             typeof value === "function" ? value(state.totalNettoyage) : value,
         })),
+      reset: () =>
+        set({
+          totalNettoyage: {
+            totalService: null,
+            totalRepasse: null,
+            totalSamedi: null,
+            totalDimanche: null,
+            totalVitrerie: null,
+          },
+        }),
     }),
     {
       name: "totalNettoyage",

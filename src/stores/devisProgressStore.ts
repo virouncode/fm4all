@@ -9,6 +9,7 @@ type DevisProgressStore = {
   setDevisProgress: (
     value: DevisProgressType | ((prev: DevisProgressType) => DevisProgressType),
   ) => void;
+  reset: () => void;
 };
 
 export const useDevisProgressStore = create<DevisProgressStore>()(
@@ -23,7 +24,15 @@ export const useDevisProgressStore = create<DevisProgressStore>()(
           devisProgress:
             typeof value === "function" ? value(state.devisProgress) : value,
         })),
+      reset: () =>
+        set(() => ({
+          devisProgress: {
+            currentStep: 1,
+            completedSteps: [],
+          },
+        })),
     }),
+
     { name: "devisProgress" },
   ),
 );

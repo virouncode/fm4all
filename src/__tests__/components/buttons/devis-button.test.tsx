@@ -1,9 +1,7 @@
 import { mocki18nNavigation, pushMock } from "@/__tests__/mocks/next-i18n";
 import { mockNextIntl } from "@/__tests__/mocks/next-intl";
 import { fullReinitialisationDevis } from "@/app/[locale]/(main)/(application)/devis/(etapes)/locaux/fullReinitialisationDevis";
-import { ClientContext } from "@/context/ClientProvider";
 import { DevisProgressContext } from "@/context/DevisProgressProvider";
-import { InsertClientType } from "@/zod-schemas/client";
 import { DevisProgressType } from "@/zod-schemas/devisProgress";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -38,13 +36,13 @@ const renderWithContexts = (
       devisProgress: DevisProgressType;
       setDevisProgress: Dispatch<SetStateAction<DevisProgressType>>;
     };
-    clientContext?: {
-      client: InsertClientType;
-      setClient: Dispatch<SetStateAction<InsertClientType>>;
+    prospectContext?: {
+      prospect: InsertProspectType;
+      setProspect: Dispatch<SetStateAction<InsertProspectType>>;
     };
   },
 ) => {
-  const { devisContext, clientContext } = options ?? {};
+  const { devisContext, prospectContext } = options ?? {};
 
   render(
     <DevisProgressContext.Provider
@@ -55,10 +53,10 @@ const renderWithContexts = (
         }
       }
     >
-      {clientContext ? (
-        <ClientContext.Provider value={clientContext}>
+      {prospectContext ? (
+        <ProspectContext.Provider value={prospectContext}>
           {children}
-        </ClientContext.Provider>
+        </ProspectContext.Provider>
       ) : (
         children
       )}
@@ -71,7 +69,7 @@ const renderWithContexts = (
 };
 
 const setIsMobileNavOpen = vi.fn();
-const defaultClient: InsertClientType = {
+const defaultProspect: InsertProspectType = {
   nomEntreprise: "Test Company",
   siret: "123456789",
   prenomContact: "John",
@@ -96,6 +94,7 @@ const defaultClient: InsertClientType = {
 };
 
 import DevisButton from "@/components/buttons/devis-button";
+import { InsertProspectType } from "@/zod-schemas/prospect";
 
 describe("DevisButton", () => {
   beforeEach(() => {
@@ -220,9 +219,9 @@ describe("DevisButton", () => {
           },
           setDevisProgress: vi.fn(),
         },
-        clientContext: {
-          client: defaultClient,
-          setClient: vi.fn(),
+        prospectContext: {
+          prospect: defaultProspect,
+          setProspect: vi.fn(),
         },
       },
     );
@@ -254,9 +253,9 @@ describe("DevisButton", () => {
           },
           setDevisProgress: vi.fn(),
         },
-        clientContext: {
-          client: defaultClient,
-          setClient: vi.fn(),
+        prospectContext: {
+          prospect: defaultProspect,
+          setProspect: vi.fn(),
         },
       },
     );

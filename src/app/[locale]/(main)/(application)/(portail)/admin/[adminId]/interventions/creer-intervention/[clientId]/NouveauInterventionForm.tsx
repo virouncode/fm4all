@@ -3,10 +3,12 @@
 import { insertInterventionAction } from "@/actions/interventionsActions";
 import { Form } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
+import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
 import {
+  insertInterventionFormSchema,
+  InsertInterventionFormType,
   InsertInterventionType,
-  insertInterventionSchema,
 } from "@/zod-schemas/intervention";
 import { SelectSiteType } from "@/zod-schemas/site";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,7 +17,7 @@ import { useForm } from "react-hook-form";
 import InterventionForm from "../../../../../forms/InterventionForm";
 
 type NouveauInterventionFormProps = {
-  defaultValues: InsertInterventionType;
+  defaultValues: InsertInterventionFormType;
   clientId: number;
   sites: SelectSiteType[];
   fournisseurs: SelectFournisseurType[];
@@ -27,10 +29,10 @@ export default function NouveauInterventionForm({
   sites,
   fournisseurs,
 }: NouveauInterventionFormProps) {
-  const form = useForm<InsertInterventionType>({
+  const form = useForm<InsertInterventionFormType>({
     defaultValues,
     mode: "onTouched",
-    resolver: zodResolver(insertInterventionSchema),
+    resolver: zodResolver(insertInterventionFormSchema),
   });
 
   const {
@@ -62,8 +64,13 @@ export default function NouveauInterventionForm({
     },
   });
 
-  const submitForm = (data: InsertInterventionType) => {
-    executeInsertIntervention(data);
+  const submitForm = (data: InsertInterventionFormType) => {
+    const payload = normalizeForSubmit(data, {
+      requiredDates: ["dateDebutPrevue"],
+      optionalDates: ["dateFinPrevue"],
+      requiredNumbers: ["siteId", "fournisseurId", "clientId"],
+    });
+    executeInsertIntervention(payload);
   };
 
   const isSubmitDisabled = !isDirty || isSubmitting || isSavingIntervention;

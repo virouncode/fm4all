@@ -6,8 +6,8 @@ import {
 } from "@/lib/queries/clients/getClients";
 import { getIntervention } from "@/lib/queries/interventions/getInterventions";
 import {
-  ClientUpdateInterventionFormType,
   InterventionStatusType,
+  UpdateInterventionFormType,
 } from "@/zod-schemas/intervention";
 import { ReactNode } from "react";
 import ClientUpdateInterventionForm from "./ClientUpdateInterventionForm";
@@ -74,10 +74,10 @@ const page = async ({
     return errorComponent;
   }
 
-  const defaultValues: ClientUpdateInterventionFormType = {
+  const defaultValues: UpdateInterventionFormType = {
     id: initialIntervention.id,
     titre: initialIntervention.titre,
-    description: initialIntervention.description,
+    description: initialIntervention.description ?? "",
     dateDebutPrevue: initialIntervention.dateDebutPrevue
       ? initialIntervention.dateDebutPrevue.toISOString()
       : "",
@@ -85,18 +85,16 @@ const page = async ({
       ? initialIntervention.dateFinPrevue.toISOString()
       : "",
     type: initialIntervention.type,
-    status: initialIntervention.status,
-    confirmeeClient: true,
-    confirmeeFournisseur: initialIntervention.confirmeeFournisseur,
-    siteId: initialIntervention.siteId,
-    fournisseurId: initialIntervention.fournisseurId,
+    siteId: initialIntervention.siteId.toString(),
+    clientId: initialIntervention.clientId.toString(),
+    fournisseurId: initialIntervention.fournisseurId.toString(),
   };
 
   const isReadOnly =
-    defaultValues.status === "annulee" ||
-    defaultValues.status === "en_cours" ||
-    defaultValues.status === "realisee" ||
-    defaultValues.status === "non_honoree";
+    initialIntervention.status === "annulee" ||
+    initialIntervention.status === "en_cours" ||
+    initialIntervention.status === "realisee" ||
+    initialIntervention.status === "non_honoree";
 
   return (
     <main className="flex h-full w-full flex-col overflow-hidden">
@@ -119,7 +117,7 @@ const page = async ({
                 className={`text-muted-foreground text-sm ${isReadOnly ? "text-red-500" : undefined}`}
               >
                 {isReadOnly
-                  ? `L'intervention ne peut être modifiée (lecture seule). Etat de l'intervention : ${toCodeTableName(defaultValues.status as InterventionStatusType, interventionStatusCT)}`
+                  ? `L'intervention ne peut être modifiée (lecture seule). Etat de l'intervention : ${toCodeTableName(initialIntervention.status as InterventionStatusType, interventionStatusCT)}`
                   : "Modifiez les détails de l'intervention ci-dessous"}
               </p>
             </div>

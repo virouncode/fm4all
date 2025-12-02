@@ -2,14 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import { useRouter } from "@/i18n/navigation";
-import { useClientStore } from "@/stores/clientStore";
 import { useDevisProgressStore } from "@/stores/devisProgressStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/shallow";
 
 const NextEtapePilotageButton = () => {
   const t = useTranslations("DevisPage");
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const { devisProgress, setDevisProgress } = useDevisProgressStore(
     useShallow((s) => ({
       devisProgress: s.devisProgress,
@@ -20,9 +20,10 @@ const NextEtapePilotageButton = () => {
 
   const handleClickNext = () => {
     const searchParams = new URLSearchParams();
-    if (client.effectif)
-      searchParams.set("effectif", client.effectif.toString());
-    if (client.surface) searchParams.set("surface", client.surface.toString());
+    if (prospect.effectif)
+      searchParams.set("effectif", prospect.effectif.toString());
+    if (prospect.surface)
+      searchParams.set("surface", prospect.surface.toString());
     const newCompletedSteps = [
       ...new Set([...devisProgress.completedSteps, 1, 2, 3]),
     ].sort((a, b) => a - b);

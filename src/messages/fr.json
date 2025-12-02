@@ -858,11 +858,11 @@
       "1-mes-locaux": "1. Mes locaux",
       "5-informations-seulement-pour-obtenir-tous-vos-devis": "5 informations seulement pour obtenir tous vos devis",
       "locauxForm": {
-        "code-postal": "Code postal*",
-        "surface-en-m": "Surface en m²*",
-        "nombre-moyen-de-personnes": "Nombre moyen de personnes*",
-        "type-de-batiment": "Type de bâtiment*",
-        "type-doccupation": "Type d'occupation*",
+        "code-postal": "Code postal",
+        "surface-en-m": "Surface en m²",
+        "nombre-moyen-de-personnes": "Nombre moyen de personnes",
+        "type-de-batiment": "Type de bâtiment",
+        "type-doccupation": "Type d'occupation",
         "afficher-les-tarifs": "Afficher les tarifs",
         "un-devis-est-deja-en-cours-souaitez-vous-recommencer-un-nouveau-devis-vos-informations-actuelles-seront-perdues": "Un devis est déjà en cours. Souaitez-vous recommencer un nouveau devis (vos informations actuelles seront perdues) ?",
         "annuler": "Annuler",
@@ -885,7 +885,9 @@
           "occupation": "Type d'occupation invalide",
           "codePostal": "Code postal invalide,entrez 5 chiffres"
         },
-        "le-code-postal-ne-correspond-a-aucune-ville-veullez-reessayer": "Le code postal ne correspond à aucune ville, veullez réessayer"
+        "le-code-postal-ne-correspond-a-aucune-ville-veuillez-reessayer": "Le code postal ne correspond à aucune ville, veullez réessayer",
+        "ville-non-verifiee": "Ville non vérifiée",
+        "nous-navons-pas-pu-verifier-la-ville-mais-vous-pouvez-continuer-votre-devis": "Nous n'avons pas pu vérifier la ville, mais vous pouvez continuer votre devis."
       },
       "cityOut": {
         "succes": "Succès ! 🎉",
@@ -1193,11 +1195,11 @@
       "impossible-de-sauvegarder-le-devis-veuillez-reessayer": "Impossible de sauvegarder le devis: veuillez réessayer",
       "veuillez-accepter-notre-politique-de-confidentialite-avant-de-continuer": "Veuillez accepter notre politique de confidentialité avant de  continuer",
       "dans-la-prochaine-etape-vous-allez-personnaliser-vos-services-et-choisir-des-options-avant-de-valider-votre-budget-final-afin-dameliorer-votre-experience-et-enregistrer-votre-progression-merci-de-renseigner-vos-informations-suivantes": "Dans la prochaine étape, vous allez personnaliser vos services et choisir des options avant de valider votre budget final. Afin d’améliorer votre expérience et enregistrer votre progression, merci de renseigner vos informations suivantes :",
-      "n-de-telephone": "N°de téléphone*",
-      "nom-de-lentreprise": "Nom de l'entreprise*",
-      "prenom-du-contact": "Prénom du contact*",
-      "nom-du-contact": "Nom du contact*",
-      "poste-du-contact": "Poste du contact*",
+      "n-de-telephone": "N°de téléphone",
+      "nom-de-lentreprise": "Nom de l'entreprise",
+      "prenom-du-contact": "Prénom du contact",
+      "nom-du-contact": "Nom du contact",
+      "poste-du-contact": "Poste du contact",
       "parce-que-nous-ne-sommes-pas-un-comparateur-en-ligne-comme-les-autres-avant-de-valider-cette-etape-voici": "Parce que nous ne sommes pas un comparateur en ligne comme les autres, avant de valider cette étape, voici",
       "3-engagements-que-nous-prenons-envers-vous": "3 engagements que nous prenons envers vous :",
       "engagement-n-1-vous-allez-bien-obtenir-un-devis-complet-et-definitif-100-en-ligne": "Engagement N°1 : Vous allez bien obtenir un devis complet et définitif 100% en ligne",
@@ -1225,7 +1227,8 @@
         "code-postal-obligatoire": "Code postal obligatoire",
         "code-postal-invalide-entrez-5-chiffres": "Code postal invalide, entrez 5 chiffres",
         "ville-obligatoire": "Ville obligatoire"
-      }
+      },
+      "impossible-de-generer-votre-devis-veuillez-reessayer": "Impossible de générer votre devis, veuillez réessayer"
     },
     "personnaliser": {
       "6-personnaliser-mon-devis": "6. Personnaliser mon devis",

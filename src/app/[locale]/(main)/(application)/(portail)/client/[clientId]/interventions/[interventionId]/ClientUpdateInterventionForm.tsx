@@ -4,10 +4,11 @@ import { updateInterventionAction } from "@/actions/interventionsActions";
 import { Form } from "@/components/ui/form";
 import { useConfirm } from "@/hooks/use-confirm";
 import { toast } from "@/hooks/use-toast";
+import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
 import {
-  clientUpdateInterventionFormSchema,
-  ClientUpdateInterventionFormType,
+  updateInterventionFormSchema,
+  UpdateInterventionFormType,
 } from "@/zod-schemas/intervention";
 import { SelectSiteType } from "@/zod-schemas/site";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,7 +18,7 @@ import { useForm } from "react-hook-form";
 import InterventionForm from "../../../../forms/InterventionForm";
 
 type ClientUpdateInterventionFormProps = {
-  defaultValues: ClientUpdateInterventionFormType;
+  defaultValues: UpdateInterventionFormType;
   clientId: number;
   sites: SelectSiteType[];
   fournisseurs: SelectFournisseurType[];
@@ -34,10 +35,10 @@ export default function ClientUpdateInterventionForm({
   const confirm = useConfirm();
   const router = useRouter();
 
-  const form = useForm<ClientUpdateInterventionFormType>({
+  const form = useForm<UpdateInterventionFormType>({
     defaultValues,
     mode: "onTouched",
-    resolver: zodResolver(clientUpdateInterventionFormSchema),
+    resolver: zodResolver(updateInterventionFormSchema),
   });
 
   const {
@@ -69,12 +70,12 @@ export default function ClientUpdateInterventionForm({
     },
   });
 
-  const submitForm = (data: ClientUpdateInterventionFormType) => {
-    const payload = {
-      ...data,
-      dateDebutPrevue: new Date(data.dateDebutPrevue),
-      dateFinPrevue: data.dateFinPrevue ? new Date(data.dateFinPrevue) : null,
-    };
+  const submitForm = (data: UpdateInterventionFormType) => {
+    const payload = normalizeForSubmit(data, {
+      requiredDates: ["dateDebutPrevue"],
+      optionalDates: ["dateFinPrevue"],
+      requiredNumbers: ["siteId", "clientId", "fournisseurId"],
+    });
     executeUpdateIntervention(payload);
   };
 
@@ -90,20 +91,17 @@ export default function ClientUpdateInterventionForm({
       danger: true,
     });
     if (!ok) return;
-    const payload = {
-      ...defaultValues,
-      dateDebutPrevue: new Date(defaultValues.dateDebutPrevue),
-      dateFinPrevue: defaultValues.dateFinPrevue
-        ? new Date(defaultValues.dateFinPrevue)
-        : null,
-      status: "annulee" as const,
-    };
-    executeUpdateIntervention(payload);
+    const payload = normalizeForSubmit(defaultValues, {
+      requiredDates: ["dateDebutPrevue"],
+      optionalDates: ["dateFinPrevue"],
+      requiredNumbers: ["siteId", "clientId", "fournisseurId"],
+    });
+    executeUpdateIntervention({ ...payload, status: "annulee" });
   };
 
   return (
     <Form {...form}>
-      <InterventionForm<ClientUpdateInterventionFormType>
+      <InterventionForm<UpdateInterventionFormType>
         mode="edit"
         onSubmit={form.handleSubmit(submitForm)}
         isSubmitting={isSubmitting}

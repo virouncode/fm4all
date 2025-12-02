@@ -10,7 +10,6 @@ const page = async ({
   const { clientId } = await params;
   const defaultValues: InsertUserType = {
     name: "",
-    password: "",
     firstName: "",
     lastName: "",
     phone: "",

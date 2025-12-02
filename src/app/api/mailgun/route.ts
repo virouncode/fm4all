@@ -6,22 +6,33 @@ import { z } from "zod";
 import { ApiResponseBody } from "../types/apiResponseBody";
 
 const emailSchema = z.object({
-  from: z.string().email(),
-  to: z.string().email(),
+  from: z.email(),
+  to: z.email(),
   subject: z.string().min(1, "Le sujet est obligatoire"),
-  text: z.string().min(1, "Le message est obligatoire"),
-  attachment: z.string().url().optional(),
+  text: z.string().min(1, "Le corps du message est obligatoire"),
+  html: z.string().optional(),
+  attachment: z.url().optional(),
   filename: z.string().optional(),
   nomDestinataire: z.string().optional(),
   prenomDestinataire: z.string().optional(),
+  useTemplate: z.boolean().optional(),
 });
 
-type EmailType = {
+type EmailWithTemplateType = {
   from: string;
   to: string[];
   subject: string;
   template: string;
   "h:X-Mailgun-Variables": string;
+  attachment?: { data: Buffer; filename: string };
+};
+
+type EmailWithoutTemplateType = {
+  from: string;
+  to: string[];
+  subject: string;
+  text: string;
+  html?: string;
   attachment?: { data: Buffer; filename: string };
 };
 
@@ -47,13 +58,13 @@ export async function POST(req: NextRequest) {
       return errorHandler(result.error);
     }
 
-    const data = result.data;
+    const parsedBody = result.data;
 
     let fileBuffer: Buffer | undefined;
 
-    if (data.attachment) {
+    if (parsedBody.attachment) {
       try {
-        const responseBlob = await fetch(data.attachment);
+        const responseBlob = await fetch(parsedBody.attachment);
         if (!responseBlob.ok)
           throw new Error("Impossible de récupérer la pièce jointe");
         const arrayBuffer = await responseBlob.arrayBuffer();
@@ -63,23 +74,50 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const emailOptions: EmailType = {
-      from: `fm4all: Le Facility Management pour tous <${data.from}>`,
-      to: [data.to, "viroun@fm4all.com"],
-      subject: data.subject,
+    if (parsedBody.useTemplate === false) {
+      const emailOptions: EmailWithoutTemplateType = {
+        from: `fm4all: Le Facility Management pour tous <${parsedBody.from}>`,
+        to: [parsedBody.to, "viroun@fm4all.com"],
+        subject: parsedBody.subject,
+        html: parsedBody.html ? parsedBody.html : undefined,
+        text: parsedBody.html ? undefined : parsedBody.text,
+      } as any;
+
+      if (fileBuffer) {
+        emailOptions.attachment = {
+          data: fileBuffer,
+          filename: parsedBody.filename ?? "attachment",
+        };
+      }
+
+      const response = await mg.messages.create("mg.fm4all.com", emailOptions);
+
+      const responseBody: ApiResponseBody = {
+        success: true,
+        message: "Email envoyé avec succès",
+        data: { id: response.id, message: response.message },
+      };
+      return NextResponse.json(responseBody, { status: 200 });
+    }
+
+    // Sinon : comportement actuel avec template
+    const emailOptions: EmailWithTemplateType = {
+      from: `fm4all: Le Facility Management pour tous <${parsedBody.from}>`,
+      to: [parsedBody.to, "viroun@fm4all.com"],
+      subject: parsedBody.subject,
       template: "general",
       "h:X-Mailgun-Variables": JSON.stringify({
-        nom_destinataire: data.nomDestinataire,
-        prenom_destinataire: data.prenomDestinataire,
-        corps_message: data.text,
-        subject: data.subject,
+        nom_destinataire: parsedBody.nomDestinataire,
+        prenom_destinataire: parsedBody.prenomDestinataire,
+        corps_message: parsedBody.text, // ici on est sûr que text reste raisonnable
+        subject: parsedBody.subject,
       }),
     };
 
     if (fileBuffer) {
       emailOptions.attachment = {
         data: fileBuffer,
-        filename: data.filename ?? "attachment",
+        filename: parsedBody.filename ?? "attachment",
       };
     }
 
@@ -92,6 +130,7 @@ export async function POST(req: NextRequest) {
     };
     return NextResponse.json(responseBody, { status: 200 });
   } catch (err) {
+    console.log(err);
     return errorHandler(err);
   }
 }

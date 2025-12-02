@@ -1,6 +1,6 @@
 import { toast } from "@/hooks/use-toast";
 import { useCafeStore } from "@/stores/cafeStore";
-import { useClientStore } from "@/stores/clientStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useTheStore } from "@/stores/theStore";
 import { useTotalCafeStore } from "@/stores/totalCafeStore";
 import { useTotalTheStore } from "@/stores/totalTheStore";
@@ -13,12 +13,12 @@ import { SelectLaitConsoTarifsType } from "@/zod-schemas/laitConsoTarifs";
 import { SelectSucreConsoTarifsType } from "@/zod-schemas/sucreConsoTarifs";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { useTranslations } from "next-intl";
+import { useShallow } from "zustand/shallow";
 import CafeEspaceForm from "../CafeEspaceForm";
 import CafeEspacePropositions from "../CafeEspacePropositions";
 import PreviousEspaceButton from "../PreviousEspaceButton";
 import { reinitialisationCafeThe } from "../reinitialisationCafeThe";
 import RetirerEspaceButton from "../RetirerEspaceButton";
-import { useShallow } from "zustand/shallow";
 
 type CafeEspaceProps = {
   espace: CafeEspaceType;
@@ -42,7 +42,7 @@ const CafeEspace = ({
   sucreConsoTarifs,
 }: CafeEspaceProps) => {
   const t = useTranslations("DevisPage.foodBeverage.cafe");
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const { cafe, setCafe } = useCafeStore(
     useShallow((s) => ({
       cafe: s.cafe,
@@ -68,13 +68,7 @@ const CafeEspace = ({
   const handleClickRemove = () => {
     if (cafeEspacesIds[0] === espace.infos.espaceId) {
       //Je reinitialise tout
-      reinitialisationCafeThe(
-        setCafe,
-        setThe,
-        setTotalCafe,
-        setTotalThe,
-        client,
-      );
+      reinitialisationCafeThe();
       return;
     }
     const indexOfCurrentEspace = cafeEspacesIds.indexOf(espace.infos.espaceId);

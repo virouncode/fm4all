@@ -1,16 +1,16 @@
 import WhyCard from "@/components/cards/WhyCard";
+import { usePersonnalisationStore } from "@/stores/personnalisationStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { Euro, Feather, Handshake, Rabbit, Waves } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMediaQuery } from "react-responsive";
-import NextServiceButton from "../../NextServiceButton";
-import { useClientStore } from "@/stores/clientStore";
-import { usePersonnalisationStore } from "@/stores/personnalisationStore";
 import { useShallow } from "zustand/shallow";
+import NextServiceButton from "../../NextServiceButton";
 
 const PersonnaliserPresentation = () => {
   const tPourquoi = useTranslations("HomePage.pourquoi");
   const tPersonnaliser = useTranslations("DevisPage.personnaliser");
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const { personnalisation, setPersonnalisation } = usePersonnalisationStore(
     useShallow((s) => ({
       personnalisation: s.personnalisation,
@@ -35,7 +35,7 @@ const PersonnaliserPresentation = () => {
     >
       <div className="flex flex-1 flex-col gap-4">
         <p className="mx-auto max-w-prose">
-          {client.prenomContact} {client.nomContact},{" "}
+          {prospect.prenomContact} {prospect.nomContact},{" "}
         </p>
         <p className="mx-auto max-w-prose">
           {tPersonnaliser(

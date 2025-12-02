@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MAX_EFFECTIF } from "@/constants/constants";
 import { TypesSnacksFruitsType } from "@/constants/typesSnacksFruits";
-import { useClientStore } from "@/stores/clientStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
 import { useTranslations } from "next-intl";
 
@@ -20,7 +20,7 @@ const SnacksFruitsDesktopInputs = ({
 }: SnacksFruitsDesktopInputsProps) => {
   const t = useTranslations("DevisPage");
   const tSnacks = useTranslations("DevisPage.foodBeverage.snacks");
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const snacksFruits = useSnacksFruitsStore((s) => s.snacksFruits);
   return (
     <form className="flex w-2/3 items-center gap-8 py-1">
@@ -67,7 +67,7 @@ const SnacksFruitsDesktopInputs = ({
       <div className="flex items-center gap-2">
         <Input
           className={`w-full max-w-xs min-w-20 ${
-            snacksFruits.quantites.nbPersonnes === client.effectif
+            snacksFruits.quantites.nbPersonnes === prospect.effectif
               ? "text-destructive"
               : ""
           }`}

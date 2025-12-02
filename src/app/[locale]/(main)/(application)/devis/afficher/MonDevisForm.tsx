@@ -1,35 +1,32 @@
 "use client";
 
-import { insertClientAction } from "@/actions/clientAction";
-import { insertDevisAction } from "@/actions/devisAction";
-import { DateInputWithLabel } from "@/components/form-inputs/DateInputWithLabel";
-import { InputWithLabel } from "@/components/form-inputs/InputWithLabel";
+import { finaliserDevisAction } from "@/actions/devisAction";
+import { RhfDatePicker } from "@/components/rhf/RhfDatePicker";
+import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Form } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
-import { batiments } from "@/constants/batiments";
+import { Spinner } from "@/components/ui/spinner";
 import { departements } from "@/constants/departements";
-import { occupation } from "@/constants/occupation";
 import useScrollIntoMonDevis from "@/hooks/use-scroll-into-mon-devis";
 import { toast } from "@/hooks/use-toast";
 import { Link, useRouter } from "@/i18n/navigation";
-import { sendEmailFromClient } from "@/lib/email/sendEmail";
 import { postVercelBlob } from "@/lib/queries/vercel-blob/postVercelBlob";
 import fillDevis from "@/lib/utils/fillDevis";
-import { useClientStore } from "@/stores/clientStore";
 import { useCommentairesStore } from "@/stores/commentairesStore";
 import { useMonDevisStore } from "@/stores/monDevisStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useTotalStore } from "@/stores/totalStore";
+import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
-  createUpdateClientSchema,
-  InsertClientType,
-  UpdateClientType,
-} from "@/zod-schemas/client";
+  createUpdateProspectFormSchema,
+  UpdateProspectFormType,
+  UpdateProspectType,
+} from "@/zod-schemas/prospect";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Loader } from "lucide-react";
 import { DateTime } from "luxon";
 import { useTranslations } from "next-intl";
 import { useAction } from "next-safe-action/hooks";
@@ -42,58 +39,47 @@ type MonDevisFormProps = {
 };
 
 const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
+  const [isLoading, setIsLoading] = useState(false);
   const tDevisErreurs = useTranslations("DevisPage.sauver.erreurs");
   const t = useTranslations("DevisPage.afficher");
   const tSauver = useTranslations("DevisPage.sauver");
-  const { client, setClient } = useClientStore(
+  const { prospect, setProspect } = useProspectStore(
     useShallow((s) => ({
-      client: s.client,
-      setClient: s.setClient,
+      prospect: s.prospect,
+      setProspect: s.setProspect,
     })),
   );
   const total = useTotalStore((s) => s.total);
   const commentaires = useCommentairesStore((s) => s.commentaires);
   const setMonDevis = useMonDevisStore((s) => s.setMonDevis);
-  const [loading, setLoading] = useState(false);
   const [accepte, setAccepte] = useState(false);
   const router = useRouter();
   useScrollIntoMonDevis();
 
-  const defaultValues: UpdateClientType = {
-    nomEntreprise: client.nomEntreprise ?? "",
-    siret: client.siret ?? "",
-    prenomContact: client.prenomContact ?? "",
-    nomContact: client.nomContact ?? "",
-    posteContact: client.posteContact ?? "",
-    emailContact: client.emailContact ?? "",
-    phoneContact: client.phoneContact ?? "",
-    prenomSignataire: client.prenomSignataire ?? "",
-    nomSignataire: client.nomSignataire ?? "",
-    posteSignataire: client.posteSignataire ?? "",
-    emailSignataire: client.emailSignataire ?? "",
-    surface: client.surface ?? 100,
-    effectif: client.effectif ?? 20,
-    typeBatiment: client.typeBatiment as
-      | "bureaux"
-      | "localCommercial"
-      | "entrepot"
-      | "cabinetMedical",
-    typeOccupation: client.typeOccupation as
-      | "partieEtage"
-      | "plateauComplet"
-      | "batimentEntier",
-    adresseLigne1: client.adresseLigne1 ?? "",
-    adresseLigne2: client.adresseLigne2 ?? "",
-    codePostal: client.codePostal ?? "",
-    ville: client.ville ?? "",
-    dateDeDemarrage: client.dateDeDemarrage ?? null,
-    commentaires: client.commentaires ?? "",
+  const defaultValues: UpdateProspectFormType = {
+    nomEntreprise: prospect.nomEntreprise ?? "",
+    siret: prospect.siret ?? "",
+    prenomContact: prospect.prenomContact ?? "",
+    nomContact: prospect.nomContact ?? "",
+    posteContact: prospect.posteContact ?? "",
+    emailContact: prospect.emailContact ?? "",
+    phoneContact: prospect.phoneContact ?? "",
+    prenomSignataire: prospect.prenomSignataire ?? "",
+    nomSignataire: prospect.nomSignataire ?? "",
+    posteSignataire: prospect.posteSignataire ?? "",
+    emailSignataire: prospect.emailSignataire ?? "",
+    adresseLigne1: prospect.adresseLigne1 ?? "",
+    adresseLigne2: prospect.adresseLigne2 ?? "",
+    codePostal: prospect.codePostal ?? "",
+    ville: prospect.ville ?? "",
+    dateDeDemarrage: prospect.dateDeDemarrage ?? "",
+    commentaires: prospect.commentaires ?? "",
   };
 
-  const form = useForm<UpdateClientType>({
-    mode: "all",
+  const form = useForm<UpdateProspectFormType>({
+    mode: "onTouched",
     resolver: zodResolver(
-      createUpdateClientSchema({
+      createUpdateProspectFormSchema({
         nomEntreprise: tDevisErreurs("nom-de-lentreprise-obligatoire"),
         siret: tDevisErreurs("siret-invalide-format-attendu-xxx-xxx-xxx-xxxxx"),
         prenomContact: tDevisErreurs("prenom-du-contact-obligatoire"),
@@ -102,11 +88,6 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
         emailContact: tDevisErreurs("adresse-email-invalide"),
         phoneContact: tDevisErreurs("numero-de-telephone-invalide"),
         emailSignataire: tDevisErreurs("adresse-email-invalide"),
-        surface: tDevisErreurs("surface-obligatoire"),
-        surfaceMax: tDevisErreurs("surface-maximum-3000-m"),
-        effectif: tDevisErreurs("effectif-obligatoire"),
-        effectifMax: tDevisErreurs("effectif-maximum-300-personnes"),
-
         codePostal: tDevisErreurs("code-postal-invalide-entrez-5-chiffres"),
         ville: tDevisErreurs("ville-obligatoire"),
       }),
@@ -114,11 +95,10 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
     defaultValues,
   });
 
-  const { execute: executeSaveClient, isPending: isSavingClient } = useAction(
-    insertClientAction,
-    {
-      onSuccess: async ({ data }) => {
-        if (!data?.success || !data?.data?.client) {
+  const { execute: executeFinaliserDevis, isPending: isSavingFinaliserDevis } =
+    useAction(finaliserDevisAction, {
+      onSuccess: ({ data }) => {
+        if (!data?.success || !data.data) {
           toast({
             variant: "destructive",
             title: t("erreur"),
@@ -126,184 +106,78 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
           });
           return;
         }
-        const newClientData = data?.data.client;
-        const numerosDevis = `${newClientData?.nomEntreprise}_${DateTime.local().toFormat(
-          "dd-MM-yyyy'T'HH:mm",
-        )}`;
-        const nomDevis = `Devis_fm4all_${numerosDevis}.pdf`;
-        setLoading(true);
-        try {
-          const url = await fillDevis(
-            numerosDevis,
-            format(new Date(), "dd/MM/yyyy", { locale: fr }),
-            "FM4ALL comparateur en ligne",
-            newClientData,
-            total.totalAnnuelHt,
-            total.totalInstallationHt,
-            commentaires ?? "",
-            newClientData.dateDeDemarrage
-              ? format(new Date(newClientData.dateDeDemarrage), "dd/MM/yyyy", {
-                  locale: fr,
-                })
-              : "",
-          );
-          if (!url) throw new Error("Erreur lors de la génération du devis.");
-
-          //Le Fichier du devis
-          const responseBlob = await fetch(url);
-          const blob = await responseBlob.blob();
-          const file = new File([blob], nomDevis);
-          //Dans vercel blob
-          const response = await postVercelBlob({
-            file,
-            filename: nomDevis,
-            foldername: "devis",
-          });
-          const urlToPost = response.url;
-          executeSaveDevis({
-            clientId: newClientData.id,
-            devisUrl: urlToPost,
-          });
-          setDevisUrl(urlToPost);
-          if (newClientData.nomContact !== "Kattygnarath") {
-            const response = await sendEmailFromClient({
-              to: "contact@fm4all.com",
-              from: "devis@fm4all.com",
-              subject: "Un client a finalisé son devis",
-              text: `<p>Un client a finalisé son devis.</p><br/>
-                            <p>Voici ses coordonnées :</p><br/>
-                            <p>Entreprise : ${newClientData.nomEntreprise}</p>
-                            <p>Siret : ${newClientData.siret}</p>
-                            <p>Adresse ligne 1 : ${newClientData.adresseLigne1}</p>
-                            <p>Adresse ligne 2 : ${newClientData.adresseLigne2}</p>
-                            <p>Code postal : ${newClientData.codePostal}</p>
-                            <p>Ville : ${newClientData.ville}</p>
-                            <p>Surface des locaux : ${newClientData.surface}</p>
-                            <p>Effectif : ${newClientData.effectif}</p>
-                            <p>Type de bâtiment : ${batiments.find(({ id }) => id === newClientData.typeBatiment)?.description}</p>
-                            <p>Type d'occupation : ${occupation.find(({ id }) => id === newClientData.typeOccupation)?.description}</p>
-                            <p>Nom du contact : ${newClientData.nomContact}</p>
-                            <p>Prénom du contact : ${newClientData.prenomContact}</p>
-                            <p>Poste du contact : ${newClientData.posteContact}</p>
-                            <p>Email du contact : ${newClientData.emailContact}</p>
-                            <p>N°Tél du contact : ${newClientData.phoneContact}</p>
-                            <p>Nom du signataire : ${newClientData.nomSignataire}</p>
-                            <p>Prénom du signataire : ${newClientData.prenomSignataire}</p>
-                            <p>Poste du signataire : ${newClientData.posteSignataire}</p>
-                            <p>Email du signataire : ${newClientData.emailSignataire}</p>
-                            <p>Date de démarrage : ${
-                              newClientData.dateDeDemarrage
-                                ? format(
-                                    new Date(newClientData.dateDeDemarrage),
-                                    "dd/MM/yyyy",
-                                    {
-                                      locale: fr,
-                                    },
-                                  )
-                                : newClientData.dateDeDemarrage
-                            }</p></br>
-                            <p>Commentaires du client : ${commentaires}</p><br/>
-                            <p>Veuillez trouver en pièce jointe le devis</p>
-                            `,
-              attachment: urlToPost,
-              filename: nomDevis,
-            });
-            if (!response.ok) {
-              response.json().then((body) =>
-                toast({
-                  variant: "destructive",
-                  title: t("erreur"),
-                  description: body?.message ?? t("une-erreur-est-survenue"),
-                }),
-              );
-              return;
-            }
-          }
-          setMonDevis({ currentMonDevisId: 2 });
-        } catch (err) {
-          toast({
-            variant: "destructive",
-            title: t("erreur"),
-            description:
-              err instanceof Error ? err.message : t("une-erreur-est-survenue"),
-          });
-        } finally {
-          setLoading(false);
-        }
-        // toast({
-        //   variant: "default",
-        //   title: tSauver("succes"),
-        //   description: data?.message,
-        // });
-      },
-      onError: ({ error }) => {
-        toast({
-          variant: "destructive",
-          title: tSauver("erreur"),
-          description:
-            error?.serverError ??
-            tSauver(
-              "impossible-de-sauvegarder-vos-coordonnees-veuillez-reessayer",
-            ),
-        });
-      },
-    },
-  );
-
-  const { execute: executeSaveDevis, isPending: isSavingDevis } = useAction(
-    insertDevisAction,
-    {
-      onSuccess: ({ data }) => {
-        if (!data?.success) {
-          return toast({
-            variant: "destructive",
-            title: tSauver("erreur"),
-            description: data?.message,
-          });
-        }
+        setProspect(data.data.prospect);
+        setDevisUrl(data.data.devisUrl);
+        setMonDevis({ currentMonDevisId: 2 });
         toast({
           variant: "default",
           title: tSauver("succes"),
-          description: data?.message,
+          description: data.message,
         });
       },
       onError: ({ error }) => {
+        console.error("[finaliserDevisAction error]", error);
+        // Pour voir plus clair :
+        console.log("serverError:", error.serverError);
+        console.log("validationErrors:", (error as any).validationErrors);
+
         toast({
           variant: "destructive",
           title: tSauver("erreur"),
           description:
             error?.serverError ??
-            tSauver("impossible-de-sauvegarder-le-devis-veuillez-reessayer"),
+            tSauver("impossible-de-generer-votre-devis-veuillez-reessayer"),
         });
       },
-    },
-  );
+    });
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
-    setClient((prev) => ({
+    setProspect((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
-  const handleChangeDate = (date: string | null) => {
-    setClient((prev) => ({
+  const handleChangeDate = (value: string) => {
+    setProspect((prev) => ({
       ...prev,
-      dateDeDemarrage: date,
+      dateDeDemarrage: value,
     }));
   };
 
-  const submitForm = async (data: UpdateClientType) => {
+  const submitForm = async (data: UpdateProspectFormType) => {
+    if (!accepte) {
+      toast({
+        variant: "destructive",
+        title: tSauver("erreur"),
+        description: t(
+          "en-cochant-cette-case-je-reconnais-avoir-lu-compris-et-accepte-sans-reserve-les",
+        ),
+      });
+      return;
+    }
+
+    if (!prospect.id) {
+      toast({
+        variant: "destructive",
+        title: t("erreur"),
+        description: t(
+          "impossible-de-finaliser-votre-devis-aucun-prospect-associe",
+        ),
+      });
+      return;
+    }
+
     if (
       !departements.find(({ id }) => id === data.codePostal?.substring(0, 2))
     ) {
       router.push("/chalandise");
       return;
     }
-    //La ville existe ?
+    setIsLoading(true);
     try {
       const response = await fetch(
         `https://geo.api.gouv.fr/communes?codePostal=${data.codePostal}`,
@@ -318,37 +192,95 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
             "le-code-postal-ne-correspond-a-aucune-ville-veuillez-reessayer",
           ),
         });
+        setIsLoading(false);
         return;
       }
     } catch (err) {
       console.log(err);
     }
-    const clientToPost: InsertClientType = {
-      nomEntreprise: data.nomEntreprise ?? "",
-      siret: data.siret ?? "",
-      prenomContact: data.prenomContact ?? "",
-      nomContact: data.nomContact ?? "",
-      posteContact: data.posteContact ?? "",
-      emailContact: data.emailContact ?? "",
-      phoneContact: data.phoneContact ?? "",
-      emailSignataire: data.emailSignataire ?? "",
-      surface: data.surface ?? 100,
-      effectif: data.effectif ?? 20,
-      typeBatiment: data.typeBatiment,
-      typeOccupation: data.typeOccupation,
-      codePostal: data.codePostal ?? "",
-      ville: data.ville ?? "",
-      id: client.id,
-      prenomSignataire: data.prenomSignataire,
-      nomSignataire: data.nomSignataire,
-      posteSignataire: data.posteSignataire,
-      adresseLigne1: data.adresseLigne1,
-      adresseLigne2: data.adresseLigne2,
-      dateDeDemarrage: data.dateDeDemarrage,
-      commentaires: data.commentaires,
-      createdAt: data.createdAt,
-    };
-    executeSaveClient(clientToPost);
+
+    // 1) fusionner prospect store + valeurs form
+    const merged = { ...prospect, ...data };
+
+    // 2) normaliser pour la base (surface/effectif → number, trim, capitalize, etc.)
+    const payload = normalizeForSubmit(merged, {
+      requiredNumbers: ["surface", "effectif"] as const,
+      optionalStrings: [
+        "siret",
+        "prenomSignataire",
+        "nomSignataire",
+        "posteSignataire",
+        "emailSignataire",
+        "adresseLigne1",
+        "adresseLigne2",
+        "commentaires",
+        "dateDeDemarrage",
+      ] as const,
+    });
+
+    try {
+      // 3) générer le PDF côté client avec ce prospect normalisé
+      const numerosDevis = `${payload.nomEntreprise}_${DateTime.local().toFormat(
+        "dd-MM-yyyy'T'HH:mm",
+      )}`;
+      const nomDevis = `Devis_fm4all_${numerosDevis}.pdf`;
+
+      const urlTemp = await fillDevis(
+        numerosDevis,
+        format(new Date(), "dd/MM/yyyy", { locale: fr }),
+        "FM4ALL comparateur en ligne",
+        payload as UpdateProspectType,
+        total.totalAnnuelHt ?? 0,
+        total.totalInstallationHt ?? 0,
+        commentaires ?? "",
+        payload.dateDeDemarrage
+          ? format(new Date(payload.dateDeDemarrage), "dd/MM/yyyy", {
+              locale: fr,
+            })
+          : "",
+      );
+
+      if (!urlTemp) {
+        toast({
+          variant: "destructive",
+          title: t("erreur"),
+          description: t("une-erreur-est-survenue"),
+        });
+
+        setIsLoading(false);
+        return;
+      }
+      // 4) uploader le PDF vers Vercel Blob
+      const responseBlob = await fetch(urlTemp);
+      const blob = await responseBlob.blob();
+      const file = new File([blob], nomDevis, {
+        type: "application/pdf",
+      });
+
+      const uploadResponse = await postVercelBlob({
+        file,
+        filename: nomDevis,
+        foldername: "devis",
+      });
+
+      const finalDevisUrl = uploadResponse.url;
+
+      // 5) appeler la server action avec prospectToUpdate + finalDevisUrl
+      executeFinaliserDevis({
+        prospect: payload as UpdateProspectType,
+        devisUrl: finalDevisUrl,
+        commentaires: commentaires ?? "",
+      });
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: t("erreur"),
+        description: t("une-erreur-est-survenue"),
+      });
+      setIsLoading(false);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -357,7 +289,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
       id="1"
     >
       <p className="text-2xl font-bold">
-        {t("felicitations")} {client.prenomContact} {client.nomContact} !
+        {t("felicitations")} {prospect.prenomContact} {prospect.nomContact} !
       </p>
       <p className="text-lg">{t("votre-devis-final-est-pret")}</p>
       <p className="mx-auto max-w-prose text-base text-wrap hyphens-auto">
@@ -375,123 +307,117 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
           <div className="flex w-full flex-1 flex-col gap-4">
             <div className="flex flex-col gap-4 lg:flex-row lg:gap-20">
               <div className="flex w-full flex-col lg:w-1/4">
-                <InputWithLabel<InsertClientType>
-                  fieldTitle={t("prenom-du-contact")}
-                  nameInSchema="prenomContact"
+                <RhfInput<UpdateProspectFormType>
+                  label={t("prenom-du-contact")}
                   name="prenomContact"
-                  handleChange={handleChange}
+                  onChange={handleChange}
+                  requiredMark
                   className="w-full"
                 />
-                <InputWithLabel<InsertClientType>
-                  fieldTitle={t("nom-du-contact")}
-                  nameInSchema="nomContact"
+                <RhfInput<UpdateProspectFormType>
+                  label={t("nom-du-contact")}
                   name="nomContact"
-                  handleChange={handleChange}
+                  onChange={handleChange}
+                  requiredMark
                   className="w-full"
                 />
-                <InputWithLabel<InsertClientType>
-                  fieldTitle={t("email-du-contact")}
-                  nameInSchema="emailContact"
+                <RhfInput<UpdateProspectFormType>
+                  label={t("email-du-contact")}
                   type="email"
                   name="emailContact"
-                  handleChange={handleChange}
+                  onChange={handleChange}
+                  requiredMark
                   className="w-full"
                 />
-                <InputWithLabel<InsertClientType>
-                  fieldTitle={t("poste-du-contact")}
-                  nameInSchema="posteContact"
+                <RhfInput<UpdateProspectFormType>
+                  label={t("poste-du-contact")}
                   name="posteContact"
-                  handleChange={handleChange}
+                  onChange={handleChange}
+                  requiredMark
                   className="w-full"
                 />
               </div>
               <div className="flex w-full flex-col lg:w-1/4">
-                <InputWithLabel<InsertClientType>
-                  fieldTitle={t("prenom-du-signataire")}
-                  nameInSchema="prenomSignataire"
+                <RhfInput<UpdateProspectFormType>
+                  label={t("prenom-du-signataire")}
                   name="prenomSignataire"
-                  handleChange={handleChange}
+                  onChange={handleChange}
                   className="w-full"
                 />
-                <InputWithLabel<InsertClientType>
-                  fieldTitle={t("nom-du-signataire")}
-                  nameInSchema="nomSignataire"
+                <RhfInput<UpdateProspectFormType>
+                  label={t("nom-du-signataire")}
                   name="nomSignataire"
-                  handleChange={handleChange}
+                  onChange={handleChange}
                   className="w-full"
                 />
-                <InputWithLabel<InsertClientType>
-                  fieldTitle={t("email-du-signataire")}
-                  nameInSchema="emailSignataire"
+                <RhfInput<UpdateProspectFormType>
+                  label={t("email-du-signataire")}
                   type="email"
                   name="emailSignataire"
-                  handleChange={handleChange}
+                  onChange={handleChange}
                   className="w-full"
                 />
-                <InputWithLabel<InsertClientType>
-                  fieldTitle={t("poste-du-signataire")}
-                  nameInSchema="posteSignataire"
+                <RhfInput<UpdateProspectFormType>
+                  label={t("poste-du-signataire")}
                   name="posteSignataire"
-                  handleChange={handleChange}
+                  onChange={handleChange}
                   className="w-full"
                 />
               </div>
               <div className="flex w-full flex-col lg:w-1/4">
-                <InputWithLabel<InsertClientType>
-                  fieldTitle={t("nom-de-lentreprise")}
-                  nameInSchema="nomEntreprise"
+                <RhfInput<UpdateProspectFormType>
+                  label={t("nom-de-lentreprise")}
                   name="nomEntreprise"
-                  handleChange={handleChange}
+                  onChange={handleChange}
+                  requiredMark
                   className="w-full"
                 />
-                <InputWithLabel<InsertClientType>
-                  fieldTitle={t("siret")}
-                  nameInSchema="siret"
+                <RhfInput<UpdateProspectFormType>
+                  label={t("siret")}
                   name="siret"
-                  handleChange={handleChange}
+                  onChange={handleChange}
                   className="w-full"
                 />
-                <InputWithLabel<InsertClientType>
-                  fieldTitle={t("n-de-telephone")}
-                  nameInSchema="phoneContact"
+                <RhfInput<UpdateProspectFormType>
+                  label={t("n-de-telephone")}
                   name="phoneContact"
-                  handleChange={handleChange}
+                  onChange={handleChange}
+                  requiredMark
                   className="w-full"
                 />
-                <DateInputWithLabel<InsertClientType>
-                  fieldTitle={t("date-de-demarrage")}
-                  nameInSchema="dateDeDemarrage"
-                  handleChangeDate={handleChangeDate}
+                <RhfDatePicker<UpdateProspectFormType>
+                  label={t("date-de-demarrage")}
+                  name="dateDeDemarrage"
+                  onChange={handleChangeDate}
+                  requiredMark
+                  className="w-full"
                 />
               </div>
-
               <div className="flex w-full flex-col lg:w-1/4">
-                <InputWithLabel<InsertClientType>
-                  fieldTitle={t("addresse-du-site-ligne-1")}
-                  nameInSchema="adresseLigne1"
-                  name="addressLigne1"
-                  handleChange={handleChange}
+                <RhfInput<UpdateProspectFormType>
+                  label={t("addresse-du-site-ligne-1")}
+                  name="adresseLigne1"
+                  onChange={handleChange}
                   className="w-full"
                 />
-                <InputWithLabel<InsertClientType>
-                  fieldTitle={t("addresse-du-site-ligne-2")}
-                  nameInSchema="adresseLigne2"
+                <RhfInput<UpdateProspectFormType>
+                  label={t("addresse-du-site-ligne-2")}
                   name="adresseLigne2"
-                  handleChange={handleChange}
+                  onChange={handleChange}
                   className="w-full"
                 />
-                <InputWithLabel<InsertClientType>
-                  fieldTitle={t("code-postal")}
-                  nameInSchema="codePostal"
+                <RhfInput<UpdateProspectFormType>
+                  label={t("code-postal")}
                   name="codePostal"
-                  handleChange={handleChange}
+                  onChange={handleChange}
+                  requiredMark
                   className="w-full"
                 />
-                <InputWithLabel<InsertClientType>
-                  fieldTitle={t("ville")}
-                  nameInSchema="ville"
+                <RhfInput<UpdateProspectFormType>
+                  label={t("ville")}
                   name="ville"
-                  handleChange={handleChange}
+                  onChange={handleChange}
+                  requiredMark
                   className="w-full"
                 />
               </div>
@@ -523,16 +449,11 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
               <Button
                 size="lg"
                 className="min-w-[200px] text-base"
-                disabled={
-                  loading || isSavingClient || isSavingDevis || !accepte
-                }
+                disabled={isSavingFinaliserDevis || isLoading || !accepte}
                 data-testid="afficher-devis-button"
               >
-                {loading || isSavingClient || isSavingDevis ? (
-                  <Loader className="animate-spin" />
-                ) : (
-                  t("afficher-mon-devis")
-                )}
+                {(isSavingFinaliserDevis || isLoading) && <Spinner />}
+                {t("afficher-mon-devis")}
               </Button>
             </div>
           </div>

@@ -11,6 +11,7 @@ type PersonnalisationStore = {
       | PersonnalisationType
       | ((prev: PersonnalisationType) => PersonnalisationType),
   ) => void;
+  reset: () => void;
 };
 
 export const usePersonnalisationStore = create<PersonnalisationStore>()(
@@ -25,6 +26,13 @@ export const usePersonnalisationStore = create<PersonnalisationStore>()(
           personnalisation:
             typeof value === "function" ? value(state.personnalisation) : value,
         })),
+      reset: () =>
+        set({
+          personnalisation: {
+            currentPersonnalisationId: 1,
+            personnalisationIds: [1],
+          },
+        }),
     }),
     { name: "personnalisation" },
   ),

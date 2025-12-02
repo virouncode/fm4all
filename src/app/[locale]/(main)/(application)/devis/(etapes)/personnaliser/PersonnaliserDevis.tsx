@@ -1,6 +1,7 @@
 "use client";
 import { usePersonnalisation } from "@/hooks/use-personnalisation";
 import useScrollIntoPersonnalisation from "@/hooks/use-scroll-into-personnalisation";
+import { usePersonnalisationStore } from "@/stores/personnalisationStore";
 import { SelectAlarmesTarifsType } from "@/zod-schemas/alarmesTarifs";
 import { SelectColonnesSechesTarifsType } from "@/zod-schemas/colonnesSechesTarifs";
 import { SelectExutoiresTarifsType } from "@/zod-schemas/exutoiresTarifs";
@@ -11,7 +12,6 @@ import PersonnaliserNettoyageVitrerie from "./(nettoyage)/PersonnaliserNettoyage
 import PersonnaliserCommentaires from "./PersonnaliserCommentaires";
 import PersonnaliserFinal from "./PersonnaliserFinal";
 import PersonnaliserPresentation from "./PersonnaliserPresentation";
-import { usePersonnalisationStore } from "@/stores/personnalisationStore";
 
 type PersonnaliserDevisProps = {
   exutoiresTarifs?: SelectExutoiresTarifsType[];

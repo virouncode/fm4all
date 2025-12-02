@@ -65,12 +65,12 @@ const page = async ({
   const defaultValues: InsertTicketFormType = {
     titre: "",
     categorie: "autre",
-    fournisseurId: 0,
+    fournisseurId: "0",
     description: "",
     priorite: "normale",
     status: "nouveau",
     attachments: [],
-    siteId: sites[0].id,
+    siteId: sites[0].id.toString(),
   };
 
   return (

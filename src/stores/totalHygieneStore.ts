@@ -7,6 +7,7 @@ interface TotalHygieneStore {
   setTotalHygiene: (
     value: TotalHygieneType | ((prev: TotalHygieneType) => TotalHygieneType),
   ) => void;
+  reset: () => void;
 }
 
 export const useTotalHygieneStore = create<TotalHygieneStore>()(
@@ -25,7 +26,19 @@ export const useTotalHygieneStore = create<TotalHygieneStore>()(
           totalHygiene:
             typeof value === "function" ? value(state.totalHygiene) : value,
         })),
+      reset: () =>
+        set({
+          totalHygiene: {
+            totalTrilogie: null,
+            totalDesinfectant: null,
+            totalParfum: null,
+            totalBalai: null,
+            totalPoubelle: null,
+            totalInstallation: null,
+          },
+        }),
     }),
+
     {
       name: "totalHygiene",
     },

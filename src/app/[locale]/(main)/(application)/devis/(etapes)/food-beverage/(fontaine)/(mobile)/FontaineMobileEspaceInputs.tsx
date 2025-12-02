@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/select";
 import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/constants/constants";
 import { locationFontaine } from "@/constants/locationFontaine";
-import { useClientStore } from "@/stores/clientStore";
 import { useFontainesStore } from "@/stores/fontainesStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -46,7 +46,7 @@ const FontaineMobileEspaceInputs = ({
   const tLocation = useTranslations("DevisPage.location");
 
   const fontaines = useFontainesStore((s) => s.fontaines);
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   return (
     <div className="flex flex-col gap-8">
       {espace.infos.espaceId === fontainesEspacesIds[0] && (
@@ -144,7 +144,7 @@ const FontaineMobileEspaceInputs = ({
           <div className="flex items-center gap-2">
             <Input
               className={`w-16 max-w-xs min-w-20 ${
-                nbPersonnes === client.effectif ? "text-destructive" : ""
+                nbPersonnes === prospect.effectif ? "text-destructive" : ""
               }`}
               type="number"
               min={1}

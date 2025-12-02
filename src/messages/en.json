@@ -858,11 +858,11 @@
       "1-mes-locaux": "1. My premises",
       "5-informations-seulement-pour-obtenir-tous-vos-devis": "Only 5 pieces of information to receive all your quotes.",
       "locauxForm": {
-        "code-postal": "Postal code*",
-        "surface-en-m": "Surface area in m²*",
-        "nombre-moyen-de-personnes": "Average number of people*",
-        "type-de-batiment": "Building type*",
-        "type-doccupation": "Type of occupancy*",
+        "code-postal": "Postal code",
+        "surface-en-m": "Surface area in m²",
+        "nombre-moyen-de-personnes": "Average number of people",
+        "type-de-batiment": "Building type",
+        "type-doccupation": "Type of occupancy",
         "afficher-les-tarifs": "Show prices",
         "un-devis-est-deja-en-cours-souaitez-vous-recommencer-un-nouveau-devis-vos-informations-actuelles-seront-perdues": "A quote is already in progress. Would you like to start a new quote (your current information will be lost)?",
         "annuler": "Cancel",
@@ -885,7 +885,9 @@
           "occupation": "Invalid type of occupancy",
           "codePostal": "Invalid postal code, enter 5 digits"
         },
-        "le-code-postal-ne-correspond-a-aucune-ville-veullez-reessayer": "The postal code does not match any city, please try again"
+        "le-code-postal-ne-correspond-a-aucune-ville-veuillez-reessayer": "The postal code does not match any city, please try again",
+        "ville-non-verifiee": "City not verified",
+        "nous-navons-pas-pu-verifier-la-ville-mais-vous-pouvez-continuer-votre-devis": "We could not verify the city, but you can continue your quote"
       },
       "cityOut": {
         "succes": "Success! 🎉",
@@ -1193,11 +1195,11 @@
       "impossible-de-sauvegarder-le-devis-veuillez-reessayer": "Unable to save the quote: please try again",
       "veuillez-accepter-notre-politique-de-confidentialite-avant-de-continuer": "Please accept our privacy policy before continuing",
       "dans-la-prochaine-etape-vous-allez-personnaliser-vos-services-et-choisir-des-options-avant-de-valider-votre-budget-final-afin-dameliorer-votre-experience-et-enregistrer-votre-progression-merci-de-renseigner-vos-informations-suivantes": "In the next step, you will customize your services and choose options before validating your final budget. To improve your experience and save your progress, please provide the following information:",
-      "n-de-telephone": "Phone number*",
-      "nom-de-lentreprise": "Company name*",
-      "prenom-du-contact": "Contact first name*",
-      "nom-du-contact": "Contact last name*",
-      "poste-du-contact": "Job title*",
+      "n-de-telephone": "Phone number",
+      "nom-de-lentreprise": "Company name",
+      "prenom-du-contact": "Contact first name",
+      "nom-du-contact": "Contact last name",
+      "poste-du-contact": "Job title",
       "parce-que-nous-ne-sommes-pas-un-comparateur-en-ligne-comme-les-autres-avant-de-valider-cette-etape-voici": "Because we are not an online comparison tool like the others, before validating this step, here are",
       "3-engagements-que-nous-prenons-envers-vous": "3 commitments we make to you:",
       "engagement-n-1-vous-allez-bien-obtenir-un-devis-complet-et-definitif-100-en-ligne": "Commitment #1: You will receive a complete and final quote 100% online",
@@ -1225,7 +1227,8 @@
         "code-postal-obligatoire": "Postal code required",
         "code-postal-invalide-entrez-5-chiffres": "Invalid postal code, enter 5 digits",
         "ville-obligatoire": "City required"
-      }
+      },
+      "impossible-de-generer-votre-devis-veuillez-reessayer": "Unable to generate your quote, please try again"
     },
     "personnaliser": {
       "6-personnaliser-mon-devis": "6. Customize my quote",

@@ -1,8 +1,8 @@
 import { MAJORATION_DIMANCHE } from "@/constants/constants";
 import { toast } from "@/hooks/use-toast";
-import { useClientStore } from "@/stores/clientStore";
 import { useHygieneStore } from "@/stores/hygieneStore";
 import { useNettoyageStore } from "@/stores/nettoyageStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useTotalHygieneStore } from "@/stores/totalHygieneStore";
 import { useTotalNettoyageStore } from "@/stores/totalNettoyageStore";
 import { gammes, GammeType } from "@/zod-schemas/gamme";
@@ -17,9 +17,9 @@ import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";
 import { useTranslations } from "next-intl";
 import { useMediaQuery } from "react-responsive";
+import { useShallow } from "zustand/shallow";
 import NettoyageMobilePropositions from "../(mobile)/NettoyageMobilePropositions";
 import NettoyageDesktopPropositions from "./NettoyageDesktopPropositions";
-import { useShallow } from "zustand/shallow";
 
 type NettoyagePropositionsProps = {
   nettoyageQuantites: SelectNettoyageQuantitesType[];
@@ -46,7 +46,7 @@ const NettoyagePropositions = ({
 }: NettoyagePropositionsProps) => {
   const t = useTranslations("DevisPage");
   const tNettoyage = useTranslations("DevisPage.services.nettoyage");
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const hygiene = useHygieneStore((s) => s.hygiene);
   const { nettoyage, setNettoyage } = useNettoyageStore(
     useShallow((s) => ({
@@ -57,8 +57,10 @@ const NettoyagePropositions = ({
   const setHygiene = useHygieneStore((s) => s.setHygiene);
   const setTotalNettoyage = useTotalNettoyageStore((s) => s.setTotalNettoyage);
   const setTotalHygiene = useTotalHygieneStore((s) => s.setTotalHygiene);
-  const effectif = client.effectif ?? 0;
-  const surface = client.surface ?? 0;
+  const resetTotalNettoyage = useTotalNettoyageStore((s) => s.reset);
+  const resetTotalHygiene = useTotalHygieneStore((s) => s.reset);
+  const effectif = prospect.effectif ?? 0;
+  const surface = prospect.surface ?? 0;
 
   //Calcul des propositions
   const propositions = nettoyageTarifs.map((item) => {
@@ -194,13 +196,7 @@ const NettoyagePropositions = ({
           fraisDeplacementVitrerie: null,
         },
       }));
-      setTotalNettoyage({
-        totalService: null,
-        totalRepasse: null,
-        totalSamedi: null,
-        totalDimanche: null,
-        totalVitrerie: null,
-      });
+      resetTotalNettoyage();
       setHygiene((prev) => ({
         ...prev,
         infos: {
@@ -227,14 +223,7 @@ const NettoyagePropositions = ({
           minFacturation: null,
         },
       }));
-      setTotalHygiene({
-        totalTrilogie: null,
-        totalDesinfectant: null,
-        totalParfum: null,
-        totalBalai: null,
-        totalPoubelle: null,
-        totalInstallation: null,
-      });
+      resetTotalHygiene();
       return;
     }
     //Je coche la proposition
@@ -275,6 +264,10 @@ const NettoyagePropositions = ({
     const fraisDeplacementVitrerie = vitrerieTarif?.fraisDeplacement ?? null;
     const cadenceVitres = vitrerieTarif?.cadenceVitres ?? null;
     const cadenceCloisons = vitrerieTarif?.cadenceCloisons ?? null;
+
+    const surfaceCloisons =
+      nettoyage.quantites.surfaceCloisons ?? surface * 0.15;
+    const surfaceVitres = nettoyage.quantites.surfaceVitres ?? surface * 0.15;
 
     setNettoyage((prev) => ({
       infos: {
@@ -323,8 +316,8 @@ const NettoyagePropositions = ({
       tauxHoraireVitrerie !== null
         ? nettoyage.quantites.nbPassagesVitrerie *
           Math.max(
-            ((surface * 0.15) / cadenceVitres) * tauxHoraireVitrerie +
-              ((surface * 0.15) / cadenceCloisons) * tauxHoraireVitrerie,
+            (surfaceVitres / cadenceVitres) * tauxHoraireVitrerie +
+              (surfaceCloisons / cadenceCloisons) * tauxHoraireVitrerie,
             minFacturationVitrerie ?? 0,
           )
         : null;

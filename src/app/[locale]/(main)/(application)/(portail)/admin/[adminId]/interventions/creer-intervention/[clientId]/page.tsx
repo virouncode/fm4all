@@ -3,7 +3,7 @@ import {
   getClientFournisseurs,
   getClientSites,
 } from "@/lib/queries/clients/getClients";
-import { InsertInterventionType } from "@/zod-schemas/intervention";
+import { InsertInterventionFormType } from "@/zod-schemas/intervention";
 import { ReactNode } from "react";
 import NouveauInterventionForm from "./NouveauInterventionForm";
 
@@ -63,13 +63,15 @@ const page = async ({
     return errorComponent;
   }
 
-  const defaultValues: InsertInterventionType = {
+  const defaultValues: InsertInterventionFormType = {
     titre: "",
-    description: "",
     type: "corrective",
-    siteId: sites[0].id,
-    fournisseurId: fournisseurs[0].id,
-    clientId: parseInt(clientId),
+    siteId: sites[0].id.toString(),
+    clientId,
+    fournisseurId: fournisseurs[0].id.toString(),
+    dateDebutPrevue: "",
+    dateFinPrevue: "",
+    description: "",
   };
 
   return (

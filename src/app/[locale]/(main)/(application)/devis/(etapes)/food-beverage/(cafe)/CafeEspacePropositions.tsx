@@ -13,8 +13,8 @@ import { roundEffectif } from "@/lib/utils/roundEffectif";
 import { roundNbPersonnesCafeConso } from "@/lib/utils/roundNbPersonnesCafeConso";
 import { roundNbPersonnesCafeMachines } from "@/lib/utils/roundNbPersonnesCafeMachines";
 import { useCafeStore } from "@/stores/cafeStore";
-import { useClientStore } from "@/stores/clientStore";
 import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
 import { useTheStore } from "@/stores/theStore";
 import { useTotalCafeStore } from "@/stores/totalCafeStore";
@@ -34,7 +34,6 @@ import { useMediaQuery } from "react-responsive";
 import { useShallow } from "zustand/shallow";
 import CafeDesktopEspacePropositions from "./(desktop)/CafeDesktopEspacePropositions";
 import CafeMobileEspacePropositions from "./(mobile)/CafeMobileEspacePropositions";
-import { client } from "@/sanity/lib/client";
 
 type CafeEspacePropositionsProps = {
   espace: CafeEspaceType;
@@ -59,7 +58,7 @@ const CafeEspacePropositions = ({
 }: CafeEspacePropositionsProps) => {
   const tCafe = useTranslations("DevisPage.foodBeverage.cafe");
   const t = useTranslations("DevisPage");
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const snacksFruits = useSnacksFruitsStore((s) => s.snacksFruits);
   const setFoodBeverage = useFoodBeverageStore((s) => s.setFoodBeverage);
   const { cafe, setCafe } = useCafeStore(
@@ -83,7 +82,7 @@ const CafeEspacePropositions = ({
 
   //Calcul des propositions
   const cafeEspacesIds = cafe.espaces.map((espace) => espace.infos.espaceId);
-  const effectif = client.effectif ?? 0;
+  const effectif = prospect.effectif ?? 0;
   const nbPersonnes =
     espace.quantites.nbPersonnes ??
     (effectif > MAX_NB_PERSONNES_PAR_ESPACE
@@ -770,7 +769,7 @@ const CafeEspacePropositions = ({
             tarif.fournisseurId === fournisseurId,
         );
         const itemTypeLait =
-          espace.infos.typeBoissons !== "cafe"
+          item.infos.typeBoissons !== "cafe"
             ? itemMachinesTarifFournisseur?.typeLait
             : null;
         const itemPrixUnitaireConsoLait =
@@ -788,7 +787,7 @@ const CafeEspacePropositions = ({
             tarif.fournisseurId === fournisseurId,
         );
         const itemTypeChocolat =
-          espace.infos.typeBoissons === "chocolat"
+          item.infos.typeBoissons === "chocolat"
             ? itemMachinesTarifFournisseur?.typeChocolat
             : null;
         const itemPrixUnitaireConsoChocolat =
@@ -812,10 +811,10 @@ const CafeEspacePropositions = ({
         const itemTotalConso =
           (itemPrixUnitaireConsoCafe ?? 0) * itemNbTassesParAn +
           (itemPrixUnitaireConsoSucre ?? 0) * itemNbTassesParAn * RATIO_SUCRE +
-          (espace.infos.typeBoissons !== "cafe"
+          (item.infos.typeBoissons !== "cafe"
             ? (itemPrixUnitaireConsoLait ?? 0) * itemNbTassesParAn * RATIO_LAIT
             : 0) +
-          (espace.infos.typeBoissons === "chocolat"
+          (item.infos.typeBoissons === "chocolat"
             ? (itemPrixUnitaireConsoChocolat ?? 0) *
               itemNbTassesParAn *
               RATIO_CHOCO
@@ -991,8 +990,8 @@ const CafeEspacePropositions = ({
         {
           espaceId:
             prev.totalEspaces[prev.totalEspaces.length - 1].espaceId + 1,
-          total: 0,
-          totalInstallation: 0,
+          total: null,
+          totalInstallation: null,
         },
       ],
     }));

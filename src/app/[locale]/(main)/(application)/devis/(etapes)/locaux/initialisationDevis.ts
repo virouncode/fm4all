@@ -1,0 +1,63 @@
+import { useCafeStore } from "@/stores/cafeStore";
+import { useCommentairesStore } from "@/stores/commentairesStore";
+import { useDevisProgressStore } from "@/stores/devisProgressStore";
+import { useFontainesStore } from "@/stores/fontainesStore";
+import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
+import { useHygieneStore } from "@/stores/hygieneStore";
+import { useIncendieStore } from "@/stores/incendieStore";
+import { useMaintenanceStore } from "@/stores/maintenanceStore";
+import { useManagementStore } from "@/stores/managementStore";
+import { useMonDevisStore } from "@/stores/monDevisStore";
+import { useNettoyageStore } from "@/stores/nettoyageStore";
+import { useOfficeManagerStore } from "@/stores/officeManagerStore";
+import { usePersonnalisationStore } from "@/stores/personnalisationStore";
+import { useServicesFm4AllStore } from "@/stores/servicesFm4AllStore";
+import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
+import { useTheStore } from "@/stores/theStore";
+import { useTotalCafeStore } from "@/stores/totalCafeStore";
+import { useTotalFontainesStore } from "@/stores/totalFontainesStore";
+import { useTotalHygieneStore } from "@/stores/totalHygieneStore";
+import { useTotalIncendieStore } from "@/stores/totalIncendieStore";
+import { useTotalMaintenanceStore } from "@/stores/totalMaintenanceStore";
+import { useTotalNettoyageStore } from "@/stores/totalNettoyageStore";
+import { useTotalOfficeManagerStore } from "@/stores/totalOfficeManagerStore";
+import { useTotalServicesFm4AllStore } from "@/stores/totalServicesFm4AllStore";
+import { useTotalSnacksFruitsStore } from "@/stores/totalSnacksFruitsStore";
+import { useTotalStore } from "@/stores/totalStore";
+import { useTotalTheStore } from "@/stores/totalTheStore";
+
+export const initialisationDevis = () => {
+  //Devis
+  const setDevisProgress = useDevisProgressStore.getState().setDevisProgress;
+  setDevisProgress({
+    currentStep: 2,
+    completedSteps: [1],
+  });
+  useNettoyageStore.getState().reset();
+  useHygieneStore.getState().reset();
+  useMaintenanceStore.getState().reset();
+  useIncendieStore.getState().reset();
+  useCafeStore.getState().reset();
+  useTheStore.getState().reset();
+  useSnacksFruitsStore.getState().reset();
+  useFontainesStore.getState().reset();
+  useOfficeManagerStore.getState().reset();
+  useServicesFm4AllStore.getState().reset();
+  useCommentairesStore.getState().reset();
+  useServicesFm4AllStore.getState().reset();
+  useFoodBeverageStore.getState().reset();
+  useManagementStore.getState().reset();
+  usePersonnalisationStore.getState().reset();
+  useMonDevisStore.getState().reset();
+  useTotalNettoyageStore.getState().reset();
+  useTotalHygieneStore.getState().reset();
+  useTotalMaintenanceStore.getState().reset();
+  useTotalIncendieStore.getState().reset();
+  useTotalCafeStore.getState().reset();
+  useTotalTheStore.getState().reset();
+  useTotalSnacksFruitsStore.getState().reset();
+  useTotalFontainesStore.getState().reset();
+  useTotalOfficeManagerStore.getState().reset();
+  useTotalServicesFm4AllStore.getState().reset();
+  useTotalStore.getState().reset();
+};

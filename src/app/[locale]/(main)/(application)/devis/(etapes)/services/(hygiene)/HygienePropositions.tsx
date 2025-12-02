@@ -1,6 +1,6 @@
 import { MAX_NB_EMP, MAX_NB_PH, MAX_NB_SAVON } from "@/constants/constants";
-import { useClientStore } from "@/stores/clientStore";
 import { useHygieneStore } from "@/stores/hygieneStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useTotalHygieneStore } from "@/stores/totalHygieneStore";
 import { DureeLocationHygieneType } from "@/zod-schemas/dureeLocation";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
@@ -10,13 +10,13 @@ import { SelectHygieneInstalDistribTarifsType } from "@/zod-schemas/hygieneInsta
 import { SelectHygieneMinFacturationType } from "@/zod-schemas/hygieneMinFacturation";
 import { ChangeEvent } from "react";
 import { useMediaQuery } from "react-responsive";
+import { useShallow } from "zustand/shallow";
 import HygieneDesktopPropositions from "./(desktop)/HygieneDesktopPropositions";
 import HygieneMobilePropositions from "./(mobile)/HygieneMobilePropositions";
 import {
   getFormattedHygienePropositions,
   getHygieneFournisseurTarifs,
 } from "./getFormattedHygienePropositions";
-import { useShallow } from "zustand/shallow";
 
 type HygienePropositionsProps = {
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
@@ -39,11 +39,11 @@ const HygienePropositions = ({
       setHygiene: s.setHygiene,
     })),
   );
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const setTotalHygiene = useTotalHygieneStore((s) => s.setTotalHygiene);
 
   //Calcul des propositions : 1 fournisseur 3 gammes.
-  const effectif = client.effectif ?? 0;
+  const effectif = prospect.effectif ?? 0;
   const nbDistribEmp =
     hygiene.quantites.nbDistribEmp ?? hygieneDistribQuantite.nbDistribEmp;
   // const nbDistribEmpPoubelle = nbDistribEmp;
@@ -221,6 +221,9 @@ const HygienePropositions = ({
     type: string,
   ) => {
     const value = e.target.value;
+    const paParPersonneEmp = hygiene.prix.paParPersonneEmp;
+    const paParPersonneSavon = hygiene.prix.paParPersonneSavon;
+    const paParPersonnePh = hygiene.prix.paParPersonnePh;
 
     if (!hygiene.infos.trilogieGammeSelected) {
       //On change juste le nb de distributeurs
@@ -281,7 +284,9 @@ const HygienePropositions = ({
         (item) => item.type === "ph" && item.gamme === gamme,
       )?.[hygiene.infos.dureeLocation] ?? null;
     const minFacturation =
-      hygieneMinFacturationFournisseur?.minFacturation ?? null;
+      hygieneMinFacturationFournisseur?.minFacturation ??
+      hygiene.prix.minFacturation ??
+      0;
 
     let totalEmp: number | null = null;
     let totalSavon: number | null = null;
@@ -367,7 +372,7 @@ const HygienePropositions = ({
             ? null
             : Math.max(
                 (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0),
-                hygiene.prix.minFacturation ?? 0,
+                minFacturation ?? 0,
               );
         if (hygiene.infos.trilogieGammeSelected) {
           setTotalHygiene((prev) => ({
@@ -409,7 +414,7 @@ const HygienePropositions = ({
             ? null
             : Math.max(
                 (totalEmp ?? 0) + (totalSavon ?? 0) + (totalPh ?? 0),
-                hygiene.prix.minFacturation ?? 0,
+                minFacturation ?? 0,
               );
         if (hygiene.infos.trilogieGammeSelected) {
           setTotalHygiene((prev) => ({
@@ -481,7 +486,9 @@ const HygienePropositions = ({
         (item) => item.type === "ph" && item.gamme === gamme,
       )?.[hygiene.infos.dureeLocation] ?? null;
     const minFacturation =
-      hygieneMinFacturationFournisseur?.minFacturation ?? null;
+      hygieneMinFacturationFournisseur?.minFacturation ??
+      hygiene.prix.minFacturation ??
+      0;
 
     let totalEmp: number | null = null;
     let totalSavon: number | null = null;
@@ -695,7 +702,9 @@ const HygienePropositions = ({
       )?.[hygiene.infos.dureeLocation] ?? null;
 
     const minFacturation =
-      hygieneMinFacturationFournisseur?.minFacturation ?? null;
+      hygieneMinFacturationFournisseur?.minFacturation ??
+      hygiene.prix.minFacturation ??
+      0;
 
     let totalEmp: number | null = null;
     let totalSavon: number | null = null;
@@ -904,7 +913,9 @@ const HygienePropositions = ({
     const nbDistribPoubelle = hygiene.quantites.nbDistribPoubelle;
     const paParPersonneDesinfectant = hygiene.prix.paParPersonneDesinfectant;
     const minFacturation =
-      hygieneMinFacturationFournisseur?.minFacturation ?? null;
+      hygieneMinFacturationFournisseur?.minFacturation ??
+      hygiene.prix.minFacturation ??
+      0;
 
     const totalEmp =
       nbDistribEmp &&

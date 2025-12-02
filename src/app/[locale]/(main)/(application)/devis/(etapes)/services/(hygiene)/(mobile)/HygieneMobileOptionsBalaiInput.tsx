@@ -9,12 +9,13 @@ import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ChangeEvent } from "react";
 import { useShallow } from "zustand/shallow";
+import { HygieneOptionsType } from "../(desktop)/HygieneOptionsPropositions";
 
 type HygieneMobileOptionsBalaiInputProps = {
   nbDistribBalai: number;
   handleChangeDistribNbr: (
     e: ChangeEvent<HTMLInputElement>,
-    type: string,
+    type: HygieneOptionsType,
   ) => void;
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
   hygieneDistribTarifsFournisseur: {

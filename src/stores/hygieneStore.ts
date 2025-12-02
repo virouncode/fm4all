@@ -9,6 +9,7 @@ type HygieneStore = {
   setHygiene: (
     value: HygieneType | ((prev: HygieneType) => HygieneType),
   ) => void;
+  reset: () => void;
 };
 
 export const useHygieneStore = create<HygieneStore>()(
@@ -59,6 +60,50 @@ export const useHygieneStore = create<HygieneStore>()(
         set((state) => ({
           hygiene: typeof value === "function" ? value(state.hygiene) : value,
         })),
+      reset: () =>
+        set({
+          hygiene: {
+            infos: {
+              fournisseurId: null,
+              nomFournisseur: null,
+              sloganFournisseur: null,
+              logoUrl: null,
+              dureeLocation: "pa12M",
+              trilogieGammeSelected: "essentiel",
+              desinfectantGammeSelected: null,
+              parfumGammeSelected: null,
+              balaiGammeSelected: null,
+              poubelleGammeSelected: null,
+              commentaires: null,
+            },
+            quantites: {
+              nbDistribEmp: null,
+              nbDistribEmpPoubelle: null,
+              nbDistribSavon: null,
+              nbDistribPh: null,
+              nbDistribDesinfectant: null,
+              nbDistribParfum: null,
+              nbDistribBalai: null,
+              nbDistribPoubelle: null,
+            },
+            prix: {
+              prixDistribEmp: null,
+              prixDistribEmpPoubelle: null,
+              prixDistribSavon: null,
+              prixDistribPh: null,
+              prixDistribDesinfectant: null,
+              prixDistribParfum: null,
+              prixDistribBalai: null,
+              prixDistribPoubelle: null,
+              prixInstalDistrib: null,
+              paParPersonneEmp: null,
+              paParPersonneSavon: null,
+              paParPersonnePh: null,
+              paParPersonneDesinfectant: null,
+              minFacturation: null,
+            },
+          },
+        }),
     }),
     { name: "hygiene" },
   ),

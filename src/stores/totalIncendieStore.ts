@@ -7,6 +7,7 @@ interface TotalIncendieStore {
   setTotalIncendie: (
     value: TotalIncendieType | ((prev: TotalIncendieType) => TotalIncendieType),
   ) => void;
+  reset: () => void;
 }
 
 export const useTotalIncendieStore = create<TotalIncendieStore>()(
@@ -31,6 +32,23 @@ export const useTotalIncendieStore = create<TotalIncendieStore>()(
           totalIncendie:
             typeof value === "function" ? value(state.totalIncendie) : value,
         })),
+      reset: () =>
+        set({
+          totalIncendie: {
+            totalTrilogie: null,
+            totalExutoires: null,
+            totalExutoiresParking: null,
+            totalAlarmes: null,
+            totalPortesCoupeFeuBattantes: null,
+            totalPortesCoupeFeuCoulissantes: null,
+            totalRIA: null,
+            totalColonnesSechesStatiques: null,
+            totalColonnesSechesDynamiques: null,
+            totalDeplacementTrilogie: null,
+            totalDeplacementExutoires: null,
+            totalDeplacementExutoiresParking: null,
+          },
+        }),
     }),
     {
       name: "totalIncendie",

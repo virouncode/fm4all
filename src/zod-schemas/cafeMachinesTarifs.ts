@@ -17,5 +17,6 @@ export const selectCafeMachinesTarifsSchema = createSelectSchema(
   nbAvis: z.number().nullable(),
 });
 
-export type SelectCafeMachinesTarifsType =
-  z.infer<typeof selectCafeMachinesTarifsSchema>;
+export type SelectCafeMachinesTarifsType = z.infer<
+  typeof selectCafeMachinesTarifsSchema
+>;

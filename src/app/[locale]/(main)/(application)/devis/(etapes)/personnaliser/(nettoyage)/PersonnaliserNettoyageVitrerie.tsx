@@ -2,9 +2,9 @@ import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/P
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useClientStore } from "@/stores/clientStore";
 import { useNettoyageStore } from "@/stores/nettoyageStore";
 import { usePersonnalisationStore } from "@/stores/personnalisationStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useTotalNettoyageStore } from "@/stores/totalNettoyageStore";
 import { SprayCan } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -17,7 +17,7 @@ import PropositionsTitle from "../../../PropositionsTitle";
 const PersonnaliserNettoyageVitrerie = () => {
   const t = useTranslations("DevisPage.services.presentation.cards");
   const tPersonnaliser = useTranslations("DevisPage.personnaliser");
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const { nettoyage, setNettoyage } = useNettoyageStore(
     useShallow((s) => ({
       nettoyage: s.nettoyage,
@@ -46,11 +46,10 @@ const PersonnaliserNettoyageVitrerie = () => {
     const cadenceCloisons = nettoyage.quantites.cadenceCloisons;
     const nbPassagesVitrerie = nettoyage.quantites.nbPassagesVitrerie;
     const minFacturationVitrerie = nettoyage.prix.minFacturationVitrerie;
-    const newSurface = value ? parseInt(value) : (client.surface ?? 0) * 0.15;
+    const newSurface = value ? parseInt(value) : (prospect.surface ?? 0) * 0.15;
     if (name === "vitres") {
       const surfaceCloisons = nettoyage.quantites.surfaceCloisons;
       const totalVitrerieParPassage =
-        cadenceVitres !== null &&
         cadenceVitres !== null &&
         surfaceCloisons !== null &&
         cadenceCloisons !== null &&
@@ -79,7 +78,6 @@ const PersonnaliserNettoyageVitrerie = () => {
       const surfaceVitres = nettoyage.quantites.surfaceVitres;
       const totalVitrerieParPassage =
         cadenceVitres !== null &&
-        cadenceVitres !== null &&
         surfaceVitres !== null &&
         cadenceCloisons !== null &&
         tauxHoraireVitrerie !== null
@@ -106,7 +104,7 @@ const PersonnaliserNettoyageVitrerie = () => {
   const handleChangePleinPied = (value: string) => {
     setNettoyage((prev) => ({
       ...prev,
-      infos: { ...prev.infos, plainPied: value === "oui" ? true : false },
+      infos: { ...prev.infos, plainPied: value === "oui" },
     }));
   };
 

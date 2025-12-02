@@ -4,9 +4,9 @@ import { MAX_NB_PERSONNES_PAR_ESPACE } from "@/constants/constants";
 import useScrollIntoCafeEspace from "@/hooks/use-scroll-into-cafe-espace";
 import useScrollIntoFood from "@/hooks/use-scroll-into-food";
 import { useCafeStore } from "@/stores/cafeStore";
-import { useClientStore } from "@/stores/clientStore";
 import { useDevisProgressStore } from "@/stores/devisProgressStore";
 import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useTotalCafeStore } from "@/stores/totalCafeStore";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine";
@@ -45,7 +45,7 @@ const Cafe = ({
   sucreConsoTarifs,
 }: CafeProps) => {
   const t = useTranslations("DevisPage.foodBeverage.cafe");
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const setFoodBeverage = useFoodBeverageStore((s) => s.setFoodBeverage);
   const { cafe, setCafe } = useCafeStore(
     useShallow((s) => ({
@@ -55,7 +55,7 @@ const Cafe = ({
   );
   const setTotalCafe = useTotalCafeStore((s) => s.setTotalCafe);
   const devisProgress = useDevisProgressStore((s) => s.devisProgress);
-  const effectif = client.effectif ?? 0;
+  const effectif = prospect.effectif ?? 0;
   useScrollIntoFood();
   useScrollIntoCafeEspace();
 

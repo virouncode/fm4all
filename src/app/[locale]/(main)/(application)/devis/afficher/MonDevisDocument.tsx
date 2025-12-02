@@ -1,7 +1,7 @@
 "use client";
 
 import CTAContactButtons from "@/components/buttons/cta-contact-buttons";
-import { useClientStore } from "@/stores/clientStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { DateTime } from "luxon";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -12,12 +12,12 @@ type MonDevisDocumentProps = {
 
 const MonDevisDocument = ({ devisUrl }: MonDevisDocumentProps) => {
   const t = useTranslations("DevisPage.afficher");
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
 
   return (
     <div className="flex h-full flex-col gap-6 overflow-auto" id="2">
       <p className="mx-auto max-w-prose text-lg font-bold">
-        {client.prenomContact} {client.nomContact},
+        {prospect.prenomContact} {prospect.nomContact},
       </p>
       <div className="flex flex-1 flex-col items-center gap-6 overflow-auto">
         <div className="mx-auto flex max-w-prose flex-col items-center gap-4 text-wrap hyphens-auto">

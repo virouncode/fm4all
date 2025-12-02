@@ -14,6 +14,7 @@ export * from "./interventions";
 export * from "./maintenance";
 export * from "./nettoyage";
 export * from "./office-manager";
+export * from "./prospects";
 export * from "./services";
 export * from "./services-fm4all";
 export * from "./sites";
@@ -69,6 +70,7 @@ import {
   nettoyageVitrerieTarifs,
 } from "./nettoyage";
 import { officeManagerTarifs } from "./office-manager";
+import { prospects } from "./prospects";
 import { services, servicesFournisseurs } from "./services";
 import { sites } from "./sites";
 import { tickets } from "./tickets";
@@ -408,18 +410,18 @@ export const officeManagerTarifsRelations = relations(
 );
 
 export const devisRelations = relations(devis, ({ one }) => ({
-  client: one(clients, {
-    fields: [devis.clientId],
-    references: [clients.id],
+  prospect: one(prospects, {
+    fields: [devis.prospectId],
+    references: [prospects.id],
   }),
 }));
 
 export const devisTemporairesRelations = relations(
   devisTemporaires,
   ({ one }) => ({
-    client: one(clients, {
-      fields: [devisTemporaires.clientId],
-      references: [clients.id],
+    prospect: one(prospects, {
+      fields: [devisTemporaires.prospectId],
+      references: [prospects.id],
     }),
   }),
 );
@@ -513,4 +515,9 @@ export const interventionsRelations = relations(interventions, ({ one }) => ({
     fields: [interventions.ticketId],
     references: [tickets.id],
   }),
+}));
+
+export const prospectsRelations = relations(prospects, ({ many }) => ({
+  devisTemporaires: many(devisTemporaires),
+  devis: many(devis),
 }));

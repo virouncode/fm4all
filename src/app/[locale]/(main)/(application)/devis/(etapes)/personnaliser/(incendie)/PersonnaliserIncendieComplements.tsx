@@ -344,7 +344,13 @@ const PersonnaliserIncendieComplements = ({
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const newNb = value ? parseInt(value) : 1;
+    const parsed = parseInt(value, 10);
+
+    if (Number.isNaN(parsed)) {
+      return;
+    }
+
+    const newNb = Math.max(1, parsed);
     updateComplements(name as IncendieComplementType, newNb);
   };
 
@@ -477,7 +483,7 @@ const PersonnaliserIncendieComplements = ({
             )?.prixParExutoire ?? null;
           const totalExutoiresParking =
             prixParExutoireParking !== null
-              ? prixParExutoireParking * nbExutoires
+              ? prixParExutoireParking * nbExutoiresParking
               : null;
           const fraisDeplacementExutoiresParking =
             exutoiresParkingTarifsFournisseur?.find(

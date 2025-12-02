@@ -18,11 +18,12 @@ import { Info } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { ChangeEvent } from "react";
+import { HygieneOptionsType } from "./HygieneOptionsPropositions";
 
 type HygieneOptionsParfumCardProps = {
   nbDistribParfum: number;
   handleClickProposition: (
-    type: string,
+    type: HygieneOptionsType,
     proposition: {
       nomFournisseur: string;
       sloganFournisseur: string | null;
@@ -52,7 +53,7 @@ type HygieneOptionsParfumCardProps = {
   ) => void;
   handleChangeDistribNbr: (
     e: ChangeEvent<HTMLInputElement>,
-    type: string,
+    type: HygieneOptionsType,
   ) => void;
   hygieneDistribQuantite: SelectHygieneDistribQuantitesType;
   propositions: {

@@ -1,6 +1,6 @@
 import { toast } from "@/hooks/use-toast";
 import { useCafeStore } from "@/stores/cafeStore";
-import { useClientStore } from "@/stores/clientStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useTheStore } from "@/stores/theStore";
 import { useTotalCafeStore } from "@/stores/totalCafeStore";
 import { useTotalTheStore } from "@/stores/totalTheStore";
@@ -41,7 +41,7 @@ const CafeMobileEspace = ({
   sucreConsoTarifs,
 }: CafeMobileEspaceProps) => {
   const t = useTranslations("DevisPage.foodBeverage.cafe");
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const { cafe, setCafe } = useCafeStore(
     useShallow((s) => ({
       cafe: s.cafe,
@@ -56,13 +56,7 @@ const CafeMobileEspace = ({
   const handleClickRemove = () => {
     if (cafeEspacesIds[0] === espace.infos.espaceId) {
       //Je reinitialise tout
-      reinitialisationCafeThe(
-        setCafe,
-        setThe,
-        setTotalCafe,
-        setTotalThe,
-        client,
-      );
+      reinitialisationCafeThe();
       return;
     }
     const indexOfCurrentEspace = cafeEspacesIds.indexOf(espace.infos.espaceId);

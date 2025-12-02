@@ -9,6 +9,7 @@ type OfficeManagerStore = {
   setOfficeManager: (
     value: OfficeManagerType | ((prev: OfficeManagerType) => OfficeManagerType),
   ) => void;
+  reset: () => void;
 };
 
 export const useOfficeManagerStore = create<OfficeManagerStore>()(
@@ -38,6 +39,28 @@ export const useOfficeManagerStore = create<OfficeManagerStore>()(
           officeManager:
             typeof value === "function" ? value(state.officeManager) : value,
         })),
+      reset: () =>
+        set({
+          officeManager: {
+            infos: {
+              fournisseurId: null,
+              nomFournisseur: null,
+              sloganFournisseur: null,
+              logoUrl: null,
+              gammeSelected: null,
+              remplace: false,
+              commentaires: null,
+              premium: false,
+            },
+            quantites: {
+              demiJParSemaine: null,
+            },
+            prix: {
+              demiTjm: null,
+              demiTjmPremium: null,
+            },
+          },
+        }),
     }),
     { name: "officeManager" },
   ),

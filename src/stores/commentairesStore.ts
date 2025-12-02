@@ -9,6 +9,7 @@ type CommentairesStore = {
   setCommentaires: (
     value: CommentairesType | ((prev: CommentairesType) => CommentairesType),
   ) => void;
+  reset: () => void;
 };
 
 export const useCommentairesStore = create<CommentairesStore>()(
@@ -20,6 +21,7 @@ export const useCommentairesStore = create<CommentairesStore>()(
           commentaires:
             typeof value === "function" ? value(state.commentaires) : value,
         })),
+      reset: () => set({ commentaires: null }),
     }),
     { name: "commentaires" },
   ),

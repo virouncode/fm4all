@@ -1,5 +1,6 @@
 "use client";
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
+import { useServicesStore } from "@/stores/servicesStore";
 import { SelectLegioTarifsType } from "@/zod-schemas/legioTarifs";
 import { SelectMaintenanceQuantitesType } from "@/zod-schemas/maintenanceQuantites";
 import { SelectMaintenanceTarifsType } from "@/zod-schemas/maintenanceTarifs";
@@ -12,7 +13,6 @@ import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import MaintenancePropositions from "./MaintenancePropositions";
-import { useServicesStore } from "@/stores/servicesStore";
 
 type MaintenanceProps = {
   maintenanceQuantites: SelectMaintenanceQuantitesType[];

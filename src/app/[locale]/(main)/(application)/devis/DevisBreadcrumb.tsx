@@ -11,17 +11,17 @@ import { Link } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
 import { roundEffectif } from "@/lib/utils/roundEffectif";
 import { roundSurface } from "@/lib/utils/roundSurface";
-import { useClientStore } from "@/stores/clientStore";
 import { useDevisProgressStore } from "@/stores/devisProgressStore";
 import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
 import { useManagementStore } from "@/stores/managementStore";
 import { usePersonnalisationStore } from "@/stores/personnalisationStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useServicesStore } from "@/stores/servicesStore";
 import { useLocale } from "next-intl";
 import { useShallow } from "zustand/shallow";
 
 //Pour naviguer dans le Funnel de devis
-//Il faut que le client ait rempli les étapes précédentes pour pouvoir cliquer sur l'étape suivante
+//Il faut que le propect ait rempli les étapes précédentes pour pouvoir cliquer sur l'étape suivante
 //Quand on clique sur une étape il faut renvoyer vers l'url avec les search params correspondants
 
 const DevisBreadcrumb = () => {
@@ -32,7 +32,7 @@ const DevisBreadcrumb = () => {
       setDevisProgress: s.setDevisProgress,
     })),
   );
-  const client = useClientStore((s) => s.client);
+  const propect = useProspectStore((s) => s.prospect);
   const setServices = useServicesStore((s) => s.setServices);
   const setFoodBeverage = useFoodBeverageStore((s) => s.setFoodBeverage);
   const setManagement = useManagementStore((s) => s.setManagement);
@@ -43,28 +43,31 @@ const DevisBreadcrumb = () => {
   const serviceSearchParams = new URLSearchParams();
   const sauvegarderSearchParams = new URLSearchParams();
 
-  if (client.effectif) {
+  if (propect.effectif) {
     serviceSearchParams.set(
       "effectif",
-      roundEffectif(client.effectif).toString(),
+      roundEffectif(propect.effectif).toString(),
     );
     sauvegarderSearchParams.set(
       "effectif",
-      roundEffectif(client.effectif).toString(),
+      roundEffectif(propect.effectif).toString(),
     );
   }
-  if (client.surface) {
-    serviceSearchParams.set("surface", roundSurface(client.surface).toString());
+  if (propect.surface) {
+    serviceSearchParams.set(
+      "surface",
+      roundSurface(propect.surface).toString(),
+    );
     sauvegarderSearchParams.set(
       "surface",
-      roundSurface(client.surface).toString(),
+      roundSurface(propect.surface).toString(),
     );
   }
-  if (client.typeBatiment) {
-    sauvegarderSearchParams.set("typeBatiment", client.typeBatiment);
+  if (propect.typeBatiment) {
+    sauvegarderSearchParams.set("typeBatiment", propect.typeBatiment);
   }
-  if (client.typeOccupation) {
-    sauvegarderSearchParams.set("typeOccupation", client.typeOccupation);
+  if (propect.typeOccupation) {
+    sauvegarderSearchParams.set("typeOccupation", propect.typeOccupation);
   }
 
   const devisRoutes: {

@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "prospects_email_nom_udx" ON "prospects" USING btree ("email_contact","nom_contact");

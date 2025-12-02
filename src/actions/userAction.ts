@@ -83,6 +83,7 @@ export const insertUserAction = actionClient
               <p>Pensez aussi à vérifier votre adresse email en cliquant sur le lien que nous vous avons envoyé.</p>
               `,
         nomDestinataire: userInput.name,
+        useTemplate: true,
       });
       return {
         success: true,
@@ -117,6 +118,14 @@ export const updateUserAction = actionClient
           locale === "fr"
             ? "Vous devez être connecté pour mettre à jour ce compte utilisateur."
             : "You must be logged in to update this user account.",
+        );
+      }
+
+      if (!userInput.id) {
+        throw new Error(
+          locale === "fr"
+            ? "ID de l'utilisateur obligatoire pour la mise à jour."
+            : "User ID required for update.",
         );
       }
 
@@ -187,7 +196,6 @@ export const updateUserAction = actionClient
           );
         }
       }
-
       return {
         success: true,
         message:

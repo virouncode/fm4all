@@ -4,8 +4,8 @@ import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/constants/constants";
 import { TypesEauType } from "@/constants/typesEau";
 import { toast } from "@/hooks/use-toast";
 import { roundNbPersonnesFontaine } from "@/lib/utils/roundNbPersonnesFontaine";
-import { useClientStore } from "@/stores/clientStore";
 import { useFontainesStore } from "@/stores/fontainesStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useTotalFontainesStore } from "@/stores/totalFontainesStore";
 import { DureeLocationFontaineType } from "@/zod-schemas/dureeLocation";
 import { FontaineEspaceType } from "@/zod-schemas/fontaines";
@@ -31,7 +31,7 @@ const FontaineEspaceForm = ({
 }: FontaineEspaceFormProps) => {
   const t = useTranslations("DevisPage");
   const tFontaines = useTranslations("DevisPage.foodBeverage.fontaines");
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const { fontaines, setFontaines } = useFontainesStore(
     useShallow((s) => ({
       fontaines: s.fontaines,
@@ -42,7 +42,7 @@ const FontaineEspaceForm = ({
   const fontainesEspacesIds = fontaines.espaces.map(
     (espace) => espace.infos.espaceId,
   );
-  const effectif = client.effectif ?? 0;
+  const effectif = prospect.effectif ?? 0;
   const nbPersonnes =
     espace.quantites.nbPersonnes ??
     (effectif > MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE

@@ -6,9 +6,9 @@ import { SelectOfficeManagerQuantitesType } from "@/zod-schemas/officeManagerQua
 import { SelectOfficeManagerTarifsType } from "@/zod-schemas/officeManagerTarifs";
 import { useTranslations } from "next-intl";
 import { useMediaQuery } from "react-responsive";
+import { useShallow } from "zustand/shallow";
 import OfficeManagerDesktopPropositions from "./(desktop)/OfficeManagerDesktopPropositions";
 import OfficeManagerMobilePropositions from "./(mobile)/OfficeManagerMobilePropositions";
-import { useShallow } from "zustand/shallow";
 
 type OfficeManagerPropositionsProps = {
   officeManagerQuantites: SelectOfficeManagerQuantitesType[];
@@ -133,7 +133,7 @@ const OfficeManagerPropositions = ({
         },
       }));
       setTotalOfficeManager({
-        totalService: 0,
+        totalService: null,
       });
       return;
     }
@@ -172,28 +172,40 @@ const OfficeManagerPropositions = ({
     value: number[],
     demiTauxJournalier: number | null,
   ) => {
+    const newDemiJ = value[0];
     setOfficeManager((prev) => ({
       ...prev,
+      infos: {
+        ...prev.infos,
+        gammeSelected:
+          demiJParSemaineConfort !== null && demiJParSemaineExcellence !== null
+            ? newDemiJ < demiJParSemaineConfort
+              ? "essentiel"
+              : newDemiJ < demiJParSemaineExcellence
+                ? "confort"
+                : "excellence"
+            : prev.infos.gammeSelected,
+      },
       quantites: {
-        demiJParSemaine: value[0],
+        demiJParSemaine: newDemiJ,
       },
     }));
     if (officeManager.infos.gammeSelected) {
       const newMajoration =
-        value[0] <= 1
+        newDemiJ <= 1
           ? 20
-          : value[0] <= 2
+          : newDemiJ <= 2
             ? 15
-            : value[0] <= 3
+            : newDemiJ <= 3
               ? 10
-              : value[0] <= 4
+              : newDemiJ <= 4
                 ? 5
                 : 0;
       const totalAnnuel =
         demiTauxJournalier !== null
           ? officeManager.infos.remplace
-            ? value[0] * demiTauxJournalier * 52 * (1 + newMajoration / 100)
-            : value[0] * demiTauxJournalier * 47 * (1 + newMajoration / 100)
+            ? newDemiJ * demiTauxJournalier * 52 * (1 + newMajoration / 100)
+            : newDemiJ * demiTauxJournalier * 47 * (1 + newMajoration / 100)
           : null;
       setTotalOfficeManager({
         totalService: totalAnnuel,
@@ -211,7 +223,7 @@ const OfficeManagerPropositions = ({
     }));
     if (officeManager.infos.gammeSelected) {
       const demiJParSemaine =
-        officeManager.quantites.demiJParSemaine || demiJParSemaineEssentiel;
+        officeManager.quantites.demiJParSemaine ?? demiJParSemaineEssentiel;
       const newMajoration =
         demiJParSemaine !== null
           ? demiJParSemaine <= 1
@@ -257,7 +269,7 @@ const OfficeManagerPropositions = ({
     }));
     if (officeManager.infos.gammeSelected) {
       const demiJParSemaine =
-        officeManager.quantites.demiJParSemaine || demiJParSemaineEssentiel;
+        officeManager.quantites.demiJParSemaine ?? demiJParSemaineEssentiel;
       const newMajoration =
         demiJParSemaine !== null
           ? demiJParSemaine <= 1

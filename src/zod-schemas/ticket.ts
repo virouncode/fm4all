@@ -13,6 +13,7 @@ import {
   RawSearchParams,
 } from "@/normalize/normalizeSearchParams";
 import { createSortSchema } from "@/zod-helpers/createSortSchema";
+import { capitalizeFirstWord } from "@/zod-helpers/normalize";
 import {
   createInsertSchema,
   createSelectSchema,
@@ -29,84 +30,118 @@ export type TicketPrioriteType = z.infer<typeof ticketPrioriteSchema>;
 export const ticketStatusSchema = z.enum(ticketStatusEnum.enumValues);
 export type TicketStatusType = z.infer<typeof ticketStatusSchema>;
 
-//SELECT
-export const selectTicketSchema = createSelectSchema(tickets, {
-  titre: (schema) => schema.min(1, "Titre du ticket obligatoire"),
-});
+export const selectTicketSchema = createSelectSchema(tickets);
 export type SelectTicketType = z.infer<typeof selectTicketSchema>;
 
-export const selectTicketAttachmentSchema = createSelectSchema(
-  ticketsAttachments,
-  {
-    ticketId: (schema) => schema.min(1, "Ticket obligatoire"),
-    url: (schema) => schema.min(1, "URL de fichier obligatoire"),
-    filename: (schema) => schema.min(1, "Nom de fichier obligatoire"),
-    mimeType: (schema) => schema.min(1, "Type MIME obligatoire"),
-    size: (schema) => schema.min(1, "Taille de fichier obligatoire"),
-  },
-);
+export const selectTicketAttachmentSchema =
+  createSelectSchema(ticketsAttachments);
 export type SelectTicketAttachmentType = z.infer<
   typeof selectTicketAttachmentSchema
 >;
 
-//INSERT
-//validation côté backend
-export const insertTicketSchema = createInsertSchema(tickets, {
-  clientId: (schema) => schema.min(1, "Client obligatoire"),
-  siteId: (schema) => schema.min(1, "Site obligatoire"),
-  titre: (schema) => schema.min(1, "Titre du ticket obligatoire"),
+export const insertTicketSchema = createInsertSchema(tickets).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  clientId: true, //sera ajouté côté serveur
 });
 export type InsertTicketType = z.infer<typeof insertTicketSchema>;
 
+export const insertTicketToDbSchema = insertTicketSchema.extend({
+  createdById: z.string().min(1, "ID de l'utilisateur créateur obligatoire"),
+  updatedById: z
+    .string()
+    .min(1, "ID de l'utilisateur modificateur obligatoire"),
+  clientId: z.number().positive(),
+});
+export type InsertTicketToDbType = z.infer<typeof insertTicketToDbSchema>;
+
 export const insertTicketAttachmentSchema = createInsertSchema(
   ticketsAttachments,
-  {
-    ticketId: (schema) => schema.min(1, "Ticket obligatoire"),
-    url: (schema) => schema.min(1, "URL de fichier obligatoire"),
-    filename: (schema) => schema.min(1, "Nom de fichier obligatoire"),
-    mimeType: (schema) => schema.min(1, "Type MIME obligatoire"),
-  },
-);
+).omit({
+  id: true,
+  uploadedAt: true,
+  uploadedById: true,
+});
 export type InsertTicketAttachmentType = z.infer<
   typeof insertTicketAttachmentSchema
 >;
-//formulaire frontend
-export const insertTicketFormSchema = insertTicketSchema
+
+export const insertTicketAttachmentToDbSchema =
+  insertTicketAttachmentSchema.extend({
+    uploadedById: z.string().min(1, "ID de l'utilisateur uploadant le fichier"),
+  });
+export type InsertTicketAttachmentToDbType = z.infer<
+  typeof insertTicketAttachmentToDbSchema
+>;
+
+export const insertTicketAttachmentsForActionSchema =
+  insertTicketAttachmentSchema
+    .omit({
+      ticketId: true,
+    })
+    .array()
+    .optional();
+
+export type InsertTicketAttachmentsForActionType = z.infer<
+  typeof insertTicketAttachmentsForActionSchema
+>;
+
+export const insertTicketInputSchema = insertTicketSchema.extend({
+  attachments: insertTicketAttachmentsForActionSchema,
+});
+export type InsertTicketInputType = z.infer<typeof insertTicketInputSchema>;
+
+export const updateTicketSchema = createUpdateSchema(tickets)
   .omit({
-    clientId: true,
-    dateCloture: true,
+    createdAt: true,
+    updatedAt: true,
+    clientId: true, //ne peut pas être mis à jour
   })
   .extend({
-    attachments: insertTicketAttachmentSchema
-      .omit({
-        ticketId: true,
-        uploadedById: true,
-      })
-      .array()
-      .optional(),
+    id: z.number().positive("ID du ticket invalide"),
   });
+export type UpdateTicketType = z.infer<typeof updateTicketSchema>;
+
+export const updateTicketInDbSchema = updateTicketSchema.extend({
+  updatedById: z
+    .string()
+    .min(1, "ID de l'utilisateur modificateur obligatoire"),
+});
+export type UpdateTicketInDbType = z.infer<typeof updateTicketInDbSchema>;
+
+export const updateTicketInputSchema = updateTicketSchema.extend({
+  attachments: insertTicketAttachmentsForActionSchema,
+});
+
+//======================= FORM SCHEMAS ==========================//
+//On ne peut pas appliquer des transform de type mais on peut appliquer des transform de nettoyage
+//formulaire frontend
+export const insertTicketFormSchema = z.object({
+  titre: z
+    .string()
+    .min(1, "Titre du ticket obligatoire")
+    .transform((v) => capitalizeFirstWord(v)),
+  categorie: ticketCategorieSchema,
+  priorite: ticketPrioriteSchema,
+  status: ticketStatusSchema,
+  siteId: z.string().min(1, "Site obligatoire"), //select
+  fournisseurId: z.string(), //select
+  description: z.string(),
+  attachments: insertTicketAttachmentSchema
+    .omit({
+      ticketId: true,
+      uploadedById: true,
+    })
+    .array()
+    .optional(),
+});
 
 export type InsertTicketFormType = z.infer<typeof insertTicketFormSchema>;
 
-//UPDATE
-//validation côté backend
-export const updateTicketSchema = createUpdateSchema(tickets);
-export type UpdateTicketType = z.infer<typeof updateTicketSchema>;
-
-//formulaire frontend
-export const updateTicketFormSchema = updateTicketSchema
-  .omit({
-    dateCloture: true,
-  })
-  .extend({
-    attachments: insertTicketAttachmentSchema
-      .omit({
-        ticketId: true,
-        uploadedById: true,
-      })
-      .array()
-      .optional(),
-  });
+export const updateTicketFormSchema = insertTicketFormSchema.partial().extend({
+  id: z.number().positive("ID du ticket invalide"),
+});
 export type UpdateTicketFormType = z.infer<typeof updateTicketFormSchema>;
 
 //=========================== QUERY: SORT, FILTERS, ETC.============================//

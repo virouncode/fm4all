@@ -46,14 +46,14 @@ const page = async ({
     id: initialSite.id,
     nomSite: initialSite.nomSite,
     adresseLigne1: initialSite.adresseLigne1,
-    adresseLigne2: initialSite.adresseLigne2,
+    adresseLigne2: initialSite.adresseLigne2 ?? "",
     codePostal: initialSite.codePostal,
     ville: initialSite.ville,
-    surface: initialSite.surface,
-    effectif: initialSite.effectif,
+    surface: initialSite.surface.toString(),
+    effectif: initialSite.effectif.toString(),
     typeBatiment: initialSite.typeBatiment,
     typeOccupation: initialSite.typeOccupation,
-    commentaires: initialSite.commentaires,
+    commentaires: initialSite.commentaires ?? "",
   };
 
   return (

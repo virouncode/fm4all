@@ -32,6 +32,7 @@ const SecuriteIncendiePropositions = ({
     })),
   );
   const setTotalIncendie = useTotalIncendieStore((s) => s.setTotalIncendie);
+  const resetTotalIncendie = useTotalIncendieStore((s) => s.reset);
 
   //Calcul des propositions
   const nbExtincteurs =
@@ -136,20 +137,7 @@ const SecuriteIncendiePropositions = ({
           fraisDeplacementExutoiresParking: null,
         },
       }));
-      setTotalIncendie({
-        totalTrilogie: null,
-        totalExutoires: null,
-        totalExutoiresParking: null,
-        totalAlarmes: null,
-        totalPortesCoupeFeuBattantes: null,
-        totalPortesCoupeFeuCoulissantes: null,
-        totalRIA: null,
-        totalColonnesSechesStatiques: null,
-        totalColonnesSechesDynamiques: null,
-        totalDeplacementTrilogie: null,
-        totalDeplacementExutoires: null,
-        totalDeplacementExutoiresParking: null,
-      });
+      resetTotalIncendie();
       return;
     }
     setIncendie((prev) => ({

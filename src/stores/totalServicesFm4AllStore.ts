@@ -9,6 +9,7 @@ interface TotalServicesFm4AllStore {
       | TotalServicesFm4AllType
       | ((prev: TotalServicesFm4AllType) => TotalServicesFm4AllType),
   ) => void;
+  reset: () => void;
 }
 
 export const useTotalServicesFm4AllStore = create<TotalServicesFm4AllStore>()(
@@ -30,6 +31,18 @@ export const useTotalServicesFm4AllStore = create<TotalServicesFm4AllStore>()(
               ? value(state.totalServicesFm4All)
               : value,
         })),
+      reset: () =>
+        set({
+          totalServicesFm4All: {
+            totalAssurance: null,
+            totalPlateforme: null,
+            totalSupportAdmin: null,
+            totalSupportOp: null,
+            totalAccountManager: null,
+            totalRemiseCa: null,
+            totalRemiseHof: null,
+          },
+        }),
     }),
     {
       name: "totalServicesFm4All",

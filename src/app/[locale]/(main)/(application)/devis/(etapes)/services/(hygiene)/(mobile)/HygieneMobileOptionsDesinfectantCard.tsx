@@ -15,6 +15,7 @@ import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
 import { useHygieneStore } from "@/stores/hygieneStore";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
+import { HygieneOptionsType } from "../(desktop)/HygieneOptionsPropositions";
 
 type HygieneMobileOptionsDesinfectantCardProps = {
   proposition: {
@@ -44,7 +45,7 @@ type HygieneMobileOptionsDesinfectantCardProps = {
     imageUrlPoubelle: string | null;
   };
   handleClickProposition: (
-    type: string,
+    type: HygieneOptionsType,
     proposition: {
       nomFournisseur: string;
       sloganFournisseur: string | null;

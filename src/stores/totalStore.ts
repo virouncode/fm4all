@@ -5,6 +5,7 @@ import { persist } from "zustand/middleware";
 interface TotalStore {
   total: TotalType;
   setTotal: (value: TotalType | ((prev: TotalType) => TotalType)) => void;
+  reset: () => void;
 }
 
 export const useTotalStore = create<TotalStore>()(
@@ -19,6 +20,14 @@ export const useTotalStore = create<TotalStore>()(
         set((state) => ({
           total: typeof value === "function" ? value(state.total) : value,
         })),
+      reset: () =>
+        set({
+          total: {
+            totalAnnuelHt: null,
+            totalAnnuelHtSansServicesFm4all: null,
+            totalInstallationHt: null,
+          },
+        }),
     }),
     {
       name: "total",

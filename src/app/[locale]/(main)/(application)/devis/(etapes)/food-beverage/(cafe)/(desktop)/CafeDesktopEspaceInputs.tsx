@@ -18,7 +18,7 @@ import { MAX_EFFECTIF } from "@/constants/constants";
 import { locationCafeMachine } from "@/constants/locationCafeMachine";
 import { typesBoissons } from "@/constants/typesBoissons";
 import { useCafeStore } from "@/stores/cafeStore";
-import { useClientStore } from "@/stores/clientStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
 import { useTranslations } from "next-intl";
 
@@ -43,7 +43,7 @@ const CafeDesktopEspaceInputs = ({
   const tLocation = useTranslations("DevisPage.location");
   const t = useTranslations("DevisPage");
   const tCafe = useTranslations("DevisPage.foodBeverage.cafe");
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const cafe = useCafeStore((s) => s.cafe);
   return (
     <TooltipProvider delayDuration={0}>
@@ -76,7 +76,7 @@ const CafeDesktopEspaceInputs = ({
               <div className="flex items-center gap-2">
                 <Input
                   className={`w-full max-w-xs min-w-20 ${
-                    nbPersonnes === client.effectif ? "text-destructive" : ""
+                    nbPersonnes === prospect.effectif ? "text-destructive" : ""
                   }`}
                   type="number"
                   min={1}

@@ -1,8 +1,8 @@
 "use client";
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
 import { useRouter } from "@/i18n/navigation";
-import { useClientStore } from "@/stores/clientStore";
 import { useDevisProgressStore } from "@/stores/devisProgressStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useServicesStore } from "@/stores/servicesStore";
 import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites";
 import { SelectIncendieTarifsType } from "@/zod-schemas/incendieTarifs";
@@ -10,10 +10,10 @@ import { FireExtinguisher } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRef } from "react";
 import { useMediaQuery } from "react-responsive";
+import { useShallow } from "zustand/shallow";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import SecuriteIncendiePropositions from "./SecuriteIncendiePropositions";
-import { useShallow } from "zustand/shallow";
 
 type SecuriteIncendieProps = {
   incendieQuantite: SelectIncendieQuantitesType;
@@ -25,7 +25,7 @@ const SecuriteIncendie = ({
   incendieTarifs,
 }: SecuriteIncendieProps) => {
   const t = useTranslations("DevisPage.services.incendie");
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const setServices = useServicesStore((s) => s.setServices);
   const { devisProgress, setDevisProgress } = useDevisProgressStore(
     useShallow((s) => ({
@@ -38,8 +38,8 @@ const SecuriteIncendie = ({
 
   const handleClickNext = () => {
     const searchParams = new URLSearchParams();
-    if (client.effectif)
-      searchParams.set("effectif", client.effectif.toString());
+    if (prospect.effectif)
+      searchParams.set("effectif", prospect.effectif.toString());
     const newCompletedSteps = [
       ...new Set([...devisProgress.completedSteps, 1, 2]),
     ].sort((a, b) => a - b);

@@ -13,5 +13,6 @@ export const selectChocolatConsoTarifsSchema = createSelectSchema(
   logoUrl: z.string().nullable(),
 });
 
-export type SelectChocolatConsoTarifsType =
-  z.infer<typeof selectChocolatConsoTarifsSchema>;
+export type SelectChocolatConsoTarifsType = z.infer<
+  typeof selectChocolatConsoTarifsSchema
+>;

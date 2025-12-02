@@ -9,6 +9,7 @@ interface TotalFontainesStore {
       | TotalFontainesType
       | ((prev: TotalFontainesType) => TotalFontainesType),
   ) => void;
+  reset: () => void;
 }
 
 export const useTotalFontainesStore = create<TotalFontainesStore>()(
@@ -28,6 +29,18 @@ export const useTotalFontainesStore = create<TotalFontainesStore>()(
           totalFontaines:
             typeof value === "function" ? value(state.totalFontaines) : value,
         })),
+      reset: () =>
+        set({
+          totalFontaines: {
+            totalEspaces: [
+              {
+                espaceId: 1,
+                total: null,
+                totalInstallation: null,
+              },
+            ],
+          },
+        }),
     }),
     {
       name: "totalFontaines",

@@ -13,7 +13,7 @@ import { MAX_EFFECTIF } from "@/constants/constants";
 import { locationCafeMachine } from "@/constants/locationCafeMachine";
 import { typesBoissons } from "@/constants/typesBoissons";
 import { useCafeStore } from "@/stores/cafeStore";
-import { useClientStore } from "@/stores/clientStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { CafeEspaceType } from "@/zod-schemas/cafe";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -44,7 +44,7 @@ const CafeMobileEspaceInputs = ({
   const tCafe = useTranslations("DevisPage.foodBeverage.cafe");
   const tTypeBoisson = useTranslations("DevisPage.foodBeverage.cafe.types");
   const tLocation = useTranslations("DevisPage.location");
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const cafe = useCafeStore((s) => s.cafe);
 
   return (
@@ -122,7 +122,7 @@ const CafeMobileEspaceInputs = ({
           <div className="flex items-center gap-2">
             <Input
               className={`w-16 max-w-xs min-w-20 ${
-                nbPersonnes === client.effectif ? "text-destructive" : ""
+                nbPersonnes === prospect.effectif ? "text-destructive" : ""
               }`}
               type="number"
               min={1}

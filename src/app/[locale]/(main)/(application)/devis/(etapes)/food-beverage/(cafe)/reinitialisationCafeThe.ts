@@ -1,15 +1,13 @@
-import { CafeType } from "@/zod-schemas/cafe";
-import { SelectClientType } from "@/zod-schemas/client";
-import { TheType } from "@/zod-schemas/the";
-import { TotalCafeType, TotalTheType } from "@/zod-schemas/total";
+import { useCafeStore } from "@/stores/cafeStore";
+import { useTheStore } from "@/stores/theStore";
+import { useTotalCafeStore } from "@/stores/totalCafeStore";
+import { useTotalTheStore } from "@/stores/totalTheStore";
 
-export const reinitialisationCafeThe = (
-  setCafe: (cafe: CafeType) => void,
-  setThe: (the: TheType) => void,
-  setTotalCafe: (totalCafe: TotalCafeType) => void,
-  setTotalThe: (totalThe: TotalTheType) => void,
-  client: Partial<SelectClientType>,
-) => {
+export const reinitialisationCafeThe = () => {
+  const resetThe = useTheStore.getState().reset;
+  const resetTotalThe = useTotalTheStore.getState().reset;
+  const setCafe = useCafeStore.getState().setCafe;
+  const setTotalCafe = useTotalCafeStore.getState().setTotalCafe;
   setCafe({
     infos: {
       fournisseurId: null,
@@ -23,22 +21,9 @@ export const reinitialisationCafeThe = (
     nbEspaces: null,
     espaces: [],
   });
-  setThe({
-    infos: {
-      gammeSelected: null,
-      commentaires: null,
-    },
-    quantites: {
-      nbPersonnes: Math.round((client.effectif ?? 0) * 0.15),
-    },
-    prix: {
-      prixUnitaire: null,
-    },
-  });
   setTotalCafe({
     totalEspaces: [],
   });
-  setTotalThe({
-    totalService: 0,
-  });
+  resetThe();
+  resetTotalThe();
 };

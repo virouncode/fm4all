@@ -1,26 +1,23 @@
 "use client";
-import { insertClientAction } from "@/actions/clientAction";
-import { insertDevisTemporaireAction } from "@/actions/devisAction";
-import { InputWithLabel } from "@/components/form-inputs/InputWithLabel";
+import { saveProgressAction } from "@/actions/devisAction";
+import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Form } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
-import { batiments } from "@/constants/batiments";
-import { occupation } from "@/constants/occupation";
+import { Spinner } from "@/components/ui/spinner";
 import { toast } from "@/hooks/use-toast";
 import { Link, useRouter } from "@/i18n/navigation";
-import { sendEmailFromClient } from "@/lib/email/sendEmail";
 import { formatLocalStorageData } from "@/lib/utils/formatLocalStorageData";
-import { useClientStore } from "@/stores/clientStore";
 import { useDevisProgressStore } from "@/stores/devisProgressStore";
+import { useProspectStore } from "@/stores/prospectStore";
+import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
-  createInsertClientSchema,
-  InsertClientType,
-} from "@/zod-schemas/client";
-import { InsertDevisTemporaireType } from "@/zod-schemas/devis";
+  createInsertProspectFormSchema,
+  InsertProspectFormType,
+  InsertProspectType,
+} from "@/zod-schemas/prospect";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LoaderCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useAction } from "next-safe-action/hooks";
 import { ChangeEvent, useState } from "react";
@@ -31,11 +28,11 @@ const SauvegarderProgression = () => {
   const t = useTranslations("DevisPage");
   const tSauverErreurs = useTranslations("DevisPage.sauver.erreurs");
   const tSauver = useTranslations("DevisPage.sauver");
-  const [loading, setLoading] = useState(false);
-  const { client, setClient } = useClientStore(
+  const [isLoading, setIsLoading] = useState(false);
+  const { prospect, setProspect } = useProspectStore(
     useShallow((s) => ({
-      client: s.client,
-      setClient: s.setClient,
+      prospect: s.prospect,
+      setProspect: s.setProspect,
     })),
   );
   const { devisProgress, setDevisProgress } = useDevisProgressStore(
@@ -47,56 +44,65 @@ const SauvegarderProgression = () => {
   const [accepte, setAccepte] = useState(false);
   const router = useRouter();
 
-  const defaultValues: InsertClientType = {
-    ...client,
+  const defaultValues: InsertProspectFormType = {
+    nomEntreprise: prospect.nomEntreprise || "",
+    prenomContact: prospect.prenomContact || "",
+    nomContact: prospect.nomContact || "",
+    posteContact: prospect.posteContact || "",
+    emailContact: prospect.emailContact || "",
+    phoneContact: prospect.phoneContact || "",
+    surface: prospect.surface?.toString() || "100",
+    effectif: prospect.effectif?.toString() || "20",
+    typeBatiment: prospect.typeBatiment || "bureaux",
+    typeOccupation: prospect.typeOccupation || "partieEtage",
+    codePostal: prospect.codePostal || "",
+    ville: prospect.ville || "",
   };
-  const form = useForm<InsertClientType>({
+  const form = useForm<InsertProspectFormType>({
     mode: "all",
     resolver: zodResolver(
-      createInsertClientSchema({
+      createInsertProspectFormSchema({
         nomEntreprise: tSauverErreurs("nom-de-lentreprise-obligatoire"),
-        siret: tSauverErreurs(
-          "siret-invalide-format-attendu-xxx-xxx-xxx-xxxxx",
-        ),
         prenomContact: tSauverErreurs("prenom-du-contact-obligatoire"),
         nomContact: tSauverErreurs("nom-du-contact-obligatoire"),
         posteContact: tSauverErreurs("poste-du-contact-obligatoire"),
-        emailContact: tSauverErreurs("adresse-email-invalide"),
+        emailContactInvalide: tSauverErreurs("adresse-email-invalide"),
+        emailContactObligatoire: tSauverErreurs("adresse-email-obligatoire"),
         phoneContact: tSauverErreurs("numero-de-telephone-invalide"),
-        emailSignataire: tSauverErreurs("adresse-email-invalide"),
-        surface: tSauverErreurs("surface-obligatoire"),
-        surfaceMax: tSauverErreurs("surface-maximum-3000-m"),
-        effectif: tSauverErreurs("effectif-obligatoire"),
-        effectifMax: tSauverErreurs("effectif-maximum-300-personnes"),
-        codePostal: tSauverErreurs("code-postal-invalide-entrez-5-chiffres"),
-        ville: tSauverErreurs("ville-obligatoire"),
       }),
     ),
     defaultValues,
   });
-  const { execute: executeSaveClient, isPending: isSavingClient } = useAction(
-    insertClientAction,
-    {
+  const { execute: executeSaveProgress, isPending: isSavingProgress } =
+    useAction(saveProgressAction, {
       onSuccess: ({ data }) => {
-        if (!data?.success) {
-          return toast({
+        if (!data || !data.success) {
+          toast({
             variant: "destructive",
             title: tSauver("erreur"),
             description: data?.message,
           });
+          return;
         }
+
         toast({
           variant: "default",
           title: tSauver("succes"),
           description: data?.message,
         });
-        if (data?.data?.client?.id) {
-          const devisToPost: InsertDevisTemporaireType = {
-            clientId: data?.data.client.id,
-            texte: formatLocalStorageData(),
-          };
-          executeSaveDevisTemporaire(devisToPost);
-        }
+
+        const newCompletedSteps = [
+          ...new Set([...devisProgress.completedSteps, 1, 2, 3, 4, 5]),
+        ].sort((a, b) => a - b);
+
+        setDevisProgress({ currentStep: 6, completedSteps: newCompletedSteps });
+        setProspect(data.data.prospect);
+
+        setIsLoading(true);
+        //Pour donner le temps au toast de s'afficher avant de changer de page
+        setTimeout(() => {
+          router.push("/devis/personnaliser");
+        }, 500);
       },
       onError: () => {
         toast({
@@ -107,38 +113,9 @@ const SauvegarderProgression = () => {
           ),
         });
       },
-    },
-  );
-  const {
-    execute: executeSaveDevisTemporaire,
-    isPending: isSavingDevisTemporaire,
-  } = useAction(insertDevisTemporaireAction, {
-    onSuccess: ({ data }) => {
-      if (!data?.success) {
-        return toast({
-          variant: "destructive",
-          title: tSauver("erreur"),
-          description: data?.message,
-        });
-      }
-      toast({
-        variant: "default",
-        title: tSauver("succes"),
-        description: data?.message,
-      });
-    },
-    onError: ({ error }) => {
-      toast({
-        variant: "destructive",
-        title: tSauver("erreur"),
-        description:
-          error?.serverError ??
-          tSauver("impossible-de-sauvegarder-le-devis-veuillez-reessayer"),
-      });
-    },
-  });
+    });
 
-  const submitForm = async (data: InsertClientType) => {
+  const submitForm = async (data: InsertProspectFormType) => {
     if (!accepte) {
       toast({
         variant: "destructive",
@@ -148,54 +125,16 @@ const SauvegarderProgression = () => {
       });
       return;
     }
-    if (data.emailContact !== "virounk@gmail.com") {
-      //Server action pour insérer ou update le client dans la db
-      executeSaveClient(data);
-      //TODO: ecrire dans la bdd une log table du devis avec formatted data, client_id, createdAt
-      //cf onSuccess
-      //TODO envoyez un email à Romu avec toutes les infos du devis grâce aux contextes
-      try {
-        await sendEmailFromClient({
-          to: "contact@fm4all.com",
-          from: "contact@fm4all.com",
-          subject: "Un client a sauvegardé sa progression",
-          text: `<p>Un client a sauvegardé sa progression dans le funnel.</p><br/>
-                <p>Voici ses coordonnées :</p><br/>
-                <p>Entreprise : ${data.nomEntreprise}</p>
-                <p>Code postal : ${data.codePostal}</p>
-                <p>Ville : ${data.ville}</p>
-                <p>Surface des locaux : ${data.surface}</p>
-                <p>Effectif : ${data.effectif}</p>
-                <p>Type de bâtiment : ${batiments.find(({ id }) => id === data.typeBatiment)?.description}</p>
-                <p>Type d'occupation : ${occupation.find(({ id }) => id === data.typeOccupation)?.description}</p><br/>
-                <p>Nom du contact : ${data.nomContact}</p>
-                <p>Prénom du contact : ${data.prenomContact}</p>
-                <p>Poste du contact : ${data.posteContact}</p>
-                <p>Email du contact : ${data.emailContact}</p>
-                <p>N°Tél du contact : ${data.phoneContact}</p><br/>
-                <p>Voici ses informations de chiffrage (avant personnalisation) :</p><br/>
-                <pre>${formatLocalStorageData()}</pre>
-                `,
-        });
-      } catch (err) {
-        console.log(err);
-      }
-    }
-    //TODO envoyer un email au client, bienvenue blablabla
-    const newCompletedSteps = [
-      ...new Set([...devisProgress.completedSteps, 1, 2, 3, 4, 5]),
-    ].sort((a, b) => a - b);
-    setDevisProgress({ currentStep: 6, completedSteps: newCompletedSteps });
-    setClient(data);
-    setLoading(true);
-    setTimeout(() => {
-      router.push("/devis/personnaliser");
-    }, 1000);
+    const prospectPayload: InsertProspectType = normalizeForSubmit(data, {
+      requiredNumbers: ["surface", "effectif"],
+    });
+    const textePayload = formatLocalStorageData();
+    executeSaveProgress({ prospect: prospectPayload, texte: textePayload });
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setClient((prev) => ({
+    setProspect((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -214,52 +153,52 @@ const SauvegarderProgression = () => {
             onSubmit={form.handleSubmit(submitForm)}
             className="mx-auto mt-6 flex w-full flex-col gap-8 md:w-2/3"
           >
-            <div className="flex flex-col gap-4 px-1 md:flex-row md:gap-8">
+            <div className="flex flex-col gap-4 px-1 md:flex-row md:gap-14">
               <div className="flex w-full flex-col gap-4 md:w-1/2">
-                <InputWithLabel<InsertClientType>
-                  fieldTitle="Email*"
-                  nameInSchema="emailContact"
-                  type="email"
+                <RhfInput<InsertProspectFormType>
+                  label="Email"
                   name="emailContact"
-                  handleChange={handleChange}
+                  type="email"
+                  onChange={handleChange}
                   data-testid="email-contact-input"
+                  requiredMark
                 />
-                <InputWithLabel<InsertClientType>
-                  fieldTitle={tSauver("n-de-telephone")}
-                  nameInSchema="phoneContact"
+                <RhfInput<InsertProspectFormType>
+                  label={tSauver("n-de-telephone")}
                   name="phoneContact"
-                  handleChange={handleChange}
+                  onChange={handleChange}
                   data-testid="phone-contact-input"
+                  requiredMark
                 />
-                <InputWithLabel<InsertClientType>
-                  fieldTitle={tSauver("nom-de-lentreprise")}
-                  nameInSchema="nomEntreprise"
+                <RhfInput<InsertProspectFormType>
+                  label={tSauver("nom-de-lentreprise")}
                   name="nomEntreprise"
-                  handleChange={handleChange}
+                  onChange={handleChange}
                   data-testid="nom-entreprise-input"
+                  requiredMark
                 />
               </div>
               <div className="flex w-full flex-col gap-4 md:w-1/2">
-                <InputWithLabel<InsertClientType>
-                  fieldTitle={tSauver("prenom-du-contact")}
-                  nameInSchema="prenomContact"
+                <RhfInput<InsertProspectFormType>
+                  label={tSauver("prenom-du-contact")}
                   name="prenomContact"
-                  handleChange={handleChange}
+                  onChange={handleChange}
                   data-testid="prenom-contact-input"
+                  requiredMark
                 />
-                <InputWithLabel<InsertClientType>
-                  fieldTitle={tSauver("nom-du-contact")}
-                  nameInSchema="nomContact"
+                <RhfInput<InsertProspectFormType>
+                  label={tSauver("nom-du-contact")}
                   name="nomContact"
-                  handleChange={handleChange}
+                  onChange={handleChange}
                   data-testid="nom-contact-input"
+                  requiredMark
                 />
-                <InputWithLabel<InsertClientType>
-                  fieldTitle={tSauver("poste-du-contact")}
-                  nameInSchema="posteContact"
-                  name="phoneContact"
-                  handleChange={handleChange}
+                <RhfInput<InsertProspectFormType>
+                  label={tSauver("poste-du-contact")}
+                  name="posteContact"
+                  onChange={handleChange}
                   data-testid="poste-contact-input"
+                  requiredMark
                 />
               </div>
             </div>
@@ -317,14 +256,11 @@ const SauvegarderProgression = () => {
                 size="lg"
                 title={tSauver("sauvegarder-ma-progression")}
                 className="min-w-28 text-base"
-                disabled={!accepte}
+                disabled={!accepte || isSavingProgress || isLoading}
                 data-testid="sauvegarder-progression-button"
               >
-                {isSavingClient || isSavingDevisTemporaire || loading ? (
-                  <LoaderCircle className="animate-spin" />
-                ) : (
-                  t("suivant")
-                )}
+                {(isSavingProgress || isLoading) && <Spinner />}
+                {t("suivant")}
               </Button>
             </div>
           </form>

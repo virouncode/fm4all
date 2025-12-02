@@ -8,7 +8,7 @@ import { occupation } from "@/constants/occupation";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";
 import { sendEmailFromClient } from "@/lib/email/sendEmail";
-import { useClientStore } from "@/stores/clientStore";
+import { useProspectStore } from "@/stores/prospectStore";
 import { CityOutType, createCityOutSchema } from "@/zod-schemas/cityout";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircle } from "lucide-react";
@@ -37,16 +37,16 @@ const CityOut = ({
 }: CityOutProps) => {
   const t = useTranslations("DevisPage.locaux.cityOut");
   const tSauverErreurs = useTranslations("DevisPage.sauver.erreurs");
-  const client = useClientStore((s) => s.client);
+  const prospect = useProspectStore((s) => s.prospect);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const defaultValues: CityOutType = {
-    nomEntreprise: client?.nomEntreprise || "",
-    prenomContact: client?.prenomContact || "",
-    nomContact: client?.nomContact || "",
-    posteContact: client?.posteContact || "",
-    emailContact: client?.emailContact || "",
-    phoneContact: client?.phoneContact || "",
+    nomEntreprise: prospect?.nomEntreprise || "",
+    prenomContact: prospect?.prenomContact || "",
+    nomContact: prospect?.nomContact || "",
+    posteContact: prospect?.posteContact || "",
+    emailContact: prospect?.emailContact || "",
+    phoneContact: prospect?.phoneContact || "",
   };
   const form = useForm<CityOutType>({
     mode: "all",
@@ -70,8 +70,8 @@ const CityOut = ({
       await sendEmailFromClient({
         to: "contact@fm4all.com",
         from: "contact@fm4all.com",
-        subject: "Nouveau client : région en cours de développement",
-        text: `<p>Un nouveau client a laissé ses coordonnées sur la page de chiffrage automatique. La matrice de chiffrage est en cours de développement pour sa région.</p><br/>
+        subject: "Nouveau prospect : région en cours de développement",
+        text: `<p>Un nouveau prospect a laissé ses coordonnées sur la page de chiffrage automatique. La matrice de chiffrage est en cours de développement pour sa région.</p><br/>
           <p>Voici ses coordonnées :</p><br/>
           <p>Entreprise : ${data.nomEntreprise}</p>
           <p>Code postal : ${codePostal ?? ""}</p>
@@ -86,6 +86,7 @@ const CityOut = ({
           <p>Email du contact : ${data.emailContact}</p>
           <p>N°Tél du contact : ${data.phoneContact}</p>
           `,
+        useTemplate: true,
       });
       toast({
         variant: "default",

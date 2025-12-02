@@ -1086,6 +1086,27 @@
       "when": 1764536188797,
       "tag": "0154_equal_omega_flight",
       "breakpoints": true
+    },
+    {
+      "idx": 155,
+      "version": "7",
+      "when": 1764619728673,
+      "tag": "0155_special_miracleman",
+      "breakpoints": true
+    },
+    {
+      "idx": 156,
+      "version": "7",
+      "when": 1764619871288,
+      "tag": "0156_hard_mad_thinker",
+      "breakpoints": true
+    },
+    {
+      "idx": 157,
+      "version": "7",
+      "when": 1764621044148,
+      "tag": "0157_marvelous_war_machine",
+      "breakpoints": true
     }
   ]
 }

@@ -94,10 +94,10 @@ export const interventionTypeCodes = interventionTypeCT.map(
 ];
 
 export const typeBatimentCT = [
-  { code: "bureaux", name: "Bureaux" },
-  { code: "localCommercial", name: "Local commercial" },
-  { code: "entrepot", name: "Entrepot" },
-  { code: "cabinetMedical", name: "Cabinet médical" },
+  { code: "bureaux", name: "batiments.bureaux" },
+  { code: "localCommercial", name: "batiments.localCommercial" },
+  { code: "entrepot", name: "batiments.entrepot" },
+  { code: "cabinetMedical", name: "batiments.cabinetMedical" },
 ] as const;
 
 export const typeBatimentCodes = typeBatimentCT.map(
@@ -108,9 +108,9 @@ export const typeBatimentCodes = typeBatimentCT.map(
 ];
 
 export const typeOccupationCT = [
-  { code: "partieEtage", name: "Partie d'étage" },
-  { code: "plateauComplet", name: "Plateau complet" },
-  { code: "batimentEntier", name: "Bâtiment entier" },
+  { code: "partieEtage", name: "occupation.partieEtage" },
+  { code: "plateauComplet", name: "occupation.plateauComplet" },
+  { code: "batimentEntier", name: "occupation.batimentEntier" },
 ] as const;
 
 export const typeOccupationCodes = typeOccupationCT.map(
