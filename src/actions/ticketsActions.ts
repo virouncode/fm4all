@@ -235,7 +235,7 @@ export const updateTicketAction = actionClient
     }
 
     // Vérifier que le ticket appartient bien au client
-    const existingTicket = await db
+    const [existingTicket] = await db
       .select()
       .from(tickets)
       .where(
@@ -243,7 +243,7 @@ export const updateTicketAction = actionClient
       )
       .limit(1);
 
-    if (existingTicket.length === 0) {
+    if (!existingTicket) {
       throw new Error(
         locale === "fr"
           ? "Ticket introuvable ou non accessible."
@@ -258,6 +258,7 @@ export const updateTicketAction = actionClient
 
     const payload = updateTicketInDbSchema.parse({
       ...ticketData,
+      id: ticketIdFromInput,
       dateCloture: dateClotureValue,
       updatedById,
     });
