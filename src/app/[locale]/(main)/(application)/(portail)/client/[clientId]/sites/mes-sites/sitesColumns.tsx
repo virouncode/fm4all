@@ -8,6 +8,7 @@ import {
 import { formatInTimezone } from "@/lib/utils/formatDates";
 import { SelectSiteType, SORTABLE_SITES_COLUMNS } from "@/zod-schemas/site";
 import { ColumnDef } from "@tanstack/react-table";
+import { useTranslations } from "next-intl";
 
 export const sitesIdLabelMap = new Map<
   keyof typeof SORTABLE_SITES_COLUMNS,
@@ -25,7 +26,9 @@ export const sitesIdLabelMap = new Map<
   ["updatedAt", "Dernière mise à jour"],
 ]);
 
-export const sitesColumns: ColumnDef<SelectSiteType>[] = [
+export const createSitesColumns = (
+  t: ReturnType<typeof useTranslations>,
+): ColumnDef<SelectSiteType>[] => [
   {
     accessorKey: "id",
     header: ({ column }) => (
@@ -94,7 +97,7 @@ export const sitesColumns: ColumnDef<SelectSiteType>[] = [
         label={getColumnLabel("typeBatiment", sitesIdLabelMap)}
       />
     ),
-    accessorFn: (row) => toCodeTableName(row.typeBatiment, typeBatimentCT),
+    accessorFn: (row) => t(toCodeTableName(row.typeBatiment, typeBatimentCT)),
   },
   {
     accessorKey: "typeOccupation",
@@ -104,7 +107,8 @@ export const sitesColumns: ColumnDef<SelectSiteType>[] = [
         label={getColumnLabel("typeOccupation", sitesIdLabelMap)}
       />
     ),
-    accessorFn: (row) => toCodeTableName(row.typeOccupation, typeOccupationCT),
+    accessorFn: (row) =>
+      t(toCodeTableName(row.typeOccupation, typeOccupationCT)),
   },
   {
     accessorKey: "createdAt",

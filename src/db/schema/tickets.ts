@@ -21,13 +21,7 @@ export const tickets = pgTable(
     id: serial().primaryKey(),
     clientId: integer("client_id").notNull(),
     siteId: integer("site_id").notNull(),
-    fournisseurId: integer("fournisseur_id"),
-    createdById: text("created_by_id").references(() => user.id, {
-      onDelete: "set null",
-    }),
-    updatedById: text("updated_by_id").references(() => user.id, {
-      onDelete: "set null",
-    }),
+    fournisseurId: integer("fournisseur_id").notNull(),
     titre: varchar().notNull(),
     description: varchar(),
     categorie: ticketCategorieEnum("categorie").notNull(),
@@ -37,6 +31,12 @@ export const tickets = pgTable(
       withTimezone: true,
       mode: "date",
       precision: 3,
+    }),
+    createdById: text("created_by_id").references(() => user.id, {
+      onDelete: "set null",
+    }),
+    updatedById: text("updated_by_id").references(() => user.id, {
+      onDelete: "set null",
     }),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
@@ -60,19 +60,15 @@ export const ticketsAttachments = pgTable(
     ticketId: integer("ticket_id")
       .notNull()
       .references(() => tickets.id, { onDelete: "cascade" }),
-    uploadedById: text("uploaded_by_id").references(() => user.id, {
-      onDelete: "set null",
-    }),
     url: varchar("url").notNull(),
     filename: varchar("filename").notNull(),
     mimeType: varchar("mime_type").notNull(),
     size: integer("size").notNull(), // en bytes
     description: varchar("description"),
+    createdById: text("created_by_id").references(() => user.id, {
+      onDelete: "set null",
+    }),
     createdAt: createdAt(),
-    updatedAt: updatedAt(),
   },
-  (table) => [
-    index("tickets_attachment_ticket_id_idx").on(table.ticketId),
-    index("tickets_attachment_uploaded_by_id_idx").on(table.uploadedById),
-  ],
+  (table) => [index("tickets_attachment_ticket_id_idx").on(table.ticketId)],
 );

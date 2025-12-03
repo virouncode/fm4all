@@ -126,7 +126,7 @@ const SauvegarderProgression = () => {
       return;
     }
     const prospectPayload: InsertProspectType = normalizeForSubmit(data, {
-      requiredNumbers: ["surface", "effectif"],
+      requiredNumbers: ["surface", "effectif"] as const,
     });
     const textePayload = formatLocalStorageData();
     executeSaveProgress({ prospect: prospectPayload, texte: textePayload });

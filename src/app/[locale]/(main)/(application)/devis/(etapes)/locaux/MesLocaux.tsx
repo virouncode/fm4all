@@ -148,7 +148,7 @@ const MesLocaux = () => {
     const payload = normalizeForSubmit(
       { ...data, ville: "" },
       {
-        requiredNumbers: ["surface", "effectif"],
+        requiredNumbers: ["surface", "effectif"] as const,
       },
     );
     setLoading(true);

@@ -1,6 +1,6 @@
 import { getSession } from "@/lib/auth-session";
 import { getUserById } from "@/lib/queries/users/getUsers";
-import { UpdateUserType } from "@/zod-schemas/user";
+import { UpdateUserFormType } from "@/zod-schemas/user";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 import UpdateUserForm from "./UpdateUserForm";
@@ -46,14 +46,20 @@ const page = async ({
 
   if (!user) return errorComponent;
 
-  const defaultValues: UpdateUserType = {
+  const defaultValues: UpdateUserFormType = {
     id: user.id ?? "",
-    name: user.name ?? "",
     firstName: user.firstName ?? "",
     lastName: user.lastName ?? "",
     email: user.email ?? "",
-    image: user.image ?? undefined,
     phone: user.phone ?? "",
+    avatarAttachment: user.image
+      ? {
+          url: user.image,
+          mimeType: "image/*",
+          filename: "avatar",
+          size: 0,
+        }
+      : null,
   };
 
   return (

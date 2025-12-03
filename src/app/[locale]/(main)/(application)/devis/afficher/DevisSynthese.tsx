@@ -2,6 +2,7 @@
 
 import { MARGE } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
+import { useProspectStore } from "@/stores/prospectStore";
 import { useTotalStore } from "@/stores/totalStore";
 import { useTranslations } from "next-intl";
 import TotalCafe from "../TotalCafe";
@@ -14,7 +15,6 @@ import TotalOfficeManager from "../TotalOfficeManager";
 import TotalServicesFm4All from "../TotalServicesFm4All";
 import TotalSnacksFruits from "../TotalSnacksFruits";
 import TotalThe from "../TotalThe";
-import { useProspectStore } from "@/stores/prospectStore";
 
 // Font files can be colocated inside of `pages`
 

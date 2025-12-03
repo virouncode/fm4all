@@ -21,6 +21,7 @@ type UpdateTicketFormProps = {
   clientId: number;
   sites: SelectSiteType[];
   fournisseurs: SelectFournisseurType[];
+  isDevisTicket?: boolean;
 };
 
 export default function UpdateTicketForm({
@@ -28,6 +29,7 @@ export default function UpdateTicketForm({
   clientId,
   sites,
   fournisseurs,
+  isDevisTicket = false,
 }: UpdateTicketFormProps) {
   const router = useRouter();
   const form = useForm<UpdateTicketFormType>({
@@ -68,9 +70,8 @@ export default function UpdateTicketForm({
 
   const submitForm = (data: UpdateTicketFormType) => {
     const payload = normalizeForSubmit(data, {
-      optionalStrings: ["description"],
-      optionalNumbers: ["fournisseurId"],
-      requiredNumbers: ["siteId"],
+      optionalStrings: ["description"] as const,
+      requiredNumbers: ["siteId", "fournisseurId"] as const,
     });
     executeUpdateTicket(payload);
   };
@@ -88,6 +89,7 @@ export default function UpdateTicketForm({
         sites={sites}
         fournisseurs={fournisseurs}
         userRole="client"
+        isDevisTicket={isDevisTicket}
       />
     </Form>
   );

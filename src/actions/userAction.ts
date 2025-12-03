@@ -70,7 +70,6 @@ export const insertUserAction = actionClient
         body: {
           ...userInput,
           password: tempPassword,
-          name: userInput.firstName + " " + userInput.lastName,
         },
       });
       await sendEmailFromServer({

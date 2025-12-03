@@ -6,7 +6,6 @@ import { SelectUserType } from "@/zod-schemas/user";
 import { ColumnDef } from "@tanstack/react-table";
 
 export const clientUsersIdLabelMap = new Map<string, string>([
-  ["id", "ID"],
   ["lastName", "Nom"],
   ["firstName", "Prénom"],
   ["email", "Email"],
@@ -16,16 +15,6 @@ export const clientUsersIdLabelMap = new Map<string, string>([
 ]);
 
 export const clientUsersColumns: ColumnDef<SelectUserType>[] = [
-  {
-    accessorKey: "id",
-    header: ({ column }) => (
-      <SortableHeader
-        column={column}
-        label={getColumnLabel("id", clientUsersIdLabelMap)}
-      />
-    ),
-    accessorFn: (row) => row.id,
-  },
   {
     accessorKey: "lastName",
     header: ({ column }) => (

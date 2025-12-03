@@ -21,6 +21,9 @@ export const insertSiteSchema = createInsertSchema(sites).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+  createdById: true, //ajouté côté serveur
+  updatedById: true, //ajouté côté serveur
+  clientId: true, //ajouté côté serveur
 });
 export type InsertSiteType = z.infer<typeof insertSiteSchema>;
 
@@ -29,6 +32,7 @@ export const insertSiteToDbSchema = insertSiteSchema.extend({
   updatedById: z
     .string() //c'est normal que ce soit un string ici car dans la table users id est un string
     .min(1, "ID de l'utilisateur modificateur obligatoire"),
+  clientId: z.number().positive("ID du client invalide"),
 });
 export type InsertSiteToDbType = z.infer<typeof insertSiteToDbSchema>;
 
@@ -36,17 +40,24 @@ export const updateSiteSchema = createUpdateSchema(sites)
   .omit({
     createdAt: true,
     updatedAt: true,
+    createdById: true, //ne peut pas être mis à jour
+    updatedById: true, //ajouté côté serveur
+    clientId: true, //ne peut pas être mis à jour
   })
   .extend({
     id: z.number().positive("ID du site invalide"),
   });
 export type UpdateSiteType = z.infer<typeof updateSiteSchema>;
 
-export const updateSiteInDbSchema = updateSiteSchema.extend({
-  updatedById: z
-    .string() //c'est normal que ce soit un string ici car dans la table users id est un string
-    .min(1, "ID de l'utilisateur modificateur obligatoire"),
-});
+export const updateSiteInDbSchema = updateSiteSchema
+  .extend({
+    updatedById: z
+      .string()
+      .min(1, "ID de l'utilisateur modificateur obligatoire"),
+  })
+  .omit({
+    id: true, //on ne met pas à jour l'id dans le parse
+  });
 
 export type UpdateSiteInDbType = z.infer<typeof updateSiteInDbSchema>;
 

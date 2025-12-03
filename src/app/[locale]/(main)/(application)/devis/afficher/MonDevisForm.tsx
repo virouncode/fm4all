@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Form } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
+import { MARGE, RATIO } from "@/constants/constants";
 import { departements } from "@/constants/departements";
 import useScrollIntoMonDevis from "@/hooks/use-scroll-into-mon-devis";
 import { toast } from "@/hooks/use-toast";
@@ -220,25 +221,25 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
 
     try {
       // 3) générer le PDF côté client avec ce prospect normalisé
-      const numerosDevis = `${payload.nomEntreprise}_${DateTime.local().toFormat(
+      const numeroDevis = `${payload.nomEntreprise}_${DateTime.local().toFormat(
         "dd-MM-yyyy'T'HH:mm",
       )}`;
-      const nomDevis = `Devis_fm4all_${numerosDevis}.pdf`;
+      const nomDevis = `Devis_fm4all_${numeroDevis}.pdf`;
 
-      const urlTemp = await fillDevis(
-        numerosDevis,
-        format(new Date(), "dd/MM/yyyy", { locale: fr }),
-        "FM4ALL comparateur en ligne",
-        payload as UpdateProspectType,
-        total.totalAnnuelHt ?? 0,
-        total.totalInstallationHt ?? 0,
-        commentaires ?? "",
-        payload.dateDeDemarrage
+      const urlTemp = await fillDevis({
+        numeroDevis,
+        dateEmission: format(new Date(), "dd/MM/yyyy", { locale: fr }),
+        nomEmetteur: "FM4ALL comparateur en ligne",
+        prospect: payload as UpdateProspectType,
+        totalAnnuelHTMarge: total.totalAnnuelHt ?? 0,
+        totalInstallationHTMarge: total.totalInstallationHt ?? 0,
+        commentaires: commentaires ?? "",
+        dateDemarrage: payload.dateDeDemarrage
           ? format(new Date(payload.dateDeDemarrage), "dd/MM/yyyy", {
               locale: fr,
             })
           : "",
-      );
+      });
 
       if (!urlTemp) {
         toast({
@@ -269,7 +270,14 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
       executeFinaliserDevis({
         prospect: payload as UpdateProspectType,
         devisUrl: finalDevisUrl,
-        commentaires: commentaires ?? "",
+        commentaires: commentaires ?? null,
+        devisMontants: {
+          totalMensuelHt: Math.round(((total.totalAnnuelHt ?? 0) / 12) * RATIO),
+          totalInstallationHt: Math.round(
+            (total.totalInstallationHt ?? 0) * RATIO,
+          ),
+          margeCoefficient: MARGE,
+        },
       });
     } catch (err) {
       toast({

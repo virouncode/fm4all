@@ -1,5 +1,5 @@
 import { LocaleType } from "@/i18n/routing";
-import { InsertUserType } from "@/zod-schemas/user";
+import { InsertUserFormType } from "@/zod-schemas/user";
 import NouveauMembreForm from "./NouveauMembreForm";
 
 const page = async ({
@@ -8,15 +8,12 @@ const page = async ({
   params: Promise<{ clientId: string; locale: LocaleType }>;
 }) => {
   const { clientId } = await params;
-  const defaultValues: InsertUserType = {
-    name: "",
+  const defaultValues: InsertUserFormType = {
     firstName: "",
     lastName: "",
     phone: "",
     email: "",
-    image: null,
-    role: "client",
-    clientId: parseInt(clientId),
+    avatarAttachment: null,
   };
   return (
     <main className="flex h-full w-full flex-col overflow-hidden">

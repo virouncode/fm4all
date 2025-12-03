@@ -91,7 +91,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
               >
                 {t("mon-espace")}
               </ObfuscatedLink>
-            ) : user?.role === "client" ? (
+            ) : user?.role.startsWith("client") ? (
               <ObfuscatedLink
                 href={{
                   pathname: "/client/[clientId]",

@@ -72,9 +72,9 @@ export default function ClientUpdateInterventionForm({
 
   const submitForm = (data: UpdateInterventionFormType) => {
     const payload = normalizeForSubmit(data, {
-      requiredDates: ["dateDebutPrevue"],
-      optionalDates: ["dateFinPrevue"],
-      requiredNumbers: ["siteId", "clientId", "fournisseurId"],
+      requiredDates: ["dateDebutPrevue"] as const,
+      optionalDates: ["dateFinPrevue"] as const,
+      requiredNumbers: ["siteId", "clientId", "fournisseurId"] as const,
     });
     executeUpdateIntervention(payload);
   };
@@ -92,9 +92,9 @@ export default function ClientUpdateInterventionForm({
     });
     if (!ok) return;
     const payload = normalizeForSubmit(defaultValues, {
-      requiredDates: ["dateDebutPrevue"],
-      optionalDates: ["dateFinPrevue"],
-      requiredNumbers: ["siteId", "clientId", "fournisseurId"],
+      requiredDates: ["dateDebutPrevue"] as const,
+      optionalDates: ["dateFinPrevue"] as const,
+      requiredNumbers: ["siteId", "clientId", "fournisseurId"] as const,
     });
     executeUpdateIntervention({ ...payload, status: "annulee" });
   };

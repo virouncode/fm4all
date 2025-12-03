@@ -130,13 +130,14 @@ const Total = () => {
       totalAnnuelHtSansServicesFm4all + totalFinalServicesFm4All;
 
     const totalInstallationHt =
-      (totalHygiene.totalInstallation ?? 0) +
-      totalCafe.totalEspaces
-        .map(({ totalInstallation }) => totalInstallation ?? 0)
-        .reduce((acc, curr) => acc + curr, 0) +
-      totalFontaines.totalEspaces
-        .map(({ totalInstallation }) => totalInstallation ?? 0)
-        .reduce((acc, curr) => acc + curr, 0);
+      ((totalHygiene.totalInstallation ?? 0) +
+        totalCafe.totalEspaces
+          .map(({ totalInstallation }) => totalInstallation ?? 0)
+          .reduce((acc, curr) => acc + curr, 0) +
+        totalFontaines.totalEspaces
+          .map(({ totalInstallation }) => totalInstallation ?? 0)
+          .reduce((acc, curr) => acc + curr, 0)) *
+      MARGE;
 
     setTotal({
       totalAnnuelHt,
@@ -202,10 +203,7 @@ const Total = () => {
             </span>
             <br />
             <span>
-              +{" "}
-              {formatNumber(
-                Math.round((total.totalInstallationHt ?? 0) * MARGE),
-              )}{" "}
+              + {formatNumber(Math.round(total.totalInstallationHt ?? 0))}{" "}
               {t("eur-ht-dinstallation")}
             </span>
           </SheetDescription>

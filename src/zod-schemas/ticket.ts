@@ -43,7 +43,9 @@ export const insertTicketSchema = createInsertSchema(tickets).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
-  clientId: true, //sera ajouté côté serveur
+  createdById: true, //ajouté côté serveur
+  updatedById: true, //ajouté côté serveur
+  clientId: true, //ajouté côté serveur
 });
 export type InsertTicketType = z.infer<typeof insertTicketSchema>;
 
@@ -60,8 +62,8 @@ export const insertTicketAttachmentSchema = createInsertSchema(
   ticketsAttachments,
 ).omit({
   id: true,
-  uploadedAt: true,
-  uploadedById: true,
+  createdAt: true,
+  createdById: true, //ajouté côté serveur
 });
 export type InsertTicketAttachmentType = z.infer<
   typeof insertTicketAttachmentSchema
@@ -69,7 +71,7 @@ export type InsertTicketAttachmentType = z.infer<
 
 export const insertTicketAttachmentToDbSchema =
   insertTicketAttachmentSchema.extend({
-    uploadedById: z.string().min(1, "ID de l'utilisateur uploadant le fichier"),
+    createdById: z.string().min(1, "ID de l'utilisateur créateur obligatoire"),
   });
 export type InsertTicketAttachmentToDbType = z.infer<
   typeof insertTicketAttachmentToDbSchema
@@ -96,6 +98,8 @@ export const updateTicketSchema = createUpdateSchema(tickets)
   .omit({
     createdAt: true,
     updatedAt: true,
+    createdById: true, //ne peut pas être mis à jour
+    updatedById: true, //ajouté côté serveur
     clientId: true, //ne peut pas être mis à jour
   })
   .extend({
@@ -103,11 +107,15 @@ export const updateTicketSchema = createUpdateSchema(tickets)
   });
 export type UpdateTicketType = z.infer<typeof updateTicketSchema>;
 
-export const updateTicketInDbSchema = updateTicketSchema.extend({
-  updatedById: z
-    .string()
-    .min(1, "ID de l'utilisateur modificateur obligatoire"),
-});
+export const updateTicketInDbSchema = updateTicketSchema
+  .extend({
+    updatedById: z
+      .string()
+      .min(1, "ID de l'utilisateur modificateur obligatoire"),
+  })
+  .omit({
+    id: true, //on ne met pas à jour l'id dans le parse
+  });
 export type UpdateTicketInDbType = z.infer<typeof updateTicketInDbSchema>;
 
 export const updateTicketInputSchema = updateTicketSchema.extend({
@@ -125,8 +133,10 @@ export const insertTicketFormSchema = z.object({
   categorie: ticketCategorieSchema,
   priorite: ticketPrioriteSchema,
   status: ticketStatusSchema,
-  siteId: z.string().min(1, "Site obligatoire"), //select
-  fournisseurId: z.string(), //select
+  siteId: z.string().refine((val) => val !== "0", "Site obligatoire"), //select
+  fournisseurId: z
+    .string()
+    .refine((val) => val !== "0", "Prestataire obligatoire"), //select
   description: z.string(),
   attachments: insertTicketAttachmentSchema
     .omit({

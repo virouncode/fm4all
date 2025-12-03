@@ -34,10 +34,14 @@ export const insertInterventionSchema = createInsertSchema(interventions).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
-  confirmeeClient: true,
-  confirmeeFournisseur: true,
-  clientConfirmedAt: true,
-  fournisseurConfirmedAt: true,
+  confirmeeClient: true, //ajouté côté serveur
+  confirmeeFournisseur: true, //ajouté côté serveur
+  clientConfirmedAt: true, //ajouté côté serveur
+  fournisseurConfirmedAt: true, //ajouté côté serveur
+  createdById: true, //ajouté côté serveur
+  updatedById: true, //ajouté côté serveur
+  dateDebutReelle: true,
+  dateFinReelle: true,
 });
 export type InsertInterventionType = z.infer<typeof insertInterventionSchema>;
 
@@ -60,17 +64,29 @@ export const updateInterventionSchema = createUpdateSchema(interventions)
   .omit({
     createdAt: true,
     updatedAt: true,
+    createdById: true, //ne peut pas être mis à jour
+    updatedById: true, //ajouté côté serveur
+    confirmeeClient: true, //ajouté côté serveur
+    confirmeeFournisseur: true, //ajouté côté serveur
+    clientConfirmedAt: true, //ajouté côté serveur
+    fournisseurConfirmedAt: true, //ajouté côté serveur
   })
   .extend({
     id: z.number().positive("ID de l'intervention invalide"),
   });
 export type UpdateInterventionType = z.infer<typeof updateInterventionSchema>;
 
-export const updateInterventionInDbSchema = updateInterventionSchema.extend({
-  updatedById: z
-    .string()
-    .min(1, "ID de l'utilisateur modificateur obligatoire"),
-});
+export const updateInterventionInDbSchema = updateInterventionSchema
+  .extend({
+    updatedById: z
+      .string()
+      .min(1, "ID de l'utilisateur modificateur obligatoire"),
+    confirmeeClient: z.boolean(),
+    confirmeeFournisseur: z.boolean(),
+    clientConfirmedAt: z.date().optional().nullable(),
+    fournisseurConfirmedAt: z.date().optional().nullable(),
+  })
+  .omit({ id: true });
 export type UpdateInterventionInDbType = z.infer<
   typeof updateInterventionInDbSchema
 >;
@@ -147,8 +163,8 @@ const DEFAULT_ORDER_DIR: "asc" | "desc" = "desc";
 export const interventionsQueryBackendSchema = z.object({
   dateDebutPrevueFrom: z.date().optional(),
   dateDebutPrevueTo: z.date().optional(),
-  type: z.string().optional(),
-  status: z.string().optional(),
+  type: interventionTypeSchema.optional(),
+  status: interventionStatusSchema.optional(),
   fournisseurId: z.number().int().optional(),
   siteId: z.number().int().optional(),
   //tri

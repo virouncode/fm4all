@@ -3,11 +3,7 @@
 import { updateUserAction } from "@/actions/userAction";
 import { Form } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
-import {
-  updateUserFormSchema,
-  UpdateUserFormType,
-  UpdateUserType,
-} from "@/zod-schemas/user";
+import { updateUserFormSchema, UpdateUserFormType } from "@/zod-schemas/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
@@ -16,25 +12,13 @@ import UserForm from "./UserForm";
 
 type UpdateUserFormProps = {
   clientId: number;
-  defaultValues: UpdateUserType;
+  defaultValues: UpdateUserFormType;
 };
 
 const UpdateUserForm = ({ clientId, defaultValues }: UpdateUserFormProps) => {
   const router = useRouter();
   const form = useForm<UpdateUserFormType>({
-    defaultValues: {
-      // on garde tous tes defaultValues...
-      ...defaultValues,
-      // ...et on ajoute avatarAttachment pour le RhfFileInput
-      avatarAttachment: defaultValues.image
-        ? {
-            url: defaultValues.image,
-            filename: "avatar", // on met ce qu'on veut, c'est juste pour l'UI
-            mimeType: "image/*", // commence par "image/" -> isImage = true
-            size: 0, // on s'en fiche ici
-          }
-        : null,
-    },
+    defaultValues,
     mode: "onTouched",
     resolver: zodResolver(updateUserFormSchema),
   });
@@ -80,7 +64,7 @@ const UpdateUserForm = ({ clientId, defaultValues }: UpdateUserFormProps) => {
 
   return (
     <Form {...form}>
-      <UserForm<UpdateUserType>
+      <UserForm<UpdateUserFormType>
         mode="edit"
         onSubmit={form.handleSubmit(submitForm)}
         isSubmitting={isSubmitting}

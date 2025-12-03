@@ -1,5 +1,5 @@
 import { getUserById } from "@/lib/queries/users/getUsers";
-import { UpdateUserType } from "@/zod-schemas/user";
+import { UpdateUserFormType } from "@/zod-schemas/user";
 import { ReactNode } from "react";
 import UpdateUserForm from "../../mon-profil/[userId]/UpdateUserForm";
 
@@ -38,14 +38,20 @@ const page = async ({
 
   if (!user) return errorComponent;
 
-  const defaultValues: UpdateUserType = {
-    id: user.id ?? "",
-    name: user.name ?? "",
-    firstName: user.firstName ?? "",
-    lastName: user.lastName ?? "",
-    email: user.email ?? "",
-    image: user.image ?? undefined,
-    phone: user.phone ?? "",
+  const defaultValues: UpdateUserFormType = {
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    phone: user.phone,
+    email: user.email,
+    avatarAttachment: user.image
+      ? {
+          url: user.image,
+          filename: "", // Non disponible
+          mimeType: "image/*", // Non disponible
+          size: 0, // Non disponible
+        }
+      : null,
   };
 
   return (

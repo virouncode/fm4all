@@ -20,9 +20,13 @@ import { useForm, useWatch } from "react-hook-form";
 
 type TicketsFiltersFormProps = {
   initialFilters: TicketsQueryBackendType;
+  isDevisTickets?: boolean;
 };
 
-const TicketsFiltersForm = ({ initialFilters }: TicketsFiltersFormProps) => {
+const TicketsFiltersForm = ({
+  initialFilters,
+  isDevisTickets = false,
+}: TicketsFiltersFormProps) => {
   const { replace } = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -37,7 +41,9 @@ const TicketsFiltersForm = ({ initialFilters }: TicketsFiltersFormProps) => {
       : "",
 
     // enums → valeur ou "all"
-    categorie: initialFilters.categorie ?? "all",
+    categorie: isDevisTickets
+      ? "demande_devis"
+      : (initialFilters.categorie ?? "all"),
     priorite: initialFilters.priorite ?? "all",
     status: initialFilters.status ?? "all",
 
@@ -129,19 +135,21 @@ const TicketsFiltersForm = ({ initialFilters }: TicketsFiltersFormProps) => {
           buttonClassName="w-40"
           withError={false}
         />
-        <RhfControlledSelect<TicketsQueryFiltersType>
-          label="Catégorie"
-          name="categorie"
-          selectClassName="w-40"
-          withError={false}
-        >
-          <SelectItem value="all">Toutes</SelectItem>
-          {ticketCategorieCT.map((c) => (
-            <SelectItem key={c.code} value={c.code}>
-              {c.name}
-            </SelectItem>
-          ))}
-        </RhfControlledSelect>
+        {!isDevisTickets && (
+          <RhfControlledSelect<TicketsQueryFiltersType>
+            label="Catégorie"
+            name="categorie"
+            selectClassName="w-40"
+            withError={false}
+          >
+            <SelectItem value="all">Toutes</SelectItem>
+            {ticketCategorieCT.map((c) => (
+              <SelectItem key={c.code} value={c.code}>
+                {c.name}
+              </SelectItem>
+            ))}
+          </RhfControlledSelect>
+        )}
         <RhfControlledSelect<TicketsQueryFiltersType>
           label="Priorité"
           name="priorite"
@@ -155,19 +163,21 @@ const TicketsFiltersForm = ({ initialFilters }: TicketsFiltersFormProps) => {
             </SelectItem>
           ))}
         </RhfControlledSelect>
-        <RhfControlledSelect<TicketsQueryFiltersType>
-          label="Etat"
-          name="status"
-          selectClassName="w-40"
-          withError={false}
-        >
-          <SelectItem value="all">Tous</SelectItem>
-          {ticketStatusCT.map((s) => (
-            <SelectItem key={s.code} value={s.code}>
-              {s.name}
-            </SelectItem>
-          ))}
-        </RhfControlledSelect>
+        {!isDevisTickets && (
+          <RhfControlledSelect<TicketsQueryFiltersType>
+            label="Etat"
+            name="status"
+            selectClassName="w-40"
+            withError={false}
+          >
+            <SelectItem value="all">Tous</SelectItem>
+            {ticketStatusCT.map((s) => (
+              <SelectItem key={s.code} value={s.code}>
+                {s.name}
+              </SelectItem>
+            ))}
+          </RhfControlledSelect>
+        )}
         {/* TODO Fournisseur et Sites */}
       </form>
     </Form>

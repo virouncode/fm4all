@@ -32,6 +32,7 @@ type TicketFormProps<TFormValues> = {
   sites: SelectSiteType[];
   fournisseurs: SelectFournisseurType[];
   userRole: UserRoleType;
+  isDevisTicket?: boolean;
 };
 
 type TicketFormValues = InsertTicketFormType | UpdateTicketFormType;
@@ -45,6 +46,7 @@ const TicketForm = <TFormValues,>({
   sites,
   fournisseurs,
   userRole,
+  isDevisTicket = false,
 }: TicketFormProps<TFormValues>) => {
   const form = useFormContext<TicketFormValues>();
   const { control, watch } = form;
@@ -83,19 +85,25 @@ const TicketForm = <TFormValues,>({
               requiredMark
               className="w-full md:col-span-1"
             />
-
             <RhfControlledSelect<TicketFormValues>
               name="categorie"
               label="Catégorie"
               requiredMark
               className="w-full md:col-span-1"
               selectClassName="w-full"
+              disabled={isDevisTicket}
             >
-              {ticketCategorieCT.map((categorie) => (
-                <SelectItem key={categorie.code} value={categorie.code}>
-                  {categorie.name}
-                </SelectItem>
-              ))}
+              {ticketCategorieCT
+                .filter((categorie) =>
+                  isDevisTicket
+                    ? categorie.code === "demande_devis"
+                    : categorie.code !== "demande_devis",
+                )
+                .map((categorie) => (
+                  <SelectItem key={categorie.code} value={categorie.code}>
+                    {categorie.name}
+                  </SelectItem>
+                ))}
             </RhfControlledSelect>
           </div>
 
@@ -139,6 +147,7 @@ const TicketForm = <TFormValues,>({
               className="w-full md:col-span-1"
               selectClassName="w-full"
             >
+              <SelectItem value="0">Sélectionner un site</SelectItem>
               {sites.map((site) => (
                 <SelectItem key={site.id} value={site.id.toString()}>
                   {site.nomSite}
@@ -151,6 +160,7 @@ const TicketForm = <TFormValues,>({
               className="w-full md:col-span-1"
               selectClassName="w-full"
               placeholder="Sélectionner un prestataire"
+              requiredMark
             >
               <SelectItem value="0">Sélectionner un prestataire</SelectItem>
               {fournisseurs.map((fournisseur) => (
@@ -168,7 +178,11 @@ const TicketForm = <TFormValues,>({
           <div className="grid gap-4 md:grid-cols-2 md:gap-14">
             <RhfTextArea<TicketFormValues>
               name="description"
-              label="Description"
+              label={
+                isDevisTicket
+                  ? "Description : veuillez détailler au mieux votre demande de devis (quantités, unités, spécificités, etc.)"
+                  : "Description"
+              }
               className="w-full md:col-span-2"
               textareaClassName="resize-none h-[200px]"
             />

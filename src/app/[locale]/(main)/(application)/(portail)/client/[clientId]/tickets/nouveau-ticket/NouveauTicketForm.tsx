@@ -20,6 +20,7 @@ type NouveauTicketFormProps = {
   clientId: number;
   sites: SelectSiteType[];
   fournisseurs: SelectFournisseurType[];
+  isDevisTicket?: boolean;
 };
 
 export default function NouveauTicketForm({
@@ -27,6 +28,7 @@ export default function NouveauTicketForm({
   clientId,
   sites,
   fournisseurs,
+  isDevisTicket = false,
 }: NouveauTicketFormProps) {
   const form = useForm<InsertTicketFormType>({
     defaultValues,
@@ -65,9 +67,8 @@ export default function NouveauTicketForm({
 
   const submitForm = (data: InsertTicketFormType) => {
     const payload = normalizeForSubmit(data, {
-      requiredNumbers: ["siteId"],
-      optionalNumbers: ["fournisseurId"],
-      optionalStrings: ["description"],
+      requiredNumbers: ["siteId", "fournisseurId"] as const,
+      optionalStrings: ["description"] as const,
     });
     executeInsertTicket(payload);
   };
@@ -85,6 +86,7 @@ export default function NouveauTicketForm({
         sites={sites}
         fournisseurs={fournisseurs}
         userRole="client"
+        isDevisTicket={isDevisTicket}
       />
     </Form>
   );

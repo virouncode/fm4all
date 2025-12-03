@@ -1,5 +1,5 @@
 import { batiments } from "@/constants/batiments";
-import { MARGE, TVA } from "@/constants/constants";
+import { TVA } from "@/constants/constants";
 import { occupation } from "@/constants/occupation";
 import { toast } from "@/hooks/use-toast";
 import { UpdateProspectType } from "@/zod-schemas/prospect";
@@ -11,15 +11,27 @@ import { sanitizeText } from "./sanitizeText";
 
 export const fillDevis = async (
   // url: string,
-  numeroDevis: string,
-  dateEmission: string,
-  nomEmetteur: string,
-  prospect: UpdateProspectType,
-  totalAnnuelHTMarge: number | null,
-  totalInstallationHT: number | null,
-  commentaires: string | null,
-  dateDemarrage: string | null,
+  params: {
+    numeroDevis: string;
+    dateEmission: string;
+    nomEmetteur: string;
+    prospect: UpdateProspectType;
+    totalAnnuelHTMarge: number | null;
+    totalInstallationHTMarge: number | null;
+    commentaires: string | null;
+    dateDemarrage: string | null;
+  },
 ) => {
+  const {
+    numeroDevis,
+    dateEmission,
+    nomEmetteur,
+    prospect,
+    totalAnnuelHTMarge,
+    totalInstallationHTMarge,
+    commentaires,
+    dateDemarrage,
+  } = params;
   try {
     const formPdfBytes = await fetch(
       "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/fm4all_devis_template_NEW.pdf",
@@ -31,11 +43,9 @@ export const fillDevis = async (
     const totalAnnuelHtText = formatNumber(totalAnnuelHTMarge ?? 0);
     const totalMensuelHtText = formatNumber((totalAnnuelHTMarge ?? 0) / 12);
     const tvaText = formatNumber(0.2 * (totalAnnuelHTMarge ?? 0));
-    const totalInstallationHtText = formatNumber(
-      (totalInstallationHT ?? 0) * MARGE,
-    );
+    const totalInstallationHtText = formatNumber(totalInstallationHTMarge ?? 0);
     const totalInstallationTtcText = formatNumber(
-      (totalInstallationHT ?? 0) * MARGE * TVA,
+      (totalInstallationHTMarge ?? 0) * TVA,
     );
     const totalAnnuelTtcText = formatNumber((totalAnnuelHTMarge ?? 0) * TVA);
     const adresseClient =

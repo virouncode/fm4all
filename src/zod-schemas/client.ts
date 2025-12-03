@@ -40,11 +40,15 @@ export const updateClientSchema = createUpdateSchema(clients)
   });
 export type UpdateClientType = z.infer<typeof updateClientSchema>;
 
-export const updateClientInDbSchema = updateClientSchema.extend({
-  updatedById: z
-    .string() //c'est normal que ce soit un string ici car dans la table users id est un string
-    .min(1, "ID de l'utilisateur modificateur obligatoire"),
-});
+export const updateClientInDbSchema = updateClientSchema
+  .extend({
+    updatedById: z
+      .string() //c'est normal que ce soit un string ici car dans la table users id est un string
+      .min(1, "ID de l'utilisateur modificateur obligatoire"),
+  })
+  .omit({
+    id: true, //on ne met pas à jour l'id dans le parse
+  });
 
 export type UpdateClientInDbType = z.infer<typeof updateClientInDbSchema>;
 

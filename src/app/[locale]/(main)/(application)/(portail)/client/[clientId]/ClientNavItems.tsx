@@ -294,15 +294,15 @@ export default function ClientNavItems() {
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild
-                    isActive={isActive("nouveau-devis")}
+                    isActive={isActive("nouvelle-demande")}
                   >
                     <Link
                       href={{
-                        pathname: "/client/[clientId]/devis/nouveau-devis",
+                        pathname: "/client/[clientId]/devis/nouvelle-demande",
                         params: { clientId },
                       }}
                     >
-                      Nouveau devis
+                      Nouvelle demande
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -311,49 +311,29 @@ export default function ClientNavItems() {
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild
-                    isActive={isActive("devis-en-cours")}
+                    isActive={isActive("demandes-en-cours")}
                   >
                     <Link
                       href={{
-                        pathname: "/client/[clientId]/devis/devis-en-cours",
+                        pathname: "/client/[clientId]/devis/demandes-en-cours",
                         params: { clientId },
                       }}
                     >
-                      Devis en cours
+                      Mes demandes en cours
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
 
-                {/* Devis acceptés */}
+                {/* Devis  */}
                 <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive("devis-acceptes")}
-                  >
+                  <SidebarMenuButton asChild isActive={isActive("mes-devis")}>
                     <Link
                       href={{
-                        pathname: "/client/[clientId]/devis/devis-acceptes",
+                        pathname: "/client/[clientId]/devis/mes-devis",
                         params: { clientId },
                       }}
                     >
-                      Devis acceptés
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-
-                {/* Historique */}
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive("historique-devis")}
-                  >
-                    <Link
-                      href={{
-                        pathname: "/client/[clientId]/devis/historique-devis",
-                        params: { clientId },
-                      }}
-                    >
-                      Historique
+                      Mes devis
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

@@ -3,18 +3,14 @@
 import { insertUserAction } from "@/actions/userAction";
 import { Form } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
-import {
-  insertUserFormSchema,
-  InsertUserFormType,
-  InsertUserType,
-} from "@/zod-schemas/user";
+import { insertUserFormSchema, InsertUserFormType } from "@/zod-schemas/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 import UserForm from "../../mon-profil/[userId]/UserForm";
 
 type NouveauMembreFormProps = {
-  defaultValues: InsertUserType;
+  defaultValues: InsertUserFormType;
   clientId: number;
 };
 
@@ -23,19 +19,7 @@ const NouveauMembreForm = ({
   clientId,
 }: NouveauMembreFormProps) => {
   const form = useForm<InsertUserFormType>({
-    defaultValues: {
-      // on garde tous tes defaultValues...
-      ...defaultValues,
-      // ...et on ajoute avatarAttachment pour le RhfFileInput
-      avatarAttachment: defaultValues.image
-        ? {
-            url: defaultValues.image,
-            filename: "avatar", // on met ce qu'on veut, c'est juste pour l'UI
-            mimeType: "image/*", // commence par "image/" -> isImage = true
-            size: 0, // on s'en fiche ici
-          }
-        : null,
-    },
+    defaultValues,
     mode: "onTouched",
     resolver: zodResolver(insertUserFormSchema),
   });
@@ -73,8 +57,9 @@ const NouveauMembreForm = ({
     const payload = {
       ...data,
       name: data.firstName + " " + data.lastName,
-      password: "TempPass123!", // Mot de passe temporaire
       image: data.avatarAttachment ? data.avatarAttachment.url : null,
+      role: "client" as const,
+      clientId,
     };
     executeInsertUser(payload);
   };
@@ -83,7 +68,7 @@ const NouveauMembreForm = ({
 
   return (
     <Form {...form}>
-      <UserForm<InsertUserType>
+      <UserForm<InsertUserFormType>
         mode="create"
         onSubmit={form.handleSubmit(submitForm)}
         isSubmitting={isSubmitting}

@@ -111,3 +111,88 @@ export const getTicket = async (ticketId: number) => {
   });
   return { ...parsedTicket, attachments };
 };
+
+export const getDevisTickets = async (params: {
+  clientId: number;
+  query: TicketsQueryBackendType;
+}) => {
+  const {
+    createdFrom,
+    createdTo,
+    categorie,
+    priorite,
+    status,
+    fournisseurId,
+    siteId,
+    orderBy,
+    orderDir,
+    page,
+    pageSize,
+  } = params.query;
+
+  const whereClauses: SQL[] = [];
+  whereClauses.push(eq(tickets.clientId, params.clientId));
+
+  if (createdFrom) {
+    const createdFromDate = dateToUtcStartOfDay(createdFrom);
+    if (createdFromDate)
+      whereClauses.push(gte(tickets.createdAt, createdFromDate));
+  }
+
+  if (createdTo) {
+    const createdToDate = dateToUtcStartOfNextDay(createdTo);
+    if (createdToDate) whereClauses.push(lt(tickets.createdAt, createdToDate));
+  }
+
+  whereClauses.push(eq(tickets.categorie, "demande_devis"));
+  if (priorite) whereClauses.push(eq(tickets.priorite, priorite));
+  if (status) whereClauses.push(eq(tickets.status, status));
+  if (fournisseurId)
+    whereClauses.push(eq(tickets.fournisseurId, fournisseurId));
+  if (siteId) whereClauses.push(eq(tickets.siteId, siteId));
+
+  const orderColumn =
+    SORTABLE_TICKETS_COLUMNS[orderBy] ?? SORTABLE_TICKETS_COLUMNS.createdAt;
+
+  const orderDirection = orderDir === "asc" ? asc : desc;
+  const orderExpr = orderDirection(orderColumn);
+
+  const effectivePage = page ?? 1;
+  const effectivePageSize = pageSize ?? DEFAULT_PAGE_SIZE;
+  const offset = (effectivePage - 1) * effectivePageSize;
+
+  const where = whereClauses.length > 0 ? and(...whereClauses) : undefined;
+
+  const [totalRows] = await db
+    .select({
+      value: sql<number>`cast(count(*) as int)`,
+    })
+    .from(tickets)
+    .where(where);
+
+  const total = totalRows?.value ?? 0;
+  const totalPages = Math.max(Math.ceil(total / effectivePageSize), 1);
+
+  const rows = await db
+    .select()
+    .from(tickets)
+    .where(where)
+    .orderBy(orderExpr)
+    .limit(effectivePageSize + 1) // +1 pour savoir s'il y a une page suivante
+    .offset(offset);
+
+  const hasMore = rows.length > effectivePageSize;
+  const slice = hasMore ? rows.slice(0, effectivePageSize) : rows;
+  const items = slice.map((ticket) => selectTicketSchema.parse(ticket));
+  const nextPage = hasMore ? effectivePage + 1 : null;
+
+  return {
+    items,
+    page: effectivePage,
+    pageSize: effectivePageSize,
+    total,
+    totalPages,
+    hasMore,
+    nextPage,
+  };
+};

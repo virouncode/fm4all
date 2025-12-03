@@ -1,16 +1,15 @@
-import { LocaleType } from "@/i18n/routing";
 import {
   getClientFournisseurs,
   getClientSites,
 } from "@/lib/queries/clients/getClients";
 import { InsertTicketFormType } from "@/zod-schemas/ticket";
 import { ReactNode } from "react";
-import NouveauTicketForm from "./NouveauTicketForm";
+import NouveauTicketForm from "../../tickets/nouveau-ticket/NouveauTicketForm";
 
 const page = async ({
   params,
 }: {
-  params: Promise<{ clientId: string; locale: LocaleType }>;
+  params: Promise<{ clientId: string; locale: string }>;
 }) => {
   const { clientId } = await params;
   const [sites, fournisseurs] = await Promise.all([
@@ -32,17 +31,19 @@ const page = async ({
   const errorComponent: ReactNode = (
     <main className="flex h-full w-full flex-col overflow-hidden">
       <div className="bg-background/95 shrink-0 border-b p-2">
-        <h1 className="text-center text-xl font-bold">Nouveau ticket</h1>
+        <h1 className="text-center text-xl font-bold">
+          Nouvelle demande de devis
+        </h1>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto">
         <div className="flex justify-center p-6">
           <div className="w-full max-w-3xl pb-8">
             <div className="mb-6">
               <h2 className="mb-2 text-xl font-semibold tracking-tight">
-                Ajoutez un nouveau ticket
+                Ajoutez une nouvelle demande de devis
               </h2>
               <p className="text-muted-foreground text-sm">
-                Ajoutez les détails du nouveau ticket ci-dessous
+                Ajoutez les détails de la demande de devis ci-dessous
               </p>
             </div>
             <div>
@@ -62,29 +63,31 @@ const page = async ({
 
   const defaultValues: InsertTicketFormType = {
     titre: "",
-    categorie: "autre",
+    categorie: "demande_devis",
     fournisseurId: "0",
     description: "",
     priorite: "normale",
     status: "nouveau",
     attachments: [],
-    siteId: sites[0].id.toString(),
+    siteId: "0",
   };
 
   return (
     <main className="flex h-full w-full flex-col overflow-hidden">
       <div className="bg-background/95 shrink-0 border-b">
-        <h1 className="py-2 text-center text-xl font-bold">Nouveau ticket</h1>
+        <h1 className="py-2 text-center text-xl font-bold">
+          Nouvelle demande de devis
+        </h1>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto">
         <div className="flex justify-center p-6">
           <div className="w-full max-w-3xl pb-8">
             <div className="mb-6">
               <h2 className="mb-2 text-xl font-semibold tracking-tight">
-                Ajoutez un nouveau ticket
+                Ajoutez une demande de devis
               </h2>
               <p className="text-muted-foreground text-sm">
-                Ajoutez les détails du nouveau ticket ci-dessous
+                Ajoutez les détails de la demande ci-dessous
               </p>
             </div>
             <NouveauTicketForm
@@ -92,6 +95,7 @@ const page = async ({
               clientId={parseInt(clientId)}
               sites={sites}
               fournisseurs={fournisseurs}
+              isDevisTicket={true}
             />
           </div>
         </div>

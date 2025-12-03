@@ -2,11 +2,8 @@
 import { insertSiteAction } from "@/actions/sitesActions";
 import { Form } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
-import {
-  insertSiteFormSchema,
-  InsertSiteFormType,
-  InsertSiteType,
-} from "@/zod-schemas/site";
+import { normalizeForSubmit } from "@/zod-helpers/normalize";
+import { insertSiteFormSchema, InsertSiteFormType } from "@/zod-schemas/site";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
@@ -54,14 +51,10 @@ const NouveauSiteForm = ({ defaultValues, clientId }: NouveauSiteFormProps) => {
   );
 
   const submitForm = (data: InsertSiteFormType) => {
-    const payload: InsertSiteType = {
-      ...data,
-      clientId,
-      adresseLigne2: data.adresseLigne2 ?? null,
-      commentaires: data.commentaires ?? null,
-      surface: Number(data.surface),
-      effectif: Number(data.effectif),
-    };
+    const payload = normalizeForSubmit(data, {
+      optionalStrings: ["adresseLigne2", "commentaires"] as const,
+      requiredNumbers: ["surface", "effectif"] as const,
+    });
     executeInsertSite(payload);
   };
 

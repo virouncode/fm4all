@@ -6,12 +6,13 @@ import { db } from "@/db";
 import { devis, devisTemporaires, prospects } from "@/db/schema";
 import { sendEmailFromServer } from "@/lib/email/sendEmail";
 import { actionClient } from "@/lib/safe-actions";
-import { saveProgressSchema } from "@/zod-schemas/devis";
+import { insertDevisSchema, saveProgressSchema } from "@/zod-schemas/devis";
 import { finaliserDevisSchema } from "@/zod-schemas/finaliserDevis";
 import { SelectProspectType } from "@/zod-schemas/prospect";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { and, eq } from "drizzle-orm";
+import { DateTime } from "luxon";
 import { getLocale } from "next-intl/server";
 import { flattenValidationErrors } from "next-safe-action";
 
@@ -140,7 +141,7 @@ export const finaliserDevisAction = actionClient
   })
   .action(async ({ parsedInput }) => {
     const locale = await getLocale();
-    const { prospect, devisUrl, commentaires } = parsedInput;
+    const { prospect, devisUrl, commentaires, devisMontants } = parsedInput;
 
     if (!prospect.id) {
       throw new Error("Prospect ID manquant pour la finalisation du devis.");
@@ -159,14 +160,28 @@ export const finaliserDevisAction = actionClient
 
     const finalDevisUrl = devisUrl;
 
+    const payload = insertDevisSchema.parse({
+      titre: "Devis en ligne fm4all",
+      description: "Devis généré via le comparateur en ligne fm4all",
+      typePrix: "forfait",
+      margeCoefficient: devisMontants.margeCoefficient,
+      status: "emis",
+      devisUrl: finalDevisUrl,
+      prospectId: updatedProspect.id,
+      fournisseurId: 16, // FM4ALL ID
+      totalMensuelHt: devisMontants.totalMensuelHt /*10000*/,
+      totalInstallationHt: devisMontants.totalInstallationHt ?? null /*10000*/,
+      dateValidite: DateTime.now()
+        .startOf("day")
+        .plus({ days: 15 })
+        .toISODate(),
+    });
+
     // 2) Transaction : insert devis
     const result = await db.transaction(async (tx) => {
       const [insertedDevis] = await tx
         .insert(devis)
-        .values({
-          prospectId: updatedProspect.id,
-          devisUrl: finalDevisUrl,
-        })
+        .values(payload)
         .returning();
 
       if (!insertedDevis) {

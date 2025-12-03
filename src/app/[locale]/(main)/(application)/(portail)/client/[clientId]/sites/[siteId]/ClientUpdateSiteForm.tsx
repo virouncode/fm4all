@@ -57,8 +57,8 @@ const ClientUpdateSiteForm = ({
 
   const submitForm = (data: UpdateSiteFormType) => {
     const payload = normalizeForSubmit(data, {
-      requiredNumbers: ["surface", "effectif"],
-      optionalStrings: ["adresseLigne2", "commentaires"],
+      requiredNumbers: ["surface", "effectif"] as const,
+      optionalStrings: ["adresseLigne2", "commentaires"] as const,
     });
     executeUpdateSite(payload);
   };

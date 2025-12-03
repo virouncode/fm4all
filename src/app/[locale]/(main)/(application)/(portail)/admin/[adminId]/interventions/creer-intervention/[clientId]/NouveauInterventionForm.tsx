@@ -66,9 +66,9 @@ export default function NouveauInterventionForm({
 
   const submitForm = (data: InsertInterventionFormType) => {
     const payload = normalizeForSubmit(data, {
-      requiredDates: ["dateDebutPrevue"],
-      optionalDates: ["dateFinPrevue"],
-      requiredNumbers: ["siteId", "fournisseurId", "clientId"],
+      requiredDates: ["dateDebutPrevue"] as const,
+      optionalDates: ["dateFinPrevue"] as const,
+      requiredNumbers: ["siteId", "fournisseurId", "clientId"] as const,
     });
     executeInsertIntervention(payload);
   };

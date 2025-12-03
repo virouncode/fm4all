@@ -1,12 +1,9 @@
-import {
-  AttachmentFieldValue,
-  RhfFileInput,
-} from "@/components/rhf/RhfFileInput";
+import { RhfFileInput } from "@/components/rhf/RhfFileInput";
 import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
 import { FieldGroup, FieldLegend, FieldSet } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
-import { InsertUserType, UpdateUserType } from "@/zod-schemas/user";
+import { InsertUserFormType, UpdateUserFormType } from "@/zod-schemas/user";
 import { useFormContext } from "react-hook-form";
 
 type UserFormProps<TFormValues> = {
@@ -17,9 +14,7 @@ type UserFormProps<TFormValues> = {
   clientId?: number;
 };
 
-type UserFormValues =
-  | (InsertUserType & { avatarAttachment: AttachmentFieldValue | null })
-  | (UpdateUserType & { avatarAttachment: AttachmentFieldValue | null });
+type UserFormValues = InsertUserFormType | UpdateUserFormType;
 
 const UserForm = <TFormValues,>({
   mode,
@@ -77,13 +72,13 @@ const UserForm = <TFormValues,>({
             className="w-1/2"
             onValueChange={(val) => {
               // ne garder que l'URL dans image
-              setValue("image", val?.url ?? null, {
+              setValue("avatarAttachment.url", val?.url, {
                 shouldDirty: true,
                 shouldTouch: true,
               });
             }}
             onClear={() => {
-              setValue("image", null, {
+              setValue("avatarAttachment.url", undefined, {
                 shouldDirty: true,
                 shouldTouch: true,
               });

@@ -4,13 +4,14 @@ import {
   RawSearchParams,
 } from "@/normalize/normalizeSearchParams";
 import { createSortSchema } from "@/zod-helpers/createSortSchema";
+import { capitalizeWords } from "@/zod-helpers/normalize";
 import {
   createInsertSchema,
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-zod";
 import { z } from "zod";
-import { AttachmentFieldValue } from "./ticket";
+import { phoneNumberSchema } from "./phone";
 
 export const userRoleSchema = z.enum(roleEnum.enumValues);
 export type UserRoleType = z.infer<typeof userRoleSchema>;
@@ -31,28 +32,23 @@ export const updateUserSchema = createUpdateSchema(user).omit({
   createdAt: true,
   updatedAt: true,
   emailVerified: true,
+  clientId: true, //ne peut pas être modifié
+  role: true, //ne peut pas être modifié
 });
 export type UpdateUserType = z.infer<typeof updateUserSchema>;
 
 //======================= FORM SCHEMAS ==========================//
-export const insertUserFormSchema = insertUserSchema
-  .omit({ name: true, password: true })
-  .extend({
-    avatarAttachment: z
-      .object({
-        url: z.url("URL invalide"),
-        filename: z.string(),
-        mimeType: z.string(),
-        size: z.number(),
-      })
-      .nullable(),
-  });
-
-export type InsertUserFormType = z.input<typeof insertUserFormSchema> & {
-  avatarAttachment: AttachmentFieldValue | null;
-};
-
-export const updateUserFormSchema = updateUserSchema.extend({
+export const insertUserFormSchema = z.object({
+  firstName: z
+    .string()
+    .min(1, "Le prénom est obligatoire")
+    .transform((val) => capitalizeWords(val)),
+  lastName: z
+    .string()
+    .min(1, "Le nom est obligatoire")
+    .transform((val) => capitalizeWords(val)),
+  email: z.email("Email invalide").transform((val) => val.toLowerCase()),
+  phone: phoneNumberSchema("N° de téléphone invalide"),
   avatarAttachment: z
     .object({
       url: z.url("URL invalide"),
@@ -63,13 +59,15 @@ export const updateUserFormSchema = updateUserSchema.extend({
     .nullable(),
 });
 
-export type UpdateUserFormType = z.input<typeof updateUserSchema> & {
-  avatarAttachment: AttachmentFieldValue | null;
-};
+export type InsertUserFormType = z.infer<typeof insertUserFormSchema>;
+
+export const updateUserFormSchema = insertUserFormSchema.partial().extend({
+  id: z.string().min(1, "ID de l'utilisateur obligatoire"),
+});
+export type UpdateUserFormType = z.infer<typeof updateUserFormSchema>;
 
 //================== USERS QUERY PARAMS ==================//
 export const SORTABLE_CLIENT_USERS_COLUMNS = {
-  id: user.id,
   lastName: user.lastName,
   firstName: user.firstName,
   email: user.email,
@@ -79,7 +77,6 @@ export const SORTABLE_CLIENT_USERS_COLUMNS = {
 } as const;
 
 export const clientUsersOrderBySchema = z.enum([
-  "id",
   "lastName",
   "firstName",
   "email",

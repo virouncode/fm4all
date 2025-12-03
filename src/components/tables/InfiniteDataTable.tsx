@@ -51,6 +51,7 @@ type InfiniteDataTableProps<T> = {
   enableClientSorting?: boolean;
   sorting?: SortingState;
   setSorting?: Dispatch<SetStateAction<SortingState>>;
+  initialHiddenColumns?: string[];
 };
 
 const InfiniteDataTable = <T,>({
@@ -68,8 +69,16 @@ const InfiniteDataTable = <T,>({
   enableClientSorting = false,
   sorting,
   setSorting,
+  initialHiddenColumns = [],
 }: InfiniteDataTableProps<T>) => {
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+    () => {
+      return initialHiddenColumns.reduce<VisibilityState>((acc, colId) => {
+        acc[colId] = false;
+        return acc;
+      }, {});
+    },
+  );
 
   const { rootRef, targetRef } = useIntersection<HTMLDivElement>({
     isLoading: isLoadingMore,

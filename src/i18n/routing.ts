@@ -223,24 +223,19 @@ export const routing = defineRouting({
     },
 
     // ----- Devis -----
-    "/client/[clientId]/devis/nouveau-devis": {
-      fr: "/client/[clientId]/devis/nouveau-devis",
-      en: "/client/[clientId]/devis/nouveau-devis",
+    "/client/[clientId]/devis/nouvelle-demande": {
+      fr: "/client/[clientId]/devis/nouvelle-demande",
+      en: "/client/[clientId]/devis/nouvelle-demande",
     },
 
-    "/client/[clientId]/devis/devis-en-cours": {
-      fr: "/client/[clientId]/devis/devis-en-cours",
-      en: "/client/[clientId]/devis/devis-en-cours",
+    "/client/[clientId]/devis/demandes-en-cours": {
+      fr: "/client/[clientId]/devis/demandes-en-cours",
+      en: "/client/[clientId]/devis/demandes-en-cours",
     },
 
-    "/client/[clientId]/devis/devis-acceptes": {
-      fr: "/client/[clientId]/devis/devis-acceptes",
-      en: "/client/[clientId]/devis/devis-acceptes",
-    },
-
-    "/client/[clientId]/devis/historique-devis": {
-      fr: "/client/[clientId]/devis/historique-devis",
-      en: "/client/[clientId]/devis/historique-devis",
+    "/client/[clientId]/devis/mes-devis": {
+      fr: "/client/[clientId]/devis/mes-devis",
+      en: "/client/[clientId]/devis/mes-devis",
     },
 
     // ----- Contrats -----

@@ -42,6 +42,7 @@ export const ticketCategorieCT = [
   { code: "cafe", name: "Café" },
   { code: "fontaines_eau", name: "Fontaines à eau" },
   { code: "office_management", name: "Office management" },
+  { code: "demande_devis", name: "Demande de devis" },
   { code: "autre", name: "Autre" },
 ] as const;
 
@@ -70,7 +71,7 @@ export const interventionStatusCT = [
   { code: "realisee", name: "Réalisée" },
   { code: "annulee", name: "Annulée" },
   { code: "non_honoree", name: "Non honorée" },
-];
+] as const;
 
 export const interventionStatusCodes = interventionStatusCT.map(
   (i) => i.code,
@@ -84,7 +85,7 @@ export const interventionTypeCT = [
   { code: "preventive", name: "Préventive" },
   { code: "audit", name: "Audit" },
   { code: "autre", name: "Autre" },
-];
+] as const;
 
 export const interventionTypeCodes = interventionTypeCT.map(
   (i) => i.code,
@@ -118,6 +119,92 @@ export const typeOccupationCodes = typeOccupationCT.map(
 ) as unknown as [
   (typeof typeOccupationCT)[number]["code"],
   ...(typeof typeOccupationCT)[number]["code"][],
+];
+
+export const devisStatusCT = [
+  { code: "brouillon", name: "Brouillon" },
+  { code: "emis", name: "Emis" },
+  { code: "signe", name: "Devis signé" },
+  { code: "refuse", name: "Devis refusé" },
+] as const;
+
+export const devisStatusCodes = devisStatusCT.map((i) => i.code) as unknown as [
+  (typeof devisStatusCT)[number]["code"],
+  ...(typeof devisStatusCT)[number]["code"][],
+];
+
+export const devisTypePrixCT = [
+  { code: "forfait", name: "Forfait" },
+  { code: "one_shot", name: "One shot" },
+] as const;
+
+export const devisTypePrixCodes = devisTypePrixCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof devisTypePrixCT)[number]["code"],
+  ...(typeof devisTypePrixCT)[number]["code"][],
+];
+
+export const devisLigneUniteCT = [
+  // Basic units
+  { code: "unite", name: "Unité" },
+  { code: "paire", name: "Paire" },
+  { code: "piece", name: "Pièce" },
+  { code: "article", name: "Article" },
+  { code: "ensemble", name: "Ensemble" },
+  { code: "lot", name: "Lot" },
+  //temps
+  { code: "seconde", name: "Seconde" },
+  { code: "minute", name: "Minute" },
+  { code: "heure", name: "Heure" },
+  { code: "jour", name: "Jour" },
+  { code: "semaine", name: "Semaine" },
+  { code: "deux_semaines", name: "Deux semaines" },
+  { code: "quatre_semaines", name: "Quatre semaines" },
+  { code: "trimestre", name: "Trimestre" },
+  { code: "semestre", name: "Semestre" },
+  { code: "mois", name: "Mois" },
+  { code: "annee", name: "Année" },
+  //poids
+  { code: "milligramme", name: "mg - Milligramme" },
+  { code: "gramme", name: "g - Gramme" },
+  { code: "kilogramme", name: "kg - Kilogramme" },
+  { code: "tonne", name: "t - Tonne" },
+  //liquide
+  { code: "millilitre", name: "mL - Millilitre" },
+  { code: "centilitre", name: "cL - Centilitre" },
+  { code: "litre", name: "L - Litre" },
+  //Longueur
+  { code: "millimetre", name: "mm - Millimètre" },
+  { code: "centimètre", name: "cm - Centimètre" },
+  { code: "metre", name: "m - Mètre" },
+  //Surface et volume
+  { code: "metre_carre", name: "m² - Mètre carré" },
+  { code: "metre_cube", name: "m³ - Mètre cube" },
+  //Énergie et puissance
+  { code: "metre_cube_par_heure", name: "m³/h - Mètre cube par heure" },
+  { code: "ampère", name: "A - Ampère" },
+  { code: "gigajoule", name: "GJ - Gigajoule" },
+  { code: "gigawatt", name: "GW - Gigawatt" },
+  { code: "gigawatt_par_heure", name: "GW/h - Gigawatt par heure" },
+  { code: "joule", name: "J - Joule" },
+  { code: "kilojoule", name: "kJ - Kilojoule" },
+  { code: "kilovar", name: "kVar - Kilovar" },
+  { code: "kilowatt", name: "kW - Kilowatt" },
+  { code: "kilowatt_par_heure", name: "kW/h - Kilowattheure" },
+  { code: "megajoule", name: "MJ - Megajoule" },
+  { code: "megawatt", name: "MW - Megawatt" },
+  { code: "megawatt_par_heure", name: "MW/h - Megawattheure" },
+  { code: "voltampere", name: "VA - Voltampère" },
+  { code: "voltampere_reactif", name: "VAr - Voltampère réactif" },
+  { code: "wattheure", name: "Wh - Wattheure" },
+] as const;
+
+export const devisLigneUniteCodes = devisLigneUniteCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof devisLigneUniteCT)[number]["code"],
+  ...(typeof devisLigneUniteCT)[number]["code"][],
 ];
 
 export const toCodeTableName = (

@@ -16,6 +16,7 @@ type TicketsTableProps = {
   initialData?: Awaited<ReturnType<typeof getTickets>>; // SSR: { items, total, hasMore, page }
   idLabelMap: Map<string, string>;
   clientId: number;
+  isDevisTickets?: boolean;
 };
 
 const TicketsTable = ({
@@ -23,6 +24,7 @@ const TicketsTable = ({
   initialData,
   idLabelMap,
   clientId,
+  isDevisTickets = false,
 }: TicketsTableProps) => {
   const router = useRouter();
 
@@ -95,7 +97,10 @@ const TicketsTable = ({
 
   const handleRowClick = (ticket: SelectTicketType) => {
     const ticketId = ticket.id;
-    router.push(`/client/${clientId}/tickets/${ticketId}`);
+    const redirectUrl = isDevisTickets
+      ? `/client/${clientId}/devis/demande/${ticketId}`
+      : `/client/${clientId}/tickets/${ticketId}`;
+    router.push(redirectUrl);
   };
 
   return (
@@ -111,6 +116,9 @@ const TicketsTable = ({
       idLabelMap={memoIdLabelMap}
       total={total}
       onRowClick={handleRowClick}
+      initialHiddenColumns={
+        isDevisTickets ? ["categorie", "status", "dateCloture"] : []
+      }
     />
   );
 };

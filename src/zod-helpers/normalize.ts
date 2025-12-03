@@ -11,7 +11,10 @@ export const normalizeString = (v: string) => v.trim().replace(/\s+/g, " ");
 export const capitalizeWords = (v: string) =>
   normalizeString(v)
     .toLowerCase()
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+    .replace(
+      /(^|[^\p{L}])(\p{L})/gu,
+      (m, before, letter) => before + letter.toUpperCase(),
+    );
 
 // Only first word uppercase
 export const capitalizeFirstWord = (v: string) => {
@@ -47,8 +50,7 @@ export type NormalizeResult<
   OD extends readonly (keyof T)[] = [],
   OS extends readonly (keyof T)[] = [], // Optional Strings
 > = {
-  [K in keyof T]: // nombres obligatoires → number
-  K extends RN[number]
+  [K in keyof T]: K extends RN[number] // nombres obligatoires → number
     ? T[K] extends string | null | undefined
       ? number
       : T[K]

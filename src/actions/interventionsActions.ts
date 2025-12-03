@@ -72,11 +72,14 @@ export const insertInterventionAction = actionClient
       ...parsedInput,
       createdById,
       updatedById,
-      confirmeeClient: currentUser.role === "client",
-      confirmeeFournisseur: currentUser.role === "fournisseur",
-      clientConfirmedAt: currentUser.role === "client" ? new Date() : null,
-      fournisseurConfirmedAt:
-        currentUser.role === "fournisseur" ? new Date() : null,
+      confirmeeClient: currentUser.role.startsWith("client"),
+      confirmeeFournisseur: currentUser.role.startsWith("fournisseur"),
+      clientConfirmedAt: currentUser.role.startsWith("client")
+        ? new Date()
+        : null,
+      fournisseurConfirmedAt: currentUser.role.startsWith("fournisseur")
+        ? new Date()
+        : null,
     });
 
     const result = await db.transaction(async (tx) => {
@@ -120,14 +123,18 @@ export const updateInterventionAction = actionClient
           : "You are not authenticated.",
       );
     }
-    const clientId = currentUser.clientId;
-    if (!clientId) {
-      throw new Error(
-        locale === "fr"
-          ? "Utilisateur non rattaché à une entreprise cliente"
-          : "User not associated with a client company",
-      );
-    }
+    const clientId = currentUser.clientId; //l'utilisateur est un client
+    const fournisseurId = currentUser.fournisseurId; //l'utilisateur est un fournisseur
+    const userRole = currentUser.role;
+    const isClient = userRole.startsWith("client");
+    const isFournisseur = userRole.startsWith("fournisseur");
+    // if (!clientId) {
+    //   throw new Error(
+    //     locale === "fr"
+    //       ? "Utilisateur non rattaché à une entreprise cliente"
+    //       : "User not associated with a client company",
+    //   );
+    // }
 
     const interventionId = parsedInput.id;
 
@@ -145,7 +152,11 @@ export const updateInterventionAction = actionClient
       .where(
         and(
           eq(interventions.id, interventionId),
-          eq(interventions.clientId, clientId),
+          clientId
+            ? eq(interventions.clientId, clientId)
+            : fournisseurId
+              ? eq(interventions.fournisseurId, fournisseurId)
+              : undefined,
         ),
       )
       .limit(1);
@@ -158,28 +169,27 @@ export const updateInterventionAction = actionClient
       );
     }
 
-    const userRole = currentUser.role;
-    const isClient = userRole === "client";
-    const isFournisseur = userRole === "fournisseur";
-
     const oldDebutDate = existingIntervention.dateDebutPrevue;
     const newDebutDate = parsedInput.dateDebutPrevue;
     const oldFinDate = existingIntervention.dateFinPrevue;
     const newFinDate = parsedInput.dateFinPrevue;
 
     const debutHasChanged =
-      newDebutDate &&
-      oldDebutDate &&
-      new Date(newDebutDate).getTime() !== new Date(oldDebutDate).getTime();
+      oldDebutDate !== newDebutDate &&
+      !(oldDebutDate == null && newDebutDate == null);
 
     const finHasChanged =
-      newFinDate &&
-      oldFinDate &&
-      new Date(newFinDate).getTime() !== new Date(oldFinDate).getTime();
+      oldFinDate !== newFinDate && !(oldFinDate == null && newFinDate == null);
 
     const datesHaveChanged = debutHasChanged || finHasChanged;
 
     const wasPlanifiee = existingIntervention.status === "planifiee";
+    let confirmeeClient: boolean = existingIntervention.confirmeeClient;
+    let confirmeeFournisseur: boolean =
+      existingIntervention.confirmeeFournisseur;
+    let clientConfirmedAt: Date | null = existingIntervention.clientConfirmedAt;
+    let fournisseurConfirmedAt: Date | null =
+      existingIntervention.fournisseurConfirmedAt;
 
     // On travaille sur parsedInput, mais on NE met que ce qu’on veut vraiment changer
     if (datesHaveChanged) {
@@ -188,31 +198,30 @@ export const updateInterventionAction = actionClient
         parsedInput.status = "en_attente_confirmation";
 
         // reset des confirmations
-        parsedInput.confirmeeClient = false;
-        parsedInput.confirmeeFournisseur = false;
-        parsedInput.clientConfirmedAt = null;
-        parsedInput.fournisseurConfirmedAt = null;
-
+        confirmeeClient = false;
+        confirmeeFournisseur = false;
+        clientConfirmedAt = null;
+        fournisseurConfirmedAt = null;
         // puis on marque l'initiateur comme confirmé
         if (isClient) {
-          parsedInput.confirmeeClient = true;
-          parsedInput.clientConfirmedAt = new Date();
+          confirmeeClient = true;
+          clientConfirmedAt = new Date();
         } else if (isFournisseur) {
-          parsedInput.confirmeeFournisseur = true;
-          parsedInput.fournisseurConfirmedAt = new Date();
+          confirmeeFournisseur = true;
+          fournisseurConfirmedAt = new Date();
         }
       } else {
         // ----- Cas 2 : date changée mais pas encore planifiée -----
         if (isClient) {
-          parsedInput.confirmeeClient = true;
-          parsedInput.clientConfirmedAt = new Date();
-          parsedInput.confirmeeFournisseur = false;
-          parsedInput.fournisseurConfirmedAt = null;
+          confirmeeClient = true;
+          clientConfirmedAt = new Date();
+          confirmeeFournisseur = false;
+          fournisseurConfirmedAt = null;
         } else if (isFournisseur) {
-          parsedInput.confirmeeFournisseur = true;
-          parsedInput.fournisseurConfirmedAt = new Date();
-          parsedInput.confirmeeClient = false;
-          parsedInput.clientConfirmedAt = null;
+          confirmeeFournisseur = true;
+          fournisseurConfirmedAt = new Date();
+          confirmeeClient = false;
+          clientConfirmedAt = null;
         }
         // status reste par ex. "en_attente_confirmation"
       }
@@ -220,22 +229,19 @@ export const updateInterventionAction = actionClient
       // ----- Cas 3 : pas de changement de date -----
       if (isClient) {
         if (!existingIntervention.confirmeeClient) {
-          parsedInput.confirmeeClient = true;
-          parsedInput.clientConfirmedAt = new Date();
+          confirmeeClient = true;
+          clientConfirmedAt = new Date();
         }
       } else if (isFournisseur) {
         if (!existingIntervention.confirmeeFournisseur) {
-          parsedInput.confirmeeFournisseur = true;
-          parsedInput.fournisseurConfirmedAt = new Date();
+          confirmeeFournisseur = true;
+          fournisseurConfirmedAt = new Date();
         }
       }
 
       // Si les deux sont confirmés (après cette éventuelle maj), on planifie
-      const clientConfirmed =
-        parsedInput.confirmeeClient ?? existingIntervention.confirmeeClient;
-      const fournisseurConfirmed =
-        parsedInput.confirmeeFournisseur ??
-        existingIntervention.confirmeeFournisseur;
+      const clientConfirmed = confirmeeClient;
+      const fournisseurConfirmed = confirmeeFournisseur;
 
       if (clientConfirmed && fournisseurConfirmed) {
         parsedInput.status = "planifiee";
@@ -244,6 +250,10 @@ export const updateInterventionAction = actionClient
 
     const payload = updateInterventionInDbSchema.parse({
       ...parsedInput,
+      confirmeeClient,
+      confirmeeFournisseur,
+      clientConfirmedAt,
+      fournisseurConfirmedAt,
       updatedById,
     });
 
@@ -253,7 +263,11 @@ export const updateInterventionAction = actionClient
       .where(
         and(
           eq(interventions.id, interventionId),
-          eq(interventions.clientId, clientId),
+          clientId
+            ? eq(interventions.clientId, clientId)
+            : fournisseurId
+              ? eq(interventions.fournisseurId, fournisseurId)
+              : undefined,
         ),
       )
       .returning();
