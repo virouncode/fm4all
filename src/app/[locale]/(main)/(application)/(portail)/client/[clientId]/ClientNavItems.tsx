@@ -29,8 +29,13 @@ import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { useParams, usePathname } from "next/navigation";
 import { useState } from "react";
+import { UserRoleType } from "@/zod-schemas/enums";
 
-export default function ClientNavItems() {
+type ClientNavItemsProps = {
+  currentRole: UserRoleType;
+};
+
+export default function ClientNavItems({ currentRole }: ClientNavItemsProps) {
   const pathname = usePathname();
   const { clientId } = useParams() as { clientId: string };
 
@@ -118,21 +123,23 @@ export default function ClientNavItems() {
               {/* Sous-menu */}
               <CollapsibleContent className="animate-collapsible-down ml-8 border-l pl-2">
                 {/* Nouveau ticket */}
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive("nouveau-ticket")}
-                  >
-                    <Link
-                      href={{
-                        pathname: "/client/[clientId]/tickets/nouveau-ticket",
-                        params: { clientId },
-                      }}
+                {currentRole === "client_admin" && (
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive("nouveau-ticket")}
                     >
-                      Nouveau ticket
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                      <Link
+                        href={{
+                          pathname: "/client/[clientId]/tickets/nouveau-ticket",
+                          params: { clientId },
+                        }}
+                      >
+                        Nouveau ticket
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )}
 
                 {/* Tickets en cours */}
                 <SidebarMenuItem>
@@ -291,21 +298,23 @@ export default function ClientNavItems() {
 
               <CollapsibleContent className="animate-collapsible-down ml-8 border-l pl-2">
                 {/* Nouveau devis */}
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive("nouvelle-demande")}
-                  >
-                    <Link
-                      href={{
-                        pathname: "/client/[clientId]/devis/nouvelle-demande",
-                        params: { clientId },
-                      }}
+                {currentRole === "client_admin" && (
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive("nouvelle-demande")}
                     >
-                      Nouvelle demande
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                      <Link
+                        href={{
+                          pathname: "/client/[clientId]/devis/nouvelle-demande",
+                          params: { clientId },
+                        }}
+                      >
+                        Nouvelle demande
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )}
 
                 {/* Devis en cours */}
                 <SidebarMenuItem>
@@ -470,21 +479,23 @@ export default function ClientNavItems() {
                 </SidebarMenuItem>
 
                 {/* Nouveau site */}
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive("nouveau-site")}
-                  >
-                    <Link
-                      href={{
-                        pathname: "/client/[clientId]/sites/nouveau-site",
-                        params: { clientId },
-                      }}
+                {currentRole === "client_admin" && (
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive("nouveau-site")}
                     >
-                      Ajouter un site
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                      <Link
+                        href={{
+                          pathname: "/client/[clientId]/sites/nouveau-site",
+                          params: { clientId },
+                        }}
+                      >
+                        Ajouter un site
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )}
               </CollapsibleContent>
             </Collapsible>
           </SidebarMenu>

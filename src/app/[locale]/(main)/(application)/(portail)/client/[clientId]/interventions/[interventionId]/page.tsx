@@ -1,16 +1,15 @@
 import { interventionStatusCT, toCodeTableName } from "@/constants/codeTables";
 import { LocaleType } from "@/i18n/routing";
+import { getSession } from "@/lib/auth-session";
 import {
   getClientFournisseurs,
   getClientSites,
 } from "@/lib/queries/clients/getClients";
 import { getIntervention } from "@/lib/queries/interventions/getInterventions";
-import {
-  InterventionStatusType,
-  UpdateInterventionFormType,
-} from "@/zod-schemas/intervention";
+import { UpdateInterventionFormType } from "@/zod-schemas/intervention";
 import { ReactNode } from "react";
 import ClientUpdateInterventionForm from "./ClientUpdateInterventionForm";
+import { InterventionStatusType } from "@/zod-schemas/enums";
 
 const page = async ({
   params,
@@ -38,6 +37,31 @@ const page = async ({
     getClientFournisseurs(parseInt(clientId)),
     getIntervention(parseInt(interventionId)),
   ]);
+
+  const currentSession = await getSession();
+  const currentRole = currentSession?.user?.role;
+
+  if (
+    !currentRole ||
+    (currentRole !== "client_admin" && currentRole !== "admin")
+  ) {
+    return (
+      <main className="flex h-full w-full flex-col overflow-hidden md:border-x">
+        <div className="bg-background/95 shrink-0 border-b">
+          <h1 className="py-2 text-center text-xl font-bold">
+            Modifiez l'intervention
+          </h1>
+        </div>
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div className="flex min-h-0 flex-1 items-center justify-center p-4">
+            <p className="text-muted-foreground">
+              Vous n'avez pas la permission d'accéder à cette page.
+            </p>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   const errorComponent: ReactNode = (
     <main className="flex h-full w-full flex-col overflow-hidden">
@@ -90,11 +114,14 @@ const page = async ({
     fournisseurId: initialIntervention.fournisseurId.toString(),
   };
 
+  const isClientAdmin = currentRole === "client_admin";
+
   const isReadOnly =
     initialIntervention.status === "annulee" ||
     initialIntervention.status === "en_cours" ||
     initialIntervention.status === "realisee" ||
-    initialIntervention.status === "non_honoree";
+    initialIntervention.status === "non_honoree" ||
+    !isClientAdmin;
 
   return (
     <main className="flex h-full w-full flex-col overflow-hidden">

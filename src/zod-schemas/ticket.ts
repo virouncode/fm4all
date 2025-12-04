@@ -1,11 +1,5 @@
 import { DEFAULT_PAGE_SIZE } from "@/constants/pagination";
-import {
-  ticketCategorieEnum,
-  ticketPrioriteEnum,
-  tickets,
-  ticketsAttachments,
-  ticketStatusEnum,
-} from "@/db/schema";
+import { tickets, ticketsAttachments } from "@/db/schema";
 import { emptyStringToUndefinedOptional } from "@/normalize/emptyStringToUndefined";
 
 import {
@@ -20,15 +14,11 @@ import {
   createUpdateSchema,
 } from "drizzle-zod";
 import { z } from "zod";
-
-export const ticketCategorieSchema = z.enum(ticketCategorieEnum.enumValues);
-export type TicketCategorieType = z.infer<typeof ticketCategorieSchema>;
-
-export const ticketPrioriteSchema = z.enum(ticketPrioriteEnum.enumValues);
-export type TicketPrioriteType = z.infer<typeof ticketPrioriteSchema>;
-
-export const ticketStatusSchema = z.enum(ticketStatusEnum.enumValues);
-export type TicketStatusType = z.infer<typeof ticketStatusSchema>;
+import {
+  ticketCategorieSchema,
+  ticketPrioriteSchema,
+  ticketStatusSchema,
+} from "./enums";
 
 export const selectTicketSchema = createSelectSchema(tickets);
 export type SelectTicketType = z.infer<typeof selectTicketSchema>;
@@ -195,8 +185,8 @@ export const ticketsQueryBackendSchema = z.object({
   categorie: ticketCategorieSchema.optional(),
   priorite: ticketPrioriteSchema.optional(),
   status: ticketStatusSchema.optional(),
-  fournisseurId: z.number().int().optional(),
-  siteId: z.number().int().optional(),
+  fournisseurId: z.number().int().positive().optional(),
+  siteId: z.number().int().positive().optional(),
   //tri
   orderBy: ticketsOrderBySchema.default(DEFAULT_ORDER_BY),
   orderDir: z.enum(["asc", "desc"]).default(DEFAULT_ORDER_DIR),
@@ -215,8 +205,10 @@ export const ticketsQueryFiltersSchema = z
     categorie: ticketCategorieSchema.or(z.literal("all")).optional(),
     priorite: ticketPrioriteSchema.or(z.literal("all")).optional(),
     status: ticketStatusSchema.or(z.literal("all")).optional(),
-    fournisseurId: emptyStringToUndefinedOptional,
-    siteId: emptyStringToUndefinedOptional,
+    fournisseurId: emptyStringToUndefinedOptional
+      .or(z.literal("all"))
+      .optional(),
+    siteId: emptyStringToUndefinedOptional.or(z.literal("all")).optional(),
   })
   .partial();
 export type TicketsQueryFiltersType = z.infer<typeof ticketsQueryFiltersSchema>;
@@ -249,12 +241,16 @@ export function parseTicketsQuery(
       : undefined;
 
   const fournisseurId =
-    urlQuery.fournisseurId && !Number.isNaN(Number(urlQuery.fournisseurId))
+    urlQuery.fournisseurId &&
+    !Number.isNaN(Number(urlQuery.fournisseurId)) &&
+    urlQuery.fournisseurId !== "all"
       ? Number(urlQuery.fournisseurId)
       : undefined;
 
   const siteId =
-    urlQuery.siteId && !Number.isNaN(Number(urlQuery.siteId))
+    urlQuery.siteId &&
+    !Number.isNaN(Number(urlQuery.siteId)) &&
+    urlQuery.siteId !== "all"
       ? Number(urlQuery.siteId)
       : undefined;
 

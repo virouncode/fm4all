@@ -171,10 +171,10 @@ export const finaliserDevisAction = actionClient
       fournisseurId: 16, // FM4ALL ID
       totalMensuelHt: devisMontants.totalMensuelHt /*10000*/,
       totalInstallationHt: devisMontants.totalInstallationHt ?? null /*10000*/,
-      dateValidite: DateTime.now()
-        .startOf("day")
-        .plus({ days: 15 })
-        .toISODate(),
+      dateDemarrage: updatedProspect.dateDeDemarrage
+        ? new Date(updatedProspect.dateDeDemarrage)
+        : null,
+      dateValidite: DateTime.now().startOf("day").plus({ days: 15 }).toJSDate(),
     });
 
     // 2) Transaction : insert devis

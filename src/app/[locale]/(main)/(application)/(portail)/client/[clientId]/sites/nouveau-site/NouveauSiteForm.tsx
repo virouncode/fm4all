@@ -67,8 +67,7 @@ const NouveauSiteForm = ({ defaultValues, clientId }: NouveauSiteFormProps) => {
         onSubmit={form.handleSubmit(submitForm)}
         isSubmitting={isSubmitting}
         isSubmitDisabled={isSubmitDisabled}
-        clientId={clientId}
-        userRole="client"
+        isReadOnly={false}
       />
     </Form>
   );

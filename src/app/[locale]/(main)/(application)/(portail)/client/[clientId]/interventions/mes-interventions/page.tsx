@@ -6,7 +6,7 @@ import {
 import { getInterventions } from "@/lib/queries/interventions/getInterventions";
 import { RawSearchParams } from "@/normalize/normalizeSearchParams";
 import { parseInterventionsQuery } from "@/zod-schemas/intervention";
-import { ticketsIdLabelMap } from "../../tickets/tickets-en-cours/ticketsColumns";
+import { ticketsIdLabelMap } from "../../tickets/tickets-en-cours/createTicketsColumns";
 import ClientInterventionsFiltersForm from "./ClientInterventionsFiltersForm";
 import ClientInterventionsTable from "./ClientInterventionsTable";
 

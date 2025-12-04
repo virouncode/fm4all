@@ -13,11 +13,13 @@ import SiteForm from "../nouveau-site/SiteForm";
 type ClientUpdateSiteFormProps = {
   defaultValues: UpdateSiteFormType;
   clientId: number;
+  isReadOnly: boolean;
 };
 
 const ClientUpdateSiteForm = ({
   defaultValues,
   clientId,
+  isReadOnly,
 }: ClientUpdateSiteFormProps) => {
   const router = useRouter();
   const form = useForm<UpdateSiteFormType>({
@@ -71,8 +73,7 @@ const ClientUpdateSiteForm = ({
         onSubmit={form.handleSubmit(submitForm)}
         isSubmitting={isSubmitting}
         isSubmitDisabled={isSubmitDisabled}
-        clientId={clientId}
-        userRole="client"
+        isReadOnly={isReadOnly}
       />
     </Form>
   );

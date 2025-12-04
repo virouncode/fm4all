@@ -87,6 +87,7 @@ export default function NouveauTicketForm({
         fournisseurs={fournisseurs}
         userRole="client"
         isDevisTicket={isDevisTicket}
+        isReadOnly={false}
       />
     </Form>
   );

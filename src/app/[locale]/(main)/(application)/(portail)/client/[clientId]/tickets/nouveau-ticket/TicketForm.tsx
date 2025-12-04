@@ -13,6 +13,7 @@ import {
   ticketPrioriteCT,
   ticketStatusCT,
 } from "@/constants/codeTables";
+import { UserRoleType } from "@/zod-schemas/enums";
 import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
 import { SelectSiteType } from "@/zod-schemas/site";
 import {
@@ -20,7 +21,6 @@ import {
   InsertTicketFormType,
   UpdateTicketFormType,
 } from "@/zod-schemas/ticket";
-import { UserRoleType } from "@/zod-schemas/user";
 import { useFieldArray, useFormContext } from "react-hook-form";
 
 type TicketFormProps<TFormValues> = {
@@ -33,6 +33,7 @@ type TicketFormProps<TFormValues> = {
   fournisseurs: SelectFournisseurType[];
   userRole: UserRoleType;
   isDevisTicket?: boolean;
+  isReadOnly: boolean;
 };
 
 type TicketFormValues = InsertTicketFormType | UpdateTicketFormType;
@@ -47,6 +48,7 @@ const TicketForm = <TFormValues,>({
   fournisseurs,
   userRole,
   isDevisTicket = false,
+  isReadOnly,
 }: TicketFormProps<TFormValues>) => {
   const form = useFormContext<TicketFormValues>();
   const { control, watch } = form;
@@ -84,6 +86,7 @@ const TicketForm = <TFormValues,>({
               label="Titre"
               requiredMark
               className="w-full md:col-span-1"
+              disabled={isReadOnly}
             />
             <RhfControlledSelect<TicketFormValues>
               name="categorie"
@@ -91,7 +94,7 @@ const TicketForm = <TFormValues,>({
               requiredMark
               className="w-full md:col-span-1"
               selectClassName="w-full"
-              disabled={isDevisTicket}
+              disabled={isDevisTicket || isReadOnly}
             >
               {ticketCategorieCT
                 .filter((categorie) =>
@@ -115,6 +118,7 @@ const TicketForm = <TFormValues,>({
                 requiredMark
                 className="w-full md:col-span-1"
                 selectClassName="w-full"
+                disabled={isReadOnly}
               >
                 {ticketPrioriteCT.map((priorite) => (
                   <SelectItem key={priorite.code} value={priorite.code}>
@@ -129,6 +133,7 @@ const TicketForm = <TFormValues,>({
                   requiredMark
                   className="w-full md:col-span-1"
                   selectClassName="w-full"
+                  disabled={isReadOnly}
                 >
                   {ticketStatusCT.map((status) => (
                     <SelectItem key={status.code} value={status.code}>
@@ -146,6 +151,7 @@ const TicketForm = <TFormValues,>({
               requiredMark
               className="w-full md:col-span-1"
               selectClassName="w-full"
+              disabled={isReadOnly}
             >
               <SelectItem value="0">Sélectionner un site</SelectItem>
               {sites.map((site) => (
@@ -161,6 +167,7 @@ const TicketForm = <TFormValues,>({
               selectClassName="w-full"
               placeholder="Sélectionner un prestataire"
               requiredMark
+              disabled={isReadOnly}
             >
               <SelectItem value="0">Sélectionner un prestataire</SelectItem>
               {fournisseurs.map((fournisseur) => (
@@ -185,6 +192,7 @@ const TicketForm = <TFormValues,>({
               }
               className="w-full md:col-span-2"
               textareaClassName="resize-none h-[200px]"
+              disabled={isReadOnly}
             />
           </div>
 
@@ -200,7 +208,7 @@ const TicketForm = <TFormValues,>({
                 variant="outline"
                 size="sm"
                 onClick={handleAddAttachment}
-                disabled={hasPendingAttachment}
+                disabled={hasPendingAttachment || isReadOnly}
               >
                 Ajouter une pièce jointe
               </Button>
@@ -216,6 +224,7 @@ const TicketForm = <TFormValues,>({
                   onClear={() => remove(index)}
                   className="w-1/2"
                   maxSizeBytes={500 * 1024} // 500 KB
+                  disabled={isReadOnly}
                 />
               ))}
 

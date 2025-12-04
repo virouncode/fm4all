@@ -16,11 +16,11 @@ export default async function AuthRedirect() {
     redirect({
       locale,
       href: {
-        pathname: "/admin/[adminId]",
-        params: { adminId: user.id },
+        pathname: "/admin/[userId]",
+        params: { userId: user.id },
       },
     });
-  } else if (user?.role === "client") {
+  } else if (user?.role.startsWith("client")) {
     redirect({
       locale,
       href: {
@@ -28,7 +28,7 @@ export default async function AuthRedirect() {
         params: { clientId: user.clientId ?? 0 },
       },
     });
-  } else if (user?.role === "fournisseur") {
+  } else if (user?.role.startsWith("fournisseur")) {
     redirect({
       locale,
       href: {

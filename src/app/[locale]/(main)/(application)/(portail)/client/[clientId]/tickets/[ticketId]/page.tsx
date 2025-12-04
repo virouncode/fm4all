@@ -1,4 +1,5 @@
 import { LocaleType } from "@/i18n/routing";
+import { getSession } from "@/lib/auth-session";
 import {
   getClientFournisseurs,
   getClientSites,
@@ -30,6 +31,33 @@ const page = async ({
     getClientFournisseurs(parseInt(clientId)),
     getTicket(parseInt(ticketId)),
   ]);
+
+  const currentSession = await getSession();
+  const currentRole = currentSession?.user?.role;
+
+  if (
+    !currentRole ||
+    (currentRole !== "client_admin" && currentRole !== "admin")
+  ) {
+    return (
+      <main className="flex h-full w-full flex-col overflow-hidden md:border-x">
+        <div className="bg-background/95 shrink-0 border-b">
+          <h1 className="py-2 text-center text-xl font-bold">
+            Modifiez le ticket
+          </h1>
+        </div>
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div className="flex min-h-0 flex-1 items-center justify-center p-4">
+            <p className="text-muted-foreground">
+              Vous n'avez pas la permission d'accéder à cette page.
+            </p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  const isClientAdmin = currentRole === "client_admin";
 
   const errorComponent: ReactNode = (
     <main className="flex h-full w-full flex-col overflow-hidden">
@@ -89,10 +117,12 @@ const page = async ({
           <div className="w-full max-w-3xl pb-8">
             <div className="mb-6">
               <h2 className="mb-2 text-xl font-semibold tracking-tight">
-                Modifiez le ticket
+                {isClientAdmin ? "Modifiez le ticket" : "Détails du ticket"}
               </h2>
               <p className="text-muted-foreground text-sm">
-                Modifiez les détails du ticket ci-dessous
+                {isClientAdmin
+                  ? "Modifiez les détails du ticket ci-dessous"
+                  : "Vous n'avez pas la permission de modifier ce ticket"}
               </p>
             </div>
             <UpdateTicketForm
@@ -100,6 +130,7 @@ const page = async ({
               clientId={parseInt(clientId)}
               sites={sites}
               fournisseurs={fournisseurs}
+              isReadOnly={!isClientAdmin}
             />
           </div>
         </div>

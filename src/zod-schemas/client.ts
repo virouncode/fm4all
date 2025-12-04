@@ -1,16 +1,14 @@
-import { clients, typeBatimentEnum, typeOccupationEnum } from "@/db/schema";
+import { clients } from "@/db/schema";
+import { upper } from "@/zod-helpers/normalize";
 import {
   createInsertSchema,
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-zod";
 import { z } from "zod";
-
-export const typeBatimentSchema = z.enum(typeBatimentEnum.enumValues);
-export type TypeBatimentType = z.infer<typeof typeBatimentSchema>;
-
-export const typeOccupationSchema = z.enum(typeOccupationEnum.enumValues);
-export type TypeOccupationType = z.infer<typeof typeOccupationSchema>;
+import { siretSchemaEmpty } from "./siret";
+import { insertSiteFormSchema, insertSiteSchema } from "./site";
+import { insertUserFormSchema, insertUserSchema } from "./user";
 
 export const selectClientSchema = createSelectSchema(clients);
 export type SelectClientType = z.infer<typeof selectClientSchema>;
@@ -52,7 +50,28 @@ export const updateClientInDbSchema = updateClientSchema
 
 export type UpdateClientInDbType = z.infer<typeof updateClientInDbSchema>;
 
+export const onboardClientSchema = z.object({
+  client: insertClientSchema,
+  sitePrincipal: insertSiteSchema,
+  userAdmin: insertUserSchema,
+});
+
 //======================= FORM SCHEMAS ==========================//
 //On ne peut pas appliquer des transform de type mais on peut appliquer des transform de nettoyage
 
-//TODO changer les tables clients => simplifer
+//Créer un client + un site principal + un user administrateur pour ce client
+
+export const onboardClientFormSchema = z.object({
+  client: z.object({
+    nomEntreprise: z
+      .string()
+      .min(1, "Le nom de l'entreprise est obligatoire")
+      .transform((v) => upper(v)),
+    siret: siretSchemaEmpty("SIRET invalide"),
+    prospectId: z.number().optional().nullable(),
+  }),
+  sitePrincipal: insertSiteFormSchema,
+  userAdmin: insertUserFormSchema,
+});
+
+export type OnboardClientFormType = z.infer<typeof onboardClientFormSchema>;

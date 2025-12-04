@@ -24,10 +24,10 @@ type ObfuscatedLinkProps = {
     | "/cookies"
     | "/cgv"
     | "/cgu"
-    | { pathname: "/admin/[adminId]/dashboard"; params: { adminId: string } }
+    | { pathname: "/admin/[userId]"; params: { userId: string } }
     | { pathname: "/client/[clientId]"; params: { clientId: string } }
     | {
-        pathname: "/fournisseur/[fournisseurId]/dashboard";
+        pathname: "/fournisseur/[fournisseurId]";
         params: { fournisseurId: string };
       }
     | "/auth/signin"

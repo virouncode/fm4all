@@ -1,9 +1,5 @@
 import { DEFAULT_PAGE_SIZE } from "@/constants/pagination";
-import {
-  interventions,
-  interventionStatusEnum,
-  interventionTypeEnum,
-} from "@/db/schema";
+import { interventions } from "@/db/schema";
 import { emptyStringToUndefinedOptional } from "@/normalize/emptyStringToUndefined";
 
 import {
@@ -18,14 +14,7 @@ import {
   createUpdateSchema,
 } from "drizzle-zod";
 import { z } from "zod";
-
-export const interventionTypeSchema = z.enum(interventionTypeEnum.enumValues);
-export type InterventionTypeType = z.infer<typeof interventionTypeSchema>;
-
-export const interventionStatusSchema = z.enum(
-  interventionStatusEnum.enumValues,
-);
-export type InterventionStatusType = z.infer<typeof interventionStatusSchema>;
+import { interventionTypeSchema, interventionStatusSchema } from "./enums";
 
 export const selectInterventionSchema = createSelectSchema(interventions);
 export type SelectInterventionType = z.infer<typeof selectInterventionSchema>;

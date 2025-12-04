@@ -1,10 +1,14 @@
 import { LocaleType } from "@/i18n/routing";
+import {
+  getClientFournisseurs,
+  getClientSites,
+} from "@/lib/queries/clients/getClients";
 import { getTickets } from "@/lib/queries/tickets/getTickets";
 import { RawSearchParams } from "@/normalize/normalizeSearchParams";
 import { parseTicketsQuery } from "@/zod-schemas/ticket";
 import TicketsFiltersForm from "./TicketsFiltersForm";
 import TicketsTable from "./TicketsTable";
-import { ticketsIdLabelMap } from "./ticketsColumns";
+import { ticketsIdLabelMap } from "./createTicketsColumns";
 
 const page = async ({
   params,
@@ -20,6 +24,21 @@ const page = async ({
     clientId: parseInt(clientId),
     query,
   });
+  const [sites, fournisseurs] = await Promise.all([
+    getClientSites({
+      clientId: parseInt(clientId),
+      query: {
+        nomSite: undefined,
+        codePostal: undefined,
+        ville: undefined,
+        typeBatiment: undefined,
+        typeOccupation: undefined,
+        orderBy: "nomSite",
+        orderDir: "asc",
+      },
+    }),
+    getClientFournisseurs(parseInt(clientId)),
+  ]);
 
   return (
     <main className="flex h-full w-full flex-col overflow-hidden md:border-x">
@@ -30,7 +49,11 @@ const page = async ({
       </div>
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="border-b p-4">
-          <TicketsFiltersForm initialFilters={query} />
+          <TicketsFiltersForm
+            initialFilters={query}
+            sites={sites}
+            fournisseurs={fournisseurs}
+          />
         </div>
         <div className="min-h-0 flex-1 p-4">
           <TicketsTable
@@ -38,6 +61,8 @@ const page = async ({
             initialQuery={query}
             idLabelMap={ticketsIdLabelMap}
             clientId={parseInt(clientId)}
+            sites={sites}
+            fournisseurs={fournisseurs}
           />
         </div>
       </div>

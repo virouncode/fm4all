@@ -9,6 +9,8 @@ import {
   ticketPrioriteCT,
   ticketStatusCT,
 } from "@/constants/codeTables";
+import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
+import { SelectSiteType } from "@/zod-schemas/site";
 import {
   TicketsQueryBackendType,
   TicketsQueryFiltersType,
@@ -20,11 +22,15 @@ import { useForm, useWatch } from "react-hook-form";
 
 type TicketsFiltersFormProps = {
   initialFilters: TicketsQueryBackendType;
+  sites: SelectSiteType[];
+  fournisseurs: SelectFournisseurType[];
   isDevisTickets?: boolean;
 };
 
 const TicketsFiltersForm = ({
   initialFilters,
+  sites,
+  fournisseurs,
   isDevisTickets = false,
 }: TicketsFiltersFormProps) => {
   const { replace } = useRouter();
@@ -50,8 +56,8 @@ const TicketsFiltersForm = ({
     // ids → string ou ""
     fournisseurId: initialFilters.fournisseurId
       ? String(initialFilters.fournisseurId)
-      : "",
-    siteId: initialFilters.siteId ? String(initialFilters.siteId) : "",
+      : "all",
+    siteId: initialFilters.siteId ? String(initialFilters.siteId) : "all",
   };
   const form = useForm<TicketsQueryFiltersType>({
     defaultValues,
@@ -179,6 +185,32 @@ const TicketsFiltersForm = ({
           </RhfControlledSelect>
         )}
         {/* TODO Fournisseur et Sites */}
+        <RhfControlledSelect<TicketsQueryFiltersType>
+          label="Site"
+          name="siteId"
+          selectClassName="w-40"
+          withError={false}
+        >
+          <SelectItem value="all">Tous</SelectItem>
+          {sites.map((s) => (
+            <SelectItem key={s.id} value={String(s.id)}>
+              {s.nomSite}
+            </SelectItem>
+          ))}
+        </RhfControlledSelect>
+        <RhfControlledSelect<TicketsQueryFiltersType>
+          label="Fournisseur"
+          name="fournisseurId"
+          selectClassName="w-40"
+          withError={false}
+        >
+          <SelectItem value="all">Tous</SelectItem>
+          {fournisseurs.map((f) => (
+            <SelectItem key={f.id} value={String(f.id)}>
+              {f.nomFournisseur}
+            </SelectItem>
+          ))}
+        </RhfControlledSelect>
       </form>
     </Form>
   );

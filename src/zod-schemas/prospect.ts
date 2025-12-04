@@ -1,13 +1,20 @@
+import { DEFAULT_PAGE_SIZE } from "@/constants/pagination";
 import { prospects } from "@/db/schema";
-import { capitalizeWords } from "@/zod-helpers/normalize";
+import { emptyStringToUndefinedOptional } from "@/normalize/emptyStringToUndefined";
+import {
+  normalizeSearchParams,
+  RawSearchParams,
+} from "@/normalize/normalizeSearchParams";
+import { createSortSchema } from "@/zod-helpers/createSortSchema";
+import { capitalizeWords, lower, upper } from "@/zod-helpers/normalize";
 import {
   createInsertSchema,
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-zod";
 import { z } from "zod";
-import { typeBatimentSchema, typeOccupationSchema } from "./client";
 import { codePostalSchema } from "./codePostal";
+import { typeBatimentSchema, typeOccupationSchema } from "./enums";
 import { phoneNumberSchema } from "./phone";
 import { siretSchemaEmpty } from "./siret";
 
@@ -41,7 +48,7 @@ export const createInsertProspectFormSchema = (
     nomEntreprise: z
       .string()
       .min(1, messages.nomEntreprise)
-      .transform((v) => capitalizeWords(v)),
+      .transform((v) => upper(v)),
     prenomContact: z
       .string()
       .min(1, messages.prenomContact)
@@ -54,7 +61,7 @@ export const createInsertProspectFormSchema = (
     emailContact: z
       .email(messages.emailContactInvalide)
       .min(1, messages.emailContactObligatoire)
-      .transform((v) => v.toLowerCase()),
+      .transform((v) => lower(v)),
     phoneContact: phoneNumberSchema(messages.phoneContact),
     surface: z
       .string()
@@ -174,3 +181,132 @@ export const updateProspectFormSchema = createUpdateProspectFormSchema({
 });
 
 export type UpdateProspectFormType = z.infer<typeof updateProspectFormSchema>;
+
+//======================= QUERY SCHEMAS ==========================//
+
+export const SORTABLE_PROSPECTS_COLUMNS = {
+  id: prospects.id,
+  nomEntreprise: prospects.nomEntreprise,
+  siret: prospects.siret,
+  prenomContact: prospects.prenomContact,
+  nomContact: prospects.nomContact,
+  emailContact: prospects.emailContact,
+  phoneContact: prospects.phoneContact,
+  prenomSignataire: prospects.prenomSignataire,
+  nomSignataire: prospects.nomSignataire,
+  emailSignataire: prospects.emailSignataire,
+  codePostal: prospects.codePostal,
+  ville: prospects.ville,
+  dateDeDemarrage: prospects.dateDeDemarrage,
+  createdAt: prospects.createdAt,
+  updatedAt: prospects.updatedAt,
+} as const;
+
+export const prospectsOrderBySchema = z.enum([
+  "id",
+  "nomEntreprise",
+  "siret",
+  "prenomContact",
+  "nomContact",
+  "emailContact",
+  "phoneContact",
+  "prenomSignataire",
+  "nomSignataire",
+  "emailSignataire",
+  "codePostal",
+  "ville",
+  "dateDeDemarrage",
+  "createdAt",
+  "updatedAt",
+]);
+export type ProspectsSortableColumnType = z.infer<
+  typeof prospectsOrderBySchema
+>;
+
+const DEFAULT_ORDER_BY = "createdAt";
+const DEFAULT_ORDER_DIR: "asc" | "desc" = "desc";
+
+export const prospectsQueryBackendSchema = z.object({
+  //filtres
+  createdFrom: z.date().optional(),
+  createdTo: z.date().optional(),
+  nomEntreprise: z.string().optional(),
+  siret: z.string().optional(),
+  nomContact: z.string().optional(),
+  emailContact: z.string().optional(),
+  phoneContact: z.string().optional(),
+  codePostal: z.string().optional(),
+  ville: z.string().optional(),
+  //tri
+  orderBy: prospectsOrderBySchema.default(DEFAULT_ORDER_BY),
+  orderDir: z.enum(["asc", "desc"]).default(DEFAULT_ORDER_DIR),
+  //pagination
+  page: z.number().int().positive().default(1),
+  pageSize: z.number().int().positive().default(DEFAULT_PAGE_SIZE),
+});
+export type ProspectsQueryBackendType = z.infer<
+  typeof prospectsQueryBackendSchema
+>;
+
+export const prospectsQueryFiltersSchema = z
+  .object({
+    createdFrom: emptyStringToUndefinedOptional,
+    createdTo: emptyStringToUndefinedOptional,
+    nomEntreprise: emptyStringToUndefinedOptional,
+    siret: emptyStringToUndefinedOptional,
+    nomContact: emptyStringToUndefinedOptional,
+    emailContact: emptyStringToUndefinedOptional,
+    phoneContact: emptyStringToUndefinedOptional,
+    codePostal: emptyStringToUndefinedOptional,
+    ville: emptyStringToUndefinedOptional,
+  })
+  .partial();
+
+export type ProspectsQueryFiltersType = z.infer<
+  typeof prospectsQueryFiltersSchema
+>;
+
+export const prospectsQueryFrontendSchema = prospectsQueryFiltersSchema.merge(
+  createSortSchema(SORTABLE_PROSPECTS_COLUMNS, "createdAt"), // orderBy, orderDir
+);
+
+export type ProspectsQueryFrontendType = z.infer<
+  typeof prospectsQueryFrontendSchema
+>;
+
+export function parseProspectsQuery(raw: RawSearchParams) {
+  const normalized = normalizeSearchParams(raw);
+  const urlQuery = prospectsQueryFrontendSchema.parse(normalized);
+
+  const createdFrom =
+    urlQuery.createdFrom && !Number.isNaN(Date.parse(urlQuery.createdFrom))
+      ? new Date(urlQuery.createdFrom)
+      : undefined;
+
+  const createdTo =
+    urlQuery.createdTo && !Number.isNaN(Date.parse(urlQuery.createdTo))
+      ? new Date(urlQuery.createdTo)
+      : undefined;
+
+  const nomEntreprise = urlQuery.nomEntreprise ?? undefined;
+  const siret = urlQuery.siret ?? undefined;
+  const nomContact = urlQuery.nomContact ?? undefined;
+  const emailContact = urlQuery.emailContact ?? undefined;
+  const phoneContact = urlQuery.phoneContact ?? undefined;
+  const codePostal = urlQuery.codePostal ?? undefined;
+  const ville = urlQuery.ville ?? undefined;
+
+  return prospectsQueryBackendSchema.parse({
+    createdFrom,
+    createdTo,
+    nomEntreprise,
+    siret,
+    nomContact,
+    emailContact,
+    phoneContact,
+    codePostal,
+    ville,
+    orderBy: urlQuery.orderBy,
+    orderDir: urlQuery.orderDir,
+  });
+}

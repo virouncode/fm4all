@@ -1,6 +1,6 @@
 import z from "zod";
-import { typeBatimentSchema, typeOccupationSchema } from "./client";
 import { codePostalSchema } from "./codePostal";
+import { typeBatimentSchema, typeOccupationSchema } from "./enums";
 
 //MES LOCAUX
 export const createMesLocauxFormSchema = (messages: {

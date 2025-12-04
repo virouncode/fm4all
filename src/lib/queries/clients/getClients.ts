@@ -2,12 +2,23 @@ import { db } from "@/db";
 import {
   clientFournisseurs,
   clients,
+  devis,
   fournisseurs,
   sites,
   user,
 } from "@/db/schema";
 import { errorHelper } from "@/lib/errorHelper";
+import {
+  dateToUtcStartOfDay,
+  dateToUtcStartOfNextDay,
+} from "@/lib/utils/formatDates";
 import { selectClientSchema, SelectClientType } from "@/zod-schemas/client";
+import {
+  DevisQueryBackendType,
+  selectDevisSchema,
+  SelectDevisType,
+  SORTABLE_DEVIS_COLUMNS,
+} from "@/zod-schemas/devis";
 import {
   selectFournisseurSchema,
   SelectFournisseurType,
@@ -24,26 +35,7 @@ import {
   SelectUserType,
   SORTABLE_CLIENT_USERS_COLUMNS,
 } from "@/zod-schemas/user";
-import { and, asc, desc, eq, ilike, SQL } from "drizzle-orm";
-
-export const getClientsWithEmailAndNomContact = async (
-  emailContact: string,
-  nomContact: string,
-) => {
-  try {
-    const result = await db.$count(
-      clients,
-      and(
-        eq(clients.emailContact, emailContact),
-        eq(clients.nomContact, nomContact),
-      ),
-    );
-    return result;
-  } catch (err) {
-    errorHelper(err);
-    return 0;
-  }
-};
+import { and, asc, desc, eq, gte, ilike, lt, SQL } from "drizzle-orm";
 
 export const getClients = async (): Promise<SelectClientType[]> => {
   try {
@@ -175,6 +167,83 @@ export const getClientUsers = async (params: {
 
     const result = await db.select().from(user).where(where).orderBy(orderExpr);
     const parsedResult = result.map((u) => selectUserSchema.parse(u));
+    return parsedResult;
+  } catch (err) {
+    errorHelper(err);
+    return [];
+  }
+};
+
+export const getClientDevis = async (params: {
+  clientId: number;
+  query: DevisQueryBackendType;
+}): Promise<SelectDevisType[]> => {
+  const { clientId } = params;
+  const {
+    fournisseurId,
+    siteId,
+    titre,
+    typePrix,
+    status,
+    createdFrom,
+    createdTo,
+    validFrom,
+    validTo,
+    orderBy,
+    orderDir,
+  } = params.query;
+
+  const whereClauses: SQL[] = [];
+  whereClauses.push(eq(devis.clientId, clientId));
+
+  if (titre) whereClauses.push(ilike(devis.titre, `%${titre}%`));
+  if (status) whereClauses.push(eq(devis.status, status));
+  if (fournisseurId) whereClauses.push(eq(devis.fournisseurId, fournisseurId));
+  if (siteId) whereClauses.push(eq(devis.siteId, siteId));
+  if (typePrix) whereClauses.push(eq(devis.typePrix, typePrix));
+
+  if (createdFrom) {
+    const createdFromDate = dateToUtcStartOfDay(createdFrom); // Date
+    if (createdFromDate) {
+      whereClauses.push(gte(devis.createdAt, createdFromDate));
+    }
+  }
+
+  if (createdTo) {
+    const createdToDate = dateToUtcStartOfNextDay(createdTo); // Date
+    if (createdToDate) {
+      whereClauses.push(lt(devis.createdAt, createdToDate));
+    }
+  }
+
+  if (validFrom) {
+    const validFromDate = dateToUtcStartOfDay(validFrom); // Date
+    if (validFromDate) {
+      whereClauses.push(gte(devis.dateValidite, validFromDate));
+    }
+  }
+
+  if (validTo) {
+    const validToDate = dateToUtcStartOfNextDay(validTo); // Date
+    if (validToDate) {
+      whereClauses.push(lt(devis.dateValidite, validToDate));
+    }
+  }
+  const orderColumn =
+    SORTABLE_DEVIS_COLUMNS[orderBy] ?? SORTABLE_DEVIS_COLUMNS.createdAt;
+
+  const orderDirection = orderDir === "asc" ? asc : desc;
+  const orderExpr = orderDirection(orderColumn);
+
+  const where = whereClauses.length > 0 ? and(...whereClauses) : undefined;
+
+  try {
+    const results = await db
+      .select()
+      .from(devis)
+      .where(where)
+      .orderBy(orderExpr);
+    const parsedResult = results.map((s) => selectDevisSchema.parse(s));
     return parsedResult;
   } catch (err) {
     errorHelper(err);

@@ -1,6 +1,13 @@
+"use server";
+
 import { db } from "@/db";
+import { getSession } from "@/lib/auth-session";
+import { getProspects } from "@/lib/queries/prospects/getProspects";
 import { actionClient } from "@/lib/safe-actions";
-import { insertProspectSchema } from "@/zod-schemas/prospect";
+import {
+  insertProspectSchema,
+  prospectsQueryBackendSchema,
+} from "@/zod-schemas/prospect";
 import { and, eq } from "drizzle-orm";
 import { getLocale } from "next-intl/server";
 import { flattenValidationErrors } from "next-safe-action";
@@ -53,4 +60,31 @@ export const insertProspectAction = actionClient
       message: "Prospect créé avec succès",
       data: insertedProspect,
     };
+  });
+
+export const getProspectsAction = actionClient
+  .metadata({ actionName: "getProspectsAction" })
+  .inputSchema(prospectsQueryBackendSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    const locale = await getLocale();
+
+    if (!currentUser) {
+      throw new Error(
+        locale === "fr"
+          ? "Vous n'êtes pas authentifié."
+          : "You are not authenticated.",
+      );
+    }
+
+    // parsedInput EST déjà un TicketsQueryBackendType
+    const prospects = await getProspects({
+      query: parsedInput,
+    });
+
+    return prospects;
   });

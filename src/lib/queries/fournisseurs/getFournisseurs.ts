@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { fournisseurs } from "@/db/schema";
 import { errorHelper } from "@/lib/errorHelper";
+import { selectFournisseurSchema } from "@/zod-schemas/fournisseur";
 import { eq } from "drizzle-orm";
 
 export const getFournisseurs = async () => {
@@ -9,9 +10,11 @@ export const getFournisseurs = async () => {
       .select()
       .from(fournisseurs)
       .orderBy(fournisseurs.nomFournisseur);
-    return results;
+    const parsedResults = results.map((f) => selectFournisseurSchema.parse(f));
+    return parsedResults;
   } catch (err) {
     errorHelper(err);
+    return [];
   }
 };
 

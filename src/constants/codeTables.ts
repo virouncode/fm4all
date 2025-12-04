@@ -57,6 +57,8 @@ export const userRoleCT = [
   { code: "admin", name: "Administrateur" },
   { code: "fournisseur", name: "Prestataire" },
   { code: "client", name: "Client" },
+  { code: "client_admin", name: "Client administrateur" },
+  { code: "fournisseur_admin", name: "Prestataire administrateur" },
 ] as const;
 
 export const userRoleCodes = userRoleCT.map((i) => i.code) as unknown as [

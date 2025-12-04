@@ -21,6 +21,7 @@ type UpdateTicketFormProps = {
   clientId: number;
   sites: SelectSiteType[];
   fournisseurs: SelectFournisseurType[];
+  isReadOnly: boolean;
   isDevisTicket?: boolean;
 };
 
@@ -29,6 +30,7 @@ export default function UpdateTicketForm({
   clientId,
   sites,
   fournisseurs,
+  isReadOnly,
   isDevisTicket = false,
 }: UpdateTicketFormProps) {
   const router = useRouter();
@@ -76,7 +78,8 @@ export default function UpdateTicketForm({
     executeUpdateTicket(payload);
   };
 
-  const isSubmitDisabled = !isDirty || isSubmitting || isSavingTicket;
+  const isSubmitDisabled =
+    !isDirty || isSubmitting || isSavingTicket || isReadOnly;
 
   return (
     <Form {...form}>
@@ -90,6 +93,7 @@ export default function UpdateTicketForm({
         fournisseurs={fournisseurs}
         userRole="client"
         isDevisTicket={isDevisTicket}
+        isReadOnly={isReadOnly}
       />
     </Form>
   );

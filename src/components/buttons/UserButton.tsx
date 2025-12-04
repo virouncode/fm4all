@@ -84,8 +84,8 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
             {user?.role === "admin" ? (
               <ObfuscatedLink
                 href={{
-                  pathname: "/admin/[adminId]/dashboard",
-                  params: { adminId: user.id },
+                  pathname: "/admin/[userId]",
+                  params: { userId: user.id?.toString() ?? "0" },
                 }}
                 className="cursor-default !text-base"
               >
@@ -104,7 +104,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
             ) : (
               <ObfuscatedLink
                 href={{
-                  pathname: "/fournisseur/[fournisseurId]/dashboard",
+                  pathname: "/fournisseur/[fournisseurId]",
                   params: {
                     fournisseurId: user.fournisseurId?.toString() ?? "0",
                   },

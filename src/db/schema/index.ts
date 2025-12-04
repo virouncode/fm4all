@@ -123,6 +123,7 @@ export const fournisseursRelations = relations(
     clientFournisseurs: many(clientFournisseurs),
     tickets: many(tickets),
     interventions: many(interventions),
+    devis: many(devis),
   }),
 );
 
@@ -409,10 +410,26 @@ export const officeManagerTarifsRelations = relations(
   }),
 );
 
-export const devisRelations = relations(devis, ({ one }) => ({
+export const devisRelations = relations(devis, ({ one, many }) => ({
   prospect: one(prospects, {
     fields: [devis.prospectId],
     references: [prospects.id],
+  }),
+  client: one(clients, {
+    fields: [devis.clientId],
+    references: [clients.id],
+  }),
+  fournisseur: one(fournisseurs, {
+    fields: [devis.fournisseurId],
+    references: [fournisseurs.id],
+  }),
+  ticket: one(tickets, {
+    fields: [devis.ticketId],
+    references: [tickets.id],
+  }),
+  site: one(sites, {
+    fields: [devis.siteId],
+    references: [sites.id],
   }),
 }));
 
@@ -476,6 +493,7 @@ export const sitesRelations = relations(sites, ({ one, many }) => ({
   }),
   tickets: many(tickets),
   interventions: many(interventions),
+  devis: many(devis),
 }));
 
 export const ticketsRelations = relations(tickets, ({ one, many }) => ({
@@ -496,6 +514,7 @@ export const ticketsRelations = relations(tickets, ({ one, many }) => ({
     references: [user.id],
   }),
   interventions: many(interventions),
+  devis: many(devis),
 }));
 
 export const interventionsRelations = relations(interventions, ({ one }) => ({

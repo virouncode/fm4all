@@ -1,7 +1,9 @@
+import { RhfControlledSelect } from "@/components/rhf/RhfControlledSelect";
 import { RhfFileInput } from "@/components/rhf/RhfFileInput";
 import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
 import { FieldGroup, FieldLegend, FieldSet } from "@/components/ui/field";
+import { SelectItem } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { InsertUserFormType, UpdateUserFormType } from "@/zod-schemas/user";
 import { useFormContext } from "react-hook-form";
@@ -60,6 +62,19 @@ const UserForm = <TFormValues,>({
               className="w-full md:col-span-1"
               requiredMark
             />
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 md:gap-14">
+            <RhfControlledSelect<UserFormValues>
+              name="role"
+              label="Permissions"
+              requiredMark
+              selectClassName="w-full md:col-span-1"
+            >
+              <SelectItem value="client_admin">
+                Administrateur (lecture/écriture)
+              </SelectItem>
+              <SelectItem value="client">Utilisateur (lecture)</SelectItem>
+            </RhfControlledSelect>
           </div>
         </FieldGroup>
         <FieldGroup className="gap-2">

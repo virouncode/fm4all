@@ -3,19 +3,23 @@
 import { getTicketsAction } from "@/actions/ticketsActions";
 import InfiniteDataTable from "@/components/tables/InfiniteDataTable";
 import { getTickets } from "@/lib/queries/tickets/getTickets";
+import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
+import { SelectSiteType } from "@/zod-schemas/site";
 import {
   TicketsQueryBackendType,
   type SelectTicketType,
 } from "@/zod-schemas/ticket";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ticketsColumns } from "./ticketsColumns";
+import { createTicketsColumns } from "./createTicketsColumns";
 
 type TicketsTableProps = {
   initialQuery: TicketsQueryBackendType; // filtres + orderBy/orderDir, SANS se soucier de page dans l'URL
   initialData?: Awaited<ReturnType<typeof getTickets>>; // SSR: { items, total, hasMore, page }
   idLabelMap: Map<string, string>;
   clientId: number;
+  sites: SelectSiteType[];
+  fournisseurs: SelectFournisseurType[];
   isDevisTickets?: boolean;
 };
 
@@ -24,6 +28,8 @@ const TicketsTable = ({
   initialData,
   idLabelMap,
   clientId,
+  sites,
+  fournisseurs,
   isDevisTickets = false,
 }: TicketsTableProps) => {
   const router = useRouter();
@@ -105,7 +111,7 @@ const TicketsTable = ({
 
   return (
     <InfiniteDataTable<SelectTicketType>
-      columns={ticketsColumns}
+      columns={createTicketsColumns({ sites, fournisseurs })}
       items={items}
       isLoading={isLoading}
       isError={isError}

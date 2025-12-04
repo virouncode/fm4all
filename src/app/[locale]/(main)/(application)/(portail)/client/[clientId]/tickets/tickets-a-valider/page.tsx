@@ -1,8 +1,12 @@
 import { LocaleType } from "@/i18n/routing";
+import {
+  getClientFournisseurs,
+  getClientSites,
+} from "@/lib/queries/clients/getClients";
 import { getTickets } from "@/lib/queries/tickets/getTickets";
 import { RawSearchParams } from "@/normalize/normalizeSearchParams";
 import { parseTicketsQuery } from "@/zod-schemas/ticket";
-import { ticketsIdLabelMap } from "../tickets-en-cours/ticketsColumns";
+import { ticketsIdLabelMap } from "../tickets-en-cours/createTicketsColumns";
 import TicketsTable from "../tickets-en-cours/TicketsTable";
 
 const page = async ({
@@ -19,6 +23,21 @@ const page = async ({
     clientId: parseInt(clientId, 10),
     query,
   });
+  const [sites, fournisseurs] = await Promise.all([
+    getClientSites({
+      clientId: parseInt(clientId),
+      query: {
+        nomSite: undefined,
+        codePostal: undefined,
+        ville: undefined,
+        typeBatiment: undefined,
+        typeOccupation: undefined,
+        orderBy: "nomSite",
+        orderDir: "asc",
+      },
+    }),
+    getClientFournisseurs(parseInt(clientId)),
+  ]);
 
   return (
     <main className="flex h-full w-full flex-col overflow-hidden md:border-x">
@@ -33,7 +52,9 @@ const page = async ({
             initialQuery={query}
             initialData={initialData}
             idLabelMap={ticketsIdLabelMap}
-            clientId={parseInt(clientId, 10)}
+            clientId={parseInt(clientId)}
+            sites={sites}
+            fournisseurs={fournisseurs}
           />
         </div>
       </div>

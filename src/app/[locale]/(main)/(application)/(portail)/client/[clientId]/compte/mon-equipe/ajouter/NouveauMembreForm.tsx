@@ -58,7 +58,6 @@ const NouveauMembreForm = ({
       ...data,
       name: data.firstName + " " + data.lastName,
       image: data.avatarAttachment ? data.avatarAttachment.url : null,
-      role: "client" as const,
       clientId,
     };
     executeInsertUser(payload);

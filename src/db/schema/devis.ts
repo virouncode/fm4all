@@ -70,8 +70,9 @@ export const devis = pgTable(
     totalOneShotHt: integer("total_one_shot_ht"), //*10000
     totalMensuelHt: integer("total_mensuel_ht"), //*10000
     totalInstallationHt: integer("total_installation_ht"), //*10000
-    dateValidite: date("date_validite", { mode: "string" }),
-    status: devisStatusEnum("status").notNull().default("emis"), //TODO retirer default
+    dateValidite: date("date_validite", { mode: "date" }),
+    dateDemarrage: date("date_demarrage", { mode: "date" }),
+    status: devisStatusEnum("status").notNull(),
     devisUrl: varchar("devis_url"),
     signedAt: timestamp("signed_at", {
       withTimezone: true,

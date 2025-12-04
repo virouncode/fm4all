@@ -220,8 +220,15 @@ export async function middleware(req: NextRequest) {
   // ============================================================================
   // 4. Vérification des permissions
   // ============================================================================
+  const userRole = user.role.startsWith("admin")
+    ? "admin"
+    : user.role.startsWith("client")
+      ? "client"
+      : user.role.startsWith("fournisseur")
+        ? "fournisseur"
+        : "unknown";
   const check = isAuthorizedRoute(
-    user.role,
+    userRole as "admin" | "client" | "fournisseur",
     area,
     pathnameWithoutLocale,
     user as SelectUserType,

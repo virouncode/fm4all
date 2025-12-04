@@ -9,6 +9,7 @@ import {
 import { AuthUser } from "@/lib/auth";
 import ClientNavItems from "./ClientNavItems";
 import ClientSidebarFooter from "./ClientSidebarFooter";
+import { UserRoleType } from "@/zod-schemas/enums";
 
 type ClientSidebarProps = {
   clientId: number;
@@ -23,7 +24,7 @@ export default function ClientSidebar({
     <Sidebar collapsible="icon" variant="sidebar">
       <SidebarTrigger />
       <SidebarContent className="overflow-y-auto">
-        <ClientNavItems />
+        <ClientNavItems currentRole={currentUser.role as UserRoleType} />
       </SidebarContent>
       <SidebarFooter className="border-t">
         <ClientSidebarFooter clientId={clientId} currentUser={currentUser} />

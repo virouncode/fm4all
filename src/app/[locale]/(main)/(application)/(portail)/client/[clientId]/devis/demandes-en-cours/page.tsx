@@ -1,8 +1,12 @@
 import { LocaleType } from "@/i18n/routing";
+import {
+  getClientFournisseurs,
+  getClientSites,
+} from "@/lib/queries/clients/getClients";
 import { getDevisTickets } from "@/lib/queries/tickets/getTickets";
 import { RawSearchParams } from "@/normalize/normalizeSearchParams";
 import { parseTicketsQuery } from "@/zod-schemas/ticket";
-import { ticketsIdLabelMap } from "../../tickets/tickets-en-cours/ticketsColumns";
+import { ticketsIdLabelMap } from "../../tickets/tickets-en-cours/createTicketsColumns";
 import TicketsFiltersForm from "../../tickets/tickets-en-cours/TicketsFiltersForm";
 import TicketsTable from "../../tickets/tickets-en-cours/TicketsTable";
 
@@ -21,6 +25,22 @@ const page = async ({
     query,
   });
 
+  const [sites, fournisseurs] = await Promise.all([
+    getClientSites({
+      clientId: parseInt(clientId),
+      query: {
+        nomSite: undefined,
+        codePostal: undefined,
+        ville: undefined,
+        typeBatiment: undefined,
+        typeOccupation: undefined,
+        orderBy: "nomSite",
+        orderDir: "asc",
+      },
+    }),
+    getClientFournisseurs(parseInt(clientId)),
+  ]);
+
   return (
     <main className="flex h-full w-full flex-col overflow-hidden md:border-x">
       <div className="bg-background/95 shrink-0 border-b">
@@ -30,7 +50,12 @@ const page = async ({
       </div>
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="border-b p-4">
-          <TicketsFiltersForm initialFilters={query} isDevisTickets={true} />
+          <TicketsFiltersForm
+            initialFilters={query}
+            isDevisTickets={true}
+            sites={sites}
+            fournisseurs={fournisseurs}
+          />
         </div>
         <div className="min-h-0 flex-1 p-4">
           <TicketsTable
@@ -39,6 +64,8 @@ const page = async ({
             idLabelMap={ticketsIdLabelMap}
             clientId={parseInt(clientId)}
             isDevisTickets={true}
+            sites={sites}
+            fournisseurs={fournisseurs}
           />
         </div>
       </div>

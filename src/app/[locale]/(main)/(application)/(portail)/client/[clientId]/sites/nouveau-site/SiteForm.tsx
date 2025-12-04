@@ -7,7 +7,6 @@ import { SelectItem } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { typeBatimentCT, typeOccupationCT } from "@/constants/codeTables";
 import { InsertSiteFormType, UpdateSiteFormType } from "@/zod-schemas/site";
-import { UserRoleType } from "@/zod-schemas/user";
 import { useTranslations } from "next-intl";
 import React from "react";
 
@@ -16,8 +15,7 @@ type SiteFormProps<TFormValues> = {
   onSubmit: React.FormEventHandler<HTMLFormElement>;
   isSubmitting: boolean;
   isSubmitDisabled: boolean;
-  clientId: number;
-  userRole: UserRoleType;
+  isReadOnly: boolean;
 };
 
 type SiteFormValues = InsertSiteFormType | UpdateSiteFormType;
@@ -27,8 +25,7 @@ const SiteForm = <TFormValues,>({
   onSubmit,
   isSubmitting,
   isSubmitDisabled,
-  clientId,
-  userRole,
+  isReadOnly,
 }: SiteFormProps<TFormValues>) => {
   const t = useTranslations("DevisPage.locaux.locauxForm");
   return (
@@ -42,6 +39,7 @@ const SiteForm = <TFormValues,>({
               label="Nom du site"
               requiredMark
               className="w-full md:col-span-1"
+              disabled={isReadOnly}
             />
           </div>
           <div className="grid gap-4 md:grid-cols-2 md:gap-14">
@@ -50,11 +48,13 @@ const SiteForm = <TFormValues,>({
               label="Adresse ligne 1"
               requiredMark
               className="w-full md:col-span-1"
+              disabled={isReadOnly}
             />
             <RhfInput<SiteFormValues>
               name="adresseLigne2"
               label="Adresse ligne 2"
               className="w-full md:col-span-1"
+              disabled={isReadOnly}
             />
           </div>
           <div className="grid gap-4 md:grid-cols-2 md:gap-14">
@@ -63,12 +63,14 @@ const SiteForm = <TFormValues,>({
               label="Code postal"
               requiredMark
               className="w-full md:col-span-1"
+              disabled={isReadOnly}
             />
             <RhfInput<SiteFormValues>
               name="ville"
               label="Ville"
               requiredMark
               className="w-full md:col-span-1"
+              disabled={isReadOnly}
             />
           </div>
         </FieldGroup>
@@ -80,12 +82,14 @@ const SiteForm = <TFormValues,>({
               label="Surface (m²)"
               requiredMark
               className="w-full md:col-span-1"
+              disabled={isReadOnly}
             />
             <RhfInput<SiteFormValues>
               name="effectif"
               label="Effectif (personnes)"
               requiredMark
               className="w-full md:col-span-1"
+              disabled={isReadOnly}
             />
           </div>
           <div className="grid gap-4 md:grid-cols-2 md:gap-14">
@@ -95,6 +99,7 @@ const SiteForm = <TFormValues,>({
               requiredMark
               className="w-full md:col-span-1"
               selectClassName="w-full"
+              disabled={isReadOnly}
             >
               {typeBatimentCT.map((type) => (
                 <SelectItem key={type.code} value={type.code}>
@@ -108,6 +113,7 @@ const SiteForm = <TFormValues,>({
               requiredMark
               className="w-full md:col-span-1"
               selectClassName="w-full"
+              disabled={isReadOnly}
             >
               {typeOccupationCT.map((type) => (
                 <SelectItem key={type.code} value={type.code}>
@@ -122,13 +128,14 @@ const SiteForm = <TFormValues,>({
               label="Commentaires"
               className="w-full md:col-span-2"
               textareaClassName="resize-none h-[200px]"
+              disabled={isReadOnly}
             />
           </div>
         </FieldGroup>
         <div className="flex justify-end border-t pt-6">
           <Button
             type="submit"
-            disabled={isSubmitDisabled}
+            disabled={isSubmitDisabled || isReadOnly}
             className="min-w-32"
           >
             {isSubmitting && <Spinner />}

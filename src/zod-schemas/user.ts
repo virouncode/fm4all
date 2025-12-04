@@ -1,4 +1,4 @@
-import { roleEnum, user } from "@/db/schema";
+import { user } from "@/db/schema";
 import {
   normalizeSearchParams,
   RawSearchParams,
@@ -12,9 +12,7 @@ import {
 } from "drizzle-zod";
 import { z } from "zod";
 import { phoneNumberSchema } from "./phone";
-
-export const userRoleSchema = z.enum(roleEnum.enumValues);
-export type UserRoleType = z.infer<typeof userRoleSchema>;
+import { userRoleSchema } from "./enums";
 
 //SELECT
 export const selectUserSchema = createSelectSchema(user);
@@ -33,7 +31,6 @@ export const updateUserSchema = createUpdateSchema(user).omit({
   updatedAt: true,
   emailVerified: true,
   clientId: true, //ne peut pas être modifié
-  role: true, //ne peut pas être modifié
 });
 export type UpdateUserType = z.infer<typeof updateUserSchema>;
 
@@ -48,6 +45,7 @@ export const insertUserFormSchema = z.object({
     .min(1, "Le nom est obligatoire")
     .transform((val) => capitalizeWords(val)),
   email: z.email("Email invalide").transform((val) => val.toLowerCase()),
+  role: userRoleSchema,
   phone: phoneNumberSchema("N° de téléphone invalide"),
   avatarAttachment: z
     .object({

@@ -1,140 +1,161 @@
 "use server";
 
 import { db } from "@/db";
-import { clients } from "@/db/schema";
+import { auth } from "@/lib/auth";
+import { getSession } from "@/lib/auth-session";
+import { sendEmailFromServer } from "@/lib/email/sendEmail";
 import { actionClient } from "@/lib/safe-actions";
-import { capitalize } from "@/lib/utils/capitalize";
-import { formatSIRET } from "@/lib/utils/isValidSIRET";
+import { generatePassword } from "@/lib/utils/generatePassword";
 import {
-  insertClientSchema,
-  InsertClientType,
-  updateClientSchema,
-  UpdateClientType,
+  insertClientToDbSchema,
+  onboardClientSchema,
 } from "@/zod-schemas/client";
-import { and, eq } from "drizzle-orm";
+import { insertSiteToDbSchema } from "@/zod-schemas/site";
+import { insertUserSchema } from "@/zod-schemas/user";
+import { eq, sql } from "drizzle-orm";
 import { getLocale } from "next-intl/server";
 import { flattenValidationErrors } from "next-safe-action";
+import { clients, devis, sites, user } from "../db/schema";
 
-function normalizeClientInput<T extends InsertClientType | UpdateClientType>(
-  clientInput: T,
-): T {
-  return {
-    ...clientInput,
-    nomEntreprise: clientInput.nomEntreprise?.toUpperCase(),
-    siret: clientInput.siret
-      ? formatSIRET(clientInput.siret)
-      : clientInput.siret,
-    prenomContact: capitalize(clientInput.prenomContact),
-    nomContact: capitalize(clientInput.nomContact),
-    posteContact: capitalize(clientInput.posteContact),
-    emailContact: clientInput.emailContact?.toLowerCase(),
-    prenomSignataire: capitalize(clientInput.prenomSignataire),
-    nomSignataire: capitalize(clientInput.nomSignataire),
-    posteSignataire: capitalize(clientInput.posteSignataire),
-    emailSignataire: clientInput.emailSignataire
-      ? clientInput.emailSignataire.toLowerCase()
-      : clientInput.emailSignataire,
-    adresseLigne1: capitalize(clientInput.adresseLigne1),
-    adresseLigne2: capitalize(clientInput.adresseLigne2),
-    ville: capitalize(clientInput.ville),
-  };
-}
-
-export const insertClientAction = actionClient
-  .metadata({ actionName: "insertClientAction" })
-  .inputSchema(insertClientSchema, {
+export const onboardClientAction = actionClient
+  .metadata({ actionName: "onboardClientAction" })
+  .inputSchema(onboardClientSchema, {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
   })
-  .action(async ({ parsedInput }: { parsedInput: InsertClientType }) => {
+  .action(async ({ parsedInput }) => {
     const locale = await getLocale();
-    const clientToPost = normalizeClientInput(parsedInput);
+    const session = await getSession();
+    const currentUser = session?.user;
+
+    if (!currentUser) {
+      throw new Error(
+        locale === "fr"
+          ? "Vous n'êtes pas authentifié."
+          : "You are not authenticated.",
+      );
+    }
+
+    if (currentUser.role !== "admin") {
+      throw new Error(
+        locale === "fr"
+          ? "Vous n'avez pas les droits pour créer un client."
+          : "You do not have permission to create a client.",
+      );
+    }
+
+    const { client, sitePrincipal, userAdmin: clientUserAdmin } = parsedInput;
+    const createdById = currentUser.id;
+    const updatedById = currentUser.id;
 
     const result = await db.transaction(async (tx) => {
-      const existingClient = await tx
-        .select({ id: clients.id })
-        .from(clients)
-        .where(
-          and(
-            eq(clients.emailContact, clientToPost.emailContact),
-            eq(clients.nomContact, clientToPost.nomContact),
-          ),
-        )
-        .limit(1);
-
-      // Si le client existe déjà, on met à jour ses coordonnées
-      if (existingClient.length > 0) {
-        const updatedClient = await tx
-          .update(clients)
-          .set(clientToPost)
-          .where(eq(clients.id, existingClient[0].id))
-          .returning();
-
-        return {
-          success: true as const,
-          message: `${clientToPost.nomEntreprise}, ${
-            locale === "fr"
-              ? "vos coordonnées ont été mises à jour."
-              : "your contact information has been updated."
-          }`,
-          data: { client: updatedClient[0] },
-        };
-      }
-
-      // Si le client n'existe pas, on l'insère
-      const insertedClient = await tx
+      // 1) Insert client
+      const clientPayload = insertClientToDbSchema.parse({
+        ...client,
+        createdById,
+        updatedById,
+      });
+      const [insertedClient] = await tx
         .insert(clients)
-        .values(clientToPost)
+        .values(clientPayload)
         .returning();
 
-      return {
-        success: true as const,
-        message: `${clientToPost.nomEntreprise}, ${
+      if (!insertedClient) {
+        throw new Error(
           locale === "fr"
-            ? "vos coordonnées ont été enregistrées, nous prendrons contact avec vous dans les plus brefs délais. A bientôt !"
-            : "your contact information has been saved. We will get in touch with you as soon as possible. See you soon!"
-        }`,
-        data: { client: insertedClient[0] },
+            ? "Échec de la création du client."
+            : "Failed to create client.",
+        );
+      }
+
+      // 2) Insert site principal
+      const sitePayload = insertSiteToDbSchema.parse({
+        ...sitePrincipal,
+        clientId: insertedClient.id,
+        createdById,
+        updatedById,
+      });
+      const [insertedSite] = await tx
+        .insert(sites)
+        .values(sitePayload)
+        .returning();
+
+      if (!insertedSite) {
+        throw new Error(
+          locale === "fr"
+            ? "Échec de la création du site principal."
+            : "Failed to create main site.",
+        );
+      }
+      // 3) Promotion des devis
+      if (clientPayload.prospectId != null) {
+        await tx
+          .update(devis)
+          .set({
+            clientId: insertedClient.id,
+            siteId: insertedSite.id,
+            updatedAt: new Date(),
+            updatedById: createdById,
+          })
+          .where(eq(devis.prospectId, clientPayload.prospectId));
+      }
+
+      // 4) Insert user admin
+      const [existingUserEmail] = await tx
+        .select({ id: user.id })
+        .from(user)
+        .where(
+          eq(sql`LOWER(${user.email})`, clientUserAdmin.email.toLowerCase()),
+        )
+        .limit(1);
+      if (existingUserEmail) {
+        throw new Error(
+          locale === "fr"
+            ? "Cette adresse email est déjà utilisée par un autre compte utilisateur."
+            : "This email address is already used by another user account.",
+        );
+      }
+      const tempPassword = generatePassword();
+
+      const clientUserAdminPayload = insertUserSchema.parse(clientUserAdmin);
+      const insertedUser = await auth.api.signUpEmail({
+        body: {
+          ...clientUserAdmin,
+          password: tempPassword,
+        },
+      });
+      if (!insertedUser) {
+        throw new Error(
+          locale === "fr"
+            ? "Échec de la création du compte utilisateur."
+            : "Failed to create user account.",
+        );
+      }
+      await sendEmailFromServer({
+        to: clientUserAdminPayload.email,
+        from: "noreply@mg.fm4all.com",
+        subject: "Création de votre compte utilisateur",
+        text: `<p>Votre compte utilisateur a été crée avec succès, bienvenue chez fm4all !</p><br/>
+                    <p>Voici mot de passe temporaire : ${tempPassword}</p><br/>
+                    <p>Nous vous conseillons de le changer dès votre première connexion dans votre espace.</p>
+                    <p>Pensez aussi à vérifier votre adresse email en cliquant sur le lien que nous vous avons envoyé.</p>
+                    `,
+        nomDestinataire: clientUserAdminPayload.name,
+        useTemplate: true,
+      });
+      return {
+        client: insertedClient,
+        sitePrincipal: insertedSite,
+        userAdmin: insertedUser.user,
       };
     });
 
-    return result;
-  });
-
-export const updateClientAction = actionClient
-  .metadata({ actionName: "updateClientAction" })
-  .inputSchema(updateClientSchema, {
-    handleValidationErrorsShape: async (ve) =>
-      flattenValidationErrors(ve).fieldErrors,
-  })
-  .action(async ({ parsedInput }: { parsedInput: UpdateClientType }) => {
-    const locale = await getLocale();
-
-    if (!parsedInput.id) {
-      return {
-        success: false as const,
-        message:
-          locale === "fr"
-            ? "L'id du client est requis pour la mise à jour."
-            : "Client ID is required for update.",
-      };
-    }
-
-    const clientToUpdate = normalizeClientInput(parsedInput);
-
-    const resultClient = await db
-      .update(clients)
-      .set(clientToUpdate)
-      .where(eq(clients.id, parsedInput.id))
-      .returning();
-
     return {
-      success: true as const,
-      message: `${clientToUpdate.nomEntreprise}, ${
+      success: true,
+      message:
         locale === "fr"
-          ? "vos coordonnées ont été mises à jour."
-          : "your contact information has been updated."
-      }`,
-      data: { client: resultClient[0] },
+          ? "Client, site principal et administrateur créés avec succès."
+          : "Client, main site and admin user created successfully.",
+      data: result,
     };
   });

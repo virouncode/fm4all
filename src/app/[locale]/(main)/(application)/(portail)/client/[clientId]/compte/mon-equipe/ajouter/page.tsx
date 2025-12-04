@@ -13,6 +13,7 @@ const page = async ({
     lastName: "",
     phone: "",
     email: "",
+    role: "client_admin",
     avatarAttachment: null,
   };
   return (

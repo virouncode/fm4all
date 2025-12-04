@@ -127,18 +127,10 @@ export const routing = defineRouting({
       fr: "/carriere",
       en: "/careers",
     },
-    // "/tag/[slug]": {
-    //   fr: "/tag/[slug]",
-    //   en: "/tag/[slug]",
-    // },
     "/auth/signin": {
       fr: "/auth/signin",
       en: "/auth/signin",
     },
-    // "/auth/signup": {
-    //   fr: "/auth/signup",
-    //   en: "/auth/signup",
-    // },
     "/auth/redirect": {
       fr: "/auth/redirect",
       en: "/auth/redirect",
@@ -160,37 +152,92 @@ export const routing = defineRouting({
       en: "/auth/unauthorized",
     },
     //ADMIN
-    "/admin/[adminId]": {
-      fr: "/admin/[adminId]",
-      en: "/admin/[adminId]",
+    "/admin/[userId]": {
+      fr: "/admin/[userId]",
+      en: "/admin/[userId]",
     },
-    "/admin/[adminId]/dashboard": {
-      fr: "/admin/[adminId]/dashboard",
-      en: "/admin/[adminId]/dashboard",
+    "/admin/[userId]/compte/mon-profil": {
+      fr: "/admin/[userId]/compte/mon-profil",
+      en: "/admin/[userId]/compte/mon-profil",
     },
-    "/admin/[adminId]/comptes": {
-      fr: "/admin/[adminId]/comptes",
-      en: "/admin/[adminId]/accounts",
+    "/admin/[userId]/compte/mon-equipe": {
+      fr: "/admin/[userId]/compte/mon-equipe",
+      en: "/admin/[userId]/compte/mon-equipe",
     },
-    "/admin/[adminId]/signup": {
-      fr: "/admin/[adminId]/signup",
-      en: "/admin/[adminId]/signup",
+    "/admin/[userId]/tickets/nouveau-ticket": {
+      fr: "/admin/[userId]/tickets/nouveau-ticket",
+      en: "/admin/[userId]/tickets/nouveau-ticket",
     },
-    "/admin/[adminId]/info": {
-      fr: "/admin/[adminId]/info",
-      en: "/admin/[adminId]/info",
+    "/admin/[userId]/tickets/tickets-en-cours": {
+      fr: "/admin/[userId]/tickets/tickets-en-cours",
+      en: "/admin/[userId]/tickets/tickets-en-cours",
     },
-    "/admin/[adminId]/interventions/creer-intervention": {
-      fr: "/admin/[adminId]/interventions/creer-intervention",
-      en: "/admin/[adminId]/interventions/creer-intervention",
+    "/admin/[userId]/interventions/toutes-les-interventions": {
+      fr: "/admin/[userId]/interventions/toutes-les-interventions",
+      en: "/admin/[userId]/interventions/toutes-les-interventions",
     },
+    "/admin/[userId]/interventions/creer-intervention": {
+      fr: "/admin/[userId]/interventions/creer-intervention",
+      en: "/admin/[userId]/interventions/creer-intervention",
+    },
+    "/admin/[userId]/interventions/rapports-interventions": {
+      fr: "/admin/[userId]/interventions/rapports-interventions",
+      en: "/admin/[userId]/interventions/rapports-interventions",
+    },
+    "/admin/[userId]/devis/demandes-en-cours": {
+      fr: "/admin/[userId]/devis/demandes-en-cours",
+      en: "/admin/[userId]/devis/demandes-en-cours",
+    },
+    "/admin/[userId]/devis/tous-les-devis": {
+      fr: "/admin/[userId]/devis/tous-les-devis",
+      en: "/admin/[userId]/devis/tous-les-devis",
+    },
+    "/admin/[userId]/contrats/tous-les-contrats": {
+      fr: "/admin/[userId]/contrats/tous-les-contrats",
+      en: "/admin/[userId]/contrats/tous-les-contrats",
+    },
+    "/admin/[userId]/contrats/depenses-et-factures": {
+      fr: "/admin/[userId]/contrats/depenses-et-factures",
+      en: "/admin/[userId]/contrats/depenses-et-factures",
+    },
+    "/admin/[userId]/clients/tous-les-clients": {
+      fr: "/admin/[userId]/clients/tous-les-clients",
+      en: "/admin/[userId]/clients/tous-les-clients",
+    },
+    "/admin/[userId]/clients/ajouter-un-client": {
+      fr: "/admin/[userId]/clients/ajouter-un-client",
+      en: "/admin/[userId]/clients/ajouter-un-client",
+    },
+    "/admin/[userId]/clients/ajouter-un-client/avec-prospect": {
+      fr: "/admin/[userId]/clients/ajouter-un-client/avec-prospect",
+      en: "/admin/[userId]/clients/ajouter-un-client/avec-prospect",
+    },
+    "/admin/[userId]/clients/ajouter-un-client/manuel": {
+      fr: "/admin/[userId]/clients/ajouter-un-client/manuel",
+      en: "/admin/[userId]/clients/ajouter-un-client/manuel",
+    },
+    "/admin/[userId]/clients/tous-les-sites": {
+      fr: "/admin/[userId]/clients/tous-les-sites",
+      en: "/admin/[userId]/clients/tous-les-sites",
+    },
+    "/admin/[userId]/fournisseurs/tous-les-fournisseurs": {
+      fr: "/admin/[userId]/fournisseurs/tous-les-fournisseurs",
+      en: "/admin/[userId]/fournisseurs/tous-les-fournisseurs",
+    },
+    "/admin/[userId]/fournisseurs/ajouter-un-fournisseur": {
+      fr: "/admin/[userId]/fournisseurs/ajouter-un-fournisseur",
+      en: "/admin/[userId]/fournisseurs/ajouter-un-fournisseur",
+    },
+    "/admin/[userId]/prospects/tous-les-prospects": {
+      fr: "/admin/[userId]/prospects/tous-les-prospects",
+      en: "/admin/[userId]/prospects/tous-les-prospects",
+    },
+
     //CLIENT
     "/client/[clientId]": {
       fr: "/client/[clientId]",
       en: "/client/[clientId]",
     },
-
-    // ----- Tickets -----
     "/client/[clientId]/tickets/nouveau-ticket": {
       fr: "/client/[clientId]/tickets/nouveau-ticket",
       en: "/client/[clientId]/tickets/nouveau-ticket",
@@ -210,77 +257,58 @@ export const routing = defineRouting({
       fr: "/client/[clientId]/tickets/tickets-a-valider",
       en: "/client/[clientId]/tickets/tickets-a-valider",
     },
-
-    // ----- Interventions -----
     "/client/[clientId]/interventions/mes-interventions": {
       fr: "/client/[clientId]/interventions/mes-interventions",
       en: "/client/[clientId]/interventions/mes-interventions",
     },
-
     "/client/[clientId]/interventions/rapports-intervention": {
       fr: "/client/[clientId]/interventions/rapports-intervention",
       en: "/client/[clientId]/interventions/rapports-intervention",
     },
-
-    // ----- Devis -----
     "/client/[clientId]/devis/nouvelle-demande": {
       fr: "/client/[clientId]/devis/nouvelle-demande",
       en: "/client/[clientId]/devis/nouvelle-demande",
     },
-
     "/client/[clientId]/devis/demandes-en-cours": {
       fr: "/client/[clientId]/devis/demandes-en-cours",
       en: "/client/[clientId]/devis/demandes-en-cours",
     },
-
     "/client/[clientId]/devis/mes-devis": {
       fr: "/client/[clientId]/devis/mes-devis",
       en: "/client/[clientId]/devis/mes-devis",
     },
-
-    // ----- Contrats -----
     "/client/[clientId]/contrats/mes-contrats": {
       fr: "/client/[clientId]/contrats/mes-contrats",
       en: "/client/[clientId]/contrats/mes-contrats",
     },
-
     "/client/[clientId]/contrats/depenses-et-factures": {
       fr: "/client/[clientId]/contrats/depenses-et-factures",
       en: "/client/[clientId]/contrats/depenses-et-factures",
     },
-
     "/client/[clientId]/contrats/forfaits": {
       fr: "/client/[clientId]/contrats/forfaits",
       en: "/client/[clientId]/contrats/forfaits",
     },
-
-    // ----- Sites -----
     "/client/[clientId]/sites/mes-sites": {
       fr: "/client/[clientId]/sites/mes-sites",
       en: "/client/[clientId]/sites/mes-sites",
     },
-
     "/client/[clientId]/sites/nouveau-site": {
       fr: "/client/[clientId]/sites/nouveau-site",
       en: "/client/[clientId]/sites/nouveau-site",
     },
-
-    // ----- Compte -----
     "/client/[clientId]/compte/mon-profil/[userId]": {
       fr: "/client/[clientId]/compte/mon-profil/[userId]",
       en: "/client/[clientId]/compte/mon-profil/[userId]",
     },
-
     "/client/[clientId]/compte/mon-equipe": {
       fr: "/client/[clientId]/compte/mon-equipe",
       en: "/client/[clientId]/compte/mon-equipe",
     },
-
     "/client/[clientId]/compte/notifications": {
       fr: "/client/[clientId]/compte/notifications",
       en: "/client/[clientId]/compte/notifications",
     },
-
     "/client/[clientId]/compte/preferences": {
       fr: "/client/[clientId]/compte/preferences",
       en: "/client/[clientId]/compte/preferences",
