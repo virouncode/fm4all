@@ -292,7 +292,10 @@ export default function AdminNavItems({ userId }: AdminNavItemsProps) {
 
                 {/* Devis  */}
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={isActive("mes-devis")}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive("tous-les-devis")}
+                  >
                     <Link
                       href={{
                         pathname: "/admin/[userId]/devis/tous-les-devis",
@@ -342,7 +345,7 @@ export default function AdminNavItems({ userId }: AdminNavItemsProps) {
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild
-                    isActive={isActive("mes-contrats")}
+                    isActive={isActive("tous-les-contrats")}
                   >
                     <Link
                       href={{
@@ -408,7 +411,7 @@ export default function AdminNavItems({ userId }: AdminNavItemsProps) {
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild
-                    isActive={isActive("tous-les-clients")}
+                    isActive={isActive("tous-les-prospects")}
                   >
                     <Link
                       href={{
@@ -553,7 +556,7 @@ export default function AdminNavItems({ userId }: AdminNavItemsProps) {
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild
-                    isActive={isActive("ajouter-un-client")}
+                    isActive={isActive("ajouter-un-fournisseur")}
                   >
                     <Link
                       href={{
