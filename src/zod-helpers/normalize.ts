@@ -4,6 +4,8 @@
 // STRING NORMALIZATIONS
 // ---------------------------
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 // Trim + collapse espaces multiples
 export const normalizeString = (v: string) => v.trim().replace(/\s+/g, " ");
 
