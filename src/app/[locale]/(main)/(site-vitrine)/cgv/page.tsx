@@ -40,8 +40,8 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             <Link
               href={
                 locale === "fr"
-                  ? "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/cgv/CGV%20fm4all%2020250416-PHvyk70HWFDxvKTw2rRTjD513c0Rws.pdf"
-                  : "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/cgv/T%26C%27s%20fm4all%2020250416-AHdw5e3gXVc4wUvfHb0HhwYbJoC6Tt.pdf"
+                  ? "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/cgv/CGV%20fm4all%2020250416-3cWd57xG84FTKBYBot6WEpJQrZjE1J.pdf"
+                  : "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/cgv/Terms%20and%20conditions%20%28CGV%20EN%29%2020250416-7v7RF6gJkp9PazUE7xhTunF93J1sea.pdf"
               }
               target="_blank"
               className="underline"
@@ -50,7 +50,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             </Link>
           </p>
         </div>
-        <div className="mb-6 mt-6 w-full">
+        <div className="mt-6 mb-6 w-full">
           <iframe
             src={
               locale === "fr"
