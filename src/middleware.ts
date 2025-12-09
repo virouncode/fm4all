@@ -22,7 +22,7 @@ import { SelectUserType } from "./zod-schemas/user";
 // ============================================================================
 const devLogging = process.env.NODE_ENV === "development";
 
-const log = (...args: any[]) => {
+const log = (...args: unknown[]) => {
   if (devLogging) console.log("[middleware]", ...args);
 };
 

@@ -1,6 +1,8 @@
 import { InsertTicketAttachmentType } from "@/zod-schemas/ticket";
 import { emptyToNull } from "./normalize";
 
+/*eslint-disable @typescript-eslint/no-explicit-any */
+
 export function normalizeTicketAttachmentForDb<
   T extends InsertTicketAttachmentType,
 >(input: T): T {

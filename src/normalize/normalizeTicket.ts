@@ -1,6 +1,7 @@
 import { capitalize } from "@/lib/utils/capitalize";
 import { InsertTicketType, UpdateTicketType } from "@/zod-schemas/ticket";
 import { emptyToNull } from "./normalize";
+/*eslint-disable @typescript-eslint/no-explicit-any */
 
 export type TicketInput = InsertTicketType | UpdateTicketType;
 
