@@ -6,10 +6,10 @@ import {
   getClientSites,
 } from "@/lib/queries/clients/getClients";
 import { getIntervention } from "@/lib/queries/interventions/getInterventions";
+import { InterventionStatusType } from "@/zod-schemas/enums";
 import { UpdateInterventionFormType } from "@/zod-schemas/intervention";
 import { ReactNode } from "react";
 import ClientUpdateInterventionForm from "./ClientUpdateInterventionForm";
-import { InterventionStatusType } from "@/zod-schemas/enums";
 
 const page = async ({
   params,
@@ -49,13 +49,13 @@ const page = async ({
       <main className="flex h-full w-full flex-col overflow-hidden md:border-x">
         <div className="bg-background/95 shrink-0 border-b">
           <h1 className="py-2 text-center text-xl font-bold">
-            Modifiez l'intervention
+            Modifiez l&apos;intervention
           </h1>
         </div>
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="flex min-h-0 flex-1 items-center justify-center p-4">
             <p className="text-muted-foreground">
-              Vous n'avez pas la permission d'accéder à cette page.
+              Vous n&apos;avez pas la permission d&apos;accéder à cette page.
             </p>
           </div>
         </div>
@@ -75,10 +75,10 @@ const page = async ({
           <div className="w-full max-w-3xl pb-8">
             <div className="mb-6">
               <h2 className="mb-2 text-xl font-semibold tracking-tight">
-                Modifiez l'intervention
+                Modifiez l&apos;intervention
               </h2>
               <p className="text-muted-foreground text-sm">
-                Modifiez les détails de l'intervention ci-dessous
+                Modifiez les détails de l&apos;intervention ci-dessous
               </p>
             </div>
             <div>
@@ -127,8 +127,8 @@ const page = async ({
     <main className="flex h-full w-full flex-col overflow-hidden">
       <div className="bg-background/95 shrink-0 border-b">
         <h1 className="py-2 text-center text-xl font-bold">
-          Intervention "{initialIntervention.titre}" (n°{initialIntervention.id}
-          )
+          Intervention &quot;{initialIntervention.titre}&quot; (n°
+          {initialIntervention.id})
         </h1>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto">

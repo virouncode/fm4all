@@ -27,7 +27,7 @@ const page = async ({ params }: { params: Promise<{ clientId: number }> }) => {
           <CardContent>
             <p className="text-3xl font-bold">2,4 jours</p>
             <p className="text-muted-foreground mt-1 text-sm">
-              ↗︎ 8% d'amélioration
+              ↗︎ 8% d&apos;amélioration
             </p>
             <p className="text-muted-foreground text-sm">30 derniers jours</p>
           </CardContent>
@@ -56,7 +56,7 @@ const page = async ({ params }: { params: Promise<{ clientId: number }> }) => {
               ↘︎ -6% vs mois dernier
             </p>
             <p className="text-muted-foreground text-sm">
-              Interventions en cours d'intégration
+              Interventions en cours d&apos;intégration
             </p>
           </CardContent>
         </Card>

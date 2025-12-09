@@ -73,7 +73,7 @@ const TicketForm = <TFormValues,>({
       filename: "",
       mimeType: "",
       size: 0,
-    } as any);
+    });
   };
 
   return (
@@ -218,7 +218,7 @@ const TicketForm = <TFormValues,>({
               {fields.map((fieldItem, index) => (
                 <RhfFileInput<TicketFormValues>
                   key={fieldItem.id}
-                  name={`attachments.${index}` as any}
+                  name={`attachments.${index}`}
                   folderName={`tickets/${clientId}`}
                   // pas de label pour éviter la répétition
                   onClear={() => remove(index)}

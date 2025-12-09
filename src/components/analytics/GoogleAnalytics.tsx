@@ -36,6 +36,7 @@ export default function GoogleAnalytics({
         src="https://www.googletagmanager.com/gtag/js?id=AW-17528670078"
       />
       <Script
+        id="google-ads-init"
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
@@ -47,6 +48,7 @@ export default function GoogleAnalytics({
         }}
       />
       <Script
+        id="google-ads-conversion-handler"
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
