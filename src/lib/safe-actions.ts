@@ -15,7 +15,7 @@ export const actionClient = createSafeActionClient({
     console.error("[Server action error]", {
       name: error.constructor.name,
       message: error.message,
-      cause: (error as any).cause,
+      cause: error.cause,
       clientInput,
       metadata,
     });

@@ -80,8 +80,8 @@ export async function POST(req: NextRequest) {
         to: [parsedBody.to, "viroun@fm4all.com"],
         subject: parsedBody.subject,
         html: parsedBody.html ? parsedBody.html : undefined,
-        text: parsedBody.html ? undefined : parsedBody.text,
-      } as any;
+        text: parsedBody.html ? "" : parsedBody.text,
+      };
 
       if (fileBuffer) {
         emailOptions.attachment = {

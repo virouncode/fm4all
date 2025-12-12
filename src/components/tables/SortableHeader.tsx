@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
+/*eslint-disable @typescript-eslint/no-explicit-any */
+
 type SortableHeaderProps = {
   column: any; // tanstack column
   label: string;

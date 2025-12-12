@@ -80,7 +80,7 @@ const InterventionForm = <TFormValues,>({
     );
 
     if (!stillValid) {
-      setValue("siteId", undefined as any, {
+      setValue("siteId", undefined, {
         shouldDirty: true,
         shouldValidate: true,
       });
@@ -226,7 +226,7 @@ const InterventionForm = <TFormValues,>({
               onClick={handleAnnuler}
               variant="destructive"
             >
-              Annuler l'intervention
+              Annuler l&apos;intervention
             </Button>
           )}
           <Button

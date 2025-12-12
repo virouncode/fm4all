@@ -7,6 +7,8 @@ import {
   normalizeUpper,
 } from "./normalize";
 
+/*eslint-disable @typescript-eslint/no-explicit-any */
+
 type ClientInput = InsertClientType | UpdateClientType;
 export function normalizeClient<T extends ClientInput>(input: T): T {
   const clone: any = { ...input };

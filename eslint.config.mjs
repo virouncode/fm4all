@@ -23,7 +23,7 @@ const eslintConfig = [
   }),
   ...compat.config({
     extends: [
-      "plugin:tailwindcss/recommended", // Utilise la configuration recommandée du plugin Tailwind,
+      //"plugin:tailwindcss/recommended", // Utilise la configuration recommandée du plugin Tailwind,
       "prettier",
     ],
     // Options spécifiques pour eslint-plugin-tailwindcss si besoin

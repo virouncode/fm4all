@@ -77,8 +77,8 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
 
       <article className="flex flex-col gap-10">
         <h2 className="mx-auto max-w-prose font-bold text-wrap hyphens-auto">
-          Rejoignez l'équipe fm4all : façonnez l'environnement de travail de
-          demain
+          Rejoignez l&apos;équipe fm4all : façonnez l&apos;environnement de
+          travail de demain
         </h2>
         <div className="flex flex-col gap-6">
           <p className="mb-4 ml-6 border-l-2 px-4 text-3xl">
@@ -86,15 +86,16 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           </p>
           <p className="mx-auto max-w-prose text-wrap hyphens-auto">
             Chez fm4all, nous sommes convaincus que la performance d’une
-            entreprise passe avant tout par l'expérience de ses occupants. En
-            tant qu'acteur du Facility Management (FM) nouvelle génération,
-            notre mission est de transformer les bâtiments en lieux de vie et de
-            travail fluides, sûrs, et durables.
+            entreprise passe avant tout par l&apos;expérience de ses occupants.
+            En tant qu&apos;acteur du Facility Management (FM) nouvelle
+            génération, notre mission est de transformer les bâtiments en lieux
+            de vie et de travail fluides, sûrs, et durables.
           </p>
           <p className="mx-auto max-w-prose text-wrap hyphens-auto">
-            Si vous êtes passionné par la gestion technique, l'hospitalité,
-            l'innovation, et que vous souhaitez avoir un impact concret sur le
-            quotidien de milliers de professionnels, votre place est chez nous.
+            Si vous êtes passionné par la gestion technique, l&apos;hospitalité,
+            l&apos;innovation, et que vous souhaitez avoir un impact concret sur
+            le quotidien de milliers de professionnels, votre place est chez
+            nous.
           </p>
         </div>
 
@@ -104,10 +105,10 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           </p>
           <ul className="flex max-w-prose flex-col gap-4 text-wrap hyphens-auto md:mx-auto">
             <li className="list-disc md:ml-10">
-              <strong>L'Humain au Centre</strong> : Nous plaçons l'occupant au
-              cœur de nos préoccupations. Chaque membre de notre équipe
-              contribue directement à la qualité de l'environnement de travail
-              de nos clients.
+              <strong>L&apos;Humain au Centre</strong> : Nous plaçons
+              l&apos;occupant au cœur de nos préoccupations. Chaque membre de
+              notre équipe contribue directement à la qualité de
+              l&apos;environnement de travail de nos clients.
             </li>
             <li className="list-disc md:ml-10">
               <strong>Expertise 360°</strong> : Que vous soyez expert en{" "}
@@ -124,9 +125,9 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             </li>
             <li className="list-disc md:ml-10">
               <strong>Développement de carrière</strong> : En croissance
-              constante, fm4all offre de réelles perspectives d'évolution, que
-              ce soit vers des postes de management, de direction de contrat ou
-              de l'expertise technique.
+              constante, fm4all offre de réelles perspectives d&apos;évolution,
+              que ce soit vers des postes de management, de direction de contrat
+              ou de l&apos;expertise technique.
             </li>
           </ul>
 
@@ -136,7 +137,7 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             </p>
             <p className="mx-auto max-w-prose text-wrap hyphens-auto">
               Nous recrutons des profils variés, du terrain au siège, qui
-              partagent notre engagement pour l'excellence et le service.
+              partagent notre engagement pour l&apos;excellence et le service.
             </p>
             <ul className="flex max-w-prose flex-col gap-4 text-wrap hyphens-auto md:mx-auto">
               <li className="list-disc md:ml-10">
@@ -166,14 +167,14 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
             </p>
             <p className="mx-auto max-w-prose text-wrap hyphens-auto">
               Nous vous offrons un environnement de travail stimulant, une
-              équipe soudée, et les moyens d'exprimer pleinement votre
+              équipe soudée, et les moyens d&apos;exprimer pleinement votre
               potentiel. Chez fm4all, nous ne gérons pas seulement des
               bâtiments, nous gérons des expériences.
             </p>
             <p className="mx-auto max-w-prose text-wrap hyphens-auto">
               {" "}
-              Prêt à être l'architecte de l'expérience client et collaborateur
-              de demain ?
+              Prêt à être l&apos;architecte de l&apos;expérience client et
+              collaborateur de demain ?
             </p>
           </div>
 
@@ -182,9 +183,9 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
               Candidature spontanée
             </p>
             <p className="mx-auto max-w-prose text-wrap hyphens-auto">
-              Votre profil est rare et précieux ? Nous sommes toujours à l'affût
-              de talents exceptionnels. Envoyez-nous votre candidature spontanée
-              et discutons de nos futurs projets communs !
+              Votre profil est rare et précieux ? Nous sommes toujours à
+              l&apos;affût de talents exceptionnels. Envoyez-nous votre
+              candidature spontanée et discutons de nos futurs projets communs !
             </p>
             <CTAContactButtonsNoConversion
               withVisio={false}
@@ -196,22 +197,22 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
 
           <div className="flex flex-col gap-6">
             <p className="mb-4 ml-6 border-l-2 px-4 text-3xl">
-              Nos valeurs : Le code de conduite de l'innovation FM
+              Nos valeurs : Le code de conduite de l&apos;innovation FM
             </p>
             <p className="mx-auto max-w-prose text-wrap hyphens-auto">
               Notre plateforme est alimentée par la technologie, mais notre
-              succès repose sur des valeurs humaines et une culture d'entreprise
-              forte. Ces principes guident nos équipes, nos relations clients et
-              nos partenariats avec les prestataires.
+              succès repose sur des valeurs humaines et une culture
+              d&apos;entreprise forte. Ces principes guident nos équipes, nos
+              relations clients et nos partenariats avec les prestataires.
             </p>
             <p className="text-center font-bold">
               La sécurité (digitale et physique)
             </p>
             <p className="mx-auto max-w-prose text-wrap hyphens-auto">
-              La sécurité est notre fondation, qu'il s'agisse de protéger les
-              occupants sur site ou les données de nos clients. Nous nous
-              engageons à garantir un environnement de travail sécurisé sur le
-              terrain et la{" "}
+              La sécurité est notre fondation, qu&apos;il s&apos;agisse de
+              protéger les occupants sur site ou les données de nos clients.
+              Nous nous engageons à garantir un environnement de travail
+              sécurisé sur le terrain et la{" "}
               <strong>protection maximale de toutes les informations </strong>
               transitant par notre plateforme.
             </p>
@@ -221,42 +222,43 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
               <strong>clarté absolue</strong>. Notre intégrité se traduit par la{" "}
               <strong>transparence de nos outils</strong> : des devis
               comparables, des contrats clairs et des engagements financiers
-              sans surprise. Zéro zone d'ombre.
+              sans surprise. Zéro zone d&apos;ombre.
             </p>
             <p className="text-center font-bold">
-              Engagement envers l'excellence opérationnelle
+              Engagement envers l&apos;excellence opérationnelle
             </p>
             <p className="mx-auto max-w-prose text-wrap hyphens-auto">
-              Nous visons l'excellence grâce à la rigueur de nos processus et à
-              la <strong>précision de nos algorithmes</strong>. C'est notre
-              passion pour le service, boostée par la technologie, qui nous
-              permet de toujours garantir la meilleure performance FM.
+              Nous visons l&apos;excellence grâce à la rigueur de nos processus
+              et à la <strong>précision de nos algorithmes</strong>. C&apos;est
+              notre passion pour le service, boostée par la technologie, qui
+              nous permet de toujours garantir la meilleure performance FM.
             </p>
             <p className="text-center font-bold">
-              Esprit d'équipe et synergie digitale
+              Esprit d&apos;équipe et synergie digitale
             </p>
             <p className="mx-auto max-w-prose text-wrap hyphens-auto">
-              Nous sommes un <strong>écosystème unifié</strong>. L'entraide est
-              notre quotidien, non seulement au sein de nos équipes, mais aussi
-              entre notre plateforme et nos partenaires. Ensemble (client,
+              Nous sommes un <strong>écosystème unifié</strong>. L&apos;entraide
+              est notre quotidien, non seulement au sein de nos équipes, mais
+              aussi entre notre plateforme et nos partenaires. Ensemble (client,
               fm4all et prestataires), nous allons toujours plus loin.
             </p>
             <p className="text-center font-bold">Innovation continue</p>
             <p className="mx-auto max-w-prose text-wrap hyphens-auto">
-              Notre raison d'être est de bousculer les codes. Nous encourageons
-              activement les <strong>idées neuves</strong> qui simplifient la
-              vie de nos clients. L'innovation est notre moteur pour développer
-              les solutions digitales qui feront la différence sur le marché du
-              FM de demain.
+              Notre raison d&apos;être est de bousculer les codes. Nous
+              encourageons activement les <strong>idées neuves</strong> qui
+              simplifient la vie de nos clients. L&apos;innovation est notre
+              moteur pour développer les solutions digitales qui feront la
+              différence sur le marché du FM de demain.
             </p>
             <p className="text-center font-bold">
               Respect, diversité et valorisation du talent
             </p>
             <p className="mx-auto max-w-prose text-wrap hyphens-auto">
-              Chaque profil compte, qu'il soit sur le terrain ou derrière un
-              écran. Nous valorisons la diversité des parcours, car c'est la
-              variété des expertises qui alimente notre plateforme. Votre talent
-              et votre contribution méritent une reconnaissance et une
+              Chaque profil compte, qu&apos;il soit sur le terrain ou derrière
+              un écran. Nous valorisons la diversité des parcours, car
+              c&apos;est la variété des expertises qui alimente notre
+              plateforme. Votre talent et votre contribution méritent une
+              reconnaissance et une
               <strong>
                 valorisation financière à la hauteur de votre impact
               </strong>

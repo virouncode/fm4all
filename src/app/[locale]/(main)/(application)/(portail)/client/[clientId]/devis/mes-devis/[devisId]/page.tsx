@@ -39,12 +39,12 @@ const page = async ({
     <main className="flex h-full w-full flex-col overflow-hidden md:border-x">
       <div className="bg-background/95 shrink-0 border-b">
         <h1 className="py-2 text-center text-xl font-bold">
-          Devis n° {devisId} : "{devis.titre}"
+          Devis n° {devisId} : &quot;{devis.titre}&quot;
         </h1>
       </div>
       <div className="mt-6 flex min-h-0 flex-col overflow-y-auto">
         <p className="mx-auto max-w-prose">
-          Si le document ne s'affiche pas correctement{" "}
+          Si le document ne s&apos;affiche pas correctement{" "}
           <Link href={devis.devisUrl} target="_blank" className="underline">
             cliquez ici
           </Link>

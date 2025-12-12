@@ -109,7 +109,7 @@ export const createInsertProspectFormSchema = (
     commentaires: z.string().optional(),
   });
 
-const insertProspectFormSchema = createInsertProspectFormSchema({
+export const insertProspectFormSchema = createInsertProspectFormSchema({
   nomEntreprise: "Nom de l'entreprise obligatoire",
   prenomContact: "Prénom du contact obligatoire",
   nomContact: "Nom du contact obligatoire",

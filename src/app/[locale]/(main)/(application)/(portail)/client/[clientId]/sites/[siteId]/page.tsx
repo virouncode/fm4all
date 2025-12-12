@@ -34,7 +34,7 @@ const page = async ({
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="flex min-h-0 flex-1 items-center justify-center p-4">
             <p className="text-muted-foreground">
-              Vous n'avez pas la permission d'accéder à cette page.
+              Vous n&apos;avez pas la permission d&apos;accéder à cette page.
             </p>
           </div>
         </div>
@@ -58,7 +58,7 @@ const page = async ({
                 Modifiez les détails du site ci-dessous
               </p>
             </div>
-            <div>"Le site demandé est introuvable."</div>
+            <div>Le site demandé est introuvable.</div>
           </div>
         </div>
       </div>
@@ -89,7 +89,7 @@ const page = async ({
     <main className="flex h-full w-full flex-col overflow-hidden">
       <div className="bg-background/95 shrink-0 border-b">
         <h1 className="py-2 text-center text-xl font-bold">
-          Site "{initialSite.nomSite}" (n°{initialSite.id})
+          Site &quot;{initialSite.nomSite}&quot; (n°{initialSite.id})
         </h1>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto">

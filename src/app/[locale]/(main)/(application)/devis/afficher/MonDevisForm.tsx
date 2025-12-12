@@ -120,7 +120,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
         console.error("[finaliserDevisAction error]", error);
         // Pour voir plus clair :
         console.log("serverError:", error.serverError);
-        console.log("validationErrors:", (error as any).validationErrors);
+        console.log("validationErrors:", error.validationErrors);
 
         toast({
           variant: "destructive",

@@ -1,13 +1,13 @@
 import { LocaleType } from "@/i18n/routing";
+import {
+  getClientFournisseurs,
+  getClientSites,
+} from "@/lib/queries/clients/getClients";
 import { getTickets } from "@/lib/queries/tickets/getTickets";
 import { RawSearchParams } from "@/normalize/normalizeSearchParams";
 import { parseTicketsQuery } from "@/zod-schemas/ticket";
 import { ticketsIdLabelMap } from "../tickets-en-cours/createTicketsColumns";
 import TicketsTable from "../tickets-en-cours/TicketsTable";
-import {
-  getClientSites,
-  getClientFournisseurs,
-} from "@/lib/queries/clients/getClients";
 
 const page = async ({
   params,
@@ -44,7 +44,7 @@ const page = async ({
     <main className="flex h-full w-full flex-col overflow-hidden md:border-x">
       <div className="bg-background/95 shrink-0 border-b">
         <h1 className="py-2 text-center text-xl font-bold">
-          Mes tickets en attente d'action
+          Mes tickets en attente d&apos;action
         </h1>
       </div>
       <div className="flex min-h-0 flex-1 flex-col">

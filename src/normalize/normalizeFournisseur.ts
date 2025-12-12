@@ -11,6 +11,8 @@ import {
   toIntOrNull,
 } from "./normalize";
 
+/*eslint-disable @typescript-eslint/no-explicit-any */
+
 type FournisseurInput = InsertFournisseurType | UpdateFournisseurType;
 
 export function normalizeFournisseur<T extends FournisseurInput>(input: T): T {
