@@ -51,6 +51,25 @@ export const getClients = async (): Promise<SelectClientType[]> => {
   }
 };
 
+export const getClient = async (
+  clientId: number,
+): Promise<SelectClientType | null> => {
+  try {
+    const result = await db
+      .select()
+      .from(clients)
+      .where(eq(clients.id, clientId))
+      .limit(1);
+    if (result.length === 0) {
+      return null;
+    }
+    return selectClientSchema.parse(result[0]);
+  } catch (err) {
+    errorHelper(err);
+    return null;
+  }
+};
+
 export const getClientSites = async (params: {
   clientId: number;
   query: SitesQueryBackendType;
@@ -249,4 +268,72 @@ export const getClientDevis = async (params: {
     errorHelper(err);
     return [];
   }
+};
+
+// ======================= ADMIN: getAllClientsWithPagination ==========================//
+
+import { DEFAULT_PAGE_SIZE } from "@/constants/pagination";
+import {
+  ClientsQueryBackendType,
+  SORTABLE_CLIENTS_COLUMNS,
+} from "@/zod-schemas/client";
+import { sql } from "drizzle-orm";
+
+export const getAllClientsWithPagination = async (params: {
+  query: ClientsQueryBackendType;
+}) => {
+  const { nomEntreprise, siret, orderBy, orderDir, page, pageSize } =
+    params.query;
+
+  const whereClauses: SQL[] = [];
+
+  if (nomEntreprise) {
+    whereClauses.push(eq(clients.nomEntreprise, nomEntreprise));
+  }
+  if (siret) {
+    whereClauses.push(ilike(clients.siret, `%${siret}%`));
+  }
+
+  const orderColumn =
+    SORTABLE_CLIENTS_COLUMNS[orderBy] ?? SORTABLE_CLIENTS_COLUMNS.nomEntreprise;
+
+  const orderDirection = orderDir === "asc" ? asc : desc;
+  const orderExpr = orderDirection(orderColumn);
+
+  const effectivePage = page ?? 1;
+  const effectivePageSize = pageSize ?? DEFAULT_PAGE_SIZE;
+  const offset = (effectivePage - 1) * effectivePageSize;
+
+  const where = whereClauses.length > 0 ? and(...whereClauses) : undefined;
+
+  const [totalRows] = await db
+    .select({ value: sql<number>`cast(count(*) as int)` })
+    .from(clients)
+    .where(where);
+
+  const total = totalRows?.value ?? 0;
+  const totalPages = Math.max(Math.ceil(total / effectivePageSize), 1);
+
+  const rows = await db
+    .select()
+    .from(clients)
+    .where(where)
+    .orderBy(orderExpr)
+    .limit(effectivePageSize + 1)
+    .offset(offset);
+
+  const hasMore = rows.length > effectivePageSize;
+  const slice = hasMore ? rows.slice(0, effectivePageSize) : rows;
+  const items = slice.map((client) => selectClientSchema.parse(client));
+  const nextPage = hasMore ? effectivePage + 1 : null;
+
+  return {
+    items,
+    page: effectivePage,
+    pageSize: effectivePageSize,
+    total,
+    totalPages,
+    hasMore,
+    nextPage,
+  };
 };

@@ -2,6 +2,7 @@ import {
   ticketCategorieCodes,
   ticketPrioriteCodes,
   ticketStatusCodes,
+  ticketTypeCodes,
   typeBatimentCodes,
   typeOccupationCodes,
   userRoleCodes,
@@ -58,3 +59,4 @@ export const ticketCategorieEnum = pgEnum(
   "ticket_categorie",
   ticketCategorieCodes,
 );
+export const ticketTypeEnum = pgEnum("ticket_type", ticketTypeCodes);

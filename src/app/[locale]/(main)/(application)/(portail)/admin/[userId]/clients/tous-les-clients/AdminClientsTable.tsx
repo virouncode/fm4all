@@ -1,42 +1,34 @@
 "use client";
 
-import { getTicketsAction } from "@/actions/ticketsActions";
+import { getAllClientsAction } from "@/actions/clientAction";
 import InfiniteDataTable from "@/components/tables/InfiniteDataTable";
-import { getTickets } from "@/lib/queries/tickets/getTickets";
-import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
-import { SelectSiteType } from "@/zod-schemas/site";
+import { getAllClientsWithPagination } from "@/lib/queries/clients/getClients";
 import {
-  TicketsQueryBackendType,
-  type SelectTicketType,
-} from "@/zod-schemas/ticket";
+  ClientsQueryBackendType,
+  SelectClientType,
+} from "@/zod-schemas/client";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { createTicketsColumns } from "./createTicketsColumns";
+import { createAdminClientsColumns } from "./createAdminClientsColumns";
 
-type TicketsTableProps = {
-  initialQuery: TicketsQueryBackendType; // filtres + orderBy/orderDir, SANS se soucier de page dans l'URL
-  initialData?: Awaited<ReturnType<typeof getTickets>>; // SSR: { items, total, hasMore, page }
+type AdminClientsTableProps = {
+  initialQuery: ClientsQueryBackendType;
+  initialData?: Awaited<ReturnType<typeof getAllClientsWithPagination>>;
   idLabelMap: Map<string, string>;
-  clientId: number;
-  sites: SelectSiteType[];
-  fournisseurs: SelectFournisseurType[];
-  isDevisTickets?: boolean;
+  userId: string;
 };
 
-const TicketsTable = ({
+const AdminClientsTable = ({
   initialQuery,
   initialData,
   idLabelMap,
-  clientId,
-  sites,
-  fournisseurs,
-  isDevisTickets = false,
-}: TicketsTableProps) => {
+  userId,
+}: AdminClientsTableProps) => {
   const router = useRouter();
 
   // --- DATA STATE ---
 
-  const [items, setItems] = useState<SelectTicketType[]>(
+  const [items, setItems] = useState<SelectClientType[]>(
     initialData?.items ?? [],
   );
   const [total, setTotal] = useState<number>(initialData?.total ?? 0);
@@ -74,13 +66,13 @@ const TicketsTable = ({
 
       const nextPage = page + 1;
 
-      const res = await getTicketsAction({
-        ...initialQuery, // filtres + tri courants (dérivés de l'URL)
+      const res = await getAllClientsAction({
+        ...initialQuery,
         page: nextPage,
       });
 
       if (res.serverError || res.validationErrors || !res.data) {
-        console.error("Erreur lors du chargement de plus de tickets:", res);
+        console.error("Erreur lors du chargement de plus de clients:", res);
         setIsError(true);
         return;
       }
@@ -92,7 +84,7 @@ const TicketsTable = ({
       setHasMore(data.hasMore);
       setPage(data.page);
     } catch (error) {
-      console.error("Erreur lors du chargement de plus de tickets:", error);
+      console.error("Erreur lors du chargement de plus de clients:", error);
       setIsError(true);
     } finally {
       setIsLoadingMore(false);
@@ -101,32 +93,26 @@ const TicketsTable = ({
 
   const memoIdLabelMap = useMemo(() => idLabelMap, [idLabelMap]);
 
-  const handleRowClick = (ticket: SelectTicketType) => {
-    const ticketId = ticket.id;
-    const redirectUrl = isDevisTickets
-      ? `/client/${clientId}/devis/demande/${ticketId}`
-      : `/client/${clientId}/tickets/${ticketId}`;
+  const handleRowClick = (client: SelectClientType) => {
+    const clientId = client.id;
+    const redirectUrl = `/admin/${userId}/clients/${clientId}`;
     router.push(redirectUrl);
   };
 
   return (
-    <InfiniteDataTable<SelectTicketType>
-      columns={createTicketsColumns({ sites, fournisseurs })}
+    <InfiniteDataTable<SelectClientType>
+      columns={createAdminClientsColumns()}
       items={items}
       isLoading={isLoading}
       isError={isError}
       isLoadingMore={isLoadingMore}
       hasMore={hasMore}
       loadMore={loadMore}
-      // pas de tri client: tri géré par l'URL + SSR
       idLabelMap={memoIdLabelMap}
       total={total}
       onRowClick={handleRowClick}
-      initialHiddenColumns={
-        isDevisTickets ? ["categorie", "status", "dateCloture"] : []
-      }
     />
   );
 };
 
-export default TicketsTable;
+export default AdminClientsTable;

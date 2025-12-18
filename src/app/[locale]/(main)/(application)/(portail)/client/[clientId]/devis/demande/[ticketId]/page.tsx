@@ -103,6 +103,7 @@ const page = async ({
     description: initialTicket.description ?? "",
     priorite: initialTicket.priorite,
     status: initialTicket.status,
+    type: initialTicket.type,
     attachments: initialTicket.attachments ?? [],
     siteId: initialTicket.siteId?.toString() ?? sites[0].id.toString(),
   };

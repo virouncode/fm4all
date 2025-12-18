@@ -26,10 +26,10 @@ import {
 } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
+import { UserRoleType } from "@/zod-schemas/enums";
 import Image from "next/image";
 import { useParams, usePathname } from "next/navigation";
 import { useState } from "react";
-import { UserRoleType } from "@/zod-schemas/enums";
 
 type ClientNavItemsProps = {
   currentRole: UserRoleType;
@@ -46,7 +46,6 @@ export default function ClientNavItems({ currentRole }: ClientNavItemsProps) {
   const [devisOpen, setDevisOpen] = useState(isActive("/devis/"));
   const [contrOpen, setContrOpen] = useState(isActive("/contrats/"));
   const [sitesOpen, setSitesOpen] = useState(isActive("/sites/"));
-  const [compteOpen, setCompteOpen] = useState(isActive("/compte/"));
 
   return (
     <div className="flex flex-col">
@@ -141,19 +140,15 @@ export default function ClientNavItems({ currentRole }: ClientNavItemsProps) {
                   </SidebarMenuItem>
                 )}
 
-                {/* Tickets en cours */}
                 <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive("tickets-en-cours")}
-                  >
+                  <SidebarMenuButton asChild isActive={isActive("mes-tickets")}>
                     <Link
                       href={{
-                        pathname: "/client/[clientId]/tickets/tickets-en-cours",
+                        pathname: "/client/[clientId]/tickets/mes-tickets",
                         params: { clientId },
                       }}
                     >
-                      Tickets en cours
+                      Mes tickets
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -320,15 +315,15 @@ export default function ClientNavItems({ currentRole }: ClientNavItemsProps) {
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild
-                    isActive={isActive("demandes-en-cours")}
+                    isActive={isActive("mes-demandes")}
                   >
                     <Link
                       href={{
-                        pathname: "/client/[clientId]/devis/demandes-en-cours",
+                        pathname: "/client/[clientId]/devis/mes-demandes",
                         params: { clientId },
                       }}
                     >
-                      Mes demandes en cours
+                      Mes demandes
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

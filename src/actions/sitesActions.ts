@@ -13,6 +13,7 @@ import {
 import { eq } from "drizzle-orm";
 import { getLocale } from "next-intl/server";
 import { flattenValidationErrors } from "next-safe-action";
+import { z } from "zod";
 import { sites } from "../db/schema";
 
 export const getSitesAction = actionClient
@@ -170,4 +171,81 @@ export const updateSiteAction = actionClient
           : "Site updated successfully.",
       site: updatedSite,
     };
+  });
+
+// Schema pour l'action admin avec clientId
+const getClientSitesForAdminSchema = sitesQueryBackendSchema.extend({
+  clientId: z.number().int().positive("ID du client invalide"),
+});
+
+// Action pour récupérer les sites d'un client spécifique (admin uniquement)
+export const getClientSitesForAdminAction = actionClient
+  .metadata({ actionName: "getClientSitesForAdminAction" })
+  .inputSchema(getClientSitesForAdminSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    const locale = await getLocale();
+
+    if (!currentUser) {
+      throw new Error(
+        locale === "fr"
+          ? "Vous n'êtes pas authentifié."
+          : "You are not authenticated.",
+      );
+    }
+
+    if (currentUser.role !== "admin") {
+      throw new Error(
+        locale === "fr"
+          ? "Vous n'avez pas les droits pour effectuer cette action."
+          : "You do not have permission to perform this action.",
+      );
+    }
+
+    const { clientId, ...query } = parsedInput;
+    const sites = await getClientSites({ clientId, query });
+    return sites;
+  });
+
+// ======================= ADMIN: getAllSitesAction ==========================//
+
+import { getAllSitesWithPagination } from "@/lib/queries/sites/getSites";
+import { adminSitesQueryBackendSchema } from "@/zod-schemas/site";
+
+export const getAllSitesAction = actionClient
+  .metadata({ actionName: "getAllSitesAction" })
+  .inputSchema(adminSitesQueryBackendSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    const locale = await getLocale();
+
+    if (!currentUser) {
+      throw new Error(
+        locale === "fr"
+          ? "Vous n'êtes pas authentifié."
+          : "You are not authenticated.",
+      );
+    }
+
+    if (currentUser.role !== "admin") {
+      throw new Error(
+        locale === "fr"
+          ? "Vous n'avez pas les droits pour effectuer cette action."
+          : "You do not have permission to perform this action.",
+      );
+    }
+
+    const sites = await getAllSitesWithPagination({
+      query: parsedInput,
+    });
+
+    return sites;
   });

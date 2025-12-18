@@ -4,21 +4,25 @@ import {
   ticketCategorieCT,
   ticketPrioriteCT,
   ticketStatusCT,
+  ticketTypeCT,
   toCodeTableName,
 } from "@/constants/codeTables";
 import { formatInTimezone } from "@/lib/utils/formatDates";
+import { SelectClientType } from "@/zod-schemas/client";
 import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
 import { SelectSiteType } from "@/zod-schemas/site";
 import { SelectTicketType } from "@/zod-schemas/ticket";
 import { ColumnDef } from "@tanstack/react-table";
 
-export const ticketsIdLabelMap = new Map<string, string>([
+export const adminTicketsIdLabelMap = new Map<string, string>([
   ["id", "ID"],
+  ["clientId", "Client"],
   ["createdAt", "Date de création"],
   ["updatedAt", "Dernière mise à jour"],
   ["categorie", "Catégorie"],
   ["priorite", "Priorité"],
   ["status", "État"],
+  ["type", "Type"],
   ["siteId", "Site"],
   ["fournisseurId", "Prestataire"],
   ["titre", "Titre"],
@@ -26,10 +30,12 @@ export const ticketsIdLabelMap = new Map<string, string>([
   ["description", "Description"],
 ]);
 
-export const createTicketsColumns = ({
+export const createAdminTicketsColumns = ({
+  clients,
   sites,
   fournisseurs,
 }: {
+  clients: SelectClientType[];
   sites: SelectSiteType[];
   fournisseurs: SelectFournisseurType[];
 }): ColumnDef<SelectTicketType>[] => [
@@ -38,17 +44,28 @@ export const createTicketsColumns = ({
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label={getColumnLabel("id", ticketsIdLabelMap)}
+        label={getColumnLabel("id", adminTicketsIdLabelMap)}
       />
     ),
     accessorFn: (row) => row.id,
+  },
+  {
+    accessorKey: "clientId",
+    header: ({ column }) => (
+      <SortableHeader
+        column={column}
+        label={getColumnLabel("clientId", adminTicketsIdLabelMap)}
+      />
+    ),
+    accessorFn: (row) =>
+      clients.find((c) => c.id === row.clientId)?.nomEntreprise || "-",
   },
   {
     accessorKey: "titre",
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label={getColumnLabel("titre", ticketsIdLabelMap)}
+        label={getColumnLabel("titre", adminTicketsIdLabelMap)}
       />
     ),
     accessorFn: (row) => row.titre,
@@ -58,7 +75,7 @@ export const createTicketsColumns = ({
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label={getColumnLabel("categorie", ticketsIdLabelMap)}
+        label={getColumnLabel("categorie", adminTicketsIdLabelMap)}
       />
     ),
     accessorFn: (row) => toCodeTableName(row.categorie, ticketCategorieCT),
@@ -68,7 +85,7 @@ export const createTicketsColumns = ({
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label={getColumnLabel("priorite", ticketsIdLabelMap)}
+        label={getColumnLabel("priorite", adminTicketsIdLabelMap)}
       />
     ),
     accessorFn: (row) => toCodeTableName(row.priorite, ticketPrioriteCT),
@@ -78,17 +95,37 @@ export const createTicketsColumns = ({
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label={getColumnLabel("status", ticketsIdLabelMap)}
+        label={getColumnLabel("status", adminTicketsIdLabelMap)}
       />
     ),
     accessorFn: (row) => toCodeTableName(row.status, ticketStatusCT),
+  },
+  {
+    accessorKey: "type",
+    header: ({ column }) => (
+      <SortableHeader
+        column={column}
+        label={getColumnLabel("type", adminTicketsIdLabelMap)}
+      />
+    ),
+    accessorFn: (row) => toCodeTableName(row.type, ticketTypeCT),
+  },
+  {
+    accessorKey: "siteId",
+    header: ({ column }) => (
+      <SortableHeader
+        column={column}
+        label={getColumnLabel("siteId", adminTicketsIdLabelMap)}
+      />
+    ),
+    accessorFn: (row) => sites.find((s) => s.id === row.siteId)?.nomSite || "-",
   },
   {
     accessorKey: "fournisseurId",
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label={getColumnLabel("fournisseurId", ticketsIdLabelMap)}
+        label={getColumnLabel("fournisseurId", adminTicketsIdLabelMap)}
       />
     ),
     accessorFn: (row) =>
@@ -96,21 +133,11 @@ export const createTicketsColumns = ({
       "-",
   },
   {
-    accessorKey: "siteId",
-    header: ({ column }) => (
-      <SortableHeader
-        column={column}
-        label={getColumnLabel("siteId", ticketsIdLabelMap)}
-      />
-    ),
-    accessorFn: (row) => sites.find((s) => s.id === row.siteId)?.nomSite || "-",
-  },
-  {
     accessorKey: "createdAt",
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label={getColumnLabel("createdAt", ticketsIdLabelMap)}
+        label={getColumnLabel("createdAt", adminTicketsIdLabelMap)}
       />
     ),
     accessorFn: (row) => row.createdAt,
@@ -124,7 +151,7 @@ export const createTicketsColumns = ({
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label={getColumnLabel("updatedAt", ticketsIdLabelMap)}
+        label={getColumnLabel("updatedAt", adminTicketsIdLabelMap)}
       />
     ),
     accessorFn: (row) => row.updatedAt,
@@ -133,13 +160,12 @@ export const createTicketsColumns = ({
       return formatInTimezone(value);
     },
   },
-
   {
     accessorKey: "dateCloture",
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label={getColumnLabel("dateCloture", ticketsIdLabelMap)}
+        label={getColumnLabel("dateCloture", adminTicketsIdLabelMap)}
       />
     ),
     accessorFn: (row) => row.dateCloture,

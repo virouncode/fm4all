@@ -75,3 +75,105 @@ export const onboardClientFormSchema = z.object({
 });
 
 export type OnboardClientFormType = z.infer<typeof onboardClientFormSchema>;
+
+//======================= UPDATE CLIENT FORM SCHEMA ==========================//
+
+export const updateClientFormSchema = z.object({
+  id: z.number().positive("ID du client invalide"),
+  nomEntreprise: z
+    .string()
+    .min(1, "Le nom de l'entreprise est obligatoire")
+    .transform((v) => upper(v)),
+  siret: siretSchemaEmpty("SIRET invalide"),
+});
+
+export type UpdateClientFormType = z.infer<typeof updateClientFormSchema>;
+
+//=========================== ADMIN: QUERY SCHEMAS ============================//
+
+import { DEFAULT_PAGE_SIZE } from "@/constants/pagination";
+import { emptyStringToUndefinedOptional } from "@/normalize/emptyStringToUndefined";
+import {
+  normalizeSearchParams,
+  RawSearchParams,
+} from "@/normalize/normalizeSearchParams";
+import { createSortSchema } from "@/zod-helpers/createSortSchema";
+
+// Colonnes triables
+export const SORTABLE_CLIENTS_COLUMNS = {
+  id: clients.id,
+  prospectId: clients.prospectId,
+  nomEntreprise: clients.nomEntreprise,
+  siret: clients.siret,
+  createdAt: clients.createdAt,
+  updatedAt: clients.updatedAt,
+} as const;
+
+export const clientsOrderBySchema = z.enum([
+  "id",
+  "prospectId",
+  "nomEntreprise",
+  "siret",
+  "createdAt",
+  "updatedAt",
+]);
+
+export type ClientsOrderByType = z.infer<typeof clientsOrderBySchema>;
+
+// Backend schema
+const DEFAULT_ORDER_BY: ClientsOrderByType = "nomEntreprise";
+const DEFAULT_ORDER_DIR: "asc" | "desc" = "asc";
+
+export const clientsQueryBackendSchema = z.object({
+  // Filtres
+  nomEntreprise: z.string().optional(),
+  siret: z.string().optional(),
+  // Tri
+  orderBy: clientsOrderBySchema.default(DEFAULT_ORDER_BY),
+  orderDir: z.enum(["asc", "desc"]).default(DEFAULT_ORDER_DIR),
+  // Pagination
+  page: z.number().int().positive().default(1),
+  pageSize: z.number().int().positive().default(DEFAULT_PAGE_SIZE),
+});
+export type ClientsQueryBackendType = z.infer<typeof clientsQueryBackendSchema>;
+
+// Frontend filters
+export const clientsQueryFiltersSchema = z
+  .object({
+    nomEntreprise: emptyStringToUndefinedOptional,
+    siret: emptyStringToUndefinedOptional,
+  })
+  .partial();
+
+export type ClientsQueryFiltersType = z.infer<typeof clientsQueryFiltersSchema>;
+
+// Frontend schema complet (filtres + tri)
+export const clientsQueryFrontendSchema = clientsQueryFiltersSchema.merge(
+  createSortSchema(SORTABLE_CLIENTS_COLUMNS, "nomEntreprise"),
+);
+export type ClientsQueryFrontendType = z.infer<
+  typeof clientsQueryFrontendSchema
+>;
+
+// Parse function
+export function parseClientsQuery(raw: RawSearchParams) {
+  const normalized = normalizeSearchParams(raw);
+  const urlQuery = clientsQueryFrontendSchema.parse(normalized);
+
+  const nomEntreprise =
+    urlQuery.nomEntreprise &&
+    urlQuery.nomEntreprise !== "all" &&
+    urlQuery.nomEntreprise !== ""
+      ? urlQuery.nomEntreprise
+      : undefined;
+
+  const siret =
+    urlQuery.siret && urlQuery.siret !== "" ? urlQuery.siret : undefined;
+
+  return clientsQueryBackendSchema.parse({
+    nomEntreprise,
+    siret,
+    orderBy: urlQuery.orderBy,
+    orderDir: urlQuery.orderDir,
+  });
+}

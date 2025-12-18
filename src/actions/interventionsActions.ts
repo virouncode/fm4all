@@ -288,3 +288,41 @@ export const updateInterventionAction = actionClient
       intervention: selectInterventionSchema.parse(updatedIntervention),
     };
   });
+
+// ======================= ADMIN: getAllInterventionsAction ==========================//
+import { getAllInterventions } from "@/lib/queries/interventions/getInterventions";
+import { adminInterventionsQueryBackendSchema } from "@/zod-schemas/intervention";
+
+export const getAllInterventionsAction = actionClient
+  .metadata({ actionName: "getAllInterventionsAction" })
+  .inputSchema(adminInterventionsQueryBackendSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    const locale = await getLocale();
+
+    if (!currentUser) {
+      throw new Error(
+        locale === "fr"
+          ? "Vous n'êtes pas authentifié."
+          : "You are not authenticated.",
+      );
+    }
+
+    if (currentUser.role !== "admin") {
+      throw new Error(
+        locale === "fr"
+          ? "Vous n'avez pas les droits pour effectuer cette action."
+          : "You do not have permission to perform this action.",
+      );
+    }
+
+    const interventions = await getAllInterventions({
+      query: parsedInput,
+    });
+
+    return interventions;
+  });

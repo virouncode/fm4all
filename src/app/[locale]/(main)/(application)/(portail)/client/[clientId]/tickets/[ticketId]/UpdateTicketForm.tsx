@@ -53,7 +53,7 @@ export default function UpdateTicketForm({
           title: "Succès",
           description: data.message,
         });
-        router.push(`/client/${clientId}/tickets/tickets-en-cours`);
+        router.push(`/client/${clientId}/tickets/mes-tickets`);
       },
 
       onError: ({ error }) => {

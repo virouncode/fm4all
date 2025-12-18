@@ -6,9 +6,9 @@ import {
 import { getDevisTickets } from "@/lib/queries/tickets/getTickets";
 import { RawSearchParams } from "@/normalize/normalizeSearchParams";
 import { parseTicketsQuery } from "@/zod-schemas/ticket";
-import { ticketsIdLabelMap } from "../../tickets/tickets-en-cours/createTicketsColumns";
-import TicketsFiltersForm from "../../tickets/tickets-en-cours/TicketsFiltersForm";
-import TicketsTable from "../../tickets/tickets-en-cours/TicketsTable";
+import { ticketsIdLabelMap } from "../../tickets/mes-tickets/createTicketsColumns";
+import TicketsFiltersForm from "../../tickets/mes-tickets/TicketsFiltersForm";
+import TicketsTable from "../../tickets/mes-tickets/TicketsTable";
 
 const page = async ({
   params,

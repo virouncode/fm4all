@@ -12,6 +12,7 @@ import {
   ticketCategorieCT,
   ticketPrioriteCT,
   ticketStatusCT,
+  ticketTypeCT,
 } from "@/constants/codeTables";
 import { UserRoleType } from "@/zod-schemas/enums";
 import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
@@ -85,31 +86,40 @@ const TicketForm = <TFormValues,>({
               name="titre"
               label="Titre"
               requiredMark
-              className="w-full md:col-span-1"
+              className="w-full md:col-span-2"
               disabled={isReadOnly}
             />
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 md:gap-14">
+            <RhfControlledSelect<TicketFormValues>
+              name="type"
+              label="Type"
+              requiredMark
+              className="w-full md:col-span-1"
+              selectClassName="w-full"
+              disabled={isDevisTicket || isReadOnly}
+            >
+              {ticketTypeCT.map((type) => (
+                <SelectItem key={type.code} value={type.code}>
+                  {type.name}
+                </SelectItem>
+              ))}
+            </RhfControlledSelect>
             <RhfControlledSelect<TicketFormValues>
               name="categorie"
               label="Catégorie"
               requiredMark
               className="w-full md:col-span-1"
               selectClassName="w-full"
-              disabled={isDevisTicket || isReadOnly}
+              disabled={isReadOnly}
             >
-              {ticketCategorieCT
-                .filter((categorie) =>
-                  isDevisTicket
-                    ? categorie.code === "demande_devis"
-                    : categorie.code !== "demande_devis",
-                )
-                .map((categorie) => (
-                  <SelectItem key={categorie.code} value={categorie.code}>
-                    {categorie.name}
-                  </SelectItem>
-                ))}
+              {ticketCategorieCT.map((categorie) => (
+                <SelectItem key={categorie.code} value={categorie.code}>
+                  {categorie.name}
+                </SelectItem>
+              ))}
             </RhfControlledSelect>
           </div>
-
           {userRole === "admin" && (
             <div className="grid gap-4 md:grid-cols-2 md:gap-14">
               <RhfControlledSelect<TicketFormValues>

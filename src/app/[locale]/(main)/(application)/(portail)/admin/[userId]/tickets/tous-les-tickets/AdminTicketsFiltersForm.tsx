@@ -8,36 +8,50 @@ import {
   ticketCategorieCT,
   ticketPrioriteCT,
   ticketStatusCT,
+  ticketTypeCT,
 } from "@/constants/codeTables";
+import { SelectClientType } from "@/zod-schemas/client";
 import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
 import { SelectSiteType } from "@/zod-schemas/site";
 import {
-  TicketsQueryBackendType,
-  TicketsQueryFiltersType,
+  AdminTicketsQueryBackendType,
+  AdminTicketsQueryFiltersType,
 } from "@/zod-schemas/ticket";
 import { DateTime } from "luxon";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
-type TicketsFiltersFormProps = {
-  initialFilters: TicketsQueryBackendType;
+type AdminTicketsFiltersFormProps = {
+  initialFilters: AdminTicketsQueryBackendType;
+  clients: SelectClientType[];
   sites: SelectSiteType[];
-  fournisseurs: SelectFournisseurType[];
+  fournisseursParClient: Record<number, SelectFournisseurType[]>;
+  allFournisseurs: SelectFournisseurType[];
   isDevisTickets?: boolean;
 };
 
-const TicketsFiltersForm = ({
+const AdminTicketsFiltersForm = ({
   initialFilters,
+  clients,
   sites,
-  fournisseurs,
+  fournisseursParClient,
+  allFournisseurs,
   isDevisTickets = false,
-}: TicketsFiltersFormProps) => {
+}: AdminTicketsFiltersFormProps) => {
   const { replace } = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const defaultValues: TicketsQueryFiltersType = {
+  // Ref pour tracker le changement de client
+  const previousClientId = useRef<string | undefined>(
+    initialFilters.clientId ? String(initialFilters.clientId) : "all",
+  );
+
+  const defaultValues: AdminTicketsQueryFiltersType = {
+    // client
+    clientId: initialFilters.clientId ? String(initialFilters.clientId) : "all",
+
     // dates → string (yyyy-mm-dd) ou ""
     createdFrom: initialFilters.createdFrom
       ? initialFilters.createdFrom.toISOString().slice(0, 10)
@@ -47,11 +61,10 @@ const TicketsFiltersForm = ({
       : "",
 
     // enums → valeur ou "all"
-    categorie: isDevisTickets
-      ? "demande_devis"
-      : (initialFilters.categorie ?? "all"),
+    categorie: initialFilters.categorie ?? "all",
     priorite: initialFilters.priorite ?? "all",
     status: initialFilters.status ?? "all",
+    type: isDevisTickets ? "demande_devis" : (initialFilters.type ?? "all"),
 
     // ids → string ou ""
     fournisseurId: initialFilters.fournisseurId
@@ -59,24 +72,40 @@ const TicketsFiltersForm = ({
       : "all",
     siteId: initialFilters.siteId ? String(initialFilters.siteId) : "all",
   };
-  const form = useForm<TicketsQueryFiltersType>({
+
+  const form = useForm<AdminTicketsQueryFiltersType>({
     defaultValues,
     mode: "onTouched",
   });
+
   const filters = useWatch({ control: form.control });
   const start = useWatch({ control: form.control, name: "createdFrom" });
   const end = useWatch({ control: form.control, name: "createdTo" });
+  const clientId = useWatch({ control: form.control, name: "clientId" });
+
+  // Reset fournisseurId et siteId quand le client change
+  useEffect(() => {
+    if (clientId !== previousClientId.current) {
+      form.setValue("fournisseurId", "all", {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      form.setValue("siteId", "all", {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      previousClientId.current = clientId;
+    }
+  }, [clientId, form]);
 
   useEffect(() => {
-    if (!start || !end) return; // ⬅️ si l’un des deux est vide, on ne touche à rien
+    if (!start || !end) return;
 
     const startDt = DateTime.fromISO(start).startOf("day");
     const endDt = DateTime.fromISO(end).startOf("day");
 
-    // Cas : from >= to -> on force to = from + 1 jour
     if (endDt <= startDt) {
       const newEnd = startDt.plus({ days: 1 }).startOf("day").toISODate() ?? "";
-
       form.setValue("createdTo", newEnd, {
         shouldDirty: true,
         shouldValidate: true,
@@ -92,9 +121,28 @@ const TicketsFiltersForm = ({
     );
   }, [start]);
 
+  // Filtrer les sites en fonction du client sélectionné
+  // Si client = "all", afficher tous les sites
+  const filteredSites = useMemo(() => {
+    if (!clientId || clientId === "all") return sites;
+    const clientIdNum = Number(clientId);
+    return sites.filter((s) => s.clientId === clientIdNum);
+  }, [clientId, sites]);
+
+  // Filtrer les fournisseurs en fonction du client sélectionné
+  // Si client = "all", afficher tous les fournisseurs
+  const filteredFournisseurs = useMemo(() => {
+    if (!clientId || clientId === "all") return allFournisseurs;
+    const clientIdNum = Number(clientId);
+    return fournisseursParClient[clientIdNum] ?? [];
+  }, [clientId, fournisseursParClient, allFournisseurs]);
+
   useEffect(() => {
     const params = new URLSearchParams();
 
+    if (filters.clientId) {
+      params.set("clientId", filters.clientId);
+    }
     if (filters.createdFrom) {
       params.set("createdFrom", filters.createdFrom);
     }
@@ -110,6 +158,9 @@ const TicketsFiltersForm = ({
     if (filters.status) {
       params.set("status", filters.status);
     }
+    if (filters.type) {
+      params.set("type", filters.type);
+    }
     if (filters.fournisseurId) {
       params.set("fournisseurId", String(filters.fournisseurId));
     }
@@ -117,46 +168,66 @@ const TicketsFiltersForm = ({
       params.set("siteId", String(filters.siteId));
     }
 
+    // Préserver les paramètres de tri existants (orderBy, orderDir)
+    const orderBy = searchParams.get("orderBy");
+    const orderDir = searchParams.get("orderDir");
+    if (orderBy) params.set("orderBy", orderBy);
+    if (orderDir) params.set("orderDir", orderDir);
+
     const next = `${pathname}?${params.toString()}`;
     const current = `${pathname}?${searchParams.toString()}`;
 
     if (next !== current) {
       replace(next, { scroll: false });
     }
-  }, [filters, pathname, replace]);
+  }, [filters, pathname, replace, searchParams]);
 
   return (
     <Form {...form}>
       <form className="flex flex-wrap gap-4">
-        <RhfDatePicker<TicketsQueryFiltersType>
+        <RhfControlledSelect<AdminTicketsQueryFiltersType>
+          label="Client"
+          name="clientId"
+          selectClassName="w-48"
+          withError={false}
+        >
+          <SelectItem value="all">Tous les clients</SelectItem>
+          {clients.map((c) => (
+            <SelectItem key={c.id} value={String(c.id)}>
+              {c.nomEntreprise}
+            </SelectItem>
+          ))}
+        </RhfControlledSelect>
+
+        <RhfDatePicker<AdminTicketsQueryFiltersType>
           label="Du"
           name="createdFrom"
           buttonClassName="w-40"
           withError={false}
         />
-        <RhfDatePicker<TicketsQueryFiltersType>
+        <RhfDatePicker<AdminTicketsQueryFiltersType>
           label="Au"
           name="createdTo"
           min={minTo}
           buttonClassName="w-40"
           withError={false}
         />
-        {!isDevisTickets && (
-          <RhfControlledSelect<TicketsQueryFiltersType>
-            label="Catégorie"
-            name="categorie"
-            selectClassName="w-40"
-            withError={false}
-          >
-            <SelectItem value="all">Toutes</SelectItem>
-            {ticketCategorieCT.map((c) => (
-              <SelectItem key={c.code} value={c.code}>
-                {c.name}
-              </SelectItem>
-            ))}
-          </RhfControlledSelect>
-        )}
-        <RhfControlledSelect<TicketsQueryFiltersType>
+
+        <RhfControlledSelect<AdminTicketsQueryFiltersType>
+          label="Catégorie"
+          name="categorie"
+          selectClassName="w-40"
+          withError={false}
+        >
+          <SelectItem value="all">Toutes</SelectItem>
+          {ticketCategorieCT.map((c) => (
+            <SelectItem key={c.code} value={c.code}>
+              {c.name}
+            </SelectItem>
+          ))}
+        </RhfControlledSelect>
+
+        <RhfControlledSelect<AdminTicketsQueryFiltersType>
           label="Priorité"
           name="priorite"
           selectClassName="w-40"
@@ -169,43 +240,59 @@ const TicketsFiltersForm = ({
             </SelectItem>
           ))}
         </RhfControlledSelect>
+
+        <RhfControlledSelect<AdminTicketsQueryFiltersType>
+          label="Etat"
+          name="status"
+          selectClassName="w-40"
+          withError={false}
+        >
+          <SelectItem value="all">Tous</SelectItem>
+          {ticketStatusCT.map((s) => (
+            <SelectItem key={s.code} value={s.code}>
+              {s.name}
+            </SelectItem>
+          ))}
+        </RhfControlledSelect>
+
         {!isDevisTickets && (
-          <RhfControlledSelect<TicketsQueryFiltersType>
-            label="Etat"
-            name="status"
-            selectClassName="w-40"
+          <RhfControlledSelect<AdminTicketsQueryFiltersType>
+            label="Type"
+            name="type"
+            selectClassName="w-52"
             withError={false}
           >
             <SelectItem value="all">Tous</SelectItem>
-            {ticketStatusCT.map((s) => (
-              <SelectItem key={s.code} value={s.code}>
-                {s.name}
+            {ticketTypeCT.map((t) => (
+              <SelectItem key={t.code} value={t.code}>
+                {t.name}
               </SelectItem>
             ))}
           </RhfControlledSelect>
         )}
-        {/* TODO Fournisseur et Sites */}
-        <RhfControlledSelect<TicketsQueryFiltersType>
+
+        <RhfControlledSelect<AdminTicketsQueryFiltersType>
           label="Site"
           name="siteId"
           selectClassName="w-40"
           withError={false}
         >
           <SelectItem value="all">Tous</SelectItem>
-          {sites.map((s) => (
+          {filteredSites.map((s) => (
             <SelectItem key={s.id} value={String(s.id)}>
               {s.nomSite}
             </SelectItem>
           ))}
         </RhfControlledSelect>
-        <RhfControlledSelect<TicketsQueryFiltersType>
-          label="Fournisseur"
+
+        <RhfControlledSelect<AdminTicketsQueryFiltersType>
+          label="Prestataire"
           name="fournisseurId"
           selectClassName="w-40"
           withError={false}
         >
           <SelectItem value="all">Tous</SelectItem>
-          {fournisseurs.map((f) => (
+          {filteredFournisseurs.map((f) => (
             <SelectItem key={f.id} value={String(f.id)}>
               {f.nomFournisseur}
             </SelectItem>
@@ -216,4 +303,4 @@ const TicketsFiltersForm = ({
   );
 };
 
-export default TicketsFiltersForm;
+export default AdminTicketsFiltersForm;

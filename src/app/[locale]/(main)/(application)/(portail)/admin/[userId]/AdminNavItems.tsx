@@ -142,19 +142,18 @@ export default function AdminNavItems({ userId }: AdminNavItemsProps) {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
 
-                {/* Tickets en cours */}
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild
-                    isActive={isActive("tickets-en-cours")}
+                    isActive={isActive("tous-les-tickets")}
                   >
                     <Link
                       href={{
-                        pathname: "/admin/[userId]/tickets/tickets-en-cours",
+                        pathname: "/admin/[userId]/tickets/tous-les-tickets",
                         params: { userId },
                       }}
                     >
-                      Tickets en cours
+                      Tous les tickets
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -277,15 +276,15 @@ export default function AdminNavItems({ userId }: AdminNavItemsProps) {
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild
-                    isActive={isActive("demandes-en-cours")}
+                    isActive={isActive("toutes-les-demandes")}
                   >
                     <Link
                       href={{
-                        pathname: "/admin/[userId]/devis/demandes-en-cours",
+                        pathname: "/admin/[userId]/devis/toutes-les-demandes",
                         params: { userId },
                       }}
                     >
-                      Demandes en cours
+                      Toutes les demandes
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

@@ -6,8 +6,8 @@ import {
 import { getTickets } from "@/lib/queries/tickets/getTickets";
 import { RawSearchParams } from "@/normalize/normalizeSearchParams";
 import { parseTicketsQuery } from "@/zod-schemas/ticket";
-import { ticketsIdLabelMap } from "../tickets-en-cours/createTicketsColumns";
-import TicketsTable from "../tickets-en-cours/TicketsTable";
+import { ticketsIdLabelMap } from "../mes-tickets/createTicketsColumns";
+import TicketsTable from "../mes-tickets/TicketsTable";
 
 const page = async ({
   params,

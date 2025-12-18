@@ -15,9 +15,7 @@ const page = async () => {
   const errorComponent: ReactNode = (
     <main className="flex h-full w-full flex-col overflow-hidden">
       <div className="bg-background/95 shrink-0 border-b p-2">
-        <h1 className="text-center text-xl font-bold">
-          Programmer une intervention
-        </h1>
+        <h1 className="text-center text-xl font-bold">Nouvelle intervention</h1>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto">
         <div className="flex justify-center p-6">
@@ -62,7 +60,7 @@ const page = async () => {
     <main className="flex h-full w-full flex-col overflow-hidden">
       <div className="bg-background/95 shrink-0 border-b">
         <h1 className="py-2 text-center text-xl font-bold">
-          Programmer une intervention
+          Nouvelle intervention
         </h1>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto">

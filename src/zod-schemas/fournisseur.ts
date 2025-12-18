@@ -159,5 +159,130 @@ export const updateFournisseurFormSchema = createUpdateFournisseurFormSchema({
   phoneContact: "Numéro de téléphone invalide",
 });
 
-export type UpdateFournisseurFormType =
-  z.infer<typeof updateFournisseurFormSchema>;
+export type UpdateFournisseurFormType = z.infer<
+  typeof updateFournisseurFormSchema
+>;
+
+//=========================== ADMIN: QUERY SCHEMAS ============================//
+
+import { DEFAULT_PAGE_SIZE } from "@/constants/pagination";
+import { emptyStringToUndefinedOptional } from "@/normalize/emptyStringToUndefined";
+import {
+  normalizeSearchParams,
+  RawSearchParams,
+} from "@/normalize/normalizeSearchParams";
+import { createSortSchema } from "@/zod-helpers/createSortSchema";
+
+// Colonnes triables
+export const SORTABLE_ADMIN_FOURNISSEURS_COLUMNS = {
+  id: fournisseurs.id,
+  nomFournisseur: fournisseurs.nomFournisseur,
+  siret: fournisseurs.siret,
+  prenomContact: fournisseurs.prenomContact,
+  nomContact: fournisseurs.nomContact,
+  emailContact: fournisseurs.emailContact,
+  phoneContact: fournisseurs.phoneContact,
+  createdAt: fournisseurs.createdAt,
+  updatedAt: fournisseurs.updatedAt,
+} as const;
+
+export const adminFournisseursOrderBySchema = z.enum([
+  "id",
+  "nomFournisseur",
+  "siret",
+  "prenomContact",
+  "nomContact",
+  "emailContact",
+  "phoneContact",
+  "createdAt",
+  "updatedAt",
+]);
+
+export type AdminFournisseursOrderByType = z.infer<
+  typeof adminFournisseursOrderBySchema
+>;
+
+// Backend schema
+const DEFAULT_ORDER_BY: AdminFournisseursOrderByType = "nomFournisseur";
+const DEFAULT_ORDER_DIR: "asc" | "desc" = "asc";
+
+export const adminFournisseursQueryBackendSchema = z.object({
+  // Filtres
+  nomFournisseur: z.string().optional(),
+  siret: z.string().optional(),
+  emailContact: z.string().optional(),
+  phoneContact: z.string().optional(),
+  // Tri
+  orderBy: adminFournisseursOrderBySchema.default(DEFAULT_ORDER_BY),
+  orderDir: z.enum(["asc", "desc"]).default(DEFAULT_ORDER_DIR),
+  // Pagination
+  page: z.number().int().positive().default(1),
+  pageSize: z.number().int().positive().default(DEFAULT_PAGE_SIZE),
+});
+
+export type AdminFournisseursQueryBackendType = z.infer<
+  typeof adminFournisseursQueryBackendSchema
+>;
+
+// Frontend filters
+export const adminFournisseursQueryFiltersSchema = z
+  .object({
+    nomFournisseur: emptyStringToUndefinedOptional,
+    siret: emptyStringToUndefinedOptional,
+    emailContact: emptyStringToUndefinedOptional,
+    phoneContact: emptyStringToUndefinedOptional,
+  })
+  .partial();
+
+export type AdminFournisseursQueryFiltersType = z.infer<
+  typeof adminFournisseursQueryFiltersSchema
+>;
+
+// Frontend schema complet (filtres + tri)
+export const adminFournisseursQueryFrontendSchema =
+  adminFournisseursQueryFiltersSchema.merge(
+    createSortSchema(
+      SORTABLE_ADMIN_FOURNISSEURS_COLUMNS,
+      "nomFournisseur",
+      "asc",
+    ),
+  );
+
+export type AdminFournisseursQueryFrontendType = z.infer<
+  typeof adminFournisseursQueryFrontendSchema
+>;
+
+// Parse function
+export function parseAdminFournisseursQuery(raw: RawSearchParams) {
+  const normalized = normalizeSearchParams(raw);
+  const urlQuery = adminFournisseursQueryFrontendSchema.parse(normalized);
+
+  const nomFournisseur =
+    urlQuery.nomFournisseur &&
+    urlQuery.nomFournisseur !== "all" &&
+    urlQuery.nomFournisseur !== ""
+      ? urlQuery.nomFournisseur
+      : undefined;
+
+  const siret =
+    urlQuery.siret && urlQuery.siret !== "" ? urlQuery.siret : undefined;
+
+  const emailContact =
+    urlQuery.emailContact && urlQuery.emailContact !== ""
+      ? urlQuery.emailContact
+      : undefined;
+
+  const phoneContact =
+    urlQuery.phoneContact && urlQuery.phoneContact !== ""
+      ? urlQuery.phoneContact
+      : undefined;
+
+  return adminFournisseursQueryBackendSchema.parse({
+    nomFournisseur,
+    siret,
+    emailContact,
+    phoneContact,
+    orderBy: urlQuery.orderBy,
+    orderDir: urlQuery.orderDir,
+  });
+}

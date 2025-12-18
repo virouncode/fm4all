@@ -41,6 +41,7 @@ describe("TltrCard", () => {
         devisButtonTitle="Devis"
         imageUrl="/test.jpg"
         imageAlt="Image test"
+        titre="Titre test"
       />,
     );
 
@@ -55,6 +56,7 @@ describe("TltrCard", () => {
         devisButtonTitle="Demander un devis"
         imageUrl="/img.jpg"
         imageAlt="Image devis"
+        titre="Titre devis"
       />,
     );
 
@@ -71,6 +73,7 @@ describe("TltrCard", () => {
         devisButtonTitle="Devis"
         imageUrl="/img.jpg"
         imageAlt="Alt test"
+        titre="Titre alt"
       />,
     );
 
@@ -85,6 +88,7 @@ describe("TltrCard", () => {
         devisButtonTitle="Devis"
         imageUrl="/img.jpg"
         imageAlt="Image alt"
+        titre="Titre portable text"
       />,
     );
 
@@ -99,6 +103,7 @@ describe("TltrCard", () => {
         devisButtonTitle="Devis"
         imageUrl="/img.jpg"
         imageAlt="Image alt"
+        titre="Titre empty"
       />,
     );
 

@@ -8,6 +8,7 @@ import {
   ticketCategorieEnum,
   ticketPrioriteEnum,
   ticketStatusEnum,
+  ticketTypeEnum,
   typeBatimentEnum,
   typeOccupationEnum,
 } from "../db/schema";
@@ -37,6 +38,9 @@ export type TicketCategorieType = z.infer<typeof ticketCategorieSchema>;
 
 export const ticketPrioriteSchema = z.enum(ticketPrioriteEnum.enumValues);
 export type TicketPrioriteType = z.infer<typeof ticketPrioriteSchema>;
+
+export const ticketTypeSchema = z.enum(ticketTypeEnum.enumValues);
+export type TicketTypeType = z.infer<typeof ticketTypeSchema>;
 
 export const ticketStatusSchema = z.enum(ticketStatusEnum.enumValues);
 export type TicketStatusType = z.infer<typeof ticketStatusSchema>;

@@ -188,3 +188,42 @@ export const updateFournisseurAction = actionClient
       };
     },
   );
+
+// ======================= ADMIN: getAllFournisseursAction ==========================//
+
+import { getAllFournisseursWithPagination } from "@/lib/queries/fournisseurs/getFournisseurs";
+import { adminFournisseursQueryBackendSchema } from "@/zod-schemas/fournisseur";
+
+export const getAllFournisseursAction = actionClient
+  .metadata({ actionName: "getAllFournisseursAction" })
+  .inputSchema(adminFournisseursQueryBackendSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    const locale = await getLocale();
+
+    if (!currentUser) {
+      throw new Error(
+        locale === "fr"
+          ? "Vous n'êtes pas authentifié."
+          : "You are not authenticated.",
+      );
+    }
+
+    if (currentUser.role !== "admin") {
+      throw new Error(
+        locale === "fr"
+          ? "Vous n'avez pas les droits pour effectuer cette action."
+          : "You do not have permission to perform this action.",
+      );
+    }
+
+    const fournisseurs = await getAllFournisseursWithPagination({
+      query: parsedInput,
+    });
+
+    return fournisseurs;
+  });

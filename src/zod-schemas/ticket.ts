@@ -18,6 +18,7 @@ import {
   ticketCategorieSchema,
   ticketPrioriteSchema,
   ticketStatusSchema,
+  ticketTypeSchema,
 } from "./enums";
 
 export const selectTicketSchema = createSelectSchema(tickets);
@@ -122,6 +123,7 @@ export const insertTicketFormSchema = z.object({
     .transform((v) => capitalizeFirstWord(v)),
   categorie: ticketCategorieSchema,
   priorite: ticketPrioriteSchema,
+  type: ticketTypeSchema,
   status: ticketStatusSchema,
   siteId: z.string().refine((val) => val !== "0", "Site obligatoire"), //select
   fournisseurId: z
@@ -185,6 +187,7 @@ export const ticketsQueryBackendSchema = z.object({
   categorie: ticketCategorieSchema.optional(),
   priorite: ticketPrioriteSchema.optional(),
   status: ticketStatusSchema.optional(),
+  type: ticketTypeSchema.optional(),
   fournisseurId: z.number().int().positive().optional(),
   siteId: z.number().int().positive().optional(),
   //tri
@@ -205,6 +208,7 @@ export const ticketsQueryFiltersSchema = z
     categorie: ticketCategorieSchema.or(z.literal("all")).optional(),
     priorite: ticketPrioriteSchema.or(z.literal("all")).optional(),
     status: ticketStatusSchema.or(z.literal("all")).optional(),
+    type: ticketTypeSchema.or(z.literal("all")).optional(),
     fournisseurId: emptyStringToUndefinedOptional
       .or(z.literal("all"))
       .optional(),
@@ -267,6 +271,9 @@ export function parseTicketsQuery(
   const status =
     urlQuery.status && urlQuery.status !== "all" ? urlQuery.status : undefined;
 
+  const type =
+    urlQuery.type && urlQuery.type !== "all" ? urlQuery.type : undefined;
+
   const orderBy =
     urlQuery.orderBy &&
     Object.keys(SORTABLE_TICKETS_COLUMNS).includes(urlQuery.orderBy)
@@ -285,6 +292,7 @@ export function parseTicketsQuery(
     categorie,
     priorite,
     status,
+    type,
     fournisseurId,
     siteId,
     orderBy,
@@ -298,3 +306,135 @@ export type AttachmentFieldValue = {
   mimeType: string;
   size: number;
 };
+
+//======================= ADMIN QUERY SCHEMAS ==========================//
+// Pour la page admin/tous-les-tickets avec clientId optionnel
+
+export const adminTicketsQueryBackendSchema = z.object({
+  //filtres
+  clientId: z.number().int().positive().optional(),
+  createdFrom: z.date().optional(),
+  createdTo: z.date().optional(),
+  categorie: ticketCategorieSchema.optional(),
+  priorite: ticketPrioriteSchema.optional(),
+  status: ticketStatusSchema.optional(),
+  type: ticketTypeSchema.optional(),
+  fournisseurId: z.number().int().positive().optional(),
+  siteId: z.number().int().positive().optional(),
+  //tri
+  orderBy: ticketsOrderBySchema.default(DEFAULT_ORDER_BY),
+  orderDir: z.enum(["asc", "desc"]).default(DEFAULT_ORDER_DIR),
+  //pagination
+  page: z.number().int().positive().default(1),
+  pageSize: z.number().int().positive().default(DEFAULT_PAGE_SIZE),
+});
+export type AdminTicketsQueryBackendType = z.infer<
+  typeof adminTicketsQueryBackendSchema
+>;
+
+export const adminTicketsQueryFiltersSchema = z
+  .object({
+    clientId: emptyStringToUndefinedOptional.or(z.literal("all")).optional(),
+    createdFrom: emptyStringToUndefinedOptional,
+    createdTo: emptyStringToUndefinedOptional,
+    categorie: ticketCategorieSchema.or(z.literal("all")).optional(),
+    priorite: ticketPrioriteSchema.or(z.literal("all")).optional(),
+    status: ticketStatusSchema.or(z.literal("all")).optional(),
+    type: ticketTypeSchema.or(z.literal("all")).optional(),
+    fournisseurId: emptyStringToUndefinedOptional
+      .or(z.literal("all"))
+      .optional(),
+    siteId: emptyStringToUndefinedOptional.or(z.literal("all")).optional(),
+  })
+  .partial();
+export type AdminTicketsQueryFiltersType = z.infer<
+  typeof adminTicketsQueryFiltersSchema
+>;
+
+export const adminTicketsQueryFrontendSchema =
+  adminTicketsQueryFiltersSchema.merge(
+    createSortSchema(SORTABLE_TICKETS_COLUMNS, "createdAt"),
+  );
+
+export type AdminTicketsQueryFrontendType = z.infer<
+  typeof adminTicketsQueryFrontendSchema
+>;
+
+export function parseAdminTicketsQuery(
+  raw: RawSearchParams,
+): AdminTicketsQueryBackendType {
+  const normalized = normalizeSearchParams(raw);
+  const urlQuery = adminTicketsQueryFrontendSchema.parse(normalized);
+
+  const clientId =
+    urlQuery.clientId &&
+    !Number.isNaN(Number(urlQuery.clientId)) &&
+    urlQuery.clientId !== "all"
+      ? Number(urlQuery.clientId)
+      : undefined;
+
+  const createdFrom =
+    urlQuery.createdFrom && !Number.isNaN(Date.parse(urlQuery.createdFrom))
+      ? new Date(urlQuery.createdFrom)
+      : undefined;
+
+  const createdTo =
+    urlQuery.createdTo && !Number.isNaN(Date.parse(urlQuery.createdTo))
+      ? new Date(urlQuery.createdTo)
+      : undefined;
+
+  const fournisseurId =
+    urlQuery.fournisseurId &&
+    !Number.isNaN(Number(urlQuery.fournisseurId)) &&
+    urlQuery.fournisseurId !== "all"
+      ? Number(urlQuery.fournisseurId)
+      : undefined;
+
+  const siteId =
+    urlQuery.siteId &&
+    !Number.isNaN(Number(urlQuery.siteId)) &&
+    urlQuery.siteId !== "all"
+      ? Number(urlQuery.siteId)
+      : undefined;
+
+  const categorie =
+    urlQuery.categorie && urlQuery.categorie !== "all"
+      ? urlQuery.categorie
+      : undefined;
+
+  const priorite =
+    urlQuery.priorite && urlQuery.priorite !== "all"
+      ? urlQuery.priorite
+      : undefined;
+
+  const status =
+    urlQuery.status && urlQuery.status !== "all" ? urlQuery.status : undefined;
+
+  const type =
+    urlQuery.type && urlQuery.type !== "all" ? urlQuery.type : undefined;
+
+  const orderBy =
+    urlQuery.orderBy &&
+    Object.keys(SORTABLE_TICKETS_COLUMNS).includes(urlQuery.orderBy)
+      ? (urlQuery.orderBy as TicketsSortableColumnType)
+      : DEFAULT_ORDER_BY;
+
+  const orderDir =
+    urlQuery.orderDir === "asc" || urlQuery.orderDir === "desc"
+      ? urlQuery.orderDir
+      : DEFAULT_ORDER_DIR;
+
+  return adminTicketsQueryBackendSchema.parse({
+    clientId,
+    createdFrom,
+    createdTo,
+    categorie,
+    priorite,
+    status,
+    type,
+    fournisseurId,
+    siteId,
+    orderBy,
+    orderDir,
+  });
+}

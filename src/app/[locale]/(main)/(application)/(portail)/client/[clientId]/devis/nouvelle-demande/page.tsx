@@ -63,7 +63,8 @@ const page = async ({
 
   const defaultValues: InsertTicketFormType = {
     titre: "",
-    categorie: "demande_devis",
+    categorie: "autre",
+    type: "demande_devis",
     fournisseurId: "0",
     description: "",
     priorite: "normale",

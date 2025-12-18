@@ -159,3 +159,148 @@ export const onboardClientAction = actionClient
       data: result,
     };
   });
+
+// Schema pour l'action admin pour récupérer les fournisseurs d'un client
+import { getClientFournisseurs } from "@/lib/queries/clients/getClients";
+import { z } from "zod";
+
+const getClientFournisseursForAdminSchema = z.object({
+  clientId: z.number().int().positive("ID du client invalide"),
+});
+
+// Action pour récupérer les fournisseurs d'un client spécifique (admin uniquement)
+export const getClientFournisseursForAdminAction = actionClient
+  .metadata({ actionName: "getClientFournisseursForAdminAction" })
+  .inputSchema(getClientFournisseursForAdminSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    const locale = await getLocale();
+
+    if (!currentUser) {
+      throw new Error(
+        locale === "fr"
+          ? "Vous n'êtes pas authentifié."
+          : "You are not authenticated.",
+      );
+    }
+
+    if (currentUser.role !== "admin") {
+      throw new Error(
+        locale === "fr"
+          ? "Vous n'avez pas les droits pour effectuer cette action."
+          : "You do not have permission to perform this action.",
+      );
+    }
+
+    const { clientId } = parsedInput;
+    const fournisseurs = await getClientFournisseurs(clientId);
+    return fournisseurs;
+  });
+
+// ======================= ADMIN: getAllClientsAction ==========================//
+
+import { getAllClientsWithPagination } from "@/lib/queries/clients/getClients";
+import { clientsQueryBackendSchema } from "@/zod-schemas/client";
+
+export const getAllClientsAction = actionClient
+  .metadata({ actionName: "getAllClientsAction" })
+  .inputSchema(clientsQueryBackendSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    const locale = await getLocale();
+
+    if (!currentUser) {
+      throw new Error(
+        locale === "fr"
+          ? "Vous n'êtes pas authentifié."
+          : "You are not authenticated.",
+      );
+    }
+
+    if (currentUser.role !== "admin") {
+      throw new Error(
+        locale === "fr"
+          ? "Vous n'avez pas les droits pour effectuer cette action."
+          : "You do not have permission to perform this action.",
+      );
+    }
+
+    const clients = await getAllClientsWithPagination({
+      query: parsedInput,
+    });
+
+    return clients;
+  });
+
+// ======================= ADMIN: updateClientAction ==========================//
+
+import {
+  updateClientInDbSchema,
+  updateClientSchema,
+} from "@/zod-schemas/client";
+
+export const updateClientAction = actionClient
+  .metadata({ actionName: "updateClientAction" })
+  .inputSchema(updateClientSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    const locale = await getLocale();
+
+    if (!currentUser) {
+      throw new Error(
+        locale === "fr"
+          ? "Vous n'êtes pas authentifié."
+          : "You are not authenticated.",
+      );
+    }
+
+    if (currentUser.role !== "admin") {
+      throw new Error(
+        locale === "fr"
+          ? "Vous n'avez pas les droits pour effectuer cette action."
+          : "You do not have permission to perform this action.",
+      );
+    }
+
+    const { id, ...rest } = parsedInput;
+
+    const payload = updateClientInDbSchema.parse({
+      ...rest,
+      updatedById: currentUser.id,
+    });
+
+    const [updatedClient] = await db
+      .update(clients)
+      .set(payload)
+      .where(eq(clients.id, id))
+      .returning();
+
+    if (!updatedClient) {
+      throw new Error(
+        locale === "fr"
+          ? "Échec de la mise à jour du client."
+          : "Failed to update client.",
+      );
+    }
+
+    return {
+      success: true,
+      message:
+        locale === "fr"
+          ? "Client mis à jour avec succès."
+          : "Client updated successfully.",
+      client: updatedClient,
+    };
+  });

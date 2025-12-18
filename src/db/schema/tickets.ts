@@ -13,6 +13,7 @@ import {
   ticketCategorieEnum,
   ticketPrioriteEnum,
   ticketStatusEnum,
+  ticketTypeEnum,
 } from "./enums";
 
 export const tickets = pgTable(
@@ -25,6 +26,7 @@ export const tickets = pgTable(
     titre: varchar().notNull(),
     description: varchar(),
     categorie: ticketCategorieEnum("categorie").notNull(),
+    type: ticketTypeEnum("type").notNull(),
     priorite: ticketPrioriteEnum("priorite").notNull().default("normale"),
     status: ticketStatusEnum("status").notNull().default("nouveau"),
     dateCloture: timestamp("date_cloture", {
@@ -50,6 +52,7 @@ export const tickets = pgTable(
     index("tickets_priorite_idx").on(table.priorite),
     index("tickets_created_at_idx").on(table.createdAt),
     index("tickets_categorie_idx").on(table.categorie),
+    index("tickets_type_idx").on(table.type),
   ],
 );
 

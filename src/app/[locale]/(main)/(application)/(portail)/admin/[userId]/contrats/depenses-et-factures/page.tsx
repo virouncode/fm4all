@@ -1,5 +1,13 @@
 const page = () => {
-  return <div>Dépenses et factures</div>;
+  return (
+    <main className="flex h-full w-full flex-col overflow-hidden md:border-x">
+      <div className="bg-background/95 shrink-0 border-b">
+        <h1 className="py-2 text-center text-xl font-bold">
+          Dépenses et factures
+        </h1>
+      </div>
+    </main>
+  );
 };
 
 export default page;

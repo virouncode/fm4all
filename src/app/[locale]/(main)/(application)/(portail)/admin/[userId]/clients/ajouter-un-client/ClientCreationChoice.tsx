@@ -25,7 +25,7 @@ import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { ticketsIdLabelMap } from "../../../../client/[clientId]/tickets/tickets-en-cours/createTicketsColumns";
+import { ticketsIdLabelMap } from "../../../../client/[clientId]/tickets/mes-tickets/createTicketsColumns";
 import ProspectsFiltersForm from "../../prospects/tous-les-prospects/ProspectsFiltersForm";
 import ProspectsTable from "../../prospects/tous-les-prospects/ProspectsTable";
 import ClientForm from "./ClientForm";

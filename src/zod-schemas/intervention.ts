@@ -14,7 +14,7 @@ import {
   createUpdateSchema,
 } from "drizzle-zod";
 import { z } from "zod";
-import { interventionTypeSchema, interventionStatusSchema } from "./enums";
+import { interventionStatusSchema, interventionTypeSchema } from "./enums";
 
 export const selectInterventionSchema = createSelectSchema(interventions);
 export type SelectInterventionType = z.infer<typeof selectInterventionSchema>;
@@ -223,6 +223,87 @@ export function parseInterventionsQuery(raw: RawSearchParams) {
     urlQuery.type && urlQuery.type !== "all" ? urlQuery.type : undefined;
 
   return interventionsQueryBackendSchema.parse({
+    dateDebutPrevueFrom,
+    dateDebutPrevueTo,
+    fournisseurId,
+    siteId,
+    status,
+    type,
+    orderBy: urlQuery.orderBy,
+    orderDir: urlQuery.orderDir,
+  });
+}
+
+//=========================== ADMIN: QUERY SCHEMAS ============================//
+
+// Backend schema avec clientId optionnel
+export const adminInterventionsQueryBackendSchema =
+  interventionsQueryBackendSchema.extend({
+    clientId: z.number().int().optional(),
+  });
+export type AdminInterventionsQueryBackendType = z.infer<
+  typeof adminInterventionsQueryBackendSchema
+>;
+
+// Frontend filters avec clientId
+export const adminInterventionsQueryFiltersSchema =
+  interventionsQueryFiltersSchema.extend({
+    clientId: emptyStringToUndefinedOptional,
+  });
+export type AdminInterventionsQueryFiltersType = z.infer<
+  typeof adminInterventionsQueryFiltersSchema
+>;
+
+// Frontend schema complet
+export const adminInterventionsQueryFrontendSchema =
+  adminInterventionsQueryFiltersSchema.merge(
+    createSortSchema(SORTABLE_INTERVENTIONS_COLUMNS, "dateDebutPrevue"),
+  );
+export type AdminInterventionsQueryFrontendType = z.infer<
+  typeof adminInterventionsQueryFrontendSchema
+>;
+
+// Parse function pour admin
+export function parseAdminInterventionsQuery(raw: RawSearchParams) {
+  const normalized = normalizeSearchParams(raw);
+  const urlQuery = adminInterventionsQueryFrontendSchema.parse(normalized);
+
+  const clientId =
+    urlQuery.clientId &&
+    urlQuery.clientId !== "all" &&
+    !Number.isNaN(Number(urlQuery.clientId))
+      ? Number(urlQuery.clientId)
+      : undefined;
+
+  const dateDebutPrevueFrom =
+    urlQuery.dateDebutPrevueFrom &&
+    !Number.isNaN(Date.parse(urlQuery.dateDebutPrevueFrom))
+      ? new Date(urlQuery.dateDebutPrevueFrom)
+      : undefined;
+  const dateDebutPrevueTo =
+    urlQuery.dateDebutPrevueTo &&
+    !Number.isNaN(Date.parse(urlQuery.dateDebutPrevueTo))
+      ? new Date(urlQuery.dateDebutPrevueTo)
+      : undefined;
+  const fournisseurId =
+    urlQuery.fournisseurId &&
+    urlQuery.fournisseurId !== "all" &&
+    !Number.isNaN(Number(urlQuery.fournisseurId))
+      ? Number(urlQuery.fournisseurId)
+      : undefined;
+  const siteId =
+    urlQuery.siteId &&
+    urlQuery.siteId !== "all" &&
+    !Number.isNaN(Number(urlQuery.siteId))
+      ? Number(urlQuery.siteId)
+      : undefined;
+  const status =
+    urlQuery.status && urlQuery.status !== "all" ? urlQuery.status : undefined;
+  const type =
+    urlQuery.type && urlQuery.type !== "all" ? urlQuery.type : undefined;
+
+  return adminInterventionsQueryBackendSchema.parse({
+    clientId,
     dateDebutPrevueFrom,
     dateDebutPrevueTo,
     fournisseurId,

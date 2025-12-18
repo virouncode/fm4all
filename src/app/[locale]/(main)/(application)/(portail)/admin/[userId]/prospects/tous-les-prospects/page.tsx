@@ -1,7 +1,7 @@
 import { getProspects } from "@/lib/queries/prospects/getProspects";
 import { RawSearchParams } from "@/normalize/normalizeSearchParams";
 import { parseProspectsQuery } from "@/zod-schemas/prospect";
-import { ticketsIdLabelMap } from "../../../../client/[clientId]/tickets/tickets-en-cours/createTicketsColumns";
+import { ticketsIdLabelMap } from "../../../../client/[clientId]/tickets/mes-tickets/createTicketsColumns";
 import ProspectsFiltersForm from "./ProspectsFiltersForm";
 import ProspectsTable from "./ProspectsTable";
 

@@ -212,3 +212,151 @@ export function parseSitesQuery(raw: RawSearchParams): SitesQueryBackendType {
     orderDir,
   });
 }
+
+//=========================== ADMIN: QUERY SCHEMAS ============================//
+
+import { DEFAULT_PAGE_SIZE } from "@/constants/pagination";
+import { createSortSchema } from "@/zod-helpers/createSortSchema";
+
+// Colonnes triables admin (ajout de clientId, adresseLigne1, adresseLigne2)
+export const SORTABLE_ADMIN_SITES_COLUMNS = {
+  id: sites.id,
+  clientId: sites.clientId,
+  nomSite: sites.nomSite,
+  adresseLigne1: sites.adresseLigne1,
+  adresseLigne2: sites.adresseLigne2,
+  codePostal: sites.codePostal,
+  ville: sites.ville,
+  surface: sites.surface,
+  effectif: sites.effectif,
+  typeBatiment: sites.typeBatiment,
+  typeOccupation: sites.typeOccupation,
+  createdAt: sites.createdAt,
+  updatedAt: sites.updatedAt,
+} as const;
+
+export const adminSitesOrderBySchema = z.enum([
+  "id",
+  "clientId",
+  "nomSite",
+  "adresseLigne1",
+  "adresseLigne2",
+  "codePostal",
+  "ville",
+  "surface",
+  "effectif",
+  "typeBatiment",
+  "typeOccupation",
+  "createdAt",
+  "updatedAt",
+]);
+
+export type AdminSitesOrderByType = z.infer<typeof adminSitesOrderBySchema>;
+
+// Backend schema avec clientId optionnel et pagination
+const ADMIN_DEFAULT_ORDER_BY: AdminSitesOrderByType = "nomSite";
+const ADMIN_DEFAULT_ORDER_DIR: "asc" | "desc" = "asc";
+
+export const adminSitesQueryBackendSchema = z.object({
+  // Filtres
+  clientId: z.number().int().optional(),
+  nomSite: z.string().optional(),
+  adresseLigne1: z.string().optional(),
+  codePostal: z.string().optional(),
+  ville: z.string().optional(),
+  typeBatiment: typeBatimentSchema.optional(),
+  typeOccupation: typeOccupationSchema.optional(),
+  // Tri
+  orderBy: adminSitesOrderBySchema.default(ADMIN_DEFAULT_ORDER_BY),
+  orderDir: z.enum(["asc", "desc"]).default(ADMIN_DEFAULT_ORDER_DIR),
+  // Pagination
+  page: z.number().int().positive().default(1),
+  pageSize: z.number().int().positive().default(DEFAULT_PAGE_SIZE),
+});
+export type AdminSitesQueryBackendType = z.infer<
+  typeof adminSitesQueryBackendSchema
+>;
+
+// Frontend filters avec clientId
+export const adminSitesQueryFiltersSchema = z
+  .object({
+    clientId: emptyStringToUndefinedOptional,
+    nomSite: emptyStringToUndefinedOptional,
+    adresseLigne1: emptyStringToUndefinedOptional,
+    codePostal: emptyStringToUndefinedOptional,
+    ville: emptyStringToUndefinedOptional,
+    typeBatiment: typeBatimentSchema.or(z.literal("all")).optional(),
+    typeOccupation: typeOccupationSchema.or(z.literal("all")).optional(),
+  })
+  .partial();
+
+export type AdminSitesQueryFiltersType = z.infer<
+  typeof adminSitesQueryFiltersSchema
+>;
+
+// Frontend schema complet
+export const adminSitesQueryFrontendSchema = adminSitesQueryFiltersSchema.merge(
+  createSortSchema(SORTABLE_ADMIN_SITES_COLUMNS, "nomSite"),
+);
+export type AdminSitesQueryFrontendType = z.infer<
+  typeof adminSitesQueryFrontendSchema
+>;
+
+// Parse function pour admin
+export function parseAdminSitesQuery(
+  raw: RawSearchParams,
+): AdminSitesQueryBackendType {
+  const normalized = normalizeSearchParams(raw);
+  const urlQuery = adminSitesQueryFrontendSchema.parse(normalized);
+
+  const clientId =
+    urlQuery.clientId &&
+    urlQuery.clientId !== "all" &&
+    !Number.isNaN(Number(urlQuery.clientId))
+      ? Number(urlQuery.clientId)
+      : undefined;
+
+  const nomSite =
+    urlQuery.nomSite &&
+    urlQuery.nomSite !== "all" &&
+    urlQuery.nomSite.trim().length > 0
+      ? urlQuery.nomSite.trim()
+      : undefined;
+
+  const adresseLigne1 =
+    urlQuery.adresseLigne1 && urlQuery.adresseLigne1.trim().length > 0
+      ? urlQuery.adresseLigne1.trim()
+      : undefined;
+
+  const codePostal =
+    urlQuery.codePostal && urlQuery.codePostal.trim().length > 0
+      ? urlQuery.codePostal.trim()
+      : undefined;
+
+  const ville =
+    urlQuery.ville && urlQuery.ville.trim().length > 0
+      ? urlQuery.ville.trim()
+      : undefined;
+
+  const typeBatiment =
+    urlQuery.typeBatiment && urlQuery.typeBatiment !== "all"
+      ? urlQuery.typeBatiment
+      : undefined;
+
+  const typeOccupation =
+    urlQuery.typeOccupation && urlQuery.typeOccupation !== "all"
+      ? urlQuery.typeOccupation
+      : undefined;
+
+  return adminSitesQueryBackendSchema.parse({
+    clientId,
+    nomSite,
+    adresseLigne1,
+    codePostal,
+    ville,
+    typeBatiment,
+    typeOccupation,
+    orderBy: urlQuery.orderBy,
+    orderDir: urlQuery.orderDir,
+  });
+}

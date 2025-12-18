@@ -1,7 +1,7 @@
 export const ticketStatusCT = [
   { code: "nouveau", name: "Nouveau" },
   { code: "pris_en_charge", name: "Pris en charge" },
-  { code: "en_attent_fournisseur", name: "En attente fournisseur" },
+  { code: "en_attente_fournisseur", name: "En attente fournisseur" },
   { code: "en_attente_client", name: "En attente client" },
   { code: "a_valider", name: "À valider" },
   { code: "clos", name: "Clos" },
@@ -42,7 +42,6 @@ export const ticketCategorieCT = [
   { code: "cafe", name: "Café" },
   { code: "fontaines_eau", name: "Fontaines à eau" },
   { code: "office_management", name: "Office management" },
-  { code: "demande_devis", name: "Demande de devis" },
   { code: "autre", name: "Autre" },
 ] as const;
 
@@ -51,6 +50,19 @@ export const ticketCategorieCodes = ticketCategorieCT.map(
 ) as unknown as [
   (typeof ticketCategorieCT)[number]["code"],
   ...(typeof ticketCategorieCT)[number]["code"][],
+];
+
+export const ticketTypeCT = [
+  { code: "incident", name: "Incident" },
+  { code: "demande_devis", name: "Demande de devis" },
+  { code: "demande_intervention", name: "Demande d'intervention" },
+  { code: "audit", name: "Audit" },
+  { code: "autre", name: "Autre" },
+] as const;
+
+export const ticketTypeCodes = ticketTypeCT.map((i) => i.code) as unknown as [
+  (typeof ticketTypeCT)[number]["code"],
+  ...(typeof ticketTypeCT)[number]["code"][],
 ];
 
 export const userRoleCT = [

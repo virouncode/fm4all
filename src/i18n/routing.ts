@@ -168,9 +168,9 @@ export const routing = defineRouting({
       fr: "/admin/[userId]/tickets/nouveau-ticket",
       en: "/admin/[userId]/tickets/nouveau-ticket",
     },
-    "/admin/[userId]/tickets/tickets-en-cours": {
-      fr: "/admin/[userId]/tickets/tickets-en-cours",
-      en: "/admin/[userId]/tickets/tickets-en-cours",
+    "/admin/[userId]/tickets/tous-les-tickets": {
+      fr: "/admin/[userId]/tickets/tous-les-tickets",
+      en: "/admin/[userId]/tickets/tous-les-tickets",
     },
     "/admin/[userId]/interventions/toutes-les-interventions": {
       fr: "/admin/[userId]/interventions/toutes-les-interventions",
@@ -184,9 +184,9 @@ export const routing = defineRouting({
       fr: "/admin/[userId]/interventions/rapports-interventions",
       en: "/admin/[userId]/interventions/rapports-interventions",
     },
-    "/admin/[userId]/devis/demandes-en-cours": {
-      fr: "/admin/[userId]/devis/demandes-en-cours",
-      en: "/admin/[userId]/devis/demandes-en-cours",
+    "/admin/[userId]/devis/toutes-les-demandes": {
+      fr: "/admin/[userId]/devis/toutes-les-demandes",
+      en: "/admin/[userId]/devis/toutes-les-demandes",
     },
     "/admin/[userId]/devis/tous-les-devis": {
       fr: "/admin/[userId]/devis/tous-les-devis",
@@ -243,9 +243,9 @@ export const routing = defineRouting({
       en: "/client/[clientId]/tickets/nouveau-ticket",
     },
 
-    "/client/[clientId]/tickets/tickets-en-cours": {
-      fr: "/client/[clientId]/tickets/tickets-en-cours",
-      en: "/client/[clientId]/tickets/tickets-en-cours",
+    "/client/[clientId]/tickets/mes-tickets": {
+      fr: "/client/[clientId]/tickets/mes-tickets",
+      en: "/client/[clientId]/tickets/mes-tickets",
     },
 
     "/client/[clientId]/tickets/action-requise": {
@@ -269,9 +269,9 @@ export const routing = defineRouting({
       fr: "/client/[clientId]/devis/nouvelle-demande",
       en: "/client/[clientId]/devis/nouvelle-demande",
     },
-    "/client/[clientId]/devis/demandes-en-cours": {
-      fr: "/client/[clientId]/devis/demandes-en-cours",
-      en: "/client/[clientId]/devis/demandes-en-cours",
+    "/client/[clientId]/devis/mes-demandes": {
+      fr: "/client/[clientId]/devis/mes-demandes",
+      en: "/client/[clientId]/devis/mes-demandes",
     },
     "/client/[clientId]/devis/mes-devis": {
       fr: "/client/[clientId]/devis/mes-devis",
