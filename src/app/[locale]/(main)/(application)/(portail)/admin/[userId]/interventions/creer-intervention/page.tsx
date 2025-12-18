@@ -1,17 +1,13 @@
 import { getClients } from "@/lib/queries/clients/getClients";
 import { getFournisseurs } from "@/lib/queries/fournisseurs/getFournisseurs";
-import { getSites } from "@/lib/queries/sites/getSites";
-import { getAllTicketsSimple } from "@/lib/queries/tickets/getTickets";
 import { InsertInterventionFormType } from "@/zod-schemas/intervention";
 import { ReactNode } from "react";
 import NouveauInterventionForm from "./NouveauInterventionForm";
 
 const page = async () => {
-  const [clients, sites, fournisseurs, tickets] = await Promise.all([
+  const [clients, fournisseurs] = await Promise.all([
     getClients(),
-    getSites(),
     getFournisseurs(),
-    getAllTicketsSimple(),
   ]);
 
   const errorComponent: ReactNode = (
@@ -31,11 +27,9 @@ const page = async () => {
               </p>
             </div>
             <div>
-              {sites.length === 0
-                ? "Sites introuvables"
-                : fournisseurs.length === 0
-                  ? "Fournisseurs introuvables"
-                  : "Clients introuvables"}
+              {clients.length === 0
+                ? "Clients introuvables"
+                : "Fournisseurs introuvables"}
             </div>
           </div>
         </div>
@@ -43,17 +37,17 @@ const page = async () => {
     </main>
   );
 
-  if (sites.length === 0 || fournisseurs.length === 0 || clients.length === 0) {
+  if (clients.length === 0 || fournisseurs.length === 0) {
     return errorComponent;
   }
 
   const defaultValues: InsertInterventionFormType = {
     titre: "",
     type: "corrective",
-    siteId: "",
+    siteId: "0",
     clientId: "",
-    ticketId: "",
-    fournisseurId: "",
+    ticketId: "0",
+    fournisseurId: "0",
     dateDebutPrevue: "",
     dateFinPrevue: "",
     description: "",
@@ -80,8 +74,6 @@ const page = async () => {
             <NouveauInterventionForm
               defaultValues={defaultValues}
               clients={clients}
-              tickets={tickets}
-              sites={sites}
               fournisseurs={fournisseurs}
             />
           </div>

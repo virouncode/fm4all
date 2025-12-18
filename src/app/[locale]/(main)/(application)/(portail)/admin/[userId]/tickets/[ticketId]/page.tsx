@@ -1,9 +1,6 @@
 import { LocaleType } from "@/i18n/routing";
-import {
-  getClient,
-  getClientFournisseurs,
-  getClientSites,
-} from "@/lib/queries/clients/getClients";
+import { getClient, getClientSites } from "@/lib/queries/clients/getClients";
+import { getFournisseurs } from "@/lib/queries/fournisseurs/getFournisseurs";
 import { getTicket } from "@/lib/queries/tickets/getTickets";
 import { UpdateTicketFormType } from "@/zod-schemas/ticket";
 import { ReactNode } from "react";
@@ -40,7 +37,7 @@ const page = async ({
 
   const clientId = initialTicket.clientId;
 
-  // Récupérer les données liées au client du ticket
+  // Récupérer les données liées au client du ticket + tous les fournisseurs
   const [client, sites, fournisseurs] = await Promise.all([
     getClient(clientId),
     getClientSites({
@@ -55,7 +52,7 @@ const page = async ({
         orderDir: "asc",
       },
     }),
-    getClientFournisseurs(clientId),
+    getFournisseurs(), // Tous les fournisseurs pour l'admin
   ]);
 
   const errorComponent: ReactNode = (
@@ -79,7 +76,7 @@ const page = async ({
                 ? "Le client associé à ce ticket n'existe pas"
                 : sites.length === 0
                   ? "Ce client n'a pas de site configuré"
-                  : "Ce client n'a pas de prestataire configuré"}
+                  : "Aucun fournisseur disponible"}
             </div>
           </div>
         </div>
@@ -120,8 +117,7 @@ const page = async ({
                 Modifiez le ticket
               </h2>
               <p className="text-muted-foreground text-sm">
-                En tant qu&apos;administrateur, vous pouvez modifier tous les
-                champs sauf le client
+                Modifier les détails du ticket ci-dessous
               </p>
             </div>
             <AdminUpdateTicketForm

@@ -1,9 +1,7 @@
 import { LocaleType } from "@/i18n/routing";
-import {
-  getClientFournisseurs,
-  getClients,
-  getClientSites,
-} from "@/lib/queries/clients/getClients";
+import { getClients } from "@/lib/queries/clients/getClients";
+import { getFournisseurs } from "@/lib/queries/fournisseurs/getFournisseurs";
+import { getSites } from "@/lib/queries/sites/getSites";
 import { getAllTickets } from "@/lib/queries/tickets/getTickets";
 import { RawSearchParams } from "@/normalize/normalizeSearchParams";
 import { parseAdminTicketsQuery } from "@/zod-schemas/ticket";
@@ -24,42 +22,14 @@ const page = async ({
   // Récupérer tous les clients
   const clients = await getClients();
 
-  // Récupérer tous les sites de tous les clients
-  const allSites = await Promise.all(
-    clients.map((client) =>
-      getClientSites({
-        clientId: client.id,
-        query: {
-          nomSite: undefined,
-          codePostal: undefined,
-          ville: undefined,
-          typeBatiment: undefined,
-          typeOccupation: undefined,
-          orderBy: "nomSite",
-          orderDir: "asc",
-        },
-      }),
-    ),
-  ).then((results) => results.flat());
+  // Récupérer tous les sites (pour tous les clients)
+  const allSites = await getSites();
 
-  // Récupérer les fournisseurs par client (Record pour sérialisation)
-  const fournisseursParClientEntries = await Promise.all(
-    clients.map(async (client) => {
-      const fournisseurs = await getClientFournisseurs(client.id);
-      return [client.id, fournisseurs] as const;
-    }),
-  );
-  // Utiliser un Record au lieu de Map pour la sérialisation Server -> Client
-  const fournisseursParClient: Record<
-    number,
-    (typeof fournisseursParClientEntries)[0][1]
-  > = {};
-  for (const [clientId, fournisseurs] of fournisseursParClientEntries) {
-    fournisseursParClient[clientId] = fournisseurs;
-  }
+  // Récupérer TOUS les fournisseurs (pas filtrés par client)
+  const allFournisseurs = await getFournisseurs();
 
-  // Tous les fournisseurs (flat)
-  const allFournisseurs = fournisseursParClientEntries.flatMap(([, f]) => f);
+  // fournisseursParClient n'est plus nécessaire car on montre toujours tous les fournisseurs
+  const fournisseursParClient: Record<number, typeof allFournisseurs> = {};
 
   const initialData = await getAllTickets({
     query,

@@ -11,8 +11,8 @@ import {
   createUpdateSchema,
 } from "drizzle-zod";
 import { z } from "zod";
-import { insertProspectSchema } from "./prospect";
 import { devisStatusSchema, devisTypePrixSchema } from "./enums";
+import { insertProspectSchema } from "./prospect";
 
 export const selectDevisTemporaireSchema = createSelectSchema(devisTemporaires);
 export type SelectDevisTemporaireType = z.infer<
@@ -158,6 +158,116 @@ export const devisQueryFrontendSchema = devisQueryFiltersSchema.merge(
   createSortSchema(SORTABLE_DEVIS_COLUMNS, "createdAt"),
 );
 export type DevisQueryFrontendType = z.infer<typeof devisQueryFrontendSchema>;
+
+//============================= ADMIN QUERY ==============================//
+
+export const adminDevisQueryBackendSchema = devisQueryBackendSchema.extend({
+  clientId: z.number().int().positive().optional(),
+});
+export type AdminDevisQueryBackendType = z.infer<
+  typeof adminDevisQueryBackendSchema
+>;
+
+export const adminDevisQueryFiltersSchema = devisQueryFiltersSchema.extend({
+  clientId: emptyStringToUndefinedOptional.or(z.literal("all")).optional(),
+});
+export type AdminDevisQueryFiltersType = z.infer<
+  typeof adminDevisQueryFiltersSchema
+>;
+
+export const adminDevisQueryFrontendSchema = adminDevisQueryFiltersSchema.merge(
+  createSortSchema(SORTABLE_DEVIS_COLUMNS, "createdAt"),
+);
+export type AdminDevisQueryFrontendType = z.infer<
+  typeof adminDevisQueryFrontendSchema
+>;
+
+export function parseAdminDevisQuery(
+  raw: RawSearchParams,
+): AdminDevisQueryBackendType {
+  const normalized = normalizeSearchParams(raw);
+  const urlQuery = adminDevisQueryFrontendSchema.parse(normalized);
+
+  const createdFrom =
+    urlQuery.createdFrom && !Number.isNaN(Date.parse(urlQuery.createdFrom))
+      ? new Date(urlQuery.createdFrom)
+      : undefined;
+
+  const createdTo =
+    urlQuery.createdTo && !Number.isNaN(Date.parse(urlQuery.createdTo))
+      ? new Date(urlQuery.createdTo)
+      : undefined;
+
+  const validFrom =
+    urlQuery.validFrom && !Number.isNaN(Date.parse(urlQuery.validFrom))
+      ? new Date(urlQuery.validFrom)
+      : undefined;
+
+  const validTo =
+    urlQuery.validTo && !Number.isNaN(Date.parse(urlQuery.validTo))
+      ? new Date(urlQuery.validTo)
+      : undefined;
+
+  const titre =
+    urlQuery.titre && urlQuery.titre.trim().length > 0
+      ? urlQuery.titre.trim()
+      : undefined;
+
+  const status =
+    urlQuery.status && urlQuery.status !== "all" ? urlQuery.status : undefined;
+
+  const typePrix =
+    urlQuery.typePrix && urlQuery.typePrix !== "all"
+      ? urlQuery.typePrix
+      : undefined;
+
+  const fournisseurId =
+    urlQuery.fournisseurId &&
+    !Number.isNaN(Number(urlQuery.fournisseurId)) &&
+    urlQuery.fournisseurId !== "all"
+      ? Number(urlQuery.fournisseurId)
+      : undefined;
+
+  const siteId =
+    urlQuery.siteId &&
+    !Number.isNaN(Number(urlQuery.siteId)) &&
+    urlQuery.siteId !== "all"
+      ? Number(urlQuery.siteId)
+      : undefined;
+
+  const clientId =
+    urlQuery.clientId &&
+    !Number.isNaN(Number(urlQuery.clientId)) &&
+    urlQuery.clientId !== "all"
+      ? Number(urlQuery.clientId)
+      : undefined;
+
+  const orderBy =
+    urlQuery.orderBy &&
+    Object.keys(SORTABLE_DEVIS_COLUMNS).includes(urlQuery.orderBy)
+      ? (urlQuery.orderBy as DevisSortableColumnType)
+      : DEFAULT_ORDER_BY;
+
+  const orderDir =
+    urlQuery.orderDir === "asc" || urlQuery.orderDir === "desc"
+      ? urlQuery.orderDir
+      : DEFAULT_ORDER_DIR;
+
+  return adminDevisQueryBackendSchema.parse({
+    clientId,
+    titre,
+    status,
+    fournisseurId,
+    siteId,
+    typePrix,
+    createdFrom,
+    createdTo,
+    validFrom,
+    validTo,
+    orderBy,
+    orderDir,
+  });
+}
 
 export function parseDevisQuery(raw: RawSearchParams): DevisQueryBackendType {
   const normalized = normalizeSearchParams(raw);

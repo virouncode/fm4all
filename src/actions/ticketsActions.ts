@@ -680,6 +680,50 @@ const insertTicketForAdminInputSchema = insertTicketInputSchema.extend({
   clientId: z.number().int().positive("ID du client invalide"),
 });
 
+// Action pour récupérer les tickets d'un client (admin uniquement)
+const getClientTicketsInputSchema = z.object({
+  clientId: z.number().int().positive("ID du client invalide"),
+});
+
+export const getClientTicketsForAdminAction = actionClient
+  .metadata({ actionName: "getClientTicketsForAdminAction" })
+  .inputSchema(getClientTicketsInputSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    const locale = await getLocale();
+
+    if (!currentUser) {
+      throw new Error(
+        locale === "fr"
+          ? "Vous n'êtes pas authentifié."
+          : "You are not authenticated.",
+      );
+    }
+
+    if (currentUser.role !== "admin") {
+      throw new Error(
+        locale === "fr"
+          ? "Vous n'avez pas les droits pour effectuer cette action."
+          : "You do not have permission to perform this action.",
+      );
+    }
+
+    const { clientId } = parsedInput;
+
+    // Récupérer tous les tickets du client (sans pagination)
+    const clientTickets = await db
+      .select()
+      .from(tickets)
+      .where(eq(tickets.clientId, clientId))
+      .orderBy(tickets.createdAt);
+
+    return clientTickets.map((ticket) => selectTicketSchema.parse(ticket));
+  });
+
 // Action pour créer un ticket pour un client spécifique (admin uniquement)
 export const insertTicketForAdminAction = actionClient
   .metadata({ actionName: "insertTicketForAdminAction" })

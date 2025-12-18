@@ -175,7 +175,6 @@ const TicketForm = <TFormValues,>({
               label="Prestataire"
               className="w-full md:col-span-1"
               selectClassName="w-full"
-              placeholder="Sélectionner un prestataire"
               requiredMark
               disabled={isReadOnly}
             >

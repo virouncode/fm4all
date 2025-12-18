@@ -97,7 +97,6 @@ export default function AdminNavItems({ userId }: AdminNavItemsProps) {
       <SidebarGroup>
         <SidebarGroupContent>
           <SidebarMenu>
-            {/* Parent item collapsible */}
             <Collapsible open={ticketsOpen} onOpenChange={setTicketsOpen}>
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
@@ -121,27 +120,7 @@ export default function AdminNavItems({ userId }: AdminNavItemsProps) {
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
               </SidebarMenuItem>
-
-              {/* Sous-menu */}
               <CollapsibleContent className="animate-collapsible-down ml-8 border-l pl-2">
-                {/* Nouveau ticket */}
-
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive("nouveau-ticket")}
-                  >
-                    <Link
-                      href={{
-                        pathname: "/admin/[userId]/tickets/nouveau-ticket",
-                        params: { userId },
-                      }}
-                    >
-                      Nouveau ticket
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild
@@ -154,6 +133,21 @@ export default function AdminNavItems({ userId }: AdminNavItemsProps) {
                       }}
                     >
                       Tous les tickets
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive("nouveau-ticket")}
+                  >
+                    <Link
+                      href={{
+                        pathname: "/admin/[userId]/tickets/nouveau-ticket",
+                        params: { userId },
+                      }}
+                    >
+                      Nouveau ticket
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

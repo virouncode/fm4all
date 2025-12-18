@@ -2,43 +2,36 @@
 
 import { RhfControlledSelect } from "@/components/rhf/RhfControlledSelect";
 import { RhfDatePicker } from "@/components/rhf/RhfDatePicker";
+import { RhfInput } from "@/components/rhf/RhfInput";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
-import {
-  ticketCategorieCT,
-  ticketPrioriteCT,
-  ticketStatusCT,
-  ticketTypeCT,
-} from "@/constants/codeTables";
+import { devisStatusCT, devisTypePrixCT } from "@/constants/codeTables";
+import { useDebounce } from "@/hooks/use-debounce";
 import { SelectClientType } from "@/zod-schemas/client";
+import {
+  AdminDevisQueryBackendType,
+  AdminDevisQueryFiltersType,
+} from "@/zod-schemas/devis";
 import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
 import { SelectSiteType } from "@/zod-schemas/site";
-import {
-  AdminTicketsQueryBackendType,
-  AdminTicketsQueryFiltersType,
-} from "@/zod-schemas/ticket";
 import { DateTime } from "luxon";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
-type AdminTicketsFiltersFormProps = {
-  initialFilters: AdminTicketsQueryBackendType;
+type AdminDevisFiltersFormProps = {
+  initialFilters: AdminDevisQueryBackendType;
   clients: SelectClientType[];
   sites: SelectSiteType[];
-  fournisseursParClient: Record<number, SelectFournisseurType[]>;
   allFournisseurs: SelectFournisseurType[];
-  isDevisTickets?: boolean;
 };
 
-const AdminTicketsFiltersForm = ({
+const AdminDevisFiltersForm = ({
   initialFilters,
   clients,
   sites,
-  fournisseursParClient,
   allFournisseurs,
-  isDevisTickets = false,
-}: AdminTicketsFiltersFormProps) => {
+}: AdminDevisFiltersFormProps) => {
   const { replace } = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -48,48 +41,45 @@ const AdminTicketsFiltersForm = ({
     initialFilters.clientId ? String(initialFilters.clientId) : "all",
   );
 
-  const defaultValues: AdminTicketsQueryFiltersType = {
-    // client
+  const defaultValues: AdminDevisQueryFiltersType = {
     clientId: initialFilters.clientId ? String(initialFilters.clientId) : "all",
-
-    // dates → string (yyyy-mm-dd) ou ""
     createdFrom: initialFilters.createdFrom
       ? initialFilters.createdFrom.toISOString().slice(0, 10)
       : "",
     createdTo: initialFilters.createdTo
       ? initialFilters.createdTo.toISOString().slice(0, 10)
       : "",
-
-    // enums → valeur ou "all"
-    categorie: initialFilters.categorie ?? "all",
-    priorite: initialFilters.priorite ?? "all",
+    validFrom: initialFilters.validFrom
+      ? initialFilters.validFrom.toISOString().slice(0, 10)
+      : "",
+    validTo: initialFilters.validTo
+      ? initialFilters.validTo.toISOString().slice(0, 10)
+      : "",
+    titre: initialFilters.titre ? initialFilters.titre : "",
     status: initialFilters.status ?? "all",
-    type: isDevisTickets ? "demande_devis" : (initialFilters.type ?? "all"),
-
-    // ids → string ou ""
+    typePrix: initialFilters.typePrix ?? "all",
     fournisseurId: initialFilters.fournisseurId
-      ? String(initialFilters.fournisseurId)
+      ? initialFilters.fournisseurId.toString()
       : "all",
-    siteId: initialFilters.siteId ? String(initialFilters.siteId) : "all",
+    siteId: initialFilters.siteId ? initialFilters.siteId.toString() : "all",
   };
 
-  const form = useForm<AdminTicketsQueryFiltersType>({
+  const form = useForm<AdminDevisQueryFiltersType>({
     defaultValues,
     mode: "onTouched",
   });
 
   const filters = useWatch({ control: form.control });
-  const start = useWatch({ control: form.control, name: "createdFrom" });
-  const end = useWatch({ control: form.control, name: "createdTo" });
+  const createdStart = useWatch({ control: form.control, name: "createdFrom" });
+  const createdEnd = useWatch({ control: form.control, name: "createdTo" });
+  const validStart = useWatch({ control: form.control, name: "validFrom" });
+  const validEnd = useWatch({ control: form.control, name: "validTo" });
   const clientId = useWatch({ control: form.control, name: "clientId" });
+  const debouncedTitre = useDebounce(filters.titre, 400);
 
-  // Reset fournisseurId et siteId quand le client change
+  // Reset siteId quand le client change
   useEffect(() => {
     if (clientId !== previousClientId.current) {
-      form.setValue("fournisseurId", "all", {
-        shouldDirty: true,
-        shouldValidate: true,
-      });
       form.setValue("siteId", "all", {
         shouldDirty: true,
         shouldValidate: true,
@@ -99,10 +89,10 @@ const AdminTicketsFiltersForm = ({
   }, [clientId, form]);
 
   useEffect(() => {
-    if (!start || !end) return;
+    if (!createdStart || !createdEnd) return;
 
-    const startDt = DateTime.fromISO(start).startOf("day");
-    const endDt = DateTime.fromISO(end).startOf("day");
+    const startDt = DateTime.fromISO(createdStart).startOf("day");
+    const endDt = DateTime.fromISO(createdEnd).startOf("day");
 
     if (endDt <= startDt) {
       const newEnd = startDt.plus({ days: 1 }).startOf("day").toISODate() ?? "";
@@ -111,26 +101,49 @@ const AdminTicketsFiltersForm = ({
         shouldValidate: true,
       });
     }
-  }, [start, end, form]);
+  }, [createdStart, createdEnd, form]);
 
-  const minTo = useMemo(() => {
-    if (!start) return undefined;
+  useEffect(() => {
+    if (!validStart || !validEnd) return;
+
+    const startDt = DateTime.fromISO(validStart).startOf("day");
+    const endDt = DateTime.fromISO(validEnd).startOf("day");
+
+    if (endDt <= startDt) {
+      const newEnd = startDt.plus({ days: 1 }).startOf("day").toISODate() ?? "";
+      form.setValue("validTo", newEnd, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    }
+  }, [validStart, validEnd, form]);
+
+  const minCreatedTo = useMemo(() => {
+    if (!createdStart) return undefined;
     return (
-      DateTime.fromISO(start).plus({ days: 1 }).startOf("day").toISODate() ??
-      undefined
+      DateTime.fromISO(createdStart)
+        .plus({ days: 1 })
+        .startOf("day")
+        .toISODate() ?? undefined
     );
-  }, [start]);
+  }, [createdStart]);
+
+  const minValidTo = useMemo(() => {
+    if (!validStart) return undefined;
+    return (
+      DateTime.fromISO(validStart)
+        .plus({ days: 1 })
+        .startOf("day")
+        .toISODate() ?? undefined
+    );
+  }, [validStart]);
 
   // Filtrer les sites en fonction du client sélectionné
-  // Si client = "all", afficher tous les sites
   const filteredSites = useMemo(() => {
     if (!clientId || clientId === "all") return sites;
     const clientIdNum = Number(clientId);
     return sites.filter((s) => s.clientId === clientIdNum);
   }, [clientId, sites]);
-
-  // Toujours afficher tous les fournisseurs (pas de contrainte par client)
-  const filteredFournisseurs = allFournisseurs;
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -144,23 +157,26 @@ const AdminTicketsFiltersForm = ({
     if (filters.createdTo) {
       params.set("createdTo", filters.createdTo);
     }
-    if (filters.categorie) {
-      params.set("categorie", filters.categorie);
+    if (filters.validFrom) {
+      params.set("validFrom", filters.validFrom);
     }
-    if (filters.priorite) {
-      params.set("priorite", filters.priorite);
+    if (filters.validTo) {
+      params.set("validTo", filters.validTo);
+    }
+    if (debouncedTitre) {
+      params.set("titre", debouncedTitre);
     }
     if (filters.status) {
       params.set("status", filters.status);
     }
-    if (filters.type) {
-      params.set("type", filters.type);
+    if (filters.typePrix) {
+      params.set("typePrix", filters.typePrix);
     }
     if (filters.fournisseurId) {
-      params.set("fournisseurId", String(filters.fournisseurId));
+      params.set("fournisseurId", filters.fournisseurId);
     }
     if (filters.siteId) {
-      params.set("siteId", String(filters.siteId));
+      params.set("siteId", filters.siteId);
     }
 
     // Préserver les paramètres de tri existants (orderBy, orderDir)
@@ -175,12 +191,12 @@ const AdminTicketsFiltersForm = ({
     if (next !== current) {
       replace(next, { scroll: false });
     }
-  }, [filters, pathname, replace, searchParams]);
+  }, [filters, pathname, replace, debouncedTitre, searchParams]);
 
   return (
     <Form {...form}>
       <form className="flex flex-wrap gap-4">
-        <RhfControlledSelect<AdminTicketsQueryFiltersType>
+        <RhfControlledSelect<AdminDevisQueryFiltersType>
           label="Client"
           name="clientId"
           selectClassName="w-48"
@@ -194,79 +210,61 @@ const AdminTicketsFiltersForm = ({
           ))}
         </RhfControlledSelect>
 
-        <RhfDatePicker<AdminTicketsQueryFiltersType>
-          label="Du"
+        <RhfDatePicker<AdminDevisQueryFiltersType>
+          label="Crée du"
           name="createdFrom"
           buttonClassName="w-40"
           withError={false}
         />
-        <RhfDatePicker<AdminTicketsQueryFiltersType>
+        <RhfDatePicker<AdminDevisQueryFiltersType>
           label="Au"
           name="createdTo"
-          min={minTo}
+          min={minCreatedTo}
           buttonClassName="w-40"
           withError={false}
         />
-
-        <RhfControlledSelect<AdminTicketsQueryFiltersType>
-          label="Catégorie"
-          name="categorie"
-          selectClassName="w-40"
+        <RhfDatePicker<AdminDevisQueryFiltersType>
+          label="Valide du"
+          name="validFrom"
+          buttonClassName="w-40"
           withError={false}
-        >
-          <SelectItem value="all">Toutes</SelectItem>
-          {ticketCategorieCT.map((c) => (
-            <SelectItem key={c.code} value={c.code}>
-              {c.name}
-            </SelectItem>
-          ))}
-        </RhfControlledSelect>
-
-        <RhfControlledSelect<AdminTicketsQueryFiltersType>
-          label="Priorité"
-          name="priorite"
-          selectClassName="w-40"
+        />
+        <RhfDatePicker<AdminDevisQueryFiltersType>
+          label="Au"
+          name="validTo"
+          min={minValidTo}
+          buttonClassName="w-40"
           withError={false}
-        >
-          <SelectItem value="all">Toutes</SelectItem>
-          {ticketPrioriteCT.map((p) => (
-            <SelectItem key={p.code} value={p.code}>
-              {p.name}
-            </SelectItem>
-          ))}
-        </RhfControlledSelect>
-
-        <RhfControlledSelect<AdminTicketsQueryFiltersType>
+        />
+        <RhfControlledSelect<AdminDevisQueryFiltersType>
           label="Etat"
           name="status"
           selectClassName="w-40"
           withError={false}
         >
           <SelectItem value="all">Tous</SelectItem>
-          {ticketStatusCT.map((s) => (
-            <SelectItem key={s.code} value={s.code}>
-              {s.name}
+          {devisStatusCT
+            .filter((s) => s.code !== "brouillon")
+            .map((s) => (
+              <SelectItem key={s.code} value={s.code}>
+                {s.name}
+              </SelectItem>
+            ))}
+        </RhfControlledSelect>
+        <RhfControlledSelect<AdminDevisQueryFiltersType>
+          label="Type"
+          name="typePrix"
+          selectClassName="w-40"
+          withError={false}
+        >
+          <SelectItem value="all">Tous</SelectItem>
+          {devisTypePrixCT.map((tp) => (
+            <SelectItem key={tp.code} value={tp.code}>
+              {tp.name}
             </SelectItem>
           ))}
         </RhfControlledSelect>
-
-        {!isDevisTickets && (
-          <RhfControlledSelect<AdminTicketsQueryFiltersType>
-            label="Type"
-            name="type"
-            selectClassName="w-52"
-            withError={false}
-          >
-            <SelectItem value="all">Tous</SelectItem>
-            {ticketTypeCT.map((t) => (
-              <SelectItem key={t.code} value={t.code}>
-                {t.name}
-              </SelectItem>
-            ))}
-          </RhfControlledSelect>
-        )}
-
-        <RhfControlledSelect<AdminTicketsQueryFiltersType>
+        <RhfControlledSelect<AdminDevisQueryFiltersType>
           label="Site"
           name="siteId"
           selectClassName="w-40"
@@ -274,28 +272,33 @@ const AdminTicketsFiltersForm = ({
         >
           <SelectItem value="all">Tous</SelectItem>
           {filteredSites.map((s) => (
-            <SelectItem key={s.id} value={String(s.id)}>
+            <SelectItem key={s.id} value={s.id.toString()}>
               {s.nomSite}
             </SelectItem>
           ))}
         </RhfControlledSelect>
-
-        <RhfControlledSelect<AdminTicketsQueryFiltersType>
+        <RhfControlledSelect<AdminDevisQueryFiltersType>
           label="Prestataire"
           name="fournisseurId"
           selectClassName="w-40"
           withError={false}
         >
           <SelectItem value="all">Tous</SelectItem>
-          {filteredFournisseurs.map((f) => (
-            <SelectItem key={f.id} value={String(f.id)}>
+          {allFournisseurs.map((f) => (
+            <SelectItem key={f.id} value={f.id.toString()}>
               {f.nomFournisseur}
             </SelectItem>
           ))}
         </RhfControlledSelect>
+        <RhfInput<AdminDevisQueryFiltersType>
+          label="Titre"
+          name="titre"
+          inputClassName="w-60"
+          withError={false}
+        />
       </form>
     </Form>
   );
 };
 
-export default AdminTicketsFiltersForm;
+export default AdminDevisFiltersForm;

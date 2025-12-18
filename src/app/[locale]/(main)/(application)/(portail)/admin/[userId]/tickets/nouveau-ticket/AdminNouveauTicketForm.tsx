@@ -1,6 +1,5 @@
 "use client";
 
-import { getClientFournisseursForAdminAction } from "@/actions/clientAction";
 import { getClientSitesForAdminAction } from "@/actions/sitesActions";
 import { insertTicketForAdminAction } from "@/actions/ticketsActions";
 import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
@@ -30,15 +29,16 @@ import TicketForm from "../../../../client/[clientId]/tickets/nouveau-ticket/Tic
 type AdminNouveauTicketFormProps = {
   defaultValues: InsertTicketFormType;
   clients: SelectClientType[];
+  fournisseurs: SelectFournisseurType[];
 };
 
 export default function AdminNouveauTicketForm({
   defaultValues,
   clients,
+  fournisseurs,
 }: AdminNouveauTicketFormProps) {
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
   const [sites, setSites] = useState<SelectSiteType[]>([]);
-  const [fournisseurs, setFournisseurs] = useState<SelectFournisseurType[]>([]);
   const [isLoadingClientData, setIsLoadingClientData] = useState(false);
 
   const form = useForm<InsertTicketFormType>({
@@ -61,6 +61,7 @@ export default function AdminNouveauTicketForm({
         // Reset du site sélectionné
         setValue("siteId", "0");
       }
+      setIsLoadingClientData(false);
     },
     onError: ({ error }) => {
       const message =
@@ -72,56 +73,25 @@ export default function AdminNouveauTicketForm({
         description: message,
       });
       setSites([]);
+      setIsLoadingClientData(false);
     },
   });
 
-  // Action pour récupérer les fournisseurs du client sélectionné
-  const { execute: executeGetFournisseurs } = useAction(
-    getClientFournisseursForAdminAction,
-    {
-      onSuccess: ({ data }) => {
-        if (data) {
-          setFournisseurs(data);
-          // Reset du fournisseur sélectionné
-          setValue("fournisseurId", "0");
-        }
-        setIsLoadingClientData(false);
-      },
-      onError: ({ error }) => {
-        const message =
-          (typeof error.serverError === "string" && error.serverError) ||
-          "Impossible de récupérer les fournisseurs du client.";
-        toast({
-          variant: "destructive",
-          title: "Erreur",
-          description: message,
-        });
-        setFournisseurs([]);
-        setIsLoadingClientData(false);
-      },
-    },
-  );
-
-  // Charger les sites et fournisseurs quand le client change
+  // Charger les sites quand le client change (fournisseurs sont tous disponibles)
   const loadClientData = useCallback(
     (clientId: number) => {
       setIsLoadingClientData(true);
       setSites([]);
-      setFournisseurs([]);
       setValue("siteId", "0");
-      setValue("fournisseurId", "0");
 
-      // Récupérer les sites
+      // Récupérer les sites du client
       executeGetSites({
         clientId,
         orderBy: "nomSite",
         orderDir: "asc",
       });
-
-      // Récupérer les fournisseurs
-      executeGetFournisseurs({ clientId });
     },
-    [executeGetSites, executeGetFournisseurs, setValue],
+    [executeGetSites, setValue],
   );
 
   // Quand le client sélectionné change
@@ -130,7 +100,6 @@ export default function AdminNouveauTicketForm({
       loadClientData(selectedClientId);
     } else {
       setSites([]);
-      setFournisseurs([]);
     }
   }, [selectedClientId, loadClientData]);
 
@@ -147,7 +116,6 @@ export default function AdminNouveauTicketForm({
         reset(defaultValues);
         setSelectedClientId(null);
         setSites([]);
-        setFournisseurs([]);
       },
       onError: ({ error }) => {
         const message =
@@ -191,7 +159,6 @@ export default function AdminNouveauTicketForm({
     } else {
       setSelectedClientId(null);
       setSites([]);
-      setFournisseurs([]);
     }
   };
 
@@ -238,43 +205,33 @@ export default function AdminNouveauTicketForm({
         {isLoadingClientData && (
           <div className="text-muted-foreground flex items-center gap-2 text-sm">
             <Spinner className="h-4 w-4" />
-            <span>Chargement des sites et fournisseurs...</span>
+            <span>Chargement des sites...</span>
           </div>
         )}
 
-        {/* Message si pas de sites ou fournisseurs */}
+        {/* Message si pas de sites */}
         {selectedClientId && !isLoadingClientData && sites.length === 0 && (
           <p className="text-destructive text-sm">
             Ce client n&apos;a pas de site enregistré.
           </p>
         )}
-        {selectedClientId &&
-          !isLoadingClientData &&
-          fournisseurs.length === 0 && (
-            <p className="text-destructive text-sm">
-              Ce client n&apos;a pas de fournisseur associé.
-            </p>
-          )}
       </div>
 
-      {/* Formulaire de ticket */}
-      {selectedClientId &&
-        !isLoadingClientData &&
-        sites.length > 0 &&
-        fournisseurs.length > 0 && (
-          <TicketForm<InsertTicketFormType>
-            mode="create"
-            onSubmit={form.handleSubmit(submitForm)}
-            isSubmitting={isSubmitting}
-            isSubmitDisabled={isSubmitDisabled}
-            clientId={selectedClientId}
-            sites={sites}
-            fournisseurs={fournisseurs}
-            userRole="admin"
-            isDevisTicket={false}
-            isReadOnly={false}
-          />
-        )}
+      {/* Formulaire de ticket - fournisseurs disponibles pour tous les clients */}
+      {selectedClientId && !isLoadingClientData && sites.length > 0 && (
+        <TicketForm<InsertTicketFormType>
+          mode="create"
+          onSubmit={form.handleSubmit(submitForm)}
+          isSubmitting={isSubmitting}
+          isSubmitDisabled={isSubmitDisabled}
+          clientId={selectedClientId}
+          sites={sites}
+          fournisseurs={fournisseurs}
+          userRole="admin"
+          isDevisTicket={false}
+          isReadOnly={false}
+        />
+      )}
     </Form>
   );
 }

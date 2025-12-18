@@ -93,7 +93,7 @@ const InterventionForm = <TFormValues,>({
     );
 
     if (!stillValid) {
-      setValue("siteId", undefined, {
+      setValue("siteId", "0", {
         shouldDirty: true,
         shouldValidate: true,
       });
@@ -111,7 +111,7 @@ const InterventionForm = <TFormValues,>({
     );
 
     if (!stillValid) {
-      setValue("ticketId", undefined, {
+      setValue("ticketId", "0", {
         shouldDirty: true,
         shouldValidate: true,
       });
@@ -130,6 +130,43 @@ const InterventionForm = <TFormValues,>({
     <form onSubmit={isReadOnly ? handleClose : onSubmit}>
       <FieldSet>
         <FieldGroup className="gap-2">
+          <div className="grid gap-4 md:grid-cols-2 md:gap-14">
+            {userRole === "admin" && clients && (
+              <RhfControlledSelect<InterventionFormValues>
+                name="clientId"
+                label="Client"
+                requiredMark
+                className="w-full md:col-span-1"
+                selectClassName="w-full"
+                disabled={isReadOnly}
+              >
+                <SelectItem value="0">Sélectionner un client</SelectItem>
+                {clients.map((client) => (
+                  <SelectItem key={client.id} value={client.id.toString()}>
+                    {client.nomEntreprise}
+                  </SelectItem>
+                ))}
+              </RhfControlledSelect>
+            )}
+            {tickets && tickets.length > 0 && (
+              <RhfControlledSelect<InterventionFormValues>
+                name="ticketId"
+                label="N° Ticket"
+                requiredMark
+                className="w-full md:col-span-1"
+                selectClassName="w-full"
+                disabled={isReadOnly}
+              >
+                <SelectItem value="0">Sélectionner un ticket</SelectItem>
+                {filteredTickets.map((ticket) => (
+                  <SelectItem key={ticket.id} value={ticket.id.toString()}>
+                    #{ticket.id} - {ticket.titre}
+                  </SelectItem>
+                ))}
+              </RhfControlledSelect>
+            )}
+          </div>
+
           {/* Titre + Type */}
           <div className="grid gap-4 md:grid-cols-2 md:gap-14">
             <RhfInput<InterventionFormValues>
@@ -156,40 +193,6 @@ const InterventionForm = <TFormValues,>({
             </RhfControlledSelect>
           </div>
 
-          {userRole === "admin" && clients && (
-            <div className="grid gap-4 md:grid-cols-2 md:gap-14">
-              <RhfControlledSelect<InterventionFormValues>
-                name="clientId"
-                label="Client"
-                requiredMark
-                className="w-full md:col-span-1"
-                selectClassName="w-full"
-                disabled={isReadOnly}
-              >
-                {clients.map((client) => (
-                  <SelectItem key={client.id} value={client.id.toString()}>
-                    {client.nomEntreprise}
-                  </SelectItem>
-                ))}
-              </RhfControlledSelect>
-
-              <RhfControlledSelect<InterventionFormValues>
-                name="ticketId"
-                label="N° Ticket"
-                requiredMark
-                className="w-full md:col-span-1"
-                selectClassName="w-full"
-                disabled={isReadOnly || !selectedClientId}
-              >
-                {filteredTickets.map((ticket) => (
-                  <SelectItem key={ticket.id} value={ticket.id.toString()}>
-                    #{ticket.id} - {ticket.titre}
-                  </SelectItem>
-                ))}
-              </RhfControlledSelect>
-            </div>
-          )}
-
           {/* Site + Prestataire */}
           <div className="grid gap-4 md:grid-cols-2 md:gap-14">
             <RhfControlledSelect<InterventionFormValues>
@@ -200,6 +203,7 @@ const InterventionForm = <TFormValues,>({
               selectClassName="w-full"
               disabled={isReadOnly}
             >
+              <SelectItem value="0">Sélectionner un site</SelectItem>
               {filteredSites.map((site) => (
                 <SelectItem key={site.id} value={site.id.toString()}>
                   {site.nomSite}
@@ -215,6 +219,7 @@ const InterventionForm = <TFormValues,>({
               selectClassName="w-full"
               disabled={isReadOnly || userRole === "fournisseur"}
             >
+              <SelectItem value="0">Sélectionner un prestataire</SelectItem>
               {fournisseurs.map((fournisseur) => (
                 <SelectItem
                   key={fournisseur.id}

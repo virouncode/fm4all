@@ -128,12 +128,8 @@ const AdminInterventionsFiltersForm = ({
     return sites.filter((s) => s.clientId === clientIdNum);
   }, [clientId, sites]);
 
-  // Filtrer les fournisseurs en fonction du client sélectionné
-  const filteredFournisseurs = useMemo(() => {
-    if (!clientId || clientId === "all") return allFournisseurs;
-    const clientIdNum = Number(clientId);
-    return fournisseursParClient[clientIdNum] ?? [];
-  }, [clientId, fournisseursParClient, allFournisseurs]);
+  // Toujours afficher tous les fournisseurs (pas de contrainte par client)
+  const filteredFournisseurs = allFournisseurs;
 
   useEffect(() => {
     const params = new URLSearchParams();

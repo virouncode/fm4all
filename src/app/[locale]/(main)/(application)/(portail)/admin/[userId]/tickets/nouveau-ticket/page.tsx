@@ -1,5 +1,6 @@
 import { LocaleType } from "@/i18n/routing";
 import { getClients } from "@/lib/queries/clients/getClients";
+import { getFournisseurs } from "@/lib/queries/fournisseurs/getFournisseurs";
 import { InsertTicketFormType } from "@/zod-schemas/ticket";
 import { ReactNode } from "react";
 import AdminNouveauTicketForm from "./AdminNouveauTicketForm";
@@ -10,7 +11,10 @@ const page = async ({
   params: Promise<{ userId: string; locale: LocaleType }>;
 }) => {
   await params;
-  const clients = await getClients();
+  const [clients, fournisseurs] = await Promise.all([
+    getClients(),
+    getFournisseurs(),
+  ]);
 
   const errorComponent: ReactNode = (
     <main className="flex h-full w-full flex-col overflow-hidden">
@@ -70,6 +74,7 @@ const page = async ({
             <AdminNouveauTicketForm
               defaultValues={defaultValues}
               clients={clients}
+              fournisseurs={fournisseurs}
             />
           </div>
         </div>
