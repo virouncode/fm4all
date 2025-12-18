@@ -91,6 +91,7 @@ export const insertInterventionFormSchema = z.object({
   type: interventionTypeSchema,
   siteId: z.string().min(1, "Le site est obligatoire"), //select
   clientId: z.string().min(1, "Le client est obligatoire"), //select
+  ticketId: z.string().min(1, "Le ticket est obligatoire"), //select
   fournisseurId: z.string().min(1, "Le fournisseur est obligatoire"), //select
   dateDebutPrevue: z.string().min(1, "La date de début prévue est obligatoire"),
   dateFinPrevue: z.string().optional(),

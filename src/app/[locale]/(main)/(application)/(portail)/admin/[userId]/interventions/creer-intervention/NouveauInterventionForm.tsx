@@ -12,6 +12,7 @@ import {
   InsertInterventionType,
 } from "@/zod-schemas/intervention";
 import { SelectSiteType } from "@/zod-schemas/site";
+import { SelectTicketType } from "@/zod-schemas/ticket";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
@@ -20,6 +21,7 @@ import InterventionForm from "../../../../forms/InterventionForm";
 type NouveauInterventionFormProps = {
   defaultValues: InsertInterventionFormType;
   clients: SelectClientType[];
+  tickets: SelectTicketType[];
   sites: SelectSiteType[];
   fournisseurs: SelectFournisseurType[];
 };
@@ -27,6 +29,7 @@ type NouveauInterventionFormProps = {
 export default function NouveauInterventionForm({
   defaultValues,
   clients,
+  tickets,
   sites,
   fournisseurs,
 }: NouveauInterventionFormProps) {
@@ -69,7 +72,12 @@ export default function NouveauInterventionForm({
     const payload = normalizeForSubmit(data, {
       requiredDates: ["dateDebutPrevue"] as const,
       optionalDates: ["dateFinPrevue"] as const,
-      requiredNumbers: ["siteId", "fournisseurId", "clientId"] as const,
+      requiredNumbers: [
+        "siteId",
+        "fournisseurId",
+        "clientId",
+        "ticketId",
+      ] as const,
     });
     executeInsertIntervention(payload);
   };
@@ -84,6 +92,7 @@ export default function NouveauInterventionForm({
         isSubmitting={isSubmitting}
         isSubmitDisabled={isSubmitDisabled}
         clients={clients}
+        tickets={tickets}
         sites={sites}
         fournisseurs={fournisseurs}
         userRole="admin"

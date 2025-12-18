@@ -1,15 +1,17 @@
 import { getClients } from "@/lib/queries/clients/getClients";
 import { getFournisseurs } from "@/lib/queries/fournisseurs/getFournisseurs";
 import { getSites } from "@/lib/queries/sites/getSites";
+import { getAllTicketsSimple } from "@/lib/queries/tickets/getTickets";
 import { InsertInterventionFormType } from "@/zod-schemas/intervention";
 import { ReactNode } from "react";
 import NouveauInterventionForm from "./NouveauInterventionForm";
 
 const page = async () => {
-  const [clients, sites, fournisseurs] = await Promise.all([
+  const [clients, sites, fournisseurs, tickets] = await Promise.all([
     getClients(),
     getSites(),
     getFournisseurs(),
+    getAllTicketsSimple(),
   ]);
 
   const errorComponent: ReactNode = (
@@ -48,9 +50,10 @@ const page = async () => {
   const defaultValues: InsertInterventionFormType = {
     titre: "",
     type: "corrective",
-    siteId: sites[0].id.toString(),
-    clientId: clients[0].id.toString(),
-    fournisseurId: fournisseurs[0].id.toString(),
+    siteId: "",
+    clientId: "",
+    ticketId: "",
+    fournisseurId: "",
     dateDebutPrevue: "",
     dateFinPrevue: "",
     description: "",
@@ -77,6 +80,7 @@ const page = async () => {
             <NouveauInterventionForm
               defaultValues={defaultValues}
               clients={clients}
+              tickets={tickets}
               sites={sites}
               fournisseurs={fournisseurs}
             />

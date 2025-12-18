@@ -17,6 +17,7 @@ import {
   UpdateInterventionFormType,
 } from "@/zod-schemas/intervention";
 import { SelectSiteType } from "@/zod-schemas/site";
+import { SelectTicketType } from "@/zod-schemas/ticket";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react"; // 🆕
 import { useFormContext } from "react-hook-form"; // 🆕
@@ -28,6 +29,7 @@ type InterventionFormProps<TFormValues> = {
   isSubmitDisabled: boolean;
   clientId?: number;
   clients?: SelectClientType[];
+  tickets?: SelectTicketType[];
   sites: SelectSiteType[];
   fournisseurs: SelectFournisseurType[];
   userRole: UserRoleType;
@@ -46,6 +48,7 @@ const InterventionForm = <TFormValues,>({
   isSubmitDisabled,
   clientId,
   clients,
+  tickets,
   sites,
   fournisseurs,
   userRole,
@@ -59,6 +62,16 @@ const InterventionForm = <TFormValues,>({
 
   const selectedClientId = watch("clientId");
   const selectedSiteId = watch("siteId");
+  const selectedTicketId = watch("ticketId");
+
+  // Tickets filtrés en fonction du client sélectionné
+  const filteredTickets = useMemo(() => {
+    if (userRole === "admin" && selectedClientId && tickets) {
+      const clientIdNumber = Number(selectedClientId);
+      return tickets.filter((ticket) => ticket.clientId === clientIdNumber);
+    }
+    return tickets ?? [];
+  }, [tickets, selectedClientId, userRole]);
 
   // Sites filtrés en fonction du client sélectionné
   const filteredSites = useMemo(() => {
@@ -86,6 +99,24 @@ const InterventionForm = <TFormValues,>({
       });
     }
   }, [filteredSites, selectedSiteId, setValue, userRole]);
+
+  // Si on change de client et que le ticket actuel ne correspond plus, on le reset
+  useEffect(() => {
+    if (userRole !== "admin") return;
+    if (!selectedTicketId) return;
+
+    const currentTicketIdNumber = Number(selectedTicketId);
+    const stillValid = filteredTickets.some(
+      (ticket) => ticket.id === currentTicketIdNumber,
+    );
+
+    if (!stillValid) {
+      setValue("ticketId", undefined, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    }
+  }, [filteredTickets, selectedTicketId, setValue, userRole]);
 
   const handleClose = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -138,6 +169,21 @@ const InterventionForm = <TFormValues,>({
                 {clients.map((client) => (
                   <SelectItem key={client.id} value={client.id.toString()}>
                     {client.nomEntreprise}
+                  </SelectItem>
+                ))}
+              </RhfControlledSelect>
+
+              <RhfControlledSelect<InterventionFormValues>
+                name="ticketId"
+                label="N° Ticket"
+                requiredMark
+                className="w-full md:col-span-1"
+                selectClassName="w-full"
+                disabled={isReadOnly || !selectedClientId}
+              >
+                {filteredTickets.map((ticket) => (
+                  <SelectItem key={ticket.id} value={ticket.id.toString()}>
+                    #{ticket.id} - {ticket.titre}
                   </SelectItem>
                 ))}
               </RhfControlledSelect>

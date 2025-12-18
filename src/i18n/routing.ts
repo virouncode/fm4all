@@ -281,13 +281,13 @@ export const routing = defineRouting({
       fr: "/client/[clientId]/contrats/mes-contrats",
       en: "/client/[clientId]/contrats/mes-contrats",
     },
-    "/client/[clientId]/contrats/depenses-et-factures": {
-      fr: "/client/[clientId]/contrats/depenses-et-factures",
-      en: "/client/[clientId]/contrats/depenses-et-factures",
+    "/client/[clientId]/contrats/depenses": {
+      fr: "/client/[clientId]/contrats/depenses",
+      en: "/client/[clientId]/contrats/depenses",
     },
-    "/client/[clientId]/contrats/forfaits": {
-      fr: "/client/[clientId]/contrats/forfaits",
-      en: "/client/[clientId]/contrats/forfaits",
+    "/client/[clientId]/contrats/factures": {
+      fr: "/client/[clientId]/contrats/factures",
+      en: "/client/[clientId]/contrats/factures",
     },
     "/client/[clientId]/sites/mes-sites": {
       fr: "/client/[clientId]/sites/mes-sites",

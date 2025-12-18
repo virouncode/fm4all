@@ -395,24 +395,32 @@ export default function ClientNavItems({ currentRole }: ClientNavItemsProps) {
 
                 {/* Dépenses & factures */}
                 <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive("depenses-et-factures")}
-                  >
+                  <SidebarMenuButton asChild isActive={isActive("depenses")}>
                     <Link
                       href={{
-                        pathname:
-                          "/client/[clientId]/contrats/depenses-et-factures",
+                        pathname: "/client/[clientId]/contrats/depenses",
                         params: { clientId },
                       }}
                     >
-                      Dépenses & factures
+                      Dépenses
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={isActive("factures")}>
+                    <Link
+                      href={{
+                        pathname: "/client/[clientId]/contrats/factures",
+                        params: { clientId },
+                      }}
+                    >
+                      Factures
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
 
                 {/* Forfaits */}
-                <SidebarMenuItem>
+                {/* <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={isActive("forfaits")}>
                     <Link
                       href={{
@@ -423,7 +431,7 @@ export default function ClientNavItems({ currentRole }: ClientNavItemsProps) {
                       Suivi des forfaits
                     </Link>
                   </SidebarMenuButton>
-                </SidebarMenuItem>
+                </SidebarMenuItem> */}
               </CollapsibleContent>
             </Collapsible>
           </SidebarMenu>

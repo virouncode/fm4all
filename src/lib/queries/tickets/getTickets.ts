@@ -195,6 +195,13 @@ export const getAllTickets = async (params: {
   };
 };
 
+// Fonction simple pour récupérer tous les tickets sans pagination
+export const getAllTicketsSimple = async () => {
+  const rows = await db.select().from(tickets).orderBy(desc(tickets.createdAt));
+
+  return rows.map((ticket) => selectTicketSchema.parse(ticket));
+};
+
 export const getTicket = async (ticketId: number) => {
   const ticket = await db.query.tickets.findFirst({
     where: eq(tickets.id, ticketId),
