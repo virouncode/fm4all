@@ -59,7 +59,7 @@ export default function AdminUpdateInterventionForm({
         title: "Succès",
         description: data.message,
       });
-      router.push("../toutes-les-interventions");
+      router.push("../interventions/toutes-les-interventions");
     },
     onError: ({ error }) => {
       const message =
