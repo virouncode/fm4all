@@ -114,7 +114,7 @@ export const promoteTempAvatarUrl = async (
   avatarUrl: string | null | undefined,
   userRole: string,
 ): Promise<string | null | undefined> => {
-  // Si ce n’est pas un fichier temp, on ne fait rien
+  // Si ce n'est pas un fichier temp, on ne fait rien
   if (!avatarUrl) {
     return avatarUrl;
   }
@@ -138,8 +138,54 @@ export const promoteTempAvatarUrl = async (
     contentType,
   });
 
-  // On supprime l’ancien dans /temp
+  // On supprime l'ancien dans /temp
   await del(avatarUrl); // del accepte une URL complète
+
+  return newBlob.url;
+};
+
+// ======================= LOGO FOURNISSEUR ==========================//
+
+const buildFinalLogoBlobPath = (logoUrl: string, folderName: string) => {
+  const parsed = new URL(logoUrl);
+  const filenameFromUrl = parsed.pathname.split("/").pop() || "logo.bin";
+
+  const { base, ext } = splitName(filenameFromUrl);
+
+  // On ajoute un timestamp pour éviter les collisions
+  return `${folderName}/${base}_${Date.now()}.${ext}`;
+};
+
+export const promoteTempLogoUrl = async (
+  logoUrl: string | null | undefined,
+  folderName: string = "fournisseurs-logos",
+): Promise<string | null | undefined> => {
+  // Si ce n'est pas un fichier temp, on ne fait rien
+  if (!logoUrl) {
+    return logoUrl;
+  }
+  if (!isTempBlob(logoUrl)) {
+    return logoUrl;
+  }
+
+  const targetPath = buildFinalLogoBlobPath(logoUrl, folderName);
+
+  // On lit le blob public existant
+  const res = await fetch(logoUrl);
+  if (!res.ok || !res.body) {
+    throw new Error("Impossible de lire le logo temporaire pour promotion.");
+  }
+
+  const contentType = res.headers.get("content-type") ?? undefined;
+
+  // On ré-upload dans le chemin définitif
+  const newBlob = await put(targetPath, res.body, {
+    access: "public",
+    contentType,
+  });
+
+  // On supprime l'ancien dans /temp
+  await del(logoUrl); // del accepte une URL complète
 
   return newBlob.url;
 };

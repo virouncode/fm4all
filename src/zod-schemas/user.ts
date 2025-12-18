@@ -11,8 +11,8 @@ import {
   createUpdateSchema,
 } from "drizzle-zod";
 import { z } from "zod";
-import { phoneNumberSchema } from "./phone";
 import { userRoleSchema } from "./enums";
+import { phoneNumberSchema } from "./phone";
 
 //SELECT
 export const selectUserSchema = createSelectSchema(user);
@@ -31,6 +31,7 @@ export const updateUserSchema = createUpdateSchema(user).omit({
   updatedAt: true,
   emailVerified: true,
   clientId: true, //ne peut pas être modifié
+  fournisseurId: true, //ne peut pas être modifié
 });
 export type UpdateUserType = z.infer<typeof updateUserSchema>;
 

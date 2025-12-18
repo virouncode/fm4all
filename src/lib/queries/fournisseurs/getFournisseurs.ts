@@ -104,3 +104,21 @@ export const getAllFournisseursWithPagination = async ({
     return { items: [], total: 0, page: 1, pageSize: 25, hasMore: false };
   }
 };
+
+// Récupérer les services d'un fournisseur (ids uniquement)
+import { servicesFournisseurs } from "@/db/schema";
+
+export const getFournisseurServices = async (
+  fournisseurId: number,
+): Promise<number[]> => {
+  try {
+    const results = await db
+      .select({ serviceId: servicesFournisseurs.serviceId })
+      .from(servicesFournisseurs)
+      .where(eq(servicesFournisseurs.fournisseurId, fournisseurId));
+    return results.map((r) => r.serviceId);
+  } catch (err) {
+    errorHelper(err);
+    return [];
+  }
+};

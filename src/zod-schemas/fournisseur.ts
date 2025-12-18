@@ -6,161 +6,114 @@ import {
 } from "drizzle-zod";
 import { z } from "zod";
 import { phoneNumberSchema } from "./phone";
-import { siretSchema } from "./siret";
 
 //SELECT
-export const selectFournisseurSchema = createSelectSchema(fournisseurs, {
-  nomFournisseur: (schema) => schema.min(1, "Nom du fournisseur obligatoire"),
-  siret: siretSchema("Siret fournisseur invalide"),
-  prenomContact: (schema) =>
-    schema.min(1, "Prénom du contact fournisseur obligatoire"),
-  nomContact: (schema) =>
-    schema.min(1, "Nom du contact fournisseur obligatoire"),
-  emailContact: (schema) =>
-    schema.email("Email du contact fournisseur invalide"),
-  phoneContact: phoneNumberSchema("Numéro de téléphone fournisseur invalide"),
-});
+export const selectFournisseurSchema = createSelectSchema(fournisseurs);
 
 export type SelectFournisseurType = z.infer<typeof selectFournisseurSchema>;
 
 //INSERT
-export const createInsertFournisseurSchema = (messages: {
-  nomFournisseur: string;
-  siret: string;
-  prenomContact: string;
-  nomContact: string;
-  emailContact: string;
-  phoneContact: string;
-}) => {
-  return createInsertSchema(fournisseurs, {
-    nomFournisseur: (schema) => schema.min(1, messages.nomFournisseur),
-    siret: siretSchema(messages.siret),
-    prenomContact: (schema) => schema.min(1, messages.prenomContact),
-    nomContact: (schema) => schema.min(1, messages.nomContact),
-    emailContact: (schema) => schema.email(messages.emailContact),
-    phoneContact: phoneNumberSchema(messages.phoneContact),
-  });
-};
-export const insertFournisseurSchema = createInsertFournisseurSchema({
-  nomFournisseur: "Nom de l'entreprise obligatoire",
-  siret: "Siret invalide",
-  prenomContact: "Prénom du contact obligatoire",
-  nomContact: "Nom du contact obligatoire",
-  emailContact: "Email du contact invalide",
-  phoneContact: "Numéro de téléphone obligatoire",
+export const insertFournisseurSchema = createInsertSchema(fournisseurs).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 export type InsertFournisseurType = z.infer<typeof insertFournisseurSchema>;
 
-//UPDATE
-export const createUpdateFournisseurSchema = (messages: {
-  nomFournisseur: string;
-  siret: string;
-  prenomContact: string;
-  nomContact: string;
-  emailContact: string;
-  phoneContact: string;
-  noteGoogle: string;
-  anneeCreation: string;
-  nbClients: string;
-  nbAvis: string;
-}) => {
-  return createUpdateSchema(fournisseurs, {
-    nomFournisseur: (schema) => schema.min(1, messages.nomFournisseur),
-    siret: siretSchema(messages.siret),
-    prenomContact: (schema) => schema.min(1, messages.prenomContact),
-    nomContact: (schema) => schema.min(1, messages.nomContact),
-    emailContact: (schema) => schema.email(messages.emailContact),
-    phoneContact: phoneNumberSchema(messages.phoneContact),
-    slogan: (schema) => schema.optional(),
-    presentation: (schema) => schema.optional(),
-    logoUrl: (schema) => schema.optional(),
-    locationUrl: (schema) => schema.optional(),
-    noteGoogle: z
-      .string()
-      .trim()
-      .refine((val) => !val || /^\d+([.,]\d+)?$/.test(val), {
-        message: messages.noteGoogle,
-      })
-      .nullable(),
-  });
-};
-
-// Version FR concrète
-export const updateFournisseurSchema = createUpdateFournisseurSchema({
-  nomFournisseur: "Nom du fournisseur obligatoire",
-  siret: "Siret invalide, entrez 14 chiffres avec ou sans espaces",
-  prenomContact: "Prénom du contact fournisseur obligatoire",
-  nomContact: "Nom du contact fournisseur obligatoire",
-  emailContact: "Email du contact fournisseur invalide",
-  phoneContact: "Numéro de téléphone invalide",
-  noteGoogle: "Note Google invalide",
-  anneeCreation: "Année de création invalide",
-  nbClients: "Nombre de clients invalide",
-  nbAvis: "Nombre d'avis invalide",
+export const insertFournisseurToDbSchema = insertFournisseurSchema.extend({
+  createdById: z.string().min(1, "ID de l'utilisateur créateur obligatoire"),
+  updatedById: z
+    .string()
+    .min(1, "ID de l'utilisateur modificateur obligatoire"),
 });
+
+export type InsertFournisseurToDbType = z.infer<
+  typeof insertFournisseurToDbSchema
+>;
+
+//UPDATE
+export const updateFournisseurSchema = createUpdateSchema(fournisseurs)
+  .omit({
+    createdAt: true,
+    updatedAt: true,
+  })
+  .extend({
+    id: z.number().positive("ID du fournisseur invalide"),
+  });
 
 export type UpdateFournisseurType = z.infer<typeof updateFournisseurSchema>;
 
-export const createUpdateFournisseurFormSchema = (messages: {
-  nomFournisseur: string;
-  siret: string;
-  prenomContact: string;
-  nomContact: string;
-  emailContact: string;
-  phoneContact: string;
-}) => {
-  return createUpdateSchema(fournisseurs, {
-    nomFournisseur: (schema) => schema.min(1, messages.nomFournisseur),
-    siret: siretSchema(messages.siret),
-    prenomContact: (schema) => schema.min(1, messages.prenomContact),
-    nomContact: (schema) => schema.min(1, messages.nomContact),
-    emailContact: (schema) => schema.email(messages.emailContact),
-    phoneContact: phoneNumberSchema(messages.phoneContact),
-    noteGoogle: (schema) =>
-      schema
-        .refine((value) => !value || value.match(/^\d+([.,]\d+)?$/), {
-          message: "Note Google invalide",
-        })
-        .nullable(),
-  }).extend({
-    noteGoogle: z
+export const updateFournissuerInDbSchema = updateFournisseurSchema
+  .extend({
+    updatedById: z
       .string()
-      .refine((value) => !value || value.match(/^\d+([.,]\d+)?$/), {
-        message: "Note Google invalide",
-      })
-      .nullable(),
-    anneeCreation: z
-      .string()
-      .refine((value) => !value || value.match(/^\d{4}$/), {
-        message: "Année de création invalide",
-      })
-      .nullable(),
-    nbClients: z
-      .string()
-      .refine((value) => !value || value.match(/^\d+$/), {
-        message: "Nombre de clients invalide",
-      })
-      .nullable(),
-    nbAvis: z
-      .string()
-      .refine((value) => !value || value.match(/^\d+$/), {
-        message: "Nombre d'avis invalide",
-      })
-      .nullable(),
+      .min(1, "ID de l'utilisateur modificateur obligatoire"),
+  })
+  .omit({
+    id: true,
   });
-};
-export const updateFournisseurFormSchema = createUpdateFournisseurFormSchema({
-  nomFournisseur: "Nom de l'entreprise obligatoire",
-  siret: "Siret invalide",
-  prenomContact: "Prénom du contact obligatoire",
-  nomContact: "Nom du contact obligatoire",
-  emailContact: "Email du contact invalide",
-  phoneContact: "Numéro de téléphone invalide",
+
+export type UpdateFournisseurInDbType = z.infer<
+  typeof updateFournissuerInDbSchema
+>;
+
+//======================= ONBOARD FOURNISSEUR SCHEMAS ==========================//
+// Pour créer un fournisseur + un user admin + les relations services-fournisseurs
+
+import { insertUserSchema } from "./user";
+
+export const onboardFournisseurSchema = z.object({
+  fournisseur: insertFournisseurSchema,
+  userAdmin: insertUserSchema,
+  services: z
+    .array(z.number().int().positive())
+    .min(1, "Au moins un service requis"),
 });
 
-export type UpdateFournisseurFormType = z.infer<
-  typeof updateFournisseurFormSchema
+export type OnboardFournisseurType = z.infer<typeof onboardFournisseurSchema>;
+
+//======================= FORM SCHEMAS ==========================//
+//On ne peut pas appliquer des transform de type mais on peut appliquer des transform de nettoyage
+
+export const onboardFournisseurFormSchema = z.object({
+  fournisseur: z.object({
+    nomFournisseur: z.string().min(1, "Le nom du fournisseur est obligatoire"),
+    siret: siretSchema("SIRET invalide"),
+    prenomContact: z.string().min(1, "Le prénom du contact est obligatoire"),
+    nomContact: z.string().min(1, "Le nom du contact est obligatoire"),
+    emailContact: z.string().email("Email du contact invalide"),
+    phoneContact: phoneNumberSchema("Numéro de téléphone du contact invalide"),
+    logoUrl: z.string().url("URL invalide").nullable().optional(),
+  }),
+  services: z
+    .array(z.number().int().positive())
+    .min(1, "Ajoutez au moins un service"),
+});
+
+export type OnboardFournisseurFormType = z.infer<
+  typeof onboardFournisseurFormSchema
+>;
+
+// Schéma de mise à jour d'un fournisseur par l'admin (avec services)
+export const updateFournisseurForAdminFormSchema = z.object({
+  id: z.number().positive("ID du fournisseur invalide"),
+  fournisseur: z.object({
+    nomFournisseur: z.string().min(1, "Le nom du fournisseur est obligatoire"),
+    siret: siretSchema("SIRET invalide"),
+    prenomContact: z.string().min(1, "Le prénom du contact est obligatoire"),
+    nomContact: z.string().min(1, "Le nom du contact est obligatoire"),
+    emailContact: z.string().email("Email du contact invalide"),
+    phoneContact: phoneNumberSchema("Numéro de téléphone du contact invalide"),
+    logoUrl: z.string().url("URL invalide").nullable().optional(),
+  }),
+  services: z
+    .array(z.number().int().positive())
+    .min(1, "Ajoutez au moins un service"),
+});
+
+export type UpdateFournisseurForAdminFormType = z.infer<
+  typeof updateFournisseurForAdminFormSchema
 >;
 
 //=========================== ADMIN: QUERY SCHEMAS ============================//
@@ -172,6 +125,7 @@ import {
   RawSearchParams,
 } from "@/normalize/normalizeSearchParams";
 import { createSortSchema } from "@/zod-helpers/createSortSchema";
+import { siretSchema } from "./siret";
 
 // Colonnes triables
 export const SORTABLE_ADMIN_FOURNISSEURS_COLUMNS = {
