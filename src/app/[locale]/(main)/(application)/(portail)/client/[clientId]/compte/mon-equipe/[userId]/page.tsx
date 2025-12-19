@@ -23,13 +23,13 @@ const page = async ({
           <div className="w-full max-w-3xl pb-8">
             <div className="mb-6">
               <h2 className="mb-2 text-xl font-semibold tracking-tight">
-                Modifiez votre profil
+                Profil
               </h2>
               <p className="text-muted-foreground text-sm">
-                Modifiez les détails de votre profil ci-dessous
+                Modifiez les détails du profil ci-dessous
               </p>
             </div>
-            <div>Impossible de trouver votre profil utilisateur</div>
+            <div>Impossible de trouver le profil utilisateur</div>
           </div>
         </div>
       </div>
@@ -57,17 +57,19 @@ const page = async ({
   return (
     <main className="flex h-full w-full flex-col overflow-hidden">
       <div className="bg-background/95 shrink-0 border-b">
-        <h1 className="py-2 text-center text-xl font-bold">Mon profil</h1>
+        <h1 className="py-2 text-center text-xl font-bold">
+          Profil de {user.firstName} {user.lastName}
+        </h1>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto">
         <div className="flex justify-center p-6">
           <div className="w-full max-w-3xl pb-8">
             <div className="mb-6">
               <h2 className="mb-2 text-xl font-semibold tracking-tight">
-                Modifiez votre profil
+                Modifiez le profil
               </h2>
               <p className="text-muted-foreground text-sm">
-                Modifiez les détails de votre profil ci-dessous
+                Modifiez les détails du profil ci-dessous
               </p>
             </div>
             <UpdateUserForm

@@ -64,12 +64,12 @@ const page = async ({
     titre: "",
     categorie: "autre",
     type: "demande_intervention",
-    fournisseurId: "0",
+    fournisseurId: "16",
     description: "",
     priorite: "normale",
     status: "nouveau",
     attachments: [],
-    siteId: sites[0].id.toString(),
+    siteId: "0",
   };
 
   return (

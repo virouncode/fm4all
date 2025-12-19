@@ -9,6 +9,7 @@ import {
   SitesQueryBackendType,
   SitesQueryFiltersType,
 } from "@/zod-schemas/site";
+import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -23,6 +24,7 @@ const ClientSitesFiltersForm = ({
   const { replace } = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const t = useTranslations("DevisPage.locaux.locauxForm");
 
   const defaultValues: SitesQueryFiltersType = {
     ...initialFilters,
@@ -118,7 +120,7 @@ const ClientSitesFiltersForm = ({
           <SelectItem value="all">Tous</SelectItem>
           {typeBatimentCT.map((tb) => (
             <SelectItem key={tb.code} value={tb.code}>
-              {tb.name}
+              {t(tb.name)}
             </SelectItem>
           ))}
         </RhfControlledSelect>
@@ -130,7 +132,7 @@ const ClientSitesFiltersForm = ({
           <SelectItem value="all">Tous</SelectItem>
           {typeOccupationCT.map((to) => (
             <SelectItem key={to.code} value={to.code}>
-              {to.name}
+              {t(to.name)}
             </SelectItem>
           ))}
         </RhfControlledSelect>

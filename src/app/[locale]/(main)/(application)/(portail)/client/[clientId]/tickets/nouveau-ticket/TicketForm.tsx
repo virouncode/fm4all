@@ -170,24 +170,26 @@ const TicketForm = <TFormValues,>({
                 </SelectItem>
               ))}
             </RhfControlledSelect>
-            <RhfControlledSelect<TicketFormValues>
-              name="fournisseurId"
-              label="Prestataire"
-              className="w-full md:col-span-1"
-              selectClassName="w-full"
-              requiredMark
-              disabled={isReadOnly}
-            >
-              <SelectItem value="0">Sélectionner un prestataire</SelectItem>
-              {fournisseurs.map((fournisseur) => (
-                <SelectItem
-                  key={fournisseur.id}
-                  value={fournisseur.id.toString()}
-                >
-                  {fournisseur.nomFournisseur}
-                </SelectItem>
-              ))}
-            </RhfControlledSelect>
+            {userRole === "admin" && (
+              <RhfControlledSelect<TicketFormValues>
+                name="fournisseurId"
+                label="Prestataire"
+                className="w-full md:col-span-1"
+                selectClassName="w-full"
+                requiredMark
+                disabled={isReadOnly}
+              >
+                <SelectItem value="0">Sélectionner un prestataire</SelectItem>
+                {fournisseurs.map((fournisseur) => (
+                  <SelectItem
+                    key={fournisseur.id}
+                    value={fournisseur.id.toString()}
+                  >
+                    {fournisseur.nomFournisseur}
+                  </SelectItem>
+                ))}
+              </RhfControlledSelect>
+            )}
           </div>
 
           {/* Description */}

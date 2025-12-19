@@ -1,8 +1,6 @@
 import { LocaleType } from "@/i18n/routing";
-import {
-  getClientFournisseurs,
-  getClientSites,
-} from "@/lib/queries/clients/getClients";
+import { getClientSites } from "@/lib/queries/clients/getClients";
+import { getFournisseurs } from "@/lib/queries/fournisseurs/getFournisseurs";
 import { getTickets } from "@/lib/queries/tickets/getTickets";
 import { RawSearchParams } from "@/normalize/normalizeSearchParams";
 import { parseTicketsQuery } from "@/zod-schemas/ticket";
@@ -37,7 +35,7 @@ const page = async ({
         orderDir: "asc",
       },
     }),
-    getClientFournisseurs(parseInt(clientId)),
+    getFournisseurs(),
   ]);
 
   return (
