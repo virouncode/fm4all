@@ -15,31 +15,38 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import FournisseurForm from "../_components/FournisseurForm";
 
-type UpdateFournisseurFormProps = {
+type AdminUpdateFournisseurFormProps = {
   userId: string;
   fournisseur: SelectFournisseurType;
   fournisseurServices: number[];
   services: Awaited<ReturnType<typeof getAllServices>>;
 };
 
-const UpdateFournisseurForm = ({
+const AdminUpdateFournisseurForm = ({
   userId,
   fournisseur,
   fournisseurServices,
   services,
-}: UpdateFournisseurFormProps) => {
+}: AdminUpdateFournisseurFormProps) => {
   const router = useRouter();
 
   const defaultValues: UpdateFournisseurForAdminFormType = {
-    id: fournisseur.id,
     fournisseur: {
-      nomFournisseur: fournisseur.nomFournisseur ?? "",
-      siret: fournisseur.siret ?? "",
-      prenomContact: fournisseur.prenomContact ?? "",
-      nomContact: fournisseur.nomContact ?? "",
-      emailContact: fournisseur.emailContact ?? "",
-      phoneContact: fournisseur.phoneContact ?? "",
-      logoUrl: fournisseur.logoUrl ?? null,
+      id: fournisseur.id,
+      nomFournisseur: fournisseur.nomFournisseur,
+      siret: fournisseur.siret,
+      prenomContact: fournisseur.prenomContact,
+      nomContact: fournisseur.nomContact,
+      emailContact: fournisseur.emailContact,
+      phoneContact: fournisseur.phoneContact,
+      logoAttachment: fournisseur.logoUrl
+        ? {
+            url: fournisseur.logoUrl,
+            filename: "",
+            mimeType: "image/*",
+            size: 0,
+          }
+        : null,
     },
     services: fournisseurServices,
   };
@@ -88,7 +95,16 @@ const UpdateFournisseurForm = ({
   );
 
   const submitForm = (data: UpdateFournisseurForAdminFormType) => {
-    executeUpdateFournisseur(data);
+    const payload = {
+      ...data,
+      fournisseur: {
+        ...data.fournisseur,
+        logoUrl: data.fournisseur.logoAttachment
+          ? data.fournisseur.logoAttachment.url
+          : null,
+      },
+    };
+    executeUpdateFournisseur(payload);
   };
 
   const isSubmitDisabled = !isDirty || isSubmitting || isPending;
@@ -106,4 +122,4 @@ const UpdateFournisseurForm = ({
   );
 };
 
-export default UpdateFournisseurForm;
+export default AdminUpdateFournisseurForm;

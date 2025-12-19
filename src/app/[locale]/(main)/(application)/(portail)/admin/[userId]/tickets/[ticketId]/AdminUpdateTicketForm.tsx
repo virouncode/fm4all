@@ -119,8 +119,8 @@ export default function AdminUpdateTicketForm({
 
   const submitForm = (data: UpdateTicketFormType) => {
     const payload = normalizeForSubmit(data, {
-      optionalStrings: ["description"] as const,
       requiredNumbers: ["siteId", "fournisseurId"] as const,
+      optionalStrings: ["description"] as const,
     });
     // Ajouter le clientId au payload
     executeUpdateTicket({ ...payload, clientId });

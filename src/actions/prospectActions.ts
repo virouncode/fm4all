@@ -13,6 +13,7 @@ import { getLocale } from "next-intl/server";
 import { flattenValidationErrors } from "next-safe-action";
 import { prospects } from "../db/schema";
 
+//upsert
 export const insertProspectAction = actionClient
   .metadata({
     actionName: "insertProspectAction",
@@ -22,7 +23,6 @@ export const insertProspectAction = actionClient
       flattenValidationErrors(ve).fieldErrors,
   })
   .action(async ({ parsedInput }) => {
-    const locale = await getLocale();
     //Existing prospect
     const [existingProspect] = await db
       .select({ id: prospects.id })

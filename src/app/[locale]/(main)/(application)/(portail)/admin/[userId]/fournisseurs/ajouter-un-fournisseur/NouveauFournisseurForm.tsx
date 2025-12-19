@@ -33,7 +33,7 @@ const NouveauFournisseurForm = ({
       nomContact: "",
       emailContact: "",
       phoneContact: "",
-      logoUrl: null,
+      logoAttachment: null,
     },
     services: [],
   };
@@ -82,27 +82,26 @@ const NouveauFournisseurForm = ({
   );
 
   const submitForm = (data: OnboardFournisseurFormType) => {
+    const fournisseurPayload = {
+      ...data.fournisseur,
+      logoUrl: data.fournisseur.logoAttachment
+        ? data.fournisseur.logoAttachment.url
+        : null,
+    };
+    const userAdminPayload = {
+      name: data.fournisseur.prenomContact + " " + data.fournisseur.nomContact,
+      firstName: data.fournisseur.prenomContact,
+      lastName: data.fournisseur.nomContact,
+      email: data.fournisseur.emailContact,
+      phone: data.fournisseur.phoneContact,
+      role: "fournisseur" as const,
+      fournisseurId: null,
+      clientId: null,
+      image: null,
+    };
     const payload = {
-      fournisseur: {
-        nomFournisseur: data.fournisseur.nomFournisseur,
-        siret: data.fournisseur.siret || "",
-        prenomContact: data.fournisseur.prenomContact,
-        nomContact: data.fournisseur.nomContact,
-        emailContact: data.fournisseur.emailContact,
-        phoneContact: data.fournisseur.phoneContact,
-        logoUrl: data.fournisseur.logoUrl ?? null,
-      },
-      userAdmin: {
-        name: data.fournisseur.nomFournisseur,
-        firstName: data.fournisseur.prenomContact,
-        lastName: data.fournisseur.nomContact,
-        email: data.fournisseur.emailContact,
-        phone: data.fournisseur.phoneContact,
-        role: "fournisseur" as const,
-        fournisseurId: null,
-        clientId: null,
-        image: data.fournisseur.logoUrl ?? null,
-      },
+      fournisseur: fournisseurPayload,
+      userAdmin: userAdminPayload,
       services: data.services,
     };
     executeOnboardFournisseur(payload);

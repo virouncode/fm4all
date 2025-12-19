@@ -84,7 +84,7 @@ const page = async ({
     type: initialIntervention.type,
     siteId: initialIntervention.siteId.toString(),
     clientId: initialIntervention.clientId.toString(),
-    ticketId: initialIntervention.ticketId?.toString() ?? "",
+    ticketId: initialIntervention.ticketId.toString(),
     fournisseurId: initialIntervention.fournisseurId.toString(),
   };
 

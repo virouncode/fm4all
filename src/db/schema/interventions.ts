@@ -43,9 +43,11 @@ export const interventions = pgTable(
     fournisseurId: integer("fournisseur_id")
       .notNull()
       .references(() => fournisseurs.id, { onDelete: "restrict" }),
-    ticketId: integer("ticket_id").references(() => tickets.id, {
-      onDelete: "set null",
-    }),
+    ticketId: integer("ticket_id")
+      .notNull()
+      .references(() => tickets.id, {
+        onDelete: "set null",
+      }),
     type: interventionTypeEnum("type").notNull(),
     status: interventionStatusEnum("status")
       .notNull()

@@ -5,17 +5,15 @@ import { auth } from "@/lib/auth";
 import { getSession } from "@/lib/auth-session";
 import { sendEmailFromServer } from "@/lib/email/sendEmail";
 import { actionClient } from "@/lib/safe-actions";
-import { capitalize } from "@/lib/utils/capitalize";
 import { promoteTempLogoUrl } from "@/lib/utils/file-helper";
 import { generatePassword } from "@/lib/utils/generatePassword";
-import { formatSIRET } from "@/lib/utils/isValidSIRET";
 import {
   insertFournisseurToDbSchema,
   onboardFournisseurSchema,
-  updateFournisseurSchema,
-  UpdateFournisseurType,
+  updateFournisseurForAdminSchema,
+  UpdateFournisseurForAdminType,
 } from "@/zod-schemas/fournisseur";
-import { insertUserSchema, UpdateUserType } from "@/zod-schemas/user";
+import { insertUserSchema } from "@/zod-schemas/user";
 import { eq, sql } from "drizzle-orm";
 import { getLocale } from "next-intl/server";
 import { flattenValidationErrors } from "next-safe-action";
@@ -62,11 +60,6 @@ export const onboardFournisseurAction = actionClient
       // 1) Insert fournisseur
       const fournisseurPayload = insertFournisseurToDbSchema.parse({
         ...fournisseur,
-        nomFournisseur: fournisseur.nomFournisseur?.toUpperCase(),
-        siret: fournisseur.siret ? formatSIRET(fournisseur.siret) : null,
-        prenomContact: capitalize(fournisseur.prenomContact),
-        nomContact: capitalize(fournisseur.nomContact),
-        emailContact: fournisseur.emailContact?.toLowerCase(),
         logoUrl: promotedLogoUrl ?? null,
         createdById,
         updatedById,
@@ -121,6 +114,7 @@ export const onboardFournisseurAction = actionClient
       const insertedUser = await auth.api.signUpEmail({
         body: {
           ...fournisseurUserAdmin,
+          fournisseurId: insertedFournisseur.id,
           password: tempPassword,
         },
       });
@@ -171,112 +165,21 @@ export const onboardFournisseurAction = actionClient
     };
   });
 
-export const updateFournisseurAction = actionClient
-  .metadata({ actionName: "updateFournisseurAction" })
-  .inputSchema(updateFournisseurSchema, {
-    handleValidationErrorsShape: async (ve) =>
-      flattenValidationErrors(ve).fieldErrors,
-  })
-  .action(
-    async ({
-      parsedInput: fournisseurInput,
-    }: {
-      parsedInput: UpdateFournisseurType;
-    }) => {
-      const locale = await getLocale();
-      const currentUser = (await getSession())?.user;
-      if (!currentUser) {
-        return {
-          success: false,
-          message:
-            locale === "fr"
-              ? "Vous devez être connecté pour mettre à jour vote compte fournisseur."
-              : "You must be logged in to update your provider account.",
-        };
-      }
-      if (currentUser?.fournisseurId !== fournisseurInput.id) {
-        return {
-          success: false,
-          message:
-            locale === "fr"
-              ? "Vous n'avez pas les droits pour mettre à jour le compte de ce fournisseur."
-              : "You do not have permission to update this provider account.",
-        };
-      }
-
-      // Promouvoir le logo temporaire vers un chemin définitif
-      const promotedLogoUrl = await promoteTempLogoUrl(
-        fournisseurInput.logoUrl,
-      );
-
-      const fournisseurToUpdate: UpdateFournisseurType = {
-        ...fournisseurInput,
-        nomFournisseur: fournisseurInput.nomFournisseur?.toUpperCase(),
-        siret: fournisseurInput.siret
-          ? formatSIRET(fournisseurInput.siret)
-          : "",
-        prenomContact: capitalize(fournisseurInput.prenomContact),
-        nomContact: capitalize(fournisseurInput.nomContact),
-        emailContact: fournisseurInput.emailContact?.toLowerCase(),
-        logoUrl: promotedLogoUrl ?? undefined,
-      };
-
-      const resultFournisseur = await db
-        .update(fournisseurs)
-        .set(fournisseurToUpdate)
-        .where(eq(fournisseurs.id, fournisseurToUpdate.id ?? 0))
-        .returning();
-
-      //mettre à jour l'avatar du fournisseur
-      const correspondingUser = await db
-        .select()
-        .from(user)
-        .where(eq(user.fournisseurId, fournisseurToUpdate.id ?? 0))
-        .limit(1);
-
-      if (correspondingUser.length > 0) {
-        const userToUpdate: UpdateUserType = {
-          ...correspondingUser[0],
-          image: promotedLogoUrl ?? undefined,
-        };
-        await db
-          .update(user)
-          .set(userToUpdate)
-          .where(eq(user.id, correspondingUser[0].id));
-      }
-
-      return {
-        success: true,
-        message:
-          locale === "fr"
-            ? "Votre profil a bien été mis à jour."
-            : "Your profile has been successfully updated.",
-        data: { fournisseur: resultFournisseur[0] },
-      };
-    },
-  );
-
 // ======================= ADMIN: updateFournisseurForAdminAction ==========================//
 
 import {
   adminFournisseursQueryBackendSchema,
-  updateFournisseurForAdminFormSchema,
-  UpdateFournisseurForAdminFormType,
-  updateFournissuerInDbSchema,
+  updateFournisseurInDbSchema,
 } from "@/zod-schemas/fournisseur";
 
 export const updateFournisseurForAdminAction = actionClient
   .metadata({ actionName: "updateFournisseurForAdminAction" })
-  .inputSchema(updateFournisseurForAdminFormSchema, {
+  .inputSchema(updateFournisseurForAdminSchema, {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
   })
   .action(
-    async ({
-      parsedInput,
-    }: {
-      parsedInput: UpdateFournisseurForAdminFormType;
-    }) => {
+    async ({ parsedInput }: { parsedInput: UpdateFournisseurForAdminType }) => {
       const locale = await getLocale();
       const session = await getSession();
       const currentUser = session?.user;
@@ -297,20 +200,15 @@ export const updateFournisseurForAdminAction = actionClient
         );
       }
 
-      const { id, fournisseur, services } = parsedInput;
+      const { fournisseur, services } = parsedInput;
 
       // Promouvoir le logo temporaire vers un chemin définitif
       const promotedLogoUrl = await promoteTempLogoUrl(fournisseur.logoUrl);
 
       const result = await db.transaction(async (tx) => {
         // 1) Update fournisseur
-        const fournisseurPayload = updateFournissuerInDbSchema.parse({
-          nomFournisseur: fournisseur.nomFournisseur?.toUpperCase(),
-          siret: fournisseur.siret ? formatSIRET(fournisseur.siret) : null,
-          prenomContact: capitalize(fournisseur.prenomContact),
-          nomContact: capitalize(fournisseur.nomContact),
-          emailContact: fournisseur.emailContact?.toLowerCase(),
-          phoneContact: fournisseur.phoneContact,
+        const fournisseurPayload = updateFournisseurInDbSchema.parse({
+          ...fournisseur,
           logoUrl: promotedLogoUrl ?? null,
           updatedById: currentUser.id,
         });
@@ -318,7 +216,7 @@ export const updateFournisseurForAdminAction = actionClient
         const [updatedFournisseur] = await tx
           .update(fournisseurs)
           .set(fournisseurPayload)
-          .where(eq(fournisseurs.id, id))
+          .where(eq(fournisseurs.id, fournisseur.id))
           .returning();
 
         if (!updatedFournisseur) {
@@ -332,27 +230,19 @@ export const updateFournisseurForAdminAction = actionClient
         // 2) Delete existing services-fournisseurs relations
         await tx
           .delete(servicesFournisseurs)
-          .where(eq(servicesFournisseurs.fournisseurId, id));
+          .where(eq(servicesFournisseurs.fournisseurId, fournisseur.id));
 
         // 3) Insert new services-fournisseurs relations
         if (services.length > 0) {
           const serviceFournisseurRecords = services.map(
             (serviceId: number) => ({
-              fournisseurId: id,
+              fournisseurId: fournisseur.id,
               serviceId,
             }),
           );
           await tx
             .insert(servicesFournisseurs)
             .values(serviceFournisseurRecords);
-        }
-
-        // 4) Mettre à jour l'avatar de l'utilisateur si logo fourni
-        if (promotedLogoUrl) {
-          await tx
-            .update(user)
-            .set({ image: promotedLogoUrl })
-            .where(eq(user.fournisseurId, id));
         }
 
         return updatedFournisseur;

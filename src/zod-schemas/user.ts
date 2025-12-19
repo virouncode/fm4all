@@ -4,7 +4,7 @@ import {
   RawSearchParams,
 } from "@/normalize/normalizeSearchParams";
 import { createSortSchema } from "@/zod-helpers/createSortSchema";
-import { capitalizeWords } from "@/zod-helpers/normalize";
+import { capitalizeWords, lower } from "@/zod-helpers/normalize";
 import {
   createInsertSchema,
   createSelectSchema,
@@ -45,7 +45,7 @@ export const insertUserFormSchema = z.object({
     .string()
     .min(1, "Le nom est obligatoire")
     .transform((val) => capitalizeWords(val)),
-  email: z.email("Email invalide").transform((val) => val.toLowerCase()),
+  email: z.email("Email invalide").transform((val) => lower(val)),
   role: userRoleSchema,
   phone: phoneNumberSchema("N° de téléphone invalide"),
   avatarAttachment: z

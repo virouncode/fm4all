@@ -44,7 +44,7 @@ export const updateFournisseurSchema = createUpdateSchema(fournisseurs)
 
 export type UpdateFournisseurType = z.infer<typeof updateFournisseurSchema>;
 
-export const updateFournissuerInDbSchema = updateFournisseurSchema
+export const updateFournisseurInDbSchema = updateFournisseurSchema
   .extend({
     updatedById: z
       .string()
@@ -55,7 +55,7 @@ export const updateFournissuerInDbSchema = updateFournisseurSchema
   });
 
 export type UpdateFournisseurInDbType = z.infer<
-  typeof updateFournissuerInDbSchema
+  typeof updateFournisseurInDbSchema
 >;
 
 //======================= ONBOARD FOURNISSEUR SCHEMAS ==========================//
@@ -73,18 +73,47 @@ export const onboardFournisseurSchema = z.object({
 
 export type OnboardFournisseurType = z.infer<typeof onboardFournisseurSchema>;
 
+export const updateFournisseurForAdminSchema = z.object({
+  fournisseur: updateFournisseurSchema,
+  services: z
+    .array(z.number().int().positive())
+    .min(1, "Au moins un service requis"),
+});
+
+export type UpdateFournisseurForAdminType = z.infer<
+  typeof updateFournisseurForAdminSchema
+>;
+
 //======================= FORM SCHEMAS ==========================//
 //On ne peut pas appliquer des transform de type mais on peut appliquer des transform de nettoyage
 
 export const onboardFournisseurFormSchema = z.object({
   fournisseur: z.object({
-    nomFournisseur: z.string().min(1, "Le nom du fournisseur est obligatoire"),
+    nomFournisseur: z
+      .string()
+      .min(1, "Le nom du fournisseur est obligatoire")
+      .transform((v) => upper(v)),
     siret: siretSchema("SIRET invalide"),
-    prenomContact: z.string().min(1, "Le prénom du contact est obligatoire"),
-    nomContact: z.string().min(1, "Le nom du contact est obligatoire"),
-    emailContact: z.string().email("Email du contact invalide"),
+    prenomContact: z
+      .string()
+      .min(1, "Le prénom du contact est obligatoire")
+      .transform((v) => capitalizeWords(v)),
+    nomContact: z
+      .string()
+      .min(1, "Le nom du contact est obligatoire")
+      .transform((v) => capitalizeWords(v)),
+    emailContact: z
+      .email("Email du contact invalide")
+      .transform((v) => lower(v)),
     phoneContact: phoneNumberSchema("Numéro de téléphone du contact invalide"),
-    logoUrl: z.string().url("URL invalide").nullable().optional(),
+    logoAttachment: z
+      .object({
+        url: z.url("URL invalide"),
+        filename: z.string(),
+        mimeType: z.string(),
+        size: z.number(),
+      })
+      .nullable(),
   }),
   services: z
     .array(z.number().int().positive())
@@ -96,21 +125,14 @@ export type OnboardFournisseurFormType = z.infer<
 >;
 
 // Schéma de mise à jour d'un fournisseur par l'admin (avec services)
-export const updateFournisseurForAdminFormSchema = z.object({
-  id: z.number().positive("ID du fournisseur invalide"),
-  fournisseur: z.object({
-    nomFournisseur: z.string().min(1, "Le nom du fournisseur est obligatoire"),
-    siret: siretSchema("SIRET invalide"),
-    prenomContact: z.string().min(1, "Le prénom du contact est obligatoire"),
-    nomContact: z.string().min(1, "Le nom du contact est obligatoire"),
-    emailContact: z.string().email("Email du contact invalide"),
-    phoneContact: phoneNumberSchema("Numéro de téléphone du contact invalide"),
-    logoUrl: z.string().url("URL invalide").nullable().optional(),
-  }),
-  services: z
-    .array(z.number().int().positive())
-    .min(1, "Ajoutez au moins un service"),
-});
+export const updateFournisseurForAdminFormSchema =
+  onboardFournisseurFormSchema.extend({
+    fournisseur: onboardFournisseurFormSchema.shape.fournisseur
+      .partial()
+      .extend({
+        id: z.number().positive("ID du fournisseur invalide"),
+      }),
+  });
 
 export type UpdateFournisseurForAdminFormType = z.infer<
   typeof updateFournisseurForAdminFormSchema
@@ -125,6 +147,7 @@ import {
   RawSearchParams,
 } from "@/normalize/normalizeSearchParams";
 import { createSortSchema } from "@/zod-helpers/createSortSchema";
+import { capitalizeWords, lower, upper } from "@/zod-helpers/normalize";
 import { siretSchema } from "./siret";
 
 // Colonnes triables

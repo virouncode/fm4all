@@ -12,6 +12,7 @@ import {
 import { Form } from "@/components/ui/form";
 import { Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/hooks/use-toast";
+import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
   SelectClientType,
   UpdateClientFormType,
@@ -42,32 +43,34 @@ const AdminUpdateClientForm = ({ client }: AdminUpdateClientFormProps) => {
     defaultValues,
   });
 
-  const { execute, isPending } = useAction(updateClientAction, {
-    onSuccess: ({ data }) => {
-      if (data?.success) {
+  const { execute: executeUpdateClient, isPending } = useAction(
+    updateClientAction,
+    {
+      onSuccess: ({ data }) => {
+        if (data?.success) {
+          toast({
+            title: "Succès",
+            description: data.message,
+            variant: "default",
+          });
+          router.refresh();
+        }
+      },
+      onError: ({ error }) => {
         toast({
-          title: "Succès",
-          description: data.message,
-          variant: "default",
+          title: "Erreur",
+          description: error.serverError ?? "Une erreur est survenue.",
+          variant: "destructive",
         });
-        router.refresh();
-      }
+      },
     },
-    onError: ({ error }) => {
-      toast({
-        title: "Erreur",
-        description: error.serverError ?? "Une erreur est survenue.",
-        variant: "destructive",
-      });
-    },
-  });
+  );
 
   const onSubmit = (data: UpdateClientFormType) => {
-    execute({
-      id: data.id,
-      nomEntreprise: data.nomEntreprise,
-      siret: data.siret || null,
+    const payload = normalizeForSubmit(data, {
+      optionalStrings: ["siret"] as const,
     });
+    executeUpdateClient(payload);
   };
 
   const isSubmitDisabled = isPending || !form.formState.isDirty;

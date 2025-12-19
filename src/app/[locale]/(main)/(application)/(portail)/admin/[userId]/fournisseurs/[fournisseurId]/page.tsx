@@ -5,7 +5,7 @@ import {
 } from "@/lib/queries/fournisseurs/getFournisseurs";
 import { getAllServices } from "@/lib/queries/services/getServices";
 import { notFound } from "next/navigation";
-import UpdateFournisseurForm from "./UpdateFournisseurForm";
+import AdminUpdateFournisseurForm from "./AdminUpdateFournisseurForm";
 
 type UpdateFournisseurPageProps = {
   params: Promise<{
@@ -15,9 +15,7 @@ type UpdateFournisseurPageProps = {
   }>;
 };
 
-const UpdateFournisseurPage = async ({
-  params,
-}: UpdateFournisseurPageProps) => {
+const page = async ({ params }: UpdateFournisseurPageProps) => {
   const { userId, fournisseurId } = await params;
   const fournisseurIdNum = parseInt(fournisseurId, 10);
 
@@ -53,7 +51,7 @@ const UpdateFournisseurPage = async ({
                 Modifiez les informations du fournisseur ci-dessous.
               </p>
             </div>
-            <UpdateFournisseurForm
+            <AdminUpdateFournisseurForm
               userId={userId}
               fournisseur={fournisseur}
               fournisseurServices={fournisseurServices}
@@ -66,4 +64,4 @@ const UpdateFournisseurPage = async ({
   );
 };
 
-export default UpdateFournisseurPage;
+export default page;

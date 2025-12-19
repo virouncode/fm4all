@@ -353,18 +353,26 @@ export default function AdminNavItems({ userId }: AdminNavItemsProps) {
 
                 {/* Dépenses & factures */}
                 <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive("depenses-et-factures")}
-                  >
+                  <SidebarMenuButton asChild isActive={isActive("depenses")}>
                     <Link
                       href={{
-                        pathname:
-                          "/admin/[userId]/contrats/depenses-et-factures",
+                        pathname: "/admin/[userId]/contrats/depenses",
                         params: { userId },
                       }}
                     >
-                      Dépenses & factures
+                      Dépenses
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={isActive("factures")}>
+                    <Link
+                      href={{
+                        pathname: "/admin/[userId]/contrats/factures",
+                        params: { userId },
+                      }}
+                    >
+                      Factures
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

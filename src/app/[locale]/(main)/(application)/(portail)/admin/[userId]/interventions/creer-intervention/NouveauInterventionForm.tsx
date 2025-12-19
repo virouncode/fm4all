@@ -179,6 +179,7 @@ export default function NouveauInterventionForm({
       requiredDates: ["dateDebutPrevue"] as const,
       optionalDates: ["dateFinPrevue"] as const,
       requiredNumbers: ["siteId", "fournisseurId", "ticketId"] as const,
+      optionalStrings: ["description"] as const,
     });
 
     executeInsertIntervention({

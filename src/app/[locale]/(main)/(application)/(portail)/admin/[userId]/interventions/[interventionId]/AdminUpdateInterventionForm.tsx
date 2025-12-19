@@ -76,22 +76,17 @@ export default function AdminUpdateInterventionForm({
 
   const submitForm = (data: UpdateInterventionFormType) => {
     const payload = normalizeForSubmit(data, {
-      optionalDates: ["dateDebutPrevue", "dateFinPrevue"] as const,
-      optionalNumbers: [
+      requiredDates: ["dateDebutPrevue"] as const,
+      optionalDates: ["dateFinPrevue"] as const,
+      requiredNumbers: [
         "siteId",
         "clientId",
         "fournisseurId",
         "ticketId",
       ] as const,
+      optionalStrings: ["description"] as const,
     });
-    // Convert null to undefined for compatibility
-    executeUpdateIntervention({
-      ...payload,
-      siteId: payload.siteId ?? undefined,
-      clientId: payload.clientId ?? undefined,
-      fournisseurId: payload.fournisseurId ?? undefined,
-      ticketId: payload.ticketId ?? undefined,
-    });
+    executeUpdateIntervention(payload);
   };
 
   const isSubmitDisabled = !isDirty || isSubmitting || isSavingIntervention;

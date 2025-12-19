@@ -93,13 +93,12 @@ const page = async ({
     titre: initialTicket.titre,
     type: initialTicket.type,
     categorie: initialTicket.categorie,
-    fournisseurId:
-      initialTicket.fournisseurId?.toString() ?? fournisseurs[0].id.toString(),
+    fournisseurId: initialTicket.fournisseurId.toString(),
     description: initialTicket.description ?? "",
     priorite: initialTicket.priorite,
     status: initialTicket.status,
     attachments: initialTicket.attachments ?? [],
-    siteId: initialTicket.siteId?.toString() ?? sites[0].id.toString(),
+    siteId: initialTicket.siteId.toString(),
   };
 
   return (
