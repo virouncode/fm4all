@@ -94,7 +94,7 @@ const NouveauFournisseurForm = ({
       lastName: data.fournisseur.nomContact,
       email: data.fournisseur.emailContact,
       phone: data.fournisseur.phoneContact,
-      role: "fournisseur" as const,
+      role: "fournisseur_admin" as const,
       fournisseurId: null,
       clientId: null,
       image: null,
