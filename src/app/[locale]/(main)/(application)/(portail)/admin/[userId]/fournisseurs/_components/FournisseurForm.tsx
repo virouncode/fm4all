@@ -158,12 +158,11 @@ const FournisseurForm = ({
         </FieldGroup>
 
         <FieldGroup className="mt-4 gap-2">
-          <FieldLegend>Logo (format carré 1:1, max 500 Ko)</FieldLegend>
+          <FieldLegend>Logo (max 500 Ko)</FieldLegend>
           <RhfFileInput<FournisseurFormValues>
             name="fournisseur.logoAttachment"
             folderName="fournisseurs-logos"
             maxSizeBytes={500 * 1024}
-            squareMandatory
             className="w-1/2"
             onValueChange={(val) => {
               setValue("fournisseur.logoAttachment.url", val?.url, {
