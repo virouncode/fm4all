@@ -96,7 +96,7 @@ const InterventionForm = <TFormValues,>({
     if (!stillValid) {
       setValue("siteId", "0", {
         shouldDirty: true,
-        shouldValidate: true,
+        shouldValidate: false,
       });
     }
   }, [filteredSites, selectedSiteId, setValue, userRole]);
@@ -114,7 +114,7 @@ const InterventionForm = <TFormValues,>({
     if (!stillValid) {
       setValue("ticketId", "0", {
         shouldDirty: true,
-        shouldValidate: true,
+        shouldValidate: false,
       });
     }
   }, [filteredTickets, selectedTicketId, setValue, userRole]);
