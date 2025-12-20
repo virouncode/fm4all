@@ -127,15 +127,7 @@ export const onboardFournisseurAction = actionClient
         );
       }
 
-      // 4) Mettre à jour l'avatar si logo fourni
-      if (promotedLogoUrl) {
-        await tx
-          .update(user)
-          .set({ image: promotedLogoUrl })
-          .where(eq(user.fournisseurId, insertedFournisseur.id));
-      }
-
-      // 5) Envoyer l'email
+      // 4) Envoyer l'email
       await sendEmailFromServer({
         to: fournisseurUserAdminPayload.email,
         from: "noreply@mg.fm4all.com",

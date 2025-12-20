@@ -18,6 +18,7 @@ import {
 } from "@/zod-schemas/intervention";
 import { SelectSiteType } from "@/zod-schemas/site";
 import { SelectTicketType } from "@/zod-schemas/ticket";
+import { DateTime } from "luxon";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react"; // 🆕
 import { useFormContext } from "react-hook-form"; // 🆕
@@ -254,6 +255,7 @@ const InterventionForm = <TFormValues,>({
               timeFormat="24"
               timeDisabled={isReadOnly}
               dateDisabled={isReadOnly}
+              min={DateTime.now().toISODate()}
             />
 
             <RhfDateTimePicker<InterventionFormValues>
@@ -265,6 +267,7 @@ const InterventionForm = <TFormValues,>({
               timeFormat="24"
               timeDisabled={isReadOnly}
               dateDisabled={isReadOnly}
+              min={DateTime.now().toISODate()}
             />
           </div>
         </FieldGroup>

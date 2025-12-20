@@ -89,10 +89,12 @@ export const insertInterventionFormSchema = z.object({
     .min(1, "Le titre de l'intervention est obligatoire")
     .transform((v) => capitalizeFirstWord(v)),
   type: interventionTypeSchema,
-  siteId: z.string().min(1, "Le site est obligatoire"), //select
-  clientId: z.string().min(1, "Le client est obligatoire"), //select
-  ticketId: z.string().min(1, "Le ticket est obligatoire"), //select
-  fournisseurId: z.string().min(1, "Le prestataire est obligatoire"), //select
+  siteId: z.string().refine((val) => val !== "0", "Site obligatoire"),
+  clientId: z.string().refine((val) => val !== "0", "Client obligatoire"),
+  ticketId: z.string().refine((val) => val !== "0", "N°ticket obligatoire"),
+  fournisseurId: z
+    .string()
+    .refine((val) => val !== "0", "Prestataire obligatoire"), //select
   dateDebutPrevue: z.string().min(1, "La date de début prévue est obligatoire"),
   dateFinPrevue: z.string().optional(),
   description: z.string().optional(),
