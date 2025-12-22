@@ -54,8 +54,8 @@ const page = async ({ params }: { params: Promise<{ locale: string }> }) => {
           <iframe
             src={
               locale === "fr"
-                ? "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/cgv/CGV%20fm4all%2020250416-PHvyk70HWFDxvKTw2rRTjD513c0Rws.pdf"
-                : "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/cgv/T%26C%27s%20fm4all%2020250416-AHdw5e3gXVc4wUvfHb0HhwYbJoC6Tt.pdf"
+                ? "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/cgv/CGV%20fm4all%2020250416-3cWd57xG84FTKBYBot6WEpJQrZjE1J.pdf"
+                : "https://6njvcatb4pcugmyl.public.blob.vercel-storage.com/cgv/Terms%20and%20conditions%20%28CGV%20EN%29%2020250416-7v7RF6gJkp9PazUE7xhTunF93J1sea.pdf"
             }
             className="h-screen w-full"
           />
