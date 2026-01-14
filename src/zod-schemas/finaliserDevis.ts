@@ -4,7 +4,7 @@ import { z } from "zod";
 const finaliserDevisMontantsSchema = z.object({
   totalMensuelHt: z.number().int().nonnegative().default(0), //*10000
   totalInstallationHt: z.number().int().nonnegative().default(0), //*10000
-  margeCoefficient: z.number(),
+  margeCoefficient: z.coerce.number(),
 });
 export const finaliserDevisSchema = z.object({
   prospect: updateProspectSchema,

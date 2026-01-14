@@ -37,7 +37,9 @@ export type InsertDevisTemporaireType = z.infer<
 export const selectDevisSchema = createSelectSchema(devis);
 export type SelectDevisType = z.infer<typeof selectDevisSchema>;
 
-export const insertDevisSchema = createInsertSchema(devis).omit({
+export const insertDevisSchema = createInsertSchema(devis, {
+  margeCoefficient: z.coerce.string(), // numeric en DB retourne string, mais on accepte number aussi
+}).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
