@@ -17,7 +17,7 @@ import { postVercelBlob } from "@/lib/queries/vercel-blob/postVercelBlob";
 import fillDevis from "@/lib/utils/fillDevis";
 import { useCommentairesStore } from "@/stores/commentairesStore";
 import { useMonDevisStore } from "@/stores/monDevisStore";
-import { useProspectStore } from "@/stores/prospectStore";
+import { toStoreProspect, useProspectStore } from "@/stores/prospectStore";
 import { useTotalStore } from "@/stores/totalStore";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
@@ -107,7 +107,7 @@ const MonDevisForm = ({ setDevisUrl }: MonDevisFormProps) => {
           });
           return;
         }
-        setProspect(data.data.prospect);
+        setProspect(toStoreProspect(data.data.prospect));
         setDevisUrl(data.data.devisUrl);
         setMonDevis({ currentMonDevisId: 2 });
         toast({

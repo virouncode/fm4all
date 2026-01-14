@@ -1,6 +1,6 @@
 "use client";
 
-import { InsertProspectType } from "@/zod-schemas/prospect";
+import { InsertProspectType, SelectProspectType } from "@/zod-schemas/prospect";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -106,3 +106,32 @@ Comme un setState classique la fonction set prend en argument un objet partiel d
 leA
 En plus la fonction set merge le state (attention à un seul niveau, pas de nested merge) donc pas besoin d'utiliser le spread operator.
 */
+
+export function toStoreProspect(
+  prospect: SelectProspectType,
+): InsertProspectType & { id: number } {
+  return {
+    id: prospect.id,
+    nomEntreprise: prospect.nomEntreprise,
+    prenomContact: prospect.prenomContact,
+    nomContact: prospect.nomContact,
+    posteContact: prospect.posteContact,
+    emailContact: prospect.emailContact,
+    phoneContact: prospect.phoneContact,
+    surface: prospect.surface,
+    effectif: prospect.effectif,
+    typeBatiment: prospect.typeBatiment,
+    typeOccupation: prospect.typeOccupation,
+    codePostal: prospect.codePostal,
+    ville: prospect.ville,
+    siret: prospect.siret,
+    prenomSignataire: prospect.prenomSignataire,
+    nomSignataire: prospect.nomSignataire,
+    posteSignataire: prospect.posteSignataire,
+    emailSignataire: prospect.emailSignataire,
+    adresseLigne1: prospect.adresseLigne1,
+    adresseLigne2: prospect.adresseLigne2,
+    dateDeDemarrage: prospect.dateDeDemarrage,
+    commentaires: prospect.commentaires,
+  };
+}

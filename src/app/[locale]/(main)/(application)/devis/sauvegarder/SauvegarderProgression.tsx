@@ -10,7 +10,7 @@ import { toast } from "@/hooks/use-toast";
 import { Link, useRouter } from "@/i18n/navigation";
 import { formatLocalStorageData } from "@/lib/utils/formatLocalStorageData";
 import { useDevisProgressStore } from "@/stores/devisProgressStore";
-import { useProspectStore } from "@/stores/prospectStore";
+import { toStoreProspect, useProspectStore } from "@/stores/prospectStore";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
   createInsertProspectFormSchema,
@@ -96,7 +96,7 @@ const SauvegarderProgression = () => {
         ].sort((a, b) => a - b);
 
         setDevisProgress({ currentStep: 6, completedSteps: newCompletedSteps });
-        setProspect(data.data.prospect);
+        setProspect(toStoreProspect(data.data.prospect));
 
         setIsLoading(true);
         //Pour donner le temps au toast de s'afficher avant de changer de page
