@@ -45,7 +45,7 @@ export const ticketCategorieCT = [
   { code: "autre", name: "Autre" },
 ] as const;
 
-export const serviceticketCategorieCodes = ticketCategorieCT.map(
+export const ticketCategorieCodes = ticketCategorieCT.map(
   (i) => i.code,
 ) as unknown as [
   (typeof ticketCategorieCT)[number]["code"],
