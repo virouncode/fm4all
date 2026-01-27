@@ -63,12 +63,12 @@ const ptComponents = {
         return null;
       }
       return (
-        <div className="relative mx-auto my-6 mb-20 h-[200px] w-full md:h-[400px]">
+        <div className="relative mx-auto my-6 mb-20 h-[200px] w-full rounded-md md:h-[400px] md:w-3/4">
           <Image
             src={urlFor(value).url()}
             alt={value.alt || "illustration du service et et de la ville"}
             fill
-            className="m-0 object-contain"
+            className="m-0 rounded-md object-cover"
             sizes="(min-width:768px) 100vw"
           />
         </div>
