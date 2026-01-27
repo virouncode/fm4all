@@ -73,7 +73,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent align="end">
         {session && user?.role && (
           <DropdownMenuItem
             asChild

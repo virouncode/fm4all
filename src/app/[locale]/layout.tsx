@@ -6,7 +6,6 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
-import { ThemeProvider } from "next-themes";
 import { Didact_Gothic, Geist, Inter } from "next/font/google";
 import { notFound } from "next/navigation";
 import "./globals.css";
@@ -79,17 +78,17 @@ export default async function LocalizedLayout({
         />
         <ConfirmProvider>
           <NextIntlClientProvider>
-            <ThemeProvider
+            {/* <ThemeProvider
               attribute="class"
               defaultTheme="light"
               enableSystem
               disableTransitionOnChange
-            >
-              <Analytics />
-              <SpeedInsights />
-              {children}
-              <Toaster />
-            </ThemeProvider>
+            > */}
+            <Analytics />
+            <SpeedInsights />
+            {children}
+            <Toaster />
+            {/* </ThemeProvider> */}
           </NextIntlClientProvider>
         </ConfirmProvider>
       </body>

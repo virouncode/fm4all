@@ -134,7 +134,7 @@ const LocaleButton = ({ className }: LocaleButtonProps) => {
           {locale === "fr" ? "🇫🇷" : "🇬🇧"} {locale.toUpperCase()}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent align="start">
         {routing.locales.map((l) => (
           <DropdownMenuCheckboxItem
             key={l}

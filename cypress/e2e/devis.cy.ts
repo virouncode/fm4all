@@ -57,7 +57,6 @@ describe("Parcours devis", { viewportHeight: 850, viewportWidth: 1400 }, () => {
     cy.url().should("include", "/mes-services", { timeout: 50000 });
 
     // ➤ Étape 3 : Nettoyage
-
     cy.get("[data-testid='next-service-button']").eq(0).click();
     cy.get("[data-testid='nettoyage-proposition-switch']").eq(2).click();
     verifyMontantService(

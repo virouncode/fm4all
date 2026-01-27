@@ -5,6 +5,7 @@ import LocaleButton from "@/components/buttons/locale-button";
 import UserButton from "@/components/buttons/UserButton";
 import { Link } from "@/i18n/navigation";
 import { PathnamesType } from "@/i18n/routing";
+import { cn } from "@/lib/utils";
 import {
   Banana,
   Building,
@@ -39,6 +40,7 @@ import HeaderNavigationMenu from "./header-navigation-menu";
 
 const Header = () => {
   const locale = useLocale();
+  // const { theme } = useTheme();
 
   // const tGlobal = useTranslations("Global");
   // const t = useTranslations("header");
@@ -365,7 +367,9 @@ const Header = () => {
       <header className="mx-auto flex h-full max-w-7xl items-center justify-between p-6">
         <div className="flex items-center gap-6">
           <Link href="/" data-testid="home-link">
-            <div className="relative h-[23px] w-[100px]">
+            <div
+              className={cn("relative h-[29px] w-[110px] rounded-sm px-4 py-2")}
+            >
               <Image
                 src="/img/logo_full.webp"
                 alt="fm4all-Logo"

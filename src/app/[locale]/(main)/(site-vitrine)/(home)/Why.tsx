@@ -56,7 +56,7 @@ const Why = () => {
           <strong>{t("le-probleme")}</strong>{" "}
           {t("un-marche-complexe-pour-les-petites-structures")}
         </p>
-        <div className="mx-auto flex w-full flex-col overflow-hidden rounded-xl border bg-[rgb(250,250,250)] text-sm md:flex-row lg:w-3/4">
+        <div className="bg-background mx-auto flex w-full flex-col overflow-hidden rounded-xl border text-sm md:flex-row lg:w-3/4">
           <div className="order-last flex w-full flex-col gap-4 p-6 italic md:order-first md:w-2/3 md:px-16 md:py-10">
             <p>
               {t(

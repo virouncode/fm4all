@@ -1,6 +1,5 @@
 "use client";
 
-import { usePathname } from "@/i18n/navigation";
 import { Menu, X } from "lucide-react";
 import { useLocale } from "next-intl";
 import { Suspense } from "react";
@@ -20,7 +19,6 @@ const HeaderButtons = ({
   setIsMobileNavOpen,
 }: HeaderButtonsProps) => {
   const locale = useLocale();
-  const path = usePathname();
   const handleShowMobileNav = () => {
     setIsMobileNavOpen(true);
   };
@@ -43,6 +41,9 @@ const HeaderButtons = ({
       >
         <LocaleButton className="hidden md:flex" />
       </Suspense>
+      {/* <div className="hidden lg:flex">
+        <ModeToggle />
+      </div> */}
       <ContactButton
         setIsMobileNavOpen={setIsMobileNavOpen}
         className="hidden md:flex"

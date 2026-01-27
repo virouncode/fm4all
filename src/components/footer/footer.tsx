@@ -20,11 +20,11 @@ const Footer = async () => {
   ]);
 
   return (
-    <footer className="from-primary/100 to-primary/60 bg-gradient-to-r">
+    <footer className="from-primary/100 to-primary/60 bg-white bg-gradient-to-r">
       <div className="mx-auto max-w-7xl p-6">
         <div className="flex flex-wrap gap-6">
           <div className="flex w-52 flex-col gap-2">
-            <ul className="text-secondary flex flex-col gap-2 text-sm">
+            <ul className="text-primary-foreground flex flex-col gap-2 text-sm">
               <li className="text-xl">
                 <Link
                   href="/"
@@ -69,7 +69,7 @@ const Footer = async () => {
             </ul>
           </div>
           <div className="flex w-52 flex-col gap-2">
-            <ul className="text-secondary flex flex-col gap-2 text-sm">
+            <ul className="text-primary-foreground flex flex-col gap-2 text-sm">
               <li className="text-xl">
                 <Link
                   href="/services"
@@ -100,8 +100,8 @@ const Footer = async () => {
             </ul>
           </div>
           <div className="flex w-52 flex-col gap-2">
-            <ul className="text-secondary flex flex-col gap-2 text-sm">
-              <li className="text-secondary text-xl">
+            <ul className="text-primary-foreground flex flex-col gap-2 text-sm">
+              <li className="text-primary-foreground text-xl">
                 <Link href="/secteurs">{t("secteurs")}</Link>
               </li>
               {secteurs.map((secteur) => {
@@ -122,8 +122,8 @@ const Footer = async () => {
             </ul>
           </div>
           <div className="flex w-52 flex-col gap-2">
-            <ul className="text-secondary flex flex-col gap-2 text-sm">
-              <li className="text-secondary text-xl">
+            <ul className="text-primary-foreground flex flex-col gap-2 text-sm">
+              <li className="text-primary-foreground text-xl">
                 <Link href="/blog">{t("derniers-articles")}</Link>
               </li>
               {articles.map((article) => {
@@ -146,8 +146,10 @@ const Footer = async () => {
             </ul>
           </div>
           <div className="flex w-52 flex-col gap-2">
-            <p className="text-secondary text-xl">{t("prestataires")}</p>
-            <ul className="text-secondary flex flex-col gap-2 text-sm">
+            <p className="text-primary-foreground text-xl">
+              {t("prestataires")}
+            </p>
+            <ul className="text-primary-foreground flex flex-col gap-2 text-sm">
               <li>
                 <Link href="/prestataire">{t("devenir-prestataire")}</Link>
               </li>

@@ -3,9 +3,10 @@ import Image from "next/image";
 
 const Slogan = () => {
   const t = useTranslations("Global");
+
   return (
-    <section className="relative mx-auto flex w-full max-w-7xl flex-col items-center justify-center gap-6 p-12 lg:flex-row lg:gap-10">
-      <div className="relative h-[50px] w-[200px] overflow-hidden rounded-xl">
+    <section className="relative mx-auto flex w-full max-w-7xl flex-col items-center justify-center gap-6 rounded-sm p-12 lg:flex-row lg:gap-10">
+      <div className="relative h-[50px] w-[200px] overflow-hidden">
         <Image
           src={"/img/logo_full.webp"}
           alt={"logo-fm4all"}
