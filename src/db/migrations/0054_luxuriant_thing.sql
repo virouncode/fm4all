@@ -1,1 +1,0 @@
-ALTER TABLE "alarmes_tarifs" RENAME COLUMN "nb_ponts" TO "nb_points";

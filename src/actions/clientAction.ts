@@ -1,15 +1,15 @@
 "use server";
 
 import { db } from "@/db";
-import { auth } from "@/lib/auth";
-import { getSession } from "@/lib/auth-session";
+import { actionClient } from "@/lib/action/safe-actions";
 import { sendEmailFromServer } from "@/lib/email/sendEmail";
-import { actionClient } from "@/lib/safe-actions";
 import { generatePassword } from "@/lib/utils/generatePassword";
+import { auth } from "@/server/auth/auth";
+import { getSession } from "@/server/auth/get-session";
 import {
   insertClientToDbSchema,
   onboardClientSchema,
-} from "@/zod-schemas/client";
+} from "@/zod-schemas/client.schema";
 import { insertSiteToDbSchema } from "@/zod-schemas/site";
 import { insertUserSchema } from "@/zod-schemas/user";
 import { eq, sql } from "drizzle-orm";
@@ -161,7 +161,7 @@ export const onboardClientAction = actionClient
   });
 
 // Schema pour l'action admin pour récupérer les fournisseurs d'un client
-import { getClientFournisseurs } from "@/lib/queries/clients/getClients";
+import { getClientFournisseurs } from "@/server/queries_a_classer/clients/getClients";
 import { z } from "zod";
 
 const getClientFournisseursForAdminSchema = z.object({
@@ -203,8 +203,8 @@ export const getClientFournisseursForAdminAction = actionClient
 
 // ======================= ADMIN: getAllClientsAction ==========================//
 
-import { getAllClientsWithPagination } from "@/lib/queries/clients/getClients";
-import { clientsQueryBackendSchema } from "@/zod-schemas/client";
+import { getAllClientsWithPagination } from "@/server/queries_a_classer/clients/getClients";
+import { clientsQueryBackendSchema } from "@/zod-schemas/client.schema";
 
 export const getAllClientsAction = actionClient
   .metadata({ actionName: "getAllClientsAction" })
@@ -245,7 +245,7 @@ export const getAllClientsAction = actionClient
 import {
   updateClientInDbSchema,
   updateClientSchema,
-} from "@/zod-schemas/client";
+} from "@/zod-schemas/client.schema";
 
 export const updateClientAction = actionClient
   .metadata({ actionName: "updateClientAction" })

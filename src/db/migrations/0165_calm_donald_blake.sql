@@ -1,1 +1,0 @@
-DROP INDEX "prospects_email_nom_udx";

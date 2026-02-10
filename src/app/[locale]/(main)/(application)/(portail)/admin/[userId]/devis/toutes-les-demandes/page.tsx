@@ -1,9 +1,9 @@
 import { LocaleType } from "@/i18n/routing";
-import { getClients } from "@/lib/queries/clients/getClients";
-import { getFournisseurs } from "@/lib/queries/fournisseurs/getFournisseurs";
-import { getSites } from "@/lib/queries/sites/getSites";
-import { getAllDevisTickets } from "@/lib/queries/tickets/getTickets";
 import { RawSearchParams } from "@/normalize/normalizeSearchParams";
+import { getClients } from "@/server/queries_a_classer/clients/getClients";
+import { getFournisseurs } from "@/server/queries_a_classer/fournisseurs/getFournisseurs";
+import { getSites } from "@/server/queries_a_classer/sites/getSites";
+import { getAllDevisTickets } from "@/server/queries_a_classer/tickets/getTickets";
 import { parseAdminTicketsQuery } from "@/zod-schemas/ticket";
 import AdminTicketsFiltersForm from "../../tickets/tous-les-tickets/AdminTicketsFiltersForm";
 import AdminTicketsTable from "../../tickets/tous-les-tickets/AdminTicketsTable";

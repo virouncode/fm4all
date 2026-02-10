@@ -1,9 +1,9 @@
-import { index, integer, pgTable, serial } from "drizzle-orm/pg-core";
-import { createdAt, updatedAt } from "../schema-helper";
+import { index, integer, pgTable } from "drizzle-orm/pg-core";
+import { createdAt, id, updatedAt } from "../schema-helper";
 import { gammeEnum, inclusEnum } from "./enums";
 
 export const servicesFm4AllTaux = pgTable("services_fm4all_taux", {
-  id: serial().primaryKey(),
+  id: id(),
   assurance: integer().notNull(),
   plateforme: integer().notNull(),
   minFacturationPlateforme: integer("min_facturation_plateforme").notNull(),
@@ -24,7 +24,7 @@ export const servicesFm4AllTaux = pgTable("services_fm4all_taux", {
 export const servicesFm4AllOffres = pgTable(
   "services_fm4all_offres",
   {
-    id: serial().primaryKey(),
+    id: id(),
     gamme: gammeEnum().notNull(),
     assurance: inclusEnum().notNull(),
     plateforme: inclusEnum().notNull(),

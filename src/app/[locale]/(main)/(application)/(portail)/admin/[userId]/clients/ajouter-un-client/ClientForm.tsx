@@ -12,7 +12,7 @@ import {
 import { SelectItem } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { typeBatimentCT, typeOccupationCT } from "@/constants/codeTables";
-import { OnboardClientFormType } from "@/zod-schemas/client";
+import { OnboardClientFormType } from "@/zod-schemas/client.schema";
 import { useTranslations } from "next-intl";
 
 type ClientFormProps = {

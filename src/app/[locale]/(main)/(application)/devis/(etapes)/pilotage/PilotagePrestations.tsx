@@ -2,11 +2,11 @@ import { Link } from "@/i18n/navigation";
 import {
   getOfficeManagerQuantites,
   getOfficeManagerTarifs,
-} from "@/lib/queries/office-manager/getOfficeManager";
+} from "@/server/queries_a_classer/office-manager/getOfficeManager";
 import {
   getServicesFm4AllOffres,
   getServicesFm4AllTaux,
-} from "@/lib/queries/services-fm4all/getServicesFm4All";
+} from "@/server/queries_a_classer/services-fm4all/getServicesFm4All";
 import { getTranslations } from "next-intl/server";
 import OfficeManager from "./(office-manager)/OfficeManager";
 import ServicesFm4All from "./(services-fm4all)/ServicesFm4All";

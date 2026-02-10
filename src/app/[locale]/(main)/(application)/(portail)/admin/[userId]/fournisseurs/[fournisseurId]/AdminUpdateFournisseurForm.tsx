@@ -3,7 +3,7 @@
 import { updateFournisseurForAdminAction } from "@/actions/fournisseurAction";
 import { Form } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
-import { getAllServices } from "@/lib/queries/services/getServices";
+import { getAllServices } from "@/server/queries_a_classer/services/getServices";
 import {
   SelectFournisseurType,
   updateFournisseurForAdminFormSchema,

@@ -1,11 +1,13 @@
-import { index, integer, pgTable, serial, varchar } from "drizzle-orm/pg-core";
-import { createdAt, updatedAt } from "../schema-helper";
+import { index, integer, pgTable, uuid, varchar } from "drizzle-orm/pg-core";
+import { createdAt, id, updatedAt } from "../schema-helper";
+import { documents } from "./documents";
+import { entreprises } from "./entreprises";
 import { gammeEnum } from "./enums";
 
 export const officeManagerQuantites = pgTable(
   "office_manager_quantites",
   {
-    id: serial().primaryKey(),
+    id: id(),
     effectif: integer().notNull(),
     surface: integer().notNull(),
     gamme: gammeEnum().notNull(),
@@ -26,16 +28,22 @@ export const officeManagerQuantites = pgTable(
 export const officeManagerTarifs = pgTable(
   "office_manager_tarifs",
   {
-    id: serial().primaryKey(),
-    fournisseurId: integer("fournisseur_id").notNull(),
+    id: id(),
+    entrepriseId: uuid("entreprise_id")
+      .notNull()
+      .references(() => entreprises.id, {
+        onDelete: "cascade",
+      }),
     demiTjm: integer("demi_tjm").notNull(),
     demiTjmPremium: integer("demi_tjm_premium").notNull(),
-    imageUrl: varchar("image_url"),
+    imageId: uuid("image_id").references(() => documents.id, {
+      onDelete: "set null",
+    }),
     infos: varchar(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
   (table) => [
-    index("office_manager_tarifs_fournisseur_idx").on(table.fournisseurId),
+    index("office_manager_tarifs_entreprise_idx").on(table.entrepriseId),
   ],
 );

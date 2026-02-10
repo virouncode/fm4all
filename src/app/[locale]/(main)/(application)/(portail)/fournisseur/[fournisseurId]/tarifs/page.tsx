@@ -1,7 +1,7 @@
 import ServicePresentationCard from "@/components/cards/ServicePresentationCard";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
-import { getServicesForFournisseur } from "@/lib/queries/services/getServices";
+import { getServicesForFournisseur } from "@/server/queries_a_classer/services/getServices";
 
 const page = async ({
   params,

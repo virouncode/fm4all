@@ -1,5 +1,5 @@
 import { LocaleType } from "@/i18n/routing";
-import { getDevisById } from "@/lib/queries/devis/getDevis";
+import { getDevisById } from "@/server/queries_a_classer/devis/getDevis";
 import Link from "next/link";
 
 const page = async ({

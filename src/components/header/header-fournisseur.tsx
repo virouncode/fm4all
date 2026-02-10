@@ -3,7 +3,7 @@
 import LocaleButton from "@/components/buttons/locale-button";
 import UserButton from "@/components/buttons/UserButton";
 import { Link, usePathname } from "@/i18n/navigation";
-import { useSession } from "@/lib/auth-client";
+import { useSession } from "@/lib/auth/auth-client";
 import { User } from "better-auth";
 import {
   Barcode,

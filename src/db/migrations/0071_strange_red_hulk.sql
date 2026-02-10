@@ -1,1 +1,0 @@
-DROP TABLE "nettoyage_quantites" CASCADE;

@@ -1,1 +1,0 @@
-DROP TABLE "nettoyage_repasse_tarifs" CASCADE;

@@ -1,5 +1,8 @@
 import { formatSIRET } from "@/lib/utils/isValidSIRET";
-import { InsertClientType, UpdateClientType } from "@/zod-schemas/client";
+import {
+  InsertClientType,
+  UpdateClientType,
+} from "@/zod-schemas/client.schema";
 import {
   emptyToNull,
   normalizeCapitalized,

@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { getProspects } from "@/lib/queries/prospects/getProspects";
+import { getProspects } from "@/server/queries_a_classer/prospects/getProspects";
 import {
   ProspectsQueryBackendType,
   SelectProspectType,

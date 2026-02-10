@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
-import { getAllServices } from "@/lib/queries/services/getServices";
+import { getAllServices } from "@/server/queries_a_classer/services/getServices";
 import {
   OnboardFournisseurFormType,
   UpdateFournisseurForAdminFormType,

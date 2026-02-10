@@ -1,1 +1,0 @@
-ALTER TABLE "boissons_quantites" RENAME COLUMN "consos_par_semaine" TO "consos_par_semaine_par_personne";

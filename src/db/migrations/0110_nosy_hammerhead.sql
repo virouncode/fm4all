@@ -1,1 +1,0 @@
-DROP TABLE "office_manager_tarifs" CASCADE;

@@ -1,5 +1,5 @@
 import { LocaleType } from "@/i18n/routing";
-import { getAllServices } from "@/lib/queries/services/getServices";
+import { getAllServices } from "@/server/queries_a_classer/services/getServices";
 import NouveauFournisseurForm from "./NouveauFournisseurForm";
 
 const page = async ({

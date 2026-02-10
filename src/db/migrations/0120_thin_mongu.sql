@@ -1,1 +1,0 @@
-ALTER TABLE "fournisseurs" ALTER COLUMN "note_google" SET DATA TYPE varchar;

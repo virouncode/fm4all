@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";
-import { authClient, useSession } from "@/lib/auth-client";
+import { authClient, useSession } from "@/lib/auth/auth-client";
 import { User } from "better-auth";
 import { UserCheck, UserX } from "lucide-react";
 import { useTranslations } from "next-intl";

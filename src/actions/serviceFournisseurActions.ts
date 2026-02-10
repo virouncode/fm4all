@@ -1,10 +1,10 @@
 "use server";
 import { db } from "@/db";
 import { servicesFournisseurs } from "@/db/schema";
-import { getSession } from "@/lib/auth-session";
+import { actionClient } from "@/lib/action/safe-actions";
 import { invalidateCacheTag } from "@/lib/cache-invalidation";
 import { getFournisseurTag } from "@/lib/data-cache";
-import { actionClient } from "@/lib/safe-actions";
+import { getSession } from "@/server/auth/get-session";
 import {
   insertServiceFournisseurSchema,
   InsertServiceFournisseurType,

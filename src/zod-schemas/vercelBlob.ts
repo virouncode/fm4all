@@ -1,4 +1,4 @@
-import { ApiResponseBody } from "@/app/api/types/apiResponseBody";
+import { ApiResponseBody } from "@/app/api/types/apiResponse";
 
 // types/vercelBlob.ts (par exemple)
 export type VercelBlobUploadData = {

@@ -2,8 +2,8 @@ import { LocaleType } from "@/i18n/routing";
 import {
   getFournisseur,
   getFournisseurServices,
-} from "@/lib/queries/fournisseurs/getFournisseurs";
-import { getAllServices } from "@/lib/queries/services/getServices";
+} from "@/server/queries_a_classer/fournisseurs/getFournisseurs";
+import { getAllServices } from "@/server/queries_a_classer/services/getServices";
 import { notFound } from "next/navigation";
 import AdminUpdateFournisseurForm from "./AdminUpdateFournisseurForm";
 

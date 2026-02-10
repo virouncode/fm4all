@@ -1,36 +1,59 @@
-import { index, integer, pgTable, serial, varchar } from "drizzle-orm/pg-core";
-import { createdAt, updatedAt } from "../schema-helper";
+import {
+  index,
+  integer,
+  pgTable,
+  uniqueIndex,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
+import { createdAt, id, updatedAt } from "../schema-helper";
+import { documents } from "./documents";
+import { entreprises } from "./entreprises";
 import { gammeEnum } from "./enums";
 
 export const fruitsQuantites = pgTable(
   "fruits_quantites",
   {
-    id: serial().primaryKey(),
+    id: id(),
     gParSemaineParPersonne: integer("g_par_semaine_par_personne").notNull(),
     minKgParSemaine: integer("min_kg_par_semaine").notNull(),
     gamme: gammeEnum().notNull(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
-  (table) => [index("fruits_quantites_gamme_idx").on(table.gamme)],
+  (table) => [
+    index("fruits_quantites_gamme_idx").on(table.gamme),
+    uniqueIndex("fruits_quantites_gamme_udx").on(table.gamme),
+  ],
 );
 
 export const fruitsTarifs = pgTable(
   "fruits_tarifs",
   {
-    id: serial().primaryKey(),
-    fournisseurId: integer("fournisseur_id").notNull(),
+    id: id(),
+    entrepriseId: uuid("entreprise_id")
+      .notNull()
+      .references(() => entreprises.id, {
+        onDelete: "cascade",
+      }),
     effectif: integer().notNull(),
     prixKg: integer("prix_kg"),
     gamme: gammeEnum().notNull(),
-    imageUrl: varchar("image_url"),
+    imageId: uuid("image_id").references(() => documents.id, {
+      onDelete: "set null",
+    }),
     infos: varchar(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
   (table) => [
-    index("fruits_tarifs_fournisseur_gamme_effectif_idx").on(
-      table.fournisseurId,
+    index("fruits_tarifs_entreprise_gamme_effectif_idx").on(
+      table.entrepriseId,
+      table.gamme,
+      table.effectif,
+    ),
+    uniqueIndex("fruits_tarifs_entreprise_gamme_effectif_udx").on(
+      table.entrepriseId,
       table.gamme,
       table.effectif,
     ),
@@ -40,7 +63,7 @@ export const fruitsTarifs = pgTable(
 export const snacksQuantites = pgTable(
   "snacks_quantites",
   {
-    id: serial().primaryKey(),
+    id: id(),
     portionsParSemaineParPersonne: integer(
       "portions_par_semaine_par_personne",
     ).notNull(),
@@ -49,25 +72,39 @@ export const snacksQuantites = pgTable(
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
-  (table) => [index("snacks_quantites_gamme_idx").on(table.gamme)],
+  (table) => [
+    index("snacks_quantites_gamme_idx").on(table.gamme),
+    uniqueIndex("snacks_quantites_gamme_udx").on(table.gamme),
+  ],
 );
 
 export const snacksTarifs = pgTable(
   "snacks_tarifs",
   {
-    id: serial().primaryKey(),
-    fournisseurId: integer("fournisseur_id").notNull(),
+    id: id(),
+    entrepriseId: uuid("entreprise_id")
+      .notNull()
+      .references(() => entreprises.id, {
+        onDelete: "cascade",
+      }),
     effectif: integer().notNull(),
     prixUnitaire: integer("prix_unitaire"),
     gamme: gammeEnum().notNull(),
-    imageUrl: varchar("image_url"),
+    imageId: uuid("image_id").references(() => documents.id, {
+      onDelete: "set null",
+    }),
     infos: varchar(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
   (table) => [
-    index("snacks_tarifs_fournisseur_gamme_effectif_idx").on(
-      table.fournisseurId,
+    index("snacks_tarifs_entreprise_gamme_effectif_idx").on(
+      table.entrepriseId,
+      table.gamme,
+      table.effectif,
+    ),
+    uniqueIndex("snacks_tarifs_entreprise_gamme_effectif_udx").on(
+      table.entrepriseId,
       table.gamme,
       table.effectif,
     ),
@@ -77,7 +114,7 @@ export const snacksTarifs = pgTable(
 export const boissonsQuantites = pgTable(
   "boissons_quantites",
   {
-    id: serial().primaryKey(),
+    id: id(),
     consosParSemaineParPersonne: integer(
       "consos_par_semaine_par_personne",
     ).notNull(),
@@ -86,25 +123,39 @@ export const boissonsQuantites = pgTable(
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
-  (table) => [index("boissons_quantites_gamme_idx").on(table.gamme)],
+  (table) => [
+    index("boissons_quantites_gamme_idx").on(table.gamme),
+    uniqueIndex("boissons_quantites_gamme_udx").on(table.gamme),
+  ],
 );
 
 export const boissonsTarifs = pgTable(
   "boissons_tarifs",
   {
-    id: serial().primaryKey(),
-    fournisseurId: integer("fournisseur_id").notNull(),
+    id: id(),
+    entrepriseId: uuid("entreprise_id")
+      .notNull()
+      .references(() => entreprises.id, {
+        onDelete: "cascade",
+      }),
     effectif: integer().notNull(),
     prixUnitaire: integer("prix_unitaire"),
     gamme: gammeEnum().notNull(),
-    imageUrl: varchar("image_url"),
+    imageId: uuid("image_id").references(() => documents.id, {
+      onDelete: "set null",
+    }),
     infos: varchar(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
   (table) => [
-    index("boissons_tarifs_fournisseur_gamme_effectif_idx").on(
-      table.fournisseurId,
+    index("boissons_tarifs_entreprise_gamme_effectif_idx").on(
+      table.entrepriseId,
+      table.gamme,
+      table.effectif,
+    ),
+    uniqueIndex("boissons_tarifs_entreprise_gamme_effectif_udx").on(
+      table.entrepriseId,
       table.gamme,
       table.effectif,
     ),
@@ -114,8 +165,12 @@ export const boissonsTarifs = pgTable(
 export const foodLivraisonTarifs = pgTable(
   "food_livraison_tarifs",
   {
-    id: serial().primaryKey(),
-    fournisseurId: integer("fournisseur_id").notNull(),
+    id: id(),
+    entrepriseId: uuid("entreprise_id")
+      .notNull()
+      .references(() => entreprises.id, {
+        onDelete: "cascade",
+      }),
     freqAnnuelle: integer("freq_annuelle").notNull(),
     panierMin: integer("panier_min"),
     prixUnitaire: integer("prix_unitaire").notNull(),
@@ -126,8 +181,12 @@ export const foodLivraisonTarifs = pgTable(
     updatedAt: updatedAt(),
   },
   (table) => [
-    index("food_livraison_tarifs_fournisseur_freq_idx").on(
-      table.fournisseurId,
+    index("food_livraison_tarifs_entreprise_freq_idx").on(
+      table.entrepriseId,
+      table.freqAnnuelle,
+    ),
+    uniqueIndex("food_livraison_tarifs_entreprise_freq_udx").on(
+      table.entrepriseId,
       table.freqAnnuelle,
     ),
   ],

@@ -2,8 +2,8 @@
 
 import { getAllSitesAction } from "@/actions/sitesActions";
 import InfiniteDataTable from "@/components/tables/InfiniteDataTable";
-import { getAllSitesWithPagination } from "@/lib/queries/sites/getSites";
-import { SelectClientType } from "@/zod-schemas/client";
+import { getAllSitesWithPagination } from "@/server/queries_a_classer/sites/getSites";
+import { SelectClientType } from "@/zod-schemas/client.schema";
 import { AdminSitesQueryBackendType, SelectSiteType } from "@/zod-schemas/site";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";

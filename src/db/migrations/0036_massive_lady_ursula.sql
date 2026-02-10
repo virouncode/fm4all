@@ -1,1 +1,0 @@
--- ALTER TABLE "boissons_tarifs" ADD COLUMN "effectif" integer NOT NULL;

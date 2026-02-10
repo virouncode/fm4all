@@ -1,5 +1,5 @@
 import { LocaleType } from "@/i18n/routing";
-import { getClient } from "@/lib/queries/clients/getClients";
+import { getClient } from "@/server/queries_a_classer/clients/getClients";
 import { notFound } from "next/navigation";
 import AdminUpdateClientForm from "./AdminUpdateClientForm";
 

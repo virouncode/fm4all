@@ -1,4 +1,4 @@
-import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
+import GoogleTags from "@/components/analytics/GoogleTags";
 import { Toaster } from "@/components/ui/toaster";
 import { ConfirmProvider } from "@/context/ConfirmContextProvider";
 import { routing } from "@/i18n/routing";
@@ -50,6 +50,25 @@ export default async function LocalizedLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
+        <script
+          // IMPORTANT: exécuté au parsing HTML (plus tôt que next/script)
+          dangerouslySetInnerHTML={{
+            __html: `
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){window.dataLayer.push(arguments);}
+        window.gtag = gtag;
+
+        gtag('consent', 'default', {
+          analytics_storage: 'denied',
+          ad_storage: 'denied',
+          ad_user_data: 'denied',
+          ad_personalization: 'denied',
+          wait_for_update: 500
+        });
+      `,
+          }}
+        />
+
         {/* Preconnect pour les domaines critiques */}
         <link rel="preconnect" href="https://cdn.sanity.io" crossOrigin="" />
         <link
@@ -73,7 +92,7 @@ export default async function LocalizedLayout({
         <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
       </head>
       <body className={`scroll-smooth font-sans tracking-tight antialiased`}>
-        <GoogleAnalytics
+        <GoogleTags
           GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!}
         />
         <ConfirmProvider>

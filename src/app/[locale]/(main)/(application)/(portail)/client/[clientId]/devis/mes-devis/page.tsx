@@ -1,10 +1,10 @@
 import { LocaleType } from "@/i18n/routing";
+import { RawSearchParams } from "@/normalize/normalizeSearchParams";
 import {
   getClientDevis,
   getClientFournisseurs,
   getClientSites,
-} from "@/lib/queries/clients/getClients";
-import { RawSearchParams } from "@/normalize/normalizeSearchParams";
+} from "@/server/queries_a_classer/clients/getClients";
 import { parseDevisQuery } from "@/zod-schemas/devis";
 import { devisIdLabelMap } from "./createDevisColumns";
 import DevisFiltersForm from "./DevisFiltersForm";

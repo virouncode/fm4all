@@ -2,11 +2,11 @@
 
 import { db } from "@/db";
 import { user } from "@/db/schema";
-import { auth } from "@/lib/auth";
-import { getSession } from "@/lib/auth-session";
+import { actionClient } from "@/lib/action/safe-actions";
 import { sendEmailFromServer } from "@/lib/email/sendEmail";
-import { actionClient } from "@/lib/safe-actions";
 import { generatePassword } from "@/lib/utils/generatePassword";
+import { auth } from "@/server/auth/auth";
+import { getSession } from "@/server/auth/get-session";
 import { eq, sql } from "drizzle-orm";
 import { getLocale } from "next-intl/server";
 import { flattenValidationErrors } from "next-safe-action";

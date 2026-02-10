@@ -3,18 +3,22 @@ import {
   index,
   integer,
   pgTable,
-  serial,
+  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { createdAt, updatedAt } from "../schema-helper";
+import { createdAt, id, updatedAt } from "../schema-helper";
+import { documents } from "./documents";
+import { entreprises } from "./entreprises";
 import { typeEau, typePose } from "./enums";
 
 export const fontaines = pgTable("fontaines", {
-  id: serial().primaryKey(),
+  id: id(),
   marque: varchar().notNull(),
   modele: varchar().notNull(),
   infos: varchar(),
-  imageUrl: varchar("image_url"),
+  imageId: uuid("image_id").references(() => documents.id, {
+    onDelete: "set null",
+  }),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 });
@@ -22,8 +26,12 @@ export const fontaines = pgTable("fontaines", {
 export const fontainesTarifs = pgTable(
   "fontaines_tarifs",
   {
-    id: serial().primaryKey(),
-    fournisseurId: integer("fournisseur_id").notNull(),
+    id: id(),
+    entrepriseId: uuid("entreprise_id")
+      .notNull()
+      .references(() => entreprises.id, {
+        onDelete: "cascade",
+      }),
     type: typeEau().notNull(),
     typePose: typePose("type_pose").notNull(),
     nbPersonnes: integer("nb_personnes").notNull(),
@@ -42,14 +50,16 @@ export const fontainesTarifs = pgTable(
     paConsoEauChaude: integer("pa_conso_eau_chaude"),
     fontaineId: integer("fontaine_id"),
     reconditionne: boolean().default(false),
-    imageUrl: varchar("image_url"),
+    imageId: uuid("image_id").references(() => documents.id, {
+      onDelete: "set null",
+    }),
     infos: varchar(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
   (table) => [
-    index("fontaines_tarifs_fournisseur_type_nb_personnes_idx").on(
-      table.fournisseurId,
+    index("fontaines_tarifs_entreprise_type_nb_personnes_idx").on(
+      table.entrepriseId,
       table.type,
       table.nbPersonnes,
     ),

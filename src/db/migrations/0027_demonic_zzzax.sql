@@ -1,1 +1,0 @@
-ALTER TABLE "food_livraison_tarifs" RENAME COLUMN "panier_minimum" TO "panier_min";

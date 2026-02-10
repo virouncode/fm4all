@@ -1,8 +1,8 @@
 "use server";
 import { db } from "@/db";
-import { getSession } from "@/lib/auth-session";
-import { getClientSites } from "@/lib/queries/clients/getClients";
-import { actionClient } from "@/lib/safe-actions";
+import { actionClient } from "@/lib/action/safe-actions";
+import { getSession } from "@/server/auth/get-session";
+import { getClientSites } from "@/server/queries_a_classer/clients/getClients";
 import {
   insertSiteSchema,
   insertSiteToDbSchema,
@@ -213,7 +213,7 @@ export const getClientSitesForAdminAction = actionClient
 
 // ======================= ADMIN: getAllSitesAction ==========================//
 
-import { getAllSitesWithPagination } from "@/lib/queries/sites/getSites";
+import { getAllSitesWithPagination } from "@/server/queries_a_classer/sites/getSites";
 import { adminSitesQueryBackendSchema } from "@/zod-schemas/site";
 
 export const getAllSitesAction = actionClient

@@ -2,7 +2,7 @@
 
 import { getTicketsAction } from "@/actions/ticketsActions";
 import InfiniteDataTable from "@/components/tables/InfiniteDataTable";
-import { getTickets } from "@/lib/queries/tickets/getTickets";
+import { getTickets } from "@/server/queries_a_classer/tickets/getTickets";
 import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
 import { SelectSiteType } from "@/zod-schemas/site";
 import {

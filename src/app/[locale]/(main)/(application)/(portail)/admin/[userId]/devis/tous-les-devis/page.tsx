@@ -1,9 +1,9 @@
 import { LocaleType } from "@/i18n/routing";
-import { getClients } from "@/lib/queries/clients/getClients";
-import { getAllDevis } from "@/lib/queries/devis/getDevis";
-import { getFournisseurs } from "@/lib/queries/fournisseurs/getFournisseurs";
-import { getSites } from "@/lib/queries/sites/getSites";
 import { RawSearchParams } from "@/normalize/normalizeSearchParams";
+import { getClients } from "@/server/queries_a_classer/clients/getClients";
+import { getAllDevis } from "@/server/queries_a_classer/devis/getDevis";
+import { getFournisseurs } from "@/server/queries_a_classer/fournisseurs/getFournisseurs";
+import { getSites } from "@/server/queries_a_classer/sites/getSites";
 import { parseAdminDevisQuery } from "@/zod-schemas/devis";
 import AdminDevisFiltersForm from "./AdminDevisFiltersForm";
 import AdminDevisTable from "./AdminDevisTable";

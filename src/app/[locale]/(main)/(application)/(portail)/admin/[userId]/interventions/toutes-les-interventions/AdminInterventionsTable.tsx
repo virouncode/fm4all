@@ -2,8 +2,8 @@
 
 import { getAllInterventionsAction } from "@/actions/interventionsActions";
 import InfiniteDataTable from "@/components/tables/InfiniteDataTable";
-import { getAllInterventions } from "@/lib/queries/interventions/getInterventions";
-import { SelectClientType } from "@/zod-schemas/client";
+import { getAllInterventions } from "@/server/queries_a_classer/interventions/getInterventions";
+import { SelectClientType } from "@/zod-schemas/client.schema";
 import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
 import {
   AdminInterventionsQueryBackendType,

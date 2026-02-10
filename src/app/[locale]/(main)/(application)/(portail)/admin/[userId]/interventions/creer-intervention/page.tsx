@@ -1,5 +1,5 @@
-import { getClients } from "@/lib/queries/clients/getClients";
-import { getFournisseurs } from "@/lib/queries/fournisseurs/getFournisseurs";
+import { getClients } from "@/server/queries_a_classer/clients/getClients";
+import { getFournisseurs } from "@/server/queries_a_classer/fournisseurs/getFournisseurs";
 import { InsertInterventionFormType } from "@/zod-schemas/intervention";
 import { ReactNode } from "react";
 import NouveauInterventionForm from "./NouveauInterventionForm";

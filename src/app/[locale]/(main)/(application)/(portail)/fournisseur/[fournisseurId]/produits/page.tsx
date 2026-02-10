@@ -1,5 +1,5 @@
 import ServicePresentationCard from "@/components/cards/ServicePresentationCard";
-import { getServicesForFournisseur } from "@/lib/queries/services/getServices";
+import { getServicesForFournisseur } from "@/server/queries_a_classer/services/getServices";
 
 const page = async ({
   params,
@@ -10,7 +10,7 @@ const page = async ({
   const services = await getServicesForFournisseur(parseInt(fournisseurId));
 
   return (
-    <main className="mx-auto mb-24 max-w-7xl flex-1 hyphens-auto px-6 py-4 md:px-6">
+    <main className="mx-auto mb-24 max-w-7xl flex-1 px-6 py-4 hyphens-auto md:px-6">
       <section className="mt-2">
         <h1 className="mb-14 text-4xl">Mes produits</h1>
         <div className="flex flex-col gap-14">
@@ -40,7 +40,7 @@ const page = async ({
                 </div>
               </>
             ) : (
-              <p className="hyphens-auto text-center">
+              <p className="text-center hyphens-auto">
                 Veuillez ajouter un service dans &quot;Mes tarifs&quot;
               </p>
             )}

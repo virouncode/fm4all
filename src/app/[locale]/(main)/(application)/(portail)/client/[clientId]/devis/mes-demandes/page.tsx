@@ -1,10 +1,10 @@
 import { LocaleType } from "@/i18n/routing";
+import { RawSearchParams } from "@/normalize/normalizeSearchParams";
 import {
   getClientFournisseurs,
   getClientSites,
-} from "@/lib/queries/clients/getClients";
-import { getDevisTickets } from "@/lib/queries/tickets/getTickets";
-import { RawSearchParams } from "@/normalize/normalizeSearchParams";
+} from "@/server/queries_a_classer/clients/getClients";
+import { getDevisTickets } from "@/server/queries_a_classer/tickets/getTickets";
 import { parseTicketsQuery } from "@/zod-schemas/ticket";
 import { ticketsIdLabelMap } from "../../tickets/mes-tickets/createTicketsColumns";
 import TicketsFiltersForm from "../../tickets/mes-tickets/TicketsFiltersForm";

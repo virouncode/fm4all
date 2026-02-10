@@ -1,1 +1,0 @@
-ALTER TABLE "office_manager_tarifs" ALTER COLUMN "demi_tjm_premium" SET NOT NULL;

@@ -3,10 +3,12 @@ import {
   index,
   integer,
   pgTable,
-  serial,
+  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { createdAt, updatedAt } from "../schema-helper";
+import { createdAt, id, updatedAt } from "../schema-helper";
+import { documents } from "./documents";
+import { entreprises } from "./entreprises";
 import {
   gammeEnum,
   possibiliteEnum,
@@ -16,7 +18,7 @@ import {
 } from "./enums";
 
 export const cafeMachines = pgTable("cafe_machines", {
-  id: serial().primaryKey(),
+  id: id(),
   marque: varchar().notNull(),
   modele: varchar().notNull(),
   nbBoissons: integer("nb_boissons").notNull(),
@@ -27,7 +29,9 @@ export const cafeMachines = pgTable("cafe_machines", {
   lactee: boolean().notNull(),
   gourmande: boolean().notNull(),
   infos: varchar(),
-  imageUrl: varchar("image_url"),
+  imageId: uuid("image_id").references(() => documents.id, {
+    onDelete: "set null",
+  }),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 });
@@ -35,8 +39,12 @@ export const cafeMachines = pgTable("cafe_machines", {
 export const cafeMachinesTarifs = pgTable(
   "cafe_machines_tarifs",
   {
-    id: serial().primaryKey(),
-    fournisseurId: integer("fournisseur_id").notNull(),
+    id: id(),
+    entrepriseId: uuid("entreprise_id")
+      .notNull()
+      .references(() => entreprises.id, {
+        onDelete: "cascade",
+      }),
     type: typeMachineEnum().notNull(),
     nbPersonnes: integer("nb_personnes").notNull(),
     nbMachines: integer("nb_machines"),
@@ -52,16 +60,20 @@ export const cafeMachinesTarifs = pgTable(
     paMaintenance: integer("pa_maintenance"),
     nbPassages: integer("nb_passages"),
     fraisInstallation: integer("frais_installation"),
-    cafeMachineId: integer("cafe_machine_id"),
+    cafeMachineId: uuid("cafe_machine_id").references(() => cafeMachines.id, {
+      onDelete: "set null",
+    }),
     reconditionne: boolean().default(false),
-    imageUrl: varchar("image_url"),
+    imageId: uuid("image_id").references(() => documents.id, {
+      onDelete: "set null",
+    }),
     infos: varchar(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
   (table) => [
-    index("cafe_machines_tarifs_fournisseur_type_nb_personnes_idx").on(
-      table.fournisseurId,
+    index("cafe_machines_tarifs_entreprise_type_nb_personnes_idx").on(
+      table.entrepriseId,
       table.type,
       table.nbPersonnes,
     ),
@@ -72,19 +84,25 @@ export const cafeMachinesTarifs = pgTable(
 export const cafeConsoTarifs = pgTable(
   "cafe_conso_tarifs",
   {
-    id: serial().primaryKey(),
-    fournisseurId: integer("fournisseur_id").notNull(),
+    id: id(),
+    entrepriseId: uuid("entreprise_id")
+      .notNull()
+      .references(() => entreprises.id, {
+        onDelete: "cascade",
+      }),
     gamme: gammeEnum().notNull(),
     effectif: integer().notNull(),
     prixUnitaire: integer("prix_unitaire"),
-    imageUrl: varchar("image_url"),
+    imageId: uuid("image_id").references(() => documents.id, {
+      onDelete: "set null",
+    }),
     infos: varchar(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
   (table) => [
-    index("cafe_conso_tarifs_fournisseur_gamme_effectif_idx").on(
-      table.fournisseurId,
+    index("cafe_conso_tarifs_entreprise_gamme_effectif_idx").on(
+      table.entrepriseId,
       table.gamme,
       table.effectif,
     ),
@@ -94,19 +112,25 @@ export const cafeConsoTarifs = pgTable(
 export const theConsoTarifs = pgTable(
   "the_conso_tarifs",
   {
-    id: serial().primaryKey(),
-    fournisseurId: integer("fournisseur_id").notNull(),
+    id: id(),
+    entrepriseId: uuid("entreprise_id")
+      .notNull()
+      .references(() => entreprises.id, {
+        onDelete: "cascade",
+      }),
     gamme: gammeEnum().notNull(),
     effectif: integer().notNull(),
     prixUnitaire: integer("prix_unitaire"),
-    imageUrl: varchar("image_url"),
+    imageId: uuid("image_id").references(() => documents.id, {
+      onDelete: "set null",
+    }),
     infos: varchar(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
   (table) => [
-    index("the_conso_tarifs_fournisseur_gamme_effectif_idx").on(
-      table.fournisseurId,
+    index("the_conso_tarifs_entreprise_gamme_effectif_idx").on(
+      table.entrepriseId,
       table.gamme,
       table.effectif,
     ),
@@ -116,19 +140,26 @@ export const theConsoTarifs = pgTable(
 export const laitConsoTarifs = pgTable(
   "lait_conso_tarifs",
   {
-    id: serial().primaryKey(),
-    fournisseurId: integer("fournisseur_id").notNull(),
+    id: id(),
+    entrepriseId: uuid("entreprise_id")
+      .notNull()
+      .references(() => entreprises.id, {
+        onDelete: "cascade",
+      }),
     effectif: integer().notNull(),
     prixUnitaireDosette: integer("prix_unitaire_dosette"),
     prixUnitaireFrais: integer("prix_unitaire_frais"),
     prixUnitairePoudre: integer("prix_unitaire_poudre"),
+    imageId: uuid("image_id").references(() => documents.id, {
+      onDelete: "set null",
+    }),
     infos: varchar(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
   (table) => [
-    index("lait_conso_tarifs_fournisseur_effectif_idx").on(
-      table.fournisseurId,
+    index("lait_conso_tarifs_entreprise_effectif_idx").on(
+      table.entrepriseId,
       table.effectif,
     ),
   ],
@@ -137,18 +168,25 @@ export const laitConsoTarifs = pgTable(
 export const chocolatConsoTarifs = pgTable(
   "chocolat_conso_tarifs",
   {
-    id: serial().primaryKey(),
-    fournisseurId: integer("fournisseur_id").notNull(),
+    id: id(),
+    entrepriseId: uuid("entreprise_id")
+      .notNull()
+      .references(() => entreprises.id, {
+        onDelete: "cascade",
+      }),
     effectif: integer().notNull(),
     prixUnitaireSachet: integer("prix_unitaire_sachet"),
     prixUnitairePoudre: integer("prix_unitaire_poudre"),
+    imageId: uuid("image_id").references(() => documents.id, {
+      onDelete: "set null",
+    }),
     infos: varchar(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
   (table) => [
-    index("chocolat_conso_tarifs_fournisseur_effectif_idx").on(
-      table.fournisseurId,
+    index("chocolat_conso_tarifs_entreprise_effectif_idx").on(
+      table.entrepriseId,
       table.effectif,
     ),
   ],
@@ -157,17 +195,24 @@ export const chocolatConsoTarifs = pgTable(
 export const sucreConsoTarifs = pgTable(
   "sucre_conso_tarifs",
   {
-    id: serial().primaryKey(),
-    fournisseurId: integer("fournisseur_id").notNull(),
+    id: id(),
+    entrepriseId: uuid("entreprise_id")
+      .notNull()
+      .references(() => entreprises.id, {
+        onDelete: "cascade",
+      }),
     effectif: integer().notNull(),
     prixUnitaire: integer("prix_unitaire"),
+    imageId: uuid("image_id").references(() => documents.id, {
+      onDelete: "set null",
+    }),
     infos: varchar(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
   (table) => [
-    index("sucre_conso_tarifs_fournisseur_effectif_idx").on(
-      table.fournisseurId,
+    index("sucre_conso_tarifs_entreprise_effectif_idx").on(
+      table.entrepriseId,
       table.effectif,
     ),
   ],

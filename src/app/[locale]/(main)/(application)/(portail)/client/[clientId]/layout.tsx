@@ -1,6 +1,6 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { getSession } from "@/lib/auth-session";
-import { getUserById } from "@/lib/queries/users/getUsers";
+import { getSession } from "@/server/auth/get-session";
+import { getUserById } from "@/server/queries_a_classer/users/getUsers";
 import { ReactNode } from "react";
 import ClientSidebar from "./ClientSidebar";
 

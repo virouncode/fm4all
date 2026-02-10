@@ -1,9 +1,9 @@
 import { LocaleType } from "@/i18n/routing";
+import { RawSearchParams } from "@/normalize/normalizeSearchParams";
 import {
   getAllFournisseursWithPagination,
   getFournisseurs,
-} from "@/lib/queries/fournisseurs/getFournisseurs";
-import { RawSearchParams } from "@/normalize/normalizeSearchParams";
+} from "@/server/queries_a_classer/fournisseurs/getFournisseurs";
 import { parseAdminFournisseursQuery } from "@/zod-schemas/fournisseur";
 import AdminFournisseursFiltersForm from "./AdminFournisseursFiltersForm";
 import AdminFournisseursTable from "./AdminFournisseursTable";

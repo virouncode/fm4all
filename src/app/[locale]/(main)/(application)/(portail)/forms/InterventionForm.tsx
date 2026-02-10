@@ -9,7 +9,7 @@ import { FieldGroup, FieldSet } from "@/components/ui/field";
 import { SelectItem } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { interventionTypeCT } from "@/constants/codeTables";
-import { SelectClientType } from "@/zod-schemas/client";
+import { SelectClientType } from "@/zod-schemas/client.schema";
 import { UserRoleType } from "@/zod-schemas/enums";
 import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
 import {

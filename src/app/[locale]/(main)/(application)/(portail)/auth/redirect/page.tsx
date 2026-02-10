@@ -1,5 +1,5 @@
 import { redirect } from "@/i18n/navigation";
-import { getSession } from "@/lib/auth-session";
+import { getSession } from "@/server/auth/get-session";
 import { getLocale } from "next-intl/server";
 
 export default async function AuthRedirect() {

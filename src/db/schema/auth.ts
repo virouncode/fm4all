@@ -1,46 +1,46 @@
 import {
+  AnyPgColumn,
   boolean,
   index,
-  integer,
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
+  uuid,
 } from "drizzle-orm/pg-core";
-import { createdAt, updatedAt } from "../schema-helper";
-import { roleEnum } from "./enums";
+import { createdAt, id, updatedAt } from "../schema-helper";
+import { documents } from "./documents";
 
 export const user = pgTable(
   "user",
   {
-    id: text("id").primaryKey(),
+    id: id(),
     name: text("name").notNull(),
-    firstName: text("first_name").notNull(),
-    lastName: text("last_name").notNull(),
-    phone: text("phone").notNull(),
+    prenom: text("prenom").notNull(),
+    nom: text("nom").notNull(),
+    phone: text("phone"),
     email: text("email").unique().notNull(),
-    emailVerified: boolean("email_verified").notNull(),
+    emailVerified: boolean("email_verified").notNull().default(false),
     image: text("image"),
-    role: roleEnum("role").notNull(),
-    fournisseurId: integer("fournisseur_id"),
-    clientId: integer("client_id"),
+    avatarId: uuid("avatar_id").references((): AnyPgColumn => documents.id, {
+      onDelete: "set null",
+    }),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
+    createdById: uuid("created_by_id").references((): AnyPgColumn => user.id, {
+      onDelete: "set null",
+    }),
+    updatedById: uuid("updated_by_id").references((): AnyPgColumn => user.id, {
+      onDelete: "set null",
+    }),
   },
-  (table) => [
-    index("user_role_idx").on(table.role),
-    index("user_fournisseur_id_idx").on(table.fournisseurId),
-    index("user_email_idx").on(table.email),
-    index("user_client_id_idx").on(table.clientId),
-    index("user_first_name_idx").on(table.firstName),
-    index("user_last_name_idx").on(table.lastName),
-    index("user_phone_idx").on(table.phone),
-  ],
+  (table) => [index("user_phone_idx").on(table.phone)],
 );
 
 export const session = pgTable(
   "session",
   {
-    id: text("id").primaryKey(),
+    id: id(),
     expiresAt: timestamp("expires_at", {
       withTimezone: true,
       mode: "date",
@@ -49,7 +49,11 @@ export const session = pgTable(
     token: text("token").notNull().unique(),
     ipAddress: text("ip_address"),
     userAgent: text("user_agent"),
-    userId: text("user_id").notNull(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => user.id, {
+        onDelete: "cascade",
+      }),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
@@ -63,10 +67,12 @@ export const session = pgTable(
 export const account = pgTable(
   "account",
   {
-    id: text("id").primaryKey(),
+    id: id(),
     accountId: text("account_id").notNull(),
     providerId: text("provider_id").notNull(),
-    userId: text("user_id").notNull(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
     accessToken: text("access_token"),
     refreshToken: text("refresh_token"),
     idToken: text("id_token"),
@@ -87,14 +93,17 @@ export const account = pgTable(
   },
   (table) => [
     index("account_user_id_idx").on(table.userId),
-    index("account_provider_account_idx").on(table.providerId, table.accountId),
+    uniqueIndex("account_provider_account_udx").on(
+      table.providerId,
+      table.accountId,
+    ),
   ],
 );
 
 export const verification = pgTable(
   "verification",
   {
-    id: text("id").primaryKey(),
+    id: id(),
     identifier: text("identifier").notNull(),
     value: text("value").notNull(),
     expiresAt: timestamp("expires_at", {

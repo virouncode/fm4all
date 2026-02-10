@@ -1,1 +1,0 @@
-ALTER TABLE "cafe_machines" ADD COLUMN "imageUrl" varchar;

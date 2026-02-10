@@ -1,77 +1,106 @@
+import { index, pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
+import { user } from "./auth";
+import { clientServiceOccurrences, occurrenceTaches } from "./services";
+
 import {
-  index,
-  integer,
-  pgTable,
-  serial,
-  text,
-  timestamp,
-  varchar,
-} from "drizzle-orm/pg-core";
-import { user } from "../schema";
-import { createdAt, updatedAt } from "../schema-helper";
+  createdAt,
+  createdById,
+  id,
+  timestamptz,
+  updatedAt,
+  updatedById,
+} from "../schema-helper";
+import { entreprises } from "./entreprises";
 import {
-  ticketCategorieEnum,
+  ticketMessageVisibiliteEnum,
   ticketPrioriteEnum,
-  ticketStatusEnum,
+  ticketStatutEnum,
   ticketTypeEnum,
 } from "./enums";
 
 export const tickets = pgTable(
   "tickets",
   {
-    id: serial().primaryKey(),
-    clientId: integer("client_id").notNull(),
-    siteId: integer("site_id").notNull(),
-    fournisseurId: integer("fournisseur_id").notNull(),
-    titre: varchar().notNull(),
-    description: varchar(),
-    categorie: ticketCategorieEnum("categorie").notNull(),
+    id: id(),
+    occurenceId: uuid("occurence_id").references(
+      () => clientServiceOccurrences.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    occurenceTacheId: uuid("occurence_tache_id").references(
+      () => occurrenceTaches.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    proprietaireEntrepriseId: uuid("proprietaire_entreprise_id")
+      .notNull()
+      .references(() => entreprises.id, { onDelete: "cascade" }),
+    demandeurEntrepriseId: uuid("demandeur_entreprise_id").references(
+      () => entreprises.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    assigneEntrepriseId: uuid("assigne_entreprise_id").references(
+      () => entreprises.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    assigneUserId: uuid("assigne_user_id").references(() => user.id, {
+      onDelete: "set null",
+    }),
+
+    titre: varchar("titre", { length: 255 }).notNull(),
+    description: text("description"),
     type: ticketTypeEnum("type").notNull(),
     priorite: ticketPrioriteEnum("priorite").notNull().default("normale"),
-    status: ticketStatusEnum("status").notNull().default("nouveau"),
-    dateCloture: timestamp("date_cloture", {
-      withTimezone: true,
-      mode: "date",
-      precision: 3,
-    }),
-    createdById: text("created_by_id").references(() => user.id, {
-      onDelete: "set null",
-    }),
-    updatedById: text("updated_by_id").references(() => user.id, {
-      onDelete: "set null",
-    }),
+    statut: ticketStatutEnum("statut").notNull().default("nouveau"),
+    lastActivityAt: timestamptz("last_activity_at").notNull().defaultNow(),
+    resolvedAt: timestamptz("resolved_at"),
+    closedAt: timestamptz("closed_at"),
+    createdById: createdById(() => user),
+    updatedById: updatedById(() => user),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
-  (table) => [
-    index("tickets_client_id_idx").on(table.clientId),
-    index("tickets_site_id_idx").on(table.siteId),
-    index("tickets_fournisseur_id_idx").on(table.fournisseurId),
-    index("tickets_created_by_user_id_idx").on(table.createdById),
-    index("tickets_status_idx").on(table.status),
-    index("tickets_priorite_idx").on(table.priorite),
-    index("tickets_created_at_idx").on(table.createdAt),
-    index("tickets_categorie_idx").on(table.categorie),
-    index("tickets_type_idx").on(table.type),
+  (t) => [
+    index("tickets_proprietaire_idx").on(t.proprietaireEntrepriseId),
+    index("tickets_demandeur_idx").on(t.demandeurEntrepriseId),
+    index("tickets_assigne_entreprise_idx").on(t.assigneEntrepriseId),
+    index("tickets_occurence_idx").on(t.occurenceId),
+    index("tickets_occurence_tache_idx").on(t.occurenceTacheId),
+    index("tickets_statut_idx").on(t.statut),
+    index("tickets_priorite_idx").on(t.priorite),
+    index("tickets_type_idx").on(t.type),
+    index("tickets_assigne_user_idx").on(t.assigneUserId),
+    index("tickets_last_activity_idx").on(t.lastActivityAt),
+    index("tickets_created_at_idx").on(t.createdAt),
   ],
 );
 
-export const ticketsAttachments = pgTable(
-  "tickets_attachments",
+export const ticketMessages = pgTable(
+  "ticket_messages",
   {
-    id: serial().primaryKey(),
-    ticketId: integer("ticket_id")
+    id: id(),
+    ticketId: uuid("ticket_id")
       .notNull()
       .references(() => tickets.id, { onDelete: "cascade" }),
-    url: varchar("url").notNull(),
-    filename: varchar("filename").notNull(),
-    mimeType: varchar("mime_type").notNull(),
-    size: integer("size").notNull(), // en bytes
-    description: varchar("description"),
-    createdById: text("created_by_id").references(() => user.id, {
+    auteurUserId: uuid("auteur_user_id").references(() => user.id, {
       onDelete: "set null",
     }),
+    message: text("message").notNull(),
+    visibilite: ticketMessageVisibiliteEnum("visibilite")
+      .notNull()
+      .default("public"),
     createdAt: createdAt(),
   },
-  (table) => [index("tickets_attachment_ticket_id_idx").on(table.ticketId)],
+  (t) => [
+    index("ticket_messages_ticket_idx").on(t.ticketId),
+    index("ticket_messages_ticket_created_at_idx").on(t.ticketId, t.createdAt),
+    index("ticket_messages_auteur_idx").on(t.auteurUserId),
+    index("ticket_messages_visibilite_idx").on(t.visibilite),
+  ],
 );

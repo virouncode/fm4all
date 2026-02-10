@@ -1,7 +1,7 @@
 import { getColumnLabel } from "@/components/tables/getColumnLabel";
 import { SortableHeader } from "@/components/tables/SortableHeader";
 import { formatInTimezone } from "@/lib/utils/formatDates";
-import { SelectClientType } from "@/zod-schemas/client";
+import { SelectClientType } from "@/zod-schemas/client.schema";
 import { ColumnDef } from "@tanstack/react-table";
 
 export const adminClientsIdLabelMap = new Map<string, string>([

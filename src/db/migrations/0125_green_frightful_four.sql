@@ -1,1 +1,0 @@
-ALTER TABLE "fournisseurs" ALTER COLUMN "date_chiffrage" DROP NOT NULL;

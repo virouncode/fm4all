@@ -2,7 +2,7 @@ import { getColumnLabel } from "@/components/tables/getColumnLabel";
 import { SortableHeader } from "@/components/tables/SortableHeader";
 import { typeBatimentCT, typeOccupationCT } from "@/constants/codeTables";
 import { formatInTimezone } from "@/lib/utils/formatDates";
-import { SelectClientType } from "@/zod-schemas/client";
+import { SelectClientType } from "@/zod-schemas/client.schema";
 import { SelectSiteType } from "@/zod-schemas/site";
 import { ColumnDef } from "@tanstack/react-table";
 

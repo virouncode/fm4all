@@ -1,6 +1,6 @@
 import { LocaleType } from "@/i18n/routing";
-import { getClientUsers } from "@/lib/queries/clients/getClients";
 import { RawSearchParams } from "@/normalize/normalizeSearchParams";
+import { getClientUsers } from "@/server/queries_a_classer/clients/getClients";
 import { parseClientUsersQuery } from "@/zod-schemas/user";
 import ClientUsersFiltersForm from "./ClientUsersFiltersForm";
 import ClientUsersTable from "./ClientUsersTable";

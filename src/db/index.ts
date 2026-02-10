@@ -1,11 +1,12 @@
 // src/db/index.ts
 import { Pool } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-serverless";
-import * as schema from "./schema"; // adapte le chemin si ton index de schémas est ailleurs
+import * as schema from "./schema";
 
-// Next.js charge déjà .env.local au runtime, pas besoin de dotenv ici
-
-const connectionString = process.env.DATABASE_URL!;
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error("Missing DATABASE_URL environment variable");
+}
 
 // Singleton global pour éviter de recréer un Pool en dev / sur Vercel
 const globalForDb = globalThis as unknown as {
@@ -13,15 +14,13 @@ const globalForDb = globalThis as unknown as {
   db?: ReturnType<typeof drizzle<typeof schema>>;
 };
 
-if (!globalForDb.pool) {
-  globalForDb.pool = new Pool({
+export const pool =
+  globalForDb.pool ??
+  new Pool({
     connectionString,
   });
-}
 
-export const db =
-  globalForDb.db ?? drizzle({ client: globalForDb.pool, schema });
+if (!globalForDb.pool) globalForDb.pool = pool;
 
-if (!globalForDb.db) {
-  globalForDb.db = db;
-}
+export const db = globalForDb.db ?? drizzle({ client: pool, schema });
+if (!globalForDb.db) globalForDb.db = db;

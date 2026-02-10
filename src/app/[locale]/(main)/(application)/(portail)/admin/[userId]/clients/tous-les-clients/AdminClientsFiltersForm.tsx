@@ -9,7 +9,7 @@ import {
   ClientsQueryBackendType,
   ClientsQueryFiltersType,
   SelectClientType,
-} from "@/zod-schemas/client";
+} from "@/zod-schemas/client.schema";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";

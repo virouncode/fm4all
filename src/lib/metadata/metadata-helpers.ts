@@ -158,7 +158,7 @@ export const routes: Record<RouteKey, Record<LocaleType, string>> = {
 
 export function generateAlternates(
   routeKey: RouteKey,
-  locale: string,
+  locale: LocaleType,
   title: string,
   description: string,
   imageUrl?: string,
@@ -177,9 +177,9 @@ export function generateAlternates(
     frUrl = `https://www.fm4all.com/fr`;
   } else if (routeKey === "blogCategorie" && slugs) {
     canonicalUrl =
-      `https://www.fm4all.com/${locale}${routes[routeKey][locale as LocaleType]}`.replace(
+      `https://www.fm4all.com/${locale}${routes[routeKey][locale]}`.replace(
         "[slug]",
-        slugs[locale as LocaleType] as string,
+        slugs[locale] as string,
       );
     enUrl = `https://www.fm4all.com/en${routes[routeKey]["en"]}`.replace(
       "[slug]",
@@ -190,18 +190,15 @@ export function generateAlternates(
       slugs["fr"] as string,
     );
   } else if (routeKey === "blogArticle" && slugs) {
-    canonicalUrl =
-      `https://www.fm4all.com/${locale}${routes[routeKey][locale as LocaleType]}`
-        .replace(
-          "[slug]",
-          (slugs[locale as LocaleType] as { slug: string; subSlug?: string })
-            .slug,
-        )
-        .replace(
-          "[subSlug]",
-          (slugs[locale as LocaleType] as { slug: string; subSlug?: string })
-            .subSlug || "",
-        );
+    canonicalUrl = `https://www.fm4all.com/${locale}${routes[routeKey][locale]}`
+      .replace(
+        "[slug]",
+        (slugs[locale] as { slug: string; subSlug?: string }).slug,
+      )
+      .replace(
+        "[subSlug]",
+        (slugs[locale] as { slug: string; subSlug?: string }).subSlug || "",
+      );
     enUrl = `https://www.fm4all.com/en${routes[routeKey]["en"]}`
       .replace(
         "[slug]",
@@ -222,9 +219,9 @@ export function generateAlternates(
       );
   } else if (routeKey === "servicePresentation" && slugs) {
     canonicalUrl =
-      `https://www.fm4all.com/${locale}${routes[routeKey][locale as LocaleType]}`.replace(
+      `https://www.fm4all.com/${locale}${routes[routeKey][locale]}`.replace(
         "[slug]",
-        slugs[locale as LocaleType] as string,
+        slugs[locale] as string,
       );
     enUrl = `https://www.fm4all.com/en${routes[routeKey]["en"]}`.replace(
       "[slug]",
@@ -235,18 +232,15 @@ export function generateAlternates(
       slugs["fr"] as string,
     );
   } else if (routeKey === "serviceVille" && slugs) {
-    canonicalUrl =
-      `https://www.fm4all.com/${locale}${routes[routeKey][locale as LocaleType]}`
-        .replace(
-          "[slug]",
-          (slugs[locale as LocaleType] as { slug: string; subSlug?: string })
-            .slug,
-        )
-        .replace(
-          "[subSlug]",
-          (slugs[locale as LocaleType] as { slug: string; subSlug?: string })
-            .subSlug || "",
-        );
+    canonicalUrl = `https://www.fm4all.com/${locale}${routes[routeKey][locale]}`
+      .replace(
+        "[slug]",
+        (slugs[locale] as { slug: string; subSlug?: string }).slug,
+      )
+      .replace(
+        "[subSlug]",
+        (slugs[locale] as { slug: string; subSlug?: string }).subSlug || "",
+      );
     enUrl = `https://www.fm4all.com/en${routes[routeKey]["en"]}`
       .replace(
         "[slug]",
@@ -267,9 +261,9 @@ export function generateAlternates(
       );
   } else if (routeKey === "secteurPresentation" && slugs) {
     canonicalUrl =
-      `https://www.fm4all.com/${locale}${routes[routeKey][locale as LocaleType]}`.replace(
+      `https://www.fm4all.com/${locale}${routes[routeKey][locale]}`.replace(
         "[slug]",
-        slugs[locale as LocaleType] as string,
+        slugs[locale] as string,
       );
     enUrl = `https://www.fm4all.com/en${routes[routeKey]["en"]}`.replace(
       "[slug]",
@@ -281,9 +275,9 @@ export function generateAlternates(
     );
     // } else if (routeKey === "tag" && slugs) {
     //   canonicalUrl =
-    //     `https://www.fm4all.com/${locale}${routes[routeKey][locale as LocaleType]}`.replace(
+    //     `https://www.fm4all.com/${locale}${routes[routeKey][locale ]}`.replace(
     //       "[slug]",
-    //       slugs[locale as LocaleType] as string
+    //       slugs[locale ] as string
     //     );
     //   enUrl = `https://www.fm4all.com/en${routes[routeKey]["en"]}`.replace(
     //     "[slug]",
@@ -294,7 +288,7 @@ export function generateAlternates(
     //     slugs["fr"] as string
     //   );
   } else {
-    canonicalUrl = `https://www.fm4all.com/${locale}${routes[routeKey][locale as LocaleType]}`;
+    canonicalUrl = `https://www.fm4all.com/${locale}${routes[routeKey][locale]}`;
     enUrl = `https://www.fm4all.com/en${routes[routeKey]["en"]}`;
     frUrl = `https://www.fm4all.com/fr${routes[routeKey]["fr"]}`;
   }

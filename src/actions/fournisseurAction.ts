@@ -1,12 +1,12 @@
 "use server";
 import { db } from "@/db";
 import { fournisseurs, servicesFournisseurs, user } from "@/db/schema";
-import { auth } from "@/lib/auth";
-import { getSession } from "@/lib/auth-session";
+import { actionClient } from "@/lib/action/safe-actions";
 import { sendEmailFromServer } from "@/lib/email/sendEmail";
-import { actionClient } from "@/lib/safe-actions";
 import { promoteTempLogoUrl } from "@/lib/utils/file-helper";
 import { generatePassword } from "@/lib/utils/generatePassword";
+import { auth } from "@/server/auth/auth";
+import { getSession } from "@/server/auth/get-session";
 import {
   insertFournisseurToDbSchema,
   onboardFournisseurSchema,
@@ -253,7 +253,7 @@ export const updateFournisseurForAdminAction = actionClient
 
 // ======================= ADMIN: getAllFournisseursAction ==========================//
 
-import { getAllFournisseursWithPagination } from "@/lib/queries/fournisseurs/getFournisseurs";
+import { getAllFournisseursWithPagination } from "@/server/queries_a_classer/fournisseurs/getFournisseurs";
 
 export const getAllFournisseursAction = actionClient
   .metadata({ actionName: "getAllFournisseursAction" })

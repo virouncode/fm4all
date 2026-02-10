@@ -1,4 +1,4 @@
-export const ticketStatusCT = [
+export const ticketStatutCT = [
   { code: "nouveau", name: "Nouveau" },
   { code: "pris_en_charge", name: "Pris en charge" },
   { code: "en_attente_fournisseur", name: "En attente fournisseur" },
@@ -9,11 +9,11 @@ export const ticketStatusCT = [
   { code: "rejete", name: "Rejeté / Hors périmètre" },
 ] as const;
 
-export const ticketStatusCodes = ticketStatusCT.map(
+export const ticketStatutCodes = ticketStatutCT.map(
   (i) => i.code,
 ) as unknown as [
-  (typeof ticketStatusCT)[number]["code"],
-  ...(typeof ticketStatusCT)[number]["code"][],
+  (typeof ticketStatutCT)[number]["code"],
+  ...(typeof ticketStatutCT)[number]["code"][],
 ];
 
 export const ticketPrioriteCT = [
@@ -30,39 +30,29 @@ export const ticketPrioriteCodes = ticketPrioriteCT.map(
   ...(typeof ticketPrioriteCT)[number]["code"][],
 ];
 
-export const ticketCategorieCT = [
-  { code: "proprete", name: "Propreté" },
-  { code: "consommables", name: "Consommables" },
-  { code: "degradations", name: "Dégradations" },
-  { code: "electricite", name: "Électricité" },
-  { code: "plomberie", name: "Plomberie" },
-  { code: "cvc", name: "CVC" },
-  { code: "exterieurs", name: "Extérieurs" },
-  { code: "securite_incendie", name: "Sécurité incendie" },
-  { code: "cafe", name: "Café" },
-  { code: "fontaines_eau", name: "Fontaines à eau" },
-  { code: "office_management", name: "Office management" },
-  { code: "autre", name: "Autre" },
-] as const;
-
-export const ticketCategorieCodes = ticketCategorieCT.map(
-  (i) => i.code,
-) as unknown as [
-  (typeof ticketCategorieCT)[number]["code"],
-  ...(typeof ticketCategorieCT)[number]["code"][],
-];
-
 export const ticketTypeCT = [
   { code: "incident", name: "Incident" },
-  { code: "demande_devis", name: "Demande de devis" },
-  { code: "demande_intervention", name: "Demande d'intervention" },
-  { code: "audit", name: "Audit" },
+  { code: "demande", name: "Demande" },
   { code: "autre", name: "Autre" },
 ] as const;
 
 export const ticketTypeCodes = ticketTypeCT.map((i) => i.code) as unknown as [
   (typeof ticketTypeCT)[number]["code"],
   ...(typeof ticketTypeCT)[number]["code"][],
+];
+
+export const ticketMessageVisibiliteCT = [
+  { code: "public", name: "Public" }, // visible client + fournisseur + fm4all
+  { code: "fm4all_only", name: "fm4all uniquement" }, // fm4all only
+  { code: "client_only", name: "Client uniquement" },
+  { code: "fournisseur_only", name: "Prestataire uniquement" },
+] as const;
+
+export const ticketMessageVisibiliteCodes = ticketMessageVisibiliteCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof ticketMessageVisibiliteCT)[number]["code"],
+  ...(typeof ticketMessageVisibiliteCT)[number]["code"][],
 ];
 
 export const userRoleCT = [
@@ -135,20 +125,20 @@ export const typeOccupationCodes = typeOccupationCT.map(
   ...(typeof typeOccupationCT)[number]["code"][],
 ];
 
-export const devisStatusCT = [
+export const devisStatutCT = [
   { code: "brouillon", name: "Brouillon" },
   { code: "emis", name: "Emis" },
   { code: "signe", name: "Devis signé" },
   { code: "refuse", name: "Devis refusé" },
 ] as const;
 
-export const devisStatusCodes = devisStatusCT.map((i) => i.code) as unknown as [
-  (typeof devisStatusCT)[number]["code"],
-  ...(typeof devisStatusCT)[number]["code"][],
+export const devisStatutCodes = devisStatutCT.map((i) => i.code) as unknown as [
+  (typeof devisStatutCT)[number]["code"],
+  ...(typeof devisStatutCT)[number]["code"][],
 ];
 
 export const devisTypePrixCT = [
-  { code: "forfait", name: "Forfait" },
+  { code: "recurrent", name: "Récurrent" },
   { code: "one_shot", name: "One shot" },
 ] as const;
 
@@ -221,6 +211,349 @@ export const devisLigneUniteCodes = devisLigneUniteCT.map(
   ...(typeof devisLigneUniteCT)[number]["code"][],
 ];
 
+export const siteAttributionScopeCT = [
+  { code: "self", name: "Site uniquement" },
+  { code: "subtree", name: "Site et sous-sites" },
+] as const;
+
+export const siteAttributionScopeCodes = siteAttributionScopeCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof siteAttributionScopeCT)[number]["code"],
+  ...(typeof siteAttributionScopeCT)[number]["code"][],
+];
+
+export const clientServiceModeCT = [
+  { code: "recurrent", name: "Récurrent" },
+  { code: "one_shot", name: "One shot" },
+] as const;
+
+export const clientServiceModeCodes = clientServiceModeCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof clientServiceModeCT)[number]["code"],
+  ...(typeof clientServiceModeCT)[number]["code"][],
+];
+
+export const perimetreModeCT = [
+  { code: "inclure", name: "Inclure" },
+  { code: "exclure", name: "Exclure" },
+] as const;
+
+export const perimetreModeCodes = perimetreModeCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof perimetreModeCT)[number]["code"],
+  ...(typeof perimetreModeCT)[number]["code"][],
+];
+
+export const occurrenceStatutCT = [
+  { code: "planifiee", name: "Planifiée" },
+  { code: "en_cours", name: "En cours" },
+  { code: "terminee", name: "Terminée" },
+  { code: "non_honoree", name: "Non honorée" },
+  { code: "annulee", name: "Annulée" },
+] as const;
+
+export const occurrenceStatutCodes = occurrenceStatutCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof occurrenceStatutCT)[number]["code"],
+  ...(typeof occurrenceStatutCT)[number]["code"][],
+];
+
+export const occurrenceTacheStatutCT = [
+  { code: "a_faire", name: "À faire" },
+  { code: "en_cours", name: "En cours" },
+  { code: "terminee", name: "Terminée" },
+  { code: "non_honoree", name: "Non honorée" },
+  { code: "annulee", name: "Annulée" },
+] as const;
+
+export const occurrenceTacheStatutCodes = occurrenceTacheStatutCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof occurrenceTacheStatutCT)[number]["code"],
+  ...(typeof occurrenceTacheStatutCT)[number]["code"][],
+];
+
+export const documentTypeCT = [
+  // Contrats
+  { code: "contrat_pdf", name: "Contrat PDF" },
+  { code: "avenant_pdf", name: "Avenant PDF" },
+
+  // Devis
+  { code: "devis_pdf", name: "Devis PDF" },
+  { code: "devis_signe_pdf", name: "Devis signé PDF" },
+  { code: "annexe", name: "Annexe" },
+
+  // Référentiels / sites
+  { code: "cahier_des_charges", name: "Cahier des charges" },
+  { code: "plan_site", name: "Plan de site" },
+  { code: "procedure_acces", name: "Procédure d'accès" },
+  { code: "consignes_securite", name: "Consignes de sécurité" },
+
+  // Admin fournisseur
+  { code: "assurance", name: "Assurance" },
+  { code: "kbis", name: "KBIS" },
+
+  // Fallback
+  { code: "autre", name: "Autre" },
+] as const;
+
+export const documentTypeCodes = documentTypeCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof documentTypeCT)[number]["code"],
+  ...(typeof documentTypeCT)[number]["code"][],
+];
+
+export const documentVisibiliteCT = [
+  { code: "public", name: "Public" }, // visible client + fournisseur + fm4all
+  { code: "fm4all_only", name: "fm4all uniquement" }, // fm4all only
+  { code: "client_only", name: "Client uniquement" },
+  { code: "fournisseur_only", name: "Prestataire uniquement" },
+] as const;
+
+export const documentVisibiliteCodes = documentVisibiliteCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof documentVisibiliteCT)[number]["code"],
+  ...(typeof documentVisibiliteCT)[number]["code"][],
+];
+
+export const roleEntrepriseCT = [
+  { code: "client", name: "Client" },
+  { code: "prestataire", name: "Prestataire" },
+  { code: "operateur_plateforme", name: "Operateur plateforme" },
+] as const;
+
+export const roleEntrepriseCodes = roleEntrepriseCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof roleEntrepriseCT)[number]["code"],
+  ...(typeof roleEntrepriseCT)[number]["code"][],
+];
+
+export const roleAdhesionCT = [
+  //Droits globaux, indépendants des sites
+  { code: "super_admin", name: "Super Administrateur" },
+  { code: "admin", name: "Administrateur" },
+  { code: "manager", name: "Manager" },
+  { code: "collaborateur", name: "Collaborateur" },
+] as const;
+
+export const roleAdhesionCodes = roleAdhesionCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof roleAdhesionCT)[number]["code"],
+  ...(typeof roleAdhesionCT)[number]["code"][],
+];
+
+export const roleAttributionSiteCT = [
+  // Droits spécifiques à un site donné
+  { code: "responsable_site", name: "Responsable de site" },
+  { code: "validateur_site", name: "Validateur de site" },
+  { code: "demandeur_site", name: "Demandeur de site" },
+  { code: "intervenant_site", name: "Intervenant de site" },
+  { code: "observateur_site", name: "Observateur de site" },
+] as const;
+
+export const roleAttributionSiteCodes = roleAttributionSiteCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof roleAttributionSiteCT)[number]["code"],
+  ...(typeof roleAttributionSiteCT)[number]["code"][],
+];
+
+export const adhesionStatutCT = [
+  { code: "actif", name: "Actif" },
+  { code: "en_attente", name: "En attente" },
+  { code: "refuse", name: "Refusé" },
+  { code: "suspendu", name: "Suspendu" },
+] as const;
+
+export const adhesionStatutCodes = adhesionStatutCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof adhesionStatutCT)[number]["code"],
+  ...(typeof adhesionStatutCT)[number]["code"][],
+];
+
+export const frequenceCT = [
+  { code: "one_shot", name: "One shot" },
+  { code: "hebdomadaire", name: "Hebdomadaire" },
+  { code: "mensuelle", name: "Mensuelle" },
+  { code: "trimestrielle", name: "Trimestrielle" },
+  { code: "semestrielle", name: "Semestrielle" },
+  { code: "annuelle", name: "Annuelle" },
+  { code: "tous_les_x_jours", name: "Tous les X jours" },
+] as const;
+
+export const frequenceCodes = frequenceCT.map((i) => i.code) as unknown as [
+  (typeof frequenceCT)[number]["code"],
+  ...(typeof frequenceCT)[number]["code"][],
+];
+
+export const documentCategorieCT = [
+  // Contractuel / financier
+  { code: "contrat", name: "Contrat" },
+  { code: "avenant", name: "Avenant" },
+  { code: "devis", name: "Devis" },
+  { code: "facture", name: "Facture" },
+  { code: "bon_commande", name: "Bon de commande" },
+
+  // Opérationnel FM
+  { code: "rapport_intervention", name: "Rapport d’intervention" },
+  { code: "compte_rendu", name: "Compte rendu" },
+  { code: "procedure", name: "Procédure" },
+  { code: "plan_acces", name: "Plan / Accès" },
+
+  // Projet / besoin
+  { code: "cahier_charges", name: "Cahier des charges" },
+  { code: "specification", name: "Spécification" },
+
+  // Identité
+  { code: "avatar", name: "Avatar" },
+  { code: "photo", name: "Photo" },
+  { code: "logo", name: "Logo" },
+
+  // Générique
+  { code: "document", name: "Document" },
+  { code: "piece_jointe", name: "Pièce jointe" },
+] as const;
+
+export const documentCategorieCodes = documentCategorieCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof documentCategorieCT)[number]["code"],
+  ...(typeof documentCategorieCT)[number]["code"][],
+];
+
+import { pgEnum } from "drizzle-orm/pg-core";
+
+/**
+ * CONTRAT - TYPE
+ * => nature du contrat (ce que c'est)
+ */
+export const contratTypeCT = [
+  { code: "multiservices", name: "Contrat multiservices (cadre)" },
+  { code: "service", name: "Contrat de service" },
+  { code: "mandat_gestion", name: "Mandat / Gestion pilotée" },
+  { code: "ponctuel", name: "Contrat ponctuel" },
+] as const;
+
+export const contratTypeCodes = contratTypeCT.map((i) => i.code) as unknown as [
+  (typeof contratTypeCT)[number]["code"],
+  ...(typeof contratTypeCT)[number]["code"][],
+];
+
+export const contratTypeEnum = pgEnum("contrat_type", contratTypeCodes);
+
+/**
+ * CONTRAT - DEAL MODE
+ * => mode commercial / qui porte la relation
+ */
+export const contratDealModeCT = [
+  { code: "direct", name: "Direct (client ↔ fournisseur)" },
+  { code: "intermediaire", name: "Intermédiaire (FM4ALL porte / refacture)" },
+  {
+    code: "gestion_pilotee",
+    name: "Gestion pilotée (FM4ALL facture des frais)",
+  },
+  { code: "apporteur_affaires", name: "Apporteur d’affaires (commission)" },
+] as const;
+
+export const contratDealModeCodes = contratDealModeCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof contratDealModeCT)[number]["code"],
+  ...(typeof contratDealModeCT)[number]["code"][],
+];
+
+export const contratDealModeEnum = pgEnum(
+  "contrat_deal_mode",
+  contratDealModeCodes,
+);
+
+/**
+ * CONTRAT - STATUT
+ * => cycle de vie du contrat
+ */
+export const contratStatutCT = [
+  { code: "brouillon", name: "Brouillon" },
+  { code: "actif", name: "Actif" },
+  { code: "suspendu", name: "Suspendu" },
+  { code: "termine", name: "Terminé" },
+  { code: "resilie", name: "Résilié" },
+] as const;
+
+export const contratStatutCodes = contratStatutCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof contratStatutCT)[number]["code"],
+  ...(typeof contratStatutCT)[number]["code"][],
+];
+
+export const factureStatutCT = [
+  { code: "brouillon", name: "Brouillon" },
+  { code: "emise", name: "Émise" },
+  { code: "payee", name: "Payée" },
+  { code: "en_retard", name: "En retard" },
+  { code: "litige", name: "En litige" },
+  { code: "annulee", name: "Annulée" },
+] as const;
+
+export const factureStatutCodes = factureStatutCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof factureStatutCT)[number]["code"],
+  ...(typeof factureStatutCT)[number]["code"][],
+];
+
+export const factureLigneTypeCT = [
+  { code: "ponctuel", name: "Ponctuel" },
+  { code: "recurrent", name: "Récurrent" },
+  { code: "ajustement", name: "Ajustement" },
+] as const;
+
+export const factureLigneTypeCodes = factureLigneTypeCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof factureLigneTypeCT)[number]["code"],
+  ...(typeof factureLigneTypeCT)[number]["code"][],
+];
+
+export const paiementStatutCT = [
+  { code: "en_attente", name: "En attente" },
+  { code: "recu", name: "Reçu" },
+  { code: "partiel", name: "Partiel" },
+  { code: "refuse", name: "Refusé" },
+  { code: "annule", name: "Annulé" },
+] as const;
+
+export const paiementStatutCodes = paiementStatutCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof paiementStatutCT)[number]["code"],
+  ...(typeof paiementStatutCT)[number]["code"][],
+];
+
+export const paiementMethodeCT = [
+  { code: "virement", name: "Virement bancaire" },
+  { code: "cheque", name: "Chèque" },
+  { code: "prelevement", name: "Prélèvement" },
+  { code: "carte", name: "Carte bancaire" },
+  { code: "especes", name: "Espèces" },
+  { code: "avoir", name: "Avoir" },
+] as const;
+
+export const paiementMethodeCodes = paiementMethodeCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof paiementMethodeCT)[number]["code"],
+  ...(typeof paiementMethodeCT)[number]["code"][],
+];
 export const toCodeTableName = (
   code: string,
   table: readonly { code: string; name: string }[],

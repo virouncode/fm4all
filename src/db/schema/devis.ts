@@ -1,33 +1,38 @@
 import {
-  devisLigneUniteCodes,
-  devisStatusCodes,
-  devisTypePrixCodes,
-} from "@/constants/codeTables";
-import {
-  date,
   index,
   integer,
   numeric,
-  pgEnum,
   pgTable,
-  serial,
   text,
-  timestamp,
+  uniqueIndex,
+  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { createdAt, updatedAt } from "../schema-helper";
+import {
+  createdAt,
+  createdById,
+  id,
+  timestamptz,
+  updatedAt,
+  updatedById,
+} from "../schema-helper";
 import { user } from "./auth";
-import { clients } from "./clients";
-import { fournisseurs } from "./fournisseurs";
+import { entreprises } from "./entreprises";
+import {
+  devisLigneUniteEnum,
+  devisStatutEnum,
+  devisTypePrixEnum,
+} from "./enums";
 import { prospects } from "./prospects";
+import { services } from "./services";
 import { sites } from "./sites";
 import { tickets } from "./tickets";
 
 export const devisTemporaires = pgTable(
   "devis_temporaires",
   {
-    id: serial().primaryKey(),
-    prospectId: integer("prospect_id").references(() => prospects.id),
+    id: id(),
+    prospectId: uuid("prospect_id").references(() => prospects.id),
     texte: varchar().notNull(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
@@ -38,96 +43,120 @@ export const devisTemporaires = pgTable(
   ],
 );
 
-export const devisStatusEnum = pgEnum("devis_status", devisStatusCodes);
-export const devisTypePrixEnum = pgEnum("devis_type_prix", devisTypePrixCodes);
+export const devisDemandes = pgTable(
+  "devis_demandes",
+  {
+    id: id(),
+    demandeurEntrepriseId: uuid("demandeur_entreprise_id")
+      .notNull()
+      .references(() => entreprises.id, {
+        onDelete: "cascade",
+      }),
+    siteId: uuid("site_id")
+      .notNull()
+      .references(() => sites.id, {
+        onDelete: "cascade",
+      }),
+    ticketId: uuid("ticket_id").references(() => tickets.id, {
+      onDelete: "set null",
+    }),
+    serviceId: uuid("service_id")
+      .notNull()
+      .references(() => services.id, { onDelete: "cascade" }),
+    titre: varchar("titre", { length: 255 }).notNull(),
+    description: text("description").notNull(),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+    createdById: createdById(() => user),
+    updatedById: updatedById(() => user),
+  },
+  (table) => [
+    index("devis_demandes_demandeur_entreprise_id_idx").on(
+      table.demandeurEntrepriseId,
+    ),
+    index("devis_demandes_site_id_idx").on(table.siteId),
+    index("devis_demandes_ticket_id_idx").on(table.ticketId),
+    index("devis_demandes_service_id_idx").on(table.serviceId),
+    index("devis_demandes_created_at_idx").on(table.createdAt),
+  ],
+);
 
 export const devis = pgTable(
   "devis",
   {
-    id: serial().primaryKey(),
-    prospectId: integer("prospect_id").references(() => prospects.id, {
+    id: id(),
+    devisDemandeId: uuid("devis_demande_id").references(
+      () => devisDemandes.id,
+      {
+        onDelete: "cascade",
+      },
+    ),
+    demandeurEntrepriseId: uuid("demandeur_entreprise_id")
+      .notNull()
+      .references(() => entreprises.id, {
+        onDelete: "cascade",
+      }),
+    emetteurEntrepriseId: uuid("emetteur_entreprise_id")
+      .notNull()
+      .references(() => entreprises.id, {
+        onDelete: "cascade",
+      }),
+    proprietaireEntrepriseId: uuid("proprietaire_entreprise_id")
+      .notNull()
+      .references(() => entreprises.id, {
+        onDelete: "cascade",
+      }),
+    siteId: uuid("site_id")
+      .notNull()
+      .references(() => sites.id, {
+        onDelete: "cascade",
+      }),
+    ticketId: uuid("ticket_id").references(() => tickets.id, {
       onDelete: "set null",
     }),
-    clientId: integer("client_id").references(() => clients.id, {
-      onDelete: "set null",
-    }),
-    fournisseurId: integer("fournisseur_id").references(() => fournisseurs.id, {
-      onDelete: "set null",
-    }),
-    ticketId: integer("ticket_id").references(() => tickets.id, {
-      onDelete: "set null",
-    }),
-    siteId: integer("site_id").references(() => sites.id, {
-      onDelete: "set null",
-    }),
-    titre: varchar("titre", { length: 255 }).notNull(), //TODO retirer default
-    description: text("description").notNull(), //TODO retirer default
-    typePrix: devisTypePrixEnum("type_prix").notNull(), //TODO retirer default
-    margeCoefficient: numeric("marge_coefficient", {
-      precision: 9,
-      scale: 8,
-    }).notNull(), // ou avec un default(MARGE) si tu veux
-    totalOneShotHt: integer("total_one_shot_ht"), //*10000
-    totalMensuelHt: integer("total_mensuel_ht"), //*10000
-    totalInstallationHt: integer("total_installation_ht"), //*10000
-    dateValidite: date("date_validite", { mode: "date" }),
-    dateDemarrage: date("date_demarrage", { mode: "date" }),
-    status: devisStatusEnum("status").notNull(),
-    devisUrl: varchar("devis_url"),
-    signedAt: timestamp("signed_at", {
-      withTimezone: true,
-      precision: 3,
-    }),
-    createdById: text("created_by_id").references(() => user.id, {
-      onDelete: "set null",
-    }),
-    updatedById: text("updated_by_id").references(() => user.id, {
-      onDelete: "set null",
-    }),
+    titre: varchar("titre", { length: 255 }).notNull(),
+    description: text("description"),
+    statut: devisStatutEnum("statut").notNull().default("brouillon"),
+    validTo: timestamptz("valid_to"),
+    createdById: createdById(() => user),
+    updatedById: updatedById(() => user),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
   (table) => [
-    index("devis_prospect_id_idx").on(table.prospectId),
-    index("devis_client_id_idx").on(table.clientId),
     index("devis_ticket_id_idx").on(table.ticketId),
-    index("devis_fournisseur_id_idx").on(table.fournisseurId),
-    index("devis_status_idx").on(table.status),
+    index("devis_statut_idx").on(table.statut),
     index("devis_created_at_idx").on(table.createdAt),
   ],
-);
-
-export const devisLigneUniteEnum = pgEnum(
-  "devis_ligne_unite",
-  devisLigneUniteCodes,
 );
 
 export const devisLignes = pgTable(
   "devis_lignes",
   {
-    id: serial().primaryKey(),
-    devisId: integer("devis_id")
+    id: id(),
+    devisId: uuid("devis_id")
       .references(() => devis.id, { onDelete: "cascade" })
       .notNull(),
-    ordre: integer("ordre").notNull(), //position de la ligne dans le devis
-    libelle: varchar("libelle", { length: 255 }).notNull(),
+    serviceId: uuid("service_id").references(() => services.id, {
+      onDelete: "set null",
+    }),
+    designation: varchar("designation", { length: 255 }).notNull(),
     description: text("description"),
     quantite: numeric("quantite", { precision: 12, scale: 3 }).notNull(),
     unite: devisLigneUniteEnum("unite").notNull(),
-    prixUnitaireHt: integer("prix_unitaire_ht").notNull(), // *10000
-    totalLigneHt: integer("total_ligne_ht").notNull(), // *10000
-    remiseHtMontant: integer("remise_ht").notNull().default(0), // *10000
+    prixUnitaireHt: integer("prix_unitaire_ht").notNull(), // *100
+    tauxTva: integer("taux_tva").notNull(), // *100
+    ordre: integer("ordre").notNull(), //position de la ligne dans le devis
+    remiseHtMontant: integer("remise_ht").notNull().default(0), // *100
+    typePrix: devisTypePrixEnum("type_prix").notNull(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
-    createdById: text("created_by_id").references(() => user.id, {
-      onDelete: "set null",
-    }),
-    updatedById: text("updated_by_id").references(() => user.id, {
-      onDelete: "set null",
-    }),
+    createdById: createdById(() => user),
+    updatedById: updatedById(() => user),
   },
   (table) => [
     index("devis_lignes_devis_id_idx").on(table.devisId),
     index("devis_lignes_created_at_idx").on(table.createdAt),
+    uniqueIndex("devis_lignes_ordre_udx").on(table.devisId, table.ordre),
   ],
 );

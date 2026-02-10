@@ -1,10 +1,10 @@
 import { LocaleType } from "@/i18n/routing";
+import { RawSearchParams } from "@/normalize/normalizeSearchParams";
 import {
   getClientFournisseurs,
   getClientSites,
-} from "@/lib/queries/clients/getClients";
-import { getInterventions } from "@/lib/queries/interventions/getInterventions";
-import { RawSearchParams } from "@/normalize/normalizeSearchParams";
+} from "@/server/queries_a_classer/clients/getClients";
+import { getInterventions } from "@/server/queries_a_classer/interventions/getInterventions";
 import { parseInterventionsQuery } from "@/zod-schemas/intervention";
 import { ticketsIdLabelMap } from "../../tickets/mes-tickets/createTicketsColumns";
 import ClientInterventionsFiltersForm from "./ClientInterventionsFiltersForm";

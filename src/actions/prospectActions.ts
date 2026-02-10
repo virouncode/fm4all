@@ -1,9 +1,9 @@
 "use server";
 
 import { db } from "@/db";
-import { getSession } from "@/lib/auth-session";
-import { getProspects } from "@/lib/queries/prospects/getProspects";
-import { actionClient } from "@/lib/safe-actions";
+import { actionClient } from "@/lib/action/safe-actions";
+import { getSession } from "@/server/auth/get-session";
+import { getProspects } from "@/server/queries_a_classer/prospects/getProspects";
 import {
   insertProspectSchema,
   prospectsQueryBackendSchema,

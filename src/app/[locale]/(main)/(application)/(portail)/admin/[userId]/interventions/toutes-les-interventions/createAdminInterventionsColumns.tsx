@@ -6,7 +6,7 @@ import {
   toCodeTableName,
 } from "@/constants/codeTables";
 import { formatInTimezone } from "@/lib/utils/formatDates";
-import { SelectClientType } from "@/zod-schemas/client";
+import { SelectClientType } from "@/zod-schemas/client.schema";
 import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
 import { SelectInterventionType } from "@/zod-schemas/intervention";
 import { SelectSiteType } from "@/zod-schemas/site";

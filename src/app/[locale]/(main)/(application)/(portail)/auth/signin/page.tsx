@@ -13,7 +13,7 @@ import {
 import { Form } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
 import { Link, useRouter } from "@/i18n/navigation";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/auth-client";
 import { createSignInSchema, SignInType } from "@/zod-schemas/signIn";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";

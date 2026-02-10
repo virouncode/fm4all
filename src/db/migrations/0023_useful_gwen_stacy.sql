@@ -1,1 +1,0 @@
-ALTER TABLE "fruits_tarifs" ALTER COLUMN "prix_kg" DROP NOT NULL;

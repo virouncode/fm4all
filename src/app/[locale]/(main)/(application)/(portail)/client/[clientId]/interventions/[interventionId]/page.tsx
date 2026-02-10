@@ -1,11 +1,11 @@
 import { interventionStatusCT, toCodeTableName } from "@/constants/codeTables";
 import { LocaleType } from "@/i18n/routing";
-import { getSession } from "@/lib/auth-session";
+import { getSession } from "@/server/auth/get-session";
 import {
   getClientFournisseurs,
   getClientSites,
-} from "@/lib/queries/clients/getClients";
-import { getIntervention } from "@/lib/queries/interventions/getInterventions";
+} from "@/server/queries_a_classer/clients/getClients";
+import { getIntervention } from "@/server/queries_a_classer/interventions/getInterventions";
 import { InterventionStatusType } from "@/zod-schemas/enums";
 import { UpdateInterventionFormType } from "@/zod-schemas/intervention";
 import { ReactNode } from "react";

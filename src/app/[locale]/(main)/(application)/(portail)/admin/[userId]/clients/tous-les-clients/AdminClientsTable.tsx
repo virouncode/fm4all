@@ -2,11 +2,11 @@
 
 import { getAllClientsAction } from "@/actions/clientAction";
 import InfiniteDataTable from "@/components/tables/InfiniteDataTable";
-import { getAllClientsWithPagination } from "@/lib/queries/clients/getClients";
+import { getAllClientsWithPagination } from "@/server/queries_a_classer/clients/getClients";
 import {
   ClientsQueryBackendType,
   SelectClientType,
-} from "@/zod-schemas/client";
+} from "@/zod-schemas/client.schema";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createAdminClientsColumns } from "./createAdminClientsColumns";

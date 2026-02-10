@@ -1,10 +1,10 @@
 import { LocaleType } from "@/i18n/routing";
+import { RawSearchParams } from "@/normalize/normalizeSearchParams";
 import {
   getAllClientsWithPagination,
   getClients,
-} from "@/lib/queries/clients/getClients";
-import { RawSearchParams } from "@/normalize/normalizeSearchParams";
-import { parseClientsQuery } from "@/zod-schemas/client";
+} from "@/server/queries_a_classer/clients/getClients";
+import { parseClientsQuery } from "@/zod-schemas/client.schema";
 import AdminClientsFiltersForm from "./AdminClientsFiltersForm";
 import AdminClientsTable from "./AdminClientsTable";
 import { adminClientsIdLabelMap } from "./createAdminClientsColumns";

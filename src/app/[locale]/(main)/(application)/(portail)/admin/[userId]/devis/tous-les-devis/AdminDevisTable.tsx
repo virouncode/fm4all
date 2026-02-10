@@ -1,7 +1,7 @@
 "use client";
 
 import DataTable from "@/components/tables/DataTable";
-import { SelectClientType } from "@/zod-schemas/client";
+import { SelectClientType } from "@/zod-schemas/client.schema";
 import { SelectDevisType } from "@/zod-schemas/devis";
 import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
 import { SelectSiteType } from "@/zod-schemas/site";

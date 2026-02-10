@@ -1,1 +1,0 @@
-ALTER TABLE "fournisseurs" ADD COLUMN "logo_url" varchar;

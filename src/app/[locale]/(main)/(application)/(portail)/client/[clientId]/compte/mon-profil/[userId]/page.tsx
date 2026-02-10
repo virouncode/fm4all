@@ -1,5 +1,5 @@
-import { getSession } from "@/lib/auth-session";
-import { getUserById } from "@/lib/queries/users/getUsers";
+import { getSession } from "@/server/auth/get-session";
+import { getUserById } from "@/server/queries_a_classer/users/getUsers";
 import { UpdateUserFormType } from "@/zod-schemas/user";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";

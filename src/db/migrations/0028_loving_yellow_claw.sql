@@ -1,1 +1,0 @@
-ALTER TABLE "food_livraison_tarifs" ADD COLUMN "prix_unitaire_si_cafe" integer NOT NULL;

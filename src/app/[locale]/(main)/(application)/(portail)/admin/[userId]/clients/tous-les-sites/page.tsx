@@ -1,10 +1,10 @@
 import { LocaleType } from "@/i18n/routing";
-import { getClients } from "@/lib/queries/clients/getClients";
+import { RawSearchParams } from "@/normalize/normalizeSearchParams";
+import { getClients } from "@/server/queries_a_classer/clients/getClients";
 import {
   getAllSitesWithPagination,
   getSites,
-} from "@/lib/queries/sites/getSites";
-import { RawSearchParams } from "@/normalize/normalizeSearchParams";
+} from "@/server/queries_a_classer/sites/getSites";
 import { parseAdminSitesQuery } from "@/zod-schemas/site";
 import AdminSitesFiltersForm from "./AdminSitesFiltersForm";
 import AdminSitesTable from "./AdminSitesTable";

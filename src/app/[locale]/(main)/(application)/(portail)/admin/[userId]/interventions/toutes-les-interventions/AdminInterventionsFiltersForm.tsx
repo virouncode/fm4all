@@ -8,7 +8,7 @@ import {
   interventionStatusCT,
   interventionTypeCT,
 } from "@/constants/codeTables";
-import { SelectClientType } from "@/zod-schemas/client";
+import { SelectClientType } from "@/zod-schemas/client.schema";
 import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
 import {
   AdminInterventionsQueryBackendType,

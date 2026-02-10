@@ -6,10 +6,10 @@ import {
   SidebarFooter,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { AuthUser } from "@/lib/auth";
+import { AuthUser } from "@/server/auth/auth";
+import { UserRoleType } from "@/zod-schemas/enums";
 import ClientNavItems from "./ClientNavItems";
 import ClientSidebarFooter from "./ClientSidebarFooter";
-import { UserRoleType } from "@/zod-schemas/enums";
 
 type ClientSidebarProps = {
   clientId: number;

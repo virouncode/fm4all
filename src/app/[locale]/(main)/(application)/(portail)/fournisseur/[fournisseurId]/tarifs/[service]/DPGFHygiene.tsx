@@ -6,7 +6,7 @@ import {
   getHygieneDistribTarifsFournisseur,
   getHygieneInstalDistribTarifsFournisseur,
   getHygieneMinFacturationFournisseur,
-} from "@/lib/queries/hygiene/getHygiene";
+} from "@/server/queries_a_classer/hygiene/getHygiene";
 import { SelectHygieneDistribTarifsFournisseurType } from "@/zod-schemas/hygieneDistribTarifs";
 import { Toilet } from "lucide-react";
 import CDCDialog from "./CDCDialog";

@@ -2,7 +2,7 @@
 
 import { getAllFournisseursAction } from "@/actions/fournisseurAction";
 import InfiniteDataTable from "@/components/tables/InfiniteDataTable";
-import { getAllFournisseursWithPagination } from "@/lib/queries/fournisseurs/getFournisseurs";
+import { getAllFournisseursWithPagination } from "@/server/queries_a_classer/fournisseurs/getFournisseurs";
 import {
   AdminFournisseursQueryBackendType,
   SelectFournisseurType,

@@ -1,7 +1,10 @@
 import { LocaleType } from "@/i18n/routing";
-import { getClient, getClientSites } from "@/lib/queries/clients/getClients";
-import { getFournisseurs } from "@/lib/queries/fournisseurs/getFournisseurs";
-import { getTicket } from "@/lib/queries/tickets/getTickets";
+import {
+  getClient,
+  getClientSites,
+} from "@/server/queries_a_classer/clients/getClients";
+import { getFournisseurs } from "@/server/queries_a_classer/fournisseurs/getFournisseurs";
+import { getTicket } from "@/server/queries_a_classer/tickets/getTickets";
 import { UpdateTicketFormType } from "@/zod-schemas/ticket";
 import { ReactNode } from "react";
 import AdminUpdateTicketForm from "./AdminUpdateTicketForm";

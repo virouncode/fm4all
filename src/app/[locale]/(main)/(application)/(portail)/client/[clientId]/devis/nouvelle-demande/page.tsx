@@ -1,7 +1,7 @@
 import {
   getClientFournisseurs,
   getClientSites,
-} from "@/lib/queries/clients/getClients";
+} from "@/server/queries_a_classer/clients/getClients";
 import { InsertTicketFormType } from "@/zod-schemas/ticket";
 import { ReactNode } from "react";
 import NouveauTicketForm from "../../tickets/nouveau-ticket/NouveauTicketForm";

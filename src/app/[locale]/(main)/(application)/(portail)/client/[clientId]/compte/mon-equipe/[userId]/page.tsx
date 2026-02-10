@@ -1,4 +1,4 @@
-import { getUserById } from "@/lib/queries/users/getUsers";
+import { getUserById } from "@/server/queries_a_classer/users/getUsers";
 import { UpdateUserFormType } from "@/zod-schemas/user";
 import { ReactNode } from "react";
 import UpdateUserForm from "../../mon-profil/[userId]/UpdateUserForm";

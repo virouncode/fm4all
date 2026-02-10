@@ -1,1 +1,0 @@
-ALTER TABLE "the_conso_tarifs" RENAME COLUMN "prixUnitaire" TO "prix_unitaire";

@@ -1,10 +1,13 @@
 "use server";
 
 import { db } from "@/db";
-import { getSession } from "@/lib/auth-session";
-import { getAllTickets, getTickets } from "@/lib/queries/tickets/getTickets";
-import { actionClient } from "@/lib/safe-actions";
+import { actionClient } from "@/lib/action/safe-actions";
 import { promoteTempTicketAttachment } from "@/lib/utils/file-helper";
+import { getSession } from "@/server/auth/get-session";
+import {
+  getAllTickets,
+  getTickets,
+} from "@/server/queries_a_classer/tickets/getTickets";
 import {
   adminTicketsQueryBackendSchema,
   insertTicketAttachmentToDbSchema,
@@ -182,7 +185,7 @@ export const insertTicketAction = actionClient
   });
 
 // ======================= ADMIN: getAllDevisTicketsAction ==========================//
-import { getAllDevisTickets } from "@/lib/queries/tickets/getTickets";
+import { getAllDevisTickets } from "@/server/queries_a_classer/tickets/getTickets";
 
 export const getAllDevisTicketsAction = actionClient
   .metadata({ actionName: "getAllDevisTicketsAction" })

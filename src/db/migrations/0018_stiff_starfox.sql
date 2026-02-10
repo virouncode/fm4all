@@ -1,1 +1,0 @@
-ALTER TABLE "cafe_machines_tarifs" DROP COLUMN "type";

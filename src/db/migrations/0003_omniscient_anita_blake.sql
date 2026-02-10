@@ -1,1 +1,0 @@
-ALTER TABLE "hygiene_conso_tarifs" ADD COLUMN "effectif" integer;

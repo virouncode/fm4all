@@ -1,9 +1,9 @@
 import { LocaleType } from "@/i18n/routing";
-import { getClients } from "@/lib/queries/clients/getClients";
-import { getFournisseurs } from "@/lib/queries/fournisseurs/getFournisseurs";
-import { getAllInterventions } from "@/lib/queries/interventions/getInterventions";
-import { getSites } from "@/lib/queries/sites/getSites";
 import { RawSearchParams } from "@/normalize/normalizeSearchParams";
+import { getClients } from "@/server/queries_a_classer/clients/getClients";
+import { getFournisseurs } from "@/server/queries_a_classer/fournisseurs/getFournisseurs";
+import { getAllInterventions } from "@/server/queries_a_classer/interventions/getInterventions";
+import { getSites } from "@/server/queries_a_classer/sites/getSites";
 import { parseAdminInterventionsQuery } from "@/zod-schemas/intervention";
 import AdminInterventionsFiltersForm from "./AdminInterventionsFiltersForm";
 import AdminInterventionsTable from "./AdminInterventionsTable";

@@ -1,78 +1,97 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
 import { Link, usePathname } from "@/i18n/navigation";
 import { getLocalStorage, setLocalStorage } from "@/lib/utils/storageHelper";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
+import { useEffect, useMemo, useState } from "react";
+import { ConsentState, ConsentUpdateParams } from "../analytics/GoogleTags";
 
-import { useEffect, useState } from "react";
+const CONSENT_KEY = "cookie_consent";
+const CONSENT_DATE_KEY = "cookie_consent_date";
 
-declare global {
-  interface Window {
-    gtag: (
-      command: string,
-      action: string,
-      params?: {
-        [key: string]: unknown;
-      },
-    ) => void;
+// À ajuster selon ta politique (souvent 6 mois / 12 mois en prod)
+const CONSENT_EXPIRATION_MS = 1000 * 60 * 60 * 24; // 24h
+
+type StoredConsent = boolean | null;
+type StoredConsentDate = number | null;
+
+function safeRemove(key: string) {
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    // noop
   }
 }
 
-const COOKIE_EXPIRATION_MS = 1000 * 60 * 60 * 24;
-// const COOKIE_EXPIRATION_MS = 1000 * 60;
-
-const CookieBanner = () => {
+export default function CookieBanner() {
   const t = useTranslations("cookieBanniere");
-  const [cookieConsent, setCookieConsent] = useState<boolean | null>(null);
   const pathname = usePathname();
 
-  useEffect(() => {
-    const storedCookieConsent = getLocalStorage("cookie_consent", null);
-    const storedConsentDate = getLocalStorage("cookie_consent_date", null);
-    if (storedCookieConsent !== null && storedConsentDate !== null) {
-      const now = Date.now();
-      const isExpired = now - storedConsentDate > COOKIE_EXPIRATION_MS;
+  const [consent, setConsent] = useState<StoredConsent>(null);
 
-      if (isExpired) {
-        localStorage.removeItem("cookie_consent");
-        localStorage.removeItem("cookie_consent_date");
-        setCookieConsent(null);
-      } else {
-        setCookieConsent(storedCookieConsent);
-      }
+  const shouldOpen = useMemo(
+    () => consent === null && pathname !== "/cookies",
+    [consent, pathname],
+  );
+
+  // 1) Lire la décision stockée + expiration
+  useEffect(() => {
+    const storedConsent = getLocalStorage(CONSENT_KEY, null) as StoredConsent;
+    const storedDate = getLocalStorage(
+      CONSENT_DATE_KEY,
+      null,
+    ) as StoredConsentDate;
+
+    if (storedConsent === null || storedDate === null) {
+      setConsent(null);
+      return;
     }
+
+    const expired = Date.now() - storedDate > CONSENT_EXPIRATION_MS;
+
+    if (expired) {
+      safeRemove(CONSENT_KEY);
+      safeRemove(CONSENT_DATE_KEY);
+      setConsent(null);
+      return;
+    }
+
+    setConsent(storedConsent);
   }, []);
 
+  // 2) Appliquer Consent Mode quand l’utilisateur choisit
   useEffect(() => {
-    if (cookieConsent === null) return;
-    const newValue = cookieConsent ? "granted" : "denied";
+    if (consent === null) return;
 
-    if (window !== undefined && window.gtag) {
-      window.gtag("consent", "update", {
-        analytics_storage: newValue,
-      });
-    }
-    setLocalStorage("cookie_consent", cookieConsent);
-    setLocalStorage("cookie_consent_date", Date.now());
-  }, [cookieConsent]);
+    const mode: ConsentState = consent ? "granted" : "denied";
 
-  const handleAccept = () => {
-    setCookieConsent(true);
-  };
-  const handleRefuse = () => {
-    setCookieConsent(false);
-  };
+    const params: ConsentUpdateParams = {
+      analytics_storage: mode,
+      ad_storage: mode,
+      ad_user_data: mode,
+      ad_personalization: mode,
+      // wait_for_update: 500, // optionnel si tu veux
+    };
+
+    window.gtag?.("consent", "update", params);
+
+    setLocalStorage(CONSENT_KEY, consent);
+    setLocalStorage(CONSENT_DATE_KEY, Date.now());
+  }, [consent]);
+
+  const handleAccept = () => setConsent(true);
+  const handleRefuse = () => setConsent(false);
+
   return (
-    <Sheet open={cookieConsent === null && pathname !== "/cookies"}>
-      <SheetTrigger asChild></SheetTrigger>
+    <Sheet open={shouldOpen}>
       <SheetContent
         side="bottom"
         className="gap-0 [&>button:first-child]:hidden"
@@ -82,17 +101,19 @@ const CookieBanner = () => {
             {t("banniere-de-consentement-aux-cookies")}
           </SheetTitle>
         </SheetHeader>
+
         <div className="flex flex-col items-center justify-between gap-6 px-6 pt-4 pb-10 text-sm md:flex-row lg:px-40">
           <div className="flex flex-col gap-2">
             <div className="relative h-[40px] w-[100px]">
               <Image
-                src={"/img/logo_full.webp"}
-                alt={`logo-de-fm4all`}
+                src="/img/logo_full.webp"
+                alt="logo-de-fm4all"
                 fill
                 className="object-contain"
                 sizes="100px"
               />
             </div>
+
             <div>
               <p>
                 {t(
@@ -117,6 +138,7 @@ const CookieBanner = () => {
               </Link>
             </div>
           </div>
+
           <div className="flex w-full flex-col gap-2 md:w-72">
             <Button
               title={t("jaccepte")}
@@ -126,6 +148,7 @@ const CookieBanner = () => {
             >
               {t("jaccepte")}
             </Button>
+
             <Button
               variant="outline"
               title={t("je-refuse")}
@@ -139,6 +162,4 @@ const CookieBanner = () => {
       </SheetContent>
     </Sheet>
   );
-};
-
-export default CookieBanner;
+}

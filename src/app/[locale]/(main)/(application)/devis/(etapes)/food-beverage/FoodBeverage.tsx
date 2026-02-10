@@ -7,11 +7,11 @@ import {
   getLaitConsoTarifs,
   getSucreConsoTarifs,
   getTheConsoTarifs,
-} from "@/lib/queries/boissons-chaudes/getBoissonsChaudes";
+} from "@/server/queries_a_classer/boissons-chaudes/getBoissonsChaudes";
 import {
   getFontaines,
   getFontainesTarifs,
-} from "@/lib/queries/fontaines/getFontaines";
+} from "@/server/queries_a_classer/fontaines/getFontaines";
 import {
   getBoissonsQuantites,
   getBoissonsTarifs,
@@ -20,13 +20,13 @@ import {
   getFruitsTarifs,
   getSnacksQuantites,
   getSnacksTarifs,
-} from "@/lib/queries/snacks-fruits/getSnacksFruits";
+} from "@/server/queries_a_classer/snacks-fruits/getSnacksFruits";
+import { getTranslations } from "next-intl/server";
 import NextEtapePilotageButton from "../../NextEtapePilotageButton";
 import Cafe from "./(cafe)/Cafe";
 import Fontaines from "./(fontaine)/Fontaines";
 import SnacksFruits from "./(snacks)/SnacksFruits";
 import The from "./(the)/The";
-import { getTranslations } from "next-intl/server";
 
 const FoodBeverage = async () => {
   const [

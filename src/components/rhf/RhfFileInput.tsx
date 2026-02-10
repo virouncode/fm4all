@@ -10,12 +10,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Spinner } from "@/components/ui/spinner";
-import { postVercelBlob } from "@/lib/queries/vercel-blob/postVercelBlob";
 import { cn } from "@/lib/utils";
 import {
   validateFileSize,
   validateImageDimensions,
 } from "@/lib/utils/validateFile";
+import { postVercelBlob } from "@/server/queries_a_classer/vercel-blob/postVercelBlob";
 
 import { X } from "lucide-react";
 import * as React from "react";

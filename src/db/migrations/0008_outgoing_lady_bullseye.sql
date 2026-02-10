@@ -1,1 +1,0 @@
-DROP TABLE "maintenance_tarifs" CASCADE;

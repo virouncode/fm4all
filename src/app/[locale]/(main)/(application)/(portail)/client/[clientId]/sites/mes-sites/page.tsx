@@ -1,6 +1,6 @@
 import { LocaleType } from "@/i18n/routing";
-import { getClientSites } from "@/lib/queries/clients/getClients";
 import { RawSearchParams } from "@/normalize/normalizeSearchParams";
+import { getClientSites } from "@/server/queries_a_classer/clients/getClients";
 import { parseSitesQuery } from "@/zod-schemas/site";
 import ClientSitesFiltersForm from "./ClientSitesFiltersForm";
 import ClientSitesTable from "./ClientSitesTable";

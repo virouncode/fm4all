@@ -2,7 +2,7 @@
 
 import { getInterventionsAction } from "@/actions/interventionsActions";
 import InfiniteDataTable from "@/components/tables/InfiniteDataTable";
-import { getInterventions } from "@/lib/queries/interventions/getInterventions";
+import { getInterventions } from "@/server/queries_a_classer/interventions/getInterventions";
 import {
   InterventionsQueryBackendType,
   SelectInterventionType,

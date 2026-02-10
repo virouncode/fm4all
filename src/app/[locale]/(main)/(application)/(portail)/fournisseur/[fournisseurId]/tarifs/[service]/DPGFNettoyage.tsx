@@ -6,7 +6,7 @@ import {
   getNettoyageTarifsFournisseur,
   getRepasseTarifsFournisseur,
   getVitrerieTarifsFournisseur,
-} from "@/lib/queries/nettoyage/getNettoyage";
+} from "@/server/queries_a_classer/nettoyage/getNettoyage";
 import { SelectNettoyageQuantitesType } from "@/zod-schemas/nettoyageQuantites";
 import { SelectNettoyageTarifFournisseurType } from "@/zod-schemas/nettoyageTarifs";
 import { SprayCan } from "lucide-react";

@@ -3,8 +3,8 @@ import {
   getClient,
   getClientFournisseurs,
   getClientSites,
-} from "@/lib/queries/clients/getClients";
-import { getTicket } from "@/lib/queries/tickets/getTickets";
+} from "@/server/queries_a_classer/clients/getClients";
+import { getTicket } from "@/server/queries_a_classer/tickets/getTickets";
 import { UpdateTicketFormType } from "@/zod-schemas/ticket";
 import { ReactNode } from "react";
 import AdminUpdateTicketForm from "../../../tickets/[ticketId]/AdminUpdateTicketForm";

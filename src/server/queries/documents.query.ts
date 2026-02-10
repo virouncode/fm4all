@@ -1,0 +1,23 @@
+import "server-only";
+
+import { db } from "@/db";
+import { documents } from "@/db/schema";
+import { eq } from "drizzle-orm";
+
+export async function getDocumentById(documentId: string) {
+  const [row] = await db
+    .select({
+      id: documents.id,
+      proprietaireEntrepriseId: documents.proprietaireEntrepriseId,
+      storageProvider: documents.storageProvider,
+      storageKey: documents.storageKey,
+      filename: documents.filename,
+      mimeType: documents.mimeType,
+      sizeBytes: documents.sizeBytes,
+    })
+    .from(documents)
+    .where(eq(documents.id, documentId))
+    .limit(1);
+
+  return row ?? null;
+}

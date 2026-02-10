@@ -5,7 +5,7 @@ import { Form } from "@/components/ui/form";
 import { useConfirm } from "@/hooks/use-confirm";
 import { toast } from "@/hooks/use-toast";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
-import { SelectClientType } from "@/zod-schemas/client";
+import { SelectClientType } from "@/zod-schemas/client.schema";
 import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
 import {
   updateInterventionFormSchema,

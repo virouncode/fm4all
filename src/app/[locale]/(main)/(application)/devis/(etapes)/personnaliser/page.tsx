@@ -1,4 +1,5 @@
 import { generateAlternates } from "@/lib/metadata/metadata-helpers";
+import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
 import {
   getAlarmesTarifs,
   getColonnesSechesTarifs,
@@ -6,8 +7,7 @@ import {
   getExutoiresTarifs,
   getPortesCoupeFeuTarifs,
   getRiaTarifs,
-} from "@/lib/queries/incendie/getIncendie";
-import { generateLocaleParams } from "@/lib/utils/staticParamsHelper";
+} from "@/server/queries_a_classer/incendie/getIncendie";
 import { Metadata } from "next";
 import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";

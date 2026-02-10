@@ -1,9 +1,9 @@
 "use server";
 import { db } from "@/db";
 import { interventions } from "@/db/schema/interventions";
-import { getSession } from "@/lib/auth-session";
-import { getInterventions } from "@/lib/queries/interventions/getInterventions";
-import { actionClient } from "@/lib/safe-actions";
+import { actionClient } from "@/lib/action/safe-actions";
+import { getSession } from "@/server/auth/get-session";
+import { getInterventions } from "@/server/queries_a_classer/interventions/getInterventions";
 import {
   insertInterventionSchema,
   insertInterventionToDbSchema,
@@ -290,7 +290,7 @@ export const updateInterventionAction = actionClient
   });
 
 // ======================= ADMIN: getAllInterventionsAction ==========================//
-import { getAllInterventions } from "@/lib/queries/interventions/getInterventions";
+import { getAllInterventions } from "@/server/queries_a_classer/interventions/getInterventions";
 import { adminInterventionsQueryBackendSchema } from "@/zod-schemas/intervention";
 
 export const getAllInterventionsAction = actionClient

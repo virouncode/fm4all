@@ -1,5 +1,8 @@
 import { LocaleType } from "@/i18n/routing";
-import { getClient, getClientSiteById } from "@/lib/queries/clients/getClients";
+import {
+  getClient,
+  getClientSiteById,
+} from "@/server/queries_a_classer/clients/getClients";
 import { UpdateSiteFormType } from "@/zod-schemas/site";
 import { notFound } from "next/navigation";
 import AdminUpdateSiteForm from "./AdminUpdateSiteForm";

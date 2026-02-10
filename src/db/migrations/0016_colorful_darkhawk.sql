@@ -1,1 +1,0 @@
-ALTER TABLE "cafe_machines_tarifs" RENAME COLUMN "limite_boissons_j" TO "limite_tasses_j";

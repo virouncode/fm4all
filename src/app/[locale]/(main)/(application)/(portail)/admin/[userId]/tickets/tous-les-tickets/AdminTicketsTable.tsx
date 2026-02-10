@@ -5,8 +5,8 @@ import {
   getAllTicketsAction,
 } from "@/actions/ticketsActions";
 import InfiniteDataTable from "@/components/tables/InfiniteDataTable";
-import { getAllTickets } from "@/lib/queries/tickets/getTickets";
-import { SelectClientType } from "@/zod-schemas/client";
+import { getAllTickets } from "@/server/queries_a_classer/tickets/getTickets";
+import { SelectClientType } from "@/zod-schemas/client.schema";
 import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
 import { SelectSiteType } from "@/zod-schemas/site";
 import {

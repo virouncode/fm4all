@@ -6,9 +6,9 @@ import {
   SidebarFooter,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { AuthUser } from "@/lib/auth";
-import AdminSidebarFooter from "./AdminSidebarFooter";
+import { AuthUser } from "@/server/auth/auth";
 import AdminNavItems from "./AdminNavItems";
+import AdminSidebarFooter from "./AdminSidebarFooter";
 
 type AdminSidebarProps = {
   currentUser: AuthUser;

@@ -1,1 +1,0 @@
--- ALTER TABLE "boissons_tarifs" DROP COLUMN "effectif";

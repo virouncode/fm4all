@@ -8,7 +8,7 @@ import {
 import { RATIO } from "@/constants/constants";
 import { formatInTimezone } from "@/lib/utils/formatDates";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { SelectClientType } from "@/zod-schemas/client";
+import { SelectClientType } from "@/zod-schemas/client.schema";
 import { SelectDevisType, SORTABLE_DEVIS_COLUMNS } from "@/zod-schemas/devis";
 import { SelectFournisseurType } from "@/zod-schemas/fournisseur";
 import { SelectSiteType } from "@/zod-schemas/site";

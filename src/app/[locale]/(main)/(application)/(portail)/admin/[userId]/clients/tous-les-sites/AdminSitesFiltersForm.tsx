@@ -6,7 +6,7 @@ import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
 import { typeBatimentCT, typeOccupationCT } from "@/constants/codeTables";
 import { useDebounce } from "@/hooks/use-debounce";
-import { SelectClientType } from "@/zod-schemas/client";
+import { SelectClientType } from "@/zod-schemas/client.schema";
 import {
   AdminSitesQueryBackendType,
   AdminSitesQueryFiltersType,

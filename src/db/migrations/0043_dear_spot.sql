@@ -1,3 +1,0 @@
--- ALTER TABLE "services_fm4all_taux" ADD COLUMN "min_facturation_plateforme" integer NOT NULL;--> statement-breakpoint
--- ALTER TABLE "services_fm4all_taux" ADD COLUMN "min_facturation_support_op" integer NOT NULL;--> statement-breakpoint
--- ALTER TABLE "services_fm4all_taux" ADD COLUMN "min_facturation_account_manager" integer NOT NULL;

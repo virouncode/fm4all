@@ -1,1 +1,0 @@
-DROP TABLE "hygiene_distrib_tarifs" CASCADE;

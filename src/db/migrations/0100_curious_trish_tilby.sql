@@ -1,1 +1,0 @@
-DROP TABLE "qualite_air_tarifs" CASCADE;

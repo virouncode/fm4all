@@ -1,1 +1,0 @@
-ALTER TABLE "tickets" ALTER COLUMN "type" SET NOT NULL;

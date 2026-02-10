@@ -1,6 +1,6 @@
 import { LocaleType } from "@/i18n/routing";
-import { getSession } from "@/lib/auth-session";
-import { getClientSiteById } from "@/lib/queries/clients/getClients";
+import { getSession } from "@/server/auth/get-session";
+import { getClientSiteById } from "@/server/queries_a_classer/clients/getClients";
 import { UpdateSiteFormType } from "@/zod-schemas/site";
 import { ReactNode } from "react";
 import ClientUpdateSiteForm from "./ClientUpdateSiteForm";

@@ -14,8 +14,8 @@ import {
 } from "@/components/ui/sidebar";
 import { toast } from "@/hooks/use-toast";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
-import { AuthUser } from "@/lib/auth";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/auth-client";
+import { AuthUser } from "@/server/auth/auth";
 import { User2 } from "lucide-react";
 
 type AdminSidebarFooterProps = {

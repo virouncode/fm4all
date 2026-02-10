@@ -9,12 +9,12 @@ import {
 } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
-import { getProspects } from "@/lib/queries/prospects/getProspects";
+import { getProspects } from "@/server/queries_a_classer/prospects/getProspects";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
   OnboardClientFormType,
   onboardClientFormSchema,
-} from "@/zod-schemas/client";
+} from "@/zod-schemas/client.schema";
 import {
   ProspectsQueryBackendType,
   SelectProspectType,
