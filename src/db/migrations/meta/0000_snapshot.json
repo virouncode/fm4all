@@ -1,5 +1,5 @@
 {
-  "id": "2eb143d7-8f62-47b0-9a9a-348af93fe20d",
+  "id": "54ae1144-2aa4-41cd-98ea-226715e9f666",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -863,7 +863,7 @@
         },
         "cafe_machine_id": {
           "name": "cafe_machine_id",
-          "type": "integer",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
@@ -957,6 +957,19 @@
             "id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "cafe_machines_tarifs_cafe_machine_id_cafe_machines_id_fk": {
+          "name": "cafe_machines_tarifs_cafe_machine_id_cafe_machines_id_fk",
+          "tableFrom": "cafe_machines_tarifs",
+          "tableTo": "cafe_machines",
+          "columnsFrom": [
+            "cafe_machine_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
           "onUpdate": "no action"
         },
         "cafe_machines_tarifs_image_id_documents_id_fk": {
@@ -3719,6 +3732,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "logo_id": {
+          "name": "logo_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_by_id": {
           "name": "created_by_id",
           "type": "uuid",
@@ -3785,6 +3804,19 @@
           "tableTo": "prospects",
           "columnsFrom": [
             "prospect_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "entreprises_logo_id_documents_id_fk": {
+          "name": "entreprises_logo_id_documents_id_fk",
+          "tableFrom": "entreprises",
+          "tableTo": "documents",
+          "columnsFrom": [
+            "logo_id"
           ],
           "columnsTo": [
             "id"
@@ -12845,7 +12877,7 @@
       "values": [
         "client",
         "prestataire",
-        "operateur_plateforme"
+        "plateforme"
       ]
     },
     "public.role": {

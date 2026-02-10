@@ -1,4 +1,4 @@
-import { usePersonnalisationStore } from "@/stores/personnalisationStore";
+import { usePersonnalisationStore } from "@/stores/devis/personnalisationStore";
 import { useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
 

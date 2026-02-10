@@ -10,9 +10,9 @@ import {
 import { MARGE } from "@/constants/constants";
 import { typesBoissons } from "@/constants/typesBoissons";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { useCafeStore } from "@/stores/cafeStore";
+import { useCafeStore } from "@/stores/devis/cafeStore";
+import { useTotalCafeStore } from "@/stores/devis/totalCafeStore";
 import { locationCafeMachine } from "../../../../../../constants/locationCafeMachine";
-import { useTotalCafeStore } from "@/stores/totalCafeStore";
 
 const DetailCafe = () => {
   const cafe = useCafeStore((s) => s.cafe);

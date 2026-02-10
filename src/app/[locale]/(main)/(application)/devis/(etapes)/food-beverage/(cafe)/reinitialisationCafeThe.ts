@@ -1,7 +1,7 @@
-import { useCafeStore } from "@/stores/cafeStore";
-import { useTheStore } from "@/stores/theStore";
-import { useTotalCafeStore } from "@/stores/totalCafeStore";
-import { useTotalTheStore } from "@/stores/totalTheStore";
+import { useCafeStore } from "@/stores/devis/cafeStore";
+import { useTheStore } from "@/stores/devis/theStore";
+import { useTotalCafeStore } from "@/stores/devis/totalCafeStore";
+import { useTotalTheStore } from "@/stores/devis/totalTheStore";
 
 export const reinitialisationCafeThe = () => {
   const resetThe = useTheStore.getState().reset;

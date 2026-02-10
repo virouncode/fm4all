@@ -1,8 +1,8 @@
 import { MARGE } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
-import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
-import { useTotalSnacksFruitsStore } from "@/stores/totalSnacksFruitsStore";
+import { useSnacksFruitsStore } from "@/stores/devis/snacksFruitsStore";
+import { useTotalSnacksFruitsStore } from "@/stores/devis/totalSnacksFruitsStore";
 import { useTranslations } from "next-intl";
 
 const TotalSnacksFruits = () => {

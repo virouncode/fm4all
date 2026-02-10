@@ -11,8 +11,8 @@ import { MARGE } from "@/constants/constants";
 import { locationFontaine } from "@/constants/locationFontaine";
 import { typesPose } from "@/constants/typesPose";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { useFontainesStore } from "@/stores/fontainesStore";
-import { useTotalFontainesStore } from "@/stores/totalFontainesStore";
+import { useFontainesStore } from "@/stores/devis/fontainesStore";
+import { useTotalFontainesStore } from "@/stores/devis/totalFontainesStore";
 
 const DetailFontaines = () => {
   const fontaines = useFontainesStore((s) => s.fontaines);

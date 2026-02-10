@@ -8,7 +8,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { useIncendieStore } from "@/stores/incendieStore";
+import { useIncendieStore } from "@/stores/devis/incendieStore";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";

@@ -1,4 +1,4 @@
-import { useManagementStore } from "@/stores/managementStore";
+import { useManagementStore } from "@/stores/devis/managementStore";
 import { useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
 

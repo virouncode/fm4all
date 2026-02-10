@@ -4,9 +4,9 @@ import {
   CarouselApi,
   CarouselContent,
 } from "@/components/ui/carousel";
+import { useHygieneStore } from "@/stores/devis/hygieneStore";
 import { useEffect, useState } from "react";
 import HygieneMobilePropositionCard from "./HygieneMobilePropositionCard";
-import { useHygieneStore } from "@/stores/hygieneStore";
 
 type HygieneMobilePropositionsProps = {
   prixInstalDistrib: number | null;

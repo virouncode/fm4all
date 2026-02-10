@@ -1,5 +1,5 @@
 import { gammes } from "@/zod-schemas/gamme";
-import { HygieneType } from "@/zod-schemas/hygiene";
+import { HygieneType } from "@/zod-schemas/hygiene.schema";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";

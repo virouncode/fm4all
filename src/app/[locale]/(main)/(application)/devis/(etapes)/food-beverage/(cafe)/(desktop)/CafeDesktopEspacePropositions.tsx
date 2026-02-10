@@ -1,5 +1,5 @@
 import NextServiceButton from "@/app/[locale]/(main)/(application)/devis/NextServiceButton";
-import { CafeEspaceType } from "@/zod-schemas/cafe";
+import { CafeEspaceType } from "@/zod-schemas/cafe.schema";
 import { useTranslations } from "next-intl";
 import AddEspaceButton from "../AddEspaceButton";
 import CafeEspacePropositionFournisseurLogo from "../CafeEspacePropositionFournisseurLogo";

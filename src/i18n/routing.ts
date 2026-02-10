@@ -127,10 +127,6 @@ export const routing = defineRouting({
       fr: "/carriere",
       en: "/careers",
     },
-    "/auth/signin": {
-      fr: "/auth/signin",
-      en: "/auth/signin",
-    },
     "/auth/redirect": {
       fr: "/auth/redirect",
       en: "/auth/redirect",
@@ -362,6 +358,68 @@ export const routing = defineRouting({
     "/fournisseur/[fournisseurId]/interventions": {
       fr: "/fournisseur/[fournisseurId]/mes-interventions",
       en: "/fournisseur/[fournisseurId]/my-interventions",
+    },
+
+    //APP
+    "/app": {
+      fr: "/app",
+      en: "/app",
+    },
+    "/app/contrats": {
+      fr: "/app/contrats",
+      en: "/app/contrats",
+    },
+    "/app/devis": {
+      fr: "/app/devis",
+      en: "/app/devis",
+    },
+    "/app/facturation": {
+      fr: "/app/facturation",
+      en: "/app/facturation",
+    },
+    "/app/documents": {
+      fr: "/app/documents",
+      en: "/app/documents",
+    },
+    "/app/utilisateurs": {
+      fr: "/app/utilisateurs",
+      en: "/app/utilisateurs",
+    },
+    "/app/parametres": {
+      fr: "/app/parametres",
+      en: "/app/parametres",
+    },
+    "/app/tickets": {
+      fr: "/app/tickets",
+      en: "/app/tickets",
+    },
+    "/app/sites": {
+      fr: "/app/sites",
+      en: "/app/sites",
+    },
+    "/app/services": {
+      fr: "/app/services",
+      en: "/app/services",
+    },
+    "/app/planning": {
+      fr: "/app/planning",
+      en: "/app/planning",
+    },
+    "/app/entreprises": {
+      fr: "/app/entreprises",
+      en: "/app/companies",
+    },
+    "/app/securite": {
+      fr: "/app/securite",
+      en: "/app/securite",
+    },
+    "/app/compte/mon-profil": {
+      fr: "/app/compte/mon-profil",
+      en: "/app/compte/mon-profil",
+    },
+    "/auth/login": {
+      fr: "/auth/login",
+      en: "/auth/login",
     },
   },
 });

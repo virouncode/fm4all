@@ -2,8 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { useRouter } from "@/i18n/navigation";
-import { useDevisProgressStore } from "@/stores/devisProgressStore";
-import { useProspectStore } from "@/stores/prospectStore";
+import { useDevisProgressStore } from "@/stores/devis/devisProgressStore";
+import { useProspectStore } from "@/stores/devis/prospectStore";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/shallow";
 

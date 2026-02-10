@@ -1,6 +1,6 @@
 "use client";
 
-import { useServicesStore } from "@/stores/servicesStore";
+import { useServicesStore } from "@/stores/devis/servicesStore";
 import { Info, SquareArrowOutUpRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMediaQuery } from "react-responsive";

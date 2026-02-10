@@ -1,7 +1,7 @@
 import { MAX_NB_DISTRIB } from "@/constants/constants";
-import { useHygieneStore } from "@/stores/hygieneStore";
-import { useProspectStore } from "@/stores/prospectStore";
-import { useTotalHygieneStore } from "@/stores/totalHygieneStore";
+import { useHygieneStore } from "@/stores/devis/hygieneStore";
+import { useProspectStore } from "@/stores/devis/prospectStore";
+import { useTotalHygieneStore } from "@/stores/devis/totalHygieneStore";
 import { gammes } from "@/zod-schemas/gamme";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";

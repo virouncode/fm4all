@@ -1,6 +1,6 @@
 "use client";
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
-import { useServicesStore } from "@/stores/servicesStore";
+import { useServicesStore } from "@/stores/devis/servicesStore";
 import { SelectLegioTarifsType } from "@/zod-schemas/legioTarifs";
 import { SelectMaintenanceQuantitesType } from "@/zod-schemas/maintenanceQuantites";
 import { SelectMaintenanceTarifsType } from "@/zod-schemas/maintenanceTarifs";

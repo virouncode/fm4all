@@ -4,9 +4,9 @@ import {
   CarouselApi,
   CarouselContent,
 } from "@/components/ui/carousel";
+import { useMaintenanceStore } from "@/stores/devis/maintenanceStore";
 import { useEffect, useState } from "react";
 import MaintenanceMobilePropositionCard from "./MaintenanceMobilePropositionCard";
-import { useMaintenanceStore } from "@/stores/maintenanceStore";
 
 type MaintenanceMobilePropositionsCarouselProps = {
   handleClickProposition: (proposition: {

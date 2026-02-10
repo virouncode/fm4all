@@ -3,10 +3,10 @@
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";
-import { useDevisProgressStore } from "@/stores/devisProgressStore";
-import { useProspectStore } from "@/stores/prospectStore";
-import { useServicesFm4AllStore } from "@/stores/servicesFm4AllStore";
-import { useTotalServicesFm4AllStore } from "@/stores/totalServicesFm4AllStore";
+import { useDevisProgressStore } from "@/stores/devis/devisProgressStore";
+import { useProspectStore } from "@/stores/devis/prospectStore";
+import { useServicesFm4AllStore } from "@/stores/devis/servicesFm4AllStore";
+import { useTotalServicesFm4AllStore } from "@/stores/devis/totalServicesFm4AllStore";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/shallow";
 

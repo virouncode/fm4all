@@ -1,10 +1,10 @@
 import { MAJORATION_DIMANCHE } from "@/constants/constants";
 import { toast } from "@/hooks/use-toast";
-import { useHygieneStore } from "@/stores/hygieneStore";
-import { useNettoyageStore } from "@/stores/nettoyageStore";
-import { useProspectStore } from "@/stores/prospectStore";
-import { useTotalHygieneStore } from "@/stores/totalHygieneStore";
-import { useTotalNettoyageStore } from "@/stores/totalNettoyageStore";
+import { useHygieneStore } from "@/stores/devis/hygieneStore";
+import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
+import { useProspectStore } from "@/stores/devis/prospectStore";
+import { useTotalHygieneStore } from "@/stores/devis/totalHygieneStore";
+import { useTotalNettoyageStore } from "@/stores/devis/totalNettoyageStore";
 import { gammes, GammeType } from "@/zod-schemas/gamme";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";

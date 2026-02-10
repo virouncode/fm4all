@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1770651301829,
-      "tag": "0000_goofy_marvel_zombies",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1770654281934,
-      "tag": "0001_small_iron_patriot",
+      "when": 1770717450830,
+      "tag": "0000_flawless_yellow_claw",
       "breakpoints": true
     }
   ]

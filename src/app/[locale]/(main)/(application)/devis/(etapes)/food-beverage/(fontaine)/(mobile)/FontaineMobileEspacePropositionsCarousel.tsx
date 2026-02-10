@@ -4,10 +4,10 @@ import {
   CarouselApi,
   CarouselContent,
 } from "@/components/ui/carousel";
-import { FontaineEspaceType } from "@/zod-schemas/fontaines";
+import { useFontainesStore } from "@/stores/devis/fontainesStore";
+import { FontaineEspaceType } from "@/zod-schemas/fontaines.schema";
 import { useEffect, useState } from "react";
 import FontaineMobileEspacePropositionCard from "./FontaineMobileEspacePropositionCard";
-import { useFontainesStore } from "@/stores/fontainesStore";
 
 type FontaineMobileEspacePropositionsCarouselProps = {
   propositions: {

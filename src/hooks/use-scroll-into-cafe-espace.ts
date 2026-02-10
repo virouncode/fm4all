@@ -1,5 +1,5 @@
-import { useCafeStore } from "@/stores/cafeStore";
-import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
+import { useCafeStore } from "@/stores/devis/cafeStore";
+import { useFoodBeverageStore } from "@/stores/devis/foodBeverageStore";
 import { useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
 

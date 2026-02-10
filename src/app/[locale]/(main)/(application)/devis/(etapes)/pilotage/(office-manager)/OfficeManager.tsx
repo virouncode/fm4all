@@ -2,6 +2,7 @@
 
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
 import useScrollIntoManagement from "@/hooks/use-scroll-into-management";
+import { useManagementStore } from "@/stores/devis/managementStore";
 import { SelectOfficeManagerQuantitesType } from "@/zod-schemas/officeManagerQuantites";
 import { SelectOfficeManagerTarifsType } from "@/zod-schemas/officeManagerTarifs";
 import { UserRoundCog } from "lucide-react";
@@ -11,7 +12,6 @@ import { useMediaQuery } from "react-responsive";
 import PropositionsFooter from "../../../PropositionsFooter";
 import PropositionsTitle from "../../../PropositionsTitle";
 import OfficeManagerPropositions from "./OfficeManagerPropositions";
-import { useManagementStore } from "@/stores/managementStore";
 
 type OfficeManagerProps = {
   officeManagerQuantites: SelectOfficeManagerQuantitesType[];

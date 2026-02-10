@@ -1,9 +1,9 @@
 "use client";
 import { CacheInvalidationData } from "@/lib/cache-invalidation";
 import { roundEffectif } from "@/lib/utils/roundEffectif";
-import { useHygieneStore } from "@/stores/hygieneStore";
-import { useProspectStore } from "@/stores/prospectStore";
-import { useTotalHygieneStore } from "@/stores/totalHygieneStore";
+import { useHygieneStore } from "@/stores/devis/hygieneStore";
+import { useProspectStore } from "@/stores/devis/prospectStore";
+import { useTotalHygieneStore } from "@/stores/devis/totalHygieneStore";
 import { useTranslations } from "next-intl";
 import { useCallback } from "react";
 import { useShallow } from "zustand/shallow";

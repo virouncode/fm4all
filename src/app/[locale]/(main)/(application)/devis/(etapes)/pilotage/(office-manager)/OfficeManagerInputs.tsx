@@ -8,7 +8,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useOfficeManagerStore } from "@/stores/officeManagerStore";
+import { useOfficeManagerStore } from "@/stores/devis/officeManagerStore";
 import { useTranslations } from "next-intl";
 
 type OfficeManagerInputsProps = {

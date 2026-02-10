@@ -1,4 +1,4 @@
-import { useServicesStore } from "@/stores/servicesStore";
+import { useServicesStore } from "@/stores/devis/servicesStore";
 import { useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
 

@@ -1,8 +1,8 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "@/i18n/navigation";
-import { useCafeStore } from "@/stores/cafeStore";
-import { usePersonnalisationStore } from "@/stores/personnalisationStore";
+import { useCafeStore } from "@/stores/devis/cafeStore";
+import { usePersonnalisationStore } from "@/stores/devis/personnalisationStore";
 import { Coffee } from "lucide-react";
 import { ChangeEvent } from "react";
 import { useShallow } from "zustand/shallow";

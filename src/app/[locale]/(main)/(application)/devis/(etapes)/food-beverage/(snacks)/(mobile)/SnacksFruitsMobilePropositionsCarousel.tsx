@@ -4,9 +4,9 @@ import {
   CarouselApi,
   CarouselContent,
 } from "@/components/ui/carousel";
+import { useSnacksFruitsStore } from "@/stores/devis/snacksFruitsStore";
 import { useEffect, useState } from "react";
 import SnacksFruitsMobilePropositionCard from "./SnacksFruitsMobilePropositionCard";
-import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
 
 type SnacksFruitsMobilePropositionsCarouselProps = {
   propositions: {

@@ -1,6 +1,6 @@
 import FournisseurDialog from "@/app/[locale]/(main)/(application)/devis/FournisseurDialog";
 import StarRating from "@/components/star/StarRating";
-import { useNettoyageStore } from "@/stores/nettoyageStore";
+import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
 
 import {
   Dialog,

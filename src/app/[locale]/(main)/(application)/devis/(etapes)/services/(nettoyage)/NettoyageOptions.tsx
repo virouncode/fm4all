@@ -2,8 +2,8 @@
 
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
 import { MAJORATION_DIMANCHE } from "@/constants/constants";
-import { useNettoyageStore } from "@/stores/nettoyageStore";
-import { useServicesStore } from "@/stores/servicesStore";
+import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
+import { useServicesStore } from "@/stores/devis/servicesStore";
 import { SelectRepasseTarifsType } from "@/zod-schemas/nettoyageRepasse";
 import { SelectNettoyageTarifsType } from "@/zod-schemas/nettoyageTarifs";
 import { SelectVitrerieTarifsType } from "@/zod-schemas/nettoyageVitrerie";

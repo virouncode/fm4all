@@ -2,10 +2,10 @@ import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/P
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useNettoyageStore } from "@/stores/nettoyageStore";
-import { usePersonnalisationStore } from "@/stores/personnalisationStore";
-import { useProspectStore } from "@/stores/prospectStore";
-import { useTotalNettoyageStore } from "@/stores/totalNettoyageStore";
+import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
+import { usePersonnalisationStore } from "@/stores/devis/personnalisationStore";
+import { useProspectStore } from "@/stores/devis/prospectStore";
+import { useTotalNettoyageStore } from "@/stores/devis/totalNettoyageStore";
 import { SprayCan } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ChangeEvent, useRef } from "react";

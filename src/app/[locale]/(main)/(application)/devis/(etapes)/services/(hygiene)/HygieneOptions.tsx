@@ -1,9 +1,9 @@
 "use client";
 
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
-import { useHygieneStore } from "@/stores/hygieneStore";
-import { useNettoyageStore } from "@/stores/nettoyageStore";
-import { useServicesStore } from "@/stores/servicesStore";
+import { useHygieneStore } from "@/stores/devis/hygieneStore";
+import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
+import { useServicesStore } from "@/stores/devis/servicesStore";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";

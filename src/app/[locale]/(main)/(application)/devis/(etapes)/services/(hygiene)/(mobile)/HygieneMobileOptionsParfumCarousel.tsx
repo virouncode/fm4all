@@ -4,10 +4,10 @@ import {
   CarouselApi,
   CarouselContent,
 } from "@/components/ui/carousel";
-import { useHygieneStore } from "@/stores/hygieneStore";
+import { useHygieneStore } from "@/stores/devis/hygieneStore";
 import { useEffect, useState } from "react";
-import HygieneMobileOptionsParfumCard from "./HygieneMobileOptionsParfumCard";
 import { HygieneOptionsType } from "../(desktop)/HygieneOptionsPropositions";
+import HygieneMobileOptionsParfumCard from "./HygieneMobileOptionsParfumCard";
 
 type HygieneMobileOptionsParfumCarouselProps = {
   propositions: {

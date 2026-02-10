@@ -12,8 +12,8 @@ import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
-import { useCafeStore } from "@/stores/cafeStore";
-import { CafeEspaceType } from "@/zod-schemas/cafe";
+import { useCafeStore } from "@/stores/devis/cafeStore";
+import { CafeEspaceType } from "@/zod-schemas/cafe.schema";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 

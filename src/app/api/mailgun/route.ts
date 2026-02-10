@@ -13,8 +13,8 @@ import { getDocumentById } from "@/server/queries/documents.query";
 import { getS3ObjectAsBuffer, validateKeyAllowed } from "@/server/s3/s3";
 
 const emailSchema = z.object({
-  from: z.string().email().optional(), // utilisé en Reply-To uniquement
-  to: z.string().email(),
+  from: z.email().optional(), // utilisé en Reply-To uniquement
+  to: z.email(),
   subject: z.string().min(1, "Le sujet est obligatoire"),
   text: z.string().min(1, "Le corps du message est obligatoire"),
   html: z.string().optional(),

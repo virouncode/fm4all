@@ -1,8 +1,8 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "@/i18n/navigation";
-import { useOfficeManagerStore } from "@/stores/officeManagerStore";
-import { usePersonnalisationStore } from "@/stores/personnalisationStore";
+import { useOfficeManagerStore } from "@/stores/devis/officeManagerStore";
+import { usePersonnalisationStore } from "@/stores/devis/personnalisationStore";
 import { UserRoundCog } from "lucide-react";
 import { ChangeEvent } from "react";
 import { useShallow } from "zustand/shallow";

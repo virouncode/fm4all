@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useCafeStore } from "@/stores/cafeStore";
+import { useCafeStore } from "@/stores/devis/cafeStore";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine";
 import { SelectCafeMachinesTarifsType } from "@/zod-schemas/cafeMachinesTarifs";

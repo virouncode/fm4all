@@ -9,8 +9,11 @@ import { Spinner } from "@/components/ui/spinner";
 import { toast } from "@/hooks/use-toast";
 import { Link, useRouter } from "@/i18n/navigation";
 import { formatLocalStorageData } from "@/lib/utils/formatLocalStorageData";
-import { useDevisProgressStore } from "@/stores/devisProgressStore";
-import { toStoreProspect, useProspectStore } from "@/stores/prospectStore";
+import { useDevisProgressStore } from "@/stores/devis/devisProgressStore";
+import {
+  toStoreProspect,
+  useProspectStore,
+} from "@/stores/devis/prospectStore";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
   createInsertProspectFormSchema,

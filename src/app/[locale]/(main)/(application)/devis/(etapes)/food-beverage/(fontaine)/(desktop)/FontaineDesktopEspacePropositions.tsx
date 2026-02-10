@@ -1,5 +1,5 @@
 import NextServiceButton from "@/app/[locale]/(main)/(application)/devis/NextServiceButton";
-import { FontaineEspaceType } from "@/zod-schemas/fontaines";
+import { FontaineEspaceType } from "@/zod-schemas/fontaines.schema";
 import { useTranslations } from "next-intl";
 import AddEspaceButton from "../../(cafe)/AddEspaceButton";
 import NextEspaceButton from "../../(cafe)/NextEspaceButton";

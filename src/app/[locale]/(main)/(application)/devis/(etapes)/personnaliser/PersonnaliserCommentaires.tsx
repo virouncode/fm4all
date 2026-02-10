@@ -1,8 +1,8 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "@/i18n/navigation";
-import { useCommentairesStore } from "@/stores/commentairesStore";
-import { usePersonnalisationStore } from "@/stores/personnalisationStore";
+import { useCommentairesStore } from "@/stores/devis/commentairesStore";
+import { usePersonnalisationStore } from "@/stores/devis/personnalisationStore";
 import { MessageSquareText } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ChangeEvent, useRef } from "react";

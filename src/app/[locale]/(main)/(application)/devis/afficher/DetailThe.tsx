@@ -9,9 +9,9 @@ import {
 } from "@/components/ui/table";
 import { MARGE } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { useCafeStore } from "@/stores/cafeStore";
-import { useTheStore } from "@/stores/theStore";
-import { useTotalTheStore } from "@/stores/totalTheStore";
+import { useCafeStore } from "@/stores/devis/cafeStore";
+import { useTheStore } from "@/stores/devis/theStore";
+import { useTotalTheStore } from "@/stores/devis/totalTheStore";
 
 const DetailThe = () => {
   const cafe = useCafeStore((s) => s.cafe);

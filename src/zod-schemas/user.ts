@@ -12,7 +12,7 @@ import {
 } from "drizzle-zod";
 import { z } from "zod";
 import { userRoleSchema } from "./enums";
-import { phoneNumberSchema } from "./phone";
+import { phoneNumberSchema } from "./phone.schema";
 
 //SELECT
 export const selectUserSchema = createSelectSchema(user);

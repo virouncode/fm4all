@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useMemo } from "react";
 
-import { useIncendieStore } from "@/stores/incendieStore";
-import { useNettoyageStore } from "@/stores/nettoyageStore";
-import { usePersonnalisationStore } from "@/stores/personnalisationStore";
+import { useIncendieStore } from "@/stores/devis/incendieStore";
+import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
+import { usePersonnalisationStore } from "@/stores/devis/personnalisationStore";
 
 export const usePersonnalisation = () => {
   // Extract all contexts

@@ -1,7 +1,7 @@
 "use client";
 
-import { useOfficeManagerStore } from "@/stores/officeManagerStore";
-import { useTotalOfficeManagerStore } from "@/stores/totalOfficeManagerStore";
+import { useOfficeManagerStore } from "@/stores/devis/officeManagerStore";
+import { useTotalOfficeManagerStore } from "@/stores/devis/totalOfficeManagerStore";
 import { SelectOfficeManagerQuantitesType } from "@/zod-schemas/officeManagerQuantites";
 import { SelectOfficeManagerTarifsType } from "@/zod-schemas/officeManagerTarifs";
 import { useTranslations } from "next-intl";

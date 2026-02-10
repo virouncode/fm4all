@@ -2,10 +2,10 @@
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
 import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/constants/constants";
 import useScrollIntoFontainesEspace from "@/hooks/use-scroll-into-fontaines-espace";
-import { useFontainesStore } from "@/stores/fontainesStore";
-import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
-import { useProspectStore } from "@/stores/prospectStore";
-import { useTotalFontainesStore } from "@/stores/totalFontainesStore";
+import { useFontainesStore } from "@/stores/devis/fontainesStore";
+import { useFoodBeverageStore } from "@/stores/devis/foodBeverageStore";
+import { useProspectStore } from "@/stores/devis/prospectStore";
+import { useTotalFontainesStore } from "@/stores/devis/totalFontainesStore";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
 import { Droplets } from "lucide-react";

@@ -1,8 +1,8 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "@/i18n/navigation";
-import { usePersonnalisationStore } from "@/stores/personnalisationStore";
-import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
+import { usePersonnalisationStore } from "@/stores/devis/personnalisationStore";
+import { useSnacksFruitsStore } from "@/stores/devis/snacksFruitsStore";
 import { Banana, Cookie, CupSoda } from "lucide-react";
 import { ChangeEvent } from "react";
 import { useShallow } from "zustand/shallow";

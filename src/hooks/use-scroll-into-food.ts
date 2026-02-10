@@ -1,4 +1,4 @@
-import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
+import { useFoodBeverageStore } from "@/stores/devis/foodBeverageStore";
 import { useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
 

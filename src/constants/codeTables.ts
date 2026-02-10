@@ -325,7 +325,7 @@ export const documentVisibiliteCodes = documentVisibiliteCT.map(
 export const roleEntrepriseCT = [
   { code: "client", name: "Client" },
   { code: "prestataire", name: "Prestataire" },
-  { code: "operateur_plateforme", name: "Operateur plateforme" },
+  { code: "plateforme", name: "Plateforme" },
 ] as const;
 
 export const roleEntrepriseCodes = roleEntrepriseCT.map(

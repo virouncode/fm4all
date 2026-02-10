@@ -11,9 +11,9 @@ import {
 } from "@/components/ui/select";
 import { MAX_NB_PERSONNES_PAR_ESPACE_FONTAINE } from "@/constants/constants";
 import { locationFontaine } from "@/constants/locationFontaine";
-import { useFontainesStore } from "@/stores/fontainesStore";
-import { useProspectStore } from "@/stores/prospectStore";
-import { FontaineEspaceType } from "@/zod-schemas/fontaines";
+import { useFontainesStore } from "@/stores/devis/fontainesStore";
+import { useProspectStore } from "@/stores/devis/prospectStore";
+import { FontaineEspaceType } from "@/zod-schemas/fontaines.schema";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 

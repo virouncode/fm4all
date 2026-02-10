@@ -3,11 +3,11 @@ import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/P
 import { MAX_NB_PERSONNES_PAR_ESPACE } from "@/constants/constants";
 import useScrollIntoCafeEspace from "@/hooks/use-scroll-into-cafe-espace";
 import useScrollIntoFood from "@/hooks/use-scroll-into-food";
-import { useCafeStore } from "@/stores/cafeStore";
-import { useDevisProgressStore } from "@/stores/devisProgressStore";
-import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
-import { useProspectStore } from "@/stores/prospectStore";
-import { useTotalCafeStore } from "@/stores/totalCafeStore";
+import { useCafeStore } from "@/stores/devis/cafeStore";
+import { useDevisProgressStore } from "@/stores/devis/devisProgressStore";
+import { useFoodBeverageStore } from "@/stores/devis/foodBeverageStore";
+import { useProspectStore } from "@/stores/devis/prospectStore";
+import { useTotalCafeStore } from "@/stores/devis/totalCafeStore";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine";
 import { SelectCafeMachinesTarifsType } from "@/zod-schemas/cafeMachinesTarifs";

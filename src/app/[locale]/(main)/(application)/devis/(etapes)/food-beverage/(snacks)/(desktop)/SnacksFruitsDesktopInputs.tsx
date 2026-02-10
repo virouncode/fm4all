@@ -3,8 +3,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MAX_EFFECTIF } from "@/constants/constants";
 import { TypesSnacksFruitsType } from "@/constants/typesSnacksFruits";
-import { useProspectStore } from "@/stores/prospectStore";
-import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
+import { useProspectStore } from "@/stores/devis/prospectStore";
+import { useSnacksFruitsStore } from "@/stores/devis/snacksFruitsStore";
 import { useTranslations } from "next-intl";
 
 type SnacksFruitsDesktopInputsProps = {

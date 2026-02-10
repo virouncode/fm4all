@@ -11,35 +11,37 @@ export default async function AuthRedirect() {
     redirect({ locale, href: "/auth/signin" });
   }
 
-  // Redirect based on user role
-  if (user?.role === "admin") {
-    redirect({
-      locale,
-      href: {
-        pathname: "/admin/[userId]",
-        params: { userId: user.id },
-      },
-    });
-  } else if (user?.role.startsWith("client")) {
-    redirect({
-      locale,
-      href: {
-        pathname: "/client/[clientId]",
-        params: { clientId: user.clientId ?? 0 },
-      },
-    });
-  } else if (user?.role.startsWith("fournisseur")) {
-    redirect({
-      locale,
-      href: {
-        pathname: "/fournisseur/[fournisseurId]/dashboard",
-        params: { fournisseurId: user.fournisseurId ?? 0 },
-      },
-    });
-  } else {
-    // Default redirect if role is not recognized
-    // redirect("/dashboard");
-  }
+  console.log("User:", user); // Debug log to check the user's role
+
+  // // Redirect based on user role
+  // if (user?.role === "admin") {
+  //   redirect({
+  //     locale,
+  //     href: {
+  //       pathname: "/admin/[userId]",
+  //       params: { userId: user.id },
+  //     },
+  //   });
+  // } else if (user?.role.startsWith("client")) {
+  //   redirect({
+  //     locale,
+  //     href: {
+  //       pathname: "/client/[clientId]",
+  //       params: { clientId: user.clientId ?? 0 },
+  //     },
+  //   });
+  // } else if (user?.role.startsWith("fournisseur")) {
+  //   redirect({
+  //     locale,
+  //     href: {
+  //       pathname: "/fournisseur/[fournisseurId]/dashboard",
+  //       params: { fournisseurId: user.fournisseurId ?? 0 },
+  //     },
+  //   });
+  // } else {
+  //   // Default redirect if role is not recognized
+  //   // redirect("/dashboard");
+  // }
 
   // This is just a fallback and should never be displayed
   return (

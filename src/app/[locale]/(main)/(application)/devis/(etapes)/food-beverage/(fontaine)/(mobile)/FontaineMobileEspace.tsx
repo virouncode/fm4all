@@ -1,14 +1,14 @@
 import { toast } from "@/hooks/use-toast";
-import { useFontainesStore } from "@/stores/fontainesStore";
-import { FontaineEspaceType } from "@/zod-schemas/fontaines";
+import { useFontainesStore } from "@/stores/devis/fontainesStore";
+import { useTotalFontainesStore } from "@/stores/devis/totalFontainesStore";
+import { FontaineEspaceType } from "@/zod-schemas/fontaines.schema";
 import { SelectFontainesModelesType } from "@/zod-schemas/fontainesModeles";
 import { SelectFontainesTarifsType } from "@/zod-schemas/fontainesTarifs";
 import { useTranslations } from "next-intl";
+import { useShallow } from "zustand/shallow";
 import RetirerEspaceButton from "../../(cafe)/RetirerEspaceButton";
 import FontaineEspaceForm from "../FontaineEspaceForm";
 import FontaineEspacePropositions from "../FontaineEspacePropositions";
-import { useTotalFontainesStore } from "@/stores/totalFontainesStore";
-import { useShallow } from "zustand/shallow";
 
 type FontainesMobileEspacesProps = {
   espace: FontaineEspaceType;

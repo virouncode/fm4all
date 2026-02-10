@@ -1,12 +1,12 @@
 import { MAX_PASSAGES_VITRERIE } from "@/constants/constants";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
-import { useNettoyageStore } from "@/stores/nettoyageStore";
-import { useTotalNettoyageStore } from "@/stores/totalNettoyageStore";
+import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
+import { useTotalNettoyageStore } from "@/stores/devis/totalNettoyageStore";
 import { ChangeEvent } from "react";
 import { useMediaQuery } from "react-responsive";
+import { useShallow } from "zustand/shallow";
 import NettoyageMobileOptionsPropositions from "../(mobile)/NettoyageMobileOptionsPropositions";
 import NettoyageDesktopOptionsPropositions from "./NettoyageDesktopOptionsPropositions";
-import { useShallow } from "zustand/shallow";
 
 type NettoyageOptionsPropositionsProps = {
   repasseProposition: {

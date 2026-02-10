@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MAX_EFFECTIF } from "@/constants/constants";
-import { useProspectStore } from "@/stores/prospectStore";
+import { useProspectStore } from "@/stores/devis/prospectStore";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ChangeEvent } from "react";

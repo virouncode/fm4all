@@ -9,8 +9,8 @@ import {
 } from "@/components/ui/table";
 import { MARGE } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { useMaintenanceStore } from "@/stores/maintenanceStore";
-import { useTotalMaintenanceStore } from "@/stores/totalMaintenanceStore";
+import { useMaintenanceStore } from "@/stores/devis/maintenanceStore";
+import { useTotalMaintenanceStore } from "@/stores/devis/totalMaintenanceStore";
 
 const DetailMaintenance = () => {
   const maintenance = useMaintenanceStore((s) => s.maintenance);

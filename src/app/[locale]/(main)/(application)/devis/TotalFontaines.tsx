@@ -1,7 +1,7 @@
 import { MARGE } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { useFontainesStore } from "@/stores/fontainesStore";
-import { useTotalFontainesStore } from "@/stores/totalFontainesStore";
+import { useFontainesStore } from "@/stores/devis/fontainesStore";
+import { useTotalFontainesStore } from "@/stores/devis/totalFontainesStore";
 import { useTranslations } from "next-intl";
 
 const TotalFontaines = () => {

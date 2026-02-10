@@ -2,8 +2,8 @@
 
 import { MARGE } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { useProspectStore } from "@/stores/prospectStore";
-import { useTotalStore } from "@/stores/totalStore";
+import { useProspectStore } from "@/stores/devis/prospectStore";
+import { useTotalStore } from "@/stores/devis/totalStore";
 import { useTranslations } from "next-intl";
 import TotalCafe from "../TotalCafe";
 import TotalFontaines from "../TotalFontaines";

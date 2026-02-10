@@ -1,8 +1,8 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "@/i18n/navigation";
-import { useNettoyageStore } from "@/stores/nettoyageStore";
-import { usePersonnalisationStore } from "@/stores/personnalisationStore";
+import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
+import { usePersonnalisationStore } from "@/stores/devis/personnalisationStore";
 import { SprayCan } from "lucide-react";
 import { ChangeEvent } from "react";
 import { useShallow } from "zustand/shallow";

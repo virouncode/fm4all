@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
-import { useNettoyageStore } from "@/stores/nettoyageStore";
+import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
 import { GammeType } from "@/zod-schemas/gamme";
 import { Info } from "lucide-react";
 import { useTranslations } from "next-intl";

@@ -4,7 +4,7 @@ import { betterAuth, BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { openAPI } from "better-auth/plugins";
-import { sendEmailFromServer } from "../../lib/email/sendEmail";
+import { sendEmailFromServer } from "../email/sendEmail";
 
 export const auth = betterAuth({
   session: {
@@ -13,6 +13,11 @@ export const auth = betterAuth({
       maxAge: 3600,
     },
     updateAge: 86400,
+  },
+  advanced: {
+    database: {
+      generateId: false, // "serial" for auto-incrementing numeric IDs
+    },
   },
   database: drizzleAdapter(db, {
     provider: "pg",

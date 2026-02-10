@@ -1,5 +1,5 @@
-import { useMaintenanceStore } from "@/stores/maintenanceStore";
-import { useTotalMaintenanceStore } from "@/stores/totalMaintenanceStore";
+import { useMaintenanceStore } from "@/stores/devis/maintenanceStore";
+import { useTotalMaintenanceStore } from "@/stores/devis/totalMaintenanceStore";
 import { gammes } from "@/zod-schemas/gamme";
 import { SelectLegioTarifsType } from "@/zod-schemas/legioTarifs";
 import { SelectMaintenanceQuantitesType } from "@/zod-schemas/maintenanceQuantites";

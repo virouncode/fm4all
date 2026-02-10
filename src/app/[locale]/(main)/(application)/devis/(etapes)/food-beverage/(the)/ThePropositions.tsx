@@ -1,10 +1,10 @@
 import { MAX_EFFECTIF } from "@/constants/constants";
 import { toast } from "@/hooks/use-toast";
 import { roundNbPersonnesCafeConso } from "@/lib/utils/roundNbPersonnesCafeConso";
-import { useCafeStore } from "@/stores/cafeStore";
-import { useProspectStore } from "@/stores/prospectStore";
-import { useTheStore } from "@/stores/theStore";
-import { useTotalTheStore } from "@/stores/totalTheStore";
+import { useCafeStore } from "@/stores/devis/cafeStore";
+import { useProspectStore } from "@/stores/devis/prospectStore";
+import { useTheStore } from "@/stores/devis/theStore";
+import { useTotalTheStore } from "@/stores/devis/totalTheStore";
 import { GammeType } from "@/zod-schemas/gamme";
 import { SelectTheConsoTarifsType } from "@/zod-schemas/theConsoTarifs";
 import { useTranslations } from "next-intl";

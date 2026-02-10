@@ -1,6 +1,6 @@
 import WhyCard from "@/components/cards/WhyCard";
-import { usePersonnalisationStore } from "@/stores/personnalisationStore";
-import { useProspectStore } from "@/stores/prospectStore";
+import { usePersonnalisationStore } from "@/stores/devis/personnalisationStore";
+import { useProspectStore } from "@/stores/devis/prospectStore";
 import { Euro, Feather, Handshake, Rabbit, Waves } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMediaQuery } from "react-responsive";

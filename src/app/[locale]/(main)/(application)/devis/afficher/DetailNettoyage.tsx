@@ -9,8 +9,8 @@ import {
 } from "@/components/ui/table";
 import { MARGE, S_OUVREES_PAR_AN } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { useNettoyageStore } from "@/stores/nettoyageStore";
-import { useTotalNettoyageStore } from "@/stores/totalNettoyageStore";
+import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
+import { useTotalNettoyageStore } from "@/stores/devis/totalNettoyageStore";
 
 const DetailNettoyage = () => {
   const nettoyage = useNettoyageStore((s) => s.nettoyage);

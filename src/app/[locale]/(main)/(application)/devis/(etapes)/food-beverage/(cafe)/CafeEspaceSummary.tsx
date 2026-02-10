@@ -1,4 +1,4 @@
-import { CafeEspaceType } from "@/zod-schemas/cafe";
+import { CafeEspaceType } from "@/zod-schemas/cafe.schema";
 
 type CafeEspaceSummaryProps = {
   espace: CafeEspaceType;

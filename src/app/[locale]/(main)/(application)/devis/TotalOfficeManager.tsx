@@ -1,8 +1,8 @@
 import { MARGE } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
-import { useOfficeManagerStore } from "@/stores/officeManagerStore";
-import { useTotalOfficeManagerStore } from "@/stores/totalOfficeManagerStore";
+import { useOfficeManagerStore } from "@/stores/devis/officeManagerStore";
+import { useTotalOfficeManagerStore } from "@/stores/devis/totalOfficeManagerStore";
 import { useTranslations } from "next-intl";
 
 const TotalOfficeManager = () => {

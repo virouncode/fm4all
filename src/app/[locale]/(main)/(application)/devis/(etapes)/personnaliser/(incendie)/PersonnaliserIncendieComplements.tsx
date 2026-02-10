@@ -8,9 +8,9 @@ import {
 } from "@/constants/constants";
 import { roundNbAlarmes } from "@/lib/utils/roundAlarmes";
 import { roundNbExutoires } from "@/lib/utils/roundNbExutoires";
-import { useIncendieStore } from "@/stores/incendieStore";
-import { usePersonnalisationStore } from "@/stores/personnalisationStore";
-import { useTotalIncendieStore } from "@/stores/totalIncendieStore";
+import { useIncendieStore } from "@/stores/devis/incendieStore";
+import { usePersonnalisationStore } from "@/stores/devis/personnalisationStore";
+import { useTotalIncendieStore } from "@/stores/devis/totalIncendieStore";
 import { SelectAlarmesTarifsType } from "@/zod-schemas/alarmesTarifs";
 import { SelectColonnesSechesTarifsType } from "@/zod-schemas/colonnesSechesTarifs";
 import { SelectExutoiresTarifsType } from "@/zod-schemas/exutoiresTarifs";

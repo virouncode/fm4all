@@ -1,7 +1,7 @@
 "use client";
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
 import useScrollIntoService from "@/hooks/use-scroll-into-service";
-import { useServicesStore } from "@/stores/servicesStore";
+import { useServicesStore } from "@/stores/devis/servicesStore";
 import { SelectHygieneConsoTarifsType } from "@/zod-schemas/hygieneConsoTarifs";
 import { SelectHygieneDistribQuantitesType } from "@/zod-schemas/hygieneDistribQuantites";
 import { SelectHygieneDistribTarifsType } from "@/zod-schemas/hygieneDistribTarifs";

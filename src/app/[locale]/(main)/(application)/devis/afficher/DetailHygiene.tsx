@@ -10,8 +10,8 @@ import {
 import { MARGE } from "@/constants/constants";
 import { locationDistribHygiene } from "@/constants/locationsDistribHygiene";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { useHygieneStore } from "@/stores/hygieneStore";
-import { useTotalHygieneStore } from "@/stores/totalHygieneStore";
+import { useHygieneStore } from "@/stores/devis/hygieneStore";
+import { useTotalHygieneStore } from "@/stores/devis/totalHygieneStore";
 
 const DetailHygiene = () => {
   const hygiene = useHygieneStore((s) => s.hygiene);

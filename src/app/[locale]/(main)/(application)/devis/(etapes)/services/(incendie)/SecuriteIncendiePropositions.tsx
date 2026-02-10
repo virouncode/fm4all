@@ -4,8 +4,8 @@ import {
   MAX_NB_TEL_BAES,
 } from "@/constants/constants";
 import { toast } from "@/hooks/use-toast";
-import { useIncendieStore } from "@/stores/incendieStore";
-import { useTotalIncendieStore } from "@/stores/totalIncendieStore";
+import { useIncendieStore } from "@/stores/devis/incendieStore";
+import { useTotalIncendieStore } from "@/stores/devis/totalIncendieStore";
 import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites";
 import { SelectIncendieTarifsType } from "@/zod-schemas/incendieTarifs";
 import { useTranslations } from "next-intl";

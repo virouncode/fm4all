@@ -2,8 +2,8 @@
 
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
-import { useServicesFm4AllStore } from "@/stores/servicesFm4AllStore";
-import { useTotalServicesFm4AllStore } from "@/stores/totalServicesFm4AllStore";
+import { useServicesFm4AllStore } from "@/stores/devis/servicesFm4AllStore";
+import { useTotalServicesFm4AllStore } from "@/stores/devis/totalServicesFm4AllStore";
 import { useTranslations } from "next-intl";
 
 const TotalServicesFm4All = () => {

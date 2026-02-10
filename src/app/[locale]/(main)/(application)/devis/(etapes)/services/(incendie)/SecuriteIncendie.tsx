@@ -1,9 +1,9 @@
 "use client";
 import PropositionsTitleMobile from "@/app/[locale]/(main)/(application)/devis/PropositionsTitleMobile";
 import { useRouter } from "@/i18n/navigation";
-import { useDevisProgressStore } from "@/stores/devisProgressStore";
-import { useProspectStore } from "@/stores/prospectStore";
-import { useServicesStore } from "@/stores/servicesStore";
+import { useDevisProgressStore } from "@/stores/devis/devisProgressStore";
+import { useProspectStore } from "@/stores/devis/prospectStore";
+import { useServicesStore } from "@/stores/devis/servicesStore";
 import { SelectIncendieQuantitesType } from "@/zod-schemas/incendieQuantites";
 import { SelectIncendieTarifsType } from "@/zod-schemas/incendieTarifs";
 import { FireExtinguisher } from "lucide-react";

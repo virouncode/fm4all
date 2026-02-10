@@ -34,7 +34,10 @@ type ObfuscatedLinkProps = {
     | {
         pathname: "/services/[slug]";
         params: { slug: string };
-      };
+      }
+    | "/app"
+    | "/auth/login"
+    | "/app/compte/mon-profil";
 
   children: React.ReactNode;
   className?: string;

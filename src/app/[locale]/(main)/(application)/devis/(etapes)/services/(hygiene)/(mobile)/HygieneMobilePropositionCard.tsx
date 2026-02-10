@@ -12,7 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
-import { useHygieneStore } from "@/stores/hygieneStore";
+import { useHygieneStore } from "@/stores/devis/hygieneStore";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 

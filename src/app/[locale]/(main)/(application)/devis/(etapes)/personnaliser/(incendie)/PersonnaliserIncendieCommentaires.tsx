@@ -1,8 +1,8 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "@/i18n/navigation";
-import { useIncendieStore } from "@/stores/incendieStore";
-import { usePersonnalisationStore } from "@/stores/personnalisationStore";
+import { useIncendieStore } from "@/stores/devis/incendieStore";
+import { usePersonnalisationStore } from "@/stores/devis/personnalisationStore";
 import { Wrench } from "lucide-react";
 import { ChangeEvent } from "react";
 import { useShallow } from "zustand/shallow";

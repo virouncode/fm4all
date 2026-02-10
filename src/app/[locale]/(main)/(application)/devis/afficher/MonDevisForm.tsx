@@ -15,10 +15,13 @@ import { toast } from "@/hooks/use-toast";
 import { Link, useRouter } from "@/i18n/navigation";
 import fillDevis from "@/lib/utils/fillDevis";
 import { postVercelBlob } from "@/server/queries_a_classer/vercel-blob/postVercelBlob";
-import { useCommentairesStore } from "@/stores/commentairesStore";
-import { useMonDevisStore } from "@/stores/monDevisStore";
-import { toStoreProspect, useProspectStore } from "@/stores/prospectStore";
-import { useTotalStore } from "@/stores/totalStore";
+import { useCommentairesStore } from "@/stores/devis/commentairesStore";
+import { useMonDevisStore } from "@/stores/devis/monDevisStore";
+import {
+  toStoreProspect,
+  useProspectStore,
+} from "@/stores/devis/prospectStore";
+import { useTotalStore } from "@/stores/devis/totalStore";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
   createUpdateProspectFormSchema,

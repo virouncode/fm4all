@@ -1,10 +1,10 @@
 import { toast } from "@/hooks/use-toast";
-import { useCafeStore } from "@/stores/cafeStore";
-import { useProspectStore } from "@/stores/prospectStore";
-import { useTheStore } from "@/stores/theStore";
-import { useTotalCafeStore } from "@/stores/totalCafeStore";
-import { useTotalTheStore } from "@/stores/totalTheStore";
-import { CafeEspaceType } from "@/zod-schemas/cafe";
+import { useCafeStore } from "@/stores/devis/cafeStore";
+import { useProspectStore } from "@/stores/devis/prospectStore";
+import { useTheStore } from "@/stores/devis/theStore";
+import { useTotalCafeStore } from "@/stores/devis/totalCafeStore";
+import { useTotalTheStore } from "@/stores/devis/totalTheStore";
+import { CafeEspaceType } from "@/zod-schemas/cafe.schema";
 import { SelectCafeConsoTarifsType } from "@/zod-schemas/cafeConsoTarifs";
 import { SelectCafeMachinesType } from "@/zod-schemas/cafeMachine";
 import { SelectCafeMachinesTarifsType } from "@/zod-schemas/cafeMachinesTarifs";

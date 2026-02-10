@@ -6,7 +6,7 @@ import {
   MAX_NB_EXTINCTEURS,
   MAX_NB_TEL_BAES,
 } from "@/constants/constants";
-import { useIncendieStore } from "@/stores/incendieStore";
+import { useIncendieStore } from "@/stores/devis/incendieStore";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";

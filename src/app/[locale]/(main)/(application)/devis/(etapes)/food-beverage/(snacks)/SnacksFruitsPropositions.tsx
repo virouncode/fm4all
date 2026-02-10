@@ -1,9 +1,9 @@
 import { roundEffectif } from "@/lib/utils/roundEffectif";
-import { useCafeStore } from "@/stores/cafeStore";
-import { useProspectStore } from "@/stores/prospectStore";
-import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
-import { useTotalCafeStore } from "@/stores/totalCafeStore";
-import { useTotalSnacksFruitsStore } from "@/stores/totalSnacksFruitsStore";
+import { useCafeStore } from "@/stores/devis/cafeStore";
+import { useProspectStore } from "@/stores/devis/prospectStore";
+import { useSnacksFruitsStore } from "@/stores/devis/snacksFruitsStore";
+import { useTotalCafeStore } from "@/stores/devis/totalCafeStore";
+import { useTotalSnacksFruitsStore } from "@/stores/devis/totalSnacksFruitsStore";
 import { SelectBoissonsQuantitesType } from "@/zod-schemas/boissonsQuantites";
 import { SelectBoissonsTarifsType } from "@/zod-schemas/boissonsTarifs";
 import { SelectFoodLivraisonTarifsType } from "@/zod-schemas/foodLivraisonTarifs";

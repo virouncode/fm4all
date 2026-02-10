@@ -1,7 +1,7 @@
-import { FontaineEspaceType } from "@/zod-schemas/fontaines";
+import { FontaineEspaceType } from "@/zod-schemas/fontaines.schema";
+import { useTranslations } from "next-intl";
 import AddEspaceButton from "../../(cafe)/AddEspaceButton";
 import FontaineMobileEspacePropositionsCarousel from "./FontaineMobileEspacePropositionsCarousel";
-import { useTranslations } from "next-intl";
 
 type FontaineMobileEspacePropositionsProps = {
   formattedPropositions: {

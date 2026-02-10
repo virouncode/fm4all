@@ -4,7 +4,7 @@ import {
   CarouselApi,
   CarouselContent,
 } from "@/components/ui/carousel";
-import { useServicesFm4AllStore } from "@/stores/servicesFm4AllStore";
+import { useServicesFm4AllStore } from "@/stores/devis/servicesFm4AllStore";
 import { GammeType } from "@/zod-schemas/gamme";
 import { ServicesFm4AllOffresType } from "@/zod-schemas/servicesFm4All";
 import { useTranslations } from "next-intl";

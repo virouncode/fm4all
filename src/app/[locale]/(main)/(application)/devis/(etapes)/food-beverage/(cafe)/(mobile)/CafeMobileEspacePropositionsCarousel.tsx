@@ -4,8 +4,8 @@ import {
   CarouselApi,
   CarouselContent,
 } from "@/components/ui/carousel";
-import { useCafeStore } from "@/stores/cafeStore";
-import { CafeEspaceType } from "@/zod-schemas/cafe";
+import { useCafeStore } from "@/stores/devis/cafeStore";
+import { CafeEspaceType } from "@/zod-schemas/cafe.schema";
 import { useEffect, useState } from "react";
 import CafeMobileEspacePropositionCard from "./CafeMobileEspacePropositionCard";
 

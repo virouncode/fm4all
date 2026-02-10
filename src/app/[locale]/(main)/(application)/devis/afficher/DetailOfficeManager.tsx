@@ -9,8 +9,8 @@ import {
 } from "@/components/ui/table";
 import { MARGE } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { useOfficeManagerStore } from "@/stores/officeManagerStore";
-import { useTotalOfficeManagerStore } from "@/stores/totalOfficeManagerStore";
+import { useOfficeManagerStore } from "@/stores/devis/officeManagerStore";
+import { useTotalOfficeManagerStore } from "@/stores/devis/totalOfficeManagerStore";
 
 const DetailOfficeManager = () => {
   const officeManager = useOfficeManagerStore((s) => s.officeManager);

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useRouter } from "@/i18n/navigation";
-import { useDevisProgressStore } from "@/stores/devisProgressStore";
-import { usePersonnalisationStore } from "@/stores/personnalisationStore";
+import { useDevisProgressStore } from "@/stores/devis/devisProgressStore";
+import { usePersonnalisationStore } from "@/stores/devis/personnalisationStore";
 import { useTranslations } from "next-intl";
 import { useMediaQuery } from "react-responsive";
 import { useShallow } from "zustand/shallow";

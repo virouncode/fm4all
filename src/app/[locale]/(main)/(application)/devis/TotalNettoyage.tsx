@@ -2,8 +2,8 @@
 import { MARGE } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
-import { useNettoyageStore } from "@/stores/nettoyageStore";
-import { useTotalNettoyageStore } from "@/stores/totalNettoyageStore";
+import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
+import { useTotalNettoyageStore } from "@/stores/devis/totalNettoyageStore";
 import { useTranslations } from "next-intl";
 
 const TotalNettoyage = () => {

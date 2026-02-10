@@ -4,7 +4,7 @@ import {
   CarouselApi,
   CarouselContent,
 } from "@/components/ui/carousel";
-import { useNettoyageStore } from "@/stores/nettoyageStore";
+import { useNettoyageStore } from "@/stores/devis/nettoyageStore";
 import { GammeType } from "@/zod-schemas/gamme";
 import { useEffect, useState } from "react";
 import NettoyageMobilePropositionCard from "./NettoyageMobilePropositionCard";

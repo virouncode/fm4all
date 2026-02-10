@@ -18,8 +18,8 @@ import { typeBatimentCT, typeOccupationCT } from "@/constants/codeTables";
 import { departements } from "@/constants/departements";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/navigation";
-import { useDevisProgressStore } from "@/stores/devisProgressStore";
-import { useProspectStore } from "@/stores/prospectStore";
+import { useDevisProgressStore } from "@/stores/devis/devisProgressStore";
+import { useProspectStore } from "@/stores/devis/prospectStore";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
   createMesLocauxFormSchema,

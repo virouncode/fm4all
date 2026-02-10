@@ -1,8 +1,8 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "@/i18n/navigation";
-import { usePersonnalisationStore } from "@/stores/personnalisationStore";
-import { useServicesFm4AllStore } from "@/stores/servicesFm4AllStore";
+import { usePersonnalisationStore } from "@/stores/devis/personnalisationStore";
+import { useServicesFm4AllStore } from "@/stores/devis/servicesFm4AllStore";
 import { HandPlatter } from "lucide-react";
 import { ChangeEvent } from "react";
 import { useShallow } from "zustand/shallow";

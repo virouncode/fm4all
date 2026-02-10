@@ -5,7 +5,7 @@ import {
   createUpdateSchema,
 } from "drizzle-zod";
 import { z } from "zod";
-import { phoneNumberSchema } from "./phone";
+import { phoneNumberSchema } from "./phone.schema";
 
 //SELECT
 export const selectFournisseurSchema = createSelectSchema(fournisseurs);

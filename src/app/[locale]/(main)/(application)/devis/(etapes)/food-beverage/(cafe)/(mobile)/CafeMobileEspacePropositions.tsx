@@ -1,4 +1,4 @@
-import { CafeEspaceType } from "@/zod-schemas/cafe";
+import { CafeEspaceType } from "@/zod-schemas/cafe.schema";
 import { useTranslations } from "next-intl";
 import AddEspaceButton from "../AddEspaceButton";
 import CafeMobileEspacePropositionsCarousel from "./CafeMobileEspacePropositionsCarousel";

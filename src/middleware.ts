@@ -15,7 +15,6 @@ import {
 } from "./redirects/handleRedirects";
 
 import { goneUrls, legacyRedirects } from "./redirects/urls";
-import { SelectUserType } from "./zod-schemas/user";
 
 // ============================================================================
 // Config : logs activés uniquement en dev
@@ -44,53 +43,53 @@ function getPortalArea(
 }
 
 // Vérifie si l’utilisateur a accès à la zone
-function isAuthorizedRoute(
-  role: "admin" | "client" | "fournisseur",
-  area: string | null,
-  pathnameWithoutLocale: string,
-  user: SelectUserType,
-): { authorized: boolean; type?: string } {
-  // Si route publique → autorisation automatique
-  if (!area) return { authorized: true };
+// function isAuthorizedRoute(
+//   role: "admin" | "client" | "fournisseur",
+//   area: string | null,
+//   pathnameWithoutLocale: string,
+//   user: SelectUserType,
+// ): { authorized: boolean; type?: string } {
+//   // Si route publique → autorisation automatique
+//   if (!area) return { authorized: true };
 
-  const segments = pathnameWithoutLocale.split("/").filter(Boolean);
-  const requestedId = segments[1];
+//   const segments = pathnameWithoutLocale.split("/").filter(Boolean);
+//   const requestedId = segments[1];
 
-  // Zones autorisées par rôle
-  const ROLE_ACCESS: Record<string, string[]> = {
-    admin: ["admin"],
-    client: ["client"],
-    fournisseur: ["fournisseur"],
-  };
+//   // Zones autorisées par rôle
+//   const ROLE_ACCESS: Record<string, string[]> = {
+//     admin: ["admin"],
+//     client: ["client"],
+//     fournisseur: ["fournisseur"],
+//   };
 
-  // Si la zone ne fait pas partie des zones autorisées pour ce rôle
-  if (!ROLE_ACCESS[role].includes(area)) {
-    return { authorized: false, type: area };
-  }
+//   // Si la zone ne fait pas partie des zones autorisées pour ce rôle
+//   if (!ROLE_ACCESS[role].includes(area)) {
+//     return { authorized: false, type: area };
+//   }
 
-  // Vérification de l’ID utilisateur dans l’URL
-  if (area === "admin" && requestedId !== user.id) {
-    return { authorized: false, type: "admin" };
-  }
+//   // Vérification de l’ID utilisateur dans l’URL
+//   if (area === "admin" && requestedId !== user.id) {
+//     return { authorized: false, type: "admin" };
+//   }
 
-  if (
-    area === "client" &&
-    requestedId &&
-    parseInt(requestedId) !== user.clientId
-  ) {
-    return { authorized: false, type: "client" };
-  }
+//   if (
+//     area === "client" &&
+//     requestedId &&
+//     parseInt(requestedId) !== user.clientId
+//   ) {
+//     return { authorized: false, type: "client" };
+//   }
 
-  if (
-    area === "fournisseur" &&
-    requestedId &&
-    parseInt(requestedId) !== user.fournisseurId
-  ) {
-    return { authorized: false, type: "fournisseur" };
-  }
+//   if (
+//     area === "fournisseur" &&
+//     requestedId &&
+//     parseInt(requestedId) !== user.fournisseurId
+//   ) {
+//     return { authorized: false, type: "fournisseur" };
+//   }
 
-  return { authorized: true };
-}
+//   return { authorized: true };
+// }
 
 // Récupération session (cookie → fallback API)
 async function resolveSession(req: NextRequest) {
@@ -220,28 +219,28 @@ export async function middleware(req: NextRequest) {
   // ============================================================================
   // 4. Vérification des permissions
   // ============================================================================
-  const userRole = user.role.startsWith("admin")
-    ? "admin"
-    : user.role.startsWith("client")
-      ? "client"
-      : user.role.startsWith("fournisseur")
-        ? "fournisseur"
-        : "unknown";
-  const check = isAuthorizedRoute(
-    userRole as "admin" | "client" | "fournisseur",
-    area,
-    pathnameWithoutLocale,
-    user as SelectUserType,
-  );
+  // const userRole = user.role.startsWith("admin")
+  //   ? "admin"
+  //   : user.role.startsWith("client")
+  //     ? "client"
+  //     : user.role.startsWith("fournisseur")
+  //       ? "fournisseur"
+  //       : "unknown";
+  // const check = isAuthorizedRoute(
+  //   userRole as "admin" | "client" | "fournisseur",
+  //   area,
+  //   pathnameWithoutLocale,
+  //   user as SelectUserType,
+  // );
 
-  if (!check.authorized) {
-    log("Accès refusé :", check.type);
-    return NextResponse.redirect(
-      new URL(`/${locale}/auth/unauthorized?type=${check.type}`, req.url),
-    );
-  }
+  // if (!check.authorized) {
+  //   log("Accès refusé :", check.type);
+  //   return NextResponse.redirect(
+  //     new URL(`/${locale}/auth/unauthorized?type=${check.type}`, req.url),
+  //   );
+  // }
 
-  log("Accès autorisé pour :", user.role);
+  // log("Accès autorisé pour :", user.role);
 
   // ============================================================================
   // 5. Accès OK → next-intl rend la page

@@ -1,8 +1,8 @@
 import { MARGE } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
-import { useCafeStore } from "@/stores/cafeStore";
-import { useTotalCafeStore } from "@/stores/totalCafeStore";
+import { useCafeStore } from "@/stores/devis/cafeStore";
+import { useTotalCafeStore } from "@/stores/devis/totalCafeStore";
 import { useTranslations } from "next-intl";
 
 const TotalCafe = () => {

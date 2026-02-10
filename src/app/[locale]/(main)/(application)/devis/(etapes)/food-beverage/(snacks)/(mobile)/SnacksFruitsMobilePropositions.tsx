@@ -1,4 +1,4 @@
-import { useSnacksFruitsStore } from "@/stores/snacksFruitsStore";
+import { useSnacksFruitsStore } from "@/stores/devis/snacksFruitsStore";
 import { useTranslations } from "next-intl";
 import SnacksFruitsMobilePropositionsCarousel from "./SnacksFruitsMobilePropositionsCarousel";
 

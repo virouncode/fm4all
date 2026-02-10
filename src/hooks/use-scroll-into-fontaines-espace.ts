@@ -1,5 +1,5 @@
-import { useFontainesStore } from "@/stores/fontainesStore";
-import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
+import { useFontainesStore } from "@/stores/devis/fontainesStore";
+import { useFoodBeverageStore } from "@/stores/devis/foodBeverageStore";
 import { useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
 import { useShallow } from "zustand/shallow";

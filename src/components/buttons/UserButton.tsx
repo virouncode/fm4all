@@ -28,11 +28,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
   const t = useTranslations("auth");
   const router = useRouter();
   const { data: session } = useSession();
-  const user = session?.user as User & {
-    role: string;
-    fournisseurId?: number;
-    clientId?: number;
-  };
+  const user = session?.user as User | undefined;
 
   const handleSignOut = async () => {
     try {
@@ -74,46 +70,16 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {session && user?.role && (
+        {session && user && (
           <DropdownMenuItem
             asChild
             onClick={
               setIsMobileNavOpen ? () => setIsMobileNavOpen(false) : undefined
             }
           >
-            {user?.role === "admin" ? (
-              <ObfuscatedLink
-                href={{
-                  pathname: "/admin/[userId]",
-                  params: { userId: user.id?.toString() ?? "0" },
-                }}
-                className="cursor-default !text-base"
-              >
-                {t("mon-espace")}
-              </ObfuscatedLink>
-            ) : user?.role.startsWith("client") ? (
-              <ObfuscatedLink
-                href={{
-                  pathname: "/client/[clientId]",
-                  params: { clientId: user.clientId?.toString() ?? "0" },
-                }}
-                className="cursor-default !text-base"
-              >
-                {t("mon-espace")}
-              </ObfuscatedLink>
-            ) : (
-              <ObfuscatedLink
-                href={{
-                  pathname: "/fournisseur/[fournisseurId]",
-                  params: {
-                    fournisseurId: user.fournisseurId?.toString() ?? "0",
-                  },
-                }}
-                className="cursor-default !text-base"
-              >
-                {t("mon-espace")}
-              </ObfuscatedLink>
-            )}
+            <ObfuscatedLink href="/app" className="cursor-default !text-base">
+              {t("mon-espace")}
+            </ObfuscatedLink>
           </DropdownMenuItem>
         )}
         <DropdownMenuItem
@@ -128,7 +94,7 @@ const UserButton = ({ setIsMobileNavOpen, className }: UserButtonProps) => {
             </p>
           ) : (
             <ObfuscatedLink
-              href="/auth/signin"
+              href="/auth/login"
               className="cursor-default !text-base"
             >
               {t("connexion")}

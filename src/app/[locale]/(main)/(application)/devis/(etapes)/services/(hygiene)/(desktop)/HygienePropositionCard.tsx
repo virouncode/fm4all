@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { MARGE } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
 import { getFm4AllColor } from "@/lib/utils/getFm4AllColor";
-import { useHygieneStore } from "@/stores/hygieneStore";
+import { useHygieneStore } from "@/stores/devis/hygieneStore";
 import { GammeType } from "@/zod-schemas/gamme";
 import { Info } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";

@@ -8,8 +8,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { useServicesFm4AllStore } from "@/stores/servicesFm4AllStore";
-import { useTotalServicesFm4AllStore } from "@/stores/totalServicesFm4AllStore";
+import { useServicesFm4AllStore } from "@/stores/devis/servicesFm4AllStore";
+import { useTotalServicesFm4AllStore } from "@/stores/devis/totalServicesFm4AllStore";
 
 const DetailServicesFm4All = () => {
   const servicesFm4All = useServicesFm4AllStore((s) => s.servicesFm4All);

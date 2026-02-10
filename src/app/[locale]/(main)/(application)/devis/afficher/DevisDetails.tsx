@@ -1,6 +1,6 @@
 "use client";
 
-import { useTotalStore } from "@/stores/totalStore";
+import { useTotalStore } from "@/stores/devis/totalStore";
 import DetailCafe from "./DetailCafe";
 import DetailFontaines from "./DetailFontaines";
 import DetailHygiene from "./DetailHygiene";

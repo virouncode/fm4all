@@ -9,8 +9,8 @@ import {
 } from "@/components/ui/table";
 import { MARGE } from "@/constants/constants";
 import { formatNumber } from "@/lib/utils/formatNumber";
-import { useIncendieStore } from "@/stores/incendieStore";
-import { useTotalIncendieStore } from "@/stores/totalIncendieStore";
+import { useIncendieStore } from "@/stores/devis/incendieStore";
+import { useTotalIncendieStore } from "@/stores/devis/totalIncendieStore";
 
 const DetailIncendie = () => {
   const incendie = useIncendieStore((s) => s.incendie);

@@ -11,12 +11,12 @@ import { Link } from "@/i18n/navigation";
 import { LocaleType } from "@/i18n/routing";
 import { roundEffectif } from "@/lib/utils/roundEffectif";
 import { roundSurface } from "@/lib/utils/roundSurface";
-import { useDevisProgressStore } from "@/stores/devisProgressStore";
-import { useFoodBeverageStore } from "@/stores/foodBeverageStore";
-import { useManagementStore } from "@/stores/managementStore";
-import { usePersonnalisationStore } from "@/stores/personnalisationStore";
-import { useProspectStore } from "@/stores/prospectStore";
-import { useServicesStore } from "@/stores/servicesStore";
+import { useDevisProgressStore } from "@/stores/devis/devisProgressStore";
+import { useFoodBeverageStore } from "@/stores/devis/foodBeverageStore";
+import { useManagementStore } from "@/stores/devis/managementStore";
+import { usePersonnalisationStore } from "@/stores/devis/personnalisationStore";
+import { useProspectStore } from "@/stores/devis/prospectStore";
+import { useServicesStore } from "@/stores/devis/servicesStore";
 import { useLocale } from "next-intl";
 import { useShallow } from "zustand/shallow";
 

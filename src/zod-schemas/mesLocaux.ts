@@ -1,5 +1,5 @@
 import z from "zod";
-import { codePostalSchema } from "./codePostal";
+import { codePostalSchema } from "./codePostal.schema";
 import { typeBatimentSchema, typeOccupationSchema } from "./enums";
 
 //MES LOCAUX

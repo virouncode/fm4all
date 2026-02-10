@@ -11,7 +11,7 @@ import {
 } from "drizzle-zod";
 import { z } from "zod";
 import { sites } from "../db/schema";
-import { codePostalSchema } from "./codePostal";
+import { codePostalSchema } from "./codePostal.schema";
 import { typeBatimentSchema, typeOccupationSchema } from "./enums";
 
 export const selectSiteSchema = createSelectSchema(sites);

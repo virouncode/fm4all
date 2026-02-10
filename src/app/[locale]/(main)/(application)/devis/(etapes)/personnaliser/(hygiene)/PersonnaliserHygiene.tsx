@@ -1,8 +1,8 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "@/i18n/navigation";
-import { useHygieneStore } from "@/stores/hygieneStore";
-import { usePersonnalisationStore } from "@/stores/personnalisationStore";
+import { useHygieneStore } from "@/stores/devis/hygieneStore";
+import { usePersonnalisationStore } from "@/stores/devis/personnalisationStore";
 import { Toilet } from "lucide-react";
 import { ChangeEvent } from "react";
 import { useShallow } from "zustand/shallow";
