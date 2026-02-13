@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
-import { getSitesAction } from "@/server/actions/sitesActions";
+import { getAccessibleSitesAction } from "@/server/actions/sitesActions";
 import { insertTicketAction } from "@/server/actions/ticketsActions";
 import { useAppStore } from "@/stores/application/appStore";
 import {
@@ -60,15 +60,15 @@ export function TicketFormDialog({
 
     async function loadSites() {
       try {
-        const result = await getSitesAction({
+        const result = await getAccessibleSitesAction({
           entrepriseId: entreprise!.id,
         });
 
         if (result?.data) {
           setSites(result.data.map((s) => ({ id: s.id, nom: s.nom })));
         }
-      } catch (error) {
-        console.error("Failed to load sites:", error);
+      } catch {
+        toast.error("Erreur lors du chargement des sites");
       }
     }
 

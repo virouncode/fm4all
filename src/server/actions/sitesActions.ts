@@ -9,6 +9,7 @@ import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
 import {
+  getAccessibleSitesByUser,
   getSiteById,
   getSitesByEntrepriseId,
   siteBelongsToEntreprise,
@@ -133,6 +134,48 @@ export const getSiteByIdAction = actionClient
     }
 
     return site;
+  });
+
+// ==================== GET ACCESSIBLE SITES ====================
+
+export const getAccessibleSitesAction = actionClient
+  .metadata({ actionName: "getAccessibleSitesAction" })
+  .inputSchema(
+    z.object({
+      entrepriseId: z.uuid("ID de l'entreprise invalide"),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+
+    if (!currentUser) {
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    }
+
+    // Vérifier accès entreprise
+    const adhesion = await db.query.userAdhesions.findFirst({
+      where: and(
+        eq(userAdhesions.userId, currentUser.id),
+        eq(userAdhesions.entrepriseId, parsedInput.entrepriseId),
+      ),
+    });
+
+    if (!adhesion) {
+      throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+    }
+
+    // Récupérer sites accessibles (filtré par attributions)
+    const sites = await getAccessibleSitesByUser({
+      userId: currentUser.id,
+      entrepriseId: parsedInput.entrepriseId,
+    });
+
+    return sites;
   });
 
 // ==================== INSERT SITE ====================

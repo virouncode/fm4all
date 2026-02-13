@@ -2,7 +2,7 @@
 
 import DataTable from "@/components/tables/DataTable";
 import { Button } from "@/components/ui/button";
-import { getSitesAction } from "@/server/actions/sitesActions";
+import { getAccessibleSitesAction } from "@/server/actions/sitesActions";
 import { getTicketsAction } from "@/server/actions/ticketsActions";
 import { useAppStore } from "@/stores/application/appStore";
 import {
@@ -69,7 +69,7 @@ export function TicketsTable() {
       setLoading(true);
       try {
         const [sitesResult, ticketsResult] = await Promise.all([
-          getSitesAction({ entrepriseId: entreprise.id }),
+          getAccessibleSitesAction({ entrepriseId: entreprise.id }),
           getTicketsAction({
             entrepriseId: entreprise.id,
             page: 1,
