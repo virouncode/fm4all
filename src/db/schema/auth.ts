@@ -15,6 +15,9 @@ export const user = pgTable(
   "user",
   {
     id: id(),
+    parentId: uuid("parent_id").references((): AnyPgColumn => user.id, {
+      onDelete: "set null",
+    }),
     name: text("name").notNull(),
     prenom: text("prenom").notNull(),
     nom: text("nom").notNull(),

@@ -105,7 +105,7 @@ export type UpdateSiteFormType = z.infer<typeof updateSiteFormSchema>;
 // ================== FILTERS + SORT ================== //
 export const SORTABLE_SITES_COLUMNS = {
   id: sites.id,
-  nomSite: sites.nomSite,
+  nom: sites.nom,
   codePostal: sites.codePostal,
   ville: sites.ville,
   surface: sites.surface,
@@ -221,8 +221,8 @@ import { createSortSchema } from "@/zod-helpers/createSortSchema";
 // Colonnes triables admin (ajout de clientId, adresseLigne1, adresseLigne2)
 export const SORTABLE_ADMIN_SITES_COLUMNS = {
   id: sites.id,
-  clientId: sites.clientId,
-  nomSite: sites.nomSite,
+  entrepriseId: sites.entrepriseId,
+  nom: sites.nom,
   adresseLigne1: sites.adresseLigne1,
   adresseLigne2: sites.adresseLigne2,
   codePostal: sites.codePostal,
@@ -296,7 +296,7 @@ export type AdminSitesQueryFiltersType = z.infer<
 
 // Frontend schema complet
 export const adminSitesQueryFrontendSchema = adminSitesQueryFiltersSchema.merge(
-  createSortSchema(SORTABLE_ADMIN_SITES_COLUMNS, "nomSite"),
+  createSortSchema(SORTABLE_ADMIN_SITES_COLUMNS, "nom"),
 );
 export type AdminSitesQueryFrontendType = z.infer<
   typeof adminSitesQueryFrontendSchema

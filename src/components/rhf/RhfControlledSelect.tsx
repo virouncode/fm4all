@@ -69,10 +69,10 @@ function assignRef<T>(ref: React.Ref<T> | undefined, value: T | null) {
 
 /** Surcharges pour corréler name ↔ valueType au call-site */
 export function RhfControlledSelect<S extends FieldValues>(
-  props: StringProps<S>
+  props: StringProps<S>,
 ): React.ReactElement;
 export function RhfControlledSelect<S extends FieldValues>(
-  props: NumberProps<S>
+  props: NumberProps<S>,
 ): React.ReactElement;
 
 export function RhfControlledSelect<S extends FieldValues>({
@@ -114,7 +114,7 @@ export function RhfControlledSelect<S extends FieldValues>({
               orientation === "horizontal"
                 ? "flex flex-row items-center"
                 : "flex flex-col",
-              className
+              className,
             )}
           >
             {label && (

@@ -42,6 +42,7 @@ const AppLayout = async ({ children }: { children: React.ReactNode }) => {
     roleAdhesion: bootstrap.roleAdhesion,
     rolesEntreprise: bootstrap.rolesEntreprise,
     postureActive: bootstrap.postureActive,
+    rolePlateformeAdhesion: bootstrap.rolePlateformeAdhesion,
   };
 
   return (

@@ -148,7 +148,7 @@ import {
 } from "@/normalize/normalizeSearchParams";
 import { createSortSchema } from "@/zod-helpers/createSortSchema";
 import { capitalizeWords, lower, upper } from "@/zod-helpers/normalize";
-import { siretSchema } from "./siret";
+import { siretSchema } from "./siret.schema.ts";
 
 // Colonnes triables
 export const SORTABLE_ADMIN_FOURNISSEURS_COLUMNS = {

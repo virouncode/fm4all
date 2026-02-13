@@ -5,6 +5,7 @@ import {
   RoleEntrepriseType,
 } from "@/zod-schemas/entreprise.schema";
 import { RoleAdhesionType } from "@/zod-schemas/userAdhesion.schema";
+import { RolePlateformeAdhesionType } from "@/zod-schemas/userPlateformeAdhesion.schema";
 import { create } from "zustand";
 
 export type AppUser = {
@@ -21,6 +22,7 @@ export type BootstrapPayload = {
   roleAdhesion: RoleAdhesionType;
   rolesEntreprise: RoleEntrepriseType[];
   postureActive: RoleEntrepriseType;
+  rolePlateformeAdhesion: RolePlateformeAdhesionType | null;
 };
 
 type AppStore = {
@@ -30,10 +32,12 @@ type AppStore = {
   roleAdhesion: RoleAdhesionType | null;
   rolesEntreprise: RoleEntrepriseType[];
   postureActive: RoleEntrepriseType | null;
+  rolePlateformeAdhesion: RolePlateformeAdhesionType | null;
 
   // actions
   hydrate: (payload: BootstrapPayload) => void;
   setPostureActive: (posture: RoleEntrepriseType) => void;
+  updateUser: (user: AppUser) => void;
   reset: () => void;
 };
 
@@ -43,6 +47,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   roleAdhesion: null,
   rolesEntreprise: [],
   postureActive: null,
+  rolePlateformeAdhesion: null,
 
   hydrate: (payload) =>
     set({
@@ -51,6 +56,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       roleAdhesion: payload.roleAdhesion,
       rolesEntreprise: payload.rolesEntreprise,
       postureActive: payload.postureActive,
+      rolePlateformeAdhesion: payload.rolePlateformeAdhesion,
     }),
 
   setPostureActive: (posture) => {
@@ -59,6 +65,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
     set({ postureActive: posture });
   },
 
+  updateUser: (user) => set({ user }),
+
   reset: () =>
     set({
       user: null,
@@ -66,5 +74,6 @@ export const useAppStore = create<AppStore>((set, get) => ({
       roleAdhesion: null,
       rolesEntreprise: [],
       postureActive: null,
+      rolePlateformeAdhesion: null,
     }),
 }));

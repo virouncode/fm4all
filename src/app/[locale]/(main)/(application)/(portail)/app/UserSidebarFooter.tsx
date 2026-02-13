@@ -13,21 +13,59 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { toast } from "@/hooks/use-toast";
-import { Link, usePathname, useRouter } from "@/i18n/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth/auth-client";
+import { getPresignedReadUrl } from "@/lib/s3/upload-helper";
+import { getDocumentAction } from "@/server/actions/documentsActions";
 import { useAppStore } from "@/stores/application/appStore";
 import { User2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function UserSidebarFooter() {
   const user = useAppStore((state) => state.user);
+  const entreprise = useAppStore((state) => state.entreprise);
   const router = useRouter();
-  const pathname = usePathname();
   const { state } = useSidebar();
 
   const collapsed = state === "collapsed";
 
-  const isActive = (segment: string) => pathname.includes(segment);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [isLoadingAvatar, setIsLoadingAvatar] = useState(false);
+
+  // Générer l'URL présignée pour l'avatar
+  useEffect(() => {
+    if (!user?.avatarId || !entreprise?.id) {
+      setAvatarUrl(null);
+      return;
+    }
+
+    setIsLoadingAvatar(true);
+
+    // 1. Récupérer les données complètes du document avatar
+    getDocumentAction({ documentId: user.avatarId })
+      .then(async (result) => {
+        if (result?.data?.document) {
+          const doc = result.data.document;
+
+          // 2. Générer l'URL présignée
+          if (doc.storageKey && doc.storageProvider === "s3") {
+            const url = await getPresignedReadUrl({
+              key: doc.storageKey,
+              proprietaireEntrepriseId: entreprise.id,
+            });
+            setAvatarUrl(url || null);
+          }
+        }
+      })
+      .catch((error) => {
+        console.error("Error loading avatar:", error);
+        setAvatarUrl(null);
+      })
+      .finally(() => {
+        setIsLoadingAvatar(false);
+      });
+  }, [user?.avatarId, entreprise?.id]);
 
   const handleSignOut = async () => {
     try {
@@ -35,11 +73,7 @@ export default function UserSidebarFooter() {
         fetchOptions: {
           onSuccess: () => {
             router.push("/");
-            toast({
-              title: "Déconnexion réussie",
-              description: "Vous avez été déconnecté avec succès",
-              variant: "default",
-            });
+            toast.success("Vous avez été déconnecté avec succès");
           },
         },
       });
@@ -61,12 +95,12 @@ export default function UserSidebarFooter() {
               className={collapsed ? "justify-center rounded-full px-2" : ""}
             >
               <Avatar className={collapsed ? "mx-auto h-9 w-9" : "h-8 w-8"}>
-                {user?.avatarId && (
+                {avatarUrl && !isLoadingAvatar ? (
                   <AvatarImage
-                    src={user.avatarId}
+                    src={avatarUrl}
                     alt={`${user?.prenom ?? ""} ${user?.nom ?? ""}`.trim()}
                   />
-                )}
+                ) : null}
                 <AvatarFallback className="flex items-center justify-center">
                   {initials ? (
                     <span className="text-primary text-xs font-bold">
@@ -84,7 +118,7 @@ export default function UserSidebarFooter() {
           </DropdownMenuTrigger>
 
           <DropdownMenuContent side="top" align="start">
-            <DropdownMenuItem
+            {/* <DropdownMenuItem
               className={
                 isActive("mon-profil")
                   ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
@@ -95,7 +129,7 @@ export default function UserSidebarFooter() {
               <Link href={{ pathname: "/app/compte/mon-profil" }}>
                 Mon profil
               </Link>
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
 
             <DropdownMenuItem onClick={handleSignOut}>
               Déconnexion

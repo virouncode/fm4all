@@ -1,0 +1,169 @@
+import { tickets, ticketMessages } from "@/db/schema/tickets";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
+import {
+  ticketMessageVisibiliteSchema,
+  ticketPrioriteSchema,
+  ticketStatutSchema,
+  ticketTypeSchema,
+} from "./enums";
+
+// ═══════════════════════════════════════════════════════════════
+// TICKETS - SELECT (depuis DB)
+// ═══════════════════════════════════════════════════════════════
+
+export const selectTicketSchema = createSelectSchema(tickets);
+export type SelectTicketType = z.infer<typeof selectTicketSchema>;
+
+// ═══════════════════════════════════════════════════════════════
+// TICKETS - INSERT FORM (formulaire client)
+// ═══════════════════════════════════════════════════════════════
+
+export const insertTicketFormSchema = z.object({
+  titre: z.string().min(1, "Titre obligatoire").max(255),
+  description: z.string().optional(),
+  type: ticketTypeSchema,
+  priorite: ticketPrioriteSchema,
+  siteId: z.string().uuid("Site obligatoire"),
+});
+export type InsertTicketFormType = z.infer<typeof insertTicketFormSchema>;
+
+// ═══════════════════════════════════════════════════════════════
+// TICKETS - INSERT TO DB (Server Action ajoute les champs)
+// ═══════════════════════════════════════════════════════════════
+
+export const insertTicketToDbSchema = createInsertSchema(tickets)
+  .extend({
+    proprietaireEntrepriseId: z.string().uuid(),
+    demandeurEntrepriseId: z.string().uuid().nullable(),
+    statut: ticketStatutSchema.default("nouveau"),
+    createdById: z.string().uuid(),
+    updatedById: z.string().uuid(),
+  })
+  .omit({
+    id: true,
+    createdAt: true,
+    updatedAt: true,
+    lastActivityAt: true,
+    resolvedAt: true,
+    closedAt: true,
+  });
+export type InsertTicketToDbType = z.infer<typeof insertTicketToDbSchema>;
+
+// ═══════════════════════════════════════════════════════════════
+// TICKETS - UPDATE FORM (formulaire client)
+// ═══════════════════════════════════════════════════════════════
+
+export const updateTicketFormSchema = insertTicketFormSchema.partial().extend({
+  id: z.string().uuid(),
+  statut: ticketStatutSchema.optional(),
+  assigneEntrepriseId: z.string().uuid().nullable().optional(),
+  assigneUserId: z.string().uuid().nullable().optional(),
+});
+export type UpdateTicketFormType = z.infer<typeof updateTicketFormSchema>;
+
+// ═══════════════════════════════════════════════════════════════
+// TICKETS - UPDATE TO DB (Server Action ajoute updatedById)
+// ═══════════════════════════════════════════════════════════════
+
+export const updateTicketToDbSchema = z.object({
+  titre: z.string().min(1).max(255).optional(),
+  description: z.string().optional().nullable(),
+  type: ticketTypeSchema.optional(),
+  priorite: ticketPrioriteSchema.optional(),
+  siteId: z.string().uuid().optional(),
+  statut: ticketStatutSchema.optional(),
+  assigneEntrepriseId: z.string().uuid().nullable().optional(),
+  assigneUserId: z.string().uuid().nullable().optional(),
+  lastActivityAt: z.date().optional(),
+  resolvedAt: z.date().nullable().optional(),
+  closedAt: z.date().nullable().optional(),
+  updatedById: z.string().uuid(),
+});
+export type UpdateTicketToDbType = z.infer<typeof updateTicketToDbSchema>;
+
+// ═══════════════════════════════════════════════════════════════
+// TICKET MESSAGES - SELECT (depuis DB)
+// ═══════════════════════════════════════════════════════════════
+
+export const selectTicketMessageSchema = createSelectSchema(ticketMessages);
+export type SelectTicketMessageType = z.infer<typeof selectTicketMessageSchema>;
+
+// ═══════════════════════════════════════════════════════════════
+// TICKET MESSAGES - INSERT FORM (formulaire client)
+// ═══════════════════════════════════════════════════════════════
+
+export const insertTicketMessageFormSchema = z.object({
+  message: z.string().min(1, "Message obligatoire"),
+  visibilite: ticketMessageVisibiliteSchema,
+});
+export type InsertTicketMessageFormType = z.infer<
+  typeof insertTicketMessageFormSchema
+>;
+
+// ═══════════════════════════════════════════════════════════════
+// TICKET MESSAGES - INSERT TO DB (Server Action ajoute les champs)
+// ═══════════════════════════════════════════════════════════════
+
+export const insertTicketMessageToDbSchema = createInsertSchema(ticketMessages)
+  .extend({
+    ticketId: z.string().uuid(),
+    auteurUserId: z.string().uuid(),
+  })
+  .omit({
+    id: true,
+    createdAt: true,
+  });
+export type InsertTicketMessageToDbType = z.infer<
+  typeof insertTicketMessageToDbSchema
+>;
+
+// ═══════════════════════════════════════════════════════════════
+// QUERY SCHEMAS (filtres + pagination)
+// ═══════════════════════════════════════════════════════════════
+
+export const ticketsQuerySchema = z.object({
+  entrepriseId: z.string().uuid(),
+
+  // Filtres
+  search: z.string().optional(),
+  statut: ticketStatutSchema.optional(),
+  priorite: ticketPrioriteSchema.optional(),
+  type: ticketTypeSchema.optional(),
+  siteId: z.string().uuid().optional(),
+  assigneUserId: z.string().uuid().optional(),
+
+  // Tri
+  orderBy: z
+    .enum(["createdAt", "lastActivityAt", "priorite", "statut"])
+    .default("lastActivityAt"),
+  orderDir: z.enum(["asc", "desc"]).default("desc"),
+
+  // Pagination
+  page: z.number().int().positive().default(1),
+  pageSize: z.number().int().positive().default(50),
+});
+export type TicketsQueryType = z.infer<typeof ticketsQuerySchema>;
+
+// ═══════════════════════════════════════════════════════════════
+// CHANGE STATUS SCHEMA
+// ═══════════════════════════════════════════════════════════════
+
+export const changeTicketStatusSchema = z.object({
+  ticketId: z.string().uuid(),
+  entrepriseId: z.string().uuid(),
+  newStatut: ticketStatutSchema,
+});
+export type ChangeTicketStatusType = z.infer<typeof changeTicketStatusSchema>;
+
+// ═══════════════════════════════════════════════════════════════
+// ASSIGN TICKET SCHEMA
+// ═══════════════════════════════════════════════════════════════
+
+export const assignTicketSchema = z.object({
+  ticketId: z.string().uuid(),
+  entrepriseId: z.string().uuid(),
+  assigneEntrepriseId: z.string().uuid().nullable().optional(),
+  assigneUserId: z.string().uuid().nullable().optional(),
+});
+export type AssignTicketType = z.infer<typeof assignTicketSchema>;

@@ -1,13 +1,11 @@
 import z from "zod";
 import {
-  devisStatusEnum,
+  devisStatutEnum,
   devisTypePrixEnum,
-  interventionStatusEnum,
-  interventionTypeEnum,
   roleEnum,
-  ticketCategorieEnum,
+  ticketMessageVisibiliteEnum,
   ticketPrioriteEnum,
-  ticketStatusEnum,
+  ticketStatutEnum,
   ticketTypeEnum,
   typeBatimentEnum,
   typeOccupationEnum,
@@ -22,19 +20,8 @@ export type TypeOccupationType = z.infer<typeof typeOccupationSchema>;
 export const devisTypePrixSchema = z.enum(devisTypePrixEnum.enumValues);
 export type DevisTypePrixType = z.infer<typeof devisTypePrixSchema>;
 
-export const devisStatusSchema = z.enum(devisStatusEnum.enumValues);
-export type DevisStatusType = z.infer<typeof devisStatusSchema>;
-
-export const interventionTypeSchema = z.enum(interventionTypeEnum.enumValues);
-export type InterventionTypeType = z.infer<typeof interventionTypeSchema>;
-
-export const interventionStatusSchema = z.enum(
-  interventionStatusEnum.enumValues,
-);
-export type InterventionStatusType = z.infer<typeof interventionStatusSchema>;
-
-export const ticketCategorieSchema = z.enum(ticketCategorieEnum.enumValues);
-export type TicketCategorieType = z.infer<typeof ticketCategorieSchema>;
+export const devisStatutSchema = z.enum(devisStatutEnum.enumValues);
+export type DevisStatutType = z.infer<typeof devisStatutSchema>;
 
 export const ticketPrioriteSchema = z.enum(ticketPrioriteEnum.enumValues);
 export type TicketPrioriteType = z.infer<typeof ticketPrioriteSchema>;
@@ -42,8 +29,15 @@ export type TicketPrioriteType = z.infer<typeof ticketPrioriteSchema>;
 export const ticketTypeSchema = z.enum(ticketTypeEnum.enumValues);
 export type TicketTypeType = z.infer<typeof ticketTypeSchema>;
 
-export const ticketStatusSchema = z.enum(ticketStatusEnum.enumValues);
-export type TicketStatusType = z.infer<typeof ticketStatusSchema>;
+export const ticketStatutSchema = z.enum(ticketStatutEnum.enumValues);
+export type TicketStatutType = z.infer<typeof ticketStatutSchema>;
+
+export const ticketMessageVisibiliteSchema = z.enum(
+  ticketMessageVisibiliteEnum.enumValues
+);
+export type TicketMessageVisibiliteType = z.infer<
+  typeof ticketMessageVisibiliteSchema
+>;
 
 export const userRoleSchema = z.enum(roleEnum.enumValues);
 export type UserRoleType = z.infer<typeof userRoleSchema>;

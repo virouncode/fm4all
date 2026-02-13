@@ -1,9 +1,9 @@
 "use client";
 
+import { useRouter } from "@/i18n/navigation";
 import { setActivePostureAction } from "@/server/actions/activePostureAction";
 import { useAppStore } from "@/stores/application/appStore";
 import { RoleEntrepriseType } from "@/zod-schemas/entreprise.schema";
-import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 
 import { Label } from "@/components/ui/label";

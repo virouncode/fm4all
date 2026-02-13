@@ -1,5 +1,3 @@
-// src/components/ui/rhf/RhfFileInput.tsx
-
 import { Button } from "@/components/ui/button";
 import {
   FormControl,
@@ -10,28 +8,28 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Spinner } from "@/components/ui/spinner";
+import type { documentCategorieCodes } from "@/constants/codeTables";
+import { deleteS3Object, uploadFileToS3 } from "@/lib/s3/upload-helper";
 import { cn } from "@/lib/utils";
 import {
   validateFileSize,
   validateImageDimensions,
 } from "@/lib/utils/validateFile";
-import { postVercelBlob } from "@/server/queries_a_classer/vercel-blob/postVercelBlob";
 
 import { X } from "lucide-react";
-import * as React from "react";
+import Image from "next/image";
+import { useRef, useState } from "react";
 import { useFormContext, type FieldValues, type Path } from "react-hook-form";
 
-// Prefix temporaire
-const TEMP_PREFIX = "temp";
-
-type BaseProps = React.JSX.IntrinsicElements["input"];
-
-export type AttachmentFieldValue = {
-  url: string;
+export type AttachmentFormType = {
+  storageKey: string;
   filename: string;
   mimeType: string;
-  size: number;
+  sizeBytes: number;
+  previewUrl?: string; // URL présignée pour preview immédiat
 };
+
+type BaseProps = React.JSX.IntrinsicElements["input"];
 
 type RhfFileInputProps<S extends FieldValues> = {
   label?: string;
@@ -41,13 +39,21 @@ type RhfFileInputProps<S extends FieldValues> = {
   className?: string;
   inputClassName?: string;
   requiredMark?: boolean;
-  folderName: string;
-  onValueChange?: (value: AttachmentFieldValue | null) => void;
+
+  // S3
+  proprietaireEntrepriseId: string;
+  categorie: (typeof documentCategorieCodes)[number];
+
+  onValueChange?: (value: AttachmentFormType | null) => void;
   onClear?: () => void;
+
   previewHeight?: number;
   withError?: boolean;
   squareMandatory?: boolean;
   maxSizeBytes?: number;
+
+  // Optionnel: delete immédiat sur clear (souvent utile si scope=temp)
+  deleteOnClear?: boolean;
 } & Omit<
   BaseProps,
   "name" | "type" | "value" | "defaultValue" | "onChange" | "onBlur"
@@ -62,7 +68,8 @@ export function RhfFileInput<S extends FieldValues>({
   inputClassName,
   requiredMark,
   id: idProp,
-  folderName,
+  proprietaireEntrepriseId,
+  categorie,
   onValueChange,
   onClear,
   previewHeight = 180,
@@ -70,43 +77,36 @@ export function RhfFileInput<S extends FieldValues>({
   accept,
   squareMandatory = false,
   maxSizeBytes = 5 * 1024 * 1024,
+  deleteOnClear = true,
+
   ...props
 }: RhfFileInputProps<S>) {
   const form = useFormContext<S>();
-  const { control, watch } = form;
+  const { control } = form;
 
   const id = idProp ?? String(name).replace(/\./g, "_");
   const errorId = `${id}-error`;
   const descriptionId = description ? `${id}-description` : undefined;
 
-  const watchedValue = watch(name) as AttachmentFieldValue | null;
-  const [isUploading, setIsUploading] = React.useState(false);
-  const [localError, setLocalError] = React.useState<string | null>(null);
-  const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
-  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
 
-  React.useEffect(() => {
-    if (!watchedValue || !watchedValue.url) {
-      setPreviewUrl(null);
-      return;
-    }
-    setPreviewUrl(watchedValue.url);
-  }, [watchedValue]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   return (
     <FormField
       control={control}
       name={name}
       render={({ field, fieldState }) => {
-        const value = field.value as AttachmentFieldValue | null;
+        const value = field.value as AttachmentFormType | null;
         const hasError = !!fieldState.error;
         const describedBy = cn(descriptionId, hasError ? errorId : undefined);
 
-        const currentUrl = value?.url ?? "";
+        const currentKey = value?.storageKey ?? "";
         const currentMime = value?.mimeType ?? "";
         const currentFilename = value?.filename ?? "";
-
-        const hasValue = !!currentUrl;
+        const previewUrl = value?.previewUrl ?? null;
+        const hasValue = !!currentKey;
 
         const isImage =
           currentMime.startsWith("image/") ||
@@ -118,8 +118,13 @@ export function RhfFileInput<S extends FieldValues>({
         const handleFileChange: React.ChangeEventHandler<
           HTMLInputElement
         > = async (e) => {
+          console.log("=== handleFileChange START ===");
           const file = e.target.files?.[0];
-          if (!file) return;
+          console.log("File selected:", file?.name, file?.type, file?.size);
+          if (!file) {
+            console.log("No file selected, returning");
+            return;
+          }
 
           setLocalError(null);
           setIsUploading(true);
@@ -128,28 +133,26 @@ export function RhfFileInput<S extends FieldValues>({
             await validateFileSize(file, maxSizeBytes);
 
             if (/^image\//.test(file.type)) {
-              await validateImageDimensions(file, {
-                squareMandatory,
-              });
+              await validateImageDimensions(file, { squareMandatory });
             }
 
-            const tempFolder = `${TEMP_PREFIX}/${folderName}`;
-            const { url, size, mimeType, filename } = await postVercelBlob({
+            // 1) presign + 2) upload direct + 3) retourne key + previewUrl
+            const { key, previewUrl } = await uploadFileToS3({
               file,
-              filename: file.name,
-              foldername: tempFolder,
+              proprietaireEntrepriseId,
+              categorie,
             });
 
-            const newValue: AttachmentFieldValue = {
-              url,
-              size,
-              mimeType,
-              filename,
+            const newValue: AttachmentFormType = {
+              storageKey: key,
+              sizeBytes: file.size,
+              mimeType: file.type,
+              filename: file.name,
+              previewUrl, // URL présignée incluse directement
             };
 
             field.onChange(newValue);
             onValueChange?.(newValue);
-            setPreviewUrl(url);
 
             if (fileInputRef.current) fileInputRef.current.value = "";
           } catch (err) {
@@ -159,20 +162,40 @@ export function RhfFileInput<S extends FieldValues>({
             );
             field.onChange(null);
             onValueChange?.(null);
-            setPreviewUrl(null);
             if (fileInputRef.current) fileInputRef.current.value = "";
           } finally {
             setIsUploading(false);
           }
         };
 
-        const handleClear = () => {
+        const handleClear = async () => {
           setLocalError(null);
+
+          const keyToDelete = (field.value as AttachmentFormType | null)
+            ?.storageKey;
+
           field.onChange(null);
           onValueChange?.(null);
+
           if (fileInputRef.current) fileInputRef.current.value = "";
-          setPreviewUrl(null);
-          onClear?.(); // important pour retirer la ligne dans TicketForm
+
+          // Optionnel: delete immédiat côté S3
+          // ✅ SÉCURITÉ : Ne supprimer QUE les fichiers temporaires
+          if (deleteOnClear && keyToDelete && keyToDelete.startsWith("temp/")) {
+            try {
+              await deleteS3Object({
+                key: keyToDelete,
+                proprietaireEntrepriseId,
+              });
+            } catch (e) {
+              // On ne rebloque pas l'UX si la suppression échoue
+              console.error("Failed to delete temp file:", e);
+            }
+          }
+          // Note: Les fichiers dans documents/ ne sont jamais supprimés lors du clear.
+          // Ils doivent être gérés explicitement par les actions serveur si nécessaire.
+
+          onClear?.();
         };
 
         return (
@@ -194,7 +217,7 @@ export function RhfFileInput<S extends FieldValues>({
 
             <FormControl>
               <div className="flex flex-col gap-2">
-                <div className="flex w-full items-center">
+                <div className="flex w-full items-center gap-1">
                   <input
                     id={id}
                     type="file"
@@ -218,26 +241,26 @@ export function RhfFileInput<S extends FieldValues>({
                     className={cn("w-5/6 justify-center", inputClassName)}
                   >
                     {isUploading
-                      ? "Chargement..."
+                      ? "Loading..."
                       : hasValue
                         ? "Changer de fichier"
                         : "Choisir un fichier"}
                   </Button>
 
-                  {currentFilename && !isUploading && (
-                    <span className="text-muted-foreground max-w-[180px] truncate text-xs">
+                  {/* {currentFilename && !isUploading && (
+                    <span className="text-muted-foreground max-w-45 truncate text-xs">
                       {currentFilename}
                     </span>
-                  )}
+                  )} */}
 
                   <Button
                     type="button"
                     variant="outline"
                     size="icon"
-                    onClick={handleClear}
+                    onClick={() => void handleClear()}
                     disabled={isUploading}
                     aria-label="Remove file"
-                    className={`w-1/6 ${hasValue ? "" : "invisible"}`}
+                    className={`flex-1 ${hasValue ? "" : "invisible"}`}
                   >
                     {isUploading ? (
                       <Spinner className="h-4 w-4" />
@@ -247,14 +270,14 @@ export function RhfFileInput<S extends FieldValues>({
                   </Button>
                 </div>
 
-                {currentUrl && previewUrl && (
-                  <div className="bg-muted/20 animate-in fade-in-0 slide-in-from-top-1 max-w-sm rounded-md border p-3">
+                {hasValue && previewUrl ? (
+                  <div className="bg-muted/20 relative h-40 max-w-sm rounded-md border p-3">
                     {isImage && (
-                      <img
+                      <Image
                         src={previewUrl}
                         alt={currentFilename || "Preview"}
-                        className="max-w-full rounded object-contain shadow-sm"
-                        style={{ maxHeight: previewHeight }}
+                        className="object-contain"
+                        fill
                       />
                     )}
                     {isPdf && (
@@ -278,6 +301,10 @@ export function RhfFileInput<S extends FieldValues>({
                       </div>
                     )}
                   </div>
+                ) : (
+                  <div className="bg-muted/20 text-muted-foreground relative flex h-40 max-w-sm items-center justify-center rounded-md border p-3 text-sm">
+                    Preview
+                  </div>
                 )}
 
                 {description ? (
@@ -287,7 +314,7 @@ export function RhfFileInput<S extends FieldValues>({
                 ) : null}
 
                 {withError && (
-                  <div className="min-h-[19px]">
+                  <div className="min-h-4.75">
                     <FormMessage id={errorId} />
                     {localError && (
                       <p className="text-sm text-red-500">{localError}</p>

@@ -35,7 +35,9 @@ export const S3_BUCKET = process.env.AWS_S3_BUCKET;
 if (!AWS_REGION) throw new Error("Missing env AWS_REGION");
 if (!S3_BUCKET) throw new Error("Missing env AWS_S3_BUCKET");
 
-export const s3 = new S3Client({ region: AWS_REGION });
+export const s3 = new S3Client({
+  region: AWS_REGION,
+});
 
 const EXT_BY_CONTENT_TYPE: Record<S3AllowedContentType, string> = {
   "image/jpeg": "jpg",
@@ -68,7 +70,10 @@ export function makeTempKey(params: {
   const yyyy = String(now.getUTCFullYear());
   const mm = String(now.getUTCMonth() + 1).padStart(2, "0");
 
-  return `temp/entreprises/${proprietaireEntrepriseId}/${categorie}/${yyyy}/${mm}/${uuid}_${safeBase}.${ext}`;
+  // Mapping catégorie DB → nom de dossier S3 (pluriels)
+  const folderName = categorie === "avatar" ? "avatars" : categorie;
+
+  return `temp/entreprises/${proprietaireEntrepriseId}/${folderName}/${yyyy}/${mm}/${uuid}_${safeBase}.${ext}`;
 }
 
 /**
@@ -83,9 +88,13 @@ export async function promoteS3Key(params: {
   const { tempKey } = params;
 
   // already promoted (or not a temp key)
-  if (!tempKey.startsWith("temp/")) return tempKey;
+  if (!tempKey.startsWith("temp/")) {
+    console.log(`[S3] Key already promoted or not temp: ${tempKey}`);
+    return tempKey;
+  }
 
   const newKey = tempKey.replace(/^temp\//, "documents/");
+  console.log(`[S3] Promoting ${tempKey} → ${newKey}`);
 
   try {
     await s3.send(
@@ -103,8 +112,10 @@ export async function promoteS3Key(params: {
       }),
     );
 
+    console.log(`[S3] Successfully promoted to ${newKey}`);
     return newKey;
   } catch (e) {
+    console.error(`[S3] Failed to promote ${tempKey}:`, e);
     // keep it simple: callers convert to API errorResponse
     throw new Error(
       `S3_PROMOTE_FAILED: tempKey=${tempKey} newKey=${newKey} cause=${String(e)}`,
@@ -186,4 +197,19 @@ export async function getS3ObjectAsBuffer(key: string): Promise<Buffer> {
 
   if (!obj.Body) throw new Error("S3 object body is empty");
   return streamToBuffer(obj.Body);
+}
+
+/**
+ * Delete an object from S3.
+ * This is a low-level utility - caller is responsible for validation/permissions.
+ */
+export async function deleteS3Object(params: { key: string }): Promise<void> {
+  const { key } = params;
+
+  await s3.send(
+    new DeleteObjectCommand({
+      Bucket: S3_BUCKET,
+      Key: key,
+    }),
+  );
 }

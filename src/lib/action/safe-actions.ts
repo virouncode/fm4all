@@ -1,4 +1,4 @@
-import { errors } from "@/lib/action/errors"; // du fichier errors.ts que je t'ai donné
+import { errors, AppError } from "@/lib/action/errors";
 import type { ApiError } from "@/lib/action/result";
 import { createSafeActionClient } from "next-safe-action";
 import { z, ZodError } from "zod";
@@ -39,29 +39,38 @@ export const actionClient = createSafeActionClient({
       clientInput,
     });
 
+    // 0) Erreurs métier (AppError) - retourner directement l'apiError
+    if (error instanceof AppError) {
+      console.log("[Server action] AppError détectée, code:", error.apiError.code);
+      return error.apiError;
+    }
+
     // 1) Erreurs DB / infra
     if (isDbError(error)) {
-      return errors.dependency(
+      const dbError = errors.dependency(
         "Erreur de base de données : impossible de sauvegarder vos données.",
         { actionName: metadata?.actionName, requestId: metadata?.requestId },
       );
+      return dbError.apiError;
     }
 
     // 2) ZodError: en théorie rare ici (next-safe-action sort validationErrors)
     if (error instanceof ZodError) {
-      return errors.validation("Données invalides fournies.", undefined, {
+      const validationError = errors.validation("Données invalides fournies.", undefined, {
         actionName: metadata?.actionName,
         requestId: metadata?.requestId,
       });
+      return validationError.apiError;
     }
 
     // 3) Défaut : erreur interne générique
-    return errors.internal(
+    const internalError = errors.internal(
       "Une erreur inattendue est survenue. Merci de réessayer.",
       {
         actionName: metadata?.actionName,
         requestId: metadata?.requestId,
       },
     );
+    return internalError.apiError;
   },
 });

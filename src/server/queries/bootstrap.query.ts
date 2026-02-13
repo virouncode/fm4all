@@ -1,6 +1,13 @@
+import "server-only";
 import { db } from "@/db";
-import { entrepriseRoles, entreprises, userAdhesions } from "@/db/schema";
+import {
+  entrepriseRoles,
+  entreprises,
+  userAdhesions,
+  userPlateformeAdhesions,
+} from "@/db/schema";
 import { RoleEntrepriseType } from "@/zod-schemas/entreprise.schema";
+import { RolePlateformeAdhesionType } from "@/zod-schemas/userPlateformeAdhesion.schema";
 import { and, eq, getTableColumns } from "drizzle-orm";
 
 function pickDefaultPosture(roles: RoleEntrepriseType[]): RoleEntrepriseType {
@@ -40,10 +47,19 @@ export async function bootstrapUser(
       ? activePosture
       : pickDefaultPosture(roles);
 
+  // Query platform adhesion
+  const platformAdhesion = await db.query.userPlateformeAdhesions.findFirst({
+    where: and(
+      eq(userPlateformeAdhesions.userId, userId),
+      eq(userPlateformeAdhesions.statut, "actif"),
+    ),
+  });
+
   return {
     entreprise: bootstrapData.entreprise,
     roleAdhesion: bootstrapData.roleAdhesion,
     rolesEntreprise: roles,
     postureActive,
+    rolePlateformeAdhesion: (platformAdhesion?.role as RolePlateformeAdhesionType) || null,
   };
 }

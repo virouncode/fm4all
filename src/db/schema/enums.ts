@@ -1,5 +1,6 @@
 import {
   adhesionStatutCodes,
+  attributionModeCodes,
   clientServiceModeCodes,
   contratDealModeCodes,
   contratStatutCodes,
@@ -21,6 +22,7 @@ import {
   roleAdhesionCodes,
   roleAttributionSiteCodes,
   roleEntrepriseCodes,
+  rolePlateformeAdhesionCodes,
   siteAttributionScopeCodes,
   ticketMessageVisibiliteCodes,
   ticketPrioriteCodes,
@@ -87,6 +89,10 @@ export const siteAttributionScopeEnum = pgEnum(
   "site_attribution_scope",
   siteAttributionScopeCodes,
 );
+export const attributionModeEnum = pgEnum(
+  "attribution_mode",
+  attributionModeCodes,
+);
 export const clientServiceModeEnum = pgEnum(
   "client_service_mode",
   clientServiceModeCodes,
@@ -122,6 +128,10 @@ export const roleEntrepriseEnum = pgEnum(
   roleEntrepriseCodes,
 );
 export const roleAdhesionEnum = pgEnum("role_adhesion", roleAdhesionCodes);
+export const rolePlateformeAdhesionEnum = pgEnum(
+  "role_plateforme_adhesion",
+  rolePlateformeAdhesionCodes,
+);
 export const roleAttributionSiteEnum = pgEnum(
   "role_attribution_site",
   roleAttributionSiteCodes,

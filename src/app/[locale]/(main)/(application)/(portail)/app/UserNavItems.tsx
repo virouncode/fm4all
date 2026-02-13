@@ -1,9 +1,8 @@
 "use client";
 
-import { Link } from "@/i18n/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 import { useAppStore } from "@/stores/application/appStore";
 import { RoleEntrepriseType } from "@/zod-schemas/entreprise.schema";
-import { usePathname } from "next/navigation";
 
 import {
   SidebarGroup,
@@ -16,6 +15,7 @@ import {
 
 import {
   BriefcaseBusiness,
+  Building,
   Building2,
   ClipboardList,
   CreditCard,
@@ -23,7 +23,6 @@ import {
   HandPlatter,
   Handshake,
   LayoutDashboard,
-  MapPin,
   Settings,
   Shield,
   Ticket,
@@ -80,7 +79,7 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
           key: "sites",
           label: "Sites",
           href: "/app/sites",
-          icon: MapPin,
+          icon: Building,
           match: "startsWith",
         },
         {

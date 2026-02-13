@@ -1,0 +1,2 @@
+ALTER TABLE "tickets" ADD COLUMN "site_id" uuid NOT NULL;--> statement-breakpoint
+ALTER TABLE "tickets" ADD CONSTRAINT "tickets_site_id_sites_id_fk" FOREIGN KEY ("site_id") REFERENCES "public"."sites"("id") ON DELETE restrict ON UPDATE no action;

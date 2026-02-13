@@ -2,18 +2,19 @@
 import { InputWithLabel } from "@/components/form-inputs/InputWithLabel";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { toast } from "@/hooks/use-toast";
+import { PasswordStrengthIndicator } from "@/components/ui/password-strength-indicator";
 import { useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth/auth-client";
 import {
   ResetPasswordType,
   resetPasswordSchema,
-} from "@/zod-schemas/resetPassword";
+} from "@/zod-schemas/resetPassword.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 type ResetPasswordProps = {
   token: string;
@@ -35,11 +36,7 @@ const ResetPasswordForm = ({ token }: ResetPasswordProps) => {
 
   const submitForm = async (data: ResetPasswordType) => {
     if (data.password !== data.passwordConfirmation) {
-      toast({
-        variant: "destructive",
-        title: "Erreur 😿",
-        description: "Les mots de passe ne correspondent pas.",
-      });
+      toast.error("Les mots de passe ne correspondent pas.");
       return;
     }
     setLoading(true);
@@ -48,33 +45,31 @@ const ResetPasswordForm = ({ token }: ResetPasswordProps) => {
       token,
     });
     if (error) {
-      toast({
-        variant: "destructive",
-        title: "Erreur 😿",
-        description: error.message,
-      });
+      toast.error(error.message);
     } else {
-      toast({
-        variant: "default",
-        title: "Succès ! 🎉",
-        description:
-          "Votre mot de passe a été réinitialisé avec succès. Vous aller être redirigé vers la page de connexion.",
-      });
+      toast.success(
+        "Votre mot de passe a été réinitialisé avec succès. Vous allez être redirigé vers la page de connexion.",
+      );
       setTimeout(() => {
-        router.push("/auth/signin");
+        router.push("/auth/login");
       }, 2000);
     }
     setLoading(false);
   };
+  const passwordValue = form.watch("password");
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(submitForm)}>
         <div className="grid gap-4">
-          <InputWithLabel<ResetPasswordType>
-            fieldTitle="Nouveau mot de passe*"
-            nameInSchema="password"
-            type="password"
-          />
+          <div className="space-y-3">
+            <InputWithLabel<ResetPasswordType>
+              fieldTitle="Nouveau mot de passe*"
+              nameInSchema="password"
+              type="password"
+            />
+            <PasswordStrengthIndicator password={passwordValue} />
+          </div>
           <InputWithLabel<ResetPasswordType>
             fieldTitle="Confirmation mot de passe*"
             nameInSchema="passwordConfirmation"

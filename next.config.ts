@@ -25,6 +25,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "placehold.co",
       },
+      {
+        protocol: "https",
+        hostname: "fm4all-dev-files.s3.eu-west-3.amazonaws.com",
+      },
     ],
   },
   experimental: {

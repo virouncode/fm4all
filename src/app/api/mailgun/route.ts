@@ -19,7 +19,7 @@ const emailSchema = z.object({
   text: z.string().min(1, "Le corps du message est obligatoire"),
   html: z.string().optional(),
 
-  attachmentDocumentId: z.string().uuid().optional(),
+  attachmentDocumentId: z.uuid().optional(),
 
   nomDestinataire: z.string().optional(),
   prenomDestinataire: z.string().optional(),
@@ -55,6 +55,7 @@ const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024; // 10MB (ajuste)
 export async function POST(req: NextRequest) {
   const session = await getSession();
   const userId = session?.user?.id;
+  console.log("Mailgun route called by userId:", userId); // Debug log to check authentication
 
   if (!userId) {
     return errorResponse("UNAUTHORIZED", "Authentication required", {
@@ -137,7 +138,7 @@ export async function POST(req: NextRequest) {
     const base = {
       from: `fm4all: Le Facility Management pour tous <noreply@mg.fm4all.com>`,
       to: [body.to],
-      bcc: ["viroun@fm4all.com"], // BCC => invisible côté destinataire
+      bcc: [process.env.MAILGUN_BCC_EMAIL!], // BCC => invisible côté destinataire
       subject: body.subject,
       ...(replyTo ? { "h:Reply-To": replyTo } : {}),
       ...(attachment ? { attachment } : {}),

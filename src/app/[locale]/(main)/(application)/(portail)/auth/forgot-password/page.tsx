@@ -11,7 +11,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
-import { toast } from "@/hooks/use-toast";
 import { authClient } from "@/lib/auth/auth-client";
 import {
   forgotPasswordSchema,
@@ -20,6 +19,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { useForm } from "react-hook-form";
 
@@ -36,22 +36,16 @@ export default function ForgotPassword() {
 
   const submitForm = async (data: ForgotPasswordType) => {
     setLoading(true);
-    const { error } = await authClient.forgetPassword({
+    const { error } = await authClient.requestPasswordReset({
       email: data.email.toLowerCase(),
       redirectTo: "/auth/reset-password",
     });
     if (error) {
-      toast({
-        variant: "destructive",
-        title: "Erreur 😿",
-        description: error.message,
-      });
+      toast.error(error.message);
     } else {
-      toast({
-        title: "Email envoyé !",
-        description:
-          "Si un compte existe avec cette adresse email, vous recevrez un lien de réinitialisation de mot de passe.",
-      });
+      toast.success(
+        "Email envoyé !, si un compte existe avec cette adresse email, vous recevrez un lien de réinitialisation de mot de passe.",
+      );
     }
     setLoading(false);
   };

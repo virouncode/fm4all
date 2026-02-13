@@ -1,849 +1,660 @@
 "use server";
 
-import { db } from "@/db";
 import { actionClient } from "@/lib/action/safe-actions";
-import { promoteTempTicketAttachment } from "@/lib/utils/file-helper";
-import { getSession } from "@/server/auth/get-session";
+import { errors } from "@/lib/action/errors";
+import { db } from "@/db";
+import { tickets, ticketMessages } from "@/db/schema/tickets";
 import {
-  getAllTickets,
-  getTickets,
-} from "@/server/queries_a_classer/tickets/getTickets";
-import {
-  adminTicketsQueryBackendSchema,
-  insertTicketAttachmentToDbSchema,
-  insertTicketInputSchema,
-  insertTicketToDbSchema,
   selectTicketSchema,
-  ticketsQueryBackendSchema,
-  updateTicketInDbSchema,
-  updateTicketInputSchema,
-} from "@/zod-schemas/ticket";
-import { del } from "@vercel/blob";
-import { and, eq, inArray } from "drizzle-orm";
-import { getLocale } from "next-intl/server";
-import { flattenValidationErrors } from "next-safe-action";
+  insertTicketFormSchema,
+  updateTicketFormSchema,
+  ticketsQuerySchema,
+  changeTicketStatusSchema,
+  assignTicketSchema,
+  insertTicketMessageFormSchema,
+  selectTicketMessageSchema,
+} from "@/zod-schemas/ticket.schema";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { tickets, ticketsAttachments } from "../db/schema";
+import { flattenValidationErrors } from "next-safe-action";
+
+// Queries
+import {
+  getTicketById,
+  getTicketsByPerimetre,
+} from "@/server/queries/tickets.query";
+import { getTicketMessagesFiltered } from "@/server/queries/ticketMessages.query";
+import { getUserAdhesion } from "@/server/queries/userAdhesions.query";
+import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
+import { getEntrepriseById } from "@/server/queries/entreprise.query";
+import { getSession } from "@/server/auth/get-session";
+
+// Utils
+import { canUserAccessTicket } from "@/server/utils/ticketsPerimetre.utils";
+import {
+  canUserCreateTicket,
+  canUserUpdateTicket,
+  canUserAssignTicket,
+} from "@/server/utils/ticketsPermissions.utils";
+import { isStatusTransitionAllowed } from "@/server/utils/ticketsTransitions.utils";
+import { canUserWriteVisibility } from "@/server/utils/ticketsMessages.utils";
+
+// ═══════════════════════════════════════════════════════════════
+// GET TICKETS (avec filtres et pagination)
+// ═══════════════════════════════════════════════════════════════
 
 export const getTicketsAction = actionClient
   .metadata({ actionName: "getTicketsAction" })
-  .inputSchema(ticketsQueryBackendSchema, {
+  .inputSchema(ticketsQuerySchema, {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
   })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
-    const locale = await getLocale();
 
     if (!currentUser) {
-      throw new Error(
-        locale === "fr"
-          ? "Vous n'êtes pas authentifié."
-          : "You are not authenticated.",
-      );
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    if (!currentUser.clientId) {
-      throw new Error(
-        locale === "fr"
-          ? "Utilisateur non rattaché à une entreprise cliente"
-          : "User not associated with a client company",
-      );
-    }
-
-    const clientId = currentUser.clientId;
-
-    // parsedInput EST déjà un TicketsQueryBackendType
-    const tickets = await getTickets({
-      clientId,
-      query: parsedInput,
+    // Vérifier accès entreprise
+    const adhesion = await getUserAdhesion({
+      userId: currentUser.id,
+      entrepriseId: parsedInput.entrepriseId,
     });
 
-    return tickets;
+    if (!adhesion) {
+      throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+    }
+
+    // Déterminer posture
+    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const entreprise = await getEntrepriseById(parsedInput.entrepriseId);
+
+    let posture: "client" | "fournisseur" | "plateforme" = "client";
+
+    if (platformRole?.role) {
+      posture = "plateforme";
+    } else if (entreprise?.roles.includes("prestataire")) {
+      posture = "fournisseur";
+    }
+
+    // Récupérer tickets avec périmètre
+    const result = await getTicketsByPerimetre({
+      userId: currentUser.id,
+      entrepriseId: parsedInput.entrepriseId,
+      posture,
+      filters: parsedInput,
+    });
+
+    return {
+      tickets: result.items,
+      total: result.total,
+      page: result.page,
+      pageSize: result.pageSize,
+    };
   });
+
+// ═══════════════════════════════════════════════════════════════
+// GET TICKET BY ID
+// ═══════════════════════════════════════════════════════════════
+
+export const getTicketByIdAction = actionClient
+  .metadata({ actionName: "getTicketByIdAction" })
+  .inputSchema(
+    z.object({
+      ticketId: z.string().uuid(),
+      entrepriseId: z.string().uuid(),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    }
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+
+    if (!currentUser) {
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    }
+
+    // Vérifier accès entreprise
+    const adhesion = await getUserAdhesion({
+      userId: currentUser.id,
+      entrepriseId: parsedInput.entrepriseId,
+    });
+
+    if (!adhesion) {
+      throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+    }
+
+    // Récupérer ticket
+    const ticket = await getTicketById(parsedInput.ticketId);
+
+    if (!ticket) {
+      throw errors.notFound("Ticket");
+    }
+
+    // Vérifier ownership
+    if (ticket.proprietaireEntrepriseId !== parsedInput.entrepriseId) {
+      throw errors.forbidden(
+        "Ce ticket n'appartient pas à votre entreprise."
+      );
+    }
+
+    // Vérifier accès via périmètre
+    const hasAccess = await canUserAccessTicket({
+      userId: currentUser.id,
+      ticketId: parsedInput.ticketId,
+      entrepriseId: parsedInput.entrepriseId,
+    });
+
+    if (!hasAccess) {
+      throw errors.forbidden(
+        "Vous n'avez pas accès à ce ticket (périmètre insuffisant)."
+      );
+    }
+
+    return { ticket };
+  });
+
+// ═══════════════════════════════════════════════════════════════
+// INSERT TICKET
+// ═══════════════════════════════════════════════════════════════
 
 export const insertTicketAction = actionClient
   .metadata({ actionName: "insertTicketAction" })
-  .inputSchema(insertTicketInputSchema, {
-    handleValidationErrorsShape: async (ve) =>
-      flattenValidationErrors(ve).fieldErrors,
-  })
+  .inputSchema(
+    insertTicketFormSchema.extend({
+      entrepriseId: z.string().uuid(),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    }
+  )
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
-    const locale = await getLocale();
 
     if (!currentUser) {
-      throw new Error(
-        locale === "fr"
-          ? "Vous n'êtes pas authentifié."
-          : "You are not authenticated.",
-      );
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    const clientId = currentUser.clientId;
-    if (!clientId) {
-      throw new Error(
-        locale === "fr"
-          ? "Utilisateur non rattaché à une entreprise cliente."
-          : "User not associated with a client company.",
-      );
-    }
-
-    const createdById = currentUser.id;
-    const updatedById = currentUser.id;
-    const uploadedById = currentUser.id;
-
-    const {
-      attachments = [],
-      dateCloture,
-      // le reste des champs du ticket
-      ...ticketData
-    } = parsedInput;
-
-    let dateClotureValue: Date | null = null;
-    if (ticketData.status === "clos") {
-      dateClotureValue = new Date();
-    }
-    const payload = insertTicketToDbSchema.parse({
-      ...ticketData,
-      clientId,
-      dateCloture: dateClotureValue,
-      createdById,
-      updatedById,
+    // Vérifier accès entreprise
+    const adhesion = await getUserAdhesion({
+      userId: currentUser.id,
+      entrepriseId: parsedInput.entrepriseId,
     });
 
-    const result = await db.transaction(async (tx) => {
-      // 1) Insert du ticket
-      const [insertedTicket] = await tx
+    if (!adhesion) {
+      throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+    }
+
+    // Vérifier permission CREATE
+    const canCreate = await canUserCreateTicket({
+      userId: currentUser.id,
+      siteId: parsedInput.siteId,
+      entrepriseId: parsedInput.entrepriseId,
+    });
+
+    if (!canCreate) {
+      throw errors.forbidden(
+        "Vous n'avez pas la permission de créer un ticket sur ce site. Rôle requis: demandeur_site ou supérieur."
+      );
+    }
+
+    // Déterminer demandeurEntrepriseId (si plateforme → FM4ALL, sinon null)
+    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    let demandeurEntrepriseId: string | null = null;
+
+    if (platformRole?.role) {
+      // C'est la plateforme FM4ALL qui crée le ticket
+      demandeurEntrepriseId = parsedInput.entrepriseId;
+    }
+
+    // Transaction: INSERT ticket
+    const insertedTicket = await db.transaction(async (tx) => {
+      const [ticket] = await tx
         .insert(tickets)
-        .values(payload)
+        .values({
+          titre: parsedInput.titre,
+          description: parsedInput.description || null,
+          type: parsedInput.type,
+          priorite: parsedInput.priorite,
+          siteId: parsedInput.siteId,
+          proprietaireEntrepriseId: parsedInput.entrepriseId,
+          demandeurEntrepriseId,
+          statut: "nouveau",
+          createdById: currentUser.id,
+          updatedById: currentUser.id,
+        })
         .returning();
 
-      if (!insertedTicket) {
-        throw new Error(
-          locale === "fr"
-            ? "Échec de la création du ticket."
-            : "Failed to create ticket.",
-        );
-      }
-
-      const ticketId = insertedTicket.id;
-
-      // 2) Promotion des attachments (temp -> définitif)
-      const promotedAttachments =
-        attachments.length > 0
-          ? await Promise.all(
-              attachments.map((att) =>
-                promoteTempTicketAttachment(att, {
-                  clientId,
-                  ticketId,
-                  tableName: "tickets",
-                }),
-              ),
-            )
-          : [];
-
-      // 3) Insert des attachments en base avec les URL finales
-      if (promotedAttachments.length > 0) {
-        await tx.insert(ticketsAttachments).values(
-          promotedAttachments.map((att) =>
-            insertTicketAttachmentToDbSchema.parse({
-              ticketId,
-              uploadedById,
-              url: att.url,
-              filename: att.filename,
-              mimeType: att.mimeType,
-              size: att.size, // si ta colonne existe bien côté DB
-            }),
-          ),
-        );
-      }
-
-      // 4) Relire les attachments si tu veux renvoyer un snapshot
-      const insertedAttachments =
-        promotedAttachments.length > 0
-          ? await tx
-              .select()
-              .from(ticketsAttachments)
-              .where(eq(ticketsAttachments.ticketId, ticketId))
-          : [];
-
-      const safeTicket = selectTicketSchema.parse(insertedTicket);
-
-      return {
-        ticket: safeTicket,
-        attachments: insertedAttachments,
-      };
+      return ticket;
     });
-    return {
-      message: locale === "fr" ? "Ticket ajouté" : "Ticket added",
-      ticket: result.ticket,
-      attachments: result.attachments,
-    };
+
+    // Valider retour
+    const parsedTicket = selectTicketSchema.parse(insertedTicket);
+
+    return { ticket: parsedTicket };
   });
 
-// ======================= ADMIN: getAllDevisTicketsAction ==========================//
-import { getAllDevisTickets } from "@/server/queries_a_classer/tickets/getTickets";
-
-export const getAllDevisTicketsAction = actionClient
-  .metadata({ actionName: "getAllDevisTicketsAction" })
-  .inputSchema(adminTicketsQueryBackendSchema, {
-    handleValidationErrorsShape: async (ve) =>
-      flattenValidationErrors(ve).fieldErrors,
-  })
-  .action(async ({ parsedInput }) => {
-    const session = await getSession();
-    const currentUser = session?.user;
-    const locale = await getLocale();
-
-    if (!currentUser) {
-      throw new Error(
-        locale === "fr"
-          ? "Vous n'êtes pas authentifié."
-          : "You are not authenticated.",
-      );
-    }
-
-    if (currentUser.role !== "admin") {
-      throw new Error(
-        locale === "fr"
-          ? "Vous n'avez pas les droits pour effectuer cette action."
-          : "You do not have permission to perform this action.",
-      );
-    }
-
-    const tickets = await getAllDevisTickets({
-      query: parsedInput,
-    });
-
-    return tickets;
-  });
-
-// Schema pour l'action admin pour mettre à jour un ticket
-const updateTicketForAdminInputSchema = updateTicketInputSchema.extend({
-  clientId: z.number().int().positive("ID du client invalide"),
-});
-
-// Action pour mettre à jour un ticket (admin uniquement - peut tout modifier sauf clientId et dateCloture)
-export const updateTicketForAdminAction = actionClient
-  .metadata({ actionName: "updateTicketForAdminAction" })
-  .inputSchema(updateTicketForAdminInputSchema, {
-    handleValidationErrorsShape: async (ve) =>
-      flattenValidationErrors(ve).fieldErrors,
-  })
-  .action(async ({ parsedInput }) => {
-    const session = await getSession();
-    const currentUser = session?.user;
-    const locale = await getLocale();
-
-    if (!currentUser) {
-      throw new Error(
-        locale === "fr"
-          ? "Vous n'êtes pas authentifié."
-          : "You are not authenticated.",
-      );
-    }
-
-    if (currentUser.role !== "admin") {
-      throw new Error(
-        locale === "fr"
-          ? "Vous n'avez pas les droits pour effectuer cette action."
-          : "You do not have permission to perform this action.",
-      );
-    }
-
-    const updatedById = currentUser.id;
-    const uploadedById = currentUser.id;
-
-    const {
-      id: ticketIdFromInput,
-      attachments = [],
-      dateCloture,
-      clientId,
-      ...ticketData
-    } = parsedInput;
-
-    if (!ticketIdFromInput) {
-      throw new Error(
-        locale === "fr"
-          ? "ID du ticket obligatoire pour la mise à jour."
-          : "Ticket ID is required for update.",
-      );
-    }
-
-    // Vérifier que le ticket existe
-    const [existingTicket] = await db
-      .select()
-      .from(tickets)
-      .where(eq(tickets.id, ticketIdFromInput))
-      .limit(1);
-
-    if (!existingTicket) {
-      throw new Error(
-        locale === "fr" ? "Ticket introuvable." : "Ticket not found.",
-      );
-    }
-
-    // Vérifier que le clientId correspond (sécurité - on ne peut pas changer de client)
-    if (existingTicket.clientId !== clientId) {
-      throw new Error(
-        locale === "fr"
-          ? "Le client du ticket ne peut pas être modifié."
-          : "The client of the ticket cannot be changed.",
-      );
-    }
-
-    let dateClotureValue: Date | null = existingTicket.dateCloture;
-    if (ticketData.status === "clos" && !existingTicket.dateCloture) {
-      dateClotureValue = new Date();
-    } else if (ticketData.status !== "clos") {
-      dateClotureValue = null;
-    }
-
-    const payload = updateTicketInDbSchema.parse({
-      ...ticketData,
-      id: ticketIdFromInput,
-      dateCloture: dateClotureValue,
-      updatedById,
-    });
-
-    const result = await db.transaction(async (tx) => {
-      // 1) Mise à jour du ticket
-      const [updatedTicket] = await tx
-        .update(tickets)
-        .set(payload)
-        .where(eq(tickets.id, ticketIdFromInput))
-        .returning();
-
-      if (!updatedTicket) {
-        throw new Error(
-          locale === "fr"
-            ? "Échec de la mise à jour du ticket."
-            : "Failed to update ticket.",
-        );
-      }
-
-      const ticketId = updatedTicket.id;
-
-      // 2) Récupérer les attachments existants en base
-      const existingAttachments = await tx
-        .select()
-        .from(ticketsAttachments)
-        .where(eq(ticketsAttachments.ticketId, ticketId));
-
-      // Helper pour comparer "logiquement" deux attachments
-      const attachmentKey = (att: {
-        url: string;
-        filename: string;
-        mimeType: string;
-        size: number;
-      }) => `${att.url}__${att.filename}__${att.mimeType}__${att.size}`;
-
-      const existingByKey = new Map(
-        existingAttachments.map((att) => [attachmentKey(att), att]),
-      );
-
-      const incomingByKey = new Map(
-        attachments.map((att) => [attachmentKey(att), att]),
-      );
-
-      // 3) Déterminer ceux à supprimer (présents en DB mais plus dans le payload)
-      const toDelete = existingAttachments.filter(
-        (att) => !incomingByKey.has(attachmentKey(att)),
-      );
-
-      if (toDelete.length > 0) {
-        for (const att of toDelete) {
-          try {
-            if (att.url) {
-              await promoteSafeDelete(att.url);
-            }
-          } catch {
-            // ignore
-          }
-        }
-
-        await tx.delete(ticketsAttachments).where(
-          inArray(
-            ticketsAttachments.id,
-            toDelete.map((a) => a.id),
-          ),
-        );
-      }
-
-      // 4) Déterminer ceux à ajouter (payload mais pas en DB)
-      const toInsertRaw = attachments.filter(
-        (att) => !existingByKey.has(attachmentKey(att)),
-      );
-
-      if (toInsertRaw.length > 0) {
-        const promotedAttachments = await Promise.all(
-          toInsertRaw.map((att) =>
-            promoteTempTicketAttachment(att, {
-              clientId,
-              ticketId,
-              tableName: "tickets",
-            }),
-          ),
-        );
-
-        await tx.insert(ticketsAttachments).values(
-          promotedAttachments.map((att) =>
-            insertTicketAttachmentToDbSchema.parse({
-              ticketId,
-              uploadedById,
-              url: att.url,
-              filename: att.filename,
-              mimeType: att.mimeType,
-              size: att.size,
-            }),
-          ),
-        );
-      }
-
-      // 5) Récupérer l'état final des pièces jointes
-      const updatedAttachments = await tx
-        .select()
-        .from(ticketsAttachments)
-        .where(eq(ticketsAttachments.ticketId, ticketId));
-
-      const safeTicket = selectTicketSchema.parse(updatedTicket);
-
-      return {
-        ticket: safeTicket,
-        attachments: updatedAttachments,
-      };
-    });
-
-    return {
-      message: locale === "fr" ? "Ticket mis à jour" : "Ticket updated",
-      ticket: result.ticket,
-      attachments: result.attachments,
-    };
-  });
-
-// ======================= ADMIN: getAllTicketsAction ==========================//
-
-export const getAllTicketsAction = actionClient
-  .metadata({ actionName: "getAllTicketsAction" })
-  .inputSchema(adminTicketsQueryBackendSchema, {
-    handleValidationErrorsShape: async (ve) =>
-      flattenValidationErrors(ve).fieldErrors,
-  })
-  .action(async ({ parsedInput }) => {
-    const session = await getSession();
-    const currentUser = session?.user;
-    const locale = await getLocale();
-
-    if (!currentUser) {
-      throw new Error(
-        locale === "fr"
-          ? "Vous n'êtes pas authentifié."
-          : "You are not authenticated.",
-      );
-    }
-
-    if (currentUser.role !== "admin") {
-      throw new Error(
-        locale === "fr"
-          ? "Vous n'avez pas les droits pour effectuer cette action."
-          : "You do not have permission to perform this action.",
-      );
-    }
-
-    const tickets = await getAllTickets({
-      query: parsedInput,
-    });
-
-    return tickets;
-  });
-
-/**
- * Action de mise à jour d'un ticket + synchronisation des pièces jointes.
- * - Met à jour les champs du ticket (titre, description, etc.)
- * - Gère les attachments via un diff:
- *   - ceux qui restent dans le payload sont conservés
- *   - ceux qui ont disparu sont supprimés (DB + blob)
- *   - ceux qui arrivent depuis /temp/ sont promus + insérés
- */
+// ═══════════════════════════════════════════════════════════════
+// UPDATE TICKET
+// ═══════════════════════════════════════════════════════════════
 
 export const updateTicketAction = actionClient
   .metadata({ actionName: "updateTicketAction" })
-  .inputSchema(updateTicketInputSchema, {
+  .inputSchema(
+    updateTicketFormSchema.extend({
+      entrepriseId: z.string().uuid(),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    }
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+
+    if (!currentUser) {
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    }
+
+    // Vérifier accès entreprise
+    const adhesion = await getUserAdhesion({
+      userId: currentUser.id,
+      entrepriseId: parsedInput.entrepriseId,
+    });
+
+    if (!adhesion) {
+      throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+    }
+
+    // Récupérer ticket
+    const ticket = await getTicketById(parsedInput.id);
+
+    if (!ticket) {
+      throw errors.notFound("Ticket");
+    }
+
+    // Vérifier ownership
+    if (ticket.proprietaireEntrepriseId !== parsedInput.entrepriseId) {
+      throw errors.forbidden(
+        "Ce ticket n'appartient pas à votre entreprise."
+      );
+    }
+
+    // Vérifier permission UPDATE
+    const canUpdate = await canUserUpdateTicket({
+      userId: currentUser.id,
+      ticketId: parsedInput.id,
+      entrepriseId: parsedInput.entrepriseId,
+      updateData: parsedInput,
+    });
+
+    if (!canUpdate) {
+      throw errors.forbidden(
+        "Vous n'avez pas la permission de modifier ce ticket."
+      );
+    }
+
+    // UPDATE
+    const [updatedTicket] = await db
+      .update(tickets)
+      .set({
+        ...(parsedInput.titre && { titre: parsedInput.titre }),
+        ...(parsedInput.description !== undefined && {
+          description: parsedInput.description || null,
+        }),
+        ...(parsedInput.type && { type: parsedInput.type }),
+        ...(parsedInput.priorite && { priorite: parsedInput.priorite }),
+        ...(parsedInput.siteId && { siteId: parsedInput.siteId }),
+        ...(parsedInput.statut && { statut: parsedInput.statut }),
+        ...(parsedInput.assigneEntrepriseId !== undefined && {
+          assigneEntrepriseId: parsedInput.assigneEntrepriseId,
+        }),
+        ...(parsedInput.assigneUserId !== undefined && {
+          assigneUserId: parsedInput.assigneUserId,
+        }),
+        lastActivityAt: new Date(),
+        updatedById: currentUser.id,
+      })
+      .where(eq(tickets.id, parsedInput.id))
+      .returning();
+
+    // Valider retour
+    const parsedTicket = selectTicketSchema.parse(updatedTicket);
+
+    return { ticket: parsedTicket };
+  });
+
+// ═══════════════════════════════════════════════════════════════
+// CHANGE TICKET STATUS
+// ═══════════════════════════════════════════════════════════════
+
+export const changeTicketStatusAction = actionClient
+  .metadata({ actionName: "changeTicketStatusAction" })
+  .inputSchema(changeTicketStatusSchema, {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
   })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
-    const locale = await getLocale();
 
     if (!currentUser) {
-      throw new Error(
-        locale === "fr"
-          ? "Vous n'êtes pas authentifié."
-          : "You are not authenticated.",
-      );
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    const clientId = currentUser.clientId;
-    if (!clientId) {
-      throw new Error(
-        locale === "fr"
-          ? "Utilisateur non rattaché à une entreprise cliente."
-          : "User not associated with a client company.",
-      );
-    }
-
-    const updatedById = currentUser.id;
-    const uploadedById = currentUser.id;
-
-    // On suppose que l'input contient l'id du ticket
-    const {
-      id: ticketIdFromInput,
-      attachments = [],
-      dateCloture,
-      ...ticketData
-    } = parsedInput;
-
-    if (!ticketIdFromInput) {
-      throw new Error(
-        locale === "fr"
-          ? "ID du ticket obligatoire pour la mise à jour."
-          : "Ticket ID is required for update.",
-      );
-    }
-
-    // Vérifier que le ticket appartient bien au client
-    const [existingTicket] = await db
-      .select()
-      .from(tickets)
-      .where(
-        and(eq(tickets.id, ticketIdFromInput), eq(tickets.clientId, clientId)),
-      )
-      .limit(1);
-
-    if (!existingTicket) {
-      throw new Error(
-        locale === "fr"
-          ? "Ticket introuvable ou non accessible."
-          : "Ticket not found or not accessible.",
-      );
-    }
-
-    let dateClotureValue: Date | null = null;
-    if (ticketData.status === "clos") {
-      dateClotureValue = new Date();
-    }
-
-    const payload = updateTicketInDbSchema.parse({
-      ...ticketData,
-      id: ticketIdFromInput,
-      dateCloture: dateClotureValue,
-      updatedById,
+    // Vérifier accès entreprise
+    const adhesion = await getUserAdhesion({
+      userId: currentUser.id,
+      entrepriseId: parsedInput.entrepriseId,
     });
 
-    const result = await db.transaction(async (tx) => {
-      // 1) Mise à jour du ticket
-      const [updatedTicket] = await tx
+    if (!adhesion) {
+      throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+    }
+
+    // Récupérer ticket
+    const ticket = await getTicketById(parsedInput.ticketId);
+
+    if (!ticket) {
+      throw errors.notFound("Ticket");
+    }
+
+    // Vérifier ownership
+    if (ticket.proprietaireEntrepriseId !== parsedInput.entrepriseId) {
+      throw errors.forbidden(
+        "Ce ticket n'appartient pas à votre entreprise."
+      );
+    }
+
+    // Vérifier transition autorisée
+    const isAllowed = await isStatusTransitionAllowed({
+      userId: currentUser.id,
+      ticketId: parsedInput.ticketId,
+      entrepriseId: parsedInput.entrepriseId,
+      currentStatut: ticket.statut,
+      newStatut: parsedInput.newStatut,
+    });
+
+    if (!isAllowed) {
+      throw errors.forbidden(
+        `Transition ${ticket.statut} → ${parsedInput.newStatut} non autorisée pour votre rôle.`
+      );
+    }
+
+    // Calculer timestamps
+    const now = new Date();
+    const updates: Record<string, unknown> = {
+      statut: parsedInput.newStatut,
+      lastActivityAt: now,
+      updatedById: currentUser.id,
+    };
+
+    if (parsedInput.newStatut === "a_valider") {
+      updates.resolvedAt = now;
+    }
+
+    if (parsedInput.newStatut === "clos") {
+      updates.closedAt = now;
+      if (!ticket.resolvedAt) {
+        updates.resolvedAt = now;
+      }
+    }
+
+    // UPDATE
+    const [updatedTicket] = await db
+      .update(tickets)
+      .set(updates)
+      .where(eq(tickets.id, parsedInput.ticketId))
+      .returning();
+
+    // Valider retour
+    const parsedTicket = selectTicketSchema.parse(updatedTicket);
+
+    return { ticket: parsedTicket };
+  });
+
+// ═══════════════════════════════════════════════════════════════
+// ASSIGN TICKET
+// ═══════════════════════════════════════════════════════════════
+
+export const assignTicketAction = actionClient
+  .metadata({ actionName: "assignTicketAction" })
+  .inputSchema(assignTicketSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+
+    if (!currentUser) {
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    }
+
+    // Vérifier accès entreprise
+    const adhesion = await getUserAdhesion({
+      userId: currentUser.id,
+      entrepriseId: parsedInput.entrepriseId,
+    });
+
+    if (!adhesion) {
+      throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+    }
+
+    // Récupérer ticket
+    const ticket = await getTicketById(parsedInput.ticketId);
+
+    if (!ticket) {
+      throw errors.notFound("Ticket");
+    }
+
+    // Vérifier ownership
+    if (ticket.proprietaireEntrepriseId !== parsedInput.entrepriseId) {
+      throw errors.forbidden(
+        "Ce ticket n'appartient pas à votre entreprise."
+      );
+    }
+
+    // Vérifier permission ASSIGN
+    const canAssign = await canUserAssignTicket({
+      userId: currentUser.id,
+      ticketId: parsedInput.ticketId,
+      entrepriseId: parsedInput.entrepriseId,
+    });
+
+    if (!canAssign) {
+      throw errors.forbidden(
+        "Vous n'avez pas la permission d'assigner ce ticket. Rôle requis: responsable_site ou plateforme."
+      );
+    }
+
+    // UPDATE assignation
+    const [updatedTicket] = await db
+      .update(tickets)
+      .set({
+        ...(parsedInput.assigneEntrepriseId !== undefined && {
+          assigneEntrepriseId: parsedInput.assigneEntrepriseId,
+        }),
+        ...(parsedInput.assigneUserId !== undefined && {
+          assigneUserId: parsedInput.assigneUserId,
+        }),
+        lastActivityAt: new Date(),
+        updatedById: currentUser.id,
+      })
+      .where(eq(tickets.id, parsedInput.ticketId))
+      .returning();
+
+    // Valider retour
+    const parsedTicket = selectTicketSchema.parse(updatedTicket);
+
+    return { ticket: parsedTicket };
+  });
+
+// ═══════════════════════════════════════════════════════════════
+// INSERT TICKET MESSAGE
+// ═══════════════════════════════════════════════════════════════
+
+export const insertTicketMessageAction = actionClient
+  .metadata({ actionName: "insertTicketMessageAction" })
+  .inputSchema(
+    insertTicketMessageFormSchema.extend({
+      ticketId: z.string().uuid(),
+      entrepriseId: z.string().uuid(),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    }
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+
+    if (!currentUser) {
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    }
+
+    // Vérifier accès entreprise
+    const adhesion = await getUserAdhesion({
+      userId: currentUser.id,
+      entrepriseId: parsedInput.entrepriseId,
+    });
+
+    if (!adhesion) {
+      throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+    }
+
+    // Récupérer ticket
+    const ticket = await getTicketById(parsedInput.ticketId);
+
+    if (!ticket) {
+      throw errors.notFound("Ticket");
+    }
+
+    // Vérifier ownership
+    if (ticket.proprietaireEntrepriseId !== parsedInput.entrepriseId) {
+      throw errors.forbidden(
+        "Ce ticket n'appartient pas à votre entreprise."
+      );
+    }
+
+    // Vérifier accès ticket
+    const hasAccess = await canUserAccessTicket({
+      userId: currentUser.id,
+      ticketId: parsedInput.ticketId,
+      entrepriseId: parsedInput.entrepriseId,
+    });
+
+    if (!hasAccess) {
+      throw errors.forbidden(
+        "Vous n'avez pas accès à ce ticket (périmètre insuffisant)."
+      );
+    }
+
+    // Vérifier permission visibilité
+    const canWrite = await canUserWriteVisibility({
+      userId: currentUser.id,
+      entrepriseId: parsedInput.entrepriseId,
+      visibilite: parsedInput.visibilite,
+    });
+
+    if (!canWrite) {
+      throw errors.forbidden(
+        `Vous ne pouvez pas écrire un message avec la visibilité "${parsedInput.visibilite}".`
+      );
+    }
+
+    // Transaction: INSERT message + UPDATE lastActivityAt
+    const insertedMessage = await db.transaction(async (tx) => {
+      const [message] = await tx
+        .insert(ticketMessages)
+        .values({
+          ticketId: parsedInput.ticketId,
+          auteurUserId: currentUser.id,
+          message: parsedInput.message,
+          visibilite: parsedInput.visibilite,
+        })
+        .returning();
+
+      // Mettre à jour lastActivityAt du ticket
+      await tx
         .update(tickets)
-        .set(payload)
-        .where(eq(tickets.id, ticketIdFromInput))
-        .returning();
+        .set({
+          lastActivityAt: new Date(),
+          updatedById: currentUser.id,
+        })
+        .where(eq(tickets.id, parsedInput.ticketId));
 
-      if (!updatedTicket) {
-        throw new Error(
-          locale === "fr"
-            ? "Échec de la mise à jour du ticket."
-            : "Failed to update ticket.",
-        );
-      }
-
-      const ticketId = updatedTicket.id;
-
-      // 2) Récupérer les attachments existants en base
-      const existingAttachments = await tx
-        .select()
-        .from(ticketsAttachments)
-        .where(eq(ticketsAttachments.ticketId, ticketId));
-
-      // Helper pour comparer "logiquement" deux attachments
-      const attachmentKey = (att: {
-        url: string;
-        filename: string;
-        mimeType: string;
-        size: number;
-      }) => `${att.url}__${att.filename}__${att.mimeType}__${att.size}`;
-
-      const existingByKey = new Map(
-        existingAttachments.map((att) => [attachmentKey(att), att]),
-      );
-
-      const incomingByKey = new Map(
-        attachments.map((att) => [attachmentKey(att), att]),
-      );
-
-      // 3) Déterminer ceux à supprimer (présents en DB mais plus dans le payload)
-      const toDelete = existingAttachments.filter(
-        (att) => !incomingByKey.has(attachmentKey(att)),
-      );
-
-      if (toDelete.length > 0) {
-        // Supprimer les blobs de ceux qui disparaissent
-        // (on ignore les erreurs de delete, c'est du best-effort)
-        for (const att of toDelete) {
-          try {
-            if (att.url) {
-              await promoteSafeDelete(att.url);
-            }
-          } catch {
-            // ignore
-          }
-        }
-
-        // Supprimer les rows en DB
-        await tx.delete(ticketsAttachments).where(
-          inArray(
-            ticketsAttachments.id,
-            toDelete.map((a) => a.id),
-          ),
-        );
-      }
-
-      // 4) Déterminer ceux à ajouter (payload mais pas en DB)
-      const toInsertRaw = attachments.filter(
-        (att) => !existingByKey.has(attachmentKey(att)),
-      );
-
-      // Promouvoir les nouveaux (si /temp/) puis insérer
-      if (toInsertRaw.length > 0) {
-        const promotedAttachments = await Promise.all(
-          toInsertRaw.map((att) =>
-            promoteTempTicketAttachment(att, {
-              clientId,
-              ticketId,
-              tableName: "tickets",
-            }),
-          ),
-        );
-
-        await tx.insert(ticketsAttachments).values(
-          promotedAttachments.map((att) =>
-            insertTicketAttachmentToDbSchema.parse({
-              ticketId,
-              uploadedById,
-              url: att.url,
-              filename: att.filename,
-              mimeType: att.mimeType,
-              size: att.size,
-            }),
-          ),
-        );
-      }
-
-      // 5) Récupérer l'état final des pièces jointes
-      const updatedAttachments = await tx
-        .select()
-        .from(ticketsAttachments)
-        .where(eq(ticketsAttachments.ticketId, ticketId));
-
-      const safeTicket = selectTicketSchema.parse(updatedTicket);
-
-      return {
-        ticket: safeTicket,
-        attachments: updatedAttachments,
-      };
+      return message;
     });
 
-    return {
-      message: locale === "fr" ? "Ticket mis à jour" : "Ticket updated",
-      ticket: result.ticket,
-      attachments: result.attachments,
-    };
+    // Valider retour
+    const parsedMessage = selectTicketMessageSchema.parse(insertedMessage);
+
+    return { message: parsedMessage };
   });
 
-/**
- * Helper best-effort pour supprimer un blob.
- * Ici on utilise simplement del(url), mais tu peux affiner si besoin.
- */
+// ═══════════════════════════════════════════════════════════════
+// GET TICKET MESSAGES
+// ═══════════════════════════════════════════════════════════════
 
-async function promoteSafeDelete(url: string) {
-  try {
-    await del(url);
-  } catch {
-    // on ne bloque pas la transaction pour un échec de delete de blob
-  }
-}
-
-// Schema pour l'action admin pour insérer un ticket avec clientId explicite
-
-const insertTicketForAdminInputSchema = insertTicketInputSchema.extend({
-  clientId: z.number().int().positive("ID du client invalide"),
-});
-
-// Action pour récupérer les tickets d'un client (admin uniquement)
-const getClientTicketsInputSchema = z.object({
-  clientId: z.number().int().positive("ID du client invalide"),
-});
-
-export const getClientTicketsForAdminAction = actionClient
-  .metadata({ actionName: "getClientTicketsForAdminAction" })
-  .inputSchema(getClientTicketsInputSchema, {
-    handleValidationErrorsShape: async (ve) =>
-      flattenValidationErrors(ve).fieldErrors,
-  })
+export const getTicketMessagesAction = actionClient
+  .metadata({ actionName: "getTicketMessagesAction" })
+  .inputSchema(
+    z.object({
+      ticketId: z.string().uuid(),
+      entrepriseId: z.string().uuid(),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    }
+  )
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
-    const locale = await getLocale();
 
     if (!currentUser) {
-      throw new Error(
-        locale === "fr"
-          ? "Vous n'êtes pas authentifié."
-          : "You are not authenticated.",
-      );
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    if (currentUser.role !== "admin") {
-      throw new Error(
-        locale === "fr"
-          ? "Vous n'avez pas les droits pour effectuer cette action."
-          : "You do not have permission to perform this action.",
-      );
-    }
-
-    const { clientId } = parsedInput;
-
-    // Récupérer tous les tickets du client (sans pagination)
-    const clientTickets = await db
-      .select()
-      .from(tickets)
-      .where(eq(tickets.clientId, clientId))
-      .orderBy(tickets.createdAt);
-
-    return clientTickets.map((ticket) => selectTicketSchema.parse(ticket));
-  });
-
-// Action pour créer un ticket pour un client spécifique (admin uniquement)
-export const insertTicketForAdminAction = actionClient
-  .metadata({ actionName: "insertTicketForAdminAction" })
-  .inputSchema(insertTicketForAdminInputSchema, {
-    handleValidationErrorsShape: async (ve) =>
-      flattenValidationErrors(ve).fieldErrors,
-  })
-  .action(async ({ parsedInput }) => {
-    const session = await getSession();
-    const currentUser = session?.user;
-    const locale = await getLocale();
-
-    if (!currentUser) {
-      throw new Error(
-        locale === "fr"
-          ? "Vous n'êtes pas authentifié."
-          : "You are not authenticated.",
-      );
-    }
-
-    if (currentUser.role !== "admin") {
-      throw new Error(
-        locale === "fr"
-          ? "Vous n'avez pas les droits pour effectuer cette action."
-          : "You do not have permission to perform this action.",
-      );
-    }
-
-    const createdById = currentUser.id;
-    const updatedById = currentUser.id;
-    const uploadedById = currentUser.id;
-
-    const {
-      attachments = [],
-      dateCloture,
-      clientId,
-      ...ticketData
-    } = parsedInput;
-
-    let dateClotureValue: Date | null = null;
-    if (ticketData.status === "clos") {
-      dateClotureValue = new Date();
-    }
-    const payload = insertTicketToDbSchema.parse({
-      ...ticketData,
-      clientId,
-      dateCloture: dateClotureValue,
-      createdById,
-      updatedById,
+    // Vérifier accès entreprise
+    const adhesion = await getUserAdhesion({
+      userId: currentUser.id,
+      entrepriseId: parsedInput.entrepriseId,
     });
 
-    const result = await db.transaction(async (tx) => {
-      // 1) Insert du ticket
-      const [insertedTicket] = await tx
-        .insert(tickets)
-        .values(payload)
-        .returning();
+    if (!adhesion) {
+      throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+    }
 
-      if (!insertedTicket) {
-        throw new Error(
-          locale === "fr"
-            ? "Échec de la création du ticket."
-            : "Failed to create ticket.",
-        );
-      }
-
-      const ticketId = insertedTicket.id;
-
-      // 2) Promotion des attachments (temp -> définitif)
-      const promotedAttachments =
-        attachments.length > 0
-          ? await Promise.all(
-              attachments.map((att) =>
-                promoteTempTicketAttachment(att, {
-                  clientId,
-                  ticketId,
-                  tableName: "tickets",
-                }),
-              ),
-            )
-          : [];
-
-      // 3) Insert des attachments en base avec les URL finales
-      if (promotedAttachments.length > 0) {
-        await tx.insert(ticketsAttachments).values(
-          promotedAttachments.map((att) =>
-            insertTicketAttachmentToDbSchema.parse({
-              ticketId,
-              uploadedById,
-              url: att.url,
-              filename: att.filename,
-              mimeType: att.mimeType,
-              size: att.size,
-            }),
-          ),
-        );
-      }
-
-      // 4) Relire les attachments si tu veux renvoyer un snapshot
-      const insertedAttachments =
-        promotedAttachments.length > 0
-          ? await tx
-              .select()
-              .from(ticketsAttachments)
-              .where(eq(ticketsAttachments.ticketId, ticketId))
-          : [];
-
-      const safeTicket = selectTicketSchema.parse(insertedTicket);
-
-      return {
-        ticket: safeTicket,
-        attachments: insertedAttachments,
-      };
+    // Vérifier accès ticket
+    const hasAccess = await canUserAccessTicket({
+      userId: currentUser.id,
+      ticketId: parsedInput.ticketId,
+      entrepriseId: parsedInput.entrepriseId,
     });
-    return {
-      message: locale === "fr" ? "Ticket ajouté" : "Ticket added",
-      ticket: result.ticket,
-      attachments: result.attachments,
-    };
+
+    if (!hasAccess) {
+      throw errors.forbidden(
+        "Vous n'avez pas accès à ce ticket (périmètre insuffisant)."
+      );
+    }
+
+    // Récupérer messages filtrés
+    const messages = await getTicketMessagesFiltered({
+      ticketId: parsedInput.ticketId,
+      userId: currentUser.id,
+      entrepriseId: parsedInput.entrepriseId,
+    });
+
+    return { messages };
   });

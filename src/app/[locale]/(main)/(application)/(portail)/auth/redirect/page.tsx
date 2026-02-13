@@ -8,10 +8,8 @@ export default async function AuthRedirect() {
   const locale = await getLocale();
   // If no user is found, redirect to signin
   if (!user) {
-    redirect({ locale, href: "/auth/signin" });
+    redirect({ locale, href: "/auth/login" });
   }
-
-  console.log("User:", user); // Debug log to check the user's role
 
   // // Redirect based on user role
   // if (user?.role === "admin") {

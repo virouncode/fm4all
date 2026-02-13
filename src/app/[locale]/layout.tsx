@@ -1,5 +1,5 @@
 import GoogleTags from "@/components/analytics/GoogleTags";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/sonner";
 import { ConfirmProvider } from "@/context/ConfirmContextProvider";
 import { routing } from "@/i18n/routing";
 import { Analytics } from "@vercel/analytics/next";
@@ -106,7 +106,7 @@ export default async function LocalizedLayout({
             <Analytics />
             <SpeedInsights />
             {children}
-            <Toaster />
+            <Toaster richColors toastOptions={{}} />
             {/* </ThemeProvider> */}
           </NextIntlClientProvider>
         </ConfirmProvider>

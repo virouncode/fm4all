@@ -407,7 +407,7 @@ export const routing = defineRouting({
     },
     "/app/entreprises": {
       fr: "/app/entreprises",
-      en: "/app/companies",
+      en: "/app/entreprises",
     },
     "/app/securite": {
       fr: "/app/securite",

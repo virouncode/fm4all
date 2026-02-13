@@ -8,6 +8,62 @@
       "when": 1770717450830,
       "tag": "0000_flawless_yellow_claw",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1770764944784,
+      "tag": "0001_safe_colossus",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1770898492080,
+      "tag": "0002_real_wong",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1770909675022,
+      "tag": "0003_flippant_rhodey",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1770910681511,
+      "tag": "0004_opposite_malcolm_colcord",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1770912803020,
+      "tag": "0005_fixed_titania",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1770930805855,
+      "tag": "0006_nostalgic_sabretooth",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1770938976296,
+      "tag": "0007_oval_franklin_richards",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1770939438705,
+      "tag": "0008_faulty_cerebro",
+      "breakpoints": true
     }
   ]
 }

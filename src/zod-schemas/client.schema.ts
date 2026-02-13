@@ -6,7 +6,7 @@ import {
   createUpdateSchema,
 } from "drizzle-zod";
 import { z } from "zod";
-import { siretSchemaEmpty } from "./siret";
+import { siretSchemaEmpty } from "./siret.schema.ts";
 import { insertSiteFormSchema, insertSiteSchema } from "./site";
 import { insertUserFormSchema, insertUserSchema } from "./user";
 

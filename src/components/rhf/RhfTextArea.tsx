@@ -91,7 +91,7 @@ export function RhfTextArea<S extends FieldValues>({
                 id={id}
                 {...field}
                 {...props}
-                className={textareaClassName}
+                className={cn(textareaClassName, "resize-none")}
                 aria-invalid={hasError || undefined}
                 aria-describedby={describedBy || undefined}
                 aria-errormessage={hasError ? errorId : undefined}

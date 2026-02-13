@@ -1,0 +1,2 @@
+DROP INDEX "user_site_attributions_user_site_role_udx";--> statement-breakpoint
+CREATE UNIQUE INDEX "user_site_attributions_user_site_entreprise_udx" ON "user_site_attributions" USING btree ("user_id","site_id","entreprise_id");

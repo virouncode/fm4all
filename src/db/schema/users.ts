@@ -16,8 +16,10 @@ import { user } from "./auth";
 import { entreprises } from "./entreprises";
 import {
   adhesionStatutEnum,
+  attributionModeEnum,
   roleAdhesionEnum,
   roleAttributionSiteEnum,
+  rolePlateformeAdhesionEnum,
   siteAttributionScopeEnum,
 } from "./enums";
 import { sites } from "./sites";
@@ -78,8 +80,9 @@ export const userSiteAttributions = pgTable(
       .references(() => sites.id, {
         onDelete: "cascade",
       }),
-    role: roleAttributionSiteEnum("role").notNull(),
+    mode: attributionModeEnum("mode").notNull().default("inclure"),
     scope: siteAttributionScopeEnum("scope").notNull().default("subtree"),
+    role: roleAttributionSiteEnum("role").notNull(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
     createdById: uuid("created_by_id").references(() => user.id, {
@@ -93,10 +96,10 @@ export const userSiteAttributions = pgTable(
     index("user_site_attributions_entreprise_id_idx").on(table.entrepriseId),
     index("user_site_attributions_user_id_idx").on(table.userId),
     index("user_site_attributions_site_id_idx").on(table.siteId),
-    uniqueIndex("user_site_attributions_user_site_role_udx").on(
+    uniqueIndex("user_site_attributions_user_site_entreprise_udx").on(
       table.userId,
       table.siteId,
-      table.role,
+      table.entrepriseId,
     ),
   ],
 );
@@ -130,5 +133,33 @@ export const userAdhesions = pgTable(
       table.userId,
       table.entrepriseId,
     ),
+  ],
+);
+
+/**
+ * Adhésion "plateforme" (FM4ALL) : droits cross-entreprises.
+ * 1 ligne max par utilisateur.
+ */
+export const userPlateformeAdhesions = pgTable(
+  "user_plateforme_adhesions",
+  {
+    id: id(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+
+    role: rolePlateformeAdhesionEnum("role").notNull(),
+    statut: adhesionStatutEnum("statut").notNull().default("actif"),
+
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+    createdById: createdById(() => user),
+    updatedById: updatedById(() => user),
+  },
+  (t) => [
+    // 1 adhésion plateforme max par user
+    uniqueIndex("user_plateforme_adhesions_user_udx").on(t.userId),
+    index("user_plateforme_adhesions_role_idx").on(t.role),
+    index("user_plateforme_adhesions_statut_idx").on(t.statut),
   ],
 );

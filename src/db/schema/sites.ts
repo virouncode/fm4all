@@ -1,5 +1,6 @@
 import {
   AnyPgColumn,
+  boolean,
   index,
   integer,
   pgTable,
@@ -39,6 +40,7 @@ export const sites = pgTable(
     typeBatiment: typeBatimentEnum("type_batiment").notNull(),
     typeOccupation: typeOccupationEnum("type_occupation").notNull(),
     commentaires: varchar(),
+    actif: boolean("actif").default(true).notNull(),
     createdById: createdById(() => user),
     updatedById: updatedById(() => user),
     createdAt: createdAt(),

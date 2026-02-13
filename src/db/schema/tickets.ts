@@ -17,6 +17,7 @@ import {
   ticketStatutEnum,
   ticketTypeEnum,
 } from "./enums";
+import { sites } from "./sites";
 
 export const tickets = pgTable(
   "tickets",
@@ -52,7 +53,9 @@ export const tickets = pgTable(
     assigneUserId: uuid("assigne_user_id").references(() => user.id, {
       onDelete: "set null",
     }),
-
+    siteId: uuid("site_id")
+      .notNull()
+      .references(() => sites.id, { onDelete: "restrict" }),
     titre: varchar("titre", { length: 255 }).notNull(),
     description: text("description"),
     type: ticketTypeEnum("type").notNull(),

@@ -223,6 +223,18 @@ export const siteAttributionScopeCodes = siteAttributionScopeCT.map(
   ...(typeof siteAttributionScopeCT)[number]["code"][],
 ];
 
+export const attributionModeCT = [
+  { code: "inclure", name: "Inclure" },
+  { code: "exclure", name: "Exclure" },
+] as const;
+
+export const attributionModeCodes = attributionModeCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof attributionModeCT)[number]["code"],
+  ...(typeof attributionModeCT)[number]["code"][],
+];
+
 export const clientServiceModeCT = [
   { code: "recurrent", name: "Récurrent" },
   { code: "one_shot", name: "One shot" },
@@ -337,7 +349,6 @@ export const roleEntrepriseCodes = roleEntrepriseCT.map(
 
 export const roleAdhesionCT = [
   //Droits globaux, indépendants des sites
-  { code: "super_admin", name: "Super Administrateur" },
   { code: "admin", name: "Administrateur" },
   { code: "manager", name: "Manager" },
   { code: "collaborateur", name: "Collaborateur" },
@@ -350,13 +361,24 @@ export const roleAdhesionCodes = roleAdhesionCT.map(
   ...(typeof roleAdhesionCT)[number]["code"][],
 ];
 
+export const rolePlateformeAdhesionCT = [
+  { code: "super_admin_plateforme", name: "Super administrateur plateforme" },
+  { code: "operateur_plateforme", name: "Opérateur plateforme" },
+] as const;
+
+export const rolePlateformeAdhesionCodes = rolePlateformeAdhesionCT.map(
+  (i) => i.code,
+) as [
+  (typeof rolePlateformeAdhesionCT)[number]["code"],
+  ...(typeof rolePlateformeAdhesionCT)[number]["code"][],
+];
+
 export const roleAttributionSiteCT = [
   // Droits spécifiques à un site donné
   { code: "responsable_site", name: "Responsable de site" },
-  { code: "validateur_site", name: "Validateur de site" },
   { code: "demandeur_site", name: "Demandeur de site" },
-  { code: "intervenant_site", name: "Intervenant de site" },
   { code: "observateur_site", name: "Observateur de site" },
+  { code: "intervenant_site", name: "Intervenant de site" },
 ] as const;
 
 export const roleAttributionSiteCodes = roleAttributionSiteCT.map(
@@ -369,7 +391,6 @@ export const roleAttributionSiteCodes = roleAttributionSiteCT.map(
 export const adhesionStatutCT = [
   { code: "actif", name: "Actif" },
   { code: "en_attente", name: "En attente" },
-  { code: "refuse", name: "Refusé" },
   { code: "suspendu", name: "Suspendu" },
 ] as const;
 

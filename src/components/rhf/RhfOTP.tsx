@@ -95,7 +95,7 @@ export function RhfOTP<S extends FieldValues>({
               orientation === "horizontal"
                 ? "flex flex-row items-center"
                 : "flex flex-col",
-              className
+              className,
             )}
           >
             {/* LABEL */}
@@ -148,7 +148,7 @@ export function RhfOTP<S extends FieldValues>({
                 className={cn(
                   "w-full max-w-xs disabled:opacity-75",
                   // évite des couleurs non standard en disabled; ajoute tes variantes si besoin
-                  inputClassName
+                  inputClassName,
                 )}
                 // Props InputOTP
                 maxLength={length}
