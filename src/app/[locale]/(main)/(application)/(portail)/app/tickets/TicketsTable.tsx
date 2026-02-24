@@ -2,8 +2,9 @@
 
 import InfiniteDataTable from "@/components/tables/InfiniteDataTable";
 import { Button } from "@/components/ui/button";
-import { getAccessibleSitesAction } from "@/server/actions/sitesActions";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import { getEntreprisesAction } from "@/server/actions/entreprisesActions";
+import { getAccessibleSitesAction } from "@/server/actions/sitesActions";
 import { getTicketsAction } from "@/server/actions/ticketsActions";
 import { useAppStore } from "@/stores/application/appStore";
 import {
@@ -13,10 +14,9 @@ import {
 } from "@/zod-schemas/enums";
 import { SelectSiteType } from "@/zod-schemas/sites.schema";
 import { SelectTicketType } from "@/zod-schemas/ticket.schema";
-import { Filter, Plus } from "lucide-react";
+import { Filter, Grid3x3, List, Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useRouter, usePathname } from "@/i18n/navigation";
 import {
   createTicketsColumns,
   ticketsIdLabelMap,
@@ -118,6 +118,9 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
   // Dialogs state
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [filtersDialogOpen, setFiltersDialogOpen] = useState(false);
+
+  // View state
+  const [view, setView] = useState<"list" | "grid">("list");
 
   // Filters for dialog - initialisés depuis searchParams
   const [filters, setFilters] = useState<FiltersType>({
@@ -258,9 +261,7 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
         entrepriseId: entreprise.id,
         search: searchParams.search || undefined,
         statut: toEnumOrUndefined<TicketStatutType>(searchParams.statut),
-        priorite: toEnumOrUndefined<TicketPrioriteType>(
-          searchParams.priorite,
-        ),
+        priorite: toEnumOrUndefined<TicketPrioriteType>(searchParams.priorite),
         type: toEnumOrUndefined<TicketTypeType>(searchParams.type),
         siteId: searchParams.siteId || undefined,
         proprietaireEntrepriseId:
@@ -315,9 +316,7 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
         entrepriseId: entreprise.id,
         search: searchParams.search || undefined,
         statut: toEnumOrUndefined<TicketStatutType>(searchParams.statut),
-        priorite: toEnumOrUndefined<TicketPrioriteType>(
-          searchParams.priorite,
-        ),
+        priorite: toEnumOrUndefined<TicketPrioriteType>(searchParams.priorite),
         type: toEnumOrUndefined<TicketTypeType>(searchParams.type),
         siteId: searchParams.siteId || undefined,
         proprietaireEntrepriseId:
@@ -402,24 +401,47 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
   return (
     <div className="flex h-full flex-col gap-4">
       {/* Header Actions */}
-      <div className="flex flex-shrink-0 items-center justify-end gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setFiltersDialogOpen(true)}
-        >
-          <Filter className="h-4 w-4" />
-          Filtrer
-          {activeFiltersCount > 0 && (
-            <span className="bg-primary text-primary-foreground ml-1 rounded-full px-1.5 text-xs">
-              {activeFiltersCount}
-            </span>
-          )}
-        </Button>
-        <Button size="sm" onClick={() => setCreateDialogOpen(true)}>
-          <Plus className="h-4 w-4" />
-          Nouveau ticket
-        </Button>
+      <div className="flex flex-shrink-0 items-center justify-between gap-2">
+        {/* View Toggle */}
+        <div className="flex items-center">
+          <Button
+            variant={view === "list" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setView("list")}
+            className="rounded-r-none border-r-0"
+          >
+            <List />
+          </Button>
+          <Button
+            variant={view === "grid" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setView("grid")}
+            className="rounded-l-none"
+          >
+            <Grid3x3 />
+          </Button>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setFiltersDialogOpen(true)}
+          >
+            <Filter className="h-4 w-4" />
+            Filtrer
+            {activeFiltersCount > 0 && (
+              <span className="bg-primary text-primary-foreground ml-1 rounded-full px-1.5 text-xs">
+                {activeFiltersCount}
+              </span>
+            )}
+          </Button>
+          <Button size="sm" onClick={() => setCreateDialogOpen(true)}>
+            <Plus className="h-4 w-4" />
+            Nouveau ticket
+          </Button>
+        </div>
       </div>
 
       {/* Infinite Data Table - prend toute la hauteur restante */}
