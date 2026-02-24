@@ -1,8 +1,9 @@
 "use client";
 
-import DataTable from "@/components/tables/DataTable";
+import InfiniteDataTable from "@/components/tables/InfiniteDataTable";
 import { Button } from "@/components/ui/button";
 import { getAccessibleSitesAction } from "@/server/actions/sitesActions";
+import { getEntreprisesAction } from "@/server/actions/entreprisesActions";
 import { getTicketsAction } from "@/server/actions/ticketsActions";
 import { useAppStore } from "@/stores/application/appStore";
 import {
@@ -11,9 +12,10 @@ import {
   TicketTypeType,
 } from "@/zod-schemas/enums";
 import { SelectSiteType } from "@/zod-schemas/sites.schema";
+import { SelectEntrepriseType } from "@/zod-schemas/entreprise.schema";
 import { SelectTicketType } from "@/zod-schemas/ticket.schema";
 import { Filter, Plus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
   createTicketsColumns,
@@ -21,6 +23,22 @@ import {
 } from "./createTicketsColumns";
 import { TicketFormDialog } from "./TicketFormDialog";
 import { TicketsFiltersDialog } from "./TicketsFiltersDialog";
+
+type SearchParams = {
+  // Filtres
+  search?: string;
+  statut?: string;
+  priorite?: string;
+  type?: string;
+  siteId?: string;
+  proprietaireEntrepriseId?: string;
+  demandeurEntrepriseId?: string;
+  assigneEntrepriseId?: string;
+
+  // Tri
+  orderBy?: string;
+  orderDir?: string;
+};
 
 type FiltersType = {
   search?: string;
@@ -30,52 +48,97 @@ type FiltersType = {
   siteId?: string;
 };
 
-// Helper pour convertir les filtres string en types enum de manière type-safe
-// Les valeurs vides ("") sont converties en undefined
+// Helpers pour conversion type-safe
 function toEnumOrUndefined<T extends string>(
   value: string | undefined,
 ): T | undefined {
   return value && value !== "" ? (value as T) : undefined;
 }
 
-export function TicketsTable() {
+function toOrderBy(value: string | undefined) {
+  const validValues = [
+    "createdAt",
+    "lastActivityAt",
+    "priorite",
+    "statut",
+    "titre",
+    "siteNom",
+    "proprietaireEntrepriseNom",
+    "demandeurEntrepriseNom",
+    "assigneEntrepriseNom",
+  ];
+  return value && validValues.includes(value) ? value : "lastActivityAt";
+}
+
+function toOrderDir(value: string | undefined): "asc" | "desc" {
+  return value === "asc" || value === "desc" ? value : "desc";
+}
+
+type TicketsTableProps = {
+  searchParams: SearchParams;
+};
+
+export function TicketsTable({ searchParams }: TicketsTableProps) {
   const entreprise = useAppStore((state) => state.entreprise);
 
+  // Data state
   const [tickets, setTickets] = useState<SelectTicketType[]>([]);
   const [sites, setSites] = useState<SelectSiteType[]>([]);
+  const [entreprises, setEntreprises] = useState<SelectEntrepriseType[]>([]);
   const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
-
-  // Filters & Pagination state
-  const [filters, setFilters] = useState<FiltersType>({});
   const [page, setPage] = useState(1);
-  const pageSize = 50;
+  const [hasMore, setHasMore] = useState(false);
+
+  // Loading states
+  const [loading, setLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   // Dialogs state
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [filtersDialogOpen, setFiltersDialogOpen] = useState(false);
 
-  // TODO: Ajouter quand TicketDialog sera créé
-  // const [selectedTicket, setSelectedTicket] = useState<SelectTicketType | null>(null);
-  // const [dialogMode, setDialogMode] = useState<"view" | "edit" | null>(null);
+  // Filters for dialog
+  const [filters, setFilters] = useState<FiltersType>({});
 
-  // Initial load: sites and tickets
+  const pageSize = 30;
+
+  // Initial load: sites, entreprises, and tickets
   useEffect(() => {
     if (!entreprise?.id) return;
 
-    async function loadData() {
+    async function loadInitialData() {
       if (!entreprise?.id) return;
 
       setLoading(true);
+      setIsError(false);
+
       try {
-        const [sitesResult, ticketsResult] = await Promise.all([
-          getAccessibleSitesAction({ entrepriseId: entreprise.id }),
-          getTicketsAction({
-            entrepriseId: entreprise.id,
-            page: 1,
-            pageSize,
-          }),
-        ]);
+        const [sitesResult, entreprisesResult, ticketsResult] =
+          await Promise.all([
+            getAccessibleSitesAction({ entrepriseId: entreprise.id }),
+            getEntreprisesAction(),
+            getTicketsAction({
+              entrepriseId: entreprise.id,
+              search: searchParams.search || undefined,
+              statut: toEnumOrUndefined<TicketStatutType>(searchParams.statut),
+              priorite: toEnumOrUndefined<TicketPrioriteType>(
+                searchParams.priorite,
+              ),
+              type: toEnumOrUndefined<TicketTypeType>(searchParams.type),
+              siteId: searchParams.siteId || undefined,
+              proprietaireEntrepriseId:
+                searchParams.proprietaireEntrepriseId || undefined,
+              demandeurEntrepriseId:
+                searchParams.demandeurEntrepriseId || undefined,
+              assigneEntrepriseId:
+                searchParams.assigneEntrepriseId || undefined,
+              orderBy: toOrderBy(searchParams.orderBy),
+              orderDir: toOrderDir(searchParams.orderDir),
+              page: 1,
+              pageSize,
+            }),
+          ]);
 
         if (sitesResult?.serverError) {
           toast.error(sitesResult.serverError.message);
@@ -83,73 +146,178 @@ export function TicketsTable() {
           setSites(sitesResult.data);
         }
 
+        if (entreprisesResult?.serverError) {
+          toast.error(entreprisesResult.serverError.message);
+        } else if (entreprisesResult?.data?.entreprises) {
+          setEntreprises(entreprisesResult.data.entreprises);
+        }
+
         if (ticketsResult?.serverError) {
           toast.error(ticketsResult.serverError.message);
+          setIsError(true);
         } else if (ticketsResult?.data) {
           setTickets(ticketsResult.data.tickets || []);
           setTotal(ticketsResult.data.total || 0);
+          setHasMore(ticketsResult.data.hasMore || false);
+          setPage(1);
         }
+      } catch {
+        toast.error("Erreur lors du chargement des données");
+        setIsError(true);
       } finally {
         setLoading(false);
       }
     }
 
-    loadData();
-  }, [entreprise]);
+    loadInitialData();
+  }, [
+    entreprise?.id,
+    searchParams.search,
+    searchParams.statut,
+    searchParams.priorite,
+    searchParams.type,
+    searchParams.siteId,
+    searchParams.proprietaireEntrepriseId,
+    searchParams.demandeurEntrepriseId,
+    searchParams.assigneEntrepriseId,
+    searchParams.orderBy,
+    searchParams.orderDir,
+  ]);
 
-  // Reload tickets when filters or page change
-  useEffect(() => {
-    if (!entreprise?.id || loading) return;
-    loadTickets();
-  }, [filters, page]);
-
-  const loadTickets = async () => {
+  // Reload tickets when URL params change (RESET pattern)
+  const loadTickets = useCallback(async () => {
     if (!entreprise?.id) return;
+
+    setLoading(true);
+    setIsError(false);
 
     try {
       const result = await getTicketsAction({
         entrepriseId: entreprise.id,
-        search: filters.search || undefined,
-        statut: toEnumOrUndefined<TicketStatutType>(filters.statut),
-        priorite: toEnumOrUndefined<TicketPrioriteType>(filters.priorite),
-        type: toEnumOrUndefined<TicketTypeType>(filters.type),
-        siteId: filters.siteId || undefined,
-        page,
+        search: searchParams.search || undefined,
+        statut: toEnumOrUndefined<TicketStatutType>(searchParams.statut),
+        priorite: toEnumOrUndefined<TicketPrioriteType>(
+          searchParams.priorite,
+        ),
+        type: toEnumOrUndefined<TicketTypeType>(searchParams.type),
+        siteId: searchParams.siteId || undefined,
+        proprietaireEntrepriseId:
+          searchParams.proprietaireEntrepriseId || undefined,
+        demandeurEntrepriseId: searchParams.demandeurEntrepriseId || undefined,
+        assigneEntrepriseId: searchParams.assigneEntrepriseId || undefined,
+        orderBy: toOrderBy(searchParams.orderBy),
+        orderDir: toOrderDir(searchParams.orderDir),
+        page: 1,
         pageSize,
       });
 
       if (result?.serverError) {
         toast.error(result.serverError.message);
+        setIsError(true);
       } else if (result?.data) {
-        setTickets(result.data.tickets || []);
+        setTickets(result.data.tickets || []); // REPLACE
         setTotal(result.data.total || 0);
+        setHasMore(result.data.hasMore || false);
+        setPage(1);
       }
     } catch (error) {
       toast.error("Erreur lors du chargement des tickets");
+      setIsError(true);
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [
+    entreprise?.id,
+    searchParams.search,
+    searchParams.statut,
+    searchParams.priorite,
+    searchParams.type,
+    searchParams.siteId,
+    searchParams.proprietaireEntrepriseId,
+    searchParams.demandeurEntrepriseId,
+    searchParams.assigneEntrepriseId,
+    searchParams.orderBy,
+    searchParams.orderDir,
+    pageSize,
+  ]);
 
-  // TODO: Ajouter quand TicketDialog sera créé
-  // const handleRowClick = (ticket: SelectTicketType) => {
-  //   setSelectedTicket(ticket);
-  //   setDialogMode("view");
-  // };
+  // Trigger reload when searchParams change
+  useEffect(() => {
+    if (loading) return; // Skip during initial load
+    loadTickets();
+  }, [loadTickets, loading]);
 
-  // const handleTicketUpdated = () => {
-  //   loadTickets();
-  //   setDialogMode(null);
-  //   setSelectedTicket(null);
-  // };
+  // Load more for infinite scroll (APPEND pattern)
+  const loadMore = useCallback(async () => {
+    if (isLoadingMore || !hasMore || isError || !entreprise?.id) return;
+
+    setIsLoadingMore(true);
+    const nextPage = page + 1;
+
+    try {
+      const result = await getTicketsAction({
+        entrepriseId: entreprise.id,
+        search: searchParams.search || undefined,
+        statut: toEnumOrUndefined<TicketStatutType>(searchParams.statut),
+        priorite: toEnumOrUndefined<TicketPrioriteType>(
+          searchParams.priorite,
+        ),
+        type: toEnumOrUndefined<TicketTypeType>(searchParams.type),
+        siteId: searchParams.siteId || undefined,
+        proprietaireEntrepriseId:
+          searchParams.proprietaireEntrepriseId || undefined,
+        demandeurEntrepriseId: searchParams.demandeurEntrepriseId || undefined,
+        assigneEntrepriseId: searchParams.assigneEntrepriseId || undefined,
+        orderBy: toOrderBy(searchParams.orderBy),
+        orderDir: toOrderDir(searchParams.orderDir),
+        page: nextPage,
+        pageSize,
+      });
+
+      if (result?.serverError) {
+        toast.error(result.serverError.message);
+        setIsError(true);
+      } else if (result?.data) {
+        setTickets((prev) => [...prev, ...result.data.tickets]); // APPEND
+        setHasMore(result.data.hasMore || false);
+        setPage(nextPage);
+      }
+    } catch {
+      toast.error("Erreur lors du chargement de plus de tickets");
+      setIsError(true);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [
+    page,
+    hasMore,
+    isLoadingMore,
+    isError,
+    entreprise?.id,
+    searchParams.search,
+    searchParams.statut,
+    searchParams.priorite,
+    searchParams.type,
+    searchParams.siteId,
+    searchParams.proprietaireEntrepriseId,
+    searchParams.demandeurEntrepriseId,
+    searchParams.assigneEntrepriseId,
+    searchParams.orderBy,
+    searchParams.orderDir,
+    pageSize,
+  ]);
 
   const handleFiltersApply = (newFilters: FiltersType) => {
     setFilters(newFilters);
-    setPage(1); // Reset to page 1 when filters change
+    // TODO: Update URL with new filters
   };
 
   const handleTicketCreated = () => {
     loadTickets();
     setCreateDialogOpen(false);
   };
+
+  const columns = createTicketsColumns({ sites, entreprises });
 
   return (
     <div className="space-y-4">
@@ -169,27 +337,18 @@ export function TicketsTable() {
         </Button>
       </div>
 
-      {/* Loading State */}
-      {loading ? (
-        <div className="flex items-center justify-center p-8">
-          <p className="text-muted-foreground">Chargement...</p>
-        </div>
-      ) : (
-        <>
-          {/* Table */}
-          <DataTable
-            columns={createTicketsColumns({ sites })}
-            items={tickets}
-            idLabelMap={ticketsIdLabelMap}
-            // TODO: Ajouter onRowClick={handleRowClick} quand TicketDialog sera créé
-          />
-
-          {/* Pagination Info */}
-          <div className="text-muted-foreground text-sm">
-            {tickets.length} ticket{tickets.length !== 1 ? "s" : ""} sur {total}
-          </div>
-        </>
-      )}
+      {/* Infinite Data Table */}
+      <InfiniteDataTable<SelectTicketType>
+        columns={columns}
+        items={tickets}
+        total={total}
+        isLoading={loading}
+        isLoadingMore={isLoadingMore}
+        isError={isError}
+        hasMore={hasMore}
+        loadMore={loadMore}
+        idLabelMap={ticketsIdLabelMap}
+      />
 
       {/* Dialogs */}
       <TicketFormDialog
@@ -205,8 +364,6 @@ export function TicketsTable() {
         sites={sites}
         onApply={handleFiltersApply}
       />
-
-      {/* TODO: Add TicketDialog for view/edit */}
     </div>
   );
 }
