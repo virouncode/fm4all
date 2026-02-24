@@ -7,15 +7,18 @@ import {
   getAllEntreprises,
   getEntreprisesClientes,
 } from "@/server/queries/entreprises.query";
+import { z } from "zod";
 
 /**
  * Récupère la liste de toutes les entreprises
  * Utilisé pour afficher les noms dans les colonnes relationnelles
  */
-export const getEntreprisesAction = actionClient.action(async () => {
-  const entreprises = await getAllEntreprises();
-  return { entreprises };
-});
+export const getEntreprisesAction = actionClient
+  .schema(z.object({}))
+  .action(async () => {
+    const entreprises = await getAllEntreprises();
+    return { entreprises };
+  });
 
 /**
  * Récupère la liste des entreprises clientes
