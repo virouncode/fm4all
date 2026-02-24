@@ -87,11 +87,15 @@ export const getTicketsAction = actionClient
       filters: parsedInput,
     });
 
+    // Calculer hasMore pour infinite scroll
+    const hasMore = result.page * result.pageSize < result.total;
+
     return {
       tickets: result.items,
       total: result.total,
       page: result.page,
       pageSize: result.pageSize,
+      hasMore,
     };
   });
 

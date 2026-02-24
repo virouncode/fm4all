@@ -194,7 +194,7 @@ const InfiniteDataTable = <T,>({
 
       {/* TABLE SCROLLABLE */}
       <div
-        className="relative max-h-[600px] flex-1 overflow-auto rounded-md border"
+        className="relative h-full flex-1 overflow-auto rounded-md border"
         ref={rootRef}
       >
         <Table className="min-w-full">

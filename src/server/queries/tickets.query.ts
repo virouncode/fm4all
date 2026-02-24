@@ -2,12 +2,14 @@ import "server-only";
 
 import { db } from "@/db";
 import { tickets } from "@/db/schema/tickets";
+import { sites } from "@/db/schema/sites";
+import { entreprises } from "@/db/schema/entreprises";
 import { getUserAccessibleSiteIdsForTickets } from "@/server/utils/ticketsPerimetre.utils";
 import {
   SelectTicketType,
   TicketsQueryType,
 } from "@/zod-schemas/ticket.schema";
-import { eq, and, or, desc, asc, like, inArray, sql, count } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, like, or, sql, SQL } from "drizzle-orm";
 
 /**
  * Récupère un ticket par ID
@@ -75,7 +77,7 @@ export async function getTicketsByPerimetre({
   }
 
   // 2. Construire WHERE clause
-  const conditions: any[] = [];
+  const conditions: (SQL | undefined)[] = [];
 
   // Filtre périmètre
   if (posture === "plateforme" || posture === "client") {
@@ -123,30 +125,130 @@ export async function getTicketsByPerimetre({
   if (filters.assigneUserId) {
     conditions.push(eq(tickets.assigneUserId, filters.assigneUserId));
   }
+  if (filters.proprietaireEntrepriseId) {
+    conditions.push(
+      eq(tickets.proprietaireEntrepriseId, filters.proprietaireEntrepriseId),
+    );
+  }
+  if (filters.demandeurEntrepriseId) {
+    conditions.push(
+      eq(tickets.demandeurEntrepriseId, filters.demandeurEntrepriseId),
+    );
+  }
+  if (filters.assigneEntrepriseId) {
+    conditions.push(
+      eq(tickets.assigneEntrepriseId, filters.assigneEntrepriseId),
+    );
+  }
 
-  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+  // Filtrer les undefined avant de passer à and()
+  const validConditions = conditions.filter((c): c is SQL => c !== undefined);
+  const whereClause =
+    validConditions.length > 0 ? and(...validConditions) : undefined;
 
   // 3. Compter le total
-  const countResult = await db
-    .select({ count: count() })
-    .from(tickets)
-    .where(whereClause);
+  const countResult = whereClause
+    ? await db.select({ count: count() }).from(tickets).where(whereClause)
+    : await db.select({ count: count() }).from(tickets);
 
   const total = countResult[0]?.count || 0;
 
   // 4. Récupérer les items avec pagination + tri
-  const orderByClause =
-    filters.orderDir === "desc"
-      ? desc(tickets[filters.orderBy])
-      : asc(tickets[filters.orderBy]);
+  // Construire les clauses de tri (primaire + secondaire)
+  const orderByClauses: SQL[] = [];
 
-  const items = await db
-    .select()
+  switch (filters.orderBy) {
+    case "siteNom":
+      orderByClauses.push(
+        filters.orderDir === "desc" ? desc(sites.nom) : asc(sites.nom),
+      );
+      break;
+
+    case "proprietaireEntrepriseNom":
+      orderByClauses.push(
+        filters.orderDir === "desc"
+          ? desc(sql`proprietaire_entreprise.nom`)
+          : asc(sql`proprietaire_entreprise.nom`),
+      );
+      break;
+
+    case "demandeurEntrepriseNom":
+      orderByClauses.push(
+        filters.orderDir === "desc"
+          ? desc(sql`demandeur_entreprise.nom`)
+          : asc(sql`demandeur_entreprise.nom`),
+      );
+      break;
+
+    case "assigneEntrepriseNom":
+      orderByClauses.push(
+        filters.orderDir === "desc"
+          ? desc(sql`assigne_entreprise.nom`)
+          : asc(sql`assigne_entreprise.nom`),
+      );
+      break;
+
+    default:
+      // Tri sur colonnes tickets directes (priorite, statut, createdAt, etc.)
+      orderByClauses.push(
+        filters.orderDir === "desc"
+          ? desc(tickets[filters.orderBy])
+          : asc(tickets[filters.orderBy]),
+      );
+  }
+
+  // Tri secondaire systématique sur lastActivityAt (les plus récents en premier)
+  orderByClauses.push(desc(tickets.lastActivityAt));
+
+  // Query avec JOINs pour tri relationnel
+  const queryBuilder = db
+    .select({
+      id: tickets.id,
+      occurenceId: tickets.occurenceId,
+      occurenceTacheId: tickets.occurenceTacheId,
+      proprietaireEntrepriseId: tickets.proprietaireEntrepriseId,
+      demandeurEntrepriseId: tickets.demandeurEntrepriseId,
+      assigneEntrepriseId: tickets.assigneEntrepriseId,
+      assigneUserId: tickets.assigneUserId,
+      siteId: tickets.siteId,
+      titre: tickets.titre,
+      description: tickets.description,
+      type: tickets.type,
+      priorite: tickets.priorite,
+      statut: tickets.statut,
+      lastActivityAt: tickets.lastActivityAt,
+      resolvedAt: tickets.resolvedAt,
+      closedAt: tickets.closedAt,
+      createdById: tickets.createdById,
+      updatedById: tickets.updatedById,
+      createdAt: tickets.createdAt,
+      updatedAt: tickets.updatedAt,
+    })
     .from(tickets)
-    .where(whereClause)
-    .orderBy(orderByClause)
-    .limit(filters.pageSize)
-    .offset((filters.page - 1) * filters.pageSize);
+    .leftJoin(sites, eq(tickets.siteId, sites.id))
+    .leftJoin(
+      sql`entreprises AS proprietaire_entreprise`,
+      eq(tickets.proprietaireEntrepriseId, sql`proprietaire_entreprise.id`),
+    )
+    .leftJoin(
+      sql`entreprises AS demandeur_entreprise`,
+      eq(tickets.demandeurEntrepriseId, sql`demandeur_entreprise.id`),
+    )
+    .leftJoin(
+      sql`entreprises AS assigne_entreprise`,
+      eq(tickets.assigneEntrepriseId, sql`assigne_entreprise.id`),
+    );
+
+  const items = whereClause
+    ? await queryBuilder
+        .where(whereClause)
+        .orderBy(...orderByClauses)
+        .limit(filters.pageSize)
+        .offset((filters.page - 1) * filters.pageSize)
+    : await queryBuilder
+        .orderBy(...orderByClauses)
+        .limit(filters.pageSize)
+        .offset((filters.page - 1) * filters.pageSize);
 
   return {
     items,

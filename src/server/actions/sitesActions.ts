@@ -7,13 +7,13 @@ import { userAdhesions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
-import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
 import {
   getAccessibleSitesByUser,
   getSiteById,
   getSitesByEntrepriseId,
   siteBelongsToEntreprise,
 } from "@/server/queries/sites.query";
+import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
 import {
   deleteSiteArborescence,
   getDescendantsOfSite,
@@ -38,10 +38,7 @@ import { z } from "zod";
 /**
  * Vérifie si l'utilisateur est admin de l'entreprise
  */
-async function isAdmin(
-  userId: string,
-  entrepriseId: string,
-): Promise<boolean> {
+async function isAdmin(userId: string, entrepriseId: string): Promise<boolean> {
   const adhesion = await db.query.userAdhesions.findFirst({
     where: and(
       eq(userAdhesions.userId, userId),
@@ -84,6 +81,7 @@ export const getSitesAction = actionClient
       flattenValidationErrors(ve).fieldErrors,
   })
   .action(async ({ parsedInput }) => {
+    console.log("getSitesAction START", parsedInput);
     const session = await getSession();
     const currentUser = session?.user;
 
@@ -150,6 +148,7 @@ export const getAccessibleSitesAction = actionClient
     },
   )
   .action(async ({ parsedInput }) => {
+    console.log("getAccessibleSitesAction - parsedInput:", parsedInput); // --- DEBUG ---
     const session = await getSession();
     const currentUser = session?.user;
 
@@ -301,7 +300,12 @@ export const updateSiteAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    const { id: siteId, entrepriseId, actif: newActif, ...updateData } = parsedInput;
+    const {
+      id: siteId,
+      entrepriseId,
+      actif: newActif,
+      ...updateData
+    } = parsedInput;
 
     // Vérifier que le site existe et appartient à l'entreprise
     const belongs = await siteBelongsToEntreprise({ siteId, entrepriseId });
@@ -395,10 +399,7 @@ export const updateSiteAction = actionClient
             updatedById: currentUser.id,
           });
 
-          await db
-            .update(sites)
-            .set(payload)
-            .where(eq(sites.id, siteId));
+          await db.update(sites).set(payload).where(eq(sites.id, siteId));
         }
       } else {
         // Pas de changement de statut (même valeur) → mise à jour normale
@@ -408,10 +409,7 @@ export const updateSiteAction = actionClient
           updatedById: currentUser.id,
         });
 
-        await db
-          .update(sites)
-          .set(payload)
-          .where(eq(sites.id, siteId));
+        await db.update(sites).set(payload).where(eq(sites.id, siteId));
       }
     } else {
       // Pas de changement de statut → mise à jour normale
@@ -420,10 +418,7 @@ export const updateSiteAction = actionClient
         updatedById: currentUser.id,
       });
 
-      await db
-        .update(sites)
-        .set(payload)
-        .where(eq(sites.id, siteId));
+      await db.update(sites).set(payload).where(eq(sites.id, siteId));
     }
 
     // Récupérer le site mis à jour

@@ -553,6 +553,20 @@ export const ticketsRelations = relations(tickets, ({ one, many }) => ({
     references: [user.id],
     relationName: "ticketAssigneeUser",
   }),
+  site: one(sites, {
+    fields: [tickets.siteId],
+    references: [sites.id],
+  }),
+  createdByUser: one(user, {
+    fields: [tickets.createdById],
+    references: [user.id],
+    relationName: "ticketCreatedBy",
+  }),
+  updatedByUser: one(user, {
+    fields: [tickets.updatedById],
+    references: [user.id],
+    relationName: "ticketUpdatedBy",
+  }),
   messages: many(ticketMessages),
   devisDemandes: many(devisDemandes),
   devis: many(devis),

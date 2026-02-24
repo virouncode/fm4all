@@ -28,6 +28,7 @@ import {
   type UpdateUserFormType,
 } from "@/zod-schemas/user.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
@@ -421,7 +422,12 @@ function EditUserForm({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[90vh] max-w-2xl flex-col">
         <DialogHeader>
-          <DialogTitle>Modifier un utilisateur</DialogTitle>
+          <DialogTitle>
+            <div className="flex items-center gap-2">
+              <User className="text-primary" />
+              Modifier un utilisateur
+            </div>
+          </DialogTitle>
         </DialogHeader>
 
         <Form {...form}>

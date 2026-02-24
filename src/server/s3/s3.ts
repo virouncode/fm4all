@@ -49,6 +49,36 @@ const EXT_BY_CONTENT_TYPE: Record<S3AllowedContentType, string> = {
   "video/quicktime": "mov",
 };
 
+/**
+ * Pluralise une catégorie de document pour obtenir le nom de dossier S3
+ * Gère les cas particuliers de pluralisation en français
+ */
+function pluralizeCategorie(
+  categorie: (typeof documentCategorieCodes)[number],
+): string {
+  // Mots invariables
+  if (categorie === "devis") {
+    return "devis";
+  }
+
+  // Cas spécial : compte_rendu → comptes_rendus (double pluriel)
+  if (categorie === "compte_rendu") {
+    return "comptes_rendus";
+  }
+
+  // Mots composés avec underscore : pluriel sur le premier mot uniquement
+  // Ex: bon_commande → bons_commande, rapport_intervention → rapports_intervention
+  if (categorie.includes("_")) {
+    const parts = categorie.split("_");
+    parts[0] = `${parts[0]}s`;
+    return parts.join("_");
+  }
+
+  // Mots simples : ajouter "s"
+  // Ex: avatar → avatars, document → documents, contrat → contrats
+  return `${categorie}s`;
+}
+
 export function makeTempKey(params: {
   proprietaireEntrepriseId: string;
   categorie: (typeof documentCategorieCodes)[number];
@@ -70,8 +100,8 @@ export function makeTempKey(params: {
   const yyyy = String(now.getUTCFullYear());
   const mm = String(now.getUTCMonth() + 1).padStart(2, "0");
 
-  // Mapping catégorie DB → nom de dossier S3 (pluriels)
-  const folderName = categorie === "avatar" ? "avatars" : categorie;
+  // Pluralisation de la catégorie pour le nom de dossier S3
+  const folderName = pluralizeCategorie(categorie);
 
   return `temp/entreprises/${proprietaireEntrepriseId}/${folderName}/${yyyy}/${mm}/${uuid}_${safeBase}.${ext}`;
 }

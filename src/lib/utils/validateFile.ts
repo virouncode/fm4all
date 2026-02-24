@@ -39,11 +39,11 @@ export const validateImageDimensions = (
         // Vérifier dimension min / max
         if (width < minSize || height < minSize) {
           toast.error(
-            `Le logo doit mesurer au moins ${minSize}px de chaque côté.`,
+            `L'image doit mesurer au moins ${minSize}px de chaque côté.`,
           );
           reject(
             new Error(
-              `Le logo doit mesurer au moins ${minSize}px de chaque côté.`,
+              `L'image doit mesurer au moins ${minSize}px de chaque côté.`,
             ),
           );
           return;
@@ -51,11 +51,11 @@ export const validateImageDimensions = (
 
         if (width > maxSize || height > maxSize) {
           toast.error(
-            `Le logo ne doit pas dépasser ${maxSize}px de chaque côté.`,
+            `L'image ne doit pas dépasser ${maxSize}px de chaque côté.`,
           );
           reject(
             new Error(
-              `Le logo ne doit pas dépasser ${maxSize}px de chaque côté.`,
+              `L'image ne doit pas dépasser ${maxSize}px de chaque côté.`,
             ),
           );
           return;

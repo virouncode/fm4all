@@ -7,27 +7,27 @@ import { fr } from "date-fns/locale";
  */
 export function getTicketStatutBadge(statut: TicketStatutType): {
   label: string;
-  variant: "default" | "secondary" | "destructive" | "outline";
+  className: string;
 } {
   switch (statut) {
     case "nouveau":
-      return { label: "Nouveau", variant: "default" };
+      return { label: "Nouveau", className: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" };
     case "pris_en_charge":
-      return { label: "Pris en charge", variant: "secondary" };
+      return { label: "Pris en charge", className: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200" };
     case "en_attente_fournisseur":
-      return { label: "En attente fournisseur", variant: "outline" };
+      return { label: "En attente fournisseur", className: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200" };
     case "en_attente_client":
-      return { label: "En attente client", variant: "outline" };
+      return { label: "En attente client", className: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200" };
     case "a_valider":
-      return { label: "À valider", variant: "secondary" };
+      return { label: "À valider", className: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200" };
     case "clos":
-      return { label: "Clos", variant: "secondary" };
+      return { label: "Clos", className: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" };
     case "annule":
-      return { label: "Annulé", variant: "destructive" };
+      return { label: "Annulé", className: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200" };
     case "rejete":
-      return { label: "Rejeté", variant: "destructive" };
+      return { label: "Rejeté", className: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200" };
     default:
-      return { label: statut, variant: "outline" };
+      return { label: statut, className: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200" };
   }
 }
 
@@ -36,19 +36,19 @@ export function getTicketStatutBadge(statut: TicketStatutType): {
  */
 export function getTicketPrioriteBadge(priorite: TicketPrioriteType): {
   label: string;
-  variant: "default" | "secondary" | "destructive" | "outline";
+  className: string;
 } {
   switch (priorite) {
     case "critique":
-      return { label: "Critique", variant: "destructive" };
+      return { label: "Critique", className: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200" };
     case "haute":
-      return { label: "Haute", variant: "default" };
+      return { label: "Haute", className: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200" };
     case "normale":
-      return { label: "Normale", variant: "secondary" };
+      return { label: "Normale", className: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200" };
     case "basse":
-      return { label: "Basse", variant: "outline" };
+      return { label: "Basse", className: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200" };
     default:
-      return { label: priorite, variant: "outline" };
+      return { label: priorite, className: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200" };
   }
 }
 

@@ -132,10 +132,23 @@ export const ticketsQuerySchema = z.object({
   type: ticketTypeSchema.optional(),
   siteId: z.string().uuid().optional(),
   assigneUserId: z.string().uuid().optional(),
+  proprietaireEntrepriseId: z.string().uuid().optional(),
+  demandeurEntrepriseId: z.string().uuid().optional(),
+  assigneEntrepriseId: z.string().uuid().optional(),
 
   // Tri
   orderBy: z
-    .enum(["createdAt", "lastActivityAt", "priorite", "statut"])
+    .enum([
+      "createdAt",
+      "lastActivityAt",
+      "priorite",
+      "statut",
+      "titre",
+      "siteNom",
+      "proprietaireEntrepriseNom",
+      "demandeurEntrepriseNom",
+      "assigneEntrepriseNom",
+    ])
     .default("lastActivityAt"),
   orderDir: z.enum(["asc", "desc"]).default("desc"),
 

@@ -80,6 +80,17 @@ export async function siteBelongsToEntreprise({
 }
 
 /**
+ * Récupère TOUS les sites (toutes entreprises) - pour la plateforme uniquement
+ */
+export async function getAllSites(): Promise<SelectSiteType[]> {
+  const allSites = await db.query.sites.findMany({
+    where: eq(sites.actif, true),
+    orderBy: (sites, { asc }) => [asc(sites.nom)],
+  });
+  return selectSiteSchema.array().parse(allSites);
+}
+
+/**
  * Récupère les sites accessibles par un utilisateur (selon ses attributions)
  * @returns Sites pour lesquels l'utilisateur a un rôle effectif (mode=inclure)
  *
@@ -95,6 +106,7 @@ export async function getAccessibleSitesByUser({
   userId: string;
   entrepriseId: string;
 }): Promise<SelectSiteType[]> {
+
   // Vérifier si plateforme
   const { getUserPlateformeAdhesion } = await import(
     "@/server/queries/userPlateformeAdhesions.query"
@@ -107,8 +119,13 @@ export async function getAccessibleSitesByUser({
   );
   const adhesion = await getUserAdhesion({ userId, entrepriseId });
 
-  // Si plateforme OU admin → retourner tous les sites
-  if (plateformeRole || adhesion?.role === "admin") {
+  // Si plateforme → retourner TOUS les sites (toutes entreprises)
+  if (plateformeRole) {
+    return getAllSites();
+  }
+
+  // Si admin → retourner tous les sites de l'entreprise
+  if (adhesion?.role === "admin") {
     const allSites = await db.query.sites.findMany({
       where: eq(sites.entrepriseId, entrepriseId),
       orderBy: (sites, { asc }) => [asc(sites.nom)],

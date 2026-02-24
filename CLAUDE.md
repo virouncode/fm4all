@@ -365,6 +365,180 @@ export function SitesClient({ initialSites }) {
 - Composants interactifs = Client Components (`"use client"`)
 - Passer les données via props du Server au Client
 
+### 8. Filtrage et Tri Côté Serveur avec URL Sync
+
+**PATTERN CRITIQUE** : Quand on implémente du filtrage/tri/pagination côté serveur avec Next.js, il faut TOUJOURS inclure TOUS les paramètres dans la chaîne complète.
+
+**Checklist OBLIGATOIRE** (ne jamais oublier) :
+
+#### ✅ 1. Définir SearchParams COMPLET dans page.tsx
+
+```typescript
+// ❌ FAUX - Paramètres manquants
+type SearchParams = {
+  search?: string;
+  statut?: string;
+};
+
+// ✅ CORRECT - TOUS les paramètres (filtres + tri + pagination)
+type SearchParams = {
+  // Filtres
+  search?: string;
+  statut?: string;
+  priorite?: string;
+  type?: string;
+  siteId?: string;
+  demandeurEntrepriseId?: string;
+  assigneEntrepriseId?: string;
+
+  // Tri (NE PAS OUBLIER!)
+  orderBy?: string;
+  orderDir?: string;
+
+  // Pagination (si applicable)
+  page?: string;
+  pageSize?: string;
+};
+```
+
+#### ✅ 2. Dupliquer SearchParams dans le composant client
+
+```typescript
+// Dans TicketsTable.tsx - MÊME type que page.tsx
+type SearchParams = {
+  search?: string;
+  statut?: string;
+  priorite?: string;
+  type?: string;
+  siteId?: string;
+  demandeurEntrepriseId?: string;
+  assigneEntrepriseId?: string;
+  orderBy?: string;      // ⚠️ NE PAS OUBLIER
+  orderDir?: string;     // ⚠️ NE PAS OUBLIER
+};
+```
+
+#### ✅ 3. Créer helpers type-safe pour conversion
+
+```typescript
+// Helper pour enums génériques
+function toEnumOrUndefined<T extends string>(
+  value: string | undefined,
+): T | undefined {
+  return value && value !== "" ? (value as T) : undefined;
+}
+
+// Helper pour orderBy avec validation
+function toOrderBy(
+  value: string | undefined,
+): "createdAt" | "lastActivityAt" | "priorite" | "statut" | undefined {
+  const validValues = ["createdAt", "lastActivityAt", "priorite", "statut"];
+  return value && validValues.includes(value)
+    ? (value as "createdAt" | "lastActivityAt" | "priorite" | "statut")
+    : undefined;
+}
+
+// Helper pour orderDir
+function toOrderDir(value: string | undefined): "asc" | "desc" | undefined {
+  return value === "asc" || value === "desc" ? value : undefined;
+}
+```
+
+#### ✅ 4. Passer TOUS les paramètres à l'action serveur
+
+```typescript
+const result = await getTicketsAction({
+  entrepriseId: entreprise.id,
+
+  // Filtres
+  search: searchParams.search || undefined,
+  statut: toEnumOrUndefined<TicketStatutType>(searchParams.statut),
+  priorite: toEnumOrUndefined<TicketPrioriteType>(searchParams.priorite),
+  type: toEnumOrUndefined<TicketTypeType>(searchParams.type),
+  siteId: searchParams.siteId || undefined,
+  demandeurEntrepriseId: searchParams.demandeurEntrepriseId || undefined,
+  assigneEntrepriseId: searchParams.assigneEntrepriseId || undefined,
+
+  // Tri (⚠️ NE PAS OUBLIER)
+  orderBy: toOrderBy(searchParams.orderBy),
+  orderDir: toOrderDir(searchParams.orderDir),
+
+  // Pagination
+  page: 1,
+  pageSize,
+});
+```
+
+#### ✅ 5. Ajouter TOUS les paramètres comme dépendances useEffect
+
+```typescript
+useEffect(() => {
+  if (!entreprise?.id) return;
+  loadTickets();
+}, [
+  entreprise?.id,
+
+  // Filtres
+  searchParams.search,
+  searchParams.statut,
+  searchParams.priorite,
+  searchParams.type,
+  searchParams.siteId,
+  searchParams.demandeurEntrepriseId,
+  searchParams.assigneEntrepriseId,
+
+  // Tri (⚠️ NE PAS OUBLIER)
+  searchParams.orderBy,
+  searchParams.orderDir,
+]);
+```
+
+#### ✅ 6. Inclure dans useCallback dependencies
+
+```typescript
+const loadTickets = useCallback(async () => {
+  // ... logique
+}, [
+  entreprise?.id,
+  searchParams.search,
+  searchParams.statut,
+  searchParams.priorite,
+  searchParams.type,
+  searchParams.siteId,
+  searchParams.demandeurEntrepriseId,
+  searchParams.assigneEntrepriseId,
+  searchParams.orderBy,     // ⚠️ NE PAS OUBLIER
+  searchParams.orderDir,    // ⚠️ NE PAS OUBLIER
+  pageSize,
+]);
+```
+
+#### ✅ 7. Passer aussi dans loadMore (infinite scroll)
+
+```typescript
+const loadMore = useCallback(async () => {
+  const result = await getTicketsAction({
+    entrepriseId: entreprise.id,
+    // ... tous les filtres
+    orderBy: toOrderBy(searchParams.orderBy),     // ⚠️ NE PAS OUBLIER
+    orderDir: toOrderDir(searchParams.orderDir),  // ⚠️ NE PAS OUBLIER
+    page: nextPage,
+    pageSize,
+  });
+}, [/* ... toutes les dépendances incluant orderBy/orderDir */]);
+```
+
+**SYMPTÔMES d'oubli** :
+- ❌ L'URL change mais les données ne se rechargent pas
+- ❌ Le tri visuel ne change pas malgré le clic sur SortableHeader
+- ❌ Les filtres fonctionnent mais pas le tri (ou vice-versa)
+
+**CAUSE** : Paramètres manquants dans SearchParams, useEffect, ou action call
+
+**SOLUTION** : Vérifier la checklist complète ci-dessus point par point
+
+**Référence d'implémentation** : `/app/tickets` (implémentation complète)
+
 ---
 
 ## Patterns Spécifiques au Projet
@@ -803,6 +977,42 @@ surface: z.string().refine(
   "La surface doit être un nombre compris entre 50 et 3000 m²",
 ),
 ```
+
+### ❌ N'oubliez PAS les paramètres de tri (orderBy/orderDir)
+
+**ERREUR FRÉQUENTE** : Implémenter le filtrage mais oublier le tri
+
+```typescript
+// ❌ FAUX - SearchParams incomplet
+type SearchParams = {
+  search?: string;
+  statut?: string;
+  // ❌ Manque orderBy et orderDir!
+};
+
+// Symptôme : L'URL change mais l'ordre visuel ne change pas
+
+// ✅ CORRECT - SearchParams COMPLET
+type SearchParams = {
+  // Filtres
+  search?: string;
+  statut?: string;
+  priorite?: string;
+  // ...
+
+  // Tri (TOUJOURS inclure)
+  orderBy?: string;
+  orderDir?: string;
+};
+
+// ET les passer partout :
+// 1. Dans getAction()
+// 2. Dans useEffect dependencies
+// 3. Dans useCallback dependencies
+// 4. Dans loadMore()
+```
+
+**Solution** : Voir la checklist complète dans "### 8. Filtrage et Tri Côté Serveur"
 
 ---
 

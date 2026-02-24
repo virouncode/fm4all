@@ -1,14 +1,16 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 /*eslint-disable @typescript-eslint/no-explicit-any */
 
 type SortableHeaderProps = {
   column: any; // tanstack column
   label: string;
+  sortKey?: string; // Permet de trier par un champ différent de column.id
   className?: string;
   pageParamName?: string; // ex: "page"
   cursorParamName?: string; // ex: "cursor" si tu fais cursor-based
@@ -17,6 +19,7 @@ type SortableHeaderProps = {
 export const SortableHeader = ({
   column,
   label,
+  sortKey,
   className,
   pageParamName = "page",
   cursorParamName = "cursor",
@@ -28,7 +31,9 @@ export const SortableHeader = ({
   const currentOrderBy = searchParams.get("orderBy");
   const currentOrderDir = searchParams.get("orderDir") as "asc" | "desc" | null;
 
-  const isActive = currentOrderBy === column.id;
+  // Utiliser sortKey si fourni, sinon column.id
+  const key = sortKey || column.id;
+  const isActive = currentOrderBy === key;
 
   // Icône selon l'état de tri
   let Icon = ArrowUpDown;
@@ -41,7 +46,7 @@ export const SortableHeader = ({
     // 🔁 Logique de cycle de tri
     if (!isActive) {
       // Pas encore trié sur cette colonne -> on commence en asc
-      params.set("orderBy", column.id);
+      params.set("orderBy", key);
       params.set("orderDir", "asc");
     } else if (currentOrderDir === "asc") {
       // Déjà trié asc -> passe en desc
