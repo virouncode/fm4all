@@ -257,12 +257,6 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
     pageSize,
   ]);
 
-  // Trigger reload when searchParams change
-  useEffect(() => {
-    if (loading) return; // Skip during initial load
-    loadTickets();
-  }, [loadTickets, loading]);
-
   // Load more for infinite scroll (APPEND pattern)
   const loadMore = useCallback(async () => {
     if (isLoadingMore || !hasMore || isError || !entreprise?.id) return;
