@@ -62,6 +62,7 @@ function toOrderBy(value: string | undefined) {
     "priorite",
     "statut",
     "titre",
+    "type",
     "siteNom",
     "proprietaireEntrepriseNom",
     "demandeurEntrepriseNom",

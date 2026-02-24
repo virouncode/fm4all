@@ -144,6 +144,7 @@ export const ticketsQuerySchema = z.object({
       "priorite",
       "statut",
       "titre",
+      "type",
       "siteNom",
       "proprietaireEntrepriseNom",
       "demandeurEntrepriseNom",
