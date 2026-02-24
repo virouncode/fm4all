@@ -4,7 +4,10 @@ import InfiniteDataTable from "@/components/tables/InfiniteDataTable";
 import { Button } from "@/components/ui/button";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { getEntreprisesAction } from "@/server/actions/entreprisesActions";
-import { getAccessibleSitesAction } from "@/server/actions/sitesActions";
+import {
+  getAccessibleSitesAction,
+  getAllSitesForPlatformAction,
+} from "@/server/actions/sitesActions";
 import { getTicketsAction } from "@/server/actions/ticketsActions";
 import { useAppStore } from "@/stores/application/appStore";
 import {
@@ -14,7 +17,7 @@ import {
 } from "@/zod-schemas/enums";
 import { SelectSiteType } from "@/zod-schemas/sites.schema";
 import { SelectTicketType } from "@/zod-schemas/ticket.schema";
-import { Filter, Grid3x3, List, Plus } from "lucide-react";
+import { ArrowDownUp, Filter, Grid3x3, List, Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -24,6 +27,7 @@ import {
 import { TicketFormDialog } from "./TicketFormDialog";
 import { TicketsFiltersDialog } from "./TicketsFiltersDialog";
 import { TicketsGrid } from "./TicketsGrid";
+import { TicketsSortDialog } from "./TicketsSortDialog";
 
 type EntrepriseMinimal = { id: string; nom: string };
 
@@ -100,6 +104,7 @@ type TicketsTableProps = {
 
 export function TicketsTable({ searchParams }: TicketsTableProps) {
   const entreprise = useAppStore((state) => state.entreprise);
+  const posture = useAppStore((state) => state.postureActive);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -119,6 +124,7 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
   // Dialogs state
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [filtersDialogOpen, setFiltersDialogOpen] = useState(false);
+  const [sortDialogOpen, setSortDialogOpen] = useState(false);
 
   // View state
   const [view, setView] = useState<"list" | "grid">("list");
@@ -180,9 +186,16 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
       setIsError(false);
 
       try {
+        // En posture plateforme, charger TOUS les sites de tous les clients
+        // Sinon, charger seulement les sites accessibles de l'entreprise courante
+        const sitesPromise =
+          posture === "plateforme"
+            ? getAllSitesForPlatformAction({})
+            : getAccessibleSitesAction({ entrepriseId: entreprise.id });
+
         const [sitesResult, entreprisesResult, ticketsResult] =
           await Promise.all([
-            getAccessibleSitesAction({ entrepriseId: entreprise.id }),
+            sitesPromise,
             getEntreprisesAction(),
             getTicketsAction({
               entrepriseId: entreprise.id,
@@ -248,6 +261,7 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
     searchParams.assigneEntrepriseId,
     searchParams.orderBy,
     searchParams.orderDir,
+    posture,
   ]);
 
   // Reload tickets when URL params change (RESET pattern)
@@ -392,6 +406,13 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
     router.replace({ pathname, query }, { scroll: false });
   };
 
+  const handleRowClick = (ticket: SelectTicketType) => {
+    router.push({
+      pathname: "/app/tickets/[ticketId]",
+      params: { ticketId: ticket.id },
+    });
+  };
+
   const handleTicketCreated = () => {
     loadTickets();
     setCreateDialogOpen(false);
@@ -438,10 +459,21 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
               </span>
             )}
           </Button>
-          <Button size="sm" onClick={() => setCreateDialogOpen(true)}>
-            <Plus className="h-4 w-4" />
-            Nouveau ticket
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setSortDialogOpen(true)}
+          >
+            <ArrowDownUp className="h-4 w-4" />
+            Trier
           </Button>
+          {/* Bouton visible seulement si pas prestataire */}
+          {posture !== "prestataire" && (
+            <Button size="sm" onClick={() => setCreateDialogOpen(true)}>
+              <Plus className="h-4 w-4" />
+              Nouveau ticket
+            </Button>
+          )}
         </div>
       </div>
 
@@ -458,6 +490,7 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
             hasMore={hasMore}
             loadMore={loadMore}
             idLabelMap={ticketsIdLabelMap}
+            onRowClick={handleRowClick}
           />
         ) : (
           <TicketsGrid
@@ -469,6 +502,7 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
             isError={isError}
             hasMore={hasMore}
             loadMore={loadMore}
+            onTicketClick={handleRowClick}
           />
         )}
       </div>
@@ -485,6 +519,11 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
         onOpenChange={setFiltersDialogOpen}
         currentFilters={filters}
         onApply={handleFiltersApply}
+      />
+
+      <TicketsSortDialog
+        open={sortDialogOpen}
+        onOpenChange={setSortDialogOpen}
       />
     </div>
   );

@@ -134,6 +134,38 @@ export const getSiteByIdAction = actionClient
     return site;
   });
 
+// ==================== GET ALL SITES (PLATFORM ONLY) ====================
+
+export const getAllSitesForPlatformAction = actionClient
+  .metadata({ actionName: "getAllSitesForPlatformAction" })
+  .inputSchema(z.object({}), {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async () => {
+    const session = await getSession();
+    const currentUser = session?.user;
+
+    if (!currentUser) {
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    }
+
+    // Vérifier que l'utilisateur est plateforme
+    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+
+    if (!platformRole?.role) {
+      throw errors.forbidden("Accès réservé à la plateforme.");
+    }
+
+    // Récupérer TOUS les sites de TOUS les clients (y compris inactifs)
+    const allSites = await db.query.sites.findMany({
+      // Pas de filtre actif = true pour inclure TOUS les sites
+      orderBy: (sites, { asc }) => [asc(sites.nom)],
+    });
+
+    return selectSiteSchema.array().parse(allSites);
+  });
+
 // ==================== GET ACCESSIBLE SITES ====================
 
 export const getAccessibleSitesAction = actionClient
@@ -159,18 +191,22 @@ export const getAccessibleSitesAction = actionClient
     // Vérifier si l'utilisateur est plateforme
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
 
-    if (!platformRole) {
-      // Si pas plateforme, vérifier accès entreprise via adhésion
-      const adhesion = await db.query.userAdhesions.findFirst({
-        where: and(
-          eq(userAdhesions.userId, currentUser.id),
-          eq(userAdhesions.entrepriseId, parsedInput.entrepriseId),
-        ),
-      });
+    // Si plateforme : retourner TOUS les sites sans filtrage (inclure inactifs)
+    if (platformRole?.role) {
+      const sites = await getSitesByEntrepriseId(parsedInput.entrepriseId, true);
+      return sites;
+    }
 
-      if (!adhesion) {
-        throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
-      }
+    // Si pas plateforme, vérifier accès entreprise via adhésion
+    const adhesion = await db.query.userAdhesions.findFirst({
+      where: and(
+        eq(userAdhesions.userId, currentUser.id),
+        eq(userAdhesions.entrepriseId, parsedInput.entrepriseId),
+      ),
+    });
+
+    if (!adhesion) {
+      throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
     }
 
     // Récupérer sites accessibles (filtré par attributions)
