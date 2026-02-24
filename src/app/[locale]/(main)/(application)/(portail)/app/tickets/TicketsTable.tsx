@@ -23,6 +23,7 @@ import {
 } from "./createTicketsColumns";
 import { TicketFormDialog } from "./TicketFormDialog";
 import { TicketsFiltersDialog } from "./TicketsFiltersDialog";
+import { TicketsGrid } from "./TicketsGrid";
 
 type EntrepriseMinimal = { id: string; nom: string };
 
@@ -444,19 +445,32 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
         </div>
       </div>
 
-      {/* Infinite Data Table - prend toute la hauteur restante */}
-      <div className="flex-1 overflow-auto">
-        <InfiniteDataTable<SelectTicketType>
-          columns={columns}
-          items={tickets}
-          total={total}
-          isLoading={loading}
-          isLoadingMore={isLoadingMore}
-          isError={isError}
-          hasMore={hasMore}
-          loadMore={loadMore}
-          idLabelMap={ticketsIdLabelMap}
-        />
+      {/* View: Table ou Grid */}
+      <div className="flex-1 overflow-hidden">
+        {view === "list" ? (
+          <InfiniteDataTable<SelectTicketType>
+            columns={columns}
+            items={tickets}
+            total={total}
+            isLoading={loading}
+            isLoadingMore={isLoadingMore}
+            isError={isError}
+            hasMore={hasMore}
+            loadMore={loadMore}
+            idLabelMap={ticketsIdLabelMap}
+          />
+        ) : (
+          <TicketsGrid
+            tickets={tickets}
+            sites={sites}
+            entreprises={entreprises}
+            isLoading={loading}
+            isLoadingMore={isLoadingMore}
+            isError={isError}
+            hasMore={hasMore}
+            loadMore={loadMore}
+          />
+        )}
       </div>
 
       {/* Dialogs */}

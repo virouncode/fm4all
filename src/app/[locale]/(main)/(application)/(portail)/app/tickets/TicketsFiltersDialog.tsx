@@ -143,7 +143,8 @@ export function TicketsFiltersDialog({
       setLoadingSites(true);
       try {
         // Determine target entrepriseId based on posture and filters
-        let targetEntrepriseId = entrepriseId;
+        // entrepriseId is guaranteed to be defined by the early return check above
+        let targetEntrepriseId = entrepriseId!;
 
         if (
           (postureActive === "plateforme" || postureActive === "prestataire") &&
@@ -187,9 +188,10 @@ export function TicketsFiltersDialog({
     async function reloadSites() {
       setLoadingSites(true);
       try {
+        // entrepriseId is guaranteed to be defined by the early return check above
         const targetEntrepriseId =
           proprietaireEntrepriseId === "all" || !proprietaireEntrepriseId
-            ? entrepriseId
+            ? entrepriseId!
             : proprietaireEntrepriseId;
 
         const result = await getAccessibleSitesAction({
