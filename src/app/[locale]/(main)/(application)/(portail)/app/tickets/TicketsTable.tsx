@@ -128,6 +128,18 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
 
   const pageSize = 30;
 
+  // Compter les filtres actifs
+  const activeFiltersCount = [
+    searchParams.search,
+    searchParams.statut,
+    searchParams.priorite,
+    searchParams.type,
+    searchParams.siteId,
+    searchParams.proprietaireEntrepriseId,
+    searchParams.demandeurEntrepriseId,
+    searchParams.assigneEntrepriseId,
+  ].filter(Boolean).length;
+
   // Synchroniser filters avec searchParams quand ils changent
   useEffect(() => {
     setFilters({
@@ -384,6 +396,11 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
         >
           <Filter className="h-4 w-4" />
           Filtrer
+          {activeFiltersCount > 0 && (
+            <span className="bg-primary text-primary-foreground ml-1 rounded-full px-1.5 text-xs">
+              {activeFiltersCount}
+            </span>
+          )}
         </Button>
         <Button size="sm" onClick={() => setCreateDialogOpen(true)}>
           <Plus className="h-4 w-4" />
