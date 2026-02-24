@@ -4,8 +4,9 @@ import { SortableHeader } from "@/components/tables/SortableHeader";
 import { Badge } from "@/components/ui/badge";
 import { SelectSiteType } from "@/zod-schemas/sites.schema";
 import { SelectTicketType } from "@/zod-schemas/ticket.schema";
-import { SelectEntrepriseType } from "@/zod-schemas/entreprise.schema";
 import { ColumnDef } from "@tanstack/react-table";
+
+type EntrepriseMinimal = { id: string; nom: string };
 import {
   formatTicketDate,
   getTicketPrioriteBadge,
@@ -32,7 +33,7 @@ export const createTicketsColumns = ({
   entreprises,
 }: {
   sites: SelectSiteType[];
-  entreprises: SelectEntrepriseType[];
+  entreprises: EntrepriseMinimal[];
 }): ColumnDef<SelectTicketType>[] => [
   {
     accessorKey: "priorite",

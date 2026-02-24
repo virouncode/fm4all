@@ -3,7 +3,19 @@
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
-import { getEntreprisesClientes } from "@/server/queries/entreprises.query";
+import {
+  getAllEntreprises,
+  getEntreprisesClientes,
+} from "@/server/queries/entreprises.query";
+
+/**
+ * Récupère la liste de toutes les entreprises
+ * Utilisé pour afficher les noms dans les colonnes relationnelles
+ */
+export const getEntreprisesAction = actionClient.action(async () => {
+  const entreprises = await getAllEntreprises();
+  return { entreprises };
+});
 
 /**
  * Récupère la liste des entreprises clientes

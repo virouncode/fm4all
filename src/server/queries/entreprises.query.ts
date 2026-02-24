@@ -45,6 +45,26 @@ export async function getEntrepriseById(entrepriseId: string) {
 }
 
 /**
+ * Récupère toutes les entreprises
+ * Retourne id et nom uniquement pour optimisation
+ *
+ * @returns Liste de toutes les entreprises avec id et nom
+ */
+export async function getAllEntreprises(): Promise<
+  Array<{ id: string; nom: string }>
+> {
+  const results = await db
+    .select({
+      id: entreprises.id,
+      nom: entreprises.nom,
+    })
+    .from(entreprises)
+    .orderBy(entreprises.nom);
+
+  return results;
+}
+
+/**
  * Vérifie si une entreprise possède un rôle spécifique
  *
  * @param entrepriseId - ID de l'entreprise

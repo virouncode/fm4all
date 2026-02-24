@@ -12,7 +12,6 @@ import {
   TicketTypeType,
 } from "@/zod-schemas/enums";
 import { SelectSiteType } from "@/zod-schemas/sites.schema";
-import { SelectEntrepriseType } from "@/zod-schemas/entreprise.schema";
 import { SelectTicketType } from "@/zod-schemas/ticket.schema";
 import { Filter, Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -23,6 +22,8 @@ import {
 } from "./createTicketsColumns";
 import { TicketFormDialog } from "./TicketFormDialog";
 import { TicketsFiltersDialog } from "./TicketsFiltersDialog";
+
+type EntrepriseMinimal = { id: string; nom: string };
 
 type SearchParams = {
   // Filtres
@@ -55,8 +56,20 @@ function toEnumOrUndefined<T extends string>(
   return value && value !== "" ? (value as T) : undefined;
 }
 
-function toOrderBy(value: string | undefined) {
-  const validValues = [
+type OrderByType =
+  | "createdAt"
+  | "lastActivityAt"
+  | "priorite"
+  | "statut"
+  | "titre"
+  | "type"
+  | "siteNom"
+  | "proprietaireEntrepriseNom"
+  | "demandeurEntrepriseNom"
+  | "assigneEntrepriseNom";
+
+function toOrderBy(value: string | undefined): OrderByType {
+  const validValues: OrderByType[] = [
     "createdAt",
     "lastActivityAt",
     "priorite",
@@ -68,7 +81,9 @@ function toOrderBy(value: string | undefined) {
     "demandeurEntrepriseNom",
     "assigneEntrepriseNom",
   ];
-  return value && validValues.includes(value) ? value : "lastActivityAt";
+  return value && validValues.includes(value as OrderByType)
+    ? (value as OrderByType)
+    : "lastActivityAt";
 }
 
 function toOrderDir(value: string | undefined): "asc" | "desc" {
@@ -85,7 +100,7 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
   // Data state
   const [tickets, setTickets] = useState<SelectTicketType[]>([]);
   const [sites, setSites] = useState<SelectSiteType[]>([]);
-  const [entreprises, setEntreprises] = useState<SelectEntrepriseType[]>([]);
+  const [entreprises, setEntreprises] = useState<EntrepriseMinimal[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
@@ -278,9 +293,10 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
       if (result?.serverError) {
         toast.error(result.serverError.message);
         setIsError(true);
-      } else if (result?.data) {
-        setTickets((prev) => [...prev, ...result.data.tickets]); // APPEND
-        setHasMore(result.data.hasMore || false);
+      } else if (result?.data?.tickets) {
+        const { tickets: newTickets, hasMore: hasMoreData } = result.data;
+        setTickets((prev) => [...prev, ...newTickets]); // APPEND
+        setHasMore(hasMoreData || false);
         setPage(nextPage);
       }
     } catch {
