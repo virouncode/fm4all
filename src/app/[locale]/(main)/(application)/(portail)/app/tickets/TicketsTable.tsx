@@ -16,6 +16,7 @@ import { SelectTicketType } from "@/zod-schemas/ticket.schema";
 import { Filter, Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useRouter, usePathname } from "@/i18n/navigation";
 import {
   createTicketsColumns,
   ticketsIdLabelMap,
@@ -96,6 +97,8 @@ type TicketsTableProps = {
 
 export function TicketsTable({ searchParams }: TicketsTableProps) {
   const entreprise = useAppStore((state) => state.entreprise);
+  const router = useRouter();
+  const pathname = usePathname();
 
   // Data state
   const [tickets, setTickets] = useState<SelectTicketType[]>([]);
@@ -114,10 +117,33 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [filtersDialogOpen, setFiltersDialogOpen] = useState(false);
 
-  // Filters for dialog
-  const [filters, setFilters] = useState<FiltersType>({});
+  // Filters for dialog - initialisés depuis searchParams
+  const [filters, setFilters] = useState<FiltersType>({
+    search: searchParams.search,
+    statut: searchParams.statut,
+    priorite: searchParams.priorite,
+    type: searchParams.type,
+    siteId: searchParams.siteId,
+  });
 
   const pageSize = 30;
+
+  // Synchroniser filters avec searchParams quand ils changent
+  useEffect(() => {
+    setFilters({
+      search: searchParams.search,
+      statut: searchParams.statut,
+      priorite: searchParams.priorite,
+      type: searchParams.type,
+      siteId: searchParams.siteId,
+    });
+  }, [
+    searchParams.search,
+    searchParams.statut,
+    searchParams.priorite,
+    searchParams.type,
+    searchParams.siteId,
+  ]);
 
   // Initial load: sites, entreprises, and tickets
   useEffect(() => {
@@ -320,7 +346,24 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
 
   const handleFiltersApply = (newFilters: FiltersType) => {
     setFilters(newFilters);
-    // TODO: Update URL with new filters
+
+    // Construire l'objet query avec les filtres et tri
+    const query: Record<string, string> = {};
+
+    // Garder les paramètres de tri existants
+    if (searchParams.orderBy) query.orderBy = searchParams.orderBy;
+    if (searchParams.orderDir) query.orderDir = searchParams.orderDir;
+
+    // Ajouter les nouveaux filtres (seulement si définis)
+    if (newFilters.search) query.search = newFilters.search;
+    if (newFilters.statut) query.statut = newFilters.statut;
+    if (newFilters.priorite) query.priorite = newFilters.priorite;
+    if (newFilters.type) query.type = newFilters.type;
+    if (newFilters.siteId) query.siteId = newFilters.siteId;
+
+    // Naviguer vers la nouvelle URL
+    // @ts-expect-error - next-intl router typing issue
+    router.replace({ pathname, query }, { scroll: false });
   };
 
   const handleTicketCreated = () => {
