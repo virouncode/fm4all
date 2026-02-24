@@ -12,12 +12,21 @@ import {
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
 import { useDebounce } from "@/hooks/use-debounce";
+import {
+  getEntreprisesClientesAction,
+  getEntreprisesPrestatairesAction,
+} from "@/server/actions/entreprisesActions";
+import { getAccessibleSitesAction } from "@/server/actions/sitesActions";
+import { useAppStore } from "@/stores/application/appStore";
 import { SelectSiteType } from "@/zod-schemas/sites.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Filter, RotateCcw } from "lucide-react";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
+
+type EntrepriseMinimal = { id: string; nom: string };
 
 const filtersSchema = z.object({
   search: z.string().optional(),
@@ -25,6 +34,8 @@ const filtersSchema = z.object({
   priorite: z.string().optional(),
   type: z.string().optional(),
   siteId: z.string().optional(),
+  proprietaireEntrepriseId: z.string().optional(),
+  assigneEntrepriseId: z.string().optional(),
 });
 
 type FiltersType = z.infer<typeof filtersSchema>;
@@ -33,7 +44,6 @@ interface TicketsFiltersDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   currentFilters: FiltersType;
-  sites: SelectSiteType[];
   onApply: (filters: FiltersType) => void;
 }
 
@@ -41,9 +51,24 @@ export function TicketsFiltersDialog({
   open,
   onOpenChange,
   currentFilters,
-  sites,
   onApply,
 }: TicketsFiltersDialogProps) {
+  // Posture detection
+  const postureActive = useAppStore((state) => state.postureActive);
+  const entrepriseId = useAppStore((state) => state.entreprise?.id);
+
+  // Entreprise lists
+  const [clientEntreprises, setClientEntreprises] = useState<
+    EntrepriseMinimal[]
+  >([]);
+  const [prestataireEntreprises, setPrestataireEntreprises] = useState<
+    EntrepriseMinimal[]
+  >([]);
+
+  // Sites state (moved from TicketsTable)
+  const [sites, setSites] = useState<SelectSiteType[]>([]);
+  const [loadingSites, setLoadingSites] = useState(false);
+
   // Convertir les valeurs undefined en "all" pour le formulaire
   const formDefaults = {
     search: currentFilters.search || "",
@@ -51,6 +76,8 @@ export function TicketsFiltersDialog({
     priorite: currentFilters.priorite || "all",
     type: currentFilters.type || "all",
     siteId: currentFilters.siteId || "all",
+    proprietaireEntrepriseId: currentFilters.proprietaireEntrepriseId || "all",
+    assigneEntrepriseId: currentFilters.assigneEntrepriseId || "all",
   };
 
   const form = useForm<FiltersType>({
@@ -62,7 +89,132 @@ export function TicketsFiltersDialog({
   const filters = useWatch({ control: form.control });
   const debouncedSearch = useDebounce(filters.search, 500);
 
-  // Appliquer automatiquement les filtres
+  // Observer le changement de client pour recharger les sites
+  const proprietaireEntrepriseId = useWatch({
+    control: form.control,
+    name: "proprietaireEntrepriseId",
+  });
+
+  // useEffect #1: Load entreprises by posture
+  useEffect(() => {
+    async function loadEntreprises() {
+      try {
+        if (postureActive === "plateforme") {
+          // Load both clients and prestataires
+          const [clientsResult, prestatairesResult] = await Promise.all([
+            getEntreprisesClientesAction(),
+            getEntreprisesPrestatairesAction(),
+          ]);
+
+          if (clientsResult?.data?.clients) {
+            setClientEntreprises(clientsResult.data.clients);
+          }
+          if (prestatairesResult?.data?.prestataires) {
+            setPrestataireEntreprises(prestatairesResult.data.prestataires);
+          }
+        } else if (postureActive === "client") {
+          // Load only prestataires
+          const result = await getEntreprisesPrestatairesAction();
+          if (result?.data?.prestataires) {
+            setPrestataireEntreprises(result.data.prestataires);
+          }
+        } else if (postureActive === "prestataire") {
+          // Load only clients
+          const result = await getEntreprisesClientesAction();
+          if (result?.data?.clients) {
+            setClientEntreprises(result.data.clients);
+          }
+        }
+      } catch {
+        toast.error("Erreur lors du chargement des entreprises");
+      }
+    }
+
+    if (postureActive) {
+      loadEntreprises();
+    }
+  }, [postureActive]);
+
+  // useEffect #2: Load initial sites when dialog opens
+  useEffect(() => {
+    if (!open || !entrepriseId) return;
+
+    async function loadInitialSites() {
+      setLoadingSites(true);
+      try {
+        // Determine target entrepriseId based on posture and filters
+        let targetEntrepriseId = entrepriseId;
+
+        if (
+          (postureActive === "plateforme" || postureActive === "prestataire") &&
+          currentFilters.proprietaireEntrepriseId &&
+          currentFilters.proprietaireEntrepriseId !== "all"
+        ) {
+          targetEntrepriseId = currentFilters.proprietaireEntrepriseId;
+        }
+
+        const result = await getAccessibleSitesAction({
+          entrepriseId: targetEntrepriseId,
+        });
+
+        if (result?.serverError) {
+          toast.error(result.serverError.message);
+        } else if (result?.data) {
+          setSites(result.data);
+        }
+      } catch {
+        toast.error("Erreur lors du chargement des sites");
+      } finally {
+        setLoadingSites(false);
+      }
+    }
+
+    loadInitialSites();
+  }, [
+    open,
+    entrepriseId,
+    postureActive,
+    currentFilters.proprietaireEntrepriseId,
+  ]);
+
+  // useEffect #3: Reload sites when client selection changes
+  useEffect(() => {
+    // Only for plateforme/prestataire postures
+    if (postureActive !== "plateforme" && postureActive !== "prestataire")
+      return;
+    if (!open || !entrepriseId) return;
+
+    async function reloadSites() {
+      setLoadingSites(true);
+      try {
+        const targetEntrepriseId =
+          proprietaireEntrepriseId === "all" || !proprietaireEntrepriseId
+            ? entrepriseId
+            : proprietaireEntrepriseId;
+
+        const result = await getAccessibleSitesAction({
+          entrepriseId: targetEntrepriseId,
+        });
+
+        if (result?.serverError) {
+          toast.error(result.serverError.message);
+        } else if (result?.data) {
+          setSites(result.data);
+
+          // CRITICAL: Reset siteId when client changes
+          form.setValue("siteId", "all");
+        }
+      } catch {
+        toast.error("Erreur lors du chargement des sites");
+      } finally {
+        setLoadingSites(false);
+      }
+    }
+
+    reloadSites();
+  }, [proprietaireEntrepriseId, postureActive, open, entrepriseId, form]);
+
+  // useEffect #4: Auto-apply filters
   useEffect(() => {
     const cleanedData: FiltersType = {
       search: debouncedSearch || undefined,
@@ -70,6 +222,14 @@ export function TicketsFiltersDialog({
       priorite: filters.priorite === "all" ? undefined : filters.priorite,
       type: filters.type === "all" ? undefined : filters.type,
       siteId: filters.siteId === "all" ? undefined : filters.siteId,
+      proprietaireEntrepriseId:
+        filters.proprietaireEntrepriseId === "all"
+          ? undefined
+          : filters.proprietaireEntrepriseId,
+      assigneEntrepriseId:
+        filters.assigneEntrepriseId === "all"
+          ? undefined
+          : filters.assigneEntrepriseId,
     };
     onApply(cleanedData);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -79,6 +239,8 @@ export function TicketsFiltersDialog({
     filters.priorite,
     filters.type,
     filters.siteId,
+    filters.proprietaireEntrepriseId,
+    filters.assigneEntrepriseId,
   ]);
 
   // Compter les filtres actifs
@@ -89,6 +251,13 @@ export function TicketsFiltersDialog({
     if (filters.priorite && filters.priorite !== "all") count++;
     if (filters.type && filters.type !== "all") count++;
     if (filters.siteId && filters.siteId !== "all") count++;
+    if (
+      filters.proprietaireEntrepriseId &&
+      filters.proprietaireEntrepriseId !== "all"
+    )
+      count++;
+    if (filters.assigneEntrepriseId && filters.assigneEntrepriseId !== "all")
+      count++;
     return count;
   }, [filters]);
 
@@ -99,6 +268,8 @@ export function TicketsFiltersDialog({
       priorite: "all",
       type: "all",
       siteId: "all",
+      proprietaireEntrepriseId: "all",
+      assigneEntrepriseId: "all",
     });
   };
 
@@ -118,7 +289,7 @@ export function TicketsFiltersDialog({
           <Form {...form}>
             <form className="flex flex-col gap-4">
               {/* Ligne 1 */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-4 gap-4">
                 <RhfInput
                   label="Recherche"
                   name="search"
@@ -162,10 +333,6 @@ export function TicketsFiltersDialog({
                   <SelectItem value="normale">Normale</SelectItem>
                   <SelectItem value="basse">Basse</SelectItem>
                 </RhfControlledSelect>
-              </div>
-
-              {/* Ligne 2 */}
-              <div className="grid grid-cols-3 gap-4">
                 <RhfControlledSelect
                   label="Type"
                   name="type"
@@ -178,6 +345,47 @@ export function TicketsFiltersDialog({
                   <SelectItem value="demande">Demande</SelectItem>
                   <SelectItem value="autre">Autre</SelectItem>
                 </RhfControlledSelect>
+              </div>
+
+              {/* Ligne 2: 4-column grid for flexible layout */}
+              <div className="grid grid-cols-4 gap-4">
+                {/* Client Filter - Show for plateforme and prestataire */}
+                {(postureActive === "plateforme" ||
+                  postureActive === "prestataire") && (
+                  <RhfControlledSelect
+                    label="Client"
+                    name="proprietaireEntrepriseId"
+                    className="col-span-1"
+                    selectClassName="w-full"
+                    withError={false}
+                  >
+                    <SelectItem value="all">Tous les clients</SelectItem>
+                    {clientEntreprises.map((e) => (
+                      <SelectItem key={e.id} value={e.id}>
+                        {e.nom}
+                      </SelectItem>
+                    ))}
+                  </RhfControlledSelect>
+                )}
+
+                {/* Prestataire Filter - Show for plateforme and client */}
+                {(postureActive === "plateforme" ||
+                  postureActive === "client") && (
+                  <RhfControlledSelect
+                    label="Prestataire"
+                    name="assigneEntrepriseId"
+                    className="col-span-1"
+                    selectClassName="w-full"
+                    withError={false}
+                  >
+                    <SelectItem value="all">Tous les prestataires</SelectItem>
+                    {prestataireEntreprises.map((e) => (
+                      <SelectItem key={e.id} value={e.id}>
+                        {e.nom}
+                      </SelectItem>
+                    ))}
+                  </RhfControlledSelect>
+                )}
 
                 <RhfControlledSelect
                   label="Site"
@@ -185,8 +393,11 @@ export function TicketsFiltersDialog({
                   className="col-span-1"
                   selectClassName="w-full"
                   withError={false}
+                  disabled={loadingSites}
                 >
-                  <SelectItem value="all">Tous les sites</SelectItem>
+                  <SelectItem value="all">
+                    {loadingSites ? "Chargement..." : "Tous les sites"}
+                  </SelectItem>
                   {sites.map((s) => (
                     <SelectItem key={s.id} value={s.id}>
                       {s.nom}

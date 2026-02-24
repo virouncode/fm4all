@@ -31,8 +31,8 @@ export async function getTicketById(
  * Récupère les tickets du périmètre utilisateur avec filtres et pagination
  *
  * Logique selon posture:
- * - Plateforme: tous les tickets de l'entreprise
- * - Client: tickets des sites du périmètre effectif
+ * - Plateforme: TOUS les tickets (aucun filtre de périmètre)
+ * - Client: tickets des sites du périmètre effectif (attributions)
  * - Fournisseur: tickets assignés à son entreprise ou à lui
  *
  * @param userId - ID de l'utilisateur
@@ -60,15 +60,7 @@ export async function getTicketsByPerimetre({
   // 1. Calculer les siteIds accessibles selon posture
   let accessibleSiteIds: string[] = [];
 
-  if (posture === "plateforme") {
-    // Plateforme: tous les sites de l'entreprise
-    const { sites } = await import("@/db/schema/sites");
-    const allSites = await db.query.sites.findMany({
-      where: eq(sites.entrepriseId, entrepriseId),
-      columns: { id: true },
-    });
-    accessibleSiteIds = allSites.map((s) => s.id);
-  } else if (posture === "client") {
+  if (posture === "client") {
     // Client: sites du périmètre effectif
     accessibleSiteIds = await getUserAccessibleSiteIdsForTickets({
       userId,
@@ -80,7 +72,11 @@ export async function getTicketsByPerimetre({
   const conditions: (SQL | undefined)[] = [];
 
   // Filtre périmètre
-  if (posture === "plateforme" || posture === "client") {
+  if (posture === "plateforme") {
+    // Plateforme: aucun filtre de périmètre, voit TOUS les tickets
+    // (Pas de condition ici)
+  } else if (posture === "client") {
+    // Client: filtrer par sites accessibles
     if (accessibleSiteIds.length === 0) {
       // Aucun site accessible → aucun ticket
       return {

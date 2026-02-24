@@ -156,16 +156,21 @@ export const getAccessibleSitesAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    // Vérifier accès entreprise
-    const adhesion = await db.query.userAdhesions.findFirst({
-      where: and(
-        eq(userAdhesions.userId, currentUser.id),
-        eq(userAdhesions.entrepriseId, parsedInput.entrepriseId),
-      ),
-    });
+    // Vérifier si l'utilisateur est plateforme
+    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
 
-    if (!adhesion) {
-      throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+    if (!platformRole) {
+      // Si pas plateforme, vérifier accès entreprise via adhésion
+      const adhesion = await db.query.userAdhesions.findFirst({
+        where: and(
+          eq(userAdhesions.userId, currentUser.id),
+          eq(userAdhesions.entrepriseId, parsedInput.entrepriseId),
+        ),
+      });
+
+      if (!adhesion) {
+        throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+      }
     }
 
     // Récupérer sites accessibles (filtré par attributions)

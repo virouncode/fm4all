@@ -84,3 +84,28 @@ export async function hasEntrepriseRole(
 
   return !!result;
 }
+
+/**
+ * Récupère toutes les entreprises ayant le rôle "prestataire"
+ * Utilisé pour le filtre prestataire dans les tickets
+ *
+ * @returns Liste des entreprises prestataires avec id et nom
+ */
+export async function getEntreprisesPrestataires(): Promise<
+  Array<{ id: string; nom: string }>
+> {
+  const results = await db
+    .select({
+      id: entreprises.id,
+      nom: entreprises.nom,
+    })
+    .from(entreprises)
+    .innerJoin(
+      entrepriseRoles,
+      eq(entreprises.id, entrepriseRoles.entrepriseId),
+    )
+    .where(eq(entrepriseRoles.role, "prestataire"))
+    .orderBy(entreprises.nom);
+
+  return results;
+}

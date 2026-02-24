@@ -6,6 +6,7 @@ import { getSession } from "@/server/auth/get-session";
 import {
   getAllEntreprises,
   getEntreprisesClientes,
+  getEntreprisesPrestataires,
 } from "@/server/queries/entreprises.query";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
 
@@ -46,4 +47,15 @@ export const getEntreprisesClientesAction = actionClient
     const clients = await getEntreprisesClientes();
 
     return { clients };
+  });
+
+/**
+ * Récupère la liste des entreprises prestataires
+ * Utilisé pour le filtre prestataire dans les tickets
+ */
+export const getEntreprisesPrestatairesAction = actionClient
+  .metadata({ actionName: "getEntreprisesPrestatairesAction" })
+  .action(async () => {
+    const prestataires = await getEntreprisesPrestataires();
+    return { prestataires };
   });

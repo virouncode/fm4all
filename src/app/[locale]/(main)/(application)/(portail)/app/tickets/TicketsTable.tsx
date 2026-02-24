@@ -48,6 +48,8 @@ type FiltersType = {
   priorite?: string;
   type?: string;
   siteId?: string;
+  proprietaireEntrepriseId?: string;
+  assigneEntrepriseId?: string;
 };
 
 // Helpers pour conversion type-safe
@@ -124,6 +126,8 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
     priorite: searchParams.priorite,
     type: searchParams.type,
     siteId: searchParams.siteId,
+    proprietaireEntrepriseId: searchParams.proprietaireEntrepriseId,
+    assigneEntrepriseId: searchParams.assigneEntrepriseId,
   });
 
   const pageSize = 30;
@@ -148,6 +152,8 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
       priorite: searchParams.priorite,
       type: searchParams.type,
       siteId: searchParams.siteId,
+      proprietaireEntrepriseId: searchParams.proprietaireEntrepriseId,
+      assigneEntrepriseId: searchParams.assigneEntrepriseId,
     });
   }, [
     searchParams.search,
@@ -155,6 +161,8 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
     searchParams.priorite,
     searchParams.type,
     searchParams.siteId,
+    searchParams.proprietaireEntrepriseId,
+    searchParams.assigneEntrepriseId,
   ]);
 
   // Initial load: sites, entreprises, and tickets
@@ -372,6 +380,12 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
     if (newFilters.priorite) query.priorite = newFilters.priorite;
     if (newFilters.type) query.type = newFilters.type;
     if (newFilters.siteId) query.siteId = newFilters.siteId;
+    if (newFilters.proprietaireEntrepriseId) {
+      query.proprietaireEntrepriseId = newFilters.proprietaireEntrepriseId;
+    }
+    if (newFilters.assigneEntrepriseId) {
+      query.assigneEntrepriseId = newFilters.assigneEntrepriseId;
+    }
 
     // Naviguer vers la nouvelle URL
     // @ts-expect-error - next-intl router typing issue
@@ -434,7 +448,6 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
         open={filtersDialogOpen}
         onOpenChange={setFiltersDialogOpen}
         currentFilters={filters}
-        sites={sites}
         onApply={handleFiltersApply}
       />
     </div>
