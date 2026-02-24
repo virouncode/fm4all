@@ -5,14 +5,14 @@ import { Badge } from "@/components/ui/badge";
 import { SelectSiteType } from "@/zod-schemas/sites.schema";
 import { SelectTicketType } from "@/zod-schemas/ticket.schema";
 import { ColumnDef } from "@tanstack/react-table";
-
-type EntrepriseMinimal = { id: string; nom: string };
 import {
   formatTicketDate,
   getTicketPrioriteBadge,
   getTicketStatutBadge,
   getTicketTypeLabel,
 } from "./helpers";
+
+type EntrepriseMinimal = { id: string; nom: string };
 
 export const ticketsIdLabelMap = new Map<string, string>([
   ["id", "ID"],
@@ -36,6 +36,13 @@ export const createTicketsColumns = ({
   entreprises: EntrepriseMinimal[];
 }): ColumnDef<SelectTicketType>[] => [
   {
+    accessorKey: "titre",
+    header: ({ column }) => <SortableHeader column={column} label="Titre" />,
+    cell: ({ getValue }) => (
+      <span className="font-medium">{getValue() as string}</span>
+    ),
+  },
+  {
     accessorKey: "priorite",
     header: ({ column }) => (
       <SortableHeader column={column} label="Priorité" className="w-24" />
@@ -44,24 +51,24 @@ export const createTicketsColumns = ({
       const priorite = getValue() as SelectTicketType["priorite"];
       const badge = getTicketPrioriteBadge(priorite);
       return (
-        <Badge className={`text-xs ${badge.className}`}>
-          {badge.label}
-        </Badge>
+        <Badge className={`text-xs ${badge.className}`}>{badge.label}</Badge>
       );
     },
     size: 100,
   },
   {
-    accessorKey: "createdAt",
-    header: ({ column }) => (
-      <SortableHeader column={column} label="Créé le" />
-    ),
+    accessorKey: "statut",
+    header: ({ column }) => <SortableHeader column={column} label="Statut" />,
     cell: ({ getValue }) => {
-      const date = getValue() as Date;
-      return <span className="text-sm">{formatTicketDate(date)}</span>;
+      const statut = getValue() as SelectTicketType["statut"];
+      const badge = getTicketStatutBadge(statut);
+      return (
+        <Badge className={`text-xs ${badge.className}`}>{badge.label}</Badge>
+      );
     },
-    size: 120,
+    size: 150,
   },
+
   {
     accessorKey: "proprietaireEntrepriseId",
     header: ({ column }) => (
@@ -76,6 +83,17 @@ export const createTicketsColumns = ({
       return entreprises.find((e) => e.id === entrepriseId)?.nom || "-";
     },
     size: 180,
+  },
+  {
+    accessorKey: "siteId",
+    header: ({ column }) => (
+      <SortableHeader column={column} label="Site" sortKey="siteNom" />
+    ),
+    cell: ({ getValue }) => {
+      const siteId = getValue() as string;
+      return sites.find((s) => s.id === siteId)?.nom || "-";
+    },
+    size: 160,
   },
   {
     accessorKey: "demandeurEntrepriseId",
@@ -110,27 +128,7 @@ export const createTicketsColumns = ({
     },
     size: 180,
   },
-  {
-    accessorKey: "titre",
-    header: ({ column }) => <SortableHeader column={column} label="Titre" />,
-    cell: ({ getValue }) => (
-      <span className="font-medium">{getValue() as string}</span>
-    ),
-  },
-  {
-    accessorKey: "statut",
-    header: ({ column }) => <SortableHeader column={column} label="Statut" />,
-    cell: ({ getValue }) => {
-      const statut = getValue() as SelectTicketType["statut"];
-      const badge = getTicketStatutBadge(statut);
-      return (
-        <Badge className={`text-xs ${badge.className}`}>
-          {badge.label}
-        </Badge>
-      );
-    },
-    size: 150,
-  },
+
   {
     accessorKey: "type",
     header: ({ column }) => <SortableHeader column={column} label="Type" />,
@@ -140,17 +138,7 @@ export const createTicketsColumns = ({
     },
     size: 100,
   },
-  {
-    accessorKey: "siteId",
-    header: ({ column }) => (
-      <SortableHeader column={column} label="Site" sortKey="siteNom" />
-    ),
-    cell: ({ getValue }) => {
-      const siteId = getValue() as string;
-      return sites.find((s) => s.id === siteId)?.nom || "-";
-    },
-    size: 160,
-  },
+
   {
     accessorKey: "lastActivityAt",
     header: ({ column }) => (
@@ -161,5 +149,14 @@ export const createTicketsColumns = ({
       return <span className="text-sm">{formatTicketDate(date)}</span>;
     },
     size: 160,
+  },
+  {
+    accessorKey: "createdAt",
+    header: ({ column }) => <SortableHeader column={column} label="Créé le" />,
+    cell: ({ getValue }) => {
+      const date = getValue() as Date;
+      return <span className="text-sm">{formatTicketDate(date)}</span>;
+    },
+    size: 120,
   },
 ];

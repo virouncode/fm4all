@@ -331,9 +331,9 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
   const columns = createTicketsColumns({ sites, entreprises });
 
   return (
-    <div className="space-y-4">
+    <div className="flex h-full flex-col gap-4">
       {/* Header Actions */}
-      <div className="flex items-center justify-end gap-2">
+      <div className="flex flex-shrink-0 items-center justify-end gap-2">
         <Button
           variant="outline"
           size="sm"
@@ -348,18 +348,20 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
         </Button>
       </div>
 
-      {/* Infinite Data Table */}
-      <InfiniteDataTable<SelectTicketType>
-        columns={columns}
-        items={tickets}
-        total={total}
-        isLoading={loading}
-        isLoadingMore={isLoadingMore}
-        isError={isError}
-        hasMore={hasMore}
-        loadMore={loadMore}
-        idLabelMap={ticketsIdLabelMap}
-      />
+      {/* Infinite Data Table - prend toute la hauteur restante */}
+      <div className="flex-1 overflow-auto">
+        <InfiniteDataTable<SelectTicketType>
+          columns={columns}
+          items={tickets}
+          total={total}
+          isLoading={loading}
+          isLoadingMore={isLoadingMore}
+          isError={isError}
+          hasMore={hasMore}
+          loadMore={loadMore}
+          idLabelMap={ticketsIdLabelMap}
+        />
+      </div>
 
       {/* Dialogs */}
       <TicketFormDialog

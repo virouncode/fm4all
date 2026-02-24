@@ -2,19 +2,19 @@
 
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
-import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
+import { getSession } from "@/server/auth/get-session";
 import {
   getAllEntreprises,
   getEntreprisesClientes,
 } from "@/server/queries/entreprises.query";
-import { z } from "zod";
+import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
 
 /**
  * Récupère la liste de toutes les entreprises
  * Utilisé pour afficher les noms dans les colonnes relationnelles
  */
 export const getEntreprisesAction = actionClient
-  .schema(z.object({}))
+  .metadata({ actionName: "getEntreprisesAction" })
   .action(async () => {
     const entreprises = await getAllEntreprises();
     return { entreprises };
@@ -24,11 +24,17 @@ export const getEntreprisesAction = actionClient
  * Récupère la liste des entreprises clientes
  * Réservé à la plateforme uniquement
  */
-export const getEntreprisesClientesAction = actionClient.action(
-  async ({ ctx }) => {
-    const { currentUser } = ctx;
-
+export const getEntreprisesClientesAction = actionClient
+  .metadata({ actionName: "getEntreprisesClientesAction" })
+  .action(async () => {
     // Vérifier que l'utilisateur est plateforme
+    const session = await getSession();
+    const currentUser = session?.user;
+
+    if (!currentUser) {
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    }
+
     const plateformeRole = await getUserPlateformeAdhesion(currentUser.id);
 
     if (!plateformeRole) {
@@ -40,5 +46,4 @@ export const getEntreprisesClientesAction = actionClient.action(
     const clients = await getEntreprisesClientes();
 
     return { clients };
-  },
-);
+  });
