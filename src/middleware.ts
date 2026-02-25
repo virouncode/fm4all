@@ -165,13 +165,14 @@ export async function middleware(req: NextRequest) {
     return new NextResponse(null, { status: 410 });
   }
 
-  if (
-    pathname.match(/^\/(fr|en)\/tag\b/) ||
-    pathname.includes("[") ||
-    pathname.includes("]")
-  ) {
-    return new NextResponse(null, { status: 410 });
-  }
+  // DIAGNOSTIC: Désactiver complètement le blocage des crochets pour tester
+  // if (
+  //   pathname.match(/^\/(fr|en)\/tag\b/) ||
+  //   (pathname.includes("[") && !pathname.startsWith("/_next")) ||
+  //   (pathname.includes("]") && !pathname.startsWith("/_next"))
+  // ) {
+  //   return new NextResponse(null, { status: 410 });
+  // }
 
   if (legacyRedirects[pathname]) {
     return NextResponse.redirect(

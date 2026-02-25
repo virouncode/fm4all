@@ -128,8 +128,6 @@ export function UserDetails({
     if (!entreprise?.id) return;
 
     const fetchAttributions = async () => {
-      console.log("fetchAttributions");
-
       try {
         const result = await getUserSiteAttributionsAction({
           userId: user.id,

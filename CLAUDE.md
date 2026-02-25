@@ -626,14 +626,41 @@ const loadMore = useCallback(async () => {
 }, [/* ... toutes les dépendances incluant orderBy/orderDir */]);
 ```
 
+#### ✅ 8. CRITIQUE : Utiliser l'OBJET searchParams dans useEffect (pas les propriétés individuelles)
+
+**BUG RÉEL** : La page reste bloquée en chargement lors de la navigation client-side.
+
+```typescript
+// ❌ FAUX - Les propriétés individuelles (toutes undefined) ne changent pas de référence
+// → useEffect ne se re-déclenche PAS lors de la navigation client-side
+useEffect(() => {
+  loadInitialData();
+}, [
+  entreprise?.id,
+  searchParams.search,     // undefined === undefined → pas de changement
+  searchParams.statut,     // undefined === undefined → pas de changement
+  searchParams.orderBy,    // undefined === undefined → pas de changement
+  // ...
+]);
+
+// ✅ CORRECT - L'objet searchParams est une NOUVELLE RÉFÉRENCE à chaque navigation
+// → useEffect se re-déclenche correctement
+useEffect(() => {
+  loadInitialData();
+}, [entreprise?.id, posture, searchParams]);
+```
+
+**Explication** : Quand le parent (page.tsx) re-render lors d'une navigation client-side, il passe un NOUVEL objet `searchParams`. Avec les propriétés individuelles (toutes `undefined`), React ne détecte aucun changement (`undefined === undefined`). Avec l'objet entier, la nouvelle référence déclenche le useEffect.
+
 **SYMPTÔMES d'oubli** :
 - ❌ L'URL change mais les données ne se rechargent pas
 - ❌ Le tri visuel ne change pas malgré le clic sur SortableHeader
 - ❌ Les filtres fonctionnent mais pas le tri (ou vice-versa)
+- ❌ La page reste bloquée en chargement (spinner infini) lors de la navigation client-side
 
-**CAUSE** : Paramètres manquants dans SearchParams, useEffect, ou action call
+**CAUSE** : Paramètres manquants dans SearchParams, useEffect, ou action call. Ou bien propriétés individuelles au lieu de l'objet `searchParams` dans les dépendances useEffect.
 
-**SOLUTION** : Vérifier la checklist complète ci-dessus point par point
+**SOLUTION** : Vérifier la checklist complète ci-dessus point par point. Pour le useEffect principal (loadInitialData), utiliser `searchParams` en tant qu'objet.
 
 **Référence d'implémentation** : `/app/tickets` (implémentation complète)
 
@@ -1276,6 +1303,23 @@ type SearchParams = {
 ```
 
 **Solution** : Voir la checklist complète dans "### 8. Filtrage et Tri Côté Serveur"
+
+### ❌ N'utilisez PAS les propriétés individuelles de searchParams dans useEffect
+
+```typescript
+// ❌ FAUX - Navigation client-side ne déclenche pas le useEffect
+// Car les propriétés individuelles (undefined) ne changent pas
+useEffect(() => {
+  loadInitialData();
+}, [entreprise?.id, searchParams.search, searchParams.statut, ...]);
+
+// ✅ CORRECT - L'objet searchParams est une nouvelle référence à chaque navigation
+useEffect(() => {
+  loadInitialData();
+}, [entreprise?.id, posture, searchParams]);
+```
+
+**Symptôme** : Page bloquée en chargement lors de la navigation client-side (fonctionne au refresh)
 
 ---
 

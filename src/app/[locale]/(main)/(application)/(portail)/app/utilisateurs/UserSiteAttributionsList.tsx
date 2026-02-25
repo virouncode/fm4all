@@ -89,8 +89,6 @@ export function UserSiteAttributionsList({
   onAttributionDeleted,
   onAddClick,
 }: UserSiteAttributionsListProps) {
-  console.log("attributions", attributions);
-
   const currentUser = useAppStore((state) => state.user);
   const currentUserRole = useAppStore((state) => state.roleAdhesion);
   const currentUserPlateformeRole = useAppStore(
@@ -119,7 +117,9 @@ export function UserSiteAttributionsList({
     });
   }, [attributions, siteTree]);
 
-  const handleEdit = (attribution: SelectUserSiteAttributionWithInheritanceType) => {
+  const handleEdit = (
+    attribution: SelectUserSiteAttributionWithInheritanceType,
+  ) => {
     setEditingAttribution(attribution);
     setEditDialogOpen(true);
   };

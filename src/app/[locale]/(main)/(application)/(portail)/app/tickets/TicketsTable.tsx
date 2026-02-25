@@ -251,20 +251,7 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
     }
 
     loadInitialData();
-  }, [
-    entreprise?.id,
-    searchParams.search,
-    searchParams.statut,
-    searchParams.priorite,
-    searchParams.type,
-    searchParams.siteId,
-    searchParams.proprietaireEntrepriseId,
-    searchParams.demandeurEntrepriseId,
-    searchParams.assigneEntrepriseId,
-    searchParams.orderBy,
-    searchParams.orderDir,
-    posture,
-  ]);
+  }, [entreprise?.id, posture, searchParams]);
 
   // Reload tickets when URL params change (RESET pattern)
   const loadTickets = useCallback(async () => {
