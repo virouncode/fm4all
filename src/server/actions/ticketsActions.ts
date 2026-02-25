@@ -1206,11 +1206,12 @@ export const insertTicketMessageAction = actionClient
             .returning();
 
           // INSERT documentsLinks avec ticketMessageId
+          // Note: ticketId est NULL pour les PJ des messages (normalisation)
+          // Le lien se fait uniquement via ticketMessageId
           await tx.insert(documentsLinks).values({
             documentId: doc.id,
             proprietaireEntrepriseId: ticket.proprietaireEntrepriseId,
-            ticketId: parsedInput.ticketId,
-            ticketMessageId: message.id, // ✅ Lier au message
+            ticketMessageId: message.id, // ✅ Lier au message uniquement
             visibilite: "public",
             createdById: currentUser.id,
             updatedById: currentUser.id,

@@ -1692,6 +1692,22 @@ Le module `/app/tickets` implémente des fonctionnalités avancées :
 - Preview Dialog pour images/PDFs
 - Promotion fichiers temp → S3 permanent lors de l'envoi
 
+**Architecture polymorphique documentsLinks (IMPORTANT)** :
+- **Table polymorphique** : `documentsLinks` peut lier un document à différentes entités (ticket, ticketMessage, site, devis, etc.)
+- **Principe de normalisation** : Chaque ligne pointe vers **UN SEUL parent**
+  - PJ du ticket : `ticketId` rempli, `ticketMessageId` NULL
+  - PJ d'un message : `ticketMessageId` rempli, `ticketId` **NULL** (pas de redondance)
+- **Rationale** : Évite la redondance et les risques d'incohérence (l'info ticketId est déjà dans `ticketMessages.ticketId`)
+- **Distinction** : Utiliser `isNull(documentsLinks.ticketMessageId)` pour filtrer les PJ du ticket uniquement
+- **Query exemple** :
+  ```typescript
+  // PJ du ticket (sans les PJ des messages)
+  .where(and(
+    eq(documentsLinks.ticketId, ticketId),
+    isNull(documentsLinks.ticketMessageId)
+  ))
+  ```
+
 **Pattern visibilité** :
 ```typescript
 // Frontend - Filtrage messages affichés
