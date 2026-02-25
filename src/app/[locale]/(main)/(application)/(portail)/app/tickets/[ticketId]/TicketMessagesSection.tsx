@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "@/i18n/navigation";
 import { useForm, useFieldArray, useFormState } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -66,16 +67,16 @@ export function TicketMessagesSection({
   initialMessages,
   posture,
 }: TicketMessagesSectionProps) {
+  const router = useRouter();
+
   // Filtrer les messages selon la posture
-  const visibleMessages = initialMessages.filter((msg) => {
+  const messages = initialMessages.filter((msg) => {
     if (posture === "plateforme") return true; // fm4all voit tout
     if (msg.visibilite === "public") return true;
     if (posture === "client" && msg.visibilite === "client_only") return true;
     if (posture === "prestataire" && msg.visibilite === "prestataire_only") return true;
     return false;
   });
-
-  const [messages, setMessages] = useState<Message[]>(visibleMessages);
   const [previewAttachment, setPreviewAttachment] = useState<{
     url: string;
     filename: string;
@@ -157,24 +158,15 @@ export function TicketMessagesSection({
     if (result?.data?.message) {
       toast.success("Message envoyé");
 
-      // Ajouter le message à la liste (sans PJ car on les affiche pas immédiatement)
-      // Dans un vrai cas, on ferait un refresh ou on utiliserait les données retournées
-      setMessages((prev) => [
-        ...prev,
-        {
-          ...result.data!.message,
-          auteurPrenom: null, // Sera rechargé
-          auteurNom: null,
-          attachments: [],
-        },
-      ]);
-
       // Reset form
       form.reset({
         message: "",
         visibilite: "public",
         attachments: [],
       });
+
+      // Recharger les données serveur pour afficher le message avec les infos auteur
+      router.refresh();
     }
   };
 
@@ -182,7 +174,7 @@ export function TicketMessagesSection({
     const isCurrentUser = msg.auteurUserId === currentUserId;
     const auteurNom = msg.auteurPrenom && msg.auteurNom
       ? `${msg.auteurPrenom} ${msg.auteurNom}`
-      : "Utilisateur supprimé";
+      : "Utilisateur";
 
     return (
       <div
@@ -219,7 +211,7 @@ export function TicketMessagesSection({
               : "bg-muted",
           )}
         >
-          <p className="whitespace-pre-wrap break-words">{msg.message}</p>
+          <p className="text-sm whitespace-pre-wrap break-words">{msg.message}</p>
 
           {/* Pièces jointes */}
           {msg.attachments.length > 0 && (
