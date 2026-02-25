@@ -750,28 +750,6 @@ export function TicketDetailsClient({
         </CardContent>
       </Card>
 
-      {/* Debug info */}
-      <Card className="bg-muted/50 border-dashed">
-        <CardHeader>
-          <CardTitle className="text-muted-foreground text-sm font-medium">
-            Debug Info
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-1.5 pt-4 font-mono text-xs">
-          <p>
-            <span className="font-semibold">Posture:</span> {posture}
-          </p>
-          <p>
-            <span className="font-semibold">Permissions:</span>{" "}
-            {JSON.stringify(permissions)}
-          </p>
-          <p>
-            <span className="font-semibold">Statuts disponibles:</span>{" "}
-            {availableStatuts.join(", ")}
-          </p>
-        </CardContent>
-      </Card>
-
       {/* Dialog d'affichage en grand */}
       <Dialog
         open={!!selectedAttachment}
