@@ -3,16 +3,19 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-const TICKET_VIEW_KEY = "fm4all:ticketView";
+const UI_STORE_KEY = "fm4all:ui";
 
 export type TicketView = "list" | "grid";
+export type PrestationView = "list" | "grid";
 
 type UiStore = {
   // state
   ticketView: TicketView;
+  prestationView: PrestationView;
 
   // actions
   setTicketView: (view: TicketView) => void;
+  setPrestationView: (view: PrestationView) => void;
 };
 
 export const useUiStore = create<UiStore>()(
@@ -20,14 +23,18 @@ export const useUiStore = create<UiStore>()(
     (set) => ({
       // default state
       ticketView: "list",
+      prestationView: "list",
 
       // actions
       setTicketView: (view) => set({ ticketView: view }),
+      setPrestationView: (view) => set({ prestationView: view }),
     }),
     {
-      name: TICKET_VIEW_KEY,
-      // Ne persister que ticketView (pas les actions)
-      partialize: (state) => ({ ticketView: state.ticketView }),
+      name: UI_STORE_KEY,
+      partialize: (state) => ({
+        ticketView: state.ticketView,
+        prestationView: state.prestationView,
+      }),
     }
   )
 );
