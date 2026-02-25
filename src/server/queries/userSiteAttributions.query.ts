@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { sites, sitesArborescence } from "@/db/schema/sites";
 import { userSiteAttributions } from "@/db/schema/users";
 import { RoleAttributionType } from "@/zod-schemas/userSiteAttribution.schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -54,15 +54,83 @@ export async function getUserSiteAttributions({
     )
     .parse(rows.map((r) => ({ ...r.attribution, site: r.site })));
 
-  // NOUVEAU : Calculer les sites hérités via scope=subtree
-  const { resolveUserEffectiveRoleOnSite } = await import(
+  // Calculer les sites hérités via scope=subtree (version batch optimisée)
+  const { resolveUserEffectiveRolesOnSites } = await import(
     "@/server/utils/userSiteAttributions.utils"
   );
 
   // Créer un Set des siteIds déjà directement attribués pour éviter les doublons
   const directSiteIds = new Set(attributions.map((a) => a.siteId));
 
-  // Pour chaque attribution avec scope=subtree, récupérer tous les descendants
+  // Étape 1 : Fetch TOUS les descendants de TOUS les subtree attrs en 1 query
+  const subtreeAttrSiteIds = attributions
+    .filter((a) => a.scope === "subtree")
+    .map((a) => a.siteId);
+
+  let allDescendants: Array<{
+    ancetreId: string | null;
+    descendantId: string | null;
+    profondeur: number | null;
+  }> = [];
+
+  if (subtreeAttrSiteIds.length > 0) {
+    allDescendants = await db
+      .select({
+        ancetreId: sitesArborescence.ancetreId,
+        descendantId: sitesArborescence.descendantId,
+        profondeur: sitesArborescence.profondeur,
+      })
+      .from(sitesArborescence)
+      .where(
+        and(
+          inArray(sitesArborescence.ancetreId, subtreeAttrSiteIds),
+          eq(sitesArborescence.entrepriseId, entrepriseId),
+        ),
+      );
+  }
+
+  // Étape 2 : Filtrer (exclure self, exclure déjà-directs, exclure nulls)
+  const descendantSiteIds = [
+    ...new Set(
+      allDescendants
+        .filter(
+          (d) =>
+            d.descendantId !== null &&
+            d.profondeur !== null &&
+            d.profondeur > 0 &&
+            !directSiteIds.has(d.descendantId!),
+        )
+        .map((d) => d.descendantId!),
+    ),
+  ];
+
+  // Étape 3 : Batch resolve des rôles effectifs (2 queries au lieu de N*(1+K))
+  const rolesMap =
+    descendantSiteIds.length > 0
+      ? await resolveUserEffectiveRolesOnSites({
+          userId,
+          siteIds: descendantSiteIds,
+          entrepriseId,
+        })
+      : new Map<string, RoleAttributionType | null>();
+
+  // Étape 4 : Construire un index ancetreId → descendantIds pour retrouver l'attribution source
+  const ancestorToDescendants = new Map<string, string[]>();
+  for (const d of allDescendants) {
+    if (
+      d.ancetreId === null ||
+      d.descendantId === null ||
+      d.profondeur === null ||
+      d.profondeur === 0
+    )
+      continue;
+    if (directSiteIds.has(d.descendantId)) continue;
+    if (!ancestorToDescendants.has(d.ancetreId))
+      ancestorToDescendants.set(d.ancetreId, []);
+    ancestorToDescendants.get(d.ancetreId)!.push(d.descendantId);
+  }
+
+  // Étape 5 : Assembler les inheritedAttributions en mémoire (0 queries)
   const inheritedAttributions: Array<{
     id: string;
     userId: string;
@@ -84,68 +152,44 @@ export async function getUserSiteAttributions({
     inheritedFromSiteId: string;
   }> = [];
 
+  // Set pour éviter les doublons (un descendant peut apparaître via plusieurs subtree attrs)
+  const addedDescendantIds = new Set<string>();
+
   for (const attr of attributions) {
-    if (attr.scope === "subtree") {
-      // Récupérer tous les descendants via closure table
-      const descendants = await db
-        .select({
-          descendantId: sitesArborescence.descendantId,
-          profondeur: sitesArborescence.profondeur,
-        })
-        .from(sitesArborescence)
-        .where(
-          and(
-            eq(sitesArborescence.ancetreId, attr.siteId),
-            eq(sitesArborescence.entrepriseId, entrepriseId),
-          ),
-        );
+    if (attr.scope !== "subtree") continue;
 
-      // Pour chaque descendant (sauf le site lui-même)
-      for (const desc of descendants) {
-        if (
-          desc.descendantId === attr.siteId ||
-          !desc.descendantId ||
-          desc.profondeur === null
-        )
-          continue; // Skip self
-        if (directSiteIds.has(desc.descendantId)) continue; // Skip si déjà attribution directe
+    const descIds = ancestorToDescendants.get(attr.siteId) || [];
+    for (const descId of descIds) {
+      if (addedDescendantIds.has(descId)) continue;
 
-        // Calculer le rôle effectif (prend en compte les exclusions et overrides)
-        const effectiveRole = await resolveUserEffectiveRoleOnSite({
-          userId,
-          siteId: desc.descendantId,
-          entrepriseId,
-        });
+      const effectiveRole = rolesMap.get(descId);
+      if (!effectiveRole) continue; // Exclusion ou pas de rôle
 
-        // Si pas de rôle effectif (exclusion), skip
-        if (!effectiveRole) continue;
+      const descendantSite = allSites.find((s) => s.id === descId);
+      if (!descendantSite) continue;
 
-        // Récupérer les infos du site descendant
-        const descendantSite = allSites.find((s) => s.id === desc.descendantId);
-        if (!descendantSite) continue;
+      addedDescendantIds.add(descId);
 
-        // Créer une pseudo-attribution pour l'héritage
-        inheritedAttributions.push({
-          id: `inherited-${attr.id}-${desc.descendantId}`, // ID fictif
-          userId: attr.userId,
-          siteId: desc.descendantId,
-          mode: "inclure", // Toujours inclure pour les hérités (exclusions filtrées avant)
-          scope: "self", // Les hérités sont considérés comme self
-          role: effectiveRole,
-          entrepriseId: attr.entrepriseId,
-          createdAt: attr.createdAt,
-          updatedAt: attr.updatedAt,
-          createdById: attr.createdById,
-          updatedById: attr.updatedById,
-          site: {
-            id: descendantSite.id,
-            nom: descendantSite.nom,
-            parentId: descendantSite.parentId,
-          },
-          isInherited: true,
-          inheritedFromSiteId: attr.siteId,
-        });
-      }
+      inheritedAttributions.push({
+        id: `inherited-${attr.id}-${descId}`,
+        userId: attr.userId,
+        siteId: descId,
+        mode: "inclure",
+        scope: "self",
+        role: effectiveRole,
+        entrepriseId: attr.entrepriseId,
+        createdAt: attr.createdAt,
+        updatedAt: attr.updatedAt,
+        createdById: attr.createdById,
+        updatedById: attr.updatedById,
+        site: {
+          id: descendantSite.id,
+          nom: descendantSite.nom,
+          parentId: descendantSite.parentId,
+        },
+        isInherited: true,
+        inheritedFromSiteId: attr.siteId,
+      });
     }
   }
 

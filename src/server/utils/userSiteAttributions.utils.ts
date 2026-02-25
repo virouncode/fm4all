@@ -2,7 +2,7 @@ import "server-only";
 import { db } from "@/db";
 import { userSiteAttributions } from "@/db/schema/users";
 import { sitesArborescence } from "@/db/schema/sites";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import type {
   AttributionModeType,
   RoleAttributionType,
@@ -289,6 +289,144 @@ export async function resolveUserEffectiveRoleOnSite({
 
   // 6. Si mode=inclure → Retourner le rôle
   return mostSpecific.role;
+}
+
+/**
+ * Version BATCH de resolveUserEffectiveRoleOnSite()
+ * Résout le rôle effectif d'un utilisateur sur PLUSIEURS sites en 2 queries max
+ * au lieu de N*(1+K) queries pour la version unitaire.
+ *
+ * Même algorithme (spécificité par profondeur, mode exclure) appliqué en mémoire.
+ *
+ * @returns Map<siteId, RoleAttributionType | null>
+ */
+export async function resolveUserEffectiveRolesOnSites({
+  userId,
+  siteIds,
+  entrepriseId,
+  tx,
+}: {
+  userId: string;
+  siteIds: string[];
+  entrepriseId: string;
+  tx?: DbOrTransaction;
+}): Promise<Map<string, RoleAttributionType | null>> {
+  if (siteIds.length === 0) {
+    return new Map();
+  }
+
+  const dbClient = tx || db;
+
+  // 1 seule query : toutes les attributions de l'utilisateur
+  const attributions = await dbClient
+    .select()
+    .from(userSiteAttributions)
+    .where(
+      and(
+        eq(userSiteAttributions.userId, userId),
+        eq(userSiteAttributions.entrepriseId, entrepriseId),
+      ),
+    );
+
+  if (attributions.length === 0) {
+    return new Map(siteIds.map((id) => [id, null]));
+  }
+
+  // Séparer self vs subtree
+  const selfAttrs = attributions.filter((a) => a.scope === "self");
+  const subtreeAttrs = attributions.filter((a) => a.scope === "subtree");
+
+  // 1 seule query : toutes les relations closure pour les subtree attrs × siteIds
+  let closureRelations: Array<{
+    ancetreId: string | null;
+    descendantId: string | null;
+    profondeur: number | null;
+  }> = [];
+
+  if (subtreeAttrs.length > 0) {
+    closureRelations = await dbClient
+      .select({
+        ancetreId: sitesArborescence.ancetreId,
+        descendantId: sitesArborescence.descendantId,
+        profondeur: sitesArborescence.profondeur,
+      })
+      .from(sitesArborescence)
+      .where(
+        and(
+          eq(sitesArborescence.entrepriseId, entrepriseId),
+          inArray(
+            sitesArborescence.ancetreId,
+            subtreeAttrs.map((a) => a.siteId),
+          ),
+          inArray(sitesArborescence.descendantId, siteIds),
+        ),
+      );
+  }
+
+  // Index closure pour lookup O(1) : ancetreId → descendantId → profondeur
+  const closureMap = new Map<string, Map<string, number>>();
+  for (const rel of closureRelations) {
+    if (
+      rel.ancetreId === null ||
+      rel.descendantId === null ||
+      rel.profondeur === null
+    )
+      continue;
+    if (!closureMap.has(rel.ancetreId))
+      closureMap.set(rel.ancetreId, new Map());
+    closureMap.get(rel.ancetreId)!.set(rel.descendantId, rel.profondeur);
+  }
+
+  // Résoudre en mémoire pour chaque siteId (même algo que resolveUserEffectiveRoleOnSite)
+  const results = new Map<string, RoleAttributionType | null>();
+
+  for (const siteId of siteIds) {
+    const validAttrs: Array<{
+      role: RoleAttributionType;
+      mode: "inclure" | "exclure";
+      profondeur: number;
+    }> = [];
+
+    // Check self attributions
+    for (const attr of selfAttrs) {
+      if (attr.siteId === siteId) {
+        validAttrs.push({
+          role: attr.role,
+          mode: attr.mode,
+          profondeur: 0,
+        });
+      }
+    }
+
+    // Check subtree attributions via closure index
+    for (const attr of subtreeAttrs) {
+      const profondeur = closureMap.get(attr.siteId)?.get(siteId);
+      if (profondeur !== undefined) {
+        validAttrs.push({
+          role: attr.role,
+          mode: attr.mode,
+          profondeur,
+        });
+      }
+    }
+
+    if (validAttrs.length === 0) {
+      results.set(siteId, null);
+      continue;
+    }
+
+    // Trier par profondeur ASC (plus spécifique en premier)
+    validAttrs.sort((a, b) => a.profondeur - b.profondeur);
+    const mostSpecific = validAttrs[0];
+
+    // mode=exclure → null, mode=inclure → role
+    results.set(
+      siteId,
+      mostSpecific.mode === "exclure" ? null : mostSpecific.role,
+    );
+  }
+
+  return results;
 }
 
 /**

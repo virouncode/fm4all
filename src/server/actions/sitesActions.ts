@@ -82,7 +82,6 @@ export const getSitesAction = actionClient
       flattenValidationErrors(ve).fieldErrors,
   })
   .action(async ({ parsedInput }) => {
-    console.log("getSitesAction START", parsedInput);
     const session = await getSession();
     const currentUser = session?.user;
 
@@ -181,7 +180,6 @@ export const getAccessibleSitesAction = actionClient
     },
   )
   .action(async ({ parsedInput }) => {
-    console.log("getAccessibleSitesAction - parsedInput:", parsedInput); // --- DEBUG ---
     const session = await getSession();
     const currentUser = session?.user;
 
