@@ -38,11 +38,11 @@ export async function getClientPrestataires(
     .where(
       and(
         eq(clientServices.entrepriseId, clientEntrepriseId),
-        eq(clientServices.actif, true),
+        eq(clientServices.statut, "actif"),
         eq(clientServiceExecutions.actif, true),
         or(
-          isNull(clientServiceExecutions.validTo),
-          gte(clientServiceExecutions.validTo, new Date())
+          isNull(clientServiceExecutions.dateFinValidite),
+          gte(clientServiceExecutions.dateFinValidite, new Date())
         )
       )
     )

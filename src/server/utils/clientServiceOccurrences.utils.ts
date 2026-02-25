@@ -472,7 +472,10 @@ export async function ensureOccurrencesWindow({
     .from(clientServices)
     .where(eq(clientServices.id, clientServiceId));
 
-  if (!cs || !cs.actif) return { created: 0, skipped: 0 };
+  // Génération uniquement si actif + planification automatique activée
+  if (!cs || cs.statut !== "actif" || cs.modePlanning !== "planifie") {
+    return { created: 0, skipped: 0 };
+  }
 
   const windowEnd = new Date(now);
   windowEnd.setDate(windowEnd.getDate() + daysAhead);

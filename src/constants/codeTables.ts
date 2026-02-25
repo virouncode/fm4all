@@ -247,6 +247,32 @@ export const clientServiceModeCodes = clientServiceModeCT.map(
   ...(typeof clientServiceModeCT)[number]["code"][],
 ];
 
+export const clientServiceStatutCT = [
+  { code: "brouillon", name: "Brouillon" },
+  { code: "actif", name: "Actif" },
+  { code: "en_pause", name: "En pause" },
+  { code: "termine", name: "Terminé" },
+] as const;
+
+export const clientServiceStatutCodes = clientServiceStatutCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof clientServiceStatutCT)[number]["code"],
+  ...(typeof clientServiceStatutCT)[number]["code"][],
+];
+
+export const clientServiceModePlanningCT = [
+  { code: "planifie", name: "Planifié" },
+  { code: "a_la_demande", name: "À la demande" },
+] as const;
+
+export const clientServiceModePlanningCodes = clientServiceModePlanningCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof clientServiceModePlanningCT)[number]["code"],
+  ...(typeof clientServiceModePlanningCT)[number]["code"][],
+];
+
 export const perimetreModeCT = [
   { code: "inclure", name: "Inclure" },
   { code: "exclure", name: "Exclure" },

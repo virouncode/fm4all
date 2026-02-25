@@ -22,6 +22,8 @@ import {
 import { user } from "./auth";
 import { entreprises, serviceEntreprises } from "./entreprises";
 import {
+  clientServiceModePlanningEnum,
+  clientServiceStatutEnum,
   executionPeriodeFacturationEnum,
   executionTypePrixEnum,
   frequenceEnum,
@@ -85,7 +87,10 @@ export const clientServices = pgTable(
     // format "HH:mm" (ex: "08:00") — heure de début par défaut des occurrences
     dureeEstimeeMinutes: smallint("duree_estimee_minutes"),
     // durée d'une intervention en minutes — sert à calculer dateFinPrevue
-    actif: boolean("actif").notNull().default(true),
+    statut: clientServiceStatutEnum("statut").notNull().default("brouillon"),
+    modePlanning: clientServiceModePlanningEnum("mode_planning")
+      .notNull()
+      .default("planifie"),
     notes: text("notes"),
     createdById: createdById(() => user),
     updatedById: updatedById(() => user),
@@ -96,7 +101,7 @@ export const clientServices = pgTable(
     index("client_services_entreprise_idx").on(t.entrepriseId),
     index("client_services_site_idx").on(t.siteId),
     index("client_services_service_idx").on(t.serviceId),
-    index("client_services_actif_idx").on(t.actif),
+    index("client_services_statut_idx").on(t.statut),
     index("client_services_dates_idx").on(t.dateDebut, t.dateFin),
   ],
 );

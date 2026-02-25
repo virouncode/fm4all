@@ -2,6 +2,8 @@ import {
   adhesionStatutCodes,
   attributionModeCodes,
   clientServiceModeCodes,
+  clientServiceModePlanningCodes,
+  clientServiceStatutCodes,
   contratDealModeCodes,
   contratStatutCodes,
   contratTypeCodes,
@@ -98,6 +100,14 @@ export const attributionModeEnum = pgEnum(
 export const clientServiceModeEnum = pgEnum(
   "client_service_mode",
   clientServiceModeCodes,
+);
+export const clientServiceStatutEnum = pgEnum(
+  "client_service_statut",
+  clientServiceStatutCodes,
+);
+export const clientServiceModePlanningEnum = pgEnum(
+  "client_service_mode_planning",
+  clientServiceModePlanningCodes,
 );
 export const perimetreModeEnum = pgEnum("perimetre_mode", perimetreModeCodes);
 export const occurrenceStatutEnum = pgEnum(
