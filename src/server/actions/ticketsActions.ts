@@ -1182,11 +1182,12 @@ export const insertTicketMessageAction = actionClient
       // 2. Traiter les pièces jointes si présentes
       if (parsedInput.attachments && parsedInput.attachments.length > 0) {
         for (const attachment of parsedInput.attachments) {
+          // Skip si pas de storageKey (fichier non uploadé)
+          if (!attachment.storageKey) continue;
+
           // Promouvoir le fichier temp → documents
-          await promoteS3Key({
-            proprietaireEntrepriseId: ticket.proprietaireEntrepriseId,
-            fromKey: attachment.storageKey,
-            categorie: "piece_jointe",
+          const promotedKey = await promoteS3Key({
+            tempKey: attachment.storageKey,
           });
 
           // INSERT document
@@ -1196,7 +1197,7 @@ export const insertTicketMessageAction = actionClient
               proprietaireEntrepriseId: ticket.proprietaireEntrepriseId,
               categorie: "piece_jointe",
               storageProvider: "s3",
-              storageKey: attachment.storageKey,
+              storageKey: promotedKey, // ✅ Utiliser le promotedKey
               filename: attachment.filename,
               mimeType: attachment.mimeType,
               sizeBytes: attachment.sizeBytes,

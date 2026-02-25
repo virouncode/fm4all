@@ -2,7 +2,7 @@ import "server-only";
 
 import { db } from "@/db";
 import { documents, documentsLinks } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 export async function getDocumentById(documentId: string) {
   const [row] = await db
@@ -36,7 +36,12 @@ export async function getDocumentsByTicketId(ticketId: string) {
     })
     .from(documents)
     .innerJoin(documentsLinks, eq(documentsLinks.documentId, documents.id))
-    .where(eq(documentsLinks.ticketId, ticketId))
+    .where(
+      and(
+        eq(documentsLinks.ticketId, ticketId),
+        isNull(documentsLinks.ticketMessageId), // Exclure les PJ des messages
+      ),
+    )
     .orderBy(documents.createdAt);
 
   return rows;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "@/i18n/navigation";
 import { useForm, useFieldArray, useFormState } from "react-hook-form";
@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/dialog";
 import { SelectItem } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Paperclip, Send } from "lucide-react";
+import { Paperclip, Send, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -58,6 +58,104 @@ type TicketMessagesSectionProps = {
   initialMessages: Message[];
   posture: "client" | "prestataire" | "plateforme";
 };
+
+/**
+ * Composant pour afficher une pièce jointe avec thumbnail si c'est une image
+ */
+function AttachmentThumbnail({
+  attachment,
+  proprietaireEntrepriseId,
+  isCurrentUser,
+  onClick,
+}: {
+  attachment: MessageAttachment;
+  proprietaireEntrepriseId: string;
+  isCurrentUser: boolean;
+  onClick: () => void;
+}) {
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const isImage = attachment.mimeType.startsWith("image/");
+
+  useEffect(() => {
+    if (!isImage) {
+      setIsLoading(false);
+      return;
+    }
+
+    // Charger l'URL presignée pour les images
+    async function loadImageUrl() {
+      try {
+        const result = await getPresignedReadUrlAction({
+          proprietaireEntrepriseId,
+          key: attachment.storageKey,
+        });
+
+        if (result?.data?.url) {
+          setImageUrl(result.data.url);
+        }
+      } catch (error) {
+        console.error("Erreur chargement thumbnail:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadImageUrl();
+  }, [attachment.storageKey, proprietaireEntrepriseId, isImage]);
+
+  // Pour les images
+  if (isImage) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className={cn(
+          "relative rounded overflow-hidden border-2 transition-opacity hover:opacity-80",
+          isCurrentUser
+            ? "border-primary-foreground/20"
+            : "border-border",
+        )}
+      >
+        {isLoading ? (
+          <div className="w-32 h-32 bg-muted flex items-center justify-center">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+          </div>
+        ) : imageUrl ? (
+          <Image
+            src={imageUrl}
+            alt={attachment.filename}
+            width={128}
+            height={128}
+            className="object-cover w-32 h-32"
+            sizes="128px"
+          />
+        ) : (
+          <div className="w-32 h-32 bg-muted flex items-center justify-center">
+            <FileText className="h-8 w-8 text-muted-foreground" />
+          </div>
+        )}
+      </button>
+    );
+  }
+
+  // Pour les autres fichiers (PDF, etc.)
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "flex items-center gap-2 text-sm hover:underline",
+        isCurrentUser
+          ? "text-primary-foreground/90"
+          : "text-foreground",
+      )}
+    >
+      <FileText className="h-4 w-4" />
+      <span className="truncate">{attachment.filename}</span>
+    </button>
+  );
+}
 
 export function TicketMessagesSection({
   ticketId,
@@ -215,22 +313,15 @@ export function TicketMessagesSection({
 
           {/* Pièces jointes */}
           {msg.attachments.length > 0 && (
-            <div className="mt-2 space-y-1">
+            <div className="mt-2 flex flex-wrap gap-2">
               {msg.attachments.map((att) => (
-                <button
+                <AttachmentThumbnail
                   key={att.id}
-                  type="button"
+                  attachment={att}
+                  proprietaireEntrepriseId={proprietaireEntrepriseId}
+                  isCurrentUser={isCurrentUser}
                   onClick={() => handlePreviewAttachment(att)}
-                  className={cn(
-                    "flex items-center gap-2 text-sm hover:underline",
-                    isCurrentUser
-                      ? "text-primary-foreground/90"
-                      : "text-foreground",
-                  )}
-                >
-                  <Paperclip className="h-3 w-3" />
-                  <span className="truncate">{att.filename}</span>
-                </button>
+                />
               ))}
             </div>
           )}
