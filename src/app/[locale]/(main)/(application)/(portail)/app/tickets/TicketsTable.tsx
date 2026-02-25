@@ -10,6 +10,7 @@ import {
 } from "@/server/actions/sitesActions";
 import { getTicketsAction } from "@/server/actions/ticketsActions";
 import { useAppStore } from "@/stores/application/appStore";
+import { useUiStore } from "@/stores/ui/uiStore";
 import {
   TicketPrioriteType,
   TicketStatutType,
@@ -108,6 +109,10 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
   const router = useRouter();
   const pathname = usePathname();
 
+  // View state from UI store (persisted in localStorage)
+  const ticketView = useUiStore((state) => state.ticketView);
+  const setTicketView = useUiStore((state) => state.setTicketView);
+
   // Data state
   const [tickets, setTickets] = useState<SelectTicketType[]>([]);
   const [sites, setSites] = useState<SelectSiteType[]>([]);
@@ -125,9 +130,6 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [filtersDialogOpen, setFiltersDialogOpen] = useState(false);
   const [sortDialogOpen, setSortDialogOpen] = useState(false);
-
-  // View state
-  const [view, setView] = useState<"list" | "grid">("list");
 
   // Filters for dialog - initialisés depuis searchParams
   const [filters, setFilters] = useState<FiltersType>({
@@ -427,17 +429,17 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
         {/* View Toggle */}
         <div className="flex items-center">
           <Button
-            variant={view === "list" ? "default" : "outline"}
+            variant={ticketView === "list" ? "default" : "outline"}
             size="sm"
-            onClick={() => setView("list")}
+            onClick={() => setTicketView("list")}
             className="rounded-r-none border-r-0"
           >
             <List />
           </Button>
           <Button
-            variant={view === "grid" ? "default" : "outline"}
+            variant={ticketView === "grid" ? "default" : "outline"}
             size="sm"
-            onClick={() => setView("grid")}
+            onClick={() => setTicketView("grid")}
             className="rounded-l-none"
           >
             <Grid3x3 />
@@ -479,7 +481,7 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
 
       {/* View: Table ou Grid */}
       <div className="flex-1 overflow-hidden">
-        {view === "list" ? (
+        {ticketView === "list" ? (
           <InfiniteDataTable<SelectTicketType>
             columns={columns}
             items={tickets}

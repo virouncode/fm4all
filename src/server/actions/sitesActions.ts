@@ -29,6 +29,7 @@ import {
   updateSiteSchema,
   updateSiteToDbSchema,
 } from "@/zod-schemas/sites.schema";
+import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import { and, eq, inArray } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
 import { z } from "zod";
@@ -239,7 +240,13 @@ export const insertSiteAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    const { entrepriseId, parentId, ...siteData } = parsedInput;
+    const { entrepriseId, parentId } = parsedInput;
+
+    // Normaliser les données (string → string déjà fait dans schema, "" → null + string → number)
+    const normalized = normalizeForSubmit(parsedInput, {
+      optionalStrings: ["adresseLigne2", "commentaires"] as const,
+      optionalNumbers: ["surface", "effectif"] as const,
+    });
 
     // Vérifier les permissions
     const userIsAdmin = await isAdmin(currentUser.id, entrepriseId);
@@ -283,7 +290,16 @@ export const insertSiteAction = actionClient
 
     // Préparer le payload
     const payload = insertSiteToDbSchema.parse({
-      ...siteData,
+      nom: normalized.nom, // Déjà nettoyé (capitalizeWords)
+      adresseLigne1: normalized.adresseLigne1, // Déjà nettoyé (capitalizeWords)
+      adresseLigne2: normalized.adresseLigne2, // "" → null
+      codePostal: normalized.codePostal,
+      ville: normalized.ville, // Déjà nettoyé (capitalizeWords)
+      surface: normalized.surface, // string → number
+      effectif: normalized.effectif, // string → number
+      typeBatiment: normalized.typeBatiment,
+      typeOccupation: normalized.typeOccupation,
+      commentaires: normalized.commentaires, // "" → null
       entrepriseId,
       parentId: parentId || null,
       createdById: currentUser.id,
@@ -345,8 +361,14 @@ export const updateSiteAction = actionClient
       id: siteId,
       entrepriseId,
       actif: newActif,
-      ...updateData
+      parentId,
     } = parsedInput;
+
+    // Normaliser les données (string → string déjà fait dans schema, "" → null + string → number)
+    const normalized = normalizeForSubmit(parsedInput, {
+      optionalStrings: ["adresseLigne2", "commentaires"] as const,
+      optionalNumbers: ["surface", "effectif"] as const,
+    });
 
     // Vérifier que le site existe et appartient à l'entreprise
     const belongs = await siteBelongsToEntreprise({ siteId, entrepriseId });
@@ -372,12 +394,41 @@ export const updateSiteAction = actionClient
       }
 
       // Non-admin ne peut PAS changer le parentId (déplacer le site)
-      if ("parentId" in updateData) {
+      if (parentId !== undefined) {
         throw errors.forbidden(
           "Seuls les administrateurs peuvent déplacer un site dans l'arborescence.",
         );
       }
     }
+
+    // Construire l'objet de mise à jour avec les champs normalisés
+    const updateFields = {
+      ...(normalized.nom !== undefined && { nom: normalized.nom }),
+      ...(normalized.adresseLigne1 !== undefined && {
+        adresseLigne1: normalized.adresseLigne1,
+      }),
+      ...(normalized.adresseLigne2 !== undefined && {
+        adresseLigne2: normalized.adresseLigne2,
+      }),
+      ...(normalized.codePostal !== undefined && {
+        codePostal: normalized.codePostal,
+      }),
+      ...(normalized.ville !== undefined && { ville: normalized.ville }),
+      ...(normalized.surface !== undefined && { surface: normalized.surface }),
+      ...(normalized.effectif !== undefined && {
+        effectif: normalized.effectif,
+      }),
+      ...(normalized.typeBatiment !== undefined && {
+        typeBatiment: normalized.typeBatiment,
+      }),
+      ...(normalized.typeOccupation !== undefined && {
+        typeOccupation: normalized.typeOccupation,
+      }),
+      ...(normalized.commentaires !== undefined && {
+        commentaires: normalized.commentaires,
+      }),
+      ...(parentId !== undefined && { parentId }),
+    };
 
     // LOGIQUE DE CASCADE POUR LE STATUT ACTIF
     if (newActif !== undefined) {
@@ -401,7 +452,7 @@ export const updateSiteAction = actionClient
 
             // 2. Préparer le payload (sans le champ actif)
             const payload = updateSiteToDbSchema.parse({
-              ...updateData,
+              ...updateFields,
               updatedById: currentUser.id,
             });
 
@@ -435,7 +486,7 @@ export const updateSiteAction = actionClient
           // Parent actif (ou pas de parent) → réactivation autorisée
           // Note: Les descendants restent inactifs (pas de cascade)
           const payload = updateSiteToDbSchema.parse({
-            ...updateData,
+            ...updateFields,
             actif: true,
             updatedById: currentUser.id,
           });
@@ -445,7 +496,7 @@ export const updateSiteAction = actionClient
       } else {
         // Pas de changement de statut (même valeur) → mise à jour normale
         const payload = updateSiteToDbSchema.parse({
-          ...updateData,
+          ...updateFields,
           actif: newActif,
           updatedById: currentUser.id,
         });
@@ -455,7 +506,7 @@ export const updateSiteAction = actionClient
     } else {
       // Pas de changement de statut → mise à jour normale
       const payload = updateSiteToDbSchema.parse({
-        ...updateData,
+        ...updateFields,
         updatedById: currentUser.id,
       });
 

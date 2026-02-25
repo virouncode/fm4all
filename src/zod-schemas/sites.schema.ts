@@ -67,21 +67,18 @@ export const insertSiteFormSchema = z.object({
   nom: z
     .string()
     .min(1, "Nom du site obligatoire")
-    .transform((v) => capitalizeWords(v)),
+    .transform((v) => capitalizeWords(v)), // ✅ Nettoyage (string → string)
   parentId: z.uuid().nullable().optional(), // null = racine
   adresseLigne1: z
     .string()
     .min(1, "Adresse ligne 1 obligatoire")
-    .transform((v) => capitalizeWords(v)),
-  adresseLigne2: z
-    .string()
-    .optional()
-    .transform((v) => (v ? capitalizeWords(v) : null)),
+    .transform((v) => capitalizeWords(v)), // ✅ Nettoyage (string → string)
+  adresseLigne2: z.string().optional(), // ❌ PAS de transform (normalisation dans action)
   codePostal: codePostalSchema("Code postal invalide (5 chiffres)"),
   ville: z
     .string()
     .min(1, "Ville obligatoire")
-    .transform((v) => capitalizeWords(v)),
+    .transform((v) => capitalizeWords(v)), // ✅ Nettoyage (string → string)
   surface: z
     .string()
     .refine(
@@ -96,10 +93,7 @@ export const insertSiteFormSchema = z.object({
     ),
   typeBatiment: typeBatimentSchema,
   typeOccupation: typeOccupationSchema,
-  commentaires: z
-    .string()
-    .optional()
-    .transform((v) => v || null),
+  commentaires: z.string().optional(), // ❌ PAS de transform (normalisation dans action)
 });
 export type InsertSiteFormType = z.infer<typeof insertSiteFormSchema>;
 
