@@ -88,7 +88,105 @@ src/
 
 ## Patterns et Conventions
 
-### 1. Schemas Zod
+### 1. Normalisation et Nettoyage des Données (Stratégie à 2 niveaux)
+
+**RÈGLE CRITIQUE** : Séparer la validation/nettoyage (schema) de la normalisation/transformation (action serveur).
+
+#### Niveau 1 : Schema Zod (validation + nettoyage)
+
+**✅ FAIRE** : Utiliser `.transform()` pour le **nettoyage** qui préserve le type
+
+```typescript
+import { capitalizeWords, lower, upper } from "@/zod-helpers/normalize";
+
+export const insertSiteFormSchema = z.object({
+  nom: z.string()
+    .min(1, "Nom obligatoire")
+    .transform(v => capitalizeWords(v)),  // ✅ string → string (nettoyage)
+
+  email: z.email()
+    .transform(v => lower(v)),            // ✅ string → string (nettoyage)
+
+  nomEntreprise: z.string()
+    .transform(v => upper(v)),            // ✅ string → string (nettoyage)
+
+  // Champs optionnels : accepter "" SANS transformer
+  description: z.string().optional(),     // ✅ Accepte "" ou undefined
+  assigneId: z.string().uuid()
+    .or(z.literal(""))
+    .optional(),                          // ✅ Accepte UUID, "", ou undefined
+});
+```
+
+**❌ NE PAS FAIRE** : Transformer le type dans le schema (évite bugs React Hook Form)
+
+```typescript
+// ❌ FAUX - Transforme string → null (cause value={null} dans input)
+description: z.string().optional().transform(v => v || null),
+
+// ❌ FAUX - Transforme string → number (change le type)
+surface: z.string().transform(v => Number(v)),
+```
+
+**Pourquoi ?** React Hook Form expect des strings pour les inputs. Si le schema transforme `""` en `null`, l'input reçoit `value={null}` ce qui cause des warnings React.
+
+#### Niveau 2 : Action Serveur (normalisation avant DB)
+
+**✅ FAIRE** : Utiliser `normalizeForSubmit()` pour transformer avant insertion DB
+
+```typescript
+import { normalizeForSubmit } from "@/zod-helpers/normalize";
+
+export const insertSiteAction = actionClient
+  .action(async ({ parsedInput }) => {
+    // Normaliser AVANT insertion DB
+    const normalized = normalizeForSubmit(parsedInput, {
+      optionalNumbers: ["surface", "effectif"] as const,    // string → number | null
+      optionalStrings: ["description", "adresseLigne2"] as const, // "" → null
+    });
+
+    await db.insert(sites).values({
+      nom: normalized.nom,              // Déjà nettoyé (capitalizeWords) par schema
+      description: normalized.description, // "" transformé en null
+      surface: normalized.surface,      // string "150" transformé en number 150
+      // ...
+    });
+  });
+```
+
+**Pattern pour champs UUID optionnels** :
+
+```typescript
+// Schema : accepte UUID ou ""
+assigneEntrepriseId: z.string().uuid().or(z.literal("")).optional(),
+
+// Action : transforme "" en null
+const normalized = normalizeForSubmit(parsedInput, {
+  optionalStrings: ["assigneEntrepriseId"] as const,
+});
+// Résultat : "" → null, UUID → UUID, undefined → null
+```
+
+#### Fonctions de nettoyage disponibles (`/zod-helpers/normalize.ts`)
+
+```typescript
+import {
+  capitalizeWords,      // "jean DUPONT" → "Jean Dupont"
+  capitalizeFirstWord,  // "bonjour monde" → "Bonjour monde"
+  upper,                // "acme corp" → "ACME CORP"
+  lower,                // "Email@EXAMPLE.COM" → "email@example.com"
+  normalizeString,      // Trim + collapse espaces multiples
+} from "@/zod-helpers/normalize";
+```
+
+#### Résumé de la stratégie
+
+| Où | Quoi | Exemple |
+|----|------|---------|
+| **Schema** | Validation + Nettoyage (string → string) | `.transform(capitalizeWords)` |
+| **Action** | Normalisation de type (string → null, string → number) | `normalizeForSubmit()` |
+
+### 2. Schemas Zod
 
 **Toujours créer 3 types de schemas**:
 

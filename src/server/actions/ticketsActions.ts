@@ -49,6 +49,7 @@ import {
 import { isStatusTransitionAllowed } from "@/server/utils/ticketsTransitions.utils";
 import { canUserWriteVisibility } from "@/server/utils/ticketsMessages.utils";
 import { promoteS3Key } from "@/server/s3/s3";
+import { normalizeForSubmit } from "@/zod-helpers/normalize";
 
 // ═══════════════════════════════════════════════════════════════
 // GET TICKETS (avec filtres et pagination)
@@ -234,20 +235,25 @@ export const insertTicketAction = actionClient
       ? parsedInput.proprietaireEntrepriseId || parsedInput.entrepriseId
       : parsedInput.entrepriseId;
 
+    // Normaliser les données avant insertion (transforme "" → null)
+    const normalized = normalizeForSubmit(parsedInput, {
+      optionalStrings: ["description", "assigneEntrepriseId"] as const,
+    });
+
     // Transaction: INSERT ticket + attachments
     const insertedTicket = await db.transaction(async (tx) => {
       // 1. INSERT ticket
       const [ticket] = await tx
         .insert(tickets)
         .values({
-          titre: parsedInput.titre,
-          description: parsedInput.description || null,
-          type: parsedInput.type,
-          priorite: parsedInput.priorite,
-          siteId: parsedInput.siteId,
+          titre: normalized.titre, // Déjà nettoyé (capitalizeFirstWord) par schema
+          description: normalized.description, // "" → null par normalizeForSubmit
+          type: normalized.type,
+          priorite: normalized.priorite,
+          siteId: normalized.siteId,
           proprietaireEntrepriseId,
           demandeurEntrepriseId,
-          assigneEntrepriseId: parsedInput.assigneEntrepriseId || null,
+          assigneEntrepriseId: normalized.assigneEntrepriseId, // "" → null par normalizeForSubmit
           statut: "nouveau",
           createdById: currentUser.id,
           updatedById: currentUser.id,

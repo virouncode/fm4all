@@ -7,6 +7,7 @@ import {
   ticketStatutSchema,
   ticketTypeSchema,
 } from "./enums";
+import { capitalizeFirstWord } from "@/zod-helpers/normalize";
 
 // ═══════════════════════════════════════════════════════════════
 // TICKETS - SELECT (depuis DB)
@@ -33,13 +34,17 @@ export type AttachmentFormType = z.infer<typeof attachmentSchema>;
 // ═══════════════════════════════════════════════════════════════
 
 export const insertTicketFormSchema = z.object({
-  titre: z.string().min(1, "Titre obligatoire").max(255),
-  description: z.string().optional(),
+  titre: z
+    .string()
+    .min(1, "Titre obligatoire")
+    .max(255)
+    .transform((v) => capitalizeFirstWord(v)), // Nettoyage : première lettre majuscule
+  description: z.string().optional(), // Pas de transform (normalisation dans action)
   type: ticketTypeSchema,
   priorite: ticketPrioriteSchema,
   siteId: z.string().uuid("Site obligatoire"),
   proprietaireEntrepriseId: z.string().uuid("Client obligatoire").optional(), // Pour posture plateforme
-  assigneEntrepriseId: z.string().uuid().optional(), // Prestataire (optionnel)
+  assigneEntrepriseId: z.string().uuid().or(z.literal("")).optional(), // Prestataire (optionnel) - accepte UUID ou ""
   attachments: z.array(attachmentSchema).optional(), // Pièces jointes
 });
 export type InsertTicketFormType = z.infer<typeof insertTicketFormSchema>;
