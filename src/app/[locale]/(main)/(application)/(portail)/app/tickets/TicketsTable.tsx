@@ -431,22 +431,26 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
       {/* Header Actions */}
       <div className="flex flex-shrink-0 items-center justify-between gap-2">
         {/* View Toggle */}
-        <div className="flex items-center">
+        <div role="group" aria-label="Mode d'affichage" className="flex items-center">
           <Button
             variant={ticketView === "list" ? "default" : "outline"}
             size="sm"
             onClick={() => setTicketView("list")}
             className="rounded-r-none border-r-0"
+            aria-label="Vue liste"
+            aria-pressed={ticketView === "list"}
           >
-            <List />
+            <List aria-hidden="true" />
           </Button>
           <Button
             variant={ticketView === "grid" ? "default" : "outline"}
             size="sm"
             onClick={() => setTicketView("grid")}
             className="rounded-l-none"
+            aria-label="Vue grille"
+            aria-pressed={ticketView === "grid"}
           >
-            <Grid3x3 />
+            <Grid3x3 aria-hidden="true" />
           </Button>
         </div>
 
