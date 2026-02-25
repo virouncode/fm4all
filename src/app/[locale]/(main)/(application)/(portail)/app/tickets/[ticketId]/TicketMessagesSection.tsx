@@ -432,45 +432,54 @@ export function TicketMessagesSection({
           if (!open) setPreviewAttachment(null);
         }}
       >
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Paperclip className="h-4 w-4" />
-              {previewAttachment?.filename}
-            </DialogTitle>
-          </DialogHeader>
+        <DialogContent className="flex !h-[95vh] !w-[90vw] !max-w-none flex-col p-0">
+          {previewAttachment && (
+            <>
+              <DialogHeader className="flex-shrink-0 p-6 pb-3">
+                <DialogTitle className="truncate pr-12">
+                  {previewAttachment.filename}
+                </DialogTitle>
+              </DialogHeader>
 
-          {loadingPreview ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
-            </div>
-          ) : previewAttachment ? (
-            <div className="relative h-[70vh] w-full">
-              {previewAttachment.mimeType.startsWith("image/") ? (
-                <Image
-                  src={previewAttachment.url}
-                  alt={previewAttachment.filename}
-                  fill
-                  className="object-contain"
-                  sizes="1280px"
-                />
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground mb-4">
-                    Aperçu non disponible pour ce type de fichier
-                  </p>
-                  <a
-                    href={previewAttachment.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >
-                    Télécharger le fichier
-                  </a>
-                </div>
-              )}
-            </div>
-          ) : null}
+              <div className="min-h-0 flex-1 px-6 pb-6">
+                {loadingPreview ? (
+                  <div className="flex h-full items-center justify-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+                  </div>
+                ) : (
+                  <>
+                    {previewAttachment.mimeType.startsWith("image/") ? (
+                      <div className="relative h-full w-full">
+                        <Image
+                          src={previewAttachment.url}
+                          alt={previewAttachment.filename}
+                          fill
+                          className="object-contain"
+                          sizes="1280px"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex h-full items-center justify-center">
+                        <div className="text-center">
+                          <p className="text-muted-foreground mb-4">
+                            Aperçu non disponible pour ce type de fichier
+                          </p>
+                          <a
+                            href={previewAttachment.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline"
+                          >
+                            Télécharger le fichier
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </>
