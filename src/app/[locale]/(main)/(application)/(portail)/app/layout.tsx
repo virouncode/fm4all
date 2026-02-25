@@ -55,7 +55,7 @@ const AppLayout = async ({ children }: { children: React.ReactNode }) => {
             <header className="bg-background sticky top-0 z-10 border-b p-4">
               <h1 className="text-xl font-semibold">Portail Administrateur</h1>
             </header> */}
-            <div className="flex-1 overflow-y-auto">{children}</div>
+            <div className="flex-1 overflow-y-auto overscroll-none">{children}</div>
           </main>
         </div>
       </SidebarProvider>
