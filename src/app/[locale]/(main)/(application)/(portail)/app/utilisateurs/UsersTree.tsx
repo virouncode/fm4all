@@ -134,6 +134,14 @@ function TreeNode({
         <button
           onClick={() => onToggleExpand(node.id)}
           className="flex h-4 w-4 items-center justify-center"
+          aria-expanded={hasChildren ? expanded : undefined}
+          aria-label={
+            hasChildren
+              ? expanded
+                ? `Réduire ${node.prenom} ${node.nom}`
+                : `Développer ${node.prenom} ${node.nom}`
+              : undefined
+          }
         >
           {hasChildren ? (
             expanded ? (

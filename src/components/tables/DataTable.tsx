@@ -115,15 +115,23 @@ const DataTable = <T,>({
       return <EmptyRow colSpan={visibleColumnCount} />;
     }
     return table.getRowModel().rows.map((row, index) => (
-      <TableRow key={row.id}>
+      <TableRow
+        key={row.id}
+        tabIndex={onRowClick ? 0 : undefined}
+        onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+        onKeyDown={
+          onRowClick
+            ? (e) => {
+                if (e.key === "Enter") onRowClick(row.original);
+              }
+            : undefined
+        }
+        className={cn(onRowClick ? "cursor-pointer hover:bg-muted/60" : "")}
+      >
         {row.getVisibleCells().map((cell) => (
           <TableCell
             key={cell.id}
-            onClick={onRowClick ? () => onRowClick(row.original) : undefined}
-            className={cn(
-              index % 2 === 0 ? "bg-muted" : "",
-              onRowClick ? "hover:bg-muted/60 cursor-pointer" : "",
-            )}
+            className={cn(index % 2 === 0 ? "bg-muted" : "")}
           >
             {flexRender(cell.column.columnDef.cell, cell.getContext())}
           </TableCell>

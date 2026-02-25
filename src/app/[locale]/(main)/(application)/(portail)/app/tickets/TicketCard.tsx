@@ -41,6 +41,19 @@ export function TicketCard({
     <Card
       className="cursor-pointer transition-colors hover:bg-accent h-full flex flex-col"
       onClick={onClick}
+      tabIndex={onClick ? 0 : undefined}
+      role={onClick ? "button" : undefined}
+      aria-label={ticket.titre}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
     >
       <CardHeader className="pb-2 space-y-1.5 flex-shrink-0">
         {/* Titre et statut */}
