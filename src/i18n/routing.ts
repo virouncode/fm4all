@@ -405,6 +405,14 @@ export const routing = defineRouting({
       fr: "/app/services",
       en: "/app/services",
     },
+    "/app/prestations": {
+      fr: "/app/prestations",
+      en: "/app/prestations",
+    },
+    "/app/prestations/[prestationId]": {
+      fr: "/app/prestations/[prestationId]",
+      en: "/app/prestations/[prestationId]",
+    },
     "/app/planning": {
       fr: "/app/planning",
       en: "/app/planning",
