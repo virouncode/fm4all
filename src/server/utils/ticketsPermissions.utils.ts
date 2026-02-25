@@ -186,3 +186,311 @@ export async function canUserAssignTicket({
   // Peut assigner si responsable_site
   return effectiveRole === "responsable_site";
 }
+
+/**
+ * NOUVELLES PERMISSIONS - Ticket Details Page
+ * Basées sur la matrice de permissions 2026-02-24
+ */
+
+/**
+ * Vérifie si l'utilisateur peut éditer les champs de base du ticket
+ * (titre, description, type, priorite)
+ *
+ * Règles:
+ * - Plateforme: ✅ OUI
+ * - Client (demandeur_site ou responsable_site): ✅ OUI
+ * - Prestataire: ❌ NON
+ */
+export async function canUserEditTicketBasicFields({
+  userId,
+  ticketId,
+  entrepriseId,
+  tx,
+}: {
+  userId: string;
+  ticketId: string;
+  entrepriseId: string;
+  tx?: DbOrTransaction;
+}): Promise<boolean> {
+  // Vérifier si plateforme
+  const platformRole = await getUserPlateformeAdhesion(userId);
+  if (
+    platformRole?.role === "super_admin_plateforme" ||
+    platformRole?.role === "operateur_plateforme"
+  ) {
+    return true;
+  }
+
+  // Récupérer le ticket
+  const { getTicketById } = await import("@/server/queries/tickets.query");
+  const ticket = await getTicketById(ticketId);
+  if (!ticket) return false;
+
+  // Vérifier que c'est un client (pas un prestataire)
+  // Si l'entreprise courante est le proprietaire ou demandeur = client
+  if (
+    ticket.proprietaireEntrepriseId !== entrepriseId &&
+    ticket.demandeurEntrepriseId !== entrepriseId
+  ) {
+    return false; // Pas un client de ce ticket
+  }
+
+  // Récupérer rôle effectif sur le site
+  const effectiveRole = await resolveUserEffectiveRoleOnSite({
+    userId,
+    siteId: ticket.siteId,
+    entrepriseId,
+    tx,
+  });
+
+  if (!effectiveRole) return false;
+
+  const userLevel = ROLE_HIERARCHY[effectiveRole];
+  return userLevel >= 2; // demandeur_site (2) ou responsable_site (3)
+}
+
+/**
+ * Vérifie si l'utilisateur peut modifier assigneEntrepriseId
+ *
+ * Règles:
+ * - Plateforme: ✅ OUI (tous les prestataires)
+ * - Client (demandeur_site ou responsable_site): ✅ OUI (leurs prestataires uniquement)
+ * - Prestataire: ❌ NON
+ */
+export async function canUserEditAssigneEntrepriseId({
+  userId,
+  ticketId,
+  entrepriseId,
+  tx,
+}: {
+  userId: string;
+  ticketId: string;
+  entrepriseId: string;
+  tx?: DbOrTransaction;
+}): Promise<boolean> {
+  // Vérifier si plateforme
+  const platformRole = await getUserPlateformeAdhesion(userId);
+  if (
+    platformRole?.role === "super_admin_plateforme" ||
+    platformRole?.role === "operateur_plateforme"
+  ) {
+    return true;
+  }
+
+  // Récupérer le ticket
+  const { getTicketById } = await import("@/server/queries/tickets.query");
+  const ticket = await getTicketById(ticketId);
+  if (!ticket) return false;
+
+  // Vérifier que c'est un client
+  if (
+    ticket.proprietaireEntrepriseId !== entrepriseId &&
+    ticket.demandeurEntrepriseId !== entrepriseId
+  ) {
+    return false;
+  }
+
+  // Récupérer rôle effectif sur le site
+  const effectiveRole = await resolveUserEffectiveRoleOnSite({
+    userId,
+    siteId: ticket.siteId,
+    entrepriseId,
+    tx,
+  });
+
+  if (!effectiveRole) return false;
+
+  const userLevel = ROLE_HIERARCHY[effectiveRole];
+  return userLevel >= 2; // demandeur_site ou responsable_site
+}
+
+/**
+ * Vérifie si l'utilisateur peut modifier assigneUserId
+ *
+ * Règles:
+ * - UNIQUEMENT prestataire si le ticket est assigné à leur entreprise
+ * - Plateforme: ❌ NON
+ * - Client: ❌ NON
+ */
+export async function canUserEditAssigneUserId({
+  userId,
+  ticketId,
+  entrepriseId,
+  tx,
+}: {
+  userId: string;
+  ticketId: string;
+  entrepriseId: string;
+  tx?: DbOrTransaction;
+}): Promise<boolean> {
+  // Récupérer le ticket
+  const { getTicketById } = await import("@/server/queries/tickets.query");
+  const ticket = await getTicketById(ticketId);
+  if (!ticket) return false;
+
+  // Le ticket doit être assigné à l'entreprise courante
+  if (ticket.assigneEntrepriseId !== entrepriseId) {
+    return false;
+  }
+
+  // L'utilisateur doit avoir un rôle dans cette entreprise prestataire
+  const { getUserAdhesion } = await import(
+    "@/server/queries/userAdhesions.query"
+  );
+  const adhesion = await getUserAdhesion({ userId, entrepriseId });
+
+  return !!adhesion; // Si adhesion existe, il peut assigner
+}
+
+/**
+ * Vérifie si l'utilisateur peut modifier le statut du ticket
+ *
+ * Règles:
+ * - Plateforme: ✅ OUI (tous les statuts)
+ * - Client: ✅ OUI (tous les statuts, pour autonomie)
+ * - Prestataire: ✅ OUI (sous-ensemble: pris_en_charge, en_attente_client, a_valider, rejete)
+ */
+export async function canUserEditStatut({
+  userId,
+  ticketId,
+  entrepriseId,
+  tx,
+}: {
+  userId: string;
+  ticketId: string;
+  entrepriseId: string;
+  tx?: DbOrTransaction;
+}): Promise<boolean> {
+  // Vérifier si plateforme
+  const platformRole = await getUserPlateformeAdhesion(userId);
+  if (
+    platformRole?.role === "super_admin_plateforme" ||
+    platformRole?.role === "operateur_plateforme"
+  ) {
+    return true;
+  }
+
+  // Récupérer le ticket
+  const { getTicketById } = await import("@/server/queries/tickets.query");
+  const ticket = await getTicketById(ticketId);
+  if (!ticket) return false;
+
+  // Client (proprietaire ou demandeur)
+  if (
+    ticket.proprietaireEntrepriseId === entrepriseId ||
+    ticket.demandeurEntrepriseId === entrepriseId
+  ) {
+    // Vérifier rôle sur le site
+    const effectiveRole = await resolveUserEffectiveRoleOnSite({
+      userId,
+      siteId: ticket.siteId,
+      entrepriseId,
+      tx,
+    });
+
+    if (!effectiveRole) return false;
+
+    const userLevel = ROLE_HIERARCHY[effectiveRole];
+    return userLevel >= 2; // Client peut si demandeur_site ou +
+  }
+
+  // Prestataire (assigné)
+  if (ticket.assigneEntrepriseId === entrepriseId) {
+    const { getUserAdhesion } = await import(
+      "@/server/queries/userAdhesions.query"
+    );
+    const adhesion = await getUserAdhesion({ userId, entrepriseId });
+    return !!adhesion;
+  }
+
+  return false;
+}
+
+/**
+ * Retourne les statuts disponibles pour un utilisateur sur un ticket
+ *
+ * @param userId - ID de l'utilisateur
+ * @param ticketId - ID du ticket
+ * @param entrepriseId - ID de l'entreprise courante
+ * @returns Array des statuts possibles
+ */
+export async function getAvailableStatutsForUser({
+  userId,
+  ticketId,
+  entrepriseId,
+  tx,
+}: {
+  userId: string;
+  ticketId: string;
+  entrepriseId: string;
+  tx?: DbOrTransaction;
+}): Promise<string[]> {
+  // Vérifier si plateforme
+  const platformRole = await getUserPlateformeAdhesion(userId);
+  if (
+    platformRole?.role === "super_admin_plateforme" ||
+    platformRole?.role === "operateur_plateforme"
+  ) {
+    // Plateforme: tous les statuts
+    return [
+      "nouveau",
+      "pris_en_charge",
+      "en_attente_fournisseur",
+      "en_attente_client",
+      "a_valider",
+      "clos",
+      "annule",
+      "rejete",
+    ];
+  }
+
+  // Récupérer le ticket
+  const { getTicketById } = await import("@/server/queries/tickets.query");
+  const ticket = await getTicketById(ticketId);
+  if (!ticket) return [];
+
+  // Client
+  if (
+    ticket.proprietaireEntrepriseId === entrepriseId ||
+    ticket.demandeurEntrepriseId === entrepriseId
+  ) {
+    const effectiveRole = await resolveUserEffectiveRoleOnSite({
+      userId,
+      siteId: ticket.siteId,
+      entrepriseId,
+      tx,
+    });
+
+    if (!effectiveRole) return [];
+
+    const userLevel = ROLE_HIERARCHY[effectiveRole];
+    if (userLevel >= 2) {
+      // Client: tous les statuts (pour autonomie)
+      return [
+        "nouveau",
+        "pris_en_charge",
+        "en_attente_fournisseur",
+        "en_attente_client",
+        "a_valider",
+        "clos",
+        "annule",
+        "rejete",
+      ];
+    }
+  }
+
+  // Prestataire
+  if (ticket.assigneEntrepriseId === entrepriseId) {
+    const { getUserAdhesion } = await import(
+      "@/server/queries/userAdhesions.query"
+    );
+    const adhesion = await getUserAdhesion({ userId, entrepriseId });
+
+    if (adhesion) {
+      // Prestataire: sous-ensemble
+      return ["pris_en_charge", "en_attente_client", "a_valider", "rejete"];
+    }
+  }
+
+  return [];
+}

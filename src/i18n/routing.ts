@@ -393,6 +393,10 @@ export const routing = defineRouting({
       fr: "/app/tickets",
       en: "/app/tickets",
     },
+    "/app/tickets/[ticketId]": {
+      fr: "/app/tickets/[ticketId]",
+      en: "/app/tickets/[ticketId]",
+    },
     "/app/sites": {
       fr: "/app/sites",
       en: "/app/sites",

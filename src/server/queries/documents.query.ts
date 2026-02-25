@@ -1,7 +1,7 @@
 import "server-only";
 
 import { db } from "@/db";
-import { documents } from "@/db/schema";
+import { documents, documentsLinks } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function getDocumentById(documentId: string) {
@@ -20,4 +20,24 @@ export async function getDocumentById(documentId: string) {
     .limit(1);
 
   return row ?? null;
+}
+
+export async function getDocumentsByTicketId(ticketId: string) {
+  const rows = await db
+    .select({
+      id: documents.id,
+      proprietaireEntrepriseId: documents.proprietaireEntrepriseId,
+      storageProvider: documents.storageProvider,
+      storageKey: documents.storageKey,
+      filename: documents.filename,
+      mimeType: documents.mimeType,
+      sizeBytes: documents.sizeBytes,
+      createdAt: documents.createdAt,
+    })
+    .from(documents)
+    .innerJoin(documentsLinks, eq(documentsLinks.documentId, documents.id))
+    .where(eq(documentsLinks.ticketId, ticketId))
+    .orderBy(documents.createdAt);
+
+  return rows;
 }

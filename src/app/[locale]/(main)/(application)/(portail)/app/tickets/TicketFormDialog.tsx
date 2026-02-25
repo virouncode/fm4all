@@ -216,6 +216,8 @@ export function TicketFormDialog({
       siteId: data.siteId,
       entrepriseId: entreprise.id, // demandeurEntrepriseId
       proprietaireEntrepriseId: proprietaireId,
+      assigneEntrepriseId: data.assigneEntrepriseId || undefined, // Transformer "" en undefined
+      attachments: data.attachments, // Pièces jointes
     });
 
     if (result?.serverError) {

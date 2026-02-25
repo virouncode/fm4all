@@ -1130,6 +1130,267 @@ pnpm db:generate    # Generate migrations
 
 ---
 
+## Checklists & Patterns UX
+
+### Checklist Implémentation Formulaire
+
+**TOUJOURS vérifier ces points AVANT de considérer qu'un formulaire est terminé :**
+
+#### 1. Logique Métier & État Initial
+- [ ] **DefaultValues cohérents avec le contexte**
+  - Exemple: Posture plateforme → `proprietaireEntrepriseId: ""` (vide pour forcer sélection)
+  - Exemple: Posture client → `proprietaireEntrepriseId: entreprise.id` (auto-rempli)
+- [ ] **Reset form prend en compte TOUS les états** (posture, entreprise, etc.)
+- [ ] **Visualiser mentalement le parcours utilisateur complet** avant de coder
+
+#### 2. Dépendances entre Champs
+- [ ] **Champs disabled selon dépendances logiques**
+  - Exemple: Select sites disabled si `!selectedClientId` (pas de client sélectionné)
+  - Pattern: `disabled={!prerequisiteField || isLoading || items.length === 0}`
+- [ ] **Rechargement dynamique des données** quand un champ parent change
+  - Exemple: Changement de client → recharger les sites de ce client
+
+#### 3. Validation & Messages d'Erreur
+- [ ] **Messages d'erreur en français, clairs et contextuels**
+  - ❌ Mauvais: `"Invalid UUID"`
+  - ✅ Bon: `"Client obligatoire"`
+- [ ] **Messages alignés avec la validation réelle**
+  - Si validation dit "entre 50 et 3000", le message doit dire "entre 50 et 3000" (pas "entre 1 et 1000000")
+- [ ] **Required fields avec `requiredMark` visible**
+
+#### 4. UX & Accessibilité
+- [ ] **Placeholders explicites et utiles**
+  - ✅ Bon: `"Sélectionnez un client"`
+  - ❌ Mauvais: `"Choisir"` (trop vague)
+- [ ] **Labels clairs et en français**
+- [ ] **États de chargement visibles** (skeleton, spinner, disabled pendant loading)
+- [ ] **Footer sticky si contenu scrollable** (DialogFooter avec sticky, contenu avec overflow-y-auto)
+
+#### 5. Technique
+- [ ] **TypeScript vérifié** : `npx tsc --noEmit` SANS erreurs
+- [ ] **Imports corrects** (pas d'imports inutilisés)
+- [ ] **Pas de `console.log` en production**
+- [ ] **Gestion d'erreur avec toast** (success, error, loading)
+
+#### 6. Test Mental (CRITIQUE)
+- [ ] **"Que voit l'utilisateur quand il ouvre le formulaire ?"**
+  - Champs pré-remplis corrects ?
+  - Champs disabled corrects ?
+- [ ] **"Que se passe-t-il si l'utilisateur change le champ X ?"**
+  - Les champs dépendants se mettent à jour ?
+  - Les validations s'adaptent ?
+- [ ] **"Que se passe-t-il si l'utilisateur soumet sans remplir ?"**
+  - Messages d'erreur corrects ?
+  - Focus sur le bon champ ?
+
+### Pattern: Formulaire avec Posture Multi-Rôles
+
+**Contexte**: Un formulaire qui se comporte différemment selon la posture (client/plateforme/prestataire)
+
+**Pattern à suivre**:
+
+```typescript
+export function MyFormDialog({ open, onOpenChange }: Props) {
+  const posture = useAppStore((state) => state.postureActive);
+  const entreprise = useAppStore((state) => state.entreprise);
+
+  // ✅ DefaultValues adaptés à la posture
+  const form = useForm<MyFormType>({
+    resolver: zodResolver(mySchema),
+    defaultValues: {
+      field1: "",
+      // Pattern: Conditionnel selon posture
+      proprietaireEntrepriseId: posture === "plateforme" ? "" : (entreprise?.id || ""),
+    },
+  });
+
+  // ✅ Reset form avec logique posture
+  useEffect(() => {
+    if (open) {
+      const defaultProprietaireId = posture === "plateforme" ? "" : (entreprise?.id || "");
+      form.reset({
+        field1: "",
+        proprietaireEntrepriseId: defaultProprietaireId,
+      });
+    }
+  }, [open, posture, entreprise?.id]);
+
+  // ✅ Champs conditionnels selon posture
+  return (
+    <Form {...form}>
+      {posture === "plateforme" && (
+        <RhfControlledSelect
+          name="proprietaireEntrepriseId"
+          label="Client"
+          requiredMark
+          // Pattern: Forcer la sélection avec placeholder
+          placeholder="Sélectionnez un client"
+        />
+      )}
+
+      {/* Pattern: Champ dépendant disabled si parent vide */}
+      <RhfControlledSelect
+        name="siteId"
+        label="Site"
+        requiredMark
+        disabled={!selectedClientId || loadingSites || sites.length === 0}
+      />
+    </Form>
+  );
+}
+```
+
+### Pattern: Champs Dépendants Dynamiques
+
+**Exemple**: Client → Sites → Validation
+
+```typescript
+const [selectedClientId, setSelectedClientId] = useState<string>(
+  posture === "plateforme" ? "" : (entreprise?.id || "")
+);
+const [sites, setSites] = useState<Array<{ id: string; nom: string }>>([]);
+const [loadingSites, setLoadingSites] = useState(false);
+
+// ✅ Charger sites quand client change
+useEffect(() => {
+  if (!selectedClientId || !open) return;
+
+  async function loadSites() {
+    setLoadingSites(true);
+    const result = await getAccessibleSitesAction({
+      entrepriseId: selectedClientId,
+    });
+    if (result?.data) {
+      setSites(result.data.map((s) => ({ id: s.id, nom: s.nom })));
+    }
+    setLoadingSites(false);
+  }
+
+  loadSites();
+}, [selectedClientId, open]);
+
+// ✅ Handler qui reset les dépendances
+const handleClientChange = (clientId: string) => {
+  setSelectedClientId(clientId);
+  form.setValue("proprietaireEntrepriseId", clientId);
+  form.setValue("siteId", ""); // ⚠️ CRITIQUE: Reset site quand client change
+};
+```
+
+### Pattern: Messages d'Erreur Zod Personnalisés
+
+```typescript
+// ❌ MAUVAIS: Message générique
+export const mySchema = z.object({
+  clientId: z.string().uuid().optional(),
+});
+
+// ✅ BON: Message contextuel
+export const mySchema = z.object({
+  clientId: z.string().uuid("Client obligatoire").optional(),
+});
+
+// ✅ BON: Validation avec message détaillé
+export const mySchema = z.object({
+  surface: z.string().refine(
+    (v) => !isNaN(Number(v)) && Number(v) >= 50 && Number(v) <= 3000,
+    "La surface doit être un nombre compris entre 50 et 3000 m²"
+  ),
+});
+```
+
+### Pattern: Dialog Scrollable avec Footer Sticky
+
+```typescript
+<DialogContent className="max-w-2xl max-h-[90vh] flex flex-col gap-0 p-0">
+  <DialogHeader className="px-6 pt-6 pb-4">
+    <DialogTitle>Titre</DialogTitle>
+  </DialogHeader>
+
+  <Form {...form}>
+    <form className="flex flex-col flex-1 overflow-hidden">
+      {/* Contenu scrollable */}
+      <div className="flex-1 overflow-y-auto px-6 space-y-4">
+        {/* Tous les champs ici */}
+      </div>
+
+      {/* Footer sticky */}
+      <DialogFooter className="sticky bottom-0 bg-background border-t pt-4 pb-6 px-6">
+        <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+          Annuler
+        </Button>
+        <Button type="submit">Enregistrer</Button>
+      </DialogFooter>
+    </form>
+  </Form>
+</DialogContent>
+```
+
+### Erreurs Communes à Éviter
+
+#### ❌ DefaultValues non adaptés au contexte
+```typescript
+// FAUX: Toujours la même valeur
+defaultValues: {
+  proprietaireEntrepriseId: entreprise?.id, // ❌ Pas bon pour posture plateforme
+}
+
+// CORRECT: Conditionnel selon posture
+defaultValues: {
+  proprietaireEntrepriseId: posture === "plateforme" ? "" : (entreprise?.id || ""),
+}
+```
+
+#### ❌ Champs dépendants non disabled
+```typescript
+// FAUX: Site toujours enabled même sans client
+<Select name="siteId" disabled={loadingSites} />
+
+// CORRECT: Site disabled si pas de client
+<Select name="siteId" disabled={!selectedClientId || loadingSites} />
+```
+
+#### ❌ Oublier de reset les champs dépendants
+```typescript
+// FAUX: Changer client sans reset site
+const handleClientChange = (clientId: string) => {
+  setSelectedClientId(clientId);
+  // ❌ Oubli de reset siteId → garde l'ancien site d'un autre client!
+};
+
+// CORRECT: Reset les dépendances
+const handleClientChange = (clientId: string) => {
+  setSelectedClientId(clientId);
+  form.setValue("siteId", ""); // ✅ Reset site
+};
+```
+
+#### ❌ Messages d'erreur techniques
+```typescript
+// FAUX: Message pour développeur
+z.string().uuid() // → "Invalid UUID"
+
+// CORRECT: Message pour utilisateur final
+z.string().uuid("Client obligatoire")
+```
+
+### Rappel: Visualisation du Flow Utilisateur
+
+**AVANT de coder un formulaire complexe, écrire le scénario** :
+
+1. **État initial** : Quels champs sont remplis ? Lesquels sont disabled ?
+2. **Action utilisateur** : L'utilisateur clique sur X → que se passe-t-il ?
+3. **Validation** : L'utilisateur submit vide → quels messages apparaissent ?
+4. **Success** : Le formulaire est validé → que voit l'utilisateur ?
+
+**Exemple concret (Création Ticket)** :
+- Posture plateforme ouvre le formulaire → Client vide, Sites disabled
+- Sélectionne client "Acme" → Sites se chargent, deviennent enabled
+- Soumet sans site → Message "Site obligatoire"
+- Soumet complet → Toast success, dialog se ferme
+
+---
+
 ## Audit & Corrections (2026-02-12)
 
 **Sections Auditées**: `/app/sites`, `/app/utilisateurs`, `/auth`
@@ -1149,7 +1410,7 @@ pnpm db:generate    # Generate migrations
 
 ---
 
-**Dernière mise à jour**: 2026-02-12
+**Dernière mise à jour**: 2026-02-24
 
 Pour toute question ou clarification, référez-vous d'abord aux implémentations de référence:
 - `/app/sites` - Gestion hiérarchique avec closure table

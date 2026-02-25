@@ -16,6 +16,19 @@ export const selectTicketSchema = createSelectSchema(tickets);
 export type SelectTicketType = z.infer<typeof selectTicketSchema>;
 
 // ═══════════════════════════════════════════════════════════════
+// ATTACHMENTS (pièces jointes)
+// ═══════════════════════════════════════════════════════════════
+
+export const attachmentSchema = z.object({
+  storageKey: z.string(),
+  filename: z.string(),
+  mimeType: z.string(),
+  sizeBytes: z.number(),
+  previewUrl: z.string().optional(),
+});
+export type AttachmentFormType = z.infer<typeof attachmentSchema>;
+
+// ═══════════════════════════════════════════════════════════════
 // TICKETS - INSERT FORM (formulaire client)
 // ═══════════════════════════════════════════════════════════════
 
@@ -25,6 +38,9 @@ export const insertTicketFormSchema = z.object({
   type: ticketTypeSchema,
   priorite: ticketPrioriteSchema,
   siteId: z.string().uuid("Site obligatoire"),
+  proprietaireEntrepriseId: z.string().uuid("Client obligatoire").optional(), // Pour posture plateforme
+  assigneEntrepriseId: z.string().uuid().optional(), // Prestataire (optionnel)
+  attachments: z.array(attachmentSchema).optional(), // Pièces jointes
 });
 export type InsertTicketFormType = z.infer<typeof insertTicketFormSchema>;
 
@@ -81,6 +97,63 @@ export const updateTicketToDbSchema = z.object({
   updatedById: z.string().uuid(),
 });
 export type UpdateTicketToDbType = z.infer<typeof updateTicketToDbSchema>;
+
+// ═══════════════════════════════════════════════════════════════
+// TICKETS - UPDATE FIELD-LEVEL SCHEMAS (permissions granulaires)
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Schema pour la mise à jour des champs de base
+ * Permissions: Plateforme OU Client (demandeur/responsable site)
+ */
+export const updateTicketBasicFieldsSchema = z.object({
+  ticketId: z.string().uuid(),
+  entrepriseId: z.string().uuid(),
+  titre: z.string().min(1, "Titre obligatoire").max(255).optional(),
+  description: z.string().nullable().optional(),
+  type: ticketTypeSchema.optional(),
+  priorite: ticketPrioriteSchema.optional(),
+});
+export type UpdateTicketBasicFieldsType = z.infer<
+  typeof updateTicketBasicFieldsSchema
+>;
+
+/**
+ * Schema pour la mise à jour du prestataire assigné
+ * Permissions: Plateforme OU Client (demandeur/responsable site)
+ */
+export const updateTicketAssigneEntrepriseSchema = z.object({
+  ticketId: z.string().uuid(),
+  entrepriseId: z.string().uuid(),
+  assigneEntrepriseId: z.string().uuid().nullable(),
+});
+export type UpdateTicketAssigneEntrepriseType = z.infer<
+  typeof updateTicketAssigneEntrepriseSchema
+>;
+
+/**
+ * Schema pour la mise à jour de l'utilisateur assigné
+ * Permissions: UNIQUEMENT Prestataire (si ticket assigné à son entreprise)
+ */
+export const updateTicketAssigneUserSchema = z.object({
+  ticketId: z.string().uuid(),
+  entrepriseId: z.string().uuid(),
+  assigneUserId: z.string().uuid().nullable(),
+});
+export type UpdateTicketAssigneUserType = z.infer<
+  typeof updateTicketAssigneUserSchema
+>;
+
+/**
+ * Schema pour la mise à jour du statut
+ * Permissions: Variables selon posture (voir getAvailableStatutsForUser)
+ */
+export const updateTicketStatutSchema = z.object({
+  ticketId: z.string().uuid(),
+  entrepriseId: z.string().uuid(),
+  statut: ticketStatutSchema,
+});
+export type UpdateTicketStatutType = z.infer<typeof updateTicketStatutSchema>;
 
 // ═══════════════════════════════════════════════════════════════
 // TICKET MESSAGES - SELECT (depuis DB)

@@ -1,0 +1,196 @@
+import { notFound } from "next/navigation";
+import { redirect } from "@/i18n/navigation";
+import { getSession } from "@/server/auth/get-session";
+import { getTicketById } from "@/server/queries/tickets.query";
+import { getUserAdhesion } from "@/server/queries/userAdhesions.query";
+import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
+import { canUserAccessTicket } from "@/server/utils/ticketsPerimetre.utils";
+import {
+  canUserEditTicketBasicFields,
+  canUserEditAssigneEntrepriseId,
+  canUserEditAssigneUserId,
+  canUserEditStatut,
+  getAvailableStatutsForUser,
+} from "@/server/utils/ticketsPermissions.utils";
+import { getClientPrestataires } from "@/server/queries/clientServiceExecutions.query";
+import { getEntreprisesPrestataires, getEntrepriseById } from "@/server/queries/entreprises.query";
+import { getUsersByEntrepriseId } from "@/server/queries/users.query";
+import { getSiteById } from "@/server/queries/sites.query";
+import { getDocumentsByTicketId } from "@/server/queries/documents.query";
+import { TicketDetailsClient } from "./TicketDetailsClient";
+
+export default async function TicketDetailsPage({
+  params,
+}: {
+  params: Promise<{ ticketId: string }>;
+}) {
+  const resolvedParams = await params;
+  const { ticketId } = resolvedParams;
+
+  // 1. Auth
+  const session = await getSession();
+  if (!session || !session.user) {
+    redirect("/auth/signin" as any);
+  }
+
+  const currentUser = session!.user; // Non-null après check
+
+  // 2. Récupérer le ticket
+  const ticket = await getTicketById(ticketId);
+
+  if (!ticket) {
+    notFound();
+  }
+
+  // 3. Déterminer l'entreprise courante et la posture
+  // On vérifie dans l'ordre: proprietaire, demandeur, assigné
+  let entrepriseId: string | null = null;
+  let posture: "client" | "prestataire" | "plateforme" = "client";
+
+  // Check si plateforme
+  const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+  if (platformRole?.role) {
+    posture = "plateforme";
+    entrepriseId = ticket.proprietaireEntrepriseId;
+  } else {
+    // Vérifier adhesion proprietaire
+    const proprietaireAdhesion = await getUserAdhesion({
+      userId: currentUser.id,
+      entrepriseId: ticket.proprietaireEntrepriseId,
+    });
+
+    if (proprietaireAdhesion) {
+      entrepriseId = ticket.proprietaireEntrepriseId;
+      posture = "client";
+    } else if (ticket.demandeurEntrepriseId) {
+      // Vérifier adhesion demandeur
+      const demandeurAdhesion = await getUserAdhesion({
+        userId: currentUser.id,
+        entrepriseId: ticket.demandeurEntrepriseId,
+      });
+
+      if (demandeurAdhesion) {
+        entrepriseId = ticket.demandeurEntrepriseId;
+        posture = "client";
+      } else if (ticket.assigneEntrepriseId) {
+        // Vérifier adhesion prestataire
+        const prestataireAdhesion = await getUserAdhesion({
+          userId: currentUser.id,
+          entrepriseId: ticket.assigneEntrepriseId,
+        });
+
+        if (prestataireAdhesion) {
+          entrepriseId = ticket.assigneEntrepriseId;
+          posture = "prestataire";
+        }
+      }
+    }
+  }
+
+  if (!entrepriseId) {
+    notFound();
+  }
+
+  // 4. Vérifier permission d'accès au ticket (périmètre site)
+  const hasAccess = await canUserAccessTicket({
+    userId: currentUser.id,
+    ticketId,
+    entrepriseId,
+  });
+
+  if (!hasAccess) {
+    notFound();
+  }
+
+  // 5. Calculer les permissions field-level
+  const canEditBasicFields = await canUserEditTicketBasicFields({
+    userId: currentUser.id,
+    ticketId,
+    entrepriseId,
+  });
+
+  const canEditAssigneEntreprise = await canUserEditAssigneEntrepriseId({
+    userId: currentUser.id,
+    ticketId,
+    entrepriseId,
+  });
+
+  const canEditAssigneUser = await canUserEditAssigneUserId({
+    userId: currentUser.id,
+    ticketId,
+    entrepriseId,
+  });
+
+  const canEditStatut = await canUserEditStatut({
+    userId: currentUser.id,
+    ticketId,
+    entrepriseId,
+  });
+
+  const availableStatuts = await getAvailableStatutsForUser({
+    userId: currentUser.id,
+    ticketId,
+    entrepriseId,
+  });
+
+  // 6. Charger les prestataires disponibles (selon posture)
+  let availablePrestataires: Array<{ id: string; nom: string }> = [];
+
+  if (canEditAssigneEntreprise) {
+    if (posture === "plateforme") {
+      availablePrestataires = await getEntreprisesPrestataires();
+    } else if (posture === "client") {
+      availablePrestataires = await getClientPrestataires(entrepriseId);
+    }
+  }
+
+  // 7. Charger les utilisateurs du prestataire (si éditable)
+  let availableUsers: Array<{ id: string; prenom: string; nom: string }> = [];
+
+  if (canEditAssigneUser && ticket.assigneEntrepriseId) {
+    const users = await getUsersByEntrepriseId(ticket.assigneEntrepriseId);
+
+    availableUsers = users.map((u: any) => ({
+      id: u.id,
+      prenom: u.prenom,
+      nom: u.nom,
+    }));
+  }
+
+  // 8. Charger le site et les entreprises pour afficher les noms
+  const site = await getSiteById(ticket.siteId);
+
+  const proprietaireEntreprise = await getEntrepriseById(ticket.proprietaireEntrepriseId);
+  const demandeurEntreprise = ticket.demandeurEntrepriseId
+    ? await getEntrepriseById(ticket.demandeurEntrepriseId)
+    : null;
+  const assigneEntreprise = ticket.assigneEntrepriseId
+    ? await getEntrepriseById(ticket.assigneEntrepriseId)
+    : null;
+
+  // 9. Charger les pièces jointes du ticket
+  const attachments = await getDocumentsByTicketId(ticketId);
+
+  // 10. Passer à TicketDetailsClient
+  return (
+    <TicketDetailsClient
+      ticket={ticket}
+      entrepriseId={entrepriseId}
+      posture={posture}
+      permissions={{
+        canEditBasicFields,
+        canEditAssigneEntreprise,
+        canEditAssigneUser,
+        canEditStatut,
+      }}
+      availableStatuts={availableStatuts}
+      availablePrestataires={availablePrestataires}
+      availableUsers={availableUsers}
+      site={site}
+      proprietaireEntreprise={proprietaireEntreprise}
+      demandeurEntreprise={demandeurEntreprise}
+      assigneEntreprise={assigneEntreprise}
+      attachments={attachments}
+    />
+  );
+}

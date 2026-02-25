@@ -4,6 +4,7 @@ import { actionClient } from "@/lib/action/safe-actions";
 import { errors } from "@/lib/action/errors";
 import { db } from "@/db";
 import { tickets, ticketMessages } from "@/db/schema/tickets";
+import { documents, documentsLinks } from "@/db/schema/documents";
 import {
   selectTicketSchema,
   insertTicketFormSchema,
@@ -13,6 +14,10 @@ import {
   assignTicketSchema,
   insertTicketMessageFormSchema,
   selectTicketMessageSchema,
+  updateTicketBasicFieldsSchema,
+  updateTicketAssigneEntrepriseSchema,
+  updateTicketAssigneUserSchema,
+  updateTicketStatutSchema,
 } from "@/zod-schemas/ticket.schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -35,9 +40,15 @@ import {
   canUserCreateTicket,
   canUserUpdateTicket,
   canUserAssignTicket,
+  canUserEditTicketBasicFields,
+  canUserEditAssigneEntrepriseId,
+  canUserEditAssigneUserId,
+  canUserEditStatut,
+  getAvailableStatutsForUser,
 } from "@/server/utils/ticketsPermissions.utils";
 import { isStatusTransitionAllowed } from "@/server/utils/ticketsTransitions.utils";
 import { canUserWriteVisibility } from "@/server/utils/ticketsMessages.utils";
+import { promoteS3Key } from "@/server/s3/s3";
 
 // ═══════════════════════════════════════════════════════════════
 // GET TICKETS (avec filtres et pagination)
@@ -209,17 +220,23 @@ export const insertTicketAction = actionClient
       );
     }
 
-    // Déterminer demandeurEntrepriseId (si plateforme → FM4ALL, sinon null)
+    // Déterminer posture
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
-    let demandeurEntrepriseId: string | null = null;
+    const isPlatform = !!platformRole?.role;
 
-    if (platformRole?.role) {
-      // C'est la plateforme FM4ALL qui crée le ticket
-      demandeurEntrepriseId = parsedInput.entrepriseId;
-    }
+    // demandeurEntrepriseId = TOUJOURS l'entreprise courante
+    const demandeurEntrepriseId = parsedInput.entrepriseId;
 
-    // Transaction: INSERT ticket
+    // proprietaireEntrepriseId selon posture:
+    // - Client: auto = entreprise courante
+    // - Plateforme: choisi dans le Select
+    const proprietaireEntrepriseId = isPlatform
+      ? parsedInput.proprietaireEntrepriseId || parsedInput.entrepriseId
+      : parsedInput.entrepriseId;
+
+    // Transaction: INSERT ticket + attachments
     const insertedTicket = await db.transaction(async (tx) => {
+      // 1. INSERT ticket
       const [ticket] = await tx
         .insert(tickets)
         .values({
@@ -228,13 +245,52 @@ export const insertTicketAction = actionClient
           type: parsedInput.type,
           priorite: parsedInput.priorite,
           siteId: parsedInput.siteId,
-          proprietaireEntrepriseId: parsedInput.entrepriseId,
+          proprietaireEntrepriseId,
           demandeurEntrepriseId,
+          assigneEntrepriseId: parsedInput.assigneEntrepriseId || null,
           statut: "nouveau",
           createdById: currentUser.id,
           updatedById: currentUser.id,
         })
         .returning();
+
+      // 2. Traiter les pièces jointes si présentes
+      if (parsedInput.attachments && parsedInput.attachments.length > 0) {
+        for (const attachment of parsedInput.attachments) {
+          // Skip si pas de storageKey (fichier non uploadé)
+          if (!attachment.storageKey) continue;
+
+          // Promouvoir le fichier de /temp à /documents
+          const promotedKey = await promoteS3Key({
+            tempKey: attachment.storageKey,
+          });
+
+          // INSERT dans documents
+          const [document] = await tx
+            .insert(documents)
+            .values({
+              proprietaireEntrepriseId,
+              categorie: "piece_jointe",
+              storageProvider: "s3",
+              storageKey: promotedKey,
+              filename: attachment.filename,
+              mimeType: attachment.mimeType,
+              sizeBytes: attachment.sizeBytes,
+              createdById: currentUser.id,
+            })
+            .returning();
+
+          // INSERT lien dans documentsLinks
+          await tx.insert(documentsLinks).values({
+            documentId: document.id,
+            proprietaireEntrepriseId,
+            ticketId: ticket.id,
+            visibilite: "public",
+            createdById: currentUser.id,
+            updatedById: currentUser.id,
+          });
+        }
+      }
 
       return ticket;
     });
@@ -661,4 +717,315 @@ export const getTicketMessagesAction = actionClient
     });
 
     return { messages };
+  });
+
+// ═══════════════════════════════════════════════════════════════
+// FIELD-LEVEL UPDATE ACTIONS (Ticket Details Page)
+// Basées sur la matrice de permissions 2026-02-24
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Met à jour les champs de base du ticket (titre, description, type, priorite)
+ * Permissions: Plateforme OU Client (demandeur/responsable site)
+ */
+export const updateTicketBasicFieldsAction = actionClient
+  .metadata({ actionName: "updateTicketBasicFieldsAction" })
+  .inputSchema(
+    updateTicketBasicFieldsSchema,
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    }
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+
+    if (!currentUser) {
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    }
+
+    // Vérifier accès entreprise
+    const adhesion = await getUserAdhesion({
+      userId: currentUser.id,
+      entrepriseId: parsedInput.entrepriseId,
+    });
+
+    if (!adhesion) {
+      throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+    }
+
+    // Vérifier permission
+    const canEdit = await canUserEditTicketBasicFields({
+      userId: currentUser.id,
+      ticketId: parsedInput.ticketId,
+      entrepriseId: parsedInput.entrepriseId,
+    });
+
+    if (!canEdit) {
+      throw errors.forbidden(
+        "Vous n'avez pas la permission de modifier ces champs. Seuls les clients avec rôle demandeur_site ou supérieur peuvent modifier le titre, description, type et priorité."
+      );
+    }
+
+    // Préparer les updates
+    const updates: Record<string, unknown> = {
+      lastActivityAt: new Date(),
+      updatedById: currentUser.id,
+    };
+
+    if (parsedInput.titre) updates.titre = parsedInput.titre;
+    if (parsedInput.description !== undefined)
+      updates.description = parsedInput.description;
+    if (parsedInput.type) updates.type = parsedInput.type;
+    if (parsedInput.priorite) updates.priorite = parsedInput.priorite;
+
+    // UPDATE
+    const [updatedTicket] = await db
+      .update(tickets)
+      .set(updates)
+      .where(eq(tickets.id, parsedInput.ticketId))
+      .returning();
+
+    const parsedTicket = selectTicketSchema.parse(updatedTicket);
+    return { ticket: parsedTicket };
+  });
+
+/**
+ * Met à jour le prestataire assigné (assigneEntrepriseId)
+ * Permissions: Plateforme OU Client (demandeur/responsable site)
+ */
+export const updateTicketAssigneEntrepriseAction = actionClient
+  .metadata({ actionName: "updateTicketAssigneEntrepriseAction" })
+  .inputSchema(
+    updateTicketAssigneEntrepriseSchema,
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    }
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+
+    if (!currentUser) {
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    }
+
+    // Vérifier accès entreprise
+    const adhesion = await getUserAdhesion({
+      userId: currentUser.id,
+      entrepriseId: parsedInput.entrepriseId,
+    });
+
+    if (!adhesion) {
+      throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+    }
+
+    // Vérifier permission
+    const canEdit = await canUserEditAssigneEntrepriseId({
+      userId: currentUser.id,
+      ticketId: parsedInput.ticketId,
+      entrepriseId: parsedInput.entrepriseId,
+    });
+
+    if (!canEdit) {
+      throw errors.forbidden(
+        "Vous n'avez pas la permission de modifier le prestataire assigné."
+      );
+    }
+
+    // Si client, vérifier que le prestataire est dans sa liste
+    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const isPlatform = !!platformRole?.role;
+
+    if (!isPlatform && parsedInput.assigneEntrepriseId) {
+      const { getClientPrestataires } = await import(
+        "@/server/queries/clientServiceExecutions.query"
+      );
+      const prestataires = await getClientPrestataires(
+        parsedInput.entrepriseId
+      );
+
+      const isAllowed = prestataires.some(
+        (p) => p.id === parsedInput.assigneEntrepriseId
+      );
+
+      if (!isAllowed) {
+        throw errors.forbidden(
+          "Ce prestataire n'est pas dans votre liste de prestataires autorisés."
+        );
+      }
+    }
+
+    // Si on change de prestataire, reset assigneUserId
+    const updates: Record<string, unknown> = {
+      assigneEntrepriseId: parsedInput.assigneEntrepriseId,
+      assigneUserId: null, // Reset user assignment
+      lastActivityAt: new Date(),
+      updatedById: currentUser.id,
+    };
+
+    // UPDATE
+    const [updatedTicket] = await db
+      .update(tickets)
+      .set(updates)
+      .where(eq(tickets.id, parsedInput.ticketId))
+      .returning();
+
+    const parsedTicket = selectTicketSchema.parse(updatedTicket);
+    return { ticket: parsedTicket };
+  });
+
+/**
+ * Met à jour l'utilisateur assigné (assigneUserId)
+ * Permissions: UNIQUEMENT Prestataire (si ticket assigné à son entreprise)
+ */
+export const updateTicketAssigneUserAction = actionClient
+  .metadata({ actionName: "updateTicketAssigneUserAction" })
+  .inputSchema(
+    updateTicketAssigneUserSchema,
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    }
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+
+    if (!currentUser) {
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    }
+
+    // Vérifier accès entreprise
+    const adhesion = await getUserAdhesion({
+      userId: currentUser.id,
+      entrepriseId: parsedInput.entrepriseId,
+    });
+
+    if (!adhesion) {
+      throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+    }
+
+    // Vérifier permission
+    const canEdit = await canUserEditAssigneUserId({
+      userId: currentUser.id,
+      ticketId: parsedInput.ticketId,
+      entrepriseId: parsedInput.entrepriseId,
+    });
+
+    if (!canEdit) {
+      throw errors.forbidden(
+        "Seul le prestataire assigné peut modifier l'utilisateur assigné."
+      );
+    }
+
+    // UPDATE
+    const [updatedTicket] = await db
+      .update(tickets)
+      .set({
+        assigneUserId: parsedInput.assigneUserId,
+        lastActivityAt: new Date(),
+        updatedById: currentUser.id,
+      })
+      .where(eq(tickets.id, parsedInput.ticketId))
+      .returning();
+
+    const parsedTicket = selectTicketSchema.parse(updatedTicket);
+    return { ticket: parsedTicket };
+  });
+
+/**
+ * Met à jour le statut du ticket
+ * Permissions: Variables selon posture (voir getAvailableStatutsForUser)
+ */
+export const updateTicketStatutAction = actionClient
+  .metadata({ actionName: "updateTicketStatutAction" })
+  .inputSchema(
+    updateTicketStatutSchema,
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    }
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+
+    if (!currentUser) {
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    }
+
+    // Vérifier accès entreprise
+    const adhesion = await getUserAdhesion({
+      userId: currentUser.id,
+      entrepriseId: parsedInput.entrepriseId,
+    });
+
+    if (!adhesion) {
+      throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+    }
+
+    // Vérifier permission générale
+    const canEdit = await canUserEditStatut({
+      userId: currentUser.id,
+      ticketId: parsedInput.ticketId,
+      entrepriseId: parsedInput.entrepriseId,
+    });
+
+    if (!canEdit) {
+      throw errors.forbidden(
+        "Vous n'avez pas la permission de modifier le statut du ticket."
+      );
+    }
+
+    // Vérifier que le statut demandé est autorisé pour cet utilisateur
+    const availableStatuts = await getAvailableStatutsForUser({
+      userId: currentUser.id,
+      ticketId: parsedInput.ticketId,
+      entrepriseId: parsedInput.entrepriseId,
+    });
+
+    if (!availableStatuts.includes(parsedInput.statut)) {
+      throw errors.forbidden(
+        `Le statut "${parsedInput.statut}" n'est pas autorisé pour votre rôle.`
+      );
+    }
+
+    // Calculer timestamps
+    const now = new Date();
+    const updates: Record<string, unknown> = {
+      statut: parsedInput.statut,
+      lastActivityAt: now,
+      updatedById: currentUser.id,
+    };
+
+    // Récupérer ticket pour vérifier resolvedAt
+    const ticket = await getTicketById(parsedInput.ticketId);
+    if (!ticket) {
+      throw errors.notFound("Ticket");
+    }
+
+    if (parsedInput.statut === "a_valider" && !ticket.resolvedAt) {
+      updates.resolvedAt = now;
+    }
+
+    if (
+      parsedInput.statut === "clos" ||
+      parsedInput.statut === "annule" ||
+      parsedInput.statut === "rejete"
+    ) {
+      updates.closedAt = now;
+    }
+
+    // UPDATE
+    const [updatedTicket] = await db
+      .update(tickets)
+      .set(updates)
+      .where(eq(tickets.id, parsedInput.ticketId))
+      .returning();
+
+    const parsedTicket = selectTicketSchema.parse(updatedTicket);
+    return { ticket: parsedTicket };
   });

@@ -66,6 +66,11 @@ function pluralizeCategorie(
     return "comptes_rendus";
   }
 
+  // Cas spécial : piece_jointe → pieces_jointes (double pluriel)
+  if (categorie === "piece_jointe") {
+    return "pieces_jointes";
+  }
+
   // Mots composés avec underscore : pluriel sur le premier mot uniquement
   // Ex: bon_commande → bons_commande, rapport_intervention → rapports_intervention
   if (categorie.includes("_")) {
