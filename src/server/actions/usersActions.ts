@@ -38,6 +38,7 @@ import { auth } from "@/server/auth/auth";
 import { getDocumentById } from "@/server/queries/documents.query";
 import crypto from "crypto";
 import { deleteS3Object, promoteS3Key } from "../s3/s3";
+import { normalizeForSubmit } from "@/zod-helpers/normalize";
 
 // ==================== GET USERS ====================
 
@@ -186,10 +187,6 @@ export const insertUserAction = actionClient
     const {
       entrepriseId,
       parentId,
-      prenom,
-      nom,
-      email,
-      phone,
       avatar,
       roleAdhesion,
     } = parsedInput;
@@ -295,20 +292,25 @@ export const insertUserAction = actionClient
       }
     }
 
-    // 2. Créer l'utilisateur via better-auth avec un mot de passe temporaire
+    // 2. Normaliser les données avant insertion (transforme "" → null)
+    const normalized = normalizeForSubmit(parsedInput, {
+      optionalStrings: ["phone"] as const,
+    });
+
+    // 3. Créer l'utilisateur via better-auth avec un mot de passe temporaire
     const tempPassword = crypto.randomUUID(); // Mot de passe aléatoire fort
 
     let authResult;
     try {
       authResult = await auth.api.signUpEmail({
         body: {
-          email,
+          email: normalized.email, // Déjà nettoyé (lower) par schema
           password: tempPassword, // Jamais communiqué à l'utilisateur
           parentId: parentId ?? null,
-          name: `${prenom} ${nom}`,
-          prenom,
-          nom,
-          phone: phone ?? null,
+          name: `${normalized.prenom} ${normalized.nom}`, // Déjà nettoyés (capitalizeWords) par schema
+          prenom: normalized.prenom,
+          nom: normalized.nom,
+          phone: normalized.phone, // "" → null par normalizeForSubmit
           avatarId: avatarDocumentId ?? null,
           createdById: currentUser.id,
           updatedById: currentUser.id,
@@ -328,7 +330,7 @@ export const insertUserAction = actionClient
         errorMessage.toLowerCase().includes("user already exists")
       ) {
         throw errors.conflict(
-          `Un utilisateur avec l'email "${email}" existe déjà.`,
+          `Un utilisateur avec l'email "${normalized.email}" existe déjà.`,
         );
       }
 
@@ -369,7 +371,10 @@ export const insertUserAction = actionClient
     // Better Auth détectera que emailVerified = false et enverra l'email d'activation
     const resetHeaders = await headers();
     await auth.api.requestPasswordReset({
-      body: { email, redirectTo: `${process.env.APP_URL}/auth/reset-password` },
+      body: {
+        email: normalized.email,
+        redirectTo: `${process.env.APP_URL}/auth/reset-password`,
+      },
       headers: resetHeaders, // Passer les headers pour la session
     });
 
@@ -634,22 +639,27 @@ export const updateUserAction = actionClient
       // Cas 3: avatar === undefined → champ non touché, avatarDocumentId reste undefined
 
       // 2. Compute name si prenom/nom changent
+      // Normaliser les données avant update (transforme "" → null)
+      const normalized = normalizeForSubmit(parsedInput, {
+        optionalStrings: ["phone"] as const,
+      });
+
       let name: string | undefined = undefined;
-      if (prenom || nom) {
+      if (normalized.prenom || normalized.nom) {
         // Réutiliser oldUser déjà récupéré (optimisation)
-        const newPrenom = prenom ?? oldUser?.prenom ?? "";
-        const newNom = nom ?? oldUser?.nom ?? "";
+        const newPrenom = normalized.prenom ?? oldUser?.prenom ?? "";
+        const newNom = normalized.nom ?? oldUser?.nom ?? "";
         name = `${newPrenom} ${newNom}`;
       }
 
       // 3. Update user
       const payload = updateUserToDbSchema.parse({
-        prenom,
-        nom,
+        prenom: normalized.prenom, // Déjà nettoyé (capitalizeWords) par schema
+        nom: normalized.nom, // Déjà nettoyé (capitalizeWords) par schema
         name,
         // ⚠️ NE PAS inclure email si changé (déjà géré par better-auth)
-        email: emailChanged ? undefined : email,
-        phone: phone === undefined ? undefined : phone || null,
+        email: emailChanged ? undefined : normalized.email,
+        phone: normalized.phone, // "" → null par normalizeForSubmit
         avatarId: avatarDocumentId,
         updatedById: currentUser.id,
       });
