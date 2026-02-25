@@ -194,6 +194,7 @@ function TreeNode({
               e.stopPropagation();
               onCreateChild(node.id);
             }}
+            aria-label="Ajouter un subordonné"
             title="Ajouter un subordonné"
           >
             <Plus className="h-3 w-3" />

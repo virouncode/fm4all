@@ -724,9 +724,10 @@ export function TicketDetailsClient({
                               e.stopPropagation();
                               handleDownload(url, attachment.filename);
                             }}
+                            aria-label={`Télécharger ${attachment.filename}`}
                             className="text-primary hover:text-primary/80 flex items-center gap-1 transition-colors"
                           >
-                            <Download className="h-4 w-4" />
+                            <Download className="h-4 w-4" aria-hidden="true" />
                           </button>
                         )}
                       </div>

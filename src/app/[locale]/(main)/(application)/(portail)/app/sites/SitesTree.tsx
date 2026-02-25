@@ -150,6 +150,7 @@ function TreeNode({
               e.stopPropagation();
               onCreateChild(node.id);
             }}
+            aria-label="Ajouter un sous-site"
             title="Ajouter un sous-site"
           >
             <Plus className="h-3 w-3" />
