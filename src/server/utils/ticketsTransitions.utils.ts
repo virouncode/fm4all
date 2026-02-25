@@ -9,9 +9,9 @@ import { TicketStatutType } from "@/zod-schemas/enums";
  *
  * Règles métier:
  * - nouveau → pris_en_charge: responsable/plateforme
- * - pris_en_charge → en_attente_fournisseur: responsable/plateforme
- * - en_attente_fournisseur → en_attente_client: intervenant assigné/plateforme
- * - en_attente_fournisseur → a_valider: intervenant assigné/plateforme
+ * - pris_en_charge → en_attente_prestataire: responsable/plateforme
+ * - en_attente_prestataire → en_attente_client: intervenant assigné/plateforme
+ * - en_attente_prestataire → a_valider: intervenant assigné/plateforme
  * - a_valider → clos: responsable/plateforme
  * - nouveau → annule: demandeur (créateur)/responsable/plateforme
  * - nouveau → rejete: responsable/plateforme
@@ -76,12 +76,12 @@ export async function isStatusTransitionAllowed({
       break;
 
     case "pris_en_charge":
-      if (newStatut === "en_attente_fournisseur") {
+      if (newStatut === "en_attente_prestataire") {
         return isPlateforme || isResponsable;
       }
       break;
 
-    case "en_attente_fournisseur":
+    case "en_attente_prestataire":
       if (newStatut === "en_attente_client") {
         return isPlateforme || (isIntervenant && isAssignedUser);
       }

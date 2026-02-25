@@ -435,7 +435,7 @@ export async function getAvailableStatutsForUser({
     return [
       "nouveau",
       "pris_en_charge",
-      "en_attente_fournisseur",
+      "en_attente_prestataire",
       "en_attente_client",
       "a_valider",
       "clos",
@@ -469,7 +469,7 @@ export async function getAvailableStatutsForUser({
       return [
         "nouveau",
         "pris_en_charge",
-        "en_attente_fournisseur",
+        "en_attente_prestataire",
         "en_attente_client",
         "a_valider",
         "clos",

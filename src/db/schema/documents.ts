@@ -30,7 +30,7 @@ import {
   occurrenceTaches,
 } from "./services";
 import { sites } from "./sites";
-import { tickets } from "./tickets";
+import { tickets, ticketMessages } from "./tickets";
 
 export const documents = pgTable(
   "documents",
@@ -85,6 +85,10 @@ export const documentsLinks = pgTable(
     ticketId: uuid("ticket_id").references(() => tickets.id, {
       onDelete: "cascade",
     }),
+    ticketMessageId: uuid("ticket_message_id").references(
+      () => ticketMessages.id,
+      { onDelete: "cascade" },
+    ),
     occurrenceId: uuid("occurrence_id").references(
       () => clientServiceOccurrences.id,
       { onDelete: "cascade" },
@@ -125,6 +129,7 @@ export const documentsLinks = pgTable(
     index("documents_links_document_idx").on(t.documentId),
 
     index("documents_links_ticket_idx").on(t.ticketId),
+    index("documents_links_ticket_message_idx").on(t.ticketMessageId),
     index("documents_links_site_idx").on(t.siteId),
     index("documents_links_occurrence_idx").on(t.occurrenceId),
     index("documents_links_devis_idx").on(t.devisId),

@@ -64,6 +64,27 @@
       "when": 1770939438705,
       "tag": "0008_faulty_cerebro",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1772019007539,
+      "tag": "0009_narrow_korath",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1772019386337,
+      "tag": "0010_wild_rumiko_fujikawa",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1772021632001,
+      "tag": "0011_chunky_tana_nile",
+      "breakpoints": true
     }
   ]
 }

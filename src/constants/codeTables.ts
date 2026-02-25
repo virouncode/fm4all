@@ -1,7 +1,7 @@
 export const ticketStatutCT = [
   { code: "nouveau", name: "Nouveau" },
   { code: "pris_en_charge", name: "Pris en charge" },
-  { code: "en_attente_fournisseur", name: "En attente fournisseur" },
+  { code: "en_attente_prestataire", name: "En attente prestataire" },
   { code: "en_attente_client", name: "En attente client" },
   { code: "a_valider", name: "À valider" },
   { code: "clos", name: "Clos" },
@@ -42,10 +42,10 @@ export const ticketTypeCodes = ticketTypeCT.map((i) => i.code) as unknown as [
 ];
 
 export const ticketMessageVisibiliteCT = [
-  { code: "public", name: "Public" }, // visible client + fournisseur + fm4all
+  { code: "public", name: "Public" }, // visible client + prestataire + fm4all
   { code: "fm4all_only", name: "fm4all uniquement" }, // fm4all only
   { code: "client_only", name: "Client uniquement" },
-  { code: "fournisseur_only", name: "Prestataire uniquement" },
+  { code: "prestataire_only", name: "Prestataire uniquement" },
 ] as const;
 
 export const ticketMessageVisibiliteCodes = ticketMessageVisibiliteCT.map(

@@ -1,22 +1,28 @@
-import { notFound } from "next/navigation";
 import { redirect } from "@/i18n/navigation";
 import { getSession } from "@/server/auth/get-session";
-import { getTicketById } from "@/server/queries/tickets.query";
+import { getClientPrestataires } from "@/server/queries/clientServiceExecutions.query";
+import { getDocumentsByTicketId } from "@/server/queries/documents.query";
+import {
+  getEntrepriseById,
+  getEntreprisesPrestataires,
+} from "@/server/queries/entreprises.query";
+import { getSiteById } from "@/server/queries/sites.query";
+import {
+  getTicketById,
+  getTicketMessagesWithAttachments,
+} from "@/server/queries/tickets.query";
 import { getUserAdhesion } from "@/server/queries/userAdhesions.query";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
+import { getUsersByEntrepriseId } from "@/server/queries/users.query";
 import { canUserAccessTicket } from "@/server/utils/ticketsPerimetre.utils";
 import {
-  canUserEditTicketBasicFields,
   canUserEditAssigneEntrepriseId,
   canUserEditAssigneUserId,
   canUserEditStatut,
+  canUserEditTicketBasicFields,
   getAvailableStatutsForUser,
 } from "@/server/utils/ticketsPermissions.utils";
-import { getClientPrestataires } from "@/server/queries/clientServiceExecutions.query";
-import { getEntreprisesPrestataires, getEntrepriseById } from "@/server/queries/entreprises.query";
-import { getUsersByEntrepriseId } from "@/server/queries/users.query";
-import { getSiteById } from "@/server/queries/sites.query";
-import { getDocumentsByTicketId } from "@/server/queries/documents.query";
+import { notFound } from "next/navigation";
 import { TicketDetailsClient } from "./TicketDetailsClient";
 
 export default async function TicketDetailsPage({
@@ -30,7 +36,7 @@ export default async function TicketDetailsPage({
   // 1. Auth
   const session = await getSession();
   if (!session || !session.user) {
-    redirect("/auth/signin" as any);
+    redirect({ href: "/auth/login", locale: "fr" });
   }
 
   const currentUser = session!.user; // Non-null après check
@@ -150,7 +156,7 @@ export default async function TicketDetailsPage({
   if (canEditAssigneUser && ticket.assigneEntrepriseId) {
     const users = await getUsersByEntrepriseId(ticket.assigneEntrepriseId);
 
-    availableUsers = users.map((u: any) => ({
+    availableUsers = users.map((u) => ({
       id: u.id,
       prenom: u.prenom,
       nom: u.nom,
@@ -160,7 +166,9 @@ export default async function TicketDetailsPage({
   // 8. Charger le site et les entreprises pour afficher les noms
   const site = await getSiteById(ticket.siteId);
 
-  const proprietaireEntreprise = await getEntrepriseById(ticket.proprietaireEntrepriseId);
+  const proprietaireEntreprise = await getEntrepriseById(
+    ticket.proprietaireEntrepriseId,
+  );
   const demandeurEntreprise = ticket.demandeurEntrepriseId
     ? await getEntrepriseById(ticket.demandeurEntrepriseId)
     : null;
@@ -171,11 +179,15 @@ export default async function TicketDetailsPage({
   // 9. Charger les pièces jointes du ticket
   const attachments = await getDocumentsByTicketId(ticketId);
 
-  // 10. Passer à TicketDetailsClient
+  // 10. Charger les messages
+  const messages = await getTicketMessagesWithAttachments(ticketId);
+
+  // 11. Passer à TicketDetailsClient
   return (
     <TicketDetailsClient
       ticket={ticket}
       entrepriseId={entrepriseId}
+      currentUserId={currentUser.id}
       posture={posture}
       permissions={{
         canEditBasicFields,
@@ -191,6 +203,7 @@ export default async function TicketDetailsPage({
       demandeurEntreprise={demandeurEntreprise}
       assigneEntreprise={assigneEntreprise}
       attachments={attachments}
+      messages={messages}
     />
   );
 }

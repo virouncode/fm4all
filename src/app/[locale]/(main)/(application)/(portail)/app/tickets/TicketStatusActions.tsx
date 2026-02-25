@@ -55,13 +55,13 @@ export function TicketStatusActions({
       case "pris_en_charge":
         return [
           {
-            statut: "en_attente_fournisseur",
-            label: "Attente fournisseur",
+            statut: "en_attente_prestataire",
+            label: "Attente prestataire",
             variant: "outline",
           },
         ];
 
-      case "en_attente_fournisseur":
+      case "en_attente_prestataire":
         return [
           {
             statut: "en_attente_client",

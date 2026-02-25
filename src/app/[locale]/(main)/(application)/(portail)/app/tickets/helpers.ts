@@ -14,8 +14,8 @@ export function getTicketStatutBadge(statut: TicketStatutType): {
       return { label: "Nouveau", className: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" };
     case "pris_en_charge":
       return { label: "Pris en charge", className: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200" };
-    case "en_attente_fournisseur":
-      return { label: "En attente fournisseur", className: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200" };
+    case "en_attente_prestataire":
+      return { label: "En attente prestataire", className: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200" };
     case "en_attente_client":
       return { label: "En attente client", className: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200" };
     case "a_valider":

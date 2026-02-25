@@ -1,9 +1,11 @@
 import "server-only";
 
 import { db } from "@/db";
-import { tickets } from "@/db/schema/tickets";
+import { tickets, ticketMessages } from "@/db/schema/tickets";
 import { sites } from "@/db/schema/sites";
 import { entreprises } from "@/db/schema/entreprises";
+import { user } from "@/db/schema/auth";
+import { documents, documentsLinks } from "@/db/schema/documents";
 import { getUserAccessibleSiteIdsForTickets } from "@/server/utils/ticketsPerimetre.utils";
 import {
   SelectTicketType,
@@ -33,11 +35,11 @@ export async function getTicketById(
  * Logique selon posture:
  * - Plateforme: TOUS les tickets (aucun filtre de périmètre)
  * - Client: tickets des sites du périmètre effectif (attributions)
- * - Fournisseur: tickets assignés à son entreprise ou à lui
+ * - Prestataire: tickets assignés à son entreprise ou à lui
  *
  * @param userId - ID de l'utilisateur
  * @param entrepriseId - ID de l'entreprise active
- * @param posture - Posture de l'utilisateur (client/fournisseur/plateforme)
+ * @param posture - Posture de l'utilisateur (client/prestataire/plateforme)
  * @param filters - Filtres, tri et pagination
  * @returns Tickets paginés avec métadonnées
  */
@@ -49,7 +51,7 @@ export async function getTicketsByPerimetre({
 }: {
   userId: string;
   entrepriseId: string;
-  posture: "client" | "fournisseur" | "plateforme";
+  posture: "client" | "prestataire" | "plateforme";
   filters: TicketsQueryType;
 }): Promise<{
   items: SelectTicketType[];
@@ -87,8 +89,8 @@ export async function getTicketsByPerimetre({
       };
     }
     conditions.push(inArray(tickets.siteId, accessibleSiteIds));
-  } else if (posture === "fournisseur") {
-    // Fournisseur: tickets assignés
+  } else if (posture === "prestataire") {
+    // Prestataire: tickets assignés
     conditions.push(
       or(
         eq(tickets.assigneEntrepriseId, entrepriseId),
@@ -276,4 +278,55 @@ export async function ticketBelongsToEntreprise({
   });
 
   return !!ticket;
+}
+
+/**
+ * Récupère les messages d'un ticket avec leurs pièces jointes et infos auteur
+ *
+ * @param ticketId - ID du ticket
+ * @returns Messages avec attachments et infos auteur
+ */
+export async function getTicketMessagesWithAttachments(ticketId: string) {
+  // 1. Récupérer les messages avec infos auteur
+  const messages = await db
+    .select({
+      id: ticketMessages.id,
+      ticketId: ticketMessages.ticketId,
+      auteurUserId: ticketMessages.auteurUserId,
+      message: ticketMessages.message,
+      visibilite: ticketMessages.visibilite,
+      createdAt: ticketMessages.createdAt,
+      // Infos auteur
+      auteurPrenom: user.prenom,
+      auteurNom: user.nom,
+    })
+    .from(ticketMessages)
+    .leftJoin(user, eq(ticketMessages.auteurUserId, user.id))
+    .where(eq(ticketMessages.ticketId, ticketId))
+    .orderBy(asc(ticketMessages.createdAt));
+
+  // 2. Récupérer les pièces jointes pour chaque message
+  const messagesWithAttachments = await Promise.all(
+    messages.map(async (msg) => {
+      const attachments = await db
+        .select({
+          id: documents.id,
+          storageKey: documents.storageKey,
+          filename: documents.filename,
+          mimeType: documents.mimeType,
+          sizeBytes: documents.sizeBytes,
+        })
+        .from(documents)
+        .innerJoin(documentsLinks, eq(documentsLinks.documentId, documents.id))
+        .where(eq(documentsLinks.ticketMessageId, msg.id))
+        .orderBy(asc(documents.createdAt));
+
+      return {
+        ...msg,
+        attachments,
+      };
+    }),
+  );
+
+  return messagesWithAttachments;
 }

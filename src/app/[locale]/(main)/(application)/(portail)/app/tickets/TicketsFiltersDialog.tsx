@@ -310,8 +310,8 @@ export function TicketsFiltersDialog({
                   <SelectItem value="all">Tous</SelectItem>
                   <SelectItem value="nouveau">Nouveau</SelectItem>
                   <SelectItem value="pris_en_charge">Pris en charge</SelectItem>
-                  <SelectItem value="en_attente_fournisseur">
-                    En attente fournisseur
+                  <SelectItem value="en_attente_prestataire">
+                    En attente prestataire
                   </SelectItem>
                   <SelectItem value="en_attente_client">
                     En attente client

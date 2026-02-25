@@ -8,8 +8,8 @@ import { TicketMessageVisibiliteType } from "@/zod-schemas/enums";
  *
  * Règles métier:
  * - Plateforme: ✅ Peut tout écrire
- * - Client: ❌ Ne peut PAS écrire fournisseur_only
- * - Fournisseur: ❌ Ne peut PAS écrire client_only
+ * - Client: ❌ Ne peut PAS écrire prestataire_only
+ * - Prestataire: ❌ Ne peut PAS écrire client_only
  * - public et fm4all_only: Tous peuvent écrire (filtrage lecture géré ailleurs)
  *
  * @param userId - ID de l'utilisateur
@@ -32,7 +32,7 @@ export async function canUserWriteVisibility({
     return true;
   }
 
-  // Déterminer posture (client/fournisseur)
+  // Déterminer posture (client/prestataire)
   const { getEntrepriseById } = await import(
     "@/server/queries/entreprise.query"
   );
@@ -41,8 +41,8 @@ export async function canUserWriteVisibility({
   const isClient = entreprise?.roles.includes("client");
   const isFournisseur = entreprise?.roles.includes("prestataire");
 
-  // Client ne peut pas écrire fournisseur_only
-  if (isClient && visibilite === "fournisseur_only") {
+  // Client ne peut pas écrire prestataire_only
+  if (isClient && visibilite === "prestataire_only") {
     return false;
   }
 

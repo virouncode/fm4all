@@ -10,9 +10,9 @@ import { eq, asc } from "drizzle-orm";
  * Récupère les messages d'un ticket avec filtrage par visibilité
  *
  * Règles de visibilité selon posture:
- * - public: client + fournisseur + plateforme
+ * - public: client + prestataire + plateforme
  * - client_only: client + plateforme
- * - fournisseur_only: fournisseur + plateforme
+ * - prestataire_only: prestataire + plateforme
  * - fm4all_only: plateforme uniquement
  *
  * @param ticketId - ID du ticket
@@ -42,12 +42,12 @@ export async function getTicketMessagesFiltered({
   );
   const entreprise = await getEntrepriseById(entrepriseId);
 
-  let posture: "client" | "fournisseur" | "plateforme" = "client";
+  let posture: "client" | "prestataire" | "plateforme" = "client";
 
   if (platformRole?.role) {
     posture = "plateforme";
   } else if (entreprise?.roles.includes("prestataire")) {
-    posture = "fournisseur";
+    posture = "prestataire";
   }
 
   // Filtrer par visibilité
@@ -56,8 +56,8 @@ export async function getTicketMessagesFiltered({
     if (msg.visibilite === "fm4all_only") return posture === "plateforme";
     if (msg.visibilite === "client_only")
       return posture === "client" || posture === "plateforme";
-    if (msg.visibilite === "fournisseur_only")
-      return posture === "fournisseur" || posture === "plateforme";
+    if (msg.visibilite === "prestataire_only")
+      return posture === "prestataire" || posture === "plateforme";
     return false;
   });
 

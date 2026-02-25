@@ -67,7 +67,7 @@ export async function canUserAccessTicket({
   userId: string;
   ticketId: string;
   entrepriseId: string;
-  posture?: "client" | "fournisseur" | "plateforme";
+  posture?: "client" | "prestataire" | "plateforme";
 }): Promise<boolean> {
   const { getTicketById } = await import("@/server/queries/tickets.query");
   const ticket = await getTicketById(ticketId);
@@ -94,7 +94,7 @@ export async function canUserAccessTicket({
     if (platformRole?.role) {
       userPosture = "plateforme";
     } else if (entreprise?.roles.includes("prestataire")) {
-      userPosture = "fournisseur";
+      userPosture = "prestataire";
     } else {
       userPosture = "client";
     }
@@ -105,8 +105,8 @@ export async function canUserAccessTicket({
     return true; // Plateforme a accès à tout
   }
 
-  if (userPosture === "fournisseur") {
-    // Fournisseur: ticket assigné à son entreprise ou à lui
+  if (userPosture === "prestataire") {
+    // Prestataire: ticket assigné à son entreprise ou à lui
     return (
       ticket.assigneEntrepriseId === entrepriseId ||
       ticket.assigneUserId === userId

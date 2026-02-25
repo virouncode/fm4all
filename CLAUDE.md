@@ -930,6 +930,171 @@ toast.info("Information importante");
 
 ---
 
+## Patterns Critiques (NE PAS OUBLIER)
+
+### ✅ Pattern 1: normalizeForSubmit pour les champs optionnels
+
+**RÈGLE CRITIQUE**: Pour tous les champs optionnels (nullable en DB), utiliser `normalizeForSubmit` côté serveur pour convertir `""` → `null`.
+
+**❌ Mauvaise approche** (ancienne, à éviter):
+```typescript
+// Schema avec .nullable()
+assigneEntrepriseId: z.string().uuid().nullable()
+
+// Conversion manuelle côté client
+const newId = value === "none" ? null : value;
+```
+
+**✅ Bonne approche** (pattern standard du projet):
+
+1. **Schema Zod** - Accepte `string` (pas `.uuid().nullable()`):
+```typescript
+// src/zod-schemas/[feature].schema.ts
+export const updateSchema = z.object({
+  ticketId: z.string().uuid(),
+  assigneEntrepriseId: z.string(), // ✅ Accepte "" ou UUID
+});
+```
+
+2. **Action serveur** - Utilise `normalizeForSubmit` après validation:
+```typescript
+// src/server/actions/[feature]Actions.ts
+import { normalizeForSubmit } from "@/zod-helpers/normalize";
+
+export const updateAction = actionClient
+  .inputSchema(updateSchema)
+  .action(async ({ parsedInput }) => {
+    // ✅ Normaliser: "" → null
+    const normalized = normalizeForSubmit(parsedInput, {
+      optionalStrings: ["assigneEntrepriseId"] as const,
+    });
+
+    // Utiliser normalized au lieu de parsedInput
+    await db.update(table).set({
+      assigneEntrepriseId: normalized.assigneEntrepriseId, // null si ""
+    });
+  });
+```
+
+3. **Composant client** - Utilise `""` pour "non sélectionné":
+```typescript
+// Composants avec Select
+<Select
+  value={currentValue || ""} // ✅ "" au lieu de "none"
+  onValueChange={handleChange}
+>
+  <SelectTrigger>
+    <SelectValue placeholder="Choisir..." />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value=""> {/* ✅ "" au lieu de "none" */}
+      <span className="italic text-muted-foreground">Non assigné</span>
+    </SelectItem>
+    {/* ... autres options */}
+  </SelectContent>
+</Select>
+
+// Dans handleChange - Pas de conversion manuelle
+const handleChange = async (value: string) => {
+  // ✅ Envoyer directement, normalizeForSubmit le fera
+  await updateAction({
+    assigneEntrepriseId: value // "" sera converti en null côté serveur
+  });
+};
+```
+
+**Référence**: Voir `/app/sites` et `/app/utilisateurs` pour des exemples complets.
+
+---
+
+### ✅ Pattern 2: Vérification systématique des permissions
+
+**RÈGLE CRITIQUE**: TOUJOURS vérifier les permissions AVANT d'afficher les boutons/composants d'édition.
+
+**Pattern**: Le composant éditable ne vérifie PAS les permissions. C'est le **parent** qui décide de l'afficher ou non.
+
+**✅ Exemple correct**:
+
+```typescript
+// Composant éditable (EditableField.tsx) - "dumb", suppose permissions OK
+export function EditableField({ value, onUpdate }: Props) {
+  // Pas de vérification de permissions ici
+  return <Select value={value} onValueChange={handleChange} />;
+}
+
+// Parent (DetailsClient.tsx) - Rendu conditionnel selon permissions
+{permissions.canEditField ? (
+  <EditableField
+    value={data.field}
+    onUpdate={handleUpdate}
+  />
+) : (
+  <p>{data.field || "Non renseigné"}</p>
+)}
+```
+
+**Calcul des permissions**: Se fait **côté serveur** dans la page:
+
+```typescript
+// app/[feature]/[id]/page.tsx (Server Component)
+export default async function DetailsPage({ params }) {
+  const canEditField = await canUserEditField({
+    userId: currentUser.id,
+    resourceId: params.id,
+    entrepriseId,
+  });
+
+  return (
+    <DetailsClient
+      permissions={{ canEditField }}
+      // ...
+    />
+  );
+}
+```
+
+**Référence**: Voir `/app/tickets/[ticketId]` - Tous les composants éditables suivent ce pattern.
+
+---
+
+### ✅ Pattern 3: Vérification TypeScript systématique
+
+**RÈGLE CRITIQUE**: TOUJOURS vérifier les erreurs TypeScript AVANT de committer ou de considérer une tâche terminée.
+
+**Commande à exécuter**:
+```bash
+pnpm tsc --noEmit
+```
+
+**Points de vigilance**:
+- ❌ **JAMAIS** utiliser `any` - Toujours typer correctement
+- ❌ **JAMAIS** utiliser `@ts-ignore` ou `@ts-expect-error` sans justification
+- ✅ Résoudre TOUTES les erreurs TypeScript avant de passer à la suite
+- ✅ Si un type n'existe pas, le créer (ne pas utiliser `any`)
+
+**Exemple d'erreur fréquente**:
+```typescript
+// ❌ FAUX
+const users = await getUsers();
+availableUsers = users.map((u: any) => ({ ... })); // any interdit!
+
+// ✅ CORRECT
+const users = await getUsersByEntrepriseId(entrepriseId);
+availableUsers = users.map((u) => ({ // Type inféré automatiquement
+  id: u.id,
+  prenom: u.prenom,
+  nom: u.nom,
+}));
+```
+
+**Workflow recommandé**:
+1. Écrire le code
+2. Vérifier TypeScript: `pnpm tsc --noEmit`
+3. Corriger TOUTES les erreurs
+4. Commit
+
+---
+
 ## Erreurs Courantes à Éviter
 
 ### ❌ N'utilisez PAS `next/navigation` pour le routing
@@ -1489,6 +1654,71 @@ z.string().uuid("Client obligatoire")
 
 ---
 
+## Terminologie Importante
+
+### "Prestataire" (pas "Fournisseur")
+
+**RÈGLE CRITIQUE** : Utiliser TOUJOURS le terme **"prestataire"** dans tout le code et la DB.
+
+- ✅ **prestataire** / **Prestataire**
+- ❌ ~~fournisseur~~ / ~~Fournisseur~~
+
+**Raison** : Cohérence terminologique avec le métier du facility management.
+
+**Exemples** :
+- Posture : `"client" | "prestataire" | "plateforme"`
+- Statut ticket : `"en_attente_prestataire"` (pas `en_attente_fournisseur`)
+- Visibilité message : `"prestataire_only"` (pas `fournisseur_only`)
+- Variables : `isPrestataire`, `prestataireAdhesion`, etc.
+
+**Attention** : Le rôle entreprise dans la DB reste `"prestataire"` (table `entreprise_roles`).
+
+---
+
+## Module Tickets - Architecture Avancée
+
+Le module `/app/tickets` implémente des fonctionnalités avancées :
+
+### Section Messages/Discussion
+
+**Fichiers clés** :
+- `[ticketId]/TicketMessagesSection.tsx` - Composant messages avec UI WhatsApp-style
+- `insertTicketMessageAction` - Action serveur avec gestion attachments
+- `getTicketMessagesWithAttachments` - Query avec JOINs documents
+
+**Fonctionnalités** :
+- Messages filtrés par visibilité selon posture (public, client_only, prestataire_only, fm4all_only)
+- Pièces jointes liées aux messages (polymorphic via `documentsLinks.ticketMessageId`)
+- Preview Dialog pour images/PDFs
+- Promotion fichiers temp → S3 permanent lors de l'envoi
+
+**Pattern visibilité** :
+```typescript
+// Frontend - Filtrage messages affichés
+const visibleMessages = initialMessages.filter((msg) => {
+  if (posture === "plateforme") return true; // fm4all voit tout
+  if (msg.visibilite === "public") return true;
+  if (posture === "client" && msg.visibilite === "client_only") return true;
+  if (posture === "prestataire" && msg.visibilite === "prestataire_only") return true;
+  return false;
+});
+
+// Backend - Permissions d'écriture
+if (isClient && !["public", "client_only"].includes(visibilite)) {
+  throw errors.forbidden("Client ne peut poster que public ou client_only");
+}
+if (isPrestataire && !["public", "prestataire_only"].includes(visibilite)) {
+  throw errors.forbidden("Prestataire ne peut poster que public ou prestataire_only");
+}
+```
+
+**Références d'implémentation** :
+- `/app/tickets/[ticketId]/TicketMessagesSection.tsx` - UI messages
+- `/server/actions/ticketsActions.ts` - `insertTicketMessageAction`
+- `/server/queries/tickets.query.ts` - `getTicketMessagesWithAttachments`
+
+---
+
 ## Audit & Corrections (2026-02-12)
 
 **Sections Auditées**: `/app/sites`, `/app/utilisateurs`, `/auth`
@@ -1508,9 +1738,30 @@ z.string().uuid("Client obligatoire")
 
 ---
 
-**Dernière mise à jour**: 2026-02-24
+## Changelog (2026-02-25)
+
+**Module Tickets - Refonte Messages/Discussion** :
+- ✅ Implémentation section messages avec UI WhatsApp-style
+- ✅ Visibilité messages selon posture (public, client_only, prestataire_only, fm4all_only)
+- ✅ Pièces jointes sur messages (polymorphic documentsLinks)
+- ✅ Preview Dialog images/PDFs avec URLs présignées
+- ✅ Terminologie unifiée "prestataire" (renommage DB enum `en_attente_fournisseur` → `en_attente_prestataire`)
+
+**Fichiers ajoutés** :
+- `[ticketId]/TicketMessagesSection.tsx` - Composant messages
+- Migration 0010 - Enum `ticket_message_visibilite` (prestataire_only)
+- Migration 0011 - Enum `ticket_statut` (en_attente_prestataire)
+
+**Fichiers supprimés** :
+- `TicketMessagesList.tsx` (obsolète)
+- `TicketMessageForm.tsx` (obsolète)
+
+---
+
+**Dernière mise à jour**: 2026-02-25
 
 Pour toute question ou clarification, référez-vous d'abord aux implémentations de référence:
 - `/app/sites` - Gestion hiérarchique avec closure table
 - `/app/utilisateurs` - Système de permissions & attributions
+- `/app/tickets` - Système tickets avec messages et visibilité
 - Ce document CLAUDE.md - Patterns et bonnes pratiques
