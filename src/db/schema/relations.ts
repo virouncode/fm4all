@@ -73,6 +73,7 @@ import { paiements, paiementsAllocations } from "./paiements";
 import { prospects } from "./prospects";
 // SERVICES TABLES
 import {
+  clientServiceExecutionPrix,
   clientServiceExecutions,
   clientServiceOccurrences,
   clientServicePerimetre,
@@ -425,6 +426,10 @@ export const clientServiceOccurrencesRelations = relations(
       fields: [clientServiceOccurrences.siteId],
       references: [sites.id],
     }),
+    execution: one(clientServiceExecutions, {
+      fields: [clientServiceOccurrences.executionId],
+      references: [clientServiceExecutions.id],
+    }),
     assigneeUser: one(user, {
       fields: [clientServiceOccurrences.assigneeUserId],
       references: [user.id],
@@ -457,7 +462,19 @@ export const clientServiceExecutionsRelations = relations(
       fields: [clientServiceExecutions.serviceEntrepriseId],
       references: [serviceEntreprises.id],
     }),
+    prix: many(clientServiceExecutionPrix),
+    occurrences: many(clientServiceOccurrences),
     documentsLinks: many(documentsLinks),
+  }),
+);
+
+export const clientServiceExecutionPrixRelations = relations(
+  clientServiceExecutionPrix,
+  ({ one }) => ({
+    execution: one(clientServiceExecutions, {
+      fields: [clientServiceExecutionPrix.executionId],
+      references: [clientServiceExecutions.id],
+    }),
   }),
 );
 

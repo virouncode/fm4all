@@ -575,6 +575,33 @@ export const paiementMethodeCodes = paiementMethodeCT.map(
   (typeof paiementMethodeCT)[number]["code"],
   ...(typeof paiementMethodeCT)[number]["code"][],
 ];
+export const executionTypePrixCT = [
+  { code: "abonnement", name: "Abonnement" },
+  { code: "par_occurrence", name: "Par occurrence" },
+  { code: "installation", name: "Installation" },
+  { code: "frais_livraison", name: "Frais de livraison" },
+] as const;
+
+export const executionTypePrixCodes = executionTypePrixCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof executionTypePrixCT)[number]["code"],
+  ...(typeof executionTypePrixCT)[number]["code"][],
+];
+
+export const executionPeriodeFacturationCT = [
+  { code: "semaine", name: "Semaine" },
+  { code: "mois", name: "Mois" },
+  { code: "annee", name: "Année" },
+] as const;
+
+export const executionPeriodeFacturationCodes = executionPeriodeFacturationCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof executionPeriodeFacturationCT)[number]["code"],
+  ...(typeof executionPeriodeFacturationCT)[number]["code"][],
+];
+
 export const toCodeTableName = (
   code: string,
   table: readonly { code: string; name: string }[],

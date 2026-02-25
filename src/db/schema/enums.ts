@@ -11,6 +11,8 @@ import {
   documentCategorieCodes,
   documentTypeCodes,
   documentVisibiliteCodes,
+  executionPeriodeFacturationCodes,
+  executionTypePrixCodes,
   factureLigneTypeCodes,
   factureStatutCodes,
   frequenceCodes,
@@ -168,4 +170,14 @@ export const paiementStatutEnum = pgEnum(
 export const paiementMethodeEnum = pgEnum(
   "paiement_methode",
   paiementMethodeCodes,
+);
+
+export const executionTypePrixEnum = pgEnum(
+  "execution_type_prix",
+  executionTypePrixCodes,
+);
+
+export const executionPeriodeFacturationEnum = pgEnum(
+  "execution_periode_facturation",
+  executionPeriodeFacturationCodes,
 );

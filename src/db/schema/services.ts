@@ -2,6 +2,7 @@ import {
   boolean,
   index,
   integer,
+  jsonb,
   pgTable,
   smallint,
   text,
@@ -21,6 +22,8 @@ import {
 import { user } from "./auth";
 import { entreprises, serviceEntreprises } from "./entreprises";
 import {
+  executionPeriodeFacturationEnum,
+  executionTypePrixEnum,
   frequenceEnum,
   occurrenceStatutEnum,
   occurrenceTacheStatutEnum,
@@ -63,17 +66,25 @@ export const clientServices = pgTable(
       .references(() => services.id, { onDelete: "cascade" }),
     frequence: frequenceEnum("frequence").notNull(),
     frequenceParPeriode: integer("frequence_par_periode"),
-    intervalleJours: integer("intervalle_jours"),
+    intervalleJours: integer("intervalle_jours"), //si tous les X jours
     dateDebut: timestamp("date_debut", {
+      //début du contrat de service, à partir duquel les occurrences seront générées
       withTimezone: true,
       mode: "date",
       precision: 3,
     }),
     dateFin: timestamp("date_fin", {
+      //fin du contrat de service, après lequel les occurrences ne seront plus générées
       withTimezone: true,
       mode: "date",
       precision: 3,
     }),
+    joursPreference: jsonb("jours_preference").$type<number[]>(),
+    // jours ISO 8601 : 1=lundi … 7=dimanche ; utilisé quand frequenceParPeriode > 1
+    heureDebutPreference: varchar("heure_debut_preference", { length: 5 }),
+    // format "HH:mm" (ex: "08:00") — heure de début par défaut des occurrences
+    dureeEstimeeMinutes: smallint("duree_estimee_minutes"),
+    // durée d'une intervention en minutes — sert à calculer dateFinPrevue
     actif: boolean("actif").notNull().default(true),
     notes: text("notes"),
     createdById: createdById(() => user),
@@ -104,6 +115,11 @@ export const clientServiceOccurrences = pgTable(
     dateFinPrevue: timestamptz("date_fin_prevue"),
     dateDebutReelle: timestamptz("date_debut_reelle"),
     dateFinReelle: timestamptz("date_fin_reelle"),
+    executionId: uuid("execution_id").references(
+      () => clientServiceExecutions.id,
+      { onDelete: "set null" },
+    ),
+    // execution gagnante figée à la génération (prestataire + tarif applicables)
     statut: occurrenceStatutEnum("statut").notNull().default("planifiee"),
     assigneeUserId: uuid("assignee_user_id").references(() => user.id, {
       onDelete: "set null",
@@ -123,6 +139,7 @@ export const clientServiceOccurrences = pgTable(
     ),
     index("client_service_occurrences_site_idx").on(t.siteId),
     index("client_service_occurrences_statut_idx").on(t.statut),
+    index("client_service_occurrences_execution_idx").on(t.executionId),
     index("client_service_occurrences_assignee_idx").on(t.assigneeUserId),
     index("client_service_occurrences_dates_prevues_idx").on(
       t.dateDebutPrevue,
@@ -145,11 +162,12 @@ export const clientServiceExecutions = pgTable(
       () => serviceEntreprises.id,
       { onDelete: "set null" },
     ),
-    prixHt: integer("prix_ht"), // *100
-    taux: integer("taux"), // en pourcentage *100
-    validFrom: timestamptz("valid_from").notNull(),
-    validTo: timestamptz("valid_to"),
-    ordre: smallint("ordre").notNull(),
+    // prestataire responsable (nullable = non encore assigné)
+    dateDebutValidite: timestamptz("date_debut_validite").notNull(),
+    dateFinValidite: timestamptz("date_fin_validite"),
+    // null = pas de fin (règle perpétuelle jusqu'à désactivation)
+    priorite: smallint("priorite").notNull(),
+    // plus grand = gagne ; convention : 0=global, 10=bâtiment, 20=zone
     actif: boolean("actif").notNull().default(true),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
@@ -160,6 +178,43 @@ export const clientServiceExecutions = pgTable(
     index("client_service_executions_client_service_idx").on(t.clientServiceId),
     index("client_service_executions_site_idx").on(t.siteId),
     index("client_service_executions_actif_idx").on(t.actif),
+  ],
+);
+
+export const clientServiceExecutionPrix = pgTable(
+  "client_service_execution_prix",
+  {
+    id: id(),
+    executionId: uuid("execution_id")
+      .notNull()
+      .references(() => clientServiceExecutions.id, { onDelete: "cascade" }),
+    typePrix: executionTypePrixEnum("type_prix").notNull(),
+    // abonnement | par_occurrence | installation | frais_livraison
+    montantHt: integer("montant_ht").notNull(),
+    // prix facturé au client (HT *100) — source de vérité pour la facturation
+    coutPrestataireHt: integer("cout_prestataire_ht"),
+    // coût réel payé au prestataire (HT *100) — nullable si inconnu / standalone
+    margePourcent: integer("marge_pourcent"),
+    // marge FM4ALL en % (*100, ex: 12.5% = 1250) — nullable si non applicable
+    periodeFacturation: executionPeriodeFacturationEnum("periode_facturation"),
+    // requis si typePrix = abonnement (semaine | mois | annee)
+    nbOccurrencesIncluses: integer("nb_occurrences_incluses"),
+    // optionnel : quota d'occurrences incluses (au-delà → facturation par_occurrence)
+    actif: boolean("actif").notNull().default(true),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+    createdById: createdById(() => user),
+    updatedById: updatedById(() => user),
+  },
+  (t) => [
+    index("client_service_execution_prix_execution_idx").on(t.executionId),
+    index("client_service_execution_prix_type_idx").on(t.typePrix),
+    index("client_service_execution_prix_actif_idx").on(t.actif),
+    uniqueIndex("client_service_execution_prix_udx").on(
+      t.executionId,
+      t.typePrix,
+      t.periodeFacturation,
+    ),
   ],
 );
 
@@ -179,7 +234,8 @@ export const clientServicePerimetre = pgTable(
       }),
     mode: perimetreModeEnum("mode").notNull(),
     scope: siteAttributionScopeEnum("scope").notNull().default("subtree"),
-    ordre: smallint("ordre").notNull().default(0),
+    ordreAffichage: smallint("ordre_affichage").notNull().default(0),
+    // tri UI uniquement — pas de logique métier sur cet ordre
     createdById: createdById(() => user),
     updatedById: updatedById(() => user),
     createdAt: createdAt(),
