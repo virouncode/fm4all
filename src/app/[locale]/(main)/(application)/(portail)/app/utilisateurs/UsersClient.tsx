@@ -89,7 +89,18 @@ export function UsersClient() {
 
       const result = await getUsersAction(queryParams);
       if (result?.data?.items) {
-        setUsers(result.data.items);
+        const items = result.data.items;
+        setUsers(items);
+
+        // Sélection par défaut : soi-même si présent, sinon premier utilisateur
+        // Si l'utilisateur sélectionné est encore dans les résultats → le conserver
+        setSelectedUserId((prev) => {
+          if (prev && items.some((u) => u.id === prev)) return prev;
+          if (currentUser?.id && items.some((u) => u.id === currentUser.id)) {
+            return currentUser.id;
+          }
+          return items.length > 0 ? items[0].id : null;
+        });
       }
     } catch (error) {
       console.error("Failed to load users:", error);

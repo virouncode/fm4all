@@ -45,21 +45,22 @@ export function SitesClient() {
     async function loadData() {
       setLoading(true);
       try {
-        // Load sites
-        const sitesResult = await getSitesAction({
-          entrepriseId: entreprise!.id,
-        });
+        // Load sites and attributions in parallel
+        const [sitesResult, attributionsResult] = await Promise.all([
+          getSitesAction({ entrepriseId: entreprise!.id }),
+          getUserSiteAttributionsAction({
+            userId: currentUser!.id,
+            entrepriseId: entreprise!.id,
+          }),
+        ]);
+
+        let builtTree: SiteTreeNode[] = [];
+
         if (sitesResult?.data) {
           setSites(sitesResult.data);
-          const builtTree = buildSiteTree(sitesResult.data);
+          builtTree = buildSiteTree(sitesResult.data);
           setTree(builtTree);
         }
-
-        // Load user's site attributions to determine permissions
-        const attributionsResult = await getUserSiteAttributionsAction({
-          userId: currentUser!.id,
-          entrepriseId: entreprise!.id,
-        });
 
         if (attributionsResult?.data?.attributions) {
           // Build Set of siteIds where user is responsable_site
@@ -69,6 +70,26 @@ export function SitesClient() {
               .map((attr) => attr.siteId),
           );
           setResponsableSiteIds(responsableIds);
+
+          // Sélection par défaut : site le plus haut dans la hiérarchie avec attribution
+          // BFS sur l'arbre → premier nœud attribué = nœud au niveau le plus haut
+          const attributedSiteIds = new Set(
+            attributionsResult.data.attributions.map((a) => a.siteId),
+          );
+          setSelectedSiteId((prev) => {
+            if (prev !== null) return prev; // Garder la sélection existante
+            const queue: SiteTreeNode[] = [...builtTree];
+            while (queue.length > 0) {
+              const node = queue.shift()!;
+              if (attributedSiteIds.has(node.id)) return node.id;
+              queue.push(...node.children);
+            }
+            // Fallback : premier site racine (admins sans attribution explicite)
+            return builtTree.length > 0 ? builtTree[0].id : null;
+          });
+        } else if (builtTree.length > 0) {
+          // Aucune attribution mais des sites → sélectionner le premier site racine
+          setSelectedSiteId((prev) => (prev !== null ? prev : builtTree[0].id));
         }
       } catch (error) {
         console.error("Failed to load data:", error);
