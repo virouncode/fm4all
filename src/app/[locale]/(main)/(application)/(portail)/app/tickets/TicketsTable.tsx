@@ -396,9 +396,26 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
   };
 
   const handleRowClick = (ticket: SelectTicketType) => {
+    // Construire la query avec les searchParams actuels (filtres + tri)
+    const query: Record<string, string> = {};
+    if (searchParams.search) query.search = searchParams.search;
+    if (searchParams.statut) query.statut = searchParams.statut;
+    if (searchParams.priorite) query.priorite = searchParams.priorite;
+    if (searchParams.type) query.type = searchParams.type;
+    if (searchParams.siteId) query.siteId = searchParams.siteId;
+    if (searchParams.proprietaireEntrepriseId)
+      query.proprietaireEntrepriseId = searchParams.proprietaireEntrepriseId;
+    if (searchParams.demandeurEntrepriseId)
+      query.demandeurEntrepriseId = searchParams.demandeurEntrepriseId;
+    if (searchParams.assigneEntrepriseId)
+      query.assigneEntrepriseId = searchParams.assigneEntrepriseId;
+    if (searchParams.orderBy) query.orderBy = searchParams.orderBy;
+    if (searchParams.orderDir) query.orderDir = searchParams.orderDir;
+
     router.push({
       pathname: "/app/tickets/[ticketId]",
       params: { ticketId: ticket.id },
+      query,
     });
   };
 

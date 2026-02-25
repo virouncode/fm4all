@@ -35,6 +35,7 @@ import {
   Users as UsersIcon,
 } from "lucide-react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   formatTicketDate,
@@ -123,6 +124,14 @@ export function TicketDetailsClient({
   messages,
 }: TicketDetailsClientProps) {
   const router = useRouter();
+  const rawSearchParams = useSearchParams();
+
+  // Reconstruire la query de retour depuis les searchParams de l'URL courante
+  const backQuery: Record<string, string> = {};
+  rawSearchParams.forEach((value, key) => {
+    if (value) backQuery[key] = value;
+  });
+
   const statutBadge = getTicketStatutBadge(ticket.statut);
   const prioriteBadge = getTicketPrioriteBadge(ticket.priorite);
   const typeLabel = getTicketTypeLabel(ticket.type);
@@ -266,7 +275,12 @@ export function TicketDetailsClient({
             asChild
             className="flex-shrink-0 gap-2"
           >
-            <Link href="/app/tickets">
+            <Link
+              href={{
+                pathname: "/app/tickets",
+                query: backQuery,
+              }}
+            >
               <ArrowLeft className="h-4 w-4" />
               Retour aux tickets
             </Link>
