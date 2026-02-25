@@ -16,119 +16,46 @@ import {
 
 import { goneUrls, legacyRedirects } from "./redirects/urls";
 
-// ============================================================================
-// Config : logs activés uniquement en dev
-// ============================================================================
-const devLogging = process.env.NODE_ENV === "development";
-
-const log = (...args: unknown[]) => {
-  if (devLogging) console.log("[middleware]", ...args);
-};
-
 // next-intl middleware
 const intlMiddleware = createMiddleware(routing);
 
 // ============================================================================
-// Helpers internes
+// Helpers
 // ============================================================================
 
-// Détermine si la route est dans un espace protégé (admin/client/fournisseur)
-function getPortalArea(
-  pathname: string,
-): "admin" | "client" | "fournisseur" | null {
-  if (pathname.startsWith("/admin")) return "admin";
-  if (pathname.startsWith("/client")) return "client";
-  if (pathname.startsWith("/fournisseur")) return "fournisseur";
-  return null;
+/** Vérifie si la route (sans locale) est protégée (/app/*) */
+function isProtectedRoute(pathnameWithoutLocale: string): boolean {
+  return pathnameWithoutLocale.startsWith("/app");
 }
 
-// Vérifie si l’utilisateur a accès à la zone
-// function isAuthorizedRoute(
-//   role: "admin" | "client" | "fournisseur",
-//   area: string | null,
-//   pathnameWithoutLocale: string,
-//   user: SelectUserType,
-// ): { authorized: boolean; type?: string } {
-//   // Si route publique → autorisation automatique
-//   if (!area) return { authorized: true };
-
-//   const segments = pathnameWithoutLocale.split("/").filter(Boolean);
-//   const requestedId = segments[1];
-
-//   // Zones autorisées par rôle
-//   const ROLE_ACCESS: Record<string, string[]> = {
-//     admin: ["admin"],
-//     client: ["client"],
-//     fournisseur: ["fournisseur"],
-//   };
-
-//   // Si la zone ne fait pas partie des zones autorisées pour ce rôle
-//   if (!ROLE_ACCESS[role].includes(area)) {
-//     return { authorized: false, type: area };
-//   }
-
-//   // Vérification de l’ID utilisateur dans l’URL
-//   if (area === "admin" && requestedId !== user.id) {
-//     return { authorized: false, type: "admin" };
-//   }
-
-//   if (
-//     area === "client" &&
-//     requestedId &&
-//     parseInt(requestedId) !== user.clientId
-//   ) {
-//     return { authorized: false, type: "client" };
-//   }
-
-//   if (
-//     area === "fournisseur" &&
-//     requestedId &&
-//     parseInt(requestedId) !== user.fournisseurId
-//   ) {
-//     return { authorized: false, type: "fournisseur" };
-//   }
-
-//   return { authorized: true };
-// }
-
-// Récupération session (cookie → fallback API)
+/** Récupération session via cookie Better-auth, fallback API */
 async function resolveSession(req: NextRequest) {
-  // 1. Lecture du cookie Better-auth (rapide)
   const cookieData = await getCookieCache(req);
   if (cookieData?.session && cookieData?.user) {
-    log("Session trouvée dans le cookie");
     return { session: cookieData.session, user: cookieData.user };
   }
 
-  log("Pas de session dans cookie → fallback API");
-
-  // 2. Fallback API vers /api/auth/get-session
   try {
-    const response = await fetch(`${req.nextUrl.origin}/api/auth/get-session`, {
-      headers: { cookie: req.headers.get("cookie") || "" },
-    });
+    const response = await fetch(
+      `${req.nextUrl.origin}/api/auth/get-session`,
+      { headers: { cookie: req.headers.get("cookie") || "" } },
+    );
 
-    if (!response.ok) {
-      log("API session → pas ok :", response.status);
-      return null;
-    }
+    if (!response.ok) return null;
 
     const data = await response.json();
     if (data.session && data.user) {
-      log("Session trouvée via API");
       return { session: data.session, user: data.user };
     }
 
-    log("API session renvoie vide");
     return null;
-  } catch (err) {
-    log("Erreur API get-session :", err);
+  } catch {
     return null;
   }
 }
 
 // ============================================================================
-// MIDDLEWARE PRINCIPAL OPTIMISÉ
+// MIDDLEWARE PRINCIPAL
 // ============================================================================
 export async function middleware(req: NextRequest) {
   const fullUrl = req.nextUrl.href;
@@ -137,19 +64,6 @@ export async function middleware(req: NextRequest) {
   const locale = getLocaleFromPathname(pathname);
   const hostname = req.headers.get("host") || "";
 
-  log("URL :", fullUrl);
-  log("Locale :", locale);
-  log("Sans locale :", pathnameWithoutLocale);
-
-  // ============================================================================
-  // 0. TEMP : désactiver la protection pour /client
-  // ============================================================================
-  // if (pathnameWithoutLocale.startsWith("/client")) {
-  //   log("TEMP: bypass auth pour /client");
-  //   // on laisse juste next-intl gérer la locale
-  //   if (!locale) return intlMiddleware(req);
-  //   return intlMiddleware(req);
-  // }
   // ============================================================================
   // 1. Redirections SEO / legacy
   // ============================================================================
@@ -165,14 +79,13 @@ export async function middleware(req: NextRequest) {
     return new NextResponse(null, { status: 410 });
   }
 
-  // DIAGNOSTIC: Désactiver complètement le blocage des crochets pour tester
-  // if (
-  //   pathname.match(/^\/(fr|en)\/tag\b/) ||
-  //   (pathname.includes("[") && !pathname.startsWith("/_next")) ||
-  //   (pathname.includes("]") && !pathname.startsWith("/_next"))
-  // ) {
-  //   return new NextResponse(null, { status: 410 });
-  // }
+  if (
+    pathname.match(/^\/(fr|en)\/tag\b/) ||
+    (pathname.includes("[") && !pathname.startsWith("/_next")) ||
+    (pathname.includes("]") && !pathname.startsWith("/_next"))
+  ) {
+    return new NextResponse(null, { status: 410 });
+  }
 
   if (legacyRedirects[pathname]) {
     return NextResponse.redirect(
@@ -184,13 +97,9 @@ export async function middleware(req: NextRequest) {
   if (!locale) return intlMiddleware(req);
 
   // ============================================================================
-  // 2. Routes publiques
+  // 2. Redirections SEO articles/services/secteurs (routes publiques)
   // ============================================================================
-
-  const area = getPortalArea(pathnameWithoutLocale);
-  const isProtected = area !== null;
-
-  if (!isProtected) {
+  if (!isProtectedRoute(pathnameWithoutLocale)) {
     const parts = pathnameWithoutLocale.split("/").filter(Boolean);
 
     const r1 = handleArticleRedirects(req, parts, locale);
@@ -206,46 +115,16 @@ export async function middleware(req: NextRequest) {
   }
 
   // ============================================================================
-  // 3. Route protégée → Résolution session
+  // 3. Route protégée /app → vérification session
   // ============================================================================
   const sessionData = await resolveSession(req);
 
   if (!sessionData) {
-    log("Aucune session valide → redirection signin");
     return NextResponse.redirect(new URL(`/${locale}/auth/signin`, req.url));
   }
 
-  const { user } = sessionData;
-
-  // ============================================================================
-  // 4. Vérification des permissions
-  // ============================================================================
-  // const userRole = user.role.startsWith("admin")
-  //   ? "admin"
-  //   : user.role.startsWith("client")
-  //     ? "client"
-  //     : user.role.startsWith("fournisseur")
-  //       ? "fournisseur"
-  //       : "unknown";
-  // const check = isAuthorizedRoute(
-  //   userRole as "admin" | "client" | "fournisseur",
-  //   area,
-  //   pathnameWithoutLocale,
-  //   user as SelectUserType,
-  // );
-
-  // if (!check.authorized) {
-  //   log("Accès refusé :", check.type);
-  //   return NextResponse.redirect(
-  //     new URL(`/${locale}/auth/unauthorized?type=${check.type}`, req.url),
-  //   );
-  // }
-
-  // log("Accès autorisé pour :", user.role);
-
-  // ============================================================================
-  // 5. Accès OK → next-intl rend la page
-  // ============================================================================
+  // Session OK → next-intl rend la page
+  // (les permissions granulaires sont gérées côté layout/server actions)
   return intlMiddleware(req);
 }
 
