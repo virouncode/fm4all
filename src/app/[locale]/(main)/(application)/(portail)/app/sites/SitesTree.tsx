@@ -7,13 +7,14 @@ import { SiteTreeNode } from "@/zod-schemas/sites.schema";
 import { RoleAdhesionType } from "@/zod-schemas/userAdhesion.schema";
 import { RolePlateformeAdhesionType } from "@/zod-schemas/userPlateformeAdhesion.schema";
 import { Building, ChevronDown, ChevronRight, Plus } from "lucide-react";
-import { useState } from "react";
 
 interface SitesTreeProps {
   tree: SiteTreeNode[];
   selectedSiteId: string | null;
   onSelectSite: (siteId: string) => void;
   onCreateChild: (parentId: string) => void;
+  expandedNodes: Set<string>;
+  onToggleExpand: (nodeId: string) => void;
   currentUserRole: RoleAdhesionType | null;
   currentUserPlateformeRole: RolePlateformeAdhesionType | null;
   responsableSiteIds: Set<string>;
@@ -24,6 +25,8 @@ export function SitesTree({
   selectedSiteId,
   onSelectSite,
   onCreateChild,
+  expandedNodes,
+  onToggleExpand,
   currentUserRole,
   currentUserPlateformeRole,
   responsableSiteIds,
@@ -43,6 +46,8 @@ export function SitesTree({
           selectedSiteId={selectedSiteId}
           onSelectSite={onSelectSite}
           onCreateChild={onCreateChild}
+          expandedNodes={expandedNodes}
+          onToggleExpand={onToggleExpand}
           currentUserRole={currentUserRole}
           currentUserPlateformeRole={currentUserPlateformeRole}
           responsableSiteIds={responsableSiteIds}
@@ -58,6 +63,8 @@ type TreeNodeProps = {
   selectedSiteId: string | null;
   onSelectSite: (siteId: string) => void;
   onCreateChild: (parentId: string) => void;
+  expandedNodes: Set<string>;
+  onToggleExpand: (nodeId: string) => void;
   currentUserRole: RoleAdhesionType | null;
   currentUserPlateformeRole: RolePlateformeAdhesionType | null;
   responsableSiteIds: Set<string>;
@@ -69,11 +76,13 @@ function TreeNode({
   selectedSiteId,
   onSelectSite,
   onCreateChild,
+  expandedNodes,
+  onToggleExpand,
   currentUserRole,
   currentUserPlateformeRole,
   responsableSiteIds,
 }: TreeNodeProps) {
-  const [expanded, setExpanded] = useState(false);
+  const expanded = expandedNodes.has(node.id);
   const hasChildren = node.children.length > 0;
   const isSelected = node.id === selectedSiteId;
 
@@ -95,7 +104,7 @@ function TreeNode({
       >
         {/* Expand/Collapse */}
         <button
-          onClick={() => setExpanded(!expanded)}
+          onClick={() => onToggleExpand(node.id)}
           className="flex h-4 w-4 items-center justify-center"
         >
           {hasChildren ? (
@@ -159,6 +168,8 @@ function TreeNode({
               selectedSiteId={selectedSiteId}
               onSelectSite={onSelectSite}
               onCreateChild={onCreateChild}
+              expandedNodes={expandedNodes}
+              onToggleExpand={onToggleExpand}
               currentUserRole={currentUserRole}
               currentUserPlateformeRole={currentUserPlateformeRole}
               responsableSiteIds={responsableSiteIds}

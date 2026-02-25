@@ -7,7 +7,7 @@ import { useAppStore } from "@/stores/application/appStore";
 import { SelectSiteType, SiteTreeNode } from "@/zod-schemas/sites.schema";
 import { Network, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
-import { buildSiteTree } from "./helpers";
+import { buildSiteTree, getPathToRoot } from "./helpers";
 import { SiteDetails } from "./SiteDetails";
 import { SiteFormDialog } from "./SiteFormDialog";
 import { SitesTree } from "./SitesTree";
@@ -34,6 +34,7 @@ export function SitesClient() {
     null,
   );
   const [loading, setLoading] = useState(true);
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
   const [responsableSiteIds, setResponsableSiteIds] = useState<Set<string>>(
     new Set(),
   );
@@ -62,34 +63,47 @@ export function SitesClient() {
           setTree(builtTree);
         }
 
-        if (attributionsResult?.data?.attributions) {
-          // Build Set of siteIds where user is responsable_site
-          const responsableIds = new Set(
-            attributionsResult.data.attributions
+        const attributions = attributionsResult?.data?.attributions ?? [];
+
+        // Responsable IDs
+        setResponsableSiteIds(
+          new Set(
+            attributions
               .filter((attr) => attr.role === "responsable_site")
               .map((attr) => attr.siteId),
-          );
-          setResponsableSiteIds(responsableIds);
+          ),
+        );
 
-          // Sélection par défaut : site le plus haut dans la hiérarchie avec attribution
-          // BFS sur l'arbre → premier nœud attribué = nœud au niveau le plus haut
-          const attributedSiteIds = new Set(
-            attributionsResult.data.attributions.map((a) => a.siteId),
-          );
-          setSelectedSiteId((prev) => {
-            if (prev !== null) return prev; // Garder la sélection existante
-            const queue: SiteTreeNode[] = [...builtTree];
-            while (queue.length > 0) {
-              const node = queue.shift()!;
-              if (attributedSiteIds.has(node.id)) return node.id;
-              queue.push(...node.children);
-            }
-            // Fallback : premier site racine (admins sans attribution explicite)
-            return builtTree.length > 0 ? builtTree[0].id : null;
-          });
-        } else if (builtTree.length > 0) {
-          // Aucune attribution mais des sites → sélectionner le premier site racine
-          setSelectedSiteId((prev) => (prev !== null ? prev : builtTree[0].id));
+        // Sélection par défaut : BFS → premier site attribué (le plus haut dans la hiérachie)
+        const attributedSiteIds = new Set(attributions.map((a) => a.siteId));
+        let defaultSiteId: string | null = null;
+        const queue: SiteTreeNode[] = [...builtTree];
+        while (queue.length > 0) {
+          const node = queue.shift()!;
+          if (attributedSiteIds.has(node.id)) {
+            defaultSiteId = node.id;
+            break;
+          }
+          queue.push(...node.children);
+        }
+        // Fallback : premier site racine (admins sans attribution explicite)
+        if (!defaultSiteId && builtTree.length > 0) {
+          defaultSiteId = builtTree[0].id;
+        }
+
+        if (defaultSiteId) {
+          setSelectedSiteId((prev) => prev ?? defaultSiteId);
+
+          // Déplier les ancêtres pour que le site soit visible dans l'arbre
+          const path = getPathToRoot(builtTree, defaultSiteId);
+          if (path.length > 1) {
+            const ancestorIds = path.slice(0, -1).map((n) => n.id);
+            setExpandedNodes((prev) => {
+              const next = new Set(prev);
+              ancestorIds.forEach((id) => next.add(id));
+              return next;
+            });
+          }
         }
       } catch (error) {
         console.error("Failed to load data:", error);
@@ -104,6 +118,18 @@ export function SitesClient() {
   // Handlers
   const handleSiteSelect = (siteId: string) => {
     setSelectedSiteId(siteId);
+  };
+
+  const handleToggleExpand = (nodeId: string) => {
+    setExpandedNodes((prev) => {
+      const next = new Set(prev);
+      if (next.has(nodeId)) {
+        next.delete(nodeId);
+      } else {
+        next.add(nodeId);
+      }
+      return next;
+    });
   };
 
   const handleCreateRoot = () => {
@@ -180,6 +206,8 @@ export function SitesClient() {
           selectedSiteId={selectedSiteId}
           onSelectSite={handleSiteSelect}
           onCreateChild={handleCreateChild}
+          expandedNodes={expandedNodes}
+          onToggleExpand={handleToggleExpand}
           currentUserRole={currentUserRole}
           currentUserPlateformeRole={currentUserPlateformeRole}
           responsableSiteIds={responsableSiteIds}

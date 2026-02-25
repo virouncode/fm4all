@@ -14,7 +14,7 @@ import { UserWithAdhesionType } from "@/zod-schemas/user.schema";
 import { Filter, Plus, Users } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { buildUserTree } from "./helpers";
+import { buildUserTree, getPathToRoot } from "./helpers";
 import { UserDetails } from "./UserDetails";
 import { UserFormDialog } from "./UserFormDialog";
 import { UsersFiltersForm } from "./UsersFiltersForm";
@@ -114,6 +114,19 @@ export function UsersClient() {
     loadUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [entreprise?.id, searchFilter, roleFilter, statutFilter]);
+
+  // Déplier les ancêtres quand un utilisateur est sélectionné (par défaut ou par clic)
+  useEffect(() => {
+    if (!selectedUserId) return;
+    const path = getPathToRoot(tree, selectedUserId);
+    if (path.length <= 1) return; // Racine, rien à déplier
+    const ancestorIds = path.slice(0, -1).map((n) => n.id);
+    setExpandedNodes((prev) => {
+      const next = new Set(prev);
+      ancestorIds.forEach((id) => next.add(id));
+      return next;
+    });
+  }, [selectedUserId, tree]);
 
   // Handlers
   const handleUserSelect = (userId: string) => {
