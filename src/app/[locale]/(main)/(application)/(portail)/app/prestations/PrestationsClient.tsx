@@ -307,8 +307,6 @@ export default function PrestationsClient({
             loading={loading}
             isError={isError}
             showEntreprise={showEntreprise}
-            onEdit={setEditingPrestation}
-            onChangeStatut={setStatutPrestation}
           />
         )}
       </div>
@@ -406,8 +404,6 @@ interface PrestationsGridProps {
   loading: boolean;
   isError: boolean;
   showEntreprise: boolean;
-  onEdit: (p: PrestationListItem) => void;
-  onChangeStatut: (p: PrestationListItem) => void;
 }
 
 function PrestationsGrid({
@@ -415,8 +411,6 @@ function PrestationsGrid({
   loading,
   isError,
   showEntreprise,
-  onEdit,
-  onChangeStatut,
 }: PrestationsGridProps) {
   if (loading) {
     return (
@@ -452,8 +446,6 @@ function PrestationsGrid({
             key={p.id}
             prestation={p}
             showEntreprise={showEntreprise}
-            onEdit={onEdit}
-            onChangeStatut={onChangeStatut}
           />
         ))}
       </div>
