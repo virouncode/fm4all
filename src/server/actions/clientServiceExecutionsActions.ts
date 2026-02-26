@@ -142,6 +142,14 @@ export const insertExecutionWithPrixAction = actionClient
       );
     });
 
+    // Backfill : assigner l'exécution aux occurrences non assignées si prestation active + planifiée
+    if (prestation.statut === "actif" && prestation.modePlanning === "planifie") {
+      const { backfillOccurrencesWithExecution } = await import(
+        "@/server/utils/clientServiceOccurrences.utils"
+      );
+      await backfillOccurrencesWithExecution({ clientServiceId: prestationId, now: new Date() });
+    }
+
     // Recharger les exécutions mises à jour
     const updatedExecutions =
       await getExecutionsWithPrixByPrestationId(prestationId);
@@ -209,6 +217,14 @@ export const toggleExecutionActifAction = actionClient
       .update(clientServiceExecutions)
       .set({ actif: parsedInput.actif, updatedById: currentUser.id })
       .where(eq(clientServiceExecutions.id, executionId));
+
+    // Backfill : si on active une exécution sur une prestation active + planifiée
+    if (parsedInput.actif && prestation.statut === "actif" && prestation.modePlanning === "planifie") {
+      const { backfillOccurrencesWithExecution } = await import(
+        "@/server/utils/clientServiceOccurrences.utils"
+      );
+      await backfillOccurrencesWithExecution({ clientServiceId: prestationId, now: new Date() });
+    }
 
     const updatedExecutions =
       await getExecutionsWithPrixByPrestationId(prestationId);

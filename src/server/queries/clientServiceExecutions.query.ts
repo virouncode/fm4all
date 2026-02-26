@@ -9,7 +9,8 @@ import {
 } from "@/db/schema/services";
 import { serviceEntreprises } from "@/db/schema/entreprises";
 import { entreprises } from "@/db/schema/entreprises";
-import { and, asc, desc, eq, gte, isNull, or } from "drizzle-orm";
+import { sites } from "@/db/schema/sites";
+import { and, asc, count, desc, eq, gte, isNull, or } from "drizzle-orm";
 
 /**
  * Récupère la liste des prestataires avec lesquels un client a une relation
@@ -113,6 +114,7 @@ export type OccurrenceListItem = {
   id: string;
   clientServiceId: string;
   siteId: string;
+  siteNom: string | null;
   executionId: string | null;
   dateDebutPrevue: Date | null;
   dateFinPrevue: Date | null;
@@ -199,18 +201,41 @@ export async function getExecutionsWithPrixByPrestationId(
 
 // ==================== OCCURRENCES ====================
 
+export type OccurrenceFilters = {
+  limit?: number;
+  offset?: number;
+  statut?: "planifiee" | "en_cours" | "terminee" | "non_honoree" | "annulee";
+  nonAssignedOnly?: boolean;
+  siteId?: string;
+  sortDir?: "asc" | "desc";
+};
+
 /**
- * Récupère les occurrences d'une prestation.
+ * Récupère les occurrences d'une prestation avec filtres, tri et pagination.
  */
 export async function getOccurrencesByPrestationId(
   prestationId: string,
-  options?: { limit?: number; offset?: number },
+  options?: OccurrenceFilters,
 ): Promise<OccurrenceListItem[]> {
+  const conditions = [
+    eq(clientServiceOccurrences.clientServiceId, prestationId),
+  ];
+  if (options?.statut) {
+    conditions.push(eq(clientServiceOccurrences.statut, options.statut));
+  }
+  if (options?.nonAssignedOnly) {
+    conditions.push(isNull(clientServiceOccurrences.executionId));
+  }
+  if (options?.siteId) {
+    conditions.push(eq(clientServiceOccurrences.siteId, options.siteId));
+  }
+
   const rows = await db
     .select({
       id: clientServiceOccurrences.id,
       clientServiceId: clientServiceOccurrences.clientServiceId,
       siteId: clientServiceOccurrences.siteId,
+      siteNom: sites.nom,
       executionId: clientServiceOccurrences.executionId,
       dateDebutPrevue: clientServiceOccurrences.dateDebutPrevue,
       dateFinPrevue: clientServiceOccurrences.dateFinPrevue,
@@ -221,8 +246,14 @@ export async function getOccurrencesByPrestationId(
       createdAt: clientServiceOccurrences.createdAt,
     })
     .from(clientServiceOccurrences)
-    .where(eq(clientServiceOccurrences.clientServiceId, prestationId))
-    .orderBy(desc(clientServiceOccurrences.dateDebutPrevue))
+    .leftJoin(sites, eq(sites.id, clientServiceOccurrences.siteId))
+    .where(and(...conditions))
+    .orderBy(
+      options?.sortDir === "desc"
+        ? desc(clientServiceOccurrences.dateDebutPrevue)
+        : asc(clientServiceOccurrences.dateDebutPrevue),
+      asc(clientServiceOccurrences.id),
+    )
     .limit(options?.limit ?? 50)
     .offset(options?.offset ?? 0);
 
@@ -241,4 +272,42 @@ export async function countOccurrencesByPrestationId(
     .where(eq(clientServiceOccurrences.clientServiceId, prestationId));
 
   return Number(row?.count ?? 0);
+}
+
+/**
+ * Compte les occurrences sans prestataire assigné (executionId IS NULL).
+ */
+export async function countNonAssignedOccurrencesByPrestationId(
+  prestationId: string,
+): Promise<number> {
+  const [row] = await db
+    .select({ count: count() })
+    .from(clientServiceOccurrences)
+    .where(
+      and(
+        eq(clientServiceOccurrences.clientServiceId, prestationId),
+        isNull(clientServiceOccurrences.executionId),
+      ),
+    );
+
+  return Number(row?.count ?? 0);
+}
+
+/**
+ * Récupère les sites distincts ayant des occurrences pour une prestation.
+ */
+export async function getDistinctSitesForPrestation(
+  prestationId: string,
+): Promise<Array<{ id: string; nom: string }>> {
+  const rows = await db
+    .selectDistinct({
+      id: clientServiceOccurrences.siteId,
+      nom: sites.nom,
+    })
+    .from(clientServiceOccurrences)
+    .innerJoin(sites, eq(sites.id, clientServiceOccurrences.siteId))
+    .where(eq(clientServiceOccurrences.clientServiceId, prestationId))
+    .orderBy(sites.nom);
+
+  return rows.map((r) => ({ id: r.id, nom: r.nom ?? r.id }));
 }

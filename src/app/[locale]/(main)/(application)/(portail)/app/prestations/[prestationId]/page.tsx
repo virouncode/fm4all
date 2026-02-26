@@ -1,6 +1,9 @@
 import { redirect } from "@/i18n/navigation";
 import { getSession } from "@/server/auth/get-session";
 import {
+  countNonAssignedOccurrencesByPrestationId,
+  countOccurrencesByPrestationId,
+  getDistinctSitesForPrestation,
   getExecutionsWithPrixByPrestationId,
   getOccurrencesByPrestationId,
 } from "@/server/queries/clientServiceExecutions.query";
@@ -60,10 +63,14 @@ export default async function PrestationDetailPage({
   // 5. Charger les exécutions et leurs prix
   const executions = await getExecutionsWithPrixByPrestationId(prestationId);
 
-  // 6. Charger les interventions (première page)
-  const occurrences = await getOccurrencesByPrestationId(prestationId, {
-    limit: 50,
-  });
+  // 6. Charger les interventions (première page) + totaux + sites disponibles
+  const [occurrences, totalOccurrences, totalNonAssigned, availableSites] =
+    await Promise.all([
+      getOccurrencesByPrestationId(prestationId, { limit: 50, sortDir: "asc" }),
+      countOccurrencesByPrestationId(prestationId),
+      countNonAssignedOccurrencesByPrestationId(prestationId),
+      getDistinctSitesForPrestation(prestationId),
+    ]);
 
   return (
     <PrestationDetailsClient
@@ -72,6 +79,9 @@ export default async function PrestationDetailPage({
       isPlateforme={isPlateforme}
       executions={executions}
       occurrences={occurrences}
+      totalOccurrences={totalOccurrences}
+      totalNonAssigned={totalNonAssigned}
+      availableSites={availableSites}
     />
   );
 }

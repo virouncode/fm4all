@@ -99,7 +99,30 @@ export async function getEffectiveSitesForService({
     excludedSiteIds.forEach((id) => includedSiteIds.delete(id));
   }
 
-  return Array.from(includedSiteIds);
+  // Filtrer aux feuilles uniquement.
+  // Une intervention se fait sur un lieu physique terminal (feuille), jamais sur
+  // un nœud intermédiaire (conteneur abstrait type "Siège Paris").
+  const allSiteIds = Array.from(includedSiteIds);
+  if (allSiteIds.length === 0) return [];
+
+  // Les nœuds ayant au moins un descendant PARMI les sites retenus sont des non-feuilles.
+  // Double inArray : ancêtre ET descendant doivent être dans allSiteIds.
+  // Ainsi un site sélectionné seul (scope=self) reste une feuille même s'il a des
+  // enfants dans l'arbre global.
+  const nonLeafRows = await dbClient
+    .selectDistinct({ ancetreId: sitesArborescence.ancetreId })
+    .from(sitesArborescence)
+    .where(
+      and(
+        eq(sitesArborescence.entrepriseId, entrepriseId),
+        inArray(sitesArborescence.ancetreId, allSiteIds),
+        inArray(sitesArborescence.descendantId, allSiteIds),
+        gt(sitesArborescence.profondeur, 0),
+      ),
+    );
+
+  const nonLeaves = new Set(nonLeafRows.map((r) => r.ancetreId));
+  return allSiteIds.filter((id) => !nonLeaves.has(id));
 }
 
 // ---------------------------------------------------------------------------
@@ -629,4 +652,164 @@ export async function onClientServiceChanged({
 
     return { deleted: futurePlanifiees.length, created };
   });
+}
+
+// ---------------------------------------------------------------------------
+// 6. BACKFILL — Assigne une exécution aux occurrences non assignées
+// ---------------------------------------------------------------------------
+
+/**
+ * Parcourt les occurrences futures planifiées sans exécution (executionId = null)
+ * et tente de leur assigner une exécution gagnante.
+ *
+ * À appeler après l'ajout ou l'activation d'une exécution.
+ * N'est utile que si statut = actif + modePlanning = planifie.
+ */
+export async function backfillOccurrencesWithExecution({
+  clientServiceId,
+  now,
+  tx,
+}: {
+  clientServiceId: string;
+  now: Date;
+  tx?: DbOrTransaction;
+}): Promise<{ updated: number }> {
+  const dbClient = tx ?? db;
+
+  const [cs] = await dbClient
+    .select()
+    .from(clientServices)
+    .where(eq(clientServices.id, clientServiceId));
+
+  if (!cs || cs.statut !== "actif" || cs.modePlanning !== "planifie") {
+    return { updated: 0 };
+  }
+
+  // Récupère les occurrences futures planifiées sans exécution
+  const unassigned = await dbClient
+    .select({
+      id: clientServiceOccurrences.id,
+      siteId: clientServiceOccurrences.siteId,
+      dateDebutPrevue: clientServiceOccurrences.dateDebutPrevue,
+    })
+    .from(clientServiceOccurrences)
+    .where(
+      and(
+        eq(clientServiceOccurrences.clientServiceId, clientServiceId),
+        eq(clientServiceOccurrences.statut, "planifiee"),
+        isNull(clientServiceOccurrences.executionId),
+        gte(clientServiceOccurrences.dateDebutPrevue, now),
+      ),
+    );
+
+  let updated = 0;
+
+  for (const occ of unassigned) {
+    if (!occ.dateDebutPrevue) continue;
+
+    const executionId = await pickExecutionForOccurrence({
+      clientServiceId,
+      entrepriseId: cs.entrepriseId,
+      siteId: occ.siteId,
+      targetDate: occ.dateDebutPrevue,
+      tx,
+    });
+
+    if (executionId) {
+      await dbClient
+        .update(clientServiceOccurrences)
+        .set({ executionId })
+        .where(eq(clientServiceOccurrences.id, occ.id));
+      updated++;
+    }
+  }
+
+  return { updated };
+}
+
+// ---------------------------------------------------------------------------
+// 7. TRANSITIONS STATUT PRESTATION — Nettoyage des occurrences
+// ---------------------------------------------------------------------------
+
+/**
+ * actif → en_pause :
+ * Supprime les occurrences futures planifiées.
+ * Elles seront régénérées automatiquement au retour à actif (onClientServiceChanged).
+ */
+export async function deleteFuturePlanifieeOccurrences({
+  clientServiceId,
+  now,
+  tx,
+}: {
+  clientServiceId: string;
+  now: Date;
+  tx?: DbOrTransaction;
+}): Promise<{ deleted: number }> {
+  const dbClient = tx ?? db;
+
+  const toDelete = await dbClient
+    .select({ id: clientServiceOccurrences.id })
+    .from(clientServiceOccurrences)
+    .where(
+      and(
+        eq(clientServiceOccurrences.clientServiceId, clientServiceId),
+        eq(clientServiceOccurrences.statut, "planifiee"),
+        gte(clientServiceOccurrences.dateDebutPrevue, now),
+      ),
+    );
+
+  if (toDelete.length > 0) {
+    await dbClient
+      .delete(clientServiceOccurrences)
+      .where(
+        inArray(
+          clientServiceOccurrences.id,
+          toDelete.map((o) => o.id),
+        ),
+      );
+  }
+
+  return { deleted: toDelete.length };
+}
+
+/**
+ * actif/en_pause → termine :
+ * Annule les occurrences futures planifiées (statut → annulee).
+ * Conserve l'historique pour audit et analytics.
+ */
+export async function cancelFuturePlanifieeOccurrences({
+  clientServiceId,
+  now,
+  tx,
+}: {
+  clientServiceId: string;
+  now: Date;
+  tx?: DbOrTransaction;
+}): Promise<{ cancelled: number }> {
+  const dbClient = tx ?? db;
+
+  const toCancel = await dbClient
+    .select({ id: clientServiceOccurrences.id })
+    .from(clientServiceOccurrences)
+    .where(
+      and(
+        eq(clientServiceOccurrences.clientServiceId, clientServiceId),
+        eq(clientServiceOccurrences.statut, "planifiee"),
+        gte(clientServiceOccurrences.dateDebutPrevue, now),
+      ),
+    );
+
+  if (toCancel.length > 0) {
+    await dbClient
+      .update(clientServiceOccurrences)
+      .set({ statut: "annulee", updatedAt: new Date() })
+      .where(
+        inArray(
+          clientServiceOccurrences.id,
+          toCancel.map((o) => o.id),
+        ),
+      );
+  }
+
+  return { cancelled: toCancel.length };
 }

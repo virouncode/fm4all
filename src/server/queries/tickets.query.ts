@@ -197,6 +197,8 @@ export async function getTicketsByPerimetre({
 
   // Tri secondaire systématique sur lastActivityAt (les plus récents en premier)
   orderByClauses.push(desc(tickets.lastActivityAt));
+  // Tri tertiaire sur id pour garantir un ordre stable (pagination sans doublons)
+  orderByClauses.push(asc(tickets.id));
 
   // Query avec JOINs pour tri relationnel
   const queryBuilder = db
