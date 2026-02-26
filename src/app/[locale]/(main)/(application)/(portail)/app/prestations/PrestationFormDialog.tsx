@@ -37,6 +37,8 @@ import { useAppStore } from "@/stores/application/appStore";
 import {
   clientServiceModePlanningSchema,
   frequenceSchema,
+  modeCommercialSchema,
+  type ModeCommercialType,
   type PrestationListItem,
 } from "@/zod-schemas/clientServices.schema";
 import { type SelectSiteType } from "@/zod-schemas/sites.schema";
@@ -97,6 +99,7 @@ const prestationFormSchema = z
         "La durée doit être un nombre entre 1 et 720 minutes",
       ),
     modePlanning: clientServiceModePlanningSchema.optional(),
+    modeCommercial: modeCommercialSchema.optional(),
     notes: z.string().optional(),
   })
   .superRefine((data, ctx) => {
@@ -209,6 +212,7 @@ export function PrestationFormDialog({
           heureDebutPreference: prestation.heureDebutPreference ?? "",
           dureeEstimeeMinutes: prestation.dureeEstimeeMinutes?.toString() ?? "",
           modePlanning: prestation.modePlanning ?? "planifie",
+          modeCommercial: prestation.modeCommercial ?? "direct",
           notes: prestation.notes ?? "",
         }
       : {
@@ -223,6 +227,7 @@ export function PrestationFormDialog({
           heureDebutPreference: "",
           dureeEstimeeMinutes: "",
           modePlanning: "planifie",
+          modeCommercial: "direct" as ModeCommercialType,
           notes: "",
         },
   });
@@ -312,6 +317,7 @@ export function PrestationFormDialog({
         heureDebutPreference: prestation.heureDebutPreference ?? "",
         dureeEstimeeMinutes: prestation.dureeEstimeeMinutes?.toString() ?? "",
         modePlanning: prestation.modePlanning ?? "planifie",
+        modeCommercial: prestation.modeCommercial ?? "direct",
         notes: prestation.notes ?? "",
       });
     } else {
@@ -330,6 +336,7 @@ export function PrestationFormDialog({
         heureDebutPreference: "",
         dureeEstimeeMinutes: "",
         modePlanning: "planifie",
+        modeCommercial: "direct",
         notes: "",
       });
       setSelectedClientId(defaultClientId);
@@ -458,6 +465,7 @@ export function PrestationFormDialog({
         heureDebutPreference: data.heureDebutPreference,
         dureeEstimeeMinutes: data.dureeEstimeeMinutes,
         modePlanning: data.modePlanning,
+        modeCommercial: data.modeCommercial,
         notes: data.notes,
       });
       if (result?.serverError) {
@@ -486,6 +494,7 @@ export function PrestationFormDialog({
         heureDebutPreference: data.heureDebutPreference,
         dureeEstimeeMinutes: data.dureeEstimeeMinutes,
         modePlanning: data.modePlanning,
+        modeCommercial: data.modeCommercial,
         notes: data.notes,
         perimetre,
       });
@@ -671,6 +680,19 @@ export function PrestationFormDialog({
                 <h3 className="text-sm font-semibold">
                   Fréquence & planification
                 </h3>
+
+                {posture === "plateforme" && (
+                  <RhfControlledSelect<PrestationFormValues>
+                    name="modeCommercial"
+                    label="Mode commercial"
+                    selectClassName="w-full"
+                  >
+                    <SelectItem value="direct">Direct</SelectItem>
+                    <SelectItem value="intermediaire_fm4all">
+                      Intermédiaire FM4ALL
+                    </SelectItem>
+                  </RhfControlledSelect>
+                )}
 
                 <div className="grid grid-cols-2 gap-4">
                   <RhfControlledSelect<PrestationFormValues>

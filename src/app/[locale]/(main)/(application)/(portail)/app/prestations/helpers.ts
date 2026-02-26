@@ -2,6 +2,7 @@ import {
   type ClientServiceModePlanningType,
   type ClientServiceStatutType,
   type FrequenceType,
+  type ModeCommercialType,
 } from "@/zod-schemas/clientServices.schema";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -120,6 +121,32 @@ export function getModePlanningBadge(mode: ClientServiceModePlanningType): {
   }
 }
 
+export function getModeCommercialBadge(mode: ModeCommercialType): {
+  label: string;
+  className: string;
+} {
+  switch (mode) {
+    case "direct":
+      return {
+        label: "Direct",
+        className:
+          "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+      };
+    case "intermediaire_fm4all":
+      return {
+        label: "Intermédiaire FM4ALL",
+        className:
+          "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200",
+      };
+    default:
+      return {
+        label: mode,
+        className:
+          "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+      };
+  }
+}
+
 // ==================== DURATION ====================
 
 export function formatDuree(minutes: number | null | undefined): string {
@@ -135,4 +162,16 @@ export function formatDuree(minutes: number | null | undefined): string {
 export function formatDate(date: Date | null | undefined): string {
   if (!date) return "—";
   return format(new Date(date), "dd/MM/yyyy", { locale: fr });
+}
+
+export function formatDateTime(date: Date | null | undefined): string {
+  if (!date) return "—";
+  const d = new Date(date);
+  const hours = d.getHours();
+  const minutes = d.getMinutes();
+  const timeStr =
+    hours === 0 && minutes === 0
+      ? ""
+      : ` ${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+  return format(d, "dd/MM/yyyy", { locale: fr }) + timeStr;
 }

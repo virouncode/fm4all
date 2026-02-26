@@ -1,0 +1,2 @@
+CREATE TYPE "public"."mode_commercial" AS ENUM('direct', 'intermediaire_fm4all');--> statement-breakpoint
+ALTER TABLE "client_services" ADD COLUMN "mode_commercial" "mode_commercial" DEFAULT 'direct' NOT NULL;

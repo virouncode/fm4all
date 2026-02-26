@@ -273,6 +273,18 @@ export const clientServiceModePlanningCodes = clientServiceModePlanningCT.map(
   ...(typeof clientServiceModePlanningCT)[number]["code"][],
 ];
 
+export const modeCommercialCT = [
+  { code: "direct", name: "Direct" },
+  { code: "intermediaire_fm4all", name: "Intermédiaire FM4ALL" },
+] as const;
+
+export const modeCommercialCodes = modeCommercialCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof modeCommercialCT)[number]["code"],
+  ...(typeof modeCommercialCT)[number]["code"][],
+];
+
 export const perimetreModeCT = [
   { code: "inclure", name: "Inclure" },
   { code: "exclure", name: "Exclure" },

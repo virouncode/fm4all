@@ -83,6 +83,7 @@ import {
   formatDateTime,
   formatDuree,
   getFrequenceLabel,
+  getModeCommercialBadge,
   getModePlanningBadge,
   getPrestationStatutBadge,
 } from "../helpers";
@@ -275,6 +276,13 @@ export function PrestationDetailsClient({
               }
             >
               {getModePlanningBadge(prestation.modePlanning).label}
+            </Badge>
+            <Badge
+              className={
+                getModeCommercialBadge(prestation.modeCommercial).className
+              }
+            >
+              {getModeCommercialBadge(prestation.modeCommercial).label}
             </Badge>
           </div>
 

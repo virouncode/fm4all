@@ -27,6 +27,7 @@ import {
   executionPeriodeFacturationEnum,
   executionTypePrixEnum,
   frequenceEnum,
+  modeCommercialEnum,
   occurrenceStatutEnum,
   occurrenceTacheStatutEnum,
   perimetreModeEnum,
@@ -91,6 +92,9 @@ export const clientServices = pgTable(
     modePlanning: clientServiceModePlanningEnum("mode_planning")
       .notNull()
       .default("planifie"),
+    modeCommercial: modeCommercialEnum("mode_commercial")
+      .notNull()
+      .default("direct"),
     notes: text("notes"),
     createdById: createdById(() => user),
     updatedById: updatedById(() => user),

@@ -2,7 +2,12 @@
 
 import { db } from "@/db";
 import { userAdhesions } from "@/db/schema/users";
-import { clientServicePerimetre, clientServices } from "@/db/schema/services";
+import {
+  clientServiceExecutions,
+  clientServiceOccurrences,
+  clientServicePerimetre,
+  clientServices,
+} from "@/db/schema/services";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
@@ -24,7 +29,7 @@ import {
   updatePrestationStatutSchema,
 } from "@/zod-schemas/clientServices.schema";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
-import { and, eq } from "drizzle-orm";
+import { and, count, eq, gte, or } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
 import { z } from "zod";
 
@@ -69,6 +74,38 @@ async function hasAccessToEntreprise(
   });
 
   return !!adhesion;
+}
+
+/**
+ * Vérifie si une prestation est "mise en exécution" (au moins une exécution, un tarif ou une occurrence future).
+ * Dans ce cas, le modeCommercial est verrouillé.
+ */
+async function isPrestationMiseEnExecution(
+  prestationId: string,
+): Promise<boolean> {
+  const now = new Date();
+
+  const [executionRow] = await db
+    .select({ n: count() })
+    .from(clientServiceExecutions)
+    .where(eq(clientServiceExecutions.clientServiceId, prestationId));
+
+  if ((executionRow?.n ?? 0) > 0) return true;
+
+  const [occurrenceRow] = await db
+    .select({ n: count() })
+    .from(clientServiceOccurrences)
+    .where(
+      and(
+        eq(clientServiceOccurrences.clientServiceId, prestationId),
+        or(
+          gte(clientServiceOccurrences.dateDebutPrevue, now),
+          gte(clientServiceOccurrences.dateDebutReelle, now),
+        ),
+      ),
+    );
+
+  return (occurrenceRow?.n ?? 0) > 0;
 }
 
 // ==================== GET PRESTATIONS ====================
@@ -192,6 +229,13 @@ export const insertPrestationAction = actionClient
       );
     }
 
+    // Règle métier : seule la plateforme peut créer en mode intermediaire_fm4all
+    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const modeCommercial =
+      platformRole?.role && parsedInput.modeCommercial === "intermediaire_fm4all"
+        ? "intermediaire_fm4all"
+        : "direct";
+
     // Normaliser les données (strings → types corrects, "" → null)
     const normalized = normalizeForSubmit(parsedInput, {
       optionalNumbers: [
@@ -218,6 +262,7 @@ export const insertPrestationAction = actionClient
       dureeEstimeeMinutes: normalized.dureeEstimeeMinutes,
       statut: "brouillon", // toujours brouillon à la création
       modePlanning: normalized.modePlanning ?? "planifie",
+      modeCommercial,
       notes: normalized.notes,
       createdById: currentUser.id,
       updatedById: currentUser.id,
@@ -324,6 +369,22 @@ export const updatePrestationAction = actionClient
       );
     }
 
+    // Règle modeCommercial : seule la plateforme peut le modifier, et seulement avant exécution
+    if (parsedInput.modeCommercial !== undefined && parsedInput.modeCommercial !== current.modeCommercial) {
+      const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+      if (!platformRole?.role) {
+        throw errors.forbidden(
+          "Seule la plateforme FM4ALL peut modifier le mode commercial.",
+        );
+      }
+      const isLocked = await isPrestationMiseEnExecution(prestationId);
+      if (isLocked) {
+        throw errors.conflict(
+          "Le mode commercial ne peut plus être modifié : des exécutions, tarifs ou interventions existent déjà.",
+        );
+      }
+    }
+
     // Normaliser les données
     const normalized = normalizeForSubmit(parsedInput, {
       optionalNumbers: [
@@ -355,6 +416,8 @@ export const updatePrestationAction = actionClient
       updateFields.dureeEstimeeMinutes = normalized.dureeEstimeeMinutes;
     if (normalized.modePlanning !== undefined)
       updateFields.modePlanning = normalized.modePlanning;
+    if (parsedInput.modeCommercial !== undefined)
+      updateFields.modeCommercial = parsedInput.modeCommercial;
     if (normalized.notes !== undefined) updateFields.notes = normalized.notes;
 
     const payload = updateClientServiceToDbSchema.parse({
@@ -478,15 +541,29 @@ export const updatePrestationStatutAction = actionClient
 
     const parsedPrestation = selectClientServiceSchema.parse(updated);
 
-    // Déclencher la génération d'occurrences si passage à "actif" + mode "planifie"
-    if (
-      newStatut === "actif" &&
-      parsedPrestation.modePlanning === "planifie"
-    ) {
-      const { onClientServiceChanged } = await import(
-        "@/server/utils/clientServiceOccurrences.utils"
-      );
-      await onClientServiceChanged({ clientServiceId: parsedPrestation.id, now: new Date() });
+    // Effets de bord sur les occurrences selon la transition (mode planifie uniquement)
+    if (parsedPrestation.modePlanning === "planifie") {
+      const now = new Date();
+
+      if (newStatut === "actif") {
+        // Régénère la fenêtre glissante (supprime les planifiées futures + recrée)
+        const { onClientServiceChanged } = await import(
+          "@/server/utils/clientServiceOccurrences.utils"
+        );
+        await onClientServiceChanged({ clientServiceId: parsedPrestation.id, now });
+      } else if (newStatut === "en_pause") {
+        // Supprime les planifiées futures : seront régénérées au retour à actif
+        const { deleteFuturePlanifieeOccurrences } = await import(
+          "@/server/utils/clientServiceOccurrences.utils"
+        );
+        await deleteFuturePlanifieeOccurrences({ clientServiceId: parsedPrestation.id, now });
+      } else if (newStatut === "termine") {
+        // Annule les planifiées futures : conserve l'historique pour audit
+        const { cancelFuturePlanifieeOccurrences } = await import(
+          "@/server/utils/clientServiceOccurrences.utils"
+        );
+        await cancelFuturePlanifieeOccurrences({ clientServiceId: parsedPrestation.id, now });
+      }
     }
 
     return {

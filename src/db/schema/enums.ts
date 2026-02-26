@@ -5,6 +5,7 @@ import {
   clientServiceModePlanningCodes,
   clientServiceStatutCodes,
   contratDealModeCodes,
+  modeCommercialCodes,
   contratStatutCodes,
   contratTypeCodes,
   devisLigneUniteCodes,
@@ -190,4 +191,9 @@ export const executionTypePrixEnum = pgEnum(
 export const executionPeriodeFacturationEnum = pgEnum(
   "execution_periode_facturation",
   executionPeriodeFacturationCodes,
+);
+
+export const modeCommercialEnum = pgEnum(
+  "mode_commercial",
+  modeCommercialCodes,
 );

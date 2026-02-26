@@ -3,6 +3,7 @@ import {
   clientServiceModePlanningEnum,
   clientServiceStatutEnum,
   frequenceEnum,
+  modeCommercialEnum,
 } from "@/db/schema/enums";
 import {
   createInsertSchema,
@@ -89,6 +90,9 @@ export type ClientServiceModePlanningType = z.infer<
   typeof clientServiceModePlanningSchema
 >;
 
+export const modeCommercialSchema = z.enum(modeCommercialEnum.enumValues);
+export type ModeCommercialType = z.infer<typeof modeCommercialSchema>;
+
 // ==================== FORM SCHEMAS ====================
 // Form uses string inputs for numbers and dates, converted in actions
 
@@ -150,6 +154,7 @@ export const insertPrestationFormSchema = z.object({
   // Planning
   statut: clientServiceStatutSchema.optional(),
   modePlanning: clientServiceModePlanningSchema.optional(),
+  modeCommercial: modeCommercialSchema.optional(),
 
   // Commentaires
   notes: z.string().optional(),
@@ -169,6 +174,7 @@ export const updatePrestationFormSchema = insertPrestationFormSchema
     id: z.uuid("ID de la prestation invalide"),
     statut: clientServiceStatutSchema.optional(),
     modePlanning: clientServiceModePlanningSchema.optional(),
+    modeCommercial: modeCommercialSchema.optional(),
   });
 export type UpdatePrestationFormType = z.infer<typeof updatePrestationFormSchema>;
 
@@ -212,6 +218,7 @@ export type PrestationListItem = {
   dureeEstimeeMinutes: number | null;
   statut: ClientServiceStatutType;
   modePlanning: ClientServiceModePlanningType;
+  modeCommercial: ModeCommercialType;
   notes: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -236,6 +243,7 @@ export const prestationListItemSchema: z.ZodType<PrestationListItem> = z.object(
     dureeEstimeeMinutes: z.number().nullable(),
     statut: clientServiceStatutSchema,
     modePlanning: clientServiceModePlanningSchema,
+    modeCommercial: modeCommercialSchema,
     notes: z.string().nullable(),
     createdAt: z.date(),
     updatedAt: z.date(),
