@@ -139,6 +139,8 @@ export function PrestationDetailsClient({
   const router = useRouter();
   const [executions, setExecutions] =
     useState<ExecutionWithPrix[]>(initialExecutions);
+  const [interventionsCount, setInterventionsCount] =
+    useState(totalOccurrences);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -232,9 +234,9 @@ export function PrestationDetailsClient({
           <TabsTrigger value="interventions" className="gap-2">
             <Wrench className="h-4 w-4" />
             Interventions
-            {totalOccurrences > 0 && (
+            {interventionsCount > 0 && (
               <span className="bg-primary/10 text-primary rounded-full px-1.5 text-xs">
-                {totalOccurrences}
+                {interventionsCount}
               </span>
             )}
             {totalNonAssigned > 0 && (
@@ -426,6 +428,7 @@ export function PrestationDetailsClient({
             prestation={prestation}
             canManage={canManage}
             onUpdate={() => router.refresh()}
+            onCountChange={setInterventionsCount}
             availableSites={availableSites}
           />
         </TabsContent>
@@ -916,6 +919,7 @@ function InterventionsTab({
   prestation,
   canManage,
   onUpdate,
+  onCountChange,
   availableSites,
 }: {
   initialOccurrences: OccurrenceListItem[];
@@ -923,10 +927,12 @@ function InterventionsTab({
   prestation: PrestationListItem;
   canManage: boolean;
   onUpdate: () => void;
+  onCountChange: (count: number) => void;
   availableSites: Array<{ id: string; nom: string }>;
 }) {
   const [occurrences, setOccurrences] =
     useState<OccurrenceListItem[]>(initialOccurrences);
+  const [displayedTotal, setDisplayedTotal] = useState(totalOccurrences);
   const [filters, setFilters] =
     useState<OccurrenceFiltersState>(DEFAULT_FILTERS);
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
@@ -1001,6 +1007,10 @@ function InterventionsTab({
     if (result?.data) {
       setOccurrences(result.data.occurrences);
       setHasMore(result.data.occurrences.length === PAGE_SIZE);
+      if (result.data.filteredTotal !== undefined) {
+        setDisplayedTotal(result.data.filteredTotal);
+        onCountChange(result.data.filteredTotal);
+      }
     }
     setIsFiltering(false);
   };
@@ -1028,7 +1038,7 @@ function InterventionsTab({
           ) : (
             <>
               Fenêtre glissante de <strong>90 jours</strong> —{" "}
-              {totalOccurrences} intervention{totalOccurrences > 1 ? "s" : ""}
+              {displayedTotal} intervention{displayedTotal > 1 ? "s" : ""}
             </>
           )}
         </p>

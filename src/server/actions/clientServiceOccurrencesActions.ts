@@ -9,6 +9,7 @@ import { getPrestationById } from "@/server/queries/clientServices.query";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
 import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userSiteAttributions.utils";
 import {
+  countFilteredOccurrencesByPrestationId,
   getOccurrencesByPrestationId,
 } from "@/server/queries/clientServiceExecutions.query";
 import { getUserAdhesion } from "@/server/queries/userAdhesions.query";
@@ -179,14 +180,24 @@ export const getOccurrencesPageAction = actionClient
       }
     }
 
-    const occurrences = await getOccurrencesByPrestationId(prestationId, {
-      offset,
-      limit,
-      statut,
-      nonAssignedOnly,
-      siteId,
-      sortDir,
-    });
+    const [occurrences, filteredTotal] = await Promise.all([
+      getOccurrencesByPrestationId(prestationId, {
+        offset,
+        limit,
+        statut,
+        nonAssignedOnly,
+        siteId,
+        sortDir,
+      }),
+      // Count seulement pour la première page (offset=0 = filtre/tri changé)
+      offset === 0
+        ? countFilteredOccurrencesByPrestationId(prestationId, {
+            statut,
+            nonAssignedOnly,
+            siteId,
+          })
+        : Promise.resolve(undefined),
+    ]);
 
-    return { occurrences };
+    return { occurrences, filteredTotal };
   });

@@ -261,7 +261,7 @@ export async function getOccurrencesByPrestationId(
 }
 
 /**
- * Compte le nombre d'occurrences pour une prestation.
+ * Compte le nombre d'occurrences pour une prestation (sans filtres).
  */
 export async function countOccurrencesByPrestationId(
   prestationId: string,
@@ -270,6 +270,34 @@ export async function countOccurrencesByPrestationId(
     .select({ count: db.$count(clientServiceOccurrences) })
     .from(clientServiceOccurrences)
     .where(eq(clientServiceOccurrences.clientServiceId, prestationId));
+
+  return Number(row?.count ?? 0);
+}
+
+/**
+ * Compte les occurrences avec les mêmes filtres que getOccurrencesByPrestationId.
+ */
+export async function countFilteredOccurrencesByPrestationId(
+  prestationId: string,
+  options?: Pick<OccurrenceFilters, "statut" | "nonAssignedOnly" | "siteId">,
+): Promise<number> {
+  const conditions = [
+    eq(clientServiceOccurrences.clientServiceId, prestationId),
+  ];
+  if (options?.statut) {
+    conditions.push(eq(clientServiceOccurrences.statut, options.statut));
+  }
+  if (options?.nonAssignedOnly) {
+    conditions.push(isNull(clientServiceOccurrences.executionId));
+  }
+  if (options?.siteId) {
+    conditions.push(eq(clientServiceOccurrences.siteId, options.siteId));
+  }
+
+  const [row] = await db
+    .select({ count: count() })
+    .from(clientServiceOccurrences)
+    .where(and(...conditions));
 
   return Number(row?.count ?? 0);
 }
