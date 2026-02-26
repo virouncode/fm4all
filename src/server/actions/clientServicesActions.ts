@@ -216,7 +216,7 @@ export const insertPrestationAction = actionClient
       joursPreference: normalized.joursPreference ?? null,
       heureDebutPreference: normalized.heureDebutPreference,
       dureeEstimeeMinutes: normalized.dureeEstimeeMinutes,
-      statut: normalized.statut ?? "brouillon",
+      statut: "brouillon", // toujours brouillon à la création
       modePlanning: normalized.modePlanning ?? "planifie",
       notes: normalized.notes,
       createdById: currentUser.id,

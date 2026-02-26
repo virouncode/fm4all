@@ -36,7 +36,6 @@ import { getAccessibleSitesAction } from "@/server/actions/sitesActions";
 import { useAppStore } from "@/stores/application/appStore";
 import {
   clientServiceModePlanningSchema,
-  clientServiceStatutSchema,
   frequenceSchema,
   type PrestationListItem,
 } from "@/zod-schemas/clientServices.schema";
@@ -97,7 +96,6 @@ const prestationFormSchema = z
         (!isNaN(Number(v)) && Number(v) >= 1 && Number(v) <= 720),
       "La durée doit être un nombre entre 1 et 720 minutes",
     ),
-  statut: clientServiceStatutSchema.optional(),
   modePlanning: clientServiceModePlanningSchema.optional(),
   notes: z.string().optional(),
 })
@@ -224,7 +222,6 @@ export function PrestationFormDialog({
           joursPreference: [],
           heureDebutPreference: "",
           dureeEstimeeMinutes: "",
-          statut: "brouillon",
           modePlanning: "planifie",
           notes: "",
         },
@@ -332,7 +329,6 @@ export function PrestationFormDialog({
         joursPreference: [],
         heureDebutPreference: "",
         dureeEstimeeMinutes: "",
-        statut: "brouillon",
         modePlanning: "planifie",
         notes: "",
       });
@@ -489,7 +485,6 @@ export function PrestationFormDialog({
         joursPreference: data.joursPreference,
         heureDebutPreference: data.heureDebutPreference,
         dureeEstimeeMinutes: data.dureeEstimeeMinutes,
-        statut: data.statut,
         modePlanning: data.modePlanning,
         notes: data.notes,
         perimetre,
@@ -811,24 +806,6 @@ export function PrestationFormDialog({
                         type="number"
                       />
                     </div>
-                  </div>
-                </>
-              )}
-
-              {/* ==================== STATUT INITIAL (création uniquement) ==================== */}
-              {!isEdit && (
-                <>
-                  <Separator />
-                  <div className="space-y-4">
-                    <h3 className="text-sm font-semibold">Statut initial</h3>
-                    <RhfControlledSelect<PrestationFormValues>
-                      name="statut"
-                      label="Statut"
-                      selectClassName="w-full"
-                    >
-                      <SelectItem value="brouillon">Brouillon</SelectItem>
-                      <SelectItem value="actif">Actif</SelectItem>
-                    </RhfControlledSelect>
                   </div>
                 </>
               )}
