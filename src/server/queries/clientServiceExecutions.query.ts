@@ -55,6 +55,33 @@ export async function getClientPrestataires(
   return results;
 }
 
+// ==================== PRESTATAIRES FOR SERVICE ====================
+
+/**
+ * Récupère les prestataires actifs offrant un service donné.
+ */
+export async function getPrestatairesForService(
+  serviceId: string,
+): Promise<Array<{ serviceEntrepriseId: string; entrepriseId: string; nom: string }>> {
+  const rows = await db
+    .select({
+      serviceEntrepriseId: serviceEntreprises.id,
+      entrepriseId: entreprises.id,
+      nom: entreprises.nom,
+    })
+    .from(serviceEntreprises)
+    .innerJoin(entreprises, eq(entreprises.id, serviceEntreprises.entrepriseId))
+    .where(
+      and(
+        eq(serviceEntreprises.serviceId, serviceId),
+        eq(serviceEntreprises.actif, true),
+      ),
+    )
+    .orderBy(entreprises.nom);
+
+  return rows;
+}
+
 // ==================== TYPES ====================
 
 export type ExecutionPrixItem = {

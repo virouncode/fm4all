@@ -1,11 +1,25 @@
 "use client";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link, useRouter } from "@/i18n/navigation";
+import {
+  deleteExecutionAction,
+  toggleExecutionActifAction,
+} from "@/server/actions/clientServiceExecutionsActions";
 import {
   type ExecutionWithPrix,
   type OccurrenceListItem,
@@ -19,12 +33,15 @@ import {
   Clock,
   MapPin,
   Pencil,
+  Power,
   RotateCcw,
   Settings,
+  Trash2,
   Wrench,
   Zap,
 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { PrestationFormDialog } from "../PrestationFormDialog";
 import { PrestationStatutDialog } from "../PrestationStatutDialog";
 import {
@@ -34,6 +51,7 @@ import {
   getModePlanningBadge,
   getPrestationStatutBadge,
 } from "../helpers";
+import { ExecutionFormDialog } from "./ExecutionFormDialog";
 
 interface PrestationDetailsClientProps {
   prestation: PrestationListItem;
@@ -57,10 +75,12 @@ export function PrestationDetailsClient({
   prestation,
   canManage,
   isPlateforme,
-  executions,
+  executions: initialExecutions,
   occurrences,
 }: PrestationDetailsClientProps) {
   const router = useRouter();
+  const [executions, setExecutions] =
+    useState<ExecutionWithPrix[]>(initialExecutions);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [statutDialogOpen, setStatutDialogOpen] = useState(false);
 
@@ -221,7 +241,9 @@ export function PrestationDetailsClient({
                 <InfoRow
                   label="Date de fin"
                   value={
-                    prestation.dateFin ? formatDate(prestation.dateFin) : "∞ Sans échéance"
+                    prestation.dateFin
+                      ? formatDate(prestation.dateFin)
+                      : "∞ Sans échéance"
                   }
                 />
                 <InfoRow
@@ -256,7 +278,8 @@ export function PrestationDetailsClient({
           <ExecutionTab
             executions={executions}
             canManage={canManage}
-            prestationId={prestation.id}
+            prestation={prestation}
+            onExecutionsChange={setExecutions}
           />
         </TabsContent>
 
@@ -300,53 +323,85 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 function ExecutionTab({
   executions,
   canManage,
-  prestationId,
+  prestation,
+  onExecutionsChange,
 }: {
   executions: ExecutionWithPrix[];
   canManage: boolean;
-  prestationId: string;
+  prestation: PrestationListItem;
+  onExecutionsChange: (executions: ExecutionWithPrix[]) => void;
 }) {
-  if (executions.length === 0) {
-    return (
-      <div className="py-16 text-center">
-        <Zap className="text-muted-foreground/30 mx-auto mb-4 h-12 w-12" />
-        <p className="text-muted-foreground text-lg font-medium">
-          Aucun prestataire assigné
-        </p>
-        <p className="text-muted-foreground mt-1 text-sm">
-          Ajoutez un prestataire et configurez les tarifs pour activer cette
-          prestation.
-        </p>
-        {canManage && (
-          <Button className="mt-4" disabled>
-            <Zap className="mr-2 h-4 w-4" />
-            Ajouter un prestataire (bientôt disponible)
-          </Button>
-        )}
-      </div>
-    );
-  }
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
 
   return (
     <div className="space-y-4">
       {canManage && (
         <div className="flex justify-end">
-          <Button disabled>
+          <Button onClick={() => setAddDialogOpen(true)}>
             <Zap className="mr-2 h-4 w-4" />
-            Ajouter un prestataire (bientôt disponible)
+            Ajouter un prestataire
           </Button>
         </div>
       )}
 
-      {executions.map((execution) => (
-        <ExecutionCard key={execution.id} execution={execution} />
-      ))}
+      {executions.length === 0 ? (
+        <div className="py-12 text-center">
+          <Zap className="text-muted-foreground/30 mx-auto mb-4 h-12 w-12" />
+          <p className="text-muted-foreground text-lg font-medium">
+            Aucun prestataire assigné
+          </p>
+          <p className="text-muted-foreground mt-1 text-sm">
+            Ajoutez un prestataire et configurez les tarifs pour activer cette
+            prestation.
+          </p>
+        </div>
+      ) : (
+        executions.map((execution) => (
+          <ExecutionCard
+            key={execution.id}
+            execution={execution}
+            canManage={canManage}
+            prestation={prestation}
+            onExecutionsChange={onExecutionsChange}
+          />
+        ))
+      )}
+
+      {canManage && (
+        <ExecutionFormDialog
+          open={addDialogOpen}
+          onOpenChange={setAddDialogOpen}
+          prestationId={prestation.id}
+          entrepriseId={prestation.entrepriseId}
+          siteId={prestation.siteId}
+          serviceId={prestation.serviceId}
+          onSuccess={(updated) => {
+            onExecutionsChange(updated);
+            setAddDialogOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }
 
-function ExecutionCard({ execution }: { execution: ExecutionWithPrix }) {
+function ExecutionCard({
+  execution,
+  canManage,
+  prestation,
+  onExecutionsChange,
+}: {
+  execution: ExecutionWithPrix;
+  canManage: boolean;
+  prestation: PrestationListItem;
+  onExecutionsChange: (executions: ExecutionWithPrix[]) => void;
+}) {
+  const [isToggling, setIsToggling] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const isActive = execution.actif;
+
   const typePrixLabels: Record<string, string> = {
     abonnement: "Abonnement",
     par_occurrence: "Par occurrence",
@@ -359,65 +414,153 @@ function ExecutionCard({ execution }: { execution: ExecutionWithPrix }) {
     annee: "/ an",
   };
 
-  return (
-    <Card className={isActive ? "" : "opacity-60"}>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Building className="text-primary h-4 w-4" />
-            {execution.prestataireNom ?? "Prestataire inconnu"}
-          </CardTitle>
-          <div className="flex items-center gap-2">
-            {!isActive && (
-              <Badge className="bg-gray-100 text-gray-600 text-xs">
-                Inactif
-              </Badge>
-            )}
-            <Badge className="bg-blue-100 text-blue-700 text-xs">
-              Priorité {execution.priorite}
-            </Badge>
-          </div>
-        </div>
-        <div className="text-muted-foreground flex gap-4 text-xs">
-          <span className="flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            Depuis le {formatDate(execution.dateDebutValidite)}
-          </span>
-          {execution.dateFinValidite && (
-            <span>
-              Jusqu&apos;au {formatDate(execution.dateFinValidite)}
-            </span>
-          )}
-        </div>
-      </CardHeader>
+  const handleToggle = async () => {
+    setIsToggling(true);
+    const result = await toggleExecutionActifAction({
+      executionId: execution.id,
+      prestationId: prestation.id,
+      entrepriseId: prestation.entrepriseId,
+      actif: !isActive,
+    });
 
-      {execution.prix.length > 0 && (
-        <CardContent className="pt-0">
-          <div className="space-y-2">
-            <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
-              Tarifs
-            </p>
-            {execution.prix.map((prix) => (
-              <div
-                key={prix.id}
-                className={`flex items-center justify-between rounded-md border px-3 py-2 text-sm ${
-                  prix.actif ? "" : "opacity-50"
-                }`}
-              >
-                <span>
-                  {typePrixLabels[prix.typePrix] ?? prix.typePrix}
-                  {prix.periodeFacturation &&
-                    ` ${periodeLabels[prix.periodeFacturation] ?? ""}`}
-                </span>
-                <span className="font-semibold">
-                  {(prix.montantHt / 100).toFixed(2)} € HT
-                </span>
-              </div>
-            ))}
+    if (result?.serverError) {
+      toast.error(result.serverError.message);
+    } else if (result?.data) {
+      toast.success(result.data.message);
+      onExecutionsChange(result.data.executions);
+    }
+    setIsToggling(false);
+  };
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    const result = await deleteExecutionAction({
+      executionId: execution.id,
+      prestationId: prestation.id,
+      entrepriseId: prestation.entrepriseId,
+    });
+
+    if (result?.serverError) {
+      toast.error(result.serverError.message);
+    } else if (result?.data) {
+      toast.success(result.data.message);
+      onExecutionsChange(result.data.executions);
+    }
+    setIsDeleting(false);
+    setDeleteOpen(false);
+  };
+
+  return (
+    <>
+      <Card className={isActive ? "" : "opacity-60"}>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Building className="text-primary h-4 w-4" />
+              {execution.prestataireNom ?? "Prestataire inconnu"}
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              {!isActive && (
+                <Badge className="bg-gray-100 text-xs text-gray-600">
+                  Inactif
+                </Badge>
+              )}
+              <Badge className="bg-blue-100 text-xs text-blue-700">
+                Priorité {execution.priorite}
+              </Badge>
+              {canManage && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={handleToggle}
+                    disabled={isToggling}
+                    aria-label={isActive ? "Désactiver" : "Activer"}
+                  >
+                    <Power className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="text-destructive hover:text-destructive h-7 w-7"
+                    onClick={() => setDeleteOpen(true)}
+                    aria-label="Supprimer ce prestataire"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
-        </CardContent>
-      )}
-    </Card>
+          <div className="text-muted-foreground flex gap-4 text-xs">
+            <span className="flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              Depuis le {formatDate(execution.dateDebutValidite)}
+            </span>
+            {execution.dateFinValidite && (
+              <span>
+                Jusqu&apos;au {formatDate(execution.dateFinValidite)}
+              </span>
+            )}
+          </div>
+        </CardHeader>
+
+        {execution.prix.length > 0 && (
+          <CardContent className="pt-0">
+            <div className="space-y-2">
+              <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                Tarifs
+              </p>
+              {execution.prix.map((prix) => (
+                <div
+                  key={prix.id}
+                  className={`flex items-center justify-between rounded-md border px-3 py-2 text-sm ${
+                    prix.actif ? "" : "opacity-50"
+                  }`}
+                >
+                  <span>
+                    {typePrixLabels[prix.typePrix] ?? prix.typePrix}
+                    {prix.periodeFacturation &&
+                      ` ${periodeLabels[prix.periodeFacturation] ?? ""}`}
+                  </span>
+                  <span className="font-semibold">
+                    {(prix.montantHt / 100).toFixed(2)} € HT
+                  </span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        )}
+      </Card>
+
+      {/* Confirmation suppression */}
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Retirer ce prestataire ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Le prestataire{" "}
+              <strong>
+                {execution.prestataireNom ?? "inconnu"}
+              </strong>{" "}
+              et tous ses tarifs seront retirés de cette prestation. Les
+              interventions déjà planifiées ne seront pas affectées.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? "Suppression..." : "Retirer"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 
@@ -482,7 +625,8 @@ function InterventionsTab({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-muted-foreground text-sm">
-          {occurrences.length} intervention{occurrences.length > 1 ? "s" : ""}
+          {occurrences.length} intervention
+          {occurrences.length > 1 ? "s" : ""}
         </p>
         {canGenerate && (
           <Button variant="outline" size="sm" disabled>

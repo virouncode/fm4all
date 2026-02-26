@@ -50,81 +50,81 @@ import { z } from "zod";
 // Schéma unifié pour les deux modes (create et edit)
 const prestationFormSchema = z
   .object({
-  id: z.uuid().optional(),
-  entrepriseId: z.string().optional(),
-  serviceId: z.string().optional(),
-  siteAnchorId: z.string().optional(), // champ caché pour valider la sélection de site
-  frequence: frequenceSchema.optional(),
-  frequenceParPeriode: z
-    .string()
-    .optional()
-    .refine(
-      (v) =>
-        v === undefined ||
-        v === "" ||
-        (!isNaN(Number(v)) && Number(v) >= 1 && Number(v) <= 365),
-      "La fréquence par période doit être un nombre entre 1 et 365",
-    ),
-  intervalleJours: z
-    .string()
-    .optional()
-    .refine(
-      (v) =>
-        v === undefined ||
-        v === "" ||
-        (!isNaN(Number(v)) && Number(v) >= 1 && Number(v) <= 365),
-      "L'intervalle doit être un nombre entre 1 et 365 jours",
-    ),
-  dateDebut: z.string().optional(),
-  dateFin: z.string().optional(),
-  joursPreference: z.array(z.number().int().min(1).max(7)).optional(),
-  heureDebutPreference: z
-    .string()
-    .optional()
-    .refine(
-      (v) =>
-        v === undefined || v === "" || /^([0-1]?\d|2[0-3]):[0-5]\d$/.test(v),
-      "Format invalide (ex: 08:00)",
-    ),
-  dureeEstimeeMinutes: z
-    .string()
-    .optional()
-    .refine(
-      (v) =>
-        v === undefined ||
-        v === "" ||
-        (!isNaN(Number(v)) && Number(v) >= 1 && Number(v) <= 720),
-      "La durée doit être un nombre entre 1 et 720 minutes",
-    ),
-  modePlanning: clientServiceModePlanningSchema.optional(),
-  notes: z.string().optional(),
-})
-.superRefine((data, ctx) => {
-  // Validations obligatoires en mode création (pas d'id)
-  if (!data.id) {
-    if (!data.entrepriseId || data.entrepriseId === "") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["entrepriseId"],
-        message: "Client obligatoire",
-      });
+    id: z.uuid().optional(),
+    entrepriseId: z.string().optional(),
+    serviceId: z.string().optional(),
+    siteAnchorId: z.string().optional(), // champ caché pour valider la sélection de site
+    frequence: frequenceSchema.optional(),
+    frequenceParPeriode: z
+      .string()
+      .optional()
+      .refine(
+        (v) =>
+          v === undefined ||
+          v === "" ||
+          (!isNaN(Number(v)) && Number(v) >= 1 && Number(v) <= 365),
+        "La fréquence par période doit être un nombre entre 1 et 365",
+      ),
+    intervalleJours: z
+      .string()
+      .optional()
+      .refine(
+        (v) =>
+          v === undefined ||
+          v === "" ||
+          (!isNaN(Number(v)) && Number(v) >= 1 && Number(v) <= 365),
+        "L'intervalle doit être un nombre entre 1 et 365 jours",
+      ),
+    dateDebut: z.string().optional(),
+    dateFin: z.string().optional(),
+    joursPreference: z.array(z.number().int().min(1).max(7)).optional(),
+    heureDebutPreference: z
+      .string()
+      .optional()
+      .refine(
+        (v) =>
+          v === undefined || v === "" || /^([0-1]?\d|2[0-3]):[0-5]\d$/.test(v),
+        "Format invalide (ex: 08:00)",
+      ),
+    dureeEstimeeMinutes: z
+      .string()
+      .optional()
+      .refine(
+        (v) =>
+          v === undefined ||
+          v === "" ||
+          (!isNaN(Number(v)) && Number(v) >= 1 && Number(v) <= 720),
+        "La durée doit être un nombre entre 1 et 720 minutes",
+      ),
+    modePlanning: clientServiceModePlanningSchema.optional(),
+    notes: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    // Validations obligatoires en mode création (pas d'id)
+    if (!data.id) {
+      if (!data.entrepriseId || data.entrepriseId === "") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["entrepriseId"],
+          message: "Client obligatoire",
+        });
+      }
+      if (!data.serviceId || data.serviceId === "") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["serviceId"],
+          message: "Service obligatoire",
+        });
+      }
+      if (!data.siteAnchorId || data.siteAnchorId === "") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["siteAnchorId"],
+          message: "Veuillez sélectionner au moins un site",
+        });
+      }
     }
-    if (!data.serviceId || data.serviceId === "") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["serviceId"],
-        message: "Service obligatoire",
-      });
-    }
-    if (!data.siteAnchorId || data.siteAnchorId === "") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["siteAnchorId"],
-        message: "Veuillez sélectionner au moins un site",
-      });
-    }
-  }
-});
+  });
 
 type PrestationFormValues = z.infer<typeof prestationFormSchema>;
 
@@ -548,7 +548,7 @@ export function PrestationFormDialog({
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-1 flex-col overflow-hidden"
           >
-            <div className="flex-1 space-y-5 overflow-y-auto px-6 pb-2">
+            <div className="flex-1 space-y-5 overflow-y-auto px-6 py-2">
               {/* ==================== CLIENT / SITE / SERVICE ==================== */}
               {isEdit ? (
                 <div className="bg-muted/50 space-y-1.5 rounded-md px-4 py-3 text-sm">
@@ -634,16 +634,18 @@ export function PrestationFormDialog({
                         {form.formState.errors.siteAnchorId.message}
                       </p>
                     )}
-                    {!form.formState.errors.siteAnchorId && selectionSummary && (
-                      <p className="text-muted-foreground text-xs">
-                        {selectionSummary}
-                      </p>
-                    )}
-                    {!form.formState.errors.siteAnchorId && !selectionSummary && (
-                      <p className="text-muted-foreground text-xs">
-                        {selectedSiteIds.length} site(s) sélectionné(s)
-                      </p>
-                    )}
+                    {!form.formState.errors.siteAnchorId &&
+                      selectionSummary && (
+                        <p className="text-muted-foreground text-xs">
+                          {selectionSummary}
+                        </p>
+                      )}
+                    {!form.formState.errors.siteAnchorId &&
+                      !selectionSummary && (
+                        <p className="text-muted-foreground text-xs">
+                          {selectedSiteIds.length} site(s) sélectionné(s)
+                        </p>
+                      )}
                   </div>
 
                   <RhfControlledSelect<PrestationFormValues>
