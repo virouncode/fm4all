@@ -1,5 +1,6 @@
 import {
   boolean,
+  date,
   index,
   integer,
   jsonb,
@@ -344,5 +345,65 @@ export const occurrenceTaches = pgTable(
     index("occurrence_taches_statut_idx").on(t.statut),
     index("occurrence_taches_template_idx").on(t.tacheTemplateId),
     uniqueIndex("occurrence_taches_order_udx").on(t.occurrenceId, t.ordre),
+  ],
+);
+
+/**
+ * Table de traçabilité : enregistre chaque application d'un tarif à un événement.
+ * Sert de base pour la facturation future sans jamais modifier l'historique.
+ *
+ * Règles de déclenchement :
+ *   ABONNEMENT      → 1 ligne par période (periodeStart/periodeEnd renseignés, occurrenceId null)
+ *   PAR_OCCURRENCE  → 1 ligne par occurrence réalisée (occurrenceId renseigné)
+ *   FRAIS_LIVRAISON → 1 ligne par occurrence réalisée (occurrenceId renseigné)
+ *   INSTALLATION    → 1 ligne unique à la 1ère occurrence réalisée (occurrenceId renseigné)
+ */
+export const clientServicePrixAppliques = pgTable(
+  "client_service_prix_appliques",
+  {
+    id: id(),
+    executionPrixId: uuid("execution_prix_id")
+      .notNull()
+      .references(() => clientServiceExecutionPrix.id, { onDelete: "cascade" }),
+    clientServiceId: uuid("client_service_id")
+      .notNull()
+      .references(() => clientServices.id, { onDelete: "cascade" }),
+    executionId: uuid("execution_id")
+      .notNull()
+      .references(() => clientServiceExecutions.id, { onDelete: "cascade" }),
+    occurrenceId: uuid("occurrence_id").references(
+      () => clientServiceOccurrences.id,
+      { onDelete: "cascade" },
+    ),
+    // Snapshot immuable : ne jamais modifier, même si le tarif source change
+    typePrix: executionTypePrixEnum("type_prix").notNull(),
+    montantHtSnapshot: integer("montant_ht_snapshot").notNull(),
+    // montant facturé au client (centimes, HT)
+    coutPrestataireHtSnapshot: integer("cout_prestataire_ht_snapshot"),
+    // coût réel prestataire (centimes, HT) — null si non renseigné
+    margePourcentSnapshot: integer("marge_pourcent_snapshot"),
+    // marge FM4ALL (%) — null si direct
+    // Pour les abonnements : plage de la période facturée
+    periodeStart: date("periode_start"),
+    periodeEnd: date("periode_end"),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+    createdById: createdById(() => user),
+    updatedById: updatedById(() => user),
+  },
+  (t) => [
+    index("csp_appliques_execution_prix_idx").on(t.executionPrixId),
+    index("csp_appliques_client_service_idx").on(t.clientServiceId),
+    index("csp_appliques_occurrence_idx").on(t.occurrenceId),
+    // Anti double-facturation : un tarif ne peut être appliqué qu'une fois par occurrence
+    uniqueIndex("csp_appliques_par_occurrence_udx").on(
+      t.executionPrixId,
+      t.occurrenceId,
+    ),
+    // Anti double-facturation : un abonnement ne peut être appliqué qu'une fois par période
+    uniqueIndex("csp_appliques_par_periode_udx").on(
+      t.executionPrixId,
+      t.periodeStart,
+    ),
   ],
 );

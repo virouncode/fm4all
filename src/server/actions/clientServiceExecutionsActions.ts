@@ -95,6 +95,12 @@ export const insertExecutionWithPrixAction = actionClient
       throw errors.notFound("Prestation");
     }
 
+    // Déterminer si l'utilisateur est plateforme pour la logique des marges
+    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    const isIntermedaire =
+      prestation.modeCommercial === "intermediaire_fm4all" &&
+      !!platformRole?.role;
+
     // Transaction : créer l'exécution + les prix
     await db.transaction(async (tx) => {
       const [execution] = await tx
@@ -120,25 +126,51 @@ export const insertExecutionWithPrixAction = actionClient
 
       // Insérer les lignes de prix
       await tx.insert(clientServiceExecutionPrix).values(
-        parsedInput.prix.map((p) => ({
-          executionId: execution.id,
-          typePrix: p.typePrix,
-          // Montants stockés en centimes (×100)
-          montantHt: Math.round(Number(p.montantHt) * 100),
-          coutPrestataireHt:
-            p.coutPrestataireHt && p.coutPrestataireHt !== ""
-              ? Math.round(Number(p.coutPrestataireHt) * 100)
-              : null,
-          margePourcent: null,
-          periodeFacturation: p.periodeFacturation ?? null,
-          nbOccurrencesIncluses:
-            p.nbOccurrencesIncluses && p.nbOccurrencesIncluses !== ""
-              ? Number(p.nbOccurrencesIncluses)
-              : null,
-          actif: true,
-          createdById: currentUser.id,
-          updatedById: currentUser.id,
-        })),
+        parsedInput.prix.map((p) => {
+          if (isIntermedaire) {
+            // Mode intermédiaire FM4ALL : stocker coût, marge, et recalculer montant côté serveur
+            const cout =
+              p.coutPrestataireHt && p.coutPrestataireHt !== ""
+                ? Number(p.coutPrestataireHt)
+                : 0;
+            const marge =
+              p.margePourcent && p.margePourcent !== ""
+                ? Math.round(Number(p.margePourcent))
+                : 0;
+            const montant = cout * (1 + marge / 100);
+            return {
+              executionId: execution.id,
+              typePrix: p.typePrix,
+              montantHt: Math.round(montant * 100),
+              coutPrestataireHt: Math.round(cout * 100),
+              margePourcent: marge,
+              periodeFacturation: p.periodeFacturation ?? null,
+              nbOccurrencesIncluses:
+                p.nbOccurrencesIncluses && p.nbOccurrencesIncluses !== ""
+                  ? Number(p.nbOccurrencesIncluses)
+                  : null,
+              actif: true,
+              createdById: currentUser.id,
+              updatedById: currentUser.id,
+            };
+          }
+          // Mode direct (ou non-plateforme sur intermédiaire) : stocker uniquement montantHt
+          return {
+            executionId: execution.id,
+            typePrix: p.typePrix,
+            montantHt: Math.round(Number(p.montantHt) * 100),
+            coutPrestataireHt: null,
+            margePourcent: null,
+            periodeFacturation: p.periodeFacturation ?? null,
+            nbOccurrencesIncluses:
+              p.nbOccurrencesIncluses && p.nbOccurrencesIncluses !== ""
+                ? Number(p.nbOccurrencesIncluses)
+                : null,
+            actif: true,
+            createdById: currentUser.id,
+            updatedById: currentUser.id,
+          };
+        }),
       );
     });
 

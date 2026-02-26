@@ -420,6 +420,7 @@ export function PrestationDetailsClient({
           <ExecutionTab
             executions={executions}
             canManage={canManage}
+            isPlateforme={isPlateforme}
             prestation={prestation}
             onExecutionsChange={setExecutions}
           />
@@ -650,11 +651,13 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 function ExecutionTab({
   executions,
   canManage,
+  isPlateforme,
   prestation,
   onExecutionsChange,
 }: {
   executions: ExecutionWithPrix[];
   canManage: boolean;
+  isPlateforme: boolean;
   prestation: PrestationListItem;
   onExecutionsChange: (executions: ExecutionWithPrix[]) => void;
 }) {
@@ -702,6 +705,8 @@ function ExecutionTab({
           entrepriseId={prestation.entrepriseId}
           siteId={prestation.siteId}
           serviceId={prestation.serviceId}
+          modeCommercial={prestation.modeCommercial}
+          isPlateforme={isPlateforme}
           onSuccess={(updated) => {
             onExecutionsChange(updated);
             setAddDialogOpen(false);
