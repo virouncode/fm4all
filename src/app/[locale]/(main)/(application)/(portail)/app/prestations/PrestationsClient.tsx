@@ -169,6 +169,13 @@ export default function PrestationsClient({
     searchParams.clientEntrepriseId,
   ]);
 
+  const handlePrestationClick = (p: PrestationListItem) => {
+    router.push({
+      pathname: "/app/prestations/[prestationId]",
+      params: { prestationId: p.id },
+    });
+  };
+
   const handleFiltersApply = (newFilters: FiltersType) => {
     setFilters(newFilters);
 
@@ -300,6 +307,7 @@ export default function PrestationsClient({
             loadMore={async () => {}}
             idLabelMap={prestationsIdLabelMap}
             getRowId={(row) => row.id}
+            onRowClick={handlePrestationClick}
           />
         ) : (
           <PrestationsGrid
@@ -307,6 +315,7 @@ export default function PrestationsClient({
             loading={loading}
             isError={isError}
             showEntreprise={showEntreprise}
+            onPrestationClick={handlePrestationClick}
           />
         )}
       </div>
@@ -404,6 +413,7 @@ interface PrestationsGridProps {
   loading: boolean;
   isError: boolean;
   showEntreprise: boolean;
+  onPrestationClick: (p: PrestationListItem) => void;
 }
 
 function PrestationsGrid({
@@ -411,6 +421,7 @@ function PrestationsGrid({
   loading,
   isError,
   showEntreprise,
+  onPrestationClick,
 }: PrestationsGridProps) {
   if (loading) {
     return (
@@ -446,6 +457,7 @@ function PrestationsGrid({
             key={p.id}
             prestation={p}
             showEntreprise={showEntreprise}
+            onClick={() => onPrestationClick(p)}
           />
         ))}
       </div>

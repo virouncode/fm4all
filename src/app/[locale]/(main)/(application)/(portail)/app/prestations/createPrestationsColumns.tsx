@@ -10,7 +10,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Link } from "@/i18n/navigation";
 import { type PrestationListItem } from "@/zod-schemas/clientServices.schema";
 import { type ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, Pencil, RotateCcw, Trash2 } from "lucide-react";
@@ -49,16 +48,8 @@ export function createPrestationsColumns(
       header: ({ column }) => (
         <SortableHeader column={column} label="Service" />
       ),
-      cell: ({ row }) => (
-        <Link
-          href={{
-            pathname: "/app/prestations/[prestationId]",
-            params: { prestationId: row.original.id },
-          }}
-          className="font-medium hover:underline"
-        >
-          {row.original.serviceNom}
-        </Link>
+      cell: ({ getValue }) => (
+        <span className="font-medium">{getValue() as string}</span>
       ),
     },
   ];
