@@ -13,6 +13,7 @@ import {
   prestationBelongsToEntreprise,
 } from "@/server/queries/clientServices.query";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
+import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userSiteAttributions.utils";
 import {
   getPrestationsQuerySchema,
   insertClientServiceToDbSchema,
@@ -30,25 +31,24 @@ import { z } from "zod";
 // ==================== HELPERS ====================
 
 /**
- * Vérifie si l'utilisateur est admin de l'entreprise OU super_admin_plateforme
+ * Vérifie si l'utilisateur peut gérer une prestation sur un site donné.
+ * Règle : rôle plateforme (any) OU responsable_site sur le site.
+ * L'admin d'entreprise sert à configurer les utilisateurs, pas à gérer les prestations.
  */
-async function isAdminOrPlateforme(
+async function canManagePrestation(
   userId: string,
   entrepriseId: string,
+  siteId: string,
 ): Promise<boolean> {
-  const adhesion = await db.query.userAdhesions.findFirst({
-    where: and(
-      eq(userAdhesions.userId, userId),
-      eq(userAdhesions.entrepriseId, entrepriseId),
-    ),
-  });
-
   const platformRole = await getUserPlateformeAdhesion(userId);
+  if (platformRole?.role) return true;
 
-  return (
-    adhesion?.role === "admin" ||
-    platformRole?.role === "super_admin_plateforme"
-  );
+  const siteRole = await resolveUserEffectiveRoleOnSite({
+    userId,
+    siteId,
+    entrepriseId,
+  });
+  return siteRole === "responsable_site";
 }
 
 /**
@@ -182,13 +182,13 @@ export const insertPrestationAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    const { entrepriseId } = parsedInput;
+    const { entrepriseId, siteId } = parsedInput;
 
-    // Seuls admin ou plateforme peuvent créer une prestation
-    const canCreate = await isAdminOrPlateforme(currentUser.id, entrepriseId);
+    // Vérifier les permissions : plateforme OU responsable_site sur le site d'ancrage
+    const canCreate = await canManagePrestation(currentUser.id, entrepriseId, siteId);
     if (!canCreate) {
       throw errors.forbidden(
-        "Seuls les administrateurs peuvent créer des prestations.",
+        "Vous devez être responsable de ce site pour créer une prestation.",
       );
     }
 
@@ -303,18 +303,18 @@ export const updatePrestationAction = actionClient
       throw errors.notFound("Prestation");
     }
 
-    // Vérifier les permissions
-    const canEdit = await isAdminOrPlateforme(currentUser.id, entrepriseId);
-    if (!canEdit) {
-      throw errors.forbidden(
-        "Seuls les administrateurs peuvent modifier des prestations.",
-      );
-    }
-
-    // Récupérer la prestation actuelle pour vérifier le statut
+    // Récupérer la prestation pour avoir le siteId avant la vérification des permissions
     const current = await getPrestationById(prestationId);
     if (!current) {
       throw errors.notFound("Prestation");
+    }
+
+    // Vérifier les permissions : plateforme OU responsable_site sur le site
+    const canEdit = await canManagePrestation(currentUser.id, entrepriseId, current.siteId);
+    if (!canEdit) {
+      throw errors.forbidden(
+        "Vous devez être responsable de ce site pour modifier une prestation.",
+      );
     }
 
     // Interdire la modification si la prestation est terminée
@@ -437,18 +437,18 @@ export const updatePrestationStatutAction = actionClient
       throw errors.notFound("Prestation");
     }
 
-    // Vérifier les permissions
-    const canEdit = await isAdminOrPlateforme(currentUser.id, entrepriseId);
-    if (!canEdit) {
-      throw errors.forbidden(
-        "Seuls les administrateurs peuvent modifier le statut d'une prestation.",
-      );
-    }
-
-    // Récupérer le statut actuel
+    // Récupérer la prestation pour avoir le siteId avant la vérification des permissions
     const current = await getPrestationById(prestationId);
     if (!current) {
       throw errors.notFound("Prestation");
+    }
+
+    // Vérifier les permissions : plateforme OU responsable_site sur le site
+    const canEdit = await canManagePrestation(currentUser.id, entrepriseId, current.siteId);
+    if (!canEdit) {
+      throw errors.forbidden(
+        "Vous devez être responsable de ce site pour modifier le statut d'une prestation.",
+      );
     }
 
     const currentStatut = current.statut;
@@ -528,18 +528,18 @@ export const deletePrestationAction = actionClient
       throw errors.notFound("Prestation");
     }
 
-    // Vérifier les permissions
-    const canDelete = await isAdminOrPlateforme(currentUser.id, entrepriseId);
-    if (!canDelete) {
-      throw errors.forbidden(
-        "Seuls les administrateurs peuvent supprimer des prestations.",
-      );
-    }
-
-    // Récupérer la prestation pour vérifier le statut
+    // Récupérer la prestation pour avoir le siteId avant la vérification des permissions
     const current = await getPrestationById(prestationId);
     if (!current) {
       throw errors.notFound("Prestation");
+    }
+
+    // Vérifier les permissions : plateforme OU responsable_site sur le site
+    const canDelete = await canManagePrestation(currentUser.id, entrepriseId, current.siteId);
+    if (!canDelete) {
+      throw errors.forbidden(
+        "Vous devez être responsable de ce site pour supprimer une prestation.",
+      );
     }
 
     // Seules les prestations en "brouillon" peuvent être supprimées

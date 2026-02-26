@@ -1,12 +1,12 @@
 "use server";
 
-import { actionClient } from "@/lib/action/safe-actions";
 import { errors } from "@/lib/action/errors";
+import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
-import { getUserAdhesion } from "@/server/queries/userAdhesions.query";
 import { getClientPrestataires } from "@/server/queries/clientServiceExecutions.query";
-import { z } from "zod";
+import { getUserAdhesion } from "@/server/queries/userAdhesions.query";
 import { flattenValidationErrors } from "next-safe-action";
+import { z } from "zod";
 
 /**
  * Récupère la liste des prestataires avec lesquels un client a une relation
@@ -16,12 +16,12 @@ export const getClientPrestatairesAction = actionClient
   .metadata({ actionName: "getClientPrestatairesAction" })
   .inputSchema(
     z.object({
-      clientEntrepriseId: z.string().uuid(),
+      clientEntrepriseId: z.uuid(),
     }),
     {
       handleValidationErrorsShape: async (ve) =>
         flattenValidationErrors(ve).fieldErrors,
-    }
+    },
   )
   .action(async ({ parsedInput }) => {
     const session = await getSession();
@@ -41,7 +41,9 @@ export const getClientPrestatairesAction = actionClient
       throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
     }
 
-    const prestataires = await getClientPrestataires(parsedInput.clientEntrepriseId);
+    const prestataires = await getClientPrestataires(
+      parsedInput.clientEntrepriseId,
+    );
 
     return { prestataires };
   });

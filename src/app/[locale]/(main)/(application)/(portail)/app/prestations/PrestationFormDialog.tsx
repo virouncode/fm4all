@@ -43,16 +43,18 @@ import {
 import { type SelectSiteType } from "@/zod-schemas/sites.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { HandPlatter } from "lucide-react";
-import { useMemo, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
 // Schéma unifié pour les deux modes (create et edit)
-const prestationFormSchema = z.object({
+const prestationFormSchema = z
+  .object({
   id: z.uuid().optional(),
   entrepriseId: z.string().optional(),
   serviceId: z.string().optional(),
+  siteAnchorId: z.string().optional(), // champ caché pour valider la sélection de site
   frequence: frequenceSchema.optional(),
   frequenceParPeriode: z
     .string()
@@ -98,6 +100,32 @@ const prestationFormSchema = z.object({
   statut: clientServiceStatutSchema.optional(),
   modePlanning: clientServiceModePlanningSchema.optional(),
   notes: z.string().optional(),
+})
+.superRefine((data, ctx) => {
+  // Validations obligatoires en mode création (pas d'id)
+  if (!data.id) {
+    if (!data.entrepriseId || data.entrepriseId === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["entrepriseId"],
+        message: "Client obligatoire",
+      });
+    }
+    if (!data.serviceId || data.serviceId === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["serviceId"],
+        message: "Service obligatoire",
+      });
+    }
+    if (!data.siteAnchorId || data.siteAnchorId === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["siteAnchorId"],
+        message: "Veuillez sélectionner au moins un site",
+      });
+    }
+  }
 });
 
 type PrestationFormValues = z.infer<typeof prestationFormSchema>;
@@ -141,9 +169,13 @@ export function PrestationFormDialog({
   const entreprise = useAppStore((state) => state.entreprise);
   const posture = useAppStore((state) => state.postureActive);
 
-  const [clients, setClients] = useState<Array<{ id: string; nom: string }>>([]);
+  const [clients, setClients] = useState<Array<{ id: string; nom: string }>>(
+    [],
+  );
   const [sites, setSites] = useState<SelectSiteType[]>([]);
-  const [services, setServices] = useState<Array<{ id: string; nom: string }>>([]);
+  const [services, setServices] = useState<Array<{ id: string; nom: string }>>(
+    [],
+  );
   const [loadingSites, setLoadingSites] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState<string>(
     isEdit
@@ -156,6 +188,8 @@ export function PrestationFormDialog({
   // Sites sélectionnés via l'arbre (ancrage + sous-sites inclus)
   // Un seul "root" autorisé à la fois (= le site d'ancrage)
   const [selectedSiteIds, setSelectedSiteIds] = useState<string[]>([]);
+  // Indique si l'utilisateur a déjà interagi avec l'arbre (pour la validation onTouched)
+  const [siteTreeTouched, setSiteTreeTouched] = useState(false);
 
   const form = useForm<PrestationFormValues>({
     resolver: zodResolver(prestationFormSchema),
@@ -249,6 +283,9 @@ export function PrestationFormDialog({
       setLoadingSites(true);
       const result = await getAccessibleSitesAction({
         entrepriseId: selectedClientId,
+        // En posture client : filtrer uniquement les sites où l'utilisateur est responsable_site
+        // En posture plateforme : l'action retourne tous les sites (early return plateforme)
+        filterByRole: "responsable_site",
       });
       if (result?.data) {
         setSites(Array.isArray(result.data) ? result.data : []);
@@ -286,6 +323,7 @@ export function PrestationFormDialog({
       form.reset({
         entrepriseId: defaultClientId,
         serviceId: "",
+        siteAnchorId: "",
         frequence: "hebdomadaire",
         frequenceParPeriode: "",
         intervalleJours: "",
@@ -301,8 +339,21 @@ export function PrestationFormDialog({
       setSelectedClientId(defaultClientId);
       setSites([]);
       setSelectedSiteIds([]);
+      setSiteTreeTouched(false);
     }
   }, [open, isEdit, prestation, form, posture, entreprise?.id]);
+
+  // Synchronise l'ancrage de site avec le champ caché pour validation RHF
+  useEffect(() => {
+    if (isEdit) return;
+    form.setValue("siteAnchorId", anchorId ?? "", {
+      shouldValidate:
+        form.formState.isSubmitted ||
+        !!form.formState.errors.siteAnchorId ||
+        // Afficher l'erreur immédiatement si l'utilisateur a déjà interagi et décoché tout
+        (siteTreeTouched && anchorId === null),
+    });
+  }, [anchorId, form, isEdit, siteTreeTouched]);
 
   const handleClientChange = (clientId: string) => {
     setSelectedClientId(clientId);
@@ -317,6 +368,7 @@ export function PrestationFormDialog({
    * Si l'utilisateur coche un 2e site racine, l'ancienne sélection est remplacée.
    */
   const handleSiteToggle = (siteId: string, isChecked: boolean) => {
+    setSiteTreeTouched(true);
     if (isChecked) {
       const currentSelectedSet = new Set(selectedSiteIds);
       const isNewRoot = !hasCheckedAncestor(siteId, currentSelectedSet, sites);
@@ -331,7 +383,9 @@ export function PrestationFormDialog({
         const node = findSiteInTree(siteTree, siteId);
         if (node) {
           const descendantIds = getAllDescendantIds(node);
-          setSelectedSiteIds((prev) => [...new Set([...prev, ...descendantIds])]);
+          setSelectedSiteIds((prev) => [
+            ...new Set([...prev, ...descendantIds]),
+          ]);
         } else {
           setSelectedSiteIds((prev) => [...new Set([...prev, siteId])]);
         }
@@ -340,7 +394,9 @@ export function PrestationFormDialog({
       // Décocher : retirer ce site et tous ses descendants
       const node = findSiteInTree(siteTree, siteId);
       const idsToRemove = node ? getAllDescendantIds(node) : [siteId];
-      setSelectedSiteIds((prev) => prev.filter((id) => !idsToRemove.includes(id)));
+      setSelectedSiteIds((prev) =>
+        prev.filter((id) => !idsToRemove.includes(id)),
+      );
     }
   };
 
@@ -418,16 +474,12 @@ export function PrestationFormDialog({
         onOpenChange(false);
       }
     } else {
-      if (!anchorId) {
-        toast.error("Veuillez sélectionner au moins un site");
-        return;
-      }
-
-      const perimetre = computePerimetre(anchorId);
+      // anchorId est garanti non-null par la validation du schema (siteAnchorId)
+      const perimetre = computePerimetre(anchorId!);
 
       const result = await insertPrestationAction({
         entrepriseId: data.entrepriseId!,
-        siteId: anchorId,
+        siteId: anchorId!,
         serviceId: data.serviceId!,
         frequence: data.frequence!,
         frequenceParPeriode: data.frequenceParPeriode,
@@ -546,7 +598,15 @@ export function PrestationFormDialog({
                   )}
 
                   {/* Arbre de sélection des sites — même pattern que l'attribution */}
-                  <div className="space-y-2">
+                  <div
+                    className="space-y-2"
+                    onBlur={(e) => {
+                      // Déclencher la validation quand le focus quitte complètement la zone
+                      if (!e.currentTarget.contains(e.relatedTarget)) {
+                        void form.trigger("siteAnchorId");
+                      }
+                    }}
+                  >
                     <Label>
                       Sites à couvrir <span>*</span>
                     </Label>
@@ -574,11 +634,17 @@ export function PrestationFormDialog({
                         />
                       )}
                     </ScrollArea>
-                    {selectionSummary ? (
+                    {form.formState.errors.siteAnchorId && (
+                      <p className="text-destructive text-sm">
+                        {form.formState.errors.siteAnchorId.message}
+                      </p>
+                    )}
+                    {!form.formState.errors.siteAnchorId && selectionSummary && (
                       <p className="text-muted-foreground text-xs">
                         {selectionSummary}
                       </p>
-                    ) : (
+                    )}
+                    {!form.formState.errors.siteAnchorId && !selectionSummary && (
                       <p className="text-muted-foreground text-xs">
                         {selectedSiteIds.length} site(s) sélectionné(s)
                       </p>
@@ -643,7 +709,7 @@ export function PrestationFormDialog({
                     label="Nombre d'interventions par période"
                     placeholder="Ex: 2"
                     type="number"
-                    inputClassName="w-40"
+                    inputClassName="w-full"
                     description="Nombre de fois que le service est réalisé par période"
                   />
                 )}
@@ -654,7 +720,7 @@ export function PrestationFormDialog({
                     label="Intervalle (en jours)"
                     placeholder="Ex: 14"
                     type="number"
-                    inputClassName="w-40"
+                    inputClassName="w-full"
                   />
                 )}
               </div>
@@ -664,16 +730,16 @@ export function PrestationFormDialog({
               {/* ==================== PÉRIODE ==================== */}
               <div className="space-y-4">
                 <h3 className="text-sm font-semibold">Période</h3>
-                <div className="flex flex-wrap items-end gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <RhfDatePicker<PrestationFormValues>
                     name="dateDebut"
                     label="Date de début"
-                    buttonClassName="w-44"
+                    buttonClassName="w-full"
                   />
                   <RhfDatePicker<PrestationFormValues>
                     name="dateFin"
                     label="Date de fin"
-                    buttonClassName="w-44"
+                    buttonClassName="w-full"
                   />
                 </div>
               </div>
@@ -688,7 +754,7 @@ export function PrestationFormDialog({
                     </h3>
 
                     {/* Jours préférés */}
-                    <div className="space-y-4">
+                    <div>
                       <label className="text-sm font-medium">
                         Jours préférés
                       </label>
@@ -700,7 +766,7 @@ export function PrestationFormDialog({
                             ? field.value
                             : [];
                           return (
-                            <div className="flex flex-wrap gap-3">
+                            <div className="mt-2 mb-6 flex flex-wrap gap-3">
                               {JOURS_SEMAINE.map((jour) => {
                                 const checked = current.includes(jour.value);
                                 return (
@@ -731,7 +797,7 @@ export function PrestationFormDialog({
                       />
                     </div>
 
-                    <div className="mt-2 grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
                       <RhfInput<PrestationFormValues>
                         name="heureDebutPreference"
                         label="Heure de début préférée"
@@ -758,7 +824,7 @@ export function PrestationFormDialog({
                     <RhfControlledSelect<PrestationFormValues>
                       name="statut"
                       label="Statut"
-                      selectClassName="w-full max-w-xs"
+                      selectClassName="w-full"
                     >
                       <SelectItem value="brouillon">Brouillon</SelectItem>
                       <SelectItem value="actif">Actif</SelectItem>

@@ -102,9 +102,12 @@ export async function getAllSites(): Promise<SelectSiteType[]> {
 export async function getAccessibleSitesByUser({
   userId,
   entrepriseId,
+  filterRole,
 }: {
   userId: string;
   entrepriseId: string;
+  /** Si défini, ne retourne que les sites où l'utilisateur a ce rôle exact (ignore le raccourci admin) */
+  filterRole?: string;
 }): Promise<SelectSiteType[]> {
 
   // Vérifier si plateforme
@@ -113,27 +116,27 @@ export async function getAccessibleSitesByUser({
   );
   const plateformeRole = await getUserPlateformeAdhesion(userId);
 
-  // Vérifier si admin de l'entreprise
-  const { getUserAdhesion } = await import(
-    "@/server/queries/userAdhesions.query"
-  );
-  const adhesion = await getUserAdhesion({ userId, entrepriseId });
-
-  // Si plateforme → retourner TOUS les sites (toutes entreprises)
+  // Si plateforme → retourner TOUS les sites
   if (plateformeRole) {
     return getAllSites();
   }
 
-  // Si admin → retourner tous les sites de l'entreprise
-  if (adhesion?.role === "admin") {
-    const allSites = await db.query.sites.findMany({
-      where: eq(sites.entrepriseId, entrepriseId),
-      orderBy: (sites, { asc }) => [asc(sites.nom)],
-    });
-    return selectSiteSchema.array().parse(allSites);
+  // Si pas de filtre de rôle : raccourci admin → tous les sites de l'entreprise
+  if (!filterRole) {
+    const { getUserAdhesion } = await import(
+      "@/server/queries/userAdhesions.query"
+    );
+    const adhesion = await getUserAdhesion({ userId, entrepriseId });
+    if (adhesion?.role === "admin") {
+      const allSites = await db.query.sites.findMany({
+        where: eq(sites.entrepriseId, entrepriseId),
+        orderBy: (sites, { asc }) => [asc(sites.nom)],
+      });
+      return selectSiteSchema.array().parse(allSites);
+    }
   }
 
-  // Sinon, calculer le périmètre via attributions
+  // Sinon, calculer le périmètre via attributions (filtré par rôle si demandé)
   const { getUserSiteAttributions } = await import(
     "@/server/queries/userSiteAttributions.query"
   );
@@ -143,9 +146,13 @@ export async function getAccessibleSitesByUser({
     entrepriseId,
   });
 
-  // Filtrer les attributions avec rôle effectif (exclut mode=exclure)
+  // Filtrer les attributions avec rôle effectif (exclut mode=exclure) + filtre de rôle
   const accessibleSiteIds = attributions
-    .filter((attr) => attr.role !== null) // role null = exclu
+    .filter(
+      (attr) =>
+        attr.role !== null &&
+        (!filterRole || attr.role === filterRole),
+    )
     .map((attr) => attr.siteId);
 
   // Dédupliquer

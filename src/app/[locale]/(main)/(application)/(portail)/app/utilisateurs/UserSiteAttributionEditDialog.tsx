@@ -16,12 +16,11 @@ import {
   updateUserSiteAttributionAction,
 } from "@/server/actions/userSiteAttributionsActions";
 import { useAppStore } from "@/stores/application/appStore";
+import type { SelectUserSiteAttributionWithInheritanceType } from "@/zod-schemas/userSiteAttribution.schema";
 import {
-  SelectUserSiteAttributionWithSiteType,
   updateUserSiteAttributionFormSchema,
   type UpdateUserSiteAttributionFormType,
 } from "@/zod-schemas/userSiteAttribution.schema";
-import type { SelectUserSiteAttributionWithInheritanceType } from "@/zod-schemas/userSiteAttribution.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm, useFormState } from "react-hook-form";

@@ -1,57 +1,55 @@
 "use server";
 
-import { actionClient } from "@/lib/action/safe-actions";
-import { errors } from "@/lib/action/errors";
 import { db } from "@/db";
-import { tickets, ticketMessages } from "@/db/schema/tickets";
 import { documents, documentsLinks } from "@/db/schema/documents";
+import { ticketMessages, tickets } from "@/db/schema/tickets";
+import { errors } from "@/lib/action/errors";
+import { actionClient } from "@/lib/action/safe-actions";
 import {
-  selectTicketSchema,
-  insertTicketFormSchema,
-  updateTicketFormSchema,
-  ticketsQuerySchema,
-  changeTicketStatusSchema,
   assignTicketSchema,
-  insertTicketMessageFormSchema,
+  changeTicketStatusSchema,
+  insertTicketFormSchema,
+  insertTicketMessageActionSchema,
   selectTicketMessageSchema,
-  updateTicketBasicFieldsSchema,
+  selectTicketSchema,
+  ticketsQuerySchema,
   updateTicketAssigneEntrepriseSchema,
   updateTicketAssigneUserSchema,
-  updateTicketStatutSchema,
   updateTicketAttachmentsSchema,
-  insertTicketMessageActionSchema,
+  updateTicketBasicFieldsSchema,
+  updateTicketFormSchema,
+  updateTicketStatutSchema,
 } from "@/zod-schemas/ticket.schema";
 import { eq } from "drizzle-orm";
-import { z } from "zod";
 import { flattenValidationErrors } from "next-safe-action";
+import { z } from "zod";
 
 // Queries
+import { getSession } from "@/server/auth/get-session";
+import { getEntrepriseById } from "@/server/queries/entreprise.query";
+import { getTicketMessagesFiltered } from "@/server/queries/ticketMessages.query";
 import {
   getTicketById,
   getTicketsByPerimetre,
 } from "@/server/queries/tickets.query";
-import { getTicketMessagesFiltered } from "@/server/queries/ticketMessages.query";
 import { getUserAdhesion } from "@/server/queries/userAdhesions.query";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
-import { getEntrepriseById } from "@/server/queries/entreprise.query";
-import { getSession } from "@/server/auth/get-session";
 
 // Utils
+import { getDocumentsByTicketId } from "@/server/queries/documents.query";
+import { deleteS3Object, promoteS3Key } from "@/server/s3/s3";
 import { canUserAccessTicket } from "@/server/utils/ticketsPerimetre.utils";
 import {
-  canUserCreateTicket,
-  canUserUpdateTicket,
   canUserAssignTicket,
-  canUserEditTicketBasicFields,
+  canUserCreateTicket,
   canUserEditAssigneEntrepriseId,
   canUserEditAssigneUserId,
   canUserEditStatut,
+  canUserEditTicketBasicFields,
+  canUserUpdateTicket,
   getAvailableStatutsForUser,
 } from "@/server/utils/ticketsPermissions.utils";
 import { isStatusTransitionAllowed } from "@/server/utils/ticketsTransitions.utils";
-import { canUserWriteVisibility } from "@/server/utils/ticketsMessages.utils";
-import { promoteS3Key, deleteS3Object } from "@/server/s3/s3";
-import { getDocumentsByTicketId } from "@/server/queries/documents.query";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
 
 // ═══════════════════════════════════════════════════════════════
@@ -122,13 +120,13 @@ export const getTicketByIdAction = actionClient
   .metadata({ actionName: "getTicketByIdAction" })
   .inputSchema(
     z.object({
-      ticketId: z.string().uuid(),
-      entrepriseId: z.string().uuid(),
+      ticketId: z.uuid(),
+      entrepriseId: z.uuid(),
     }),
     {
       handleValidationErrorsShape: async (ve) =>
         flattenValidationErrors(ve).fieldErrors,
-    }
+    },
   )
   .action(async ({ parsedInput }) => {
     const session = await getSession();
@@ -157,9 +155,7 @@ export const getTicketByIdAction = actionClient
 
     // Vérifier ownership
     if (ticket.proprietaireEntrepriseId !== parsedInput.entrepriseId) {
-      throw errors.forbidden(
-        "Ce ticket n'appartient pas à votre entreprise."
-      );
+      throw errors.forbidden("Ce ticket n'appartient pas à votre entreprise.");
     }
 
     // Vérifier accès via périmètre
@@ -171,7 +167,7 @@ export const getTicketByIdAction = actionClient
 
     if (!hasAccess) {
       throw errors.forbidden(
-        "Vous n'avez pas accès à ce ticket (périmètre insuffisant)."
+        "Vous n'avez pas accès à ce ticket (périmètre insuffisant).",
       );
     }
 
@@ -186,12 +182,12 @@ export const insertTicketAction = actionClient
   .metadata({ actionName: "insertTicketAction" })
   .inputSchema(
     insertTicketFormSchema.extend({
-      entrepriseId: z.string().uuid(),
+      entrepriseId: z.uuid(),
     }),
     {
       handleValidationErrorsShape: async (ve) =>
         flattenValidationErrors(ve).fieldErrors,
-    }
+    },
   )
   .action(async ({ parsedInput }) => {
     const session = await getSession();
@@ -220,7 +216,7 @@ export const insertTicketAction = actionClient
 
     if (!canCreate) {
       throw errors.forbidden(
-        "Vous n'avez pas la permission de créer un ticket sur ce site. Rôle requis: demandeur_site ou supérieur."
+        "Vous n'avez pas la permission de créer un ticket sur ce site. Rôle requis: demandeur_site ou supérieur.",
       );
     }
 
@@ -318,12 +314,12 @@ export const updateTicketAction = actionClient
   .metadata({ actionName: "updateTicketAction" })
   .inputSchema(
     updateTicketFormSchema.extend({
-      entrepriseId: z.string().uuid(),
+      entrepriseId: z.uuid(),
     }),
     {
       handleValidationErrorsShape: async (ve) =>
         flattenValidationErrors(ve).fieldErrors,
-    }
+    },
   )
   .action(async ({ parsedInput }) => {
     const session = await getSession();
@@ -352,9 +348,7 @@ export const updateTicketAction = actionClient
 
     // Vérifier ownership
     if (ticket.proprietaireEntrepriseId !== parsedInput.entrepriseId) {
-      throw errors.forbidden(
-        "Ce ticket n'appartient pas à votre entreprise."
-      );
+      throw errors.forbidden("Ce ticket n'appartient pas à votre entreprise.");
     }
 
     // Vérifier permission UPDATE
@@ -367,7 +361,7 @@ export const updateTicketAction = actionClient
 
     if (!canUpdate) {
       throw errors.forbidden(
-        "Vous n'avez pas la permission de modifier ce ticket."
+        "Vous n'avez pas la permission de modifier ce ticket.",
       );
     }
 
@@ -438,9 +432,7 @@ export const changeTicketStatusAction = actionClient
 
     // Vérifier ownership
     if (ticket.proprietaireEntrepriseId !== parsedInput.entrepriseId) {
-      throw errors.forbidden(
-        "Ce ticket n'appartient pas à votre entreprise."
-      );
+      throw errors.forbidden("Ce ticket n'appartient pas à votre entreprise.");
     }
 
     // Vérifier transition autorisée
@@ -454,7 +446,7 @@ export const changeTicketStatusAction = actionClient
 
     if (!isAllowed) {
       throw errors.forbidden(
-        `Transition ${ticket.statut} → ${parsedInput.newStatut} non autorisée pour votre rôle.`
+        `Transition ${ticket.statut} → ${parsedInput.newStatut} non autorisée pour votre rôle.`,
       );
     }
 
@@ -527,9 +519,7 @@ export const assignTicketAction = actionClient
 
     // Vérifier ownership
     if (ticket.proprietaireEntrepriseId !== parsedInput.entrepriseId) {
-      throw errors.forbidden(
-        "Ce ticket n'appartient pas à votre entreprise."
-      );
+      throw errors.forbidden("Ce ticket n'appartient pas à votre entreprise.");
     }
 
     // Vérifier permission ASSIGN
@@ -541,7 +531,7 @@ export const assignTicketAction = actionClient
 
     if (!canAssign) {
       throw errors.forbidden(
-        "Vous n'avez pas la permission d'assigner ce ticket. Rôle requis: responsable_site ou plateforme."
+        "Vous n'avez pas la permission d'assigner ce ticket. Rôle requis: responsable_site ou plateforme.",
       );
     }
 
@@ -567,7 +557,6 @@ export const assignTicketAction = actionClient
     return { ticket: parsedTicket };
   });
 
-
 // ═══════════════════════════════════════════════════════════════
 // GET TICKET MESSAGES
 // ═══════════════════════════════════════════════════════════════
@@ -576,13 +565,13 @@ export const getTicketMessagesAction = actionClient
   .metadata({ actionName: "getTicketMessagesAction" })
   .inputSchema(
     z.object({
-      ticketId: z.string().uuid(),
-      entrepriseId: z.string().uuid(),
+      ticketId: z.uuid(),
+      entrepriseId: z.uuid(),
     }),
     {
       handleValidationErrorsShape: async (ve) =>
         flattenValidationErrors(ve).fieldErrors,
-    }
+    },
   )
   .action(async ({ parsedInput }) => {
     const session = await getSession();
@@ -611,7 +600,7 @@ export const getTicketMessagesAction = actionClient
 
     if (!hasAccess) {
       throw errors.forbidden(
-        "Vous n'avez pas accès à ce ticket (périmètre insuffisant)."
+        "Vous n'avez pas accès à ce ticket (périmètre insuffisant).",
       );
     }
 
@@ -636,13 +625,10 @@ export const getTicketMessagesAction = actionClient
  */
 export const updateTicketBasicFieldsAction = actionClient
   .metadata({ actionName: "updateTicketBasicFieldsAction" })
-  .inputSchema(
-    updateTicketBasicFieldsSchema,
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    }
-  )
+  .inputSchema(updateTicketBasicFieldsSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -675,7 +661,7 @@ export const updateTicketBasicFieldsAction = actionClient
 
     if (!canEdit) {
       throw errors.forbidden(
-        "Vous n'avez pas la permission de modifier ces champs. Seuls les clients avec rôle demandeur_site ou supérieur peuvent modifier le titre, description, type et priorité."
+        "Vous n'avez pas la permission de modifier ces champs. Seuls les clients avec rôle demandeur_site ou supérieur peuvent modifier le titre, description, type et priorité.",
       );
     }
 
@@ -708,13 +694,10 @@ export const updateTicketBasicFieldsAction = actionClient
  */
 export const updateTicketAssigneEntrepriseAction = actionClient
   .metadata({ actionName: "updateTicketAssigneEntrepriseAction" })
-  .inputSchema(
-    updateTicketAssigneEntrepriseSchema,
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    }
-  )
+  .inputSchema(updateTicketAssigneEntrepriseSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -747,7 +730,7 @@ export const updateTicketAssigneEntrepriseAction = actionClient
 
     if (!canEdit) {
       throw errors.forbidden(
-        "Vous n'avez pas la permission de modifier le prestataire assigné."
+        "Vous n'avez pas la permission de modifier le prestataire assigné.",
       );
     }
 
@@ -759,17 +742,15 @@ export const updateTicketAssigneEntrepriseAction = actionClient
       const { getClientPrestataires } = await import(
         "@/server/queries/clientServiceExecutions.query"
       );
-      const prestataires = await getClientPrestataires(
-        normalized.entrepriseId
-      );
+      const prestataires = await getClientPrestataires(normalized.entrepriseId);
 
       const isAllowed = prestataires.some(
-        (p) => p.id === normalized.assigneEntrepriseId
+        (p) => p.id === normalized.assigneEntrepriseId,
       );
 
       if (!isAllowed) {
         throw errors.forbidden(
-          "Ce prestataire n'est pas dans votre liste de prestataires autorisés."
+          "Ce prestataire n'est pas dans votre liste de prestataires autorisés.",
         );
       }
     }
@@ -799,13 +780,10 @@ export const updateTicketAssigneEntrepriseAction = actionClient
  */
 export const updateTicketAssigneUserAction = actionClient
   .metadata({ actionName: "updateTicketAssigneUserAction" })
-  .inputSchema(
-    updateTicketAssigneUserSchema,
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    }
-  )
+  .inputSchema(updateTicketAssigneUserSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -838,7 +816,7 @@ export const updateTicketAssigneUserAction = actionClient
 
     if (!canEdit) {
       throw errors.forbidden(
-        "Seul le prestataire assigné peut modifier l'utilisateur assigné."
+        "Seul le prestataire assigné peut modifier l'utilisateur assigné.",
       );
     }
 
@@ -863,13 +841,10 @@ export const updateTicketAssigneUserAction = actionClient
  */
 export const updateTicketStatutAction = actionClient
   .metadata({ actionName: "updateTicketStatutAction" })
-  .inputSchema(
-    updateTicketStatutSchema,
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    }
-  )
+  .inputSchema(updateTicketStatutSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -902,7 +877,7 @@ export const updateTicketStatutAction = actionClient
 
     if (!canEdit) {
       throw errors.forbidden(
-        "Vous n'avez pas la permission de modifier le statut du ticket."
+        "Vous n'avez pas la permission de modifier le statut du ticket.",
       );
     }
 
@@ -915,7 +890,7 @@ export const updateTicketStatutAction = actionClient
 
     if (!availableStatuts.includes(parsedInput.statut)) {
       throw errors.forbidden(
-        `Le statut "${parsedInput.statut}" n'est pas autorisé pour votre rôle.`
+        `Le statut "${parsedInput.statut}" n'est pas autorisé pour votre rôle.`,
       );
     }
 
@@ -969,13 +944,10 @@ export const updateTicketStatutAction = actionClient
  */
 export const updateTicketAttachmentsAction = actionClient
   .metadata({ actionName: "updateTicketAttachmentsAction" })
-  .inputSchema(
-    updateTicketAttachmentsSchema,
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    }
-  )
+  .inputSchema(updateTicketAttachmentsSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -1008,7 +980,7 @@ export const updateTicketAttachmentsAction = actionClient
 
     if (!canEdit) {
       throw errors.forbidden(
-        "Vous n'avez pas la permission de modifier les pièces jointes du ticket."
+        "Vous n'avez pas la permission de modifier les pièces jointes du ticket.",
       );
     }
 
@@ -1020,11 +992,13 @@ export const updateTicketAttachmentsAction = actionClient
     }
 
     // Récupérer les documents actuels du ticket
-    const existingDocuments = await getDocumentsByTicketId(parsedInput.ticketId);
+    const existingDocuments = await getDocumentsByTicketId(
+      parsedInput.ticketId,
+    );
 
     // IDs des nouveaux attachments (depuis le form)
     const newStorageKeys = new Set(
-      parsedInput.attachments.map((att) => att.storageKey)
+      parsedInput.attachments.map((att) => att.storageKey),
     );
 
     // Transaction pour update atomique
@@ -1047,7 +1021,7 @@ export const updateTicketAttachmentsAction = actionClient
 
       // 2. Ajouter les nouveaux documents (ceux qui ont une temp key)
       const existingKeys = new Set(
-        existingDocuments.map((doc) => doc.storageKey)
+        existingDocuments.map((doc) => doc.storageKey),
       );
 
       for (const attachment of parsedInput.attachments) {
@@ -1098,7 +1072,10 @@ export const updateTicketAttachmentsAction = actionClient
         .where(eq(tickets.id, parsedInput.ticketId));
     });
 
-    return { success: true, message: "Pièces jointes mises à jour avec succès" };
+    return {
+      success: true,
+      message: "Pièces jointes mises à jour avec succès",
+    };
   });
 
 /**
@@ -1116,13 +1093,10 @@ export const updateTicketAttachmentsAction = actionClient
  */
 export const insertTicketMessageAction = actionClient
   .metadata({ actionName: "insertTicketMessageAction" })
-  .inputSchema(
-    insertTicketMessageActionSchema,
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(insertTicketMessageActionSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -1139,27 +1113,34 @@ export const insertTicketMessageAction = actionClient
     }
 
     if (ticket.proprietaireEntrepriseId !== parsedInput.entrepriseId) {
-      throw errors.forbidden(
-        "Vous n'avez pas accès à ce ticket.",
-      );
+      throw errors.forbidden("Vous n'avez pas accès à ce ticket.");
     }
 
     // Vérifier permissions de visibilité selon posture
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     const isPlatform = !!platformRole?.role;
-    const isClient = !isPlatform && ticket.proprietaireEntrepriseId === parsedInput.entrepriseId;
-    const isPrestataire = !isPlatform && ticket.assigneEntrepriseId === parsedInput.entrepriseId;
+    const isClient =
+      !isPlatform &&
+      ticket.proprietaireEntrepriseId === parsedInput.entrepriseId;
+    const isPrestataire =
+      !isPlatform && ticket.assigneEntrepriseId === parsedInput.entrepriseId;
 
     // Plateforme peut tout poster
     if (!isPlatform) {
       // Client peut poster "public" ou "client_only"
-      if (isClient && !["public", "client_only"].includes(parsedInput.visibilite)) {
+      if (
+        isClient &&
+        !["public", "client_only"].includes(parsedInput.visibilite)
+      ) {
         throw errors.forbidden(
           "Le client ne peut poster que des messages publics ou réservés au client.",
         );
       }
       // Prestataire peut poster "public" ou "prestataire_only"
-      if (isPrestataire && !["public", "prestataire_only"].includes(parsedInput.visibilite)) {
+      if (
+        isPrestataire &&
+        !["public", "prestataire_only"].includes(parsedInput.visibilite)
+      ) {
         throw errors.forbidden(
           "Le prestataire ne peut poster que des messages publics ou réservés au prestataire.",
         );

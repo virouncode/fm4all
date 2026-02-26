@@ -5,12 +5,14 @@
 ## Vue d'Ensemble du Projet
 
 **FM4ALL** est une plateforme de devis pour services de facility management (nettoyage, hygiène, boissons, maintenance, etc.). La plateforme permet aux utilisateurs de:
+
 1. Spécifier leurs locaux/sites
 2. Sélectionner et configurer des services
 3. Obtenir des devis avec tarification temps réel
 4. Gérer l'ensemble du cycle de vie d'un devis
 
 **Système Multi-Rôles**:
+
 - **Client**: Demande des devis, gère ses sites
 - **Prestataire**: Gère ses interventions, planning
 - **Plateforme**: Administration globale, pilotage
@@ -22,6 +24,7 @@ Le système utilise un concept de **"posture"** (rôle actif) pour permettre aux
 ## Stack Technique
 
 ### Frontend
+
 - **Next.js 14+** avec App Router
 - **TypeScript** (strict mode)
 - **React 18** avec Server & Client Components
@@ -29,6 +32,7 @@ Le système utilise un concept de **"posture"** (rôle actif) pour permettre aux
 - **next-intl** pour l'internationalisation (FR/EN)
 
 ### Backend
+
 - **Drizzle ORM** avec PostgreSQL
 - **next-safe-action** pour les Server Actions sécurisées
 - **Zod** pour la validation de schémas
@@ -36,6 +40,7 @@ Le système utilise un concept de **"posture"** (rôle actif) pour permettre aux
 - **Sanity CMS** pour le contenu
 
 ### Outils de Développement
+
 - **pnpm** comme gestionnaire de paquets
 - **Vitest** pour les tests
 - **ESLint** + **Prettier** pour le linting
@@ -100,21 +105,18 @@ src/
 import { capitalizeWords, lower, upper } from "@/zod-helpers/normalize";
 
 export const insertSiteFormSchema = z.object({
-  nom: z.string()
+  nom: z
+    .string()
     .min(1, "Nom obligatoire")
-    .transform(v => capitalizeWords(v)),  // ✅ string → string (nettoyage)
+    .transform((v) => capitalizeWords(v)), // ✅ string → string (nettoyage)
 
-  email: z.email()
-    .transform(v => lower(v)),            // ✅ string → string (nettoyage)
+  email: z.email().transform((v) => lower(v)), // ✅ string → string (nettoyage)
 
-  nomEntreprise: z.string()
-    .transform(v => upper(v)),            // ✅ string → string (nettoyage)
+  nomEntreprise: z.string().transform((v) => upper(v)), // ✅ string → string (nettoyage)
 
   // Champs optionnels : accepter "" SANS transformer
-  description: z.string().optional(),     // ✅ Accepte "" ou undefined
-  assigneId: z.string().uuid()
-    .or(z.literal(""))
-    .optional(),                          // ✅ Accepte UUID, "", ou undefined
+  description: z.string().optional(), // ✅ Accepte "" ou undefined
+  assigneId: z.uuid().or(z.literal("")).optional(), // ✅ Accepte UUID, "", ou undefined
 });
 ```
 
@@ -137,28 +139,27 @@ surface: z.string().transform(v => Number(v)),
 ```typescript
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
 
-export const insertSiteAction = actionClient
-  .action(async ({ parsedInput }) => {
-    // Normaliser AVANT insertion DB
-    const normalized = normalizeForSubmit(parsedInput, {
-      optionalNumbers: ["surface", "effectif"] as const,    // string → number | null
-      optionalStrings: ["description", "adresseLigne2"] as const, // "" → null
-    });
-
-    await db.insert(sites).values({
-      nom: normalized.nom,              // Déjà nettoyé (capitalizeWords) par schema
-      description: normalized.description, // "" transformé en null
-      surface: normalized.surface,      // string "150" transformé en number 150
-      // ...
-    });
+export const insertSiteAction = actionClient.action(async ({ parsedInput }) => {
+  // Normaliser AVANT insertion DB
+  const normalized = normalizeForSubmit(parsedInput, {
+    optionalNumbers: ["surface", "effectif"] as const, // string → number | null
+    optionalStrings: ["description", "adresseLigne2"] as const, // "" → null
   });
+
+  await db.insert(sites).values({
+    nom: normalized.nom, // Déjà nettoyé (capitalizeWords) par schema
+    description: normalized.description, // "" transformé en null
+    surface: normalized.surface, // string "150" transformé en number 150
+    // ...
+  });
+});
 ```
 
 **Pattern pour champs UUID optionnels** :
 
 ```typescript
 // Schema : accepte UUID ou ""
-assigneEntrepriseId: z.string().uuid().or(z.literal("")).optional(),
+assigneEntrepriseId: z.uuid().or(z.literal("")).optional(),
 
 // Action : transforme "" en null
 const normalized = normalizeForSubmit(parsedInput, {
@@ -171,20 +172,20 @@ const normalized = normalizeForSubmit(parsedInput, {
 
 ```typescript
 import {
-  capitalizeWords,      // "jean DUPONT" → "Jean Dupont"
-  capitalizeFirstWord,  // "bonjour monde" → "Bonjour monde"
-  upper,                // "acme corp" → "ACME CORP"
-  lower,                // "Email@EXAMPLE.COM" → "email@example.com"
-  normalizeString,      // Trim + collapse espaces multiples
+  capitalizeWords, // "jean DUPONT" → "Jean Dupont"
+  capitalizeFirstWord, // "bonjour monde" → "Bonjour monde"
+  upper, // "acme corp" → "ACME CORP"
+  lower, // "Email@EXAMPLE.COM" → "email@example.com"
+  normalizeString, // Trim + collapse espaces multiples
 } from "@/zod-helpers/normalize";
 ```
 
 #### Résumé de la stratégie
 
-| Où | Quoi | Exemple |
-|----|------|---------|
-| **Schema** | Validation + Nettoyage (string → string) | `.transform(capitalizeWords)` |
-| **Action** | Normalisation de type (string → null, string → number) | `normalizeForSubmit()` |
+| Où         | Quoi                                                   | Exemple                       |
+| ---------- | ------------------------------------------------------ | ----------------------------- |
+| **Schema** | Validation + Nettoyage (string → string)               | `.transform(capitalizeWords)` |
+| **Action** | Normalisation de type (string → null, string → number) | `normalizeForSubmit()`        |
 
 ### 2. Schemas Zod
 
@@ -201,7 +202,7 @@ export type SelectSiteType = z.infer<typeof selectSiteSchema>;
 export const insertSiteFormSchema = z.object({
   nom: z.string().min(1),
   adresseLigne1: z.string().min(1),
-  surface: z.string().min(1),  // String dans le form, Number dans l'action
+  surface: z.string().min(1), // String dans le form, Number dans l'action
   // ...
 });
 export type InsertSiteFormType = z.infer<typeof insertSiteFormSchema>;
@@ -209,12 +210,13 @@ export type InsertSiteFormType = z.infer<typeof insertSiteFormSchema>;
 // 3. Schema UPDATE (modification)
 export const updateSiteFormSchema = insertSiteFormSchema.extend({
   id: z.string(),
-  surface: z.string().optional(),  // Champs optionnels en update
+  surface: z.string().optional(), // Champs optionnels en update
 });
 export type UpdateSiteFormType = z.infer<typeof updateSiteFormSchema>;
 ```
 
 **Conventions importantes**:
+
 - Les champs `number` dans la DB sont souvent `string` dans les forms (pour les inputs)
 - La conversion `Number()` se fait dans les Server Actions
 - **JAMAIS de `.default()` dans les schemas Zod** : Cela crée des conflits de types avec React Hook Form (input vs output types). Gérer les defaults dans `defaultValues` du `useForm` à la place.
@@ -230,23 +232,28 @@ import { insertSiteFormSchema } from "@/zod-schemas/sites.schema";
 const action = createSafeActionClient();
 
 export const insertSiteAction = action
-  .schema(insertSiteFormSchema.extend({
-    entrepriseId: z.string(),
-    parentId: z.string().nullable(),
-  }))
+  .schema(
+    insertSiteFormSchema.extend({
+      entrepriseId: z.string(),
+      parentId: z.string().nullable(),
+    }),
+  )
   .action(async ({ parsedInput, ctx }) => {
     const { currentUser } = ctx;
 
     // TOUJOURS utiliser des transactions pour les mutations multi-tables
     const insertedSite = await db.transaction(async (tx) => {
       // 1. INSERT principal
-      const [site] = await tx.insert(sites).values({
-        nom: parsedInput.nom,
-        surface: Number(parsedInput.surface),  // Conversion ici
-        entrepriseId: parsedInput.entrepriseId,
-        createdById: currentUser.id,
-        updatedById: currentUser.id,
-      }).returning();
+      const [site] = await tx
+        .insert(sites)
+        .values({
+          nom: parsedInput.nom,
+          surface: Number(parsedInput.surface), // Conversion ici
+          entrepriseId: parsedInput.entrepriseId,
+          createdById: currentUser.id,
+          updatedById: currentUser.id,
+        })
+        .returning();
 
       // 2. INSERT relations (ex: closure table)
       await insertSiteArborescence({
@@ -254,7 +261,7 @@ export const insertSiteAction = action
         siteId: site.id,
         parentId: parsedInput.parentId,
         userId: currentUser.id,
-        tx,  // Passer la transaction
+        tx, // Passer la transaction
       });
 
       return site;
@@ -268,6 +275,7 @@ export const insertSiteAction = action
 ```
 
 **Points Critiques**:
+
 - ✅ **Transactions atomiques** pour toutes les mutations multi-tables
 - ✅ **Validation Zod** des entrées ET sorties
 - ✅ **Gestion des erreurs** via `createSafeActionClient`
@@ -294,6 +302,7 @@ export async function getSitesByEntreprise(entrepriseId: string) {
 ```
 
 **Convention**:
+
 - Toujours ajouter `import "server-only"` en haut
 - Pas de logique métier complexe (utiliser `/utils/` pour ça)
 
@@ -305,7 +314,9 @@ export async function getSitesByEntreprise(entrepriseId: string) {
 import "server-only";
 import { db } from "@/db";
 
-type DbOrTransaction = typeof db | Parameters<Parameters<typeof db.transaction>[0]>[0];
+type DbOrTransaction =
+  | typeof db
+  | Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 export async function insertSiteArborescence({
   entrepriseId,
@@ -318,9 +329,9 @@ export async function insertSiteArborescence({
   siteId: string;
   parentId: string | null;
   userId: string;
-  tx?: DbOrTransaction;  // Optionnel mais recommandé
+  tx?: DbOrTransaction; // Optionnel mais recommandé
 }) {
-  const dbClient = tx || db;  // Utiliser tx si fourni
+  const dbClient = tx || db; // Utiliser tx si fourni
 
   // Logique métier complexe ici
   await dbClient.insert(sitesArborescence).values({
@@ -330,6 +341,7 @@ export async function insertSiteArborescence({
 ```
 
 **Convention**:
+
 - Accepter `tx?: DbOrTransaction` pour permettre l'usage dans des transactions
 - Toujours utiliser `const dbClient = tx || db;`
 
@@ -402,12 +414,14 @@ export function SiteFormDialog({ mode, site }: Props) {
 ```
 
 **Composants RHF Disponibles**:
+
 - `RhfInput` - Input texte, number, email, etc.
 - `RhfControlledSelect` - Select avec Radix UI
 - `RhfTextArea` - Textarea
 - `RhfCheckbox`, `RhfSwitch`, etc.
 
 **Convention**:
+
 - Typer les composants RHF: `RhfInput<FormType>`
 - Utiliser `useFormState` pour `isSubmitting` et `isDirty`
 - Désactiver submit si `isSubmitting || !isDirty`
@@ -416,16 +430,18 @@ export function SiteFormDialog({ mode, site }: Props) {
 ### 6. Internationalisation (next-intl)
 
 **RÈGLE CRITIQUE**:
+
 ```typescript
 // ✅ TOUJOURS utiliser
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 
 // ❌ JAMAIS utiliser
-import { usePathname } from "next/navigation";  // Retourne pathname avec locale!
-import Link from "next/link";  // Ne gère pas l'i18n!
+import { usePathname } from "next/navigation"; // Retourne pathname avec locale!
+import Link from "next/link"; // Ne gère pas l'i18n!
 ```
 
 **Traductions**:
+
 ```typescript
 import { useTranslations } from "next-intl";
 
@@ -459,6 +475,7 @@ export function SitesClient({ initialSites }) {
 ```
 
 **Convention**:
+
 - Pages = Server Components qui font les queries initiales
 - Composants interactifs = Client Components (`"use client"`)
 - Passer les données via props du Server au Client
@@ -511,8 +528,8 @@ type SearchParams = {
   siteId?: string;
   demandeurEntrepriseId?: string;
   assigneEntrepriseId?: string;
-  orderBy?: string;      // ⚠️ NE PAS OUBLIER
-  orderDir?: string;     // ⚠️ NE PAS OUBLIER
+  orderBy?: string; // ⚠️ NE PAS OUBLIER
+  orderDir?: string; // ⚠️ NE PAS OUBLIER
 };
 ```
 
@@ -605,8 +622,8 @@ const loadTickets = useCallback(async () => {
   searchParams.siteId,
   searchParams.demandeurEntrepriseId,
   searchParams.assigneEntrepriseId,
-  searchParams.orderBy,     // ⚠️ NE PAS OUBLIER
-  searchParams.orderDir,    // ⚠️ NE PAS OUBLIER
+  searchParams.orderBy, // ⚠️ NE PAS OUBLIER
+  searchParams.orderDir, // ⚠️ NE PAS OUBLIER
   pageSize,
 ]);
 ```
@@ -614,16 +631,21 @@ const loadTickets = useCallback(async () => {
 #### ✅ 7. Passer aussi dans loadMore (infinite scroll)
 
 ```typescript
-const loadMore = useCallback(async () => {
-  const result = await getTicketsAction({
-    entrepriseId: entreprise.id,
-    // ... tous les filtres
-    orderBy: toOrderBy(searchParams.orderBy),     // ⚠️ NE PAS OUBLIER
-    orderDir: toOrderDir(searchParams.orderDir),  // ⚠️ NE PAS OUBLIER
-    page: nextPage,
-    pageSize,
-  });
-}, [/* ... toutes les dépendances incluant orderBy/orderDir */]);
+const loadMore = useCallback(
+  async () => {
+    const result = await getTicketsAction({
+      entrepriseId: entreprise.id,
+      // ... tous les filtres
+      orderBy: toOrderBy(searchParams.orderBy), // ⚠️ NE PAS OUBLIER
+      orderDir: toOrderDir(searchParams.orderDir), // ⚠️ NE PAS OUBLIER
+      page: nextPage,
+      pageSize,
+    });
+  },
+  [
+    /* ... toutes les dépendances incluant orderBy/orderDir */
+  ],
+);
 ```
 
 #### ✅ 8. CRITIQUE : Utiliser l'OBJET searchParams dans useEffect (pas les propriétés individuelles)
@@ -637,9 +659,9 @@ useEffect(() => {
   loadInitialData();
 }, [
   entreprise?.id,
-  searchParams.search,     // undefined === undefined → pas de changement
-  searchParams.statut,     // undefined === undefined → pas de changement
-  searchParams.orderBy,    // undefined === undefined → pas de changement
+  searchParams.search, // undefined === undefined → pas de changement
+  searchParams.statut, // undefined === undefined → pas de changement
+  searchParams.orderBy, // undefined === undefined → pas de changement
   // ...
 ]);
 
@@ -653,6 +675,7 @@ useEffect(() => {
 **Explication** : Quand le parent (page.tsx) re-render lors d'une navigation client-side, il passe un NOUVEL objet `searchParams`. Avec les propriétés individuelles (toutes `undefined`), React ne détecte aucun changement (`undefined === undefined`). Avec l'objet entier, la nouvelle référence déclenche le useEffect.
 
 **SYMPTÔMES d'oubli** :
+
 - ❌ L'URL change mais les données ne se rechargent pas
 - ❌ Le tri visuel ne change pas malgré le clic sur SortableHeader
 - ❌ Les filtres fonctionnent mais pas le tri (ou vice-versa)
@@ -693,17 +716,19 @@ Le projet utilise une **closure table** pour gérer les hiérarchies de sites:
 ```typescript
 // Table sites_arborescence
 {
-  ancetreId: string;      // ID de l'ancêtre
-  descendantId: string;   // ID du descendant
-  profondeur: number;     // Distance (0 = lui-même, 1 = enfant direct)
+  ancetreId: string; // ID de l'ancêtre
+  descendantId: string; // ID du descendant
+  profondeur: number; // Distance (0 = lui-même, 1 = enfant direct)
 }
 ```
 
 **Algorithme INSERT**:
+
 1. Ligne réflexive (site → site, profondeur 0)
 2. Copier tous les ancêtres du parent avec profondeur+1
 
 **Algorithme DELETE**:
+
 1. Vérifier si le site a des enfants (profondeur = 1)
 2. Si oui, rejeter avec erreur
 3. Supprimer toutes les lignes où `descendantId = siteId`
@@ -774,6 +799,7 @@ const onSubmit = async (data: UpdateUserFormType) => {
 ```
 
 **Quand synchroniser**:
+
 - ✅ Après mutation qui change `user` (nom, avatar, email)
 - ✅ Après mutation qui change `entreprise`
 - ✅ Après changement de posture
@@ -793,7 +819,9 @@ export const getUsersAction = action
     const { currentUser } = ctx;
 
     // ✅ TOUJOURS vérifier l'accès via getUserAdhesion
-    const { getUserAdhesion } = await import("@/server/queries/userAdhesions.query");
+    const { getUserAdhesion } = await import(
+      "@/server/queries/userAdhesions.query"
+    );
     const adhesion = await getUserAdhesion({
       userId: currentUser.id,
       entrepriseId: parsedInput.entrepriseId,
@@ -815,10 +843,12 @@ export const getUsersAction = action
 **Système de Permissions**:
 
 **Rôles Plateforme** (cross-entreprise, FM4ALL uniquement):
+
 - `super_admin_plateforme` - Accès total, administration globale (niveau 4)
 - `operateur_plateforme` - Opérations plateforme
 
 **Rôles d'Entreprise** (au sein d'une entreprise):
+
 - `admin` - Gestion entreprise (niveau 3)
 - `manager` - Gestion équipe (niveau 2)
 - `collaborateur` - Accès lecture (niveau 1)
@@ -836,6 +866,7 @@ Un utilisateur FM4ALL peut avoir DEUX rôles simultanément :
    - Exemple : `super_admin_plateforme` pour administration cross-entreprise
 
 **Pattern dans le code** :
+
 ```typescript
 // Frontend
 const currentUserRole = useAppStore((state) => state.roleAdhesion);
@@ -902,11 +933,12 @@ function ResetPasswordForm() {
 ```
 
 **Critères de Validation**:
+
 - ✓ Au moins 8 caractères
 - ✓ Une majuscule (A-Z)
 - ✓ Une minuscule (a-z)
 - ✓ Un chiffre (0-9)
-- ✓ Un caractère spécial (!@#$%^&*(),.?":{}|<>)
+- ✓ Un caractère spécial (!@#$%^&\*(),.?":{}|<>)
 
 **Composant**: Affiche barre de progression (rouge → jaune → vert) + checklist des critères
 
@@ -919,7 +951,7 @@ function ResetPasswordForm() {
 const base = {
   from: `fm4all <noreply@mg.fm4all.com>`,
   to: [to],
-  bcc: ["viroun@fm4all.com"],  // ❌ Hardcodé!
+  bcc: ["viroun@fm4all.com"], // ❌ Hardcodé!
   subject,
 };
 
@@ -929,12 +961,13 @@ const bccEmail = process.env.MAILGUN_BCC_EMAIL;
 const base = {
   from: `fm4all: Le Facility Management pour tous <noreply@mg.fm4all.com>`,
   to: [to],
-  ...(bccEmail ? { bcc: [bccEmail] } : {}),  // ✅ Optionnel depuis env
+  ...(bccEmail ? { bcc: [bccEmail] } : {}), // ✅ Optionnel depuis env
   subject,
 };
 ```
 
 **Variables d'environnement**:
+
 - `MAILGUN_API_KEY` - Clé API Mailgun (requis)
 - `MAILGUN_BCC_EMAIL` - Email BCC optionnel pour debug/copie
 
@@ -964,9 +997,10 @@ toast.info("Information importante");
 **RÈGLE CRITIQUE**: Pour tous les champs optionnels (nullable en DB), utiliser `normalizeForSubmit` côté serveur pour convertir `""` → `null`.
 
 **❌ Mauvaise approche** (ancienne, à éviter):
+
 ```typescript
 // Schema avec .nullable()
-assigneEntrepriseId: z.string().uuid().nullable()
+assigneEntrepriseId: z.uuid().nullable();
 
 // Conversion manuelle côté client
 const newId = value === "none" ? null : value;
@@ -975,15 +1009,17 @@ const newId = value === "none" ? null : value;
 **✅ Bonne approche** (pattern standard du projet):
 
 1. **Schema Zod** - Accepte `string` (pas `.uuid().nullable()`):
+
 ```typescript
 // src/zod-schemas/[feature].schema.ts
 export const updateSchema = z.object({
-  ticketId: z.string().uuid(),
+  ticketId: z.uuid(),
   assigneEntrepriseId: z.string(), // ✅ Accepte "" ou UUID
 });
 ```
 
 2. **Action serveur** - Utilise `normalizeForSubmit` après validation:
+
 ```typescript
 // src/server/actions/[feature]Actions.ts
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
@@ -1004,6 +1040,7 @@ export const updateAction = actionClient
 ```
 
 3. **Composant client** - Utilise `""` pour "non sélectionné":
+
 ```typescript
 // Composants avec Select
 <Select
@@ -1089,17 +1126,20 @@ export default async function DetailsPage({ params }) {
 **RÈGLE CRITIQUE**: TOUJOURS vérifier les erreurs TypeScript AVANT de committer ou de considérer une tâche terminée.
 
 **Commande à exécuter**:
+
 ```bash
 pnpm tsc --noEmit
 ```
 
 **Points de vigilance**:
+
 - ❌ **JAMAIS** utiliser `any` - Toujours typer correctement
 - ❌ **JAMAIS** utiliser `@ts-ignore` ou `@ts-expect-error` sans justification
 - ✅ Résoudre TOUTES les erreurs TypeScript avant de passer à la suite
 - ✅ Si un type n'existe pas, le créer (ne pas utiliser `any`)
 
 **Exemple d'erreur fréquente**:
+
 ```typescript
 // ❌ FAUX
 const users = await getUsers();
@@ -1115,6 +1155,7 @@ availableUsers = users.map((u) => ({ // Type inféré automatiquement
 ```
 
 **Workflow recommandé**:
+
 1. Écrire le code
 2. Vérifier TypeScript: `pnpm tsc --noEmit`
 3. Corriger TOUTES les erreurs
@@ -1192,7 +1233,7 @@ export const getUsersAction = action
     const users = await getUsersByEntreprise({
       entrepriseId: parsedInput.entrepriseId,
     });
-    return { users };  // ❌ Bypass de sécurité!
+    return { users }; // ❌ Bypass de sécurité!
   });
 
 // ✅ CORRECT - Vérifie que currentUser a accès à entrepriseId
@@ -1223,7 +1264,7 @@ export const getUsersAction = action
 // ❌ FAUX - Bootstrap est réservé au login/refresh page
 const onSubmit = async (data) => {
   await updateUserAction(data);
-  await bootstrap();  // ❌ Trop lourd, pas nécessaire!
+  await bootstrap(); // ❌ Trop lourd, pas nécessaire!
 };
 
 // ✅ CORRECT - Update juste le slice concerné avec les données serveur
@@ -1326,11 +1367,13 @@ useEffect(() => {
 ## Checklist pour Nouvelle Feature
 
 ### Phase 1 - Schémas & Types
+
 - [ ] Créer le schéma Drizzle dans `/db/schema/`
 - [ ] Créer les schemas Zod (select, insert, update) dans `/zod-schemas/`
 - [ ] Vérifier que validation = messages d'erreur (ranges, formats)
 
 ### Phase 2 - Backend
+
 - [ ] Créer les queries dans `/server/queries/` avec `import "server-only"`
 - [ ] Créer les actions dans `/server/actions/`
 - [ ] **CRITIQUE**: Ajouter checks de permissions avec `getUserAdhesion` dans actions
@@ -1339,6 +1382,7 @@ useEffect(() => {
 - [ ] Passer `tx` aux fonctions utilitaires
 
 ### Phase 3 - Frontend
+
 - [ ] Créer la page serveur dans `/app/[locale]/.../page.tsx`
 - [ ] Créer le composant client principal `[Feature]Client.tsx`
 - [ ] Créer les dialogs/formulaires avec RHF + Zod
@@ -1347,12 +1391,14 @@ useEffect(() => {
 - [ ] **IMPORTANT**: Synchroniser appStore après mutations si nécessaire
 
 ### Phase 4 - i18n & Tests
+
 - [ ] Ajouter les traductions dans `/messages/`
 - [ ] Utiliser `@/i18n/navigation` (PAS `next/navigation`)
 - [ ] Tester en local
 - [ ] Vérifier que les permissions sont bien enforced
 
 ### Phase 5 - Sécurité & Qualité
+
 - [ ] Supprimer tous les `console.log`
 - [ ] Pas d'emails ou secrets hardcodés (utiliser `.env`)
 - [ ] Vérifier transactions atomiques
@@ -1444,6 +1490,7 @@ pnpm db:generate    # Generate migrations
 **TOUJOURS vérifier ces points AVANT de considérer qu'un formulaire est terminé :**
 
 #### 1. Logique Métier & État Initial
+
 - [ ] **DefaultValues cohérents avec le contexte**
   - Exemple: Posture plateforme → `proprietaireEntrepriseId: ""` (vide pour forcer sélection)
   - Exemple: Posture client → `proprietaireEntrepriseId: entreprise.id` (auto-rempli)
@@ -1451,6 +1498,7 @@ pnpm db:generate    # Generate migrations
 - [ ] **Visualiser mentalement le parcours utilisateur complet** avant de coder
 
 #### 2. Dépendances entre Champs
+
 - [ ] **Champs disabled selon dépendances logiques**
   - Exemple: Select sites disabled si `!selectedClientId` (pas de client sélectionné)
   - Pattern: `disabled={!prerequisiteField || isLoading || items.length === 0}`
@@ -1458,6 +1506,7 @@ pnpm db:generate    # Generate migrations
   - Exemple: Changement de client → recharger les sites de ce client
 
 #### 3. Validation & Messages d'Erreur
+
 - [ ] **Messages d'erreur en français, clairs et contextuels**
   - ❌ Mauvais: `"Invalid UUID"`
   - ✅ Bon: `"Client obligatoire"`
@@ -1466,6 +1515,7 @@ pnpm db:generate    # Generate migrations
 - [ ] **Required fields avec `requiredMark` visible**
 
 #### 4. UX & Accessibilité
+
 - [ ] **Placeholders explicites et utiles**
   - ✅ Bon: `"Sélectionnez un client"`
   - ❌ Mauvais: `"Choisir"` (trop vague)
@@ -1474,12 +1524,14 @@ pnpm db:generate    # Generate migrations
 - [ ] **Footer sticky si contenu scrollable** (DialogFooter avec sticky, contenu avec overflow-y-auto)
 
 #### 5. Technique
+
 - [ ] **TypeScript vérifié** : `npx tsc --noEmit` SANS erreurs
 - [ ] **Imports corrects** (pas d'imports inutilisés)
 - [ ] **Pas de `console.log` en production**
 - [ ] **Gestion d'erreur avec toast** (success, error, loading)
 
 #### 6. Test Mental (CRITIQUE)
+
 - [ ] **"Que voit l'utilisateur quand il ouvre le formulaire ?"**
   - Champs pré-remplis corrects ?
   - Champs disabled corrects ?
@@ -1553,7 +1605,7 @@ export function MyFormDialog({ open, onOpenChange }: Props) {
 
 ```typescript
 const [selectedClientId, setSelectedClientId] = useState<string>(
-  posture === "plateforme" ? "" : (entreprise?.id || "")
+  posture === "plateforme" ? "" : entreprise?.id || "",
 );
 const [sites, setSites] = useState<Array<{ id: string; nom: string }>>([]);
 const [loadingSites, setLoadingSites] = useState(false);
@@ -1589,20 +1641,22 @@ const handleClientChange = (clientId: string) => {
 ```typescript
 // ❌ MAUVAIS: Message générique
 export const mySchema = z.object({
-  clientId: z.string().uuid().optional(),
+  clientId: z.uuid().optional(),
 });
 
 // ✅ BON: Message contextuel
 export const mySchema = z.object({
-  clientId: z.string().uuid("Client obligatoire").optional(),
+  clientId: z.uuid("Client obligatoire").optional(),
 });
 
 // ✅ BON: Validation avec message détaillé
 export const mySchema = z.object({
-  surface: z.string().refine(
-    (v) => !isNaN(Number(v)) && Number(v) >= 50 && Number(v) <= 3000,
-    "La surface doit être un nombre compris entre 50 et 3000 m²"
-  ),
+  surface: z
+    .string()
+    .refine(
+      (v) => !isNaN(Number(v)) && Number(v) >= 50 && Number(v) <= 3000,
+      "La surface doit être un nombre compris entre 50 et 3000 m²",
+    ),
 });
 ```
 
@@ -1636,6 +1690,7 @@ export const mySchema = z.object({
 ### Erreurs Communes à Éviter
 
 #### ❌ DefaultValues non adaptés au contexte
+
 ```typescript
 // FAUX: Toujours la même valeur
 defaultValues: {
@@ -1649,6 +1704,7 @@ defaultValues: {
 ```
 
 #### ❌ Champs dépendants non disabled
+
 ```typescript
 // FAUX: Site toujours enabled même sans client
 <Select name="siteId" disabled={loadingSites} />
@@ -1658,6 +1714,7 @@ defaultValues: {
 ```
 
 #### ❌ Oublier de reset les champs dépendants
+
 ```typescript
 // FAUX: Changer client sans reset site
 const handleClientChange = (clientId: string) => {
@@ -1673,12 +1730,13 @@ const handleClientChange = (clientId: string) => {
 ```
 
 #### ❌ Messages d'erreur techniques
+
 ```typescript
 // FAUX: Message pour développeur
-z.string().uuid() // → "Invalid UUID"
+z.uuid(); // → "Invalid UUID"
 
 // CORRECT: Message pour utilisateur final
-z.string().uuid("Client obligatoire")
+z.uuid("Client obligatoire");
 ```
 
 ### Rappel: Visualisation du Flow Utilisateur
@@ -1691,6 +1749,7 @@ z.string().uuid("Client obligatoire")
 4. **Success** : Le formulaire est validé → que voit l'utilisateur ?
 
 **Exemple concret (Création Ticket)** :
+
 - Posture plateforme ouvre le formulaire → Client vide, Sites disabled
 - Sélectionne client "Acme" → Sites se chargent, deviennent enabled
 - Soumet sans site → Message "Site obligatoire"
@@ -1710,6 +1769,7 @@ z.string().uuid("Client obligatoire")
 **Raison** : Cohérence terminologique avec le métier du facility management.
 
 **Exemples** :
+
 - Posture : `"client" | "prestataire" | "plateforme"`
 - Statut ticket : `"en_attente_prestataire"` (pas `en_attente_fournisseur`)
 - Visibilité message : `"prestataire_only"` (pas `fournisseur_only`)
@@ -1726,17 +1786,20 @@ Le module `/app/tickets` implémente des fonctionnalités avancées :
 ### Section Messages/Discussion
 
 **Fichiers clés** :
+
 - `[ticketId]/TicketMessagesSection.tsx` - Composant messages avec UI WhatsApp-style
 - `insertTicketMessageAction` - Action serveur avec gestion attachments
 - `getTicketMessagesWithAttachments` - Query avec JOINs documents
 
 **Fonctionnalités** :
+
 - Messages filtrés par visibilité selon posture (public, client_only, prestataire_only, fm4all_only)
 - Pièces jointes liées aux messages (polymorphic via `documentsLinks.ticketMessageId`)
 - Preview Dialog pour images/PDFs
 - Promotion fichiers temp → S3 permanent lors de l'envoi
 
 **Architecture polymorphique documentsLinks (IMPORTANT)** :
+
 - **Table polymorphique** : `documentsLinks` peut lier un document à différentes entités (ticket, ticketMessage, site, devis, etc.)
 - **Principe de normalisation** : Chaque ligne pointe vers **UN SEUL parent**
   - PJ du ticket : `ticketId` rempli, `ticketMessageId` NULL
@@ -1753,13 +1816,15 @@ Le module `/app/tickets` implémente des fonctionnalités avancées :
   ```
 
 **Pattern visibilité** :
+
 ```typescript
 // Frontend - Filtrage messages affichés
 const visibleMessages = initialMessages.filter((msg) => {
   if (posture === "plateforme") return true; // fm4all voit tout
   if (msg.visibilite === "public") return true;
   if (posture === "client" && msg.visibilite === "client_only") return true;
-  if (posture === "prestataire" && msg.visibilite === "prestataire_only") return true;
+  if (posture === "prestataire" && msg.visibilite === "prestataire_only")
+    return true;
   return false;
 });
 
@@ -1768,11 +1833,14 @@ if (isClient && !["public", "client_only"].includes(visibilite)) {
   throw errors.forbidden("Client ne peut poster que public ou client_only");
 }
 if (isPrestataire && !["public", "prestataire_only"].includes(visibilite)) {
-  throw errors.forbidden("Prestataire ne peut poster que public ou prestataire_only");
+  throw errors.forbidden(
+    "Prestataire ne peut poster que public ou prestataire_only",
+  );
 }
 ```
 
 **Références d'implémentation** :
+
 - `/app/tickets/[ticketId]/TicketMessagesSection.tsx` - UI messages
 - `/server/actions/ticketsActions.ts` - `insertTicketMessageAction`
 - `/server/queries/tickets.query.ts` - `getTicketMessagesWithAttachments`
@@ -1784,6 +1852,7 @@ if (isPrestataire && !["public", "prestataire_only"].includes(visibilite)) {
 **Sections Auditées**: `/app/sites`, `/app/utilisateurs`, `/auth`
 
 **Bugs Corrigés**:
+
 - 🔴 3 bypass de permissions critiques (usersActions.ts)
 - 🔴 Email BCC hardcodé (mailgunDirect.ts)
 - 🟠 Validation password faible (resetPassword.ts)
@@ -1801,6 +1870,7 @@ if (isPrestataire && !["public", "prestataire_only"].includes(visibilite)) {
 ## Changelog (2026-02-25)
 
 **Module Tickets - Refonte Messages/Discussion** :
+
 - ✅ Implémentation section messages avec UI WhatsApp-style
 - ✅ Visibilité messages selon posture (public, client_only, prestataire_only, fm4all_only)
 - ✅ Pièces jointes sur messages (polymorphic documentsLinks)
@@ -1808,11 +1878,13 @@ if (isPrestataire && !["public", "prestataire_only"].includes(visibilite)) {
 - ✅ Terminologie unifiée "prestataire" (renommage DB enum `en_attente_fournisseur` → `en_attente_prestataire`)
 
 **Fichiers ajoutés** :
+
 - `[ticketId]/TicketMessagesSection.tsx` - Composant messages
 - Migration 0010 - Enum `ticket_message_visibilite` (prestataire_only)
 - Migration 0011 - Enum `ticket_statut` (en_attente_prestataire)
 
 **Fichiers supprimés** :
+
 - `TicketMessagesList.tsx` (obsolète)
 - `TicketMessageForm.tsx` (obsolète)
 
@@ -1821,6 +1893,7 @@ if (isPrestataire && !["public", "prestataire_only"].includes(visibilite)) {
 **Dernière mise à jour**: 2026-02-25
 
 Pour toute question ou clarification, référez-vous d'abord aux implémentations de référence:
+
 - `/app/sites` - Gestion hiérarchique avec closure table
 - `/app/utilisateurs` - Système de permissions & attributions
 - `/app/tickets` - Système tickets avec messages et visibilité

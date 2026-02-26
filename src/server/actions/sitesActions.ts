@@ -173,6 +173,8 @@ export const getAccessibleSitesAction = actionClient
   .inputSchema(
     z.object({
       entrepriseId: z.uuid("ID de l'entreprise invalide"),
+      /** Filtre optionnel : ne retourner que les sites où l'utilisateur a ce rôle */
+      filterByRole: z.string().optional(),
     }),
     {
       handleValidationErrorsShape: async (ve) =>
@@ -208,10 +210,11 @@ export const getAccessibleSitesAction = actionClient
       throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
     }
 
-    // Récupérer sites accessibles (filtré par attributions)
+    // Récupérer sites accessibles (filtré par attributions + rôle si demandé)
     const sites = await getAccessibleSitesByUser({
       userId: currentUser.id,
       entrepriseId: parsedInput.entrepriseId,
+      filterRole: parsedInput.filterByRole,
     });
 
     return sites;
