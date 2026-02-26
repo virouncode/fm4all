@@ -3,8 +3,9 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Link } from "@/i18n/navigation";
 import { type PrestationListItem } from "@/zod-schemas/clientServices.schema";
-import { Building, Calendar, Clock, MapPin, Pencil, RotateCcw } from "lucide-react";
+import { Building, Calendar, Clock, Eye, MapPin, Pencil, RotateCcw } from "lucide-react";
 import {
   formatDate,
   formatDuree,
@@ -101,26 +102,35 @@ export function PrestationCard({
 
         {/* Actions */}
         <div className="mt-auto flex gap-2 border-t pt-3">
+          <Button variant="default" size="sm" className="flex-1" asChild>
+            <Link
+              href={{
+                pathname: "/app/prestations/[prestationId]",
+                params: { prestationId: prestation.id },
+              }}
+            >
+              <Eye className="mr-1 h-3.5 w-3.5" />
+              Voir
+            </Link>
+          </Button>
           {onEdit && (
             <Button
               variant="outline"
               size="sm"
-              className="flex-1"
               onClick={() => onEdit(prestation)}
+              aria-label="Modifier la prestation"
             >
-              <Pencil className="mr-1 h-3.5 w-3.5" />
-              Modifier
+              <Pencil className="h-3.5 w-3.5" />
             </Button>
           )}
           {canChangeStatut && onChangeStatut && (
             <Button
               variant="outline"
               size="sm"
-              className="flex-1"
               onClick={() => onChangeStatut(prestation)}
+              aria-label="Changer le statut"
             >
-              <RotateCcw className="mr-1 h-3.5 w-3.5" />
-              Statut
+              <RotateCcw className="h-3.5 w-3.5" />
             </Button>
           )}
         </div>

@@ -10,9 +10,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Link } from "@/i18n/navigation";
 import { type PrestationListItem } from "@/zod-schemas/clientServices.schema";
 import { type ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Pencil, RotateCcw, Trash2 } from "lucide-react";
+import { Eye, MoreHorizontal, Pencil, RotateCcw, Trash2 } from "lucide-react";
 import {
   formatDate,
   formatDuree,
@@ -168,6 +169,18 @@ export function createPrestationsColumns(
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Link
+                  href={{
+                    pathname: "/app/prestations/[prestationId]",
+                    params: { prestationId: p.id },
+                  }}
+                >
+                  <Eye className="mr-2 h-4 w-4" />
+                  Voir le détail
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => actions.onEdit(p)}>
                 <Pencil className="mr-2 h-4 w-4" />
                 Modifier
