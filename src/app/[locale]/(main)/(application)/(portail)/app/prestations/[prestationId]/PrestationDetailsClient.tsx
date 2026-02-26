@@ -13,18 +13,29 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link, useRouter } from "@/i18n/navigation";
+import { cn } from "@/lib/utils";
 import {
   deleteExecutionAction,
   toggleExecutionActifAction,
 } from "@/server/actions/clientServiceExecutionsActions";
+import { updatePrestationStatutAction } from "@/server/actions/clientServicesActions";
 import {
   type ExecutionWithPrix,
   type OccurrenceListItem,
 } from "@/server/queries/clientServiceExecutions.query";
-import { type PrestationListItem } from "@/zod-schemas/clientServices.schema";
+import {
+  type ClientServiceStatutType,
+  type PrestationListItem,
+} from "@/zod-schemas/clientServices.schema";
 import {
   ArrowLeft,
   Building,
@@ -34,7 +45,6 @@ import {
   MapPin,
   Pencil,
   Power,
-  RotateCcw,
   Settings,
   Trash2,
   Wrench,
@@ -43,7 +53,6 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 import { PrestationFormDialog } from "../PrestationFormDialog";
-import { PrestationStatutDialog } from "../PrestationStatutDialog";
 import {
   formatDate,
   formatDuree,
@@ -71,6 +80,20 @@ const JOUR_LABELS: Record<number, string> = {
   7: "Dimanche",
 };
 
+const STATUT_TRANSITIONS: Record<ClientServiceStatutType, readonly ClientServiceStatutType[]> = {
+  brouillon: ["actif"],
+  actif: ["en_pause", "termine"],
+  en_pause: ["actif", "termine"],
+  termine: [],
+};
+
+const STATUT_LABELS: Record<ClientServiceStatutType, string> = {
+  brouillon: "Brouillon",
+  actif: "Actif",
+  en_pause: "En pause",
+  termine: "Terminé",
+};
+
 export function PrestationDetailsClient({
   prestation,
   canManage,
@@ -82,43 +105,28 @@ export function PrestationDetailsClient({
   const [executions, setExecutions] =
     useState<ExecutionWithPrix[]>(initialExecutions);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [statutDialogOpen, setStatutDialogOpen] = useState(false);
 
-  const statutBadge = getPrestationStatutBadge(prestation.statut);
-  const modeBadge = getModePlanningBadge(prestation.modePlanning);
   const frequenceLabel = getFrequenceLabel(
     prestation.frequence,
     prestation.frequenceParPeriode,
     prestation.intervalleJours,
   );
-  const canChangeStatut = prestation.statut !== "termine";
 
   const handleEditSuccess = () => {
     setEditDialogOpen(false);
     router.refresh();
   };
 
-  const handleStatutSuccess = () => {
-    setStatutDialogOpen(false);
-    router.refresh();
-  };
-
   return (
     <div className="container mx-auto max-w-5xl space-y-6 p-6">
       {/* ==================== HEADER ==================== */}
-      <div className="space-y-3">
-        {/* Bouton retour */}
-        <Button variant="ghost" size="sm" asChild className="gap-2">
-          <Link href="/app/prestations">
-            <ArrowLeft className="h-4 w-4" />
-            Retour aux prestations
-          </Link>
-        </Button>
-
-        {/* Titre + badges + actions */}
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="space-y-1">
-            <h1 className="text-2xl font-bold">{prestation.serviceNom}</h1>
+      <div className="space-y-4">
+        <div className="flex flex-wrap items-start gap-4">
+          {/* Titre + metadata */}
+          <div className="min-w-0 flex-1 space-y-2">
+            <h1 className="text-2xl font-bold tracking-tight break-words">
+              {prestation.serviceNom}
+            </h1>
             <div className="text-muted-foreground flex flex-wrap items-center gap-3 text-sm">
               {isPlateforme && (
                 <span className="flex items-center gap-1">
@@ -136,26 +144,18 @@ export function PrestationDetailsClient({
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge className={statutBadge.className}>{statutBadge.label}</Badge>
-            <Badge className={modeBadge.className}>{modeBadge.label}</Badge>
-            {canManage && canChangeStatut && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setStatutDialogOpen(true)}
-              >
-                <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
-                Statut
-              </Button>
-            )}
-            {canManage && (
-              <Button size="sm" onClick={() => setEditDialogOpen(true)}>
-                <Pencil className="mr-1.5 h-3.5 w-3.5" />
-                Modifier
-              </Button>
-            )}
-          </div>
+          {/* Bouton retour */}
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="flex-shrink-0 gap-2"
+          >
+            <Link href="/app/prestations">
+              <ArrowLeft className="h-4 w-4" />
+              Retour aux prestations
+            </Link>
+          </Button>
         </div>
       </div>
 
@@ -190,14 +190,43 @@ export function PrestationDetailsClient({
 
         {/* ============ TAB: PARAMÈTRES ============ */}
         <TabsContent value="parametres" className="mt-6 space-y-4">
+          {/* Badges statut + mode */}
+          <div className="flex flex-wrap items-center gap-2">
+            {canManage ? (
+              <EditablePrestationStatutBadge
+                prestation={prestation}
+                onUpdate={() => router.refresh()}
+              />
+            ) : (
+              <Badge className={getPrestationStatutBadge(prestation.statut).className}>
+                {getPrestationStatutBadge(prestation.statut).label}
+              </Badge>
+            )}
+            <Badge className={getModePlanningBadge(prestation.modePlanning).className}>
+              {getModePlanningBadge(prestation.modePlanning).label}
+            </Badge>
+          </div>
+
           <div className="grid gap-4 md:grid-cols-2">
             {/* Fréquence & Planning */}
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <CalendarDays className="text-primary h-4 w-4" />
-                  Planification
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2 text-base font-medium">
+                    <CalendarDays className="text-primary h-4 w-4" />
+                    Planification
+                  </CardTitle>
+                  {canManage && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setEditDialogOpen(true)}
+                    >
+                      <Pencil className="mr-1.5 h-3.5 w-3.5" />
+                      Modifier
+                    </Button>
+                  )}
+                </div>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
                 <InfoRow label="Fréquence" value={frequenceLabel} />
@@ -228,7 +257,7 @@ export function PrestationDetailsClient({
             {/* Dates */}
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-base">
+                <CardTitle className="flex items-center gap-2 text-base font-medium">
                   <Calendar className="text-primary h-4 w-4" />
                   Période
                 </CardTitle>
@@ -262,7 +291,7 @@ export function PrestationDetailsClient({
           {prestation.notes && (
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-base">Notes</CardTitle>
+                <CardTitle className="text-base font-medium">Notes</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground whitespace-pre-wrap text-sm">
@@ -296,14 +325,74 @@ export function PrestationDetailsClient({
         prestation={prestation}
         onSuccess={handleEditSuccess}
       />
-
-      <PrestationStatutDialog
-        open={statutDialogOpen}
-        onOpenChange={setStatutDialogOpen}
-        prestation={prestation}
-        onSuccess={handleStatutSuccess}
-      />
     </div>
+  );
+}
+
+// ==================== EDITABLE STATUT BADGE ====================
+
+function EditablePrestationStatutBadge({
+  prestation,
+  onUpdate,
+}: {
+  prestation: PrestationListItem;
+  onUpdate: () => void;
+}) {
+  const [isUpdating, setIsUpdating] = useState(false);
+  const badge = getPrestationStatutBadge(prestation.statut);
+  const transitions = STATUT_TRANSITIONS[prestation.statut] ?? [];
+
+  const handleChange = async (newStatut: string) => {
+    if (newStatut === prestation.statut) return;
+    setIsUpdating(true);
+    const result = await updatePrestationStatutAction({
+      prestationId: prestation.id,
+      entrepriseId: prestation.entrepriseId,
+      statut: newStatut as ClientServiceStatutType,
+    });
+    if (result?.serverError) {
+      toast.error(result.serverError.message);
+    } else if (result?.data) {
+      toast.success(result.data.message);
+      onUpdate();
+    }
+    setIsUpdating(false);
+  };
+
+  // Statut terminal : badge statique
+  if (transitions.length === 0) {
+    return (
+      <Badge className={badge.className}>{badge.label}</Badge>
+    );
+  }
+
+  const availableStatuts: ClientServiceStatutType[] = [
+    prestation.statut,
+    ...transitions,
+  ];
+
+  return (
+    <Select
+      value={prestation.statut}
+      onValueChange={handleChange}
+      disabled={isUpdating}
+    >
+      <SelectTrigger
+        className={cn(
+          "inline-flex items-center rounded-md border-0 !px-2 !py-0.5 !h-auto gap-1 text-xs font-medium w-fit whitespace-nowrap hover:opacity-80 transition-opacity [&>svg]:pointer-events-none",
+          badge.className,
+        )}
+      >
+        <span>{badge.label}</span>
+      </SelectTrigger>
+      <SelectContent>
+        {availableStatuts.map((s) => (
+          <SelectItem key={s} value={s}>
+            {STATUT_LABELS[s]}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }
 
@@ -455,7 +544,7 @@ function ExecutionCard({
       <Card className={isActive ? "" : "opacity-60"}>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-base">
+            <CardTitle className="flex items-center gap-2 text-base font-medium">
               <Building className="text-primary h-4 w-4" />
               {execution.prestataireNom ?? "Prestataire inconnu"}
             </CardTitle>
@@ -534,18 +623,15 @@ function ExecutionCard({
         )}
       </Card>
 
-      {/* Confirmation suppression */}
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Retirer ce prestataire ?</AlertDialogTitle>
             <AlertDialogDescription>
               Le prestataire{" "}
-              <strong>
-                {execution.prestataireNom ?? "inconnu"}
-              </strong>{" "}
-              et tous ses tarifs seront retirés de cette prestation. Les
-              interventions déjà planifiées ne seront pas affectées.
+              <strong>{execution.prestataireNom ?? "inconnu"}</strong> et tous
+              ses tarifs seront retirés de cette prestation. Les interventions
+              déjà planifiées ne seront pas affectées.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -574,26 +660,11 @@ function InterventionsTab({
   prestation: PrestationListItem;
 }) {
   const statutLabels: Record<string, { label: string; className: string }> = {
-    planifiee: {
-      label: "Planifiée",
-      className: "bg-blue-100 text-blue-700",
-    },
-    en_cours: {
-      label: "En cours",
-      className: "bg-amber-100 text-amber-700",
-    },
-    terminee: {
-      label: "Terminée",
-      className: "bg-green-100 text-green-700",
-    },
-    non_honoree: {
-      label: "Non honorée",
-      className: "bg-red-100 text-red-700",
-    },
-    annulee: {
-      label: "Annulée",
-      className: "bg-gray-100 text-gray-600",
-    },
+    planifiee: { label: "Planifiée", className: "bg-blue-100 text-blue-700" },
+    en_cours: { label: "En cours", className: "bg-amber-100 text-amber-700" },
+    terminee: { label: "Terminée", className: "bg-green-100 text-green-700" },
+    non_honoree: { label: "Non honorée", className: "bg-red-100 text-red-700" },
+    annulee: { label: "Annulée", className: "bg-gray-100 text-gray-600" },
   };
 
   const canGenerate =
