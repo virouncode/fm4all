@@ -71,6 +71,59 @@ export async function getPrestationsByEntreprise(
 }
 
 /**
+ * GET ALL PRESTATIONS (cross-client view — plateforme only)
+ * Returns flat list with joined names for display
+ */
+export async function getAllPrestations(options?: {
+  statut?: SelectClientServiceType["statut"];
+  serviceId?: string;
+  siteId?: string;
+}): Promise<PrestationListItem[]> {
+  const rows = await db
+    .select({
+      id: clientServices.id,
+      entrepriseId: clientServices.entrepriseId,
+      entrepriseNom: entreprises.nom,
+      siteId: clientServices.siteId,
+      siteNom: sites.nom,
+      serviceId: clientServices.serviceId,
+      serviceNom: services.nom,
+      frequence: clientServices.frequence,
+      frequenceParPeriode: clientServices.frequenceParPeriode,
+      intervalleJours: clientServices.intervalleJours,
+      dateDebut: clientServices.dateDebut,
+      dateFin: clientServices.dateFin,
+      joursPreference: clientServices.joursPreference,
+      heureDebutPreference: clientServices.heureDebutPreference,
+      dureeEstimeeMinutes: clientServices.dureeEstimeeMinutes,
+      statut: clientServices.statut,
+      modePlanning: clientServices.modePlanning,
+      modeCommercial: clientServices.modeCommercial,
+      notes: clientServices.notes,
+      createdAt: clientServices.createdAt,
+      updatedAt: clientServices.updatedAt,
+    })
+    .from(clientServices)
+    .innerJoin(entreprises, eq(entreprises.id, clientServices.entrepriseId))
+    .innerJoin(sites, eq(sites.id, clientServices.siteId))
+    .innerJoin(services, eq(services.id, clientServices.serviceId))
+    .where(
+      and(
+        options?.statut ? eq(clientServices.statut, options.statut) : undefined,
+        options?.serviceId
+          ? eq(clientServices.serviceId, options.serviceId)
+          : undefined,
+        options?.siteId
+          ? eq(clientServices.siteId, options.siteId)
+          : undefined,
+      ),
+    )
+    .orderBy(clientServices.createdAt);
+
+  return rows.map((row) => prestationListItemSchema.parse(row));
+}
+
+/**
  * GET SINGLE PRESTATION BY ID
  */
 export async function getPrestationById(

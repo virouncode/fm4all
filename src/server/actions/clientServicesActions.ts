@@ -12,6 +12,7 @@ import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
 import {
+  getAllPrestations,
   getPrestationById,
   getPrestationsByEntreprise,
   getPrestationWithJoinsById,
@@ -126,7 +127,19 @@ export const getPrestationsAction = actionClient
 
     const { entrepriseId, statut, serviceId, siteId } = parsedInput;
 
-    // Vérifier l'accès à l'entreprise
+    if (!entrepriseId) {
+      // Vue cross-clients : réservée à la plateforme
+      const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+      if (!platformRole?.role) {
+        throw errors.forbidden(
+          "Seule la plateforme peut accéder à la vue cross-clients.",
+        );
+      }
+      const prestations = await getAllPrestations({ statut, serviceId, siteId });
+      return { prestations };
+    }
+
+    // Vue standard : vérifier l'accès à l'entreprise
     const hasAccess = await hasAccessToEntreprise(currentUser.id, entrepriseId);
     if (!hasAccess) {
       throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");

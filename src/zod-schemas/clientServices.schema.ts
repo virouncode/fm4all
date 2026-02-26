@@ -191,7 +191,8 @@ export type UpdatePrestationStatutType = z.infer<
 // ==================== QUERY SCHEMAS ====================
 
 export const getPrestationsQuerySchema = z.object({
-  entrepriseId: z.uuid("ID de l'entreprise invalide"),
+  // Optionnel : si absent, la plateforme peut voir tous les clients (cross-client)
+  entrepriseId: z.uuid("ID de l'entreprise invalide").optional(),
   statut: clientServiceStatutSchema.optional(),
   serviceId: z.uuid().optional(),
   siteId: z.uuid().optional(),

@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
-import { getEntreprisesClientesAction } from "@/server/actions/entreprisesActions";
 import { getServicesAction } from "@/server/actions/servicesActions";
 import { getAccessibleSitesAction } from "@/server/actions/sitesActions";
 import { useAppStore } from "@/stores/application/appStore";
@@ -25,7 +24,6 @@ const filtersSchema = z.object({
   statut: z.string().optional(),
   serviceId: z.string().optional(),
   siteId: z.string().optional(),
-  clientEntrepriseId: z.string().optional(),
 });
 
 type PrestationsFiltersType = z.infer<typeof filtersSchema>;
@@ -35,6 +33,9 @@ interface PrestationsFiltersDialogProps {
   onOpenChange: (open: boolean) => void;
   currentFilters: PrestationsFiltersType;
   onApply: (filters: PrestationsFiltersType) => void;
+  /** Client sélectionné dans la barre principale (plateforme uniquement).
+   *  Utilisé pour charger les sites du bon client et activer/désactiver le filtre site. */
+  clientEntrepriseId?: string;
 }
 
 export function PrestationsFiltersDialog({
@@ -42,12 +43,14 @@ export function PrestationsFiltersDialog({
   onOpenChange,
   currentFilters,
   onApply,
+  clientEntrepriseId,
 }: PrestationsFiltersDialogProps) {
   const postureActive = useAppStore((state) => state.postureActive);
   const entrepriseId = useAppStore((state) => state.entreprise?.id);
 
-  const [clients, setClients] = useState<Array<{ id: string; nom: string }>>([]);
-  const [services, setServices] = useState<Array<{ id: string; nom: string }>>([]);
+  const [services, setServices] = useState<Array<{ id: string; nom: string }>>(
+    [],
+  );
   const [sites, setSites] = useState<Array<{ id: string; nom: string }>>([]);
   const [loadingSites, setLoadingSites] = useState(false);
 
@@ -57,28 +60,10 @@ export function PrestationsFiltersDialog({
       statut: currentFilters.statut || "all",
       serviceId: currentFilters.serviceId || "all",
       siteId: currentFilters.siteId || "all",
-      clientEntrepriseId: currentFilters.clientEntrepriseId || "all",
     },
   });
 
   const filters = useWatch({ control: form.control });
-  const selectedClientId = useWatch({
-    control: form.control,
-    name: "clientEntrepriseId",
-  });
-
-  // Charger clients (plateforme uniquement)
-  useEffect(() => {
-    if (postureActive !== "plateforme" || !open) return;
-
-    async function loadClients() {
-      const result = await getEntreprisesClientesAction();
-      if (result?.data?.clients) {
-        setClients(result.data.clients);
-      }
-    }
-    loadClients();
-  }, [postureActive, open]);
 
   // Charger services
   useEffect(() => {
@@ -93,16 +78,12 @@ export function PrestationsFiltersDialog({
     loadServices();
   }, [open]);
 
-  // Charger sites selon le client sélectionné (ou l'entreprise courante)
+  // Charger sites selon le client sélectionné (prop, depuis la barre principale) ou l'entreprise courante
   useEffect(() => {
     if (!open) return;
 
     const targetId =
-      postureActive === "plateforme"
-        ? selectedClientId === "all" || !selectedClientId
-          ? null
-          : selectedClientId
-        : entrepriseId;
+      postureActive === "plateforme" ? clientEntrepriseId || null : entrepriseId;
 
     if (!targetId) {
       setSites([]);
@@ -125,12 +106,12 @@ export function PrestationsFiltersDialog({
       setLoadingSites(false);
     }
     loadSites();
-  }, [open, selectedClientId, entrepriseId, postureActive]);
+  }, [open, clientEntrepriseId, entrepriseId, postureActive]);
 
-  // Reset site quand le client change
+  // Reset siteId quand le client change (les sites sont propres à chaque client)
   useEffect(() => {
     form.setValue("siteId", "all");
-  }, [selectedClientId, form]);
+  }, [clientEntrepriseId, form]);
 
   // Auto-apply filters
   useEffect(() => {
@@ -138,27 +119,16 @@ export function PrestationsFiltersDialog({
       statut: filters.statut === "all" ? undefined : filters.statut,
       serviceId: filters.serviceId === "all" ? undefined : filters.serviceId,
       siteId: filters.siteId === "all" ? undefined : filters.siteId,
-      clientEntrepriseId:
-        filters.clientEntrepriseId === "all"
-          ? undefined
-          : filters.clientEntrepriseId,
     };
     onApply(cleaned);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    filters.statut,
-    filters.serviceId,
-    filters.siteId,
-    filters.clientEntrepriseId,
-  ]);
+  }, [filters.statut, filters.serviceId, filters.siteId]);
 
   const activeFiltersCount = useMemo(() => {
     let count = 0;
     if (filters.statut && filters.statut !== "all") count++;
     if (filters.serviceId && filters.serviceId !== "all") count++;
     if (filters.siteId && filters.siteId !== "all") count++;
-    if (filters.clientEntrepriseId && filters.clientEntrepriseId !== "all")
-      count++;
     return count;
   }, [filters]);
 
@@ -167,7 +137,6 @@ export function PrestationsFiltersDialog({
       statut: "all",
       serviceId: "all",
       siteId: "all",
-      clientEntrepriseId: "all",
     });
   };
 
@@ -215,24 +184,7 @@ export function PrestationsFiltersDialog({
                 ))}
               </RhfControlledSelect>
 
-              {/* Client (plateforme uniquement) */}
-              {postureActive === "plateforme" && (
-                <RhfControlledSelect<PrestationsFiltersType>
-                  name="clientEntrepriseId"
-                  label="Client"
-                  selectClassName="w-full"
-                  withError={false}
-                >
-                  <SelectItem value="all">Tous les clients</SelectItem>
-                  {clients.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.nom}
-                    </SelectItem>
-                  ))}
-                </RhfControlledSelect>
-              )}
-
-              {/* Site */}
+              {/* Site — disabled si plateforme sans client sélectionné */}
               <RhfControlledSelect<PrestationsFiltersType>
                 name="siteId"
                 label="Site"
@@ -240,8 +192,7 @@ export function PrestationsFiltersDialog({
                 withError={false}
                 disabled={
                   loadingSites ||
-                  (postureActive === "plateforme" &&
-                    (!selectedClientId || selectedClientId === "all"))
+                  (postureActive === "plateforme" && !clientEntrepriseId)
                 }
               >
                 <SelectItem value="all">

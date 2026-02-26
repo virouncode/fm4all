@@ -1,22 +1,17 @@
 "use client";
 
 import InfiniteDataTable from "@/components/tables/InfiniteDataTable";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { usePathname, useRouter } from "@/i18n/navigation";
 import {
-  deletePrestationAction,
-  getPrestationsAction,
-} from "@/server/actions/clientServicesActions";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { usePathname, useRouter } from "@/i18n/navigation";
+import { getPrestationsAction } from "@/server/actions/clientServicesActions";
+import { getEntreprisesClientesAction } from "@/server/actions/entreprisesActions";
 import { useAppStore } from "@/stores/application/appStore";
 import { useUiStore } from "@/stores/ui/uiStore";
 import {
@@ -32,7 +27,6 @@ import {
 } from "./createPrestationsColumns";
 import { PrestationCard } from "./PrestationCard";
 import { PrestationFormDialog } from "./PrestationFormDialog";
-import { PrestationStatutDialog } from "./PrestationStatutDialog";
 import { PrestationsFiltersDialog } from "./PrestationsFiltersDialog";
 import { PrestationsSortDialog } from "./PrestationsSortDialog";
 
@@ -45,11 +39,11 @@ type SearchParams = {
   orderDir?: string;
 };
 
+// Filtres gérés par le dialog (sans clientEntrepriseId, géré par sélecteur dédié)
 type FiltersType = {
   statut?: string;
   serviceId?: string;
   siteId?: string;
-  clientEntrepriseId?: string;
 };
 
 interface PrestationsClientProps {
@@ -73,46 +67,58 @@ export default function PrestationsClient({
   const [loading, setLoading] = useState(true);
   const [isError, setIsError] = useState(false);
 
+  // Clients (plateforme uniquement)
+  const [clients, setClients] = useState<Array<{ id: string; nom: string }>>(
+    [],
+  );
+
   // États des dialogs
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [editingPrestation, setEditingPrestation] =
-    useState<PrestationListItem | null>(null);
-  const [statutPrestation, setStatutPrestation] =
-    useState<PrestationListItem | null>(null);
-  const [deletingPrestation, setDeletingPrestation] =
-    useState<PrestationListItem | null>(null);
   const [filtersDialogOpen, setFiltersDialogOpen] = useState(false);
   const [sortDialogOpen, setSortDialogOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   // Filtres synchronisés avec searchParams
   const [filters, setFilters] = useState<FiltersType>({
     statut: searchParams.statut,
     serviceId: searchParams.serviceId,
     siteId: searchParams.siteId,
-    clientEntrepriseId: searchParams.clientEntrepriseId,
   });
 
   const showEntreprise = posture === "plateforme";
 
+  // clientEntrepriseId n'est pas dans le dialog filtres → ne compte pas dans activeFiltersCount
   const activeFiltersCount = [
     searchParams.statut,
     searchParams.serviceId,
     searchParams.siteId,
-    searchParams.clientEntrepriseId,
   ].filter(Boolean).length;
 
-  // En posture plateforme, cibler le client filtré (ou l'entreprise FM4ALL par défaut)
+  // En posture plateforme : cibler le client filtré (ou undefined = tous les clients)
+  // En posture client : toujours son propre entreprise
   const targetEntrepriseId = useMemo(() => {
     if (posture === "plateforme") {
-      return searchParams.clientEntrepriseId || entreprise?.id || "";
+      return searchParams.clientEntrepriseId || undefined;
     }
-    return entreprise?.id || "";
+    return entreprise?.id || undefined;
   }, [posture, entreprise?.id, searchParams.clientEntrepriseId]);
+
+  // Chargement des clients (plateforme uniquement, une seule fois)
+  useEffect(() => {
+    if (posture !== "plateforme") return;
+
+    async function loadClients() {
+      const result = await getEntreprisesClientesAction();
+      if (result?.data?.clients) {
+        setClients(result.data.clients);
+      }
+    }
+    loadClients();
+  }, [posture]);
 
   // Chargement des prestations
   const loadPrestations = useCallback(async () => {
-    if (!targetEntrepriseId) {
+    // Pour posture non-plateforme, on a besoin d'un entrepriseId
+    if (posture !== "plateforme" && !targetEntrepriseId) {
       setLoading(false);
       setPrestations([]);
       return;
@@ -123,7 +129,7 @@ export default function PrestationsClient({
 
     try {
       const result = await getPrestationsAction({
-        entrepriseId: targetEntrepriseId,
+        entrepriseId: targetEntrepriseId, // undefined = tous les clients (plateforme only)
         statut: (searchParams.statut as ClientServiceStatutType) || undefined,
         serviceId: searchParams.serviceId || undefined,
         siteId: searchParams.siteId || undefined,
@@ -143,6 +149,7 @@ export default function PrestationsClient({
     }
   }, [
     targetEntrepriseId,
+    posture,
     searchParams.statut,
     searchParams.serviceId,
     searchParams.siteId,
@@ -160,20 +167,27 @@ export default function PrestationsClient({
       statut: searchParams.statut,
       serviceId: searchParams.serviceId,
       siteId: searchParams.siteId,
-      clientEntrepriseId: searchParams.clientEntrepriseId,
     });
-  }, [
-    searchParams.statut,
-    searchParams.serviceId,
-    searchParams.siteId,
-    searchParams.clientEntrepriseId,
-  ]);
+  }, [searchParams.statut, searchParams.serviceId, searchParams.siteId]);
 
   const handlePrestationClick = (p: PrestationListItem) => {
     router.push({
       pathname: "/app/prestations/[prestationId]",
       params: { prestationId: p.id },
     });
+  };
+
+  // Changement de client dans le sélecteur dédié (plateforme uniquement)
+  const handleClientChange = (clientId: string) => {
+    const query: Record<string, string> = {};
+    if (searchParams.orderBy) query.orderBy = searchParams.orderBy;
+    if (searchParams.orderDir) query.orderDir = searchParams.orderDir;
+    if (searchParams.statut) query.statut = searchParams.statut;
+    if (searchParams.serviceId) query.serviceId = searchParams.serviceId;
+    // Pas de siteId : reset au changement de client (les sites sont propres à chaque client)
+    if (clientId !== "all") query.clientEntrepriseId = clientId;
+    // @ts-expect-error - next-intl router typing issue
+    router.replace({ pathname, query }, { scroll: false });
   };
 
   const handleFiltersApply = (newFilters: FiltersType) => {
@@ -185,54 +199,46 @@ export default function PrestationsClient({
     if (newFilters.statut) query.statut = newFilters.statut;
     if (newFilters.serviceId) query.serviceId = newFilters.serviceId;
     if (newFilters.siteId) query.siteId = newFilters.siteId;
-    if (newFilters.clientEntrepriseId)
-      query.clientEntrepriseId = newFilters.clientEntrepriseId;
+    // Préserver le filtre client (géré par le sélecteur dédié, pas le dialog)
+    if (searchParams.clientEntrepriseId)
+      query.clientEntrepriseId = searchParams.clientEntrepriseId;
 
     // @ts-expect-error - next-intl router typing issue
     router.replace({ pathname, query }, { scroll: false });
   };
 
-  const handleDeleteConfirm = async () => {
-    if (!deletingPrestation) return;
-
-    setIsDeleting(true);
-    try {
-      const result = await deletePrestationAction({
-        prestationId: deletingPrestation.id,
-        entrepriseId: deletingPrestation.entrepriseId,
-      });
-
-      if (result?.serverError) {
-        toast.error(result.serverError.message);
-      } else if (result?.data) {
-        toast.success(result.data.message);
-        setPrestations((prev) =>
-          prev.filter((p) => p.id !== deletingPrestation.id),
-        );
-      }
-    } catch {
-      toast.error("Erreur lors de la suppression");
-    } finally {
-      setIsDeleting(false);
-      setDeletingPrestation(null);
-    }
-  };
-
   const columns = useMemo(
-    () =>
-      createPrestationsColumns(
-        {
-          onEdit: setEditingPrestation,
-          onChangeStatut: setStatutPrestation,
-          onDelete: setDeletingPrestation,
-        },
-        { showEntreprise },
-      ),
+    () => createPrestationsColumns({ showEntreprise }),
     [showEntreprise],
   );
 
   return (
     <div className="flex h-full flex-col gap-4">
+      {/* ==================== SÉLECTEUR CLIENT (plateforme uniquement) ==================== */}
+      {posture === "plateforme" && (
+        <div className="flex flex-shrink-0 items-center gap-2">
+          <span className="text-muted-foreground whitespace-nowrap text-sm">
+            Client :
+          </span>
+          <Select
+            value={searchParams.clientEntrepriseId || "all"}
+            onValueChange={handleClientChange}
+          >
+            <SelectTrigger className="h-8 w-64">
+              <SelectValue placeholder="Tous les clients" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tous les clients</SelectItem>
+              {clients.map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.nom}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
       {/* ==================== BARRE D'ACTIONS ==================== */}
       <div className="flex flex-shrink-0 items-center justify-between gap-2">
         {/* Toggle liste / grille */}
@@ -332,40 +338,13 @@ export default function PrestationsClient({
         }}
       />
 
-      {/* Édition */}
-      <PrestationFormDialog
-        open={!!editingPrestation}
-        onOpenChange={(v) => {
-          if (!v) setEditingPrestation(null);
-        }}
-        onSuccess={() => {
-          loadPrestations();
-          setEditingPrestation(null);
-        }}
-        prestation={editingPrestation ?? undefined}
-      />
-
-      {/* Changement de statut */}
-      {statutPrestation && (
-        <PrestationStatutDialog
-          open={!!statutPrestation}
-          onOpenChange={(v) => {
-            if (!v) setStatutPrestation(null);
-          }}
-          prestation={statutPrestation}
-          onSuccess={() => {
-            loadPrestations();
-            setStatutPrestation(null);
-          }}
-        />
-      )}
-
       {/* Filtres */}
       <PrestationsFiltersDialog
         open={filtersDialogOpen}
         onOpenChange={setFiltersDialogOpen}
         currentFilters={filters}
         onApply={handleFiltersApply}
+        clientEntrepriseId={searchParams.clientEntrepriseId}
       />
 
       {/* Tri */}
@@ -373,35 +352,6 @@ export default function PrestationsClient({
         open={sortDialogOpen}
         onOpenChange={setSortDialogOpen}
       />
-
-      {/* Confirmation de suppression */}
-      <AlertDialog
-        open={!!deletingPrestation}
-        onOpenChange={(v) => {
-          if (!v) setDeletingPrestation(null);
-        }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer la prestation ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Cette action est irréversible. La prestation{" "}
-              <strong>{deletingPrestation?.serviceNom}</strong> —{" "}
-              {deletingPrestation?.siteNom} sera définitivement supprimée.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Annuler</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteConfirm}
-              disabled={isDeleting}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {isDeleting ? "Suppression..." : "Supprimer"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }
