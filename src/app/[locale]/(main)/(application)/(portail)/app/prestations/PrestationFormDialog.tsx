@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  buildSiteTree,
+  findSiteInTree,
+  getAllDescendantIds,
+} from "@/app/[locale]/(main)/(application)/(portail)/app/sites/helpers";
+import { AttributionSitesTree } from "@/app/[locale]/(main)/(application)/(portail)/app/utilisateurs/AttributionSitesTree";
 import { RhfControlledSelect } from "@/components/rhf/RhfControlledSelect";
 import { RhfDatePicker } from "@/components/rhf/RhfDatePicker";
 import { RhfInput } from "@/components/rhf/RhfInput";
@@ -9,11 +15,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { SelectItem } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
@@ -31,25 +40,19 @@ import {
   frequenceSchema,
   type PrestationListItem,
 } from "@/zod-schemas/clientServices.schema";
+import { type SelectSiteType } from "@/zod-schemas/sites.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ClipboardList } from "lucide-react";
-import { useEffect, useState } from "react";
+import { HandPlatter } from "lucide-react";
+import { useMemo, useEffect, useState } from "react";
 import { Controller, useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
 // Schéma unifié pour les deux modes (create et edit)
-// Tous les champs sont optionnels au niveau schema — la validation requise est faite côté serveur
 const prestationFormSchema = z.object({
-  // Champs identité (edit uniquement, mais présents dans le state)
-  id: z.string().uuid().optional(),
+  id: z.uuid().optional(),
   entrepriseId: z.string().optional(),
-
-  // Relations (create uniquement)
-  siteId: z.string().optional(),
   serviceId: z.string().optional(),
-
-  // Fréquence
   frequence: frequenceSchema.optional(),
   frequenceParPeriode: z
     .string()
@@ -71,12 +74,8 @@ const prestationFormSchema = z.object({
         (!isNaN(Number(v)) && Number(v) >= 1 && Number(v) <= 365),
       "L'intervalle doit être un nombre entre 1 et 365 jours",
     ),
-
-  // Dates
   dateDebut: z.string().optional(),
   dateFin: z.string().optional(),
-
-  // Planification
   joursPreference: z.array(z.number().int().min(1).max(7)).optional(),
   heureDebutPreference: z
     .string()
@@ -96,12 +95,8 @@ const prestationFormSchema = z.object({
         (!isNaN(Number(v)) && Number(v) >= 1 && Number(v) <= 720),
       "La durée doit être un nombre entre 1 et 720 minutes",
     ),
-
-  // Planning
   statut: clientServiceStatutSchema.optional(),
   modePlanning: clientServiceModePlanningSchema.optional(),
-
-  // Notes
   notes: z.string().optional(),
 });
 
@@ -124,6 +119,18 @@ const JOURS_SEMAINE = [
   { value: 7, label: "Dim" },
 ] as const;
 
+// Vérifie si un site a un ancêtre dans un ensemble de siteIds sélectionnés
+function hasCheckedAncestor(
+  siteId: string,
+  selectedSet: Set<string>,
+  allSites: SelectSiteType[],
+): boolean {
+  const site = allSites.find((s) => s.id === siteId);
+  if (!site?.parentId) return false;
+  if (selectedSet.has(site.parentId)) return true;
+  return hasCheckedAncestor(site.parentId, selectedSet, allSites);
+}
+
 export function PrestationFormDialog({
   open,
   onOpenChange,
@@ -134,13 +141,9 @@ export function PrestationFormDialog({
   const entreprise = useAppStore((state) => state.entreprise);
   const posture = useAppStore((state) => state.postureActive);
 
-  const [clients, setClients] = useState<Array<{ id: string; nom: string }>>(
-    [],
-  );
-  const [sites, setSites] = useState<Array<{ id: string; nom: string }>>([]);
-  const [services, setServices] = useState<Array<{ id: string; nom: string }>>(
-    [],
-  );
+  const [clients, setClients] = useState<Array<{ id: string; nom: string }>>([]);
+  const [sites, setSites] = useState<SelectSiteType[]>([]);
+  const [services, setServices] = useState<Array<{ id: string; nom: string }>>([]);
   const [loadingSites, setLoadingSites] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState<string>(
     isEdit
@@ -149,6 +152,10 @@ export function PrestationFormDialog({
         ? ""
         : (entreprise?.id ?? ""),
   );
+
+  // Sites sélectionnés via l'arbre (ancrage + sous-sites inclus)
+  // Un seul "root" autorisé à la fois (= le site d'ancrage)
+  const [selectedSiteIds, setSelectedSiteIds] = useState<string[]>([]);
 
   const form = useForm<PrestationFormValues>({
     resolver: zodResolver(prestationFormSchema),
@@ -174,7 +181,6 @@ export function PrestationFormDialog({
         }
       : {
           entrepriseId: posture === "plateforme" ? "" : (entreprise?.id ?? ""),
-          siteId: "",
           serviceId: "",
           frequence: "hebdomadaire",
           frequenceParPeriode: "",
@@ -202,6 +208,20 @@ export function PrestationFormDialog({
   const showIntervalleJours = frequenceValue === "tous_les_x_jours";
   const showPlanificationDetails = modePlanningValue === "planifie";
 
+  // Arbre complet des sites du client
+  const siteTree = useMemo(() => buildSiteTree(sites), [sites]);
+
+  // Site racine actuellement sélectionné (le "site d'ancrage")
+  const anchorId = useMemo(() => {
+    if (selectedSiteIds.length === 0) return null;
+    const selectedSet = new Set(selectedSiteIds);
+    return (
+      selectedSiteIds.find(
+        (id) => !hasCheckedAncestor(id, selectedSet, sites),
+      ) ?? null
+    );
+  }, [selectedSiteIds, sites]);
+
   // Charger les clients (posture plateforme, mode création)
   useEffect(() => {
     if (isEdit || posture !== "plateforme" || !open) return;
@@ -222,7 +242,7 @@ export function PrestationFormDialog({
     loadServices();
   }, [isEdit, open]);
 
-  // Charger les sites selon le client
+  // Charger les sites selon le client (avec parentId pour arborescence)
   useEffect(() => {
     if (isEdit || !selectedClientId || !open) return;
     async function loadSites() {
@@ -231,8 +251,7 @@ export function PrestationFormDialog({
         entrepriseId: selectedClientId,
       });
       if (result?.data) {
-        const sitesData = Array.isArray(result.data) ? result.data : [];
-        setSites(sitesData.map((s) => ({ id: s.id, nom: s.nom })));
+        setSites(Array.isArray(result.data) ? result.data : []);
       }
       setLoadingSites(false);
     }
@@ -266,7 +285,6 @@ export function PrestationFormDialog({
         posture === "plateforme" ? "" : (entreprise?.id ?? "");
       form.reset({
         entrepriseId: defaultClientId,
-        siteId: "",
         serviceId: "",
         frequence: "hebdomadaire",
         frequenceParPeriode: "",
@@ -281,14 +299,97 @@ export function PrestationFormDialog({
         notes: "",
       });
       setSelectedClientId(defaultClientId);
+      setSites([]);
+      setSelectedSiteIds([]);
     }
   }, [open, isEdit, prestation, form, posture, entreprise?.id]);
 
   const handleClientChange = (clientId: string) => {
     setSelectedClientId(clientId);
     form.setValue("entrepriseId", clientId);
-    form.setValue("siteId", "");
     setSites([]);
+    setSelectedSiteIds([]);
+  };
+
+  /**
+   * Toggle d'un site dans l'arbre avec cascade (scope = subtree)
+   * Contrainte : un seul site racine à la fois (= siteId de la prestation)
+   * Si l'utilisateur coche un 2e site racine, l'ancienne sélection est remplacée.
+   */
+  const handleSiteToggle = (siteId: string, isChecked: boolean) => {
+    if (isChecked) {
+      const currentSelectedSet = new Set(selectedSiteIds);
+      const isNewRoot = !hasCheckedAncestor(siteId, currentSelectedSet, sites);
+
+      if (isNewRoot && selectedSiteIds.length > 0) {
+        // Nouveau site racine : remplace toute la sélection précédente
+        const node = findSiteInTree(siteTree, siteId);
+        const newIds = node ? getAllDescendantIds(node) : [siteId];
+        setSelectedSiteIds(newIds);
+      } else {
+        // Sous-site d'un racine existant : ajouter + cascade descendants
+        const node = findSiteInTree(siteTree, siteId);
+        if (node) {
+          const descendantIds = getAllDescendantIds(node);
+          setSelectedSiteIds((prev) => [...new Set([...prev, ...descendantIds])]);
+        } else {
+          setSelectedSiteIds((prev) => [...new Set([...prev, siteId])]);
+        }
+      }
+    } else {
+      // Décocher : retirer ce site et tous ses descendants
+      const node = findSiteInTree(siteTree, siteId);
+      const idsToRemove = node ? getAllDescendantIds(node) : [siteId];
+      setSelectedSiteIds((prev) => prev.filter((id) => !idsToRemove.includes(id)));
+    }
+  };
+
+  /**
+   * Calcule les entrées de périmètre à partir de la sélection dans l'arbre.
+   * Algorithme (minimum de lignes DB) :
+   * - Tout sélectionné → { anchorId, inclure, subtree } = 1 ligne
+   * - Rien sélectionné sous le racine → { anchorId, inclure, self } = 1 ligne
+   * - Partiel → { anchorId, inclure, subtree } + N × { excludedId, exclure, self }
+   */
+  const computePerimetre = (
+    rootId: string,
+  ): Array<{
+    siteId: string;
+    mode: "inclure" | "exclure";
+    scope: "self" | "subtree";
+  }> => {
+    const rootNode = findSiteInTree(siteTree, rootId);
+    if (!rootNode) return [{ siteId: rootId, mode: "inclure", scope: "self" }];
+
+    const allDescendants = getAllDescendantIds(rootNode).filter(
+      (id) => id !== rootId,
+    );
+
+    if (allDescendants.length === 0) {
+      return [{ siteId: rootId, mode: "inclure", scope: "self" }];
+    }
+
+    const selectedSet = new Set(selectedSiteIds);
+    const allSelected = allDescendants.every((id) => selectedSet.has(id));
+    const noneSelected = allDescendants.every((id) => !selectedSet.has(id));
+
+    if (allSelected) {
+      return [{ siteId: rootId, mode: "inclure", scope: "subtree" }];
+    }
+
+    if (noneSelected) {
+      return [{ siteId: rootId, mode: "inclure", scope: "self" }];
+    }
+
+    const excluded = allDescendants.filter((id) => !selectedSet.has(id));
+    return [
+      { siteId: rootId, mode: "inclure", scope: "subtree" },
+      ...excluded.map((id) => ({
+        siteId: id,
+        mode: "exclure" as const,
+        scope: "self" as const,
+      })),
+    ];
   };
 
   const onSubmit = async (data: PrestationFormValues) => {
@@ -317,9 +418,16 @@ export function PrestationFormDialog({
         onOpenChange(false);
       }
     } else {
+      if (!anchorId) {
+        toast.error("Veuillez sélectionner au moins un site");
+        return;
+      }
+
+      const perimetre = computePerimetre(anchorId);
+
       const result = await insertPrestationAction({
         entrepriseId: data.entrepriseId!,
-        siteId: data.siteId!,
+        siteId: anchorId,
         serviceId: data.serviceId!,
         frequence: data.frequence!,
         frequenceParPeriode: data.frequenceParPeriode,
@@ -332,6 +440,7 @@ export function PrestationFormDialog({
         statut: data.statut,
         modePlanning: data.modePlanning,
         notes: data.notes,
+        perimetre,
       });
       if (result?.serverError) {
         toast.error(result.serverError.message);
@@ -345,16 +454,46 @@ export function PrestationFormDialog({
     }
   };
 
+  // Texte informatif sur la sélection actuelle
+  const selectionSummary = useMemo(() => {
+    if (selectedSiteIds.length === 0) return null;
+    if (!anchorId) return null;
+
+    const anchorNode = findSiteInTree(siteTree, anchorId);
+    if (!anchorNode) return null;
+
+    const anchorNom = anchorNode.nom;
+    const allDescendants = getAllDescendantIds(anchorNode).filter(
+      (id) => id !== anchorId,
+    );
+    const selectedDescendants = allDescendants.filter((id) =>
+      selectedSiteIds.includes(id),
+    );
+
+    if (allDescendants.length === 0) {
+      return `Site d'ancrage : "${anchorNom}" (aucun sous-site)`;
+    }
+    if (selectedDescendants.length === allDescendants.length) {
+      return `Site d'ancrage : "${anchorNom}" + ${allDescendants.length} sous-site(s)`;
+    }
+    return `Site d'ancrage : "${anchorNom}" + ${selectedDescendants.length}/${allDescendants.length} sous-site(s)`;
+  }, [selectedSiteIds, anchorId, siteTree]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[90vh] max-w-2xl flex-col gap-0 overflow-hidden p-0">
         <DialogHeader className="px-6 pt-6 pb-4">
           <DialogTitle>
             <div className="flex items-center gap-2">
-              <ClipboardList className="text-primary" />
+              <HandPlatter className="text-primary" />
               {isEdit ? "Modifier la prestation" : "Nouvelle prestation"}
             </div>
           </DialogTitle>
+          <DialogDescription>
+            {isEdit
+              ? "Modifiez les paramètres de planification de cette prestation."
+              : "Définissez un service récurrent ou ponctuel assigné à un site client."}
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -406,30 +545,45 @@ export function PrestationFormDialog({
                     </RhfControlledSelect>
                   )}
 
-                  <RhfControlledSelect<PrestationFormValues>
-                    name="siteId"
-                    label="Site"
-                    requiredMark
-                    placeholder={
-                      !selectedClientId
-                        ? "Sélectionnez d'abord un client"
-                        : loadingSites
-                          ? "Chargement..."
-                          : sites.length === 0
-                            ? "Aucun site disponible"
-                            : "Sélectionnez un site"
-                    }
-                    disabled={
-                      !selectedClientId || loadingSites || sites.length === 0
-                    }
-                    selectClassName="w-full"
-                  >
-                    {sites.map((s) => (
-                      <SelectItem key={s.id} value={s.id}>
-                        {s.nom}
-                      </SelectItem>
-                    ))}
-                  </RhfControlledSelect>
+                  {/* Arbre de sélection des sites — même pattern que l'attribution */}
+                  <div className="space-y-2">
+                    <Label>
+                      Sites à couvrir <span>*</span>
+                    </Label>
+                    <ScrollArea className="h-[220px] rounded-md border p-3">
+                      {loadingSites ? (
+                        <p className="text-muted-foreground text-sm">
+                          Chargement...
+                        </p>
+                      ) : sites.length === 0 && selectedClientId ? (
+                        <p className="text-muted-foreground text-sm">
+                          Aucun site disponible
+                        </p>
+                      ) : sites.length === 0 ? (
+                        <p className="text-muted-foreground text-sm">
+                          {posture === "plateforme"
+                            ? "Sélectionnez d'abord un client"
+                            : "Aucun site disponible"}
+                        </p>
+                      ) : (
+                        <AttributionSitesTree
+                          tree={siteTree}
+                          selectedSiteIds={selectedSiteIds}
+                          onSiteToggle={handleSiteToggle}
+                          scope="subtree"
+                        />
+                      )}
+                    </ScrollArea>
+                    {selectionSummary ? (
+                      <p className="text-muted-foreground text-xs">
+                        {selectionSummary}
+                      </p>
+                    ) : (
+                      <p className="text-muted-foreground text-xs">
+                        {selectedSiteIds.length} site(s) sélectionné(s)
+                      </p>
+                    )}
+                  </div>
 
                   <RhfControlledSelect<PrestationFormValues>
                     name="serviceId"

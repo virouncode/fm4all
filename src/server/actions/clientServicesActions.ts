@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { userAdhesions } from "@/db/schema/users";
-import { clientServices } from "@/db/schema/services";
+import { clientServicePerimetre, clientServices } from "@/db/schema/services";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
@@ -153,12 +153,27 @@ export const getPrestationByIdAction = actionClient
 
 // ==================== INSERT PRESTATION ====================
 
+// Schéma pour une entrée de périmètre (inclure/exclure un site)
+const perimetreEntrySchema = z.object({
+  siteId: z.string().uuid("ID de site invalide"),
+  mode: z.enum(["inclure", "exclure"]),
+  scope: z.enum(["self", "subtree"]),
+});
+
 export const insertPrestationAction = actionClient
   .metadata({ actionName: "insertPrestationAction" })
-  .inputSchema(insertPrestationFormSchema, {
-    handleValidationErrorsShape: async (ve) =>
-      flattenValidationErrors(ve).fieldErrors,
-  })
+  .inputSchema(
+    insertPrestationFormSchema.extend({
+      // Périmètre obligatoire : au moins l'entrée inclure du site d'ancrage
+      perimetre: z
+        .array(perimetreEntrySchema)
+        .min(1, "Au moins une entrée de périmètre est requise"),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
+  )
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -208,16 +223,32 @@ export const insertPrestationAction = actionClient
       updatedById: currentUser.id,
     });
 
-    const [inserted] = await db
-      .insert(clientServices)
-      .values(payload)
-      .returning();
+    // Transaction : créer la prestation + son périmètre atomiquement
+    const parsedPrestation = await db.transaction(async (tx) => {
+      const [inserted] = await tx
+        .insert(clientServices)
+        .values(payload)
+        .returning();
 
-    if (!inserted) {
-      throw errors.internal("Échec de la création de la prestation.");
-    }
+      if (!inserted) {
+        throw errors.internal("Échec de la création de la prestation.");
+      }
 
-    const parsedPrestation = selectClientServiceSchema.parse(inserted);
+      // Insérer les entrées de périmètre
+      await tx.insert(clientServicePerimetre).values(
+        parsedInput.perimetre.map((entry, idx) => ({
+          clientServiceId: inserted.id,
+          siteId: entry.siteId,
+          mode: entry.mode,
+          scope: entry.scope,
+          ordreAffichage: idx,
+          createdById: currentUser.id,
+          updatedById: currentUser.id,
+        })),
+      );
+
+      return selectClientServiceSchema.parse(inserted);
+    });
 
     // Si la prestation est directement créée en statut "actif" + mode "planifie",
     // déclencher la génération des occurrences
@@ -228,7 +259,10 @@ export const insertPrestationAction = actionClient
       const { onClientServiceChanged } = await import(
         "@/server/utils/clientServiceOccurrences.utils"
       );
-      await onClientServiceChanged({ clientServiceId: parsedPrestation.id, now: new Date() });
+      await onClientServiceChanged({
+        clientServiceId: parsedPrestation.id,
+        now: new Date(),
+      });
     }
 
     return {
