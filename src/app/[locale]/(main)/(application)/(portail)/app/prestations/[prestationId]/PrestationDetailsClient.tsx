@@ -61,6 +61,7 @@ import {
   Calendar,
   CalendarDays,
   CheckCircle2,
+  ClipboardList,
   Clock,
   Filter,
   Loader2,
@@ -71,7 +72,6 @@ import {
   RotateCcw,
   Settings,
   Trash2,
-  Wrench,
   XCircle,
   Zap,
 } from "lucide-react";
@@ -88,6 +88,8 @@ import {
   getPrestationStatutBadge,
 } from "../helpers";
 import { ExecutionFormDialog } from "./ExecutionFormDialog";
+import { TacheListeManagerDialog } from "./TacheListeManagerDialog";
+import { TacheListePickerDialog } from "./TacheListePickerDialog";
 
 interface PrestationDetailsClientProps {
   prestation: PrestationListItem;
@@ -185,12 +187,12 @@ export function PrestationDetailsClient({
             <div className="text-muted-foreground flex flex-wrap items-center gap-3 text-sm">
               {isPlateforme && (
                 <span className="flex items-center gap-1">
-                  <Building className="h-3.5 w-3.5" />
+                  <Building className="h-4 w-4" />
                   {prestation.entrepriseNom}
                 </span>
               )}
               <span className="flex items-center gap-1">
-                <MapPin className="h-3.5 w-3.5" />
+                <MapPin className="h-4 w-4" />
                 {prestation.siteNom}
               </span>
               <span className="text-muted-foreground/50 font-mono text-xs">
@@ -233,7 +235,7 @@ export function PrestationDetailsClient({
             )}
           </TabsTrigger>
           <TabsTrigger value="interventions" className="gap-2">
-            <Wrench className="h-4 w-4" />
+            <Calendar className="h-4 w-4" />
             Interventions
             {interventionsCount > 0 && (
               <span className="bg-primary/10 text-primary rounded-full px-1.5 text-xs">
@@ -291,6 +293,9 @@ export function PrestationDetailsClient({
             <ReadinessCard prestation={prestation} executions={executions} />
           )}
 
+          {/* Checklist par défaut */}
+          <ChecklistDefaultCard prestation={prestation} canManage={canManage} />
+
           <div className="grid gap-4 md:grid-cols-2">
             {/* Fréquence & Planning */}
             <Card>
@@ -306,7 +311,7 @@ export function PrestationDetailsClient({
                       size="sm"
                       onClick={() => setEditDialogOpen(true)}
                     >
-                      <Pencil className="mr-1.5 h-3.5 w-3.5" />
+                      <Pencil className="h-4 w-4" />
                       Modifier
                     </Button>
                   )}
@@ -404,7 +409,7 @@ export function PrestationDetailsClient({
                   onClick={() => setDeleteDialogOpen(true)}
                   className="flex-shrink-0"
                 >
-                  <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                  <Trash2 className="h-4 w-4" />
                   Supprimer
                 </Button>
               </CardContent>
@@ -668,7 +673,7 @@ function ExecutionTab({
       {canManage && (
         <div className="flex justify-end">
           <Button onClick={() => setAddDialogOpen(true)}>
-            <Zap className="mr-2 h-4 w-4" />
+            <Zap className="h-4 w-4" />
             Ajouter un prestataire
           </Button>
         </div>
@@ -728,9 +733,12 @@ function ExecutionCard({
   prestation: PrestationListItem;
   onExecutionsChange: (executions: ExecutionWithPrix[]) => void;
 }) {
+  const router = useRouter();
   const [isToggling, setIsToggling] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [checklistPickerOpen, setChecklistPickerOpen] = useState(false);
+  const [checklistManagerOpen, setChecklistManagerOpen] = useState(false);
 
   const isActive = execution.actif;
 
@@ -810,7 +818,7 @@ function ExecutionCard({
                     disabled={isToggling}
                     aria-label={isActive ? "Désactiver" : "Activer"}
                   >
-                    <Power className="h-3.5 w-3.5" />
+                    <Power className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="outline"
@@ -819,7 +827,7 @@ function ExecutionCard({
                     onClick={() => setDeleteOpen(true)}
                     aria-label="Supprimer ce prestataire"
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </>
               )}
@@ -862,7 +870,76 @@ function ExecutionCard({
             </div>
           </CardContent>
         )}
+
+        {/* Section Checklist */}
+        <CardContent className="border-t pt-3">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2 text-sm">
+              <ClipboardList className="text-muted-foreground h-4 w-4 flex-shrink-0" />
+              {execution.tacheListeTemplateId ? (
+                <span className="font-medium text-green-700">
+                  Checklist assignée
+                </span>
+              ) : (
+                <span className="text-muted-foreground italic">
+                  Aucune checklist
+                </span>
+              )}
+            </div>
+            {canManage && (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 text-xs"
+                  onClick={() => setChecklistPickerOpen(true)}
+                >
+                  <Pencil className="h-3 w-3" />
+                  Modifier
+                </Button>
+                {execution.prestataireEntrepriseId && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 text-xs"
+                    onClick={() => setChecklistManagerOpen(true)}
+                  >
+                    Gérer
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
+        </CardContent>
       </Card>
+
+      {canManage && (
+        <>
+          <TacheListePickerDialog
+            open={checklistPickerOpen}
+            onOpenChange={setChecklistPickerOpen}
+            context="execution"
+            entityId={execution.id}
+            prestationId={prestation.id}
+            serviceId={prestation.serviceId}
+            entrepriseId={prestation.entrepriseId}
+            executionId={execution.id}
+            currentPackId={execution.tacheListeTemplateId}
+            onSuccess={() => {
+              setChecklistPickerOpen(false);
+              router.refresh();
+            }}
+          />
+          {execution.prestataireEntrepriseId && (
+            <TacheListeManagerDialog
+              open={checklistManagerOpen}
+              onOpenChange={setChecklistManagerOpen}
+              serviceId={prestation.serviceId}
+              proprietaireEntrepriseId={execution.prestataireEntrepriseId}
+            />
+          )}
+        </>
+      )}
 
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
@@ -1050,8 +1127,8 @@ function InterventionsTab({
             </span>
           ) : (
             <>
-              Fenêtre glissante de <strong>90 jours</strong> —{" "}
-              {displayedTotal} intervention{displayedTotal > 1 ? "s" : ""}
+              Fenêtre glissante de <strong>90 jours</strong> — {displayedTotal}{" "}
+              intervention{displayedTotal > 1 ? "s" : ""}
             </>
           )}
         </p>
@@ -1091,7 +1168,7 @@ function InterventionsTab({
       >
         {occurrences.length === 0 && !isFiltering ? (
           <div className="py-16 text-center">
-            <Wrench className="text-muted-foreground/30 mx-auto mb-4 h-12 w-12" />
+            <Calendar className="text-muted-foreground/30 mx-auto mb-4 h-12 w-12" />
             <p className="text-muted-foreground text-lg font-medium">
               Aucune intervention
             </p>
@@ -1181,132 +1258,139 @@ function OccurrenceRow({
 
   return (
     <>
-    <div className="flex items-center justify-between px-4 py-3 text-sm">
-      {/* Infos gauche */}
-      <div className="flex items-start gap-3">
-        <Calendar className="text-muted-foreground mt-0.5 h-4 w-4 flex-shrink-0" />
-        <div className="space-y-0.5">
-          <span className="font-medium">
-            {occ.dateDebutPrevue
-              ? formatDateTime(occ.dateDebutPrevue)
-              : "Date non définie"}
-          </span>
-          {occ.siteNom && (
-            <div className="text-muted-foreground flex items-center gap-1 text-xs">
-              <MapPin className="h-3 w-3 flex-shrink-0" />
-              {occ.siteNom}
-            </div>
+      <div className="hover:border-primary/30 flex items-center justify-between px-4 py-3 text-sm transition-all hover:shadow-sm">
+        {/* Infos gauche — cliquable → detail */}
+        <Link
+          href={{
+            pathname:
+              "/app/prestations/[prestationId]/occurrences/[occurrenceId]",
+            params: { prestationId: prestation.id, occurrenceId: occ.id },
+          }}
+          className="flex min-w-0 flex-1 items-start gap-3"
+        >
+          <Calendar className="text-muted-foreground mt-0.5 h-4 w-4 flex-shrink-0" />
+          <div className="min-w-0 space-y-0.5">
+            <span className="font-medium">
+              {occ.dateDebutPrevue
+                ? formatDateTime(occ.dateDebutPrevue)
+                : "Date non définie"}
+            </span>
+            {occ.siteNom && (
+              <div className="text-muted-foreground flex items-center gap-1 text-xs">
+                <MapPin className="h-3 w-3 flex-shrink-0" />
+                {occ.siteNom}
+              </div>
+            )}
+          </div>
+        </Link>
+
+        {/* Badges + actions droite */}
+        <div className="flex items-center gap-2">
+          {/* Badge "À attribuer" */}
+          {!occ.executionId && (
+            <Badge className="bg-orange-100 text-xs text-orange-700">
+              À attribuer
+            </Badge>
+          )}
+
+          {/* Badge statut */}
+          <Badge className={`text-xs ${badge.className}`}>{badge.label}</Badge>
+
+          {/* Boutons d'action (uniquement si canManage) */}
+          {canManage && occ.statut === "planifiee" && (
+            <>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 gap-1 text-xs"
+                onClick={() => handleTransition("en_cours")}
+                disabled={isUpdating || !occ.executionId}
+                title={
+                  !occ.executionId
+                    ? "Attribuez un prestataire avant de démarrer"
+                    : "Démarrer l'intervention"
+                }
+              >
+                <Play className="h-3 w-3" />
+                Démarrer
+              </Button>
+              <Button
+                size="sm"
+                variant="destructive"
+                className="h-7 text-xs"
+                onClick={() => setCancelDialogOpen(true)}
+                disabled={isUpdating}
+              >
+                Annuler
+              </Button>
+            </>
+          )}
+
+          {canManage && occ.statut === "en_cours" && (
+            <>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 gap-1 text-xs"
+                onClick={() => handleTransition("terminee")}
+                disabled={isUpdating}
+              >
+                Terminer
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-destructive h-7 text-xs"
+                onClick={() => handleTransition("non_honoree")}
+                disabled={isUpdating}
+              >
+                Non honorée
+              </Button>
+            </>
           )}
         </div>
       </div>
 
-      {/* Badges + actions droite */}
-      <div className="flex items-center gap-2">
-        {/* Badge "À attribuer" */}
-        {!occ.executionId && (
-          <Badge className="bg-orange-100 text-xs text-orange-700">
-            À attribuer
-          </Badge>
-        )}
-
-        {/* Badge statut */}
-        <Badge className={`text-xs ${badge.className}`}>{badge.label}</Badge>
-
-        {/* Boutons d'action (uniquement si canManage) */}
-        {canManage && occ.statut === "planifiee" && (
-          <>
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 gap-1 text-xs"
-              onClick={() => handleTransition("en_cours")}
-              disabled={isUpdating || !occ.executionId}
-              title={
-                !occ.executionId
-                  ? "Attribuez un prestataire avant de démarrer"
-                  : "Démarrer l'intervention"
-              }
-            >
-              <Play className="h-3 w-3" />
-              Démarrer
-            </Button>
-            <Button
-              size="sm"
+      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Annuler cette intervention ?</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2 text-sm">
+                <p>
+                  L&apos;intervention du{" "}
+                  <strong>
+                    {occ.dateDebutPrevue
+                      ? formatDateTime(occ.dateDebutPrevue)
+                      : "date non définie"}
+                  </strong>{" "}
+                  passera au statut <strong>Annulée</strong>.
+                </p>
+                <p className="text-muted-foreground">
+                  Cette action est irréversible. L&apos;intervention restera
+                  visible dans l&apos;historique mais ne sera plus exécutée.
+                  Elle ne sera pas remplacée par une nouvelle occurrence.
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isUpdating}>
+              Conserver
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setCancelDialogOpen(false);
+                void handleTransition("annulee");
+              }}
+              disabled={isUpdating}
               variant="destructive"
-              className="h-7 text-xs"
-              onClick={() => setCancelDialogOpen(true)}
-              disabled={isUpdating}
             >
-              Annuler
-            </Button>
-          </>
-        )}
-
-        {canManage && occ.statut === "en_cours" && (
-          <>
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 gap-1 text-xs"
-              onClick={() => handleTransition("terminee")}
-              disabled={isUpdating}
-            >
-              Terminer
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              className="text-destructive h-7 text-xs"
-              onClick={() => handleTransition("non_honoree")}
-              disabled={isUpdating}
-            >
-              Non honorée
-            </Button>
-          </>
-        )}
-      </div>
-    </div>
-
-    <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Annuler cette intervention ?</AlertDialogTitle>
-          <AlertDialogDescription asChild>
-            <div className="space-y-2 text-sm">
-              <p>
-                L&apos;intervention du{" "}
-                <strong>
-                  {occ.dateDebutPrevue
-                    ? formatDateTime(occ.dateDebutPrevue)
-                    : "date non définie"}
-                </strong>{" "}
-                passera au statut <strong>Annulée</strong>.
-              </p>
-              <p className="text-muted-foreground">
-                Cette action est irréversible. L&apos;intervention restera
-                visible dans l&apos;historique mais ne sera plus exécutée.
-                Elle ne sera pas remplacée par une nouvelle occurrence.
-              </p>
-            </div>
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={isUpdating}>
-            Conserver
-          </AlertDialogCancel>
-          <AlertDialogAction
-            onClick={() => {
-              setCancelDialogOpen(false);
-              void handleTransition("annulee");
-            }}
-            disabled={isUpdating}
-            variant="destructive"
-          >
-            {isUpdating ? "Annulation..." : "Confirmer l'annulation"}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+              {isUpdating ? "Annulation..." : "Confirmer l'annulation"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
@@ -1426,7 +1510,7 @@ function OccurrencesFiltersDialog({
               disabled={activeFiltersCount === 0}
               className="gap-1.5"
             >
-              <RotateCcw className="h-3.5 w-3.5" />
+              <RotateCcw className="h-4 w-4" />
               Réinitialiser
               {activeFiltersCount > 0 && ` (${activeFiltersCount})`}
             </Button>
@@ -1484,7 +1568,7 @@ function OccurrencesSortDialog({
                 className="flex-1"
                 onClick={() => onApply("asc")}
               >
-                <ArrowUpAZ className="mr-2 h-4 w-4" />
+                <ArrowUpAZ className="h-4 w-4" />
                 Croissant
               </Button>
               <Button
@@ -1493,7 +1577,7 @@ function OccurrencesSortDialog({
                 className="flex-1"
                 onClick={() => onApply("desc")}
               >
-                <ArrowDownAZ className="mr-2 h-4 w-4" />
+                <ArrowDownAZ className="h-4 w-4" />
                 Décroissant
               </Button>
             </div>
@@ -1501,6 +1585,92 @@ function OccurrencesSortDialog({
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+// ==================== CHECKLIST DEFAULT CARD ====================
+
+function ChecklistDefaultCard({
+  prestation,
+  canManage,
+}: {
+  prestation: PrestationListItem;
+  canManage: boolean;
+}) {
+  const router = useRouter();
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [managerOpen, setManagerOpen] = useState(false);
+
+  return (
+    <>
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-base font-medium">
+              <ClipboardList className="text-primary h-4 w-4" />
+              Checklist par défaut
+            </CardTitle>
+            {canManage && (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPickerOpen(true)}
+                >
+                  <Pencil className="h-4 w-4" />
+                  Modifier
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setManagerOpen(true)}
+                >
+                  Gérer les checklists
+                </Button>
+              </div>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="text-sm">
+          {prestation.tacheListeTemplateId ? (
+            <p className="font-medium text-green-700">Checklist configurée</p>
+          ) : (
+            <p className="text-muted-foreground italic">
+              Aucune checklist configurée
+            </p>
+          )}
+          <p className="text-muted-foreground mt-1 text-xs">
+            Utilisée par défaut pour toutes les interventions, sauf si une
+            checklist spécifique est définie au niveau de l&apos;exécution.
+          </p>
+        </CardContent>
+      </Card>
+
+      {canManage && (
+        <>
+          <TacheListePickerDialog
+            open={pickerOpen}
+            onOpenChange={setPickerOpen}
+            context="client_service"
+            entityId={prestation.id}
+            prestationId={prestation.id}
+            serviceId={prestation.serviceId}
+            entrepriseId={prestation.entrepriseId}
+            currentPackId={prestation.tacheListeTemplateId}
+            onSuccess={() => {
+              setPickerOpen(false);
+              router.refresh();
+            }}
+          />
+          <TacheListeManagerDialog
+            open={managerOpen}
+            onOpenChange={setManagerOpen}
+            serviceId={prestation.serviceId}
+            proprietaireEntrepriseId={prestation.entrepriseId}
+          />
+        </>
+      )}
+    </>
   );
 }
 

@@ -80,7 +80,8 @@ import {
   clientServices,
   occurrenceTaches,
   services,
-  servicesTachesTemplates,
+  tacheListeItems,
+  tacheListesTemplates,
 } from "./services";
 // Note: servicesFm4AllTaux and servicesFm4AllOffres are standalone tables without foreign keys
 // SITES TABLES
@@ -234,7 +235,7 @@ export const entreprisesRelations = relations(entreprises, ({ one, many }) => ({
   nettoyageRepasseTarifs: many(nettoyageRepasseTarifs),
   nettoyageVitrerieTarifs: many(nettoyageVitrerieTarifs),
   officeManagerTarifs: many(officeManagerTarifs),
-  servicesTachesTemplates: many(servicesTachesTemplates),
+  tacheListesTemplates: many(tacheListesTemplates),
 }));
 
 export const entrepriseRolesRelations = relations(
@@ -259,7 +260,6 @@ export const serviceEntreprisesRelations = relations(
       references: [services.id],
     }),
     clientServiceExecutions: many(clientServiceExecutions),
-    servicesTachesTemplates: many(servicesTachesTemplates),
   }),
 );
 
@@ -387,7 +387,7 @@ export const servicesRelations = relations(services, ({ many }) => ({
   devisDemandes: many(devisDemandes),
   devisLignes: many(devisLignes),
   factureLignes: many(factureLignes),
-  servicesTachesTemplates: many(servicesTachesTemplates),
+  tacheListesTemplates: many(tacheListesTemplates),
 }));
 
 export const clientServicesRelations = relations(
@@ -412,6 +412,10 @@ export const clientServicesRelations = relations(
     factures: many(factures),
     factureLigneAllocations: many(factureLigneAllocations),
     documentsLinks: many(documentsLinks),
+    tacheListeTemplate: one(tacheListesTemplates, {
+      fields: [clientServices.tacheListeTemplateId],
+      references: [tacheListesTemplates.id],
+    }),
   }),
 );
 
@@ -465,6 +469,10 @@ export const clientServiceExecutionsRelations = relations(
     prix: many(clientServiceExecutionPrix),
     occurrences: many(clientServiceOccurrences),
     documentsLinks: many(documentsLinks),
+    tacheListeTemplate: one(tacheListesTemplates, {
+      fields: [clientServiceExecutions.tacheListeTemplateId],
+      references: [tacheListesTemplates.id],
+    }),
   }),
 );
 
@@ -492,20 +500,29 @@ export const clientServicePerimetreRelations = relations(
   }),
 );
 
-export const servicesTachesTemplatesRelations = relations(
-  servicesTachesTemplates,
+export const tacheListesTemplatesRelations = relations(
+  tacheListesTemplates,
   ({ one, many }) => ({
     service: one(services, {
-      fields: [servicesTachesTemplates.serviceId],
+      fields: [tacheListesTemplates.serviceId],
       references: [services.id],
     }),
     proprietaireEntreprise: one(entreprises, {
-      fields: [servicesTachesTemplates.proprietaireEntrepriseId],
+      fields: [tacheListesTemplates.proprietaireEntrepriseId],
       references: [entreprises.id],
     }),
-    serviceEntreprise: one(serviceEntreprises, {
-      fields: [servicesTachesTemplates.serviceEntrepriseId],
-      references: [serviceEntreprises.id],
+    items: many(tacheListeItems),
+    clientServices: many(clientServices),
+    clientServiceExecutions: many(clientServiceExecutions),
+  }),
+);
+
+export const tacheListeItemsRelations = relations(
+  tacheListeItems,
+  ({ one, many }) => ({
+    listeTemplate: one(tacheListesTemplates, {
+      fields: [tacheListeItems.listeTemplateId],
+      references: [tacheListesTemplates.id],
     }),
     occurrenceTaches: many(occurrenceTaches),
   }),
@@ -518,9 +535,9 @@ export const occurrenceTachesRelations = relations(
       fields: [occurrenceTaches.occurrenceId],
       references: [clientServiceOccurrences.id],
     }),
-    tacheTemplate: one(servicesTachesTemplates, {
-      fields: [occurrenceTaches.tacheTemplateId],
-      references: [servicesTachesTemplates.id],
+    listeItem: one(tacheListeItems, {
+      fields: [occurrenceTaches.listeItemId],
+      references: [tacheListeItems.id],
     }),
     assigneeUser: one(user, {
       fields: [occurrenceTaches.assigneeUserId],

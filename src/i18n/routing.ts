@@ -413,6 +413,10 @@ export const routing = defineRouting({
       fr: "/app/prestations/[prestationId]",
       en: "/app/prestations/[prestationId]",
     },
+    "/app/prestations/[prestationId]/occurrences/[occurrenceId]": {
+      fr: "/app/prestations/[prestationId]/occurrences/[occurrenceId]",
+      en: "/app/prestations/[prestationId]/occurrences/[occurrenceId]",
+    },
     "/app/planning": {
       fr: "/app/planning",
       en: "/app/planning",

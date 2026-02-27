@@ -242,6 +242,19 @@ export function PrestationFormDialog({
     frequenceValue !== "one_shot" &&
     frequenceValue !== "tous_les_x_jours";
   const showIntervalleJours = frequenceValue === "tous_les_x_jours";
+
+  const frequenceParPeriodeLabel =
+    frequenceValue === "hebdomadaire"
+      ? "Interventions par semaine"
+      : frequenceValue === "mensuelle"
+        ? "Interventions par mois"
+        : frequenceValue === "trimestrielle"
+          ? "Interventions par trimestre"
+          : frequenceValue === "semestrielle"
+            ? "Interventions par semestre"
+            : frequenceValue === "annuelle"
+              ? "Interventions par an"
+              : "Interventions par cycle";
   const showPlanificationDetails = modePlanningValue === "planifie";
 
   // Arbre complet des sites du client
@@ -725,11 +738,10 @@ export function PrestationFormDialog({
                 {showFrequenceParPeriode && (
                   <RhfInput<PrestationFormValues>
                     name="frequenceParPeriode"
-                    label="Nombre d'interventions par période"
+                    label={frequenceParPeriodeLabel}
                     placeholder="Ex: 2"
                     type="number"
                     inputClassName="w-full"
-                    description="Nombre de fois que le service est réalisé par période"
                   />
                 )}
 

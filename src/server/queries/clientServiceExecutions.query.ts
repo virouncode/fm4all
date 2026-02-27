@@ -10,6 +10,7 @@ import {
 import { serviceEntreprises } from "@/db/schema/entreprises";
 import { entreprises } from "@/db/schema/entreprises";
 import { sites } from "@/db/schema/sites";
+import { occurrenceTaches } from "@/db/schema/services";
 import { and, asc, count, desc, eq, gte, isNull, or } from "drizzle-orm";
 
 /**
@@ -101,11 +102,13 @@ export type ExecutionWithPrix = {
   clientServiceId: string;
   siteId: string;
   serviceEntrepriseId: string | null;
+  prestataireEntrepriseId: string | null;
   prestataireNom: string | null;
   dateDebutValidite: Date;
   dateFinValidite: Date | null;
   priorite: number;
   actif: boolean;
+  tacheListeTemplateId: string | null;
   createdAt: Date;
   prix: ExecutionPrixItem[];
 };
@@ -140,11 +143,13 @@ export async function getExecutionsWithPrixByPrestationId(
       clientServiceId: clientServiceExecutions.clientServiceId,
       siteId: clientServiceExecutions.siteId,
       serviceEntrepriseId: clientServiceExecutions.serviceEntrepriseId,
+      prestataireEntrepriseId: entreprises.id,
       prestataireNom: entreprises.nom,
       dateDebutValidite: clientServiceExecutions.dateDebutValidite,
       dateFinValidite: clientServiceExecutions.dateFinValidite,
       priorite: clientServiceExecutions.priorite,
       actif: clientServiceExecutions.actif,
+      tacheListeTemplateId: clientServiceExecutions.tacheListeTemplateId,
       createdAt: clientServiceExecutions.createdAt,
     })
     .from(clientServiceExecutions)
@@ -338,4 +343,102 @@ export async function getDistinctSitesForPrestation(
     .orderBy(sites.nom);
 
   return rows.map((r) => ({ id: r.id, nom: r.nom ?? r.id }));
+}
+
+// ==================== OCCURRENCE DETAIL ====================
+
+export type OccurrenceDetail = {
+  id: string;
+  clientServiceId: string;
+  siteId: string;
+  siteNom: string | null;
+  executionId: string | null;
+  prestataireNom: string | null;
+  dateDebutPrevue: Date | null;
+  dateFinPrevue: Date | null;
+  dateDebutReelle: Date | null;
+  dateFinReelle: Date | null;
+  statut: "planifiee" | "en_cours" | "terminee" | "non_honoree" | "annulee";
+  notes: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type OccurrenceTacheDetail = {
+  id: string;
+  occurrenceId: string;
+  listeItemId: string | null;
+  ordre: number;
+  titre: string;
+  description: string | null;
+  statut: "a_faire" | "en_cours" | "terminee" | "non_honoree" | "non_applicable" | "annulee";
+  notes: string | null;
+  startedAt: Date | null;
+  doneAt: Date | null;
+};
+
+/**
+ * Récupère le détail d'une occurrence (avec site + prestataire) pour la page de détail.
+ */
+export async function getOccurrenceWithDetailsById(
+  occurrenceId: string,
+): Promise<OccurrenceDetail | null> {
+  const [row] = await db
+    .select({
+      id: clientServiceOccurrences.id,
+      clientServiceId: clientServiceOccurrences.clientServiceId,
+      siteId: clientServiceOccurrences.siteId,
+      siteNom: sites.nom,
+      executionId: clientServiceOccurrences.executionId,
+      prestataireNom: entreprises.nom,
+      dateDebutPrevue: clientServiceOccurrences.dateDebutPrevue,
+      dateFinPrevue: clientServiceOccurrences.dateFinPrevue,
+      dateDebutReelle: clientServiceOccurrences.dateDebutReelle,
+      dateFinReelle: clientServiceOccurrences.dateFinReelle,
+      statut: clientServiceOccurrences.statut,
+      notes: clientServiceOccurrences.notes,
+      createdAt: clientServiceOccurrences.createdAt,
+      updatedAt: clientServiceOccurrences.updatedAt,
+    })
+    .from(clientServiceOccurrences)
+    .leftJoin(sites, eq(sites.id, clientServiceOccurrences.siteId))
+    .leftJoin(
+      clientServiceExecutions,
+      eq(clientServiceExecutions.id, clientServiceOccurrences.executionId),
+    )
+    .leftJoin(
+      serviceEntreprises,
+      eq(serviceEntreprises.id, clientServiceExecutions.serviceEntrepriseId),
+    )
+    .leftJoin(entreprises, eq(entreprises.id, serviceEntreprises.entrepriseId))
+    .where(eq(clientServiceOccurrences.id, occurrenceId))
+    .limit(1);
+
+  return (row as OccurrenceDetail | undefined) ?? null;
+}
+
+/**
+ * Récupère les tâches d'une occurrence (ordonnées).
+ */
+export async function getOccurrenceTaches(
+  occurrenceId: string,
+): Promise<OccurrenceTacheDetail[]> {
+  const rows = await db
+    .select({
+      id: occurrenceTaches.id,
+      occurrenceId: occurrenceTaches.occurrenceId,
+      listeItemId: occurrenceTaches.listeItemId,
+      ordre: occurrenceTaches.ordre,
+      titre: occurrenceTaches.titre,
+      description: occurrenceTaches.description,
+      statut: occurrenceTaches.statut,
+      notes: occurrenceTaches.notes,
+      startedAt: occurrenceTaches.startedAt,
+      doneAt: occurrenceTaches.doneAt,
+    })
+    .from(occurrenceTaches)
+    .where(eq(occurrenceTaches.occurrenceId, occurrenceId))
+    .orderBy(asc(occurrenceTaches.ordre));
+
+  return rows as OccurrenceTacheDetail[];
 }

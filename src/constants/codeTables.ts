@@ -318,6 +318,7 @@ export const occurrenceTacheStatutCT = [
   { code: "terminee", name: "Terminée" },
   { code: "non_honoree", name: "Non honorée" },
   { code: "annulee", name: "Annulée" },
+  { code: "non_applicable", name: "Non applicable" },
 ] as const;
 
 export const occurrenceTacheStatutCodes = occurrenceTacheStatutCT.map(

@@ -221,6 +221,7 @@ export type PrestationListItem = {
   modePlanning: ClientServiceModePlanningType;
   modeCommercial: ModeCommercialType;
   notes: string | null;
+  tacheListeTemplateId: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -246,6 +247,7 @@ export const prestationListItemSchema: z.ZodType<PrestationListItem> = z.object(
     modePlanning: clientServiceModePlanningSchema,
     modeCommercial: modeCommercialSchema,
     notes: z.string().nullable(),
+    tacheListeTemplateId: z.string().nullable(),
     createdAt: z.date(),
     updatedAt: z.date(),
   },

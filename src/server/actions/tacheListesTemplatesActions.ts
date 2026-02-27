@@ -1,0 +1,566 @@
+"use server";
+
+import { db } from "@/db";
+import { entreprises, serviceEntreprises } from "@/db/schema/entreprises";
+import {
+  clientServiceExecutions,
+  tacheListeItems,
+  tacheListesTemplates,
+} from "@/db/schema/services";
+import { userAdhesions } from "@/db/schema/users";
+import { errors } from "@/lib/action/errors";
+import { actionClient } from "@/lib/action/safe-actions";
+import { getSession } from "@/server/auth/get-session";
+import {
+  getAvailableTacheListesTemplates,
+  getTacheListeTemplateWithItems,
+  getTacheListesTemplatesByProprietaire,
+} from "@/server/queries/tacheListesTemplates.query";
+import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
+import { and, asc, eq, max } from "drizzle-orm";
+import { flattenValidationErrors } from "next-safe-action";
+import { z } from "zod";
+
+// ==================== HELPERS ====================
+
+/** Vérifie que l'utilisateur a accès à l'entreprise (adhésion ou rôle plateforme) */
+async function hasAccessToEntreprise(
+  userId: string,
+  entrepriseId: string,
+): Promise<boolean> {
+  const platformRole = await getUserPlateformeAdhesion(userId);
+  if (platformRole?.role) return true;
+
+  const adhesion = await db.query.userAdhesions.findFirst({
+    where: and(
+      eq(userAdhesions.userId, userId),
+      eq(userAdhesions.entrepriseId, entrepriseId),
+    ),
+  });
+
+  return !!adhesion;
+}
+
+/** Retourne l'ID de l'entreprise FM4ALL (packs système) */
+async function getFm4allEntrepriseId(): Promise<string | null> {
+  const [row] = await db
+    .select({ id: entreprises.id })
+    .from(entreprises)
+    .where(eq(entreprises.nom, "FM4ALL"))
+    .limit(1);
+  return row?.id ?? null;
+}
+
+/** Retourne l'entreprise du prestataire lié à une exécution */
+async function getExecutionPrestataireEntrepriseId(
+  executionId: string,
+): Promise<string | null> {
+  const [row] = await db
+    .select({ prestataireEntrepriseId: serviceEntreprises.entrepriseId })
+    .from(clientServiceExecutions)
+    .innerJoin(
+      serviceEntreprises,
+      eq(serviceEntreprises.id, clientServiceExecutions.serviceEntrepriseId),
+    )
+    .where(eq(clientServiceExecutions.id, executionId))
+    .limit(1);
+  return row?.prestataireEntrepriseId ?? null;
+}
+
+// ==================== GET AVAILABLE PACKS ====================
+
+/**
+ * Retourne les packs disponibles selon le contexte :
+ * - Toujours les packs FM4ALL (système)
+ * - Les packs de l'entreprise passée en input (client ou créateur)
+ * - Si executionId fourni : aussi les packs du prestataire lié à l'exécution
+ */
+export const getAvailableTacheListesTemplatesAction = actionClient
+  .metadata({ actionName: "getAvailableTacheListesTemplatesAction" })
+  .inputSchema(
+    z.object({
+      serviceId: z.string().uuid("ID de service invalide"),
+      entrepriseId: z.string().uuid("ID d'entreprise invalide"),
+      executionId: z.string().uuid().optional(),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const { serviceId, entrepriseId, executionId } = parsedInput;
+
+    const hasAccess = await hasAccessToEntreprise(currentUser.id, entrepriseId);
+    if (!hasAccess) {
+      throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+    }
+
+    // Résolution des entreprises visibles
+    const entrepriseIds: string[] = [entrepriseId];
+
+    const fm4allId = await getFm4allEntrepriseId();
+    if (fm4allId && !entrepriseIds.includes(fm4allId)) {
+      entrepriseIds.unshift(fm4allId); // FM4ALL en premier
+    }
+
+    if (executionId) {
+      const prestataireId =
+        await getExecutionPrestataireEntrepriseId(executionId);
+      if (prestataireId && !entrepriseIds.includes(prestataireId)) {
+        entrepriseIds.push(prestataireId);
+      }
+    }
+
+    const packs = await getAvailableTacheListesTemplates({
+      serviceId,
+      entrepriseIds,
+    });
+
+    return { packs };
+  });
+
+// ==================== GET PACKS FOR MANAGER ====================
+
+export const getTacheListesTemplatesAction = actionClient
+  .metadata({ actionName: "getTacheListesTemplatesAction" })
+  .inputSchema(
+    z.object({
+      proprietaireEntrepriseId: z.string().uuid("ID d'entreprise invalide"),
+      serviceId: z.string().uuid().optional(),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const { proprietaireEntrepriseId, serviceId } = parsedInput;
+
+    const hasAccess = await hasAccessToEntreprise(
+      currentUser.id,
+      proprietaireEntrepriseId,
+    );
+    if (!hasAccess) {
+      throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+    }
+
+    const packs = await getTacheListesTemplatesByProprietaire({
+      proprietaireEntrepriseId,
+      serviceId,
+    });
+
+    return { packs };
+  });
+
+// ==================== INSERT PACK ====================
+
+export const insertTacheListeTemplateAction = actionClient
+  .metadata({ actionName: "insertTacheListeTemplateAction" })
+  .inputSchema(
+    z.object({
+      nom: z.string().min(1, "Nom obligatoire").max(255, "Nom trop long"),
+      serviceId: z.string().uuid("ID de service invalide"),
+      proprietaireEntrepriseId: z.string().uuid("ID d'entreprise invalide"),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const { nom, serviceId, proprietaireEntrepriseId } = parsedInput;
+
+    const hasAccess = await hasAccessToEntreprise(
+      currentUser.id,
+      proprietaireEntrepriseId,
+    );
+    if (!hasAccess) {
+      throw errors.forbidden(
+        "Vous n'avez pas accès à cette entreprise pour créer un pack.",
+      );
+    }
+
+    const [pack] = await db
+      .insert(tacheListesTemplates)
+      .values({
+        nom,
+        serviceId,
+        proprietaireEntrepriseId,
+        actif: true,
+        createdById: currentUser.id,
+        updatedById: currentUser.id,
+      })
+      .returning();
+
+    return { pack };
+  });
+
+// ==================== UPDATE PACK ====================
+
+export const updateTacheListeTemplateAction = actionClient
+  .metadata({ actionName: "updateTacheListeTemplateAction" })
+  .inputSchema(
+    z.object({
+      id: z.string().uuid("ID de pack invalide"),
+      entrepriseId: z.string().uuid("ID d'entreprise invalide"),
+      nom: z.string().min(1).max(255).optional(),
+      actif: z.boolean().optional(),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const { id, entrepriseId, nom, actif } = parsedInput;
+
+    // Vérifier que le pack appartient à cette entreprise (ou rôle plateforme)
+    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    if (!platformRole?.role) {
+      const [packRow] = await db
+        .select({ proprietaireEntrepriseId: tacheListesTemplates.proprietaireEntrepriseId })
+        .from(tacheListesTemplates)
+        .where(eq(tacheListesTemplates.id, id))
+        .limit(1);
+
+      if (!packRow) throw errors.notFound("Pack introuvable.");
+      if (packRow.proprietaireEntrepriseId !== entrepriseId) {
+        throw errors.forbidden("Vous ne pouvez modifier que vos propres packs.");
+      }
+    }
+
+    const updateData: Partial<typeof tacheListesTemplates.$inferInsert> = {
+      updatedById: currentUser.id,
+    };
+    if (nom !== undefined) updateData.nom = nom;
+    if (actif !== undefined) updateData.actif = actif;
+
+    const [pack] = await db
+      .update(tacheListesTemplates)
+      .set(updateData)
+      .where(eq(tacheListesTemplates.id, id))
+      .returning();
+
+    return { pack };
+  });
+
+// ==================== DELETE PACK ====================
+
+export const deleteTacheListeTemplateAction = actionClient
+  .metadata({ actionName: "deleteTacheListeTemplateAction" })
+  .inputSchema(
+    z.object({
+      id: z.string().uuid("ID de pack invalide"),
+      entrepriseId: z.string().uuid("ID d'entreprise invalide"),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const { id, entrepriseId } = parsedInput;
+
+    // Vérifier propriété du pack (ou rôle plateforme)
+    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    if (!platformRole?.role) {
+      const [packRow] = await db
+        .select({ proprietaireEntrepriseId: tacheListesTemplates.proprietaireEntrepriseId })
+        .from(tacheListesTemplates)
+        .where(eq(tacheListesTemplates.id, id))
+        .limit(1);
+
+      if (!packRow) throw errors.notFound("Pack introuvable.");
+      if (packRow.proprietaireEntrepriseId !== entrepriseId) {
+        throw errors.forbidden("Vous ne pouvez supprimer que vos propres packs.");
+      }
+    }
+
+    // CASCADE supprime les items (ON DELETE CASCADE sur tache_liste_items.liste_template_id)
+    // ON DELETE SET NULL sur client_services.tache_liste_template_id et client_service_executions
+    await db
+      .delete(tacheListesTemplates)
+      .where(eq(tacheListesTemplates.id, id));
+
+    return { success: true };
+  });
+
+// ==================== INSERT ITEM ====================
+
+export const insertTacheListeItemAction = actionClient
+  .metadata({ actionName: "insertTacheListeItemAction" })
+  .inputSchema(
+    z.object({
+      listeTemplateId: z.string().uuid("ID de pack invalide"),
+      entrepriseId: z.string().uuid("ID d'entreprise invalide"),
+      titre: z.string().min(1, "Titre obligatoire").max(255, "Titre trop long"),
+      description: z.string().optional(),
+      dureeEstimeeMinutes: z.number().int().positive().optional(),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const { listeTemplateId, entrepriseId, titre, description, dureeEstimeeMinutes } = parsedInput;
+
+    // Vérifier que le pack appartient à cette entreprise
+    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    if (!platformRole?.role) {
+      const [packRow] = await db
+        .select({ proprietaireEntrepriseId: tacheListesTemplates.proprietaireEntrepriseId })
+        .from(tacheListesTemplates)
+        .where(eq(tacheListesTemplates.id, listeTemplateId))
+        .limit(1);
+
+      if (!packRow) throw errors.notFound("Pack introuvable.");
+      if (packRow.proprietaireEntrepriseId !== entrepriseId) {
+        throw errors.forbidden("Vous ne pouvez modifier que vos propres packs.");
+      }
+    }
+
+    // Calculer le prochain ordre (max + 1)
+    const [maxRow] = await db
+      .select({ maxOrdre: max(tacheListeItems.ordre) })
+      .from(tacheListeItems)
+      .where(eq(tacheListeItems.listeTemplateId, listeTemplateId));
+
+    const nextOrdre = (maxRow?.maxOrdre ?? 0) + 1;
+
+    const [item] = await db
+      .insert(tacheListeItems)
+      .values({
+        listeTemplateId,
+        ordre: nextOrdre,
+        titre,
+        description: description || null,
+        actif: true,
+        dureeEstimeeMinutes: dureeEstimeeMinutes ?? null,
+        createdById: currentUser.id,
+        updatedById: currentUser.id,
+      })
+      .returning();
+
+    return { item };
+  });
+
+// ==================== UPDATE ITEM ====================
+
+export const updateTacheListeItemAction = actionClient
+  .metadata({ actionName: "updateTacheListeItemAction" })
+  .inputSchema(
+    z.object({
+      id: z.string().uuid("ID d'item invalide"),
+      entrepriseId: z.string().uuid("ID d'entreprise invalide"),
+      titre: z.string().min(1).max(255).optional(),
+      description: z.string().optional(),
+      ordre: z.number().int().positive().optional(),
+      actif: z.boolean().optional(),
+      dureeEstimeeMinutes: z.number().int().positive().nullable().optional(),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const { id, entrepriseId, titre, description, ordre, actif, dureeEstimeeMinutes } =
+      parsedInput;
+
+    // Vérifier propriété via le pack
+    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    if (!platformRole?.role) {
+      const [itemRow] = await db
+        .select({
+          proprietaireEntrepriseId: tacheListesTemplates.proprietaireEntrepriseId,
+        })
+        .from(tacheListeItems)
+        .innerJoin(
+          tacheListesTemplates,
+          eq(tacheListesTemplates.id, tacheListeItems.listeTemplateId),
+        )
+        .where(eq(tacheListeItems.id, id))
+        .limit(1);
+
+      if (!itemRow) throw errors.notFound("Item introuvable.");
+      if (itemRow.proprietaireEntrepriseId !== entrepriseId) {
+        throw errors.forbidden("Vous ne pouvez modifier que vos propres items.");
+      }
+    }
+
+    const updateData: Partial<typeof tacheListeItems.$inferInsert> = {
+      updatedById: currentUser.id,
+    };
+    if (titre !== undefined) updateData.titre = titre;
+    if (description !== undefined) updateData.description = description || null;
+    if (ordre !== undefined) updateData.ordre = ordre;
+    if (actif !== undefined) updateData.actif = actif;
+    if (dureeEstimeeMinutes !== undefined)
+      updateData.dureeEstimeeMinutes = dureeEstimeeMinutes;
+
+    const [item] = await db
+      .update(tacheListeItems)
+      .set(updateData)
+      .where(eq(tacheListeItems.id, id))
+      .returning();
+
+    return { item };
+  });
+
+// ==================== DELETE ITEM ====================
+
+export const deleteTacheListeItemAction = actionClient
+  .metadata({ actionName: "deleteTacheListeItemAction" })
+  .inputSchema(
+    z.object({
+      id: z.string().uuid("ID d'item invalide"),
+      entrepriseId: z.string().uuid("ID d'entreprise invalide"),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const { id, entrepriseId } = parsedInput;
+
+    // Vérifier propriété via le pack
+    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    if (!platformRole?.role) {
+      const [itemRow] = await db
+        .select({
+          proprietaireEntrepriseId: tacheListesTemplates.proprietaireEntrepriseId,
+          listeTemplateId: tacheListeItems.listeTemplateId,
+        })
+        .from(tacheListeItems)
+        .innerJoin(
+          tacheListesTemplates,
+          eq(tacheListesTemplates.id, tacheListeItems.listeTemplateId),
+        )
+        .where(eq(tacheListeItems.id, id))
+        .limit(1);
+
+      if (!itemRow) throw errors.notFound("Item introuvable.");
+      if (itemRow.proprietaireEntrepriseId !== entrepriseId) {
+        throw errors.forbidden("Vous ne pouvez supprimer que vos propres items.");
+      }
+    }
+
+    // Récupérer le listeTemplateId AVANT la suppression pour pouvoir renuméroter
+    const [itemRow] = await db
+      .select({ listeTemplateId: tacheListeItems.listeTemplateId })
+      .from(tacheListeItems)
+      .where(eq(tacheListeItems.id, id))
+      .limit(1);
+
+    await db.delete(tacheListeItems).where(eq(tacheListeItems.id, id));
+
+    // Renuméroter les ordres restants pour éviter les trous
+    if (itemRow) {
+      const remaining = await db
+        .select({ id: tacheListeItems.id })
+        .from(tacheListeItems)
+        .where(eq(tacheListeItems.listeTemplateId, itemRow.listeTemplateId))
+        .orderBy(asc(tacheListeItems.ordre));
+
+      for (let i = 0; i < remaining.length; i++) {
+        await db
+          .update(tacheListeItems)
+          .set({ ordre: i + 1, updatedById: currentUser.id })
+          .where(eq(tacheListeItems.id, remaining[i].id));
+      }
+    }
+
+    return { success: true };
+  });
+
+// ==================== REORDER ITEMS ====================
+
+export const reorderTacheListeItemsAction = actionClient
+  .metadata({ actionName: "reorderTacheListeItemsAction" })
+  .inputSchema(
+    z.object({
+      listeTemplateId: z.string().uuid("ID de pack invalide"),
+      entrepriseId: z.string().uuid("ID d'entreprise invalide"),
+      /** Tableau des IDs dans le nouvel ordre (du premier au dernier) */
+      orderedIds: z.array(z.string().uuid()).min(1),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const { listeTemplateId, entrepriseId, orderedIds } = parsedInput;
+
+    // Vérifier propriété du pack
+    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    if (!platformRole?.role) {
+      const [packRow] = await db
+        .select({ proprietaireEntrepriseId: tacheListesTemplates.proprietaireEntrepriseId })
+        .from(tacheListesTemplates)
+        .where(eq(tacheListesTemplates.id, listeTemplateId))
+        .limit(1);
+
+      if (!packRow) throw errors.notFound("Pack introuvable.");
+      if (packRow.proprietaireEntrepriseId !== entrepriseId) {
+        throw errors.forbidden("Vous ne pouvez modifier que vos propres packs.");
+      }
+    }
+
+    await db.transaction(async (tx) => {
+      for (let i = 0; i < orderedIds.length; i++) {
+        await tx
+          .update(tacheListeItems)
+          .set({ ordre: i + 1, updatedById: currentUser.id })
+          .where(
+            and(
+              eq(tacheListeItems.id, orderedIds[i]),
+              eq(tacheListeItems.listeTemplateId, listeTemplateId),
+            ),
+          );
+      }
+    });
+
+    const pack = await getTacheListeTemplateWithItems(listeTemplateId);
+
+    return { pack };
+  });

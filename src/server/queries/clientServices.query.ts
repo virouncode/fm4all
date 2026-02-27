@@ -57,6 +57,7 @@ export async function getPrestationsByEntreprise(
       modePlanning: clientServices.modePlanning,
       modeCommercial: clientServices.modeCommercial,
       notes: clientServices.notes,
+      tacheListeTemplateId: clientServices.tacheListeTemplateId,
       createdAt: clientServices.createdAt,
       updatedAt: clientServices.updatedAt,
     })
@@ -100,6 +101,7 @@ export async function getAllPrestations(options?: {
       modePlanning: clientServices.modePlanning,
       modeCommercial: clientServices.modeCommercial,
       notes: clientServices.notes,
+      tacheListeTemplateId: clientServices.tacheListeTemplateId,
       createdAt: clientServices.createdAt,
       updatedAt: clientServices.updatedAt,
     })
@@ -167,6 +169,7 @@ export async function getPrestationWithJoinsById(
       modePlanning: clientServices.modePlanning,
       modeCommercial: clientServices.modeCommercial,
       notes: clientServices.notes,
+      tacheListeTemplateId: clientServices.tacheListeTemplateId,
       createdAt: clientServices.createdAt,
       updatedAt: clientServices.updatedAt,
     })

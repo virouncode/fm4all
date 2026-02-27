@@ -7,6 +7,7 @@ import {
   clientServiceOccurrences,
   clientServicePerimetre,
   clientServices,
+  tacheListesTemplates,
 } from "@/db/schema/services";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
@@ -20,6 +21,7 @@ import {
 } from "@/server/queries/clientServices.query";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
 import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userSiteAttributions.utils";
+import { onClientServiceChanged } from "@/server/utils/clientServiceOccurrences.utils";
 import {
   getPrestationsQuerySchema,
   insertClientServiceToDbSchema,
@@ -647,4 +649,81 @@ export const deletePrestationAction = actionClient
       message: "Prestation supprimée avec succès.",
       prestationId,
     };
+  });
+
+// ==================== UPDATE CHECKLIST PAR DÉFAUT ====================
+
+export const updateClientServiceTacheListeAction = actionClient
+  .metadata({ actionName: "updateClientServiceTacheListeAction" })
+  .inputSchema(
+    z.object({
+      prestationId: z.string().uuid("ID de la prestation invalide"),
+      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
+      tacheListeTemplateId: z.string().uuid().nullable(),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const { prestationId, entrepriseId, tacheListeTemplateId } = parsedInput;
+
+    // Vérifier que la prestation appartient à l'entreprise
+    const prestation = await getPrestationById(prestationId);
+    if (!prestation || prestation.entrepriseId !== entrepriseId) {
+      throw errors.notFound("Prestation");
+    }
+
+    // Vérifier les permissions
+    const canManage = await canManagePrestation(
+      currentUser.id,
+      entrepriseId,
+      prestation.siteId,
+    );
+    if (!canManage) {
+      throw errors.forbidden(
+        "Vous devez être responsable de ce site pour modifier la checklist.",
+      );
+    }
+
+    // Si un pack est fourni, vérifier qu'il existe et appartient au bon service
+    if (tacheListeTemplateId) {
+      const [pack] = await db
+        .select({ serviceId: tacheListesTemplates.serviceId })
+        .from(tacheListesTemplates)
+        .where(eq(tacheListesTemplates.id, tacheListeTemplateId))
+        .limit(1);
+
+      if (!pack) throw errors.notFound("Pack de tâches");
+      if (pack.serviceId !== prestation.serviceId) {
+        throw errors.conflict(
+          "Ce pack de tâches n'est pas compatible avec le service de cette prestation.",
+        );
+      }
+    }
+
+    const [updated] = await db
+      .update(clientServices)
+      .set({
+        tacheListeTemplateId,
+        updatedById: currentUser.id,
+        updatedAt: new Date(),
+      })
+      .where(eq(clientServices.id, prestationId))
+      .returning();
+
+    if (!updated) throw errors.internal("Échec de la mise à jour.");
+
+    // Resync les occurrences futures (les tâches snapshotées seront remplacées)
+    await onClientServiceChanged({
+      clientServiceId: prestationId,
+      now: new Date(),
+    });
+
+    return { prestation: updated };
   });

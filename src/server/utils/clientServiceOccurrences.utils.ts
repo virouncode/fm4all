@@ -5,9 +5,11 @@ import {
   clientServiceOccurrences,
   clientServicePerimetre,
   clientServices,
+  occurrenceTaches,
+  tacheListeItems,
 } from "@/db/schema/services";
 import { sitesArborescence } from "@/db/schema/sites";
-import { and, eq, gte, inArray, isNull, lte, or, gt } from "drizzle-orm";
+import { and, asc, eq, gte, inArray, isNull, lte, or, gt } from "drizzle-orm";
 
 type DbOrTransaction =
   | typeof db
@@ -464,7 +466,51 @@ export function generateOccurrenceDates(
 }
 
 // ---------------------------------------------------------------------------
-// 4. FENÊTRE GLISSANTE — POINT D'ENTRÉE PRINCIPAL
+// 4. SNAPSHOT DES TÂCHES
+// ---------------------------------------------------------------------------
+
+/**
+ * Copie les items actifs d'un pack de tâches dans une occurrence (snapshot immuable).
+ * Appelé immédiatement après la création de chaque occurrence si un pack est résolu.
+ */
+async function snapshotOccurrenceTaches({
+  occurrenceId,
+  tacheListeTemplateId,
+  tx,
+}: {
+  occurrenceId: string;
+  tacheListeTemplateId: string;
+  tx?: DbOrTransaction;
+}) {
+  const dbClient = tx ?? db;
+
+  const items = await dbClient
+    .select()
+    .from(tacheListeItems)
+    .where(
+      and(
+        eq(tacheListeItems.listeTemplateId, tacheListeTemplateId),
+        eq(tacheListeItems.actif, true),
+      ),
+    )
+    .orderBy(asc(tacheListeItems.ordre));
+
+  if (items.length === 0) return;
+
+  await dbClient.insert(occurrenceTaches).values(
+    items.map((item) => ({
+      occurrenceId,
+      listeItemId: item.id,
+      ordre: item.ordre,
+      titre: item.titre,
+      description: item.description,
+      statut: "a_faire" as const,
+    })),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// 5. FENÊTRE GLISSANTE — POINT D'ENTRÉE PRINCIPAL
 // ---------------------------------------------------------------------------
 
 /**
@@ -549,7 +595,9 @@ export async function ensureOccurrencesWindow({
   let created = 0;
   let skipped = 0;
 
+  // Données intermédiaires pour résoudre le pack de tâches après insertion
   const toInsert: (typeof clientServiceOccurrences.$inferInsert)[] = [];
+  const toInsertExecutionIds: (string | null)[] = [];
 
   for (const siteId of effectiveSiteIds) {
     const dates = generateOccurrenceDates(csForGen, now, windowEnd);
@@ -587,6 +635,7 @@ export async function ensureOccurrencesWindow({
         executionId,
         statut: "planifiee",
       });
+      toInsertExecutionIds.push(executionId);
 
       // Prévenir les doublons au sein du même batch
       existingKeys.add(key);
@@ -595,7 +644,45 @@ export async function ensureOccurrencesWindow({
   }
 
   if (toInsert.length > 0) {
-    await dbClient.insert(clientServiceOccurrences).values(toInsert);
+    // Pré-charger le tacheListeTemplateId des exécutions concernées
+    const uniqueExecIds = [
+      ...new Set(toInsertExecutionIds.filter((id): id is string => id !== null)),
+    ];
+    const executionPackMap = new Map<string, string | null>();
+    if (uniqueExecIds.length > 0) {
+      const execRows = await dbClient
+        .select({
+          id: clientServiceExecutions.id,
+          tacheListeTemplateId: clientServiceExecutions.tacheListeTemplateId,
+        })
+        .from(clientServiceExecutions)
+        .where(inArray(clientServiceExecutions.id, uniqueExecIds));
+      for (const row of execRows) {
+        executionPackMap.set(row.id, row.tacheListeTemplateId ?? null);
+      }
+    }
+
+    // Insérer les occurrences et récupérer leurs IDs
+    const inserted = await dbClient
+      .insert(clientServiceOccurrences)
+      .values(toInsert)
+      .returning({ id: clientServiceOccurrences.id });
+
+    // Snapshot des tâches pour chaque occurrence si un pack est résolu
+    const defaultPackId = cs.tacheListeTemplateId ?? null;
+    for (let i = 0; i < inserted.length; i++) {
+      const execId = toInsertExecutionIds[i];
+      const execPackId = execId ? (executionPackMap.get(execId) ?? null) : null;
+      const resolvedPackId = execPackId ?? defaultPackId;
+
+      if (resolvedPackId) {
+        await snapshotOccurrenceTaches({
+          occurrenceId: inserted[i].id,
+          tacheListeTemplateId: resolvedPackId,
+          tx,
+        });
+      }
+    }
   }
 
   return { created, skipped };

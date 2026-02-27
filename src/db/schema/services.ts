@@ -97,6 +97,11 @@ export const clientServices = pgTable(
       .notNull()
       .default("direct"),
     notes: text("notes"),
+    tacheListeTemplateId: uuid("tache_liste_template_id").references(
+      () => tacheListesTemplates.id,
+      { onDelete: "set null" },
+    ),
+    // checklist par défaut pour les occurrences de cette prestation
     createdById: createdById(() => user),
     updatedById: updatedById(() => user),
     createdAt: createdAt(),
@@ -179,6 +184,11 @@ export const clientServiceExecutions = pgTable(
     priorite: smallint("priorite").notNull(),
     // plus grand = gagne ; convention : 0=global, 10=bâtiment, 20=zone
     actif: boolean("actif").notNull().default(true),
+    tacheListeTemplateId: uuid("tache_liste_template_id").references(
+      () => tacheListesTemplates.id,
+      { onDelete: "set null" },
+    ),
+    // checklist override du prestataire (prioritaire sur celle de la prestation)
     createdAt: createdAt(),
     updatedAt: updatedAt(),
     createdById: createdById(() => user),
@@ -264,27 +274,49 @@ export const clientServicePerimetre = pgTable(
   ],
 );
 
-export const servicesTachesTemplates = pgTable(
-  "services_taches_templates",
+/**
+ * Pack de tâches nommé (checklist header).
+ * Appartient à une entreprise (FM4ALL = pack système, client = pack client, prestataire = pack prestataire).
+ */
+export const tacheListesTemplates = pgTable(
+  "tache_listes_templates",
   {
     id: id(),
     serviceId: uuid("service_id")
       .notNull()
       .references(() => services.id, { onDelete: "cascade" }),
-
     proprietaireEntrepriseId: uuid("proprietaire_entreprise_id")
       .notNull()
-      .references(() => entreprises.id, {
-        onDelete: "cascade",
-      }),
-    serviceEntrepriseId: uuid("service_entreprise_id").references(
-      () => serviceEntreprises.id,
-      {
-        onDelete: "set null",
-      },
+      .references(() => entreprises.id, { onDelete: "cascade" }),
+    nom: varchar("nom", { length: 255 }).notNull(),
+    actif: boolean("actif").notNull().default(true),
+    createdById: createdById(() => user),
+    updatedById: updatedById(() => user),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    index("tache_listes_templates_service_idx").on(t.serviceId),
+    index("tache_listes_templates_proprietaire_idx").on(
+      t.proprietaireEntrepriseId,
     ),
-    ordre: smallint("ordre").notNull(), // ordre d’affichage / exécution
-    titre: varchar("titre", { length: 255 }).notNull(), //le titre de la tâche
+    index("tache_listes_templates_actif_idx").on(t.actif),
+  ],
+);
+
+/**
+ * Item d’un pack de tâches (anciennement services_taches_templates).
+ * Renommé + refonte : les items appartiennent maintenant à un pack (tacheListesTemplates).
+ */
+export const tacheListeItems = pgTable(
+  "tache_liste_items",
+  {
+    id: id(),
+    listeTemplateId: uuid("liste_template_id")
+      .notNull()
+      .references(() => tacheListesTemplates.id, { onDelete: "cascade" }),
+    ordre: smallint("ordre").notNull(),
+    titre: varchar("titre", { length: 255 }).notNull(),
     description: text("description"),
     actif: boolean("actif").notNull().default(true),
     dureeEstimeeMinutes: smallint("duree_estimee_minutes"),
@@ -294,14 +326,9 @@ export const servicesTachesTemplates = pgTable(
     updatedAt: updatedAt(),
   },
   (t) => [
-    index("service_task_templates_service_idx").on(t.serviceId),
-    index("service_task_templates_actif_idx").on(t.actif),
-    // Empêcher deux tâches au même ordre pour un service
-    uniqueIndex("service_task_templates_order_udx").on(
-      t.proprietaireEntrepriseId,
-      t.serviceId,
-      t.ordre,
-    ),
+    index("tache_liste_items_liste_template_idx").on(t.listeTemplateId),
+    index("tache_liste_items_actif_idx").on(t.actif),
+    uniqueIndex("tache_liste_items_order_udx").on(t.listeTemplateId, t.ordre),
   ],
 );
 
@@ -312,12 +339,10 @@ export const occurrenceTaches = pgTable(
     occurrenceId: uuid("occurrence_id")
       .notNull()
       .references(() => clientServiceOccurrences.id, { onDelete: "cascade" }),
-    tacheTemplateId: uuid("tache_template_id").references(
-      () => servicesTachesTemplates.id,
-      {
-        onDelete: "set null",
-      },
-    ),
+    listeItemId: uuid("liste_item_id").references(() => tacheListeItems.id, {
+      onDelete: "set null",
+    }),
+    // item d'origine du snapshot (null si tâche ad-hoc ou item supprimé)
     ordre: smallint("ordre").notNull(),
     titre: varchar("titre", { length: 255 }).notNull(),
     description: text("description"),
@@ -343,7 +368,7 @@ export const occurrenceTaches = pgTable(
   (t) => [
     index("occurrence_taches_occurrence_idx").on(t.occurrenceId),
     index("occurrence_taches_statut_idx").on(t.statut),
-    index("occurrence_taches_template_idx").on(t.tacheTemplateId),
+    index("occurrence_taches_liste_item_idx").on(t.listeItemId),
     uniqueIndex("occurrence_taches_order_udx").on(t.occurrenceId, t.ordre),
   ],
 );
