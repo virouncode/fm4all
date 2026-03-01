@@ -1,5 +1,6 @@
 "use client";
 
+import { RhfDateTimePicker } from "@/components/rhf/RhfDateTimePicker";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,9 +14,11 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { Link, useRouter } from "@/i18n/navigation";
 import {
+  updateOccurrenceDatesAction,
   updateOccurrenceStatutAction,
   updateOccurrenceTacheStatutAction,
 } from "@/server/actions/clientServiceOccurrencesActions";
@@ -24,6 +27,7 @@ import type {
   OccurrenceTacheDetail,
 } from "@/server/queries/clientServiceExecutions.query";
 import type { PrestationListItem } from "@/zod-schemas/clientServices.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ArrowLeft,
   Building2,
@@ -34,18 +38,23 @@ import {
   ListTodo,
   Loader2,
   MapPin,
+  Pencil,
   Play,
   User,
+  X,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
 import { formatDate, formatDateTime } from "../../../helpers";
 
 interface OccurrenceDetailClientProps {
   occurrence: OccurrenceDetail;
   prestation: PrestationListItem;
   taches: OccurrenceTacheDetail[];
-  canManage: boolean;
+  canManage: boolean; // contrôle total : annuler, non honorée
+  canInteract: boolean; // travail terrain : démarrer, terminer, tâches
 }
 
 // ==================== STATUT BADGES ====================
@@ -89,13 +98,28 @@ export function OccurrenceDetailClient({
   prestation,
   taches: initialTaches,
   canManage,
+  canInteract,
 }: OccurrenceDetailClientProps) {
   const router = useRouter();
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [isUpdatingStatut, setIsUpdatingStatut] = useState(false);
   const [taches, setTaches] = useState<OccurrenceTacheDetail[]>(initialTaches);
+  const [occurrenceStatut, setOccurrenceStatut] = useState(occurrence.statut);
+  const [isEditingDates, setIsEditingDates] = useState(false);
 
-  const occurrenceBadge = OCCURRENCE_STATUT[occurrence.statut];
+  // Dates prévues mutables en local (mises à jour après sauvegarde sans router.refresh)
+  const [dateDebutPrevue, setDateDebutPrevue] = useState<Date | null>(
+    occurrence.dateDebutPrevue,
+  );
+  const [dateFinPrevue, setDateFinPrevue] = useState<Date | null>(
+    occurrence.dateFinPrevue,
+  );
+
+  useEffect(() => {
+    setOccurrenceStatut(occurrence.statut);
+  }, [occurrence.statut]);
+
+  const occurrenceBadge = OCCURRENCE_STATUT[occurrenceStatut];
 
   const handleTransition = async (
     statut: "en_cours" | "terminee" | "non_honoree" | "annulee",
@@ -111,9 +135,30 @@ export function OccurrenceDetailClient({
     if (result?.serverError) {
       toast.error(result.serverError.message);
     } else if (result?.data) {
+      setOccurrenceStatut(statut);
       toast.success(result.data.message);
       router.refresh();
     }
+  };
+
+  // Utilisé par TacheRow en cascade : démarre l'occurrence silencieusement avant de démarrer une tâche
+  const startOccurrenceForCascade = async (): Promise<boolean> => {
+    const result = await updateOccurrenceStatutAction({
+      occurrenceId: occurrence.id,
+      prestationId: prestation.id,
+      entrepriseId: prestation.entrepriseId,
+      statut: "en_cours",
+    });
+    if (result?.serverError) {
+      toast.error(result.serverError.message);
+      return false;
+    }
+    if (result?.data) {
+      setOccurrenceStatut("en_cours");
+      toast.success("Intervention démarrée automatiquement");
+      return true;
+    }
+    return false;
   };
 
   const handleTacheTransition = async (
@@ -144,6 +189,10 @@ export function OccurrenceDetailClient({
       );
     }
   };
+
+  const canEditDates =
+    canManage &&
+    (occurrenceStatut === "planifiee" || occurrenceStatut === "en_cours");
 
   const allTasksDone =
     taches.length === 0 ||
@@ -201,63 +250,65 @@ export function OccurrenceDetailClient({
             {occurrenceBadge.label}
           </Badge>
 
-          {canManage && (
-            <>
-              {occurrence.statut === "planifiee" && (
-                <>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleTransition("en_cours")}
-                    disabled={isUpdatingStatut || !occurrence.executionId}
-                    title={
-                      !occurrence.executionId
-                        ? "Attribuez un prestataire avant de démarrer"
-                        : undefined
-                    }
-                  >
-                    <Play className="h-4 w-4" />
-                    Démarrer
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => setCancelDialogOpen(true)}
-                    disabled={isUpdatingStatut}
-                  >
-                    Annuler
-                  </Button>
-                </>
-              )}
+          {/* Bouton "Démarrer" occurrence : uniquement si pas de tâches (sinon la cascade des tâches s'en charge) */}
+          {canInteract &&
+            occurrenceStatut === "planifiee" &&
+            taches.length === 0 && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleTransition("en_cours")}
+                disabled={isUpdatingStatut || !occurrence.executionId}
+                title={
+                  !occurrence.executionId
+                    ? "Attribuez un prestataire avant de démarrer"
+                    : undefined
+                }
+              >
+                <Play className="h-4 w-4" />
+                Démarrer
+              </Button>
+            )}
 
-              {occurrence.statut === "en_cours" && (
-                <>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleTransition("terminee")}
-                    disabled={isUpdatingStatut || !allTasksDone}
-                    title={
-                      !allTasksDone
-                        ? "Toutes les tâches doivent être terminées ou N/A"
-                        : undefined
-                    }
-                  >
-                    <CheckCircle2 className="h-4 w-4" />
-                    Terminer
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="text-destructive"
-                    onClick={() => handleTransition("non_honoree")}
-                    disabled={isUpdatingStatut}
-                  >
-                    Non honorée
-                  </Button>
-                </>
-              )}
-            </>
+          {canInteract && occurrenceStatut === "en_cours" && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleTransition("terminee")}
+              disabled={isUpdatingStatut || !allTasksDone}
+              title={
+                !allTasksDone
+                  ? "Toutes les tâches doivent être terminées ou N/A"
+                  : undefined
+              }
+            >
+              <CheckCircle2 className="h-4 w-4" />
+              Terminer
+            </Button>
+          )}
+
+          {/* Boutons managériaux (annuler / non honorée) → canManage uniquement */}
+          {canManage && occurrenceStatut === "planifiee" && (
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={() => setCancelDialogOpen(true)}
+              disabled={isUpdatingStatut}
+            >
+              Annuler
+            </Button>
+          )}
+
+          {canManage && occurrenceStatut === "en_cours" && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-destructive"
+              onClick={() => handleTransition("non_honoree")}
+              disabled={isUpdatingStatut}
+            >
+              Non honorée
+            </Button>
           )}
 
           {isUpdatingStatut && (
@@ -276,25 +327,50 @@ export function OccurrenceDetailClient({
             <CardTitle className="flex items-center gap-2 text-base font-medium">
               <Calendar className="text-primary h-4 w-4" />
               Dates
+              {canEditDates && !isEditingDates && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="ml-auto"
+                  onClick={() => setIsEditingDates(true)}
+                >
+                  <Pencil className="h-3 w-3" />
+                  Modifier
+                </Button>
+              )}
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Début prévu</span>
-              <span className="font-medium">
-                {occurrence.dateDebutPrevue
-                  ? formatDateTime(occurrence.dateDebutPrevue)
-                  : "—"}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Fin prévue</span>
-              <span className="font-medium">
-                {occurrence.dateFinPrevue
-                  ? formatDateTime(occurrence.dateFinPrevue)
-                  : "—"}
-              </span>
-            </div>
+          <CardContent className="space-y-3 text-sm">
+            {isEditingDates ? (
+              <DateEditForm
+                occurrenceId={occurrence.id}
+                prestationId={prestation.id}
+                entrepriseId={prestation.entrepriseId}
+                initialDateDebut={dateDebutPrevue}
+                initialDateFin={dateFinPrevue}
+                onSaved={(debut, fin) => {
+                  setDateDebutPrevue(debut);
+                  setDateFinPrevue(fin);
+                  setIsEditingDates(false);
+                }}
+                onCancel={() => setIsEditingDates(false)}
+              />
+            ) : (
+              <>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Début prévu</span>
+                  <span className="font-medium">
+                    {dateDebutPrevue ? formatDateTime(dateDebutPrevue) : "—"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Fin prévue</span>
+                  <span className="font-medium">
+                    {dateFinPrevue ? formatDateTime(dateFinPrevue) : "—"}
+                  </span>
+                </div>
+              </>
+            )}
             {occurrence.dateDebutReelle && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Début réel</span>
@@ -345,8 +421,10 @@ export function OccurrenceDetailClient({
                 <TacheRow
                   key={tache.id}
                   tache={tache}
-                  canManage={canManage}
-                  occurrenceStatut={occurrence.statut}
+                  canInteract={canInteract}
+                  occurrenceStatut={occurrenceStatut}
+                  executionId={occurrence.executionId}
+                  onStartOccurrence={startOccurrenceForCascade}
                   onTransition={(statut) =>
                     handleTacheTransition(tache.id, statut)
                   }
@@ -420,13 +498,17 @@ export function OccurrenceDetailClient({
 
 function TacheRow({
   tache,
-  canManage,
+  canInteract,
   occurrenceStatut,
+  executionId,
+  onStartOccurrence,
   onTransition,
 }: {
   tache: OccurrenceTacheDetail;
-  canManage: boolean;
+  canInteract: boolean;
   occurrenceStatut: OccurrenceDetail["statut"];
+  executionId: string | null;
+  onStartOccurrence: () => Promise<boolean>;
   onTransition: (
     statut:
       | "en_cours"
@@ -448,14 +530,34 @@ function TacheRow({
       | "annulee",
   ) => {
     setIsUpdating(true);
+
+    // Cascade : toute interaction sur une tâche (démarrer OU marquer N/A) démarre
+    // l'occurrence automatiquement si elle est encore planifiée et qu'un prestataire est assigné.
+    if (
+      (statut === "en_cours" || statut === "non_applicable") &&
+      occurrenceStatut === "planifiee"
+    ) {
+      const started = await onStartOccurrence();
+      if (!started) {
+        setIsUpdating(false);
+        return;
+      }
+    }
+
     await onTransition(statut);
     setIsUpdating(false);
   };
 
-  // Les tâches ne sont interactives que si l'occurrence est en cours
-  const canInteract =
-    canManage &&
+  // Boutons visibles quand planifiée ou en cours ; disabled si planifiée SANS prestataire assigné
+  const showButtons =
+    canInteract &&
     (occurrenceStatut === "en_cours" || occurrenceStatut === "planifiee");
+  const buttonsDisabled =
+    isUpdating || (occurrenceStatut === "planifiee" && !executionId);
+  const disabledTitle =
+    occurrenceStatut === "planifiee" && !executionId
+      ? "Attribuez un prestataire à l'intervention avant de travailler sur les tâches"
+      : undefined;
 
   return (
     <div className="rounded-lg border p-3 text-sm">
@@ -492,7 +594,7 @@ function TacheRow({
           )}
 
           {/* Boutons de transition selon statut courant */}
-          {canInteract && !isUpdating && (
+          {showButtons && !isUpdating && (
             <>
               {tache.statut === "a_faire" && (
                 <>
@@ -501,7 +603,10 @@ function TacheRow({
                     variant="outline"
                     className="h-6 px-2 text-xs"
                     onClick={() => handleTransition("en_cours")}
+                    disabled={buttonsDisabled}
+                    title={disabledTitle}
                   >
+                    <Play className="h-4 w-4" />
                     Démarrer
                   </Button>
                   <Button
@@ -509,6 +614,8 @@ function TacheRow({
                     variant="ghost"
                     className="text-muted-foreground h-6 px-2 text-xs"
                     onClick={() => handleTransition("non_applicable")}
+                    disabled={buttonsDisabled}
+                    title={disabledTitle}
                   >
                     N/A
                   </Button>
@@ -521,6 +628,8 @@ function TacheRow({
                     variant="outline"
                     className="h-6 px-2 text-xs"
                     onClick={() => handleTransition("terminee")}
+                    disabled={buttonsDisabled}
+                    title={disabledTitle}
                   >
                     Terminer
                   </Button>
@@ -529,6 +638,8 @@ function TacheRow({
                     variant="ghost"
                     className="text-muted-foreground h-6 px-2 text-xs"
                     onClick={() => handleTransition("non_applicable")}
+                    disabled={buttonsDisabled}
+                    title={disabledTitle}
                   >
                     N/A
                   </Button>
@@ -539,5 +650,100 @@ function TacheRow({
         </div>
       </div>
     </div>
+  );
+}
+
+// ==================== DATE EDIT FORM ====================
+
+const occurrenceDatesSchema = z.object({
+  dateDebutPrevue: z.string().optional(),
+  dateFinPrevue: z.string().optional(),
+});
+type OccurrenceDatesFormType = z.infer<typeof occurrenceDatesSchema>;
+
+function DateEditForm({
+  occurrenceId,
+  prestationId,
+  entrepriseId,
+  initialDateDebut,
+  initialDateFin,
+  onSaved,
+  onCancel,
+}: {
+  occurrenceId: string;
+  prestationId: string;
+  entrepriseId: string;
+  initialDateDebut: Date | null;
+  initialDateFin: Date | null;
+  onSaved: (debut: Date | null, fin: Date | null) => void;
+  onCancel: () => void;
+}) {
+  const form = useForm<OccurrenceDatesFormType>({
+    resolver: zodResolver(occurrenceDatesSchema),
+    defaultValues: {
+      dateDebutPrevue: initialDateDebut?.toISOString() ?? "",
+      dateFinPrevue: initialDateFin?.toISOString() ?? "",
+    },
+  });
+
+  const { isSubmitting } = useFormState({ control: form.control });
+
+  const onSubmit = async (data: OccurrenceDatesFormType) => {
+    const result = await updateOccurrenceDatesAction({
+      occurrenceId,
+      prestationId,
+      entrepriseId,
+      dateDebutPrevue: data.dateDebutPrevue || null,
+      dateFinPrevue: data.dateFinPrevue || null,
+    });
+    if (result?.serverError) {
+      toast.error(result.serverError.message);
+      return;
+    }
+    if (result?.data) {
+      onSaved(result.data.dateDebutPrevue, result.data.dateFinPrevue);
+      toast.success("Dates mises à jour");
+    }
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+        <RhfDateTimePicker<OccurrenceDatesFormType>
+          name="dateDebutPrevue"
+          label="Début prévu"
+          timeFormat="24"
+          withError={false}
+        />
+        <RhfDateTimePicker<OccurrenceDatesFormType>
+          name="dateFinPrevue"
+          label="Fin prévue"
+          timeFormat="24"
+          withError={false}
+        />
+        <div className="flex gap-2 pt-1">
+          <Button
+            type="submit"
+            size="sm"
+            disabled={isSubmitting}
+            className="h-7 gap-1.5 px-3 text-xs"
+          >
+            {isSubmitting && <Loader2 className="h-3 w-3 animate-spin" />}
+            Enregistrer
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={onCancel}
+            disabled={isSubmitting}
+            className="h-7 gap-1.5 px-3 text-xs"
+          >
+            <X className="h-3 w-3" />
+            Annuler
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }

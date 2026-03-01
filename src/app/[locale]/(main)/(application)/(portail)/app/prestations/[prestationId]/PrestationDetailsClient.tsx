@@ -36,18 +36,17 @@ import {
   deleteExecutionAction,
   toggleExecutionActifAction,
 } from "@/server/actions/clientServiceExecutionsActions";
-import {
-  getOccurrencesPageAction,
-  updateOccurrenceStatutAction,
-} from "@/server/actions/clientServiceOccurrencesActions";
+import { getOccurrencesPageAction } from "@/server/actions/clientServiceOccurrencesActions";
 import {
   deletePrestationAction,
   updatePrestationStatutAction,
 } from "@/server/actions/clientServicesActions";
+import { getTacheListeTemplateAction } from "@/server/actions/tacheListesTemplatesActions";
 import {
   type ExecutionWithPrix,
   type OccurrenceListItem,
 } from "@/server/queries/clientServiceExecutions.query";
+import type { TacheListeTemplateWithItems } from "@/server/queries/tacheListesTemplates.query";
 import {
   type ClientServiceStatutType,
   type PrestationListItem,
@@ -67,7 +66,6 @@ import {
   Loader2,
   MapPin,
   Pencil,
-  Play,
   Power,
   RotateCcw,
   Settings,
@@ -75,7 +73,7 @@ import {
   XCircle,
   Zap,
 } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { PrestationFormDialog } from "../PrestationFormDialog";
 import {
@@ -294,7 +292,11 @@ export function PrestationDetailsClient({
           )}
 
           {/* Checklist par défaut */}
-          <ChecklistDefaultCard prestation={prestation} canManage={canManage} />
+          <ChecklistDefaultCard
+            prestation={prestation}
+            canManage={canManage}
+            isPlateforme={isPlateforme}
+          />
 
           <div className="grid gap-4 md:grid-cols-2">
             {/* Fréquence & Planning */}
@@ -440,8 +442,6 @@ export function PrestationDetailsClient({
             initialOccurrences={occurrences}
             totalOccurrences={totalOccurrences}
             prestation={prestation}
-            canManage={canManage}
-            onUpdate={() => router.refresh()}
             onCountChange={setInterventionsCount}
             availableSites={availableSites}
           />
@@ -1007,16 +1007,12 @@ function InterventionsTab({
   initialOccurrences,
   totalOccurrences,
   prestation,
-  canManage,
-  onUpdate,
   onCountChange,
   availableSites,
 }: {
   initialOccurrences: OccurrenceListItem[];
   totalOccurrences: number;
   prestation: PrestationListItem;
-  canManage: boolean;
-  onUpdate: () => void;
   onCountChange: (count: number) => void;
   availableSites: Array<{ id: string; nom: string }>;
 }) {
@@ -1187,8 +1183,6 @@ function InterventionsTab({
                 key={occ.id}
                 occ={occ}
                 prestation={prestation}
-                canManage={canManage}
-                onUpdate={onUpdate}
               />
             ))}
             {/* Sentinel d'infinite scroll */}
@@ -1222,176 +1216,52 @@ function InterventionsTab({
 function OccurrenceRow({
   occ,
   prestation,
-  canManage,
-  onUpdate,
 }: {
   occ: OccurrenceListItem;
   prestation: PrestationListItem;
-  canManage: boolean;
-  onUpdate: () => void;
 }) {
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const badge = OCCURRENCE_STATUT_LABELS[occ.statut] ?? {
     label: occ.statut,
     className: "bg-gray-100 text-gray-600",
   };
 
-  const handleTransition = async (
-    statut: "en_cours" | "terminee" | "non_honoree" | "annulee",
-  ) => {
-    setIsUpdating(true);
-    const result = await updateOccurrenceStatutAction({
-      occurrenceId: occ.id,
-      prestationId: prestation.id,
-      entrepriseId: prestation.entrepriseId,
-      statut,
-    });
-    if (result?.serverError) {
-      toast.error(result.serverError.message);
-    } else if (result?.data) {
-      toast.success(result.data.message);
-      onUpdate();
-    }
-    setIsUpdating(false);
-  };
-
   return (
-    <>
-      <div className="hover:border-primary/30 flex items-center justify-between px-4 py-3 text-sm transition-all hover:shadow-sm">
-        {/* Infos gauche — cliquable → detail */}
-        <Link
-          href={{
-            pathname:
-              "/app/prestations/[prestationId]/occurrences/[occurrenceId]",
-            params: { prestationId: prestation.id, occurrenceId: occ.id },
-          }}
-          className="flex min-w-0 flex-1 items-start gap-3"
-        >
-          <Calendar className="text-muted-foreground mt-0.5 h-4 w-4 flex-shrink-0" />
-          <div className="min-w-0 space-y-0.5">
-            <span className="font-medium">
-              {occ.dateDebutPrevue
-                ? formatDateTime(occ.dateDebutPrevue)
-                : "Date non définie"}
-            </span>
-            {occ.siteNom && (
-              <div className="text-muted-foreground flex items-center gap-1 text-xs">
-                <MapPin className="h-3 w-3 flex-shrink-0" />
-                {occ.siteNom}
-              </div>
-            )}
-          </div>
-        </Link>
-
-        {/* Badges + actions droite */}
-        <div className="flex items-center gap-2">
-          {/* Badge "À attribuer" */}
-          {!occ.executionId && (
-            <Badge className="bg-orange-100 text-xs text-orange-700">
-              À attribuer
-            </Badge>
-          )}
-
-          {/* Badge statut */}
-          <Badge className={`text-xs ${badge.className}`}>{badge.label}</Badge>
-
-          {/* Boutons d'action (uniquement si canManage) */}
-          {canManage && occ.statut === "planifiee" && (
-            <>
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-7 gap-1 text-xs"
-                onClick={() => handleTransition("en_cours")}
-                disabled={isUpdating || !occ.executionId}
-                title={
-                  !occ.executionId
-                    ? "Attribuez un prestataire avant de démarrer"
-                    : "Démarrer l'intervention"
-                }
-              >
-                <Play className="h-3 w-3" />
-                Démarrer
-              </Button>
-              <Button
-                size="sm"
-                variant="destructive"
-                className="h-7 text-xs"
-                onClick={() => setCancelDialogOpen(true)}
-                disabled={isUpdating}
-              >
-                Annuler
-              </Button>
-            </>
-          )}
-
-          {canManage && occ.statut === "en_cours" && (
-            <>
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-7 gap-1 text-xs"
-                onClick={() => handleTransition("terminee")}
-                disabled={isUpdating}
-              >
-                Terminer
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="text-destructive h-7 text-xs"
-                onClick={() => handleTransition("non_honoree")}
-                disabled={isUpdating}
-              >
-                Non honorée
-              </Button>
-            </>
+    <Link
+      href={{
+        pathname:
+          "/app/prestations/[prestationId]/occurrences/[occurrenceId]",
+        params: { prestationId: prestation.id, occurrenceId: occ.id },
+      }}
+      className="hover:border-primary/30 flex items-center justify-between px-4 py-3 text-sm transition-all hover:shadow-sm"
+    >
+      {/* Infos gauche */}
+      <div className="flex min-w-0 flex-1 items-start gap-3">
+        <Calendar className="text-muted-foreground mt-0.5 h-4 w-4 flex-shrink-0" />
+        <div className="min-w-0 space-y-0.5">
+          <span className="font-medium">
+            {occ.dateDebutPrevue
+              ? formatDateTime(occ.dateDebutPrevue)
+              : "Date non définie"}
+          </span>
+          {occ.siteNom && (
+            <div className="text-muted-foreground flex items-center gap-1 text-xs">
+              <MapPin className="h-3 w-3 flex-shrink-0" />
+              {occ.siteNom}
+            </div>
           )}
         </div>
       </div>
 
-      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Annuler cette intervention ?</AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <div className="space-y-2 text-sm">
-                <p>
-                  L&apos;intervention du{" "}
-                  <strong>
-                    {occ.dateDebutPrevue
-                      ? formatDateTime(occ.dateDebutPrevue)
-                      : "date non définie"}
-                  </strong>{" "}
-                  passera au statut <strong>Annulée</strong>.
-                </p>
-                <p className="text-muted-foreground">
-                  Cette action est irréversible. L&apos;intervention restera
-                  visible dans l&apos;historique mais ne sera plus exécutée.
-                  Elle ne sera pas remplacée par une nouvelle occurrence.
-                </p>
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isUpdating}>
-              Conserver
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                setCancelDialogOpen(false);
-                void handleTransition("annulee");
-              }}
-              disabled={isUpdating}
-              variant="destructive"
-            >
-              {isUpdating ? "Annulation..." : "Confirmer l'annulation"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
+      {/* Badges droite */}
+      <div className="flex items-center gap-2">
+        {!occ.executionId && (
+          <Badge className="bg-orange-100 text-xs text-orange-700">
+            À attribuer
+          </Badge>
+        )}
+        <Badge className={`text-xs ${badge.className}`}>{badge.label}</Badge>
+      </div>
+    </Link>
   );
 }
 
@@ -1593,13 +1463,36 @@ function OccurrencesSortDialog({
 function ChecklistDefaultCard({
   prestation,
   canManage,
+  isPlateforme,
 }: {
   prestation: PrestationListItem;
   canManage: boolean;
+  isPlateforme: boolean;
 }) {
   const router = useRouter();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [managerOpen, setManagerOpen] = useState(false);
+  const [packDetails, setPackDetails] =
+    useState<TacheListeTemplateWithItems | null>(null);
+  const [loadingPack, setLoadingPack] = useState(false);
+
+  useEffect(() => {
+    if (!prestation.tacheListeTemplateId) {
+      setPackDetails(null);
+      return;
+    }
+    async function loadPack() {
+      setLoadingPack(true);
+      const result = await getTacheListeTemplateAction({
+        id: prestation.tacheListeTemplateId!,
+      });
+      if (result?.data?.pack) {
+        setPackDetails(result.data.pack);
+      }
+      setLoadingPack(false);
+    }
+    void loadPack();
+  }, [prestation.tacheListeTemplateId]);
 
   return (
     <>
@@ -1608,7 +1501,7 @@ function ChecklistDefaultCard({
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-base font-medium">
               <ClipboardList className="text-primary h-4 w-4" />
-              Checklist par défaut
+              Checklist
             </CardTitle>
             {canManage && (
               <div className="flex items-center gap-2">
@@ -1631,15 +1524,62 @@ function ChecklistDefaultCard({
             )}
           </div>
         </CardHeader>
-        <CardContent className="text-sm">
+        <CardContent className="space-y-3 text-sm">
           {prestation.tacheListeTemplateId ? (
-            <p className="font-medium text-green-700">Checklist configurée</p>
+            loadingPack ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
+                <span className="text-muted-foreground text-xs">
+                  Chargement...
+                </span>
+              </div>
+            ) : packDetails ? (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-green-600" />
+                  <span className="font-medium">{packDetails.nom}</span>
+                  <Badge variant="outline" className="text-xs">
+                    {packDetails.items.length} tâche
+                    {packDetails.items.length !== 1 ? "s" : ""}
+                  </Badge>
+                </div>
+                {packDetails.items.length > 0 && (
+                  <div className="bg-muted/30 divide-y rounded-md border">
+                    {packDetails.items.slice(0, 5).map((item, idx) => (
+                      <div
+                        key={item.id}
+                        className="flex items-start gap-2 px-3 py-1.5 text-xs"
+                      >
+                        <span className="text-muted-foreground w-5 flex-shrink-0 text-center">
+                          {idx + 1}.
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <span className="font-medium">{item.titre}</span>
+                          {item.description && (
+                            <p className="text-muted-foreground mt-0.5 truncate">
+                              {item.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                    {packDetails.items.length > 5 && (
+                      <div className="text-muted-foreground px-3 py-1.5 text-xs italic">
+                        +{packDetails.items.length - 5} autres tâches…
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="font-medium text-green-700">Checklist configurée</p>
+            )
           ) : (
             <p className="text-muted-foreground italic">
               Aucune checklist configurée
             </p>
           )}
-          <p className="text-muted-foreground mt-1 text-xs">
+          <p className="text-muted-foreground text-xs">
             Utilisée par défaut pour toutes les interventions, sauf si une
             checklist spécifique est définie au niveau de l&apos;exécution.
           </p>
@@ -1664,9 +1604,18 @@ function ChecklistDefaultCard({
           />
           <TacheListeManagerDialog
             open={managerOpen}
-            onOpenChange={setManagerOpen}
+            onOpenChange={(open) => {
+              setManagerOpen(open);
+              // Rafraîchit les données serveur à la fermeture pour refléter
+              // les suppressions/modifications qui impactent cette prestation
+              if (!open) router.refresh();
+            }}
             serviceId={prestation.serviceId}
-            proprietaireEntrepriseId={prestation.entrepriseId}
+            proprietaireEntrepriseId={
+              isPlateforme ? null : prestation.entrepriseId
+            }
+            clientEntrepriseId={prestation.entrepriseId}
+            clientEntrepriseNom={prestation.entrepriseNom ?? undefined}
           />
         </>
       )}

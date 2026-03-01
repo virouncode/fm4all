@@ -19,6 +19,7 @@ import { z } from "zod";
 
 // ==================== HELPERS ====================
 
+// Contrôle total : plateforme OU responsable_site (annulation, non-honorée, etc.)
 async function canManagePrestation(
   userId: string,
   entrepriseId: string,
@@ -33,6 +34,23 @@ async function canManagePrestation(
     entrepriseId,
   });
   return siteRole === "responsable_site";
+}
+
+// Interaction terrain : plateforme OU responsable_site OU intervenant_site (démarrer, terminer, tâches)
+async function canInteractWithPrestation(
+  userId: string,
+  entrepriseId: string,
+  siteId: string,
+): Promise<boolean> {
+  const platformRole = await getUserPlateformeAdhesion(userId);
+  if (platformRole?.role) return true;
+
+  const siteRole = await resolveUserEffectiveRoleOnSite({
+    userId,
+    siteId,
+    entrepriseId,
+  });
+  return siteRole === "responsable_site" || siteRole === "intervenant_site";
 }
 
 // Transitions autorisées par statut courant
@@ -74,16 +92,33 @@ export const updateOccurrenceStatutAction = actionClient
       throw errors.notFound("Prestation");
     }
 
-    // Vérifier les permissions
-    const canManage = await canManagePrestation(
-      currentUser.id,
-      entrepriseId,
-      prestation.siteId,
-    );
-    if (!canManage) {
-      throw errors.forbidden(
-        "Vous devez être responsable de ce site pour modifier le statut d'une intervention.",
+    // Vérifier les permissions selon le type de transition
+    // annulee / non_honoree = décision managériale → canManage requis
+    // en_cours / terminee   = travail terrain → canInteract suffit
+    const isManagementTransition = newStatut === "annulee" || newStatut === "non_honoree";
+
+    if (isManagementTransition) {
+      const canManage = await canManagePrestation(
+        currentUser.id,
+        entrepriseId,
+        prestation.siteId,
       );
+      if (!canManage) {
+        throw errors.forbidden(
+          "Vous devez être responsable de ce site pour annuler ou marquer une intervention comme non honorée.",
+        );
+      }
+    } else {
+      const canInteract = await canInteractWithPrestation(
+        currentUser.id,
+        entrepriseId,
+        prestation.siteId,
+      );
+      if (!canInteract) {
+        throw errors.forbidden(
+          "Vous devez être responsable ou intervenant de ce site pour modifier le statut d'une intervention.",
+        );
+      }
     }
 
     // Charger l'occurrence
@@ -278,6 +313,89 @@ export const getOccurrenceTachesAction = actionClient
     return { taches };
   });
 
+// ==================== UPDATE OCCURRENCE DATES ====================
+
+export const updateOccurrenceDatesAction = actionClient
+  .metadata({ actionName: "updateOccurrenceDatesAction" })
+  .inputSchema(
+    z.object({
+      occurrenceId: z.string().uuid("ID de l'occurrence invalide"),
+      prestationId: z.string().uuid("ID de la prestation invalide"),
+      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
+      dateDebutPrevue: z.string().nullable(),
+      dateFinPrevue: z.string().nullable(),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const { occurrenceId, prestationId, entrepriseId, dateDebutPrevue, dateFinPrevue } =
+      parsedInput;
+
+    const prestation = await getPrestationById(prestationId);
+    if (!prestation || prestation.entrepriseId !== entrepriseId) {
+      throw errors.notFound("Prestation");
+    }
+
+    const canManage = await canManagePrestation(
+      currentUser.id,
+      entrepriseId,
+      prestation.siteId,
+    );
+    if (!canManage) {
+      throw errors.forbidden(
+        "Vous devez être responsable de ce site pour modifier les dates d'une intervention.",
+      );
+    }
+
+    const [occurrence] = await db
+      .select({ id: clientServiceOccurrences.id, statut: clientServiceOccurrences.statut })
+      .from(clientServiceOccurrences)
+      .where(
+        and(
+          eq(clientServiceOccurrences.id, occurrenceId),
+          eq(clientServiceOccurrences.clientServiceId, prestationId),
+        ),
+      )
+      .limit(1);
+
+    if (!occurrence) throw errors.notFound("Intervention");
+
+    if (
+      occurrence.statut === "terminee" ||
+      occurrence.statut === "annulee" ||
+      occurrence.statut === "non_honoree"
+    ) {
+      throw errors.conflict(
+        "Impossible de modifier les dates d'une intervention terminée, annulée ou non honorée.",
+      );
+    }
+
+    const [updated] = await db
+      .update(clientServiceOccurrences)
+      .set({
+        dateDebutPrevue: dateDebutPrevue ? new Date(dateDebutPrevue) : null,
+        dateFinPrevue: dateFinPrevue ? new Date(dateFinPrevue) : null,
+        updatedById: currentUser.id,
+        updatedAt: new Date(),
+      })
+      .where(eq(clientServiceOccurrences.id, occurrenceId))
+      .returning();
+
+    if (!updated) throw errors.internal("Échec de la mise à jour des dates.");
+
+    return {
+      dateDebutPrevue: updated.dateDebutPrevue,
+      dateFinPrevue: updated.dateFinPrevue,
+    };
+  });
+
 // ==================== UPDATE OCCURRENCE TACHE STATUT ====================
 
 // Transitions autorisées par statut courant pour les tâches
@@ -312,21 +430,38 @@ export const updateOccurrenceTacheStatutAction = actionClient
     const { tacheId, occurrenceId, prestationId, entrepriseId, statut: newStatut } =
       parsedInput;
 
-    // Vérifier permissions (plateforme OU responsable_site)
+    // Vérifier permissions selon le type de transition
+    // non_honoree / annulee = décision managériale → canManage requis
+    // en_cours / terminee / non_applicable = travail terrain → canInteract suffit
     const prestation = await getPrestationById(prestationId);
     if (!prestation || prestation.entrepriseId !== entrepriseId) {
       throw errors.notFound("Prestation");
     }
 
-    const canManage = await canManagePrestation(
-      currentUser.id,
-      entrepriseId,
-      prestation.siteId,
-    );
-    if (!canManage) {
-      throw errors.forbidden(
-        "Vous devez être responsable de ce site pour modifier le statut d'une tâche.",
+    const isManagementTransition = newStatut === "non_honoree" || newStatut === "annulee";
+
+    if (isManagementTransition) {
+      const canManage = await canManagePrestation(
+        currentUser.id,
+        entrepriseId,
+        prestation.siteId,
       );
+      if (!canManage) {
+        throw errors.forbidden(
+          "Vous devez être responsable de ce site pour marquer une tâche comme non honorée ou l'annuler.",
+        );
+      }
+    } else {
+      const canInteract = await canInteractWithPrestation(
+        currentUser.id,
+        entrepriseId,
+        prestation.siteId,
+      );
+      if (!canInteract) {
+        throw errors.forbidden(
+          "Vous devez être responsable ou intervenant de ce site pour modifier le statut d'une tâche.",
+        );
+      }
     }
 
     // Charger la tâche (avec vérification que l'occurrence correspond)
@@ -349,6 +484,21 @@ export const updateOccurrenceTacheStatutAction = actionClient
       throw errors.conflict(
         `Transition invalide : ${tache.statut} → ${newStatut}.`,
       );
+    }
+
+    // Guard : une tâche ne peut démarrer que si l'intervention est elle-même en cours
+    if (newStatut === "en_cours") {
+      const [occRow] = await db
+        .select({ statut: clientServiceOccurrences.statut })
+        .from(clientServiceOccurrences)
+        .where(eq(clientServiceOccurrences.id, occurrenceId))
+        .limit(1);
+
+      if (!occRow || occRow.statut !== "en_cours") {
+        throw errors.conflict(
+          "Impossible de démarrer une tâche : l'intervention n'est pas encore démarrée.",
+        );
+      }
     }
 
     const now = new Date();

@@ -219,6 +219,10 @@ export function RhfDateTimePicker<S extends FieldValues>({
         };
 
         const setTimePart = (patch: Partial<TimePickerValue>) => {
+          // Si aucune date n'a encore été choisie, ne pas commiter silencieusement
+          // "aujourd'hui" simplement parce que l'utilisateur a touché un select d'heure.
+          if (isEmpty) return;
+
           const nextParts: TimePickerValue = { ...timeParts, ...patch };
           let nextDt = applyTime(dateStart, nextParts);
           nextDt = clampToBounds(nextDt);

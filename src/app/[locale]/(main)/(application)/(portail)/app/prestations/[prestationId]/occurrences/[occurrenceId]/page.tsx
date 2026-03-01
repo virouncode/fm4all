@@ -47,14 +47,16 @@ export default async function OccurrenceDetailPage({
   if (!occurrence || occurrence.clientServiceId !== prestationId) notFound();
 
   // 5. Calculer les permissions
-  let canManage = isPlateforme;
-  if (!canManage) {
+  let canManage = isPlateforme;   // contrôle total (annulation, non-honorée)
+  let canInteract = isPlateforme; // travail terrain (démarrer, terminer, tâches)
+  if (!isPlateforme) {
     const siteRole = await resolveUserEffectiveRoleOnSite({
       userId: currentUser.id,
       siteId: prestation.siteId,
       entrepriseId: prestation.entrepriseId,
     });
     canManage = siteRole === "responsable_site";
+    canInteract = siteRole === "responsable_site" || siteRole === "intervenant_site";
   }
 
   // 6. Charger les tâches
@@ -66,6 +68,7 @@ export default async function OccurrenceDetailPage({
       prestation={prestation}
       taches={taches}
       canManage={canManage}
+      canInteract={canInteract}
     />
   );
 }
