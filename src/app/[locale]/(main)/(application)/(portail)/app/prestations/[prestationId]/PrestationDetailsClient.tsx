@@ -98,6 +98,7 @@ interface PrestationDetailsClientProps {
   totalOccurrences: number;
   totalNonAssigned: number;
   availableSites: Array<{ id: string; nom: string }>;
+  defaultTab?: string;
 }
 
 const JOUR_LABELS: Record<number, string> = {
@@ -136,8 +137,10 @@ export function PrestationDetailsClient({
   totalOccurrences,
   totalNonAssigned,
   availableSites,
+  defaultTab = "parametres",
 }: PrestationDetailsClientProps) {
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState(defaultTab);
   const [executions, setExecutions] =
     useState<ExecutionWithPrix[]>(initialExecutions);
   const [interventionsCount, setInterventionsCount] =
@@ -217,7 +220,18 @@ export function PrestationDetailsClient({
       <Separator className="my-6 flex-shrink-0" />
 
       {/* ==================== TABS ==================== */}
-      <Tabs defaultValue="parametres" className="flex min-h-0 flex-1 flex-col">
+      <Tabs
+        value={activeTab}
+        onValueChange={(tab) => {
+          setActiveTab(tab);
+          router.replace({
+            pathname: "/app/prestations/[prestationId]",
+            params: { prestationId: prestation.id },
+            query: { tab },
+          });
+        }}
+        className="flex min-h-0 flex-1 flex-col"
+      >
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="parametres" className="gap-2">
             <Settings className="h-4 w-4" />

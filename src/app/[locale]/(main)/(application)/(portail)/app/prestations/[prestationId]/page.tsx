@@ -16,11 +16,15 @@ import { PrestationDetailsClient } from "./PrestationDetailsClient";
 
 export default async function PrestationDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ prestationId: string }>;
+  searchParams: Promise<{ tab?: string }>;
 }) {
   const resolvedParams = await params;
   const { prestationId } = resolvedParams;
+  const resolvedSearchParams = await searchParams;
+  const defaultTab = resolvedSearchParams.tab ?? "parametres";
 
   // 1. Auth
   const session = await getSession();
@@ -82,6 +86,7 @@ export default async function PrestationDetailPage({
       totalOccurrences={totalOccurrences}
       totalNonAssigned={totalNonAssigned}
       availableSites={availableSites}
+      defaultTab={defaultTab}
     />
   );
 }

@@ -246,6 +246,12 @@ export function OccurrenceDetailClient({
 
         {/* Statut badge + actions */}
         <div className="flex flex-wrap items-center gap-2">
+          {!occurrence.executionId && (
+            <Badge className="bg-orange-100 text-xs text-orange-700">
+              À attribuer
+            </Badge>
+          )}
+
           <Badge className={occurrenceBadge.className}>
             {occurrenceBadge.label}
           </Badge>
@@ -292,6 +298,7 @@ export function OccurrenceDetailClient({
             <Button
               size="sm"
               variant="destructive"
+              className="ml-auto"
               onClick={() => setCancelDialogOpen(true)}
               disabled={isUpdatingStatut}
             >
@@ -303,7 +310,7 @@ export function OccurrenceDetailClient({
             <Button
               size="sm"
               variant="ghost"
-              className="text-destructive"
+              className="ml-auto text-destructive"
               onClick={() => handleTransition("non_honoree")}
               disabled={isUpdatingStatut}
             >
@@ -315,6 +322,24 @@ export function OccurrenceDetailClient({
             <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
           )}
         </div>
+
+        {/* Message d'aide si aucun prestataire assigné */}
+        {!occurrence.executionId && (
+          <p className="text-muted-foreground text-sm">
+            Aucun prestataire n&apos;est encore assigné à cette intervention.{" "}
+            <Link
+              href={{
+                pathname: "/app/prestations/[prestationId]",
+                params: { prestationId: prestation.id },
+                query: { tab: "execution" },
+              }}
+              className="text-primary font-medium underline underline-offset-2"
+            >
+              Ajoutez une exécution dans la prestation
+            </Link>{" "}
+            pour l&apos;attribuer.
+          </p>
+        )}
       </div>
 
       <Separator className="my-5 flex-shrink-0" />
