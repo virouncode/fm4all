@@ -481,6 +481,11 @@ export const documentCategorieCT = [
   // Générique
   { code: "document", name: "Document" },
   { code: "piece_jointe", name: "Pièce jointe" },
+
+  // Ticket
+  { code: "ticket_piece_jointe", name: "Pièce jointe (ticket)" },
+  { code: "ticket_message_piece_jointe", name: "Pièce jointe (message ticket)" },
+  { code: "tache_piece_jointe", name: "Pièce jointe (tâche)" },
 ] as const;
 
 export const documentCategorieCodes = documentCategorieCT.map(
@@ -634,12 +639,11 @@ export const executionPeriodeFacturationCT = [
   { code: "annee", name: "Année" },
 ] as const;
 
-export const executionPeriodeFacturationCodes = executionPeriodeFacturationCT.map(
-  (i) => i.code,
-) as unknown as [
-  (typeof executionPeriodeFacturationCT)[number]["code"],
-  ...(typeof executionPeriodeFacturationCT)[number]["code"][],
-];
+export const executionPeriodeFacturationCodes =
+  executionPeriodeFacturationCT.map((i) => i.code) as unknown as [
+    (typeof executionPeriodeFacturationCT)[number]["code"],
+    ...(typeof executionPeriodeFacturationCT)[number]["code"][],
+  ];
 
 export const toCodeTableName = (
   code: string,

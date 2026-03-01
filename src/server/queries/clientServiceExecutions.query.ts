@@ -1,6 +1,7 @@
 import "server-only";
 
 import { db } from "@/db";
+import { documents, documentsLinks } from "@/db/schema/documents";
 import {
   clientServiceExecutionPrix,
   clientServiceExecutions,
@@ -11,7 +12,7 @@ import { serviceEntreprises } from "@/db/schema/entreprises";
 import { entreprises } from "@/db/schema/entreprises";
 import { sites } from "@/db/schema/sites";
 import { occurrenceTaches } from "@/db/schema/services";
-import { and, asc, count, desc, eq, gte, isNull, or } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, inArray, isNull, or } from "drizzle-orm";
 
 /**
  * Récupère la liste des prestataires avec lesquels un client a une relation
@@ -364,6 +365,15 @@ export type OccurrenceDetail = {
   updatedAt: Date;
 };
 
+export type TachePieceJointe = {
+  linkId: string;
+  documentId: string;
+  storageKey: string;
+  filename: string;
+  mimeType: string;
+  sizeBytes: number;
+};
+
 export type OccurrenceTacheDetail = {
   id: string;
   occurrenceId: string;
@@ -375,6 +385,7 @@ export type OccurrenceTacheDetail = {
   notes: string | null;
   startedAt: Date | null;
   doneAt: Date | null;
+  piecesJointes: TachePieceJointe[];
 };
 
 /**
@@ -418,7 +429,7 @@ export async function getOccurrenceWithDetailsById(
 }
 
 /**
- * Récupère les tâches d'une occurrence (ordonnées).
+ * Récupère les tâches d'une occurrence (ordonnées) avec leurs pièces jointes.
  */
 export async function getOccurrenceTaches(
   occurrenceId: string,
@@ -440,5 +451,41 @@ export async function getOccurrenceTaches(
     .where(eq(occurrenceTaches.occurrenceId, occurrenceId))
     .orderBy(asc(occurrenceTaches.ordre));
 
-  return rows as OccurrenceTacheDetail[];
+  if (rows.length === 0) return [];
+
+  // Charger les PJs de toutes les tâches en une seule requête
+  const tacheIds = rows.map((r) => r.id);
+  const pjRows = await db
+    .select({
+      tacheId: documentsLinks.occurrenceTacheId,
+      linkId: documentsLinks.id,
+      documentId: documents.id,
+      storageKey: documents.storageKey,
+      filename: documents.filename,
+      mimeType: documents.mimeType,
+      sizeBytes: documents.sizeBytes,
+    })
+    .from(documentsLinks)
+    .innerJoin(documents, eq(documents.id, documentsLinks.documentId))
+    .where(inArray(documentsLinks.occurrenceTacheId, tacheIds));
+
+  // Grouper par tacheId
+  const pjByTacheId = new Map<string, TachePieceJointe[]>();
+  for (const pj of pjRows) {
+    if (!pj.tacheId) continue;
+    if (!pjByTacheId.has(pj.tacheId)) pjByTacheId.set(pj.tacheId, []);
+    pjByTacheId.get(pj.tacheId)!.push({
+      linkId: pj.linkId,
+      documentId: pj.documentId,
+      storageKey: pj.storageKey,
+      filename: pj.filename,
+      mimeType: pj.mimeType,
+      sizeBytes: pj.sizeBytes,
+    });
+  }
+
+  return rows.map((row) => ({
+    ...row,
+    piecesJointes: pjByTacheId.get(row.id) ?? [],
+  }));
 }

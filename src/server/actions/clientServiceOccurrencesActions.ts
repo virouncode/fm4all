@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/db";
+import { documents, documentsLinks } from "@/db/schema/documents";
 import { clientServiceOccurrences, occurrenceTaches } from "@/db/schema/services";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
@@ -13,7 +14,9 @@ import {
   getOccurrencesByPrestationId,
 } from "@/server/queries/clientServiceExecutions.query";
 import { getUserAdhesion } from "@/server/queries/userAdhesions.query";
-import { and, asc, eq } from "drizzle-orm";
+import { promoteS3Key, s3, S3_BUCKET } from "@/server/s3/s3";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { and, asc, count, eq } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
 import { z } from "zod";
 
@@ -525,4 +528,219 @@ export const updateOccurrenceTacheStatutAction = actionClient
     if (!updated) throw errors.internal("Échec de la mise à jour de la tâche.");
 
     return { tache: updated };
+  });
+
+// ==================== TACHE PIECE JOINTE — ADD ====================
+
+export const addTachePieceJointeAction = actionClient
+  .metadata({ actionName: "addTachePieceJointeAction" })
+  .inputSchema(
+    z.object({
+      tacheId: z.string().uuid("ID de la tâche invalide"),
+      occurrenceId: z.string().uuid("ID de l'occurrence invalide"),
+      prestationId: z.string().uuid("ID de la prestation invalide"),
+      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
+      storageKey: z.string().min(1, "Clé S3 requise"),
+      filename: z.string().min(1, "Nom de fichier requis"),
+      mimeType: z.string().min(1, "Type MIME requis"),
+      sizeBytes: z.number().int().positive("Taille invalide"),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const { tacheId, occurrenceId, prestationId, entrepriseId, storageKey, filename, mimeType, sizeBytes } =
+      parsedInput;
+
+    const prestation = await getPrestationById(prestationId);
+    if (!prestation || prestation.entrepriseId !== entrepriseId) {
+      throw errors.notFound("Prestation");
+    }
+
+    const canInteract = await canInteractWithPrestation(
+      currentUser.id,
+      entrepriseId,
+      prestation.siteId,
+    );
+    if (!canInteract) {
+      throw errors.forbidden(
+        "Vous devez être responsable ou intervenant de ce site pour ajouter une pièce jointe.",
+      );
+    }
+
+    // Vérifier que la tâche existe, appartient à l'occurrence, et est en cours
+    const [tache] = await db
+      .select({ id: occurrenceTaches.id, statut: occurrenceTaches.statut })
+      .from(occurrenceTaches)
+      .where(
+        and(
+          eq(occurrenceTaches.id, tacheId),
+          eq(occurrenceTaches.occurrenceId, occurrenceId),
+        ),
+      )
+      .limit(1);
+
+    if (!tache) throw errors.notFound("Tâche");
+
+    if (tache.statut !== "en_cours") {
+      throw errors.conflict(
+        "Les pièces jointes ne peuvent être ajoutées que sur une tâche en cours.",
+      );
+    }
+
+    // Vérifier la limite (max 2 PJs par tâche)
+    const [{ nb }] = await db
+      .select({ nb: count() })
+      .from(documentsLinks)
+      .where(eq(documentsLinks.occurrenceTacheId, tacheId));
+
+    if (nb >= 2) {
+      throw errors.conflict(
+        "Maximum 2 pièces jointes par tâche.",
+      );
+    }
+
+    // Transaction : promouvoir la clé S3 + insérer document + lien
+    const pieceJointe = await db.transaction(async (tx) => {
+      const promotedKey = await promoteS3Key({ tempKey: storageKey });
+
+      const [doc] = await tx
+        .insert(documents)
+        .values({
+          proprietaireEntrepriseId: entrepriseId,
+          categorie: "tache_piece_jointe",
+          storageProvider: "s3",
+          storageKey: promotedKey,
+          filename,
+          mimeType,
+          sizeBytes,
+          createdById: currentUser.id,
+        })
+        .returning();
+
+      const [link] = await tx
+        .insert(documentsLinks)
+        .values({
+          documentId: doc.id,
+          proprietaireEntrepriseId: entrepriseId,
+          occurrenceTacheId: tacheId,
+          visibilite: "public",
+          createdById: currentUser.id,
+          updatedById: currentUser.id,
+        })
+        .returning();
+
+      return {
+        linkId: link.id,
+        documentId: doc.id,
+        storageKey: doc.storageKey,
+        filename: doc.filename,
+        mimeType: doc.mimeType,
+        sizeBytes: doc.sizeBytes,
+      };
+    });
+
+    return { pieceJointe };
+  });
+
+// ==================== TACHE PIECE JOINTE — DELETE ====================
+
+export const deleteTachePieceJointeAction = actionClient
+  .metadata({ actionName: "deleteTachePieceJointeAction" })
+  .inputSchema(
+    z.object({
+      linkId: z.string().uuid("ID du lien invalide"),
+      documentId: z.string().uuid("ID du document invalide"),
+      tacheId: z.string().uuid("ID de la tâche invalide"),
+      occurrenceId: z.string().uuid("ID de l'occurrence invalide"),
+      prestationId: z.string().uuid("ID de la prestation invalide"),
+      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const { linkId, documentId, tacheId, occurrenceId, prestationId, entrepriseId } =
+      parsedInput;
+
+    const prestation = await getPrestationById(prestationId);
+    if (!prestation || prestation.entrepriseId !== entrepriseId) {
+      throw errors.notFound("Prestation");
+    }
+
+    const canInteract = await canInteractWithPrestation(
+      currentUser.id,
+      entrepriseId,
+      prestation.siteId,
+    );
+    if (!canInteract) {
+      throw errors.forbidden(
+        "Vous devez être responsable ou intervenant de ce site pour supprimer une pièce jointe.",
+      );
+    }
+
+    // Vérifier que la tâche existe et appartient à l'occurrence
+    const [tache] = await db
+      .select({ id: occurrenceTaches.id, statut: occurrenceTaches.statut })
+      .from(occurrenceTaches)
+      .where(
+        and(
+          eq(occurrenceTaches.id, tacheId),
+          eq(occurrenceTaches.occurrenceId, occurrenceId),
+        ),
+      )
+      .limit(1);
+
+    if (!tache) throw errors.notFound("Tâche");
+
+    // Vérifier que le lien appartient bien à cette tâche et récupérer la clé S3
+    const [link] = await db
+      .select({
+        id: documentsLinks.id,
+        storageKey: documents.storageKey,
+      })
+      .from(documentsLinks)
+      .innerJoin(documents, eq(documents.id, documentsLinks.documentId))
+      .where(
+        and(
+          eq(documentsLinks.id, linkId),
+          eq(documentsLinks.occurrenceTacheId, tacheId),
+          eq(documentsLinks.documentId, documentId),
+        ),
+      )
+      .limit(1);
+
+    if (!link) throw errors.notFound("Pièce jointe");
+
+    // Supprimer le lien + document en transaction
+    await db.transaction(async (tx) => {
+      await tx.delete(documentsLinks).where(eq(documentsLinks.id, linkId));
+      await tx.delete(documents).where(eq(documents.id, documentId));
+    });
+
+    // Supprimer le fichier S3 (hors transaction, best-effort)
+    try {
+      await s3.send(
+        new DeleteObjectCommand({
+          Bucket: S3_BUCKET,
+          Key: link.storageKey,
+        }),
+      );
+    } catch {
+      // Non bloquant : le fichier orphelin sera nettoyé par un job
+    }
+
+    return { deleted: true };
   });

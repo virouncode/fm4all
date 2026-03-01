@@ -1,34 +1,34 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
-import { useRouter } from "@/i18n/navigation";
-import { useForm, useFieldArray, useFormState } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  insertTicketMessageFormSchema,
-  type InsertTicketMessageFormType,
-} from "@/zod-schemas/ticket.schema";
-import { type TicketMessageVisibiliteType } from "@/zod-schemas/enums";
-import { insertTicketMessageAction } from "@/server/actions/ticketsActions";
-import { getPresignedReadUrlAction } from "@/server/actions/s3Actions";
-import { RhfTextArea } from "@/components/rhf/RhfTextArea";
 import { RhfControlledSelect } from "@/components/rhf/RhfControlledSelect";
 import { RhfFileInput } from "@/components/rhf/RhfFileInput";
+import { RhfTextArea } from "@/components/rhf/RhfTextArea";
 import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
-import { toast } from "sonner";
-import { Paperclip, Send, FileText } from "lucide-react";
+import { useRouter } from "@/i18n/navigation";
+import { cn } from "@/lib/utils";
+import { getPresignedReadUrlAction } from "@/server/actions/s3Actions";
+import { insertTicketMessageAction } from "@/server/actions/ticketsActions";
+import { type TicketMessageVisibiliteType } from "@/zod-schemas/enums";
+import {
+  insertTicketMessageFormSchema,
+  type InsertTicketMessageFormType,
+} from "@/zod-schemas/ticket.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { cn } from "@/lib/utils";
+import { FileText, Paperclip, Send } from "lucide-react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { useFieldArray, useForm, useFormState } from "react-hook-form";
+import { toast } from "sonner";
 
 type MessageAttachment = {
   id: string;
@@ -111,15 +111,13 @@ function AttachmentThumbnail({
         type="button"
         onClick={onClick}
         className={cn(
-          "relative rounded overflow-hidden border-2 transition-opacity hover:opacity-80",
-          isCurrentUser
-            ? "border-primary-foreground/20"
-            : "border-border",
+          "relative overflow-hidden rounded border-2 transition-opacity hover:opacity-80",
+          isCurrentUser ? "border-primary-foreground/20" : "border-border",
         )}
       >
         {isLoading ? (
-          <div className="w-32 h-32 bg-muted flex items-center justify-center">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+          <div className="bg-muted flex h-32 w-32 items-center justify-center">
+            <div className="border-primary h-6 w-6 animate-spin rounded-full border-b-2" />
           </div>
         ) : imageUrl ? (
           <Image
@@ -127,12 +125,12 @@ function AttachmentThumbnail({
             alt={attachment.filename}
             width={128}
             height={128}
-            className="object-cover w-32 h-32"
+            className="h-32 w-32 object-cover"
             sizes="128px"
           />
         ) : (
-          <div className="w-32 h-32 bg-muted flex items-center justify-center">
-            <FileText className="h-8 w-8 text-muted-foreground" />
+          <div className="bg-muted flex h-32 w-32 items-center justify-center">
+            <FileText className="text-muted-foreground h-8 w-8" />
           </div>
         )}
       </button>
@@ -146,9 +144,7 @@ function AttachmentThumbnail({
       onClick={onClick}
       className={cn(
         "flex items-center gap-2 text-sm hover:underline",
-        isCurrentUser
-          ? "text-primary-foreground/90"
-          : "text-foreground",
+        isCurrentUser ? "text-primary-foreground/90" : "text-foreground",
       )}
     >
       <FileText className="h-4 w-4" />
@@ -172,7 +168,8 @@ export function TicketMessagesSection({
     if (posture === "plateforme") return true; // fm4all voit tout
     if (msg.visibilite === "public") return true;
     if (posture === "client" && msg.visibilite === "client_only") return true;
-    if (posture === "prestataire" && msg.visibilite === "prestataire_only") return true;
+    if (posture === "prestataire" && msg.visibilite === "prestataire_only")
+      return true;
     return false;
   });
   const [previewAttachment, setPreviewAttachment] = useState<{
@@ -270,20 +267,21 @@ export function TicketMessagesSection({
 
   const renderMessage = (msg: Message) => {
     const isCurrentUser = msg.auteurUserId === currentUserId;
-    const auteurNom = msg.auteurPrenom && msg.auteurNom
-      ? `${msg.auteurPrenom} ${msg.auteurNom}`
-      : "Utilisateur";
+    const auteurNom =
+      msg.auteurPrenom && msg.auteurNom
+        ? `${msg.auteurPrenom} ${msg.auteurNom}`
+        : "Utilisateur";
 
     return (
       <div
         key={msg.id}
         className={cn(
-          "flex flex-col mb-4",
+          "mb-4 flex flex-col",
           isCurrentUser ? "items-end" : "items-start",
         )}
       >
         {/* Nom auteur + date */}
-        <div className="text-xs text-muted-foreground mb-1 px-2">
+        <div className="text-muted-foreground mb-1 px-2 text-xs">
           <span className="font-medium">{auteurNom}</span>
           {" · "}
           <span>
@@ -292,7 +290,7 @@ export function TicketMessagesSection({
             })}
           </span>
           {msg.visibilite !== "public" && (
-            <span className="ml-2 text-orange-500 font-medium">
+            <span className="ml-2 font-medium text-orange-500">
               {msg.visibilite === "fm4all_only" && "(fm4all uniquement)"}
               {msg.visibilite === "client_only" && "(Client)"}
               {msg.visibilite === "prestataire_only" && "(Prestataire)"}
@@ -303,13 +301,13 @@ export function TicketMessagesSection({
         {/* Bulle message */}
         <div
           className={cn(
-            "rounded-lg px-4 py-2 max-w-[70%]",
-            isCurrentUser
-              ? "bg-primary text-primary-foreground"
-              : "bg-muted",
+            "max-w-[70%] rounded-lg px-4 py-2",
+            isCurrentUser ? "bg-primary text-primary-foreground" : "bg-muted",
           )}
         >
-          <p className="text-sm whitespace-pre-wrap break-words">{msg.message}</p>
+          <p className="text-sm break-words whitespace-pre-wrap">
+            {msg.message}
+          </p>
 
           {/* Pièces jointes */}
           {msg.attachments.length > 0 && (
@@ -333,9 +331,9 @@ export function TicketMessagesSection({
   return (
     <>
       {/* Messages */}
-      <div className="space-y-2 max-h-[500px] overflow-y-auto">
+      <div className="max-h-[500px] space-y-2 overflow-y-auto">
         {messages.length === 0 ? (
-          <p className="text-center text-muted-foreground text-sm italic py-8">
+          <p className="text-muted-foreground py-8 text-center text-sm italic">
             Aucun message pour le moment
           </p>
         ) : (
@@ -366,14 +364,18 @@ export function TicketMessagesSection({
               <>
                 <SelectItem value="fm4all_only">fm4all uniquement</SelectItem>
                 <SelectItem value="client_only">Client + fm4all</SelectItem>
-                <SelectItem value="prestataire_only">Prestataire + fm4all</SelectItem>
+                <SelectItem value="prestataire_only">
+                  Prestataire + fm4all
+                </SelectItem>
               </>
             )}
             {posture === "client" && (
               <SelectItem value="client_only">Client + fm4all</SelectItem>
             )}
             {posture === "prestataire" && (
-              <SelectItem value="prestataire_only">Prestataire + fm4all</SelectItem>
+              <SelectItem value="prestataire_only">
+                Prestataire + fm4all
+              </SelectItem>
             )}
           </RhfControlledSelect>
 
@@ -390,7 +392,7 @@ export function TicketMessagesSection({
                 onClick={handleAddAttachment}
                 disabled={hasPendingAttachment}
               >
-                <Paperclip className="h-4 w-4 mr-2" />
+                <Paperclip className="h-4 w-4" />
                 Ajouter
               </Button>
             </div>
@@ -402,7 +404,7 @@ export function TicketMessagesSection({
                     key={field.id}
                     name={`attachments.${index}` as const}
                     proprietaireEntrepriseId={proprietaireEntrepriseId}
-                    categorie="piece_jointe"
+                    categorie="ticket_message_piece_jointe"
                     onClear={() => remove(index)}
                     deleteOnClear
                     maxSizeBytes={2 * 1024 * 1024} // 2MB
@@ -418,7 +420,7 @@ export function TicketMessagesSection({
               type="submit"
               disabled={isSubmitting || !isDirty || hasPendingAttachment}
             >
-              <Send className="h-4 w-4 mr-2" />
+              <Send className="h-4 w-4" />
               {isSubmitting ? "Envoi..." : "Envoyer"}
             </Button>
           </div>
@@ -444,7 +446,7 @@ export function TicketMessagesSection({
               <div className="min-h-0 flex-1 px-6 pb-6">
                 {loadingPreview ? (
                   <div className="flex h-full items-center justify-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+                    <div className="border-primary h-12 w-12 animate-spin rounded-full border-b-2" />
                   </div>
                 ) : (
                   <>

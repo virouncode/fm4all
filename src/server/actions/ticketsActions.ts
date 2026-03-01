@@ -275,7 +275,7 @@ export const insertTicketAction = actionClient
             .insert(documents)
             .values({
               proprietaireEntrepriseId,
-              categorie: "piece_jointe",
+              categorie: "ticket_piece_jointe",
               storageProvider: "s3",
               storageKey: promotedKey,
               filename: attachment.filename,
@@ -1041,7 +1041,7 @@ export const updateTicketAttachmentsAction = actionClient
           .insert(documents)
           .values({
             proprietaireEntrepriseId: ticket.proprietaireEntrepriseId,
-            categorie: "piece_jointe",
+            categorie: "ticket_piece_jointe",
             storageProvider: "s3",
             storageKey: promotedKey,
             filename: attachment.filename,
@@ -1176,7 +1176,7 @@ export const insertTicketMessageAction = actionClient
             .insert(documents)
             .values({
               proprietaireEntrepriseId: ticket.proprietaireEntrepriseId,
-              categorie: "piece_jointe",
+              categorie: "ticket_message_piece_jointe",
               storageProvider: "s3",
               storageKey: promotedKey, // ✅ Utiliser le promotedKey
               filename: attachment.filename,

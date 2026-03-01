@@ -209,7 +209,7 @@ export function EditAttachmentsDialog({
                         key={field.id}
                         name={`attachments.${index}` as const}
                         proprietaireEntrepriseId={proprietaireEntrepriseId}
-                        categorie="piece_jointe"
+                        categorie="ticket_piece_jointe"
                         onClear={() => remove(index)}
                         deleteOnClear
                         maxSizeBytes={2 * 1024 * 1024} // 2MB

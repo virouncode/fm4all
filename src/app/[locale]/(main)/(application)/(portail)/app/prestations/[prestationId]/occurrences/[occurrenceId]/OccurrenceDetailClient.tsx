@@ -17,7 +17,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { Link, useRouter } from "@/i18n/navigation";
+import { getPresignedReadUrl, uploadFileToS3 } from "@/lib/s3/upload-helper";
 import {
+  addTachePieceJointeAction,
+  deleteTachePieceJointeAction,
   updateOccurrenceDatesAction,
   updateOccurrenceStatutAction,
   updateOccurrenceTacheStatutAction,
@@ -25,6 +28,7 @@ import {
 import type {
   OccurrenceDetail,
   OccurrenceTacheDetail,
+  TachePieceJointe,
 } from "@/server/queries/clientServiceExecutions.query";
 import type { PrestationListItem } from "@/zod-schemas/clientServices.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,18 +36,21 @@ import {
   ArrowLeft,
   Building2,
   Calendar,
+  Camera,
   CheckCircle2,
   ClipboardList,
   Clock,
+  ImageIcon,
   ListTodo,
   Loader2,
   MapPin,
+  Paperclip,
   Pencil,
   Play,
   User,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -190,6 +197,29 @@ export function OccurrenceDetailClient({
     }
   };
 
+  const handlePjAdded = (tacheId: string, pj: TachePieceJointe) => {
+    setTaches((prev) =>
+      prev.map((t) =>
+        t.id === tacheId
+          ? { ...t, piecesJointes: [...t.piecesJointes, pj] }
+          : t,
+      ),
+    );
+  };
+
+  const handlePjDeleted = (tacheId: string, linkId: string) => {
+    setTaches((prev) =>
+      prev.map((t) =>
+        t.id === tacheId
+          ? {
+              ...t,
+              piecesJointes: t.piecesJointes.filter((pj) => pj.linkId !== linkId),
+            }
+          : t,
+      ),
+    );
+  };
+
   const canEditDates =
     canManage &&
     (occurrenceStatut === "planifiee" || occurrenceStatut === "en_cours");
@@ -256,25 +286,23 @@ export function OccurrenceDetailClient({
             {occurrenceBadge.label}
           </Badge>
 
-          {/* Bouton "Démarrer" occurrence : uniquement si pas de tâches (sinon la cascade des tâches s'en charge) */}
-          {canInteract &&
-            occurrenceStatut === "planifiee" &&
-            taches.length === 0 && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handleTransition("en_cours")}
-                disabled={isUpdatingStatut || !occurrence.executionId}
-                title={
-                  !occurrence.executionId
-                    ? "Attribuez un prestataire avant de démarrer"
-                    : undefined
-                }
-              >
-                <Play className="h-4 w-4" />
-                Démarrer
-              </Button>
-            )}
+          {/* Bouton "Démarrer" occurrence */}
+          {canInteract && occurrenceStatut === "planifiee" && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleTransition("en_cours")}
+              disabled={isUpdatingStatut || !occurrence.executionId}
+              title={
+                !occurrence.executionId
+                  ? "Attribuez un prestataire avant de démarrer"
+                  : undefined
+              }
+            >
+              <Play className="h-4 w-4" />
+              Démarrer
+            </Button>
+          )}
 
           {canInteract && occurrenceStatut === "en_cours" && (
             <Button
@@ -449,10 +477,15 @@ export function OccurrenceDetailClient({
                   canInteract={canInteract}
                   occurrenceStatut={occurrenceStatut}
                   executionId={occurrence.executionId}
+                  prestationId={prestation.id}
+                  entrepriseId={prestation.entrepriseId}
+                  occurrenceId={occurrence.id}
                   onStartOccurrence={startOccurrenceForCascade}
                   onTransition={(statut) =>
                     handleTacheTransition(tache.id, statut)
                   }
+                  onPjAdded={(pj) => handlePjAdded(tache.id, pj)}
+                  onPjDeleted={(linkId) => handlePjDeleted(tache.id, linkId)}
                 />
               ))}
             </CardContent>
@@ -526,13 +559,21 @@ function TacheRow({
   canInteract,
   occurrenceStatut,
   executionId,
+  prestationId,
+  entrepriseId,
+  occurrenceId,
   onStartOccurrence,
   onTransition,
+  onPjAdded,
+  onPjDeleted,
 }: {
   tache: OccurrenceTacheDetail;
   canInteract: boolean;
   occurrenceStatut: OccurrenceDetail["statut"];
   executionId: string | null;
+  prestationId: string;
+  entrepriseId: string;
+  occurrenceId: string;
   onStartOccurrence: () => Promise<boolean>;
   onTransition: (
     statut:
@@ -542,6 +583,8 @@ function TacheRow({
       | "non_applicable"
       | "annulee",
   ) => Promise<void>;
+  onPjAdded: (pj: TachePieceJointe) => void;
+  onPjDeleted: (linkId: string) => void;
 }) {
   const [isUpdating, setIsUpdating] = useState(false);
   const badge = TACHE_STATUT[tache.statut];
@@ -583,6 +626,11 @@ function TacheRow({
     occurrenceStatut === "planifiee" && !executionId
       ? "Attribuez un prestataire à l'intervention avant de travailler sur les tâches"
       : undefined;
+
+  const showPjZone =
+    canInteract &&
+    occurrenceStatut === "en_cours" &&
+    tache.statut === "en_cours";
 
   return (
     <div className="rounded-lg border p-3 text-sm">
@@ -674,7 +722,252 @@ function TacheRow({
           )}
         </div>
       </div>
+
+      {/* Zone pièces jointes — visible uniquement quand la tâche est en cours */}
+      {showPjZone && (
+        <PjUploadZone
+          tache={tache}
+          prestationId={prestationId}
+          entrepriseId={entrepriseId}
+          occurrenceId={occurrenceId}
+          onPjAdded={onPjAdded}
+          onPjDeleted={onPjDeleted}
+        />
+      )}
+
+      {/* Affichage des PJs existantes même hors zone upload (tâche terminée, etc.) */}
+      {!showPjZone && tache.piecesJointes.length > 0 && (
+        <div className="mt-2 ml-7 flex flex-wrap gap-2">
+          {tache.piecesJointes.map((pj) => (
+            <PjThumb
+              key={pj.linkId}
+              pj={pj}
+              proprietaireEntrepriseId={entrepriseId}
+            />
+          ))}
+        </div>
+      )}
     </div>
+  );
+}
+
+// ==================== PJ UPLOAD ZONE ====================
+
+function PjUploadZone({
+  tache,
+  prestationId,
+  entrepriseId,
+  occurrenceId,
+  onPjAdded,
+  onPjDeleted,
+}: {
+  tache: OccurrenceTacheDetail;
+  prestationId: string;
+  entrepriseId: string;
+  occurrenceId: string;
+  onPjAdded: (pj: TachePieceJointe) => void;
+  onPjDeleted: (linkId: string) => void;
+}) {
+  const [isUploading, setIsUploading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const canAddMore = tache.piecesJointes.length < 2;
+
+  const handleFileSelected = async (file: File | undefined) => {
+    if (!file) return;
+    if (tache.piecesJointes.length >= 2) {
+      toast.error("Maximum 2 photos par tâche.");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const { key } = await uploadFileToS3({
+        file,
+        proprietaireEntrepriseId: entrepriseId,
+        categorie: "tache_piece_jointe",
+      });
+
+      const result = await addTachePieceJointeAction({
+        tacheId: tache.id,
+        occurrenceId,
+        prestationId,
+        entrepriseId,
+        storageKey: key,
+        filename: file.name,
+        mimeType: file.type,
+        sizeBytes: file.size,
+      });
+
+      if (result?.serverError) {
+        toast.error(result.serverError.message);
+        return;
+      }
+
+      if (result?.data?.pieceJointe) {
+        onPjAdded(result.data.pieceJointe);
+        toast.success("Photo ajoutée");
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur lors de l'upload");
+    } finally {
+      setIsUploading(false);
+      // Réinitialiser les inputs pour permettre le même fichier à nouveau
+      if (cameraInputRef.current) cameraInputRef.current.value = "";
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleDelete = async (pj: TachePieceJointe) => {
+    setIsDeleting(pj.linkId);
+    const result = await deleteTachePieceJointeAction({
+      linkId: pj.linkId,
+      documentId: pj.documentId,
+      tacheId: tache.id,
+      occurrenceId,
+      prestationId,
+      entrepriseId,
+    });
+
+    if (result?.serverError) {
+      toast.error(result.serverError.message);
+    } else {
+      onPjDeleted(pj.linkId);
+    }
+    setIsDeleting(null);
+  };
+
+  return (
+    <div className="mt-3 ml-7 space-y-2">
+      {/* Thumbnails existants */}
+      {tache.piecesJointes.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {tache.piecesJointes.map((pj) => (
+            <div key={pj.linkId} className="relative">
+              <PjThumb pj={pj} proprietaireEntrepriseId={entrepriseId} />
+              <button
+                onClick={() => handleDelete(pj)}
+                disabled={isDeleting === pj.linkId || isUploading}
+                className="bg-destructive text-destructive-foreground absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full shadow-sm disabled:opacity-50"
+                title="Supprimer"
+              >
+                {isDeleting === pj.linkId ? (
+                  <Loader2 className="h-2.5 w-2.5 animate-spin" />
+                ) : (
+                  <X className="h-2.5 w-2.5" />
+                )}
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Boutons d'ajout */}
+      {canAddMore && (
+        <div className="flex flex-wrap gap-2">
+          {/* Input caché — appareil photo (mobile) */}
+          <input
+            ref={cameraInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            className="sr-only"
+            onChange={(e) => handleFileSelected(e.target.files?.[0])}
+          />
+          {/* Input caché — sélecteur de fichier */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*,application/pdf"
+            className="sr-only"
+            onChange={(e) => handleFileSelected(e.target.files?.[0])}
+          />
+
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 gap-1.5 px-2 text-xs"
+            onClick={() => cameraInputRef.current?.click()}
+            disabled={isUploading}
+          >
+            {isUploading ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Camera className="h-3.5 w-3.5" />
+            )}
+            Photo
+          </Button>
+
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 gap-1.5 px-2 text-xs"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading}
+          >
+            {isUploading ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Paperclip className="h-3.5 w-3.5" />
+            )}
+            Fichier
+          </Button>
+
+          {tache.piecesJointes.length === 0 && (
+            <span className="text-muted-foreground self-center text-xs">
+              Optionnel · max 2
+            </span>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ==================== PJ THUMBNAIL ====================
+
+function PjThumb({
+  pj,
+  proprietaireEntrepriseId,
+}: {
+  pj: TachePieceJointe;
+  proprietaireEntrepriseId: string;
+}) {
+  const [url, setUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    getPresignedReadUrl({ key: pj.storageKey, proprietaireEntrepriseId })
+      .then(setUrl)
+      .catch(() => setUrl(null));
+  }, [pj.storageKey, proprietaireEntrepriseId]);
+
+  const isImage = pj.mimeType.startsWith("image/");
+
+  if (isImage && url) {
+    return (
+      <a href={url} target="_blank" rel="noopener noreferrer">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={url}
+          alt={pj.filename}
+          className="h-14 w-14 rounded border object-cover"
+        />
+      </a>
+    );
+  }
+
+  return (
+    <a
+      href={url ?? "#"}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="border-muted-foreground/30 text-muted-foreground flex h-14 w-14 flex-col items-center justify-center gap-0.5 rounded border text-center"
+    >
+      <ImageIcon className="h-5 w-5" />
+      <span className="w-full truncate px-1 text-[10px]">{pj.filename}</span>
+    </a>
   );
 }
 

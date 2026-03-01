@@ -71,6 +71,17 @@ function pluralizeCategorie(
     return "pieces_jointes";
   }
 
+  // Cas spéciaux : catégories contextualisées — double pluriel sur le dernier segment
+  if (categorie === "ticket_piece_jointe") {
+    return "ticket_pieces_jointes";
+  }
+  if (categorie === "ticket_message_piece_jointe") {
+    return "ticket_message_pieces_jointes";
+  }
+  if (categorie === "tache_piece_jointe") {
+    return "tache_pieces_jointes";
+  }
+
   // Mots composés avec underscore : pluriel sur le premier mot uniquement
   // Ex: bon_commande → bons_commande, rapport_intervention → rapports_intervention
   if (categorie.includes("_")) {
