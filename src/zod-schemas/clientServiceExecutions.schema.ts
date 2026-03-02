@@ -91,6 +91,7 @@ export const insertExecutionFormSchema = z.object({
         Number.isInteger(Number(v)),
       "La priorité doit être un entier entre 0 et 100",
     ),
+  assigneeUserIdDefault: z.string().uuid().or(z.literal("")).optional(),
   prix: z.array(insertExecutionPrixFormSchema).min(1, "Au moins une ligne de tarif est requise"),
 }).superRefine((data, ctx) => {
   // Règle : max 1 abonnement par exécution (sinon les périodes se chevauchent)
@@ -118,3 +119,44 @@ export const insertExecutionFormSchema = z.object({
 });
 
 export type InsertExecutionFormType = z.infer<typeof insertExecutionFormSchema>;
+
+// ==================== UPDATE EXECUTION FORM ====================
+
+export const updateExecutionFormSchema = z.object({
+  executionId: z.string().uuid("ID de l'exécution invalide"),
+  prestationId: z.string().uuid("ID de la prestation invalide"),
+  entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
+  dateDebutValidite: z.string().min(1, "Date de début de validité obligatoire"),
+  dateFinValidite: z.string().optional(),
+  priorite: z
+    .string()
+    .refine(
+      (v) =>
+        !isNaN(Number(v)) &&
+        Number(v) >= 0 &&
+        Number(v) <= 100 &&
+        Number.isInteger(Number(v)),
+      "La priorité doit être un entier entre 0 et 100",
+    ),
+  assigneeUserIdDefault: z.string().uuid().or(z.literal("")).optional(),
+  prix: z.array(insertExecutionPrixFormSchema).min(1, "Au moins une ligne de tarif est requise"),
+}).superRefine((data, ctx) => {
+  const abonnementCount = data.prix.filter((p) => p.typePrix === "abonnement").length;
+  if (abonnementCount > 1) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["prix"],
+      message: "Une seule ligne d'abonnement est autorisée par exécution",
+    });
+  }
+  const installationCount = data.prix.filter((p) => p.typePrix === "installation").length;
+  if (installationCount > 1) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["prix"],
+      message: "Une seule ligne d'installation est autorisée par exécution",
+    });
+  }
+});
+
+export type UpdateExecutionFormType = z.infer<typeof updateExecutionFormSchema>;

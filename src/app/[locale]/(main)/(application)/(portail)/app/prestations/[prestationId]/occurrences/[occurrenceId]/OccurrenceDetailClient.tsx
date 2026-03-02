@@ -14,16 +14,38 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Form } from "@/components/ui/form";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Link, useRouter } from "@/i18n/navigation";
 import { getPresignedReadUrl, uploadFileToS3 } from "@/lib/s3/upload-helper";
 import {
   addTachePieceJointeAction,
   deleteTachePieceJointeAction,
+  getAssignableUsersForOccurrenceAction,
+  getAvailableTicketsForLinkingAction,
+  getTicketsByOccurrenceAction,
+  insertAdHocTacheAction,
+  linkTicketToOccurrenceAction,
+  unlinkTicketFromOccurrenceAction,
+  updateAdHocTacheAction,
+  updateOccurrenceAssigneeAction,
   updateOccurrenceDatesAction,
   updateOccurrenceStatutAction,
   updateOccurrenceTacheStatutAction,
+  updateTacheAssigneeAction,
 } from "@/server/actions/clientServiceOccurrencesActions";
 import type {
   OccurrenceDetail,
@@ -31,6 +53,7 @@ import type {
   TachePieceJointe,
 } from "@/server/queries/clientServiceExecutions.query";
 import type { PrestationListItem } from "@/zod-schemas/clientServices.schema";
+import type { OccurrenceTransitionStatutType } from "@/zod-schemas/enums";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ArrowLeft,
@@ -38,16 +61,24 @@ import {
   Calendar,
   Camera,
   CheckCircle2,
-  ClipboardList,
+
   Clock,
+
   ImageIcon,
+  Info,
+  Link2,
+  Link2Off,
   ListTodo,
   Loader2,
   MapPin,
   Paperclip,
   Pencil,
   Play,
+  Plus,
+  Ticket,
+  Timer,
   User,
+  Users,
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -56,12 +87,33 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { formatDate, formatDateTime } from "../../../helpers";
 
-interface OccurrenceDetailClientProps {
+type OccurrenceDetailClientProps = {
   occurrence: OccurrenceDetail;
   prestation: PrestationListItem;
   taches: OccurrenceTacheDetail[];
-  canManage: boolean; // contrôle total : annuler, non honorée
-  canInteract: boolean; // travail terrain : démarrer, terminer, tâches
+  canManage: boolean; // contrôle total : annuler, non honorée, assigner autrui
+  canInteract: boolean; // travail terrain : démarrer, terminer, tâches, auto-assign
+  canAssignOccurrence: boolean; // peut assigner/modifier l'intervenant de l'occurrence
+  suiviMode: "interne" | "prestataire";
+  currentUserId: string;
+  currentUserPrenom: string | null;
+  currentUserNom: string | null;
+}
+
+type LinkedTicket = {
+  id: string;
+  titre: string;
+  statut: string;
+  priorite: string;
+  type: string;
+  createdAt: Date;
+}
+
+type AssignableUser = {
+  id: string;
+  prenom: string;
+  nom: string;
+  email: string;
 }
 
 // ==================== STATUT BADGES ====================
@@ -106,6 +158,11 @@ export function OccurrenceDetailClient({
   taches: initialTaches,
   canManage,
   canInteract,
+  canAssignOccurrence,
+  suiviMode,
+  currentUserId,
+  currentUserPrenom,
+  currentUserNom,
 }: OccurrenceDetailClientProps) {
   const router = useRouter();
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
@@ -113,6 +170,38 @@ export function OccurrenceDetailClient({
   const [taches, setTaches] = useState<OccurrenceTacheDetail[]>(initialTaches);
   const [occurrenceStatut, setOccurrenceStatut] = useState(occurrence.statut);
   const [isEditingDates, setIsEditingDates] = useState(false);
+  const [linkedTickets, setLinkedTickets] = useState<LinkedTicket[]>([]);
+
+  // Occurrence-level assignee (mutable)
+  const [occurrenceAssigneeUserId, setOccurrenceAssigneeUserId] = useState<string | null>(
+    occurrence.assigneeUserId,
+  );
+  const [occurrenceAssigneePrenom, setOccurrenceAssigneePrenom] = useState<string | null>(
+    occurrence.assigneePrenom,
+  );
+  const [occurrenceAssigneeNom, setOccurrenceAssigneeNom] = useState<string | null>(
+    occurrence.assigneeNom,
+  );
+  const [assigneePopoverOpen, setAssigneePopoverOpen] = useState(false);
+  const [assignableUsers, setAssignableUsers] = useState<AssignableUser[]>([]);
+  const [loadingAssignees, setLoadingAssignees] = useState(false);
+  const [isAssigning, setIsAssigning] = useState(false);
+  const [applyToTaches, setApplyToTaches] = useState(false);
+
+  // Charger les tickets liés à l'occurrence
+  useEffect(() => {
+    async function loadLinkedTickets() {
+      const result = await getTicketsByOccurrenceAction({
+        occurrenceId: occurrence.id,
+        entrepriseId: prestation.entrepriseId,
+      });
+      if (result?.data?.tickets) {
+        setLinkedTickets(result.data.tickets as LinkedTicket[]);
+      }
+    }
+    void loadLinkedTickets();
+  }, [occurrence.id, prestation.entrepriseId]);
+  const [isAddingAdHoc, setIsAddingAdHoc] = useState(false);
 
   // Dates prévues mutables en local (mises à jour après sauvegarde sans router.refresh)
   const [dateDebutPrevue, setDateDebutPrevue] = useState<Date | null>(
@@ -128,9 +217,7 @@ export function OccurrenceDetailClient({
 
   const occurrenceBadge = OCCURRENCE_STATUT[occurrenceStatut];
 
-  const handleTransition = async (
-    statut: "en_cours" | "terminee" | "non_honoree" | "annulee",
-  ) => {
+  const handleTransition = async (statut: OccurrenceTransitionStatutType) => {
     setIsUpdatingStatut(true);
     const result = await updateOccurrenceStatutAction({
       occurrenceId: occurrence.id,
@@ -220,15 +307,124 @@ export function OccurrenceDetailClient({
     );
   };
 
+  const handleAdHocAdded = (newTache: OccurrenceTacheDetail) => {
+    setTaches((prev) => [...prev, newTache]);
+    setIsAddingAdHoc(false);
+  };
+
+  const handleAdHocUpdated = (updatedTache: OccurrenceTacheDetail) => {
+    setTaches((prev) =>
+      prev.map((t) => (t.id === updatedTache.id ? { ...t, ...updatedTache } : t)),
+    );
+  };
+
+  const handleAssigneeChanged = (tacheId: string, assigneeUserId: string | null, assigneePrenom: string | null, assigneeNom: string | null) => {
+    setTaches((prev) =>
+      prev.map((t) =>
+        t.id === tacheId ? { ...t, assigneeUserId, assigneePrenom, assigneeNom } : t,
+      ),
+    );
+  };
+
+  // Load assignable users when the occurrence assignee popover opens
+  useEffect(() => {
+    if (!assigneePopoverOpen || !occurrence.prestataireEntrepriseId) return;
+    setLoadingAssignees(true);
+    getAssignableUsersForOccurrenceAction({
+      entrepriseId: occurrence.prestataireEntrepriseId,
+    })
+      .then((result) => {
+        if (result?.data?.users) setAssignableUsers(result.data.users);
+      })
+      .finally(() => setLoadingAssignees(false));
+  }, [assigneePopoverOpen, occurrence.prestataireEntrepriseId]);
+
+  const handleOccurrenceAssign = async (userId: string | null) => {
+    setIsAssigning(true);
+    const result = await updateOccurrenceAssigneeAction({
+      occurrenceId: occurrence.id,
+      prestationId: prestation.id,
+      entrepriseId: prestation.entrepriseId,
+      assigneeUserId: userId,
+      applyToTaches,
+    });
+    setIsAssigning(false);
+    if (result?.serverError) {
+      toast.error(result.serverError.message);
+      return;
+    }
+    if (result?.data !== undefined) {
+      const user = assignableUsers.find((u) => u.id === userId);
+      setOccurrenceAssigneeUserId(userId);
+      setOccurrenceAssigneePrenom(user?.prenom ?? null);
+      setOccurrenceAssigneeNom(user?.nom ?? null);
+      setApplyToTaches(false);
+      setAssigneePopoverOpen(false);
+      toast.success(userId ? "Intervenant assigné." : "Assignation retirée.");
+    }
+  };
+
+  const handleAssignAllTaches = async () => {
+    if (!occurrenceAssigneeUserId) return;
+    const activeTachesCount = taches.filter(
+      (t) => t.statut === "a_faire" || t.statut === "en_cours",
+    ).length;
+    if (activeTachesCount === 0) {
+      toast.info("Aucune tâche active à assigner.");
+      return;
+    }
+    setIsAssigning(true);
+    const result = await updateOccurrenceAssigneeAction({
+      occurrenceId: occurrence.id,
+      prestationId: prestation.id,
+      entrepriseId: prestation.entrepriseId,
+      assigneeUserId: occurrenceAssigneeUserId,
+      applyToTaches: true,
+    });
+    setIsAssigning(false);
+    if (result?.serverError) {
+      toast.error(result.serverError.message);
+      return;
+    }
+    if (result?.data !== undefined) {
+      setTaches((prev) =>
+        prev.map((t) =>
+          t.statut === "a_faire" || t.statut === "en_cours"
+            ? {
+                ...t,
+                assigneeUserId: occurrenceAssigneeUserId,
+                assigneePrenom: occurrenceAssigneePrenom,
+                assigneeNom: occurrenceAssigneeNom,
+              }
+            : t,
+        ),
+      );
+      toast.success(
+        `${activeTachesCount} tâche${activeTachesCount > 1 ? "s" : ""} assignée${activeTachesCount > 1 ? "s" : ""}.`,
+      );
+    }
+  };
+
+  const handleTicketLinked = (ticket: LinkedTicket) => {
+    setLinkedTickets((prev) => [...prev, ticket]);
+  };
+
+  const handleTicketUnlinked = (ticketId: string) => {
+    setLinkedTickets((prev) => prev.filter((t) => t.id !== ticketId));
+  };
+
   const canEditDates =
     canManage &&
     (occurrenceStatut === "planifiee" || occurrenceStatut === "en_cours");
 
+  const canAddAdHoc =
+    canInteract &&
+    (occurrenceStatut === "planifiee" || occurrenceStatut === "en_cours");
+
+  // Une occurrence peut être clôturée si aucune tâche n'est encore ouverte (a_faire ou en_cours)
   const allTasksDone =
     taches.length === 0 ||
-    taches.every(
-      (t) => t.statut === "terminee" || t.statut === "non_applicable",
-    );
+    taches.every((t) => t.statut !== "a_faire" && t.statut !== "en_cours");
 
   return (
     <div className="container mx-auto flex h-full max-w-4xl flex-col overflow-hidden p-6">
@@ -250,6 +446,80 @@ export function OccurrenceDetailClient({
                   {occurrence.prestataireNom}
                 </span>
               )}
+
+              {/* Intervenant de l'occurrence */}
+              {occurrence.prestataireEntrepriseId && (
+                <span className="flex items-center gap-1">
+                  <User className="h-4 w-4" />
+                  {occurrenceAssigneePrenom
+                    ? `${occurrenceAssigneePrenom} ${occurrenceAssigneeNom}`
+                    : "Non assigné"}
+                  {canAssignOccurrence && (
+                    <Popover
+                      open={assigneePopoverOpen}
+                      onOpenChange={setAssigneePopoverOpen}
+                    >
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5"
+                          title="Modifier l'intervenant"
+                        >
+                          <Pencil className="h-3 w-3" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        className="w-72 space-y-3 p-4"
+                        align="start"
+                      >
+                        <p className="text-sm font-medium">
+                          Modifier l&apos;intervenant
+                        </p>
+                        <Select
+                          value={occurrenceAssigneeUserId ?? ""}
+                          onValueChange={(v) =>
+                            handleOccurrenceAssign(v || null)
+                          }
+                          disabled={loadingAssignees || isAssigning}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue
+                              placeholder={
+                                loadingAssignees
+                                  ? "Chargement..."
+                                  : "Sélectionnez"
+                              }
+                            />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">
+                              <span className="text-muted-foreground italic">
+                                Retirer l&apos;assignation
+                              </span>
+                            </SelectItem>
+                            {assignableUsers.map((u) => (
+                              <SelectItem key={u.id} value={u.id}>
+                                {u.prenom} {u.nom}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <label className="flex cursor-pointer items-center gap-2">
+                          <Checkbox
+                            checked={applyToTaches}
+                            onCheckedChange={(v) => setApplyToTaches(!!v)}
+                          />
+                          <span className="text-xs">
+                            Appliquer aussi aux tâches non terminées
+                          </span>
+                        </label>
+                      </PopoverContent>
+                    </Popover>
+                  )}
+                </span>
+              )}
+
               <span className="text-muted-foreground/50 font-mono text-xs">
                 #{occurrence.id}
               </span>
@@ -266,6 +536,7 @@ export function OccurrenceDetailClient({
               href={{
                 pathname: "/app/prestations/[prestationId]",
                 params: { prestationId: prestation.id },
+                query: { tab: "interventions" },
               }}
             >
               <ArrowLeft className="h-4 w-4" />
@@ -286,24 +557,6 @@ export function OccurrenceDetailClient({
             {occurrenceBadge.label}
           </Badge>
 
-          {/* Bouton "Démarrer" occurrence */}
-          {canInteract && occurrenceStatut === "planifiee" && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleTransition("en_cours")}
-              disabled={isUpdatingStatut || !occurrence.executionId}
-              title={
-                !occurrence.executionId
-                  ? "Attribuez un prestataire avant de démarrer"
-                  : undefined
-              }
-            >
-              <Play className="h-4 w-4" />
-              Démarrer
-            </Button>
-          )}
-
           {canInteract && occurrenceStatut === "en_cours" && (
             <Button
               size="sm"
@@ -312,7 +565,7 @@ export function OccurrenceDetailClient({
               disabled={isUpdatingStatut || !allTasksDone}
               title={
                 !allTasksDone
-                  ? "Toutes les tâches doivent être terminées ou N/A"
+                  ? "Toutes les tâches doivent être dans un état final (terminées, N/A, annulées ou non honorées)"
                   : undefined
               }
             >
@@ -321,34 +574,52 @@ export function OccurrenceDetailClient({
             </Button>
           )}
 
-          {/* Boutons managériaux (annuler / non honorée) → canManage uniquement */}
-          {canManage && occurrenceStatut === "planifiee" && (
-            <Button
-              size="sm"
-              variant="destructive"
-              className="ml-auto"
-              onClick={() => setCancelDialogOpen(true)}
-              disabled={isUpdatingStatut}
-            >
-              Annuler
-            </Button>
-          )}
+          {/* Boutons managériaux + Démarrer regroupés à droite */}
+          <div className="ml-auto flex items-center gap-2">
+            {isUpdatingStatut && (
+              <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
+            )}
 
-          {canManage && occurrenceStatut === "en_cours" && (
-            <Button
-              size="sm"
-              variant="ghost"
-              className="ml-auto text-destructive"
-              onClick={() => handleTransition("non_honoree")}
-              disabled={isUpdatingStatut}
-            >
-              Non honorée
-            </Button>
-          )}
+            {canInteract && occurrenceStatut === "planifiee" && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleTransition("en_cours")}
+                disabled={isUpdatingStatut || !occurrence.executionId}
+                title={
+                  !occurrence.executionId
+                    ? "Attribuez un prestataire avant de démarrer"
+                    : undefined
+                }
+              >
+                <Play className="h-4 w-4" />
+                Démarrer
+              </Button>
+            )}
 
-          {isUpdatingStatut && (
-            <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
-          )}
+            {canManage && occurrenceStatut === "planifiee" && (
+              <Button
+                size="sm"
+                variant="destructive"
+                onClick={() => setCancelDialogOpen(true)}
+                disabled={isUpdatingStatut}
+              >
+                Annuler
+              </Button>
+            )}
+
+            {canManage && occurrenceStatut === "en_cours" && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-destructive"
+                onClick={() => handleTransition("non_honoree")}
+                disabled={isUpdatingStatut}
+              >
+                Non honorée
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Message d'aide si aucun prestataire assigné */}
@@ -371,6 +642,34 @@ export function OccurrenceDetailClient({
       </div>
 
       <Separator className="my-5 flex-shrink-0" />
+
+      {/* ==================== BANNIÈRE MODE DE SUIVI ==================== */}
+      {occurrence.executionId && (
+        <div
+          className={`flex-shrink-0 flex items-start gap-2 rounded-lg border px-4 py-3 text-sm mb-4 ${
+            suiviMode === "prestataire"
+              ? "border-blue-200 bg-blue-50 text-blue-800"
+              : "border-amber-200 bg-amber-50 text-amber-800"
+          }`}
+        >
+          <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
+          <div>
+            {suiviMode === "prestataire" ? (
+              <>
+                <span className="font-semibold">Suivi prestataire</span>
+                {" — "}
+                Le prestataire dispose d&apos;agents connectés sur la plateforme. Ils gèrent la progression de cette intervention de leur côté.
+              </>
+            ) : (
+              <>
+                <span className="font-semibold">Suivi interne</span>
+                {" — "}
+                Le prestataire n&apos;a pas d&apos;agents attribués à ce site sur la plateforme. La progression est suivie en interne.
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ==================== CONTENT ==================== */}
       <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pb-6">
@@ -450,58 +749,100 @@ export function OccurrenceDetailClient({
         </Card>
 
         {/* Tâches */}
-        {taches.length > 0 && (
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base font-medium">
-                <ListTodo className="text-primary h-4 w-4" />
-                Tâches
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base font-medium">
+              <ListTodo className="text-primary h-4 w-4" />
+              Tâches
+              {taches.length > 0 && (
                 <span className="text-muted-foreground text-xs font-normal">
                   (
                   {
                     taches.filter(
                       (t) =>
                         t.statut === "terminee" ||
-                        t.statut === "non_applicable",
+                        t.statut === "non_applicable" ||
+                        t.statut === "annulee" ||
+                        t.statut === "non_honoree",
                     ).length
                   }
                   /{taches.length} traitées)
                 </span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {taches.map((tache) => (
-                <TacheRow
-                  key={tache.id}
-                  tache={tache}
-                  canInteract={canInteract}
-                  occurrenceStatut={occurrenceStatut}
-                  executionId={occurrence.executionId}
-                  prestationId={prestation.id}
-                  entrepriseId={prestation.entrepriseId}
-                  occurrenceId={occurrence.id}
-                  onStartOccurrence={startOccurrenceForCascade}
-                  onTransition={(statut) =>
-                    handleTacheTransition(tache.id, statut)
-                  }
-                  onPjAdded={(pj) => handlePjAdded(tache.id, pj)}
-                  onPjDeleted={(linkId) => handlePjDeleted(tache.id, linkId)}
-                />
-              ))}
-            </CardContent>
-          </Card>
-        )}
-
-        {taches.length === 0 && (
-          <Card>
-            <CardContent className="py-8 text-center">
-              <ClipboardList className="text-muted-foreground/30 mx-auto mb-3 h-10 w-10" />
-              <p className="text-muted-foreground text-sm">
+              )}
+              {canAssignOccurrence && occurrenceAssigneeUserId && taches.length > 0 && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="ml-auto h-7 gap-1.5 px-2 text-xs"
+                  onClick={handleAssignAllTaches}
+                  disabled={isAssigning}
+                >
+                  <Users className="h-3.5 w-3.5" />
+                  Assigner toutes
+                </Button>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {taches.length === 0 && !isAddingAdHoc && (
+              <p className="text-muted-foreground py-4 text-center text-sm">
                 Aucune tâche associée à cette intervention.
               </p>
-            </CardContent>
-          </Card>
-        )}
+            )}
+            {taches.map((tache) => (
+              <TacheRow
+                key={tache.id}
+                tache={tache}
+                canInteract={canInteract}
+                canManage={canManage}
+                currentUserId={currentUserId}
+                currentUserPrenom={currentUserPrenom}
+                currentUserNom={currentUserNom}
+                occurrenceStatut={occurrenceStatut}
+                executionId={occurrence.executionId}
+                prestationId={prestation.id}
+                entrepriseId={prestation.entrepriseId}
+                prestataireEntrepriseId={occurrence.prestataireEntrepriseId}
+                occurrenceId={occurrence.id}
+                onStartOccurrence={startOccurrenceForCascade}
+                onTransition={(statut) =>
+                  handleTacheTransition(tache.id, statut)
+                }
+                onPjAdded={(pj) => handlePjAdded(tache.id, pj)}
+                onPjDeleted={(linkId) => handlePjDeleted(tache.id, linkId)}
+                onAdHocUpdated={handleAdHocUpdated}
+                onAssigneeChanged={(userId, prenom, nom) =>
+                  handleAssigneeChanged(tache.id, userId, prenom, nom)
+                }
+              />
+            ))}
+
+            {/* Zone ajout tâche ad-hoc */}
+            {canAddAdHoc && (
+              <div className="border-t pt-2">
+                {isAddingAdHoc ? (
+                  <AdHocTacheForm
+                    occurrenceId={occurrence.id}
+                    prestationId={prestation.id}
+                    entrepriseId={prestation.entrepriseId}
+                    onAdded={handleAdHocAdded}
+                    onCancel={() => setIsAddingAdHoc(false)}
+                  />
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-muted-foreground h-7 gap-1.5 px-2 text-xs"
+                    onClick={() => setIsAddingAdHoc(true)}
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Ajouter une tâche
+                  </Button>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Notes */}
         {occurrence.notes && (
@@ -519,6 +860,15 @@ export function OccurrenceDetailClient({
             </CardContent>
           </Card>
         )}
+
+        {/* Tickets liés */}
+        <LinkedTicketsCard
+          occurrenceId={occurrence.id}
+          entrepriseId={prestation.entrepriseId}
+          linkedTickets={linkedTickets}
+          onLinked={handleTicketLinked}
+          onUnlinked={handleTicketUnlinked}
+        />
       </div>
 
       {/* ==================== CANCEL DIALOG ==================== */}
@@ -554,25 +904,46 @@ export function OccurrenceDetailClient({
 
 // ==================== TACHE ROW ====================
 
+function formatTemps(seconds: number): string {
+  if (seconds < 60) return `${seconds}s`;
+  const minutes = Math.round(seconds / 60);
+  if (minutes < 60) return `${minutes} min`;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return m > 0 ? `${h}h ${m}min` : `${h}h`;
+}
+
 function TacheRow({
   tache,
   canInteract,
+  canManage,
+  currentUserId,
+  currentUserPrenom,
+  currentUserNom,
   occurrenceStatut,
   executionId,
   prestationId,
   entrepriseId,
+  prestataireEntrepriseId,
   occurrenceId,
   onStartOccurrence,
   onTransition,
   onPjAdded,
   onPjDeleted,
+  onAdHocUpdated,
+  onAssigneeChanged,
 }: {
   tache: OccurrenceTacheDetail;
   canInteract: boolean;
+  canManage: boolean;
+  currentUserId: string;
+  currentUserPrenom: string | null;
+  currentUserNom: string | null;
   occurrenceStatut: OccurrenceDetail["statut"];
   executionId: string | null;
   prestationId: string;
   entrepriseId: string;
+  prestataireEntrepriseId: string | null;
   occurrenceId: string;
   onStartOccurrence: () => Promise<boolean>;
   onTransition: (
@@ -585,9 +956,56 @@ function TacheRow({
   ) => Promise<void>;
   onPjAdded: (pj: TachePieceJointe) => void;
   onPjDeleted: (linkId: string) => void;
+  onAdHocUpdated: (tache: OccurrenceTacheDetail) => void;
+  onAssigneeChanged: (userId: string | null, prenom: string | null, nom: string | null) => void;
 }) {
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isEditingAdHoc, setIsEditingAdHoc] = useState(false);
+  const [assigneePopoverOpen, setAssigneePopoverOpen] = useState(false);
+  const [assignableUsers, setAssignableUsers] = useState<AssignableUser[]>([]);
+  const [isAssigning, setIsAssigning] = useState(false);
   const badge = TACHE_STATUT[tache.statut];
+  const isAdHoc = tache.listeItemId === null;
+
+  const handleOpenAssigneePopover = async (open: boolean) => {
+    setAssigneePopoverOpen(open);
+    if (open && assignableUsers.length === 0 && prestataireEntrepriseId) {
+      const result = await getAssignableUsersForOccurrenceAction({
+        entrepriseId: prestataireEntrepriseId,
+      });
+      if (result?.data?.users) {
+        setAssignableUsers(result.data.users as AssignableUser[]);
+      }
+    }
+  };
+
+  const handleAssignUser = async (userId: string | null) => {
+    setIsAssigning(true);
+    const result = await updateTacheAssigneeAction({
+      tacheId: tache.id,
+      occurrenceId,
+      entrepriseId,
+      assigneeUserId: userId,
+    });
+    setIsAssigning(false);
+    if (result?.serverError) {
+      toast.error(result.serverError.message);
+      return;
+    }
+    // Lookup du nom : self-assign utilise currentUser, sinon la liste chargée
+    let prenom: string | null = null;
+    let nom: string | null = null;
+    if (userId === currentUserId) {
+      prenom = currentUserPrenom;
+      nom = currentUserNom;
+    } else if (userId !== null) {
+      const user = assignableUsers.find((u) => u.id === userId);
+      prenom = user?.prenom ?? null;
+      nom = user?.nom ?? null;
+    }
+    onAssigneeChanged(userId, prenom, nom);
+    setAssigneePopoverOpen(false);
+  };
 
   const handleTransition = async (
     statut:
@@ -633,20 +1051,55 @@ function TacheRow({
     tache.statut === "en_cours";
 
   return (
-    <div className="rounded-lg border p-3 text-sm">
+    <div className={`rounded-lg border p-3 text-sm ${isAdHoc ? "border-dashed" : ""}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1 space-y-0.5">
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground w-5 flex-shrink-0 text-center text-xs">
               {tache.ordre}.
             </span>
-            <span
-              className={`font-medium ${tache.statut === "terminee" ? "line-through opacity-60" : ""}`}
-            >
-              {tache.titre}
-            </span>
+            {isAdHoc && (
+              <span className="text-muted-foreground rounded bg-slate-100 px-1 py-0.5 text-[10px]">
+                ad-hoc
+              </span>
+            )}
+            {isEditingAdHoc ? (
+              <AdHocTacheInlineEdit
+                tache={tache}
+                occurrenceId={occurrenceId}
+                prestationId={prestationId}
+                entrepriseId={entrepriseId}
+                onSaved={(updated) => {
+                  onAdHocUpdated({ ...tache, ...updated });
+                  setIsEditingAdHoc(false);
+                }}
+                onCancel={() => setIsEditingAdHoc(false)}
+              />
+            ) : (
+              <>
+                <span
+                  className={`font-medium ${tache.statut === "terminee" ? "line-through opacity-60" : ""}`}
+                >
+                  {tache.titre}
+                </span>
+                {isAdHoc &&
+                  canInteract &&
+                  tache.statut !== "terminee" &&
+                  (occurrenceStatut === "planifiee" || occurrenceStatut === "en_cours") && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsEditingAdHoc(true)}
+                      className="ml-1 h-5 w-5 flex-shrink-0 p-0"
+                      title="Modifier"
+                    >
+                      <Pencil className="h-3 w-3" />
+                    </Button>
+                  )}
+              </>
+            )}
           </div>
-          {tache.description && (
+          {!isEditingAdHoc && tache.description && (
             <p className="text-muted-foreground ml-7 text-xs">
               {tache.description}
             </p>
@@ -655,12 +1108,124 @@ function TacheRow({
             <p className="text-muted-foreground ml-7 flex items-center gap-1 text-xs">
               <Clock className="h-3 w-3" />
               {formatDateTime(tache.doneAt)}
+              {tache.tempsPasseSecondes !== null && tache.tempsPasseSecondes !== undefined && (
+                <span className="ml-1 flex items-center gap-0.5">
+                  <Timer className="h-3 w-3" />
+                  {formatTemps(tache.tempsPasseSecondes)}
+                </span>
+              )}
             </p>
           )}
         </div>
 
         <div className="flex flex-shrink-0 items-center gap-2">
           <Badge className={`text-xs ${badge.className}`}>{badge.label}</Badge>
+
+          {/* Assignee — visible quand l'occurrence est active */}
+          {canInteract && (occurrenceStatut === "planifiee" || occurrenceStatut === "en_cours") && (
+            canManage && prestataireEntrepriseId ? (
+              // Responsable / plateforme : popover complet — uniquement si un prestataire est assigné
+              <Popover open={assigneePopoverOpen} onOpenChange={handleOpenAssigneePopover}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-6 gap-1 px-2 text-xs"
+                    title={tache.assigneePrenom ? `Assigné à ${tache.assigneePrenom} ${tache.assigneeNom ?? ""}` : "Assigner un intervenant"}
+                    aria-label={tache.assigneePrenom ? `Intervenant assigné : ${tache.assigneePrenom} ${tache.assigneeNom ?? ""}` : "Assigner un intervenant à cette tâche"}
+                  >
+                    {tache.assigneeUserId ? (
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-[10px] font-medium text-blue-700">
+                        {(tache.assigneePrenom?.[0] ?? "").toUpperCase()}{(tache.assigneeNom?.[0] ?? "").toUpperCase()}
+                      </span>
+                    ) : (
+                      "Assigner"
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-48 p-1" align="end">
+                  {isAssigning && (
+                    <div className="flex items-center justify-center py-3">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    </div>
+                  )}
+                  {!isAssigning && assignableUsers.length === 0 && (
+                    <p className="text-muted-foreground px-2 py-2 text-xs">Aucun intervenant disponible</p>
+                  )}
+                  {!isAssigning && assignableUsers.length > 0 && (
+                    <div className="space-y-0.5">
+                      {tache.assigneeUserId && (
+                        <button
+                          className="text-muted-foreground hover:bg-muted w-full rounded px-2 py-1.5 text-left text-xs italic"
+                          onClick={() => handleAssignUser(null)}
+                        >
+                          Désassigner
+                        </button>
+                      )}
+                      {assignableUsers.map((u) => (
+                        <button
+                          key={u.id}
+                          className={`hover:bg-muted w-full rounded px-2 py-1.5 text-left text-xs ${u.id === tache.assigneeUserId ? "font-semibold" : ""}`}
+                          onClick={() => handleAssignUser(u.id)}
+                        >
+                          {u.prenom} {u.nom}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </PopoverContent>
+              </Popover>
+            ) : !canManage ? (
+              // Intervenant — UI selon état d'assignation
+              tache.assigneeUserId === null ? (
+                // Tâche non assignée → "Je prends"
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-6 px-2 text-xs"
+                  onClick={() => handleAssignUser(currentUserId)}
+                  disabled={isAssigning}
+                  title="M'assigner cette tâche"
+                >
+                  {isAssigning ? <Loader2 className="h-3 w-3 animate-spin" /> : "Je prends"}
+                </Button>
+              ) : tache.assigneeUserId === currentUserId ? (
+                // Assignée à soi-même → avatar cliquable pour se désassigner
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-6 w-6 rounded-full p-0"
+                  onClick={() => handleAssignUser(null)}
+                  disabled={isAssigning}
+                  title="Me désassigner"
+                  aria-label={`Assigné à vous — cliquer pour se désassigner`}
+                >
+                  {isAssigning ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <span className="text-[10px] font-medium text-blue-700">
+                      {(tache.assigneePrenom?.[0] ?? "").toUpperCase()}{(tache.assigneeNom?.[0] ?? "").toUpperCase()}
+                    </span>
+                  )}
+                </Button>
+              ) : (
+                // Assignée à quelqu'un d'autre → lecture seule
+                <span
+                  className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-[10px] font-medium text-blue-700"
+                  title={`${tache.assigneePrenom} ${tache.assigneeNom ?? ""}`}
+                >
+                  {(tache.assigneePrenom?.[0] ?? "").toUpperCase()}{(tache.assigneeNom?.[0] ?? "").toUpperCase()}
+                </span>
+              )
+            ) : null /* canManage sans prestataire assigné : pas d'UI d'assignation */
+          )}
+
+          {/* Assignee lecture seule (non-interactif) */}
+          {!canInteract && tache.assigneeUserId && (
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-[10px] font-medium text-blue-700" title={`${tache.assigneePrenom} ${tache.assigneeNom ?? ""}`}>
+              {(tache.assigneePrenom?.[0] ?? "").toUpperCase()}{(tache.assigneeNom?.[0] ?? "").toUpperCase()}
+            </span>
+          )}
 
           {isUpdating && (
             <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
@@ -684,13 +1249,13 @@ function TacheRow({
                   </Button>
                   <Button
                     size="sm"
-                    variant="ghost"
-                    className="text-muted-foreground h-6 px-2 text-xs"
+                    variant="outline"
+                    className="h-6 px-2 text-xs"
                     onClick={() => handleTransition("non_applicable")}
                     disabled={buttonsDisabled}
                     title={disabledTitle}
                   >
-                    N/A
+                    Non applicable
                   </Button>
                 </>
               )}
@@ -708,13 +1273,13 @@ function TacheRow({
                   </Button>
                   <Button
                     size="sm"
-                    variant="ghost"
-                    className="text-muted-foreground h-6 px-2 text-xs"
+                    variant="outline"
+                    className="h-6 px-2 text-xs"
                     onClick={() => handleTransition("non_applicable")}
                     disabled={buttonsDisabled}
                     title={disabledTitle}
                   >
-                    N/A
+                    Non applicable
                   </Button>
                 </>
               )}
@@ -971,6 +1536,187 @@ function PjThumb({
   );
 }
 
+// ==================== AD-HOC TACHE FORM (nouveau) ====================
+
+function AdHocTacheForm({
+  occurrenceId,
+  prestationId,
+  entrepriseId,
+  onAdded,
+  onCancel,
+}: {
+  occurrenceId: string;
+  prestationId: string;
+  entrepriseId: string;
+  onAdded: (tache: OccurrenceTacheDetail) => void;
+  onCancel: () => void;
+}) {
+  const [titre, setTitre] = useState("");
+  const [description, setDescription] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!titre.trim()) return;
+    setIsSubmitting(true);
+    const result = await insertAdHocTacheAction({
+      occurrenceId,
+      prestationId,
+      entrepriseId,
+      titre: titre.trim(),
+      description: description.trim() || undefined,
+    });
+    setIsSubmitting(false);
+    if (result?.serverError) {
+      toast.error(result.serverError.message);
+      return;
+    }
+    if (result?.data?.tache) {
+      onAdded({
+        ...result.data.tache,
+        piecesJointes: [],
+        assigneePrenom: null,
+        assigneeNom: null,
+      });
+      toast.success("Tâche ajoutée");
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-2 pt-1">
+      <input
+        autoFocus
+        type="text"
+        value={titre}
+        onChange={(e) => setTitre(e.target.value)}
+        placeholder="Titre de la tâche *"
+        maxLength={255}
+        className="border-input bg-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-md border px-2.5 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-1"
+      />
+      <textarea
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        placeholder="Description (optionnel)"
+        maxLength={1000}
+        rows={2}
+        className="border-input bg-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-md border px-2.5 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-1"
+      />
+      <div className="flex gap-2">
+        <Button
+          type="submit"
+          size="sm"
+          disabled={isSubmitting || !titre.trim()}
+          className="h-7 gap-1.5 px-3 text-xs"
+        >
+          {isSubmitting && <Loader2 className="h-3 w-3 animate-spin" />}
+          Ajouter
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={onCancel}
+          disabled={isSubmitting}
+          className="h-7 px-3 text-xs"
+        >
+          <X className="h-3 w-3" />
+          Annuler
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+// ==================== AD-HOC TACHE INLINE EDIT ====================
+
+function AdHocTacheInlineEdit({
+  tache,
+  occurrenceId,
+  prestationId,
+  entrepriseId,
+  onSaved,
+  onCancel,
+}: {
+  tache: OccurrenceTacheDetail;
+  occurrenceId: string;
+  prestationId: string;
+  entrepriseId: string;
+  onSaved: (updated: { titre: string; description: string | null }) => void;
+  onCancel: () => void;
+}) {
+  const [titre, setTitre] = useState(tache.titre);
+  const [description, setDescription] = useState(tache.description ?? "");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!titre.trim()) return;
+    setIsSubmitting(true);
+    const result = await updateAdHocTacheAction({
+      tacheId: tache.id,
+      occurrenceId,
+      prestationId,
+      entrepriseId,
+      titre: titre.trim(),
+      description: description.trim() || undefined,
+    });
+    setIsSubmitting(false);
+    if (result?.serverError) {
+      toast.error(result.serverError.message);
+      return;
+    }
+    if (result?.data?.tache) {
+      onSaved({
+        titre: result.data.tache.titre,
+        description: result.data.tache.description,
+      });
+      toast.success("Tâche mise à jour");
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="flex-1 space-y-1.5">
+      <input
+        autoFocus
+        type="text"
+        value={titre}
+        onChange={(e) => setTitre(e.target.value)}
+        maxLength={255}
+        className="border-input bg-background focus-visible:ring-ring w-full rounded-md border px-2 py-1 text-sm font-medium focus-visible:outline-none focus-visible:ring-1"
+      />
+      <textarea
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        placeholder="Description (optionnel)"
+        maxLength={1000}
+        rows={2}
+        className="border-input bg-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-md border px-2 py-1 text-xs focus-visible:outline-none focus-visible:ring-1"
+      />
+      <div className="flex gap-1.5">
+        <Button
+          type="submit"
+          size="sm"
+          disabled={isSubmitting || !titre.trim()}
+          className="h-6 px-2 text-xs"
+        >
+          {isSubmitting && <Loader2 className="h-3 w-3 animate-spin" />}
+          OK
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={onCancel}
+          disabled={isSubmitting}
+          className="h-6 px-2 text-xs"
+        >
+          <X className="h-3 w-3" />
+        </Button>
+      </div>
+    </form>
+  );
+}
+
 // ==================== DATE EDIT FORM ====================
 
 const occurrenceDatesSchema = z.object({
@@ -1063,5 +1809,201 @@ function DateEditForm({
         </div>
       </form>
     </Form>
+  );
+}
+
+// ==================== LINKED TICKETS CARD ====================
+
+const TICKET_STATUT_LABELS: Record<string, { label: string; className: string }> = {
+  ouvert: { label: "Ouvert", className: "bg-blue-100 text-blue-700" },
+  en_attente_prestataire: { label: "En attente prestataire", className: "bg-orange-100 text-orange-700" },
+  en_attente_client: { label: "En attente client", className: "bg-yellow-100 text-yellow-700" },
+  resolu: { label: "Résolu", className: "bg-green-100 text-green-700" },
+  ferme: { label: "Fermé", className: "bg-gray-100 text-gray-500" },
+};
+
+function LinkedTicketsCard({
+  occurrenceId,
+  entrepriseId,
+  linkedTickets,
+  onLinked,
+  onUnlinked,
+}: {
+  occurrenceId: string;
+  entrepriseId: string;
+  linkedTickets: LinkedTicket[];
+  onLinked: (ticket: LinkedTicket) => void;
+  onUnlinked: (ticketId: string) => void;
+}) {
+  const [linkPopoverOpen, setLinkPopoverOpen] = useState(false);
+  const [availableTickets, setAvailableTickets] = useState<LinkedTicket[]>([]);
+  const [isLoadingAvailable, setIsLoadingAvailable] = useState(false);
+  const [isLinking, setIsLinking] = useState<string | null>(null);
+  const [isUnlinking, setIsUnlinking] = useState<string | null>(null);
+
+  const handleOpenLinkPopover = async (open: boolean) => {
+    setLinkPopoverOpen(open);
+    if (open) {
+      setIsLoadingAvailable(true);
+      const result = await getAvailableTicketsForLinkingAction({
+        occurrenceId,
+        entrepriseId,
+      });
+      if (result?.data?.tickets) {
+        setAvailableTickets(result.data.tickets as LinkedTicket[]);
+      }
+      setIsLoadingAvailable(false);
+    }
+  };
+
+  const handleLink = async (ticket: LinkedTicket) => {
+    setIsLinking(ticket.id);
+    const result = await linkTicketToOccurrenceAction({
+      ticketId: ticket.id,
+      occurrenceId,
+      entrepriseId,
+    });
+    setIsLinking(null);
+    if (result?.serverError) {
+      toast.error(result.serverError.message);
+      return;
+    }
+    onLinked(ticket);
+    setLinkPopoverOpen(false);
+    toast.success("Ticket lié à l'intervention");
+  };
+
+  const handleUnlink = async (ticketId: string) => {
+    setIsUnlinking(ticketId);
+    const result = await unlinkTicketFromOccurrenceAction({
+      ticketId,
+      occurrenceId,
+      entrepriseId,
+    });
+    setIsUnlinking(null);
+    if (result?.serverError) {
+      toast.error(result.serverError.message);
+      return;
+    }
+    onUnlinked(ticketId);
+    toast.success("Ticket délié");
+  };
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center justify-between gap-2 text-base font-medium">
+          <span className="flex items-center gap-2">
+            <Ticket className="text-primary h-4 w-4" />
+            Tickets liés
+            {linkedTickets.length > 0 && (
+              <span className="text-muted-foreground text-xs font-normal">
+                ({linkedTickets.length})
+              </span>
+            )}
+          </span>
+          <Popover open={linkPopoverOpen} onOpenChange={handleOpenLinkPopover}>
+            <PopoverTrigger asChild>
+              <Button size="sm" variant="outline" className="h-7 gap-1.5 px-2 text-xs">
+                <Link2 className="h-3.5 w-3.5" />
+                Lier un ticket
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-72 p-2" align="end">
+              <p className="text-muted-foreground mb-2 text-xs font-medium">
+                Tickets disponibles
+              </p>
+              {isLoadingAvailable && (
+                <div className="flex items-center justify-center py-3">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                </div>
+              )}
+              {!isLoadingAvailable && availableTickets.length === 0 && (
+                <p className="text-muted-foreground py-2 text-center text-xs">
+                  Aucun ticket disponible à lier
+                </p>
+              )}
+              {!isLoadingAvailable && availableTickets.length > 0 && (
+                <div className="max-h-52 space-y-1 overflow-y-auto">
+                  {availableTickets.map((t) => {
+                    const alreadyLinked = linkedTickets.some((l) => l.id === t.id);
+                    if (alreadyLinked) return null;
+                    const statutInfo = TICKET_STATUT_LABELS[t.statut];
+                    return (
+                      <button
+                        key={t.id}
+                        className="hover:bg-muted w-full rounded px-2 py-1.5 text-left"
+                        onClick={() => handleLink(t)}
+                        disabled={isLinking === t.id}
+                      >
+                        <div className="flex items-center gap-2">
+                          {isLinking === t.id ? (
+                            <Loader2 className="h-3.5 w-3.5 flex-shrink-0 animate-spin" />
+                          ) : (
+                            <Link2 className="text-muted-foreground h-3.5 w-3.5 flex-shrink-0" />
+                          )}
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate text-xs font-medium">{t.titre}</span>
+                            {statutInfo && (
+                              <span className={`mt-0.5 inline-block rounded px-1 py-0.5 text-[10px] ${statutInfo.className}`}>
+                                {statutInfo.label}
+                              </span>
+                            )}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </PopoverContent>
+          </Popover>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {linkedTickets.length === 0 && (
+          <p className="text-muted-foreground py-2 text-center text-sm">
+            Aucun ticket lié à cette intervention.
+          </p>
+        )}
+        {linkedTickets.length > 0 && (
+          <div className="space-y-2">
+            {linkedTickets.map((ticket) => {
+              const statutInfo = TICKET_STATUT_LABELS[ticket.statut];
+              return (
+                <div
+                  key={ticket.id}
+                  className="flex items-center gap-3 rounded-lg border px-3 py-2 text-sm"
+                >
+                  <Ticket className="text-muted-foreground h-4 w-4 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <span className="block truncate font-medium">{ticket.titre}</span>
+                    {statutInfo && (
+                      <span className={`mt-0.5 inline-block rounded px-1.5 py-0.5 text-[10px] ${statutInfo.className}`}>
+                        {statutInfo.label}
+                      </span>
+                    )}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 w-7 flex-shrink-0 p-0"
+                    title="Délier"
+                    onClick={() => handleUnlink(ticket.id)}
+                    disabled={isUnlinking === ticket.id}
+                  >
+                    {isUnlinking === ticket.id ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Link2Off className="h-3.5 w-3.5" />
+                    )}
+                  </Button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }

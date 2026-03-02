@@ -1,0 +1,2 @@
+DROP INDEX "client_service_execution_prix_udx";--> statement-breakpoint
+CREATE UNIQUE INDEX "client_service_execution_prix_udx" ON "client_service_execution_prix" USING btree ("execution_id","type_prix","periode_facturation") WHERE actif = true;

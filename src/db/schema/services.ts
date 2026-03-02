@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   boolean,
   date,
@@ -189,6 +190,11 @@ export const clientServiceExecutions = pgTable(
       { onDelete: "set null" },
     ),
     // checklist override du prestataire (prioritaire sur celle de la prestation)
+    assigneeUserIdDefault: uuid("assignee_user_id_default").references(
+      () => user.id,
+      { onDelete: "set null" },
+    ),
+    // intervenant par défaut propagé aux occurrences futures (non rétroactif)
     createdAt: createdAt(),
     updatedAt: updatedAt(),
     createdById: createdById(() => user),
@@ -230,11 +236,11 @@ export const clientServiceExecutionPrix = pgTable(
     index("client_service_execution_prix_execution_idx").on(t.executionId),
     index("client_service_execution_prix_type_idx").on(t.typePrix),
     index("client_service_execution_prix_actif_idx").on(t.actif),
-    uniqueIndex("client_service_execution_prix_udx").on(
-      t.executionId,
-      t.typePrix,
-      t.periodeFacturation,
-    ),
+    // Index partiel : n'empêche les doublons que sur les lignes actives.
+    // Les lignes soft-deleted (actif=false) peuvent coexister avec la même clé.
+    uniqueIndex("client_service_execution_prix_udx")
+      .on(t.executionId, t.typePrix, t.periodeFacturation)
+      .where(sql`actif = true`),
   ],
 );
 

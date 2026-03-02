@@ -1,18 +1,26 @@
 import "server-only";
 
+import {
+  OccurrenceStatutType,
+  OccurrenceTacheStatutType,
+} from "@/zod-schemas/enums";
 import { db } from "@/db";
+import { user } from "@/db/schema/auth";
 import { documents, documentsLinks } from "@/db/schema/documents";
 import {
   clientServiceExecutionPrix,
   clientServiceExecutions,
   clientServiceOccurrences,
   clientServices,
+  services,
 } from "@/db/schema/services";
 import { serviceEntreprises } from "@/db/schema/entreprises";
 import { entreprises } from "@/db/schema/entreprises";
 import { sites } from "@/db/schema/sites";
+import { userSiteAttributions } from "@/db/schema/users";
 import { occurrenceTaches } from "@/db/schema/services";
 import { and, asc, count, desc, eq, gte, inArray, isNull, or } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 
 /**
  * Récupère la liste des prestataires avec lesquels un client a une relation
@@ -62,11 +70,40 @@ export async function getClientPrestataires(
 
 /**
  * Récupère les prestataires actifs offrant un service donné.
+ *
+ * - Si clientEntrepriseId fourni (mode direct) : uniquement les prestataires
+ *   avec lesquels ce client a déjà une relation (toute prestation confondue).
+ * - Sinon (mode intermédiaire FM4ALL / plateforme) : catalogue complet.
  */
-export async function getPrestatairesForService(
-  serviceId: string,
-): Promise<Array<{ serviceEntrepriseId: string; entrepriseId: string; nom: string }>> {
-  const rows = await db
+export async function getPrestatairesForService(params: {
+  serviceId: string;
+  clientEntrepriseId?: string;
+}): Promise<Array<{ serviceEntrepriseId: string; entrepriseId: string; nom: string }>> {
+  const { serviceId, clientEntrepriseId } = params;
+
+  const baseConditions = and(
+    eq(serviceEntreprises.serviceId, serviceId),
+    eq(serviceEntreprises.actif, true),
+  );
+
+  const conditions = clientEntrepriseId
+    ? and(
+        baseConditions,
+        inArray(
+          serviceEntreprises.id,
+          db
+            .selectDistinct({ id: clientServiceExecutions.serviceEntrepriseId })
+            .from(clientServiceExecutions)
+            .innerJoin(
+              clientServices,
+              eq(clientServices.id, clientServiceExecutions.clientServiceId),
+            )
+            .where(eq(clientServices.entrepriseId, clientEntrepriseId)),
+        ),
+      )
+    : baseConditions;
+
+  return await db
     .select({
       serviceEntrepriseId: serviceEntreprises.id,
       entrepriseId: entreprises.id,
@@ -74,15 +111,22 @@ export async function getPrestatairesForService(
     })
     .from(serviceEntreprises)
     .innerJoin(entreprises, eq(entreprises.id, serviceEntreprises.entrepriseId))
-    .where(
-      and(
-        eq(serviceEntreprises.serviceId, serviceId),
-        eq(serviceEntreprises.actif, true),
-      ),
-    )
+    .where(conditions)
     .orderBy(entreprises.nom);
+}
 
-  return rows;
+/**
+ * Recherche une entreprise par SIRET.
+ */
+export async function findEntrepriseBySiret(
+  siret: string,
+): Promise<{ id: string; nom: string; siret: string } | null> {
+  const [row] = await db
+    .select({ id: entreprises.id, nom: entreprises.nom, siret: entreprises.siret })
+    .from(entreprises)
+    .where(eq(entreprises.siret, siret))
+    .limit(1);
+  return row ?? null;
 }
 
 // ==================== TYPES ====================
@@ -110,6 +154,9 @@ export type ExecutionWithPrix = {
   priorite: number;
   actif: boolean;
   tacheListeTemplateId: string | null;
+  assigneeUserIdDefault: string | null;
+  assigneeDefaultPrenom: string | null;
+  assigneeDefaultNom: string | null;
   createdAt: Date;
   prix: ExecutionPrixItem[];
 };
@@ -124,9 +171,12 @@ export type OccurrenceListItem = {
   dateFinPrevue: Date | null;
   dateDebutReelle: Date | null;
   dateFinReelle: Date | null;
-  statut: "planifiee" | "en_cours" | "terminee" | "non_honoree" | "annulee";
+  statut: OccurrenceStatutType;
   notes: string | null;
   createdAt: Date;
+  assigneeUserId: string | null;
+  assigneePrenom: string | null;
+  assigneeNom: string | null;
 };
 
 // ==================== EXECUTIONS WITH PRIX ====================
@@ -137,7 +187,9 @@ export type OccurrenceListItem = {
 export async function getExecutionsWithPrixByPrestationId(
   prestationId: string,
 ): Promise<ExecutionWithPrix[]> {
-  // 1. Récupérer les exécutions (avec nom prestataire via LEFT JOIN)
+  const assigneeDefaultUser = alias(user, "assignee_default_user");
+
+  // 1. Récupérer les exécutions (avec nom prestataire + assignee par défaut via LEFT JOINs)
   const executionRows = await db
     .select({
       id: clientServiceExecutions.id,
@@ -151,6 +203,9 @@ export async function getExecutionsWithPrixByPrestationId(
       priorite: clientServiceExecutions.priorite,
       actif: clientServiceExecutions.actif,
       tacheListeTemplateId: clientServiceExecutions.tacheListeTemplateId,
+      assigneeUserIdDefault: clientServiceExecutions.assigneeUserIdDefault,
+      assigneeDefaultPrenom: assigneeDefaultUser.prenom,
+      assigneeDefaultNom: assigneeDefaultUser.nom,
       createdAt: clientServiceExecutions.createdAt,
     })
     .from(clientServiceExecutions)
@@ -159,6 +214,10 @@ export async function getExecutionsWithPrixByPrestationId(
       eq(serviceEntreprises.id, clientServiceExecutions.serviceEntrepriseId),
     )
     .leftJoin(entreprises, eq(entreprises.id, serviceEntreprises.entrepriseId))
+    .leftJoin(
+      assigneeDefaultUser,
+      eq(assigneeDefaultUser.id, clientServiceExecutions.assigneeUserIdDefault),
+    )
     .where(eq(clientServiceExecutions.clientServiceId, prestationId))
     .orderBy(desc(clientServiceExecutions.priorite), asc(clientServiceExecutions.createdAt));
 
@@ -201,6 +260,9 @@ export async function getExecutionsWithPrixByPrestationId(
   return executionRows.map((e) => ({
     ...e,
     prestataireNom: e.prestataireNom ?? null,
+    assigneeUserIdDefault: e.assigneeUserIdDefault ?? null,
+    assigneeDefaultPrenom: e.assigneeDefaultPrenom ?? null,
+    assigneeDefaultNom: e.assigneeDefaultNom ?? null,
     prix: prixByExecution.get(e.id) ?? [],
   }));
 }
@@ -236,6 +298,8 @@ export async function getOccurrencesByPrestationId(
     conditions.push(eq(clientServiceOccurrences.siteId, options.siteId));
   }
 
+  const assigneeUser = alias(user, "assignee_user_occ");
+
   const rows = await db
     .select({
       id: clientServiceOccurrences.id,
@@ -250,9 +314,16 @@ export async function getOccurrencesByPrestationId(
       statut: clientServiceOccurrences.statut,
       notes: clientServiceOccurrences.notes,
       createdAt: clientServiceOccurrences.createdAt,
+      assigneeUserId: clientServiceOccurrences.assigneeUserId,
+      assigneePrenom: assigneeUser.prenom,
+      assigneeNom: assigneeUser.nom,
     })
     .from(clientServiceOccurrences)
     .leftJoin(sites, eq(sites.id, clientServiceOccurrences.siteId))
+    .leftJoin(
+      assigneeUser,
+      eq(assigneeUser.id, clientServiceOccurrences.assigneeUserId),
+    )
     .where(and(...conditions))
     .orderBy(
       options?.sortDir === "desc"
@@ -355,14 +426,18 @@ export type OccurrenceDetail = {
   siteNom: string | null;
   executionId: string | null;
   prestataireNom: string | null;
+  prestataireEntrepriseId: string | null;
   dateDebutPrevue: Date | null;
   dateFinPrevue: Date | null;
   dateDebutReelle: Date | null;
   dateFinReelle: Date | null;
-  statut: "planifiee" | "en_cours" | "terminee" | "non_honoree" | "annulee";
+  statut: OccurrenceStatutType;
   notes: string | null;
   createdAt: Date;
   updatedAt: Date;
+  assigneeUserId: string | null;
+  assigneePrenom: string | null;
+  assigneeNom: string | null;
 };
 
 export type TachePieceJointe = {
@@ -381,10 +456,14 @@ export type OccurrenceTacheDetail = {
   ordre: number;
   titre: string;
   description: string | null;
-  statut: "a_faire" | "en_cours" | "terminee" | "non_honoree" | "non_applicable" | "annulee";
+  statut: OccurrenceTacheStatutType;
   notes: string | null;
   startedAt: Date | null;
   doneAt: Date | null;
+  tempsPasseSecondes: number | null;
+  assigneeUserId: string | null;
+  assigneePrenom: string | null;
+  assigneeNom: string | null;
   piecesJointes: TachePieceJointe[];
 };
 
@@ -394,6 +473,8 @@ export type OccurrenceTacheDetail = {
 export async function getOccurrenceWithDetailsById(
   occurrenceId: string,
 ): Promise<OccurrenceDetail | null> {
+  const assigneeUser = alias(user, "assignee_user_occ_detail");
+
   const [row] = await db
     .select({
       id: clientServiceOccurrences.id,
@@ -402,6 +483,7 @@ export async function getOccurrenceWithDetailsById(
       siteNom: sites.nom,
       executionId: clientServiceOccurrences.executionId,
       prestataireNom: entreprises.nom,
+      prestataireEntrepriseId: serviceEntreprises.entrepriseId,
       dateDebutPrevue: clientServiceOccurrences.dateDebutPrevue,
       dateFinPrevue: clientServiceOccurrences.dateFinPrevue,
       dateDebutReelle: clientServiceOccurrences.dateDebutReelle,
@@ -410,6 +492,9 @@ export async function getOccurrenceWithDetailsById(
       notes: clientServiceOccurrences.notes,
       createdAt: clientServiceOccurrences.createdAt,
       updatedAt: clientServiceOccurrences.updatedAt,
+      assigneeUserId: clientServiceOccurrences.assigneeUserId,
+      assigneePrenom: assigneeUser.prenom,
+      assigneeNom: assigneeUser.nom,
     })
     .from(clientServiceOccurrences)
     .leftJoin(sites, eq(sites.id, clientServiceOccurrences.siteId))
@@ -422,6 +507,10 @@ export async function getOccurrenceWithDetailsById(
       eq(serviceEntreprises.id, clientServiceExecutions.serviceEntrepriseId),
     )
     .leftJoin(entreprises, eq(entreprises.id, serviceEntreprises.entrepriseId))
+    .leftJoin(
+      assigneeUser,
+      eq(assigneeUser.id, clientServiceOccurrences.assigneeUserId),
+    )
     .where(eq(clientServiceOccurrences.id, occurrenceId))
     .limit(1);
 
@@ -429,11 +518,13 @@ export async function getOccurrenceWithDetailsById(
 }
 
 /**
- * Récupère les tâches d'une occurrence (ordonnées) avec leurs pièces jointes.
+ * Récupère les tâches d'une occurrence (ordonnées) avec leurs pièces jointes et l'assigné.
  */
 export async function getOccurrenceTaches(
   occurrenceId: string,
 ): Promise<OccurrenceTacheDetail[]> {
+  const assigneeUser = alias(user, "assignee_user");
+
   const rows = await db
     .select({
       id: occurrenceTaches.id,
@@ -446,8 +537,13 @@ export async function getOccurrenceTaches(
       notes: occurrenceTaches.notes,
       startedAt: occurrenceTaches.startedAt,
       doneAt: occurrenceTaches.doneAt,
+      tempsPasseSecondes: occurrenceTaches.tempsPasseSecondes,
+      assigneeUserId: occurrenceTaches.assigneeUserId,
+      assigneePrenom: assigneeUser.prenom,
+      assigneeNom: assigneeUser.nom,
     })
     .from(occurrenceTaches)
+    .leftJoin(assigneeUser, eq(assigneeUser.id, occurrenceTaches.assigneeUserId))
     .where(eq(occurrenceTaches.occurrenceId, occurrenceId))
     .orderBy(asc(occurrenceTaches.ordre));
 
@@ -486,6 +582,133 @@ export async function getOccurrenceTaches(
 
   return rows.map((row) => ({
     ...row,
+    assigneeUserId: row.assigneeUserId ?? null,
+    assigneePrenom: row.assigneePrenom ?? null,
+    assigneeNom: row.assigneeNom ?? null,
     piecesJointes: pjByTacheId.get(row.id) ?? [],
+  }));
+}
+
+// ==================== MES SITES CLIENTS (Posture Prestataire) ====================
+
+export type SiteClientCouvert = {
+  siteId: string;
+  siteNom: string | null;
+  clientEntrepriseId: string;
+  clientEntrepriseNom: string | null;
+  serviceNoms: string[];
+};
+
+export type PrestataireUserOnSite = {
+  attributionId: string;
+  userId: string;
+  userPrenom: string;
+  userNom: string;
+  userEmail: string;
+  role: string;
+};
+
+export type SiteClientAvecAgents = SiteClientCouvert & {
+  agentsAttribues: PrestataireUserOnSite[];
+};
+
+/**
+ * Retourne les sites clients couverts par le prestataire via des exécutions actives,
+ * avec la liste des agents prestataires déjà attribués à chaque site.
+ */
+export async function getSitesCouvertsParPrestataire(
+  prestataireEntrepriseId: string,
+): Promise<SiteClientAvecAgents[]> {
+  // 1. Sites couverts (exécutions actives sur prestations actives)
+  const rows = await db
+    .select({
+      siteId: sites.id,
+      siteNom: sites.nom,
+      clientEntrepriseId: clientServices.entrepriseId,
+      clientEntrepriseNom: entreprises.nom,
+      serviceNom: services.nom,
+    })
+    .from(clientServiceExecutions)
+    .innerJoin(
+      serviceEntreprises,
+      eq(serviceEntreprises.id, clientServiceExecutions.serviceEntrepriseId),
+    )
+    .innerJoin(
+      clientServices,
+      eq(clientServices.id, clientServiceExecutions.clientServiceId),
+    )
+    .innerJoin(sites, eq(sites.id, clientServiceExecutions.siteId))
+    .innerJoin(entreprises, eq(entreprises.id, clientServices.entrepriseId))
+    .innerJoin(services, eq(services.id, clientServices.serviceId))
+    .where(
+      and(
+        eq(serviceEntreprises.entrepriseId, prestataireEntrepriseId),
+        eq(clientServiceExecutions.actif, true),
+        eq(clientServices.statut, "actif"),
+      ),
+    )
+    .orderBy(entreprises.nom, sites.nom, services.nom);
+
+  if (rows.length === 0) return [];
+
+  // Grouper par siteId
+  const siteMap = new Map<string, SiteClientCouvert>();
+  for (const row of rows) {
+    const existing = siteMap.get(row.siteId);
+    if (existing) {
+      if (row.serviceNom && !existing.serviceNoms.includes(row.serviceNom)) {
+        existing.serviceNoms.push(row.serviceNom);
+      }
+    } else {
+      siteMap.set(row.siteId, {
+        siteId: row.siteId,
+        siteNom: row.siteNom,
+        clientEntrepriseId: row.clientEntrepriseId,
+        clientEntrepriseNom: row.clientEntrepriseNom,
+        serviceNoms: row.serviceNom ? [row.serviceNom] : [],
+      });
+    }
+  }
+
+  const siteIds = Array.from(siteMap.keys());
+
+  // 2. Agents prestataires attribués à ces sites
+  const attributions = await db
+    .select({
+      attributionId: userSiteAttributions.id,
+      siteId: userSiteAttributions.siteId,
+      userId: user.id,
+      userPrenom: user.prenom,
+      userNom: user.nom,
+      userEmail: user.email,
+      role: userSiteAttributions.role,
+    })
+    .from(userSiteAttributions)
+    .innerJoin(user, eq(user.id, userSiteAttributions.userId))
+    .where(
+      and(
+        eq(userSiteAttributions.entrepriseId, prestataireEntrepriseId),
+        eq(userSiteAttributions.mode, "inclure"),
+        inArray(userSiteAttributions.siteId, siteIds),
+      ),
+    );
+
+  // Grouper les attributions par siteId
+  const agentsBySiteId = new Map<string, PrestataireUserOnSite[]>();
+  for (const a of attributions) {
+    if (!agentsBySiteId.has(a.siteId)) agentsBySiteId.set(a.siteId, []);
+    agentsBySiteId.get(a.siteId)!.push({
+      attributionId: a.attributionId,
+      userId: a.userId,
+      userPrenom: a.userPrenom,
+      userNom: a.userNom,
+      userEmail: a.userEmail,
+      role: a.role,
+    });
+  }
+
+  return Array.from(siteMap.values()).map((site) => ({
+    ...site,
+    agentsAttribues: agentsBySiteId.get(site.siteId) ?? [],
   }));
 }

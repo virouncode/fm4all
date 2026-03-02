@@ -1,6 +1,7 @@
 "use client";
 
 import { RhfControlledSelect } from "@/components/rhf/RhfControlledSelect";
+import { RhfDatePicker } from "@/components/rhf/RhfDatePicker";
 import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -20,6 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -27,11 +29,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import {
+  createOrLinkPrestataireAction,
+  findEntrepriseBySiretAction,
   getPrestatairesForServiceAction,
   insertExecutionWithPrixAction,
 } from "@/server/actions/clientServiceExecutionsActions";
+import { getAssignableUsersForOccurrenceAction } from "@/server/actions/clientServiceOccurrencesActions";
+import { isValidSIRET } from "@/lib/utils/isValidSIRET";
 import type { ExecutionWithPrix } from "@/server/queries/clientServiceExecutions.query";
 import {
   type InsertExecutionFormType,
@@ -39,12 +46,12 @@ import {
 } from "@/zod-schemas/clientServiceExecutions.schema";
 import type { ModeCommercialType } from "@/zod-schemas/clientServices.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Trash2 } from "lucide-react";
+import { CheckCircle2, Plus, Search, Trash2, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useFieldArray, useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
 
-interface ExecutionFormDialogProps {
+type ExecutionFormDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   prestationId: string;
@@ -62,6 +69,13 @@ type PrestatairItem = {
   nom: string;
 };
 
+type SiretState =
+  | { status: "idle" }
+  | { status: "searching" }
+  | { status: "found"; entreprise: { id: string; nom: string; siret: string } }
+  | { status: "not_found" }
+  | { status: "error"; message: string };
+
 const TYPE_PRIX_OPTIONS = [
   { value: "abonnement", label: "Abonnement (récurrent)" },
   { value: "par_occurrence", label: "Par intervention" },
@@ -69,7 +83,6 @@ const TYPE_PRIX_OPTIONS = [
   { value: "frais_livraison", label: "Frais par intervention" },
 ] as const;
 
-/** Texte d'aide expliquant quand le tarif est déclenché */
 const TYPE_PRIX_HELP: Record<string, string> = {
   abonnement:
     "Facturé à chaque période (semaine/mois/an), indépendamment du nombre d'interventions.",
@@ -98,7 +111,6 @@ function emptyPrixItem() {
   };
 }
 
-/** Retourne le label du montant selon le type de prix et la période */
 function getMontantLabel(
   typePrix: string,
   periodeFacturation: string | undefined,
@@ -141,10 +153,28 @@ export function ExecutionFormDialog({
 }: ExecutionFormDialogProps) {
   const [prestataires, setPrestataires] = useState<PrestatairItem[]>([]);
   const [loadingPrestataires, setLoadingPrestataires] = useState(false);
+  const [assignableUsers, setAssignableUsers] = useState<Array<{ id: string; prenom: string; nom: string }>>([]);
+  const [loadingAssignees, setLoadingAssignees] = useState(false);
+
+  // Sous-formulaire "nouveau prestataire"
+  const [showNouveauPrestataire, setShowNouveauPrestataire] = useState(false);
+  const [siretInput, setSiretInput] = useState("");
+  const [siretState, setSiretState] = useState<SiretState>({ status: "idle" });
+  const [nouveauNom, setNouveauNom] = useState("");
+  const [nouveauContact, setNouveauContact] = useState({
+    prenom: "",
+    nom: "",
+    email: "",
+    phone: "",
+  });
+  const [creatingPrestataire, setCreatingPrestataire] = useState(false);
 
   // Mode intermédiaire : uniquement plateforme + modeCommercial=intermediaire_fm4all
   const showIntermediaire =
     isPlateforme && modeCommercial === "intermediaire_fm4all";
+
+  // En mode direct : le client peut créer un nouveau prestataire
+  const canCreatePrestataire = modeCommercial === "direct";
 
   const form = useForm<InsertExecutionFormType>({
     resolver: zodResolver(insertExecutionFormSchema),
@@ -157,6 +187,7 @@ export function ExecutionFormDialog({
       dateDebutValidite: "",
       dateFinValidite: "",
       priorite: "0",
+      assigneeUserIdDefault: "",
       prix: [emptyPrixItem()],
     },
   });
@@ -179,14 +210,22 @@ export function ExecutionFormDialog({
       dateDebutValidite: "",
       dateFinValidite: "",
       priorite: "0",
+      assigneeUserIdDefault: "",
       prix: [emptyPrixItem()],
     });
+    setAssignableUsers([]);
+    setShowNouveauPrestataire(false);
+    setSiretInput("");
+    setSiretState({ status: "idle" });
+    setNouveauNom("");
+    setNouveauContact({ prenom: "", nom: "", email: "", phone: "" });
 
     async function loadPrestataires() {
       setLoadingPrestataires(true);
       const result = await getPrestatairesForServiceAction({
         serviceId,
         entrepriseId,
+        modeCommercial,
       });
       if (result?.data?.prestataires) {
         setPrestataires(result.data.prestataires);
@@ -195,7 +234,83 @@ export function ExecutionFormDialog({
     }
 
     loadPrestataires();
-  }, [open, serviceId, entrepriseId, prestationId, siteId, form]);
+  }, [
+    open,
+    serviceId,
+    entrepriseId,
+    prestationId,
+    siteId,
+    modeCommercial,
+    form,
+  ]);
+
+  // siretInput contient déjà uniquement des chiffres (onChange filtre les non-digits)
+  const siretValide = isValidSIRET(siretInput);
+
+  const handleSearchSiret = async () => {
+    setSiretState({ status: "searching" });
+    const result = await findEntrepriseBySiretAction({ siret: siretInput });
+    if (result?.serverError) {
+      setSiretState({ status: "error", message: result.serverError.message });
+      return;
+    }
+    if (result?.data?.entreprise) {
+      setSiretState({ status: "found", entreprise: result.data.entreprise });
+      setNouveauNom(result.data.entreprise.nom);
+    } else {
+      setSiretState({ status: "not_found" });
+      setNouveauNom("");
+    }
+  };
+
+  const handleConfirmPrestataire = async () => {
+    const siret = siretInput.replace(/\s/g, "");
+    if (!nouveauNom.trim()) {
+      toast.error("Le nom du prestataire est requis");
+      return;
+    }
+    setCreatingPrestataire(true);
+    const result = await createOrLinkPrestataireAction({
+      siret,
+      nom: nouveauNom.trim(),
+      serviceId,
+      entrepriseId,
+      prenomContact: nouveauContact.prenom || undefined,
+      nomContact: nouveauContact.nom || undefined,
+      emailContact: nouveauContact.email || undefined,
+      phoneContact: nouveauContact.phone || undefined,
+    });
+    setCreatingPrestataire(false);
+
+    if (result?.serverError) {
+      toast.error(result.serverError.message);
+      return;
+    }
+
+    if (result?.data?.serviceEntrepriseId) {
+      const seId = result.data.serviceEntrepriseId;
+      form.setValue("serviceEntrepriseId", seId, { shouldValidate: true });
+
+      // Ajouter à la liste locale si pas déjà présent
+      if (!prestataires.find((p) => p.serviceEntrepriseId === seId)) {
+        setPrestataires((prev) => [
+          ...prev,
+          {
+            serviceEntrepriseId: seId,
+            entrepriseId: "",
+            nom: nouveauNom.trim(),
+          },
+        ]);
+      }
+
+      setShowNouveauPrestataire(false);
+      setSiretInput("");
+      setSiretState({ status: "idle" });
+      setNouveauNom("");
+      setNouveauContact({ prenom: "", nom: "", email: "", phone: "" });
+      toast.success("Prestataire lié avec succès");
+    }
+  };
 
   const onSubmit = async (data: InsertExecutionFormType) => {
     const result = await insertExecutionWithPrixAction(data);
@@ -213,6 +328,33 @@ export function ExecutionFormDialog({
   };
 
   const watchedPrix = form.watch("prix");
+  const watchedServiceEntrepriseId = form.watch("serviceEntrepriseId");
+
+  // Load assignable users when prestataire changes
+  useEffect(() => {
+    const selectedPrestataire = prestataires.find(
+      (p) => p.serviceEntrepriseId === watchedServiceEntrepriseId,
+    );
+    const prestataireEntrepriseId = selectedPrestataire?.entrepriseId;
+
+    if (!prestataireEntrepriseId) {
+      setAssignableUsers([]);
+      form.setValue("assigneeUserIdDefault", "");
+      return;
+    }
+
+    setLoadingAssignees(true);
+    getAssignableUsersForOccurrenceAction({ entrepriseId: prestataireEntrepriseId })
+      .then((result) => {
+        if (result?.data?.users) {
+          setAssignableUsers(result.data.users);
+        } else {
+          setAssignableUsers([]);
+        }
+      })
+      .finally(() => setLoadingAssignees(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watchedServiceEntrepriseId, prestataires]);
 
   function recalculateMontant(index: number, cout: string, marge: string) {
     const coutNum = Number(cout) || 0;
@@ -225,7 +367,6 @@ export function ExecutionFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      {/* overflow-hidden empêche le contenu de déborder des coins arrondis */}
       <DialogContent className="flex max-h-[90vh] max-w-2xl flex-col gap-0 overflow-hidden p-0">
         <DialogHeader className="flex-shrink-0 px-6 pt-6 pb-4">
           <DialogTitle>Ajouter un prestataire</DialogTitle>
@@ -236,45 +377,253 @@ export function ExecutionFormDialog({
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex min-h-0 flex-1 flex-col"
           >
-            {/* Zone scrollable */}
             <div className="min-h-0 flex-1 overflow-y-auto px-6">
               <div className="space-y-5 py-2 pb-4">
-                {/* Prestataire */}
-                <RhfControlledSelect<InsertExecutionFormType>
-                  name="serviceEntrepriseId"
-                  label="Prestataire"
-                  requiredMark
-                  disabled={loadingPrestataires || prestataires.length === 0}
-                  placeholder={
-                    loadingPrestataires
-                      ? "Chargement..."
-                      : prestataires.length === 0
-                        ? "Aucun prestataire disponible pour ce service"
-                        : "Sélectionnez un prestataire"
-                  }
-                >
-                  {prestataires.map((p) => (
-                    <SelectItem
-                      key={p.serviceEntrepriseId}
-                      value={p.serviceEntrepriseId}
-                    >
-                      {p.nom}
-                    </SelectItem>
-                  ))}
-                </RhfControlledSelect>
+                {/* ── SECTION PRESTATAIRE ── */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label>
+                      Prestataire <span className="text-destructive">*</span>
+                    </Label>
+                    {canCreatePrestataire && !showNouveauPrestataire && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() => setShowNouveauPrestataire(true)}
+                      >
+                        <Plus className="h-3 w-3" />
+                        Nouveau prestataire
+                      </Button>
+                    )}
+                  </div>
 
-                {/* Dates de validité — RhfInput réserve min-h pour l'erreur, items-start non nécessaire mais sans impact */}
+                  {/* Select prestataires existants */}
+                  <RhfControlledSelect<InsertExecutionFormType>
+                    name="serviceEntrepriseId"
+                    label=""
+                    disabled={
+                      loadingPrestataires ||
+                      (prestataires.length === 0 && !showNouveauPrestataire)
+                    }
+                    placeholder={
+                      loadingPrestataires
+                        ? "Chargement..."
+                        : prestataires.length === 0
+                          ? canCreatePrestataire
+                            ? "Aucun prestataire — créez-en un ci-dessous"
+                            : "Aucun prestataire disponible"
+                          : "Sélectionnez un prestataire"
+                    }
+                  >
+                    {prestataires.map((p) => (
+                      <SelectItem
+                        key={p.serviceEntrepriseId}
+                        value={p.serviceEntrepriseId}
+                      >
+                        {p.nom}
+                      </SelectItem>
+                    ))}
+                  </RhfControlledSelect>
+
+                  {/* Sous-formulaire nouveau prestataire */}
+                  {showNouveauPrestataire && (
+                    <div className="bg-muted/30 space-y-3 rounded-lg border p-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">
+                          Nouveau prestataire
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => {
+                            setShowNouveauPrestataire(false);
+                            setSiretInput("");
+                            setSiretState({ status: "idle" });
+                            setNouveauNom("");
+                          }}
+                        >
+                          <XCircle className="h-4 w-4" />
+                        </Button>
+                      </div>
+
+                      {/* SIRET */}
+                      <div className="space-y-1">
+                        <Label className="text-xs">
+                          SIRET <span className="text-destructive">*</span>
+                        </Label>
+                        <div className="flex gap-2">
+                          <div className="relative flex-1">
+                            <Input
+                              className="h-8 font-mono pr-7"
+                              placeholder="14 chiffres"
+                              maxLength={14}
+                              value={siretInput}
+                              onChange={(e) => {
+                                setSiretInput(e.target.value.replace(/\D/g, ""));
+                                setSiretState({ status: "idle" });
+                              }}
+                            />
+                            {siretInput.length > 0 && (
+                              <span className="absolute right-2 top-1/2 -translate-y-1/2">
+                                {siretValide ? (
+                                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                                ) : (
+                                  <XCircle className="h-4 w-4 text-destructive" />
+                                )}
+                              </span>
+                            )}
+                          </div>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-8 shrink-0"
+                            onClick={handleSearchSiret}
+                            disabled={!siretValide || siretState.status === "searching"}
+                          >
+                            {siretState.status === "searching" ? (
+                              <Spinner />
+                            ) : (
+                              <Search className="h-4 w-4" />
+                            )}
+                            Rechercher
+                          </Button>
+                        </div>
+                        {siretState.status === "error" && (
+                          <p className="text-destructive text-xs">
+                            {siretState.message}
+                          </p>
+                        )}
+                        {siretState.status === "found" && (
+                          <p className="flex items-center gap-1 text-xs text-green-600">
+                            <CheckCircle2 className="h-3 w-3" />
+                            Trouvé dans le système : {siretState.entreprise.nom}
+                          </p>
+                        )}
+                        {siretState.status === "not_found" && (
+                          <p className="text-muted-foreground text-xs">
+                            Prestataire non trouvé — renseignez les informations
+                            ci-dessous.
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Nom (toujours visible après recherche) */}
+                      {(siretState.status === "found" ||
+                        siretState.status === "not_found") && (
+                        <>
+                          <div className="space-y-1">
+                            <Label className="text-xs">
+                              Nom de l&apos;entreprise{" "}
+                              <span className="text-destructive">*</span>
+                            </Label>
+                            <Input
+                              className="h-8"
+                              value={nouveauNom}
+                              onChange={(e) => setNouveauNom(e.target.value)}
+                              readOnly={siretState.status === "found"}
+                            />
+                          </div>
+
+                          {/* Infos contact (uniquement si nouveau) */}
+                          {siretState.status === "not_found" && (
+                            <>
+                              <Separator />
+                              <p className="text-muted-foreground text-xs">
+                                Contact (optionnel)
+                              </p>
+                              <div className="grid grid-cols-2 gap-2">
+                                <div className="space-y-1">
+                                  <Label className="text-xs">Prénom</Label>
+                                  <Input
+                                    className="h-8"
+                                    value={nouveauContact.prenom}
+                                    onChange={(e) =>
+                                      setNouveauContact((c) => ({
+                                        ...c,
+                                        prenom: e.target.value,
+                                      }))
+                                    }
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <Label className="text-xs">Nom</Label>
+                                  <Input
+                                    className="h-8"
+                                    value={nouveauContact.nom}
+                                    onChange={(e) =>
+                                      setNouveauContact((c) => ({
+                                        ...c,
+                                        nom: e.target.value,
+                                      }))
+                                    }
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <Label className="text-xs">Email</Label>
+                                  <Input
+                                    className="h-8"
+                                    type="email"
+                                    value={nouveauContact.email}
+                                    onChange={(e) =>
+                                      setNouveauContact((c) => ({
+                                        ...c,
+                                        email: e.target.value,
+                                      }))
+                                    }
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <Label className="text-xs">Téléphone</Label>
+                                  <Input
+                                    className="h-8"
+                                    value={nouveauContact.phone}
+                                    onChange={(e) =>
+                                      setNouveauContact((c) => ({
+                                        ...c,
+                                        phone: e.target.value,
+                                      }))
+                                    }
+                                  />
+                                </div>
+                              </div>
+                            </>
+                          )}
+
+                          <Button
+                            type="button"
+                            size="sm"
+                            className="w-full"
+                            onClick={handleConfirmPrestataire}
+                            disabled={creatingPrestataire || !nouveauNom.trim()}
+                          >
+                            {creatingPrestataire && <Spinner />}
+                            {siretState.status === "found"
+                              ? "Lier ce prestataire"
+                              : "Créer et lier ce prestataire"}
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Dates de validité */}
                 <div className="grid grid-cols-2 gap-4">
-                  <RhfInput<InsertExecutionFormType>
+                  <RhfDatePicker<InsertExecutionFormType>
                     name="dateDebutValidite"
                     label="Date de début"
                     requiredMark
-                    type="date"
+                    buttonClassName="w-full"
                   />
-                  <RhfInput<InsertExecutionFormType>
+                  <RhfDatePicker<InsertExecutionFormType>
                     name="dateFinValidite"
                     label="Date de fin (optionnelle)"
-                    type="date"
+                    buttonClassName="w-full"
                   />
                 </div>
 
@@ -290,6 +639,59 @@ export function ExecutionFormDialog({
                   placeholder="0"
                   description="Plus grand = prioritaire. 0 = global, 10 = bâtiment, 20 = zone."
                 />
+
+                {/* Intervenant par défaut */}
+                {watchedServiceEntrepriseId && (
+                  <FormField
+                    control={form.control}
+                    name="assigneeUserIdDefault"
+                    render={({ field: f }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel className="text-sm">
+                          Intervenant par défaut{" "}
+                          <span className="text-muted-foreground font-normal">
+                            (optionnel)
+                          </span>
+                        </FormLabel>
+                        <Select
+                          value={f.value ?? ""}
+                          onValueChange={f.onChange}
+                          disabled={loadingAssignees}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue
+                                placeholder={
+                                  loadingAssignees
+                                    ? "Chargement..."
+                                    : assignableUsers.length === 0
+                                      ? "Aucun utilisateur disponible"
+                                      : "Sélectionnez un intervenant"
+                                }
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="">
+                              <span className="text-muted-foreground italic">
+                                Aucun (à assigner manuellement)
+                              </span>
+                            </SelectItem>
+                            {assignableUsers.map((u) => (
+                              <SelectItem key={u.id} value={u.id}>
+                                {u.prenom} {u.nom}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <p className="text-muted-foreground text-xs">
+                          Propagé automatiquement aux nouvelles interventions générées.
+                        </p>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
                 {/* Tarifs */}
                 <div className="space-y-3">
@@ -319,7 +721,6 @@ export function ExecutionFormDialog({
                       showIntermediaire,
                     );
 
-                    // Types déjà utilisés dans les AUTRES lignes (pour éviter les doublons interdits)
                     const otherTypes = watchedPrix
                       .filter((_, i) => i !== index)
                       .map((p) => p.typePrix);
@@ -349,7 +750,6 @@ export function ExecutionFormDialog({
                           )}
                         </div>
 
-                        {/* Type + montant — items-start pour éviter le décalage en cas d'erreur */}
                         <div className="grid grid-cols-2 items-start gap-3">
                           <FormField
                             control={form.control}
@@ -386,7 +786,6 @@ export function ExecutionFormDialog({
                                     })}
                                   </SelectContent>
                                 </Select>
-                                {/* Texte d'aide contextuel */}
                                 {f.value && (
                                   <p className="text-muted-foreground text-[11px] leading-tight">
                                     {TYPE_PRIX_HELP[f.value]}
@@ -426,7 +825,6 @@ export function ExecutionFormDialog({
                           />
                         </div>
 
-                        {/* Coût prestataire + marge — mode intermédiaire uniquement */}
                         {showIntermediaire && (
                           <div className="grid grid-cols-2 items-start gap-3">
                             <FormField
@@ -498,7 +896,6 @@ export function ExecutionFormDialog({
                           </div>
                         )}
 
-                        {/* Période facturation — si abonnement */}
                         {isAbonnement && (
                           <div className="grid grid-cols-2 items-start gap-3">
                             <FormField

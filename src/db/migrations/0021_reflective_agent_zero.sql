@@ -1,0 +1,2 @@
+ALTER TABLE "client_service_executions" ADD COLUMN "assignee_user_id_default" uuid;--> statement-breakpoint
+ALTER TABLE "client_service_executions" ADD CONSTRAINT "client_service_executions_assignee_user_id_default_user_id_fk" FOREIGN KEY ("assignee_user_id_default") REFERENCES "public"."user"("id") ON DELETE set null ON UPDATE no action;

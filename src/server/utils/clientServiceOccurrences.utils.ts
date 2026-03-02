@@ -1,15 +1,17 @@
 import "server-only";
 import { db } from "@/db";
 import {
+  clientServiceExecutionPrix,
   clientServiceExecutions,
   clientServiceOccurrences,
   clientServicePerimetre,
+  clientServicePrixAppliques,
   clientServices,
   occurrenceTaches,
   tacheListeItems,
 } from "@/db/schema/services";
 import { sitesArborescence } from "@/db/schema/sites";
-import { and, asc, eq, gte, inArray, isNull, lte, or, gt } from "drizzle-orm";
+import { and, asc, count, eq, gte, inArray, isNull, lte, or, gt } from "drizzle-orm";
 
 type DbOrTransaction =
   | typeof db
@@ -644,28 +646,38 @@ export async function ensureOccurrencesWindow({
   }
 
   if (toInsert.length > 0) {
-    // Pré-charger le tacheListeTemplateId des exécutions concernées
+    // Pré-charger le tacheListeTemplateId et assigneeUserIdDefault des exécutions concernées
     const uniqueExecIds = [
       ...new Set(toInsertExecutionIds.filter((id): id is string => id !== null)),
     ];
     const executionPackMap = new Map<string, string | null>();
+    const executionAssigneeMap = new Map<string, string | null>();
     if (uniqueExecIds.length > 0) {
       const execRows = await dbClient
         .select({
           id: clientServiceExecutions.id,
           tacheListeTemplateId: clientServiceExecutions.tacheListeTemplateId,
+          assigneeUserIdDefault: clientServiceExecutions.assigneeUserIdDefault,
         })
         .from(clientServiceExecutions)
         .where(inArray(clientServiceExecutions.id, uniqueExecIds));
       for (const row of execRows) {
         executionPackMap.set(row.id, row.tacheListeTemplateId ?? null);
+        executionAssigneeMap.set(row.id, row.assigneeUserIdDefault ?? null);
       }
     }
+
+    // Enrichir toInsert avec l'assignee par défaut de l'exécution
+    const toInsertWithAssignee = toInsert.map((occ, i) => {
+      const execId = toInsertExecutionIds[i];
+      const assigneeUserId = execId ? (executionAssigneeMap.get(execId) ?? null) : null;
+      return { ...occ, assigneeUserId };
+    });
 
     // Insérer les occurrences et récupérer leurs IDs
     const inserted = await dbClient
       .insert(clientServiceOccurrences)
-      .values(toInsert)
+      .values(toInsertWithAssignee)
       .returning({ id: clientServiceOccurrences.id });
 
     // Snapshot des tâches pour chaque occurrence si un pack est résolu
@@ -899,4 +911,162 @@ export async function cancelFuturePlanifieeOccurrences({
   }
 
   return { cancelled: toCancel.length };
+}
+
+// ---------------------------------------------------------------------------
+// 6. SNAPSHOT PRIX APPLIQUÉS — Facturation
+// ---------------------------------------------------------------------------
+
+/**
+ * Calcule les bornes de la période d'abonnement selon la périodicité de facturation.
+ */
+function toISODate(d: Date): string {
+  return d.toISOString().split("T")[0]!;
+}
+
+function calculateSubscriptionPeriod(
+  refDate: Date,
+  periodeFacturation: "semaine" | "mois" | "annee",
+): { periodeStart: string; periodeEnd: string } {
+  const d = new Date(refDate);
+
+  if (periodeFacturation === "semaine") {
+    // Semaine ISO : lundi → dimanche
+    const dow = d.getDay(); // 0=dim, 1=lun, ..., 6=sam
+    const diffToMonday = dow === 0 ? -6 : 1 - dow;
+    const monday = new Date(d);
+    monday.setDate(d.getDate() + diffToMonday);
+    monday.setHours(0, 0, 0, 0);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    return { periodeStart: toISODate(monday), periodeEnd: toISODate(sunday) };
+  }
+
+  if (periodeFacturation === "mois") {
+    const start = new Date(d.getFullYear(), d.getMonth(), 1);
+    const end = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+    return { periodeStart: toISODate(start), periodeEnd: toISODate(end) };
+  }
+
+  // annee
+  const start = new Date(d.getFullYear(), 0, 1);
+  const end = new Date(d.getFullYear(), 11, 31);
+  return { periodeStart: toISODate(start), periodeEnd: toISODate(end) };
+}
+
+/**
+ * Insère les lignes de prix appliqués pour une occurrence qui vient d'être clôturée.
+ *
+ * Règles :
+ *   - par_occurrence / frais_livraison : 1 ligne par occurrence (onConflictDoNothing)
+ *   - abonnement : 1 ligne par période (onConflictDoNothing → pas de double-facturation)
+ *   - installation : 1 ligne unique toute la vie de l'exécution (skip si déjà présent)
+ *
+ * Appelée dans updateOccurrenceStatutAction lorsque newStatut === "terminee".
+ */
+export async function insertPrixAppliquesForOccurrence({
+  occurrenceId,
+  tx,
+}: {
+  occurrenceId: string;
+  tx?: DbOrTransaction;
+}): Promise<void> {
+  const dbClient = tx ?? db;
+
+  // 1. Charger l'occurrence
+  const [occurrence] = await dbClient
+    .select({
+      id: clientServiceOccurrences.id,
+      clientServiceId: clientServiceOccurrences.clientServiceId,
+      executionId: clientServiceOccurrences.executionId,
+      dateDebutReelle: clientServiceOccurrences.dateDebutReelle,
+      dateDebutPrevue: clientServiceOccurrences.dateDebutPrevue,
+    })
+    .from(clientServiceOccurrences)
+    .where(eq(clientServiceOccurrences.id, occurrenceId))
+    .limit(1);
+
+  // Si aucune exécution assignée, rien à facturer
+  if (!occurrence || !occurrence.executionId) return;
+
+  // Date de référence pour la période
+  const refDate = occurrence.dateDebutReelle ?? occurrence.dateDebutPrevue;
+  if (!refDate) return;
+
+  // 2. Récupérer les prix actifs de l'exécution
+  const prixActifs = await dbClient
+    .select()
+    .from(clientServiceExecutionPrix)
+    .where(
+      and(
+        eq(clientServiceExecutionPrix.executionId, occurrence.executionId),
+        eq(clientServiceExecutionPrix.actif, true),
+      ),
+    );
+
+  if (prixActifs.length === 0) return;
+
+  // 3. Insérer une ligne par prix selon la règle
+  for (const prix of prixActifs) {
+    if (prix.typePrix === "par_occurrence" || prix.typePrix === "frais_livraison") {
+      // 1 ligne par occurrence — anti-doublon via unique(executionPrixId, occurrenceId)
+      await dbClient
+        .insert(clientServicePrixAppliques)
+        .values({
+          executionPrixId: prix.id,
+          clientServiceId: occurrence.clientServiceId,
+          executionId: occurrence.executionId,
+          occurrenceId: occurrence.id,
+          typePrix: prix.typePrix,
+          montantHtSnapshot: prix.montantHt,
+          coutPrestataireHtSnapshot: prix.coutPrestataireHt,
+          margePourcentSnapshot: prix.margePourcent,
+        })
+        .onConflictDoNothing();
+    } else if (prix.typePrix === "abonnement" && prix.periodeFacturation) {
+      // 1 ligne par période — anti-doublon via unique(executionPrixId, periodeStart)
+      const { periodeStart, periodeEnd } = calculateSubscriptionPeriod(
+        refDate,
+        prix.periodeFacturation,
+      );
+
+      await dbClient
+        .insert(clientServicePrixAppliques)
+        .values({
+          executionPrixId: prix.id,
+          clientServiceId: occurrence.clientServiceId,
+          executionId: occurrence.executionId,
+          occurrenceId: null, // abonnement n'est pas lié à 1 occurrence précise
+          typePrix: prix.typePrix,
+          montantHtSnapshot: prix.montantHt,
+          coutPrestataireHtSnapshot: prix.coutPrestataireHt,
+          margePourcentSnapshot: prix.margePourcent,
+          periodeStart: periodeStart,
+          periodeEnd: periodeEnd,
+        })
+        .onConflictDoNothing();
+    } else if (prix.typePrix === "installation") {
+      // 1 seule ligne toute la vie — vérifier si déjà une ligne pour ce prix
+      const [existing] = await dbClient
+        .select({ nb: count() })
+        .from(clientServicePrixAppliques)
+        .where(eq(clientServicePrixAppliques.executionPrixId, prix.id));
+
+      if ((existing?.nb ?? 0) === 0) {
+        await dbClient
+          .insert(clientServicePrixAppliques)
+          .values({
+            executionPrixId: prix.id,
+            clientServiceId: occurrence.clientServiceId,
+            executionId: occurrence.executionId,
+            occurrenceId: occurrence.id,
+            typePrix: prix.typePrix,
+            montantHtSnapshot: prix.montantHt,
+            coutPrestataireHtSnapshot: prix.coutPrestataireHt,
+            margePourcentSnapshot: prix.margePourcent,
+          })
+          .onConflictDoNothing();
+      }
+    }
+  }
 }

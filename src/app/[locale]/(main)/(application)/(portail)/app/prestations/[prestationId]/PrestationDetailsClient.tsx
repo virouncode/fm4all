@@ -36,6 +36,7 @@ import {
   deleteExecutionAction,
   toggleExecutionActifAction,
 } from "@/server/actions/clientServiceExecutionsActions";
+import { ExecutionEditDialog } from "./ExecutionEditDialog";
 import { getOccurrencesPageAction } from "@/server/actions/clientServiceOccurrencesActions";
 import {
   deletePrestationAction,
@@ -63,13 +64,16 @@ import {
   ClipboardList,
   Clock,
   Filter,
+  Info,
   Loader2,
   MapPin,
   Pencil,
   Power,
   RotateCcw,
+  Send,
   Settings,
   Trash2,
+  User,
   XCircle,
   Zap,
 } from "lucide-react";
@@ -85,11 +89,12 @@ import {
   getModePlanningBadge,
   getPrestationStatutBadge,
 } from "../helpers";
+import { DeployAssignationDialog } from "./DeployAssignationDialog";
 import { ExecutionFormDialog } from "./ExecutionFormDialog";
 import { TacheListeManagerDialog } from "./TacheListeManagerDialog";
 import { TacheListePickerDialog } from "./TacheListePickerDialog";
 
-interface PrestationDetailsClientProps {
+type PrestationDetailsClientProps = {
   prestation: PrestationListItem;
   canManage: boolean;
   isPlateforme: boolean;
@@ -682,14 +687,36 @@ function ExecutionTab({
 }) {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
 
+  // En mode intermédiaire, seule la plateforme configure les prestataires
+  const canAddExecution =
+    canManage && (isPlateforme || prestation.modeCommercial === "direct");
+  const showIntermediaireInfo =
+    canManage &&
+    !isPlateforme &&
+    prestation.modeCommercial === "intermediaire_fm4all";
+
   return (
     <div className="space-y-4">
-      {canManage && (
+      {canAddExecution && (
         <div className="flex justify-end">
           <Button onClick={() => setAddDialogOpen(true)}>
             <Zap className="h-4 w-4" />
             Ajouter un prestataire
           </Button>
+        </div>
+      )}
+
+      {showIntermediaireInfo && (
+        <div className="bg-muted/50 flex items-start gap-3 rounded-lg border p-4">
+          <Info className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" />
+          <div className="text-sm">
+            <p className="font-medium">Configuration gérée par FM4ALL</p>
+            <p className="text-muted-foreground mt-1">
+              En mode intermédiaire, l&apos;équipe FM4ALL sélectionne et
+              configure les prestataires pour cette prestation. Contactez FM4ALL
+              si vous souhaitez modifier l&apos;exécution.
+            </p>
+          </div>
         </div>
       )}
 
@@ -700,8 +727,9 @@ function ExecutionTab({
             Aucun prestataire assigné
           </p>
           <p className="text-muted-foreground mt-1 text-sm">
-            Ajoutez un prestataire pour permettre l&apos;exécution des
-            interventions planifiées.
+            {canAddExecution
+              ? "Ajoutez un prestataire pour permettre l'exécution des interventions planifiées."
+              : "FM4ALL configurera le prestataire pour cette prestation."}
           </p>
         </div>
       ) : (
@@ -710,6 +738,7 @@ function ExecutionTab({
             key={execution.id}
             execution={execution}
             canManage={canManage}
+            isPlateforme={isPlateforme}
             prestation={prestation}
             onExecutionsChange={onExecutionsChange}
           />
@@ -739,11 +768,13 @@ function ExecutionTab({
 function ExecutionCard({
   execution,
   canManage,
+  isPlateforme,
   prestation,
   onExecutionsChange,
 }: {
   execution: ExecutionWithPrix;
   canManage: boolean;
+  isPlateforme: boolean;
   prestation: PrestationListItem;
   onExecutionsChange: (executions: ExecutionWithPrix[]) => void;
 }) {
@@ -751,6 +782,8 @@ function ExecutionCard({
   const [isToggling, setIsToggling] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [deployDialogOpen, setDeployDialogOpen] = useState(false);
   const [checklistPickerOpen, setChecklistPickerOpen] = useState(false);
   const [checklistManagerOpen, setChecklistManagerOpen] = useState(false);
 
@@ -828,6 +861,16 @@ function ExecutionCard({
                     variant="outline"
                     size="icon"
                     className="h-7 w-7"
+                    onClick={() => setEditOpen(true)}
+                    aria-label="Modifier l'exécution"
+                    title="Modifier dates, priorité et tarifs"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-7 w-7"
                     onClick={handleToggle}
                     disabled={isToggling}
                     aria-label={isActive ? "Désactiver" : "Activer"}
@@ -847,7 +890,7 @@ function ExecutionCard({
               )}
             </div>
           </div>
-          <div className="text-muted-foreground flex gap-4 text-xs">
+          <div className="text-muted-foreground flex flex-wrap gap-4 text-xs">
             <span className="flex items-center gap-1">
               <Clock className="h-3 w-3" />
               Depuis le {formatDate(execution.dateDebutValidite)}
@@ -855,7 +898,28 @@ function ExecutionCard({
             {execution.dateFinValidite && (
               <span>Jusqu&apos;au {formatDate(execution.dateFinValidite)}</span>
             )}
+            {execution.assigneeDefaultPrenom && (
+              <span className="flex items-center gap-1 text-blue-700">
+                <User className="h-3 w-3" />
+                {execution.assigneeDefaultPrenom} {execution.assigneeDefaultNom}
+              </span>
+            )}
           </div>
+
+          {/* Bouton Déployer — uniquement si prestataire connu et canManage */}
+          {canManage && execution.prestataireEntrepriseId && (
+            <div className="mt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 gap-1 text-xs"
+                onClick={() => setDeployDialogOpen(true)}
+              >
+                <Send className="h-3 w-3" />
+                Déployer l&apos;assignation
+              </Button>
+            </div>
+          )}
         </CardHeader>
 
         {execution.prix.length > 0 && (
@@ -953,6 +1017,32 @@ function ExecutionCard({
             />
           )}
         </>
+      )}
+
+      {canManage && (
+        <ExecutionEditDialog
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          execution={execution}
+          prestationId={prestation.id}
+          entrepriseId={prestation.entrepriseId}
+          modeCommercial={prestation.modeCommercial}
+          isPlateforme={isPlateforme}
+          onSuccess={(updated) => {
+            onExecutionsChange(updated);
+            setEditOpen(false);
+          }}
+        />
+      )}
+
+      {canManage && execution.prestataireEntrepriseId && (
+        <DeployAssignationDialog
+          open={deployDialogOpen}
+          onOpenChange={setDeployDialogOpen}
+          execution={execution}
+          prestation={prestation}
+          onSuccess={() => router.refresh()}
+        />
       )}
 
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
