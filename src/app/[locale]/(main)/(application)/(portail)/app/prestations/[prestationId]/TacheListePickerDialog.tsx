@@ -14,7 +14,7 @@ import { updateExecutionTacheListeAction } from "@/server/actions/clientServiceE
 import { updateClientServiceTacheListeAction } from "@/server/actions/clientServicesActions";
 import { getAvailableTacheListesTemplatesAction } from "@/server/actions/tacheListesTemplatesActions";
 import type { TacheListeTemplateWithItems } from "@/server/queries/tacheListesTemplates.query";
-import { CheckCircle2, ClipboardList, Clock, Loader2, X } from "lucide-react";
+import { CheckCircle2, ClipboardList, Clock, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -178,17 +178,20 @@ export function TacheListePickerDialog({
                     key={pack.id}
                     className="overflow-hidden rounded-lg border"
                   >
-                    {/* Header du pack */}
-                    <button
-                      type="button"
-                      className={`flex w-full items-center justify-between gap-2 p-3 text-left text-sm transition-colors ${
+                    {/* Header du pack — deux boutons côte à côte (pas imbriqués) */}
+                    <div
+                      className={`flex w-full items-center justify-between gap-2 p-3 text-sm transition-colors ${
                         selectedPackId === pack.id
                           ? "border-primary bg-primary/5"
                           : "hover:bg-muted/50"
                       }`}
-                      onClick={() => setSelectedPackId(pack.id)}
                     >
-                      <div className="flex min-w-0 items-center gap-2">
+                      {/* Sélectionner le pack */}
+                      <button
+                        type="button"
+                        className="flex min-w-0 flex-1 items-center gap-2 text-left"
+                        onClick={() => setSelectedPackId(pack.id)}
+                      >
                         {selectedPackId === pack.id && (
                           <CheckCircle2 className="text-primary h-4 w-4 flex-shrink-0" />
                         )}
@@ -200,22 +203,21 @@ export function TacheListePickerDialog({
                           {pack.items.length} tâche
                           {pack.items.length !== 1 ? "s" : ""}
                         </Badge>
-                      </div>
+                      </button>
 
                       {/* Toggle aperçu */}
                       <button
                         type="button"
                         className="text-muted-foreground hover:text-foreground flex-shrink-0 text-xs underline"
-                        onClick={(e) => {
-                          e.stopPropagation();
+                        onClick={() =>
                           setExpandedPackId(
                             expandedPackId === pack.id ? null : pack.id,
-                          );
-                        }}
+                          )
+                        }
                       >
                         {expandedPackId === pack.id ? "Masquer" : "Aperçu"}
                       </button>
-                    </button>
+                    </div>
 
                     {/* Aperçu des items */}
                     {expandedPackId === pack.id && pack.items.length > 0 && (
@@ -262,7 +264,6 @@ export function TacheListePickerDialog({
             onClick={() => onOpenChange(false)}
             disabled={saving}
           >
-            <X className="h-4 w-4" />
             Annuler
           </Button>
           <Button

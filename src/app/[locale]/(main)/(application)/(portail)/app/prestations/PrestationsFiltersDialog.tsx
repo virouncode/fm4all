@@ -83,7 +83,9 @@ export function PrestationsFiltersDialog({
     if (!open) return;
 
     const targetId =
-      postureActive === "plateforme" ? clientEntrepriseId || null : entrepriseId;
+      postureActive === "plateforme"
+        ? clientEntrepriseId || null
+        : entrepriseId;
 
     if (!targetId) {
       setSites([]);
@@ -214,7 +216,7 @@ export function PrestationsFiltersDialog({
               onClick={handleReset}
               disabled={activeFiltersCount === 0}
             >
-              <RotateCcw className="mr-1.5 h-4 w-4" />
+              <RotateCcw className="h-4 w-4" />
               Réinitialiser ({activeFiltersCount})
             </Button>
           </div>

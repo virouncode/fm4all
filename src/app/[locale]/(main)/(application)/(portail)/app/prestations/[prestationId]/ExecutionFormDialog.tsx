@@ -3,6 +3,7 @@
 import { RhfControlledSelect } from "@/components/rhf/RhfControlledSelect";
 import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -26,7 +27,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Spinner } from "@/components/ui/spinner";
 import {
   getPrestatairesForServiceAction,
@@ -303,7 +303,7 @@ export function ExecutionFormDialog({
                       size="sm"
                       onClick={() => append(emptyPrixItem())}
                     >
-                      <Plus className="mr-1 h-3.5 w-3.5" />
+                      <Plus className="h-4 w-4" />
                       Ajouter un tarif
                     </Button>
                   </div>
@@ -344,7 +344,7 @@ export function ExecutionFormDialog({
                               onClick={() => remove(index)}
                               aria-label="Supprimer ce tarif"
                             >
-                              <Trash2 className="h-3.5 w-3.5" />
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           )}
                         </div>

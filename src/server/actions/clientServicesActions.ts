@@ -539,6 +539,14 @@ export const updatePrestationStatutAction = actionClient
       );
     }
 
+    // Guard : activation planifiée sans checklist interdite
+    if (newStatut === "actif" && current.modePlanning === "planifie" && !current.tacheListeTemplateId) {
+      throw errors.conflict(
+        "Impossible d'activer une prestation planifiée sans checklist. " +
+        "Sélectionnez une checklist par défaut dans l'onglet Paramètres.",
+      );
+    }
+
     // Effectuer la mise à jour
     const [updated] = await db
       .update(clientServices)

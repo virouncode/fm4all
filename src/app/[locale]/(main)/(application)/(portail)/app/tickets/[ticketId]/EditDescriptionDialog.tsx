@@ -70,9 +70,9 @@ export function EditDescriptionDialog({
         variant="ghost"
         size="sm"
         onClick={handleOpen}
-        className="gap-2 h-7"
+        className="h-7 gap-2"
       >
-        <Pencil className="h-3.5 w-3.5" />
+        <Pencil className="h-4 w-4" />
         Modifier
       </Button>
 
@@ -80,7 +80,7 @@ export function EditDescriptionDialog({
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <FileText className="h-4 w-4 text-primary" />
+              <FileText className="text-primary h-4 w-4" />
               Modifier la description
             </DialogTitle>
           </DialogHeader>

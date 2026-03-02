@@ -1,5 +1,15 @@
 "use client";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
@@ -27,25 +38,29 @@ import type {
   TacheListeItemRow,
   TacheListeTemplateWithItems,
 } from "@/server/queries/tacheListesTemplates.query";
+import { Reorder, useDragControls } from "framer-motion";
 import {
-  ArrowDown,
-  ArrowUp,
   ChevronDown,
   ChevronRight,
   ClipboardList,
+  GripVertical,
   Loader2,
   Pencil,
   Plus,
   Trash2,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 interface TacheListeManagerDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   serviceId: string;
-  proprietaireEntrepriseId: string;
+  /** null = afficher les templates système (posture plateforme) */
+  proprietaireEntrepriseId: string | null;
+  /** Fourni en posture plateforme : permet de choisir entre système et client */
+  clientEntrepriseId?: string;
+  clientEntrepriseNom?: string;
 }
 
 export function TacheListeManagerDialog({
@@ -53,6 +68,8 @@ export function TacheListeManagerDialog({
   onOpenChange,
   serviceId,
   proprietaireEntrepriseId,
+  clientEntrepriseId,
+  clientEntrepriseNom,
 }: TacheListeManagerDialogProps) {
   const [packs, setPacks] = useState<TacheListeTemplateWithItems[]>([]);
   const [loading, setLoading] = useState(false);
@@ -60,6 +77,9 @@ export function TacheListeManagerDialog({
   const [newPackName, setNewPackName] = useState("");
   const [isCreatingPack, setIsCreatingPack] = useState(false);
   const [creatingPack, setCreatingPack] = useState(false);
+  // En posture plateforme : choix du propriétaire du nouveau pack
+  const isPlatformMode = proprietaireEntrepriseId === null && !!clientEntrepriseId;
+  const [newPackOwner, setNewPackOwner] = useState<"system" | "client">("system");
 
   const loadPacks = useCallback(async () => {
     setLoading(true);
@@ -80,17 +100,27 @@ export function TacheListeManagerDialog({
       loadPacks();
       setIsCreatingPack(false);
       setNewPackName("");
+      setNewPackOwner("system");
       setExpandedPackId(null);
     }
   }, [open, loadPacks]);
 
   const handleCreatePack = async () => {
     if (!newPackName.trim()) return;
+
+    // Résoudre le propriétaire selon le choix
+    const resolvedProprietaireId: string | null =
+      isPlatformMode
+        ? newPackOwner === "system"
+          ? null
+          : (clientEntrepriseId ?? null)
+        : proprietaireEntrepriseId;
+
     setCreatingPack(true);
     const result = await insertTacheListeTemplateAction({
       nom: newPackName.trim(),
       serviceId,
-      proprietaireEntrepriseId,
+      proprietaireEntrepriseId: resolvedProprietaireId,
     });
     setCreatingPack(false);
     if (result?.serverError) {
@@ -136,47 +166,78 @@ export function TacheListeManagerDialog({
                     Nouvelle checklist
                   </Button>
                 ) : (
-                  <div className="rounded-lg border p-3">
-                    <Label className="mb-1.5 block text-sm font-medium">
-                      Nom de la checklist
-                    </Label>
-                    <div className="flex gap-2">
-                      <Input
-                        value={newPackName}
-                        onChange={(e) => setNewPackName(e.target.value)}
-                        placeholder="Ex : Protocole nettoyage standard"
-                        autoFocus
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") void handleCreatePack();
-                          if (e.key === "Escape") {
+                  <div className="rounded-lg border p-3 space-y-3">
+                    {/* Choix du propriétaire (posture plateforme uniquement) */}
+                    {isPlatformMode && (
+                      <div className="space-y-1.5">
+                        <Label className="text-sm font-medium">Propriétaire</Label>
+                        <RadioGroup
+                          value={newPackOwner}
+                          onValueChange={(v) => setNewPackOwner(v as "system" | "client")}
+                          className="space-y-1"
+                        >
+                          <div className="flex items-center gap-2">
+                            <RadioGroupItem value="system" id="owner-system" />
+                            <Label htmlFor="owner-system" className="text-sm font-normal cursor-pointer">
+                              Système{" "}
+                              <span className="text-muted-foreground text-xs">(disponible pour tous les clients)</span>
+                            </Label>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <RadioGroupItem value="client" id="owner-client" />
+                            <Label htmlFor="owner-client" className="text-sm font-normal cursor-pointer">
+                              Pour ce client{" "}
+                              {clientEntrepriseNom && (
+                                <span className="text-muted-foreground text-xs">: {clientEntrepriseNom}</span>
+                              )}
+                            </Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+                    )}
+
+                    <div>
+                      <Label className="mb-1.5 block text-sm font-medium">
+                        Nom de la checklist
+                      </Label>
+                      <div className="flex gap-2">
+                        <Input
+                          value={newPackName}
+                          onChange={(e) => setNewPackName(e.target.value)}
+                          placeholder="Ex : Protocole nettoyage standard"
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") void handleCreatePack();
+                            if (e.key === "Escape") {
+                              setIsCreatingPack(false);
+                              setNewPackName("");
+                            }
+                          }}
+                        />
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={handleCreatePack}
+                          disabled={creatingPack || !newPackName.trim()}
+                        >
+                          {creatingPack ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            "Créer"
+                          )}
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => {
                             setIsCreatingPack(false);
                             setNewPackName("");
-                          }
-                        }}
-                      />
-                      <Button
-                        type="button"
-                        size="sm"
-                        onClick={handleCreatePack}
-                        disabled={creatingPack || !newPackName.trim()}
-                      >
-                        {creatingPack ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          "Créer"
-                        )}
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                          setIsCreatingPack(false);
-                          setNewPackName("");
-                        }}
-                      >
-                        Annuler
-                      </Button>
+                          }}
+                        >
+                          Annuler
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -201,7 +262,7 @@ export function TacheListeManagerDialog({
                         expandedPackId === pack.id ? null : pack.id,
                       )
                     }
-                    entrepriseId={proprietaireEntrepriseId}
+                    entrepriseId={pack.proprietaireEntrepriseId}
                     onRefresh={loadPacks}
                   />
                 ))}
@@ -238,14 +299,67 @@ function PackEditor({
   pack: TacheListeTemplateWithItems;
   expanded: boolean;
   onToggleExpand: () => void;
-  entrepriseId: string;
+  entrepriseId: string | null;
   onRefresh: () => Promise<void>;
 }) {
+  const [localItems, setLocalItems] = useState<TacheListeItemRow[]>(pack.items);
+  const latestOrderRef = useRef<TacheListeItemRow[]>(pack.items);
   const [isEditingName, setIsEditingName] = useState(false);
   const [editName, setEditName] = useState(pack.nom);
   const [isSavingName, setIsSavingName] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isAddingItem, setIsAddingItem] = useState(false);
+
+  // Sync local items when pack refreshes from parent
+  useEffect(() => {
+    setLocalItems(pack.items);
+    latestOrderRef.current = pack.items;
+  }, [pack.items]);
+
+  const handleReorder = (newItems: TacheListeItemRow[]) => {
+    setLocalItems(newItems);
+    latestOrderRef.current = newItems;
+  };
+
+  const handleSaveOrder = async () => {
+    const newItems = latestOrderRef.current;
+    const result = await reorderTacheListeItemsAction({
+      listeTemplateId: pack.id,
+      entrepriseId,
+      orderedIds: newItems.map((i) => i.id),
+    });
+    if (result?.serverError) {
+      toast.error(result.serverError.message);
+      // Revert to server state
+      setLocalItems(pack.items);
+      latestOrderRef.current = pack.items;
+    }
+  };
+
+  const handleItemAdded = (newItem: TacheListeItemRow) => {
+    setLocalItems((prev) => [...prev, newItem]);
+    latestOrderRef.current = [...latestOrderRef.current, newItem];
+    setIsAddingItem(false);
+    // Background sync
+    void onRefresh();
+  };
+
+  const handleItemDeleted = (itemId: string) => {
+    setLocalItems((prev) => prev.filter((i) => i.id !== itemId));
+    latestOrderRef.current = latestOrderRef.current.filter((i) => i.id !== itemId);
+    void onRefresh();
+  };
+
+  const handleItemUpdated = (updatedItem: TacheListeItemRow) => {
+    setLocalItems((prev) =>
+      prev.map((i) => (i.id === updatedItem.id ? updatedItem : i)),
+    );
+    latestOrderRef.current = latestOrderRef.current.map((i) =>
+      i.id === updatedItem.id ? updatedItem : i,
+    );
+    void onRefresh();
+  };
 
   const handleRename = async () => {
     if (!editName.trim() || editName === pack.nom) {
@@ -288,6 +402,7 @@ function PackEditor({
       entrepriseId,
     });
     setIsDeleting(false);
+    setDeleteConfirmOpen(false);
     if (result?.serverError) {
       toast.error(result.serverError.message);
     } else {
@@ -359,8 +474,13 @@ function PackEditor({
         ) : (
           <>
             <span className="flex-1 text-sm font-medium">{pack.nom}</span>
+            {pack.proprietaireEntrepriseId === null && (
+              <span className="bg-primary/10 text-primary rounded px-1.5 py-0.5 text-xs font-medium">
+                Système
+              </span>
+            )}
             <span className="text-muted-foreground text-xs">
-              {pack.items.length} tâche{pack.items.length !== 1 ? "s" : ""}
+              {localItems.length} tâche{localItems.length !== 1 ? "s" : ""}
             </span>
           </>
         )}
@@ -391,7 +511,7 @@ function PackEditor({
               size="icon"
               variant="ghost"
               className="text-destructive h-7 w-7"
-              onClick={handleDelete}
+              onClick={() => setDeleteConfirmOpen(true)}
               disabled={isDeleting}
               aria-label="Supprimer"
             >
@@ -405,37 +525,64 @@ function PackEditor({
         )}
       </div>
 
+      {/* Confirmation suppression */}
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer la checklist ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              La checklist <strong>{pack.nom}</strong> et toutes ses tâches
+              seront définitivement supprimées. Cette action est irréversible.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? "Suppression..." : "Supprimer"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Items (si expanded) */}
       {expanded && (
         <div className="bg-muted/20 border-t">
-          {pack.items.length === 0 && !isAddingItem && (
+          {localItems.length === 0 && !isAddingItem && (
             <p className="text-muted-foreground px-4 py-3 text-xs italic">
               Aucune tâche dans cette checklist.
             </p>
           )}
 
-          {pack.items.map((item, idx) => (
-            <ItemRow
-              key={item.id}
-              item={item}
-              index={idx}
-              total={pack.items.length}
-              packId={pack.id}
-              entrepriseId={entrepriseId}
-              onRefresh={onRefresh}
-              orderedIds={pack.items.map((i) => i.id)}
-            />
-          ))}
+          <Reorder.Group
+            axis="y"
+            values={localItems}
+            onReorder={handleReorder}
+            className="outline-none"
+            as="div"
+          >
+            {localItems.map((item) => (
+              <DraggableItemRow
+                key={item.id}
+                item={item}
+                packId={pack.id}
+                entrepriseId={entrepriseId}
+                onDragEnd={handleSaveOrder}
+                onDeleted={() => handleItemDeleted(item.id)}
+                onUpdated={handleItemUpdated}
+              />
+            ))}
+          </Reorder.Group>
 
           {/* Ajouter un item */}
           {isAddingItem ? (
             <AddItemForm
               packId={pack.id}
               entrepriseId={entrepriseId}
-              onSuccess={async () => {
-                setIsAddingItem(false);
-                await onRefresh();
-              }}
+              onSuccess={handleItemAdded}
               onCancel={() => setIsAddingItem(false)}
             />
           ) : (
@@ -458,31 +605,29 @@ function PackEditor({
   );
 }
 
-// ==================== ITEM ROW ====================
+// ==================== DRAGGABLE ITEM ROW ====================
 
-function ItemRow({
+function DraggableItemRow({
   item,
-  index,
-  total,
-  packId,
+  packId: _packId,
   entrepriseId,
-  onRefresh,
-  orderedIds,
+  onDragEnd,
+  onDeleted,
+  onUpdated,
 }: {
   item: TacheListeItemRow;
-  index: number;
-  total: number;
   packId: string;
-  entrepriseId: string;
-  onRefresh: () => Promise<void>;
-  orderedIds: string[];
+  entrepriseId: string | null;
+  onDragEnd: () => Promise<void>;
+  onDeleted: () => void;
+  onUpdated: (item: TacheListeItemRow) => void;
 }) {
+  const controls = useDragControls();
   const [isEditing, setIsEditing] = useState(false);
   const [editTitre, setEditTitre] = useState(item.titre);
   const [editDesc, setEditDesc] = useState(item.description ?? "");
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isReordering, setIsReordering] = useState(false);
 
   const handleSave = async () => {
     if (!editTitre.trim()) return;
@@ -496,9 +641,16 @@ function ItemRow({
     setIsSaving(false);
     if (result?.serverError) {
       toast.error(result.serverError.message);
-    } else {
+    } else if (result?.data?.item) {
+      onUpdated({
+        id: result.data.item.id,
+        ordre: result.data.item.ordre,
+        titre: result.data.item.titre,
+        description: result.data.item.description ?? null,
+        actif: result.data.item.actif,
+        dureeEstimeeMinutes: result.data.item.dureeEstimeeMinutes ?? null,
+      });
       setIsEditing(false);
-      await onRefresh();
     }
   };
 
@@ -512,153 +664,114 @@ function ItemRow({
     if (result?.serverError) {
       toast.error(result.serverError.message);
     } else {
-      await onRefresh();
-    }
-  };
-
-  const handleMove = async (direction: "up" | "down") => {
-    const newIds = [...orderedIds];
-    const currentIdx = newIds.indexOf(item.id);
-    if (direction === "up" && currentIdx > 0) {
-      [newIds[currentIdx - 1], newIds[currentIdx]] = [
-        newIds[currentIdx]!,
-        newIds[currentIdx - 1]!,
-      ];
-    } else if (direction === "down" && currentIdx < newIds.length - 1) {
-      [newIds[currentIdx + 1], newIds[currentIdx]] = [
-        newIds[currentIdx]!,
-        newIds[currentIdx + 1]!,
-      ];
-    } else {
-      return;
-    }
-
-    setIsReordering(true);
-    const result = await reorderTacheListeItemsAction({
-      listeTemplateId: packId,
-      entrepriseId,
-      orderedIds: newIds,
-    });
-    setIsReordering(false);
-    if (result?.serverError) {
-      toast.error(result.serverError.message);
-    } else {
-      await onRefresh();
+      onDeleted();
     }
   };
 
   return (
-    <div className="divide-y border-t first:border-t-0">
-      {isEditing ? (
-        <div className="space-y-2 px-4 py-3">
-          <Input
-            value={editTitre}
-            onChange={(e) => setEditTitre(e.target.value)}
-            placeholder="Titre de la tâche"
-            className="text-sm"
-            autoFocus
-          />
-          <Textarea
-            value={editDesc}
-            onChange={(e) => setEditDesc(e.target.value)}
-            placeholder="Description (optionnel)"
-            className="min-h-[60px] text-sm"
-            rows={2}
-          />
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              size="sm"
-              onClick={handleSave}
-              disabled={isSaving || !editTitre.trim()}
-            >
-              {isSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
-              Enregistrer
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="ghost"
-              onClick={() => {
-                setIsEditing(false);
-                setEditTitre(item.titre);
-                setEditDesc(item.description ?? "");
-              }}
-            >
-              Annuler
-            </Button>
+    <Reorder.Item
+      value={item}
+      dragListener={false}
+      dragControls={controls}
+      onDragEnd={() => { void onDragEnd(); }}
+      className="outline-none"
+      as="div"
+    >
+      <div className="border-t first:border-t-0">
+        {isEditing ? (
+          <div className="space-y-2 px-4 py-3">
+            <Input
+              value={editTitre}
+              onChange={(e) => setEditTitre(e.target.value)}
+              placeholder="Titre de la tâche"
+              className="text-sm"
+              autoFocus
+            />
+            <Textarea
+              value={editDesc}
+              onChange={(e) => setEditDesc(e.target.value)}
+              placeholder="Description (optionnel)"
+              className="min-h-[60px] text-sm"
+              rows={2}
+            />
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleSave}
+                disabled={isSaving || !editTitre.trim()}
+              >
+                {isSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+                Enregistrer
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  setIsEditing(false);
+                  setEditTitre(item.titre);
+                  setEditDesc(item.description ?? "");
+                }}
+              >
+                Annuler
+              </Button>
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="flex items-start gap-2 px-4 py-2">
-          {/* Numéro */}
-          <span className="text-muted-foreground mt-0.5 w-5 flex-shrink-0 text-center text-xs">
-            {index + 1}.
-          </span>
+        ) : (
+          <div className="flex items-start gap-2 px-4 py-2">
+            {/* Drag handle */}
+            <button
+              type="button"
+              onPointerDown={(e) => controls.start(e)}
+              className="text-muted-foreground hover:text-foreground mt-0.5 cursor-grab touch-none active:cursor-grabbing"
+              aria-label="Déplacer"
+            >
+              <GripVertical className="h-4 w-4" />
+            </button>
 
-          {/* Contenu */}
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium">{item.titre}</p>
-            {item.description && (
-              <p className="text-muted-foreground mt-0.5 text-xs">
-                {item.description}
-              </p>
-            )}
-          </div>
-
-          {/* Actions */}
-          <div className="flex flex-shrink-0 items-center gap-0.5">
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              className="h-6 w-6"
-              onClick={() => handleMove("up")}
-              disabled={index === 0 || isReordering}
-              aria-label="Monter"
-            >
-              <ArrowUp className="h-3 w-3" />
-            </Button>
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              className="h-6 w-6"
-              onClick={() => handleMove("down")}
-              disabled={index === total - 1 || isReordering}
-              aria-label="Descendre"
-            >
-              <ArrowDown className="h-3 w-3" />
-            </Button>
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              className="h-6 w-6"
-              onClick={() => setIsEditing(true)}
-              aria-label="Modifier"
-            >
-              <Pencil className="h-3 w-3" />
-            </Button>
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              className="text-destructive h-6 w-6"
-              onClick={handleDelete}
-              disabled={isDeleting}
-              aria-label="Supprimer"
-            >
-              {isDeleting ? (
-                <Loader2 className="h-3 w-3 animate-spin" />
-              ) : (
-                <Trash2 className="h-3 w-3" />
+            {/* Contenu */}
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium">{item.titre}</p>
+              {item.description && (
+                <p className="text-muted-foreground mt-0.5 text-xs">
+                  {item.description}
+                </p>
               )}
-            </Button>
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-shrink-0 items-center gap-0.5">
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-6 w-6"
+                onClick={() => setIsEditing(true)}
+                aria-label="Modifier"
+              >
+                <Pencil className="h-3 w-3" />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="text-destructive h-6 w-6"
+                onClick={handleDelete}
+                disabled={isDeleting}
+                aria-label="Supprimer"
+              >
+                {isDeleting ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  <Trash2 className="h-3 w-3" />
+                )}
+              </Button>
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </Reorder.Item>
   );
 }
 
@@ -671,8 +784,8 @@ function AddItemForm({
   onCancel,
 }: {
   packId: string;
-  entrepriseId: string;
-  onSuccess: () => Promise<void>;
+  entrepriseId: string | null;
+  onSuccess: (item: TacheListeItemRow) => void;
   onCancel: () => void;
 }) {
   const [titre, setTitre] = useState("");
@@ -691,8 +804,15 @@ function AddItemForm({
     setSaving(false);
     if (result?.serverError) {
       toast.error(result.serverError.message);
-    } else {
-      await onSuccess();
+    } else if (result?.data?.item) {
+      onSuccess({
+        id: result.data.item.id,
+        ordre: result.data.item.ordre,
+        titre: result.data.item.titre,
+        description: result.data.item.description ?? null,
+        actif: result.data.item.actif,
+        dureeEstimeeMinutes: result.data.item.dureeEstimeeMinutes ?? null,
+      });
     }
   };
 

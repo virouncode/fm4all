@@ -33,7 +33,7 @@ export function PrestationCard({
 
   return (
     <Card
-      className="flex h-full flex-col cursor-pointer transition-colors hover:bg-accent"
+      className="hover:bg-accent flex h-full cursor-pointer flex-col transition-colors"
       onClick={onClick}
       tabIndex={onClick ? 0 : undefined}
       role={onClick ? "button" : undefined}
@@ -62,15 +62,15 @@ export function PrestationCard({
 
         {/* Client (posture plateforme) */}
         {showEntreprise && (
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <Building className="h-3.5 w-3.5 flex-shrink-0" />
+          <div className="text-muted-foreground flex items-center gap-1.5 text-sm">
+            <Building className="h-4 w-4 flex-shrink-0" />
             <span className="truncate">{prestation.entrepriseNom}</span>
           </div>
         )}
 
         {/* Site */}
-        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-          <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+        <div className="text-muted-foreground flex items-center gap-1.5 text-sm">
+          <MapPin className="h-4 w-4 flex-shrink-0" />
           <span className="truncate">{prestation.siteNom}</span>
         </div>
       </CardHeader>
@@ -86,8 +86,8 @@ export function PrestationCard({
 
         {/* Dates */}
         {(prestation.dateDebut || prestation.dateFin) && (
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
+          <div className="text-muted-foreground flex items-center gap-1.5 text-sm">
+            <Calendar className="h-4 w-4 flex-shrink-0" />
             <span>
               {prestation.dateDebut ? formatDate(prestation.dateDebut) : "—"}
               {" → "}
@@ -98,15 +98,15 @@ export function PrestationCard({
 
         {/* Durée */}
         {prestation.dureeEstimeeMinutes && (
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <Clock className="h-3.5 w-3.5 flex-shrink-0" />
+          <div className="text-muted-foreground flex items-center gap-1.5 text-sm">
+            <Clock className="h-4 w-4 flex-shrink-0" />
             <span>{formatDuree(prestation.dureeEstimeeMinutes)}</span>
           </div>
         )}
 
         {/* Notes */}
         {prestation.notes && (
-          <p className="mt-auto line-clamp-2 text-sm text-muted-foreground">
+          <p className="text-muted-foreground mt-auto line-clamp-2 text-sm">
             {prestation.notes}
           </p>
         )}

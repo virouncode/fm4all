@@ -2,7 +2,7 @@ import "server-only";
 
 import { db } from "@/db";
 import { tacheListeItems, tacheListesTemplates } from "@/db/schema/services";
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, or } from "drizzle-orm";
 
 export type TacheListeItemRow = {
   id: string;
@@ -16,7 +16,7 @@ export type TacheListeItemRow = {
 export type TacheListeTemplateRow = {
   id: string;
   serviceId: string;
-  proprietaireEntrepriseId: string;
+  proprietaireEntrepriseId: string | null;
   nom: string;
   actif: boolean;
 };
@@ -28,13 +28,14 @@ export type TacheListeTemplateWithItems = TacheListeTemplateRow & {
 /**
  * GET AVAILABLE PACKS FOR A CONTEXT
  *
- * Returns all active packs for a given service visible to the caller,
- * based on the list of allowed proprietaireEntrepriseIds.
+ * Returns all active packs for a given service visible to the caller.
+ * Always includes system packs (proprietaireEntrepriseId IS NULL).
+ * Also includes packs belonging to the provided entrepriseIds.
  *
  * Pack visibility rules (caller is responsible for computing entrepriseIds):
- *   - Client/plateforme creating client_service : [FM4ALL_ID, clientId]
- *   - Prestataire creating client_service       : [FM4ALL_ID, prestataireId, clientId]
- *   - Creating/editing execution                : [FM4ALL_ID, clientId, prestataireId]
+ *   - Client/plateforme creating client_service : [clientId]
+ *   - Prestataire creating client_service       : [prestataireId, clientId]
+ *   - Creating/editing execution                : [clientId, prestataireId]
  *
  * Items are included (nested) ordered by `ordre`.
  */
@@ -45,8 +46,6 @@ export async function getAvailableTacheListesTemplates({
   serviceId: string;
   entrepriseIds: string[];
 }): Promise<TacheListeTemplateWithItems[]> {
-  if (entrepriseIds.length === 0) return [];
-
   const packs = await db
     .select({
       id: tacheListesTemplates.id,
@@ -60,9 +59,14 @@ export async function getAvailableTacheListesTemplates({
       and(
         eq(tacheListesTemplates.serviceId, serviceId),
         eq(tacheListesTemplates.actif, true),
-        inArray(
-          tacheListesTemplates.proprietaireEntrepriseId,
-          entrepriseIds,
+        or(
+          isNull(tacheListesTemplates.proprietaireEntrepriseId),
+          entrepriseIds.length > 0
+            ? inArray(
+                tacheListesTemplates.proprietaireEntrepriseId,
+                entrepriseIds,
+              )
+            : undefined,
         ),
       ),
     )
@@ -162,20 +166,24 @@ export async function getTacheListeTemplateWithItems(
 /**
  * GET ALL PACKS FOR A PROPRIETAIRE (for pack manager)
  * Returns all packs (active + inactive) with their items.
+ * Pass proprietaireEntrepriseId = null to get system packs.
  */
 export async function getTacheListesTemplatesByProprietaire({
   proprietaireEntrepriseId,
   serviceId,
 }: {
-  proprietaireEntrepriseId: string;
+  proprietaireEntrepriseId: string | null;
   serviceId?: string;
 }): Promise<TacheListeTemplateWithItems[]> {
-  const conditions = [
-    eq(
-      tacheListesTemplates.proprietaireEntrepriseId,
-      proprietaireEntrepriseId,
-    ),
-  ];
+  const ownerCondition =
+    proprietaireEntrepriseId === null
+      ? isNull(tacheListesTemplates.proprietaireEntrepriseId)
+      : eq(
+          tacheListesTemplates.proprietaireEntrepriseId,
+          proprietaireEntrepriseId,
+        );
+
+  const conditions = [ownerCondition];
 
   if (serviceId) {
     conditions.push(eq(tacheListesTemplates.serviceId, serviceId));

@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-import { entreprises, serviceEntreprises } from "@/db/schema/entreprises";
+import { serviceEntreprises } from "@/db/schema/entreprises";
 import {
   clientServiceExecutions,
   tacheListeItems,
@@ -17,6 +17,10 @@ import {
   getTacheListesTemplatesByProprietaire,
 } from "@/server/queries/tacheListesTemplates.query";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
+import {
+  capitalizeFirstWord,
+  normalizeForSubmit,
+} from "@/zod-helpers/normalize";
 import { and, asc, eq, max } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
 import { z } from "zod";
@@ -41,14 +45,10 @@ async function hasAccessToEntreprise(
   return !!adhesion;
 }
 
-/** Retourne l'ID de l'entreprise FM4ALL (packs système) */
-async function getFm4allEntrepriseId(): Promise<string | null> {
-  const [row] = await db
-    .select({ id: entreprises.id })
-    .from(entreprises)
-    .where(eq(entreprises.nom, "FM4ALL"))
-    .limit(1);
-  return row?.id ?? null;
+/** Vérifie que l'utilisateur a le rôle plateforme */
+async function isPlatformUser(userId: string): Promise<boolean> {
+  const platformRole = await getUserPlateformeAdhesion(userId);
+  return !!platformRole?.role;
 }
 
 /** Retourne l'entreprise du prestataire lié à une exécution */
@@ -71,7 +71,7 @@ async function getExecutionPrestataireEntrepriseId(
 
 /**
  * Retourne les packs disponibles selon le contexte :
- * - Toujours les packs FM4ALL (système)
+ * - Toujours les packs système (proprietaireEntrepriseId IS NULL)
  * - Les packs de l'entreprise passée en input (client ou créateur)
  * - Si executionId fourni : aussi les packs du prestataire lié à l'exécution
  */
@@ -100,13 +100,8 @@ export const getAvailableTacheListesTemplatesAction = actionClient
       throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
     }
 
-    // Résolution des entreprises visibles
+    // Résolution des entreprises visibles (les packs système IS NULL sont inclus automatiquement par la query)
     const entrepriseIds: string[] = [entrepriseId];
-
-    const fm4allId = await getFm4allEntrepriseId();
-    if (fm4allId && !entrepriseIds.includes(fm4allId)) {
-      entrepriseIds.unshift(fm4allId); // FM4ALL en premier
-    }
 
     if (executionId) {
       const prestataireId =
@@ -126,11 +121,15 @@ export const getAvailableTacheListesTemplatesAction = actionClient
 
 // ==================== GET PACKS FOR MANAGER ====================
 
+/**
+ * Retourne tous les packs (actifs + inactifs) pour un propriétaire.
+ * proprietaireEntrepriseId = null → packs système (réservé aux utilisateurs plateforme)
+ */
 export const getTacheListesTemplatesAction = actionClient
   .metadata({ actionName: "getTacheListesTemplatesAction" })
   .inputSchema(
     z.object({
-      proprietaireEntrepriseId: z.string().uuid("ID d'entreprise invalide"),
+      proprietaireEntrepriseId: z.string().uuid("ID d'entreprise invalide").nullable(),
       serviceId: z.string().uuid().optional(),
     }),
     {
@@ -145,12 +144,22 @@ export const getTacheListesTemplatesAction = actionClient
 
     const { proprietaireEntrepriseId, serviceId } = parsedInput;
 
-    const hasAccess = await hasAccessToEntreprise(
-      currentUser.id,
-      proprietaireEntrepriseId,
-    );
-    if (!hasAccess) {
-      throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+    if (proprietaireEntrepriseId === null) {
+      // Templates système : réservé aux utilisateurs plateforme
+      const isPlatform = await isPlatformUser(currentUser.id);
+      if (!isPlatform) {
+        throw errors.forbidden(
+          "Seuls les utilisateurs plateforme peuvent gérer les templates système.",
+        );
+      }
+    } else {
+      const hasAccess = await hasAccessToEntreprise(
+        currentUser.id,
+        proprietaireEntrepriseId,
+      );
+      if (!hasAccess) {
+        throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+      }
     }
 
     const packs = await getTacheListesTemplatesByProprietaire({
@@ -163,13 +172,21 @@ export const getTacheListesTemplatesAction = actionClient
 
 // ==================== INSERT PACK ====================
 
+/**
+ * Crée un nouveau pack.
+ * proprietaireEntrepriseId = null → pack système (réservé aux utilisateurs plateforme)
+ */
 export const insertTacheListeTemplateAction = actionClient
   .metadata({ actionName: "insertTacheListeTemplateAction" })
   .inputSchema(
     z.object({
-      nom: z.string().min(1, "Nom obligatoire").max(255, "Nom trop long"),
+      nom: z
+        .string()
+        .min(1, "Nom obligatoire")
+        .max(255, "Nom trop long")
+        .transform(capitalizeFirstWord),
       serviceId: z.string().uuid("ID de service invalide"),
-      proprietaireEntrepriseId: z.string().uuid("ID d'entreprise invalide"),
+      proprietaireEntrepriseId: z.string().uuid("ID d'entreprise invalide").nullable(),
     }),
     {
       handleValidationErrorsShape: async (ve) =>
@@ -183,14 +200,24 @@ export const insertTacheListeTemplateAction = actionClient
 
     const { nom, serviceId, proprietaireEntrepriseId } = parsedInput;
 
-    const hasAccess = await hasAccessToEntreprise(
-      currentUser.id,
-      proprietaireEntrepriseId,
-    );
-    if (!hasAccess) {
-      throw errors.forbidden(
-        "Vous n'avez pas accès à cette entreprise pour créer un pack.",
+    if (proprietaireEntrepriseId === null) {
+      // Pack système : rôle plateforme requis
+      const isPlatform = await isPlatformUser(currentUser.id);
+      if (!isPlatform) {
+        throw errors.forbidden(
+          "Seuls les utilisateurs plateforme peuvent créer des templates système.",
+        );
+      }
+    } else {
+      const hasAccess = await hasAccessToEntreprise(
+        currentUser.id,
+        proprietaireEntrepriseId,
       );
+      if (!hasAccess) {
+        throw errors.forbidden(
+          "Vous n'avez pas accès à cette entreprise pour créer un pack.",
+        );
+      }
     }
 
     const [pack] = await db
@@ -215,8 +242,8 @@ export const updateTacheListeTemplateAction = actionClient
   .inputSchema(
     z.object({
       id: z.string().uuid("ID de pack invalide"),
-      entrepriseId: z.string().uuid("ID d'entreprise invalide"),
-      nom: z.string().min(1).max(255).optional(),
+      entrepriseId: z.string().uuid("ID d'entreprise invalide").nullable(),
+      nom: z.string().min(1).max(255).transform(capitalizeFirstWord).optional(),
       actif: z.boolean().optional(),
     }),
     {
@@ -231,7 +258,7 @@ export const updateTacheListeTemplateAction = actionClient
 
     const { id, entrepriseId, nom, actif } = parsedInput;
 
-    // Vérifier que le pack appartient à cette entreprise (ou rôle plateforme)
+    // Vérifier que le pack appartient à cette entreprise (ou rôle plateforme pour pack système)
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
       const [packRow] = await db
@@ -241,6 +268,10 @@ export const updateTacheListeTemplateAction = actionClient
         .limit(1);
 
       if (!packRow) throw errors.notFound("Pack introuvable.");
+
+      if (packRow.proprietaireEntrepriseId === null) {
+        throw errors.forbidden("Seuls les utilisateurs plateforme peuvent modifier les templates système.");
+      }
       if (packRow.proprietaireEntrepriseId !== entrepriseId) {
         throw errors.forbidden("Vous ne pouvez modifier que vos propres packs.");
       }
@@ -268,7 +299,7 @@ export const deleteTacheListeTemplateAction = actionClient
   .inputSchema(
     z.object({
       id: z.string().uuid("ID de pack invalide"),
-      entrepriseId: z.string().uuid("ID d'entreprise invalide"),
+      entrepriseId: z.string().uuid("ID d'entreprise invalide").nullable(),
     }),
     {
       handleValidationErrorsShape: async (ve) =>
@@ -292,6 +323,9 @@ export const deleteTacheListeTemplateAction = actionClient
         .limit(1);
 
       if (!packRow) throw errors.notFound("Pack introuvable.");
+      if (packRow.proprietaireEntrepriseId === null) {
+        throw errors.forbidden("Seuls les utilisateurs plateforme peuvent supprimer les templates système.");
+      }
       if (packRow.proprietaireEntrepriseId !== entrepriseId) {
         throw errors.forbidden("Vous ne pouvez supprimer que vos propres packs.");
       }
@@ -313,8 +347,12 @@ export const insertTacheListeItemAction = actionClient
   .inputSchema(
     z.object({
       listeTemplateId: z.string().uuid("ID de pack invalide"),
-      entrepriseId: z.string().uuid("ID d'entreprise invalide"),
-      titre: z.string().min(1, "Titre obligatoire").max(255, "Titre trop long"),
+      entrepriseId: z.string().uuid("ID d'entreprise invalide").nullable(),
+      titre: z
+        .string()
+        .min(1, "Titre obligatoire")
+        .max(255, "Titre trop long")
+        .transform(capitalizeFirstWord),
       description: z.string().optional(),
       dureeEstimeeMinutes: z.number().int().positive().optional(),
     }),
@@ -328,7 +366,11 @@ export const insertTacheListeItemAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const { listeTemplateId, entrepriseId, titre, description, dureeEstimeeMinutes } = parsedInput;
+    const normalized = normalizeForSubmit(parsedInput, {
+      optionalStrings: ["description"] as const,
+    });
+
+    const { listeTemplateId, entrepriseId, titre, dureeEstimeeMinutes } = normalized;
 
     // Vérifier que le pack appartient à cette entreprise
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
@@ -340,6 +382,9 @@ export const insertTacheListeItemAction = actionClient
         .limit(1);
 
       if (!packRow) throw errors.notFound("Pack introuvable.");
+      if (packRow.proprietaireEntrepriseId === null) {
+        throw errors.forbidden("Seuls les utilisateurs plateforme peuvent modifier les templates système.");
+      }
       if (packRow.proprietaireEntrepriseId !== entrepriseId) {
         throw errors.forbidden("Vous ne pouvez modifier que vos propres packs.");
       }
@@ -359,7 +404,7 @@ export const insertTacheListeItemAction = actionClient
         listeTemplateId,
         ordre: nextOrdre,
         titre,
-        description: description || null,
+        description: normalized.description ?? null,
         actif: true,
         dureeEstimeeMinutes: dureeEstimeeMinutes ?? null,
         createdById: currentUser.id,
@@ -377,8 +422,8 @@ export const updateTacheListeItemAction = actionClient
   .inputSchema(
     z.object({
       id: z.string().uuid("ID d'item invalide"),
-      entrepriseId: z.string().uuid("ID d'entreprise invalide"),
-      titre: z.string().min(1).max(255).optional(),
+      entrepriseId: z.string().uuid("ID d'entreprise invalide").nullable(),
+      titre: z.string().min(1).max(255).transform(capitalizeFirstWord).optional(),
       description: z.string().optional(),
       ordre: z.number().int().positive().optional(),
       actif: z.boolean().optional(),
@@ -394,8 +439,11 @@ export const updateTacheListeItemAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const { id, entrepriseId, titre, description, ordre, actif, dureeEstimeeMinutes } =
-      parsedInput;
+    const normalized = normalizeForSubmit(parsedInput, {
+      optionalStrings: ["description"] as const,
+    });
+
+    const { id, entrepriseId, titre, ordre, actif, dureeEstimeeMinutes } = normalized;
 
     // Vérifier propriété via le pack
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
@@ -413,6 +461,9 @@ export const updateTacheListeItemAction = actionClient
         .limit(1);
 
       if (!itemRow) throw errors.notFound("Item introuvable.");
+      if (itemRow.proprietaireEntrepriseId === null) {
+        throw errors.forbidden("Seuls les utilisateurs plateforme peuvent modifier les templates système.");
+      }
       if (itemRow.proprietaireEntrepriseId !== entrepriseId) {
         throw errors.forbidden("Vous ne pouvez modifier que vos propres items.");
       }
@@ -422,7 +473,7 @@ export const updateTacheListeItemAction = actionClient
       updatedById: currentUser.id,
     };
     if (titre !== undefined) updateData.titre = titre;
-    if (description !== undefined) updateData.description = description || null;
+    if (normalized.description !== undefined) updateData.description = normalized.description ?? null;
     if (ordre !== undefined) updateData.ordre = ordre;
     if (actif !== undefined) updateData.actif = actif;
     if (dureeEstimeeMinutes !== undefined)
@@ -444,7 +495,7 @@ export const deleteTacheListeItemAction = actionClient
   .inputSchema(
     z.object({
       id: z.string().uuid("ID d'item invalide"),
-      entrepriseId: z.string().uuid("ID d'entreprise invalide"),
+      entrepriseId: z.string().uuid("ID d'entreprise invalide").nullable(),
     }),
     {
       handleValidationErrorsShape: async (ve) =>
@@ -475,6 +526,9 @@ export const deleteTacheListeItemAction = actionClient
         .limit(1);
 
       if (!itemRow) throw errors.notFound("Item introuvable.");
+      if (itemRow.proprietaireEntrepriseId === null) {
+        throw errors.forbidden("Seuls les utilisateurs plateforme peuvent modifier les templates système.");
+      }
       if (itemRow.proprietaireEntrepriseId !== entrepriseId) {
         throw errors.forbidden("Vous ne pouvez supprimer que vos propres items.");
       }
@@ -515,7 +569,7 @@ export const reorderTacheListeItemsAction = actionClient
   .inputSchema(
     z.object({
       listeTemplateId: z.string().uuid("ID de pack invalide"),
-      entrepriseId: z.string().uuid("ID d'entreprise invalide"),
+      entrepriseId: z.string().uuid("ID d'entreprise invalide").nullable(),
       /** Tableau des IDs dans le nouvel ordre (du premier au dernier) */
       orderedIds: z.array(z.string().uuid()).min(1),
     }),
@@ -541,12 +595,29 @@ export const reorderTacheListeItemsAction = actionClient
         .limit(1);
 
       if (!packRow) throw errors.notFound("Pack introuvable.");
+      if (packRow.proprietaireEntrepriseId === null) {
+        throw errors.forbidden("Seuls les utilisateurs plateforme peuvent modifier les templates système.");
+      }
       if (packRow.proprietaireEntrepriseId !== entrepriseId) {
         throw errors.forbidden("Vous ne pouvez modifier que vos propres packs.");
       }
     }
 
     await db.transaction(async (tx) => {
+      // Passe 1 : offset élevé pour éviter la contrainte unique (liste_template_id, ordre)
+      // lors du réordonnancement (ex: swap ordre 1 et 2 créerait un doublon sinon)
+      for (let i = 0; i < orderedIds.length; i++) {
+        await tx
+          .update(tacheListeItems)
+          .set({ ordre: 10000 + i + 1 })
+          .where(
+            and(
+              eq(tacheListeItems.id, orderedIds[i]),
+              eq(tacheListeItems.listeTemplateId, listeTemplateId),
+            ),
+          );
+      }
+      // Passe 2 : ordre final
       for (let i = 0; i < orderedIds.length; i++) {
         await tx
           .update(tacheListeItems)
@@ -561,6 +632,34 @@ export const reorderTacheListeItemsAction = actionClient
     });
 
     const pack = await getTacheListeTemplateWithItems(listeTemplateId);
+
+    return { pack };
+  });
+
+// ==================== GET SINGLE PACK BY ID ====================
+
+/**
+ * Retourne un pack avec ses items (actifs + inactifs) — pour preview.
+ * Accessible à tout utilisateur authentifié (pas de check entreprise).
+ */
+export const getTacheListeTemplateAction = actionClient
+  .metadata({ actionName: "getTacheListeTemplateAction" })
+  .inputSchema(
+    z.object({
+      id: z.string().uuid("ID de pack invalide"),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const pack = await getTacheListeTemplateWithItems(parsedInput.id);
+    if (!pack) throw errors.notFound("Pack introuvable.");
 
     return { pack };
   });

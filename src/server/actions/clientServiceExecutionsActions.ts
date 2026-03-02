@@ -19,6 +19,7 @@ import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesi
 import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userSiteAttributions.utils";
 import { onClientServiceChanged } from "@/server/utils/clientServiceOccurrences.utils";
 import { insertExecutionFormSchema } from "@/zod-schemas/clientServiceExecutions.schema";
+import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import { and, eq } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
 import { z } from "zod";
@@ -77,7 +78,15 @@ export const insertExecutionWithPrixAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const { prestationId, entrepriseId, siteId } = parsedInput;
+    // Normaliser les champs top-level (string → number/Date)
+    // Note: les items du tableau `prix` conservent une conversion manuelle (normalizeForSubmit ne gère pas les arrays imbriqués)
+    const normalized = normalizeForSubmit(parsedInput, {
+      requiredNumbers: ["priorite"] as const,
+      requiredDates: ["dateDebutValidite"] as const,
+      optionalDates: ["dateFinValidite"] as const,
+    });
+
+    const { prestationId, entrepriseId, siteId } = normalized;
 
     // Vérifier les permissions
     const canManage = await canManagePrestation(
@@ -110,12 +119,10 @@ export const insertExecutionWithPrixAction = actionClient
         .values({
           clientServiceId: prestationId,
           siteId,
-          serviceEntrepriseId: parsedInput.serviceEntrepriseId,
-          dateDebutValidite: new Date(parsedInput.dateDebutValidite),
-          dateFinValidite: parsedInput.dateFinValidite
-            ? new Date(parsedInput.dateFinValidite)
-            : null,
-          priorite: Number(parsedInput.priorite),
+          serviceEntrepriseId: normalized.serviceEntrepriseId,
+          dateDebutValidite: normalized.dateDebutValidite,
+          dateFinValidite: normalized.dateFinValidite,
+          priorite: normalized.priorite,
           actif: true,
           createdById: currentUser.id,
           updatedById: currentUser.id,

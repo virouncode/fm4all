@@ -2,17 +2,8 @@
 
 import { SortableHeader } from "@/components/tables/SortableHeader";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { type PrestationListItem } from "@/zod-schemas/clientServices.schema";
 import { type ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Pencil, RotateCcw, Trash2 } from "lucide-react";
 import {
   formatDate,
   formatDuree,
@@ -32,14 +23,7 @@ export const prestationsIdLabelMap = new Map<string, string>([
   ["dureeEstimeeMinutes", "Durée"],
 ]);
 
-type PrestationActions = {
-  onEdit: (p: PrestationListItem) => void;
-  onChangeStatut: (p: PrestationListItem) => void;
-  onDelete: (p: PrestationListItem) => void;
-};
-
 export function createPrestationsColumns(
-  actions: PrestationActions,
   options: { showEntreprise: boolean },
 ): ColumnDef<PrestationListItem>[] {
   const columns: ColumnDef<PrestationListItem>[] = [
@@ -146,55 +130,6 @@ export function createPrestationsColumns(
         );
       },
       size: 80,
-    },
-    {
-      id: "actions",
-      header: "",
-      cell: ({ row }) => {
-        const p = row.original;
-        const canDelete = p.statut === "brouillon";
-        const canChangeStatut = p.statut !== "termine";
-
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                aria-label="Actions"
-              >
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => actions.onEdit(p)}>
-                <Pencil className="mr-2 h-4 w-4" />
-                Modifier
-              </DropdownMenuItem>
-              {canChangeStatut && (
-                <DropdownMenuItem onClick={() => actions.onChangeStatut(p)}>
-                  <RotateCcw className="mr-2 h-4 w-4" />
-                  Changer le statut
-                </DropdownMenuItem>
-              )}
-              {canDelete && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="text-destructive focus:text-destructive"
-                    onClick={() => actions.onDelete(p)}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Supprimer
-                  </DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
-      size: 50,
     },
   );
 

@@ -286,8 +286,7 @@ export const tacheListesTemplates = pgTable(
       .notNull()
       .references(() => services.id, { onDelete: "cascade" }),
     proprietaireEntrepriseId: uuid("proprietaire_entreprise_id")
-      .notNull()
-      .references(() => entreprises.id, { onDelete: "cascade" }),
+      .references(() => entreprises.id, { onDelete: "set null" }),
     nom: varchar("nom", { length: 255 }).notNull(),
     actif: boolean("actif").notNull().default(true),
     createdById: createdById(() => user),

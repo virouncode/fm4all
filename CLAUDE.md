@@ -4,18 +4,95 @@
 
 ## Vue d'Ensemble du Projet
 
-**FM4ALL** est une plateforme de devis pour services de facility management (nettoyage, hygiène, boissons, maintenance, etc.). La plateforme permet aux utilisateurs de:
+### Contexte Métier
 
-1. Spécifier leurs locaux/sites
-2. Sélectionner et configurer des services
-3. Obtenir des devis avec tarification temps réel
-4. Gérer l'ensemble du cycle de vie d'un devis
+**FM4ALL** est une société de mise en relation et de courtage pour les services de **facility management / office management** des TPE/PME. Le positionnement clé : **"1 contact, 1 contrat, 1 facture"** pour l'ensemble des prestations externalisées.
 
-**Système Multi-Rôles**:
+**Problème résolu** : Les petites structures (< 3 000 m²) peinent à obtenir des devis compétitifs auprès de prestataires FM. FM4ALL automatise ce processus via un comparateur en ligne et un générateur de devis en quelques minutes, en jouant sur les volumes agrégés (moyenne -10% sur les tarifs).
 
-- **Client**: Demande des devis, gère ses sites
-- **Prestataire**: Gère ses interventions, planning
-- **Plateforme**: Administration globale, pilotage
+**Cibles clients** : TPE/PME, start-ups, cabinets médicaux, locaux commerciaux, entrepôts logistiques, espaces de coworking.
+
+**Modèle économique** : FM4ALL porte le devis/contrat, facture le client, reverse aux prestataires, prend une marge (les partenaires font un "effort" tarifaire via les volumes agrégés) + facture des frais de gestion systématiques. Le client n'a qu'un seul interlocuteur.
+
+### Services Proposés
+
+9 domaines, chacun disponible en 3 niveaux (Essentiel / Confort / Excellence) :
+1. Nettoyage & propreté
+2. Maintenance multitechnique
+3. Sécurité incendie
+4. Machines à café
+5. Fontaines à eau
+6. Fruits & Snacks
+7. Boissons variées
+8. Office Manager externalisé
+9. Pilotage FM4ALL
+
+---
+
+## Les Deux Outils de la Plateforme
+
+### Outil 1 — Comparateur & Générateur de Devis
+
+Le point d'entrée public : le client configure ses locaux, sélectionne des services parmi le catalogue FM4ALL, et obtient un devis multi-services en quelques minutes avec les tarifs des partenaires.
+
+- Accessible sans compte (parcours public)
+- Tarification temps réel basée sur le catalogue partenaires
+- FM4ALL porte le contrat et facture le client (`modeCommercial: "intermediaire_fm4all"`)
+- Résultat : un devis → signé → devient des **prestations** dans l'outil de gestion
+
+### Outil 2 — Plateforme de Gestion Opérationnelle
+
+L'outil métier principal (cette application). Gère le cycle de vie complet des prestations après contractualisation.
+
+**C'est ici que réside le principal défi : la flexibilité.**
+
+#### Postures Contractuelles Supportées
+
+L'outil doit fonctionner dans tous ces cas sans être une usine à gaz :
+
+| Cas | Description | Flux de facturation |
+|-----|-------------|---------------------|
+| **Direct** | Client contracte directement avec un prestataire (FM4ALL hors équation) | Client → Prestataire |
+| **Intermédiaire FM4ALL** | FM4ALL porte le contrat, prend une marge, reverse aux prestataires | Client → FM4ALL → Prestataire(s) |
+| **FM4ALL prestataire** | FM4ALL est lui-même le prestataire (office manager, pilotage FM) | Client → FM4ALL |
+| **Gestion déléguée externe** | Prestataire porte le contrat, FM4ALL perçoit un % sur les prix | Client → Prestataire (FM4ALL en coulisse) |
+
+En code : `modeCommercial: "direct" | "intermediaire_fm4all"` sur chaque `clientService`.
+
+#### Principes de Flexibilité Structurelle (NE PAS OUBLIER)
+
+1. **Double casquette** : une entreprise peut être à la fois cliente ET prestataire
+2. **Standalone** : l'outil fonctionne même si FM4ALL n'est pas dans l'équation contractuelle
+3. **Prestataires sans compte** : un client peut gérer ses prestations même si ses prestataires n'ont pas de compte sur la plateforme (et inversement pour un prestataire vis-à-vis de ses clients)
+4. **Référencement croisé** : si client ET prestataire ont un compte, ils doivent pouvoir se référencer mutuellement
+5. **Posture plateforme FM4ALL** : peut agir AU NOM de n'importe quel client (vue cross-entreprises)
+
+#### Ce que doit pouvoir faire chaque acteur
+
+**Entreprise cliente** :
+- Créer/gérer ses sites (hiérarchie) et ses utilisateurs (attributions sites + rôles)
+- Créer des **prestations** (contrats opérationnels de services sur ses sites)
+- Créer des **exécutions** (prestataire + tarifs appliqués par prestation)
+- Gérer des **interventions/occurrences** avec **tâches** à effectuer
+- Créer/modifier/annuler des **tickets** et demandes de devis
+- Consulter des **analytics** (par période, par site, par service)
+- Basculer en posture prestataire si elle le souhaite
+
+**FM4ALL (posture plateforme)** :
+- Faire tout ce qu'un client peut faire, mais AU NOM de n'importe quelle entreprise cliente
+- Administrer les partenaires, les tarifs catalogue, les marges
+- En posture prestataire : se comporter comme n'importe quelle entreprise prestataire
+
+**Entreprise prestataire** :
+- Accéder aux tickets, demandes de devis, interventions qui la concernent
+- Agents : voir les tâches attribuées, pointer, soumettre des preuves (photos)
+- Responsables : émettre des rapports, valider les interventions
+
+**Système Multi-Rôles** :
+
+- **Client** : Demande des devis, gère ses sites, suit ses prestations
+- **Prestataire** : Gère ses interventions, planning, occurrences
+- **Plateforme** : Administration globale, pilotage cross-clients, paramétrage tarifaire
 
 Le système utilise un concept de **"posture"** (rôle actif) pour permettre aux utilisateurs ayant plusieurs rôles de basculer entre eux.
 

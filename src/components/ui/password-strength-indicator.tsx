@@ -105,9 +105,9 @@ export function PasswordStrengthIndicator({
         {criteria.map((criterion, index) => (
           <div key={index} className="flex items-center gap-2 text-xs">
             {criterion.met ? (
-              <Check className="h-3.5 w-3.5 shrink-0 text-green-600 dark:text-green-500" />
+              <Check className="h-4 w-4 shrink-0 text-green-600 dark:text-green-500" />
             ) : (
-              <X className="text-muted-foreground h-3.5 w-3.5 shrink-0" />
+              <X className="text-muted-foreground h-4 w-4 shrink-0" />
             )}
             <span
               className={cn(

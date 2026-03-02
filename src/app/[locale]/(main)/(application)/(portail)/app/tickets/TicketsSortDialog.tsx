@@ -104,7 +104,7 @@ export function TicketsSortDialog({
                 className="flex-1"
                 onClick={() => handleDirectionChange("asc")}
               >
-                <ArrowUpAZ className="mr-2 h-4 w-4" />
+                <ArrowUpAZ className="h-4 w-4" />
                 Croissant
               </Button>
               <Button
@@ -113,7 +113,7 @@ export function TicketsSortDialog({
                 className="flex-1"
                 onClick={() => handleDirectionChange("desc")}
               >
-                <ArrowDownAZ className="mr-2 h-4 w-4" />
+                <ArrowDownAZ className="h-4 w-4" />
                 Décroissant
               </Button>
             </div>
