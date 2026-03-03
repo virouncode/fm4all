@@ -5,6 +5,7 @@ type SearchParams = {
   statut?: string;
   serviceId?: string;
   siteId?: string;
+  modeCommercial?: string;
   clientEntrepriseId?: string;
   orderBy?: string;
   orderDir?: string;

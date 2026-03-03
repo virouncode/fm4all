@@ -15,7 +15,7 @@ import { Archive } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-interface SiteArchiveDialogProps {
+type SiteArchiveDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   site: SelectSiteType;

@@ -73,6 +73,18 @@ async function isEntreprisePrestataire(
   return !!prestataireRole;
 }
 
+// Helper: Empêche l'auto-attribution/suppression/modification de ses propres accès
+function assertNoSelfAction(
+  targetUserId: string,
+  currentUserId: string,
+  level: number,
+  message: string,
+): void {
+  if (targetUserId !== currentUserId) return;
+  const advisor = level >= 2 ? "un administrateur" : "votre responsable";
+  throw errors.forbidden(`${message} Demandez à ${advisor}.`);
+}
+
 // Action 1: Insert single attribution
 export const insertUserSiteAttributionAction = actionClient
   .metadata({ actionName: "insertUserSiteAttributionAction" })
@@ -102,12 +114,7 @@ export const insertUserSiteAttributionAction = actionClient
     }
     // Voie 2: Manager → Validations strictes
     else if (currentUserLevel === 2) {
-      // NOUVEAU : Interdire l'auto-attribution
-      if (parsedInput.userId === currentUser.id) {
-        throw errors.forbidden(
-          "Vous ne pouvez pas vous attribuer un rôle sur un site. Demandez à un administrateur.",
-        );
-      }
+      assertNoSelfAction(parsedInput.userId, currentUser.id, 2, "Vous ne pouvez pas vous attribuer un rôle sur un site.");
 
       // 1. Vérifier que targetUser est un descendant dans usersArborescence
       const isDescendant = await isUserDescendant({
@@ -138,12 +145,7 @@ export const insertUserSiteAttributionAction = actionClient
     }
     // Voie 3: Collaborateur avec délégation locale
     else if (currentUserLevel === 1) {
-      // NOUVEAU : Interdire l'auto-attribution
-      if (parsedInput.userId === currentUser.id) {
-        throw errors.forbidden(
-          "Vous ne pouvez pas vous attribuer un rôle sur un site. Demandez à votre responsable.",
-        );
-      }
+      assertNoSelfAction(parsedInput.userId, currentUser.id, 1, "Vous ne pouvez pas vous attribuer un rôle sur un site.");
 
       // Vérifier que le currentUser est responsable_site sur le site cible
       const resolved = await resolveUserEffectiveRoleOnSite({
@@ -261,12 +263,7 @@ export const bulkInsertUserSiteAttributionsAction = actionClient
     }
     // Voie 2: Manager → Validations strictes
     else if (currentUserLevel === 2) {
-      // NOUVEAU : Interdire l'auto-attribution
-      if (parsedInput.userId === currentUser.id) {
-        throw errors.forbidden(
-          "Vous ne pouvez pas vous attribuer des rôles sur des sites. Demandez à un administrateur.",
-        );
-      }
+      assertNoSelfAction(parsedInput.userId, currentUser.id, 2, "Vous ne pouvez pas vous attribuer des rôles sur des sites.");
 
       // 1. Vérifier que targetUser est un descendant dans usersArborescence
       const isDescendant = await isUserDescendant({
@@ -299,12 +296,7 @@ export const bulkInsertUserSiteAttributionsAction = actionClient
     }
     // Voie 3: Collaborateur avec délégation locale
     else if (currentUserLevel === 1) {
-      // NOUVEAU : Interdire l'auto-attribution
-      if (parsedInput.userId === currentUser.id) {
-        throw errors.forbidden(
-          "Vous ne pouvez pas vous attribuer des rôles sur des sites. Demandez à votre responsable.",
-        );
-      }
+      assertNoSelfAction(parsedInput.userId, currentUser.id, 1, "Vous ne pouvez pas vous attribuer des rôles sur des sites.");
 
       // Ne peut déléguer que demandeur_site et observateur_site
       if (!["demandeur_site", "observateur_site"].includes(parsedInput.role)) {
@@ -452,12 +444,7 @@ export const bulkInsertMixedAttributionsAction = actionClient
     }
     // Voie 2: Manager → Validations strictes
     else if (currentUserLevel === 2) {
-      // NOUVEAU : Interdire l'auto-attribution
-      if (parsedInput.userId === currentUser.id) {
-        throw errors.forbidden(
-          "Vous ne pouvez pas vous attribuer des rôles sur des sites. Demandez à un administrateur.",
-        );
-      }
+      assertNoSelfAction(parsedInput.userId, currentUser.id, 2, "Vous ne pouvez pas vous attribuer des rôles sur des sites.");
 
       // 1. Vérifier que targetUser est un descendant dans usersArborescence
       const isDescendant = await isUserDescendant({
@@ -490,12 +477,7 @@ export const bulkInsertMixedAttributionsAction = actionClient
     }
     // Voie 3: Collaborateur avec délégation locale
     else if (currentUserLevel === 1) {
-      // NOUVEAU : Interdire l'auto-attribution
-      if (parsedInput.userId === currentUser.id) {
-        throw errors.forbidden(
-          "Vous ne pouvez pas vous attribuer des rôles sur des sites. Demandez à votre responsable.",
-        );
-      }
+      assertNoSelfAction(parsedInput.userId, currentUser.id, 1, "Vous ne pouvez pas vous attribuer des rôles sur des sites.");
 
       // Ne peut déléguer que demandeur_site et observateur_site
       const invalidRoles = roles.filter(
@@ -735,12 +717,7 @@ export const deleteUserSiteAttributionAction = actionClient
     }
     // Voie 2: Manager → Validations strictes
     else if (currentUserLevel === 2) {
-      // NOUVEAU : Interdire l'auto-suppression
-      if (parsedInput.userId === currentUser.id) {
-        throw errors.forbidden(
-          "Vous ne pouvez pas retirer vos propres attributions. Demandez à un administrateur.",
-        );
-      }
+      assertNoSelfAction(parsedInput.userId, currentUser.id, 2, "Vous ne pouvez pas retirer vos propres attributions.");
 
       // 1. Vérifier que targetUser est un descendant dans usersArborescence
       const isDescendant = await isUserDescendant({
@@ -771,12 +748,7 @@ export const deleteUserSiteAttributionAction = actionClient
     }
     // Voie 3: Collaborateur avec délégation locale
     else if (currentUserLevel === 1) {
-      // NOUVEAU : Interdire l'auto-suppression
-      if (parsedInput.userId === currentUser.id) {
-        throw errors.forbidden(
-          "Vous ne pouvez pas retirer vos propres attributions. Demandez à votre responsable.",
-        );
-      }
+      assertNoSelfAction(parsedInput.userId, currentUser.id, 1, "Vous ne pouvez pas retirer vos propres attributions.");
 
       // Ne peut retirer que demandeur_site et observateur_site
       if (!["demandeur_site", "observateur_site"].includes(attribution.role)) {
@@ -982,12 +954,7 @@ export const updateUserSiteAttributionAction = actionClient
     }
     // Voie 2: Manager → Validations strictes
     else if (currentUserLevel === 2) {
-      // NOUVEAU : Interdire l'auto-modification
-      if (parsedInput.userId === currentUser.id) {
-        throw errors.forbidden(
-          "Vous ne pouvez pas modifier vos propres attributions. Demandez à un administrateur.",
-        );
-      }
+      assertNoSelfAction(parsedInput.userId, currentUser.id, 2, "Vous ne pouvez pas modifier vos propres attributions.");
 
       // 1. Vérifier que targetUser est un descendant dans usersArborescence
       const isDescendant = await isUserDescendant({
@@ -1018,12 +985,7 @@ export const updateUserSiteAttributionAction = actionClient
     }
     // Voie 3: Collaborateur avec délégation locale
     else if (currentUserLevel === 1) {
-      // NOUVEAU : Interdire l'auto-modification
-      if (parsedInput.userId === currentUser.id) {
-        throw errors.forbidden(
-          "Vous ne pouvez pas modifier vos propres attributions. Demandez à votre responsable.",
-        );
-      }
+      assertNoSelfAction(parsedInput.userId, currentUser.id, 1, "Vous ne pouvez pas modifier vos propres attributions.");
 
       // Ne peut modifier que vers demandeur_site ou observateur_site
       if (!["demandeur_site", "observateur_site"].includes(parsedInput.role)) {

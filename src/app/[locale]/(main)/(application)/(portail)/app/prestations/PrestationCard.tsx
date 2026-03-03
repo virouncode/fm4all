@@ -8,11 +8,12 @@ import {
   formatDate,
   formatDuree,
   getFrequenceLabel,
+  getModeCommercialBadge,
   getModePlanningBadge,
   getPrestationStatutBadge,
 } from "./helpers";
 
-interface PrestationCardProps {
+type PrestationCardProps = {
   prestation: PrestationListItem;
   showEntreprise: boolean;
   onClick?: () => void;
@@ -25,6 +26,7 @@ export function PrestationCard({
 }: PrestationCardProps) {
   const statutBadge = getPrestationStatutBadge(prestation.statut);
   const modeBadge = getModePlanningBadge(prestation.modePlanning);
+  const modeCommercialBadge = getModeCommercialBadge(prestation.modeCommercial);
   const frequenceLabel = getFrequenceLabel(
     prestation.frequence,
     prestation.frequenceParPeriode,
@@ -76,11 +78,14 @@ export function PrestationCard({
       </CardHeader>
 
       <CardContent className="flex flex-1 flex-col gap-3">
-        {/* Fréquence + Mode */}
+        {/* Fréquence + Mode planning + Mode commercial */}
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-sm">{frequenceLabel}</span>
           <Badge className={`text-xs ${modeBadge.className}`}>
             {modeBadge.label}
+          </Badge>
+          <Badge className={`text-xs ${modeCommercialBadge.className}`}>
+            {modeCommercialBadge.label}
           </Badge>
         </div>
 

@@ -179,8 +179,8 @@ export default async function TicketDetailsPage({
   // 9. Charger les pièces jointes du ticket
   const attachments = await getDocumentsByTicketId(ticketId);
 
-  // 10. Charger les messages
-  const messages = await getTicketMessagesWithAttachments(ticketId);
+  // 10. Charger les messages (filtrés côté serveur selon la posture)
+  const messages = await getTicketMessagesWithAttachments(ticketId, posture);
 
   // 11. Passer à TicketDetailsClient
   return (

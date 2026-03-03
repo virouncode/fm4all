@@ -2,6 +2,8 @@ import z from "zod";
 import {
   devisStatutEnum,
   devisTypePrixEnum,
+  occurrenceStatutEnum,
+  occurrenceTacheStatutEnum,
   roleEnum,
   ticketMessageVisibiliteEnum,
   ticketPrioriteEnum,
@@ -41,3 +43,16 @@ export type TicketMessageVisibiliteType = z.infer<
 
 export const userRoleSchema = z.enum(roleEnum.enumValues);
 export type UserRoleType = z.infer<typeof userRoleSchema>;
+
+export const occurrenceStatutSchema = z.enum(occurrenceStatutEnum.enumValues);
+export type OccurrenceStatutType = z.infer<typeof occurrenceStatutSchema>;
+
+// Sous-ensemble valide pour les transitions (planifiee n'est pas une cible de transition)
+export const occurrenceTransitionStatutSchema =
+  occurrenceStatutSchema.exclude(["planifiee"]);
+export type OccurrenceTransitionStatutType = z.infer<
+  typeof occurrenceTransitionStatutSchema
+>;
+
+export const occurrenceTacheStatutSchema = z.enum(occurrenceTacheStatutEnum.enumValues);
+export type OccurrenceTacheStatutType = z.infer<typeof occurrenceTacheStatutSchema>;

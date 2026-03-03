@@ -10,7 +10,7 @@ import { RolePlateformeAdhesionType } from "@/zod-schemas/userPlateformeAdhesion
 import { ChevronDown, ChevronRight, Plus, User } from "lucide-react";
 import { getPathToRoot } from "./helpers";
 
-interface UsersTreeProps {
+type UsersTreeProps = {
   tree: UserTreeNode[];
   selectedUserId: string | null;
   onSelectUser: (userId: string) => void;

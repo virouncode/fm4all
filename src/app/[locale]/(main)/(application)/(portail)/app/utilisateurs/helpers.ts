@@ -43,9 +43,8 @@ export function buildUserTree(users: UserWithAdhesionType[]): UserTreeNode[] {
       if (parent) {
         parent.children.push(node);
       } else {
-        // Parent manquant (ne devrait pas arriver)
-        console.warn(`Parent ${user.parentId} not found for user ${user.id}`);
-        roots.push(node); // Traiter comme racine
+        // Parent manquant (ne devrait pas arriver) — traiter comme racine
+        roots.push(node);
       }
     }
   }

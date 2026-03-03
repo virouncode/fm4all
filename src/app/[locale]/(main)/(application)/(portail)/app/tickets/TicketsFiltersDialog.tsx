@@ -40,7 +40,7 @@ const filtersSchema = z.object({
 
 type FiltersType = z.infer<typeof filtersSchema>;
 
-interface TicketsFiltersDialogProps {
+type TicketsFiltersDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   currentFilters: FiltersType;

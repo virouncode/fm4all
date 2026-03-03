@@ -42,21 +42,23 @@ import { z } from "zod";
  * Vérifie si l'utilisateur peut gérer une prestation sur un site donné.
  * Règle : rôle plateforme (any) OU responsable_site sur le site.
  * L'admin d'entreprise sert à configurer les utilisateurs, pas à gérer les prestations.
+ *
+ * Retourne { allowed, isPlateforme } pour éviter un second appel getUserPlateformeAdhesion.
  */
 async function canManagePrestation(
   userId: string,
   entrepriseId: string,
   siteId: string,
-): Promise<boolean> {
+): Promise<{ allowed: boolean; isPlateforme: boolean }> {
   const platformRole = await getUserPlateformeAdhesion(userId);
-  if (platformRole?.role) return true;
+  if (platformRole?.role) return { allowed: true, isPlateforme: true };
 
   const siteRole = await resolveUserEffectiveRoleOnSite({
     userId,
     siteId,
     entrepriseId,
   });
-  return siteRole === "responsable_site";
+  return { allowed: siteRole === "responsable_site", isPlateforme: false };
 }
 
 /**
@@ -127,7 +129,7 @@ export const getPrestationsAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    const { entrepriseId, statut, serviceId, siteId } = parsedInput;
+    const { entrepriseId, statut, serviceId, siteId, modeCommercial, orderBy, orderDir } = parsedInput;
 
     if (!entrepriseId) {
       // Vue cross-clients : réservée à la plateforme
@@ -137,7 +139,7 @@ export const getPrestationsAction = actionClient
           "Seule la plateforme peut accéder à la vue cross-clients.",
         );
       }
-      const prestations = await getAllPrestations({ statut, serviceId, siteId });
+      const prestations = await getAllPrestations({ statut, serviceId, siteId, modeCommercial, orderBy, orderDir });
       return { prestations };
     }
 
@@ -151,6 +153,9 @@ export const getPrestationsAction = actionClient
       statut,
       serviceId,
       siteId,
+      modeCommercial,
+      orderBy,
+      orderDir,
     });
 
     return { prestations };
@@ -237,7 +242,11 @@ export const insertPrestationAction = actionClient
     const { entrepriseId, siteId } = parsedInput;
 
     // Vérifier les permissions : plateforme OU responsable_site sur le site d'ancrage
-    const canCreate = await canManagePrestation(currentUser.id, entrepriseId, siteId);
+    const { allowed: canCreate, isPlateforme } = await canManagePrestation(
+      currentUser.id,
+      entrepriseId,
+      siteId,
+    );
     if (!canCreate) {
       throw errors.forbidden(
         "Vous devez être responsable de ce site pour créer une prestation.",
@@ -245,11 +254,12 @@ export const insertPrestationAction = actionClient
     }
 
     // Règle métier : seule la plateforme peut créer en mode intermediaire_fm4all
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
-    const modeCommercial =
-      platformRole?.role && parsedInput.modeCommercial === "intermediaire_fm4all"
-        ? "intermediaire_fm4all"
-        : "direct";
+    if (parsedInput.modeCommercial === "intermediaire_fm4all" && !isPlateforme) {
+      throw errors.forbidden(
+        "Seule la plateforme FM4ALL peut créer une prestation en mode intermédiaire.",
+      );
+    }
+    const modeCommercial = parsedInput.modeCommercial ?? "direct";
 
     // Normaliser les données (strings → types corrects, "" → null)
     const normalized = normalizeForSubmit(parsedInput, {
@@ -370,7 +380,11 @@ export const updatePrestationAction = actionClient
     }
 
     // Vérifier les permissions : plateforme OU responsable_site sur le site
-    const canEdit = await canManagePrestation(currentUser.id, entrepriseId, current.siteId);
+    const { allowed: canEdit, isPlateforme } = await canManagePrestation(
+      currentUser.id,
+      entrepriseId,
+      current.siteId,
+    );
     if (!canEdit) {
       throw errors.forbidden(
         "Vous devez être responsable de ce site pour modifier une prestation.",
@@ -386,8 +400,7 @@ export const updatePrestationAction = actionClient
 
     // Règle modeCommercial : seule la plateforme peut le modifier, et seulement avant exécution
     if (parsedInput.modeCommercial !== undefined && parsedInput.modeCommercial !== current.modeCommercial) {
-      const platformRole = await getUserPlateformeAdhesion(currentUser.id);
-      if (!platformRole?.role) {
+      if (!isPlateforme) {
         throw errors.forbidden(
           "Seule la plateforme FM4ALL peut modifier le mode commercial.",
         );
@@ -522,7 +535,11 @@ export const updatePrestationStatutAction = actionClient
     }
 
     // Vérifier les permissions : plateforme OU responsable_site sur le site
-    const canEdit = await canManagePrestation(currentUser.id, entrepriseId, current.siteId);
+    const { allowed: canEdit } = await canManagePrestation(
+      currentUser.id,
+      entrepriseId,
+      current.siteId,
+    );
     if (!canEdit) {
       throw errors.forbidden(
         "Vous devez être responsable de ce site pour modifier le statut d'une prestation.",

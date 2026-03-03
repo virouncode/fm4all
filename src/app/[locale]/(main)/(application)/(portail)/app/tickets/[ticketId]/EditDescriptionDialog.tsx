@@ -56,8 +56,7 @@ export function EditDescriptionDialog({
         setOpen(false);
         onUpdate();
       }
-    } catch (error) {
-      console.error("Failed to update description:", error);
+    } catch {
       toast.error("Erreur lors de la mise à jour de la description");
     } finally {
       setIsUpdating(false);

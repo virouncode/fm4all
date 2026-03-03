@@ -1,15 +1,12 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
 import { TicketTypeType } from "@/zod-schemas/enums";
-import { FileText } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { updateTicketBasicFieldsAction } from "@/server/actions/ticketsActions";
@@ -57,8 +54,7 @@ export function EditableTypeBadge({
         toast.success("Type mis à jour");
         onUpdate();
       }
-    } catch (error) {
-      console.error("Failed to update type:", error);
+    } catch {
       toast.error("Erreur lors de la mise à jour du type");
     } finally {
       setIsUpdating(false);

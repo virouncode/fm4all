@@ -37,6 +37,7 @@ import {
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import {
   formatTicketDate,
   formatTicketDateRelative,
@@ -118,7 +119,6 @@ export function TicketDetailsClient({
   availableUsers,
   site,
   proprietaireEntreprise,
-  demandeurEntreprise,
   assigneEntreprise,
   attachments,
   messages,
@@ -163,8 +163,8 @@ export function TicketDetailsClient({
       document.body.removeChild(link);
 
       window.URL.revokeObjectURL(blobUrl);
-    } catch (error) {
-      console.error("Failed to download file:", error);
+    } catch {
+      toast.error("Erreur lors du téléchargement du fichier");
     }
   };
 
@@ -189,11 +189,8 @@ export function TicketDetailsClient({
             if (result?.data?.url) {
               urls[attachment.id] = result.data.url;
             }
-          } catch (error) {
-            console.error(
-              `Failed to load URL for ${attachment.filename}:`,
-              error,
-            );
+          } catch {
+            // URL load failure handled by missing key in attachmentUrls
           }
         }),
       );
@@ -224,11 +221,8 @@ export function TicketDetailsClient({
             [selectedAttachment.id]: result.data!.url,
           }));
         }
-      } catch (error) {
-        console.error(
-          `Failed to refresh URL for ${selectedAttachment.filename}:`,
-          error,
-        );
+      } catch {
+        // URL refresh failure is non-critical
       } finally {
         setLoadingDialogUrl(false);
       }

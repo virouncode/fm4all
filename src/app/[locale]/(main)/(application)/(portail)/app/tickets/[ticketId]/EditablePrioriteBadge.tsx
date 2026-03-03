@@ -1,12 +1,10 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
 import { TicketPrioriteType } from "@/zod-schemas/enums";
 import { useState } from "react";
@@ -59,8 +57,7 @@ export function EditablePrioriteBadge({
         toast.success("Priorité mise à jour");
         onUpdate();
       }
-    } catch (error) {
-      console.error("Failed to update priorite:", error);
+    } catch {
       toast.error("Erreur lors de la mise à jour de la priorité");
     } finally {
       setIsUpdating(false);

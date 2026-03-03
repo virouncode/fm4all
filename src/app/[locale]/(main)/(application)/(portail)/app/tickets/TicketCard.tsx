@@ -11,7 +11,7 @@ import {
 
 type EntrepriseMinimal = { id: string; nom: string };
 
-interface TicketCardProps {
+type TicketCardProps = {
   ticket: SelectTicketType;
   sites: SelectSiteType[];
   entreprises: EntrepriseMinimal[];

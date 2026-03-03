@@ -30,7 +30,7 @@ export function EditableAssigneEntreprise({
 
   const handleChange = async (value: string) => {
     // Convertir valeur spéciale → "" pour normalizeForSubmit
-    const normalizedValue = value === "__none__" ? "" : value;
+    const normalizedValue = value === "none" ? "" : value;
 
     if (normalizedValue === (currentAssigneEntrepriseId || "")) return;
 
@@ -52,8 +52,7 @@ export function EditableAssigneEntreprise({
         toast.success("Prestataire mis à jour");
         onUpdate();
       }
-    } catch (error) {
-      console.error("Failed to update assigneEntrepriseId:", error);
+    } catch {
       toast.error("Erreur lors de la mise à jour du prestataire");
     } finally {
       setIsUpdating(false);
@@ -62,7 +61,7 @@ export function EditableAssigneEntreprise({
 
   return (
     <Select
-      value={currentAssigneEntrepriseId || "__none__"}
+      value={currentAssigneEntrepriseId || "none"}
       onValueChange={handleChange}
       disabled={isUpdating}
     >
@@ -70,7 +69,7 @@ export function EditableAssigneEntreprise({
         <SelectValue placeholder="Choisir un prestataire" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="__none__">
+        <SelectItem value="none">
           <span className="italic text-muted-foreground">Sélectionner un prestataire</span>
         </SelectItem>
         {availablePrestataires.map((prestataire) => (

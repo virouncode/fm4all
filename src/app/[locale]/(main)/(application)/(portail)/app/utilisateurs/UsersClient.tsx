@@ -13,6 +13,7 @@ import { useAppStore } from "@/stores/application/appStore";
 import { UserWithAdhesionType } from "@/zod-schemas/user.schema";
 import { Filter, Plus, Users } from "lucide-react";
 import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 import { useEffect, useMemo, useState } from "react";
 import { buildUserTree, getPathToRoot } from "./helpers";
 import { UserDetails } from "./UserDetails";
@@ -102,8 +103,8 @@ export function UsersClient() {
           return items.length > 0 ? items[0].id : null;
         });
       }
-    } catch (error) {
-      console.error("Failed to load users:", error);
+    } catch {
+      toast.error("Erreur lors du chargement des utilisateurs");
     } finally {
       setLoading(false);
     }

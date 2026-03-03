@@ -11,7 +11,10 @@ import {
 } from "@/components/ui/dialog";
 import { Spinner } from "@/components/ui/spinner";
 import { updatePrestationStatutAction } from "@/server/actions/clientServicesActions";
-import { type PrestationListItem } from "@/zod-schemas/clientServices.schema";
+import {
+  type ClientServiceStatutType,
+  type PrestationListItem,
+} from "@/zod-schemas/clientServices.schema";
 import { ArrowRight, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -32,7 +35,7 @@ const STATUT_LABELS: Record<string, string> = {
   termine: "Terminé",
 };
 
-interface PrestationStatutDialogProps {
+type PrestationStatutDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   prestation: PrestationListItem;
@@ -122,7 +125,7 @@ export function PrestationStatutDialog({
               <div className="flex flex-col gap-2">
                 {allowedTransitions.map((statut) => {
                   const badge = getPrestationStatutBadge(
-                    statut as "brouillon" | "actif" | "en_pause" | "termine",
+                    statut as ClientServiceStatutType,
                   );
                   const isSelected = selectedStatut === statut;
                   return (

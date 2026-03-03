@@ -14,11 +14,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { usePathname, useRouter } from "@/i18n/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { ArrowDownAZ, ArrowDownUp, ArrowUpAZ } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
-interface PrestationsSortDialogProps {
+type PrestationsSortDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -37,7 +37,6 @@ export function PrestationsSortDialog({
   onOpenChange,
 }: PrestationsSortDialogProps) {
   const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const currentOrderBy = searchParams.get("orderBy") || "createdAt";
@@ -46,17 +45,13 @@ export function PrestationsSortDialog({
   const handleSortChange = (orderBy: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("orderBy", orderBy);
-    const query = Object.fromEntries(params.entries());
-    // @ts-expect-error - next-intl router typing issue
-    router.replace({ pathname, query });
+    router.replace({ pathname: "/app/prestations", query: Object.fromEntries(params) });
   };
 
   const handleDirectionChange = (orderDir: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("orderDir", orderDir);
-    const query = Object.fromEntries(params.entries());
-    // @ts-expect-error - next-intl router typing issue
-    router.replace({ pathname, query });
+    router.replace({ pathname: "/app/prestations", query: Object.fromEntries(params) });
   };
 
   return (

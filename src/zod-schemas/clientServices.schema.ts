@@ -190,12 +190,25 @@ export type UpdatePrestationStatutType = z.infer<
 
 // ==================== QUERY SCHEMAS ====================
 
+export const prestationsOrderBySchema = z.enum([
+  "createdAt",
+  "serviceNom",
+  "siteNom",
+  "statut",
+  "frequence",
+  "dateDebut",
+]);
+export type PrestationsOrderByType = z.infer<typeof prestationsOrderBySchema>;
+
 export const getPrestationsQuerySchema = z.object({
   // Optionnel : si absent, la plateforme peut voir tous les clients (cross-client)
   entrepriseId: z.uuid("ID de l'entreprise invalide").optional(),
   statut: clientServiceStatutSchema.optional(),
   serviceId: z.uuid().optional(),
   siteId: z.uuid().optional(),
+  modeCommercial: modeCommercialSchema.optional(),
+  orderBy: prestationsOrderBySchema.optional(),
+  orderDir: z.enum(["asc", "desc"]).optional(),
 });
 export type GetPrestationsQueryType = z.infer<typeof getPrestationsQuerySchema>;
 

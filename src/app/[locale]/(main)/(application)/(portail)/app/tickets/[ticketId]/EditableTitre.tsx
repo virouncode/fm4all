@@ -74,8 +74,7 @@ export function EditableTitre({
         setIsEditing(false);
         onUpdate();
       }
-    } catch (error) {
-      console.error("Failed to update titre:", error);
+    } catch {
       toast.error("Erreur lors de la mise à jour du titre");
     } finally {
       setIsUpdating(false);

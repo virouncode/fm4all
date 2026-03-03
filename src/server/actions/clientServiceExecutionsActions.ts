@@ -31,7 +31,7 @@ import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesi
 import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userSiteAttributions.utils";
 import { onClientServiceChanged } from "@/server/utils/clientServiceOccurrences.utils";
 import { insertExecutionFormSchema, updateExecutionFormSchema } from "@/zod-schemas/clientServiceExecutions.schema";
-import { normalizeForSubmit } from "@/zod-helpers/normalize";
+import { normalizeForSubmit, upper } from "@/zod-helpers/normalize";
 import { and, count, eq, lt, ne } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
 import { z } from "zod";
@@ -155,7 +155,7 @@ export const createOrLinkPrestataireAction = actionClient
   .inputSchema(
     z.object({
       siret: siretSchema("Le SIRET est invalide"),
-      nom: z.string().min(1, "Nom de l'entreprise requis"),
+      nom: z.string().min(1, "Nom de l'entreprise requis").transform((v) => upper(v)),
       serviceId: z.string().uuid("ID du service invalide"),
       entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
       prenomContact: z.string().optional(),
@@ -900,11 +900,9 @@ export const updateExecutionAssigneeDefaultAction = actionClient
 
     if (!execution) throw errors.notFound("Exécution");
 
-    // Normaliser "" → null
-    const assigneeUserIdDefault =
-      parsedInput.assigneeUserIdDefault === "" || parsedInput.assigneeUserIdDefault === undefined
-        ? null
-        : parsedInput.assigneeUserIdDefault;
+    const { assigneeUserIdDefault } = normalizeForSubmit(parsedInput, {
+      optionalStrings: ["assigneeUserIdDefault"] as const,
+    });
 
     const [updated] = await db
       .update(clientServiceExecutions)

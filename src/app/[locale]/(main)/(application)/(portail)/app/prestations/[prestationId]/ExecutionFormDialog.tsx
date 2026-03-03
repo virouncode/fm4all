@@ -39,6 +39,7 @@ import {
 } from "@/server/actions/clientServiceExecutionsActions";
 import { getAssignableUsersForOccurrenceAction } from "@/server/actions/clientServiceOccurrencesActions";
 import { isValidSIRET } from "@/lib/utils/isValidSIRET";
+import { upper } from "@/zod-helpers/normalize";
 import type { ExecutionWithPrix } from "@/server/queries/clientServiceExecutions.query";
 import {
   type InsertExecutionFormType,
@@ -46,7 +47,7 @@ import {
 } from "@/zod-schemas/clientServiceExecutions.schema";
 import type { ModeCommercialType } from "@/zod-schemas/clientServices.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckCircle2, Plus, Search, Trash2, XCircle } from "lucide-react";
+import { CheckCircle2, Plus, RotateCcw, Search, Trash2, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useFieldArray, useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
@@ -263,6 +264,14 @@ export function ExecutionFormDialog({
     }
   };
 
+  // Remet à zéro le workflow SIRET pour saisir un nouveau numéro
+  const handleResetSiret = () => {
+    setSiretInput("");
+    setSiretState({ status: "idle" });
+    setNouveauNom("");
+    setNouveauContact({ prenom: "", nom: "", email: "", phone: "" });
+  };
+
   const handleConfirmPrestataire = async () => {
     const siret = siretInput.replace(/\s/g, "");
     if (!nouveauNom.trim()) {
@@ -458,16 +467,21 @@ export function ExecutionFormDialog({
                         <div className="flex gap-2">
                           <div className="relative flex-1">
                             <Input
-                              className="h-8 font-mono pr-7"
+                              className={`h-8 font-mono pr-7${siretState.status === "found" || siretState.status === "not_found" ? " bg-muted cursor-default" : ""}`}
                               placeholder="14 chiffres"
                               maxLength={14}
                               value={siretInput}
+                              readOnly={
+                                siretState.status === "found" ||
+                                siretState.status === "not_found" ||
+                                siretState.status === "searching"
+                              }
                               onChange={(e) => {
                                 setSiretInput(e.target.value.replace(/\D/g, ""));
                                 setSiretState({ status: "idle" });
                               }}
                             />
-                            {siretInput.length > 0 && (
+                            {siretInput.length > 0 && siretState.status !== "found" && siretState.status !== "not_found" && (
                               <span className="absolute right-2 top-1/2 -translate-y-1/2">
                                 {siretValide ? (
                                   <CheckCircle2 className="h-4 w-4 text-green-600" />
@@ -477,21 +491,38 @@ export function ExecutionFormDialog({
                               </span>
                             )}
                           </div>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="h-8 shrink-0"
-                            onClick={handleSearchSiret}
-                            disabled={!siretValide || siretState.status === "searching"}
-                          >
-                            {siretState.status === "searching" ? (
-                              <Spinner />
-                            ) : (
-                              <Search className="h-4 w-4" />
-                            )}
-                            Rechercher
-                          </Button>
+                          {siretState.status === "found" ||
+                          siretState.status === "not_found" ? (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="h-8 shrink-0"
+                              onClick={handleResetSiret}
+                            >
+                              <RotateCcw className="h-4 w-4" />
+                              Modifier
+                            </Button>
+                          ) : (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="h-8 shrink-0"
+                              onClick={handleSearchSiret}
+                              disabled={
+                                !siretValide ||
+                                siretState.status === "searching"
+                              }
+                            >
+                              {siretState.status === "searching" ? (
+                                <Spinner />
+                              ) : (
+                                <Search className="h-4 w-4" />
+                              )}
+                              Rechercher
+                            </Button>
+                          )}
                         </div>
                         {siretState.status === "error" && (
                           <p className="text-destructive text-xs">
@@ -524,7 +555,7 @@ export function ExecutionFormDialog({
                             <Input
                               className="h-8"
                               value={nouveauNom}
-                              onChange={(e) => setNouveauNom(e.target.value)}
+                              onChange={(e) => setNouveauNom(upper(e.target.value))}
                               readOnly={siretState.status === "found"}
                             />
                           </div>

@@ -99,11 +99,7 @@ export function EditAttachmentsDialog({
               ...attachment,
               previewUrl: result?.data?.url || "",
             };
-          } catch (error) {
-            console.error(
-              `Failed to load URL for ${attachment.filename}:`,
-              error,
-            );
+          } catch {
             return {
               ...attachment,
               previewUrl: "",

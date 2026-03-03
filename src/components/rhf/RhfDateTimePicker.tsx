@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { fr } from "date-fns/locale";
 import {
   FormControl,
   FormDescription,
@@ -307,6 +308,7 @@ export function RhfDateTimePicker<S extends FieldValues>({
                       defaultMonth={defaultMonth}
                       captionLayout="dropdown"
                       timeZone={zone}
+                      locale={fr}
                       disabled={disabledMatchers}
                       onSelect={(d: Date | undefined) => {
                         if (!d) return;

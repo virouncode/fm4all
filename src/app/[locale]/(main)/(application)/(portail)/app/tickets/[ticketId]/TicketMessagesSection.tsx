@@ -94,8 +94,8 @@ function AttachmentThumbnail({
         if (result?.data?.url) {
           setImageUrl(result.data.url);
         }
-      } catch (error) {
-        console.error("Erreur chargement thumbnail:", error);
+      } catch {
+        // thumbnail load failure is non-critical
       } finally {
         setIsLoading(false);
       }
@@ -163,15 +163,8 @@ export function TicketMessagesSection({
 }: TicketMessagesSectionProps) {
   const router = useRouter();
 
-  // Filtrer les messages selon la posture
-  const messages = initialMessages.filter((msg) => {
-    if (posture === "plateforme") return true; // fm4all voit tout
-    if (msg.visibilite === "public") return true;
-    if (posture === "client" && msg.visibilite === "client_only") return true;
-    if (posture === "prestataire" && msg.visibilite === "prestataire_only")
-      return true;
-    return false;
-  });
+  // Les messages sont déjà filtrés côté serveur selon la posture (getTicketMessagesWithAttachments)
+  const messages = initialMessages;
   const [previewAttachment, setPreviewAttachment] = useState<{
     url: string;
     filename: string;

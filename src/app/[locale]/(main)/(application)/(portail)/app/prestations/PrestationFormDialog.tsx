@@ -131,7 +131,7 @@ const prestationFormSchema = z
 
 type PrestationFormValues = z.infer<typeof prestationFormSchema>;
 
-interface PrestationFormDialogProps {
+type PrestationFormDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;

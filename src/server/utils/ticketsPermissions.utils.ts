@@ -308,9 +308,9 @@ export async function canUserEditAssigneEntrepriseId({
  * Vérifie si l'utilisateur peut modifier assigneUserId
  *
  * Règles:
- * - UNIQUEMENT prestataire si le ticket est assigné à leur entreprise
- * - Plateforme: ❌ NON
- * - Client: ❌ NON
+ * - Plateforme (super_admin_plateforme, operateur_plateforme): ✅ OUI
+ * - Client (proprietaire ou demandeur) avec role >= demandeur_site: ✅ OUI
+ * - Prestataire / autres: ❌ NON
  */
 export async function canUserEditAssigneUserId({
   userId,
@@ -323,23 +323,41 @@ export async function canUserEditAssigneUserId({
   entrepriseId: string;
   tx?: DbOrTransaction;
 }): Promise<boolean> {
+  // Vérifier si plateforme
+  const platformRole = await getUserPlateformeAdhesion(userId);
+  if (
+    platformRole?.role === "super_admin_plateforme" ||
+    platformRole?.role === "operateur_plateforme"
+  ) {
+    return true;
+  }
+
   // Récupérer le ticket
   const { getTicketById } = await import("@/server/queries/tickets.query");
   const ticket = await getTicketById(ticketId);
   if (!ticket) return false;
 
-  // Le ticket doit être assigné à l'entreprise courante
-  if (ticket.assigneEntrepriseId !== entrepriseId) {
+  // Vérifier que l'entreprise courante est bien le propriétaire ou le demandeur (côté client)
+  if (
+    ticket.proprietaireEntrepriseId !== entrepriseId &&
+    ticket.demandeurEntrepriseId !== entrepriseId
+  ) {
     return false;
   }
 
-  // L'utilisateur doit avoir un rôle dans cette entreprise prestataire
-  const { getUserAdhesion } = await import(
-    "@/server/queries/userAdhesions.query"
-  );
-  const adhesion = await getUserAdhesion({ userId, entrepriseId });
+  // Récupérer le rôle effectif sur le site du ticket
+  const effectiveRole = await resolveUserEffectiveRoleOnSite({
+    userId,
+    siteId: ticket.siteId,
+    entrepriseId,
+    tx,
+  });
 
-  return !!adhesion; // Si adhesion existe, il peut assigner
+  if (!effectiveRole) return false;
+
+  const userLevel = ROLE_HIERARCHY[effectiveRole];
+  // Requiert au minimum demandeur_site (niveau 2) ou responsable_site (niveau 3)
+  return userLevel >= 2;
 }
 
 /**

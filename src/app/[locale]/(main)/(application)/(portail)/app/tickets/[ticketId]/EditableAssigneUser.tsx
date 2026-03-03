@@ -30,7 +30,7 @@ export function EditableAssigneUser({
 
   const handleChange = async (value: string) => {
     // Convertir valeur spéciale → "" pour normalizeForSubmit
-    const normalizedValue = value === "__none__" ? "" : value;
+    const normalizedValue = value === "none" ? "" : value;
 
     if (normalizedValue === (currentAssigneUserId || "")) return;
 
@@ -52,8 +52,7 @@ export function EditableAssigneUser({
         toast.success("Utilisateur mis à jour");
         onUpdate();
       }
-    } catch (error) {
-      console.error("Failed to update assigneUserId:", error);
+    } catch {
       toast.error("Erreur lors de la mise à jour de l'utilisateur");
     } finally {
       setIsUpdating(false);
@@ -62,7 +61,7 @@ export function EditableAssigneUser({
 
   return (
     <Select
-      value={currentAssigneUserId || "__none__"}
+      value={currentAssigneUserId || "none"}
       onValueChange={handleChange}
       disabled={isUpdating || availableUsers.length === 0}
     >
@@ -70,7 +69,7 @@ export function EditableAssigneUser({
         <SelectValue placeholder="Choisir un utilisateur" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="__none__">
+        <SelectItem value="none">
           <span className="italic text-muted-foreground">Sélectionner un utilisateur</span>
         </SelectItem>
         {availableUsers.map((user) => (

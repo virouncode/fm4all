@@ -18,7 +18,7 @@ import { CheckCircle2, ClipboardList, Clock, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-interface TacheListePickerDialogProps {
+type TacheListePickerDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** "client_service" → modifie la prestation ; "execution" → modifie l'exécution */

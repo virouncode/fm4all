@@ -8,7 +8,7 @@ import { RoleAdhesionType } from "@/zod-schemas/userAdhesion.schema";
 import { RolePlateformeAdhesionType } from "@/zod-schemas/userPlateformeAdhesion.schema";
 import { Building, ChevronDown, ChevronRight, Plus } from "lucide-react";
 
-interface SitesTreeProps {
+type SitesTreeProps = {
   tree: SiteTreeNode[];
   selectedSiteId: string | null;
   onSelectSite: (siteId: string) => void;

@@ -8,6 +8,7 @@ import {
 import { cn } from "@/lib/utils";
 
 import { TIMEZONE } from "@/constants/time";
+import { fr } from "date-fns/locale";
 import { CalendarIcon, X } from "lucide-react";
 import { DateTime } from "luxon";
 import { useMemo, useState, type ReactElement } from "react";
@@ -234,6 +235,7 @@ export function RhfDatePicker<S extends FieldValues>(
                     defaultMonth={defaultMonth}
                     captionLayout="dropdown"
                     timeZone={zone}
+                    locale={fr}
                     disabled={hiddenMatchers}
                     onSelect={(d: Date | undefined) => {
                       if (!d) return;

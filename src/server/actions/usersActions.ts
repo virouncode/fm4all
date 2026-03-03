@@ -38,7 +38,8 @@ import { auth } from "@/server/auth/auth";
 import { getDocumentById } from "@/server/queries/documents.query";
 import crypto from "crypto";
 import { deleteS3Object, promoteS3Key } from "../s3/s3";
-import { normalizeForSubmit } from "@/zod-helpers/normalize";
+import { capitalizeWords, lower, normalizeForSubmit } from "@/zod-helpers/normalize";
+import { sendEmailDirect } from "../email/mailgunDirect";
 
 // ==================== GET USERS ====================
 
@@ -191,8 +192,6 @@ export const insertUserAction = actionClient
       roleAdhesion,
     } = parsedInput;
 
-    // TODO: Vérifier que currentUser a accès à cette entreprise
-
     // Si parentId, vérifier qu'il appartient à la même entreprise
     if (parentId) {
       const parentBelongs = await userBelongsToEntreprise({
@@ -320,11 +319,6 @@ export const insertUserAction = actionClient
       // Gérer les erreurs spécifiques de better-auth
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      console.error("[insertUserAction] Error from auth.api.signUpEmail:", {
-        errorMessage,
-        error,
-      });
-
       if (
         errorMessage.toLowerCase().includes("already exists") ||
         errorMessage.toLowerCase().includes("user already exists")
@@ -411,14 +405,14 @@ export const updateUserAction = actionClient
     const {
       id: userId,
       entrepriseId,
-      prenom,
-      nom,
       email,
-      phone,
       avatar,
       roleAdhesion,
       statut,
     } = parsedInput;
+
+    // Normalisation anticipée de l'email (nécessaire avant la section changeEmail)
+    const emailNormalized = email ? lower(email) : email;
 
     const belongs = await userBelongsToEntreprise({ userId, entrepriseId });
     if (!belongs) {
@@ -553,24 +547,62 @@ export const updateUserAction = actionClient
 
     // ===== GESTION DU CHANGEMENT D'EMAIL =====
     let emailChanged = false;
+    // Pour le path admin : email à mettre à jour dans la transaction
+    let adminEmailChangeNewEmail: string | null = null;
 
-    if (email && email !== oldUser.email) {
-      // ✅ Utiliser better-auth au lieu d'UPDATE manuel
-      try {
-        const changeEmailHeaders = await headers();
-        await auth.api.changeEmail({
-          body: {
-            newEmail: email,
-            callbackURL: `${process.env.APP_URL}/auth/email-ok`,
-          },
-          headers: changeEmailHeaders, // ✅ Passer les headers pour la session
+    if (emailNormalized && emailNormalized !== oldUser.email) {
+      if (isEditingSelf) {
+        // Flow natif better-auth : envoie un email de confirmation au nouvel email
+        // L'email n'est mis à jour qu'après que l'utilisateur clique sur le lien
+        try {
+          const changeEmailHeaders = await headers();
+          await auth.api.changeEmail({
+            body: {
+              newEmail: emailNormalized,
+              callbackURL: `${process.env.APP_URL}/auth/email-ok`,
+            },
+            headers: changeEmailHeaders,
+          });
+          emailChanged = true;
+        } catch {
+          throw errors.internal(
+            "Erreur lors du changement d'email. Veuillez réessayer.",
+          );
+        }
+      } else {
+        // Admin modifiant l'email d'un autre utilisateur
+        // Autorisé : super_admin_plateforme, operateur_plateforme, admin (entreprise propre)
+        const canChangeOtherEmail =
+          platformRole?.role === "super_admin_plateforme" ||
+          platformRole?.role === "operateur_plateforme" ||
+          currentUserRole === "admin";
+
+        if (!canChangeOtherEmail) {
+          throw errors.forbidden(
+            "Vous n'avez pas la permission de modifier l'email de cet utilisateur.",
+          );
+        }
+
+        // Notification à l'ancien email (garde-fou, non-bloquant)
+        sendEmailDirect({
+          to: oldUser.email,
+          from: "noreply@mg.fm4all.com",
+          subject: "Modification de votre adresse email - FM4ALL",
+          text: `<p>L'adresse email associée à votre compte FM4ALL a été modifiée par un administrateur.</p>
+                 <p>La nouvelle adresse de connexion est : <strong>${emailNormalized}</strong></p>
+                 <p>Un email de vérification a été envoyé à cette nouvelle adresse pour activer la connexion.</p>
+                 <p>Si vous n'êtes pas à l'origine de cette modification, contactez votre administrateur.</p>`,
+          useTemplate: false,
+        }).catch(() => {
+          // Non-bloquant : la mise à jour continue même si la notification échoue
         });
+
+        // TODO: Audit log (table à créer)
+
+        // emailChanged = true → exclut email du payload principal de la transaction
+        // adminEmailChangeNewEmail → sera mis à jour dans la transaction avec emailVerified: false
         emailChanged = true;
-      } catch (error) {
-        console.error("Error changing email:", error);
-        throw errors.internal(
-          "Erreur lors du changement d'email. Veuillez réessayer.",
-        );
+        adminEmailChangeNewEmail = emailNormalized;
       }
     }
 
@@ -644,21 +676,25 @@ export const updateUserAction = actionClient
         optionalStrings: ["phone"] as const,
       });
 
+      // Normalisation des champs texte (fait dans l'action car .transform() interdit sur optionnels)
+      const prenomNormalized = normalized.prenom ? capitalizeWords(normalized.prenom) : normalized.prenom;
+      const nomNormalized = normalized.nom ? capitalizeWords(normalized.nom) : normalized.nom;
+      // emailNormalized est calculé en dehors de la transaction (utilisé aussi pour le changeEmail)
+
       let name: string | undefined = undefined;
-      if (normalized.prenom || normalized.nom) {
-        // Réutiliser oldUser déjà récupéré (optimisation)
-        const newPrenom = normalized.prenom ?? oldUser?.prenom ?? "";
-        const newNom = normalized.nom ?? oldUser?.nom ?? "";
+      if (prenomNormalized || nomNormalized) {
+        const newPrenom = prenomNormalized ?? oldUser?.prenom ?? "";
+        const newNom = nomNormalized ?? oldUser?.nom ?? "";
         name = `${newPrenom} ${newNom}`;
       }
 
       // 3. Update user
       const payload = updateUserToDbSchema.parse({
-        prenom: normalized.prenom, // Déjà nettoyé (capitalizeWords) par schema
-        nom: normalized.nom, // Déjà nettoyé (capitalizeWords) par schema
+        prenom: prenomNormalized,
+        nom: nomNormalized,
         name,
         // ⚠️ NE PAS inclure email si changé (déjà géré par better-auth)
-        email: emailChanged ? undefined : normalized.email,
+        email: emailChanged ? undefined : emailNormalized,
         phone: normalized.phone, // "" → null par normalizeForSubmit
         avatarId: avatarDocumentId,
         updatedById: currentUser.id,
@@ -698,8 +734,38 @@ export const updateUserAction = actionClient
           );
       }
 
+      // Changement email admin : mettre à jour email + emailVerified:false dans la transaction
+      if (adminEmailChangeNewEmail) {
+        await tx
+          .update(user)
+          .set({
+            email: adminEmailChangeNewEmail,
+            emailVerified: false,
+            updatedAt: new Date(),
+          })
+          .where(eq(user.id, userId));
+      }
+
       return updated;
     });
+
+    // Envoi du lien de vérification après commit de la transaction (path admin)
+    if (adminEmailChangeNewEmail) {
+      try {
+        await auth.api.sendVerificationEmail({
+          body: {
+            email: adminEmailChangeNewEmail,
+            callbackURL: `${process.env.APP_URL}/auth/email-ok`,
+          },
+        });
+      } catch {
+        // L'email est déjà mis à jour en DB avec emailVerified:false
+        // L'utilisateur ne peut pas se connecter jusqu'à la vérification
+        throw errors.internal(
+          "Email mis à jour mais le lien de vérification n'a pas pu être envoyé. Contactez le support.",
+        );
+      }
+    }
 
     const parsedUser = selectUserSchema.parse(updatedUser);
 
@@ -708,7 +774,7 @@ export const updateUserAction = actionClient
         ? "Utilisateur mis à jour. Un email de vérification a été envoyé au nouvel email."
         : "Utilisateur mis à jour avec succès.",
       user: parsedUser,
-      emailChanged, // ✅ Retourner cette info pour le toast côté client
+      emailChanged,
     };
   });
 

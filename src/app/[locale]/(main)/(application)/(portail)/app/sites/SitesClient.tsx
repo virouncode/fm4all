@@ -7,6 +7,7 @@ import { useAppStore } from "@/stores/application/appStore";
 import { SelectSiteType, SiteTreeNode } from "@/zod-schemas/sites.schema";
 import { Network, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { buildSiteTree, getPathToRoot } from "./helpers";
 import { SiteDetails } from "./SiteDetails";
 import { SiteFormDialog } from "./SiteFormDialog";
@@ -105,8 +106,8 @@ export function SitesClient() {
             });
           }
         }
-      } catch (error) {
-        console.error("Failed to load data:", error);
+      } catch {
+        toast.error("Erreur lors du chargement des sites");
       } finally {
         setLoading(false);
       }
@@ -158,8 +159,8 @@ export function SitesClient() {
           setSites(sitesResult.data);
           setTree(buildSiteTree(sitesResult.data));
         }
-      } catch (error) {
-        console.error("Failed to reload sites:", error);
+      } catch {
+        // Reload silently ignored, local state already updated
       }
     } else {
       // Pas de changement de statut → mise à jour locale simple

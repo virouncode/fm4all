@@ -32,9 +32,8 @@ export function buildSiteTree(sites: SelectSiteType[]): SiteTreeNode[] {
       if (parent) {
         parent.children.push(node);
       } else {
-        // Parent manquant (ne devrait pas arriver)
-        console.warn(`Parent ${site.parentId} not found for site ${site.id}`);
-        roots.push(node); // Traiter comme racine
+        // Parent manquant (ne devrait pas arriver) — traiter comme racine
+        roots.push(node);
       }
     }
   }

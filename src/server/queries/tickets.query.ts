@@ -12,6 +12,7 @@ import {
   TicketsQueryType,
 } from "@/zod-schemas/ticket.schema";
 import { and, asc, count, desc, eq, inArray, like, or, sql, SQL } from "drizzle-orm";
+import type { TicketMessageVisibiliteType } from "@/zod-schemas/enums";
 
 /**
  * Récupère un ticket par ID
@@ -283,13 +284,31 @@ export async function ticketBelongsToEntreprise({
 }
 
 /**
- * Récupère les messages d'un ticket avec leurs pièces jointes et infos auteur
+ * Récupère les messages d'un ticket avec leurs pièces jointes et infos auteur,
+ * filtrés selon la posture de l'utilisateur courant.
+ *
+ * Règles de visibilité:
+ * - plateforme : voit tout (public, client_only, prestataire_only, fm4all_only)
+ * - client     : voit public + client_only
+ * - prestataire: voit public + prestataire_only
  *
  * @param ticketId - ID du ticket
- * @returns Messages avec attachments et infos auteur
+ * @param posture  - Posture de l'utilisateur courant
+ * @returns Messages visibles avec attachments et infos auteur
  */
-export async function getTicketMessagesWithAttachments(ticketId: string) {
-  // 1. Récupérer les messages avec infos auteur
+export async function getTicketMessagesWithAttachments(
+  ticketId: string,
+  posture: "client" | "prestataire" | "plateforme",
+) {
+  // Déterminer les visibilités autorisées selon la posture
+  const visibilitesAutorisees: TicketMessageVisibiliteType[] =
+    posture === "plateforme"
+      ? ["public", "client_only", "prestataire_only", "fm4all_only"]
+      : posture === "client"
+        ? ["public", "client_only"]
+        : ["public", "prestataire_only"];
+
+  // 1. Récupérer les messages avec infos auteur, filtrés par visibilité
   const messages = await db
     .select({
       id: ticketMessages.id,
@@ -304,7 +323,12 @@ export async function getTicketMessagesWithAttachments(ticketId: string) {
     })
     .from(ticketMessages)
     .leftJoin(user, eq(ticketMessages.auteurUserId, user.id))
-    .where(eq(ticketMessages.ticketId, ticketId))
+    .where(
+      and(
+        eq(ticketMessages.ticketId, ticketId),
+        inArray(ticketMessages.visibilite, visibilitesAutorisees),
+      ),
+    )
     .orderBy(asc(ticketMessages.createdAt));
 
   // 2. Récupérer les pièces jointes pour chaque message

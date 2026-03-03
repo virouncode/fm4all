@@ -14,13 +14,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { usePathname, useRouter } from "@/i18n/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { ArrowDownAZ, ArrowDownUp, ArrowUpAZ } from "lucide-react";
-import { useSearchParams } from "next/navigation";
 
-interface TicketsSortDialogProps {
+type TicketsSortDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  searchParams: Record<string, string | undefined>;
 }
 
 // Options de tri disponibles
@@ -39,29 +39,26 @@ const SORT_OPTIONS = [
 export function TicketsSortDialog({
   open,
   onOpenChange,
+  searchParams,
 }: TicketsSortDialogProps) {
   const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
 
-  // Lire les valeurs actuelles depuis l'URL
-  const currentOrderBy = searchParams.get("orderBy") || "lastActivityAt";
-  const currentOrderDir = searchParams.get("orderDir") || "desc";
+  // Lire les valeurs actuelles depuis les props (déjà résolues côté serveur)
+  const currentOrderBy = searchParams.orderBy ?? "lastActivityAt";
+  const currentOrderDir = searchParams.orderDir ?? "desc";
 
   const handleSortChange = (orderBy: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("orderBy", orderBy);
-    const query = Object.fromEntries(params.entries());
-    // @ts-expect-error - next-intl router typing issue
-    router.replace({ pathname, query });
+    router.replace({
+      pathname: "/app/tickets",
+      query: { ...searchParams, orderBy },
+    });
   };
 
   const handleDirectionChange = (orderDir: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("orderDir", orderDir);
-    const query = Object.fromEntries(params.entries());
-    // @ts-expect-error - next-intl router typing issue
-    router.replace({ pathname, query });
+    router.replace({
+      pathname: "/app/tickets",
+      query: { ...searchParams, orderDir },
+    });
   };
 
   return (

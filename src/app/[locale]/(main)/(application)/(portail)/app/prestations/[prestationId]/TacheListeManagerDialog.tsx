@@ -52,7 +52,7 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-interface TacheListeManagerDialogProps {
+type TacheListeManagerDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   serviceId: string;

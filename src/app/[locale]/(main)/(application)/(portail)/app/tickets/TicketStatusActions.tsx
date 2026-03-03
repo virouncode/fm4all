@@ -7,7 +7,7 @@ import { SelectTicketType } from "@/zod-schemas/ticket.schema";
 import { TicketStatutType } from "@/zod-schemas/enums";
 import { toast } from "sonner";
 
-interface TicketStatusActionsProps {
+type TicketStatusActionsProps = {
   ticket: SelectTicketType;
   onStatusChanged: () => void;
 }

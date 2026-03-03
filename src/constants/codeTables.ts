@@ -68,36 +68,6 @@ export const userRoleCodes = userRoleCT.map((i) => i.code) as unknown as [
   ...(typeof userRoleCT)[number]["code"][],
 ];
 
-export const interventionStatusCT = [
-  { code: "en_attente_confirmation", name: "En attente de confirmation" },
-  { code: "planifiee", name: "Planifiée" },
-  { code: "en_cours", name: "En cours" },
-  { code: "realisee", name: "Réalisée" },
-  { code: "annulee", name: "Annulée" },
-  { code: "non_honoree", name: "Non honorée" },
-] as const;
-
-export const interventionStatusCodes = interventionStatusCT.map(
-  (i) => i.code,
-) as unknown as [
-  (typeof interventionStatusCT)[number]["code"],
-  ...(typeof interventionStatusCT)[number]["code"][],
-];
-
-export const interventionTypeCT = [
-  { code: "corrective", name: "Corrective" },
-  { code: "preventive", name: "Préventive" },
-  { code: "audit", name: "Audit" },
-  { code: "autre", name: "Autre" },
-] as const;
-
-export const interventionTypeCodes = interventionTypeCT.map(
-  (i) => i.code,
-) as unknown as [
-  (typeof interventionTypeCT)[number]["code"],
-  ...(typeof interventionTypeCT)[number]["code"][],
-];
-
 export const typeBatimentCT = [
   { code: "bureaux", name: "batiments.bureaux" },
   { code: "localCommercial", name: "batiments.localCommercial" },
@@ -484,7 +454,10 @@ export const documentCategorieCT = [
 
   // Ticket
   { code: "ticket_piece_jointe", name: "Pièce jointe (ticket)" },
-  { code: "ticket_message_piece_jointe", name: "Pièce jointe (message ticket)" },
+  {
+    code: "ticket_message_piece_jointe",
+    name: "Pièce jointe (message ticket)",
+  },
   { code: "tache_piece_jointe", name: "Pièce jointe (tâche)" },
 ] as const;
 

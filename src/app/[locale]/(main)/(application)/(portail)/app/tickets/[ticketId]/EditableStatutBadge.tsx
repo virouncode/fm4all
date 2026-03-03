@@ -1,12 +1,10 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
 import { TicketStatutType } from "@/zod-schemas/enums";
 import { useState } from "react";
@@ -65,8 +63,7 @@ export function EditableStatutBadge({
         toast.success("Statut mis à jour");
         onUpdate();
       }
-    } catch (error) {
-      console.error("Failed to update statut:", error);
+    } catch {
       toast.error("Erreur lors de la mise à jour du statut");
     } finally {
       setIsUpdating(false);

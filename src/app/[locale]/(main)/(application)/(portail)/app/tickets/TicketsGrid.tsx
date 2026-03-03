@@ -8,7 +8,7 @@ import { TicketCard } from "./TicketCard";
 
 type EntrepriseMinimal = { id: string; nom: string };
 
-interface TicketsGridProps {
+type TicketsGridProps = {
   tickets: SelectTicketType[];
   sites: SelectSiteType[];
   entreprises: EntrepriseMinimal[];

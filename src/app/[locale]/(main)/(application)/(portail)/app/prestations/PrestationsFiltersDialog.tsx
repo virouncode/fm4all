@@ -24,15 +24,24 @@ const filtersSchema = z.object({
   statut: z.string().optional(),
   serviceId: z.string().optional(),
   siteId: z.string().optional(),
+  modeCommercial: z.string().optional(),
 });
 
 type PrestationsFiltersType = z.infer<typeof filtersSchema>;
 
-interface PrestationsFiltersDialogProps {
+// Type des filtres "nettoyés" passés au parent (sans sentinel "all")
+type AppliedFiltersType = {
+  statut?: string;
+  serviceId?: string;
+  siteId?: string;
+  modeCommercial?: string;
+};
+
+type PrestationsFiltersDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  currentFilters: PrestationsFiltersType;
-  onApply: (filters: PrestationsFiltersType) => void;
+  currentFilters: AppliedFiltersType;
+  onApply: (filters: AppliedFiltersType) => void;
   /** Client sélectionné dans la barre principale (plateforme uniquement).
    *  Utilisé pour charger les sites du bon client et activer/désactiver le filtre site. */
   clientEntrepriseId?: string;
@@ -60,6 +69,7 @@ export function PrestationsFiltersDialog({
       statut: currentFilters.statut || "all",
       serviceId: currentFilters.serviceId || "all",
       siteId: currentFilters.siteId || "all",
+      modeCommercial: currentFilters.modeCommercial ?? "all",
     },
   });
 
@@ -117,20 +127,28 @@ export function PrestationsFiltersDialog({
 
   // Auto-apply filters
   useEffect(() => {
-    const cleaned: PrestationsFiltersType = {
+    const cleaned: AppliedFiltersType = {
       statut: filters.statut === "all" ? undefined : filters.statut,
       serviceId: filters.serviceId === "all" ? undefined : filters.serviceId,
       siteId: filters.siteId === "all" ? undefined : filters.siteId,
+      modeCommercial:
+        filters.modeCommercial === "all" ? undefined : filters.modeCommercial,
     };
     onApply(cleaned);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters.statut, filters.serviceId, filters.siteId]);
+  }, [
+    filters.statut,
+    filters.serviceId,
+    filters.siteId,
+    filters.modeCommercial,
+  ]);
 
   const activeFiltersCount = useMemo(() => {
     let count = 0;
     if (filters.statut && filters.statut !== "all") count++;
     if (filters.serviceId && filters.serviceId !== "all") count++;
     if (filters.siteId && filters.siteId !== "all") count++;
+    if (filters.modeCommercial && filters.modeCommercial !== "all") count++;
     return count;
   }, [filters]);
 
@@ -139,6 +157,7 @@ export function PrestationsFiltersDialog({
       statut: "all",
       serviceId: "all",
       siteId: "all",
+      modeCommercial: "all",
     });
   };
 
@@ -184,6 +203,20 @@ export function PrestationsFiltersDialog({
                     {s.nom}
                   </SelectItem>
                 ))}
+              </RhfControlledSelect>
+
+              {/* Mode commercial */}
+              <RhfControlledSelect<PrestationsFiltersType>
+                name="modeCommercial"
+                label="Mode commercial"
+                selectClassName="w-full"
+                withError={false}
+              >
+                <SelectItem value="all">Tous les modes</SelectItem>
+                <SelectItem value="direct">Direct</SelectItem>
+                <SelectItem value="intermediaire_fm4all">
+                  Intermédiaire FM4ALL
+                </SelectItem>
               </RhfControlledSelect>
 
               {/* Site — disabled si plateforme sans client sélectionné */}

@@ -19,7 +19,7 @@ import ServicesCards from "./ServicesCards";
 export const generateMetadata = async ({
   params,
 }: {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: LocaleType }>;
 }): Promise<Metadata> => {
   const { locale } = await params;
   return generateAlternates(

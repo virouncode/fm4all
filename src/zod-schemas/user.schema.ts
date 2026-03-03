@@ -67,22 +67,9 @@ export type InsertUserToDbType = z.infer<typeof insertUserToDbSchema>;
 // Schema pour update utilisateur
 export const updateUserFormSchema = z.object({
   id: z.uuid(),
-  prenom: z
-    .string()
-    .min(1)
-    .max(100)
-    .optional()
-    .transform((v) => (v ? capitalizeWords(v) : v)), // Nettoyage si présent
-  nom: z
-    .string()
-    .min(1)
-    .max(100)
-    .optional()
-    .transform((v) => (v ? capitalizeWords(v) : v)), // Nettoyage si présent
-  email: z
-    .email()
-    .optional()
-    .transform((v) => (v ? lower(v) : v)), // Nettoyage si présent
+  prenom: z.string().min(1).max(100).optional(),
+  nom: z.string().min(1).max(100).optional(),
+  email: z.email().optional(),
   phone: phoneNumberSchemaEmpty("Numéro de téléphone invalide")
     .optional()
     .nullable(),

@@ -5,12 +5,40 @@ import { entreprises } from "@/db/schema/entreprises";
 import { clientServices, services } from "@/db/schema/services";
 import { sites } from "@/db/schema/sites";
 import {
+  type ModeCommercialType,
   type PrestationListItem,
   prestationListItemSchema,
+  type PrestationsOrderByType,
   type SelectClientServiceType,
   selectClientServiceSchema,
 } from "@/zod-schemas/clientServices.schema";
-import { and, eq } from "drizzle-orm";
+import { asc, desc, and, eq } from "drizzle-orm";
+
+// ==================== ORDER HELPER ====================
+
+function buildOrderBy(
+  orderBy?: PrestationsOrderByType,
+  orderDir?: "asc" | "desc",
+) {
+  const dir = orderDir === "asc" ? asc : desc;
+  switch (orderBy) {
+    case "serviceNom":
+      return dir(services.nom);
+    case "siteNom":
+      return dir(sites.nom);
+    case "statut":
+      return dir(clientServices.statut);
+    case "frequence":
+      return dir(clientServices.frequence);
+    case "dateDebut":
+      return dir(clientServices.dateDebut);
+    case "createdAt":
+    default:
+      return dir(clientServices.createdAt);
+  }
+}
+
+// ==================== QUERIES ====================
 
 /**
  * GET ALL PRESTATIONS FOR AN ENTREPRISE
@@ -22,6 +50,9 @@ export async function getPrestationsByEntreprise(
     statut?: SelectClientServiceType["statut"];
     serviceId?: string;
     siteId?: string;
+    modeCommercial?: ModeCommercialType;
+    orderBy?: PrestationsOrderByType;
+    orderDir?: "asc" | "desc";
   },
 ): Promise<PrestationListItem[]> {
   const conditions = [eq(clientServices.entrepriseId, entrepriseId)];
@@ -34,6 +65,9 @@ export async function getPrestationsByEntreprise(
   }
   if (options?.siteId) {
     conditions.push(eq(clientServices.siteId, options.siteId));
+  }
+  if (options?.modeCommercial) {
+    conditions.push(eq(clientServices.modeCommercial, options.modeCommercial));
   }
 
   const rows = await db
@@ -66,7 +100,7 @@ export async function getPrestationsByEntreprise(
     .innerJoin(sites, eq(sites.id, clientServices.siteId))
     .innerJoin(services, eq(services.id, clientServices.serviceId))
     .where(and(...conditions))
-    .orderBy(clientServices.createdAt);
+    .orderBy(buildOrderBy(options?.orderBy, options?.orderDir));
 
   return rows.map((row) => prestationListItemSchema.parse(row));
 }
@@ -79,6 +113,9 @@ export async function getAllPrestations(options?: {
   statut?: SelectClientServiceType["statut"];
   serviceId?: string;
   siteId?: string;
+  modeCommercial?: ModeCommercialType;
+  orderBy?: PrestationsOrderByType;
+  orderDir?: "asc" | "desc";
 }): Promise<PrestationListItem[]> {
   const rows = await db
     .select({
@@ -118,9 +155,12 @@ export async function getAllPrestations(options?: {
         options?.siteId
           ? eq(clientServices.siteId, options.siteId)
           : undefined,
+        options?.modeCommercial
+          ? eq(clientServices.modeCommercial, options.modeCommercial)
+          : undefined,
       ),
     )
-    .orderBy(clientServices.createdAt);
+    .orderBy(buildOrderBy(options?.orderBy, options?.orderDir));
 
   return rows.map((row) => prestationListItemSchema.parse(row));
 }

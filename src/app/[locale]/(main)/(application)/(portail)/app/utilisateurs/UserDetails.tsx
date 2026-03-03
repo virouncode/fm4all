@@ -114,8 +114,7 @@ export function UserDetails({
         proprietaireEntrepriseId: entreprise.id,
       })
         .then(setAvatarUrl)
-        .catch((err) => {
-          console.error("Failed to load avatar:", err);
+        .catch(() => {
           setAvatarUrl(null);
         });
     } else {
@@ -140,8 +139,7 @@ export function UserDetails({
           setAttributions([]);
           setAllSites([]);
         }
-      } catch (error) {
-        console.error("Failed to load attributions:", error);
+      } catch {
         setAttributions([]);
         setAllSites([]);
       }
@@ -167,8 +165,8 @@ export function UserDetails({
         setAttributions([]);
         setAllSites([]);
       }
-    } catch (error) {
-      console.error("Failed to refresh attributions:", error);
+    } catch {
+      // silently ignore
     }
   };
 

@@ -9,14 +9,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { usePathname, useRouter } from "@/i18n/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { getPrestationsAction } from "@/server/actions/clientServicesActions";
 import { getEntreprisesClientesAction } from "@/server/actions/entreprisesActions";
 import { useAppStore } from "@/stores/application/appStore";
 import { useUiStore } from "@/stores/ui/uiStore";
 import {
   type ClientServiceStatutType,
+  type ModeCommercialType,
   type PrestationListItem,
+  type PrestationsOrderByType,
 } from "@/zod-schemas/clientServices.schema";
 import { ArrowDownUp, Filter, Grid3x3, List, Plus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -34,6 +36,7 @@ type SearchParams = {
   statut?: string;
   serviceId?: string;
   siteId?: string;
+  modeCommercial?: string;
   clientEntrepriseId?: string;
   orderBy?: string;
   orderDir?: string;
@@ -44,9 +47,10 @@ type FiltersType = {
   statut?: string;
   serviceId?: string;
   siteId?: string;
+  modeCommercial?: string;
 };
 
-interface PrestationsClientProps {
+type PrestationsClientProps = {
   searchParams: SearchParams;
 }
 
@@ -56,7 +60,6 @@ export default function PrestationsClient({
   const entreprise = useAppStore((state) => state.entreprise);
   const posture = useAppStore((state) => state.postureActive);
   const router = useRouter();
-  const pathname = usePathname();
 
   // Vue persistée dans localStorage
   const prestationView = useUiStore((state) => state.prestationView);
@@ -82,6 +85,7 @@ export default function PrestationsClient({
     statut: searchParams.statut,
     serviceId: searchParams.serviceId,
     siteId: searchParams.siteId,
+    modeCommercial: searchParams.modeCommercial,
   });
 
   const showEntreprise = posture === "plateforme";
@@ -91,6 +95,7 @@ export default function PrestationsClient({
     searchParams.statut,
     searchParams.serviceId,
     searchParams.siteId,
+    searchParams.modeCommercial,
   ].filter(Boolean).length;
 
   // En posture plateforme : cibler le client filtré (ou undefined = tous les clients)
@@ -128,11 +133,20 @@ export default function PrestationsClient({
     setIsError(false);
 
     try {
+      const validOrderByValues = ["createdAt", "serviceNom", "siteNom", "statut", "frequence", "dateDebut"];
       const result = await getPrestationsAction({
         entrepriseId: targetEntrepriseId, // undefined = tous les clients (plateforme only)
         statut: (searchParams.statut as ClientServiceStatutType) || undefined,
         serviceId: searchParams.serviceId || undefined,
         siteId: searchParams.siteId || undefined,
+        modeCommercial:
+          (searchParams.modeCommercial as ModeCommercialType) || undefined,
+        orderBy: (searchParams.orderBy && validOrderByValues.includes(searchParams.orderBy)
+          ? searchParams.orderBy
+          : undefined) as PrestationsOrderByType | undefined,
+        orderDir: (searchParams.orderDir === "asc" || searchParams.orderDir === "desc"
+          ? searchParams.orderDir
+          : undefined),
       });
 
       if (result?.serverError) {
@@ -147,13 +161,7 @@ export default function PrestationsClient({
     } finally {
       setLoading(false);
     }
-  }, [
-    targetEntrepriseId,
-    posture,
-    searchParams.statut,
-    searchParams.serviceId,
-    searchParams.siteId,
-  ]);
+  }, [targetEntrepriseId, posture, searchParams]);
 
   // Chargement initial + rechargement lors de la navigation
   // Utilise searchParams comme objet (nouvelle référence à chaque navigation) pour détecter les changements
@@ -167,8 +175,9 @@ export default function PrestationsClient({
       statut: searchParams.statut,
       serviceId: searchParams.serviceId,
       siteId: searchParams.siteId,
+      modeCommercial: searchParams.modeCommercial,
     });
-  }, [searchParams.statut, searchParams.serviceId, searchParams.siteId]);
+  }, [searchParams.statut, searchParams.serviceId, searchParams.siteId, searchParams.modeCommercial]);
 
   const handlePrestationClick = (p: PrestationListItem) => {
     router.push({
@@ -177,34 +186,41 @@ export default function PrestationsClient({
     });
   };
 
+  const replaceWithParams = (params: Record<string, string>) => {
+    router.replace(
+      { pathname: "/app/prestations", query: params },
+      { scroll: false },
+    );
+  };
+
   // Changement de client dans le sélecteur dédié (plateforme uniquement)
   const handleClientChange = (clientId: string) => {
-    const query: Record<string, string> = {};
-    if (searchParams.orderBy) query.orderBy = searchParams.orderBy;
-    if (searchParams.orderDir) query.orderDir = searchParams.orderDir;
-    if (searchParams.statut) query.statut = searchParams.statut;
-    if (searchParams.serviceId) query.serviceId = searchParams.serviceId;
+    const params: Record<string, string> = {};
+    if (searchParams.orderBy) params.orderBy = searchParams.orderBy;
+    if (searchParams.orderDir) params.orderDir = searchParams.orderDir;
+    if (searchParams.statut) params.statut = searchParams.statut;
+    if (searchParams.serviceId) params.serviceId = searchParams.serviceId;
+    if (searchParams.modeCommercial) params.modeCommercial = searchParams.modeCommercial;
     // Pas de siteId : reset au changement de client (les sites sont propres à chaque client)
-    if (clientId !== "all") query.clientEntrepriseId = clientId;
-    // @ts-expect-error - next-intl router typing issue
-    router.replace({ pathname, query }, { scroll: false });
+    if (clientId !== "all") params.clientEntrepriseId = clientId;
+    replaceWithParams(params);
   };
 
   const handleFiltersApply = (newFilters: FiltersType) => {
     setFilters(newFilters);
 
-    const query: Record<string, string> = {};
-    if (searchParams.orderBy) query.orderBy = searchParams.orderBy;
-    if (searchParams.orderDir) query.orderDir = searchParams.orderDir;
-    if (newFilters.statut) query.statut = newFilters.statut;
-    if (newFilters.serviceId) query.serviceId = newFilters.serviceId;
-    if (newFilters.siteId) query.siteId = newFilters.siteId;
+    const params: Record<string, string> = {};
+    if (searchParams.orderBy) params.orderBy = searchParams.orderBy;
+    if (searchParams.orderDir) params.orderDir = searchParams.orderDir;
+    if (newFilters.statut) params.statut = newFilters.statut;
+    if (newFilters.serviceId) params.serviceId = newFilters.serviceId;
+    if (newFilters.siteId) params.siteId = newFilters.siteId;
+    if (newFilters.modeCommercial) params.modeCommercial = newFilters.modeCommercial;
     // Préserver le filtre client (géré par le sélecteur dédié, pas le dialog)
     if (searchParams.clientEntrepriseId)
-      query.clientEntrepriseId = searchParams.clientEntrepriseId;
+      params.clientEntrepriseId = searchParams.clientEntrepriseId;
 
-    // @ts-expect-error - next-intl router typing issue
-    router.replace({ pathname, query }, { scroll: false });
+    replaceWithParams(params);
   };
 
   const columns = useMemo(
@@ -358,7 +374,7 @@ export default function PrestationsClient({
 
 // ==================== VUE GRILLE ====================
 
-interface PrestationsGridProps {
+type PrestationsGridProps = {
   prestations: PrestationListItem[];
   loading: boolean;
   isError: boolean;

@@ -58,8 +58,7 @@ export default function UserSidebarFooter() {
           }
         }
       })
-      .catch((error) => {
-        console.error("Error loading avatar:", error);
+      .catch(() => {
         setAvatarUrl(null);
       })
       .finally(() => {
@@ -77,8 +76,8 @@ export default function UserSidebarFooter() {
           },
         },
       });
-    } catch (err) {
-      console.error("Erreur lors de la deconnexion:", err);
+    } catch {
+      // silently ignore sign out errors
     }
   };
 

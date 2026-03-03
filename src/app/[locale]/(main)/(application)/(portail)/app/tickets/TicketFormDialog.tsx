@@ -17,7 +17,7 @@ import { SelectItem } from "@/components/ui/select";
 import { getEntreprisesClientesAction, getEntreprisesPrestatairesAction } from "@/server/actions/entreprisesActions";
 import { getAccessibleSitesAction } from "@/server/actions/sitesActions";
 import { insertTicketAction } from "@/server/actions/ticketsActions";
-import { getClientPrestatairesAction } from "@/server/actions/clientServiceExecutions.actions";
+import { getClientPrestatairesAction } from "@/server/actions/clientServiceExecutionsActions";
 import { useAppStore } from "@/stores/application/appStore";
 import {
   insertTicketFormSchema,
@@ -30,7 +30,7 @@ import { useEffect, useState } from "react";
 import { useFieldArray, useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
 
-interface TicketFormDialogProps {
+type TicketFormDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: (ticket: SelectTicketType) => void;

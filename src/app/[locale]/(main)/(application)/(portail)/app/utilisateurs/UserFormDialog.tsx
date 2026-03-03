@@ -363,8 +363,8 @@ function EditUserForm({
             },
             { shouldDirty: false },
           );
-        } catch (err) {
-          console.error("Failed to load avatar preview:", err);
+        } catch {
+          // avatar preview load failure is non-critical
         }
       }
     };
@@ -433,8 +433,6 @@ function EditUserForm({
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit, (errors) => {
-              console.error("=== Validation Errors ===");
-              console.error(errors);
               toast.error(
                 `Erreur de validation: ${Object.keys(errors).join(", ")}`,
               );

@@ -2,7 +2,7 @@
 
 import InfiniteDataTable from "@/components/tables/InfiniteDataTable";
 import { Button } from "@/components/ui/button";
-import { usePathname, useRouter } from "@/i18n/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { getEntreprisesAction } from "@/server/actions/entreprisesActions";
 import {
   getAccessibleSitesAction,
@@ -107,7 +107,6 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
   const entreprise = useAppStore((state) => state.entreprise);
   const posture = useAppStore((state) => state.postureActive);
   const router = useRouter();
-  const pathname = usePathname();
 
   // View state from UI store (persisted in localStorage)
   const ticketView = useUiStore((state) => state.ticketView);
@@ -391,8 +390,7 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
     }
 
     // Naviguer vers la nouvelle URL
-    // @ts-expect-error - next-intl router typing issue
-    router.replace({ pathname, query }, { scroll: false });
+    router.replace({ pathname: "/app/tickets", query }, { scroll: false });
   };
 
   const handleRowClick = (ticket: SelectTicketType) => {
@@ -534,6 +532,7 @@ export function TicketsTable({ searchParams }: TicketsTableProps) {
       <TicketsSortDialog
         open={sortDialogOpen}
         onOpenChange={setSortDialogOpen}
+        searchParams={searchParams}
       />
     </div>
   );

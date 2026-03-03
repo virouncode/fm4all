@@ -103,7 +103,6 @@ export function UserSiteAttributionDialog({
   });
 
   const { isSubmitting } = useFormState({ control: form.control });
-  const selectedRole = form.watch("role");
   const selectedScope = form.watch("scope");
 
   // Fetch all sites + direct attributions when dialog opens
@@ -133,8 +132,7 @@ export function UserSiteAttributionDialog({
           );
           setDirectAttributions(direct);
         }
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      } catch {
         toast.error("Erreur lors du chargement des données");
         setAllSites([]);
         setDirectAttributions([]);

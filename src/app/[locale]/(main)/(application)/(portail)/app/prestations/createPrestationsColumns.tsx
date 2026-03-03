@@ -8,6 +8,7 @@ import {
   formatDate,
   formatDuree,
   getFrequenceLabel,
+  getModeCommercialBadge,
   getModePlanningBadge,
   getPrestationStatutBadge,
 } from "./helpers";
@@ -18,6 +19,7 @@ export const prestationsIdLabelMap = new Map<string, string>([
   ["siteNom", "Site"],
   ["frequence", "Fréquence"],
   ["modePlanning", "Mode"],
+  ["modeCommercial", "Mode commercial"],
   ["statut", "Statut"],
   ["dateDebut", "Date début"],
   ["dureeEstimeeMinutes", "Durée"],
@@ -88,6 +90,18 @@ export function createPrestationsColumns(
         );
       },
       size: 120,
+    },
+    {
+      accessorKey: "modeCommercial",
+      header: "Mode commercial",
+      cell: ({ getValue }) => {
+        const mode = getValue() as PrestationListItem["modeCommercial"];
+        const badge = getModeCommercialBadge(mode);
+        return (
+          <Badge className={`text-xs ${badge.className}`}>{badge.label}</Badge>
+        );
+      },
+      size: 160,
     },
     {
       accessorKey: "statut",

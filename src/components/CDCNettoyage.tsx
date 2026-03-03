@@ -36,7 +36,7 @@ type TaskRowType = {
   };
 };
 
-interface SectionData {
+type SectionData = {
   title: string;
   rows: TaskRowType[];
 }

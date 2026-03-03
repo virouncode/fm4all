@@ -3,12 +3,12 @@
 import { cn } from "@/lib/utils";
 import { Check, X } from "lucide-react";
 
-interface PasswordStrengthIndicatorProps {
+type PasswordStrengthIndicatorProps = {
   password: string;
   className?: string;
 }
 
-interface PasswordCriteria {
+type PasswordCriteriaType = {
   label: string;
   met: boolean;
 }
@@ -17,7 +17,7 @@ export function PasswordStrengthIndicator({
   password,
   className,
 }: PasswordStrengthIndicatorProps) {
-  const criteria: PasswordCriteria[] = [
+  const criteria: PasswordCriteriaType[] = [
     {
       label: "Au moins 8 caractères",
       met: password.length >= 8,
