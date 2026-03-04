@@ -1967,7 +1967,61 @@ if (isPrestataire && !["public", "prestataire_only"].includes(visibilite)) {
 
 ---
 
-**Dernière mise à jour**: 2026-02-25
+## Changelog (2026-03-04)
+
+**Module Entreprises — CRUD complet** :
+
+- ✅ Liste/grid paginée avec infinite scroll, filtres, tri
+- ✅ Création entreprise multi-steps (Step 1: infos + rôles/services, Step 2: admin)
+- ✅ Formulaire "Remplir depuis un prospect" (ProspectPickerDialog)
+- ✅ Page de détail avec édition inline (infos, contact, rôles, logo)
+- ✅ Upload logo via avatar cliquable + promotion S3 (temp → documents/)
+- ✅ Guards serveur sur retrait de rôles/services (vérifie clientServices et clientServiceExecutions avant toute suppression)
+- ✅ Fix React Hook Form v7 : remplacer `form.watch()` par `useWatch` hook (évite "Maximum update depth exceeded")
+
+**Pattern : URLs présignées S3 dans les listes/grids** :
+
+`S3_PRESIGN_READ_EXPIRES_SECONDS` vaut 60s par défaut. Ne jamais générer des URLs S3 côté serveur pour les passer dans une liste — elles seront expirées avant que l'utilisateur ne scrolle ou revienne sur la page.
+
+**Pattern correct pour afficher des images/logos dans une liste** :
+1. Passer `storageKey` dans les données (pas `url`)
+2. Créer un composant client qui appelle `getPresignedReadUrl()` au montage
+3. La colonne/carte utilise ce composant — URL toujours fraîche, fallback pendant le chargement
+
+```typescript
+// LogoAvatar.tsx (pattern réutilisable)
+"use client";
+export function LogoAvatar({ storageKey, proprietaireEntrepriseId, nom, size }) {
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (!storageKey) return;
+    getPresignedReadUrl({ key: storageKey, proprietaireEntrepriseId })
+      .then(setLogoUrl).catch(() => setLogoUrl(null));
+  }, [storageKey, proprietaireEntrepriseId]);
+  return (
+    <Avatar>
+      {logoUrl && <AvatarImage src={logoUrl} />}
+      <AvatarFallback>{nom.charAt(0).toUpperCase()}</AvatarFallback>
+    </Avatar>
+  );
+}
+```
+
+**Pattern : LEFT JOIN + GROUP BY + MAX() pour champ lié non-agrégé** :
+
+Quand une table est déjà en GROUP BY et qu'on veut un champ d'une table jointe (relation 0-1 via FK), utiliser `MAX()` contourne la contrainte PostgreSQL :
+
+```typescript
+logoStorageKey: sql<string | null>`MAX(${documents.storageKey})`,
+// LEFT JOIN documents ON entreprises.logoId = documents.id
+// Le MAX() retourne l'unique valeur si elle existe, NULL sinon
+```
+
+**Référence** : `src/app/[locale]/.../app/entreprises/` — `LogoAvatar.tsx`, `EntrepriseCard.tsx`, `createEntreprisesColumns.tsx`, `entreprises.query.ts`
+
+---
+
+**Dernière mise à jour**: 2026-03-04
 
 Pour toute question ou clarification, référez-vous d'abord aux implémentations de référence:
 
