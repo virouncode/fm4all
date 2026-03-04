@@ -17,8 +17,10 @@ import {
   getEntreprisesPrestataires,
   getEntreprisesPaginated,
   countEntreprises,
+  getEntrepriseWithDetailsById,
   getServicesByEntrepriseId,
 } from "@/server/queries/entreprises.query";
+import { getUserAdhesion } from "@/server/queries/userAdhesions.query";
 import {
   getProspectsPaginated,
   countProspects,
@@ -146,6 +148,42 @@ export const getEntreprisesPaginatedAction = actionClient
       pageSize,
       hasMore: page * pageSize < total,
     };
+  });
+
+// ==================== MON ENTREPRISE (client / prestataire) ====================
+
+/**
+ * Récupère les détails complets d'une entreprise pour la page "Mon Entreprise"
+ * Accessible en posture client ou prestataire (vérifie l'adhésion de l'utilisateur)
+ */
+export const getMonEntrepriseDetailsAction = actionClient
+  .metadata({ actionName: "getMonEntrepriseDetailsAction" })
+  .inputSchema(
+    z.object({ entrepriseId: z.string().uuid() }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const adhesion = await getUserAdhesion({
+      userId: currentUser.id,
+      entrepriseId: parsedInput.entrepriseId,
+    });
+    if (!adhesion) throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+
+    const entreprise = await getEntrepriseWithDetailsById(parsedInput.entrepriseId);
+    if (!entreprise) throw errors.notFound("Entreprise introuvable.");
+
+    const services = entreprise.roles.includes("prestataire")
+      ? await getServicesByEntrepriseId(parsedInput.entrepriseId)
+      : [];
+
+    return { entreprise, services };
   });
 
 // ==================== PROSPECTS PICKER ====================

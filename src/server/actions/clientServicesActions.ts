@@ -1,7 +1,6 @@
 "use server";
 
 import { db } from "@/db";
-import { userAdhesions } from "@/db/schema/users";
 import {
   clientServiceExecutions,
   clientServiceOccurrences,
@@ -9,6 +8,7 @@ import {
   clientServices,
   tacheListesTemplates,
 } from "@/db/schema/services";
+import { userAdhesions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
@@ -20,21 +20,23 @@ import {
   prestationBelongsToEntreprise,
 } from "@/server/queries/clientServices.query";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
-import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userSiteAttributions.utils";
 import { onClientServiceChanged } from "@/server/utils/clientServiceOccurrences.utils";
+import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userSiteAttributions.utils";
+import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
   getPrestationsQuerySchema,
   insertClientServiceToDbSchema,
-  insertPrestationFormSchema,
+  insertPrestationActionSchema,
+  perimetreEntrySchema,
+  prestationByIdSchema,
   selectClientServiceSchema,
   updateClientServiceToDbSchema,
-  updatePrestationFormSchema,
+  updateClientServiceTacheListeSchema,
+  updatePrestationActionSchema,
   updatePrestationStatutSchema,
 } from "@/zod-schemas/clientServices.schema";
-import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import { and, count, eq, gte, or } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
-import { z } from "zod";
 
 // ==================== HELPERS ====================
 
@@ -129,7 +131,15 @@ export const getPrestationsAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    const { entrepriseId, statut, serviceId, siteId, modeCommercial, orderBy, orderDir } = parsedInput;
+    const {
+      entrepriseId,
+      statut,
+      serviceId,
+      siteId,
+      modeCommercial,
+      orderBy,
+      orderDir,
+    } = parsedInput;
 
     if (!entrepriseId) {
       // Vue cross-clients : réservée à la plateforme
@@ -139,7 +149,14 @@ export const getPrestationsAction = actionClient
           "Seule la plateforme peut accéder à la vue cross-clients.",
         );
       }
-      const prestations = await getAllPrestations({ statut, serviceId, siteId, modeCommercial, orderBy, orderDir });
+      const prestations = await getAllPrestations({
+        statut,
+        serviceId,
+        siteId,
+        modeCommercial,
+        orderBy,
+        orderDir,
+      });
       return { prestations };
     }
 
@@ -165,12 +182,7 @@ export const getPrestationsAction = actionClient
 
 export const getPrestationByIdAction = actionClient
   .metadata({ actionName: "getPrestationByIdAction" })
-  .inputSchema(
-    z.object({
-      prestationId: z.uuid("ID de la prestation invalide"),
-      entrepriseId: z.uuid("ID de l'entreprise invalide"),
-    }),
-    {
+  .inputSchema(prestationByIdSchema, {
       handleValidationErrorsShape: async (ve) =>
         flattenValidationErrors(ve).fieldErrors,
     },
@@ -210,23 +222,9 @@ export const getPrestationByIdAction = actionClient
 
 // ==================== INSERT PRESTATION ====================
 
-// Schéma pour une entrée de périmètre (inclure/exclure un site)
-const perimetreEntrySchema = z.object({
-  siteId: z.string().uuid("ID de site invalide"),
-  mode: z.enum(["inclure", "exclure"]),
-  scope: z.enum(["self", "subtree"]),
-});
-
 export const insertPrestationAction = actionClient
   .metadata({ actionName: "insertPrestationAction" })
-  .inputSchema(
-    insertPrestationFormSchema.extend({
-      // Périmètre obligatoire : au moins l'entrée inclure du site d'ancrage
-      perimetre: z
-        .array(perimetreEntrySchema)
-        .min(1, "Au moins une entrée de périmètre est requise"),
-    }),
-    {
+  .inputSchema(insertPrestationActionSchema, {
       handleValidationErrorsShape: async (ve) =>
         flattenValidationErrors(ve).fieldErrors,
     },
@@ -254,7 +252,10 @@ export const insertPrestationAction = actionClient
     }
 
     // Règle métier : seule la plateforme peut créer en mode intermediaire_fm4all
-    if (parsedInput.modeCommercial === "intermediaire_fm4all" && !isPlateforme) {
+    if (
+      parsedInput.modeCommercial === "intermediaire_fm4all" &&
+      !isPlateforme
+    ) {
       throw errors.forbidden(
         "Seule la plateforme FM4ALL peut créer une prestation en mode intermédiaire.",
       );
@@ -345,11 +346,7 @@ export const insertPrestationAction = actionClient
 
 export const updatePrestationAction = actionClient
   .metadata({ actionName: "updatePrestationAction" })
-  .inputSchema(
-    updatePrestationFormSchema.extend({
-      entrepriseId: z.uuid("ID de l'entreprise invalide"),
-    }),
-    {
+  .inputSchema(updatePrestationActionSchema, {
       handleValidationErrorsShape: async (ve) =>
         flattenValidationErrors(ve).fieldErrors,
     },
@@ -393,13 +390,14 @@ export const updatePrestationAction = actionClient
 
     // Interdire la modification si la prestation est terminée
     if (current.statut === "termine") {
-      throw errors.conflict(
-        "Impossible de modifier une prestation terminée.",
-      );
+      throw errors.conflict("Impossible de modifier une prestation terminée.");
     }
 
     // Règle modeCommercial : seule la plateforme peut le modifier, et seulement avant exécution
-    if (parsedInput.modeCommercial !== undefined && parsedInput.modeCommercial !== current.modeCommercial) {
+    if (
+      parsedInput.modeCommercial !== undefined &&
+      parsedInput.modeCommercial !== current.modeCommercial
+    ) {
       if (!isPlateforme) {
         throw errors.forbidden(
           "Seule la plateforme FM4ALL peut modifier le mode commercial.",
@@ -473,7 +471,10 @@ export const updatePrestationAction = actionClient
       const { onClientServiceChanged } = await import(
         "@/server/utils/clientServiceOccurrences.utils"
       );
-      await onClientServiceChanged({ clientServiceId: parsedPrestation.id, now: new Date() });
+      await onClientServiceChanged({
+        clientServiceId: parsedPrestation.id,
+        now: new Date(),
+      });
     }
 
     return {
@@ -493,10 +494,7 @@ export const updatePrestationAction = actionClient
  * - en_pause → termine
  * - termine → [aucune transition autorisée]
  */
-const TRANSITIONS_AUTORISEES: Record<
-  string,
-  readonly string[]
-> = {
+const TRANSITIONS_AUTORISEES: Record<string, readonly string[]> = {
   brouillon: ["actif"],
   actif: ["en_pause", "termine"],
   en_pause: ["actif", "termine"],
@@ -557,10 +555,14 @@ export const updatePrestationStatutAction = actionClient
     }
 
     // Guard : activation planifiée sans checklist interdite
-    if (newStatut === "actif" && current.modePlanning === "planifie" && !current.tacheListeTemplateId) {
+    if (
+      newStatut === "actif" &&
+      current.modePlanning === "planifie" &&
+      !current.tacheListeTemplateId
+    ) {
       throw errors.conflict(
         "Impossible d'activer une prestation planifiée sans checklist. " +
-        "Sélectionnez une checklist par défaut dans l'onglet Paramètres.",
+          "Sélectionnez une checklist par défaut dans l'onglet Paramètres.",
       );
     }
 
@@ -590,19 +592,28 @@ export const updatePrestationStatutAction = actionClient
         const { onClientServiceChanged } = await import(
           "@/server/utils/clientServiceOccurrences.utils"
         );
-        await onClientServiceChanged({ clientServiceId: parsedPrestation.id, now });
+        await onClientServiceChanged({
+          clientServiceId: parsedPrestation.id,
+          now,
+        });
       } else if (newStatut === "en_pause") {
         // Supprime les planifiées futures : seront régénérées au retour à actif
         const { deleteFuturePlanifieeOccurrences } = await import(
           "@/server/utils/clientServiceOccurrences.utils"
         );
-        await deleteFuturePlanifieeOccurrences({ clientServiceId: parsedPrestation.id, now });
+        await deleteFuturePlanifieeOccurrences({
+          clientServiceId: parsedPrestation.id,
+          now,
+        });
       } else if (newStatut === "termine") {
         // Annule les planifiées futures : conserve l'historique pour audit
         const { cancelFuturePlanifieeOccurrences } = await import(
           "@/server/utils/clientServiceOccurrences.utils"
         );
-        await cancelFuturePlanifieeOccurrences({ clientServiceId: parsedPrestation.id, now });
+        await cancelFuturePlanifieeOccurrences({
+          clientServiceId: parsedPrestation.id,
+          now,
+        });
       }
     }
 
@@ -616,12 +627,7 @@ export const updatePrestationStatutAction = actionClient
 
 export const deletePrestationAction = actionClient
   .metadata({ actionName: "deletePrestationAction" })
-  .inputSchema(
-    z.object({
-      prestationId: z.uuid("ID de la prestation invalide"),
-      entrepriseId: z.uuid("ID de l'entreprise invalide"),
-    }),
-    {
+  .inputSchema(prestationByIdSchema, {
       handleValidationErrorsShape: async (ve) =>
         flattenValidationErrors(ve).fieldErrors,
     },
@@ -652,7 +658,11 @@ export const deletePrestationAction = actionClient
     }
 
     // Vérifier les permissions : plateforme OU responsable_site sur le site
-    const canDelete = await canManagePrestation(currentUser.id, entrepriseId, current.siteId);
+    const canDelete = await canManagePrestation(
+      currentUser.id,
+      entrepriseId,
+      current.siteId,
+    );
     if (!canDelete) {
       throw errors.forbidden(
         "Vous devez être responsable de ce site pour supprimer une prestation.",
@@ -666,9 +676,7 @@ export const deletePrestationAction = actionClient
       );
     }
 
-    await db
-      .delete(clientServices)
-      .where(eq(clientServices.id, prestationId));
+    await db.delete(clientServices).where(eq(clientServices.id, prestationId));
 
     return {
       message: "Prestation supprimée avec succès.",
@@ -680,13 +688,7 @@ export const deletePrestationAction = actionClient
 
 export const updateClientServiceTacheListeAction = actionClient
   .metadata({ actionName: "updateClientServiceTacheListeAction" })
-  .inputSchema(
-    z.object({
-      prestationId: z.string().uuid("ID de la prestation invalide"),
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-      tacheListeTemplateId: z.string().uuid().nullable(),
-    }),
-    {
+  .inputSchema(updateClientServiceTacheListeSchema, {
       handleValidationErrorsShape: async (ve) =>
         flattenValidationErrors(ve).fieldErrors,
     },

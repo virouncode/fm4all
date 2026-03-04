@@ -357,7 +357,7 @@ Le mode commercial définit le **circuit contractuel et de facturation**.
 | Mode | Description |
 |------|-------------|
 | **Planifié** | Les passages sont **générés automatiquement** selon la fréquence définie. Aucune action manuelle n'est nécessaire pour créer les passages. |
-| **À la demande** | Les passages sont créés **manuellement** au cas par cas. |
+| **À la demande** | Les passages ont vocation à être créés manuellement au cas par cas. *(Fonctionnalité en cours de développement — interface non disponible à ce jour.)* |
 
 ### 5.4 Fréquences de passage
 

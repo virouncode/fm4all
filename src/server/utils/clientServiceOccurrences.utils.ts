@@ -475,7 +475,7 @@ export function generateOccurrenceDates(
  * Copie les items actifs d'un pack de tâches dans une occurrence (snapshot immuable).
  * Appelé immédiatement après la création de chaque occurrence si un pack est résolu.
  */
-async function snapshotOccurrenceTaches({
+export async function snapshotOccurrenceTaches({
   occurrenceId,
   tacheListeTemplateId,
   tx,

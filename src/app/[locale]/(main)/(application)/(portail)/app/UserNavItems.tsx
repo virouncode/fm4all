@@ -129,6 +129,13 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
       label: "Paramètres",
       items: [
         {
+          key: "mon-entreprise",
+          label: "Mon Entreprise",
+          href: "/app/mon-entreprise",
+          icon: Building2,
+          match: "startsWith",
+        },
+        {
           key: "settings",
           label: "Paramètres",
           href: "/app/parametres",
@@ -220,6 +227,13 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
     {
       label: "Paramètres",
       items: [
+        {
+          key: "mon-entreprise",
+          label: "Mon Entreprise",
+          href: "/app/mon-entreprise",
+          icon: Building2,
+          match: "startsWith",
+        },
         {
           key: "settings",
           label: "Paramètres",

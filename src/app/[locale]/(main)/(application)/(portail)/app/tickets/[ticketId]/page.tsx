@@ -6,7 +6,7 @@ import {
   getEntrepriseById,
   getEntreprisesPrestataires,
 } from "@/server/queries/entreprises.query";
-import { getSiteById } from "@/server/queries/sites.query";
+import { getSiteById, getSiteResponsables, type SiteResponsable } from "@/server/queries/sites.query";
 import {
   getTicketById,
   getTicketMessagesWithAttachments,
@@ -163,8 +163,11 @@ export default async function TicketDetailsPage({
     }));
   }
 
-  // 8. Charger le site et les entreprises pour afficher les noms
+  // 8. Charger le site, ses responsables et les entreprises pour afficher les noms
   const site = await getSiteById(ticket.siteId);
+  const siteResponsables: SiteResponsable[] = site
+    ? await getSiteResponsables(site.id)
+    : [];
 
   const proprietaireEntreprise = await getEntrepriseById(
     ticket.proprietaireEntrepriseId,
@@ -199,6 +202,7 @@ export default async function TicketDetailsPage({
       availablePrestataires={availablePrestataires}
       availableUsers={availableUsers}
       site={site}
+      siteResponsables={siteResponsables}
       proprietaireEntreprise={proprietaireEntreprise}
       demandeurEntreprise={demandeurEntreprise}
       assigneEntreprise={assigneEntreprise}

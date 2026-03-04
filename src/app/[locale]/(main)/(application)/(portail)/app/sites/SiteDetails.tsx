@@ -8,17 +8,24 @@ import {
   typeOccupationCT,
 } from "@/constants/codeTables";
 import { cn } from "@/lib/utils";
+import type { SiteResponsable } from "@/server/queries/sites.query";
 import { SelectSiteType } from "@/zod-schemas/sites.schema";
 import { RoleAdhesionType } from "@/zod-schemas/userAdhesion.schema";
 import { RolePlateformeAdhesionType } from "@/zod-schemas/userPlateformeAdhesion.schema";
 import {
   Building,
   Building2,
+  Calendar,
   House,
+  Mail,
   MapPin,
   Pencil,
+  Phone,
   Plus,
   RulerDimensionLine,
+  TriangleAlert,
+  User,
+  UserCog,
   Users,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -30,6 +37,8 @@ type SiteDetailsProps = {
   currentUserRole: RoleAdhesionType | null;
   currentUserPlateformeRole: RolePlateformeAdhesionType | null;
   responsableSiteIds: Set<string>;
+  siteResponsables: SiteResponsable[];
+  loadingResponsables: boolean;
 };
 
 export function SiteDetails({
@@ -39,6 +48,8 @@ export function SiteDetails({
   currentUserRole,
   currentUserPlateformeRole,
   responsableSiteIds,
+  siteResponsables,
+  loadingResponsables,
 }: SiteDetailsProps) {
   const t = useTranslations("DevisPage.locaux.locauxForm");
   const typeBatiment =
@@ -99,85 +110,128 @@ export function SiteDetails({
         </div>
       </div>
 
-      {/* Details Grid */}
-      <div className="grid grid-cols-2 gap-6">
-        {/* Adresse */}
-        <div className="col-span-2">
-          <div className="mb-2 flex items-center gap-2">
-            <MapPin className="text-primary size-4" />
-            <h3 className="text-muted-foreground text-sm font-semibold">
-              Adresse
-            </h3>
+      {/* Details */}
+      <div className="flex items-stretch gap-4">
+        {/* Gauche : infos du site */}
+        <div className="flex-1 flex flex-col gap-3">
+          {/* Adresse */}
+          <div className="flex items-start gap-2">
+            <MapPin className="text-primary mt-0.5 size-4 shrink-0" />
+            <a
+              href={`https://maps.google.com/?q=${encodeURIComponent(`${site.adresseLigne1}${site.adresseLigne2 ? ` ${site.adresseLigne2}` : ""}, ${site.codePostal} ${site.ville}`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-primary text-sm transition-colors"
+            >
+              <span>{site.adresseLigne1}</span>
+              {site.adresseLigne2 && (
+                <>
+                  <br />
+                  <span>{site.adresseLigne2}</span>
+                </>
+              )}
+              <br />
+              <span>
+                {site.codePostal} {site.ville}
+              </span>
+            </a>
           </div>
 
-          <div className="space-y-1">
-            <p>{site.adresseLigne1}</p>
-            {site.adresseLigne2 && <p>{site.adresseLigne2}</p>}
-            <p>
-              {site.codePostal} {site.ville}
+          {/* Surface */}
+          <div className="flex items-center gap-2">
+            <RulerDimensionLine className="text-primary size-4 shrink-0" />
+            <p className="text-sm">{site.surface} m²</p>
+          </div>
+
+          {/* Effectif */}
+          <div className="flex items-center gap-2">
+            <Users className="text-primary size-4 shrink-0" />
+            <p className="text-sm">{site.effectif} personnes</p>
+          </div>
+
+          {/* Type de bâtiment */}
+          <div className="flex items-center gap-2">
+            <Building2 className="text-primary size-4 shrink-0" />
+            <p className="text-sm">{t(typeBatiment)}</p>
+          </div>
+
+          {/* Type d'occupation */}
+          <div className="flex items-center gap-2">
+            <House className="text-primary size-4 shrink-0" />
+            <p className="text-sm">{t(typeOccupation)}</p>
+          </div>
+
+          {/* Commentaires */}
+          {site.commentaires && (
+            <p className="text-muted-foreground border-t pt-3 text-sm whitespace-pre-wrap">
+              {site.commentaires}
             </p>
-          </div>
+          )}
         </div>
 
-        {/* Surface */}
-        <div>
-          <div className="mb-2 flex items-center gap-2">
-            <RulerDimensionLine className="text-primary size-4" />
-            <h3 className="text-muted-foreground text-sm font-semibold">
-              Surface
-            </h3>
+        {/* Droite : responsable(s) de site */}
+        <div className="flex-1 space-y-3 border-l pl-4">
+          <div className="flex items-center gap-2">
+            <UserCog className="text-primary size-4 shrink-0" />
+            <span className="text-sm font-medium">Responsable du site</span>
           </div>
-          <p>{site.surface} m²</p>
-        </div>
 
-        {/* Effectif */}
-        <div>
-          <div className="mb-2 flex items-center gap-2">
-            <Users className="text-primary size-4" />
-            <h3 className="text-muted-foreground text-sm font-semibold">
-              Effectif
-            </h3>
-          </div>
-          <p>{site.effectif} personnes</p>
+          {loadingResponsables ? (
+            <p className="text-muted-foreground text-sm">Chargement...</p>
+          ) : siteResponsables.length === 0 ? (
+            <div className="text-destructive flex items-start gap-2">
+              <TriangleAlert className="mt-0.5 size-4 shrink-0" />
+              <p className="text-sm">
+                Aucun responsable assigné à ce site. Sans responsable, les
+                tickets et interventions n&apos;ont pas de point de contact
+                dédié. Assignez un responsable via la gestion des utilisateurs.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4 pl-6">
+              {siteResponsables.map((resp) => (
+                <div key={resp.id} className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <User className="text-primary size-4 shrink-0" />
+                    <span className="text-sm font-medium">
+                      {resp.prenom} {resp.nom}
+                    </span>
+                  </div>
+                  {resp.phone && (
+                    <a
+                      href={`tel:${resp.phone}`}
+                      className="hover:text-primary flex items-center gap-2 text-sm transition-colors"
+                    >
+                      <Phone className="text-primary size-4 shrink-0" />
+                      <span>{resp.phone}</span>
+                    </a>
+                  )}
+                  <a
+                    href={`mailto:${resp.email}`}
+                    className="hover:text-primary flex items-center gap-2 text-sm transition-colors"
+                  >
+                    <Mail className="text-primary size-4 shrink-0" />
+                    <span>{resp.email}</span>
+                  </a>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-
-        {/* Type de bâtiment */}
-        <div>
-          <div className="mb-2 flex items-center gap-2">
-            <Building2 className="text-primary size-4" />
-            <h3 className="text-muted-foreground text-sm font-semibold">
-              Type de bâtiment
-            </h3>
-          </div>
-          <p>{t(typeBatiment)}</p>
-        </div>
-
-        {/* Type d'occupation */}
-        <div>
-          <div className="mb-2 flex items-center gap-2">
-            <House className="text-primary size-4" />
-            <h3 className="text-muted-foreground text-sm font-semibold">
-              Type d&apos;occupation
-            </h3>
-          </div>
-          <p>{t(typeOccupation)}</p>
-        </div>
-
-        {/* Commentaires */}
-        {site.commentaires && (
-          <div className="col-span-2">
-            <h3 className="text-muted-foreground mb-2 text-sm font-semibold">
-              Commentaires
-            </h3>
-            <p className="whitespace-pre-wrap">{site.commentaires}</p>
-          </div>
-        )}
       </div>
 
       {/* Metadata */}
       <div className="text-muted-foreground space-y-1 border-t pt-4 text-xs">
-        <p>Créé le {new Date(site.createdAt).toLocaleDateString()}</p>
-        <p>Modifié le {new Date(site.updatedAt).toLocaleDateString()}</p>
+        <div className="flex items-center gap-2">
+          <Calendar className="h-3 w-3" />
+          <span>Créé le {new Date(site.createdAt).toLocaleDateString()}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Calendar className="h-3 w-3" />
+          <span>
+            Modifié le {new Date(site.updatedAt).toLocaleDateString()}
+          </span>
+        </div>
       </div>
     </div>
   );

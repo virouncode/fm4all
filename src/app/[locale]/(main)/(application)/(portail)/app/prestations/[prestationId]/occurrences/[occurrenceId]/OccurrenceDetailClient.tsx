@@ -37,6 +37,7 @@ import {
   getAssignableUsersForOccurrenceAction,
   getAvailableTicketsForLinkingAction,
   getTicketsByOccurrenceAction,
+  deleteAdHocTacheAction,
   insertAdHocTacheAction,
   linkTicketToOccurrenceAction,
   unlinkTicketFromOccurrenceAction,
@@ -74,6 +75,7 @@ import {
   Paperclip,
   Pencil,
   Play,
+  Trash2,
   Plus,
   Ticket,
   Timer,
@@ -316,6 +318,10 @@ export function OccurrenceDetailClient({
     setTaches((prev) =>
       prev.map((t) => (t.id === updatedTache.id ? { ...t, ...updatedTache } : t)),
     );
+  };
+
+  const handleAdHocDeleted = (tacheId: string) => {
+    setTaches((prev) => prev.filter((t) => t.id !== tacheId));
   };
 
   const handleAssigneeChanged = (tacheId: string, assigneeUserId: string | null, assigneePrenom: string | null, assigneeNom: string | null) => {
@@ -811,6 +817,7 @@ export function OccurrenceDetailClient({
                 onPjAdded={(pj) => handlePjAdded(tache.id, pj)}
                 onPjDeleted={(linkId) => handlePjDeleted(tache.id, linkId)}
                 onAdHocUpdated={handleAdHocUpdated}
+                onAdHocDeleted={handleAdHocDeleted}
                 onAssigneeChanged={(userId, prenom, nom) =>
                   handleAssigneeChanged(tache.id, userId, prenom, nom)
                 }
@@ -931,6 +938,7 @@ function TacheRow({
   onPjAdded,
   onPjDeleted,
   onAdHocUpdated,
+  onAdHocDeleted,
   onAssigneeChanged,
 }: {
   tache: OccurrenceTacheDetail;
@@ -957,10 +965,13 @@ function TacheRow({
   onPjAdded: (pj: TachePieceJointe) => void;
   onPjDeleted: (linkId: string) => void;
   onAdHocUpdated: (tache: OccurrenceTacheDetail) => void;
+  onAdHocDeleted: (tacheId: string) => void;
   onAssigneeChanged: (userId: string | null, prenom: string | null, nom: string | null) => void;
 }) {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isEditingAdHoc, setIsEditingAdHoc] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [assigneePopoverOpen, setAssigneePopoverOpen] = useState(false);
   const [assignableUsers, setAssignableUsers] = useState<AssignableUser[]>([]);
   const [isAssigning, setIsAssigning] = useState(false);
@@ -1094,6 +1105,20 @@ function TacheRow({
                       title="Modifier"
                     >
                       <Pencil className="h-3 w-3" />
+                    </Button>
+                  )}
+                {isAdHoc &&
+                  canManage &&
+                  !isEditingAdHoc &&
+                  (occurrenceStatut === "planifiee" || occurrenceStatut === "en_cours") && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setDeleteConfirmOpen(true)}
+                      className="ml-1 h-5 w-5 flex-shrink-0 p-0 text-red-500 hover:text-red-600"
+                      title="Supprimer"
+                    >
+                      <Trash2 className="h-3 w-3" />
                     </Button>
                   )}
               </>
@@ -1312,6 +1337,45 @@ function TacheRow({
           ))}
         </div>
       )}
+
+      {/* AlertDialog suppression tâche ad-hoc */}
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer cette tâche ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action est irréversible. La tâche et ses pièces jointes seront définitivement supprimées.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isDeleting}
+              onClick={async (e) => {
+                e.preventDefault();
+                setIsDeleting(true);
+                const result = await deleteAdHocTacheAction({
+                  tacheId: tache.id,
+                  occurrenceId,
+                  prestationId,
+                  entrepriseId,
+                });
+                setIsDeleting(false);
+                if (result?.serverError) {
+                  toast.error(result.serverError.message);
+                  return;
+                }
+                toast.success("Tâche supprimée.");
+                setDeleteConfirmOpen(false);
+                onAdHocDeleted(tache.id);
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Supprimer"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

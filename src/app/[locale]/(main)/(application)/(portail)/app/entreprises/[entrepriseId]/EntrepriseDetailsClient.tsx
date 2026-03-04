@@ -15,11 +15,12 @@ import {
   MapPin,
   Pencil,
   Phone,
+  Shield,
   User,
   Wrench,
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { formatEntrepriseDate, getRoleBadgeStyles } from "../helpers";
 import { EditEntrepriseContactDialog } from "./EditEntrepriseContactDialog";
 import { EditEntrepriseInfosDialog } from "./EditEntrepriseInfosDialog";
@@ -33,6 +34,12 @@ type EntrepriseDetailsClientProps = {
   services: ServiceItem[];
   logoUrl: string | null;
   logoStorageKey: string | null;
+  /** Si false, les boutons "Modifier" et l'avatar cliquable sont masqués (non-admin) */
+  canEdit?: boolean;
+  /** Si false, le bouton "Retour aux entreprises" est masqué (ex: page Mon Entreprise) */
+  showBackButton?: boolean;
+  /** Callback après mutation réussie — par défaut router.refresh() */
+  onUpdate?: () => void;
 };
 
 export function EntrepriseDetailsClient({
@@ -40,6 +47,9 @@ export function EntrepriseDetailsClient({
   services,
   logoUrl,
   logoStorageKey,
+  canEdit = true,
+  showBackButton = true,
+  onUpdate,
 }: EntrepriseDetailsClientProps) {
   const router = useRouter();
   const rawSearchParams = useSearchParams();
@@ -54,8 +64,18 @@ export function EntrepriseDetailsClient({
   const [editRolesOpen, setEditRolesOpen] = useState(false);
   const [editLogoOpen, setEditLogoOpen] = useState(false);
 
+  // Référence stable pour éviter les re-renders infinis dans les dialogs enfants
+  const serviceIds = useMemo(
+    () => services.map((s) => s.serviceId),
+    [services],
+  );
+
   const handleUpdate = () => {
-    router.refresh();
+    if (onUpdate) {
+      onUpdate();
+    } else {
+      router.refresh();
+    }
   };
 
   const initials = entreprise.nom
@@ -75,14 +95,31 @@ export function EntrepriseDetailsClient({
           {/* Titre + méta */}
           <div className="min-w-0 flex-1 space-y-2">
             <div className="flex items-center gap-3">
-              {/* Avatar cliquable → ouvre dialog logo */}
-              <button
-                type="button"
-                onClick={() => setEditLogoOpen(true)}
-                className="group relative flex-shrink-0 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                title="Modifier le logo"
-              >
-                <Avatar className="h-12 w-12">
+              {/* Avatar — cliquable si canEdit, sinon statique */}
+              {canEdit ? (
+                <button
+                  type="button"
+                  onClick={() => setEditLogoOpen(true)}
+                  className="group focus-visible:ring-primary relative flex-shrink-0 rounded-full focus:outline-none focus-visible:ring-2"
+                  title="Modifier le logo"
+                >
+                  <Avatar className="h-12 w-12">
+                    {logoUrl && (
+                      <AvatarImage
+                        src={logoUrl}
+                        alt={`Logo ${entreprise.nom}`}
+                      />
+                    )}
+                    <AvatarFallback className="bg-muted text-muted-foreground text-base font-semibold">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                    <Pencil className="h-4 w-4 text-white" />
+                  </span>
+                </button>
+              ) : (
+                <Avatar className="h-12 w-12 flex-shrink-0">
                   {logoUrl && (
                     <AvatarImage src={logoUrl} alt={`Logo ${entreprise.nom}`} />
                   )}
@@ -90,11 +127,7 @@ export function EntrepriseDetailsClient({
                     {initials}
                   </AvatarFallback>
                 </Avatar>
-                {/* Overlay crayon au hover */}
-                <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
-                  <Pencil className="h-4 w-4 text-white" />
-                </span>
-              </button>
+              )}
 
               <h1 className="text-3xl font-bold tracking-tight break-words">
                 {entreprise.nom}
@@ -114,23 +147,25 @@ export function EntrepriseDetailsClient({
             </div>
           </div>
 
-          {/* Bouton retour — top right */}
-          <Button
-            variant="ghost"
-            size="sm"
-            asChild
-            className="flex-shrink-0 gap-2"
-          >
-            <Link
-              href={{
-                pathname: "/app/entreprises",
-                query: backQuery,
-              }}
+          {/* Bouton retour — top right (masqué en mode Mon Entreprise) */}
+          {showBackButton && (
+            <Button
+              variant="ghost"
+              size="sm"
+              asChild
+              className="flex-shrink-0 gap-2"
             >
-              <ArrowLeft className="h-4 w-4" />
-              Retour aux entreprises
-            </Link>
-          </Button>
+              <Link
+                href={{
+                  pathname: "/app/entreprises",
+                  query: backQuery,
+                }}
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Retour aux entreprises
+              </Link>
+            </Button>
+          )}
         </div>
 
         {/* Badges rôles */}
@@ -156,17 +191,19 @@ export function EntrepriseDetailsClient({
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-base font-medium">
                 <Building2 className="text-primary h-4 w-4" />
-                Informations entreprise
+                Informations
               </CardTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 gap-1.5 text-muted-foreground hover:text-foreground"
-                onClick={() => setEditInfosOpen(true)}
-              >
-                <Pencil className="h-3.5 w-3.5" />
-                Modifier
-              </Button>
+              {canEdit && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-foreground h-8 gap-1.5"
+                  onClick={() => setEditInfosOpen(true)}
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                  Modifier
+                </Button>
+              )}
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -193,48 +230,46 @@ export function EntrepriseDetailsClient({
                 <User className="text-primary h-4 w-4" />
                 Contact
               </CardTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 gap-1.5 text-muted-foreground hover:text-foreground"
-                onClick={() => setEditContactOpen(true)}
-              >
-                <Pencil className="h-3.5 w-3.5" />
-                Modifier
-              </Button>
+              {canEdit && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-foreground h-8 gap-1.5"
+                  onClick={() => setEditContactOpen(true)}
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                  Modifier
+                </Button>
+              )}
             </div>
           </CardHeader>
           <CardContent className="space-y-2">
+            {(entreprise.prenomContact || entreprise.nomContact) && (
+              <div className="flex items-center gap-2">
+                <User className="text-primary h-4 w-4 shrink-0" />
+                <span className="text-sm font-medium">
+                  {entreprise.prenomContact} {entreprise.nomContact}
+                </span>
+              </div>
+            )}
             {entreprise.phoneContact ? (
               <a
                 href={`tel:${entreprise.phoneContact}`}
-                className="text-muted-foreground hover:text-primary group flex items-center gap-2 text-sm transition-colors"
+                className="hover:text-primary group flex items-center gap-2 text-sm transition-colors"
               >
-                <Phone className="text-primary/60 group-hover:text-primary h-4 w-4 flex-shrink-0" />
-                <span className="group-hover:underline">
-                  {entreprise.phoneContact}
-                </span>
+                <Phone className="text-primary h-4 w-4 flex-shrink-0" />
+                <span>{entreprise.phoneContact}</span>
               </a>
             ) : null}
             {entreprise.emailContact ? (
               <a
                 href={`mailto:${entreprise.emailContact}`}
-                className="text-muted-foreground hover:text-primary group flex items-center gap-2 text-sm transition-colors"
+                className="hover:text-primary group flex items-center gap-2 text-sm transition-colors"
               >
-                <Mail className="text-primary/60 group-hover:text-primary h-4 w-4 flex-shrink-0" />
-                <span className="truncate group-hover:underline">
-                  {entreprise.emailContact}
-                </span>
+                <Mail className="text-primary h-4 w-4 flex-shrink-0" />
+                <span className="truncate">{entreprise.emailContact}</span>
               </a>
             ) : null}
-            {(entreprise.prenomContact || entreprise.nomContact) && (
-              <div className="border-t pt-1">
-                <p className="text-muted-foreground pt-2 text-xs">
-                  <span className="font-medium">Contact:</span>{" "}
-                  {entreprise.prenomContact} {entreprise.nomContact}
-                </p>
-              </div>
-            )}
             {!entreprise.prenomContact &&
               !entreprise.nomContact &&
               !entreprise.phoneContact &&
@@ -270,21 +305,26 @@ export function EntrepriseDetailsClient({
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base font-medium">Rôles</CardTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 gap-1.5 text-muted-foreground hover:text-foreground"
-                onClick={() => setEditRolesOpen(true)}
-              >
-                <Pencil className="h-3.5 w-3.5" />
-                Modifier
-              </Button>
+              <CardTitle className="flex items-center gap-2 text-base font-medium">
+                <Shield className="text-primary h-4 w-4" />
+                Rôles
+              </CardTitle>
+              {canEdit && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-foreground h-8 gap-1.5"
+                  onClick={() => setEditRolesOpen(true)}
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                  Modifier
+                </Button>
+              )}
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             {entreprise.roles.length === 0 ? (
-              <p className="text-sm text-muted-foreground italic">
+              <p className="text-muted-foreground text-sm italic">
                 Aucun rôle assigné
               </p>
             ) : (
@@ -303,19 +343,22 @@ export function EntrepriseDetailsClient({
             {/* Services proposés (si prestataire) */}
             {isPrestataire && (
               <div className="space-y-2">
-                <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                <div className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium tracking-wide uppercase">
                   <Wrench className="h-3.5 w-3.5" />
                   Services proposés
                 </div>
                 {services.length === 0 ? (
-                  <p className="text-sm text-muted-foreground italic">
+                  <p className="text-muted-foreground text-sm italic">
                     Aucun service renseigné
                   </p>
                 ) : (
                   <ul className="space-y-1">
                     {services.map((s) => (
-                      <li key={s.serviceId} className="text-sm flex items-center gap-1.5">
-                        <span className="h-1.5 w-1.5 rounded-full bg-green-500 flex-shrink-0" />
+                      <li
+                        key={s.serviceId}
+                        className="flex items-center gap-1.5 text-sm"
+                      >
+                        <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-green-500" />
                         {s.nom}
                       </li>
                     ))}
@@ -327,44 +370,48 @@ export function EntrepriseDetailsClient({
         </Card>
       </div>
 
-      {/* Dialogs */}
-      <EditEntrepriseInfosDialog
-        open={editInfosOpen}
-        onOpenChange={setEditInfosOpen}
-        entrepriseId={entreprise.id}
-        currentNom={entreprise.nom}
-        currentSiret={entreprise.siret}
-        onSuccess={handleUpdate}
-      />
+      {/* Dialogs — uniquement si l'utilisateur peut éditer */}
+      {canEdit && (
+        <>
+          <EditEntrepriseInfosDialog
+            open={editInfosOpen}
+            onOpenChange={setEditInfosOpen}
+            entrepriseId={entreprise.id}
+            currentNom={entreprise.nom}
+            currentSiret={entreprise.siret}
+            onSuccess={handleUpdate}
+          />
 
-      <EditEntrepriseContactDialog
-        open={editContactOpen}
-        onOpenChange={setEditContactOpen}
-        entrepriseId={entreprise.id}
-        currentPrenomContact={entreprise.prenomContact}
-        currentNomContact={entreprise.nomContact}
-        currentEmailContact={entreprise.emailContact}
-        currentPhoneContact={entreprise.phoneContact}
-        onSuccess={handleUpdate}
-      />
+          <EditEntrepriseContactDialog
+            open={editContactOpen}
+            onOpenChange={setEditContactOpen}
+            entrepriseId={entreprise.id}
+            currentPrenomContact={entreprise.prenomContact}
+            currentNomContact={entreprise.nomContact}
+            currentEmailContact={entreprise.emailContact}
+            currentPhoneContact={entreprise.phoneContact}
+            onSuccess={handleUpdate}
+          />
 
-      <EditEntrepriseRolesDialog
-        open={editRolesOpen}
-        onOpenChange={setEditRolesOpen}
-        entrepriseId={entreprise.id}
-        currentRoles={entreprise.roles}
-        currentServiceIds={services.map((s) => s.serviceId)}
-        onSuccess={handleUpdate}
-      />
+          <EditEntrepriseRolesDialog
+            open={editRolesOpen}
+            onOpenChange={setEditRolesOpen}
+            entrepriseId={entreprise.id}
+            currentRoles={entreprise.roles}
+            currentServiceIds={serviceIds}
+            onSuccess={handleUpdate}
+          />
 
-      <EditEntrepriseLogoDialog
-        open={editLogoOpen}
-        onOpenChange={setEditLogoOpen}
-        entrepriseId={entreprise.id}
-        currentLogoStorageKey={logoStorageKey}
-        currentLogoUrl={logoUrl}
-        onSuccess={handleUpdate}
-      />
+          <EditEntrepriseLogoDialog
+            open={editLogoOpen}
+            onOpenChange={setEditLogoOpen}
+            entrepriseId={entreprise.id}
+            currentLogoStorageKey={logoStorageKey}
+            currentLogoUrl={logoUrl}
+            onSuccess={handleUpdate}
+          />
+        </>
+      )}
     </div>
   );
 }

@@ -1,12 +1,16 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { getSitesAction } from "@/server/actions/sitesActions";
+import {
+  getSiteResponsablesAction,
+  getSitesAction,
+} from "@/server/actions/sitesActions";
 import { getUserSiteAttributionsAction } from "@/server/actions/userSiteAttributionsActions";
 import { useAppStore } from "@/stores/application/appStore";
 import { SelectSiteType, SiteTreeNode } from "@/zod-schemas/sites.schema";
 import { Network, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
+import type { SiteResponsable } from "@/server/queries/sites.query";
 import { toast } from "sonner";
 import { buildSiteTree, getPathToRoot } from "./helpers";
 import { SiteDetails } from "./SiteDetails";
@@ -39,6 +43,10 @@ export function SitesClient() {
   const [responsableSiteIds, setResponsableSiteIds] = useState<Set<string>>(
     new Set(),
   );
+  const [siteResponsables, setSiteResponsables] = useState<SiteResponsable[]>(
+    [],
+  );
+  const [loadingResponsables, setLoadingResponsables] = useState(false);
 
   // Load sites and user attributions
   useEffect(() => {
@@ -115,6 +123,31 @@ export function SitesClient() {
 
     loadData();
   }, [entreprise, currentUser]);
+
+  // Load responsables when selected site changes
+  useEffect(() => {
+    if (!selectedSiteId || !entreprise?.id) {
+      setSiteResponsables([]);
+      return;
+    }
+
+    async function loadResponsables() {
+      setLoadingResponsables(true);
+      try {
+        const result = await getSiteResponsablesAction({
+          siteId: selectedSiteId!,
+          entrepriseId: entreprise!.id,
+        });
+        setSiteResponsables(result?.data?.responsables ?? []);
+      } catch {
+        setSiteResponsables([]);
+      } finally {
+        setLoadingResponsables(false);
+      }
+    }
+
+    loadResponsables();
+  }, [selectedSiteId, entreprise?.id]);
 
   // Handlers
   const handleSiteSelect = (siteId: string) => {
@@ -225,6 +258,8 @@ export function SitesClient() {
             currentUserRole={currentUserRole}
             currentUserPlateformeRole={currentUserPlateformeRole}
             responsableSiteIds={responsableSiteIds}
+            siteResponsables={siteResponsables}
+            loadingResponsables={loadingResponsables}
           />
         </div>
       )}

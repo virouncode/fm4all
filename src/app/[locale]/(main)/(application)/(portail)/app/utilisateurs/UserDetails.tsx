@@ -3,7 +3,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { adhesionStatutCT, roleAdhesionCT } from "@/constants/codeTables";
+import { roleAdhesionCT } from "@/constants/codeTables";
 import { getPresignedReadUrl } from "@/lib/s3/upload-helper";
 import { cn } from "@/lib/utils";
 import { getUserSiteAttributionsAction } from "@/server/actions/userSiteAttributionsActions";
@@ -227,7 +227,7 @@ export function UserDetails({
             </Button>
           )}
           {canCreateChild && (
-            <Button variant="outline" size="sm" onClick={onCreateChild}>
+            <Button size="sm" onClick={onCreateChild}>
               <Plus className="h-4 w-4" />
               Subordonné
             </Button>
@@ -235,60 +235,39 @@ export function UserDetails({
         </div>
       </div>
 
-      {/* Details Grid */}
-      <div className="grid grid-cols-2 gap-6">
+      {/* Details */}
+      <div className="flex flex-col gap-3">
         {/* Email */}
-        <div>
-          <div className="mb-2 flex items-center gap-2">
-            <Mail className="text-primary size-4" />
-            <h3 className="text-muted-foreground text-sm font-semibold">
-              Email
-            </h3>
-          </div>
-          <p>{user.email}</p>
+        <div className="flex items-center gap-2">
+          <Mail className="text-primary size-4 shrink-0" />
+          <a
+            href={`mailto:${user.email}`}
+            className="hover:text-primary text-sm transition-colors"
+          >
+            {user.email}
+          </a>
         </div>
 
         {/* Phone */}
         {user.phone && (
-          <div>
-            <div className="mb-2 flex items-center gap-2">
-              <Phone className="text-primary size-4" />
-              <h3 className="text-muted-foreground text-sm font-semibold">
-                N° de téléphone
-              </h3>
-            </div>
-            <p>{user.phone}</p>
+          <div className="flex items-center gap-2">
+            <Phone className="text-primary size-4 shrink-0" />
+            <a
+              href={`tel:${user.phone}`}
+              className="hover:text-primary text-sm transition-colors"
+            >
+              {user.phone}
+            </a>
           </div>
         )}
 
         {/* Rôle */}
         {user.adhesion && (
-          <div>
-            <div className="mb-2 flex items-center gap-2">
-              <Shield className="text-primary size-4" />
-              <h3 className="text-muted-foreground text-sm font-semibold">
-                Rôle
-              </h3>
-            </div>
-            <p>
+          <div className="flex items-center gap-2">
+            <Shield className="text-primary size-4 shrink-0" />
+            <p className="text-sm">
               {roleAdhesionCT.find((r) => r.code === user.adhesion?.role)
                 ?.name || user.adhesion.role}
-            </p>
-          </div>
-        )}
-
-        {/* Statut */}
-        {user.adhesion && (
-          <div>
-            <div className="mb-2 flex items-center gap-2">
-              <UserIcon className="text-primary size-4" />
-              <h3 className="text-muted-foreground text-sm font-semibold">
-                Statut
-              </h3>
-            </div>
-            <p>
-              {adhesionStatutCT.find((s) => s.code === user.adhesion?.statut)
-                ?.name || user.adhesion.statut}
             </p>
           </div>
         )}

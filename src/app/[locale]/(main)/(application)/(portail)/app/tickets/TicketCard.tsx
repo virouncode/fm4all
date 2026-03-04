@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { SelectSiteType } from "@/zod-schemas/sites.schema";
 import { SelectTicketType } from "@/zod-schemas/ticket.schema";
+import { Calendar, Clock } from "lucide-react";
 import {
   formatTicketDate,
   getTicketStatutBadge,
@@ -67,7 +68,8 @@ export function TicketCard({
         </div>
 
         {/* Date de création */}
-        <div className="text-xs text-muted-foreground">
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Calendar className="size-3 shrink-0" />
           Créé le {formatTicketDate(ticket.createdAt)}
         </div>
 
@@ -94,45 +96,33 @@ export function TicketCard({
         <div className="space-y-1 flex-grow">
           {proprietaire && (
             <div className="flex gap-1.5">
-              <span className="font-medium text-foreground shrink-0">
-                Client:
-              </span>
-              <span className="text-muted-foreground truncate">
-                {proprietaire.nom}
-              </span>
+              <span className="text-muted-foreground shrink-0">Client :</span>
+              <span className="font-medium truncate">{proprietaire.nom}</span>
             </div>
           )}
 
           {site && (
             <div className="flex gap-1.5">
-              <span className="font-medium text-foreground shrink-0">
-                Site:
-              </span>
-              <span className="text-muted-foreground truncate">
-                {site.nom}
-              </span>
+              <span className="text-muted-foreground shrink-0">Site :</span>
+              <span className="font-medium truncate">{site.nom}</span>
             </div>
           )}
 
           {demandeur && (
             <div className="flex gap-1.5">
-              <span className="font-medium text-foreground shrink-0">
-                Demandeur:
+              <span className="text-muted-foreground shrink-0">
+                Demandeur :
               </span>
-              <span className="text-muted-foreground truncate">
-                {demandeur.nom}
-              </span>
+              <span className="font-medium truncate">{demandeur.nom}</span>
             </div>
           )}
 
           <div className="flex gap-1.5">
-            <span className="font-medium text-foreground shrink-0">
-              Prestataire:
+            <span className="text-muted-foreground shrink-0">
+              Prestataire :
             </span>
             {assigne ? (
-              <span className="text-muted-foreground truncate">
-                {assigne.nom}
-              </span>
+              <span className="font-medium truncate">{assigne.nom}</span>
             ) : (
               <span className="text-muted-foreground/60">Non assigné</span>
             )}
@@ -140,8 +130,9 @@ export function TicketCard({
         </div>
 
         {/* Dernière activité - hauteur fixe */}
-        <div className="pt-2 mt-2 border-t text-xs text-muted-foreground min-h-[1.5rem] flex items-center">
-          Dernière activité: {formatTicketDate(ticket.lastActivityAt)}
+        <div className="pt-2 mt-2 border-t text-xs text-muted-foreground min-h-[1.5rem] flex items-center gap-1.5">
+          <Clock className="size-3 shrink-0" />
+          Dernière activité : {formatTicketDate(ticket.lastActivityAt)}
         </div>
       </CardContent>
     </Card>

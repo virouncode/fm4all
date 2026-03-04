@@ -5,7 +5,6 @@ export default function NotFoundPage() {
   const t = useTranslations("NotFoundPage");
   return (
     <div className="mx-auto flex h-[calc(100vh-4rem)] items-center justify-center">
-      REST
       <div className="mt-4 flex flex-col gap-6">
         <h2 className="text-center text-lg font-bold text-red-500">
           {t("erreur-404-page-non-trouvee")}

@@ -18,12 +18,20 @@ import {
 } from "@/server/queries/tacheListesTemplates.query";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
 import {
-  capitalizeFirstWord,
-  normalizeForSubmit,
-} from "@/zod-helpers/normalize";
+  deleteTacheListeItemSchema,
+  deleteTacheListeTemplateSchema,
+  getAvailableTacheListesTemplatesSchema,
+  getTacheListeTemplateSchema,
+  getTacheListesTemplatesSchema,
+  insertTacheListeItemSchema,
+  insertTacheListeTemplateSchema,
+  reorderTacheListeItemsSchema,
+  updateTacheListeItemSchema,
+  updateTacheListeTemplateSchema,
+} from "@/zod-schemas/tacheListesTemplates.schema";
+import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import { and, asc, eq, max } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
-import { z } from "zod";
 
 // ==================== HELPERS ====================
 
@@ -77,17 +85,10 @@ async function getExecutionPrestataireEntrepriseId(
  */
 export const getAvailableTacheListesTemplatesAction = actionClient
   .metadata({ actionName: "getAvailableTacheListesTemplatesAction" })
-  .inputSchema(
-    z.object({
-      serviceId: z.string().uuid("ID de service invalide"),
-      entrepriseId: z.string().uuid("ID d'entreprise invalide"),
-      executionId: z.string().uuid().optional(),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(getAvailableTacheListesTemplatesSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -127,16 +128,10 @@ export const getAvailableTacheListesTemplatesAction = actionClient
  */
 export const getTacheListesTemplatesAction = actionClient
   .metadata({ actionName: "getTacheListesTemplatesAction" })
-  .inputSchema(
-    z.object({
-      proprietaireEntrepriseId: z.string().uuid("ID d'entreprise invalide").nullable(),
-      serviceId: z.string().uuid().optional(),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(getTacheListesTemplatesSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -178,21 +173,10 @@ export const getTacheListesTemplatesAction = actionClient
  */
 export const insertTacheListeTemplateAction = actionClient
   .metadata({ actionName: "insertTacheListeTemplateAction" })
-  .inputSchema(
-    z.object({
-      nom: z
-        .string()
-        .min(1, "Nom obligatoire")
-        .max(255, "Nom trop long")
-        .transform(capitalizeFirstWord),
-      serviceId: z.string().uuid("ID de service invalide"),
-      proprietaireEntrepriseId: z.string().uuid("ID d'entreprise invalide").nullable(),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(insertTacheListeTemplateSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -239,18 +223,10 @@ export const insertTacheListeTemplateAction = actionClient
 
 export const updateTacheListeTemplateAction = actionClient
   .metadata({ actionName: "updateTacheListeTemplateAction" })
-  .inputSchema(
-    z.object({
-      id: z.string().uuid("ID de pack invalide"),
-      entrepriseId: z.string().uuid("ID d'entreprise invalide").nullable(),
-      nom: z.string().min(1).max(255).transform(capitalizeFirstWord).optional(),
-      actif: z.boolean().optional(),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(updateTacheListeTemplateSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -262,7 +238,10 @@ export const updateTacheListeTemplateAction = actionClient
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
       const [packRow] = await db
-        .select({ proprietaireEntrepriseId: tacheListesTemplates.proprietaireEntrepriseId })
+        .select({
+          proprietaireEntrepriseId:
+            tacheListesTemplates.proprietaireEntrepriseId,
+        })
         .from(tacheListesTemplates)
         .where(eq(tacheListesTemplates.id, id))
         .limit(1);
@@ -270,10 +249,14 @@ export const updateTacheListeTemplateAction = actionClient
       if (!packRow) throw errors.notFound("Pack introuvable.");
 
       if (packRow.proprietaireEntrepriseId === null) {
-        throw errors.forbidden("Seuls les utilisateurs plateforme peuvent modifier les templates système.");
+        throw errors.forbidden(
+          "Seuls les utilisateurs plateforme peuvent modifier les templates système.",
+        );
       }
       if (packRow.proprietaireEntrepriseId !== entrepriseId) {
-        throw errors.forbidden("Vous ne pouvez modifier que vos propres packs.");
+        throw errors.forbidden(
+          "Vous ne pouvez modifier que vos propres packs.",
+        );
       }
     }
 
@@ -296,16 +279,10 @@ export const updateTacheListeTemplateAction = actionClient
 
 export const deleteTacheListeTemplateAction = actionClient
   .metadata({ actionName: "deleteTacheListeTemplateAction" })
-  .inputSchema(
-    z.object({
-      id: z.string().uuid("ID de pack invalide"),
-      entrepriseId: z.string().uuid("ID d'entreprise invalide").nullable(),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(deleteTacheListeTemplateSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -317,17 +294,24 @@ export const deleteTacheListeTemplateAction = actionClient
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
       const [packRow] = await db
-        .select({ proprietaireEntrepriseId: tacheListesTemplates.proprietaireEntrepriseId })
+        .select({
+          proprietaireEntrepriseId:
+            tacheListesTemplates.proprietaireEntrepriseId,
+        })
         .from(tacheListesTemplates)
         .where(eq(tacheListesTemplates.id, id))
         .limit(1);
 
       if (!packRow) throw errors.notFound("Pack introuvable.");
       if (packRow.proprietaireEntrepriseId === null) {
-        throw errors.forbidden("Seuls les utilisateurs plateforme peuvent supprimer les templates système.");
+        throw errors.forbidden(
+          "Seuls les utilisateurs plateforme peuvent supprimer les templates système.",
+        );
       }
       if (packRow.proprietaireEntrepriseId !== entrepriseId) {
-        throw errors.forbidden("Vous ne pouvez supprimer que vos propres packs.");
+        throw errors.forbidden(
+          "Vous ne pouvez supprimer que vos propres packs.",
+        );
       }
     }
 
@@ -344,23 +328,10 @@ export const deleteTacheListeTemplateAction = actionClient
 
 export const insertTacheListeItemAction = actionClient
   .metadata({ actionName: "insertTacheListeItemAction" })
-  .inputSchema(
-    z.object({
-      listeTemplateId: z.string().uuid("ID de pack invalide"),
-      entrepriseId: z.string().uuid("ID d'entreprise invalide").nullable(),
-      titre: z
-        .string()
-        .min(1, "Titre obligatoire")
-        .max(255, "Titre trop long")
-        .transform(capitalizeFirstWord),
-      description: z.string().optional(),
-      dureeEstimeeMinutes: z.number().int().positive().optional(),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(insertTacheListeItemSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -370,23 +341,31 @@ export const insertTacheListeItemAction = actionClient
       optionalStrings: ["description"] as const,
     });
 
-    const { listeTemplateId, entrepriseId, titre, dureeEstimeeMinutes } = normalized;
+    const { listeTemplateId, entrepriseId, titre, dureeEstimeeMinutes } =
+      normalized;
 
     // Vérifier que le pack appartient à cette entreprise
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
       const [packRow] = await db
-        .select({ proprietaireEntrepriseId: tacheListesTemplates.proprietaireEntrepriseId })
+        .select({
+          proprietaireEntrepriseId:
+            tacheListesTemplates.proprietaireEntrepriseId,
+        })
         .from(tacheListesTemplates)
         .where(eq(tacheListesTemplates.id, listeTemplateId))
         .limit(1);
 
       if (!packRow) throw errors.notFound("Pack introuvable.");
       if (packRow.proprietaireEntrepriseId === null) {
-        throw errors.forbidden("Seuls les utilisateurs plateforme peuvent modifier les templates système.");
+        throw errors.forbidden(
+          "Seuls les utilisateurs plateforme peuvent modifier les templates système.",
+        );
       }
       if (packRow.proprietaireEntrepriseId !== entrepriseId) {
-        throw errors.forbidden("Vous ne pouvez modifier que vos propres packs.");
+        throw errors.forbidden(
+          "Vous ne pouvez modifier que vos propres packs.",
+        );
       }
     }
 
@@ -419,21 +398,10 @@ export const insertTacheListeItemAction = actionClient
 
 export const updateTacheListeItemAction = actionClient
   .metadata({ actionName: "updateTacheListeItemAction" })
-  .inputSchema(
-    z.object({
-      id: z.string().uuid("ID d'item invalide"),
-      entrepriseId: z.string().uuid("ID d'entreprise invalide").nullable(),
-      titre: z.string().min(1).max(255).transform(capitalizeFirstWord).optional(),
-      description: z.string().optional(),
-      ordre: z.number().int().positive().optional(),
-      actif: z.boolean().optional(),
-      dureeEstimeeMinutes: z.number().int().positive().nullable().optional(),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(updateTacheListeItemSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -443,14 +411,16 @@ export const updateTacheListeItemAction = actionClient
       optionalStrings: ["description"] as const,
     });
 
-    const { id, entrepriseId, titre, ordre, actif, dureeEstimeeMinutes } = normalized;
+    const { id, entrepriseId, titre, ordre, actif, dureeEstimeeMinutes } =
+      normalized;
 
     // Vérifier propriété via le pack
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
       const [itemRow] = await db
         .select({
-          proprietaireEntrepriseId: tacheListesTemplates.proprietaireEntrepriseId,
+          proprietaireEntrepriseId:
+            tacheListesTemplates.proprietaireEntrepriseId,
         })
         .from(tacheListeItems)
         .innerJoin(
@@ -462,10 +432,14 @@ export const updateTacheListeItemAction = actionClient
 
       if (!itemRow) throw errors.notFound("Item introuvable.");
       if (itemRow.proprietaireEntrepriseId === null) {
-        throw errors.forbidden("Seuls les utilisateurs plateforme peuvent modifier les templates système.");
+        throw errors.forbidden(
+          "Seuls les utilisateurs plateforme peuvent modifier les templates système.",
+        );
       }
       if (itemRow.proprietaireEntrepriseId !== entrepriseId) {
-        throw errors.forbidden("Vous ne pouvez modifier que vos propres items.");
+        throw errors.forbidden(
+          "Vous ne pouvez modifier que vos propres items.",
+        );
       }
     }
 
@@ -473,7 +447,8 @@ export const updateTacheListeItemAction = actionClient
       updatedById: currentUser.id,
     };
     if (titre !== undefined) updateData.titre = titre;
-    if (normalized.description !== undefined) updateData.description = normalized.description ?? null;
+    if (normalized.description !== undefined)
+      updateData.description = normalized.description ?? null;
     if (ordre !== undefined) updateData.ordre = ordre;
     if (actif !== undefined) updateData.actif = actif;
     if (dureeEstimeeMinutes !== undefined)
@@ -492,16 +467,10 @@ export const updateTacheListeItemAction = actionClient
 
 export const deleteTacheListeItemAction = actionClient
   .metadata({ actionName: "deleteTacheListeItemAction" })
-  .inputSchema(
-    z.object({
-      id: z.string().uuid("ID d'item invalide"),
-      entrepriseId: z.string().uuid("ID d'entreprise invalide").nullable(),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(deleteTacheListeItemSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -514,7 +483,8 @@ export const deleteTacheListeItemAction = actionClient
     if (!platformRole?.role) {
       const [itemRow] = await db
         .select({
-          proprietaireEntrepriseId: tacheListesTemplates.proprietaireEntrepriseId,
+          proprietaireEntrepriseId:
+            tacheListesTemplates.proprietaireEntrepriseId,
           listeTemplateId: tacheListeItems.listeTemplateId,
         })
         .from(tacheListeItems)
@@ -527,10 +497,14 @@ export const deleteTacheListeItemAction = actionClient
 
       if (!itemRow) throw errors.notFound("Item introuvable.");
       if (itemRow.proprietaireEntrepriseId === null) {
-        throw errors.forbidden("Seuls les utilisateurs plateforme peuvent modifier les templates système.");
+        throw errors.forbidden(
+          "Seuls les utilisateurs plateforme peuvent modifier les templates système.",
+        );
       }
       if (itemRow.proprietaireEntrepriseId !== entrepriseId) {
-        throw errors.forbidden("Vous ne pouvez supprimer que vos propres items.");
+        throw errors.forbidden(
+          "Vous ne pouvez supprimer que vos propres items.",
+        );
       }
     }
 
@@ -566,18 +540,10 @@ export const deleteTacheListeItemAction = actionClient
 
 export const reorderTacheListeItemsAction = actionClient
   .metadata({ actionName: "reorderTacheListeItemsAction" })
-  .inputSchema(
-    z.object({
-      listeTemplateId: z.string().uuid("ID de pack invalide"),
-      entrepriseId: z.string().uuid("ID d'entreprise invalide").nullable(),
-      /** Tableau des IDs dans le nouvel ordre (du premier au dernier) */
-      orderedIds: z.array(z.string().uuid()).min(1),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(reorderTacheListeItemsSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -589,17 +555,24 @@ export const reorderTacheListeItemsAction = actionClient
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
       const [packRow] = await db
-        .select({ proprietaireEntrepriseId: tacheListesTemplates.proprietaireEntrepriseId })
+        .select({
+          proprietaireEntrepriseId:
+            tacheListesTemplates.proprietaireEntrepriseId,
+        })
         .from(tacheListesTemplates)
         .where(eq(tacheListesTemplates.id, listeTemplateId))
         .limit(1);
 
       if (!packRow) throw errors.notFound("Pack introuvable.");
       if (packRow.proprietaireEntrepriseId === null) {
-        throw errors.forbidden("Seuls les utilisateurs plateforme peuvent modifier les templates système.");
+        throw errors.forbidden(
+          "Seuls les utilisateurs plateforme peuvent modifier les templates système.",
+        );
       }
       if (packRow.proprietaireEntrepriseId !== entrepriseId) {
-        throw errors.forbidden("Vous ne pouvez modifier que vos propres packs.");
+        throw errors.forbidden(
+          "Vous ne pouvez modifier que vos propres packs.",
+        );
       }
     }
 
@@ -644,15 +617,10 @@ export const reorderTacheListeItemsAction = actionClient
  */
 export const getTacheListeTemplateAction = actionClient
   .metadata({ actionName: "getTacheListeTemplateAction" })
-  .inputSchema(
-    z.object({
-      id: z.string().uuid("ID de pack invalide"),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(getTacheListeTemplateSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;

@@ -36,7 +36,6 @@ import {
   deleteExecutionAction,
   toggleExecutionActifAction,
 } from "@/server/actions/clientServiceExecutionsActions";
-import { ExecutionEditDialog } from "./ExecutionEditDialog";
 import { getOccurrencesPageAction } from "@/server/actions/clientServiceOccurrencesActions";
 import {
   deletePrestationAction,
@@ -68,6 +67,7 @@ import {
   Loader2,
   MapPin,
   Pencil,
+  Plus,
   Power,
   RotateCcw,
   Send,
@@ -90,7 +90,9 @@ import {
   getPrestationStatutBadge,
 } from "../helpers";
 import { DeployAssignationDialog } from "./DeployAssignationDialog";
+import { ExecutionEditDialog } from "./ExecutionEditDialog";
 import { ExecutionFormDialog } from "./ExecutionFormDialog";
+import { OccurrenceOnDemandDialog } from "./OccurrenceOnDemandDialog";
 import { TacheListeManagerDialog } from "./TacheListeManagerDialog";
 import { TacheListePickerDialog } from "./TacheListePickerDialog";
 
@@ -104,7 +106,7 @@ type PrestationDetailsClientProps = {
   totalNonAssigned: number;
   availableSites: Array<{ id: string; nom: string }>;
   defaultTab?: string;
-}
+};
 
 const JOUR_LABELS: Record<number, string> = {
   1: "Lundi",
@@ -463,6 +465,7 @@ export function PrestationDetailsClient({
             prestation={prestation}
             onCountChange={setInterventionsCount}
             availableSites={availableSites}
+            canManage={canManage}
           />
         </TabsContent>
       </Tabs>
@@ -1113,12 +1116,14 @@ function InterventionsTab({
   prestation,
   onCountChange,
   availableSites,
+  canManage,
 }: {
   initialOccurrences: OccurrenceListItem[];
   totalOccurrences: number;
   prestation: PrestationListItem;
   onCountChange: (count: number) => void;
   availableSites: Array<{ id: string; nom: string }>;
+  canManage: boolean;
 }) {
   const [occurrences, setOccurrences] =
     useState<OccurrenceListItem[]>(initialOccurrences);
@@ -1133,6 +1138,7 @@ function InterventionsTab({
   );
   const [filtersDialogOpen, setFiltersDialogOpen] = useState(false);
   const [sortDialogOpen, setSortDialogOpen] = useState(false);
+  const [onDemandDialogOpen, setOnDemandDialogOpen] = useState(false);
 
   const activeFiltersCount = [
     filters.statut !== "",
@@ -1234,6 +1240,21 @@ function InterventionsTab({
         </p>
 
         <div className="flex items-center gap-2">
+          {canManage && prestation.statut === "actif" && (
+            <Button
+              size="sm"
+              variant="default"
+              className="h-7 gap-1 text-xs"
+              onClick={() => setOnDemandDialogOpen(true)}
+            >
+              <Plus className="h-3 w-3" />
+              Ajouter une intervention
+              {prestation.modePlanning === "planifie" && (
+                <span className="ml-1 opacity-70">(exceptionnel)</span>
+              )}
+            </Button>
+          )}
+
           <Button
             size="sm"
             variant="outline"
@@ -1283,11 +1304,7 @@ function InterventionsTab({
         ) : (
           <div className="divide-y">
             {occurrences.map((occ) => (
-              <OccurrenceRow
-                key={occ.id}
-                occ={occ}
-                prestation={prestation}
-              />
+              <OccurrenceRow key={occ.id} occ={occ} prestation={prestation} />
             ))}
             {/* Sentinel d'infinite scroll */}
             <div ref={targetRef} className="h-1" />
@@ -1313,6 +1330,16 @@ function InterventionsTab({
         currentSortDir={sortDir}
         onApply={handleSortApply}
       />
+      <OccurrenceOnDemandDialog
+        open={onDemandDialogOpen}
+        onOpenChange={setOnDemandDialogOpen}
+        prestation={prestation}
+        onSuccess={(newOccurrence) => {
+          setOccurrences((prev) => [newOccurrence, ...prev]);
+          setDisplayedTotal((prev) => prev + 1);
+          onCountChange(displayedTotal + 1);
+        }}
+      />
     </div>
   );
 }
@@ -1332,8 +1359,7 @@ function OccurrenceRow({
   return (
     <Link
       href={{
-        pathname:
-          "/app/prestations/[prestationId]/occurrences/[occurrenceId]",
+        pathname: "/app/prestations/[prestationId]/occurrences/[occurrenceId]",
         params: { prestationId: prestation.id, occurrenceId: occ.id },
       }}
       className="hover:border-primary/30 flex items-center justify-between px-4 py-3 text-sm transition-all hover:shadow-sm"

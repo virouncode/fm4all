@@ -1,11 +1,21 @@
 import { db } from "@/db";
+import { user } from "@/db/schema/auth";
 import { sites } from "@/db/schema/sites";
+import { userSiteAttributions } from "@/db/schema/users";
 import {
   selectSiteSchema,
   type SelectSiteType,
 } from "@/zod-schemas/sites.schema";
 import { and, eq } from "drizzle-orm";
 import "server-only";
+
+export type SiteResponsable = {
+  id: string;
+  prenom: string;
+  nom: string;
+  email: string;
+  phone: string | null;
+};
 
 /**
  * GET ALL SITES FOR AN ENTREPRISE
@@ -58,6 +68,33 @@ export async function getSiteById(
 
   // Parse avec Zod
   return selectSiteSchema.parse(site);
+}
+
+/**
+ * GET RESPONSABLES OF A SITE (role = "responsable_site", mode = "inclure")
+ */
+export async function getSiteResponsables(
+  siteId: string,
+): Promise<SiteResponsable[]> {
+  const rows = await db
+    .select({
+      id: user.id,
+      prenom: user.prenom,
+      nom: user.nom,
+      email: user.email,
+      phone: user.phone,
+    })
+    .from(userSiteAttributions)
+    .innerJoin(user, eq(userSiteAttributions.userId, user.id))
+    .where(
+      and(
+        eq(userSiteAttributions.siteId, siteId),
+        eq(userSiteAttributions.role, "responsable_site"),
+        eq(userSiteAttributions.mode, "inclure"),
+      ),
+    );
+
+  return rows;
 }
 
 /**

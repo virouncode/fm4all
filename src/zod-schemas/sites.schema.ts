@@ -110,6 +110,38 @@ export const getSitesQuerySchema = z.object({
 });
 export type GetSitesQueryType = z.infer<typeof getSitesQuerySchema>;
 
+// Schéma pour toutes les actions qui identifient un site dans une entreprise
+export const siteByIdSchema = z.object({
+  siteId: z.uuid("ID du site invalide"),
+  entrepriseId: z.uuid("ID de l'entreprise invalide"),
+});
+export type SiteByIdType = z.infer<typeof siteByIdSchema>;
+
+export const getAccessibleSitesSchema = z.object({
+  entrepriseId: z.uuid("ID de l'entreprise invalide"),
+  /** Filtre optionnel : ne retourner que les sites où l'utilisateur a ce rôle */
+  filterByRole: z.string().optional(),
+});
+export type GetAccessibleSitesType = z.infer<typeof getAccessibleSitesSchema>;
+
+// Schéma pour l'action plateforme sans filtre d'entreprise
+export const getAllSitesForPlatformSchema = z.object({});
+export type GetAllSitesForPlatformType = z.infer<
+  typeof getAllSitesForPlatformSchema
+>;
+
+// Schéma action INSERT site (form + entrepriseId serveur)
+export const insertSiteActionSchema = insertSiteSchema.extend({
+  entrepriseId: z.uuid("ID de l'entreprise invalide"),
+});
+export type InsertSiteActionType = z.infer<typeof insertSiteActionSchema>;
+
+// Schéma action UPDATE site (form + entrepriseId serveur)
+export const updateSiteActionSchema = updateSiteSchema.extend({
+  entrepriseId: z.uuid("ID de l'entreprise invalide"),
+});
+export type UpdateSiteActionType = z.infer<typeof updateSiteActionSchema>;
+
 // ==================== TREE TYPES ====================
 
 export type SiteTreeNode = SelectSiteType & {

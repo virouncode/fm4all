@@ -16,6 +16,7 @@ import { getPresignedReadUrlAction } from "@/server/actions/s3Actions";
 import { EntrepriseSelectType } from "@/zod-schemas/entreprise.schema";
 import { SelectSiteType } from "@/zod-schemas/sites.schema";
 import { SelectTicketType } from "@/zod-schemas/ticket.schema";
+import { type SiteResponsable } from "@/server/queries/sites.query";
 import {
   ArrowLeft,
   Building2,
@@ -31,7 +32,9 @@ import {
   MessageCircle,
   Paperclip,
   Phone,
+  TriangleAlert,
   User,
+  UserCog,
   Users as UsersIcon,
 } from "lucide-react";
 import Image from "next/image";
@@ -101,6 +104,7 @@ type TicketDetailsClientProps = {
   availablePrestataires: Array<{ id: string; nom: string }>;
   availableUsers: Array<{ id: string; prenom: string; nom: string }>;
   site: SelectSiteType | null;
+  siteResponsables: SiteResponsable[];
   proprietaireEntreprise: EntrepriseSelectType | null;
   demandeurEntreprise: EntrepriseSelectType | null;
   assigneEntreprise: EntrepriseSelectType | null;
@@ -118,6 +122,7 @@ export function TicketDetailsClient({
   availablePrestataires,
   availableUsers,
   site,
+  siteResponsables,
   proprietaireEntreprise,
   assigneEntreprise,
   attachments,
@@ -375,34 +380,87 @@ export function TicketDetailsClient({
           <CardContent className="space-y-4">
             {site ? (
               <>
-                <div>
-                  <p className="text-foreground text-sm font-semibold">
-                    {site.nom}
-                  </p>
-                </div>
-                <div className="text-muted-foreground flex items-start gap-2 text-sm">
-                  <Home className="text-primary/60 mt-0.5 h-4 w-4 flex-shrink-0" />
-                  <div className="leading-relaxed">
-                    <p>{site.adresseLigne1}</p>
-                    {site.adresseLigne2 && <p>{site.adresseLigne2}</p>}
-                    <p>
-                      {site.codePostal} {site.ville}
-                    </p>
+                <p className="text-foreground text-sm font-semibold">
+                  {site.nom}
+                </p>
+                <div className="flex items-start gap-4">
+                  {/* Gauche : infos du site */}
+                  <div className="flex-1 space-y-3">
+                    <div className="flex items-start gap-2 text-sm">
+                      <Home className="text-primary mt-0.5 h-4 w-4 flex-shrink-0" />
+                      <a
+                        href={`https://maps.google.com/?q=${encodeURIComponent(`${site.adresseLigne1}${site.adresseLigne2 ? ` ${site.adresseLigne2}` : ""}, ${site.codePostal} ${site.ville}`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-primary leading-relaxed transition-colors"
+                      >
+                        <p>{site.adresseLigne1}</p>
+                        {site.adresseLigne2 && <p>{site.adresseLigne2}</p>}
+                        <p>
+                          {site.codePostal} {site.ville}
+                        </p>
+                      </a>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2 text-sm">
+                        <LandPlot className="text-primary h-4 w-4 flex-shrink-0" />
+                        <span className="font-medium">{site.surface} m²</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <UsersIcon className="text-primary h-4 w-4 flex-shrink-0" />
+                        <span className="font-medium">
+                          {site.effectif} pers.
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="text-muted-foreground flex items-center gap-2 text-sm">
-                    <LandPlot className="text-primary/60 h-4 w-4 flex-shrink-0" />
-                    <span className="font-medium">{site.surface} m²</span>
-                  </div>
-                  <div className="text-muted-foreground flex items-center gap-2 text-sm">
-                    <UsersIcon className="text-primary/60 h-4 w-4 flex-shrink-0" />
-                    <span className="font-medium">{site.effectif} pers.</span>
+
+                  {/* Droite : responsable */}
+                  <div className="flex-1 space-y-2 border-l pl-4">
+                    <div className="flex items-center gap-2">
+                      <UserCog className="text-primary h-4 w-4 shrink-0" />
+                      <span className="text-muted-foreground text-sm font-medium">
+                        Responsable
+                      </span>
+                    </div>
+                    {siteResponsables.length === 0 ? (
+                      <div className="text-destructive flex items-center gap-2 pl-6">
+                        <TriangleAlert className="size-4 shrink-0" />
+                        <p className="text-xs">Aucun responsable assigné.</p>
+                      </div>
+                    ) : (
+                      siteResponsables.map((resp) => (
+                        <div key={resp.id} className="space-y-2 pl-6">
+                          <div className="flex items-center gap-2">
+                            <User className="text-primary h-4 w-4 shrink-0" />
+                            <span className="text-sm font-medium">
+                              {resp.prenom} {resp.nom}
+                            </span>
+                          </div>
+                          {resp.phone && (
+                            <a
+                              href={`tel:${resp.phone}`}
+                              className="hover:text-primary flex items-center gap-2 text-sm transition-colors"
+                            >
+                              <Phone className="text-primary h-4 w-4 shrink-0" />
+                              <span>{resp.phone}</span>
+                            </a>
+                          )}
+                          <a
+                            href={`mailto:${resp.email}`}
+                            className="hover:text-primary flex items-center gap-2 text-sm transition-colors"
+                          >
+                            <Mail className="text-primary h-4 w-4 shrink-0" />
+                            <span>{resp.email}</span>
+                          </a>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
                 {site.commentaires && (
-                  <div className="mt-3 border-t pt-1">
-                    <p className="text-muted-foreground pt-2 text-xs italic">
+                  <div className="border-t pt-3">
+                    <p className="text-muted-foreground text-xs italic">
                       {site.commentaires}
                     </p>
                   </div>
@@ -435,41 +493,41 @@ export function TicketDetailsClient({
                     SIRET: {proprietaireEntreprise.siret}
                   </p>
                 </div>
-                {(proprietaireEntreprise.phoneContact ||
+                {(proprietaireEntreprise.prenomContact ||
+                  proprietaireEntreprise.nomContact ||
+                  proprietaireEntreprise.phoneContact ||
                   proprietaireEntreprise.emailContact) && (
                   <div className="space-y-2">
+                    {(proprietaireEntreprise.prenomContact ||
+                      proprietaireEntreprise.nomContact) && (
+                      <div className="flex items-center gap-2">
+                        <User className="text-primary h-4 w-4 shrink-0" />
+                        <span className="text-sm font-medium">
+                          {proprietaireEntreprise.prenomContact}{" "}
+                          {proprietaireEntreprise.nomContact}
+                        </span>
+                      </div>
+                    )}
                     {proprietaireEntreprise.phoneContact && (
                       <a
                         href={`tel:${proprietaireEntreprise.phoneContact}`}
-                        className="text-muted-foreground hover:text-primary group flex items-center gap-2 text-sm transition-colors"
+                        className="hover:text-primary flex items-center gap-2 text-sm transition-colors"
                       >
-                        <Phone className="text-primary/60 group-hover:text-primary h-4 w-4 flex-shrink-0" />
-                        <span className="group-hover:underline">
-                          {proprietaireEntreprise.phoneContact}
-                        </span>
+                        <Phone className="text-primary h-4 w-4 shrink-0" />
+                        <span>{proprietaireEntreprise.phoneContact}</span>
                       </a>
                     )}
                     {proprietaireEntreprise.emailContact && (
                       <a
                         href={`mailto:${proprietaireEntreprise.emailContact}`}
-                        className="text-muted-foreground hover:text-primary group flex items-center gap-2 text-sm transition-colors"
+                        className="hover:text-primary flex items-center gap-2 text-sm transition-colors"
                       >
-                        <Mail className="text-primary/60 group-hover:text-primary h-4 w-4 flex-shrink-0" />
-                        <span className="truncate group-hover:underline">
+                        <Mail className="text-primary h-4 w-4 shrink-0" />
+                        <span className="truncate">
                           {proprietaireEntreprise.emailContact}
                         </span>
                       </a>
                     )}
-                  </div>
-                )}
-                {(proprietaireEntreprise.prenomContact ||
-                  proprietaireEntreprise.nomContact) && (
-                  <div className="mt-3 border-t pt-1">
-                    <p className="text-muted-foreground pt-2 text-xs">
-                      <span className="font-medium">Contact:</span>{" "}
-                      {proprietaireEntreprise.prenomContact}{" "}
-                      {proprietaireEntreprise.nomContact}
-                    </p>
                   </div>
                 )}
               </>
@@ -518,9 +576,9 @@ export function TicketDetailsClient({
                     {assigneEntreprise.phoneContact && (
                       <a
                         href={`tel:${assigneEntreprise.phoneContact}`}
-                        className="text-muted-foreground hover:text-primary group flex items-center gap-2 text-sm transition-colors"
+                        className="hover:text-primary group flex items-center gap-2 text-sm transition-colors"
                       >
-                        <Phone className="text-primary/60 group-hover:text-primary h-4 w-4 flex-shrink-0" />
+                        <Phone className="text-primary h-4 w-4 shrink-0" />
                         <span className="group-hover:underline">
                           {assigneEntreprise.phoneContact}
                         </span>
@@ -529,9 +587,9 @@ export function TicketDetailsClient({
                     {assigneEntreprise.emailContact && (
                       <a
                         href={`mailto:${assigneEntreprise.emailContact}`}
-                        className="text-muted-foreground hover:text-primary group flex items-center gap-2 text-sm transition-colors"
+                        className="hover:text-primary group flex items-center gap-2 text-sm transition-colors"
                       >
-                        <Mail className="text-primary/60 group-hover:text-primary h-4 w-4 flex-shrink-0" />
+                        <Mail className="text-primary h-4 w-4 shrink-0" />
                         <span className="truncate group-hover:underline">
                           {assigneEntreprise.emailContact}
                         </span>
@@ -541,11 +599,11 @@ export function TicketDetailsClient({
                 )}
                 {(assigneEntreprise.prenomContact ||
                   assigneEntreprise.nomContact) && (
-                  <div className="mt-3 border-t pt-1">
-                    <p className="text-muted-foreground pt-2 text-xs">
-                      <span className="font-medium">Contact:</span>{" "}
-                      {assigneEntreprise.prenomContact}{" "}
-                      {assigneEntreprise.nomContact}
+                  <div className="border-t pt-3">
+                    <p className="text-xs">
+                      <span className="text-muted-foreground">Contact :</span>{" "}
+                      <span className="font-medium">{assigneEntreprise.prenomContact}{" "}
+                      {assigneEntreprise.nomContact}</span>
                     </p>
                   </div>
                 )}

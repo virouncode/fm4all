@@ -6,17 +6,15 @@ import {
   entreprises,
   serviceEntreprises,
 } from "@/db/schema/entreprises";
-import { userAdhesions } from "@/db/schema/users";
 import {
   clientServiceExecutionPrix,
   clientServiceExecutions,
   clientServiceOccurrences,
-  clientServices,
   tacheListesTemplates,
 } from "@/db/schema/services";
+import { userAdhesions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
-import { siretSchema } from "@/zod-schemas/siret.schema";
 import { getSession } from "@/server/auth/get-session";
 import {
   findEntrepriseBySiret,
@@ -25,16 +23,28 @@ import {
   getPrestatairesForService,
   getSitesCouvertsParPrestataire,
 } from "@/server/queries/clientServiceExecutions.query";
-import { getUserAdhesion } from "@/server/queries/userAdhesions.query";
 import { getPrestationById } from "@/server/queries/clientServices.query";
+import { getUserAdhesion } from "@/server/queries/userAdhesions.query";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
-import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userSiteAttributions.utils";
 import { onClientServiceChanged } from "@/server/utils/clientServiceOccurrences.utils";
-import { insertExecutionFormSchema, updateExecutionFormSchema } from "@/zod-schemas/clientServiceExecutions.schema";
-import { normalizeForSubmit, upper } from "@/zod-helpers/normalize";
+import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userSiteAttributions.utils";
+import { normalizeForSubmit } from "@/zod-helpers/normalize";
+import {
+  createOrLinkPrestataireSchema,
+  deleteExecutionSchema,
+  findEntrepriseBySiretSchema,
+  getClientPrestatairesSchema,
+  getExecutionsSchema,
+  getMesSitesClientsSchema,
+  getPrestatairesForServiceSchema,
+  insertExecutionFormSchema,
+  toggleExecutionActifSchema,
+  updateExecutionAssigneeDefaultSchema,
+  updateExecutionFormSchema,
+  updateExecutionTacheListeSchema,
+} from "@/zod-schemas/clientServiceExecutions.schema";
 import { and, count, eq, lt, ne } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
-import { z } from "zod";
 
 // ==================== HELPERS ====================
 
@@ -81,17 +91,10 @@ async function hasAccessToEntreprise(
 
 export const getPrestatairesForServiceAction = actionClient
   .metadata({ actionName: "getPrestatairesForServiceAction" })
-  .inputSchema(
-    z.object({
-      serviceId: z.string().uuid("ID du service invalide"),
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-      modeCommercial: z.enum(["direct", "intermediaire_fm4all"]),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(getPrestatairesForServiceSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -108,7 +111,8 @@ export const getPrestatairesForServiceAction = actionClient
           eq(userAdhesions.entrepriseId, parsedInput.entrepriseId),
         ),
       });
-      if (!adhesion) throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+      if (!adhesion)
+        throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
     }
 
     // Mode intermédiaire FM4ALL géré par la plateforme → catalogue complet
@@ -129,18 +133,14 @@ export const getPrestatairesForServiceAction = actionClient
 
 export const findEntrepriseBySiretAction = actionClient
   .metadata({ actionName: "findEntrepriseBySiretAction" })
-  .inputSchema(
-    z.object({
-      siret: siretSchema("Le SIRET est invalide"),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(findEntrepriseBySiretSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
-    if (!session?.user) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    if (!session?.user)
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
     // siretSchema formate en "xxx xxx xxx xxxxx" — on normalise en digits purs pour la recherche DB
     const siretRaw = parsedInput.siret.replace(/\s/g, "");
@@ -152,35 +152,32 @@ export const findEntrepriseBySiretAction = actionClient
 
 export const createOrLinkPrestataireAction = actionClient
   .metadata({ actionName: "createOrLinkPrestataireAction" })
-  .inputSchema(
-    z.object({
-      siret: siretSchema("Le SIRET est invalide"),
-      nom: z.string().min(1, "Nom de l'entreprise requis").transform((v) => upper(v)),
-      serviceId: z.string().uuid("ID du service invalide"),
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-      prenomContact: z.string().optional(),
-      nomContact: z.string().optional(),
-      emailContact: z.string().email("Email invalide").optional().or(z.literal("")),
-      phoneContact: z.string().optional(),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(createOrLinkPrestataireSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
     // Vérifier que l'utilisateur a accès à l'entreprise cliente
-    const hasAccess = await hasAccessToEntreprise(currentUser.id, parsedInput.entrepriseId);
+    const hasAccess = await hasAccessToEntreprise(
+      currentUser.id,
+      parsedInput.entrepriseId,
+    );
     if (!hasAccess) {
       throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
     }
 
-    const { nom, serviceId, prenomContact, nomContact, emailContact, phoneContact } =
-      parsedInput;
+    const {
+      nom,
+      serviceId,
+      prenomContact,
+      nomContact,
+      emailContact,
+      phoneContact,
+    } = parsedInput;
     // siretSchema formate en "xxx xxx xxx xxxxx" — on normalise en digits purs pour la DB
     const siret = parsedInput.siret.replace(/\s/g, "");
 
@@ -211,15 +208,29 @@ export const createOrLinkPrestataireAction = actionClient
       // 2. S'assurer que le rôle prestataire existe
       await tx
         .insert(entrepriseRoles)
-        .values({ entrepriseId, role: "prestataire", createdById: currentUser.id, updatedById: currentUser.id })
+        .values({
+          entrepriseId,
+          role: "prestataire",
+          createdById: currentUser.id,
+          updatedById: currentUser.id,
+        })
         .onConflictDoNothing();
 
       // 3. S'assurer que le lien service_entreprises existe (réactiver si inactif)
       const [seRow] = await tx
         .insert(serviceEntreprises)
-        .values({ entrepriseId, serviceId, actif: true, createdById: currentUser.id, updatedById: currentUser.id })
+        .values({
+          entrepriseId,
+          serviceId,
+          actif: true,
+          createdById: currentUser.id,
+          updatedById: currentUser.id,
+        })
         .onConflictDoUpdate({
-          target: [serviceEntreprises.entrepriseId, serviceEntreprises.serviceId],
+          target: [
+            serviceEntreprises.entrepriseId,
+            serviceEntreprises.serviceId,
+          ],
           set: { actif: true, updatedById: currentUser.id },
         })
         .returning({ id: serviceEntreprises.id });
@@ -355,32 +366,33 @@ export const insertExecutionWithPrixAction = actionClient
     });
 
     // Resync : régénère la fenêtre glissante pour assigner l'exécution + snapshot des tâches
-    if (prestation.statut === "actif" && prestation.modePlanning === "planifie") {
-      await onClientServiceChanged({ clientServiceId: prestationId, now: new Date() });
+    if (
+      prestation.statut === "actif" &&
+      prestation.modePlanning === "planifie"
+    ) {
+      await onClientServiceChanged({
+        clientServiceId: prestationId,
+        now: new Date(),
+      });
     }
 
     // Recharger les exécutions mises à jour
     const updatedExecutions =
       await getExecutionsWithPrixByPrestationId(prestationId);
-    return { message: "Prestataire ajouté avec succès.", executions: updatedExecutions };
+    return {
+      message: "Prestataire ajouté avec succès.",
+      executions: updatedExecutions,
+    };
   });
 
 // ==================== TOGGLE EXECUTION ACTIF ====================
 
 export const toggleExecutionActifAction = actionClient
   .metadata({ actionName: "toggleExecutionActifAction" })
-  .inputSchema(
-    z.object({
-      executionId: z.string().uuid("ID de l'exécution invalide"),
-      prestationId: z.string().uuid("ID de la prestation invalide"),
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-      actif: z.boolean(),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(toggleExecutionActifSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -428,14 +440,23 @@ export const toggleExecutionActifAction = actionClient
       .where(eq(clientServiceExecutions.id, executionId));
 
     // Resync : régénère la fenêtre glissante pour assigner l'exécution + snapshot des tâches
-    if (parsedInput.actif && prestation.statut === "actif" && prestation.modePlanning === "planifie") {
-      await onClientServiceChanged({ clientServiceId: prestationId, now: new Date() });
+    if (
+      parsedInput.actif &&
+      prestation.statut === "actif" &&
+      prestation.modePlanning === "planifie"
+    ) {
+      await onClientServiceChanged({
+        clientServiceId: prestationId,
+        now: new Date(),
+      });
     }
 
     const updatedExecutions =
       await getExecutionsWithPrixByPrestationId(prestationId);
     return {
-      message: parsedInput.actif ? "Exécution activée." : "Exécution désactivée.",
+      message: parsedInput.actif
+        ? "Exécution activée."
+        : "Exécution désactivée.",
       executions: updatedExecutions,
     };
   });
@@ -444,17 +465,10 @@ export const toggleExecutionActifAction = actionClient
 
 export const deleteExecutionAction = actionClient
   .metadata({ actionName: "deleteExecutionAction" })
-  .inputSchema(
-    z.object({
-      executionId: z.string().uuid("ID de l'exécution invalide"),
-      prestationId: z.string().uuid("ID de la prestation invalide"),
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(deleteExecutionSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -503,23 +517,20 @@ export const deleteExecutionAction = actionClient
 
     const updatedExecutions =
       await getExecutionsWithPrixByPrestationId(prestationId);
-    return { message: "Prestataire retiré avec succès.", executions: updatedExecutions };
+    return {
+      message: "Prestataire retiré avec succès.",
+      executions: updatedExecutions,
+    };
   });
 
 // ==================== GET EXECUTIONS ====================
 
 export const getExecutionsAction = actionClient
   .metadata({ actionName: "getExecutionsAction" })
-  .inputSchema(
-    z.object({
-      prestationId: z.string().uuid("ID de la prestation invalide"),
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(getExecutionsSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -540,18 +551,10 @@ export const getExecutionsAction = actionClient
 
 export const updateExecutionTacheListeAction = actionClient
   .metadata({ actionName: "updateExecutionTacheListeAction" })
-  .inputSchema(
-    z.object({
-      executionId: z.string().uuid("ID de l'exécution invalide"),
-      prestationId: z.string().uuid("ID de la prestation invalide"),
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-      tacheListeTemplateId: z.string().uuid().nullable(),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(updateExecutionTacheListeSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -698,7 +701,8 @@ export const updateExecutionAction = actionClient
 
     // Mode intermédiaire : uniquement plateforme + modeCommercial=intermediaire_fm4all
     const isIntermedaire =
-      prestation.modeCommercial === "intermediaire_fm4all" && canManage.isPlateforme;
+      prestation.modeCommercial === "intermediaire_fm4all" &&
+      canManage.isPlateforme;
 
     await db.transaction(async (tx) => {
       // 1. Soft-delete toutes les lignes prix actives
@@ -771,12 +775,22 @@ export const updateExecutionAction = actionClient
     });
 
     // Resync : régénère la fenêtre glissante
-    if (prestation.statut === "actif" && prestation.modePlanning === "planifie") {
-      await onClientServiceChanged({ clientServiceId: prestationId, now: new Date() });
+    if (
+      prestation.statut === "actif" &&
+      prestation.modePlanning === "planifie"
+    ) {
+      await onClientServiceChanged({
+        clientServiceId: prestationId,
+        now: new Date(),
+      });
     }
 
-    const updatedExecutions = await getExecutionsWithPrixByPrestationId(prestationId);
-    return { message: "Exécution mise à jour avec succès.", executions: updatedExecutions };
+    const updatedExecutions =
+      await getExecutionsWithPrixByPrestationId(prestationId);
+    return {
+      message: "Exécution mise à jour avec succès.",
+      executions: updatedExecutions,
+    };
   });
 
 // ==================== GET CLIENT PRESTATAIRES ====================
@@ -787,13 +801,10 @@ export const updateExecutionAction = actionClient
  */
 export const getClientPrestatairesAction = actionClient
   .metadata({ actionName: "getClientPrestatairesAction" })
-  .inputSchema(
-    z.object({ clientEntrepriseId: z.uuid() }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(getClientPrestatairesSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -807,7 +818,9 @@ export const getClientPrestatairesAction = actionClient
       throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
     }
 
-    const prestataires = await getClientPrestataires(parsedInput.clientEntrepriseId);
+    const prestataires = await getClientPrestataires(
+      parsedInput.clientEntrepriseId,
+    );
     return { prestataires };
   });
 
@@ -815,7 +828,7 @@ export const getClientPrestatairesAction = actionClient
 
 export const getMesSitesClientsAction = actionClient
   .metadata({ actionName: "getMesSitesClientsAction" })
-  .inputSchema(z.object({ entrepriseId: z.string().uuid() }))
+  .inputSchema(getMesSitesClientsSchema)
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -843,7 +856,9 @@ export const getMesSitesClientsAction = actionClient
       throw errors.forbidden("Cette entreprise n'est pas prestataire.");
     }
 
-    const sites = await getSitesCouvertsParPrestataire(parsedInput.entrepriseId);
+    const sites = await getSitesCouvertsParPrestataire(
+      parsedInput.entrepriseId,
+    );
 
     return { sites };
   });
@@ -852,18 +867,10 @@ export const getMesSitesClientsAction = actionClient
 
 export const updateExecutionAssigneeDefaultAction = actionClient
   .metadata({ actionName: "updateExecutionAssigneeDefaultAction" })
-  .inputSchema(
-    z.object({
-      executionId: z.string().uuid("ID de l'exécution invalide"),
-      prestationId: z.string().uuid("ID de la prestation invalide"),
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-      assigneeUserIdDefault: z.string().uuid().or(z.literal("")).nullable().optional(),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(updateExecutionAssigneeDefaultSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -912,7 +919,10 @@ export const updateExecutionAssigneeDefaultAction = actionClient
         updatedAt: new Date(),
       })
       .where(eq(clientServiceExecutions.id, executionId))
-      .returning({ id: clientServiceExecutions.id, assigneeUserIdDefault: clientServiceExecutions.assigneeUserIdDefault });
+      .returning({
+        id: clientServiceExecutions.id,
+        assigneeUserIdDefault: clientServiceExecutions.assigneeUserIdDefault,
+      });
 
     if (!updated) throw errors.internal("Échec de la mise à jour.");
 

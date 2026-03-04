@@ -212,6 +212,51 @@ export const getPrestationsQuerySchema = z.object({
 });
 export type GetPrestationsQueryType = z.infer<typeof getPrestationsQuerySchema>;
 
+// ==================== ACTION SCHEMAS ====================
+
+// Identifie une prestation dans une entreprise (read / delete)
+export const prestationByIdSchema = z.object({
+  prestationId: z.uuid("ID de la prestation invalide"),
+  entrepriseId: z.uuid("ID de l'entreprise invalide"),
+});
+export type PrestationByIdType = z.infer<typeof prestationByIdSchema>;
+
+// Entrée de périmètre (inclure/exclure un site)
+export const perimetreEntrySchema = z.object({
+  siteId: z.uuid("ID de site invalide"),
+  mode: z.enum(["inclure", "exclure"]),
+  scope: z.enum(["self", "subtree"]),
+});
+export type PerimetreEntryType = z.infer<typeof perimetreEntrySchema>;
+
+// Action INSERT prestation (form + perimetre + entrepriseId)
+export const insertPrestationActionSchema = insertPrestationFormSchema.extend({
+  perimetre: z
+    .array(perimetreEntrySchema)
+    .min(1, "Au moins une entrée de périmètre est requise"),
+});
+export type InsertPrestationActionType = z.infer<
+  typeof insertPrestationActionSchema
+>;
+
+// Action UPDATE prestation (form + entrepriseId)
+export const updatePrestationActionSchema = updatePrestationFormSchema.extend({
+  entrepriseId: z.uuid("ID de l'entreprise invalide"),
+});
+export type UpdatePrestationActionType = z.infer<
+  typeof updatePrestationActionSchema
+>;
+
+// Mise à jour de la checklist par défaut d'une prestation
+export const updateClientServiceTacheListeSchema = z.object({
+  prestationId: z.uuid("ID de la prestation invalide"),
+  entrepriseId: z.uuid("ID de l'entreprise invalide"),
+  tacheListeTemplateId: z.uuid().nullable(),
+});
+export type UpdateClientServiceTacheListeType = z.infer<
+  typeof updateClientServiceTacheListeSchema
+>;
+
 // ==================== JOINED TYPE (pour la liste) ====================
 
 export type PrestationListItem = {

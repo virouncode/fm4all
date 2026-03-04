@@ -13,6 +13,7 @@ import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesi
 import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userSiteAttributions.utils";
 import { and, eq, inArray } from "drizzle-orm";
 import { notFound } from "next/navigation";
+import { z } from "zod";
 import { OccurrenceDetailClient } from "./OccurrenceDetailClient";
 
 /**
@@ -62,7 +63,15 @@ export default async function OccurrenceDetailPage({
   }
   const currentUser = session!.user;
 
-  // 2. Charger la prestation
+  // 2. Valider les UUID avant les queries (évite une erreur DB si les IDs sont invalides)
+  const uuidSchema = z.string().uuid();
+  if (
+    !uuidSchema.safeParse(prestationId).success ||
+    !uuidSchema.safeParse(occurrenceId).success
+  ) {
+    notFound();
+  }
+
   const prestation = await getPrestationWithJoinsById(prestationId);
   if (!prestation) notFound();
 

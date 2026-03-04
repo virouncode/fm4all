@@ -12,6 +12,7 @@ import { getUserAdhesion } from "@/server/queries/userAdhesions.query";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
 import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userSiteAttributions.utils";
 import { notFound } from "next/navigation";
+import { z } from "zod";
 import { PrestationDetailsClient } from "./PrestationDetailsClient";
 
 export default async function PrestationDetailPage({
@@ -33,7 +34,11 @@ export default async function PrestationDetailPage({
   }
   const currentUser = session!.user;
 
-  // 2. Charger la prestation
+  // 2. Valider UUID avant la query (évite une erreur DB si l'ID est invalide)
+  if (!z.string().uuid().safeParse(prestationId).success) {
+    notFound();
+  }
+
   const prestation = await getPrestationWithJoinsById(prestationId);
   if (!prestation) {
     notFound();

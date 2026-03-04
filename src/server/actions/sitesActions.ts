@@ -10,6 +10,7 @@ import { getSession } from "@/server/auth/get-session";
 import {
   getAccessibleSitesByUser,
   getSiteById,
+  getSiteResponsables,
   getSitesByEntrepriseId,
   siteBelongsToEntreprise,
 } from "@/server/queries/sites.query";
@@ -22,17 +23,19 @@ import {
 } from "@/server/utils/sitesArborescence.utils";
 import { resolveUserRightsOnSite } from "@/server/utils/userSiteAttributions.utils";
 import {
+  getAccessibleSitesSchema,
+  getAllSitesForPlatformSchema,
   getSitesQuerySchema,
-  insertSiteSchema,
+  insertSiteActionSchema,
   insertSiteToDbSchema,
   selectSiteSchema,
-  updateSiteSchema,
+  siteByIdSchema,
+  updateSiteActionSchema,
   updateSiteToDbSchema,
 } from "@/zod-schemas/sites.schema";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import { and, eq, inArray } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
-import { z } from "zod";
 
 // ==================== HELPERS ====================
 
@@ -100,12 +103,7 @@ export const getSitesAction = actionClient
 
 export const getSiteByIdAction = actionClient
   .metadata({ actionName: "getSiteByIdAction" })
-  .inputSchema(
-    z.object({
-      siteId: z.uuid("ID du site invalide"),
-      entrepriseId: z.uuid("ID de l'entreprise invalide"),
-    }),
-    {
+  .inputSchema(siteByIdSchema, {
       handleValidationErrorsShape: async (ve) =>
         flattenValidationErrors(ve).fieldErrors,
     },
@@ -138,7 +136,7 @@ export const getSiteByIdAction = actionClient
 
 export const getAllSitesForPlatformAction = actionClient
   .metadata({ actionName: "getAllSitesForPlatformAction" })
-  .inputSchema(z.object({}), {
+  .inputSchema(getAllSitesForPlatformSchema, {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
   })
@@ -170,13 +168,7 @@ export const getAllSitesForPlatformAction = actionClient
 
 export const getAccessibleSitesAction = actionClient
   .metadata({ actionName: "getAccessibleSitesAction" })
-  .inputSchema(
-    z.object({
-      entrepriseId: z.uuid("ID de l'entreprise invalide"),
-      /** Filtre optionnel : ne retourner que les sites où l'utilisateur a ce rôle */
-      filterByRole: z.string().optional(),
-    }),
-    {
+  .inputSchema(getAccessibleSitesSchema, {
       handleValidationErrorsShape: async (ve) =>
         flattenValidationErrors(ve).fieldErrors,
     },
@@ -224,11 +216,7 @@ export const getAccessibleSitesAction = actionClient
 
 export const insertSiteAction = actionClient
   .metadata({ actionName: "insertSiteAction" })
-  .inputSchema(
-    insertSiteSchema.extend({
-      entrepriseId: z.uuid("ID de l'entreprise invalide"),
-    }),
-    {
+  .inputSchema(insertSiteActionSchema, {
       handleValidationErrorsShape: async (ve) =>
         flattenValidationErrors(ve).fieldErrors,
     },
@@ -341,11 +329,7 @@ export const insertSiteAction = actionClient
 
 export const updateSiteAction = actionClient
   .metadata({ actionName: "updateSiteAction" })
-  .inputSchema(
-    updateSiteSchema.extend({
-      entrepriseId: z.uuid("ID de l'entreprise invalide"),
-    }),
-    {
+  .inputSchema(updateSiteActionSchema, {
       handleValidationErrorsShape: async (ve) =>
         flattenValidationErrors(ve).fieldErrors,
     },
@@ -530,12 +514,7 @@ export const updateSiteAction = actionClient
 
 export const archiveSiteAction = actionClient
   .metadata({ actionName: "archiveSiteAction" })
-  .inputSchema(
-    z.object({
-      siteId: z.uuid("ID du site invalide"),
-      entrepriseId: z.uuid("ID de l'entreprise invalide"),
-    }),
-    {
+  .inputSchema(siteByIdSchema, {
       handleValidationErrorsShape: async (ve) =>
         flattenValidationErrors(ve).fieldErrors,
     },
@@ -607,12 +586,7 @@ export const archiveSiteAction = actionClient
 
 export const restoreSiteAction = actionClient
   .metadata({ actionName: "restoreSiteAction" })
-  .inputSchema(
-    z.object({
-      siteId: z.uuid("ID du site invalide"),
-      entrepriseId: z.uuid("ID de l'entreprise invalide"),
-    }),
-    {
+  .inputSchema(siteByIdSchema, {
       handleValidationErrorsShape: async (ve) =>
         flattenValidationErrors(ve).fieldErrors,
     },
@@ -676,12 +650,7 @@ export const restoreSiteAction = actionClient
 
 export const permanentlyDeleteSiteAction = actionClient
   .metadata({ actionName: "permanentlyDeleteSiteAction" })
-  .inputSchema(
-    z.object({
-      siteId: z.uuid("ID du site invalide"),
-      entrepriseId: z.uuid("ID de l'entreprise invalide"),
-    }),
-    {
+  .inputSchema(siteByIdSchema, {
       handleValidationErrorsShape: async (ve) =>
         flattenValidationErrors(ve).fieldErrors,
     },
@@ -746,4 +715,31 @@ export const permanentlyDeleteSiteAction = actionClient
     return {
       message: "Site supprimé définitivement avec succès.",
     };
+  });
+
+// ==================== GET SITE RESPONSABLES ====================
+
+export const getSiteResponsablesAction = actionClient
+  .metadata({ actionName: "getSiteResponsablesAction" })
+  .inputSchema(siteByIdSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+
+    if (!currentUser) {
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    }
+
+    const { siteId, entrepriseId } = parsedInput;
+
+    const belongs = await siteBelongsToEntreprise({ siteId, entrepriseId });
+    if (!belongs) {
+      throw errors.forbidden("Ce site n'appartient pas à cette entreprise.");
+    }
+
+    const responsables = await getSiteResponsables(siteId);
+    return { responsables };
   });

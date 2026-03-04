@@ -2,35 +2,68 @@
 
 import { db } from "@/db";
 import { documents, documentsLinks } from "@/db/schema/documents";
+import { serviceEntreprises } from "@/db/schema/entreprises";
 import {
   clientServiceExecutions,
   clientServiceOccurrences,
   occurrenceTaches,
 } from "@/db/schema/services";
-import { serviceEntreprises } from "@/db/schema/entreprises";
+import { tickets } from "@/db/schema/tickets";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
-import { getPrestationById } from "@/server/queries/clientServices.query";
-import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
-import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userSiteAttributions.utils";
-import { insertPrixAppliquesForOccurrence } from "@/server/utils/clientServiceOccurrences.utils";
 import {
   countFilteredOccurrencesByPrestationId,
   getOccurrencesByPrestationId,
   getOccurrenceWithDetailsById,
 } from "@/server/queries/clientServiceExecutions.query";
+import {
+  getPrestationById,
+  getPrestationWithJoinsById,
+} from "@/server/queries/clientServices.query";
 import { getUserAdhesion } from "@/server/queries/userAdhesions.query";
+import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
 import { getUsersByEntrepriseId } from "@/server/queries/users.query";
 import { promoteS3Key, s3, S3_BUCKET } from "@/server/s3/s3";
-import { tickets } from "@/db/schema/tickets";
-import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { and, asc, count, eq, gte, inArray, isNull, lte, max, or } from "drizzle-orm";
-import { flattenValidationErrors } from "next-safe-action";
 import {
-  occurrenceTransitionStatutSchema,
-} from "@/zod-schemas/enums";
-import { z } from "zod";
+  insertPrixAppliquesForOccurrence,
+  pickExecutionForOccurrence,
+  snapshotOccurrenceTaches,
+} from "@/server/utils/clientServiceOccurrences.utils";
+import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userSiteAttributions.utils";
+import {
+  addTachePieceJointeSchema,
+  deleteAdHocTacheSchema,
+  deleteTachePieceJointeSchema,
+  deployAssignationSchema,
+  getAssignableUsersForOccurrenceSchema,
+  getOccurrencesPageSchema,
+  getOccurrenceTachesSchema,
+  insertAdHocTacheSchema,
+  insertOccurrenceOnDemandFormSchema,
+  occurrenceTicketsSchema,
+  ticketOccurrenceLinkSchema,
+  updateAdHocTacheSchema,
+  updateOccurrenceAssigneeSchema,
+  updateOccurrenceDatesSchema,
+  updateOccurrenceStatutSchema,
+  updateOccurrenceTacheStatutSchema,
+  updateTacheAssigneeSchema,
+} from "@/zod-schemas/clientServiceOccurrences.schema";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import {
+  and,
+  asc,
+  count,
+  eq,
+  gte,
+  inArray,
+  isNull,
+  lte,
+  max,
+  or,
+} from "drizzle-orm";
+import { flattenValidationErrors } from "next-safe-action";
 
 // ==================== HELPERS ====================
 
@@ -81,25 +114,21 @@ const OCCURRENCE_TRANSITIONS: Record<
 
 export const updateOccurrenceStatutAction = actionClient
   .metadata({ actionName: "updateOccurrenceStatutAction" })
-  .inputSchema(
-    z.object({
-      occurrenceId: z.string().uuid("ID de l'occurrence invalide"),
-      prestationId: z.string().uuid("ID de la prestation invalide"),
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-      statut: occurrenceTransitionStatutSchema,
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(updateOccurrenceStatutSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const { occurrenceId, prestationId, entrepriseId, statut: newStatut } =
-      parsedInput;
+    const {
+      occurrenceId,
+      prestationId,
+      entrepriseId,
+      statut: newStatut,
+    } = parsedInput;
 
     // Charger la prestation pour obtenir le siteId + vérifier appartenance
     const prestation = await getPrestationById(prestationId);
@@ -110,7 +139,8 @@ export const updateOccurrenceStatutAction = actionClient
     // Vérifier les permissions selon le type de transition
     // annulee / non_honoree = décision managériale → canManage requis
     // en_cours / terminee   = travail terrain → canInteract suffit
-    const isManagementTransition = newStatut === "annulee" || newStatut === "non_honoree";
+    const isManagementTransition =
+      newStatut === "annulee" || newStatut === "non_honoree";
 
     if (isManagementTransition) {
       const canManage = await canManagePrestation(
@@ -225,31 +255,25 @@ export const updateOccurrenceStatutAction = actionClient
 
 export const getOccurrencesPageAction = actionClient
   .metadata({ actionName: "getOccurrencesPageAction" })
-  .inputSchema(
-    z.object({
-      prestationId: z.string().uuid(),
-      entrepriseId: z.string().uuid(),
-      offset: z.number().int().min(0),
-      limit: z.number().int().min(1).max(100).default(50),
-      statut: z
-        .enum(["planifiee", "en_cours", "terminee", "non_honoree", "annulee"])
-        .optional(),
-      nonAssignedOnly: z.boolean().optional(),
-      siteId: z.string().uuid().optional(),
-      sortDir: z.enum(["asc", "desc"]).optional(),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(getOccurrencesPageSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const { prestationId, entrepriseId, offset, limit, statut, nonAssignedOnly, siteId, sortDir } =
-      parsedInput;
+    const {
+      prestationId,
+      entrepriseId,
+      offset,
+      limit,
+      statut,
+      nonAssignedOnly,
+      siteId,
+      sortDir,
+    } = parsedInput;
 
     // Vérifier l'accès à l'entreprise (plateforme OU adhésion)
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
@@ -289,17 +313,10 @@ export const getOccurrencesPageAction = actionClient
 
 export const getOccurrenceTachesAction = actionClient
   .metadata({ actionName: "getOccurrenceTachesAction" })
-  .inputSchema(
-    z.object({
-      occurrenceId: z.string().uuid("ID de l'occurrence invalide"),
-      prestationId: z.string().uuid("ID de la prestation invalide"),
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(getOccurrenceTachesSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -346,26 +363,22 @@ export const getOccurrenceTachesAction = actionClient
 
 export const updateOccurrenceDatesAction = actionClient
   .metadata({ actionName: "updateOccurrenceDatesAction" })
-  .inputSchema(
-    z.object({
-      occurrenceId: z.string().uuid("ID de l'occurrence invalide"),
-      prestationId: z.string().uuid("ID de la prestation invalide"),
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-      dateDebutPrevue: z.string().nullable(),
-      dateFinPrevue: z.string().nullable(),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(updateOccurrenceDatesSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const { occurrenceId, prestationId, entrepriseId, dateDebutPrevue, dateFinPrevue } =
-      parsedInput;
+    const {
+      occurrenceId,
+      prestationId,
+      entrepriseId,
+      dateDebutPrevue,
+      dateFinPrevue,
+    } = parsedInput;
 
     const prestation = await getPrestationById(prestationId);
     if (!prestation || prestation.entrepriseId !== entrepriseId) {
@@ -384,7 +397,10 @@ export const updateOccurrenceDatesAction = actionClient
     }
 
     const [occurrence] = await db
-      .select({ id: clientServiceOccurrences.id, statut: clientServiceOccurrences.statut })
+      .select({
+        id: clientServiceOccurrences.id,
+        statut: clientServiceOccurrences.statut,
+      })
       .from(clientServiceOccurrences)
       .where(
         and(
@@ -430,7 +446,13 @@ export const updateOccurrenceDatesAction = actionClient
 // Transitions autorisées par statut courant pour les tâches
 const TACHE_TRANSITIONS: Record<
   string,
-  readonly ("en_cours" | "terminee" | "non_honoree" | "non_applicable" | "annulee")[]
+  readonly (
+    | "en_cours"
+    | "terminee"
+    | "non_honoree"
+    | "non_applicable"
+    | "annulee"
+  )[]
 > = {
   a_faire: ["en_cours", "non_applicable", "annulee"],
   en_cours: ["terminee", "non_honoree", "non_applicable", "annulee"],
@@ -438,26 +460,22 @@ const TACHE_TRANSITIONS: Record<
 
 export const updateOccurrenceTacheStatutAction = actionClient
   .metadata({ actionName: "updateOccurrenceTacheStatutAction" })
-  .inputSchema(
-    z.object({
-      tacheId: z.string().uuid("ID de la tâche invalide"),
-      occurrenceId: z.string().uuid("ID de l'occurrence invalide"),
-      prestationId: z.string().uuid("ID de la prestation invalide"),
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-      statut: z.enum(["en_cours", "terminee", "non_honoree", "non_applicable", "annulee"]),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(updateOccurrenceTacheStatutSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const { tacheId, occurrenceId, prestationId, entrepriseId, statut: newStatut } =
-      parsedInput;
+    const {
+      tacheId,
+      occurrenceId,
+      prestationId,
+      entrepriseId,
+      statut: newStatut,
+    } = parsedInput;
 
     // Vérifier permissions selon le type de transition
     // non_honoree / annulee = décision managériale → canManage requis
@@ -467,7 +485,8 @@ export const updateOccurrenceTacheStatutAction = actionClient
       throw errors.notFound("Prestation");
     }
 
-    const isManagementTransition = newStatut === "non_honoree" || newStatut === "annulee";
+    const isManagementTransition =
+      newStatut === "non_honoree" || newStatut === "annulee";
 
     if (isManagementTransition) {
       const canManage = await canManagePrestation(
@@ -565,29 +584,25 @@ export const updateOccurrenceTacheStatutAction = actionClient
 
 export const addTachePieceJointeAction = actionClient
   .metadata({ actionName: "addTachePieceJointeAction" })
-  .inputSchema(
-    z.object({
-      tacheId: z.string().uuid("ID de la tâche invalide"),
-      occurrenceId: z.string().uuid("ID de l'occurrence invalide"),
-      prestationId: z.string().uuid("ID de la prestation invalide"),
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-      storageKey: z.string().min(1, "Clé S3 requise"),
-      filename: z.string().min(1, "Nom de fichier requis"),
-      mimeType: z.string().min(1, "Type MIME requis"),
-      sizeBytes: z.number().int().positive("Taille invalide"),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(addTachePieceJointeSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const { tacheId, occurrenceId, prestationId, entrepriseId, storageKey, filename, mimeType, sizeBytes } =
-      parsedInput;
+    const {
+      tacheId,
+      occurrenceId,
+      prestationId,
+      entrepriseId,
+      storageKey,
+      filename,
+      mimeType,
+      sizeBytes,
+    } = parsedInput;
 
     const prestation = await getPrestationById(prestationId);
     if (!prestation || prestation.entrepriseId !== entrepriseId) {
@@ -632,9 +647,7 @@ export const addTachePieceJointeAction = actionClient
       .where(eq(documentsLinks.occurrenceTacheId, tacheId));
 
     if (nb >= 2) {
-      throw errors.conflict(
-        "Maximum 2 pièces jointes par tâche.",
-      );
+      throw errors.conflict("Maximum 2 pièces jointes par tâche.");
     }
 
     // Transaction : promouvoir la clé S3 + insérer document + lien
@@ -684,27 +697,23 @@ export const addTachePieceJointeAction = actionClient
 
 export const deleteTachePieceJointeAction = actionClient
   .metadata({ actionName: "deleteTachePieceJointeAction" })
-  .inputSchema(
-    z.object({
-      linkId: z.string().uuid("ID du lien invalide"),
-      documentId: z.string().uuid("ID du document invalide"),
-      tacheId: z.string().uuid("ID de la tâche invalide"),
-      occurrenceId: z.string().uuid("ID de l'occurrence invalide"),
-      prestationId: z.string().uuid("ID de la prestation invalide"),
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(deleteTachePieceJointeSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const { linkId, documentId, tacheId, occurrenceId, prestationId, entrepriseId } =
-      parsedInput;
+    const {
+      linkId,
+      documentId,
+      tacheId,
+      occurrenceId,
+      prestationId,
+      entrepriseId,
+    } = parsedInput;
 
     const prestation = await getPrestationById(prestationId);
     if (!prestation || prestation.entrepriseId !== entrepriseId) {
@@ -778,23 +787,18 @@ export const deleteTachePieceJointeAction = actionClient
 
 // ==================== INSERT TACHE AD-HOC ====================
 
-const FINAL_OCCURRENCE_STATUTS = ["terminee", "annulee", "non_honoree"] as const;
+const FINAL_OCCURRENCE_STATUTS = [
+  "terminee",
+  "annulee",
+  "non_honoree",
+] as const;
 
 export const insertAdHocTacheAction = actionClient
   .metadata({ actionName: "insertAdHocTacheAction" })
-  .inputSchema(
-    z.object({
-      occurrenceId: z.string().uuid("ID de l'occurrence invalide"),
-      prestationId: z.string().uuid("ID de la prestation invalide"),
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-      titre: z.string().min(1, "Le titre est obligatoire").max(255),
-      description: z.string().max(1000).optional(),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(insertAdHocTacheSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -821,7 +825,10 @@ export const insertAdHocTacheAction = actionClient
 
     // Charger l'occurrence et vérifier le statut
     const [occurrence] = await db
-      .select({ id: clientServiceOccurrences.id, statut: clientServiceOccurrences.statut })
+      .select({
+        id: clientServiceOccurrences.id,
+        statut: clientServiceOccurrences.statut,
+      })
       .from(clientServiceOccurrences)
       .where(
         and(
@@ -833,7 +840,11 @@ export const insertAdHocTacheAction = actionClient
 
     if (!occurrence) throw errors.notFound("Intervention");
 
-    if (FINAL_OCCURRENCE_STATUTS.includes(occurrence.statut as typeof FINAL_OCCURRENCE_STATUTS[number])) {
+    if (
+      FINAL_OCCURRENCE_STATUTS.includes(
+        occurrence.statut as (typeof FINAL_OCCURRENCE_STATUTS)[number],
+      )
+    ) {
       throw errors.conflict(
         "Impossible d'ajouter une tâche à une intervention terminée, annulée ou non honorée.",
       );
@@ -870,27 +881,23 @@ export const insertAdHocTacheAction = actionClient
 
 export const updateAdHocTacheAction = actionClient
   .metadata({ actionName: "updateAdHocTacheAction" })
-  .inputSchema(
-    z.object({
-      tacheId: z.string().uuid("ID de la tâche invalide"),
-      occurrenceId: z.string().uuid("ID de l'occurrence invalide"),
-      prestationId: z.string().uuid("ID de la prestation invalide"),
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-      titre: z.string().min(1, "Le titre est obligatoire").max(255),
-      description: z.string().max(1000).optional(),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(updateAdHocTacheSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const { tacheId, occurrenceId, prestationId, entrepriseId, titre, description } =
-      parsedInput;
+    const {
+      tacheId,
+      occurrenceId,
+      prestationId,
+      entrepriseId,
+      titre,
+      description,
+    } = parsedInput;
 
     const prestation = await getPrestationById(prestationId);
     if (!prestation || prestation.entrepriseId !== entrepriseId) {
@@ -931,9 +938,7 @@ export const updateAdHocTacheAction = actionClient
 
     // Verrouiller si terminée
     if (tache.statut === "terminee") {
-      throw errors.conflict(
-        "Impossible de modifier une tâche déjà terminée.",
-      );
+      throw errors.conflict("Impossible de modifier une tâche déjà terminée.");
     }
 
     const [updated] = await db
@@ -952,22 +957,111 @@ export const updateAdHocTacheAction = actionClient
     return { tache: updated };
   });
 
+// ==================== DELETE TACHE AD-HOC ====================
+
+export const deleteAdHocTacheAction = actionClient
+  .metadata({ actionName: "deleteAdHocTacheAction" })
+  .inputSchema(deleteAdHocTacheSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const { tacheId, occurrenceId, prestationId, entrepriseId } = parsedInput;
+
+    // 1. Vérifier que la prestation existe et appartient à l'entreprise
+    const prestation = await getPrestationById(prestationId);
+    if (!prestation || prestation.entrepriseId !== entrepriseId) {
+      throw errors.notFound("Prestation");
+    }
+
+    // 2. Permission : gestionnaire ou plateforme uniquement
+    const canManage = await canManagePrestation(
+      currentUser.id,
+      entrepriseId,
+      prestation.siteId,
+    );
+    if (!canManage) {
+      throw errors.forbidden(
+        "Vous devez être responsable de ce site pour supprimer une tâche.",
+      );
+    }
+
+    // 3. Vérifier que la tâche existe et appartient à l'occurrence
+    const [tache] = await db
+      .select({
+        id: occurrenceTaches.id,
+        listeItemId: occurrenceTaches.listeItemId,
+      })
+      .from(occurrenceTaches)
+      .where(
+        and(
+          eq(occurrenceTaches.id, tacheId),
+          eq(occurrenceTaches.occurrenceId, occurrenceId),
+        ),
+      )
+      .limit(1);
+
+    if (!tache) throw errors.notFound("Tâche");
+
+    // 4. Guard : uniquement les tâches ad-hoc
+    if (tache.listeItemId !== null) {
+      throw errors.conflict(
+        "Seules les tâches ad-hoc peuvent être supprimées. Utilisez \"non applicable\" pour les tâches de la checklist.",
+      );
+    }
+
+    // 5. Charger les documents liés (pour cleanup S3 + suppression orphelins)
+    const linkedDocs = await db
+      .select({
+        documentId: documentsLinks.documentId,
+        storageKey: documents.storageKey,
+      })
+      .from(documentsLinks)
+      .innerJoin(documents, eq(documents.id, documentsLinks.documentId))
+      .where(eq(documentsLinks.occurrenceTacheId, tacheId));
+
+    const documentIds = linkedDocs.map((d) => d.documentId);
+    const storageKeys = linkedDocs.map((d) => d.storageKey);
+
+    // 6. Transaction : supprimer la tâche (cascade FK → documentsLinks) + documents orphelins
+    await db.transaction(async (tx) => {
+      // Supprime la tâche (les documentsLinks sont cascade-supprimés par la FK)
+      await tx
+        .delete(occurrenceTaches)
+        .where(eq(occurrenceTaches.id, tacheId));
+
+      // Supprimer les documents orphelins
+      if (documentIds.length > 0) {
+        await tx
+          .delete(documents)
+          .where(inArray(documents.id, documentIds));
+      }
+    });
+
+    // 7. Cleanup S3 best-effort
+    for (const key of storageKeys) {
+      s3.send(
+        new DeleteObjectCommand({ Bucket: S3_BUCKET, Key: key }),
+      ).catch(() => {
+        // Fichiers orphelins nettoyés par tâche de fond
+      });
+    }
+
+    return { tacheId };
+  });
+
 // ==================== UPDATE TACHE ASSIGNEE ====================
 
 export const updateTacheAssigneeAction = actionClient
   .metadata({ actionName: "updateTacheAssigneeAction" })
-  .inputSchema(
-    z.object({
-      tacheId: z.string().uuid("ID de la tâche invalide"),
-      occurrenceId: z.string().uuid("ID de l'occurrence invalide"),
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-      assigneeUserId: z.string().uuid().nullable(),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(updateTacheAssigneeSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -978,7 +1072,10 @@ export const updateTacheAssigneeAction = actionClient
     // Vérifier accès entreprise
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
-      const adhesion = await getUserAdhesion({ userId: currentUser.id, entrepriseId });
+      const adhesion = await getUserAdhesion({
+        userId: currentUser.id,
+        entrepriseId,
+      });
       if (!adhesion) {
         throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
       }
@@ -1009,14 +1106,21 @@ export const updateTacheAssigneeAction = actionClient
     // - Self-assign / self-unassign : canInteract (responsable_site OU intervenant_site)
     // - Assign autre / unassign autre : canManage (responsable_site) uniquement
     const isSelfAssign = assigneeUserId === currentUser.id;
-    const isSelfUnassign = assigneeUserId === null && currentAssigneeUserId === currentUser.id;
+    const isSelfUnassign =
+      assigneeUserId === null && currentAssigneeUserId === currentUser.id;
 
     if (!isSelfAssign && !isSelfUnassign) {
       // Assign/unassign quelqu'un d'autre → responsable du prestataire requis (pas du client)
       if (!prestataireEntrepriseId) {
-        throw errors.conflict("Aucun prestataire n'est assigné à cette intervention.");
+        throw errors.conflict(
+          "Aucun prestataire n'est assigné à cette intervention.",
+        );
       }
-      const canManage = await canManagePrestation(currentUser.id, prestataireEntrepriseId, siteId);
+      const canManage = await canManagePrestation(
+        currentUser.id,
+        prestataireEntrepriseId,
+        siteId,
+      );
       if (!canManage) {
         throw errors.forbidden(
           "Seuls les responsables du prestataire peuvent assigner ou désassigner d'autres utilisateurs.",
@@ -1024,9 +1128,15 @@ export const updateTacheAssigneeAction = actionClient
       }
     } else if (prestataireEntrepriseId) {
       // Self-assign / self-unassign avec prestataire → canInteract dans l'entreprise prestataire
-      const canInteract = await canInteractWithPrestation(currentUser.id, prestataireEntrepriseId, siteId);
+      const canInteract = await canInteractWithPrestation(
+        currentUser.id,
+        prestataireEntrepriseId,
+        siteId,
+      );
       if (!canInteract) {
-        throw errors.forbidden("Vous n'avez pas les droits pour vous assigner sur cette intervention.");
+        throw errors.forbidden(
+          "Vous n'avez pas les droits pour vous assigner sur cette intervention.",
+        );
       }
     } else {
       // Self-unassign sans prestataire → plateforme uniquement (nettoyage)
@@ -1039,7 +1149,9 @@ export const updateTacheAssigneeAction = actionClient
     // Guard : l'assigné doit appartenir à l'entreprise prestataire de l'occurrence
     if (assigneeUserId !== null) {
       if (!prestataireEntrepriseId) {
-        throw errors.conflict("Aucun prestataire n'est assigné à cette intervention.");
+        throw errors.conflict(
+          "Aucun prestataire n'est assigné à cette intervention.",
+        );
       }
       const assigneeAdhesion = await getUserAdhesion({
         userId: assigneeUserId,
@@ -1060,9 +1172,13 @@ export const updateTacheAssigneeAction = actionClient
         updatedAt: new Date(),
       })
       .where(eq(occurrenceTaches.id, tacheId))
-      .returning({ id: occurrenceTaches.id, assigneeUserId: occurrenceTaches.assigneeUserId });
+      .returning({
+        id: occurrenceTaches.id,
+        assigneeUserId: occurrenceTaches.assigneeUserId,
+      });
 
-    if (!updatedTache) throw errors.internal("Échec de la mise à jour de l'assigné.");
+    if (!updatedTache)
+      throw errors.internal("Échec de la mise à jour de l'assigné.");
 
     return { assigneeUserId: updatedTache.assigneeUserId };
   });
@@ -1071,15 +1187,10 @@ export const updateTacheAssigneeAction = actionClient
 
 export const getAssignableUsersForOccurrenceAction = actionClient
   .metadata({ actionName: "getAssignableUsersForOccurrenceAction" })
-  .inputSchema(
-    z.object({
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(getAssignableUsersForOccurrenceSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -1089,7 +1200,10 @@ export const getAssignableUsersForOccurrenceAction = actionClient
 
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
-      const adhesion = await getUserAdhesion({ userId: currentUser.id, entrepriseId });
+      const adhesion = await getUserAdhesion({
+        userId: currentUser.id,
+        entrepriseId,
+      });
       if (!adhesion) {
         throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
       }
@@ -1111,17 +1225,10 @@ export const getAssignableUsersForOccurrenceAction = actionClient
 
 export const linkTicketToOccurrenceAction = actionClient
   .metadata({ actionName: "linkTicketToOccurrenceAction" })
-  .inputSchema(
-    z.object({
-      ticketId: z.string().uuid("ID du ticket invalide"),
-      occurrenceId: z.string().uuid("ID de l'occurrence invalide"),
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(ticketOccurrenceLinkSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -1131,7 +1238,10 @@ export const linkTicketToOccurrenceAction = actionClient
 
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
-      const adhesion = await getUserAdhesion({ userId: currentUser.id, entrepriseId });
+      const adhesion = await getUserAdhesion({
+        userId: currentUser.id,
+        entrepriseId,
+      });
       if (!adhesion) {
         throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
       }
@@ -1139,7 +1249,10 @@ export const linkTicketToOccurrenceAction = actionClient
 
     // Vérifier que le ticket appartient à l'entreprise
     const [ticket] = await db
-      .select({ id: tickets.id, proprietaireEntrepriseId: tickets.proprietaireEntrepriseId })
+      .select({
+        id: tickets.id,
+        proprietaireEntrepriseId: tickets.proprietaireEntrepriseId,
+      })
       .from(tickets)
       .where(eq(tickets.id, ticketId))
       .limit(1);
@@ -1159,24 +1272,18 @@ export const linkTicketToOccurrenceAction = actionClient
       .where(eq(tickets.id, ticketId))
       .returning({ id: tickets.id, occurenceId: tickets.occurenceId });
 
-    if (!updatedTicket) throw errors.internal("Échec de la liaison ticket ↔ occurrence.");
+    if (!updatedTicket)
+      throw errors.internal("Échec de la liaison ticket ↔ occurrence.");
 
     return { ticket: updatedTicket };
   });
 
 export const unlinkTicketFromOccurrenceAction = actionClient
   .metadata({ actionName: "unlinkTicketFromOccurrenceAction" })
-  .inputSchema(
-    z.object({
-      ticketId: z.string().uuid("ID du ticket invalide"),
-      occurrenceId: z.string().uuid("ID de l'occurrence invalide"),
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(ticketOccurrenceLinkSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -1186,7 +1293,10 @@ export const unlinkTicketFromOccurrenceAction = actionClient
 
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
-      const adhesion = await getUserAdhesion({ userId: currentUser.id, entrepriseId });
+      const adhesion = await getUserAdhesion({
+        userId: currentUser.id,
+        entrepriseId,
+      });
       if (!adhesion) {
         throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
       }
@@ -1196,7 +1306,9 @@ export const unlinkTicketFromOccurrenceAction = actionClient
     const [linkedTicket] = await db
       .select({ id: tickets.id })
       .from(tickets)
-      .where(and(eq(tickets.id, ticketId), eq(tickets.occurenceId, occurrenceId)))
+      .where(
+        and(eq(tickets.id, ticketId), eq(tickets.occurenceId, occurrenceId)),
+      )
       .limit(1);
 
     if (!linkedTicket) throw errors.notFound("Ticket lié à cette occurrence");
@@ -1215,16 +1327,10 @@ export const unlinkTicketFromOccurrenceAction = actionClient
 
 export const getAvailableTicketsForLinkingAction = actionClient
   .metadata({ actionName: "getAvailableTicketsForLinkingAction" })
-  .inputSchema(
-    z.object({
-      occurrenceId: z.string().uuid("ID de l'occurrence invalide"),
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(occurrenceTicketsSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -1234,7 +1340,10 @@ export const getAvailableTicketsForLinkingAction = actionClient
 
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
-      const adhesion = await getUserAdhesion({ userId: currentUser.id, entrepriseId });
+      const adhesion = await getUserAdhesion({
+        userId: currentUser.id,
+        entrepriseId,
+      });
       if (!adhesion) {
         throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
       }
@@ -1270,16 +1379,10 @@ export const getAvailableTicketsForLinkingAction = actionClient
 
 export const getTicketsByOccurrenceAction = actionClient
   .metadata({ actionName: "getTicketsByOccurrenceAction" })
-  .inputSchema(
-    z.object({
-      occurrenceId: z.string().uuid("ID de l'occurrence invalide"),
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(occurrenceTicketsSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
@@ -1289,7 +1392,10 @@ export const getTicketsByOccurrenceAction = actionClient
 
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
-      const adhesion = await getUserAdhesion({ userId: currentUser.id, entrepriseId });
+      const adhesion = await getUserAdhesion({
+        userId: currentUser.id,
+        entrepriseId,
+      });
       if (!adhesion) {
         throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
       }
@@ -1315,25 +1421,17 @@ export const getTicketsByOccurrenceAction = actionClient
 
 export const updateOccurrenceAssigneeAction = actionClient
   .metadata({ actionName: "updateOccurrenceAssigneeAction" })
-  .inputSchema(
-    z.object({
-      occurrenceId: z.string().uuid("ID de l'occurrence invalide"),
-      prestationId: z.string().uuid("ID de la prestation invalide"),
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-      assigneeUserId: z.string().uuid().nullable(),
-      applyToTaches: z.boolean().default(false),
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(updateOccurrenceAssigneeSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const { occurrenceId, entrepriseId, assigneeUserId, applyToTaches } = parsedInput;
+    const { occurrenceId, entrepriseId, assigneeUserId, applyToTaches } =
+      parsedInput;
 
     // Charger l'occurrence
     const occurrence = await getOccurrenceWithDetailsById(occurrenceId);
@@ -1343,9 +1441,15 @@ export const updateOccurrenceAssigneeAction = actionClient
 
     // Permission : responsable_site du prestataire OU plateforme
     if (!prestataireEntrepriseId) {
-      throw errors.conflict("Aucun prestataire n'est assigné à cette intervention.");
+      throw errors.conflict(
+        "Aucun prestataire n'est assigné à cette intervention.",
+      );
     }
-    const canManage = await canManagePrestation(currentUser.id, prestataireEntrepriseId, siteId);
+    const canManage = await canManagePrestation(
+      currentUser.id,
+      prestataireEntrepriseId,
+      siteId,
+    );
     if (!canManage) {
       throw errors.forbidden(
         "Seuls les responsables du prestataire peuvent gérer l'assignation de cette intervention.",
@@ -1369,14 +1473,22 @@ export const updateOccurrenceAssigneeAction = actionClient
       // 1. Mettre à jour l'occurrence
       await tx
         .update(clientServiceOccurrences)
-        .set({ assigneeUserId, updatedById: currentUser.id, updatedAt: new Date() })
+        .set({
+          assigneeUserId,
+          updatedById: currentUser.id,
+          updatedAt: new Date(),
+        })
         .where(eq(clientServiceOccurrences.id, occurrenceId));
 
       // 2. Si demandé, propager aux tâches non terminées
       if (applyToTaches) {
         await tx
           .update(occurrenceTaches)
-          .set({ assigneeUserId, updatedById: currentUser.id, updatedAt: new Date() })
+          .set({
+            assigneeUserId,
+            updatedById: currentUser.id,
+            updatedAt: new Date(),
+          })
           .where(
             and(
               eq(occurrenceTaches.occurrenceId, occurrenceId),
@@ -1400,33 +1512,17 @@ export const updateOccurrenceAssigneeAction = actionClient
 
 export const deployAssignationAction = actionClient
   .metadata({ actionName: "deployAssignationAction" })
-  .inputSchema(
-    z.object({
-      executionId: z.string().uuid("ID de l'exécution invalide"),
-      prestationId: z.string().uuid("ID de la prestation invalide"),
-      entrepriseId: z.string().uuid("ID de l'entreprise invalide"),
-      assigneeUserId: z.string().uuid().nullable(),
-      applyToTaches: z.boolean().default(false),
-      dateFrom: z.string().optional(), // ISO date — défaut: now
-      dateTo: z.string().optional(),   // ISO date — défaut: now + 90j
-    }),
-    {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
+  .inputSchema(deployAssignationSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
   .action(async ({ parsedInput }) => {
     const session = await getSession();
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const {
-      executionId,
-      assigneeUserId,
-      applyToTaches,
-      dateFrom,
-      dateTo,
-    } = parsedInput;
+    const { executionId, assigneeUserId, applyToTaches, dateFrom, dateTo } =
+      parsedInput;
 
     // Charger l'exécution pour récupérer siteId + prestataireEntrepriseId
     const [executionRow] = await db
@@ -1458,7 +1554,11 @@ export const deployAssignationAction = actionClient
     const { siteId } = executionRow;
 
     // Permission : responsable_site du prestataire OU plateforme
-    const canManage = await canManagePrestation(currentUser.id, prestataireEntrepriseId, siteId);
+    const canManage = await canManagePrestation(
+      currentUser.id,
+      prestataireEntrepriseId,
+      siteId,
+    );
     if (!canManage) {
       throw errors.forbidden(
         "Seuls les responsables du prestataire peuvent déployer une assignation.",
@@ -1480,7 +1580,9 @@ export const deployAssignationAction = actionClient
 
     const now = new Date();
     const from = dateFrom ? new Date(dateFrom) : now;
-    const to = dateTo ? new Date(dateTo) : new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
+    const to = dateTo
+      ? new Date(dateTo)
+      : new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
 
     // Récupérer les occurrences ciblées (planifiée ou en_cours dans la fenêtre)
     const targetOccurrences = await db
@@ -1510,14 +1612,22 @@ export const deployAssignationAction = actionClient
       // 1. Mettre à jour toutes les occurrences
       await tx
         .update(clientServiceOccurrences)
-        .set({ assigneeUserId, updatedById: currentUser.id, updatedAt: new Date() })
+        .set({
+          assigneeUserId,
+          updatedById: currentUser.id,
+          updatedAt: new Date(),
+        })
         .where(inArray(clientServiceOccurrences.id, occurrenceIds));
 
       // 2. Si demandé, propager aux tâches non terminées de ces occurrences
       if (applyToTaches) {
         const result = await tx
           .update(occurrenceTaches)
-          .set({ assigneeUserId, updatedById: currentUser.id, updatedAt: new Date() })
+          .set({
+            assigneeUserId,
+            updatedById: currentUser.id,
+            updatedAt: new Date(),
+          })
           .where(
             and(
               inArray(occurrenceTaches.occurrenceId, occurrenceIds),
@@ -1536,4 +1646,109 @@ export const deployAssignationAction = actionClient
       updatedOccurrencesCount: occurrenceIds.length,
       updatedTachesCount,
     };
+  });
+
+// ==================== INSERT OCCURRENCE ON-DEMAND ====================
+
+export const insertOccurrenceOnDemandAction = actionClient
+  .metadata({ actionName: "insertOccurrenceOnDemandAction" })
+  .inputSchema(insertOccurrenceOnDemandFormSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
+
+    const { prestationId, entrepriseId, dateDebutPrevue, dateFinPrevue, notes } =
+      parsedInput;
+
+    // 1. Vérifier que la prestation existe et appartient à l'entreprise
+    // getPrestationWithJoinsById inclut siteNom nécessaire pour le retour OccurrenceListItem
+    const prestation = await getPrestationWithJoinsById(prestationId);
+    if (!prestation || prestation.entrepriseId !== entrepriseId) {
+      throw errors.notFound("Prestation");
+    }
+    if (prestation.statut !== "actif") {
+      throw errors.conflict(
+        "Impossible de créer un passage sur une prestation qui n'est pas active.",
+      );
+    }
+
+    // 2. Permissions : gestionnaire ou plateforme uniquement
+    const canManage = await canManagePrestation(
+      currentUser.id,
+      entrepriseId,
+      prestation.siteId,
+    );
+    if (!canManage) {
+      throw errors.forbidden(
+        "Vous devez être responsable de ce site pour créer un passage.",
+      );
+    }
+
+    // 3. Parser les dates
+    const dateDebut = new Date(dateDebutPrevue);
+    const dateFin = dateFinPrevue ? new Date(dateFinPrevue) : null;
+
+    // 4. Trouver l'exécution applicable (peut être null si aucune active)
+    const executionId = await pickExecutionForOccurrence({
+      clientServiceId: prestationId,
+      entrepriseId,
+      siteId: prestation.siteId,
+      targetDate: dateDebut,
+    });
+
+    // 5. Insérer l'occurrence (+ snapshot tâches si template) dans une transaction
+    const occurrence = await db.transaction(async (tx) => {
+      const [inserted] = await tx
+        .insert(clientServiceOccurrences)
+        .values({
+          clientServiceId: prestationId,
+          siteId: prestation.siteId,
+          dateDebutPrevue: dateDebut,
+          dateFinPrevue: dateFin,
+          executionId,
+          statut: "planifiee",
+          notes: notes ?? null,
+          createdById: currentUser.id,
+          updatedById: currentUser.id,
+        })
+        .returning();
+
+      if (!inserted) throw errors.internal("Échec de la création du passage.");
+
+      if (prestation.tacheListeTemplateId) {
+        await snapshotOccurrenceTaches({
+          occurrenceId: inserted.id,
+          tacheListeTemplateId: prestation.tacheListeTemplateId,
+          tx,
+        });
+      }
+
+      return inserted;
+    });
+
+    // 6. Construire le retour au format OccurrenceListItem
+    // (siteNom provient de la prestation déjà chargée — pas de query supplémentaire)
+    const occurrenceListItem = {
+      id: occurrence.id,
+      clientServiceId: occurrence.clientServiceId,
+      siteId: occurrence.siteId,
+      siteNom: prestation.siteNom,
+      executionId: occurrence.executionId,
+      dateDebutPrevue: occurrence.dateDebutPrevue,
+      dateFinPrevue: occurrence.dateFinPrevue,
+      dateDebutReelle: occurrence.dateDebutReelle,
+      dateFinReelle: occurrence.dateFinReelle,
+      statut: occurrence.statut,
+      notes: occurrence.notes,
+      createdAt: occurrence.createdAt,
+      assigneeUserId: occurrence.assigneeUserId,
+      assigneePrenom: null as string | null,
+      assigneeNom: null as string | null,
+    };
+
+    return { occurrence: occurrenceListItem };
   });
