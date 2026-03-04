@@ -15,7 +15,7 @@ import {
   MapPin,
   Pencil,
   Phone,
-  Shield,
+  Tags,
   User,
   Wrench,
 } from "lucide-react";
@@ -306,7 +306,7 @@ export function EntrepriseDetailsClient({
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-base font-medium">
-                <Shield className="text-primary h-4 w-4" />
+                <Tags className="text-primary h-4 w-4" />
                 Rôles
               </CardTitle>
               {canEdit && (

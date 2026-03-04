@@ -12,6 +12,7 @@
 3. [Gestion des sites](#3-gestion-des-sites)
 4. [Module Tickets](#4-module-tickets)
 5. [Module Prestations](#5-module-prestations)
+6. [Module Entreprises](#6-module-entreprises)
 
 ---
 
@@ -495,6 +496,131 @@ Tâche (assignation spécifique à une tâche)
 
 ---
 
+## 6. Module Entreprises
+
+### 6.1 Qu'est-ce qu'une entreprise dans FM4ALL ?
+
+Une **entreprise** est l'entité centrale du modèle : elle regroupe des utilisateurs, des sites et des prestations. Une même entreprise peut endosser simultanément plusieurs rôles sur la plateforme.
+
+> **Double casquette** : une entreprise peut être à la fois **cliente** (elle commande des prestations) et **prestataire** (elle en réalise). Elle peut également être la plateforme FM4ALL elle-même.
+
+### 6.2 Rôles d'une entreprise
+
+| Rôle | Description | Qui peut l'attribuer |
+|------|-------------|---------------------|
+| **Client** | L'entreprise commande des prestations FM | FM4ALL uniquement |
+| **Prestataire** | L'entreprise réalise des prestations FM | FM4ALL uniquement |
+| **Plateforme** | Rôle réservé à FM4ALL — non attribuable via l'interface | En base de données uniquement |
+
+**Règle d'obligation** : toute entreprise doit avoir **au moins un rôle** à tout moment. Il est impossible de retirer le dernier rôle d'une entreprise.
+
+**Garde-fous sur le retrait de rôle** :
+- Le rôle **Client** ne peut pas être retiré si l'entreprise possède des **prestations actives** (`clientServices`)
+- Le rôle **Prestataire** (ou un service associé) ne peut pas être retiré si l'entreprise est **référencée comme exécutante** dans des prestations (`clientServiceExecutions`)
+
+### 6.3 Informations d'une entreprise
+
+**Champs obligatoires** :
+
+| Champ | Description |
+|-------|-------------|
+| Nom | Raison sociale de l'entreprise (majuscules recommandées) |
+| SIRET | 14 chiffres — identifiant unique légal |
+
+**Champs optionnels** :
+
+| Champ | Description |
+|-------|-------------|
+| Prénom du contact | Prénom du contact principal |
+| Nom du contact | Nom du contact principal |
+| Email du contact | Adresse email du contact |
+| Téléphone du contact | Numéro de téléphone du contact |
+| Logo | Image (PNG, JPG) représentant l'entreprise |
+
+### 6.4 Services proposés (prestataires uniquement)
+
+Lorsqu'une entreprise a le rôle **Prestataire**, elle doit renseigner les **services FM qu'elle propose** parmi le catalogue FM4ALL (nettoyage, maintenance, café, etc.).
+
+**Règle** : un prestataire doit toujours avoir **au moins un service** sélectionné. Il est impossible d'enregistrer ou de maintenir un prestataire sans service associé.
+
+Si l'entreprise perd son rôle Prestataire, la liste de ses services est automatiquement vidée.
+
+### 6.5 Création d'une entreprise (processus multi-étapes)
+
+La création d'une entreprise se fait en **2 étapes** :
+
+#### Étape 1 — Informations entreprise
+
+1. **Nom** et **SIRET** de l'entreprise (obligatoires)
+2. Coordonnées du **contact principal** (optionnel)
+3. **Rôle(s)** de l'entreprise (au moins un)
+4. **Services proposés** si le rôle Prestataire est sélectionné (au moins un)
+
+> **Raccourci** : il est possible de pré-remplir le formulaire à partir d'un **prospect existant** dans le système. Les champs correspondants (nom, SIRET, contact) sont remplis automatiquement.
+
+#### Étape 2 — Administrateur principal
+
+Un compte utilisateur **administrateur** est obligatoirement créé en même temps que l'entreprise. Cet utilisateur sera le premier à pouvoir se connecter et gérer l'entreprise.
+
+| Champ | Obligatoire |
+|-------|:-----------:|
+| Prénom | ✅ |
+| Nom | ✅ |
+| Email | ✅ |
+| Téléphone | ❌ |
+
+> Les champs de l'étape 2 sont **pré-remplis automatiquement** avec les informations de contact saisies à l'étape 1 si elles existent, afin d'éviter la double saisie.
+
+Lors de la validation, un **email d'activation** est automatiquement envoyé à l'administrateur pour qu'il définisse son mot de passe.
+
+### 6.6 Logo de l'entreprise
+
+Un logo peut être uploadé et associé à chaque entreprise. Le logo est affiché :
+- Dans la liste des entreprises (vue grille et tableau)
+- Sur la page de détail de l'entreprise
+- Dans la page "Mon Entreprise"
+
+**Modification du logo** : depuis la page de détail, un clic sur l'avatar de l'entreprise ouvre le formulaire de modification du logo (réservé aux administrateurs).
+
+**Suppression du logo** : il est possible de supprimer le logo existant sans en téléverser un nouveau.
+
+### 6.7 Page "Mon Entreprise"
+
+Accessible depuis la navigation latérale pour toutes les postures (client, prestataire, plateforme), cette page affiche les informations de l'entreprise à laquelle l'utilisateur connecté appartient.
+
+**Accès en lecture** : tous les utilisateurs de l'entreprise peuvent consulter la page.
+
+**Accès en modification** : réservé aux utilisateurs ayant le rôle **Administrateur** au sein de l'entreprise.
+
+Les modifications disponibles sont identiques à celles de la page de détail entreprise (FM4ALL) :
+- Informations (nom, SIRET)
+- Contact principal
+- Rôles et services
+- Logo
+
+### 6.8 Qui peut accéder au module Entreprises
+
+Le module complet (liste, création, gestion) est **réservé à la posture Plateforme (FM4ALL)**.
+
+| Action | FM4ALL (Plateforme) | Client / Prestataire |
+|--------|:-:|:-:|
+| Lister toutes les entreprises | ✅ | ❌ |
+| Créer une entreprise | ✅ | ❌ |
+| Voir le détail d'une entreprise | ✅ | ❌ (sauf "Mon Entreprise") |
+| Modifier les infos / contact | ✅ | ✅ (admin, via "Mon Entreprise") |
+| Modifier les rôles et services | ✅ | ✅ (admin, via "Mon Entreprise") |
+| Modifier le logo | ✅ | ✅ (admin, via "Mon Entreprise") |
+
+### 6.9 Navigation selon la posture
+
+| Posture | Accès entreprises |
+|---------|------------------|
+| **Plateforme** | Section "Réseau" → "Entreprises" (liste complète) + "Mon Entreprise" |
+| **Client** | Section "Équipe" → "Mon Entreprise" uniquement |
+| **Prestataire** | Section "Paramètres" → "Mon Entreprise" uniquement |
+
+---
+
 ## Annexe — Récapitulatif des statuts
 
 ### Statuts des comptes utilisateurs
@@ -550,4 +676,4 @@ Tâche (assignation spécifique à une tâche)
 
 ---
 
-*Document généré le 2026-03-03 — FM4ALL*
+*Document mis à jour le 2026-03-04 — FM4ALL*

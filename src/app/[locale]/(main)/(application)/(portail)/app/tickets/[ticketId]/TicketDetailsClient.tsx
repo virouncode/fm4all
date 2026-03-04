@@ -13,10 +13,11 @@ import { Separator } from "@/components/ui/separator";
 import { Link, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { getPresignedReadUrlAction } from "@/server/actions/s3Actions";
+import { type SiteResponsable } from "@/server/queries/sites.query";
 import { EntrepriseSelectType } from "@/zod-schemas/entreprise.schema";
+import { type TicketMessageVisibiliteType } from "@/zod-schemas/enums";
 import { SelectSiteType } from "@/zod-schemas/sites.schema";
 import { SelectTicketType } from "@/zod-schemas/ticket.schema";
-import { type SiteResponsable } from "@/server/queries/sites.query";
 import {
   ArrowLeft,
   Building2,
@@ -25,7 +26,6 @@ import {
   Download,
   File,
   FileText,
-  Home,
   LandPlot,
   Mail,
   MapPin,
@@ -48,16 +48,15 @@ import {
   getTicketStatutBadge,
   getTicketTypeLabel,
 } from "../helpers";
-import { EditablePrioriteBadge } from "./EditablePrioriteBadge";
-import { EditableStatutBadge } from "./EditableStatutBadge";
-import { EditableTypeBadge } from "./EditableTypeBadge";
-import { EditDescriptionDialog } from "./EditDescriptionDialog";
-import { EditableTitre } from "./EditableTitre";
 import { EditableAssigneEntreprise } from "./EditableAssigneEntreprise";
 import { EditableAssigneUser } from "./EditableAssigneUser";
+import { EditablePrioriteBadge } from "./EditablePrioriteBadge";
+import { EditableStatutBadge } from "./EditableStatutBadge";
+import { EditableTitre } from "./EditableTitre";
+import { EditableTypeBadge } from "./EditableTypeBadge";
 import { EditAttachmentsDialog } from "./EditAttachmentsDialog";
+import { EditDescriptionDialog } from "./EditDescriptionDialog";
 import { TicketMessagesSection } from "./TicketMessagesSection";
-import { type TicketMessageVisibiliteType } from "@/zod-schemas/enums";
 
 type DocumentMinimal = {
   id: string;
@@ -387,7 +386,7 @@ export function TicketDetailsClient({
                   {/* Gauche : infos du site */}
                   <div className="flex-1 space-y-3">
                     <div className="flex items-start gap-2 text-sm">
-                      <Home className="text-primary mt-0.5 h-4 w-4 flex-shrink-0" />
+                      <MapPin className="text-primary mt-0.5 h-4 w-4 flex-shrink-0" />
                       <a
                         href={`https://maps.google.com/?q=${encodeURIComponent(`${site.adresseLigne1}${site.adresseLigne2 ? ` ${site.adresseLigne2}` : ""}, ${site.codePostal} ${site.ville}`)}`}
                         target="_blank"
@@ -602,8 +601,10 @@ export function TicketDetailsClient({
                   <div className="border-t pt-3">
                     <p className="text-xs">
                       <span className="text-muted-foreground">Contact :</span>{" "}
-                      <span className="font-medium">{assigneEntreprise.prenomContact}{" "}
-                      {assigneEntreprise.nomContact}</span>
+                      <span className="font-medium">
+                        {assigneEntreprise.prenomContact}{" "}
+                        {assigneEntreprise.nomContact}
+                      </span>
                     </p>
                   </div>
                 )}
