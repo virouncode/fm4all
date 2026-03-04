@@ -2,19 +2,27 @@
 
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   getSiteResponsablesAction,
   getSitesAction,
 } from "@/server/actions/sitesActions";
 import { getUserSiteAttributionsAction } from "@/server/actions/userSiteAttributionsActions";
 import { useAppStore } from "@/stores/application/appStore";
 import { SelectSiteType, SiteTreeNode } from "@/zod-schemas/sites.schema";
-import { Network, Plus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Filter, Network, Plus } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import type { SiteResponsable } from "@/server/queries/sites.query";
+import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { buildSiteTree, getPathToRoot } from "./helpers";
 import { SiteDetails } from "./SiteDetails";
 import { SiteFormDialog } from "./SiteFormDialog";
+import { SitesFiltersForm } from "./SitesFiltersForm";
 import { SitesTree } from "./SitesTree";
 
 export function SitesClient() {
@@ -24,6 +32,7 @@ export function SitesClient() {
   const currentUserPlateformeRole = useAppStore(
     (state) => state.rolePlateformeAdhesion,
   );
+  const searchParams = useSearchParams();
 
   // Seuls les platform super admins et admins peuvent créer des sites racines
   const canCreateRoot =
@@ -34,6 +43,7 @@ export function SitesClient() {
   const [tree, setTree] = useState<SiteTreeNode[]>([]);
   const [selectedSiteId, setSelectedSiteId] = useState<string | null>(null);
   const [formDialogOpen, setFormDialogOpen] = useState(false);
+  const [filterDialogOpen, setFilterDialogOpen] = useState(false);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
   const [parentIdForCreate, setParentIdForCreate] = useState<string | null>(
     null,
@@ -47,6 +57,117 @@ export function SitesClient() {
     [],
   );
   const [loadingResponsables, setLoadingResponsables] = useState(false);
+
+  // Extract filter params from URL
+  const nomFilter = searchParams.get("nom") || undefined;
+  const villeFilter = searchParams.get("ville") || undefined;
+  const typeBatimentFilter = searchParams.get("typeBatiment") || undefined;
+  const typeOccupationFilter = searchParams.get("typeOccupation") || undefined;
+  const surfaceMinFilter = searchParams.get("surfaceMin") || undefined;
+  const surfaceMaxFilter = searchParams.get("surfaceMax") || undefined;
+  const effectifMinFilter = searchParams.get("effectifMin") || undefined;
+  const effectifMaxFilter = searchParams.get("effectifMax") || undefined;
+
+  const hasActiveFilters = !!(
+    nomFilter ||
+    villeFilter ||
+    (typeBatimentFilter && typeBatimentFilter !== "all") ||
+    (typeOccupationFilter && typeOccupationFilter !== "all") ||
+    surfaceMinFilter ||
+    surfaceMaxFilter ||
+    effectifMinFilter ||
+    effectifMaxFilter
+  );
+
+  const activeFilterCount = [
+    nomFilter,
+    villeFilter,
+    typeBatimentFilter && typeBatimentFilter !== "all",
+    typeOccupationFilter && typeOccupationFilter !== "all",
+    surfaceMinFilter,
+    surfaceMaxFilter,
+    effectifMinFilter,
+    effectifMaxFilter,
+  ].filter(Boolean).length;
+
+  // Client-side filtering : sites correspondant aux critères + leurs ancêtres
+  const filteredSites = useMemo(() => {
+    if (!hasActiveFilters) return sites;
+
+    const matchingIds = new Set(
+      sites
+        .filter((site) => {
+          if (
+            nomFilter &&
+            !site.nom.toLowerCase().includes(nomFilter.toLowerCase())
+          )
+            return false;
+          if (
+            villeFilter &&
+            !site.ville.toLowerCase().includes(villeFilter.toLowerCase())
+          )
+            return false;
+          if (
+            typeBatimentFilter &&
+            typeBatimentFilter !== "all" &&
+            site.typeBatiment !== typeBatimentFilter
+          )
+            return false;
+          if (
+            typeOccupationFilter &&
+            typeOccupationFilter !== "all" &&
+            site.typeOccupation !== typeOccupationFilter
+          )
+            return false;
+          if (surfaceMinFilter && site.surface < Number(surfaceMinFilter))
+            return false;
+          if (surfaceMaxFilter && site.surface > Number(surfaceMaxFilter))
+            return false;
+          if (effectifMinFilter && site.effectif < Number(effectifMinFilter))
+            return false;
+          if (effectifMaxFilter && site.effectif > Number(effectifMaxFilter))
+            return false;
+          return true;
+        })
+        .map((s) => s.id),
+    );
+
+    // Inclure les ancêtres des sites correspondants (pour préserver le contexte de l'arbre)
+    const includedIds = new Set(matchingIds);
+    const siteMap = new Map(sites.map((s) => [s.id, s]));
+    for (const id of matchingIds) {
+      let current = siteMap.get(id);
+      while (current?.parentId) {
+        includedIds.add(current.parentId);
+        current = siteMap.get(current.parentId);
+      }
+    }
+
+    return sites.filter((s) => includedIds.has(s.id));
+  }, [
+    sites,
+    hasActiveFilters,
+    nomFilter,
+    villeFilter,
+    typeBatimentFilter,
+    typeOccupationFilter,
+    surfaceMinFilter,
+    surfaceMaxFilter,
+    effectifMinFilter,
+    effectifMaxFilter,
+  ]);
+
+  const filteredTree = useMemo(
+    () => buildSiteTree(filteredSites),
+    [filteredSites],
+  );
+
+  // Réinitialiser la sélection si le site sélectionné disparaît des résultats filtrés
+  useEffect(() => {
+    if (selectedSiteId && !filteredSites.some((s) => s.id === selectedSiteId)) {
+      setSelectedSiteId(filteredSites.length > 0 ? filteredSites[0].id : null);
+    }
+  }, [filteredSites, selectedSiteId]);
 
   // Load sites and user attributions
   useEffect(() => {
@@ -228,27 +349,45 @@ export function SitesClient() {
             <h2 className="text-xl font-semibold">Organisation des sites</h2>
           </div>
 
-          {canCreateRoot && (
-            <Button onClick={handleCreateRoot} size="sm">
-              <Plus className="h-4 w-4" />
-              Site racine
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setFilterDialogOpen(true)}
+              size="sm"
+              variant="outline"
+            >
+              <Filter className="h-4 w-4" />
+              Filtrer
+              {hasActiveFilters && (
+                <span className="bg-primary text-primary-foreground ml-1 rounded-full px-1.5 text-xs">
+                  {activeFilterCount}
+                </span>
+              )}
             </Button>
-          )}
+            {canCreateRoot && (
+              <Button onClick={handleCreateRoot} size="sm">
+                <Plus className="h-4 w-4" />
+                Site racine
+              </Button>
+            )}
+          </div>
         </div>
-        <SitesTree
-          tree={tree}
-          selectedSiteId={selectedSiteId}
-          onSelectSite={handleSiteSelect}
-          onCreateChild={handleCreateChild}
-          expandedNodes={expandedNodes}
-          onToggleExpand={handleToggleExpand}
-          currentUserRole={currentUserRole}
-          currentUserPlateformeRole={currentUserPlateformeRole}
-          responsableSiteIds={responsableSiteIds}
-        />
+        <div className="max-h-[55vh] overflow-y-auto">
+          <SitesTree
+            tree={filteredTree}
+            selectedSiteId={selectedSiteId}
+            onSelectSite={handleSiteSelect}
+            onCreateChild={handleCreateChild}
+            expandedNodes={expandedNodes}
+            onToggleExpand={handleToggleExpand}
+            currentUserRole={currentUserRole}
+            currentUserPlateformeRole={currentUserPlateformeRole}
+            responsableSiteIds={responsableSiteIds}
+            hasActiveFilters={hasActiveFilters}
+          />
+        </div>
       </div>
 
-      {/* Details Section */}
+      {/* Details Section — hauteur naturelle, pas de scroll interne */}
       {selectedSite && (
         <div className="rounded-lg border p-6">
           <SiteDetails
@@ -269,6 +408,21 @@ export function SitesClient() {
           Sélectionnez un site dans l&apos;arborescence pour voir ses détails
         </div>
       )}
+
+      {/* Filters Dialog */}
+      <Dialog open={filterDialogOpen} onOpenChange={setFilterDialogOpen}>
+        <DialogContent className="!w-2/3 !max-w-none">
+          <DialogHeader>
+            <DialogTitle>
+              <div className="flex items-center gap-2">
+                <Filter className="text-primary size-6" />
+                <h3 className="text-xl font-semibold">Filtrer les sites</h3>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          <SitesFiltersForm />
+        </DialogContent>
+      </Dialog>
 
       {/* Form Dialog */}
       <SiteFormDialog

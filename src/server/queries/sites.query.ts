@@ -1,12 +1,12 @@
 import { db } from "@/db";
 import { user } from "@/db/schema/auth";
-import { sites } from "@/db/schema/sites";
+import { sites, sitesArborescence } from "@/db/schema/sites";
 import { userSiteAttributions } from "@/db/schema/users";
 import {
   selectSiteSchema,
   type SelectSiteType,
 } from "@/zod-schemas/sites.schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import "server-only";
 
 export type SiteResponsable = {
@@ -72,12 +72,13 @@ export async function getSiteById(
 
 /**
  * GET RESPONSABLES OF A SITE (role = "responsable_site", mode = "inclure")
+ * Inclut les attributions directes ET les attributions avec scope "subtree" sur les sites ancêtres.
  */
 export async function getSiteResponsables(
   siteId: string,
 ): Promise<SiteResponsable[]> {
   const rows = await db
-    .select({
+    .selectDistinct({
       id: user.id,
       prenom: user.prenom,
       nom: user.nom,
@@ -86,11 +87,23 @@ export async function getSiteResponsables(
     })
     .from(userSiteAttributions)
     .innerJoin(user, eq(userSiteAttributions.userId, user.id))
+    .innerJoin(
+      sitesArborescence,
+      and(
+        eq(sitesArborescence.ancetreId, userSiteAttributions.siteId),
+        eq(sitesArborescence.descendantId, siteId),
+      ),
+    )
     .where(
       and(
-        eq(userSiteAttributions.siteId, siteId),
         eq(userSiteAttributions.role, "responsable_site"),
         eq(userSiteAttributions.mode, "inclure"),
+        or(
+          // Attribution directe sur ce site exact (profondeur 0 = self-reference)
+          eq(sitesArborescence.profondeur, 0),
+          // Attribution sur un site ancêtre avec scope "subtree"
+          eq(userSiteAttributions.scope, "subtree"),
+        ),
       ),
     );
 

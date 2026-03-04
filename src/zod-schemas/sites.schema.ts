@@ -82,8 +82,8 @@ export const insertSiteFormSchema = z.object({
   surface: z
     .string()
     .refine(
-      (v) => !isNaN(Number(v)) && Number(v) >= 50 && Number(v) <= 3000,
-      "La surface doit être un nombre compris entre 50 et 3000 m²",
+      (v) => !isNaN(Number(v)) && Number(v) >= 1 && Number(v) <= 3000,
+      "La surface doit être un nombre compris entre 1 et 3000 m²",
     ),
   effectif: z
     .string()
@@ -141,6 +141,23 @@ export const updateSiteActionSchema = updateSiteSchema.extend({
   entrepriseId: z.uuid("ID de l'entreprise invalide"),
 });
 export type UpdateSiteActionType = z.infer<typeof updateSiteActionSchema>;
+
+// ==================== FILTER SCHEMAS ====================
+
+export const sitesQueryFrontendSchema = z
+  .object({
+    nom: z.string().optional(),
+    ville: z.string().optional(),
+    typeBatiment: z.string().optional(),
+    typeOccupation: z.string().optional(),
+    surfaceMin: z.string().optional(),
+    surfaceMax: z.string().optional(),
+    effectifMin: z.string().optional(),
+    effectifMax: z.string().optional(),
+  })
+  .partial();
+
+export type SitesQueryFrontendType = z.infer<typeof sitesQueryFrontendSchema>;
 
 // ==================== TREE TYPES ====================
 

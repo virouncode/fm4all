@@ -13,7 +13,6 @@ import { SelectSiteType } from "@/zod-schemas/sites.schema";
 import { RoleAdhesionType } from "@/zod-schemas/userAdhesion.schema";
 import { RolePlateformeAdhesionType } from "@/zod-schemas/userPlateformeAdhesion.schema";
 import {
-  Building,
   Building2,
   Calendar,
   House,
@@ -75,7 +74,7 @@ export function SiteDetails({
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <Building className="text-primary h-6 w-6" />
+            <MapPin className="text-primary h-6 w-6" />
             <h2 className="text-xl font-bold">{site.nom}</h2>
             <Badge
               variant="outline"
@@ -113,7 +112,7 @@ export function SiteDetails({
       {/* Details */}
       <div className="flex items-stretch gap-4">
         {/* Gauche : infos du site */}
-        <div className="flex-1 flex flex-col gap-3">
+        <div className="flex flex-1 flex-col gap-3">
           {/* Adresse */}
           <div className="flex items-start gap-2">
             <MapPin className="text-primary mt-0.5 size-4 shrink-0" />

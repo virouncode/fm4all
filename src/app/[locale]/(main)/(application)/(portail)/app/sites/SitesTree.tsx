@@ -18,6 +18,7 @@ type SitesTreeProps = {
   currentUserRole: RoleAdhesionType | null;
   currentUserPlateformeRole: RolePlateformeAdhesionType | null;
   responsableSiteIds: Set<string>;
+  hasActiveFilters?: boolean;
 }
 
 export function SitesTree({
@@ -30,12 +31,15 @@ export function SitesTree({
   currentUserRole,
   currentUserPlateformeRole,
   responsableSiteIds,
+  hasActiveFilters = false,
 }: SitesTreeProps) {
   return (
     <div className="space-y-1">
       {tree.length === 0 && (
         <div className="text-muted-foreground py-4 text-center text-sm">
-          Aucun site. Créez votre premier site racine.
+          {hasActiveFilters
+            ? "Aucun résultat pour ces filtres."
+            : "Aucun site. Créez votre premier site racine."}
         </div>
       )}
       {tree.map((node) => (
