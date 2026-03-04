@@ -99,9 +99,18 @@ export function EditEntrepriseRolesDialog({
   const toggleRole = (role: RoleEntrepriseType) => {
     const isCurrentlyChecked = localRoles.includes(role);
 
-    // Si on retire prestataire, vider les services (hors updater pour éviter setState imbriqué)
-    if (role === "prestataire" && isCurrentlyChecked) {
-      setLocalServiceIds([]);
+    if (role === "prestataire") {
+      if (isCurrentlyChecked) {
+        // On retire prestataire → vider services + effacer l'erreur
+        setLocalServiceIds([]);
+        setErrors((prev) => ({ ...prev, serviceIds: undefined }));
+      } else if (localServiceIds.length === 0) {
+        // On coche prestataire sans services → afficher l'erreur immédiatement
+        setErrors((prev) => ({
+          ...prev,
+          serviceIds: "Sélectionnez au moins un service pour ce prestataire",
+        }));
+      }
     }
 
     setLocalRoles((prev) =>
@@ -114,12 +123,18 @@ export function EditEntrepriseRolesDialog({
   };
 
   const toggleService = (serviceId: string) => {
-    setLocalServiceIds((prev) =>
-      prev.includes(serviceId)
-        ? prev.filter((id) => id !== serviceId)
-        : [...prev, serviceId],
-    );
-    if (errors.serviceIds) {
+    const nextServiceIds = localServiceIds.includes(serviceId)
+      ? localServiceIds.filter((id) => id !== serviceId)
+      : [...localServiceIds, serviceId];
+
+    setLocalServiceIds(nextServiceIds);
+
+    if (isPrestataire && nextServiceIds.length === 0) {
+      setErrors((prev) => ({
+        ...prev,
+        serviceIds: "Sélectionnez au moins un service pour ce prestataire",
+      }));
+    } else if (errors.serviceIds) {
       setErrors((prev) => ({ ...prev, serviceIds: undefined }));
     }
   };

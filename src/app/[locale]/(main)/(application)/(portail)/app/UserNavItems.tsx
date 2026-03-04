@@ -24,7 +24,6 @@ import {
   LayoutDashboard,
   MapPin,
   Settings,
-  Shield,
   Ticket,
   Users,
 } from "lucide-react";
@@ -55,17 +54,6 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
           href: "/app",
           icon: LayoutDashboard,
           match: "exact",
-        },
-      ],
-    },
-    {
-      items: [
-        {
-          key: "documents",
-          label: "Documents",
-          href: "/app/documents",
-          icon: FileText,
-          match: "startsWith",
         },
       ],
     },
@@ -101,7 +89,7 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
       ],
     },
     {
-      label: "Organisation",
+      label: "Équipe",
       items: [
         {
           key: "utilisateurs",
@@ -115,6 +103,18 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
           label: "Mon entreprise",
           href: "/app/mon-entreprise",
           icon: Building2,
+          match: "startsWith",
+        },
+      ],
+    },
+    {
+      label: "Ressources",
+      items: [
+        {
+          key: "documents",
+          label: "Documents",
+          href: "/app/documents",
+          icon: FileText,
           match: "startsWith",
         },
       ],
@@ -251,11 +251,16 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
       items: [
         {
           key: "dashboard",
-          label: "Pilotage",
+          label: "Tableau de bord",
           href: "/app",
           icon: LayoutDashboard,
           match: "exact",
         },
+      ],
+    },
+    {
+      label: "Exploitation",
+      items: [
         {
           key: "tickets",
           label: "Tickets",
@@ -264,17 +269,22 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
           match: "startsWith",
         },
         {
-          key: "clients",
-          label: "Entreprises",
-          href: "/app/entreprises",
-          icon: Building2,
-          match: "startsWith",
-        },
-        {
           key: "prestations",
           label: "Prestations",
           href: "/app/prestations",
           icon: HandPlatter,
+          match: "startsWith",
+        },
+      ],
+    },
+    {
+      label: "Réseau",
+      items: [
+        {
+          key: "entreprises",
+          label: "Entreprises",
+          href: "/app/entreprises",
+          icon: Building2,
           match: "startsWith",
         },
       ],
@@ -289,6 +299,11 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
           icon: ClipboardList,
           match: "startsWith",
         },
+      ],
+    },
+    {
+      label: "Ressources",
+      items: [
         {
           key: "documents",
           label: "Documents",
@@ -299,7 +314,7 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
       ],
     },
     {
-      label: "Admin",
+      label: "Administration",
       items: [
         {
           key: "utilisateurs",
@@ -309,17 +324,10 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
           match: "startsWith",
         },
         {
-          key: "securite",
-          label: "Sécurité",
-          href: "/app/securite",
-          icon: Shield,
-          match: "startsWith",
-        },
-        {
-          key: "settings",
-          label: "Paramètres",
-          href: "/app/parametres",
-          icon: Settings,
+          key: "mon-entreprise",
+          label: "Mon entreprise",
+          href: "/app/mon-entreprise",
+          icon: Building2,
           match: "startsWith",
         },
       ],
