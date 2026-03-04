@@ -302,18 +302,6 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
       ],
     },
     {
-      label: "Ressources",
-      items: [
-        {
-          key: "documents",
-          label: "Documents",
-          href: "/app/documents",
-          icon: FileText,
-          match: "startsWith",
-        },
-      ],
-    },
-    {
       label: "Administration",
       items: [
         {
@@ -328,6 +316,44 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
           label: "Mon entreprise",
           href: "/app/mon-entreprise",
           icon: Building2,
+          match: "startsWith",
+        },
+      ],
+    },
+    {
+      label: "Ressources",
+      items: [
+        {
+          key: "documents",
+          label: "Documents",
+          href: "/app/documents",
+          icon: FileText,
+          match: "startsWith",
+        },
+      ],
+    },
+    {
+      label: "Achats",
+      items: [
+        {
+          key: "devis",
+          label: "Devis",
+          href: "/app/devis",
+          icon: Handshake,
+          match: "startsWith",
+        },
+        {
+          key: "contrats",
+          label: "Contrats",
+          href: "/app/contrats",
+          icon: BriefcaseBusiness,
+          match: "startsWith",
+        },
+        {
+          key: "facturation",
+          label: "Facturation",
+          href: "/app/facturation",
+          icon: Euro,
           match: "startsWith",
         },
       ],
