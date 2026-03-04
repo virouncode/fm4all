@@ -217,16 +217,18 @@ export function UserDetails({
               )}
             </div>
 
-            <div className="text-muted-foreground mt-1 flex items-center gap-1 text-xs">
-              <MapPin className="h-3 w-3 shrink-0" />
-              <span>
-                {attributions.length === 0
-                  ? "Aucun site attribué"
-                  : attributions.length === 1
-                    ? "1 site attribué"
-                    : `${attributions.length} sites attribués`}
-              </span>
-            </div>
+            {postureActive !== "plateforme" && (
+              <div className="text-muted-foreground mt-1 flex items-center gap-1 text-xs">
+                <MapPin className="h-3 w-3 shrink-0" />
+                <span>
+                  {attributions.length === 0
+                    ? "Aucun site attribué"
+                    : attributions.length === 1
+                      ? "1 site attribué"
+                      : `${attributions.length} sites attribués`}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 

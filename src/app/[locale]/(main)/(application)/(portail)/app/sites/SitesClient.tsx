@@ -336,6 +336,12 @@ export function SitesClient() {
 
   const selectedSite = sites.find((s) => s.id === selectedSiteId) || null;
 
+  const selectedSiteAncestors = useMemo(() => {
+    if (!selectedSiteId) return [];
+    const path = getPathToRoot(tree, selectedSiteId);
+    return path.map((n) => ({ id: n.id, nom: n.nom }));
+  }, [tree, selectedSiteId]);
+
   if (loading) {
     return <div>Chargement des sites...</div>;
   }
@@ -400,6 +406,7 @@ export function SitesClient() {
             responsableSiteIds={responsableSiteIds}
             siteResponsables={siteResponsables}
             loadingResponsables={loadingResponsables}
+            ancestorPath={selectedSiteAncestors}
           />
         </div>
       )}

@@ -15,6 +15,7 @@ import { RolePlateformeAdhesionType } from "@/zod-schemas/userPlateformeAdhesion
 import {
   Building2,
   Calendar,
+  ChevronRight,
   House,
   Mail,
   MapPin,
@@ -38,6 +39,7 @@ type SiteDetailsProps = {
   responsableSiteIds: Set<string>;
   siteResponsables: SiteResponsable[];
   loadingResponsables: boolean;
+  ancestorPath: Array<{ id: string; nom: string }>;
 };
 
 export function SiteDetails({
@@ -49,6 +51,7 @@ export function SiteDetails({
   responsableSiteIds,
   siteResponsables,
   loadingResponsables,
+  ancestorPath,
 }: SiteDetailsProps) {
   const t = useTranslations("DevisPage.locaux.locauxForm");
   const typeBatiment =
@@ -89,9 +92,20 @@ export function SiteDetails({
             </Badge>
           </div>
 
-          <p className="text-muted-foreground mt-1 text-sm">
-            {site.ville} ({site.codePostal})
-          </p>
+          {site.parentId === null ? (
+            <p className="text-muted-foreground mt-1 text-xs italic">
+              Site racine
+            </p>
+          ) : (
+            <div className="text-muted-foreground mt-1 flex flex-wrap items-center gap-0.5 text-xs">
+              {ancestorPath.map((ancestor, index) => (
+                <span key={ancestor.id} className="flex items-center gap-0.5">
+                  {index > 0 && <ChevronRight className="size-3 shrink-0" />}
+                  <span>{ancestor.nom}</span>
+                </span>
+              ))}
+            </div>
+          )}
         </div>
         <div className="flex gap-2">
           {canEdit && (
