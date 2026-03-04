@@ -3,8 +3,8 @@ import {
   UserTreeNode,
 } from "@/zod-schemas/user.schema";
 import type { RoleEntrepriseType } from "@/zod-schemas/entreprise.schema";
-import type { RoleAdhesionType } from "@/zod-schemas/userAdhesion.schema";
-import type { RoleAttributionType } from "@/zod-schemas/userSiteAttribution.schema";
+import type { RoleClientAdhesionType } from "@/zod-schemas/userAdhesion.schema";
+import type { RoleClientAttributionType } from "@/zod-schemas/userSiteAttribution.schema";
 import type { RolePlateformeAdhesionType } from "@/zod-schemas/userPlateformeAdhesion.schema";
 
 /**
@@ -132,10 +132,10 @@ export function getPathToRoot(
  */
 export function getAvailableRolesByPosture(
   posture: RoleEntrepriseType | null,
-): RoleAttributionType[] {
+): RoleClientAttributionType[] {
   if (!posture) return [];
 
-  const rolesByPosture: Record<RoleEntrepriseType, RoleAttributionType[]> = {
+  const rolesByPosture: Record<RoleEntrepriseType, RoleClientAttributionType[]> = {
     client: [
       "responsable_site",
       "demandeur_site",
@@ -143,13 +143,11 @@ export function getAvailableRolesByPosture(
     ],
     prestataire: [
       "responsable_site",
-      "intervenant_site",
       "observateur_site",
     ],
     plateforme: [
       "responsable_site",
       "demandeur_site",
-      "intervenant_site",
       "observateur_site",
     ],
   };
@@ -171,9 +169,9 @@ export function getAvailableRolesByPosture(
  */
 export function getAvailableRolesByPostureAndLevel(
   posture: RoleEntrepriseType | null,
-  roleAdhesion: RoleAdhesionType | null,
+  roleAdhesion: RoleClientAdhesionType | null,
   rolePlateformeAdhesion?: RolePlateformeAdhesionType | null,
-): RoleAttributionType[] {
+): RoleClientAttributionType[] {
   if (!posture || (!roleAdhesion && !rolePlateformeAdhesion)) return [];
 
   // Étape 1 : Filtrer par posture (existant)
@@ -202,10 +200,9 @@ export function getAvailableRolesByPostureAndLevel(
 /**
  * LABELS DES RÔLES
  */
-export const roleLabels: Record<RoleAttributionType, string> = {
+export const roleLabels: Record<string, string> = {
   responsable_site: "Responsable",
   demandeur_site: "Demandeur",
-  intervenant_site: "Intervenant",
   observateur_site: "Observateur",
 };
 
@@ -220,9 +217,8 @@ export const scopeLabels: Record<"self" | "subtree", string> = {
 /**
  * COULEURS DES BADGES PAR RÔLE
  */
-export const roleColors: Record<RoleAttributionType, string> = {
+export const roleColors: Record<string, string> = {
   responsable_site: "bg-purple-100 text-purple-800",
   demandeur_site: "bg-green-100 text-green-800",
-  intervenant_site: "bg-yellow-100 text-yellow-800",
   observateur_site: "bg-gray-100 text-gray-800",
 };

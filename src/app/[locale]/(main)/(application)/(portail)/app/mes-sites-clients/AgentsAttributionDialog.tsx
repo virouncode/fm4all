@@ -109,7 +109,7 @@ export function AgentsAttributionDialog({
       entrepriseId: prestataireEntrepriseId,
       mode: "inclure",
       scope: "self",
-      role: addingRole,
+      role: addingRole as import("@/zod-schemas/userSiteAttribution.schema").RoleClientAttributionType,
     });
 
     setIsAdding(false);
@@ -129,7 +129,7 @@ export function AgentsAttributionDialog({
         userPrenom: newUser.prenom,
         userNom: newUser.nom,
         userEmail: newUser.email,
-        role: addingRole,
+        role: addingRole as import("@/zod-schemas/userSiteAttribution.schema").RoleClientAttributionType,
       };
 
       const updated = [...agents, newAgent];

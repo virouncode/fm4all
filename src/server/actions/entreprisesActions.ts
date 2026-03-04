@@ -6,7 +6,7 @@ import { clientServices, clientServiceExecutions } from "@/db/schema/services";
 import { documents } from "@/db/schema/documents";
 import { count, ilike, eq, ne, and, inArray } from "drizzle-orm";
 import { promoteS3Key, deleteS3Object as deleteS3ObjectFromServer } from "@/server/s3/s3";
-import { userAdhesions } from "@/db/schema/users";
+import { userClientAdhesions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { auth } from "@/server/auth/auth";
@@ -20,7 +20,7 @@ import {
   getEntrepriseWithDetailsById,
   getServicesByEntrepriseId,
 } from "@/server/queries/entreprises.query";
-import { getUserAdhesion } from "@/server/queries/userAdhesions.query";
+import { getUserClientAdhesion } from "@/server/queries/userAdhesions.query";
 import {
   getProspectsPaginated,
   countProspects,
@@ -170,7 +170,7 @@ export const getMonEntrepriseDetailsAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const adhesion = await getUserAdhesion({
+    const adhesion = await getUserClientAdhesion({
       userId: currentUser.id,
       entrepriseId: parsedInput.entrepriseId,
     });
@@ -447,7 +447,7 @@ export const createEntrepriseAction = actionClient
 
     // ===== ÉTAPE 3: Créer l'adhésion admin + arborescence =====
     await db.transaction(async (tx) => {
-      await tx.insert(userAdhesions).values({
+      await tx.insert(userClientAdhesions).values({
         userId: newUser.id,
         entrepriseId: newEntreprise.id,
         role: "admin",

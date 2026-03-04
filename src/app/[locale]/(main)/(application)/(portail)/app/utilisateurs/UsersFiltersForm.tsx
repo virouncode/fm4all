@@ -5,7 +5,7 @@ import { RhfInput } from "@/components/rhf/RhfInput";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
-import { adhesionStatutCT, roleAdhesionCT } from "@/constants/codeTables";
+import { adhesionStatutCT, roleClientAdhesionCT } from "@/constants/codeTables";
 import { useDebounce } from "@/hooks/use-debounce";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import {
@@ -30,7 +30,7 @@ export function UsersFiltersForm() {
       search: searchParams.get("search") || "",
       roleAdhesion:
         (searchParams.get("roleAdhesion") as
-          | (typeof roleAdhesionCT)[number]["code"]
+          | (typeof roleClientAdhesionCT)[number]["code"]
           | "all"
           | undefined) || "all",
       statutAdhesion:
@@ -112,7 +112,7 @@ export function UsersFiltersForm() {
             withError={false}
           >
             <SelectItem value="all">Tous</SelectItem>
-            {roleAdhesionCT.map((r) => (
+            {roleClientAdhesionCT.map((r) => (
               <SelectItem key={r.code} value={r.code}>
                 {r.name}
               </SelectItem>

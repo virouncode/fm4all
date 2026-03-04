@@ -1,10 +1,13 @@
-import { roleAdhesionCodes } from "@/constants/codeTables";
+import { roleClientAdhesionCodes } from "@/constants/codeTables";
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
-import { userAdhesions } from "../db/schema";
+import { userClientAdhesions } from "../db/schema";
 
-export const roleAdhesionSchema = z.enum(roleAdhesionCodes);
-export type RoleAdhesionType = z.infer<typeof roleAdhesionSchema>;
+export const roleClientAdhesionSchema = z.enum(roleClientAdhesionCodes);
+export type RoleClientAdhesionType = z.infer<typeof roleClientAdhesionSchema>;
 
-export const userAdhesionSelectSchema = createSelectSchema(userAdhesions);
-export type UserAdhesionSelectType = z.infer<typeof userAdhesionSelectSchema>;
+export const userClientAdhesionSelectSchema =
+  createSelectSchema(userClientAdhesions);
+export type UserClientAdhesionSelectType = z.infer<
+  typeof userClientAdhesionSelectSchema
+>;

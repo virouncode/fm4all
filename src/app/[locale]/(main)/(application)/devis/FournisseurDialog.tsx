@@ -4,6 +4,7 @@ import Image from "next/image";
 
 type FournisseurDialogProps = {
   logoUrl: string | null;
+  darkLogoUrl?: string | null;
   sloganFournisseur: string | null;
   presentation?: string | null;
   locationUrl: string | null;
@@ -18,6 +19,7 @@ type FournisseurDialogProps = {
 
 const FournisseurDialog = ({
   logoUrl,
+  darkLogoUrl,
   locationUrl,
   sloganFournisseur,
   presentation,
@@ -76,11 +78,18 @@ const FournisseurDialog = ({
             src={logoUrl}
             alt={`logo-de-${nomFournisseur}`}
             fill
-            className={`object-contain ${
-              nomFournisseur === "CASTALIE" ? "blur-lg" : ""
-            }`}
+            className={`object-contain ${nomFournisseur === "CASTALIE" ? "blur-lg" : ""} ${darkLogoUrl ? "dark:hidden" : ""}`}
             sizes="(max-width:768px) 25vw, 100vw"
           />
+          {darkLogoUrl && (
+            <Image
+              src={darkLogoUrl}
+              alt={`logo-de-${nomFournisseur}`}
+              fill
+              className={`hidden object-contain dark:block ${nomFournisseur === "CASTALIE" ? "blur-lg" : ""}`}
+              sizes="(max-width:768px) 25vw, 100vw"
+            />
+          )}
         </div>
       ) : null}
       {presentation && (

@@ -12,7 +12,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useLocale } from "next-intl";
 
-export function ModeToggle() {
+type ModeToggleProps = {
+  variant?: "outline" | "ghost" | "default";
+};
+
+export function ModeToggle({ variant = "outline" }: ModeToggleProps) {
   const { setTheme } = useTheme();
   const locale = useLocale();
 
@@ -20,7 +24,7 @@ export function ModeToggle() {
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="ghost"
+          variant={variant}
           size="icon"
           aria-label={locale === "fr" ? "Changer de thème" : "Change theme"}
           title={locale === "fr" ? "Changer de thème" : "Change theme"}

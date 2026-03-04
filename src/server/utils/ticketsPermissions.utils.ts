@@ -2,7 +2,7 @@ import "server-only";
 
 import { db } from "@/db";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
-import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userSiteAttributions.utils";
+import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userClientSiteAttributions.utils";
 
 type DbOrTransaction =
   | typeof db
@@ -414,10 +414,10 @@ export async function canUserEditStatut({
 
   // Prestataire (assigné)
   if (ticket.assigneEntrepriseId === entrepriseId) {
-    const { getUserAdhesion } = await import(
+    const { getUserClientAdhesion } = await import(
       "@/server/queries/userAdhesions.query"
     );
-    const adhesion = await getUserAdhesion({ userId, entrepriseId });
+    const adhesion = await getUserClientAdhesion({ userId, entrepriseId });
     return !!adhesion;
   }
 
@@ -499,10 +499,10 @@ export async function getAvailableStatutsForUser({
 
   // Prestataire
   if (ticket.assigneEntrepriseId === entrepriseId) {
-    const { getUserAdhesion } = await import(
+    const { getUserClientAdhesion } = await import(
       "@/server/queries/userAdhesions.query"
     );
-    const adhesion = await getUserAdhesion({ userId, entrepriseId });
+    const adhesion = await getUserClientAdhesion({ userId, entrepriseId });
 
     if (adhesion) {
       // Prestataire: sous-ensemble

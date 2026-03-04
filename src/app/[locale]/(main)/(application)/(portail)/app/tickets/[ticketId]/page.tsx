@@ -11,7 +11,7 @@ import {
   getTicketById,
   getTicketMessagesWithAttachments,
 } from "@/server/queries/tickets.query";
-import { getUserAdhesion } from "@/server/queries/userAdhesions.query";
+import { getUserClientAdhesion } from "@/server/queries/userAdhesions.query";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
 import { getUsersByEntrepriseId } from "@/server/queries/users.query";
 import { canUserAccessTicket } from "@/server/utils/ticketsPerimetre.utils";
@@ -60,7 +60,7 @@ export default async function TicketDetailsPage({
     entrepriseId = ticket.proprietaireEntrepriseId;
   } else {
     // Vérifier adhesion proprietaire
-    const proprietaireAdhesion = await getUserAdhesion({
+    const proprietaireAdhesion = await getUserClientAdhesion({
       userId: currentUser.id,
       entrepriseId: ticket.proprietaireEntrepriseId,
     });
@@ -70,7 +70,7 @@ export default async function TicketDetailsPage({
       posture = "client";
     } else if (ticket.demandeurEntrepriseId) {
       // Vérifier adhesion demandeur
-      const demandeurAdhesion = await getUserAdhesion({
+      const demandeurAdhesion = await getUserClientAdhesion({
         userId: currentUser.id,
         entrepriseId: ticket.demandeurEntrepriseId,
       });
@@ -80,7 +80,7 @@ export default async function TicketDetailsPage({
         posture = "client";
       } else if (ticket.assigneEntrepriseId) {
         // Vérifier adhesion prestataire
-        const prestataireAdhesion = await getUserAdhesion({
+        const prestataireAdhesion = await getUserClientAdhesion({
           userId: currentUser.id,
           entrepriseId: ticket.assigneEntrepriseId,
         });

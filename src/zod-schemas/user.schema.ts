@@ -1,4 +1,8 @@
-import { adhesionStatutCodes, roleAdhesionCodes } from "@/constants/codeTables";
+import {
+  adhesionStatutCodes,
+  roleClientAdhesionCodes,
+  rolePlateformeAdhesionCodes,
+} from "@/constants/codeTables";
 import { user } from "@/db/schema/auth";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -19,7 +23,7 @@ export type InsertUserType = z.infer<typeof insertUserSchema>;
 
 // ==================== FORM SCHEMAS ====================
 
-// Schema pour formulaire de création utilisateur (base)
+// Schema pour formulaire de création utilisateur en posture CLIENT
 export const insertUserFormSchema = z.object({
   prenom: z
     .string()
@@ -45,13 +49,47 @@ export const insertUserFormSchema = z.object({
     })
     .optional()
     .nullable(),
-  roleAdhesion: z.enum(roleAdhesionCodes),
+  roleAdhesion: z.enum(roleClientAdhesionCodes),
 
   // Hiérarchie
   parentId: z.uuid().optional().nullable(),
 });
 
 export type InsertUserFormType = z.infer<typeof insertUserFormSchema>;
+
+// Schema pour formulaire de création utilisateur en posture PLATEFORME
+export const insertPlateformeUserFormSchema = z.object({
+  prenom: z
+    .string()
+    .min(1, "Le prénom est requis")
+    .max(100)
+    .transform((v) => capitalizeWords(v)),
+  nom: z
+    .string()
+    .min(1, "Le nom est requis")
+    .max(100)
+    .transform((v) => capitalizeWords(v)),
+  email: z
+    .email("Email invalide")
+    .transform((v) => lower(v)),
+  phone: phoneNumberSchemaEmpty("Numéro de téléphone invalide").optional(),
+  avatar: z
+    .object({
+      storageKey: z.string(),
+      filename: z.string(),
+      mimeType: z.string(),
+      sizeBytes: z.number(),
+      previewUrl: z.string().optional(),
+    })
+    .optional()
+    .nullable(),
+  rolePlateformeAdhesion: z.enum(rolePlateformeAdhesionCodes),
+  parentId: z.uuid().optional().nullable(),
+});
+
+export type InsertPlateformeUserFormType = z.infer<
+  typeof insertPlateformeUserFormSchema
+>;
 
 // Schema pour DB insert (avec computed fields)
 export const insertUserToDbSchema = insertUserSchema.extend({
@@ -86,7 +124,7 @@ export const updateUserFormSchema = z.object({
     .nullable(),
 
   // Modifiables uniquement si on édite quelqu'un de niveau inférieur (pas soi-même)
-  roleAdhesion: z.enum(roleAdhesionCodes).optional(),
+  roleAdhesion: z.enum(roleClientAdhesionCodes).optional(),
   statut: z.enum(adhesionStatutCodes).optional(),
 });
 
@@ -121,7 +159,7 @@ export const usersQueryBackendSchema = z.object({
 
   // Filters
   search: z.string().optional(), // Recherche nom/prénom/email (case-insensitive, any order)
-  roleAdhesion: z.enum(roleAdhesionCodes).optional(),
+  roleAdhesion: z.enum(roleClientAdhesionCodes).optional(),
   statutAdhesion: z.enum(adhesionStatutCodes).optional(),
 
   // Sorting & pagination
@@ -137,7 +175,10 @@ export type UsersQueryBackendType = z.infer<typeof usersQueryBackendSchema>;
 export const usersQueryFrontendSchema = z
   .object({
     search: z.string().optional(),
-    roleAdhesion: z.enum(roleAdhesionCodes).or(z.literal("all")).optional(),
+    roleAdhesion: z
+      .enum(roleClientAdhesionCodes)
+      .or(z.literal("all"))
+      .optional(),
     statutAdhesion: z.enum(adhesionStatutCodes).or(z.literal("all")).optional(),
     orderBy: z.string().optional(),
     orderDir: z.string().optional(),
@@ -179,10 +220,16 @@ export function parseUsersQuery(
 export const userWithAdhesionSchema = selectUserSchema.extend({
   adhesion: z
     .object({
-      role: z.enum(roleAdhesionCodes),
+      role: z.enum(roleClientAdhesionCodes),
       statut: z.enum(adhesionStatutCodes),
     })
     .nullable(),
+  plateformeAdhesion: z
+    .object({
+      role: z.enum(rolePlateformeAdhesionCodes),
+    })
+    .nullable()
+    .optional(),
   avatar: z
     .object({
       storageKey: z.string(),
@@ -201,8 +248,11 @@ export type UserWithAdhesionType = z.infer<typeof userWithAdhesionSchema>;
 export type UserTreeNode = SelectUserType & {
   children: UserTreeNode[];
   adhesion?: {
-    role: (typeof roleAdhesionCodes)[number];
+    role: (typeof roleClientAdhesionCodes)[number];
     statut: (typeof adhesionStatutCodes)[number];
+  } | null;
+  plateformeAdhesion?: {
+    role: (typeof rolePlateformeAdhesionCodes)[number];
   } | null;
   avatar?: {
     storageKey: string;

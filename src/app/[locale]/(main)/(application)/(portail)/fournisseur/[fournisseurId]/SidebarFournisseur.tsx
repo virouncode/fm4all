@@ -108,7 +108,14 @@ const SidebarFournisseur = ({ fournisseurId }: SidebarFournisseurProps) => {
                     alt="fm4all-Logo"
                     fill
                     sizes="100px"
-                    className="object-contain"
+                    className="object-contain dark:hidden"
+                  />
+                  <Image
+                    src="/img/logo_full_dark_mode.webp"
+                    alt="fm4all-Logo"
+                    fill
+                    sizes="100px"
+                    className="hidden object-contain dark:block"
                   />
                 </div>
               </Link>

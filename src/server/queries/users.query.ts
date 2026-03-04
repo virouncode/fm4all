@@ -3,7 +3,7 @@ import "server-only";
 import { db } from "@/db";
 import { user } from "@/db/schema/auth";
 import { documents } from "@/db/schema/documents";
-import { userAdhesions } from "@/db/schema/users";
+import { userClientAdhesions, userPlateformeAdhesions } from "@/db/schema/users";
 import {
   selectUserSchema,
   userWithAdhesionSchema,
@@ -20,8 +20,11 @@ export async function getUsersByEntrepriseId(entrepriseId: string) {
     .select({
       user: user,
       adhesion: {
-        role: userAdhesions.role,
-        statut: userAdhesions.statut,
+        role: userClientAdhesions.role,
+        statut: userClientAdhesions.statut,
+      },
+      plateformeAdhesion: {
+        role: userPlateformeAdhesions.role,
       },
       avatar: {
         storageKey: documents.storageKey,
@@ -32,14 +35,20 @@ export async function getUsersByEntrepriseId(entrepriseId: string) {
       },
     })
     .from(user)
-    .innerJoin(userAdhesions, eq(user.id, userAdhesions.userId))
+    .innerJoin(userClientAdhesions, eq(user.id, userClientAdhesions.userId))
+    .leftJoin(userPlateformeAdhesions, eq(user.id, userPlateformeAdhesions.userId))
     .leftJoin(documents, eq(user.avatarId, documents.id))
-    .where(eq(userAdhesions.entrepriseId, entrepriseId));
+    .where(eq(userClientAdhesions.entrepriseId, entrepriseId));
 
   return z
     .array(userWithAdhesionSchema)
     .parse(
-      rows.map((r) => ({ ...r.user, adhesion: r.adhesion, avatar: r.avatar })),
+      rows.map((r) => ({
+        ...r.user,
+        adhesion: r.adhesion,
+        plateformeAdhesion: r.plateformeAdhesion?.role ? r.plateformeAdhesion : null,
+        avatar: r.avatar,
+      })),
     );
 }
 
@@ -69,11 +78,11 @@ export async function userBelongsToEntreprise({
 }): Promise<boolean> {
   const [row] = await db
     .select()
-    .from(userAdhesions)
+    .from(userClientAdhesions)
     .where(
       and(
-        eq(userAdhesions.userId, userId),
-        eq(userAdhesions.entrepriseId, entrepriseId),
+        eq(userClientAdhesions.userId, userId),
+        eq(userClientAdhesions.entrepriseId, entrepriseId),
       ),
     )
     .limit(1);
@@ -96,7 +105,7 @@ export async function getUsers(query: UsersQueryBackendType) {
     pageSize,
   } = query;
 
-  const whereClauses: SQL[] = [eq(userAdhesions.entrepriseId, entrepriseId)];
+  const whereClauses: SQL[] = [eq(userClientAdhesions.entrepriseId, entrepriseId)];
 
   // Filter: Search (case-insensitive, prenom/nom/email in any order)
   if (search && search.trim()) {
@@ -114,12 +123,12 @@ export async function getUsers(query: UsersQueryBackendType) {
 
   // Filter: Role adhesion
   if (roleAdhesion) {
-    whereClauses.push(eq(userAdhesions.role, roleAdhesion));
+    whereClauses.push(eq(userClientAdhesions.role, roleAdhesion));
   }
 
   // Filter: Statut adhesion
   if (statutAdhesion) {
-    whereClauses.push(eq(userAdhesions.statut, statutAdhesion));
+    whereClauses.push(eq(userClientAdhesions.statut, statutAdhesion));
   }
 
   const where = whereClauses.length > 0 ? and(...whereClauses) : undefined;
@@ -142,8 +151,11 @@ export async function getUsers(query: UsersQueryBackendType) {
     .select({
       user: user,
       adhesion: {
-        role: userAdhesions.role,
-        statut: userAdhesions.statut,
+        role: userClientAdhesions.role,
+        statut: userClientAdhesions.statut,
+      },
+      plateformeAdhesion: {
+        role: userPlateformeAdhesions.role,
       },
       avatar: {
         storageKey: documents.storageKey,
@@ -154,7 +166,8 @@ export async function getUsers(query: UsersQueryBackendType) {
       },
     })
     .from(user)
-    .innerJoin(userAdhesions, eq(user.id, userAdhesions.userId))
+    .innerJoin(userClientAdhesions, eq(user.id, userClientAdhesions.userId))
+    .leftJoin(userPlateformeAdhesions, eq(user.id, userPlateformeAdhesions.userId))
     .leftJoin(documents, eq(user.avatarId, documents.id))
     .where(where)
     .orderBy(orderExpr)
@@ -168,7 +181,7 @@ export async function getUsers(query: UsersQueryBackendType) {
   const [countResult] = await db
     .select({ count: sql<number>`count(*)` })
     .from(user)
-    .innerJoin(userAdhesions, eq(user.id, userAdhesions.userId))
+    .innerJoin(userClientAdhesions, eq(user.id, userClientAdhesions.userId))
     .where(where);
 
   const total = countResult?.count ?? 0;
@@ -181,6 +194,7 @@ export async function getUsers(query: UsersQueryBackendType) {
         items.map((r) => ({
           ...r.user,
           adhesion: r.adhesion,
+          plateformeAdhesion: r.plateformeAdhesion?.role ? r.plateformeAdhesion : null,
           avatar: r.avatar,
         })),
       ),

@@ -2,14 +2,30 @@ import Image from "next/image";
 
 type LoaderFm4allProps = {
   src: string;
+  darkSrc?: string;
   alt: string;
 };
 
-const LoaderFm4all = ({ src, alt }: LoaderFm4allProps) => {
+const LoaderFm4all = ({ src, darkSrc, alt }: LoaderFm4allProps) => {
   return (
     <div className="flex items-center justify-center">
       <div className="relative h-[80px] w-[80px] animate-spin opacity-30">
-        <Image src={src} alt={alt} fill sizes="80px" />
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          sizes="80px"
+          className={darkSrc ? "dark:hidden" : undefined}
+        />
+        {darkSrc && (
+          <Image
+            src={darkSrc}
+            alt={alt}
+            fill
+            sizes="80px"
+            className="hidden dark:block"
+          />
+        )}
       </div>
     </div>
   );

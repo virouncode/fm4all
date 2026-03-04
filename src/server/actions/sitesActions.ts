@@ -3,7 +3,7 @@
 import { db } from "@/db";
 import { entreprises } from "@/db/schema/entreprises";
 import { sites } from "@/db/schema/sites";
-import { userAdhesions } from "@/db/schema/users";
+import { userClientAdhesions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
@@ -21,7 +21,7 @@ import {
   insertSiteArborescence,
   siteHasChildren,
 } from "@/server/utils/sitesArborescence.utils";
-import { resolveUserRightsOnSite } from "@/server/utils/userSiteAttributions.utils";
+import { resolveUserRightsOnSite } from "@/server/utils/userClientSiteAttributions.utils";
 import {
   getAccessibleSitesSchema,
   getAllSitesForPlatformSchema,
@@ -43,10 +43,10 @@ import { flattenValidationErrors } from "next-safe-action";
  * Vérifie si l'utilisateur est admin de l'entreprise
  */
 async function isAdmin(userId: string, entrepriseId: string): Promise<boolean> {
-  const adhesion = await db.query.userAdhesions.findFirst({
+  const adhesion = await db.query.userClientAdhesions.findFirst({
     where: and(
-      eq(userAdhesions.userId, userId),
-      eq(userAdhesions.entrepriseId, entrepriseId),
+      eq(userClientAdhesions.userId, userId),
+      eq(userClientAdhesions.entrepriseId, entrepriseId),
     ),
   });
 
@@ -191,10 +191,10 @@ export const getAccessibleSitesAction = actionClient
     }
 
     // Si pas plateforme, vérifier accès entreprise via adhésion
-    const adhesion = await db.query.userAdhesions.findFirst({
+    const adhesion = await db.query.userClientAdhesions.findFirst({
       where: and(
-        eq(userAdhesions.userId, currentUser.id),
-        eq(userAdhesions.entrepriseId, parsedInput.entrepriseId),
+        eq(userClientAdhesions.userId, currentUser.id),
+        eq(userClientAdhesions.entrepriseId, parsedInput.entrepriseId),
       ),
     });
 

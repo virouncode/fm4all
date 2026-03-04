@@ -1,5 +1,6 @@
 "use client";
 
+import { ModeToggle } from "@/components/theme/mode-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -17,7 +18,6 @@ import { useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth/auth-client";
 import { getPresignedReadUrl } from "@/lib/s3/upload-helper";
 import { getDocumentAction } from "@/server/actions/documentsActions";
-import { ModeToggle } from "@/components/theme/mode-toggle";
 import { useAppStore } from "@/stores/application/appStore";
 import { User2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -90,7 +90,7 @@ export default function UserSidebarFooter() {
     <SidebarMenu>
       {collapsed && (
         <SidebarMenuItem className="flex justify-center">
-          <ModeToggle />
+          <ModeToggle variant="ghost" />
         </SidebarMenuItem>
       )}
       <SidebarMenuItem>

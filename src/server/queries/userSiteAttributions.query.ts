@@ -2,16 +2,16 @@ import "server-only";
 
 import { db } from "@/db";
 import { sites, sitesArborescence } from "@/db/schema/sites";
-import { userSiteAttributions } from "@/db/schema/users";
-import { RoleAttributionType } from "@/zod-schemas/userSiteAttribution.schema";
+import { userClientSiteAttributions } from "@/db/schema/users";
+import { RoleClientAttributionType } from "@/zod-schemas/userSiteAttribution.schema";
 import { and, eq, inArray } from "drizzle-orm";
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
 const selectUserSiteAttributionSchema =
-  createSelectSchema(userSiteAttributions);
+  createSelectSchema(userClientSiteAttributions);
 
-export async function getUserSiteAttributions({
+export async function getUserClientSiteAttributions({
   userId,
   entrepriseId,
 }: {
@@ -21,19 +21,19 @@ export async function getUserSiteAttributions({
   // Fetch attributions avec site info (TOUS les sites, actifs ET inactifs)
   const rows = await db
     .select({
-      attribution: userSiteAttributions,
+      attribution: userClientSiteAttributions,
       site: {
         id: sites.id,
         nom: sites.nom,
         parentId: sites.parentId,
       },
     })
-    .from(userSiteAttributions)
-    .innerJoin(sites, eq(userSiteAttributions.siteId, sites.id))
+    .from(userClientSiteAttributions)
+    .innerJoin(sites, eq(userClientSiteAttributions.siteId, sites.id))
     .where(
       and(
-        eq(userSiteAttributions.userId, userId),
-        eq(userSiteAttributions.entrepriseId, entrepriseId),
+        eq(userClientSiteAttributions.userId, userId),
+        eq(userClientSiteAttributions.entrepriseId, entrepriseId),
       ),
     );
 
@@ -56,7 +56,7 @@ export async function getUserSiteAttributions({
 
   // Calculer les sites hérités via scope=subtree (version batch optimisée)
   const { resolveUserEffectiveRolesOnSites } = await import(
-    "@/server/utils/userSiteAttributions.utils"
+    "@/server/utils/userClientSiteAttributions.utils"
   );
 
   // Créer un Set des siteIds déjà directement attribués pour éviter les doublons
@@ -112,7 +112,7 @@ export async function getUserSiteAttributions({
           siteIds: descendantSiteIds,
           entrepriseId,
         })
-      : new Map<string, RoleAttributionType | null>();
+      : new Map<string, RoleClientAttributionType | null>();
 
   // Étape 4 : Construire un index ancetreId → descendantIds pour retrouver l'attribution source
   const ancestorToDescendants = new Map<string, string[]>();
@@ -137,7 +137,7 @@ export async function getUserSiteAttributions({
     siteId: string;
     mode: "inclure" | "exclure";
     scope: "self" | "subtree";
-    role: RoleAttributionType;
+    role: RoleClientAttributionType;
     entrepriseId: string;
     createdAt: Date;
     updatedAt: Date;
@@ -209,7 +209,7 @@ export async function getUserSiteAttributions({
 export async function getAvailableSitesForAttribution(
   userId: string,
   entrepriseId: string,
-  role: RoleAttributionType,
+  role: RoleClientAttributionType,
 ) {
   // Récupérer TOUS les sites (actifs ET inactifs)
   const allSites = await db.query.sites.findMany({
@@ -218,10 +218,10 @@ export async function getAvailableSitesForAttribution(
   });
 
   // Récupérer TOUS les sites attribués (peu importe le rôle)
-  const existingAttributions = await db.query.userSiteAttributions.findMany({
+  const existingAttributions = await db.query.userClientSiteAttributions.findMany({
     where: and(
-      eq(userSiteAttributions.userId, userId),
-      eq(userSiteAttributions.entrepriseId, entrepriseId),
+      eq(userClientSiteAttributions.userId, userId),
+      eq(userClientSiteAttributions.entrepriseId, entrepriseId),
     ),
     columns: { siteId: true },
   });

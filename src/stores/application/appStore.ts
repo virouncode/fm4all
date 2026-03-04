@@ -4,7 +4,7 @@ import {
   EntrepriseSelectType,
   RoleEntrepriseType,
 } from "@/zod-schemas/entreprise.schema";
-import { RoleAdhesionType } from "@/zod-schemas/userAdhesion.schema";
+import { RoleClientAdhesionType } from "@/zod-schemas/userAdhesion.schema";
 import { RolePlateformeAdhesionType } from "@/zod-schemas/userPlateformeAdhesion.schema";
 import { create } from "zustand";
 
@@ -19,7 +19,7 @@ export type AppUser = {
 export type BootstrapPayload = {
   user: AppUser;
   entreprise: EntrepriseSelectType;
-  roleAdhesion: RoleAdhesionType;
+  roleClientAdhesion: RoleClientAdhesionType | null;
   rolesEntreprise: RoleEntrepriseType[];
   postureActive: RoleEntrepriseType;
   rolePlateformeAdhesion: RolePlateformeAdhesionType | null;
@@ -29,7 +29,7 @@ type AppStore = {
   // state
   user: AppUser | null;
   entreprise: EntrepriseSelectType | null;
-  roleAdhesion: RoleAdhesionType | null;
+  roleClientAdhesion: RoleClientAdhesionType | null;
   rolesEntreprise: RoleEntrepriseType[];
   postureActive: RoleEntrepriseType | null;
   rolePlateformeAdhesion: RolePlateformeAdhesionType | null;
@@ -44,7 +44,7 @@ type AppStore = {
 export const useAppStore = create<AppStore>((set, get) => ({
   user: null,
   entreprise: null,
-  roleAdhesion: null,
+  roleClientAdhesion: null,
   rolesEntreprise: [],
   postureActive: null,
   rolePlateformeAdhesion: null,
@@ -53,7 +53,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
     set({
       user: payload.user,
       entreprise: payload.entreprise,
-      roleAdhesion: payload.roleAdhesion,
+      roleClientAdhesion: payload.roleClientAdhesion,
       rolesEntreprise: payload.rolesEntreprise,
       postureActive: payload.postureActive,
       rolePlateformeAdhesion: payload.rolePlateformeAdhesion,
@@ -71,7 +71,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
     set({
       user: null,
       entreprise: null,
-      roleAdhesion: null,
+      roleClientAdhesion: null,
       rolesEntreprise: [],
       postureActive: null,
       rolePlateformeAdhesion: null,

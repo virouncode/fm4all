@@ -8,6 +8,7 @@ import DevisButton from "../buttons/devis-button";
 import LinkedinButton from "../buttons/linkedin-button";
 import LocaleButton from "../buttons/locale-button";
 import UserButton from "../buttons/UserButton";
+import { ModeToggle } from "../theme/mode-toggle";
 
 type HeaderButtonsProps = {
   isMobileNavOpen: boolean;
@@ -41,9 +42,9 @@ const HeaderButtons = ({
       >
         <LocaleButton className="hidden md:flex" />
       </Suspense>
-      {/* <div className="hidden lg:flex">
+      <div className="hidden md:flex">
         <ModeToggle />
-      </div> */}
+      </div>
       <ContactButton
         setIsMobileNavOpen={setIsMobileNavOpen}
         className="hidden md:flex"

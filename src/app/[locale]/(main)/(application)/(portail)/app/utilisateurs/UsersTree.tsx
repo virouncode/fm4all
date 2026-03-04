@@ -2,10 +2,10 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { roleAdhesionCT, toCodeTableName } from "@/constants/codeTables";
+import { roleClientAdhesionCT, rolePlateformeAdhesionCT, toCodeTableName } from "@/constants/codeTables";
 import { cn } from "@/lib/utils";
 import { UserTreeNode } from "@/zod-schemas/user.schema";
-import { RoleAdhesionType } from "@/zod-schemas/userAdhesion.schema";
+import { RoleClientAdhesionType } from "@/zod-schemas/userAdhesion.schema";
 import { RolePlateformeAdhesionType } from "@/zod-schemas/userPlateformeAdhesion.schema";
 import { ChevronDown, ChevronRight, Plus, User } from "lucide-react";
 import { getPathToRoot } from "./helpers";
@@ -19,8 +19,9 @@ type UsersTreeProps = {
   expandedNodes: Set<string>;
   onToggleExpand: (nodeId: string) => void;
   currentUserId?: string;
-  currentUserRole: RoleAdhesionType | null;
+  currentUserRole: RoleClientAdhesionType | null;
   currentUserPlateformeRole: RolePlateformeAdhesionType | null;
+  postureActive?: string | null;
 }
 
 export function UsersTree({
@@ -34,6 +35,7 @@ export function UsersTree({
   currentUserId,
   currentUserRole,
   currentUserPlateformeRole,
+  postureActive,
 }: UsersTreeProps) {
   return (
     <div className="space-y-1">
@@ -58,6 +60,7 @@ export function UsersTree({
           currentUserId={currentUserId}
           currentUserRole={currentUserRole}
           currentUserPlateformeRole={currentUserPlateformeRole}
+          postureActive={postureActive}
         />
       ))}
     </div>
@@ -74,8 +77,9 @@ type TreeNodeProps = {
   onToggleExpand: (nodeId: string) => void;
   tree: UserTreeNode[];
   currentUserId?: string;
-  currentUserRole: RoleAdhesionType | null;
+  currentUserRole: RoleClientAdhesionType | null;
   currentUserPlateformeRole: RolePlateformeAdhesionType | null;
+  postureActive?: string | null;
 };
 
 function TreeNode({
@@ -90,6 +94,7 @@ function TreeNode({
   currentUserId,
   currentUserRole,
   currentUserPlateformeRole,
+  postureActive,
 }: TreeNodeProps) {
   const expanded = expandedNodes.has(node.id);
   const hasChildren = node.children.length > 0;
@@ -164,9 +169,11 @@ function TreeNode({
         >
           <span>
             {node.prenom} {node.nom}{" "}
-            {node.adhesion?.role
-              ? "(" + toCodeTableName(node.adhesion?.role, roleAdhesionCT) + ")"
-              : null}
+            {postureActive === "plateforme" && node.plateformeAdhesion?.role
+              ? "(" + toCodeTableName(node.plateformeAdhesion.role, rolePlateformeAdhesionCT) + ")"
+              : node.adhesion?.role
+                ? "(" + toCodeTableName(node.adhesion.role, roleClientAdhesionCT) + ")"
+                : null}
           </span>
           {node.adhesion?.statut && (
             <Badge
@@ -227,6 +234,7 @@ function TreeNode({
               currentUserId={currentUserId}
               currentUserRole={currentUserRole}
               currentUserPlateformeRole={currentUserPlateformeRole}
+              postureActive={postureActive}
             />
           ))}
         </div>

@@ -1,12 +1,12 @@
 import "server-only";
 import { db } from "@/db";
-import { userAdhesions } from "@/db/schema/users";
+import { userClientAdhesions } from "@/db/schema/users";
 import { eq, and } from "drizzle-orm";
 import { createSelectSchema } from "drizzle-zod";
 
-const selectUserAdhesionSchema = createSelectSchema(userAdhesions);
+const selectUserClientAdhesionSchema = createSelectSchema(userClientAdhesions);
 
-export async function getUserAdhesion({
+export async function getUserClientAdhesion({
   userId,
   entrepriseId,
 }: {
@@ -15,15 +15,15 @@ export async function getUserAdhesion({
 }) {
   const [row] = await db
     .select()
-    .from(userAdhesions)
+    .from(userClientAdhesions)
     .where(
       and(
-        eq(userAdhesions.userId, userId),
-        eq(userAdhesions.entrepriseId, entrepriseId),
+        eq(userClientAdhesions.userId, userId),
+        eq(userClientAdhesions.entrepriseId, entrepriseId),
       ),
     )
     .limit(1);
 
   if (!row) return null;
-  return selectUserAdhesionSchema.parse(row);
+  return selectUserClientAdhesionSchema.parse(row);
 }

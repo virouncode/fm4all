@@ -1,6 +1,6 @@
 import { redirect } from "@/i18n/navigation";
 import { db } from "@/db";
-import { userSiteAttributions } from "@/db/schema/users";
+import { userClientSiteAttributions } from "@/db/schema/users";
 import { sitesArborescence } from "@/db/schema/sites";
 import { getSession } from "@/server/auth/get-session";
 import {
@@ -8,9 +8,9 @@ import {
   getOccurrenceWithDetailsById,
 } from "@/server/queries/clientServiceExecutions.query";
 import { getPrestationWithJoinsById } from "@/server/queries/clientServices.query";
-import { getUserAdhesion } from "@/server/queries/userAdhesions.query";
+import { getUserClientAdhesion } from "@/server/queries/userAdhesions.query";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
-import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userSiteAttributions.utils";
+import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userClientSiteAttributions.utils";
 import { and, eq, inArray } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { z } from "zod";
@@ -34,13 +34,13 @@ async function hasPrestataireUsersOnSite(
   if (ancestorIds.length === 0) return false;
 
   const rows = await db
-    .select({ id: userSiteAttributions.id })
-    .from(userSiteAttributions)
+    .select({ id: userClientSiteAttributions.id })
+    .from(userClientSiteAttributions)
     .where(
       and(
-        eq(userSiteAttributions.entrepriseId, prestataireEntrepriseId),
-        eq(userSiteAttributions.mode, "inclure"),
-        inArray(userSiteAttributions.siteId, ancestorIds),
+        eq(userClientSiteAttributions.entrepriseId, prestataireEntrepriseId),
+        eq(userClientSiteAttributions.mode, "inclure"),
+        inArray(userClientSiteAttributions.siteId, ancestorIds),
       ),
     )
     .limit(1);
@@ -80,7 +80,7 @@ export default async function OccurrenceDetailPage({
   const isPlateforme = !!platformRole?.role;
 
   if (!isPlateforme) {
-    const adhesion = await getUserAdhesion({
+    const adhesion = await getUserClientAdhesion({
       userId: currentUser.id,
       entrepriseId: prestation.entrepriseId,
     });
@@ -101,7 +101,7 @@ export default async function OccurrenceDetailPage({
       entrepriseId: prestation.entrepriseId,
     });
     canManage = siteRole === "responsable_site";
-    canInteract = siteRole === "responsable_site" || siteRole === "intervenant_site";
+    canInteract = siteRole === "responsable_site";
   }
 
   // Permission d'assigner l'intervenant de l'occurrence (côté prestataire)

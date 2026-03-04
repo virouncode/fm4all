@@ -50,7 +50,7 @@ export function UserSiteAttributionEditDialog({
 }: UserSiteAttributionEditDialogProps) {
   // Récupérer la posture active et le rôle de l'utilisateur actuel
   const posture = useAppStore((state) => state.postureActive);
-  const currentUserRole = useAppStore((state) => state.roleAdhesion);
+  const currentUserRole = useAppStore((state) => state.roleClientAdhesion);
 
   // Filtrer les rôles disponibles selon la posture ET le niveau de l'utilisateur
   const availableRoles = getAvailableRolesByPostureAndLevel(

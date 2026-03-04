@@ -21,7 +21,7 @@ import {
   getPrestationById,
   getPrestationWithJoinsById,
 } from "@/server/queries/clientServices.query";
-import { getUserAdhesion } from "@/server/queries/userAdhesions.query";
+import { getUserClientAdhesion } from "@/server/queries/userAdhesions.query";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
 import { getUsersByEntrepriseId } from "@/server/queries/users.query";
 import { promoteS3Key, s3, S3_BUCKET } from "@/server/s3/s3";
@@ -30,7 +30,7 @@ import {
   pickExecutionForOccurrence,
   snapshotOccurrenceTaches,
 } from "@/server/utils/clientServiceOccurrences.utils";
-import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userSiteAttributions.utils";
+import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userClientSiteAttributions.utils";
 import {
   addTachePieceJointeSchema,
   deleteAdHocTacheSchema,
@@ -98,7 +98,7 @@ async function canInteractWithPrestation(
     siteId,
     entrepriseId,
   });
-  return siteRole === "responsable_site" || siteRole === "intervenant_site";
+  return siteRole === "responsable_site";
 }
 
 // Transitions autorisées par statut courant
@@ -278,7 +278,7 @@ export const getOccurrencesPageAction = actionClient
     // Vérifier l'accès à l'entreprise (plateforme OU adhésion)
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
-      const adhesion = await getUserAdhesion({
+      const adhesion = await getUserClientAdhesion({
         userId: currentUser.id,
         entrepriseId,
       });
@@ -327,7 +327,7 @@ export const getOccurrenceTachesAction = actionClient
     // Vérifier accès à l'entreprise (plateforme OU adhésion)
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
-      const adhesion = await getUserAdhesion({
+      const adhesion = await getUserClientAdhesion({
         userId: currentUser.id,
         entrepriseId,
       });
@@ -1072,7 +1072,7 @@ export const updateTacheAssigneeAction = actionClient
     // Vérifier accès entreprise
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
-      const adhesion = await getUserAdhesion({
+      const adhesion = await getUserClientAdhesion({
         userId: currentUser.id,
         entrepriseId,
       });
@@ -1153,7 +1153,7 @@ export const updateTacheAssigneeAction = actionClient
           "Aucun prestataire n'est assigné à cette intervention.",
         );
       }
-      const assigneeAdhesion = await getUserAdhesion({
+      const assigneeAdhesion = await getUserClientAdhesion({
         userId: assigneeUserId,
         entrepriseId: prestataireEntrepriseId,
       });
@@ -1200,7 +1200,7 @@ export const getAssignableUsersForOccurrenceAction = actionClient
 
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
-      const adhesion = await getUserAdhesion({
+      const adhesion = await getUserClientAdhesion({
         userId: currentUser.id,
         entrepriseId,
       });
@@ -1238,7 +1238,7 @@ export const linkTicketToOccurrenceAction = actionClient
 
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
-      const adhesion = await getUserAdhesion({
+      const adhesion = await getUserClientAdhesion({
         userId: currentUser.id,
         entrepriseId,
       });
@@ -1293,7 +1293,7 @@ export const unlinkTicketFromOccurrenceAction = actionClient
 
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
-      const adhesion = await getUserAdhesion({
+      const adhesion = await getUserClientAdhesion({
         userId: currentUser.id,
         entrepriseId,
       });
@@ -1340,7 +1340,7 @@ export const getAvailableTicketsForLinkingAction = actionClient
 
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
-      const adhesion = await getUserAdhesion({
+      const adhesion = await getUserClientAdhesion({
         userId: currentUser.id,
         entrepriseId,
       });
@@ -1392,7 +1392,7 @@ export const getTicketsByOccurrenceAction = actionClient
 
     const platformRole = await getUserPlateformeAdhesion(currentUser.id);
     if (!platformRole?.role) {
-      const adhesion = await getUserAdhesion({
+      const adhesion = await getUserClientAdhesion({
         userId: currentUser.id,
         entrepriseId,
       });
@@ -1458,7 +1458,7 @@ export const updateOccurrenceAssigneeAction = actionClient
 
     // Garde : l'assigné doit appartenir à l'entreprise prestataire
     if (assigneeUserId !== null) {
-      const assigneeAdhesion = await getUserAdhesion({
+      const assigneeAdhesion = await getUserClientAdhesion({
         userId: assigneeUserId,
         entrepriseId: prestataireEntrepriseId,
       });
@@ -1567,7 +1567,7 @@ export const deployAssignationAction = actionClient
 
     // Garde : l'assigné doit appartenir à l'entreprise prestataire
     if (assigneeUserId !== null) {
-      const assigneeAdhesion = await getUserAdhesion({
+      const assigneeAdhesion = await getUserClientAdhesion({
         userId: assigneeUserId,
         entrepriseId: prestataireEntrepriseId,
       });

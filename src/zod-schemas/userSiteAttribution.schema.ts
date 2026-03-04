@@ -1,14 +1,18 @@
 import {
   attributionModeCodes,
-  roleAttributionSiteCodes,
+  roleClientAttributionSiteCodes,
   siteAttributionScopeCodes,
 } from "@/constants/codeTables";
-import { userSiteAttributions } from "@/db/schema/users";
+import { userClientSiteAttributions } from "@/db/schema/users";
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const roleAttributionSchema = z.enum(roleAttributionSiteCodes);
-export type RoleAttributionType = z.infer<typeof roleAttributionSchema>;
+export const roleClientAttributionSchema = z.enum(
+  roleClientAttributionSiteCodes,
+);
+export type RoleClientAttributionType = z.infer<
+  typeof roleClientAttributionSchema
+>;
 
 export const siteAttributionScopeSchema = z.enum(siteAttributionScopeCodes);
 export type SiteAttributionScopeType = z.infer<
@@ -19,14 +23,15 @@ export const attributionModeSchema = z.enum(attributionModeCodes);
 export type AttributionModeType = z.infer<typeof attributionModeSchema>;
 
 // SELECT schema (from DB)
-export const selectUserSiteAttributionSchema =
-  createSelectSchema(userSiteAttributions);
-export type SelectUserSiteAttributionType = z.infer<
-  typeof selectUserSiteAttributionSchema
+export const selectUserClientSiteAttributionSchema = createSelectSchema(
+  userClientSiteAttributions,
+);
+export type SelectUserClientSiteAttributionType = z.infer<
+  typeof selectUserClientSiteAttributionSchema
 >;
 
 export const selectUserSiteAttributionWithSiteSchema =
-  selectUserSiteAttributionSchema.extend({
+  selectUserClientSiteAttributionSchema.extend({
     site: z.object({
       id: z.uuid(),
       nom: z.string(),
@@ -38,7 +43,7 @@ export type SelectUserSiteAttributionWithSiteType = z.infer<
   typeof selectUserSiteAttributionWithSiteSchema
 >;
 
-// Schema pour attributions avec héritage (utilisé par getUserSiteAttributions)
+// Schema pour attributions avec héritage (utilisé par getUserClientSiteAttributions)
 export const selectUserSiteAttributionWithInheritanceSchema =
   selectUserSiteAttributionWithSiteSchema.extend({
     isInherited: z.boolean(),
@@ -55,7 +60,7 @@ export const insertUserSiteAttributionFormSchema = z.object({
   siteId: z.uuid("ID site invalide"),
   mode: attributionModeSchema,
   scope: siteAttributionScopeSchema,
-  role: roleAttributionSchema,
+  role: roleClientAttributionSchema,
   entrepriseId: z.uuid("ID entreprise invalide"),
 });
 export type InsertUserSiteAttributionFormType = z.infer<
@@ -68,7 +73,7 @@ export const bulkInsertUserSiteAttributionsFormSchema = z.object({
   siteIds: z.array(z.uuid()).min(1, "Au moins un site doit être sélectionné"),
   mode: attributionModeSchema,
   scope: siteAttributionScopeSchema,
-  role: roleAttributionSchema,
+  role: roleClientAttributionSchema,
   entrepriseId: z.uuid("ID entreprise invalide"),
 });
 export type BulkInsertUserSiteAttributionsFormType = z.infer<
@@ -76,8 +81,6 @@ export type BulkInsertUserSiteAttributionsFormType = z.infer<
 >;
 
 // BULK INSERT avec attributions MIXTES (mode/scope/role différents par site)
-// Utilisé pour les cas complexes : racines (inclure) + exclusions (exclure)
-// Optionnel: exclusionsToDelete pour supprimer des exclusions existantes avant insertion
 export const bulkInsertMixedAttributionsFormSchema = z.object({
   userId: z.uuid("ID utilisateur invalide"),
   entrepriseId: z.uuid("ID entreprise invalide"),
@@ -87,11 +90,11 @@ export const bulkInsertMixedAttributionsFormSchema = z.object({
         siteId: z.uuid("ID site invalide"),
         mode: attributionModeSchema,
         scope: siteAttributionScopeSchema,
-        role: roleAttributionSchema,
+        role: roleClientAttributionSchema,
       }),
     )
     .min(1, "Au moins une attribution doit être fournie"),
-  exclusionsToDelete: z.array(z.uuid()).optional(), // IDs des attributions mode=exclure à supprimer
+  exclusionsToDelete: z.array(z.uuid()).optional(),
 });
 export type BulkInsertMixedAttributionsFormType = z.infer<
   typeof bulkInsertMixedAttributionsFormSchema
@@ -100,7 +103,7 @@ export type BulkInsertMixedAttributionsFormType = z.infer<
 // DELETE schema
 export const deleteUserSiteAttributionSchema = z.object({
   id: z.uuid("ID attribution invalide"),
-  userId: z.uuid("ID utilisateur invalide"), // For permission check
+  userId: z.uuid("ID utilisateur invalide"),
 });
 export type DeleteUserSiteAttributionType = z.infer<
   typeof deleteUserSiteAttributionSchema
@@ -109,10 +112,10 @@ export type DeleteUserSiteAttributionType = z.infer<
 // UPDATE schema
 export const updateUserSiteAttributionFormSchema = z.object({
   id: z.uuid("ID attribution invalide"),
-  userId: z.uuid("ID utilisateur invalide"), // For permission check
+  userId: z.uuid("ID utilisateur invalide"),
   mode: attributionModeSchema,
   scope: siteAttributionScopeSchema,
-  role: roleAttributionSchema,
+  role: roleClientAttributionSchema,
   entrepriseId: z.uuid("ID entreprise invalide"),
 });
 export type UpdateUserSiteAttributionFormType = z.infer<

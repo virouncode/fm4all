@@ -54,7 +54,14 @@ const HeaderClient = () => {
                 src="/img/logo_full.webp"
                 alt="fm4all-Logo"
                 fill
-                className="object-contain"
+                className="object-contain dark:hidden"
+                sizes="100px"
+              />
+              <Image
+                src="/img/logo_full_dark_mode.webp"
+                alt="fm4all-Logo"
+                fill
+                className="hidden object-contain dark:block"
                 sizes="100px"
               />
             </Link>

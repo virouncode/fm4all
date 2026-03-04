@@ -12,7 +12,7 @@ type ServiceItem = { serviceId: string; nom: string };
 
 export function MonEntrepriseClient() {
   const entreprise = useAppStore((s) => s.entreprise);
-  const roleAdhesion = useAppStore((s) => s.roleAdhesion);
+  const roleAdhesion = useAppStore((s) => s.roleClientAdhesion);
 
   const [data, setData] = useState<{
     entreprise: EntrepriseWithDetails;

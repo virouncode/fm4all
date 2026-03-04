@@ -1,7 +1,7 @@
 import "server-only";
 
 import { db } from "@/db";
-import { getUserSiteAttributions } from "@/server/queries/userSiteAttributions.query";
+import { getUserClientSiteAttributions } from "@/server/queries/userSiteAttributions.query";
 
 type DbOrTransaction =
   | typeof db
@@ -10,7 +10,7 @@ type DbOrTransaction =
 /**
  * Récupère les IDs des sites accessibles pour l'utilisateur (pour tickets)
  *
- * Utilise getUserSiteAttributions qui gère déjà:
+ * Utilise getUserClientSiteAttributions qui gère déjà:
  * - Le scope (self/subtree)
  * - Le mode (inclure/exclure)
  * - La closure table pour les hiérarchies
@@ -29,7 +29,7 @@ export async function getUserAccessibleSiteIdsForTickets({
   entrepriseId: string;
   tx?: DbOrTransaction;
 }): Promise<string[]> {
-  const { attributions } = await getUserSiteAttributions({
+  const { attributions } = await getUserClientSiteAttributions({
     userId,
     entrepriseId,
   });

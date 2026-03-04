@@ -1,11 +1,11 @@
 import "server-only";
 import { db } from "@/db";
-import { userSiteAttributions } from "@/db/schema/users";
+import { userClientSiteAttributions } from "@/db/schema/users";
 import { sitesArborescence } from "@/db/schema/sites";
 import { and, eq, inArray } from "drizzle-orm";
 import type {
   AttributionModeType,
-  RoleAttributionType,
+  RoleClientAttributionType,
 } from "@/zod-schemas/userSiteAttribution.schema";
 import { getSiteAncestorsFromClosureTable } from "../queries/userSiteAttributions.query";
 
@@ -36,7 +36,7 @@ export async function resolveUserRightsOnSite({
   entrepriseId: string;
   tx?: DbOrTransaction;
 }): Promise<{
-  role: RoleAttributionType;
+  role: RoleClientAttributionType;
   scope: "self" | "subtree";
   attributionId: string;
   profondeur: number;
@@ -46,11 +46,11 @@ export async function resolveUserRightsOnSite({
   // 1. Récupérer toutes les attributions de l'utilisateur
   const attributions = await dbClient
     .select()
-    .from(userSiteAttributions)
+    .from(userClientSiteAttributions)
     .where(
       and(
-        eq(userSiteAttributions.userId, userId),
-        eq(userSiteAttributions.entrepriseId, entrepriseId),
+        eq(userClientSiteAttributions.userId, userId),
+        eq(userClientSiteAttributions.entrepriseId, entrepriseId),
       ),
     );
 
@@ -58,7 +58,7 @@ export async function resolveUserRightsOnSite({
 
   // 2. Pour chaque attribution, vérifier si elle couvre le site cible
   const validAttributions: Array<{
-    role: RoleAttributionType;
+    role: RoleClientAttributionType;
     scope: "self" | "subtree";
     attributionId: string;
     profondeur: number;
@@ -121,7 +121,7 @@ export async function resolveUserRightsOnSite_OLD({
   entrepriseId: string;
   tx?: DbOrTransaction;
 }): Promise<{
-  role: RoleAttributionType;
+  role: RoleClientAttributionType;
   scope: "self" | "subtree";
   attributionId: string;
   profondeur: number;
@@ -131,18 +131,18 @@ export async function resolveUserRightsOnSite_OLD({
 
   const attributions = await dbClient
     .select()
-    .from(userSiteAttributions)
+    .from(userClientSiteAttributions)
     .where(
       and(
-        eq(userSiteAttributions.userId, userId),
-        eq(userSiteAttributions.entrepriseId, entrepriseId),
+        eq(userClientSiteAttributions.userId, userId),
+        eq(userClientSiteAttributions.entrepriseId, entrepriseId),
       ),
     );
 
   if (attributions.length === 0) return null;
 
   const validAttributions: Array<{
-    role: RoleAttributionType;
+    role: RoleClientAttributionType;
     scope: "self" | "subtree";
     attributionId: string;
     profondeur: number;
@@ -214,17 +214,17 @@ export async function resolveUserEffectiveRoleOnSite({
   siteId: string;
   entrepriseId: string;
   tx?: DbOrTransaction;
-}): Promise<RoleAttributionType | null> {
+}): Promise<RoleClientAttributionType | null> {
   const dbClient = tx || db;
 
   // 1. Récupérer TOUTES les attributions de l'utilisateur (inclure + exclure)
   const attributions = await dbClient
     .select()
-    .from(userSiteAttributions)
+    .from(userClientSiteAttributions)
     .where(
       and(
-        eq(userSiteAttributions.userId, userId),
-        eq(userSiteAttributions.entrepriseId, entrepriseId),
+        eq(userClientSiteAttributions.userId, userId),
+        eq(userClientSiteAttributions.entrepriseId, entrepriseId),
       ),
     );
 
@@ -232,7 +232,7 @@ export async function resolveUserEffectiveRoleOnSite({
 
   // 2. Pour chaque attribution, vérifier si elle couvre le site cible
   const validAttributions: Array<{
-    role: RoleAttributionType;
+    role: RoleClientAttributionType;
     mode: "inclure" | "exclure";
     scope: "self" | "subtree";
     profondeur: number;
@@ -298,7 +298,7 @@ export async function resolveUserEffectiveRoleOnSite({
  *
  * Même algorithme (spécificité par profondeur, mode exclure) appliqué en mémoire.
  *
- * @returns Map<siteId, RoleAttributionType | null>
+ * @returns Map<siteId, RoleClientAttributionType | null>
  */
 export async function resolveUserEffectiveRolesOnSites({
   userId,
@@ -310,7 +310,7 @@ export async function resolveUserEffectiveRolesOnSites({
   siteIds: string[];
   entrepriseId: string;
   tx?: DbOrTransaction;
-}): Promise<Map<string, RoleAttributionType | null>> {
+}): Promise<Map<string, RoleClientAttributionType | null>> {
   if (siteIds.length === 0) {
     return new Map();
   }
@@ -320,11 +320,11 @@ export async function resolveUserEffectiveRolesOnSites({
   // 1 seule query : toutes les attributions de l'utilisateur
   const attributions = await dbClient
     .select()
-    .from(userSiteAttributions)
+    .from(userClientSiteAttributions)
     .where(
       and(
-        eq(userSiteAttributions.userId, userId),
-        eq(userSiteAttributions.entrepriseId, entrepriseId),
+        eq(userClientSiteAttributions.userId, userId),
+        eq(userClientSiteAttributions.entrepriseId, entrepriseId),
       ),
     );
 
@@ -378,11 +378,11 @@ export async function resolveUserEffectiveRolesOnSites({
   }
 
   // Résoudre en mémoire pour chaque siteId (même algo que resolveUserEffectiveRoleOnSite)
-  const results = new Map<string, RoleAttributionType | null>();
+  const results = new Map<string, RoleClientAttributionType | null>();
 
   for (const siteId of siteIds) {
     const validAttrs: Array<{
-      role: RoleAttributionType;
+      role: RoleClientAttributionType;
       mode: "inclure" | "exclure";
       profondeur: number;
     }> = [];
@@ -442,7 +442,7 @@ export async function userHasRoleOnSite({
 }: {
   userId: string;
   siteId: string;
-  role: RoleAttributionType;
+  role: RoleClientAttributionType;
   entrepriseId: string;
   tx?: DbOrTransaction;
 }): Promise<boolean> {
@@ -485,7 +485,7 @@ export async function canonizeAttributions({
     siteId: string;
     mode: AttributionModeType;
     scope: "self" | "subtree";
-    role: RoleAttributionType;
+    role: RoleClientAttributionType;
   }>;
   userId: string;
   entrepriseId: string;
@@ -494,14 +494,14 @@ export async function canonizeAttributions({
     siteId: string;
     mode: AttributionModeType;
     scope: "self" | "subtree";
-    role: RoleAttributionType;
+    role: RoleClientAttributionType;
   }>
 > {
   const canonical: Array<{
     siteId: string;
     mode: AttributionModeType;
     scope: "self" | "subtree";
-    role: RoleAttributionType;
+    role: RoleClientAttributionType;
   }> = [];
 
   for (const attr of attributions) {

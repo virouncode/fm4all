@@ -32,7 +32,7 @@ import {
   getTicketById,
   getTicketsByPerimetre,
 } from "@/server/queries/tickets.query";
-import { getUserAdhesion } from "@/server/queries/userAdhesions.query";
+import { getUserClientAdhesion } from "@/server/queries/userAdhesions.query";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
 
 // Utils
@@ -71,7 +71,7 @@ export const getTicketsAction = actionClient
     }
 
     // Vérifier accès entreprise
-    const adhesion = await getUserAdhesion({
+    const adhesion = await getUserClientAdhesion({
       userId: currentUser.id,
       entrepriseId: parsedInput.entrepriseId,
     });
@@ -137,7 +137,7 @@ export const getTicketByIdAction = actionClient
     }
 
     // Vérifier accès entreprise
-    const adhesion = await getUserAdhesion({
+    const adhesion = await getUserClientAdhesion({
       userId: currentUser.id,
       entrepriseId: parsedInput.entrepriseId,
     });
@@ -198,7 +198,7 @@ export const insertTicketAction = actionClient
     }
 
     // Vérifier accès entreprise
-    const adhesion = await getUserAdhesion({
+    const adhesion = await getUserClientAdhesion({
       userId: currentUser.id,
       entrepriseId: parsedInput.entrepriseId,
     });
@@ -330,7 +330,7 @@ export const updateTicketAction = actionClient
     }
 
     // Vérifier accès entreprise
-    const adhesion = await getUserAdhesion({
+    const adhesion = await getUserClientAdhesion({
       userId: currentUser.id,
       entrepriseId: parsedInput.entrepriseId,
     });
@@ -414,7 +414,7 @@ export const changeTicketStatusAction = actionClient
     }
 
     // Vérifier accès entreprise
-    const adhesion = await getUserAdhesion({
+    const adhesion = await getUserClientAdhesion({
       userId: currentUser.id,
       entrepriseId: parsedInput.entrepriseId,
     });
@@ -501,7 +501,7 @@ export const assignTicketAction = actionClient
     }
 
     // Vérifier accès entreprise
-    const adhesion = await getUserAdhesion({
+    const adhesion = await getUserClientAdhesion({
       userId: currentUser.id,
       entrepriseId: parsedInput.entrepriseId,
     });
@@ -582,7 +582,7 @@ export const getTicketMessagesAction = actionClient
     }
 
     // Vérifier accès entreprise
-    const adhesion = await getUserAdhesion({
+    const adhesion = await getUserClientAdhesion({
       userId: currentUser.id,
       entrepriseId: parsedInput.entrepriseId,
     });
@@ -642,7 +642,7 @@ export const updateTicketBasicFieldsAction = actionClient
 
     // Si pas plateforme, vérifier accès entreprise
     if (!platformRole?.role) {
-      const adhesion = await getUserAdhesion({
+      const adhesion = await getUserClientAdhesion({
         userId: currentUser.id,
         entrepriseId: parsedInput.entrepriseId,
       });
@@ -712,7 +712,7 @@ export const updateTicketAssigneEntrepriseAction = actionClient
     });
 
     // Vérifier accès entreprise
-    const adhesion = await getUserAdhesion({
+    const adhesion = await getUserClientAdhesion({
       userId: currentUser.id,
       entrepriseId: normalized.entrepriseId,
     });
@@ -798,7 +798,7 @@ export const updateTicketAssigneUserAction = actionClient
     });
 
     // Vérifier accès entreprise
-    const adhesion = await getUserAdhesion({
+    const adhesion = await getUserClientAdhesion({
       userId: currentUser.id,
       entrepriseId: normalized.entrepriseId,
     });
@@ -858,7 +858,7 @@ export const updateTicketStatutAction = actionClient
 
     // Si pas plateforme, vérifier accès entreprise
     if (!platformRole?.role) {
-      const adhesion = await getUserAdhesion({
+      const adhesion = await getUserClientAdhesion({
         userId: currentUser.id,
         entrepriseId: parsedInput.entrepriseId,
       });
@@ -961,7 +961,7 @@ export const updateTicketAttachmentsAction = actionClient
 
     // Si pas plateforme, vérifier accès entreprise
     if (!platformRole?.role) {
-      const adhesion = await getUserAdhesion({
+      const adhesion = await getUserClientAdhesion({
         userId: currentUser.id,
         entrepriseId: parsedInput.entrepriseId,
       });

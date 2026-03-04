@@ -14,16 +14,23 @@ import {
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
-import { adhesionStatutCT, roleAdhesionCT } from "@/constants/codeTables";
+import {
+  adhesionStatutCT,
+  roleClientAdhesionCT,
+  rolePlateformeAdhesionCT,
+} from "@/constants/codeTables";
 import { getPresignedReadUrl } from "@/lib/s3/upload-helper";
 import {
+  insertPlateformeUserAction,
   insertUserAction,
   updateUserAction,
 } from "@/server/actions/usersActions";
 import { useAppStore } from "@/stores/application/appStore";
 import {
+  insertPlateformeUserFormSchema,
   insertUserFormSchema,
   updateUserFormSchema,
+  type InsertPlateformeUserFormType,
   type InsertUserFormType,
   type UpdateUserFormType,
 } from "@/zod-schemas/user.schema";
@@ -51,6 +58,7 @@ export function UserFormDialog({
   onSuccess,
 }: UserFormDialogProps) {
   const entreprise = useAppStore((state) => state.entreprise);
+  const postureActive = useAppStore((state) => state.postureActive);
   const isEdit = !!userId;
 
   if (!entreprise?.id) {
@@ -65,6 +73,18 @@ export function UserFormDialog({
         userId={userId!}
         entrepriseId={entreprise.id}
         defaultValues={defaultValues as Partial<UpdateUserFormType>}
+        onSuccess={onSuccess}
+      />
+    );
+  }
+
+  // Posture plateforme → formulaire de création utilisateur plateforme
+  if (postureActive === "plateforme") {
+    return (
+      <CreatePlateformeUserForm
+        open={open}
+        onOpenChange={onOpenChange}
+        entrepriseId={entreprise.id}
         onSuccess={onSuccess}
       />
     );
@@ -99,13 +119,13 @@ function CreateUserForm({
   onSuccess?: () => void;
 }) {
   // Récupérer le rôle de l'utilisateur connecté
-  const currentUserRole = useAppStore((state) => state.roleAdhesion);
+  const currentUserRole = useAppStore((state) => state.roleClientAdhesion);
   const currentUserPlateformeRole = useAppStore(
     (state) => state.rolePlateformeAdhesion,
   );
 
   // Filtrer les options de rôle selon le rôle actuel (même logique que EditUserForm)
-  const availableRoles = roleAdhesionCT.filter((r) => {
+  const availableRoles = roleClientAdhesionCT.filter((r) => {
     if (!currentUserRole && !currentUserPlateformeRole) return false;
 
     // Platform super admin: all roles
@@ -254,6 +274,148 @@ function CreateUserForm({
   );
 }
 
+// Create Plateforme User Form Component
+function CreatePlateformeUserForm({
+  open,
+  onOpenChange,
+  entrepriseId,
+  onSuccess,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  entrepriseId: string;
+  onSuccess?: () => void;
+}) {
+  const form = useForm<InsertPlateformeUserFormType>({
+    resolver: zodResolver(insertPlateformeUserFormSchema),
+    defaultValues: {
+      prenom: "",
+      nom: "",
+      email: "",
+      phone: "",
+      avatar: null,
+      rolePlateformeAdhesion: "operateur_plateforme",
+    },
+    mode: "onTouched",
+  });
+
+  const { isDirty, isSubmitting } = useFormState({ control: form.control });
+
+  useEffect(() => {
+    if (open) {
+      form.reset({
+        prenom: "",
+        nom: "",
+        email: "",
+        phone: "",
+        avatar: null,
+        rolePlateformeAdhesion: "operateur_plateforme",
+      });
+    }
+  }, [open, form]);
+
+  const onSubmit = async (data: InsertPlateformeUserFormType) => {
+    const result = await insertPlateformeUserAction({
+      ...data,
+      entrepriseId,
+    });
+
+    if (result?.serverError) {
+      toast.error(result.serverError.message);
+      return;
+    }
+
+    if (result?.validationErrors) {
+      toast.error("Erreur de validation");
+      return;
+    }
+
+    toast.success(result?.data?.message || "Utilisateur plateforme créé");
+    onSuccess?.();
+    onOpenChange(false);
+    form.reset();
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="flex max-h-[90vh] max-w-2xl flex-col">
+        <DialogHeader>
+          <DialogTitle>Créer un utilisateur plateforme</DialogTitle>
+        </DialogHeader>
+
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-1 flex-col overflow-hidden"
+          >
+            <div className="flex-1 space-y-4 overflow-y-auto px-1">
+              <div className="grid grid-cols-2 gap-4">
+                <RhfInput<InsertPlateformeUserFormType>
+                  label="Prénom"
+                  name="prenom"
+                  requiredMark
+                />
+                <RhfInput<InsertPlateformeUserFormType>
+                  label="Nom"
+                  name="nom"
+                  requiredMark
+                />
+              </div>
+
+              <RhfInput<InsertPlateformeUserFormType>
+                label="Email"
+                name="email"
+                type="email"
+                requiredMark
+              />
+              <RhfInput<InsertPlateformeUserFormType>
+                label="N° de téléphone"
+                name="phone"
+              />
+              <RhfControlledSelect<InsertPlateformeUserFormType>
+                label="Rôle plateforme"
+                name="rolePlateformeAdhesion"
+                requiredMark
+                className="w-full"
+                selectClassName="w-full"
+              >
+                {rolePlateformeAdhesionCT.map((r) => (
+                  <SelectItem key={r.code} value={r.code}>
+                    {r.name}
+                  </SelectItem>
+                ))}
+              </RhfControlledSelect>
+
+              <RhfFileInput<InsertPlateformeUserFormType>
+                label="Avatar (format carré, max 2MB)"
+                name="avatar"
+                proprietaireEntrepriseId={entrepriseId}
+                categorie="avatar"
+                accept="image/*"
+                squareMandatory
+                maxSizeBytes={2 * 1024 * 1024}
+              />
+            </div>
+
+            <DialogFooter className="bg-background flex shrink-0 justify-end gap-2 border-t pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
+                Annuler
+              </Button>
+              <Button type="submit" disabled={isSubmitting || !isDirty}>
+                {isSubmitting && <Spinner />}Créer
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 // Edit Form Component
 function EditUserForm({
   open,
@@ -272,7 +434,7 @@ function EditUserForm({
 }) {
   // Récupérer l'utilisateur connecté
   const currentUser = useAppStore((state) => state.user);
-  const currentUserRole = useAppStore((state) => state.roleAdhesion);
+  const currentUserRole = useAppStore((state) => state.roleClientAdhesion);
   const currentUserPlateformeRole = useAppStore(
     (state) => state.rolePlateformeAdhesion,
   );
@@ -281,7 +443,7 @@ function EditUserForm({
   const isEditingSelf = currentUser?.id === userId;
 
   // Filtrer les options de rôle selon le rôle actuel
-  const availableRoles = roleAdhesionCT.filter(() => {
+  const availableRoles = roleClientAdhesionCT.filter(() => {
     if (!currentUserRole && !currentUserPlateformeRole) return false;
 
     // Platform super admin: all roles

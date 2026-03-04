@@ -8,9 +8,9 @@ import {
   getOccurrencesByPrestationId,
 } from "@/server/queries/clientServiceExecutions.query";
 import { getPrestationWithJoinsById } from "@/server/queries/clientServices.query";
-import { getUserAdhesion } from "@/server/queries/userAdhesions.query";
+import { getUserClientAdhesion } from "@/server/queries/userAdhesions.query";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
-import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userSiteAttributions.utils";
+import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userClientSiteAttributions.utils";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { PrestationDetailsClient } from "./PrestationDetailsClient";
@@ -49,7 +49,7 @@ export default async function PrestationDetailPage({
   const isPlateforme = !!platformRole?.role;
 
   if (!isPlateforme) {
-    const adhesion = await getUserAdhesion({
+    const adhesion = await getUserClientAdhesion({
       userId: currentUser.id,
       entrepriseId: prestation.entrepriseId,
     });

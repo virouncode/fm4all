@@ -8,7 +8,7 @@ import {
   clientServices,
   tacheListesTemplates,
 } from "@/db/schema/services";
-import { userAdhesions } from "@/db/schema/users";
+import { userClientAdhesions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
@@ -21,7 +21,7 @@ import {
 } from "@/server/queries/clientServices.query";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
 import { onClientServiceChanged } from "@/server/utils/clientServiceOccurrences.utils";
-import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userSiteAttributions.utils";
+import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userClientSiteAttributions.utils";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
   getPrestationsQuerySchema,
@@ -73,10 +73,10 @@ async function hasAccessToEntreprise(
   const platformRole = await getUserPlateformeAdhesion(userId);
   if (platformRole?.role) return true;
 
-  const adhesion = await db.query.userAdhesions.findFirst({
+  const adhesion = await db.query.userClientAdhesions.findFirst({
     where: and(
-      eq(userAdhesions.userId, userId),
-      eq(userAdhesions.entrepriseId, entrepriseId),
+      eq(userClientAdhesions.userId, userId),
+      eq(userClientAdhesions.entrepriseId, entrepriseId),
     ),
   });
 

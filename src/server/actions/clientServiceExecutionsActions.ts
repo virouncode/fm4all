@@ -12,7 +12,7 @@ import {
   clientServiceOccurrences,
   tacheListesTemplates,
 } from "@/db/schema/services";
-import { userAdhesions } from "@/db/schema/users";
+import { userClientAdhesions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
@@ -24,10 +24,10 @@ import {
   getSitesCouvertsParPrestataire,
 } from "@/server/queries/clientServiceExecutions.query";
 import { getPrestationById } from "@/server/queries/clientServices.query";
-import { getUserAdhesion } from "@/server/queries/userAdhesions.query";
+import { getUserClientAdhesion } from "@/server/queries/userAdhesions.query";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
 import { onClientServiceChanged } from "@/server/utils/clientServiceOccurrences.utils";
-import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userSiteAttributions.utils";
+import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userClientSiteAttributions.utils";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
   createOrLinkPrestataireSchema,
@@ -78,10 +78,10 @@ async function hasAccessToEntreprise(
   const platformRole = await getUserPlateformeAdhesion(userId);
   if (platformRole?.role) return true;
 
-  const adhesion = await db.query.userAdhesions.findFirst({
+  const adhesion = await db.query.userClientAdhesions.findFirst({
     where: and(
-      eq(userAdhesions.userId, userId),
-      eq(userAdhesions.entrepriseId, entrepriseId),
+      eq(userClientAdhesions.userId, userId),
+      eq(userClientAdhesions.entrepriseId, entrepriseId),
     ),
   });
   return !!adhesion;
@@ -105,10 +105,10 @@ export const getPrestatairesForServiceAction = actionClient
     const isPlateforme = !!platformRole?.role;
 
     if (!isPlateforme) {
-      const adhesion = await db.query.userAdhesions.findFirst({
+      const adhesion = await db.query.userClientAdhesions.findFirst({
         where: and(
-          eq(userAdhesions.userId, currentUser.id),
-          eq(userAdhesions.entrepriseId, parsedInput.entrepriseId),
+          eq(userClientAdhesions.userId, currentUser.id),
+          eq(userClientAdhesions.entrepriseId, parsedInput.entrepriseId),
         ),
       });
       if (!adhesion)
@@ -810,7 +810,7 @@ export const getClientPrestatairesAction = actionClient
     const currentUser = session?.user;
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
-    const adhesion = await getUserAdhesion({
+    const adhesion = await getUserClientAdhesion({
       userId: currentUser.id,
       entrepriseId: parsedInput.clientEntrepriseId,
     });
@@ -835,10 +835,10 @@ export const getMesSitesClientsAction = actionClient
     if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
 
     // Vérifier l'adhésion à l'entreprise prestataire
-    const adhesion = await db.query.userAdhesions.findFirst({
+    const adhesion = await db.query.userClientAdhesions.findFirst({
       where: and(
-        eq(userAdhesions.userId, currentUser.id),
-        eq(userAdhesions.entrepriseId, parsedInput.entrepriseId),
+        eq(userClientAdhesions.userId, currentUser.id),
+        eq(userClientAdhesions.entrepriseId, parsedInput.entrepriseId),
       ),
     });
     if (!adhesion) {

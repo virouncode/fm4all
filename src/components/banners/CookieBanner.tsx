@@ -109,7 +109,14 @@ export default function CookieBanner() {
                 src="/img/logo_full.webp"
                 alt="logo-de-fm4all"
                 fill
-                className="object-contain"
+                className="object-contain dark:hidden"
+                sizes="100px"
+              />
+              <Image
+                src="/img/logo_full_dark_mode.webp"
+                alt="logo-de-fm4all"
+                fill
+                className="hidden object-contain dark:block"
                 sizes="100px"
               />
             </div>

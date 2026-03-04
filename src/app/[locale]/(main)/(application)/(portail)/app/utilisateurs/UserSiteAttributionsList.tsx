@@ -90,7 +90,7 @@ export function UserSiteAttributionsList({
   onAddClick,
 }: UserSiteAttributionsListProps) {
   const currentUser = useAppStore((state) => state.user);
-  const currentUserRole = useAppStore((state) => state.roleAdhesion);
+  const currentUserRole = useAppStore((state) => state.roleClientAdhesion);
   const currentUserPlateformeRole = useAppStore(
     (state) => state.rolePlateformeAdhesion,
   );
@@ -222,12 +222,12 @@ export function UserSiteAttributionsList({
               return (
                 <div
                   key={attribution.id}
-                  className="hover:bg-muted/50 flex items-center justify-between rounded-lg border p-3"
+                  className="hover:bg-muted/50 flex items-center justify-between rounded-lg border px-3 py-2"
                   style={{ marginLeft: `${indentPx + 12}px` }}
                 >
-                  <div className="flex-1 space-y-1">
-                    <p className="font-medium">{attribution.site.nom}</p>
-                    <div className="flex flex-wrap gap-2">
+                  <div className="flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-sm font-medium">{attribution.site.nom}</p>
                       <Badge
                         variant="secondary"
                         className={roleColors[attribution.role]}

@@ -90,9 +90,11 @@ import { sites, sitesArborescence } from "./sites";
 import { ticketMessages, tickets } from "./tickets";
 // USERS TABLES
 import {
-  userAdhesions,
+  userClientAdhesions,
+  userClientSiteAttributions,
+  userPrestataireAdhesions,
+  userPrestataireSiteAttributions,
   usersArborescence,
-  userSiteAttributions,
 } from "./users";
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -120,8 +122,10 @@ export const userRelations = relations(user, ({ one, many }) => ({
   }),
   sessions: many(session),
   accounts: many(account),
-  adhesions: many(userAdhesions),
-  siteAttributions: many(userSiteAttributions),
+  clientAdhesions: many(userClientAdhesions),
+  clientSiteAttributions: many(userClientSiteAttributions),
+  prestataireAdhesions: many(userPrestataireAdhesions),
+  prestataireSiteAttributions: many(userPrestataireSiteAttributions),
   ticketsAssigned: many(tickets, { relationName: "ticketAssigneeUser" }),
   ticketMessages: many(ticketMessages),
   occurrencesAssigned: many(clientServiceOccurrences, {
@@ -179,7 +183,8 @@ export const entreprisesRelations = relations(entreprises, ({ one, many }) => ({
   roles: many(entrepriseRoles),
   serviceEntreprises: many(serviceEntreprises),
   sites: many(sites),
-  adhesions: many(userAdhesions),
+  clientAdhesions: many(userClientAdhesions),
+  prestataireAdhesions: many(userPrestataireAdhesions),
   // Contrats relations
   contratsProprietaire: many(contrats, { relationName: "contratProprietaire" }),
   contratsPartieA: many(contrats, { relationName: "contratPartieA" }),
@@ -285,7 +290,8 @@ export const sitesRelations = relations(sites, ({ one, many }) => ({
   clientServiceOccurrences: many(clientServiceOccurrences),
   clientServiceExecutions: many(clientServiceExecutions),
   clientServicePerimetres: many(clientServicePerimetre),
-  userSiteAttributions: many(userSiteAttributions),
+  userClientSiteAttributions: many(userClientSiteAttributions),
+  userPrestataireSiteAttributions: many(userPrestataireSiteAttributions),
   factureLigneAllocations: many(factureLigneAllocations),
   documentsLinks: many(documentsLinks),
 }));
@@ -903,44 +909,89 @@ export const usersArborescenceRelations = relations(
   }),
 );
 
-export const userSiteAttributionsRelations = relations(
-  userSiteAttributions,
+export const userClientSiteAttributionsRelations = relations(
+  userClientSiteAttributions,
   ({ one }) => ({
     entreprise: one(entreprises, {
-      fields: [userSiteAttributions.entrepriseId],
+      fields: [userClientSiteAttributions.entrepriseId],
       references: [entreprises.id],
     }),
     user: one(user, {
-      fields: [userSiteAttributions.userId],
+      fields: [userClientSiteAttributions.userId],
       references: [user.id],
     }),
     site: one(sites, {
-      fields: [userSiteAttributions.siteId],
+      fields: [userClientSiteAttributions.siteId],
       references: [sites.id],
     }),
     createdBy: one(user, {
-      fields: [userSiteAttributions.createdById],
+      fields: [userClientSiteAttributions.createdById],
       references: [user.id],
-      relationName: "userSiteAttributionsCreatedBy",
+      relationName: "userClientSiteAttributionsCreatedBy",
     }),
     updatedBy: one(user, {
-      fields: [userSiteAttributions.updatedById],
+      fields: [userClientSiteAttributions.updatedById],
       references: [user.id],
-      relationName: "userSiteAttributionsUpdatedBy",
+      relationName: "userClientSiteAttributionsUpdatedBy",
     }),
   }),
 );
 
-export const userAdhesionsRelations = relations(userAdhesions, ({ one }) => ({
-  user: one(user, {
-    fields: [userAdhesions.userId],
-    references: [user.id],
+export const userPrestataireSiteAttributionsRelations = relations(
+  userPrestataireSiteAttributions,
+  ({ one }) => ({
+    entreprise: one(entreprises, {
+      fields: [userPrestataireSiteAttributions.entrepriseId],
+      references: [entreprises.id],
+    }),
+    user: one(user, {
+      fields: [userPrestataireSiteAttributions.userId],
+      references: [user.id],
+    }),
+    site: one(sites, {
+      fields: [userPrestataireSiteAttributions.siteId],
+      references: [sites.id],
+    }),
+    createdBy: one(user, {
+      fields: [userPrestataireSiteAttributions.createdById],
+      references: [user.id],
+      relationName: "userPrestataireSiteAttributionsCreatedBy",
+    }),
+    updatedBy: one(user, {
+      fields: [userPrestataireSiteAttributions.updatedById],
+      references: [user.id],
+      relationName: "userPrestataireSiteAttributionsUpdatedBy",
+    }),
   }),
-  entreprise: one(entreprises, {
-    fields: [userAdhesions.entrepriseId],
-    references: [entreprises.id],
+);
+
+export const userClientAdhesionsRelations = relations(
+  userClientAdhesions,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [userClientAdhesions.userId],
+      references: [user.id],
+    }),
+    entreprise: one(entreprises, {
+      fields: [userClientAdhesions.entrepriseId],
+      references: [entreprises.id],
+    }),
   }),
-}));
+);
+
+export const userPrestataireAdhesionsRelations = relations(
+  userPrestataireAdhesions,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [userPrestataireAdhesions.userId],
+      references: [user.id],
+    }),
+    entreprise: one(entreprises, {
+      fields: [userPrestataireAdhesions.entrepriseId],
+      references: [entreprises.id],
+    }),
+  }),
+);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CAFE RELATIONS

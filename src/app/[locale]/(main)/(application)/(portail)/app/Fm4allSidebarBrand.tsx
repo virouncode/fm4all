@@ -14,7 +14,7 @@ export default function Fm4allSidebarBrand() {
         href="/app"
         className="hover:bg-muted/50 flex items-center justify-center rounded-md py-1"
         aria-label="FM4ALL"
-        title="Dashboard"
+        title="Tableau de bord"
       >
         <Image
           src={collapsed ? "/img/logo_simple.webp" : "/img/logo_full.webp"}
@@ -22,7 +22,19 @@ export default function Fm4allSidebarBrand() {
           width={120}
           height={28}
           priority
-          className="h-5 w-auto object-contain"
+          className="h-5 w-auto object-contain dark:hidden"
+        />
+        <Image
+          src={
+            collapsed
+              ? "/img/logo_simple_dark_mode.webp"
+              : "/img/logo_full_dark_mode.webp"
+          }
+          alt="FM4ALL"
+          width={120}
+          height={28}
+          priority
+          className="hidden h-5 w-auto object-contain dark:block"
         />
       </Link>
     </div>

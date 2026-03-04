@@ -11,9 +11,10 @@ import {
   getSiteResponsablesAction,
   getSitesAction,
 } from "@/server/actions/sitesActions";
-import { getUserSiteAttributionsAction } from "@/server/actions/userSiteAttributionsActions";
+import { getUserClientSiteAttributionsAction } from "@/server/actions/userSiteAttributionsActions";
 import { useAppStore } from "@/stores/application/appStore";
 import { SelectSiteType, SiteTreeNode } from "@/zod-schemas/sites.schema";
+import type { SelectUserSiteAttributionWithInheritanceType } from "@/zod-schemas/userSiteAttribution.schema";
 import { Filter, Network, Plus } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { SiteResponsable } from "@/server/queries/sites.query";
@@ -28,7 +29,7 @@ import { SitesTree } from "./SitesTree";
 export function SitesClient() {
   const entreprise = useAppStore((state) => state.entreprise);
   const currentUser = useAppStore((state) => state.user);
-  const currentUserRole = useAppStore((state) => state.roleAdhesion);
+  const currentUserRole = useAppStore((state) => state.roleClientAdhesion);
   const currentUserPlateformeRole = useAppStore(
     (state) => state.rolePlateformeAdhesion,
   );
@@ -179,7 +180,7 @@ export function SitesClient() {
         // Load sites and attributions in parallel
         const [sitesResult, attributionsResult] = await Promise.all([
           getSitesAction({ entrepriseId: entreprise!.id }),
-          getUserSiteAttributionsAction({
+          getUserClientSiteAttributionsAction({
             userId: currentUser!.id,
             entrepriseId: entreprise!.id,
           }),
@@ -193,7 +194,7 @@ export function SitesClient() {
           setTree(builtTree);
         }
 
-        const attributions = attributionsResult?.data?.attributions ?? [];
+        const attributions: SelectUserSiteAttributionWithInheritanceType[] = attributionsResult?.data?.attributions ?? [];
 
         // Responsable IDs
         setResponsableSiteIds(

@@ -35,6 +35,7 @@ import { useLocale } from "next-intl";
 import Image from "next/image";
 import { Suspense, useState } from "react";
 import LinkedinButton from "../buttons/linkedin-button";
+import { ModeToggle } from "../theme/mode-toggle";
 import HeaderButtons from "./header-buttons";
 import HeaderNavigationMenu from "./header-navigation-menu";
 
@@ -374,7 +375,14 @@ const Header = () => {
                 src="/img/logo_full.webp"
                 alt="fm4all-Logo"
                 fill
-                className="object-contain"
+                className="object-contain dark:hidden"
+                sizes="100px"
+              />
+              <Image
+                src="/img/logo_full_dark_mode.webp"
+                alt="fm4all-Logo"
+                fill
+                className="hidden object-contain dark:block"
                 sizes="100px"
               />
             </div>
@@ -413,6 +421,7 @@ const Header = () => {
             >
               <LocaleButton className="flex gap-1" />
             </Suspense>
+            <ModeToggle />
             <ContactButton setIsMobileNavOpen={setIsMobileNavOpen} />
             <LinkedinButton setIsMobileNavOpen={setIsMobileNavOpen} />
             <UserButton setIsMobileNavOpen={setIsMobileNavOpen} />

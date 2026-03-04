@@ -9,7 +9,11 @@ const ServicesLoader = () => {
   return (
     <section className="flex-1 overflow-hidden">
       <div className="flex flex-col gap-10">
-        <LoaderFm4all src="/img/logo_simple.webp" alt="logo-fm4all-simple" />
+        <LoaderFm4all
+          src="/img/logo_simple.webp"
+          darkSrc="/img/logo_simple_dark_mode.webp"
+          alt="logo-fm4all-simple"
+        />
         <div className="mx-auto mt-10 max-w-prose animate-pulse text-center text-lg">
           {tLoader(
             "vous-allez-obtenir-des-devis-qui-beneficient-du-service-de-gestion-centralise-fm4all",

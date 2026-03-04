@@ -289,10 +289,17 @@ const ServicesFm4AllMobilePropositionCard = ({
               <DialogTrigger asChild>
                 <div className="relative h-10">
                   <Image
-                    src={"/img/logo_full_white.webp"}
+                    src={"/img/logo_full.webp"}
                     alt={`logo-de-fm4all`}
                     fill
-                    className="cursor-pointer object-contain object-left"
+                    className="cursor-pointer object-contain object-left dark:hidden"
+                    sizes="(max-width:768px) 100vw"
+                  />
+                  <Image
+                    src={"/img/logo_full_dark_mode.webp"}
+                    alt={`logo-de-fm4all`}
+                    fill
+                    className="hidden cursor-pointer object-contain object-left dark:block"
                     sizes="(max-width:768px) 100vw"
                   />
                 </div>
@@ -305,7 +312,8 @@ const ServicesFm4AllMobilePropositionCard = ({
                   sloganFournisseur={tGlobal(
                     "le-facility-management-pour-tous",
                   )}
-                  logoUrl={"/img/logo_full_white.webp"}
+                  logoUrl={"/img/logo_full.webp"}
+                  darkLogoUrl={"/img/logo_full_dark_mode.webp"}
                   nomFournisseur={"fm4all"}
                   locationUrl={null}
                   anneeCreation={2025}

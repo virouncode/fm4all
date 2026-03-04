@@ -20,7 +20,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { SelectItem } from "@/components/ui/select";
 import {
   bulkInsertMixedAttributionsAction,
-  getUserSiteAttributionsAction,
+  getUserClientSiteAttributionsAction,
 } from "@/server/actions/userSiteAttributionsActions";
 import { useAppStore } from "@/stores/application/appStore";
 import {
@@ -29,7 +29,7 @@ import {
 } from "@/zod-schemas/sites.schema";
 import {
   bulkInsertUserSiteAttributionsFormSchema,
-  type RoleAttributionType,
+  type RoleClientAttributionType,
   type SelectUserSiteAttributionWithInheritanceType,
 } from "@/zod-schemas/userSiteAttribution.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -69,7 +69,7 @@ export function UserSiteAttributionDialog({
 
   // Récupérer la posture active et le rôle de l'utilisateur actuel
   const posture = useAppStore((state) => state.postureActive);
-  const currentUserRole = useAppStore((state) => state.roleAdhesion);
+  const currentUserRole = useAppStore((state) => state.roleClientAdhesion);
 
   // Filtrer les rôles disponibles selon la posture ET le niveau de l'utilisateur
   const availableRoles = getAvailableRolesByPostureAndLevel(
@@ -112,7 +112,7 @@ export function UserSiteAttributionDialog({
     const fetchData = async () => {
       setLoadingSites(true);
       try {
-        const result = await getUserSiteAttributionsAction({
+        const result = await getUserClientSiteAttributionsAction({
           userId,
           entrepriseId,
         });
@@ -127,7 +127,7 @@ export function UserSiteAttributionDialog({
         if (result?.data) {
           setAllSites(result.data.allSites);
           // Filtrer seulement les attributions directes (pas héritées)
-          const direct = result.data.attributions.filter(
+          const direct = (result.data.attributions as SelectUserSiteAttributionWithInheritanceType[]).filter(
             (attr) => !attr.isInherited,
           );
           setDirectAttributions(direct);
@@ -249,7 +249,7 @@ export function UserSiteAttributionDialog({
       siteId: string;
       mode: "inclure" | "exclure";
       scope: "self" | "subtree";
-      role: RoleAttributionType;
+      role: RoleClientAttributionType;
     }> = [];
 
     // IDs des exclusions à supprimer (sites cochés avec mode=exclure existant)

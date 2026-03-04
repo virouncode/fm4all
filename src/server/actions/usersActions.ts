@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { user } from "@/db/schema/auth";
 import { documents } from "@/db/schema/documents";
 import { entreprises } from "@/db/schema/entreprises";
-import { userAdhesions } from "@/db/schema/users";
+import { userClientAdhesions, userPlateformeAdhesions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
@@ -22,13 +22,14 @@ import {
   userHasChildren,
 } from "@/server/utils/usersArborescence.utils";
 import {
+  insertPlateformeUserFormSchema,
   insertUserFormSchema,
   selectUserSchema,
   updateUserFormSchema,
   updateUserToDbSchema,
   usersQueryBackendSchema,
 } from "@/zod-schemas/user.schema";
-import { RoleAdhesionType } from "@/zod-schemas/userAdhesion.schema";
+import { RoleClientAdhesionType } from "@/zod-schemas/userAdhesion.schema";
 import { and, eq } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
 import { headers } from "next/headers";
@@ -58,8 +59,8 @@ export const getUsersAction = actionClient
     }
 
     // Vérifier que currentUser a accès à cette entreprise
-    const { getUserAdhesion } = await import("@/server/queries/userAdhesions.query");
-    const adhesion = await getUserAdhesion({
+    const { getUserClientAdhesion } = await import("@/server/queries/userAdhesions.query");
+    const adhesion = await getUserClientAdhesion({
       userId: currentUser.id,
       entrepriseId: parsedInput.entrepriseId,
     });
@@ -99,8 +100,8 @@ export const getUserByIdAction = actionClient
     const { userId, entrepriseId } = parsedInput;
 
     // Vérifier que currentUser a accès à cette entreprise
-    const { getUserAdhesion } = await import("@/server/queries/userAdhesions.query");
-    const currentUserAdhesion = await getUserAdhesion({
+    const { getUserClientAdhesion } = await import("@/server/queries/userAdhesions.query");
+    const currentUserAdhesion = await getUserClientAdhesion({
       userId: currentUser.id,
       entrepriseId,
     });
@@ -148,8 +149,8 @@ export const getUsersByEntrepriseAction = actionClient
     const { entrepriseId } = parsedInput;
 
     // Vérifier que currentUser a accès à cette entreprise
-    const { getUserAdhesion } = await import("@/server/queries/userAdhesions.query");
-    const adhesion = await getUserAdhesion({
+    const { getUserClientAdhesion } = await import("@/server/queries/userAdhesions.query");
+    const adhesion = await getUserClientAdhesion({
       userId: currentUser.id,
       entrepriseId,
     });
@@ -209,10 +210,10 @@ export const insertUserAction = actionClient
     // ===== VALIDATION DES PERMISSIONS =====
 
     // 1. Récupérer le rôle de l'utilisateur actuel
-    const currentUserAdhesion = await db.query.userAdhesions.findFirst({
+    const currentUserAdhesion = await db.query.userClientAdhesions.findFirst({
       where: and(
-        eq(userAdhesions.userId, currentUser.id),
-        eq(userAdhesions.entrepriseId, entrepriseId),
+        eq(userClientAdhesions.userId, currentUser.id),
+        eq(userClientAdhesions.entrepriseId, entrepriseId),
       ),
     });
 
@@ -342,7 +343,7 @@ export const insertUserAction = actionClient
     // 3. Transaction pour adhesion + arborescence
     await db.transaction(async (tx) => {
       // Insert adhesion (membership avec role global)
-      await tx.insert(userAdhesions).values({
+      await tx.insert(userClientAdhesions).values({
         userId: newUser.id,
         entrepriseId,
         role: roleAdhesion,
@@ -377,6 +378,140 @@ export const insertUserAction = actionClient
     return {
       message:
         "Utilisateur créé avec succès. Un email d'activation a été envoyé.",
+      user: parsedUser,
+    };
+  });
+
+// ==================== INSERT PLATEFORME USER ====================
+
+export const insertPlateformeUserAction = actionClient
+  .metadata({ actionName: "insertPlateformeUserAction" })
+  .inputSchema(
+    insertPlateformeUserFormSchema.extend({
+      entrepriseId: z.uuid("ID entreprise invalide"),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+
+    if (!currentUser) {
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    }
+
+    // Seul super_admin_plateforme peut créer des utilisateurs plateforme
+    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    if (!platformRole || platformRole.role !== "super_admin_plateforme") {
+      throw errors.forbidden(
+        "Seul un super administrateur de la plateforme peut créer des utilisateurs plateforme.",
+      );
+    }
+
+    const { entrepriseId, avatar, rolePlateformeAdhesion } = parsedInput;
+
+    // 1. Gestion avatar (si fourni)
+    let avatarDocumentId: string | null = null;
+    if (avatar?.storageKey) {
+      const promotedKey = await promoteS3Key({ tempKey: avatar.storageKey });
+      const [doc] = await db
+        .insert(documents)
+        .values({
+          proprietaireEntrepriseId: entrepriseId,
+          categorie: "avatar",
+          storageProvider: "s3",
+          storageKey: promotedKey,
+          filename: avatar.filename,
+          mimeType: avatar.mimeType,
+          sizeBytes: avatar.sizeBytes,
+          createdById: currentUser.id,
+        })
+        .returning();
+      if (doc) avatarDocumentId = doc.id;
+    }
+
+    // 2. Normaliser
+    const normalized = normalizeForSubmit(parsedInput, {
+      optionalStrings: ["phone"] as const,
+    });
+
+    // 3. Créer l'utilisateur via better-auth
+    const tempPassword = crypto.randomUUID();
+    let authResult;
+    try {
+      authResult = await auth.api.signUpEmail({
+        body: {
+          email: normalized.email,
+          password: tempPassword,
+          parentId: null,
+          name: `${normalized.prenom} ${normalized.nom}`,
+          prenom: normalized.prenom,
+          nom: normalized.nom,
+          phone: normalized.phone,
+          avatarId: avatarDocumentId ?? null,
+          createdById: currentUser.id,
+          updatedById: currentUser.id,
+        },
+      });
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      if (
+        errorMessage.toLowerCase().includes("already exists") ||
+        errorMessage.toLowerCase().includes("user already exists")
+      ) {
+        throw errors.conflict(
+          `Un utilisateur avec l'email "${normalized.email}" existe déjà.`,
+        );
+      }
+      throw errors.internal(
+        `Erreur lors de la création de l'utilisateur: ${errorMessage}`,
+      );
+    }
+
+    if (!authResult?.user) {
+      throw errors.internal("Échec de la création de l'utilisateur.");
+    }
+
+    const newUser = authResult.user;
+
+    // 4. Transaction : adhésion plateforme + arborescence (dans FM4ALL)
+    await db.transaction(async (tx) => {
+      await tx.insert(userPlateformeAdhesions).values({
+        userId: newUser.id,
+        role: rolePlateformeAdhesion,
+        statut: "actif",
+        createdById: currentUser.id,
+        updatedById: currentUser.id,
+      });
+
+      await insertUserArborescence({
+        entrepriseId,
+        userId: newUser.id,
+        parentId: null,
+        createdById: currentUser.id,
+        tx,
+      });
+    });
+
+    // 5. Envoyer email d'activation
+    const resetHeaders = await headers();
+    await auth.api.requestPasswordReset({
+      body: {
+        email: normalized.email,
+        redirectTo: `${process.env.APP_URL}/auth/reset-password`,
+      },
+      headers: resetHeaders,
+    });
+
+    const parsedUser = selectUserSchema.parse(newUser);
+
+    return {
+      message:
+        "Utilisateur plateforme créé avec succès. Un email d'activation a été envoyé.",
       user: parsedUser,
     };
   });
@@ -422,10 +557,10 @@ export const updateUserAction = actionClient
     // ===== VALIDATION DES PERMISSIONS =====
 
     // 1. Récupérer le rôle de l'utilisateur actuel
-    const currentUserAdhesion = await db.query.userAdhesions.findFirst({
+    const currentUserAdhesion = await db.query.userClientAdhesions.findFirst({
       where: and(
-        eq(userAdhesions.userId, currentUser.id),
-        eq(userAdhesions.entrepriseId, entrepriseId),
+        eq(userClientAdhesions.userId, currentUser.id),
+        eq(userClientAdhesions.entrepriseId, entrepriseId),
       ),
     });
 
@@ -438,21 +573,21 @@ export const updateUserAction = actionClient
     const currentUserRole = currentUserAdhesion.role;
 
     // 2. Récupérer le rôle de l'utilisateur cible
-    const targetUserAdhesion = await db.query.userAdhesions.findFirst({
+    const targetUserClientAdhesion = await db.query.userClientAdhesions.findFirst({
       where: and(
-        eq(userAdhesions.userId, userId),
-        eq(userAdhesions.entrepriseId, entrepriseId),
+        eq(userClientAdhesions.userId, userId),
+        eq(userClientAdhesions.entrepriseId, entrepriseId),
       ),
     });
 
-    if (!targetUserAdhesion) {
+    if (!targetUserClientAdhesion) {
       throw errors.notFound("Adhésion de l'utilisateur cible");
     }
 
-    const targetUserRole = targetUserAdhesion.role;
+    const targetUserRole = targetUserClientAdhesion.role;
 
     // 3. Hiérarchie des rôles
-    const roleHierarchy: Record<RoleAdhesionType, number> = {
+    const roleHierarchy: Record<RoleClientAdhesionType, number> = {
       admin: 3,
       manager: 2,
       collaborateur: 1,
@@ -496,9 +631,9 @@ export const updateUserAction = actionClient
     // 5. Vérifier les permissions pour modifier role/statut
     // Vérifier si le rôle ou le statut ont réellement changé
     const isRoleChanging =
-      roleAdhesion !== undefined && roleAdhesion !== targetUserAdhesion.role;
+      roleAdhesion !== undefined && roleAdhesion !== targetUserClientAdhesion.role;
     const isStatutChanging =
-      statut !== undefined && statut !== targetUserAdhesion.statut;
+      statut !== undefined && statut !== targetUserClientAdhesion.statut;
 
     if (isRoleChanging || isStatutChanging) {
       // Ne peut pas changer son propre rôle ou statut
@@ -724,12 +859,12 @@ export const updateUserAction = actionClient
         if (statut !== undefined) adhesionPayload.statut = statut;
 
         await tx
-          .update(userAdhesions)
+          .update(userClientAdhesions)
           .set(adhesionPayload)
           .where(
             and(
-              eq(userAdhesions.userId, userId),
-              eq(userAdhesions.entrepriseId, entrepriseId),
+              eq(userClientAdhesions.userId, userId),
+              eq(userClientAdhesions.entrepriseId, entrepriseId),
             ),
           );
       }
@@ -853,11 +988,11 @@ export const permanentlyDeleteUserAction = actionClient
 
       // 2. Delete adhesion
       await tx
-        .delete(userAdhesions)
+        .delete(userClientAdhesions)
         .where(
           and(
-            eq(userAdhesions.userId, userId),
-            eq(userAdhesions.entrepriseId, entrepriseId),
+            eq(userClientAdhesions.userId, userId),
+            eq(userClientAdhesions.entrepriseId, entrepriseId),
           ),
         );
 

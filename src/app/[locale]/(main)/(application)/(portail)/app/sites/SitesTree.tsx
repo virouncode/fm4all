@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SiteTreeNode } from "@/zod-schemas/sites.schema";
-import { RoleAdhesionType } from "@/zod-schemas/userAdhesion.schema";
+import { RoleClientAdhesionType } from "@/zod-schemas/userAdhesion.schema";
 import { RolePlateformeAdhesionType } from "@/zod-schemas/userPlateformeAdhesion.schema";
 import { Building, ChevronDown, ChevronRight, Plus } from "lucide-react";
 
@@ -15,7 +15,7 @@ type SitesTreeProps = {
   onCreateChild: (parentId: string) => void;
   expandedNodes: Set<string>;
   onToggleExpand: (nodeId: string) => void;
-  currentUserRole: RoleAdhesionType | null;
+  currentUserRole: RoleClientAdhesionType | null;
   currentUserPlateformeRole: RolePlateformeAdhesionType | null;
   responsableSiteIds: Set<string>;
   hasActiveFilters?: boolean;
@@ -69,7 +69,7 @@ type TreeNodeProps = {
   onCreateChild: (parentId: string) => void;
   expandedNodes: Set<string>;
   onToggleExpand: (nodeId: string) => void;
-  currentUserRole: RoleAdhesionType | null;
+  currentUserRole: RoleClientAdhesionType | null;
   currentUserPlateformeRole: RolePlateformeAdhesionType | null;
   responsableSiteIds: Set<string>;
 };

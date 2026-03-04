@@ -17,7 +17,7 @@ import {
 import { serviceEntreprises } from "@/db/schema/entreprises";
 import { entreprises } from "@/db/schema/entreprises";
 import { sites } from "@/db/schema/sites";
-import { userSiteAttributions } from "@/db/schema/users";
+import { userClientSiteAttributions } from "@/db/schema/users";
 import { occurrenceTaches } from "@/db/schema/services";
 import { and, asc, count, desc, eq, gte, inArray, isNull, or } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
@@ -675,21 +675,21 @@ export async function getSitesCouvertsParPrestataire(
   // 2. Agents prestataires attribués à ces sites
   const attributions = await db
     .select({
-      attributionId: userSiteAttributions.id,
-      siteId: userSiteAttributions.siteId,
+      attributionId: userClientSiteAttributions.id,
+      siteId: userClientSiteAttributions.siteId,
       userId: user.id,
       userPrenom: user.prenom,
       userNom: user.nom,
       userEmail: user.email,
-      role: userSiteAttributions.role,
+      role: userClientSiteAttributions.role,
     })
-    .from(userSiteAttributions)
-    .innerJoin(user, eq(user.id, userSiteAttributions.userId))
+    .from(userClientSiteAttributions)
+    .innerJoin(user, eq(user.id, userClientSiteAttributions.userId))
     .where(
       and(
-        eq(userSiteAttributions.entrepriseId, prestataireEntrepriseId),
-        eq(userSiteAttributions.mode, "inclure"),
-        inArray(userSiteAttributions.siteId, siteIds),
+        eq(userClientSiteAttributions.entrepriseId, prestataireEntrepriseId),
+        eq(userClientSiteAttributions.mode, "inclure"),
+        inArray(userClientSiteAttributions.siteId, siteIds),
       ),
     );
 

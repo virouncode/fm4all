@@ -670,19 +670,34 @@ export function PrestationFormDialog({
                       )}
                   </div>
 
-                  <RhfControlledSelect<PrestationFormValues>
-                    name="serviceId"
-                    label="Service"
-                    requiredMark
-                    placeholder="Sélectionnez un service"
-                    selectClassName="w-full"
-                  >
-                    {services.map((s) => (
-                      <SelectItem key={s.id} value={s.id}>
-                        {s.nom}
-                      </SelectItem>
-                    ))}
-                  </RhfControlledSelect>
+                  <div className="space-y-1.5">
+                    <RhfControlledSelect<PrestationFormValues>
+                      name="serviceId"
+                      label="Service"
+                      requiredMark
+                      placeholder="Sélectionnez un service"
+                      selectClassName="w-full"
+                    >
+                      {services.map((s) => (
+                        <SelectItem key={s.id} value={s.id}>
+                          {s.nom}
+                        </SelectItem>
+                      ))}
+                    </RhfControlledSelect>
+
+                    {posture !== "plateforme" && (
+                      <p className="text-muted-foreground text-xs">
+                        Service non trouvé dans la liste ?{" "}
+                        <a
+                          href="mailto:contact@fm4all.com"
+                          className="text-primary underline-offset-2 hover:underline"
+                        >
+                          Contactez un administrateur FM4ALL
+                        </a>
+                        .
+                      </p>
+                    )}
+                  </div>
                 </div>
               )}
 

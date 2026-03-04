@@ -12,7 +12,14 @@ const Slogan = () => {
           alt={"logo-fm4all"}
           fill
           sizes="200px"
-          className="object-contain object-center"
+          className="object-contain object-center dark:hidden"
+        />
+        <Image
+          src={"/img/logo_full_dark_mode.webp"}
+          alt={"logo-fm4all"}
+          fill
+          sizes="200px"
+          className="hidden object-contain object-center dark:block"
         />
       </div>
       <h2 className="text-destructive text-center text-5xl font-bold tracking-tighter">

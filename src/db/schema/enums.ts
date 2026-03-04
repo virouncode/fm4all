@@ -24,8 +24,10 @@ import {
   paiementMethodeCodes,
   paiementStatutCodes,
   perimetreModeCodes,
-  roleAdhesionCodes,
-  roleAttributionSiteCodes,
+  roleClientAdhesionCodes,
+  roleClientAttributionSiteCodes,
+  rolePrestataireAdhesionCodes,
+  rolePrestataireAttributionSiteCodes,
   roleEntrepriseCodes,
   rolePlateformeAdhesionCodes,
   siteAttributionScopeCodes,
@@ -140,14 +142,25 @@ export const roleEntrepriseEnum = pgEnum(
   "role_entreprise",
   roleEntrepriseCodes,
 );
-export const roleAdhesionEnum = pgEnum("role_adhesion", roleAdhesionCodes);
+export const roleClientAdhesionEnum = pgEnum(
+  "role_client_adhesion",
+  roleClientAdhesionCodes,
+);
+export const rolePrestataireAdhesionEnum = pgEnum(
+  "role_prestataire_adhesion",
+  rolePrestataireAdhesionCodes,
+);
 export const rolePlateformeAdhesionEnum = pgEnum(
   "role_plateforme_adhesion",
   rolePlateformeAdhesionCodes,
 );
-export const roleAttributionSiteEnum = pgEnum(
-  "role_attribution_site",
-  roleAttributionSiteCodes,
+export const roleClientAttributionSiteEnum = pgEnum(
+  "role_client_attribution_site",
+  roleClientAttributionSiteCodes,
+);
+export const rolePrestataireAttributionSiteEnum = pgEnum(
+  "role_prestataire_attribution_site",
+  rolePrestataireAttributionSiteCodes,
 );
 export const adhesionStatutEnum = pgEnum(
   "adhesion_statut",

@@ -1,29 +1,28 @@
 "use server";
 
 import { db } from "@/db";
-import { entrepriseRoles } from "@/db/schema/entreprises";
-import { userAdhesions, userSiteAttributions } from "@/db/schema/users";
+import { userClientSiteAttributions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
 import {
   getAvailableSitesForAttribution,
-  getUserSiteAttributions,
+  getUserClientSiteAttributions,
 } from "@/server/queries/userSiteAttributions.query";
 import { isUserDescendant } from "@/server/utils/usersArborescence.utils";
 import {
   canonizeAttributions,
   resolveUserEffectiveRoleOnSite,
   userHasRoleOnSite,
-} from "@/server/utils/userSiteAttributions.utils";
+} from "@/server/utils/userClientSiteAttributions.utils";
 import {
   bulkInsertMixedAttributionsFormSchema,
   bulkInsertUserSiteAttributionsFormSchema,
   deleteUserSiteAttributionSchema,
   insertUserSiteAttributionFormSchema,
-  roleAttributionSchema,
-  selectUserSiteAttributionSchema,
+  roleClientAttributionSchema,
+  selectUserClientSiteAttributionSchema,
   updateUserSiteAttributionFormSchema,
 } from "@/zod-schemas/userSiteAttribution.schema";
 import { and, eq } from "drizzle-orm";
@@ -41,12 +40,10 @@ async function getUserRoleLevel(
   }
 
   // Check enterprise role
-  const adhesion = await db.query.userAdhesions.findFirst({
-    where: and(
-      eq(userAdhesions.userId, userId),
-      eq(userAdhesions.entrepriseId, entrepriseId),
-    ),
-  });
+  const { getUserClientAdhesion } = await import(
+    "@/server/queries/userAdhesions.query"
+  );
+  const adhesion = await getUserClientAdhesion({ userId, entrepriseId });
 
   if (!adhesion) return 0;
 
@@ -57,20 +54,6 @@ async function getUserRoleLevel(
   };
 
   return roleLevels[adhesion.role] || 0;
-}
-
-// Helper: Check if enterprise has "prestataire" role
-async function isEntreprisePrestataire(
-  entrepriseId: string,
-): Promise<boolean> {
-  const prestataireRole = await db.query.entrepriseRoles.findFirst({
-    where: and(
-      eq(entrepriseRoles.entrepriseId, entrepriseId),
-      eq(entrepriseRoles.role, "prestataire"),
-    ),
-  });
-
-  return !!prestataireRole;
 }
 
 // Helper: Empêche l'auto-attribution/suppression/modification de ses propres accès
@@ -183,25 +166,12 @@ export const insertUserSiteAttributionAction = actionClient
       throw errors.unauthorized("Vous n'avez pas les permissions nécessaires");
     }
 
-    // Validation contrainte prestataire : intervenant_site uniquement si posture=prestataire
-    if (parsedInput.role === "intervenant_site") {
-      const isPrestataire = await isEntreprisePrestataire(
-        parsedInput.entrepriseId,
-      );
-
-      if (!isPrestataire) {
-        throw errors.forbidden(
-          "Le rôle 'intervenant_site' ne peut être attribué que dans une entreprise prestataire.",
-        );
-      }
-    }
-
     // Vérifier qu'aucun autre rôle n'existe déjà pour ce site (contrainte: un rôle par site)
-    const existingAttribution = await db.query.userSiteAttributions.findFirst({
+    const existingAttribution = await db.query.userClientSiteAttributions.findFirst({
       where: and(
-        eq(userSiteAttributions.userId, parsedInput.userId),
-        eq(userSiteAttributions.siteId, parsedInput.siteId),
-        eq(userSiteAttributions.entrepriseId, parsedInput.entrepriseId),
+        eq(userClientSiteAttributions.userId, parsedInput.userId),
+        eq(userClientSiteAttributions.siteId, parsedInput.siteId),
+        eq(userClientSiteAttributions.entrepriseId, parsedInput.entrepriseId),
       ),
     });
 
@@ -213,7 +183,7 @@ export const insertUserSiteAttributionAction = actionClient
 
     // Insert attribution
     const [inserted] = await db
-      .insert(userSiteAttributions)
+      .insert(userClientSiteAttributions)
       .values({
         userId: parsedInput.userId,
         siteId: parsedInput.siteId,
@@ -230,7 +200,7 @@ export const insertUserSiteAttributionAction = actionClient
       throw errors.conflict("Cette attribution existe déjà");
     }
 
-    const validated = selectUserSiteAttributionSchema.parse(inserted);
+    const validated = selectUserClientSiteAttributionSchema.parse(inserted);
     return { attribution: validated };
   });
 
@@ -336,26 +306,13 @@ export const bulkInsertUserSiteAttributionsAction = actionClient
       throw errors.unauthorized("Vous n'avez pas les permissions nécessaires");
     }
 
-    // Validation contrainte prestataire : intervenant_site uniquement si posture=prestataire
-    if (parsedInput.role === "intervenant_site") {
-      const isPrestataire = await isEntreprisePrestataire(
-        parsedInput.entrepriseId,
-      );
-
-      if (!isPrestataire) {
-        throw errors.forbidden(
-          "Le rôle 'intervenant_site' ne peut être attribué que dans une entreprise prestataire.",
-        );
-      }
-    }
-
     // Bulk insert
     const attributions = await db.transaction(async (tx) => {
       // Vérifier qu'aucun des siteIds n'a déjà une attribution (contrainte: un rôle par site)
-      const existingAttributions = await tx.query.userSiteAttributions.findMany({
+      const existingAttributions = await tx.query.userClientSiteAttributions.findMany({
         where: and(
-          eq(userSiteAttributions.userId, parsedInput.userId),
-          eq(userSiteAttributions.entrepriseId, parsedInput.entrepriseId),
+          eq(userClientSiteAttributions.userId, parsedInput.userId),
+          eq(userClientSiteAttributions.entrepriseId, parsedInput.entrepriseId),
         ),
         columns: { siteId: true, role: true },
       });
@@ -383,7 +340,7 @@ export const bulkInsertUserSiteAttributionsAction = actionClient
       }));
 
       const inserted = await tx
-        .insert(userSiteAttributions)
+        .insert(userClientSiteAttributions)
         .values(values)
         .onConflictDoNothing()
         .returning();
@@ -392,7 +349,7 @@ export const bulkInsertUserSiteAttributionsAction = actionClient
     });
 
     const validated = z
-      .array(selectUserSiteAttributionSchema)
+      .array(selectUserClientSiteAttributionSchema)
       .parse(attributions);
     return { attributions: validated, count: validated.length };
   });
@@ -520,19 +477,6 @@ export const bulkInsertMixedAttributionsAction = actionClient
       throw errors.unauthorized("Vous n'avez pas les permissions nécessaires");
     }
 
-    // Validation contrainte prestataire : intervenant_site uniquement si posture=prestataire
-    if (roles.includes("intervenant_site")) {
-      const isPrestataire = await isEntreprisePrestataire(
-        parsedInput.entrepriseId,
-      );
-
-      if (!isPrestataire) {
-        throw errors.forbidden(
-          "Le rôle 'intervenant_site' ne peut être attribué que dans une entreprise prestataire.",
-        );
-      }
-    }
-
     // Validation contrainte mode/scope : mode=exclure MUST avoir scope=self
     const invalidExclusions = parsedInput.attributions.filter(
       (a) => a.mode === "exclure" && a.scope !== "self",
@@ -556,23 +500,23 @@ export const bulkInsertMixedAttributionsAction = actionClient
       if (parsedInput.exclusionsToDelete && parsedInput.exclusionsToDelete.length > 0) {
         for (const exclusionId of parsedInput.exclusionsToDelete) {
           await tx
-            .delete(userSiteAttributions)
+            .delete(userClientSiteAttributions)
             .where(
               and(
-                eq(userSiteAttributions.id, exclusionId),
-                eq(userSiteAttributions.userId, parsedInput.userId),
-                eq(userSiteAttributions.entrepriseId, parsedInput.entrepriseId),
+                eq(userClientSiteAttributions.id, exclusionId),
+                eq(userClientSiteAttributions.userId, parsedInput.userId),
+                eq(userClientSiteAttributions.entrepriseId, parsedInput.entrepriseId),
               ),
             );
         }
       }
 
       // 2. Vérifier qu'aucun des siteIds n'a déjà une attribution (contrainte: un rôle par site)
-      const existingAttributions = await tx.query.userSiteAttributions.findMany(
+      const existingAttributions = await tx.query.userClientSiteAttributions.findMany(
         {
           where: and(
-            eq(userSiteAttributions.userId, parsedInput.userId),
-            eq(userSiteAttributions.entrepriseId, parsedInput.entrepriseId),
+            eq(userClientSiteAttributions.userId, parsedInput.userId),
+            eq(userClientSiteAttributions.entrepriseId, parsedInput.entrepriseId),
           ),
           columns: { siteId: true, role: true },
         },
@@ -604,7 +548,7 @@ export const bulkInsertMixedAttributionsAction = actionClient
       }));
 
       const inserted = await tx
-        .insert(userSiteAttributions)
+        .insert(userClientSiteAttributions)
         .values(values)
         .onConflictDoNothing()
         .returning();
@@ -616,11 +560,11 @@ export const bulkInsertMixedAttributionsAction = actionClient
       // 1. Récupérer TOUTES les attributions de l'utilisateur (existantes + nouvelles)
       const allUserAttributions = await tx
         .select()
-        .from(userSiteAttributions)
+        .from(userClientSiteAttributions)
         .where(
           and(
-            eq(userSiteAttributions.userId, parsedInput.userId),
-            eq(userSiteAttributions.entrepriseId, parsedInput.entrepriseId),
+            eq(userClientSiteAttributions.userId, parsedInput.userId),
+            eq(userClientSiteAttributions.entrepriseId, parsedInput.entrepriseId),
           ),
         );
 
@@ -659,8 +603,8 @@ export const bulkInsertMixedAttributionsAction = actionClient
       if (idsToDelete.length > 0) {
         for (const id of idsToDelete) {
           await tx
-            .delete(userSiteAttributions)
-            .where(eq(userSiteAttributions.id, id));
+            .delete(userClientSiteAttributions)
+            .where(eq(userClientSiteAttributions.id, id));
         }
       }
 
@@ -668,7 +612,7 @@ export const bulkInsertMixedAttributionsAction = actionClient
     });
 
     const validated = z
-      .array(selectUserSiteAttributionSchema)
+      .array(selectUserClientSiteAttributionSchema)
       .parse(attributions.inserted);
     return {
       attributions: validated,
@@ -691,8 +635,8 @@ export const deleteUserSiteAttributionAction = actionClient
     const currentUser = session.user;
 
     // Fetch attribution to get entrepriseId
-    const attribution = await db.query.userSiteAttributions.findFirst({
-      where: eq(userSiteAttributions.id, parsedInput.id),
+    const attribution = await db.query.userClientSiteAttributions.findFirst({
+      where: eq(userClientSiteAttributions.id, parsedInput.id),
     });
 
     if (!attribution) {
@@ -788,11 +732,11 @@ export const deleteUserSiteAttributionAction = actionClient
 
     // Garde-fou : Ne jamais supprimer le dernier responsable_site d'un site
     if (attribution.role === "responsable_site") {
-      const otherResponsables = await db.query.userSiteAttributions.findMany({
+      const otherResponsables = await db.query.userClientSiteAttributions.findMany({
         where: and(
-          eq(userSiteAttributions.siteId, attribution.siteId),
-          eq(userSiteAttributions.role, "responsable_site"),
-          eq(userSiteAttributions.entrepriseId, attribution.entrepriseId),
+          eq(userClientSiteAttributions.siteId, attribution.siteId),
+          eq(userClientSiteAttributions.role, "responsable_site"),
+          eq(userClientSiteAttributions.entrepriseId, attribution.entrepriseId),
         ),
       });
 
@@ -805,15 +749,15 @@ export const deleteUserSiteAttributionAction = actionClient
 
     // Delete
     await db
-      .delete(userSiteAttributions)
-      .where(eq(userSiteAttributions.id, parsedInput.id));
+      .delete(userClientSiteAttributions)
+      .where(eq(userClientSiteAttributions.id, parsedInput.id));
 
     return { success: true };
   });
 
 // Action 4: Get user site attributions
-export const getUserSiteAttributionsAction = actionClient
-  .metadata({ actionName: "getUserSiteAttributionsAction" })
+export const getUserClientSiteAttributionsAction = actionClient
+  .metadata({ actionName: "getUserClientSiteAttributionsAction" })
   .inputSchema(
     z.object({
       userId: z.uuid("ID utilisateur invalide"),
@@ -826,7 +770,7 @@ export const getUserSiteAttributionsAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié");
     }
 
-    const { attributions, allSites } = await getUserSiteAttributions({
+    const { attributions, allSites } = await getUserClientSiteAttributions({
       userId: parsedInput.userId,
       entrepriseId: parsedInput.entrepriseId,
     });
@@ -841,7 +785,7 @@ export const getAvailableSitesForAttributionAction = actionClient
     z.object({
       userId: z.uuid("ID utilisateur invalide"),
       entrepriseId: z.uuid("ID entreprise invalide"),
-      role: roleAttributionSchema,
+      role: roleClientAttributionSchema,
     }),
   )
   .action(async ({ parsedInput }) => {
@@ -928,8 +872,8 @@ export const updateUserSiteAttributionAction = actionClient
     const currentUser = session.user;
 
     // Fetch attribution to get entrepriseId
-    const attribution = await db.query.userSiteAttributions.findFirst({
-      where: eq(userSiteAttributions.id, parsedInput.id),
+    const attribution = await db.query.userClientSiteAttributions.findFirst({
+      where: eq(userClientSiteAttributions.id, parsedInput.id),
     });
 
     if (!attribution) {
@@ -1023,29 +967,16 @@ export const updateUserSiteAttributionAction = actionClient
       throw errors.unauthorized("Vous n'avez pas les permissions nécessaires");
     }
 
-    // Validation contrainte prestataire : intervenant_site uniquement si posture=prestataire
-    if (parsedInput.role === "intervenant_site") {
-      const isPrestataire = await isEntreprisePrestataire(
-        attribution.entrepriseId,
-      );
-
-      if (!isPrestataire) {
-        throw errors.forbidden(
-          "Le rôle 'intervenant_site' ne peut être attribué que dans une entreprise prestataire.",
-        );
-      }
-    }
-
     // Garde-fou : Si on change responsable_site → autre rôle, vérifier qu'il reste au moins 1 responsable
     if (
       attribution.role === "responsable_site" &&
       parsedInput.role !== "responsable_site"
     ) {
-      const otherResponsables = await db.query.userSiteAttributions.findMany({
+      const otherResponsables = await db.query.userClientSiteAttributions.findMany({
         where: and(
-          eq(userSiteAttributions.siteId, attribution.siteId),
-          eq(userSiteAttributions.role, "responsable_site"),
-          eq(userSiteAttributions.entrepriseId, attribution.entrepriseId),
+          eq(userClientSiteAttributions.siteId, attribution.siteId),
+          eq(userClientSiteAttributions.role, "responsable_site"),
+          eq(userClientSiteAttributions.entrepriseId, attribution.entrepriseId),
         ),
       });
 
@@ -1065,16 +996,16 @@ export const updateUserSiteAttributionAction = actionClient
 
     // Update
     const [updated] = await db
-      .update(userSiteAttributions)
+      .update(userClientSiteAttributions)
       .set({
         mode: parsedInput.mode,
         scope: parsedInput.scope,
         role: parsedInput.role,
         updatedById: currentUser.id,
       })
-      .where(eq(userSiteAttributions.id, parsedInput.id))
+      .where(eq(userClientSiteAttributions.id, parsedInput.id))
       .returning();
 
-    const validated = selectUserSiteAttributionSchema.parse(updated);
+    const validated = selectUserClientSiteAttributionSchema.parse(updated);
     return { attribution: validated };
   });

@@ -10,7 +10,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { SiteResponsable } from "@/server/queries/sites.query";
 import { SelectSiteType } from "@/zod-schemas/sites.schema";
-import { RoleAdhesionType } from "@/zod-schemas/userAdhesion.schema";
+import { RoleClientAdhesionType } from "@/zod-schemas/userAdhesion.schema";
 import { RolePlateformeAdhesionType } from "@/zod-schemas/userPlateformeAdhesion.schema";
 import {
   Building2,
@@ -33,7 +33,7 @@ type SiteDetailsProps = {
   site: SelectSiteType;
   onEdit: () => void;
   onCreateChild: () => void;
-  currentUserRole: RoleAdhesionType | null;
+  currentUserRole: RoleClientAdhesionType | null;
   currentUserPlateformeRole: RolePlateformeAdhesionType | null;
   responsableSiteIds: Set<string>;
   siteResponsables: SiteResponsable[];

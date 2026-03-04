@@ -1,7 +1,7 @@
 import "server-only";
 
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
-import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userSiteAttributions.utils";
+import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userClientSiteAttributions.utils";
 import { TicketStatutType } from "@/zod-schemas/enums";
 
 /**
@@ -57,7 +57,7 @@ export async function isStatusTransitionAllowed({
   // Flags de permissions
   const isResponsable = effectiveRole === "responsable_site";
   const isDemandeur = effectiveRole === "demandeur_site";
-  const isIntervenant = effectiveRole === "intervenant_site";
+  const isIntervenant = false; // intervenant_site retiré du scope client
   const isCreator = ticket.createdById === userId;
   const isAssignedUser = ticket.assigneUserId === userId;
 

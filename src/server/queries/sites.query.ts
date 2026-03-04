@@ -1,11 +1,12 @@
 import { db } from "@/db";
 import { user } from "@/db/schema/auth";
 import { sites, sitesArborescence } from "@/db/schema/sites";
-import { userSiteAttributions } from "@/db/schema/users";
+import { userClientSiteAttributions } from "@/db/schema/users";
 import {
   selectSiteSchema,
   type SelectSiteType,
 } from "@/zod-schemas/sites.schema";
+import type { SelectUserSiteAttributionWithInheritanceType } from "@/zod-schemas/userSiteAttribution.schema";
 import { and, eq, or } from "drizzle-orm";
 import "server-only";
 
@@ -85,24 +86,24 @@ export async function getSiteResponsables(
       email: user.email,
       phone: user.phone,
     })
-    .from(userSiteAttributions)
-    .innerJoin(user, eq(userSiteAttributions.userId, user.id))
+    .from(userClientSiteAttributions)
+    .innerJoin(user, eq(userClientSiteAttributions.userId, user.id))
     .innerJoin(
       sitesArborescence,
       and(
-        eq(sitesArborescence.ancetreId, userSiteAttributions.siteId),
+        eq(sitesArborescence.ancetreId, userClientSiteAttributions.siteId),
         eq(sitesArborescence.descendantId, siteId),
       ),
     )
     .where(
       and(
-        eq(userSiteAttributions.role, "responsable_site"),
-        eq(userSiteAttributions.mode, "inclure"),
+        eq(userClientSiteAttributions.role, "responsable_site"),
+        eq(userClientSiteAttributions.mode, "inclure"),
         or(
           // Attribution directe sur ce site exact (profondeur 0 = self-reference)
           eq(sitesArborescence.profondeur, 0),
           // Attribution sur un site ancêtre avec scope "subtree"
-          eq(userSiteAttributions.scope, "subtree"),
+          eq(userClientSiteAttributions.scope, "subtree"),
         ),
       ),
     );
@@ -173,10 +174,10 @@ export async function getAccessibleSitesByUser({
 
   // Si pas de filtre de rôle : raccourci admin → tous les sites de l'entreprise
   if (!filterRole) {
-    const { getUserAdhesion } = await import(
+    const { getUserClientAdhesion } = await import(
       "@/server/queries/userAdhesions.query"
     );
-    const adhesion = await getUserAdhesion({ userId, entrepriseId });
+    const adhesion = await getUserClientAdhesion({ userId, entrepriseId });
     if (adhesion?.role === "admin") {
       const allSites = await db.query.sites.findMany({
         where: eq(sites.entrepriseId, entrepriseId),
@@ -187,14 +188,15 @@ export async function getAccessibleSitesByUser({
   }
 
   // Sinon, calculer le périmètre via attributions (filtré par rôle si demandé)
-  const { getUserSiteAttributions } = await import(
+  const { getUserClientSiteAttributions } = await import(
     "@/server/queries/userSiteAttributions.query"
   );
 
-  const { attributions } = await getUserSiteAttributions({
+  const result = await getUserClientSiteAttributions({
     userId,
     entrepriseId,
   });
+  const attributions: SelectUserSiteAttributionWithInheritanceType[] = result.attributions;
 
   // Filtrer les attributions avec rôle effectif (exclut mode=exclure) + filtre de rôle
   const accessibleSiteIds = attributions

@@ -3,18 +3,19 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { roleAdhesionCT } from "@/constants/codeTables";
+import { roleClientAdhesionCT, rolePlateformeAdhesionCT } from "@/constants/codeTables";
 import { getPresignedReadUrl } from "@/lib/s3/upload-helper";
 import { cn } from "@/lib/utils";
-import { getUserSiteAttributionsAction } from "@/server/actions/userSiteAttributionsActions";
+import { getUserClientSiteAttributionsAction } from "@/server/actions/userSiteAttributionsActions";
 import { useAppStore } from "@/stores/application/appStore";
 import { SelectSiteType } from "@/zod-schemas/sites.schema";
 import { UserWithAdhesionType } from "@/zod-schemas/user.schema";
-import { RoleAdhesionType } from "@/zod-schemas/userAdhesion.schema";
+import { RoleClientAdhesionType } from "@/zod-schemas/userAdhesion.schema";
 import { SelectUserSiteAttributionWithInheritanceType } from "@/zod-schemas/userSiteAttribution.schema";
 import {
   Calendar,
   Mail,
+  MapPin,
   Pencil,
   Phone,
   Plus,
@@ -27,7 +28,7 @@ import { UserSiteAttributionsList } from "./UserSiteAttributionsList";
 
 type UserDetailsProps = {
   user: UserWithAdhesionType;
-  currentUserRole: RoleAdhesionType | null;
+  currentUserRole: RoleClientAdhesionType | null;
   onEdit: () => void;
   onCreateChild: () => void;
 };
@@ -43,6 +44,7 @@ export function UserDetails({
   const currentUserPlateformeRole = useAppStore(
     (state) => state.rolePlateformeAdhesion,
   );
+  const postureActive = useAppStore((state) => state.postureActive);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -57,7 +59,7 @@ export function UserDetails({
   const isViewingSelf = currentUser?.id === user.id;
 
   // Hiérarchie des rôles
-  const roleHierarchy: Record<RoleAdhesionType, number> = {
+  const roleHierarchy: Record<RoleClientAdhesionType, number> = {
     admin: 3,
     manager: 2,
     collaborateur: 1,
@@ -128,7 +130,7 @@ export function UserDetails({
 
     const fetchAttributions = async () => {
       try {
-        const result = await getUserSiteAttributionsAction({
+        const result = await getUserClientSiteAttributionsAction({
           userId: user.id,
           entrepriseId: entreprise.id,
         });
@@ -153,7 +155,7 @@ export function UserDetails({
     if (!entreprise?.id) return;
 
     try {
-      const result = await getUserSiteAttributionsAction({
+      const result = await getUserClientSiteAttributionsAction({
         userId: user.id,
         entrepriseId: entreprise.id,
       });
@@ -215,7 +217,16 @@ export function UserDetails({
               )}
             </div>
 
-            <p className="text-muted-foreground mt-1 text-sm">{user.email}</p>
+            <div className="text-muted-foreground mt-1 flex items-center gap-1 text-xs">
+              <MapPin className="h-3 w-3 shrink-0" />
+              <span>
+                {attributions.length === 0
+                  ? "Aucun site attribué"
+                  : attributions.length === 1
+                    ? "1 site attribué"
+                    : `${attributions.length} sites attribués`}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -262,15 +273,24 @@ export function UserDetails({
         )}
 
         {/* Rôle */}
-        {user.adhesion && (
+        {postureActive === "plateforme" && user.plateformeAdhesion ? (
           <div className="flex items-center gap-2">
             <Shield className="text-primary size-4 shrink-0" />
             <p className="text-sm">
-              {roleAdhesionCT.find((r) => r.code === user.adhesion?.role)
+              {rolePlateformeAdhesionCT.find(
+                (r) => r.code === user.plateformeAdhesion?.role,
+              )?.name || user.plateformeAdhesion.role}
+            </p>
+          </div>
+        ) : user.adhesion ? (
+          <div className="flex items-center gap-2">
+            <Shield className="text-primary size-4 shrink-0" />
+            <p className="text-sm">
+              {roleClientAdhesionCT.find((r) => r.code === user.adhesion?.role)
                 ?.name || user.adhesion.role}
             </p>
           </div>
-        )}
+        ) : null}
       </div>
 
       {/* Metadata */}
@@ -287,8 +307,8 @@ export function UserDetails({
         </div>
       </div>
 
-      {/* Site Attributions */}
-      {entreprise?.id && (
+      {/* Site Attributions — masqué en posture plateforme */}
+      {entreprise?.id && postureActive !== "plateforme" && (
         <>
           <UserSiteAttributionsList
             attributions={attributions}

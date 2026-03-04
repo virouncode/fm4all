@@ -356,18 +356,32 @@ export const roleEntrepriseCodes = roleEntrepriseCT.map(
   ...(typeof roleEntrepriseCT)[number]["code"][],
 ];
 
-export const roleAdhesionCT = [
-  //Droits globaux, indépendants des sites
+export const roleClientAdhesionCT = [
+  //Droits globaux, indépendants des sites (posture client)
   { code: "admin", name: "Administrateur" },
   { code: "manager", name: "Manager" },
   { code: "collaborateur", name: "Collaborateur" },
 ] as const;
 
-export const roleAdhesionCodes = roleAdhesionCT.map(
+export const roleClientAdhesionCodes = roleClientAdhesionCT.map(
   (i) => i.code,
 ) as unknown as [
-  (typeof roleAdhesionCT)[number]["code"],
-  ...(typeof roleAdhesionCT)[number]["code"][],
+  (typeof roleClientAdhesionCT)[number]["code"],
+  ...(typeof roleClientAdhesionCT)[number]["code"][],
+];
+
+export const rolePrestataireAdhesionCT = [
+  //Droits globaux, indépendants des sites (posture prestataire)
+  { code: "admin", name: "Administrateur" },
+  { code: "manager", name: "Manager" },
+  { code: "collaborateur", name: "Collaborateur" },
+] as const;
+
+export const rolePrestataireAdhesionCodes = rolePrestataireAdhesionCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof rolePrestataireAdhesionCT)[number]["code"],
+  ...(typeof rolePrestataireAdhesionCT)[number]["code"][],
 ];
 
 export const rolePlateformeAdhesionCT = [
@@ -382,20 +396,33 @@ export const rolePlateformeAdhesionCodes = rolePlateformeAdhesionCT.map(
   ...(typeof rolePlateformeAdhesionCT)[number]["code"][],
 ];
 
-export const roleAttributionSiteCT = [
-  // Droits spécifiques à un site donné
+export const roleClientAttributionSiteCT = [
+  // Droits spécifiques à un site donné (posture client) — sans intervenant_site
+  { code: "responsable_site", name: "Responsable de site" },
+  { code: "demandeur_site", name: "Demandeur de site" },
+  { code: "observateur_site", name: "Observateur de site" },
+] as const;
+
+export const roleClientAttributionSiteCodes = roleClientAttributionSiteCT.map(
+  (i) => i.code,
+) as unknown as [
+  (typeof roleClientAttributionSiteCT)[number]["code"],
+  ...(typeof roleClientAttributionSiteCT)[number]["code"][],
+];
+
+export const rolePrestataireAttributionSiteCT = [
+  // Droits spécifiques à un site donné (posture prestataire) — avec intervenant_site
   { code: "responsable_site", name: "Responsable de site" },
   { code: "demandeur_site", name: "Demandeur de site" },
   { code: "observateur_site", name: "Observateur de site" },
   { code: "intervenant_site", name: "Intervenant de site" },
 ] as const;
 
-export const roleAttributionSiteCodes = roleAttributionSiteCT.map(
-  (i) => i.code,
-) as unknown as [
-  (typeof roleAttributionSiteCT)[number]["code"],
-  ...(typeof roleAttributionSiteCT)[number]["code"][],
-];
+export const rolePrestataireAttributionSiteCodes =
+  rolePrestataireAttributionSiteCT.map((i) => i.code) as unknown as [
+    (typeof rolePrestataireAttributionSiteCT)[number]["code"],
+    ...(typeof rolePrestataireAttributionSiteCT)[number]["code"][],
+  ];
 
 export const adhesionStatutCT = [
   { code: "actif", name: "Actif" },

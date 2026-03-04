@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { adhesionStatutCodes, roleAdhesionCodes } from "@/constants/codeTables";
+import { adhesionStatutCodes, roleClientAdhesionCodes } from "@/constants/codeTables";
 import { getUsersAction } from "@/server/actions/usersActions";
 import { useAppStore } from "@/stores/application/appStore";
 import { UserWithAdhesionType } from "@/zod-schemas/user.schema";
@@ -24,10 +24,11 @@ import { UsersTree } from "./UsersTree";
 export function UsersClient() {
   const entreprise = useAppStore((state) => state.entreprise);
   const currentUser = useAppStore((state) => state.user);
-  const currentUserRole = useAppStore((state) => state.roleAdhesion);
+  const currentUserRole = useAppStore((state) => state.roleClientAdhesion);
   const currentUserPlateformeRole = useAppStore(
     (state) => state.rolePlateformeAdhesion,
   );
+  const postureActive = useAppStore((state) => state.postureActive);
   const searchParams = useSearchParams();
 
   // Déterminer si l'utilisateur peut créer des utilisateurs RACINE
@@ -76,7 +77,7 @@ export function UsersClient() {
         search: searchFilter,
         roleAdhesion:
           roleFilter && roleFilter !== "all"
-            ? (roleFilter as (typeof roleAdhesionCodes)[number])
+            ? (roleFilter as (typeof roleClientAdhesionCodes)[number])
             : undefined,
         statutAdhesion:
           statutFilter && statutFilter !== "all"
@@ -225,6 +226,7 @@ export function UsersClient() {
             currentUserId={currentUser?.id}
             currentUserRole={currentUserRole}
             currentUserPlateformeRole={currentUserPlateformeRole}
+            postureActive={postureActive}
           />
         )}
       </div>
