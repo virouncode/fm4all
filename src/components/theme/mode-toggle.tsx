@@ -20,7 +20,7 @@ export function ModeToggle() {
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon"
           aria-label={locale === "fr" ? "Changer de thème" : "Change theme"}
           title={locale === "fr" ? "Changer de thème" : "Change theme"}

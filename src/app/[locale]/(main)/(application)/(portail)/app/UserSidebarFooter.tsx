@@ -17,6 +17,7 @@ import { useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth/auth-client";
 import { getPresignedReadUrl } from "@/lib/s3/upload-helper";
 import { getDocumentAction } from "@/server/actions/documentsActions";
+import { ModeToggle } from "@/components/theme/mode-toggle";
 import { useAppStore } from "@/stores/application/appStore";
 import { User2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -87,6 +88,11 @@ export default function UserSidebarFooter() {
 
   return (
     <SidebarMenu>
+      {collapsed && (
+        <SidebarMenuItem className="flex justify-center">
+          <ModeToggle />
+        </SidebarMenuItem>
+      )}
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
