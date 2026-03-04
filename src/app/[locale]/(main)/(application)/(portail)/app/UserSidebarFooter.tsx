@@ -26,9 +26,9 @@ export default function UserSidebarFooter() {
   const user = useAppStore((state) => state.user);
   const entreprise = useAppStore((state) => state.entreprise);
   const router = useRouter();
-  const { state } = useSidebar();
+  const { state, isMobile } = useSidebar();
 
-  const collapsed = state === "collapsed";
+  const collapsed = state === "collapsed" && !isMobile;
 
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isLoadingAvatar, setIsLoadingAvatar] = useState(false);

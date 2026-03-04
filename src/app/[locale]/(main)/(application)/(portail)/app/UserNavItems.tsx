@@ -15,10 +15,9 @@ import {
 
 import {
   BriefcaseBusiness,
-  Building,
   Building2,
   ClipboardList,
-  CreditCard,
+  Euro,
   FileText,
   HandPlatter,
   Handshake,
@@ -57,6 +56,22 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
           icon: LayoutDashboard,
           match: "exact",
         },
+      ],
+    },
+    {
+      items: [
+        {
+          key: "documents",
+          label: "Documents",
+          href: "/app/documents",
+          icon: FileText,
+          match: "startsWith",
+        },
+      ],
+    },
+    {
+      label: "Exploitation",
+      items: [
         {
           key: "tickets",
           label: "Tickets",
@@ -74,22 +89,20 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
       ],
     },
     {
-      label: "Ressources",
+      label: "Patrimoine",
       items: [
         {
           key: "sites",
           label: "Sites",
           href: "/app/sites",
-          icon: Building,
+          icon: MapPin,
           match: "startsWith",
         },
-        {
-          key: "documents",
-          label: "Documents",
-          href: "/app/documents",
-          icon: FileText,
-          match: "startsWith",
-        },
+      ],
+    },
+    {
+      label: "Organisation",
+      items: [
         {
           key: "utilisateurs",
           label: "Utilisateurs",
@@ -97,10 +110,17 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
           icon: Users,
           match: "startsWith",
         },
+        {
+          key: "mon-entreprise",
+          label: "Mon entreprise",
+          href: "/app/mon-entreprise",
+          icon: Building2,
+          match: "startsWith",
+        },
       ],
     },
     {
-      label: "Commercial",
+      label: "Achats",
       items: [
         {
           key: "devis",
@@ -110,36 +130,17 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
           match: "startsWith",
         },
         {
-          key: "facturation",
-          label: "Facturation",
-          href: "/app/facturation",
-          icon: CreditCard,
-          match: "startsWith",
-        },
-        {
           key: "contrats",
           label: "Contrats",
           href: "/app/contrats",
           icon: BriefcaseBusiness,
           match: "startsWith",
         },
-      ],
-    },
-    {
-      label: "Paramètres",
-      items: [
         {
-          key: "mon-entreprise",
-          label: "Mon Entreprise",
-          href: "/app/mon-entreprise",
-          icon: Building2,
-          match: "startsWith",
-        },
-        {
-          key: "settings",
-          label: "Paramètres",
-          href: "/app/parametres",
-          icon: Settings,
+          key: "facturation",
+          label: "Facturation",
+          href: "/app/facturation",
+          icon: Euro,
           match: "startsWith",
         },
       ],
@@ -193,7 +194,7 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
           key: "facturation",
           label: "Facturation",
           href: "/app/facturation",
-          icon: CreditCard,
+          icon: Euro,
           match: "startsWith",
         },
         {
@@ -356,7 +357,7 @@ export default function UserNavItems() {
   return (
     <>
       {sections.map((section, idx) => (
-        <SidebarGroup key={`${effectivePosture}-${idx}`}>
+        <SidebarGroup key={`${effectivePosture}-${idx}`} className="py-1">
           {section.label ? (
             <SidebarGroupLabel>{section.label}</SidebarGroupLabel>
           ) : null}

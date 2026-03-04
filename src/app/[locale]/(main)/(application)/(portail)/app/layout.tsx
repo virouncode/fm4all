@@ -1,5 +1,5 @@
 import { AppProvider } from "@/components/provider/AppProvider";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { roleEntrepriseCodes } from "@/constants/codeTables";
 import { getSession } from "@/server/auth/get-session";
 import { bootstrapUser } from "@/server/queries/bootstrap.query";
@@ -51,10 +51,9 @@ const AppLayout = async ({ children }: { children: React.ReactNode }) => {
         <div className="bg-background flex h-screen w-full overflow-hidden">
           <UserSidebar />
           <main className="flex h-full flex-1 flex-col overflow-hidden">
-            {/* Header sticky
-            <header className="bg-background sticky top-0 z-10 border-b p-4">
-              <h1 className="text-xl font-semibold">Portail Administrateur</h1>
-            </header> */}
+            <div className="fixed right-3 top-3 z-50 md:hidden">
+              <SidebarTrigger />
+            </div>
             <div className="flex-1 overflow-y-auto overscroll-none">{children}</div>
           </main>
         </div>
