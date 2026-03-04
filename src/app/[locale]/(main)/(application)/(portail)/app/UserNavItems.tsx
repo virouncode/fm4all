@@ -23,7 +23,6 @@ import {
   Handshake,
   LayoutDashboard,
   MapPin,
-  Settings,
   Ticket,
   Users,
 } from "lucide-react";
@@ -157,25 +156,66 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
           icon: LayoutDashboard,
           match: "exact",
         },
+      ],
+    },
+    {
+      label: "Exploitation",
+      items: [
         {
           key: "tickets",
-          label: "Interventions",
+          label: "Tickets",
           href: "/app/tickets",
           icon: Ticket,
           match: "startsWith",
         },
         {
-          key: "planning",
-          label: "Planning",
-          href: "/app/planning",
-          icon: ClipboardList,
+          key: "prestations",
+          label: "Prestations",
+          href: "/app/prestations",
+          icon: HandPlatter,
           match: "startsWith",
         },
+      ],
+    },
+    {
+      label: "Périmètre",
+      items: [
         {
           key: "mes-sites-clients",
           label: "Sites clients",
           href: "/app/mes-sites-clients",
           icon: MapPin,
+          match: "startsWith",
+        },
+      ],
+    },
+    {
+      label: "Équipe",
+      items: [
+        {
+          key: "utilisateurs",
+          label: "Utilisateurs",
+          href: "/app/utilisateurs",
+          icon: Users,
+          match: "startsWith",
+        },
+        {
+          key: "mon-entreprise",
+          label: "Mon entreprise",
+          href: "/app/mon-entreprise",
+          icon: Building2,
+          match: "startsWith",
+        },
+      ],
+    },
+    {
+      label: "Ressources",
+      items: [
+        {
+          key: "documents",
+          label: "Documents",
+          href: "/app/documents",
+          icon: FileText,
           match: "startsWith",
         },
       ],
@@ -191,55 +231,17 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
           match: "startsWith",
         },
         {
-          key: "facturation",
-          label: "Facturation",
-          href: "/app/facturation",
-          icon: Euro,
-          match: "startsWith",
-        },
-        {
           key: "contrats",
           label: "Contrats",
           href: "/app/contrats",
           icon: BriefcaseBusiness,
           match: "startsWith",
         },
-      ],
-    },
-    {
-      label: "Ressources",
-      items: [
         {
-          key: "documents",
-          label: "Documents",
-          href: "/app/documents",
-          icon: FileText,
-          match: "startsWith",
-        },
-        {
-          key: "utilisateurs",
-          label: "Utilisateurs",
-          href: "/app/utilisateurs",
-          icon: Users,
-          match: "startsWith",
-        },
-      ],
-    },
-    {
-      label: "Paramètres",
-      items: [
-        {
-          key: "mon-entreprise",
-          label: "Mon Entreprise",
-          href: "/app/mon-entreprise",
-          icon: Building2,
-          match: "startsWith",
-        },
-        {
-          key: "settings",
-          label: "Paramètres",
-          href: "/app/parametres",
-          icon: Settings,
+          key: "facturation",
+          label: "Facturation",
+          href: "/app/facturation",
+          icon: Euro,
           match: "startsWith",
         },
       ],
