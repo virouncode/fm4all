@@ -305,6 +305,13 @@ export const createOrLinkPrestataireAction = actionClient
           entrepriseNom = created.nom;
         }
 
+        // Self-link guard : un client ne peut pas s'ajouter lui-même comme prestataire
+        if (entrepriseId === parsedInput.entrepriseId) {
+          throw errors.conflict(
+            "Une entreprise ne peut pas être son propre prestataire.",
+          );
+        }
+
         // 2. S'assurer que le rôle prestataire existe
         const existingRole = await tx.query.entrepriseRoles.findFirst({
           where: and(
@@ -325,18 +332,28 @@ export const createOrLinkPrestataireAction = actionClient
         if (serviceIds.length > 0) {
           if (existingRole) {
             // Prestataire géré par le client (pas d'admin actif) : remplacer les services
-            await tx
-              .delete(serviceEntreprises)
-              .where(eq(serviceEntreprises.entrepriseId, entrepriseId));
-            await tx.insert(serviceEntreprises).values(
-              serviceIds.map((serviceId) => ({
-                entrepriseId,
-                serviceId,
-                actif: true,
-                createdById: currentUser.id,
-                updatedById: currentUser.id,
-              })),
-            );
+            // Guard serveur : ne jamais modifier les services d'un prestataire avec admin actif
+            const activeAdmin = await tx.query.userPrestataireAdhesions.findFirst({
+              where: and(
+                eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
+                eq(userPrestataireAdhesions.role, "admin"),
+                eq(userPrestataireAdhesions.statut, "actif"),
+              ),
+            });
+            if (!activeAdmin) {
+              await tx
+                .delete(serviceEntreprises)
+                .where(eq(serviceEntreprises.entrepriseId, entrepriseId));
+              await tx.insert(serviceEntreprises).values(
+                serviceIds.map((serviceId) => ({
+                  entrepriseId,
+                  serviceId,
+                  actif: true,
+                  createdById: currentUser.id,
+                  updatedById: currentUser.id,
+                })),
+              );
+            }
           } else {
             // Nouvelle entreprise ou entreprise sans rôle prestataire : upsert
             for (const serviceId of serviceIds) {

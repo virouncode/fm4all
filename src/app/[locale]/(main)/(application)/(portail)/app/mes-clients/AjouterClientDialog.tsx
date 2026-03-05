@@ -31,6 +31,7 @@ type SiretState =
   | { status: "searching" }
   | { status: "found"; entreprise: { id: string; nom: string; siret: string } }
   | { status: "not_found" }
+  | { status: "self" }
   | { status: "error"; message: string };
 
 const addClientFormSchema = z.object({
@@ -47,7 +48,7 @@ type AjouterClientDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   prestataireEntrepriseId: string;
-  onSuccess: (entrepriseId: string, nom: string) => void;
+  onSuccess: () => void;
 };
 
 export function AjouterClientDialog({
@@ -63,6 +64,7 @@ export function AjouterClientDialog({
   const siretValide = isValidSIRET(siretInput);
   const siretResolved =
     siretState.status === "found" || siretState.status === "not_found";
+  const siretBlocked = siretState.status === "self";
 
   const form = useForm<AddClientFormType>({
     resolver: zodResolver(addClientFormSchema),
@@ -94,9 +96,16 @@ export function AjouterClientDialog({
 
   const handleSearchSiret = async () => {
     setSiretState({ status: "searching" });
-    const result = await findEntrepriseBySiretAction({ siret: siretInput });
+    const result = await findEntrepriseBySiretAction({
+      siret: siretInput,
+      clientEntrepriseId: prestataireEntrepriseId,
+    });
     if (result?.serverError) {
       setSiretState({ status: "error", message: result.serverError.message });
+      return;
+    }
+    if (result?.data?.isSelf) {
+      setSiretState({ status: "self" });
       return;
     }
     if (result?.data?.entreprise) {
@@ -142,7 +151,7 @@ export function AjouterClientDialog({
     }
 
     if (result?.data) {
-      onSuccess(result.data.entrepriseId, result.data.nom);
+      onSuccess();
       onOpenChange(false);
     }
   };
@@ -176,7 +185,8 @@ export function AjouterClientDialog({
                         readOnly={
                           siretState.status === "found" ||
                           siretState.status === "not_found" ||
-                          siretState.status === "searching"
+                          siretState.status === "searching" ||
+                          siretState.status === "self"
                         }
                         onChange={(e) => {
                           setSiretInput(e.target.value.replace(/\D/g, ""));
@@ -193,7 +203,7 @@ export function AjouterClientDialog({
                         </span>
                       )}
                     </div>
-                    {siretResolved ? (
+                    {siretBlocked || siretResolved ? (
                       <Button
                         type="button"
                         variant="outline"
@@ -227,6 +237,11 @@ export function AjouterClientDialog({
                   {siretState.status === "error" && (
                     <p className="text-destructive text-xs">
                       {siretState.message}
+                    </p>
+                  )}
+                  {siretState.status === "self" && (
+                    <p className="text-destructive text-xs">
+                      Votre propre entreprise ne peut pas être un client.
                     </p>
                   )}
                   {siretState.status === "found" && (
@@ -299,7 +314,7 @@ export function AjouterClientDialog({
               </Button>
               <Button
                 type="submit"
-                disabled={!siretResolved || isSubmitting || creating}
+                disabled={!siretResolved || siretBlocked || isSubmitting || creating}
               >
                 {(isSubmitting || creating) && <Spinner />}
                 Confirmer
