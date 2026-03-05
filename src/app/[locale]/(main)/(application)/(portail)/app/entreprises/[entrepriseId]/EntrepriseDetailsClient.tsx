@@ -11,17 +11,20 @@ import {
   ArrowLeft,
   Building2,
   Calendar,
+  Clock,
+  HandPlatter,
   Mail,
   MapPin,
   Pencil,
   Phone,
+  Send,
   Tags,
   User,
-  Wrench,
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { formatEntrepriseDate, getRoleBadgeStyles } from "../helpers";
+import { InviterEntrepriseAdminDialog } from "../InviterEntrepriseAdminDialog";
 import { EditEntrepriseContactDialog } from "./EditEntrepriseContactDialog";
 import { EditEntrepriseInfosDialog } from "./EditEntrepriseInfosDialog";
 import { EditEntrepriseLogoDialog } from "./EditEntrepriseLogoDialog";
@@ -39,7 +42,7 @@ type EntrepriseDetailsClientProps = {
   /** Si false, le bouton "Retour aux entreprises" est masqué (ex: page Mon Entreprise) */
   showBackButton?: boolean;
   /** Callback après mutation réussie — par défaut router.refresh() */
-  onUpdate?: () => void;
+  onUpdate?: (...args: unknown[]) => void;
 };
 
 export function EntrepriseDetailsClient({
@@ -63,6 +66,7 @@ export function EntrepriseDetailsClient({
   const [editContactOpen, setEditContactOpen] = useState(false);
   const [editRolesOpen, setEditRolesOpen] = useState(false);
   const [editLogoOpen, setEditLogoOpen] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
 
   // Référence stable pour éviter les re-renders infinis dans les dialogs enfants
   const serviceIds = useMemo(
@@ -86,6 +90,7 @@ export function EntrepriseDetailsClient({
     .toUpperCase();
 
   const isPrestataire = entreprise.roles.includes("prestataire");
+  const isClient = entreprise.roles.includes("client");
 
   return (
     <div className="container mx-auto max-w-6xl space-y-6 p-6">
@@ -103,11 +108,12 @@ export function EntrepriseDetailsClient({
                   className="group focus-visible:ring-primary relative flex-shrink-0 rounded-full focus:outline-none focus-visible:ring-2"
                   title="Modifier le logo"
                 >
-                  <Avatar className="h-12 w-12">
+                  <Avatar className="ring-border h-12 w-12 ring-1">
                     {logoUrl && (
                       <AvatarImage
                         src={logoUrl}
                         alt={`Logo ${entreprise.nom}`}
+                        className="object-contain"
                       />
                     )}
                     <AvatarFallback className="bg-muted text-muted-foreground text-base font-semibold">
@@ -119,9 +125,13 @@ export function EntrepriseDetailsClient({
                   </span>
                 </button>
               ) : (
-                <Avatar className="h-12 w-12 flex-shrink-0">
+                <Avatar className="ring-border h-12 w-12 flex-shrink-0 ring-1">
                   {logoUrl && (
-                    <AvatarImage src={logoUrl} alt={`Logo ${entreprise.nom}`} />
+                    <AvatarImage
+                      src={logoUrl}
+                      alt={`Logo ${entreprise.nom}`}
+                      className="object-contain"
+                    />
                   )}
                   <AvatarFallback className="bg-muted text-muted-foreground text-base font-semibold">
                     {initials}
@@ -147,25 +157,33 @@ export function EntrepriseDetailsClient({
             </div>
           </div>
 
-          {/* Bouton retour — top right (masqué en mode Mon Entreprise) */}
-          {showBackButton && (
-            <Button
-              variant="ghost"
-              size="sm"
-              asChild
-              className="flex-shrink-0 gap-2"
-            >
-              <Link
-                href={{
-                  pathname: "/app/entreprises",
-                  query: backQuery,
-                }}
+          {/* Boutons top right */}
+          <div className="flex flex-shrink-0 flex-col items-end gap-2">
+            {showBackButton && (
+              <Button variant="ghost" size="sm" asChild className="gap-2">
+                <Link
+                  href={{
+                    pathname: "/app/entreprises",
+                    query: backQuery,
+                  }}
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Retour aux entreprises
+                </Link>
+              </Button>
+            )}
+
+            {canEdit && !entreprise.hasActiveAdmin && (
+              <Button
+                size="sm"
+                className="min-w-30 gap-2"
+                onClick={() => setInviteOpen(true)}
               >
-                <ArrowLeft className="h-4 w-4" />
-                Retour aux entreprises
-              </Link>
-            </Button>
-          )}
+                <Send className="h-4 w-4" />
+                {entreprise.pendingInvitation ? "Réinviter" : "Inviter"}
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Badges rôles */}
@@ -179,6 +197,18 @@ export function EntrepriseDetailsClient({
             );
           })}
         </div>
+
+        {/* Invitation en attente */}
+        {!entreprise.hasActiveAdmin && entreprise.pendingInvitation && (
+          <div className="text-muted-foreground flex items-center gap-1.5 text-sm">
+            <Clock className="h-4 w-4 shrink-0" />
+            <span>
+              Invitation envoyée à{" "}
+              <strong>{entreprise.pendingInvitation.email}</strong> — en attente
+              d&apos;inscription
+            </span>
+          </div>
+        )}
       </div>
 
       <Separator />
@@ -195,7 +225,7 @@ export function EntrepriseDetailsClient({
               </CardTitle>
               {canEdit && (
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
                   className="text-muted-foreground hover:text-foreground h-8 gap-1.5"
                   onClick={() => setEditInfosOpen(true)}
@@ -232,7 +262,7 @@ export function EntrepriseDetailsClient({
               </CardTitle>
               {canEdit && (
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
                   className="text-muted-foreground hover:text-foreground h-8 gap-1.5"
                   onClick={() => setEditContactOpen(true)}
@@ -281,25 +311,27 @@ export function EntrepriseDetailsClient({
           </CardContent>
         </Card>
 
-        {/* Sites */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base font-medium">
-              <MapPin className="text-primary h-4 w-4" />
-              Sites
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-foreground text-sm">
-              <span className="text-2xl font-bold">{entreprise.nbSites}</span>{" "}
-              {entreprise.nbSites === 0
-                ? "aucun site enregistré"
-                : entreprise.nbSites === 1
-                  ? "site enregistré"
-                  : "sites enregistrés"}
-            </p>
-          </CardContent>
-        </Card>
+        {/* Sites — uniquement si l'entreprise est cliente */}
+        {isClient && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base font-medium">
+                <MapPin className="text-primary h-4 w-4" />
+                Sites
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-foreground text-sm">
+                <span className="text-2xl font-bold">{entreprise.nbSites}</span>{" "}
+                {entreprise.nbSites === 0
+                  ? "aucun site enregistré"
+                  : entreprise.nbSites === 1
+                    ? "site enregistré"
+                    : "sites enregistrés"}
+              </p>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Rôles + Services */}
         <Card>
@@ -311,7 +343,7 @@ export function EntrepriseDetailsClient({
               </CardTitle>
               {canEdit && (
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
                   className="text-muted-foreground hover:text-foreground h-8 gap-1.5"
                   onClick={() => setEditRolesOpen(true)}
@@ -341,34 +373,32 @@ export function EntrepriseDetailsClient({
             )}
 
             {/* Services proposés (si prestataire) */}
-            {isPrestataire && (
-              <div className="space-y-2">
-                <div className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium tracking-wide uppercase">
-                  <Wrench className="h-3.5 w-3.5" />
-                  Services proposés
-                </div>
-                {services.length === 0 ? (
-                  <p className="text-muted-foreground text-sm italic">
-                    Aucun service renseigné
-                  </p>
-                ) : (
-                  <ul className="space-y-1">
-                    {services.map((s) => (
-                      <li
-                        key={s.serviceId}
-                        className="flex items-center gap-1.5 text-sm"
-                      >
-                        <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-green-500" />
-                        {s.nom}
-                      </li>
-                    ))}
-                  </ul>
-                )}
+            {isPrestataire && services.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {services.map((s) => (
+                  <span
+                    key={s.serviceId}
+                    className="bg-primary/10 text-primary border-primary/40 inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs"
+                  >
+                    <HandPlatter className="h-3 w-3" />
+                    {s.nom}
+                  </span>
+                ))}
               </div>
             )}
           </CardContent>
         </Card>
       </div>
+
+      {/* Dialog invitation administrateur */}
+      <InviterEntrepriseAdminDialog
+        open={inviteOpen}
+        onOpenChange={setInviteOpen}
+        entrepriseId={entreprise.id}
+        entrepriseNom={entreprise.nom}
+        defaultEmail={entreprise.emailContact}
+        onSuccess={handleUpdate}
+      />
 
       {/* Dialogs — uniquement si l'utilisateur peut éditer */}
       {canEdit && (

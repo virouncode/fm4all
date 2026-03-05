@@ -5,6 +5,7 @@ import { getSession } from "@/server/auth/get-session";
 import { bootstrapUser } from "@/server/queries/bootstrap.query";
 import { RoleEntrepriseType } from "@/zod-schemas/entreprise.schema";
 import { cookies } from "next/headers";
+import { PostureIndicator } from "./PostureIndicator";
 import UserSidebar from "./UserSidebar";
 
 const AppLayout = async ({ children }: { children: React.ReactNode }) => {
@@ -54,6 +55,7 @@ const AppLayout = async ({ children }: { children: React.ReactNode }) => {
             <div className="fixed right-3 top-3 z-50 md:hidden">
               <SidebarTrigger />
             </div>
+            <PostureIndicator />
             <div className="flex-1 overflow-y-auto overscroll-none">{children}</div>
           </main>
         </div>

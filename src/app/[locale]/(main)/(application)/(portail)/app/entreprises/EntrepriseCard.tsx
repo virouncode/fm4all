@@ -1,18 +1,33 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import type { EntrepriseWithDetails } from "@/zod-schemas/entreprise.schema";
-import { Building2, Mail, Phone } from "lucide-react";
+import {
+  Building2,
+  Calendar,
+  Clock,
+  HandPlatter,
+  Mail,
+  Phone,
+  Send,
+  User,
+} from "lucide-react";
 import { formatEntrepriseDate, getRoleBadgeStyles } from "./helpers";
 import { LogoAvatar } from "./LogoAvatar";
 
 type EntrepriseCardProps = {
   entreprise: EntrepriseWithDetails;
   onClick?: () => void;
+  onInvite?: () => void;
 };
 
-export function EntrepriseCard({ entreprise, onClick }: EntrepriseCardProps) {
+export function EntrepriseCard({
+  entreprise,
+  onClick,
+  onInvite,
+}: EntrepriseCardProps) {
   const {
     id,
     nom,
@@ -25,6 +40,9 @@ export function EntrepriseCard({ entreprise, onClick }: EntrepriseCardProps) {
     nbSites,
     createdAt,
     logoStorageKey,
+    hasActiveAdmin,
+    services,
+    pendingInvitation,
   } = entreprise;
 
   const contactName =
@@ -32,9 +50,12 @@ export function EntrepriseCard({ entreprise, onClick }: EntrepriseCardProps) {
       ? `${prenomContact ?? ""} ${nomContact ?? ""}`.trim()
       : null;
 
+  const isClient = roles.includes("client");
+  const isPrestataire = roles.includes("prestataire");
+
   return (
     <Card
-      className="cursor-pointer transition-colors hover:bg-accent h-full flex flex-col"
+      className={`flex h-full flex-col transition-colors ${onClick ? "hover:bg-accent cursor-pointer" : "cursor-default"}`}
       onClick={onClick}
       tabIndex={onClick ? 0 : undefined}
       role={onClick ? "button" : undefined}
@@ -50,7 +71,7 @@ export function EntrepriseCard({ entreprise, onClick }: EntrepriseCardProps) {
           : undefined
       }
     >
-      <CardHeader className="pb-2 space-y-2 flex-shrink-0">
+      <CardHeader className="flex-shrink-0 space-y-2 pb-2">
         {/* Avatar + Nom */}
         <div className="flex items-start gap-3">
           <LogoAvatar
@@ -59,11 +80,11 @@ export function EntrepriseCard({ entreprise, onClick }: EntrepriseCardProps) {
             nom={nom}
             size="md"
           />
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-base line-clamp-2 leading-tight">
+          <div className="min-w-0 flex-1">
+            <h3 className="line-clamp-2 text-base leading-tight font-semibold">
               {nom}
             </h3>
-            <p className="font-mono text-xs text-muted-foreground mt-0.5">
+            <p className="text-muted-foreground mt-0.5 font-mono text-xs">
               {siret}
             </p>
           </div>
@@ -88,43 +109,97 @@ export function EntrepriseCard({ entreprise, onClick }: EntrepriseCardProps) {
         )}
       </CardHeader>
 
-      <CardContent className="flex flex-col text-sm flex-1 gap-1.5">
+      <CardContent className="flex flex-1 flex-col gap-1.5 text-sm">
         {/* Contact */}
         {contactName && (
           <div className="flex items-center gap-1.5 text-sm">
-            <span className="font-medium text-foreground shrink-0">
-              {contactName}
-            </span>
+            <User className="text-primary h-3.5 w-3.5 shrink-0" />
+            <span className="text-foreground font-medium">{contactName}</span>
           </div>
         )}
 
         {emailContact && (
           <div className="flex items-center gap-1.5">
-            <Mail className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-            <span className="text-muted-foreground truncate text-xs">
+            <Mail className="text-primary h-3.5 w-3.5 shrink-0" />
+            <a
+              href={`mailto:${emailContact}`}
+              onClick={(e) => e.stopPropagation()}
+              className="hover:text-primary truncate text-xs transition-colors"
+            >
               {emailContact}
-            </span>
+            </a>
           </div>
         )}
 
         {phoneContact && (
           <div className="flex items-center gap-1.5">
-            <Phone className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-            <span className="text-muted-foreground text-xs">{phoneContact}</span>
+            <Phone className="text-primary h-3.5 w-3.5 shrink-0" />
+            <a
+              href={`tel:${phoneContact}`}
+              onClick={(e) => e.stopPropagation()}
+              className="hover:text-primary text-xs transition-colors"
+            >
+              {phoneContact}
+            </a>
           </div>
         )}
 
-        {/* Nb sites */}
-        <div className="flex items-center gap-1.5 mt-auto pt-2 border-t">
-          <Building2 className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-          <span className="text-xs text-muted-foreground">
-            {nbSites === 0
-              ? "Aucun site"
-              : `${nbSites} site${nbSites > 1 ? "s" : ""}`}
-          </span>
-          <span className="ml-auto text-xs text-muted-foreground">
-            Créé le {formatEntrepriseDate(createdAt)}
-          </span>
+        {/* Services si prestataire */}
+        {isPrestataire && services.length > 0 && (
+          <div className="mt-1 flex flex-wrap gap-1">
+            {services.map((s) => (
+              <span
+                key={s.id}
+                className="bg-primary/10 text-primary border-primary/40 inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs"
+              >
+                <HandPlatter className="h-3 w-3" />
+                {s.nom}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Bouton + footer groupés en bas */}
+        <div className="mt-auto space-y-1.5">
+          {!hasActiveAdmin && pendingInvitation && (
+            <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
+              <Clock className="h-3.5 w-3.5 shrink-0" />
+              <span className="truncate">
+                Invité ({pendingInvitation.email})
+              </span>
+            </div>
+          )}
+          {!hasActiveAdmin && onInvite && (
+            <Button
+              size="sm"
+              className="my-1.5 w-full text-xs"
+              onClick={(e) => {
+                e.stopPropagation();
+                onInvite();
+              }}
+            >
+              <Send className="h-3.5 w-3.5" />
+              {pendingInvitation ? "Réinviter" : "Inviter"}
+            </Button>
+          )}
+
+          {/* Footer : nb sites (si client) + date */}
+          <div className="flex items-center gap-1.5 border-t pt-2">
+            {isClient && (
+              <>
+                <Building2 className="text-primary h-3.5 w-3.5 shrink-0" />
+                <span className="text-xs">
+                  {nbSites === 0
+                    ? "Aucun site"
+                    : `${nbSites} site${nbSites > 1 ? "s" : ""}`}
+                </span>
+              </>
+            )}
+            <span className="text-muted-foreground ml-auto inline-flex items-center gap-1 text-xs">
+              <Calendar className="h-3 w-3" />
+              Créé le {formatEntrepriseDate(createdAt)}
+            </span>
+          </div>
         </div>
       </CardContent>
     </Card>
