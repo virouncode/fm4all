@@ -1,3 +1,6 @@
+import { redirect } from "@/i18n/navigation";
+import { getSession } from "@/server/auth/get-session";
+import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
 import { Suspense } from "react";
 import { EntreprisesTable } from "./EntreprisesTable";
 
@@ -15,6 +18,17 @@ type EntreprisesPageProps = {
 export default async function EntreprisesPage({
   searchParams,
 }: EntreprisesPageProps) {
+  const session = await getSession();
+  if (!session?.user) {
+    redirect({ href: "/auth/login", locale: "fr" });
+  }
+
+  const currentUser = session!.user;
+  const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+  if (!platformRole?.role) {
+    redirect({ href: "/auth/unauthorized", locale: "fr" });
+  }
+
   const params = await searchParams;
 
   return (

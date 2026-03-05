@@ -30,7 +30,7 @@ export default async function EntrepriseDetailsPage({
   // 2. Vérifier rôle plateforme (page réservée posture plateforme)
   const platformRole = await getUserPlateformeAdhesion(currentUser.id);
   if (!platformRole?.role) {
-    notFound();
+    redirect({ href: "/auth/unauthorized", locale: "fr" });
   }
 
   // 3. Récupérer l'entreprise avec ses détails
