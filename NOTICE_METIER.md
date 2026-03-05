@@ -13,6 +13,7 @@
 4. [Module Tickets](#4-module-tickets)
 5. [Module Prestations](#5-module-prestations)
 6. [Module Entreprises](#6-module-entreprises)
+7. [Module Mes Prestataires](#7-module-mes-prestataires)
 
 ---
 
@@ -600,7 +601,7 @@ Les modifications disponibles sont identiques à celles de la page de détail en
 
 ### 6.8 Qui peut accéder au module Entreprises
 
-Le module complet (liste, création, gestion) est **réservé à la posture Plateforme (FM4ALL)**.
+Le module complet (liste, création, gestion) est **réservé à la posture Plateforme (FM4ALL)**. Toute tentative d'accès par un utilisateur sans rôle plateforme est bloquée côté serveur et redirige vers la page d'accès non autorisé.
 
 | Action | FM4ALL (Plateforme) | Client / Prestataire |
 |--------|:-:|:-:|
@@ -618,6 +619,44 @@ Le module complet (liste, création, gestion) est **réservé à la posture Plat
 | **Plateforme** | Section "Réseau" → "Entreprises" (liste complète) + "Mon Entreprise" |
 | **Client** | Section "Équipe" → "Mon Entreprise" uniquement |
 | **Prestataire** | Section "Paramètres" → "Mon Entreprise" uniquement |
+
+---
+
+## 7. Module Mes Prestataires
+
+### 7.1 Consultation des prestataires (posture Client)
+
+Les utilisateurs en posture **Client** disposent d'une page **"Mes Prestataires"** permettant de consulter les prestataires avec lesquels ils ont des relations actives (via des prestations existantes).
+
+> ℹ️ Les informations des prestataires (nom, SIRET, coordonnées de contact) sont **consultables uniquement**. Elles ne peuvent pas être modifiées depuis l'espace client.
+
+**Pourquoi ?** Un prestataire peut être partagé entre plusieurs entreprises clientes sur la plateforme. Autoriser un client à modifier les données d'un prestataire risquerait de créer des incohérences pour les autres clients liés au même prestataire.
+
+Pour mettre à jour les informations d'un prestataire, deux options :
+1. **Inviter le prestataire** à créer son compte — il gère alors lui-même ses informations
+2. **Contacter FM4ALL** à l'adresse [contact@fm4all.com](mailto:contact@fm4all.com)
+
+### 7.2 Actions disponibles pour le Client
+
+| Action | Admin | Manager | Collaborateur |
+|--------|:-:|:-:|:-:|
+| Consulter la liste de ses prestataires | ✅ | ✅ | ✅ |
+| Ajouter un prestataire (via SIRET) | ✅ | ✅ | ❌ |
+| Inviter un prestataire sans compte à s'inscrire | ✅ | ✅ | ❌ |
+| Modifier les infos d'un prestataire | ❌ | ❌ | ❌ |
+
+### 7.3 Rattacher un utilisateur existant à une nouvelle posture
+
+Lorsqu'une entreprise est **multi-posture** (ex : à la fois cliente et prestataire), un utilisateur déjà référencé dans l'entreprise peut se voir attribuer une adhésion supplémentaire **sans créer un nouveau compte**.
+
+Ce rattachement est accessible depuis le module **Gestion des Utilisateurs**, via l'option "Rattacher existant" lors de la création d'un utilisateur.
+
+**Condition** : l'utilisateur ne doit pas déjà posséder une adhésion pour la posture cible.
+
+**Ce qui se passe lors du rattachement** :
+- Une nouvelle ligne d'adhésion est ajoutée (`user_client_adhesions`, `user_prestataire_adhesions`, ou `user_plateforme_adhesions`)
+- L'arborescence de l'utilisateur reste inchangée (ses entrées hiérarchiques existantes sont conservées)
+- Aucun email d'activation n'est renvoyé (l'utilisateur a déjà un compte actif)
 
 ---
 
@@ -676,4 +715,4 @@ Le module complet (liste, création, gestion) est **réservé à la posture Plat
 
 ---
 
-*Document mis à jour le 2026-03-04 — FM4ALL*
+*Document mis à jour le 2026-03-05 (v2) — FM4ALL*

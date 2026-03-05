@@ -888,6 +888,36 @@ const onSubmit = async (data: UpdateUserFormType) => {
 
 **RÈGLE CRITIQUE**: Toujours valider que le `currentUser` a accès à l'`entrepriseId` avant de retourner des données
 
+### Guard Server-Side pour Pages Réservées Posture Plateforme
+
+**TOUJOURS** ajouter ce guard dans les `page.tsx` plateforme-only (`/app/entreprises`, `/app/services`, etc.) :
+
+```typescript
+import { redirect } from "@/i18n/navigation";
+import { getSession } from "@/server/auth/get-session";
+import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
+
+export default async function MyPage() {
+  const session = await getSession();
+  if (!session?.user) {
+    redirect({ href: "/auth/login", locale: "fr" });
+  }
+
+  // ⚠️ session! obligatoire : redirect() ne narrowe PAS TypeScript
+  const currentUser = session!.user;
+  const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+  if (!platformRole?.role) {
+    // ⚠️ redirect href n'accepte PAS de query string (?type=...) — typage strict next-intl
+    redirect({ href: "/auth/unauthorized", locale: "fr" });
+  }
+
+  // Page normale ici
+}
+```
+
+**Pages concernées** : `/app/entreprises/page.tsx`, `/app/entreprises/[id]/page.tsx`, `/app/services/page.tsx`
+
+### Check Permission dans Server Actions
 ```typescript
 // Pattern: Check permission dans Server Actions
 export const getUsersAction = action
@@ -2021,7 +2051,52 @@ logoStorageKey: sql<string | null>`MAX(${documents.storageKey})`,
 
 ---
 
-**Dernière mise à jour**: 2026-03-04
+## Changelog (2026-03-05)
+
+**Module Utilisateurs — Requêtes posture-aware** :
+
+- ✅ `getUsers()` réécrit avec 3 branches explicites : `plateforme` (→ `userPlateformeAdhesions`), `prestataire` (→ `userPrestataireAdhesions`), `client` (défaut)
+- ✅ Correction `getUsersAction` : vérification de permission posture-aware (plateforme → `getUserPlateformeAdhesion`, prestataire → check `userPrestataireAdhesions`, client → `getUserClientAdhesion`)
+- ✅ Correction `insertUserAction` : insère dans `userPrestataireAdhesions` si posture=prestataire
+- ✅ `UsersClient.tsx` : passe `posture` dans queryParams + dépendances `useEffect`
+
+**Module Utilisateurs — Rattacher un utilisateur existant** :
+
+- ✅ `getUsersEligibleForAdhesion()` : query retournant les users de l'entreprise n'ayant PAS encore l'adhésion pour la posture cible (via `notExists` + self-referential arborescence `profondeur=0`)
+- ✅ `addAdhesionToExistingUserAction` : ajoute une adhésion sans créer de compte ni modifier l'arborescence (l'utilisateur existant a déjà ses entrées)
+- ✅ `UserFormDialog.tsx` : ToggleGroup "Nouvel utilisateur" / "Rattacher existant" — `LinkExistingUserForm` charge les users éligibles et insère uniquement l'adhésion
+
+**Module Mes Prestataires — Politique lecture seule** :
+
+- ✅ Decision: posture client = lecture seule sur les infos de base des prestataires (nom, SIRET, contact)
+- ✅ Disclaimer discret ajouté dans `MesPrestatairesClient.tsx` avec lien `mailto:contact@fm4all.com`
+- Rationale: un prestataire peut être partagé entre plusieurs clients → risque d'incohérence si un client modifie les données partagées. Le client contrôle déjà la relation via le module Prestations.
+
+**Règle : `notExists` pour filtrer utilisateurs éligibles** :
+```typescript
+// Pattern: users dans l'entreprise (via arborescence self-ref) SANS l'adhésion cible
+const baseQuery = db.select({ id, prenom, nom, email }).from(user)
+  .innerJoin(usersArborescence, and(
+    eq(usersArborescence.descendantId, user.id),
+    eq(usersArborescence.ancetreId, user.id), // profondeur=0 = appartient à l'entreprise
+    eq(usersArborescence.entrepriseId, entrepriseId),
+  ))
+  .where(notExists(
+    db.select().from(userClientAdhesions).where(
+      and(
+        eq(userClientAdhesions.userId, user.id),
+        eq(userClientAdhesions.entrepriseId, entrepriseId),
+      ),
+    )
+  ));
+```
+
+**Règle : Branches Drizzle explicites pour union de tables** :
+Ne PAS essayer `const table = condition ? tableA : tableB` — le typage Drizzle ne supporte pas les unions de tables dans `.from()`. Toujours utiliser des branches `if/else` avec des queries séparées.
+
+---
+
+**Dernière mise à jour**: 2026-03-05
 
 Pour toute question ou clarification, référez-vous d'abord aux implémentations de référence:
 

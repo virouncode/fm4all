@@ -74,6 +74,7 @@ export function UsersClient() {
       // Build query params manually with proper typing
       const queryParams = {
         entrepriseId: entreprise.id,
+        posture: (postureActive ?? "client") as "client" | "prestataire" | "plateforme",
         search: searchFilter,
         roleAdhesion:
           roleFilter && roleFilter !== "all"
@@ -111,11 +112,11 @@ export function UsersClient() {
     }
   };
 
-  // Load users on mount and when filters change
+  // Load users on mount and when filters/posture change
   useEffect(() => {
     loadUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entreprise?.id, searchFilter, roleFilter, statutFilter]);
+  }, [entreprise?.id, postureActive, searchFilter, roleFilter, statutFilter]);
 
   // Déplier les ancêtres quand un utilisateur est sélectionné (par défaut ou par clic)
   useEffect(() => {

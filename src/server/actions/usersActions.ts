@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { user } from "@/db/schema/auth";
 import { documents } from "@/db/schema/documents";
 import { entreprises } from "@/db/schema/entreprises";
-import { userClientAdhesions, userPlateformeAdhesions } from "@/db/schema/users";
+import { userClientAdhesions, userPlateformeAdhesions, userPrestataireAdhesions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
@@ -21,7 +21,9 @@ import {
   isUserDescendant,
   userHasChildren,
 } from "@/server/utils/usersArborescence.utils";
+import { getUsersEligibleForAdhesion } from "@/server/queries/users.query";
 import {
+  addAdhesionFormSchema,
   insertPlateformeUserFormSchema,
   insertUserFormSchema,
   selectUserSchema,
@@ -58,17 +60,42 @@ export const getUsersAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    // Vérifier que currentUser a accès à cette entreprise
-    const { getUserClientAdhesion } = await import("@/server/queries/userAdhesions.query");
-    const adhesion = await getUserClientAdhesion({
-      userId: currentUser.id,
-      entrepriseId: parsedInput.entrepriseId,
-    });
+    const { posture = "client", entrepriseId } = parsedInput;
 
-    if (!adhesion) {
-      throw errors.forbidden(
-        "Vous n'avez pas accès à cette entreprise.",
-      );
+    // Vérifier que currentUser a accès selon la posture
+    if (posture === "plateforme") {
+      const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+      if (!platformRole?.role) {
+        throw errors.forbidden("Accès réservé aux utilisateurs de la plateforme.");
+      }
+    } else if (posture === "prestataire") {
+      const [row] = await db
+        .select()
+        .from(userPrestataireAdhesions)
+        .where(
+          and(
+            eq(userPrestataireAdhesions.userId, currentUser.id),
+            eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
+          ),
+        )
+        .limit(1);
+      // Fallback: allow platform admins too
+      if (!row) {
+        const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+        if (!platformRole?.role) {
+          throw errors.forbidden("Vous n'avez pas accès à cette entreprise en posture prestataire.");
+        }
+      }
+    } else {
+      // client (default)
+      const { getUserClientAdhesion } = await import("@/server/queries/userAdhesions.query");
+      const adhesion = await getUserClientAdhesion({
+        userId: currentUser.id,
+        entrepriseId,
+      });
+      if (!adhesion) {
+        throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
+      }
     }
 
     const result = await getUsers(parsedInput);
@@ -172,6 +199,7 @@ export const insertUserAction = actionClient
   .inputSchema(
     insertUserFormSchema.extend({
       entrepriseId: z.uuid("ID entreprise invalide"),
+      posture: z.enum(["client", "prestataire"]).default("client"),
     }),
     {
       handleValidationErrorsShape: async (ve) =>
@@ -191,6 +219,7 @@ export const insertUserAction = actionClient
       parentId,
       avatar,
       roleAdhesion,
+      posture = "client",
     } = parsedInput;
 
     // Si parentId, vérifier qu'il appartient à la même entreprise
@@ -209,22 +238,34 @@ export const insertUserAction = actionClient
 
     // ===== VALIDATION DES PERMISSIONS =====
 
-    // 1. Récupérer le rôle de l'utilisateur actuel
-    const currentUserAdhesion = await db.query.userClientAdhesions.findFirst({
-      where: and(
-        eq(userClientAdhesions.userId, currentUser.id),
-        eq(userClientAdhesions.entrepriseId, entrepriseId),
-      ),
-    });
+    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
 
-    if (!currentUserAdhesion) {
+    // 1. Récupérer le rôle de l'utilisateur actuel (selon posture)
+    let currentUserRole: "admin" | "manager" | "collaborateur" | null = null;
+
+    if (posture === "prestataire") {
+      const adhesion = await db.query.userPrestataireAdhesions.findFirst({
+        where: and(
+          eq(userPrestataireAdhesions.userId, currentUser.id),
+          eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
+        ),
+      });
+      currentUserRole = adhesion?.role ?? null;
+    } else {
+      const adhesion = await db.query.userClientAdhesions.findFirst({
+        where: and(
+          eq(userClientAdhesions.userId, currentUser.id),
+          eq(userClientAdhesions.entrepriseId, entrepriseId),
+        ),
+      });
+      currentUserRole = adhesion?.role ?? null;
+    }
+
+    if (!currentUserRole && platformRole?.role !== "super_admin_plateforme") {
       throw errors.forbidden(
         "Vous n'avez pas d'adhésion dans cette entreprise.",
       );
     }
-
-    const currentUserRole = currentUserAdhesion.role;
-    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
 
     // 2. Vérifier que l'utilisateur peut créer des utilisateurs
     if (
@@ -342,15 +383,26 @@ export const insertUserAction = actionClient
 
     // 3. Transaction pour adhesion + arborescence
     await db.transaction(async (tx) => {
-      // Insert adhesion (membership avec role global)
-      await tx.insert(userClientAdhesions).values({
-        userId: newUser.id,
-        entrepriseId,
-        role: roleAdhesion,
-        statut: "actif",
-        createdById: currentUser.id,
-        updatedById: currentUser.id,
-      });
+      // Insert adhesion dans la bonne table selon la posture
+      if (posture === "prestataire") {
+        await tx.insert(userPrestataireAdhesions).values({
+          userId: newUser.id,
+          entrepriseId,
+          role: roleAdhesion,
+          statut: "actif",
+          createdById: currentUser.id,
+          updatedById: currentUser.id,
+        });
+      } else {
+        await tx.insert(userClientAdhesions).values({
+          userId: newUser.id,
+          entrepriseId,
+          role: roleAdhesion,
+          statut: "actif",
+          createdById: currentUser.id,
+          updatedById: currentUser.id,
+        });
+      }
 
       // Insert closure table entries
       await insertUserArborescence({
@@ -1002,5 +1054,164 @@ export const permanentlyDeleteUserAction = actionClient
 
     return {
       message: "Utilisateur supprimé définitivement avec succès.",
+    };
+  });
+
+// ==================== GET USERS ELIGIBLE FOR ADHESION ====================
+
+export const getUsersEligibleForAdhesionAction = actionClient
+  .metadata({ actionName: "getUsersEligibleForAdhesionAction" })
+  .inputSchema(
+    z.object({
+      entrepriseId: z.uuid(),
+      posture: z.enum(["client", "prestataire", "plateforme"]),
+    }),
+    {
+      handleValidationErrorsShape: async (ve) =>
+        flattenValidationErrors(ve).fieldErrors,
+    },
+  )
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+
+    if (!currentUser) {
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    }
+
+    // Vérifier accès (admin ou super_admin_plateforme)
+    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    if (platformRole?.role !== "super_admin_plateforme") {
+      // Vérifier que l'utilisateur est admin dans cette entreprise (peu importe la posture)
+      const isClientAdmin = await db.query.userClientAdhesions.findFirst({
+        where: and(
+          eq(userClientAdhesions.userId, currentUser.id),
+          eq(userClientAdhesions.entrepriseId, parsedInput.entrepriseId),
+          eq(userClientAdhesions.role, "admin"),
+        ),
+      });
+      const isPrestataireAdmin = await db.query.userPrestataireAdhesions.findFirst({
+        where: and(
+          eq(userPrestataireAdhesions.userId, currentUser.id),
+          eq(userPrestataireAdhesions.entrepriseId, parsedInput.entrepriseId),
+          eq(userPrestataireAdhesions.role, "admin"),
+        ),
+      });
+      if (!isClientAdmin && !isPrestataireAdmin) {
+        throw errors.forbidden("Accès administrateur requis.");
+      }
+    }
+
+    const users = await getUsersEligibleForAdhesion(parsedInput);
+    return { users };
+  });
+
+// ==================== ADD ADHESION TO EXISTING USER ====================
+
+export const addAdhesionToExistingUserAction = actionClient
+  .metadata({ actionName: "addAdhesionToExistingUserAction" })
+  .inputSchema(addAdhesionFormSchema, {
+    handleValidationErrorsShape: async (ve) =>
+      flattenValidationErrors(ve).fieldErrors,
+  })
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    const currentUser = session?.user;
+
+    if (!currentUser) {
+      throw errors.unauthorized("Vous n'êtes pas authentifié.");
+    }
+
+    const { targetUserId, entrepriseId, posture, role } = parsedInput;
+
+    // Vérifier que le currentUser est admin ou super_admin_plateforme
+    const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+    if (platformRole?.role !== "super_admin_plateforme") {
+      const isClientAdmin = await db.query.userClientAdhesions.findFirst({
+        where: and(
+          eq(userClientAdhesions.userId, currentUser.id),
+          eq(userClientAdhesions.entrepriseId, entrepriseId),
+          eq(userClientAdhesions.role, "admin"),
+        ),
+      });
+      const isPrestataireAdmin = await db.query.userPrestataireAdhesions.findFirst({
+        where: and(
+          eq(userPrestataireAdhesions.userId, currentUser.id),
+          eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
+          eq(userPrestataireAdhesions.role, "admin"),
+        ),
+      });
+      if (!isClientAdmin && !isPrestataireAdmin) {
+        throw errors.forbidden(
+          "Seul un administrateur peut rattacher un utilisateur existant.",
+        );
+      }
+    }
+
+    // Vérifier que l'utilisateur cible existe
+    const targetUser = await getUserById(targetUserId);
+    if (!targetUser) {
+      throw errors.notFound("Utilisateur cible");
+    }
+
+    // Vérifier qu'il n'a pas déjà cette adhésion
+    if (posture === "client") {
+      const existing = await db.query.userClientAdhesions.findFirst({
+        where: and(
+          eq(userClientAdhesions.userId, targetUserId),
+          eq(userClientAdhesions.entrepriseId, entrepriseId),
+        ),
+      });
+      if (existing) {
+        throw errors.conflict("Cet utilisateur a déjà une adhésion client pour cette entreprise.");
+      }
+
+      await db.insert(userClientAdhesions).values({
+        userId: targetUserId,
+        entrepriseId,
+        role: role as "admin" | "manager" | "collaborateur",
+        statut: "actif",
+        createdById: currentUser.id,
+        updatedById: currentUser.id,
+      });
+    } else if (posture === "prestataire") {
+      const existing = await db.query.userPrestataireAdhesions.findFirst({
+        where: and(
+          eq(userPrestataireAdhesions.userId, targetUserId),
+          eq(userPrestataireAdhesions.entrepriseId, entrepriseId),
+        ),
+      });
+      if (existing) {
+        throw errors.conflict("Cet utilisateur a déjà une adhésion prestataire pour cette entreprise.");
+      }
+
+      await db.insert(userPrestataireAdhesions).values({
+        userId: targetUserId,
+        entrepriseId,
+        role: role as "admin" | "manager" | "collaborateur",
+        statut: "actif",
+        createdById: currentUser.id,
+        updatedById: currentUser.id,
+      });
+    } else {
+      // plateforme
+      const existing = await db.query.userPlateformeAdhesions.findFirst({
+        where: eq(userPlateformeAdhesions.userId, targetUserId),
+      });
+      if (existing) {
+        throw errors.conflict("Cet utilisateur a déjà une adhésion plateforme.");
+      }
+
+      await db.insert(userPlateformeAdhesions).values({
+        userId: targetUserId,
+        role: role as "super_admin_plateforme" | "operateur_plateforme",
+        statut: "actif",
+        createdById: currentUser.id,
+        updatedById: currentUser.id,
+      });
+    }
+
+    return {
+      message: `Adhésion ${posture} ajoutée avec succès à ${targetUser.prenom} ${targetUser.nom}.`,
     };
   });

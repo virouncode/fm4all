@@ -12,15 +12,26 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
-import { SelectItem } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   adhesionStatutCT,
   roleClientAdhesionCT,
   rolePlateformeAdhesionCT,
+  rolePrestataireAdhesionCT,
 } from "@/constants/codeTables";
 import { getPresignedReadUrl } from "@/lib/s3/upload-helper";
 import {
+  addAdhesionToExistingUserAction,
+  getUsersEligibleForAdhesionAction,
   insertPlateformeUserAction,
   insertUserAction,
   updateUserAction,
@@ -35,7 +46,7 @@ import {
   type UpdateUserFormType,
 } from "@/zod-schemas/user.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { User } from "lucide-react";
+import { UserPlus, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm, useFormState } from "react-hook-form";
 import { toast } from "sonner";
@@ -81,33 +92,39 @@ export function UserFormDialog({
   // Posture plateforme → formulaire de création utilisateur plateforme
   if (postureActive === "plateforme") {
     return (
-      <CreatePlateformeUserForm
+      <CreateOrLinkUserForm
         open={open}
         onOpenChange={onOpenChange}
+        parentId={parentId}
         entrepriseId={entreprise.id}
+        posture="plateforme"
         onSuccess={onSuccess}
       />
     );
   }
 
   return (
-    <CreateUserForm
+    <CreateOrLinkUserForm
       open={open}
       onOpenChange={onOpenChange}
       parentId={parentId}
       entrepriseId={entreprise.id}
+      posture={postureActive === "prestataire" ? "prestataire" : "client"}
       defaultValues={defaultValues as Partial<InsertUserFormType>}
       onSuccess={onSuccess}
     />
   );
 }
 
-// Create Form Component
-function CreateUserForm({
+// ──────────────────────────────────────────────────────────────────────────────
+// Wrapper: choisit entre "Nouvel utilisateur" et "Rattacher existant"
+// ──────────────────────────────────────────────────────────────────────────────
+function CreateOrLinkUserForm({
   open,
   onOpenChange,
   parentId,
   entrepriseId,
+  posture,
   defaultValues,
   onSuccess,
 }: {
@@ -115,29 +132,273 @@ function CreateUserForm({
   onOpenChange: (open: boolean) => void;
   parentId?: string | null;
   entrepriseId: string;
+  posture: "client" | "prestataire" | "plateforme";
   defaultValues?: Partial<InsertUserFormType>;
   onSuccess?: () => void;
 }) {
-  // Récupérer le rôle de l'utilisateur connecté
+  const [mode, setMode] = useState<"nouveau" | "existant">("nouveau");
+
+  // Reset mode on open
+  useEffect(() => {
+    if (open) setMode("nouveau");
+  }, [open]);
+
+  const title =
+    posture === "plateforme"
+      ? "Créer un utilisateur plateforme"
+      : "Créer un utilisateur";
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="flex max-h-[90vh] max-w-2xl flex-col">
+        <DialogHeader>
+          <DialogTitle>
+            <div className="flex items-center gap-2">
+              <UserPlus className="text-primary" />
+              {title}
+            </div>
+          </DialogTitle>
+        </DialogHeader>
+
+        {/* Toggle mode */}
+        <ToggleGroup
+          type="single"
+          variant="outline"
+          size="sm"
+          value={mode}
+          onValueChange={(v) => v && setMode(v as "nouveau" | "existant")}
+          className="self-start"
+        >
+          <ToggleGroupItem
+            value="nouveau"
+            className="text-xs px-3 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+          >
+            Nouvel utilisateur
+          </ToggleGroupItem>
+          <ToggleGroupItem
+            value="existant"
+            className="text-xs px-3 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+          >
+            Rattacher existant
+          </ToggleGroupItem>
+        </ToggleGroup>
+
+        {mode === "existant" ? (
+          <LinkExistingUserForm
+            entrepriseId={entrepriseId}
+            posture={posture}
+            onSuccess={onSuccess}
+            onOpenChange={onOpenChange}
+          />
+        ) : posture === "plateforme" ? (
+          <CreatePlateformeUserFormInner
+            entrepriseId={entrepriseId}
+            onSuccess={onSuccess}
+            onOpenChange={onOpenChange}
+          />
+        ) : (
+          <CreateUserFormInner
+            parentId={parentId}
+            entrepriseId={entrepriseId}
+            posture={posture}
+            defaultValues={defaultValues}
+            onSuccess={onSuccess}
+            onOpenChange={onOpenChange}
+          />
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Rattacher un utilisateur existant
+// ──────────────────────────────────────────────────────────────────────────────
+function LinkExistingUserForm({
+  entrepriseId,
+  posture,
+  onSuccess,
+  onOpenChange,
+}: {
+  entrepriseId: string;
+  posture: "client" | "prestataire" | "plateforme";
+  onSuccess?: () => void;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const [eligibleUsers, setEligibleUsers] = useState<
+    { id: string; prenom: string; nom: string; email: string }[]
+  >([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
+  const [selectedUserId, setSelectedUserId] = useState("");
+  const [selectedRole, setSelectedRole] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  // Rôles disponibles selon la posture
+  const availableRoles =
+    posture === "plateforme"
+      ? rolePlateformeAdhesionCT
+      : posture === "prestataire"
+        ? rolePrestataireAdhesionCT
+        : roleClientAdhesionCT;
+
+  useEffect(() => {
+    async function load() {
+      setLoadingUsers(true);
+      const result = await getUsersEligibleForAdhesionAction({
+        entrepriseId,
+        posture,
+      });
+      if (result?.data?.users) {
+        setEligibleUsers(result.data.users);
+      }
+      setLoadingUsers(false);
+    }
+    load();
+  }, [entrepriseId, posture]);
+
+  const handleSubmit = async () => {
+    if (!selectedUserId || !selectedRole) {
+      toast.error("Sélectionnez un utilisateur et un rôle.");
+      return;
+    }
+
+    setSubmitting(true);
+    const result = await addAdhesionToExistingUserAction({
+      targetUserId: selectedUserId,
+      entrepriseId,
+      posture,
+      role: selectedRole as never,
+    });
+    setSubmitting(false);
+
+    if (result?.serverError) {
+      toast.error(result.serverError.message);
+      return;
+    }
+
+    toast.success(result?.data?.message || "Adhésion ajoutée");
+    onSuccess?.();
+    onOpenChange(false);
+  };
+
+  if (loadingUsers) {
+    return (
+      <div className="flex flex-1 items-center justify-center py-8">
+        <Spinner />
+        <span className="text-muted-foreground ml-2 text-sm">
+          Chargement des utilisateurs...
+        </span>
+      </div>
+    );
+  }
+
+  if (eligibleUsers.length === 0) {
+    return (
+      <>
+        <div className="text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm">
+          Aucun utilisateur existant à rattacher pour cette posture.
+          <br />
+          Tous les utilisateurs de l&apos;entreprise ont déjà une adhésion{" "}
+          {posture}.
+        </div>
+        <DialogFooter className="bg-background flex shrink-0 justify-end gap-2 border-t pt-4">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Fermer
+          </Button>
+        </DialogFooter>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className="flex-1 space-y-4 overflow-y-auto px-1">
+        <div className="space-y-2">
+          <Label>
+            Utilisateur à rattacher <span aria-hidden="true">*</span>
+          </Label>
+          <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Sélectionnez un utilisateur" />
+            </SelectTrigger>
+            <SelectContent>
+              {eligibleUsers.map((u) => (
+                <SelectItem key={u.id} value={u.id}>
+                  {u.prenom} {u.nom}{" "}
+                  <span className="text-muted-foreground">({u.email})</span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label>
+            Rôle <span aria-hidden="true">*</span>
+          </Label>
+          <Select value={selectedRole} onValueChange={setSelectedRole}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Sélectionnez un rôle" />
+            </SelectTrigger>
+            <SelectContent>
+              {availableRoles.map((r) => (
+                <SelectItem key={r.code} value={r.code}>
+                  {r.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <DialogFooter className="bg-background flex shrink-0 justify-end gap-2 border-t pt-4">
+        <Button variant="outline" onClick={() => onOpenChange(false)}>
+          Annuler
+        </Button>
+        <Button
+          onClick={handleSubmit}
+          disabled={submitting || !selectedUserId || !selectedRole}
+        >
+          {submitting && <Spinner />}
+          Rattacher
+        </Button>
+      </DialogFooter>
+    </>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Création d'un nouvel utilisateur (client ou prestataire)
+// ──────────────────────────────────────────────────────────────────────────────
+function CreateUserFormInner({
+  parentId,
+  entrepriseId,
+  posture,
+  defaultValues,
+  onSuccess,
+  onOpenChange,
+}: {
+  parentId?: string | null;
+  entrepriseId: string;
+  posture: "client" | "prestataire";
+  defaultValues?: Partial<InsertUserFormType>;
+  onSuccess?: () => void;
+  onOpenChange: (open: boolean) => void;
+}) {
   const currentUserRole = useAppStore((state) => state.roleClientAdhesion);
   const currentUserPlateformeRole = useAppStore(
     (state) => state.rolePlateformeAdhesion,
   );
 
-  // Filtrer les options de rôle selon le rôle actuel (même logique que EditUserForm)
-  const availableRoles = roleClientAdhesionCT.filter((r) => {
+  const roleCT =
+    posture === "prestataire" ? rolePrestataireAdhesionCT : roleClientAdhesionCT;
+
+  const availableRoles = roleCT.filter((r) => {
     if (!currentUserRole && !currentUserPlateformeRole) return false;
-
-    // Platform super admin: all roles
     if (currentUserPlateformeRole === "super_admin_plateforme") return true;
-
-    // Admin: all roles
     if (currentUserRole === "admin") return true;
-
-    // Manager: only collaborateur
     if (currentUserRole === "manager") return r.code === "collaborateur";
-
-    return false; // Collaborateur ne peut pas créer
+    return false;
   });
 
   const form = useForm<InsertUserFormType>({
@@ -158,24 +419,23 @@ function CreateUserForm({
   const { isDirty, isSubmitting } = useFormState({ control: form.control });
 
   useEffect(() => {
-    if (open) {
-      form.reset({
-        prenom: "",
-        nom: "",
-        email: "",
-        phone: "",
-        avatar: null,
-        roleAdhesion: "collaborateur",
-        parentId: parentId || undefined,
-        ...defaultValues,
-      });
-    }
-  }, [open, parentId, defaultValues, form]);
+    form.reset({
+      prenom: "",
+      nom: "",
+      email: "",
+      phone: "",
+      avatar: null,
+      roleAdhesion: "collaborateur",
+      parentId: parentId || undefined,
+      ...defaultValues,
+    });
+  }, [parentId, defaultValues, form]);
 
   const onSubmit = async (data: InsertUserFormType) => {
     const result = await insertUserAction({
       ...data,
       entrepriseId,
+      posture,
     });
 
     if (result?.serverError) {
@@ -195,96 +455,88 @@ function CreateUserForm({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[90vh] max-w-2xl flex-col">
-        <DialogHeader>
-          <DialogTitle>Créer un utilisateur</DialogTitle>
-        </DialogHeader>
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-1 flex-col overflow-hidden"
+      >
+        <div className="flex-1 space-y-4 overflow-y-auto px-1">
+          <div className="grid grid-cols-2 gap-4">
+            <RhfInput<InsertUserFormType>
+              label="Prénom"
+              name="prenom"
+              requiredMark
+            />
+            <RhfInput<InsertUserFormType>
+              label="Nom"
+              name="nom"
+              requiredMark
+            />
+          </div>
 
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-1 flex-col overflow-hidden"
+          <RhfInput<InsertUserFormType>
+            label="Email"
+            name="email"
+            type="email"
+            requiredMark
+          />
+          <RhfInput<InsertUserFormType>
+            label="N° de téléphone"
+            name="phone"
+          />
+          <RhfControlledSelect<InsertUserFormType>
+            label="Rôle"
+            name="roleAdhesion"
+            requiredMark
+            className="w-full"
+            selectClassName="w-full"
           >
-            <div className="flex-1 space-y-4 overflow-y-auto px-1">
-              <div className="grid grid-cols-2 gap-4">
-                <RhfInput<InsertUserFormType>
-                  label="Prénom"
-                  name="prenom"
-                  requiredMark
-                />
-                <RhfInput<InsertUserFormType>
-                  label="Nom"
-                  name="nom"
-                  requiredMark
-                />
-              </div>
+            {availableRoles.map((r) => (
+              <SelectItem key={r.code} value={r.code}>
+                {r.name}
+              </SelectItem>
+            ))}
+          </RhfControlledSelect>
 
-              <RhfInput<InsertUserFormType>
-                label="Email"
-                name="email"
-                type="email"
-                requiredMark
-              />
-              <RhfInput<InsertUserFormType>
-                label="N° de téléphone"
-                name="phone"
-              />
-              <RhfControlledSelect<InsertUserFormType>
-                label="Rôle"
-                name="roleAdhesion"
-                requiredMark
-                className="w-full"
-                selectClassName="w-full"
-              >
-                {availableRoles.map((r) => (
-                  <SelectItem key={r.code} value={r.code}>
-                    {r.name}
-                  </SelectItem>
-                ))}
-              </RhfControlledSelect>
+          <RhfFileInput<InsertUserFormType>
+            label="Avatar (format carré, max 2MB)"
+            name="avatar"
+            proprietaireEntrepriseId={entrepriseId}
+            categorie="avatar"
+            accept="image/*"
+            squareMandatory
+            maxSizeBytes={2 * 1024 * 1024}
+          />
+        </div>
 
-              <RhfFileInput<InsertUserFormType>
-                label="Avatar (format carré, max 2MB)"
-                name="avatar"
-                proprietaireEntrepriseId={entrepriseId}
-                categorie="avatar"
-                accept="image/*"
-                squareMandatory
-                maxSizeBytes={2 * 1024 * 1024}
-              />
-            </div>
-
-            <DialogFooter className="bg-background flex shrink-0 justify-end gap-2 border-t pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-              >
-                Annuler
-              </Button>
-              <Button type="submit" disabled={isSubmitting || !isDirty}>
-                {isSubmitting && <Spinner />}Créer
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+        <DialogFooter className="bg-background flex shrink-0 justify-end gap-2 border-t pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+          >
+            Annuler
+          </Button>
+          <Button type="submit" disabled={isSubmitting || !isDirty}>
+            {isSubmitting && <Spinner />}Créer
+          </Button>
+        </DialogFooter>
+      </form>
+    </Form>
   );
 }
 
-// Create Plateforme User Form Component
-function CreatePlateformeUserForm({
-  open,
-  onOpenChange,
+// ──────────────────────────────────────────────────────────────────────────────
+// Création d'un nouvel utilisateur plateforme
+// ──────────────────────────────────────────────────────────────────────────────
+function CreatePlateformeUserFormInner({
   entrepriseId,
   onSuccess,
+  onOpenChange,
 }: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
   entrepriseId: string;
   onSuccess?: () => void;
+  onOpenChange: (open: boolean) => void;
 }) {
   const form = useForm<InsertPlateformeUserFormType>({
     resolver: zodResolver(insertPlateformeUserFormSchema),
@@ -300,19 +552,6 @@ function CreatePlateformeUserForm({
   });
 
   const { isDirty, isSubmitting } = useFormState({ control: form.control });
-
-  useEffect(() => {
-    if (open) {
-      form.reset({
-        prenom: "",
-        nom: "",
-        email: "",
-        phone: "",
-        avatar: null,
-        rolePlateformeAdhesion: "operateur_plateforme",
-      });
-    }
-  }, [open, form]);
 
   const onSubmit = async (data: InsertPlateformeUserFormType) => {
     const result = await insertPlateformeUserAction({
@@ -337,86 +576,80 @@ function CreatePlateformeUserForm({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[90vh] max-w-2xl flex-col">
-        <DialogHeader>
-          <DialogTitle>Créer un utilisateur plateforme</DialogTitle>
-        </DialogHeader>
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-1 flex-col overflow-hidden"
+      >
+        <div className="flex-1 space-y-4 overflow-y-auto px-1">
+          <div className="grid grid-cols-2 gap-4">
+            <RhfInput<InsertPlateformeUserFormType>
+              label="Prénom"
+              name="prenom"
+              requiredMark
+            />
+            <RhfInput<InsertPlateformeUserFormType>
+              label="Nom"
+              name="nom"
+              requiredMark
+            />
+          </div>
 
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-1 flex-col overflow-hidden"
+          <RhfInput<InsertPlateformeUserFormType>
+            label="Email"
+            name="email"
+            type="email"
+            requiredMark
+          />
+          <RhfInput<InsertPlateformeUserFormType>
+            label="N° de téléphone"
+            name="phone"
+          />
+          <RhfControlledSelect<InsertPlateformeUserFormType>
+            label="Rôle plateforme"
+            name="rolePlateformeAdhesion"
+            requiredMark
+            className="w-full"
+            selectClassName="w-full"
           >
-            <div className="flex-1 space-y-4 overflow-y-auto px-1">
-              <div className="grid grid-cols-2 gap-4">
-                <RhfInput<InsertPlateformeUserFormType>
-                  label="Prénom"
-                  name="prenom"
-                  requiredMark
-                />
-                <RhfInput<InsertPlateformeUserFormType>
-                  label="Nom"
-                  name="nom"
-                  requiredMark
-                />
-              </div>
+            {rolePlateformeAdhesionCT.map((r) => (
+              <SelectItem key={r.code} value={r.code}>
+                {r.name}
+              </SelectItem>
+            ))}
+          </RhfControlledSelect>
 
-              <RhfInput<InsertPlateformeUserFormType>
-                label="Email"
-                name="email"
-                type="email"
-                requiredMark
-              />
-              <RhfInput<InsertPlateformeUserFormType>
-                label="N° de téléphone"
-                name="phone"
-              />
-              <RhfControlledSelect<InsertPlateformeUserFormType>
-                label="Rôle plateforme"
-                name="rolePlateformeAdhesion"
-                requiredMark
-                className="w-full"
-                selectClassName="w-full"
-              >
-                {rolePlateformeAdhesionCT.map((r) => (
-                  <SelectItem key={r.code} value={r.code}>
-                    {r.name}
-                  </SelectItem>
-                ))}
-              </RhfControlledSelect>
+          <RhfFileInput<InsertPlateformeUserFormType>
+            label="Avatar (format carré, max 2MB)"
+            name="avatar"
+            proprietaireEntrepriseId={entrepriseId}
+            categorie="avatar"
+            accept="image/*"
+            squareMandatory
+            maxSizeBytes={2 * 1024 * 1024}
+          />
+        </div>
 
-              <RhfFileInput<InsertPlateformeUserFormType>
-                label="Avatar (format carré, max 2MB)"
-                name="avatar"
-                proprietaireEntrepriseId={entrepriseId}
-                categorie="avatar"
-                accept="image/*"
-                squareMandatory
-                maxSizeBytes={2 * 1024 * 1024}
-              />
-            </div>
-
-            <DialogFooter className="bg-background flex shrink-0 justify-end gap-2 border-t pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-              >
-                Annuler
-              </Button>
-              <Button type="submit" disabled={isSubmitting || !isDirty}>
-                {isSubmitting && <Spinner />}Créer
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+        <DialogFooter className="bg-background flex shrink-0 justify-end gap-2 border-t pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+          >
+            Annuler
+          </Button>
+          <Button type="submit" disabled={isSubmitting || !isDirty}>
+            {isSubmitting && <Spinner />}Créer
+          </Button>
+        </DialogFooter>
+      </form>
+    </Form>
   );
 }
 
+// ──────────────────────────────────────────────────────────────────────────────
 // Edit Form Component
+// ──────────────────────────────────────────────────────────────────────────────
 function EditUserForm({
   open,
   onOpenChange,
@@ -432,36 +665,26 @@ function EditUserForm({
   defaultValues?: Partial<UpdateUserFormType>;
   onSuccess?: () => void;
 }) {
-  // Récupérer l'utilisateur connecté
   const currentUser = useAppStore((state) => state.user);
   const currentUserRole = useAppStore((state) => state.roleClientAdhesion);
   const currentUserPlateformeRole = useAppStore(
     (state) => state.rolePlateformeAdhesion,
   );
 
-  // Déterminer si on édite soi-même
   const isEditingSelf = currentUser?.id === userId;
 
-  // Filtrer les options de rôle selon le rôle actuel
   const availableRoles = roleClientAdhesionCT.filter(() => {
     if (!currentUserRole && !currentUserPlateformeRole) return false;
-
-    // Platform super admin: all roles
     if (currentUserPlateformeRole === "super_admin_plateforme") return true;
-
-    // Admin: all roles
     if (currentUserRole === "admin") return true;
-
-    return false; // Manager et Collaborateur ne peuvent pas modifier les rôles
+    return false;
   });
 
-  // Peut modifier le rôle : uniquement super_admin_plateforme et admin
   const canEditRole =
     !isEditingSelf &&
     (currentUserPlateformeRole === "super_admin_plateforme" ||
       currentUserRole === "admin");
 
-  // Peut modifier le statut : super_admin_plateforme, admin ET manager
   const canEditStatut =
     !isEditingSelf &&
     (currentUserPlateformeRole === "super_admin_plateforme" ||
@@ -499,14 +722,12 @@ function EditUserForm({
     }
   }, [open, userId, defaultValues, form]);
 
-  // Force refresh quand le dialog s'ouvre
   useEffect(() => {
     if (open) {
       setRefreshKey((prev) => prev + 1);
     }
   }, [open]);
 
-  // Load avatar preview with presigned URL
   useEffect(() => {
     const loadAvatarPreview = async () => {
       if (defaultValues?.avatar?.storageKey && entrepriseId) {
@@ -515,18 +736,13 @@ function EditUserForm({
             key: defaultValues.avatar.storageKey,
             proprietaireEntrepriseId: entrepriseId,
           });
-
-          // Update form with previewUrl
           form.setValue(
             "avatar",
-            {
-              ...defaultValues.avatar,
-              previewUrl,
-            },
+            { ...defaultValues.avatar, previewUrl },
             { shouldDirty: false },
           );
         } catch {
-          // avatar preview load failure is non-critical
+          // non-critical
         }
       }
     };
@@ -537,10 +753,7 @@ function EditUserForm({
   }, [open, defaultValues?.avatar, entrepriseId, form, refreshKey]);
 
   const onSubmit = async (data: UpdateUserFormType) => {
-    const result = await updateUserAction({
-      ...data,
-      entrepriseId,
-    });
+    const result = await updateUserAction({ ...data, entrepriseId });
 
     if (result?.serverError) {
       toast.error(result.serverError.message);
@@ -552,7 +765,6 @@ function EditUserForm({
       return;
     }
 
-    // ✅ Update store si on modifie son propre profil
     if (isEditingSelf && result?.data?.user) {
       useAppStore.getState().updateUser({
         id: result.data.user.id,
@@ -563,14 +775,10 @@ function EditUserForm({
       });
     }
 
-    // ✅ Toast différent selon si email changé ou non
     if (result?.data?.emailChanged) {
       toast.warning(
-        "Utilisateur mis à jour. Un email de vérification a été envoyé au nouvel email. L'utilisateur devra vérifier son email avant de pouvoir se reconnecter.",
-        {
-          duration: 8000,
-          description: "Le nouvel email devra être vérifié pour se connecter.",
-        },
+        "Utilisateur mis à jour. Un email de vérification a été envoyé au nouvel email.",
+        { duration: 8000 },
       );
     } else {
       toast.success(result?.data?.message || "Utilisateur mis à jour");
@@ -626,7 +834,6 @@ function EditUserForm({
                 name="phone"
               />
 
-              {/* Champ rôle : uniquement admin et super_admin */}
               {canEditRole && (
                 <RhfControlledSelect<UpdateUserFormType>
                   label="Rôle"
@@ -642,7 +849,6 @@ function EditUserForm({
                 </RhfControlledSelect>
               )}
 
-              {/* Champ statut : admin, super_admin ET manager */}
               {canEditStatut && (
                 <RhfControlledSelect<UpdateUserFormType>
                   label="Statut"

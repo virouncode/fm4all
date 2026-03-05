@@ -2,6 +2,7 @@ import {
   adhesionStatutCodes,
   roleClientAdhesionCodes,
   rolePlateformeAdhesionCodes,
+  rolePrestataireAdhesionCodes,
 } from "@/constants/codeTables";
 import { user } from "@/db/schema/auth";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
@@ -142,6 +143,22 @@ export const updateUserToDbSchema = z.object({
 
 export type UpdateUserToDbType = z.infer<typeof updateUserToDbSchema>;
 
+// ==================== ADD ADHESION TO EXISTING USER ====================
+
+export const addAdhesionFormSchema = z.object({
+  targetUserId: z.uuid("Sélectionnez un utilisateur"),
+  entrepriseId: z.uuid(),
+  posture: z.enum(["client", "prestataire", "plateforme"]),
+  // role covers both client/prestataire (same values) and plateforme
+  role: z.union([z.enum(roleClientAdhesionCodes), z.enum(rolePlateformeAdhesionCodes)]),
+  // parentId non-utilisé ici (l'arborescence existante est conservée)
+});
+
+export type AddAdhesionFormType = z.infer<typeof addAdhesionFormSchema>;
+
+// Exposed for the UI to know which roles are available per posture
+export { rolePrestataireAdhesionCodes };
+
 // ==================== QUERY SCHEMAS ====================
 
 export const usersOrderBySchema = z.enum([
@@ -156,6 +173,9 @@ export const DEFAULT_ORDER_DIR = "asc" as const;
 // Backend query schema (from URL params)
 export const usersQueryBackendSchema = z.object({
   entrepriseId: z.uuid(),
+
+  // Posture determines which adhesion table to query
+  posture: z.enum(["client", "prestataire", "plateforme"]).default("client"),
 
   // Filters
   search: z.string().optional(), // Recherche nom/prénom/email (case-insensitive, any order)
