@@ -1,5 +1,6 @@
 import "server-only";
 
+import { ModePilotageType } from "@/zod-schemas/clientServiceExecutions.schema";
 import {
   OccurrenceStatutType,
   OccurrenceTacheStatutType,
@@ -14,12 +15,16 @@ import {
   clientServices,
   services,
 } from "@/db/schema/services";
-import { serviceEntreprises } from "@/db/schema/entreprises";
-import { entreprises } from "@/db/schema/entreprises";
+import {
+  clientPrestataireRelations,
+  entrepriseRoles,
+  serviceEntreprises,
+  entreprises,
+} from "@/db/schema/entreprises";
 import { sites } from "@/db/schema/sites";
-import { userClientSiteAttributions } from "@/db/schema/users";
+import { userClientAdhesions, userClientSiteAttributions, userPrestataireAdhesions } from "@/db/schema/users";
 import { occurrenceTaches } from "@/db/schema/services";
-import { and, asc, count, desc, eq, gte, inArray, isNull, or } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, inArray, isNull, or, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 /**
@@ -64,6 +69,161 @@ export async function getClientPrestataires(
     .orderBy(entreprises.nom);
 
   return results;
+}
+
+// ==================== MES PRESTATAIRES AVEC DETAILS (Posture Client) ====================
+
+export type PrestataireAvecDetails = {
+  id: string;
+  nom: string;
+  siret: string;
+  prenomContact: string | null;
+  nomContact: string | null;
+  emailContact: string | null;
+  phoneContact: string | null;
+  createdAt: Date;
+  logoStorageKey: string | null;
+  roles: string[];
+  hasActiveAdmin: boolean;
+  services: Array<{ id: string; nom: string }>;
+};
+
+/**
+ * Récupère les prestataires du client via UNION de :
+ * - Relations explicites (client_prestataire_relations)
+ * - Exécutions actives (clientServiceExecutions)
+ * Enrichi avec siret, contact et rôles.
+ */
+export async function getClientPrestatairesAvecDetails(
+  clientEntrepriseId: string,
+): Promise<PrestataireAvecDetails[]> {
+  // 1. IDs depuis les relations explicites
+  const fromRelations = await db
+    .select({ id: clientPrestataireRelations.prestataireEntrepriseId })
+    .from(clientPrestataireRelations)
+    .where(
+      eq(clientPrestataireRelations.clientEntrepriseId, clientEntrepriseId),
+    );
+
+  // 2. IDs depuis les exécutions actives
+  const fromExecutions = await db
+    .selectDistinct({ id: entreprises.id })
+    .from(clientServiceExecutions)
+    .innerJoin(
+      clientServices,
+      eq(clientServices.id, clientServiceExecutions.clientServiceId),
+    )
+    .innerJoin(
+      serviceEntreprises,
+      eq(serviceEntreprises.id, clientServiceExecutions.serviceEntrepriseId),
+    )
+    .innerJoin(entreprises, eq(entreprises.id, serviceEntreprises.entrepriseId))
+    .where(
+      and(
+        eq(clientServices.entrepriseId, clientEntrepriseId),
+        eq(clientServices.statut, "actif"),
+        eq(clientServiceExecutions.actif, true),
+        or(
+          isNull(clientServiceExecutions.dateFinValidite),
+          gte(clientServiceExecutions.dateFinValidite, new Date()),
+        ),
+      ),
+    );
+
+  // 3. Déduplication
+  const allIds = [
+    ...new Set([
+      ...fromRelations.map((r) => r.id),
+      ...fromExecutions.map((r) => r.id),
+    ]),
+  ];
+  if (allIds.length === 0) return [];
+
+  // 4. Fetch détails entreprises (+ logo via LEFT JOIN documents)
+  const rows = await db
+    .select({
+      id: entreprises.id,
+      nom: entreprises.nom,
+      siret: entreprises.siret,
+      prenomContact: entreprises.prenomContact,
+      nomContact: entreprises.nomContact,
+      emailContact: entreprises.emailContact,
+      phoneContact: entreprises.phoneContact,
+      createdAt: entreprises.createdAt,
+      logoStorageKey: documents.storageKey,
+    })
+    .from(entreprises)
+    .leftJoin(documents, eq(documents.id, entreprises.logoId))
+    .where(inArray(entreprises.id, allIds))
+    .orderBy(entreprises.nom);
+
+  // 5. Fetch rôles
+  const rolesRows = await db
+    .select({
+      entrepriseId: entrepriseRoles.entrepriseId,
+      role: entrepriseRoles.role,
+    })
+    .from(entrepriseRoles)
+    .where(inArray(entrepriseRoles.entrepriseId, allIds));
+
+  const rolesByEntrepriseId = new Map<string, string[]>();
+  for (const r of rolesRows) {
+    if (!rolesByEntrepriseId.has(r.entrepriseId)) {
+      rolesByEntrepriseId.set(r.entrepriseId, []);
+    }
+    rolesByEntrepriseId.get(r.entrepriseId)!.push(r.role);
+  }
+
+  // 6. Check hasActiveAdmin (admin prestataire actif dans l'entreprise)
+  const adminRows = await db
+    .select({ entrepriseId: userPrestataireAdhesions.entrepriseId })
+    .from(userPrestataireAdhesions)
+    .where(
+      and(
+        inArray(userPrestataireAdhesions.entrepriseId, allIds),
+        eq(userPrestataireAdhesions.role, "admin"),
+        eq(userPrestataireAdhesions.statut, "actif"),
+      ),
+    );
+  const hasAdminSet = new Set(adminRows.map((r) => r.entrepriseId));
+
+  // 7. Fetch services offerts par chaque prestataire
+  const serviceRows = await db
+    .select({
+      entrepriseId: serviceEntreprises.entrepriseId,
+      serviceId: services.id,
+      serviceNom: services.nom,
+    })
+    .from(serviceEntreprises)
+    .innerJoin(services, eq(services.id, serviceEntreprises.serviceId))
+    .where(
+      and(
+        inArray(serviceEntreprises.entrepriseId, allIds),
+        eq(serviceEntreprises.actif, true),
+      ),
+    );
+
+  const servicesByEntrepriseId = new Map<
+    string,
+    Array<{ id: string; nom: string }>
+  >();
+  for (const r of serviceRows) {
+    if (!servicesByEntrepriseId.has(r.entrepriseId)) {
+      servicesByEntrepriseId.set(r.entrepriseId, []);
+    }
+    servicesByEntrepriseId.get(r.entrepriseId)!.push({
+      id: r.serviceId,
+      nom: r.serviceNom,
+    });
+  }
+
+  return rows.map((p) => ({
+    ...p,
+    logoStorageKey: p.logoStorageKey ?? null,
+    roles: rolesByEntrepriseId.get(p.id) ?? [],
+    hasActiveAdmin: hasAdminSet.has(p.id),
+    services: servicesByEntrepriseId.get(p.id) ?? [],
+  }));
 }
 
 // ==================== PRESTATAIRES FOR SERVICE ====================
@@ -152,6 +312,7 @@ export type ExecutionWithPrix = {
   dateDebutValidite: Date;
   dateFinValidite: Date | null;
   priorite: number;
+  modePilotage: ModePilotageType;
   actif: boolean;
   tacheListeTemplateId: string | null;
   assigneeUserIdDefault: string | null;
@@ -202,6 +363,7 @@ export async function getExecutionsWithPrixByPrestationId(
       dateFinValidite: clientServiceExecutions.dateFinValidite,
       priorite: clientServiceExecutions.priorite,
       actif: clientServiceExecutions.actif,
+      modePilotage: clientServiceExecutions.modePilotage,
       tacheListeTemplateId: clientServiceExecutions.tacheListeTemplateId,
       assigneeUserIdDefault: clientServiceExecutions.assigneeUserIdDefault,
       assigneeDefaultPrenom: assigneeDefaultUser.prenom,
@@ -710,5 +872,162 @@ export async function getSitesCouvertsParPrestataire(
   return Array.from(siteMap.values()).map((site) => ({
     ...site,
     agentsAttribues: agentsBySiteId.get(site.siteId) ?? [],
+  }));
+}
+
+// ==================== MES CLIENTS (Posture Prestataire) ====================
+
+export type ClientAvecDetails = {
+  id: string;
+  nom: string;
+  siret: string;
+  prenomContact: string | null;
+  nomContact: string | null;
+  emailContact: string | null;
+  phoneContact: string | null;
+  createdAt: Date;
+  logoStorageKey: string | null;
+  roles: string[];
+  hasActiveAdmin: boolean;
+  services: Array<{ id: string; nom: string }>;
+};
+
+/**
+ * Récupère les clients du prestataire via UNION de :
+ * - Relations explicites (client_prestataire_relations)
+ * - Exécutions actives (clientServiceExecutions)
+ * Enrichi avec siret, contact, rôles et hasActiveAdmin.
+ */
+export async function getMesClients(
+  prestataireEntrepriseId: string,
+): Promise<ClientAvecDetails[]> {
+  // 1. IDs depuis les relations explicites
+  const fromRelations = await db
+    .select({ id: clientPrestataireRelations.clientEntrepriseId })
+    .from(clientPrestataireRelations)
+    .where(
+      eq(
+        clientPrestataireRelations.prestataireEntrepriseId,
+        prestataireEntrepriseId,
+      ),
+    );
+
+  // 2. IDs depuis les exécutions actives
+  const fromExecutions = await db
+    .selectDistinct({ id: clientServices.entrepriseId })
+    .from(clientServiceExecutions)
+    .innerJoin(
+      clientServices,
+      eq(clientServices.id, clientServiceExecutions.clientServiceId),
+    )
+    .innerJoin(
+      serviceEntreprises,
+      eq(serviceEntreprises.id, clientServiceExecutions.serviceEntrepriseId),
+    )
+    .where(
+      and(
+        eq(serviceEntreprises.entrepriseId, prestataireEntrepriseId),
+        eq(clientServices.statut, "actif"),
+        eq(clientServiceExecutions.actif, true),
+        or(
+          isNull(clientServiceExecutions.dateFinValidite),
+          gte(clientServiceExecutions.dateFinValidite, new Date()),
+        ),
+      ),
+    );
+
+  // 3. Déduplication
+  const allIds = [
+    ...new Set([
+      ...fromRelations.map((r) => r.id),
+      ...fromExecutions.map((r) => r.id),
+    ]),
+  ];
+  if (allIds.length === 0) return [];
+
+  // 4. Fetch détails entreprises (+ logo via LEFT JOIN documents)
+  const rows = await db
+    .select({
+      id: entreprises.id,
+      nom: entreprises.nom,
+      siret: entreprises.siret,
+      prenomContact: entreprises.prenomContact,
+      nomContact: entreprises.nomContact,
+      emailContact: entreprises.emailContact,
+      phoneContact: entreprises.phoneContact,
+      createdAt: entreprises.createdAt,
+      logoStorageKey: documents.storageKey,
+    })
+    .from(entreprises)
+    .leftJoin(documents, eq(documents.id, entreprises.logoId))
+    .where(inArray(entreprises.id, allIds))
+    .orderBy(entreprises.nom);
+
+  // 5. Fetch rôles
+  const rolesRows = await db
+    .select({
+      entrepriseId: entrepriseRoles.entrepriseId,
+      role: entrepriseRoles.role,
+    })
+    .from(entrepriseRoles)
+    .where(inArray(entrepriseRoles.entrepriseId, allIds));
+
+  const rolesByEntrepriseId = new Map<string, string[]>();
+  for (const r of rolesRows) {
+    if (!rolesByEntrepriseId.has(r.entrepriseId)) {
+      rolesByEntrepriseId.set(r.entrepriseId, []);
+    }
+    rolesByEntrepriseId.get(r.entrepriseId)!.push(r.role);
+  }
+
+  // 6. Check hasActiveAdmin (admin client actif dans l'entreprise)
+  const adminRows = await db
+    .select({ entrepriseId: userClientAdhesions.entrepriseId })
+    .from(userClientAdhesions)
+    .where(
+      and(
+        inArray(userClientAdhesions.entrepriseId, allIds),
+        eq(userClientAdhesions.role, "admin"),
+        eq(userClientAdhesions.statut, "actif"),
+      ),
+    );
+  const hasAdminSet = new Set(adminRows.map((r) => r.entrepriseId));
+
+  // 7. Fetch services offerts par chaque client (si double casquette prestataire)
+  const serviceRows = await db
+    .select({
+      entrepriseId: serviceEntreprises.entrepriseId,
+      serviceId: services.id,
+      serviceNom: services.nom,
+    })
+    .from(serviceEntreprises)
+    .innerJoin(services, eq(services.id, serviceEntreprises.serviceId))
+    .where(
+      and(
+        inArray(serviceEntreprises.entrepriseId, allIds),
+        eq(serviceEntreprises.actif, true),
+      ),
+    );
+
+  const servicesByEntrepriseId = new Map<
+    string,
+    Array<{ id: string; nom: string }>
+  >();
+  for (const r of serviceRows) {
+    if (!servicesByEntrepriseId.has(r.entrepriseId)) {
+      servicesByEntrepriseId.set(r.entrepriseId, []);
+    }
+    servicesByEntrepriseId.get(r.entrepriseId)!.push({
+      id: r.serviceId,
+      nom: r.serviceNom,
+    });
+  }
+
+  return rows.map((c) => ({
+    ...c,
+    logoStorageKey: c.logoStorageKey ?? null,
+    roles: rolesByEntrepriseId.get(c.id) ?? [],
+    hasActiveAdmin: hasAdminSet.has(c.id),
+    services: servicesByEntrepriseId.get(c.id) ?? [],
   }));
 }

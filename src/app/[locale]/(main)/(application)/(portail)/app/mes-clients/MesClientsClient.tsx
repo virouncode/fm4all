@@ -1,0 +1,176 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { getMesClientsAction } from "@/server/actions/clientServiceExecutionsActions";
+import type { ClientAvecDetails } from "@/server/queries/clientServiceExecutions.query";
+import { useAppStore } from "@/stores/application/appStore";
+import type {
+  EntrepriseWithDetails,
+  RoleEntrepriseType,
+} from "@/zod-schemas/entreprise.schema";
+import { Info, Loader2, Plus } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { EntrepriseCard } from "../entreprises/EntrepriseCard";
+import { AjouterClientDialog } from "./AjouterClientDialog";
+import { InviterClientDialog } from "./InviterClientDialog";
+
+function toEntrepriseCard(c: ClientAvecDetails): EntrepriseWithDetails {
+  return {
+    id: c.id,
+    nom: c.nom,
+    siret: c.siret,
+    prenomContact: c.prenomContact,
+    nomContact: c.nomContact,
+    emailContact: c.emailContact,
+    phoneContact: c.phoneContact,
+    createdAt: c.createdAt,
+    logoId: null,
+    logoStorageKey: c.logoStorageKey,
+    roles: c.roles as RoleEntrepriseType[],
+    nbSites: 0,
+    hasActiveAdmin: c.hasActiveAdmin,
+    services: c.services,
+    pendingInvitation: null,
+  };
+}
+
+export function MesClientsClient() {
+  const entreprise = useAppStore((s) => s.entreprise);
+  const posture = useAppStore((s) => s.postureActive);
+  const roleClientAdhesion = useAppStore((s) => s.roleClientAdhesion);
+
+  const canManage =
+    roleClientAdhesion === "admin" || roleClientAdhesion === "manager";
+
+  const [clients, setClients] = useState<ClientAvecDetails[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+  const [inviteTarget, setInviteTarget] = useState<ClientAvecDetails | null>(
+    null,
+  );
+
+  const loadClients = useCallback(async () => {
+    if (!entreprise?.id || posture !== "prestataire") return;
+
+    setLoading(true);
+    const result = await getMesClientsAction({ entrepriseId: entreprise.id });
+    setLoading(false);
+
+    if (result?.serverError) {
+      toast.error(result.serverError.message);
+      return;
+    }
+
+    if (result?.data) {
+      setClients(result.data.clients);
+    }
+  }, [entreprise?.id, posture]);
+
+  useEffect(() => {
+    loadClients();
+  }, [loadClients]);
+
+  if (posture !== "prestataire") {
+    return (
+      <div className="text-muted-foreground py-12 text-center text-sm">
+        Cette page est réservée à la posture prestataire.
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-full flex-col gap-4">
+      {/* Header */}
+      <div className="flex flex-shrink-0 items-center justify-end">
+        {canManage && (
+          <Button size="sm" onClick={() => setShowDialog(true)}>
+            <Plus className="h-4 w-4" />
+            Ajouter un client
+          </Button>
+        )}
+      </div>
+
+      {/* Disclaimer lecture seule */}
+      <div className="text-muted-foreground flex items-start gap-2 rounded-md border px-3 py-2 text-xs">
+        <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+        <span>
+          Les informations de vos clients sont consultables mais non modifiables
+          depuis votre espace. Pour mettre à jour leurs données, invitez-les à
+          créer leur compte ou{" "}
+          <a
+            href="mailto:contact@fm4all.com"
+            className="underline underline-offset-2"
+          >
+            contactez FM4ALL
+          </a>
+          .
+        </span>
+      </div>
+
+      {/* Contenu */}
+      {loading ? (
+        <div className="flex flex-1 items-center justify-center">
+          <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+        </div>
+      ) : clients.length === 0 ? (
+        <div className="flex flex-1 items-center justify-center">
+          <p className="text-muted-foreground text-sm">
+            Aucun client enregistré.
+          </p>
+        </div>
+      ) : (
+        <div className="flex-1 overflow-auto">
+          <div className="auto-rows-fr grid grid-cols-1 items-stretch gap-4 p-4 md:grid-cols-2 lg:grid-cols-3">
+            {clients.map((c) => (
+              <EntrepriseCard
+                key={c.id}
+                entreprise={toEntrepriseCard(c)}
+                onInvite={
+                  canManage && !c.hasActiveAdmin
+                    ? () => setInviteTarget(c)
+                    : undefined
+                }
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Dialog d'ajout */}
+      {entreprise?.id && (
+        <AjouterClientDialog
+          open={showDialog}
+          onOpenChange={setShowDialog}
+          prestataireEntrepriseId={entreprise.id}
+          onSuccess={() => {
+            setShowDialog(false);
+            loadClients();
+          }}
+        />
+      )}
+
+      {/* Dialog d'invitation */}
+      {entreprise?.id && inviteTarget && (
+        <InviterClientDialog
+          open={!!inviteTarget}
+          onOpenChange={(v) => {
+            if (!v) setInviteTarget(null);
+          }}
+          prestataireEntrepriseId={entreprise.id}
+          clientEntrepriseId={inviteTarget.id}
+          clientNom={inviteTarget.nom}
+          defaultEmail={inviteTarget.emailContact}
+          onSuccess={() => {
+            setClients((prev) =>
+              prev.map((c) =>
+                c.id === inviteTarget.id ? { ...c, hasActiveAdmin: true } : c,
+              ),
+            );
+            setInviteTarget(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
