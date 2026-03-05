@@ -1,9 +1,9 @@
 "use server";
 
 import { db } from "@/db";
-import { entreprises } from "@/db/schema/entreprises";
+import { clientPrestataireRelations, entreprises } from "@/db/schema/entreprises";
 import { sites } from "@/db/schema/sites";
-import { userClientAdhesions } from "@/db/schema/users";
+import { userClientAdhesions, userPrestataireAdhesions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
@@ -74,6 +74,52 @@ async function isResponsableSite(
   });
 
   return resolved?.role === "responsable_site";
+}
+
+/**
+ * Vérifie si un prestataire peut gérer les sites d'un client en proxy
+ * (le client n'a pas d'admin actif ET l'utilisateur est admin/manager prestataire lié à ce client)
+ */
+async function canManageSiteAsProxy(
+  userId: string,
+  clientEntrepriseId: string,
+): Promise<boolean> {
+  // 1. Le client a-t-il un admin actif ?
+  const clientActiveAdmin = await db.query.userClientAdhesions.findFirst({
+    where: and(
+      eq(userClientAdhesions.entrepriseId, clientEntrepriseId),
+      eq(userClientAdhesions.role, "admin"),
+      eq(userClientAdhesions.statut, "actif"),
+    ),
+  });
+  if (clientActiveAdmin) return false;
+
+  // 2. L'utilisateur est-il admin/manager prestataire lié à ce client ?
+  const prestataireAdhesions = await db.query.userPrestataireAdhesions.findMany(
+    {
+      where: and(
+        eq(userPrestataireAdhesions.userId, userId),
+        inArray(userPrestataireAdhesions.role, ["admin", "manager"]),
+        eq(userPrestataireAdhesions.statut, "actif"),
+      ),
+    },
+  );
+  for (const adhesion of prestataireAdhesions) {
+    const relation = await db.query.clientPrestataireRelations.findFirst({
+      where: and(
+        eq(
+          clientPrestataireRelations.clientEntrepriseId,
+          clientEntrepriseId,
+        ),
+        eq(
+          clientPrestataireRelations.prestataireEntrepriseId,
+          adhesion.entrepriseId,
+        ),
+      ),
+    });
+    if (relation) return true;
+  }
+  return false;
 }
 
 // ==================== GET SITES ====================
@@ -239,9 +285,13 @@ export const insertSiteAction = actionClient
 
     // Vérifier les permissions
     const userIsAdmin = await isAdmin(currentUser.id, entrepriseId);
+    const userIsProxy = userIsAdmin
+      ? false
+      : await canManageSiteAsProxy(currentUser.id, entrepriseId);
+    const canManage = userIsAdmin || userIsProxy;
 
-    // Si site racine (parentId = null), seul un admin peut créer
-    if (!parentId && !userIsAdmin) {
+    // Si site racine (parentId = null), seul un admin (ou proxy) peut créer
+    if (!parentId && !canManage) {
       throw errors.forbidden(
         "Seuls les administrateurs peuvent créer des sites racines.",
       );
@@ -261,8 +311,8 @@ export const insertSiteAction = actionClient
         );
       }
 
-      // Si non-admin, vérifier qu'il est responsable_site du parent
-      if (!userIsAdmin) {
+      // Si non-admin, vérifier qu'il est responsable_site du parent ou proxy
+      if (!canManage) {
         const canCreate = await isResponsableSite(
           currentUser.id,
           parentId,
@@ -363,9 +413,13 @@ export const updateSiteAction = actionClient
 
     // Vérifier les permissions
     const userIsAdmin = await isAdmin(currentUser.id, entrepriseId);
+    const userIsProxy = userIsAdmin
+      ? false
+      : await canManageSiteAsProxy(currentUser.id, entrepriseId);
+    const canManage = userIsAdmin || userIsProxy;
 
-    if (!userIsAdmin) {
-      // Non-admin: doit être responsable_site du site
+    if (!canManage) {
+      // Non-admin/non-proxy: doit être responsable_site du site
       const canEdit = await isResponsableSite(
         currentUser.id,
         siteId,
@@ -378,7 +432,7 @@ export const updateSiteAction = actionClient
         );
       }
 
-      // Non-admin ne peut PAS changer le parentId (déplacer le site)
+      // Responsable ne peut PAS changer le parentId (déplacer le site)
       if (parentId !== undefined) {
         throw errors.forbidden(
           "Seuls les administrateurs peuvent déplacer un site dans l'arborescence.",
@@ -552,10 +606,14 @@ export const archiveSiteAction = actionClient
       );
     }
 
-    // Vérifier les permissions (ADMIN uniquement)
+    // Vérifier les permissions (ADMIN ou proxy prestataire)
     const userIsAdmin = await isAdmin(currentUser.id, entrepriseId);
+    const userIsProxy = userIsAdmin
+      ? false
+      : await canManageSiteAsProxy(currentUser.id, entrepriseId);
+    const canManage = userIsAdmin || userIsProxy;
 
-    if (!userIsAdmin) {
+    if (!canManage) {
       throw errors.forbidden(
         "Seuls les administrateurs peuvent archiver des sites.",
       );
@@ -578,70 +636,6 @@ export const archiveSiteAction = actionClient
 
     return {
       message: "Site archivé avec succès.",
-      site: selectSiteSchema.parse(updatedSite),
-    };
-  });
-
-// ==================== RESTORE SITE ====================
-
-export const restoreSiteAction = actionClient
-  .metadata({ actionName: "restoreSiteAction" })
-  .inputSchema(siteByIdSchema, {
-      handleValidationErrorsShape: async (ve) =>
-        flattenValidationErrors(ve).fieldErrors,
-    },
-  )
-  .action(async ({ parsedInput }) => {
-    const session = await getSession();
-    const currentUser = session?.user;
-
-    if (!currentUser) {
-      throw errors.unauthorized("Vous n'êtes pas authentifié.");
-    }
-
-    const { siteId, entrepriseId } = parsedInput;
-
-    // Vérifier que le site existe et appartient à l'entreprise
-    const belongs = await siteBelongsToEntreprise({ siteId, entrepriseId });
-    if (!belongs) {
-      throw errors.notFound("Site");
-    }
-
-    // Récupérer le site (incluant les archivés pour la restauration)
-    const site = await db.query.sites.findFirst({
-      where: eq(sites.id, siteId),
-    });
-
-    if (!site || site.actif) {
-      throw errors.notFound("Site archivé");
-    }
-
-    // Vérifier les permissions (ADMIN uniquement)
-    const userIsAdmin = await isAdmin(currentUser.id, entrepriseId);
-
-    if (!userIsAdmin) {
-      throw errors.forbidden(
-        "Seuls les administrateurs peuvent restaurer des sites.",
-      );
-    }
-
-    // Restaurer le site
-    const [updatedSite] = await db
-      .update(sites)
-      .set({
-        actif: true,
-        updatedById: currentUser.id,
-        updatedAt: new Date(),
-      })
-      .where(eq(sites.id, siteId))
-      .returning();
-
-    if (!updatedSite) {
-      throw errors.internal("Échec de la restauration du site.");
-    }
-
-    return {
-      message: "Site restauré avec succès.",
       site: selectSiteSchema.parse(updatedSite),
     };
   });

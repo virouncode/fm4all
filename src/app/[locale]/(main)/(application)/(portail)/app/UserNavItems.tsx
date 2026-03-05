@@ -73,6 +73,13 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
           icon: HandPlatter,
           match: "startsWith",
         },
+        {
+          key: "mes-prestataires",
+          label: "Mes prestataires",
+          href: "/app/mes-prestataires",
+          icon: Building2,
+          match: "startsWith",
+        },
       ],
     },
     {
@@ -187,6 +194,13 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
           icon: MapPin,
           match: "startsWith",
         },
+        {
+          key: "mes-clients",
+          label: "Mes clients",
+          href: "/app/mes-clients",
+          icon: Building2,
+          match: "startsWith",
+        },
       ],
     },
     {
@@ -287,6 +301,13 @@ const NAV: Record<RoleEntrepriseType, NavSection[]> = {
           label: "Entreprises",
           href: "/app/entreprises",
           icon: Building2,
+          match: "startsWith",
+        },
+        {
+          key: "sites-clients",
+          label: "Sites clients",
+          href: "/app/sites-clients",
+          icon: MapPin,
           match: "startsWith",
         },
       ],

@@ -8,17 +8,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "@/i18n/navigation";
-import { getMesClientsAction } from "@/server/actions/clientServiceExecutionsActions";
+import { getEntreprisesClientesAction } from "@/server/actions/entreprisesActions";
 import {
   getSiteResponsablesAction,
   getSitesAction,
 } from "@/server/actions/sitesActions";
 import { useAppStore } from "@/stores/application/appStore";
 import type { SelectSiteType, SiteTreeNode } from "@/zod-schemas/sites.schema";
-import type { ClientAvecDetails } from "@/server/queries/clientServiceExecutions.query";
 import type { SiteResponsable } from "@/server/queries/sites.query";
-import { Building, Info, Network, Plus } from "lucide-react";
+import { Building, Network, Plus } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -26,49 +26,48 @@ import { buildSiteTree, getPathToRoot } from "../sites/helpers";
 import { SiteDetails } from "../sites/SiteDetails";
 import { SiteFormDialog } from "../sites/SiteFormDialog";
 import { SitesTree } from "../sites/SitesTree";
-import { Button } from "@/components/ui/button";
 
-export function MesSitesClientsClient() {
-  const entreprise = useAppStore((s) => s.entreprise);
-  const posture = useAppStore((s) => s.postureActive);
+export function SitesClientsClient() {
+  const currentUserPlateformeRole = useAppStore(
+    (s) => s.rolePlateformeAdhesion,
+  );
 
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // URL sync
   const selectedClientId = searchParams.get("clientId") ?? null;
 
-  // Clients list
-  const [clients, setClients] = useState<ClientAvecDetails[]>([]);
+  const [clients, setClients] = useState<Array<{ id: string; nom: string }>>(
+    [],
+  );
   const [loadingClients, setLoadingClients] = useState(false);
 
-  // Sites state
   const [sites, setSites] = useState<SelectSiteType[]>([]);
   const [tree, setTree] = useState<SiteTreeNode[]>([]);
   const [selectedSiteId, setSelectedSiteId] = useState<string | null>(null);
   const [loadingSites, setLoadingSites] = useState(false);
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
 
-  // Responsables state
-  const [siteResponsables, setSiteResponsables] = useState<SiteResponsable[]>([]);
+  const [siteResponsables, setSiteResponsables] = useState<SiteResponsable[]>(
+    [],
+  );
   const [loadingResponsables, setLoadingResponsables] = useState(false);
 
-  // Form dialog state
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
-  const [parentIdForCreate, setParentIdForCreate] = useState<string | null>(null);
+  const [parentIdForCreate, setParentIdForCreate] = useState<string | null>(
+    null,
+  );
 
-  const selectedClient = clients.find((c) => c.id === selectedClientId) ?? null;
-  const canManage = selectedClient ? !selectedClient.hasActiveAdmin : false;
+  const canCreateRoot =
+    currentUserPlateformeRole === "super_admin_plateforme";
 
-  // Load clients on mount
+  // Load all platform clients on mount
   useEffect(() => {
-    if (!entreprise?.id || posture !== "prestataire") return;
-
     async function loadClients() {
       setLoadingClients(true);
       try {
-        const result = await getMesClientsAction({ entrepriseId: entreprise!.id });
+        const result = await getEntreprisesClientesAction();
         if (result?.serverError) {
           toast.error(result.serverError.message);
           return;
@@ -82,9 +81,8 @@ export function MesSitesClientsClient() {
         setLoadingClients(false);
       }
     }
-
     loadClients();
-  }, [entreprise?.id, posture]);
+  }, []);
 
   // Load sites when selectedClientId changes
   useEffect(() => {
@@ -108,7 +106,6 @@ export function MesSitesClientsClient() {
           const builtTree = buildSiteTree(result.data);
           setSites(result.data);
           setTree(builtTree);
-          // Sélection par défaut : premier nœud racine
           if (builtTree.length > 0) {
             setSelectedSiteId(builtTree[0].id);
           }
@@ -150,7 +147,7 @@ export function MesSitesClientsClient() {
 
   const handleClientChange = (clientId: string) => {
     router.replace(
-      { pathname: "/app/mes-sites-clients", query: { clientId } },
+      { pathname: "/app/sites-clients", query: { clientId } },
       { scroll: false },
     );
   };
@@ -184,10 +181,15 @@ export function MesSitesClientsClient() {
   };
 
   const handleFormSuccess = async (newSite: SelectSiteType) => {
-    if (formMode === "edit" && selectedSite && selectedSite.actif !== newSite.actif) {
-      // Rechargement complet si statut actif a changé (cascade)
+    if (
+      formMode === "edit" &&
+      selectedSite &&
+      selectedSite.actif !== newSite.actif
+    ) {
       try {
-        const result = await getSitesAction({ entrepriseId: selectedClientId! });
+        const result = await getSitesAction({
+          entrepriseId: selectedClientId!,
+        });
         if (result?.data) {
           setSites(result.data);
           setTree(buildSiteTree(result.data));
@@ -216,14 +218,6 @@ export function MesSitesClientsClient() {
     const path = getPathToRoot(tree, selectedSiteId);
     return path.map((n) => ({ id: n.id, nom: n.nom }));
   }, [tree, selectedSiteId]);
-
-  if (posture !== "prestataire") {
-    return (
-      <div className="text-muted-foreground py-12 text-center text-sm">
-        Cette page est réservée à la posture prestataire.
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -269,37 +263,16 @@ export function MesSitesClientsClient() {
 
       {selectedClientId && (
         <div className="space-y-6">
-          {/* Bannière lecture seule si le client a un admin actif */}
-          {selectedClient?.hasActiveAdmin && (
-            <div className="bg-muted/50 flex items-start gap-3 rounded-lg border p-4">
-              <Info className="text-muted-foreground mt-0.5 h-4 w-4 flex-shrink-0" />
-              <p className="text-muted-foreground text-sm">
-                Ce client gère ses propres sites — vous ne pouvez pas les
-                modifier. Si un site sur lequel vous intervenez n&apos;est pas
-                présent, veuillez contacter{" "}
-                {selectedClient.adminEmail ? (
-                  <a
-                    href={`mailto:${selectedClient.adminEmail}`}
-                    className="text-primary underline underline-offset-2"
-                  >
-                    leur administrateur
-                  </a>
-                ) : (
-                  "leur administrateur"
-                )}
-                .
-              </p>
-            </div>
-          )}
-
           {/* Tree Section */}
           <div className="rounded-lg border p-4">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Network className="text-primary h-6" />
-                <h2 className="text-xl font-semibold">Organisation des sites</h2>
+                <h2 className="text-xl font-semibold">
+                  Organisation des sites
+                </h2>
               </div>
-              {canManage && (
+              {canCreateRoot && (
                 <Button onClick={handleCreateRoot} size="sm">
                   <Plus className="h-4 w-4" />
                   Site racine
@@ -321,9 +294,8 @@ export function MesSitesClientsClient() {
                   expandedNodes={expandedNodes}
                   onToggleExpand={handleToggleExpand}
                   currentUserRole={null}
-                  currentUserPlateformeRole={null}
+                  currentUserPlateformeRole={currentUserPlateformeRole}
                   responsableSiteIds={new Set()}
-                  canManageOverride={canManage}
                 />
               )}
             </div>
@@ -334,14 +306,10 @@ export function MesSitesClientsClient() {
             <div className="rounded-lg border p-6">
               <SiteDetails
                 site={selectedSite}
-                onEdit={canManage ? handleEdit : () => {}}
-                onCreateChild={
-                  canManage
-                    ? () => handleCreateChild(selectedSite.id)
-                    : () => {}
-                }
-                currentUserRole={canManage ? "admin" : null}
-                currentUserPlateformeRole={null}
+                onEdit={handleEdit}
+                onCreateChild={() => handleCreateChild(selectedSite.id)}
+                currentUserRole={null}
+                currentUserPlateformeRole={currentUserPlateformeRole}
                 responsableSiteIds={new Set()}
                 siteResponsables={siteResponsables}
                 loadingResponsables={loadingResponsables}
@@ -352,7 +320,8 @@ export function MesSitesClientsClient() {
 
           {!selectedSite && !loadingSites && (
             <div className="text-muted-foreground rounded-lg border p-12 text-center">
-              Sélectionnez un site dans l&apos;arborescence pour voir ses détails
+              Sélectionnez un site dans l&apos;arborescence pour voir ses
+              détails
             </div>
           )}
         </div>
@@ -369,9 +338,9 @@ export function MesSitesClientsClient() {
           entrepriseId={selectedClientId}
           parentSite={
             formMode === "create" && parentIdForCreate
-              ? sites.find((s) => s.id === parentIdForCreate) ?? null
+              ? (sites.find((s) => s.id === parentIdForCreate) ?? null)
               : formMode === "edit" && selectedSite?.parentId
-                ? sites.find((s) => s.id === selectedSite.parentId) ?? null
+                ? (sites.find((s) => s.id === selectedSite.parentId) ?? null)
                 : null
           }
           onSuccess={handleFormSuccess}

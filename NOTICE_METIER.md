@@ -14,6 +14,7 @@
 5. [Module Prestations](#5-module-prestations)
 6. [Module Entreprises](#6-module-entreprises)
 7. [Module Mes Prestataires](#7-module-mes-prestataires)
+8. [Module Sites Clients](#8-module-sites-clients)
 
 ---
 
@@ -231,6 +232,8 @@ Siège social (bâtiment)
 | Créer un sous-site | ✅ | ✅ (sur sites dont il est Responsable) | ❌ |
 | Modifier un site | ✅ | ✅ (sur sites dont il est Responsable) | ❌ |
 | Désactiver un site | ✅ | ❌ | ❌ |
+
+> **Cas particulier — Prestataire en gestion déléguée** : si une entreprise cliente n'a **aucun administrateur actif**, un prestataire lié (admin ou manager) peut créer, modifier et désactiver les sites de ce client via la page "Mes Sites Clients". Cette délégation est automatiquement révoquée dès qu'un administrateur actif est enregistré chez le client.
 
 ---
 
@@ -616,7 +619,7 @@ Le module complet (liste, création, gestion) est **réservé à la posture Plat
 
 | Posture | Accès entreprises |
 |---------|------------------|
-| **Plateforme** | Section "Réseau" → "Entreprises" (liste complète) + "Mon Entreprise" |
+| **Plateforme** | Section "Réseau" → "Entreprises" (liste complète) + "Sites clients" + "Mon Entreprise" |
 | **Client** | Section "Équipe" → "Mon Entreprise" uniquement |
 | **Prestataire** | Section "Paramètres" → "Mon Entreprise" uniquement |
 
@@ -657,6 +660,48 @@ Ce rattachement est accessible depuis le module **Gestion des Utilisateurs**, vi
 - Une nouvelle ligne d'adhésion est ajoutée (`user_client_adhesions`, `user_prestataire_adhesions`, ou `user_plateforme_adhesions`)
 - L'arborescence de l'utilisateur reste inchangée (ses entrées hiérarchiques existantes sont conservées)
 - Aucun email d'activation n'est renvoyé (l'utilisateur a déjà un compte actif)
+
+---
+
+## 8. Module Sites Clients
+
+### 8.1 Posture Prestataire — "Mes Sites Clients"
+
+Les utilisateurs en posture **Prestataire** (admin ou manager) disposent d'une page **"Mes Sites Clients"** permettant de consulter et, sous conditions, de gérer l'arborescence des sites de chacun de leurs clients.
+
+#### Sélection du client
+
+Un sélecteur en haut de page permet de choisir le client parmi les entreprises liées au prestataire (via une relation explicite ou une exécution de prestation active). Le choix est persisté dans l'URL (`?clientId=xxx`).
+
+#### Règle de gestion déléguée (proxy)
+
+| Situation | Droits du prestataire |
+|-----------|----------------------|
+| Le client **n'a pas** d'administrateur actif | Peut créer, modifier, désactiver les sites (gestion déléguée) |
+| Le client **a** au moins un administrateur actif | Vue en **lecture seule** — boutons masqués, bannière informative affichée |
+
+En cas de lecture seule, la bannière invite le prestataire à contacter l'administrateur du client (lien `mailto:` direct si l'email est disponible).
+
+#### Actions disponibles selon la situation
+
+| Action | Prestataire (client sans admin) | Prestataire (client avec admin) |
+|--------|:-:|:-:|
+| Consulter l'arborescence des sites | ✅ | ✅ |
+| Créer un site racine | ✅ | ❌ |
+| Créer un sous-site | ✅ | ❌ |
+| Modifier un site | ✅ | ❌ |
+| Désactiver un site | ✅ | ❌ |
+
+### 8.2 Posture Plateforme — "Sites Clients"
+
+Les utilisateurs en posture **Plateforme** disposent d'une page **"Sites Clients"** (section "Réseau" de la navigation) permettant de gérer l'arborescence des sites de n'importe quel client.
+
+Le sélecteur affiche **tous les clients** de la plateforme (contrairement à la vue Prestataire qui n'affiche que les clients liés).
+
+| Action | Super Admin Plateforme | Opérateur Plateforme |
+|--------|:-:|:-:|
+| Consulter l'arborescence des sites | ✅ | ✅ |
+| Créer, modifier, désactiver des sites | ✅ | ❌ |
 
 ---
 

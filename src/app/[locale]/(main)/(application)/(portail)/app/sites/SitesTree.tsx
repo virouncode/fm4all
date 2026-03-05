@@ -19,6 +19,7 @@ type SitesTreeProps = {
   currentUserPlateformeRole: RolePlateformeAdhesionType | null;
   responsableSiteIds: Set<string>;
   hasActiveFilters?: boolean;
+  canManageOverride?: boolean;
 }
 
 export function SitesTree({
@@ -32,6 +33,7 @@ export function SitesTree({
   currentUserPlateformeRole,
   responsableSiteIds,
   hasActiveFilters = false,
+  canManageOverride = false,
 }: SitesTreeProps) {
   return (
     <div className="space-y-1">
@@ -55,6 +57,7 @@ export function SitesTree({
           currentUserRole={currentUserRole}
           currentUserPlateformeRole={currentUserPlateformeRole}
           responsableSiteIds={responsableSiteIds}
+          canManageOverride={canManageOverride}
         />
       ))}
     </div>
@@ -72,6 +75,7 @@ type TreeNodeProps = {
   currentUserRole: RoleClientAdhesionType | null;
   currentUserPlateformeRole: RolePlateformeAdhesionType | null;
   responsableSiteIds: Set<string>;
+  canManageOverride?: boolean;
 };
 
 function TreeNode({
@@ -85,6 +89,7 @@ function TreeNode({
   currentUserRole,
   currentUserPlateformeRole,
   responsableSiteIds,
+  canManageOverride = false,
 }: TreeNodeProps) {
   const expanded = expandedNodes.has(node.id);
   const hasChildren = node.children.length > 0;
@@ -95,7 +100,7 @@ function TreeNode({
     currentUserPlateformeRole === "super_admin_plateforme" ||
     currentUserRole === "admin";
   const isResponsable = responsableSiteIds.has(node.id);
-  const canCreateChild = isAdmin || isResponsable;
+  const canCreateChild = canManageOverride || isAdmin || isResponsable;
 
   return (
     <div>
@@ -186,6 +191,7 @@ function TreeNode({
               currentUserRole={currentUserRole}
               currentUserPlateformeRole={currentUserPlateformeRole}
               responsableSiteIds={responsableSiteIds}
+              canManageOverride={canManageOverride}
             />
           ))}
         </div>

@@ -2096,6 +2096,36 @@ Ne PAS essayer `const table = condition ? tableA : tableB` — le typage Drizzle
 
 ---
 
+## Changelog (2026-03-05 — session 2)
+
+**Refonte `mes-sites-clients` + nouveau `sites-clients` plateforme** :
+
+- ✅ `app/mes-sites-clients` — réécriture complète : sélecteur client synced URL, arborescence SitesTree + SiteDetails + SiteFormDialog, règle proxy prestataire
+- ✅ `app/sites-clients` — nouvelle page plateforme : tous les clients + droits complets super_admin
+- ✅ `SitesTree` — nouvelle prop `canManageOverride?: boolean` pour contourner les check de rôle
+- ✅ `sitesActions.ts` — helper `canManageSiteAsProxy()` dans insert/update/archive
+- ✅ `clientServiceExecutions.query.ts` — `ClientAvecDetails` enrichi avec `adminEmail`
+- ✅ Sidebar plateforme — "Sites clients" ajouté dans section "Réseau"
+- ✅ `routing.ts` — route `/app/sites-clients` enregistrée
+- ✅ Suppression de `restoreSiteAction` (code mort)
+- ✅ `PrestationFormDialog` — suppression du sous-formulaire "+ Nouveau client"
+
+**Pattern : Proxy prestataire sur sites client** :
+
+```typescript
+// canManageSiteAsProxy() — dans sitesActions.ts
+// 1. Client sans admin actif (userClientAdhesions, statut=actif, role=admin) ?
+// 2. User est admin/manager prestataire (userPrestataireAdhesions) lié via clientPrestataireRelations ?
+// → Si les deux sont vrai : peut créer/modifier/archiver les sites du client
+```
+
+**Règle frontend** :
+- `canManage = !selectedClient.hasActiveAdmin` (prestataire)
+- Passer `canManageOverride={canManage}` à `SitesTree`
+- Passer `currentUserRole={canManage ? "admin" : null}` à `SiteDetails`
+
+---
+
 **Dernière mise à jour**: 2026-03-05
 
 Pour toute question ou clarification, référez-vous d'abord aux implémentations de référence:

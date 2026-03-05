@@ -232,7 +232,7 @@ export async function getClientPrestatairesAvecDetails(
  * Récupère les prestataires actifs offrant un service donné.
  *
  * - Si clientEntrepriseId fourni (mode direct) : uniquement les prestataires
- *   avec lesquels ce client a déjà une relation (toute prestation confondue).
+ *   référencés dans client_prestataire_relations pour ce client (et offrant le service).
  * - Sinon (mode intermédiaire FM4ALL / plateforme) : catalogue complet.
  */
 export async function getPrestatairesForService(params: {
@@ -250,15 +250,18 @@ export async function getPrestatairesForService(params: {
     ? and(
         baseConditions,
         inArray(
-          serviceEntreprises.id,
+          serviceEntreprises.entrepriseId,
           db
-            .selectDistinct({ id: clientServiceExecutions.serviceEntrepriseId })
-            .from(clientServiceExecutions)
-            .innerJoin(
-              clientServices,
-              eq(clientServices.id, clientServiceExecutions.clientServiceId),
-            )
-            .where(eq(clientServices.entrepriseId, clientEntrepriseId)),
+            .selectDistinct({
+              id: clientPrestataireRelations.prestataireEntrepriseId,
+            })
+            .from(clientPrestataireRelations)
+            .where(
+              eq(
+                clientPrestataireRelations.clientEntrepriseId,
+                clientEntrepriseId,
+              ),
+            ),
         ),
       )
     : baseConditions;
@@ -889,6 +892,7 @@ export type ClientAvecDetails = {
   logoStorageKey: string | null;
   roles: string[];
   hasActiveAdmin: boolean;
+  adminEmail: string | null;
   services: Array<{ id: string; nom: string }>;
 };
 
@@ -980,10 +984,14 @@ export async function getMesClients(
     rolesByEntrepriseId.get(r.entrepriseId)!.push(r.role);
   }
 
-  // 6. Check hasActiveAdmin (admin client actif dans l'entreprise)
+  // 6. Check hasActiveAdmin + fetch email du premier admin actif
   const adminRows = await db
-    .select({ entrepriseId: userClientAdhesions.entrepriseId })
+    .select({
+      entrepriseId: userClientAdhesions.entrepriseId,
+      email: user.email,
+    })
     .from(userClientAdhesions)
+    .innerJoin(user, eq(user.id, userClientAdhesions.userId))
     .where(
       and(
         inArray(userClientAdhesions.entrepriseId, allIds),
@@ -992,6 +1000,13 @@ export async function getMesClients(
       ),
     );
   const hasAdminSet = new Set(adminRows.map((r) => r.entrepriseId));
+  // Premier admin actif par entreprise (ordre non garanti, on prend le premier)
+  const adminEmailByEntrepriseId = new Map<string, string>();
+  for (const r of adminRows) {
+    if (!adminEmailByEntrepriseId.has(r.entrepriseId)) {
+      adminEmailByEntrepriseId.set(r.entrepriseId, r.email);
+    }
+  }
 
   // 7. Fetch services offerts par chaque client (si double casquette prestataire)
   const serviceRows = await db
@@ -1028,6 +1043,7 @@ export async function getMesClients(
     logoStorageKey: c.logoStorageKey ?? null,
     roles: rolesByEntrepriseId.get(c.id) ?? [],
     hasActiveAdmin: hasAdminSet.has(c.id),
+    adminEmail: adminEmailByEntrepriseId.get(c.id) ?? null,
     services: servicesByEntrepriseId.get(c.id) ?? [],
   }));
 }
