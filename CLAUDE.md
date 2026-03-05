@@ -915,7 +915,43 @@ export default async function MyPage() {
 }
 ```
 
-**Pages concernées** : `/app/entreprises/page.tsx`, `/app/entreprises/[id]/page.tsx`, `/app/services/page.tsx`
+**Pages concernées** : `/app/entreprises/page.tsx`, `/app/entreprises/[id]/page.tsx`, `/app/services/page.tsx`, `/app/sites-clients/page.tsx`
+
+### Guard Server-Side pour Pages Réservées à une Posture (Client / Prestataire)
+
+Pour les pages accessibles uniquement en posture client ou prestataire :
+
+```typescript
+// Page client-only (ex: /app/mes-prestataires)
+import { db } from "@/db";
+import { userClientAdhesions } from "@/db/schema/users";
+import { and, eq } from "drizzle-orm";
+
+const clientAdhesion = await db.query.userClientAdhesions.findFirst({
+  where: and(
+    eq(userClientAdhesions.userId, currentUser.id),
+    eq(userClientAdhesions.statut, "actif"),
+  ),
+});
+if (!clientAdhesion) redirect({ href: "/auth/unauthorized", locale: "fr" });
+
+// Page prestataire-only (ex: /app/mes-sites-clients, /app/mes-clients)
+import { userPrestataireAdhesions } from "@/db/schema/users";
+
+const prestataireAdhesion = await db.query.userPrestataireAdhesions.findFirst({
+  where: and(
+    eq(userPrestataireAdhesions.userId, currentUser.id),
+    eq(userPrestataireAdhesions.statut, "actif"),
+  ),
+});
+if (!prestataireAdhesion) redirect({ href: "/auth/unauthorized", locale: "fr" });
+```
+
+**Pages concernées** :
+- Client uniquement : `/app/mes-prestataires/page.tsx`
+- Prestataire uniquement : `/app/mes-sites-clients/page.tsx`, `/app/mes-clients/page.tsx`
+
+**Note** : Les pages partagées entre postures (`/app/sites`, `/app/utilisateurs`, `/app/tickets`, etc.) n'ont pas besoin de guard posture — les actions serveur scopent les données par entreprise.
 
 ### Check Permission dans Server Actions
 ```typescript
@@ -2123,6 +2159,20 @@ Ne PAS essayer `const table = condition ? tableA : tableB` — le typage Drizzle
 - `canManage = !selectedClient.hasActiveAdmin` (prestataire)
 - Passer `canManageOverride={canManage}` à `SitesTree`
 - Passer `currentUserRole={canManage ? "admin" : null}` à `SiteDetails`
+
+---
+
+## Changelog (2026-03-05 — session 3)
+
+**Audit sécurité + guards posture-spécifiques** :
+
+- ✅ Audit complet des modules : Sites, Utilisateurs, Entreprises, Mes Prestataires, Mes Sites Clients, Sites Clients
+- ✅ `isAdmin()` dans `sitesActions.ts` inclut déjà le check `super_admin_plateforme` (confirmation — pas de bug)
+- ✅ Guards serveur ajoutés sur les pages posture-restreintes :
+  - `/app/mes-prestataires/page.tsx` → redirect `/auth/unauthorized` si pas d'adhésion client active
+  - `/app/mes-sites-clients/page.tsx` → redirect `/auth/unauthorized` si pas d'adhésion prestataire active
+  - `/app/mes-clients/page.tsx` → redirect `/auth/unauthorized` si pas d'adhésion prestataire active
+- ✅ Pattern documenté dans CLAUDE.md (voir "Guard Server-Side pour Pages Réservées à une Posture")
 
 ---
 

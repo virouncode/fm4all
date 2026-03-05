@@ -703,6 +703,23 @@ Le sélecteur affiche **tous les clients** de la plateforme (contrairement à la
 | Consulter l'arborescence des sites | ✅ | ✅ |
 | Créer, modifier, désactiver des sites | ✅ | ❌ |
 
+### 8.3 Contrôle d'accès par posture
+
+L'accès aux pages posture-spécifiques est vérifié côté serveur dès le chargement de la page, avant tout rendu :
+
+| Page | Condition d'accès |
+|------|-------------------|
+| `/app/mes-prestataires` | Adhésion client active (`userClientAdhesions`) |
+| `/app/mes-sites-clients` | Adhésion prestataire active (`userPrestataireAdhesions`) |
+| `/app/mes-clients` | Adhésion prestataire active (`userPrestataireAdhesions`) |
+| `/app/entreprises` | Rôle plateforme (`userPlateformeAdhesions`) |
+| `/app/services` | Rôle plateforme (`userPlateformeAdhesions`) |
+| `/app/sites-clients` | Rôle plateforme (`userPlateformeAdhesions`) |
+
+Un utilisateur sans l'adhésion requise est redirigé vers `/auth/unauthorized` (page "Accès non autorisé"), quelle que soit sa posture active côté client.
+
+Les pages partagées entre postures (`/app/sites`, `/app/utilisateurs`, `/app/tickets`, `/app/prestations`) n'ont pas de guard posture — tout utilisateur authentifié peut y accéder, les données étant scopées par entreprise au niveau des actions serveur.
+
 ---
 
 ## Annexe — Récapitulatif des statuts
