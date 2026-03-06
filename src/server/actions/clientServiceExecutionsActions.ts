@@ -19,7 +19,7 @@ import {
 } from "@/db/schema/services";
 import { userClientAdhesions, userPrestataireAdhesions } from "@/db/schema/users";
 import { auth } from "@/server/auth/auth";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
@@ -39,9 +39,8 @@ import {
   getUserClientAdhesion,
   hasAccessToEntreprise,
 } from "@/server/queries/userAdhesions.query";
-import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
+import { getEffectivePlateformeRole, resolvePostureAwareSiteRole } from "@/server/utils/permissions.utils";
 import { onClientServiceChanged } from "@/server/utils/clientServiceOccurrences.utils";
-import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userClientSiteAttributions.utils";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
   createOrLinkClientSchema,
@@ -79,11 +78,7 @@ async function canManagePrestation(
   const platformRole = await getEffectivePlateformeRole(userId);
   if (platformRole?.role) return { allowed: true, isPlateforme: true };
 
-  const siteRole = await resolveUserEffectiveRoleOnSite({
-    userId,
-    siteId,
-    entrepriseId,
-  });
+  const siteRole = await resolvePostureAwareSiteRole({ userId, siteId, entrepriseId });
   return { allowed: siteRole === "responsable_site", isPlateforme: false };
 }
 
@@ -99,6 +94,20 @@ async function canChangeModePilotageCheck(
   const platformRole = await getEffectivePlateformeRole(userId);
   if (platformRole?.role) return true;
 
+  const cookieStore = await cookies();
+  const posture = cookieStore.get("fm4all:postureActive")?.value;
+
+  if (posture === "prestataire") {
+    // Un prestataire responsable_site peut changer le mode de pilotage
+    const siteRole = await resolvePostureAwareSiteRole({
+      userId,
+      siteId,
+      entrepriseId: clientEntrepriseId,
+    });
+    return siteRole === "responsable_site";
+  }
+
+  // client (défaut)
   const adhesion = await db.query.userClientAdhesions.findFirst({
     where: and(
       eq(userClientAdhesions.userId, userId),
@@ -110,7 +119,7 @@ async function canChangeModePilotageCheck(
   if (adhesion.role === "manager") return false;
 
   // collaborateur : vérifier responsable_site sur le site
-  const siteRole = await resolveUserEffectiveRoleOnSite({
+  const siteRole = await resolvePostureAwareSiteRole({
     userId,
     siteId,
     entrepriseId: clientEntrepriseId,

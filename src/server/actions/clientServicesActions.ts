@@ -8,7 +8,7 @@ import {
   clientServicePerimetre,
   clientServices,
 } from "@/db/schema/services";
-import { userClientAdhesions, userPrestataireAdhesions } from "@/db/schema/users";
+import { userPrestataireAdhesions } from "@/db/schema/users";
 import { errors } from "@/lib/action/errors";
 import { actionClient } from "@/lib/action/safe-actions";
 import { getSession } from "@/server/auth/get-session";
@@ -20,10 +20,10 @@ import {
   getPrestationWithJoinsById,
   prestationBelongsToEntreprise,
 } from "@/server/queries/clientServices.query";
+import { hasAccessToEntreprise } from "@/server/queries/userAdhesions.query";
 import { getResponsableSiteIdsByPrestataire } from "@/server/queries/userPrestataireSiteAttributions.query";
-import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
+import { getEffectivePlateformeRole, resolvePostureAwareSiteRole } from "@/server/utils/permissions.utils";
 import { onClientServiceChanged } from "@/server/utils/clientServiceOccurrences.utils";
-import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userClientSiteAttributions.utils";
 import { normalizeForSubmit } from "@/zod-helpers/normalize";
 import {
   getPrestationsQuerySchema,
@@ -57,32 +57,8 @@ async function canManagePrestation(
   const platformRole = await getEffectivePlateformeRole(userId);
   if (platformRole?.role) return { allowed: true, isPlateforme: true };
 
-  const siteRole = await resolveUserEffectiveRoleOnSite({
-    userId,
-    siteId,
-    entrepriseId,
-  });
+  const siteRole = await resolvePostureAwareSiteRole({ userId, siteId, entrepriseId });
   return { allowed: siteRole === "responsable_site", isPlateforme: false };
-}
-
-/**
- * Vérifie que l'utilisateur a accès à l'entreprise (adhésion ou plateforme)
- */
-async function hasAccessToEntreprise(
-  userId: string,
-  entrepriseId: string,
-): Promise<boolean> {
-  const platformRole = await getEffectivePlateformeRole(userId);
-  if (platformRole?.role) return true;
-
-  const adhesion = await db.query.userClientAdhesions.findFirst({
-    where: and(
-      eq(userClientAdhesions.userId, userId),
-      eq(userClientAdhesions.entrepriseId, entrepriseId),
-    ),
-  });
-
-  return !!adhesion;
 }
 
 /**

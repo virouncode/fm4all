@@ -13,7 +13,37 @@ import {
   type SelectClientServiceType,
   selectClientServiceSchema,
 } from "@/zod-schemas/clientServices.schema";
-import { asc, desc, and, eq } from "drizzle-orm";
+import { asc, desc, and, eq, isNotNull } from "drizzle-orm";
+
+/**
+ * Vérifie si une entreprise prestataire a au moins une exécution active sur une prestation.
+ * Utilisé pour autoriser l'accès en posture prestataire à la page de détail d'une prestation.
+ */
+export async function prestataireHasExecutionOnPrestation({
+  prestationId,
+  prestataireEntrepriseId,
+}: {
+  prestationId: string;
+  prestataireEntrepriseId: string;
+}): Promise<boolean> {
+  const row = await db
+    .select({ id: clientServiceExecutions.id })
+    .from(clientServiceExecutions)
+    .innerJoin(
+      serviceEntreprises,
+      eq(serviceEntreprises.id, clientServiceExecutions.serviceEntrepriseId),
+    )
+    .where(
+      and(
+        eq(clientServiceExecutions.clientServiceId, prestationId),
+        eq(serviceEntreprises.entrepriseId, prestataireEntrepriseId),
+        isNotNull(clientServiceExecutions.serviceEntrepriseId),
+      ),
+    )
+    .limit(1);
+
+  return row.length > 0;
+}
 
 export async function hasClientActiveAdmin(
   clientEntrepriseId: string,

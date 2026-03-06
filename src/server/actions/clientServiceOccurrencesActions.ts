@@ -22,7 +22,7 @@ import {
   getPrestationWithJoinsById,
 } from "@/server/queries/clientServices.query";
 import { getUserClientAdhesion } from "@/server/queries/userAdhesions.query";
-import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
+import { getEffectivePlateformeRole, resolvePostureAwareSiteRole } from "@/server/utils/permissions.utils";
 import { getUsersByEntrepriseId } from "@/server/queries/users.query";
 import { promoteS3Key, s3, S3_BUCKET } from "@/server/s3/s3";
 import {
@@ -30,7 +30,6 @@ import {
   pickExecutionForOccurrence,
   snapshotOccurrenceTaches,
 } from "@/server/utils/clientServiceOccurrences.utils";
-import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userClientSiteAttributions.utils";
 import {
   addTachePieceJointeSchema,
   deleteAdHocTacheSchema,
@@ -75,11 +74,7 @@ async function canManagePrestation(
   const platformRole = await getEffectivePlateformeRole(userId);
   if (platformRole?.role) return true;
 
-  const siteRole = await resolveUserEffectiveRoleOnSite({
-    userId,
-    siteId,
-    entrepriseId,
-  });
+  const siteRole = await resolvePostureAwareSiteRole({ userId, siteId, entrepriseId });
   return siteRole === "responsable_site";
 }
 
@@ -92,12 +87,8 @@ async function canInteractWithPrestation(
   const platformRole = await getEffectivePlateformeRole(userId);
   if (platformRole?.role) return true;
 
-  const siteRole = await resolveUserEffectiveRoleOnSite({
-    userId,
-    siteId,
-    entrepriseId,
-  });
-  return siteRole === "responsable_site";
+  const siteRole = await resolvePostureAwareSiteRole({ userId, siteId, entrepriseId });
+  return siteRole === "responsable_site" || siteRole === "intervenant_site";
 }
 
 // Transitions autorisées par statut courant

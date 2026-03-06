@@ -10,10 +10,17 @@ import {
 import {
   getPrestationWithJoinsById,
   hasClientActiveAdmin,
+  prestataireHasExecutionOnPrestation,
 } from "@/server/queries/clientServices.query";
-import { getUserClientAdhesion } from "@/server/queries/userAdhesions.query";
-import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
-import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userClientSiteAttributions.utils";
+import {
+  getUserClientAdhesion,
+  getUserPrestataireAdhesion,
+} from "@/server/queries/userAdhesions.query";
+import {
+  getEffectivePlateformeRole,
+  resolvePostureAwareSiteRole,
+} from "@/server/utils/permissions.utils";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { PrestationDetailsClient } from "./PrestationDetailsClient";
@@ -47,26 +54,53 @@ export default async function PrestationDetailPage({
     notFound();
   }
 
-  // 3. Vérifier l'accès à l'entreprise (plateforme OU adhésion)
-  const platformRole = await getUserPlateformeAdhesion(currentUser.id);
+  // 3. Lire la posture active
+  const cookieStore = await cookies();
+  const posture = cookieStore.get("fm4all:postureActive")?.value;
+
+  // 4. Vérifier l'accès (posture-aware)
+  const platformRole = await getEffectivePlateformeRole(currentUser.id);
   const isPlateforme = !!platformRole?.role;
 
-  let clientAdhesion = null;
+  let prestataireEntrepriseId: string | null = null;
+
   if (!isPlateforme) {
-    clientAdhesion = await getUserClientAdhesion({
-      userId: currentUser.id,
-      entrepriseId: prestation.entrepriseId,
-    });
-    if (!clientAdhesion) {
-      notFound();
+    if (posture === "prestataire") {
+      // Accès prestataire : son entreprise doit avoir une exécution sur cette prestation
+      const prestataireAdhesion = await getUserPrestataireAdhesion({
+        userId: currentUser.id,
+      });
+      if (!prestataireAdhesion) notFound();
+      prestataireEntrepriseId = prestataireAdhesion.entrepriseId;
+
+      const canAccess = await prestataireHasExecutionOnPrestation({
+        prestationId,
+        prestataireEntrepriseId,
+      });
+      if (!canAccess) notFound();
+    } else {
+      // client ou posture par défaut
+      const clientAdhesion = await getUserClientAdhesion({
+        userId: currentUser.id,
+        entrepriseId: prestation.entrepriseId,
+      });
+      if (!clientAdhesion) notFound();
     }
   }
 
-  // 4. Calculer les permissions
+  // 5. Calculer les permissions
+  // clientAdhesion peut être null si l'utilisateur est prestataire (pas client)
+  const clientAdhesion =
+    isPlateforme || posture === "prestataire"
+      ? null
+      : await getUserClientAdhesion({
+          userId: currentUser.id,
+          entrepriseId: prestation.entrepriseId,
+        });
+
   let canManage = isPlateforme;
-  let siteRole = null;
   if (!isPlateforme) {
-    siteRole = await resolveUserEffectiveRoleOnSite({
+    const siteRole = await resolvePostureAwareSiteRole({
       userId: currentUser.id,
       siteId: prestation.siteId,
       entrepriseId: prestation.entrepriseId,
@@ -83,10 +117,10 @@ export default async function PrestationDetailPage({
     isClientAdmin ||
     (canManage && !isPlateforme && !isClientManager);
 
-  // 5. Charger les exécutions et leurs prix
+  // 6. Charger les exécutions et leurs prix
   const executions = await getExecutionsWithPrixByPrestationId(prestationId);
 
-  // 6. Charger les interventions (première page) + totaux + sites disponibles + hasActiveAdmin
+  // 7. Charger les interventions (première page) + totaux + sites disponibles + hasActiveAdmin
   const [occurrences, totalOccurrences, totalNonAssigned, availableSites, clientHasActiveAdmin] =
     await Promise.all([
       getOccurrencesByPrestationId(prestationId, { limit: 50, sortDir: "asc" }),

@@ -239,6 +239,32 @@ export async function getUserPrestataireSiteAttributions({
 }
 
 /**
+ * Retourne le rôle effectif d'un utilisateur prestataire sur un site précis.
+ * Tient compte de l'héritage subtree et des exclusions.
+ *
+ * @returns Le rôle effectif ("responsable_site", "intervenant_site", etc.) ou null si aucun accès.
+ */
+export async function getUserPrestataireSiteRole({
+  userId,
+  siteId,
+  clientEntrepriseId,
+}: {
+  userId: string;
+  siteId: string;
+  clientEntrepriseId: string;
+}): Promise<RolePrestataireAttributionSiteType | null> {
+  const { attributions } = await getUserPrestataireSiteAttributions({
+    userId,
+    clientEntrepriseId,
+  });
+
+  const effective = attributions.find(
+    (a) => a.siteId === siteId && a.mode === "inclure",
+  );
+  return (effective?.role as RolePrestataireAttributionSiteType) ?? null;
+}
+
+/**
  * Retourne les IDs de sites où l'utilisateur prestataire est effectivement responsable_site.
  */
 export async function getResponsableSiteIdsByPrestataire({
