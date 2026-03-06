@@ -1,7 +1,7 @@
 import "server-only";
 
-import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
-import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userClientSiteAttributions.utils";
+import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
+import { resolvePostureAwareSiteRole } from "@/server/utils/permissions.utils";
 import { TicketStatutType } from "@/zod-schemas/enums";
 
 /**
@@ -18,7 +18,7 @@ import { TicketStatutType } from "@/zod-schemas/enums";
  *
  * @param userId - ID de l'utilisateur
  * @param ticketId - ID du ticket
- * @param entrepriseId - ID de l'entreprise
+ * @param entrepriseId - ID de l'entreprise courante
  * @param currentStatut - Statut actuel du ticket
  * @param newStatut - Nouveau statut souhaité
  * @returns true si la transition est autorisée
@@ -41,23 +41,22 @@ export async function isStatusTransitionAllowed({
   const ticket = await getTicketById(ticketId);
   if (!ticket) return false;
 
-  // Vérifier si plateforme
-  const platformRole = await getUserPlateformeAdhesion(userId);
-  const isPlateforme =
-    platformRole?.role === "super_admin_plateforme" ||
-    platformRole?.role === "operateur_plateforme";
+  // Vérifier si plateforme (posture-aware)
+  const platformRole = await getEffectivePlateformeRole(userId);
+  const isPlateforme = !!platformRole?.role;
 
-  // Récupérer rôle effectif sur le site du ticket
-  const effectiveRole = await resolveUserEffectiveRoleOnSite({
+  // Récupérer rôle effectif sur le site du ticket (posture-aware)
+  // Toujours utiliser ticket.proprietaireEntrepriseId pour la lookup de site
+  const effectiveRoleStr = await resolvePostureAwareSiteRole({
     userId,
     siteId: ticket.siteId,
-    entrepriseId,
+    entrepriseId: ticket.proprietaireEntrepriseId,
   });
 
   // Flags de permissions
-  const isResponsable = effectiveRole === "responsable_site";
-  const isDemandeur = effectiveRole === "demandeur_site";
-  const isIntervenant = false; // intervenant_site retiré du scope client
+  const isResponsable = effectiveRoleStr === "responsable_site";
+  const isDemandeur = effectiveRoleStr === "demandeur_site";
+  const isIntervenant = effectiveRoleStr === "intervenant_site";
   const isCreator = ticket.createdById === userId;
   const isAssignedUser = ticket.assigneUserId === userId;
 

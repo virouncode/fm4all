@@ -26,14 +26,14 @@ import { z } from "zod";
 
 // Queries
 import { getSession } from "@/server/auth/get-session";
-import { getEntrepriseById } from "@/server/queries/entreprise.query";
 import { getTicketMessagesFiltered } from "@/server/queries/ticketMessages.query";
 import {
   getTicketById,
   getTicketsByPerimetre,
 } from "@/server/queries/tickets.query";
-import { getUserClientAdhesion } from "@/server/queries/userAdhesions.query";
+import { hasAccessToEntreprise } from "@/server/queries/userAdhesions.query";
 import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
+import { cookies } from "next/headers";
 
 // Utils
 import { getDocumentsByTicketId } from "@/server/queries/documents.query";
@@ -70,27 +70,20 @@ export const getTicketsAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    // Vérifier accès entreprise
-    const adhesion = await getUserClientAdhesion({
-      userId: currentUser.id,
-      entrepriseId: parsedInput.entrepriseId,
-    });
+    // Vérifier accès entreprise (posture-aware)
+    const hasAccess = await hasAccessToEntreprise(
+      currentUser.id,
+      parsedInput.entrepriseId,
+    );
 
-    if (!adhesion) {
+    if (!hasAccess) {
       throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
     }
 
-    // Déterminer posture
-    const platformRole = await getEffectivePlateformeRole(currentUser.id);
-    const entreprise = await getEntrepriseById(parsedInput.entrepriseId);
-
-    let posture: "client" | "prestataire" | "plateforme" = "client";
-
-    if (platformRole?.role) {
-      posture = "plateforme";
-    } else if (entreprise?.roles.includes("prestataire")) {
-      posture = "prestataire";
-    }
+    // Déterminer posture depuis le cookie
+    const cookieStore = await cookies();
+    const posture = (cookieStore.get("fm4all:postureActive")?.value ??
+      "client") as "client" | "prestataire" | "plateforme";
 
     // Récupérer tickets avec périmètre
     const result = await getTicketsByPerimetre({
@@ -136,13 +129,13 @@ export const getTicketByIdAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    // Vérifier accès entreprise
-    const adhesion = await getUserClientAdhesion({
-      userId: currentUser.id,
-      entrepriseId: parsedInput.entrepriseId,
-    });
+    // Vérifier accès entreprise (posture-aware)
+    const hasAccess = await hasAccessToEntreprise(
+      currentUser.id,
+      parsedInput.entrepriseId,
+    );
 
-    if (!adhesion) {
+    if (!hasAccess) {
       throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
     }
 
@@ -153,19 +146,14 @@ export const getTicketByIdAction = actionClient
       throw errors.notFound("Ticket");
     }
 
-    // Vérifier ownership
-    if (ticket.proprietaireEntrepriseId !== parsedInput.entrepriseId) {
-      throw errors.forbidden("Ce ticket n'appartient pas à votre entreprise.");
-    }
-
-    // Vérifier accès via périmètre
-    const hasAccess = await canUserAccessTicket({
+    // Vérifier accès via périmètre (posture-aware, gère client/prestataire/plateforme)
+    const hasTicketAccess = await canUserAccessTicket({
       userId: currentUser.id,
       ticketId: parsedInput.ticketId,
       entrepriseId: parsedInput.entrepriseId,
     });
 
-    if (!hasAccess) {
+    if (!hasTicketAccess) {
       throw errors.forbidden(
         "Vous n'avez pas accès à ce ticket (périmètre insuffisant).",
       );
@@ -197,13 +185,13 @@ export const insertTicketAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    // Vérifier accès entreprise
-    const adhesion = await getUserClientAdhesion({
-      userId: currentUser.id,
-      entrepriseId: parsedInput.entrepriseId,
-    });
+    // Vérifier accès entreprise (posture-aware)
+    const hasAccess = await hasAccessToEntreprise(
+      currentUser.id,
+      parsedInput.entrepriseId,
+    );
 
-    if (!adhesion) {
+    if (!hasAccess) {
       throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
     }
 
@@ -329,13 +317,13 @@ export const updateTicketAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    // Vérifier accès entreprise
-    const adhesion = await getUserClientAdhesion({
-      userId: currentUser.id,
-      entrepriseId: parsedInput.entrepriseId,
-    });
+    // Vérifier accès entreprise (posture-aware)
+    const hasAccess = await hasAccessToEntreprise(
+      currentUser.id,
+      parsedInput.entrepriseId,
+    );
 
-    if (!adhesion) {
+    if (!hasAccess) {
       throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
     }
 
@@ -344,11 +332,6 @@ export const updateTicketAction = actionClient
 
     if (!ticket) {
       throw errors.notFound("Ticket");
-    }
-
-    // Vérifier ownership
-    if (ticket.proprietaireEntrepriseId !== parsedInput.entrepriseId) {
-      throw errors.forbidden("Ce ticket n'appartient pas à votre entreprise.");
     }
 
     // Vérifier permission UPDATE
@@ -413,13 +396,13 @@ export const changeTicketStatusAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    // Vérifier accès entreprise
-    const adhesion = await getUserClientAdhesion({
-      userId: currentUser.id,
-      entrepriseId: parsedInput.entrepriseId,
-    });
+    // Vérifier accès entreprise (posture-aware)
+    const hasAccess = await hasAccessToEntreprise(
+      currentUser.id,
+      parsedInput.entrepriseId,
+    );
 
-    if (!adhesion) {
+    if (!hasAccess) {
       throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
     }
 
@@ -428,11 +411,6 @@ export const changeTicketStatusAction = actionClient
 
     if (!ticket) {
       throw errors.notFound("Ticket");
-    }
-
-    // Vérifier ownership
-    if (ticket.proprietaireEntrepriseId !== parsedInput.entrepriseId) {
-      throw errors.forbidden("Ce ticket n'appartient pas à votre entreprise.");
     }
 
     // Vérifier transition autorisée
@@ -500,13 +478,13 @@ export const assignTicketAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    // Vérifier accès entreprise
-    const adhesion = await getUserClientAdhesion({
-      userId: currentUser.id,
-      entrepriseId: parsedInput.entrepriseId,
-    });
+    // Vérifier accès entreprise (posture-aware)
+    const hasAccess = await hasAccessToEntreprise(
+      currentUser.id,
+      parsedInput.entrepriseId,
+    );
 
-    if (!adhesion) {
+    if (!hasAccess) {
       throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
     }
 
@@ -515,11 +493,6 @@ export const assignTicketAction = actionClient
 
     if (!ticket) {
       throw errors.notFound("Ticket");
-    }
-
-    // Vérifier ownership
-    if (ticket.proprietaireEntrepriseId !== parsedInput.entrepriseId) {
-      throw errors.forbidden("Ce ticket n'appartient pas à votre entreprise.");
     }
 
     // Vérifier permission ASSIGN
@@ -581,24 +554,24 @@ export const getTicketMessagesAction = actionClient
       throw errors.unauthorized("Vous n'êtes pas authentifié.");
     }
 
-    // Vérifier accès entreprise
-    const adhesion = await getUserClientAdhesion({
-      userId: currentUser.id,
-      entrepriseId: parsedInput.entrepriseId,
-    });
+    // Vérifier accès entreprise (posture-aware)
+    const hasEntrepriseAccess = await hasAccessToEntreprise(
+      currentUser.id,
+      parsedInput.entrepriseId,
+    );
 
-    if (!adhesion) {
+    if (!hasEntrepriseAccess) {
       throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
     }
 
     // Vérifier accès ticket
-    const hasAccess = await canUserAccessTicket({
+    const hasTicketAccess = await canUserAccessTicket({
       userId: currentUser.id,
       ticketId: parsedInput.ticketId,
       entrepriseId: parsedInput.entrepriseId,
     });
 
-    if (!hasAccess) {
+    if (!hasTicketAccess) {
       throw errors.forbidden(
         "Vous n'avez pas accès à ce ticket (périmètre insuffisant).",
       );
@@ -640,14 +613,14 @@ export const updateTicketBasicFieldsAction = actionClient
     // Vérifier si plateforme
     const platformRole = await getEffectivePlateformeRole(currentUser.id);
 
-    // Si pas plateforme, vérifier accès entreprise
+    // Si pas plateforme, vérifier accès entreprise (posture-aware)
     if (!platformRole?.role) {
-      const adhesion = await getUserClientAdhesion({
-        userId: currentUser.id,
-        entrepriseId: parsedInput.entrepriseId,
-      });
+      const hasAccess = await hasAccessToEntreprise(
+        currentUser.id,
+        parsedInput.entrepriseId,
+      );
 
-      if (!adhesion) {
+      if (!hasAccess) {
         throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
       }
     }
@@ -711,13 +684,13 @@ export const updateTicketAssigneEntrepriseAction = actionClient
       optionalStrings: ["assigneEntrepriseId"] as const,
     });
 
-    // Vérifier accès entreprise
-    const adhesion = await getUserClientAdhesion({
-      userId: currentUser.id,
-      entrepriseId: normalized.entrepriseId,
-    });
+    // Vérifier accès entreprise (posture-aware)
+    const hasAccess = await hasAccessToEntreprise(
+      currentUser.id,
+      normalized.entrepriseId,
+    );
 
-    if (!adhesion) {
+    if (!hasAccess) {
       throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
     }
 
@@ -797,13 +770,13 @@ export const updateTicketAssigneUserAction = actionClient
       optionalStrings: ["assigneUserId"] as const,
     });
 
-    // Vérifier accès entreprise
-    const adhesion = await getUserClientAdhesion({
-      userId: currentUser.id,
-      entrepriseId: normalized.entrepriseId,
-    });
+    // Vérifier accès entreprise (posture-aware)
+    const hasAccess = await hasAccessToEntreprise(
+      currentUser.id,
+      normalized.entrepriseId,
+    );
 
-    if (!adhesion) {
+    if (!hasAccess) {
       throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
     }
 
@@ -856,14 +829,14 @@ export const updateTicketStatutAction = actionClient
     // Vérifier si plateforme
     const platformRole = await getEffectivePlateformeRole(currentUser.id);
 
-    // Si pas plateforme, vérifier accès entreprise
+    // Si pas plateforme, vérifier accès entreprise (posture-aware)
     if (!platformRole?.role) {
-      const adhesion = await getUserClientAdhesion({
-        userId: currentUser.id,
-        entrepriseId: parsedInput.entrepriseId,
-      });
+      const hasAccess = await hasAccessToEntreprise(
+        currentUser.id,
+        parsedInput.entrepriseId,
+      );
 
-      if (!adhesion) {
+      if (!hasAccess) {
         throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
       }
     }
@@ -959,14 +932,14 @@ export const updateTicketAttachmentsAction = actionClient
     // Vérifier si plateforme
     const platformRole = await getEffectivePlateformeRole(currentUser.id);
 
-    // Si pas plateforme, vérifier accès entreprise
+    // Si pas plateforme, vérifier accès entreprise (posture-aware)
     if (!platformRole?.role) {
-      const adhesion = await getUserClientAdhesion({
-        userId: currentUser.id,
-        entrepriseId: parsedInput.entrepriseId,
-      });
+      const hasAccess = await hasAccessToEntreprise(
+        currentUser.id,
+        parsedInput.entrepriseId,
+      );
 
-      if (!adhesion) {
+      if (!hasAccess) {
         throw errors.forbidden("Vous n'avez pas accès à cette entreprise.");
       }
     }
@@ -1112,11 +1085,7 @@ export const insertTicketMessageAction = actionClient
       throw errors.notFound("Ticket");
     }
 
-    if (ticket.proprietaireEntrepriseId !== parsedInput.entrepriseId) {
-      throw errors.forbidden("Vous n'avez pas accès à ce ticket.");
-    }
-
-    // Vérifier permissions de visibilité selon posture
+    // Vérifier que l'utilisateur est lié à ce ticket (client, prestataire assigné ou plateforme)
     const platformRole = await getEffectivePlateformeRole(currentUser.id);
     const isPlatform = !!platformRole?.role;
     const isClient =
@@ -1124,6 +1093,12 @@ export const insertTicketMessageAction = actionClient
       ticket.proprietaireEntrepriseId === parsedInput.entrepriseId;
     const isPrestataire =
       !isPlatform && ticket.assigneEntrepriseId === parsedInput.entrepriseId;
+
+    if (!isPlatform && !isClient && !isPrestataire) {
+      throw errors.forbidden("Vous n'avez pas accès à ce ticket.");
+    }
+
+    // Vérifier permissions de visibilité selon posture
 
     // Plateforme peut tout poster
     if (!isPlatform) {

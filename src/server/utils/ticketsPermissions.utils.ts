@@ -1,8 +1,8 @@
 import "server-only";
 
 import { db } from "@/db";
-import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
-import { resolveUserEffectiveRoleOnSite } from "@/server/utils/userClientSiteAttributions.utils";
+import { getEffectivePlateformeRole } from "@/server/utils/permissions.utils";
+import { resolvePostureAwareSiteRole } from "@/server/utils/permissions.utils";
 
 type DbOrTransaction =
   | typeof db
@@ -22,13 +22,13 @@ const ROLE_HIERARCHY = {
  * Règle métier:
  * - Plateforme (operateur/super_admin): ✅ OUI
  * - responsable_site: ✅ OUI (niveau 3)
- * - demandeur_site: ✅ OUI (niveau 2)
+ * - demandeur_site: ✅ OUI (niveau 2, client uniquement)
  * - observateur_site: ❌ NON (niveau 1)
  * - intervenant_site: ❌ NON (niveau 0)
  *
  * @param userId - ID de l'utilisateur
  * @param siteId - ID du site
- * @param entrepriseId - ID de l'entreprise
+ * @param entrepriseId - ID de l'entreprise (client propriétaire du site)
  * @param tx - Transaction optionnelle
  * @returns true si l'utilisateur peut créer un ticket
  */
@@ -43,27 +43,25 @@ export async function canUserCreateTicket({
   entrepriseId: string;
   tx?: DbOrTransaction;
 }): Promise<boolean> {
-  // Vérifier si plateforme
-  const platformRole = await getUserPlateformeAdhesion(userId);
-  if (
-    platformRole?.role === "super_admin_plateforme" ||
-    platformRole?.role === "operateur_plateforme"
-  ) {
+  // Vérifier si plateforme (posture-aware)
+  const platformRole = await getEffectivePlateformeRole(userId);
+  if (platformRole?.role) {
     return true;
   }
 
-  // Récupérer rôle effectif sur le site
-  const effectiveRole = await resolveUserEffectiveRoleOnSite({
+  // Récupérer rôle effectif sur le site (posture-aware)
+  // entrepriseId = entreprise cliente propriétaire du site
+  const effectiveRoleStr = await resolvePostureAwareSiteRole({
     userId,
     siteId,
     entrepriseId,
-    tx,
   });
 
-  if (!effectiveRole) return false;
+  if (!effectiveRoleStr || !(effectiveRoleStr in ROLE_HIERARCHY)) return false;
 
   // Peut créer si rôle ≥ demandeur_site (niveau 2)
-  const userLevel = ROLE_HIERARCHY[effectiveRole];
+  const userLevel =
+    ROLE_HIERARCHY[effectiveRoleStr as keyof typeof ROLE_HIERARCHY];
   return userLevel >= 2;
 }
 
@@ -79,7 +77,7 @@ export async function canUserCreateTicket({
  *
  * @param userId - ID de l'utilisateur
  * @param ticketId - ID du ticket
- * @param entrepriseId - ID de l'entreprise
+ * @param entrepriseId - ID de l'entreprise courante
  * @param updateData - Données à mettre à jour
  * @param tx - Transaction optionnelle
  * @returns true si l'utilisateur peut mettre à jour
@@ -97,12 +95,9 @@ export async function canUserUpdateTicket({
   updateData: any;
   tx?: DbOrTransaction;
 }): Promise<boolean> {
-  // Vérifier si plateforme
-  const platformRole = await getUserPlateformeAdhesion(userId);
-  if (
-    platformRole?.role === "super_admin_plateforme" ||
-    platformRole?.role === "operateur_plateforme"
-  ) {
+  // Vérifier si plateforme (posture-aware)
+  const platformRole = await getEffectivePlateformeRole(userId);
+  if (platformRole?.role) {
     return true; // Plateforme peut tout modifier
   }
 
@@ -111,17 +106,18 @@ export async function canUserUpdateTicket({
   const ticket = await getTicketById(ticketId);
   if (!ticket) return false;
 
-  // Récupérer rôle effectif sur le site du ticket
-  const effectiveRole = await resolveUserEffectiveRoleOnSite({
+  // Récupérer rôle effectif sur le site du ticket (posture-aware)
+  // Toujours utiliser ticket.proprietaireEntrepriseId pour la lookup de site
+  const effectiveRoleStr = await resolvePostureAwareSiteRole({
     userId,
     siteId: ticket.siteId,
-    entrepriseId,
-    tx,
+    entrepriseId: ticket.proprietaireEntrepriseId,
   });
 
-  if (!effectiveRole) return false;
+  if (!effectiveRoleStr || !(effectiveRoleStr in ROLE_HIERARCHY)) return false;
 
-  const userLevel = ROLE_HIERARCHY[effectiveRole];
+  const userLevel =
+    ROLE_HIERARCHY[effectiveRoleStr as keyof typeof ROLE_HIERARCHY];
 
   // Vérifier selon les champs modifiés
   const hasAssignFields =
@@ -146,7 +142,7 @@ export async function canUserUpdateTicket({
  *
  * @param userId - ID de l'utilisateur
  * @param ticketId - ID du ticket
- * @param entrepriseId - ID de l'entreprise
+ * @param entrepriseId - ID de l'entreprise courante
  * @param tx - Transaction optionnelle
  * @returns true si l'utilisateur peut assigner
  */
@@ -161,12 +157,9 @@ export async function canUserAssignTicket({
   entrepriseId: string;
   tx?: DbOrTransaction;
 }): Promise<boolean> {
-  // Vérifier si plateforme
-  const platformRole = await getUserPlateformeAdhesion(userId);
-  if (
-    platformRole?.role === "super_admin_plateforme" ||
-    platformRole?.role === "operateur_plateforme"
-  ) {
+  // Vérifier si plateforme (posture-aware)
+  const platformRole = await getEffectivePlateformeRole(userId);
+  if (platformRole?.role) {
     return true;
   }
 
@@ -175,16 +168,15 @@ export async function canUserAssignTicket({
   const ticket = await getTicketById(ticketId);
   if (!ticket) return false;
 
-  // Récupérer rôle effectif sur le site du ticket
-  const effectiveRole = await resolveUserEffectiveRoleOnSite({
+  // Récupérer rôle effectif sur le site du ticket (posture-aware)
+  const effectiveRoleStr = await resolvePostureAwareSiteRole({
     userId,
     siteId: ticket.siteId,
-    entrepriseId,
-    tx,
+    entrepriseId: ticket.proprietaireEntrepriseId,
   });
 
   // Peut assigner si responsable_site
-  return effectiveRole === "responsable_site";
+  return effectiveRoleStr === "responsable_site";
 }
 
 /**
@@ -212,12 +204,9 @@ export async function canUserEditTicketBasicFields({
   entrepriseId: string;
   tx?: DbOrTransaction;
 }): Promise<boolean> {
-  // Vérifier si plateforme
-  const platformRole = await getUserPlateformeAdhesion(userId);
-  if (
-    platformRole?.role === "super_admin_plateforme" ||
-    platformRole?.role === "operateur_plateforme"
-  ) {
+  // Vérifier si plateforme (posture-aware)
+  const platformRole = await getEffectivePlateformeRole(userId);
+  if (platformRole?.role) {
     return true;
   }
 
@@ -232,20 +221,20 @@ export async function canUserEditTicketBasicFields({
     ticket.proprietaireEntrepriseId !== entrepriseId &&
     ticket.demandeurEntrepriseId !== entrepriseId
   ) {
-    return false; // Pas un client de ce ticket
+    return false; // Pas un client de ce ticket (prestataire → NON)
   }
 
-  // Récupérer rôle effectif sur le site
-  const effectiveRole = await resolveUserEffectiveRoleOnSite({
+  // Récupérer rôle effectif sur le site (posture-aware)
+  const effectiveRoleStr = await resolvePostureAwareSiteRole({
     userId,
     siteId: ticket.siteId,
-    entrepriseId,
-    tx,
+    entrepriseId: ticket.proprietaireEntrepriseId,
   });
 
-  if (!effectiveRole) return false;
+  if (!effectiveRoleStr || !(effectiveRoleStr in ROLE_HIERARCHY)) return false;
 
-  const userLevel = ROLE_HIERARCHY[effectiveRole];
+  const userLevel =
+    ROLE_HIERARCHY[effectiveRoleStr as keyof typeof ROLE_HIERARCHY];
   return userLevel >= 2; // demandeur_site (2) ou responsable_site (3)
 }
 
@@ -268,12 +257,9 @@ export async function canUserEditAssigneEntrepriseId({
   entrepriseId: string;
   tx?: DbOrTransaction;
 }): Promise<boolean> {
-  // Vérifier si plateforme
-  const platformRole = await getUserPlateformeAdhesion(userId);
-  if (
-    platformRole?.role === "super_admin_plateforme" ||
-    platformRole?.role === "operateur_plateforme"
-  ) {
+  // Vérifier si plateforme (posture-aware)
+  const platformRole = await getEffectivePlateformeRole(userId);
+  if (platformRole?.role) {
     return true;
   }
 
@@ -290,17 +276,17 @@ export async function canUserEditAssigneEntrepriseId({
     return false;
   }
 
-  // Récupérer rôle effectif sur le site
-  const effectiveRole = await resolveUserEffectiveRoleOnSite({
+  // Récupérer rôle effectif sur le site (posture-aware)
+  const effectiveRoleStr = await resolvePostureAwareSiteRole({
     userId,
     siteId: ticket.siteId,
-    entrepriseId,
-    tx,
+    entrepriseId: ticket.proprietaireEntrepriseId,
   });
 
-  if (!effectiveRole) return false;
+  if (!effectiveRoleStr || !(effectiveRoleStr in ROLE_HIERARCHY)) return false;
 
-  const userLevel = ROLE_HIERARCHY[effectiveRole];
+  const userLevel =
+    ROLE_HIERARCHY[effectiveRoleStr as keyof typeof ROLE_HIERARCHY];
   return userLevel >= 2; // demandeur_site ou responsable_site
 }
 
@@ -323,12 +309,9 @@ export async function canUserEditAssigneUserId({
   entrepriseId: string;
   tx?: DbOrTransaction;
 }): Promise<boolean> {
-  // Vérifier si plateforme
-  const platformRole = await getUserPlateformeAdhesion(userId);
-  if (
-    platformRole?.role === "super_admin_plateforme" ||
-    platformRole?.role === "operateur_plateforme"
-  ) {
+  // Vérifier si plateforme (posture-aware)
+  const platformRole = await getEffectivePlateformeRole(userId);
+  if (platformRole?.role) {
     return true;
   }
 
@@ -345,17 +328,17 @@ export async function canUserEditAssigneUserId({
     return false;
   }
 
-  // Récupérer le rôle effectif sur le site du ticket
-  const effectiveRole = await resolveUserEffectiveRoleOnSite({
+  // Récupérer le rôle effectif sur le site du ticket (posture-aware)
+  const effectiveRoleStr = await resolvePostureAwareSiteRole({
     userId,
     siteId: ticket.siteId,
-    entrepriseId,
-    tx,
+    entrepriseId: ticket.proprietaireEntrepriseId,
   });
 
-  if (!effectiveRole) return false;
+  if (!effectiveRoleStr || !(effectiveRoleStr in ROLE_HIERARCHY)) return false;
 
-  const userLevel = ROLE_HIERARCHY[effectiveRole];
+  const userLevel =
+    ROLE_HIERARCHY[effectiveRoleStr as keyof typeof ROLE_HIERARCHY];
   // Requiert au minimum demandeur_site (niveau 2) ou responsable_site (niveau 3)
   return userLevel >= 2;
 }
@@ -379,12 +362,9 @@ export async function canUserEditStatut({
   entrepriseId: string;
   tx?: DbOrTransaction;
 }): Promise<boolean> {
-  // Vérifier si plateforme
-  const platformRole = await getUserPlateformeAdhesion(userId);
-  if (
-    platformRole?.role === "super_admin_plateforme" ||
-    platformRole?.role === "operateur_plateforme"
-  ) {
+  // Vérifier si plateforme (posture-aware)
+  const platformRole = await getEffectivePlateformeRole(userId);
+  if (platformRole?.role) {
     return true;
   }
 
@@ -398,27 +378,25 @@ export async function canUserEditStatut({
     ticket.proprietaireEntrepriseId === entrepriseId ||
     ticket.demandeurEntrepriseId === entrepriseId
   ) {
-    // Vérifier rôle sur le site
-    const effectiveRole = await resolveUserEffectiveRoleOnSite({
+    // Vérifier rôle sur le site (posture-aware)
+    const effectiveRoleStr = await resolvePostureAwareSiteRole({
       userId,
       siteId: ticket.siteId,
-      entrepriseId,
-      tx,
+      entrepriseId: ticket.proprietaireEntrepriseId,
     });
 
-    if (!effectiveRole) return false;
+    if (!effectiveRoleStr || !(effectiveRoleStr in ROLE_HIERARCHY))
+      return false;
 
-    const userLevel = ROLE_HIERARCHY[effectiveRole];
+    const userLevel =
+      ROLE_HIERARCHY[effectiveRoleStr as keyof typeof ROLE_HIERARCHY];
     return userLevel >= 2; // Client peut si demandeur_site ou +
   }
 
-  // Prestataire (assigné)
+  // Prestataire (assigné à ce ticket)
   if (ticket.assigneEntrepriseId === entrepriseId) {
-    const { getUserClientAdhesion } = await import(
-      "@/server/queries/userAdhesions.query"
-    );
-    const adhesion = await getUserClientAdhesion({ userId, entrepriseId });
-    return !!adhesion;
+    // Le prestataire assigné peut modifier le statut (sous-ensemble dans getAvailableStatutsForUser)
+    return true;
   }
 
   return false;
@@ -443,12 +421,9 @@ export async function getAvailableStatutsForUser({
   entrepriseId: string;
   tx?: DbOrTransaction;
 }): Promise<string[]> {
-  // Vérifier si plateforme
-  const platformRole = await getUserPlateformeAdhesion(userId);
-  if (
-    platformRole?.role === "super_admin_plateforme" ||
-    platformRole?.role === "operateur_plateforme"
-  ) {
+  // Vérifier si plateforme (posture-aware)
+  const platformRole = await getEffectivePlateformeRole(userId);
+  if (platformRole?.role) {
     // Plateforme: tous les statuts
     return [
       "nouveau",
@@ -472,16 +447,16 @@ export async function getAvailableStatutsForUser({
     ticket.proprietaireEntrepriseId === entrepriseId ||
     ticket.demandeurEntrepriseId === entrepriseId
   ) {
-    const effectiveRole = await resolveUserEffectiveRoleOnSite({
+    const effectiveRoleStr = await resolvePostureAwareSiteRole({
       userId,
       siteId: ticket.siteId,
-      entrepriseId,
-      tx,
+      entrepriseId: ticket.proprietaireEntrepriseId,
     });
 
-    if (!effectiveRole) return [];
+    if (!effectiveRoleStr || !(effectiveRoleStr in ROLE_HIERARCHY)) return [];
 
-    const userLevel = ROLE_HIERARCHY[effectiveRole];
+    const userLevel =
+      ROLE_HIERARCHY[effectiveRoleStr as keyof typeof ROLE_HIERARCHY];
     if (userLevel >= 2) {
       // Client: tous les statuts (pour autonomie)
       return [
@@ -497,17 +472,10 @@ export async function getAvailableStatutsForUser({
     }
   }
 
-  // Prestataire
+  // Prestataire (assigné)
   if (ticket.assigneEntrepriseId === entrepriseId) {
-    const { getUserClientAdhesion } = await import(
-      "@/server/queries/userAdhesions.query"
-    );
-    const adhesion = await getUserClientAdhesion({ userId, entrepriseId });
-
-    if (adhesion) {
-      // Prestataire: sous-ensemble
-      return ["pris_en_charge", "en_attente_client", "a_valider", "rejete"];
-    }
+    // Prestataire: sous-ensemble
+    return ["pris_en_charge", "en_attente_client", "a_valider", "rejete"];
   }
 
   return [];
