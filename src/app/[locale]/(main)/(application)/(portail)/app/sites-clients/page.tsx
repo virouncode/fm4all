@@ -1,6 +1,7 @@
 import { redirect } from "@/i18n/navigation";
 import { getSession } from "@/server/auth/get-session";
 import { getUserPlateformeAdhesion } from "@/server/queries/userPlateformeAdhesions.query";
+import { MapPin } from "lucide-react";
 import { SitesClientsClient } from "./SitesClientsClient";
 
 export default async function SitesClientsPage() {
@@ -17,7 +18,10 @@ export default async function SitesClientsPage() {
 
   return (
     <div className="container mx-auto px-6 py-4">
-      <h1 className="mb-6 text-2xl font-bold">Sites clients</h1>
+      <div className="mb-6 flex items-center gap-2">
+        <MapPin className="text-primary size-6" />
+        <h1 className="text-2xl font-bold">Sites clients</h1>
+      </div>
       <SitesClientsClient />
     </div>
   );

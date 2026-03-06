@@ -1,8 +1,9 @@
-import { redirect } from "@/i18n/navigation";
-import { getSession } from "@/server/auth/get-session";
 import { db } from "@/db";
 import { userPrestataireAdhesions } from "@/db/schema/users";
+import { redirect } from "@/i18n/navigation";
+import { getSession } from "@/server/auth/get-session";
 import { and, eq } from "drizzle-orm";
+import { MapPin } from "lucide-react";
 import { MesSitesClientsClient } from "./MesSitesClientsClient";
 
 export default async function MesSitesClientsPage() {
@@ -23,7 +24,10 @@ export default async function MesSitesClientsPage() {
 
   return (
     <div className="container mx-auto px-6 py-4">
-      <h1 className="mb-6 text-2xl font-bold">Mes sites clients</h1>
+      <div className="mb-6 flex items-center gap-2">
+        <MapPin className="text-primary size-6" />
+        <h1 className="text-2xl font-bold">Sites clients</h1>
+      </div>
       <MesSitesClientsClient />
     </div>
   );

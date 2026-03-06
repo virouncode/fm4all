@@ -28,7 +28,7 @@ function toEntrepriseCard(c: ClientAvecDetails): EntrepriseWithDetails {
     logoId: null,
     logoStorageKey: c.logoStorageKey,
     roles: c.roles as RoleEntrepriseType[],
-    nbSites: 0,
+    nbSites: c.nbSites,
     hasActiveAdmin: c.hasActiveAdmin,
     services: c.services,
     pendingInvitation: null,

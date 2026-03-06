@@ -893,6 +893,7 @@ export type ClientAvecDetails = {
   roles: string[];
   hasActiveAdmin: boolean;
   adminEmail: string | null;
+  nbSites: number;
   services: Array<{ id: string; nom: string }>;
 };
 
@@ -1038,12 +1039,28 @@ export async function getMesClients(
     });
   }
 
+  // 8. Comptage des sites par client
+  const sitesCountRows = await db
+    .select({
+      entrepriseId: sites.entrepriseId,
+      nbSites: count(sites.id),
+    })
+    .from(sites)
+    .where(inArray(sites.entrepriseId, allIds))
+    .groupBy(sites.entrepriseId);
+
+  const nbSitesByEntrepriseId = new Map<string, number>();
+  for (const r of sitesCountRows) {
+    nbSitesByEntrepriseId.set(r.entrepriseId, r.nbSites);
+  }
+
   return rows.map((c) => ({
     ...c,
     logoStorageKey: c.logoStorageKey ?? null,
     roles: rolesByEntrepriseId.get(c.id) ?? [],
     hasActiveAdmin: hasAdminSet.has(c.id),
     adminEmail: adminEmailByEntrepriseId.get(c.id) ?? null,
+    nbSites: nbSitesByEntrepriseId.get(c.id) ?? 0,
     services: servicesByEntrepriseId.get(c.id) ?? [],
   }));
 }
