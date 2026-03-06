@@ -31,46 +31,50 @@ export type ExecutionPeriodeFacturationType = z.infer<
 
 // ==================== PRIX FORM ====================
 
-export const insertExecutionPrixFormSchema = z
-  .object({
-    typePrix: executionTypePrixSchema,
-    montantHt: z
-      .string()
-      .refine(
-        (v) => !isNaN(Number(v)) && Number(v) >= 0,
-        "Le montant doit être un nombre positif",
-      ),
-    coutPrestataireHt: z
-      .string()
-      .optional()
-      .refine(
-        (v) =>
-          v === undefined || v === "" || (!isNaN(Number(v)) && Number(v) >= 0),
-        "Le coût prestataire doit être un nombre positif",
-      ),
-    margePourcent: z
-      .string()
-      .optional()
-      .refine(
-        (v) =>
-          v === undefined ||
-          v === "" ||
-          (!isNaN(Number(v)) && Number(v) >= 0 && Number(v) <= 100),
-        "La marge doit être un nombre entre 0 et 100",
-      ),
-    periodeFacturation: executionPeriodeFacturationSchema.optional(),
-    nbOccurrencesIncluses: z
-      .string()
-      .optional()
-      .refine(
-        (v) =>
-          v === undefined ||
-          v === "" ||
-          (!isNaN(Number(v)) && Number(v) >= 0 && Number.isInteger(Number(v))),
-        "Le nombre d'occurrences doit être un entier positif",
-      ),
-  })
-  .superRefine((data, ctx) => {
+// Base sans superRefine pour permettre l'extension
+const executionPrixBaseSchema = z.object({
+  typePrix: executionTypePrixSchema,
+  montantHt: z
+    .string()
+    .refine(
+      (v) => !isNaN(Number(v)) && Number(v) >= 0,
+      "Le montant doit être un nombre positif",
+    ),
+  coutPrestataireHt: z
+    .string()
+    .optional()
+    .refine(
+      (v) =>
+        v === undefined || v === "" || (!isNaN(Number(v)) && Number(v) >= 0),
+      "Le coût prestataire doit être un nombre positif",
+    ),
+  margePourcent: z
+    .string()
+    .optional()
+    .refine(
+      (v) =>
+        v === undefined ||
+        v === "" ||
+        (!isNaN(Number(v)) && Number(v) >= 0 && Number(v) <= 100),
+      "La marge doit être un nombre entre 0 et 100",
+    ),
+  periodeFacturation: executionPeriodeFacturationSchema.optional(),
+  nbOccurrencesIncluses: z
+    .string()
+    .optional()
+    .refine(
+      (v) =>
+        v === undefined ||
+        v === "" ||
+        (!isNaN(Number(v)) && Number(v) >= 0 && Number.isInteger(Number(v))),
+      "Le nombre d'occurrences doit être un entier positif",
+    ),
+});
+
+function withAbonnementRefinement<T extends typeof executionPrixBaseSchema>(
+  schema: T,
+) {
+  return schema.superRefine((data, ctx) => {
     if (data.typePrix === "abonnement" && !data.periodeFacturation) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -79,9 +83,21 @@ export const insertExecutionPrixFormSchema = z
       });
     }
   });
+}
+
+export const insertExecutionPrixFormSchema =
+  withAbonnementRefinement(executionPrixBaseSchema);
 
 export type InsertExecutionPrixFormType = z.infer<
   typeof insertExecutionPrixFormSchema
+>;
+
+// Schema prix pour update (même champs + id optionnel pour diff UPDATE/INSERT)
+export const updateExecutionPrixFormSchema = withAbonnementRefinement(
+  executionPrixBaseSchema.extend({ id: z.uuid().optional() }),
+);
+export type UpdateExecutionPrixFormType = z.infer<
+  typeof updateExecutionPrixFormSchema
 >;
 
 // ==================== EXECUTION FORM ====================
@@ -107,7 +123,6 @@ export const insertExecutionFormSchema = z
         "La priorité doit être un entier entre 0 et 100",
       ),
     modePilotage: modePilotageSchema,
-    assigneeUserIdDefault: z.uuid().or(z.literal("")).optional(),
     prix: z
       .array(insertExecutionPrixFormSchema)
       .min(1, "Au moins une ligne de tarif est requise"),
@@ -161,9 +176,8 @@ export const updateExecutionFormSchema = z
         "La priorité doit être un entier entre 0 et 100",
       ),
     modePilotage: modePilotageSchema,
-    assigneeUserIdDefault: z.uuid().or(z.literal("")).optional(),
     prix: z
-      .array(insertExecutionPrixFormSchema)
+      .array(updateExecutionPrixFormSchema)
       .min(1, "Au moins une ligne de tarif est requise"),
   })
   .superRefine((data, ctx) => {
@@ -272,20 +286,6 @@ export const getMesSitesClientsSchema = z.object({
 });
 export type GetMesSitesClientsType = z.infer<typeof getMesSitesClientsSchema>;
 
-export const updateExecutionAssigneeDefaultSchema = z.object({
-  executionId: z.uuid("ID de l'exécution invalide"),
-  prestationId: z.uuid("ID de la prestation invalide"),
-  entrepriseId: z.uuid("ID de l'entreprise invalide"),
-  assigneeUserIdDefault: z
-    .string()
-    .uuid()
-    .or(z.literal(""))
-    .nullable()
-    .optional(),
-});
-export type UpdateExecutionAssigneeDefaultType = z.infer<
-  typeof updateExecutionAssigneeDefaultSchema
->;
 
 export const getMesClientsSchema = z.object({
   entrepriseId: z.uuid("ID de l'entreprise invalide"),

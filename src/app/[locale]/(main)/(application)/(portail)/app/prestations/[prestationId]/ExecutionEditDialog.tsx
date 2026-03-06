@@ -1,8 +1,8 @@
 "use client";
 
+import { RhfControlledSelect } from "@/components/rhf/RhfControlledSelect";
 import { RhfDatePicker } from "@/components/rhf/RhfDatePicker";
 import { RhfInput } from "@/components/rhf/RhfInput";
-import { modePilotageCT } from "@/constants/codeTables";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -29,8 +29,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
+import { modePilotageCT } from "@/constants/codeTables";
 import { updateExecutionAction } from "@/server/actions/clientServiceExecutionsActions";
-import type { ExecutionPrixItem, ExecutionWithPrix } from "@/server/queries/clientServiceExecutions.query";
+import type {
+  ExecutionPrixItem,
+  ExecutionWithPrix,
+} from "@/server/queries/clientServiceExecutions.query";
 import {
   type UpdateExecutionFormType,
   updateExecutionFormSchema,
@@ -40,7 +44,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect } from "react";
-import { useFieldArray, useForm, useFormState } from "react-hook-form";
+import { useFieldArray, useForm, useFormState, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
 type ExecutionEditDialogProps = {
@@ -52,7 +56,7 @@ type ExecutionEditDialogProps = {
   modeCommercial: ModeCommercialType;
   isPlateforme: boolean;
   onSuccess: (executions: ExecutionWithPrix[]) => void;
-}
+};
 
 const TYPE_PRIX_OPTIONS = [
   { value: "abonnement", label: "Abonnement (récurrent)" },
@@ -64,8 +68,7 @@ const TYPE_PRIX_OPTIONS = [
 const TYPE_PRIX_HELP: Record<string, string> = {
   abonnement:
     "Facturé à chaque période (semaine/mois/an), indépendamment du nombre d'interventions.",
-  par_occurrence:
-    "Facturé à chaque intervention réalisée.",
+  par_occurrence: "Facturé à chaque intervention réalisée.",
   installation:
     "Facturé une seule fois au démarrage (1ère intervention réalisée).",
   frais_livraison:
@@ -91,6 +94,7 @@ function emptyPrixItem() {
 
 function prixItemToForm(prix: ExecutionPrixItem) {
   return {
+    id: prix.id,
     typePrix: prix.typePrix,
     montantHt: (prix.montantHt / 100).toFixed(2),
     coutPrestataireHt:
@@ -158,17 +162,23 @@ export function ExecutionEditDialog({
       executionId: execution.id,
       prestationId,
       entrepriseId,
-      dateDebutValidite: format(new Date(execution.dateDebutValidite), "yyyy-MM-dd"),
+      dateDebutValidite: format(
+        new Date(execution.dateDebutValidite),
+        "yyyy-MM-dd",
+      ),
       dateFinValidite: execution.dateFinValidite
         ? format(new Date(execution.dateFinValidite), "yyyy-MM-dd")
         : "",
       priorite: String(execution.priorite),
       modePilotage: execution.modePilotage,
-      prix: activePrix.length > 0 ? activePrix.map(prixItemToForm) : [emptyPrixItem()],
+      prix:
+        activePrix.length > 0
+          ? activePrix.map(prixItemToForm)
+          : [emptyPrixItem()],
     },
   });
 
-  const { isSubmitting } = useFormState({ control: form.control });
+  const { isSubmitting, isDirty } = useFormState({ control: form.control });
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -182,19 +192,23 @@ export function ExecutionEditDialog({
       executionId: execution.id,
       prestationId,
       entrepriseId,
-      dateDebutValidite: format(new Date(execution.dateDebutValidite), "yyyy-MM-dd"),
+      dateDebutValidite: format(
+        new Date(execution.dateDebutValidite),
+        "yyyy-MM-dd",
+      ),
       dateFinValidite: execution.dateFinValidite
         ? format(new Date(execution.dateFinValidite), "yyyy-MM-dd")
         : "",
       priorite: String(execution.priorite),
       modePilotage: execution.modePilotage,
-      prix: activePrixForReset.length > 0
-        ? activePrixForReset.map(prixItemToForm)
-        : [emptyPrixItem()],
+      prix:
+        activePrixForReset.length > 0
+          ? activePrixForReset.map(prixItemToForm)
+          : [emptyPrixItem()],
     });
   }, [open, execution, prestationId, entrepriseId, form]);
 
-  const watchedPrix = form.watch("prix");
+  const watchedPrix = useWatch({ control: form.control, name: "prix" });
 
   function recalculateMontant(index: number, cout: string, marge: string) {
     const coutNum = Number(cout) || 0;
@@ -226,7 +240,8 @@ export function ExecutionEditDialog({
         <DialogHeader className="flex-shrink-0 px-6 pt-6 pb-4">
           <DialogTitle>Modifier l&apos;exécution</DialogTitle>
           <p className="text-muted-foreground text-sm">
-            Prestataire : <strong>{execution.prestataireNom ?? "Inconnu"}</strong>
+            Prestataire :{" "}
+            <strong>{execution.prestataireNom ?? "Inconnu"}</strong>
             <span className="ml-2 text-xs italic">
               (Pour changer de prestataire, créez une nouvelle exécution)
             </span>
@@ -241,36 +256,19 @@ export function ExecutionEditDialog({
             <div className="min-h-0 flex-1 overflow-y-auto px-6">
               <div className="space-y-5 py-2 pb-4">
                 {/* Mode de pilotage */}
-                <FormField
-                  control={form.control}
+                <RhfControlledSelect<UpdateExecutionFormType>
                   name="modePilotage"
-                  render={({ field: f }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Mode de pilotage{" "}
-                        <span className="text-destructive">*</span>
-                      </FormLabel>
-                      <Select value={f.value} onValueChange={f.onChange}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Sélectionnez un mode" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {modePilotageCT.map((m) => (
-                            <SelectItem key={m.code} value={m.code}>
-                              {m.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <p className="text-muted-foreground text-xs">
-                        Détermine qui pilote le workflow de cette exécution.
-                      </p>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  label="Mode de pilotage"
+                  requiredMark
+                  description="Détermine qui pilote le workflow de cette exécution."
+                  selectClassName="w-full"
+                >
+                  {modePilotageCT.map((m) => (
+                    <SelectItem key={m.code} value={m.code}>
+                      {m.name}
+                    </SelectItem>
+                  ))}
+                </RhfControlledSelect>
 
                 {/* Dates de validité */}
                 <div className="grid grid-cols-2 gap-4">
@@ -319,7 +317,8 @@ export function ExecutionEditDialog({
 
                   {fields.map((field, index) => {
                     const typePrix = watchedPrix?.[index]?.typePrix;
-                    const periodeFacturation = watchedPrix?.[index]?.periodeFacturation;
+                    const periodeFacturation =
+                      watchedPrix?.[index]?.periodeFacturation;
                     const isAbonnement = typePrix === "abonnement";
                     const montantLabel = getMontantLabel(
                       typePrix ?? "",
@@ -419,7 +418,9 @@ export function ExecutionEditDialog({
                                     placeholder="0.00"
                                     className="h-8"
                                     readOnly={showIntermediaire}
-                                    tabIndex={showIntermediaire ? -1 : undefined}
+                                    tabIndex={
+                                      showIntermediaire ? -1 : undefined
+                                    }
                                     {...f}
                                   />
                                 </FormControl>
@@ -452,7 +453,9 @@ export function ExecutionEditDialog({
                                         recalculateMontant(
                                           index,
                                           e.target.value,
-                                          form.getValues(`prix.${index}.margePourcent`) ?? "",
+                                          form.getValues(
+                                            `prix.${index}.margePourcent`,
+                                          ) ?? "",
                                         );
                                       }}
                                     />
@@ -483,7 +486,9 @@ export function ExecutionEditDialog({
                                         f.onChange(e);
                                         recalculateMontant(
                                           index,
-                                          form.getValues(`prix.${index}.coutPrestataireHt`) ?? "",
+                                          form.getValues(
+                                            `prix.${index}.coutPrestataireHt`,
+                                          ) ?? "",
                                           e.target.value,
                                         );
                                       }}
@@ -517,7 +522,10 @@ export function ExecutionEditDialog({
                                     </FormControl>
                                     <SelectContent>
                                       {PERIODE_OPTIONS.map((opt) => (
-                                        <SelectItem key={opt.value} value={opt.value}>
+                                        <SelectItem
+                                          key={opt.value}
+                                          value={opt.value}
+                                        >
                                           {opt.label}
                                         </SelectItem>
                                       ))}
@@ -547,7 +555,8 @@ export function ExecutionEditDialog({
                                         }}
                                       />
                                       <span className="text-xs">
-                                        Limiter les interventions incluses / période
+                                        Limiter les interventions incluses /
+                                        période
                                       </span>
                                     </label>
                                     {isLimited && (
@@ -598,7 +607,7 @@ export function ExecutionEditDialog({
               >
                 Annuler
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" disabled={isSubmitting || !isDirty}>
                 {isSubmitting && <Spinner />}
                 Enregistrer les modifications
               </Button>

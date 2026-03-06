@@ -35,7 +35,6 @@ import {
   addTachePieceJointeSchema,
   deleteAdHocTacheSchema,
   deleteTachePieceJointeSchema,
-  deployAssignationSchema,
   getAssignableUsersForOccurrenceSchema,
   getOccurrencesPageSchema,
   getOccurrenceTachesSchema,
@@ -1508,146 +1507,6 @@ export const updateOccurrenceAssigneeAction = actionClient
     return { occurrenceId, assigneeUserId };
   });
 
-// ==================== DEPLOY ASSIGNATION (BULK) ====================
-
-export const deployAssignationAction = actionClient
-  .metadata({ actionName: "deployAssignationAction" })
-  .inputSchema(deployAssignationSchema, {
-    handleValidationErrorsShape: async (ve) =>
-      flattenValidationErrors(ve).fieldErrors,
-  })
-  .action(async ({ parsedInput }) => {
-    const session = await getSession();
-    const currentUser = session?.user;
-    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
-
-    const { executionId, assigneeUserId, applyToTaches, dateFrom, dateTo } =
-      parsedInput;
-
-    // Charger l'exécution pour récupérer siteId + prestataireEntrepriseId
-    const [executionRow] = await db
-      .select({
-        siteId: clientServiceExecutions.siteId,
-        serviceEntrepriseId: clientServiceExecutions.serviceEntrepriseId,
-      })
-      .from(clientServiceExecutions)
-      .where(eq(clientServiceExecutions.id, executionId))
-      .limit(1);
-
-    if (!executionRow) throw errors.notFound("Exécution");
-
-    // Récupérer le prestataireEntrepriseId via serviceEntreprises
-    let prestataireEntrepriseId: string | null = null;
-    if (executionRow.serviceEntrepriseId) {
-      const [seRow] = await db
-        .select({ entrepriseId: serviceEntreprises.entrepriseId })
-        .from(serviceEntreprises)
-        .where(eq(serviceEntreprises.id, executionRow.serviceEntrepriseId))
-        .limit(1);
-      prestataireEntrepriseId = seRow?.entrepriseId ?? null;
-    }
-
-    if (!prestataireEntrepriseId) {
-      throw errors.conflict("Cette exécution n'a pas de prestataire associé.");
-    }
-
-    const { siteId } = executionRow;
-
-    // Permission : responsable_site du prestataire OU plateforme
-    const canManage = await canManagePrestation(
-      currentUser.id,
-      prestataireEntrepriseId,
-      siteId,
-    );
-    if (!canManage) {
-      throw errors.forbidden(
-        "Seuls les responsables du prestataire peuvent déployer une assignation.",
-      );
-    }
-
-    // Garde : l'assigné doit appartenir à l'entreprise prestataire
-    if (assigneeUserId !== null) {
-      const assigneeAdhesion = await getUserClientAdhesion({
-        userId: assigneeUserId,
-        entrepriseId: prestataireEntrepriseId,
-      });
-      if (!assigneeAdhesion) {
-        throw errors.forbidden(
-          "Cet utilisateur n'appartient pas au prestataire.",
-        );
-      }
-    }
-
-    const now = new Date();
-    const from = dateFrom ? new Date(dateFrom) : now;
-    const to = dateTo
-      ? new Date(dateTo)
-      : new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
-
-    // Récupérer les occurrences ciblées (planifiée ou en_cours dans la fenêtre)
-    const targetOccurrences = await db
-      .select({ id: clientServiceOccurrences.id })
-      .from(clientServiceOccurrences)
-      .where(
-        and(
-          eq(clientServiceOccurrences.executionId, executionId),
-          or(
-            eq(clientServiceOccurrences.statut, "planifiee"),
-            eq(clientServiceOccurrences.statut, "en_cours"),
-          ),
-          gte(clientServiceOccurrences.dateDebutPrevue, from),
-          lte(clientServiceOccurrences.dateDebutPrevue, to),
-        ),
-      );
-
-    if (targetOccurrences.length === 0) {
-      return { updatedOccurrencesCount: 0, updatedTachesCount: 0 };
-    }
-
-    const occurrenceIds = targetOccurrences.map((o) => o.id);
-
-    let updatedTachesCount = 0;
-
-    await db.transaction(async (tx) => {
-      // 1. Mettre à jour toutes les occurrences
-      await tx
-        .update(clientServiceOccurrences)
-        .set({
-          assigneeUserId,
-          updatedById: currentUser.id,
-          updatedAt: new Date(),
-        })
-        .where(inArray(clientServiceOccurrences.id, occurrenceIds));
-
-      // 2. Si demandé, propager aux tâches non terminées de ces occurrences
-      if (applyToTaches) {
-        const result = await tx
-          .update(occurrenceTaches)
-          .set({
-            assigneeUserId,
-            updatedById: currentUser.id,
-            updatedAt: new Date(),
-          })
-          .where(
-            and(
-              inArray(occurrenceTaches.occurrenceId, occurrenceIds),
-              or(
-                eq(occurrenceTaches.statut, "a_faire"),
-                eq(occurrenceTaches.statut, "en_cours"),
-              ),
-            ),
-          )
-          .returning({ id: occurrenceTaches.id });
-        updatedTachesCount = result.length;
-      }
-    });
-
-    return {
-      updatedOccurrencesCount: occurrenceIds.length,
-      updatedTachesCount,
-    };
-  });
-
 // ==================== INSERT OCCURRENCE ON-DEMAND ====================
 
 export const insertOccurrenceOnDemandAction = actionClient
@@ -1692,13 +1551,19 @@ export const insertOccurrenceOnDemandAction = actionClient
     const dateDebut = new Date(dateDebutPrevue);
     const dateFin = dateFinPrevue ? new Date(dateFinPrevue) : null;
 
-    // 4. Trouver l'exécution applicable (peut être null si aucune active)
+    // 4. Trouver l'exécution applicable — obligatoire pour créer une occurrence
     const executionId = await pickExecutionForOccurrence({
       clientServiceId: prestationId,
       entrepriseId,
       siteId: prestation.siteId,
       targetDate: dateDebut,
     });
+
+    if (executionId === null) {
+      throw errors.conflict(
+        "Aucune exécution active ne couvre cette date. Ajoutez un prestataire avant de créer une intervention.",
+      );
+    }
 
     // 5. Insérer l'occurrence (+ snapshot tâches si template) dans une transaction
     const occurrence = await db.transaction(async (tx) => {
@@ -1719,12 +1584,20 @@ export const insertOccurrenceOnDemandAction = actionClient
 
       if (!inserted) throw errors.internal("Échec de la création du passage.");
 
-      if (prestation.tacheListeTemplateId) {
-        await snapshotOccurrenceTaches({
-          occurrenceId: inserted.id,
-          tacheListeTemplateId: prestation.tacheListeTemplateId,
-          tx,
-        });
+      // Snapshot des tâches depuis la checklist de l'exécution (si définie)
+      if (executionId) {
+        const [exec] = await tx
+          .select({ tacheListeTemplateId: clientServiceExecutions.tacheListeTemplateId })
+          .from(clientServiceExecutions)
+          .where(eq(clientServiceExecutions.id, executionId))
+          .limit(1);
+        if (exec?.tacheListeTemplateId) {
+          await snapshotOccurrenceTaches({
+            occurrenceId: inserted.id,
+            tacheListeTemplateId: exec.tacheListeTemplateId,
+            tx,
+          });
+        }
       }
 
       return inserted;

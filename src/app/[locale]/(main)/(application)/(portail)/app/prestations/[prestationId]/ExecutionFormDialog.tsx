@@ -34,7 +34,6 @@ import {
   getPrestatairesForServiceAction,
   insertExecutionWithPrixAction,
 } from "@/server/actions/clientServiceExecutionsActions";
-import { getAssignableUsersForOccurrenceAction } from "@/server/actions/clientServiceOccurrencesActions";
 import type { ExecutionWithPrix } from "@/server/queries/clientServiceExecutions.query";
 import { useAppStore } from "@/stores/application/appStore";
 import {
@@ -45,7 +44,7 @@ import type { ModeCommercialType } from "@/zod-schemas/clientServices.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useFieldArray, useForm, useFormState } from "react-hook-form";
+import { useFieldArray, useForm, useFormState, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
 type ExecutionFormDialogProps = {
@@ -143,10 +142,6 @@ export function ExecutionFormDialog({
 }: ExecutionFormDialogProps) {
   const [prestataires, setPrestataires] = useState<PrestatairItem[]>([]);
   const [loadingPrestataires, setLoadingPrestataires] = useState(false);
-  const [assignableUsers, setAssignableUsers] = useState<
-    Array<{ id: string; prenom: string; nom: string }>
-  >([]);
-  const [loadingAssignees, setLoadingAssignees] = useState(false);
 
   // Mode intermédiaire : uniquement plateforme + modeCommercial=intermediaire_fm4all
   const showIntermediaire =
@@ -168,7 +163,6 @@ export function ExecutionFormDialog({
       dateFinValidite: "",
       priorite: "0",
       modePilotage: defaultModePilotage,
-      assigneeUserIdDefault: "",
       prix: [emptyPrixItem()],
     },
   });
@@ -192,10 +186,8 @@ export function ExecutionFormDialog({
       dateFinValidite: "",
       priorite: "0",
       modePilotage: defaultModePilotage,
-      assigneeUserIdDefault: "",
       prix: [emptyPrixItem()],
     });
-    setAssignableUsers([]);
 
     async function loadPrestataires() {
       setLoadingPrestataires(true);
@@ -205,7 +197,12 @@ export function ExecutionFormDialog({
         modeCommercial,
       });
       if (result?.data?.prestataires) {
-        setPrestataires(result.data.prestataires);
+        const list = result.data.prestataires;
+        setPrestataires(list);
+        // En posture prestataire, auto-sélectionner le seul prestataire disponible
+        if (postureActive === "prestataire" && list.length === 1) {
+          form.setValue("serviceEntrepriseId", list[0]!.serviceEntrepriseId);
+        }
       }
       setLoadingPrestataires(false);
     }
@@ -218,6 +215,8 @@ export function ExecutionFormDialog({
     prestationId,
     siteId,
     modeCommercial,
+    postureActive,
+    defaultModePilotage,
     form,
   ]);
 
@@ -236,36 +235,7 @@ export function ExecutionFormDialog({
     }
   };
 
-  const watchedPrix = form.watch("prix");
-  const watchedServiceEntrepriseId = form.watch("serviceEntrepriseId");
-
-  // Load assignable users when prestataire changes
-  useEffect(() => {
-    const selectedPrestataire = prestataires.find(
-      (p) => p.serviceEntrepriseId === watchedServiceEntrepriseId,
-    );
-    const prestataireEntrepriseId = selectedPrestataire?.entrepriseId;
-
-    if (!prestataireEntrepriseId) {
-      setAssignableUsers([]);
-      form.setValue("assigneeUserIdDefault", "");
-      return;
-    }
-
-    setLoadingAssignees(true);
-    getAssignableUsersForOccurrenceAction({
-      entrepriseId: prestataireEntrepriseId,
-    })
-      .then((result) => {
-        if (result?.data?.users) {
-          setAssignableUsers(result.data.users);
-        } else {
-          setAssignableUsers([]);
-        }
-      })
-      .finally(() => setLoadingAssignees(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watchedServiceEntrepriseId, prestataires]);
+  const watchedPrix = useWatch({ control: form.control, name: "prix" });
 
   function recalculateMontant(index: number, cout: string, marge: string) {
     const coutNum = Number(cout) || 0;
@@ -291,32 +261,33 @@ export function ExecutionFormDialog({
             <div className="min-h-0 flex-1 overflow-y-auto px-6">
               <div className="space-y-5 py-2 pb-4">
                 {/* ── SECTION PRESTATAIRE ── */}
-                <div className="space-y-3">
-                  {/* Select prestataires existants */}
-                  <RhfControlledSelect<InsertExecutionFormType>
-                    name="serviceEntrepriseId"
-                    label="Prestataire"
-                    requiredMark
-                    disabled={loadingPrestataires || prestataires.length === 0}
-                    placeholder={
-                      loadingPrestataires
-                        ? "Chargement..."
-                        : prestataires.length === 0
-                          ? "Aucun prestataire disponible"
-                          : "Sélectionnez un prestataire"
-                    }
-                    selectClassName="w-full"
-                  >
-                    {prestataires.map((p) => (
-                      <SelectItem
-                        key={p.serviceEntrepriseId}
-                        value={p.serviceEntrepriseId}
-                      >
-                        {p.nom}
-                      </SelectItem>
-                    ))}
-                  </RhfControlledSelect>
-                </div>
+                {postureActive !== "prestataire" && (
+                  <div className="space-y-3">
+                    <RhfControlledSelect<InsertExecutionFormType>
+                      name="serviceEntrepriseId"
+                      label="Prestataire"
+                      requiredMark
+                      disabled={loadingPrestataires || prestataires.length === 0}
+                      placeholder={
+                        loadingPrestataires
+                          ? "Chargement..."
+                          : prestataires.length === 0
+                            ? "Aucun prestataire disponible"
+                            : "Sélectionnez un prestataire"
+                      }
+                      selectClassName="w-full"
+                    >
+                      {prestataires.map((p) => (
+                        <SelectItem
+                          key={p.serviceEntrepriseId}
+                          value={p.serviceEntrepriseId}
+                        >
+                          {p.nom}
+                        </SelectItem>
+                      ))}
+                    </RhfControlledSelect>
+                  </div>
+                )}
 
                 {/* Mode de pilotage */}
                 <RhfControlledSelect<InsertExecutionFormType>
@@ -325,6 +296,7 @@ export function ExecutionFormDialog({
                   requiredMark
                   placeholder="Sélectionnez un mode"
                   description="Détermine qui pilote le workflow de cette exécution."
+                  selectClassName="w-full"
                 >
                   {modePilotageCT.map((m) => (
                     <SelectItem key={m.code} value={m.code}>
@@ -361,39 +333,11 @@ export function ExecutionFormDialog({
                   description="Plus grand = prioritaire. 0 = global, 10 = bâtiment, 20 = zone."
                 />
 
-                {/* Intervenant par défaut */}
-                {watchedServiceEntrepriseId && (
-                  <RhfControlledSelect<InsertExecutionFormType>
-                    name="assigneeUserIdDefault"
-                    label="Intervenant par défaut (optionnel)"
-                    disabled={loadingAssignees}
-                    placeholder={
-                      loadingAssignees
-                        ? "Chargement..."
-                        : assignableUsers.length === 0
-                          ? "Aucun utilisateur disponible"
-                          : "Sélectionnez un intervenant"
-                    }
-                    description="Propagé automatiquement aux nouvelles interventions générées."
-                  >
-                    <SelectItem value="">
-                      <span className="text-muted-foreground italic">
-                        Aucun (à assigner manuellement)
-                      </span>
-                    </SelectItem>
-                    {assignableUsers.map((u) => (
-                      <SelectItem key={u.id} value={u.id}>
-                        {u.prenom} {u.nom}
-                      </SelectItem>
-                    ))}
-                  </RhfControlledSelect>
-                )}
-
                 {/* Tarifs */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <FormLabel>
-                      Tarifs <span className="text-destructive">*</span>
+                      Tarifs <span>*</span>
                     </FormLabel>
                     <Button
                       type="button"
@@ -607,7 +551,7 @@ export function ExecutionFormDialog({
                                     onValueChange={f.onChange}
                                   >
                                     <FormControl>
-                                      <SelectTrigger className="h-8">
+                                      <SelectTrigger className="h-8 w-full">
                                         <SelectValue placeholder="Choisir" />
                                       </SelectTrigger>
                                     </FormControl>

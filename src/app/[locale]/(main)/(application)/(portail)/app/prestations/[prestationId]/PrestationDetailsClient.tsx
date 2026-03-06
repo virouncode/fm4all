@@ -14,6 +14,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -31,7 +36,6 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useIntersection from "@/hooks/use-intersection";
 import { Link, useRouter } from "@/i18n/navigation";
-import { cn } from "@/lib/utils";
 import {
   deleteExecutionAction,
   toggleExecutionActifAction,
@@ -41,12 +45,11 @@ import {
   deletePrestationAction,
   updatePrestationStatutAction,
 } from "@/server/actions/clientServicesActions";
-import { getTacheListeTemplateAction } from "@/server/actions/tacheListesTemplatesActions";
 import {
+  type ExecutionChecklistItem,
   type ExecutionWithPrix,
   type OccurrenceListItem,
 } from "@/server/queries/clientServiceExecutions.query";
-import type { TacheListeTemplateWithItems } from "@/server/queries/tacheListesTemplates.query";
 import {
   type ClientServiceStatutType,
   type PrestationListItem,
@@ -58,26 +61,34 @@ import {
   ArrowUpAZ,
   Building,
   Calendar,
+  CalendarCheck,
   CalendarDays,
-  CheckCircle2,
-  ClipboardList,
+  CalendarPlus,
+  CalendarX,
+  ChevronDown,
+  ChevronRight,
   Clock,
   Filter,
+  HandPlatter,
   Info,
+  ListChecks,
   Loader2,
+  type LucideIcon,
   MapPin,
   Pencil,
+  PencilLine,
   Plus,
   Power,
+  Repeat,
   RotateCcw,
-  Send,
   Settings,
+  Tag,
+  Timer,
   Trash2,
-  User,
-  XCircle,
+  TriangleAlert,
   Zap,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { PrestationFormDialog } from "../PrestationFormDialog";
 import {
@@ -89,7 +100,6 @@ import {
   getModePlanningBadge,
   getPrestationStatutBadge,
 } from "../helpers";
-import { DeployAssignationDialog } from "./DeployAssignationDialog";
 import { ExecutionEditDialog } from "./ExecutionEditDialog";
 import { ExecutionFormDialog } from "./ExecutionFormDialog";
 import { OccurrenceOnDemandDialog } from "./OccurrenceOnDemandDialog";
@@ -99,7 +109,6 @@ import { TacheListePickerDialog } from "./TacheListePickerDialog";
 type PrestationDetailsClientProps = {
   prestation: PrestationListItem;
   canManage: boolean;
-  canManageChecklist: boolean;
   isPlateforme: boolean;
   executions: ExecutionWithPrix[];
   occurrences: OccurrenceListItem[];
@@ -119,27 +128,9 @@ const JOUR_LABELS: Record<number, string> = {
   7: "Dimanche",
 };
 
-const STATUT_TRANSITIONS: Record<
-  ClientServiceStatutType,
-  readonly ClientServiceStatutType[]
-> = {
-  brouillon: ["actif"],
-  actif: ["en_pause", "termine"],
-  en_pause: ["actif", "termine"],
-  termine: [],
-};
-
-const STATUT_LABELS: Record<ClientServiceStatutType, string> = {
-  brouillon: "Brouillon",
-  actif: "Actif",
-  en_pause: "En pause",
-  termine: "Terminé",
-};
-
 export function PrestationDetailsClient({
   prestation,
   canManage,
-  canManageChecklist,
   isPlateforme,
   executions: initialExecutions,
   occurrences,
@@ -157,6 +148,29 @@ export function PrestationDetailsClient({
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isUpdatingStatut, setIsUpdatingStatut] = useState(false);
+  const [confirmActivateOpen, setConfirmActivateOpen] = useState(false);
+
+  const hasActiveExecution = executions.some(
+    (e) => e.actif && e.prix.some((p) => p.actif),
+  );
+
+  const doStatutTransition = async (newStatut: ClientServiceStatutType) => {
+    setIsUpdatingStatut(true);
+    const result = await updatePrestationStatutAction({
+      prestationId: prestation.id,
+      entrepriseId: prestation.entrepriseId,
+      statut: newStatut,
+    });
+    setIsUpdatingStatut(false);
+    setConfirmActivateOpen(false);
+    if (result?.serverError) {
+      toast.error(result.serverError.message);
+    } else if (result?.data) {
+      toast.success(result.data.message);
+      router.refresh();
+    }
+  };
 
   const frequenceLabel = getFrequenceLabel(
     prestation.frequence,
@@ -228,6 +242,190 @@ export function PrestationDetailsClient({
 
       <Separator className="my-6 flex-shrink-0" />
 
+      {/* ==================== STATUT ==================== */}
+      <div className="mb-4 flex-shrink-0">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          {/* Badges */}
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge
+              className={getPrestationStatutBadge(prestation.statut).className}
+            >
+              {getPrestationStatutBadge(prestation.statut).label}
+            </Badge>
+            <Badge
+              className={
+                getModePlanningBadge(prestation.modePlanning).className
+              }
+            >
+              {getModePlanningBadge(prestation.modePlanning).label}
+            </Badge>
+            <Badge
+              className={
+                getModeCommercialBadge(prestation.modeCommercial).className
+              }
+            >
+              {getModeCommercialBadge(prestation.modeCommercial).label}
+            </Badge>
+          </div>
+
+          {/* CTA selon statut */}
+          {canManage && prestation.statut === "brouillon" && (
+            <Button
+              onClick={() => setConfirmActivateOpen(true)}
+              disabled={isUpdatingStatut || !hasActiveExecution}
+              className="gap-2"
+              size="sm"
+            >
+              {isUpdatingStatut ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Power className="h-4 w-4" />
+              )}
+              Activer la prestation
+            </Button>
+          )}
+          {canManage && prestation.statut === "actif" && (
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => doStatutTransition("en_pause")}
+                disabled={isUpdatingStatut}
+              >
+                {isUpdatingStatut ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  "Mettre en pause"
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => doStatutTransition("termine")}
+                disabled={isUpdatingStatut}
+              >
+                Terminer
+              </Button>
+            </div>
+          )}
+          {canManage && prestation.statut === "en_pause" && (
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                onClick={() => doStatutTransition("actif")}
+                disabled={isUpdatingStatut}
+              >
+                {isUpdatingStatut ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  "Reprendre"
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => doStatutTransition("termine")}
+                disabled={isUpdatingStatut}
+              >
+                Terminer
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {/* Disclaimer contextuel — encart amber */}
+        <div className="mt-3 flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
+          <TriangleAlert className="mt-0.5 h-4 w-4 flex-shrink-0" />
+          <p>
+            {prestation.statut === "brouillon" &&
+              (canManage
+                ? hasActiveExecution
+                  ? "Aucune intervention ne sera planifiée tant que la prestation est en brouillon. Vous pouvez l'activer dès maintenant."
+                  : executions.length === 0
+                    ? "Aucune intervention ne sera planifiée tant que la prestation est en brouillon. Définissez d'abord une exécution dans l'onglet « Exécution & Tarifs », puis activez la prestation."
+                    : "Aucune intervention ne sera planifiée tant que la prestation est en brouillon. Activez d'abord une exécution dans l'onglet « Exécution & Tarifs », puis activez la prestation."
+                : "Aucune intervention ne sera planifiée tant que la prestation est en brouillon. Contactez un administrateur pour l'activer.")}
+            {prestation.statut === "actif" &&
+              "Cette prestation est active. Les interventions sont planifiées selon la fréquence configurée."}
+            {prestation.statut === "en_pause" &&
+              "Cette prestation est en pause. Aucune nouvelle intervention ne sera générée jusqu'à la reprise."}
+            {prestation.statut === "termine" &&
+              "Cette prestation est terminée. Aucune nouvelle intervention ne peut être générée."}
+          </p>
+        </div>
+      </div>
+
+      {/* AlertDialog confirmation activation */}
+      <AlertDialog
+        open={confirmActivateOpen}
+        onOpenChange={setConfirmActivateOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Activer la prestation ?</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3 text-sm">
+                {prestation.modePlanning === "planifie" && (
+                  <p>
+                    Les interventions seront générées automatiquement pour les{" "}
+                    <strong>90 prochains jours</strong> selon la fréquence
+                    configurée.
+                  </p>
+                )}
+                {prestation.modePlanning === "planifie" &&
+                  !hasActiveExecution && (
+                    <div className="rounded-md border border-orange-200 bg-orange-50 px-3 py-2">
+                      <p className="font-medium text-orange-800">
+                        Aucun prestataire actif configuré
+                      </p>
+                      <p className="mt-0.5 text-orange-700">
+                        Les interventions seront créées avec le statut{" "}
+                        <strong>À attribuer</strong>. Vous pourrez ajouter un
+                        prestataire dans l&apos;onglet &quot;Exécution &amp;
+                        Tarifs&quot; pour les assigner automatiquement.
+                      </p>
+                    </div>
+                  )}
+                {prestation.modePlanning === "planifie" &&
+                  hasActiveExecution && (
+                    <div className="rounded-md border border-green-200 bg-green-50 px-3 py-2">
+                      <p className="font-medium text-green-800">
+                        Prestataire actif configuré
+                      </p>
+                      <p className="mt-0.5 text-green-700">
+                        Les interventions seront assignées automatiquement au
+                        prestataire prioritaire.
+                      </p>
+                    </div>
+                  )}
+                <p className="text-muted-foreground text-xs">
+                  Une prestation activée ne peut pas revenir en brouillon. Pour
+                  suspendre, utilisez &quot;Mettre en pause&quot;.
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isUpdatingStatut}>
+              Annuler
+            </AlertDialogCancel>
+            <Button
+              onClick={() => doStatutTransition("actif")}
+              disabled={isUpdatingStatut}
+            >
+              {isUpdatingStatut ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Activation en cours...
+                </>
+              ) : (
+                "Activer"
+              )}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* ==================== TABS ==================== */}
       <Tabs
         value={activeTab}
@@ -276,130 +474,169 @@ export function PrestationDetailsClient({
           value="parametres"
           className="mt-6 min-h-0 flex-1 space-y-4 overflow-y-auto pb-6"
         >
-          {/* Badges statut + mode */}
-          <div className="flex flex-wrap items-center gap-2">
-            {canManage ? (
-              <EditablePrestationStatutBadge
-                prestation={prestation}
-                executions={executions}
-                onUpdate={() => router.refresh()}
-              />
-            ) : (
-              <Badge
-                className={
-                  getPrestationStatutBadge(prestation.statut).className
-                }
-              >
-                {getPrestationStatutBadge(prestation.statut).label}
-              </Badge>
-            )}
-            <Badge
-              className={
-                getModePlanningBadge(prestation.modePlanning).className
-              }
-            >
-              {getModePlanningBadge(prestation.modePlanning).label}
-            </Badge>
-            <Badge
-              className={
-                getModeCommercialBadge(prestation.modeCommercial).className
-              }
-            >
-              {getModeCommercialBadge(prestation.modeCommercial).label}
-            </Badge>
-          </div>
+          {/* Disclaimer paramètres */}
+          <Collapsible defaultOpen>
+            <div className="bg-muted/40 flex items-start gap-3 rounded-lg border p-4">
+              <Info className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" />
+              <div className="text-muted-foreground w-full space-y-2 text-xs">
+                <CollapsibleTrigger className="group flex w-full cursor-pointer items-center justify-between">
+                  <p className="text-foreground font-medium">
+                    Impact des modifications sur les données
+                  </p>
+                  <ChevronDown className="text-muted-foreground h-3.5 w-3.5 shrink-0 transition-transform group-data-[state=open]:rotate-180" />
+                </CollapsibleTrigger>
 
-          {/* Checklist prêt à exécuter (uniquement pour mode planifié) */}
-          {prestation.modePlanning === "planifie" && (
-            <ReadinessCard prestation={prestation} executions={executions} />
-          )}
+                <CollapsibleContent>
+                  <div className="space-y-2">
+                    <div className="space-y-1">
+                      <p className="text-foreground font-medium text-[11px] uppercase tracking-wide">
+                        Activer la prestation
+                      </p>
+                      <p>
+                        <strong>Mode Planifié</strong> — Déclenche la
+                        génération des interventions via une{" "}
+                        <strong>fenêtre glissante</strong> : le système crée
+                        automatiquement les interventions à venir jusqu&apos;à
+                        un horizon configurable (ex. 8 semaines), puis continue
+                        à en générer de nouvelles au fil du temps. Les
+                        interventions sont attribuées à l&apos;exécution active
+                        du moment. Sans exécution active, aucune intervention
+                        n&apos;est générée.
+                      </p>
+                      <p>
+                        <strong>Mode À la demande</strong> — Aucune
+                        intervention n&apos;est générée automatiquement. Les
+                        interventions sont créées manuellement au cas par cas.
+                        Dans les deux modes, une{" "}
+                        <strong>exécution active est obligatoire</strong> pour
+                        créer une intervention : sans prestataire couvrant la
+                        date visée, la création est bloquée.
+                      </p>
+                    </div>
 
-          {/* Checklist par défaut */}
-          <ChecklistDefaultCard
-            prestation={prestation}
-            canManage={canManageChecklist}
-            isPlateforme={isPlateforme}
-          />
+                    <div className="space-y-1">
+                      <p className="text-foreground font-medium text-[11px] uppercase tracking-wide">
+                        Modifier la configuration (fréquence, dates,
+                        planification)
+                      </p>
+                      <p>
+                        Les interventions{" "}
+                        <strong>à venir non encore démarrées</strong> sont
+                        supprimées et régénérées automatiquement avec les
+                        nouveaux paramètres. Tout ce qui est déjà réalisé, en
+                        cours ou annulé est <strong>conservé intact</strong>.
+                      </p>
+                    </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            {/* Fréquence & Planning */}
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2 text-base font-medium">
-                    <CalendarDays className="text-primary h-4 w-4" />
-                    Planification
-                  </CardTitle>
-                  {canManage && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setEditDialogOpen(true)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                      Modifier
-                    </Button>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm">
-                <InfoRow label="Fréquence" value={frequenceLabel} />
-                {prestation.joursPreference &&
-                  prestation.joursPreference.length > 0 && (
-                    <InfoRow
-                      label="Jours préférés"
-                      value={prestation.joursPreference
-                        .map((j) => JOUR_LABELS[j] ?? `Jour ${j}`)
-                        .join(", ")}
-                    />
-                  )}
-                {prestation.heureDebutPreference && (
-                  <InfoRow
-                    label="Heure de début"
-                    value={prestation.heureDebutPreference}
-                  />
-                )}
-                {prestation.dureeEstimeeMinutes && (
-                  <InfoRow
-                    label="Durée estimée"
-                    value={formatDuree(prestation.dureeEstimeeMinutes)}
-                  />
-                )}
-              </CardContent>
-            </Card>
+                    <div className="space-y-1">
+                      <p className="text-foreground font-medium text-[11px] uppercase tracking-wide">
+                        Mettre en pause
+                      </p>
+                      <p>
+                        Les interventions{" "}
+                        <strong>à venir non encore démarrées</strong> sont{" "}
+                        <strong>supprimées définitivement</strong> — pas
+                        annulées, vraiment effacées. À la reprise, de nouvelles
+                        interventions sont régénérées. L&apos;historique passé
+                        est conservé.
+                      </p>
+                    </div>
 
-            {/* Dates */}
-            <Card>
-              <CardHeader className="pb-3">
+                    <div className="space-y-1">
+                      <p className="text-foreground font-medium text-[11px] uppercase tracking-wide">
+                        Terminer la prestation
+                      </p>
+                      <p>
+                        Les interventions{" "}
+                        <strong>à venir non encore démarrées</strong> passent en{" "}
+                        <strong>annulée</strong> — elles restent visibles dans
+                        l&apos;historique. Tout le passé est conservé
+                        intégralement.
+                      </p>
+                    </div>
+                  </div>
+                </CollapsibleContent>
+              </div>
+            </div>
+          </Collapsible>
+
+          {/* Planification + Période — carte unifiée */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2 text-base font-medium">
-                  <Calendar className="text-primary h-4 w-4" />
-                  Période
+                  <HandPlatter className="text-primary h-4 w-4" />
+                  Prestation
                 </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm">
+                {canManage && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setEditDialogOpen(true)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                    Modifier
+                  </Button>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent className="grid gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
+              <InfoRow
+                icon={Tag}
+                label="Service"
+                value={prestation.serviceNom}
+              />
+              <InfoRow icon={Repeat} label="Fréquence" value={frequenceLabel} />
+              <InfoRow
+                icon={CalendarCheck}
+                label="Date de début"
+                value={formatDate(prestation.dateDebut)}
+              />
+              {prestation.joursPreference &&
+                prestation.joursPreference.length > 0 && (
+                  <InfoRow
+                    icon={CalendarDays}
+                    label="Jours préférés"
+                    value={prestation.joursPreference
+                      .map((j) => JOUR_LABELS[j] ?? `Jour ${j}`)
+                      .join(", ")}
+                  />
+                )}
+              <InfoRow
+                icon={CalendarX}
+                label="Date de fin"
+                value={
+                  prestation.dateFin
+                    ? formatDate(prestation.dateFin)
+                    : "∞ Sans échéance"
+                }
+              />
+              {prestation.heureDebutPreference && (
                 <InfoRow
-                  label="Date de début"
-                  value={formatDate(prestation.dateDebut)}
+                  icon={Clock}
+                  label="Heure de début"
+                  value={prestation.heureDebutPreference}
                 />
+              )}
+              <InfoRow
+                icon={CalendarPlus}
+                label="Créée le"
+                value={formatDate(prestation.createdAt)}
+              />
+              {prestation.dureeEstimeeMinutes && (
                 <InfoRow
-                  label="Date de fin"
-                  value={
-                    prestation.dateFin
-                      ? formatDate(prestation.dateFin)
-                      : "∞ Sans échéance"
-                  }
+                  icon={Timer}
+                  label="Durée estimée"
+                  value={formatDuree(prestation.dureeEstimeeMinutes)}
                 />
-                <InfoRow
-                  label="Créée le"
-                  value={formatDate(prestation.createdAt)}
-                />
-                <InfoRow
-                  label="Modifiée le"
-                  value={formatDate(prestation.updatedAt)}
-                />
-              </CardContent>
-            </Card>
-          </div>
+              )}
+              <InfoRow
+                icon={PencilLine}
+                label="Modifiée le"
+                value={formatDate(prestation.updatedAt)}
+              />
+            </CardContent>
+          </Card>
 
           {/* Notes */}
           {prestation.notes && (
@@ -424,10 +661,21 @@ export function PrestationDetailsClient({
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex items-center justify-between gap-4">
-                <p className="text-muted-foreground text-sm">
-                  Supprime définitivement cette prestation et toutes ses
-                  données. Action irréversible.
-                </p>
+                <div className="space-y-1 text-sm">
+                  <p className="text-muted-foreground">
+                    Supprime définitivement la prestation et{" "}
+                    <strong>toutes ses données sans exception</strong> :
+                    configuration, planification, prestataires configurés,
+                    tarifs, et toutes les interventions générées (même
+                    passées).
+                  </p>
+                  <p className="text-muted-foreground text-xs">
+                    Cette action est réservée aux prestations créées par
+                    erreur. Si des interventions ont déjà été réalisées et
+                    comptabilisées, supprimer la prestation efface
+                    définitivement cet historique financier. Irréversible.
+                  </p>
+                </div>
                 <Button
                   variant="destructive"
                   size="sm"
@@ -508,168 +756,23 @@ export function PrestationDetailsClient({
   );
 }
 
-// ==================== EDITABLE STATUT BADGE ====================
-
-function EditablePrestationStatutBadge({
-  prestation,
-  executions,
-  onUpdate,
-}: {
-  prestation: PrestationListItem;
-  executions: ExecutionWithPrix[];
-  onUpdate: () => void;
-}) {
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [confirmActivateOpen, setConfirmActivateOpen] = useState(false);
-  const badge = getPrestationStatutBadge(prestation.statut);
-  const transitions = STATUT_TRANSITIONS[prestation.statut] ?? [];
-
-  const hasActiveExecution = executions.some(
-    (e) => e.actif && e.prix.some((p) => p.actif),
-  );
-
-  const doTransition = async (newStatut: ClientServiceStatutType) => {
-    setIsUpdating(true);
-    const result = await updatePrestationStatutAction({
-      prestationId: prestation.id,
-      entrepriseId: prestation.entrepriseId,
-      statut: newStatut,
-    });
-    setIsUpdating(false);
-    setConfirmActivateOpen(false);
-    if (result?.serverError) {
-      toast.error(result.serverError.message);
-    } else if (result?.data) {
-      toast.success(result.data.message);
-      onUpdate();
-    }
-  };
-
-  const handleChange = async (newStatut: string) => {
-    if (newStatut === prestation.statut) return;
-    // Intercept brouillon → actif : demander confirmation
-    if (prestation.statut === "brouillon" && newStatut === "actif") {
-      setConfirmActivateOpen(true);
-      return;
-    }
-    await doTransition(newStatut as ClientServiceStatutType);
-  };
-
-  // Statut terminal : badge statique
-  if (transitions.length === 0) {
-    return <Badge className={badge.className}>{badge.label}</Badge>;
-  }
-
-  const availableStatuts: ClientServiceStatutType[] = [
-    prestation.statut,
-    ...transitions,
-  ];
-
-  return (
-    <>
-      {isUpdating ? (
-        <Badge className={cn(badge.className, "gap-1.5")}>
-          <Loader2 className="h-3 w-3 animate-spin" />
-          {badge.label}
-        </Badge>
-      ) : (
-        <Select value={prestation.statut} onValueChange={handleChange}>
-          <SelectTrigger
-            className={cn(
-              "inline-flex !h-auto w-fit items-center gap-1 rounded-md border-0 !px-2 !py-0.5 text-xs font-medium whitespace-nowrap transition-opacity hover:opacity-80 [&>svg]:pointer-events-none",
-              badge.className,
-            )}
-          >
-            <span>{badge.label}</span>
-          </SelectTrigger>
-          <SelectContent>
-            {availableStatuts.map((s) => (
-              <SelectItem key={s} value={s}>
-                {STATUT_LABELS[s]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      )}
-
-      {/* Confirm dialog : brouillon → actif */}
-      <AlertDialog
-        open={confirmActivateOpen}
-        onOpenChange={setConfirmActivateOpen}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Activer la prestation ?</AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <div className="space-y-3 text-sm">
-                {prestation.modePlanning === "planifie" && (
-                  <p>
-                    Les interventions seront générées automatiquement pour les{" "}
-                    <strong>90 prochains jours</strong> selon la fréquence
-                    configurée.
-                  </p>
-                )}
-
-                {prestation.modePlanning === "planifie" &&
-                  !hasActiveExecution && (
-                    <div className="rounded-md border border-orange-200 bg-orange-50 px-3 py-2">
-                      <p className="font-medium text-orange-800">
-                        Aucun prestataire actif configuré
-                      </p>
-                      <p className="mt-0.5 text-orange-700">
-                        Les interventions seront créées avec le statut{" "}
-                        <strong>À attribuer</strong>. Vous pourrez ajouter un
-                        prestataire dans l&apos;onglet &quot;Exécution &amp;
-                        Tarifs&quot; pour les assigner automatiquement.
-                      </p>
-                    </div>
-                  )}
-
-                {prestation.modePlanning === "planifie" &&
-                  hasActiveExecution && (
-                    <div className="rounded-md border border-green-200 bg-green-50 px-3 py-2">
-                      <p className="font-medium text-green-800">
-                        Prestataire actif configuré
-                      </p>
-                      <p className="mt-0.5 text-green-700">
-                        Les interventions seront assignées automatiquement au
-                        prestataire prioritaire.
-                      </p>
-                    </div>
-                  )}
-
-                <p className="text-muted-foreground text-xs">
-                  Une prestation activée ne peut pas revenir en brouillon. Pour
-                  suspendre, utilisez &quot;En pause&quot;.
-                </p>
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isUpdating}>Annuler</AlertDialogCancel>
-            <Button onClick={() => doTransition("actif")} disabled={isUpdating}>
-              {isUpdating ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Activation en cours...
-                </>
-              ) : (
-                "Activer"
-              )}
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
-  );
-}
-
 // ==================== SUB-COMPONENTS ====================
 
-function InfoRow({ label, value }: { label: string; value: string }) {
+function InfoRow({
+  label,
+  value,
+  icon: Icon,
+}: {
+  label: string;
+  value: string;
+  icon?: LucideIcon;
+}) {
   return (
     <div className="flex items-start justify-between gap-4">
-      <span className="text-muted-foreground flex-shrink-0">{label}</span>
+      <span className="text-muted-foreground flex shrink-0 items-center gap-1.5">
+        {Icon && <Icon className="text-primary h-3.5 w-3.5 shrink-0" />}
+        {label}
+      </span>
       <span className="text-right font-medium">{value}</span>
     </div>
   );
@@ -702,15 +805,6 @@ function ExecutionTab({
 
   return (
     <div className="space-y-4">
-      {canAddExecution && (
-        <div className="flex justify-end">
-          <Button onClick={() => setAddDialogOpen(true)}>
-            <Zap className="h-4 w-4" />
-            Ajouter une exécution
-          </Button>
-        </div>
-      )}
-
       {showIntermediaireInfo && (
         <div className="bg-muted/50 flex items-start gap-3 rounded-lg border p-4">
           <Info className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" />
@@ -722,6 +816,122 @@ function ExecutionTab({
               si vous souhaitez modifier l&apos;exécution.
             </p>
           </div>
+        </div>
+      )}
+
+      {/* Disclaimer exécutions */}
+      <Collapsible defaultOpen>
+        <div className="bg-muted/40 flex items-start gap-3 rounded-lg border p-4">
+          <Info className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" />
+          <div className="text-muted-foreground w-full space-y-2 text-xs">
+            <CollapsibleTrigger className="group flex w-full cursor-pointer items-center justify-between">
+              <p className="text-foreground font-medium">
+                Comment fonctionne le système d&apos;exécution ?
+              </p>
+              <ChevronDown className="text-muted-foreground h-3.5 w-3.5 shrink-0 transition-transform group-data-[state=open]:rotate-180" />
+            </CollapsibleTrigger>
+
+            <CollapsibleContent>
+              <div className="space-y-2">
+                <p>
+                  Une <strong>exécution</strong> représente le contrat
+                  opérationnel entre la prestation et un prestataire : elle
+                  porte les <strong>tarifs appliqués</strong>, la{" "}
+                  <strong>fenêtre de validité</strong> (date de début / date de
+                  fin optionnelle), la <strong>priorité</strong> et le{" "}
+                  <strong>mode de pilotage</strong>. C&apos;est l&apos;exécution
+                  qui détermine quel prestataire réalise les interventions et à
+                  quel prix. Une même prestation peut avoir plusieurs exécutions
+                  (pour gérer les transitions de prestataire ou des tarifs
+                  différenciés par période).
+                </p>
+
+                <div className="space-y-1">
+                  <p className="text-foreground font-medium text-[11px] uppercase tracking-wide">
+                    Sélection automatique de l&apos;exécution
+                  </p>
+                  <p>
+                    Chaque intervention est automatiquement associée à
+                    l&apos;exécution <strong>active</strong> dont la{" "}
+                    <strong>priorité est la plus haute</strong> et dont la
+                    fenêtre de validité (
+                    <em>date de début → date de fin</em>) couvre la date de
+                    l&apos;intervention. En cas d&apos;égalité de priorité,
+                    l&apos;exécution dont la{" "}
+                    <strong>date de début est la plus récente</strong>{" "}
+                    l&apos;emporte.
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-foreground font-medium text-[11px] uppercase tracking-wide">
+                    Modifier une exécution (tarifs, dates, priorité)
+                  </p>
+                  <p>
+                    Les anciens tarifs sont <strong>archivés</strong> (conservés,
+                    marqués inactifs). Les interventions à venir non encore
+                    démarrées sont{" "}
+                    <strong>supprimées et régénérées</strong> avec les nouveaux
+                    paramètres. Les interventions passées et leurs données
+                    financières clôturées sont <strong>conservées</strong>.
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-foreground font-medium text-[11px] uppercase tracking-wide">
+                    Changer d&apos;exécution en cours de prestation
+                  </p>
+                  <p>
+                    Créez une nouvelle exécution avec une{" "}
+                    <strong>date de début au jour de la transition</strong>,
+                    puis désactivez l&apos;ancienne. Le moteur bascule
+                    automatiquement : les interventions avant la date de
+                    transition restent liées à l&apos;ancien prestataire, celles
+                    après au nouveau. L&apos;historique est intact.
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-foreground font-medium text-[11px] uppercase tracking-wide">
+                    Désactiver une exécution
+                  </p>
+                  <p>
+                    Arrête la génération de nouvelles interventions pour ce
+                    prestataire. Les interventions à venir non encore démarrées{" "}
+                    <strong>restent assignées à ce prestataire</strong>{" "}
+                    jusqu&apos;à leur échéance. L&apos;historique passé est
+                    conservé intégralement.
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-foreground font-medium text-[11px] uppercase tracking-wide">
+                    ⚠ Supprimer une exécution (corbeille)
+                  </p>
+                  <p>
+                    Supprime définitivement l&apos;exécution, ses tarifs,{" "}
+                    <strong>et toutes les données financières clôturées</strong>{" "}
+                    (montants facturés, récapitulatifs) liées à ce prestataire.
+                    Les interventions existantes perdent leur référence
+                    prestataire.{" "}
+                    <strong>
+                      À n&apos;utiliser que pour les exécutions créées par
+                      erreur, sans aucune intervention réalisée associée.
+                    </strong>
+                  </p>
+                </div>
+              </div>
+            </CollapsibleContent>
+          </div>
+        </div>
+      </Collapsible>
+
+      {canAddExecution && (
+        <div className="flex justify-end">
+          <Button onClick={() => setAddDialogOpen(true)} size="sm">
+            <Zap className="h-4 w-4" />
+            Ajouter une exécution
+          </Button>
         </div>
       )}
 
@@ -783,14 +993,19 @@ function ExecutionCard({
   prestation: PrestationListItem;
   onExecutionsChange: (executions: ExecutionWithPrix[]) => void;
 }) {
-  const router = useRouter();
   const [isToggling, setIsToggling] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
-  const [deployDialogOpen, setDeployDialogOpen] = useState(false);
   const [checklistPickerOpen, setChecklistPickerOpen] = useState(false);
   const [checklistManagerOpen, setChecklistManagerOpen] = useState(false);
+  const [localChecklistName, setLocalChecklistName] = useState<string | null>(
+    execution.tacheListeTemplateName,
+  );
+  const [localChecklistItems, setLocalChecklistItems] = useState<
+    ExecutionChecklistItem[]
+  >(execution.tacheListeItems);
+  const [checklistExpanded, setChecklistExpanded] = useState(false);
 
   const isActive = execution.actif;
 
@@ -819,6 +1034,12 @@ function ExecutionCard({
       toast.error(result.serverError.message);
     } else if (result?.data) {
       toast.success(result.data.message);
+      // isActive = état avant le toggle. Si on vient de désactiver (isActive était true)
+      if (isActive && result.data.futurePlanifieeCount > 0) {
+        toast.info(
+          `${result.data.futurePlanifieeCount} occurrence(s) planifiée(s) restent assignées à ${execution.prestataireNom ?? "ce prestataire"} jusqu'à leur échéance.`,
+        );
+      }
       onExecutionsChange(result.data.executions);
     }
     setIsToggling(false);
@@ -875,9 +1096,14 @@ function ExecutionCard({
                   <Button
                     variant="outline"
                     size="icon"
-                    className="h-7 w-7"
+                    className={`h-7 w-7 ${isActive ? "text-green-600 hover:text-green-700" : "text-muted-foreground"}`}
                     onClick={handleToggle}
                     disabled={isToggling}
+                    title={
+                      isActive
+                        ? "Désactiver cette exécution"
+                        : "Activer cette exécution"
+                    }
                     aria-label={isActive ? "Désactiver" : "Activer"}
                   >
                     <Power className="h-4 w-4" />
@@ -897,34 +1123,29 @@ function ExecutionCard({
           </div>
           <div className="text-muted-foreground flex flex-wrap gap-4 text-xs">
             <span className="flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              Depuis le {formatDate(execution.dateDebutValidite)}
+              <Clock className="h-3 w-3" />À partir du{" "}
+              {formatDate(execution.dateDebutValidite)}
             </span>
             {execution.dateFinValidite && (
               <span>Jusqu&apos;au {formatDate(execution.dateFinValidite)}</span>
             )}
-            {execution.assigneeDefaultPrenom && (
-              <span className="flex items-center gap-1 text-blue-700">
-                <User className="h-3 w-3" />
-                {execution.assigneeDefaultPrenom} {execution.assigneeDefaultNom}
-              </span>
-            )}
+            <Badge
+              className={
+                execution.modePilotage === "client"
+                  ? "bg-blue-100 text-xs text-blue-700 hover:bg-blue-100"
+                  : execution.modePilotage === "prestataire"
+                    ? "bg-green-100 text-xs text-green-700 hover:bg-green-100"
+                    : "bg-purple-100 text-xs text-purple-700 hover:bg-purple-100"
+              }
+            >
+              <Settings className="h-3 w-3" />
+              {execution.modePilotage === "client"
+                ? "Géré par le client"
+                : execution.modePilotage === "prestataire"
+                  ? "Géré par le prestataire"
+                  : "Géré en commun"}
+            </Badge>
           </div>
-
-          {/* Bouton Déployer — uniquement si prestataire connu et canManage */}
-          {canManage && execution.prestataireEntrepriseId && (
-            <div className="mt-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-7 gap-1 text-xs"
-                onClick={() => setDeployDialogOpen(true)}
-              >
-                <Send className="h-3 w-3" />
-                Déployer l&apos;assignation
-              </Button>
-            </div>
-          )}
         </CardHeader>
 
         {execution.prix.length > 0 && (
@@ -956,21 +1177,80 @@ function ExecutionCard({
 
         {/* Section Checklist */}
         <CardContent className="border-t pt-3">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2 text-sm">
-              <ClipboardList className="text-muted-foreground h-4 w-4 flex-shrink-0" />
-              {execution.tacheListeTemplateId ? (
-                <span className="font-medium text-green-700">
-                  Checklist assignée
-                </span>
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0 flex-1 space-y-2 text-sm">
+              <span className="text-muted-foreground flex items-center gap-1.5 font-medium">
+                <ListChecks className="text-primary h-4 w-4 flex-shrink-0" />
+                Checklist
+              </span>
+              {localChecklistName ? (
+                <div className="overflow-hidden rounded-lg border">
+                  {/* Header — clic sur le chevron pour déplier */}
+                  <div className="flex items-center gap-2 p-3">
+                    {localChecklistItems.length > 0 ? (
+                      <button
+                        type="button"
+                        className="text-muted-foreground hover:text-foreground flex-shrink-0"
+                        onClick={() => setChecklistExpanded((v) => !v)}
+                        aria-label={
+                          checklistExpanded ? "Réduire" : "Développer"
+                        }
+                      >
+                        {checklistExpanded ? (
+                          <ChevronDown className="h-4 w-4" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4" />
+                        )}
+                      </button>
+                    ) : (
+                      <span className="h-4 w-4 flex-shrink-0" />
+                    )}
+                    <div className="flex min-w-0 flex-1 items-center gap-2">
+                      <span className="truncate font-medium">
+                        {localChecklistName}
+                      </span>
+                      <Badge
+                        variant="outline"
+                        className="flex-shrink-0 text-xs"
+                      >
+                        {localChecklistItems.length} tâche
+                        {localChecklistItems.length !== 1 ? "s" : ""}
+                      </Badge>
+                    </div>
+                  </div>
+                  {/* Items dépliés */}
+                  {checklistExpanded && localChecklistItems.length > 0 && (
+                    <div className="bg-muted/30 divide-y border-t">
+                      {localChecklistItems.map((item, idx) => (
+                        <div
+                          key={item.id}
+                          className="flex items-start gap-2 px-3 py-2 text-xs"
+                        >
+                          <span className="text-muted-foreground w-5 flex-shrink-0 text-center">
+                            {idx + 1}.
+                          </span>
+                          <span className="min-w-0 flex-1 font-medium">
+                            {item.titre}
+                          </span>
+                          {item.dureeEstimeeMinutes && (
+                            <span className="text-muted-foreground flex flex-shrink-0 items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {item.dureeEstimeeMinutes}min
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               ) : (
-                <span className="text-muted-foreground italic">
+                <span className="text-muted-foreground pl-5 italic">
                   Aucune checklist
                 </span>
               )}
             </div>
             {canManage && (
-              <div className="flex items-center gap-2">
+              <div className="flex flex-shrink-0 items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
@@ -1001,17 +1281,16 @@ function ExecutionCard({
           <TacheListePickerDialog
             open={checklistPickerOpen}
             onOpenChange={setChecklistPickerOpen}
-            context="execution"
-            entityId={execution.id}
+            executionId={execution.id}
             prestationId={prestation.id}
             serviceId={prestation.serviceId}
             serviceNom={prestation.serviceNom}
             entrepriseId={prestation.entrepriseId}
-            executionId={execution.id}
             currentPackId={execution.tacheListeTemplateId}
-            onSuccess={() => {
+            onSuccess={(pack) => {
+              setLocalChecklistName(pack?.nom ?? null);
+              setLocalChecklistItems(pack?.items ?? []);
               setChecklistPickerOpen(false);
-              router.refresh();
             }}
           />
           {execution.prestataireEntrepriseId && (
@@ -1042,25 +1321,27 @@ function ExecutionCard({
         />
       )}
 
-      {canManage && execution.prestataireEntrepriseId && (
-        <DeployAssignationDialog
-          open={deployDialogOpen}
-          onOpenChange={setDeployDialogOpen}
-          execution={execution}
-          prestation={prestation}
-          onSuccess={() => router.refresh()}
-        />
-      )}
-
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Retirer ce prestataire ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Le prestataire{" "}
-              <strong>{execution.prestataireNom ?? "inconnu"}</strong> et tous
-              ses tarifs seront retirés de cette prestation. Les interventions
-              déjà planifiées ne seront pas affectées.
+            <AlertDialogTitle>Supprimer cette exécution ?</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2 text-sm">
+                <p>
+                  L&apos;exécution{" "}
+                  <strong>{execution.prestataireNom ?? "inconnu"}</strong>, ses
+                  tarifs et{" "}
+                  <strong>toutes les données financières clôturées</strong>{" "}
+                  associées seront supprimés définitivement.
+                </p>
+                <p>
+                  Les interventions existantes perdront leur référence
+                  prestataire. Cette action est{" "}
+                  <strong>irréversible</strong> — à n&apos;utiliser que si
+                  aucune intervention réalisée n&apos;est associée à cette
+                  exécution.
+                </p>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -1589,261 +1870,5 @@ function OccurrencesSortDialog({
         </div>
       </DialogContent>
     </Dialog>
-  );
-}
-
-// ==================== CHECKLIST DEFAULT CARD ====================
-
-function ChecklistDefaultCard({
-  prestation,
-  canManage,
-  isPlateforme,
-}: {
-  prestation: PrestationListItem;
-  canManage: boolean;
-  isPlateforme: boolean;
-}) {
-  const router = useRouter();
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const [managerOpen, setManagerOpen] = useState(false);
-  const [packDetails, setPackDetails] =
-    useState<TacheListeTemplateWithItems | null>(null);
-  const [loadingPack, setLoadingPack] = useState(false);
-
-  useEffect(() => {
-    if (!prestation.tacheListeTemplateId) {
-      setPackDetails(null);
-      return;
-    }
-    async function loadPack() {
-      setLoadingPack(true);
-      const result = await getTacheListeTemplateAction({
-        id: prestation.tacheListeTemplateId!,
-      });
-      if (result?.data?.pack) {
-        setPackDetails(result.data.pack);
-      }
-      setLoadingPack(false);
-    }
-    void loadPack();
-  }, [prestation.tacheListeTemplateId]);
-
-  return (
-    <>
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-base font-medium">
-              <ClipboardList className="text-primary h-4 w-4" />
-              Checklist
-            </CardTitle>
-            {canManage && (
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPickerOpen(true)}
-                >
-                  <Pencil className="h-4 w-4" />
-                  Modifier
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setManagerOpen(true)}
-                >
-                  Gérer les checklists
-                </Button>
-              </div>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-3 text-sm">
-          {prestation.tacheListeTemplateId ? (
-            loadingPack ? (
-              <div className="flex items-center gap-2">
-                <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
-                <span className="text-muted-foreground text-xs">
-                  Chargement...
-                </span>
-              </div>
-            ) : packDetails ? (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-green-600" />
-                  <span className="font-medium">{packDetails.nom}</span>
-                  {/* Badge type checklist */}
-                  {packDetails.proprietaireEntrepriseId === null ? (
-                    <span className="flex-shrink-0 rounded border border-violet-200 bg-violet-50 px-1.5 py-0.5 text-xs font-medium text-violet-700 dark:border-violet-800 dark:bg-violet-950/60 dark:text-violet-300">
-                      Système
-                    </span>
-                  ) : packDetails.proprietaireEntrepriseId === prestation.entrepriseId ? (
-                    <span className="flex-shrink-0 rounded border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-xs font-medium text-blue-700 dark:border-blue-800 dark:bg-blue-950/60 dark:text-blue-300">
-                      Client
-                    </span>
-                  ) : (
-                    <span className="flex-shrink-0 rounded border border-orange-200 bg-orange-50 px-1.5 py-0.5 text-xs font-medium text-orange-700 dark:border-orange-800 dark:bg-orange-950/60 dark:text-orange-300">
-                      Prestataire
-                    </span>
-                  )}
-                  <Badge variant="outline" className="text-xs">
-                    {packDetails.items.length} tâche
-                    {packDetails.items.length !== 1 ? "s" : ""}
-                  </Badge>
-                </div>
-                {packDetails.items.length > 0 && (
-                  <div className="bg-muted/30 divide-y rounded-md border">
-                    {packDetails.items.slice(0, 5).map((item, idx) => (
-                      <div
-                        key={item.id}
-                        className="flex items-start gap-2 px-3 py-1.5 text-xs"
-                      >
-                        <span className="text-muted-foreground w-5 flex-shrink-0 text-center">
-                          {idx + 1}.
-                        </span>
-                        <div className="min-w-0 flex-1">
-                          <span className="font-medium">{item.titre}</span>
-                          {item.description && (
-                            <p className="text-muted-foreground mt-0.5 truncate">
-                              {item.description}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                    {packDetails.items.length > 5 && (
-                      <div className="text-muted-foreground px-3 py-1.5 text-xs italic">
-                        +{packDetails.items.length - 5} autres tâches…
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <p className="font-medium text-green-700">Checklist configurée</p>
-            )
-          ) : (
-            <p className="text-muted-foreground italic">
-              Aucune checklist configurée
-            </p>
-          )}
-          <p className="text-muted-foreground text-xs">
-            Utilisée par défaut pour toutes les interventions, sauf si une
-            checklist spécifique est définie au niveau de l&apos;exécution.
-          </p>
-        </CardContent>
-      </Card>
-
-      {canManage && (
-        <>
-          <TacheListePickerDialog
-            open={pickerOpen}
-            onOpenChange={setPickerOpen}
-            context="client_service"
-            entityId={prestation.id}
-            prestationId={prestation.id}
-            serviceId={prestation.serviceId}
-            serviceNom={prestation.serviceNom}
-            entrepriseId={prestation.entrepriseId}
-            currentPackId={prestation.tacheListeTemplateId}
-            onSuccess={() => {
-              setPickerOpen(false);
-              router.refresh();
-            }}
-          />
-          <TacheListeManagerDialog
-            open={managerOpen}
-            onOpenChange={(open) => {
-              setManagerOpen(open);
-              // Rafraîchit les données serveur à la fermeture pour refléter
-              // les suppressions/modifications qui impactent cette prestation
-              if (!open) router.refresh();
-            }}
-            serviceId={prestation.serviceId}
-            serviceNom={prestation.serviceNom}
-            proprietaireEntrepriseId={
-              isPlateforme ? null : prestation.entrepriseId
-            }
-            clientEntrepriseId={prestation.entrepriseId}
-            clientEntrepriseNom={prestation.entrepriseNom ?? undefined}
-          />
-        </>
-      )}
-    </>
-  );
-}
-
-// ==================== READINESS CARD ====================
-
-function ReadinessCard({
-  prestation,
-  executions,
-}: {
-  prestation: PrestationListItem;
-  executions: ExecutionWithPrix[];
-}) {
-  const isReadyToSchedule = prestation.statut === "actif";
-  const isReadyToExecute =
-    isReadyToSchedule &&
-    executions.some((e) => e.actif && e.prix.some((p) => p.actif));
-
-  return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base font-medium">
-          État de préparation
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2 text-sm">
-        <ReadinessRow
-          ok={isReadyToSchedule}
-          label="Prêt à planifier"
-          hint={
-            !isReadyToSchedule
-              ? "Activez la prestation pour générer les interventions"
-              : undefined
-          }
-        />
-        <ReadinessRow
-          ok={isReadyToExecute}
-          label="Prêt à exécuter"
-          hint={
-            !isReadyToExecute
-              ? isReadyToSchedule
-                ? "Ajoutez un prestataire actif avec un tarif actif (onglet Exécution & Tarifs)"
-                : "Activez la prestation et ajoutez un prestataire actif avec un tarif actif"
-              : undefined
-          }
-        />
-      </CardContent>
-    </Card>
-  );
-}
-
-function ReadinessRow({
-  ok,
-  label,
-  hint,
-}: {
-  ok: boolean;
-  label: string;
-  hint?: string;
-}) {
-  return (
-    <div className="flex items-start gap-2">
-      {ok ? (
-        <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-500" />
-      ) : (
-        <XCircle className="text-muted-foreground/50 mt-0.5 h-4 w-4 flex-shrink-0" />
-      )}
-      <div>
-        <span className={ok ? "text-foreground" : "text-muted-foreground"}>
-          {label}
-        </span>
-        {!ok && hint && (
-          <p className="text-muted-foreground/70 mt-0.5 text-xs">{hint}</p>
-        )}
-      </div>
-    </div>
   );
 }

@@ -175,6 +175,7 @@ export async function pickExecutionForOccurrence({
     .select({
       id: clientServiceExecutions.id,
       priorite: clientServiceExecutions.priorite,
+      dateDebutValidite: clientServiceExecutions.dateDebutValidite,
     })
     .from(clientServiceExecutions)
     .where(
@@ -192,7 +193,12 @@ export async function pickExecutionForOccurrence({
 
   if (candidates.length === 0) return null;
 
-  candidates.sort((a, b) => (b.priorite ?? 0) - (a.priorite ?? 0));
+  // Tri déterministe : priorité DESC, puis dateDebutValidite DESC (la plus récente gagne en cas d'ex-æquo)
+  candidates.sort((a, b) => {
+    const pDiff = (b.priorite ?? 0) - (a.priorite ?? 0);
+    if (pDiff !== 0) return pDiff;
+    return b.dateDebutValidite.getTime() - a.dateDebutValidite.getTime();
+  });
   return candidates[0].id;
 }
 
@@ -629,6 +635,9 @@ export async function ensureOccurrencesWindow({
         tx,
       });
 
+      // Aucune exécution active ne couvre cette date → on ne génère pas d'occurrence orpheline
+      if (executionId === null) continue;
+
       toInsert.push({
         clientServiceId,
         siteId,
@@ -646,46 +655,34 @@ export async function ensureOccurrencesWindow({
   }
 
   if (toInsert.length > 0) {
-    // Pré-charger le tacheListeTemplateId et assigneeUserIdDefault des exécutions concernées
+    // Pré-charger le tacheListeTemplateId des exécutions concernées
     const uniqueExecIds = [
       ...new Set(toInsertExecutionIds.filter((id): id is string => id !== null)),
     ];
     const executionPackMap = new Map<string, string | null>();
-    const executionAssigneeMap = new Map<string, string | null>();
     if (uniqueExecIds.length > 0) {
       const execRows = await dbClient
         .select({
           id: clientServiceExecutions.id,
           tacheListeTemplateId: clientServiceExecutions.tacheListeTemplateId,
-          assigneeUserIdDefault: clientServiceExecutions.assigneeUserIdDefault,
         })
         .from(clientServiceExecutions)
         .where(inArray(clientServiceExecutions.id, uniqueExecIds));
       for (const row of execRows) {
         executionPackMap.set(row.id, row.tacheListeTemplateId ?? null);
-        executionAssigneeMap.set(row.id, row.assigneeUserIdDefault ?? null);
       }
     }
-
-    // Enrichir toInsert avec l'assignee par défaut de l'exécution
-    const toInsertWithAssignee = toInsert.map((occ, i) => {
-      const execId = toInsertExecutionIds[i];
-      const assigneeUserId = execId ? (executionAssigneeMap.get(execId) ?? null) : null;
-      return { ...occ, assigneeUserId };
-    });
 
     // Insérer les occurrences et récupérer leurs IDs
     const inserted = await dbClient
       .insert(clientServiceOccurrences)
-      .values(toInsertWithAssignee)
+      .values(toInsert)
       .returning({ id: clientServiceOccurrences.id });
 
-    // Snapshot des tâches pour chaque occurrence si un pack est résolu
-    const defaultPackId = cs.tacheListeTemplateId ?? null;
+    // Snapshot des tâches pour chaque occurrence — pack vient uniquement de l'exécution
     for (let i = 0; i < inserted.length; i++) {
       const execId = toInsertExecutionIds[i];
-      const execPackId = execId ? (executionPackMap.get(execId) ?? null) : null;
-      const resolvedPackId = execPackId ?? defaultPackId;
+      const resolvedPackId = execId ? (executionPackMap.get(execId) ?? null) : null;
 
       if (resolvedPackId) {
         await snapshotOccurrenceTaches({

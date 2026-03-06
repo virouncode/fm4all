@@ -11,6 +11,7 @@ import {
   clientServiceExecutionPrix,
   clientServiceExecutions,
   clientServiceOccurrences,
+  clientServicePrixAppliques,
   services,
   tacheListesTemplates,
 } from "@/db/schema/services";
@@ -50,12 +51,11 @@ import {
   getPrestatairesForServiceSchema,
   insertExecutionFormSchema,
   toggleExecutionActifSchema,
-  updateExecutionAssigneeDefaultSchema,
   updateExecutionFormSchema,
   updateExecutionModePilotageSchema,
   updateExecutionTacheListeSchema,
 } from "@/zod-schemas/clientServiceExecutions.schema";
-import { and, count, eq, lt, ne } from "drizzle-orm";
+import { and, count, eq, gt, lt, ne } from "drizzle-orm";
 import { flattenValidationErrors } from "next-safe-action";
 import { z } from "zod";
 
@@ -416,7 +416,6 @@ export const insertExecutionWithPrixAction = actionClient
       requiredNumbers: ["priorite"] as const,
       requiredDates: ["dateDebutValidite"] as const,
       optionalDates: ["dateFinValidite"] as const,
-      optionalStrings: ["assigneeUserIdDefault"] as const,
     });
 
     const { prestationId, entrepriseId, siteId } = normalized;
@@ -460,7 +459,6 @@ export const insertExecutionWithPrixAction = actionClient
           dateDebutValidite: normalized.dateDebutValidite,
           dateFinValidite: normalized.dateFinValidite,
           priorite: normalized.priorite,
-          assigneeUserIdDefault: normalized.assigneeUserIdDefault ?? null,
           modePilotage: parsedInput.modePilotage,
           actif: true,
           createdById: currentUser.id,
@@ -591,6 +589,24 @@ export const toggleExecutionActifAction = actionClient
       throw errors.notFound("Exécution");
     }
 
+    // Compter les occurrences futures planifiées avant de désactiver (pour warning UX)
+    let futurePlanifieeCount = 0;
+    if (!parsedInput.actif) {
+      const now = new Date();
+      const [row] = await db
+        .select({ count: count() })
+        .from(clientServiceOccurrences)
+        .where(
+          and(
+            eq(clientServiceOccurrences.clientServiceId, prestationId),
+            eq(clientServiceOccurrences.executionId, executionId),
+            eq(clientServiceOccurrences.statut, "planifiee"),
+            gt(clientServiceOccurrences.dateDebutPrevue, now),
+          ),
+        );
+      futurePlanifieeCount = row?.count ?? 0;
+    }
+
     await db
       .update(clientServiceExecutions)
       .set({ actif: parsedInput.actif, updatedById: currentUser.id })
@@ -615,6 +631,7 @@ export const toggleExecutionActifAction = actionClient
         ? "Exécution activée."
         : "Exécution désactivée.",
       executions: updatedExecutions,
+      futurePlanifieeCount,
     };
   });
 
@@ -861,61 +878,99 @@ export const updateExecutionAction = actionClient
       prestation.modeCommercial === "intermediaire_fm4all" &&
       canManage.isPlateforme;
 
-    await db.transaction(async (tx) => {
-      // 1. Soft-delete toutes les lignes prix actives
-      await tx
-        .update(clientServiceExecutionPrix)
-        .set({ actif: false, updatedById: currentUser.id })
-        .where(eq(clientServiceExecutionPrix.executionId, executionId));
+    // Helper : calcule les valeurs normalisées d'une ligne prix
+    function buildPrixValues(p: (typeof parsedInput.prix)[0]) {
+      if (isIntermedaire) {
+        const cout =
+          p.coutPrestataireHt && p.coutPrestataireHt !== ""
+            ? Number(p.coutPrestataireHt)
+            : 0;
+        const marge =
+          p.margePourcent && p.margePourcent !== ""
+            ? Math.round(Number(p.margePourcent))
+            : 0;
+        const montant = cout * (1 + marge / 100);
+        return {
+          montantHt: Math.round(montant * 100),
+          coutPrestataireHt: Math.round(cout * 100),
+          margePourcent: marge,
+          periodeFacturation: p.periodeFacturation ?? null,
+          nbOccurrencesIncluses:
+            p.nbOccurrencesIncluses && p.nbOccurrencesIncluses !== ""
+              ? Number(p.nbOccurrencesIncluses)
+              : null,
+        };
+      }
+      return {
+        montantHt: Math.round(Number(p.montantHt) * 100),
+        coutPrestataireHt: null,
+        margePourcent: null,
+        periodeFacturation: p.periodeFacturation ?? null,
+        nbOccurrencesIncluses:
+          p.nbOccurrencesIncluses && p.nbOccurrencesIncluses !== ""
+            ? Number(p.nbOccurrencesIncluses)
+            : null,
+      };
+    }
 
-      // 2. Insérer les nouvelles lignes prix
-      await tx.insert(clientServiceExecutionPrix).values(
-        parsedInput.prix.map((p) => {
-          if (isIntermedaire) {
-            const cout =
-              p.coutPrestataireHt && p.coutPrestataireHt !== ""
-                ? Number(p.coutPrestataireHt)
-                : 0;
-            const marge =
-              p.margePourcent && p.margePourcent !== ""
-                ? Math.round(Number(p.margePourcent))
-                : 0;
-            const montant = cout * (1 + marge / 100);
-            return {
-              executionId,
-              typePrix: p.typePrix,
-              montantHt: Math.round(montant * 100),
-              coutPrestataireHt: Math.round(cout * 100),
-              margePourcent: marge,
-              periodeFacturation: p.periodeFacturation ?? null,
-              nbOccurrencesIncluses:
-                p.nbOccurrencesIncluses && p.nbOccurrencesIncluses !== ""
-                  ? Number(p.nbOccurrencesIncluses)
-                  : null,
-              actif: true,
-              createdById: currentUser.id,
-              updatedById: currentUser.id,
-            };
-          }
-          return {
+    await db.transaction(async (tx) => {
+      // 1. Récupérer les lignes prix actives existantes
+      const existingPrix = await tx
+        .select({ id: clientServiceExecutionPrix.id })
+        .from(clientServiceExecutionPrix)
+        .where(
+          and(
+            eq(clientServiceExecutionPrix.executionId, executionId),
+            eq(clientServiceExecutionPrix.actif, true),
+          ),
+        );
+
+      const inputIds = new Set(
+        parsedInput.prix.filter((p) => p.id).map((p) => p.id!),
+      );
+
+      // 2. Lignes supprimées du formulaire : soft-delete si utilisées, hard-delete sinon
+      for (const existing of existingPrix) {
+        if (inputIds.has(existing.id)) continue;
+        const [ref] = await tx
+          .select({ count: count() })
+          .from(clientServicePrixAppliques)
+          .where(
+            eq(clientServicePrixAppliques.executionPrixId, existing.id),
+          );
+        if (ref && ref.count > 0) {
+          await tx
+            .update(clientServiceExecutionPrix)
+            .set({ actif: false, updatedById: currentUser.id })
+            .where(eq(clientServiceExecutionPrix.id, existing.id));
+        } else {
+          await tx
+            .delete(clientServiceExecutionPrix)
+            .where(eq(clientServiceExecutionPrix.id, existing.id));
+        }
+      }
+
+      // 3. UPDATE lignes existantes / INSERT nouvelles
+      for (const p of parsedInput.prix) {
+        const values = buildPrixValues(p);
+        if (p.id) {
+          await tx
+            .update(clientServiceExecutionPrix)
+            .set({ ...values, updatedById: currentUser.id })
+            .where(eq(clientServiceExecutionPrix.id, p.id));
+        } else {
+          await tx.insert(clientServiceExecutionPrix).values({
             executionId,
             typePrix: p.typePrix,
-            montantHt: Math.round(Number(p.montantHt) * 100),
-            coutPrestataireHt: null,
-            margePourcent: null,
-            periodeFacturation: p.periodeFacturation ?? null,
-            nbOccurrencesIncluses:
-              p.nbOccurrencesIncluses && p.nbOccurrencesIncluses !== ""
-                ? Number(p.nbOccurrencesIncluses)
-                : null,
+            ...values,
             actif: true,
             createdById: currentUser.id,
             updatedById: currentUser.id,
-          };
-        }),
-      );
+          });
+        }
+      }
 
-      // 3. Mettre à jour l'en-tête de l'exécution
+      // 4. Mettre à jour l'en-tête de l'exécution
       await tx
         .update(clientServiceExecutions)
         .set({
@@ -1019,72 +1074,6 @@ export const getMesSitesClientsAction = actionClient
     );
 
     return { sites };
-  });
-
-// ==================== UPDATE EXECUTION ASSIGNEE DEFAULT ====================
-
-export const updateExecutionAssigneeDefaultAction = actionClient
-  .metadata({ actionName: "updateExecutionAssigneeDefaultAction" })
-  .inputSchema(updateExecutionAssigneeDefaultSchema, {
-    handleValidationErrorsShape: async (ve) =>
-      flattenValidationErrors(ve).fieldErrors,
-  })
-  .action(async ({ parsedInput }) => {
-    const session = await getSession();
-    const currentUser = session?.user;
-    if (!currentUser) throw errors.unauthorized("Vous n'êtes pas authentifié.");
-
-    const { executionId, prestationId, entrepriseId } = parsedInput;
-
-    const prestation = await getPrestationById(prestationId);
-    if (!prestation || prestation.entrepriseId !== entrepriseId) {
-      throw errors.notFound("Prestation");
-    }
-
-    const { allowed: canManage } = await canManagePrestation(
-      currentUser.id,
-      entrepriseId,
-      prestation.siteId,
-    );
-    if (!canManage) {
-      throw errors.forbidden(
-        "Vous devez être responsable de ce site pour modifier cette exécution.",
-      );
-    }
-
-    const [execution] = await db
-      .select({ id: clientServiceExecutions.id })
-      .from(clientServiceExecutions)
-      .where(
-        and(
-          eq(clientServiceExecutions.id, executionId),
-          eq(clientServiceExecutions.clientServiceId, prestationId),
-        ),
-      )
-      .limit(1);
-
-    if (!execution) throw errors.notFound("Exécution");
-
-    const { assigneeUserIdDefault } = normalizeForSubmit(parsedInput, {
-      optionalStrings: ["assigneeUserIdDefault"] as const,
-    });
-
-    const [updated] = await db
-      .update(clientServiceExecutions)
-      .set({
-        assigneeUserIdDefault,
-        updatedById: currentUser.id,
-        updatedAt: new Date(),
-      })
-      .where(eq(clientServiceExecutions.id, executionId))
-      .returning({
-        id: clientServiceExecutions.id,
-        assigneeUserIdDefault: clientServiceExecutions.assigneeUserIdDefault,
-      });
-
-    if (!updated) throw errors.internal("Échec de la mise à jour.");
-
-    return { execution: updated };
   });
 
 // ==================== UPDATE EXECUTION MODE PILOTAGE ====================

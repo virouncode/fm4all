@@ -14,6 +14,8 @@ import {
   clientServiceOccurrences,
   clientServices,
   services,
+  tacheListeItems,
+  tacheListesTemplates,
 } from "@/db/schema/services";
 import {
   clientPrestataireRelations,
@@ -305,6 +307,13 @@ export type ExecutionPrixItem = {
   actif: boolean;
 };
 
+export type ExecutionChecklistItem = {
+  id: string;
+  ordre: number;
+  titre: string;
+  dureeEstimeeMinutes: number | null;
+};
+
 export type ExecutionWithPrix = {
   id: string;
   clientServiceId: string;
@@ -318,9 +327,8 @@ export type ExecutionWithPrix = {
   modePilotage: ModePilotageType;
   actif: boolean;
   tacheListeTemplateId: string | null;
-  assigneeUserIdDefault: string | null;
-  assigneeDefaultPrenom: string | null;
-  assigneeDefaultNom: string | null;
+  tacheListeTemplateName: string | null;
+  tacheListeItems: ExecutionChecklistItem[];
   createdAt: Date;
   prix: ExecutionPrixItem[];
 };
@@ -351,9 +359,7 @@ export type OccurrenceListItem = {
 export async function getExecutionsWithPrixByPrestationId(
   prestationId: string,
 ): Promise<ExecutionWithPrix[]> {
-  const assigneeDefaultUser = alias(user, "assignee_default_user");
-
-  // 1. Récupérer les exécutions (avec nom prestataire + assignee par défaut via LEFT JOINs)
+  // 1. Récupérer les exécutions (avec nom prestataire via LEFT JOINs)
   const executionRows = await db
     .select({
       id: clientServiceExecutions.id,
@@ -368,9 +374,7 @@ export async function getExecutionsWithPrixByPrestationId(
       actif: clientServiceExecutions.actif,
       modePilotage: clientServiceExecutions.modePilotage,
       tacheListeTemplateId: clientServiceExecutions.tacheListeTemplateId,
-      assigneeUserIdDefault: clientServiceExecutions.assigneeUserIdDefault,
-      assigneeDefaultPrenom: assigneeDefaultUser.prenom,
-      assigneeDefaultNom: assigneeDefaultUser.nom,
+      tacheListeTemplateName: tacheListesTemplates.nom,
       createdAt: clientServiceExecutions.createdAt,
     })
     .from(clientServiceExecutions)
@@ -380,27 +384,67 @@ export async function getExecutionsWithPrixByPrestationId(
     )
     .leftJoin(entreprises, eq(entreprises.id, serviceEntreprises.entrepriseId))
     .leftJoin(
-      assigneeDefaultUser,
-      eq(assigneeDefaultUser.id, clientServiceExecutions.assigneeUserIdDefault),
+      tacheListesTemplates,
+      eq(tacheListesTemplates.id, clientServiceExecutions.tacheListeTemplateId),
     )
     .where(eq(clientServiceExecutions.clientServiceId, prestationId))
     .orderBy(desc(clientServiceExecutions.priorite), asc(clientServiceExecutions.createdAt));
 
   if (executionRows.length === 0) return [];
 
-  // 2. Récupérer tous les prix pour ces exécutions
+  // 2. Récupérer les items des checklists assignées
+  const templateIds = [
+    ...new Set(
+      executionRows
+        .map((e) => e.tacheListeTemplateId)
+        .filter((id): id is string => id !== null),
+    ),
+  ];
+  const itemsByTemplate = new Map<string, ExecutionChecklistItem[]>();
+  if (templateIds.length > 0) {
+    const itemRows = await db
+      .select({
+        id: tacheListeItems.id,
+        templateId: tacheListeItems.listeTemplateId,
+        ordre: tacheListeItems.ordre,
+        titre: tacheListeItems.titre,
+        dureeEstimeeMinutes: tacheListeItems.dureeEstimeeMinutes,
+      })
+      .from(tacheListeItems)
+      .where(
+        templateIds.length === 1
+          ? eq(tacheListeItems.listeTemplateId, templateIds[0]!)
+          : inArray(tacheListeItems.listeTemplateId, templateIds),
+      )
+      .orderBy(asc(tacheListeItems.ordre));
+    for (const item of itemRows) {
+      const list = itemsByTemplate.get(item.templateId) ?? [];
+      list.push({
+        id: item.id,
+        ordre: item.ordre,
+        titre: item.titre,
+        dureeEstimeeMinutes: item.dureeEstimeeMinutes,
+      });
+      itemsByTemplate.set(item.templateId, list);
+    }
+  }
+
+  // 3. Récupérer tous les prix pour ces exécutions
   const executionIds = executionRows.map((e) => e.id);
   const prixRows = await db
     .select()
     .from(clientServiceExecutionPrix)
     .where(
-      executionIds.length === 1
-        ? eq(clientServiceExecutionPrix.executionId, executionIds[0]!)
-        : or(
-            ...executionIds.map((id) =>
-              eq(clientServiceExecutionPrix.executionId, id),
+      and(
+        eq(clientServiceExecutionPrix.actif, true),
+        executionIds.length === 1
+          ? eq(clientServiceExecutionPrix.executionId, executionIds[0]!)
+          : or(
+              ...executionIds.map((id) =>
+                eq(clientServiceExecutionPrix.executionId, id),
+              ),
             ),
-          ),
+      ),
     )
     .orderBy(asc(clientServiceExecutionPrix.typePrix));
 
@@ -421,13 +465,14 @@ export async function getExecutionsWithPrixByPrestationId(
     prixByExecution.set(prix.executionId, list);
   }
 
-  // 4. Assembler
+  // 5. Assembler
   return executionRows.map((e) => ({
     ...e,
     prestataireNom: e.prestataireNom ?? null,
-    assigneeUserIdDefault: e.assigneeUserIdDefault ?? null,
-    assigneeDefaultPrenom: e.assigneeDefaultPrenom ?? null,
-    assigneeDefaultNom: e.assigneeDefaultNom ?? null,
+    tacheListeTemplateName: e.tacheListeTemplateName ?? null,
+    tacheListeItems: e.tacheListeTemplateId
+      ? (itemsByTemplate.get(e.tacheListeTemplateId) ?? [])
+      : [],
     prix: prixByExecution.get(e.id) ?? [],
   }));
 }

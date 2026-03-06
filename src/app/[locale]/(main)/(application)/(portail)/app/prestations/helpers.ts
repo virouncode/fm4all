@@ -102,13 +102,13 @@ export function getModePlanningBadge(mode: ClientServiceModePlanningType): {
   switch (mode) {
     case "planifie":
       return {
-        label: "Planifié",
+        label: "Mode : Planifié",
         className:
           "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
       };
     case "a_la_demande":
       return {
-        label: "À la demande",
+        label: "Mode : À la demande",
         className:
           "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
       };
